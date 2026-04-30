@@ -74,21 +74,14 @@ jobs:
         with:
           fetch-depth: 0 # include all history for GitVersion
 
-      # Built-in caching is broken for Yarn, using setup-node twice
-      # See https://github.com/actions/setup-node/issues/531#issuecomment-3335630863
       - name: "Setup Node.js"
-        uses: "actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f" # v6.3.0
+        uses: "actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e" # v6.4.0
         with:
           node-version-file: ".node-version"
           package-manager-cache: false
 
       - name: "Enable Corepack"
         run: "corepack enable"
-
-      - name: "Setup Yarn cache"
-        uses: "actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f" # v6.3.0
-        with:
-          cache: "yarn"
 
       - name: "Setup .NET SDK"
         uses: "actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7" # v5.2.0
@@ -189,7 +182,7 @@ jobs:
           artifact-ids: ${{ needs.build-and-validate.outputs.artifact-id }}
 
       - name: "NuGet login (OIDC → temp API key)"
-        uses: "NuGet/login@d22cc5f58ff5b88bf9bd452535b4335137e24544" # v1
+        uses: "NuGet/login@8d196754b4036150537f80ac539e15c2f1028841" # v1.2.0
         id: "nuget-login"
         with:
           user: ${{ secrets.NUGET_USER }}
