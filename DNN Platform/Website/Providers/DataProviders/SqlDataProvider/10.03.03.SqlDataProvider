@@ -24,11 +24,9 @@ WHERE ps.SettingName = 'PageHeadText'
         AND psExisting.SettingName = 'PageHeaderTag_Default');
 GO
 
--- Reset legacy PageHeadText to 'false' after migration
-UPDATE {databaseOwner}[{objectQualifier}PortalSettings] 
-SET SettingValue = 'false'
+-- Delete legacy PageHeadText records after migration
+DELETE FROM {databaseOwner}[{objectQualifier}PortalSettings]
 WHERE SettingName = 'PageHeadText'
-  AND ISNULL(SettingValue, '') NOT IN ('', 'false');
 GO
 
 -- Migrate Tab-level PageHeadText to TabSettings
