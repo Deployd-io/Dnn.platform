@@ -20,6 +20,8 @@ namespace Dnn.PersonaBar.Themes.Components
     using DotNetNuke.Services.Exceptions;
     using DotNetNuke.UI.Skins;
 
+    using Microsoft.Extensions.Logging;
+
     using Image = System.Drawing.Image;
 
     public class ThemesController : ServiceLocator<IThemesController, ThemesController>, IThemesController
@@ -28,7 +30,7 @@ namespace Dnn.PersonaBar.Themes.Components
 
         internal static readonly IList<string> DefaultLayoutNames = new List<string>() { "Default", "2-Col", "Home", "Index", "Main" };
         internal static readonly IList<string> DefaultContainerNames = new List<string>() { "Title-h2", "NoTitle", "Main", "Default" };
-        private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ThemesController));
+        private static readonly ILogger Logger = DnnLoggingController.GetLogger<ThemesController>();
 
         private static readonly object ThreadLocker = new object();
 
@@ -433,7 +435,7 @@ namespace Dnn.PersonaBar.Themes.Components
                         catch (Exception ex)
                         {
                             // problem creating thumbnail
-                            Logger.Error(ex);
+                            Logger.ComponentsThemesControllerCreateThumbnailException(ex);
                         }
                     }
                 }
@@ -666,7 +668,7 @@ namespace Dnn.PersonaBar.Themes.Components
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex);
+                    Logger.ComponentsThemesControllerUpdateManifestException(ex);
                 }
             }
         }

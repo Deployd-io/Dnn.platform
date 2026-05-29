@@ -28,6 +28,7 @@ namespace DotNetNuke.Modules.Journal
     using DotNetNuke.Web.Api;
 
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>A web API controller for the Journal module.</summary>
     /// <param name="hostSettings">The host settings.</param>
@@ -40,7 +41,7 @@ namespace DotNetNuke.Modules.Journal
         private const string MentionIdentityChar = "@";
         private const int MentionNotificationLength = 100;
 
-        private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ServicesController));
+        private static readonly ILogger Logger = DnnLoggingController.GetLogger<ServicesController>();
         private static readonly string[] AcceptedFileExtensions = ["jpg", "png", "gif", "jpe", "jpeg", "tiff", "bmp",];
 
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
@@ -82,7 +83,7 @@ namespace DotNetNuke.Modules.Journal
             }
             catch (Exception exc)
             {
-                Logger.Error(exc);
+                Logger.ServicesControllerCreateException(exc);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -112,7 +113,7 @@ namespace DotNetNuke.Modules.Journal
             }
             catch (Exception exc)
             {
-                Logger.Error(exc);
+                Logger.ServicesControllerDeleteException(exc);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -142,7 +143,7 @@ namespace DotNetNuke.Modules.Journal
             }
             catch (Exception exc)
             {
-                Logger.Error(exc);
+                Logger.ServicesControllerSoftDeleteException(exc);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -159,7 +160,7 @@ namespace DotNetNuke.Modules.Journal
             }
             catch (Exception exc)
             {
-                Logger.Error(exc);
+                Logger.ServicesControllerPreviewUrlException(exc);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -175,7 +176,7 @@ namespace DotNetNuke.Modules.Journal
             }
             catch (Exception exc)
             {
-                Logger.Error(exc);
+                Logger.ServicesControllerGetListForProfileException(exc);
                 throw new HttpException(500, exc.Message);
             }
         }
@@ -197,7 +198,7 @@ namespace DotNetNuke.Modules.Journal
             }
             catch (Exception exc)
             {
-                Logger.Error(exc);
+                Logger.ServicesControllerLikeException(exc);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -228,7 +229,7 @@ namespace DotNetNuke.Modules.Journal
             }
             catch (Exception exc)
             {
-                Logger.Error(exc);
+                Logger.ServicesControllerCommentSaveException(exc);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -263,7 +264,7 @@ namespace DotNetNuke.Modules.Journal
             }
             catch (Exception exc)
             {
-                Logger.Error(exc);
+                Logger.ServicesControllerCommentDeleteException(exc);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -302,7 +303,7 @@ namespace DotNetNuke.Modules.Journal
             }
             catch (Exception exc)
             {
-                Logger.Error(exc);
+                Logger.ServicesControllerGetSuggestionsException(exc);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }

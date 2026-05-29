@@ -38,6 +38,7 @@ namespace DotNetNuke.Web.InternalServices
     using DotNetNuke.Web.Api.Internal;
 
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>A web API for the control bar.</summary>
     /// <param name="businessControllerProvider">The business controller provider.</param>
@@ -54,7 +55,7 @@ namespace DotNetNuke.Web.InternalServices
         : DnnApiController
     {
         private const string DefaultExtensionImage = "icon_extensions_32px.png";
-        private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ControlBarController));
+        private static readonly ILogger Logger = DnnLoggingController.GetLogger<ControlBarController>();
         private readonly IBusinessControllerProvider businessControllerProvider = businessControllerProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<IBusinessControllerProvider>();
         private readonly PersonalizationController personalizationController = personalizationController ?? Globals.GetCurrentServiceProvider().GetRequiredService<PersonalizationController>();
         private readonly IApplicationStatusInfo appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
@@ -265,7 +266,7 @@ namespace DotNetNuke.Web.InternalServices
                 }
                 catch (Exception exc)
                 {
-                    Logger.Error(exc);
+                    Logger.ControlBarControllerParseVisibilityException(exc);
                     permissionType = 0;
                 }
 
@@ -282,7 +283,7 @@ namespace DotNetNuke.Web.InternalServices
                     }
                     catch (Exception exc)
                     {
-                        Logger.Error(exc);
+                        Logger.ControlBarControllerParseSortException(exc);
                     }
                 }
 
@@ -308,7 +309,7 @@ namespace DotNetNuke.Web.InternalServices
                 }
                 catch (Exception exc)
                 {
-                    Logger.Error(exc);
+                    Logger.ControlBarControllerParseModuleIdException(exc);
                     moduleLstId = -1;
                 }
 
@@ -326,7 +327,7 @@ namespace DotNetNuke.Web.InternalServices
                             }
                             catch (Exception exc)
                             {
-                                Logger.Error(exc);
+                                Logger.ControlBarControllerParsePageIdException(exc);
                                 pageId = -1;
                             }
 
@@ -345,7 +346,7 @@ namespace DotNetNuke.Web.InternalServices
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex);
+                    Logger.ControlBarControllerAddModuleException(ex);
                 }
             }
 

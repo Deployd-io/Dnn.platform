@@ -19,12 +19,13 @@ namespace DotNetNuke.Web.InternalServices
     using DotNetNuke.Web.Api;
 
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>A web API which gets event log details.</summary>
     [DnnAuthorize]
     public class EventLogServiceController : DnnApiController
     {
-        private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(EventLogServiceController));
+        private static readonly ILogger Logger = DnnLoggingController.GetLogger<EventLogServiceController>();
         private readonly IEventLogService eventLogService;
 
         /// <summary>Initializes a new instance of the <see cref="EventLogServiceController"/> class.</summary>
@@ -69,7 +70,7 @@ namespace DotNetNuke.Web.InternalServices
             }
             catch (Exception ex)
             {
-                Logger.Error(ex);
+                Logger.EventLogServiceControllerGetLogDetailsException(ex);
                 return this.Request.CreateResponse(HttpStatusCode.BadRequest);
             }
         }

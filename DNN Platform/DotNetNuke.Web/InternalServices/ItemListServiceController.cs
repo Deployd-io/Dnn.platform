@@ -32,6 +32,7 @@ namespace DotNetNuke.Web.InternalServices
     using DotNetNuke.Web.Common;
 
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
 
     using Globals = DotNetNuke.Common.Globals;
 
@@ -49,7 +50,7 @@ namespace DotNetNuke.Web.InternalServices
     {
         private const string PortalPrefix = "P-";
         private const string RootKey = "Root";
-        private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ItemListServiceController));
+        private static readonly ILogger Logger = DnnLoggingController.GetLogger<ItemListServiceController>();
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
         private readonly DataProvider dataProvider = dataProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<DataProvider>();
         private readonly IPortalController portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
@@ -484,7 +485,7 @@ namespace DotNetNuke.Web.InternalServices
             }
             catch (Exception exc)
             {
-                Logger.Error(exc);
+                Logger.ItemListServiceControllerSearchUserException(exc);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }

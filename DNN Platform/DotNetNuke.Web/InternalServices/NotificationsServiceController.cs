@@ -16,11 +16,13 @@ namespace DotNetNuke.Web.InternalServices
     using DotNetNuke.Services.Social.Notifications;
     using DotNetNuke.Web.Api;
 
+    using Microsoft.Extensions.Logging;
+
     /// <summary>A web API controller for notifications.</summary>
     [DnnAuthorize]
     public class NotificationsServiceController : DnnApiController
     {
-        private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(NotificationsServiceController));
+        private static readonly ILogger Logger = DnnLoggingController.GetLogger<NotificationsServiceController>();
 
         /// <summary>Dismisses a notification.</summary>
         /// <param name="postData">Information about the notification.</param>
@@ -42,7 +44,7 @@ namespace DotNetNuke.Web.InternalServices
             }
             catch (Exception exc)
             {
-                Logger.Error(exc);
+                Logger.NotificationsServiceControllerDismissException(exc);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }

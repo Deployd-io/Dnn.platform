@@ -20,6 +20,7 @@ namespace DotNetNuke.Web.InternalServices
     using DotNetNuke.Web.Api;
 
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>A web API controller for relationships.</summary>
     /// <param name="hostSettings">The host settings.</param>
@@ -27,7 +28,7 @@ namespace DotNetNuke.Web.InternalServices
     public class RelationshipServiceController(IHostSettings hostSettings)
         : DnnApiController
     {
-        private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RelationshipServiceController));
+        private static readonly ILogger Logger = DnnLoggingController.GetLogger<RelationshipServiceController>();
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
 
         /// <summary>Initializes a new instance of the <see cref="RelationshipServiceController"/> class.</summary>
@@ -66,7 +67,7 @@ namespace DotNetNuke.Web.InternalServices
             }
             catch (Exception exc)
             {
-                Logger.Error(exc);
+                Logger.RelationshipServiceControllerAcceptFriendException(exc);
             }
 
             if (success)
@@ -116,7 +117,7 @@ namespace DotNetNuke.Web.InternalServices
             }
             catch (UserRelationshipExistsException exc)
             {
-                Logger.Error(exc);
+                Logger.RelationshipServiceControllerFollowBackUserRelationshipExistsException(exc);
                 var response = new
                 {
                     Message = Localization.GetExceptionMessage(
@@ -127,7 +128,7 @@ namespace DotNetNuke.Web.InternalServices
             }
             catch (Exception exc)
             {
-                Logger.Error(exc);
+                Logger.RelationshipServiceControllerFollowBackGeneralException(exc);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc.Message);
             }
 

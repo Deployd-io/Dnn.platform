@@ -29,11 +29,12 @@ namespace Dnn.Modules.Console
     using DotNetNuke.Services.Localization;
     using DotNetNuke.Services.Personalization;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>Implements the module view logic.</summary>
     public partial class ViewConsole : PortalModuleBase
     {
-        private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ViewConsole));
+        private static readonly ILogger Logger = DnnLoggingController.GetLogger<ViewConsole>();
         private readonly INavigationManager navigationManager;
         private readonly IJavaScriptLibraryHelper javaScript;
         private readonly IClientResourceController clientResourceController;
@@ -485,7 +486,7 @@ namespace Dnn.Modules.Console
                 }
                 catch (Exception exc)
                 {
-                    Logger.Error(exc);
+                    Logger.ViewConsoleParseConsoleModuleIdException(exc);
 
                     consoleModuleID = -1;
                 }
