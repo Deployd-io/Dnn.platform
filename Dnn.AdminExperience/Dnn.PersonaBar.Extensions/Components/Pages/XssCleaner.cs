@@ -25,6 +25,13 @@ public static class XssCleaner
         input.Alias = Clean(input.Alias);
         input.LocalizedName = Clean(input.LocalizedName);
         input.PageStyleSheet = Clean(input.PageStyleSheet);
+        if (input.PageHeaderTags != null)
+        {
+            foreach (var item in input.PageHeaderTags)
+            {
+                item.Name = Clean(item.Name);
+            }
+        }
     }
 
     /// <summary>Cleans <see cref="BulkPage"/> input.</summary>
@@ -50,23 +57,6 @@ public static class XssCleaner
     {
         foreach (var locale in input.Locales)
         {
-            input.Title = Clean(input.Title);
-            input.Description = Clean(input.Description);
-            input.Name = Clean(input.Name);
-            input.Keywords = Clean(input.Keywords);
-            input.Tags = Clean(input.Tags);
-            input.Url = Clean(input.Url);
-            input.PageType = Clean(input.PageType);
-            input.Alias = Clean(input.Alias);
-            input.LocalizedName = Clean(input.LocalizedName);
-            input.PageStyleSheet = Clean(input.PageStyleSheet);
-            if (input.PageHeaderTags != null)
-            {
-                foreach (var item in input.PageHeaderTags)
-                {
-                    item.Name = Clean(item.Name);
-                }
-            }
             locale.Clean();
         }
 
