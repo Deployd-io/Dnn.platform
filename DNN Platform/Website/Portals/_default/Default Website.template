@@ -24,7 +24,9 @@
     <hostspace>0</hostspace>
     <userquota>0</userquota>
     <pagequota>0</pagequota>
-    <pageheadtext>&lt;meta content="text/html; charset=UTF-8" http-equiv="Content-Type" /&gt;</pageheadtext>
+    <pageheadertags>
+      <pageheadertag name="Default"><![CDATA[<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />]]></pageheadertag>
+    </pageheadertags>
     <injectmodulehyperlink>True</injectmodulehyperlink>
     <addcompatiblehttpheader>IE=edge</addcompatiblehttpheader>
     <sitemapcachedays>1</sitemapcachedays>
@@ -436,7 +438,6 @@
       <visible>false</visible>
       <issystem>false</issystem>
       <keywords />
-      <pageheadtext />
       <permanentredirect>false</permanentredirect>
       <refreshinterval>-1</refreshinterval>
       <sitemappriority>0.5</sitemappriority>
@@ -759,7 +760,6 @@
       <visible>true</visible>
       <issystem>false</issystem>
       <keywords />
-      <pageheadtext />
       <permanentredirect>false</permanentredirect>
       <refreshinterval>-1</refreshinterval>
       <sitemappriority>0.5</sitemappriority>
@@ -813,7 +813,6 @@
       <visible>true</visible>
       <issystem>false</issystem>
       <keywords />
-      <pageheadtext />
       <permanentredirect>false</permanentredirect>
       <refreshinterval>-1</refreshinterval>
       <sitemappriority>0.5</sitemappriority>
@@ -867,7 +866,6 @@
       <visible>true</visible>
       <issystem>false</issystem>
       <keywords />
-      <pageheadtext />
       <permanentredirect>false</permanentredirect>
       <refreshinterval>-1</refreshinterval>
       <sitemappriority>0.5</sitemappriority>
@@ -921,7 +919,6 @@
       <visible>true</visible>
       <issystem>false</issystem>
       <keywords />
-      <pageheadtext />
       <permanentredirect>false</permanentredirect>
       <refreshinterval>-1</refreshinterval>
       <sitemappriority>0.5</sitemappriority>
@@ -975,7 +972,6 @@
       <visible>false</visible>
       <issystem>false</issystem>
       <keywords />
-      <pageheadtext />
       <permanentredirect>false</permanentredirect>
       <refreshinterval>-1</refreshinterval>
       <sitemappriority>0.5</sitemappriority>
@@ -1461,7 +1457,6 @@
       <visible>false</visible>
       <issystem>false</issystem>
       <keywords />
-      <pageheadtext />
       <permanentredirect>false</permanentredirect>
       <refreshinterval>-1</refreshinterval>
       <sitemappriority>0.5</sitemappriority>
@@ -1561,7 +1556,6 @@
       <visible>false</visible>
       <issystem>false</issystem>
       <keywords />
-      <pageheadtext />
       <permanentredirect>false</permanentredirect>
       <refreshinterval>-1</refreshinterval>
       <sitemappriority>0</sitemappriority>
@@ -1707,7 +1701,6 @@
       <visible>true</visible>
       <issystem>false</issystem>
       <keywords />
-      <pageheadtext />
       <permanentredirect>false</permanentredirect>
       <refreshinterval>-1</refreshinterval>
       <sitemappriority>0.5</sitemappriority>
@@ -2205,7 +2198,6 @@
       <visible>true</visible>
       <issystem>false</issystem>
       <keywords />
-      <pageheadtext />
       <permanentredirect>false</permanentredirect>
       <refreshinterval>-1</refreshinterval>
       <sitemappriority>0.5</sitemappriority>
@@ -2702,7 +2694,6 @@
       <visible>true</visible>
       <issystem>false</issystem>
       <keywords />
-      <pageheadtext />
       <permanentredirect>false</permanentredirect>
       <refreshinterval>-1</refreshinterval>
       <sitemappriority>0.5</sitemappriority>
@@ -3170,7 +3161,6 @@
       <visible>false</visible>
       <issystem>false</issystem>
       <keywords />
-      <pageheadtext />
       <permanentredirect>false</permanentredirect>
       <refreshinterval>-1</refreshinterval>
       <sitemappriority>0.5</sitemappriority>
@@ -3291,7 +3281,6 @@
       <visible>true</visible>
       <issystem>false</issystem>
       <keywords />
-      <pageheadtext />
       <permanentredirect>false</permanentredirect>
       <refreshinterval>-1</refreshinterval>
       <sitemappriority>0.5</sitemappriority>
@@ -3380,7 +3369,6 @@
           <visible>false</visible>
           <issystem>false</issystem>
           <keywords />
-          <pageheadtext />
           <permanentredirect>false</permanentredirect>
           <refreshinterval>-1</refreshinterval>
           <sitemappriority>0.5</sitemappriority>
