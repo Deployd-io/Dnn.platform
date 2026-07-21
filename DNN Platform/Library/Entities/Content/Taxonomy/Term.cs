@@ -47,6 +47,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
     [Serializable]
     public class Term : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly PortalSecurity Security = PortalSecurity.Instance;
         private readonly List<string> synonyms = new List<string>();
 
@@ -65,6 +66,11 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         public Term()
             : this(Null.NullString, Null.NullString, Null.NullInteger)
         {
+		Logger.LogDebug(">>> Entering Term()");
+		Logger.LogDebug("<<< Exiting Term()");
+		Logger.LogDebug(">>> Entering Term(vocabularyId={VocabularyId})", vocabularyId);
+		Logger.LogDebug("<<< Exiting Term(vocabularyId={VocabularyId})", vocabularyId);
+		Logger.LogDebug(">>> Entering Term(name={Name})", name);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Term"/> class.</summary>
@@ -79,6 +85,8 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         public Term(string name)
             : this(name, Null.NullString, Null.NullInteger)
         {
+		Logger.LogDebug("<<< Exiting Term(name={Name})", name);
+		Logger.LogDebug("Term(name={Name},description={Description},vocabularyId={VocabularyId}): vocabularyId → {VocabularyId1}", name, description, vocabularyId, vocabularyId);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Term"/> class.</summary>
@@ -97,13 +105,23 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         {
             this.Description = description;
             this.Name = name;
+			Logger.LogDebug("Term(name={Name},description={Description},vocabularyId={VocabularyId}): this.Description → {Arg3}", name, description, vocabularyId, this.Description);
+			Logger.LogDebug("Term(name={Name},description={Description},vocabularyId={VocabularyId}): this.Name → {Arg3}", name, description, vocabularyId, this.Name);
             this.vocabularyId = vocabularyId;
 
             this.ParentTermId = null;
+			Logger.LogDebug("Term(name={Name},description={Description},vocabularyId={VocabularyId}): this.vocabularyId → {Arg3}", name, description, vocabularyId, this.vocabularyId);
+			Logger.LogDebug("Term(name={Name},description={Description},vocabularyId={VocabularyId}): this.ParentTermId → {Arg3}", name, description, vocabularyId, this.ParentTermId);
             this.TermId = Null.NullInteger;
             this.left = 0;
             this.right = 0;
             this.Weight = 0;
+			Logger.LogDebug("Term(name={Name},description={Description},vocabularyId={VocabularyId}): this.TermId → {Arg3}", name, description, vocabularyId, this.TermId);
+			Logger.LogDebug("Term(name={Name},description={Description},vocabularyId={VocabularyId}): left → {Left}", name, description, vocabularyId, left);
+			Logger.LogDebug("Term(name={Name},description={Description},vocabularyId={VocabularyId}): this.left → {Arg3}", name, description, vocabularyId, this.left);
+			Logger.LogDebug("Term(name={Name},description={Description},vocabularyId={VocabularyId}): right → {Right}", name, description, vocabularyId, right);
+			Logger.LogDebug("Term(name={Name},description={Description},vocabularyId={VocabularyId}): this.right → {Arg3}", name, description, vocabularyId, this.right);
+			Logger.LogDebug("Term(name={Name},description={Description},vocabularyId={VocabularyId}): this.Weight → {Arg3}", name, description, vocabularyId, this.Weight);
         }
 
         [XmlIgnore]
@@ -304,8 +322,10 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         /// <inheritdoc />
         public virtual void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.TermId = Null.SetNullInteger(dr["TermID"]);
             this.Name = Null.SetNullString(dr["Name"]);
+			Logger.LogDebug("Fill(dr={Dr}): vocabularyId → {VocabularyId}", dr, vocabularyId);
             this.Description = Null.SetNullString(dr["Description"]);
             this.Weight = Null.SetNullInteger(dr["Weight"]);
             this.vocabularyId = Null.SetNullInteger(dr["VocabularyID"]);
@@ -313,11 +333,13 @@ namespace DotNetNuke.Entities.Content.Taxonomy
             if (dr["TermLeft"] != DBNull.Value)
             {
                 this.left = Convert.ToInt32(dr["TermLeft"], CultureInfo.InvariantCulture);
+				Logger.LogDebug("Fill(dr={Dr}): left → {Left}", dr, left);
             }
 
             if (dr["TermRight"] != DBNull.Value)
             {
                 this.right = Convert.ToInt32(dr["TermRight"], CultureInfo.InvariantCulture);
+				Logger.LogDebug("Fill(dr={Dr}): right → {Right}", dr, right);
             }
 
             if (dr["ParentTermID"] != DBNull.Value)
@@ -327,24 +349,30 @@ namespace DotNetNuke.Entities.Content.Taxonomy
 
             // Fill base class properties
             this.FillInternal(dr);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
 
         public string GetTermPath()
         {
+			Logger.LogDebug(">>> Entering GetTermPath()");
             string path = $@"\\{this.Name}";
 
+			Logger.LogDebug("GetTermPath(): path → {Path}", path);
             if (this.ParentTermId.HasValue)
             {
                 ITermController ctl = Util.GetTermController();
 
+				Logger.LogDebug("GetTermPath(): ctl → {Ctl}", ctl);
                 Term parentTerm = (from t in ctl.GetTermsByVocabulary(this.VocabularyId) where t.TermId == this.ParentTermId select t).SingleOrDefault();
 
+				Logger.LogDebug("GetTermPath(): parentTerm → {ParentTerm}", parentTerm);
                 if (parentTerm != null)
                 {
                     path = parentTerm.GetTermPath() + path;
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetTermPath()");
             return path;
         }
     }

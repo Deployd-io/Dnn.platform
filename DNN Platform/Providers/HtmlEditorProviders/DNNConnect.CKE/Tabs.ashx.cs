@@ -28,11 +28,17 @@ namespace DNNConnect.CKEditorProvider
     public class Tabs(IPortalController portalController, IHostSettings hostSettings, IApplicationStatusInfo appStatus)
         : PortalModuleBase, IHttpHandler
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IPortalController portalController = portalController ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IPortalController>();
+		Logger.LogDebug(">>> Entering Tabs(portalController={PortalController},hostSettings={HostSettings},appStatus={AppStatus})", portalController, hostSettings, appStatus);
+		Logger.LogDebug("Tabs(portalController={PortalController},hostSettings={HostSettings},appStatus={AppStatus}): portalController → {PortalController1}", portalController, hostSettings, appStatus, portalController);
         private readonly IHostSettings hostSettings = hostSettings ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IHostSettings>();
         private readonly IApplicationStatusInfo appStatus = appStatus ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IApplicationStatusInfo>();
+		Logger.LogDebug("Tabs(portalController={PortalController},hostSettings={HostSettings},appStatus={AppStatus}): hostSettings → {HostSettings1}", portalController, hostSettings, appStatus, hostSettings);
+		Logger.LogDebug("Tabs(portalController={PortalController},hostSettings={HostSettings},appStatus={AppStatus}): appStatus → {AppStatus1}", portalController, hostSettings, appStatus, appStatus);
 
         /// <summary>Initializes a new instance of the <see cref="Tabs"/> class.</summary>
+		Logger.LogDebug("<<< Exiting Tabs(portalController={PortalController},hostSettings={HostSettings},appStatus={AppStatus})", portalController, hostSettings, appStatus);
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IPortalController. Scheduled removal in v12.0.0.")]
         public Tabs()
             : this(null)
@@ -55,26 +61,32 @@ namespace DNNConnect.CKEditorProvider
         /// <param name="context">An <see cref="T:System.Web.HttpContext"/> object that provides references to the intrinsic server objects (for example, Request, Response, Session, and Server) used to service HTTP requests.</param>
         public void ProcessRequest(HttpContext context)
         {
+			Logger.LogDebug(">>> Entering ProcessRequest(context={Context})", context);
             var portalId = this.PortalSettings.PortalId;
 
             // Generate Pages Array
             var pagesArray = new StringBuilder();
 
+			Logger.LogDebug("ProcessRequest(context={Context}): pagesArray → {PagesArray}", context, pagesArray);
             pagesArray.Append("var dnnpagesSelectBox = new Array(");
 
+			Logger.LogDebug("ProcessRequest(context={Context}): dnnpagesSelectBox → {DnnpagesSelectBox}", context, dnnpagesSelectBox);
             var domainName = $"http://{Globals.GetDomainName(context.Request, true)}";
 
+			Logger.LogDebug("ProcessRequest(context={Context}): domainName → {DomainName}", context, domainName);
             foreach (TabInfo tab in TabController.GetPortalTabs(this.hostSettings, this.appStatus, portalId, -1, false, null, true, false, true, true, true))
             {
                 var tabUrl = PortalController.GetPortalSettingAsBoolean(this.portalController, "ContentLocalizationEnabled", portalId, false)
                                 && !string.IsNullOrEmpty(tab.CultureCode)
                                     ? Globals.FriendlyUrl(tab, $"{Globals.ApplicationURL(tab.TabID)}&language={tab.CultureCode}")
                                     : Globals.FriendlyUrl(tab, Globals.ApplicationURL(tab.TabID));
+									Logger.LogDebug("ProcessRequest(context={Context}): tabUrl → {TabUrl}", context, tabUrl);
 
                 tabUrl = Globals.ResolveUrl(Regex.Replace(tabUrl, domainName, "~", RegexOptions.IgnoreCase));
 
                 var tabName = GlobalObject.escape(tab.TabName);
 
+				Logger.LogDebug("ProcessRequest(context={Context}): tabName → {TabName}", context, tabName);
                 if (tab.Level.Equals(0))
                 {
                     pagesArray.AppendFormat("new Array('| {0}','{1}'),", HttpUtility.JavaScriptStringEncode(tabName), HttpUtility.JavaScriptStringEncode(tabUrl));
@@ -83,6 +95,7 @@ namespace DNNConnect.CKEditorProvider
                 {
                     var separator = new StringBuilder();
 
+					Logger.LogDebug("ProcessRequest(context={Context}): separator → {Separator}", context, separator);
                     for (int index = 0; index < tab.Level; index++)
                     {
                         separator.Append("--");
@@ -105,6 +118,7 @@ namespace DNNConnect.CKEditorProvider
 
             context.Response.ContentType = "text/javascript";
             context.Response.Write(pagesArray.ToString());
+			Logger.LogDebug("<<< Exiting ProcessRequest(context={Context})", context);
         }
     }
 }

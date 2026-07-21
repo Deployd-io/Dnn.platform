@@ -81,6 +81,8 @@ namespace log4net.Layout
         /// </remarks>
         protected LayoutSkeleton()
         {
+		Logger.DebugFormat(">>> Entering LayoutSkeleton()");
+		Logger.DebugFormat("<<< Exiting LayoutSkeleton()");
         }
 
         /// <summary>Activate component options</summary>
@@ -120,9 +122,11 @@ namespace log4net.Layout
         /// </remarks>
         public string Format(LoggingEvent loggingEvent)
         {
+			Logger.DebugFormat(">>> Entering Format(loggingEvent={0})", loggingEvent);
             using (var writer = new StringWriter(System.Globalization.CultureInfo.InvariantCulture))
             {
                 this.Format(writer, loggingEvent);
+				Logger.DebugFormat("<<< Exiting Format(loggingEvent={0})", loggingEvent);
                 return writer.ToString();
             }
         }
@@ -141,6 +145,7 @@ namespace log4net.Layout
         /// </remarks>
         public virtual string ContentType
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
             get { return "text/plain"; }
         }
 

@@ -28,6 +28,7 @@ using log4net.DateFormatter;
 
 namespace log4net.Layout.Pattern
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Write the TimeStamp to the output</summary>
     /// <remarks>
     /// <para>
@@ -62,6 +63,7 @@ namespace log4net.Layout.Pattern
         /// <seealso cref="DatePatternConverter"/>
         protected override void Convert(TextWriter writer, LoggingEvent loggingEvent)
         {
+			Logger.LogDebug(">>> Entering Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             try 
             {
                 this.m_dateFormatter.FormatDate(loggingEvent.TimeStampUtc, writer);
@@ -70,6 +72,7 @@ namespace log4net.Layout.Pattern
             {
                 LogLog.Error(declaringType, "Error occurred while converting date.", ex);
             }
+			Logger.LogDebug("<<< Exiting Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
 
         /// <summary>The fully qualified type of the UtcDatePatternConverter class.</summary>

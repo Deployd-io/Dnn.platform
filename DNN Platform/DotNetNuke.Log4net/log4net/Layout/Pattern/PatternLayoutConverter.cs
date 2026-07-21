@@ -29,6 +29,7 @@ using log4net.Repository;
 
 namespace log4net.Layout.Pattern
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Abstract class that provides the formatting functionality that 
     /// derived classes need.
@@ -44,6 +45,8 @@ namespace log4net.Layout.Pattern
         /// <summary>Initializes a new instance of the <see cref="PatternLayoutConverter" /> class.</summary>
         protected PatternLayoutConverter() 
         {  
+		Logger.LogDebug(">>> Entering PatternLayoutConverter()");
+		Logger.LogDebug("<<< Exiting PatternLayoutConverter()");
         }
 
         /// <summary>Flag indicating if this converter handles the logging event exception</summary>
@@ -82,6 +85,7 @@ namespace log4net.Layout.Pattern
         /// <param name="state">The state object on which the pattern converter should be executed.</param>
         protected override void Convert(TextWriter writer, object state)
         {
+			Logger.LogDebug(">>> Entering Convert(writer={Writer},state={State})", writer, state);
             LoggingEvent loggingEvent = state as LoggingEvent;
             if (loggingEvent != null)
             {
@@ -91,6 +95,7 @@ namespace log4net.Layout.Pattern
             {
                 throw new ArgumentException("state must be of type [" + typeof(LoggingEvent).FullName + "]", "state");
             }
+			Logger.LogDebug("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
         }
 
         /// <summary>Flag indicating if this converter handles exceptions</summary>

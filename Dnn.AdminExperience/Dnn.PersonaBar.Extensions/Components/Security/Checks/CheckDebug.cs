@@ -8,6 +8,7 @@ namespace Dnn.PersonaBar.Security.Components.Checks
 
     public class CheckDebug : IAuditCheck
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public string Id => "CheckDebug";
 
@@ -17,12 +18,14 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc />
         public CheckResult Execute()
         {
+			Logger.LogDebug(">>> Entering Execute()");
             var result = new CheckResult(SeverityEnum.Unverified, this.Id)
             {
                 Severity = HttpContext.Current.IsDebuggingEnabled
                     ? SeverityEnum.Warning
                     : SeverityEnum.Pass,
             };
+			Logger.LogDebug("<<< Exiting Execute()");
             return result;
         }
     }

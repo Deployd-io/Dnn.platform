@@ -12,9 +12,12 @@ namespace DotNetNuke.Services.FileSystem.Internal
 
     public class UserSecurityController : ServiceLocator<IUserSecurityController, UserSecurityController>, IUserSecurityController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public bool IsHostAdminUser(int portalId)
         {
+			Logger.LogDebug(">>> Entering IsHostAdminUser(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting IsHostAdminUser(portalId={PortalId})", portalId);
             return this.IsHostAdminUser(portalId, UserController.Instance.GetCurrentUserInfo().UserID);
         }
 
@@ -27,12 +30,16 @@ namespace DotNetNuke.Services.FileSystem.Internal
             }
 
             var user = UserController.Instance.GetUserById(portalId, userId);
+			Logger.LogDebug("IsHostAdminUser(portalId={PortalId},userId={UserId}): user → {User}", portalId, userId, user);
+			Logger.LogDebug("<<< Exiting IsHostAdminUser(portalId={PortalId},userId={UserId})", portalId, userId);
             return user.IsSuperUser || (portalId > Null.NullInteger && user.IsInRole(PortalController.Instance.GetPortal(portalId).AdministratorRoleName));
         }
 
         /// <inheritdoc />
         public bool HasFolderPermission(IFolderInfo folder, string permissionKey)
         {
+			Logger.LogDebug(">>> Entering HasFolderPermission(folder={Folder},permissionKey={PermissionKey})", folder, permissionKey);
+			Logger.LogDebug("<<< Exiting HasFolderPermission(folder={Folder},permissionKey={PermissionKey})", folder, permissionKey);
             return UserController.Instance.GetCurrentUserInfo().IsSuperUser ||
                    FolderPermissionController.HasFolderPermission(folder.FolderPermissions, permissionKey);
         }
@@ -40,6 +47,8 @@ namespace DotNetNuke.Services.FileSystem.Internal
         /// <inheritdoc />
         protected override System.Func<IUserSecurityController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new UserSecurityController();
         }
     }

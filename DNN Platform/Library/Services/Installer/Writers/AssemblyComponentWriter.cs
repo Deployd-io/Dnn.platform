@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// </summary>
     public class AssemblyComponentWriter : FileComponentWriter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="AssemblyComponentWriter"/> class.</summary>
         /// <param name="basePath">The assembly file base path.</param>
         /// <param name="assemblies">The assembly files.</param>

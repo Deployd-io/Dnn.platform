@@ -10,13 +10,18 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>Information about an event related to a <see cref="Term"/> being selected.</summary>
     public class TermsEventArgs : EventArgs
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly Term selectedTerm;
 
         /// <summary>Initializes a new instance of the <see cref="TermsEventArgs"/> class.</summary>
         /// <param name="selectedTerm">The selected term.</param>
         public TermsEventArgs(Term selectedTerm)
         {
+			Logger.LogDebug(">>> Entering TermsEventArgs(selectedTerm={SelectedTerm})", selectedTerm);
             this.selectedTerm = selectedTerm;
+			Logger.LogDebug("<<< Exiting TermsEventArgs(selectedTerm={SelectedTerm})", selectedTerm);
+			Logger.LogDebug("TermsEventArgs(selectedTerm={SelectedTerm}): selectedTerm → {SelectedTerm1}", selectedTerm, selectedTerm);
+			Logger.LogDebug("TermsEventArgs(selectedTerm={SelectedTerm}): this.selectedTerm → {Arg1}", selectedTerm, this.selectedTerm);
         }
 
         /// <summary>Gets the selected term.</summary>

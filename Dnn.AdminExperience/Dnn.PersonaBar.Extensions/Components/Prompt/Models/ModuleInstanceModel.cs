@@ -11,6 +11,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Models
     /// </summary>
     public class ModuleInstanceModel
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
         public int TabId;
@@ -47,6 +48,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Models
 
         public static ModuleInstanceModel FromDnnModuleInfo(DotNetNuke.Entities.Modules.ModuleInfo dnnModule)
         {
+			Logger.LogDebug(">>> Entering FromDnnModuleInfo(dnnModule={DnnModule})", dnnModule);
             var mim = new ModuleInstanceModel
             {
                 ModuleId = dnnModule.ModuleID,
@@ -62,6 +64,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Models
                 __ModuleName = $"list-modules '{dnnModule.ModuleID}'",
             };
 
+			Logger.LogDebug("<<< Exiting FromDnnModuleInfo(dnnModule={DnnModule})", dnnModule);
             return mim;
         }
     }

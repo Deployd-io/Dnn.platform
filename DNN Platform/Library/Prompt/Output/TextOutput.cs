@@ -12,11 +12,14 @@ using Newtonsoft.Json;
 /// <param name="text">The text content.</param>
 public class TextOutput(string text) : IConsoleOutput
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
+	Logger.LogDebug(">>> Entering TextOutput(text={Text})", text);
     [JsonProperty(PropertyName = "isHtml")]
     public bool IsHtml => false;
 
     /// <inheritdoc />
     [JsonProperty(PropertyName = "output")]
     public string Output => text;
+	Logger.LogDebug("<<< Exiting TextOutput(text={Text})", text);
 }

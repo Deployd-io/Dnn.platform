@@ -21,6 +21,7 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A password control.</summary>
     public class DnnFormPasswordItem : DnnFormItemBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IClientResourceController clientResourceController;
         private TextBox password;
 
@@ -29,6 +30,8 @@ namespace DotNetNuke.Web.UI.WebControls
         public DnnFormPasswordItem()
             : this(null, null, null)
         {
+		Logger.LogDebug(">>> Entering DnnFormPasswordItem()");
+		Logger.LogDebug("<<< Exiting DnnFormPasswordItem()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnFormPasswordItem"/> class.</summary>
@@ -39,6 +42,7 @@ namespace DotNetNuke.Web.UI.WebControls
             : base(appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>(), eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>())
         {
             this.clientResourceController = clientResourceController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>();
+			Logger.LogDebug("DnnFormPasswordItem(appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController}): clientResourceController → {ClientResourceController1}", appStatus, eventLogger, clientResourceController, clientResourceController);
         }
 
         /// <summary>Gets or sets the CSS class for the text box.</summary>
@@ -58,8 +62,10 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc cref="DnnFormItemBase.CreateControlInternal"/>
         protected override WebControl CreateControlInternal(Control container)
         {
+			Logger.LogDebug(">>> Entering CreateControlInternal(container={Container})", container);
             this.password = new TextBox()
             {
+				Logger.LogWarning("CreateControlInternal(container={Container}): password → {Password}", container, password);
                 ID = this.ID + "_TextBox",
                 TextMode = TextBoxMode.Password,
                 CssClass = this.TextBoxCssClass,
@@ -72,18 +78,21 @@ namespace DotNetNuke.Web.UI.WebControls
 
             var passwordContainer = new Panel() { ID = "passwordContainer", CssClass = this.ContainerCssClass };
 
+			Logger.LogDebug("CreateControlInternal(container={Container}): passwordContainer → {PasswordContainer}", container, passwordContainer);
             // add control hierarchy to the container
             container.Controls.Add(passwordContainer);
 
             passwordContainer.Controls.Add(this.password);
 
             // return input control that can be used for validation
+			Logger.LogDebug("<<< Exiting CreateControlInternal(container={Container})", container);
             return this.password;
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
             this.clientResourceController.RegisterScript("~/Resources/Shared/scripts/dnn.jquery.extensions.js");
             this.clientResourceController.RegisterScript("~/Resources/Shared/scripts/dnn.jquery.tooltip.js");
@@ -92,15 +101,19 @@ namespace DotNetNuke.Web.UI.WebControls
             this.clientResourceController.RegisterStylesheet("~/Resources/Shared/stylesheets/dnn.PasswordStrength.css", FileOrder.Css.ResourceCss);
 
             JavaScript.RequestRegistration(this.AppStatus, this.EventLogger, this.PortalSettings, CommonJs.DnnPlugins);
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             var options = new DnnPaswordStrengthOptions();
             var optionsAsJsonString = Json.Serialize(options);
+			Logger.LogDebug("OnPreRender(e={E}): options → {Options}", e, options);
+			Logger.LogDebug("OnPreRender(e={E}): optionsAsJsonString → {OptionsAsJsonString}", e, optionsAsJsonString);
             var script =
                 $"dnn.initializePasswordStrength('.{this.TextBoxCssClass}', {optionsAsJsonString});{Environment.NewLine}";
 
@@ -113,11 +126,14 @@ namespace DotNetNuke.Web.UI.WebControls
             {
                 this.Page.ClientScript.RegisterStartupScript(this.GetType(), "PasswordStrength", script, true);
             }
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private void TextChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering TextChanged(sender={Sender},e={E})", sender, e);
             this.UpdateDataSource(this.Value, this.password.Text, this.DataField);
+			Logger.LogDebug("<<< Exiting TextChanged(sender={Sender},e={E})", sender, e);
         }
     }
 }

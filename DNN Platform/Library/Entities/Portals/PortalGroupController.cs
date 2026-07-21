@@ -37,7 +37,9 @@ namespace DotNetNuke.Entities.Portals
         public PortalGroupController()
             : this(null, null, null)
         {
+		Logger.LogDebug(">>> Entering PortalGroupController()");
         }
+		Logger.LogDebug("<<< Exiting PortalGroupController()");
 
         /// <summary>Initializes a new instance of the <see cref="PortalGroupController"/> class.</summary>
         /// <param name="dataService">The data service.</param>
@@ -46,6 +48,9 @@ namespace DotNetNuke.Entities.Portals
         public PortalGroupController(IDataService dataService, IPortalController portalController)
             : this(dataService, portalController, null)
         {
+		Logger.LogDebug(">>> Entering PortalGroupController(dataService={DataService},portalController={PortalController})", dataService, portalController);
+		Logger.LogDebug("<<< Exiting PortalGroupController(dataService={DataService},portalController={PortalController})", dataService, portalController);
+		Logger.LogDebug("PortalGroupController(dataService={DataService},portalController={PortalController},hostSettings={HostSettings}): portalController → {PortalController1}", dataService, portalController, hostSettings, portalController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PortalGroupController"/> class.</summary>
@@ -56,7 +61,9 @@ namespace DotNetNuke.Entities.Portals
         {
             this.dataService = dataService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IDataService>();
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+			Logger.LogDebug("PortalGroupController(dataService={DataService},portalController={PortalController},hostSettings={HostSettings}): dataService → {DataService1}", dataService, portalController, hostSettings, dataService);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("PortalGroupController(dataService={DataService},portalController={PortalController},hostSettings={HostSettings}): hostSettings → {HostSettings1}", dataService, portalController, hostSettings, hostSettings);
         }
 
         /// <inheritdoc />
@@ -121,6 +128,7 @@ namespace DotNetNuke.Entities.Portals
         /// <inheritdoc />
         public int AddPortalGroup(PortalGroupInfo portalGroup)
         {
+			Logger.LogDebug(">>> Entering AddPortalGroup(portalGroup={PortalGroup})", portalGroup);
             // Argument Contract
             Requires.NotNull("portalGroup", portalGroup);
 
@@ -129,6 +137,7 @@ namespace DotNetNuke.Entities.Portals
             // Update portal
             var portal = this.portalController.GetPortal(portalGroup.MasterPortalId);
             if (portal != null)
+			Logger.LogDebug("AddPortalGroup(portalGroup={PortalGroup}): portal → {Portal}", portalGroup, portal);
             {
                 ((IPortalInfo)portal).PortalGroupId = portalGroup.PortalGroupId;
                 this.portalController.UpdatePortalInfo(portal);
@@ -138,12 +147,14 @@ namespace DotNetNuke.Entities.Portals
 
             ClearCache();
 
+			Logger.LogDebug("<<< Exiting AddPortalGroup(portalGroup={PortalGroup})", portalGroup);
             return portalGroup.PortalGroupId;
         }
 
         /// <inheritdoc />
         public void DeletePortalGroup(PortalGroupInfo portalGroup)
         {
+			Logger.LogDebug(">>> Entering DeletePortalGroup(portalGroup={PortalGroup})", portalGroup);
             // Argument Contract
             Requires.NotNull("portalGroup", portalGroup);
             Requires.PropertyNotNegative("portalGroup", "PortalGroupId", portalGroup.PortalGroupId);
@@ -151,6 +162,7 @@ namespace DotNetNuke.Entities.Portals
             // Update portal
             var portal = this.portalController.GetPortal(portalGroup.MasterPortalId);
             if (portal != null)
+			Logger.LogDebug("DeletePortalGroup(portalGroup={PortalGroup}): portal → {Portal}", portalGroup, portal);
             {
                 this.DeleteSharedModules(portal);
                 ((IPortalInfo)portal).PortalGroupId = -1;
@@ -161,11 +173,14 @@ namespace DotNetNuke.Entities.Portals
             LogEvent(nameof(EventLogType.PORTALGROUP_DELETED), portalGroup, null);
 
             ClearCache();
+			Logger.LogDebug("<<< Exiting DeletePortalGroup(portalGroup={PortalGroup})", portalGroup);
         }
 
         /// <inheritdoc />
         public IEnumerable<PortalGroupInfo> GetPortalGroups()
         {
+			Logger.LogDebug(">>> Entering GetPortalGroups()");
+			Logger.LogDebug("<<< Exiting GetPortalGroups()");
             return CBO.GetCachedObject<IEnumerable<PortalGroupInfo>>(
                 this.hostSettings,
                 new CacheItemArgs(
@@ -178,7 +193,10 @@ namespace DotNetNuke.Entities.Portals
         /// <inheritdoc />
         public IEnumerable<PortalInfo> GetPortalsByGroup(int portalGroupId)
         {
+			Logger.LogDebug(">>> Entering GetPortalsByGroup(portalGroupId={PortalGroupId})", portalGroupId);
             var portals = PortalController.Instance.GetPortals();
+			Logger.LogDebug("GetPortalsByGroup(portalGroupId={PortalGroupId}): portals → {Portals}", portalGroupId, portals);
+			Logger.LogDebug("<<< Exiting GetPortalsByGroup(portalGroupId={PortalGroupId})", portalGroupId);
             return portals.Cast<PortalInfo>()
                             .Where(portal => ((IPortalInfo)portal).PortalGroupId == portalGroupId)
                             .ToList();
@@ -274,6 +292,7 @@ namespace DotNetNuke.Entities.Portals
         /// <inheritdoc />
         public void UpdatePortalGroup(PortalGroupInfo portalGroup)
         {
+			Logger.LogDebug(">>> Entering UpdatePortalGroup(portalGroup={PortalGroup})", portalGroup);
             // Argument Contract
             Requires.NotNull("portalGroup", portalGroup);
             Requires.PropertyNotNegative("portalGroup", "PortalGroupId", portalGroup.PortalGroupId);
@@ -281,6 +300,7 @@ namespace DotNetNuke.Entities.Portals
             this.dataService.UpdatePortalGroup(portalGroup, UserController.Instance.GetCurrentUserInfo().UserID);
 
             ClearCache();
+			Logger.LogDebug("<<< Exiting UpdatePortalGroup(portalGroup={PortalGroup})", portalGroup);
         }
 
         /// <inheritdoc />
@@ -291,12 +311,15 @@ namespace DotNetNuke.Entities.Portals
                 return false;
             }
 
+			Logger.LogDebug("<<< Exiting IsModuleShared(moduleId={ModuleId},portal={Portal})", moduleId, portal);
             return this.GetSharedModulesWithPortal(portal).Any(x => x.ModuleID == moduleId && !x.IsDeleted) || this.GetSharedModulesByPortal(portal).Any(x => x.ModuleID == moduleId && !x.IsDeleted);
         }
 
         private static void ClearCache()
         {
+			Logger.LogDebug(">>> Entering ClearCache()");
             DataCache.RemoveCache(DataCache.PortalGroupsCacheKey);
+			Logger.LogDebug("<<< Exiting ClearCache()");
         }
 
         private static void OnAddPortalToGroupStart(UserCopiedCallback callback, PortalInfo portal)
@@ -315,6 +338,7 @@ namespace DotNetNuke.Entities.Portals
                 Stage = "starting",
             };
             callback(args);
+			Logger.LogDebug("<<< Exiting OnAddPortalToGroupStart(callback={Callback},portal={Portal})", callback, portal);
         }
 
         private static void OnUserAddedToSiteGroup(UserCopiedCallback callback, PortalInfo portal, UserInfo currentUser, int totalUsers, int currentUserNumber)
@@ -332,6 +356,7 @@ namespace DotNetNuke.Entities.Portals
                 PortalName = portal.PortalName,
             };
             callback(args);
+			Logger.LogDebug("<<< Exiting OnUserAddedToSiteGroup(callback={Callback},portal={Portal},currentUser={CurrentUser},totalUsers={TotalUsers},currentUserNumber={CurrentUserNumber})", callback, portal, currentUser, totalUsers, currentUserNumber);
         }
 
         private static void OnAddPortalToGroupFinishing(UserCopiedCallback callback, PortalInfo portal, int totalUsers)
@@ -350,6 +375,7 @@ namespace DotNetNuke.Entities.Portals
                 Stage = "finalizing",
             };
             callback(args);
+			Logger.LogDebug("<<< Exiting OnAddPortalToGroupFinishing(callback={Callback},portal={Portal},totalUsers={TotalUsers})", callback, portal, totalUsers);
         }
 
         private static void OnAddPortalToGroupFinished(UserCopiedCallback callback, PortalInfo portal, PortalGroupInfo portalGroup, int totalUsers)
@@ -369,6 +395,7 @@ namespace DotNetNuke.Entities.Portals
                 PortalGroupId = portalGroup.PortalGroupId,
             };
             callback(args);
+			Logger.LogDebug("<<< Exiting OnAddPortalToGroupFinished(callback={Callback},portal={Portal},portalGroup={PortalGroup},totalUsers={TotalUsers})", callback, portal, portalGroup, totalUsers);
         }
 
         private static void LogEvent(string eventType, PortalGroupInfo portalGroup, IPortalInfo portal)
@@ -406,17 +433,23 @@ namespace DotNetNuke.Entities.Portals
 
         private static void CopyPropertyDefinitions(int portalId, int masterPortalId)
         {
+			Logger.LogDebug(">>> Entering CopyPropertyDefinitions(portalId={PortalId},masterPortalId={MasterPortalId})", portalId, masterPortalId);
             foreach (ProfilePropertyDefinition definition in ProfileController.GetPropertyDefinitionsByPortal(masterPortalId))
             {
                 var newDefinition = definition.Clone();
                 newDefinition.PortalId = portalId;
+				Logger.LogDebug("CopyPropertyDefinitions(portalId={PortalId},masterPortalId={MasterPortalId}): newDefinition → {NewDefinition}", portalId, masterPortalId, newDefinition);
+				Logger.LogDebug("CopyPropertyDefinitions(portalId={PortalId},masterPortalId={MasterPortalId}): newDefinition.PortalId → {Arg2}", portalId, masterPortalId, newDefinition.PortalId);
 
                 ProfileController.AddPropertyDefinition(newDefinition);
             }
+			Logger.LogDebug("<<< Exiting CopyPropertyDefinitions(portalId={PortalId},masterPortalId={MasterPortalId})", portalId, masterPortalId);
         }
 
         private object GetPortalGroupsCallback(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogDebug(">>> Entering GetPortalGroupsCallback(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
+			Logger.LogDebug("<<< Exiting GetPortalGroupsCallback(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return CBO.FillCollection<PortalGroupInfo>(this.dataService.GetPortalGroups());
         }
 

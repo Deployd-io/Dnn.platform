@@ -12,9 +12,11 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
 
     public class DnnHandleErrorAttribute : HandleErrorAttribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override void OnException(ExceptionContext filterContext)
         {
+			Logger.LogDebug(">>> Entering OnException(filterContext={FilterContext})", filterContext);
             var controller = filterContext.Controller as IDnnController;
 
             if (controller == null)
@@ -23,11 +25,14 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
             }
 
             this.LogException(filterContext.Exception);
+			Logger.LogDebug("<<< Exiting OnException(filterContext={FilterContext})", filterContext);
         }
 
         protected virtual void LogException(Exception exception)
         {
+			Logger.LogDebug(">>> Entering LogException(exception={Exception})", exception);
             Exceptions.LogException(exception);
+			Logger.LogDebug("<<< Exiting LogException(exception={Exception})", exception);
         }
     }
 }

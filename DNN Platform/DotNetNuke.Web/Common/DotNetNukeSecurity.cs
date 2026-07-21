@@ -52,6 +52,7 @@ namespace DotNetNuke.Web.Common.Internal
 
         internal static void Initialize()
         {
+			Logger.LogDebug(">>> Entering Initialize()");
             if (_fileWatcher == null)
             {
                 lock (typeof(DotNetNukeSecurity))
@@ -69,13 +70,16 @@ namespace DotNetNuke.Web.Common.Internal
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting Initialize()");
         }
 
 
         private static void InitializeFileWatcher()
         {
+			Logger.LogDebug(">>> Entering InitializeFileWatcher()");
             _fileWatcher = new FileSystemWatcher
             {
+				Logger.LogDebug("InitializeFileWatcher(): _fileWatcher → {_fileWatcher}", _fileWatcher);
                 Filter = "*.*",
                 Path = Globals.ApplicationMapPath,
                 NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName,
@@ -87,8 +91,10 @@ namespace DotNetNuke.Web.Common.Internal
             _fileWatcher.Error += WatcherOnError;
 
             _filesQ = new Queue<string>();
+			Logger.LogDebug("InitializeFileWatcher(): _filesQ → {_filesQ}", _filesQ);
             _qTimer = new Timer(QTimerCallBack);
 
+			Logger.LogDebug("InitializeFileWatcher(): _qTimer → {_qTimer}", _qTimer);
             AppDomain.CurrentDomain.DomainUnload += (sender, args) =>
             {
                 _fileWatcher.Dispose();
@@ -96,10 +102,13 @@ namespace DotNetNuke.Web.Common.Internal
             };
 
             _fileWatcher.EnableRaisingEvents = true;
+			Logger.LogDebug("<<< Exiting InitializeFileWatcher()");
+			Logger.LogDebug("InitializeFileWatcher(): _fileWatcher.EnableRaisingEvents → {Arg0}", _fileWatcher.EnableRaisingEvents);
         }
 
         private static void QTimerCallBack(object obj)
         {
+			Logger.LogDebug(">>> Entering QTimerCallBack(obj={Obj})", obj);
             try
             {
                 string[] items;
@@ -108,6 +117,7 @@ namespace DotNetNuke.Web.Common.Internal
                     while (!_qTimer.Change(Timeout.Infinite, Timeout.Infinite)) { }
                     Interlocked.Exchange(ref _notificationSent, 0);
                     items = _filesQ.ToArray();
+					Logger.LogDebug("QTimerCallBack(obj={Obj}): items → {Items}", obj, items);
                     while (_filesQ.Count > 0) _filesQ.Dequeue();
                 }
 
@@ -116,32 +126,43 @@ namespace DotNetNuke.Web.Common.Internal
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in QTimerCallBack(obj={Obj}): {Arg1}", obj, ex.Message);
                 LogException(ex);
             }
+			Logger.LogDebug("<<< Exiting QTimerCallBack(obj={Obj})", obj);
         }
 
         private static void WatcherOnRenamed(object sender, RenamedEventArgs e)
         {
+			Logger.LogDebug(">>> Entering WatcherOnRenamed(sender={Sender},e={E})", sender, e);
             CheckFile(e.FullPath);
+			Logger.LogDebug("<<< Exiting WatcherOnRenamed(sender={Sender},e={E})", sender, e);
         }
 
         private static void WatcherOnCreated(object sender, FileSystemEventArgs e)
         {
+			Logger.LogDebug(">>> Entering WatcherOnCreated(sender={Sender},e={E})", sender, e);
             CheckFile(e.FullPath);
+			Logger.LogDebug("<<< Exiting WatcherOnCreated(sender={Sender},e={E})", sender, e);
         }
 
         private static void WatcherOnError(object sender, ErrorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering WatcherOnError(sender={Sender},e={E})", sender, e);
             LogException(e.GetException());
+			Logger.LogDebug("<<< Exiting WatcherOnError(sender={Sender},e={E})", sender, e);
         }
 
         private static void LogException(Exception ex)
         {
+			Logger.LogDebug(">>> Entering LogException(ex={Ex})", ex);
             Logger.Error("Watcher Activity Error: " + ex?.Message);
+			Logger.LogDebug("<<< Exiting LogException(ex={Ex})", ex);
         }
 
         private static void CheckFile(string path)
         {
+			Logger.LogDebug(">>> Entering CheckFile(path={Path})", path);
             try
             {
                 if (IsRestrictdExtension(path))
@@ -153,9 +174,11 @@ namespace DotNetNuke.Web.Common.Internal
                         try
                         {
                             appStatus = Globals.Status;
+							Logger.LogDebug("CheckFile(path={Path}): appStatus → {AppStatus}", path, appStatus);
                         }
                         catch (NullReferenceException)
                         {
+							Logger.LogError("Exception in CheckFile(path={Path}): {Arg1}", path, ex.Message);
                             appStatus = Globals.UpgradeStatus.None;
                         }
 
@@ -163,15 +186,20 @@ namespace DotNetNuke.Web.Common.Internal
                         if (appStatus == Globals.UpgradeStatus.Install || appStatus == Globals.UpgradeStatus.Upgrade)
                         {
                             _appStatus = appStatus;
+							Logger.LogDebug("CheckFile(path={Path}): _appStatus → {_appStatus}", path, _appStatus);
                         }
                         else
                         {
                             ThreadPool.QueueUserWorkItem(_ => AddEventLog(path));
                             var val = Interlocked.Increment(ref _notificationSent);
                             if (val <= 1)
+							Logger.LogDebug("CheckFile(path={Path}): val → {Val}", path, val);
                             {
                                 // first notification goes immediately
                                 ThreadPool.QueueUserWorkItem(_ => NotifyManager(new[] { path }));
+								Logger.LogDebug(">>> Entering AddEventLog(path={Path})", path);
+								Logger.LogError("Exception in AddEventLog(path={Path}): {Arg1}", path, ex.Message);
+								Logger.LogDebug("<<< Exiting AddEventLog(path={Path})", path);
                             }
                             else
                             {
@@ -180,6 +208,9 @@ namespace DotNetNuke.Web.Common.Internal
                                     while (!_qTimer.Change(val >= 100 ? 1 : SlidingDelay, Timeout.Infinite)) { }
                                     _filesQ.Enqueue(path);
                                 }
+								Logger.LogDebug(">>> Entering NotifyManager(paths={Paths})", paths);
+								Logger.LogError("Exception in NotifyManager(paths={Paths}): {Arg1}", paths, ex.Message);
+								Logger.LogDebug("<<< Exiting NotifyManager(paths={Paths})", paths);
                             }
                         }
                     }
@@ -187,26 +218,35 @@ namespace DotNetNuke.Web.Common.Internal
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in CheckFile(path={Path}): {Arg1}", path, ex.Message);
                 LogException(ex);
             }
+			Logger.LogDebug("<<< Exiting CheckFile(path={Path})", path);
         }
 
         private static bool IsRestrictdExtension(string path)
         {
+			Logger.LogDebug(">>> Entering IsRestrictdExtension(path={Path})", path);
             var extension = Path.GetExtension(path)?.ToLowerInvariant();
+			Logger.LogDebug("IsRestrictdExtension(path={Path}): extension → {Extension}", path, extension);
+			Logger.LogDebug("<<< Exiting IsRestrictdExtension(path={Path})", path);
             return !string.IsNullOrEmpty(extension) &&
                 GetRestrictExtensions().Contains(extension);
         }
 
         private static IEnumerable<string> GetRestrictExtensions()
         {
+			Logger.LogDebug(">>> Entering GetRestrictExtensions()");
             // obtain the setting and do calculations once every 5 minutes at most, plus no need for locking
             if ((DateTime.Now - _lastRead).TotalMinutes > CacheTimeOut)
             {
                 _lastRead = DateTime.Now;
+				Logger.LogDebug("GetRestrictExtensions(): _lastRead → {_lastRead}", _lastRead);
                 var settings = HostController.Instance.GetString("SA_RestrictExtensions", string.Empty);
                 _settingsRestrictExtensions = string.IsNullOrEmpty(settings)
                     ? DefaultRestrictExtensions
+					Logger.LogDebug("GetRestrictExtensions(): settings → {Settings}", settings);
+					Logger.LogDebug("GetRestrictExtensions(): _settingsRestrictExtensions → {_settingsRestrictExtensions}", _settingsRestrictExtensions);
                     : settings.ToLowerInvariant()
                         .Split(',')
                         .Where(e => !string.IsNullOrEmpty(e))
@@ -215,11 +255,13 @@ namespace DotNetNuke.Web.Common.Internal
                         .ToList();
             }
 
+			Logger.LogDebug("<<< Exiting GetRestrictExtensions()");
             return _settingsRestrictExtensions ?? DefaultRestrictExtensions;
         }
 
         private static void AddEventLog(string path)
         {
+			Logger.LogDebug(">>> Entering AddEventLog(path={Path})", path);
             try
             {
                 var log = new LogInfo
@@ -233,16 +275,21 @@ namespace DotNetNuke.Web.Common.Internal
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in AddEventLog(path={Path}): {Arg1}", path, ex.Message);
                 LogException(ex);
             }
+			Logger.LogDebug("<<< Exiting AddEventLog(path={Path})", path);
         }
 
         private static void NotifyManager(string[] paths)
         {
+			Logger.LogDebug(">>> Entering NotifyManager(paths={Paths})", paths);
             try
             {
                 var pathNames = string.Join("<br/>", paths);
                 var subject = Localization.GetString("RestrictFileMail_Subject.Text");
+				Logger.LogDebug("NotifyManager(paths={Paths}): pathNames → {PathNames}", paths, pathNames);
+				Logger.LogDebug("NotifyManager(paths={Paths}): subject → {Subject}", paths, subject);
                 var body = Localization.GetString("RestrictFileMail_Body.Text")
                     .Replace("[Path]", pathNames)
                     .Replace("[AppName]", Host.HostTitle)
@@ -252,8 +299,10 @@ namespace DotNetNuke.Web.Common.Internal
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in NotifyManager(paths={Paths}): {Arg1}", paths, ex.Message);
                 LogException(ex);
             }
+			Logger.LogDebug("<<< Exiting NotifyManager(paths={Paths})", paths);
         }
 
     }

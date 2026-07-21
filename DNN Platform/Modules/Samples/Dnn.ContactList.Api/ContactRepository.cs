@@ -16,8 +16,11 @@ namespace Dnn.ContactList.Api
     /// </summary>
     public class ContactRepository : ServiceLocator<IContactRepository, ContactRepository>, IContactRepository
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         protected override Func<IContactRepository> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new ContactRepository();
         }
 
@@ -28,10 +31,15 @@ namespace Dnn.ContactList.Api
         /// <returns>The Id of the contact</returns>
         public int AddContact(Contact contact, int userId)
         {
+			Logger.LogDebug(">>> Entering AddContact(contact={Contact},userId={UserId})", contact, userId);
             Requires.NotNull(contact);
             Requires.PropertyNotNegative(contact, "PortalId");
 
             contact.CreatedByUserId = userId;
+			Logger.LogDebug("AddContact(contact={Contact},userId={UserId}): contact.CreatedByUserId → {Arg2}", contact, userId, contact.CreatedByUserId);
+			Logger.LogDebug("AddContact(contact={Contact},userId={UserId}): contact.CreatedOnDate → {Arg2}", contact, userId, contact.CreatedOnDate);
+			Logger.LogDebug("AddContact(contact={Contact},userId={UserId}): contact.LastModifiedByUserId → {Arg2}", contact, userId, contact.LastModifiedByUserId);
+			Logger.LogDebug("AddContact(contact={Contact},userId={UserId}): contact.LastModifiedOnDate → {Arg2}", contact, userId, contact.LastModifiedOnDate);
             contact.CreatedOnDate = DateTime.UtcNow;
             contact.LastModifiedByUserId = userId;
             contact.LastModifiedOnDate = DateTime.UtcNow;
@@ -40,9 +48,11 @@ namespace Dnn.ContactList.Api
             {
                 var rep = context.GetRepository<Contact>();
 
+				Logger.LogDebug("AddContact(contact={Contact},userId={UserId}): rep → {Rep}", contact, userId, rep);
                 rep.Insert(contact);
             }
 
+			Logger.LogDebug("<<< Exiting AddContact(contact={Contact},userId={UserId})", contact, userId);
             return contact.ContactId;
         }
 
@@ -52,6 +62,7 @@ namespace Dnn.ContactList.Api
         /// <param name="contact">The contact to delete</param>
         public void DeleteContact(Contact contact)
         {
+			Logger.LogDebug(">>> Entering DeleteContact(contact={Contact})", contact);
             Requires.NotNull(contact);
             Requires.PropertyNotNegative(contact, "ContactId");
 
@@ -59,15 +70,19 @@ namespace Dnn.ContactList.Api
             {
                 var rep = context.GetRepository<Contact>();
 
+				Logger.LogDebug("DeleteContact(contact={Contact}): rep → {Rep}", contact, rep);
                 rep.Delete(contact);
             }
+			Logger.LogDebug("<<< Exiting DeleteContact(contact={Contact})", contact);
         }
 
         public Contact GetContact(int contactId, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetContact(contactId={ContactId},portalId={PortalId})", contactId, portalId);
             Requires.NotNegative("contactId", contactId);
             Requires.NotNegative("portalId", portalId);
 
+			Logger.LogDebug("<<< Exiting GetContact(contactId={ContactId},portalId={PortalId})", contactId, portalId);
             return GetContacts(portalId).SingleOrDefault(c => c.ContactId == contactId);
         }
 
@@ -79,17 +94,21 @@ namespace Dnn.ContactList.Api
         /// <returns>A collection of contacts</returns>
         public IQueryable<Contact> GetContacts(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetContacts(portalId={PortalId})", portalId);
             Requires.NotNegative("portalId", portalId);
 
             IQueryable<Contact> contacts = null;
 
+			Logger.LogDebug("GetContacts(portalId={PortalId}): contacts → {Contacts}", portalId, contacts);
             using (var context = DataContext.Instance())
             {
                 var rep = context.GetRepository<Contact>();
 
+				Logger.LogDebug("GetContacts(portalId={PortalId}): rep → {Rep}", portalId, rep);
                 contacts = rep.Get(portalId).AsQueryable();
             }
 
+			Logger.LogDebug("<<< Exiting GetContacts(portalId={PortalId})", portalId);
             return contacts;
         }
 
@@ -116,6 +135,7 @@ namespace Dnn.ContactList.Api
                                                                 c.Email.Contains(searchTerm));
 
 
+			Logger.LogDebug("<<< Exiting GetContacts(searchTerm={SearchTerm},portalId={PortalId},pageIndex={PageIndex},pageSize={PageSize})", searchTerm, portalId, pageIndex, pageSize);
             return new PagedList<Contact>(contacts, pageIndex, pageSize);
         }
 
@@ -125,17 +145,22 @@ namespace Dnn.ContactList.Api
         /// <param name="contact">The contact to update</param>
         public void UpdateContact(Contact contact, int userId)
         {
+			Logger.LogDebug(">>> Entering UpdateContact(contact={Contact},userId={UserId})", contact, userId);
             Requires.NotNull(contact);
             Requires.PropertyNotNegative(contact, "ContactId");
             contact.LastModifiedByUserId = userId;
+			Logger.LogDebug("UpdateContact(contact={Contact},userId={UserId}): contact.LastModifiedByUserId → {Arg2}", contact, userId, contact.LastModifiedByUserId);
+			Logger.LogDebug("UpdateContact(contact={Contact},userId={UserId}): contact.LastModifiedOnDate → {Arg2}", contact, userId, contact.LastModifiedOnDate);
             contact.LastModifiedOnDate = DateTime.UtcNow;
 
             using (var context = DataContext.Instance())
             {
                 var rep = context.GetRepository<Contact>();
 
+				Logger.LogDebug("UpdateContact(contact={Contact},userId={UserId}): rep → {Rep}", contact, userId, rep);
                 rep.Update(contact);
             }
+			Logger.LogDebug("<<< Exiting UpdateContact(contact={Contact},userId={UserId})", contact, userId);
         }
     }
 }

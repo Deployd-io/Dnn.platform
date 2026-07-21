@@ -4,6 +4,7 @@
 
 namespace DotNetNuke.ContentSecurityPolicy
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Provides extension methods for <see cref="IContentSecurityPolicy"/>.
     /// </summary>
@@ -16,6 +17,7 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="csp">The content security policy to modify.</param>
         public static void AddWebformsSupport(this IContentSecurityPolicy csp)
         {
+			Logger.LogDebug(">>> Entering AddWebformsSupport(csp={Csp})", csp);
             csp.DefaultSource.AddSelf();
             csp.ScriptSource.AddSelf();
             csp.ScriptSource.AddInline();
@@ -27,6 +29,7 @@ namespace DotNetNuke.ContentSecurityPolicy
             csp.FormAction.AddSelf();
             csp.ConnectSource.AddSelf();
             csp.BaseUriSource.AddSelf();
+			Logger.LogDebug("<<< Exiting AddWebformsSupport(csp={Csp})", csp);
         }
     }
 }

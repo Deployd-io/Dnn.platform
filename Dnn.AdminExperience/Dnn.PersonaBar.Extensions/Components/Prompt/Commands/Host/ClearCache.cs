@@ -24,6 +24,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Host
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             try
             {
                 DataCache.ClearCache();
@@ -35,6 +36,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Host
                 return new ConsoleErrorResultModel(this.LocalizeString("Prompt_ClearCache_Error"));
             }
 
+			Logger.LogDebug("<<< Exiting Run()");
             return new ConsoleResultModel(this.LocalizeString("Prompt_ClearCache_Success")) { MustReload = true };
         }
     }

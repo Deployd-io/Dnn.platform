@@ -8,10 +8,13 @@ namespace Dnn.PersonaBar.Vocabularies.Exceptions
 
     public class VocabularyNameAlreadyExistsException : VocabulariesException
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="VocabularyNameAlreadyExistsException"/> class.</summary>
         public VocabularyNameAlreadyExistsException()
             : base(Constants.VocabularyExistsError)
         {
+		Logger.LogDebug(">>> Entering VocabularyNameAlreadyExistsException()");
+		Logger.LogDebug("<<< Exiting VocabularyNameAlreadyExistsException()");
         }
     }
 }

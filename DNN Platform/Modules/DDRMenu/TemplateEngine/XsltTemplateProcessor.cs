@@ -23,10 +23,14 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
     /// <param name="hostSettings">The host settings.</param>
     public class XsltTemplateProcessor(IHostSettings hostSettings) : ITemplateProcessor
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+		Logger.LogDebug(">>> Entering XsltTemplateProcessor(hostSettings={HostSettings})", hostSettings);
+		Logger.LogDebug("XsltTemplateProcessor(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
         private XslCompiledTransform xsl;
 
         /// <summary>Initializes a new instance of the <see cref="XsltTemplateProcessor"/> class.</summary>
+		Logger.LogDebug("<<< Exiting XsltTemplateProcessor(hostSettings={HostSettings})", hostSettings);
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public XsltTemplateProcessor()
             : this(null)
@@ -36,6 +40,7 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
         /// <inheritdoc />
         public bool LoadDefinition(TemplateDefinition baseDefinition)
         {
+			Logger.LogDebug(">>> Entering LoadDefinition(baseDefinition={BaseDefinition})", baseDefinition);
             try
             {
                 var virtualPath = baseDefinition.TemplateVirtualPath;
@@ -46,10 +51,13 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
                 }
 
                 this.xsl = Utilities.CachedXslt(baseDefinition.TemplatePath);
+				Logger.LogDebug("LoadDefinition(baseDefinition={BaseDefinition}): xsl → {Xsl}", baseDefinition, xsl);
                 return true;
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in XsltTemplateProcessor(hostSettings={HostSettings}): {Arg1}", hostSettings, ex.Message);
+				Logger.LogDebug("<<< Exiting LoadDefinition(baseDefinition={BaseDefinition})", baseDefinition);
                 return false;
             }
         }
@@ -57,11 +65,14 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
         /// <inheritdoc />
         public void Render(object source, HtmlTextWriter htmlWriter, TemplateDefinition liveDefinition)
         {
+			Logger.LogDebug(">>> Entering Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition})", source, htmlWriter, liveDefinition);
             var resolver = new PathResolver(this.hostSettings, liveDefinition.Folder);
             var hostPage = DNNContext.Current.Page;
+			Logger.LogDebug("Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition}): resolver → {Resolver}", source, htmlWriter, liveDefinition, resolver);
 
             var args = new XsltArgumentList();
             args.AddExtensionObject("urn:ddrmenu", new XsltFunctions());
+			Logger.LogDebug("Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition}): args → {Args}", source, htmlWriter, liveDefinition, args);
             args.AddExtensionObject("urn:dnngarden", new XsltFunctions());
             args.AddParam("ControlID", string.Empty, DNNContext.Current.HostControl.ClientID);
             args.AddParam("Options", string.Empty, ConvertToJson(liveDefinition.ClientOptions));
@@ -75,15 +86,20 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 
             using var xmlStream = new MemoryStream();
             Utilities.SerialiserFor(source.GetType()).Serialize(xmlStream, source);
+			Logger.LogDebug("Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition}): xmlStream → {XmlStream}", source, htmlWriter, liveDefinition, xmlStream);
             xmlStream.Seek(0, SeekOrigin.Begin);
             using var xmlReader = XmlReader.Create(xmlStream);
             this.xsl.Transform(xmlReader, args, htmlWriter);
+			Logger.LogDebug("<<< Exiting Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition})", source, htmlWriter, liveDefinition);
+			Logger.LogDebug("Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition}): xmlReader → {XmlReader}", source, htmlWriter, liveDefinition, xmlReader);
         }
 
         protected static string ConvertToJson(List<ClientOption> options)
         {
+			Logger.LogDebug(">>> Entering ConvertToJson(options={Options})", options);
             var result = new StringBuilder();
             result.Append("{");
+			Logger.LogDebug("ConvertToJson(options={Options}): result → {Result}", options, result);
 
             if (options != null)
             {
@@ -115,6 +131,7 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
             }
 
             result.Append("}");
+			Logger.LogDebug("<<< Exiting ConvertToJson(options={Options})", options);
             return result.ToString();
         }
     }

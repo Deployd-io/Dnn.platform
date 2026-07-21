@@ -32,6 +32,7 @@ namespace log4net.Core
     /// <author>Robert Sevcik</author>
     public class TimeEvaluator : ITriggeringEventEvaluator
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>The time threshold for triggering in seconds. Zero means it won't trigger at all.</summary>
         private int m_interval;
 
@@ -54,6 +55,10 @@ namespace log4net.Core
         public TimeEvaluator()
             : this(DEFAULT_INTERVAL)
         {
+		Logger.LogDebug(">>> Entering TimeEvaluator()");
+		Logger.LogDebug("<<< Exiting TimeEvaluator()");
+		Logger.LogDebug(">>> Entering TimeEvaluator(interval={Interval})", interval);
+		Logger.LogDebug("<<< Exiting TimeEvaluator(interval={Interval})", interval);
         }
 
         /// <summary>Create a new evaluator using the specified time threshold in seconds.</summary>
@@ -74,6 +79,10 @@ namespace log4net.Core
         {
             this.m_interval = interval;
             this.m_lastTimeUtc = DateTime.UtcNow;
+			Logger.LogDebug("TimeEvaluator(interval={Interval}): this.m_interval → {Arg1}", interval, this.m_interval);
+			Logger.LogDebug("TimeEvaluator(interval={Interval}): m_lastTimeUtc → {M_lastTimeUtc}", interval, m_lastTimeUtc);
+			Logger.LogDebug("TimeEvaluator(interval={Interval}): this.m_lastTimeUtc → {Arg1}", interval, this.m_lastTimeUtc);
+			Logger.LogDebug("TimeEvaluator(interval={Interval}): m_interval → {M_interval}", interval, m_interval);
         }
 
         /// <summary>The time threshold in seconds to trigger after</summary>
@@ -106,6 +115,7 @@ namespace log4net.Core
         /// </remarks>
         public bool IsTriggeringEvent(LoggingEvent loggingEvent)
         {
+			Logger.LogDebug(">>> Entering IsTriggeringEvent(loggingEvent={LoggingEvent})", loggingEvent);
             if (loggingEvent == null)
             {
                 throw new ArgumentNullException("loggingEvent");
@@ -121,13 +131,17 @@ namespace log4net.Core
             {
                 TimeSpan passed = DateTime.UtcNow.Subtract(this.m_lastTimeUtc);
 
+				Logger.LogDebug("IsTriggeringEvent(loggingEvent={LoggingEvent}): passed → {Passed}", loggingEvent, passed);
                 if (passed.TotalSeconds > this.m_interval)
                 {
                     this.m_lastTimeUtc = DateTime.UtcNow;
+					Logger.LogDebug("IsTriggeringEvent(loggingEvent={LoggingEvent}): m_lastTimeUtc → {M_lastTimeUtc}", loggingEvent, m_lastTimeUtc);
+					Logger.LogDebug("IsTriggeringEvent(loggingEvent={LoggingEvent}): this.m_lastTimeUtc → {Arg1}", loggingEvent, this.m_lastTimeUtc);
                     return true;
                 }
                 else
                 {
+					Logger.LogDebug("<<< Exiting IsTriggeringEvent(loggingEvent={LoggingEvent})", loggingEvent);
                     return false;
                 }
             }

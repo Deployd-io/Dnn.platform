@@ -14,6 +14,7 @@ namespace DotNetNuke.Entities.Portals
     /// </summary>
     public class PortalStyles : IPortalStyles
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string Prefix = "DnnCssVars_";
 
         /// <inheritdoc />
@@ -223,6 +224,7 @@ namespace DotNetNuke.Entities.Portals
         /// </returns>
         public override string ToString()
         {
+			Logger.LogDebug(">>> Entering ToString()");
             return $$"""
                 :root {
                     --dnn-color-primary: #{{this.ColorPrimary}};
@@ -319,25 +321,34 @@ namespace DotNetNuke.Entities.Portals
                     --dnn-variation-opacity: {{this.VariationOpacity}};
                 }
              """;
+			Logger.LogDebug("<<< Exiting ToString()");
         }
 
         private static string GetRed(string hexValue)
         {
+			Logger.LogDebug(">>> Entering GetRed(hexValue={HexValue})", hexValue);
+			Logger.LogDebug("<<< Exiting GetRed(hexValue={HexValue})", hexValue);
             return GetColorValue(hexValue, 0);
         }
 
         private static string GetGreen(string hexValue)
         {
+			Logger.LogDebug(">>> Entering GetGreen(hexValue={HexValue})", hexValue);
+			Logger.LogDebug("<<< Exiting GetGreen(hexValue={HexValue})", hexValue);
             return GetColorValue(hexValue, 2);
         }
 
         private static string GetBlue(string hexValue)
         {
+			Logger.LogDebug(">>> Entering GetBlue(hexValue={HexValue})", hexValue);
+			Logger.LogDebug("<<< Exiting GetBlue(hexValue={HexValue})", hexValue);
             return GetColorValue(hexValue, 4);
         }
 
         private static string GetColorValue(string hexValue, int startIndex)
         {
+			Logger.LogDebug(">>> Entering GetColorValue(hexValue={HexValue},startIndex={StartIndex})", hexValue, startIndex);
+			Logger.LogDebug("<<< Exiting GetColorValue(hexValue={HexValue},startIndex={StartIndex})", hexValue, startIndex);
             return int.Parse(
                     hexValue.Substring(startIndex, 2),
                     NumberStyles.AllowHexSpecifier,

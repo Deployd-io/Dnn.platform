@@ -17,12 +17,14 @@ namespace DotNetNuke.Web.Prompt
     [ConsoleCommand("list-services", "Prompt_DebugCategory", "Prompt_ListServices_Description")]
     public class ListServices : ConsoleCommand
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override string LocalResourceFile => Constants.DefaultPromptResourceFile;
 
         /// <inheritdoc />
         public override void Initialize(string[] args, IPortalSettings portalSettings, IUserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             base.Initialize(args, portalSettings, userInfo, activeTabId);
             if (!userInfo.IsSuperUser)
             {
@@ -30,11 +32,13 @@ namespace DotNetNuke.Web.Prompt
             }
 
             this.ParseParameters(this);
+			Logger.LogDebug("<<< Exiting Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override IConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             if (!this.User.IsSuperUser)
             {
                 return new ConsoleErrorResultModel(this.LocalizeString("Prompt_ListServices_Unauthorized"));
@@ -42,6 +46,7 @@ namespace DotNetNuke.Web.Prompt
 
             var services = DependencyInjectionInitialize.ServiceCollection.Select(
                     descriptor => new
+					Logger.LogDebug("Run(): descriptor → {Descriptor}", descriptor);
                     {
                         LifeTime = descriptor.Lifetime.ToString("G"),
                         Service = this.GetTypeName(descriptor.ServiceType),
@@ -50,6 +55,10 @@ namespace DotNetNuke.Web.Prompt
                 .OrderBy(desc => desc.Service.Output)
                 .ThenBy(desc => desc.Implementation.Output)
                 .ToList();
+						Logger.LogDebug("Run(): LifeTime → {LifeTime}", LifeTime);
+						Logger.LogDebug("Run(): Service → {Service}", Service);
+						Logger.LogDebug("Run(): Implementation → {Implementation}", Implementation);
+			Logger.LogDebug("<<< Exiting Run()");
             return new ConsoleResultModel
             {
                 Data = services,
@@ -59,6 +68,7 @@ namespace DotNetNuke.Web.Prompt
 
         private IConsoleOutput GetImplementationText(ServiceDescriptor descriptor)
         {
+			Logger.LogDebug(">>> Entering GetImplementationText(descriptor={Descriptor})", descriptor);
             if (descriptor.ImplementationInstance != null)
             {
                 return new HtmlOutput(this.LocalizeString("Prompt_ListServices_ImplementationInstance"));
@@ -69,16 +79,19 @@ namespace DotNetNuke.Web.Prompt
                 return new HtmlOutput(this.LocalizeString("Prompt_ListServices_ImplementationFactory"));
             }
 
+			Logger.LogDebug("<<< Exiting GetImplementationText(descriptor={Descriptor})", descriptor);
             return this.GetTypeName(descriptor.ImplementationType);
         }
 
         private IConsoleOutput GetTypeName(Type type)
         {
+			Logger.LogDebug(">>> Entering GetTypeName(type={Type})", type);
             if (type == null)
             {
                 return new HtmlOutput(this.LocalizeString("Prompt_ListServices_None"));
             }
 
+			Logger.LogDebug("<<< Exiting GetTypeName(type={Type})", type);
             return new TextOutput(type.FullName ?? type.Name);
         }
     }

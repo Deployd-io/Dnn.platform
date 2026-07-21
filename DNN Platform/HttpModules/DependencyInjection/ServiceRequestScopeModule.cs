@@ -14,13 +14,17 @@ namespace DotNetNuke.HttpModules.DependencyInjection
     /// <summary>An HTTP module which creates dependency injection scopes for each request.</summary>
     public class ServiceRequestScopeModule : IHttpModule
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static IServiceProvider serviceProvider;
 
         /// <summary>For internal use only. Allows setting the service provider used to create request scopes.</summary>
         /// <param name="serviceProvider">The service provider.</param>
         public static void SetServiceProvider(IServiceProvider serviceProvider)
         {
+			Logger.LogDebug(">>> Entering SetServiceProvider(serviceProvider={ServiceProvider})", serviceProvider);
+			Logger.LogDebug("SetServiceProvider(serviceProvider={ServiceProvider}): ServiceRequestScopeModule.serviceProvider → {Arg1}", serviceProvider, ServiceRequestScopeModule.serviceProvider);
             ServiceRequestScopeModule.serviceProvider = serviceProvider;
+			Logger.LogDebug("<<< Exiting SetServiceProvider(serviceProvider={ServiceProvider})", serviceProvider);
         }
 
         /// <inheritdoc />
@@ -38,7 +42,9 @@ namespace DotNetNuke.HttpModules.DependencyInjection
         /// </summary>
         public void Dispose()
         {
+			Logger.LogDebug(">>> Entering Dispose()");
             this.Dispose(true);
+			Logger.LogDebug("<<< Exiting Dispose()");
         }
 
         /// <summary>
@@ -50,19 +56,26 @@ namespace DotNetNuke.HttpModules.DependencyInjection
         /// </param>
         protected virtual void Dispose(bool disposing)
         {
+			Logger.LogDebug(">>> Entering Dispose(disposing={Disposing})", disposing);
             // left empty by design
+			Logger.LogDebug("<<< Exiting Dispose(disposing={Disposing})", disposing);
         }
 
         private static void Context_BeginRequest(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering Context_BeginRequest(sender={Sender},e={E})", sender, e);
             var context = ((HttpApplication)sender).Context;
             context.SetScope(serviceProvider.CreateScope());
+			Logger.LogDebug("<<< Exiting Context_BeginRequest(sender={Sender},e={E})", sender, e);
+			Logger.LogDebug("Context_BeginRequest(sender={Sender},e={E}): context → {Context}", sender, e, context);
         }
 
         private static async Task Context_EndRequest(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering Context_EndRequest(sender={Sender},e={E})", sender, e);
             var context = ((HttpApplication)sender).Context;
             switch (context.GetScope())
+			Logger.LogDebug("Context_EndRequest(sender={Sender},e={E}): context → {Context}", sender, e, context);
             {
                 case IAsyncDisposable asyncDisposable:
                     await asyncDisposable.DisposeAsync();
@@ -73,6 +86,7 @@ namespace DotNetNuke.HttpModules.DependencyInjection
             }
 
             context.ClearScope();
+			Logger.LogDebug("<<< Exiting Context_EndRequest(sender={Sender},e={E})", sender, e);
         }
     }
 }

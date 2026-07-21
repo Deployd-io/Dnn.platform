@@ -23,10 +23,14 @@ namespace DotNetNuke.Entities.Users.Social
     [Serializable]
     public class Relationship : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="Relationship"/> class.</summary>
         public Relationship()
         {
+			Logger.LogDebug(">>> Entering Relationship()");
             this.RelationshipId = -1;
+			Logger.LogDebug("<<< Exiting Relationship()");
+			Logger.LogDebug("Relationship(): this.RelationshipId → {Arg0}", this.RelationshipId);
         }
 
         /// <summary>Gets a value indicating whether is this a Portal-Level Relationship.</summary>
@@ -110,6 +114,7 @@ namespace DotNetNuke.Entities.Users.Social
         /// <param name="dr">the data reader.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.RelationshipId = Convert.ToInt32(dr["RelationshipID"], CultureInfo.InvariantCulture);
             this.UserId = Null.SetNullInteger(dr["UserID"]);
             this.PortalId = Null.SetNullInteger(dr["PortalID"]);
@@ -120,6 +125,7 @@ namespace DotNetNuke.Entities.Users.Social
 
             // add audit column data
             this.FillInternal(dr);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

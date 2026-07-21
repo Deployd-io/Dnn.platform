@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class TemplateNotFoundException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public TemplateNotFoundException()
     {
+	Logger.LogDebug(">>> Entering TemplateNotFoundException()");
+	Logger.LogDebug("<<< Exiting TemplateNotFoundException()");
     }
 
     /// <inheritdoc />
     public TemplateNotFoundException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering TemplateNotFoundException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting TemplateNotFoundException(message={Message})", message);
 
     /// <inheritdoc />
     public TemplateNotFoundException(string message, Exception innerException)

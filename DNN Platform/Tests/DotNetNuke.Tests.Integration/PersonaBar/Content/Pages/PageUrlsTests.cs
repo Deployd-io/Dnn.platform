@@ -16,6 +16,7 @@ namespace DotNetNuke.Tests.Integration.PersonaBar.Content.Pages
     [TestFixture]
     public class PageUrlsTests : IntegrationTestBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string GetLanguagesApi = "/API/PersonaBar/SiteSettings/GetLanguages?portalId=undefined";
         private const string GetLanguageSettingsApi = "/API/PersonaBar/SiteSettings/GetLanguageSettings?portalId=undefined";
         private const string AddLanguageApi = "/API/PersonaBar/SiteSettings/AddLanguage";
@@ -28,15 +29,19 @@ namespace DotNetNuke.Tests.Integration.PersonaBar.Content.Pages
         [Test]
         public void Page_Url_Should_Able_To_Add_On_English_Disabled_Site()
         {
+			Logger.LogDebug(">>> Entering Page_Url_Should_Able_To_Add_On_English_Disabled_Site()");
             var isEnglishEnabled = true;
             dynamic languageSettings = null;
 
             // set default language to Spanish and disable en-US if it's enabled
             var connector = PrepareTest(out isEnglishEnabled, out languageSettings);
             var postData = new
+			Logger.LogDebug("Page_Url_Should_Able_To_Add_On_English_Disabled_Site(): connector → {Connector}", connector);
             {
                 tabId = CreateNewPage(connector),
                 saveUrl = new
+				Logger.LogDebug("Page_Url_Should_Able_To_Add_On_English_Disabled_Site(): tabId → {TabId}", tabId);
+				Logger.LogDebug("Page_Url_Should_Able_To_Add_On_English_Disabled_Site(): saveUrl → {SaveUrl}", saveUrl);
                 {
                     SiteAliasKey = 1,
                     Path = "/Path" + Guid.NewGuid().ToString().Replace("-", string.Empty),
@@ -46,27 +51,42 @@ namespace DotNetNuke.Tests.Integration.PersonaBar.Content.Pages
                     SiteAliasUsage = 2,
                 },
             };
+					Logger.LogDebug("Page_Url_Should_Able_To_Add_On_English_Disabled_Site(): SiteAliasKey → {SiteAliasKey}", SiteAliasKey);
+					Logger.LogDebug("Page_Url_Should_Able_To_Add_On_English_Disabled_Site(): Path → {Path}", Path);
+					Logger.LogDebug("Page_Url_Should_Able_To_Add_On_English_Disabled_Site(): QueryString → {QueryString}", QueryString);
+					Logger.LogDebug("Page_Url_Should_Able_To_Add_On_English_Disabled_Site(): LocaleKey → {LocaleKey}", LocaleKey);
+					Logger.LogDebug("Page_Url_Should_Able_To_Add_On_English_Disabled_Site(): StatusCodeKey → {StatusCodeKey}", StatusCodeKey);
+					Logger.LogDebug("Page_Url_Should_Able_To_Add_On_English_Disabled_Site(): SiteAliasUsage → {SiteAliasUsage}", SiteAliasUsage);
             var response = connector.PostJson(CreateCustomUrlApi, postData, null).Content.ReadAsStringAsync().Result;
             var result = JsonConvert.DeserializeObject<dynamic>(response);
+			Logger.LogDebug("Page_Url_Should_Able_To_Add_On_English_Disabled_Site(): response → {Response}", response);
+			Logger.LogDebug("Page_Url_Should_Able_To_Add_On_English_Disabled_Site(): result → {Result}", result);
 
             // reset changes
             ResetChanges(connector, isEnglishEnabled, languageSettings);
 
             Assert.That(bool.Parse(result.Success.ToString()), Is.True);
+			Logger.LogDebug("<<< Exiting Page_Url_Should_Able_To_Add_On_English_Disabled_Site()");
         }
 
         private static IWebApiConnector PrepareTest(out bool isEnglishEnabled, out dynamic languageSettings)
         {
+			Logger.LogDebug(">>> Entering PrepareTest()");
             var connector = WebApiTestHelper.LoginHost();
 
+			Logger.LogDebug("PrepareTest(): connector → {Connector}", connector);
             var response = connector.GetContent(GetLanguagesApi).Content.ReadAsStringAsync().Result;
             var result = JsonConvert.DeserializeObject<dynamic>(response);
+			Logger.LogDebug("PrepareTest(): response → {Response}", response);
+			Logger.LogDebug("PrepareTest(): result → {Result}", result);
             isEnglishEnabled = result.Languages[0].Enabled;
 
+			Logger.LogDebug("PrepareTest(): isEnglishEnabled → {IsEnglishEnabled}", isEnglishEnabled);
             response = connector.GetContent(GetLanguageSettingsApi).Content.ReadAsStringAsync().Result;
             result = JsonConvert.DeserializeObject<dynamic>(response);
             languageSettings = result.Settings;
 
+			Logger.LogDebug("PrepareTest(): languageSettings → {LanguageSettings}", languageSettings);
             if (string.Compare(languageSettings.SiteDefaultLanguage.Value, EnglishLanguageCode, StringComparison.InvariantCultureIgnoreCase) == 0)
             {
                 connector.PostJson(AddLanguageApi, new { Code = SpainishLanguageCode });
@@ -78,6 +98,7 @@ namespace DotNetNuke.Tests.Integration.PersonaBar.Content.Pages
                 EnableEnglish(connector, false);
             }
 
+			Logger.LogDebug("<<< Exiting PrepareTest()");
             return connector;
         }
 

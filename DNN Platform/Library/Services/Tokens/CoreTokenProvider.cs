@@ -5,16 +5,21 @@ namespace DotNetNuke.Services.Tokens
 {
     public class CoreTokenProvider : TokenProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override bool ContainsTokens(string content, TokenContext context)
         {
+			Logger.LogDebug(">>> Entering ContainsTokens(content={Content},context={Context})", content, context);
+			Logger.LogDebug("<<< Exiting ContainsTokens(content={Content},context={Context})", content, context);
             return false; // already determined by BaseCustomTokenReplace
         }
 
         /// <inheritdoc />
         public override string Tokenize(string content, TokenContext context)
         {
+			Logger.LogDebug(">>> Entering Tokenize(content={Content},context={Context})", content, context);
             var tokenizer = new TokenReplace { TokenContext = context };
+			Logger.LogDebug("<<< Exiting Tokenize(content={Content},context={Context})", content, context);
             return tokenizer.ReplaceEnvironmentTokens(content);
         }
     }

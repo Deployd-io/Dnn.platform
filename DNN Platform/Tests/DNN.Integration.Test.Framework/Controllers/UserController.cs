@@ -47,6 +47,8 @@ namespace DNN.Integration.Test.Framework.Controllers
         /// <remarks>Username created is firstname.lastname.</remarks>
         public static int CreateSuperUser(string firstName, string lastName, int portalId = 0)
         {
+			Logger.LogDebug(">>> Entering CreateSuperUser(firstName={FirstName},lastName={LastName},portalId={PortalId})", firstName, lastName, portalId);
+			Logger.LogDebug("<<< Exiting CreateSuperUser(firstName={FirstName},lastName={LastName},portalId={PortalId})", firstName, lastName, portalId);
             return CreateUser(new CreateUserParams { FirstName = firstName, LastName = lastName, PortalId = portalId, SuperUser = true });
         }
 
@@ -71,6 +73,7 @@ namespace DNN.Integration.Test.Framework.Controllers
 
         public static void DeleteUser(int userId)
         {
+			Logger.LogDebug(">>> Entering DeleteUser(userId={UserId})", userId);
             var fileContent = SqlScripts.UserDelete;
             var script = new StringBuilder(fileContent)
                 .Replace(UserIdMarker, userId.ToString(CultureInfo.InvariantCulture))
@@ -78,10 +81,12 @@ namespace DNN.Integration.Test.Framework.Controllers
                 .ToString();
 
             DatabaseHelper.ExecuteQuery(script);
+			Logger.LogDebug("<<< Exiting DeleteUser(userId={UserId})", userId);
         }
 
         public static TimeZoneInfo GetUserPreferredTimeZone(int userId, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetUserPreferredTimeZone(userId={UserId},portalId={PortalId})", userId, portalId);
             var fileContent = SqlScripts.UserGetPreferredTimeZone;
             var script = new StringBuilder(fileContent)
                 .Replace(UserIdMarker, userId.ToString(CultureInfo.InvariantCulture))
@@ -91,15 +96,20 @@ namespace DNN.Integration.Test.Framework.Controllers
 
             var timeZoneString = DatabaseHelper.ExecuteQuery(script).First()["PropertyValue"].ToString();
 
+			Logger.LogDebug("GetUserPreferredTimeZone(userId={UserId},portalId={PortalId}): timeZoneString → {TimeZoneString}", userId, portalId, timeZoneString);
+			Logger.LogDebug("<<< Exiting GetUserPreferredTimeZone(userId={UserId},portalId={PortalId})", userId, portalId);
             return TimeZoneInfo.FindSystemTimeZoneById(timeZoneString);
         }
 
         private static int CreateUser(CreateUserParams parms)
         {
+			Logger.LogDebug(">>> Entering CreateUser(parms={Parms})", parms);
             parms.FirstName = parms.FirstName.Replace("'", "''");
             parms.LastName = parms.LastName.Replace("'", "''");
             var username = parms.FirstName + "." + parms.LastName;
             var uid = GetUserId(username);
+			Logger.LogDebug("CreateUser(parms={Parms}): username → {Username}", parms, username);
+			Logger.LogDebug("CreateUser(parms={Parms}): uid → {Uid}", parms, uid);
             if (uid > 0)
             {
                 return uid;
@@ -125,11 +135,13 @@ namespace DNN.Integration.Test.Framework.Controllers
                 .Replace(CreateFollowersMarker, parms.AutoCreateFollowersAndFollowings ? "1" : "0")
                 .Replace(RoleMarker, string.IsNullOrEmpty(parms.Role) ? string.Empty : parms.Role);
             DatabaseHelper.ExecuteQuery(script.ToString());
+			Logger.LogDebug("<<< Exiting CreateUser(parms={Parms})", parms);
             return GetUserId(username);
         }
 
         public class CreateUserParams
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
             public string FirstName { get; set; }
 
             public string LastName { get; set; }

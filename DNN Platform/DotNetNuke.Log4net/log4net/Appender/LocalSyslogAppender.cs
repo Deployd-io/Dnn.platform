@@ -63,6 +63,7 @@ namespace log4net.Appender
     /// <author>Nicko Cadell</author>
     public class LocalSyslogAppender : AppenderSkeleton 
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>syslog severities</summary>
         /// <remarks>
         /// <para>
@@ -187,6 +188,8 @@ namespace log4net.Appender
         /// </remarks>
         public LocalSyslogAppender() 
         {
+		Logger.LogDebug(">>> Entering LocalSyslogAppender()");
+		Logger.LogDebug("<<< Exiting LocalSyslogAppender()");
         }
 
         /// <summary>Message identity</summary>
@@ -225,7 +228,9 @@ namespace log4net.Appender
         /// </remarks>
         public void AddMapping(LevelSeverity mapping)
         {
+			Logger.LogDebug(">>> Entering AddMapping(mapping={Mapping})", mapping);
             this.m_levelMapping.Add(mapping);
+			Logger.LogDebug("<<< Exiting AddMapping(mapping={Mapping})", mapping);
         }
 
         /// <summary>Initialize the appender based on the options set.</summary>
@@ -247,12 +252,14 @@ namespace log4net.Appender
 #endif
         public override void ActivateOptions()
         {
+			Logger.LogDebug(">>> Entering ActivateOptions()");
             base.ActivateOptions();
 
             this.m_levelMapping.ActivateOptions();
 
             string identString = this.m_identity;
             if (identString == null)
+			Logger.LogDebug("ActivateOptions(): identString → {IdentString}", identString);
             {
                 // Set to app name by default
                 identString = SystemInfo.ApplicationFriendlyName;
@@ -262,9 +269,11 @@ namespace log4net.Appender
             // so we do not need to hold on to the string itself, holding on to the
             // handle will keep the heap ansi string alive.
             this.m_handleToIdentity = Marshal.StringToHGlobalAnsi(identString);
+			Logger.LogDebug("ActivateOptions(): m_handleToIdentity → {M_handleToIdentity}", m_handleToIdentity);
 
             // open syslog
             openlog(this.m_handleToIdentity, 1, this.m_facility);
+			Logger.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>This method is called by the <see cref="M:AppenderSkeleton.DoAppend(LoggingEvent)"/> method.</summary>
@@ -285,12 +294,15 @@ namespace log4net.Appender
 #endif
         protected override void Append(LoggingEvent loggingEvent) 
         {
+			Logger.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             int priority = GeneratePriority(this.m_facility, this.GetSeverity(loggingEvent.Level));
             string message = this.RenderLoggingEvent(loggingEvent);
+			Logger.LogDebug("Append(loggingEvent={LoggingEvent}): priority → {Priority}", loggingEvent, priority);
 
             // Call the local libc syslog method
             // The second argument is a printf style format string
             syslog(priority, "%s", message);
+			Logger.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
         }
 
         /// <summary>Close the syslog when the appender is closed</summary>
@@ -304,6 +316,7 @@ namespace log4net.Appender
 #endif
         protected override void OnClose()
         {
+			Logger.LogDebug(">>> Entering OnClose()");
             base.OnClose();
 
             try
@@ -313,6 +326,7 @@ namespace log4net.Appender
             }
             catch(DllNotFoundException)
             {
+				Logger.LogError("Exception in OnClose(): {Arg0}", ex.Message);
                 // Ignore dll not found at this point
             }
         
@@ -321,6 +335,7 @@ namespace log4net.Appender
                 // free global ident
                 Marshal.FreeHGlobal(this.m_handleToIdentity);
             }
+			Logger.LogDebug("<<< Exiting OnClose()");
         }
 
         /// <summary>This appender requires a <see cref="AppenderSkeleton.Layout"/> to be set.</summary>
@@ -345,8 +360,10 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual SyslogSeverity GetSeverity(Level level)
         {
+			Logger.LogDebug(">>> Entering GetSeverity(level={Level})", level);
             LevelSeverity levelSeverity = this.m_levelMapping.Lookup(level) as LevelSeverity;
             if (levelSeverity != null)
+			Logger.LogDebug("GetSeverity(level={Level}): levelSeverity → {LevelSeverity}", level, levelSeverity);
             {
                 return levelSeverity.Severity;
             }
@@ -380,6 +397,7 @@ namespace log4net.Appender
                 return SyslogSeverity.Informational;
             } 
             // Default setting
+			Logger.LogDebug("<<< Exiting GetSeverity(level={Level})", level);
             return SyslogSeverity.Debug;
         }
 
@@ -389,6 +407,8 @@ namespace log4net.Appender
         /// <returns>A syslog priority.</returns>
         private static int GeneratePriority(SyslogFacility facility, SyslogSeverity severity)
         {
+			Logger.LogDebug(">>> Entering GeneratePriority(facility={Facility},severity={Severity})", facility, severity);
+			Logger.LogDebug("<<< Exiting GeneratePriority(facility={Facility},severity={Severity})", facility, severity);
             return ((int)facility * 8) + (int)severity;
         }
 

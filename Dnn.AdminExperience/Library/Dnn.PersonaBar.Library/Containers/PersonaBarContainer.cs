@@ -32,6 +32,7 @@ namespace Dnn.PersonaBar.Library.Containers
 
     public class PersonaBarContainer : IPersonaBarContainer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static IPersonaBarContainer instance;
         private readonly IPersonaBarController personaBarController;
         private readonly IHostSettings hostSettings;
@@ -41,7 +42,9 @@ namespace Dnn.PersonaBar.Library.Containers
         public PersonaBarContainer()
             : this(null, null, null)
         {
+		Logger.LogDebug(">>> Entering PersonaBarContainer()");
         }
+		Logger.LogDebug("<<< Exiting PersonaBarContainer()");
 
         /// <summary>Initializes a new instance of the <see cref="PersonaBarContainer"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
@@ -49,6 +52,9 @@ namespace Dnn.PersonaBar.Library.Containers
         public PersonaBarContainer(INavigationManager navigationManager, IPersonaBarController personaBarController)
             : this(navigationManager, personaBarController, null)
         {
+		Logger.LogDebug(">>> Entering PersonaBarContainer(navigationManager={NavigationManager},personaBarController={PersonaBarController})", navigationManager, personaBarController);
+		Logger.LogDebug("<<< Exiting PersonaBarContainer(navigationManager={NavigationManager},personaBarController={PersonaBarController})", navigationManager, personaBarController);
+		Logger.LogDebug("PersonaBarContainer(navigationManager={NavigationManager},personaBarController={PersonaBarController},hostSettings={HostSettings}): personaBarController → {PersonaBarController1}", navigationManager, personaBarController, hostSettings, personaBarController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PersonaBarContainer"/> class.</summary>
@@ -60,6 +66,7 @@ namespace Dnn.PersonaBar.Library.Containers
             this.NavigationManager = navigationManager ?? Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
             this.personaBarController = personaBarController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPersonaBarController>();
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("PersonaBarContainer(navigationManager={NavigationManager},personaBarController={PersonaBarController},hostSettings={HostSettings}): hostSettings → {HostSettings1}", navigationManager, personaBarController, hostSettings, hostSettings);
         }
 
         [Obsolete("Deprecated in DotNetNuke 10.0.0. Please resolve via dependency injection. Scheduled removal in v12.0.0.")]
@@ -75,20 +82,28 @@ namespace Dnn.PersonaBar.Library.Containers
 
         public static void SetInstance(IPersonaBarContainer instance, bool overwrite = false)
         {
+			Logger.LogDebug(">>> Entering SetInstance(instance={Instance},overwrite={Overwrite})", instance, overwrite);
             if (PersonaBarContainer.instance == null || overwrite)
             {
                 PersonaBarContainer.instance = instance;
+				Logger.LogDebug("SetInstance(instance={Instance},overwrite={Overwrite}): PersonaBarContainer.instance → {Arg2}", instance, overwrite, PersonaBarContainer.instance);
             }
+			Logger.LogDebug("<<< Exiting SetInstance(instance={Instance},overwrite={Overwrite})", instance, overwrite);
         }
 
         public static void ClearInstance()
         {
+			Logger.LogDebug(">>> Entering ClearInstance()");
             instance = null;
+			Logger.LogDebug("<<< Exiting ClearInstance()");
+			Logger.LogDebug("ClearInstance(): instance → {Instance}", instance);
         }
 
         /// <inheritdoc />
         public virtual void Initialize(UserControl personaBarControl)
         {
+		Logger.LogDebug(">>> Entering Initialize(personaBarControl={PersonaBarControl})", personaBarControl);
+		Logger.LogDebug("<<< Exiting Initialize(personaBarControl={PersonaBarControl})", personaBarControl);
         }
 
         /// <inheritdoc />
@@ -102,6 +117,8 @@ namespace Dnn.PersonaBar.Library.Containers
         /// <inheritdoc />
         public virtual void FilterMenu(PersonaBarMenu menu)
         {
+		Logger.LogDebug(">>> Entering FilterMenu(menu={Menu})", menu);
+		Logger.LogDebug("<<< Exiting FilterMenu(menu={Menu})", menu);
         }
 
         private Dictionary<string, object> GetConfiguration(PortalSettings portalSettings)

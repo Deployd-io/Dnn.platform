@@ -12,6 +12,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
 
     internal static class KpvExtension
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static IEnumerable<LocalizationEntry> MapEntries(this IEnumerable<KeyValuePair<string, string>> list)
         {
             var appPath = Globals.ApplicationMapPath;

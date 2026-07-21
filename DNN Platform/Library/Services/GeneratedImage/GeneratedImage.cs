@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.GeneratedImage
 
     public class GeneratedImage : Image
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string TimestampField = "__timestamp";
         private readonly Control bindingContainer;
         private readonly HttpContextBase context;
@@ -22,7 +23,9 @@ namespace DotNetNuke.Services.GeneratedImage
         /// <summary>Initializes a new instance of the <see cref="GeneratedImage"/> class.</summary>
         public GeneratedImage()
         {
+			Logger.LogDebug(">>> Entering GeneratedImage()");
             this.Parameters = new List<ImageParameter>();
+			Logger.LogDebug("<<< Exiting GeneratedImage()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="GeneratedImage"/> class.</summary>
@@ -33,6 +36,10 @@ namespace DotNetNuke.Services.GeneratedImage
         {
             this.context = context;
             this.bindingContainer = bindingContainer;
+			Logger.LogDebug("GeneratedImage(context={Context},bindingContainer={BindingContainer}): this.context → {Arg2}", context, bindingContainer, this.context);
+			Logger.LogDebug("GeneratedImage(context={Context},bindingContainer={BindingContainer}): bindingContainer → {BindingContainer1}", context, bindingContainer, bindingContainer);
+			Logger.LogDebug("GeneratedImage(context={Context},bindingContainer={BindingContainer}): this.bindingContainer → {Arg2}", context, bindingContainer, this.bindingContainer);
+			Logger.LogDebug("GeneratedImage(context={Context},bindingContainer={BindingContainer}): context → {Context1}", context, bindingContainer, context);
         }
 
         public List<ImageParameter> Parameters { get; }
@@ -70,19 +77,23 @@ namespace DotNetNuke.Services.GeneratedImage
         /// <inheritdoc />
         protected override void OnDataBinding(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnDataBinding(e={E})", e);
             base.OnDataBinding(e);
 
             Control bindingContainer = this.BindingContainer;
             foreach (var parameter in this.Parameters)
             {
                 parameter.BindingContainer = bindingContainer;
+				Logger.LogDebug("OnDataBinding(e={E}): parameter.BindingContainer → {Arg1}", e, parameter.BindingContainer);
                 parameter.DataBind();
             }
+			Logger.LogDebug("<<< Exiting OnDataBinding(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             if (this.DesignMode)
@@ -91,6 +102,7 @@ namespace DotNetNuke.Services.GeneratedImage
             }
 
             this.ImageUrl = this.BuildImageUrl();
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private static void AddQueryStringParameter(StringBuilder stringBuilder, bool paramAlreadyAdded, string name, string value)
@@ -103,11 +115,14 @@ namespace DotNetNuke.Services.GeneratedImage
 
         private string BuildImageUrl()
         {
+			Logger.LogDebug(">>> Entering BuildImageUrl()");
             var stringBuilder = new StringBuilder();
             stringBuilder.Append(this.ImageHandlerUrl);
+			Logger.LogDebug("BuildImageUrl(): stringBuilder → {StringBuilder}", stringBuilder);
 
             var paramAlreadyAdded = false;
 
+			Logger.LogDebug("BuildImageUrl(): paramAlreadyAdded → {ParamAlreadyAdded}", paramAlreadyAdded);
             foreach (var parameter in this.Parameters)
             {
                 AddQueryStringParameter(stringBuilder, paramAlreadyAdded, parameter.Name, parameter.Value);
@@ -120,6 +135,7 @@ namespace DotNetNuke.Services.GeneratedImage
                 AddQueryStringParameter(stringBuilder, paramAlreadyAdded, TimestampField, timeStamp);
             }
 
+			Logger.LogDebug("<<< Exiting BuildImageUrl()");
             return stringBuilder.ToString();
         }
     }

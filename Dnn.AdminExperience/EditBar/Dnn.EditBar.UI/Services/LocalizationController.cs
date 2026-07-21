@@ -22,6 +22,7 @@ namespace Dnn.EditBar.UI.Services
     [DnnAuthorize]
     public class LocalizationController : DnnApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static object threadLocker = new object();
 
         /// <summary>Retrieve a list of CMX related Localization Keys with its values for the current culture.</summary>
@@ -30,10 +31,12 @@ namespace Dnn.EditBar.UI.Services
         [HttpGet]
         public HttpResponseMessage GetTable(string culture)
         {
+			Logger.LogDebug(">>> Entering GetTable(culture={Culture})", culture);
             try
             {
                 var resources = GetResourcesFromFile(culture);
                 if (resources == null)
+				Logger.LogDebug("GetTable(culture={Culture}): resources → {Resources}", culture, resources);
                 {
                     lock (threadLocker)
                     {
@@ -49,7 +52,9 @@ namespace Dnn.EditBar.UI.Services
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in GetTable(culture={Culture}): {Arg1}", culture, ex.Message);
                 Exceptions.LogException(ex);
+				Logger.LogDebug("<<< Exiting GetTable(culture={Culture})", culture);
                 return this.Request.CreateErrorResponse(HttpStatusCode.NotFound, ex.Message);
             }
         }
@@ -69,14 +74,18 @@ namespace Dnn.EditBar.UI.Services
 
         private static bool Expired(string culture)
         {
+			Logger.LogDebug(">>> Entering Expired(culture={Culture})", culture);
             var cacheKey = $"EditBarResources{culture}";
             if (DataCache.GetCache(cacheKey) != null)
+			Logger.LogDebug("Expired(culture={Culture}): cacheKey → {CacheKey}", culture, cacheKey);
             {
                 return false;
             }
 
             var jsonFilePath = GetResourcesJsonFilePath(culture);
             var jsonFile = new FileInfo(jsonFilePath);
+			Logger.LogDebug("Expired(culture={Culture}): jsonFilePath → {JsonFilePath}", culture, jsonFilePath);
+			Logger.LogDebug("Expired(culture={Culture}): jsonFile → {JsonFile}", culture, jsonFile);
             if (!jsonFile.Exists)
             {
                 return true;
@@ -85,6 +94,7 @@ namespace Dnn.EditBar.UI.Services
             var lastModifiedTime = jsonFile.LastWriteTime;
             var resourceFiles = GetAllResourceFiles(culture);
 
+			Logger.LogDebug("Expired(culture={Culture}): resourceFiles → {ResourceFiles}", culture, resourceFiles);
             var expired = resourceFiles.Select(file => new FileInfo(file))
                 .Any(resourceFile => resourceFile.LastWriteTime > lastModifiedTime);
             if (!expired)
@@ -92,12 +102,16 @@ namespace Dnn.EditBar.UI.Services
                 DataCache.SetCache(cacheKey, new CacheDto(), TimeSpan.FromMinutes(5));
             }
 
+			Logger.LogDebug("<<< Exiting Expired(culture={Culture})", culture);
             return expired;
         }
 
         private static string GetJsonFileContent(string culture)
         {
+			Logger.LogDebug(">>> Entering GetJsonFileContent(culture={Culture})", culture);
             var path = GetResourcesJsonFilePath(culture);
+			Logger.LogDebug("GetJsonFileContent(culture={Culture}): path → {Path}", culture, path);
+			Logger.LogDebug("<<< Exiting GetJsonFileContent(culture={Culture})", culture);
             return File.Exists(path) ? File.ReadAllText(path, Encoding.UTF8) : null;
         }
 
@@ -130,14 +144,21 @@ namespace Dnn.EditBar.UI.Services
 
         private static string GetResourcesJsonFilePath(string culture)
         {
+			Logger.LogDebug(">>> Entering GetResourcesJsonFilePath(culture={Culture})", culture);
             var path = Path.Combine(Constants.EditBarRelativePath, "Resources", $"LocalResources.{culture}.resources");
+			Logger.LogDebug("GetResourcesJsonFilePath(culture={Culture}): path → {Path}", culture, path);
+			Logger.LogDebug("<<< Exiting GetResourcesJsonFilePath(culture={Culture})", culture);
             return HttpContext.Current.Server.MapPath(path);
         }
 
         private static string[] GetAllResourceFiles(string culture)
         {
+			Logger.LogDebug(">>> Entering GetAllResourceFiles(culture={Culture})", culture);
             var editBarResourcesPath = Path.Combine(Constants.EditBarRelativePath, "App_LocalResources");
             var physicalPath = HttpContext.Current.Server.MapPath(editBarResourcesPath);
+			Logger.LogDebug("GetAllResourceFiles(culture={Culture}): editBarResourcesPath → {EditBarResourcesPath}", culture, editBarResourcesPath);
+			Logger.LogDebug("GetAllResourceFiles(culture={Culture}): physicalPath → {PhysicalPath}", culture, physicalPath);
+			Logger.LogDebug("<<< Exiting GetAllResourceFiles(culture={Culture})", culture);
             return Directory.GetFiles(physicalPath, "*.resx");
         }
     }

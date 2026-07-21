@@ -104,6 +104,7 @@ namespace log4net.Appender
     /// <author>Nicko Cadell</author>
     public class AnsiColorTerminalAppender : AppenderSkeleton
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// The enum of possible display attributes
         /// </summary>
@@ -222,6 +223,8 @@ namespace log4net.Appender
         /// </remarks>
         public AnsiColorTerminalAppender() 
         {
+		Logger.LogDebug(">>> Entering AnsiColorTerminalAppender()");
+		Logger.LogDebug("<<< Exiting AnsiColorTerminalAppender()");
         }
 
         /// <summary>
@@ -268,7 +271,9 @@ namespace log4net.Appender
         /// </remarks>
         public void AddMapping(LevelColors mapping)
         {
+			Logger.LogDebug(">>> Entering AddMapping(mapping={Mapping})", mapping);
             this.m_levelMapping.Add(mapping);
+			Logger.LogDebug("<<< Exiting AddMapping(mapping={Mapping})", mapping);
         }
 
         /// <summary>
@@ -285,11 +290,14 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent loggingEvent) 
         {
+			Logger.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             string loggingMessage = this.RenderLoggingEvent(loggingEvent);
 
+			Logger.LogDebug("Append(loggingEvent={LoggingEvent}): loggingMessage → {LoggingMessage}", loggingEvent, loggingMessage);
             // see if there is a specified lookup.
             LevelColors levelColors = this.m_levelMapping.Lookup(loggingEvent.Level) as LevelColors;
             if (levelColors != null)
+			Logger.LogDebug("Append(loggingEvent={LoggingEvent}): levelColors → {LevelColors}", loggingEvent, levelColors);
             {
                 // Prepend the Ansi Color code
                 loggingMessage = levelColors.CombinedColor + loggingMessage;
@@ -342,6 +350,7 @@ namespace log4net.Appender
             }
 #endif
         
+		Logger.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
         }
 
         /// <summary>
@@ -370,6 +379,8 @@ namespace log4net.Appender
         {
             base.ActivateOptions();
             this.m_levelMapping.ActivateOptions();
+			Logger.LogDebug(">>> Entering ActivateOptions()");
+			Logger.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>
@@ -483,15 +494,18 @@ namespace log4net.Appender
             /// </remarks>
             public override void ActivateOptions()
             {
+				Logger.LogDebug(">>> Entering ActivateOptions()");
                 base.ActivateOptions();
 
                 StringBuilder buf = new StringBuilder();
 
+				Logger.LogDebug("ActivateOptions(): buf → {Buf}", buf);
                 // Reset any existing codes
                 buf.Append("\x1b[0;");
 
                 int lightAdjustment = ((this.m_attributes & AnsiAttributes.Light) > 0) ? 60 : 0;
                 
+				Logger.LogDebug("ActivateOptions(): lightAdjustment → {LightAdjustment}", lightAdjustment);
                 // set the foreground color
                 buf.Append(30 + lightAdjustment + (int)this.m_foreColor);
                 buf.Append(';');
@@ -532,6 +546,7 @@ namespace log4net.Appender
                 buf.Append('m');
 
                 this.m_combinedColor = buf.ToString();
+				Logger.LogDebug("<<< Exiting ActivateOptions()");
             }
 
             /// <summary>

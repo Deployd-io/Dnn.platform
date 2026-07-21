@@ -11,14 +11,18 @@ namespace DotNetNuke.UI.Skins.Controls
 
     public class LanguageTokenReplace : TokenReplace
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         // see http://support.dotnetnuke.com/issue/ViewIssue.aspx?id=6505
 
         /// <summary>Initializes a new instance of the <see cref="LanguageTokenReplace"/> class.</summary>
         public LanguageTokenReplace()
             : base(Scope.NoSettings)
         {
+			Logger.LogDebug(">>> Entering LanguageTokenReplace()");
             this.UseObjectLessExpression = true;
             this.AddPropertySource(ObjectLessToken, new LanguagePropertyAccess(this, Globals.GetPortalSettings()));
+			Logger.LogDebug("<<< Exiting LanguageTokenReplace()");
+			Logger.LogDebug("LanguageTokenReplace(): this.UseObjectLessExpression → {Arg0}", this.UseObjectLessExpression);
         }
 
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]

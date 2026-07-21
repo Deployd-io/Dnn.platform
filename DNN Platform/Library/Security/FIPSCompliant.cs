@@ -37,6 +37,7 @@ namespace DotNetNuke.Security
     /// </remarks>
     public class FIPSCompliant
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>uses the AES FIPS-140 compliant algorithm to encrypt a string.</summary>
         /// <param name="plainText">the text to encrypt.</param>
         /// <param name="passPhrase">the pass phase to do the encryption.</param>
@@ -46,6 +47,7 @@ namespace DotNetNuke.Security
         [Obsolete("Deprecated in DotNetNuke 10.2.1. Use overload which takes a HashAlgorithmName. Scheduled removal in v12.0.0.")]
         public static string EncryptAES(string plainText, string passPhrase, string salt, int iterations = 1000)
             => EncryptAES(HashAlgorithmName.SHA1, plainText, passPhrase, salt, iterations);
+			Logger.LogDebug(">>> Entering EncryptAES(plainText={PlainText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations})", plainText, passPhrase, salt, iterations);
 
         /// <summary>uses the AES FIPS-140 compliant algorithm to encrypt a string.</summary>
         /// <param name="hashAlgorithm">the hash algorithm to use to derive the encryption key.</param>
@@ -62,24 +64,33 @@ namespace DotNetNuke.Security
             byte[] saltBytes = Encoding.ASCII.GetBytes(salt);
             using var aesProvider = new AesCryptoServiceProvider();
             using var derivedBytes = new Rfc2898DeriveBytes(passPhrase, saltBytes, iterations, hashAlgorithm);
+			Logger.LogDebug("EncryptAES(hashAlgorithm={HashAlgorithm},plainText={PlainText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations}): aesProvider → {AesProvider}", hashAlgorithm, plainText, passPhrase, salt, iterations, aesProvider);
+			Logger.LogDebug("EncryptAES(hashAlgorithm={HashAlgorithm},plainText={PlainText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations}): derivedBytes → {DerivedBytes}", hashAlgorithm, plainText, passPhrase, salt, iterations, derivedBytes);
             byte[] derivedKey = derivedBytes.GetBytes(32); // 256 bits
             byte[] derivedInitVector = derivedBytes.GetBytes(16); // 128 bits
             byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
 
             aesProvider.KeySize = 256;
+			Logger.LogDebug("EncryptAES(hashAlgorithm={HashAlgorithm},plainText={PlainText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations}): aesProvider.KeySize → {Arg5}", hashAlgorithm, plainText, passPhrase, salt, iterations, aesProvider.KeySize);
+			Logger.LogDebug("EncryptAES(hashAlgorithm={HashAlgorithm},plainText={PlainText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations}): aesProvider.Padding → {Arg5}", hashAlgorithm, plainText, passPhrase, salt, iterations, aesProvider.Padding);
+			Logger.LogDebug("EncryptAES(hashAlgorithm={HashAlgorithm},plainText={PlainText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations}): aesProvider.Mode → {Arg5}", hashAlgorithm, plainText, passPhrase, salt, iterations, aesProvider.Mode);
             aesProvider.Padding = PaddingMode.ISO10126;
             aesProvider.Mode = CipherMode.CBC;
 
             using var encryptor = aesProvider.CreateEncryptor(derivedKey, derivedInitVector);
             using var memStream = new MemoryStream();
+			Logger.LogDebug("EncryptAES(hashAlgorithm={HashAlgorithm},plainText={PlainText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations}): encryptor → {Encryptor}", hashAlgorithm, plainText, passPhrase, salt, iterations, encryptor);
+			Logger.LogDebug("EncryptAES(hashAlgorithm={HashAlgorithm},plainText={PlainText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations}): memStream → {MemStream}", hashAlgorithm, plainText, passPhrase, salt, iterations, memStream);
             using var cryptoStream = new CryptoStream(memStream, encryptor, CryptoStreamMode.Write);
             cryptoStream.Write(plainTextBytes, 0, plainTextBytes.Length);
+			Logger.LogDebug("EncryptAES(hashAlgorithm={HashAlgorithm},plainText={PlainText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations}): cryptoStream → {CryptoStream}", hashAlgorithm, plainText, passPhrase, salt, iterations, cryptoStream);
             cryptoStream.FlushFinalBlock();
             byte[] cipherTextBytes = memStream.ToArray();
 
             memStream.Close();
             cryptoStream.Close();
 
+			Logger.LogDebug("<<< Exiting EncryptAES(plainText={PlainText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations})", plainText, passPhrase, salt, iterations);
             return Convert.ToBase64String(cipherTextBytes);
         }
 
@@ -92,6 +103,7 @@ namespace DotNetNuke.Security
         [Obsolete("Deprecated in DotNetNuke 10.2.1. Use overload which takes a HashAlgorithmName. Scheduled removal in v12.0.0.")]
         public static string DecryptAES(string encryptedText, string passPhrase, string salt, int iterations = 1000)
             => DecryptAES(HashAlgorithmName.SHA1, encryptedText, passPhrase, salt, iterations);
+			Logger.LogDebug(">>> Entering DecryptAES(encryptedText={EncryptedText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations})", encryptedText, passPhrase, salt, iterations);
 
         /// <summary>uses the AES FIPS-140 compliant algorithm to encrypt a string.</summary>
         /// <param name="hashAlgorithm">the hash algorithm to use to derive the encryption key.</param>
@@ -108,27 +120,38 @@ namespace DotNetNuke.Security
             byte[] saltBytes = Encoding.ASCII.GetBytes(salt);
             using var aesProvider = new AesCryptoServiceProvider();
             using var derivedBytes = new Rfc2898DeriveBytes(passPhrase, saltBytes, iterations, hashAlgorithm);
+			Logger.LogDebug("DecryptAES(hashAlgorithm={HashAlgorithm},encryptedText={EncryptedText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations}): aesProvider → {AesProvider}", hashAlgorithm, encryptedText, passPhrase, salt, iterations, aesProvider);
+			Logger.LogDebug("DecryptAES(hashAlgorithm={HashAlgorithm},encryptedText={EncryptedText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations}): derivedBytes → {DerivedBytes}", hashAlgorithm, encryptedText, passPhrase, salt, iterations, derivedBytes);
             byte[] derivedKey = derivedBytes.GetBytes(32); // 256 bits
             byte[] derivedInitVector = derivedBytes.GetBytes(16); // 128 bits
             byte[] cipherTextBytes = Convert.FromBase64String(encryptedText);
 
             aesProvider.KeySize = 256;
+			Logger.LogDebug("DecryptAES(hashAlgorithm={HashAlgorithm},encryptedText={EncryptedText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations}): aesProvider.KeySize → {Arg5}", hashAlgorithm, encryptedText, passPhrase, salt, iterations, aesProvider.KeySize);
+			Logger.LogDebug("DecryptAES(hashAlgorithm={HashAlgorithm},encryptedText={EncryptedText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations}): aesProvider.Padding → {Arg5}", hashAlgorithm, encryptedText, passPhrase, salt, iterations, aesProvider.Padding);
+			Logger.LogDebug("DecryptAES(hashAlgorithm={HashAlgorithm},encryptedText={EncryptedText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations}): aesProvider.Mode → {Arg5}", hashAlgorithm, encryptedText, passPhrase, salt, iterations, aesProvider.Mode);
             aesProvider.Padding = PaddingMode.ISO10126;
             aesProvider.Mode = CipherMode.CBC;
 
             using var decryptor = aesProvider.CreateDecryptor(derivedKey, derivedInitVector);
             using var memStream = new MemoryStream(cipherTextBytes);
+			Logger.LogDebug("DecryptAES(hashAlgorithm={HashAlgorithm},encryptedText={EncryptedText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations}): decryptor → {Decryptor}", hashAlgorithm, encryptedText, passPhrase, salt, iterations, decryptor);
+			Logger.LogDebug("DecryptAES(hashAlgorithm={HashAlgorithm},encryptedText={EncryptedText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations}): memStream → {MemStream}", hashAlgorithm, encryptedText, passPhrase, salt, iterations, memStream);
             using var cryptoStream = new CryptoStream(memStream, decryptor, CryptoStreamMode.Read);
             var plainTextBytes = new byte[cipherTextBytes.Length];
+			Logger.LogDebug("DecryptAES(hashAlgorithm={HashAlgorithm},encryptedText={EncryptedText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations}): cryptoStream → {CryptoStream}", hashAlgorithm, encryptedText, passPhrase, salt, iterations, cryptoStream);
             int byteCount = cryptoStream.Read(plainTextBytes, 0, plainTextBytes.Length);
 
+			Logger.LogDebug("DecryptAES(hashAlgorithm={HashAlgorithm},encryptedText={EncryptedText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations}): byteCount → {ByteCount}", hashAlgorithm, encryptedText, passPhrase, salt, iterations, byteCount);
             memStream.Close();
             cryptoStream.Close();
+			Logger.LogDebug("<<< Exiting DecryptAES(encryptedText={EncryptedText},passPhrase={PassPhrase},salt={Salt},iterations={Iterations})", encryptedText, passPhrase, salt, iterations);
             return Encoding.UTF8.GetString(plainTextBytes, 0, byteCount);
         }
 
         private static void VerifyAesSettings(string passPhrase, string salt)
         {
+			Logger.LogDebug(">>> Entering VerifyAesSettings(passPhrase={PassPhrase},salt={Salt})", passPhrase, salt);
             Requires.PropertyNotNull("passPhrase", passPhrase);
             Requires.PropertyNotNull("salt", salt);
 
@@ -142,6 +165,7 @@ namespace DotNetNuke.Security
             {
                 throw new CryptographicException("Salt must be at least 8 characters long.");
             }
+			Logger.LogDebug("<<< Exiting VerifyAesSettings(passPhrase={PassPhrase},salt={Salt})", passPhrase, salt);
         }
     }
 }

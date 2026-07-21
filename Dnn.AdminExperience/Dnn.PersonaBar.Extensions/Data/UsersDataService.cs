@@ -13,9 +13,12 @@ namespace Dnn.PersonaBar.Users.Data
 
     public class UsersDataService : ServiceLocator<IUsersDataService, UsersDataService>, IUsersDataService
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public IList<UserBasicDto> GetUsersByUserIds(int portalId, string userIds)
         {
+			Logger.LogDebug(">>> Entering GetUsersByUserIds(portalId={PortalId},userIds={UserIds})", portalId, userIds);
+			Logger.LogDebug("<<< Exiting GetUsersByUserIds(portalId={PortalId},userIds={UserIds})", portalId, userIds);
             return CBO.FillCollection<UserBasicDto>(
                 DotNetNuke.Data.DataProvider.Instance()
                     .ExecuteReader(
@@ -27,6 +30,8 @@ namespace Dnn.PersonaBar.Users.Data
         /// <inheritdoc />
         protected override Func<IUsersDataService> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new UsersDataService();
         }
     }

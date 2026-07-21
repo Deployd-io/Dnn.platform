@@ -38,6 +38,7 @@ namespace log4net.Util
     /// <author>Gert Driesen</author>
     public class CountingQuietTextWriter : QuietTextWriter 
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Constructor
         /// </summary>
@@ -51,7 +52,11 @@ namespace log4net.Util
         /// </remarks>
         public CountingQuietTextWriter(TextWriter writer, IErrorHandler errorHandler) : base(writer, errorHandler)
         {
+			Logger.LogDebug(">>> Entering CountingQuietTextWriter(writer={Writer},errorHandler={ErrorHandler})", writer, errorHandler);
             this.m_countBytes = 0;
+			Logger.LogDebug("<<< Exiting CountingQuietTextWriter(writer={Writer},errorHandler={ErrorHandler})", writer, errorHandler);
+			Logger.LogDebug("CountingQuietTextWriter(writer={Writer},errorHandler={ErrorHandler}): m_countBytes → {M_countBytes}", writer, errorHandler, m_countBytes);
+			Logger.LogDebug("CountingQuietTextWriter(writer={Writer},errorHandler={ErrorHandler}): this.m_countBytes → {Arg2}", writer, errorHandler, this.m_countBytes);
         }
 
         /// <summary>
@@ -66,6 +71,7 @@ namespace log4net.Util
         /// </remarks>
         public override void Write(char value) 
         {
+			Logger.LogDebug(">>> Entering Write(value={Value})", value);
             try 
             {
                 base.Write(value);
@@ -76,8 +82,10 @@ namespace log4net.Util
             } 
             catch(Exception e) 
             {
+				Logger.LogError("Exception in Write(value={Value}): {Arg1}", value, ex.Message);
                 this.ErrorHandler.Error("Failed to write [" + value + "].", e, ErrorCode.WriteFailure);
             }
+			Logger.LogDebug("<<< Exiting Write(value={Value})", value);
         }
     
         /// <summary>
@@ -94,6 +102,7 @@ namespace log4net.Util
         /// </remarks>
         public override void Write(char[] buffer, int index, int count) 
         {
+			Logger.LogDebug(">>> Entering Write(buffer={Buffer},index={Index},count={Count})", buffer, index, count);
             if (count > 0)
             {
                 try 
@@ -106,9 +115,11 @@ namespace log4net.Util
                 } 
                 catch(Exception e) 
                 {
+					Logger.LogError("Exception in Write(buffer={Buffer},index={Index},count={Count}): {Arg3}", buffer, index, count, ex.Message);
                     this.ErrorHandler.Error("Failed to write buffer.", e, ErrorCode.WriteFailure);
                 }
             }
+			Logger.LogDebug("<<< Exiting Write(buffer={Buffer},index={Index},count={Count})", buffer, index, count);
         }
 
         /// <summary>
@@ -123,6 +134,7 @@ namespace log4net.Util
         /// </remarks>
         public override void Write(string str) 
         {
+			Logger.LogDebug(">>> Entering Write(str={Str})", str);
             if (str != null && str.Length > 0)
             {
                 try 
@@ -135,9 +147,11 @@ namespace log4net.Util
                 }
                 catch(Exception e) 
                 {
+					Logger.LogError("Exception in Write(str={Str}): {Arg1}", str, ex.Message);
                     this.ErrorHandler.Error("Failed to write [" + str + "].", e, ErrorCode.WriteFailure);
                 }
             }
+			Logger.LogDebug("<<< Exiting Write(str={Str})", str);
         }
 
         /// <summary>

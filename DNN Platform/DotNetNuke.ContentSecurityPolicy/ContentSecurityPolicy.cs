@@ -12,6 +12,7 @@ namespace DotNetNuke.ContentSecurityPolicy
     /// </summary>
     public class ContentSecurityPolicy : IContentSecurityPolicy
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private string nonce;
         private bool checkSyntax;
 
@@ -21,7 +22,10 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="checkSyntax">Check syntax.</param>
         public ContentSecurityPolicy(bool checkSyntax)
         {
+			Logger.LogDebug(">>> Entering ContentSecurityPolicy(checkSyntax={CheckSyntax})", checkSyntax);
             this.checkSyntax = checkSyntax;
+			Logger.LogDebug("<<< Exiting ContentSecurityPolicy(checkSyntax={CheckSyntax})", checkSyntax);
+			Logger.LogDebug("ContentSecurityPolicy(checkSyntax={CheckSyntax}): this.checkSyntax → {Arg1}", checkSyntax, this.checkSyntax);
         }
 
         /// <summary>
@@ -204,8 +208,11 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <exception cref="System.ArgumentException">Thrown when the CSP header is invalid or cannot be parsed.</exception>
         public IContentSecurityPolicy AddHeader(string cspHeader)
         {
+			Logger.LogDebug(">>> Entering AddHeader(cspHeader={CspHeader})", cspHeader);
             var parser = new ContentSecurityPolicyParser(this);
             parser.Parse(cspHeader);
+			Logger.LogDebug("AddHeader(cspHeader={CspHeader}): parser → {Parser}", cspHeader, parser);
+			Logger.LogDebug("<<< Exiting AddHeader(cspHeader={CspHeader})", cspHeader);
             return this;
         }
 
@@ -216,12 +223,15 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>A ContentSecurityPolicy object representing the parsed header.</returns>
         public IContentSecurityPolicy AddReportEndpointHeader(string header)
         {
+			Logger.LogDebug(">>> Entering AddReportEndpointHeader(header={Header})", header);
             if (!string.IsNullOrEmpty(header))
             {
                 var parser = new ContentSecurityPolicyParser(this);
                 parser.ParseReportingEndpoints(header);
+				Logger.LogDebug("AddReportEndpointHeader(header={Header}): parser → {Parser}", header, parser);
             }
 
+			Logger.LogDebug("<<< Exiting AddReportEndpointHeader(header={Header})", header);
             return this;
         }
 
@@ -231,7 +241,9 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="cspSourceType">The CSP source type to remove.</param>
         public void RemoveScriptSources(CspSourceType cspSourceType)
         {
+			Logger.LogDebug(">>> Entering RemoveScriptSources(cspSourceType={CspSourceType})", cspSourceType);
             this.RemoveSources(CspDirectiveType.ScriptSrc, cspSourceType);
+			Logger.LogDebug("<<< Exiting RemoveScriptSources(cspSourceType={CspSourceType})", cspSourceType);
         }
 
         /// <summary>
@@ -240,7 +252,9 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="value">The plugin type to allow.</param>
         public void AddPluginTypes(string value)
         {
+			Logger.LogDebug(">>> Entering AddPluginTypes(value={Value})", value);
             this.AddDocumentDirective(CspDirectiveType.PluginTypes, value);
+			Logger.LogDebug("<<< Exiting AddPluginTypes(value={Value})", value);
         }
 
         /// <summary>
@@ -249,7 +263,9 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="value">The sandbox directive value.</param>
         public void AddSandbox(string value)
         {
+			Logger.LogDebug(">>> Entering AddSandbox(value={Value})", value);
             this.SetDocumentDirective(CspDirectiveType.SandboxDirective, value);
+			Logger.LogDebug("<<< Exiting AddSandbox(value={Value})", value);
         }
 
         /// <summary>
@@ -259,7 +275,9 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="value">The value associated with the source.</param>
         public void AddFormAction(CspSourceType sourceType, string value)
         {
+			Logger.LogDebug(">>> Entering AddFormAction(sourceType={SourceType},value={Value})", sourceType, value);
             this.AddSource(CspDirectiveType.FormAction, sourceType, value);
+			Logger.LogDebug("<<< Exiting AddFormAction(sourceType={SourceType},value={Value})", sourceType, value);
         }
 
         /// <summary>
@@ -269,7 +287,9 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="value">The value associated with the source.</param>
         public void AddFrameAncestors(CspSourceType sourceType, string value)
         {
+			Logger.LogDebug(">>> Entering AddFrameAncestors(sourceType={SourceType},value={Value})", sourceType, value);
             this.AddSource(CspDirectiveType.FrameAncestors, sourceType, value);
+			Logger.LogDebug("<<< Exiting AddFrameAncestors(sourceType={SourceType},value={Value})", sourceType, value);
         }
 
         /// <summary>
@@ -279,8 +299,10 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="value">The URI where violation reports will be sent.</param>
         public void AddReportEndpoint(string name, string value)
         {
+			Logger.LogDebug(">>> Entering AddReportEndpoint(name={Name},value={Value})", name, value);
             // this.AddReportingDirective(CspDirectiveType.ReportUri, value);
             this.AddReportingEndpointsDirective(name, value);
+			Logger.LogDebug("<<< Exiting AddReportEndpoint(name={Name},value={Value})", name, value);
         }
 
         /// <summary>
@@ -289,7 +311,9 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="value">The endpoint where reports will be sent.</param>
         public void AddReportTo(string value)
         {
+			Logger.LogDebug(">>> Entering AddReportTo(value={Value})", value);
             this.AddReportingDirective(CspDirectiveType.ReportTo, value);
+			Logger.LogDebug("<<< Exiting AddReportTo(value={Value})", value);
         }
 
         /// <summary>
@@ -297,7 +321,9 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// </summary>
         public void UpgradeInsecureRequests()
         {
+			Logger.LogDebug(">>> Entering UpgradeInsecureRequests()");
             this.SetDocumentDirective(CspDirectiveType.UpgradeInsecureRequests, string.Empty);
+			Logger.LogDebug("<<< Exiting UpgradeInsecureRequests()");
         }
 
         /// <summary>
@@ -306,6 +332,8 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>The complete Content Security Policy.</returns>
         public string GeneratePolicy()
         {
+			Logger.LogDebug(">>> Entering GeneratePolicy()");
+			Logger.LogDebug("<<< Exiting GeneratePolicy()");
             return string.Join(
                 "; ",
                 this.ContentSecurityPolicyContributors
@@ -319,6 +347,8 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>Reporting Endpoints as a string.</returns>
         public string GenerateReportingEndpoints()
         {
+			Logger.LogDebug(">>> Entering GenerateReportingEndpoints()");
+			Logger.LogDebug("<<< Exiting GenerateReportingEndpoints()");
             return string.Join(
                   "; ",
                   this.ReportingEndpointsContributors
@@ -331,7 +361,9 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// </summary>
         public void ClearContentSecurityPolicyContributors()
         {
+			Logger.LogDebug(">>> Entering ClearContentSecurityPolicyContributors()");
             this.ContentSecurityPolicyContributors.Clear();
+			Logger.LogDebug("<<< Exiting ClearContentSecurityPolicyContributors()");
         }
 
         /// <summary>
@@ -339,7 +371,9 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// </summary>
         public void ClearReportingEndpointsContributors()
         {
+			Logger.LogDebug(">>> Entering ClearReportingEndpointsContributors()");
             this.ReportingEndpointsContributors.Clear();
+			Logger.LogDebug("<<< Exiting ClearReportingEndpointsContributors()");
         }
 
         /// <summary>
@@ -349,13 +383,16 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>A SourceCspContributor for the specified directive type.</returns>
         private SourceCspContributor GetOrCreateDirective(CspDirectiveType directiveType)
         {
+			Logger.LogDebug(">>> Entering GetOrCreateDirective(directiveType={DirectiveType})", directiveType);
             var directive = this.ContentSecurityPolicyContributors.FirstOrDefault(c => c.DirectiveType == directiveType) as SourceCspContributor;
             if (directive == null)
+			Logger.LogDebug("GetOrCreateDirective(directiveType={DirectiveType}): directive → {Directive}", directiveType, directive);
             {
                 directive = new SourceCspContributor(directiveType, this.checkSyntax);
                 this.AddContributor(directive);
             }
 
+			Logger.LogDebug("<<< Exiting GetOrCreateDirective(directiveType={DirectiveType})", directiveType);
             return directive;
         }
 
@@ -389,8 +426,10 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="value">The value associated with the source. If null and sourceType is Nonce, uses the generated nonce.</param>
         private void AddSource(CspDirectiveType directiveType, CspSourceType sourceType, string value = null)
         {
+			Logger.LogDebug(">>> Entering AddSource(directiveType={DirectiveType},sourceType={SourceType},value={Value})", directiveType, sourceType, value);
             var contributor = this.ContentSecurityPolicyContributors.FirstOrDefault(c => c.DirectiveType == directiveType) as SourceCspContributor;
             if (contributor == null)
+			Logger.LogDebug("AddSource(directiveType={DirectiveType},sourceType={SourceType},value={Value}): contributor → {Contributor}", directiveType, sourceType, value, contributor);
             {
                 contributor = new SourceCspContributor(directiveType, this.checkSyntax);
                 this.AddContributor(contributor);
@@ -402,6 +441,7 @@ namespace DotNetNuke.ContentSecurityPolicy
             }
 
             contributor.AddSource(new CspSource(sourceType, value, this.checkSyntax));
+			Logger.LogDebug("<<< Exiting AddSource(directiveType={DirectiveType},sourceType={SourceType},value={Value})", directiveType, sourceType, value);
         }
 
         /// <summary>
@@ -411,14 +451,17 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="sourceType">The type of sources to remove.</param>
         private void RemoveSources(CspDirectiveType directiveType, CspSourceType sourceType)
         {
+			Logger.LogDebug(">>> Entering RemoveSources(directiveType={DirectiveType},sourceType={SourceType})", directiveType, sourceType);
             var contributor = this.ContentSecurityPolicyContributors.FirstOrDefault(c => c.DirectiveType == directiveType) as SourceCspContributor;
             if (contributor == null)
+			Logger.LogDebug("RemoveSources(directiveType={DirectiveType},sourceType={SourceType}): contributor → {Contributor}", directiveType, sourceType, contributor);
             {
                 contributor = new SourceCspContributor(directiveType, this.checkSyntax);
                 this.AddContributor(contributor);
             }
 
             contributor.RemoveSources(sourceType);
+			Logger.LogDebug("<<< Exiting RemoveSources(directiveType={DirectiveType},sourceType={SourceType})", directiveType, sourceType);
         }
 
         /// <summary>
@@ -428,14 +471,18 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="value">The value to set for the directive.</param>
         private void SetDocumentDirective(CspDirectiveType directiveType, string value)
         {
+			Logger.LogDebug(">>> Entering SetDocumentDirective(directiveType={DirectiveType},value={Value})", directiveType, value);
             var contributor = this.ContentSecurityPolicyContributors.FirstOrDefault(c => c.DirectiveType == directiveType) as DocumentCspContributor;
             if (contributor == null)
+			Logger.LogDebug("SetDocumentDirective(directiveType={DirectiveType},value={Value}): contributor → {Contributor}", directiveType, value, contributor);
             {
                 contributor = new DocumentCspContributor(directiveType, value, this.checkSyntax);
                 this.AddContributor(contributor);
             }
 
             contributor.DirectiveValue = value;
+			Logger.LogDebug("<<< Exiting SetDocumentDirective(directiveType={DirectiveType},value={Value})", directiveType, value);
+			Logger.LogDebug("SetDocumentDirective(directiveType={DirectiveType},value={Value}): contributor.DirectiveValue → {Arg2}", directiveType, value, contributor.DirectiveValue);
         }
 
         /// <summary>
@@ -445,14 +492,18 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="value">The value for the directive.</param>
         private void AddDocumentDirective(CspDirectiveType directiveType, string value)
         {
+			Logger.LogDebug(">>> Entering AddDocumentDirective(directiveType={DirectiveType},value={Value})", directiveType, value);
             var contributor = this.ContentSecurityPolicyContributors.FirstOrDefault(c => c.DirectiveType == directiveType) as DocumentCspContributor;
             if (contributor == null)
+			Logger.LogDebug("AddDocumentDirective(directiveType={DirectiveType},value={Value}): contributor → {Contributor}", directiveType, value, contributor);
             {
                 contributor = new DocumentCspContributor(directiveType, value, this.checkSyntax);
                 this.AddContributor(contributor);
             }
 
             contributor.DirectiveValue = value;
+			Logger.LogDebug("<<< Exiting AddDocumentDirective(directiveType={DirectiveType},value={Value})", directiveType, value);
+			Logger.LogDebug("AddDocumentDirective(directiveType={DirectiveType},value={Value}): contributor.DirectiveValue → {Arg2}", directiveType, value, contributor.DirectiveValue);
         }
 
         /// <summary>
@@ -462,14 +513,17 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="value">The value for the reporting directive.</param>
         private void AddReportingDirective(CspDirectiveType directiveType, string value)
         {
+			Logger.LogDebug(">>> Entering AddReportingDirective(directiveType={DirectiveType},value={Value})", directiveType, value);
             var contributor = this.ContentSecurityPolicyContributors.FirstOrDefault(c => c.DirectiveType == directiveType) as ReportingCspContributor;
             if (contributor == null)
+			Logger.LogDebug("AddReportingDirective(directiveType={DirectiveType},value={Value}): contributor → {Contributor}", directiveType, value, contributor);
             {
                 contributor = new ReportingCspContributor(directiveType, this.checkSyntax);
                 this.AddContributor(contributor);
             }
 
             contributor.AddReportingEndpoint(value);
+			Logger.LogDebug("<<< Exiting AddReportingDirective(directiveType={DirectiveType},value={Value})", directiveType, value);
         }
 
         /// <summary>
@@ -479,14 +533,17 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="value">The URI value for the reporting endpoint.</param>
         private void AddReportingEndpointsDirective(string name, string value)
         {
+			Logger.LogDebug(">>> Entering AddReportingEndpointsDirective(name={Name},value={Value})", name, value);
             var contributor = this.ReportingEndpointsContributors.FirstOrDefault(c => c.DirectiveType == CspDirectiveType.ReportUri) as ReportingEndpointContributor;
             if (contributor == null)
+			Logger.LogDebug("AddReportingEndpointsDirective(name={Name},value={Value}): contributor → {Contributor}", name, value, contributor);
             {
                 contributor = new ReportingEndpointContributor(CspDirectiveType.ReportUri, this.checkSyntax);
                 this.AddReportingEndpointsContributors(contributor);
             }
 
             contributor.AddReportingEndpoint(name, value);
+			Logger.LogDebug("<<< Exiting AddReportingEndpointsDirective(name={Name},value={Value})", name, value);
         }
     }
 }

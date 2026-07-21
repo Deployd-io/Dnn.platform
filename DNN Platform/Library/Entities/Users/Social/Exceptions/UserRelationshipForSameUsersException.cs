@@ -10,9 +10,12 @@ namespace DotNetNuke.Entities.Users
     [Serializable]
     public class UserRelationshipForSameUsersException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="UserRelationshipForSameUsersException"/> class.</summary>
         public UserRelationshipForSameUsersException()
         {
+		Logger.LogDebug(">>> Entering UserRelationshipForSameUsersException()");
+		Logger.LogDebug("<<< Exiting UserRelationshipForSameUsersException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="UserRelationshipForSameUsersException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Entities.Users
         public UserRelationshipForSameUsersException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering UserRelationshipForSameUsersException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting UserRelationshipForSameUsersException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="UserRelationshipForSameUsersException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

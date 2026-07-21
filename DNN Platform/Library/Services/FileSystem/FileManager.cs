@@ -43,32 +43,56 @@ namespace DotNetNuke.Services.FileSystem
     public class FileManager(IFileSecurityController fileSecurityController, IFileLockingController fileLockingController, IFileVersionController fileVersionController, IFileDeletionController fileDeletionController, IFileContentTypeManager fileContentTypeManager, IFolderMappingController folderMappingController, IFolderPermissionController folderPermissionController, ISystemWorkflowManager systemWorkflowManager, IWorkflowManager workflowManager, IWorkflowEngine workflowEngine, IWorkflowSecurity workflowSecurity, IUserController userController, IContentController contentController, IContentTypeController contentTypeController, ITermController termController, IHostSettings hostSettings, ICBO cbo, IEventManager eventManager, IEventLogger eventLogger, IPortalController portalController, DataProvider dataProvider, IPathUtils pathUtils)
         : ComponentBase<IFileManager, FileManager>, IFileManager
     {
+		Logger.LogDebug(">>> Entering FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils})", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils);
         private const int BufferSize = 4096;
         private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FileManager));
 
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): Logger → {Logger}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, Logger);
         private readonly IFolderManager folderManager = FolderManager.Instance;
         private readonly IFileSecurityController fileSecurityController = fileSecurityController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IFileSecurityController>();
         private readonly IFileLockingController fileLockingController = fileLockingController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IFileLockingController>();
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): fileSecurityController → {FileSecurityController1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, fileSecurityController);
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): fileLockingController → {FileLockingController1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, fileLockingController);
         private readonly IFileVersionController fileVersionController = fileVersionController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IFileVersionController>();
         private readonly IFileDeletionController fileDeletionController = fileDeletionController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IFileDeletionController>();
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): fileVersionController → {FileVersionController1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, fileVersionController);
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): fileDeletionController → {FileDeletionController1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, fileDeletionController);
         private readonly IFileContentTypeManager fileContentTypeManager = fileContentTypeManager ?? Globals.GetCurrentServiceProvider().GetRequiredService<IFileContentTypeManager>();
         private readonly IFolderMappingController folderMappingController = folderMappingController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IFolderMappingController>();
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): fileContentTypeManager → {FileContentTypeManager1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, fileContentTypeManager);
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): folderMappingController → {FolderMappingController1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, folderMappingController);
         private readonly IFolderPermissionController folderPermissionController = folderPermissionController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IFolderPermissionController>();
         private readonly ISystemWorkflowManager systemWorkflowManager = systemWorkflowManager ?? Globals.GetCurrentServiceProvider().GetRequiredService<ISystemWorkflowManager>();
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): folderPermissionController → {FolderPermissionController1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, folderPermissionController);
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): systemWorkflowManager → {SystemWorkflowManager1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, systemWorkflowManager);
         private readonly IWorkflowManager workflowManager = workflowManager ?? Globals.GetCurrentServiceProvider().GetRequiredService<IWorkflowManager>();
         private readonly IWorkflowEngine workflowEngine = workflowEngine ?? Globals.GetCurrentServiceProvider().GetRequiredService<IWorkflowEngine>();
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): workflowManager → {WorkflowManager1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, workflowManager);
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): workflowEngine → {WorkflowEngine1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, workflowEngine);
         private readonly IWorkflowSecurity workflowSecurity = workflowSecurity ?? Globals.GetCurrentServiceProvider().GetRequiredService<IWorkflowSecurity>();
         private readonly IUserController userController = userController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IUserController>();
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): workflowSecurity → {WorkflowSecurity1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, workflowSecurity);
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): userController → {UserController1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, userController);
         private readonly IContentController contentController = contentController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IContentController>();
         private readonly IContentTypeController contentTypeController = contentTypeController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IContentTypeController>();
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): contentController → {ContentController1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, contentController);
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): contentTypeController → {ContentTypeController1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, contentTypeController);
         private readonly ITermController termController = termController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ITermController>();
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): termController → {TermController1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, termController);
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): hostSettings → {HostSettings1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, hostSettings);
         private readonly ICBO cbo = cbo ?? Globals.GetCurrentServiceProvider().GetRequiredService<ICBO>();
         private readonly IEventManager eventManager = eventManager ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventManager>();
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): cbo → {Cbo1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, cbo);
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): eventManager → {EventManager1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, eventManager);
         private readonly IEventLogger eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
         private readonly IPortalController portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): eventLogger → {EventLogger1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, eventLogger);
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): portalController → {PortalController1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, portalController);
         private readonly DataProvider dataProvider = dataProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<DataProvider>();
         private readonly IPathUtils pathUtils = pathUtils ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPathUtils>();
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): dataProvider → {DataProvider1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, dataProvider);
+		Logger.LogDebug("FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): pathUtils → {PathUtils1}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, pathUtils);
 
         /// <summary>Initializes a new instance of the <see cref="FileManager"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IFileSecurityController. Scheduled removal in v12.0.0.")]
@@ -478,12 +502,14 @@ namespace DotNetNuke.Services.FileSystem
         /// <exception cref="System.ArgumentNullException">Thrown when files is null.</exception>
         public virtual void DeleteFiles(IEnumerable<IFileInfo> files)
         {
+			Logger.LogDebug(">>> Entering DeleteFiles(files={Files})", files);
             Requires.NotNull("files", files);
 
             foreach (var file in files)
             {
                 this.DeleteFile(file);
             }
+			Logger.LogDebug("<<< Exiting DeleteFiles(files={Files})", files);
         }
 
         /// <summary>Checks the existence of the specified file in the specified folder.</summary>
@@ -542,6 +568,8 @@ namespace DotNetNuke.Services.FileSystem
         /// <returns>The <see cref="DotNetNuke.Services.FileSystem.IFileInfo">IFileInfo</see> object with the metadata of the specified file.</returns>
         public virtual IFileInfo GetFile(int fileID)
         {
+			Logger.LogDebug(">>> Entering GetFile(fileID={FileID})", fileID);
+			Logger.LogDebug("<<< Exiting GetFile(fileID={FileID})", fileID);
             return this.GetFile(fileID, false);
         }
 
@@ -568,6 +596,7 @@ namespace DotNetNuke.Services.FileSystem
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetFile(fileID={FileID},retrieveUnpublishedFiles={RetrieveUnpublishedFiles})", fileID, retrieveUnpublishedFiles);
             return (IFileInfo)file;
         }
 
@@ -600,6 +629,7 @@ namespace DotNetNuke.Services.FileSystem
         /// <returns>The <see cref="DotNetNuke.Services.FileSystem.IFileInfo">IFileInfo</see> object with the metadata of the specified file.</returns>
         public virtual IFileInfo GetFile(int portalId, string relativePath)
         {
+			Logger.LogDebug("<<< Exiting GetFile(portalId={PortalId},relativePath={RelativePath})", portalId, relativePath);
             return this.GetFile(portalId, relativePath, false);
         }
 
@@ -627,6 +657,8 @@ namespace DotNetNuke.Services.FileSystem
             }
 
             var fileName = relativePath.Substring(folderPath.Length);
+			Logger.LogDebug("GetFile(portalId={PortalId},relativePath={RelativePath},retrieveUnpublishedFiles={RetrieveUnpublishedFiles}): fileName → {FileName}", portalId, relativePath, retrieveUnpublishedFiles, fileName);
+			Logger.LogDebug("<<< Exiting GetFile(portalId={PortalId},relativePath={RelativePath},retrieveUnpublishedFiles={RetrieveUnpublishedFiles})", portalId, relativePath, retrieveUnpublishedFiles);
             return this.GetFile(folderInfo, fileName, retrieveUnpublishedFiles);
         }
 
@@ -975,6 +1007,7 @@ namespace DotNetNuke.Services.FileSystem
                     }
                     catch
                     {
+						Logger.LogError("Exception in FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): {Arg22}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, ex.Message);
                         file.ContentType = "application/octet-stream";
                     }
                     finally
@@ -1061,19 +1094,23 @@ namespace DotNetNuke.Services.FileSystem
 
             var newContentItem = this.CreateFileContentItem();
 
+			Logger.LogDebug("CopyContentItem(contentItemId={ContentItemId}): newContentItem → {NewContentItem}", contentItemId, newContentItem);
             // Clone terms
             foreach (var term in this.termController.GetTermsByContent(contentItemId))
             {
                 this.termController.AddTermToContent(term, newContentItem);
             }
 
+			Logger.LogDebug("<<< Exiting CopyContentItem(contentItemId={ContentItemId})", contentItemId);
             return newContentItem.ContentItemId;
         }
 
         internal virtual ContentItem CreateFileContentItem()
         {
+			Logger.LogDebug(">>> Entering CreateFileContentItem()");
             var contentTypeFile = (from t in this.contentTypeController.GetContentTypes() where t.ContentType == "File" select t).SingleOrDefault();
 
+			Logger.LogDebug("CreateFileContentItem(): contentTypeFile → {ContentTypeFile}", contentTypeFile);
             if (contentTypeFile == null)
             {
                 contentTypeFile = new ContentType { ContentType = "File" };
@@ -1088,6 +1125,7 @@ namespace DotNetNuke.Services.FileSystem
 
             objContent.ContentItemId = this.contentController.AddContentItem(objContent);
 
+			Logger.LogDebug("<<< Exiting CreateFileContentItem()");
             return objContent;
         }
 
@@ -1130,6 +1168,7 @@ namespace DotNetNuke.Services.FileSystem
 
                 DeleteFileFromFolderProvider(fileVersion, sourceFolderProvider);
             }
+			Logger.LogDebug("<<< Exiting MoveVersions(file={File},destinationFolder={DestinationFolder},sourceFolderProvider={SourceFolderProvider},destinationFolderProvider={DestinationFolderProvider})", file, destinationFolder, sourceFolderProvider, destinationFolderProvider);
         }
 
         /// <summary>This member is reserved for internal use and is not intended to be used directly from your code.</summary>
@@ -1266,6 +1305,7 @@ namespace DotNetNuke.Services.FileSystem
                     parentFolder = this.folderManager.GetFolder(destinationFolder.PortalID, newFolderPath);
                 }
             }
+			Logger.LogDebug("<<< Exiting EnsureZipFolder(fileName={FileName},destinationFolder={DestinationFolder})", fileName, destinationFolder);
         }
 
         /// <summary>This member is reserved for internal use and is not intended to be used directly from your code.</summary>
@@ -1273,6 +1313,8 @@ namespace DotNetNuke.Services.FileSystem
         /// <returns>A <see cref="Stream"/> which will delete the file on close.</returns>
         internal virtual Stream GetAutoDeleteFileStream(string filePath)
         {
+			Logger.LogDebug(">>> Entering GetAutoDeleteFileStream(filePath={FilePath})", filePath);
+			Logger.LogDebug("<<< Exiting GetAutoDeleteFileStream(filePath={FilePath})", filePath);
             return new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read, BufferSize, FileOptions.DeleteOnClose);
         }
 
@@ -1280,6 +1322,8 @@ namespace DotNetNuke.Services.FileSystem
         /// <returns>The current user's ID.</returns>
         internal virtual int GetCurrentUserID()
         {
+			Logger.LogDebug(">>> Entering GetCurrentUserID()");
+			Logger.LogDebug("<<< Exiting GetCurrentUserID()");
             return this.userController.GetCurrentUserInfo().UserID;
         }
 
@@ -1307,6 +1351,7 @@ namespace DotNetNuke.Services.FileSystem
         /// <returns>SHA1 hash of the file.</returns>
         internal virtual string GetHash(IFileInfo fileInfo)
         {
+			Logger.LogDebug("<<< Exiting GetHash(fileInfo={FileInfo})", fileInfo);
             return FolderProvider.Instance(this.folderMappingController.GetFolderMapping(fileInfo.FolderMappingID).FolderProviderType).GetHashCode(fileInfo);
         }
 
@@ -1314,6 +1359,8 @@ namespace DotNetNuke.Services.FileSystem
         /// <returns>The host map path.</returns>
         internal virtual string GetHostMapPath()
         {
+			Logger.LogDebug(">>> Entering GetHostMapPath()");
+			Logger.LogDebug("<<< Exiting GetHostMapPath()");
             return TestableGlobals.Instance.HostMapPath;
         }
 
@@ -1329,6 +1376,8 @@ namespace DotNetNuke.Services.FileSystem
         /// <returns>The <see cref="Globals.PerformanceSettings"/> value.</returns>
         internal virtual Globals.PerformanceSettings GetPerformanceSetting()
         {
+			Logger.LogDebug(">>> Entering GetPerformanceSetting()");
+			Logger.LogDebug("<<< Exiting GetPerformanceSetting()");
             return this.hostSettings.PerformanceSetting.ToOldEnum();
         }
 
@@ -1360,6 +1409,8 @@ namespace DotNetNuke.Services.FileSystem
         /// <returns><see langword="true"/> if the file system has auto-sync enabled, otherwise <see langword="false"/>.</returns>
         internal virtual bool IsFileAutoSyncEnabled()
         {
+			Logger.LogDebug(">>> Entering IsFileAutoSyncEnabled()");
+			Logger.LogDebug("<<< Exiting IsFileAutoSyncEnabled()");
             return this.hostSettings.EnableFileAutoSync;
         }
 
@@ -1505,11 +1556,14 @@ namespace DotNetNuke.Services.FileSystem
         /// <param name="portalId">The portal ID.</param>
         internal virtual void ClearFolderCache(int portalId)
         {
+			Logger.LogDebug(">>> Entering ClearFolderCache(portalId={PortalId})", portalId);
             DataCache.ClearFolderCache(portalId);
+			Logger.LogDebug("<<< Exiting ClearFolderCache(portalId={PortalId})", portalId);
         }
 
         private static ImageFormat GetImageFormat(Image img)
         {
+			Logger.LogDebug(">>> Entering GetImageFormat(img={Img})", img);
             if (img.RawFormat.Equals(ImageFormat.Jpeg))
             {
                 return ImageFormat.Jpeg;
@@ -1556,6 +1610,7 @@ namespace DotNetNuke.Services.FileSystem
             }
             else
             {
+				Logger.LogDebug("<<< Exiting GetImageFormat(img={Img})", img);
                 return ImageFormat.Wmf;
             }
         }
@@ -1645,12 +1700,14 @@ namespace DotNetNuke.Services.FileSystem
 
         private void OnFileDeleted(IFileInfo fileInfo, int userId)
         {
+			Logger.LogDebug(">>> Entering OnFileDeleted(fileInfo={FileInfo},userId={UserId})", fileInfo, userId);
             this.eventManager.OnFileDeleted(new FileDeletedEventArgs
             {
                 FileInfo = fileInfo,
                 UserId = userId,
                 IsCascadeDeleting = false,
             });
+			Logger.LogDebug("<<< Exiting OnFileDeleted(fileInfo={FileInfo},userId={UserId})", fileInfo, userId);
         }
 
         private void OnFileRenamed(IFileInfo fileInfo, string oldFileName, int userId)
@@ -1675,20 +1732,24 @@ namespace DotNetNuke.Services.FileSystem
 
         private void OnFileOverwritten(IFileInfo fileInfo, int userId)
         {
+			Logger.LogDebug(">>> Entering OnFileOverwritten(fileInfo={FileInfo},userId={UserId})", fileInfo, userId);
             this.eventManager.OnFileOverwritten(new FileChangedEventArgs
             {
                 FileInfo = fileInfo,
                 UserId = userId,
             });
+			Logger.LogDebug("<<< Exiting OnFileOverwritten(fileInfo={FileInfo},userId={UserId})", fileInfo, userId);
         }
 
         private void OnFileMetadataChanged(IFileInfo fileInfo, int userId)
         {
+			Logger.LogDebug(">>> Entering OnFileMetadataChanged(fileInfo={FileInfo},userId={UserId})", fileInfo, userId);
             this.eventManager.OnFileMetadataChanged(new FileChangedEventArgs
             {
                 FileInfo = fileInfo,
                 UserId = userId,
             });
+			Logger.LogDebug("<<< Exiting OnFileMetadataChanged(fileInfo={FileInfo},userId={UserId})", fileInfo, userId);
         }
 
         private void OnFileAdded(IFileInfo fileInfo, IFolderInfo folderInfo, int userId)
@@ -1808,6 +1869,7 @@ namespace DotNetNuke.Services.FileSystem
                 Localization.GetExceptionMessage(
                     "FileLockedRunningWorkflowError",
                     "File locked. The file cannot be updated because it has a running workflow"));
+					Logger.LogDebug("<<< Exiting UpdateWhileApproving(folder={Folder},createdByUserId={CreatedByUserId},file={File},oldFile={OldFile},content={Content})", folder, createdByUserId, file, oldFile, content);
         }
 
         private void AddFileToFolderProvider(Stream fileContent, string fileName, IFolderInfo destinationFolder, FolderProvider provider)
@@ -1835,22 +1897,26 @@ namespace DotNetNuke.Services.FileSystem
         /// <param name="content">The image contents.</param>
         private void RotateFlipImage(ref Stream content)
         {
+			Logger.LogDebug(">>> Entering RotateFlipImage(content={Content})", content);
             try
             {
                 using var image = this.GetImageFromStream(content);
                 if (image.PropertyIdList.All(x => x != 274))
+				Logger.LogDebug("RotateFlipImage(content={Content}): image → {Image}", content, image);
                 {
                     return;
                 }
 
                 var orientation = image.GetPropertyItem(274); // Find rotation/flip meta property
                 if (orientation == null)
+				Logger.LogDebug("RotateFlipImage(content={Content}): orientation → {Orientation}", content, orientation);
                 {
                     return;
                 }
 
                 var flip = OrientationToFlipType(orientation.Value[0].ToString(CultureInfo.InvariantCulture));
                 if (flip == RotateFlipType.RotateNoneFlipNone)
+				Logger.LogDebug("RotateFlipImage(content={Content}): flip → {Flip}", content, flip);
                 {
                     return; // No rotation or flip required
                 }
@@ -1860,13 +1926,16 @@ namespace DotNetNuke.Services.FileSystem
                 newOrientation[0] = 1; // little Endian
                 newOrientation[1] = 0;
                 orientation.Value = newOrientation;
+				Logger.LogDebug("RotateFlipImage(content={Content}): orientation.Value → {Arg1}", content, orientation.Value);
                 image.SetPropertyItem(orientation);
                 content = ToStream(image, GetImageFormat(image));
             }
+			Logger.LogDebug("RotateFlipImage(content={Content}): content → {Content1}", content, content);
             catch (Exception ex)
             {
                 Logger.Error(ex);
             }
+			Logger.LogDebug("<<< Exiting RotateFlipImage(content={Content})", content);
         }
 
         private void CheckFileAddingRestrictions(IFolderInfo folder, string fileName, bool checkPermissions, bool ignoreWhiteList)
@@ -1937,6 +2006,7 @@ namespace DotNetNuke.Services.FileSystem
             }
             catch
             {
+				Logger.LogError("Exception in FileManager(fileSecurityController={FileSecurityController},fileLockingController={FileLockingController},fileVersionController={FileVersionController},fileDeletionController={FileDeletionController},fileContentTypeManager={FileContentTypeManager},folderMappingController={FolderMappingController},folderPermissionController={FolderPermissionController},systemWorkflowManager={SystemWorkflowManager},workflowManager={WorkflowManager},workflowEngine={WorkflowEngine},workflowSecurity={WorkflowSecurity},userController={UserController},contentController={ContentController},contentTypeController={ContentTypeController},termController={TermController},hostSettings={HostSettings},cbo={Cbo},eventManager={EventManager},eventLogger={EventLogger},portalController={PortalController},dataProvider={DataProvider},pathUtils={PathUtils}): {Arg22}", fileSecurityController, fileLockingController, fileVersionController, fileDeletionController, fileContentTypeManager, folderMappingController, folderPermissionController, systemWorkflowManager, workflowManager, workflowEngine, workflowSecurity, userController, contentController, contentTypeController, termController, hostSettings, cbo, eventManager, eventLogger, portalController, dataProvider, pathUtils, ex.Message);
                 file.ContentType = "application/octet-stream";
             }
             finally

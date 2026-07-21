@@ -39,7 +39,9 @@ namespace DotNetNuke.Modules.Admin.Users
         public Membership()
             : this(null, null)
         {
+		eventLogger.LogDebug(">>> Entering Membership()");
         }
+		eventLogger.LogDebug("<<< Exiting Membership()");
 
         /// <summary>Initializes a new instance of the <see cref="Membership"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
@@ -48,6 +50,14 @@ namespace DotNetNuke.Modules.Admin.Users
         public Membership(INavigationManager navigationManager, DataProvider dataProvider)
             : this(navigationManager, dataProvider, null, null, null, null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering Membership(navigationManager={NavigationManager},dataProvider={DataProvider})", navigationManager, dataProvider);
+		eventLogger.LogDebug("<<< Exiting Membership(navigationManager={NavigationManager},dataProvider={DataProvider})", navigationManager, dataProvider);
+		eventLogger.LogDebug("Membership(navigationManager={NavigationManager},dataProvider={DataProvider},roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},listController={ListController},hostSettings={HostSettings}): dataProvider → {DataProvider1}", navigationManager, dataProvider, roleProvider, roleController, eventManager, portalController, userController, eventLogger, listController, hostSettings, dataProvider);
+		eventLogger.LogDebug("Membership(navigationManager={NavigationManager},dataProvider={DataProvider},roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},listController={ListController},hostSettings={HostSettings}): roleProvider → {RoleProvider1}", navigationManager, dataProvider, roleProvider, roleController, eventManager, portalController, userController, eventLogger, listController, hostSettings, roleProvider);
+		eventLogger.LogDebug("Membership(navigationManager={NavigationManager},dataProvider={DataProvider},roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},listController={ListController},hostSettings={HostSettings}): roleController → {RoleController1}", navigationManager, dataProvider, roleProvider, roleController, eventManager, portalController, userController, eventLogger, listController, hostSettings, roleController);
+		eventLogger.LogDebug("Membership(navigationManager={NavigationManager},dataProvider={DataProvider},roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},listController={ListController},hostSettings={HostSettings}): eventManager → {EventManager1}", navigationManager, dataProvider, roleProvider, roleController, eventManager, portalController, userController, eventLogger, listController, hostSettings, eventManager);
+		eventLogger.LogDebug("Membership(navigationManager={NavigationManager},dataProvider={DataProvider},roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},listController={ListController},hostSettings={HostSettings}): portalController → {PortalController1}", navigationManager, dataProvider, roleProvider, roleController, eventManager, portalController, userController, eventLogger, listController, hostSettings, portalController);
+		eventLogger.LogDebug("Membership(navigationManager={NavigationManager},dataProvider={DataProvider},roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},listController={ListController},hostSettings={HostSettings}): userController → {UserController1}", navigationManager, dataProvider, roleProvider, roleController, eventManager, portalController, userController, eventLogger, listController, hostSettings, userController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Membership"/> class.</summary>
@@ -81,6 +91,8 @@ namespace DotNetNuke.Modules.Admin.Users
         {
             this.navigationManager = navigationManager ?? this.DependencyProvider.GetRequiredService<INavigationManager>();
             this.dataProvider = dataProvider ?? this.DependencyProvider.GetRequiredService<DataProvider>();
+			eventLogger.LogDebug("Membership(navigationManager={NavigationManager},dataProvider={DataProvider},roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},listController={ListController},hostSettings={HostSettings}): eventLogger → {EventLogger1}", navigationManager, dataProvider, roleProvider, roleController, eventManager, portalController, userController, eventLogger, listController, hostSettings, eventLogger);
+			eventLogger.LogDebug("Membership(navigationManager={NavigationManager},dataProvider={DataProvider},roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},listController={ListController},hostSettings={HostSettings}): navigationManager → {NavigationManager1}", navigationManager, dataProvider, roleProvider, roleController, eventManager, portalController, userController, eventLogger, listController, hostSettings, navigationManager);
             this.roleProvider = roleProvider ?? this.DependencyProvider.GetRequiredService<RoleProvider>();
             this.roleController = roleController ?? this.DependencyProvider.GetRequiredService<IRoleController>();
             this.eventManager = eventManager ?? this.DependencyProvider.GetRequiredService<IEventManager>();
@@ -121,6 +133,7 @@ namespace DotNetNuke.Modules.Admin.Users
         /// <param name="e">The event arguments.</param>
         public void OnMembershipPromoteToSuperuser(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnMembershipPromoteToSuperuser(e={E})", e);
             if (!this.IsUserOrAdmin)
             {
                 return;
@@ -131,12 +144,14 @@ namespace DotNetNuke.Modules.Admin.Users
                 this.MembershipPromoteToSuperuser(this, e);
                 this.Response.Redirect(this.navigationManager.NavigateURL(), true);
             }
+			eventLogger.LogDebug("<<< Exiting OnMembershipPromoteToSuperuser(e={E})", e);
         }
 
         /// <summary>Raises the MembershipPromoteToSuperuser Event.</summary>
         /// <param name="e">The event arguments.</param>
         public void OnMembershipDemoteFromSuperuser(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnMembershipDemoteFromSuperuser(e={E})", e);
             if (!this.IsUserOrAdmin)
             {
                 return;
@@ -147,51 +162,61 @@ namespace DotNetNuke.Modules.Admin.Users
                 this.MembershipDemoteFromSuperuser(this, e);
                 this.Response.Redirect(this.navigationManager.NavigateURL(), true);
             }
+			eventLogger.LogDebug("<<< Exiting OnMembershipDemoteFromSuperuser(e={E})", e);
         }
 
         /// <summary>Raises the MembershipAuthorized Event.</summary>
         /// <param name="e">The event arguments.</param>
         public void OnMembershipAuthorized(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnMembershipAuthorized(e={E})", e);
             if (this.IsUserOrAdmin)
             {
                 this.MembershipAuthorized?.Invoke(this, e);
             }
+			eventLogger.LogDebug("<<< Exiting OnMembershipAuthorized(e={E})", e);
         }
 
         /// <summary>Raises the MembershipPasswordUpdateChanged Event.</summary>
         /// <param name="e">The event arguments.</param>
         public void OnMembershipPasswordUpdateChanged(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnMembershipPasswordUpdateChanged(e={E})", e);
             if (this.IsUserOrAdmin)
             {
                 this.MembershipPasswordUpdateChanged?.Invoke(this, e);
             }
+			eventLogger.LogDebug("<<< Exiting OnMembershipPasswordUpdateChanged(e={E})", e);
         }
 
         /// <summary>Raises the MembershipUnAuthorized Event.</summary>
         /// <param name="e">The event arguments.</param>
         public void OnMembershipUnAuthorized(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnMembershipUnAuthorized(e={E})", e);
             if (this.IsUserOrAdmin)
             {
                 this.MembershipUnAuthorized?.Invoke(this, e);
             }
+			eventLogger.LogDebug("<<< Exiting OnMembershipUnAuthorized(e={E})", e);
         }
 
         /// <summary>Raises the MembershipUnLocked Event.</summary>
         /// <param name="e">The event arguments.</param>
         public void OnMembershipUnLocked(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnMembershipUnLocked(e={E})", e);
             if (this.IsUserOrAdmin)
             {
                 this.MembershipUnLocked?.Invoke(this, e);
             }
+			eventLogger.LogDebug("<<< Exiting OnMembershipUnLocked(e={E})", e);
         }
 
         /// <summary>DataBind binds the data to the controls.</summary>
         public override void DataBind()
         {
+			eventLogger.LogDebug(">>> Entering DataBind()");
             // disable/enable buttons
             if (this.UserInfo.UserID == this.User.UserID)
             {
@@ -247,12 +272,14 @@ namespace DotNetNuke.Modules.Admin.Users
             // ReSharper restore SpecifyACultureInStringConversionExplicitly
             this.membershipForm.DataSource = this.UserMembership;
             this.membershipForm.DataBind();
+			eventLogger.LogDebug("<<< Exiting DataBind()");
         }
 
         /// <summary>Page_Load runs when the control is loaded.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.cmdAuthorize.Click += this.CmdAuthorize_Click;
@@ -260,11 +287,13 @@ namespace DotNetNuke.Modules.Admin.Users
             this.cmdUnAuthorize.Click += this.CmdUnAuthorize_Click;
             this.cmdUnLock.Click += this.CmdUnLock_Click;
             this.cmdToggleSuperuser.Click += this.CmdToggleSuperuser_Click;
+			eventLogger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <summary>cmdAuthorize_Click runs when the Authorize User Button is clicked.</summary>
         private void CmdAuthorize_Click(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering CmdAuthorize_Click(sender={Sender},e={E})", sender, e);
             if (!this.IsUserOrAdmin)
             {
                 return;
@@ -292,11 +321,13 @@ namespace DotNetNuke.Modules.Admin.Users
             Mail.SendMail(this.User, MessageType.UserAuthorized, this.PortalSettings);
 
             this.OnMembershipAuthorized(EventArgs.Empty);
+			eventLogger.LogDebug("<<< Exiting CmdAuthorize_Click(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>cmdPassword_Click runs when the ChangePassword Button is clicked.</summary>
         private void CmdPassword_Click(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering CmdPassword_Click(sender={Sender},e={E})", sender, e);
             if (!this.IsUserOrAdmin)
             {
                 return;
@@ -324,12 +355,15 @@ namespace DotNetNuke.Modules.Admin.Users
             {
                 var message = Localization.GetString("OptionUnavailable", this.LocalResourceFile);
                 UI.Skins.Skin.AddModuleMessage(this, message, ModuleMessage.ModuleMessageType.YellowWarning);
+				eventLogger.LogDebug("CmdPassword_Click(sender={Sender},e={E}): message → {Message}", sender, e, message);
             }
+			eventLogger.LogDebug("<<< Exiting CmdPassword_Click(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>cmdUnAuthorize_Click runs when the UnAuthorize User Button is clicked.</summary>
         private void CmdUnAuthorize_Click(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering CmdUnAuthorize_Click(sender={Sender},e={E})", sender, e);
             if (!this.IsUserOrAdmin)
             {
                 return;
@@ -349,6 +383,7 @@ namespace DotNetNuke.Modules.Admin.Users
             UserController.UpdateUser(this.eventLogger, this.PortalId, this.User);
 
             this.OnMembershipUnAuthorized(EventArgs.Empty);
+			eventLogger.LogDebug("<<< Exiting CmdUnAuthorize_Click(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>cmdToggleSuperuser_Click runs when the toggle superuser button is clicked.</summary>
@@ -356,6 +391,7 @@ namespace DotNetNuke.Modules.Admin.Users
         /// <param name="e">The event arguments.</param>
         private void CmdToggleSuperuser_Click(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering CmdToggleSuperuser_Click(sender={Sender},e={E})", sender, e);
             if (!this.IsUserOrAdmin)
             {
                 return;
@@ -387,11 +423,13 @@ namespace DotNetNuke.Modules.Admin.Users
             {
                 this.OnMembershipPromoteToSuperuser(EventArgs.Empty);
             }
+			eventLogger.LogDebug("<<< Exiting CmdToggleSuperuser_Click(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>cmdUnlock_Click runs when the Unlock Account Button is clicked.</summary>
         private void CmdUnLock_Click(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering CmdUnLock_Click(sender={Sender},e={E})", sender, e);
             if (!this.IsUserOrAdmin)
             {
                 return;
@@ -410,6 +448,7 @@ namespace DotNetNuke.Modules.Admin.Users
 
                 this.OnMembershipUnLocked(EventArgs.Empty);
             }
+			eventLogger.LogDebug("<<< Exiting CmdUnLock_Click(sender={Sender},e={E})", sender, e);
         }
     }
 }
