@@ -8,11 +8,14 @@ namespace Dnn.PersonaBar.Pages.Components.Exceptions
 
     public class PageException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="PageException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>
         public PageException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering PageException(message={Message})", message);
+		Logger.LogDebug("<<< Exiting PageException(message={Message})", message);
         }
     }
 }

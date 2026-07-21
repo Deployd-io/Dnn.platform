@@ -25,6 +25,7 @@ using log4net.Util;
 
 namespace log4net
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>The log4net Logical Thread Context.</summary>
     /// <remarks>
     /// <para>
@@ -88,6 +89,8 @@ namespace log4net
         /// </remarks>
         private LogicalThreadContext()
         {
+		Logger.LogDebug(">>> Entering LogicalThreadContext()");
+		Logger.LogDebug("<<< Exiting LogicalThreadContext()");
         }
 
         /// <summary>The thread properties map</summary>

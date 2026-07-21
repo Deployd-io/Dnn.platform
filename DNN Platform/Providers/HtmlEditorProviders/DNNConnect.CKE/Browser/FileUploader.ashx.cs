@@ -32,6 +32,7 @@ using Microsoft.Extensions.DependencyInjection;
 /// <summary>The File Upload Handler.</summary>
 public class FileUploader : IHttpHandler
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>The JavaScript Serializer.</summary>
     private readonly JavaScriptSerializer js = new JavaScriptSerializer();
 
@@ -44,13 +45,16 @@ public class FileUploader : IHttpHandler
     public FileUploader()
         : this(null)
     {
+	Logger.LogDebug(">>> Entering FileUploader()");
     }
+	Logger.LogDebug("<<< Exiting FileUploader()");
 
     /// <summary>Initializes a new instance of the <see cref="FileUploader"/> class.</summary>
     /// <param name="hostSettings">The host settings.</param>
     public FileUploader(IHostSettings hostSettings)
     {
         this.hostSettings = hostSettings ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IHostSettings>();
+		Logger.LogDebug("FileUploader(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
     }
 
     /// <summary>Gets a value indicating whether another request can use the <see cref="IHttpHandler" /> instance.</summary>
@@ -70,18 +74,22 @@ public class FileUploader : IHttpHandler
     /// <param name="context">An <see cref="HttpContext" /> object that provides references to the intrinsic server objects (for example, Request, Response, Session, and Server) used to service HTTP requests.</param>
     public void ProcessRequest(HttpContext context)
     {
+		Logger.LogDebug(">>> Entering ProcessRequest(context={Context})", context);
         context.Response.AddHeader("Pragma", "no-cache");
         context.Response.AddHeader("Cache-Control", "private, no-cache");
 
         this.HandleMethod(context);
+		Logger.LogDebug("<<< Exiting ProcessRequest(context={Context})", context);
     }
 
     /// <summary>Returns the options.</summary>
     /// <param name="context">The context.</param>
     private static void ReturnOptions(HttpContext context)
     {
+		Logger.LogDebug(">>> Entering ReturnOptions(context={Context})", context);
         context.Response.AddHeader("Allow", "DELETE,GET,HEAD,POST,PUT,OPTIONS");
         context.Response.StatusCode = 200;
+		Logger.LogDebug("<<< Exiting ReturnOptions(context={Context})", context);
     }
 
     /// <summary>Gets the codec for the given <paramref name="format"/>.</summary>
@@ -89,25 +97,33 @@ public class FileUploader : IHttpHandler
     /// <returns>The codec, or <see langword="null"/>.</returns>
     private static ImageCodecInfo GetEncoder(ImageFormat format)
     {
+		Logger.LogDebug(">>> Entering GetEncoder(format={Format})", format);
         var codecs = ImageCodecInfo.GetImageDecoders();
 
+		Logger.LogDebug("GetEncoder(format={Format}): codecs → {Codecs}", format, codecs);
+		Logger.LogDebug("<<< Exiting GetEncoder(format={Format})", format);
         return codecs.FirstOrDefault(codec => codec.FormatID == format.Guid);
     }
 
     private static (int NewWidth, int NewHeight) DetermineNewDimensions(Image uplImage, int maxWidth, int maxHeight)
     {
+		Logger.LogDebug(">>> Entering DetermineNewDimensions(NewWidth={NewWidth},NewHeight={NewHeight})", NewWidth, NewHeight);
         // it's too big: we need to resize
         int newWidth, newHeight;
 
         // which determines the max: height or width?
         var ratioWidth = (double)maxWidth / (double)uplImage.Width;
         var ratioHeight = (double)maxHeight / (double)uplImage.Height;
+		Logger.LogDebug("DetermineNewDimensions(NewWidth={NewWidth},NewHeight={NewHeight}): ratioWidth → {RatioWidth}", NewWidth, NewHeight, ratioWidth);
+		Logger.LogDebug("DetermineNewDimensions(NewWidth={NewWidth},NewHeight={NewHeight}): ratioHeight → {RatioHeight}", NewWidth, NewHeight, ratioHeight);
         if (ratioWidth < ratioHeight)
         {
             // max width needs to be used
             newWidth = maxWidth;
+			Logger.LogDebug("DetermineNewDimensions(NewWidth={NewWidth},NewHeight={NewHeight}): newWidth → {NewWidth1}", NewWidth, NewHeight, newWidth);
             newHeight = (int)Math.Round(uplImage.Height * ratioWidth);
         }
+		Logger.LogDebug("DetermineNewDimensions(NewWidth={NewWidth},NewHeight={NewHeight}): newHeight → {NewHeight1}", NewWidth, NewHeight, newHeight);
         else
         {
             // max height needs to be used
@@ -115,11 +131,13 @@ public class FileUploader : IHttpHandler
             newWidth = (int)Math.Round(uplImage.Width * ratioHeight);
         }
 
+		Logger.LogDebug("<<< Exiting DetermineNewDimensions(NewWidth={NewWidth},NewHeight={NewHeight})", NewWidth, NewHeight);
         return (newWidth, newHeight);
     }
 
     private static Stream ResizeImage(Image uplImage, int newWidth, int newHeight)
     {
+		Logger.LogDebug(">>> Entering ResizeImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight})", uplImage, newWidth, newHeight);
         // Add Compression to Jpeg Images
         if (uplImage.RawFormat.Equals(ImageFormat.Jpeg))
         {
@@ -128,31 +146,43 @@ public class FileUploader : IHttpHandler
 
         using Image newImage = uplImage.GetThumbnailImage(newWidth, newHeight, null, IntPtr.Zero);
         var imageFormat = uplImage.RawFormat;
+		Logger.LogDebug("ResizeImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight}): newImage → {NewImage}", uplImage, newWidth, newHeight, newImage);
 
         var fileContents = new MemoryStream();
         newImage.Save(fileContents, imageFormat);
+		Logger.LogDebug("ResizeImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight}): fileContents → {FileContents}", uplImage, newWidth, newHeight, fileContents);
+		Logger.LogDebug("<<< Exiting ResizeImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight})", uplImage, newWidth, newHeight);
         return fileContents;
     }
 
     private static Stream ResizeJpegImage(Image uplImage, int newWidth, int newHeight)
     {
+		Logger.LogDebug(">>> Entering ResizeJpegImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight})", uplImage, newWidth, newHeight);
         var jpgEncoder = GetEncoder(uplImage.RawFormat);
 
+		Logger.LogDebug("ResizeJpegImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight}): jpgEncoder → {JpgEncoder}", uplImage, newWidth, newHeight, jpgEncoder);
         var myEncoder = Encoder.Quality;
         var encodeParams = new EncoderParameters(1);
         var encodeParam = new EncoderParameter(myEncoder, 80L);
+		Logger.LogDebug("ResizeJpegImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight}): encodeParams → {EncodeParams}", uplImage, newWidth, newHeight, encodeParams);
+		Logger.LogDebug("ResizeJpegImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight}): encodeParam → {EncodeParam}", uplImage, newWidth, newHeight, encodeParam);
         encodeParams.Param[0] = encodeParam;
 
         using var destination = new Bitmap(newWidth, newHeight);
         using (var graphic = Graphics.FromImage(destination))
         {
+		Logger.LogDebug("ResizeJpegImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight}): destination → {Destination}", uplImage, newWidth, newHeight, destination);
             graphic.SmoothingMode = SmoothingMode.AntiAlias;
+			Logger.LogDebug("ResizeJpegImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight}): graphic.SmoothingMode → {Arg3}", uplImage, newWidth, newHeight, graphic.SmoothingMode);
+			Logger.LogDebug("ResizeJpegImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight}): graphic.InterpolationMode → {Arg3}", uplImage, newWidth, newHeight, graphic.InterpolationMode);
             graphic.InterpolationMode = InterpolationMode.HighQualityBicubic;
             graphic.DrawImage(uplImage, 0, 0, destination.Width, destination.Height);
         }
 
         var fileContents = new MemoryStream();
         destination.Save(fileContents, jpgEncoder, encodeParams);
+		Logger.LogDebug("ResizeJpegImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight}): fileContents → {FileContents}", uplImage, newWidth, newHeight, fileContents);
+		Logger.LogDebug("<<< Exiting ResizeJpegImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight})", uplImage, newWidth, newHeight);
         return fileContents;
     }
 
@@ -160,6 +190,8 @@ public class FileUploader : IHttpHandler
     /// <param name="context">The context.</param>
     private void HandleMethod(HttpContext context)
     {
+		Logger.LogDebug(">>> Entering HandleMethod(context={Context})", context);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         switch (context.Request.HttpMethod)
         {
             case "HEAD":
@@ -189,35 +221,53 @@ public class FileUploader : IHttpHandler
                 context.Response.StatusCode = 405;
                 break;
         }
+		Logger.LogDebug("<<< Exiting HandleMethod(context={Context})", context);
+		Logger.LogInformation("HandleMethod(context)={Context}: external service call took {Arg1} ms", context, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>Uploads the file.</summary>
     /// <param name="context">The context.</param>
     private void UploadFile(HttpContext context)
     {
+		Logger.LogDebug(">>> Entering UploadFile(context={Context})", context);
         var statuses = new List<FilesUploadStatus>();
 
+		Logger.LogDebug("UploadFile(context={Context}): statuses → {Statuses}", context, statuses);
         this.UploadWholeFile(context, statuses);
 
         this.WriteJsonIframeSafe(context, statuses);
+		Logger.LogDebug("<<< Exiting UploadFile(context={Context})", context);
     }
 
     private EditorProviderSettings GetCurrentSettings(HttpContext context)
     {
+		Logger.LogDebug(">>> Entering GetCurrentSettings(context={Context})", context);
         var request = context.Request;
         int.TryParse(request.QueryString["PortalID"], out var portalId);
         this.portalSettings = new PortalSettings(portalId);
+		Logger.LogDebug("GetCurrentSettings(context={Context}): portalSettings → {PortalSettings}", context, portalSettings);
 
         if (!Enum.TryParse<SettingsMode>(request.QueryString["mode"], true, out var settingMode))
         {
             settingMode = SettingsMode.Default;
+			Logger.LogDebug("GetCurrentSettings(context={Context}): settingMode → {SettingMode}", context, settingMode);
         }
 
         var providerConfiguration = ProviderConfiguration.GetProviderConfiguration("htmlEditor");
         var objProvider = (Provider)providerConfiguration.Providers[providerConfiguration.DefaultProvider];
+		Logger.LogDebug("GetCurrentSettings(context={Context}): providerConfiguration → {ProviderConfiguration}", context, providerConfiguration);
+		Logger.LogDebug("GetCurrentSettings(context={Context}): objProvider → {ObjProvider}", context, objProvider);
         var settingsDictionary = EditorController.GetEditorHostSettings(this.hostSettings);
         var portalRoles = RoleController.Instance.GetRoles(this.portalSettings.PortalId);
+		Logger.LogDebug("GetCurrentSettings(context={Context}): settingsDictionary → {SettingsDictionary}", context, settingsDictionary);
+		Logger.LogDebug("GetCurrentSettings(context={Context}): portalRoles → {PortalRoles}", context, portalRoles);
 
+		Logger.LogDebug("GetCurrentSettings(context={Context}): SettingsMode.Default → {Arg1}", context, SettingsMode.Default);
+		Logger.LogDebug("GetCurrentSettings(context={Context}): SettingsMode.Host → {Arg1}", context, SettingsMode.Host);
+		Logger.LogDebug("GetCurrentSettings(context={Context}): SettingsMode.Portal → {Arg1}", context, SettingsMode.Portal);
+		Logger.LogDebug("GetCurrentSettings(context={Context}): SettingsMode.Page → {Arg1}", context, SettingsMode.Page);
+		Logger.LogDebug("GetCurrentSettings(context={Context}): SettingsMode.ModuleInstance → {Arg1}", context, SettingsMode.ModuleInstance);
+		Logger.LogDebug("<<< Exiting GetCurrentSettings(context={Context})", context);
         return settingMode switch
         {
             SettingsMode.Default =>

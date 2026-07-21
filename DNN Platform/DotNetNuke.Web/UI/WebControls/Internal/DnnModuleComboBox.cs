@@ -32,13 +32,16 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
             eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>(),
             clientResourceController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>())
     {
+		Logger.LogDebug(">>> Entering DnnModuleComboBox(appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController},hostSettings={HostSettings})", appStatus, eventLogger, clientResourceController, hostSettings);
         private const string DefaultExtensionImage = "icon_extensions_32px.png";
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+		Logger.LogDebug("DnnModuleComboBox(appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController},hostSettings={HostSettings}): hostSettings → {HostSettings1}", appStatus, eventLogger, clientResourceController, hostSettings, hostSettings);
 
         private DnnComboBox moduleCombo;
         private string originalValue;
 
         /// <summary>Initializes a new instance of the <see cref="DnnModuleComboBox"/> class.</summary>
+		Logger.LogDebug("<<< Exiting DnnModuleComboBox(appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController},hostSettings={HostSettings})", appStatus, eventLogger, clientResourceController, hostSettings);
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IApplicationStatusInfo. Scheduled removal in v12.0.0.")]
         public DnnModuleComboBox()
             : this(null, null, null)
@@ -80,58 +83,73 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <summary>Binds the portal desktop modules to the list.</summary>
         public void BindAllPortalDesktopModules()
         {
+			Logger.LogDebug(">>> Entering BindAllPortalDesktopModules()");
             this.moduleCombo.SelectedValue = null;
             this.moduleCombo.DataSource = this.GetPortalDesktopModules();
             this.moduleCombo.DataBind();
             BindPortalDesktopModuleImages(this.hostSettings);
+			Logger.LogDebug("<<< Exiting BindAllPortalDesktopModules()");
         }
 
         /// <summary>Binds the modules from the page to the list.</summary>
         /// <param name="tabID">The tab ID.</param>
         public void BindTabModulesByTabID(int tabID)
         {
+			Logger.LogDebug(">>> Entering BindTabModulesByTabID(tabID={TabID})", tabID);
             this.moduleCombo.SelectedValue = null;
             this.moduleCombo.DataSource = GetTabModules(tabID);
             this.moduleCombo.DataBind();
             BindTabModuleImages(this.hostSettings, tabID);
+			Logger.LogDebug("<<< Exiting BindTabModulesByTabID(tabID={TabID})", tabID);
         }
 
         /// <summary>Sets the module.</summary>
         /// <param name="code">The item's value.</param>
         public void SetModule(string code)
         {
+			Logger.LogDebug(">>> Entering SetModule(code={Code})", code);
             this.moduleCombo.SelectedIndex = this.moduleCombo.FindItemIndexByValue(code);
+			Logger.LogDebug("<<< Exiting SetModule(code={Code})", code);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
             this.moduleCombo = new DnnComboBox(this.AppStatus, this.EventLogger, this.ClientResourceController);
+			Logger.LogDebug("OnInit(e={E}): moduleCombo → {ModuleCombo}", e, moduleCombo);
             this.moduleCombo.DataValueField = "key";
             this.moduleCombo.DataTextField = "value";
             this.Controls.Add(this.moduleCombo);
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             this.originalValue = this.SelectedValue;
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
+			Logger.LogDebug("OnLoad(e={E}): this.originalValue → {Arg1}", e, this.originalValue);
         }
 
         /// <summary>A method which triggers the <see cref="ItemChanged"/> event.</summary>
         protected virtual void OnItemChanged()
         {
+			Logger.LogDebug(">>> Entering OnItemChanged()");
             if (this.ItemChanged != null)
             {
                 this.ItemChanged(this, new EventArgs());
             }
+			Logger.LogDebug("<<< Exiting OnItemChanged()");
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             if (this.moduleCombo.FindItemByValue(this.originalValue) != null)
             {
                 this.moduleCombo.FindItemByValue(this.originalValue).Selected = true;
@@ -139,6 +157,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
 
             this.moduleCombo.Width = this.Width;
             base.OnPreRender(e);
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private static Dictionary<int, string> GetTabModules(int tabID)
@@ -155,20 +174,25 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
 
         private static bool ModuleSuportsSharing(ModuleInfo moduleInfo)
         {
+			Logger.LogDebug(">>> Entering ModuleSuportsSharing(moduleInfo={ModuleInfo})", moduleInfo);
             switch (moduleInfo.DesktopModule.Shareable)
             {
                 case ModuleSharing.Supported:
                 case ModuleSharing.Unknown:
                     return moduleInfo.IsShareable;
                 default:
+					Logger.LogDebug("<<< Exiting ModuleSuportsSharing(moduleInfo={ModuleInfo})", moduleInfo);
                     return false;
             }
         }
 
         private static void BindPortalDesktopModuleImages(IHostSettings hostSettings)
         {
+			Logger.LogDebug(">>> Entering BindPortalDesktopModuleImages(hostSettings={HostSettings})", hostSettings);
             var portalDesktopModules = DesktopModuleController.GetDesktopModules(hostSettings, PortalSettings.Current.PortalId);
             var packages = PackageController.Instance.GetExtensionPackages(PortalSettings.Current.PortalId);
+			Logger.LogDebug("BindPortalDesktopModuleImages(hostSettings={HostSettings}): portalDesktopModules → {PortalDesktopModules}", hostSettings, portalDesktopModules);
+			Logger.LogDebug("BindPortalDesktopModuleImages(hostSettings={HostSettings}): packages → {Packages}", hostSettings, packages);
 
             ////foreach (var item in _moduleCombo.Items)
             ////{
@@ -180,14 +204,20 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
             ////
             ////item.ImageUrl = String.IsNullOrEmpty(imageUrl) ? Globals.ImagePath + DefaultExtensionImage : imageUrl;
             ////}
+			Logger.LogDebug("<<< Exiting BindPortalDesktopModuleImages(hostSettings={HostSettings})", hostSettings);
         }
 
         private static void BindTabModuleImages(IHostSettings hostSettings, int tabId)
         {
+			Logger.LogDebug(">>> Entering BindTabModuleImages(hostSettings={HostSettings},tabId={TabId})", hostSettings, tabId);
             var tabModules = ModuleController.Instance.GetTabModules(tabId);
             var portalDesktopModules = DesktopModuleController.GetDesktopModules(hostSettings, PortalSettings.Current.PortalId);
+			Logger.LogDebug("BindTabModuleImages(hostSettings={HostSettings},tabId={TabId}): tabModules → {TabModules}", hostSettings, tabId, tabModules);
+			Logger.LogDebug("BindTabModuleImages(hostSettings={HostSettings},tabId={TabId}): portalDesktopModules → {PortalDesktopModules}", hostSettings, tabId, portalDesktopModules);
             var moduleDefinitions = ModuleDefinitionController.GetModuleDefinitions(hostSettings);
             var packages = PackageController.Instance.GetExtensionPackages(PortalSettings.Current.PortalId);
+			Logger.LogDebug("BindTabModuleImages(hostSettings={HostSettings},tabId={TabId}): moduleDefinitions → {ModuleDefinitions}", hostSettings, tabId, moduleDefinitions);
+			Logger.LogDebug("BindTabModuleImages(hostSettings={HostSettings},tabId={TabId}): packages → {Packages}", hostSettings, tabId, packages);
 
             ////foreach (RadComboBoxItem item in _moduleCombo.Items)
             ////{
@@ -200,6 +230,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
             ////
             ////item.ImageUrl = String.IsNullOrEmpty(imageUrl) ? Globals.ImagePath + DefaultExtensionImage : imageUrl;
             ////}
+			Logger.LogDebug("<<< Exiting BindTabModuleImages(hostSettings={HostSettings},tabId={TabId})", hostSettings, tabId);
         }
 
         private Dictionary<int, string> GetPortalDesktopModules()

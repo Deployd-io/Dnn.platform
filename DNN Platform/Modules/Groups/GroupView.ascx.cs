@@ -23,10 +23,13 @@ namespace DotNetNuke.Modules.Groups
     /// <summary>Display the group view.</summary>
     public partial class GroupView : GroupsModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         protected void Page_Load(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering Page_Load(sender={Sender},e={E})", sender, e);
             RoleInfo role = RoleController.Instance.GetRole(this.PortalId, r => r.SecurityMode != SecurityMode.SecurityRole && r.RoleID == this.GroupId);
             if (role == null && this.GroupId > 0)
+			Logger.LogDebug("Page_Load(sender={Sender},e={E}): role → {Role}", sender, e, role);
             {
                 UI.Skins.Skin.AddModuleMessage(this, Localization.GetString("GroupIdNotFound", Constants.SharedResourcesPath), ModuleMessage.ModuleMessageType.YellowWarning);
             }
@@ -35,6 +38,7 @@ namespace DotNetNuke.Modules.Groups
             {
                 role = new RoleInfo();
                 role.RoleID = -1;
+				Logger.LogDebug("Page_Load(sender={Sender},e={E}): role.RoleID → {Arg2}", sender, e, role.RoleID);
                 role.RoleName = Localization.GetString("Sample_RoleName", this.LocalResourceFile);
                 role.Description = Localization.GetString("Sample_RoleDescription", this.LocalResourceFile);
             }
@@ -49,6 +53,7 @@ namespace DotNetNuke.Modules.Groups
 
                 var template = this.GroupViewTemplate;
                 template = template.Replace("{resx:posts}", Localization.GetString("posts", resxPath));
+				Logger.LogDebug("Page_Load(sender={Sender},e={E}): template → {Template}", sender, e, template);
                 template = template.Replace("{resx:members}", Localization.GetString("members", resxPath));
                 template = template.Replace("{resx:photos}", Localization.GetString("photos", resxPath));
                 template = template.Replace("{resx:documents}", Localization.GetString("documents", resxPath));
@@ -62,9 +67,11 @@ namespace DotNetNuke.Modules.Groups
 
                 var groupParser = new GroupViewParser(this.PortalSettings, role, this.UserInfo, template, this.TabId);
                 groupParser.GroupEditUrl = this.GetEditUrl();
+				Logger.LogDebug("Page_Load(sender={Sender},e={E}): groupParser → {GroupParser}", sender, e, groupParser);
 
                 this.litOutput.Text = groupParser.ParseView();
             }
+			Logger.LogDebug("<<< Exiting Page_Load(sender={Sender},e={E})", sender, e);
         }
     }
 }

@@ -23,14 +23,17 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         /// <returns>A cached version of the file contents in a string.</returns>
         internal static string CachedFileContent(string filename)
         {
+			Logger.LogDebug(">>> Entering CachedFileContent(filename={Filename})", filename);
             var cache = HttpContext.Current.Cache;
             var result = cache[filename] as string;
             if (result == null)
+			Logger.LogDebug("CachedFileContent(filename={Filename}): result → {Result}", filename, result);
             {
                 result = File.ReadAllText(filename);
                 cache.Insert(filename, result, new CacheDependency(filename));
             }
 
+			Logger.LogDebug("<<< Exiting CachedFileContent(filename={Filename})", filename);
             return result;
         }
 
@@ -39,9 +42,11 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         /// <returns>A <see cref="XmlDocument"/> representing the cached file contents.</returns>
         internal static XmlDocument CachedXml(string filename)
         {
+			Logger.LogDebug(">>> Entering CachedXml(filename={Filename})", filename);
             var cache = HttpContext.Current.Cache;
             var result = cache[filename] as XmlDocument;
             if (result == null)
+			Logger.LogDebug("CachedXml(filename={Filename}): result → {Result}", filename, result);
             {
                 result = new XmlDocument { XmlResolver = null };
                 using (var xmlReader = XmlReader.Create(filename, new XmlReaderSettings { XmlResolver = null, }))
@@ -52,6 +57,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
                 cache.Insert(filename, result, new CacheDependency(filename));
             }
 
+			Logger.LogDebug("<<< Exiting CachedXml(filename={Filename})", filename);
             return result;
         }
 
@@ -60,9 +66,11 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         /// <returns>An <see cref="XslCompiledTransform"/> object with the content of cached content of the file.</returns>
         internal static XslCompiledTransform CachedXslt(string filename)
         {
+			Logger.LogDebug(">>> Entering CachedXslt(filename={Filename})", filename);
             var cache = HttpContext.Current.Cache;
             var result = cache[filename] as XslCompiledTransform;
             if (result == null)
+			Logger.LogDebug("CachedXslt(filename={Filename}): result → {Result}", filename, result);
             {
                 result = new XslCompiledTransform();
                 using (var reader = XmlReader.Create(filename, new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore }))
@@ -73,6 +81,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
                 cache.Insert(filename, result, new CacheDependency(filename));
             }
 
+			Logger.LogDebug("<<< Exiting CachedXslt(filename={Filename})", filename);
             return result;
         }
 
@@ -81,7 +90,9 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         /// <returns>An <see cref="XmlSerializer"/>.</returns>
         internal static XmlSerializer SerialiserFor(Type t)
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
             XmlSerializer result;
+			Logger.LogDebug(">>> Entering SerialiserFor(t={T})", t);
             if (!Serialisers.TryGetValue(t, out result))
             {
                 lock (Serialisers)
@@ -96,6 +107,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
                 }
             }
 
+			Logger.LogDebug("<<< Exiting SerialiserFor(t={T})", t);
             return result;
         }
 
@@ -104,6 +116,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         /// <returns>A string representation of the object.</returns>
         internal static string ConvertToJs(object obj)
         {
+			Logger.LogDebug(">>> Entering ConvertToJs(obj={Obj})", obj);
             string result;
 
             if (obj == null)
@@ -113,9 +126,11 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
 
             var objType = obj.GetType();
             if (objType == typeof(bool))
+			Logger.LogDebug("ConvertToJs(obj={Obj}): objType → {ObjType}", obj, objType);
             {
                 result = (bool)obj ? "true" : "false";
             }
+			Logger.LogDebug("ConvertToJs(obj={Obj}): result → {Result}", obj, result);
             else if (objType == typeof(int) || objType == typeof(decimal) || objType == typeof(double))
             {
                 result = obj.ToString();
@@ -125,6 +140,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
                 result = $"'{HttpUtility.JavaScriptStringEncode(obj.ToString())}'";
             }
 
+			Logger.LogDebug("<<< Exiting ConvertToJs(obj={Obj})", obj);
             return result;
         }
     }

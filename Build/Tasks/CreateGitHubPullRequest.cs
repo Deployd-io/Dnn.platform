@@ -43,6 +43,7 @@ namespace DotNetNuke.Build.Tasks
     /// then checks whether any uncommitted changes exist.
     /// If changes exist it commits them to a new branch, pushes, and opens a draft PR.
     /// It requires the following environment variables:
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <list type="bullet">
     ///   <item><c>GITHUB_APP_ID</c> – The numeric GitHub App ID.</item>
     ///   <item><c>GITHUB_APP_PRIVATE_KEY</c> – The PEM-encoded private key for the GitHub App.</item>
@@ -59,6 +60,7 @@ namespace DotNetNuke.Build.Tasks
         /// <inheritdoc/>
         public override async Task RunAsync(Context context)
         {
+			Logger.LogDebug(">>> Entering RunAsync(context={Context})", context);
             if (!context.IsRunningInCI)
             {
                 context.Information("Skipping CreateGitHubPullRequest because the build is not running in CI.");
@@ -67,6 +69,8 @@ namespace DotNetNuke.Build.Tasks
 
             var solutionInfoPath = context.File("SolutionInfo.cs");
             var bugReportPath = context.File(".github/ISSUE_TEMPLATE/bug-report.yml");
+			Logger.LogDebug("RunAsync(context={Context}): solutionInfoPath → {SolutionInfoPath}", context, solutionInfoPath);
+			Logger.LogDebug("RunAsync(context={Context}): bugReportPath → {BugReportPath}", context, bugReportPath);
 
             var sourceBranch = context.AzurePipelines().IsRunningOnAzurePipelines
                 ? context.AzurePipelines().Environment.Repository.SourceBranch
@@ -82,6 +86,8 @@ namespace DotNetNuke.Build.Tasks
 
             var appId = context.EnvironmentVariable("GITHUB_APP_ID");
             var privateKey = context.EnvironmentVariable("GITHUB_APP_PRIVATE_KEY");
+			Logger.LogDebug("RunAsync(context={Context}): appId → {AppId}", context, appId);
+			Logger.LogDebug("RunAsync(context={Context}): privateKey → {PrivateKey}", context, privateKey);
             if (string.IsNullOrEmpty(appId) || string.IsNullOrEmpty(privateKey))
             {
                 context.Warning("Skipping CreateGitHubPullRequest because GITHUB_APP_ID or GITHUB_APP_PRIVATE_KEY is not set.");
@@ -97,6 +103,7 @@ namespace DotNetNuke.Build.Tasks
 
             var parts = repoSlug.Split('/');
             if (parts.Length != 2)
+			Logger.LogDebug("RunAsync(context={Context}): parts → {Parts}", context, parts);
             {
                 throw new CakeException($"Repository name '{repoSlug}' is not in the expected 'owner/repo' format.");
             }
@@ -107,9 +114,14 @@ namespace DotNetNuke.Build.Tasks
             // Generate a short-lived installation token from the GitHub App credentials
             var token = await GenerateInstallationToken(context);
 
+			Logger.LogWarning("RunAsync(context={Context}): token → {Token}", context, token);
             var client = new GitHubClient(new ProductHeaderValue("DnnPlatformCakeBuild"))
             {
                 Credentials = new Credentials(token),
+				Logger.LogDebug(">>> Entering GenerateInstallationToken(context={Context})", context);
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				Logger.LogInformation("GenerateInstallationToken(context)={Context}: external service call took {Arg1} ms", context, __logStart.ElapsedMilliseconds);
+				Logger.LogDebug("<<< Exiting GenerateInstallationToken(context={Context})", context);
             };
 
             context.Information("Authenticated as GitHub App installation.");
@@ -130,6 +142,7 @@ namespace DotNetNuke.Build.Tasks
 
             var headBranch = $"automated/ci-{context.BuildId}";
 
+			Logger.LogDebug("RunAsync(context={Context}): headBranch → {HeadBranch}", context, headBranch);
             // Configure git identity for CI (agents don't have one by default)
             Git(context, $"config user.name \"{GitUserName}\"");
             Git(context, $"config user.email \"{GitUserEmail}\"");
@@ -152,9 +165,11 @@ namespace DotNetNuke.Build.Tasks
             Git(context, $"remote set-url origin https://github.com/{repoSlug}.git");
             var encodedToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"x-access-token:{token}"));
             Git(context, $"-c http.extraHeader=\"Authorization: Basic {encodedToken}\" push origin {headBranch}", redactOutput: true);
+			Logger.LogDebug("RunAsync(context={Context}): encodedToken → {EncodedToken}", context, encodedToken);
 
             const string title = $"[Automated] Merge CI changes into {TargetBranch}";
             var body = $"Automated pull request created by CI build {context.BuildId}.";
+			Logger.LogDebug("RunAsync(context={Context}): body → {Body}", context, body);
 
             context.Information("Creating GitHub PR: {0} → {1} in {2}/{3}", headBranch, TargetBranch, owner, repo);
 
@@ -166,6 +181,8 @@ namespace DotNetNuke.Build.Tasks
 
             var pr = await client.PullRequest.Create(owner, repo, newPr);
             context.Information("Pull request #{0} created: {1}", pr.Number, pr.HtmlUrl);
+			Logger.LogDebug("RunAsync(context={Context}): pr → {Pr}", context, pr);
+			Logger.LogDebug("<<< Exiting RunAsync(context={Context})", context);
         }
 
         private static bool IsTargetedBranch(string sourceBranch)
@@ -182,15 +199,21 @@ namespace DotNetNuke.Build.Tasks
 
         private static async Task<string> GenerateInstallationToken(Context context)
         {
+			Logger.LogDebug(">>> Entering GenerateInstallationToken(context={Context})", context);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var appId = context.EnvironmentVariable("GITHUB_APP_ID");
             var privateKeyPem = context.EnvironmentVariable("GITHUB_APP_PRIVATE_KEY");
+			Logger.LogDebug("GenerateInstallationToken(context={Context}): appId → {AppId}", context, appId);
+			Logger.LogDebug("GenerateInstallationToken(context={Context}): privateKeyPem → {PrivateKeyPem}", context, privateKeyPem);
 
             // Azure DevOps collapses multi-line secrets into a single line,
             // so we need to normalize the PEM before importing it.
             var normalized = NormalizePem(privateKeyPem);
 
+			Logger.LogDebug("GenerateInstallationToken(context={Context}): normalized → {Normalized}", context, normalized);
             var rsa = RSA.Create();
             rsa.ImportFromPem(normalized);
+			Logger.LogDebug("GenerateInstallationToken(context={Context}): rsa → {Rsa}", context, rsa);
 
             var now = DateTimeOffset.UtcNow;
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -205,20 +228,27 @@ namespace DotNetNuke.Build.Tasks
 
             var tokenHandler = new JsonWebTokenHandler();
             var jwt = tokenHandler.CreateToken(tokenDescriptor);
+			Logger.LogDebug("GenerateInstallationToken(context={Context}): tokenHandler → {TokenHandler}", context, tokenHandler);
+			Logger.LogDebug("GenerateInstallationToken(context={Context}): jwt → {Jwt}", context, jwt);
 
             context.Information("Generated JWT for GitHub App ID {0}.", appId);
 
             // Exchange the JWT for a short-lived installation access token
             using var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+			Logger.LogDebug("GenerateInstallationToken(context={Context}): httpClient → {HttpClient}", context, httpClient);
+			Logger.LogInformation("GenerateInstallationToken(context)={Context}: external service call took {Arg1} ms", context, __logStart.ElapsedMilliseconds);
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
             httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("DnnPlatformCakeBuild", "1.0"));
 
             // Get the installation ID
             var installationsResponse = await httpClient.GetAsync("https://api.github.com/app/installations");
             installationsResponse.EnsureSuccessStatusCode();
+			Logger.LogDebug("GenerateInstallationToken(context={Context}): installationsResponse → {InstallationsResponse}", context, installationsResponse);
             var installationsJson = await installationsResponse.Content.ReadAsStringAsync();
             var installations = JsonConvert.DeserializeObject<List<GitHubInstallation>>(installationsJson);
+			Logger.LogDebug("GenerateInstallationToken(context={Context}): installationsJson → {InstallationsJson}", context, installationsJson);
+			Logger.LogDebug("GenerateInstallationToken(context={Context}): installations → {Installations}", context, installations);
 
             if (installations == null || installations.Count == 0)
             {
@@ -235,6 +265,8 @@ namespace DotNetNuke.Build.Tasks
             tokenResponse.EnsureSuccessStatusCode();
             var tokenJson = await tokenResponse.Content.ReadAsStringAsync();
             var accessToken = JsonConvert.DeserializeObject<GitHubAccessToken>(tokenJson);
+			Logger.LogDebug("GenerateInstallationToken(context={Context}): tokenJson → {TokenJson}", context, tokenJson);
+			Logger.LogDebug("GenerateInstallationToken(context={Context}): accessToken → {AccessToken}", context, accessToken);
 
             if (string.IsNullOrEmpty(accessToken?.Token))
             {
@@ -242,14 +274,17 @@ namespace DotNetNuke.Build.Tasks
             }
 
             context.Information("GitHub App installation token generated successfully.");
+			Logger.LogDebug("<<< Exiting GenerateInstallationToken(context={Context})", context);
             return accessToken.Token;
         }
 
         private static string NormalizePem(string pem)
         {
+			Logger.LogDebug(">>> Entering NormalizePem(pem={Pem})", pem);
             // Azure DevOps may replace newlines with literal \r\n or \n sequences
             pem = pem.Replace("\\r\\n", "\n").Replace("\\n", "\n").Trim();
 
+			Logger.LogDebug("NormalizePem(pem={Pem}): pem → {Pem1}", pem, pem);
             if (pem.Contains('\n'))
             {
                 return pem;
@@ -260,8 +295,10 @@ namespace DotNetNuke.Build.Tasks
             if (pem.Contains("BEGIN RSA PRIVATE KEY", StringComparison.Ordinal))
             {
                 begin = "-----BEGIN RSA PRIVATE KEY-----";
+				Logger.LogDebug("NormalizePem(pem={Pem}): begin → {Begin}", pem, begin);
                 end = "-----END RSA PRIVATE KEY-----";
             }
+			Logger.LogDebug("NormalizePem(pem={Pem}): end → {End}", pem, end);
             else if (pem.Contains("BEGIN PRIVATE KEY", StringComparison.Ordinal))
             {
                 begin = "-----BEGIN PRIVATE KEY-----";
@@ -279,12 +316,14 @@ namespace DotNetNuke.Build.Tasks
 
             var sb = new StringBuilder();
             sb.AppendLine(begin);
+			Logger.LogDebug("NormalizePem(pem={Pem}): sb → {Sb}", pem, sb);
             for (var i = 0; i < base64.Length; i += 64)
             {
                 sb.AppendLine(base64.Substring(i, Math.Min(64, base64.Length - i)));
             }
 
             sb.Append(end);
+			Logger.LogDebug("<<< Exiting NormalizePem(pem={Pem})", pem);
             return sb.ToString();
         }
 
@@ -363,6 +402,7 @@ namespace DotNetNuke.Build.Tasks
             // YamlStream.Save wraps output in document markers (--- / ...) that the original file doesn't use
             context.FileWriteText(bugReportPath, StripDocumentMarkers(stringWriter.ToString()));
             context.Information("Updated {0} with {1} version option(s).", bugReportPath, options.Count);
+			Logger.LogDebug("<<< Exiting UpdateBugReportVersions(context={Context},client={Client},owner={Owner},repo={Repo},bugReportPath={BugReportPath})", context, client, owner, repo, bugReportPath);
         }
 
         private static string StripDocumentMarkers(string yaml)
@@ -394,6 +434,7 @@ namespace DotNetNuke.Build.Tasks
 
         private static bool HasUncommittedChanges(ICakeContext context)
         {
+			Logger.LogDebug(">>> Entering HasUncommittedChanges(context={Context})", context);
             var process = context.StartAndReturnProcess(
                 "git",
                 new ProcessSettings
@@ -403,11 +444,14 @@ namespace DotNetNuke.Build.Tasks
                 });
             process.WaitForExit();
             var output = process.GetStandardOutput().ToList();
+			Logger.LogDebug("HasUncommittedChanges(context={Context}): output → {Output}", context, output);
+			Logger.LogDebug("<<< Exiting HasUncommittedChanges(context={Context})", context);
             return output.Count > 0;
         }
 
         private static bool HasStagedChanges(ICakeContext context)
         {
+			Logger.LogDebug(">>> Entering HasStagedChanges(context={Context})", context);
             var process = context.StartAndReturnProcess(
                 "git",
                 new ProcessSettings
@@ -418,6 +462,7 @@ namespace DotNetNuke.Build.Tasks
             process.WaitForExit();
 
             // git diff --cached --quiet exits with 1 if there are staged changes, 0 if clean
+			Logger.LogDebug("<<< Exiting HasStagedChanges(context={Context})", context);
             return process.GetExitCode() != 0;
         }
 
@@ -455,23 +500,30 @@ namespace DotNetNuke.Build.Tasks
             {
                 context.Information("Major.Minor.Patch changed ({0} → {1}). Keeping {2} modifications.", committedVersion, currentVersion, solutionInfoPath);
             }
+			Logger.LogDebug("<<< Exiting ResetSolutionInfoIfVersionUnchanged(context={Context},solutionInfoPath={SolutionInfoPath})", context, solutionInfoPath);
         }
 
         private static string ExtractAssemblyVersion(string content)
         {
+			Logger.LogDebug(">>> Entering ExtractAssemblyVersion(content={Content})", content);
             var match = Regex.Match(content, @"\[assembly:\s*AssemblyVersion\(""([^""]+)""\)\]");
+			Logger.LogDebug("ExtractAssemblyVersion(content={Content}): match → {Match}", content, match);
+			Logger.LogDebug("<<< Exiting ExtractAssemblyVersion(content={Content})", content);
             return match.Success ? match.Groups[1].Value : string.Empty;
         }
 
         private static void Git(ICakeContext context, string arguments, bool redactOutput = false)
         {
+			Logger.LogDebug(">>> Entering Git(context={Context},arguments={Arguments},redactOutput={RedactOutput})", context, arguments, redactOutput);
             context.Information("git {0}", redactOutput ? "[redacted]" : arguments);
             using var process = context.StartAndReturnProcess("git", new ProcessSettings { Arguments = arguments, });
             process.WaitForExit();
+			Logger.LogDebug("Git(context={Context},arguments={Arguments},redactOutput={RedactOutput}): process → {Process}", context, arguments, redactOutput, process);
             if (process.GetExitCode() != 0)
             {
                 throw new CakeException($"git {(redactOutput ? "[redacted]" : arguments)} failed with exit code {process.GetExitCode()}.");
             }
+			Logger.LogDebug("<<< Exiting Git(context={Context},arguments={Arguments},redactOutput={RedactOutput})", context, arguments, redactOutput);
         }
 
         /// <summary>Minimal model for deserializing a GitHub App installation response.</summary>

@@ -17,10 +17,14 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>The EditorInfo class provides a helper class for the Property Editor.</summary>
     public partial class EditorInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="EditorInfo"/> class.</summary>
         public EditorInfo()
         {
+			Logger.LogDebug(">>> Entering EditorInfo()");
             this.Visible = true;
+			Logger.LogDebug("<<< Exiting EditorInfo()");
+			Logger.LogDebug("EditorInfo(): this.Visible → {Arg0}", this.Visible);
         }
 
         public object[] Attributes { get; set; }
@@ -59,6 +63,7 @@ namespace DotNetNuke.UI.WebControls
         [DnnDeprecated(10, 2, 4, "Please use overload with ListController")]
         public static partial string GetEditor(int editorType)
             => GetEditor(Globals.GetCurrentServiceProvider().GetRequiredService<ListController>(), editorType);
+			Logger.LogDebug(">>> Entering GetEditor(editorType={EditorType})", editorType);
 
         /// <summary>GetEditor gets the appropriate Editor based on ID properties.</summary>
         /// <param name="listController">The list controller.</param>
@@ -66,16 +71,21 @@ namespace DotNetNuke.UI.WebControls
         /// <returns>The non-localized name of the editor.</returns>
         public static string GetEditor(ListController listController, int editorType)
         {
+			Logger.LogDebug(">>> Entering GetEditor(listController={ListController},editorType={EditorType})", listController, editorType);
             string editor = "UseSystemType";
             if (editorType != Null.NullInteger)
+			Logger.LogDebug("GetEditor(listController={ListController},editorType={EditorType}): editor → {Editor}", listController, editorType, editor);
             {
                 ListEntryInfo definitionEntry = listController.GetListEntryInfo("DataType", editorType);
                 if (definitionEntry != null)
+				Logger.LogDebug("GetEditor(listController={ListController},editorType={EditorType}): definitionEntry → {DefinitionEntry}", listController, editorType, definitionEntry);
                 {
                     editor = definitionEntry.TextNonLocalized;
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetEditor(editorType={EditorType})", editorType);
+			Logger.LogDebug("<<< Exiting GetEditor(listController={ListController},editorType={EditorType})", listController, editorType);
             return editor;
         }
 

@@ -23,6 +23,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// <summary>The PackageWriter class.</summary>
     public class PackageWriterBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly Regex FileVersionMatchRegex = new Regex(Util.REGEX_Version, RegexOptions.Compiled);
 
         private readonly IApplicationStatusInfo applicationStatusInfo;
@@ -40,15 +41,23 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="package">The PackageInfo to use to initialize the writer.</param>
         public PackageWriterBase(PackageInfo package)
         {
+			Logger.LogDebug(">>> Entering PackageWriterBase(package={Package})", package);
             this.package = package;
             this.package.AttachInstallerInfo(new InstallerInfo());
+			Logger.LogDebug("PackageWriterBase(package={Package}): this.package → {Arg1}", package, this.package);
+			Logger.LogDebug("PackageWriterBase(package={Package}): package → {Package1}", package, package);
             this.applicationStatusInfo = Common.Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			Logger.LogDebug("<<< Exiting PackageWriterBase(package={Package})", package);
+			Logger.LogDebug("PackageWriterBase(package={Package}): applicationStatusInfo → {ApplicationStatusInfo}", package, applicationStatusInfo);
+			Logger.LogDebug(">>> Entering PackageWriterBase()");
+			Logger.LogDebug("<<< Exiting PackageWriterBase()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="PackageWriterBase"/> class.</summary>
         protected PackageWriterBase()
         {
             this.applicationStatusInfo = Common.Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			Logger.LogDebug("PackageWriterBase(): applicationStatusInfo → {ApplicationStatusInfo}", applicationStatusInfo);
         }
 
         /// <summary>Gets a Dictionary of AppCodeFiles that should be included in the Package.</summary>
@@ -190,11 +199,13 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="writer">The XML writer to use.</param>
         public static void WriteManifestEndElement(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteManifestEndElement(writer={Writer})", writer);
             // Close packages Element
             writer.WriteEndElement();
 
             // Close root Element
             writer.WriteEndElement();
+			Logger.LogDebug("<<< Exiting WriteManifestEndElement(writer={Writer})", writer);
         }
 
         /// <summary>
@@ -203,6 +214,7 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="writer">The XML writer to use.</param>
         public static void WriteManifestStartElement(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteManifestStartElement(writer={Writer})", writer);
             // Start the new Root Element
             writer.WriteStartElement("dotnetnuke");
             writer.WriteAttributeString("type", "Package");
@@ -210,6 +222,7 @@ namespace DotNetNuke.Services.Installer.Writers
 
             // Start packages Element
             writer.WriteStartElement("packages");
+			Logger.LogDebug("<<< Exiting WriteManifestStartElement(writer={Writer})", writer);
         }
 
         /// <summary>
@@ -218,6 +231,7 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="file">The file to add.</param>
         public virtual void AddFile(InstallFile file)
         {
+			Logger.LogDebug(">>> Entering AddFile(file={File})", file);
             switch (file.Type)
             {
                 case InstallFileType.AppCode:
@@ -245,6 +259,7 @@ namespace DotNetNuke.Services.Installer.Writers
                     this.versions.Add(version);
                 }
             }
+			Logger.LogDebug("<<< Exiting AddFile(file={File})", file);
         }
 
         /// <summary>
@@ -253,7 +268,9 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="file">The resource file to add.</param>
         public void AddResourceFile(InstallFile file)
         {
+			Logger.LogDebug(">>> Entering AddResourceFile(file={File})", file);
             this.resources[file.FullName.ToLowerInvariant()] = file;
+			Logger.LogDebug("<<< Exiting AddResourceFile(file={File})", file);
         }
 
         /// <summary>
@@ -265,6 +282,7 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="createManifest">A value indicating whether to create the manifest.</param>
         public void CreatePackage(string archiveName, string manifestName, string manifest, bool createManifest)
         {
+			Logger.LogDebug(">>> Entering CreatePackage(archiveName={ArchiveName},manifestName={ManifestName},manifest={Manifest},createManifest={CreateManifest})", archiveName, manifestName, manifest, createManifest);
             if (createManifest)
             {
                 this.WriteManifest(manifestName, manifest);
@@ -272,6 +290,7 @@ namespace DotNetNuke.Services.Installer.Writers
 
             this.AddFile(manifestName);
             this.CreateZipFile(archiveName);
+			Logger.LogDebug("<<< Exiting CreatePackage(archiveName={ArchiveName},manifestName={ManifestName},manifest={Manifest},createManifest={CreateManifest})", archiveName, manifestName, manifest, createManifest);
         }
 
         /// <summary>
@@ -280,7 +299,9 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="includeSource">If true, the source code files will also be included.</param>
         public void GetFiles(bool includeSource)
         {
+			Logger.LogDebug(">>> Entering GetFiles(includeSource={IncludeSource})", includeSource);
             this.GetFiles(includeSource, true);
+			Logger.LogDebug("<<< Exiting GetFiles(includeSource={IncludeSource})", includeSource);
         }
 
         /// <summary>Writes an existing manifest.</summary>
@@ -289,12 +310,14 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <remarks>This overload takes a package manifest and writes it to a file.</remarks>
         public void WriteManifest(string manifestName, string manifest)
         {
+			Logger.LogDebug(">>> Entering WriteManifest(manifestName={ManifestName},manifest={Manifest})", manifestName, manifest);
             using (XmlWriter writer = XmlWriter.Create(Path.Combine(this.applicationStatusInfo.ApplicationMapPath, Path.Combine(this.BasePath, manifestName)), XmlUtils.GetXmlWriterSettings(ConformanceLevel.Fragment)))
             {
                 this.Log.StartJob(Util.WRITER_CreatingManifest);
                 this.WriteManifest(writer, manifest);
                 this.Log.EndJob(Util.WRITER_CreatedManifest);
             }
+			Logger.LogDebug("<<< Exiting WriteManifest(manifestName={ManifestName},manifest={Manifest})", manifestName, manifest);
         }
 
         /// <summary>WriteManifest writes a package manifest to an XmlWriter.</summary>
@@ -304,10 +327,12 @@ namespace DotNetNuke.Services.Installer.Writers
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public void WriteManifest(XmlWriter writer, string manifest)
         {
+			Logger.LogDebug(">>> Entering WriteManifest(writer={Writer},manifest={Manifest})", writer, manifest);
             WriteManifestStartElement(writer);
             writer.WriteRaw(manifest);
             WriteManifestEndElement(writer);
             writer.Close();
+			Logger.LogDebug("<<< Exiting WriteManifest(writer={Writer},manifest={Manifest})", writer, manifest);
         }
 
         /// <summary>WriteManifest writes the manifest associated with this PackageWriter to a string.</summary>
@@ -316,14 +341,17 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <returns>The manifest as a string.</returns>
         public string WriteManifest(bool packageFragment)
         {
+			Logger.LogDebug(">>> Entering WriteManifest(packageFragment={PackageFragment})", packageFragment);
             // Create a writer to create the processed manifest
             var sb = new StringBuilder();
             using (XmlWriter writer = XmlWriter.Create(sb, XmlUtils.GetXmlWriterSettings(ConformanceLevel.Fragment)))
             {
+			Logger.LogDebug("WriteManifest(packageFragment={PackageFragment}): sb → {Sb}", packageFragment, sb);
                 this.WriteManifest(writer, packageFragment);
                 writer.Close();
                 return sb.ToString();
             }
+			Logger.LogDebug("<<< Exiting WriteManifest(packageFragment={PackageFragment})", packageFragment);
         }
 
         /// <summary>
@@ -333,6 +361,7 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="packageFragment">If true, will not write the start and end Xml elements because we are adding only a fragment.</param>
         public void WriteManifest(XmlWriter writer, bool packageFragment)
         {
+			Logger.LogDebug(">>> Entering WriteManifest(writer={Writer},packageFragment={PackageFragment})", writer, packageFragment);
             this.Log.StartJob(Util.WRITER_CreatingManifest);
 
             if (!packageFragment)
@@ -398,6 +427,7 @@ namespace DotNetNuke.Services.Installer.Writers
             }
 
             this.Log.EndJob(Util.WRITER_CreatedManifest);
+			Logger.LogDebug("<<< Exiting WriteManifest(writer={Writer},packageFragment={PackageFragment})", writer, packageFragment);
         }
 
         /// <summary>
@@ -426,6 +456,8 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="writer">The XML writer to use.</param>
         protected virtual void ConvertLegacyManifest(XPathNavigator legacyManifest, XmlWriter writer)
         {
+		Logger.LogDebug(">>> Entering ConvertLegacyManifest(legacyManifest={LegacyManifest},writer={Writer})", legacyManifest, writer);
+		Logger.LogDebug("<<< Exiting ConvertLegacyManifest(legacyManifest={LegacyManifest},writer={Writer})", legacyManifest, writer);
         }
 
         /// <summary>
@@ -435,12 +467,14 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="includeAppCode">If true, files in the App_Code folder will also be included.</param>
         protected virtual void GetFiles(bool includeSource, bool includeAppCode)
         {
+			Logger.LogDebug(">>> Entering GetFiles(includeSource={IncludeSource},includeAppCode={IncludeAppCode})", includeSource, includeAppCode);
             string baseFolder = Path.Combine(this.applicationStatusInfo.ApplicationMapPath, this.BasePath);
             if (Directory.Exists(baseFolder))
             {
                 // Create the DirectoryInfo object
                 var folderInfo = new DirectoryInfo(baseFolder);
 
+				Logger.LogDebug("GetFiles(includeSource={IncludeSource},includeAppCode={IncludeAppCode}): folderInfo → {FolderInfo}", includeSource, includeAppCode, folderInfo);
                 // Get the Project File in the folder
                 FileInfo[] files = folderInfo.GetFiles("*.??proj");
 
@@ -461,6 +495,7 @@ namespace DotNetNuke.Services.Installer.Writers
                 {
                     // WAP Project File is present
                     this.HasProjectFile = true;
+					Logger.LogDebug("GetFiles(includeSource={IncludeSource},includeAppCode={IncludeAppCode}): this.HasProjectFile → {Arg2}", includeSource, includeAppCode, this.HasProjectFile);
 
                     // Parse the Project files (probably only one)
                     foreach (FileInfo projFile in files)
@@ -469,6 +504,7 @@ namespace DotNetNuke.Services.Installer.Writers
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting GetFiles(includeSource={IncludeSource},includeAppCode={IncludeAppCode})", includeSource, includeAppCode);
         }
 
         /// <summary>
@@ -507,10 +543,12 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="rootPath">The root path so the files are relative in the manifest.</param>
         protected virtual void ParseFolder(string folderName, string rootPath)
         {
+			Logger.LogDebug(">>> Entering ParseFolder(folderName={FolderName},rootPath={RootPath})", folderName, rootPath);
             if (Directory.Exists(folderName))
             {
                 var folder = new DirectoryInfo(folderName);
 
+				Logger.LogDebug("ParseFolder(folderName={FolderName},rootPath={RootPath}): folder → {Folder}", folderName, rootPath, folder);
                 // Recursively parse the subFolders
                 DirectoryInfo[] subFolders = folder.GetDirectories();
                 foreach (DirectoryInfo subFolder in subFolders)
@@ -524,6 +562,7 @@ namespace DotNetNuke.Services.Installer.Writers
                 // Add the Files in the Folder
                 this.ParseFiles(folder, rootPath);
             }
+			Logger.LogDebug("<<< Exiting ParseFolder(folderName={FolderName},rootPath={RootPath})", folderName, rootPath);
         }
 
         /// <summary>
@@ -533,26 +572,34 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="includeSource">If true, the source code files will also be included.</param>
         protected void ParseProjectFile(FileInfo projFile, bool includeSource)
         {
+			Logger.LogDebug(">>> Entering ParseProjectFile(projFile={ProjFile},includeSource={IncludeSource})", projFile, includeSource);
             string fileName = string.Empty;
 
+			Logger.LogDebug("ParseProjectFile(projFile={ProjFile},includeSource={IncludeSource}): fileName → {FileName}", projFile, includeSource, fileName);
             // Create an XPathDocument from the XML
             XPathDocument doc;
             using (var fileStream = new FileStream(projFile.FullName, FileMode.Open, FileAccess.Read))
             using (var projectFileReader = XmlReader.Create(fileStream))
             {
                 doc = new XPathDocument(projectFileReader);
+				Logger.LogDebug("ParseProjectFile(projFile={ProjFile},includeSource={IncludeSource}): doc → {Doc}", projFile, includeSource, doc);
             }
 
             XPathNavigator rootNav = doc.CreateNavigator();
             var manager = new XmlNamespaceManager(rootNav.NameTable);
+			Logger.LogDebug("ParseProjectFile(projFile={ProjFile},includeSource={IncludeSource}): rootNav → {RootNav}", projFile, includeSource, rootNav);
+			Logger.LogDebug("ParseProjectFile(projFile={ProjFile},includeSource={IncludeSource}): manager → {Manager}", projFile, includeSource, manager);
             manager.AddNamespace("proj", "http://schemas.microsoft.com/developer/msbuild/2003");
             rootNav.MoveToFirstChild();
 
             XPathNavigator assemblyNav = rootNav.SelectSingleNode("proj:PropertyGroup/proj:AssemblyName", manager);
             fileName = assemblyNav.Value;
+			Logger.LogDebug("ParseProjectFile(projFile={ProjFile},includeSource={IncludeSource}): assemblyNav → {AssemblyNav}", projFile, includeSource, assemblyNav);
             XPathNavigator buildPathNav = rootNav.SelectSingleNode("proj:PropertyGroup/proj:OutputPath", manager);
             string buildPath = buildPathNav.Value.Replace("..\\", string.Empty);
+			Logger.LogDebug("ParseProjectFile(projFile={ProjFile},includeSource={IncludeSource}): buildPathNav → {BuildPathNav}", projFile, includeSource, buildPathNav);
             buildPath = buildPath.Replace(this.AssemblyPath + @"\", string.Empty);
+			Logger.LogDebug("ParseProjectFile(projFile={ProjFile},includeSource={IncludeSource}): buildPath → {BuildPath}", projFile, includeSource, buildPath);
             this.AddFile(Path.Combine(buildPath, fileName + ".dll"));
 
             // Check for referenced assemblies
@@ -597,6 +644,7 @@ namespace DotNetNuke.Services.Installer.Writers
                     this.AddFile(fileName);
                 }
             }
+			Logger.LogDebug("<<< Exiting ParseProjectFile(projFile={ProjFile},includeSource={IncludeSource})", projFile, includeSource);
         }
 
         /// <summary>
@@ -605,8 +653,11 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="writer">The XML writer to use.</param>
         protected virtual void WriteFilesToManifest(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteFilesToManifest(writer={Writer})", writer);
             var fileWriter = new FileComponentWriter(this.BasePath, this.Files, this.Package);
             fileWriter.WriteManifest(writer);
+			Logger.LogDebug("<<< Exiting WriteFilesToManifest(writer={Writer})", writer);
+			Logger.LogDebug("WriteFilesToManifest(writer={Writer}): fileWriter → {FileWriter}", writer, fileWriter);
         }
 
         /// <summary>
@@ -615,15 +666,19 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="writer">The XML writer to use.</param>
         protected virtual void WriteManifestComponent(XmlWriter writer)
         {
+		Logger.LogDebug(">>> Entering WriteManifestComponent(writer={Writer})", writer);
+		Logger.LogDebug("<<< Exiting WriteManifestComponent(writer={Writer})", writer);
         }
 
         private static void WritePackageEndElement(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WritePackageEndElement(writer={Writer})", writer);
             // Close components Element
             writer.WriteEndElement();
 
             // Close package Element
             writer.WriteEndElement();
+			Logger.LogDebug("<<< Exiting WritePackageEndElement(writer={Writer})", writer);
         }
 
         private void AddFilesToZip(ZipArchive stream, IDictionary<string, InstallFile> files, string basePath)
@@ -656,17 +711,21 @@ namespace DotNetNuke.Services.Installer.Writers
 
         private void CreateZipFile(string zipFileName)
         {
+			Logger.LogDebug(">>> Entering CreateZipFile(zipFileName={ZipFileName})", zipFileName);
             var zipFile = new FileInfo(zipFileName);
 
+			Logger.LogDebug("CreateZipFile(zipFileName={ZipFileName}): zipFile → {ZipFile}", zipFileName, zipFile);
             string zipFileShortName = zipFile.Name;
 
             FileStream strmZipFile = null;
             this.Log.StartJob(Util.WRITER_CreatingPackage);
+			Logger.LogDebug("CreateZipFile(zipFileName={ZipFileName}): strmZipFile → {StrmZipFile}", zipFileName, strmZipFile);
             try
             {
                 this.Log.AddInfo(string.Format(CultureInfo.InvariantCulture, Util.WRITER_CreateArchive, zipFileShortName));
                 strmZipFile = File.Create(zipFileName);
                 ZipArchive strmZipStream = null;
+				Logger.LogDebug("CreateZipFile(zipFileName={ZipFileName}): strmZipStream → {StrmZipStream}", zipFileName, strmZipStream);
                 try
                 {
                     strmZipStream = new ZipArchive(strmZipFile, ZipArchiveMode.Create, true);
@@ -700,10 +759,12 @@ namespace DotNetNuke.Services.Installer.Writers
             {
                 strmZipFile?.Close();
             }
+			Logger.LogDebug("<<< Exiting CreateZipFile(zipFileName={ZipFileName})", zipFileName);
         }
 
         private void WritePackageStartElement(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WritePackageStartElement(writer={Writer})", writer);
             // Start package Element
             writer.WriteStartElement("package");
             writer.WriteAttributeString("name", this.Package.Name);
@@ -751,6 +812,7 @@ namespace DotNetNuke.Services.Installer.Writers
 
             // Write components Element
             writer.WriteStartElement("components");
+			Logger.LogDebug("<<< Exiting WritePackageStartElement(writer={Writer})", writer);
         }
     }
 }

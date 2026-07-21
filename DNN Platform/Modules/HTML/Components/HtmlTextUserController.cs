@@ -11,11 +11,14 @@ namespace DotNetNuke.Modules.Html
     /// <summary>The HtmlTextUserController is the Controller class for managing User information the HtmlText module.</summary>
     public class HtmlTextUserController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>GetHtmlTextUser retrieves a collection of HtmlTextUserInfo objects for an Item.</summary>
         /// <param name="userID">The Id of the User.</param>
         /// <returns>An <see cref="ArrayList"/> of <see cref="HtmlTextUserInfo"/> instances.</returns>
         public ArrayList GetHtmlTextUser(int userID)
         {
+			Logger.LogDebug(">>> Entering GetHtmlTextUser(userID={UserID})", userID);
+			Logger.LogDebug("<<< Exiting GetHtmlTextUser(userID={UserID})", userID);
             return CBO.FillCollection(DataProvider.Instance().GetHtmlTextUser(userID), typeof(HtmlTextUserInfo));
         }
 
@@ -23,13 +26,17 @@ namespace DotNetNuke.Modules.Html
         /// <param name="objHtmlTextUser">An HtmlTextUserInfo object.</param>
         public void AddHtmlTextUser(HtmlTextUserInfo objHtmlTextUser)
         {
+			Logger.LogDebug(">>> Entering AddHtmlTextUser(objHtmlTextUser={ObjHtmlTextUser})", objHtmlTextUser);
             DataProvider.Instance().AddHtmlTextUser(objHtmlTextUser.ItemID, objHtmlTextUser.StateID, objHtmlTextUser.ModuleID, objHtmlTextUser.TabID, objHtmlTextUser.UserID);
+			Logger.LogDebug("<<< Exiting AddHtmlTextUser(objHtmlTextUser={ObjHtmlTextUser})", objHtmlTextUser);
         }
 
         /// <summary>DeleteHtmlTextUsers cleans up old HtmlTextUser records.</summary>
         public void DeleteHtmlTextUsers()
         {
+			Logger.LogDebug(">>> Entering DeleteHtmlTextUsers()");
             DataProvider.Instance().DeleteHtmlTextUsers();
+			Logger.LogDebug("<<< Exiting DeleteHtmlTextUsers()");
         }
     }
 }

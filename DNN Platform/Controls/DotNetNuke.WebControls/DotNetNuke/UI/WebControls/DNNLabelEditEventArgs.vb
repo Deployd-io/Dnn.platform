@@ -1,5 +1,6 @@
 ﻿' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports System
 
@@ -8,9 +9,13 @@ Namespace DotNetNuke.UI.WebControls
         Inherits EventArgs
         ' Methods
         Public Sub New(ByVal [text] As String)
+			Logger.LogDebug(">>> Entering New([text]={Arg})", [text])
             Me._text = [text]
             Me._returnedText = [text]
+			Logger.LogDebug("New([text]={Arg0}): Me._returnedText → {Arg1}", [text], Me._returnedText)
+			Logger.LogDebug("New([text]={Arg0}): Me._text → {Arg1}", [text], Me._text)
         End Sub
+		Logger.LogDebug("<<< Exiting New([text]={Arg})", [text])
 
 
         ' Properties

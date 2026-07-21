@@ -12,8 +12,10 @@ namespace DotNetNuke.ExtensionPoints
     [ToolboxData("<{0}:EditPagePanelExtensionControl runat=server></{0}:EditPagePanelExtensionControl>")]
     public class EditPagePanelExtensionControl : DefaultExtensionControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public void BindAction(int portalId, int tabId, int moduleId)
         {
+			Logger.LogDebug(">>> Entering BindAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId})", portalId, tabId, moduleId);
             foreach (var control in this.Controls)
             {
                 var panelcontrol = control as PanelEditPagePanelExtensionControl;
@@ -29,10 +31,12 @@ namespace DotNetNuke.ExtensionPoints
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting BindAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId})", portalId, tabId, moduleId);
         }
 
         public void SaveAction(int portalId, int tabId, int moduleId)
         {
+			Logger.LogDebug(">>> Entering SaveAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId})", portalId, tabId, moduleId);
             foreach (var control in this.Controls)
             {
                 var panelcontrol = control as PanelEditPagePanelExtensionControl;
@@ -48,10 +52,12 @@ namespace DotNetNuke.ExtensionPoints
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting SaveAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId})", portalId, tabId, moduleId);
         }
 
         public void CancelAction(int portalId, int tabId, int moduleId)
         {
+			Logger.LogDebug(">>> Entering CancelAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId})", portalId, tabId, moduleId);
             foreach (var control in this.Controls)
             {
                 var panelcontrol = control as PanelEditPagePanelExtensionControl;
@@ -67,18 +73,22 @@ namespace DotNetNuke.ExtensionPoints
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting CancelAction(portalId={PortalId},tabId={TabId},moduleId={ModuleId})", portalId, tabId, moduleId);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
             var extensionPointManager = new ExtensionPointManager();
 
+			Logger.LogDebug("OnInit(e={E}): extensionPointManager → {ExtensionPointManager}", e, extensionPointManager);
             if (!string.IsNullOrEmpty(this.Name))
             {
                 var extension = extensionPointManager.GetEditPagePanelExtensionPointFirstByPriority(this.Module, this.Name);
                 if (extension != null)
+				Logger.LogDebug("OnInit(e={E}): extension → {Extension}", e, extension);
                 {
                     this.LoadControl(extension);
                 }
@@ -93,6 +103,7 @@ namespace DotNetNuke.ExtensionPoints
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         private void LoadControl(IEditPagePanelExtensionPoint extension)

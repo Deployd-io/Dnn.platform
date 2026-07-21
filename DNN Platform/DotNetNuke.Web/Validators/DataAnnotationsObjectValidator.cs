@@ -9,9 +9,12 @@ namespace DotNetNuke.Web.Validators
     /// <summary>A validator which applies <see cref="ValidationAttribute"/> on an object's properties.</summary>
     public class DataAnnotationsObjectValidator : AttributeBasedObjectValidator<ValidationAttribute>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         protected override ValidationResult ValidateAttribute(object target, PropertyInfo targetProperty, ValidationAttribute attribute)
         {
+			Logger.LogDebug(">>> Entering ValidateAttribute(target={Target},targetProperty={TargetProperty},attribute={Attribute})", target, targetProperty, attribute);
+			Logger.LogDebug("<<< Exiting ValidateAttribute(target={Target},targetProperty={TargetProperty},attribute={Attribute})", target, targetProperty, attribute);
             return !attribute.IsValid(targetProperty.GetValue(target, []))
                 ? new ValidationResult([this.CreateError(targetProperty.Name, attribute)])
                 : ValidationResult.Successful;
@@ -23,6 +26,8 @@ namespace DotNetNuke.Web.Validators
         /// <returns>A new <see cref="ValidationError"/> instance.</returns>
         protected virtual ValidationError CreateError(string propertyName, ValidationAttribute attribute)
         {
+			Logger.LogDebug(">>> Entering CreateError(propertyName={PropertyName},attribute={Attribute})", propertyName, attribute);
+			Logger.LogDebug("<<< Exiting CreateError(propertyName={PropertyName},attribute={Attribute})", propertyName, attribute);
             return new ValidationError { ErrorMessage = attribute.FormatErrorMessage(propertyName), PropertyName = propertyName, Validator = attribute, };
         }
     }

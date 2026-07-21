@@ -19,6 +19,7 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
     [ConsoleCommand("get-page", Constants.PagesCategory, "Prompt_GetPage_Description")]
     public class GetPage : ConsoleCommandBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [FlagParameter("name", "Prompt_GetPage_FlagName", "String")]
         private const string FlagName = "name";
 
@@ -35,7 +36,9 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
         public GetPage()
             : this(TabController.Instance, SecurityService.Instance, new ContentVerifier())
         {
+		Logger.LogDebug(">>> Entering GetPage()");
         }
+		Logger.LogDebug("<<< Exiting GetPage()");
 
         public GetPage(
             ITabController tabController,
@@ -59,6 +62,7 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.PageId = this.GetFlagValue(FlagId, "Page Id", -1, false, true);
             this.PageName = this.GetFlagValue(FlagName, "Page Name", string.Empty);
             this.ParentId = this.GetFlagValue(FlagParentId, "Parent Id", -1);
@@ -66,13 +70,16 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
             {
                 this.AddMessage(this.LocalizeString("Prompt_ParameterRequired"));
             }
+			Logger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             var lst = new List<PageModel>();
             var tab = this.PageId != -1
+				Logger.LogDebug("Run(): lst → {Lst}", lst);
                 ? this.tabController.GetTab(this.PageId, this.PortalId)
                 : (this.ParentId > 0
                     ? this.tabController.GetTabByName(this.PageName, this.PortalId, this.ParentId)
@@ -92,6 +99,7 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
                 }
             }
 
+			Logger.LogDebug("<<< Exiting Run()");
             return new ConsoleErrorResultModel(this.LocalizeString("Prompt_PageNotFound"));
         }
     }

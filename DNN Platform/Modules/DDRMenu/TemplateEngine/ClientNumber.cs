@@ -6,14 +6,20 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 {
     public class ClientNumber : ClientOption
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public ClientNumber()
         {
+		Logger.LogDebug(">>> Entering ClientNumber()");
+		Logger.LogDebug("<<< Exiting ClientNumber()");
         }
 
         public ClientNumber(string name, string value)
         {
+			Logger.LogDebug(">>> Entering ClientNumber(name={Name},value={Value})", name, value);
             this.Name = name;
             this.Value = value;
+			Logger.LogDebug("<<< Exiting ClientNumber(name={Name},value={Value})", name, value);
+			Logger.LogDebug("ClientNumber(name={Name},value={Value}): this.Name → {Arg2}", name, value, this.Name);
         }
     }
 }

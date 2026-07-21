@@ -1,5 +1,6 @@
 ﻿' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports System.Reflection
 Imports System.Web
@@ -98,11 +99,14 @@ Namespace DotNetNuke.UI.Utilities
 #Region "Public Methods"
 
         Private Shared Function ScriptManagerControl(ByVal objPage As Page) As Control
+			Logger.LogDebug(">>> Entering ScriptManagerControl(objPage={ObjPage})", objPage)
             Dim method As MethodInfo = ScriptManagerType.GetMethod("GetCurrent")
             Return CType(method.Invoke(ScriptManagerType, New Object() {objPage}), Control)
         End Function
+		Logger.LogDebug("<<< Exiting ScriptManagerControl(objPage={ObjPage})", objPage)
 
         Public Shared Sub Register(ByVal objPage As Page)
+			Logger.LogDebug(">>> Entering Register(objPage={ObjPage})", objPage)
             If IsInstalled() Then
                 If ScriptManagerControl(objPage) Is Nothing Then
                     Dim sm As Control = ScriptManagerControl(objPage)
@@ -111,6 +115,7 @@ Namespace DotNetNuke.UI.Utilities
                     End If
                     If Not sm Is Nothing Then
                         sm.ID = "ScriptManager"
+						Logger.LogDebug("Register(objPage={ObjPage}): sm.ID → {Arg1}", objPage, sm.ID)
                         'objPage.Form.Controls.AddAt(0, sm)
                         objPage.Form.Controls.Add(sm)
                         HttpContext.Current.Items("System.Web.UI.ScriptManager") = True 'Let DNN know we added it
@@ -127,8 +132,10 @@ Namespace DotNetNuke.UI.Utilities
                 objPage.ClientScript.RegisterStartupScript(objPage.GetType(), "MSAJAXInit", "Sys.Application.initialize();", True)
             End If
         End Sub
+		Logger.LogDebug("<<< Exiting Register(objPage={ObjPage})", objPage)
 
         Public Shared Sub SetScriptManagerProperty(ByVal objPage As Page, ByVal PropertyName As String, ByVal Args() As Object)
+			Logger.LogDebug(">>> Entering SetScriptManagerProperty(objPage={ObjPage},PropertyName={PropertyName},Args(={Arg})", objPage, PropertyName, Args()
             If IsInstalled() Then
                 Register(objPage)
                 If Not ScriptManagerControl(objPage) Is Nothing Then
@@ -136,8 +143,10 @@ Namespace DotNetNuke.UI.Utilities
                 End If
             End If
         End Sub
+		Logger.LogDebug("<<< Exiting SetScriptManagerProperty(objPage={ObjPage},PropertyName={PropertyName},Args(={Arg})", objPage, PropertyName, Args()
 
         Public Shared Sub RegisterClientScript(ByVal objPage As Page, ByVal Path As String)
+			Logger.LogDebug(">>> Entering RegisterClientScript(objPage={ObjPage},Path={Path})", objPage, Path)
             If IsInstalled() Then
                 Register(objPage)
                 Dim ref As Object = GetScriptReference()
@@ -150,8 +159,10 @@ Namespace DotNetNuke.UI.Utilities
                 End If
             End If
         End Sub
+		Logger.LogDebug("<<< Exiting RegisterClientScript(objPage={ObjPage},Path={Path})", objPage, Path)
 
         Public Shared Sub RegisterStartupScript(ByVal objPage As Page, ByVal Key As String, ByVal Script As String)
+			Logger.LogDebug(">>> Entering RegisterStartupScript(objPage={ObjPage},Key={Key},Script={Script})", objPage, Key, Script)
             If IsInstalled() Then
                 Dim methods() As MethodInfo = ScriptManagerType.GetMethods()
                 For Each method As MethodInfo In methods
@@ -164,6 +175,7 @@ Namespace DotNetNuke.UI.Utilities
                 objPage.ClientScript.RegisterStartupScript(objPage.GetType(), Key, Script)
             End If
         End Sub
+		Logger.LogDebug("<<< Exiting RegisterStartupScript(objPage={ObjPage},Key={Key},Script={Script})", objPage, Key, Script)
 
         Public Shared Sub RegisterClientScript(ByVal objPage As Page, ByVal Name As String, ByVal Assembly As String)
             If IsInstalled() Then
@@ -191,18 +203,25 @@ Namespace DotNetNuke.UI.Utilities
         End Sub
 
         Private Shared Function GetScriptReference() As Object
+			Logger.LogDebug(">>> Entering GetScriptReference()")
             Return Reflection.CreateInstance(ScriptReferenceType)
         End Function
+		Logger.LogDebug("<<< Exiting GetScriptReference()")
 
         Private Shared Sub SetScriptReferenceProperty(ByVal Ref As Object, ByVal Name As String, ByVal Value As Object)
+			Logger.LogDebug(">>> Entering SetScriptReferenceProperty(Ref={Ref},Name={Name},Value={Value})", Ref, Name, Value)
             Reflection.SetProperty(ScriptReferenceType, Name, Ref, New Object() {Value})
         End Sub
+		Logger.LogDebug("<<< Exiting SetScriptReferenceProperty(Ref={Ref},Name={Name},Value={Value})", Ref, Name, Value)
 
         Private Shared Function ScriptManagerScripts(ByVal objScriptManager As Object) As Object
+			Logger.LogDebug(">>> Entering ScriptManagerScripts(objScriptManager={ObjScriptManager})", objScriptManager)
             Return Reflection.GetProperty(ScriptManagerType, "Scripts", objScriptManager)
         End Function
+		Logger.LogDebug("<<< Exiting ScriptManagerScripts(objScriptManager={ObjScriptManager})", objScriptManager)
 
         Public Shared Function Deserialize(Of T)(ByVal Data As String) As T
+			Logger.LogDebug(">>> Entering Deserialize(Of={Of})", Of)
             If IsInstalled() Then
                 Dim ser As Object = Reflection.CreateInstance(JavaScriptSerializerType)
                 Return Reflection.InvokeGenericMethod(Of T)(JavaScriptSerializerType, "Deserialize", ser, New Object() {Data})
@@ -211,13 +230,16 @@ Namespace DotNetNuke.UI.Utilities
                     Return CType(Reflection.InvokeMethod(AlternateJavaScriptSerializerType, "DeserializeObject", Nothing, New Object() {Data, GetType(T)}), T)
                 Catch ex As Exception
                     'if initial attempt did not work, try one more time, without specifying a type
+					Logger.LogError("Exception in Deserialize(Of={Of}): {Arg1}", Of, ex.Message)
                     Return CType(Reflection.InvokeMethod(AlternateJavaScriptSerializerType, "DeserializeObject", Nothing, New Object() {Data}), T)
                 End Try
             End If
 
         End Function
+		Logger.LogDebug("<<< Exiting Deserialize(Of={Of})", Of)
 
         Public Shared Function DeserializeObject(ByVal Data As String) As Object
+			Logger.LogDebug(">>> Entering DeserializeObject(Data={Data})", Data)
             If IsInstalled() Then
                 Dim ser As Object = Reflection.CreateInstance(JavaScriptSerializerType)
                 Return Reflection.InvokeMethod(JavaScriptSerializerType, "DeserializeObject", ser, New Object() {Data})
@@ -226,11 +248,14 @@ Namespace DotNetNuke.UI.Utilities
             End If
             Return Nothing
         End Function
+		Logger.LogDebug("<<< Exiting DeserializeObject(Data={Data})", Data)
 
         Public Shared Function Serialize(ByVal Obj As Object) As String
+			Logger.LogDebug(">>> Entering Serialize(Obj={Obj})", Obj)
             Dim ser As Object
             If IsInstalled() Then
                 ser = Reflection.CreateInstance(JavaScriptSerializerType)
+				Logger.LogDebug("Serialize(Obj={Obj}): ser → {Ser}", Obj, ser)
                 Return CType(Reflection.InvokeMethod(JavaScriptSerializerType, "Serialize", ser, New Object() {Obj}), String)
             ElseIf AlternateJavaScriptSerializerType IsNot Nothing Then
                 Dim json As String = CType(Reflection.InvokeMethod(AlternateJavaScriptSerializerType, "SerializeObject", Nothing, New Object() {Obj}), String)
@@ -239,6 +264,7 @@ Namespace DotNetNuke.UI.Utilities
             End If
             Return ""
         End Function
+		Logger.LogDebug("<<< Exiting Serialize(Obj={Obj})", Obj)
 
 #End Region
 

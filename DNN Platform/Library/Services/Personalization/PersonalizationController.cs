@@ -21,6 +21,7 @@ namespace DotNetNuke.Services.Personalization
 
     public class PersonalizationController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string PersonalizationCookieName = "DNNPersonalization";
         private const string AlgorithmCookieName = "DNNPersonalizationAlg";
         private readonly IHostSettings hostSettings;
@@ -31,6 +32,11 @@ namespace DotNetNuke.Services.Personalization
         public PersonalizationController()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering PersonalizationController()");
+		Logger.LogDebug("<<< Exiting PersonalizationController()");
+		Logger.LogDebug(">>> Entering PersonalizationController(hostSettings={HostSettings})", hostSettings);
+		Logger.LogDebug("<<< Exiting PersonalizationController(hostSettings={HostSettings})", hostSettings);
+		Logger.LogDebug("PersonalizationController(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PersonalizationController"/> class.</summary>
@@ -49,6 +55,8 @@ namespace DotNetNuke.Services.Personalization
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.cryptographyProvider = cryptographyProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<ICryptographyProvider>();
+			Logger.LogDebug("PersonalizationController(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider}): cryptographyProvider → {CryptographyProvider1}", hostSettings, cryptographyProvider, cryptographyProvider);
+			Logger.LogDebug("PersonalizationController(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider}): hostSettings → {HostSettings1}", hostSettings, cryptographyProvider, hostSettings);
         }
 
         // default implementation relies on HTTPContext
@@ -172,10 +180,15 @@ namespace DotNetNuke.Services.Personalization
 
         private static object GetCachedUserPersonalizationCallback(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogDebug(">>> Entering GetCachedUserPersonalizationCallback(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             var portalId = (int)cacheItemArgs.ParamList[0];
             var userId = (int)cacheItemArgs.ParamList[1];
+			Logger.LogDebug("GetCachedUserPersonalizationCallback(cacheItemArgs={CacheItemArgs}): portalId → {PortalId}", cacheItemArgs, portalId);
+			Logger.LogDebug("GetCachedUserPersonalizationCallback(cacheItemArgs={CacheItemArgs}): userId → {UserId}", cacheItemArgs, userId);
             var returnValue = Null.NullString; // Default is no profile
             IDataReader dr = null;
+			Logger.LogDebug("GetCachedUserPersonalizationCallback(cacheItemArgs={CacheItemArgs}): returnValue → {ReturnValue}", cacheItemArgs, returnValue);
+			Logger.LogDebug("GetCachedUserPersonalizationCallback(cacheItemArgs={CacheItemArgs}): dr → {Dr}", cacheItemArgs, dr);
             try
             {
                 dr = DataProvider.Instance().GetProfile(userId, portalId);
@@ -191,6 +204,7 @@ namespace DotNetNuke.Services.Personalization
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in GetCachedUserPersonalizationCallback(cacheItemArgs={CacheItemArgs}): {Arg1}", cacheItemArgs, ex.Message);
                 Exceptions.Exceptions.LogException(ex);
             }
             finally
@@ -198,6 +212,7 @@ namespace DotNetNuke.Services.Personalization
                 CBO.CloseDataReader(dr, true);
             }
 
+			Logger.LogDebug("<<< Exiting GetCachedUserPersonalizationCallback(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return returnValue;
         }
 

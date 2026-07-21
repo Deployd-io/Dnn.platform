@@ -25,6 +25,7 @@ using System;
 
 namespace log4net.Config
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Assembly level attribute that specifies the logging repository for the assembly.</summary>
     /// <remarks>
     /// <para>
@@ -59,6 +60,8 @@ namespace log4net.Config
         /// </remarks>
         public RepositoryAttribute()
         {
+		Logger.LogDebug(">>> Entering RepositoryAttribute()");
+		Logger.LogDebug("<<< Exiting RepositoryAttribute()");
         }
 
         /// <summary>
@@ -73,7 +76,10 @@ namespace log4net.Config
         /// </remarks>
         public RepositoryAttribute(string name)
         {
+			Logger.LogDebug(">>> Entering RepositoryAttribute(name={Name})", name);
             this.m_name = name;
+			Logger.LogDebug("<<< Exiting RepositoryAttribute(name={Name})", name);
+			Logger.LogDebug("RepositoryAttribute(name={Name}): this.m_name → {Arg1}", name, this.m_name);
         }
 
         /// <summary>Gets or sets the name of the logging repository.</summary>

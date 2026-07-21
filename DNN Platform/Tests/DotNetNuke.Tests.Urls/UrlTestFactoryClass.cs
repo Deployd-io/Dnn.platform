@@ -13,6 +13,7 @@ namespace DotNetNuke.Tests.Urls
 
     internal static class UrlTestFactoryClass
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         internal static IEnumerable FriendlyUrl_BaseTestCases
         {
             get
@@ -252,6 +253,8 @@ namespace DotNetNuke.Tests.Urls
 
                 return testData;
             }
+			Logger.LogDebug(">>> Entering GetTestsWithAliases(testType={TestType},testName={TestName},testData={TestData})", testType, testName, testData);
+			Logger.LogDebug("<<< Exiting GetTestsWithAliases(testType={TestType},testName={TestName},testData={TestData})", testType, testName, testData);
         }
 
         internal static IEnumerable UrlRewrite_SecureRedirectTestCases
@@ -292,6 +295,8 @@ namespace DotNetNuke.Tests.Urls
 
         internal static FriendlyUrlSettings GetSettings(string testType, string testName, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetSettings(testType={TestType},testName={TestName},portalId={PortalId})", testType, testName, portalId);
+			Logger.LogDebug("<<< Exiting GetSettings(testType={TestType},testName={TestName},portalId={PortalId})", testType, testName, portalId);
             return GetSettings(testType, testName, "Settings", portalId);
         }
 
@@ -328,6 +333,7 @@ namespace DotNetNuke.Tests.Urls
                     }
                 }
             });
+			Logger.LogDebug("<<< Exiting GetSettings(testType={TestType},testName={TestName},settingsFile={SettingsFile},portalId={PortalId})", testType, testName, settingsFile, portalId);
             return settings;
         }
 

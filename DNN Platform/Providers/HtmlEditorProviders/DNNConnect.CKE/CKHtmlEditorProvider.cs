@@ -17,6 +17,7 @@ namespace DNNConnect.CKEditorProvider
     /// <summary>The CKEditor Provider.</summary>
     public class CKHtmlEditorProvider : HtmlEditorProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>The _additional toolbars.</summary>
         private ArrayList additionalToolbars = new ArrayList();
 
@@ -85,14 +86,19 @@ namespace DNNConnect.CKEditorProvider
         /// <summary>The add toolbar.</summary>
         public override void AddToolbar()
         {
+			Logger.LogDebug(">>> Entering AddToolbar()");
             // Must exist because it exists at the base class
+			Logger.LogDebug("<<< Exiting AddToolbar()");
         }
 
         /// <summary>The initialize.</summary>
         public override void Initialize()
         {
+			Logger.LogDebug(">>> Entering Initialize()");
             this.htmlEditorControl = ActivatorUtilities.CreateInstance<EditorControl>(HttpContextSource.Current.GetScope().ServiceProvider);
             this.htmlEditorControl.ID = this.ControlID;
+			Logger.LogDebug("<<< Exiting Initialize()");
+			Logger.LogDebug("Initialize(): htmlEditorControl → {HtmlEditorControl}", htmlEditorControl);
         }
     }
 }

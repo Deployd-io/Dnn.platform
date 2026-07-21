@@ -24,6 +24,7 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
     [TestFixture]
     public class TokenReplaceTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private Mock<CachingProvider> mockCache;
         private Mock<IPortalController> portalController;
         private Mock<IModuleController> moduleController;
@@ -34,13 +35,19 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
         [SetUp]
         public void SetUp()
         {
+			Logger.LogDebug(">>> Entering SetUp()");
             ComponentFactory.RegisterComponentInstance<TokenProvider>(new CoreTokenProvider());
             this.mockCache = MockComponentProvider.CreateDataCacheProvider();
+			Logger.LogDebug("SetUp(): mockCache → {MockCache}", mockCache);
             this.mockHostController = new Mock<IHostController>();
+			Logger.LogDebug("SetUp(): mockHostController → {MockHostController}", mockHostController);
             this.mockHostController.As<IHostSettingsService>();
             this.portalController = new Mock<IPortalController>();
+			Logger.LogDebug("SetUp(): portalController → {PortalController}", portalController);
             this.moduleController = new Mock<IModuleController>();
+			Logger.LogDebug("SetUp(): moduleController → {ModuleController}", moduleController);
             this.userController = new Mock<IUserController>();
+			Logger.LogDebug("SetUp(): userController → {UserController}", userController);
             PortalController.SetTestableInstance(this.portalController.Object);
             ModuleController.SetTestableInstance(this.moduleController.Object);
             UserController.SetTestableInstance(this.userController.Object);
@@ -52,6 +59,8 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
             this.serviceProvider = FakeServiceProvider.Setup(
                 services =>
                 {
+				Logger.LogDebug("SetUp(): serviceProvider → {ServiceProvider}", serviceProvider);
+				Logger.LogDebug("SetUp(): services → {Services}", services);
                     services.AddSingleton(this.mockCache.Object);
                     services.AddSingleton((IHostSettingsService)this.mockHostController.Object);
                     services.AddSingleton(this.mockHostController.Object);
@@ -59,15 +68,18 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
                     services.AddSingleton(this.moduleController.Object);
                     services.AddSingleton(this.userController.Object);
                 });
+				Logger.LogDebug("<<< Exiting SetUp()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			Logger.LogDebug(">>> Entering TearDown()");
             this.serviceProvider.Dispose();
             PortalController.ClearInstance();
             ModuleController.ClearInstance();
             UserController.ClearInstance();
+			Logger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
@@ -75,6 +87,7 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
         [TestCase("This is just plain text")]
         public void TextInputIsReturnedUnModified(string sourceText)
         {
+			Logger.LogDebug(">>> Entering TextInputIsReturnedUnModified(sourceText={SourceText})", sourceText);
             // Arrange
             var tokenReplace = new TokenReplace(Scope.DefaultSettings, PortalSettings.Current.DefaultLanguage,
                 PortalSettings.Current, UserController.Instance.GetUser(1, 1), 1);
@@ -82,8 +95,10 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
             // Act
             var outputText = tokenReplace.ReplaceEnvironmentTokens(sourceText);
 
+			Logger.LogDebug("TextInputIsReturnedUnModified(sourceText={SourceText}): outputText → {OutputText}", sourceText, outputText);
             // Assert
             Assert.That(sourceText, Is.EqualTo(outputText));
+			Logger.LogDebug("<<< Exiting TextInputIsReturnedUnModified(sourceText={SourceText})", sourceText);
         }
 
         [Test]
@@ -92,6 +107,7 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
         [TestCase("[JavaScript:{ jsname: \"Knockout\" }] [JavaScript:{ path: \"~/DesktopModules/Dnn/ContactList/ClientScripts/contacts.js\"}]")]
         public void ObjectInputIsReturnedBlank(string sourceText)
         {
+			Logger.LogDebug(">>> Entering ObjectInputIsReturnedBlank(sourceText={SourceText})", sourceText);
             // Arrange
             var tokenReplace = new TokenReplace(Scope.DefaultSettings, PortalSettings.Current.DefaultLanguage,
                 PortalSettings.Current, UserController.Instance.GetUser(1, 1), 1);
@@ -99,12 +115,15 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
             // Act
             var outputText = tokenReplace.ReplaceEnvironmentTokens(sourceText);
 
+			Logger.LogDebug("ObjectInputIsReturnedBlank(sourceText={SourceText}): outputText → {OutputText}", sourceText, outputText);
             // Assert
             Assert.That(outputText.Trim(), Is.EqualTo(string.Empty));
+			Logger.LogDebug("<<< Exiting ObjectInputIsReturnedBlank(sourceText={SourceText})", sourceText);
         }
 
         private void SetupPortalSettings()
         {
+			Logger.LogDebug(">>> Entering SetupPortalSettings()");
             var portalSettings = new PortalSettings
             {
                 AdministratorRoleName = Utilities.Constants.RoleName_Administrators,
@@ -112,10 +131,12 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
             };
 
             this.portalController.Setup(pc => pc.GetCurrentPortalSettings()).Returns(portalSettings);
+			Logger.LogDebug("<<< Exiting SetupPortalSettings()");
         }
 
         private void SetupModuleInfo()
         {
+			Logger.LogDebug(">>> Entering SetupModuleInfo()");
             var moduleInfo = new ModuleInfo
             {
                 ModuleID = 1,
@@ -124,10 +145,12 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
 
             this.moduleController.Setup(mc => mc.GetModule(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>()))
                 .Returns(moduleInfo);
+				Logger.LogDebug("<<< Exiting SetupModuleInfo()");
         }
 
         private void SetupUserInfo()
         {
+			Logger.LogDebug(">>> Entering SetupUserInfo()");
             var userInfo = new UserInfo
             {
                 UserID = 1,
@@ -135,6 +158,7 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
                 PortalID = this.portalController.Object.GetCurrentPortalSettings().PortalId,
             };
             this.userController.Setup(uc => uc.GetUser(It.IsAny<int>(), It.IsAny<int>())).Returns(userInfo);
+			Logger.LogDebug("<<< Exiting SetupUserInfo()");
         }
     }
 }

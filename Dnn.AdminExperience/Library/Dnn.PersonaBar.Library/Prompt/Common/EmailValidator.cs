@@ -10,10 +10,12 @@ namespace Dnn.PersonaBar.Library.Prompt.Common
 
     public class EmailValidator
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private bool invalid;
 
         public bool IsValid(string emailToTest)
         {
+			Logger.LogDebug(">>> Entering IsValid(emailToTest={EmailToTest})", emailToTest);
             if (string.IsNullOrEmpty(emailToTest))
             {
                 return false;
@@ -24,8 +26,10 @@ namespace Dnn.PersonaBar.Library.Prompt.Common
             {
                 emailToTest = Regex.Replace(emailToTest, "(@)(.+)$", this.DomainMapper, RegexOptions.None, TimeSpan.FromMilliseconds(200));
             }
+			Logger.LogDebug("IsValid(emailToTest={EmailToTest}): emailToTest → {EmailToTest1}", emailToTest, emailToTest);
             catch (RegexMatchTimeoutException)
             {
+				Logger.LogError("Exception in IsValid(emailToTest={EmailToTest}): {Arg1}", emailToTest, ex.Message);
                 return false;
             }
 
@@ -41,25 +45,32 @@ namespace Dnn.PersonaBar.Library.Prompt.Common
             }
             catch (RegexMatchTimeoutException)
             {
+				Logger.LogDebug("<<< Exiting IsValid(emailToTest={EmailToTest})", emailToTest);
                 return false;
             }
         }
 
         private string DomainMapper(Match match)
         {
+			Logger.LogDebug(">>> Entering DomainMapper(match={Match})", match);
             // IdnMapping class with default property values
             var idn = new IdnMapping();
 
+			Logger.LogDebug("DomainMapper(match={Match}): idn → {Idn}", match, idn);
             var domainName = match.Groups[2].Value;
             try
+			Logger.LogDebug("DomainMapper(match={Match}): domainName → {DomainName}", match, domainName);
             {
                 domainName = idn.GetAscii(domainName);
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in DomainMapper(match={Match}): {Arg1}", match, ex.Message);
                 this.invalid = true;
+				Logger.LogDebug("DomainMapper(match={Match}): this.invalid → {Arg1}", match, this.invalid);
             }
 
+			Logger.LogDebug("<<< Exiting DomainMapper(match={Match})", match);
             return match.Groups[1].Value + domainName;
         }
     }

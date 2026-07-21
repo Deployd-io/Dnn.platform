@@ -1,5 +1,6 @@
 ﻿' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports DotNetNuke.UI.Utilities
 Imports DotNetNuke.Web.Client.ClientResourceManagement
@@ -20,13 +21,17 @@ Namespace DotNetNuke.UI.WebControls
     Public NotInheritable Class WebControls
         ' Methods
         Private Shared Function FixJs(ByVal js As String) As String
+			Logger.LogDebug(">>> Entering FixJs(js={Js})", js)
             Return If((String.IsNullOrEmpty(js) OrElse js.EndsWith(";", StringComparison.Ordinal)), js, (js & ";"))
         End Function
+		Logger.LogDebug("<<< Exiting FixJs(js={Js})", js)
 
         Public Shared Function GetNodeJS(ByVal NavControl As Control, ByVal Node As DNNNode, ByVal DefaultJS As String, ByVal Target As String, ByVal NoneDoesPostBack As Boolean) As String
+			Logger.LogDebug(">>> Entering GetNodeJS(NavControl={NavControl},Node={Node},DefaultJS={DefaultJS},Target={Target},NoneDoesPostBack={NoneDoesPostBack})", NavControl, Node, DefaultJS, Target, NoneDoesPostBack)
             Dim expression As String = ""
             If (Strings.Len(Node.JSFunction) > 0) Then
                 expression = WebControls.FixJs(Node.JSFunction)
+				Logger.LogDebug("GetNodeJS(NavControl={NavControl},Node={Node},DefaultJS={DefaultJS},Target={Target},NoneDoesPostBack={NoneDoesPostBack}): expression → {Expression}", NavControl, Node, DefaultJS, Target, NoneDoesPostBack, expression)
             ElseIf (Strings.Len(DefaultJS) > 0) Then
                 expression = WebControls.FixJs(DefaultJS)
             End If
@@ -55,14 +60,18 @@ Namespace DotNetNuke.UI.WebControls
             End Select
             Return expression
         End Function
+		Logger.LogDebug("<<< Exiting GetNodeJS(NavControl={NavControl},Node={Node},DefaultJS={DefaultJS},Target={Target},NoneDoesPostBack={NoneDoesPostBack})", NavControl, Node, DefaultJS, Target, NoneDoesPostBack)
 
         Public Shared Function IsDesignMode() As Boolean
+			Logger.LogDebug(">>> Entering IsDesignMode()")
             Return Object.ReferenceEquals(HttpContext.Current, Nothing)
         End Function
+		Logger.LogDebug("<<< Exiting IsDesignMode()")
 
         
         <Obsolete("Deprecated in DotNetNuke 10.2.3. Please use overload with IClientResourceController. Scheduled removal in v12.0.0.")>
         Public Shared Sub RegisterClientScriptBlock(ByVal ThePage As Page, ByVal Key As String)
+			Logger.LogDebug(">>> Entering RegisterClientScriptBlock(ThePage={ThePage},Key={Key})", ThePage, Key)
             If ClientAPI.UseExternalScripts Then
 #Disable Warning BC40000
                 ClientResourceManager.RegisterScript(ThePage, (ClientAPI.ScriptPath & Key))
@@ -71,6 +80,7 @@ Namespace DotNetNuke.UI.WebControls
                 MSAJAX.RegisterClientScript(ThePage, Key, "DotNetNuke.WebControls")
             End If
         End Sub
+		Logger.LogDebug("<<< Exiting RegisterClientScriptBlock(ThePage={ThePage},Key={Key})", ThePage, Key)
 
         Public Shared Sub RegisterClientScriptBlock(clientResourceController As IClientResourceController, thePage As Page, key As String)
             If ClientAPI.UseExternalScripts Then
@@ -103,11 +113,13 @@ Namespace DotNetNuke.UI.WebControls
 
         <Obsolete("Deprecated in DotNetNuke 10.2.3. Please use overload with IClientResourceController. Scheduled removal in v12.0.0.")>
         Public Shared Sub RegisterSubmitComponent(ByVal ThePage As Page)
+			Logger.LogDebug(">>> Entering RegisterSubmitComponent(ThePage={ThePage})", ThePage)
             If Not ThePage.ClientScript.IsOnSubmitStatementRegistered(ThePage.GetType, "dnn.controls.submitComp") Then
                 WebControls.RegisterClientScriptBlock(ThePage, "dnn.controls.js", DotNetNuke.Web.Client.FileOrder.Js.DnnControlsLabelEdit)
                 ThePage.ClientScript.RegisterOnSubmitStatement(ThePage.GetType, "dnn.controls.submitComp", "dnn.controls.submitComp.onsubmit()")
             End If
         End Sub
+		Logger.LogDebug("<<< Exiting RegisterSubmitComponent(ThePage={ThePage})", ThePage)
 
         Public Shared Sub RegisterSubmitComponent(clientResourceController As IClientResourceController, thePage As Page)
             If Not ThePage.ClientScript.IsOnSubmitStatementRegistered(thePage.GetType, "dnn.controls.submitComp") Then
@@ -117,15 +129,19 @@ Namespace DotNetNuke.UI.WebControls
         End Sub
 
         Public Shared Function StripUrlPaths(ByVal [Text] As String, ByVal Type As UrlFormatType, ByVal ThePage As Page) As String
+			Logger.LogDebug(">>> Entering StripUrlPaths([Text]={Arg},Type={Type},ThePage={ThePage})", [Text], Type, ThePage)
             Dim str2 As String
             If Object.ReferenceEquals(ThePage, Nothing) Then
                 str2 = [Text]
+				Logger.LogDebug("StripUrlPaths([Text]={Arg0},Type={Type},ThePage={ThePage}): str2 → {Str2}", [Text], Type, ThePage, str2)
             Else
                 Dim str3 As String = Nothing
                 Dim absoluteUri As String
                 Select Case Type
                     Case UrlFormatType.AbsoluteWithoutServer
                         absoluteUri = ThePage.Request.Url.AbsoluteUri
+						Logger.LogDebug("StripUrlPaths([Text]={Arg0},Type={Type},ThePage={ThePage}): absoluteUri → {AbsoluteUri}", [Text], Type, ThePage, absoluteUri)
+						Logger.LogDebug("StripUrlPaths([Text]={Arg0},Type={Type},ThePage={ThePage}): str3 → {Str3}", [Text], Type, ThePage, str3)
                         str3 = absoluteUri.Substring(0, (absoluteUri.Length - ThePage.Request.Url.PathAndQuery.Length))
                         Exit Select
                     Case UrlFormatType.Relative
@@ -141,14 +157,17 @@ Namespace DotNetNuke.UI.WebControls
             End If
             Return str2
         End Function
+		Logger.LogDebug("<<< Exiting StripUrlPaths([Text]={Arg},Type={Type},ThePage={ThePage})", [Text], Type, ThePage)
 
         Public Shared Function ToJSON(ByVal hash As Hashtable) As String
+			Logger.LogDebug(">>> Entering ToJSON(hash={Hash})", hash)
             Dim enumerator As IEnumerator = Nothing
             Dim builder As New StringBuilder
             Dim s As String = ""
             builder.Append("{"c)
             Try 
                 enumerator = hash.Keys.GetEnumerator
+				Logger.LogDebug("ToJSON(hash={Hash}): enumerator → {Enumerator}", hash, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -173,6 +192,7 @@ Namespace DotNetNuke.UI.WebControls
             builder.Append("}"c)
             Return builder.ToString
         End Function
+		Logger.LogDebug("<<< Exiting ToJSON(hash={Hash})", hash)
 
     End Class
 End Namespace

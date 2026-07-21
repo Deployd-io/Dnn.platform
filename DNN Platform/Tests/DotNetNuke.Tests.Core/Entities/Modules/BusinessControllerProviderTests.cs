@@ -18,24 +18,32 @@ namespace DotNetNuke.Tests.Core.Entities.Modules
     [TestFixture]
     public class BusinessControllerProviderTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private FakeServiceProvider serviceProvider;
 
         [SetUp]
         public void SetUp()
         {
+			Logger.LogDebug(">>> Entering SetUp()");
             this.serviceProvider = FakeServiceProvider.Setup(
                 services =>
                 {
+				Logger.LogDebug("SetUp(): services → {Services}", services);
+				Logger.LogDebug("SetUp(): serviceProvider → {ServiceProvider}", serviceProvider);
                     var fakeCachingProvider = new FakeCachingProvider(new Dictionary<string, object>(0));
                     ComponentFactory.RegisterComponentInstance<CachingProvider>(fakeCachingProvider);
+					Logger.LogDebug("SetUp(): fakeCachingProvider → {FakeCachingProvider}", fakeCachingProvider);
                     services.AddSingleton<CachingProvider>(fakeCachingProvider);
                 });
+				Logger.LogDebug("<<< Exiting SetUp()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			Logger.LogDebug(">>> Entering TearDown()");
             this.serviceProvider.Dispose();
+			Logger.LogDebug("<<< Exiting TearDown()");
         }
 
         [TestCase(typeof(PortableControllerClass), true)]
@@ -43,8 +51,11 @@ namespace DotNetNuke.Tests.Core.Entities.Modules
         [TestCase(typeof(AllFeaturesControllerClass), true)]
         public void CanGetPortableInstanceFromType(Type businessControllerType, bool implementsPortable)
         {
+			Logger.LogDebug(">>> Entering CanGetPortableInstanceFromType(businessControllerType={BusinessControllerType},implementsPortable={ImplementsPortable})", businessControllerType, implementsPortable);
             var provider = CreateProvider();
             var portable = provider.GetInstance<IPortable>(businessControllerType);
+			Logger.LogDebug("CanGetPortableInstanceFromType(businessControllerType={BusinessControllerType},implementsPortable={ImplementsPortable}): provider → {Provider}", businessControllerType, implementsPortable, provider);
+			Logger.LogDebug("CanGetPortableInstanceFromType(businessControllerType={BusinessControllerType},implementsPortable={ImplementsPortable}): portable → {Portable}", businessControllerType, implementsPortable, portable);
 
             if (implementsPortable)
             {
@@ -55,6 +66,7 @@ namespace DotNetNuke.Tests.Core.Entities.Modules
             {
                 Assert.That(portable, Is.Null);
             }
+			Logger.LogDebug("<<< Exiting CanGetPortableInstanceFromType(businessControllerType={BusinessControllerType},implementsPortable={ImplementsPortable})", businessControllerType, implementsPortable);
         }
 
         [TestCase(typeof(PortableControllerClass), true)]
@@ -62,8 +74,11 @@ namespace DotNetNuke.Tests.Core.Entities.Modules
         [TestCase(typeof(AllFeaturesControllerClass), true)]
         public void CanGetPortableInstanceFromTypeName(Type businessControllerType, bool implementsPortable)
         {
+			Logger.LogDebug(">>> Entering CanGetPortableInstanceFromTypeName(businessControllerType={BusinessControllerType},implementsPortable={ImplementsPortable})", businessControllerType, implementsPortable);
             var provider = CreateProvider();
             var portable = provider.GetInstance<IPortable>(businessControllerType.AssemblyQualifiedName);
+			Logger.LogDebug("CanGetPortableInstanceFromTypeName(businessControllerType={BusinessControllerType},implementsPortable={ImplementsPortable}): provider → {Provider}", businessControllerType, implementsPortable, provider);
+			Logger.LogDebug("CanGetPortableInstanceFromTypeName(businessControllerType={BusinessControllerType},implementsPortable={ImplementsPortable}): portable → {Portable}", businessControllerType, implementsPortable, portable);
 
             if (implementsPortable)
             {
@@ -74,6 +89,7 @@ namespace DotNetNuke.Tests.Core.Entities.Modules
             {
                 Assert.That(portable, Is.Null);
             }
+			Logger.LogDebug("<<< Exiting CanGetPortableInstanceFromTypeName(businessControllerType={BusinessControllerType},implementsPortable={ImplementsPortable})", businessControllerType, implementsPortable);
         }
 
         [TestCase(typeof(PortableControllerClass), false)]
@@ -81,8 +97,11 @@ namespace DotNetNuke.Tests.Core.Entities.Modules
         [TestCase(typeof(AllFeaturesControllerClass), true)]
         public void CanGetSearchableInstanceFromType(Type businessControllerType, bool implementsSearchable)
         {
+			Logger.LogDebug(">>> Entering CanGetSearchableInstanceFromType(businessControllerType={BusinessControllerType},implementsSearchable={ImplementsSearchable})", businessControllerType, implementsSearchable);
             var provider = CreateProvider();
             var searchable = provider.GetInstance<ModuleSearchBase>(businessControllerType);
+			Logger.LogDebug("CanGetSearchableInstanceFromType(businessControllerType={BusinessControllerType},implementsSearchable={ImplementsSearchable}): provider → {Provider}", businessControllerType, implementsSearchable, provider);
+			Logger.LogDebug("CanGetSearchableInstanceFromType(businessControllerType={BusinessControllerType},implementsSearchable={ImplementsSearchable}): searchable → {Searchable}", businessControllerType, implementsSearchable, searchable);
 
             if (implementsSearchable)
             {
@@ -93,6 +112,7 @@ namespace DotNetNuke.Tests.Core.Entities.Modules
             {
                 Assert.That(searchable, Is.Null);
             }
+			Logger.LogDebug("<<< Exiting CanGetSearchableInstanceFromType(businessControllerType={BusinessControllerType},implementsSearchable={ImplementsSearchable})", businessControllerType, implementsSearchable);
         }
 
         [TestCase(typeof(PortableControllerClass), false)]
@@ -100,8 +120,11 @@ namespace DotNetNuke.Tests.Core.Entities.Modules
         [TestCase(typeof(AllFeaturesControllerClass), true)]
         public void CanGetSearchableInstanceFromTypeName(Type businessControllerType, bool implementsSearchable)
         {
+			Logger.LogDebug(">>> Entering CanGetSearchableInstanceFromTypeName(businessControllerType={BusinessControllerType},implementsSearchable={ImplementsSearchable})", businessControllerType, implementsSearchable);
             var provider = CreateProvider();
             var searchable = provider.GetInstance<ModuleSearchBase>(businessControllerType.AssemblyQualifiedName);
+			Logger.LogDebug("CanGetSearchableInstanceFromTypeName(businessControllerType={BusinessControllerType},implementsSearchable={ImplementsSearchable}): provider → {Provider}", businessControllerType, implementsSearchable, provider);
+			Logger.LogDebug("CanGetSearchableInstanceFromTypeName(businessControllerType={BusinessControllerType},implementsSearchable={ImplementsSearchable}): searchable → {Searchable}", businessControllerType, implementsSearchable, searchable);
 
             if (implementsSearchable)
             {
@@ -112,6 +135,7 @@ namespace DotNetNuke.Tests.Core.Entities.Modules
             {
                 Assert.That(searchable, Is.Null);
             }
+			Logger.LogDebug("<<< Exiting CanGetSearchableInstanceFromTypeName(businessControllerType={BusinessControllerType},implementsSearchable={ImplementsSearchable})", businessControllerType, implementsSearchable);
         }
 
         [TestCase(typeof(PortableControllerClass))]
@@ -119,11 +143,15 @@ namespace DotNetNuke.Tests.Core.Entities.Modules
         [TestCase(typeof(AllFeaturesControllerClass))]
         public void CanGetInstanceFromType(Type businessControllerType)
         {
+			Logger.LogDebug(">>> Entering CanGetInstanceFromType(businessControllerType={BusinessControllerType})", businessControllerType);
             var provider = CreateProvider();
             var controller = provider.GetInstance(businessControllerType);
+			Logger.LogDebug("CanGetInstanceFromType(businessControllerType={BusinessControllerType}): provider → {Provider}", businessControllerType, provider);
+			Logger.LogDebug("CanGetInstanceFromType(businessControllerType={BusinessControllerType}): controller → {Controller}", businessControllerType, controller);
 
             Assert.That(controller, Is.Not.Null);
             Assert.That(controller.GetType(), Is.EqualTo(businessControllerType));
+			Logger.LogDebug("<<< Exiting CanGetInstanceFromType(businessControllerType={BusinessControllerType})", businessControllerType);
         }
 
         [TestCase(typeof(PortableControllerClass))]
@@ -131,15 +159,21 @@ namespace DotNetNuke.Tests.Core.Entities.Modules
         [TestCase(typeof(AllFeaturesControllerClass))]
         public void CanGetInstanceFromTypeName(Type businessControllerType)
         {
+			Logger.LogDebug(">>> Entering CanGetInstanceFromTypeName(businessControllerType={BusinessControllerType})", businessControllerType);
             var provider = CreateProvider();
             var controller = provider.GetInstance(businessControllerType.AssemblyQualifiedName);
+			Logger.LogDebug("CanGetInstanceFromTypeName(businessControllerType={BusinessControllerType}): provider → {Provider}", businessControllerType, provider);
+			Logger.LogDebug("CanGetInstanceFromTypeName(businessControllerType={BusinessControllerType}): controller → {Controller}", businessControllerType, controller);
 
             Assert.That(controller, Is.Not.Null);
             Assert.That(controller.GetType(), Is.EqualTo(businessControllerType));
+			Logger.LogDebug("<<< Exiting CanGetInstanceFromTypeName(businessControllerType={BusinessControllerType})", businessControllerType);
         }
 
         private static BusinessControllerProvider CreateProvider()
         {
+			Logger.LogDebug(">>> Entering CreateProvider()");
+			Logger.LogDebug("<<< Exiting CreateProvider()");
             return new BusinessControllerProvider(Globals.DependencyProvider);
         }
 
@@ -149,6 +183,8 @@ namespace DotNetNuke.Tests.Core.Entities.Modules
 
             public void ImportModule(int moduleID, string content, string version, int userID)
             {
+			Logger.LogDebug(">>> Entering ImportModule(moduleID={ModuleID},content={Content},version={Version},userID={UserID})", moduleID, content, version, userID);
+			Logger.LogDebug(">>> Entering ExportModule(moduleID={ModuleID})", moduleID);
             }
         }
 
@@ -156,6 +192,8 @@ namespace DotNetNuke.Tests.Core.Entities.Modules
         {
             public override IList<SearchDocument> GetModifiedSearchDocuments(ModuleInfo moduleInfo, DateTime beginDateUtc)
             {
+				Logger.LogDebug(">>> Entering GetModifiedSearchDocuments(moduleInfo={ModuleInfo},beginDateUtc={BeginDateUtc})", moduleInfo, beginDateUtc);
+				Logger.LogDebug("<<< Exiting GetModifiedSearchDocuments(moduleInfo={ModuleInfo},beginDateUtc={BeginDateUtc})", moduleInfo, beginDateUtc);
                 return Array.Empty<SearchDocument>();
             }
         }
@@ -174,6 +212,7 @@ namespace DotNetNuke.Tests.Core.Entities.Modules
             }
 
             public string UpgradeModule(string version) => $"Upgraded to {version}";
+			Logger.LogDebug(">>> Entering UpgradeModule(version={Version})", version);
         }
     }
 }

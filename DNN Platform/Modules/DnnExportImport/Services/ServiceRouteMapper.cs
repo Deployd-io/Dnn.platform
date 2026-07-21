@@ -11,17 +11,20 @@ namespace Dnn.ExportImport.Services
     /// <summary>The mapper for web API routes for the Import/Export extension.</summary>
     public class ServiceRouteMapper : IServiceRouteMapper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly string[] Namespaces = [typeof(ServiceRouteMapper).Namespace,];
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void RegisterRoutes(IMapRoute routeManager)
         {
+			Logger.LogDebug(">>> Entering RegisterRoutes(routeManager={RouteManager})", routeManager);
             routeManager.MapHttpRoute(
                 "SiteExportImport",
                 "default",
                 "{controller}/{action}",
                 Namespaces);
+				Logger.LogDebug("<<< Exiting RegisterRoutes(routeManager={RouteManager})", routeManager);
         }
     }
 }

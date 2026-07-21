@@ -50,17 +50,25 @@ namespace DotNetNuke.Providers.AspNetClientCapabilityProvider
         /// <param name="browserCaps">The browser capabilities.</param>
         public AspNetClientCapability(string userAgent, HttpCapabilitiesBase browserCaps)
         {
+			Logger.LogDebug(">>> Entering AspNetClientCapability(userAgent={UserAgent},browserCaps={BrowserCaps})", userAgent, browserCaps);
             this.UserAgent = userAgent;
 
+			Logger.LogDebug("AspNetClientCapability(userAgent={UserAgent},browserCaps={BrowserCaps}): this.UserAgent → {Arg2}", userAgent, browserCaps, this.UserAgent);
             if (browserCaps != null)
             {
                 this.ID = browserCaps.Id;
+				Logger.LogDebug("AspNetClientCapability(userAgent={UserAgent},browserCaps={BrowserCaps}): this.ID → {Arg2}", userAgent, browserCaps, this.ID);
                 this.ScreenResolutionWidthInPixels = browserCaps.ScreenPixelsWidth;
                 this.ScreenResolutionHeightInPixels = browserCaps.ScreenPixelsHeight;
+				Logger.LogDebug("AspNetClientCapability(userAgent={UserAgent},browserCaps={BrowserCaps}): this.ScreenResolutionWidthInPixels → {Arg2}", userAgent, browserCaps, this.ScreenResolutionWidthInPixels);
+				Logger.LogDebug("AspNetClientCapability(userAgent={UserAgent},browserCaps={BrowserCaps}): this.ScreenResolutionHeightInPixels → {Arg2}", userAgent, browserCaps, this.ScreenResolutionHeightInPixels);
                 this.IsTouchScreen = false;
                 this.BrowserName = browserCaps.Browser;
                 this.properties = browserCaps.Capabilities?.Cast<DictionaryEntry>().ToDictionary(kvp => Convert.ToString(kvp.Key, CultureInfo.InvariantCulture), kvp => Convert.ToString(kvp.Value, CultureInfo.InvariantCulture)) ?? new Dictionary<string, string>(0);
                 this.SupportsFlash = false;
+				Logger.LogDebug("AspNetClientCapability(userAgent={UserAgent},browserCaps={BrowserCaps}): this.IsTouchScreen → {Arg2}", userAgent, browserCaps, this.IsTouchScreen);
+				Logger.LogDebug("AspNetClientCapability(userAgent={UserAgent},browserCaps={BrowserCaps}): this.BrowserName → {Arg2}", userAgent, browserCaps, this.BrowserName);
+				Logger.LogDebug("AspNetClientCapability(userAgent={UserAgent},browserCaps={BrowserCaps}): this.SupportsFlash → {Arg2}", userAgent, browserCaps, this.SupportsFlash);
                 this.HtmlPreferedDTD = null;
 
                 if (this.UserAgent.Length < 4)
@@ -68,8 +76,10 @@ namespace DotNetNuke.Providers.AspNetClientCapabilityProvider
                     return;
                 }
 
+				Logger.LogDebug("AspNetClientCapability(userAgent={UserAgent},browserCaps={BrowserCaps}): this.HtmlPreferedDTD → {Arg2}", userAgent, browserCaps, this.HtmlPreferedDTD);
                 var lowerAgent = this.UserAgent.ToLowerInvariant();
                 this.IsMobile = browserCaps.IsMobileDevice || GetIfMobile(lowerAgent);
+				Logger.LogDebug("AspNetClientCapability(userAgent={UserAgent},browserCaps={BrowserCaps}): lowerAgent → {LowerAgent}", userAgent, browserCaps, lowerAgent);
                 this.IsTablet = GetIfTablet(lowerAgent);
 
                 try
@@ -81,6 +91,7 @@ namespace DotNetNuke.Providers.AspNetClientCapabilityProvider
                     Logger.Error(ex);
                 }
             }
+			Logger.LogDebug("<<< Exiting AspNetClientCapability(userAgent={UserAgent},browserCaps={BrowserCaps})", userAgent, browserCaps);
         }
 
         /// <summary>
@@ -91,6 +102,7 @@ namespace DotNetNuke.Providers.AspNetClientCapabilityProvider
         public AspNetClientCapability(HttpRequest request)
             : this(request.UserAgent ?? string.Empty, request.Browser)
         {
+		Logger.LogDebug(">>> Entering AspNetClientCapability(request={Request})", request);
         }
 
         /// <summary>
@@ -190,11 +202,15 @@ namespace DotNetNuke.Providers.AspNetClientCapabilityProvider
 
         private static bool GetIfMobile(string userAgent)
         {
+			Logger.LogDebug(">>> Entering GetIfMobile(userAgent={UserAgent})", userAgent);
+			Logger.LogDebug("<<< Exiting GetIfMobile(userAgent={UserAgent})", userAgent);
             return MobileCheck.IsMatch(userAgent);
         }
 
         private static bool GetIfTablet(string userAgent)
         {
+			Logger.LogDebug(">>> Entering GetIfTablet(userAgent={UserAgent})", userAgent);
+			Logger.LogDebug("<<< Exiting GetIfTablet(userAgent={UserAgent})", userAgent);
             return TabletRegex.IsMatch(userAgent);
         }
 
@@ -275,6 +291,7 @@ namespace DotNetNuke.Providers.AspNetClientCapabilityProvider
 
         private static string MapAgentVersionToWinVersion(string version)
         {
+			Logger.LogDebug(">>> Entering MapAgentVersionToWinVersion(version={Version})", version);
             switch (version)
             {
                 case "10.0":
@@ -298,12 +315,14 @@ namespace DotNetNuke.Providers.AspNetClientCapabilityProvider
                     return "2000";
                 default:
                     // fallback for all older than above or newer versions
+					Logger.LogDebug("<<< Exiting MapAgentVersionToWinVersion(version={Version})", version);
                     return "NT " + version;
             }
         }
 
         private static bool CheckAgentAndVersion(string queryAgent, string userAgent, ref string version)
         {
+			Logger.LogDebug(">>> Entering CheckAgentAndVersion(queryAgent={QueryAgent},userAgent={UserAgent},version={Version})", queryAgent, userAgent, version);
             // user agent must be passed in lowercase
             var index = userAgent.IndexOf(queryAgent, StringComparison.InvariantCulture);
             if (index < 0)
@@ -315,10 +334,12 @@ namespace DotNetNuke.Providers.AspNetClientCapabilityProvider
             {
                 var v = userAgent.Substring(index + queryAgent.Length).TrimStart(Separators);
                 index = v.IndexOfAny(Separators);
+				Logger.LogDebug("CheckAgentAndVersion(queryAgent={QueryAgent},userAgent={UserAgent},version={Version}): v → {V}", queryAgent, userAgent, version, v);
                 if (index > 0)
                 {
                     version = v.Substring(0, index);
                 }
+				Logger.LogDebug("CheckAgentAndVersion(queryAgent={QueryAgent},userAgent={UserAgent},version={Version}): version → {Version1}", queryAgent, userAgent, version, version);
             }
 
             return true;

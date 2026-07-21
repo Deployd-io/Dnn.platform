@@ -1,5 +1,6 @@
 ﻿' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports DotNetNuke.UI.Utilities
 Imports DotNetNuke.Web.Client
@@ -23,12 +24,15 @@ Namespace DotNetNuke.UI.WebControls
 
         ' Methods
         Public Sub New()
+			Logger.LogDebug(">>> Entering New()")
             AddHandler MyBase.PreRender, New EventHandler(AddressOf Me.DNNLabelEdit_PreRender)
             DNNLabelEdit.__ENCAddToList(Me)
         End Sub
+		Logger.LogDebug("<<< Exiting New()")
 
         <DebuggerNonUserCode> _
         Private Shared Sub __ENCAddToList(ByVal value As Object)
+			Logger.LogDebug(">>> Entering __ENCAddToList(value={Value})", value)
             SyncLock DNNLabelEdit.__ENCList
                 If (DNNLabelEdit.__ENCList.Count = DNNLabelEdit.__ENCList.Capacity) Then
                     Dim index As Integer = 0
@@ -54,12 +58,16 @@ Namespace DotNetNuke.UI.WebControls
                 DNNLabelEdit.__ENCList.Add(New WeakReference(value))
             End SyncLock
         End Sub
+		Logger.LogDebug("<<< Exiting __ENCAddToList(value={Value})", value)
 
         Private Sub DNNLabelEdit_PreRender(ByVal sender As Object, ByVal e As EventArgs)
+			Logger.LogDebug(">>> Entering DNNLabelEdit_PreRender(sender={Sender},e={E})", sender, e)
             Me.RegisterClientScript
         End Sub
+		Logger.LogDebug("<<< Exiting DNNLabelEdit_PreRender(sender={Sender},e={E})", sender, e)
 
         Protected Overrides Sub LoadViewState(ByVal state As Object)
+			Logger.LogDebug(">>> Entering LoadViewState(state={State})", state)
             If (Not state Is Nothing) Then
                 Dim objArray As Object() = DirectCast(state, Object())
                 If (Not objArray(0) Is Nothing) Then
@@ -67,8 +75,10 @@ Namespace DotNetNuke.UI.WebControls
                 End If
             End If
         End Sub
+		Logger.LogDebug("<<< Exiting LoadViewState(state={State})", state)
 
         Protected Function MarshalledProperties() As Hashtable
+			Logger.LogDebug(">>> Entering MarshalledProperties()")
             Dim hashtable2 As New Hashtable
             If Me.EditEnabled Then
                 If ClientAPI.BrowserSupportsFunctionality(ClientAPI.ClientFunctionality.XMLHTTP) Then
@@ -83,8 +93,10 @@ Namespace DotNetNuke.UI.WebControls
             End If
             Return hashtable2
         End Function
+		Logger.LogDebug("<<< Exiting MarshalledProperties()")
 
         Public Function RaiseClientAPICallbackEvent(ByVal eventArgument As String) As String Implements IClientAPICallbackEventHandler.RaiseClientAPICallbackEvent
+			Logger.LogDebug(">>> Entering RaiseClientAPICallbackEvent(eventArgument={EventArgument})", eventArgument)
             If (Me.UrlFormat <> UrlFormatType.None) Then
                 eventArgument = WebControls.StripUrlPaths(eventArgument, Me.UrlFormat, Me.Page)
             End If
@@ -95,15 +107,19 @@ Namespace DotNetNuke.UI.WebControls
             End If
             Return e.ReturnedText
         End Function
+		Logger.LogDebug("<<< Exiting RaiseClientAPICallbackEvent(eventArgument={EventArgument})", eventArgument)
 
         Public Overridable Sub RaisePostBackEvent(ByVal eventArgument As String) Implements IPostBackEventHandler.RaisePostBackEvent
+			Logger.LogDebug(">>> Entering RaisePostBackEvent(eventArgument={EventArgument})", eventArgument)
             Dim updateLabelEvent As DNNLabelEditEventHandler = Me.UpdateLabelEvent
             If Not Object.ReferenceEquals(updateLabelEvent, Nothing) Then
                 updateLabelEvent.Invoke(Me, New DNNLabelEditEventArgs(eventArgument))
             End If
         End Sub
+		Logger.LogDebug("<<< Exiting RaisePostBackEvent(eventArgument={EventArgument})", eventArgument)
 
         Public Sub RegisterClientScript()
+			Logger.LogDebug(">>> Entering RegisterClientScript()")
             If (If((Me.IsDownLevel OrElse Not Me.EditEnabled), 0, 1) <> 0) Then
                 ClientAPI.RegisterClientReference(Me.Page, ClientAPI.ClientNamespaceReferences.dnn_dom)
                 ClientAPI.RegisterClientReference(Me.Page, ClientAPI.ClientNamespaceReferences.dnn_dom_positioning)
@@ -116,8 +132,10 @@ Namespace DotNetNuke.UI.WebControls
                 End If
             End If
         End Sub
+		Logger.LogDebug("<<< Exiting RegisterClientScript()")
 
         Protected Overrides Sub Render(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer)
             MyBase.Render(writer)
             If (If((Me.IsDownLevel OrElse Not Me.EditEnabled), 0, 1) <> 0) Then
                 Dim properties As Hashtable = Me.MarshalledProperties
@@ -125,14 +143,19 @@ Namespace DotNetNuke.UI.WebControls
                 BaseWebControl.RegisterInitialize(Me, "initLabelEdit", marshalledPropertyJSON)
             End If
         End Sub
+		Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer)
 
         Protected Overrides Function SaveViewState() As Object
+			Logger.LogDebug(">>> Entering SaveViewState()")
             Return New Object() { MyBase.SaveViewState }
         End Function
+		Logger.LogDebug("<<< Exiting SaveViewState()")
 
         Protected Overrides Sub TrackViewState()
+			Logger.LogDebug(">>> Entering TrackViewState()")
             MyBase.TrackViewState
         End Sub
+		Logger.LogDebug("<<< Exiting TrackViewState()")
 
 
         ' Properties

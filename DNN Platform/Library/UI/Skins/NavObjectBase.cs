@@ -17,6 +17,7 @@ namespace DotNetNuke.UI.Skins
 
     public class NavObjectBase : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IServiceProvider serviceProvider;
         private readonly List<CustomAttribute> objCustomAttributes = new List<CustomAttribute>();
         private bool blnPopulateNodesFromClient = true;
@@ -107,13 +108,17 @@ namespace DotNetNuke.UI.Skins
         public NavObjectBase()
             : this(Globals.DependencyProvider)
         {
+		Logger.LogDebug(">>> Entering NavObjectBase()");
         }
+		Logger.LogDebug("<<< Exiting NavObjectBase()");
 
         /// <summary>Initializes a new instance of the <see cref="NavObjectBase"/> class.</summary>
         /// <param name="serviceProvider">The service provider.</param>
         public NavObjectBase(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
+			Logger.LogDebug("NavObjectBase(serviceProvider={ServiceProvider}): serviceProvider → {ServiceProvider1}", serviceProvider, serviceProvider);
+			Logger.LogDebug("NavObjectBase(serviceProvider={ServiceProvider}): this.serviceProvider → {Arg1}", serviceProvider, this.serviceProvider);
         }
 
         // JH - 2/5/07 - support for custom attributes
@@ -2329,11 +2334,15 @@ namespace DotNetNuke.UI.Skins
 
         public DNNNodeCollection GetNavigationNodes(DNNNode objNode)
         {
+			Logger.LogDebug(">>> Entering GetNavigationNodes(objNode={ObjNode})", objNode);
             int intRootParent = this.PortalSettings.ActiveTab.TabID;
             DNNNodeCollection objNodes = null;
+			Logger.LogDebug("GetNavigationNodes(objNode={ObjNode}): intRootParent → {IntRootParent}", objNode, intRootParent);
+			Logger.LogDebug("GetNavigationNodes(objNode={ObjNode}): objNodes → {ObjNodes}", objNode, objNodes);
             Navigation.ToolTipSource eToolTips;
             int intNavNodeOptions = 0;
             int intDepth = this.ExpandDepth;
+			Logger.LogDebug("GetNavigationNodes(objNode={ObjNode}): intNavNodeOptions → {IntNavNodeOptions}", objNode, intNavNodeOptions);
             switch (this.Level.ToLowerInvariant())
             {
                 case "child":
@@ -2359,6 +2368,7 @@ namespace DotNetNuke.UI.Skins
             {
                 case "name":
                     eToolTips = Navigation.ToolTipSource.TabName;
+					Logger.LogDebug("GetNavigationNodes(objNode={ObjNode}): eToolTips → {EToolTips}", objNode, eToolTips);
                     break;
                 case "title":
                     eToolTips = Navigation.ToolTipSource.Title;
@@ -2379,6 +2389,7 @@ namespace DotNetNuke.UI.Skins
             if (this.PopulateNodesFromClient && this.Control.SupportsPopulateOnDemand == false)
             {
                 this.ExpandDepth = -1;
+				Logger.LogDebug("GetNavigationNodes(objNode={ObjNode}): this.ExpandDepth → {Arg1}", objNode, this.ExpandDepth);
             }
 
             if (this.StartTabId != -1)
@@ -2397,34 +2408,41 @@ namespace DotNetNuke.UI.Skins
                 objNodes = Navigation.GetNavigationNodes(this.Control.ClientID, eToolTips, intRootParent, intDepth, intNavNodeOptions);
             }
 
+			Logger.LogDebug("<<< Exiting GetNavigationNodes(objNode={ObjNode})", objNode);
             return objNodes;
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         protected string GetValue(string strVal, string strDefault)
         {
+			Logger.LogDebug(">>> Entering GetValue(strVal={StrVal},strDefault={StrDefault})", strVal, strDefault);
             if (string.IsNullOrEmpty(strVal))
             {
                 return strDefault;
             }
             else
             {
+				Logger.LogDebug("<<< Exiting GetValue(strVal={StrVal},strDefault={StrDefault})", strVal, strDefault);
                 return strVal;
             }
         }
 
         protected void InitializeNavControl(Control objParent, string strDefaultProvider)
         {
+			Logger.LogDebug(">>> Entering InitializeNavControl(objParent={ObjParent},strDefaultProvider={StrDefaultProvider})", objParent, strDefaultProvider);
             if (string.IsNullOrEmpty(this.ProviderName))
             {
                 this.ProviderName = strDefaultProvider;
+				Logger.LogDebug("InitializeNavControl(objParent={ObjParent},strDefaultProvider={StrDefaultProvider}): this.ProviderName → {Arg2}", objParent, strDefaultProvider, this.ProviderName);
             }
 
             this.objControl = NavigationProvider.Instance(this.serviceProvider, this.ProviderName);
+			Logger.LogDebug("InitializeNavControl(objParent={ObjParent},strDefaultProvider={StrDefaultProvider}): objControl → {ObjControl}", objParent, strDefaultProvider, objControl);
             this.Control.ControlID = "ctl" + this.ID;
             this.Control.Initialize();
             this.AssignControlProperties();
             objParent.Controls.Add(this.Control.NavigationControl);
+			Logger.LogDebug("<<< Exiting InitializeNavControl(objParent={ObjParent},strDefaultProvider={StrDefaultProvider})", objParent, strDefaultProvider);
         }
 
         protected void Bind(DNNNodeCollection objNodes)
@@ -2434,6 +2452,7 @@ namespace DotNetNuke.UI.Skins
 
         private void AssignControlProperties()
         {
+			Logger.LogDebug(">>> Entering AssignControlProperties()");
             if (!string.IsNullOrEmpty(this.strPathSystemImage))
             {
                 this.Control.PathSystemImage = this.strPathSystemImage;
@@ -2830,10 +2849,12 @@ namespace DotNetNuke.UI.Skins
             }
 
             this.Control.CustomAttributes = this.CustomAttributes;
+			Logger.LogDebug("<<< Exiting AssignControlProperties()");
         }
 
         private string GetPath(string strPath)
         {
+			Logger.LogDebug(">>> Entering GetPath(strPath={StrPath})", strPath);
             if (strPath.Contains("[SKINPATH]", StringComparison.OrdinalIgnoreCase))
             {
                 return strPath.Replace("[SKINPATH]", this.PortalSettings.ActiveTab.SkinPath);
@@ -2854,6 +2875,7 @@ namespace DotNetNuke.UI.Skins
                 return this.ResolveUrl(strPath);
             }
 
+			Logger.LogDebug("<<< Exiting GetPath(strPath={StrPath})", strPath);
             return strPath;
         }
     }

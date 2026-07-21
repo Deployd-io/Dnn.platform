@@ -10,9 +10,12 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
     [DataContract]
     public class OptionItem
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="OptionItem"/> class.</summary>
         public OptionItem()
         {
+		Logger.LogDebug(">>> Entering OptionItem()");
+		Logger.LogDebug("<<< Exiting OptionItem()");
         }
 
         /// <summary>Gets or sets the text.</summary>

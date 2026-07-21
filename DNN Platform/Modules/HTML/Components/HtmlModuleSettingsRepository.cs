@@ -26,7 +26,9 @@ namespace DotNetNuke.Modules.Html.Components
             hostSettingsService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>(),
             portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>())
     {
+		Logger.LogDebug(">>> Entering HtmlModuleSettingsRepository(moduleController={ModuleController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController})", moduleController, hostSettings, hostSettingsService, portalController);
         /// <summary>Initializes a new instance of the <see cref="HtmlModuleSettingsRepository"/> class.</summary>
+		Logger.LogDebug("<<< Exiting HtmlModuleSettingsRepository(moduleController={ModuleController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController})", moduleController, hostSettings, hostSettingsService, portalController);
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public HtmlModuleSettingsRepository()
             : this(null, null, null, null)
