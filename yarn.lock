@@ -626,7 +626,7 @@ __metadata:
     "@rsbuild/plugin-react": "npm:^2.1.0"
     "@rsbuild/plugin-svgr": "npm:^2.0.4"
     "@storybook/addon-docs": "npm:10.4.6"
-    "@storybook/addon-onboarding": "npm:10.4.6"
+    "@storybook/addon-onboarding": "npm:10.5.0"
     create-react-class: "npm:^15.7.0"
     dayjs: "npm:^1.11.21"
     dompurify: "npm:^3.4.10"
@@ -3630,12 +3630,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@storybook/addon-onboarding@npm:10.4.6":
-  version: 10.4.6
-  resolution: "@storybook/addon-onboarding@npm:10.4.6"
+"@storybook/addon-onboarding@npm:10.5.0":
+  version: 10.5.0
+  resolution: "@storybook/addon-onboarding@npm:10.5.0"
   peerDependencies:
-    storybook: ^10.4.6
-  checksum: 10/021aa3870b3f2c1e78835813363918197809b037ea60ae5751e3ae2845df3c5c429fbe125ae10d81f9af279a8944dd00bf6c48b66b6a77e125e2dc3fac686e0c
+    storybook: ^10.5.0
+  checksum: 10/64dcf4e34ee33424e28839c38dc1134a39cff686a357b544d61b3614995a6f02650c314626c1c12abf3f2657fce36d5b5b34542a0ce14efd8e1b20942366c5a5
   languageName: node
   linkType: hard
 
