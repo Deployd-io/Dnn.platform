@@ -8,6 +8,7 @@ namespace DotNetNuke.Framework.Providers
 
     public class Provider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly NameValueCollection providerAttributes = new NameValueCollection();
         private readonly string providerName;
         private readonly string providerType;
@@ -16,11 +17,14 @@ namespace DotNetNuke.Framework.Providers
         /// <param name="attributes">The XML attributes. <c>name</c> and <c>type</c> are required, any additional attributes will be in <see cref="Attributes"/>.</param>
         public Provider(XmlAttributeCollection attributes)
         {
+			Logger.LogDebug(">>> Entering Provider(attributes={Attributes})", attributes);
             // Set the name of the provider
             this.providerName = attributes["name"].Value;
+			Logger.LogDebug("Provider(attributes={Attributes}): this.providerName → {Arg1}", attributes, this.providerName);
 
             // Set the type of the provider
             this.providerType = attributes["type"].Value;
+			Logger.LogDebug("Provider(attributes={Attributes}): this.providerType → {Arg1}", attributes, this.providerType);
 
             // Store all the attributes in the attributes bucket
             foreach (XmlAttribute attribute in attributes)
@@ -30,6 +34,7 @@ namespace DotNetNuke.Framework.Providers
                     this.providerAttributes.Add(attribute.Name, attribute.Value);
                 }
             }
+			Logger.LogDebug("<<< Exiting Provider(attributes={Attributes})", attributes);
         }
 
         public string Name

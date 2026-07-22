@@ -20,15 +20,20 @@ namespace DotNetNuke.Services.Log.EventLog
         /// <summary>Initializes a new instance of the <see cref="LogInfo"/> class.</summary>
         public LogInfo()
         {
+			Logger.LogDebug(">>> Entering LogInfo()");
             ((ILogInfo)this).LogGuid = Guid.NewGuid().ToString();
             this.BypassBuffering = false;
+			Logger.LogDebug("LogInfo(): this.BypassBuffering → {Arg0}", this.BypassBuffering);
             ((ILogInfo)this).LogProperties = new LogProperties();
             ((ILogInfo)this).LogPortalId = -1;
             this.LogPortalName = string.Empty;
+			Logger.LogDebug("LogInfo(): this.LogPortalName → {Arg0}", this.LogPortalName);
             ((ILogInfo)this).LogUserId = -1;
             ((ILogInfo)this).LogEventId = -1;
             this.LogUserName = string.Empty;
+			Logger.LogDebug("LogInfo(): this.LogUserName → {Arg0}", this.LogUserName);
             this.Exception = new ExceptionInfo();
+			Logger.LogDebug("<<< Exiting LogInfo()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="LogInfo"/> class.</summary>
@@ -98,6 +103,7 @@ namespace DotNetNuke.Services.Log.EventLog
 
         public static bool IsSystemType(string propName)
         {
+			Logger.LogDebug(">>> Entering IsSystemType(propName={PropName})", propName);
             switch (propName)
             {
                 case "LogGUID":
@@ -114,6 +120,7 @@ namespace DotNetNuke.Services.Log.EventLog
                     return true;
             }
 
+			Logger.LogDebug("<<< Exiting IsSystemType(propName={PropName})", propName);
             return false;
         }
 
@@ -121,17 +128,20 @@ namespace DotNetNuke.Services.Log.EventLog
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void AddProperty(string propertyName, string propertyValue)
         {
+			Logger.LogDebug(">>> Entering AddProperty(propertyName={PropertyName},propertyValue={PropertyValue})", propertyName, propertyValue);
             try
             {
                 if (propertyValue == null)
                 {
                     propertyValue = string.Empty;
                 }
+				Logger.LogDebug("AddProperty(propertyName={PropertyName},propertyValue={PropertyValue}): propertyValue → {PropertyValue1}", propertyName, propertyValue, propertyValue);
 
                 if (propertyName.Length > 50)
                 {
                     propertyName = propertyName.Substring(0, 50);
                 }
+				Logger.LogDebug("AddProperty(propertyName={PropertyName},propertyValue={PropertyValue}): propertyName → {PropertyName1}", propertyName, propertyValue, propertyName);
 
                 if (propertyValue.Length > 500)
                 {
@@ -140,28 +150,37 @@ namespace DotNetNuke.Services.Log.EventLog
 
                 var objLogDetailInfo = new LogDetailInfo();
                 objLogDetailInfo.PropertyName = propertyName;
+				Logger.LogDebug("AddProperty(propertyName={PropertyName},propertyValue={PropertyValue}): objLogDetailInfo → {ObjLogDetailInfo}", propertyName, propertyValue, objLogDetailInfo);
+				Logger.LogDebug("AddProperty(propertyName={PropertyName},propertyValue={PropertyValue}): objLogDetailInfo.PropertyName → {Arg2}", propertyName, propertyValue, objLogDetailInfo.PropertyName);
+				Logger.LogDebug("AddProperty(propertyName={PropertyName},propertyValue={PropertyValue}): objLogDetailInfo.PropertyValue → {Arg2}", propertyName, propertyValue, objLogDetailInfo.PropertyValue);
                 objLogDetailInfo.PropertyValue = propertyValue;
                 this.LogProperties.Add(objLogDetailInfo);
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in AddProperty(propertyName={PropertyName},propertyValue={PropertyValue}): {Arg2}", propertyName, propertyValue, ex.Message);
                 Exceptions.LogException(exc);
             }
+			Logger.LogDebug("<<< Exiting AddProperty(propertyName={PropertyName},propertyValue={PropertyValue})", propertyName, propertyValue);
         }
 
         public void Deserialize(string content)
         {
+			Logger.LogDebug(">>> Entering Deserialize(content={Content})", content);
             using XmlReader reader = XmlReader.Create(new StringReader(content));
             if (reader.Read())
+			Logger.LogDebug("Deserialize(content={Content}): reader → {Reader}", content, reader);
             {
                 this.ReadXml(reader);
             }
 
             reader.Close();
+			Logger.LogDebug("<<< Exiting Deserialize(content={Content})", content);
         }
 
         public void ReadXml(XmlReader reader)
         {
+			Logger.LogDebug(">>> Entering ReadXml(reader={Reader})", reader);
             if (reader.HasAttributes)
             {
                 while (reader.MoveToNextAttribute())
@@ -227,18 +246,25 @@ namespace DotNetNuke.Services.Log.EventLog
             {
                 this.Exception.ReadXml(reader);
             }
+			Logger.LogDebug("<<< Exiting ReadXml(reader={Reader})", reader);
         }
 
         public string Serialize()
         {
+			Logger.LogDebug(">>> Entering Serialize()");
             var settings = new XmlWriterSettings();
             settings.ConformanceLevel = ConformanceLevel.Fragment;
+			Logger.LogDebug("Serialize(): settings → {Settings}", settings);
+			Logger.LogDebug("Serialize(): settings.ConformanceLevel → {Arg0}", settings.ConformanceLevel);
+			Logger.LogDebug("Serialize(): settings.OmitXmlDeclaration → {Arg0}", settings.OmitXmlDeclaration);
             settings.OmitXmlDeclaration = true;
             var sb = new StringBuilder();
             using (XmlWriter writer = XmlWriter.Create(sb, settings))
             {
+			Logger.LogDebug("Serialize(): sb → {Sb}", sb);
                 this.WriteXml(writer);
                 writer.Close();
+				Logger.LogDebug("<<< Exiting Serialize()");
                 return sb.ToString();
             }
         }
@@ -246,7 +272,9 @@ namespace DotNetNuke.Services.Log.EventLog
         /// <inheritdoc />
         public override string ToString()
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
             var str = new StringBuilder();
+			Logger.LogDebug(">>> Entering ToString()");
             str.Append("<p><strong>LogGUID:</strong>" + ((ILogInfo)this).LogGuid + "</p>");
             str.Append("<p><strong>LogType:</strong>" + this.LogTypeKey + "</p>");
             str.Append("<p><strong>UserID:</strong>" + ((ILogInfo)this).LogUserId + "</p>");
@@ -262,11 +290,13 @@ namespace DotNetNuke.Services.Log.EventLog
                 str.Append(this.Exception.ToString());
             }
 
+			Logger.LogDebug("<<< Exiting ToString()");
             return str.ToString();
         }
 
         public void WriteXml(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteXml(writer={Writer})", writer);
             writer.WriteStartElement("log");
             writer.WriteAttributeString("LogGUID", ((ILogInfo)this).LogGuid);
             writer.WriteAttributeString("LogFileID", ((ILogInfo)this).LogFileId);
@@ -288,6 +318,7 @@ namespace DotNetNuke.Services.Log.EventLog
             }
 
             writer.WriteEndElement();
+			Logger.LogDebug("<<< Exiting WriteXml(writer={Writer})", writer);
         }
     }
 }

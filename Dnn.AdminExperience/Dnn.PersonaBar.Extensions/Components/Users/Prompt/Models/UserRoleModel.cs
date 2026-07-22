@@ -8,6 +8,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Models
 
     public class UserRoleModel
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public int RoleId { get; set; }
 
         public string RoleName { get; set; }
@@ -24,6 +25,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Models
 
         public static UserRoleModel FromDnnUserRoleInfo(DotNetNuke.Entities.Users.UserRoleInfo userRoleInfo)
         {
+			Logger.LogDebug(">>> Entering FromDnnUserRoleInfo(userRoleInfo={UserRoleInfo})", userRoleInfo);
             var userRoleModel = new UserRoleModel
             {
                 RoleId = userRoleInfo.RoleID,
@@ -33,6 +35,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Models
                 Start = userRoleInfo.EffectiveDate.ToPromptShortDateString(),
                 End = userRoleInfo.ExpiryDate.ToPromptShortDateString(),
             };
+			Logger.LogDebug("<<< Exiting FromDnnUserRoleInfo(userRoleInfo={UserRoleInfo})", userRoleInfo);
             return userRoleModel;
         }
     }

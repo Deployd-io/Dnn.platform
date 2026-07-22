@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class InvalidAuthHandlerException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public InvalidAuthHandlerException()
     {
+	Logger.LogDebug(">>> Entering InvalidAuthHandlerException()");
+	Logger.LogDebug("<<< Exiting InvalidAuthHandlerException()");
     }
 
     /// <inheritdoc />
     public InvalidAuthHandlerException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering InvalidAuthHandlerException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting InvalidAuthHandlerException(message={Message})", message);
 
     /// <inheritdoc />
     public InvalidAuthHandlerException(string message, Exception innerException)

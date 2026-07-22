@@ -13,6 +13,7 @@ namespace DotNetNuke.Web.Mvc.Common
 
     internal class PropertyHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly MethodInfo CallPropertyGetterByReferenceOpenGenericMethod = typeof(PropertyHelper).GetMethod("CallPropertyGetterByReference", BindingFlags.NonPublic | BindingFlags.Static);
         private static readonly MethodInfo CallPropertyGetterOpenGenericMethod = typeof(PropertyHelper).GetMethod("CallPropertyGetter", BindingFlags.NonPublic | BindingFlags.Static);
         private static readonly ConcurrentDictionary<Type, PropertyHelper[]> ReflectionCache = new ConcurrentDictionary<Type, PropertyHelper[]>();
@@ -22,10 +23,13 @@ namespace DotNetNuke.Web.Mvc.Common
         /// <param name="property">The property.</param>
         public PropertyHelper(PropertyInfo property)
         {
+			Logger.LogDebug(">>> Entering PropertyHelper(property={Property})", property);
             Requires.NotNull("property", property);
 
             this.Name = property.Name;
+			Logger.LogDebug("PropertyHelper(property={Property}): this.Name → {Arg1}", property, this.Name);
             this.valueGetter = MakeFastPropertyGetter(property);
+			Logger.LogDebug("<<< Exiting PropertyHelper(property={Property})", property);
         }
 
         // Implementation of the fast getter.
@@ -38,6 +42,8 @@ namespace DotNetNuke.Web.Mvc.Common
         /// <returns>a cached array of all public property getters from the underlying type of this instance.</returns>
         public static PropertyHelper[] GetProperties(object instance)
         {
+			Logger.LogDebug(">>> Entering GetProperties(instance={Instance})", instance);
+			Logger.LogDebug("<<< Exiting GetProperties(instance={Instance})", instance);
             return GetProperties(instance, CreateInstance, ReflectionCache);
         }
 
@@ -81,7 +87,9 @@ namespace DotNetNuke.Web.Mvc.Common
 
         public object GetValue(object instance)
         {
+			Logger.LogDebug(">>> Entering GetValue(instance={Instance})", instance);
             // Contract.Assert(valueGetter != null, "Must call Initialize before using this object");
+			Logger.LogDebug("<<< Exiting GetValue(instance={Instance})", instance);
             return this.valueGetter(instance);
         }
 
@@ -132,6 +140,8 @@ namespace DotNetNuke.Web.Mvc.Common
 
         private static PropertyHelper CreateInstance(PropertyInfo property)
         {
+			Logger.LogDebug(">>> Entering CreateInstance(property={Property})", property);
+			Logger.LogDebug("<<< Exiting CreateInstance(property={Property})", property);
             return new PropertyHelper(property);
         }
     }

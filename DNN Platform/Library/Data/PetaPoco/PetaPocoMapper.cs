@@ -13,6 +13,7 @@ namespace DotNetNuke.Data.PetaPoco
 
     public class PetaPocoMapper : IMapper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static IMapper defaultMapper;
         private static ReaderWriterLockSlim @lock = new ReaderWriterLockSlim();
         private readonly string tablePrefix;
@@ -21,14 +22,19 @@ namespace DotNetNuke.Data.PetaPoco
         /// <param name="tablePrefix">The table prefix.</param>
         public PetaPocoMapper(string tablePrefix)
         {
+			Logger.LogDebug(">>> Entering PetaPocoMapper(tablePrefix={TablePrefix})", tablePrefix);
             this.tablePrefix = tablePrefix;
             defaultMapper = new StandardMapper();
+			Logger.LogDebug("<<< Exiting PetaPocoMapper(tablePrefix={TablePrefix})", tablePrefix);
+			Logger.LogDebug("PetaPocoMapper(tablePrefix={TablePrefix}): defaultMapper → {DefaultMapper}", tablePrefix, defaultMapper);
+			Logger.LogDebug("PetaPocoMapper(tablePrefix={TablePrefix}): this.tablePrefix → {Arg1}", tablePrefix, this.tablePrefix);
         }
 
 #pragma warning disable CS3001 // Argument type is not CLS-compliant
         public static void SetMapper<T>(IMapper mapper)
 #pragma warning restore CS3001
         {
+			Logger.LogDebug(">>> Entering SetMapper(mapper={Mapper})", mapper);
             @lock.EnterWriteLock();
             try
             {
@@ -41,6 +47,7 @@ namespace DotNetNuke.Data.PetaPoco
             {
                 @lock.ExitWriteLock();
             }
+			Logger.LogDebug("<<< Exiting SetMapper(mapper={Mapper})", mapper);
         }
 
         /// <inheritdoc />
@@ -48,8 +55,10 @@ namespace DotNetNuke.Data.PetaPoco
         public ColumnInfo GetColumnInfo(PropertyInfo pocoProperty)
 #pragma warning restore CS3002
         {
+			Logger.LogDebug(">>> Entering GetColumnInfo(pocoProperty={PocoProperty})", pocoProperty);
             bool includeColumn = true;
 
+			Logger.LogDebug("GetColumnInfo(pocoProperty={PocoProperty}): includeColumn → {IncludeColumn}", pocoProperty, includeColumn);
             // Check if the class has the DeclareColumnsAttribute
             bool declareColumns = pocoProperty.DeclaringType != null
                             && pocoProperty.DeclaringType.GetCustomAttributes(typeof(DeclareColumnsAttribute), true).Length > 0;
@@ -71,6 +80,7 @@ namespace DotNetNuke.Data.PetaPoco
 
             ColumnInfo ci = null;
             if (includeColumn)
+			Logger.LogDebug("GetColumnInfo(pocoProperty={PocoProperty}): ci → {Ci}", pocoProperty, ci);
             {
                 ci = ColumnInfo.FromProperty(pocoProperty);
                 ci.ColumnName = DataUtil.GetColumnName(pocoProperty, ci.ColumnName);
@@ -78,6 +88,7 @@ namespace DotNetNuke.Data.PetaPoco
                 ci.ResultColumn = pocoProperty.GetCustomAttributes(typeof(ReadOnlyColumnAttribute), true).Length > 0;
             }
 
+			Logger.LogDebug("<<< Exiting GetColumnInfo(pocoProperty={PocoProperty})", pocoProperty);
             return ci;
         }
 
@@ -86,18 +97,22 @@ namespace DotNetNuke.Data.PetaPoco
         public TableInfo GetTableInfo(Type pocoType)
 #pragma warning restore CS3002
         {
+			Logger.LogDebug(">>> Entering GetTableInfo(pocoType={PocoType})", pocoType);
             TableInfo ti = TableInfo.FromPoco(pocoType);
 
+			Logger.LogDebug("GetTableInfo(pocoType={PocoType}): ti → {Ti}", pocoType, ti);
             // Table Name
             ti.TableName = DataUtil.GetTableName(pocoType, ti.TableName + "s");
 
             ti.TableName = this.tablePrefix + ti.TableName;
+			Logger.LogDebug("GetTableInfo(pocoType={PocoType}): ti.TableName → {Arg1}", pocoType, ti.TableName);
 
             // Primary Key
             ti.PrimaryKey = DataUtil.GetPrimaryKeyColumn(pocoType, ti.PrimaryKey);
 
             ti.AutoIncrement = DataUtil.GetAutoIncrement(pocoType, true);
 
+			Logger.LogDebug("<<< Exiting GetTableInfo(pocoType={PocoType})", pocoType);
             return ti;
         }
 

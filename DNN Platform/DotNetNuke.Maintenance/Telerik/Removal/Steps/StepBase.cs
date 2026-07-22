@@ -21,6 +21,7 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         /// <param name="localizer">An instance of <see cref="ILocalizer"/>.</param>
         public StepBase(ILoggerSource loggerSource, ILocalizer localizer)
         {
+			Log.Debug(">>> Entering StepBase(loggerSource={LoggerSource},localizer={Localizer})", loggerSource, localizer);
             if (loggerSource is null)
             {
                 throw new ArgumentNullException(nameof(loggerSource));
@@ -29,6 +30,9 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
             this.Log = loggerSource.GetLogger(this.GetType());
 
             this.localizer = localizer ??
+				Log.Debug("<<< Exiting StepBase(loggerSource={LoggerSource},localizer={Localizer})", loggerSource, localizer);
+				Log.Debug("StepBase(loggerSource={LoggerSource},localizer={Localizer}): localizer → {Localizer1}", loggerSource, localizer, localizer);
+				Log.Debug("StepBase(loggerSource={LoggerSource},localizer={Localizer}): this.localizer → {Arg2}", loggerSource, localizer, this.localizer);
                 throw new ArgumentNullException(nameof(localizer));
         }
 
@@ -50,6 +54,7 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         /// <inheritdoc />
         public void Execute()
         {
+			Log.Debug(">>> Entering Execute()");
             try
             {
                 this.CheckRequired();
@@ -59,8 +64,10 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
             {
                 this.Log.Error(ex);
                 this.Success = false;
+				Log.Debug("Execute(): this.Success → {Arg0}", this.Success);
                 this.Notes = this.Localize("UninstallStepInternalError");
             }
+			Log.Debug("<<< Exiting Execute()");
         }
 
         /// <summary>Performs the actual step execution.</summary>
@@ -69,12 +76,16 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         /// <inheritdoc cref="ILocalizer.Localize(string)"/>
         protected virtual string Localize(string key)
         {
+			Log.Debug(">>> Entering Localize(key={Key})", key);
+			Log.Debug("<<< Exiting Localize(key={Key})", key);
             return this.localizer.Localize(key);
         }
 
         /// <inheritdoc cref="ILocalizer.LocalizeFormat(string, object[])"/>
         protected virtual string LocalizeFormat(string key, params object[] args)
         {
+			Log.Debug(">>> Entering LocalizeFormat(key={Key},args={Args})", key, args);
+			Log.Debug("<<< Exiting LocalizeFormat(key={Key},args={Args})", key, args);
             return string.Format(
                 CultureInfo.CurrentCulture,
                 this.Localize(key),
@@ -83,6 +94,7 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
 
         private void CheckRequired()
         {
+			Log.Debug(">>> Entering CheckRequired()");
             var nullProperties = this.GetType().GetProperties()
                 .Where(p => p.GetCustomAttributes(typeof(RequiredAttribute), true).Length != 0)
                 .Where(p => string.IsNullOrEmpty($"{p.GetValue(this)}"))
@@ -95,6 +107,7 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
                     "UninstallStepRequiredPropertiesNotSet",
                     string.Join(", ", nullProperties)));
             }
+			Log.Debug("<<< Exiting CheckRequired()");
         }
     }
 }

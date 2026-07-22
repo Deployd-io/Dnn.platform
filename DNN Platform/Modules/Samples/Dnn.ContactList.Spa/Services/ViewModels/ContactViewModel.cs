@@ -13,11 +13,13 @@ namespace Dnn.ContactList.Spa.Services.ViewModels
     [JsonObject(MemberSerialization.OptIn)]
     public class ContactViewModel
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Constructs a ContactViewModel
         /// </summary>
         public ContactViewModel()
         {
+		Logger.LogDebug(">>> Entering ContactViewModel()");
         }
 
         /// <summary>
@@ -26,12 +28,21 @@ namespace Dnn.ContactList.Spa.Services.ViewModels
         /// <param name="contact"></param>
         public ContactViewModel(Contact contact)
         {
+			Logger.LogDebug(">>> Entering ContactViewModel(contact={Contact})", contact);
             ContactId = contact.ContactId;
             Email = contact.Email;
+			Logger.LogDebug("ContactViewModel(contact={Contact}): Email → {Email}", contact, Email);
+			Logger.LogDebug("ContactViewModel(contact={Contact}): ContactId → {ContactId}", contact, ContactId);
             FirstName = contact.FirstName;
             LastName = contact.LastName;
+			Logger.LogDebug("ContactViewModel(contact={Contact}): FirstName → {FirstName}", contact, FirstName);
+			Logger.LogDebug("ContactViewModel(contact={Contact}): LastName → {LastName}", contact, LastName);
             Phone = contact.Phone;
             Social = contact.Social;
+			Logger.LogDebug("<<< Exiting ContactViewModel(contact={Contact})", contact);
+			Logger.LogDebug("ContactViewModel(contact={Contact}): Phone → {Phone}", contact, Phone);
+			Logger.LogDebug("ContactViewModel(contact={Contact}): Social → {Social}", contact, Social);
+			Logger.LogDebug("<<< Exiting ContactViewModel()");
         }
 
         /// <summary>

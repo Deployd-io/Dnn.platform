@@ -20,7 +20,9 @@ using SchedulerMode = DotNetNuke.Abstractions.Application.SchedulerMode;
 /// <param name="hostSettingsService">The host settings service.</param>
 public class HostSettings(IHostSettingsService hostSettingsService) : IHostSettings
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     private PerformanceSettings? performanceSettings;
+	Logger.LogDebug(">>> Entering HostSettings(hostSettingsService={HostSettingsService})", hostSettingsService);
 
     /// <inheritdoc />
     public TimeSpan AutoAccountUnlockDuration =>
@@ -64,6 +66,7 @@ public class HostSettings(IHostSettingsService hostSettingsService) : IHostSetti
     /// <inheritdoc />
     public int CrmVersion => GetCrmVersion(hostSettingsService);
 
+	Logger.LogDebug("HostSettings(hostSettingsService={HostSettingsService}): CrmVersion → {CrmVersion}", hostSettingsService, CrmVersion);
     /// <inheritdoc />
     public string DefaultAdminContainer
     {
@@ -71,6 +74,7 @@ public class HostSettings(IHostSettingsService hostSettingsService) : IHostSetti
         {
             string setting = hostSettingsService.GetString("DefaultAdminContainer");
             if (string.IsNullOrEmpty(setting))
+			Logger.LogDebug("HostSettings(hostSettingsService={HostSettingsService}): setting → {Setting}", hostSettingsService, setting);
             {
                 setting = SkinController.GetDefaultAdminContainer();
             }
@@ -101,6 +105,7 @@ public class HostSettings(IHostSettingsService hostSettingsService) : IHostSetti
         {
             string doctype = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">";
             string setting = hostSettingsService.GetString("DefaultDocType");
+			Logger.LogDebug("HostSettings(hostSettingsService={HostSettingsService}): doctype → {Doctype}", hostSettingsService, doctype);
             if (!string.IsNullOrEmpty(setting))
             {
                 switch (setting)
@@ -225,9 +230,11 @@ public class HostSettings(IHostSettingsService hostSettingsService) : IHostSetti
     /// <inheritdoc />
     public int HostPortalId => hostSettingsService.GetInteger("HostPortalId");
 
+	Logger.LogDebug("HostSettings(hostSettingsService={HostSettingsService}): HostPortalId → {HostPortalId}", hostSettingsService, HostPortalId);
     /// <inheritdoc />
     public double HostSpace => hostSettingsService.GetDouble("HostSpace", 0);
 
+	Logger.LogDebug("HostSettings(hostSettingsService={HostSettingsService}): HostSpace → {HostSpace}", hostSettingsService, HostSpace);
     /// <inheritdoc />
     public string HostTitle => hostSettingsService.GetString("HostTitle");
 
@@ -237,9 +244,11 @@ public class HostSettings(IHostSettingsService hostSettingsService) : IHostSetti
     /// <inheritdoc />
     public int HttpCompressionAlgorithm => hostSettingsService.GetInteger("HttpCompression");
 
+	Logger.LogDebug("HostSettings(hostSettingsService={HostSettingsService}): HttpCompressionAlgorithm → {HttpCompressionAlgorithm}", hostSettingsService, HttpCompressionAlgorithm);
     /// <inheritdoc />
     public int MessageSchedulerBatchSize => hostSettingsService.GetInteger("MessageSchedulerBatchSize", 50);
 
+	Logger.LogDebug("HostSettings(hostSettingsService={HostSettingsService}): MessageSchedulerBatchSize → {MessageSchedulerBatchSize}", hostSettingsService, MessageSchedulerBatchSize);
     /// <inheritdoc />
     public TimeSpan MembershipResetLinkValidity =>
         TimeSpan.FromMinutes(hostSettingsService.GetInteger("MembershipResetLinkValidity", 60));
@@ -251,6 +260,7 @@ public class HostSettings(IHostSettingsService hostSettingsService) : IHostSetti
     /// <inheritdoc />
     public int MembershipNumberPasswords => hostSettingsService.GetInteger("MembershipNumberPasswords", 5);
 
+	Logger.LogDebug("HostSettings(hostSettingsService={HostSettingsService}): MembershipNumberPasswords → {MembershipNumberPasswords}", hostSettingsService, MembershipNumberPasswords);
     /// <inheritdoc />
     public int MembershipDaysBeforePasswordReuse =>
         hostSettingsService.GetInteger("MembershipDaysBeforePasswordReuse", 0);
@@ -267,6 +277,7 @@ public class HostSettings(IHostSettingsService hostSettingsService) : IHostSetti
     /// <inheritdoc />
     public int PageQuota => hostSettingsService.GetInteger("PageQuota", 0);
 
+	Logger.LogDebug("HostSettings(hostSettingsService={HostSettingsService}): PageQuota → {PageQuota}", hostSettingsService, PageQuota);
     /// <inheritdoc />
     public string PageStatePersister
     {
@@ -285,6 +296,7 @@ public class HostSettings(IHostSettingsService hostSettingsService) : IHostSetti
     /// <inheritdoc />
     public TimeSpan PasswordExpiry => TimeSpan.FromDays(hostSettingsService.GetInteger("PasswordExpiry", 0));
 
+	Logger.LogDebug("HostSettings(hostSettingsService={HostSettingsService}): PasswordExpiry → {PasswordExpiry}", hostSettingsService, PasswordExpiry);
     /// <inheritdoc />
     public TimeSpan PasswordExpiryReminder =>
         TimeSpan.FromDays(hostSettingsService.GetInteger("PasswordExpiryReminder", 7));
@@ -295,6 +307,7 @@ public class HostSettings(IHostSettingsService hostSettingsService) : IHostSetti
     /// <inheritdoc />
     public int ProxyPort => hostSettingsService.GetInteger("ProxyPort");
 
+	Logger.LogDebug("HostSettings(hostSettingsService={HostSettingsService}): ProxyPort → {ProxyPort}", hostSettingsService, ProxyPort);
     /// <inheritdoc />
     public string ProxyServer => hostSettingsService.GetString("ProxyServer");
 
@@ -325,9 +338,11 @@ public class HostSettings(IHostSettingsService hostSettingsService) : IHostSetti
     /// <inheritdoc />
     public int SearchMaxWordLength => hostSettingsService.GetInteger("MaxSearchWordLength", 50);
 
+	Logger.LogDebug("HostSettings(hostSettingsService={HostSettingsService}): SearchMaxWordLength → {SearchMaxWordLength}", hostSettingsService, SearchMaxWordLength);
     /// <inheritdoc />
     public int SearchMinWordLength => hostSettingsService.GetInteger("MinSearchWordLength", 4);
 
+	Logger.LogDebug("HostSettings(hostSettingsService={HostSettingsService}): SearchMinWordLength → {SearchMinWordLength}", hostSettingsService, SearchMinWordLength);
     /// <inheritdoc />
     public string SearchIncludedTagInfoFilter =>
         hostSettingsService.GetString("SearchIncludedTagInfoFilter", string.Empty);
@@ -347,6 +362,7 @@ public class HostSettings(IHostSettingsService hostSettingsService) : IHostSetti
     /// <inheritdoc />
     public int UserQuota => hostSettingsService.GetInteger("UserQuota", 0);
 
+	Logger.LogDebug("HostSettings(hostSettingsService={HostSettingsService}): UserQuota → {UserQuota}", hostSettingsService, UserQuota);
     /// <inheritdoc />
     public TimeSpan WebRequestTimeout =>
         TimeSpan.FromMilliseconds(hostSettingsService.GetInteger("WebRequestTimeout", 10000));
@@ -392,6 +408,8 @@ public class HostSettings(IHostSettingsService hostSettingsService) : IHostSetti
     /// <returns>The version number.</returns>
     public static int GetCrmVersion(IHostSettingsService hostSettingsService)
     {
+		Logger.LogDebug(">>> Entering GetCrmVersion(hostSettingsService={HostSettingsService})", hostSettingsService);
+		Logger.LogDebug("<<< Exiting GetCrmVersion(hostSettingsService={HostSettingsService})", hostSettingsService);
         return hostSettingsService.GetInteger(ClientResourceSettings.VersionKey, 1);
     }
 
@@ -400,12 +418,15 @@ public class HostSettings(IHostSettingsService hostSettingsService) : IHostSetti
     /// <returns>The GUID string.</returns>
     public static string GetHostGuid(IHostSettingsService hostSettingsService)
     {
+		Logger.LogDebug(">>> Entering GetHostGuid(hostSettingsService={HostSettingsService})", hostSettingsService);
+		Logger.LogDebug("<<< Exiting GetHostGuid(hostSettingsService={HostSettingsService})", hostSettingsService);
         return hostSettingsService.GetString("GUID");
     }
 
     private static CacheControlHeader ToCacheControlHeader(string header)
         => header switch
         {
+			Logger.LogDebug(">>> Entering ToCacheControlHeader(header={Header})", header);
             "NoCache" => CacheControlHeader.NoCache,
             "Private" => CacheControlHeader.Private,
             "Public" => CacheControlHeader.Public,
@@ -413,4 +434,6 @@ public class HostSettings(IHostSettingsService hostSettingsService) : IHostSetti
             "ServerAndPrivate" => CacheControlHeader.ServerAndPrivate,
             _ => CacheControlHeader.Unknown,
         };
+			Logger.LogDebug("<<< Exiting ToCacheControlHeader(header={Header})", header);
+		Logger.LogDebug("<<< Exiting HostSettings(hostSettingsService={HostSettingsService})", hostSettingsService);
 }

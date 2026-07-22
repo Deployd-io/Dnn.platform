@@ -26,6 +26,7 @@ namespace DotNetNuke.Services.Analytics
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public void UpgradeModule(string version)
         {
+			Logger.LogDebug(">>> Entering UpgradeModule(version={Version})", version);
             // MD5 Hash value of the old synchronous script config file (from previous module versions)
             string[] traditionalFileHashes = ["aRUf9NsElvrpiASJHHlmZg==", "+R2k5mvFvVhWsCm4WinyAA==",];
 
@@ -39,16 +40,20 @@ namespace DotNetNuke.Services.Analytics
                         {
                             var fileEncoding = new ASCIIEncoding();
 #pragma warning disable CA5351 // Do not use broken cryptographic algorithms
+							Logger.LogDebug("UpgradeModule(version={Version}): fileEncoding → {FileEncoding}", version, fileEncoding);
                             using var md5 = new MD5CryptoServiceProvider();
 #pragma warning restore CA5351
+							Logger.LogDebug("UpgradeModule(version={Version}): md5 → {Md5}", version, md5);
                             string currFileHashValue = string.Empty;
 
+							Logger.LogDebug("UpgradeModule(version={Version}): currFileHashValue → {CurrFileHashValue}", version, currFileHashValue);
                             // calculate md5 hash of existing file
                             currFileHashValue = Convert.ToBase64String(md5.ComputeHash(fileEncoding.GetBytes(fileReader.ReadToEnd())));
                             fileReader.Close();
 
                             IEnumerable<string> result = from h in traditionalFileHashes where h == currFileHashValue select h;
 
+							Logger.LogDebug("UpgradeModule(version={Version}): result → {Result}", version, result);
                             // compare md5 hash
                             if (result.Any())
                             {
@@ -61,14 +66,18 @@ namespace DotNetNuke.Services.Analytics
 
                     break;
             }
+			Logger.LogDebug("<<< Exiting UpgradeModule(version={Version})", version);
         }
 
         /// <summary>Retrieves the Google Analytics config file, "SiteAnalytics.config".</summary>
         /// <returns>A <see cref="StreamReader"/> to read the config file or <see langword="null"/>.</returns>
         private static StreamReader GetConfigFile()
         {
+			Logger.LogDebug(">>> Entering GetConfigFile()");
             StreamReader fileReader = null;
             string filePath = string.Empty;
+			Logger.LogDebug("GetConfigFile(): fileReader → {FileReader}", fileReader);
+			Logger.LogDebug("GetConfigFile(): filePath → {FilePath}", filePath);
             try
             {
                 filePath = $@"{Globals.ApplicationMapPath}\SiteAnalytics.config";
@@ -83,6 +92,7 @@ namespace DotNetNuke.Services.Analytics
                 // log it
                 var log = new LogInfo { LogTypeKey = nameof(EventLogType.HOST_ALERT), };
                 log.AddProperty("GoogleAnalytics.UpgradeModule", "GetConfigFile Failed");
+				Logger.LogDebug("GetConfigFile(): log → {Log}", log);
                 log.AddProperty("FilePath", filePath);
                 log.AddProperty("ExceptionMessage", ex.Message);
                 LogController.Instance.AddLog(log);

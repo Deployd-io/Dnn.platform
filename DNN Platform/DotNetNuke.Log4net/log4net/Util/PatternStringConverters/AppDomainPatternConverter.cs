@@ -26,6 +26,7 @@ using log4net.Util;
 
 namespace log4net.Util.PatternStringConverters
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Write the name of the current AppDomain to the output
     /// </summary>
@@ -49,7 +50,9 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         protected override void Convert(TextWriter writer, object state) 
         {
+			Logger.LogDebug(">>> Entering Convert(writer={Writer},state={State})", writer, state);
             writer.Write(SystemInfo.ApplicationFriendlyName);
+			Logger.LogDebug("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
         }
     }
 }

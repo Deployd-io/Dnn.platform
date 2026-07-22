@@ -29,11 +29,17 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
     /// <summary>The ViewProfile ProfileModuleUserControlBase is used to view a Users Profile.</summary>
     public partial class ViewProfile(INavigationManager navigationManager, IJavaScriptLibraryHelper javaScript, IHostSettings hostSettings, ListController listController) : ProfileModuleUserControlBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly INavigationManager navigationManager = navigationManager ?? Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
+		Logger.LogDebug(">>> Entering ViewProfile(navigationManager={NavigationManager},javaScript={JavaScript},hostSettings={HostSettings},listController={ListController})", navigationManager, javaScript, hostSettings, listController);
+		Logger.LogDebug("ViewProfile(navigationManager={NavigationManager},javaScript={JavaScript},hostSettings={HostSettings},listController={ListController}): navigationManager → {NavigationManager1}", navigationManager, javaScript, hostSettings, listController, navigationManager);
         private readonly IJavaScriptLibraryHelper javaScript = javaScript ?? Globals.GetCurrentServiceProvider().GetRequiredService<IJavaScriptLibraryHelper>();
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+		Logger.LogDebug("ViewProfile(navigationManager={NavigationManager},javaScript={JavaScript},hostSettings={HostSettings},listController={ListController}): javaScript → {JavaScript1}", navigationManager, javaScript, hostSettings, listController, javaScript);
+		Logger.LogDebug("ViewProfile(navigationManager={NavigationManager},javaScript={JavaScript},hostSettings={HostSettings},listController={ListController}): hostSettings → {HostSettings1}", navigationManager, javaScript, hostSettings, listController, hostSettings);
         private readonly ListController listController = listController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ListController>();
 
+		Logger.LogDebug("ViewProfile(navigationManager={NavigationManager},javaScript={JavaScript},hostSettings={HostSettings},listController={ListController}): listController → {ListController1}", navigationManager, javaScript, hostSettings, listController, listController);
         /// <summary>Initializes a new instance of the <see cref="ViewProfile"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public ViewProfile()
@@ -74,6 +80,7 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             // throw 404 so that deleted profile is not reindexed
@@ -87,11 +94,13 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
             this.javaScript.RequestRegistration(CommonJs.jQuery);
             this.javaScript.RequestRegistration(CommonJs.jQueryMigrate);
             this.javaScript.RequestRegistration(CommonJs.Knockout);
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             try
@@ -99,17 +108,21 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
                 if (Null.IsNull(this.ProfileUserId))
                 {
                     this.Visible = false;
+					Logger.LogDebug("OnLoad(e={E}): this.Visible → {Arg1}", e, this.Visible);
                     return;
                 }
 
                 var template = Convert.ToString(this.ModuleContext.Settings["ProfileTemplate"]);
                 if (string.IsNullOrEmpty(template))
+				Logger.LogDebug("OnLoad(e={E}): template → {Template}", e, template);
                 {
                     template = Localization.GetString("DefaultTemplate", this.LocalResourceFile);
                 }
 
                 var editUrl = this.navigationManager.NavigateURL(this.ModuleContext.PortalSettings.ActiveTab.TabID, "Profile", "userId=" + this.ProfileUserId, "pageno=1");
                 var profileUrl = this.navigationManager.NavigateURL(this.ModuleContext.PortalSettings.ActiveTab.TabID, "Profile", "userId=" + this.ProfileUserId, "pageno=2");
+				Logger.LogDebug("OnLoad(e={E}): editUrl → {EditUrl}", e, editUrl);
+				Logger.LogDebug("OnLoad(e={E}): profileUrl → {ProfileUrl}", e, profileUrl);
 
                 if (template.Contains("[BUTTON:EDITPROFILE]"))
                 {
@@ -169,12 +182,15 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
 
                     var token = new TokenReplace { User = this.ProfileUser, AccessingUser = this.ModuleContext.PortalSettings.UserInfo };
                     this.profileOutput.InnerHtml = token.ReplaceEnvironmentTokens(template);
+					Logger.LogWarning("OnLoad(e={E}): token → {Token}", e, token);
                     this.noPropertiesLabel.Visible = false;
                     this.profileOutput.Visible = true;
                 }
 
                 var propertyAccess = new ProfilePropertyAccess(this.ProfileUser);
                 StringBuilder sb = new StringBuilder();
+				Logger.LogDebug("OnLoad(e={E}): propertyAccess → {PropertyAccess}", e, propertyAccess);
+				Logger.LogDebug("OnLoad(e={E}): sb → {Sb}", e, sb);
                 bool propertyNotFound = false;
 
                 foreach (ProfilePropertyDefinition property in this.ProfileUser.Profile.ProfileProperties)
@@ -187,9 +203,12 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
                         this.ModuleContext.PortalSettings.UserInfo,
                         Scope.DefaultSettings,
                         ref propertyNotFound);
+						Logger.LogDebug("OnLoad(e={E}): displayDataType → {DisplayDataType}", e, displayDataType);
+						Logger.LogDebug("OnLoad(e={E}): value → {Value}", e, value);
 
                     var clientName = Localization.GetSafeJSString(property.PropertyName);
                     sb.Append("self['" + clientName + "'] = ko.observable(");
+					Logger.LogDebug("OnLoad(e={E}): clientName → {ClientName}", e, clientName);
                     sb.Append("\"");
                     if (!string.IsNullOrEmpty(value))
                     {
@@ -213,6 +232,7 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
                 string email = (this.ProfileUserId == this.ModuleContext.PortalSettings.UserId
                                 || this.ModuleContext.PortalSettings.UserInfo.IsInRole(this.ModuleContext.PortalSettings.AdministratorRoleName))
                                    ? this.ProfileUser.Email
+								Logger.LogDebug("OnLoad(e={E}): email → {Email}", e, email);
                                    : string.Empty;
 
                 sb.Append("self.Email = ko.observable('");
@@ -228,13 +248,17 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in ViewProfile(navigationManager={NavigationManager},javaScript={JavaScript},hostSettings={HostSettings},listController={ListController}): {Arg4}", navigationManager, javaScript, hostSettings, listController, ex.Message);
                 // Module failed to load
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         private string GetRedirectUrl()
         {
+			Logger.LogDebug(">>> Entering GetRedirectUrl()");
             // redirect user to default page if not specific the home tab, do this action to prevent loop redirect.
             var homeTabId = this.ModuleContext.PortalSettings.HomeTabId;
             string redirectUrl;
@@ -242,6 +266,7 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
             if (homeTabId > Null.NullInteger)
             {
                 redirectUrl = this.navigationManager.NavigateURL(homeTabId);
+				Logger.LogDebug("GetRedirectUrl(): redirectUrl → {RedirectUrl}", redirectUrl);
             }
             else
             {
@@ -249,14 +274,17 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
                               "/" + Globals.glbDefaultPage;
             }
 
+			Logger.LogDebug("<<< Exiting GetRedirectUrl()");
             return redirectUrl;
         }
 
         private void ProcessQuerystring()
         {
+			Logger.LogDebug(">>> Entering ProcessQuerystring()");
             // in case someone is being redirected to here from an e-mail link action we need to process that here
             var action = this.Request.QueryString["action"];
 
+			Logger.LogDebug("ProcessQuerystring(): action → {Action}", action);
             if (!this.Request.IsAuthenticated && !string.IsNullOrEmpty(action))
             {
                 // action requested but not logged in.
@@ -270,10 +298,12 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
                 // current user, i.e. the one that the request was for
                 var currentUser = UserController.Instance.GetCurrentUserInfo();
 
+				Logger.LogDebug("ProcessQuerystring(): currentUser → {CurrentUser}", currentUser);
                 // the initiating user,i.e. the one who wanted to be friend
                 // note that in this case here currentUser is visiting the profile of initiatingUser, most likely from a link in the notification e-mail
                 var initiatingUser = UserController.Instance.GetUserById(PortalSettings.Current.PortalId, Convert.ToInt32(this.Request.QueryString["UserID"]));
 
+				Logger.LogDebug("ProcessQuerystring(): initiatingUser → {InitiatingUser}", initiatingUser);
                 if (initiatingUser.UserID == currentUser.UserID)
                 {
                     return; // do not further process for users who are on their own profile page
@@ -281,35 +311,43 @@ namespace DotNetNuke.Modules.Admin.ViewProfile
 
                 var friendRelationship = RelationshipController.Instance.GetFriendRelationship(currentUser, initiatingUser);
 
+				Logger.LogDebug("ProcessQuerystring(): friendRelationship → {FriendRelationship}", friendRelationship);
                 if (friendRelationship != null)
                 {
                     if (action.Equals("acceptfriend", StringComparison.OrdinalIgnoreCase))
                     {
                         var friend = UserController.GetUserById(this.hostSettings, PortalSettings.Current.PortalId, friendRelationship.UserId);
                         FriendsController.Instance.AcceptFriend(friend);
+						Logger.LogDebug("ProcessQuerystring(): friend → {Friend}", friend);
                     }
 
                     if (action.Equals("followback", StringComparison.OrdinalIgnoreCase))
                     {
                         var follower = UserController.GetUserById(this.hostSettings, PortalSettings.Current.PortalId, friendRelationship.UserId);
                         try
+						Logger.LogDebug("ProcessQuerystring(): follower → {Follower}", follower);
                         {
                             FollowersController.Instance.FollowUser(follower);
                             var notifications = NotificationsController.Instance.GetNotificationByContext(3, initiatingUser.UserID.ToString());
                             if (notifications.Count > 0)
+							Logger.LogDebug("ProcessQuerystring(): notifications → {Notifications}", notifications);
                             {
                                 NotificationsController.Instance.DeleteNotificationRecipient(notifications[0].NotificationID, currentUser.UserID);
                             }
                         }
                         catch
                         {
+							Logger.LogError("Exception in ViewProfile(navigationManager={NavigationManager},javaScript={JavaScript},hostSettings={HostSettings},listController={ListController}): {Arg4}", navigationManager, javaScript, hostSettings, listController, ex.Message);
                             // ignore
+							Logger.LogError("Exception in ProcessQuerystring(): {Arg0}", ex.Message);
                         }
                     }
                 }
 
                 this.Response.Redirect(Common.Globals.UserProfileURL(initiatingUser.UserID));
             }
+			Logger.LogDebug("<<< Exiting ProcessQuerystring()");
         }
+		Logger.LogDebug("<<< Exiting ViewProfile(navigationManager={NavigationManager},javaScript={JavaScript},hostSettings={HostSettings},listController={ListController})", navigationManager, javaScript, hostSettings, listController);
     }
 }

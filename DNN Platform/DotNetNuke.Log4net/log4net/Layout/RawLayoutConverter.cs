@@ -36,6 +36,7 @@ namespace log4net.Layout
     /// <author>Gert Driesen</author>
     public class RawLayoutConverter : IConvertFrom
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Can the sourceType be converted to an <see cref="IRawLayout"/></summary>
         /// <param name="sourceType">the source to be to be converted</param>
         /// <returns><c>true</c> if the source type can be converted to <see cref="IRawLayout"/></returns>
@@ -48,7 +49,10 @@ namespace log4net.Layout
         /// </remarks>
         public bool CanConvertFrom(Type sourceType) 
         {
+			Logger.LogDebug(">>> Entering CanConvertFrom(sourceType={SourceType})", sourceType);
             // Accept an ILayout object
+			Logger.LogDebug(">>> Entering ConvertFrom(source={Source})", source);
+			Logger.LogDebug("<<< Exiting ConvertFrom(source={Source})", source);
             return (typeof(ILayout).IsAssignableFrom(sourceType));
         }
 

@@ -28,6 +28,7 @@ using log4net.Repository;
 
 namespace log4net.Config
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Base class for all log4net configuration attributes.
     /// </summary>
@@ -57,7 +58,11 @@ namespace log4net.Config
         /// </remarks>
         protected ConfiguratorAttribute(int priority)
         {
+			Logger.LogDebug(">>> Entering ConfiguratorAttribute(priority={Priority})", priority);
             this.m_priority = priority;
+			Logger.LogDebug("<<< Exiting ConfiguratorAttribute(priority={Priority})", priority);
+			Logger.LogDebug("ConfiguratorAttribute(priority={Priority}): m_priority → {M_priority}", priority, m_priority);
+			Logger.LogDebug("ConfiguratorAttribute(priority={Priority}): this.m_priority → {Arg1}", priority, this.m_priority);
         }
 
         /// <summary>
@@ -87,6 +92,7 @@ namespace log4net.Config
         /// </remarks>
         public int CompareTo(object obj)
         {
+			Logger.LogDebug(">>> Entering CompareTo(obj={Obj})", obj);
             // Reference equals
             if ((object)this == obj)
             {
@@ -95,6 +101,7 @@ namespace log4net.Config
 
             int result = -1;
 
+			Logger.LogDebug("CompareTo(obj={Obj}): result → {Result}", obj, result);
             ConfiguratorAttribute target = obj as ConfiguratorAttribute;
             if (target != null)
             {
@@ -106,6 +113,7 @@ namespace log4net.Config
                     result = -1;
                 }
             }
+			Logger.LogDebug("<<< Exiting CompareTo(obj={Obj})", obj);
             return result;
         }
     }

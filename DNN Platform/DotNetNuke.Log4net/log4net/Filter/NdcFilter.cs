@@ -43,6 +43,7 @@ namespace log4net.Filter
     /*[Obsolete("NdcFilter has been replaced by PropertyFilter")]*/
     public class NdcFilter : PropertyFilter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Default constructor</summary>
         /// <remarks>
         /// <para>
@@ -51,7 +52,10 @@ namespace log4net.Filter
         /// </remarks>
         public NdcFilter()
         {
+			Logger.DebugFormat(">>> Entering NdcFilter()");
             this.Key = "NDC";
+			Logger.DebugFormat("<<< Exiting NdcFilter()");
+			Logger.DebugFormat("NdcFilter(): this.Key → {0}", this.Key);
         }
     }
 }

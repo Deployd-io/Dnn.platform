@@ -8,14 +8,18 @@ namespace Dnn.Modules.Console.Components
     /// <summary>Controls the Console.</summary>
     public class ConsoleController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Gets the size values.</summary>
         /// <returns>A list with different icon types.</returns>
         public static IList<string> GetSizeValues()
         {
+			Logger.LogDebug(">>> Entering GetSizeValues()");
             IList<string> returnValue = new List<string>();
             returnValue.Add("IconFile");
+			Logger.LogDebug("GetSizeValues(): returnValue → {ReturnValue}", returnValue);
             returnValue.Add("IconFileLarge");
             returnValue.Add("IconNone");
+			Logger.LogDebug("<<< Exiting GetSizeValues()");
             return returnValue;
         }
 
@@ -23,9 +27,12 @@ namespace Dnn.Modules.Console.Components
         /// <returns>Show or Hide.</returns>
         public static IList<string> GetViewValues()
         {
+			Logger.LogDebug(">>> Entering GetViewValues()");
             IList<string> returnValue = new List<string>();
             returnValue.Add("Hide");
+			Logger.LogDebug("GetViewValues(): returnValue → {ReturnValue}", returnValue);
             returnValue.Add("Show");
+			Logger.LogDebug("<<< Exiting GetViewValues()");
             return returnValue;
         }
     }

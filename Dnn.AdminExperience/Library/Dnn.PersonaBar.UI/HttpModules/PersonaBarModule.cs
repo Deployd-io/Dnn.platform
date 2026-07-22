@@ -28,6 +28,7 @@ namespace Dnn.PersonaBar.UI.HttpModules
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void Init(HttpApplication application)
         {
+			Logger.LogDebug(">>> Entering Init(application={Application})", application);
             if (hasAppStarted)
             {
                 return;
@@ -42,27 +43,34 @@ namespace Dnn.PersonaBar.UI.HttpModules
 
                 ApplicationStart();
                 hasAppStarted = true;
+				Logger.LogDebug("Init(application={Application}): hasAppStarted → {HasAppStarted}", application, hasAppStarted);
             }
+			Logger.LogDebug("<<< Exiting Init(application={Application})", application);
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+			Logger.LogDebug(">>> Entering Dispose()");
             EventsController.Instance.ApplicationEndEvent();
+			Logger.LogDebug("<<< Exiting Dispose()");
         }
 
         private static void ApplicationStart()
         {
+			Logger.LogDebug(">>> Entering ApplicationStart()");
             EventsController.Instance.ApplicationStartEvent();
 
             DotNetNukeContext.Current.SkinEventListeners.Add(new SkinEventListener(SkinEventType.OnSkinInit, OnSkinInit));
             DotNetNukeContext.Current.SkinEventListeners.Add(new SkinEventListener(SkinEventType.OnSkinLoad, OnSkinLoad));
             DotNetNukeContext.Current.SkinEventListeners.Add(new SkinEventListener(SkinEventType.OnSkinPreRender, OnSkinPreRender));
             DotNetNukeContext.Current.SkinEventListeners.Add(new SkinEventListener(SkinEventType.OnSkinUnLoad, OnSkinUnLoad));
+			Logger.LogDebug("<<< Exiting ApplicationStart()");
         }
 
         private static void OnSkinInit(object sender, SkinEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnSkinInit(sender={Sender},e={E})", sender, e);
             IocUtil.GetInstanceContracts<ISkinEvents>().ForEach(instance =>
             {
                 try
@@ -79,10 +87,12 @@ namespace Dnn.PersonaBar.UI.HttpModules
                         ex.StackTrace);
                 }
             });
+			Logger.LogDebug("<<< Exiting OnSkinInit(sender={Sender},e={E})", sender, e);
         }
 
         private static void OnSkinLoad(object sender, SkinEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnSkinLoad(sender={Sender},e={E})", sender, e);
             IocUtil.GetInstanceContracts<ISkinEvents>().ForEach(instance =>
             {
                 try
@@ -99,10 +109,12 @@ namespace Dnn.PersonaBar.UI.HttpModules
                         ex.StackTrace);
                 }
             });
+			Logger.LogDebug("<<< Exiting OnSkinLoad(sender={Sender},e={E})", sender, e);
         }
 
         private static void OnSkinPreRender(object sender, SkinEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnSkinPreRender(sender={Sender},e={E})", sender, e);
             IocUtil.GetInstanceContracts<ISkinEvents>().ForEach(instance =>
             {
                 try
@@ -119,10 +131,12 @@ namespace Dnn.PersonaBar.UI.HttpModules
                         ex.StackTrace);
                 }
             });
+			Logger.LogDebug("<<< Exiting OnSkinPreRender(sender={Sender},e={E})", sender, e);
         }
 
         private static void OnSkinUnLoad(object sender, SkinEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnSkinUnLoad(sender={Sender},e={E})", sender, e);
             IocUtil.GetInstanceContracts<ISkinEvents>().ForEach(instance =>
             {
                 try
@@ -139,6 +153,7 @@ namespace Dnn.PersonaBar.UI.HttpModules
                         ex.StackTrace);
                 }
             });
+			Logger.LogDebug("<<< Exiting OnSkinUnLoad(sender={Sender},e={E})", sender, e);
         }
     }
 }

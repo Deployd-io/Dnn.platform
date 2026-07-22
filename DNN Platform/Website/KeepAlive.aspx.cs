@@ -9,25 +9,32 @@ namespace DotNetNuke.Common.Utilities
     /// <summary>A page which does minimal work but keeps the site's application pool active.</summary>
     public partial class KeepAlive : Page
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             // CODEGEN: This method call is required by the Web Form Designer
             // Do not modify it using the code editor.
             this.InitializeComponent();
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         // This call is required by the Web Form Designer.
         private void InitializeComponent()
         {
+		Logger.LogDebug(">>> Entering InitializeComponent()");
+		Logger.LogDebug("<<< Exiting InitializeComponent()");
         }
     }
 }

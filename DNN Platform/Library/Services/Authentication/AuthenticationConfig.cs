@@ -21,12 +21,16 @@ namespace DotNetNuke.Services.Authentication
         protected AuthenticationConfig(int portalID)
             : base(portalID)
         {
+			Logger.LogDebug(">>> Entering AuthenticationConfig(portalID={PortalID})", portalID);
             this.UseCaptcha = Null.NullBoolean;
             this.Enabled = true;
+			Logger.LogDebug("AuthenticationConfig(portalID={PortalID}): this.UseCaptcha → {Arg1}", portalID, this.UseCaptcha);
+			Logger.LogDebug("AuthenticationConfig(portalID={PortalID}): this.Enabled → {Arg1}", portalID, this.Enabled);
             try
             {
                 string setting = Null.NullString;
                 if (PortalController.Instance.GetPortalSettings(portalID).TryGetValue("DNN_Enabled", out setting))
+				Logger.LogDebug("AuthenticationConfig(portalID={PortalID}): setting → {Setting}", portalID, setting);
                 {
                     this.Enabled = bool.Parse(setting);
                 }
@@ -41,6 +45,7 @@ namespace DotNetNuke.Services.Authentication
             {
                 Logger.Error(ex);
             }
+			Logger.LogDebug("<<< Exiting AuthenticationConfig(portalID={PortalID})", portalID);
         }
 
         public bool Enabled { get; set; }
@@ -49,20 +54,25 @@ namespace DotNetNuke.Services.Authentication
 
         public static void ClearConfig(int portalId)
         {
+			Logger.LogDebug(">>> Entering ClearConfig(portalId={PortalId})", portalId);
             string key = CACHEKEY + "_" + portalId;
             DataCache.RemoveCache(key);
+			Logger.LogDebug("<<< Exiting ClearConfig(portalId={PortalId})", portalId);
         }
 
         public static AuthenticationConfig GetConfig(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetConfig(portalId={PortalId})", portalId);
             string key = CACHEKEY + "_" + portalId;
             var config = (AuthenticationConfig)DataCache.GetCache(key);
             if (config == null)
+			Logger.LogDebug("GetConfig(portalId={PortalId}): config → {Config}", portalId, config);
             {
                 config = new AuthenticationConfig(portalId);
                 DataCache.SetCache(key, config);
             }
 
+			Logger.LogDebug("<<< Exiting GetConfig(portalId={PortalId})", portalId);
             return config;
         }
 

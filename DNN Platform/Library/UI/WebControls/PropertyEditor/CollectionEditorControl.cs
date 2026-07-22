@@ -19,11 +19,14 @@ namespace DotNetNuke.UI.WebControls
     [ToolboxData("<{0}:CollectionEditorControl runat=server></{0}:CollectionEditorControl>")]
     public class CollectionEditorControl : PropertyEditorControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="CollectionEditorControl"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.0.0. Please use overload with IServiceProvider. Scheduled removal in v12.0.0.")]
         public CollectionEditorControl()
             : this(Globals.GetCurrentServiceProvider())
         {
+		Logger.LogDebug(">>> Entering CollectionEditorControl()");
+		Logger.LogDebug("<<< Exiting CollectionEditorControl()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="CollectionEditorControl"/> class.</summary>
@@ -129,13 +132,19 @@ namespace DotNetNuke.UI.WebControls
         /// <inheritdoc />
         protected override void AddEditorRow(Table table, object obj)
         {
+			Logger.LogDebug(">>> Entering AddEditorRow(table={Table},obj={Obj})", table, obj);
             this.AddEditorRow(table, this.NameDataField, new CollectionEditorInfoAdapter(obj, this.ID, this.NameDataField, this.GetFieldNames()));
+			Logger.LogDebug("<<< Exiting AddEditorRow(table={Table},obj={Obj})", table, obj);
         }
 
         /// <inheritdoc />
         protected override void AddEditorRow(Panel container, object obj)
         {
+			Logger.LogDebug(">>> Entering AddEditorRow(container={Container},obj={Obj})", container, obj);
             this.AddEditorRow(container, this.NameDataField, new CollectionEditorInfoAdapter(obj, this.ID, this.NameDataField, this.GetFieldNames()));
+			Logger.LogDebug("<<< Exiting AddEditorRow(container={Container},obj={Obj})", container, obj);
+			Logger.LogDebug(">>> Entering AddEditorRow(obj={Obj})", obj);
+			Logger.LogDebug("<<< Exiting AddEditorRow(obj={Obj})", obj);
         }
 
         /// <inheritdoc />
@@ -149,18 +158,22 @@ namespace DotNetNuke.UI.WebControls
         /// <returns>The category name or <see cref="Null.NullString"/>.</returns>
         protected override string GetCategory(object obj)
         {
+			Logger.LogDebug(">>> Entering GetCategory(obj={Obj})", obj);
             string category = Null.NullString;
 
+			Logger.LogDebug("GetCategory(obj={Obj}): category → {Category}", obj, category);
             // Get Category Field
             if (!string.IsNullOrEmpty(this.CategoryDataField))
             {
                 var objProperty = obj.GetType().GetProperty(this.CategoryDataField);
                 if (!(objProperty == null || (objProperty.GetValue(obj, null) == null)))
+				Logger.LogDebug("GetCategory(obj={Obj}): objProperty → {ObjProperty}", obj, objProperty);
                 {
                     category = Convert.ToString(objProperty.GetValue(obj, null), CultureInfo.InvariantCulture);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetCategory(obj={Obj})", obj);
             return category;
         }
 
@@ -169,8 +182,10 @@ namespace DotNetNuke.UI.WebControls
         /// <returns>An array of group/category names.</returns>
         protected override string[] GetGroups(IEnumerable arrObjects)
         {
+			Logger.LogDebug(">>> Entering GetGroups(arrObjects={ArrObjects})", arrObjects);
             var arrGroups = new ArrayList();
 
+			Logger.LogDebug("GetGroups(arrObjects={ArrObjects}): arrGroups → {ArrGroups}", arrObjects, arrGroups);
             foreach (object obj in arrObjects)
             {
                 // Get Category Field
@@ -178,9 +193,11 @@ namespace DotNetNuke.UI.WebControls
                 {
                     var objProperty = obj.GetType().GetProperty(this.CategoryDataField);
                     if (!((objProperty == null) || (objProperty.GetValue(obj, null) == null)))
+					Logger.LogDebug("GetGroups(arrObjects={ArrObjects}): objProperty → {ObjProperty}", arrObjects, objProperty);
                     {
                         string category = Convert.ToString(objProperty.GetValue(obj, null), CultureInfo.InvariantCulture);
 
+						Logger.LogDebug("GetGroups(arrObjects={ArrObjects}): category → {Category}", arrObjects, category);
                         if (!arrGroups.Contains(category))
                         {
                             arrGroups.Add(category);
@@ -195,6 +212,7 @@ namespace DotNetNuke.UI.WebControls
                 strGroups[i] = Convert.ToString(arrGroups[i], CultureInfo.InvariantCulture);
             }
 
+			Logger.LogDebug("<<< Exiting GetGroups(arrObjects={ArrObjects})", arrObjects);
             return strGroups;
         }
 
@@ -203,9 +221,12 @@ namespace DotNetNuke.UI.WebControls
         /// <returns><see langword="true"/> if the row is visible, otherwise <see langword="false"/>.</returns>
         protected override bool GetRowVisibility(object obj)
         {
+			Logger.LogDebug(">>> Entering GetRowVisibility(obj={Obj})", obj);
             bool isVisible = true;
             var objProperty = obj.GetType().GetProperty(this.VisibleDataField);
+			Logger.LogDebug("GetRowVisibility(obj={Obj}): isVisible → {IsVisible}", obj, isVisible);
             if (!(objProperty == null || (objProperty.GetValue(obj, null) == null)))
+			Logger.LogDebug("GetRowVisibility(obj={Obj}): objProperty → {ObjProperty}", obj, objProperty);
             {
                 isVisible = Convert.ToBoolean(objProperty.GetValue(obj, null), CultureInfo.InvariantCulture);
             }
@@ -220,13 +241,16 @@ namespace DotNetNuke.UI.WebControls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetRowVisibility(obj={Obj})", obj);
             return isVisible;
         }
 
         private Hashtable GetFieldNames()
         {
+			Logger.LogDebug(">>> Entering GetFieldNames()");
             var fields = new Hashtable();
             fields.Add("Category", this.CategoryDataField);
+			Logger.LogDebug("GetFieldNames(): fields → {Fields}", fields);
             fields.Add("Editor", this.EditorDataField);
             fields.Add("Name", this.NameDataField);
             fields.Add("Required", this.RequiredDataField);
@@ -236,6 +260,7 @@ namespace DotNetNuke.UI.WebControls
             fields.Add("ProfileVisibility", this.VisibilityDataField);
             fields.Add("Length", this.LengthDataField);
 
+			Logger.LogDebug("<<< Exiting GetFieldNames()");
             return fields;
         }
     }

@@ -61,6 +61,7 @@ namespace DotNetNuke.Web.UI.WebControls
         public DnnFilePicker()
             : this(null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering DnnFilePicker()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnFilePicker"/> class.</summary>
@@ -72,8 +73,13 @@ namespace DotNetNuke.Web.UI.WebControls
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+			Logger.LogDebug("DnnFilePicker(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalController → {PortalController1}", hostSettings, portalController, appStatus, portalGroupController, portalController);
+			Logger.LogDebug("DnnFilePicker(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalGroupController → {PortalGroupController1}", hostSettings, portalController, appStatus, portalGroupController, portalGroupController);
+			Logger.LogDebug("DnnFilePicker(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): hostSettings → {HostSettings1}", hostSettings, portalController, appStatus, portalGroupController, hostSettings);
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			Logger.LogDebug("DnnFilePicker(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): appStatus → {AppStatus1}", hostSettings, portalController, appStatus, portalGroupController, appStatus);
             this.portalGroupController = portalGroupController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalGroupController>();
+			Logger.LogDebug("<<< Exiting DnnFilePicker(hostSettings={HostSettings},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController})", hostSettings, portalController, appStatus, portalGroupController);
         }
 
         /// <summary>  Represents a possible mode for the File Control.</summary>
@@ -304,14 +310,18 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         public virtual void LocalizeStrings()
         {
+		Logger.LogDebug(">>> Entering LocalizeStrings()");
+		Logger.LogDebug("<<< Exiting LocalizeStrings()");
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
             this.LocalResourceFile = Utilities.GetLocalResourceFile(this);
             this.EnsureChildControls();
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <summary>
@@ -320,12 +330,17 @@ namespace DotNetNuke.Web.UI.WebControls
         /// </summary>
         protected override void CreateChildControls()
         {
+			Logger.LogDebug(">>> Entering CreateChildControls()");
             // First clear the controls collection
             this.Controls.Clear();
 
             this.pnlContainer = new Panel { CssClass = "dnnFilePicker" };
+			Logger.LogDebug("CreateChildControls(): pnlContainer → {PnlContainer}", pnlContainer);
+			Logger.LogDebug("CreateChildControls(): this.pnlContainer → {Arg0}", this.pnlContainer);
 
             this.pnlLeftDiv = new Panel { CssClass = "dnnLeft" };
+			Logger.LogDebug("CreateChildControls(): pnlLeftDiv → {PnlLeftDiv}", pnlLeftDiv);
+			Logger.LogDebug("CreateChildControls(): this.pnlLeftDiv → {Arg0}", this.pnlLeftDiv);
 
             this.AddFolderArea();
             this.AddFileAndUploadArea();
@@ -335,6 +350,8 @@ namespace DotNetNuke.Web.UI.WebControls
             this.pnlContainer.Controls.Add(this.pnlLeftDiv);
 
             this.pnlRightDiv = new Panel { CssClass = "dnnLeft" };
+			Logger.LogDebug("CreateChildControls(): pnlRightDiv → {PnlRightDiv}", pnlRightDiv);
+			Logger.LogDebug("CreateChildControls(): this.pnlRightDiv → {Arg0}", this.pnlRightDiv);
 
             this.GeneratePreviewImage();
 
@@ -343,12 +360,14 @@ namespace DotNetNuke.Web.UI.WebControls
             this.Controls.Add(this.pnlContainer);
 
             base.CreateChildControls();
+			Logger.LogDebug("<<< Exiting CreateChildControls()");
         }
 
         /// <summary>OnPreRender runs just before the control is rendered.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             if (this.cboFolders.Items.Count > 0)
@@ -365,8 +384,10 @@ namespace DotNetNuke.Web.UI.WebControls
                 if (!string.IsNullOrEmpty(this.FilePath))
                 {
                     fileName = this.FilePath.Substring(this.FilePath.LastIndexOf("/", StringComparison.Ordinal) + 1);
+					Logger.LogDebug("OnPreRender(e={E}): fileName → {FileName}", e, fileName);
                     folderPath = string.IsNullOrEmpty(fileName) ? this.FilePath : this.FilePath.Replace(fileName, string.Empty);
                 }
+				Logger.LogDebug("OnPreRender(e={E}): folderPath → {FolderPath}", e, folderPath);
                 else
                 {
                     fileName = this.FilePath;
@@ -389,6 +410,7 @@ namespace DotNetNuke.Web.UI.WebControls
                 if (this.cboFiles.SelectedItem == null || string.IsNullOrEmpty(this.cboFiles.SelectedItem.Value))
                 {
                     this.FileID = -1;
+					Logger.LogDebug("OnPreRender(e={E}): this.FileID → {Arg1}", e, this.FileID);
                 }
                 else
                 {
@@ -436,24 +458,31 @@ namespace DotNetNuke.Web.UI.WebControls
 
             // Show message Row
             this.pnlMessage.Visible = !string.IsNullOrEmpty(this.lblMessage.Text);
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <summary>  AddButton adds a button to the Command Row.</summary>
         /// <param name="button">The button to add to the Row.</param>
         private void AddButton(ref LinkButton button)
         {
+			Logger.LogDebug(">>> Entering AddButton(button={Button})", button);
             button = new LinkButton { EnableViewState = false, CausesValidation = false };
             button.ControlStyle.CssClass = this.CommandCssClass;
             button.Visible = false;
+			Logger.LogDebug("AddButton(button={Button}): button.Visible → {Arg1}", button, button.Visible);
 
             this.pnlButtons.Controls.Add(button);
+			Logger.LogDebug("<<< Exiting AddButton(button={Button})", button);
         }
 
         /// <summary>  AddCommandRow adds the Command Row.</summary>
         private void AddButtonArea()
         {
+			Logger.LogDebug(">>> Entering AddButtonArea()");
             this.pnlButtons = new Panel { Visible = false };
 
+			Logger.LogDebug("AddButtonArea(): this.pnlButtons → {Arg0}", this.pnlButtons);
+			Logger.LogDebug("AddButtonArea(): pnlButtons → {PnlButtons}", pnlButtons);
             this.AddButton(ref this.cmdUpload);
             this.cmdUpload.Click += this.UploadFile;
 
@@ -464,20 +493,28 @@ namespace DotNetNuke.Web.UI.WebControls
             this.cmdCancel.Click += this.CancelUpload;
 
             this.pnlLeftDiv.Controls.Add(this.pnlButtons);
+			Logger.LogDebug("<<< Exiting AddButtonArea()");
         }
 
         /// <summary>  AddFileRow adds the Files Row.</summary>
         private void AddFileAndUploadArea()
         {
+			Logger.LogDebug(">>> Entering AddFileAndUploadArea()");
             // Create Url Div
             this.pnlFile = new Panel { CssClass = "dnnFormItem" };
+			Logger.LogDebug("AddFileAndUploadArea(): pnlFile → {PnlFile}", pnlFile);
+			Logger.LogDebug("AddFileAndUploadArea(): this.pnlFile → {Arg0}", this.pnlFile);
 
             // Create File Label
             this.lblFile = new Label { EnableViewState = false };
+			Logger.LogDebug("AddFileAndUploadArea(): lblFile → {LblFile}", lblFile);
+			Logger.LogDebug("AddFileAndUploadArea(): this.lblFile → {Arg0}", this.lblFile);
             this.pnlFile.Controls.Add(this.lblFile);
 
             // Create Files Combo
             this.cboFiles = new DropDownList { ID = "File", DataTextField = "Text", DataValueField = "Value", AutoPostBack = true };
+			Logger.LogDebug("AddFileAndUploadArea(): cboFiles → {CboFiles}", cboFiles);
+			Logger.LogDebug("AddFileAndUploadArea(): this.cboFiles → {Arg0}", this.cboFiles);
             this.cboFiles.SelectedIndexChanged += this.FileChanged;
             this.pnlFile.Controls.Add(this.cboFiles);
 
@@ -485,27 +522,38 @@ namespace DotNetNuke.Web.UI.WebControls
 
             // Create Upload Div
             this.pnlUpload = new Panel { CssClass = "dnnFormItem" };
+			Logger.LogDebug("AddFileAndUploadArea(): pnlUpload → {PnlUpload}", pnlUpload);
+			Logger.LogDebug("AddFileAndUploadArea(): this.pnlUpload → {Arg0}", this.pnlUpload);
 
             // Create Upload Box
             this.txtFile = new HtmlInputFile();
+			Logger.LogDebug("AddFileAndUploadArea(): txtFile → {TxtFile}", txtFile);
             this.txtFile.Attributes.Add("size", "13");
             this.pnlUpload.Controls.Add(this.txtFile);
 
             this.pnlLeftDiv.Controls.Add(this.pnlUpload);
+			Logger.LogDebug("<<< Exiting AddFileAndUploadArea()");
         }
 
         /// <summary>  AddFolderRow adds the Folders Row.</summary>
         private void AddFolderArea()
         {
+			Logger.LogDebug(">>> Entering AddFolderArea()");
             // Create Url Div
             this.pnlFolder = new Panel { CssClass = "dnnFormItem" };
+			Logger.LogDebug("AddFolderArea(): pnlFolder → {PnlFolder}", pnlFolder);
+			Logger.LogDebug("AddFolderArea(): this.pnlFolder → {Arg0}", this.pnlFolder);
 
             // Create Folder Label
             this.lblFolder = new Label { EnableViewState = false };
+			Logger.LogDebug("AddFolderArea(): lblFolder → {LblFolder}", lblFolder);
+			Logger.LogDebug("AddFolderArea(): this.lblFolder → {Arg0}", this.lblFolder);
             this.pnlFolder.Controls.Add(this.lblFolder);
 
             // Create Folders Combo
             this.cboFolders = new DropDownList { ID = "Folder", AutoPostBack = true };
+			Logger.LogDebug("AddFolderArea(): cboFolders → {CboFolders}", cboFolders);
+			Logger.LogDebug("AddFolderArea(): this.cboFolders → {Arg0}", this.cboFolders);
             this.cboFolders.SelectedIndexChanged += this.FolderChanged;
             this.pnlFolder.Controls.Add(this.cboFolders);
 
@@ -514,25 +562,35 @@ namespace DotNetNuke.Web.UI.WebControls
 
             // Load Folders
             this.LoadFolders();
+			Logger.LogDebug("<<< Exiting AddFolderArea()");
         }
 
         /// <summary>Adds an empty preview image to the <see cref="pnlRightDiv"/> control.</summary>
         private void GeneratePreviewImage()
         {
+			Logger.LogDebug(">>> Entering GeneratePreviewImage()");
             this.imgPreview = new Image();
             this.pnlRightDiv.Controls.Add(this.imgPreview);
+			Logger.LogDebug("<<< Exiting GeneratePreviewImage()");
+			Logger.LogDebug("GeneratePreviewImage(): imgPreview → {ImgPreview}", imgPreview);
         }
 
         /// <summary>  AddMessageRow adds the Message Row.</summary>
         private void AddMessageRow()
         {
+			Logger.LogDebug(">>> Entering AddMessageRow()");
             this.pnlMessage = new Panel { CssClass = "dnnFormMessage dnnFormWarning" };
 
+			Logger.LogDebug("AddMessageRow(): this.pnlMessage → {Arg0}", this.pnlMessage);
+			Logger.LogDebug("AddMessageRow(): pnlMessage → {PnlMessage}", pnlMessage);
             // Create Label
             this.lblMessage = new Label { EnableViewState = false, Text = string.Empty };
+			Logger.LogDebug("AddMessageRow(): lblMessage → {LblMessage}", lblMessage);
+			Logger.LogDebug("AddMessageRow(): this.lblMessage → {Arg0}", this.lblMessage);
             this.pnlMessage.Controls.Add(this.lblMessage);
 
             this.pnlLeftDiv.Controls.Add(this.pnlMessage);
+			Logger.LogDebug("<<< Exiting AddMessageRow()");
         }
 
         private bool IsUserFolder(string folderPath)
@@ -543,27 +601,34 @@ namespace DotNetNuke.Web.UI.WebControls
 
         private void LoadFiles()
         {
+			Logger.LogDebug(">>> Entering LoadFiles()");
             int effectivePortalId = this.PortalId;
             if (this.IsUserFolder(this.cboFolders.SelectedItem.Value))
+			Logger.LogDebug("LoadFiles(): effectivePortalId → {EffectivePortalId}", effectivePortalId);
             {
                 effectivePortalId = PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, this.PortalId);
             }
 
             this.cboFiles.DataSource = Globals.GetFileList(effectivePortalId, this.FileFilter, !this.Required, this.cboFolders.SelectedItem.Value);
             this.cboFiles.DataBind();
+			Logger.LogDebug("<<< Exiting LoadFiles()");
         }
 
         /// <summary>LoadFolders fetches the list of folders from the Database.</summary>
         private void LoadFolders()
         {
+			Logger.LogDebug(">>> Entering LoadFolders()");
             UserInfo user = this.User ?? UserController.Instance.GetCurrentUserInfo();
             this.cboFolders.Items.Clear();
+			Logger.LogDebug("LoadFolders(): user → {User}", user);
 
             // Add Personal Folder
             if (this.UsePersonalFolder)
             {
                 var userFolder = FolderManager.Instance.GetUserFolder(user).FolderPath;
                 var userFolderItem = this.cboFolders.Items.FindByValue(userFolder);
+				Logger.LogDebug("LoadFolders(): userFolder → {UserFolder}", userFolder);
+				Logger.LogDebug("LoadFolders(): userFolderItem → {UserFolderItem}", userFolderItem);
                 if (userFolderItem != null)
                 {
                     userFolderItem.Text = Utilities.GetLocalizedString("MyFolder");
@@ -579,6 +644,7 @@ namespace DotNetNuke.Web.UI.WebControls
                 var folders = FolderManager.Instance.GetFolders(this.PortalId, "READ,ADD", user.UserID);
                 foreach (FolderInfo folder in folders)
                 {
+				Logger.LogDebug("LoadFolders(): folders → {Folders}", folders);
                     var folderItem = new ListItem
                     {
                         Text =
@@ -590,6 +656,7 @@ namespace DotNetNuke.Web.UI.WebControls
                     this.cboFolders.Items.Add(folderItem);
                 }
             }
+			Logger.LogDebug("<<< Exiting LoadFolders()");
         }
 
         /// <summary>  SetFilePath sets the FilePath property.</summary>
@@ -598,7 +665,9 @@ namespace DotNetNuke.Web.UI.WebControls
         /// </remarks>
         private void SetFilePath()
         {
+			Logger.LogDebug(">>> Entering SetFilePath()");
             this.SetFilePath(this.cboFiles.SelectedItem.Text);
+			Logger.LogDebug("<<< Exiting SetFilePath()");
         }
 
         /// <summary>  SetFilePath sets the FilePath property.</summary>
@@ -623,21 +692,26 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <param name="command">The command name (amd key) of the button.</param>
         private void ShowButton(LinkButton button, string command)
         {
+			Logger.LogDebug(">>> Entering ShowButton(button={Button},command={Command})", button, command);
             button.Visible = true;
             if (!string.IsNullOrEmpty(command))
+			Logger.LogDebug("ShowButton(button={Button},command={Command}): button.Visible → {Arg2}", button, command, button.Visible);
             {
                 button.Text = Utilities.GetLocalizedString(command);
             }
 
             AJAX.RegisterPostBackControl(button);
             this.pnlButtons.Visible = true;
+			Logger.LogDebug("<<< Exiting ShowButton(button={Button},command={Command})", button, command);
         }
 
         /// <summary>  ShowImage displays the Preview Image.</summary>
         private void ShowImage()
         {
+			Logger.LogDebug(">>> Entering ShowImage()");
             var image = (FileInfo)FileManager.Instance.GetFile(this.FileID);
 
+			Logger.LogDebug("ShowImage(): image → {Image}", image);
             if (image != null)
             {
                 this.imgPreview.ImageUrl = FileManager.Instance.GetUrl(image);
@@ -657,28 +731,38 @@ namespace DotNetNuke.Web.UI.WebControls
 
                 Panel imageHolderPanel = new Panel { CssClass = "dnnFilePickerImageHolder", };
                 this.pnlRightDiv.Controls.Add(imageHolderPanel);
+				Logger.LogDebug("ShowImage(): imageHolderPanel → {ImageHolderPanel}", imageHolderPanel);
                 this.pnlRightDiv.Visible = true;
             }
+			Logger.LogDebug("<<< Exiting ShowImage()");
         }
 
         private void CancelUpload(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering CancelUpload(sender={Sender},e={E})", sender, e);
             this.Mode = FileControlMode.Normal;
+			Logger.LogDebug("<<< Exiting CancelUpload(sender={Sender},e={E})", sender, e);
+			Logger.LogDebug("CancelUpload(sender={Sender},e={E}): this.Mode → {Arg2}", sender, e, this.Mode);
         }
 
         private void FileChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering FileChanged(sender={Sender},e={E})", sender, e);
             this.SetFilePath();
+			Logger.LogDebug("<<< Exiting FileChanged(sender={Sender},e={E})", sender, e);
         }
 
         private void FolderChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering FolderChanged(sender={Sender},e={E})", sender, e);
             this.LoadFiles();
             this.SetFilePath();
+			Logger.LogDebug("<<< Exiting FolderChanged(sender={Sender},e={E})", sender, e);
         }
 
         private void SaveFile(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering SaveFile(sender={Sender},e={E})", sender, e);
             // if file is selected exit
             if (!string.IsNullOrEmpty(this.txtFile.PostedFile.FileName))
             {
@@ -707,6 +791,7 @@ namespace DotNetNuke.Web.UI.WebControls
                     {
                         // Make sure the user folder exists
                         folder = folderManager.GetFolder(PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, this.PortalId), folderPath);
+						Logger.LogDebug("SaveFile(sender={Sender},e={E}): folder → {Folder}", sender, e, folder);
                         if (folder == null)
                         {
                             // Add User folder
@@ -714,6 +799,7 @@ namespace DotNetNuke.Web.UI.WebControls
 
                             // fix user's portal id
                             user.PortalID = this.PortalId;
+							Logger.LogDebug("SaveFile(sender={Sender},e={E}): user.PortalID → {Arg2}", sender, e, user.PortalID);
                             folder = ((FolderManager)folderManager).AddUserFolder(user);
                         }
                     }
@@ -730,6 +816,7 @@ namespace DotNetNuke.Web.UI.WebControls
                     }
                     catch (PermissionsNotMetException)
                     {
+						Logger.LogError("Exception in SaveFile(sender={Sender},e={E}): {Arg2}", sender, e, ex.Message);
                         this.lblMessage.Text += "<br />" + string.Format(CultureInfo.CurrentCulture, Localization.GetString("InsufficientFolderPermission"), folder.FolderPath);
                     }
                     catch (NoSpaceAvailableException)
@@ -756,11 +843,16 @@ namespace DotNetNuke.Web.UI.WebControls
             }
 
             this.Mode = FileControlMode.Normal;
+			Logger.LogDebug("<<< Exiting SaveFile(sender={Sender},e={E})", sender, e);
+			Logger.LogDebug("SaveFile(sender={Sender},e={E}): this.Mode → {Arg2}", sender, e, this.Mode);
         }
 
         private void UploadFile(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering UploadFile(sender={Sender},e={E})", sender, e);
             this.Mode = FileControlMode.UpLoadFile;
+			Logger.LogDebug("<<< Exiting UploadFile(sender={Sender},e={E})", sender, e);
+			Logger.LogDebug("UploadFile(sender={Sender},e={E}): this.Mode → {Arg2}", sender, e, this.Mode);
         }
     }
 }

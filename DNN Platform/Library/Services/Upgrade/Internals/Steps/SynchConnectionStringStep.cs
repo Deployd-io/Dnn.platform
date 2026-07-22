@@ -19,14 +19,19 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
     /// </summary>
     public class SynchConnectionStringStep : BaseInstallationStep
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Main method to execute the step.</summary>
         public override void Execute()
         {
+			Logger.LogDebug(">>> Entering Execute()");
             this.Percentage = 0;
             this.Status = StepStatus.Running;
+			Logger.LogDebug("Execute(): this.Percentage → {Arg0}", this.Percentage);
+			Logger.LogDebug("Execute(): this.Status → {Arg0}", this.Status);
 
             var installConfig = InstallController.Instance.GetInstallConfig();
             if (installConfig == null)
+			Logger.LogDebug("Execute(): installConfig → {InstallConfig}", installConfig);
             {
                 this.Status = StepStatus.Done;
                 return;
@@ -48,6 +53,7 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
 
             var builder = DataProvider.Instance().GetConnectionStringBuilder();
 
+			Logger.LogDebug("Execute(): builder → {Builder}", builder);
             if (!string.IsNullOrEmpty(connectionConfig.Server))
             {
                 builder["Data Source"] = connectionConfig.Server;
@@ -82,6 +88,7 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
             if (connectionConfig.RunAsDbowner)
             {
                 dbowner = "dbo.";
+				Logger.LogDebug("Execute(): dbowner → {Dbowner}", dbowner);
             }
             else
             {
@@ -92,11 +99,14 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
 
             var connectionString = builder.ToString();
 
+			Logger.LogDebug("Execute(): connectionString → {ConnectionString}", connectionString);
             // load web.config connection string for comparison
             var appConnectionString = Config.GetConnectionString();
 
+			Logger.LogDebug("Execute(): appConnectionString → {AppConnectionString}", appConnectionString);
             var modified = false;
 
+			Logger.LogDebug("Execute(): modified → {Modified}", modified);
             // save to web.config if different
             if (!appConnectionString.Equals(connectionString, System.StringComparison.OrdinalIgnoreCase))
             {
@@ -120,12 +130,15 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
             }
 
             this.Status = modified ? StepStatus.AppRestart : StepStatus.Done;
+			Logger.LogDebug("<<< Exiting Execute()");
         }
 
         private static string GetUpgradeConnectionStringUserId()
         {
+			Logger.LogDebug(">>> Entering GetUpgradeConnectionStringUserId()");
             string dbUser = string.Empty;
             string connection = Config.GetUpgradeConnectionString();
+			Logger.LogDebug("GetUpgradeConnectionStringUserId(): dbUser → {DbUser}", dbUser);
 
             // If connection string does not use integrated security, then get user id.
             if (connection.Contains("user id", StringComparison.OrdinalIgnoreCase) || connection.Contains("uid", StringComparison.OrdinalIgnoreCase) || connection.Contains("user", StringComparison.OrdinalIgnoreCase))
@@ -147,6 +160,7 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetUpgradeConnectionStringUserId()");
             return dbUser;
         }
     }

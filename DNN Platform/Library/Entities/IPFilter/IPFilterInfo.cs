@@ -13,6 +13,7 @@ namespace DotNetNuke.Entities.Host
     [Serializable]
     public class IPFilterInfo : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Initializes a new instance of the <see cref="IPFilterInfo"/> class.
         /// Create new IPFilterInfo instance.
@@ -22,9 +23,18 @@ namespace DotNetNuke.Entities.Host
         /// <param name="ruleType">The Rule Type, 1 to allow, 2 to deny.</param>
         public IPFilterInfo(string ipAddress, string subnetMask, int ruleType)
         {
+			Logger.LogDebug(">>> Entering IPFilterInfo(ipAddress={IpAddress},subnetMask={SubnetMask},ruleType={RuleType})", ipAddress, subnetMask, ruleType);
             this.IPAddress = ipAddress;
             this.SubnetMask = subnetMask;
+			Logger.LogDebug("IPFilterInfo(ipAddress={IpAddress},subnetMask={SubnetMask},ruleType={RuleType}): this.IPAddress → {Arg3}", ipAddress, subnetMask, ruleType, this.IPAddress);
+			Logger.LogDebug("IPFilterInfo(ipAddress={IpAddress},subnetMask={SubnetMask},ruleType={RuleType}): this.SubnetMask → {Arg3}", ipAddress, subnetMask, ruleType, this.SubnetMask);
+			Logger.LogDebug(">>> Entering IPFilterInfo()");
+			Logger.LogDebug("IPFilterInfo(): this.IPAddress → {Arg0}", this.IPAddress);
+			Logger.LogDebug("IPFilterInfo(): this.SubnetMask → {Arg0}", this.SubnetMask);
             this.RuleType = ruleType;
+			Logger.LogDebug("<<< Exiting IPFilterInfo(ipAddress={IpAddress},subnetMask={SubnetMask},ruleType={RuleType})", ipAddress, subnetMask, ruleType);
+			Logger.LogDebug("IPFilterInfo(ipAddress={IpAddress},subnetMask={SubnetMask},ruleType={RuleType}): this.RuleType → {Arg3}", ipAddress, subnetMask, ruleType, this.RuleType);
+			Logger.LogDebug("<<< Exiting IPFilterInfo()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="IPFilterInfo"/> class.</summary>
@@ -33,6 +43,7 @@ namespace DotNetNuke.Entities.Host
             this.IPAddress = string.Empty;
             this.SubnetMask = string.Empty;
             this.RuleType = -1;
+			Logger.LogDebug("IPFilterInfo(): this.RuleType → {Arg0}", this.RuleType);
         }
 
         /// <summary>Gets or sets the IP of the IP filter.</summary>
@@ -72,6 +83,7 @@ namespace DotNetNuke.Entities.Host
         /// <seealso cref="KeyID"></seealso></remarks>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.IPFilterID = Null.SetNullInteger(dr["IPFilterID"]);
 
             try
@@ -80,6 +92,7 @@ namespace DotNetNuke.Entities.Host
             }
             catch (IndexOutOfRangeException)
             {
+				Logger.LogError("Exception in Fill(dr={Dr}): {Arg1}", dr, ex.Message);
                 // else swallow the error
             }
 
@@ -89,6 +102,7 @@ namespace DotNetNuke.Entities.Host
             this.Notes = Null.SetNullString(dr["Notes"]);
 
             this.FillInternal(dr);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

@@ -41,7 +41,9 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
         public SimpleWebFarmCachingProvider()
             : this(null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering SimpleWebFarmCachingProvider()");
         }
+		Logger.LogDebug("<<< Exiting SimpleWebFarmCachingProvider()");
 
         /// <summary>Initializes a new instance of the <see cref="SimpleWebFarmCachingProvider"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -61,6 +63,9 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
         {
             this.appStatus = appStatus ?? new ApplicationStatusInfo(new Application());
             this.hostSettingsService = hostSettingsService ??
+									Logger.LogDebug("SimpleWebFarmCachingProvider(hostSettings={HostSettings},appStatus={AppStatus},hostSettingsService={HostSettingsService},cryptographyProvider={CryptographyProvider}): hostSettingsService → {HostSettingsService1}", hostSettings, appStatus, hostSettingsService, cryptographyProvider, hostSettingsService);
+									Logger.LogDebug("SimpleWebFarmCachingProvider(hostSettings={HostSettings},appStatus={AppStatus},hostSettingsService={HostSettingsService},cryptographyProvider={CryptographyProvider}): this.hostSettingsService → {Arg4}", hostSettings, appStatus, hostSettingsService, cryptographyProvider, this.hostSettingsService);
+									Logger.LogDebug("SimpleWebFarmCachingProvider(hostSettings={HostSettings},appStatus={AppStatus},hostSettingsService={HostSettingsService},cryptographyProvider={CryptographyProvider}): appStatus → {AppStatus1}", hostSettings, appStatus, hostSettingsService, cryptographyProvider, appStatus);
                                        new HostController(
 #pragma warning disable CS0618 // Type or member is obsolete
                                            new EventLogController(),
@@ -68,12 +73,14 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
                                            new Lazy<IPortalController>(() => PortalController.Instance));
 #pragma warning disable CS0618 // Type or member is obsolete
             this.cryptographyProvider = cryptographyProvider ?? CryptographyProvider.Instance() as ICryptographyProvider;
+			Logger.LogDebug("SimpleWebFarmCachingProvider(hostSettings={HostSettings},appStatus={AppStatus},hostSettingsService={HostSettingsService},cryptographyProvider={CryptographyProvider}): cryptographyProvider → {CryptographyProvider1}", hostSettings, appStatus, hostSettingsService, cryptographyProvider, cryptographyProvider);
 #pragma warning restore CS0618 // Type or member is obsolete
         }
 
         /// <inheritdoc />
         public override void Clear(string type, string data)
         {
+			Logger.LogDebug(">>> Entering Clear(type={Type},data={Data})", type, data);
             // Clear the local cache
             this.ClearCacheInternal(type, data, true);
 
@@ -85,12 +92,14 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
 
             // Notify other servers
             this.NotifyOtherServers("Clear~" + type, data);
+			Logger.LogDebug("<<< Exiting Clear(type={Type},data={Data})", type, data);
         }
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public override void Remove(string key)
         {
+			Logger.LogDebug(">>> Entering Remove(key={Key})", key);
             // Remove from local cache
             this.RemoveInternal(key);
 
@@ -102,6 +111,7 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
 
             // Notify Other Servers
             this.NotifyOtherServers("Remove", key);
+			Logger.LogDebug("<<< Exiting Remove(key={Key})", key);
         }
 
         /// <summary>This method responds to an incoming request to process synchronization from an additional server.</summary>
@@ -110,6 +120,7 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
         /// <param name="detail">Additional detail to pass to the caching sub-system.</param>
         internal void ProcessSynchronizationRequest(string command, string detail)
         {
+			Logger.LogDebug(">>> Entering ProcessSynchronizationRequest(command={Command},detail={Detail})", command, detail);
             // Handle basic removal
             if (command.StartsWith("remove", StringComparison.OrdinalIgnoreCase))
             {
@@ -122,11 +133,15 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
             {
                 var commandParts = command.Split('~');
                 this.ClearCacheInternal(commandParts[1], detail, true);
+				Logger.LogDebug("ProcessSynchronizationRequest(command={Command},detail={Detail}): commandParts → {CommandParts}", command, detail, commandParts);
             }
+			Logger.LogDebug("<<< Exiting ProcessSynchronizationRequest(command={Command},detail={Detail})", command, detail);
         }
 
         private static void HandleNotificationTimeout(object state, bool timedOut)
         {
+			Logger.LogDebug(">>> Entering HandleNotificationTimeout(state={State},timedOut={TimedOut})", state, timedOut);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (!timedOut)
             {
                 return;
@@ -135,10 +150,14 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
             // Abort if possible
             var request = (HttpWebRequest)state;
             request?.Abort();
+			Logger.LogInformation("HandleNotificationTimeout(state,timedOut)={State},{TimedOut}: external service call took {Arg2} ms", state, timedOut, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("HandleNotificationTimeout(state={State},timedOut={TimedOut}): request → {Request}", state, timedOut, request);
+			Logger.LogDebug("<<< Exiting HandleNotificationTimeout(state={State},timedOut={TimedOut})", state, timedOut);
         }
 
         private void NotifyOtherServers(string command, string detail)
         {
+			Logger.LogDebug(">>> Entering NotifyOtherServers(command={Command},detail={Detail})", command, detail);
             // Do not send notifications to other servers if currently upgrading
             if (this.appStatus.Status != UpgradeStatus.None)
             {
@@ -152,6 +171,7 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
             var additionalServers = ServerController.GetEnabledServers()
                 .Where(s => !string.IsNullOrWhiteSpace(s.Url)
                             && s.LastActivityDate >= lastActivityDate
+				Logger.LogDebug("NotifyOtherServers(command={Command},detail={Detail}): lastActivityDate → {LastActivityDate}", command, detail, lastActivityDate);
                             && s.ServerName != Globals.ServerName)
                 .ToList();
 
@@ -167,31 +187,41 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
                 // Setup parameters for sending
                 var commandParameter = this.HostSettings.DebugMode ? command : UrlUtils.EncryptParameter(this.cryptographyProvider, command, this.HostSettings.Guid);
                 var detailParameter = this.HostSettings.DebugMode ? detail : UrlUtils.EncryptParameter(this.cryptographyProvider, detail, this.HostSettings.Guid);
+				Logger.LogDebug("NotifyOtherServers(command={Command},detail={Detail}): commandParameter → {CommandParameter}", command, detail, commandParameter);
+				Logger.LogDebug("NotifyOtherServers(command={Command},detail={Detail}): detailParameter → {DetailParameter}", command, detail, detailParameter);
                 var protocol = this.hostSettingsService.GetBoolean("UseSSLForCacheSync", false) ? "https://" : "http://";
                 var notificationUrl =
                     $"{protocol}{server.Url}/SimpleWebFarmSync.axd?command={commandParameter}&detail={detailParameter}";
+					Logger.LogDebug("NotifyOtherServers(command={Command},detail={Detail}): protocol → {Protocol}", command, detail, protocol);
 
                 // Build a webrequest
                 var notificationRequest = WebRequest.CreateHttp(notificationUrl);
 
+				Logger.LogDebug("NotifyOtherServers(command={Command},detail={Detail}): notificationRequest → {NotificationRequest}", command, detail, notificationRequest);
                 // Create a cookie container so we can get cookies and use default credentials
                 notificationRequest.CookieContainer = new CookieContainer();
                 notificationRequest.UseDefaultCredentials = true;
+				Logger.LogDebug("NotifyOtherServers(command={Command},detail={Detail}): notificationRequest.UseDefaultCredentials → {Arg2}", command, detail, notificationRequest.UseDefaultCredentials);
 
                 // Start the asynchronous request
                 var result = notificationRequest.BeginGetResponse(this.OnServerNotificationCompleteCallback, notificationRequest);
 
+				Logger.LogDebug("NotifyOtherServers(command={Command},detail={Detail}): result → {Result}", command, detail, result);
                 // Register timeout
                 // TODO: Review possible use of async/await C# 7 implementation
                 ThreadPool.RegisterWaitForSingleObject(result.AsyncWaitHandle, HandleNotificationTimeout, notificationRequest, this.executionTimeout, true);
             }
+			Logger.LogDebug("<<< Exiting NotifyOtherServers(command={Command},detail={Detail})", command, detail);
         }
 
         private void OnServerNotificationCompleteCallback(IAsyncResult asynchronousResult)
         {
+			Logger.LogDebug(">>> Entering OnServerNotificationCompleteCallback(asynchronousResult={AsynchronousResult})", asynchronousResult);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             // Get the request from the state object
             var request = (HttpWebRequest)asynchronousResult.AsyncState;
             try
+			Logger.LogDebug("OnServerNotificationCompleteCallback(asynchronousResult={AsynchronousResult}): request → {Request}", asynchronousResult, request);
             {
                 // Get the response
                 using (var response = (HttpWebResponse)request.EndGetResponse(asynchronousResult))
@@ -209,11 +239,14 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
             }
             catch (WebException e)
             {
+				Logger.LogError("Exception in OnServerNotificationCompleteCallback(asynchronousResult={AsynchronousResult}): {Arg1}", asynchronousResult, ex.Message);
                 if (e.Status != WebExceptionStatus.RequestCanceled)
                 {
                     Exceptions.LogException(new SyncException("Synchronization Error in Request: " + request.RequestUri.AbsoluteUri, e));
                 }
             }
+			Logger.LogInformation("OnServerNotificationCompleteCallback(asynchronousResult)={AsynchronousResult}: external service call took {Arg1} ms", asynchronousResult, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting OnServerNotificationCompleteCallback(asynchronousResult={AsynchronousResult})", asynchronousResult);
         }
     }
 }

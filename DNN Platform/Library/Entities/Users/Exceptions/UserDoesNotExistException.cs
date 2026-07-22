@@ -10,9 +10,12 @@ namespace DotNetNuke.Entities.Users
     [Serializable]
     public class UserDoesNotExistException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="UserDoesNotExistException"/> class.</summary>
         public UserDoesNotExistException()
         {
+		Logger.LogDebug(">>> Entering UserDoesNotExistException()");
+		Logger.LogDebug("<<< Exiting UserDoesNotExistException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="UserDoesNotExistException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Entities.Users
         public UserDoesNotExistException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering UserDoesNotExistException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting UserDoesNotExistException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="UserDoesNotExistException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

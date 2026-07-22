@@ -10,6 +10,7 @@ namespace Dnn.PersonaBar.Security.Components.Checks
 
     public class CheckPasswordFormat : IAuditCheck
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public string Id => "CheckPasswordFormat";
 
@@ -19,13 +20,17 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc />
         public CheckResult Execute()
         {
+			Logger.LogDebug(">>> Entering Execute()");
             var result = new CheckResult(SeverityEnum.Unverified, this.Id);
             try
+			Logger.LogDebug("Execute(): result → {Result}", result);
             {
                 var format = MembershipProvider.Instance().PasswordFormat;
                 if (format == PasswordFormat.Hashed)
+				Logger.LogDebug("Execute(): format → {Format}", format);
                 {
                     result.Severity = SeverityEnum.Pass;
+					Logger.LogDebug("Execute(): result.Severity → {Arg0}", result.Severity);
                 }
                 else
                 {
@@ -35,9 +40,11 @@ namespace Dnn.PersonaBar.Security.Components.Checks
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in Execute(): {Arg0}", ex.Message);
                 throw;
             }
 
+			Logger.LogDebug("<<< Exiting Execute()");
             return result;
         }
     }

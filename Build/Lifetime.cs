@@ -19,6 +19,7 @@ namespace DotNetNuke.Build
         /// <inheritdoc />
         public override void Setup(Context context, ISetupContext info)
         {
+			Logger.LogDebug(">>> Entering Setup(context={Context},info={Info})", context, info);
             context.IsRunningInCI = !context.BuildSystem().IsLocalBuild;
             context.Information("Is Running in CI : {0}", context.IsRunningInCI);
             if (context.Settings.Version == "auto" && !context.IsRunningInCI)
@@ -32,11 +33,13 @@ namespace DotNetNuke.Build
             {
                 throw new CakeException("Could not find corepack, Node.js 18 or later must be installed.");
             }
+			Logger.LogDebug("<<< Exiting Setup(context={Context},info={Info})", context, info);
         }
 
         /// <inheritdoc />
         public override void Teardown(Context context, ITeardownContext info)
         {
+			Logger.LogDebug(">>> Entering Teardown(context={Context},info={Info})", context, info);
             if (context.Settings.Version == "auto" && !context.IsRunningInCI)
             {
                 // Undoes the script changes to all tracked files.
@@ -45,15 +48,19 @@ namespace DotNetNuke.Build
                 // Undoes the setup commit keeping file states as before this build script ran.
                 Git(context, "reset HEAD^");
             }
+			Logger.LogDebug("<<< Exiting Teardown(context={Context},info={Info})", context, info);
         }
 
         private static void Git(ICakeContext context, string arguments)
         {
+			Logger.LogDebug(">>> Entering Git(context={Context},arguments={Arguments})", context, arguments);
             context.Information($"git ${arguments}");
             using (var process = context.StartAndReturnProcess("git", new ProcessSettings { Arguments = arguments, }))
             {
                 process.WaitForExit();
+				private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
             }
+			Logger.LogDebug("<<< Exiting Git(context={Context},arguments={Arguments})", context, arguments);
         }
     }
 }

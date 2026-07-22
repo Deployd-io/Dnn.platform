@@ -6,9 +6,12 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 {
     public class TemplateArgument
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="TemplateArgument"/> class.</summary>
         public TemplateArgument()
         {
+		Logger.LogDebug(">>> Entering TemplateArgument()");
+		Logger.LogDebug("<<< Exiting TemplateArgument()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="TemplateArgument"/> class.</summary>
@@ -16,8 +19,12 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
         /// <param name="value">The template argument value.</param>
         public TemplateArgument(string name, string value)
         {
+			Logger.LogDebug(">>> Entering TemplateArgument(name={Name},value={Value})", name, value);
             this.Name = name;
             this.Value = value;
+			Logger.LogDebug("<<< Exiting TemplateArgument(name={Name},value={Value})", name, value);
+			Logger.LogDebug("TemplateArgument(name={Name},value={Value}): this.Name → {Arg2}", name, value, this.Name);
+			Logger.LogDebug("TemplateArgument(name={Name},value={Value}): this.Value → {Arg2}", name, value, this.Value);
         }
 
         public string Name { get; set; }

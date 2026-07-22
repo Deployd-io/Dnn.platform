@@ -31,6 +31,7 @@ using System.Runtime.InteropServices;
 
 namespace log4net.Util 
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Represents a native error code and message.</summary>
     /// <remarks>
     /// <para>
@@ -57,6 +58,10 @@ namespace log4net.Util
         {
             this.m_number = number;
             this.m_message = message;
+			Logger.LogDebug("<<< Exiting NativeError(number={Number},message={Message})", number, message);
+			Logger.LogDebug("NativeError(number={Number},message={Message}): this.m_number → {Arg2}", number, message, this.m_number);
+			Logger.LogDebug("NativeError(number={Number},message={Message}): this.m_message → {Arg2}", number, message, this.m_message);
+			Logger.LogDebug("NativeError(number={Number},message={Message}): m_number → {M_number}", number, message, m_number);
         }
 
         /// <summary>Gets the number of the native error.</summary>
@@ -105,7 +110,10 @@ namespace log4net.Util
 #endif
         public static NativeError GetLastError() 
         {
+			Logger.LogDebug(">>> Entering GetLastError()");
             int number = Marshal.GetLastWin32Error();
+			Logger.LogDebug("GetLastError(): number → {Number}", number);
+			Logger.LogDebug("<<< Exiting GetLastError()");
             return new NativeError(number, GetErrorMessage(number));
         }
 
@@ -145,6 +153,7 @@ namespace log4net.Util
 #endif
         public static string GetErrorMessage(int messageId) 
         {
+			Logger.LogDebug(">>> Entering GetErrorMessage(messageId={MessageId})", messageId);
             // Win32 constants
             int FORMAT_MESSAGE_ALLOCATE_BUFFER = 0x00000100;	// The function should allocates a buffer large enough to hold the formatted message
             int FORMAT_MESSAGE_IGNORE_INSERTS = 0x00000200;		// Insert sequences in the message definition are to be ignored
@@ -152,6 +161,7 @@ namespace log4net.Util
 
             string msgBuf = string.Empty;				// buffer that will receive the message
             IntPtr sourcePtr = IntPtr.Zero;	// Location of the message definition, will be ignored
+			Logger.LogDebug("GetErrorMessage(messageId={MessageId}): msgBuf → {MsgBuf}", messageId, msgBuf);
             IntPtr argumentsPtr = IntPtr.Zero;	// Pointer to array of values to insert, not supported as it requires unsafe code
 
             if (messageId != 0) 
@@ -182,6 +192,7 @@ namespace log4net.Util
                 msgBuf = null;
             }
 
+			Logger.LogDebug("<<< Exiting GetErrorMessage(messageId={MessageId})", messageId);
             return msgBuf;
         }
 
@@ -194,6 +205,8 @@ namespace log4net.Util
         /// </remarks>
         public override string ToString() 
         {
+			Logger.LogDebug(">>> Entering ToString()");
+			Logger.LogDebug("<<< Exiting ToString()");
             return string.Format(CultureInfo.InvariantCulture, "0x{0:x8}", this.Number) + (this.Message != null ? ": " + this.Message : string.Empty);
         }
 

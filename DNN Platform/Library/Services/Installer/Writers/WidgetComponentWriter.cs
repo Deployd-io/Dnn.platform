@@ -10,6 +10,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// <summary>The WidgetComponentWriter class handles creating the manifest for Widget Component(s).</summary>
     public class WidgetComponentWriter : FileComponentWriter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="WidgetComponentWriter"/> class.</summary>
         /// <param name="basePath">The base path.</param>
         /// <param name="files">The files.</param>

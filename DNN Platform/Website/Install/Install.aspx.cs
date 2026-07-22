@@ -53,7 +53,9 @@ namespace DotNetNuke.Services.Install
         public Install()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering Install()");
         }
+		Logger.LogDebug("<<< Exiting Install()");
 
         /// <summary>Initializes a new instance of the <see cref="Install"/> class.</summary>
         /// <param name="appStatus">The application status.</param>
@@ -61,6 +63,8 @@ namespace DotNetNuke.Services.Install
         public Install(IApplicationStatusInfo appStatus)
             : this(appStatus, null)
         {
+		Logger.LogDebug(">>> Entering Install(appStatus={AppStatus})", appStatus);
+		Logger.LogDebug("<<< Exiting Install(appStatus={AppStatus})", appStatus);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Install"/> class.</summary>
@@ -70,11 +74,14 @@ namespace DotNetNuke.Services.Install
         {
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+			Logger.LogDebug("Install(appStatus={AppStatus},eventLogger={EventLogger}): eventLogger → {EventLogger1}", appStatus, eventLogger, eventLogger);
+			Logger.LogDebug("Install(appStatus={AppStatus},eventLogger={EventLogger}): appStatus → {AppStatus1}", appStatus, eventLogger, appStatus);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             if (Upgrade.Upgrade.UpdateNewtonsoftVersion())
@@ -85,14 +92,17 @@ namespace DotNetNuke.Services.Install
             // if previous config deleted create new empty one
             string installConfig = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Install", "DotNetNuke.install.config");
             if (!File.Exists(installConfig))
+			Logger.LogDebug("OnInit(e={E}): installConfig → {InstallConfig}", e, installConfig);
             {
                 File.Copy(installConfig + ".resources", installConfig);
             }
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             Config.AddFCNMode(this.appStatus, Config.FcnMode.Single);
 
@@ -101,6 +111,7 @@ namespace DotNetNuke.Services.Install
 
             string mode = string.Empty;
             if (this.Request.QueryString["mode"] != null)
+			Logger.LogDebug("OnLoad(e={E}): mode → {Mode}", e, mode);
             {
                 mode = this.Request.QueryString["mode"].ToLowerInvariant();
             }
@@ -156,25 +167,33 @@ namespace DotNetNuke.Services.Install
                 // restore Script timeout
                 this.Server.ScriptTimeout = scriptTimeOut;
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         private static void RegisterInstallBegining()
         {
+			Logger.LogDebug(">>> Entering RegisterInstallBegining()");
             InstallBlocker.Instance.RegisterInstallBegining();
+			Logger.LogDebug("<<< Exiting RegisterInstallBegining()");
         }
 
         private static void RegisterInstallEnd()
         {
+			Logger.LogDebug(">>> Entering RegisterInstallEnd()");
             InstallBlocker.Instance.RegisterInstallEnd();
+			Logger.LogDebug("<<< Exiting RegisterInstallEnd()");
         }
 
         private static ITelerikUtils CreateTelerikUtils()
         {
+			Logger.LogDebug(">>> Entering CreateTelerikUtils()");
+			Logger.LogDebug("<<< Exiting CreateTelerikUtils()");
             return Globals.GetCurrentServiceProvider().GetRequiredService<ITelerikUtils>();
         }
 
         private static void SetHostSetting(string key, string value, bool isSecure = false)
         {
+			Logger.LogDebug(">>> Entering SetHostSetting(key={Key},value={Value},isSecure={IsSecure})", key, value, isSecure);
             var setting = new ConfigurationSetting
             {
                 IsSecure = isSecure,
@@ -185,10 +204,12 @@ namespace DotNetNuke.Services.Install
             Globals.GetCurrentServiceProvider()
                 .GetRequiredService<IHostSettingsService>()
                 .Update(setting);
+				Logger.LogDebug("<<< Exiting SetHostSetting(key={Key},value={Value},isSecure={IsSecure})", key, value, isSecure);
         }
 
         private void ExecuteScripts()
         {
+			Logger.LogDebug(">>> Entering ExecuteScripts()");
             // Start Timer
             Upgrade.Upgrade.StartTimer();
 
@@ -209,10 +230,12 @@ namespace DotNetNuke.Services.Install
 
             // Write out Footer
             HtmlUtils.WriteFooter(this.Response);
+			Logger.LogDebug("<<< Exiting ExecuteScripts()");
         }
 
         private void InstallApplication()
         {
+			Logger.LogDebug(">>> Entering InstallApplication()");
             // the application uses a two step installation process. The first step is used to update
             // the Web.config with any configuration settings - which forces an application restart.
             // The second step finishes the installation process and provisions the site.
@@ -239,9 +262,11 @@ namespace DotNetNuke.Services.Install
             {
                 bool cleanupLocker = false;
                 try
+				Logger.LogDebug("InstallApplication(): cleanupLocker → {CleanupLocker}", cleanupLocker);
                 {
                     var synchConnectionString = new SynchConnectionStringStep();
                     synchConnectionString.Execute();
+					Logger.LogDebug("InstallApplication(): synchConnectionString → {SynchConnectionString}", synchConnectionString);
                     if (synchConnectionString.Status == StepStatus.AppRestart)
                     {
                         // send a new request to the application to initiate step 2
@@ -279,6 +304,7 @@ namespace DotNetNuke.Services.Install
 
                         var installConfig = InstallController.Instance.GetInstallConfig();
 
+						Logger.LogDebug("InstallApplication(): installConfig → {InstallConfig}", installConfig);
                         // Create Folder Mappings config
                         if (!string.IsNullOrEmpty(installConfig.FolderMappingsSettings))
                         {
@@ -292,10 +318,12 @@ namespace DotNetNuke.Services.Install
                         {
                             var locale = LocaleController.Instance.GetLocale("en-US");
                             Localization.RemoveLanguageFromPortal(this.eventLogger, 0, locale.LanguageId, true);
+							Logger.LogDebug("InstallApplication(): locale → {Locale}", locale);
                         }
 
                         var installVersion = DataProvider.Instance().GetInstallVersion();
                         string strError = Config.UpdateInstallVersion(this.appStatus, installVersion);
+						Logger.LogDebug("InstallApplication(): installVersion → {InstallVersion}", installVersion);
 
                         // Adding FCN mode to web.config
                         strError += Config.AddFCNMode(this.appStatus, Config.FcnMode.Single);
@@ -335,29 +363,35 @@ namespace DotNetNuke.Services.Install
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting InstallApplication()");
         }
 
         private void WriteInstallationHeader()
         {
+			Logger.LogDebug(">>> Entering WriteInstallationHeader()");
             this.Response.Write("<h2>Version: " + Globals.FormatVersion(DotNetNukeContext.Current.Application.Version) + "</h2>");
             this.Response.Flush();
 
             this.Response.Write("<br><br>");
             this.Response.Write("<h2>Installation Status Report</h2>");
             this.Response.Flush();
+			Logger.LogDebug("<<< Exiting WriteInstallationHeader()");
         }
 
         private void WriteInstallationInProgress()
         {
+			Logger.LogDebug(">>> Entering WriteInstallationInProgress()");
             HtmlUtils.WriteFeedback(
                 HttpContext.Current.Response,
                 0,
                 Localization.GetString("ThereIsAInstallationCurrentlyInProgress.Error", Localization.GlobalResourceFile) + "<br>");
             this.Response.Flush();
+			Logger.LogDebug("<<< Exiting WriteInstallationInProgress()");
         }
 
         private bool CheckPermissions()
         {
+			Logger.LogDebug(">>> Entering CheckPermissions()");
             bool verified = new FileSystemPermissionVerifier(this.Server.MapPath("~")).VerifyAll();
             HtmlUtils.WriteFeedback(
                 HttpContext.Current.Response,
@@ -365,13 +399,16 @@ namespace DotNetNuke.Services.Install
                 "Checking File and Folder permissions " + (verified ? "<font color='green'>Success</font>" : "<font color='red'>Error!</font>") + "<br>");
             this.Response.Flush();
 
+			Logger.LogDebug("<<< Exiting CheckPermissions()");
             return verified;
         }
 
         private void UpgradeApplication()
         {
+			Logger.LogDebug(">>> Entering UpgradeApplication()");
             bool cleanupLocker = false;
             try
+			Logger.LogDebug("UpgradeApplication(): cleanupLocker → {CleanupLocker}", cleanupLocker);
             {
                 if (Upgrade.Upgrade.RemoveInvalidAntiForgeryCookie())
                 {
@@ -380,6 +417,7 @@ namespace DotNetNuke.Services.Install
 
                 var databaseVersion = DataProvider.Instance().GetVersion();
 
+				Logger.LogDebug("UpgradeApplication(): databaseVersion → {DatabaseVersion}", databaseVersion);
                 // Start Timer
                 Upgrade.Upgrade.StartTimer();
 
@@ -410,6 +448,7 @@ namespace DotNetNuke.Services.Install
                     // get current database version
                     var strDatabaseVersion = Globals.FormatVersion(databaseVersion);
 
+					Logger.LogDebug("UpgradeApplication(): strDatabaseVersion → {StrDatabaseVersion}", strDatabaseVersion);
                     this.Response.Write("<h2>Current Database Version: " + strDatabaseVersion + "</h2>");
                     this.Response.Flush();
 
@@ -426,12 +465,14 @@ namespace DotNetNuke.Services.Install
                     var packages = Upgrade.Upgrade.GetInstallPackages();
                     foreach (var package in packages)
                     {
+					Logger.LogDebug("UpgradeApplication(): packages → {Packages}", packages);
                         Upgrade.Upgrade.InstallPackage(package.Key, package.Value.PackageType, true);
                     }
 
                     // calling GetInstallVersion after SQL scripts execution to ensure sp GetDatabaseInstallVersion exists
                     var installVersion = DataProvider.Instance().GetInstallVersion();
                     string strError = Config.UpdateInstallVersion(this.appStatus, installVersion);
+					Logger.LogDebug("UpgradeApplication(): installVersion → {InstallVersion}", installVersion);
 
                     // Adding FCN mode to web.config
                     strError += Config.AddFCNMode(this.appStatus, Config.FcnMode.Single);
@@ -448,6 +489,7 @@ namespace DotNetNuke.Services.Install
                     this.Response.Write("<h2>Checking Security Aspects</h2>");
                     var telerikUtils = CreateTelerikUtils();
                     if (!telerikUtils.TelerikIsInstalled())
+					Logger.LogDebug("UpgradeApplication(): telerikUtils → {TelerikUtils}", telerikUtils);
                     {
                         this.Response.Write(this.LocalizeString("TelerikNotInstalledInfo"));
                         this.Response.Write("<br>");
@@ -456,6 +498,7 @@ namespace DotNetNuke.Services.Install
                     {
                         var version = telerikUtils.GetTelerikVersion();
                         this.Response.Write("<strong>");
+						Logger.LogDebug("UpgradeApplication(): version → {Version}", version);
                         this.Response.Write(this.LocalizeString("TelerikInstalledHeading"));
                         this.Response.Write("</strong><br>");
                         this.Response.Write(this.LocalizeString("TelerikInstalledDetected"));
@@ -523,10 +566,12 @@ namespace DotNetNuke.Services.Install
                     RegisterInstallEnd();
                 }
             }
+			Logger.LogDebug("<<< Exiting UpgradeApplication()");
         }
 
         private void AddPortal()
         {
+			Logger.LogDebug(">>> Entering AddPortal()");
             // Start Timer
             Upgrade.Upgrade.StartTimer();
 
@@ -548,6 +593,7 @@ namespace DotNetNuke.Services.Install
                 // parse portal(s) if available
                 var nodes = xmlDoc.SelectNodes("//dotnetnuke/portals/portal");
                 if (nodes != null)
+				Logger.LogDebug("AddPortal(): nodes → {Nodes}", nodes);
                 {
                     foreach (XmlNode node in nodes)
                     {
@@ -577,10 +623,12 @@ namespace DotNetNuke.Services.Install
 
             // Write out Footer
             HtmlUtils.WriteFooter(this.Response);
+			Logger.LogDebug("<<< Exiting AddPortal()");
         }
 
         private void InstallResources()
         {
+			Logger.LogDebug(">>> Entering InstallResources()");
             // Start Timer
             Upgrade.Upgrade.StartTimer();
 
@@ -594,6 +642,7 @@ namespace DotNetNuke.Services.Install
             var packages = Upgrade.Upgrade.GetInstallPackages();
             foreach (var package in packages)
             {
+			Logger.LogDebug("InstallResources(): packages → {Packages}", packages);
                 Upgrade.Upgrade.InstallPackage(package.Key, package.Value.PackageType, true);
             }
 
@@ -603,10 +652,12 @@ namespace DotNetNuke.Services.Install
 
             // Write out Footer
             HtmlUtils.WriteFooter(this.Response);
+			Logger.LogDebug("<<< Exiting InstallResources()");
         }
 
         private void NoUpgrade()
         {
+			Logger.LogDebug(">>> Entering NoUpgrade()");
             // get path to script files
             string strProviderPath = DataProvider.Instance().GetProviderPath();
             if (!strProviderPath.StartsWith("ERROR:"))
@@ -636,6 +687,7 @@ namespace DotNetNuke.Services.Install
                                 // existing DNN installation
                                 var strDatabaseVersion = ((int)dr["Major"]).ToString("00") + "." + ((int)dr["Minor"]).ToString("00") + "." + ((int)dr["Build"]).ToString("00");
                                 this.Response.Write("<h2>Current Database Version: " + strDatabaseVersion + "</h2>");
+								Logger.LogDebug("NoUpgrade(): strDatabaseVersion → {StrDatabaseVersion}", strDatabaseVersion);
                             }
 
                             this.Response.Write("<br><br><a href='Install.aspx?mode=Install'>Click Here To Upgrade DotNetNuke</a>");
@@ -678,10 +730,13 @@ namespace DotNetNuke.Services.Install
 
             // Write out Footer
             HtmlUtils.WriteFooter(this.Response);
+			Logger.LogDebug("<<< Exiting NoUpgrade()");
         }
 
         private string LocalizeString(string key)
         {
+			Logger.LogDebug(">>> Entering LocalizeString(key={Key})", key);
+			Logger.LogDebug("<<< Exiting LocalizeString(key={Key})", key);
             return Localization.GetString(key, UpgradeWizardLocalResourceFile);
         }
     }

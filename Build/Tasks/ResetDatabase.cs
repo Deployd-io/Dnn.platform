@@ -22,8 +22,10 @@ namespace DotNetNuke.Build.Tasks
         /// <inheritdoc />
         public override void Run(Context context)
         {
+			Logger.LogDebug(">>> Entering Run(context={Context})", context);
             var script = ReplaceScriptVariables(context, LoadScript(context, "db-connections-drop"));
             ExecuteScript(context, script);
+			Logger.LogDebug("Run(context={Context}): script → {Script}", context, script);
             script = ReplaceScriptVariables(context, LoadScript(context, "create-db"));
             ExecuteScript(context, script);
             if (context.Settings.DnnSqlUsername != string.Empty)
@@ -31,16 +33,20 @@ namespace DotNetNuke.Build.Tasks
                 script = ReplaceScriptVariables(context, LoadScript(context, "add-db-user"));
                 ExecuteScript(context, script);
             }
+			Logger.LogDebug("<<< Exiting Run(context={Context})", context);
         }
 
         private static string LoadScript(ICakeContext context, string scriptName)
         {
+			Logger.LogDebug(">>> Entering LoadScript(context={Context},scriptName={ScriptName})", context, scriptName);
             var script = scriptName + ".local.sql";
             if (!System.IO.File.Exists(ScriptsPath + script))
+			Logger.LogDebug("LoadScript(context={Context},scriptName={ScriptName}): script → {Script}", context, scriptName, script);
             {
                 script = scriptName + ".sql";
             }
 
+			Logger.LogDebug("<<< Exiting LoadScript(context={Context},scriptName={ScriptName})", context, scriptName);
             return context.FileReadText(ScriptsPath + script);
         }
 
@@ -57,6 +63,8 @@ namespace DotNetNuke.Build.Tasks
 
         private static bool ExecuteScript(Context context, string scriptStatement)
         {
+			Logger.LogDebug(">>> Entering ExecuteScript(context={Context},scriptStatement={ScriptStatement})", context, scriptStatement);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             try
             {
                 using (var connection = new SqlConnection(context.Settings.SaConnectionString))
@@ -64,8 +72,10 @@ namespace DotNetNuke.Build.Tasks
                     connection.Open();
                     foreach (var cmd in scriptStatement.Split(GoStatement, StringSplitOptions.RemoveEmptyEntries))
                     {
+						private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                         var command = new SqlCommand(cmd, connection);
                         command.ExecuteNonQuery();
+						Logger.LogInformation("ExecuteScript(context)={Context}: database query executed in {Arg1} ms", context, __logStart.ElapsedMilliseconds);
                     }
 
                     connection.Close();
@@ -73,10 +83,12 @@ namespace DotNetNuke.Build.Tasks
             }
             catch (Exception err)
             {
+				Logger.LogError("Exception in ExecuteScript(context={Context},scriptStatement={ScriptStatement}): {Arg2}", context, scriptStatement, ex.Message);
                 context.Error(err);
                 return false;
             }
 
+			Logger.LogDebug("<<< Exiting ExecuteScript(context={Context},scriptStatement={ScriptStatement})", context, scriptStatement);
             return true;
         }
     }

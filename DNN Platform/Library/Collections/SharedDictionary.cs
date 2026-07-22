@@ -14,6 +14,7 @@ namespace DotNetNuke.Collections.Internal
     [Serializable]
     public class SharedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDisposable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private IDictionary<TKey, TValue> dict;
 
         private bool isDisposed;
@@ -23,6 +24,10 @@ namespace DotNetNuke.Collections.Internal
         public SharedDictionary()
             : this(LockingStrategy.ReaderWriter)
         {
+		Logger.LogDebug(">>> Entering SharedDictionary()");
+		Logger.LogDebug("<<< Exiting SharedDictionary()");
+		Logger.LogDebug(">>> Entering SharedDictionary(lockStrategy={LockStrategy})", lockStrategy);
+		Logger.LogDebug("<<< Exiting SharedDictionary(lockStrategy={LockStrategy})", lockStrategy);
         }
 
         /// <summary>Initializes a new instance of the <see cref="SharedDictionary{TKey, TValue}"/> class.</summary>
@@ -31,6 +36,9 @@ namespace DotNetNuke.Collections.Internal
         {
             this.dict = new Dictionary<TKey, TValue>();
             this.lockController = lockStrategy;
+			Logger.LogDebug("SharedDictionary(lockStrategy={LockStrategy}): lockController → {LockController}", lockStrategy, lockController);
+			Logger.LogDebug("SharedDictionary(lockStrategy={LockStrategy}): this.lockController → {Arg1}", lockStrategy, this.lockController);
+			Logger.LogDebug("SharedDictionary(lockStrategy={LockStrategy}): dict → {Dict}", lockStrategy, dict);
         }
 
         /// <summary>Initializes a new instance of the <see cref="SharedDictionary{TKey, TValue}"/> class.</summary>
@@ -120,6 +128,8 @@ namespace DotNetNuke.Collections.Internal
         /// <inheritdoc />
         public IEnumerator GetEnumerator()
         {
+			Logger.LogDebug(">>> Entering GetEnumerator()");
+			Logger.LogDebug("<<< Exiting GetEnumerator()");
             return this.IEnumerable_GetEnumerator();
         }
 
@@ -134,9 +144,11 @@ namespace DotNetNuke.Collections.Internal
         /// <inheritdoc />
         public void Clear()
         {
+			Logger.LogDebug(">>> Entering Clear()");
             this.EnsureNotDisposed();
             this.EnsureWriteAccess();
             this.dict.Clear();
+			Logger.LogDebug("<<< Exiting Clear()");
         }
 
         /// <inheritdoc />
@@ -166,17 +178,21 @@ namespace DotNetNuke.Collections.Internal
         /// <inheritdoc />
         public bool ContainsKey(TKey key)
         {
+			Logger.LogDebug(">>> Entering ContainsKey(key={Key})", key);
             this.EnsureNotDisposed();
             this.EnsureReadAccess();
+			Logger.LogDebug("<<< Exiting ContainsKey(key={Key})", key);
             return this.dict.ContainsKey(key);
         }
 
         /// <inheritdoc />
         public void Add(TKey key, TValue value)
         {
+			Logger.LogDebug(">>> Entering Add(key={Key},value={Value})", key, value);
             this.EnsureNotDisposed();
             this.EnsureWriteAccess();
             this.dict.Add(key, value);
+			Logger.LogDebug("<<< Exiting Add(key={Key},value={Value})", key, value);
         }
 
         /// <inheritdoc />
@@ -184,29 +200,36 @@ namespace DotNetNuke.Collections.Internal
         {
             this.EnsureNotDisposed();
             this.EnsureWriteAccess();
+			Logger.LogDebug("<<< Exiting Remove(key={Key})", key);
             return this.dict.Remove(key);
         }
 
         /// <inheritdoc />
         public bool TryGetValue(TKey key, out TValue value)
         {
+			Logger.LogDebug(">>> Entering TryGetValue(key={Key})", key);
             this.EnsureNotDisposed();
             this.EnsureReadAccess();
+			Logger.LogDebug("<<< Exiting TryGetValue(key={Key})", key);
             return this.dict.TryGetValue(key, out value);
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+			Logger.LogDebug(">>> Entering Dispose()");
             this.Dispose(true);
 
             GC.SuppressFinalize(this);
+			Logger.LogDebug("<<< Exiting Dispose()");
         }
 
         /// <summary>Gets a read lock.</summary>
         /// <returns>An <see cref="ISharedCollectionLock"/> instance.</returns>
         public ISharedCollectionLock GetReadLock()
         {
+			Logger.LogDebug(">>> Entering GetReadLock()");
+			Logger.LogDebug("<<< Exiting GetReadLock()");
             return this.GetReadLock(TimeSpan.FromMilliseconds(-1));
         }
 
@@ -216,6 +239,7 @@ namespace DotNetNuke.Collections.Internal
         public ISharedCollectionLock GetReadLock(TimeSpan timeOut)
         {
             this.EnsureNotDisposed();
+			Logger.LogDebug("<<< Exiting GetReadLock(timeOut={TimeOut})", timeOut);
             return this.lockController.GetReadLock(timeOut);
         }
 
@@ -224,6 +248,7 @@ namespace DotNetNuke.Collections.Internal
         /// <returns>An <see cref="ISharedCollectionLock"/> instance.</returns>
         public ISharedCollectionLock GetReadLock(int millisecondTimeout)
         {
+			Logger.LogDebug("<<< Exiting GetReadLock(millisecondTimeout={MillisecondTimeout})", millisecondTimeout);
             return this.GetReadLock(TimeSpan.FromMilliseconds(millisecondTimeout));
         }
 
@@ -231,6 +256,8 @@ namespace DotNetNuke.Collections.Internal
         /// <returns>An <see cref="ISharedCollectionLock"/> instance.</returns>
         public ISharedCollectionLock GetWriteLock()
         {
+			Logger.LogDebug(">>> Entering GetWriteLock()");
+			Logger.LogDebug("<<< Exiting GetWriteLock()");
             return this.GetWriteLock(TimeSpan.FromMilliseconds(-1));
         }
 
@@ -240,6 +267,7 @@ namespace DotNetNuke.Collections.Internal
         public ISharedCollectionLock GetWriteLock(TimeSpan timeOut)
         {
             this.EnsureNotDisposed();
+			Logger.LogDebug("<<< Exiting GetWriteLock(timeOut={TimeOut})", timeOut);
             return this.lockController.GetWriteLock(timeOut);
         }
 
@@ -248,6 +276,7 @@ namespace DotNetNuke.Collections.Internal
         /// <returns>An <see cref="ISharedCollectionLock"/> instance.</returns>
         public ISharedCollectionLock GetWriteLock(int millisecondTimeout)
         {
+			Logger.LogDebug("<<< Exiting GetWriteLock(millisecondTimeout={MillisecondTimeout})", millisecondTimeout);
             return this.GetWriteLock(TimeSpan.FromMilliseconds(millisecondTimeout));
         }
 
@@ -273,43 +302,56 @@ namespace DotNetNuke.Collections.Internal
         /// <param name="disposing">A value indicating whether this instance is currently disposing.</param>
         protected virtual void Dispose(bool disposing)
         {
+			Logger.LogDebug(">>> Entering Dispose(disposing={Disposing})", disposing);
             if (!this.isDisposed)
             {
                 if (disposing)
                 {
                     // dispose managed resources here
                     this.dict = null;
+					Logger.LogDebug("Dispose(disposing={Disposing}): dict → {Dict}", disposing, dict);
+					Logger.LogDebug("Dispose(disposing={Disposing}): this.dict → {Arg1}", disposing, this.dict);
                 }
 
                 // dispose unmanaged resources here
                 this.lockController.Dispose();
                 this.lockController = null;
+				Logger.LogDebug("Dispose(disposing={Disposing}): lockController → {LockController}", disposing, lockController);
+				Logger.LogDebug("Dispose(disposing={Disposing}): this.lockController → {Arg1}", disposing, this.lockController);
                 this.isDisposed = true;
             }
+			Logger.LogDebug("<<< Exiting Dispose(disposing={Disposing})", disposing);
+			Logger.LogDebug("Dispose(disposing={Disposing}): this.isDisposed → {Arg1}", disposing, this.isDisposed);
         }
 
         private void EnsureReadAccess()
         {
+			Logger.LogDebug(">>> Entering EnsureReadAccess()");
             if (!this.lockController.ThreadCanRead)
             {
                 throw new ReadLockRequiredException();
             }
+			Logger.LogDebug("<<< Exiting EnsureReadAccess()");
         }
 
         private void EnsureWriteAccess()
         {
+			Logger.LogDebug(">>> Entering EnsureWriteAccess()");
             if (!this.lockController.ThreadCanWrite)
             {
                 throw new WriteLockRequiredException();
             }
+			Logger.LogDebug("<<< Exiting EnsureWriteAccess()");
         }
 
         private void EnsureNotDisposed()
         {
+			Logger.LogDebug(">>> Entering EnsureNotDisposed()");
             if (this.isDisposed)
             {
                 throw new ObjectDisposedException("SharedDictionary");
             }
+			Logger.LogDebug("<<< Exiting EnsureNotDisposed()");
         }
     }
 }

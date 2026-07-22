@@ -21,6 +21,7 @@ namespace Dnn.PersonaBar.Users.Tests
 
     public class SetUserUnitTests : CommandTests<SetUser>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private Mock<IUserValidator> _userValidatorMock;
         private Mock<IUsersController> _usersControllerMock;
         private Mock<IUserControllerWrapper> _userControllerWrapperMock;
@@ -31,6 +32,7 @@ namespace Dnn.PersonaBar.Users.Tests
         [Test]
         public void Run_UserIdNull_ReturnErrorResponse()
         {
+			Logger.LogDebug(">>> Entering Run_UserIdNull_ReturnErrorResponse()");
             // Arrange
             UserInfo userInfo;
             this.errorResultModel = new ConsoleErrorResultModel();
@@ -41,8 +43,10 @@ namespace Dnn.PersonaBar.Users.Tests
             // Act
             var result = this.RunCommand("--username", "testusername", "--firstname", "testfirstname", "--lastname", "testlastname");
 
+			Logger.LogDebug("Run_UserIdNull_ReturnErrorResponse(): result → {Result}", result);
             // Assert
             Assert.That(result.IsError, Is.True);
+			Logger.LogDebug("<<< Exiting Run_UserIdNull_ReturnErrorResponse()");
         }
 
         [TestCase("--email", "user@gm.com")]
@@ -52,9 +56,15 @@ namespace Dnn.PersonaBar.Users.Tests
         [TestCase("--approved", "true")]
         public void Run_ValidCommand_ReturnSuccessResponse(string attributeName, string attributeValue)
         {
+			Logger.LogDebug(">>> Entering Run_ValidCommand_ReturnSuccessResponse(attributeName={AttributeName},attributeValue={AttributeValue})", attributeName, attributeValue);
             // Arrange
             var userId = 4;
             var userInfo = this.GetUser(userId, false);
+			Logger.LogDebug("Run_ValidCommand_ReturnSuccessResponse(attributeName={AttributeName},attributeValue={AttributeValue}): userId → {UserId}", attributeName, attributeValue, userId);
+			Logger.LogDebug("Run_ValidCommand_ReturnSuccessResponse(attributeName={AttributeName},attributeValue={AttributeValue}): userInfo → {UserInfo}", attributeName, attributeValue, userInfo);
+			Logger.LogDebug("Run_ValidCommand_ReturnSuccessResponse(attributeName={AttributeName},attributeValue={AttributeValue}): userInfo.FirstName → {Arg2}", attributeName, attributeValue, userInfo.FirstName);
+			Logger.LogDebug("Run_ValidCommand_ReturnSuccessResponse(attributeName={AttributeName},attributeValue={AttributeValue}): userInfo.LastName → {Arg2}", attributeName, attributeValue, userInfo.LastName);
+			Logger.LogDebug("Run_ValidCommand_ReturnSuccessResponse(attributeName={AttributeName},attributeValue={AttributeValue}): userInfo.Email → {Arg2}", attributeName, attributeValue, userInfo.Email);
             userInfo.FirstName = "userFirstName";
             userInfo.LastName = "userLastName";
             userInfo.Email = "user@email.com";
@@ -69,31 +79,43 @@ namespace Dnn.PersonaBar.Users.Tests
             // Act
             var result = this.RunCommand(userId.ToString(), "--firstname", "user4", "--lastname", "user4", attributeName, attributeValue);
 
+			Logger.LogDebug("Run_ValidCommand_ReturnSuccessResponse(attributeName={AttributeName},attributeValue={AttributeValue}): result → {Result}", attributeName, attributeValue, result);
             using (Assert.EnterMultipleScope())
             {
                 // Assert
                 Assert.That(result.IsError, Is.False);
                 Assert.That(result.Records, Is.EqualTo(1));
             }
+			Logger.LogDebug("<<< Exiting Run_ValidCommand_ReturnSuccessResponse(attributeName={AttributeName},attributeValue={AttributeValue})", attributeName, attributeValue);
         }
 
         [SetUp]
         protected override void ChildSetup()
         {
+			Logger.LogDebug(">>> Entering ChildSetup()");
             this._userValidatorMock = new Mock<IUserValidator>();
             this._usersControllerMock = new Mock<IUsersController>();
+			Logger.LogDebug("ChildSetup(): _usersControllerMock → {_usersControllerMock}", _usersControllerMock);
+			Logger.LogDebug("ChildSetup(): _userValidatorMock → {_userValidatorMock}", _userValidatorMock);
             this._userControllerWrapperMock = new Mock<IUserControllerWrapper>();
+			Logger.LogDebug("ChildSetup(): _userControllerWrapperMock → {_userControllerWrapperMock}", _userControllerWrapperMock);
             this.serviceProvider = FakeServiceProvider.Setup(services => services.AddSingleton(Mock.Of<IHostSettings>()));
+			Logger.LogDebug("<<< Exiting ChildSetup()");
+			Logger.LogDebug("ChildSetup(): serviceProvider → {ServiceProvider}", serviceProvider);
         }
 
         [TearDown]
         protected override void ChildTearDown()
         {
+			Logger.LogDebug(">>> Entering ChildTearDown()");
             this.serviceProvider.Dispose();
+			Logger.LogDebug("<<< Exiting ChildTearDown()");
         }
 
         protected override SetUser CreateCommand()
         {
+			Logger.LogDebug(">>> Entering CreateCommand()");
+			Logger.LogDebug("<<< Exiting CreateCommand()");
             return new SetUser(this._userValidatorMock.Object, this._usersControllerMock.Object, this._userControllerWrapperMock.Object);
         }
     }

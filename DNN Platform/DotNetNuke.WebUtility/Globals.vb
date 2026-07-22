@@ -1,5 +1,6 @@
 ' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports System.Web.UI
 Imports System.Web.UI.HtmlControls
@@ -28,11 +29,13 @@ Namespace DotNetNuke.UI.Utilities
 		''' </history>
 		''' -----------------------------------------------------------------------------
 		Public Shared Function FindControlRecursive(ByVal objParent As Control, ByVal strControlName As String) As Control
+			Logger.LogDebug(">>> Entering FindControlRecursive(objParent={ObjParent},strControlName={StrControlName})", objParent, strControlName)
 			Return FindControlRecursive(objParent, strControlName, "")
         End Function
 
         Public Shared Function FindControlRecursive(ByVal objParent As Control, ByVal strControlName As String, ByVal strClientID As String) As Control
             Dim objCtl As Control
+			Logger.LogDebug("<<< Exiting FindControlRecursive(objParent={ObjParent},strControlName={StrControlName})", objParent, strControlName)
             Dim objChild As Control
             objCtl = objParent.FindControl(strControlName)
             If objCtl Is Nothing Then
@@ -46,6 +49,7 @@ Namespace DotNetNuke.UI.Utilities
         End Function
 
         Public Shared Function GetAttribute(ByVal objControl As Control, ByVal strAttr As String) As String
+			Logger.LogDebug(">>> Entering GetAttribute(objControl={ObjControl},strAttr={StrAttr})", objControl, strAttr)
             Select Case True
                 Case TypeOf objControl Is WebControl
                     Return CType(objControl, WebControl).Attributes(strAttr)
@@ -56,8 +60,10 @@ Namespace DotNetNuke.UI.Utilities
                     Return Nothing
             End Select
         End Function
+		Logger.LogDebug("<<< Exiting GetAttribute(objControl={ObjControl},strAttr={StrAttr})", objControl, strAttr)
 
         Public Shared Sub SetAttribute(ByVal objControl As Control, ByVal strAttr As String, ByVal strValue As String)
+			Logger.LogDebug(">>> Entering SetAttribute(objControl={ObjControl},strAttr={StrAttr},strValue={StrValue})", objControl, strAttr, strValue)
             Dim strOrigVal As String = GetAttribute(objControl, strAttr)
             If Len(strOrigVal) > 0 Then strValue = strOrigVal & strValue
             Select Case True
@@ -79,12 +85,15 @@ Namespace DotNetNuke.UI.Utilities
                     'throw error?
             End Select
         End Sub
+		Logger.LogDebug("<<< Exiting SetAttribute(objControl={ObjControl},strAttr={StrAttr},strValue={StrValue})", objControl, strAttr, strValue)
 
         'hack... can we use a method to determine this
         Private Shared m_aryScripts As Hashtable
         Public Shared Function IsEmbeddedScript(ByVal key As String) As Boolean
+			Logger.LogDebug(">>> Entering IsEmbeddedScript(key={Key})", key)
             If m_aryScripts Is Nothing Then
                 m_aryScripts = New Hashtable
+				Logger.LogDebug("IsEmbeddedScript(key={Key}): m_aryScripts → {M_aryScripts}", key, m_aryScripts)
                 m_aryScripts.Add("dnn.js", "")
                 m_aryScripts.Add("dnn.dom.positioning.js", "")
                 m_aryScripts.Add("dnn.diagnostics.js", "")
@@ -98,6 +107,7 @@ Namespace DotNetNuke.UI.Utilities
             End If
             Return m_aryScripts.ContainsKey(key)
         End Function
+		Logger.LogDebug("<<< Exiting IsEmbeddedScript(key={Key})", key)
 
     End Class
 End Namespace

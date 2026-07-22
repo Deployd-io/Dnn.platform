@@ -26,6 +26,7 @@ using log4net.Core;
 
 namespace log4net.Util
 {
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
     /// <summary>Delegate type used for LogicalThreadContextStack's callbacks.</summary>
     #if NET_2_0 || MONO_2_0 || NETSTANDARD
@@ -74,8 +75,13 @@ namespace log4net.Util
         internal LogicalThreadContextStack(string propertyKey, TwoArgAction registerNew)
         #endif
         {
+			Logger.LogDebug(">>> Entering LogicalThreadContextStack(propertyKey={PropertyKey},registerNew={RegisterNew})", propertyKey, registerNew);
             this.m_propertyKey = propertyKey;
             this.m_registerNew = registerNew;
+			Logger.LogDebug("<<< Exiting LogicalThreadContextStack(propertyKey={PropertyKey},registerNew={RegisterNew})", propertyKey, registerNew);
+			Logger.LogDebug("LogicalThreadContextStack(propertyKey={PropertyKey},registerNew={RegisterNew}): this.m_propertyKey → {Arg2}", propertyKey, registerNew, this.m_propertyKey);
+			Logger.LogDebug("LogicalThreadContextStack(propertyKey={PropertyKey},registerNew={RegisterNew}): m_registerNew → {M_registerNew}", propertyKey, registerNew, m_registerNew);
+			Logger.LogDebug("LogicalThreadContextStack(propertyKey={PropertyKey},registerNew={RegisterNew}): this.m_registerNew → {Arg2}", propertyKey, registerNew, this.m_registerNew);
         }
 
         /// <summary>The number of messages in the stack</summary>
@@ -109,7 +115,9 @@ namespace log4net.Util
         /// </remarks>
         public void Clear()
         {
+			Logger.LogDebug(">>> Entering Clear()");
             this.m_registerNew(this.m_propertyKey, new LogicalThreadContextStack(this.m_propertyKey, this.m_registerNew));
+			Logger.LogDebug("<<< Exiting Clear()");
         }
 
         /// <summary>Removes the top context from this stack.</summary>
@@ -123,16 +131,22 @@ namespace log4net.Util
         /// </remarks>
         public string Pop()
         {
+			Logger.LogDebug(">>> Entering Pop()");
             // copy current stack
             Stack stack = new Stack(new Stack(this.m_stack));
             string result = string.Empty;
+			Logger.LogDebug("Pop(): stack → {Stack}", stack);
+			Logger.LogDebug("Pop(): result → {Result}", result);
             if (stack.Count > 0)
             {
                 result = ((StackFrame)(stack.Pop())).Message;
             }
             LogicalThreadContextStack ltcs = new LogicalThreadContextStack(this.m_propertyKey, this.m_registerNew);
             ltcs.m_stack = stack;
+			Logger.LogDebug("Pop(): ltcs → {Ltcs}", ltcs);
+			Logger.LogDebug("Pop(): ltcs.m_stack → {Arg0}", ltcs.m_stack);
             this.m_registerNew(this.m_propertyKey, ltcs);
+			Logger.LogDebug("<<< Exiting Pop()");
             return result;
         }
 
@@ -159,13 +173,17 @@ namespace log4net.Util
         /// </example>
         public IDisposable Push(string message)
         {
+			Logger.LogDebug(">>> Entering Push(message={Message})", message);
             // do modifications on a copy
             Stack stack = new Stack(new Stack(this.m_stack));
             stack.Push(new StackFrame(message, (stack.Count > 0) ? (StackFrame)stack.Peek() : null));
 
             LogicalThreadContextStack contextStack = new LogicalThreadContextStack(this.m_propertyKey, this.m_registerNew);
             contextStack.m_stack = stack;
+			Logger.LogDebug("Push(message={Message}): contextStack → {ContextStack}", message, contextStack);
+			Logger.LogDebug("Push(message={Message}): contextStack.m_stack → {Arg1}", message, contextStack.m_stack);
             this.m_registerNew(this.m_propertyKey, contextStack);
+			Logger.LogDebug("<<< Exiting Push(message={Message})", message);
             return new AutoPopStackFrame(contextStack, stack.Count - 1);
         }
 
@@ -173,11 +191,13 @@ namespace log4net.Util
         /// <returns>The current context information.</returns>
         internal string GetFullMessage()
         {
+			Logger.LogDebug(">>> Entering GetFullMessage()");
             Stack stack = this.m_stack;
             if (stack.Count > 0)
             {
                 return ((StackFrame)(stack.Peek())).FullMessage;
             }
+			Logger.LogDebug("<<< Exiting GetFullMessage()");
             return null;
         }
 
@@ -205,6 +225,8 @@ namespace log4net.Util
         /// </remarks>
         public override string ToString()
         {
+			Logger.LogDebug(">>> Entering ToString()");
+			Logger.LogDebug("<<< Exiting ToString()");
             return this.GetFullMessage();
         }
 
@@ -243,13 +265,19 @@ namespace log4net.Util
             /// </remarks>
             internal StackFrame(string message, StackFrame parent)
             {
+				Logger.LogDebug(">>> Entering StackFrame(message={Message},parent={Parent})", message, parent);
                 this.m_message = message;
                 this.m_parent = parent;
+				Logger.LogDebug("StackFrame(message={Message},parent={Parent}): this.m_message → {Arg2}", message, parent, this.m_message);
+				Logger.LogDebug("StackFrame(message={Message},parent={Parent}): m_parent → {M_parent}", message, parent, m_parent);
+				Logger.LogDebug("StackFrame(message={Message},parent={Parent}): this.m_parent → {Arg2}", message, parent, this.m_parent);
 
                 if (parent == null)
                 {
                     this.m_fullMessage = message;
                 }
+				Logger.LogDebug("<<< Exiting StackFrame(message={Message},parent={Parent})", message, parent);
+				Logger.LogDebug("StackFrame(message={Message},parent={Parent}): this.m_fullMessage → {Arg2}", message, parent, this.m_fullMessage);
             }
 
             /// <summary>Get the message.</summary>
@@ -312,8 +340,14 @@ namespace log4net.Util
             /// </remarks>
             internal AutoPopStackFrame(LogicalThreadContextStack logicalThreadContextStack, int frameDepth)
             {
+				Logger.LogDebug(">>> Entering AutoPopStackFrame(logicalThreadContextStack={LogicalThreadContextStack},frameDepth={FrameDepth})", logicalThreadContextStack, frameDepth);
                 this.m_frameDepth = frameDepth;
                 this.m_logicalThreadContextStack = logicalThreadContextStack;
+				Logger.LogDebug("<<< Exiting AutoPopStackFrame(logicalThreadContextStack={LogicalThreadContextStack},frameDepth={FrameDepth})", logicalThreadContextStack, frameDepth);
+				Logger.LogDebug("AutoPopStackFrame(logicalThreadContextStack={LogicalThreadContextStack},frameDepth={FrameDepth}): this.m_frameDepth → {Arg2}", logicalThreadContextStack, frameDepth, this.m_frameDepth);
+				Logger.LogDebug("AutoPopStackFrame(logicalThreadContextStack={LogicalThreadContextStack},frameDepth={FrameDepth}): m_logicalThreadContextStack → {M_logicalThreadContextStack}", logicalThreadContextStack, frameDepth, m_logicalThreadContextStack);
+				Logger.LogDebug("AutoPopStackFrame(logicalThreadContextStack={LogicalThreadContextStack},frameDepth={FrameDepth}): this.m_logicalThreadContextStack → {Arg2}", logicalThreadContextStack, frameDepth, this.m_logicalThreadContextStack);
+				Logger.LogDebug("AutoPopStackFrame(logicalThreadContextStack={LogicalThreadContextStack},frameDepth={FrameDepth}): m_frameDepth → {M_frameDepth}", logicalThreadContextStack, frameDepth, m_frameDepth);
             }
 
             /// <summary>Returns the stack to the correct depth.</summary>
@@ -324,18 +358,23 @@ namespace log4net.Util
             /// </remarks>
             public void Dispose()
             {
+				Logger.LogDebug(">>> Entering Dispose()");
                 if (this.m_frameDepth >= 0 && this.m_logicalThreadContextStack.m_stack != null)
                 {
                     Stack stack = new Stack(new Stack(this.m_logicalThreadContextStack.m_stack));
                     while (stack.Count > this.m_frameDepth)
+					Logger.LogDebug("Dispose(): stack → {Stack}", stack);
                     {
                         stack.Pop();
                     }
                     LogicalThreadContextStack ltcs = new LogicalThreadContextStack(this.m_logicalThreadContextStack.m_propertyKey, this.m_logicalThreadContextStack.m_registerNew);
                     ltcs.m_stack = stack;
+					Logger.LogDebug("Dispose(): ltcs → {Ltcs}", ltcs);
+					Logger.LogDebug("Dispose(): ltcs.m_stack → {Arg0}", ltcs.m_stack);
                     this.m_logicalThreadContextStack.m_registerNew(this.m_logicalThreadContextStack.m_propertyKey,
                         ltcs);
                 }
+				Logger.LogDebug("<<< Exiting Dispose()");
             }
         }
 

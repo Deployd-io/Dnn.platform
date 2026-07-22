@@ -21,244 +21,320 @@ namespace DotNetNuke.Tests.Web.Mvc.Helpers
     [TestFixture]
     public class DnnUrlHelperTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [SetUp]
         public void SetUp()
         {
+			Logger.LogDebug(">>> Entering SetUp()");
             MockComponentProvider.ResetContainer();
+			Logger.LogDebug("<<< Exiting SetUp()");
         }
 
         [Test]
         public void Constructor_Throws_On_Null_ViewContext()
         {
+			Logger.LogDebug(">>> Entering Constructor_Throws_On_Null_ViewContext()");
             // Act,Assert
             Assert.Throws<ArgumentNullException>(() => new DnnUrlHelper(null));
+			Logger.LogDebug("<<< Exiting Constructor_Throws_On_Null_ViewContext()");
         }
 
         [Test]
         public void Constructor_Throws_On_Null_RequestContext()
         {
+			Logger.LogDebug(">>> Entering Constructor_Throws_On_Null_RequestContext()");
             // Act,Assert
             Assert.Throws<ArgumentNullException>(() => new DnnUrlHelper(null, new Mock<IDnnController>().Object));
+			Logger.LogDebug("<<< Exiting Constructor_Throws_On_Null_RequestContext()");
         }
 
         [Test]
         public void Constructor_Throws_On_Null_Controller()
         {
+			Logger.LogDebug(">>> Entering Constructor_Throws_On_Null_Controller()");
             // Act,Assert
             Assert.Throws<ArgumentNullException>(() => new DnnUrlHelper(new Mock<RequestContext>().Object, null));
+			Logger.LogDebug("<<< Exiting Constructor_Throws_On_Null_Controller()");
         }
 
         [Test]
         public void Constructor_Throws_On_Invalid_Controller_Property()
         {
+			Logger.LogDebug(">>> Entering Constructor_Throws_On_Invalid_Controller_Property()");
             // Arrange
             var mockController = new Mock<ControllerBase>();
             var viewContext = new ViewContext { Controller = mockController.Object };
+			Logger.LogDebug("Constructor_Throws_On_Invalid_Controller_Property(): mockController → {MockController}", mockController);
 
             // Act,Assert
             Assert.Throws<InvalidOperationException>(() => new DnnUrlHelper(viewContext));
+			Logger.LogDebug("<<< Exiting Constructor_Throws_On_Invalid_Controller_Property()");
         }
 
         [Test]
         public void ViewContext_Constructor_Sets_ModuleContext_Property()
         {
+			Logger.LogDebug(">>> Entering ViewContext_Constructor_Sets_ModuleContext_Property()");
             // Arrange
             var mockController = new Mock<ControllerBase>();
             var mockDnnController = mockController.As<IDnnController>();
+			Logger.LogDebug("ViewContext_Constructor_Sets_ModuleContext_Property(): mockController → {MockController}", mockController);
+			Logger.LogDebug("ViewContext_Constructor_Sets_ModuleContext_Property(): mockDnnController → {MockDnnController}", mockDnnController);
             var expectedContext = new ModuleInstanceContext();
             mockDnnController.Setup(c => c.ModuleContext).Returns(expectedContext);
+			Logger.LogDebug("ViewContext_Constructor_Sets_ModuleContext_Property(): expectedContext → {ExpectedContext}", expectedContext);
             var viewContext = new ViewContext { Controller = mockController.Object };
 
             // Act
             var helper = new DnnUrlHelper(viewContext);
 
+			Logger.LogDebug("ViewContext_Constructor_Sets_ModuleContext_Property(): helper → {Helper}", helper);
             // Assert
             Assert.That(helper.ModuleContext, Is.EqualTo(expectedContext));
+			Logger.LogDebug("<<< Exiting ViewContext_Constructor_Sets_ModuleContext_Property()");
         }
 
         [Test]
         public void RequestContext_Constructor_Sets_ModuleContext_Property()
         {
+			Logger.LogDebug(">>> Entering RequestContext_Constructor_Sets_ModuleContext_Property()");
             // Arrange
             var expectedContext = new ModuleInstanceContext();
 
+			Logger.LogDebug("RequestContext_Constructor_Sets_ModuleContext_Property(): expectedContext → {ExpectedContext}", expectedContext);
             var mockController = new Mock<IDnnController>();
             mockController.SetupGet(c => c.ModuleContext)
                           .Returns(expectedContext);
+						Logger.LogDebug("RequestContext_Constructor_Sets_ModuleContext_Property(): mockController → {MockController}", mockController);
 
             var requestContext = new RequestContext();
 
+			Logger.LogDebug("RequestContext_Constructor_Sets_ModuleContext_Property(): requestContext → {RequestContext}", requestContext);
             // Act
             var helper = new DnnUrlHelper(requestContext, mockController.Object);
 
+			Logger.LogDebug("RequestContext_Constructor_Sets_ModuleContext_Property(): helper → {Helper}", helper);
             // Assert
             Assert.That(helper, Is.Not.Null);
             Assert.That(helper.ModuleContext, Is.EqualTo(expectedContext));
+			Logger.LogDebug("<<< Exiting RequestContext_Constructor_Sets_ModuleContext_Property()");
         }
 
         [Test]
         public void Action_Method_ViewContext_RetrievesRawUrl()
         {
+			Logger.LogDebug(">>> Entering Action_Method_ViewContext_RetrievesRawUrl()");
             // Arrange
             var expectedContext = new ModuleInstanceContext();
             var rawUrl = "http://base.url/";
+			Logger.LogDebug("Action_Method_ViewContext_RetrievesRawUrl(): expectedContext → {ExpectedContext}", expectedContext);
+			Logger.LogDebug("Action_Method_ViewContext_RetrievesRawUrl(): rawUrl → {RawUrl}", rawUrl);
             var helper = ArrangeHelper(expectedContext, rawUrl);
 
+			Logger.LogDebug("Action_Method_ViewContext_RetrievesRawUrl(): helper → {Helper}", helper);
             // Act
             var result = helper.Action();
 
+			Logger.LogDebug("Action_Method_ViewContext_RetrievesRawUrl(): result → {Result}", result);
             // Assert
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(rawUrl));
+			Logger.LogDebug("<<< Exiting Action_Method_ViewContext_RetrievesRawUrl()");
         }
 
         [Test]
         public void Action_Method_RequestContext_RetrievesRawUrl()
         {
+			Logger.LogDebug(">>> Entering Action_Method_RequestContext_RetrievesRawUrl()");
             // Arrange
             var expectedContext = new ModuleInstanceContext();
             var rawUrl = "http://base.url/";
+			Logger.LogDebug("Action_Method_RequestContext_RetrievesRawUrl(): expectedContext → {ExpectedContext}", expectedContext);
+			Logger.LogDebug("Action_Method_RequestContext_RetrievesRawUrl(): rawUrl → {RawUrl}", rawUrl);
             var helper = ArrangeHelper(expectedContext, rawUrl, false);
 
+			Logger.LogDebug("Action_Method_RequestContext_RetrievesRawUrl(): helper → {Helper}", helper);
             // Act
             var result = helper.Action();
 
+			Logger.LogDebug("Action_Method_RequestContext_RetrievesRawUrl(): result → {Result}", result);
             // Assert
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(rawUrl));
+			Logger.LogDebug("<<< Exiting Action_Method_RequestContext_RetrievesRawUrl()");
         }
 
         [Test]
         public void Action_Method_Calls_ModuleRouteProvider()
         {
+			Logger.LogDebug(">>> Entering Action_Method_Calls_ModuleRouteProvider()");
             // Arrange
             var expectedContext = new ModuleInstanceContext();
             var helper = ArrangeHelper(expectedContext);
+			Logger.LogDebug("Action_Method_Calls_ModuleRouteProvider(): expectedContext → {ExpectedContext}", expectedContext);
+			Logger.LogDebug("Action_Method_Calls_ModuleRouteProvider(): helper → {Helper}", helper);
 
             var mockRouteProvider = new Mock<ModuleRoutingProvider>();
             ComponentFactory.RegisterComponentInstance<ModuleRoutingProvider>(mockRouteProvider.Object);
+			Logger.LogDebug("Action_Method_Calls_ModuleRouteProvider(): mockRouteProvider → {MockRouteProvider}", mockRouteProvider);
 
             // Act
             helper.Action("foo");
 
             // Assert
             mockRouteProvider.Verify(p => p.GenerateUrl(It.IsAny<RouteValueDictionary>(), expectedContext));
+			Logger.LogDebug("<<< Exiting Action_Method_Calls_ModuleRouteProvider()");
         }
 
         [Test]
         public void Action_Overload_1__Method_Calls_ModuleRouteProvider()
         {
+			Logger.LogDebug(">>> Entering Action_Overload_1__Method_Calls_ModuleRouteProvider()");
             // Arrange
             var expectedContext = new ModuleInstanceContext();
             var helper = ArrangeHelper(expectedContext);
+			Logger.LogDebug("Action_Overload_1__Method_Calls_ModuleRouteProvider(): expectedContext → {ExpectedContext}", expectedContext);
+			Logger.LogDebug("Action_Overload_1__Method_Calls_ModuleRouteProvider(): helper → {Helper}", helper);
 
             var mockRouteProvider = new Mock<ModuleRoutingProvider>();
             ComponentFactory.RegisterComponentInstance<ModuleRoutingProvider>(mockRouteProvider.Object);
+			Logger.LogDebug("Action_Overload_1__Method_Calls_ModuleRouteProvider(): mockRouteProvider → {MockRouteProvider}", mockRouteProvider);
 
             // Act
             helper.Action("foo", new RouteValueDictionary());
 
             // Assert
             mockRouteProvider.Verify(p => p.GenerateUrl(It.IsAny<RouteValueDictionary>(), expectedContext));
+			Logger.LogDebug("<<< Exiting Action_Overload_1__Method_Calls_ModuleRouteProvider()");
         }
 
         [Test]
         public void Action_Overload_2_Method_Calls_ModuleRouteProvider()
         {
+			Logger.LogDebug(">>> Entering Action_Overload_2_Method_Calls_ModuleRouteProvider()");
             // Arrange
             var expectedContext = new ModuleInstanceContext();
             var helper = ArrangeHelper(expectedContext);
+			Logger.LogDebug("Action_Overload_2_Method_Calls_ModuleRouteProvider(): expectedContext → {ExpectedContext}", expectedContext);
+			Logger.LogDebug("Action_Overload_2_Method_Calls_ModuleRouteProvider(): helper → {Helper}", helper);
 
             var mockRouteProvider = new Mock<ModuleRoutingProvider>();
             ComponentFactory.RegisterComponentInstance<ModuleRoutingProvider>(mockRouteProvider.Object);
+			Logger.LogDebug("Action_Overload_2_Method_Calls_ModuleRouteProvider(): mockRouteProvider → {MockRouteProvider}", mockRouteProvider);
 
             // Act
             helper.Action("foo", "bar");
 
             // Assert
             mockRouteProvider.Verify(p => p.GenerateUrl(It.IsAny<RouteValueDictionary>(), expectedContext));
+			Logger.LogDebug("<<< Exiting Action_Overload_2_Method_Calls_ModuleRouteProvider()");
         }
 
         [Test]
         public void Action_Overload_3_Method_Calls_ModuleRouteProvider()
         {
+			Logger.LogDebug(">>> Entering Action_Overload_3_Method_Calls_ModuleRouteProvider()");
             // Arrange
             var expectedContext = new ModuleInstanceContext();
             var helper = ArrangeHelper(expectedContext);
+			Logger.LogDebug("Action_Overload_3_Method_Calls_ModuleRouteProvider(): expectedContext → {ExpectedContext}", expectedContext);
+			Logger.LogDebug("Action_Overload_3_Method_Calls_ModuleRouteProvider(): helper → {Helper}", helper);
 
             var mockRouteProvider = new Mock<ModuleRoutingProvider>();
             ComponentFactory.RegisterComponentInstance<ModuleRoutingProvider>(mockRouteProvider.Object);
+			Logger.LogDebug("Action_Overload_3_Method_Calls_ModuleRouteProvider(): mockRouteProvider → {MockRouteProvider}", mockRouteProvider);
 
             // Act
             helper.Action("foo", "bar", new RouteValueDictionary());
 
             // Assert
             mockRouteProvider.Verify(p => p.GenerateUrl(It.IsAny<RouteValueDictionary>(), expectedContext));
+			Logger.LogDebug("<<< Exiting Action_Overload_3_Method_Calls_ModuleRouteProvider()");
         }
 
         [Test]
         public void Action_Overload_4_Method_Calls_ModuleRouteProvider()
         {
+			Logger.LogDebug(">>> Entering Action_Overload_4_Method_Calls_ModuleRouteProvider()");
             // Arrange
             var expectedContext = new ModuleInstanceContext();
             var helper = ArrangeHelper(expectedContext);
+			Logger.LogDebug("Action_Overload_4_Method_Calls_ModuleRouteProvider(): expectedContext → {ExpectedContext}", expectedContext);
+			Logger.LogDebug("Action_Overload_4_Method_Calls_ModuleRouteProvider(): helper → {Helper}", helper);
 
             var mockRouteProvider = new Mock<ModuleRoutingProvider>();
             ComponentFactory.RegisterComponentInstance<ModuleRoutingProvider>(mockRouteProvider.Object);
+			Logger.LogDebug("Action_Overload_4_Method_Calls_ModuleRouteProvider(): mockRouteProvider → {MockRouteProvider}", mockRouteProvider);
 
             // Act
             helper.Action("foo", new { id = 5 });
 
             // Assert
             mockRouteProvider.Verify(p => p.GenerateUrl(It.IsAny<RouteValueDictionary>(), expectedContext));
+			Logger.LogDebug("<<< Exiting Action_Overload_4_Method_Calls_ModuleRouteProvider()");
         }
 
         [Test]
         public void Action_Overload_5_Method_Calls_ModuleRouteProvider()
         {
+			Logger.LogDebug(">>> Entering Action_Overload_5_Method_Calls_ModuleRouteProvider()");
             // Arrange
             var expectedContext = new ModuleInstanceContext();
             var helper = ArrangeHelper(expectedContext);
+			Logger.LogDebug("Action_Overload_5_Method_Calls_ModuleRouteProvider(): expectedContext → {ExpectedContext}", expectedContext);
+			Logger.LogDebug("Action_Overload_5_Method_Calls_ModuleRouteProvider(): helper → {Helper}", helper);
 
             var mockRouteProvider = new Mock<ModuleRoutingProvider>();
             ComponentFactory.RegisterComponentInstance<ModuleRoutingProvider>(mockRouteProvider.Object);
+			Logger.LogDebug("Action_Overload_5_Method_Calls_ModuleRouteProvider(): mockRouteProvider → {MockRouteProvider}", mockRouteProvider);
 
             // Act
             helper.Action("foo", "bar", new { id = 5 });
 
             // Assert
             mockRouteProvider.Verify(p => p.GenerateUrl(It.IsAny<RouteValueDictionary>(), expectedContext));
+			Logger.LogDebug("<<< Exiting Action_Overload_5_Method_Calls_ModuleRouteProvider()");
         }
 
         [Test]
         public void Content_Method_Calls_Returns_Correct_Url()
         {
+			Logger.LogDebug(">>> Entering Content_Method_Calls_Returns_Correct_Url()");
             // Arrange
             var context = new ModuleInstanceContext();
             var helper = ArrangeHelper(context, "http://foo.com/foo");
+			Logger.LogDebug("Content_Method_Calls_Returns_Correct_Url(): context → {Context}", context);
+			Logger.LogDebug("Content_Method_Calls_Returns_Correct_Url(): helper → {Helper}", helper);
             string expectedResult = "/foo/test.css";
 
             // Act
             var url = helper.Content("~/test.css");
 
+			Logger.LogDebug("Content_Method_Calls_Returns_Correct_Url(): url → {Url}", url);
             using (Assert.EnterMultipleScope())
             {
                 // Assert
                 Assert.That(url, Is.Not.Null);
                 Assert.That(url, Is.EqualTo(expectedResult));
             }
+			Logger.LogDebug("<<< Exiting Content_Method_Calls_Returns_Correct_Url()");
         }
 
         [Test]
         public void IsLocalUrl_Method_Calls_Returns_Correct_Result()
         {
+			Logger.LogDebug(">>> Entering IsLocalUrl_Method_Calls_Returns_Correct_Result()");
             // Arrange
             var context = new ModuleInstanceContext();
             var helper = ArrangeHelper(context, "http://foo.com");
+			Logger.LogDebug("IsLocalUrl_Method_Calls_Returns_Correct_Result(): context → {Context}", context);
+			Logger.LogDebug("IsLocalUrl_Method_Calls_Returns_Correct_Result(): helper → {Helper}", helper);
 
             // Act
             var withOuterUrl = helper.IsLocalUrl("http://dnnsoftware.com");
             var withLocalUrl = helper.IsLocalUrl("~/foo/foo.html");
+			Logger.LogDebug("IsLocalUrl_Method_Calls_Returns_Correct_Result(): withOuterUrl → {WithOuterUrl}", withOuterUrl);
+			Logger.LogDebug("IsLocalUrl_Method_Calls_Returns_Correct_Result(): withLocalUrl → {WithLocalUrl}", withLocalUrl);
 
             using (Assert.EnterMultipleScope())
             {
@@ -266,19 +342,24 @@ namespace DotNetNuke.Tests.Web.Mvc.Helpers
                 Assert.That(withOuterUrl, Is.False);
                 Assert.That(withLocalUrl, Is.True);
             }
+			Logger.LogDebug("<<< Exiting IsLocalUrl_Method_Calls_Returns_Correct_Result()");
         }
 
         [Test]
         public void GenerateUrl_Method_Passes_Correct_RouteValueCollection_To_ModuleRouteProvider()
         {
+			Logger.LogDebug(">>> Entering GenerateUrl_Method_Passes_Correct_RouteValueCollection_To_ModuleRouteProvider()");
             // Arrange
             var expectedContext = new ModuleInstanceContext();
             var helper = ArrangeHelper(expectedContext);
+			Logger.LogDebug("GenerateUrl_Method_Passes_Correct_RouteValueCollection_To_ModuleRouteProvider(): expectedContext → {ExpectedContext}", expectedContext);
+			Logger.LogDebug("GenerateUrl_Method_Passes_Correct_RouteValueCollection_To_ModuleRouteProvider(): helper → {Helper}", helper);
 
             RouteValueDictionary routeValues = null;
             var mockRouteProvider = new Mock<ModuleRoutingProvider>();
             mockRouteProvider.Setup(p => p.GenerateUrl(It.IsAny<RouteValueDictionary>(), expectedContext))
                                 .Callback<RouteValueDictionary, ModuleInstanceContext>((r, c) => routeValues = r);
+								Logger.LogDebug("GenerateUrl_Method_Passes_Correct_RouteValueCollection_To_ModuleRouteProvider(): mockRouteProvider → {MockRouteProvider}", mockRouteProvider);
 
             ComponentFactory.RegisterComponentInstance<ModuleRoutingProvider>(mockRouteProvider.Object);
 
@@ -296,6 +377,7 @@ namespace DotNetNuke.Tests.Web.Mvc.Helpers
                 Assert.That((string)routeValues["controller"], Is.EqualTo("bar"));
                 Assert.That((int)routeValues["id"], Is.EqualTo(5));
             }
+			Logger.LogDebug("<<< Exiting GenerateUrl_Method_Passes_Correct_RouteValueCollection_To_ModuleRouteProvider()");
         }
 
         private static DnnUrlHelper ArrangeHelper(ModuleInstanceContext expectedContext, string url = null, bool isViewContext = true)

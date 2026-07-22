@@ -10,16 +10,21 @@ namespace DotNetNuke.UI.WebControls
 
     public class PropertyCategoryComparer : IComparer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public int Compare(object x, object y)
         {
+			Logger.LogDebug(">>> Entering Compare(x={X},y={Y})", x, y);
             if (x is PropertyInfo && y is PropertyInfo)
             {
                 var xProp = (PropertyInfo)x;
                 var yProp = (PropertyInfo)y;
+				Logger.LogDebug("Compare(x={X},y={Y}): xProp → {XProp}", x, y, xProp);
+				Logger.LogDebug("Compare(x={X},y={Y}): yProp → {YProp}", x, y, yProp);
                 object[] xCategory = xProp.GetCustomAttributes(typeof(CategoryAttribute), true);
                 string xCategoryName = string.Empty;
                 if (xCategory.Length > 0)
+				Logger.LogDebug("Compare(x={X},y={Y}): xCategoryName → {XCategoryName}", x, y, xCategoryName);
                 {
                     xCategoryName = ((CategoryAttribute)xCategory[0]).Category;
                 }
@@ -31,6 +36,7 @@ namespace DotNetNuke.UI.WebControls
                 object[] yCategory = yProp.GetCustomAttributes(typeof(CategoryAttribute), true);
                 string yCategoryName = string.Empty;
                 if (yCategory.Length > 0)
+				Logger.LogDebug("Compare(x={X},y={Y}): yCategoryName → {YCategoryName}", x, y, yCategoryName);
                 {
                     yCategoryName = ((CategoryAttribute)yCategory[0]).Category;
                 }
@@ -52,6 +58,7 @@ namespace DotNetNuke.UI.WebControls
             {
                 throw new ArgumentException("Object is not of type PropertyInfo");
             }
+			Logger.LogDebug("<<< Exiting Compare(x={X},y={Y})", x, y);
         }
     }
 }

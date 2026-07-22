@@ -9,6 +9,7 @@ namespace DotNetNuke.ExtensionPoints
 
     public class PanelEditPagePanelExtensionControl : WebControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public string PanelId { get; set; }
 
         public string Text { get; set; }
@@ -17,6 +18,7 @@ namespace DotNetNuke.ExtensionPoints
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         protected override void RenderContents(HtmlTextWriter op)
         {
+			Logger.LogDebug(">>> Entering RenderContents(op={Op})", op);
             op.Write(
                 $"""
                  <div class="{this.CssClass}">
@@ -27,6 +29,7 @@ namespace DotNetNuke.ExtensionPoints
                  """);
             base.RenderContents(op);
             op.Write("</fieldset></div>");
+			Logger.LogDebug("<<< Exiting RenderContents(op={Op})", op);
         }
     }
 }

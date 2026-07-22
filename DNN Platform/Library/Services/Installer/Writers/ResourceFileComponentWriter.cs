@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// </summary>
     public class ResourceFileComponentWriter : FileComponentWriter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Initializes a new instance of the <see cref="ResourceFileComponentWriter"/> class.
         /// Constructs the ResourceFileComponentWriter.

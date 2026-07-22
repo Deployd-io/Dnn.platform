@@ -30,6 +30,10 @@ namespace DotNetNuke.Modules.SearchResults
         public ResultsSettings()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering ResultsSettings()");
+		Logger.LogDebug("<<< Exiting ResultsSettings()");
+		Logger.LogDebug(">>> Entering ResultsSettings(portalController={PortalController})", portalController);
+		Logger.LogDebug("<<< Exiting ResultsSettings(portalController={PortalController})", portalController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ResultsSettings"/> class.</summary>
@@ -37,11 +41,13 @@ namespace DotNetNuke.Modules.SearchResults
         public ResultsSettings(IPortalController portalController)
         {
             this.portalController = portalController ?? this.DependencyProvider.GetRequiredService<IPortalController>();
+			Logger.LogDebug("ResultsSettings(portalController={PortalController}): portalController → {PortalController1}", portalController, portalController);
         }
 
         /// <inheritdoc />
         public override void LoadSettings()
         {
+			Logger.LogDebug(">>> Entering LoadSettings()");
             try
             {
                 if (this.Page.IsPostBack == false)
@@ -55,12 +61,15 @@ namespace DotNetNuke.Modules.SearchResults
                     {
                         var list = Convert.ToString(this.Settings["ScopeForPortals"]).Split('|').ToList();
                         var portalList = this.LoadPortalsList().ToList();
+						Logger.LogDebug("LoadSettings(): list → {List}", list);
+						Logger.LogDebug("LoadSettings(): portalList → {PortalList}", portalList);
                         if (portalList.Any())
                         {
                             foreach (var portal in portalList)
                             {
                                 var item = new ListItem(portal[0], portal[1]) { Selected = list.Contains(portal[1]) };
                                 this.comboBoxPortals.Items.Add(item);
+								Logger.LogDebug("LoadSettings(): item → {Item}", item);
                             }
                         }
                         else
@@ -89,6 +98,7 @@ namespace DotNetNuke.Modules.SearchResults
                     {
                         var list = Convert.ToString(this.Settings["ScopeForFilters"]).Split('|').ToList();
                         var filterList = this.LoadSeachContentSourcesList();
+						Logger.LogDebug("LoadSettings(): filterList → {FilterList}", filterList);
                         foreach (var filter in filterList)
                         {
                             var item = new ListItem(filter, filter) { Selected = list.Contains(filter) };
@@ -110,6 +120,7 @@ namespace DotNetNuke.Modules.SearchResults
                         .Split([','], StringSplitOptions.RemoveEmptyEntries);
                     var roles = RoleController.Instance.GetRoles(this.PortalId, r => !r.IsSystemRole || r.RoleName == "Registered Users");
                     roles.Insert(0, new RoleInfo() { RoleName = "Superusers" });
+					Logger.LogDebug("LoadSettings(): roles → {Roles}", roles);
 
                     foreach (var role in roles)
                     {
@@ -130,14 +141,17 @@ namespace DotNetNuke.Modules.SearchResults
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in LoadSettings(): {Arg0}", ex.Message);
                 // Module failed to load
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting LoadSettings()");
         }
 
         /// <inheritdoc />
         public override void UpdateSettings()
         {
+			Logger.LogDebug(">>> Entering UpdateSettings()");
             try
             {
                 if (this.Page.IsValid)
@@ -146,10 +160,12 @@ namespace DotNetNuke.Modules.SearchResults
 
                     var selectedPortals = this.comboBoxPortals.Value.Replace(",", "|");
 
+					Logger.LogDebug("UpdateSettings(): selectedPortals → {SelectedPortals}", selectedPortals);
                     ModuleController.Instance.UpdateModuleSetting(this.ModuleId, "ScopeForPortals", selectedPortals);
 
                     var selectedFilters = this.comboBoxFilters.Value.Replace(",", "|");
 
+					Logger.LogDebug("UpdateSettings(): selectedFilters → {SelectedFilters}", selectedFilters);
                     ModuleController.Instance.UpdateModuleSetting(this.ModuleId, "ScopeForFilters", selectedFilters.ToString());
 
                     var selectedRoles = this.comboBoxRoles.Value;
@@ -165,6 +181,7 @@ namespace DotNetNuke.Modules.SearchResults
 
                     var maxDescriptionLength = this.txtMaxDescriptionLength.Text;
                     if (string.IsNullOrEmpty(maxDescriptionLength) || !Regex.IsMatch(maxDescriptionLength, "^\\d+$"))
+					Logger.LogDebug("UpdateSettings(): maxDescriptionLength → {MaxDescriptionLength}", maxDescriptionLength);
                     {
                         maxDescriptionLength = "100";
                     }
@@ -174,17 +191,21 @@ namespace DotNetNuke.Modules.SearchResults
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in UpdateSettings(): {Arg0}", ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
 
             DataCache.RemoveCache(string.Format("ModuleInfos{0}", this.PortalSettings.PortalId));
+			Logger.LogDebug("<<< Exiting UpdateSettings()");
         }
 
         protected IEnumerable<string[]> LoadPortalsList()
         {
+			Logger.LogDebug(">>> Entering LoadPortalsList()");
             var groups = PortalGroupController.Instance.GetPortalGroups().ToArray();
             var myGroup = (
                 from @group in groups
+				Logger.LogDebug("LoadPortalsList(): groups → {Groups}", groups);
                 select PortalGroupController.Instance.GetPortalsByGroup(@group.PortalGroupId) into portals
                 where portals.Any((IPortalInfo x) => x.PortalId == PortalSettings.Current.PortalId)
                 select portals.ToArray())
@@ -192,27 +213,34 @@ namespace DotNetNuke.Modules.SearchResults
 
             var result = new List<string[]>();
             if (myGroup != null && myGroup.Any())
+			Logger.LogDebug("LoadPortalsList(): result → {Result}", result);
             {
+				private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                 result.AddRange(myGroup.Select(
                     (IPortalInfo pi) => new[] { pi.PortalName, pi.PortalId.ToString(CultureInfo.InvariantCulture) }));
             }
 
+			Logger.LogDebug("<<< Exiting LoadPortalsList()");
             return result;
         }
 
         protected IEnumerable<string> LoadSeachContentSourcesList()
         {
+			Logger.LogDebug(">>> Entering LoadSeachContentSourcesList()");
             var portals = PortalController.Instance.GetPortals();
 
+			Logger.LogDebug("LoadSeachContentSourcesList(): portals → {Portals}", portals);
             var result = new List<string>();
             foreach (var portal in portals)
             {
+			Logger.LogDebug("LoadSeachContentSourcesList(): result → {Result}", result);
                 var pi = portal as IPortalInfo;
                 if (pi != null)
                 {
                     var list = InternalSearchController.Instance.GetSearchContentSourceList(pi.PortalId);
                     foreach (var src in list)
                     {
+					Logger.LogDebug("LoadSeachContentSourcesList(): list → {List}", list);
                         if (!src.IsPrivate && !result.Contains(src.LocalizedName))
                         {
                             result.Add(src.LocalizedName);
@@ -221,26 +249,31 @@ namespace DotNetNuke.Modules.SearchResults
                 }
             }
 
+			Logger.LogDebug("<<< Exiting LoadSeachContentSourcesList()");
             return result;
         }
 
         private bool GetBooleanSetting(string settingName, bool defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetBooleanSetting(settingName={SettingName},defaultValue={DefaultValue})", settingName, defaultValue);
             if (!string.IsNullOrEmpty(Convert.ToString(this.Settings[settingName])))
             {
                 return Convert.ToBoolean(this.Settings[settingName]);
             }
 
+			Logger.LogDebug("<<< Exiting GetBooleanSetting(settingName={SettingName},defaultValue={DefaultValue})", settingName, defaultValue);
             return defaultValue;
         }
 
         private string GetStringSetting(string settingName, string defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetStringSetting(settingName={SettingName},defaultValue={DefaultValue})", settingName, defaultValue);
             if (!string.IsNullOrEmpty(Convert.ToString(this.Settings[settingName])))
             {
                 return Convert.ToString(this.Settings[settingName]);
             }
 
+			Logger.LogDebug("<<< Exiting GetStringSetting(settingName={SettingName},defaultValue={DefaultValue})", settingName, defaultValue);
             return defaultValue;
         }
     }

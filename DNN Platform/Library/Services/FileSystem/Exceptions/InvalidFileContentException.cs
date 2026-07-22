@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.FileSystem
     [Serializable]
     public class InvalidFileContentException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="InvalidFileContentException"/> class.</summary>
         public InvalidFileContentException()
         {
+		Logger.LogDebug(">>> Entering InvalidFileContentException()");
+		Logger.LogDebug("<<< Exiting InvalidFileContentException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="InvalidFileContentException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Services.FileSystem
         public InvalidFileContentException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering InvalidFileContentException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting InvalidFileContentException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="InvalidFileContentException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

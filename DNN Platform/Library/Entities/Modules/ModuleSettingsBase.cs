@@ -10,6 +10,7 @@ namespace DotNetNuke.Entities.Modules
     /// <summary>Base class for module settings.</summary>
     public class ModuleSettingsBase : PortalModuleBase, ISettingsControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Gets the module settings.</summary>
         public Hashtable ModuleSettings
         {
@@ -31,11 +32,15 @@ namespace DotNetNuke.Entities.Modules
         /// <inheritdoc />
         public virtual void LoadSettings()
         {
+		Logger.LogDebug(">>> Entering LoadSettings()");
+		Logger.LogDebug("<<< Exiting LoadSettings()");
         }
 
         /// <inheritdoc />
         public virtual void UpdateSettings()
         {
+		Logger.LogDebug(">>> Entering UpdateSettings()");
+		Logger.LogDebug("<<< Exiting UpdateSettings()");
         }
     }
 }

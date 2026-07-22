@@ -28,6 +28,7 @@ namespace DotNetNuke.Services.GeneratedImage
 
     internal class ImageHandlerInternal
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static TimeSpan defaultClientCacheExpiration = new TimeSpan(0, 10, 0);
 
         private readonly IEventLogger eventLogger;
@@ -39,12 +40,19 @@ namespace DotNetNuke.Services.GeneratedImage
         /// <param name="eventLogger">The event logger.</param>
         public ImageHandlerInternal(IEventLogger eventLogger)
         {
+			Logger.LogDebug(">>> Entering ImageHandlerInternal(eventLogger={EventLogger})", eventLogger);
             this.eventLogger = eventLogger;
 
+			Logger.LogDebug("ImageHandlerInternal(eventLogger={EventLogger}): this.eventLogger → {Arg1}", eventLogger, this.eventLogger);
+			Logger.LogDebug("ImageHandlerInternal(eventLogger={EventLogger}): eventLogger → {EventLogger1}", eventLogger, eventLogger);
             this.ContentType = ImageFormat.Jpeg;
+			Logger.LogDebug("ImageHandlerInternal(eventLogger={EventLogger}): this.ContentType → {Arg1}", eventLogger, this.ContentType);
             this.ImageCompression = 95;
             this.ImageTransforms = new List<ImageTransform>();
+			Logger.LogDebug("ImageHandlerInternal(eventLogger={EventLogger}): this.ImageCompression → {Arg1}", eventLogger, this.ImageCompression);
             this.AllowStandalone = false;
+			Logger.LogDebug("<<< Exiting ImageHandlerInternal(eventLogger={EventLogger})", eventLogger);
+			Logger.LogDebug("ImageHandlerInternal(eventLogger={EventLogger}): this.AllowStandalone → {Arg1}", eventLogger, this.AllowStandalone);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ImageHandlerInternal"/> class.</summary>
@@ -56,6 +64,10 @@ namespace DotNetNuke.Services.GeneratedImage
         {
             this.imageStore = imageStore;
             this.now = now;
+			Logger.LogDebug("ImageHandlerInternal(eventLogger={EventLogger},imageStore={ImageStore},now={Now}): this.imageStore → {Arg3}", eventLogger, imageStore, now, this.imageStore);
+			Logger.LogDebug("ImageHandlerInternal(eventLogger={EventLogger},imageStore={ImageStore},now={Now}): now → {Now1}", eventLogger, imageStore, now, now);
+			Logger.LogDebug("ImageHandlerInternal(eventLogger={EventLogger},imageStore={ImageStore},now={Now}): this.now → {Arg3}", eventLogger, imageStore, now, this.now);
+			Logger.LogDebug("ImageHandlerInternal(eventLogger={EventLogger},imageStore={ImageStore},now={Now}): imageStore → {ImageStore1}", eventLogger, imageStore, now, imageStore);
         }
 
         public TimeSpan ClientCacheExpiration
@@ -353,12 +365,15 @@ namespace DotNetNuke.Services.GeneratedImage
 
                 context.Response.End();
             }
+			Logger.LogDebug("<<< Exiting HandleImageRequest(context={Context},Func<NameValueCollection={Arg1},imageGenCallback={ImageGenCallback},uniqueIdStringSeed={UniqueIdStringSeed})", context, Func<NameValueCollection, imageGenCallback, uniqueIdStringSeed);
         }
 
         internal static string GetImageMimeType(ImageFormat format)
         {
+			Logger.LogDebug(">>> Entering GetImageMimeType(format={Format})", format);
             string mimeType = "image/x-unknown";
 
+			Logger.LogDebug("GetImageMimeType(format={Format}): mimeType → {MimeType}", format, mimeType);
             if (format.Equals(ImageFormat.Gif))
             {
                 mimeType = "image/gif";
@@ -384,6 +399,7 @@ namespace DotNetNuke.Services.GeneratedImage
                 mimeType = "image/x-icon";
             }
 
+			Logger.LogDebug("<<< Exiting GetImageMimeType(format={Format})", format);
             return mimeType;
         }
 
@@ -412,23 +428,31 @@ namespace DotNetNuke.Services.GeneratedImage
 
         private static bool IsPicVisibleToCurrentUser(int profileUserId)
         {
+			Logger.LogDebug(">>> Entering IsPicVisibleToCurrentUser(profileUserId={ProfileUserId})", profileUserId);
             var settings = PortalController.Instance.GetCurrentSettings();
             var profileUser = UserController.Instance.GetUser(settings.PortalId, profileUserId);
+			Logger.LogDebug("IsPicVisibleToCurrentUser(profileUserId={ProfileUserId}): settings → {Settings}", profileUserId, settings);
+			Logger.LogDebug("IsPicVisibleToCurrentUser(profileUserId={ProfileUserId}): profileUser → {ProfileUser}", profileUserId, profileUser);
 
             var photoProperty = profileUser?.Profile.GetProperty("Photo");
             if (photoProperty == null)
+			Logger.LogDebug("IsPicVisibleToCurrentUser(profileUserId={ProfileUserId}): photoProperty → {PhotoProperty}", profileUserId, photoProperty);
             {
                 return false;
             }
 
             var currentUser = UserController.Instance.GetCurrentUserInfo();
+			Logger.LogDebug("IsPicVisibleToCurrentUser(profileUserId={ProfileUserId}): currentUser → {CurrentUser}", profileUserId, currentUser);
+			Logger.LogDebug("<<< Exiting IsPicVisibleToCurrentUser(profileUserId={ProfileUserId})", profileUserId);
             return ProfilePropertyAccess.CheckAccessLevel(settings, photoProperty, currentUser, profileUser);
         }
 
         private string GetUniqueIDString(HttpContextBase context, string uniqueIdStringSeed)
         {
+			Logger.LogDebug(">>> Entering GetUniqueIDString(context={Context},uniqueIdStringSeed={UniqueIdStringSeed})", context, uniqueIdStringSeed);
             var builder = new StringBuilder();
             builder.Append(uniqueIdStringSeed);
+			Logger.LogDebug("GetUniqueIDString(context={Context},uniqueIdStringSeed={UniqueIdStringSeed}): builder → {Builder}", context, uniqueIdStringSeed, builder);
             foreach (var key in context.Request.QueryString.AllKeys.OrderBy(k => k))
             {
                 builder.Append(key);
@@ -440,11 +464,13 @@ namespace DotNetNuke.Services.GeneratedImage
                 builder.Append(tran.UniqueString);
             }
 
+			Logger.LogDebug("<<< Exiting GetUniqueIDString(context={Context},uniqueIdStringSeed={UniqueIdStringSeed})", context, uniqueIdStringSeed);
             return GetIDFromBytes(Encoding.ASCII.GetBytes(builder.ToString()));
         }
 
         private Image GetImageThroughTransforms(Image image)
         {
+			Logger.LogDebug(">>> Entering GetImageThroughTransforms(image={Image})", image);
             try
             {
                 Image temp = image;
@@ -454,6 +480,7 @@ namespace DotNetNuke.Services.GeneratedImage
                     temp = tran.ProcessImage(temp);
                 }
 
+				Logger.LogDebug("<<< Exiting GetImageThroughTransforms(image={Image})", image);
                 return temp;
             }
             finally
@@ -497,6 +524,7 @@ namespace DotNetNuke.Services.GeneratedImage
 
         private void RenderImage(Image image, Stream outStream)
         {
+			Logger.LogDebug(">>> Entering RenderImage(image={Image},outStream={OutStream})", image, outStream);
             try
             {
                 if (this.ContentType == ImageFormat.Gif)
@@ -504,6 +532,7 @@ namespace DotNetNuke.Services.GeneratedImage
                     var quantizer = new OctreeQuantizer(255, 8);
                     using (var quantized = quantizer.Quantize(image))
                     {
+					Logger.LogDebug("RenderImage(image={Image},outStream={OutStream}): quantizer → {Quantizer}", image, outStream, quantizer);
                         quantized.Save(outStream, ImageFormat.Gif);
                     }
                 }
@@ -515,12 +544,14 @@ namespace DotNetNuke.Services.GeneratedImage
                     };
                     var ici = GetEncoderInfo(GetImageMimeType(this.ContentType));
                     image?.Save(outStream, ici, eps);
+					Logger.LogDebug("RenderImage(image={Image},outStream={OutStream}): ici → {Ici}", image, outStream, ici);
                 }
             }
             finally
             {
                 image?.Dispose();
             }
+			Logger.LogDebug("<<< Exiting RenderImage(image={Image},outStream={OutStream})", image, outStream);
         }
     }
 }

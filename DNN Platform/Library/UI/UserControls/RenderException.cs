@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class RenderException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public RenderException()
     {
+	Logger.LogDebug(">>> Entering RenderException()");
+	Logger.LogDebug("<<< Exiting RenderException()");
     }
 
     /// <inheritdoc />
     public RenderException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering RenderException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting RenderException(message={Message})", message);
 
     /// <inheritdoc />
     public RenderException(string message, Exception innerException)

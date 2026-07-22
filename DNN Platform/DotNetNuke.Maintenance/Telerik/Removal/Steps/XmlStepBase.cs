@@ -41,9 +41,12 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         /// <inheritdoc />
         protected override void ExecuteInternal()
         {
+			Logger.LogDebug(">>> Entering ExecuteInternal()");
             var doc = new XmlDocument { PreserveWhitespace = true };
             var root = this.applicationStatusInfo.ApplicationMapPath + @"\";
             var fullPath = Path.GetFullPath(Path.Combine(root, this.RelativeFilePath));
+			Logger.LogWarning("ExecuteInternal(): root → {Root}", root);
+			Logger.LogDebug("ExecuteInternal(): fullPath → {FullPath}", fullPath);
             using (var xmlReader = XmlReader.Create(fullPath, new XmlReaderSettings { XmlResolver = null, }))
             {
                 doc.Load(xmlReader);
@@ -56,13 +59,17 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
 
             if (this.Success.HasValue && this.Success.Value)
             {
+				private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                 doc.Save(fullPath);
             }
+			Logger.LogDebug("<<< Exiting ExecuteInternal()");
         }
 
         /// <summary>Provides an opportunity for derived classes to configure the namespace manager.</summary>
         protected virtual void ConfigureNamespaceManager()
         {
+		Logger.LogDebug(">>> Entering ConfigureNamespaceManager()");
+		Logger.LogDebug("<<< Exiting ConfigureNamespaceManager()");
         }
 
         /// <summary>Performs the actual processing of the XML document.</summary>

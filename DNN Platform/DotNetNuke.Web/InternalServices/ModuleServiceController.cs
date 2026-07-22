@@ -35,6 +35,10 @@ namespace DotNetNuke.Web.InternalServices
         public ModuleServiceController()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering ModuleServiceController()");
+		Logger.LogDebug("<<< Exiting ModuleServiceController()");
+		Logger.LogDebug(">>> Entering ModuleServiceController(hostSettings={HostSettings},dataProvider={DataProvider})", hostSettings, dataProvider);
+		Logger.LogDebug("<<< Exiting ModuleServiceController(hostSettings={HostSettings},dataProvider={DataProvider})", hostSettings, dataProvider);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleServiceController"/> class.</summary>
@@ -44,6 +48,8 @@ namespace DotNetNuke.Web.InternalServices
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.dataProvider = dataProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<DataProvider>();
+			Logger.LogDebug("ModuleServiceController(hostSettings={HostSettings},dataProvider={DataProvider}): dataProvider → {DataProvider1}", hostSettings, dataProvider, dataProvider);
+			Logger.LogDebug("ModuleServiceController(hostSettings={HostSettings},dataProvider={DataProvider}): hostSettings → {HostSettings1}", hostSettings, dataProvider, hostSettings);
         }
 
         /// <summary>Gets a value determining whether a module is shareable.</summary>
@@ -55,11 +61,15 @@ namespace DotNetNuke.Web.InternalServices
         [DnnAuthorize(StaticRoles = "Registered Users")]
         public HttpResponseMessage GetModuleShareable(int moduleId, int tabId, int portalId = -1)
         {
+			Logger.LogDebug(">>> Entering GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId})", moduleId, tabId, portalId);
             var requiresWarning = false;
             if (portalId <= -1)
+			Logger.LogDebug("GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId}): requiresWarning → {RequiresWarning}", moduleId, tabId, portalId, requiresWarning);
+			Logger.LogDebug("GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId}): portalId → {PortalId1}", moduleId, tabId, portalId, portalId);
             {
                 var portalDict = PortalController.GetPortalDictionary(this.hostSettings, this.dataProvider);
                 portalId = portalDict[tabId];
+				Logger.LogDebug("GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId}): portalDict → {PortalDict}", moduleId, tabId, portalId, portalDict);
             }
             else
             {
@@ -70,11 +80,13 @@ namespace DotNetNuke.Web.InternalServices
             if (tabId < 0)
             {
                 desktopModule = DesktopModuleController.GetDesktopModule(this.hostSettings, moduleId, portalId);
+				Logger.LogDebug("GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId}): desktopModule → {DesktopModule}", moduleId, tabId, portalId, desktopModule);
             }
             else
             {
                 var moduleInfo = ModuleController.Instance.GetModule(moduleId, tabId, false);
 
+				Logger.LogDebug("GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId}): moduleInfo → {ModuleInfo}", moduleId, tabId, portalId, moduleInfo);
                 desktopModule = moduleInfo.DesktopModule;
 
                 requiresWarning = moduleInfo.PortalID != this.PortalSettings.PortalId && desktopModule.Shareable == ModuleSharing.Unknown;
@@ -84,9 +96,11 @@ namespace DotNetNuke.Web.InternalServices
             {
                 var message = $"Cannot find module ID {moduleId} (tab ID {tabId}, portal ID {portalId})";
                 Logger.Error(message);
+				Logger.LogDebug("GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId}): message → {Message}", moduleId, tabId, portalId, message);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, message);
             }
 
+			Logger.LogDebug("<<< Exiting GetModuleShareable(moduleId={ModuleId},tabId={TabId},portalId={PortalId})", moduleId, tabId, portalId);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Shareable = desktopModule.Shareable.ToString(), RequiresWarning = requiresWarning });
         }
 
@@ -98,6 +112,7 @@ namespace DotNetNuke.Web.InternalServices
         [DnnPageEditor]
         public HttpResponseMessage MoveModule(MoveModuleDTO postData)
         {
+			Logger.LogDebug(">>> Entering MoveModule(postData={PostData})", postData);
             var moduleOrder = postData.ModuleOrder;
             if (moduleOrder > 0)
             {
@@ -106,6 +121,7 @@ namespace DotNetNuke.Web.InternalServices
                 var deletedModules = ModuleController.Instance.GetTabModules(postData.TabId).Values.Where(m => m.IsDeleted);
                 foreach (var module in deletedModules)
                 {
+				Logger.LogDebug("MoveModule(postData={PostData}): deletedModules → {DeletedModules}", postData, deletedModules);
                     if (module.ModuleOrder < moduleOrder && module.PaneName == postData.Pane)
                     {
                         moduleOrder += 2;
@@ -116,6 +132,7 @@ namespace DotNetNuke.Web.InternalServices
             ModuleController.Instance.UpdateModuleOrder(postData.TabId, postData.ModuleId, moduleOrder, postData.Pane);
             ModuleController.Instance.UpdateTabModuleOrder(postData.TabId);
 
+			Logger.LogDebug("<<< Exiting MoveModule(postData={PostData})", postData);
             return this.Request.CreateResponse(HttpStatusCode.OK);
         }
 
@@ -128,13 +145,17 @@ namespace DotNetNuke.Web.InternalServices
         [DnnAuthorize(StaticRoles = "Administrators")]
         public HttpResponseMessage DeleteModule(DeleteModuleDto deleteModuleDto)
         {
+			Logger.LogDebug(">>> Entering DeleteModule(deleteModuleDto={DeleteModuleDto})", deleteModuleDto);
             ModuleController.Instance.DeleteTabModule(deleteModuleDto.TabId, deleteModuleDto.ModuleId, deleteModuleDto.SoftDelete);
 
+			Logger.LogDebug("<<< Exiting DeleteModule(deleteModuleDto={DeleteModuleDto})", deleteModuleDto);
             return this.Request.CreateResponse(HttpStatusCode.OK);
         }
 
         private int FixPortalId(int portalId)
         {
+			Logger.LogDebug(">>> Entering FixPortalId(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting FixPortalId(portalId={PortalId})", portalId);
             return this.UserInfo.IsSuperUser &&
                    this.PortalSettings.PortalId != portalId &&
                    PortalController.Instance.GetPortals().OfType<IPortalInfo>().Any(x => x.PortalId == portalId)
