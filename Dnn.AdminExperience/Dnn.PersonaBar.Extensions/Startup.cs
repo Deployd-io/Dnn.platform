@@ -15,9 +15,11 @@ using Microsoft.Extensions.DependencyInjection;
 /// <summary>Registers services for the Persona Bar Extensions.</summary>
 public class Startup : IDnnStartup
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public void ConfigureServices(IServiceCollection services)
     {
+	Logger.LogDebug(">>> Entering ConfigureServices(services={Services})", services);
 #pragma warning disable CS0618
         services.AddTransient<ICommandRepository, CommandRepository>();
 #pragma warning restore CS0618
@@ -28,5 +30,6 @@ public class Startup : IDnnStartup
         services.AddTransient<IThemesController, ThemesController>();
         services.AddTransient<IDefaultPortalThemeController, DefaultPortalThemeController>();
         services.AddTransient<ConfigConsoleController>();
+		Logger.LogDebug("<<< Exiting ConfigureServices(services={Services})", services);
     }
 }

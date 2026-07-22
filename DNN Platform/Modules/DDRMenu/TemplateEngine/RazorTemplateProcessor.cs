@@ -24,9 +24,13 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
     /// <param name="hostSettings">The host settings.</param>
     public class RazorTemplateProcessor(IHostSettings hostSettings) : ITemplateProcessor
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+		Logger.LogDebug(">>> Entering RazorTemplateProcessor(hostSettings={HostSettings})", hostSettings);
+		Logger.LogDebug("RazorTemplateProcessor(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
 
         /// <summary>Initializes a new instance of the <see cref="RazorTemplateProcessor"/> class.</summary>
+		Logger.LogDebug("<<< Exiting RazorTemplateProcessor(hostSettings={HostSettings})", hostSettings);
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public RazorTemplateProcessor()
             : this(null)
@@ -36,6 +40,7 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
         /// <inheritdoc />
         public bool LoadDefinition(TemplateDefinition baseDefinition)
         {
+			Logger.LogDebug(">>> Entering LoadDefinition(baseDefinition={BaseDefinition})", baseDefinition);
             var virtualPath = baseDefinition.TemplateVirtualPath;
 
             if (!virtualPath.EndsWith(".cshtml", StringComparison.InvariantCultureIgnoreCase) &&
@@ -44,16 +49,21 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
                 return false;
             }
 
+			Logger.LogDebug("<<< Exiting LoadDefinition(baseDefinition={BaseDefinition})", baseDefinition);
             return true;
         }
 
         /// <inheritdoc />
         public void Render(object source, HtmlTextWriter htmlWriter, TemplateDefinition liveDefinition)
         {
+			Logger.LogDebug(">>> Entering Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition})", source, htmlWriter, liveDefinition);
             if (!string.IsNullOrEmpty(liveDefinition.TemplateVirtualPath))
             {
                 var resolver = new PathResolver(this.hostSettings, liveDefinition.Folder);
                 dynamic model = new ExpandoObject();
+				Logger.LogDebug("Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition}): resolver → {Resolver}", source, htmlWriter, liveDefinition, resolver);
+				Logger.LogDebug("Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition}): model.Source → {Arg3}", source, htmlWriter, liveDefinition, model.Source);
+				Logger.LogDebug("Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition}): model.ControlID → {Arg3}", source, htmlWriter, liveDefinition, model.ControlID);
                 model.Source = source;
                 model.ControlID = DNNContext.Current.HostControl.ClientID;
                 model.Options = ConvertToJson(liveDefinition.ClientOptions);
@@ -65,12 +75,15 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
                 liveDefinition.TemplateArguments.ForEach(a => modelDictionary.Add(a.Name, a.Value));
                 htmlWriter.Write(this.RenderTemplate(liveDefinition.TemplateVirtualPath, model));
             }
+			Logger.LogDebug("<<< Exiting Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition})", source, htmlWriter, liveDefinition);
         }
 
         protected static string ConvertToJson(List<ClientOption> options)
         {
+			Logger.LogDebug(">>> Entering ConvertToJson(options={Options})", options);
             var result = new StringBuilder();
             result.Append("{");
+			Logger.LogDebug("ConvertToJson(options={Options}): result → {Result}", options, result);
 
             if (options != null)
             {
@@ -102,6 +115,7 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
             }
 
             result.Append("}");
+			Logger.LogDebug("<<< Exiting ConvertToJson(options={Options})", options);
             return result.ToString();
         }
 

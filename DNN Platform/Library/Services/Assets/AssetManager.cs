@@ -23,6 +23,7 @@ namespace DotNetNuke.Services.Assets
 
     public class AssetManager : ComponentBase<IAssetManager, AssetManager>, IAssetManager
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string UserHasNoPermissionToBrowseFolderDefaultMessage = "The user has no permission to browse this folder";
         private const string FileNameInvalidDefaultMessage = "The specified name ({0}) is not valid";
         private const string FolderFileNameIsReservedDefaultMessage = "The name is reserved. Try a different name";
@@ -38,12 +39,16 @@ namespace DotNetNuke.Services.Assets
 
         public static IOrderedQueryable<T> ApplyOrder<T>(IQueryable<T> source, string propertyName, bool asc)
         {
+			Logger.LogDebug(">>> Entering ApplyOrder(source={Source},propertyName={PropertyName},asc={Asc})", source, propertyName, asc);
             var methodName = asc ? "OrderBy" : "OrderByDescending";
             var arg = Expression.Parameter(typeof(T), "x");
+			Logger.LogDebug("ApplyOrder(source={Source},propertyName={PropertyName},asc={Asc}): methodName → {MethodName}", source, propertyName, asc, methodName);
+			Logger.LogDebug("ApplyOrder(source={Source},propertyName={PropertyName},asc={Asc}): arg → {Arg}", source, propertyName, asc, arg);
 
             // Use reflection to mirror LINQ
             var property = typeof(T).GetProperty(propertyName);
 
+			Logger.LogDebug("ApplyOrder(source={Source},propertyName={PropertyName},asc={Asc}): property → {Property}", source, propertyName, asc, property);
             // If property is undefined returns the original source
             if (property == null)
             {
@@ -52,8 +57,11 @@ namespace DotNetNuke.Services.Assets
 
             Expression expr = Expression.Property(arg, property);
 
+			Logger.LogDebug("ApplyOrder(source={Source},propertyName={PropertyName},asc={Asc}): expr → {Expr}", source, propertyName, asc, expr);
             var delegateType = typeof(Func<,>).MakeGenericType(typeof(T), property.PropertyType);
             var lambda = Expression.Lambda(delegateType, expr, arg);
+			Logger.LogDebug("ApplyOrder(source={Source},propertyName={PropertyName},asc={Asc}): delegateType → {DelegateType}", source, propertyName, asc, delegateType);
+			Logger.LogDebug("ApplyOrder(source={Source},propertyName={PropertyName},asc={Asc}): lambda → {Lambda}", source, propertyName, asc, lambda);
 
             var result = typeof(Queryable).GetMethods().Single(
                     method => method.Name == methodName
@@ -80,8 +88,10 @@ namespace DotNetNuke.Services.Assets
         /// <inheritdoc />
         public ContentPage GetFolderContent(int folderId, int startIndex, int numItems, string sortExpression = null, SubfolderFilter subfolderFilter = SubfolderFilter.IncludeSubfoldersFolderStructure)
         {
+			Logger.LogDebug(">>> Entering GetFolderContent(folderId={FolderId},startIndex={StartIndex},numItems={NumItems},sortExpression={SortExpression},subfolderFilter={SubfolderFilter})", folderId, startIndex, numItems, sortExpression, subfolderFilter);
             var folder = GetFolderInfo(folderId);
 
+			Logger.LogDebug("GetFolderContent(folderId={FolderId},startIndex={StartIndex},numItems={NumItems},sortExpression={SortExpression},subfolderFilter={SubfolderFilter}): folder → {Folder}", folderId, startIndex, numItems, sortExpression, subfolderFilter, folder);
             if (!FolderPermissionController.CanBrowseFolder((FolderInfo)folder))
             {
                 throw new AssetManagerException(Localization.GetExceptionMessage("UserHasNoPermissionToBrowseFolder", UserHasNoPermissionToBrowseFolderDefaultMessage));
@@ -89,11 +99,13 @@ namespace DotNetNuke.Services.Assets
 
             var sortProperties = SortProperties.Parse(sortExpression);
 
+			Logger.LogDebug("GetFolderContent(folderId={FolderId},startIndex={StartIndex},numItems={NumItems},sortExpression={SortExpression},subfolderFilter={SubfolderFilter}): sortProperties → {SortProperties}", folderId, startIndex, numItems, sortExpression, subfolderFilter, sortProperties);
             List<IFolderInfo> folders;
 
             if (subfolderFilter != SubfolderFilter.IncludeSubfoldersFolderStructure)
             {
                 folders = new List<IFolderInfo>();
+				Logger.LogDebug("GetFolderContent(folderId={FolderId},startIndex={StartIndex},numItems={NumItems},sortExpression={SortExpression},subfolderFilter={SubfolderFilter}): folders → {Folders}", folderId, startIndex, numItems, sortExpression, subfolderFilter, folders);
             }
             else
             {
@@ -103,10 +115,12 @@ namespace DotNetNuke.Services.Assets
             var recursive = subfolderFilter == SubfolderFilter.IncludeSubfoldersFilesOnly;
             var files = GetFiles(folder, sortProperties, startIndex, recursive).ToList();
 
+			Logger.LogDebug("GetFolderContent(folderId={FolderId},startIndex={StartIndex},numItems={NumItems},sortExpression={SortExpression},subfolderFilter={SubfolderFilter}): files → {Files}", folderId, startIndex, numItems, sortExpression, subfolderFilter, files);
             IEnumerable<object> content;
             if (startIndex + numItems <= folders.Count)
             {
                 content = folders.Skip(startIndex).Take(numItems);
+				Logger.LogDebug("GetFolderContent(folderId={FolderId},startIndex={StartIndex},numItems={NumItems},sortExpression={SortExpression},subfolderFilter={SubfolderFilter}): content → {Content}", folderId, startIndex, numItems, sortExpression, subfolderFilter, content);
             }
             else if (startIndex >= folders.Count)
             {
@@ -116,9 +130,11 @@ namespace DotNetNuke.Services.Assets
             {
                 var numFiles = numItems - (folders.Count - startIndex);
                 content = folders.Skip(startIndex);
+				Logger.LogDebug("GetFolderContent(folderId={FolderId},startIndex={StartIndex},numItems={NumItems},sortExpression={SortExpression},subfolderFilter={SubfolderFilter}): numFiles → {NumFiles}", folderId, startIndex, numItems, sortExpression, subfolderFilter, numFiles);
                 content = content.Union(files.Take(numFiles));
             }
 
+			Logger.LogDebug("<<< Exiting GetFolderContent(folderId={FolderId},startIndex={StartIndex},numItems={NumItems},sortExpression={SortExpression},subfolderFilter={SubfolderFilter})", folderId, startIndex, numItems, sortExpression, subfolderFilter);
             return new ContentPage
             {
                 Folder = folder,
@@ -130,15 +146,22 @@ namespace DotNetNuke.Services.Assets
         /// <inheritdoc />
         public ContentPage SearchFolderContent(int folderId, string pattern, int startIndex, int numItems, string sortExpression = null, SubfolderFilter subfolderFilter = SubfolderFilter.IncludeSubfoldersFolderStructure)
         {
+			Logger.LogDebug(">>> Entering SearchFolderContent(folderId={FolderId},pattern={Pattern},startIndex={StartIndex},numItems={NumItems},sortExpression={SortExpression},subfolderFilter={SubfolderFilter})", folderId, pattern, startIndex, numItems, sortExpression, subfolderFilter);
             var recursive = subfolderFilter != SubfolderFilter.ExcludeSubfolders;
             var folder = GetFolderInfo(folderId);
 
+			Logger.LogDebug("SearchFolderContent(folderId={FolderId},pattern={Pattern},startIndex={StartIndex},numItems={NumItems},sortExpression={SortExpression},subfolderFilter={SubfolderFilter}): folder → {Folder}", folderId, pattern, startIndex, numItems, sortExpression, subfolderFilter, folder);
             var files = FolderManager.Instance.SearchFiles(folder, pattern, recursive);
             var sortProperties = SortProperties.Parse(sortExpression);
+			Logger.LogDebug("SearchFolderContent(folderId={FolderId},pattern={Pattern},startIndex={StartIndex},numItems={NumItems},sortExpression={SortExpression},subfolderFilter={SubfolderFilter}): files → {Files}", folderId, pattern, startIndex, numItems, sortExpression, subfolderFilter, files);
+			Logger.LogDebug("SearchFolderContent(folderId={FolderId},pattern={Pattern},startIndex={StartIndex},numItems={NumItems},sortExpression={SortExpression},subfolderFilter={SubfolderFilter}): sortProperties → {SortProperties}", folderId, pattern, startIndex, numItems, sortExpression, subfolderFilter, sortProperties);
             var sortedFiles = SortFiles(files, sortProperties).ToList();
 
+			Logger.LogDebug("SearchFolderContent(folderId={FolderId},pattern={Pattern},startIndex={StartIndex},numItems={NumItems},sortExpression={SortExpression},subfolderFilter={SubfolderFilter}): sortedFiles → {SortedFiles}", folderId, pattern, startIndex, numItems, sortExpression, subfolderFilter, sortedFiles);
             IEnumerable<object> content = sortedFiles.Skip(startIndex).Take(numItems);
 
+			Logger.LogDebug("SearchFolderContent(folderId={FolderId},pattern={Pattern},startIndex={StartIndex},numItems={NumItems},sortExpression={SortExpression},subfolderFilter={SubfolderFilter}): content → {Content}", folderId, pattern, startIndex, numItems, sortExpression, subfolderFilter, content);
+			Logger.LogDebug("<<< Exiting SearchFolderContent(folderId={FolderId},pattern={Pattern},startIndex={StartIndex},numItems={NumItems},sortExpression={SortExpression},subfolderFilter={SubfolderFilter})", folderId, pattern, startIndex, numItems, sortExpression, subfolderFilter);
             return new ContentPage
             {
                 Folder = folder,
@@ -163,10 +186,12 @@ namespace DotNetNuke.Services.Assets
         /// <inheritdoc />
         public IFileInfo RenameFile(int fileId, string newFileName)
         {
+			Logger.LogDebug(">>> Entering RenameFile(fileId={FileId},newFileName={NewFileName})", fileId, newFileName);
             Requires.NotNullOrEmpty("newFileName", newFileName);
 
             var filteredName = CleanDotsAtTheEndOfTheName(newFileName);
 
+			Logger.LogDebug("RenameFile(fileId={FileId},newFileName={NewFileName}): filteredName → {FilteredName}", fileId, newFileName, filteredName);
             if (string.IsNullOrEmpty(filteredName))
             {
                 throw new AssetManagerException(Localization.GetExceptionMessage("FileNameInvalid", FileNameInvalidDefaultMessage, newFileName));
@@ -186,6 +211,7 @@ namespace DotNetNuke.Services.Assets
 
             var file = FileManager.Instance.GetFile(fileId, true);
 
+			Logger.LogDebug("RenameFile(fileId={FileId},newFileName={NewFileName}): file → {File}", fileId, newFileName, file);
             // Check if the name has not changed
             if (file.FileName == newFileName)
             {
@@ -195,20 +221,24 @@ namespace DotNetNuke.Services.Assets
             // Check if user has appropiate permissions
             var folder = FolderManager.Instance.GetFolder(file.FolderId);
             if (!HasPermission(folder, "MANAGE"))
+			Logger.LogDebug("RenameFile(fileId={FileId},newFileName={NewFileName}): folder → {Folder}", fileId, newFileName, folder);
             {
                 throw new AssetManagerException(Localization.GetExceptionMessage("UserHasNoPermissionToEditFile", UserHasNoPermissionToEditFileDefaultMessage));
             }
 
+			Logger.LogDebug("<<< Exiting RenameFile(fileId={FileId},newFileName={NewFileName})", fileId, newFileName);
             return FileManager.Instance.RenameFile(file, newFileName);
         }
 
         /// <inheritdoc />
         public IFolderInfo RenameFolder(int folderId, string newFolderName)
         {
+			Logger.LogDebug(">>> Entering RenameFolder(folderId={FolderId},newFolderName={NewFolderName})", folderId, newFolderName);
             Requires.NotNullOrEmpty("newFolderName", newFolderName);
 
             newFolderName = CleanDotsAtTheEndOfTheName(newFolderName);
 
+			Logger.LogDebug("RenameFolder(folderId={FolderId},newFolderName={NewFolderName}): newFolderName → {NewFolderName1}", folderId, newFolderName, newFolderName);
             // Check if the new name has invalid chars
             if (IsInvalidName(newFolderName))
             {
@@ -223,6 +253,7 @@ namespace DotNetNuke.Services.Assets
 
             var folder = GetFolderInfo(folderId);
 
+			Logger.LogDebug("RenameFolder(folderId={FolderId},newFolderName={NewFolderName}): folder → {Folder}", folderId, newFolderName, folder);
             // Check if user has appropiate permissions
             if (!HasPermission(folder, "MANAGE"))
             {
@@ -243,6 +274,7 @@ namespace DotNetNuke.Services.Assets
 
             var newFolderPath = GetNewFolderPath(newFolderName, folder);
 
+			Logger.LogDebug("RenameFolder(folderId={FolderId},newFolderName={NewFolderName}): newFolderPath → {NewFolderPath}", folderId, newFolderName, newFolderPath);
             // Check if the new folder already exists
             if (FolderManager.Instance.FolderExists(folder.PortalID, newFolderPath))
             {
@@ -250,16 +282,19 @@ namespace DotNetNuke.Services.Assets
             }
 
             FolderManager.Instance.RenameFolder(folder, newFolderName);
+			Logger.LogDebug("<<< Exiting RenameFolder(folderId={FolderId},newFolderName={NewFolderName})", folderId, newFolderName);
             return folder;
         }
 
         /// <inheritdoc />
         public IFolderInfo CreateFolder(string folderName, int folderParentId, int folderMappingId, string mappedPath)
         {
+			Logger.LogDebug(">>> Entering CreateFolder(folderName={FolderName},folderParentId={FolderParentId},folderMappingId={FolderMappingId},mappedPath={MappedPath})", folderName, folderParentId, folderMappingId, mappedPath);
             Requires.NotNullOrEmpty("folderName", folderName);
 
             var filterFolderName = CleanDotsAtTheEndOfTheName(folderName);
 
+			Logger.LogDebug("CreateFolder(folderName={FolderName},folderParentId={FolderParentId},folderMappingId={FolderMappingId},mappedPath={MappedPath}): filterFolderName → {FilterFolderName}", folderName, folderParentId, folderMappingId, mappedPath, filterFolderName);
             if (IsInvalidName(filterFolderName))
             {
                 throw new AssetManagerException(GetInvalidCharsErrorText());
@@ -273,6 +308,7 @@ namespace DotNetNuke.Services.Assets
 
             var parentFolder = GetFolderInfo(folderParentId);
 
+			Logger.LogDebug("CreateFolder(folderName={FolderName},folderParentId={FolderParentId},folderMappingId={FolderMappingId},mappedPath={MappedPath}): parentFolder → {ParentFolder}", folderName, folderParentId, folderMappingId, mappedPath, parentFolder);
             if (!HasPermission(parentFolder, "ADD"))
             {
                 throw new AssetManagerException(Localization.GetExceptionMessage("UserHasNoPermissionToAdd", UserHasNoPermissionToAddDefaultMessage));
@@ -284,6 +320,7 @@ namespace DotNetNuke.Services.Assets
 
             mappedPath = PathUtils.Instance.FormatFolderPath(mappedPath);
 
+			Logger.LogDebug("CreateFolder(folderName={FolderName},folderParentId={FolderParentId},folderMappingId={FolderMappingId},mappedPath={MappedPath}): mappedPath → {MappedPath1}", folderName, folderParentId, folderMappingId, mappedPath, mappedPath);
             if (!MappedPathRegex.IsMatch(mappedPath))
             {
                 throw new AssetManagerException(Localization.GetExceptionMessage("InvalidMappedPath", InvalidMappedPathDefaultMessage));
@@ -292,6 +329,8 @@ namespace DotNetNuke.Services.Assets
             try
             {
                 var folderMapping = FolderMappingController.Instance.GetFolderMapping(parentFolder.PortalID, folderMappingId);
+				Logger.LogDebug("CreateFolder(folderName={FolderName},folderParentId={FolderParentId},folderMappingId={FolderMappingId},mappedPath={MappedPath}): folderMapping → {FolderMapping}", folderName, folderParentId, folderMappingId, mappedPath, folderMapping);
+				Logger.LogDebug("<<< Exiting CreateFolder(folderName={FolderName},folderParentId={FolderParentId},folderMappingId={FolderMappingId},mappedPath={MappedPath})", folderName, folderParentId, folderMappingId, mappedPath);
                 return FolderManager.Instance.AddFolder(folderMapping, folderPath, mappedPath.Replace(@"\", "/"));
             }
             catch (FolderAlreadyExistsException)
@@ -331,20 +370,24 @@ namespace DotNetNuke.Services.Assets
         /// <inheritdoc />
         public bool DeleteFile(int fileId)
         {
+			Logger.LogDebug(">>> Entering DeleteFile(fileId={FileId})", fileId);
             var fileInfo = FileManager.Instance.GetFile(fileId, true);
             if (fileInfo == null)
+			Logger.LogDebug("DeleteFile(fileId={FileId}): fileInfo → {FileInfo}", fileId, fileInfo);
             {
                 return false;
             }
 
             var folder = FolderManager.Instance.GetFolder(fileInfo.FolderId);
 
+			Logger.LogDebug("DeleteFile(fileId={FileId}): folder → {Folder}", fileId, folder);
             if (!HasPermission(folder, "DELETE"))
             {
                 return false;
             }
 
             FileManager.Instance.DeleteFile(fileInfo);
+			Logger.LogDebug("<<< Exiting DeleteFile(fileId={FileId})", fileId);
             return true;
         }
 
@@ -379,6 +422,8 @@ namespace DotNetNuke.Services.Assets
 
         private static string CleanDotsAtTheEndOfTheName(string name)
         {
+			Logger.LogDebug(">>> Entering CleanDotsAtTheEndOfTheName(name={Name})", name);
+			Logger.LogDebug("<<< Exiting CleanDotsAtTheEndOfTheName(name={Name})", name);
             return name.Trim().TrimEnd('.', ' ');
         }
 
@@ -407,19 +452,25 @@ namespace DotNetNuke.Services.Assets
             {
                 nonDeletedItems.Add(nonDeletedSubfolder);
             }
+			Logger.LogDebug("<<< Exiting DeleteFolder(folderId={FolderId},onlyUnlink={OnlyUnlink},nonDeletedSubfolders={NonDeletedSubfolders})", folderId, onlyUnlink, nonDeletedSubfolders);
         }
 
         private static bool IsInvalidName(string itemName)
         {
+			Logger.LogDebug(">>> Entering IsInvalidName(itemName={ItemName})", itemName);
             var invalidFilenameChars = RegexUtils.GetCachedRegex("[" + Regex.Escape(GetInvalidChars()) + "]");
 
+			Logger.LogDebug("IsInvalidName(itemName={ItemName}): invalidFilenameChars → {InvalidFilenameChars}", itemName, invalidFilenameChars);
+			Logger.LogDebug("<<< Exiting IsInvalidName(itemName={ItemName})", itemName);
             return invalidFilenameChars.IsMatch(itemName);
         }
 
         private static string GetInvalidChars()
         {
+			Logger.LogDebug(">>> Entering GetInvalidChars()");
             var invalidChars = new string(Path.GetInvalidFileNameChars());
 
+			Logger.LogDebug("GetInvalidChars(): invalidChars → {InvalidChars}", invalidChars);
             foreach (var ch in Path.GetInvalidPathChars())
             {
                 if (invalidChars.IndexOf(ch) == -1)
@@ -429,49 +480,62 @@ namespace DotNetNuke.Services.Assets
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetInvalidChars()");
             return invalidChars;
         }
 
         private static bool IsReservedName(string name)
         {
+			Logger.LogDebug(">>> Entering IsReservedName(name={Name})", name);
             var reservedNames = new[] { "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9", "CLOCK$" };
+			Logger.LogDebug("IsReservedName(name={Name}): reservedNames → {ReservedNames}", name, reservedNames);
+			Logger.LogDebug("<<< Exiting IsReservedName(name={Name})", name);
             return reservedNames.Contains(Path.GetFileNameWithoutExtension(name.ToUpperInvariant()));
         }
 
         private static string GetInvalidCharsErrorText()
         {
+			Logger.LogDebug(">>> Entering GetInvalidCharsErrorText()");
             throw new AssetManagerException(
                 Localization.GetExceptionMessage(
                     "FolderFileNameHasInvalidcharacters",
                     FolderFileNameHasInvalidcharactersDefaultMessage,
                     "\\:/*?\"<>|"));
+				Logger.LogDebug("<<< Exiting GetInvalidCharsErrorText()");
         }
 
         private static IFolderInfo GetFolderInfo(int folderId)
         {
+			Logger.LogDebug(">>> Entering GetFolderInfo(folderId={FolderId})", folderId);
             var folder = FolderManager.Instance.GetFolder(folderId);
             if (folder == null)
+			Logger.LogDebug("GetFolderInfo(folderId={FolderId}): folder → {Folder}", folderId, folder);
             {
                 throw new AssetManagerException(Localization.GetExceptionMessage("FolderDoesNotExists", DefaultMessageDefaultMessage));
             }
 
+			Logger.LogDebug("<<< Exiting GetFolderInfo(folderId={FolderId})", folderId);
             return folder;
         }
 
         private static string ReplaceFolderName(string path, string folderName, string newFolderName)
         {
+			Logger.LogDebug(">>> Entering ReplaceFolderName(path={Path},folderName={FolderName},newFolderName={NewFolderName})", path, folderName, newFolderName);
             var newPath = PathUtils.Instance.RemoveTrailingSlash(path);
             if (string.IsNullOrEmpty(newPath))
+			Logger.LogDebug("ReplaceFolderName(path={Path},folderName={FolderName},newFolderName={NewFolderName}): newPath → {NewPath}", path, folderName, newFolderName, newPath);
             {
                 return path;
             }
 
             var nameIndex = newPath.LastIndexOf(folderName, StringComparison.Ordinal);
             if (nameIndex == -1)
+			Logger.LogDebug("ReplaceFolderName(path={Path},folderName={FolderName},newFolderName={NewFolderName}): nameIndex → {NameIndex}", path, folderName, newFolderName, nameIndex);
             {
                 return path;
             }
 
+			Logger.LogDebug("<<< Exiting ReplaceFolderName(path={Path},folderName={FolderName},newFolderName={NewFolderName})", path, folderName, newFolderName);
             return newPath.Substring(0, nameIndex) + newPath.Substring(nameIndex).Replace(folderName, newFolderName);
         }
 

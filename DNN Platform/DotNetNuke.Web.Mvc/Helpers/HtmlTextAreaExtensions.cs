@@ -12,18 +12,22 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
     public static class HtmlTextAreaExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const int TextAreaRows = 2;
         private const int TextAreaColumns = 20;
 
         public static MvcHtmlString TextArea(this DnnHtmlHelper html, string name)
         {
+			Logger.LogDebug(">>> Entering TextArea(html={Html},name={Name})", html, name);
             var htmlHelper = html.HtmlHelper;
+			Logger.LogDebug("<<< Exiting TextArea(html={Html},name={Name})", html, name);
             return htmlHelper.TextArea(name);
         }
 
         public static MvcHtmlString TextArea(this DnnHtmlHelper html, string name, object htmlAttributes)
         {
             var htmlHelper = html.HtmlHelper;
+			Logger.LogDebug("<<< Exiting TextArea(html={Html},name={Name},htmlAttributes={HtmlAttributes})", html, name, htmlAttributes);
             return htmlHelper.TextArea(name, htmlAttributes);
         }
 
@@ -36,12 +40,14 @@ namespace DotNetNuke.Web.Mvc.Helpers
         public static MvcHtmlString TextArea(this DnnHtmlHelper html, string name, string value)
         {
             var htmlHelper = html.HtmlHelper;
+			Logger.LogDebug("<<< Exiting TextArea(html={Html},name={Name},value={Value})", html, name, value);
             return htmlHelper.TextArea(name, value);
         }
 
         public static MvcHtmlString TextArea(this DnnHtmlHelper html, string name, string value, object htmlAttributes)
         {
             var htmlHelper = html.HtmlHelper;
+			Logger.LogDebug("<<< Exiting TextArea(html={Html},name={Name},value={Value},htmlAttributes={HtmlAttributes})", html, name, value, htmlAttributes);
             return htmlHelper.TextArea(name, value, htmlAttributes);
         }
 
@@ -54,6 +60,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         public static MvcHtmlString TextArea(this DnnHtmlHelper html, string name, string value, int rows, int columns, object htmlAttributes)
         {
             var htmlHelper = html.HtmlHelper;
+			Logger.LogDebug("<<< Exiting TextArea(html={Html},name={Name},value={Value},rows={Rows},columns={Columns},htmlAttributes={HtmlAttributes})", html, name, value, rows, columns, htmlAttributes);
             return htmlHelper.TextArea(name, value, rows, columns, htmlAttributes);
         }
 

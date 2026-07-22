@@ -18,6 +18,7 @@ namespace Dnn.ContactList.Spa.Services
     [DnnModuleAuthorize(AccessLevel = SecurityAccessLevel.View)]
     public class SettingsController : DnnApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly ISettingsService _setttingsService;
 
         /// <summary>
@@ -25,7 +26,10 @@ namespace Dnn.ContactList.Spa.Services
         /// </summary>
         public SettingsController()
         {
+			Logger.LogDebug(">>> Entering SettingsController()");
             _setttingsService = SettingsService.Instance;
+			Logger.LogDebug("<<< Exiting SettingsController()");
+			Logger.LogDebug("SettingsController(): _setttingsService → {_setttingsService}", _setttingsService);
         }
 
         /// <summary>
@@ -35,13 +39,16 @@ namespace Dnn.ContactList.Spa.Services
         [HttpPost]
         public HttpResponseMessage SaveSettings(SettingsViewModel settings)
         {
+			Logger.LogDebug(">>> Entering SaveSettings(settings={Settings})", settings);
             _setttingsService.SaveFormEnabled(settings.IsFormEnabled, ActiveModule.ModuleID);
 
             var response = new
             {
                 success = true
+				Logger.LogDebug("SaveSettings(settings={Settings}): success → {Success}", settings, success);
             };
 
+			Logger.LogDebug("<<< Exiting SaveSettings(settings={Settings})", settings);
             return Request.CreateResponse(response);
         }
     }

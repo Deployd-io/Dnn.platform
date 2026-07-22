@@ -21,12 +21,15 @@ namespace DotNetNuke.Web.Api.Auth
     [DnnDeprecated(10, 2, 2, "Use JWT or API token authentication")]
     public partial class DigestAuthMessageHandler : AuthMessageHandlerBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="DigestAuthMessageHandler"/> class.</summary>
         /// <param name="includeByDefault">Should this handler be included by default on all routes.</param>
         /// <param name="forceSsl">Should this handler enforce SSL usage.</param>
         public DigestAuthMessageHandler(bool includeByDefault, bool forceSsl)
             : base(includeByDefault, forceSsl)
         {
+		Logger.LogDebug(">>> Entering DigestAuthMessageHandler(includeByDefault={IncludeByDefault},forceSsl={ForceSsl})", includeByDefault, forceSsl);
+		Logger.LogDebug("<<< Exiting DigestAuthMessageHandler(includeByDefault={IncludeByDefault},forceSsl={ForceSsl})", includeByDefault, forceSsl);
         }
 
         /// <inheritdoc />
@@ -35,51 +38,64 @@ namespace DotNetNuke.Web.Api.Auth
         /// <inheritdoc />
         public override HttpResponseMessage OnInboundRequest(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+			Logger.LogDebug(">>> Entering OnInboundRequest(request={Request},cancellationToken={CancellationToken})", request, cancellationToken);
             if (this.NeedsAuthentication(request))
             {
                 var portalSettings = PortalController.Instance.GetCurrentSettings();
                 if (portalSettings != null)
+				Logger.LogDebug("OnInboundRequest(request={Request},cancellationToken={CancellationToken}): portalSettings → {PortalSettings}", request, cancellationToken, portalSettings);
                 {
                     var isStale = TryToAuthenticate(request, portalSettings.PortalId);
 
+					Logger.LogDebug("OnInboundRequest(request={Request},cancellationToken={CancellationToken}): isStale → {IsStale}", request, cancellationToken, isStale);
                     if (isStale)
                     {
                         var staleResponse = request.CreateResponse(HttpStatusCode.Unauthorized);
                         this.AddStaleWwwAuthenticateHeader(staleResponse);
+						Logger.LogDebug("OnInboundRequest(request={Request},cancellationToken={CancellationToken}): staleResponse → {StaleResponse}", request, cancellationToken, staleResponse);
 
                         return staleResponse;
                     }
                 }
             }
 
+			Logger.LogDebug("<<< Exiting OnInboundRequest(request={Request},cancellationToken={CancellationToken})", request, cancellationToken);
             return base.OnInboundRequest(request, cancellationToken);
         }
 
         /// <inheritdoc />
         public override HttpResponseMessage OnOutboundResponse(HttpResponseMessage response, CancellationToken cancellationToken)
         {
+			Logger.LogDebug(">>> Entering OnOutboundResponse(response={Response},cancellationToken={CancellationToken})", response, cancellationToken);
             if (response.StatusCode == HttpStatusCode.Unauthorized && SupportsDigestAuth(response.RequestMessage))
             {
                 this.AddWwwAuthenticateHeader(response);
+				Logger.LogDebug(">>> Entering SupportsDigestAuth(request={Request})", request);
+				Logger.LogDebug("<<< Exiting SupportsDigestAuth(request={Request})", request);
             }
 
+			Logger.LogDebug("<<< Exiting OnOutboundResponse(response={Response},cancellationToken={CancellationToken})", response, cancellationToken);
             return base.OnOutboundResponse(response, cancellationToken);
         }
 
         private static string CreateNewNonce()
         {
+			Logger.LogDebug(">>> Entering CreateNewNonce()");
             DateTime nonceTime = DateTime.Now + TimeSpan.FromMinutes(1);
             string expireStr = nonceTime.ToString("G", CultureInfo.InvariantCulture);
+			Logger.LogDebug("CreateNewNonce(): nonceTime → {NonceTime}", nonceTime);
 
             byte[] expireBytes = Encoding.Default.GetBytes(expireStr);
             string nonce = Convert.ToBase64String(expireBytes);
 
             nonce = nonce.TrimEnd('=');
+			Logger.LogDebug("<<< Exiting CreateNewNonce()");
             return nonce;
         }
 
         private static bool TryToAuthenticate(HttpRequestMessage request, int portalId)
         {
+			Logger.LogDebug(">>> Entering TryToAuthenticate(request={Request},portalId={PortalId})", request, portalId);
             if (request?.Headers.Authorization == null)
             {
                 return false;
@@ -89,6 +105,7 @@ namespace DotNetNuke.Web.Api.Auth
 
             var digestAuthentication = new DigestAuthentication(new DigestAuthenticationRequest(authHeader, request.Method.Method), portalId, request.GetIPAddress());
 
+			Logger.LogDebug("TryToAuthenticate(request={Request},portalId={PortalId}): digestAuthentication → {DigestAuthentication}", request, portalId, digestAuthentication);
             if (digestAuthentication.IsValid)
             {
                 SetCurrentPrincipal(digestAuthentication.User, request);
@@ -98,23 +115,31 @@ namespace DotNetNuke.Web.Api.Auth
                 return true;
             }
 
+			Logger.LogDebug("<<< Exiting TryToAuthenticate(request={Request},portalId={PortalId})", request, portalId);
             return false;
         }
 
         private static bool SupportsDigestAuth(HttpRequestMessage request)
         {
+			Logger.LogDebug(">>> Entering SupportsDigestAuth(request={Request})", request);
+			Logger.LogDebug("<<< Exiting SupportsDigestAuth(request={Request})", request);
             return !IsXmlHttpRequest(request) && MembershipProviderConfig.PasswordRetrievalEnabled;
         }
 
         private void AddStaleWwwAuthenticateHeader(HttpResponseMessage response)
         {
+			Logger.LogDebug(">>> Entering AddStaleWwwAuthenticateHeader(response={Response})", response);
             this.AddWwwAuthenticateHeader(response, true);
+			Logger.LogDebug("<<< Exiting AddStaleWwwAuthenticateHeader(response={Response})", response);
         }
 
         private void AddWwwAuthenticateHeader(HttpResponseMessage response, bool isStale = false)
         {
+			Logger.LogDebug(">>> Entering AddWwwAuthenticateHeader(response={Response},isStale={IsStale})", response, isStale);
             var value = $"realm=\"DNNAPI\", nonce=\"{CreateNewNonce()}\",  opaque=\"0000000000000000\", stale={isStale}, algorithm=MD5, qop=\"auth\"";
             response.Headers.WwwAuthenticate.Add(new AuthenticationHeaderValue(this.AuthScheme, value));
+			Logger.LogDebug("<<< Exiting AddWwwAuthenticateHeader(response={Response},isStale={IsStale})", response, isStale);
+			Logger.LogDebug("AddWwwAuthenticateHeader(response={Response},isStale={IsStale}): value → {Value}", response, isStale, value);
         }
     }
 }

@@ -29,6 +29,7 @@ namespace Dnn.PersonaBar.Extensions.Components
 
     public class ExtensionsController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string OwnerUpdateService = "DotNetNuke Update Service";
         private readonly IHostSettings hostSettings;
         private readonly IHostSettingsService hostSettingsService;
@@ -42,7 +43,9 @@ namespace Dnn.PersonaBar.Extensions.Components
         public ExtensionsController()
             : this(null, null, null, null, null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering ExtensionsController()");
         }
+		Logger.LogDebug("<<< Exiting ExtensionsController()");
 
         /// <summary>Initializes a new instance of the <see cref="ExtensionsController"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
@@ -89,13 +92,16 @@ namespace Dnn.PersonaBar.Extensions.Components
 
         public bool HasAvailablePackage(string packageType, out string rootPath)
         {
+			Logger.LogDebug(">>> Entering HasAvailablePackage(packageType={PackageType})", packageType);
             var type = packageType;
             switch (packageType.ToLowerInvariant())
+			Logger.LogDebug("HasAvailablePackage(packageType={PackageType}): type → {Type}", packageType, type);
             {
                 case "authsystem":
                 case "auth_system":
                     type = nameof(PackageTypes.AuthSystem);
                     rootPath = this.appStatus.ApplicationMapPath + "\\Install\\AuthSystem";
+					Logger.LogDebug("HasAvailablePackage(packageType={PackageType}): rootPath → {RootPath}", packageType, rootPath);
                     break;
                 case "javascriptlibrary":
                 case "javascript_library":
@@ -128,13 +134,16 @@ namespace Dnn.PersonaBar.Extensions.Components
                 return true;
             }
 
+			Logger.LogDebug("<<< Exiting HasAvailablePackage(packageType={PackageType})", packageType);
             return false;
         }
 
         public IList<PackageInfoSlimDto> GetInstalledPackages(int portalId, string packageType)
         {
+			Logger.LogDebug(">>> Entering GetInstalledPackages(portalId={PortalId},packageType={PackageType})", portalId, packageType);
             var typePackages = new List<PackageInfo>();
             switch (packageType.ToLowerInvariant())
+			Logger.LogDebug("GetInstalledPackages(portalId={PortalId},packageType={PackageType}): typePackages → {TypePackages}", portalId, packageType, typePackages);
             {
                 case "module":
                     if (portalId == Null.NullInteger)
@@ -157,6 +166,7 @@ namespace Dnn.PersonaBar.Extensions.Components
                     break;
             }
 
+			Logger.LogDebug("<<< Exiting GetInstalledPackages(portalId={PortalId},packageType={PackageType})", portalId, packageType);
             return typePackages
                 .Select(p => new PackageInfoSlimDto(this.hostSettings, this.hostSettingsService, this.portalController, portalId, p))
                 .ToList();
@@ -164,11 +174,15 @@ namespace Dnn.PersonaBar.Extensions.Components
 
         public List<AvailablePackagesDto> GetAvailablePackages(string packageType)
         {
+			Logger.LogDebug(">>> Entering GetAvailablePackages(packageType={PackageType})", packageType);
             var packages = new List<AvailablePackagesDto>();
             if (this.HasAvailablePackage(packageType, out var packagePath))
+			Logger.LogDebug("GetAvailablePackages(packageType={PackageType}): packages → {Packages}", packageType, packages);
             {
                 var validPackages = new Dictionary<string, PackageInfo>();
                 var invalidPackages = new List<string>();
+				Logger.LogDebug("GetAvailablePackages(packageType={PackageType}): validPackages → {ValidPackages}", packageType, validPackages);
+				Logger.LogDebug("GetAvailablePackages(packageType={PackageType}): invalidPackages → {InvalidPackages}", packageType, invalidPackages);
 
                 foreach (string file in Directory.GetFiles(packagePath))
                 {
@@ -191,24 +205,30 @@ namespace Dnn.PersonaBar.Extensions.Components
                 });
             }
 
+			Logger.LogDebug("<<< Exiting GetAvailablePackages(packageType={PackageType})", packageType);
             return packages;
         }
 
         public List<TabInfo> GetPackageUsage(int portalId, int packageId)
         {
+			Logger.LogDebug(">>> Entering GetPackageUsage(portalId={PortalId},packageId={PackageId})", portalId, packageId);
             var tabs = BuildData(this.tabController, portalId, packageId);
             if (tabs != null && tabs.Count > 0)
+			Logger.LogDebug("GetPackageUsage(portalId={PortalId},packageId={PackageId}): tabs → {Tabs}", portalId, packageId, tabs);
             {
                 return tabs.Values.ToList();
             }
 
+			Logger.LogDebug("<<< Exiting GetPackageUsage(portalId={PortalId},packageId={PackageId})", portalId, packageId);
             return null;
         }
 
         public string GetFormattedTabLink(int portalId, TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering GetFormattedTabLink(portalId={PortalId},tab={Tab})", portalId, tab);
             var returnValue = new StringBuilder();
 
+			Logger.LogDebug("GetFormattedTabLink(portalId={PortalId},tab={Tab}): returnValue → {ReturnValue}", portalId, tab, returnValue);
             int index = 0;
             this.tabController.PopulateBreadCrumbs(ref tab);
             foreach (TabInfo t in tab.BreadCrumbs)
@@ -232,16 +252,19 @@ namespace Dnn.PersonaBar.Extensions.Components
                                                             .First();
                     var url = this.NavigationManager.NavigateURL(t.TabID, new PortalSettings(t.PortalID, alias), string.Empty);
                     returnValue.AppendFormat(CultureInfo.InvariantCulture, "<a href=\"{0}\">{1}</a>", url, t.LocalizedTabName);
+					Logger.LogDebug("GetFormattedTabLink(portalId={PortalId},tab={Tab}): url → {Url}", portalId, tab, url);
                 }
 
                 index = index + 1;
             }
 
+			Logger.LogDebug("<<< Exiting GetFormattedTabLink(portalId={PortalId},tab={Tab})", portalId, tab);
             return returnValue.ToString();
         }
 
         internal static string IsPackageInUse(PackageInfo packageInfo, int portalId)
         {
+			Logger.LogDebug(">>> Entering IsPackageInUse(packageInfo={PackageInfo},portalId={PortalId})", packageInfo, portalId);
             if (packageInfo.PackageID == Null.NullInteger)
             {
                 return string.Empty;
@@ -259,6 +282,7 @@ namespace Dnn.PersonaBar.Extensions.Components
                 }
             }
 
+			Logger.LogDebug("<<< Exiting IsPackageInUse(packageInfo={PackageInfo},portalId={PortalId})", packageInfo, portalId);
             return string.Empty;
         }
 
@@ -359,6 +383,7 @@ namespace Dnn.PersonaBar.Extensions.Components
 
         private static bool IconExists(string imagePath)
         {
+			Logger.LogDebug(">>> Entering IconExists(imagePath={ImagePath})", imagePath);
             if (string.IsNullOrWhiteSpace(imagePath) || HttpContext.Current == null)
             {
                 return false;
@@ -371,6 +396,8 @@ namespace Dnn.PersonaBar.Extensions.Components
             }
             catch (HttpException)
             {
+				Logger.LogError("Exception in IconExists(imagePath={ImagePath}): {Arg1}", imagePath, ex.Message);
+				Logger.LogDebug("<<< Exiting IconExists(imagePath={ImagePath})", imagePath);
                 return false;
             }
         }

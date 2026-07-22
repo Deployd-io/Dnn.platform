@@ -39,6 +39,7 @@ namespace Dnn.EditBar.UI.HttpModules
         public EditBarModule()
             : this(null)
         {
+		eventLogger.LogDebug(">>> Entering EditBarModule()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="EditBarModule"/> class.</summary>
@@ -46,13 +47,17 @@ namespace Dnn.EditBar.UI.HttpModules
         public EditBarModule(IHostSettings hostSettings)
         {
             if (hostSettings is not null)
+			eventLogger.LogDebug("<<< Exiting EditBarModule()");
             {
                 this.hostSettings = hostSettings;
+				eventLogger.LogDebug("EditBarModule(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
+				eventLogger.LogDebug("EditBarModule(hostSettings={HostSettings}): this.hostSettings → {Arg1}", hostSettings, this.hostSettings);
             }
             else
             {
                 var scope = HttpContextSource.Current?.GetScope();
                 if (scope is not null)
+				eventLogger.LogDebug("EditBarModule(hostSettings={HostSettings}): scope → {Scope}", hostSettings, scope);
                 {
                     this.hostSettings = scope.ServiceProvider.GetRequiredService<IHostSettings>();
                 }
@@ -72,6 +77,7 @@ namespace Dnn.EditBar.UI.HttpModules
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void Init(HttpApplication application)
         {
+			eventLogger.LogDebug(">>> Entering Init(application={Application})", application);
             if (hasAppStarted)
             {
                 return;
@@ -86,21 +92,28 @@ namespace Dnn.EditBar.UI.HttpModules
 
                 this.ApplicationStart();
                 hasAppStarted = true;
+				eventLogger.LogDebug("Init(application={Application}): hasAppStarted → {HasAppStarted}", application, hasAppStarted);
             }
+			eventLogger.LogDebug("<<< Exiting Init(application={Application})", application);
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+		eventLogger.LogDebug(">>> Entering Dispose()");
+		eventLogger.LogDebug("<<< Exiting Dispose()");
         }
 
         private void ApplicationStart()
         {
+			eventLogger.LogDebug(">>> Entering ApplicationStart()");
             DotNetNukeContext.Current.SkinEventListeners.Add(new SkinEventListener(SkinEventType.OnSkinInit, this.OnSkinInit));
+			eventLogger.LogDebug("<<< Exiting ApplicationStart()");
         }
 
         private void OnSkinInit(object sender, SkinEventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnSkinInit(sender={Sender},e={E})", sender, e);
             if (this.hostSettings.DisableEditBar)
             {
                 return;
@@ -109,6 +122,7 @@ namespace Dnn.EditBar.UI.HttpModules
             var request = e.Skin.Page.Request;
             var isSpecialPageMode = request.QueryString["dnnprintmode"] == "true" || request.QueryString["popUp"] == "true";
             if (isSpecialPageMode || Globals.IsAdminControl())
+			eventLogger.LogDebug("OnSkinInit(sender={Sender},e={E}): isSpecialPageMode → {IsSpecialPageMode}", sender, e, isSpecialPageMode);
             {
                 return;
             }
@@ -119,16 +133,25 @@ namespace Dnn.EditBar.UI.HttpModules
                 {
                     var scope = HttpContextSource.Current.GetScope();
                     var clientResourceController = scope.ServiceProvider.GetRequiredService<IClientResourceController>();
+					eventLogger.LogDebug("OnSkinInit(sender={Sender},e={E}): scope → {Scope}", sender, e, scope);
+					eventLogger.LogDebug("OnSkinInit(sender={Sender},e={E}): clientResourceController → {ClientResourceController}", sender, e, clientResourceController);
                     var appStatus = scope.ServiceProvider.GetRequiredService<IApplicationStatusInfo>();
                     var eventLogger = scope.ServiceProvider.GetRequiredService<IEventLogger>();
+					eventLogger.LogDebug("OnSkinInit(sender={Sender},e={E}): appStatus → {AppStatus}", sender, e, appStatus);
+					eventLogger.LogDebug("OnSkinInit(sender={Sender},e={E}): eventLogger → {EventLogger}", sender, e, eventLogger);
                     var portalController = scope.ServiceProvider.GetRequiredService<IPortalController>();
                     var userController = scope.ServiceProvider.GetRequiredService<IUserController>();
+					eventLogger.LogDebug("OnSkinInit(sender={Sender},e={E}): portalController → {PortalController}", sender, e, portalController);
+					eventLogger.LogDebug("OnSkinInit(sender={Sender},e={E}): userController → {UserController}", sender, e, userController);
                     var hostSettingsService = scope.ServiceProvider.GetRequiredService<IHostSettingsService>();
                     var servicesFramework = scope.ServiceProvider.GetRequiredService<IServicesFramework>();
+					eventLogger.LogDebug("OnSkinInit(sender={Sender},e={E}): hostSettingsService → {HostSettingsService}", sender, e, hostSettingsService);
+					eventLogger.LogDebug("OnSkinInit(sender={Sender},e={E}): servicesFramework → {ServicesFramework}", sender, e, servicesFramework);
 
                     e.Skin.Page.Form.Controls.Add(new ContentEditorManager(clientResourceController, appStatus, eventLogger, portalController, this.hostSettings, userController, hostSettingsService, servicesFramework) { Skin = e.Skin, });
                 }
             }
+			eventLogger.LogDebug("<<< Exiting OnSkinInit(sender={Sender},e={E})", sender, e);
         }
     }
 }

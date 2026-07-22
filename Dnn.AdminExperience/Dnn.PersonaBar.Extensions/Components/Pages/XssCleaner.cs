@@ -9,8 +9,10 @@ namespace Dnn.PersonaBar.Pages.Components
 
     public static class XssCleaner
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static void Clean(this PageSettings input)
         {
+			Logger.LogDebug(">>> Entering Clean(input={Input})", input);
             input.Title = Clean(input.Title);
             input.Description = Clean(input.Description);
             input.Name = Clean(input.Name);
@@ -21,6 +23,7 @@ namespace Dnn.PersonaBar.Pages.Components
             input.Alias = Clean(input.Alias);
             input.LocalizedName = Clean(input.LocalizedName);
             input.PageStyleSheet = Clean(input.PageStyleSheet);
+			Logger.LogDebug("<<< Exiting Clean(input={Input})", input);
         }
 
         public static void Clean(this BulkPage input)

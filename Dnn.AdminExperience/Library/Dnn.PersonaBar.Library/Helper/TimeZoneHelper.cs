@@ -11,8 +11,11 @@ namespace Dnn.PersonaBar.Library.Helper
 
     public class TimeZoneHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static TimeZoneDto GetPreferredTimeZone(TimeZoneInfo userTimeZone)
         {
+			Logger.LogDebug(">>> Entering GetPreferredTimeZone(userTimeZone={UserTimeZone})", userTimeZone);
+			Logger.LogDebug("<<< Exiting GetPreferredTimeZone(userTimeZone={UserTimeZone})", userTimeZone);
             return new TimeZoneDto()
             {
                 Id = userTimeZone.Id,
@@ -24,6 +27,8 @@ namespace Dnn.PersonaBar.Library.Helper
 
         private static string FormatOffset(TimeSpan time)
         {
+			Logger.LogDebug(">>> Entering FormatOffset(time={Time})", time);
+			Logger.LogDebug("<<< Exiting FormatOffset(time={Time})", time);
             return ((time < TimeSpan.Zero) ? "-" : "+") + time.ToString(@"hh\:mm", CultureInfo.InvariantCulture);
         }
     }

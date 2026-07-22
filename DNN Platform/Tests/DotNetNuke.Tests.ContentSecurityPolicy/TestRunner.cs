@@ -13,13 +13,16 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
     /// </summary>
     public static class TestRunner
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Runs all parsing examples and demonstrates the functionality.
         /// </summary>
         public static void RunAllExamples()
         {
+			Logger.LogDebug(">>> Entering RunAllExamples()");
             Console.WriteLine("=== DotNetNuke ContentSecurityPolicy Parser Test Runner ===\n");
 
+			Logger.LogDebug("RunAllExamples(): Runner → {Runner}", Runner);
             RunBasicParsingExample();
             RunComplexParsingExample();
             RunRealWorldExample();
@@ -34,19 +37,24 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         /// </summary>
         public static void RunBasicParsingExample()
         {
+			Logger.LogDebug(">>> Entering RunBasicParsingExample()");
             Console.WriteLine("1. Basic Parsing Example:");
             Console.WriteLine("========================");
 
             var cspHeader = "default-src 'self'; script-src 'self' 'unsafe-inline'";
             Console.WriteLine($"Original CSP: {cspHeader}");
+			Logger.LogDebug("RunBasicParsingExample(): cspHeader → {CspHeader}", cspHeader);
 
             try
             {
                 var policy = new ContentSecurityPolicy();
                 var parser = new ContentSecurityPolicyParser(policy);
+				Logger.LogDebug("RunBasicParsingExample(): policy → {Policy}", policy);
+				Logger.LogDebug("RunBasicParsingExample(): parser → {Parser}", parser);
                 parser.Parse(cspHeader);
                 var regenerated = policy.GeneratePolicy();
 
+				Logger.LogDebug("RunBasicParsingExample(): regenerated → {Regenerated}", regenerated);
                 Console.WriteLine($"Parsed and regenerated: {regenerated}");
                 Console.WriteLine($"Nonce available: {policy.Nonce}");
                 Console.WriteLine("✅ Basic parsing successful\n");
@@ -55,6 +63,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             {
                 Console.WriteLine($"❌ Error: {ex.Message}\n");
             }
+			Logger.LogDebug("<<< Exiting RunBasicParsingExample()");
         }
 
         /// <summary>
@@ -62,16 +71,20 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         /// </summary>
         public static void RunComplexParsingExample()
         {
+			Logger.LogDebug(">>> Entering RunComplexParsingExample()");
             Console.WriteLine("2. Complex Parsing Example:");
             Console.WriteLine("===========================");
 
             var complexHeader = "default-src 'self'; script-src 'self' 'strict-dynamic'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' wss:; font-src 'self' https://fonts.googleapis.com; frame-ancestors 'none'; upgrade-insecure-requests; report-uri /csp-report";
             Console.WriteLine($"Original CSP: {complexHeader}");
+			Logger.LogDebug("RunComplexParsingExample(): complexHeader → {ComplexHeader}", complexHeader);
 
             try
             {
                 var policy = new ContentSecurityPolicy();
                 var parser = new ContentSecurityPolicyParser(policy);
+				Logger.LogDebug("RunComplexParsingExample(): policy → {Policy}", policy);
+				Logger.LogDebug("RunComplexParsingExample(): parser → {Parser}", parser);
                 parser.Parse(complexHeader);
 
                 // Modify the policy
@@ -80,12 +93,14 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
 
                 var modifiedPolicy = policy.GeneratePolicy();
                 Console.WriteLine($"Modified policy: {modifiedPolicy}");
+				Logger.LogDebug("RunComplexParsingExample(): modifiedPolicy → {ModifiedPolicy}", modifiedPolicy);
                 Console.WriteLine("✅ Complex parsing and modification successful\n");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"❌ Error: {ex.Message}\n");
             }
+			Logger.LogDebug("<<< Exiting RunComplexParsingExample()");
         }
 
         /// <summary>
@@ -93,11 +108,13 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         /// </summary>
         public static void RunRealWorldExample()
         {
+			Logger.LogDebug(">>> Entering RunRealWorldExample()");
             Console.WriteLine("3. Real-World Example:");
             Console.WriteLine("======================");
 
             var realWorldPolicy = "default-src 'self'; img-src 'self' https://front.satrabel.be https://www.googletagmanager.com https://region1.google-analytics.com; font-src 'self' https://fonts.gstatic.com; style-src 'self' https://fonts.googleapis.com https://www.googletagmanager.com; frame-ancestors 'self'; frame-src 'self'; form-action 'self'; object-src 'none'; base-uri 'self'; script-src 'nonce-hq9CE6VltPZiiySID0F9914GvPObOnIAN3Qs/0R+AmQ=' 'strict-dynamic'; report-to csp-endpoint; report-uri https://dnncore.satrabel.be/DesktopModules/Csp/Report; connect-src https://www.googletagmanager.com https://region1.google-analytics.com https://www.google-analytics.com; upgrade-insecure-requests";
 
+			Logger.LogDebug("RunRealWorldExample(): realWorldPolicy → {RealWorldPolicy}", realWorldPolicy);
             Console.WriteLine("Original real-world CSP (truncated for display):");
             Console.WriteLine($"{realWorldPolicy.Substring(0, Math.Min(100, realWorldPolicy.Length))}...");
 
@@ -105,9 +122,12 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             {
                 var policy = new ContentSecurityPolicy();
                 var parser = new ContentSecurityPolicyParser(policy);
+				Logger.LogDebug("RunRealWorldExample(): policy → {Policy}", policy);
+				Logger.LogDebug("RunRealWorldExample(): parser → {Parser}", parser);
                 parser.Parse(realWorldPolicy);
                 var regenerated = policy.GeneratePolicy();
 
+				Logger.LogDebug("RunRealWorldExample(): regenerated → {Regenerated}", regenerated);
                 Console.WriteLine($"Successfully parsed {realWorldPolicy.Split(';').Length} directives");
                 Console.WriteLine($"Regenerated policy length: {regenerated.Length} characters");
                 Console.WriteLine("✅ Real-world parsing successful\n");
@@ -116,6 +136,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             {
                 Console.WriteLine($"❌ Error: {ex.Message}\n");
             }
+			Logger.LogDebug("<<< Exiting RunRealWorldExample()");
         }
 
         /// <summary>
@@ -123,6 +144,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         /// </summary>
         public static void RunErrorHandlingExample()
         {
+			Logger.LogDebug(">>> Entering RunErrorHandlingExample()");
             Console.WriteLine("4. Error Handling Example:");
             Console.WriteLine("==========================");
 
@@ -141,8 +163,11 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
 
                 var policy = new ContentSecurityPolicy();
                 var parser = new ContentSecurityPolicyParser(policy);
+				Logger.LogDebug("RunErrorHandlingExample(): policy → {Policy}", policy);
+				Logger.LogDebug("RunErrorHandlingExample(): parser → {Parser}", parser);
                 var result = parser.TryParse(cspHeader);
 
+				Logger.LogDebug("RunErrorHandlingExample(): result → {Result}", result);
                 if (result == shouldSucceed)
                 {
                     Console.WriteLine($"✅ Expected result: {(shouldSucceed ? "Success" : "Failure")}");
@@ -154,6 +179,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             }
 
             Console.WriteLine();
+			Logger.LogDebug("<<< Exiting RunErrorHandlingExample()");
         }
 
         /// <summary>
@@ -161,6 +187,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         /// </summary>
         public static void RunPerformanceExample()
         {
+			Logger.LogDebug(">>> Entering RunPerformanceExample()");
             Console.WriteLine("5. Performance Example:");
             Console.WriteLine("=======================");
 
@@ -184,13 +211,17 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
 
             var stopwatch = Stopwatch.StartNew();
 
+			Logger.LogDebug("RunPerformanceExample(): stopwatch → {Stopwatch}", stopwatch);
             try
             {
                 var policy = new ContentSecurityPolicy();
                 var parser = new ContentSecurityPolicyParser(policy);
+				Logger.LogDebug("RunPerformanceExample(): policy → {Policy}", policy);
+				Logger.LogDebug("RunPerformanceExample(): parser → {Parser}", parser);
                 parser.Parse(largePolicy);
                 var regenerated = policy.GeneratePolicy();
 
+				Logger.LogDebug("RunPerformanceExample(): regenerated → {Regenerated}", regenerated);
                 stopwatch.Stop();
 
                 Console.WriteLine($"Parse time: {stopwatch.ElapsedMilliseconds}ms");
@@ -210,6 +241,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         /// </summary>
         public static void RunSourceTypeExamples()
         {
+			Logger.LogDebug(">>> Entering RunSourceTypeExamples()");
             Console.WriteLine("6. Source Type Examples:");
             Console.WriteLine("========================");
 
@@ -233,9 +265,12 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
                 {
                     var policy = new ContentSecurityPolicy();
                     var parser = new ContentSecurityPolicyParser(policy);
+					Logger.LogDebug("RunSourceTypeExamples(): policy → {Policy}", policy);
+					Logger.LogDebug("RunSourceTypeExamples(): parser → {Parser}", parser);
                     parser.Parse(example);
                     var regenerated = policy.GeneratePolicy();
                     Console.WriteLine($"  Input:  {example}");
+					Logger.LogDebug("RunSourceTypeExamples(): regenerated → {Regenerated}", regenerated);
                     Console.WriteLine($"  Output: {regenerated}");
                     Console.WriteLine("  ✅ Success");
                 }
@@ -246,6 +281,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
 
                 Console.WriteLine();
             }
+			Logger.LogDebug("<<< Exiting RunSourceTypeExamples()");
         }
     }
 }

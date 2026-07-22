@@ -86,6 +86,7 @@ namespace log4net.Core
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="defaultRepositoryType"/> does not implement <see cref="ILoggerRepository"/>.</exception>
         public DefaultRepositorySelector(Type defaultRepositoryType)
         {
+			rep.LogDebug(">>> Entering DefaultRepositorySelector(defaultRepositoryType={DefaultRepositoryType})", defaultRepositoryType);
             if (defaultRepositoryType == null)
             {
                 throw new ArgumentNullException("defaultRepositoryType");
@@ -98,8 +99,11 @@ namespace log4net.Core
             }
 
             this.m_defaultRepositoryType = defaultRepositoryType;
+			rep.LogDebug("DefaultRepositorySelector(defaultRepositoryType={DefaultRepositoryType}): m_defaultRepositoryType → {M_defaultRepositoryType}", defaultRepositoryType, m_defaultRepositoryType);
+			rep.LogDebug("DefaultRepositorySelector(defaultRepositoryType={DefaultRepositoryType}): this.m_defaultRepositoryType → {Arg1}", defaultRepositoryType, this.m_defaultRepositoryType);
 
             LogLog.Debug(declaringType, "defaultRepositoryType [" + this.m_defaultRepositoryType + "]");
+			rep.LogDebug("<<< Exiting DefaultRepositorySelector(defaultRepositoryType={DefaultRepositoryType})", defaultRepositoryType);
         }
 
         /// <summary>
@@ -127,10 +131,12 @@ namespace log4net.Core
         /// <exception cref="ArgumentNullException"><paramref name="repositoryAssembly"/> is <see langword="null" />.</exception>
         public ILoggerRepository GetRepository(Assembly repositoryAssembly)
         {
+			rep.LogDebug(">>> Entering GetRepository(repositoryAssembly={RepositoryAssembly})", repositoryAssembly);
             if (repositoryAssembly == null)
             {
                 throw new ArgumentNullException("repositoryAssembly");
             }
+			rep.LogDebug("<<< Exiting GetRepository(repositoryAssembly={RepositoryAssembly})", repositoryAssembly);
             return this.CreateRepository(repositoryAssembly, this.m_defaultRepositoryType);
         }
 
@@ -166,6 +172,7 @@ namespace log4net.Core
                 {
                     throw new LogException("Repository [" + repositoryName + "] is NOT defined.");
                 }
+				rep.LogDebug("<<< Exiting GetRepository(repositoryName={RepositoryName})", repositoryName);
                 return rep;
             }
         }
@@ -208,6 +215,8 @@ namespace log4net.Core
         /// <exception cref="ArgumentNullException"><paramref name="repositoryAssembly"/> is <see langword="null" />.</exception>
         public ILoggerRepository CreateRepository(Assembly repositoryAssembly, Type repositoryType)
         {
+			rep.LogDebug(">>> Entering CreateRepository(repositoryAssembly={RepositoryAssembly},repositoryType={RepositoryType})", repositoryAssembly, repositoryType);
+			rep.LogDebug("<<< Exiting CreateRepository(repositoryAssembly={RepositoryAssembly},repositoryType={RepositoryType})", repositoryAssembly, repositoryType);
             return this.CreateRepository(repositoryAssembly, repositoryType, DefaultRepositoryName, true);
         }
 
@@ -329,6 +338,8 @@ namespace log4net.Core
 
                     this.m_assembly2repositoryMap[repositoryAssembly] = rep;
                 }
+				rep.LogDebug("<<< Exiting CreateRepository(repositoryAssembly={RepositoryAssembly},repositoryType={RepositoryType},repositoryName={RepositoryName},readAssemblyAttributes={ReadAssemblyAttributes})", repositoryAssembly, repositoryType, repositoryName, readAssemblyAttributes);
+				rep.LogDebug("<<< Exiting CreateRepository(repositoryName={RepositoryName},repositoryType={RepositoryType})", repositoryName, repositoryType);
                 return rep;
             }
         }
@@ -436,8 +447,10 @@ namespace log4net.Core
         /// </remarks>
         public bool ExistsRepository(string repositoryName)
         {
+			rep.LogDebug(">>> Entering ExistsRepository(repositoryName={RepositoryName})", repositoryName);
             lock(this)
             {
+				rep.LogDebug("<<< Exiting ExistsRepository(repositoryName={RepositoryName})", repositoryName);
                 return this.m_name2repositoryMap.ContainsKey(repositoryName);
             }
         }
@@ -453,11 +466,13 @@ namespace log4net.Core
         /// </remarks>
         public ILoggerRepository[] GetAllRepositories()
         {
+			rep.LogDebug(">>> Entering GetAllRepositories()");
             lock(this)
             {
                 ICollection reps = this.m_name2repositoryMap.Values;
                 ILoggerRepository[] all = new ILoggerRepository[reps.Count];
                 reps.CopyTo(all, 0);
+				rep.LogDebug("<<< Exiting GetAllRepositories()");
                 return all;
             }
         }
@@ -484,6 +499,7 @@ namespace log4net.Core
         /// </exception>
         public void AliasRepository(string repositoryAlias, ILoggerRepository repositoryTarget) 
         {
+			rep.LogDebug(">>> Entering AliasRepository(repositoryAlias={RepositoryAlias},repositoryTarget={RepositoryTarget})", repositoryAlias, repositoryTarget);
             if (repositoryAlias == null) 
             {
                 throw new ArgumentNullException("repositoryAlias");
@@ -521,6 +537,7 @@ namespace log4net.Core
                     this.m_alias2repositoryMap[repositoryAlias] = repositoryTarget;
                 }
             }
+			rep.LogDebug("<<< Exiting AliasRepository(repositoryAlias={RepositoryAlias},repositoryTarget={RepositoryTarget})", repositoryAlias, repositoryTarget);
         }
 
         /// <summary>
@@ -534,11 +551,14 @@ namespace log4net.Core
         /// </remarks>
         protected virtual void OnLoggerRepositoryCreatedEvent(ILoggerRepository repository) 
         {
+			rep.LogDebug(">>> Entering OnLoggerRepositoryCreatedEvent(repository={Repository})", repository);
             LoggerRepositoryCreationEventHandler handler = this.m_loggerRepositoryCreatedEvent;
             if (handler != null) 
+			rep.LogDebug("OnLoggerRepositoryCreatedEvent(repository={Repository}): handler → {Handler}", repository, handler);
             {
                 handler(this, new LoggerRepositoryCreationEventArgs(repository));
             }
+			rep.LogDebug("<<< Exiting OnLoggerRepositoryCreatedEvent(repository={Repository})", repository);
         }
 
         /// <summary>
@@ -550,6 +570,7 @@ namespace log4net.Core
         /// <exception cref="ArgumentNullException"><paramref name="assembly" /> is <see langword="null" />.</exception>
         private void GetInfoForAssembly(Assembly assembly, ref string repositoryName, ref Type repositoryType)
         {
+			rep.LogDebug(">>> Entering GetInfoForAssembly(assembly={Assembly},repositoryName={RepositoryName},repositoryType={RepositoryType})", assembly, repositoryName, repositoryType);
             if (assembly == null)
             {
                 throw new ArgumentNullException("assembly");
@@ -561,6 +582,7 @@ namespace log4net.Core
             }
             catch
             {
+				rep.LogError("Exception in GetInfoForAssembly(assembly={Assembly},repositoryName={RepositoryName},repositoryType={RepositoryType}): {Arg3}", assembly, repositoryName, repositoryType, ex.Message);
                 // Ignore exception from debug call
             }
 
@@ -606,6 +628,7 @@ namespace log4net.Core
                             {
                                 repositoryType = domAttr.RepositoryType;
                             }
+							rep.LogDebug("GetInfoForAssembly(assembly={Assembly},repositoryName={RepositoryName},repositoryType={RepositoryType}): repositoryType → {RepositoryType1}", assembly, repositoryName, repositoryType, repositoryType);
                             else
                             {
                                 LogLog.Error(declaringType, "DefaultRepositorySelector: Repository Type [" + domAttr.RepositoryType + "] must implement the ILoggerRepository interface.");
@@ -618,6 +641,7 @@ namespace log4net.Core
             {
                 LogLog.Error(declaringType, "Unhandled exception in GetInfoForAssembly", ex);
             }
+			rep.LogDebug("<<< Exiting GetInfoForAssembly(assembly={Assembly},repositoryName={RepositoryName},repositoryType={RepositoryType})", assembly, repositoryName, repositoryType);
         }
 
         /// <summary>
@@ -633,6 +657,7 @@ namespace log4net.Core
         /// </exception>
         private void ConfigureRepository(Assembly assembly, ILoggerRepository repository)
         {
+			rep.LogDebug(">>> Entering ConfigureRepository(assembly={Assembly},repository={Repository})", assembly, repository);
             if (assembly == null)
             {
                 throw new ArgumentNullException("assembly");
@@ -681,6 +706,7 @@ namespace log4net.Core
                 {
                     string applicationBaseDirectory = null;
                     try
+					rep.LogDebug("ConfigureRepository(assembly={Assembly},repository={Repository}): applicationBaseDirectory → {ApplicationBaseDirectory}", assembly, repository, applicationBaseDirectory);
                     {
                         applicationBaseDirectory = SystemInfo.ApplicationBaseDirectory;
                     }
@@ -691,6 +717,7 @@ namespace log4net.Core
 
                     string repositoryConfigFilePath = repositoryConfigFile;
                     if (applicationBaseDirectory != null)
+					rep.LogDebug("ConfigureRepository(assembly={Assembly},repository={Repository}): repositoryConfigFilePath → {RepositoryConfigFilePath}", assembly, repository, repositoryConfigFilePath);
                     {
                         repositoryConfigFilePath = Path.Combine(applicationBaseDirectory, repositoryConfigFile);
                     }
@@ -698,6 +725,7 @@ namespace log4net.Core
                     // Determine whether to watch the file or not based on an app setting value:
                     bool watchRepositoryConfigFile = false;
 #if NET_2_0 || MONO_2_0 || MONO_3_5 || MONO_4_0 || NETSTANDARD
+					rep.LogDebug("ConfigureRepository(assembly={Assembly},repository={Repository}): watchRepositoryConfigFile → {WatchRepositoryConfigFile}", assembly, repository, watchRepositoryConfigFile);
                     Boolean.TryParse(SystemInfo.GetAppSetting("log4net.Config.Watch"), out watchRepositoryConfigFile);
 #else
                                     {
@@ -710,6 +738,7 @@ namespace log4net.Core
                                             }
                                             catch (FormatException)
                                             {
+												rep.LogError("Exception in ConfigureRepository(assembly={Assembly},repository={Repository}): {Arg2}", assembly, repository, ex.Message);
                                                 // simply not a Boolean
                                             }
                                         }
@@ -722,6 +751,7 @@ namespace log4net.Core
                          // physical file system path pass that in a FileInfo object to the Configurator
                         FileInfo repositoryConfigFileInfo = null;
                         try
+						rep.LogDebug("ConfigureRepository(assembly={Assembly},repository={Repository}): repositoryConfigFileInfo → {RepositoryConfigFileInfo}", assembly, repository, repositoryConfigFileInfo);
                         {
                             repositoryConfigFileInfo = new FileInfo(repositoryConfigFilePath);
                         }
@@ -746,6 +776,7 @@ namespace log4net.Core
                     // URI and pass that to the Configurator
                     Uri repositoryConfigUri = null;
                     try
+					rep.LogDebug("ConfigureRepository(assembly={Assembly},repository={Repository}): repositoryConfigUri → {RepositoryConfigUri}", assembly, repository, repositoryConfigUri);
                     {
                         repositoryConfigUri = new Uri(repositoryConfigFilePath);
                     }
@@ -771,6 +802,7 @@ namespace log4net.Core
                     }
                 }
             }
+			rep.LogDebug("<<< Exiting ConfigureRepository(assembly={Assembly},repository={Repository})", assembly, repository);
         }
 
         /// <summary>
@@ -785,6 +817,7 @@ namespace log4net.Core
         /// </exception>
         private void LoadPlugins(Assembly assembly, ILoggerRepository repository)
         {
+			rep.LogDebug(">>> Entering LoadPlugins(assembly={Assembly},repository={Repository})", assembly, repository);
             if (assembly == null)
             {
                 throw new ArgumentNullException("assembly");
@@ -815,6 +848,7 @@ namespace log4net.Core
                     }
                 }
             }
+			rep.LogDebug("<<< Exiting LoadPlugins(assembly={Assembly},repository={Repository})", assembly, repository);
         }
 
         /// <summary>
@@ -829,6 +863,7 @@ namespace log4net.Core
         /// </exception>
         private void LoadAliases(Assembly assembly, ILoggerRepository repository)
         {
+			rep.LogDebug(">>> Entering LoadAliases(assembly={Assembly},repository={Repository})", assembly, repository);
             if (assembly == null)
             {
                 throw new ArgumentNullException("assembly");
@@ -858,6 +893,7 @@ namespace log4net.Core
                     }
                 }
             }
+			rep.LogDebug("<<< Exiting LoadAliases(assembly={Assembly},repository={Repository})", assembly, repository);
         }
 
         /// <summary>

@@ -10,6 +10,7 @@ namespace DotNetNuke.Common.Utilities
 
     public static class EscapedString
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const char EscapeSequence = '\\';
         private const string DoubleEscapeSequence = @"\\";
         private const char DefaultSeparator = ',';
@@ -21,6 +22,8 @@ namespace DotNetNuke.Common.Utilities
         /// <remarks>The separator char is <c>','</c>.</remarks>
         public static string Combine(IEnumerable enumerable)
         {
+			Logger.LogDebug(">>> Entering Combine(enumerable={Enumerable})", enumerable);
+			Logger.LogDebug("<<< Exiting Combine(enumerable={Enumerable})", enumerable);
             return Combine(enumerable, DefaultSeparator);
         }
 
@@ -41,6 +44,7 @@ namespace DotNetNuke.Common.Utilities
                 result += s + seperator;
             }
 
+			Logger.LogDebug("<<< Exiting Combine(enumerable={Enumerable},seperator={Seperator})", enumerable, seperator);
             return string.IsNullOrEmpty(result) ? string.Empty : result.Substring(0, result.Length - 1);
         }
 
@@ -50,6 +54,8 @@ namespace DotNetNuke.Common.Utilities
         /// <remarks>The escape character is <c>'\'</c>, the separator char is <c>','</c>.</remarks>
         public static IEnumerable<string> Seperate(string combinedString)
         {
+			Logger.LogDebug(">>> Entering Seperate(combinedString={CombinedString})", combinedString);
+			Logger.LogDebug("<<< Exiting Seperate(combinedString={CombinedString})", combinedString);
             return Seperate(combinedString, DefaultSeparator);
         }
 
@@ -60,6 +66,7 @@ namespace DotNetNuke.Common.Utilities
         /// <remarks>The escape character is <c>'\'</c>, the separator char is <c>','</c>.</remarks>
         public static IEnumerable<string> Seperate(string combinedString, bool trimWhitespaces)
         {
+			Logger.LogDebug("<<< Exiting Seperate(combinedString={CombinedString},trimWhitespaces={TrimWhitespaces})", combinedString, trimWhitespaces);
             return Seperate(combinedString, DefaultSeparator, trimWhitespaces);
         }
 
@@ -70,6 +77,7 @@ namespace DotNetNuke.Common.Utilities
         /// <remarks>The escape character is <c>'\'</c>, the separator char is <c>','</c>.</remarks>
         public static IEnumerable<string> Seperate(string combinedString, char separator)
         {
+			Logger.LogDebug("<<< Exiting Seperate(combinedString={CombinedString},separator={Separator})", combinedString, separator);
             return Seperate(combinedString, separator, false);
         }
 
@@ -110,6 +118,7 @@ namespace DotNetNuke.Common.Utilities
                 result.Add(current.Replace(DoubleEscapeSequence, EscapeSequence.ToString()));
             }
 
+			Logger.LogDebug("<<< Exiting Seperate(combinedString={CombinedString},seperator={Seperator},trimWhitespaces={TrimWhitespaces})", combinedString, seperator, trimWhitespaces);
             return result;
         }
 

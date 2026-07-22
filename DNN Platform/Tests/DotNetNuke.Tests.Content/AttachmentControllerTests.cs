@@ -29,36 +29,47 @@ namespace DotNetNuke.Tests.Content
     [TestFixture]
     public class AttachmentControllerTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private Mock<CachingProvider> mockCache;
         private FakeServiceProvider serviceProvider;
 
         [SetUp]
         public void SetUp()
         {
+			Logger.LogDebug(">>> Entering SetUp()");
             // Register MockCachingProvider
             this.mockCache = MockComponentProvider.CreateDataCacheProvider();
+			Logger.LogDebug("SetUp(): mockCache → {MockCache}", mockCache);
             var dataProvider = MockComponentProvider.CreateDataProvider();
             dataProvider.Setup(c => c.GetProviderPath()).Returns(string.Empty);
+			Logger.LogDebug("SetUp(): dataProvider → {DataProvider}", dataProvider);
             this.serviceProvider = FakeServiceProvider.Setup(
                 services =>
                 {
+				Logger.LogDebug("SetUp(): serviceProvider → {ServiceProvider}", serviceProvider);
+				Logger.LogDebug("SetUp(): services → {Services}", services);
                     services.AddSingleton(this.mockCache.Object);
                     services.AddSingleton(dataProvider.Object);
                 });
+				Logger.LogDebug("<<< Exiting SetUp()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			Logger.LogDebug(">>> Entering TearDown()");
             this.serviceProvider.Dispose();
             MockComponentProvider.ResetContainer();
+			Logger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void Test_Add_File_To_Content_Item_Without_Metadata()
         {
+			Logger.LogDebug(">>> Entering Test_Add_File_To_Content_Item_Without_Metadata()");
             var dataService = DataServiceFactory();
 
+			Logger.LogDebug("Test_Add_File_To_Content_Item_Without_Metadata(): dataService → {DataService}", dataService);
             dataService.Setup(ds => ds.AddContentItem(It.IsAny<ContentItem>(), It.IsAny<int>()))
                 .Returns(Constants.CONTENT_AddContentItemId);
 
@@ -67,10 +78,12 @@ namespace DotNetNuke.Tests.Content
 
             var content = ContentTestHelper.CreateValidContentItem();
             content.Metadata.Clear();
+			Logger.LogDebug("Test_Add_File_To_Content_Item_Without_Metadata(): content → {Content}", content);
 
             var contentId = Util.GetContentController().AddContentItem(content);
             using (Assert.EnterMultipleScope())
             {
+			Logger.LogDebug("Test_Add_File_To_Content_Item_Without_Metadata(): contentId → {ContentId}", contentId);
                 Assert.That(contentId, Is.EqualTo(Constants.CONTENT_AddContentItemId));
                 Assert.That(content.Metadata, Is.Empty);
             }
@@ -80,15 +93,18 @@ namespace DotNetNuke.Tests.Content
 
             var fileController = ComponentFactory.GetComponent<IAttachmentController>();
 
+			Logger.LogDebug("Test_Add_File_To_Content_Item_Without_Metadata(): fileController → {FileController}", fileController);
             fileController.AddFileToContent(contentId, ContentTestHelper.CreateValidFile(0));
 
             dataService.Verify(
                 ds => ds.AddMetaData(It.IsAny<ContentItem>(), FileController.FilesKey, new[] { 0 }.ToJson()));
+				Logger.LogDebug("<<< Exiting Test_Add_File_To_Content_Item_Without_Metadata()");
         }
 
         [Test]
         public void Test_Load_Attachments_From_DataService()
         {
+			Logger.LogDebug(">>> Entering Test_Load_Attachments_From_DataService()");
             var files = new List<IFileInfo>
                 {
                     ContentTestHelper.CreateValidFile(0),
@@ -98,6 +114,7 @@ namespace DotNetNuke.Tests.Content
 
             var dataService = DataServiceFactory();
 
+			Logger.LogDebug("Test_Load_Attachments_From_DataService(): dataService → {DataService}", dataService);
             dataService.Setup(ds => ds.GetContentItem(It.IsAny<int>())).Returns(MockHelper.CreateValidContentItemReader);
 
             dataService.Setup(
@@ -107,6 +124,7 @@ namespace DotNetNuke.Tests.Content
 
             var contentItem = Util.GetContentController().GetContentItem(Constants.CONTENT_ValidContentItemId);
             Assert.That(contentItem, Is.Not.Null);
+			Logger.LogDebug("Test_Load_Attachments_From_DataService(): contentItem → {ContentItem}", contentItem);
 
             var serialized = contentItem.Metadata[FileController.FilesKey];
             using (Assert.EnterMultipleScope())
@@ -122,13 +140,16 @@ namespace DotNetNuke.Tests.Content
                 Assert.That(contentItem.Files[1].FileId, Is.EqualTo(1));
                 Assert.That(contentItem.Files[2].FileId, Is.EqualTo(2));
             }
+			Logger.LogDebug("<<< Exiting Test_Load_Attachments_From_DataService()");
         }
 
         [Test]
         public void Test_Add_Attachments_With_FileController()
         {
+			Logger.LogDebug(">>> Entering Test_Add_Attachments_With_FileController()");
             var dataService = DataServiceFactory();
 
+			Logger.LogDebug("Test_Add_Attachments_With_FileController(): dataService → {DataService}", dataService);
             dataService.Setup(
                 ds =>
                     ds.GetContentItem(It.IsAny<int>())).Returns(MockHelper.CreateValidContentItemReader);
@@ -136,6 +157,7 @@ namespace DotNetNuke.Tests.Content
             // Use a closure to store the metadata locally in this method.
             var data = new Dictionary<string, string>();
 
+			Logger.LogDebug("Test_Add_Attachments_With_FileController(): data → {Data}", data);
             dataService.Setup(
                 ds =>
                     ds.GetMetaData(It.IsAny<int>())).Returns(
@@ -151,8 +173,10 @@ namespace DotNetNuke.Tests.Content
 
             var contentController = Util.GetContentController();
 
+			Logger.LogDebug("Test_Add_Attachments_With_FileController(): contentController → {ContentController}", contentController);
             var contentItem = contentController.GetContentItem(Constants.CONTENT_ValidContentItemId);
             Assert.That(contentItem, Is.Not.Null);
+			Logger.LogDebug("Test_Add_Attachments_With_FileController(): contentItem → {ContentItem}", contentItem);
 
             var serialized = contentItem.Metadata[FileController.FilesKey];
             using (Assert.EnterMultipleScope())
@@ -163,9 +187,11 @@ namespace DotNetNuke.Tests.Content
 
             var fileManager = ComponentFactory.GetComponent<IFileManager>();
 
+			Logger.LogDebug("Test_Add_Attachments_With_FileController(): fileManager → {FileManager}", fileManager);
             // Add some files.
             var fileController = ComponentFactory.GetComponent<IAttachmentController>();
             fileController.AddFileToContent(contentItem.ContentItemId, fileManager.GetFile(0));
+			Logger.LogDebug("Test_Add_Attachments_With_FileController(): fileController → {FileController}", fileController);
             fileController.AddFileToContent(contentItem.ContentItemId, fileManager.GetFile(1));
 
             contentItem = contentController.GetContentItem(Constants.CONTENT_ValidContentItemId);
@@ -185,23 +211,30 @@ namespace DotNetNuke.Tests.Content
 
             dataService.Verify(
                 ds => ds.AddMetaData(It.IsAny<ContentItem>(), FileController.FilesKey, "[0,1]"), Times.Once());
+				Logger.LogDebug("<<< Exiting Test_Add_Attachments_With_FileController()");
         }
 
         [Test]
         public void Set_MetaData_To_Empty_Value_Deletes_Row()
         {
+			Logger.LogDebug(">>> Entering Set_MetaData_To_Empty_Value_Deletes_Row()");
             var data = new Dictionary<string, string>();
 
+			Logger.LogDebug("Set_MetaData_To_Empty_Value_Deletes_Row(): data → {Data}", data);
             var dataService = DataServiceFactoryWithLocalMetaData(ref data);
 
+			Logger.LogDebug("Set_MetaData_To_Empty_Value_Deletes_Row(): dataService → {DataService}", dataService);
             dataService.Setup(ds => ds.GetContentItem(It.IsAny<int>())).Returns(MockHelper.CreateValidContentItemReader);
 
             var contentController = Util.GetContentController();
 
+			Logger.LogDebug("Set_MetaData_To_Empty_Value_Deletes_Row(): contentController → {ContentController}", contentController);
             var fileManager = ComponentFactory.GetComponent<IFileManager>();
 
+			Logger.LogDebug("Set_MetaData_To_Empty_Value_Deletes_Row(): fileManager → {FileManager}", fileManager);
             var contentItem = contentController.GetContentItem(Constants.CONTENT_ValidContentItemId);
             Assert.That(contentItem, Is.Not.Null);
+			Logger.LogDebug("Set_MetaData_To_Empty_Value_Deletes_Row(): contentItem → {ContentItem}", contentItem);
 
             var serialized = contentItem.Metadata[FileController.FilesKey];
             using (Assert.EnterMultipleScope())
@@ -213,6 +246,7 @@ namespace DotNetNuke.Tests.Content
             // Add some files.
             var fileController = ComponentFactory.GetComponent<IAttachmentController>();
             fileController.AddFileToContent(contentItem.ContentItemId, fileManager.GetFile(0));
+			Logger.LogDebug("Set_MetaData_To_Empty_Value_Deletes_Row(): fileController → {FileController}", fileController);
             fileController.AddFileToContent(contentItem.ContentItemId, fileManager.GetFile(1));
 
             contentItem = contentController.GetContentItem(Constants.CONTENT_ValidContentItemId);
@@ -236,26 +270,34 @@ namespace DotNetNuke.Tests.Content
 
             var emptyFiles = fileController.GetFilesByContent(contentItem.ContentItemId);
             Assert.That(emptyFiles, Is.Empty);
+			Logger.LogDebug("<<< Exiting Set_MetaData_To_Empty_Value_Deletes_Row()");
+			Logger.LogDebug("Set_MetaData_To_Empty_Value_Deletes_Row(): emptyFiles → {EmptyFiles}", emptyFiles);
         }
 
         /// <remarks>This test should be moved elsewhere (cb).</remarks>
         [Test]
         public void Set_MetaData_To_Same_Value_Doesnt_Update_Database_Entry()
         {
+			Logger.LogDebug(">>> Entering Set_MetaData_To_Same_Value_Doesnt_Update_Database_Entry()");
             var metadata = new Dictionary<string, string>();
 
+			Logger.LogDebug("Set_MetaData_To_Same_Value_Doesnt_Update_Database_Entry(): metadata → {Metadata}", metadata);
             var dataService = DataServiceFactoryWithLocalMetaData(ref metadata);
 
+			Logger.LogDebug("Set_MetaData_To_Same_Value_Doesnt_Update_Database_Entry(): dataService → {DataService}", dataService);
             var contentController = Util.GetContentController();
 
+			Logger.LogDebug("Set_MetaData_To_Same_Value_Doesnt_Update_Database_Entry(): contentController → {ContentController}", contentController);
             var contentItem = ContentTestHelper.CreateValidContentItem();
 
+			Logger.LogDebug("Set_MetaData_To_Same_Value_Doesnt_Update_Database_Entry(): contentItem → {ContentItem}", contentItem);
             contentController.AddContentItem(contentItem);
 
             dataService.Verify(ds => ds.AddMetaData(contentItem, FileController.TitleKey, It.IsAny<string>()), Times.Never());
             dataService.Verify(ds => ds.DeleteMetaData(contentItem, FileController.TitleKey, It.IsAny<string>()), Times.Never());
 
             contentItem.ContentTitle = "Foobar";
+			Logger.LogDebug("Set_MetaData_To_Same_Value_Doesnt_Update_Database_Entry(): contentItem.ContentTitle → {Arg0}", contentItem.ContentTitle);
 
             contentController.UpdateContentItem(contentItem);
 
@@ -277,12 +319,15 @@ namespace DotNetNuke.Tests.Content
 
             dataService.Verify(ds => ds.AddMetaData(contentItem, FileController.TitleKey, It.IsAny<string>()), Times.Exactly(2));
             dataService.Verify(ds => ds.DeleteMetaData(contentItem, FileController.TitleKey, It.IsAny<string>()), Times.Once());
+			Logger.LogDebug("<<< Exiting Set_MetaData_To_Same_Value_Doesnt_Update_Database_Entry()");
         }
 
         private static Mock<IDataService> DataServiceFactory()
         {
+			Logger.LogDebug(">>> Entering DataServiceFactory()");
             var dataService = new Mock<IDataService>();
 
+			Logger.LogDebug("DataServiceFactory(): dataService → {DataService}", dataService);
             dataService.Setup(ds =>
              ds.SynchronizeMetaData(
                  It.IsAny<ContentItem>(),
@@ -293,6 +338,7 @@ namespace DotNetNuke.Tests.Content
                  {
                      deleted.ToList().ForEach(
                          item => dataService.Object.DeleteMetaData(ci, item.Key, item.Value));
+						Logger.LogDebug("DataServiceFactory(): item → {Item}", item);
 
                      added.ToList().ForEach(
                          item => dataService.Object.AddMetaData(ci, item.Key, item.Value));
@@ -301,10 +347,12 @@ namespace DotNetNuke.Tests.Content
             // Register controller types that are dependent on our IDataService.
             var contentController = new ContentController(dataService.Object);
 
+			Logger.LogDebug("DataServiceFactory(): contentController → {ContentController}", contentController);
             ComponentFactory.RegisterComponentInstance<IAttachmentController>(new FileController(contentController));
             ComponentFactory.RegisterComponentInstance<IContentController>(contentController);
             ComponentFactory.RegisterComponentInstance<IFileManager>(MockHelper.CreateMockFileManager().Object);
 
+			Logger.LogDebug("<<< Exiting DataServiceFactory()");
             return dataService;
         }
 

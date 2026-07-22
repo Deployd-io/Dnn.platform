@@ -10,6 +10,7 @@ namespace DotNetNuke.UI.Skins.Controls
     /// <summary>A control which causes JavaScript to be included on the page.</summary>
     public partial class DnnJsInclude : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public string FilePath { get; set; }
 
         public string PathNameAlias { get; set; }
@@ -59,6 +60,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
             this.ctlInclude.AddTag = this.AddTag;
             this.ctlInclude.FilePath = this.FilePath;
@@ -77,6 +79,7 @@ namespace DotNetNuke.UI.Skins.Controls
             this.ctlInclude.Async = this.Async;
             this.ctlInclude.Defer = this.Defer;
             this.ctlInclude.NoModule = this.NoModule;
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
     }
 }

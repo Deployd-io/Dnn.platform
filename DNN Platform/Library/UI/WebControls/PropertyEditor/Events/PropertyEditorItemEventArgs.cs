@@ -11,6 +11,7 @@ namespace DotNetNuke.UI.WebControls
     /// </summary>
     public class PropertyEditorItemEventArgs : EventArgs
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyEditorItemEventArgs"/> class.
         /// Constructs a new PropertyEditorItemEventArgs.
@@ -18,7 +19,10 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="editor">The editor created.</param>
         public PropertyEditorItemEventArgs(EditorInfo editor)
         {
+			Logger.LogDebug(">>> Entering PropertyEditorItemEventArgs(editor={Editor})", editor);
             this.Editor = editor;
+			Logger.LogDebug("<<< Exiting PropertyEditorItemEventArgs(editor={Editor})", editor);
+			Logger.LogDebug("PropertyEditorItemEventArgs(editor={Editor}): this.Editor → {Arg1}", editor, this.Editor);
         }
 
         /// <summary>Gets or sets whether the proeprty has changed.</summary>

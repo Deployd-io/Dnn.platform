@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class AzureConnectorException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public AzureConnectorException()
     {
+	Logger.LogDebug(">>> Entering AzureConnectorException()");
+	Logger.LogDebug("<<< Exiting AzureConnectorException()");
     }
 
     /// <inheritdoc />
     public AzureConnectorException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering AzureConnectorException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting AzureConnectorException(message={Message})", message);
 
     /// <inheritdoc />
     public AzureConnectorException(string message, Exception innerException)

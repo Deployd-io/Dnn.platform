@@ -11,17 +11,21 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
     /// <inheritdoc cref="IDamUninstaller" />
     internal sealed class DamUninstaller : UnInstaller, IDamUninstaller
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="DamUninstaller"/> class.</summary>
         /// <param name="serviceProvider">An instance of <see cref="IServiceProvider"/>.</param>
         /// <param name="localizer">An instance of <see cref="ILocalizer"/>.</param>
         public DamUninstaller(IServiceProvider serviceProvider, ILocalizer localizer)
         : base(serviceProvider, localizer)
         {
+		Logger.LogDebug(">>> Entering DamUninstaller(serviceProvider={ServiceProvider},localizer={Localizer})", serviceProvider, localizer);
+		Logger.LogDebug("<<< Exiting DamUninstaller(serviceProvider={ServiceProvider},localizer={Localizer})", serviceProvider, localizer);
         }
 
         /// <inheritdoc />
         public void Execute()
         {
+			Logger.LogDebug(">>> Entering Execute()");
             var steps = new[]
             {
                 this.ReplaceModule("Digital Asset Management", "ResourceManager", this.MigrateSettings),
@@ -30,6 +34,7 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
 
             var skip = false;
 
+			Logger.LogDebug("Execute(): skip → {Skip}", skip);
             foreach (var step in steps)
             {
                 if (!skip)
@@ -45,14 +50,19 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
 
                 this.ProgressInternal.AddRange(UninstallSummaryItem.FromStep(step));
             }
+			Logger.LogDebug("<<< Exiting Execute()");
         }
 
         private Hashtable MigrateSettings(Hashtable oldSettings)
         {
+			Logger.LogDebug(">>> Entering MigrateSettings(oldSettings={OldSettings})", oldSettings);
             var settings = new Hashtable();
             var mode = oldSettings["Mode"];
+			Logger.LogDebug("MigrateSettings(oldSettings={OldSettings}): settings → {Settings}", oldSettings, settings);
+			Logger.LogDebug("MigrateSettings(oldSettings={OldSettings}): mode → {Mode}", oldSettings, mode);
             var newMode = 0;
             if (mode != null)
+			Logger.LogDebug("MigrateSettings(oldSettings={OldSettings}): newMode → {NewMode}", oldSettings, newMode);
             {
                 switch ((string)mode)
                 {
@@ -71,10 +81,12 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
 
             var rootFolder = oldSettings["RootFolderId"];
             if (rootFolder != null)
+			Logger.LogDebug("MigrateSettings(oldSettings={OldSettings}): rootFolder → {RootFolder}", oldSettings, rootFolder);
             {
                 settings.Add("RM_HomeFolder", rootFolder);
             }
 
+			Logger.LogDebug("<<< Exiting MigrateSettings(oldSettings={OldSettings})", oldSettings);
             return settings;
         }
     }

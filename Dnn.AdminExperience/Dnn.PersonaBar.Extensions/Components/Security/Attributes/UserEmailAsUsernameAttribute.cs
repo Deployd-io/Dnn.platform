@@ -14,9 +14,11 @@ namespace Dnn.PersonaBar.Security.Attributes
     [AttributeUsage(AttributeTargets.Property)]
     internal class UserEmailAsUsernameAttribute : ValidationAttribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
+			Logger.LogDebug(">>> Entering IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             var propertyName = validationContext.DisplayName;
 
             if (!bool.TryParse(value.ToString(), out var userEmailAsUsername))
@@ -29,6 +31,7 @@ namespace Dnn.PersonaBar.Security.Attributes
                 return new ValidationResult(Localization.GetString(Components.Constants.ContainsDuplicateAddresses, Components.Constants.LocalResourcesFile));
             }
 
+			Logger.LogDebug("<<< Exiting IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             return ValidationResult.Success;
         }
     }

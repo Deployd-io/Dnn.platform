@@ -1,5 +1,6 @@
 ﻿' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports System
 Imports System.IO
@@ -12,10 +13,12 @@ Namespace DotNetNuke.UI.WebControls
         Inherits ControlDesigner
         ' Methods
         Public Overrides Function GetDesignTimeHtml() As String
+			Logger.LogDebug(">>> Entering GetDesignTimeHtml()")
             Dim str As String
             Dim component As DNNMenu = DirectCast(Me.Component, DNNMenu)
             If (component.ID.Length <= 0) Then
                 str = Nothing
+				Logger.LogDebug("GetDesignTimeHtml(): str → {Str}", str)
             Else
                 Dim unit2 As Unit
                 Dim writer As New StringWriter
@@ -26,9 +29,12 @@ Namespace DotNetNuke.UI.WebControls
                 }
                 If (component.Orientation = Orientation.Horizontal) Then
                     unit2 = New Unit("100%")
+					Logger.LogDebug("GetDesignTimeHtml(): unit2 → {Unit2}", unit2)
+					Logger.LogDebug("GetDesignTimeHtml(): label.Width → {Arg0}", label.Width)
                     label.Width = unit2
                 Else
                     unit2 = New Unit(500)
+					Logger.LogDebug("GetDesignTimeHtml(): label.Height → {Arg0}", label.Height)
                     label.Height = unit2
                 End If
                 label.RenderControl(writer2)
@@ -36,6 +42,7 @@ Namespace DotNetNuke.UI.WebControls
             End If
             Return str
         End Function
+		Logger.LogDebug("<<< Exiting GetDesignTimeHtml()")
 
 
         ' Properties

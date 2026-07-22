@@ -56,7 +56,9 @@ namespace DotNetNuke.Modules.Admin.Modules
         public ModuleSettingsPage()
             : this(null, null, null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering ModuleSettingsPage()");
         }
+		Logger.LogDebug("<<< Exiting ModuleSettingsPage()");
 
         /// <summary>Initializes a new instance of the <see cref="ModuleSettingsPage"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
@@ -68,6 +70,12 @@ namespace DotNetNuke.Modules.Admin.Modules
         public ModuleSettingsPage(INavigationManager navigationManager, IPortalAliasService portalAliasService, IModuleControlPipeline moduleControlPipeline, IHostSettings hostSettings, IJavaScriptLibraryHelper javaScript)
             : this(navigationManager, portalAliasService, moduleControlPipeline, hostSettings, javaScript, null)
         {
+		Logger.LogDebug(">>> Entering ModuleSettingsPage(navigationManager={NavigationManager},portalAliasService={PortalAliasService},moduleControlPipeline={ModuleControlPipeline},hostSettings={HostSettings},javaScript={JavaScript})", navigationManager, portalAliasService, moduleControlPipeline, hostSettings, javaScript);
+		Logger.LogDebug("<<< Exiting ModuleSettingsPage(navigationManager={NavigationManager},portalAliasService={PortalAliasService},moduleControlPipeline={ModuleControlPipeline},hostSettings={HostSettings},javaScript={JavaScript})", navigationManager, portalAliasService, moduleControlPipeline, hostSettings, javaScript);
+		Logger.LogDebug("ModuleSettingsPage(navigationManager={NavigationManager},portalAliasService={PortalAliasService},moduleControlPipeline={ModuleControlPipeline},hostSettings={HostSettings},javaScript={JavaScript},appStatus={AppStatus}): portalAliasService → {PortalAliasService1}", navigationManager, portalAliasService, moduleControlPipeline, hostSettings, javaScript, appStatus, portalAliasService);
+		Logger.LogDebug("ModuleSettingsPage(navigationManager={NavigationManager},portalAliasService={PortalAliasService},moduleControlPipeline={ModuleControlPipeline},hostSettings={HostSettings},javaScript={JavaScript},appStatus={AppStatus}): moduleControlPipeline → {ModuleControlPipeline1}", navigationManager, portalAliasService, moduleControlPipeline, hostSettings, javaScript, appStatus, moduleControlPipeline);
+		Logger.LogDebug("ModuleSettingsPage(navigationManager={NavigationManager},portalAliasService={PortalAliasService},moduleControlPipeline={ModuleControlPipeline},hostSettings={HostSettings},javaScript={JavaScript},appStatus={AppStatus}): hostSettings → {HostSettings1}", navigationManager, portalAliasService, moduleControlPipeline, hostSettings, javaScript, appStatus, hostSettings);
+		Logger.LogDebug("ModuleSettingsPage(navigationManager={NavigationManager},portalAliasService={PortalAliasService},moduleControlPipeline={ModuleControlPipeline},hostSettings={HostSettings},javaScript={JavaScript},appStatus={AppStatus}): javaScript → {JavaScript1}", navigationManager, portalAliasService, moduleControlPipeline, hostSettings, javaScript, appStatus, javaScript);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleSettingsPage"/> class.</summary>
@@ -81,6 +89,8 @@ namespace DotNetNuke.Modules.Admin.Modules
         {
             this.navigationManager = navigationManager ?? this.DependencyProvider.GetRequiredService<INavigationManager>();
             this.portalAliasService = portalAliasService ?? this.DependencyProvider.GetRequiredService<IPortalAliasService>();
+			Logger.LogDebug("ModuleSettingsPage(navigationManager={NavigationManager},portalAliasService={PortalAliasService},moduleControlPipeline={ModuleControlPipeline},hostSettings={HostSettings},javaScript={JavaScript},appStatus={AppStatus}): appStatus → {AppStatus1}", navigationManager, portalAliasService, moduleControlPipeline, hostSettings, javaScript, appStatus, appStatus);
+			Logger.LogDebug("ModuleSettingsPage(navigationManager={NavigationManager},portalAliasService={PortalAliasService},moduleControlPipeline={ModuleControlPipeline},hostSettings={HostSettings},javaScript={JavaScript},appStatus={AppStatus}): navigationManager → {NavigationManager1}", navigationManager, portalAliasService, moduleControlPipeline, hostSettings, javaScript, appStatus, navigationManager);
             this.moduleControlPipeline = moduleControlPipeline ?? this.DependencyProvider.GetRequiredService<IModuleControlPipeline>();
             this.hostSettings = hostSettings ?? this.DependencyProvider.GetRequiredService<IHostSettings>();
             this.javaScript = javaScript ?? this.DependencyProvider.GetRequiredService<IJavaScriptLibraryHelper>();
@@ -101,8 +111,10 @@ namespace DotNetNuke.Modules.Admin.Modules
 
         protected string GetInstalledOnLink(object dataItem)
         {
+			Logger.LogDebug(">>> Entering GetInstalledOnLink(dataItem={DataItem})", dataItem);
             var returnValue = new StringBuilder();
             if (dataItem is TabInfo tab)
+			Logger.LogDebug("GetInstalledOnLink(dataItem={DataItem}): returnValue → {ReturnValue}", dataItem, returnValue);
             {
                 var index = 0;
                 TabController.Instance.PopulateBreadCrumbs(ref tab);
@@ -116,6 +128,7 @@ namespace DotNetNuke.Modules.Admin.Modules
 
                 var tabUrl = this.navigationManager.NavigateURL(tab.TabID, portalSettings, string.Empty);
 
+				Logger.LogDebug("GetInstalledOnLink(dataItem={DataItem}): tabUrl → {TabUrl}", dataItem, tabUrl);
                 foreach (TabInfo t in tab.BreadCrumbs)
                 {
                     if (index > 0)
@@ -136,32 +149,40 @@ namespace DotNetNuke.Modules.Admin.Modules
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetInstalledOnLink(dataItem={DataItem})", dataItem);
             return returnValue.ToString();
         }
 
         protected string GetInstalledOnSite(object dataItem)
         {
+			Logger.LogDebug(">>> Entering GetInstalledOnSite(dataItem={DataItem})", dataItem);
             string returnValue = string.Empty;
             if (dataItem is TabInfo tab)
+			Logger.LogDebug("GetInstalledOnSite(dataItem={DataItem}): returnValue → {ReturnValue}", dataItem, returnValue);
             {
                 var portal = PortalController.Instance.GetPortal(tab.PortalID);
                 if (portal != null)
+				Logger.LogDebug("GetInstalledOnSite(dataItem={DataItem}): portal → {Portal}", dataItem, portal);
                 {
                     returnValue = portal.PortalName;
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetInstalledOnSite(dataItem={DataItem})", dataItem);
             return returnValue;
         }
 
         protected bool IsSharedViewOnly()
         {
+			Logger.LogDebug(">>> Entering IsSharedViewOnly()");
+			Logger.LogDebug("<<< Exiting IsSharedViewOnly()");
             return this.ModuleContext.Configuration.IsShared && this.ModuleContext.Configuration.IsShareableViewOnly;
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
             try
             {
@@ -177,6 +198,7 @@ namespace DotNetNuke.Modules.Admin.Modules
                 if (this.Request.QueryString["ModuleId"] != null)
                 {
                     this.moduleId = int.Parse(this.Request.QueryString["ModuleId"]);
+					Logger.LogDebug("OnInit(e={E}): moduleId → {ModuleId}", e, moduleId);
                 }
 
                 if (this.Module.ContentItemId == Null.NullInteger && this.Module.ModuleID != Null.NullInteger)
@@ -200,13 +222,16 @@ namespace DotNetNuke.Modules.Admin.Modules
                 {
                     // get module
                     this.TabModuleId = this.Module.TabModuleID;
+					Logger.LogDebug("OnInit(e={E}): this.TabModuleId → {Arg1}", e, this.TabModuleId);
 
                     // get Settings Control
                     ModuleControlInfo moduleControlInfo = ModuleControlController.GetModuleControlByControlKey(this.hostSettings, "Settings", this.Module.ModuleDefID);
 
+					Logger.LogDebug("OnInit(e={E}): moduleControlInfo → {ModuleControlInfo}", e, moduleControlInfo);
                     if (moduleControlInfo != null)
                     {
                         this.control = this.moduleControlPipeline.LoadSettingsControl(this.Page, this.Module, moduleControlInfo.ControlSrc);
+						Logger.LogDebug("OnInit(e={E}): control → {Control}", e, control);
 
                         if (this.control is ISettingsControl settingsControl)
                         {
@@ -228,13 +253,16 @@ namespace DotNetNuke.Modules.Admin.Modules
             }
             catch (Exception err)
             {
+				Logger.LogError("Exception in OnInit(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, err);
             }
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             try
@@ -270,12 +298,14 @@ namespace DotNetNuke.Modules.Admin.Modules
                         {
                             var objTab = TabController.Instance.GetTab(this.Module.TabID, this.Module.PortalID, false);
                             this.cboTab.AddItem(objTab.LocalizedTabName, objTab.TabID.ToString());
+							Logger.LogDebug("OnLoad(e={E}): objTab → {ObjTab}", e, objTab);
                         }
                     }
 
                     // only Portal Administrators can manage the visibility on all Tabs
                     var isAdmin = PermissionProvider.Instance().IsPortalEditor();
                     this.rowAllTabs.Visible = isAdmin;
+					Logger.LogDebug("OnLoad(e={E}): isAdmin → {IsAdmin}", e, isAdmin);
                     this.chkAllModules.Enabled = isAdmin;
 
                     if (this.HideCancelButton)
@@ -346,22 +376,29 @@ namespace DotNetNuke.Modules.Admin.Modules
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         protected void OnAllTabsCheckChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnAllTabsCheckChanged(sender={Sender},e={E})", sender, e);
             this.trnewPages.Visible = this.chkAllTabs.Checked;
+			Logger.LogDebug("<<< Exiting OnAllTabsCheckChanged(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnCacheProviderIndexChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnCacheProviderIndexChanged(sender={Sender},e={E})", sender, e);
             this.ShowCacheRows();
+			Logger.LogDebug("<<< Exiting OnCacheProviderIndexChanged(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnDeleteClick(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnDeleteClick(sender={Sender},e={E})", sender, e);
             try
             {
                 ModuleController.Instance.DeleteTabModule(this.TabId, this.moduleId, true);
@@ -369,17 +406,22 @@ namespace DotNetNuke.Modules.Admin.Modules
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnDeleteClick(sender={Sender},e={E}): {Arg2}", sender, e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnDeleteClick(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnInheritPermissionsChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInheritPermissionsChanged(sender={Sender},e={E})", sender, e);
             this.dgPermissions.InheritViewPermissionsFromTab = this.chkInheritPermissions.Checked;
+			Logger.LogDebug("<<< Exiting OnInheritPermissionsChanged(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnUpdateClick(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnUpdateClick(sender={Sender},e={E})", sender, e);
             try
             {
                 if (this.Page.IsValid)
@@ -521,6 +563,7 @@ namespace DotNetNuke.Modules.Admin.Modules
                         }
                         catch (Exception ex)
                         {
+							Logger.LogError("Exception in OnUpdateClick(sender={Sender},e={E}): {Arg2}", sender, e, ex.Message);
                             Exceptions.LogException(ex);
                         }
                     }
@@ -594,8 +637,10 @@ namespace DotNetNuke.Modules.Admin.Modules
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnUpdateClick(sender={Sender},e={E}): {Arg2}", sender, e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnUpdateClick(sender={Sender},e={E})", sender, e);
         }
 
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
@@ -603,17 +648,21 @@ namespace DotNetNuke.Modules.Admin.Modules
         // ReSharper disable once InconsistentNaming
         protected void dgOnTabs_PageIndexChanging(object sender, System.Web.UI.WebControls.GridViewPageEventArgs e)
         {
+			Logger.LogDebug(">>> Entering dgOnTabs_PageIndexChanging(sender={Sender},e={E})", sender, e);
             this.dgOnTabs.PageIndex = e.NewPageIndex;
             this.BindModulePages();
+			Logger.LogDebug("<<< Exiting dgOnTabs_PageIndexChanging(sender={Sender},e={E})", sender, e);
         }
 
         private void BindData()
         {
+			Logger.LogDebug(">>> Entering BindData()");
             if (this.Module != null)
             {
                 var desktopModule = DesktopModuleController.GetDesktopModule(this.hostSettings, this.Module.DesktopModuleID, this.PortalId);
                 this.dgPermissions.ResourceFile =
                     $"{Globals.ApplicationPath}/DesktopModules/{desktopModule.FolderName}/{Localization.LocalResourceDirectory}/{Localization.LocalSharedResourceFile}";
+					Logger.LogDebug("BindData(): desktopModule → {DesktopModule}", desktopModule);
                 if (!this.Module.IsShared)
                 {
                     this.chkInheritPermissions.Checked = this.Module.InheritViewPermissions;
@@ -642,6 +691,7 @@ namespace DotNetNuke.Modules.Admin.Modules
 
                 var objModuleDef = ModuleDefinitionController.GetModuleDefinitionByID(this.Module.ModuleDefID);
                 if (objModuleDef.DefaultCacheTime == Null.NullInteger)
+				Logger.LogDebug("BindData(): objModuleDef → {ObjModuleDef}", objModuleDef);
                 {
                     this.cacheWarningRow.Visible = true;
                     this.txtCacheDuration.Text = this.Module.CacheTime.ToString();
@@ -692,28 +742,35 @@ namespace DotNetNuke.Modules.Admin.Modules
                     this.chkInheritPermissions.Visible = true;
                 }
             }
+			Logger.LogDebug("<<< Exiting BindData()");
         }
 
         private void BindContainers()
         {
+			Logger.LogDebug(">>> Entering BindContainers()");
             this.moduleContainerCombo.PortalId = this.PortalId;
             this.moduleContainerCombo.RootPath = SkinController.RootContainer;
             this.moduleContainerCombo.Scope = SkinScope.All;
             this.moduleContainerCombo.IncludeNoneSpecificItem = true;
             this.moduleContainerCombo.NoneSpecificText = "<" + Localization.GetString("None_Specified") + ">";
             this.moduleContainerCombo.SelectedValue = this.Module.ContainerSrc;
+			Logger.LogDebug("<<< Exiting BindContainers()");
         }
 
         private void BindModulePages()
         {
+			Logger.LogDebug(">>> Entering BindModulePages()");
             var tabsByModule = TabController.Instance.GetTabsByModuleID(this.moduleId);
             tabsByModule.Remove(this.TabId);
+			Logger.LogDebug("BindModulePages(): tabsByModule → {TabsByModule}", tabsByModule);
             this.dgOnTabs.DataSource = tabsByModule.Values;
             this.dgOnTabs.DataBind();
+			Logger.LogDebug("<<< Exiting BindModulePages()");
         }
 
         private void BindModuleCacheProviderList()
         {
+			Logger.LogDebug(">>> Entering BindModuleCacheProviderList()");
             this.cboCacheProvider.DataSource = this.GetFilteredProviders(ModuleCachingProvider.GetProviderList(), "ModuleCachingProvider");
             this.cboCacheProvider.DataBind();
 
@@ -733,6 +790,7 @@ namespace DotNetNuke.Modules.Admin.Modules
             }
 
             this.lblCacheInherited.Visible = this.Module.CacheMethod != this.Module.GetEffectiveCacheMethod();
+			Logger.LogDebug("<<< Exiting BindModuleCacheProviderList()");
         }
 
         private IEnumerable GetFilteredProviders<T>(Dictionary<string, T> providerList, string keyFilter)
@@ -744,13 +802,17 @@ namespace DotNetNuke.Modules.Admin.Modules
 
         private void ShowCacheRows()
         {
+			Logger.LogDebug(">>> Entering ShowCacheRows()");
             this.divCacheDuration.Visible = !string.IsNullOrEmpty(this.cboCacheProvider.SelectedValue);
+			Logger.LogDebug("<<< Exiting ShowCacheRows()");
         }
 
         private bool GetBooleanSetting(string settingName, bool defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetBooleanSetting(settingName={SettingName},defaultValue={DefaultValue})", settingName, defaultValue);
             var value = this.Settings[settingName];
 
+			Logger.LogDebug("<<< Exiting GetBooleanSetting(settingName={SettingName},defaultValue={DefaultValue})", settingName, defaultValue);
             return value == null
                 ? defaultValue
                 : bool.Parse(value.ToString());

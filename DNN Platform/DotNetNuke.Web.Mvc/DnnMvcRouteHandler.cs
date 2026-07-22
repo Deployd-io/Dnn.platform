@@ -11,11 +11,14 @@ namespace DotNetNuke.Web.Mvc
 
     public class DnnMvcRouteHandler : IRouteHandler
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IControllerFactory controllerFactory;
 
         /// <summary>Initializes a new instance of the <see cref="DnnMvcRouteHandler"/> class.</summary>
         public DnnMvcRouteHandler()
         {
+		Logger.LogDebug(">>> Entering DnnMvcRouteHandler()");
+		Logger.LogDebug("<<< Exiting DnnMvcRouteHandler()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnMvcRouteHandler"/> class.</summary>
@@ -23,11 +26,16 @@ namespace DotNetNuke.Web.Mvc
         public DnnMvcRouteHandler(IControllerFactory controllerFactory)
         {
             this.controllerFactory = controllerFactory;
+			Logger.LogDebug("<<< Exiting DnnMvcRouteHandler(controllerFactory={ControllerFactory})", controllerFactory);
+			Logger.LogDebug("DnnMvcRouteHandler(controllerFactory={ControllerFactory}): controllerFactory → {ControllerFactory1}", controllerFactory, controllerFactory);
+			Logger.LogDebug("DnnMvcRouteHandler(controllerFactory={ControllerFactory}): this.controllerFactory → {Arg1}", controllerFactory, this.controllerFactory);
         }
 
         /// <inheritdoc />
         IHttpHandler IRouteHandler.GetHttpHandler(RequestContext requestContext)
         {
+			Logger.LogDebug(">>> Entering GetHttpHandler(requestContext={RequestContext})", requestContext);
+			Logger.LogDebug("<<< Exiting GetHttpHandler(requestContext={RequestContext})", requestContext);
             return this.GetHttpHandler(requestContext);
         }
 
@@ -39,6 +47,7 @@ namespace DotNetNuke.Web.Mvc
 
         protected virtual SessionStateBehavior GetSessionStateBehavior(RequestContext requestContext)
         {
+			Logger.LogDebug(">>> Entering GetSessionStateBehavior(requestContext={RequestContext})", requestContext);
             string controllerName = (string)requestContext.RouteData.Values["controller"];
             if (string.IsNullOrWhiteSpace(controllerName))
             {
@@ -46,6 +55,8 @@ namespace DotNetNuke.Web.Mvc
             }
 
             IControllerFactory controllerFactory = this.controllerFactory ?? ControllerBuilder.Current.GetControllerFactory();
+			Logger.LogDebug("GetSessionStateBehavior(requestContext={RequestContext}): controllerFactory → {ControllerFactory}", requestContext, controllerFactory);
+			Logger.LogDebug("<<< Exiting GetSessionStateBehavior(requestContext={RequestContext})", requestContext);
             return controllerFactory.GetControllerSessionBehavior(requestContext, controllerName);
         }
     }

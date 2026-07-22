@@ -25,6 +25,7 @@ using log4net.Util;
 
 namespace log4net
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// The log4net Global Context.
     /// </summary>
@@ -60,11 +61,15 @@ namespace log4net
         /// </remarks>
         private GlobalContext()
         {
+		Logger.LogDebug(">>> Entering GlobalContext()");
+		Logger.LogDebug("<<< Exiting GlobalContext()");
         }
 
         static GlobalContext()
         {
+			Logger.LogDebug(">>> Entering GlobalContext()");
             Properties[Core.LoggingEvent.HostNameProperty] = SystemInfo.HostName;
+			Logger.LogDebug("<<< Exiting GlobalContext()");
         }
 
         /// <summary>

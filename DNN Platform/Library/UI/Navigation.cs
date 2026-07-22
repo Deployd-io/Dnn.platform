@@ -23,6 +23,7 @@ namespace DotNetNuke.UI
 
     public class Navigation
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public enum NavNodeOptions
         {
             /// <summary>Include the node.</summary>
@@ -58,12 +59,15 @@ namespace DotNetNuke.UI
 
         public static bool CanShowTab(TabInfo objTab, bool isAdminMode, bool showDisabled)
         {
+			Logger.LogDebug(">>> Entering CanShowTab(objTab={ObjTab},isAdminMode={IsAdminMode},showDisabled={ShowDisabled})", objTab, isAdminMode, showDisabled);
+			Logger.LogDebug("<<< Exiting CanShowTab(objTab={ObjTab},isAdminMode={IsAdminMode},showDisabled={ShowDisabled})", objTab, isAdminMode, showDisabled);
             return CanShowTab(objTab, isAdminMode, showDisabled, false);
         }
 
         public static bool CanShowTab(TabInfo tab, bool isAdminMode, bool showDisabled, bool showHidden)
         {
             // if tab is visible, not deleted, not expired (or admin), and user has permission to see it...
+			Logger.LogDebug("<<< Exiting CanShowTab(tab={Tab},isAdminMode={IsAdminMode},showDisabled={ShowDisabled},showHidden={ShowHidden})", tab, isAdminMode, showDisabled, showHidden);
             return (tab.IsVisible || showHidden) && tab.HasAVisibleVersion && !tab.IsDeleted &&
                     (!tab.DisableLink || showDisabled) &&
                     (((tab.StartDate < DateTime.Now || tab.StartDate == Null.NullDate) &&
@@ -80,11 +84,16 @@ namespace DotNetNuke.UI
         /// <remarks>Primary purpose of this is to obtain the DNNNode needed for the events exposed by the NavigationProvider.</remarks>
         public static DNNNode GetActionNode(string strID, string strNamespace, ModuleAction objActionRoot, Control objControl)
         {
+			Logger.LogDebug(">>> Entering GetActionNode(strID={StrID},strNamespace={StrNamespace},objActionRoot={ObjActionRoot},objControl={ObjControl})", strID, strNamespace, objActionRoot, objControl);
             DNNNodeCollection objNodes = GetActionNodes(objActionRoot, objControl, -1);
             DNNNode objNode = objNodes.FindNode(strID);
+			Logger.LogDebug("GetActionNode(strID={StrID},strNamespace={StrNamespace},objActionRoot={ObjActionRoot},objControl={ObjControl}): objNodes → {ObjNodes}", strID, strNamespace, objActionRoot, objControl, objNodes);
+			Logger.LogDebug("GetActionNode(strID={StrID},strNamespace={StrNamespace},objActionRoot={ObjActionRoot},objControl={ObjControl}): objNode → {ObjNode}", strID, strNamespace, objActionRoot, objControl, objNode);
             var objReturnNodes = new DNNNodeCollection(strNamespace);
             objReturnNodes.Import(objNode);
+			Logger.LogDebug("GetActionNode(strID={StrID},strNamespace={StrNamespace},objActionRoot={ObjActionRoot},objControl={ObjControl}): objReturnNodes → {ObjReturnNodes}", strID, strNamespace, objActionRoot, objControl, objReturnNodes);
             objReturnNodes[0].ID = strID;
+			Logger.LogDebug("<<< Exiting GetActionNode(strID={StrID},strNamespace={StrNamespace},objActionRoot={ObjActionRoot},objControl={ObjControl})", strID, strNamespace, objActionRoot, objControl);
             return objReturnNodes[0];
         }
 
@@ -97,6 +106,8 @@ namespace DotNetNuke.UI
         /// <returns>A new <see cref="DNNNodeCollection"/>.</returns>
         public static DNNNodeCollection GetActionNodes(ModuleAction objActionRoot, Control objControl)
         {
+			Logger.LogDebug(">>> Entering GetActionNodes(objActionRoot={ObjActionRoot},objControl={ObjControl})", objActionRoot, objControl);
+			Logger.LogDebug("<<< Exiting GetActionNodes(objActionRoot={ObjActionRoot},objControl={ObjControl})", objActionRoot, objControl);
             return GetActionNodes(objActionRoot, objControl, -1);
         }
 
@@ -128,6 +139,7 @@ namespace DotNetNuke.UI
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetActionNodes(objActionRoot={ObjActionRoot},objControl={ObjControl},intDepth={IntDepth})", objActionRoot, objControl, intDepth);
             return objCol;
         }
 
@@ -149,6 +161,7 @@ namespace DotNetNuke.UI
                 AddChildActions(objActionRoot, objRootNode, objRootNode, objActionControl, intDepth);
             }
 
+			Logger.LogDebug("<<< Exiting GetActionNodes(objActionRoot={ObjActionRoot},objRootNode={ObjRootNode},objControl={ObjControl},intDepth={IntDepth})", objActionRoot, objRootNode, objControl, intDepth);
             return objCol;
         }
 
@@ -159,11 +172,16 @@ namespace DotNetNuke.UI
         /// <remarks>Primary purpose of this is to obtain the DNNNode needed for the events exposed by the NavigationProvider.</remarks>
         public static DNNNode GetNavigationNode(string strID, string strNamespace)
         {
+			Logger.LogDebug(">>> Entering GetNavigationNode(strID={StrID},strNamespace={StrNamespace})", strID, strNamespace);
             DNNNodeCollection objNodes = GetNavigationNodes(strNamespace);
             DNNNode objNode = objNodes.FindNode(strID);
+			Logger.LogDebug("GetNavigationNode(strID={StrID},strNamespace={StrNamespace}): objNodes → {ObjNodes}", strID, strNamespace, objNodes);
+			Logger.LogDebug("GetNavigationNode(strID={StrID},strNamespace={StrNamespace}): objNode → {ObjNode}", strID, strNamespace, objNode);
             var objReturnNodes = new DNNNodeCollection(strNamespace);
             objReturnNodes.Import(objNode);
+			Logger.LogDebug("GetNavigationNode(strID={StrID},strNamespace={StrNamespace}): objReturnNodes → {ObjReturnNodes}", strID, strNamespace, objReturnNodes);
             objReturnNodes[0].ID = strID;
+			Logger.LogDebug("<<< Exiting GetNavigationNode(strID={StrID},strNamespace={StrNamespace})", strID, strNamespace);
             return objReturnNodes[0];
         }
 
@@ -176,6 +194,8 @@ namespace DotNetNuke.UI
         /// <remarks>Returns all navigation nodes for a given user.</remarks>
         public static DNNNodeCollection GetNavigationNodes(string strNamespace)
         {
+			Logger.LogDebug(">>> Entering GetNavigationNodes(strNamespace={StrNamespace})", strNamespace);
+			Logger.LogDebug("<<< Exiting GetNavigationNodes(strNamespace={StrNamespace})", strNamespace);
             return GetNavigationNodes(strNamespace, ToolTipSource.None, -1, -1, 0);
         }
 
@@ -193,6 +213,8 @@ namespace DotNetNuke.UI
         public static DNNNodeCollection GetNavigationNodes(string strNamespace, ToolTipSource eToolTips, int intStartTabId, int intDepth, int intNavNodeOptions)
         {
             var objCol = new DNNNodeCollection(strNamespace);
+			Logger.LogDebug("GetNavigationNodes(strNamespace={StrNamespace},eToolTips={EToolTips},intStartTabId={IntStartTabId},intDepth={IntDepth},intNavNodeOptions={IntNavNodeOptions}): objCol → {ObjCol}", strNamespace, eToolTips, intStartTabId, intDepth, intNavNodeOptions, objCol);
+			Logger.LogDebug("<<< Exiting GetNavigationNodes(strNamespace={StrNamespace},eToolTips={EToolTips},intStartTabId={IntStartTabId},intDepth={IntDepth},intNavNodeOptions={IntNavNodeOptions})", strNamespace, eToolTips, intStartTabId, intDepth, intNavNodeOptions);
             return GetNavigationNodes(new DNNNode(objCol.XMLNode), eToolTips, intStartTabId, intDepth, intNavNodeOptions);
         }
 
@@ -252,6 +274,7 @@ namespace DotNetNuke.UI
                 ProcessTab(objRootNode, objTab, objTabLookup, objBreadCrumbs, intLastBreadCrumbId, eToolTips, intStartTabId, intDepth, intNavNodeOptions, nodesDict);
             }
 
+			Logger.LogDebug("<<< Exiting GetNavigationNodes(objRootNode={ObjRootNode},eToolTips={EToolTips},intStartTabId={IntStartTabId},intDepth={IntDepth},intNavNodeOptions={IntNavNodeOptions})", objRootNode, eToolTips, intStartTabId, intDepth, intNavNodeOptions);
             return objRootNodes;
         }
 
@@ -263,6 +286,7 @@ namespace DotNetNuke.UI
         /// <param name="intDepth">How many levels deep should be populated.</param>
         private static void AddChildActions(ModuleAction parentAction, DNNNode parentNode, DNNNode rootNode, IActionControl actionControl, int intDepth)
         {
+			Logger.LogDebug(">>> Entering AddChildActions(parentAction={ParentAction},parentNode={ParentNode},rootNode={RootNode},actionControl={ActionControl},intDepth={IntDepth})", parentAction, parentNode, rootNode, actionControl, intDepth);
             // Add Menu Items
             foreach (ModuleAction action in parentAction.Actions)
             {
@@ -286,6 +310,7 @@ namespace DotNetNuke.UI
                         if (isActionPending)
                         {
                             parentNode.HasNodes = true;
+							Logger.LogDebug("AddChildActions(parentAction={ParentAction},parentNode={ParentNode},rootNode={RootNode},actionControl={ActionControl},intDepth={IntDepth}): parentNode.HasNodes → {Arg5}", parentAction, parentNode, rootNode, actionControl, intDepth, parentNode.HasNodes);
                         }
                         else
                         {
@@ -294,24 +319,30 @@ namespace DotNetNuke.UI
                             node.ID = action.ID.ToString(CultureInfo.InvariantCulture);
                             node.Key = action.ID.ToString(CultureInfo.InvariantCulture);
                             node.Text = action.Title; // no longer including SPACE in generic node collection, each control must handle how they want to display
+							Logger.LogDebug("AddChildActions(parentAction={ParentAction},parentNode={ParentNode},rootNode={RootNode},actionControl={ActionControl},intDepth={IntDepth}): node.Text → {Arg5}", parentAction, parentNode, rootNode, actionControl, intDepth, node.Text);
                             if (string.IsNullOrEmpty(action.ClientScript) && string.IsNullOrEmpty(action.Url) && string.IsNullOrEmpty(action.CommandArgument))
                             {
                                 node.Enabled = false;
+								Logger.LogDebug("AddChildActions(parentAction={ParentAction},parentNode={ParentNode},rootNode={RootNode},actionControl={ActionControl},intDepth={IntDepth}): node.Enabled → {Arg5}", parentAction, parentNode, rootNode, actionControl, intDepth, node.Enabled);
                             }
                             else if (!string.IsNullOrEmpty(action.ClientScript))
                             {
                                 node.JSFunction = action.ClientScript;
+								Logger.LogDebug("AddChildActions(parentAction={ParentAction},parentNode={ParentNode},rootNode={RootNode},actionControl={ActionControl},intDepth={IntDepth}): node.JSFunction → {Arg5}", parentAction, parentNode, rootNode, actionControl, intDepth, node.JSFunction);
+								Logger.LogDebug("AddChildActions(parentAction={ParentAction},parentNode={ParentNode},rootNode={RootNode},actionControl={ActionControl},intDepth={IntDepth}): node.ClickAction → {Arg5}", parentAction, parentNode, rootNode, actionControl, intDepth, node.ClickAction);
                                 node.ClickAction = eClickAction.None;
                             }
                             else
                             {
                                 node.NavigateURL = action.Url;
+								Logger.LogDebug("AddChildActions(parentAction={ParentAction},parentNode={ParentNode},rootNode={RootNode},actionControl={ActionControl},intDepth={IntDepth}): node.NavigateURL → {Arg5}", parentAction, parentNode, rootNode, actionControl, intDepth, node.NavigateURL);
                                 if (action.UseActionEvent == false && !string.IsNullOrEmpty(node.NavigateURL))
                                 {
                                     node.ClickAction = eClickAction.Navigate;
                                     if (action.NewWindow)
                                     {
                                         node.Target = "_blank";
+										Logger.LogDebug("AddChildActions(parentAction={ParentAction},parentNode={ParentNode},rootNode={RootNode},actionControl={ActionControl},intDepth={IntDepth}): node.Target → {Arg5}", parentAction, parentNode, rootNode, actionControl, intDepth, node.Target);
                                     }
                                 }
                                 else
@@ -321,6 +352,7 @@ namespace DotNetNuke.UI
                             }
 
                             node.Image = action.Icon;
+							Logger.LogDebug("AddChildActions(parentAction={ParentAction},parentNode={ParentNode},rootNode={RootNode},actionControl={ActionControl},intDepth={IntDepth}): node.Image → {Arg5}", parentAction, parentNode, rootNode, actionControl, intDepth, node.Image);
                             if (action.HasChildren())
                             {
                                 // if action has children then call function recursively
@@ -330,6 +362,7 @@ namespace DotNetNuke.UI
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting AddChildActions(parentAction={ParentAction},parentNode={ParentNode},rootNode={RootNode},actionControl={ActionControl},intDepth={IntDepth})", parentAction, parentNode, rootNode, actionControl, intDepth);
         }
 
         /// <summary>Assigns common properties from passed in tab to newly created DNNNode that is added to the passed in DNNNodeCollection.</summary>
@@ -403,6 +436,7 @@ namespace DotNetNuke.UI
 
         private static bool IsActionPending(DNNNode objParentNode, DNNNode objRootNode, int intDepth)
         {
+			Logger.LogDebug(">>> Entering IsActionPending(objParentNode={ObjParentNode},objRootNode={ObjRootNode},intDepth={IntDepth})", objParentNode, objRootNode, intDepth);
             // if we aren't restricting depth then its never pending
             if (intDepth == -1)
             {
@@ -416,6 +450,7 @@ namespace DotNetNuke.UI
                 return false;
             }
 
+			Logger.LogDebug("<<< Exiting IsActionPending(objParentNode={ObjParentNode},objRootNode={ObjRootNode},intDepth={IntDepth})", objParentNode, objRootNode, intDepth);
             return true;
         }
 

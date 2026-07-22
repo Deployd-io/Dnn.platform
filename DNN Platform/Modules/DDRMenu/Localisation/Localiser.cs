@@ -20,6 +20,7 @@ namespace DotNetNuke.Web.DDRMenu.Localisation
     /// <summary>Implements the localization logic for all providers.</summary>
     public partial class Localiser : ILocaliser
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static bool apiChecked;
         private static ILocalisation localisationApi;
 
@@ -31,6 +32,10 @@ namespace DotNetNuke.Web.DDRMenu.Localisation
         public Localiser()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering Localiser()");
+		Logger.LogDebug("<<< Exiting Localiser()");
+		Logger.LogDebug(">>> Entering Localiser(localizations={Localizations},portalController={PortalController})", localizations, portalController);
+		Logger.LogDebug("<<< Exiting Localiser(localizations={Localizations},portalController={PortalController})", localizations, portalController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Localiser"/> class.</summary>
@@ -40,6 +45,8 @@ namespace DotNetNuke.Web.DDRMenu.Localisation
         {
             this.localizations = localizations ?? Globals.GetCurrentServiceProvider().GetServices<ILocalisation>();
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+			Logger.LogDebug("Localiser(localizations={Localizations},portalController={PortalController}): portalController → {PortalController1}", localizations, portalController, portalController);
+			Logger.LogDebug("Localiser(localizations={Localizations},portalController={PortalController}): localizations → {Localizations1}", localizations, portalController, localizations);
         }
 
         private ILocalisation LocalisationApi
@@ -67,6 +74,8 @@ namespace DotNetNuke.Web.DDRMenu.Localisation
         /// <inheritdoc />
         public DNNNodeCollection LocaliseDNNNodeCollection(DNNNodeCollection nodes)
         {
+			Logger.LogDebug(">>> Entering LocaliseDNNNodeCollection(nodes={Nodes})", nodes);
+			Logger.LogDebug("<<< Exiting LocaliseDNNNodeCollection(nodes={Nodes})", nodes);
             return this.LocalisationApi?.LocaliseNodes(nodes) ?? nodes;
         }
 
@@ -75,21 +84,29 @@ namespace DotNetNuke.Web.DDRMenu.Localisation
         [DnnDeprecated(10, 0, 0, "Use overload taking a portalId.")]
         public partial void LocaliseNode(MenuNode node)
         {
+			Logger.LogDebug(">>> Entering LocaliseNode(node={Node})", node);
             this.LocaliseNode(node, this.portalController.GetCurrentSettings().PortalId);
+			Logger.LogDebug("<<< Exiting LocaliseNode(node={Node})", node);
         }
 
         /// <inheritdoc />
         public void LocaliseNode(MenuNode node, int portalId)
         {
+			Logger.LogDebug(">>> Entering LocaliseNode(node={Node},portalId={PortalId})", node, portalId);
             var tab = (node.TabId > 0) ? TabController.Instance.GetTab(node.TabId, Null.NullInteger, false) : null;
+			Logger.LogDebug("LocaliseNode(node={Node},portalId={PortalId}): tab → {Tab}", node, portalId, tab);
             if (tab != null)
             {
                 var localised = this.LocaliseTab(tab, portalId);
                 tab = localised ?? tab;
+				Logger.LogDebug("LocaliseNode(node={Node},portalId={PortalId}): localised → {Localised}", node, portalId, localised);
 
                 if (localised != null)
                 {
                     node.TabId = tab.TabID;
+					Logger.LogDebug("LocaliseNode(node={Node},portalId={PortalId}): node.TabId → {Arg2}", node, portalId, node.TabId);
+					Logger.LogDebug("LocaliseNode(node={Node},portalId={PortalId}): node.Text → {Arg2}", node, portalId, node.Text);
+					Logger.LogDebug("LocaliseNode(node={Node},portalId={PortalId}): node.Enabled → {Arg2}", node, portalId, node.Enabled);
                     node.Text = tab.TabName;
                     node.Enabled = !tab.DisableLink;
                     if (!tab.IsVisible)
@@ -99,6 +116,9 @@ namespace DotNetNuke.Web.DDRMenu.Localisation
                 }
 
                 node.Title = tab.Title;
+				Logger.LogDebug("LocaliseNode(node={Node},portalId={PortalId}): node.Title → {Arg2}", node, portalId, node.Title);
+				Logger.LogDebug("LocaliseNode(node={Node},portalId={PortalId}): node.Description → {Arg2}", node, portalId, node.Description);
+				Logger.LogDebug("LocaliseNode(node={Node},portalId={PortalId}): node.Keywords → {Arg2}", node, portalId, node.Keywords);
                 node.Description = tab.Description;
                 node.Keywords = tab.KeyWords;
             }
@@ -108,6 +128,7 @@ namespace DotNetNuke.Web.DDRMenu.Localisation
             }
 
             node.Children.ForEach(child => this.LocaliseNode(child, portalId));
+			Logger.LogDebug("<<< Exiting LocaliseNode(node={Node},portalId={PortalId})", node, portalId);
         }
 
         private TabInfo LocaliseTab(TabInfo tab, int portalId)

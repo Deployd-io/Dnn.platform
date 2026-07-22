@@ -30,10 +30,13 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
             eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>(),
             clientResourceController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>())
     {
+		Logger.LogDebug(">>> Entering TermsSelector(appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController},termController={TermController})", appStatus, eventLogger, clientResourceController, termController);
         private static readonly char[] TermIdSeparator = [',',];
         private readonly ITermController termController = termController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ITermController>();
 
+		Logger.LogDebug("TermsSelector(appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController},termController={TermController}): termController → {TermController1}", appStatus, eventLogger, clientResourceController, termController, termController);
         /// <summary>Initializes a new instance of the <see cref="TermsSelector"/> class.</summary>
+		Logger.LogDebug("<<< Exiting TermsSelector(appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController},termController={TermController})", appStatus, eventLogger, clientResourceController, termController);
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IApplicationStatusInfo. Scheduled removal in v12.0.0.")]
         public TermsSelector()
             : this(null, null, null, null)
@@ -100,11 +103,13 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             if (!string.IsNullOrEmpty(this.CssClass))
             {
                 this.CssClass = $"{this.CssClass} TermsSelector";
+				Logger.LogDebug("OnInit(e={E}): this.CssClass → {Arg1}", e, this.CssClass);
             }
             else
             {
@@ -113,7 +118,10 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
 
             var includeSystem = this.IncludeSystemVocabularies.ToString().ToLowerInvariant();
             var includeTags = this.IncludeTags.ToString().ToLowerInvariant();
+			Logger.LogDebug("OnInit(e={E}): includeSystem → {IncludeSystem}", e, includeSystem);
             var apiPath = Globals.ResolveUrl($"~/API/InternalServices/ItemListService/GetTerms?includeSystem={includeSystem}&includeTags={includeTags}&q=");
+			Logger.LogDebug("OnInit(e={E}): includeTags → {IncludeTags}", e, includeTags);
+			Logger.LogDebug("OnInit(e={E}): apiPath → {ApiPath}", e, apiPath);
 
             this.Options.Preload = "focus";
             this.Options.Plugins.Add("remove_button");
@@ -122,6 +130,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
                 Option = "function(item, escape) {return '<div>' + item.text + '</div>';}",
             };
 
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
             this.Options.Load = $$"""
                                   function(query, callback) {
                                       $.ajax({

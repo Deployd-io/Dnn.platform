@@ -14,6 +14,7 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
     /// <inheritdoc cref="IExecuteSqlStep" />
     internal sealed class ExecuteSqlStep : StepBase, IExecuteSqlStep
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IDataProvider dataProvider;
 
         /// <summary>Initializes a new instance of the <see cref="ExecuteSqlStep"/> class.</summary>
@@ -23,7 +24,11 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         public ExecuteSqlStep(ILoggerSource loggerSource, ILocalizer localizer, IDataProvider dataProvider)
             : base(loggerSource, localizer)
         {
+			Logger.LogDebug(">>> Entering ExecuteSqlStep(loggerSource={LoggerSource},localizer={Localizer},dataProvider={DataProvider})", loggerSource, localizer, dataProvider);
             this.dataProvider = dataProvider ??
+				Logger.LogDebug("<<< Exiting ExecuteSqlStep(loggerSource={LoggerSource},localizer={Localizer},dataProvider={DataProvider})", loggerSource, localizer, dataProvider);
+				Logger.LogDebug("ExecuteSqlStep(loggerSource={LoggerSource},localizer={Localizer},dataProvider={DataProvider}): dataProvider → {DataProvider1}", loggerSource, localizer, dataProvider, dataProvider);
+				Logger.LogDebug("ExecuteSqlStep(loggerSource={LoggerSource},localizer={Localizer},dataProvider={DataProvider}): this.dataProvider → {Arg3}", loggerSource, localizer, dataProvider, this.dataProvider);
                 throw new ArgumentNullException(nameof(dataProvider));
         }
 
@@ -37,9 +42,12 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         /// <inheritdoc />
         protected override void ExecuteInternal()
         {
+			Logger.LogDebug(">>> Entering ExecuteInternal()");
             this.Result = this.dataProvider.ExecuteSQL(this.CommandText);
             this.Notes = this.LocalizeFormat("UninstallStepCountOfRecordsAffected", this.Result.RecordsAffected);
             this.Success = true;
+			Logger.LogDebug("<<< Exiting ExecuteInternal()");
+			Logger.LogDebug("ExecuteInternal(): this.Success → {Arg0}", this.Success);
         }
     }
 }

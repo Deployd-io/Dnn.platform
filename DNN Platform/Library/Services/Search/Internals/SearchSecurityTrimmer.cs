@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.Search.Internals
 
     internal class SearchSecurityTrimmer : Collector
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly SecurityCheckerDelegate securityChecker;
         private readonly IndexSearcher searcher;
         private readonly LuceneQuery luceneQuery;
@@ -31,11 +32,22 @@ namespace DotNetNuke.Services.Search.Internals
         /// <param name="searchContext">The search context.</param>
         public SearchSecurityTrimmer(SearchSecurityTrimmerContext searchContext)
         {
+			Logger.LogDebug(">>> Entering SearchSecurityTrimmer(searchContext={SearchContext})", searchContext);
             this.securityChecker = searchContext.SecurityChecker;
             this.searcher = searchContext.Searcher;
+			Logger.LogDebug("SearchSecurityTrimmer(searchContext={SearchContext}): this.securityChecker → {Arg1}", searchContext, this.securityChecker);
+			Logger.LogDebug("SearchSecurityTrimmer(searchContext={SearchContext}): searcher → {Searcher}", searchContext, searcher);
+			Logger.LogDebug("SearchSecurityTrimmer(searchContext={SearchContext}): this.searcher → {Arg1}", searchContext, this.searcher);
+			Logger.LogDebug("SearchSecurityTrimmer(searchContext={SearchContext}): securityChecker → {SecurityChecker}", searchContext, securityChecker);
             this.luceneQuery = searchContext.LuceneQuery;
             this.searchQuery = searchContext.SearchQuery;
             this.hitDocs = new List<ScoreDoc>(16);
+			Logger.LogDebug("<<< Exiting SearchSecurityTrimmer(searchContext={SearchContext})", searchContext);
+			Logger.LogDebug("SearchSecurityTrimmer(searchContext={SearchContext}): luceneQuery → {LuceneQuery}", searchContext, luceneQuery);
+			Logger.LogDebug("SearchSecurityTrimmer(searchContext={SearchContext}): this.luceneQuery → {Arg1}", searchContext, this.luceneQuery);
+			Logger.LogDebug("SearchSecurityTrimmer(searchContext={SearchContext}): searchQuery → {SearchQuery}", searchContext, searchQuery);
+			Logger.LogDebug("SearchSecurityTrimmer(searchContext={SearchContext}): this.searchQuery → {Arg1}", searchContext, this.searchQuery);
+			Logger.LogDebug("SearchSecurityTrimmer(searchContext={SearchContext}): hitDocs → {HitDocs}", searchContext, hitDocs);
         }
 
         /// <inheritdoc />
@@ -73,31 +85,45 @@ namespace DotNetNuke.Services.Search.Internals
         /// <inheritdoc />
         public override void SetNextReader(IndexReader reader, int docBase)
         {
+			Logger.LogDebug(">>> Entering SetNextReader(reader={Reader},docBase={DocBase})", reader, docBase);
             this.docBase = docBase;
+			Logger.LogDebug("<<< Exiting SetNextReader(reader={Reader},docBase={DocBase})", reader, docBase);
+			Logger.LogDebug("SetNextReader(reader={Reader},docBase={DocBase}): docBase → {DocBase1}", reader, docBase, docBase);
+			Logger.LogDebug("SetNextReader(reader={Reader},docBase={DocBase}): this.docBase → {Arg2}", reader, docBase, this.docBase);
         }
 
         /// <inheritdoc />
         public override void SetScorer(Scorer scorer)
         {
+			Logger.LogDebug(">>> Entering SetScorer(scorer={Scorer})", scorer);
             this.scorer = scorer;
+			Logger.LogDebug("<<< Exiting SetScorer(scorer={Scorer})", scorer);
+			Logger.LogDebug("SetScorer(scorer={Scorer}): scorer → {Scorer1}", scorer, scorer);
+			Logger.LogDebug("SetScorer(scorer={Scorer}): this.scorer → {Arg1}", scorer, this.scorer);
         }
 
         /// <inheritdoc />
         public override void Collect(int doc)
         {
+			Logger.LogDebug(">>> Entering Collect(doc={Doc})", doc);
             this.hitDocs.Add(new ScoreDoc(doc + this.docBase, this.scorer.Score()));
+			Logger.LogDebug("<<< Exiting Collect(doc={Doc})", doc);
         }
 
         private static string GetStringFromField(Document doc, SortField sortField)
         {
+			Logger.LogDebug(">>> Entering GetStringFromField(doc={Doc},sortField={SortField})", doc, sortField);
             var field = doc.GetField(sortField.Field);
+			Logger.LogDebug("<<< Exiting GetStringFromField(doc={Doc},sortField={SortField})", doc, sortField);
             return field == null ? string.Empty : field.StringValue;
         }
 
         private static long GetLongFromField(Document doc, SortField sortField)
         {
+			Logger.LogDebug(">>> Entering GetLongFromField(doc={Doc},sortField={SortField})", doc, sortField);
             var field = doc.GetField(sortField.Field);
             if (field == null)
+			Logger.LogDebug("GetLongFromField(doc={Doc},sortField={SortField}): field → {Field}", doc, sortField, field);
             {
                 return 0;
             }
@@ -108,21 +134,28 @@ namespace DotNetNuke.Services.Search.Internals
                 return data;
             }
 
+			Logger.LogDebug("<<< Exiting GetLongFromField(doc={Doc},sortField={SortField})", doc, sortField);
             return 0;
         }
 
         private void PrepareScoreDocs()
         {
+			Logger.LogDebug(">>> Entering PrepareScoreDocs()");
             int skippedSoFar;
             var collectedSoFar = skippedSoFar = 0;
             var pageSize = this.luceneQuery.PageSize;
             var toSkip = this.luceneQuery.PageIndex <= 1 ? 0 : ((this.luceneQuery.PageIndex - 1) * pageSize);
             IEnumerable<ScoreDoc> tempDocs = new List<ScoreDoc>();
+			Logger.LogDebug("PrepareScoreDocs(): toSkip → {ToSkip}", toSkip);
+			Logger.LogDebug("PrepareScoreDocs(): tempDocs → {TempDocs}", tempDocs);
 
             this.totalHits = this.hitDocs.Count;
+			Logger.LogDebug("PrepareScoreDocs(): totalHits → {TotalHits}", totalHits);
+			Logger.LogDebug("PrepareScoreDocs(): this.totalHits → {Arg0}", this.totalHits);
 
             var useRelevance = false;
             if (ReferenceEquals(Sort.RELEVANCE, this.luceneQuery.Sort))
+			Logger.LogDebug("PrepareScoreDocs(): useRelevance → {UseRelevance}", useRelevance);
             {
                 useRelevance = true;
             }
@@ -130,6 +163,7 @@ namespace DotNetNuke.Services.Search.Internals
             {
                 var fields = this.luceneQuery.Sort.GetSort();
                 if (fields is not { Length: 1 })
+				Logger.LogDebug("PrepareScoreDocs(): fields → {Fields}", fields);
                 {
                     useRelevance = true;
                 }
@@ -180,6 +214,8 @@ namespace DotNetNuke.Services.Search.Internals
 
             var scoreDocSize = Math.Min(tempDocs.Count(), pageSize);
             this.scoreDocs = new List<ScoreDoc>(scoreDocSize);
+			Logger.LogDebug("PrepareScoreDocs(): scoreDocSize → {ScoreDocSize}", scoreDocSize);
+			Logger.LogDebug("PrepareScoreDocs(): scoreDocs → {ScoreDocs}", scoreDocs);
 
             foreach (var scoreDoc in tempDocs)
             {
@@ -204,6 +240,7 @@ namespace DotNetNuke.Services.Search.Internals
                     this.totalHits--;
                 }
             }
+			Logger.LogDebug("<<< Exiting PrepareScoreDocs()");
         }
     }
 }

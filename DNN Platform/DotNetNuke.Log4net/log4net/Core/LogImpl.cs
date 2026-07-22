@@ -97,6 +97,7 @@ namespace log4net.Core
     /// <author>Gert Driesen</author>
     public class LogImpl : LoggerWrapperImpl, ILog
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Construct a new wrapper for the specified logger.</summary>
         /// <param name="logger">The logger to wrap.</param>
         /// <remarks>
@@ -106,11 +107,13 @@ namespace log4net.Core
         /// </remarks>
         public LogImpl(ILogger logger) : base(logger)
         {
+			Logger.LogDebug(">>> Entering LogImpl(logger={Logger})", logger);
             // Listen for changes to the repository
             logger.Repository.ConfigurationChanged += new LoggerRepositoryConfigurationChangedEventHandler(this.LoggerRepositoryConfigurationChanged);
 
             // load the current levels
             this.ReloadLevels(logger.Repository);
+			Logger.LogDebug("<<< Exiting LogImpl(logger={Logger})", logger);
         }
 
         /// <summary>Virtual method called when the configuration of the repository changes</summary>
@@ -154,7 +157,9 @@ namespace log4net.Core
         /// </remarks>
         public virtual void Debug(object message) 
         {
+			Logger.LogDebug(">>> Entering Debug(message={Message})", message);
             this.Logger.Log(ThisDeclaringType, this.m_levelDebug, message, null);
+			Logger.LogDebug("<<< Exiting Debug(message={Message})", message);
         }
 
         /// <summary>Logs a message object with the <c>DEBUG</c> level</summary>
@@ -173,7 +178,9 @@ namespace log4net.Core
         /// <seealso cref="M:Debug(object)"/>
         public virtual void Debug(object message, Exception exception) 
         {
+			Logger.LogDebug(">>> Entering Debug(message={Message},exception={Exception})", message, exception);
             this.Logger.Log(ThisDeclaringType, this.m_levelDebug, message, exception);
+			Logger.LogDebug("<<< Exiting Debug(message={Message},exception={Exception})", message, exception);
         }
 
         /// <summary>Logs a formatted message string with the <c>DEBUG</c> level.</summary>
@@ -198,10 +205,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void DebugFormat(string format, params object[] args) 
         {
+			Logger.LogDebug(">>> Entering DebugFormat(format={Format},args={Args})", format, args);
             if (this.IsDebugEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelDebug, new SystemStringFormat(CultureInfo.InvariantCulture, format, args), null);
             }
+			Logger.LogDebug("<<< Exiting DebugFormat(format={Format},args={Args})", format, args);
         }
 
         /// <summary>Logs a formatted message string with the <c>DEBUG</c> level.</summary>
@@ -226,10 +235,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void DebugFormat(string format, object arg0) 
         {
+			Logger.LogDebug(">>> Entering DebugFormat(format={Format},arg0={Arg0})", format, arg0);
             if (this.IsDebugEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelDebug, new SystemStringFormat(CultureInfo.InvariantCulture, format, new object[] { arg0 }), null);
             }
+			Logger.LogDebug("<<< Exiting DebugFormat(format={Format},arg0={Arg0})", format, arg0);
         }
 
         /// <summary>Logs a formatted message string with the <c>DEBUG</c> level.</summary>
@@ -255,10 +266,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void DebugFormat(string format, object arg0, object arg1) 
         {
+			Logger.LogDebug(">>> Entering DebugFormat(format={Format},arg0={Arg0},arg1={Arg1})", format, arg0, arg1);
             if (this.IsDebugEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelDebug, new SystemStringFormat(CultureInfo.InvariantCulture, format, new object[] { arg0, arg1 }), null);
             }
+			Logger.LogDebug("<<< Exiting DebugFormat(format={Format},arg0={Arg0},arg1={Arg1})", format, arg0, arg1);
         }
 
         /// <summary>Logs a formatted message string with the <c>DEBUG</c> level.</summary>
@@ -285,10 +298,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void DebugFormat(string format, object arg0, object arg1, object arg2) 
         {
+			Logger.LogDebug(">>> Entering DebugFormat(format={Format},arg0={Arg0},arg1={Arg1},arg2={Arg2})", format, arg0, arg1, arg2);
             if (this.IsDebugEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelDebug, new SystemStringFormat(CultureInfo.InvariantCulture, format, new object[] { arg0, arg1, arg2 }), null);
             }
+			Logger.LogDebug("<<< Exiting DebugFormat(format={Format},arg0={Arg0},arg1={Arg1},arg2={Arg2})", format, arg0, arg1, arg2);
         }
 
         /// <summary>Logs a formatted message string with the <c>DEBUG</c> level.</summary>
@@ -309,10 +324,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void DebugFormat(IFormatProvider provider, string format, params object[] args) 
         {
+			Logger.LogDebug(">>> Entering DebugFormat(provider={Provider},format={Format},args={Args})", provider, format, args);
             if (this.IsDebugEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelDebug, new SystemStringFormat(provider, format, args), null);
             }
+			Logger.LogDebug("<<< Exiting DebugFormat(provider={Provider},format={Format},args={Args})", provider, format, args);
         }
 
         /// <summary>Logs a message object with the <c>INFO</c> level.</summary>
@@ -338,7 +355,9 @@ namespace log4net.Core
         /// </remarks>
         public virtual void Info(object message) 
         {
+			Logger.LogDebug(">>> Entering Info(message={Message})", message);
             this.Logger.Log(ThisDeclaringType, this.m_levelInfo, message, null);
+			Logger.LogDebug("<<< Exiting Info(message={Message})", message);
         }
   
         /// <summary>Logs a message object with the <c>INFO</c> level.</summary>
@@ -357,7 +376,9 @@ namespace log4net.Core
         /// <seealso cref="M:Info(object)"/>
         public virtual void Info(object message, Exception exception) 
         {
+			Logger.LogDebug(">>> Entering Info(message={Message},exception={Exception})", message, exception);
             this.Logger.Log(ThisDeclaringType, this.m_levelInfo, message, exception);
+			Logger.LogDebug("<<< Exiting Info(message={Message},exception={Exception})", message, exception);
         }
 
         /// <summary>Logs a formatted message string with the <c>INFO</c> level.</summary>
@@ -382,10 +403,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void InfoFormat(string format, params object[] args) 
         {
+			Logger.LogDebug(">>> Entering InfoFormat(format={Format},args={Args})", format, args);
             if (this.IsInfoEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelInfo, new SystemStringFormat(CultureInfo.InvariantCulture, format, args), null);
             }
+			Logger.LogDebug("<<< Exiting InfoFormat(format={Format},args={Args})", format, args);
         }
 
         /// <summary>Logs a formatted message string with the <c>INFO</c> level.</summary>
@@ -410,10 +433,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void InfoFormat(string format, object arg0) 
         {
+			Logger.LogDebug(">>> Entering InfoFormat(format={Format},arg0={Arg0})", format, arg0);
             if (this.IsInfoEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelInfo, new SystemStringFormat(CultureInfo.InvariantCulture, format, new object[] { arg0 }), null);
             }
+			Logger.LogDebug("<<< Exiting InfoFormat(format={Format},arg0={Arg0})", format, arg0);
         }
 
         /// <summary>Logs a formatted message string with the <c>INFO</c> level.</summary>
@@ -439,10 +464,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void InfoFormat(string format, object arg0, object arg1) 
         {
+			Logger.LogDebug(">>> Entering InfoFormat(format={Format},arg0={Arg0},arg1={Arg1})", format, arg0, arg1);
             if (this.IsInfoEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelInfo, new SystemStringFormat(CultureInfo.InvariantCulture, format, new object[] { arg0, arg1 }), null);
             }
+			Logger.LogDebug("<<< Exiting InfoFormat(format={Format},arg0={Arg0},arg1={Arg1})", format, arg0, arg1);
         }
 
         /// <summary>Logs a formatted message string with the <c>INFO</c> level.</summary>
@@ -469,10 +496,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void InfoFormat(string format, object arg0, object arg1, object arg2) 
         {
+			Logger.LogDebug(">>> Entering InfoFormat(format={Format},arg0={Arg0},arg1={Arg1},arg2={Arg2})", format, arg0, arg1, arg2);
             if (this.IsInfoEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelInfo, new SystemStringFormat(CultureInfo.InvariantCulture, format, new object[] { arg0, arg1, arg2 }), null);
             }
+			Logger.LogDebug("<<< Exiting InfoFormat(format={Format},arg0={Arg0},arg1={Arg1},arg2={Arg2})", format, arg0, arg1, arg2);
         }
 
         /// <summary>Logs a formatted message string with the <c>INFO</c> level.</summary>
@@ -493,10 +522,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void InfoFormat(IFormatProvider provider, string format, params object[] args) 
         {
+			Logger.LogDebug(">>> Entering InfoFormat(provider={Provider},format={Format},args={Args})", provider, format, args);
             if (this.IsInfoEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelInfo, new SystemStringFormat(provider, format, args), null);
             }
+			Logger.LogDebug("<<< Exiting InfoFormat(provider={Provider},format={Format},args={Args})", provider, format, args);
         }
 
         /// <summary>Logs a message object with the <c>WARN</c> level.</summary>
@@ -522,7 +553,9 @@ namespace log4net.Core
         /// </remarks>
         public virtual void Warn(object message) 
         {
+			Logger.LogDebug(">>> Entering Warn(message={Message})", message);
             this.Logger.Log(ThisDeclaringType, this.m_levelWarn, message, null);
+			Logger.LogDebug("<<< Exiting Warn(message={Message})", message);
         }
   
         /// <summary>Logs a message object with the <c>WARN</c> level</summary>
@@ -541,7 +574,9 @@ namespace log4net.Core
         /// <seealso cref="M:Warn(object)"/>
         public virtual void Warn(object message, Exception exception) 
         {
+			Logger.LogDebug(">>> Entering Warn(message={Message},exception={Exception})", message, exception);
             this.Logger.Log(ThisDeclaringType, this.m_levelWarn, message, exception);
+			Logger.LogDebug("<<< Exiting Warn(message={Message},exception={Exception})", message, exception);
         }
 
         /// <summary>Logs a formatted message string with the <c>WARN</c> level.</summary>
@@ -566,10 +601,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void WarnFormat(string format, params object[] args) 
         {
+			Logger.LogDebug(">>> Entering WarnFormat(format={Format},args={Args})", format, args);
             if (this.IsWarnEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelWarn, new SystemStringFormat(CultureInfo.InvariantCulture, format, args), null);
             }
+			Logger.LogDebug("<<< Exiting WarnFormat(format={Format},args={Args})", format, args);
         }
 
         /// <summary>Logs a formatted message string with the <c>WARN</c> level.</summary>
@@ -594,10 +631,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void WarnFormat(string format, object arg0) 
         {
+			Logger.LogDebug(">>> Entering WarnFormat(format={Format},arg0={Arg0})", format, arg0);
             if (this.IsWarnEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelWarn, new SystemStringFormat(CultureInfo.InvariantCulture, format, new object[] { arg0 }), null);
             }
+			Logger.LogDebug("<<< Exiting WarnFormat(format={Format},arg0={Arg0})", format, arg0);
         }
 
         /// <summary>Logs a formatted message string with the <c>WARN</c> level.</summary>
@@ -623,10 +662,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void WarnFormat(string format, object arg0, object arg1) 
         {
+			Logger.LogDebug(">>> Entering WarnFormat(format={Format},arg0={Arg0},arg1={Arg1})", format, arg0, arg1);
             if (this.IsWarnEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelWarn, new SystemStringFormat(CultureInfo.InvariantCulture, format, new object[] { arg0, arg1 }), null);
             }
+			Logger.LogDebug("<<< Exiting WarnFormat(format={Format},arg0={Arg0},arg1={Arg1})", format, arg0, arg1);
         }
 
         /// <summary>Logs a formatted message string with the <c>WARN</c> level.</summary>
@@ -653,10 +694,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void WarnFormat(string format, object arg0, object arg1, object arg2) 
         {
+			Logger.LogDebug(">>> Entering WarnFormat(format={Format},arg0={Arg0},arg1={Arg1},arg2={Arg2})", format, arg0, arg1, arg2);
             if (this.IsWarnEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelWarn, new SystemStringFormat(CultureInfo.InvariantCulture, format, new object[] { arg0, arg1, arg2 }), null);
             }
+			Logger.LogDebug("<<< Exiting WarnFormat(format={Format},arg0={Arg0},arg1={Arg1},arg2={Arg2})", format, arg0, arg1, arg2);
         }
 
         /// <summary>Logs a formatted message string with the <c>WARN</c> level.</summary>
@@ -677,10 +720,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void WarnFormat(IFormatProvider provider, string format, params object[] args) 
         {
+			Logger.LogDebug(">>> Entering WarnFormat(provider={Provider},format={Format},args={Args})", provider, format, args);
             if (this.IsWarnEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelWarn, new SystemStringFormat(provider, format, args), null);
             }
+			Logger.LogDebug("<<< Exiting WarnFormat(provider={Provider},format={Format},args={Args})", provider, format, args);
         }
 
         /// <summary>Logs a message object with the <c>ERROR</c> level.</summary>
@@ -706,7 +751,9 @@ namespace log4net.Core
         /// </remarks>
         public virtual void Error(object message) 
         {
+			Logger.LogDebug(">>> Entering Error(message={Message})", message);
             this.Logger.Log(ThisDeclaringType, this.m_levelError, message, null);
+			Logger.LogDebug("<<< Exiting Error(message={Message})", message);
         }
 
         /// <summary>Logs a message object with the <c>ERROR</c> level</summary>
@@ -725,7 +772,9 @@ namespace log4net.Core
         /// <seealso cref="M:Error(object)"/>
         public virtual void Error(object message, Exception exception) 
         {
+			Logger.LogDebug(">>> Entering Error(message={Message},exception={Exception})", message, exception);
             this.Logger.Log(ThisDeclaringType, this.m_levelError, message, exception);
+			Logger.LogDebug("<<< Exiting Error(message={Message},exception={Exception})", message, exception);
         }
 
         /// <summary>Logs a formatted message string with the <c>ERROR</c> level.</summary>
@@ -750,10 +799,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void ErrorFormat(string format, params object[] args) 
         {
+			Logger.LogDebug(">>> Entering ErrorFormat(format={Format},args={Args})", format, args);
             if (this.IsErrorEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelError, new SystemStringFormat(CultureInfo.InvariantCulture, format, args), null);
             }
+			Logger.LogDebug("<<< Exiting ErrorFormat(format={Format},args={Args})", format, args);
         }
 
         /// <summary>Logs a formatted message string with the <c>ERROR</c> level.</summary>
@@ -778,10 +829,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void ErrorFormat(string format, object arg0) 
         {
+			Logger.LogDebug(">>> Entering ErrorFormat(format={Format},arg0={Arg0})", format, arg0);
             if (this.IsErrorEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelError, new SystemStringFormat(CultureInfo.InvariantCulture, format, new object[] { arg0 }), null);
             }
+			Logger.LogDebug("<<< Exiting ErrorFormat(format={Format},arg0={Arg0})", format, arg0);
         }
 
         /// <summary>Logs a formatted message string with the <c>ERROR</c> level.</summary>
@@ -807,10 +860,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void ErrorFormat(string format, object arg0, object arg1) 
         {
+			Logger.LogDebug(">>> Entering ErrorFormat(format={Format},arg0={Arg0},arg1={Arg1})", format, arg0, arg1);
             if (this.IsErrorEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelError, new SystemStringFormat(CultureInfo.InvariantCulture, format, new object[] { arg0, arg1 }), null);
             }
+			Logger.LogDebug("<<< Exiting ErrorFormat(format={Format},arg0={Arg0},arg1={Arg1})", format, arg0, arg1);
         }
 
         /// <summary>Logs a formatted message string with the <c>ERROR</c> level.</summary>
@@ -837,10 +892,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void ErrorFormat(string format, object arg0, object arg1, object arg2) 
         {
+			Logger.LogDebug(">>> Entering ErrorFormat(format={Format},arg0={Arg0},arg1={Arg1},arg2={Arg2})", format, arg0, arg1, arg2);
             if (this.IsErrorEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelError, new SystemStringFormat(CultureInfo.InvariantCulture, format, new object[] { arg0, arg1, arg2 }), null);
             }
+			Logger.LogDebug("<<< Exiting ErrorFormat(format={Format},arg0={Arg0},arg1={Arg1},arg2={Arg2})", format, arg0, arg1, arg2);
         }
 
         /// <summary>Logs a formatted message string with the <c>ERROR</c> level.</summary>
@@ -861,10 +918,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void ErrorFormat(IFormatProvider provider, string format, params object[] args) 
         {
+			Logger.LogDebug(">>> Entering ErrorFormat(provider={Provider},format={Format},args={Args})", provider, format, args);
             if (this.IsErrorEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelError, new SystemStringFormat(provider, format, args), null);
             }
+			Logger.LogDebug("<<< Exiting ErrorFormat(provider={Provider},format={Format},args={Args})", provider, format, args);
         }
 
         /// <summary>Logs a message object with the <c>FATAL</c> level.</summary>
@@ -890,7 +949,9 @@ namespace log4net.Core
         /// </remarks>
         public virtual void Fatal(object message) 
         {
+			Logger.LogDebug(">>> Entering Fatal(message={Message})", message);
             this.Logger.Log(ThisDeclaringType, this.m_levelFatal, message, null);
+			Logger.LogDebug("<<< Exiting Fatal(message={Message})", message);
         }
   
         /// <summary>Logs a message object with the <c>FATAL</c> level</summary>
@@ -909,7 +970,9 @@ namespace log4net.Core
         /// <seealso cref="M:Fatal(object)"/>
         public virtual void Fatal(object message, Exception exception) 
         {
+			Logger.LogDebug(">>> Entering Fatal(message={Message},exception={Exception})", message, exception);
             this.Logger.Log(ThisDeclaringType, this.m_levelFatal, message, exception);
+			Logger.LogDebug("<<< Exiting Fatal(message={Message},exception={Exception})", message, exception);
         }
 
         /// <summary>Logs a formatted message string with the <c>FATAL</c> level.</summary>
@@ -934,10 +997,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void FatalFormat(string format, params object[] args) 
         {
+			Logger.LogDebug(">>> Entering FatalFormat(format={Format},args={Args})", format, args);
             if (this.IsFatalEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelFatal, new SystemStringFormat(CultureInfo.InvariantCulture, format, args), null);
             }
+			Logger.LogDebug("<<< Exiting FatalFormat(format={Format},args={Args})", format, args);
         }
 
         /// <summary>Logs a formatted message string with the <c>FATAL</c> level.</summary>
@@ -962,10 +1027,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void FatalFormat(string format, object arg0) 
         {
+			Logger.LogDebug(">>> Entering FatalFormat(format={Format},arg0={Arg0})", format, arg0);
             if (this.IsFatalEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelFatal, new SystemStringFormat(CultureInfo.InvariantCulture, format, new object[] { arg0 }), null);
             }
+			Logger.LogDebug("<<< Exiting FatalFormat(format={Format},arg0={Arg0})", format, arg0);
         }
 
         /// <summary>Logs a formatted message string with the <c>FATAL</c> level.</summary>
@@ -991,10 +1058,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void FatalFormat(string format, object arg0, object arg1) 
         {
+			Logger.LogDebug(">>> Entering FatalFormat(format={Format},arg0={Arg0},arg1={Arg1})", format, arg0, arg1);
             if (this.IsFatalEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelFatal, new SystemStringFormat(CultureInfo.InvariantCulture, format, new object[] { arg0, arg1 }), null);
             }
+			Logger.LogDebug("<<< Exiting FatalFormat(format={Format},arg0={Arg0},arg1={Arg1})", format, arg0, arg1);
         }
 
         /// <summary>Logs a formatted message string with the <c>FATAL</c> level.</summary>
@@ -1021,10 +1090,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void FatalFormat(string format, object arg0, object arg1, object arg2) 
         {
+			Logger.LogDebug(">>> Entering FatalFormat(format={Format},arg0={Arg0},arg1={Arg1},arg2={Arg2})", format, arg0, arg1, arg2);
             if (this.IsFatalEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelFatal, new SystemStringFormat(CultureInfo.InvariantCulture, format, new object[] { arg0, arg1, arg2 }), null);
             }
+			Logger.LogDebug("<<< Exiting FatalFormat(format={Format},arg0={Arg0},arg1={Arg1},arg2={Arg2})", format, arg0, arg1, arg2);
         }
 
         /// <summary>Logs a formatted message string with the <c>FATAL</c> level.</summary>
@@ -1045,10 +1116,12 @@ namespace log4net.Core
         /// </remarks>
         public virtual void FatalFormat(IFormatProvider provider, string format, params object[] args) 
         {
+			Logger.LogDebug(">>> Entering FatalFormat(provider={Provider},format={Format},args={Args})", provider, format, args);
             if (this.IsFatalEnabled)
             {
                 this.Logger.Log(ThisDeclaringType, this.m_levelFatal, new SystemStringFormat(provider, format, args), null);
             }
+			Logger.LogDebug("<<< Exiting FatalFormat(provider={Provider},format={Format},args={Args})", provider, format, args);
         }
 
         /// <summary>
@@ -1170,11 +1243,13 @@ namespace log4net.Core
         /// <param name="e">Empty</param>
         private void LoggerRepositoryConfigurationChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering LoggerRepositoryConfigurationChanged(sender={Sender},e={E})", sender, e);
             ILoggerRepository repository = sender as ILoggerRepository;
             if (repository != null)
             {
                 this.ReloadLevels(repository);
             }
+			Logger.LogDebug("<<< Exiting LoggerRepositoryConfigurationChanged(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>The fully qualified name of this declaring type not the type of any subclass.</summary>

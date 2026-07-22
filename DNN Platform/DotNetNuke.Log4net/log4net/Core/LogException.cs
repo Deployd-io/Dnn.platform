@@ -44,6 +44,7 @@ namespace log4net.Core
     public class LogException : ApplicationException 
 #endif
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Constructor</summary>
         /// <remarks>
         /// <para>
@@ -52,6 +53,8 @@ namespace log4net.Core
         /// </remarks>
         public LogException()
         {
+		Logger.LogDebug(">>> Entering LogException()");
+		Logger.LogDebug("<<< Exiting LogException()");
         }
 
         /// <summary>Constructor</summary>
@@ -64,6 +67,7 @@ namespace log4net.Core
         /// </remarks>
         public LogException(String message) : base(message) 
         {
+		Logger.LogDebug(">>> Entering LogException(message={Message})", message);
         }
         
         /// <summary>Constructor</summary>
@@ -77,6 +81,7 @@ namespace log4net.Core
         /// </remarks>
         public LogException(String message, Exception innerException) : base(message, innerException) 
         {
+		Logger.LogDebug(">>> Entering LogException(message={Message},innerException={InnerException})", message, innerException);
         }
 
 #if !NETCF && !NETSTANDARD1_3
@@ -91,6 +96,7 @@ namespace log4net.Core
         /// </remarks>
         protected LogException(SerializationInfo info, StreamingContext context) : base(info, context) 
         {
+		Logger.LogDebug(">>> Entering LogException(info={Info},context={Context})", info, context);
         }
 #endif
     }

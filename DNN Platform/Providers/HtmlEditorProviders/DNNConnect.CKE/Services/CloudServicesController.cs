@@ -13,12 +13,15 @@ namespace DNNConnect.CKEditorProvider.Services
     /// <summary>WebAPI controller to enable the CKE cloudservices plugin.</summary>
     public class CloudServicesController : DnnApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Provides a fake token the cloudservices plugin needs.</summary>
         /// <returns>A fake token.</returns>
         [AllowAnonymous]
         [HttpGet]
         public HttpResponseMessage GetToken()
         {
+			Logger.LogDebug(">>> Entering GetToken()");
+			Logger.LogDebug("<<< Exiting GetToken()");
             return this.Request.CreateResponse(HttpStatusCode.OK, "faketoken");
         }
     }

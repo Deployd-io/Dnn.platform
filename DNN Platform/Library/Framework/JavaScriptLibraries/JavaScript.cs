@@ -54,12 +54,20 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         /// <param name="javaScriptLibraryController">The JavaScript library controller.</param>
         public JavaScript(IHostSettings hostSettings, IHostSettingsService hostSettingsService, IApplicationStatusInfo appStatus, IEventLogger eventLogger, IPortalController portalController, IJavaScriptLibraryController javaScriptLibraryController)
         {
+			eventLogger.LogDebug(">>> Entering JavaScript(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},javaScriptLibraryController={JavaScriptLibraryController})", hostSettings, hostSettingsService, appStatus, eventLogger, portalController, javaScriptLibraryController);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.hostSettingsService = hostSettingsService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
+			eventLogger.LogDebug("JavaScript(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},javaScriptLibraryController={JavaScriptLibraryController}): hostSettingsService → {HostSettingsService1}", hostSettings, hostSettingsService, appStatus, eventLogger, portalController, javaScriptLibraryController, hostSettingsService);
+			eventLogger.LogDebug("JavaScript(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},javaScriptLibraryController={JavaScriptLibraryController}): eventLogger → {EventLogger1}", hostSettings, hostSettingsService, appStatus, eventLogger, portalController, javaScriptLibraryController, eventLogger);
+			eventLogger.LogDebug("JavaScript(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},javaScriptLibraryController={JavaScriptLibraryController}): portalController → {PortalController1}", hostSettings, hostSettingsService, appStatus, eventLogger, portalController, javaScriptLibraryController, portalController);
+			eventLogger.LogDebug("JavaScript(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},javaScriptLibraryController={JavaScriptLibraryController}): javaScriptLibraryController → {JavaScriptLibraryController1}", hostSettings, hostSettingsService, appStatus, eventLogger, portalController, javaScriptLibraryController, javaScriptLibraryController);
+			eventLogger.LogDebug("JavaScript(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},javaScriptLibraryController={JavaScriptLibraryController}): hostSettings → {HostSettings1}", hostSettings, hostSettingsService, appStatus, eventLogger, portalController, javaScriptLibraryController, hostSettings);
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			eventLogger.LogDebug("JavaScript(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},javaScriptLibraryController={JavaScriptLibraryController}): appStatus → {AppStatus1}", hostSettings, hostSettingsService, appStatus, eventLogger, portalController, javaScriptLibraryController, appStatus);
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
             this.javaScriptLibraryController = javaScriptLibraryController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IJavaScriptLibraryController>();
+			eventLogger.LogDebug("<<< Exiting JavaScript(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},javaScriptLibraryController={JavaScriptLibraryController})", hostSettings, hostSettingsService, appStatus, eventLogger, portalController, javaScriptLibraryController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="JavaScript"/> class.</summary>
@@ -74,6 +82,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         [DnnDeprecated(10, 0, 2, "Use overload taking IJavaScriptLibraryController")]
         public static partial bool IsInstalled(string jsname)
             => IsInstalled(null, jsname);
+			eventLogger.LogDebug(">>> Entering IsInstalled(jsname={Jsname})", jsname);
 
         /// <summary>checks whether the script file is a known javascript library.</summary>
         /// <param name="javaScriptLibraryController">The JavaScript library controller.</param>
@@ -83,6 +92,8 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         {
             javaScriptLibraryController ??= Globals.GetCurrentServiceProvider().GetRequiredService<IJavaScriptLibraryController>();
             var library = javaScriptLibraryController.GetLibrary(l => l.LibraryName.Equals(jsname, StringComparison.OrdinalIgnoreCase));
+			eventLogger.LogDebug("IsInstalled(javaScriptLibraryController={JavaScriptLibraryController},jsname={Jsname}): library → {Library}", javaScriptLibraryController, jsname, library);
+			eventLogger.LogDebug("<<< Exiting IsInstalled(jsname={Jsname})", jsname);
             return library != null;
         }
 
@@ -91,6 +102,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         [DnnDeprecated(10, 0, 2, "Use overload taking IHostSettings")]
         public static partial bool UseDebugScript()
             => UseDebugScript(null);
+			eventLogger.LogDebug(">>> Entering UseDebugScript()");
 
         /// <summary>determine whether to use the debug script for a file.</summary>
         /// <param name="appStatus">The application status.</param>
@@ -102,6 +114,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
                 return false;
             }
 
+			eventLogger.LogDebug("<<< Exiting UseDebugScript()");
             return HttpContextSource.Current.IsDebuggingEnabled;
         }
 
@@ -111,6 +124,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         [DnnDeprecated(10, 0, 2, "Use overload taking IApplicationStatusInfo")]
         public static partial string Version(string jsname)
             => Version(null, jsname);
+			eventLogger.LogDebug(">>> Entering Version(jsname={Jsname})", jsname);
 
         /// <summary>Returns the version of a javascript library from the database.</summary>
         /// <param name="appStatus">The application status.</param>
@@ -121,6 +135,8 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
             appStatus ??= Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
 
             var library = GetHighestVersionLibrary(appStatus, jsname);
+			eventLogger.LogDebug("Version(appStatus={AppStatus},jsname={Jsname}): library → {Library}", appStatus, jsname, library);
+			eventLogger.LogDebug("<<< Exiting Version(jsname={Jsname})", jsname);
             return library != null ? Convert.ToString(library.Version, CultureInfo.InvariantCulture) : string.Empty;
         }
 
@@ -129,6 +145,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         [DnnDeprecated(10, 0, 2, "Use overload taking IApplicationStatusInfo")]
         public static partial void RequestRegistration(string jsname)
             => RequestRegistration(null, null, null, jsname);
+			eventLogger.LogDebug(">>> Entering RequestRegistration(jsname={Jsname})", jsname);
 
         /// <summary>Requests a script to be added to the page.</summary>
         /// <param name="appStatus">The application status.</param>
@@ -137,7 +154,9 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         /// <param name="jsname">the library name.</param>
         public static void RequestRegistration(IApplicationStatusInfo appStatus, IEventLogger eventLogger, IPortalSettings portalSettings, string jsname)
         {
+			eventLogger.LogDebug(">>> Entering RequestRegistration(appStatus={AppStatus},eventLogger={EventLogger},portalSettings={PortalSettings},jsname={Jsname})", appStatus, eventLogger, portalSettings, jsname);
             appStatus ??= Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			eventLogger.LogDebug("<<< Exiting RequestRegistration(jsname={Jsname})", jsname);
             eventLogger ??= Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
             portalSettings ??= Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>().GetCurrentSettings();
 
@@ -150,6 +169,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
             }
 
             RequestRegistration(appStatus, eventLogger, portalSettings, jsname, null, SpecificVersion.Latest);
+			eventLogger.LogDebug("<<< Exiting RequestRegistration(appStatus={AppStatus},eventLogger={EventLogger},portalSettings={PortalSettings},jsname={Jsname})", appStatus, eventLogger, portalSettings, jsname);
         }
 
         /// <summary>Requests a script to be added to the page.</summary>
@@ -158,12 +178,14 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         [DnnDeprecated(10, 0, 2, "Use overload taking IApplicationStatusInfo")]
         public static partial void RequestRegistration(string jsname, Version version)
             => RequestRegistration(null, null, null, jsname, version);
+			eventLogger.LogDebug(">>> Entering RequestRegistration(jsname={Jsname},version={Version})", jsname, version);
 
         /// <summary>Requests a script to be added to the page.</summary>
         /// <param name="appStatus">The application status.</param>
         /// <param name="eventLogger">The event logger.</param>
         /// <param name="portalSettings">The portal settings.</param>
         /// <param name="jsname">the library name.</param>
+		eventLogger.LogDebug("<<< Exiting RequestRegistration(jsname={Jsname},version={Version})", jsname, version);
         /// <param name="version">the library's version.</param>
         public static void RequestRegistration(IApplicationStatusInfo appStatus, IEventLogger eventLogger, IPortalSettings portalSettings, string jsname, Version version)
         {
@@ -233,6 +255,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         [DnnDeprecated(10, 0, 2, "Use overload taking IHostSettings")]
         public static partial void Register(Page page)
             => Register(null, null, null, null, null, page);
+			eventLogger.LogDebug(">>> Entering Register(page={Page})", page);
 
         /// <summary>method is called once per page event cycle and will load all scripts requested during that page processing cycle.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -244,6 +267,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         public static void Register(IHostSettings hostSettings, IHostSettingsService hostSettingsService, IApplicationStatusInfo appStatus, IEventLogger eventLogger, IPortalSettings portalSettings, Page page)
         {
             hostSettings ??= Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			eventLogger.LogDebug("<<< Exiting Register(page={Page})", page);
             hostSettingsService ??= Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
             appStatus ??= Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
             eventLogger ??= Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
@@ -251,6 +275,8 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
 
             var scripts = GetScriptVersions(appStatus);
             var finalScripts = ResolveVersionConflicts(eventLogger, portalSettings, scripts);
+			eventLogger.LogDebug("Register(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalSettings={PortalSettings},page={Page}): scripts → {Scripts}", hostSettings, hostSettingsService, appStatus, eventLogger, portalSettings, page, scripts);
+			eventLogger.LogDebug("Register(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalSettings={PortalSettings},page={Page}): finalScripts → {FinalScripts}", hostSettings, hostSettingsService, appStatus, eventLogger, portalSettings, page, finalScripts);
             foreach (var jsl in finalScripts)
             {
                 RegisterScript(hostSettings, hostSettingsService, page, jsl);
@@ -263,6 +289,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         [DnnDeprecated(10, 0, 2, "Use overload taking IHostSettings")]
         public static partial string JQueryUIFile(bool getMinFile)
             => JQueryUIFile(null, null, getMinFile);
+			eventLogger.LogDebug(">>> Entering JQueryUIFile(getMinFile={GetMinFile})", getMinFile);
 
         /// <summary>Gets the script path to the jQuery UI library.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -273,6 +300,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         {
             hostSettings ??= Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             hostSettingsService ??= Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
+			eventLogger.LogDebug("<<< Exiting JQueryUIFile(getMinFile={GetMinFile})", getMinFile);
             return GetScriptPath(hostSettings, hostSettingsService, CommonJs.jQueryUI);
         }
 
@@ -281,6 +309,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         [DnnDeprecated(10, 0, 2, "Use overload taking IHostSettings")]
         public static partial string GetJQueryScriptReference()
             => GetJQueryScriptReference(null, null);
+			eventLogger.LogDebug(">>> Entering GetJQueryScriptReference()");
 
         /// <summary>Gets the script path to the jQuery library.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -290,6 +319,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         {
             hostSettings ??= Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             hostSettingsService ??= Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
+			eventLogger.LogDebug("<<< Exiting GetJQueryScriptReference()");
             return GetScriptPath(hostSettings, hostSettingsService, CommonJs.jQuery);
         }
 
@@ -299,6 +329,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         [DnnDeprecated(10, 0, 2, "Use overload taking IHostSettings")]
         public static partial string GetScriptPath(string libraryName)
             => GetScriptPath(null, null, libraryName);
+			eventLogger.LogDebug(">>> Entering GetScriptPath(libraryName={LibraryName})", libraryName);
 
         /// <summary>Gets the path for a JS library's primary script.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -307,15 +338,19 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         /// <returns>The path or <see langword="null"/>.</returns>
         public static string GetScriptPath(IHostSettings hostSettings, IHostSettingsService hostSettingsService, string libraryName)
         {
+			eventLogger.LogDebug(">>> Entering GetScriptPath(hostSettings={HostSettings},hostSettingsService={HostSettingsService},libraryName={LibraryName})", hostSettings, hostSettingsService, libraryName);
             hostSettings ??= Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             hostSettingsService ??= Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
 
             var library = JavaScriptLibraryController.Instance.GetLibrary(jsl => jsl.LibraryName.Equals(libraryName, StringComparison.OrdinalIgnoreCase));
             if (library == null)
+			eventLogger.LogDebug("GetScriptPath(hostSettings={HostSettings},hostSettingsService={HostSettingsService},libraryName={LibraryName}): library → {Library}", hostSettings, hostSettingsService, libraryName, library);
             {
                 return null;
             }
 
+			eventLogger.LogDebug("<<< Exiting GetScriptPath(libraryName={LibraryName})", libraryName);
+			eventLogger.LogDebug("<<< Exiting GetScriptPath(hostSettings={HostSettings},hostSettingsService={HostSettingsService},libraryName={LibraryName})", hostSettings, hostSettingsService, libraryName);
             return GetScriptPath(hostSettings, hostSettingsService, library, HttpContextSource.Current?.Request);
         }
 
@@ -324,6 +359,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         /// <param name="reference">The reference to add.</param>
         public static void RegisterClientReference(Page page, ClientAPI.ClientNamespaceReferences reference)
         {
+			eventLogger.LogDebug(">>> Entering RegisterClientReference(page={Page},reference={Reference})", page, reference);
             switch (reference)
             {
                 case ClientAPI.ClientNamespaceReferences.dnn:
@@ -353,6 +389,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
                     ClientResourceManager.RegisterScript(page, ClientAPI.ScriptPath + "dnn.dom.positioning.js", 13);
                     break;
             }
+			eventLogger.LogDebug("<<< Exiting RegisterClientReference(page={Page},reference={Reference})", page, reference);
         }
 
         /// <inheritdoc />
@@ -385,8 +422,10 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
 
         private static void RequestHighestVersionLibraryRegistration(IApplicationStatusInfo appStatus, string jsname)
         {
+			eventLogger.LogDebug(">>> Entering RequestHighestVersionLibraryRegistration(appStatus={AppStatus},jsname={Jsname})", appStatus, jsname);
             var library = GetHighestVersionLibrary(appStatus, jsname);
             if (library != null)
+			eventLogger.LogDebug("RequestHighestVersionLibraryRegistration(appStatus={AppStatus},jsname={Jsname}): library → {Library}", appStatus, jsname, library);
             {
                 AddItemRequest(library, false);
             }
@@ -395,16 +434,19 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
                 // covers case where upgrading to 7.2.0 and JSL's are not installed
                 AddPreInstallOrLegacyItemRequest(jsname);
             }
+			eventLogger.LogDebug("<<< Exiting RequestHighestVersionLibraryRegistration(appStatus={AppStatus},jsname={Jsname})", appStatus, jsname);
         }
 
         private static bool RequestLooseVersionLibraryRegistration(IApplicationStatusInfo appStatus, IEventLogger eventLogger, IPortalSettings portalSettings, string jsname, Version version, SpecificVersion specific)
         {
+			eventLogger.LogDebug(">>> Entering RequestLooseVersionLibraryRegistration(appStatus={AppStatus},eventLogger={EventLogger},portalSettings={PortalSettings},jsname={Jsname},version={Version},specific={Specific})", appStatus, eventLogger, portalSettings, jsname, version, specific);
             Func<JavaScriptLibrary, bool> isValidLibrary = specific == SpecificVersion.LatestMajor
                 ? l => l.Version.Major == version.Major && l.Version.Minor >= version.Minor
                 : l => l.Version.Major == version.Major && l.Version.Minor == version.Minor && l.Version.Build >= version.Build;
             var library = JavaScriptLibraryController.Instance.GetLibraries(l => l.LibraryName.Equals(jsname, StringComparison.OrdinalIgnoreCase))
                                                               .OrderByDescending(l => l.Version)
                                                               .FirstOrDefault(isValidLibrary);
+															eventLogger.LogDebug("RequestLooseVersionLibraryRegistration(appStatus={AppStatus},eventLogger={EventLogger},portalSettings={PortalSettings},jsname={Jsname},version={Version},specific={Specific}): library → {Library}", appStatus, eventLogger, portalSettings, jsname, version, specific, library);
             if (library != null)
             {
                 AddItemRequest(library, false);
@@ -420,13 +462,16 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
                 return true;
             }
 
+			eventLogger.LogDebug("<<< Exiting RequestLooseVersionLibraryRegistration(appStatus={AppStatus},eventLogger={EventLogger},portalSettings={PortalSettings},jsname={Jsname},version={Version},specific={Specific})", appStatus, eventLogger, portalSettings, jsname, version, specific);
             return false;
         }
 
         private static void RequestSpecificVersionLibraryRegistration(IEventLogger eventLogger, IPortalSettings portalSettings, string jsname, Version version)
         {
+			eventLogger.LogDebug(">>> Entering RequestSpecificVersionLibraryRegistration(eventLogger={EventLogger},portalSettings={PortalSettings},jsname={Jsname},version={Version})", eventLogger, portalSettings, jsname, version);
             var library = JavaScriptLibraryController.Instance.GetLibrary(l => l.LibraryName.Equals(jsname, StringComparison.OrdinalIgnoreCase) && l.Version == version);
             if (library != null)
+			eventLogger.LogDebug("RequestSpecificVersionLibraryRegistration(eventLogger={EventLogger},portalSettings={PortalSettings},jsname={Jsname},version={Version}): library → {Library}", eventLogger, portalSettings, jsname, version, library);
             {
                 AddItemRequest(library, true);
             }
@@ -435,6 +480,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
                 // this will only occur if a specific library is requested and not available
                 LogCollision(eventLogger, portalSettings, $"Missing Library request - {jsname} : {version}");
             }
+			eventLogger.LogDebug("<<< Exiting RequestSpecificVersionLibraryRegistration(eventLogger={EventLogger},portalSettings={PortalSettings},jsname={Jsname},version={Version})", eventLogger, portalSettings, jsname, version);
         }
 
         private static void AddItemRequest(JavaScriptLibrary library, bool forceVersion)
@@ -462,7 +508,9 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
 
         private static void AddPreInstallOrLegacyItemRequest(string jsl)
         {
+			eventLogger.LogDebug(">>> Entering AddPreInstallOrLegacyItemRequest(jsl={Jsl})", jsl);
             HttpContextSource.Current.Items[LegacyPrefix + jsl] = true;
+			eventLogger.LogDebug("<<< Exiting AddPreInstallOrLegacyItemRequest(jsl={Jsl})", jsl);
         }
 
         private static List<JavaScriptLibrary> ResolveVersionConflicts(IEventLogger eventLogger, IPortalSettings portalSettings, IEnumerable<string> scripts)
@@ -507,6 +555,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
 
         private static JavaScriptLibrary GetHighestVersionLibrary(IApplicationStatusInfo appStatus, string jsname)
         {
+			eventLogger.LogDebug(">>> Entering GetHighestVersionLibrary(appStatus={AppStatus},jsname={Jsname})", appStatus, jsname);
             if (appStatus.Status == UpgradeStatus.Install)
             {
                 // if in install process, then do not use JSL but all use the legacy versions.
@@ -521,7 +570,9 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
             }
             catch (Exception)
             {
+				eventLogger.LogError("Exception in GetHighestVersionLibrary(appStatus={AppStatus},jsname={Jsname}): {Arg2}", appStatus, jsname, ex.Message);
                 // no library found (install or upgrade)
+				eventLogger.LogDebug("<<< Exiting GetHighestVersionLibrary(appStatus={AppStatus},jsname={Jsname})", appStatus, jsname);
                 return null;
             }
         }
@@ -552,11 +603,13 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
             }
 
             var formatVersion = Globals.FormatVersion(js.Version, "00", 3, "_");
+			eventLogger.LogDebug("GetScriptPath(hostSettings={HostSettings},hostSettingsService={HostSettingsService},js={Js},request={Request}): formatVersion → {FormatVersion}", hostSettings, hostSettingsService, js, request, formatVersion);
             return $"~/Resources/libraries/{js.LibraryName}/{formatVersion}/{js.FileName}";
         }
 
         private static string GetScriptLocation(JavaScriptLibrary js)
         {
+			eventLogger.LogDebug(">>> Entering GetScriptLocation(js={Js})", js);
             switch (js.PreferredScriptLocation)
             {
                 case ScriptLocation.PageHead:
@@ -567,11 +620,13 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
                     return Abstractions.ClientResources.ClientResourceProviders.DnnBodyProvider;
             }
 
+			eventLogger.LogDebug("<<< Exiting GetScriptLocation(js={Js})", js);
             return string.Empty;
         }
 
         private static List<string> GetScriptVersions(IApplicationStatusInfo appStatus)
         {
+			eventLogger.LogDebug(">>> Entering GetScriptVersions(appStatus={AppStatus})", appStatus);
             var orderedScripts = (
                 from object item in HttpContextSource.Current.Items.Keys
                 where item.ToString().StartsWith(ScriptPrefix, StringComparison.Ordinal)
@@ -581,9 +636,11 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
             var finalScripts = orderedScripts.ToList();
             foreach (var libraryId in orderedScripts)
             {
+			eventLogger.LogDebug("GetScriptVersions(appStatus={AppStatus}): finalScripts → {FinalScripts}", appStatus, finalScripts);
                 // find dependencies
                 var library = JavaScriptLibraryController.Instance.GetLibrary(l => l.JavaScriptLibraryID.ToString(CultureInfo.InvariantCulture) == libraryId);
                 if (library == null)
+				eventLogger.LogDebug("GetScriptVersions(appStatus={AppStatus}): library → {Library}", appStatus, library);
                 {
                     continue;
                 }
@@ -597,6 +654,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting GetScriptVersions(appStatus={AppStatus})", appStatus);
             return finalScripts;
         }
 
@@ -635,6 +693,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
 
         private static void RegisterScript(IHostSettings hostSettings, IHostSettingsService hostSettingsService, Page page, JavaScriptLibrary jsl)
         {
+			eventLogger.LogDebug(">>> Entering RegisterScript(hostSettings={HostSettings},hostSettingsService={HostSettingsService},page={Page},jsl={Jsl})", hostSettings, hostSettingsService, page, jsl);
             if (string.IsNullOrEmpty(jsl.FileName))
             {
                 return;
@@ -650,6 +709,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
                     case ScriptLocation.PageHead:
 
                         pagePortion = "ClientDependencyHeadJs";
+						eventLogger.LogDebug("RegisterScript(hostSettings={HostSettings},hostSettingsService={HostSettingsService},page={Page},jsl={Jsl}): pagePortion → {PagePortion}", hostSettings, hostSettingsService, page, jsl, pagePortion);
                         break;
                     case ScriptLocation.BodyBottom:
                         pagePortion = "ClientResourcesFormBottom";
@@ -664,6 +724,8 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
 
                 var scriptloader = page.FindControl(pagePortion);
                 var fallback = new DnnJsIncludeFallback(jsl.ObjectName, VirtualPathUtility.ToAbsolute("~/Resources/libraries/" + jsl.LibraryName + "/" + Globals.FormatVersion(jsl.Version, "00", 3, "_") + "/" + jsl.FileName));
+				eventLogger.LogDebug("RegisterScript(hostSettings={HostSettings},hostSettingsService={HostSettingsService},page={Page},jsl={Jsl}): scriptloader → {Scriptloader}", hostSettings, hostSettingsService, page, jsl, scriptloader);
+				eventLogger.LogDebug("RegisterScript(hostSettings={HostSettings},hostSettingsService={HostSettingsService},page={Page},jsl={Jsl}): fallback → {Fallback}", hostSettings, hostSettingsService, page, jsl, fallback);
                 if (scriptloader != null)
                 {
                     // add the fallback control after script loader.
@@ -671,10 +733,12 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
                     scriptloader.Parent.Controls.AddAt(index + 1, fallback);
                 }
             }
+			eventLogger.LogDebug("<<< Exiting RegisterScript(hostSettings={HostSettings},hostSettingsService={HostSettingsService},page={Page},jsl={Jsl})", hostSettings, hostSettingsService, page, jsl);
         }
 
         private static int GetFileOrder(JavaScriptLibrary jsl)
         {
+			eventLogger.LogDebug(">>> Entering GetFileOrder(jsl={Jsl})", jsl);
             switch (jsl.LibraryName)
             {
                 case CommonJs.jQuery:
@@ -686,13 +750,17 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
                 case CommonJs.HoverIntent:
                     return (int)Abstractions.ClientResources.FileOrder.Js.HoverIntent;
                 default:
+					eventLogger.LogDebug("<<< Exiting GetFileOrder(jsl={Jsl})", jsl);
                     return jsl.PackageID + (int)Abstractions.ClientResources.FileOrder.Js.DefaultPriority;
             }
         }
 
         private static IClientResourceController GetClientResourcesController()
         {
+			eventLogger.LogDebug(">>> Entering GetClientResourcesController()");
             var serviceProvider = Globals.GetCurrentServiceProvider();
+			eventLogger.LogDebug("GetClientResourcesController(): serviceProvider → {ServiceProvider}", serviceProvider);
+			eventLogger.LogDebug("<<< Exiting GetClientResourcesController()");
             return serviceProvider.GetRequiredService<IClientResourceController>();
         }
     }

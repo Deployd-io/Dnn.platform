@@ -37,6 +37,10 @@ namespace DotNetNuke.Common.Utilities
         public CBO()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering CBO()");
+		Logger.LogDebug("<<< Exiting CBO()");
+		Logger.LogDebug(">>> Entering CBO(hostSettings={HostSettings})", hostSettings);
+		Logger.LogDebug("<<< Exiting CBO(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CBO"/> class.</summary>
@@ -44,6 +48,7 @@ namespace DotNetNuke.Common.Utilities
         public CBO(IHostSettings hostSettings)
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("CBO(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
         }
 
         /// <summary>CloneObject clones an object.</summary>
@@ -110,6 +115,7 @@ namespace DotNetNuke.Common.Utilities
 
         public static void CloseDataReader(IDataReader dr, bool closeReader)
         {
+			Logger.LogDebug(">>> Entering CloseDataReader(dr={Dr},closeReader={CloseReader})", dr, closeReader);
             // close datareader
             if (dr != null && closeReader)
             {
@@ -118,6 +124,7 @@ namespace DotNetNuke.Common.Utilities
                     dr.Close();
                 }
             }
+			Logger.LogDebug("<<< Exiting CloseDataReader(dr={Dr},closeReader={CloseReader})", dr, closeReader);
         }
 
         /// <summary>CreateObject creates a new object of Type TObject.</summary>
@@ -126,13 +133,17 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The created object.</returns>
         public static TObject CreateObject<TObject>(bool initialise)
         {
+			Logger.LogDebug(">>> Entering CreateObject(initialise={Initialise})", initialise);
             return (TObject)CreateObjectInternal(typeof(TObject), initialise);
         }
 
         public static TObject DeserializeObject<TObject>(string fileName)
         {
+			Logger.LogDebug(">>> Entering DeserializeObject(fileName={FileName})", fileName);
             using var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
             using var xmlReader = XmlReader.Create(fileStream);
+			Logger.LogDebug("DeserializeObject(fileName={FileName}): fileStream → {FileStream}", fileName, fileStream);
+			Logger.LogDebug("DeserializeObject(fileName={FileName}): xmlReader → {XmlReader}", fileName, xmlReader);
             return DeserializeObject<TObject>(xmlReader);
         }
 
@@ -141,10 +152,13 @@ namespace DotNetNuke.Common.Utilities
             using var xmlReader = XmlReader.Create(new StringReader(document.OuterXml));
             return DeserializeObject<TObject>(xmlReader);
         }
+		Logger.LogDebug("DeserializeObject(document={Document}): xmlReader → {XmlReader}", document, xmlReader);
 
         public static TObject DeserializeObject<TObject>(Stream stream)
         {
             using var xmlReader = XmlReader.Create(stream);
+			Logger.LogDebug("<<< Exiting DeserializeObject(document={Document})", document);
+			Logger.LogDebug("DeserializeObject(stream={Stream}): xmlReader → {XmlReader}", stream, xmlReader);
             return DeserializeObject<TObject>(xmlReader);
         }
 
@@ -159,6 +173,7 @@ namespace DotNetNuke.Common.Utilities
             // First Create the Object
             var objObject = CreateObject<TObject>(true);
 
+			Logger.LogDebug("DeserializeObject(reader={Reader}): objObject → {ObjObject}", reader, objObject);
             // Try to cast the Object as IXmlSerializable
             var xmlSerializableObject = objObject as IXmlSerializable;
             if (xmlSerializableObject == null)
@@ -166,6 +181,7 @@ namespace DotNetNuke.Common.Utilities
                 // Use XmlSerializer
                 var serializer = new XmlSerializer(objObject.GetType());
                 objObject = (TObject)serializer.Deserialize(reader);
+				Logger.LogDebug("DeserializeObject(reader={Reader}): serializer → {Serializer}", reader, serializer);
             }
             else
             {
@@ -182,6 +198,7 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>A new <see cref="ArrayList"/> filled with the values from <paramref name="dr"/>.</returns>
         public static ArrayList FillCollection(IDataReader dr, Type objType)
         {
+			Logger.LogDebug("<<< Exiting FillCollection(dr={Dr})", dr);
             return (ArrayList)FillListFromReader(objType, dr, new ArrayList(), true);
         }
 
@@ -202,6 +219,7 @@ namespace DotNetNuke.Common.Utilities
         /// <returns><paramref name="objToFill"/> filled with the values from <paramref name="dr"/>.</returns>
         public static IList FillCollection(IDataReader dr, Type objType, ref IList objToFill)
         {
+			Logger.LogDebug("<<< Exiting FillCollection(dr={Dr},objToFill={ObjToFill})", dr, objToFill);
             return FillListFromReader(objType, dr, objToFill, true);
         }
 
@@ -262,6 +280,7 @@ namespace DotNetNuke.Common.Utilities
                 CloseDataReader(dr, true);
             }
 
+			Logger.LogDebug("<<< Exiting FillCollection(dr={Dr},totalRecords={TotalRecords})", dr, totalRecords);
             return objFillCollection;
         }
 
@@ -337,6 +356,7 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The filled object or <see langword="null"/>.</returns>
         public static TObject FillObject<TObject>(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering FillObject(dr={Dr})", dr);
             return (TObject)CreateObjectFromReader(typeof(TObject), dr, true);
         }
 
@@ -352,6 +372,7 @@ namespace DotNetNuke.Common.Utilities
 
         public static IQueryable<TItem> FillQueryable<TItem>(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering FillQueryable(dr={Dr})", dr);
             return FillListFromReader(dr, new List<TItem>(), true).AsQueryable();
         }
 
@@ -369,8 +390,11 @@ namespace DotNetNuke.Common.Utilities
 
         public static void DeserializeSettings(IDictionary dictionary, XmlNode rootNode, string elementName)
         {
+			Logger.LogDebug(">>> Entering DeserializeSettings(dictionary={Dictionary},rootNode={RootNode},elementName={ElementName})", dictionary, rootNode, elementName);
             string sKey = null;
             string sValue = null;
+			Logger.LogDebug("DeserializeSettings(dictionary={Dictionary},rootNode={RootNode},elementName={ElementName}): sKey → {SKey}", dictionary, rootNode, elementName, sKey);
+			Logger.LogDebug("DeserializeSettings(dictionary={Dictionary},rootNode={RootNode},elementName={ElementName}): sValue → {SValue}", dictionary, rootNode, elementName, sValue);
 
             foreach (XmlNode settingNode in rootNode.SelectNodes(elementName))
             {
@@ -379,6 +403,7 @@ namespace DotNetNuke.Common.Utilities
 
                 dictionary[sKey] = sValue;
             }
+			Logger.LogDebug("<<< Exiting DeserializeSettings(dictionary={Dictionary},rootNode={RootNode},elementName={ElementName})", dictionary, rootNode, elementName);
         }
 
         /// <summary>Iterates items in a IDictionary object and generates XML nodes.</summary>
@@ -388,15 +413,21 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="elementName">The name of the new element created.</param>
         public static void SerializeSettings(IDictionary dictionary, XmlDocument document, string targetPath, string elementName)
         {
+			Logger.LogDebug(">>> Entering SerializeSettings(dictionary={Dictionary},document={Document},targetPath={TargetPath},elementName={ElementName})", dictionary, document, targetPath, elementName);
             string sOuterElementName = elementName + "s";
             string sInnerElementName = elementName;
             XmlNode nodeSetting = default(XmlNode);
             XmlNode nodeSettings = default(XmlNode);
+			Logger.LogDebug("SerializeSettings(dictionary={Dictionary},document={Document},targetPath={TargetPath},elementName={ElementName}): nodeSetting → {NodeSetting}", dictionary, document, targetPath, elementName, nodeSetting);
+			Logger.LogDebug("SerializeSettings(dictionary={Dictionary},document={Document},targetPath={TargetPath},elementName={ElementName}): nodeSettings → {NodeSettings}", dictionary, document, targetPath, elementName, nodeSettings);
             XmlNode nodeSettingName = default(XmlNode);
             XmlNode nodeSettingValue = default(XmlNode);
+			Logger.LogDebug("SerializeSettings(dictionary={Dictionary},document={Document},targetPath={TargetPath},elementName={ElementName}): nodeSettingName → {NodeSettingName}", dictionary, document, targetPath, elementName, nodeSettingName);
+			Logger.LogDebug("SerializeSettings(dictionary={Dictionary},document={Document},targetPath={TargetPath},elementName={ElementName}): nodeSettingValue → {NodeSettingValue}", dictionary, document, targetPath, elementName, nodeSettingValue);
 
             XmlNode targetNode = document.SelectSingleNode(targetPath);
 
+			Logger.LogDebug("SerializeSettings(dictionary={Dictionary},document={Document},targetPath={TargetPath},elementName={ElementName}): targetNode → {TargetNode}", dictionary, document, targetPath, elementName, targetNode);
             if (targetNode != null)
             {
                 nodeSettings = targetNode.AppendChild(document.CreateElement(sOuterElementName));
@@ -415,6 +446,7 @@ namespace DotNetNuke.Common.Utilities
             {
                 throw new ArgumentException("Invalid Target Path");
             }
+			Logger.LogDebug("<<< Exiting SerializeSettings(dictionary={Dictionary},document={Document},targetPath={TargetPath},elementName={ElementName})", dictionary, document, targetPath, elementName);
         }
 
         /// <summary>GetCachedObject gets an object from the Cache.</summary>
@@ -427,6 +459,7 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(10, 0, 2, "Use overload taking IHostSettings")]
         public static partial TObject GetCachedObject<TObject>(CacheItemArgs cacheItemArgs, CacheItemExpiredCallback cacheItemExpired)
             => GetCachedObject<TObject>(Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>(), cacheItemArgs, cacheItemExpired);
+			Logger.LogDebug(">>> Entering GetCachedObject(cacheItemArgs={CacheItemArgs},cacheItemExpired={CacheItemExpired})", cacheItemArgs, cacheItemExpired);
 
         /// <summary>GetCachedObject gets an object from the Cache.</summary>
         /// <typeparam name="TObject">The type of the object to fetch.</typeparam>
@@ -435,6 +468,7 @@ namespace DotNetNuke.Common.Utilities
         /// cache AND to fetch the item if the cache has expired.</param>
         /// <param name="cacheItemExpired">A CacheItemExpiredCallback delegate that is used to repopulate
         /// the cache if the item has expired.</param>
+		Logger.LogDebug("<<< Exiting GetCachedObject(cacheItemArgs={CacheItemArgs},cacheItemExpired={CacheItemExpired})", cacheItemArgs, cacheItemExpired);
         /// <returns>The cached object.</returns>
         public static TObject GetCachedObject<TObject>(IHostSettings hostSettings, CacheItemArgs cacheItemArgs, CacheItemExpiredCallback cacheItemExpired)
         {
@@ -566,6 +600,7 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="writer">An XmlWriter to serialize to.</param>
         public static void SerializeObject(object objObject, XmlWriter writer)
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
             // Try to cast the Object as IXmlSerializable
             if (objObject is not IXmlSerializable xmlSerializableObject)
             {
@@ -601,6 +636,8 @@ namespace DotNetNuke.Common.Utilities
         /// <inheritdoc />
         protected override Func<ICBO> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => Globals.GetCurrentServiceProvider().GetRequiredService<ICBO>();
         }
 
@@ -753,6 +790,7 @@ namespace DotNetNuke.Common.Utilities
                 CloseDataReader(dr, closeReader);
             }
 
+			Logger.LogDebug("<<< Exiting FillListFromReader(dr={Dr},objList={ObjList},closeReader={CloseReader})", dr, objList, closeReader);
             return objList;
         }
 
@@ -819,15 +857,18 @@ namespace DotNetNuke.Common.Utilities
 
         private static void HydrateObject(object hydratedObject, IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering HydrateObject(hydratedObject={HydratedObject},dr={Dr})", hydratedObject, dr);
             PropertyInfo objPropertyInfo = null;
             Type propType = null;
             object columnValue;
+			Logger.LogDebug("HydrateObject(hydratedObject={HydratedObject},dr={Dr}): propType → {PropType}", hydratedObject, dr, propType);
             Type objDataType;
             int intIndex;
 
             // get cached object mapping for type
             ObjectMappingInfo objMappingInfo = GetObjectMapping(hydratedObject.GetType());
             if (hydratedObject is BaseEntityInfo info and not ScheduleItem)
+			Logger.LogDebug("HydrateObject(hydratedObject={HydratedObject},dr={Dr}): objMappingInfo → {ObjMappingInfo}", hydratedObject, dr, objMappingInfo);
             {
                 // Call the base classes fill method to populate base class properties
                 info.FillBaseProperties(dr);
@@ -847,9 +888,11 @@ namespace DotNetNuke.Common.Utilities
                     {
                         // Get the Data Value from the data reader
                         columnValue = dr.GetValue(intIndex);
+						Logger.LogDebug("HydrateObject(hydratedObject={HydratedObject},dr={Dr}): columnValue → {ColumnValue}", hydratedObject, dr, columnValue);
 
                         // Get the Data Value's type
                         objDataType = columnValue.GetType();
+						Logger.LogDebug("HydrateObject(hydratedObject={HydratedObject},dr={Dr}): objDataType → {ObjDataType}", hydratedObject, dr, objDataType);
                         if (columnValue == DBNull.Value)
                         {
                             // set property value to Null
@@ -904,12 +947,15 @@ namespace DotNetNuke.Common.Utilities
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting HydrateObject(hydratedObject={HydratedObject},dr={Dr})", hydratedObject, dr);
         }
 
         private static object ChangeType(object obj, Type type, IFormatProvider formatProvider)
         {
+			Logger.LogDebug(">>> Entering ChangeType(obj={Obj},type={Type},formatProvider={FormatProvider})", obj, type, formatProvider);
             Type u = Nullable.GetUnderlyingType(type);
 
+			Logger.LogDebug("ChangeType(obj={Obj},type={Type},formatProvider={FormatProvider}): u → {U}", obj, type, formatProvider, u);
             if (u != null)
             {
                 if (obj == null)
@@ -920,16 +966,19 @@ namespace DotNetNuke.Common.Utilities
                 return Convert.ChangeType(obj, u, formatProvider);
             }
 
+			Logger.LogDebug("<<< Exiting ChangeType(obj={Obj},type={Type},formatProvider={FormatProvider})", obj, type, formatProvider);
             return Convert.ChangeType(obj, type, formatProvider);
         }
 
         private static object GetDefault(Type type)
         {
+			Logger.LogDebug(">>> Entering GetDefault(type={Type})", type);
             if (type.IsValueType)
             {
                 return Activator.CreateInstance(type);
             }
 
+			Logger.LogDebug("<<< Exiting GetDefault(type={Type})", type);
             return null;
         }
 

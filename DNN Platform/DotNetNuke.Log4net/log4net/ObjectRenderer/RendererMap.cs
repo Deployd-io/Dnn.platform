@@ -44,6 +44,7 @@ namespace log4net.ObjectRenderer
     /// <author>Gert Driesen</author>
     public class RendererMap
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly Type declaringType = typeof(RendererMap);
 
         private System.Collections.Hashtable m_map;
@@ -59,7 +60,10 @@ namespace log4net.ObjectRenderer
         /// </remarks>
         public RendererMap() 
         {
+			Logger.LogDebug(">>> Entering RendererMap()");
             this.m_map = System.Collections.Hashtable.Synchronized(new System.Collections.Hashtable());
+			Logger.LogDebug("<<< Exiting RendererMap()");
+			Logger.LogDebug("RendererMap(): m_map → {M_map}", m_map);
         }
 
         /// <summary>Render <paramref name="obj"/> using the appropriate renderer.</summary>
@@ -74,6 +78,7 @@ namespace log4net.ObjectRenderer
         /// </remarks>
         public string FindAndRender(object obj)
         {
+			Logger.LogDebug(">>> Entering FindAndRender(obj={Obj})", obj);
             // Optimisation for strings
             string strData = obj as String;
             if (strData != null)
@@ -84,6 +89,7 @@ namespace log4net.ObjectRenderer
             using (var stringWriter = new StringWriter(System.Globalization.CultureInfo.InvariantCulture))
             {
                 this.FindAndRender(obj, stringWriter);
+				Logger.LogDebug("<<< Exiting FindAndRender(obj={Obj})", obj);
                 return stringWriter.ToString();
             }
                 
@@ -170,12 +176,14 @@ namespace log4net.ObjectRenderer
         /// </remarks>
         public IObjectRenderer Get(Object obj) 
         {
+			Logger.LogDebug(">>> Entering Get(obj={Obj})", obj);
             if (obj == null) 
             {
                 return null;
             }
             else
             {
+				Logger.LogDebug("<<< Exiting Get(obj={Obj})", obj);
                 return this.Get(obj.GetType());
             }
         }
@@ -228,6 +236,7 @@ namespace log4net.ObjectRenderer
                 this.m_cache[type] = result;
             }
 
+			Logger.LogDebug("<<< Exiting Get(type={Type})", type);
             return result;
         }  
 
@@ -236,8 +245,10 @@ namespace log4net.ObjectRenderer
         /// <returns>the renderer for the specified type</returns>
         private IObjectRenderer SearchTypeAndInterfaces(Type type) 
         {
+			Logger.LogDebug(">>> Entering SearchTypeAndInterfaces(type={Type})", type);
             IObjectRenderer r = (IObjectRenderer)this.m_map[type];
             if (r != null) 
+			Logger.LogDebug("SearchTypeAndInterfaces(type={Type}): r → {R}", type, r);
             {
                 return r;
             } 
@@ -252,6 +263,7 @@ namespace log4net.ObjectRenderer
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting SearchTypeAndInterfaces(type={Type})", type);
             return null;
         }
 
@@ -277,8 +289,10 @@ namespace log4net.ObjectRenderer
         /// </remarks>
         public void Clear() 
         {
+			Logger.LogDebug(">>> Entering Clear()");
             this.m_map.Clear();
             this.m_cache.Clear();
+			Logger.LogDebug("<<< Exiting Clear()");
         }
 
         /// <summary>Register an <see cref="IObjectRenderer"/> for <paramref name="typeToRender"/>. </summary>
@@ -293,6 +307,7 @@ namespace log4net.ObjectRenderer
         /// </remarks>
         public void Put(Type typeToRender, IObjectRenderer renderer) 
         {
+			Logger.LogDebug(">>> Entering Put(typeToRender={TypeToRender},renderer={Renderer})", typeToRender, renderer);
             this.m_cache.Clear();
 
             if (typeToRender == null)
@@ -305,6 +320,7 @@ namespace log4net.ObjectRenderer
             }
 
             this.m_map[typeToRender] = renderer;
+			Logger.LogDebug("<<< Exiting Put(typeToRender={TypeToRender},renderer={Renderer})", typeToRender, renderer);
         }	
     }
 }

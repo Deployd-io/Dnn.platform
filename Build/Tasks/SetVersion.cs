@@ -17,18 +17,22 @@ namespace DotNetNuke.Build.Tasks
     /// <summary>A cake task to calculate the version.</summary>
     public sealed class SetVersion : FrostingTask<Context>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override void Run(Context context)
         {
+			Logger.LogDebug(">>> Entering Run(context={Context})", context);
             if (context.Settings.Version == "auto")
             {
                 try
                 {
                     context.Version = context.GitVersion();
                     context.BuildNumber = context.Version.FullSemVer;
+					Logger.LogDebug("Run(context={Context}): context.BuildNumber → {Arg1}", context, context.BuildNumber);
                 }
                 catch (CakeException)
                 {
+					Logger.LogError("Exception in Run(context={Context}): {Arg1}", context, ex.Message);
                     if (context.IsRunningInCI)
                     {
                         throw;
@@ -58,16 +62,20 @@ namespace DotNetNuke.Build.Tasks
 
             context.Information("Informational Version : " + context.Version.InformationalVersion);
             context.ProductVersion = context.Version.MajorMinorPatch;
+			Logger.LogDebug("Run(context={Context}): context.ProductVersion → {Arg1}", context, context.ProductVersion);
             context.Information("Product Version : " + context.ProductVersion);
             context.Information("Build Number : " + context.BuildNumber);
             context.Information("The build Id is : " + context.BuildId);
+			Logger.LogDebug("<<< Exiting Run(context={Context})", context);
         }
 
         private static void SetManualVersion(Context context, string settingsVersion)
         {
+			Logger.LogDebug(">>> Entering SetManualVersion(context={Context},settingsVersion={SettingsVersion})", context, settingsVersion);
             context.Version = new GitVersion();
             var assemblyInfo = new AssemblyInfo("SolutionInfo.cs");
             var requestedVersion = settingsVersion == "off"
+				Logger.LogDebug("SetManualVersion(context={Context},settingsVersion={SettingsVersion}): assemblyInfo → {AssemblyInfo}", context, settingsVersion, assemblyInfo);
                 ? assemblyInfo.GetVersion()
                 : new Version(context.Settings.Version);
             context.Version.Major = requestedVersion.Major;
@@ -83,6 +91,7 @@ namespace DotNetNuke.Build.Tasks
             }
 
             context.BuildNumber = requestedVersion.ToString(3);
+			Logger.LogDebug("<<< Exiting SetManualVersion(context={Context},settingsVersion={SettingsVersion})", context, settingsVersion);
         }
     }
 }

@@ -14,10 +14,13 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 /// <summary>The <see cref="IDnnStartup"/> instance for the Persona Bar UI project.</summary>
 public class Startup : IDnnStartup
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public void ConfigureServices(IServiceCollection services)
     {
+		Logger.LogDebug(">>> Entering ConfigureServices(services={Services})", services);
         services.TryAddTransient<IDirectory, DirectoryWrapper>();
         services.AddTransient<IAdminMenuController, AdminMenuController>();
+		Logger.LogDebug("<<< Exiting ConfigureServices(services={Services})", services);
     }
 }

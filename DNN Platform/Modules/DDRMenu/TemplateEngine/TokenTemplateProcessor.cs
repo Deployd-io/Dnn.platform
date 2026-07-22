@@ -25,7 +25,9 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
     public class TokenTemplateProcessor(IHostSettings hostSettings)
         : ITemplateProcessor
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly Dictionary<string, string> Aliases = new Dictionary<string, string>
+		Logger.LogDebug(">>> Entering TokenTemplateProcessor(hostSettings={HostSettings})", hostSettings);
         {
             { "page", "node" },
             { "name", "text" },
@@ -38,8 +40,10 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
         private XslCompiledTransform xsl;
+		Logger.LogDebug("TokenTemplateProcessor(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
 
         /// <summary>Initializes a new instance of the <see cref="TokenTemplateProcessor"/> class.</summary>
+		Logger.LogDebug("<<< Exiting TokenTemplateProcessor(hostSettings={HostSettings})", hostSettings);
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public TokenTemplateProcessor()
             : this(null)
@@ -49,6 +53,7 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
         /// <inheritdoc />
         public bool LoadDefinition(TemplateDefinition baseDefinition)
         {
+			Logger.LogDebug(">>> Entering LoadDefinition(baseDefinition={BaseDefinition})", baseDefinition);
             if (!baseDefinition.TemplateVirtualPath.EndsWith(".txt", StringComparison.InvariantCultureIgnoreCase))
             {
                 return false;
@@ -56,6 +61,7 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 
             var templateText = Utilities.CachedFileContent(baseDefinition.TemplatePath);
             var xml = new XmlDocument { XmlResolver = null };
+			Logger.LogDebug("LoadDefinition(baseDefinition={BaseDefinition}): templateText → {TemplateText}", baseDefinition, templateText);
             const string xmlNs = "http://www.w3.org/1999/XSL/Transform";
             const string xslXml = $"""
                                    	<xsl:stylesheet version='1.0' xmlns:xsl='{xmlNs}' xmlns:ddr='urn:ddrmenu'>
@@ -74,18 +80,23 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 
             var validParams = baseDefinition.DefaultTemplateArguments.ConvertAll(a => a.Name.ToLowerInvariant());
             validParams.AddRange(["controlid", "options", "dnnpath", "manifestpath", "portalpath", "skinpath",]);
+			Logger.LogDebug("LoadDefinition(baseDefinition={BaseDefinition}): validParams → {ValidParams}", baseDefinition, validParams);
 
             var docElt = xml.DocumentElement;
             var outputElt = (XmlElement)docElt.GetElementsByTagName("output", xmlNs)[0];
             foreach (var param in validParams)
             {
+			Logger.LogDebug("LoadDefinition(baseDefinition={BaseDefinition}): outputElt → {OutputElt}", baseDefinition, outputElt);
                 var elt = xml.CreateElement("param", xmlNs);
                 elt.SetAttribute("name", param);
+				Logger.LogDebug("LoadDefinition(baseDefinition={BaseDefinition}): elt → {Elt}", baseDefinition, elt);
                 docElt.InsertAfter(elt, outputElt);
             }
 
             var current = (XmlElement)docElt.GetElementsByTagName("template", xmlNs)[1];
             var stack = new Stack<XmlElement>();
+			Logger.LogDebug("LoadDefinition(baseDefinition={BaseDefinition}): current → {Current}", baseDefinition, current);
+			Logger.LogDebug("LoadDefinition(baseDefinition={BaseDefinition}): stack → {Stack}", baseDefinition, stack);
 
             var index = 0;
             foreach (Match match in TemplatesRegex.Matches(templateText))
@@ -94,8 +105,11 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 
                 var directive = match.Groups["directive"].Value;
                 var nodeName = match.Groups["nodename"].Value.ToLowerInvariant();
+				Logger.LogDebug("LoadDefinition(baseDefinition={BaseDefinition}): directive → {Directive}", baseDefinition, directive);
+				Logger.LogDebug("LoadDefinition(baseDefinition={BaseDefinition}): nodeName → {NodeName}", baseDefinition, nodeName);
                 var modeName = match.Groups["modename"].Value.ToLowerInvariant();
 
+				Logger.LogDebug("LoadDefinition(baseDefinition={BaseDefinition}): modeName → {ModeName}", baseDefinition, modeName);
                 string alias;
                 if (Aliases.TryGetValue(nodeName, out alias))
                 {
@@ -147,6 +161,7 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
                     {
                         elt = xml.CreateElement("when", xmlNs);
                         var test = string.Format("{0} or (@{0}=1) or (@{0}!=0 and @{0}!=1 and @{0}!='')", nodeName);
+						Logger.LogDebug("LoadDefinition(baseDefinition={BaseDefinition}): test → {Test}", baseDefinition, test);
                         if (directive == "?!")
                         {
                             test = string.Format("not({0})", test);
@@ -156,6 +171,7 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 
                         var choose = xml.CreateElement("choose", xmlNs);
                         current.AppendChild(choose);
+						Logger.LogDebug("LoadDefinition(baseDefinition={BaseDefinition}): choose → {Choose}", baseDefinition, choose);
                         choose.AppendChild(elt);
                         stack.Push(current);
                     }
@@ -178,15 +194,20 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
             current.AppendChild(xml.CreateTextNode(templateText.Substring(index)));
 
             this.xsl = new XslCompiledTransform();
+			Logger.LogDebug("LoadDefinition(baseDefinition={BaseDefinition}): xsl → {Xsl}", baseDefinition, xsl);
             this.xsl.Load(xml);
+			Logger.LogDebug("<<< Exiting LoadDefinition(baseDefinition={BaseDefinition})", baseDefinition);
             return true;
         }
 
         /// <inheritdoc />
         public void Render(object source, HtmlTextWriter htmlWriter, TemplateDefinition liveDefinition)
         {
+			Logger.LogDebug(">>> Entering Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition})", source, htmlWriter, liveDefinition);
             var resolver = new PathResolver(this.hostSettings, liveDefinition.Folder);
             var args = new XsltArgumentList();
+			Logger.LogDebug("Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition}): resolver → {Resolver}", source, htmlWriter, liveDefinition, resolver);
+			Logger.LogDebug("Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition}): args → {Args}", source, htmlWriter, liveDefinition, args);
             args.AddExtensionObject("urn:ddrmenu", new XsltFunctions());
             args.AddExtensionObject("urn:dnngarden", new XsltFunctions());
             args.AddParam("controlid", string.Empty, DNNContext.Current.HostControl.ClientID);
@@ -199,6 +220,7 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 
             var sb = new StringBuilder();
 
+			Logger.LogDebug("Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition}): sb → {Sb}", source, htmlWriter, liveDefinition, sb);
             using (var xmlStream = new MemoryStream())
             using (var outputWriter = new StringWriter(sb))
             {
@@ -209,12 +231,15 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
             }
 
             htmlWriter.Write(HttpUtility.HtmlDecode(sb.ToString()));
+			Logger.LogDebug("<<< Exiting Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition})", source, htmlWriter, liveDefinition);
         }
 
         protected static string ConvertToJson(List<ClientOption> options)
         {
+			Logger.LogDebug(">>> Entering ConvertToJson(options={Options})", options);
             var result = new StringBuilder();
             result.Append("{");
+			Logger.LogDebug("ConvertToJson(options={Options}): result → {Result}", options, result);
 
             if (options != null)
             {
@@ -246,6 +271,7 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
             }
 
             result.Append("}");
+			Logger.LogDebug("<<< Exiting ConvertToJson(options={Options})", options);
             return result.ToString();
         }
     }

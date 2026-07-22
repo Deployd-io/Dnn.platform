@@ -12,13 +12,16 @@ namespace DotNetNuke.Build.Tasks
     /// <summary>A cake task to copy files into the website's <c>bin</c> directory.</summary>
     public sealed class CopyWebsiteBinFolder : FrostingTask<Context>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override void Run(Context context)
         {
+			Logger.LogDebug(">>> Entering Run(context={Context})", context);
             context.CopyFiles(
                 context.GetFiles("./DNN Platform/Website/bin/**/*"),
                 context.WebsiteDir + context.Directory("bin/"),
                 true);
+				Logger.LogDebug("<<< Exiting Run(context={Context})", context);
         }
     }
 }

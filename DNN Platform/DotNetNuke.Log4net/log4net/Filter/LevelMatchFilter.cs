@@ -43,6 +43,7 @@ namespace log4net.Filter
     /// <author>Gert Driesen</author>
     public class LevelMatchFilter : FilterSkeleton
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>flag to indicate if the filter should <see cref="FilterDecision.Accept"/> on a match</summary>
         private bool m_acceptOnMatch = true;
 
@@ -52,6 +53,8 @@ namespace log4net.Filter
         /// <summary>Default constructor</summary>
         public LevelMatchFilter()
         {
+		Logger.DebugFormat(">>> Entering LevelMatchFilter()");
+		Logger.DebugFormat("<<< Exiting LevelMatchFilter()");
         }
 
         /// <summary><see cref="FilterDecision.Accept"/> when matching <see cref="LevelToMatch"/></summary>
@@ -101,6 +104,7 @@ namespace log4net.Filter
         /// </remarks>
         public override FilterDecision Decide(LoggingEvent loggingEvent) 
         {
+			Logger.DebugFormat(">>> Entering Decide(loggingEvent={0})", loggingEvent);
             if (loggingEvent == null)
             {
                 throw new ArgumentNullException("loggingEvent");
@@ -111,6 +115,7 @@ namespace log4net.Filter
                 // Found match
                 return this.m_acceptOnMatch ? FilterDecision.Accept : FilterDecision.Deny;
             }
+			Logger.DebugFormat("<<< Exiting Decide(loggingEvent={0})", loggingEvent);
             return FilterDecision.Neutral;
         }
     }

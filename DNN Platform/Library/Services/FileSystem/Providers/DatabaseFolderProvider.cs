@@ -20,12 +20,15 @@ namespace DotNetNuke.Services.FileSystem
 
     public class DatabaseFolderProvider : SecureFolderProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Clears the content of the file in the database.</summary>
         /// <param name="fileId">The file identifier.</param>
         public static void ClearFileContent(int fileId)
         {
+			Logger.LogDebug(">>> Entering ClearFileContent(fileId={FileId})", fileId);
             DataProvider.Instance().ClearFileContent(fileId);
             DataProvider.Instance().UpdateFileVersion(fileId, Guid.NewGuid());
+			Logger.LogDebug("<<< Exiting ClearFileContent(fileId={FileId})", fileId);
         }
 
         /// <summary>Updates the content of the file in the database.</summary>
@@ -33,6 +36,7 @@ namespace DotNetNuke.Services.FileSystem
         /// <param name="content">The new content.</param>
         public static void UpdateFileContent(int fileId, Stream content)
         {
+			Logger.LogDebug(">>> Entering UpdateFileContent(fileId={FileId},content={Content})", fileId, content);
             if (content != null)
             {
                 byte[] fileContent;
@@ -56,6 +60,7 @@ namespace DotNetNuke.Services.FileSystem
             }
 
             DataProvider.Instance().UpdateFileVersion(fileId, Guid.NewGuid());
+			Logger.LogDebug("<<< Exiting UpdateFileContent(fileId={FileId},content={Content})", fileId, content);
         }
 
         /// <summary>Updates the content of the file in the database.</summary>
@@ -77,6 +82,7 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         public override void CopyFile(string folderPath, string fileName, string newFolderPath, FolderMappingInfo folderMapping)
         {
+			Logger.LogDebug(">>> Entering CopyFile(folderPath={FolderPath},fileName={FileName},newFolderPath={NewFolderPath},folderMapping={FolderMapping})", folderPath, fileName, newFolderPath, folderMapping);
             Requires.PropertyNotNull("folderPath", folderPath);
             Requires.NotNullOrEmpty("fileName", fileName);
             Requires.PropertyNotNull("newFolderPath", newFolderPath);
@@ -89,6 +95,8 @@ namespace DotNetNuke.Services.FileSystem
 
             var sourceFolder = FolderManager.Instance.GetFolder(folderMapping.PortalID, folderPath);
             var destinationFolder = FolderManager.Instance.GetFolder(folderMapping.PortalID, newFolderPath);
+			Logger.LogDebug("CopyFile(folderPath={FolderPath},fileName={FileName},newFolderPath={NewFolderPath},folderMapping={FolderMapping}): sourceFolder → {SourceFolder}", folderPath, fileName, newFolderPath, folderMapping, sourceFolder);
+			Logger.LogDebug("CopyFile(folderPath={FolderPath},fileName={FileName},newFolderPath={NewFolderPath},folderMapping={FolderMapping}): destinationFolder → {DestinationFolder}", folderPath, fileName, newFolderPath, folderMapping, destinationFolder);
 
             Requires.NotNull("sourceFolder", sourceFolder);
             Requires.NotNull("destinationFolder", destinationFolder);
@@ -107,6 +115,7 @@ namespace DotNetNuke.Services.FileSystem
                     this.AddFile(destinationFolder, fileName, fileContent);
                 }
             }
+			Logger.LogDebug("<<< Exiting CopyFile(folderPath={FolderPath},fileName={FileName},newFolderPath={NewFolderPath},folderMapping={FolderMapping})", folderPath, fileName, newFolderPath, folderMapping);
         }
 
         /// <inheritdoc />
@@ -138,9 +147,11 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         public override bool FolderExists(string folderPath, FolderMappingInfo folderMapping)
         {
+			Logger.LogDebug(">>> Entering FolderExists(folderPath={FolderPath},folderMapping={FolderMapping})", folderPath, folderMapping);
             Requires.PropertyNotNull("folderPath", folderPath);
             Requires.NotNull("folderMapping", folderMapping);
 
+			Logger.LogDebug("<<< Exiting FolderExists(folderPath={FolderPath},folderMapping={FolderMapping})", folderPath, folderMapping);
             return FolderManager.Instance.GetFolder(folderMapping.PortalID, folderPath) != null;
         }
 
@@ -196,6 +207,8 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         public override string GetFolderProviderIconPath()
         {
+			Logger.LogDebug(">>> Entering GetFolderProviderIconPath()");
+			Logger.LogDebug("<<< Exiting GetFolderProviderIconPath()");
             return IconControllerWrapper.Instance.IconURL("FolderDatabase", "32x32");
         }
 
@@ -208,6 +221,7 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         public override IEnumerable<string> GetSubFolders(string folderPath, FolderMappingInfo folderMapping)
         {
+			Logger.LogDebug(">>> Entering GetSubFolders(folderPath={FolderPath},folderMapping={FolderMapping})", folderPath, folderMapping);
             Requires.PropertyNotNull("folderPath", folderPath);
             Requires.NotNull("folderMapping", folderMapping);
 
@@ -215,6 +229,8 @@ namespace DotNetNuke.Services.FileSystem
 
             var folder = folderManager.GetFolder(folderMapping.PortalID, folderPath);
 
+			Logger.LogDebug("GetSubFolders(folderPath={FolderPath},folderMapping={FolderMapping}): folder → {Folder}", folderPath, folderMapping, folder);
+			Logger.LogDebug("<<< Exiting GetSubFolders(folderPath={FolderPath},folderMapping={FolderMapping})", folderPath, folderMapping);
             return folderManager.GetFolders(folder).Select(subfolder => subfolder.FolderPath);
         }
 
@@ -247,6 +263,8 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         public override bool SupportsFileAttributes()
         {
+			Logger.LogDebug(">>> Entering SupportsFileAttributes()");
+			Logger.LogDebug("<<< Exiting SupportsFileAttributes()");
             return false;
         }
 
@@ -276,8 +294,10 @@ namespace DotNetNuke.Services.FileSystem
 
         private static MemoryStream GetFileStreamInternal(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering GetFileStreamInternal(dr={Dr})", dr);
             byte[] bytes = null;
             try
+			Logger.LogDebug("GetFileStreamInternal(dr={Dr}): bytes → {Bytes}", dr, bytes);
             {
                 if (dr.Read())
                 {
@@ -289,11 +309,13 @@ namespace DotNetNuke.Services.FileSystem
                 CBO.CloseDataReader(dr, true);
             }
 
+			Logger.LogDebug("<<< Exiting GetFileStreamInternal(dr={Dr})", dr);
             return bytes != null ? new MemoryStream(bytes) : null;
         }
 
         private static void UpdateFileInternal(int fileId, Stream content)
         {
+			Logger.LogDebug(">>> Entering UpdateFileInternal(fileId={FileId},content={Content})", fileId, content);
             byte[] fileContent = null;
 
             if (content != null)
@@ -301,10 +323,12 @@ namespace DotNetNuke.Services.FileSystem
                 var restorePosition = content.CanSeek;
                 long originalPosition = Null.NullInteger;
 
+				Logger.LogDebug("UpdateFileInternal(fileId={FileId},content={Content}): originalPosition → {OriginalPosition}", fileId, content, originalPosition);
                 if (restorePosition)
                 {
                     originalPosition = content.Position;
                     content.Position = 0;
+					Logger.LogDebug("UpdateFileInternal(fileId={FileId},content={Content}): content.Position → {Arg2}", fileId, content, content.Position);
                 }
 
                 var buffer = new byte[16 * 1024];
@@ -328,6 +352,7 @@ namespace DotNetNuke.Services.FileSystem
             }
 
             UpdateFileContent(fileId, fileContent);
+			Logger.LogDebug("<<< Exiting UpdateFileInternal(fileId={FileId},content={Content})", fileId, content);
         }
     }
 }

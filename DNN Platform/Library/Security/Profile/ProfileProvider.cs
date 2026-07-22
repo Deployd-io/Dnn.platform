@@ -8,11 +8,14 @@ namespace DotNetNuke.Security.Profile
 
     public abstract class ProfileProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public abstract bool CanEditProviderProperties { get; }
 
         // return the provider
         public static ProfileProvider Instance()
         {
+			Logger.LogDebug(">>> Entering Instance()");
+			Logger.LogDebug("<<< Exiting Instance()");
             return ComponentFactory.GetComponent<ProfileProvider>();
         }
 

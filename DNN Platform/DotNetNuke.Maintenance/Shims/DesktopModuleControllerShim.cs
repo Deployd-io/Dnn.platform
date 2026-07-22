@@ -13,18 +13,25 @@ namespace DotNetNuke.Maintenance.Shims
     /// </summary>
     internal sealed class DesktopModuleControllerShim : IDesktopModuleController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IHostSettings hostSettings;
 
         /// <summary>Initializes a new instance of the <see cref="DesktopModuleControllerShim"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
         public DesktopModuleControllerShim(IHostSettings hostSettings)
         {
+			Logger.LogDebug(">>> Entering DesktopModuleControllerShim(hostSettings={HostSettings})", hostSettings);
             this.hostSettings = hostSettings;
+			Logger.LogDebug("<<< Exiting DesktopModuleControllerShim(hostSettings={HostSettings})", hostSettings);
+			Logger.LogDebug("DesktopModuleControllerShim(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
+			Logger.LogDebug("DesktopModuleControllerShim(hostSettings={HostSettings}): this.hostSettings → {Arg1}", hostSettings, this.hostSettings);
         }
 
         /// <inheritdoc />
         public DesktopModuleInfo GetDesktopModuleByModuleName(string moduleName, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetDesktopModuleByModuleName(moduleName={ModuleName},portalId={PortalId})", moduleName, portalId);
+			Logger.LogDebug("<<< Exiting GetDesktopModuleByModuleName(moduleName={ModuleName},portalId={PortalId})", moduleName, portalId);
             return DesktopModuleController.GetDesktopModuleByModuleName(this.hostSettings, moduleName, portalId);
         }
     }

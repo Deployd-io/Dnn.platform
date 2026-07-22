@@ -14,11 +14,16 @@ namespace DotNetNuke.Web.Razor.Helpers
     [DnnDeprecated(9, 3, 2, "Use Razor Pages instead")]
     public partial class DnnHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly ModuleInstanceContext context;
 
         public DnnHelper(ModuleInstanceContext context)
         {
+			Logger.LogDebug(">>> Entering DnnHelper(context={Context})", context);
             this.context = context;
+			Logger.LogDebug("<<< Exiting DnnHelper(context={Context})", context);
+			Logger.LogDebug("DnnHelper(context={Context}): context → {Context1}", context, context);
+			Logger.LogDebug("DnnHelper(context={Context}): this.context → {Arg1}", context, this.context);
         }
 
         public ModuleInfo Module

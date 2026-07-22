@@ -22,8 +22,14 @@ public class ContainerWithServiceProviderFallback : IContainer
     /// <param name="serviceProvider">The service provider.</param>
     public ContainerWithServiceProviderFallback(IContainer container, IServiceProvider serviceProvider)
     {
+		Logger.LogDebug(">>> Entering ContainerWithServiceProviderFallback(container={Container},serviceProvider={ServiceProvider})", container, serviceProvider);
         this.container = container;
         this.serviceProvider = serviceProvider;
+		Logger.LogDebug("<<< Exiting ContainerWithServiceProviderFallback(container={Container},serviceProvider={ServiceProvider})", container, serviceProvider);
+		Logger.LogDebug("ContainerWithServiceProviderFallback(container={Container},serviceProvider={ServiceProvider}): this.container → {Arg2}", container, serviceProvider, this.container);
+		Logger.LogDebug("ContainerWithServiceProviderFallback(container={Container},serviceProvider={ServiceProvider}): serviceProvider → {ServiceProvider1}", container, serviceProvider, serviceProvider);
+		Logger.LogDebug("ContainerWithServiceProviderFallback(container={Container},serviceProvider={ServiceProvider}): this.serviceProvider → {Arg2}", container, serviceProvider, this.serviceProvider);
+		Logger.LogDebug("ContainerWithServiceProviderFallback(container={Container},serviceProvider={ServiceProvider}): container → {Container1}", container, serviceProvider, container);
     }
 
     /// <inheritdoc />
@@ -33,8 +39,10 @@ public class ContainerWithServiceProviderFallback : IContainer
     /// <inheritdoc />
     public void RegisterComponent<TComponent>()
         where TComponent : class
+		Logger.LogDebug(">>> Entering RegisterComponent()");
         => this.container.RegisterComponent<TComponent>();
 
+	Logger.LogDebug("<<< Exiting RegisterComponent()");
     /// <inheritdoc />
     public void RegisterComponent<TComponent>(string name)
         where TComponent : class
@@ -83,11 +91,15 @@ public class ContainerWithServiceProviderFallback : IContainer
     /// <inheritdoc />
     public void RegisterComponentInstance<TContract>(string name, object instance)
         => this.container.RegisterComponentInstance<TContract>(name, instance);
+		Logger.LogDebug(">>> Entering RegisterComponentInstance(name={Name},instance={Instance})", name, instance);
 
+	Logger.LogDebug("<<< Exiting RegisterComponentInstance(name={Name},instance={Instance})", name, instance);
     /// <inheritdoc />
     public void RegisterComponentSettings(string name, IDictionary dependencies)
         => this.container.RegisterComponentSettings(name, dependencies);
+		Logger.LogDebug(">>> Entering RegisterComponentSettings(name={Name},dependencies={Dependencies})", name, dependencies);
 
+	Logger.LogDebug("<<< Exiting RegisterComponentSettings(name={Name},dependencies={Dependencies})", name, dependencies);
     /// <inheritdoc />
     public void RegisterComponentSettings(Type component, IDictionary dependencies)
         => this.container.RegisterComponentSettings(component, dependencies);
@@ -119,9 +131,11 @@ public class ContainerWithServiceProviderFallback : IContainer
     /// <inheritdoc />
     public TContract GetComponent<TContract>()
     {
+		Logger.LogDebug(">>> Entering GetComponent()");
         Logger.Trace($"Getting component for {typeof(TContract).FullName}");
         var service = this.container.GetComponent<TContract>();
         if (service is not null)
+		Logger.LogDebug("GetComponent(): service → {Service}", service);
         {
             Logger.Trace($"Got component for {typeof(TContract).FullName} from container");
             return service;
@@ -135,6 +149,7 @@ public class ContainerWithServiceProviderFallback : IContainer
     public TContract GetComponent<TContract>(string name)
         => this.container.GetComponent<TContract>(name);
 
+	Logger.LogDebug("<<< Exiting GetComponent(name={Name})", name);
     /// <inheritdoc />
     public object GetComponent(string name, Type contractType)
         => this.container.GetComponent(name, contractType);
@@ -142,7 +157,9 @@ public class ContainerWithServiceProviderFallback : IContainer
     /// <inheritdoc />
     public string[] GetComponentList<TContract>()
         => this.container.GetComponentList<TContract>();
+		Logger.LogDebug(">>> Entering GetComponentList()");
 
+	Logger.LogDebug("<<< Exiting GetComponentList()");
     /// <inheritdoc />
     public string[] GetComponentList(Type contractType)
         => this.container.GetComponentList(contractType);
@@ -150,7 +167,9 @@ public class ContainerWithServiceProviderFallback : IContainer
     /// <inheritdoc />
     public IDictionary GetComponentSettings(string name)
         => this.container.GetComponentSettings(name);
+		Logger.LogDebug(">>> Entering GetComponentSettings(name={Name})", name);
 
+	Logger.LogDebug("<<< Exiting GetComponentSettings(name={Name})", name);
     /// <inheritdoc />
     public IDictionary GetComponentSettings(Type component)
         => this.container.GetComponentSettings(component);

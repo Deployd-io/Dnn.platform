@@ -66,12 +66,16 @@ namespace Dnn.ExportImport.Components.Engines
 
         static ExportImportEngine()
         {
+			Logger.LogDebug(">>> Entering ExportImportEngine()");
             var appStatus = Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
             ExportFolder = appStatus.ApplicationMapPath + Constants.ExportFolder;
+			Logger.LogDebug("ExportImportEngine(): appStatus → {AppStatus}", appStatus);
+			Logger.LogDebug("ExportImportEngine(): ExportFolder → {ExportFolder}", ExportFolder);
             if (!Directory.Exists(ExportFolder))
             {
                 Directory.CreateDirectory(ExportFolder);
             }
+			Logger.LogDebug("<<< Exiting ExportImportEngine()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ExportImportEngine"/> class.</summary>
@@ -86,8 +90,12 @@ namespace Dnn.ExportImport.Components.Engines
         /// <param name="exportController">The export controller.</param>
         public ExportImportEngine(IEnumerable<BasePortableService> portableServices, ExportController exportController)
         {
+			Logger.LogDebug(">>> Entering ExportImportEngine(portableServices={PortableServices},exportController={ExportController})", portableServices, exportController);
             this.exportController = exportController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ExportController>();
             this.portableServices = (portableServices ?? Globals.GetCurrentServiceProvider().GetServices<BasePortableService>()).ToList();
+			Logger.LogDebug("<<< Exiting ExportImportEngine(portableServices={PortableServices},exportController={ExportController})", portableServices, exportController);
+			Logger.LogDebug("ExportImportEngine(portableServices={PortableServices},exportController={ExportController}): portableServices → {PortableServices1}", portableServices, exportController, portableServices);
+			Logger.LogDebug("ExportImportEngine(portableServices={PortableServices},exportController={ExportController}): exportController → {ExportController1}", portableServices, exportController, exportController);
         }
 
         private static string[] NotAllowedCategoriesInRequestArray => new[]
@@ -134,21 +142,28 @@ namespace Dnn.ExportImport.Components.Engines
         /// <param name="scheduleHistoryItem">The schedule history item.</param>
         public void Export(ExportImportJob exportJob, ExportImportResult result, ScheduleHistoryItem scheduleHistoryItem)
         {
+			Logger.LogDebug(">>> Entering Export(exportJob={ExportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem})", exportJob, result, scheduleHistoryItem);
             var exportDto = JsonConvert.DeserializeObject<ExportDto>(exportJob.JobObject);
             if (exportDto == null)
+			Logger.LogDebug("Export(exportJob={ExportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem}): exportDto → {ExportDto}", exportJob, result, scheduleHistoryItem, exportDto);
             {
                 exportJob.CompletedOnDate = DateUtils.GetDatabaseUtcTime();
                 exportJob.JobStatus = JobStatus.Failed;
+				Logger.LogDebug("Export(exportJob={ExportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem}): exportJob.JobStatus → {Arg3}", exportJob, result, scheduleHistoryItem, exportJob.JobStatus);
                 return;
             }
 
             this.timeoutSeconds = GetTimeoutPerSlot();
+			Logger.LogDebug("Export(exportJob={ExportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem}): timeoutSeconds → {TimeoutSeconds}", exportJob, result, scheduleHistoryItem, timeoutSeconds);
             var dbName = Path.Combine(ExportFolder, exportJob.Directory, Constants.ExportDbName);
             var finfo = new FileInfo(dbName);
+			Logger.LogDebug("Export(exportJob={ExportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem}): dbName → {DbName}", exportJob, result, scheduleHistoryItem, dbName);
+			Logger.LogDebug("Export(exportJob={ExportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem}): finfo → {Finfo}", exportJob, result, scheduleHistoryItem, finfo);
             dbName = finfo.FullName;
 
             var checkpoints = EntitiesController.Instance.GetJobChekpoints(exportJob.JobId);
 
+			Logger.LogDebug("Export(exportJob={ExportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem}): checkpoints → {Checkpoints}", exportJob, result, scheduleHistoryItem, checkpoints);
             // Delete so we start a fresh export database; only if there is no previous checkpoint exists
             if (checkpoints.Count == 0)
             {
@@ -180,8 +195,12 @@ namespace Dnn.ExportImport.Components.Engines
             // there must be one parent implementor at least for this to work
             var parentServices = this.portableServices.Where(imp => string.IsNullOrEmpty(imp.ParentCategory)).ToList();
             var implementors = this.portableServices.Except(parentServices).ToList();
+			Logger.LogDebug("Export(exportJob={ExportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem}): parentServices → {ParentServices}", exportJob, result, scheduleHistoryItem, parentServices);
+			Logger.LogDebug("Export(exportJob={ExportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem}): implementors → {Implementors}", exportJob, result, scheduleHistoryItem, implementors);
             var nextLevelServices = new List<BasePortableService>();
             var includedItems = GetAllCategoriesToInclude(exportDto, implementors);
+			Logger.LogDebug("Export(exportJob={ExportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem}): nextLevelServices → {NextLevelServices}", exportJob, result, scheduleHistoryItem, nextLevelServices);
+			Logger.LogDebug("Export(exportJob={ExportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem}): includedItems → {IncludedItems}", exportJob, result, scheduleHistoryItem, includedItems);
 
             if (includedItems.Count == 0)
             {
@@ -294,6 +313,7 @@ namespace Dnn.ExportImport.Components.Engines
                 var summary = new ImportExportSummary();
                 using (var ctx = new ExportImportRepository(dbName))
                 {
+				Logger.LogDebug("Export(exportJob={ExportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem}): summary → {Summary}", exportJob, result, scheduleHistoryItem, summary);
                     BaseController.BuildJobSummary(this.portableServices, exportJob.Directory, ctx, summary);
                 }
 
@@ -310,6 +330,7 @@ namespace Dnn.ExportImport.Components.Engines
                 };
 
                 summary.ExportFileInfo = exportFileInfo;
+				Logger.LogDebug("Export(exportJob={ExportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem}): summary.ExportFileInfo → {Arg3}", exportJob, result, scheduleHistoryItem, summary.ExportFileInfo);
                 this.exportController.CreatePackageManifest(exportJob, exportFileInfo, summary);
             }
         }
@@ -320,18 +341,24 @@ namespace Dnn.ExportImport.Components.Engines
         /// <param name="scheduleHistoryItem">The schedule history item.</param>
         public void Import(ExportImportJob importJob, ExportImportResult result, ScheduleHistoryItem scheduleHistoryItem)
         {
+			Logger.LogDebug(">>> Entering Import(importJob={ImportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem})", importJob, result, scheduleHistoryItem);
             scheduleHistoryItem.AddLogNote($"<br/><b>SITE IMPORT Started. JOB #{importJob.JobId}</b>");
             this.timeoutSeconds = GetTimeoutPerSlot();
+			Logger.LogDebug("Import(importJob={ImportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem}): timeoutSeconds → {TimeoutSeconds}", importJob, result, scheduleHistoryItem, timeoutSeconds);
             var importDto = JsonConvert.DeserializeObject<ImportDto>(importJob.JobObject);
             if (importDto == null)
+			Logger.LogDebug("Import(importJob={ImportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem}): importDto → {ImportDto}", importJob, result, scheduleHistoryItem, importDto);
             {
                 importJob.CompletedOnDate = DateUtils.GetDatabaseUtcTime();
                 importJob.JobStatus = JobStatus.Failed;
+				Logger.LogDebug("Import(importJob={ImportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem}): importJob.JobStatus → {Arg3}", importJob, result, scheduleHistoryItem, importJob.JobStatus);
                 return;
             }
 
             var dbName = Path.Combine(ExportFolder, importJob.Directory, Constants.ExportDbName);
             var finfo = new FileInfo(dbName);
+			Logger.LogDebug("Import(importJob={ImportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem}): dbName → {DbName}", importJob, result, scheduleHistoryItem, dbName);
+			Logger.LogDebug("Import(importJob={ImportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem}): finfo → {Finfo}", importJob, result, scheduleHistoryItem, finfo);
 
             if (!finfo.Exists)
             {
@@ -480,6 +507,7 @@ namespace Dnn.ExportImport.Components.Engines
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting Import(importJob={ImportJob},result={Result},scheduleHistoryItem={ScheduleHistoryItem})", importJob, result, scheduleHistoryItem);
         }
 
         /// <summary>Adds the logs to the database.</summary>
@@ -488,6 +516,7 @@ namespace Dnn.ExportImport.Components.Engines
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public void AddLogsToDatabase(int jobId, ICollection<LogItem> completeLog)
         {
+			Logger.LogDebug(">>> Entering AddLogsToDatabase(jobId={JobId},completeLog={CompleteLog})", jobId, completeLog);
             if (completeLog == null || completeLog.Count == 0)
             {
                 return;
@@ -522,29 +551,38 @@ namespace Dnn.ExportImport.Components.Engines
             }
 
             completeLog.Clear();
+			Logger.LogDebug("<<< Exiting AddLogsToDatabase(jobId={JobId},completeLog={CompleteLog})", jobId, completeLog);
         }
 
         private static bool CheckCancelledCallBack(ExportImportJob job)
         {
+			Logger.LogDebug(">>> Entering CheckCancelledCallBack(job={Job})", job);
             var job2 = CachingProvider.Instance().GetItem(Util.GetExpImpJobCacheKey(job)) as ExportImportJob;
             if (job2 == null)
+			Logger.LogDebug("CheckCancelledCallBack(job={Job}): job2 → {Job2}", job, job2);
             {
                 job2 = EntitiesController.Instance.GetJobById(job.JobId);
                 job.IsCancelled = job2.IsCancelled;
+				Logger.LogDebug("CheckCancelledCallBack(job={Job}): job.IsCancelled → {Arg1}", job, job.IsCancelled);
                 AddJobToCache(job2);
             }
 
+			Logger.LogDebug("<<< Exiting CheckCancelledCallBack(job={Job})", job);
             return job2.IsCancelled;
         }
 
         private static void AddJobToCache(ExportImportJob job)
         {
+			Logger.LogDebug(">>> Entering AddJobToCache(job={Job})", job);
             CachingProvider.Instance().Insert(Util.GetExpImpJobCacheKey(job), job);
+			Logger.LogDebug("<<< Exiting AddJobToCache(job={Job})", job);
         }
 
         private static void RemoveTokenFromCache(ExportImportJob job)
         {
+			Logger.LogDebug(">>> Entering RemoveTokenFromCache(job={Job})", job);
             CachingProvider.Instance().Remove(Util.GetExpImpJobCacheKey(job));
+			Logger.LogDebug("<<< Exiting RemoveTokenFromCache(job={Job})", job);
         }
 
         private static HashSet<string> GetAllCategoriesToInclude(
@@ -638,8 +676,11 @@ namespace Dnn.ExportImport.Components.Engines
 
         private static int GetTimeoutPerSlot()
         {
+			Logger.LogDebug(">>> Entering GetTimeoutPerSlot()");
             var value = 0;
             var setting = SettingsController.Instance.GetSetting(Constants.MaxSecondsToRunJobKey);
+			Logger.LogDebug("GetTimeoutPerSlot(): value → {Value}", value);
+			Logger.LogDebug("GetTimeoutPerSlot(): setting → {Setting}", setting);
             if (setting != null && !int.TryParse(setting.SettingValue, out value))
             {
                 // default max time to run a job is 8 hours
@@ -656,17 +697,20 @@ namespace Dnn.ExportImport.Components.Engines
                 value = 12 * 60 * 60;
             }
 
+			Logger.LogDebug("<<< Exiting GetTimeoutPerSlot()");
             return value;
         }
 
         private static void SetLastJobStartTime(int scheduleId, DateTimeOffset time)
         {
+			Logger.LogDebug(">>> Entering SetLastJobStartTime(scheduleId={ScheduleId},time={Time})", scheduleId, time);
             SchedulingProvider.Instance()
                 .AddScheduleItemSetting(
                     scheduleId,
                     Constants.LastJobStartTimeKey,
                     time.ToUniversalTime()
                         .DateTime.ToString(Constants.JobRunDateTimeFormat, CultureInfo.InvariantCulture));
+						Logger.LogDebug("<<< Exiting SetLastJobStartTime(scheduleId={ScheduleId},time={Time})", scheduleId, time);
         }
 
         private static void DoPacking(ExportImportJob exportJob, string dbName)
@@ -680,8 +724,11 @@ namespace Dnn.ExportImport.Components.Engines
 
         private static void DoUnPacking(ExportImportJob importJob)
         {
+			Logger.LogDebug(">>> Entering DoUnPacking(importJob={ImportJob})", importJob);
             var extractFolder = Path.Combine(ExportFolder, importJob.Directory);
             var dbName = Path.Combine(extractFolder, Constants.ExportDbName);
+			Logger.LogDebug("DoUnPacking(importJob={ImportJob}): extractFolder → {ExtractFolder}", importJob, extractFolder);
+			Logger.LogDebug("DoUnPacking(importJob={ImportJob}): dbName → {DbName}", importJob, dbName);
             if (File.Exists(dbName))
             {
                 return;
@@ -689,21 +736,31 @@ namespace Dnn.ExportImport.Components.Engines
 
             var zipDbName = Path.Combine(extractFolder, Constants.ExportZipDbName);
             CompressionUtil.UnZipFileFromArchive(Constants.ExportDbName, zipDbName, extractFolder, false);
+			Logger.LogDebug("DoUnPacking(importJob={ImportJob}): zipDbName → {ZipDbName}", importJob, zipDbName);
+			Logger.LogDebug("<<< Exiting DoUnPacking(importJob={ImportJob})", importJob);
         }
 
         private static long GetExportSize(string exportFolder)
         {
+			Logger.LogDebug(">>> Entering GetExportSize(exportFolder={ExportFolder})", exportFolder);
             var files = Directory.GetFiles(exportFolder);
+			Logger.LogDebug("GetExportSize(exportFolder={ExportFolder}): files → {Files}", exportFolder, files);
+			Logger.LogDebug("<<< Exiting GetExportSize(exportFolder={ExportFolder})", exportFolder);
             return files.Sum(file => new FileInfo(file).Length);
         }
 
         private static void CleanupDatabaseIfDirty(ExportImportRepository repository)
         {
+			Logger.LogDebug(">>> Entering CleanupDatabaseIfDirty(repository={Repository})", repository);
             var exportDto = repository.GetSingleItem<ExportDto>();
             var isDirty = exportDto.IsDirty;
+			Logger.LogDebug("CleanupDatabaseIfDirty(repository={Repository}): exportDto → {ExportDto}", repository, exportDto);
+			Logger.LogDebug("CleanupDatabaseIfDirty(repository={Repository}): exportDto.IsDirty → {Arg1}", repository, exportDto.IsDirty);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             exportDto.IsDirty = true;
             repository.UpdateSingleItem(exportDto);
             if (!isDirty)
+			Logger.LogInformation("CleanupDatabaseIfDirty(repository)={Repository}: update query executed in {Arg1} ms", repository, __logStart.ElapsedMilliseconds);
             {
                 return;
             }
@@ -712,6 +769,7 @@ namespace Dnn.ExportImport.Components.Engines
             var types = typeLocator.GetAllMatchingTypes(
                 t => t != null && t.IsClass && !t.IsAbstract && t.IsVisible &&
                      typeof(BasicExportImportDto).IsAssignableFrom(t));
+				Logger.LogDebug("CleanupDatabaseIfDirty(repository={Repository}): typeLocator → {TypeLocator}", repository, typeLocator);
 
             foreach (var type in from type in types
                                  let typeName = type.Name
@@ -721,6 +779,7 @@ namespace Dnn.ExportImport.Components.Engines
                 try
                 {
                     repository.CleanUpLocal(type.Name);
+					Logger.LogInformation("CleanupDatabaseIfDirty(repository)={Repository}: database query executed in {Arg1} ms", repository, __logStart.ElapsedMilliseconds);
                 }
                 catch (Exception e)
                 {
@@ -731,6 +790,7 @@ namespace Dnn.ExportImport.Components.Engines
                         e.Message);
                 }
             }
+			Logger.LogDebug("<<< Exiting CleanupDatabaseIfDirty(repository={Repository})", repository);
         }
 
         private void PrepareCheckPoints(
@@ -798,7 +858,9 @@ namespace Dnn.ExportImport.Components.Engines
         /// <returns>Treu to stop further <see cref="BasePortableService"/> processing; false otherwise.</returns>
         private bool CheckpointCallback(BasePortableService service)
         {
+			Logger.LogDebug(">>> Entering CheckpointCallback(service={Service})", service);
             EntitiesController.Instance.UpdateJobChekpoint(service.CheckPoint);
+			Logger.LogDebug("<<< Exiting CheckpointCallback(service={Service})", service);
             return this.TimeIsUp;
         }
     }

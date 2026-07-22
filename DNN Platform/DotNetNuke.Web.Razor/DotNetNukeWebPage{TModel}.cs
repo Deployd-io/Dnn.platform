@@ -17,12 +17,16 @@ namespace DotNetNuke.Web.Razor
     public abstract partial class DotNetNukeWebPage<TModel> : DotNetNukeWebPage
         where TModel : class
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private TModel model;
 
         public DotNetNukeWebPage()
         {
+			Logger.LogDebug(">>> Entering DotNetNukeWebPage()");
             var model = Globals.GetCurrentServiceProvider().GetService<TModel>();
             this.Model = model ?? Activator.CreateInstance<TModel>();
+			Logger.LogDebug("<<< Exiting DotNetNukeWebPage()");
+			Logger.LogDebug("DotNetNukeWebPage(): model → {Model}", model);
         }
 
         public new TModel Model
