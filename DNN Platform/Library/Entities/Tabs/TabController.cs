@@ -54,16 +54,25 @@ namespace DotNetNuke.Entities.Tabs
     public partial class TabController(IEventLogger eventLogger, DataProvider dataProvider, IPermissionDefinitionService permissionDefinitionService, IHostSettings hostSettings, IApplicationStatusInfo appStatus)
         : ServiceLocator<ITabController, TabController>, ITabController
     {
+		Logger.LogDebug(">>> Entering TabController(eventLogger={EventLogger},dataProvider={DataProvider},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},appStatus={AppStatus})", eventLogger, dataProvider, permissionDefinitionService, hostSettings, appStatus);
         private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabController));
         private static readonly Regex TabNameCheck1 = new Regex("^LPT[1-9]$|^COM[1-9]$", RegexOptions.IgnoreCase);
+		Logger.LogDebug("TabController(eventLogger={EventLogger},dataProvider={DataProvider},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},appStatus={AppStatus}): Logger → {Logger}", eventLogger, dataProvider, permissionDefinitionService, hostSettings, appStatus, Logger);
+		Logger.LogDebug("TabController(eventLogger={EventLogger},dataProvider={DataProvider},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},appStatus={AppStatus}): TabNameCheck1 → {TabNameCheck1}", eventLogger, dataProvider, permissionDefinitionService, hostSettings, appStatus, TabNameCheck1);
         private static readonly Regex TabNameCheck2 = new Regex("^AUX$|^CON$|^NUL$|^SITEMAP$|^LINKCLICK$|^KEEPALIVE$|^DEFAULT$|^ERRORPAGE$|^LOGIN$|^REGISTER$", RegexOptions.IgnoreCase);
 
+		Logger.LogDebug("TabController(eventLogger={EventLogger},dataProvider={DataProvider},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},appStatus={AppStatus}): TabNameCheck2 → {TabNameCheck2}", eventLogger, dataProvider, permissionDefinitionService, hostSettings, appStatus, TabNameCheck2);
         private readonly IEventLogger eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
         private readonly DataProvider dataProvider = dataProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<DataProvider>();
+		Logger.LogDebug("TabController(eventLogger={EventLogger},dataProvider={DataProvider},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},appStatus={AppStatus}): eventLogger → {EventLogger1}", eventLogger, dataProvider, permissionDefinitionService, hostSettings, appStatus, eventLogger);
+		Logger.LogDebug("TabController(eventLogger={EventLogger},dataProvider={DataProvider},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},appStatus={AppStatus}): dataProvider → {DataProvider1}", eventLogger, dataProvider, permissionDefinitionService, hostSettings, appStatus, dataProvider);
         private readonly IPermissionDefinitionService permissionDefinitionService = permissionDefinitionService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPermissionDefinitionService>();
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+		Logger.LogDebug("TabController(eventLogger={EventLogger},dataProvider={DataProvider},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},appStatus={AppStatus}): permissionDefinitionService → {PermissionDefinitionService1}", eventLogger, dataProvider, permissionDefinitionService, hostSettings, appStatus, permissionDefinitionService);
+		Logger.LogDebug("TabController(eventLogger={EventLogger},dataProvider={DataProvider},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},appStatus={AppStatus}): hostSettings → {HostSettings1}", eventLogger, dataProvider, permissionDefinitionService, hostSettings, appStatus, hostSettings);
         private readonly IApplicationStatusInfo appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
 
+		Logger.LogDebug("TabController(eventLogger={EventLogger},dataProvider={DataProvider},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},appStatus={AppStatus}): appStatus → {AppStatus1}", eventLogger, dataProvider, permissionDefinitionService, hostSettings, appStatus, appStatus);
         /// <summary>Initializes a new instance of the <see cref="TabController"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IEventLogger. Scheduled removal in v12.0.0.")]
         public TabController()
@@ -79,6 +88,7 @@ namespace DotNetNuke.Entities.Tabs
         public TabController(IEventLogger eventLogger, DataProvider dataProvider, IPermissionDefinitionService permissionDefinitionService)
             : this(eventLogger, dataProvider, permissionDefinitionService, null, null)
         {
+		Logger.LogDebug("<<< Exiting TabController(eventLogger={EventLogger},dataProvider={DataProvider},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},appStatus={AppStatus})", eventLogger, dataProvider, permissionDefinitionService, hostSettings, appStatus);
         }
 
         /// <summary>Gets the current page in current http request.</summary>
@@ -791,6 +801,8 @@ namespace DotNetNuke.Entities.Tabs
         /// <returns>An <see cref="XmlNode"/> representing the page's data.</returns>
         public static XmlNode SerializeTab(IBusinessControllerProvider businessControllerProvider, XmlDocument tabXml, TabInfo objTab, bool includeContent)
         {
+			Logger.LogDebug(">>> Entering SerializeTab(businessControllerProvider={BusinessControllerProvider},tabXml={TabXml},objTab={ObjTab},includeContent={IncludeContent})", businessControllerProvider, tabXml, objTab, includeContent);
+			Logger.LogDebug("<<< Exiting SerializeTab(businessControllerProvider={BusinessControllerProvider},tabXml={TabXml},objTab={ObjTab},includeContent={IncludeContent})", businessControllerProvider, tabXml, objTab, includeContent);
             return SerializeTab(businessControllerProvider, tabXml, null, objTab, null, includeContent);
         }
 
@@ -1200,12 +1212,15 @@ namespace DotNetNuke.Entities.Tabs
         /// <returns>The new tab ID.</returns>
         public int AddTabBefore(TabInfo objTab, int beforeTabId)
         {
+			Logger.LogDebug(">>> Entering AddTabBefore(objTab={ObjTab},beforeTabId={BeforeTabId})", objTab, beforeTabId);
             // Add tab to store
             int tabID = this.AddTabInternal(objTab, -1, beforeTabId, true);
 
+			Logger.LogDebug("AddTabBefore(objTab={ObjTab},beforeTabId={BeforeTabId}): tabID → {TabID}", objTab, beforeTabId, tabID);
             // Clear the Cache
             this.ClearCache(objTab.PortalID);
 
+			Logger.LogDebug("<<< Exiting AddTabBefore(objTab={ObjTab},beforeTabId={BeforeTabId})", objTab, beforeTabId);
             return tabID;
         }
 
@@ -1632,6 +1647,7 @@ namespace DotNetNuke.Entities.Tabs
                     List<TabInfo> tabs = CBO.FillCollection<TabInfo>(this.dataProvider.GetTabs(portalId));
                     return new TabCollection(tabs);
                 });
+				Logger.LogDebug("<<< Exiting GetTabsByPortal(portalId={PortalId})", portalId);
         }
 
         /// <inheritdoc />
@@ -1754,8 +1770,10 @@ namespace DotNetNuke.Entities.Tabs
         /// <returns>true if tab is published.</returns>
         public bool IsTabPublished(TabInfo publishTab)
         {
+			Logger.LogDebug(">>> Entering IsTabPublished(publishTab={PublishTab})", publishTab);
             bool returnValue = true;
 
+			Logger.LogDebug("IsTabPublished(publishTab={PublishTab}): returnValue → {ReturnValue}", publishTab, returnValue);
             // To publish a subsidiary language tab we need to enable the View Permissions
             if (publishTab != null && publishTab.DefaultLanguageTab != null)
             {
@@ -1777,6 +1795,7 @@ namespace DotNetNuke.Entities.Tabs
                 }
             }
 
+			Logger.LogDebug("<<< Exiting IsTabPublished(publishTab={PublishTab})", publishTab);
             return returnValue;
         }
 
@@ -1916,6 +1935,7 @@ namespace DotNetNuke.Entities.Tabs
         /// <param name="publishTab">The publish tab.</param>
         public void PublishTab(TabInfo publishTab)
         {
+			Logger.LogDebug(">>> Entering PublishTab(publishTab={PublishTab})", publishTab);
             // To publish a subsidiary language tab we need to enable the View Permissions
             if (publishTab != null && publishTab.DefaultLanguageTab != null)
             {
@@ -1937,6 +1957,7 @@ namespace DotNetNuke.Entities.Tabs
                     TabPermissionController.SaveTabPermissions(publishTab);
                 }
             }
+			Logger.LogDebug("<<< Exiting PublishTab(publishTab={PublishTab})", publishTab);
         }
 
         /// <summary>Publishes the tabs.</summary>
@@ -1989,6 +2010,7 @@ namespace DotNetNuke.Entities.Tabs
             this.ClearCache(tab.PortalID);
 
             EventManager.Instance.OnTabRestored(new TabEventArgs { Tab = tab });
+			Logger.LogDebug("<<< Exiting RestoreTab(tab={Tab},portalSettings={PortalSettings})", tab, portalSettings);
         }
 
         /// <summary>Save url information for a page (tab).</summary>
@@ -2232,6 +2254,8 @@ namespace DotNetNuke.Entities.Tabs
         /// <inheritdoc />
         protected override Func<ITabController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => Globals.DependencyProvider.GetRequiredService<ITabController>();
         }
 
@@ -2255,12 +2279,14 @@ namespace DotNetNuke.Entities.Tabs
 
         private static void DeserializeTabSettings(XmlNodeList nodeTabSettings, TabInfo objTab)
         {
+			Logger.LogDebug(">>> Entering DeserializeTabSettings(nodeTabSettings={NodeTabSettings},objTab={ObjTab})", nodeTabSettings, objTab);
             foreach (XmlNode oTabSettingNode in nodeTabSettings)
             {
                 string sKey = XmlUtils.GetNodeValue(oTabSettingNode.CreateNavigator(), "settingname");
                 string sValue = XmlUtils.GetNodeValue(oTabSettingNode.CreateNavigator(), "settingvalue");
                 objTab.TabSettings[sKey] = sValue;
             }
+			Logger.LogDebug("<<< Exiting DeserializeTabSettings(nodeTabSettings={NodeTabSettings},objTab={ObjTab})", nodeTabSettings, objTab);
         }
 
         private static void DeserializeTabPermissions(IPermissionDefinitionService permissionDefinitionService, XmlNodeList nodeTabPermissions, TabInfo tab, bool isAdminTemplate)
@@ -2327,6 +2353,7 @@ namespace DotNetNuke.Entities.Tabs
 
         private static void DeserializeTabUrls(XmlNode nodeTabUrl, TabUrlInfo objTabUrl)
         {
+			Logger.LogDebug(">>> Entering DeserializeTabUrls(nodeTabUrl={NodeTabUrl},objTabUrl={ObjTabUrl})", nodeTabUrl, objTabUrl);
             objTabUrl.SeqNum = XmlUtils.GetAttributeValueAsInteger(nodeTabUrl.CreateNavigator(), "SeqNum", 0);
             objTabUrl.Url = string.IsNullOrEmpty(XmlUtils.GetAttributeValue(nodeTabUrl.CreateNavigator(), "Url")) ? "/" : XmlUtils.GetAttributeValue(nodeTabUrl.CreateNavigator(), "Url");
             objTabUrl.QueryString = XmlUtils.GetAttributeValue(nodeTabUrl.CreateNavigator(), "QueryString");
@@ -2334,7 +2361,10 @@ namespace DotNetNuke.Entities.Tabs
             objTabUrl.HttpStatus = string.IsNullOrEmpty(XmlUtils.GetAttributeValue(nodeTabUrl.CreateNavigator(), "HttpStatus")) ? "200" : XmlUtils.GetAttributeValue(nodeTabUrl.CreateNavigator(), "HttpStatus");
             objTabUrl.IsSystem = XmlUtils.GetAttributeValueAsBoolean(nodeTabUrl.CreateNavigator(), "IsSystem", true);
             objTabUrl.PortalAliasId = Null.NullInteger;
+			Logger.LogDebug("DeserializeTabUrls(nodeTabUrl={NodeTabUrl},objTabUrl={ObjTabUrl}): objTabUrl.PortalAliasId → {Arg2}", nodeTabUrl, objTabUrl, objTabUrl.PortalAliasId);
+			Logger.LogDebug("DeserializeTabUrls(nodeTabUrl={NodeTabUrl},objTabUrl={ObjTabUrl}): objTabUrl.PortalAliasUsage → {Arg2}", nodeTabUrl, objTabUrl, objTabUrl.PortalAliasUsage);
             objTabUrl.PortalAliasUsage = PortalAliasUsageType.Default;
+			Logger.LogDebug("<<< Exiting DeserializeTabUrls(nodeTabUrl={NodeTabUrl},objTabUrl={ObjTabUrl})", nodeTabUrl, objTabUrl);
         }
 
         private static int GetIndexOfTab(TabInfo objTab, IEnumerable<TabInfo> tabs)
@@ -2358,10 +2388,15 @@ namespace DotNetNuke.Entities.Tabs
 
         private static object GetTabPathDictionaryCallback(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogDebug(">>> Entering GetTabPathDictionaryCallback(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             string cultureCode = Convert.ToString(cacheItemArgs.ParamList[0], CultureInfo.InvariantCulture);
             var portalId = (int)cacheItemArgs.ParamList[1];
+			Logger.LogDebug("GetTabPathDictionaryCallback(cacheItemArgs={CacheItemArgs}): cultureCode → {CultureCode}", cacheItemArgs, cultureCode);
+			Logger.LogDebug("GetTabPathDictionaryCallback(cacheItemArgs={CacheItemArgs}): portalId → {PortalId}", cacheItemArgs, portalId);
             var tabPathDictionary = new Dictionary<string, int>(StringComparer.CurrentCultureIgnoreCase);
             IDataReader dr = DataProvider.Instance().GetTabPaths(portalId, cultureCode);
+			Logger.LogDebug("GetTabPathDictionaryCallback(cacheItemArgs={CacheItemArgs}): tabPathDictionary → {TabPathDictionary}", cacheItemArgs, tabPathDictionary);
+			Logger.LogDebug("GetTabPathDictionaryCallback(cacheItemArgs={CacheItemArgs}): dr → {Dr}", cacheItemArgs, dr);
             try
             {
                 while (dr.Read())
@@ -2371,6 +2406,7 @@ namespace DotNetNuke.Entities.Tabs
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in GetTabPathDictionaryCallback(cacheItemArgs={CacheItemArgs}): {Arg1}", cacheItemArgs, ex.Message);
                 Exceptions.LogException(exc);
             }
             finally
@@ -2378,6 +2414,7 @@ namespace DotNetNuke.Entities.Tabs
                 CBO.CloseDataReader(dr, true);
             }
 
+			Logger.LogDebug("<<< Exiting GetTabPathDictionaryCallback(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return tabPathDictionary;
         }
 
@@ -2869,6 +2906,8 @@ namespace DotNetNuke.Entities.Tabs
 
         private List<TabInfo> GetSiblingTabs(TabInfo objTab)
         {
+			Logger.LogDebug(">>> Entering GetSiblingTabs(objTab={ObjTab})", objTab);
+			Logger.LogDebug("<<< Exiting GetSiblingTabs(objTab={ObjTab})", objTab);
             return this.GetTabsByPortal(objTab.PortalID).WithCulture(objTab.CultureCode, true).WithParentId(objTab.ParentId);
         }
 

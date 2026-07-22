@@ -26,6 +26,7 @@ using log4net.Core;
 
 namespace log4net.Util.PatternStringConverters
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Write the current date to the output
     /// </summary>
@@ -111,8 +112,10 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         public void ActivateOptions()
         {
+			Logger.LogDebug(">>> Entering ActivateOptions()");
             string dateFormatStr = this.Option;
 
+			Logger.LogDebug("ActivateOptions(): dateFormatStr → {DateFormatStr}", dateFormatStr);
             if (dateFormatStr == null)
             {
                 dateFormatStr = AbsoluteTimeDateFormatter.Iso8601TimeDateFormat;
@@ -121,6 +124,7 @@ namespace log4net.Util.PatternStringConverters
             if (SystemInfo.EqualsIgnoringCase(dateFormatStr, AbsoluteTimeDateFormatter.Iso8601TimeDateFormat))
             {
                 this.m_dateFormatter = new Iso8601DateFormatter();
+				Logger.LogDebug("ActivateOptions(): m_dateFormatter → {M_dateFormatter}", m_dateFormatter);
             }
             else if (SystemInfo.EqualsIgnoringCase(dateFormatStr, AbsoluteTimeDateFormatter.AbsoluteTimeDateFormat))
             {
@@ -142,6 +146,7 @@ namespace log4net.Util.PatternStringConverters
                     this.m_dateFormatter = new Iso8601DateFormatter();
                 }	
             }
+			Logger.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>
@@ -160,6 +165,7 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         protected override void Convert(TextWriter writer, object state) 
         {
+			Logger.LogDebug(">>> Entering Convert(writer={Writer},state={State})", writer, state);
             try 
             {
                 this.m_dateFormatter.FormatDate(DateTime.Now, writer);
@@ -168,6 +174,7 @@ namespace log4net.Util.PatternStringConverters
             {
                 LogLog.Error(declaringType, "Error occurred while converting date.", ex);
             }
+			Logger.LogDebug("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
         }
 
         /// <summary>

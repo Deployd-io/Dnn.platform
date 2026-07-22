@@ -12,10 +12,13 @@ namespace DotNetNuke.Services.Url.FriendlyUrl
     /// <summary>The base provider for friendly URLs.</summary>
     public abstract partial class FriendlyUrlProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Gets the <see cref="FriendlyUrlProvider"/> implementation.</summary>
         /// <returns>A <see cref="FriendlyUrlProvider"/> instance.</returns>
         public static FriendlyUrlProvider Instance()
         {
+			Logger.LogDebug(">>> Entering Instance()");
+			Logger.LogDebug("<<< Exiting Instance()");
             return ComponentFactory.GetComponent<FriendlyUrlProvider>();
         }
 
@@ -41,6 +44,8 @@ namespace DotNetNuke.Services.Url.FriendlyUrl
         [DnnDeprecated(9, 4, 3, "Use the IPortalSettings overload")]
         public virtual partial string FriendlyUrl(TabInfo tab, string path, string pageName, PortalSettings settings)
         {
+			Logger.LogDebug(">>> Entering FriendlyUrl(tab={Tab},path={Path},pageName={PageName},settings={Settings})", tab, path, pageName, settings);
+			Logger.LogDebug("<<< Exiting FriendlyUrl(tab={Tab},path={Path},pageName={PageName},settings={Settings})", tab, path, pageName, settings);
             return this.FriendlyUrl(tab, path, pageName, (IPortalSettings)settings);
         }
 

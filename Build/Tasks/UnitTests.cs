@@ -13,11 +13,14 @@ namespace DotNetNuke.Build.Tasks
     /// <summary>Runs units tests on solution. Make sure to build the solution before running this task.</summary>
     public sealed class UnitTests : FrostingTask<Context>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override void Run(Context context)
         {
+			Logger.LogDebug(">>> Entering Run(context={Context})", context);
             var testAssemblies = context.GetFiles(@"**\bin\**\DotNetNuke.Tests.*.dll");
             testAssemblies += context.GetFiles(@"**\bin\**\Dnn.PersonaBar.*.Tests.dll");
+			Logger.LogDebug("Run(context={Context}): testAssemblies → {TestAssemblies}", context, testAssemblies);
             testAssemblies -= context.GetFiles(@"**\DotNetNuke.Tests.Utilities.dll");
 
             // TODO: address issues to allow these tests to run
@@ -36,6 +39,7 @@ namespace DotNetNuke.Build.Tasks
                     EnableCodeCoverage = true,
                     TestAdapterPath = $@"tools\NUnit3TestAdapter.{Program.NUnit3TestAdapterVersion}\build",
                 });
+				Logger.LogDebug("<<< Exiting Run(context={Context})", context);
         }
     }
 }

@@ -11,11 +11,14 @@ namespace DotNetNuke.Web.DDRMenu
     /// <summary>Registers DDR Menu services.</summary>
     public class Startup : IDnnStartup
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public void ConfigureServices(IServiceCollection services)
         {
+			Logger.LogDebug(">>> Entering ConfigureServices(services={Services})", services);
             services.AddScoped<ILocaliser, Localiser>();
             services.TryAddEnumerable(ServiceDescriptor.Scoped<ILocalisation, Generic>());
+			Logger.LogDebug("<<< Exiting ConfigureServices(services={Services})", services);
         }
     }
 }

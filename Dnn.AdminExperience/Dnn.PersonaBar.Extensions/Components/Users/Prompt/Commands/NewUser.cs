@@ -19,6 +19,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
     [ConsoleCommand("new-user", Constants.UsersCategory, "Prompt_NewUser_Description")]
     public class NewUser : ConsoleCommandBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [FlagParameter("email", "Prompt_NewUser_FlagEmail", "String", true)]
         private const string FlagEmail = "email";
 
@@ -77,11 +78,13 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             {
                 this.AddMessage(this.LocalizeString("Email.RegExError"));
             }
+			Logger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             var settings = new RegisterationDetails
             {
                 PortalSettings = this.PortalSettings,
@@ -99,6 +102,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             {
                 var userInfo = RegisterController.Instance.Register(settings);
                 var lstResult = new List<UserModel>
+				Logger.LogDebug("Run(): userInfo → {UserInfo}", userInfo);
                 {
                     new UserModel(UserController.Instance.GetUser(this.PortalId, userInfo.UserId)),
                 };
@@ -106,6 +110,8 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in Run(): {Arg0}", ex.Message);
+				Logger.LogDebug("<<< Exiting Run()");
                 return new ConsoleErrorResultModel(ex.Message);
             }
         }

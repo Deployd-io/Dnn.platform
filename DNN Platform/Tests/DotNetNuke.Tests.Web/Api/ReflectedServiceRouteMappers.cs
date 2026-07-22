@@ -12,10 +12,12 @@ namespace DotNetNuke.Tests.Web.Api
     // various ServiceRouteMappers that will be reflected upon by the tests
     public class ReflectedServiceRouteMappers
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public class EmbeddedServiceRouteMapper : IServiceRouteMapper
         {
             public void RegisterRoutes(IMapRoute mapRouteManager)
             {
+				Logger.LogDebug(">>> Entering RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
                 throw new NotImplementedException();
             }
         }
@@ -25,8 +27,10 @@ namespace DotNetNuke.Tests.Web.Api
     {
         public ExceptionOnCreateInstanceServiceRouteMapper(int i)
         {
+			Logger.LogDebug(">>> Entering ExceptionOnCreateInstanceServiceRouteMapper(i={I})", i);
             // no default constructor prevents Activator.CreateInstance from working
             Debug.WriteLine(i);
+			Logger.LogDebug("<<< Exiting ExceptionOnCreateInstanceServiceRouteMapper(i={I})", i);
         }
 
         public void RegisterRoutes(IMapRoute mapRouteManager)

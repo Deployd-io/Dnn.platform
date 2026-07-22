@@ -30,6 +30,7 @@ namespace DotNetNuke.Modules.Html
     /// <summary>The EditHtml PortalModuleBase is used to manage HTML.</summary>
     public partial class EditHtml : HtmlModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly HtmlTextLogController htmlTextLogController = new HtmlTextLogController();
         private readonly IWorkflowManager workflowManager = WorkflowManager.Instance;
         private readonly INavigationManager navigationManager;
@@ -42,7 +43,9 @@ namespace DotNetNuke.Modules.Html
         public EditHtml()
             : this(null, null, null)
         {
+		Logger.LogDebug(">>> Entering EditHtml()");
         }
+		Logger.LogDebug("<<< Exiting EditHtml()");
 
         /// <summary>Initializes a new instance of the <see cref="EditHtml"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
@@ -65,7 +68,11 @@ namespace DotNetNuke.Modules.Html
         {
             this.navigationManager = navigationManager ?? this.DependencyProvider.GetRequiredService<INavigationManager>();
             this.htmlTextController = htmlTextController ?? this.DependencyProvider.GetRequiredService<HtmlTextController>();
+			Logger.LogDebug("EditHtml(settingsRepository={SettingsRepository},navigationManager={NavigationManager},htmlTextController={HtmlTextController},portalAliasService={PortalAliasService},hostSettings={HostSettings}): htmlTextController → {HtmlTextController1}", settingsRepository, navigationManager, htmlTextController, portalAliasService, hostSettings, htmlTextController);
+			Logger.LogDebug("EditHtml(settingsRepository={SettingsRepository},navigationManager={NavigationManager},htmlTextController={HtmlTextController},portalAliasService={PortalAliasService},hostSettings={HostSettings}): hostSettings → {HostSettings1}", settingsRepository, navigationManager, htmlTextController, portalAliasService, hostSettings, hostSettings);
+			Logger.LogDebug("EditHtml(settingsRepository={SettingsRepository},navigationManager={NavigationManager},htmlTextController={HtmlTextController},portalAliasService={PortalAliasService},hostSettings={HostSettings}): navigationManager → {NavigationManager1}", settingsRepository, navigationManager, htmlTextController, portalAliasService, hostSettings, navigationManager);
             this.portalAliasService = portalAliasService ?? this.DependencyProvider.GetRequiredService<IPortalAliasService>();
+			Logger.LogDebug("EditHtml(settingsRepository={SettingsRepository},navigationManager={NavigationManager},htmlTextController={HtmlTextController},portalAliasService={PortalAliasService},hostSettings={HostSettings}): portalAliasService → {PortalAliasService1}", settingsRepository, navigationManager, htmlTextController, portalAliasService, hostSettings, portalAliasService);
             this.hostSettings = hostSettings ?? this.DependencyProvider.GetRequiredService<IHostSettings>();
         }
 
@@ -166,6 +173,7 @@ namespace DotNetNuke.Modules.Html
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.hlCancel.NavigateUrl = this.navigationManager.NavigateURL();
@@ -180,17 +188,21 @@ namespace DotNetNuke.Modules.Html
             this.dgVersions.RowCommand += this.OnVersionsGridItemCommand;
             this.dgVersions.RowDataBound += this.OnVersionsGridItemDataBound;
             this.dgVersions.PageIndexChanged += this.OnVersionsGridPageIndexChanged;
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             try
             {
                 var htmlContentItemID = Null.NullInteger;
                 var htmlContent = this.htmlTextController.GetTopHtmlText(this.ModuleId, false, this.WorkflowID);
+				Logger.LogDebug("OnLoad(e={E}): htmlContentItemID → {HtmlContentItemID}", e, htmlContentItemID);
+				Logger.LogDebug("OnLoad(e={E}): htmlContent → {HtmlContent}", e, htmlContent);
 
                 if (htmlContent != null)
                 {
@@ -201,8 +213,12 @@ namespace DotNetNuke.Modules.Html
                 {
                     var workflow = this.workflowManager.GetWorkflow(this.WorkflowID);
                     var workflowStates = workflow.States.ToList();
+					Logger.LogDebug("OnLoad(e={E}): workflow → {Workflow}", e, workflow);
+					Logger.LogDebug("OnLoad(e={E}): workflowStates → {WorkflowStates}", e, workflowStates);
                     var maxVersions = this.htmlTextController.GetMaximumVersionHistory(this.PortalId);
                     var userCanEdit = this.UserInfo.IsSuperUser || PortalSecurity.IsInRole(this.PortalSettings.AdministratorRoleName);
+					Logger.LogDebug("OnLoad(e={E}): maxVersions → {MaxVersions}", e, maxVersions);
+					Logger.LogDebug("OnLoad(e={E}): userCanEdit → {UserCanEdit}", e, userCanEdit);
 
                     this.lblMaxVersions.Text = maxVersions.ToString();
                     this.dgVersions.PageSize = Math.Min(Math.Max(maxVersions, 5), 10); // min 5, max 10
@@ -211,6 +227,7 @@ namespace DotNetNuke.Modules.Html
                     {
                         case SystemWorkflowManager.DirectPublishWorkflowKey:
                             this.CurrentWorkflowType = WorkflowType.DirectPublish;
+							Logger.LogDebug("OnLoad(e={E}): this.CurrentWorkflowType → {Arg1}", e, this.CurrentWorkflowType);
                             break;
                         case SystemWorkflowManager.SaveDraftWorkflowKey:
                             this.CurrentWorkflowType = WorkflowType.SaveDraft;
@@ -245,12 +262,15 @@ namespace DotNetNuke.Modules.Html
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         protected void OnSaveClick(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnSaveClick(sender={Sender},e={E})", sender, e);
             const bool redirect = true;
 
             try
@@ -258,8 +278,11 @@ namespace DotNetNuke.Modules.Html
                 // get content
                 var htmlContent = this.GetLatestHTMLContent();
 
+				Logger.LogDebug("OnSaveClick(sender={Sender},e={E}): htmlContent → {HtmlContent}", sender, e, htmlContent);
                 var aliases = this.portalAliasService.GetPortalAliasesByPortalId(this.PortalSettings.PortalId).Select(pa => pa.HttpAlias);
                 var content = this.phEdit.Visible ? this.txtContent.Text : this.hfEditor.Value;
+				Logger.LogDebug("OnSaveClick(sender={Sender},e={E}): aliases → {Aliases}", sender, e, aliases);
+				Logger.LogDebug("OnSaveClick(sender={Sender},e={E}): content → {Content}", sender, e, content);
 
                 if (this.Request.QueryString["nuru"] == null)
                 {
@@ -267,8 +290,10 @@ namespace DotNetNuke.Modules.Html
                 }
 
                 htmlContent.Content = content;
+				Logger.LogDebug("OnSaveClick(sender={Sender},e={E}): htmlContent.Content → {Arg2}", sender, e, htmlContent.Content);
                 var workflow = this.workflowManager.GetWorkflow(this.WorkflowID);
                 var draftStateID = workflow.FirstState.StateID;
+				Logger.LogDebug("OnSaveClick(sender={Sender},e={E}): workflow → {Workflow}", sender, e, workflow);
                 var publishedStateID = workflow.LastState.StateID;
 
                 switch (this.CurrentWorkflowType)
@@ -282,6 +307,7 @@ namespace DotNetNuke.Modules.Html
                         if (htmlContent.StateID == publishedStateID)
                         {
                             htmlContent.StateID = draftStateID;
+							Logger.LogDebug("OnSaveClick(sender={Sender},e={E}): htmlContent.StateID → {Arg2}", sender, e, htmlContent.StateID);
                         }
 
                         this.htmlTextController.UpdateHtmlText(htmlContent, this.htmlTextController.GetMaximumVersionHistory(this.PortalId));
@@ -290,6 +316,7 @@ namespace DotNetNuke.Modules.Html
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnSaveClick(sender={Sender},e={E}): {Arg2}", sender, e, ex.Message);
                 Exceptions.LogException(exc);
                 UI.Skins.Skin.AddModuleMessage(this.Page, "Error occurred: ", exc.Message, ModuleMessage.ModuleMessageType.RedError);
                 return;
@@ -300,10 +327,12 @@ namespace DotNetNuke.Modules.Html
             {
                 this.Response.Redirect(this.navigationManager.NavigateURL(), true);
             }
+			Logger.LogDebug("<<< Exiting OnSaveClick(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnEditClick(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnEditClick(sender={Sender},e={E})", sender, e);
             try
             {
                 this.DisplayEdit(this.hfEditor.Value);
@@ -315,12 +344,15 @@ namespace DotNetNuke.Modules.Html
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnEditClick(sender={Sender},e={E}): {Arg2}", sender, e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnEditClick(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnPreviewClick(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreviewClick(sender={Sender},e={E})", sender, e);
             try
             {
                 if (this.phEdit.Visible)
@@ -332,12 +364,15 @@ namespace DotNetNuke.Modules.Html
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnPreviewClick(sender={Sender},e={E}): {Arg2}", sender, e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnPreviewClick(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnHistoryGridItemDataBound(object sender, GridViewRowEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnHistoryGridItemDataBound(sender={Sender},e={E})", sender, e);
             var item = e.Row;
 
             if (item.RowType == DataControlRowType.DataRow)
@@ -346,10 +381,12 @@ namespace DotNetNuke.Modules.Html
                 item.Cells[2].Text = Localization.GetString(item.Cells[2].Text, this.LocalResourceFile);
                 item.Cells[3].Text = Localization.GetString(item.Cells[3].Text, this.LocalResourceFile);
             }
+			Logger.LogDebug("<<< Exiting OnHistoryGridItemDataBound(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnVersionsGridItemCommand(object source, GridViewCommandEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnVersionsGridItemCommand(source={Source},e={E})", source, e);
             try
             {
                 HtmlTextInfo htmlContent;
@@ -359,10 +396,14 @@ namespace DotNetNuke.Modules.Html
                 {
                     case "remove":
                         htmlContent = this.GetHTMLContent(e);
+						Logger.LogDebug("OnVersionsGridItemCommand(source={Source},e={E}): htmlContent → {HtmlContent}", source, e, htmlContent);
                         this.htmlTextController.DeleteHtmlText(this.ModuleId, htmlContent.ItemID);
                         break;
                     case "rollback":
                         htmlContent = this.GetHTMLContent(e);
+						Logger.LogDebug("OnVersionsGridItemCommand(source={Source},e={E}): htmlContent.ItemID → {Arg2}", source, e, htmlContent.ItemID);
+						Logger.LogDebug("OnVersionsGridItemCommand(source={Source},e={E}): htmlContent.ModuleID → {Arg2}", source, e, htmlContent.ModuleID);
+						Logger.LogDebug("OnVersionsGridItemCommand(source={Source},e={E}): htmlContent.WorkflowID → {Arg2}", source, e, htmlContent.WorkflowID);
                         htmlContent.ItemID = -1;
                         htmlContent.ModuleID = this.ModuleId;
                         htmlContent.WorkflowID = this.WorkflowID;
@@ -379,6 +420,7 @@ namespace DotNetNuke.Modules.Html
                 {
                     var latestContent = this.htmlTextController.GetTopHtmlText(this.ModuleId, false, this.WorkflowID);
                     if (latestContent == null)
+					Logger.LogDebug("OnVersionsGridItemCommand(source={Source},e={E}): latestContent → {LatestContent}", source, e, latestContent);
                     {
                         this.DisplayInitialContent(this.workflowManager.GetWorkflow(this.WorkflowID).FirstState);
                     }
@@ -395,21 +437,26 @@ namespace DotNetNuke.Modules.Html
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnVersionsGridItemCommand(source={Source},e={E}): {Arg2}", source, e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnVersionsGridItemCommand(source={Source},e={E})", source, e);
         }
 
         protected void OnVersionsGridItemDataBound(object sender, GridViewRowEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnVersionsGridItemDataBound(sender={Sender},e={E})", sender, e);
             if (e.Row.RowType == DataControlRowType.DataRow)
             {
                 var htmlContent = e.Row.DataItem as HtmlTextInfo;
                 var createdBy = "Default";
 
+				Logger.LogDebug("OnVersionsGridItemDataBound(sender={Sender},e={E}): createdBy → {CreatedBy}", sender, e, createdBy);
                 if (htmlContent.CreatedByUserID != -1)
                 {
                     var createdByByUser = UserController.GetUserById(this.hostSettings, this.PortalId, htmlContent.CreatedByUserID);
                     if (createdByByUser != null)
+					Logger.LogDebug("OnVersionsGridItemDataBound(sender={Sender},e={E}): createdByByUser → {CreatedByByUser}", sender, e, createdByByUser);
                     {
                         createdBy = createdByByUser.DisplayName;
                     }
@@ -432,6 +479,7 @@ namespace DotNetNuke.Modules.Html
                                         if (e.Row.RowIndex == 0)
                                         {
                                             imageButton.Visible = false;
+											Logger.LogDebug("OnVersionsGridItemDataBound(sender={Sender},e={E}): imageButton.Visible → {Arg2}", sender, e, imageButton.Visible);
                                             break;
                                         }
                                     }
@@ -444,11 +492,13 @@ namespace DotNetNuke.Modules.Html
                                     msg =
                                         msg.Replace("[VERSION]", htmlContent.Version.ToString()).Replace("[STATE]", htmlContent.StateName).Replace("[DATECREATED]", htmlContent.CreatedOnDate.ToString())
                                             .Replace("[USERNAME]", createdBy);
+										Logger.LogDebug("OnVersionsGridItemDataBound(sender={Sender},e={E}): msg → {Msg}", sender, e, msg);
                                     imageButton.OnClientClick = "return confirm(\"" + msg + "\");";
 
                                     // hide the delete button
                                     var showDelete = this.UserInfo.IsSuperUser || PortalSecurity.IsInRole(this.PortalSettings.AdministratorRoleName);
 
+									Logger.LogDebug("OnVersionsGridItemDataBound(sender={Sender},e={E}): showDelete → {ShowDelete}", sender, e, showDelete);
                                     if (!showDelete)
                                     {
                                         showDelete = htmlContent.IsPublished == false;
@@ -461,11 +511,14 @@ namespace DotNetNuke.Modules.Html
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting OnVersionsGridItemDataBound(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnVersionsGridPageIndexChanged(object source, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnVersionsGridPageIndexChanged(source={Source},e={E})", source, e);
             this.DisplayVersions();
+			Logger.LogDebug("<<< Exiting OnVersionsGridPageIndexChanged(source={Source},e={E})", source, e);
         }
 
         /// <summary>Displays the history of an html content item in a grid in the preview section.</summary>
@@ -486,13 +539,16 @@ namespace DotNetNuke.Modules.Html
 
             this.dnnSitePanelEditHTMLHistory.Visible = htmlLogging.Count != 0;
             this.fsEditHtmlHistory.Visible = htmlLogging.Count != 0;
+			Logger.LogDebug("<<< Exiting DisplayHistory(htmlContent={HtmlContent})", htmlContent);
         }
 
         /// <summary>Displays the versions of the html content in the versions section.</summary>
         private void DisplayVersions()
         {
+			Logger.LogDebug(">>> Entering DisplayVersions()");
             var versions = this.htmlTextController.GetAllHtmlText(this.ModuleId);
 
+			Logger.LogDebug("DisplayVersions(): versions → {Versions}", versions);
             foreach (var item in versions)
             {
                 item.StateName = this.GetLocalizedString(item.StateName);
@@ -509,21 +565,26 @@ namespace DotNetNuke.Modules.Html
             this.cmdHistory.Enabled = false;
             this.cmdMasterContent.Visible = false;
             this.ddlRender.Visible = false;
+			Logger.LogDebug("<<< Exiting DisplayVersions()");
         }
 
         /// <summary>Displays the content of the master language if localized content is enabled.</summary>
         private void DisplayMasterLanguageContent()
         {
+			Logger.LogDebug(">>> Entering DisplayMasterLanguageContent()");
             // Get master language
             var objModule = ModuleController.Instance.GetModule(this.ModuleId, this.TabId, false);
             if (objModule.DefaultLanguageModule != null)
+			Logger.LogDebug("DisplayMasterLanguageContent(): objModule → {ObjModule}", objModule);
             {
                 var masterContent = this.htmlTextController.GetTopHtmlText(objModule.DefaultLanguageModule.ModuleID, false, this.WorkflowID);
                 if (masterContent != null)
+				Logger.LogDebug("DisplayMasterLanguageContent(): masterContent → {MasterContent}", masterContent);
                 {
                     this.placeMasterContent.Controls.Add(new LiteralControl(HtmlTextController.FormatHtmlText(objModule.DefaultLanguageModule.ModuleID, this.FormatContent(masterContent.Content), this.Settings, this.PortalSettings, this.Page)));
                 }
             }
+			Logger.LogDebug("<<< Exiting DisplayMasterLanguageContent()");
         }
 
         /// <summary>Displays the html content in the preview section.</summary>
@@ -548,8 +609,10 @@ namespace DotNetNuke.Modules.Html
 
         private void DisplayMasterContentButton()
         {
+			Logger.LogDebug(">>> Entering DisplayMasterContentButton()");
             var objModule = ModuleController.Instance.GetModule(this.ModuleId, this.TabId, false);
             if (objModule.DefaultLanguageModule != null)
+			Logger.LogDebug("DisplayMasterContentButton(): objModule → {ObjModule}", objModule);
             {
                 this.cmdMasterContent.Visible = true;
                 this.cmdMasterContent.Text = Localization.GetString("cmdShowMasterContent", this.LocalResourceFile);
@@ -558,6 +621,7 @@ namespace DotNetNuke.Modules.Html
                     Localization.GetString("cmdHideMasterContent", this.LocalResourceFile) :
                     Localization.GetString("cmdShowMasterContent", this.LocalResourceFile);
             }
+			Logger.LogDebug("<<< Exiting DisplayMasterContentButton()");
         }
 
         /// <summary>Displays the content preview in the preview section.</summary>
@@ -649,6 +713,7 @@ namespace DotNetNuke.Modules.Html
         /// <param name="firstState">The first state.</param>
         private void DisplayInitialContent(WorkflowState firstState)
         {
+			Logger.LogDebug(">>> Entering DisplayInitialContent(firstState={FirstState})", firstState);
             this.cmdHistory.Enabled = false;
 
             this.txtContent.Text = this.GetLocalizedString("AddContent");
@@ -665,6 +730,7 @@ namespace DotNetNuke.Modules.Html
             this.divPreviewWorkflowState.Visible = false;
 
             this.lblPreviewWorkflowState.Text = firstState.StateName;
+			Logger.LogDebug("<<< Exiting DisplayInitialContent(firstState={FirstState})", firstState);
         }
 
         /// <summary>Formats the content to make it HTML safe.</summary>
@@ -683,7 +749,10 @@ namespace DotNetNuke.Modules.Html
         /// <returns>The localized text or <paramref name="str"/>.</returns>
         private string GetLocalizedString(string str)
         {
+			Logger.LogDebug(">>> Entering GetLocalizedString(str={Str})", str);
             var localizedString = Localization.GetString(str, this.LocalResourceFile);
+			Logger.LogDebug("GetLocalizedString(str={Str}): localizedString → {LocalizedString}", str, localizedString);
+			Logger.LogDebug("<<< Exiting GetLocalizedString(str={Str})", str);
             return string.IsNullOrEmpty(localizedString) ? str : localizedString;
         }
 
@@ -691,16 +760,22 @@ namespace DotNetNuke.Modules.Html
         /// <returns>An <see cref="HtmlTextInfo"/> instance (with <see cref="HtmlTextInfo.ItemID"/> set to <c>-1</c> if there's no existing content).</returns>
         private HtmlTextInfo GetLatestHTMLContent()
         {
+			Logger.LogDebug(">>> Entering GetLatestHTMLContent()");
             var htmlContent = this.htmlTextController.GetTopHtmlText(this.ModuleId, false, this.WorkflowID);
             if (htmlContent == null)
+			Logger.LogDebug("GetLatestHTMLContent(): htmlContent → {HtmlContent}", htmlContent);
             {
                 htmlContent = new HtmlTextInfo();
                 htmlContent.ItemID = -1;
+				Logger.LogDebug("GetLatestHTMLContent(): htmlContent.ItemID → {Arg0}", htmlContent.ItemID);
+				Logger.LogDebug("GetLatestHTMLContent(): htmlContent.WorkflowID → {Arg0}", htmlContent.WorkflowID);
+				Logger.LogDebug("GetLatestHTMLContent(): htmlContent.ModuleID → {Arg0}", htmlContent.ModuleID);
                 htmlContent.StateID = this.workflowManager.GetWorkflow(this.WorkflowID).FirstState.StateID;
                 htmlContent.WorkflowID = this.WorkflowID;
                 htmlContent.ModuleID = this.ModuleId;
             }
 
+			Logger.LogDebug("<<< Exiting GetLatestHTMLContent()");
             return htmlContent;
         }
 
@@ -714,11 +789,14 @@ namespace DotNetNuke.Modules.Html
 
         private void OnRenderSelectedIndexChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnRenderSelectedIndexChanged(sender={Sender},e={E})", sender, e);
             this.txtContent.ChangeMode(this.ddlRender.SelectedValue);
+			Logger.LogDebug("<<< Exiting OnRenderSelectedIndexChanged(sender={Sender},e={E})", sender, e);
         }
 
         private void OnHistoryClick(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnHistoryClick(sender={Sender},e={E})", sender, e);
             try
             {
                 if (this.phEdit.Visible)
@@ -730,12 +808,15 @@ namespace DotNetNuke.Modules.Html
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnHistoryClick(sender={Sender},e={E}): {Arg2}", sender, e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnHistoryClick(sender={Sender},e={E})", sender, e);
         }
 
         private void OnMasterContentClick(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnMasterContentClick(sender={Sender},e={E})", sender, e);
             try
             {
                 this.phMasterContent.Visible = !this.phMasterContent.Visible;
@@ -750,23 +831,29 @@ namespace DotNetNuke.Modules.Html
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnMasterContentClick(sender={Sender},e={E}): {Arg2}", sender, e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnMasterContentClick(sender={Sender},e={E})", sender, e);
         }
 
         private HtmlTextInfo GetHTMLContent(GridViewCommandEventArgs e)
         {
+			Logger.LogDebug(">>> Entering GetHTMLContent(e={E})", e);
+			Logger.LogDebug("<<< Exiting GetHTMLContent(e={E})", e);
             return this.htmlTextController.GetHtmlText(this.ModuleId, int.Parse(e.CommandArgument.ToString()));
         }
 
         private void BindRenderItems()
         {
+			Logger.LogDebug(">>> Entering BindRenderItems()");
             if (this.txtContent.IsRichEditorAvailable)
             {
                 this.ddlRender.Items.Add(new ListItem(this.LocalizeText("liRichText"), "RICH"));
             }
 
             this.ddlRender.Items.Add(new ListItem(this.LocalizeText("liBasicText"), "BASIC"));
+			Logger.LogDebug("<<< Exiting BindRenderItems()");
         }
     }
 }

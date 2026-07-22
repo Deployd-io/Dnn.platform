@@ -24,6 +24,7 @@ using log4net.Core;
 
 namespace log4net.Filter
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// This filter drops all <see cref="LoggingEvent"/>. 
     /// </summary>
@@ -44,6 +45,8 @@ namespace log4net.Filter
         /// </summary>
         public DenyAllFilter()
         {
+		Logger.LogDebug(">>> Entering DenyAllFilter()");
+		Logger.LogDebug("<<< Exiting DenyAllFilter()");
         }
 
         /// <summary>
@@ -62,6 +65,8 @@ namespace log4net.Filter
         /// </remarks>
         public override FilterDecision Decide(LoggingEvent loggingEvent) 
         {
+			Logger.LogDebug(">>> Entering Decide(loggingEvent={LoggingEvent})", loggingEvent);
+			Logger.LogDebug("<<< Exiting Decide(loggingEvent={LoggingEvent})", loggingEvent);
             return FilterDecision.Deny;
         }
     }

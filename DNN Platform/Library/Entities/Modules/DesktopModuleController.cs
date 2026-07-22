@@ -38,10 +38,14 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="eventLogger">The event logger.</param>
     public partial class DesktopModuleController(IEventLogger eventLogger)
     {
+		Logger.LogDebug(">>> Entering DesktopModuleController(eventLogger={EventLogger})", eventLogger);
         private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DesktopModuleController));
         private static readonly DataProvider DataProvider = DataProvider.Instance();
+		Logger.LogDebug("DesktopModuleController(eventLogger={EventLogger}): Logger → {Logger}", eventLogger, Logger);
+		Logger.LogDebug("DesktopModuleController(eventLogger={EventLogger}): DataProvider → {DataProvider}", eventLogger, DataProvider);
         private readonly IEventLogger eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
 
+		Logger.LogDebug("DesktopModuleController(eventLogger={EventLogger}): eventLogger → {EventLogger1}", eventLogger, eventLogger);
         /// <summary>Initializes a new instance of the <see cref="DesktopModuleController"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IEventLogger. Scheduled removal in v12.0.0.")]
         public DesktopModuleController()
@@ -51,9 +55,12 @@ namespace DotNetNuke.Entities.Modules
 
         public static void AddModuleCategory(string category)
         {
+			Logger.LogDebug(">>> Entering AddModuleCategory(category={Category})", category);
             var termController = Util.GetTermController();
             var term = (from Term t in termController.GetTermsByVocabulary("Module_Categories")
                         where t.Name == category
+						Logger.LogDebug("AddModuleCategory(category={Category}): termController → {TermController}", category, termController);
+						Logger.LogDebug("AddModuleCategory(category={Category}): term → {Term}", category, term);
                         select t)
                         .FirstOrDefault();
 
@@ -62,6 +69,7 @@ namespace DotNetNuke.Entities.Modules
                 var vocabularyController = Util.GetVocabularyController();
                 var vocabulary = (from v in vocabularyController.GetVocabularies()
                                   where v.Name == "Module_Categories"
+								Logger.LogDebug("AddModuleCategory(category={Category}): vocabularyController → {VocabularyController}", category, vocabularyController);
                                   select v)
                                   .FirstOrDefault();
 
@@ -72,14 +80,17 @@ namespace DotNetNuke.Entities.Modules
                     termController.AddTerm(term);
                 }
             }
+			Logger.LogDebug("<<< Exiting AddModuleCategory(category={Category})", category);
         }
 
         /// <summary>DeleteDesktopModule deletes a Desktop Module.</summary>
         /// <param name="moduleName">The Name of the Desktop Module to delete.</param>
         public static void DeleteDesktopModule(string moduleName)
         {
+			Logger.LogDebug(">>> Entering DeleteDesktopModule(moduleName={ModuleName})", moduleName);
             DesktopModuleInfo desktopModule = GetDesktopModuleByModuleName(moduleName, Null.NullInteger);
             if (desktopModule != null)
+			Logger.LogDebug("DeleteDesktopModule(moduleName={ModuleName}): desktopModule → {DesktopModule}", moduleName, desktopModule);
             {
                 var controller = new DesktopModuleController();
                 controller.DeleteDesktopModule(desktopModule.DesktopModuleID);
@@ -87,6 +98,7 @@ namespace DotNetNuke.Entities.Modules
                 // Delete the Package
                 PackageController.Instance.DeleteExtensionPackage(PackageController.Instance.GetExtensionPackage(Null.NullInteger, p => p.PackageID == desktopModule.PackageID));
             }
+			Logger.LogDebug("<<< Exiting DeleteDesktopModule(moduleName={ModuleName})", moduleName);
         }
 
         /// <summary>GetDesktopModule gets a Desktop Module by its ID.</summary>
@@ -137,6 +149,7 @@ namespace DotNetNuke.Entities.Modules
         [DnnDeprecated(10, 2, 4, "Use overload taking IHostSettings")]
         public static partial DesktopModuleInfo GetDesktopModuleByPackageID(int packageID)
             => GetDesktopModuleByPackageID(Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>(), packageID);
+			Logger.LogDebug(">>> Entering GetDesktopModuleByPackageID(packageID={PackageID})", packageID);
 
         /// <summary>Gets a Desktop Module by its Package ID.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -155,6 +168,7 @@ namespace DotNetNuke.Entities.Modules
                 Logger.WarnFormat(CultureInfo.InvariantCulture, "Unable to find module by package ID. ID:{0}", packageId);
             }
 
+			Logger.LogDebug("<<< Exiting GetDesktopModuleByPackageID(packageID={PackageID})", packageID);
             return desktopModuleByPackageId;
         }
 
@@ -168,6 +182,7 @@ namespace DotNetNuke.Entities.Modules
         [DnnDeprecated(10, 2, 4, "Use overload taking IHostSettings")]
         public static partial DesktopModuleInfo GetDesktopModuleByModuleName(string moduleName, int portalID)
             => GetDesktopModuleByModuleName(Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>(), moduleName, portalID);
+			Logger.LogDebug(">>> Entering GetDesktopModuleByModuleName(moduleName={ModuleName},portalID={PortalID})", moduleName, portalID);
 
         /// <summary>GetDesktopModuleByModuleName gets a Desktop Module by its Name.</summary>
         /// <remarks>This method uses the cached Dictionary of DesktopModules.  It first checks
@@ -189,6 +204,7 @@ namespace DotNetNuke.Entities.Modules
                 Logger.WarnFormat(CultureInfo.InvariantCulture, "Unable to find module by name. Name:{0} portalId:{1}", moduleName, portalId);
             }
 
+			Logger.LogDebug("<<< Exiting GetDesktopModuleByModuleName(moduleName={ModuleName},portalID={PortalID})", moduleName, portalID);
             return desktopModuleByModuleName;
         }
 
@@ -214,6 +230,7 @@ namespace DotNetNuke.Entities.Modules
         [DnnDeprecated(10, 2, 4, "Use overload taking IHostSettings")]
         public static partial DesktopModuleInfo GetDesktopModuleByFriendlyName(string friendlyName)
             => GetDesktopModuleByFriendlyName(Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>(), friendlyName);
+			Logger.LogDebug(">>> Entering GetDesktopModuleByFriendlyName(friendlyName={FriendlyName})", friendlyName);
 
         /// <summary>Gets a Desktop Module by its friendly name.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -231,6 +248,7 @@ namespace DotNetNuke.Entities.Modules
                 Logger.WarnFormat(CultureInfo.InvariantCulture, "Unable to find module by friendly name. Name:{0}", friendlyName);
             }
 
+			Logger.LogDebug("<<< Exiting GetDesktopModuleByFriendlyName(friendlyName={FriendlyName})", friendlyName);
             return module;
         }
 
@@ -334,12 +352,14 @@ namespace DotNetNuke.Entities.Modules
 
         public static void AddDesktopModuleToPortals(int desktopModuleId)
         {
+			Logger.LogDebug(">>> Entering AddDesktopModuleToPortals(desktopModuleId={DesktopModuleId})", desktopModuleId);
             foreach (IPortalInfo portal in PortalController.Instance.GetPortals())
             {
                 AddDesktopModuleToPortal(portal.PortalId, desktopModuleId, true, false);
             }
 
             DataCache.ClearHostCache(true);
+			Logger.LogDebug("<<< Exiting AddDesktopModuleToPortals(desktopModuleId={DesktopModuleId})", desktopModuleId);
         }
 
         /// <summary>Adds each non-premium desktop module to the specified portal.</summary>
@@ -468,9 +488,11 @@ namespace DotNetNuke.Entities.Modules
         [DnnDeprecated(10, 2, 2, "Use overload taking IEventLogger")]
         public static partial void RemoveDesktopModuleFromPortals(int desktopModuleId)
             => RemoveDesktopModuleFromPortals(Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>(), desktopModuleId);
+			Logger.LogDebug(">>> Entering RemoveDesktopModuleFromPortals(desktopModuleId={DesktopModuleId})", desktopModuleId);
 
         /// <summary>Remove the desktop module from all portals.</summary>
         /// <param name="eventLogger">The event logger.</param>
+		Logger.LogDebug("<<< Exiting RemoveDesktopModuleFromPortals(desktopModuleId={DesktopModuleId})", desktopModuleId);
         /// <param name="desktopModuleId">The desktop module ID.</param>
         public static void RemoveDesktopModuleFromPortals(IEventLogger eventLogger, int desktopModuleId)
         {
@@ -534,7 +556,9 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="objDesktopModule">Desktop Module Info.</param>
         public void DeleteDesktopModule(DesktopModuleInfo objDesktopModule)
         {
+			Logger.LogDebug(">>> Entering DeleteDesktopModule(objDesktopModule={ObjDesktopModule})", objDesktopModule);
             this.DeleteDesktopModule(objDesktopModule.DesktopModuleID);
+			Logger.LogDebug("<<< Exiting DeleteDesktopModule(objDesktopModule={ObjDesktopModule})", objDesktopModule);
         }
 
         /// <summary>DeleteDesktopModule deletes a Desktop Module By ID.</summary>
@@ -554,12 +578,15 @@ namespace DotNetNuke.Entities.Modules
 
         public void UpdateModuleInterfaces(ref DesktopModuleInfo desktopModuleInfo)
         {
+			Logger.LogDebug(">>> Entering UpdateModuleInterfaces(desktopModuleInfo={DesktopModuleInfo})", desktopModuleInfo);
             this.UpdateModuleInterfaces(ref desktopModuleInfo, (UserController.Instance.GetCurrentUserInfo() == null) ? string.Empty : UserController.Instance.GetCurrentUserInfo().Username, true);
+			Logger.LogDebug("<<< Exiting UpdateModuleInterfaces(desktopModuleInfo={DesktopModuleInfo})", desktopModuleInfo);
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public void UpdateModuleInterfaces(ref DesktopModuleInfo desktopModuleInfo, string sender, bool forceAppRestart)
         {
+			Logger.LogDebug(">>> Entering UpdateModuleInterfaces(desktopModuleInfo={DesktopModuleInfo},sender={Sender},forceAppRestart={ForceAppRestart})", desktopModuleInfo, sender, forceAppRestart);
             CheckInterfacesImplementation(ref desktopModuleInfo);
             var oAppStartMessage = new EventMessage
             {
@@ -578,6 +605,7 @@ namespace DotNetNuke.Entities.Modules
             {
                 Config.Touch();
             }
+			Logger.LogDebug("<<< Exiting UpdateModuleInterfaces(desktopModuleInfo={DesktopModuleInfo},sender={Sender},forceAppRestart={ForceAppRestart})", desktopModuleInfo, sender, forceAppRestart);
         }
 
         internal static int SaveDesktopModule(IEventLogger eventLogger, DesktopModuleInfo desktopModule, bool saveChildren, bool clearCache, bool saveTerms)
@@ -719,6 +747,7 @@ namespace DotNetNuke.Entities.Modules
 
                 AddDesktopModuleToPage(desktopModule, existTab, ref addedNewModule);
             }
+			Logger.LogDebug("<<< Exiting AddDesktopModulePageToPortal(desktopModule={DesktopModule},pageName={PageName},portalId={PortalId},createdNewPage={CreatedNewPage},addedNewModule={AddedNewModule})", desktopModule, pageName, portalId, createdNewPage, addedNewModule);
         }
 
         internal static void AddDesktopModuleToPage(DesktopModuleInfo desktopModule, TabInfo tab, ref bool addedNewModule)
@@ -757,6 +786,8 @@ namespace DotNetNuke.Entities.Modules
 
         private static object GetDesktopModulesCallBack(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogDebug(">>> Entering GetDesktopModulesCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
+			Logger.LogDebug("<<< Exiting GetDesktopModulesCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return CBO.FillDictionary("DesktopModuleID", DataProvider.GetDesktopModules(), new Dictionary<int, DesktopModuleInfo>());
         }
 
@@ -764,13 +795,19 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="cacheItemArgs">The CacheItemArgs object that contains the parameters needed for the database call.</param>
         private static object GetDesktopModulesByPortalCallBack(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogDebug(">>> Entering GetDesktopModulesByPortalCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             var portalId = (int)cacheItemArgs.ParamList[0];
+			Logger.LogDebug("GetDesktopModulesByPortalCallBack(cacheItemArgs={CacheItemArgs}): portalId → {PortalId}", cacheItemArgs, portalId);
+			Logger.LogDebug("<<< Exiting GetDesktopModulesByPortalCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return CBO.FillDictionary("DesktopModuleID", DataProvider.GetDesktopModulesByPortal(portalId), new Dictionary<int, DesktopModuleInfo>());
         }
 
         private static object GetPortalDesktopModulesByPortalIDCallBack(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogDebug(">>> Entering GetPortalDesktopModulesByPortalIDCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             var portalId = (int)cacheItemArgs.ParamList[0];
+			Logger.LogDebug("GetPortalDesktopModulesByPortalIDCallBack(cacheItemArgs={CacheItemArgs}): portalId → {PortalId}", cacheItemArgs, portalId);
+			Logger.LogDebug("<<< Exiting GetPortalDesktopModulesByPortalIDCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return CBO.FillDictionary("PortalDesktopModuleID", DataProvider.Instance().GetPortalDesktopModules(portalId, Null.NullInteger), new Dictionary<int, PortalDesktopModuleInfo>());
         }
 
@@ -794,11 +831,15 @@ namespace DotNetNuke.Entities.Modules
 
         private static void CheckInterfacesImplementation(ref DesktopModuleInfo desktopModuleInfo)
         {
+			Logger.LogDebug(">>> Entering CheckInterfacesImplementation(desktopModuleInfo={DesktopModuleInfo})", desktopModuleInfo);
             var businessControllerType = Reflection.CreateType(desktopModuleInfo.BusinessControllerClass);
 
+			Logger.LogDebug("CheckInterfacesImplementation(desktopModuleInfo={DesktopModuleInfo}): businessControllerType → {BusinessControllerType}", desktopModuleInfo, businessControllerType);
             desktopModuleInfo.IsPortable = typeof(IPortable).IsAssignableFrom(businessControllerType);
             desktopModuleInfo.IsSearchable = typeof(ModuleSearchBase).IsAssignableFrom(businessControllerType);
             desktopModuleInfo.IsUpgradeable = typeof(IUpgradeable).IsAssignableFrom(businessControllerType);
+			Logger.LogDebug("<<< Exiting CheckInterfacesImplementation(desktopModuleInfo={DesktopModuleInfo})", desktopModuleInfo);
         }
+		Logger.LogDebug("<<< Exiting DesktopModuleController(eventLogger={EventLogger})", eventLogger);
     }
 }

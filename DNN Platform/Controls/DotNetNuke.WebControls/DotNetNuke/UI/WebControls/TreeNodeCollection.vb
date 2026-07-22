@@ -1,5 +1,6 @@
 ﻿' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports Microsoft.VisualBasic
 Imports Microsoft.VisualBasic.CompilerServices
@@ -17,23 +18,29 @@ Namespace DotNetNuke.UI.WebControls
         Implements IStateManager
         ' Methods
         Public Sub New(ByVal JSONDict As Dictionary(Of String, Object), ByVal Tree As DnnTree)
+			Logger.LogDebug(">>> Entering New(JSONDict={JSONDict},Object={Object})", JSONDict, Object)
             MyBase.New(Tree.ClientID, JSONDict)
             Me.m_DNNTree = Tree
+			Logger.LogDebug("New(JSONDict={JSONDict},Object={Object}): Me.m_DNNTree → {Arg2}", JSONDict, Object, Me.m_DNNTree)
         End Sub
+		Logger.LogDebug("<<< Exiting New(JSONDict={JSONDict},Object={Object})", JSONDict, Object)
 
         Public Sub New(ByVal strNamespace As String, ByVal objControl As DnnTree)
             MyBase.New(strNamespace, objControl)
             Me.m_DNNTree = objControl
+			Logger.LogDebug("New(strNamespace={StrNamespace},objControl={ObjControl}): Me.m_DNNTree → {Arg2}", strNamespace, objControl, Me.m_DNNTree)
         End Sub
 
         Public Sub New(ByVal objXmlNode As XmlNode, ByVal objControl As DnnTree)
             MyBase.New(objXmlNode, objControl)
             Me.m_DNNTree = objControl
+			Logger.LogDebug("New(objXmlNode={ObjXmlNode},objControl={ObjControl}): Me.m_DNNTree → {Arg2}", objXmlNode, objControl, Me.m_DNNTree)
         End Sub
 
         Public Sub New(ByVal strXML As String, ByVal strXSLFile As String, ByVal objControl As DnnTree)
             MyBase.New(strXML, strXSLFile)
             Me.m_DNNTree = objControl
+			Logger.LogDebug("New(strXML={StrXML},strXSLFile={StrXSLFile},objControl={ObjControl}): Me.m_DNNTree → {Arg3}", strXML, strXSLFile, objControl, Me.m_DNNTree)
         End Sub
 
         Public Shadows Function Add() As Integer
@@ -108,6 +115,7 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Public Overrides Function FindSelectedNodes() As Collection
+			Logger.LogDebug(">>> Entering FindSelectedNodes()")
             Dim collection As New Collection
             Dim flag As Boolean = Not Object.ReferenceEquals(Me.XMLNode, Nothing)
             If flag Then
@@ -115,8 +123,10 @@ Namespace DotNetNuke.UI.WebControls
                 Dim list As XmlNodeList = Me.XMLNode.SelectNodes("//n[@selected='1']")
                 Try 
                     enumerator = list.GetEnumerator
+					Logger.LogDebug("FindSelectedNodes(): enumerator → {Enumerator}", enumerator)
                     Do While True
                         flag = enumerator.MoveNext
+						Logger.LogDebug("FindSelectedNodes(): flag → {Flag}", flag)
                         If Not flag Then
                             Exit Do
                         End If
@@ -131,6 +141,7 @@ Namespace DotNetNuke.UI.WebControls
             End If
             Return collection
         End Function
+		Logger.LogDebug("<<< Exiting FindSelectedNodes()")
 
         Public Shadows Function GetEnumerator() As IEnumerator
             Return New TreeNodeEnumerator(Me.XMLNode, Me.m_DNNTree)
@@ -156,10 +167,13 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Public Sub Insert(ByVal index As Integer, ByVal value As TreeNode)
+			Logger.LogDebug(">>> Entering Insert(index={Index},value={Value})", index, value)
             Me.XMLNode.InsertAfter(Me.XMLNode.ChildNodes(index), value.XmlNode)
         End Sub
+		Logger.LogDebug("<<< Exiting Insert(index={Index},value={Value})", index, value)
 
         Public Sub LoadViewState(ByVal state As Object) Implements IStateManager.LoadViewState
+		Logger.LogDebug(">>> Entering LoadViewState(state={State})", state)
         End Sub
 
         Public Shadows Sub Remove(ByVal value As TreeNode)
@@ -167,11 +181,14 @@ Namespace DotNetNuke.UI.WebControls
         End Sub
 
         Public Function SaveViewState() As Object Implements IStateManager.SaveViewState
+			Logger.LogDebug(">>> Entering SaveViewState()")
             Dim obj2 As Object = Nothing
             Return obj2
         End Function
+		Logger.LogDebug("<<< Exiting SaveViewState()")
 
         Public Sub TrackViewState() Implements IStateManager.TrackViewState
+		Logger.LogDebug(">>> Entering TrackViewState()")
         End Sub
 
 

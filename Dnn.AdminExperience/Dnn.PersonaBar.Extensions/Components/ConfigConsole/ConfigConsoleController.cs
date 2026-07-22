@@ -45,6 +45,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
         public ConfigConsoleController()
             : this(null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering ConfigConsoleController()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ConfigConsoleController"/> class.</summary>
@@ -56,8 +57,13 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
         {
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
             this.appInfo = appInfo ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationInfo>();
+			Logger.LogDebug("ConfigConsoleController(appStatus={AppStatus},appInfo={AppInfo},directoryApi={DirectoryApi},fileApi={FileApi}): appInfo → {AppInfo1}", appStatus, appInfo, directoryApi, fileApi, appInfo);
+			Logger.LogDebug("ConfigConsoleController(appStatus={AppStatus},appInfo={AppInfo},directoryApi={DirectoryApi},fileApi={FileApi}): fileApi → {FileApi1}", appStatus, appInfo, directoryApi, fileApi, fileApi);
+			Logger.LogDebug("ConfigConsoleController(appStatus={AppStatus},appInfo={AppInfo},directoryApi={DirectoryApi},fileApi={FileApi}): appStatus → {AppStatus1}", appStatus, appInfo, directoryApi, fileApi, appStatus);
             this.directoryApi = directoryApi ?? Globals.GetCurrentServiceProvider().GetRequiredService<IDirectory>();
+			Logger.LogDebug("ConfigConsoleController(appStatus={AppStatus},appInfo={AppInfo},directoryApi={DirectoryApi},fileApi={FileApi}): directoryApi → {DirectoryApi1}", appStatus, appInfo, directoryApi, fileApi, directoryApi);
             this.fileApi = fileApi ?? Globals.GetCurrentServiceProvider().GetRequiredService<IFile>();
+			Logger.LogDebug("<<< Exiting ConfigConsoleController(appStatus={AppStatus},appInfo={AppInfo},directoryApi={DirectoryApi},fileApi={FileApi})", appStatus, appInfo, directoryApi, fileApi);
         }
 
         /// <summary>Gets the config file list.</summary>
@@ -65,6 +71,8 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
         [DnnDeprecated(10, 2, 2, "Use GetConfigFilesListAsync")]
         public partial IEnumerable<string> GetConfigFilesList()
         {
+			Logger.LogDebug(">>> Entering GetConfigFilesList()");
+				Logger.LogDebug("<<< Exiting GetConfigFilesList()");
             return
                 from file in this.directoryApi.GetFiles(this.appStatus.ApplicationMapPath)
                 where file.EndsWith(CONFIGEXT, StringComparison.OrdinalIgnoreCase) || file.EndsWith(ROBOTSEXT, StringComparison.OrdinalIgnoreCase)
@@ -75,6 +83,8 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
         /// <returns>A sequence of file names.</returns>
         public async Task<IEnumerable<string>> GetConfigFilesListAsync()
         {
+			Logger.LogDebug(">>> Entering GetConfigFilesListAsync()");
+				Logger.LogDebug("<<< Exiting GetConfigFilesListAsync()");
             return
                 from file in await this.directoryApi.GetFilesAsync(this.appStatus.ApplicationMapPath)
                 where file.EndsWith(CONFIGEXT, StringComparison.OrdinalIgnoreCase) || file.EndsWith(ROBOTSEXT, StringComparison.OrdinalIgnoreCase)
@@ -87,6 +97,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
         [DnnDeprecated(10, 2, 2, "Use GetConfigFileAsync")]
         public partial string GetConfigFile(string configFile)
         {
+			Logger.LogDebug(">>> Entering GetConfigFile(configFile={ConfigFile})", configFile);
             this.ValidateFilePath(configFile);
 
             if (!configFile.EndsWith(CONFIGEXT, StringComparison.InvariantCultureIgnoreCase))
@@ -96,12 +107,15 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
 
             var configDoc = Config.Load(this.appStatus, configFile);
             using var txtWriter = new StringWriter();
+			Logger.LogDebug("GetConfigFile(configFile={ConfigFile}): configDoc → {ConfigDoc}", configFile, configDoc);
+			Logger.LogDebug("GetConfigFile(configFile={ConfigFile}): txtWriter → {TxtWriter}", configFile, txtWriter);
             using (var writer = new XmlTextWriter(txtWriter))
             {
                 writer.Formatting = Formatting.Indented;
                 configDoc.WriteTo(writer);
             }
 
+			Logger.LogDebug("<<< Exiting GetConfigFile(configFile={ConfigFile})", configFile);
             return txtWriter.ToString();
         }
 
@@ -110,23 +124,31 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
         /// <returns>The file contents.</returns>
         public async Task<string> GetConfigFileAsync(string configFile)
         {
+			Logger.LogDebug(">>> Entering GetConfigFileAsync(configFile={ConfigFile})", configFile);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             await this.ValidateFilePathAsync(configFile);
 
             if (!configFile.EndsWith(CONFIGEXT, StringComparison.InvariantCultureIgnoreCase))
             {
                 var configFilePath = Path.Combine(this.appStatus.ApplicationMapPath, configFile);
                 using var streamReader = new StreamReader(this.fileApi.OpenRead(configFilePath));
+				Logger.LogDebug("GetConfigFileAsync(configFile={ConfigFile}): configFilePath → {ConfigFilePath}", configFile, configFilePath);
+				Logger.LogDebug("GetConfigFileAsync(configFile={ConfigFile}): streamReader → {StreamReader}", configFile, streamReader);
                 return await streamReader.ReadToEndAsync();
             }
 
             var configDoc = Config.Load(this.appStatus, configFile);
             using var txtWriter = new StringWriter();
+			Logger.LogDebug("GetConfigFileAsync(configFile={ConfigFile}): configDoc → {ConfigDoc}", configFile, configDoc);
+			Logger.LogDebug("GetConfigFileAsync(configFile={ConfigFile}): txtWriter → {TxtWriter}", configFile, txtWriter);
             using (var writer = new XmlTextWriter(txtWriter))
             {
                 writer.Formatting = Formatting.Indented;
                 configDoc.WriteTo(writer);
             }
 
+			Logger.LogInformation("GetConfigFileAsync(configFile)={ConfigFile}: external service call took {Arg1} ms", configFile, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting GetConfigFileAsync(configFile={ConfigFile})", configFile);
             return txtWriter.ToString();
         }
 
@@ -136,6 +158,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
         [DnnDeprecated(10, 2, 2, "Use UpdateConfigFileAsync")]
         public partial void UpdateConfigFile(string fileName, string fileContent)
         {
+			Logger.LogDebug(">>> Entering UpdateConfigFile(fileName={FileName},fileContent={FileContent})", fileName, fileContent);
             this.ValidateFilePath(fileName);
 
             if (fileName.EndsWith(CONFIGEXT, StringComparison.InvariantCultureIgnoreCase))
@@ -152,6 +175,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
             {
                 this.SaveNonConfig(fileContent, fileName);
             }
+			Logger.LogDebug("<<< Exiting UpdateConfigFile(fileName={FileName},fileContent={FileContent})", fileName, fileContent);
         }
 
         /// <summary>Update the contents of a config file.</summary>
@@ -160,6 +184,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public async Task UpdateConfigFileAsync(string fileName, string fileContent)
         {
+			Logger.LogDebug(">>> Entering UpdateConfigFileAsync(fileName={FileName},fileContent={FileContent})", fileName, fileContent);
             await this.ValidateFilePathAsync(fileName);
 
             if (fileName.EndsWith(CONFIGEXT, StringComparison.InvariantCultureIgnoreCase))
@@ -176,6 +201,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
             {
                 await this.SaveNonConfigAsync(fileContent, fileName);
             }
+			Logger.LogDebug("<<< Exiting UpdateConfigFileAsync(fileName={FileName},fileContent={FileContent})", fileName, fileContent);
         }
 
         /// <summary>Validates a config file against a well known schema.</summary>
@@ -185,6 +211,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
         [DnnDeprecated(10, 2, 2, "Use ValidateConfigFileAsync")]
         public partial IEnumerable<string> ValidateConfigFile(string fileName, string fileContent)
         {
+			Logger.LogDebug(">>> Entering ValidateConfigFile(fileName={FileName},fileContent={FileContent})", fileName, fileContent);
             this.ValidateFilePath(fileName);
 
             if (!fileName.EndsWith(CONFIGEXT, StringComparison.InvariantCultureIgnoreCase))
@@ -203,6 +230,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
                 configDoc.Load(configReader);
             }
 
+			Logger.LogDebug("<<< Exiting ValidateConfigFile(fileName={FileName},fileContent={FileContent})", fileName, fileContent);
             return ValidateSchema(configDoc, "Schemas/DotNetConfig.xsd");
         }
 
@@ -212,6 +240,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
         /// <returns>A list of validation errors.</returns>
         public async Task<IEnumerable<string>> ValidateConfigFileAsync(string fileName, string fileContent)
         {
+			Logger.LogDebug(">>> Entering ValidateConfigFileAsync(fileName={FileName},fileContent={FileContent})", fileName, fileContent);
             await this.ValidateFilePathAsync(fileName);
 
             if (!fileName.EndsWith(CONFIGEXT, StringComparison.InvariantCultureIgnoreCase))
@@ -230,6 +259,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
                 configDoc.Load(configReader);
             }
 
+			Logger.LogDebug("<<< Exiting ValidateConfigFileAsync(fileName={FileName},fileContent={FileContent})", fileName, fileContent);
             return await ValidateSchemaAsync(configDoc, "Schemas/DotNetConfig.xsd");
         }
 
@@ -238,6 +268,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public void MergeConfigFile(string fileContent)
         {
+			Logger.LogDebug(">>> Entering MergeConfigFile(fileContent={FileContent})", fileContent);
             if (!IsValidXmlMergeDocument(fileContent))
             {
                 return;
@@ -251,6 +282,8 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
 
             var merge = new XmlMerge(doc, Globals.FormatVersion(this.appInfo.Version), this.appInfo.Description);
             merge.UpdateConfigs();
+			Logger.LogDebug("MergeConfigFile(fileContent={FileContent}): merge → {Merge}", fileContent, merge);
+			Logger.LogDebug("<<< Exiting MergeConfigFile(fileContent={FileContent})", fileContent);
         }
 
         [DnnDeprecated(10, 2, 2, "Use ValidateSchemaAsync")]
@@ -279,6 +312,7 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
 
                 using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(name);
                 using var reader = new StreamReader(stream);
+				Logger.LogDebug("<<< Exiting LoadResource(relativePath={RelativePath})", relativePath);
                 return reader.ReadToEnd();
             }
         }
@@ -294,8 +328,10 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
 
             static async Task<XmlSchema> LoadSchema(string schemaRelPath)
             {
+				Logger.LogDebug(">>> Entering LoadSchema(schemaRelPath={SchemaRelPath})", schemaRelPath);
                 var xsd = await LoadResource(schemaRelPath);
 
+				Logger.LogDebug("LoadSchema(schemaRelPath={SchemaRelPath}): xsd → {Xsd}", schemaRelPath, xsd);
                 using var reader = new StringReader(xsd);
                 return XmlSchema.Read(XmlReader.Create(reader), (_, _) => { });
             }
@@ -308,29 +344,36 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
 
                 using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(name);
                 using var reader = new StreamReader(stream);
+				Logger.LogDebug("LoadResource(relativePath={RelativePath}): reader → {Reader}", relativePath, reader);
                 return await reader.ReadToEndAsync();
             }
         }
 
         private static bool IsValidXmlMergeDocument(string mergeDocText)
         {
+			Logger.LogDebug(">>> Entering IsValidXmlMergeDocument(mergeDocText={MergeDocText})", mergeDocText);
             if (string.IsNullOrEmpty(mergeDocText.Trim()))
             {
                 return false;
             }
 
             // TODO: Add more checks here
+			Logger.LogDebug("<<< Exiting IsValidXmlMergeDocument(mergeDocText={MergeDocText})", mergeDocText);
             return true;
         }
 
         [DnnDeprecated(10, 2, 2, "Use SaveNonConfigAsync")]
         private partial string SaveNonConfig(string document, string filename)
         {
+			Logger.LogDebug(">>> Entering SaveNonConfig(document={Document},filename={Filename})", document, filename);
             var retMsg = string.Empty;
             try
+			Logger.LogDebug("SaveNonConfig(document={Document},filename={Filename}): retMsg → {RetMsg}", document, filename, retMsg);
             {
                 var strFilePath = Path.Combine(this.appStatus.ApplicationMapPath, filename);
                 var existingFileAttributes = FileAttributes.Normal;
+				Logger.LogDebug("SaveNonConfig(document={Document},filename={Filename}): strFilePath → {StrFilePath}", document, filename, strFilePath);
+				Logger.LogDebug("SaveNonConfig(document={Document},filename={Filename}): existingFileAttributes → {ExistingFileAttributes}", document, filename, existingFileAttributes);
                 if (this.fileApi.Exists(strFilePath))
                 {
                     // save current file attributes
@@ -376,16 +419,21 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
                 retMsg = exc.Message;
             }
 
+			Logger.LogDebug("<<< Exiting SaveNonConfig(document={Document},filename={Filename})", document, filename);
             return retMsg;
         }
 
         private async Task<string> SaveNonConfigAsync(string document, string filename)
         {
+			Logger.LogDebug(">>> Entering SaveNonConfigAsync(document={Document},filename={Filename})", document, filename);
             var retMsg = string.Empty;
             try
+			Logger.LogDebug("SaveNonConfigAsync(document={Document},filename={Filename}): retMsg → {RetMsg}", document, filename, retMsg);
             {
                 var strFilePath = Path.Combine(this.appStatus.ApplicationMapPath, filename);
                 var existingFileAttributes = FileAttributes.Normal;
+				Logger.LogDebug("SaveNonConfigAsync(document={Document},filename={Filename}): strFilePath → {StrFilePath}", document, filename, strFilePath);
+				Logger.LogDebug("SaveNonConfigAsync(document={Document},filename={Filename}): existingFileAttributes → {ExistingFileAttributes}", document, filename, existingFileAttributes);
                 if (await this.fileApi.ExistsAsync(strFilePath))
                 {
                     // save current file attributes
@@ -431,26 +479,33 @@ namespace Dnn.PersonaBar.ConfigConsole.Components
                 retMsg = exc.Message;
             }
 
+			Logger.LogDebug("<<< Exiting SaveNonConfigAsync(document={Document},filename={Filename})", document, filename);
             return retMsg;
         }
 
         [DnnDeprecated(10, 2, 2, "Use ValidateFilePathAsync")]
         private partial void ValidateFilePath(string filePath)
         {
+			Logger.LogDebug(">>> Entering ValidateFilePath(filePath={FilePath})", filePath);
             var configFileNames = this.GetConfigFilesList();
             if (!configFileNames.ToHashSet(StringComparer.OrdinalIgnoreCase).Contains(filePath))
+			Logger.LogDebug("ValidateFilePath(filePath={FilePath}): configFileNames → {ConfigFileNames}", filePath, configFileNames);
             {
                 throw new ArgumentException("Invalid File Path");
             }
+			Logger.LogDebug("<<< Exiting ValidateFilePath(filePath={FilePath})", filePath);
         }
 
         private async Task ValidateFilePathAsync(string filePath)
         {
+			Logger.LogDebug(">>> Entering ValidateFilePathAsync(filePath={FilePath})", filePath);
             var configFileNames = await this.GetConfigFilesListAsync();
             if (!configFileNames.ToHashSet(StringComparer.OrdinalIgnoreCase).Contains(filePath))
+			Logger.LogDebug("ValidateFilePathAsync(filePath={FilePath}): configFileNames → {ConfigFileNames}", filePath, configFileNames);
             {
                 throw new ArgumentException("Invalid File Path");
             }
+			Logger.LogDebug("<<< Exiting ValidateFilePathAsync(filePath={FilePath})", filePath);
         }
     }
 }

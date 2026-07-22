@@ -26,9 +26,14 @@ public abstract class PackageComponentTaskBase : AsyncFrostingTask<Context>
     /// <param name="componentFolderName">The name of the folder in <c>DNN Platform/Components/</c>.</param>
     protected PackageComponentTaskBase(string componentName, FilePath primaryAssemblyName = null, DirectoryPath componentFolderName = null)
     {
+		Logger.LogDebug(">>> Entering PackageComponentTaskBase(componentName={ComponentName},primaryAssemblyName={PrimaryAssemblyName},componentFolderName={ComponentFolderName})", componentName, primaryAssemblyName, componentFolderName);
         this.ComponentName = componentName;
         this.ComponentFolderName = componentFolderName ?? componentName;
+		Logger.LogDebug("PackageComponentTaskBase(componentName={ComponentName},primaryAssemblyName={PrimaryAssemblyName},componentFolderName={ComponentFolderName}): this.ComponentName → {Arg3}", componentName, primaryAssemblyName, componentFolderName, this.ComponentName);
+		Logger.LogDebug("PackageComponentTaskBase(componentName={ComponentName},primaryAssemblyName={PrimaryAssemblyName},componentFolderName={ComponentFolderName}): this.ComponentFolderName → {Arg3}", componentName, primaryAssemblyName, componentFolderName, this.ComponentFolderName);
         this.PrimaryAssemblyName = primaryAssemblyName ?? $"{componentName}.dll";
+		Logger.LogDebug("<<< Exiting PackageComponentTaskBase(componentName={ComponentName},primaryAssemblyName={PrimaryAssemblyName},componentFolderName={ComponentFolderName})", componentName, primaryAssemblyName, componentFolderName);
+		Logger.LogDebug("PackageComponentTaskBase(componentName={ComponentName},primaryAssemblyName={PrimaryAssemblyName},componentFolderName={ComponentFolderName}): this.PrimaryAssemblyName → {Arg3}", componentName, primaryAssemblyName, componentFolderName, this.PrimaryAssemblyName);
     }
 
     /// <summary>Gets the name of the component.</summary>
@@ -43,10 +48,15 @@ public abstract class PackageComponentTaskBase : AsyncFrostingTask<Context>
     /// <inheritdoc />
     public override Task RunAsync(Context context)
     {
+		Logger.LogDebug(">>> Entering RunAsync(context={Context})", context);
         var binDir = GetBinDir(context);
         var packageZip = this.GetPackageZipPath(context, binDir);
+		Logger.LogDebug("RunAsync(context={Context}): binDir → {BinDir}", context, binDir);
+		Logger.LogDebug("RunAsync(context={Context}): packageZip → {PackageZip}", context, packageZip);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var packageDir = context.Directory($"DNN Platform/Components/{this.ComponentFolderName}");
 
+		Logger.LogDebug("RunAsync(context={Context}): packageDir → {PackageDir}", context, packageDir);
         context.Information($"Creating {packageZip}");
         context.Zip(
             packageDir.ToString(),
@@ -55,10 +65,13 @@ public abstract class PackageComponentTaskBase : AsyncFrostingTask<Context>
 
         var manifestPath = context.GetFiles(packageDir.Path.CombineWithFilePath("*.dnn").ToString()).Single();
         context.Information($"Reading manifest from {manifestPath}");
+		Logger.LogDebug("RunAsync(context={Context}): manifestPath → {ManifestPath}", context, manifestPath);
+		Logger.LogInformation("RunAsync(context)={Context}: find query executed in {Arg1} ms", context, __logStart.ElapsedMilliseconds);
         var manifest = new XmlDocument();
         using (var manifestStream = context.GenerateStreamFromString(context.ReadFile(manifestPath)))
         using (var manifestReader = XmlReader.Create(manifestStream, new XmlReaderSettings { XmlResolver = null, }))
         {
+		Logger.LogDebug("RunAsync(context={Context}): manifest → {Manifest}", context, manifest);
             manifest.Load(manifestReader);
         }
 
@@ -71,8 +84,10 @@ public abstract class PackageComponentTaskBase : AsyncFrostingTask<Context>
 
         foreach (var assemblyNameNode in assemblies)
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
             var assemblyPath = binDir.CombineWithFilePath(assemblyNameNode.InnerText);
             context.Information($"Adding {assemblyPath} to {packageZip}");
+			Logger.LogDebug("RunAsync(context={Context}): assemblyPath → {AssemblyPath}", context, assemblyPath);
             context.AddFilesToZip(
                 packageZip,
                 context.MakeAbsolute(context.WebsiteDir.Path),
@@ -92,6 +107,7 @@ public abstract class PackageComponentTaskBase : AsyncFrostingTask<Context>
 
         context.AddXmlFileToZip(packageZip, manifest, manifestPath.GetFilename().ToString(), append: true);
 
+		Logger.LogDebug("<<< Exiting RunAsync(context={Context})", context);
         return Task.CompletedTask;
     }
 
@@ -100,6 +116,8 @@ public abstract class PackageComponentTaskBase : AsyncFrostingTask<Context>
     /// <returns>The path.</returns>
     protected static DirectoryPath GetBinDir(Context context)
     {
+		Logger.LogDebug(">>> Entering GetBinDir(context={Context})", context);
+		Logger.LogDebug("<<< Exiting GetBinDir(context={Context})", context);
         return context.WebsiteDir.Path.Combine("bin");
     }
 

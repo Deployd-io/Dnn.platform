@@ -10,6 +10,7 @@ namespace Dnn.PersonaBar.Security.Components.Checks
 
     public class CheckAllowableFileExtensions : IAuditCheck
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public string Id => "CheckAllowableFileExtensions";
 
@@ -19,14 +20,17 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc />
         public CheckResult Execute()
         {
+			Logger.LogDebug(">>> Entering Execute()");
             var result = new CheckResult(SeverityEnum.Unverified, this.Id);
             try
+			Logger.LogDebug("Execute(): result → {Result}", result);
             {
                 if (Host.AllowedExtensionWhitelist.IsAllowedExtension("asp")
                         || Host.AllowedExtensionWhitelist.IsAllowedExtension("aspx")
                         || Host.AllowedExtensionWhitelist.IsAllowedExtension("php"))
                 {
                     result.Severity = SeverityEnum.Failure;
+					Logger.LogDebug("Execute(): result.Severity → {Arg0}", result.Severity);
                     result.Notes.Add("Extensions: " + Host.AllowedExtensionWhitelist.ToDisplayString());
                 }
                 else
@@ -36,9 +40,11 @@ namespace Dnn.PersonaBar.Security.Components.Checks
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in Execute(): {Arg0}", ex.Message);
                 throw;
             }
 
+			Logger.LogDebug("<<< Exiting Execute()");
             return result;
         }
     }

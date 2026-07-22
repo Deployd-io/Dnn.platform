@@ -14,13 +14,19 @@ namespace DotNetNuke.Web.Razor.Helpers
     [DnnDeprecated(9, 3, 2, "Use Razor Pages instead")]
     public partial class HtmlHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly string resourceFile;
         private ModuleInstanceContext context;
 
         public HtmlHelper(ModuleInstanceContext context, string resourcefile)
         {
+			Logger.LogDebug(">>> Entering HtmlHelper(context={Context},resourcefile={Resourcefile})", context, resourcefile);
             this.context = context;
             this.resourceFile = resourcefile;
+			Logger.LogDebug("<<< Exiting HtmlHelper(context={Context},resourcefile={Resourcefile})", context, resourcefile);
+			Logger.LogDebug("HtmlHelper(context={Context},resourcefile={Resourcefile}): this.context → {Arg2}", context, resourcefile, this.context);
+			Logger.LogDebug("HtmlHelper(context={Context},resourcefile={Resourcefile}): this.resourceFile → {Arg2}", context, resourcefile, this.resourceFile);
+			Logger.LogDebug("HtmlHelper(context={Context},resourcefile={Resourcefile}): context → {Context1}", context, resourcefile, context);
         }
 
         /// <summary>Gets localized text.</summary>
@@ -29,6 +35,8 @@ namespace DotNetNuke.Web.Razor.Helpers
         [DnnDeprecated(9, 3, 2, "Use Razor Pages instead")]
         public partial object GetLocalizedString(string key)
         {
+			Logger.LogDebug(">>> Entering GetLocalizedString(key={Key})", key);
+			Logger.LogDebug("<<< Exiting GetLocalizedString(key={Key})", key);
             return Localization.GetString(key, this.resourceFile);
         }
 
@@ -39,6 +47,7 @@ namespace DotNetNuke.Web.Razor.Helpers
         [DnnDeprecated(9, 3, 2, "Use Razor Pages instead")]
         public partial object GetLocalizedString(string key, string culture)
         {
+			Logger.LogDebug("<<< Exiting GetLocalizedString(key={Key},culture={Culture})", key, culture);
             return Localization.GetString(key, this.resourceFile, culture);
         }
 
@@ -48,6 +57,8 @@ namespace DotNetNuke.Web.Razor.Helpers
         [DnnDeprecated(9, 3, 2, "Use Razor Pages instead")]
         public partial HtmlString Raw(string text)
         {
+			Logger.LogDebug(">>> Entering Raw(text={Text})", text);
+			Logger.LogDebug("<<< Exiting Raw(text={Text})", text);
             return new HtmlString(text);
         }
     }

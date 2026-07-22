@@ -17,8 +17,11 @@ namespace Dnn.EditBar.UI.Items
     public class WorkflowStateMenu(IContentController contentController, IWorkflowEngine workflowEngine)
         : WorkflowBaseMenuItem(contentController, workflowEngine)
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="WorkflowStateMenu"/> class.</summary>
+		Logger.LogDebug(">>> Entering WorkflowStateMenu(contentController={ContentController},workflowEngine={WorkflowEngine})", contentController, workflowEngine);
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IContentController. Scheduled removal in v12.0.0.")]
+		Logger.LogDebug("<<< Exiting WorkflowStateMenu(contentController={ContentController},workflowEngine={WorkflowEngine})", contentController, workflowEngine);
         public WorkflowStateMenu()
             : this(null, null)
         {
@@ -48,6 +51,7 @@ namespace Dnn.EditBar.UI.Items
         // render list of workflow states from first state to current workflow state
         private string RenderStates()
         {
+			Logger.LogDebug(">>> Entering RenderStates()");
             if (this.WorkflowState == null)
             {
                 return string.Empty;
@@ -55,6 +59,7 @@ namespace Dnn.EditBar.UI.Items
 
             var currentState = $"<strong>{this.WorkflowState.StateName}</strong>";
             if (this.IsFirstState == true || this.IsLastState == true)
+			Logger.LogDebug("RenderStates(): currentState → {CurrentState}", currentState);
             {
                 return currentState;
             }
@@ -62,6 +67,9 @@ namespace Dnn.EditBar.UI.Items
             // return "Draft > Review > Review2" for example
             var pastStates = this.Workflow.States.Where(s => s.Order < this.WorkflowState.Order).OrderBy(s => s.Order).ToList();
             var pastStatesHtml = string.Join(" &gt; ", pastStates.Select(s => $"{s.StateName}"));
+			Logger.LogDebug("RenderStates(): pastStates → {PastStates}", pastStates);
+			Logger.LogDebug("RenderStates(): pastStatesHtml → {PastStatesHtml}", pastStatesHtml);
+			Logger.LogDebug("<<< Exiting RenderStates()");
             return string.Join(" &gt; ", pastStatesHtml, currentState);
         }
     }

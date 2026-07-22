@@ -12,11 +12,15 @@ namespace DotNetNuke.Framework.Providers
     [DnnDeprecated(7, 0, 0, "It is no longer used to load provider configurations, as there are medium trust issues", RemovalVersion = 10)]
     internal partial class ProviderConfigurationHandler : IConfigurationSectionHandler
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public virtual object Create(object parent, object context, XmlNode node)
         {
+			Logger.LogDebug(">>> Entering Create(parent={Parent},context={Context},node={Node})", parent, context, node);
             var objProviderConfiguration = new ProviderConfiguration();
             objProviderConfiguration.LoadValuesFromConfigurationXml(node);
+			Logger.LogDebug("Create(parent={Parent},context={Context},node={Node}): objProviderConfiguration → {ObjProviderConfiguration}", parent, context, node, objProviderConfiguration);
+			Logger.LogDebug("<<< Exiting Create(parent={Parent},context={Context},node={Node})", parent, context, node);
             return objProviderConfiguration;
         }
     }

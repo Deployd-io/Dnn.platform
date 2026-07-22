@@ -27,13 +27,17 @@ namespace Dnn.PersonaBar.UI.MenuControllers
     public class LinkMenuController(INavigationManager navigationManager, IHostSettings hostSettings)
         : IMenuItemController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+		Logger.LogDebug(">>> Entering LinkMenuController(navigationManager={NavigationManager},hostSettings={HostSettings})", navigationManager, hostSettings);
+		Logger.LogDebug("LinkMenuController(navigationManager={NavigationManager},hostSettings={HostSettings}): hostSettings → {HostSettings1}", navigationManager, hostSettings, hostSettings);
 
         /// <summary>Initializes a new instance of the <see cref="LinkMenuController"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with INavigationManager. Scheduled removal in v12.0.0.")]
         public LinkMenuController()
             : this(null, null)
         {
+		Logger.LogDebug("<<< Exiting LinkMenuController()");
         }
 
         /// <summary>Gets the navigation manager.</summary>
@@ -42,6 +46,7 @@ namespace Dnn.PersonaBar.UI.MenuControllers
         /// <inheritdoc />
         public void UpdateParameters(MenuItem menuItem)
         {
+			Logger.LogDebug(">>> Entering UpdateParameters(menuItem={MenuItem})", menuItem);
             if (!this.Visible(menuItem))
             {
                 return;
@@ -49,12 +54,15 @@ namespace Dnn.PersonaBar.UI.MenuControllers
 
             var query = GetPathQuery(menuItem);
 
+			Logger.LogDebug("UpdateParameters(menuItem={MenuItem}): query → {Query}", menuItem, query);
             int tabId, portalId;
             if (query.TryGetValue("path", out var path))
             {
                 portalId = query.TryGetValue("portalId", out var queryPortalId) ? Convert.ToInt32(queryPortalId, CultureInfo.InvariantCulture) : PortalSettings.Current.PortalId;
+				Logger.LogDebug("UpdateParameters(menuItem={MenuItem}): portalId → {PortalId}", menuItem, portalId);
                 tabId = TabController.GetTabByTabPath(this.hostSettings, portalId, path, string.Empty);
             }
+			Logger.LogDebug("UpdateParameters(menuItem={MenuItem}): tabId → {TabId}", menuItem, tabId);
             else
             {
                 portalId = Convert.ToInt32(query["portalId"], CultureInfo.InvariantCulture);
@@ -63,16 +71,22 @@ namespace Dnn.PersonaBar.UI.MenuControllers
 
             var tabUrl = this.NavigationManager.NavigateURL(tabId, portalId == Null.NullInteger);
             var alias = Globals.AddHTTP(((IPortalAliasInfo)PortalSettings.Current.PortalAlias).HttpAlias);
+			Logger.LogDebug("UpdateParameters(menuItem={MenuItem}): menuItem.Link → {Arg1}", menuItem, menuItem.Link);
             tabUrl = tabUrl.Replace(alias, string.Empty).TrimStart('/');
+			Logger.LogDebug("UpdateParameters(menuItem={MenuItem}): tabUrl → {TabUrl}", menuItem, tabUrl);
+			Logger.LogDebug("UpdateParameters(menuItem={MenuItem}): alias → {Alias}", menuItem, alias);
 
             menuItem.Link = tabUrl;
+			Logger.LogDebug("<<< Exiting UpdateParameters(menuItem={MenuItem})", menuItem);
         }
 
         /// <inheritdoc />
         public bool Visible(MenuItem menuItem)
         {
+			Logger.LogDebug(">>> Entering Visible(menuItem={MenuItem})", menuItem);
             var query = GetPathQuery(menuItem);
             if (PortalSettings.Current == null || query == null)
+			Logger.LogDebug("Visible(menuItem={MenuItem}): query → {Query}", menuItem, query);
             {
                 return false;
             }
@@ -89,8 +103,10 @@ namespace Dnn.PersonaBar.UI.MenuControllers
             if (query.TryGetValue("path", out var path) && !string.IsNullOrEmpty(path))
             {
                 portalId = query.TryGetValue("portalId", out var queryPortalId) ? Convert.ToInt32(queryPortalId, CultureInfo.InvariantCulture) : PortalSettings.Current.PortalId;
+				Logger.LogDebug("Visible(menuItem={MenuItem}): portalId → {PortalId}", menuItem, portalId);
                 tabId = TabController.GetTabByTabPath(this.hostSettings, portalId, path, string.Empty);
 
+				Logger.LogDebug("Visible(menuItem={MenuItem}): tabId → {TabId}", menuItem, tabId);
                 if (tabId == Null.NullInteger)
                 {
                     return false;
@@ -108,6 +124,8 @@ namespace Dnn.PersonaBar.UI.MenuControllers
             }
 
             var tab = TabController.Instance.GetTab(tabId, portalId);
+			Logger.LogDebug("Visible(menuItem={MenuItem}): tab → {Tab}", menuItem, tab);
+			Logger.LogDebug("<<< Exiting Visible(menuItem={MenuItem})", menuItem);
             return (portalId == Null.NullInteger || portalId == PortalSettings.Current.PortalId)
                    && tab is { IsDeleted: false, DisableLink: false, IsVisible: true };
         }

@@ -16,14 +16,21 @@ namespace DotNetNuke.Security.Permissions
     [Serializable]
     public class ModulePermissionInfo : PermissionInfoBase, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private int moduleId;
         private int modulePermissionId;
 
         /// <summary>Initializes a new instance of the <see cref="ModulePermissionInfo"/> class.</summary>
         public ModulePermissionInfo()
         {
+			Logger.LogDebug(">>> Entering ModulePermissionInfo()");
             this.modulePermissionId = Null.NullInteger;
             this.moduleId = Null.NullInteger;
+			Logger.LogDebug("<<< Exiting ModulePermissionInfo()");
+			Logger.LogDebug("ModulePermissionInfo(): this.modulePermissionId → {Arg0}", this.modulePermissionId);
+			Logger.LogDebug("ModulePermissionInfo(): moduleId → {ModuleId}", moduleId);
+			Logger.LogDebug("ModulePermissionInfo(): this.moduleId → {Arg0}", this.moduleId);
+			Logger.LogDebug("ModulePermissionInfo(): modulePermissionId → {ModulePermissionId}", modulePermissionId);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModulePermissionInfo"/> class.</summary>
@@ -38,13 +45,18 @@ namespace DotNetNuke.Security.Permissions
         public ModulePermissionInfo(IPermissionDefinitionInfo permission)
             : this()
         {
+			Logger.LogDebug(">>> Entering ModulePermissionInfo(permission={Permission})", permission);
             ((IPermissionDefinitionInfo)this).ModuleDefId = permission.ModuleDefId;
             this.PermissionCode = permission.PermissionCode;
+			Logger.LogDebug("ModulePermissionInfo(permission={Permission}): this.PermissionCode → {Arg1}", permission, this.PermissionCode);
             ((IPermissionDefinitionInfo)this).PermissionId = permission.PermissionId;
             this.PermissionKey = permission.PermissionKey;
+			Logger.LogDebug("ModulePermissionInfo(permission={Permission}): this.PermissionKey → {Arg1}", permission, this.PermissionKey);
             this.PermissionName = permission.PermissionName;
+			Logger.LogDebug("<<< Exiting ModulePermissionInfo(permission={Permission})", permission);
         }
 
+		Logger.LogDebug("ModulePermissionInfo(permission={Permission}): this.PermissionName → {Arg1}", permission, this.PermissionName);
         /// <summary>Gets or sets the Module Permission ID.</summary>
         /// <returns>An Integer.</returns>
         [XmlElement("modulepermissionid")]
@@ -77,9 +89,11 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="dr">The Data Reader to use.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.FillInternal(dr);
             this.ModulePermissionID = Null.SetNullInteger(dr["ModulePermissionID"]);
             this.ModuleID = Null.SetNullInteger(dr["ModuleID"]);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
 
         /// <summary>Compares if two ModulePermissionInfo objects are equivalent/equal.</summary>
@@ -94,6 +108,7 @@ namespace DotNetNuke.Security.Permissions
         /// </remarks>
         public bool Equals(ModulePermissionInfo other)
         {
+			Logger.LogDebug(">>> Entering Equals(other={Other})", other);
             if (ReferenceEquals(null, other))
             {
                 return false;
@@ -104,6 +119,7 @@ namespace DotNetNuke.Security.Permissions
                 return true;
             }
 
+			Logger.LogDebug("<<< Exiting Equals(other={Other})", other);
             return (this.AllowAccess == other.AllowAccess) && (this.ModuleID == other.ModuleID) && (this.RoleID == other.RoleID) && (this.PermissionID == other.PermissionID);
         }
 
@@ -134,14 +150,17 @@ namespace DotNetNuke.Security.Permissions
                 return false;
             }
 
+			Logger.LogDebug("<<< Exiting Equals(obj={Obj})", obj);
             return this.Equals((ModulePermissionInfo)obj);
         }
 
         /// <inheritdoc />
         public override int GetHashCode()
         {
+			Logger.LogDebug(">>> Entering GetHashCode()");
             unchecked
             {
+				Logger.LogDebug("<<< Exiting GetHashCode()");
                 return (this.moduleId * 397) ^ this.modulePermissionId;
             }
         }

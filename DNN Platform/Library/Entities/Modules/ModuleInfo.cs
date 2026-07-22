@@ -50,15 +50,29 @@ namespace DotNetNuke.Entities.Modules
         /// <summary>Initializes a new instance of the <see cref="ModuleInfo"/> class.</summary>
         public ModuleInfo()
         {
+			Logger.LogDebug(">>> Entering ModuleInfo()");
             // initialize the properties that can be null
             // in the database
             this.PortalID = Null.NullInteger;
+			Logger.LogDebug("ModuleInfo(): PortalID → {PortalID}", PortalID);
+			Logger.LogDebug("ModuleInfo(): this.PortalID → {Arg0}", this.PortalID);
             this.OwnerPortalID = Null.NullInteger;
             this.TabModuleID = Null.NullInteger;
+			Logger.LogDebug("ModuleInfo(): OwnerPortalID → {OwnerPortalID}", OwnerPortalID);
+			Logger.LogDebug("ModuleInfo(): this.OwnerPortalID → {Arg0}", this.OwnerPortalID);
+			Logger.LogDebug("ModuleInfo(): TabModuleID → {TabModuleID}", TabModuleID);
+			Logger.LogDebug("ModuleInfo(): this.TabModuleID → {Arg0}", this.TabModuleID);
             this.DesktopModuleID = Null.NullInteger;
             this.ModuleDefID = Null.NullInteger;
             this.ModuleTitle = Null.NullString;
             this.ModuleVersion = Null.NullInteger;
+			Logger.LogDebug("ModuleInfo(): DesktopModuleID → {DesktopModuleID}", DesktopModuleID);
+			Logger.LogDebug("ModuleInfo(): this.DesktopModuleID → {Arg0}", this.DesktopModuleID);
+			Logger.LogDebug("ModuleInfo(): ModuleDefID → {ModuleDefID}", ModuleDefID);
+			Logger.LogDebug("ModuleInfo(): this.ModuleDefID → {Arg0}", this.ModuleDefID);
+			Logger.LogDebug("ModuleInfo(): ModuleTitle → {ModuleTitle}", ModuleTitle);
+			Logger.LogDebug("ModuleInfo(): this.ModuleTitle → {Arg0}", this.ModuleTitle);
+			Logger.LogDebug("ModuleInfo(): this.ModuleVersion → {Arg0}", this.ModuleVersion);
             this.authorizedEditRoles = Null.NullString;
             this.authorizedViewRoles = Null.NullString;
             this.Alignment = Null.NullString;
@@ -67,6 +81,20 @@ namespace DotNetNuke.Entities.Modules
             this.IconFile = Null.NullString;
             this.Header = Null.NullString;
             this.Footer = Null.NullString;
+			Logger.LogDebug("ModuleInfo(): this.authorizedEditRoles → {Arg0}", this.authorizedEditRoles);
+			Logger.LogDebug("ModuleInfo(): this.authorizedViewRoles → {Arg0}", this.authorizedViewRoles);
+			Logger.LogDebug("ModuleInfo(): Alignment → {Alignment}", Alignment);
+			Logger.LogDebug("ModuleInfo(): this.Alignment → {Arg0}", this.Alignment);
+			Logger.LogDebug("ModuleInfo(): Color → {Color}", Color);
+			Logger.LogDebug("ModuleInfo(): this.Color → {Arg0}", this.Color);
+			Logger.LogDebug("ModuleInfo(): Border → {Border}", Border);
+			Logger.LogDebug("ModuleInfo(): this.Border → {Arg0}", this.Border);
+			Logger.LogDebug("ModuleInfo(): IconFile → {IconFile}", IconFile);
+			Logger.LogDebug("ModuleInfo(): this.IconFile → {Arg0}", this.IconFile);
+			Logger.LogDebug("ModuleInfo(): Header → {Header}", Header);
+			Logger.LogDebug("ModuleInfo(): this.Header → {Arg0}", this.Header);
+			Logger.LogDebug("ModuleInfo(): Footer → {Footer}", Footer);
+			Logger.LogDebug("ModuleInfo(): this.Footer → {Arg0}", this.Footer);
             this.StartDate = Null.NullDate;
             this.EndDate = Null.NullDate;
             this.ContainerSrc = Null.NullString;
@@ -81,6 +109,24 @@ namespace DotNetNuke.Entities.Modules
 
             // Default Language Guid should be initialised to a null Guid
             this.defaultLanguageGuid = Null.NullGuid;
+			Logger.LogDebug("<<< Exiting ModuleInfo()");
+			Logger.LogDebug("ModuleInfo(): StartDate → {StartDate}", StartDate);
+			Logger.LogDebug("ModuleInfo(): this.StartDate → {Arg0}", this.StartDate);
+			Logger.LogDebug("ModuleInfo(): EndDate → {EndDate}", EndDate);
+			Logger.LogDebug("ModuleInfo(): this.EndDate → {Arg0}", this.EndDate);
+			Logger.LogDebug("ModuleInfo(): ContainerSrc → {ContainerSrc}", ContainerSrc);
+			Logger.LogDebug("ModuleInfo(): this.ContainerSrc → {Arg0}", this.ContainerSrc);
+			Logger.LogDebug("ModuleInfo(): DisplayTitle → {DisplayTitle}", DisplayTitle);
+			Logger.LogDebug("ModuleInfo(): this.DisplayTitle → {Arg0}", this.DisplayTitle);
+			Logger.LogDebug("ModuleInfo(): DisplayPrint → {DisplayPrint}", DisplayPrint);
+			Logger.LogDebug("ModuleInfo(): this.DisplayPrint → {Arg0}", this.DisplayPrint);
+			Logger.LogDebug("ModuleInfo(): DisplaySyndicate → {DisplaySyndicate}", DisplaySyndicate);
+			Logger.LogDebug("ModuleInfo(): this.DisplaySyndicate → {Arg0}", this.DisplaySyndicate);
+			Logger.LogDebug("ModuleInfo(): UniqueId → {UniqueId}", UniqueId);
+			Logger.LogDebug("ModuleInfo(): VersionGuid → {VersionGuid}", VersionGuid);
+			Logger.LogDebug("ModuleInfo(): localizedVersionGuid → {LocalizedVersionGuid}", localizedVersionGuid);
+			Logger.LogDebug("ModuleInfo(): defaultLanguageGuid → {DefaultLanguageGuid}", defaultLanguageGuid);
+			Logger.LogDebug("ModuleInfo(): this.defaultLanguageGuid → {Arg0}", this.defaultLanguageGuid);
         }
 
         /// <summary>Gets the Associated Desktop Module.</summary>
@@ -536,57 +582,88 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="dr">The Data Reader to use.</param>
         public override void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             // Call the base classes fill method to populate base class properties
             this.FillInternal(dr);
 
             this.UniqueId = Null.SetNullGuid(dr["UniqueId"]);
+			Logger.LogDebug("Fill(dr={Dr}): UniqueId → {UniqueId}", dr, UniqueId);
+			Logger.LogDebug("Fill(dr={Dr}): DefaultLanguageGuid → {DefaultLanguageGuid}", dr, DefaultLanguageGuid);
+			Logger.LogDebug("Fill(dr={Dr}): LocalizedVersionGuid → {LocalizedVersionGuid}", dr, LocalizedVersionGuid);
             this.VersionGuid = Null.SetNullGuid(dr["VersionGuid"]);
+			Logger.LogDebug("Fill(dr={Dr}): VersionGuid → {VersionGuid}", dr, VersionGuid);
             this.DefaultLanguageGuid = Null.SetNullGuid(dr["DefaultLanguageGuid"]);
             this.LocalizedVersionGuid = Null.SetNullGuid(dr["LocalizedVersionGuid"]);
             this.CultureCode = Null.SetNullString(dr["CultureCode"]);
+			Logger.LogDebug("Fill(dr={Dr}): CultureCode → {CultureCode}", dr, CultureCode);
 
             this.PortalID = Null.SetNullInteger(dr["PortalID"]);
+			Logger.LogDebug("Fill(dr={Dr}): PortalID → {PortalID}", dr, PortalID);
             if (dr.GetSchemaTable().Select("ColumnName = 'OwnerPortalID'").Length > 0)
             {
                 this.OwnerPortalID = Null.SetNullInteger(dr["OwnerPortalID"]);
+				Logger.LogDebug("Fill(dr={Dr}): OwnerPortalID → {OwnerPortalID}", dr, OwnerPortalID);
             }
 
             this.ModuleDefID = Null.SetNullInteger(dr["ModuleDefID"]);
+			Logger.LogDebug("Fill(dr={Dr}): ModuleDefID → {ModuleDefID}", dr, ModuleDefID);
             this.ModuleTitle = Null.SetNullString(dr["ModuleTitle"]);
+			Logger.LogDebug("Fill(dr={Dr}): ModuleTitle → {ModuleTitle}", dr, ModuleTitle);
             this.AllTabs = Null.SetNullBoolean(dr["AllTabs"]);
+			Logger.LogDebug("Fill(dr={Dr}): AllTabs → {AllTabs}", dr, AllTabs);
             this.IsDeleted = Null.SetNullBoolean(dr["IsDeleted"]);
+			Logger.LogDebug("Fill(dr={Dr}): IsDeleted → {IsDeleted}", dr, IsDeleted);
             this.InheritViewPermissions = Null.SetNullBoolean(dr["InheritViewPermissions"]);
+			Logger.LogDebug("Fill(dr={Dr}): InheritViewPermissions → {InheritViewPermissions}", dr, InheritViewPermissions);
 
             if (dr.GetSchemaTable().Select("ColumnName = 'IsShareable'").Length > 0)
             {
                 this.IsShareable = Null.SetNullBoolean(dr["IsShareable"]);
+				Logger.LogDebug("Fill(dr={Dr}): IsShareable → {IsShareable}", dr, IsShareable);
             }
 
             if (dr.GetSchemaTable().Select("ColumnName = 'IsShareableViewOnly'").Length > 0)
             {
                 this.IsShareableViewOnly = Null.SetNullBoolean(dr["IsShareableViewOnly"]);
+				Logger.LogDebug("Fill(dr={Dr}): IsShareableViewOnly → {IsShareableViewOnly}", dr, IsShareableViewOnly);
             }
 
             this.Header = Null.SetNullString(dr["Header"]);
+			Logger.LogDebug("Fill(dr={Dr}): Header → {Header}", dr, Header);
+			Logger.LogDebug("Fill(dr={Dr}): StartDate → {StartDate}", dr, StartDate);
+			Logger.LogDebug("Fill(dr={Dr}): EndDate → {EndDate}", dr, EndDate);
             this.Footer = Null.SetNullString(dr["Footer"]);
+			Logger.LogDebug("Fill(dr={Dr}): Footer → {Footer}", dr, Footer);
             this.StartDate = Null.SetNullDateTime(dr["StartDate"]);
             this.EndDate = Null.SetNullDateTime(dr["EndDate"]);
             this.LastContentModifiedOnDate = Null.SetNullDateTime(dr["LastContentModifiedOnDate"]);
             try
             {
                 this.TabModuleID = Null.SetNullInteger(dr["TabModuleID"]);
+				Logger.LogDebug("Fill(dr={Dr}): TabModuleID → {TabModuleID}", dr, TabModuleID);
+				Logger.LogDebug("Fill(dr={Dr}): Alignment → {Alignment}", dr, Alignment);
+				Logger.LogDebug("Fill(dr={Dr}): Color → {Color}", dr, Color);
+				Logger.LogDebug("Fill(dr={Dr}): Border → {Border}", dr, Border);
+				Logger.LogDebug("Fill(dr={Dr}): IconFile → {IconFile}", dr, IconFile);
                 this.ModuleOrder = Null.SetNullInteger(dr["ModuleOrder"]);
+				Logger.LogDebug("Fill(dr={Dr}): ModuleOrder → {ModuleOrder}", dr, ModuleOrder);
                 this.PaneName = Null.SetNullString(dr["PaneName"]);
+				Logger.LogDebug("Fill(dr={Dr}): PaneName → {PaneName}", dr, PaneName);
                 this.CacheTime = Null.SetNullInteger(dr["CacheTime"]);
+				Logger.LogDebug("Fill(dr={Dr}): CacheTime → {CacheTime}", dr, CacheTime);
                 this.CacheMethod = Null.SetNullString(dr["CacheMethod"]);
+				Logger.LogDebug("Fill(dr={Dr}): CacheMethod → {CacheMethod}", dr, CacheMethod);
                 this.Alignment = Null.SetNullString(dr["Alignment"]);
                 this.Color = Null.SetNullString(dr["Color"]);
                 this.Border = Null.SetNullString(dr["Border"]);
                 this.IconFile = Null.SetNullString(dr["IconFile"]);
                 int visible = Null.SetNullInteger(dr["Visibility"]);
                 if (visible == Null.NullInteger)
+				Logger.LogDebug("Fill(dr={Dr}): visible → {Visible}", dr, visible);
                 {
                     this.Visibility = VisibilityState.Maximized;
+					Logger.LogDebug("Fill(dr={Dr}): Visibility → {Visibility}", dr, Visibility);
+					Logger.LogDebug("Fill(dr={Dr}): this.Visibility → {Arg1}", dr, this.Visibility);
                 }
                 else
                 {
@@ -605,24 +682,33 @@ namespace DotNetNuke.Entities.Modules
                 }
 
                 this.ContainerSrc = Null.SetNullString(dr["ContainerSrc"]);
+				Logger.LogDebug("Fill(dr={Dr}): ContainerSrc → {ContainerSrc}", dr, ContainerSrc);
+				Logger.LogDebug("Fill(dr={Dr}): DisplayPrint → {DisplayPrint}", dr, DisplayPrint);
+				Logger.LogDebug("Fill(dr={Dr}): DisplaySyndicate → {DisplaySyndicate}", dr, DisplaySyndicate);
+				Logger.LogDebug("Fill(dr={Dr}): DesktopModuleID → {DesktopModuleID}", dr, DesktopModuleID);
                 this.DisplayTitle = Null.SetNullBoolean(dr["DisplayTitle"]);
+				Logger.LogDebug("Fill(dr={Dr}): DisplayTitle → {DisplayTitle}", dr, DisplayTitle);
                 this.DisplayPrint = Null.SetNullBoolean(dr["DisplayPrint"]);
                 this.DisplaySyndicate = Null.SetNullBoolean(dr["DisplaySyndicate"]);
                 this.DesktopModuleID = Null.SetNullInteger(dr["DesktopModuleID"]);
                 this.ModuleControlId = Null.SetNullInteger(dr["ModuleControlID"]);
+				Logger.LogDebug("Fill(dr={Dr}): ModuleControlId → {ModuleControlId}", dr, ModuleControlId);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
             }
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope currentScope, ref bool propertyNotFound)
         {
+			Logger.LogDebug(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound);
             string outputFormat = string.Empty;
             if (format == string.Empty)
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): outputFormat → {OutputFormat}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, outputFormat);
             {
                 outputFormat = "g";
             }
@@ -635,8 +721,11 @@ namespace DotNetNuke.Entities.Modules
 
             propertyNotFound = true;
             string result = string.Empty;
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): propertyNotFound → {PropertyNotFound1}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, propertyNotFound);
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): result → {Result}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, result);
             bool isPublic = true;
             switch (propertyName.ToLowerInvariant())
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): isPublic → {IsPublic}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, isPublic);
             {
                 case "portalid":
                     propertyNotFound = false;
@@ -909,11 +998,13 @@ namespace DotNetNuke.Entities.Modules
                 result = PropertyAccess.ContentLocked;
             }
 
+			Logger.LogDebug("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound);
             return result;
         }
 
         public ModuleInfo Clone()
         {
+			Logger.LogDebug(">>> Entering Clone()");
             var objModuleInfo = new ModuleInfo
             {
                 PortalID = this.PortalID,
@@ -961,15 +1052,18 @@ namespace DotNetNuke.Entities.Modules
 
             // localized properties
             this.Clone(objModuleInfo, this);
+			Logger.LogDebug("<<< Exiting Clone()");
             return objModuleInfo;
         }
 
         public string GetEffectiveCacheMethod()
         {
+			Logger.LogDebug(">>> Entering GetEffectiveCacheMethod()");
             string effectiveCacheMethod;
             if (!string.IsNullOrEmpty(this.CacheMethod))
             {
                 effectiveCacheMethod = this.CacheMethod;
+				Logger.LogDebug("GetEffectiveCacheMethod(): effectiveCacheMethod → {EffectiveCacheMethod}", effectiveCacheMethod);
             }
             else if (!string.IsNullOrEmpty(Host.Host.ModuleCachingMethod))
             {
@@ -979,6 +1073,7 @@ namespace DotNetNuke.Entities.Modules
             {
                 var defaultModuleCache = ComponentFactory.GetComponent<ModuleCachingProvider>();
                 effectiveCacheMethod = (from provider in ModuleCachingProvider.GetProviderList() where provider.Value.Equals(defaultModuleCache) select provider.Key).SingleOrDefault();
+				Logger.LogDebug("GetEffectiveCacheMethod(): defaultModuleCache → {DefaultModuleCache}", defaultModuleCache);
             }
 
             if (string.IsNullOrEmpty(effectiveCacheMethod))
@@ -986,16 +1081,66 @@ namespace DotNetNuke.Entities.Modules
                 throw new InvalidOperationException(Localization.GetString("EXCEPTION_ModuleCacheMissing"));
             }
 
+			Logger.LogDebug("<<< Exiting GetEffectiveCacheMethod()");
             return effectiveCacheMethod;
         }
 
         public void Initialize(int portalId)
         {
+			Logger.LogDebug(">>> Entering Initialize(portalId={PortalId})", portalId);
             this.PortalID = portalId;
             this.OwnerPortalID = portalId;
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.PortalID → {Arg1}", portalId, this.PortalID);
+			Logger.LogDebug("Initialize(portalId={PortalId}): OwnerPortalID → {OwnerPortalID}", portalId, OwnerPortalID);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.OwnerPortalID → {Arg1}", portalId, this.OwnerPortalID);
+			Logger.LogDebug("Initialize(portalId={PortalId}): ModuleOrder → {ModuleOrder}", portalId, ModuleOrder);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.ModuleOrder → {Arg1}", portalId, this.ModuleOrder);
+			Logger.LogDebug("Initialize(portalId={PortalId}): PaneName → {PaneName}", portalId, PaneName);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.PaneName → {Arg1}", portalId, this.PaneName);
+			Logger.LogDebug("Initialize(portalId={PortalId}): ModuleTitle → {ModuleTitle}", portalId, ModuleTitle);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.ModuleTitle → {Arg1}", portalId, this.ModuleTitle);
+			Logger.LogDebug("Initialize(portalId={PortalId}): CacheTime → {CacheTime}", portalId, CacheTime);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.CacheTime → {Arg1}", portalId, this.CacheTime);
+			Logger.LogDebug("Initialize(portalId={PortalId}): CacheMethod → {CacheMethod}", portalId, CacheMethod);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.CacheMethod → {Arg1}", portalId, this.CacheMethod);
+			Logger.LogDebug("Initialize(portalId={PortalId}): Alignment → {Alignment}", portalId, Alignment);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.Alignment → {Arg1}", portalId, this.Alignment);
+			Logger.LogDebug("Initialize(portalId={PortalId}): Color → {Color}", portalId, Color);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.Color → {Arg1}", portalId, this.Color);
+			Logger.LogDebug("Initialize(portalId={PortalId}): Border → {Border}", portalId, Border);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.Border → {Arg1}", portalId, this.Border);
+			Logger.LogDebug("Initialize(portalId={PortalId}): IconFile → {IconFile}", portalId, IconFile);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.IconFile → {Arg1}", portalId, this.IconFile);
+			Logger.LogDebug("Initialize(portalId={PortalId}): AllTabs → {AllTabs}", portalId, AllTabs);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.AllTabs → {Arg1}", portalId, this.AllTabs);
+			Logger.LogDebug("Initialize(portalId={PortalId}): Visibility → {Visibility}", portalId, Visibility);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.Visibility → {Arg1}", portalId, this.Visibility);
+			Logger.LogDebug("Initialize(portalId={PortalId}): IsDeleted → {IsDeleted}", portalId, IsDeleted);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.IsDeleted → {Arg1}", portalId, this.IsDeleted);
+			Logger.LogDebug("Initialize(portalId={PortalId}): Header → {Header}", portalId, Header);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.Header → {Arg1}", portalId, this.Header);
+			Logger.LogDebug("Initialize(portalId={PortalId}): Footer → {Footer}", portalId, Footer);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.Footer → {Arg1}", portalId, this.Footer);
+			Logger.LogDebug("Initialize(portalId={PortalId}): StartDate → {StartDate}", portalId, StartDate);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.StartDate → {Arg1}", portalId, this.StartDate);
+			Logger.LogDebug("Initialize(portalId={PortalId}): EndDate → {EndDate}", portalId, EndDate);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.EndDate → {Arg1}", portalId, this.EndDate);
+			Logger.LogDebug("Initialize(portalId={PortalId}): DisplayTitle → {DisplayTitle}", portalId, DisplayTitle);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.DisplayTitle → {Arg1}", portalId, this.DisplayTitle);
+			Logger.LogDebug("Initialize(portalId={PortalId}): DisplayPrint → {DisplayPrint}", portalId, DisplayPrint);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.DisplayPrint → {Arg1}", portalId, this.DisplayPrint);
+			Logger.LogDebug("Initialize(portalId={PortalId}): DisplaySyndicate → {DisplaySyndicate}", portalId, DisplaySyndicate);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.DisplaySyndicate → {Arg1}", portalId, this.DisplaySyndicate);
+			Logger.LogDebug("Initialize(portalId={PortalId}): InheritViewPermissions → {InheritViewPermissions}", portalId, InheritViewPermissions);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.InheritViewPermissions → {Arg1}", portalId, this.InheritViewPermissions);
+			Logger.LogDebug("Initialize(portalId={PortalId}): IsShareable → {IsShareable}", portalId, IsShareable);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.IsShareable → {Arg1}", portalId, this.IsShareable);
+			Logger.LogDebug("Initialize(portalId={PortalId}): IsShareableViewOnly → {IsShareableViewOnly}", portalId, IsShareableViewOnly);
             this.ModuleDefID = Null.NullInteger;
             this.ModuleOrder = Null.NullInteger;
             this.PaneName = Null.NullString;
+			Logger.LogDebug("Initialize(portalId={PortalId}): ModuleDefID → {ModuleDefID}", portalId, ModuleDefID);
+			Logger.LogDebug("Initialize(portalId={PortalId}): this.ModuleDefID → {Arg1}", portalId, this.ModuleDefID);
             this.ModuleTitle = Null.NullString;
             this.CacheTime = 0;
             this.CacheMethod = Null.NullString;
@@ -1028,6 +1173,7 @@ namespace DotNetNuke.Entities.Modules
             {
                 ModuleInfo objModule = ModuleController.Instance.GetModule(PortalSettings.Current.DefaultModuleId, PortalSettings.Current.DefaultTabId, true);
                 if (objModule != null)
+				Logger.LogDebug("Initialize(portalId={PortalId}): objModule → {ObjModule}", portalId, objModule);
                 {
                     this.Alignment = objModule.Alignment;
                     this.Color = objModule.Color;
@@ -1040,6 +1186,7 @@ namespace DotNetNuke.Entities.Modules
                     this.DisplaySyndicate = objModule.DisplaySyndicate;
                 }
             }
+			Logger.LogDebug("<<< Exiting Initialize(portalId={PortalId})", portalId);
         }
     }
 }

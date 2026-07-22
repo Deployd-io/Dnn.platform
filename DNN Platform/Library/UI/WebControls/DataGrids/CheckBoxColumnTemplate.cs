@@ -13,10 +13,15 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>The CheckBoxColumnTemplate provides a Template for the CheckBoxColumn.</summary>
     public class CheckBoxColumnTemplate : ITemplate
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="CheckBoxColumnTemplate"/> class.</summary>
         public CheckBoxColumnTemplate()
             : this(ListItemType.Item)
         {
+		Logger.LogDebug(">>> Entering CheckBoxColumnTemplate()");
+		Logger.LogDebug("<<< Exiting CheckBoxColumnTemplate()");
+		Logger.LogDebug(">>> Entering CheckBoxColumnTemplate(itemType={ItemType})", itemType);
+		Logger.LogDebug("<<< Exiting CheckBoxColumnTemplate(itemType={ItemType})", itemType);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CheckBoxColumnTemplate"/> class.</summary>
@@ -24,6 +29,7 @@ namespace DotNetNuke.UI.WebControls
         public CheckBoxColumnTemplate(ListItemType itemType)
         {
             this.ItemType = itemType;
+			Logger.LogDebug("CheckBoxColumnTemplate(itemType={ItemType}): this.ItemType → {Arg1}", itemType, this.ItemType);
         }
 
         public event DNNDataGridCheckedColumnEventHandler CheckedChanged;
@@ -98,13 +104,17 @@ namespace DotNetNuke.UI.WebControls
         /// <summary>Called when the template item is Data Bound.</summary>
         private void Item_DataBinding(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering Item_DataBinding(sender={Sender},e={E})", sender, e);
             var box = (CheckBox)sender;
             var container = (DataGridItem)box.NamingContainer;
+			Logger.LogDebug("Item_DataBinding(sender={Sender},e={E}): box → {Box}", sender, e, box);
+			Logger.LogDebug("Item_DataBinding(sender={Sender},e={E}): container → {Container}", sender, e, container);
             if (!string.IsNullOrEmpty(this.DataField) && this.ItemType != ListItemType.Header)
             {
                 if (this.DesignMode)
                 {
                     box.Checked = false;
+					Logger.LogDebug("Item_DataBinding(sender={Sender},e={E}): box.Checked → {Arg2}", sender, e, box.Checked);
                 }
                 else
                 {
@@ -121,6 +131,7 @@ namespace DotNetNuke.UI.WebControls
                 if (this.DesignMode)
                 {
                     box.Enabled = false;
+					Logger.LogDebug("Item_DataBinding(sender={Sender},e={E}): box.Enabled → {Arg2}", sender, e, box.Enabled);
                 }
                 else
                 {
@@ -131,17 +142,22 @@ namespace DotNetNuke.UI.WebControls
             {
                 box.Enabled = this.Enabled;
             }
+			Logger.LogDebug("<<< Exiting Item_DataBinding(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Centralised Event that is raised whenever a check box's state is modified.</summary>
         private void OnCheckChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnCheckChanged(sender={Sender},e={E})", sender, e);
             var box = (CheckBox)sender;
             var container = (DataGridItem)box.NamingContainer;
+			Logger.LogDebug("OnCheckChanged(sender={Sender},e={E}): box → {Box}", sender, e, box);
+			Logger.LogDebug("OnCheckChanged(sender={Sender},e={E}): container → {Container}", sender, e, container);
             DNNDataGridCheckChangedEventArgs evntArgs;
             if (container.ItemIndex == Null.NullInteger)
             {
                 evntArgs = new DNNDataGridCheckChangedEventArgs(container, box.Checked, this.DataField, true);
+				Logger.LogDebug("OnCheckChanged(sender={Sender},e={E}): evntArgs → {EvntArgs}", sender, e, evntArgs);
             }
             else
             {
@@ -152,6 +168,7 @@ namespace DotNetNuke.UI.WebControls
             {
                 this.CheckedChanged(sender, evntArgs);
             }
+			Logger.LogDebug("<<< Exiting OnCheckChanged(sender={Sender},e={E})", sender, e);
         }
     }
 }

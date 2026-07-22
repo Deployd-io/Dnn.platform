@@ -35,9 +35,12 @@ namespace log4net.Layout
     /// <author>Nicko Cadell</author>
     public class RawPropertyLayout : IRawLayout
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Constructs a RawPropertyLayout</summary>
         public RawPropertyLayout()
         {
+		Logger.LogDebug(">>> Entering RawPropertyLayout()");
+		Logger.LogDebug("<<< Exiting RawPropertyLayout()");
         }
 
         private string m_key;
@@ -69,6 +72,8 @@ namespace log4net.Layout
         /// </remarks>
         public virtual object Format(LoggingEvent loggingEvent)
         {
+			Logger.LogDebug(">>> Entering Format(loggingEvent={LoggingEvent})", loggingEvent);
+			Logger.LogDebug("<<< Exiting Format(loggingEvent={LoggingEvent})", loggingEvent);
             return loggingEvent.LookupProperty(this.m_key);
         }
     }

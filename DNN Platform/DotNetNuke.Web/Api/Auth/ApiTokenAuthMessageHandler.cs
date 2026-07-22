@@ -30,8 +30,13 @@ namespace DotNetNuke.Web.Api.Auth
         public ApiTokenAuthMessageHandler(bool includeByDefault, bool forceSsl, IApiTokenController apiTokenController)
             : base(includeByDefault, forceSsl)
         {
+			Logger.LogDebug(">>> Entering ApiTokenAuthMessageHandler(includeByDefault={IncludeByDefault},forceSsl={ForceSsl},apiTokenController={ApiTokenController})", includeByDefault, forceSsl, apiTokenController);
             IsEnabled = true;
             this.apiTokenController = apiTokenController;
+			Logger.LogDebug("<<< Exiting ApiTokenAuthMessageHandler(includeByDefault={IncludeByDefault},forceSsl={ForceSsl},apiTokenController={ApiTokenController})", includeByDefault, forceSsl, apiTokenController);
+			Logger.LogDebug("ApiTokenAuthMessageHandler(includeByDefault={IncludeByDefault},forceSsl={ForceSsl},apiTokenController={ApiTokenController}): apiTokenController → {ApiTokenController1}", includeByDefault, forceSsl, apiTokenController, apiTokenController);
+			Logger.LogDebug("ApiTokenAuthMessageHandler(includeByDefault={IncludeByDefault},forceSsl={ForceSsl},apiTokenController={ApiTokenController}): this.apiTokenController → {Arg3}", includeByDefault, forceSsl, apiTokenController, this.apiTokenController);
+			Logger.LogDebug("ApiTokenAuthMessageHandler(includeByDefault={IncludeByDefault},forceSsl={ForceSsl},apiTokenController={ApiTokenController}): IsEnabled → {IsEnabled}", includeByDefault, forceSsl, apiTokenController, IsEnabled);
         }
 
         /// <inheritdoc />
@@ -48,16 +53,19 @@ namespace DotNetNuke.Web.Api.Auth
         /// <inheritdoc />
         public override HttpResponseMessage OnInboundRequest(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+			Logger.LogDebug(">>> Entering OnInboundRequest(request={Request},cancellationToken={CancellationToken})", request, cancellationToken);
             if (this.NeedsAuthentication(request))
             {
                 this.TryToAuthenticate(request);
             }
 
+			Logger.LogDebug("<<< Exiting OnInboundRequest(request={Request},cancellationToken={CancellationToken})", request, cancellationToken);
             return base.OnInboundRequest(request, cancellationToken);
         }
 
         private void TryToAuthenticate(HttpRequestMessage request)
         {
+			Logger.LogDebug(">>> Entering TryToAuthenticate(request={Request})", request);
             try
             {
                 var (token, user) = this.apiTokenController.ValidateToken(request);
@@ -80,6 +88,7 @@ namespace DotNetNuke.Web.Api.Auth
             {
                 Logger.Error("Unexpected error authenticating API Token. " + ex);
             }
+			Logger.LogDebug("<<< Exiting TryToAuthenticate(request={Request})", request);
         }
     }
 }

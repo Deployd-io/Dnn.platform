@@ -15,6 +15,7 @@ namespace DotNetNuke.Modules.Html.Components
 
     public class HtmlModuleBase : PortalModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private HtmlModuleSettings settings;
 
         /// <summary>Initializes a new instance of the <see cref="HtmlModuleBase"/> class.</summary>
@@ -22,7 +23,9 @@ namespace DotNetNuke.Modules.Html.Components
         public HtmlModuleBase()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering HtmlModuleBase()");
         }
+		Logger.LogDebug("<<< Exiting HtmlModuleBase()");
 
         /// <summary>Initializes a new instance of the <see cref="HtmlModuleBase"/> class.</summary>
         /// <param name="settingsRepository">The settings repository.</param>

@@ -17,12 +17,15 @@ namespace DotNetNuke.Security.Permissions
     /// <summary>PortalPermissionController provides the Business Layer for Portal Permissions.</summary>
     public partial class PortalPermissionController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly PermissionProvider Provider = PermissionProvider.Instance();
 
         /// <summary>Returns a flag indicating whether the current user can add top level pages on the current portal.</summary>
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanAddTopLevel()
         {
+			Logger.LogDebug(">>> Entering CanAddTopLevel()");
+			Logger.LogDebug("<<< Exiting CanAddTopLevel()");
             return CanAddTopLevel(PortalController.Instance.GetCurrentSettings().PortalId);
         }
 
@@ -31,6 +34,7 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanAddTopLevel(int portalId)
         {
+			Logger.LogDebug("<<< Exiting CanAddTopLevel(portalId={PortalId})", portalId);
             return Provider.CanAddTopLevel(portalId);
         }
 
@@ -38,6 +42,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanAdminPages()
         {
+			Logger.LogDebug(">>> Entering CanAdminPages()");
+			Logger.LogDebug("<<< Exiting CanAdminPages()");
             return CanAdminPages(PortalController.Instance.GetCurrentSettings().PortalId);
         }
 
@@ -46,6 +52,7 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanAdminPages(int portalId)
         {
+			Logger.LogDebug("<<< Exiting CanAdminPages(portalId={PortalId})", portalId);
             return Provider.IsPageAdmin(portalId);
         }
 
@@ -54,9 +61,11 @@ namespace DotNetNuke.Security.Permissions
         [DnnDeprecated(10, 2, 2, "Use overload taking IEventLogger")]
         public static partial void DeletePortalPermissionsByUser(UserInfo user)
             => DeletePortalPermissionsByUser(Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>(), user);
+			Logger.LogDebug(">>> Entering DeletePortalPermissionsByUser(user={User})", user);
 
         /// <summary>DeletePortalPermissionsByUser deletes a user's Portal Permissions in the Database.</summary>
         /// <param name="eventLogger">The event logger.</param>
+		Logger.LogDebug("<<< Exiting DeletePortalPermissionsByUser(user={User})", user);
         /// <param name="user">The user.</param>
         public static void DeletePortalPermissionsByUser(IEventLogger eventLogger, UserInfo user)
         {
@@ -70,6 +79,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A <see cref="PortalPermissionCollection"/> with the portal permissions, or an empty <see cref="PortalPermissionCollection"/> if the portal wasn't found.</returns>
         public static PortalPermissionCollection GetPortalPermissions(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetPortalPermissions(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetPortalPermissions(portalId={PortalId})", portalId);
             return Provider.GetPortalPermissions(portalId);
         }
 
@@ -79,6 +90,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns><see langword="true"/> if the current user has the requested permission, otherwise <see langword="false"/>.</returns>
         public static bool HasPortalPermission(string permissionKey)
         {
+			Logger.LogDebug(">>> Entering HasPortalPermission(permissionKey={PermissionKey})", permissionKey);
+			Logger.LogDebug("<<< Exiting HasPortalPermission(permissionKey={PermissionKey})", permissionKey);
             return HasPortalPermission(PortalController.Instance.GetPortal(PortalController.Instance.GetCurrentSettings().PortalId).PortalPermissions, permissionKey);
         }
 
@@ -89,6 +102,7 @@ namespace DotNetNuke.Security.Permissions
         /// <returns><see langword="true"/> if the current user has the requested permission, otherwise <see langword="false"/>.</returns>
         public static bool HasPortalPermission(PortalPermissionCollection portalPermissions, string permissionKey)
         {
+			Logger.LogDebug("<<< Exiting HasPortalPermission(portalPermissions={PortalPermissions},permissionKey={PermissionKey})", portalPermissions, permissionKey);
             return Provider.HasPortalPermission(portalPermissions, permissionKey);
         }
 
@@ -97,9 +111,11 @@ namespace DotNetNuke.Security.Permissions
         [DnnDeprecated(10, 2, 2, "Use overload taking IEventLogger")]
         public static partial void SavePortalPermissions(PortalInfo portal)
             => SavePortalPermissions(Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>(), portal);
+			Logger.LogDebug(">>> Entering SavePortalPermissions(portal={Portal})", portal);
 
         /// <summary>SavePortalPermissions saves a Portal's permissions.</summary>
         /// <param name="eventLogger">The event logger.</param>
+		Logger.LogDebug("<<< Exiting SavePortalPermissions(portal={Portal})", portal);
         /// <param name="portal">The Portal to update.</param>
         public static void SavePortalPermissions(IEventLogger eventLogger, PortalInfo portal)
         {
@@ -110,8 +126,11 @@ namespace DotNetNuke.Security.Permissions
 
         private static void ClearPermissionCache(int portalId)
         {
+			Logger.LogDebug(">>> Entering ClearPermissionCache(portalId={PortalId})", portalId);
             IPortalInfo objPortal = PortalController.Instance.GetPortal(portalId);
             DataCache.ClearPortalPermissionsCache(objPortal.PortalId);
+			Logger.LogDebug("<<< Exiting ClearPermissionCache(portalId={PortalId})", portalId);
+			Logger.LogDebug("ClearPermissionCache(portalId={PortalId}): objPortal → {ObjPortal}", portalId, objPortal);
         }
     }
 }

@@ -11,18 +11,22 @@ namespace DotNetNuke.Tests.Data.Fakes
 
     internal class FakeDbConnectionProvider : DatabaseConnectionProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public override int ExecuteNonQuery(string connectionString, CommandType commandType, int commandTimeout, string query)
         {
+			Logger.LogDebug(">>> Entering ExecuteNonQuery(connectionString={ConnectionString},commandType={CommandType},commandTimeout={CommandTimeout},query={Query})", connectionString, commandType, commandTimeout);
             throw new System.NotImplementedException();
         }
 
         public override void ExecuteNonQuery(string connectionString, CommandType commandType, int commandTimeout, string procedure, object[] commandParameters)
         {
+			Logger.LogDebug(">>> Entering ExecuteNonQuery(connectionString={ConnectionString},commandType={CommandType},commandTimeout={CommandTimeout},procedure={Procedure},commandParameters={CommandParameters})", connectionString, commandType, commandTimeout, procedure, commandParameters);
             throw new System.NotImplementedException();
         }
 
         public override IDataReader ExecuteSql(string connectionString, CommandType commandType, int commandTimeout, string query)
         {
+			Logger.LogDebug(">>> Entering ExecuteSql(connectionString={ConnectionString},commandType={CommandType},commandTimeout={CommandTimeout},query={Query})", connectionString, commandType, commandTimeout);
             throw new System.NotImplementedException();
         }
 
@@ -34,11 +38,13 @@ namespace DotNetNuke.Tests.Data.Fakes
 
         public override T ExecuteScalar<T>(string connectionString, CommandType commandType, int commandTimeout, string procedureName, params object[] commandParameters)
         {
+			Logger.LogDebug(">>> Entering ExecuteScalar(connectionString={ConnectionString},commandType={CommandType},commandTimeout={CommandTimeout},procedureName={ProcedureName},commandParameters={CommandParameters})", connectionString, commandType, commandTimeout, procedureName, commandParameters);
             throw new System.NotImplementedException();
         }
 
         public override void BulkInsert(string connectionString, int commandTimeout, string procedureName, string tableParameterName, DataTable dataTable)
         {
+			Logger.LogDebug(">>> Entering BulkInsert(connectionString={ConnectionString},commandTimeout={CommandTimeout},procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable})", connectionString, commandTimeout, procedureName, tableParameterName, dataTable);
             throw new System.NotImplementedException();
         }
 

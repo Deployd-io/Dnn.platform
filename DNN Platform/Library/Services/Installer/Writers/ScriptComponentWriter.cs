@@ -18,6 +18,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// </summary>
     public class ScriptComponentWriter : FileComponentWriter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ScriptComponentWriter"/> class.</summary>
         /// <param name="basePath">The script files base path.</param>
         /// <param name="scripts">The script files.</param>
@@ -60,9 +61,12 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <inheritdoc />
         protected override void WriteFileElement(XmlWriter writer, InstallFile file)
         {
+			Logger.LogDebug(">>> Entering WriteFileElement(writer={Writer},file={File})", writer, file);
             this.Log.AddInfo(string.Format(CultureInfo.InvariantCulture, Util.WRITER_AddFileToManifest, file.Name));
             string type = "Install";
             string version = Null.NullString;
+			Logger.LogDebug("WriteFileElement(writer={Writer},file={File}): type → {Type}", writer, file, type);
+			Logger.LogDebug("WriteFileElement(writer={Writer},file={File}): version → {Version}", writer, file, version);
             string fileName = Path.GetFileNameWithoutExtension(file.Name);
             if (fileName.Equals("uninstall", StringComparison.OrdinalIgnoreCase))
             {
@@ -113,6 +117,7 @@ namespace DotNetNuke.Services.Installer.Writers
 
             // Close file Element
             writer.WriteEndElement();
+			Logger.LogDebug("<<< Exiting WriteFileElement(writer={Writer},file={File})", writer, file);
         }
     }
 }

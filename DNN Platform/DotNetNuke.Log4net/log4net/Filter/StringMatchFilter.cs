@@ -37,6 +37,7 @@ namespace log4net.Filter
     /// <author>Gert Driesen</author>
     public class StringMatchFilter : FilterSkeleton
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Flag to indicate the behavior when we have a match</summary>
         protected bool m_acceptOnMatch = true;
 
@@ -52,6 +53,8 @@ namespace log4net.Filter
         /// <summary>Default constructor</summary>
         public StringMatchFilter()
         {
+		Logger.DebugFormat(">>> Entering StringMatchFilter()");
+		Logger.DebugFormat("<<< Exiting StringMatchFilter()");
         }
 
         /// <summary>Initialize and precompile the Regex if required</summary>
@@ -70,14 +73,17 @@ namespace log4net.Filter
         /// </remarks>
         public override void ActivateOptions() 
         {
+			Logger.DebugFormat(">>> Entering ActivateOptions()");
             if (this.m_stringRegexToMatch != null)
             {
 #if NETSTANDARD1_3
                 m_regexToMatch = new Regex(m_stringRegexToMatch);
+				Logger.DebugFormat("ActivateOptions(): m_regexToMatch → {0}", m_regexToMatch);
 #else
                 this.m_regexToMatch = new Regex(this.m_stringRegexToMatch, RegexOptions.Compiled);
 #endif
             }
+			Logger.DebugFormat("<<< Exiting ActivateOptions()");
         }
 
         /// <summary><see cref="FilterDecision.Accept"/> when matching <see cref="StringToMatch"/> or <see cref="RegexToMatch"/></summary>
@@ -153,6 +159,7 @@ namespace log4net.Filter
         /// </remarks>
         public override FilterDecision Decide(LoggingEvent loggingEvent) 
         {
+			Logger.DebugFormat(">>> Entering Decide(loggingEvent={0})", loggingEvent);
             if (loggingEvent == null)
             {
                 throw new ArgumentNullException("loggingEvent");
@@ -201,6 +208,7 @@ namespace log4net.Filter
                 } 
                 return FilterDecision.Deny;
             }
+			Logger.DebugFormat("<<< Exiting Decide(loggingEvent={0})", loggingEvent);
             return FilterDecision.Neutral;
 
         }

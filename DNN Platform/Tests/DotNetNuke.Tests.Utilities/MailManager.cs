@@ -11,13 +11,17 @@ using DotNetNuke.Tests.UI.WatiN.Utilities;
 
 public class MailManager
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     private static string GetEmailDumpFolderPath()
     {
+		Logger.LogDebug(">>> Entering GetEmailDumpFolderPath()");
+		Logger.LogDebug("<<< Exiting GetEmailDumpFolderPath()");
         return Directory.GetCurrentDirectory().Replace("\\Fixtures", "\\Packages") + "\\TestEmails";
     }
 
     public static void ClearDumpFolder()
     {
+		Logger.LogDebug(">>> Entering ClearDumpFolder()");
         string emailPath = GetEmailDumpFolderPath();
 
         if (Directory.Exists(emailPath))
@@ -27,12 +31,15 @@ public class MailManager
                 File.Delete(file);
             }
         }
+		Logger.LogDebug("<<< Exiting ClearDumpFolder()");
     }
 
     public static void SetUpMailDumpFolder()
     {
+		Logger.LogDebug(">>> Entering SetUpMailDumpFolder()");
         string emailPath = GetEmailDumpFolderPath();
         var mailDropPath = Directory.GetCurrentDirectory().Replace("\\Fixtures", "\\Community\\Tests\\Packages");
+		Logger.LogDebug("SetUpMailDumpFolder(): mailDropPath → {MailDropPath}", mailDropPath);
 
         if (!Directory.Exists(emailPath))
         {
@@ -41,5 +48,6 @@ public class MailManager
 
         WebConfigManager.UpdateConfigForMailDrop(mailDropPath, emailPath);
         HostController.Instance.Update("SMTPServer", "localhost", false);
+		Logger.LogDebug("<<< Exiting SetUpMailDumpFolder()");
     }
 }

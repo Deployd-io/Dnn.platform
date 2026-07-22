@@ -27,6 +27,7 @@ namespace DotNetNuke.Entities.Urls
 
     public class ExtensionUrlProviderController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly object ProvidersBuildLock = new object();
 
         private static readonly Regex RewrittenUrlRegex = new Regex(
@@ -35,24 +36,32 @@ namespace DotNetNuke.Entities.Urls
 
         public static void DeleteProvider(ExtensionUrlProviderInfo urlProvider)
         {
+			Logger.LogDebug(">>> Entering DeleteProvider(urlProvider={UrlProvider})", urlProvider);
             DataProvider.Instance().DeleteExtensionUrlProvider(urlProvider.ExtensionUrlProviderId);
             ClearCache();
+			Logger.LogDebug("<<< Exiting DeleteProvider(urlProvider={UrlProvider})", urlProvider);
         }
 
         public static void DisableProvider(int providerId, int portalId)
         {
+			Logger.LogDebug(">>> Entering DisableProvider(providerId={ProviderId},portalId={PortalId})", providerId, portalId);
             DataProvider.Instance().UpdateExtensionUrlProvider(providerId, false);
             ClearCache(portalId);
+			Logger.LogDebug("<<< Exiting DisableProvider(providerId={ProviderId},portalId={PortalId})", providerId, portalId);
         }
 
         public static void EnableProvider(int providerId, int portalId)
         {
+			Logger.LogDebug(">>> Entering EnableProvider(providerId={ProviderId},portalId={PortalId})", providerId, portalId);
             DataProvider.Instance().UpdateExtensionUrlProvider(providerId, true);
             ClearCache(portalId);
+			Logger.LogDebug("<<< Exiting EnableProvider(providerId={ProviderId},portalId={PortalId})", providerId, portalId);
         }
 
         public static List<ExtensionUrlProviderInfo> GetProviders(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetProviders(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetProviders(portalId={PortalId})", portalId);
             return CBO.FillCollection<ExtensionUrlProviderInfo>(DataProvider.Instance().GetExtensionUrlProviders(portalId));
         }
 
@@ -62,6 +71,7 @@ namespace DotNetNuke.Entities.Urls
         /// <remarks>Note : similar copy for UI purposes in ConfigurationController.cs.</remarks>
         public static List<ExtensionUrlProvider> GetModuleProviders(int portalId)
             => GetModuleProviders(Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>(), Globals.GetCurrentServiceProvider(), portalId);
+			Logger.LogDebug(">>> Entering GetModuleProviders(portalId={PortalId})", portalId);
 
         /// <summary>Loads the module providers.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -77,17 +87,23 @@ namespace DotNetNuke.Entities.Urls
                 new CacheItemArgs(cacheKey, 60, CacheItemPriority.High, portalId),
                 c =>
                 {
+				Logger.LogDebug("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): cacheKey → {CacheKey}", hostSettings, serviceProvider, portalId, cacheKey);
                     var id = (int)c.Params[0];
                     IDataReader dr = DataProvider.Instance().GetExtensionUrlProviders(id);
+					Logger.LogDebug("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): id → {Id}", hostSettings, serviceProvider, portalId, id);
+					Logger.LogDebug("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): dr → {Dr}", hostSettings, serviceProvider, portalId, dr);
                     try
                     {
                         var providers = new List<ExtensionUrlProvider>();
                         var providerConfigs = CBO.FillCollection(dr, new List<ExtensionUrlProviderInfo>(), false);
+						Logger.LogDebug("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): providers → {Providers}", hostSettings, serviceProvider, portalId, providers);
+						Logger.LogDebug("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): providerConfigs → {ProviderConfigs}", hostSettings, serviceProvider, portalId, providerConfigs);
 
                         foreach (var providerConfig in providerConfigs)
                         {
                             var providerType = Reflection.CreateType(providerConfig.ProviderType);
                             if (providerType == null)
+							Logger.LogDebug("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): providerType → {ProviderType}", hostSettings, serviceProvider, portalId, providerType);
                             {
                                 continue;
                             }
@@ -109,8 +125,11 @@ namespace DotNetNuke.Entities.Urls
                             {
                                 var extensionUrlProviderId = Null.SetNullInteger(dr["ExtensionUrlProviderID"]);
                                 var key = Null.SetNullString(dr["SettingName"]);
+								Logger.LogDebug("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): extensionUrlProviderId → {ExtensionUrlProviderId}", hostSettings, serviceProvider, portalId, extensionUrlProviderId);
+								Logger.LogWarning("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): key → {Key}", hostSettings, serviceProvider, portalId, key);
                                 var value = Null.SetNullString(dr["SettingValue"]);
 
+								Logger.LogDebug("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): value → {Value}", hostSettings, serviceProvider, portalId, value);
                                 var provider = providers.SingleOrDefault(p =>
                                     p.ProviderConfig.ExtensionUrlProviderId == extensionUrlProviderId);
                                 provider?.ProviderConfig.Settings[key] = value;
@@ -124,6 +143,7 @@ namespace DotNetNuke.Entities.Urls
                             {
                                 var extensionUrlProviderId = Null.SetNullInteger(dr["ExtensionUrlProviderID"]);
                                 var tabId = Null.SetNullInteger(dr["TabID"]);
+								Logger.LogDebug("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): tabId → {TabId}", hostSettings, serviceProvider, portalId, tabId);
 
                                 var provider = providers.SingleOrDefault(p =>
                                     p.ProviderConfig.ExtensionUrlProviderId == extensionUrlProviderId);
@@ -143,11 +163,14 @@ namespace DotNetNuke.Entities.Urls
                     }
                 });
 
+			Logger.LogDebug("<<< Exiting GetModuleProviders(portalId={PortalId})", portalId);
             return moduleProviders;
         }
 
         public static FriendlyUrlOptions GetOptionsFromSettings(FriendlyUrlSettings settings)
         {
+			Logger.LogDebug(">>> Entering GetOptionsFromSettings(settings={Settings})", settings);
+			Logger.LogDebug("<<< Exiting GetOptionsFromSettings(settings={Settings})", settings);
             return new FriendlyUrlOptions
             {
                 PunctuationReplacement = (settings.ReplaceSpaceWith != FriendlyUrlSettings.ReplaceSpaceWithNothing)
@@ -283,8 +306,10 @@ namespace DotNetNuke.Entities.Urls
 
         public static void SaveSetting(int providerId, int portalId, string settingName, string settingValue)
         {
+			Logger.LogDebug(">>> Entering SaveSetting(providerId={ProviderId},portalId={PortalId},settingName={SettingName},settingValue={SettingValue})", providerId, portalId, settingName, settingValue);
             DataProvider.Instance().SaveExtensionUrlProviderSetting(providerId, portalId, settingName, settingValue);
             ClearCache(portalId);
+			Logger.LogDebug("<<< Exiting SaveSetting(providerId={ProviderId},portalId={PortalId},settingName={SettingName},settingValue={SettingValue})", providerId, portalId, settingName, settingValue);
         }
 
         /// <summary>Checks to see if any providers are marked as 'always call for rewrites'.</summary>
@@ -409,9 +434,12 @@ namespace DotNetNuke.Entities.Urls
         /// <returns><see langword="true"/> if there is a provider that requires checks for a site root rewrite/redirect, otherwise <see langword="false"/>.</returns>
         internal static bool CheckForSiteRootRewrite(int portalId, FriendlyUrlSettings settings, Guid parentTraceId)
         {
+			Logger.LogDebug(">>> Entering CheckForSiteRootRewrite(portalId={PortalId},settings={Settings},parentTraceId={ParentTraceId})", portalId, settings, parentTraceId);
             var providers = GetProvidersToCall(RewriteController.SiteRootRewrite, portalId, settings, parentTraceId);
 
+			Logger.LogDebug("CheckForSiteRootRewrite(portalId={PortalId},settings={Settings},parentTraceId={ParentTraceId}): providers → {Providers}", portalId, settings, parentTraceId, providers);
             // list should have returned all providers with site root rewrite, but double check here in case of faulty third-party logic
+			Logger.LogDebug("<<< Exiting CheckForSiteRootRewrite(portalId={PortalId},settings={Settings},parentTraceId={ParentTraceId})", portalId, settings, parentTraceId);
             return providers.Any(provider => provider.AlwaysUsesDnnPagePath(portalId) == false);
         }
 
@@ -653,16 +681,21 @@ namespace DotNetNuke.Entities.Urls
 
         private static void ClearCache()
         {
+			Logger.LogDebug(">>> Entering ClearCache()");
             foreach (IPortalInfo portal in PortalController.Instance.GetPortals())
             {
                 ClearCache(portal.PortalId);
             }
+			Logger.LogDebug("<<< Exiting ClearCache()");
         }
 
         private static void ClearCache(int portalId)
         {
+			Logger.LogDebug(">>> Entering ClearCache(portalId={PortalId})", portalId);
             var cacheKey = string.Format(CultureInfo.InvariantCulture, "ExtensionUrlProviders_{0}", portalId);
             DataCache.RemoveCache(cacheKey);
+			Logger.LogDebug("<<< Exiting ClearCache(portalId={PortalId})", portalId);
+			Logger.LogDebug("ClearCache(portalId={PortalId}): cacheKey → {CacheKey}", portalId, cacheKey);
         }
 
         /// <summary>Returns the providers to call. Returns tab ID matches first, and any portal ID matches after that.</summary>

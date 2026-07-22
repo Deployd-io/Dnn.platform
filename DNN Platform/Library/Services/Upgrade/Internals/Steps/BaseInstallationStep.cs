@@ -9,6 +9,7 @@ namespace DotNetNuke.Services.Upgrade.Internals.Steps
     /// <summary>BaseInstallationStep - Abstract class to perform common tasks for the various installation steps.</summary>
     public abstract class BaseInstallationStep : IInstallationStep
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Breaking Change")]
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
@@ -28,8 +29,11 @@ namespace DotNetNuke.Services.Upgrade.Internals.Steps
         /// <summary>Initializes a new instance of the <see cref="BaseInstallationStep"/> class.</summary>
         protected BaseInstallationStep()
         {
+			Logger.LogDebug(">>> Entering BaseInstallationStep()");
             this.Percentage = 0;
             this.Errors = new List<string>();
+			Logger.LogDebug("<<< Exiting BaseInstallationStep()");
+			Logger.LogDebug("BaseInstallationStep(): this.Percentage → {Arg0}", this.Percentage);
         }
 
         /// <summary>This event gets fired when any activity gets recorded</summary>

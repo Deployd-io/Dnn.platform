@@ -22,6 +22,7 @@ namespace Dnn.ExportImport.Components.Services
     /// <summary>An export service for vocabularies.</summary>
     public class VocabularyService : BasePortableService
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override string Category => Constants.Category_Vocabularies;
 
@@ -34,6 +35,8 @@ namespace Dnn.ExportImport.Components.Services
         /// <inheritdoc />
         public override void ExportData(ExportImportJob exportJob, ExportDto exportDto)
         {
+			Logger.LogDebug(">>> Entering ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (this.CheckPoint.Stage > 0)
             {
                 return;
@@ -46,16 +49,22 @@ namespace Dnn.ExportImport.Components.Services
 
             var fromDate = (exportDto.FromDateUtc ?? Constants.MinDbTime).ToLocalTime();
             var toDate = exportDto.ToDateUtc.ToLocalTime();
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): fromDate → {FromDate}", exportJob, exportDto, fromDate);
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): toDate → {ToDate}", exportJob, exportDto, toDate);
             List<TaxonomyVocabularyType> vocabularyTypes = null;
 
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): vocabularyTypes → {VocabularyTypes}", exportJob, exportDto, vocabularyTypes);
             if (this.CheckPoint.Stage == 0)
             {
                 var taxonomyTerms = GetTaxonomyTerms(exportDto.PortalId, toDate, fromDate);
                 var taxonomyVocabularies = GetTaxonomyVocabularies(exportDto.PortalId, toDate, fromDate);
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): taxonomyTerms → {TaxonomyTerms}", exportJob, exportDto, taxonomyTerms);
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): taxonomyVocabularies → {TaxonomyVocabularies}", exportJob, exportDto, taxonomyVocabularies);
                 if (taxonomyTerms.Count > 0 || taxonomyVocabularies.Count > 0)
                 {
                     var scopeTypes = CBO.FillCollection<TaxonomyScopeType>(DataProvider.Instance().GetAllScopeTypes());
 
+					Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): scopeTypes → {ScopeTypes}", exportJob, exportDto, scopeTypes);
                     // Update the total items count in the check points. This should be updated only once.
                     this.CheckPoint.TotalItems = this.CheckPoint.TotalItems <= 0 ? scopeTypes.Count : this.CheckPoint.TotalItems;
                     if (this.CheckPoint.TotalItems == scopeTypes.Count)
@@ -69,6 +78,7 @@ namespace Dnn.ExportImport.Components.Services
                     this.CheckPointStageCallback(this);
 
                     this.Repository.CreateItems(scopeTypes);
+					Logger.LogInformation("ExportData(exportJob,exportDto)={ExportJob},{ExportDto}: database query executed in {Arg2} ms", exportJob, exportDto, __logStart.ElapsedMilliseconds);
 
                     ////Result.AddSummary("Exported Taxonomy Scopes", scopeTypes.Count.ToString()); -- not imported so don't show
                     ////CheckPoint.ProcessedItems += scopeTypes.Count;
@@ -117,11 +127,14 @@ namespace Dnn.ExportImport.Components.Services
                 this.CheckPoint.Completed = true;
                 this.CheckPointStageCallback(this);
             }
+			Logger.LogDebug("<<< Exiting ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
         }
 
         /// <inheritdoc />
         public override void ImportData(ExportImportJob importJob, ImportDto importDto)
         {
+			Logger.LogDebug(">>> Entering ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (this.CheckPoint.Stage > 0)
             {
                 return;
@@ -138,6 +151,7 @@ namespace Dnn.ExportImport.Components.Services
             {
                 var otherScopeTypes = this.Repository.GetAllItems<TaxonomyScopeType>().ToList();
 
+				Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): otherScopeTypes → {OtherScopeTypes}", importJob, importDto, otherScopeTypes);
                 // the table Taxonomy_ScopeTypes is used for lookup only and never changed/updated in the database
                 ////CheckPoint.Progress = 10;
 
@@ -147,6 +161,8 @@ namespace Dnn.ExportImport.Components.Services
 
                 var otherVocabularies = this.Repository.GetAllItems<TaxonomyVocabulary>().ToList();
                 this.ProcessVocabularies(importJob, importDto, otherScopeTypes, otherVocabularies);
+				Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): otherVocabularies → {OtherVocabularies}", importJob, importDto, otherVocabularies);
+				Logger.LogInformation("ImportData(importJob,importDto)={ImportJob},{ImportDto}: update query executed in {Arg2} ms", importJob, importDto, __logStart.ElapsedMilliseconds);
                 this.Repository.UpdateItems(otherVocabularies);
                 this.Result.AddSummary("Imported Vocabularies", otherVocabularies.Count.ToString(CultureInfo.InvariantCulture));
                 this.CheckPoint.Progress = 60;
@@ -154,6 +170,7 @@ namespace Dnn.ExportImport.Components.Services
 
                 var otherTaxonomyTerms = this.Repository.GetAllItems<TaxonomyTerm>().ToList();
                 this.ProcessTaxonomyTerms(importJob, importDto, otherVocabularies, otherTaxonomyTerms);
+				Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): otherTaxonomyTerms → {OtherTaxonomyTerms}", importJob, importDto, otherTaxonomyTerms);
                 this.Repository.UpdateItems(otherTaxonomyTerms);
                 this.Result.AddSummary("Imported Terms", otherTaxonomyTerms.Count.ToString(CultureInfo.InvariantCulture));
                 this.CheckPoint.Progress = 100;
@@ -162,11 +179,14 @@ namespace Dnn.ExportImport.Components.Services
                 this.CheckPoint.Completed = true;
                 this.CheckPointStageCallback(this);
             }
+			Logger.LogDebug("<<< Exiting ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
         }
 
         /// <inheritdoc />
         public override int GetImportTotal()
         {
+			Logger.LogDebug(">>> Entering GetImportTotal()");
+			Logger.LogDebug("<<< Exiting GetImportTotal()");
             return this.Repository.GetCount<TaxonomyVocabulary>() + this.Repository.GetCount<TaxonomyTerm>();
         }
 

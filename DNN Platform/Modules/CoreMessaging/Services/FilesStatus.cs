@@ -11,9 +11,12 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         Justification = "Acceptable in the context of a DTO to not cause an unneccessary breaking change.")]
     public class FilesStatus
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="FilesStatus"/> class.</summary>
         public FilesStatus()
         {
+		Logger.LogDebug(">>> Entering FilesStatus()");
+		Logger.LogDebug("<<< Exiting FilesStatus()");
         }
 
         /// <summary>Gets or sets a value indicating whether the upload succeeded.</summary>

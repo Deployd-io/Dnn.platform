@@ -7,6 +7,7 @@ namespace DotNetNuke.UI.Skins
 
     public class InstalledSkinInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public bool InUse { get; set; }
 
         public string SkinFile { get; set; }
@@ -15,6 +16,7 @@ namespace DotNetNuke.UI.Skins
 
         public void WriteXml(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteXml(writer={Writer})", writer);
             // Write start of main elemenst
             writer.WriteStartElement("skin");
 
@@ -23,6 +25,7 @@ namespace DotNetNuke.UI.Skins
 
             // Write end of Host Info
             writer.WriteEndElement();
+			Logger.LogDebug("<<< Exiting WriteXml(writer={Writer})", writer);
         }
     }
 }

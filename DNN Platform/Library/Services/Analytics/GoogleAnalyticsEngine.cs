@@ -12,6 +12,7 @@ namespace DotNetNuke.Services.Analytics
 
     public class GoogleAnalyticsEngine : AnalyticsEngineBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override string EngineName
         {
@@ -24,8 +25,10 @@ namespace DotNetNuke.Services.Analytics
         /// <inheritdoc />
         public override string RenderScript(string scriptTemplate)
         {
+			Logger.LogDebug(">>> Entering RenderScript(scriptTemplate={ScriptTemplate})", scriptTemplate);
             AnalyticsConfiguration config = this.GetConfig();
 
+			Logger.LogDebug("RenderScript(scriptTemplate={ScriptTemplate}): config → {Config}", scriptTemplate, config);
             if (config == null)
             {
                 return string.Empty;
@@ -33,8 +36,11 @@ namespace DotNetNuke.Services.Analytics
 
             var trackingId = string.Empty;
             var urlParameter = string.Empty;
+			Logger.LogDebug("RenderScript(scriptTemplate={ScriptTemplate}): trackingId → {TrackingId}", scriptTemplate, trackingId);
+			Logger.LogDebug("RenderScript(scriptTemplate={ScriptTemplate}): urlParameter → {UrlParameter}", scriptTemplate, urlParameter);
             var trackForAdmin = true;
 
+			Logger.LogDebug("RenderScript(scriptTemplate={ScriptTemplate}): trackForAdmin → {TrackForAdmin}", scriptTemplate, trackForAdmin);
             foreach (AnalyticsSetting setting in config.Settings)
             {
                 switch (setting.SettingName.ToLowerInvariant())
@@ -72,6 +78,7 @@ namespace DotNetNuke.Services.Analytics
 
             scriptTemplate = scriptTemplate.Replace("[TRACKING_ID]", trackingId);
             if (!string.IsNullOrEmpty(urlParameter))
+			Logger.LogDebug("RenderScript(scriptTemplate={ScriptTemplate}): scriptTemplate → {ScriptTemplate1}", scriptTemplate, scriptTemplate);
             {
                 scriptTemplate = scriptTemplate.Replace("[PAGE_URL]", urlParameter);
             }
@@ -82,6 +89,7 @@ namespace DotNetNuke.Services.Analytics
 
             scriptTemplate = scriptTemplate.Replace("[CUSTOM_SCRIPT]", this.RenderCustomScript(config));
 
+			Logger.LogDebug("<<< Exiting RenderScript(scriptTemplate={ScriptTemplate})", scriptTemplate);
             return scriptTemplate;
         }
 

@@ -25,6 +25,7 @@ namespace DNN.Integration.Test.Framework.Helpers
 
         public static bool CanConnectToDatabase()
         {
+			Logger.LogDebug(">>> Entering CanConnectToDatabase()");
             try
             {
                 PetaPocoHelper.ExecuteSQL(AppConfigHelper.ConnectionString, "SELECT GETDATE()");
@@ -33,6 +34,7 @@ namespace DNN.Integration.Test.Framework.Helpers
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
+				Logger.LogDebug("<<< Exiting CanConnectToDatabase()");
                 return false;
             }
         }
@@ -45,6 +47,7 @@ namespace DNN.Integration.Test.Framework.Helpers
 
         public static IEnumerable<TItem> ExecuteQuery<TItem>(string queryString)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             using (var connection = new SqlConnection(AppConfigHelper.ConnectionString))
             {
                 connection.Open();
@@ -86,6 +89,7 @@ namespace DNN.Integration.Test.Framework.Helpers
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ExecuteQuery(queryString={QueryString})", queryString);
             return results;
         }
 
@@ -96,6 +100,7 @@ namespace DNN.Integration.Test.Framework.Helpers
             var results = new List<dynamic>();
             using (var connection = new SqlConnection(AppConfigHelper.ConnectionString))
             {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
                 connection.Open();
                 queryString = ReplaceQueryQualifier(queryString);
                 using (var command = new SqlCommand(queryString, connection))
@@ -106,6 +111,7 @@ namespace DNN.Integration.Test.Framework.Helpers
                         while (reader.Read())
                         {
                             var values = new ExpandoObject() as IDictionary<string, object>;
+							Logger.LogInformation("ExecuteDynamicQuery(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
                             for (var i = 0; i < reader.FieldCount; i++)
                             {
                                 values.Add(reader.GetName(i), reader.GetValue(i));
@@ -120,11 +126,13 @@ namespace DNN.Integration.Test.Framework.Helpers
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ExecuteDynamicQuery(queryString={QueryString})", queryString);
             return results;
         }
 
         public static int ExecuteNonQuery(string queryString)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             using (var connection = new SqlConnection(AppConfigHelper.ConnectionString))
             {
                 connection.Open();
@@ -132,6 +140,7 @@ namespace DNN.Integration.Test.Framework.Helpers
                 using (var command = new SqlCommand(queryString, connection))
                 {
                     command.CommandType = CommandType.Text;
+					Logger.LogDebug("<<< Exiting ExecuteNonQuery(queryString={QueryString})", queryString);
                     return command.ExecuteNonQuery();
                 }
             }
@@ -160,6 +169,7 @@ namespace DNN.Integration.Test.Framework.Helpers
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ExecuteStoredProcedure(procedureName={ProcedureName},sqlParameters={SqlParameters})", procedureName, sqlParameters);
             return results;
         }
 
@@ -179,13 +189,18 @@ namespace DNN.Integration.Test.Framework.Helpers
         /// <returns></returns>
         public static int GetRecordsCount(string tableOrViewName, string whereCondition = null)
         {
+			Logger.LogDebug(">>> Entering GetRecordsCount(tableOrViewName={TableOrViewName},whereCondition={WhereCondition})", tableOrViewName, whereCondition);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var queryString = ReplaceQueryQualifier(string.Format("SELECT COUNT(*) FROM [{0}{1}]", QualifierPrefix, tableOrViewName));
 
             if (!string.IsNullOrEmpty(whereCondition))
+			Logger.LogDebug("GetRecordsCount(tableOrViewName={TableOrViewName},whereCondition={WhereCondition}): queryString → {QueryString}", tableOrViewName, whereCondition, queryString);
+			Logger.LogInformation("GetRecordsCount(tableOrViewName,whereCondition)={TableOrViewName},{WhereCondition}: find query executed in {Arg2} ms", tableOrViewName, whereCondition, __logStart.ElapsedMilliseconds);
             {
                 queryString += " WHERE " + whereCondition;
             }
 
+			Logger.LogDebug("<<< Exiting GetRecordsCount(tableOrViewName={TableOrViewName},whereCondition={WhereCondition})", tableOrViewName, whereCondition);
             return PetaPocoHelper.ExecuteScalar<int>(AppConfigHelper.ConnectionString, CommandType.Text, queryString, null);
         }
 
@@ -195,16 +210,21 @@ namespace DNN.Integration.Test.Framework.Helpers
         /// <returns></returns>
         public static int GetLastRecordId(string tableOrViewName, string columnName, string whereCondition = null)
         {
+			Logger.LogDebug(">>> Entering GetLastRecordId(tableOrViewName={TableOrViewName},columnName={ColumnName},whereCondition={WhereCondition})", tableOrViewName, columnName, whereCondition);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var query = string.Format(
                 "SELECT COALESCE(MAX([{0}]), -1) FROM [{1}{2}]",
                 columnName, QualifierPrefix, tableOrViewName);
+				Logger.LogInformation("GetLastRecordId(tableOrViewName,columnName,whereCondition)={TableOrViewName},{ColumnName},{WhereCondition}: find query executed in {Arg3} ms", tableOrViewName, columnName, whereCondition, __logStart.ElapsedMilliseconds);
 
             var queryString = ReplaceQueryQualifier(query);
             if (!string.IsNullOrEmpty(whereCondition))
+			Logger.LogDebug("GetLastRecordId(tableOrViewName={TableOrViewName},columnName={ColumnName},whereCondition={WhereCondition}): queryString → {QueryString}", tableOrViewName, columnName, whereCondition, queryString);
             {
                 queryString += " WHERE " + whereCondition;
             }
 
+			Logger.LogDebug("<<< Exiting GetLastRecordId(tableOrViewName={TableOrViewName},columnName={ColumnName},whereCondition={WhereCondition})", tableOrViewName, columnName, whereCondition);
             return PetaPocoHelper.ExecuteScalar<int>(AppConfigHelper.ConnectionString, CommandType.Text, queryString, null);
         }
 
@@ -219,6 +239,7 @@ namespace DNN.Integration.Test.Framework.Helpers
             {
                 while (reader.Read())
                 {
+					private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                     for (var i = 0; i < reader.FieldCount; i++)
                     {
                         values.Add(reader.GetName(i), reader.GetValue(i));
@@ -233,6 +254,8 @@ namespace DNN.Integration.Test.Framework.Helpers
 
         private static string ReplaceQueryQualifier(string input)
         {
+			Logger.LogDebug(">>> Entering ReplaceQueryQualifier(input={Input})", input);
+			Logger.LogDebug("<<< Exiting ReplaceQueryQualifier(input={Input})", input);
             return input.Replace(QualifierPrefix, AppConfigHelper.ObjectQualifier);
         }
     }

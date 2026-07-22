@@ -13,6 +13,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
     /// <summary>Represents support for HTML input controls in an application.</summary>
     public static class HtmlInputExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         // CheckBox
 
         /// <summary>Returns a check box input element by using the specified HTML helper and the name of the form field.</summary>
@@ -23,6 +24,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field.</param>
         public static MvcHtmlString CheckBox(this DnnHtmlHelper html, string name)
         {
+			Logger.LogDebug(">>> Entering CheckBox(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting CheckBox(html={Html},name={Name})", html, name);
             return html.HtmlHelper.CheckBox(name);
         }
 
@@ -34,6 +37,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field.</param><param name="isChecked">true to select the check box; otherwise, false.</param>
         public static MvcHtmlString CheckBox(this DnnHtmlHelper html, string name, bool isChecked)
         {
+			Logger.LogDebug("<<< Exiting CheckBox(html={Html},name={Name},isChecked={IsChecked})", html, name, isChecked);
             return html.HtmlHelper.CheckBox(name, isChecked);
         }
 
@@ -45,6 +49,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field.</param><param name="isChecked">true to select the check box; otherwise, false.</param><param name="htmlAttributes">An object that contains the HTML attributes to set for the element.</param>
         public static MvcHtmlString CheckBox(this DnnHtmlHelper html, string name, bool isChecked, object htmlAttributes)
         {
+			Logger.LogDebug("<<< Exiting CheckBox(html={Html},name={Name},isChecked={IsChecked},htmlAttributes={HtmlAttributes})", html, name, isChecked, htmlAttributes);
+			Logger.LogDebug("<<< Exiting CheckBox(html={Html},name={Name},htmlAttributes={HtmlAttributes})", html, name, htmlAttributes);
             return html.HtmlHelper.CheckBox(name, isChecked, htmlAttributes);
         }
 
@@ -124,6 +130,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field and the <see cref="System.Web.Mvc.ViewDataDictionary"/> key that is used to look up the value.</param>
         public static MvcHtmlString Hidden(this DnnHtmlHelper html, string name)
         {
+			Logger.LogDebug(">>> Entering Hidden(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting Hidden(html={Html},name={Name})", html, name);
             return html.HtmlHelper.Hidden(name);
         }
 
@@ -135,6 +143,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field and the <see cref="System.Web.Mvc.ViewDataDictionary"/> key that is used to look up the value.</param><param name="value">The value of the hidden input element. The value of the element is retrieved from the <see cref="System.Web.Mvc.ViewDataDictionary"/> object. If no value exists there, the value is retrieved from the <see cref="System.Web.Mvc.ModelStateDictionary"/> object. If the element is not found in the <see cref="System.Web.Mvc.ViewDataDictionary"/> or the <see cref="System.Web.Mvc.ModelStateDictionary"/>, the value parameter is used.</param>
         public static MvcHtmlString Hidden(this DnnHtmlHelper html, string name, object value)
         {
+			Logger.LogDebug("<<< Exiting Hidden(html={Html},name={Name},value={Value})", html, name, value);
             return html.HtmlHelper.Hidden(name, value);
         }
 
@@ -146,6 +155,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field and the <see cref="System.Web.Mvc.ViewDataDictionary"/> key that is used to look up the value.</param><param name="value">The value of the hidden input element The value of the element is retrieved from the <see cref="System.Web.Mvc.ViewDataDictionary"/> object. If no value exists there, the value is retrieved from the <see cref="System.Web.Mvc.ModelStateDictionary"/> object. If the element is not found in the <see cref="System.Web.Mvc.ViewDataDictionary"/> object or the <see cref="System.Web.Mvc.ModelStateDictionary"/> object, the value parameter is used.</param><param name="htmlAttributes">An object that contains the HTML attributes to set for the element.</param>
         public static MvcHtmlString Hidden(this DnnHtmlHelper html, string name, object value, object htmlAttributes)
         {
+			Logger.LogDebug("<<< Exiting Hidden(html={Html},name={Name},value={Value},htmlAttributes={HtmlAttributes})", html, name, value, htmlAttributes);
             return html.HtmlHelper.Hidden(name, value, htmlAttributes);
         }
 
@@ -203,6 +213,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field and the <see cref="System.Web.Mvc.ViewDataDictionary"/> key that is used to look up the value.</param>
         public static MvcHtmlString Password(this DnnHtmlHelper html, string name)
         {
+			Logger.LogDebug(">>> Entering Password(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting Password(html={Html},name={Name})", html, name);
             return html.HtmlHelper.Password(name);
         }
 
@@ -214,6 +226,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field and the <see cref="System.Web.Mvc.ViewDataDictionary"/> key that is used to look up the value.</param><param name="value">The value of the password input element. If this value is null, the value of the element is retrieved from the <see cref="System.Web.Mvc.ViewDataDictionary"/> object. If no value exists there, the value is retrieved from the <see cref="System.Web.Mvc.ModelStateDictionary"/> object.</param>
         public static MvcHtmlString Password(this DnnHtmlHelper html, string name, object value)
         {
+			Logger.LogDebug("<<< Exiting Password(html={Html},name={Name},value={Value})", html, name, value);
             return html.HtmlHelper.Password(name, value);
         }
 
@@ -225,6 +238,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field and the <see cref="System.Web.Mvc.ViewDataDictionary"/> key that is used to look up the value.</param><param name="value">The value of the password input element. If this value is null, the value of the element is retrieved from the <see cref="System.Web.Mvc.ViewDataDictionary"/> object. If no value exists there, the value is retrieved from the <see cref="System.Web.Mvc.ModelStateDictionary"/> object.</param><param name="htmlAttributes">An object that contains the HTML attributes to set for the element.</param>
         public static MvcHtmlString Password(this DnnHtmlHelper html, string name, object value, object htmlAttributes)
         {
+			Logger.LogDebug("<<< Exiting Password(html={Html},name={Name},value={Value},htmlAttributes={HtmlAttributes})", html, name, value, htmlAttributes);
             return html.HtmlHelper.Password(name, value, htmlAttributes);
         }
 
@@ -282,6 +296,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field and the <see cref="System.Web.Mvc.ViewDataDictionary"/> key that is used to look up the value.</param><param name="value">If this radio button is selected, the value of the radio button that is submitted when the form is posted. If the value of the selected radio button in the <see cref="System.Web.Mvc.ViewDataDictionary"/> or the <see cref="System.Web.Mvc.ModelStateDictionary"/> object matches this value, this radio button is selected.</param><exception cref="System.ArgumentException">The <paramref name="name"/> parameter is null or empty.</exception><exception cref="System.ArgumentNullException">The <paramref name="value"/> parameter is null.</exception>
         public static MvcHtmlString RadioButton(this DnnHtmlHelper html, string name, object value)
         {
+			Logger.LogDebug(">>> Entering RadioButton(html={Html},name={Name},value={Value})", html, name, value);
+			Logger.LogDebug("<<< Exiting RadioButton(html={Html},name={Name},value={Value})", html, name, value);
             return html.HtmlHelper.RadioButton(name, value);
         }
 
@@ -293,6 +309,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field and the <see cref="System.Web.Mvc.ViewDataDictionary"/> key that is used to look up the value.</param><param name="value">If this radio button is selected, the value of the radio button that is submitted when the form is posted. If the value of the selected radio button in the <see cref="System.Web.Mvc.ViewDataDictionary"/> or the <see cref="System.Web.Mvc.ModelStateDictionary"/> object matches this value, this radio button is selected.</param><param name="htmlAttributes">An object that contains the HTML attributes to set for the element.</param><exception cref="System.ArgumentException">The <paramref name="name"/> parameter is null or empty.</exception><exception cref="System.ArgumentNullException">The <paramref name="value"/> parameter is null.</exception>
         public static MvcHtmlString RadioButton(this DnnHtmlHelper html, string name, object value, object htmlAttributes)
         {
+			Logger.LogDebug("<<< Exiting RadioButton(html={Html},name={Name},value={Value},htmlAttributes={HtmlAttributes})", html, name, value, htmlAttributes);
             return html.HtmlHelper.RadioButton(name, value, htmlAttributes);
         }
 
@@ -315,6 +332,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field and the <see cref="System.Web.Mvc.ViewDataDictionary"/> key that is used to look up the value.</param><param name="value">If this radio button is selected, the value of the radio button that is submitted when the form is posted. If the value of the selected radio button in the <see cref="System.Web.Mvc.ViewDataDictionary"/> or the <see cref="System.Web.Mvc.ModelStateDictionary"/> object matches this value, this radio button is selected.</param><param name="isChecked">true to select the radio button; otherwise, false.</param><exception cref="System.ArgumentException">The <paramref name="name"/> parameter is null or empty.</exception><exception cref="System.ArgumentNullException">The <paramref name="value"/> parameter is null.</exception>
         public static MvcHtmlString RadioButton(this DnnHtmlHelper html, string name, object value, bool isChecked)
         {
+			Logger.LogDebug("<<< Exiting RadioButton(html={Html},name={Name},value={Value},isChecked={IsChecked})", html, name, value, isChecked);
             return html.HtmlHelper.RadioButton(name, value, isChecked);
         }
 
@@ -326,6 +344,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field and the <see cref="System.Web.Mvc.ViewDataDictionary"/> key that is used to look up the value.</param><param name="value">If this radio button is selected, the value of the radio button that is submitted when the form is posted. If the value of the selected radio button in the <see cref="System.Web.Mvc.ViewDataDictionary"/> or the <see cref="System.Web.Mvc.ModelStateDictionary"/> object matches this value, this radio button is selected.</param><param name="isChecked">true to select the radio button; otherwise, false.</param><param name="htmlAttributes">An object that contains the HTML attributes to set for the element.</param><exception cref="System.ArgumentException">The <paramref name="name"/> parameter is null or empty.</exception><exception cref="System.ArgumentNullException">The <paramref name="value"/> parameter is null.</exception>
         public static MvcHtmlString RadioButton(this DnnHtmlHelper html, string name, object value, bool isChecked, object htmlAttributes)
         {
+			Logger.LogDebug("<<< Exiting RadioButton(html={Html},name={Name},value={Value},isChecked={IsChecked},htmlAttributes={HtmlAttributes})", html, name, value, isChecked, htmlAttributes);
             return html.HtmlHelper.RadioButton(name, value, isChecked, htmlAttributes);
         }
 
@@ -383,6 +402,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field and the <see cref="System.Web.Mvc.ViewDataDictionary"/> key that is used to look up the value.</param>
         public static MvcHtmlString TextBox(this DnnHtmlHelper html, string name)
         {
+			Logger.LogDebug(">>> Entering TextBox(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting TextBox(html={Html},name={Name})", html, name);
             return html.HtmlHelper.TextBox(name);
         }
 
@@ -394,6 +415,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field and the <see cref="System.Web.Mvc.ViewDataDictionary"/> key that is used to look up the value.</param><param name="value">The value of the text input element. If this value is null, the value of the element is retrieved from the <see cref="System.Web.Mvc.ViewDataDictionary"/> object. If no value exists there, the value is retrieved from the <see cref="System.Web.Mvc.ModelStateDictionary"/> object.</param>
         public static MvcHtmlString TextBox(this DnnHtmlHelper html, string name, object value)
         {
+			Logger.LogDebug("<<< Exiting TextBox(html={Html},name={Name},value={Value})", html, name, value);
             return html.HtmlHelper.TextBox(name, value);
         }
 
@@ -405,6 +427,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field.</param><param name="value">The value of the text input element. If this value is null, the value of the element is retrieved from the <see cref="System.Web.Mvc.ViewDataDictionary"/> object. If no value exists there, the value is retrieved from the <see cref="System.Web.Mvc.ModelStateDictionary"/> object.</param><param name="format">A string that is used to format the input.</param>
         public static MvcHtmlString TextBox(this DnnHtmlHelper html, string name, object value, string format)
         {
+			Logger.LogDebug("<<< Exiting TextBox(html={Html},name={Name},value={Value},format={Format})", html, name, value, format);
             return html.HtmlHelper.TextBox(name, value, format);
         }
 
@@ -416,6 +439,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field and the <see cref="System.Web.Mvc.ViewDataDictionary"/> key that is used to look up the value.</param><param name="value">The value of the text input element. If this value is null, the value of the element is retrieved from the <see cref="System.Web.Mvc.ViewDataDictionary"/> object. If no value exists there, the value is retrieved from the <see cref="System.Web.Mvc.ModelStateDictionary"/> object.</param><param name="htmlAttributes">An object that contains the HTML attributes to set for the element.</param>
         public static MvcHtmlString TextBox(this DnnHtmlHelper html, string name, object value, object htmlAttributes)
         {
+			Logger.LogDebug("<<< Exiting TextBox(html={Html},name={Name},value={Value},htmlAttributes={HtmlAttributes})", html, name, value, htmlAttributes);
             return html.HtmlHelper.TextBox(name, value, htmlAttributes);
         }
 
@@ -427,6 +451,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field and the <see cref="System.Web.Mvc.ViewDataDictionary"/> key that is used to look up the value.</param><param name="value">The value of the text input element. If this value is null, the value of the element is retrieved from the <see cref="System.Web.Mvc.ViewDataDictionary"/> object. If no value exists there, the value is retrieved from the <see cref="System.Web.Mvc.ModelStateDictionary"/> object.</param><param name="format">A string that is used to format the input.</param><param name="htmlAttributes">An object that contains the HTML attributes to set for the element.</param>
         public static MvcHtmlString TextBox(this DnnHtmlHelper html, string name, object value, string format, object htmlAttributes)
         {
+			Logger.LogDebug("<<< Exiting TextBox(html={Html},name={Name},value={Value},format={Format},htmlAttributes={HtmlAttributes})", html, name, value, format, htmlAttributes);
             return html.HtmlHelper.TextBox(name, value, format, htmlAttributes);
         }
 

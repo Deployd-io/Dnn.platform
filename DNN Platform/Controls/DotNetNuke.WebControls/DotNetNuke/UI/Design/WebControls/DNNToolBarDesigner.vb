@@ -1,5 +1,6 @@
 ﻿' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports DotNetNuke.UI.WebControls
 Imports Microsoft.VisualBasic
@@ -15,6 +16,7 @@ Namespace DotNetNuke.UI.Design.WebControls
         Inherits ControlDesigner
         ' Methods
         Public Overrides Function GetDesignTimeHtml() As String
+			Logger.LogDebug(">>> Entering GetDesignTimeHtml()")
             Dim enumerator As IEnumerator = Nothing
             Dim component As DNNToolBar = DirectCast(MyBase.Component, DNNToolBar)
             Dim writer As New StringWriter
@@ -22,9 +24,11 @@ Namespace DotNetNuke.UI.Design.WebControls
             Dim label2 As New Label
             If (Strings.Len(component.CssClass) > 0) Then
                 label2.CssClass = component.CssClass
+				Logger.LogDebug("GetDesignTimeHtml(): label2.CssClass → {Arg0}", label2.CssClass)
             End If
             Try 
                 enumerator = component.Buttons.GetEnumerator
+				Logger.LogDebug("GetDesignTimeHtml(): enumerator → {Enumerator}", enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -33,9 +37,11 @@ Namespace DotNetNuke.UI.Design.WebControls
                     Dim child As New Label
                     If (Strings.Len(current.CssClass) > 0) Then
                         child.CssClass = current.CssClass
+						Logger.LogDebug("GetDesignTimeHtml(): child.CssClass → {Arg0}", child.CssClass)
                     End If
                     If (Strings.Len(current.Text) > 0) Then
                         child.Text = current.Text
+						Logger.LogDebug("GetDesignTimeHtml(): child.Text → {Arg0}", child.Text)
                     End If
                     label2.Controls.Add(child)
                 Loop
@@ -50,6 +56,7 @@ Namespace DotNetNuke.UI.Design.WebControls
             label2.RenderControl(writer2)
             Return writer.ToString
         End Function
+		Logger.LogDebug("<<< Exiting GetDesignTimeHtml()")
 
     End Class
 End Namespace

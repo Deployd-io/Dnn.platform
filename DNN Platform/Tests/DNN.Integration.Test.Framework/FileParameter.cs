@@ -6,9 +6,14 @@ namespace DNN.Integration.Test.Framework
 {
     public class FileParameter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public FileParameter(byte[] file)
             : this(file, null)
         {
+		Logger.LogDebug(">>> Entering FileParameter(file={File})", file);
+		Logger.LogDebug("<<< Exiting FileParameter(file={File})", file);
+		Logger.LogDebug(">>> Entering FileParameter(file={File},filename={Filename})", file, filename);
+		Logger.LogDebug("<<< Exiting FileParameter(file={File},filename={Filename},contenttype={Contenttype})", file, filename, contenttype);
         }
 
         public FileParameter(byte[] file, string filename)
@@ -20,7 +25,10 @@ namespace DNN.Integration.Test.Framework
         {
             this.File = file;
             this.FileName = filename;
+			Logger.LogDebug("FileParameter(file={File},filename={Filename},contenttype={Contenttype}): this.File → {Arg3}", file, filename, contenttype, this.File);
+			Logger.LogDebug("FileParameter(file={File},filename={Filename},contenttype={Contenttype}): this.FileName → {Arg3}", file, filename, contenttype, this.FileName);
             this.ContentType = contenttype;
+			Logger.LogDebug("FileParameter(file={File},filename={Filename},contenttype={Contenttype}): this.ContentType → {Arg3}", file, filename, contenttype, this.ContentType);
         }
 
         public byte[] File { get; set; }
