@@ -8,17 +8,26 @@ namespace Dnn.PersonaBar.Prompt.Components.Models
 
     public class PortalModelBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public PortalModelBase()
         {
+		Logger.LogDebug(">>> Entering PortalModelBase()");
+		Logger.LogDebug("<<< Exiting PortalModelBase()");
         }
 
         public PortalModelBase(DotNetNuke.Entities.Portals.PortalInfo portal)
         {
+			Logger.LogDebug(">>> Entering PortalModelBase(portal={Portal})", portal);
             this.PortalId = portal.PortalID;
             this.PortalName = portal.PortalName;
+			Logger.LogDebug("PortalModelBase(portal={Portal}): this.PortalId → {Arg1}", portal, this.PortalId);
+			Logger.LogDebug("PortalModelBase(portal={Portal}): this.PortalName → {Arg1}", portal, this.PortalName);
             this.PageCount = portal.Pages;
             this.UserCount = portal.Users;
             this.Language = portal.DefaultLanguage;
+			Logger.LogDebug("PortalModelBase(portal={Portal}): this.PageCount → {Arg1}", portal, this.PageCount);
+			Logger.LogDebug("PortalModelBase(portal={Portal}): this.UserCount → {Arg1}", portal, this.UserCount);
+			Logger.LogDebug("PortalModelBase(portal={Portal}): this.Language → {Arg1}", portal, this.Language);
 
             switch (portal.UserRegistration)
             {
@@ -30,8 +39,10 @@ namespace Dnn.PersonaBar.Prompt.Components.Models
                     break;
                 case (int)Globals.PortalRegistrationType.PublicRegistration:
                     this.RegistrationMode = "Public";
+					Logger.LogDebug("PortalModelBase(portal={Portal}): this.RegistrationMode → {Arg1}", portal, this.RegistrationMode);
                     break;
                 case (int)Globals.PortalRegistrationType.VerifiedRegistration:
+					Logger.LogDebug("<<< Exiting PortalModelBase()");
                     this.RegistrationMode = "Verified";
                     break;
                 default:

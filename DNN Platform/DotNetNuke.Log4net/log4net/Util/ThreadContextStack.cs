@@ -48,6 +48,8 @@ namespace log4net.Util
         /// </remarks>
         internal ThreadContextStack()
         {
+		Logger.LogDebug(">>> Entering ThreadContextStack()");
+		Logger.LogDebug("<<< Exiting ThreadContextStack()");
         }
 
         /// <summary>The number of messages in the stack</summary>
@@ -82,6 +84,8 @@ namespace log4net.Util
         public void Clear() 
         {
             this.m_stack.Clear();
+			Logger.LogDebug(">>> Entering Clear()");
+			Logger.LogDebug("<<< Exiting Clear()");
         }
 
         /// <summary>Removes the top context from this stack.</summary>
@@ -95,11 +99,13 @@ namespace log4net.Util
         /// </remarks>
         public string Pop() 
         {
+			Logger.LogDebug(">>> Entering Pop()");
             Stack stack = this.m_stack;
             if (stack.Count > 0)
             {
                 return ((StackFrame)(stack.Pop())).Message;
             }
+			Logger.LogDebug("<<< Exiting Pop()");
             return string.Empty;
         }
 
@@ -126,9 +132,11 @@ namespace log4net.Util
         /// </example>
         public IDisposable Push(string message) 
         {
+			Logger.LogDebug(">>> Entering Push(message={Message})", message);
             Stack stack = this.m_stack;
             stack.Push(new StackFrame(message, (stack.Count>0) ? (StackFrame)stack.Peek() : null));
 
+			Logger.LogDebug("<<< Exiting Push(message={Message})", message);
             return new AutoPopStackFrame(stack, stack.Count - 1);
         }
 
@@ -136,11 +144,13 @@ namespace log4net.Util
         /// <returns>The current context information.</returns>
         internal string GetFullMessage() 
         {
+			Logger.LogDebug(">>> Entering GetFullMessage()");
             Stack stack = this.m_stack;
             if (stack.Count > 0)
             {
                 return ((StackFrame)(stack.Peek())).FullMessage;
             }
+			Logger.LogDebug("<<< Exiting GetFullMessage()");
             return null;
         }
 
@@ -168,6 +178,8 @@ namespace log4net.Util
         /// </remarks>
         public override string ToString()
         {
+			Logger.LogDebug(">>> Entering ToString()");
+			Logger.LogDebug("<<< Exiting ToString()");
             return this.GetFullMessage();
         }
 
@@ -206,13 +218,19 @@ namespace log4net.Util
             /// </remarks>
             internal StackFrame(string message, StackFrame parent) 
             {
+				Logger.LogDebug(">>> Entering StackFrame(message={Message},parent={Parent})", message, parent);
                 this.m_message = message;
                 this.m_parent = parent;
+				Logger.LogDebug("StackFrame(message={Message},parent={Parent}): this.m_message → {Arg2}", message, parent, this.m_message);
+				Logger.LogDebug("StackFrame(message={Message},parent={Parent}): m_parent → {M_parent}", message, parent, m_parent);
+				Logger.LogDebug("StackFrame(message={Message},parent={Parent}): this.m_parent → {Arg2}", message, parent, this.m_parent);
 
                 if (parent == null) 
                 {
                     this.m_fullMessage = message;
                 } 
+				Logger.LogDebug("<<< Exiting StackFrame(message={Message},parent={Parent})", message, parent);
+				Logger.LogDebug("StackFrame(message={Message},parent={Parent}): this.m_fullMessage → {Arg2}", message, parent, this.m_fullMessage);
             }
 
             /// <summary>Get the message.</summary>
@@ -275,8 +293,14 @@ namespace log4net.Util
             /// </remarks>
             internal AutoPopStackFrame(Stack frameStack, int frameDepth)
             {
+				Logger.LogDebug(">>> Entering AutoPopStackFrame(frameStack={FrameStack},frameDepth={FrameDepth})", frameStack, frameDepth);
                 this.m_frameStack = frameStack;
                 this.m_frameDepth = frameDepth;
+				Logger.LogDebug("<<< Exiting AutoPopStackFrame(frameStack={FrameStack},frameDepth={FrameDepth})", frameStack, frameDepth);
+				Logger.LogDebug("AutoPopStackFrame(frameStack={FrameStack},frameDepth={FrameDepth}): this.m_frameStack → {Arg2}", frameStack, frameDepth, this.m_frameStack);
+				Logger.LogDebug("AutoPopStackFrame(frameStack={FrameStack},frameDepth={FrameDepth}): m_frameDepth → {M_frameDepth}", frameStack, frameDepth, m_frameDepth);
+				Logger.LogDebug("AutoPopStackFrame(frameStack={FrameStack},frameDepth={FrameDepth}): this.m_frameDepth → {Arg2}", frameStack, frameDepth, this.m_frameDepth);
+				Logger.LogDebug("AutoPopStackFrame(frameStack={FrameStack},frameDepth={FrameDepth}): m_frameStack → {M_frameStack}", frameStack, frameDepth, m_frameStack);
             }
 
             /// <summary>Returns the stack to the correct depth.</summary>
@@ -287,6 +311,7 @@ namespace log4net.Util
             /// </remarks>
             public void Dispose()
             {
+				Logger.LogDebug(">>> Entering Dispose()");
                 if (this.m_frameDepth >= 0 && this.m_frameStack != null)
                 {
                     while(this.m_frameStack.Count > this.m_frameDepth)
@@ -294,6 +319,7 @@ namespace log4net.Util
                         this.m_frameStack.Pop();
                     }
                 }
+				Logger.LogDebug("<<< Exiting Dispose()");
             }
         }
 
@@ -311,6 +337,7 @@ namespace log4net.Util
         /// </remarks>
         public class Stack : System.Collections.Stack
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
             /// <summary>Clears the stack of all elements.</summary>
             /// <remarks>
             /// <para>
@@ -319,10 +346,12 @@ namespace log4net.Util
             /// </remarks>
             public void Clear()
             {
+				Logger.LogDebug(">>> Entering Clear()");
                 while(Count > 0)
                 {
                     Pop();
                 }
+				Logger.LogDebug("<<< Exiting Clear()");
             }
 
             /// <summary>Makes a shallow copy of the stack's elements.</summary>
@@ -334,12 +363,15 @@ namespace log4net.Util
             /// </remarks>
             public Stack Clone()
             {
+				Logger.LogDebug(">>> Entering Clone()");
                 Stack res = new Stack();
                 object[] items = ToArray();
+				Logger.LogDebug("Clone(): res → {Res}", res);
                 foreach(object item in items)
                 {
                     res.Push(item);
                 }
+				Logger.LogDebug("<<< Exiting Clone()");
                 return res;
             }
         }

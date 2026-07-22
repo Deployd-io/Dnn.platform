@@ -30,6 +30,10 @@ namespace DotNetNuke.Modules.Admin.EditExtension
         public AuthenticationEditor()
             : this(null, null)
         {
+		eventLogger.LogDebug(">>> Entering AuthenticationEditor()");
+		eventLogger.LogDebug("<<< Exiting AuthenticationEditor()");
+		eventLogger.LogDebug(">>> Entering AuthenticationEditor(navigationManager={NavigationManager},eventLogger={EventLogger})", navigationManager, eventLogger);
+		eventLogger.LogDebug("<<< Exiting AuthenticationEditor(navigationManager={NavigationManager},eventLogger={EventLogger})", navigationManager, eventLogger);
         }
 
         /// <summary>Initializes a new instance of the <see cref="AuthenticationEditor"/> class.</summary>
@@ -39,6 +43,8 @@ namespace DotNetNuke.Modules.Admin.EditExtension
         {
             this.navigationManager = navigationManager ?? Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+			eventLogger.LogDebug("AuthenticationEditor(navigationManager={NavigationManager},eventLogger={EventLogger}): eventLogger → {EventLogger1}", navigationManager, eventLogger, eventLogger);
+			eventLogger.LogDebug("AuthenticationEditor(navigationManager={NavigationManager},eventLogger={EventLogger}): navigationManager → {NavigationManager1}", navigationManager, eventLogger, navigationManager);
         }
 
         protected AuthenticationInfo AuthSystem
@@ -79,6 +85,7 @@ namespace DotNetNuke.Modules.Admin.EditExtension
         /// <inheritdoc />
         public override void Initialize()
         {
+			eventLogger.LogDebug(">>> Entering Initialize()");
             this.pnlSettings.Visible = !this.IsSuperTab;
             if (this.IsSuperTab)
             {
@@ -97,11 +104,13 @@ namespace DotNetNuke.Modules.Admin.EditExtension
             }
 
             this.BindAuthentication();
+			eventLogger.LogDebug("<<< Exiting Initialize()");
         }
 
         /// <inheritdoc />
         public override void UpdatePackage()
         {
+			eventLogger.LogDebug(">>> Entering UpdatePackage()");
             if (this.authenticationForm.IsValid)
             {
                 if (this.authenticationForm.DataSource is AuthenticationInfo authInfo)
@@ -109,11 +118,13 @@ namespace DotNetNuke.Modules.Admin.EditExtension
                     AuthenticationController.UpdateAuthentication(this.eventLogger, authInfo);
                 }
             }
+			eventLogger.LogDebug("<<< Exiting UpdatePackage()");
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             this.cmdUpdate.Click += this.cmdUpdate_Click;
             var displayMode = this.DisplayMode;
@@ -121,6 +132,7 @@ namespace DotNetNuke.Modules.Admin.EditExtension
             {
                 this.AuthEditorHead.Visible = this.AuthEditorHead.EnableViewState = false;
             }
+			eventLogger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
@@ -128,6 +140,7 @@ namespace DotNetNuke.Modules.Admin.EditExtension
         // ReSharper disable once InconsistentNaming
         protected void cmdUpdate_Click(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering cmdUpdate_Click(sender={Sender},e={E})", sender, e);
             this.SettingsControl?.UpdateSettings();
 
             var displayMode = this.DisplayMode;
@@ -135,11 +148,13 @@ namespace DotNetNuke.Modules.Admin.EditExtension
             {
                 this.Response.Redirect(this.navigationManager.NavigateURL(), true);
             }
+			eventLogger.LogDebug("<<< Exiting cmdUpdate_Click(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>This routine Binds the Authentication System.</summary>
         private void BindAuthentication()
         {
+			eventLogger.LogDebug(">>> Entering BindAuthentication()");
             if (this.AuthSystem != null)
             {
                 if (this.AuthSystem.AuthenticationType == "DNN")
@@ -170,6 +185,7 @@ namespace DotNetNuke.Modules.Admin.EditExtension
                     this.cmdUpdate.Visible = false;
                 }
             }
+			eventLogger.LogDebug("<<< Exiting BindAuthentication()");
         }
     }
 }

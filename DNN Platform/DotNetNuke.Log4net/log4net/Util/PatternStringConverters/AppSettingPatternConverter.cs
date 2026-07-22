@@ -27,6 +27,7 @@ using System.Configuration;
 
 namespace log4net.Util.PatternStringConverters
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// AppSetting pattern converter
     /// </summary>
@@ -92,6 +93,7 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         protected override void Convert(TextWriter writer, object state)
         {
+		Logger.LogDebug(">>> Entering Convert(writer={Writer},state={State})", writer, state);
 
             if (this.Option != null)
             {
@@ -103,6 +105,7 @@ namespace log4net.Util.PatternStringConverters
                 // Write all the key value pairs
                 WriteDictionary(writer, null, AppSettingsDictionary);
             }
+			Logger.LogDebug("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
         }
     }
 }

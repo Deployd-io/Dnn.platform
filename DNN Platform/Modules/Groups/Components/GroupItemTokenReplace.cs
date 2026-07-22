@@ -17,15 +17,20 @@ namespace DotNetNuke.Modules.Groups.Components
 
     public class GroupItemTokenReplace : Services.Tokens.BaseCustomTokenReplace
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="GroupItemTokenReplace"/> class.</summary>
         /// <param name="groupInfo">The group info.</param>
         public GroupItemTokenReplace(RoleInfo groupInfo)
         {
+			Logger.LogDebug(">>> Entering GroupItemTokenReplace(groupInfo={GroupInfo})", groupInfo);
             this.AddPropertySource("groupitem", groupInfo);
+			Logger.LogDebug("<<< Exiting GroupItemTokenReplace(groupInfo={GroupInfo})", groupInfo);
         }
 
         public string ReplaceGroupItemTokens(string source)
         {
+			Logger.LogDebug(">>> Entering ReplaceGroupItemTokens(source={Source})", source);
+			Logger.LogDebug("<<< Exiting ReplaceGroupItemTokens(source={Source})", source);
             return this.ReplaceTokens(source);
         }
     }

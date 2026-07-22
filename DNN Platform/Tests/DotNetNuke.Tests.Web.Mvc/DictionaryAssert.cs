@@ -23,6 +23,7 @@ namespace DotNetNuke.Tests.Web.Mvc
                 using (Assert.EnterMultipleScope())
                 {
                     Assert.That(actual, Does.ContainKey(pair.Key));
+					private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                     Assert.That(actual[pair.Key], Is.EqualTo(pair.Value));
                 }
             }

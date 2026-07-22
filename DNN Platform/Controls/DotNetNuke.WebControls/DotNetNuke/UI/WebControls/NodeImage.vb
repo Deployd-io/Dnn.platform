@@ -9,9 +9,16 @@ Imports System.Web.UI
 Namespace DotNetNuke.UI.WebControls
     Public Class NodeImage
         Implements IStateManager
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(NodeImage))
         ' Methods
         Public Sub New()
+			Logger.LogDebug(">>> Entering New()")
             Me._marked = False
+			Logger.LogDebug("<<< Exiting New()")
+			Logger.LogDebug("New(): Me._marked → {Arg0}", Me._marked)
+			Logger.LogDebug(">>> Entering New(NewImageUrl={NewImageUrl})", NewImageUrl)
+			Logger.LogDebug("New(NewImageUrl={NewImageUrl}): Me._marked → {Arg1}", NewImageUrl, Me._marked)
+			Logger.LogDebug("New(NewImageUrl={NewImageUrl}): Me.ImageUrl → {Arg1}", NewImageUrl, Me.ImageUrl)
         End Sub
 
         Public Sub New(ByVal NewImageUrl As String)
@@ -21,30 +28,39 @@ Namespace DotNetNuke.UI.WebControls
             End If
             DirectCast(Me, IStateManager).TrackViewState
             Me.ImageUrl = NewImageUrl
+			Logger.LogDebug("<<< Exiting New(NewImageUrl={NewImageUrl})", NewImageUrl)
         End Sub
 
         Public Sub LoadViewState(ByVal state As Object) Implements IStateManager.LoadViewState
+			Logger.LogDebug(">>> Entering LoadViewState(state={State})", state)
             If (Not state Is Nothing) Then
                 DirectCast(Me.ViewState, IStateManager).LoadViewState(state)
             End If
+			Logger.LogDebug("<<< Exiting LoadViewState(state={State})", state)
         End Sub
 
         Public Function SaveViewState() As Object Implements IStateManager.SaveViewState
+			Logger.LogDebug(">>> Entering SaveViewState()")
             Dim obj2 As Object = Nothing
             If Not Object.ReferenceEquals(Me._state, Nothing) Then
                 obj2 = DirectCast(Me._state, IStateManager).SaveViewState
+				Logger.LogDebug("SaveViewState(): obj2 → {Obj2}", obj2)
             End If
+			Logger.LogDebug("<<< Exiting SaveViewState()")
             Return obj2
         End Function
 
         Friend Sub SetDirty()
+			Logger.LogDebug(">>> Entering SetDirty()")
             Dim flag As Boolean = Not Object.ReferenceEquals(Me._state, Nothing)
             If flag Then
                 Dim enumerator As IEnumerator = Nothing
                 Try 
                     enumerator = Me._state.Keys.GetEnumerator
+					Logger.LogDebug("SetDirty(): enumerator → {Enumerator}", enumerator)
                     Do While True
                         flag = enumerator.MoveNext
+						Logger.LogDebug("SetDirty(): flag → {Flag}", flag)
                         If Not flag Then
                             Exit Do
                         End If
@@ -57,10 +73,14 @@ Namespace DotNetNuke.UI.WebControls
                     End If
                 End Try
             End If
+			Logger.LogDebug("<<< Exiting SetDirty()")
         End Sub
 
         Public Sub TrackViewState() Implements IStateManager.TrackViewState
+			Logger.LogDebug(">>> Entering TrackViewState()")
             Me._marked = True
+			Logger.LogDebug("<<< Exiting TrackViewState()")
+			Logger.LogDebug("TrackViewState(): Me._marked → {Arg0}", Me._marked)
         End Sub
 
 

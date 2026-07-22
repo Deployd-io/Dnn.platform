@@ -18,6 +18,7 @@ namespace DotNetNuke.Entities.Urls
     /// <summary>The TabPathHelper class provides helper methods for working with tab urls.</summary>
     public class TabPathHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static string BuildTabPathWithReplacement(TabInfo tab, FriendlyUrlOptions options, Guid parentTraceId)
         {
             string path = string.Empty;
@@ -45,8 +46,10 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>The <paramref name="tabPath"/> with diacritics replaced.</returns>
         public static string ReplaceDiacritics(string tabPath, out bool replacedDiacritic)
         {
+			Logger.LogDebug(">>> Entering ReplaceDiacritics(tabPath={TabPath})", tabPath);
             string nmTabPath = tabPath.Normalize(NormalizationForm.FormD);
             var sb = new StringBuilder();
+			Logger.LogDebug("ReplaceDiacritics(tabPath={TabPath}): sb → {Sb}", tabPath, sb);
             for (int i = 0; i < nmTabPath.Length; i++)
             {
                 char c = nmTabPath[i];
@@ -58,6 +61,9 @@ namespace DotNetNuke.Entities.Urls
 
             string result = sb.ToString();
             replacedDiacritic = !string.Equals(tabPath, result, StringComparison.Ordinal);
+			Logger.LogDebug("ReplaceDiacritics(tabPath={TabPath}): result → {Result}", tabPath, result);
+			Logger.LogDebug("ReplaceDiacritics(tabPath={TabPath}): replacedDiacritic → {ReplacedDiacritic}", tabPath, replacedDiacritic);
+			Logger.LogDebug("<<< Exiting ReplaceDiacritics(tabPath={TabPath})", tabPath);
             return sb.ToString();
         }
 
@@ -95,26 +101,33 @@ namespace DotNetNuke.Entities.Urls
         /// <remarks>Note if no specific home page found for the culture, will return defaultHomeTabId back.</remarks>
         internal static int GetHomePageTabIdForCulture(string defaultCulture, int portalId, string cultureCode, int defaultHomeTabId)
         {
+			Logger.LogDebug(">>> Entering GetHomePageTabIdForCulture(defaultCulture={DefaultCulture},portalId={PortalId},cultureCode={CultureCode},defaultHomeTabId={DefaultHomeTabId})", defaultCulture, portalId, cultureCode, defaultHomeTabId);
             int homeTabId = defaultHomeTabId;
             if (!string.Equals(defaultCulture, cultureCode, StringComparison.OrdinalIgnoreCase))
+			Logger.LogDebug("GetHomePageTabIdForCulture(defaultCulture={DefaultCulture},portalId={PortalId},cultureCode={CultureCode},defaultHomeTabId={DefaultHomeTabId}): homeTabId → {HomeTabId}", defaultCulture, portalId, cultureCode, defaultHomeTabId, homeTabId);
             {
                 // not the default culture, so there could be a different home page for the different culture in 5.5+ builds
                 var cultureLocale = new Locale { Code = cultureCode, Fallback = cultureCode, Text = cultureCode };
                 TabInfo tab = TabController.Instance.GetTabByCulture(defaultHomeTabId, portalId, cultureLocale);
                 if (tab != null)
+				Logger.LogDebug("GetHomePageTabIdForCulture(defaultCulture={DefaultCulture},portalId={PortalId},cultureCode={CultureCode},defaultHomeTabId={DefaultHomeTabId}): tab → {Tab}", defaultCulture, portalId, cultureCode, defaultHomeTabId, tab);
                 {
                     // this is the culture specific tab of the home page
                     homeTabId = tab.TabID;
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetHomePageTabIdForCulture(defaultCulture={DefaultCulture},portalId={PortalId},cultureCode={CultureCode},defaultHomeTabId={DefaultHomeTabId})", defaultCulture, portalId, cultureCode, defaultHomeTabId);
             return homeTabId;
         }
 
         internal static string GetTabAliasSkinForTabAndAlias(int portalId, string httpAlias, string culture)
         {
+			Logger.LogDebug(">>> Entering GetTabAliasSkinForTabAndAlias(portalId={PortalId},httpAlias={HttpAlias},culture={Culture})", portalId, httpAlias, culture);
             string skin = null;
             Hashtable homePageSkins = CacheController.GetHomePageSkinsFromCache(portalId);
+			Logger.LogDebug("GetTabAliasSkinForTabAndAlias(portalId={PortalId},httpAlias={HttpAlias},culture={Culture}): skin → {Skin}", portalId, httpAlias, culture, skin);
+			Logger.LogDebug("GetTabAliasSkinForTabAndAlias(portalId={PortalId},httpAlias={HttpAlias},culture={Culture}): homePageSkins → {HomePageSkins}", portalId, httpAlias, culture, homePageSkins);
             if (homePageSkins != null)
             {
                 string key = httpAlias + "::" + culture;
@@ -129,6 +142,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetTabAliasSkinForTabAndAlias(portalId={PortalId},httpAlias={HttpAlias},culture={Culture})", portalId, httpAlias, culture);
             return skin;
         }
 

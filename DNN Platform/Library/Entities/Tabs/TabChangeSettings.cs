@@ -13,9 +13,11 @@ namespace DotNetNuke.Entities.Tabs
 
     public class TabChangeSettings : ServiceLocator<ITabChangeSettings, TabChangeSettings>, ITabChangeSettings
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public bool IsChangeControlEnabled(int portalId, int tabId)
         {
+			Logger.LogDebug(">>> Entering IsChangeControlEnabled(portalId={PortalId},tabId={TabId})", portalId, tabId);
             if (portalId == Null.NullInteger)
             {
                 return false;
@@ -23,12 +25,17 @@ namespace DotNetNuke.Entities.Tabs
 
             var isVersioningEnabled = TabVersionSettings.Instance.IsVersioningEnabled(portalId, tabId);
             var isWorkflowEnable = TabWorkflowSettings.Instance.IsWorkflowEnabled(portalId, tabId);
+			Logger.LogDebug("IsChangeControlEnabled(portalId={PortalId},tabId={TabId}): isVersioningEnabled → {IsVersioningEnabled}", portalId, tabId, isVersioningEnabled);
+			Logger.LogDebug("IsChangeControlEnabled(portalId={PortalId},tabId={TabId}): isWorkflowEnable → {IsWorkflowEnable}", portalId, tabId, isWorkflowEnable);
+			Logger.LogDebug("<<< Exiting IsChangeControlEnabled(portalId={PortalId},tabId={TabId})", portalId, tabId);
             return isVersioningEnabled || isWorkflowEnable;
         }
 
         /// <inheritdoc />
         public ChangeControlState GetChangeControlState(int portalId, int tabId)
         {
+			Logger.LogDebug(">>> Entering GetChangeControlState(portalId={PortalId},tabId={TabId})", portalId, tabId);
+			Logger.LogDebug("<<< Exiting GetChangeControlState(portalId={PortalId},tabId={TabId})", portalId, tabId);
             return new ChangeControlState
             {
                 PortalId = portalId,
@@ -41,6 +48,8 @@ namespace DotNetNuke.Entities.Tabs
         /// <inheritdoc />
         protected override Func<ITabChangeSettings> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new TabChangeSettings();
         }
     }

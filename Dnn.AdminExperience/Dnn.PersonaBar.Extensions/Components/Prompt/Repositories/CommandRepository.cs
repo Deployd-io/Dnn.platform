@@ -33,11 +33,16 @@ namespace Dnn.PersonaBar.Prompt.Components.Repositories
         public CommandRepository()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering CommandRepository()");
+		Logger.LogDebug("<<< Exiting CommandRepository()");
+		Logger.LogDebug(">>> Entering CommandRepository(serviceScopeFactory={ServiceScopeFactory})", serviceScopeFactory);
+		Logger.LogDebug("<<< Exiting CommandRepository(serviceScopeFactory={ServiceScopeFactory})", serviceScopeFactory);
         }
 
         public CommandRepository(IServiceScopeFactory serviceScopeFactory)
         {
             this.serviceScopeFactory = serviceScopeFactory ?? Globals.GetCurrentServiceProvider().GetRequiredService<IServiceScopeFactory>();
+			Logger.LogDebug("CommandRepository(serviceScopeFactory={ServiceScopeFactory}): serviceScopeFactory → {ServiceScopeFactory1}", serviceScopeFactory, serviceScopeFactory);
         }
 
         /// <inheritdoc />
@@ -52,7 +57,10 @@ namespace Dnn.PersonaBar.Prompt.Components.Repositories
         /// <inheritdoc />
         public CommandHelp GetCommandHelp(string[] args, IConsoleCommand consoleCommand)
         {
+			Logger.LogDebug(">>> Entering GetCommandHelp(args={Args},consoleCommand={ConsoleCommand})", args, consoleCommand);
             var cacheKey = (string.Join("_", args) + "_" + PortalController.Instance.GetCurrentSettings()?.DefaultLanguage).Replace("-", "_");
+			Logger.LogDebug("GetCommandHelp(args={Args},consoleCommand={ConsoleCommand}): cacheKey → {CacheKey}", args, consoleCommand, cacheKey);
+			Logger.LogDebug("<<< Exiting GetCommandHelp(args={Args},consoleCommand={ConsoleCommand})", args, consoleCommand);
             return DataCache.GetCachedData<CommandHelp>(
                 new CacheItemArgs(cacheKey, CacheItemPriority.Low),
                 c => this.GetCommandHelpInternal(consoleCommand));
@@ -61,6 +69,8 @@ namespace Dnn.PersonaBar.Prompt.Components.Repositories
         /// <inheritdoc />
         protected override Func<ICommandRepository> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return Globals.DependencyProvider.GetRequiredService<ICommandRepository>;
         }
 
@@ -72,12 +82,17 @@ namespace Dnn.PersonaBar.Prompt.Components.Repositories
 
         private static string CreateCommandFromClass(string className)
         {
+			Logger.LogDebug(">>> Entering CreateCommandFromClass(className={ClassName})", className);
             var camelCasedParts = SplitCamelCase(className);
+			Logger.LogDebug("CreateCommandFromClass(className={ClassName}): camelCasedParts → {CamelCasedParts}", className, camelCasedParts);
+			Logger.LogDebug("<<< Exiting CreateCommandFromClass(className={ClassName})", className);
             return string.Join("-", camelCasedParts.Select(x => x.ToLowerInvariant()));
         }
 
         private static string[] SplitCamelCase(string source)
         {
+			Logger.LogDebug(">>> Entering SplitCamelCase(source={Source})", source);
+			Logger.LogDebug("<<< Exiting SplitCamelCase(source={Source})", source);
             return Regex.Split(source, @"(?<!^)(?=[A-Z])");
         }
 
@@ -92,6 +107,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Repositories
             using var serviceScope = this.serviceScopeFactory.CreateScope();
             foreach (var commandType in allCommandTypes)
             {
+				private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                 var attr = commandType.GetCustomAttributes(typeof(ConsoleCommandAttribute), false).FirstOrDefault() ?? new ConsoleCommandAttribute(CreateCommandFromClass(commandType.Name), Constants.GeneralCategory, $"Prompt_{commandType.Name}_Description");
                 var assemblyName = commandType.Assembly.GetName();
                 var version = assemblyName.Version.ToString();
@@ -116,11 +132,16 @@ namespace Dnn.PersonaBar.Prompt.Components.Repositories
 
         private CommandHelp GetCommandHelpInternal(IConsoleCommand consoleCommand)
         {
+			Logger.LogDebug(">>> Entering GetCommandHelpInternal(consoleCommand={ConsoleCommand})", consoleCommand);
             var commandHelp = new CommandHelp();
             if (consoleCommand != null)
+			Logger.LogDebug("GetCommandHelpInternal(consoleCommand={ConsoleCommand}): commandHelp → {CommandHelp}", consoleCommand, commandHelp);
             {
                 var commandType = consoleCommand.GetType();
                 var attr = commandType.GetCustomAttributes(typeof(ConsoleCommandAttribute), false).FirstOrDefault() as ConsoleCommandAttribute ?? new ConsoleCommandAttribute(CreateCommandFromClass(commandType.Name), Constants.GeneralCategory, $"Prompt_{commandType.Name}_Description");
+				Logger.LogDebug("GetCommandHelpInternal(consoleCommand={ConsoleCommand}): commandType → {CommandType}", consoleCommand, commandType);
+				Logger.LogDebug("GetCommandHelpInternal(consoleCommand={ConsoleCommand}): attr → {Attr}", consoleCommand, attr);
+				Logger.LogDebug("GetCommandHelpInternal(consoleCommand={ConsoleCommand}): commandHelp.Name → {Arg1}", consoleCommand, commandHelp.Name);
                 commandHelp.Name = attr.Name;
                 commandHelp.Description = LocalizeString(attr.Description, consoleCommand.LocalResourceFile);
                 var flagAttributes = commandType.GetFields(BindingFlags.NonPublic | BindingFlags.Static)
@@ -138,15 +159,18 @@ namespace Dnn.PersonaBar.Prompt.Components.Repositories
                                LocalizeString(attribute.Description, consoleCommand.LocalResourceFile),
                     }).ToList();
                     commandHelp.Options = options;
+					Logger.LogDebug("GetCommandHelpInternal(consoleCommand={ConsoleCommand}): commandHelp.Options → {Arg1}", consoleCommand, commandHelp.Options);
                 }
 
                 commandHelp.ResultHtml = consoleCommand.ResultHtml;
+				Logger.LogDebug("GetCommandHelpInternal(consoleCommand={ConsoleCommand}): commandHelp.ResultHtml → {Arg1}", consoleCommand, commandHelp.ResultHtml);
             }
             else
             {
                 commandHelp.Error = LocalizeString("Prompt_CommandNotFound");
             }
 
+			Logger.LogDebug("<<< Exiting GetCommandHelpInternal(consoleCommand={ConsoleCommand})", consoleCommand);
             return commandHelp;
         }
     }

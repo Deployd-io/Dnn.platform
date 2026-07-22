@@ -16,6 +16,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
     [ConsoleCommand("delete-user", Constants.UsersCategory, "Prompt_DeleteUser_Description")]
     public class DeleteUser : ConsoleCommandBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [FlagParameter("id", "Prompt_DeleteUser_FlagId", "Integer", true)]
         private const string FlagId = "id";
 
@@ -29,6 +30,10 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         public DeleteUser()
             : this(new UserValidator(), new UserControllerWrapper())
         {
+		Logger.LogDebug(">>> Entering DeleteUser()");
+		Logger.LogDebug("<<< Exiting DeleteUser()");
+		Logger.LogDebug(">>> Entering DeleteUser(userValidator={UserValidator},userControllerWrapper={UserControllerWrapper})", userValidator, userControllerWrapper);
+		Logger.LogDebug("<<< Exiting DeleteUser(userValidator={UserValidator},userControllerWrapper={UserControllerWrapper})", userValidator, userControllerWrapper);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DeleteUser"/> class.</summary>
@@ -38,6 +43,10 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         {
             this.userValidator = userValidator;
             this.userControllerWrapper = userControllerWrapper;
+			Logger.LogDebug("DeleteUser(userValidator={UserValidator},userControllerWrapper={UserControllerWrapper}): this.userValidator → {Arg2}", userValidator, userControllerWrapper, this.userValidator);
+			Logger.LogDebug("DeleteUser(userValidator={UserValidator},userControllerWrapper={UserControllerWrapper}): userControllerWrapper → {UserControllerWrapper1}", userValidator, userControllerWrapper, userControllerWrapper);
+			Logger.LogDebug("DeleteUser(userValidator={UserValidator},userControllerWrapper={UserControllerWrapper}): this.userControllerWrapper → {Arg2}", userValidator, userControllerWrapper, this.userControllerWrapper);
+			Logger.LogDebug("DeleteUser(userValidator={UserValidator},userControllerWrapper={UserControllerWrapper}): userValidator → {UserValidator1}", userValidator, userControllerWrapper, userValidator);
         }
 
         /// <inheritdoc />
@@ -50,13 +59,16 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.UserId = this.GetFlagValue(FlagId, "User Id", -1, true, true, true);
             this.Notify = this.GetFlagValue(FlagNotify, "Notify", false);
+			Logger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             ConsoleErrorResultModel errorResultModel;
             UserInfo userInfo;
 
@@ -67,6 +79,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
 
             var userModels = new List<UserModel> { new UserModel(userInfo) };
 
+			Logger.LogDebug("Run(): userModels → {UserModels}", userModels);
             if (userInfo.IsDeleted)
             {
                 return new ConsoleErrorResultModel(this.LocalizeString("Prompt_UserAlreadyDeleted"));
@@ -84,7 +97,9 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
 
             // attempt to retrieve the user from the dB
             userInfo = this.userControllerWrapper.GetUserById(validPortalId, userInfo.UserID);
+			Logger.LogDebug("Run(): userInfo → {UserInfo}", userInfo);
             userModels = new List<UserModel> { new UserModel(userInfo) };
+			Logger.LogDebug("<<< Exiting Run()");
             return new ConsoleResultModel(this.LocalizeString("UserDeleted")) { Data = userModels, Records = userModels.Count };
         }
     }

@@ -18,17 +18,21 @@ namespace DotNetNuke.Tests.Core.Services.Installer
     [TestFixture]
     public class CleanupInstallerTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string wwwroot = "D:/inetpub/wwwroot";
 
         [Test]
         [TestCaseSource(nameof(InvalidPathsTestCaseSource))]
         public void Install_WhenFolderInvalid_DoesNotCallFileSystem(string path)
         {
+			Logger.LogDebug(">>> Entering Install_WhenFolderInvalid_DoesNotCallFileSystem(path={Path})", path);
             // arrange
             var applicationStatusInfoMock = SetupApplicationStatusInfoMock();
 
+			Logger.LogDebug("Install_WhenFolderInvalid_DoesNotCallFileSystem(path={Path}): applicationStatusInfoMock → {ApplicationStatusInfoMock}", path, applicationStatusInfoMock);
             var fileSystemUtilsMock = new Mock<IFileSystemUtils>();
 
+			Logger.LogDebug("Install_WhenFolderInvalid_DoesNotCallFileSystem(path={Path}): fileSystemUtilsMock → {FileSystemUtilsMock}", path, fileSystemUtilsMock);
             var sut = new CleanupInstaller(applicationStatusInfoMock.Object, fileSystemUtilsMock.Object)
             {
                 Package = new PackageInfo(new InstallerInfo()),
@@ -41,6 +45,7 @@ namespace DotNetNuke.Tests.Core.Services.Installer
             // assert
             Assert.That(sut.Completed, Is.True);
             fileSystemUtilsMock.Verify(x => x.DeleteEmptyFoldersRecursive(It.IsAny<string>()), Times.Never);
+			Logger.LogDebug("<<< Exiting Install_WhenFolderInvalid_DoesNotCallFileSystem(path={Path})", path);
         }
 
         [Test]
@@ -79,6 +84,7 @@ namespace DotNetNuke.Tests.Core.Services.Installer
 
         private static IEnumerable<string> InvalidPathsTestCaseSource()
         {
+			Logger.LogDebug(">>> Entering InvalidPathsTestCaseSource()");
             yield return null;
 
             var nonSlashedPaths = new[]
@@ -137,12 +143,15 @@ namespace DotNetNuke.Tests.Core.Services.Installer
                 yield return AddTrailingSlash(path);
                 yield return Alternate(AddTrailingSlash(path));
             }
+			Logger.LogDebug("<<< Exiting InvalidPathsTestCaseSource()");
         }
 
         private static IEnumerable<IEnumerable<string>> ValidPathsTestCaseSource()
         {
+			Logger.LogDebug(">>> Entering ValidPathsTestCaseSource()");
             var expectedPath = Alternate(wwwroot + "/dir");
 
+			Logger.LogDebug("ValidPathsTestCaseSource(): expectedPath → {ExpectedPath}", expectedPath);
             yield return new[] { "dir", expectedPath };
             yield return new[] { AddTrailingSlash("dir"), expectedPath };
             yield return new[] { Alternate(AddTrailingSlash("dir")), expectedPath };
@@ -159,30 +168,40 @@ namespace DotNetNuke.Tests.Core.Services.Installer
                 yield return new[] { AddTrailingSlash(path), expectedPath };
                 yield return new[] { Alternate(AddTrailingSlash(path)), expectedPath };
             }
+			Logger.LogDebug("<<< Exiting ValidPathsTestCaseSource()");
         }
 
         private static string MakeAbsolute(string relative)
         {
+			Logger.LogDebug(">>> Entering MakeAbsolute(relative={Relative})", relative);
+			Logger.LogDebug("<<< Exiting MakeAbsolute(relative={Relative})", relative);
             return string.Concat(wwwroot, "/", relative);
         }
 
         private static string Alternate(string path)
         {
+			Logger.LogDebug(">>> Entering Alternate(path={Path})", path);
+			Logger.LogDebug("<<< Exiting Alternate(path={Path})", path);
             return path.Replace('/', '\\');
         }
 
         private static string AddTrailingSlash(string path)
         {
+			Logger.LogDebug(">>> Entering AddTrailingSlash(path={Path})", path);
+			Logger.LogDebug("<<< Exiting AddTrailingSlash(path={Path})", path);
             return path + '/';
         }
 
         private static Mock<IApplicationStatusInfo> SetupApplicationStatusInfoMock()
         {
+			Logger.LogDebug(">>> Entering SetupApplicationStatusInfoMock()");
             var mock = new Mock<IApplicationStatusInfo>();
 
+			Logger.LogDebug("SetupApplicationStatusInfoMock(): mock → {Mock}", mock);
             mock.SetupGet(x => x.ApplicationMapPath)
                 .Returns(wwwroot);
 
+			Logger.LogDebug("<<< Exiting SetupApplicationStatusInfoMock()");
             return mock;
         }
     }

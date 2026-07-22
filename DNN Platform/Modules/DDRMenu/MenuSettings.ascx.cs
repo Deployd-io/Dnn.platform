@@ -11,9 +11,11 @@ namespace DotNetNuke.Web.DDRMenu
     /// <summary>Implements the settings view of the module.</summary>
     public partial class MenuSettings : ModuleSettingsBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override void LoadSettings()
         {
+			Logger.LogDebug(">>> Entering LoadSettings()");
             if (this.IsPostBack)
             {
                 return;
@@ -29,11 +31,13 @@ namespace DotNetNuke.Web.DDRMenu
             this.IncludeHidden.Value = Convert.ToBoolean(this.Settings["IncludeHidden"] ?? "false");
             this.TemplateArguments.Value = this.Settings["TemplateArguments"] ?? string.Empty;
             this.ClientOptions.Value = this.Settings["ClientOptions"] ?? string.Empty;
+			Logger.LogDebug("<<< Exiting LoadSettings()");
         }
 
         /// <inheritdoc />
         public override void UpdateSettings()
         {
+			Logger.LogDebug(">>> Entering UpdateSettings()");
             ModuleController.Instance.UpdateModuleSetting(this.ModuleId, "MenuStyle", (this.MenuStyle.Value ?? string.Empty).ToString());
             ModuleController.Instance.UpdateModuleSetting(this.ModuleId, "NodeXmlPath", (this.NodeXmlPath.Value ?? string.Empty).ToString());
             ModuleController.Instance.UpdateModuleSetting(this.ModuleId, "NodeSelector", (this.NodeSelector.Value ?? string.Empty).ToString());
@@ -44,12 +48,15 @@ namespace DotNetNuke.Web.DDRMenu
             ModuleController.Instance.UpdateModuleSetting(this.ModuleId, "IncludeHidden", (this.IncludeHidden.Value ?? "false").ToString());
             ModuleController.Instance.UpdateModuleSetting(this.ModuleId, "TemplateArguments", (this.TemplateArguments.Value ?? string.Empty).ToString());
             ModuleController.Instance.UpdateModuleSetting(this.ModuleId, "ClientOptions", (this.ClientOptions.Value ?? string.Empty).ToString());
+			Logger.LogDebug("<<< Exiting UpdateSettings()");
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             this.IncludeHiddenSection.Visible = DNNAbstract.IncludeHiddenSupported();
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
     }
 }

@@ -17,6 +17,7 @@ namespace DotNetNuke.Entities.Urls
 
     internal class RedirectController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Cancels a redirect.</summary>
         /// <param name="result">The URL action to update.</param>
         /// <param name="context">The HTTP context.</param>
@@ -24,13 +25,18 @@ namespace DotNetNuke.Entities.Urls
         /// <param name="message">The message to add to <see cref="UrlAction.DebugMessages"/>.</param>
         internal static void CancelRedirect(ref UrlAction result, HttpContext context, FriendlyUrlSettings settings, string message)
         {
+			Logger.LogDebug(">>> Entering CancelRedirect(result={Result},context={Context},settings={Settings},message={Message})", result, context, settings, message);
             result.Action = ActionType.Continue;
             result.Reason = RedirectReason.Not_Redirected;
+			Logger.LogDebug("CancelRedirect(result={Result},context={Context},settings={Settings},message={Message}): result.Reason → {Arg4}", result, context, settings, message, result.Reason);
+			Logger.LogDebug("CancelRedirect(result={Result},context={Context},settings={Settings},message={Message}): result.FinalUrl → {Arg4}", result, context, settings, message, result.FinalUrl);
+			Logger.LogDebug("CancelRedirect(result={Result},context={Context},settings={Settings},message={Message}): result.Action → {Arg4}", result, context, settings, message, result.Action);
             result.FinalUrl = null;
 
             // clean the path for the rewrite
             NameValueCollection queryString = null;
             if (context != null)
+			Logger.LogDebug("CancelRedirect(result={Result},context={Context},settings={Settings},message={Message}): queryString → {QueryString}", result, context, settings, message, queryString);
             {
                 queryString = context.Request.QueryString;
             }
@@ -46,6 +52,7 @@ namespace DotNetNuke.Entities.Urls
             }
 
             result.DebugMessages.Add(message);
+			Logger.LogDebug("<<< Exiting CancelRedirect(result={Result},context={Context},settings={Settings},message={Message})", result, context, settings, message);
         }
 
         /// <summary>Checks for a redirect based on a module friendly url provider rule.</summary>

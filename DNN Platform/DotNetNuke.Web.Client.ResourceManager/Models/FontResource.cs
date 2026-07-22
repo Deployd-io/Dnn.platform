@@ -12,27 +12,37 @@ using DotNetNuke.Abstractions.ClientResources;
 /// <summary>Represents a font resource that can be registered and rendered for client use.</summary>
 public class FontResource : LinkResource, IFontResource
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     private readonly IClientResourceController clientResourceController;
 
     /// <summary>Initializes a new instance of the <see cref="FontResource"/> class.</summary>
     /// <param name="clientResourceController">The client resources controller used to manage font resources.</param>
     public FontResource(IClientResourceController clientResourceController)
     {
+		Logger.LogDebug(">>> Entering FontResource(clientResourceController={ClientResourceController})", clientResourceController);
         this.clientResourceController = clientResourceController;
         this.Provider = ClientResourceProviders.DnnPageHeaderProvider;
+		Logger.LogDebug("<<< Exiting FontResource(clientResourceController={ClientResourceController})", clientResourceController);
+		Logger.LogDebug("FontResource(clientResourceController={ClientResourceController}): this.clientResourceController → {Arg1}", clientResourceController, this.clientResourceController);
+		Logger.LogDebug("FontResource(clientResourceController={ClientResourceController}): this.Provider → {Arg1}", clientResourceController, this.Provider);
+		Logger.LogDebug("FontResource(clientResourceController={ClientResourceController}): clientResourceController → {ClientResourceController1}", clientResourceController, clientResourceController);
     }
 
     /// <inheritdoc />
     public override void Register()
     {
+		Logger.LogDebug(">>> Entering Register()");
         this.clientResourceController.AddFont(this);
+		Logger.LogDebug("<<< Exiting Register()");
     }
 
     /// <inheritdoc />
     public override string Render(int crmVersion, bool useCdn, string applicationPath)
     {
+		Logger.LogDebug(">>> Entering Render(crmVersion={CrmVersion},useCdn={UseCdn},applicationPath={ApplicationPath})", crmVersion, useCdn, applicationPath);
         var htmlString = new StringBuilder("<link");
         htmlString.Append($" href=\"{this.GetVersionedPath(crmVersion, useCdn, applicationPath)}\"");
+		Logger.LogDebug("Render(crmVersion={CrmVersion},useCdn={UseCdn},applicationPath={ApplicationPath}): htmlString → {HtmlString}", crmVersion, useCdn, applicationPath, htmlString);
         if (this.Preload && !this.Attributes.ContainsKey("rel") && !this.Attributes.ContainsKey("as"))
         {
             htmlString.Append($" rel=\"preload\" as=\"font\"");
@@ -49,6 +59,7 @@ public class FontResource : LinkResource, IFontResource
         this.RenderReferrerPolicy(htmlString);
         this.RenderAttributes(htmlString);
         htmlString.Append(" />");
+		Logger.LogDebug("<<< Exiting Render(crmVersion={CrmVersion},useCdn={UseCdn},applicationPath={ApplicationPath})", crmVersion, useCdn, applicationPath);
         return htmlString.ToString();
     }
 }

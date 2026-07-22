@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.Installer.Dependencies
     /// </summary>
     public class PermissionsDependency : DependencyBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private string permission = Null.NullString;
         private string permissions;
 
@@ -40,7 +41,10 @@ namespace DotNetNuke.Services.Installer.Dependencies
         /// <inheritdoc />
         public override void ReadManifest(XPathNavigator dependencyNav)
         {
+			Logger.LogDebug(">>> Entering ReadManifest(dependencyNav={DependencyNav})", dependencyNav);
             this.permissions = dependencyNav.Value;
+			Logger.LogDebug("<<< Exiting ReadManifest(dependencyNav={DependencyNav})", dependencyNav);
+			Logger.LogDebug("ReadManifest(dependencyNav={DependencyNav}): this.permissions → {Arg1}", dependencyNav, this.permissions);
         }
     }
 }

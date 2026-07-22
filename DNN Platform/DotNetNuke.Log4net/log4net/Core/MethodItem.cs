@@ -35,11 +35,16 @@ namespace log4net.Core
 #endif
     public class MethodItem
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>constructs a method item for an unknown method.</summary>
         public MethodItem()
         {
+			Logger.LogDebug(">>> Entering MethodItem()");
             this.m_name = NA;
             this.m_parameters = [];
+			Logger.LogDebug("<<< Exiting MethodItem()");
+			Logger.LogDebug("MethodItem(): this.m_name → {Arg0}", this.m_name);
+			Logger.LogDebug("MethodItem(): this.m_parameters → {Arg0}", this.m_parameters);
         }
 
         /// <summary>constructs a method item from the name of the method.</summary>
@@ -47,7 +52,10 @@ namespace log4net.Core
         public MethodItem(string name)
             : this()
         {
+			Logger.LogDebug(">>> Entering MethodItem(name={Name})", name);
             this.m_name = name;
+			Logger.LogDebug("<<< Exiting MethodItem(name={Name})", name);
+			Logger.LogDebug("MethodItem(name={Name}): this.m_name → {Arg1}", name, this.m_name);
         }
 
         /// <summary>constructs a method item from the name of the method and its parameters.</summary>
@@ -57,6 +65,7 @@ namespace log4net.Core
             : this(name)
         {
             this.m_parameters = parameters;
+			Logger.LogDebug("MethodItem(name={Name},parameters={Parameters}): this.m_parameters → {Arg2}", name, parameters, this.m_parameters);
         }
 
         /// <summary>constructs a method item from a method base by determining the method name and its parameters.</summary>
@@ -68,13 +77,16 @@ namespace log4net.Core
 
         private static string[] GetMethodParameterNames(System.Reflection.MethodBase methodBase)
         {
+			Logger.LogDebug(">>> Entering GetMethodParameterNames(methodBase={MethodBase})", methodBase);
             ArrayList methodParameterNames = new ArrayList();
             try
+			Logger.LogDebug("GetMethodParameterNames(methodBase={MethodBase}): methodParameterNames → {MethodParameterNames}", methodBase, methodParameterNames);
             {
                 System.Reflection.ParameterInfo[] methodBaseGetParameters = methodBase.GetParameters();
 
                 int methodBaseGetParametersCount = methodBaseGetParameters.GetUpperBound(0);
 
+				Logger.LogDebug("GetMethodParameterNames(methodBase={MethodBase}): methodBaseGetParametersCount → {MethodBaseGetParametersCount}", methodBase, methodBaseGetParametersCount);
                 for (int i = 0; i <= methodBaseGetParametersCount; i++)
                 {
                     methodParameterNames.Add(methodBaseGetParameters[i].ParameterType + " " + methodBaseGetParameters[i].Name);

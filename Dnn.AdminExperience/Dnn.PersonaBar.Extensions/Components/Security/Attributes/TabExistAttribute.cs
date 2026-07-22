@@ -15,16 +15,21 @@ namespace Dnn.PersonaBar.Security.Attributes
     [AttributeUsage(AttributeTargets.Property)]
     internal class TabExistAttribute : ValidationAttribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
+			Logger.LogDebug(">>> Entering IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             var propertyName = validationContext.DisplayName;
             int tabId = Convert.ToInt32(value.ToString(), CultureInfo.InvariantCulture);
 
+			Logger.LogDebug("IsValid(value={Value},validationContext={ValidationContext}): tabId → {TabId}", value, validationContext, tabId);
             if (tabId != -1)
             {
                 var portalSetting = PortalController.Instance.GetCurrentSettings();
                 var tab = TabController.Instance.GetTab(tabId, portalSetting.PortalId);
+				Logger.LogDebug("IsValid(value={Value},validationContext={ValidationContext}): portalSetting → {PortalSetting}", value, validationContext, portalSetting);
+				Logger.LogDebug("IsValid(value={Value},validationContext={ValidationContext}): tab → {Tab}", value, validationContext, tab);
 
                 if (tab == null)
                 {
@@ -42,6 +47,7 @@ namespace Dnn.PersonaBar.Security.Attributes
                 }
             }
 
+			Logger.LogDebug("<<< Exiting IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             return ValidationResult.Success;
         }
     }

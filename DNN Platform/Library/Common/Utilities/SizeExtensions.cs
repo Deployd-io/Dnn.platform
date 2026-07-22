@@ -9,8 +9,11 @@ namespace DotNetNuke.Common.Utilities
 
     public static class SizeExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static Orientation Orientation(this Size size)
         {
+			Logger.LogDebug(">>> Entering Orientation(size={Size})", size);
+			Logger.LogDebug("<<< Exiting Orientation(size={Size})", size);
             return size.Width > size.Height
                        ? System.Web.UI.WebControls.Orientation.Horizontal
                        : System.Web.UI.WebControls.Orientation.Vertical;

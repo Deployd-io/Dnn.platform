@@ -10,6 +10,7 @@ namespace DotNetNuke.Tests.Providers.Caching
 
     public static class MoqExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static IReturnsResult<CachingProvider> ReturnsValidValue(this ISetup<CachingProvider, object> ret)
         {
             return ret.Returns(() => Constants.CACHEING_ValidValue);

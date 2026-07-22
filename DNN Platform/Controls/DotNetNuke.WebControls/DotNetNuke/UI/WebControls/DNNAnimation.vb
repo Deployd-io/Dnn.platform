@@ -13,27 +13,38 @@ Namespace DotNetNuke.UI.WebControls
     <TypeConverter(GetType(ExpandableObjectConverter))> _
     Public Class DNNAnimation
         Implements IStateManager, IUrlResolutionService
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(DNNAnimation))
         ' Methods
         Protected Sub LoadViewState(ByVal state As Object) Implements IStateManager.LoadViewState
+			Logger.LogDebug(">>> Entering LoadViewState(state={State})", state)
             If (Not state Is Nothing) Then
                 DirectCast(Me.ViewState, IStateManager).LoadViewState(state)
             End If
+			Logger.LogDebug("<<< Exiting LoadViewState(state={State})", state)
         End Sub
 
         Public Function ResolveClientUrl(ByVal Url As String) As String Implements IUrlResolutionService.ResolveClientUrl
+			Logger.LogDebug(">>> Entering ResolveClientUrl(Url={Url})", Url)
+			Logger.LogDebug("<<< Exiting ResolveClientUrl(Url={Url})", Url)
             Return Url
         End Function
 
         Protected Function SaveViewState() As Object Implements IStateManager.SaveViewState
+			Logger.LogDebug(">>> Entering SaveViewState()")
             Dim obj2 As Object = Nothing
             If Not Object.ReferenceEquals(Me.m_State, Nothing) Then
                 obj2 = DirectCast(Me.m_State, IStateManager).SaveViewState
+				Logger.LogDebug("SaveViewState(): obj2 → {Obj2}", obj2)
             End If
+			Logger.LogDebug("<<< Exiting SaveViewState()")
             Return obj2
         End Function
 
         Protected Sub TrackViewState() Implements IStateManager.TrackViewState
+			Logger.LogDebug(">>> Entering TrackViewState()")
             Me.m_Marked = True
+			Logger.LogDebug("<<< Exiting TrackViewState()")
+			Logger.LogDebug("TrackViewState(): Me.m_Marked → {Arg0}", Me.m_Marked)
         End Sub
 
 

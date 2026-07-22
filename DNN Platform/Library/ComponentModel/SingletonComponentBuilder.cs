@@ -9,6 +9,7 @@ namespace DotNetNuke.ComponentModel
 
     internal class SingletonComponentBuilder : IComponentBuilder
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IServiceProvider serviceProvider;
         private readonly Type type;
         private object instance;
@@ -19,9 +20,16 @@ namespace DotNetNuke.ComponentModel
         /// <param name="type">The type of the component.</param>
         public SingletonComponentBuilder(IServiceProvider serviceProvider, string name, Type type)
         {
+			Logger.LogDebug(">>> Entering SingletonComponentBuilder(serviceProvider={ServiceProvider},name={Name},type={Type})", serviceProvider, name, type);
             this.Name = name;
             this.serviceProvider = serviceProvider;
+			Logger.LogDebug("SingletonComponentBuilder(serviceProvider={ServiceProvider},name={Name},type={Type}): this.Name → {Arg3}", serviceProvider, name, type, this.Name);
+			Logger.LogDebug("SingletonComponentBuilder(serviceProvider={ServiceProvider},name={Name},type={Type}): serviceProvider → {ServiceProvider1}", serviceProvider, name, type, serviceProvider);
+			Logger.LogDebug("SingletonComponentBuilder(serviceProvider={ServiceProvider},name={Name},type={Type}): this.serviceProvider → {Arg3}", serviceProvider, name, type, this.serviceProvider);
             this.type = type;
+			Logger.LogDebug("<<< Exiting SingletonComponentBuilder(serviceProvider={ServiceProvider},name={Name},type={Type})", serviceProvider, name, type);
+			Logger.LogDebug("SingletonComponentBuilder(serviceProvider={ServiceProvider},name={Name},type={Type}): type → {Type1}", serviceProvider, name, type, type);
+			Logger.LogDebug("SingletonComponentBuilder(serviceProvider={ServiceProvider},name={Name},type={Type}): this.type → {Arg3}", serviceProvider, name, type, this.type);
         }
 
         /// <inheritdoc />
@@ -30,6 +38,8 @@ namespace DotNetNuke.ComponentModel
         /// <inheritdoc />
         public object BuildComponent()
         {
+			Logger.LogDebug(">>> Entering BuildComponent()");
+			Logger.LogDebug("<<< Exiting BuildComponent()");
             return this.instance ??= Reflection.CreateObject(this.serviceProvider, this.type);
         }
     }

@@ -21,6 +21,7 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
 
     public class PurgeModule : ConsoleCommandBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [FlagParameter("id", "Prompt_PurgeModule_FlagId", "Integer", true)]
         private const string FlagId = "id";
 
@@ -37,16 +38,20 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.ModuleId = this.GetFlagValue(FlagId, "Module Id", -1, true, true, true);
             this.PageId = this.GetFlagValue(FlagPageId, "Page Id", -1, true, false, true);
+			Logger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             KeyValuePair<HttpStatusCode, string> message;
             var module = ModulesController.Instance.GetModule(this.PortalSettings, this.ModuleId, this.PageId, out message);
             if (module == null)
+			Logger.LogDebug("Run(): module → {Module}", module);
             {
                 return new ConsoleErrorResultModel(string.Format(CultureInfo.CurrentCulture, this.LocalizeString("ModuleNotFound"), this.ModuleId, this.PageId));
             }
@@ -54,6 +59,8 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
             var modulesToPurge = new List<ModuleInfo> { module };
             var errors = new StringBuilder();
             RecyclebinController.Instance.DeleteModules(modulesToPurge, errors);
+			Logger.LogDebug("Run(): errors → {Errors}", errors);
+			Logger.LogDebug("<<< Exiting Run()");
             return errors.Length > 0
                 ? new ConsoleErrorResultModel(string.Format(CultureInfo.CurrentCulture, this.LocalizeString("Service_RemoveTabModuleError"), errors))
                 : new ConsoleResultModel(string.Format(CultureInfo.CurrentCulture, this.LocalizeString("Prompt_ModulePurgedSuccessfully"), this.ModuleId)) { Records = 1, };

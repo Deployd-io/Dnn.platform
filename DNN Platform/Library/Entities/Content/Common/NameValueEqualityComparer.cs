@@ -8,6 +8,7 @@ namespace DotNetNuke.Entities.Content.Common
 
     internal class NameValueEqualityComparer : IEqualityComparer<KeyValuePair<string, string>>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public bool Equals(KeyValuePair<string, string> x, KeyValuePair<string, string> y)
         {

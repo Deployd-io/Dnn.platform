@@ -22,12 +22,15 @@ namespace Dnn.PersonaBar.Security.Components.Checks
     /// </summary>
     public class CheckTelerikPresence : BaseCheck
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly ITelerikUtils telerikUtils;
 
         /// <summary>Initializes a new instance of the <see cref="CheckTelerikPresence"/> class.</summary>
         public CheckTelerikPresence()
             : this(Globals.GetCurrentServiceProvider().GetRequiredService<ITelerikUtils>())
         {
+		Logger.LogDebug(">>> Entering CheckTelerikPresence()");
+		Logger.LogDebug("<<< Exiting CheckTelerikPresence()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="CheckTelerikPresence"/> class.</summary>
@@ -38,16 +41,21 @@ namespace Dnn.PersonaBar.Security.Components.Checks
             : base()
         {
             this.telerikUtils = telerikUtils ??
+				Logger.LogDebug("CheckTelerikPresence(telerikUtils={TelerikUtils}): telerikUtils → {TelerikUtils1}", telerikUtils, telerikUtils);
+				Logger.LogDebug("CheckTelerikPresence(telerikUtils={TelerikUtils}): this.telerikUtils → {Arg1}", telerikUtils, this.telerikUtils);
                 throw new ArgumentNullException(nameof(telerikUtils));
         }
 
         /// <inheritdoc />
         protected override CheckResult ExecuteInternal()
         {
+			Logger.LogDebug(">>> Entering ExecuteInternal()");
             if (this.telerikUtils.TelerikIsInstalled())
             {
                 var files = this.telerikUtils.GetAssembliesThatDependOnTelerik();
                 var fileList = files as IList<string> ?? files.ToList();
+				Logger.LogDebug("ExecuteInternal(): files → {Files}", files);
+				Logger.LogDebug("ExecuteInternal(): fileList → {FileList}", fileList);
 
                 if (fileList.Any())
                 {
@@ -57,13 +65,17 @@ namespace Dnn.PersonaBar.Security.Components.Checks
                 return this.InstalledButNotUsed();
             }
 
+			Logger.LogDebug("<<< Exiting ExecuteInternal()");
             return this.NotInstalled();
         }
 
         private CheckResult InstalledButNotUsed()
         {
+			Logger.LogDebug(">>> Entering InstalledButNotUsed()");
             var note = this.GetLocalizedString("InstalledButNotUsed");
 
+			Logger.LogDebug("InstalledButNotUsed(): note → {Note}", note);
+			Logger.LogDebug("<<< Exiting InstalledButNotUsed()");
             return new CheckResult(SeverityEnum.Failure, this.Id)
             {
                 Notes = { note },
@@ -85,6 +97,8 @@ namespace Dnn.PersonaBar.Security.Components.Checks
 
         private CheckResult NotInstalled()
         {
+			Logger.LogDebug(">>> Entering NotInstalled()");
+			Logger.LogDebug("<<< Exiting NotInstalled()");
             return new CheckResult(SeverityEnum.Pass, this.Id);
         }
     }

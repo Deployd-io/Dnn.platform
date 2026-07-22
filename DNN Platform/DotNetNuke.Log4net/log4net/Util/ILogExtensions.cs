@@ -77,6 +77,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsDebugEnabled"/>
         public static void DebugExt(this ILog logger, Func<object> callback)
         {
+			log.DebugFormat(">>> Entering DebugExt(logger={0},callback={1})", logger, callback);
             try
             {
                 if (!logger.IsDebugEnabled)
@@ -90,6 +91,7 @@ namespace log4net.Util
             {
                 LogLog.Error(declaringType, "Exception while logging", ex);
             }
+			log.DebugFormat("<<< Exiting DebugExt(logger={0},callback={1})", logger, callback);
         }
 
         /// <summary>
@@ -109,6 +111,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsDebugEnabled"/>
         public static void DebugExt(this ILog logger, Func<object> callback, Exception exception)
         {
+			log.DebugFormat(">>> Entering DebugExt(logger={0},callback={1},exception={2})", logger, callback, exception);
             try
             {
                 if (!logger.IsDebugEnabled)
@@ -150,6 +153,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsDebugEnabled"/>
         public static void DebugExt(this ILog logger, object message)
         {
+			log.DebugFormat(">>> Entering DebugExt(logger={0},message={1})", logger, message);
             try
             {
                 if (!logger.IsDebugEnabled)
@@ -182,6 +186,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsDebugEnabled"/>
         public static void DebugExt(this ILog logger, object message, Exception exception)
         {
+			log.DebugFormat(">>> Entering DebugExt(logger={0},message={1},exception={2})", logger, message, exception);
             try
             {
                 if (!logger.IsDebugEnabled)
@@ -217,6 +222,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsDebugEnabled"/>
         public static void DebugFormatExt(this ILog logger, string format, object arg0)
         {
+			log.DebugFormat(">>> Entering DebugFormatExt(logger={0},format={1},arg0={2})", logger, format, arg0);
             try
             {
                 if (!logger.IsDebugEnabled)
@@ -230,6 +236,7 @@ namespace log4net.Util
             {
                 LogLog.Error(declaringType, "Exception while logging", ex);
             }
+			log.DebugFormat("<<< Exiting DebugFormatExt(logger={0},format={1},arg0={2})", logger, format, arg0);
         }
 
         /// <summary>Logs a formatted message string with the <see cref="Level.Debug"/> level.</summary>
@@ -252,6 +259,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsDebugEnabled"/>
         public static void DebugFormatExt(this ILog logger, string format, params object[] args)
         {
+			log.DebugFormat(">>> Entering DebugFormatExt(logger={0},format={1},args={2})", logger, format, args);
             try
             {
                 if (!logger.IsDebugEnabled)
@@ -288,6 +296,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsDebugEnabled"/>
         public static void DebugFormatExt(this ILog logger, IFormatProvider provider, string format, params object[] args)
         {
+			log.DebugFormat(">>> Entering DebugFormatExt(logger={0},provider={1},format={2},args={3})", logger, provider, format, args);
             try
             {
                 if (!logger.IsDebugEnabled)
@@ -324,6 +333,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsDebugEnabled"/>
         public static void DebugFormatExt(this ILog logger, string format, object arg0, object arg1)
         {
+			log.DebugFormat(">>> Entering DebugFormatExt(logger={0},format={1},arg0={2},arg1={3})", logger, format, arg0, arg1);
             try
             {
                 if (!logger.IsDebugEnabled)
@@ -361,6 +371,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsDebugEnabled"/>
         public static void DebugFormatExt(this ILog logger, string format, object arg0, object arg1, object arg2)
         {
+			log.DebugFormat(">>> Entering DebugFormatExt(logger={0},format={1},arg0={2},arg1={3},arg2={4})", logger, format, arg0, arg1, arg2);
             try
             {
                 if (!logger.IsDebugEnabled)
@@ -401,6 +412,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsInfoEnabled"/>
         public static void InfoExt(this ILog logger, Func<object> callback)
         {
+			log.DebugFormat(">>> Entering InfoExt(logger={0},callback={1})", logger, callback);
             try
             {
                 if (!logger.IsInfoEnabled)
@@ -414,6 +426,7 @@ namespace log4net.Util
             {
                 LogLog.Error(declaringType, "Exception while logging", ex);
             }
+			log.DebugFormat("<<< Exiting InfoExt(logger={0},callback={1})", logger, callback);
         }
 
         /// <summary>
@@ -433,6 +446,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsInfoEnabled"/>
         public static void InfoExt(this ILog logger, Func<object> callback, Exception exception)
         {
+			log.DebugFormat(">>> Entering InfoExt(logger={0},callback={1},exception={2})", logger, callback, exception);
             try
             {
                 if (!logger.IsInfoEnabled)
@@ -474,6 +488,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsInfoEnabled"/>
         public static void InfoExt(this ILog logger, object message)
         {
+			log.DebugFormat(">>> Entering InfoExt(logger={0},message={1})", logger, message);
             try
             {
                 if (!logger.IsInfoEnabled)
@@ -506,6 +521,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsInfoEnabled"/>
         public static void InfoExt(this ILog logger, object message, Exception exception)
         {
+			log.DebugFormat(">>> Entering InfoExt(logger={0},message={1},exception={2})", logger, message, exception);
             try
             {
                 if (!logger.IsInfoEnabled)
@@ -541,6 +557,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsInfoEnabled"/>
         public static void InfoFormatExt(this ILog logger, string format, object arg0)
         {
+			log.DebugFormat(">>> Entering InfoFormatExt(logger={0},format={1},arg0={2})", logger, format, arg0);
             try
             {
                 if (!logger.IsInfoEnabled)
@@ -554,6 +571,7 @@ namespace log4net.Util
             {
                 LogLog.Error(declaringType, "Exception while logging", ex);
             }
+			log.DebugFormat("<<< Exiting InfoFormatExt(logger={0},format={1},arg0={2})", logger, format, arg0);
         }
 
         /// <summary>Logs a formatted message string with the <see cref="Level.Info"/> level.</summary>
@@ -576,6 +594,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsInfoEnabled"/>
         public static void InfoFormatExt(this ILog logger, string format, params object[] args)
         {
+			log.DebugFormat(">>> Entering InfoFormatExt(logger={0},format={1},args={2})", logger, format, args);
             try
             {
                 if (!logger.IsInfoEnabled)
@@ -612,6 +631,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsInfoEnabled"/>
         public static void InfoFormatExt(this ILog logger, IFormatProvider provider, string format, params object[] args)
         {
+			log.DebugFormat(">>> Entering InfoFormatExt(logger={0},provider={1},format={2},args={3})", logger, provider, format, args);
             try
             {
                 if (!logger.IsInfoEnabled)
@@ -648,6 +668,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsInfoEnabled"/>
         public static void InfoFormatExt(this ILog logger, string format, object arg0, object arg1)
         {
+			log.DebugFormat(">>> Entering InfoFormatExt(logger={0},format={1},arg0={2},arg1={3})", logger, format, arg0, arg1);
             try
             {
                 if (!logger.IsInfoEnabled)
@@ -685,6 +706,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsInfoEnabled"/>
         public static void InfoFormatExt(this ILog logger, string format, object arg0, object arg1, object arg2)
         {
+			log.DebugFormat(">>> Entering InfoFormatExt(logger={0},format={1},arg0={2},arg1={3},arg2={4})", logger, format, arg0, arg1, arg2);
             try
             {
                 if (!logger.IsInfoEnabled)
@@ -725,6 +747,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsWarnEnabled"/>
         public static void WarnExt(this ILog logger, Func<object> callback)
         {
+			log.DebugFormat(">>> Entering WarnExt(logger={0},callback={1})", logger, callback);
             try
             {
                 if (!logger.IsWarnEnabled)
@@ -738,6 +761,7 @@ namespace log4net.Util
             {
                 LogLog.Error(declaringType, "Exception while logging", ex);
             }
+			log.DebugFormat("<<< Exiting WarnExt(logger={0},callback={1})", logger, callback);
         }
 
         /// <summary>
@@ -757,6 +781,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsWarnEnabled"/>
         public static void WarnExt(this ILog logger, Func<object> callback, Exception exception)
         {
+			log.DebugFormat(">>> Entering WarnExt(logger={0},callback={1},exception={2})", logger, callback, exception);
             try
             {
                 if (!logger.IsWarnEnabled)
@@ -798,6 +823,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsWarnEnabled"/>
         public static void WarnExt(this ILog logger, object message)
         {
+			log.DebugFormat(">>> Entering WarnExt(logger={0},message={1})", logger, message);
             try
             {
                 if (!logger.IsWarnEnabled)
@@ -830,6 +856,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsWarnEnabled"/>
         public static void WarnExt(this ILog logger, object message, Exception exception)
         {
+			log.DebugFormat(">>> Entering WarnExt(logger={0},message={1},exception={2})", logger, message, exception);
             try
             {
                 if (!logger.IsWarnEnabled)
@@ -865,6 +892,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsWarnEnabled"/>
         public static void WarnFormatExt(this ILog logger, string format, object arg0)
         {
+			log.DebugFormat(">>> Entering WarnFormatExt(logger={0},format={1},arg0={2})", logger, format, arg0);
             try
             {
                 if (!logger.IsWarnEnabled)
@@ -878,6 +906,7 @@ namespace log4net.Util
             {
                 LogLog.Error(declaringType, "Exception while logging", ex);
             }
+			log.DebugFormat("<<< Exiting WarnFormatExt(logger={0},format={1},arg0={2})", logger, format, arg0);
         }
 
         /// <summary>Logs a formatted message string with the <see cref="Level.Warn"/> level.</summary>
@@ -900,6 +929,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsWarnEnabled"/>
         public static void WarnFormatExt(this ILog logger, string format, params object[] args)
         {
+			log.DebugFormat(">>> Entering WarnFormatExt(logger={0},format={1},args={2})", logger, format, args);
             try
             {
                 if (!logger.IsWarnEnabled)
@@ -936,6 +966,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsWarnEnabled"/>
         public static void WarnFormatExt(this ILog logger, IFormatProvider provider, string format, params object[] args)
         {
+			log.DebugFormat(">>> Entering WarnFormatExt(logger={0},provider={1},format={2},args={3})", logger, provider, format, args);
             try
             {
                 if (!logger.IsWarnEnabled)
@@ -972,6 +1003,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsWarnEnabled"/>
         public static void WarnFormatExt(this ILog logger, string format, object arg0, object arg1)
         {
+			log.DebugFormat(">>> Entering WarnFormatExt(logger={0},format={1},arg0={2},arg1={3})", logger, format, arg0, arg1);
             try
             {
                 if (!logger.IsWarnEnabled)
@@ -1009,6 +1041,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsWarnEnabled"/>
         public static void WarnFormatExt(this ILog logger, string format, object arg0, object arg1, object arg2)
         {
+			log.DebugFormat(">>> Entering WarnFormatExt(logger={0},format={1},arg0={2},arg1={3},arg2={4})", logger, format, arg0, arg1, arg2);
             try
             {
                 if (!logger.IsWarnEnabled)
@@ -1049,6 +1082,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsErrorEnabled"/>
         public static void ErrorExt(this ILog logger, Func<object> callback)
         {
+			log.DebugFormat(">>> Entering ErrorExt(logger={0},callback={1})", logger, callback);
             try
             {
                 if (!logger.IsErrorEnabled)
@@ -1062,6 +1096,7 @@ namespace log4net.Util
             {
                 LogLog.Error(declaringType, "Exception while logging", ex);
             }
+			log.DebugFormat("<<< Exiting ErrorExt(logger={0},callback={1})", logger, callback);
         }
 
         /// <summary>
@@ -1081,6 +1116,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsErrorEnabled"/>
         public static void ErrorExt(this ILog logger, Func<object> callback, Exception exception)
         {
+			log.DebugFormat(">>> Entering ErrorExt(logger={0},callback={1},exception={2})", logger, callback, exception);
             try
             {
                 if (!logger.IsErrorEnabled)
@@ -1122,6 +1158,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsErrorEnabled"/>
         public static void ErrorExt(this ILog logger, object message)
         {
+			log.DebugFormat(">>> Entering ErrorExt(logger={0},message={1})", logger, message);
             try
             {
                 if (!logger.IsErrorEnabled)
@@ -1154,6 +1191,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsErrorEnabled"/>
         public static void ErrorExt(this ILog logger, object message, Exception exception)
         {
+			log.DebugFormat(">>> Entering ErrorExt(logger={0},message={1},exception={2})", logger, message, exception);
             try
             {
                 if (!logger.IsErrorEnabled)
@@ -1189,6 +1227,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsErrorEnabled"/>
         public static void ErrorFormatExt(this ILog logger, string format, object arg0)
         {
+			log.DebugFormat(">>> Entering ErrorFormatExt(logger={0},format={1},arg0={2})", logger, format, arg0);
             try
             {
                 if (!logger.IsErrorEnabled)
@@ -1202,6 +1241,7 @@ namespace log4net.Util
             {
                 LogLog.Error(declaringType, "Exception while logging", ex);
             }
+			log.DebugFormat("<<< Exiting ErrorFormatExt(logger={0},format={1},arg0={2})", logger, format, arg0);
         }
 
         /// <summary>Logs a formatted message string with the <see cref="Level.Error"/> level.</summary>
@@ -1224,6 +1264,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsErrorEnabled"/>
         public static void ErrorFormatExt(this ILog logger, string format, params object[] args)
         {
+			log.DebugFormat(">>> Entering ErrorFormatExt(logger={0},format={1},args={2})", logger, format, args);
             try
             {
                 if (!logger.IsErrorEnabled)
@@ -1260,6 +1301,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsErrorEnabled"/>
         public static void ErrorFormatExt(this ILog logger, IFormatProvider provider, string format, params object[] args)
         {
+			log.DebugFormat(">>> Entering ErrorFormatExt(logger={0},provider={1},format={2},args={3})", logger, provider, format, args);
             try
             {
                 if (!logger.IsErrorEnabled)
@@ -1296,6 +1338,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsErrorEnabled"/>
         public static void ErrorFormatExt(this ILog logger, string format, object arg0, object arg1)
         {
+			log.DebugFormat(">>> Entering ErrorFormatExt(logger={0},format={1},arg0={2},arg1={3})", logger, format, arg0, arg1);
             try
             {
                 if (!logger.IsErrorEnabled)
@@ -1333,6 +1376,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsErrorEnabled"/>
         public static void ErrorFormatExt(this ILog logger, string format, object arg0, object arg1, object arg2)
         {
+			log.DebugFormat(">>> Entering ErrorFormatExt(logger={0},format={1},arg0={2},arg1={3},arg2={4})", logger, format, arg0, arg1, arg2);
             try
             {
                 if (!logger.IsErrorEnabled)
@@ -1373,6 +1417,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsFatalEnabled"/>
         public static void FatalExt(this ILog logger, Func<object> callback)
         {
+			log.DebugFormat(">>> Entering FatalExt(logger={0},callback={1})", logger, callback);
             try
             {
                 if (!logger.IsFatalEnabled)
@@ -1386,6 +1431,7 @@ namespace log4net.Util
             {
                 LogLog.Error(declaringType, "Exception while logging", ex);
             }
+			log.DebugFormat("<<< Exiting FatalExt(logger={0},callback={1})", logger, callback);
         }
 
         /// <summary>
@@ -1405,6 +1451,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsFatalEnabled"/>
         public static void FatalExt(this ILog logger, Func<object> callback, Exception exception)
         {
+			log.DebugFormat(">>> Entering FatalExt(logger={0},callback={1},exception={2})", logger, callback, exception);
             try
             {
                 if (!logger.IsFatalEnabled)
@@ -1446,6 +1493,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsFatalEnabled"/>
         public static void FatalExt(this ILog logger, object message)
         {
+			log.DebugFormat(">>> Entering FatalExt(logger={0},message={1})", logger, message);
             try
             {
                 if (!logger.IsFatalEnabled)
@@ -1478,6 +1526,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsFatalEnabled"/>
         public static void FatalExt(this ILog logger, object message, Exception exception)
         {
+			log.DebugFormat(">>> Entering FatalExt(logger={0},message={1},exception={2})", logger, message, exception);
             try
             {
                 if (!logger.IsFatalEnabled)
@@ -1513,6 +1562,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsFatalEnabled"/>
         public static void FatalFormatExt(this ILog logger, string format, object arg0)
         {
+			log.DebugFormat(">>> Entering FatalFormatExt(logger={0},format={1},arg0={2})", logger, format, arg0);
             try
             {
                 if (!logger.IsFatalEnabled)
@@ -1526,6 +1576,7 @@ namespace log4net.Util
             {
                 LogLog.Error(declaringType, "Exception while logging", ex);
             }
+			log.DebugFormat("<<< Exiting FatalFormatExt(logger={0},format={1},arg0={2})", logger, format, arg0);
         }
 
         /// <summary>Logs a formatted message string with the <see cref="Level.Fatal"/> level.</summary>
@@ -1548,6 +1599,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsFatalEnabled"/>
         public static void FatalFormatExt(this ILog logger, string format, params object[] args)
         {
+			log.DebugFormat(">>> Entering FatalFormatExt(logger={0},format={1},args={2})", logger, format, args);
             try
             {
                 if (!logger.IsFatalEnabled)
@@ -1584,6 +1636,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsFatalEnabled"/>
         public static void FatalFormatExt(this ILog logger, IFormatProvider provider, string format, params object[] args)
         {
+			log.DebugFormat(">>> Entering FatalFormatExt(logger={0},provider={1},format={2},args={3})", logger, provider, format, args);
             try
             {
                 if (!logger.IsFatalEnabled)
@@ -1620,6 +1673,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsFatalEnabled"/>
         public static void FatalFormatExt(this ILog logger, string format, object arg0, object arg1)
         {
+			log.DebugFormat(">>> Entering FatalFormatExt(logger={0},format={1},arg0={2},arg1={3})", logger, format, arg0, arg1);
             try
             {
                 if (!logger.IsFatalEnabled)
@@ -1657,6 +1711,7 @@ namespace log4net.Util
         /// <seealso cref="ILog.IsFatalEnabled"/>
         public static void FatalFormatExt(this ILog logger, string format, object arg0, object arg1, object arg2)
         {
+			log.DebugFormat(">>> Entering FatalFormatExt(logger={0},format={1},arg0={2},arg1={3},arg2={4})", logger, format, arg0, arg1, arg2);
             try
             {
                 if (!logger.IsFatalEnabled)

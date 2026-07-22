@@ -16,6 +16,7 @@ namespace DotNetNuke.Modules.Html.Components
     /// </summary>
     public class LocalizationHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Returns all possible localization values for a given key across all available languages.
         /// </summary>
@@ -23,6 +24,8 @@ namespace DotNetNuke.Modules.Html.Components
         /// <returns>A list of localized values for the specified key in all available languages.</returns>
         public List<string> StateLocalizations(string key)
         {
+			Logger.LogDebug(">>> Entering StateLocalizations(key={Key})", key);
+			Logger.LogDebug("<<< Exiting StateLocalizations(key={Key})", key);
             return this.GetLanguages().Select(language => Localization.GetString(key, Localization.GlobalResourceFile, language.Key)).ToList();
         }
 

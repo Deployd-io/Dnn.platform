@@ -25,11 +25,15 @@ namespace DotNetNuke.Web
         /// <returns>An <see cref="IServiceProvider"/> instance.</returns>
         public static IServiceProvider BuildServiceProvider()
         {
+			Logger.LogDebug(">>> Entering BuildServiceProvider()");
             var services = new ServiceCollection();
             services.AddSingleton<IScopeAccessor, ScopeAccessor>();
+			Logger.LogDebug("BuildServiceProvider(): services → {Services}", services);
             ConfigureAllStartupServices(services);
 
             ServiceCollection = services;
+			Logger.LogDebug("BuildServiceProvider(): ServiceCollection → {ServiceCollection}", ServiceCollection);
+			Logger.LogDebug("<<< Exiting BuildServiceProvider()");
             return services.BuildServiceProvider();
         }
 
@@ -72,6 +76,7 @@ namespace DotNetNuke.Web
             catch (Exception ex)
             {
                 Logger.Error($"Unable to instantiate startup code for {startupType.FullName}", ex);
+				Logger.LogDebug("<<< Exiting CreateInstance(startupType={StartupType})", startupType);
                 return null;
             }
         }

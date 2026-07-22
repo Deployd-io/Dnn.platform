@@ -14,10 +14,13 @@ namespace Dnn.ExportImport.Components.Models
     /// <summary>An import/export result.</summary>
     public class ExportImportResult
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ExportImportResult"/> class.</summary>
         public ExportImportResult()
         {
+			Logger.LogDebug(">>> Entering ExportImportResult()");
             this.CompleteLog = this.CompleteLog = new List<LogItem>();
+			Logger.LogDebug("<<< Exiting ExportImportResult()");
         }
 
         /// <summary>Gets the summary log items.</summary>
@@ -38,6 +41,8 @@ namespace Dnn.ExportImport.Components.Models
         /// <returns>The log item.</returns>
         public LogItem AddSummary(string name, string value)
         {
+			Logger.LogDebug(">>> Entering AddSummary(name={Name},value={Value})", name, value);
+			Logger.LogDebug("<<< Exiting AddSummary(name={Name},value={Value})", name, value);
             return this.AddLogEntry(name, value, ReportLevel.Info);
         }
 
@@ -48,6 +53,7 @@ namespace Dnn.ExportImport.Components.Models
         /// <returns>The log item.</returns>
         public LogItem AddLogEntry(string name, string value, ReportLevel level = ReportLevel.Verbose)
         {
+			Logger.LogDebug(">>> Entering AddLogEntry(name={Name},value={Value},level={Level})", name, value, level);
             var item = new LogItem
             {
                 Name = name,
@@ -57,6 +63,7 @@ namespace Dnn.ExportImport.Components.Models
             };
 
             this.CompleteLog.Add(item);
+			Logger.LogDebug("<<< Exiting AddLogEntry(name={Name},value={Value},level={Level})", name, value, level);
             return item;
         }
     }

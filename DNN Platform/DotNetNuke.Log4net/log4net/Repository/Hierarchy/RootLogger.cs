@@ -42,6 +42,7 @@ namespace log4net.Repository.Hierarchy
     /// <author>Gert Driesen</author>
     public class RootLogger : Logger
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Construct a <see cref="RootLogger"/></summary>
         /// <param name="level">The level to assign to the root logger.</param>
         /// <remarks>
@@ -56,7 +57,10 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public RootLogger(Level level) : base("root")
         {
+			Logger.LogDebug(">>> Entering RootLogger(level={Level})", level);
             this.Level = level;
+			Logger.LogDebug("<<< Exiting RootLogger(level={Level})", level);
+			Logger.LogDebug("RootLogger(level={Level}): this.Level → {Arg1}", level, this.Level);
         }
 
         /// <summary>Gets the assigned level value without walking the logger hierarchy.</summary>

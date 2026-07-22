@@ -8,11 +8,14 @@ namespace Dnn.Modules.ResourceManager.Exceptions
     /// <summary>Thrown when the resource manager is not in the expected mode for the requested operation.</summary>
     public class ModeValidationException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ModeValidationException"/> class.</summary>
         /// <param name="message">The exception message.</param>
         public ModeValidationException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering ModeValidationException(message={Message})", message);
+		Logger.LogDebug("<<< Exiting ModeValidationException(message={Message})", message);
         }
     }
 }

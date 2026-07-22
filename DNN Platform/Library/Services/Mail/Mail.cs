@@ -29,15 +29,21 @@ namespace DotNetNuke.Services.Mail
     {
         public static string ConvertToText(string sHTML)
         {
+			Logger.LogDebug(">>> Entering ConvertToText(sHTML={SHTML})", sHTML);
             var formattedHtml = HtmlUtils.FormatText(sHTML, true);
             var styleLessHtml = HtmlUtils.RemoveInlineStyle(formattedHtml);
+			Logger.LogDebug("ConvertToText(sHTML={SHTML}): formattedHtml → {FormattedHtml}", sHTML, formattedHtml);
+			Logger.LogDebug("ConvertToText(sHTML={SHTML}): styleLessHtml → {StyleLessHtml}", sHTML, styleLessHtml);
+			Logger.LogDebug("<<< Exiting ConvertToText(sHTML={SHTML})", sHTML);
             return HtmlUtils.StripTags(styleLessHtml, true);
         }
 
         public static bool IsValidEmailAddress(string email, int portalid)
         {
+			Logger.LogDebug(">>> Entering IsValidEmailAddress(email={Email},portalid={Portalid})", email, portalid);
             string pattern = Null.NullString;
 
+			Logger.LogDebug("IsValidEmailAddress(email={Email},portalid={Portalid}): pattern → {Pattern}", email, portalid, pattern);
             // During install Wizard we may not have a valid PortalID
             if (portalid != Null.NullInteger)
             {
@@ -45,16 +51,20 @@ namespace DotNetNuke.Services.Mail
             }
 
             pattern = string.IsNullOrEmpty(pattern) ? Globals.glbEmailRegEx : pattern;
+			Logger.LogDebug("<<< Exiting IsValidEmailAddress(email={Email},portalid={Portalid})", email, portalid);
             return Regex.IsMatch(email, pattern);
         }
 
         public static void SendEmail(string fromAddress, string toAddress, string subject, string body)
         {
+			Logger.LogDebug(">>> Entering SendEmail(fromAddress={FromAddress},toAddress={ToAddress},subject={Subject},body={Body})", fromAddress, toAddress, subject, body);
             SendEmail(fromAddress, fromAddress, toAddress, subject, body);
+			Logger.LogDebug("<<< Exiting SendEmail(fromAddress={FromAddress},toAddress={ToAddress},subject={Subject},body={Body})", fromAddress, toAddress, subject, body);
         }
 
         public static void SendEmail(string fromAddress, string senderAddress, string toAddress, string subject, string body)
         {
+			Logger.LogDebug(">>> Entering SendEmail(fromAddress={FromAddress},senderAddress={SenderAddress},toAddress={ToAddress},subject={Subject},body={Body})", fromAddress, senderAddress, toAddress, subject, body);
             if (string.IsNullOrWhiteSpace(Host.SMTPServer) || string.IsNullOrEmpty(fromAddress) || string.IsNullOrEmpty(senderAddress) || string.IsNullOrEmpty(toAddress))
             {
                 return;
@@ -73,6 +83,7 @@ namespace DotNetNuke.Services.Mail
             };
 
             MailProvider.Instance().SendMail(mailInfo);
+			Logger.LogDebug("<<< Exiting SendEmail(fromAddress={FromAddress},senderAddress={SenderAddress},toAddress={ToAddress},subject={Subject},body={Body})", fromAddress, senderAddress, toAddress, subject, body);
         }
 
         /// <summary>Send a simple email.</summary>
@@ -86,6 +97,7 @@ namespace DotNetNuke.Services.Mail
         [DnnDeprecated(9, 8, 0, "Please use SendEmail() with ICollection<MailAttachment>")]
         public static partial string SendEmail(string fromAddress, string senderAddress, string toAddress, string subject, string body, List<Attachment> attachments)
         {
+			Logger.LogDebug(">>> Entering SendEmail(fromAddress={FromAddress},senderAddress={SenderAddress},toAddress={ToAddress},subject={Subject},body={Body},attachments={Attachments})", fromAddress, senderAddress, toAddress, subject, body, attachments);
             var mailInfo = new MailInfo
             {
                 From = fromAddress,
@@ -233,6 +245,7 @@ namespace DotNetNuke.Services.Mail
                 : settings.Email;
             SendEmail(fromUser, UserController.GetUserById(settings.PortalId, toUser).Email, subject, body);
 
+			Logger.LogDebug("<<< Exiting SendMail(portalId={PortalId},userId={UserId},msgType={MsgType},settings={Settings})", portalId, userId, msgType, settings);
             return Null.NullString;
         }
 
@@ -265,6 +278,7 @@ namespace DotNetNuke.Services.Mail
                 }
             }
 
+			Logger.LogDebug("<<< Exiting SendMail(mailFrom={MailFrom},mailTo={MailTo},bcc={Bcc},subject={Subject},body={Body},attachment={Attachment},bodyType={BodyType},smtpServer={SmtpServer},smtpAuthentication={SmtpAuthentication},smtpUsername={SmtpUsername},smtpPassword={SmtpPassword})", mailFrom, mailTo, bcc, subject, body, attachment, bodyType, smtpServer, smtpAuthentication, smtpUsername, smtpPassword);
             return SendMail(mailFrom, mailTo, string.Empty, bcc, MailPriority.Normal, subject, bodyFormat, Encoding.UTF8, body, attachment, smtpServer, smtpAuthentication, smtpUsername, smtpPassword);
         }
 
@@ -736,6 +750,8 @@ namespace DotNetNuke.Services.Mail
 
         private static List<MailAttachment> ConvertAttachments(List<Attachment> attachments)
         {
+			Logger.LogDebug(">>> Entering ConvertAttachments(attachments={Attachments})", attachments);
+			Logger.LogDebug("ConvertAttachments(attachments={Attachments}): attachment → {Attachment}", attachments, attachment);
             return attachments.Select(
                     attachment =>
                     {
@@ -744,6 +760,7 @@ namespace DotNetNuke.Services.Mail
                         return new MailAttachment(attachment.Name, ms.ToArray());
                     })
                 .ToList();
+				Logger.LogDebug("<<< Exiting ConvertAttachments(attachments={Attachments})", attachments);
         }
     }
 }

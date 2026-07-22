@@ -17,18 +17,23 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
     public static class HtmlLinkExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static MvcHtmlString ActionLink(this DnnHtmlHelper htmlHelper, string linkText, string actionName)
         {
+			Logger.LogDebug(">>> Entering ActionLink(htmlHelper={HtmlHelper},linkText={LinkText},actionName={ActionName})", htmlHelper, linkText, actionName);
+			Logger.LogDebug("<<< Exiting ActionLink(htmlHelper={HtmlHelper},linkText={LinkText},actionName={ActionName})", htmlHelper, linkText, actionName);
             return ActionLink(htmlHelper, linkText, actionName, null, new RouteValueDictionary(), new RouteValueDictionary());
         }
 
         public static MvcHtmlString ActionLink(this DnnHtmlHelper htmlHelper, string linkText, string actionName, object routeValues)
         {
+			Logger.LogDebug("<<< Exiting ActionLink(htmlHelper={HtmlHelper},linkText={LinkText},actionName={ActionName},routeValues={RouteValues})", htmlHelper, linkText, actionName, routeValues);
             return ActionLink(htmlHelper, linkText, actionName, null, TypeHelper.ObjectToDictionary(routeValues), new RouteValueDictionary());
         }
 
         public static MvcHtmlString ActionLink(this DnnHtmlHelper htmlHelper, string linkText, string actionName, object routeValues, object htmlAttributes)
         {
+			Logger.LogDebug("<<< Exiting ActionLink(htmlHelper={HtmlHelper},linkText={LinkText},actionName={ActionName},routeValues={RouteValues},htmlAttributes={HtmlAttributes})", htmlHelper, linkText, actionName, routeValues, htmlAttributes);
             return ActionLink(htmlHelper, linkText, actionName, null, TypeHelper.ObjectToDictionary(routeValues), HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
         }
 
@@ -44,11 +49,13 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
         public static MvcHtmlString ActionLink(this DnnHtmlHelper htmlHelper, string linkText, string actionName, string controllerName)
         {
+			Logger.LogDebug("<<< Exiting ActionLink(htmlHelper={HtmlHelper},linkText={LinkText},actionName={ActionName},controllerName={ControllerName})", htmlHelper, linkText, actionName, controllerName);
             return ActionLink(htmlHelper, linkText, actionName, controllerName, new RouteValueDictionary(), new RouteValueDictionary());
         }
 
         public static MvcHtmlString ActionLink(this DnnHtmlHelper htmlHelper, string linkText, string actionName, string controllerName, object routeValues, object htmlAttributes)
         {
+			Logger.LogDebug("<<< Exiting ActionLink(htmlHelper={HtmlHelper},linkText={LinkText},actionName={ActionName},controllerName={ControllerName},routeValues={RouteValues},htmlAttributes={HtmlAttributes})", htmlHelper, linkText, actionName, controllerName, routeValues, htmlAttributes);
             return ActionLink(htmlHelper, linkText, actionName, controllerName, TypeHelper.ObjectToDictionary(routeValues), HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
         }
 
@@ -61,6 +68,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
         public static MvcHtmlString ActionLink(this DnnHtmlHelper htmlHelper, string linkText, string actionName, string controllerName, string protocol, string hostName, string fragment, object routeValues, object htmlAttributes)
         {
+			Logger.LogDebug("<<< Exiting ActionLink(htmlHelper={HtmlHelper},linkText={LinkText},actionName={ActionName},controllerName={ControllerName},protocol={Protocol},hostName={HostName},fragment={Fragment},routeValues={RouteValues},htmlAttributes={HtmlAttributes})", htmlHelper, linkText, actionName, controllerName, protocol, hostName, fragment, routeValues, htmlAttributes);
             return ActionLink(htmlHelper, linkText, actionName, controllerName, protocol, hostName, fragment, TypeHelper.ObjectToDictionary(routeValues), HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
         }
 

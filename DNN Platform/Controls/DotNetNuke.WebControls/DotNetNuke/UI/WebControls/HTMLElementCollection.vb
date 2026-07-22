@@ -12,12 +12,16 @@ Namespace DotNetNuke.UI.WebControls
     <DefaultMember("Item")> _
     Public Class HTMLElementCollection
         Inherits CollectionBase
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(HTMLElementCollection))
         ' Methods
         Public Function Add(ByVal value As HTMLElement) As Integer
+			Logger.LogDebug(">>> Entering Add(value={Value})", value)
+			Logger.LogDebug("<<< Exiting Add(value={Value})", value)
             Return Me.List.Add(value)
         End Function
 
         Public Sub AddRange(ByVal value As HTMLElement())
+			Logger.LogDebug(">>> Entering AddRange(value={Value})", value)
             Dim num2 As Integer = (value.Length - 1)
             Dim index As Integer = 0
             Do While True
@@ -28,31 +32,46 @@ Namespace DotNetNuke.UI.WebControls
                 Me.Add(value(index))
                 index += 1
             Loop
+			Logger.LogDebug("<<< Exiting AddRange(value={Value})", value)
         End Sub
 
         Public Function Contains(ByVal value As HTMLElement) As Boolean
+			Logger.LogDebug(">>> Entering Contains(value={Value})", value)
             Dim flag As Boolean
+			Logger.LogDebug("<<< Exiting Contains(value={Value})", value)
             Return flag
         End Function
 
         Public Sub CopyTo(ByVal array As HTMLElement(), ByVal index As Integer)
+			Logger.LogDebug(">>> Entering CopyTo(array={Array})", array)
             Me.List.CopyTo(array, index)
+			Logger.LogDebug("<<< Exiting CopyTo(array={Array})", array)
         End Sub
 
         Public Function IndexOf(ByVal value As HTMLElement) As Integer
+			Logger.LogDebug(">>> Entering IndexOf(value={Value})", value)
             Dim num As Integer
+			Logger.LogDebug("<<< Exiting IndexOf(value={Value})", value)
             Return num
         End Function
 
         Public Sub Insert(ByVal index As Integer, ByVal value As HTMLElement)
+			Logger.LogDebug(">>> Entering Insert(index={Index},value={Value})", index, value)
             Me.List.Insert(index, value)
+			Logger.LogDebug("<<< Exiting Insert(index={Index},value={Value})", index, value)
         End Sub
 
         Public Sub Remove(ByVal value As HTMLElement)
+			Logger.LogDebug(">>> Entering Remove(value={Value})", value)
             Me.List.Remove(value)
+			Logger.LogDebug("<<< Exiting Remove(value={Value})", value)
         End Sub
 
         Public Function ToJSON() As String
+			Logger.LogDebug(">>> Entering ToJSON()")
+			Logger.LogDebug(">>> Entering ToJSON(KeyAttribute={KeyAttribute})", KeyAttribute)
+			Logger.LogDebug("<<< Exiting ToJSON()")
+			Logger.LogDebug("<<< Exiting ToJSON(KeyAttribute={KeyAttribute})", KeyAttribute)
             Return Me.ToJSON("")
         End Function
 
@@ -90,10 +109,12 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Public Overrides Function ToString() As String
+			Logger.LogDebug(">>> Entering ToString()")
             Dim enumerator As IEnumerator = Nothing
             Dim builder As New StringBuilder
             Try 
                 enumerator = Me.List.GetEnumerator
+				Logger.LogDebug("ToString(): enumerator → {Enumerator}", enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -106,6 +127,7 @@ Namespace DotNetNuke.UI.WebControls
                     TryCast(enumerator,IDisposable).Dispose
                 End If
             End Try
+			Logger.LogDebug("<<< Exiting ToString()")
             Return builder.ToString
         End Function
 

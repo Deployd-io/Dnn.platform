@@ -29,6 +29,7 @@ using System;
 
 namespace log4net.Util
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Defines a lock that supports single writers and multiple readers</summary>
     /// <remarks>
     /// <para>
@@ -56,14 +57,17 @@ namespace log4net.Util
         /// </remarks>
         public ReaderWriterLock()
         {
+		Logger.LogDebug(">>> Entering ReaderWriterLock()");
 
 #if HAS_READERWRITERLOCK
 #if HAS_READERWRITERLOCKSLIM
             this.m_lock = new System.Threading.ReaderWriterLockSlim(System.Threading.LockRecursionPolicy.SupportsRecursion);
+			Logger.LogDebug("ReaderWriterLock(): m_lock → {M_lock}", m_lock);
 #else
             m_lock = new System.Threading.ReaderWriterLock();
 #endif
 #endif
+		Logger.LogDebug("<<< Exiting ReaderWriterLock()");
         }
 
         /// <summary>Acquires a reader lock</summary>
@@ -75,6 +79,7 @@ namespace log4net.Util
         /// </remarks>
         public void AcquireReaderLock()
         {
+		Logger.LogDebug(">>> Entering AcquireReaderLock()");
 #if HAS_READERWRITERLOCK
 #if HAS_READERWRITERLOCKSLIM
                     // prevent ThreadAbort while updating state, see https://issues.apache.org/jira/browse/LOG4NET-443
@@ -91,6 +96,7 @@ namespace log4net.Util
 #else
             System.Threading.Monitor.Enter(this);
 #endif
+		Logger.LogDebug("<<< Exiting AcquireReaderLock()");
         }
 
         /// <summary>Decrements the lock count</summary>
@@ -102,6 +108,7 @@ namespace log4net.Util
         /// </remarks>
         public void ReleaseReaderLock()
         {
+		Logger.LogDebug(">>> Entering ReleaseReaderLock()");
 #if HAS_READERWRITERLOCK
 #if HAS_READERWRITERLOCKSLIM
             this.m_lock.ExitReadLock();
@@ -112,6 +119,7 @@ namespace log4net.Util
 #else
             System.Threading.Monitor.Exit(this);
 #endif
+		Logger.LogDebug("<<< Exiting ReleaseReaderLock()");
         }
 
         /// <summary>Acquires the writer lock</summary>
@@ -122,6 +130,7 @@ namespace log4net.Util
         /// </remarks>
         public void AcquireWriterLock()
         {
+		Logger.LogDebug(">>> Entering AcquireWriterLock()");
 #if HAS_READERWRITERLOCK
 #if HAS_READERWRITERLOCKSLIM
                     // prevent ThreadAbort while updating state, see https://issues.apache.org/jira/browse/LOG4NET-443
@@ -138,6 +147,7 @@ namespace log4net.Util
 #else
             System.Threading.Monitor.Enter(this);
 #endif
+		Logger.LogDebug("<<< Exiting AcquireWriterLock()");
         }
 
         /// <summary>Decrements the lock count on the writer lock</summary>
@@ -149,6 +159,7 @@ namespace log4net.Util
         /// </remarks>
         public void ReleaseWriterLock()
         {
+		Logger.LogDebug(">>> Entering ReleaseWriterLock()");
 #if HAS_READERWRITERLOCK
 #if HAS_READERWRITERLOCKSLIM
             this.m_lock.ExitWriteLock();
@@ -158,6 +169,7 @@ namespace log4net.Util
 #else
             System.Threading.Monitor.Exit(this);
 #endif
+		Logger.LogDebug("<<< Exiting ReleaseWriterLock()");
         }
 
 #if HAS_READERWRITERLOCK

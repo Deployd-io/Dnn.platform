@@ -27,6 +27,7 @@ namespace DotNetNuke.Entities.Urls
 
     public class RewriteController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         internal const int SiteRootRewrite = -3;
         internal const int AllTabsRewrite = -1;
         private const string TabKeySeparator = "::";
@@ -202,11 +203,14 @@ namespace DotNetNuke.Entities.Urls
 
         internal static string CleanExtension(string value, string extension, out bool replaced)
         {
+			Logger.LogDebug(">>> Entering CleanExtension(value={Value},extension={Extension})", value, extension);
+			Logger.LogDebug("<<< Exiting CleanExtension(value={Value},extension={Extension})", value, extension);
             return CleanExtension(value, extension, string.Empty, out replaced);
         }
 
         internal static string CleanExtension(string value, FriendlyUrlSettings settings, string langParms, out bool replaced)
         {
+			Logger.LogDebug("<<< Exiting CleanExtension(value={Value},settings={Settings})", value, settings);
             return CleanExtension(value, settings.PageExtension, langParms, out replaced);
         }
 
@@ -702,9 +706,11 @@ namespace DotNetNuke.Entities.Urls
 
         internal static void GetUrlWithQuerystring(HttpRequest request, Uri requestUri, out string fullUrl, out string querystring)
         {
+			Logger.LogDebug(">>> Entering GetUrlWithQuerystring(request={Request},requestUri={RequestUri})", request, requestUri);
             // 699: incorrect encoding in absoluteUri.ToString()
             string urlWoutQuery = requestUri.AbsoluteUri;
             if (requestUri.Query != string.Empty)
+			Logger.LogDebug("GetUrlWithQuerystring(request={Request},requestUri={RequestUri}): urlWoutQuery → {UrlWoutQuery}", request, requestUri, urlWoutQuery);
             {
                 urlWoutQuery = urlWoutQuery.Replace(requestUri.Query, string.Empty);
 
@@ -714,9 +720,11 @@ namespace DotNetNuke.Entities.Urls
             // 926 : do not use querystring.toString() because of encoding errors that restul,
             // the encoding type is changed from utf-8 to latin-1
             querystring = requestUri.Query;
+			Logger.LogDebug("GetUrlWithQuerystring(request={Request},requestUri={RequestUri}): querystring → {Querystring}", request, requestUri, querystring);
 
             // get results
             fullUrl = urlWoutQuery;
+			Logger.LogDebug("GetUrlWithQuerystring(request={Request},requestUri={RequestUri}): fullUrl → {FullUrl}", request, requestUri, fullUrl);
             if (fullUrl.EndsWith("/_noext.aspx", StringComparison.InvariantCultureIgnoreCase))
             {
                 fullUrl = fullUrl.Replace("_noext.aspx", string.Empty);
@@ -734,6 +742,7 @@ namespace DotNetNuke.Entities.Urls
 
                 fullUrl += querystring;
             }
+			Logger.LogDebug("<<< Exiting GetUrlWithQuerystring(request={Request},requestUri={RequestUri})", request, requestUri);
         }
 
         /// <summary>Identifies a request for a physical file on the system.</summary>
@@ -1477,15 +1486,18 @@ namespace DotNetNuke.Entities.Urls
                         {
                             rewritePath = rewritePath + "&" + queryStringPiece;
                         }
+						Logger.LogDebug("AddQueryStringToRewritePath(rewritePath={RewritePath},queryString={QueryString}): rewritePath → {RewritePath1}", rewritePath, queryString, rewritePath);
                         else
                         {
                             rewritePath = rewritePath + "?" + queryStringPiece;
                             rewritePathHasQuery = true;
+							Logger.LogDebug("AddQueryStringToRewritePath(rewritePath={RewritePath},queryString={QueryString}): rewritePathHasQuery → {RewritePathHasQuery}", rewritePath, queryString, rewritePathHasQuery);
                         }
                     }
                 }
             }
 
+			Logger.LogDebug("<<< Exiting AddQueryStringToRewritePath(rewritePath={RewritePath},queryString={QueryString})", rewritePath, queryString);
             return rewritePath;
         }
 
@@ -1727,6 +1739,7 @@ namespace DotNetNuke.Entities.Urls
 
         private static UserInfo GetUser(IHostSettings hostSettings, int portalId, string vanityUrl)
         {
+			Logger.LogDebug(">>> Entering GetUser(hostSettings={HostSettings},portalId={PortalId},vanityUrl={VanityUrl})", hostSettings, portalId, vanityUrl);
             string cacheKey = string.Format(CultureInfo.InvariantCulture, CacheController.VanityUrlLookupKey, portalId);
             var vanityUrlLookupDictionary = CBO.GetCachedObject<Dictionary<string, UserInfo>>(
                 hostSettings,
@@ -1736,9 +1749,11 @@ namespace DotNetNuke.Entities.Urls
             if (!vanityUrlLookupDictionary.TryGetValue(vanityUrl, out var user))
             {
                 user = UserController.GetUserByVanityUrl(portalId, vanityUrl);
+				Logger.LogDebug("GetUser(hostSettings={HostSettings},portalId={PortalId},vanityUrl={VanityUrl}): user → {User}", hostSettings, portalId, vanityUrl, user);
                 vanityUrlLookupDictionary[vanityUrl] = user;
             }
 
+			Logger.LogDebug("<<< Exiting GetUser(hostSettings={HostSettings},portalId={PortalId},vanityUrl={VanityUrl})", hostSettings, portalId, vanityUrl);
             return user;
         }
 

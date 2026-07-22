@@ -13,12 +13,15 @@ namespace DotNetNuke.UI.WebControls
     [ToolboxData("<{0}:TextEditControl runat=server></{0}:TextEditControl>")]
     public class TextEditControl : EditControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Initializes a new instance of the <see cref="TextEditControl"/> class.
         /// Constructs a TextEditControl.
         /// </summary>
         public TextEditControl()
         {
+		Logger.LogDebug(">>> Entering TextEditControl()");
+		Logger.LogDebug("<<< Exiting TextEditControl()");
         }
 
         /// <summary>
@@ -28,7 +31,10 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="type">The type of the property.</param>
         public TextEditControl(string type)
         {
+			Logger.LogDebug(">>> Entering TextEditControl(type={Type})", type);
             this.SystemType = type;
+			Logger.LogDebug("<<< Exiting TextEditControl(type={Type})", type);
+			Logger.LogDebug("TextEditControl(type={Type}): this.SystemType → {Arg1}", type, this.SystemType);
         }
 
         /// <summary>Gets oldStringValue returns the Boolean representation of the OldValue.</summary>
@@ -60,19 +66,27 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">The event arguments.</param>
         protected override void OnDataChanged(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnDataChanged(e={E})", e);
             var args = new PropertyEditorEventArgs(this.Name);
             args.Value = this.StringValue;
+			Logger.LogDebug("OnDataChanged(e={E}): args → {Args}", e, args);
+			Logger.LogDebug("OnDataChanged(e={E}): args.Value → {Arg1}", e, args.Value);
+			Logger.LogDebug("OnDataChanged(e={E}): args.OldValue → {Arg1}", e, args.OldValue);
+			Logger.LogDebug("OnDataChanged(e={E}): args.StringValue → {Arg1}", e, args.StringValue);
             args.OldValue = this.OldStringValue;
             args.StringValue = this.StringValue;
             this.OnValueChanged(args);
+			Logger.LogDebug("<<< Exiting OnDataChanged(e={E})", e);
         }
 
         /// <summary>RenderEditMode renders the Edit mode of the control.</summary>
         /// <param name="writer">A HtmlTextWriter.</param>
         protected override void RenderEditMode(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering RenderEditMode(writer={Writer})", writer);
             int length = Null.NullInteger;
             if (this.CustomAttributes != null)
+			Logger.LogDebug("RenderEditMode(writer={Writer}): length → {Length}", writer, length);
             {
                 foreach (Attribute attribute in this.CustomAttributes)
                 {
@@ -96,6 +110,7 @@ namespace DotNetNuke.UI.WebControls
             writer.AddAttribute(HtmlTextWriterAttribute.Id, this.ClientID);
             writer.RenderBeginTag(HtmlTextWriterTag.Input);
             writer.RenderEndTag();
+			Logger.LogDebug("<<< Exiting RenderEditMode(writer={Writer})", writer);
         }
     }
 }

@@ -27,6 +27,7 @@ namespace DotNetNuke.Tests.Urls
     [TestFixture]
     public class UrlRewriteTests : UrlTestBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string DefaultPage = Globals.glbDefaultPage;
         private const string TestPage = "Test Page";
         private const string AboutUsPageName = "About Us";
@@ -41,6 +42,7 @@ namespace DotNetNuke.Tests.Urls
         [SetUp]
         public override void SetUp()
         {
+			Logger.LogDebug(">>> Entering SetUp()");
             base.SetUp();
 
             this.DeleteTab(TestPage);
@@ -53,13 +55,19 @@ namespace DotNetNuke.Tests.Urls
             this.sslEnforced = PortalController.GetPortalSettingAsBoolean("SSLEnforced", this.PortalId, false);
             this.sslEnabled = PortalController.GetPortalSettingAsInteger("SSLSetup", this.PortalId, 0) != 0;
             this.primaryAlias = null;
+			Logger.LogDebug("SetUp(): primaryAlias → {PrimaryAlias}", primaryAlias);
+			Logger.LogDebug("SetUp(): this.primaryAlias → {Arg0}", this.primaryAlias);
             this.customLocale = null;
             DataCache.ClearCache();
+			Logger.LogDebug("<<< Exiting SetUp()");
+			Logger.LogDebug("SetUp(): customLocale → {CustomLocale}", customLocale);
+			Logger.LogDebug("SetUp(): this.customLocale → {Arg0}", this.customLocale);
         }
 
         [TearDown]
         public override void TearDown()
         {
+			Logger.LogDebug(">>> Entering TearDown()");
             base.TearDown();
 
             this.DeleteTab(TestPage);
@@ -70,8 +78,10 @@ namespace DotNetNuke.Tests.Urls
             {
                 var tab = TabController.Instance.GetTabByName(this.securePageName, this.PortalId);
                 if (tab != null)
+				Logger.LogDebug("TearDown(): tab → {Tab}", tab);
                 {
                     tab.IsSecure = false;
+					Logger.LogDebug("TearDown(): tab.IsSecure → {Arg0}", tab.IsSecure);
 
                     this.UpdateTab(tab);
                 }
@@ -97,32 +107,42 @@ namespace DotNetNuke.Tests.Urls
             {
                 TabController.Instance.DeleteTabUrl(tabUrl, this.PortalId, true);
             }
+			Logger.LogDebug("<<< Exiting TearDown()");
         }
 
         [OneTimeSetUp]
         public override void OneTimeSetUp()
         {
+			Logger.LogDebug(">>> Entering OneTimeSetUp()");
             base.OneTimeSetUp();
 
             var tab = TabController.Instance.GetTabByName(AboutUsPageName, this.PortalId);
             if (tab == null)
+			Logger.LogDebug("OneTimeSetUp(): tab → {Tab}", tab);
             {
                 this.CreateTab(AboutUsPageName);
                 tab = TabController.Instance.GetTabByName(AboutUsPageName, this.PortalId);
             }
 
             this.tabId = tab.TabID;
+			Logger.LogDebug("OneTimeSetUp(): tabId → {TabId}", tabId);
+			Logger.LogDebug("OneTimeSetUp(): this.tabId → {Arg0}", this.tabId);
 
             // Add Portal Aliases
             var aliasController = Globals.DependencyProvider.GetRequiredService<IPortalAliasService>();
             TestUtil.ReadStream("Aliases", (line, header) =>
                             {
+							Logger.LogDebug("OneTimeSetUp(): aliasController → {AliasController}", aliasController);
                                 var fields = line.Split(',');
                                 var alias = aliasController.GetPortalAlias(fields[0], this.PortalId);
+								Logger.LogDebug("OneTimeSetUp(): fields → {Fields}", fields);
                                 if (alias == null)
+								Logger.LogDebug("OneTimeSetUp(): alias → {Alias}", alias);
                                 {
                                     alias = new PortalAliasInfo();
                                     alias.HttpAlias = fields[0];
+									Logger.LogDebug("OneTimeSetUp(): alias.HttpAlias → {Arg0}", alias.HttpAlias);
+									Logger.LogDebug("OneTimeSetUp(): alias.PortalId → {Arg0}", alias.PortalId);
                                     alias.PortalId = this.PortalId;
                                     aliasController.AddPortalAlias(alias);
                                 }
@@ -133,18 +153,23 @@ namespace DotNetNuke.Tests.Urls
 
                                     TestUtil.AddUser(this.PortalId, fields[0].Trim(), fields[1].Trim(), fields[2].Trim());
                                 });
+								Logger.LogDebug("<<< Exiting OneTimeSetUp()");
         }
 
         [OneTimeTearDown]
         public override void OneTimeTearDown()
         {
+			Logger.LogDebug(">>> Entering OneTimeTearDown()");
             base.OneTimeTearDown();
 
             var aliasController = Globals.DependencyProvider.GetRequiredService<IPortalAliasService>();
             TestUtil.ReadStream("Aliases", (line, header) =>
                             {
+							Logger.LogDebug("OneTimeTearDown(): aliasController → {AliasController}", aliasController);
                                 var fields = line.Split(',');
                                 var alias = aliasController.GetPortalAlias(fields[0], this.PortalId);
+								Logger.LogDebug("OneTimeTearDown(): fields → {Fields}", fields);
+								Logger.LogDebug("OneTimeTearDown(): alias → {Alias}", alias);
                                 aliasController.DeletePortalAlias(alias);
                             });
             TestUtil.ReadStream("Users", (line, header) =>
@@ -153,6 +178,7 @@ namespace DotNetNuke.Tests.Urls
 
                                 TestUtil.DeleteUser(this.PortalId, fields[0]);
                             });
+							Logger.LogDebug("<<< Exiting OneTimeTearDown()");
         }
 
         [Test]

@@ -16,16 +16,19 @@ namespace DotNetNuke.Web.Mvp
     public partial class ModuleSettingsPresenterBase<TView> : ModulePresenterBase<TView>
         where TView : class, ISettingsView
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ModuleSettingsPresenterBase{TView}"/> class.</summary>
         /// <param name="view">The view.</param>
         public ModuleSettingsPresenterBase(TView view)
             : base(view)
         {
+			Logger.LogDebug(">>> Entering ModuleSettingsPresenterBase(view={View})", view);
             view.OnLoadSettings += this.OnLoadSettingsInternal;
             view.OnSaveSettings += this.OnSaveSettingsInternal;
 
             this.ModuleSettings = new Dictionary<string, string>();
             this.TabModuleSettings = new Dictionary<string, string>();
+			Logger.LogDebug("<<< Exiting ModuleSettingsPresenterBase(view={View})", view);
         }
 
         /// <summary>Gets or sets the module settings.</summary>
@@ -37,6 +40,7 @@ namespace DotNetNuke.Web.Mvp
         /// <inheritdoc />
         protected override void LoadFromContext()
         {
+			Logger.LogDebug(">>> Entering LoadFromContext()");
             base.LoadFromContext();
 
             foreach (var key in this.ModuleContext.Configuration.ModuleSettings.Keys)
@@ -48,26 +52,35 @@ namespace DotNetNuke.Web.Mvp
             {
                 this.TabModuleSettings.Add(Convert.ToString(key, CultureInfo.InvariantCulture), Convert.ToString(this.ModuleContext.Configuration.TabModuleSettings[key], CultureInfo.InvariantCulture));
             }
+			Logger.LogDebug("<<< Exiting LoadFromContext()");
         }
 
         /// <summary>A method which is called when the settings view is loaded.</summary>
         protected virtual void LoadSettings()
         {
+		Logger.LogDebug(">>> Entering LoadSettings()");
+		Logger.LogDebug("<<< Exiting LoadSettings()");
         }
 
         /// <summary>A method which is called when the settings are saved.</summary>
         protected virtual void SaveSettings()
         {
+		Logger.LogDebug(">>> Entering SaveSettings()");
+		Logger.LogDebug("<<< Exiting SaveSettings()");
         }
 
         private void OnLoadSettingsInternal(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoadSettingsInternal(sender={Sender},e={E})", sender, e);
             this.LoadSettings();
+			Logger.LogDebug("<<< Exiting OnLoadSettingsInternal(sender={Sender},e={E})", sender, e);
         }
 
         private void OnSaveSettingsInternal(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnSaveSettingsInternal(sender={Sender},e={E})", sender, e);
             this.SaveSettings();
+			Logger.LogDebug("<<< Exiting OnSaveSettingsInternal(sender={Sender},e={E})", sender, e);
         }
     }
 }

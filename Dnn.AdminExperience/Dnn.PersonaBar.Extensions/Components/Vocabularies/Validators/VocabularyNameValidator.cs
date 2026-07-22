@@ -12,6 +12,7 @@ namespace Dnn.PersonaBar.Vocabularies.Validators
 
     public class VocabularyNameValidator : ObjectValidator
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private IVocabularyController vocabularyController;
         private ITermController termController;
 
@@ -20,17 +21,25 @@ namespace Dnn.PersonaBar.Vocabularies.Validators
         /// <param name="termController">The term controller.</param>
         public VocabularyNameValidator(IVocabularyController vocabularyController, ITermController termController)
         {
+			Logger.LogDebug(">>> Entering VocabularyNameValidator(vocabularyController={VocabularyController},termController={TermController})", vocabularyController, termController);
             this.vocabularyController = vocabularyController;
             this.termController = termController;
+			Logger.LogDebug("<<< Exiting VocabularyNameValidator(vocabularyController={VocabularyController},termController={TermController})", vocabularyController, termController);
+			Logger.LogDebug("VocabularyNameValidator(vocabularyController={VocabularyController},termController={TermController}): this.vocabularyController → {Arg2}", vocabularyController, termController, this.vocabularyController);
+			Logger.LogDebug("VocabularyNameValidator(vocabularyController={VocabularyController},termController={TermController}): termController → {TermController1}", vocabularyController, termController, termController);
+			Logger.LogDebug("VocabularyNameValidator(vocabularyController={VocabularyController},termController={TermController}): this.termController → {Arg2}", vocabularyController, termController, this.termController);
+			Logger.LogDebug("VocabularyNameValidator(vocabularyController={VocabularyController},termController={TermController}): vocabularyController → {VocabularyController1}", vocabularyController, termController, vocabularyController);
         }
 
         public override ValidationResult ValidateObject(object target)
         {
+			Logger.LogDebug(">>> Entering ValidateObject(target={Target})", target);
             if (target is Vocabulary)
             {
                 var vocabulary = target as Vocabulary;
                 var existVocabulary =
                     this.vocabularyController.GetVocabularies().FirstOrDefault(v => v.Name == vocabulary.Name && v.ScopeId == vocabulary.ScopeId);
+					Logger.LogDebug("ValidateObject(target={Target}): vocabulary → {Vocabulary}", target, vocabulary);
 
                 if (existVocabulary != null && (vocabulary.VocabularyId == Null.NullInteger || existVocabulary.VocabularyId != vocabulary.VocabularyId))
                 {
@@ -42,6 +51,7 @@ namespace Dnn.PersonaBar.Vocabularies.Validators
                 var term = target as Term;
                 var vocabulary = this.vocabularyController.GetVocabularies().FirstOrDefault(v => v.VocabularyId == term.VocabularyId);
                 var terms = this.termController.GetTermsByVocabulary(term.VocabularyId);
+				Logger.LogDebug("ValidateObject(target={Target}): terms → {Terms}", target, terms);
 
                 if (vocabulary != null)
                 {
@@ -51,6 +61,7 @@ namespace Dnn.PersonaBar.Vocabularies.Validators
                         {
                             var existTerm = terms.FirstOrDefault(v => v.Name == term.Name && v.TermId != term.TermId && v.ParentTermId == term.ParentTermId);
                             if (existTerm != null)
+							Logger.LogDebug("ValidateObject(target={Target}): existTerm → {ExistTerm}", target, existTerm);
                             {
                                 return
                                     new ValidationResult(new[]
@@ -80,6 +91,7 @@ namespace Dnn.PersonaBar.Vocabularies.Validators
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ValidateObject(target={Target})", target);
             return ValidationResult.Successful;
         }
     }

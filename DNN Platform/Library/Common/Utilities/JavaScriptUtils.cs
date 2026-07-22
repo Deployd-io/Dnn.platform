@@ -11,13 +11,17 @@ namespace DotNetNuke.Common.Utilities
 
     public class JavaScriptUtils : ServiceLocator<IJavaScriptUtils, JavaScriptUtils>, IJavaScriptUtils
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public void RegisterJavascriptVariable(string variableName, object value, Page page, Type type)
         {
+			Logger.LogDebug(">>> Entering RegisterJavascriptVariable(variableName={VariableName},value={Value},page={Page},type={Type})", variableName, value, page, type);
             var valueAsJson = Json.Serialize(value);
 
+			Logger.LogDebug("RegisterJavascriptVariable(variableName={VariableName},value={Value},page={Page},type={Type}): valueAsJson → {ValueAsJson}", variableName, value, page, type, valueAsJson);
             var script = $"var {variableName} = {valueAsJson};";
 
+			Logger.LogDebug("RegisterJavascriptVariable(variableName={VariableName},value={Value},page={Page},type={Type}): script → {Script}", variableName, value, page, type, script);
             if (ScriptManager.GetCurrent(page) != null)
             {
                 // respect MS AJAX
@@ -27,11 +31,14 @@ namespace DotNetNuke.Common.Utilities
             {
                 page.ClientScript.RegisterStartupScript(type, variableName, script, true);
             }
+			Logger.LogDebug("<<< Exiting RegisterJavascriptVariable(variableName={VariableName},value={Value},page={Page},type={Type})", variableName, value, page, type);
         }
 
         /// <inheritdoc />
         protected override Func<IJavaScriptUtils> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new JavaScriptUtils();
         }
     }
