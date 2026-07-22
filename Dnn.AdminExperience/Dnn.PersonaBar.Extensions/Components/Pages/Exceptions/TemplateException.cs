@@ -8,11 +8,14 @@ namespace Dnn.PersonaBar.Pages.Components.Exceptions
 
     public class TemplateException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="TemplateException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>
         public TemplateException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering TemplateException(message={Message})", message);
+		Logger.LogDebug("<<< Exiting TemplateException(message={Message})", message);
         }
     }
 }

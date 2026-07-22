@@ -14,11 +14,14 @@ namespace DotNetNuke.Framework
     /// <summary>DiskPageStatePersister provides a disk (stream) based page state persistence mechanism.</summary>
     public class DiskPageStatePersister : PageStatePersister
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="DiskPageStatePersister"/> class.</summary>
         /// <param name="page">The <see cref="Page"/> that the view state persistence mechanism is created for.</param>
         public DiskPageStatePersister(Page page)
             : base(page)
         {
+		Logger.LogDebug(">>> Entering DiskPageStatePersister(page={Page})", page);
+		Logger.LogDebug("<<< Exiting DiskPageStatePersister(page={Page})", page);
         }
 
         /// <summary>
@@ -48,8 +51,10 @@ namespace DotNetNuke.Framework
         /// <summary>Loads the Page State from the Cache.</summary>
         public override void Load()
         {
+			Logger.LogDebug(">>> Entering Load()");
             StreamReader reader = null;
 
+			Logger.LogDebug("Load(): reader → {Reader}", reader);
             // Read the state string, using the StateFormatter.
             try
             {
@@ -63,20 +68,25 @@ namespace DotNetNuke.Framework
                 // the Save method.
                 var statePair = (Pair)formatter.Deserialize(serializedStatePair);
                 this.ViewState = statePair.First;
+				Logger.LogDebug("Load(): statePair → {StatePair}", statePair);
+				Logger.LogDebug("Load(): this.ViewState → {Arg0}", this.ViewState);
                 this.ControlState = statePair.Second;
             }
             finally
+			Logger.LogDebug("Load(): this.ControlState → {Arg0}", this.ControlState);
             {
                 if (reader != null)
                 {
                     reader.Close();
                 }
             }
+			Logger.LogDebug("<<< Exiting Load()");
         }
 
         /// <summary>Saves the Page State to the Cache.</summary>
         public override void Save()
         {
+			Logger.LogDebug(">>> Entering Save()");
             // No processing needed if no states available
             if (this.ViewState == null && this.ControlState == null)
             {
@@ -100,6 +110,7 @@ namespace DotNetNuke.Framework
                     writer.Close();
                 }
             }
+			Logger.LogDebug("<<< Exiting Save()");
         }
     }
 }

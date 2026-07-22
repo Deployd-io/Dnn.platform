@@ -14,13 +14,16 @@ namespace DotNetNuke.Services.Social.Messaging
 
     public class UserPreferencesController : ServiceLocator<IUserPreferencesController, UserPreferencesController>, IUserPreferencesController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IDataService dataService;
 
         /// <summary>Initializes a new instance of the <see cref="UserPreferencesController"/> class.</summary>
         public UserPreferencesController()
             : this(DataService.Instance)
         {
+		Logger.LogDebug(">>> Entering UserPreferencesController()");
         }
+		Logger.LogDebug("<<< Exiting UserPreferencesController()");
 
         /// <summary>Initializes a new instance of the <see cref="UserPreferencesController"/> class.</summary>
         /// <param name="dataService">The data service.</param>
@@ -30,23 +33,31 @@ namespace DotNetNuke.Services.Social.Messaging
             Requires.NotNull("dataService", dataService);
 
             this.dataService = dataService;
+			Logger.LogDebug("UserPreferencesController(dataService={DataService}): dataService → {DataService1}", dataService, dataService);
+			Logger.LogDebug("UserPreferencesController(dataService={DataService}): this.dataService → {Arg1}", dataService, this.dataService);
         }
 
         /// <inheritdoc />
         public void SetUserPreference(UserPreference userPreference)
         {
+			Logger.LogDebug(">>> Entering SetUserPreference(userPreference={UserPreference})", userPreference);
             this.dataService.SetUserPreference(userPreference.PortalId, userPreference.UserId, (int)userPreference.MessagesEmailFrequency, (int)userPreference.NotificationsEmailFrequency);
+			Logger.LogDebug("<<< Exiting SetUserPreference(userPreference={UserPreference})", userPreference);
         }
 
         /// <inheritdoc />
         public UserPreference GetUserPreference(UserInfo userinfo)
         {
+			Logger.LogDebug(">>> Entering GetUserPreference(userinfo={Userinfo})", userinfo);
+			Logger.LogDebug("<<< Exiting GetUserPreference(userinfo={Userinfo})", userinfo);
             return CBO.FillObject<UserPreference>(this.dataService.GetUserPreference(userinfo.PortalID, userinfo.UserID));
         }
 
         /// <inheritdoc />
         protected override Func<IUserPreferencesController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new UserPreferencesController();
         }
     }

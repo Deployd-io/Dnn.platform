@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.Pages
     /// </summary>
     public static class PageExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Adds a tag to the header of the page using simple parameters.
         /// </summary>
@@ -21,8 +22,10 @@ namespace DotNetNuke.Services.Pages
         /// <param name="priority">The priority of this tag. Defaults to <see cref="PagePriority.Default"/>.</param>
         public static void AddToHead(this IPageService pageService, string tag, int priority = PagePriority.Default)
         {
+			Logger.LogDebug(">>> Entering AddToHead(pageService={PageService},tag={Tag},priority={Priority})", pageService, tag, priority);
             var priorityItem = new PageTag(tag, priority);
             pageService.AddToHead(priorityItem);
+			Logger.LogDebug("<<< Exiting AddToHead(pageService={PageService},tag={Tag},priority={Priority})", pageService, tag, priority);
         }
 
         /// <summary>
@@ -34,8 +37,10 @@ namespace DotNetNuke.Services.Pages
         /// <param name="priority">The priority of this meta tag. Defaults to <see cref="PagePriority.Default"/>.</param>
         public static void AddMeta(this IPageService pageService, string name, string content, int priority = PagePriority.Default)
         {
+			Logger.LogDebug(">>> Entering AddMeta(pageService={PageService},name={Name},content={Content},priority={Priority})", pageService, name, content, priority);
             var priorityMeta = new PageMeta(name, content, priority);
             pageService.AddMeta(priorityMeta);
+			Logger.LogDebug("<<< Exiting AddMeta(pageService={PageService},name={Name},content={Content},priority={Priority})", pageService, name, content, priority);
         }
 
         /// <summary>
@@ -47,8 +52,10 @@ namespace DotNetNuke.Services.Pages
         /// <param name="priority">The priority of this message. Defaults to <see cref="PagePriority.Default"/>.</param>
         public static void AddMessage(this IPageService pageService, string heading, string message, int priority = PagePriority.Default)
         {
+			Logger.LogDebug(">>> Entering AddMessage(pageService={PageService},heading={Heading},message={Message},priority={Priority})", pageService, heading, message, priority);
             var priorityMessage = new PageMessage(heading, message, PageMessageType.Info, string.Empty, priority);
             pageService.AddMessage(priorityMessage);
+			Logger.LogDebug("<<< Exiting AddMessage(pageService={PageService},heading={Heading},message={Message},priority={Priority})", pageService, heading, message, priority);
         }
 
         /// <summary>
@@ -62,8 +69,10 @@ namespace DotNetNuke.Services.Pages
         /// <param name="priority">The priority of this message. Defaults to <see cref="PagePriority.Default"/>.</param>
         public static void AddMessage(this IPageService pageService, string heading, string message, PageMessageType messageType, string iconSrc, int priority = PagePriority.Default)
         {
+			Logger.LogDebug(">>> Entering AddMessage(pageService={PageService},heading={Heading},message={Message},messageType={MessageType},iconSrc={IconSrc},priority={Priority})", pageService, heading, message, messageType, iconSrc, priority);
             var priorityMessage = new PageMessage(heading, message, messageType, iconSrc ?? string.Empty, priority);
             pageService.AddMessage(priorityMessage);
+			Logger.LogDebug("<<< Exiting AddMessage(pageService={PageService},heading={Heading},message={Message},messageType={MessageType},iconSrc={IconSrc},priority={Priority})", pageService, heading, message, messageType, iconSrc, priority);
         }
 
         /// <summary>
@@ -75,8 +84,11 @@ namespace DotNetNuke.Services.Pages
         /// <param name="priority">The priority of this message. Defaults to <see cref="PagePriority.Default"/>.</param>
         public static void AddSuccessMessage(this IPageService pageService, string heading, string message, int priority = PagePriority.Default)
         {
+			Logger.LogDebug(">>> Entering AddSuccessMessage(pageService={PageService},heading={Heading},message={Message},priority={Priority})", pageService, heading, message, priority);
             var priorityMessage = new PageMessage(heading, message, PageMessageType.Success, string.Empty, priority);
             pageService.AddMessage(priorityMessage);
+			Logger.LogDebug("<<< Exiting AddSuccessMessage(pageService={PageService},heading={Heading},message={Message},priority={Priority})", pageService, heading, message, priority);
+			Logger.LogDebug("AddSuccessMessage(pageService={PageService},heading={Heading},message={Message},priority={Priority}): priorityMessage → {PriorityMessage}", pageService, heading, message, priority, priorityMessage);
         }
 
         /// <summary>
@@ -88,8 +100,11 @@ namespace DotNetNuke.Services.Pages
         /// <param name="priority">The priority of this message. Defaults to <see cref="PagePriority.Default"/>.</param>
         public static void AddErrorMessage(this IPageService pageService, string heading, string message, int priority = PagePriority.Default)
         {
+			Logger.LogDebug(">>> Entering AddErrorMessage(pageService={PageService},heading={Heading},message={Message},priority={Priority})", pageService, heading, message, priority);
             var priorityMessage = new PageMessage(heading, message, PageMessageType.Error, string.Empty, priority);
             pageService.AddMessage(priorityMessage);
+			Logger.LogDebug("<<< Exiting AddErrorMessage(pageService={PageService},heading={Heading},message={Message},priority={Priority})", pageService, heading, message, priority);
+			Logger.LogDebug("AddErrorMessage(pageService={PageService},heading={Heading},message={Message},priority={Priority}): priorityMessage → {PriorityMessage}", pageService, heading, message, priority, priorityMessage);
         }
 
         /// <summary>
@@ -101,8 +116,11 @@ namespace DotNetNuke.Services.Pages
         /// <param name="priority">The priority of this message. Defaults to <see cref="PagePriority.Default"/>.</param>
         public static void AddWarningMessage(this IPageService pageService, string heading, string message, int priority = PagePriority.Default)
         {
+			Logger.LogDebug(">>> Entering AddWarningMessage(pageService={PageService},heading={Heading},message={Message},priority={Priority})", pageService, heading, message, priority);
             var priorityMessage = new PageMessage(heading, message, PageMessageType.Warning, string.Empty, priority);
             pageService.AddMessage(priorityMessage);
+			Logger.LogDebug("<<< Exiting AddWarningMessage(pageService={PageService},heading={Heading},message={Message},priority={Priority})", pageService, heading, message, priority);
+			Logger.LogDebug("AddWarningMessage(pageService={PageService},heading={Heading},message={Message},priority={Priority}): priorityMessage → {PriorityMessage}", pageService, heading, message, priority, priorityMessage);
         }
 
         /// <summary>
@@ -114,8 +132,11 @@ namespace DotNetNuke.Services.Pages
         /// <param name="priority">The priority of this message. Defaults to <see cref="PagePriority.Default"/>.</param>
         public static void AddInfoMessage(this IPageService pageService, string heading, string message, int priority = PagePriority.Default)
         {
+			Logger.LogDebug(">>> Entering AddInfoMessage(pageService={PageService},heading={Heading},message={Message},priority={Priority})", pageService, heading, message, priority);
             var priorityMessage = new PageMessage(heading, message, PageMessageType.Info, string.Empty, priority);
             pageService.AddMessage(priorityMessage);
+			Logger.LogDebug("<<< Exiting AddInfoMessage(pageService={PageService},heading={Heading},message={Message},priority={Priority})", pageService, heading, message, priority);
+			Logger.LogDebug("AddInfoMessage(pageService={PageService},heading={Heading},message={Message},priority={Priority}): priorityMessage → {PriorityMessage}", pageService, heading, message, priority, priorityMessage);
         }
 
         /// <summary>

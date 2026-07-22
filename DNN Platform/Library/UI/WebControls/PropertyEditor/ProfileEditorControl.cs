@@ -22,9 +22,13 @@ namespace DotNetNuke.UI.WebControls
     public class ProfileEditorControl(IServiceProvider serviceProvider, ListController listController)
         : CollectionEditorControl(serviceProvider)
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly ListController listController = listController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ListController>();
+		Logger.LogDebug(">>> Entering ProfileEditorControl(serviceProvider={ServiceProvider},listController={ListController})", serviceProvider, listController);
+		Logger.LogDebug("ProfileEditorControl(serviceProvider={ServiceProvider},listController={ListController}): listController → {ListController1}", serviceProvider, listController, listController);
 
         /// <summary>Initializes a new instance of the <see cref="ProfileEditorControl"/> class.</summary>
+		Logger.LogDebug("<<< Exiting ProfileEditorControl(serviceProvider={ServiceProvider},listController={ListController})", serviceProvider, listController);
         [Obsolete("Deprecated in DotNetNuke 10.0.0. Please use overload with IServiceProvider. Scheduled removal in v12.0.0.")]
         public ProfileEditorControl()
             : this(Globals.GetCurrentServiceProvider())
@@ -42,17 +46,27 @@ namespace DotNetNuke.UI.WebControls
         /// <summary>CreateEditor creates the control collection.</summary>
         protected override void CreateEditor()
         {
+			Logger.LogDebug(">>> Entering CreateEditor()");
             this.CategoryDataField = "PropertyCategory";
             this.EditorDataField = "DataType";
+			Logger.LogDebug("CreateEditor(): this.CategoryDataField → {Arg0}", this.CategoryDataField);
+			Logger.LogDebug("CreateEditor(): this.EditorDataField → {Arg0}", this.EditorDataField);
             this.NameDataField = "PropertyName";
             this.RequiredDataField = "Required";
             this.ValidationExpressionDataField = "ValidationExpression";
+			Logger.LogDebug("CreateEditor(): this.NameDataField → {Arg0}", this.NameDataField);
+			Logger.LogDebug("CreateEditor(): this.RequiredDataField → {Arg0}", this.RequiredDataField);
+			Logger.LogDebug("CreateEditor(): this.ValidationExpressionDataField → {Arg0}", this.ValidationExpressionDataField);
             this.ValueDataField = "PropertyValue";
             this.VisibleDataField = "Visible";
             this.VisibilityDataField = "ProfileVisibility";
             this.LengthDataField = "Length";
 
             base.CreateEditor();
+			Logger.LogDebug("CreateEditor(): this.ValueDataField → {Arg0}", this.ValueDataField);
+			Logger.LogDebug("CreateEditor(): this.VisibleDataField → {Arg0}", this.VisibleDataField);
+			Logger.LogDebug("CreateEditor(): this.VisibilityDataField → {Arg0}", this.VisibilityDataField);
+			Logger.LogDebug("CreateEditor(): this.LengthDataField → {Arg0}", this.LengthDataField);
 
             foreach (FieldEditorControl editor in this.Fields)
             {
@@ -65,6 +79,7 @@ namespace DotNetNuke.UI.WebControls
                 {
                     var ps = PortalController.Instance.GetCurrentSettings();
                     if (!PortalSecurity.IsInRole(ps.AdministratorRoleName))
+					Logger.LogDebug("CreateEditor(): ps → {Ps}", ps);
                     {
                         editor.Editor.EditMode = PropertyEditorMode.View;
                     }
@@ -75,6 +90,7 @@ namespace DotNetNuke.UI.WebControls
                 {
                     string country = null;
 
+					Logger.LogDebug("CreateEditor(): country → {Country}", country);
                     foreach (FieldEditorControl checkEditor in this.Fields)
                     {
                         if (checkEditor.Editor is DNNCountryEditControl countryEdit)
@@ -89,9 +105,11 @@ namespace DotNetNuke.UI.WebControls
                     // Create a ListAttribute for the Region
                     string countryKey = "Unknown";
                     if (int.TryParse(country, out var entryId))
+					Logger.LogDebug("CreateEditor(): countryKey → {CountryKey}", countryKey);
                     {
                         ListEntryInfo item = this.listController.GetListEntryInfo(entryId);
                         if (item != null)
+						Logger.LogDebug("CreateEditor(): item → {Item}", item);
                         {
                             countryKey = item.Value;
                         }
@@ -103,6 +121,7 @@ namespace DotNetNuke.UI.WebControls
                     editor.Editor.CustomAttributes = attributes;
                 }
             }
+			Logger.LogDebug("<<< Exiting CreateEditor()");
         }
     }
 }

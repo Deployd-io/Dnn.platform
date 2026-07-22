@@ -12,6 +12,7 @@ namespace DotNetNuke.Tests.Authentication
     [TestFixture]
     public class TwitterUserDataTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string SampleUserJson = @"{
       ""name"": ""Matt Harris"",
       ""profile_sidebar_border_color"": ""C0DEED"",
@@ -74,41 +75,53 @@ namespace DotNetNuke.Tests.Authentication
         [Test]
         public void TwitterUserData_Populates_Inherited_DisplayName_Property_When_Deserialized()
         {
+			Logger.LogDebug(">>> Entering TwitterUserData_Populates_Inherited_DisplayName_Property_When_Deserialized()");
             // Act
             UserData sampleUser = Json.Deserialize<TwitterUserData>(SampleUserJson);
 
+			Logger.LogDebug("TwitterUserData_Populates_Inherited_DisplayName_Property_When_Deserialized(): sampleUser → {SampleUser}", sampleUser);
             // Assert
             Assert.That(sampleUser.DisplayName, Is.EqualTo("themattharris"));
+			Logger.LogDebug("<<< Exiting TwitterUserData_Populates_Inherited_DisplayName_Property_When_Deserialized()");
         }
 
         [Test]
         public void TwitterUserData_Populates_Inherited_Locale_Property_When_Deserialized()
         {
+			Logger.LogDebug(">>> Entering TwitterUserData_Populates_Inherited_Locale_Property_When_Deserialized()");
             // Act
             UserData sampleUser = Json.Deserialize<TwitterUserData>(SampleUserJson);
 
+			Logger.LogDebug("TwitterUserData_Populates_Inherited_Locale_Property_When_Deserialized(): sampleUser → {SampleUser}", sampleUser);
             // Assert
             Assert.That(sampleUser.Locale, Is.EqualTo("en"));
+			Logger.LogDebug("<<< Exiting TwitterUserData_Populates_Inherited_Locale_Property_When_Deserialized()");
         }
 
         [Test]
         public void TwitterUserData_Populates_Inherited_ProfileImage_Property_When_Deserialized()
         {
+			Logger.LogDebug(">>> Entering TwitterUserData_Populates_Inherited_ProfileImage_Property_When_Deserialized()");
             // Act
             UserData sampleUser = Json.Deserialize<TwitterUserData>(SampleUserJson);
 
+			Logger.LogDebug("TwitterUserData_Populates_Inherited_ProfileImage_Property_When_Deserialized(): sampleUser → {SampleUser}", sampleUser);
             // Assert
             Assert.That(sampleUser.ProfileImage, Is.EqualTo("http://a1.twimg.com/profile_images/554181350/matt_normal.jpg"));
+			Logger.LogDebug("<<< Exiting TwitterUserData_Populates_Inherited_ProfileImage_Property_When_Deserialized()");
         }
 
         [Test]
         public void TwitterUserData_Populates_Inherited_Website_Property_When_Deserialized()
         {
+			Logger.LogDebug(">>> Entering TwitterUserData_Populates_Inherited_Website_Property_When_Deserialized()");
             // Act
             UserData sampleUser = Json.Deserialize<TwitterUserData>(SampleUserJson);
 
+			Logger.LogDebug("TwitterUserData_Populates_Inherited_Website_Property_When_Deserialized(): sampleUser → {SampleUser}", sampleUser);
             // Assert
             Assert.That(sampleUser.Website, Is.EqualTo("http://themattharris.com"));
+			Logger.LogDebug("<<< Exiting TwitterUserData_Populates_Inherited_Website_Property_When_Deserialized()");
         }
     }
 }

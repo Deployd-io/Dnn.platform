@@ -12,6 +12,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
     [Serializable]
     public class JavaScriptLibrary : IXmlSerializable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Gets or sets unique identifier id for a javscript library package.</summary>
         public int JavaScriptLibraryID { get; set; }
 
@@ -42,6 +43,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         /// <inheritdoc />
         public XmlSchema GetSchema()
         {
+			Logger.LogDebug(">>> Entering GetSchema()");
             throw new NotImplementedException();
         }
 
@@ -49,6 +51,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         /// <param name="reader">The XmlReader to use.</param>
         public void ReadXml(XmlReader reader)
         {
+			Logger.LogDebug(">>> Entering ReadXml(reader={Reader})", reader);
             while (reader.Read())
             {
                 if (reader.NodeType == XmlNodeType.EndElement)
@@ -78,9 +81,11 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
                         case "preferredScriptLocation":
                             var location = reader.ReadElementContentAsString();
                             switch (location)
+							Logger.LogDebug("ReadXml(reader={Reader}): location → {Location}", reader, location);
                             {
                                 case "BodyTop":
                                     this.PreferredScriptLocation = ScriptLocation.BodyTop;
+									Logger.LogDebug("ReadXml(reader={Reader}): this.PreferredScriptLocation → {Arg1}", reader, this.PreferredScriptLocation);
                                     break;
                                 case "BodyBottom":
                                     this.PreferredScriptLocation = ScriptLocation.BodyBottom;
@@ -104,12 +109,14 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting ReadXml(reader={Reader})", reader);
         }
 
         /// <summary>Writes a JavaScriptLibrary to an XmlWriter.</summary>
         /// <param name="writer">The XmlWriter to use.</param>
         public void WriteXml(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteXml(writer={Writer})", writer);
             // Write start of main elemenst
             writer.WriteStartElement("javaScriptLibrary");
 
@@ -122,6 +129,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
 
             // Write end of main element
             writer.WriteEndElement();
+			Logger.LogDebug("<<< Exiting WriteXml(writer={Writer})", writer);
         }
     }
 }

@@ -54,7 +54,9 @@ namespace DotNetNuke.Services.Cache
         protected CachingProvider()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering CachingProvider()");
         }
+		Logger.LogDebug("<<< Exiting CachingProvider()");
 
         /// <summary>Initializes a new instance of the <see cref="CachingProvider"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -106,6 +108,8 @@ namespace DotNetNuke.Services.Cache
         /// <returns>The <see cref="CachingProvider"/> instance defined in <c>web.config</c>.</returns>
         public static CachingProvider Instance()
         {
+			Logger.LogDebug(">>> Entering Instance()");
+			Logger.LogDebug("<<< Exiting Instance()");
             return ComponentFactory.GetComponent<CachingProvider>();
         }
 
@@ -114,11 +118,15 @@ namespace DotNetNuke.Services.Cache
         /// <param name="data">The data.</param>
         public virtual void Clear(string type, string data)
         {
+			Logger.LogDebug(">>> Entering Clear(type={Type},data={Data})", type, data);
             this.ClearCacheInternal(type, data, false);
+			Logger.LogDebug("<<< Exiting Clear(type={Type},data={Data})", type, data);
         }
 
         public virtual IDictionaryEnumerator GetEnumerator()
         {
+			Logger.LogDebug(">>> Entering GetEnumerator()");
+			Logger.LogDebug("<<< Exiting GetEnumerator()");
             return Cache.GetEnumerator();
         }
 
@@ -175,6 +183,8 @@ namespace DotNetNuke.Services.Cache
         /// <returns><see langword="true"/> if is web farm; otherwise, <see langword="false"/>.</returns>
         public virtual bool IsWebFarm()
         {
+			Logger.LogDebug(">>> Entering IsWebFarm()");
+			Logger.LogDebug("<<< Exiting IsWebFarm()");
             return ServerController.GetEnabledServers().Count > 1;
         }
 
@@ -182,6 +192,8 @@ namespace DotNetNuke.Services.Cache
         /// <returns>A message indicating the results of the cache purge.</returns>
         public virtual string PurgeCache()
         {
+			Logger.LogDebug(">>> Entering PurgeCache()");
+			Logger.LogDebug("<<< Exiting PurgeCache()");
             return Localization.GetString("PurgeCacheUnsupported.Text", Localization.GlobalResourceFile);
         }
 
@@ -199,8 +211,11 @@ namespace DotNetNuke.Services.Cache
         /// <seealso cref="CacheExpirationDisable"/>
         internal static void DisableCacheExpiration()
         {
+			Logger.LogDebug(">>> Entering DisableCacheExpiration()");
             CacheExpirationDisable = true;
             Logger.Warn("Disable cache expiration.");
+			Logger.LogDebug("<<< Exiting DisableCacheExpiration()");
+			Logger.LogDebug("DisableCacheExpiration(): CacheExpirationDisable → {CacheExpirationDisable}", CacheExpirationDisable);
         }
 
         /// <summary>
@@ -210,9 +225,12 @@ namespace DotNetNuke.Services.Cache
         /// <seealso cref="CacheExpirationDisable"/>
         internal static void EnableCacheExpiration()
         {
+			Logger.LogDebug(">>> Entering EnableCacheExpiration()");
             CacheExpirationDisable = false;
             DataCache.ClearHostCache(true);
+			Logger.LogDebug("EnableCacheExpiration(): CacheExpirationDisable → {CacheExpirationDisable}", CacheExpirationDisable);
             Logger.Warn("Enable cache expiration.");
+			Logger.LogDebug("<<< Exiting EnableCacheExpiration()");
         }
 
         /// <summary>Clears the cache internal.</summary>
@@ -221,6 +239,7 @@ namespace DotNetNuke.Services.Cache
         /// <param name="clearRuntime">if set to <see langword="true"/> clear runtime cache.</param>
         protected void ClearCacheInternal(string cacheType, string data, bool clearRuntime)
         {
+			Logger.LogDebug(">>> Entering ClearCacheInternal(cacheType={CacheType},data={Data},clearRuntime={ClearRuntime})", cacheType, data, clearRuntime);
             switch (cacheType)
             {
                 case "Prefix":
@@ -251,6 +270,7 @@ namespace DotNetNuke.Services.Cache
                     ReloadServicesFrameworkRoutes();
                     break;
             }
+			Logger.LogDebug("<<< Exiting ClearCacheInternal(cacheType={CacheType},data={Data},clearRuntime={ClearRuntime})", cacheType, data, clearRuntime);
         }
 
         /// <summary>Removes value from the cache.</summary>
@@ -270,14 +290,17 @@ namespace DotNetNuke.Services.Cache
 
         private static void ReloadServicesFrameworkRoutes()
         {
+			Logger.LogDebug(">>> Entering ReloadServicesFrameworkRoutes()");
             // registration of routes when the servers is operating is done as part of the cache
             // because the web request caching provider is the only inter-server communication channel
             // that is reliable
             ServicesRoutingManager.RegisterServiceRoutes();
+			Logger.LogDebug("<<< Exiting ReloadServicesFrameworkRoutes()");
         }
 
         private void ClearCacheInternal(string prefix, bool clearRuntime)
         {
+			Logger.LogDebug(">>> Entering ClearCacheInternal(prefix={Prefix},clearRuntime={ClearRuntime})", prefix, clearRuntime);
             foreach (DictionaryEntry objDictionaryEntry in HttpRuntime.Cache)
             {
                 if (Convert.ToString(objDictionaryEntry.Key, CultureInfo.InvariantCulture).StartsWith(prefix, StringComparison.Ordinal))
@@ -294,10 +317,12 @@ namespace DotNetNuke.Services.Cache
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting ClearCacheInternal(prefix={Prefix},clearRuntime={ClearRuntime})", prefix, clearRuntime);
         }
 
         private void ClearCacheKeysByPortalInternal(int portalId, bool clearRuntime)
         {
+			Logger.LogDebug(">>> Entering ClearCacheKeysByPortalInternal(portalId={PortalId},clearRuntime={ClearRuntime})", portalId, clearRuntime);
             this.RemoveFormattedCacheKey(DataCache.PortalCacheKey, clearRuntime, Null.NullInteger, string.Empty);
             this.RemoveFormattedCacheKey(DataCache.LocalesCacheKey, clearRuntime, portalId);
             this.RemoveFormattedCacheKey(DataCache.ProfileDefinitionsCacheKey, clearRuntime, portalId);
@@ -307,32 +332,39 @@ namespace DotNetNuke.Services.Cache
             this.RemoveFormattedCacheKey(DataCache.PackagesCacheKey, clearRuntime, portalId);
 
             this.RemoveCacheKey(DataCache.AllPortalsCacheKey, clearRuntime);
+			Logger.LogDebug("<<< Exiting ClearCacheKeysByPortalInternal(portalId={PortalId},clearRuntime={ClearRuntime})", portalId, clearRuntime);
         }
 
         private void ClearDesktopModuleCacheInternal(int portalId, bool clearRuntime)
         {
+			Logger.LogDebug(">>> Entering ClearDesktopModuleCacheInternal(portalId={PortalId},clearRuntime={ClearRuntime})", portalId, clearRuntime);
             this.RemoveFormattedCacheKey(DataCache.DesktopModuleCacheKey, clearRuntime, portalId);
             this.RemoveFormattedCacheKey(DataCache.PortalDesktopModuleCacheKey, clearRuntime, portalId);
             this.RemoveCacheKey(DataCache.ModuleDefinitionCacheKey, clearRuntime);
             this.RemoveCacheKey(DataCache.ModuleControlsCacheKey, clearRuntime);
+			Logger.LogDebug("<<< Exiting ClearDesktopModuleCacheInternal(portalId={PortalId},clearRuntime={ClearRuntime})", portalId, clearRuntime);
         }
 
         private void ClearFolderCacheInternal(int portalId, bool clearRuntime)
         {
+			Logger.LogDebug(">>> Entering ClearFolderCacheInternal(portalId={PortalId},clearRuntime={ClearRuntime})", portalId, clearRuntime);
             this.RemoveFormattedCacheKey(DataCache.FolderCacheKey, clearRuntime, portalId);
 
             // FolderUserCacheKey also includes permissions and userId, but we don't have that information
             // here so we remove them using a prefix
             var folderUserCachePrefix = GetCacheKey(string.Format(CultureInfo.InvariantCulture, "Folders|{0}|", portalId));
             this.ClearCacheInternal(folderUserCachePrefix, clearRuntime);
+			Logger.LogDebug("ClearFolderCacheInternal(portalId={PortalId},clearRuntime={ClearRuntime}): folderUserCachePrefix → {FolderUserCachePrefix}", portalId, clearRuntime, folderUserCachePrefix);
 
             PermissionProvider.ResetCacheDependency(
                 portalId,
                 () => this.RemoveFormattedCacheKey(DataCache.FolderPermissionCacheKey, clearRuntime, portalId));
+				Logger.LogDebug("<<< Exiting ClearFolderCacheInternal(portalId={PortalId},clearRuntime={ClearRuntime})", portalId, clearRuntime);
         }
 
         private void ClearHostCacheInternal(bool clearRuntime)
         {
+			Logger.LogDebug(">>> Entering ClearHostCacheInternal(clearRuntime={ClearRuntime})", clearRuntime);
             this.RemoveCacheKey(DataCache.HostSettingsCacheKey, clearRuntime);
             this.RemoveCacheKey(DataCache.SecureHostSettingsCacheKey, clearRuntime);
             this.RemoveCacheKey(DataCache.UnSecureHostSettingsCacheKey, clearRuntime);
@@ -353,12 +385,16 @@ namespace DotNetNuke.Services.Cache
             this.ClearDesktopModuleCacheInternal(-1, clearRuntime);
             this.ClearCacheKeysByPortalInternal(-1, clearRuntime);
             this.ClearTabCacheInternal(-1, clearRuntime);
+			Logger.LogDebug("<<< Exiting ClearHostCacheInternal(clearRuntime={ClearRuntime})", clearRuntime);
         }
 
         private void ClearModuleCacheInternal(int tabId, bool clearRuntime)
         {
+			Logger.LogDebug(">>> Entering ClearModuleCacheInternal(tabId={TabId},clearRuntime={ClearRuntime})", tabId, clearRuntime);
             var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.TabModuleCacheKey, tabId);
             var tabModules = Cache.Get(cacheKey) as Dictionary<int, ModuleInfo>;
+			Logger.LogDebug("ClearModuleCacheInternal(tabId={TabId},clearRuntime={ClearRuntime}): cacheKey → {CacheKey}", tabId, clearRuntime, cacheKey);
+			Logger.LogDebug("ClearModuleCacheInternal(tabId={TabId},clearRuntime={ClearRuntime}): tabModules → {TabModules}", tabId, clearRuntime, tabModules);
             if (tabModules != null && tabModules.Count != 0)
             {
                 foreach (var moduleInfo in tabModules.Values)
@@ -379,22 +415,27 @@ namespace DotNetNuke.Services.Cache
             this.RemoveFormattedCacheKey(DataCache.PublishedTabModuleCacheKey, clearRuntime, tabId);
             this.RemoveFormattedCacheKey(DataCache.ModulePermissionCacheKey, clearRuntime, tabId);
             this.RemoveFormattedCacheKey(DataCache.ModuleSettingsCacheKey, clearRuntime, tabId);
+			Logger.LogDebug("<<< Exiting ClearModuleCacheInternal(tabId={TabId},clearRuntime={ClearRuntime})", tabId, clearRuntime);
         }
 
         private void ClearModulePermissionsCachesByPortalInternal(int portalId, bool clearRuntime)
         {
+			Logger.LogDebug(">>> Entering ClearModulePermissionsCachesByPortalInternal(portalId={PortalId},clearRuntime={ClearRuntime})", portalId, clearRuntime);
             foreach (var tabPair in TabController.Instance.GetTabsByPortal(portalId))
             {
                 this.RemoveFormattedCacheKey(DataCache.ModulePermissionCacheKey, clearRuntime, tabPair.Value.TabID);
             }
+			Logger.LogDebug("<<< Exiting ClearModulePermissionsCachesByPortalInternal(portalId={PortalId},clearRuntime={ClearRuntime})", portalId, clearRuntime);
         }
 
         private void ClearPortalCacheInternal(int portalId, bool cascade, bool clearRuntime)
         {
+			Logger.LogDebug(">>> Entering ClearPortalCacheInternal(portalId={PortalId},cascade={Cascade},clearRuntime={ClearRuntime})", portalId, cascade, clearRuntime);
             this.RemoveFormattedCacheKey(DataCache.PortalSettingsCacheKey, clearRuntime, portalId, string.Empty);
 
             var locales = LocaleController.Instance.GetLocales(portalId);
             if (locales == null || locales.Count == 0)
+			Logger.LogDebug("ClearPortalCacheInternal(portalId={PortalId},cascade={Cascade},clearRuntime={ClearRuntime}): locales → {Locales}", portalId, cascade, clearRuntime, locales);
             {
                 // At least attempt to remove default locale
                 string defaultLocale = PortalController.GetPortalDefaultLanguage(this.HostSettings, portalId);
@@ -435,10 +476,12 @@ namespace DotNetNuke.Services.Cache
 
             this.RemoveCacheKey(string.Format(CultureInfo.InvariantCulture, DataCache.RolesCacheKey, portalId), clearRuntime);
             this.RemoveCacheKey(string.Format(CultureInfo.InvariantCulture, DataCache.JournalTypesCacheKey, portalId), clearRuntime);
+			Logger.LogDebug("<<< Exiting ClearPortalCacheInternal(portalId={PortalId},cascade={Cascade},clearRuntime={ClearRuntime})", portalId, cascade, clearRuntime);
         }
 
         private void ClearTabCacheInternal(int portalId, bool clearRuntime)
         {
+			Logger.LogDebug(">>> Entering ClearTabCacheInternal(portalId={PortalId},clearRuntime={ClearRuntime})", portalId, clearRuntime);
             this.RemoveFormattedCacheKey(DataCache.TabCacheKey, clearRuntime, portalId);
             this.RemoveFormattedCacheKey(DataCache.TabAliasSkinCacheKey, clearRuntime, portalId);
             this.RemoveFormattedCacheKey(DataCache.TabCustomAliasCacheKey, clearRuntime, portalId);
@@ -446,6 +489,7 @@ namespace DotNetNuke.Services.Cache
             this.RemoveFormattedCacheKey(DataCache.TabPermissionCacheKey, clearRuntime, portalId);
             Dictionary<string, Locale> locales = LocaleController.Instance.GetLocales(portalId);
             if (locales == null || locales.Count == 0)
+			Logger.LogDebug("ClearTabCacheInternal(portalId={PortalId},clearRuntime={ClearRuntime}): locales → {Locales}", portalId, clearRuntime, locales);
             {
                 // At least attempt to remove default locale
                 string defaultLocale = PortalController.GetPortalDefaultLanguage(this.HostSettings, portalId);
@@ -461,6 +505,7 @@ namespace DotNetNuke.Services.Cache
 
             this.RemoveCacheKey(string.Format(CultureInfo.InvariantCulture, DataCache.TabPathCacheKey, Null.NullString, portalId), clearRuntime);
             this.RemoveCacheKey(string.Format(CultureInfo.InvariantCulture, DataCache.TabSettingsCacheKey, portalId), clearRuntime);
+			Logger.LogDebug("<<< Exiting ClearTabCacheInternal(portalId={PortalId},clearRuntime={ClearRuntime})", portalId, clearRuntime);
         }
 
         private void RemoveCacheKey(string cacheKey, bool clearRuntime)
@@ -479,6 +524,7 @@ namespace DotNetNuke.Services.Cache
 
         private void RemoveFormattedCacheKey(string cacheKeyBase, bool clearRuntime, params object[] parameters)
         {
+			Logger.LogDebug(">>> Entering RemoveFormattedCacheKey(cacheKeyBase={CacheKeyBase},clearRuntime={ClearRuntime},parameters={Parameters})", cacheKeyBase, clearRuntime, parameters);
             if (clearRuntime)
             {
                 // remove item from runtime cache
@@ -489,6 +535,7 @@ namespace DotNetNuke.Services.Cache
                 // Call provider's remove method
                 this.Remove(string.Format(CultureInfo.InvariantCulture, GetCacheKey(cacheKeyBase), parameters));
             }
+			Logger.LogDebug("<<< Exiting RemoveFormattedCacheKey(cacheKeyBase={CacheKeyBase},clearRuntime={ClearRuntime},parameters={Parameters})", cacheKeyBase, clearRuntime, parameters);
         }
     }
 }

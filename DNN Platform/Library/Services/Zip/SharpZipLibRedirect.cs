@@ -25,6 +25,7 @@ namespace DotNetNuke.Services.Zip
     /// </remarks>
     internal class SharpZipLibRedirect
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string OldName = "SharpZipLib";
         private const string NewName = "ICSharpCode.SharpZipLib";
 
@@ -36,6 +37,7 @@ namespace DotNetNuke.Services.Zip
         /// </summary>
         internal static void RegisterSharpZipLibRedirect()
         {
+			Logger.LogDebug(">>> Entering RegisterSharpZipLibRedirect()");
             if (AlreadyRun)
             {
                 return;
@@ -43,6 +45,7 @@ namespace DotNetNuke.Services.Zip
 
             // stop any further attempts to access this
             AlreadyRun = true;
+			Logger.LogDebug("RegisterSharpZipLibRedirect(): AlreadyRun → {AlreadyRun}", AlreadyRun);
 
             try
             {
@@ -51,13 +54,16 @@ namespace DotNetNuke.Services.Zip
             }
             catch
             {
+				Logger.LogError("Exception in RegisterSharpZipLibRedirect(): {Arg0}", ex.Message);
                 /* ignore */
                 // this is to ensure that if anything at all goes wrong when registering this, it won't break DNN.
             }
+			Logger.LogDebug("<<< Exiting RegisterSharpZipLibRedirect()");
         }
 
         private static Assembly Handler(object sender, ResolveEventArgs args)
         {
+			Logger.LogDebug(">>> Entering Handler(sender={Sender},args={Args})", sender, args);
             // only check for access to old SharpZipLib
             // requires startswith, because the full string is something like "SharpZipLib, Version=0.81.0.1407, Culture=neutral, PublicKeyToken=null"
             if (!args.Name.StartsWith(OldName, StringComparison.OrdinalIgnoreCase))
@@ -67,6 +73,8 @@ namespace DotNetNuke.Services.Zip
 
             // If the original was not found, it should find the new one - otherwise it will be null
             var alreadyLoadedAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == NewName);
+			Logger.LogDebug("Handler(sender={Sender},args={Args}): alreadyLoadedAssembly → {AlreadyLoadedAssembly}", sender, args, alreadyLoadedAssembly);
+			Logger.LogDebug("<<< Exiting Handler(sender={Sender},args={Args})", sender, args);
             return alreadyLoadedAssembly;
         }
     }

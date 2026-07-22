@@ -14,13 +14,17 @@ namespace Dnn.EditBar.UI.Helpers
     /// <summary>This class offers some common methods to work with pages and their permission.</summary>
     public class PageSecurityHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Checks if current user is page editor of the passed tab.</summary>
         /// <param name="tabId">Tab ID.</param>
         /// <param name="portalSettings">Portal Settings related with the portal which contains the tab.</param>
         /// <returns>Returns true if current user has a edit permission on the page or is admin of some module in the page. Otherwise, returns false.</returns>
         public static bool IsPageEditor(int tabId, PortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering IsPageEditor(tabId={TabId},portalSettings={PortalSettings})", tabId, portalSettings);
             var tabPermissions = TabPermissionController.GetTabPermissions(tabId, portalSettings.PortalId);
+			Logger.LogDebug("IsPageEditor(tabId={TabId},portalSettings={PortalSettings}): tabPermissions → {TabPermissions}", tabId, portalSettings, tabPermissions);
+			Logger.LogDebug("<<< Exiting IsPageEditor(tabId={TabId},portalSettings={PortalSettings})", tabId, portalSettings);
             return TabPermissionController.HasTabPermission(tabPermissions, "EDIT,CONTENT,MANAGE")
                 || IsModuleAdmin(portalSettings, TabController.Instance.GetTab(tabId, portalSettings.PortalId));
         }
@@ -29,6 +33,8 @@ namespace Dnn.EditBar.UI.Helpers
         /// <returns>Returns true if current user has any admin permission. Otherwise returns false.</returns>
         public static bool IsPageAdmin()
         {
+			Logger.LogDebug(">>> Entering IsPageAdmin()");
+			Logger.LogDebug("<<< Exiting IsPageAdmin()");
             return TabPermissionController.CanAddContentToPage() || TabPermissionController.CanAddPage() || TabPermissionController.CanAdminPage() || TabPermissionController.CanCopyPage() ||
                 TabPermissionController.CanDeletePage() || TabPermissionController.CanExportPage() || TabPermissionController.CanImportPage() || TabPermissionController.CanManagePage();
         }
@@ -38,6 +44,8 @@ namespace Dnn.EditBar.UI.Helpers
         /// <returns>Returns true if current user has admin permission over some module in the current page. Otherwise, returns false.</returns>
         public static bool IsModuleAdmin(PortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering IsModuleAdmin(portalSettings={PortalSettings})", portalSettings);
+			Logger.LogDebug("<<< Exiting IsModuleAdmin(portalSettings={PortalSettings})", portalSettings);
             return IsModuleAdmin(portalSettings, portalSettings.ActiveTab);
         }
 
@@ -61,6 +69,7 @@ namespace Dnn.EditBar.UI.Helpers
                 }
             }
 
+			Logger.LogDebug("<<< Exiting IsModuleAdmin(portalSettings={PortalSettings},tab={Tab})", portalSettings, tab);
             return portalSettings.ControlPanelSecurity == PortalSettings.ControlPanelPermission.ModuleEditor && isModuleAdmin;
         }
     }

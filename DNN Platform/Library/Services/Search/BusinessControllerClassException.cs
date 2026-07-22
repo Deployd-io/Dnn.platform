@@ -12,16 +12,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class BusinessControllerClassException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public BusinessControllerClassException()
     {
+	Logger.LogDebug(">>> Entering BusinessControllerClassException()");
+	Logger.LogDebug("<<< Exiting BusinessControllerClassException()");
     }
 
     /// <inheritdoc />
     public BusinessControllerClassException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering BusinessControllerClassException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting BusinessControllerClassException(message={Message})", message);
 
     /// <inheritdoc />
     public BusinessControllerClassException(string message, Exception innerException)

@@ -8,6 +8,7 @@ namespace DNN.Integration.Test.Framework.Helpers
 
     public static class AppConfigHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string DefaultWebsiteName = "http://dnnce.lvh.me";
         private const string DefaultHostName = "host";
         private const string DefaultHostPwd = "dnnhost";
@@ -40,18 +41,24 @@ namespace DNN.Integration.Test.Framework.Helpers
 
         public static string GetAppSetting(string key)
         {
+			Logger.LogDebug(">>> Entering GetAppSetting(key={Key})", key);
+			Logger.LogDebug("<<< Exiting GetAppSetting(key={Key})", key);
             return ConfigurationManager.AppSettings[key];
         }
 
         public static bool GetAppSettingAsBool(string key, bool defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetAppSettingAsBool(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             bool value;
+			Logger.LogDebug("<<< Exiting GetAppSettingAsBool(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             return bool.TryParse(GetAppSetting(key), out value) ? value : defaultValue;
         }
 
         public static int GetAppSettingAsInt(string key, int defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetAppSettingAsInt(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             int value;
+			Logger.LogDebug("<<< Exiting GetAppSettingAsInt(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             return int.TryParse(GetAppSetting(key), out value) ? value : defaultValue;
         }
     }

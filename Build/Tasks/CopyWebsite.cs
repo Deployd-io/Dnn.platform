@@ -14,10 +14,13 @@ namespace DotNetNuke.Build.Tasks
     [IsDependentOn(typeof(GenerateSqlDataProvider))]
     public sealed class CopyWebsite : FrostingTask<Context>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override void Run(Context context)
         {
+			Logger.LogDebug(">>> Entering Run(context={Context})", context);
             context.CopyFiles(context.GetFiles("./DNN Platform/Website/**/*"), context.WebsiteDir, true);
+			Logger.LogDebug("<<< Exiting Run(context={Context})", context);
         }
     }
 }

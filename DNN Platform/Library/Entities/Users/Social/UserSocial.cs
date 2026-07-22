@@ -17,6 +17,7 @@ namespace DotNetNuke.Entities.Users.Social
     [Serializable]
     public class UserSocial
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly UserInfo userInfo;
         private IList<Relationship> relationships;
         private IList<UserRelationship> userRelationships;
@@ -26,7 +27,11 @@ namespace DotNetNuke.Entities.Users.Social
         /// <param name="userInfo">The user info.</param>
         public UserSocial(UserInfo userInfo)
         {
+			Logger.LogDebug(">>> Entering UserSocial(userInfo={UserInfo})", userInfo);
             this.userInfo = userInfo;
+			Logger.LogDebug("<<< Exiting UserSocial(userInfo={UserInfo})", userInfo);
+			Logger.LogDebug("UserSocial(userInfo={UserInfo}): userInfo → {UserInfo1}", userInfo, userInfo);
+			Logger.LogDebug("UserSocial(userInfo={UserInfo}): this.userInfo → {Arg1}", userInfo, this.userInfo);
         }
 
         /// <summary>Gets the Friend Relationship (if it exists with the current User).</summary>

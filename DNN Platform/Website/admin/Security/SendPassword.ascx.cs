@@ -45,7 +45,9 @@ namespace DotNetNuke.Modules.Admin.Security
         public SendPassword()
             : this(null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering SendPassword()");
         }
+		Logger.LogDebug("<<< Exiting SendPassword()");
 
         /// <summary>Initializes a new instance of the <see cref="SendPassword"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
@@ -70,7 +72,11 @@ namespace DotNetNuke.Modules.Admin.Security
         {
             this.navigationManager = navigationManager ?? this.DependencyProvider.GetRequiredService<INavigationManager>();
             this.eventLogger = eventLogger ?? this.DependencyProvider.GetRequiredService<IEventLogger>();
+			Logger.LogDebug("SendPassword(navigationManager={NavigationManager},eventLogger={EventLogger},portalController={PortalController},mailSettings={MailSettings},listController={ListController},hostSettings={HostSettings}): eventLogger → {EventLogger1}", navigationManager, eventLogger, portalController, mailSettings, listController, hostSettings, eventLogger);
+			Logger.LogDebug("SendPassword(navigationManager={NavigationManager},eventLogger={EventLogger},portalController={PortalController},mailSettings={MailSettings},listController={ListController},hostSettings={HostSettings}): mailSettings → {MailSettings1}", navigationManager, eventLogger, portalController, mailSettings, listController, hostSettings, mailSettings);
+			Logger.LogDebug("SendPassword(navigationManager={NavigationManager},eventLogger={EventLogger},portalController={PortalController},mailSettings={MailSettings},listController={ListController},hostSettings={HostSettings}): navigationManager → {NavigationManager1}", navigationManager, eventLogger, portalController, mailSettings, listController, hostSettings, navigationManager);
             this.portalController = portalController ?? this.DependencyProvider.GetRequiredService<IPortalController>();
+			Logger.LogDebug("SendPassword(navigationManager={NavigationManager},eventLogger={EventLogger},portalController={PortalController},mailSettings={MailSettings},listController={ListController},hostSettings={HostSettings}): portalController → {PortalController1}", navigationManager, eventLogger, portalController, mailSettings, listController, hostSettings, portalController);
             this.mailSettings = mailSettings ?? this.DependencyProvider.GetRequiredService<IMailSettings>();
         }
 
@@ -146,10 +152,12 @@ namespace DotNetNuke.Modules.Admin.Security
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             var isEnabled = true;
 
+			Logger.LogDebug("OnInit(e={E}): isEnabled → {IsEnabled}", e, isEnabled);
             // both retrieval and reset now use password token resets
             if (MembershipProviderConfig.PasswordRetrievalEnabled || MembershipProviderConfig.PasswordResetEnabled)
             {
@@ -179,12 +187,14 @@ namespace DotNetNuke.Modules.Admin.Security
             {
                 this.lblHelp.Text += Localization.GetString("RequiresQuestionAndAnswer", this.LocalResourceFile);
             }
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <summary>Page_Load runs when the control is loaded.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.cmdSendPassword.Click += this.OnSendPasswordClick;
@@ -201,6 +211,7 @@ namespace DotNetNuke.Modules.Admin.Security
                 this.ctlCaptcha.ErrorMessage = Localization.GetString("InvalidCaptcha", this.LocalResourceFile);
                 this.ctlCaptcha.Text = Localization.GetString("CaptchaText", this.LocalResourceFile);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <summary>cmdSendPassword_Click runs when the Password Reminder button is clicked.</summary>
@@ -208,11 +219,16 @@ namespace DotNetNuke.Modules.Admin.Security
         /// <param name="e">The event arguments.</param>
         protected void OnSendPasswordClick(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnSendPasswordClick(sender={Sender},e={E})", sender, e);
             // pretty much always display the same message to avoid hinting on the existence of a username
             var input = string.IsNullOrEmpty(this.txtUsername.Text) ? this.txtEmail.Text : this.txtUsername.Text;
             var message = string.Format(CultureInfo.CurrentCulture, Localization.GetString("PasswordSent", this.LocalResourceFile), WebUtility.HtmlEncode(input));
+			Logger.LogDebug("OnSendPasswordClick(sender={Sender},e={E}): input → {Input}", sender, e, input);
+			Logger.LogDebug("OnSendPasswordClick(sender={Sender},e={E}): message → {Message}", sender, e, message);
             var moduleMessageType = ModuleMessage.ModuleMessageType.GreenSuccess;
             var canSend = true;
+			Logger.LogDebug("OnSendPasswordClick(sender={Sender},e={E}): moduleMessageType → {ModuleMessageType}", sender, e, moduleMessageType);
+			Logger.LogDebug("OnSendPasswordClick(sender={Sender},e={E}): canSend → {CanSend}", sender, e, canSend);
 
             if ((this.UseCaptcha && this.ctlCaptcha.IsValid) || (!this.UseCaptcha))
             {
@@ -247,6 +263,7 @@ namespace DotNetNuke.Modules.Admin.Security
 
                     var logMessage = Localization.GetString("SMTPNotConfigured", this.LocalResourceFile);
 
+					Logger.LogDebug("OnSendPasswordClick(sender={Sender},e={E}): logMessage → {LogMessage}", sender, e, logMessage);
                     this.LogResult(logMessage);
                 }
 
@@ -320,32 +337,41 @@ namespace DotNetNuke.Modules.Admin.Security
                     UI.Skins.Skin.AddModuleMessage(this, message, moduleMessageType);
                 }
             }
+			Logger.LogDebug("<<< Exiting OnSendPasswordClick(sender={Sender},e={E})", sender, e);
         }
 
         private void GetUser()
         {
+			Logger.LogDebug(">>> Entering GetUser()");
             if (this.ShowEmailField && !string.IsNullOrEmpty(this.txtEmail.Text.Trim()) && (string.IsNullOrEmpty(this.txtUsername.Text.Trim()) || this.divUsername.Visible == false))
             {
                 var arrUsers = UserController.GetUsersByEmail(this.PortalSettings.PortalId, this.txtEmail.Text, 0, int.MaxValue, ref this.userCount);
                 if (arrUsers is { Count: 1 })
+				Logger.LogDebug("GetUser(): arrUsers → {ArrUsers}", arrUsers);
                 {
                     this.user = (UserInfo)arrUsers[0];
+					Logger.LogDebug("GetUser(): user → {User}", user);
                 }
             }
             else
             {
                 this.user = UserController.GetUserByName(this.PortalSettings.PortalId, this.txtUsername.Text);
             }
+			Logger.LogDebug("<<< Exiting GetUser()");
         }
 
         private void LogSuccess()
         {
+			Logger.LogDebug(">>> Entering LogSuccess()");
             this.LogResult(string.Empty);
+			Logger.LogDebug("<<< Exiting LogSuccess()");
         }
 
         private void LogFailure(string reason)
         {
+			Logger.LogDebug(">>> Entering LogFailure(reason={Reason})", reason);
             this.LogResult(reason);
+			Logger.LogDebug("<<< Exiting LogFailure(reason={Reason})", reason);
         }
 
         private void LogResult(string message)

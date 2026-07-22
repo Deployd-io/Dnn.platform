@@ -22,39 +22,50 @@ namespace DotNetNuke.Tests.Core.Services.Installer
 
     public class AssemblyInstallerTests : DnnUnitTest
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private FakeServiceProvider serviceProvider;
 
         [OneTimeSetUp]
         public override void OneTimeSetUp()
         {
+			Logger.LogDebug(">>> Entering OneTimeSetUp()");
             base.OneTimeSetUp();
+			Logger.LogDebug("<<< Exiting OneTimeSetUp()");
         }
 
         [SetUp]
         public void SetUp()
         {
+			Logger.LogDebug(">>> Entering SetUp()");
             var dataProvider = MockComponentProvider.CreateDataProvider();
             dataProvider.Setup(p => p.UnRegisterAssembly(It.IsAny<int>(), It.IsAny<string>())).Returns(true);
+			Logger.LogDebug("SetUp(): dataProvider → {DataProvider}", dataProvider);
 
             LocalizationProvider.SetTestableInstance(Mock.Of<ILocalizationProvider>());
 
             this.serviceProvider = FakeServiceProvider.Setup(
                 services =>
                 {
+				Logger.LogDebug("SetUp(): serviceProvider → {ServiceProvider}", serviceProvider);
+				Logger.LogDebug("SetUp(): services → {Services}", services);
                     services.AddSingleton(dataProvider.Object);
                     services.AddSingleton(LocalizationProvider.Instance);
                 });
+				Logger.LogDebug("<<< Exiting SetUp()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			Logger.LogDebug(">>> Entering TearDown()");
             this.serviceProvider.Dispose();
+			Logger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void Install_UnRegisterAssembly_ShouldSucceed_WhenFileIsMissing()
         {
+			Logger.LogDebug(">>> Entering Install_UnRegisterAssembly_ShouldSucceed_WhenFileIsMissing()");
             var installer = new AssemblyInstaller
             {
                 DeleteFiles = true,
@@ -62,14 +73,17 @@ namespace DotNetNuke.Tests.Core.Services.Installer
             };
             var manifestNav = GetUnRegisterAssemblyManifest();
             installer.ReadManifest(manifestNav);
+			Logger.LogDebug("Install_UnRegisterAssembly_ShouldSucceed_WhenFileIsMissing(): manifestNav → {ManifestNav}", manifestNav);
 
             installer.Install();
 
             Assert.That(installer.Log.Valid, Is.True);
+			Logger.LogDebug("<<< Exiting Install_UnRegisterAssembly_ShouldSucceed_WhenFileIsMissing()");
         }
 
         private static XPathNavigator GetUnRegisterAssemblyManifest()
         {
+			Logger.LogDebug(">>> Entering GetUnRegisterAssemblyManifest()");
             var doc = new XPathDocument(new StringReader(@"
 <assemblies>
     <assembly action=""UnRegister"">
@@ -80,6 +94,7 @@ namespace DotNetNuke.Tests.Core.Services.Installer
     </assembly>
 </assemblies>
 "));
+			Logger.LogDebug("<<< Exiting GetUnRegisterAssemblyManifest()");
             return doc.CreateNavigator();
         }
     }

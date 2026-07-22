@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class SitemapException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public SitemapException()
     {
+	Logger.LogDebug(">>> Entering SitemapException()");
+	Logger.LogDebug("<<< Exiting SitemapException()");
     }
 
     /// <inheritdoc />
     public SitemapException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering SitemapException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting SitemapException(message={Message})", message);
 
     /// <inheritdoc />
     public SitemapException(string message, Exception innerException)

@@ -10,9 +10,12 @@ namespace DotNetNuke.Entities.Users
     [Serializable]
     public class UserAlreadyVerifiedException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="UserAlreadyVerifiedException"/> class.</summary>
         public UserAlreadyVerifiedException()
         {
+		Logger.LogDebug(">>> Entering UserAlreadyVerifiedException()");
+		Logger.LogDebug("<<< Exiting UserAlreadyVerifiedException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="UserAlreadyVerifiedException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Entities.Users
         public UserAlreadyVerifiedException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering UserAlreadyVerifiedException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting UserAlreadyVerifiedException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="UserAlreadyVerifiedException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

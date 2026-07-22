@@ -26,6 +26,7 @@ using log4net.Core;
 
 namespace log4net.Layout.Pattern
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Write the event level to the output</summary>
     /// <remarks>
     /// <para>
@@ -47,7 +48,9 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         protected override void Convert(TextWriter writer, LoggingEvent loggingEvent)
         {
+			Logger.LogDebug(">>> Entering Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             writer.Write(loggingEvent.Level.DisplayName);
+			Logger.LogDebug("<<< Exiting Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
     }
 }

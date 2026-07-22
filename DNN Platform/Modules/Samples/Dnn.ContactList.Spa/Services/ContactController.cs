@@ -21,6 +21,7 @@ namespace Dnn.ContactList.Spa.Services
     [DnnModuleAuthorize(AccessLevel = SecurityAccessLevel.View)]
     public class ContactController : DnnApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IContactService _contactService;
 
         /// <summary>
@@ -28,7 +29,11 @@ namespace Dnn.ContactList.Spa.Services
         /// </summary>
         public ContactController() : this(ContactService.Instance)
         {
+		Logger.LogDebug(">>> Entering ContactController()");
 
+		Logger.LogDebug("<<< Exiting ContactController()");
+		Logger.LogDebug(">>> Entering ContactController(service={Service})", service);
+		Logger.LogDebug("<<< Exiting ContactController(service={Service})", service);
         }
 
         /// <summary>
@@ -39,6 +44,7 @@ namespace Dnn.ContactList.Spa.Services
             Requires.NotNull(service);
 
             _contactService = service;
+			Logger.LogDebug("ContactController(service={Service}): _contactService → {_contactService}", service, _contactService);
         }
 
         /// <summary>
@@ -48,15 +54,19 @@ namespace Dnn.ContactList.Spa.Services
         [HttpPost]
         public HttpResponseMessage DeleteContact(ContactViewModel viewModel)
         {
+			Logger.LogDebug(">>> Entering DeleteContact(viewModel={ViewModel})", viewModel);
             var contact = _contactService.GetContact(viewModel.ContactId, PortalSettings.PortalId);
 
+			Logger.LogDebug("DeleteContact(viewModel={ViewModel}): contact → {Contact}", viewModel, contact);
             _contactService.DeleteContact(contact);
 
             var response = new
             {
                 success = true
+				Logger.LogDebug("DeleteContact(viewModel={ViewModel}): success → {Success}", viewModel, success);
             };
 
+			Logger.LogDebug("<<< Exiting DeleteContact(viewModel={ViewModel})", viewModel);
             return Request.CreateResponse(response);
         }
 
@@ -67,17 +77,21 @@ namespace Dnn.ContactList.Spa.Services
         [HttpGet]
         public HttpResponseMessage GetContact(int contactId)
         {
+			Logger.LogDebug(">>> Entering GetContact(contactId={ContactId})", contactId);
             var contact = new ContactViewModel(_contactService.GetContact(contactId, PortalSettings.PortalId));
 
+			Logger.LogDebug("GetContact(contactId={ContactId}): contact → {Contact}", contactId, contact);
             var response = new
             {
                 success = true,
                 data = new
+				Logger.LogDebug("GetContact(contactId={ContactId}): success → {Success}", contactId, success);
                 {
                     contact = contact
                 }
             };
 
+			Logger.LogDebug("<<< Exiting GetContact(contactId={ContactId})", contactId);
             return Request.CreateResponse(response);
         }
 
@@ -88,8 +102,10 @@ namespace Dnn.ContactList.Spa.Services
         [HttpGet]
         public HttpResponseMessage GetContacts(string searchTerm, int pageSize, int pageIndex)
         {
+			Logger.LogDebug(">>> Entering GetContacts(searchTerm={SearchTerm},pageSize={PageSize},pageIndex={PageIndex})", searchTerm, pageSize, pageIndex);
             var contactList = _contactService.GetContacts(searchTerm, PortalSettings.PortalId, pageIndex, pageSize);
             var contacts = contactList
+								Logger.LogDebug("GetContacts(searchTerm={SearchTerm},pageSize={PageSize},pageIndex={PageIndex}): contactList → {ContactList}", searchTerm, pageSize, pageIndex, contactList);
                                  .Select(contact => new ContactViewModel(contact))
                                  .ToList();
 
@@ -97,12 +113,16 @@ namespace Dnn.ContactList.Spa.Services
             {
                 success = true,
                 data = new
+				Logger.LogDebug("GetContacts(searchTerm={SearchTerm},pageSize={PageSize},pageIndex={PageIndex}): success → {Success}", searchTerm, pageSize, pageIndex, success);
                 {
                     results = contacts,
                     totalCount = contactList.TotalCount
+					Logger.LogDebug("GetContacts(searchTerm={SearchTerm},pageSize={PageSize},pageIndex={PageIndex}): results → {Results}", searchTerm, pageSize, pageIndex, results);
+					Logger.LogDebug("GetContacts(searchTerm={SearchTerm},pageSize={PageSize},pageIndex={PageIndex}): totalCount → {TotalCount}", searchTerm, pageSize, pageIndex, totalCount);
                 }
             };
 
+			Logger.LogDebug("<<< Exiting GetContacts(searchTerm={SearchTerm},pageSize={PageSize},pageIndex={PageIndex})", searchTerm, pageSize, pageIndex);
             return Request.CreateResponse(response);
         }
 
@@ -114,11 +134,13 @@ namespace Dnn.ContactList.Spa.Services
         [HttpPost]
         public HttpResponseMessage SaveContact(ContactViewModel viewModel)
         {
+			Logger.LogDebug(">>> Entering SaveContact(viewModel={ViewModel})", viewModel);
             Contact contact;
 
             if (viewModel.ContactId == -1)
             {
                 contact = new Contact
+				Logger.LogDebug("SaveContact(viewModel={ViewModel}): contact → {Contact}", viewModel, contact);
                 {
                     FirstName = viewModel.FirstName,
                     LastName = viewModel.LastName,
@@ -137,6 +159,11 @@ namespace Dnn.ContactList.Spa.Services
                 if (contact != null)
                 {
                     contact.FirstName = viewModel.FirstName;
+					Logger.LogDebug("SaveContact(viewModel={ViewModel}): contact.FirstName → {Arg1}", viewModel, contact.FirstName);
+					Logger.LogDebug("SaveContact(viewModel={ViewModel}): contact.LastName → {Arg1}", viewModel, contact.LastName);
+					Logger.LogDebug("SaveContact(viewModel={ViewModel}): contact.Email → {Arg1}", viewModel, contact.Email);
+					Logger.LogDebug("SaveContact(viewModel={ViewModel}): contact.Phone → {Arg1}", viewModel, contact.Phone);
+					Logger.LogDebug("SaveContact(viewModel={ViewModel}): contact.Social → {Arg1}", viewModel, contact.Social);
                     contact.LastName = viewModel.LastName;
                     contact.Email = viewModel.Email;
                     contact.Phone = viewModel.Phone;
@@ -148,11 +175,14 @@ namespace Dnn.ContactList.Spa.Services
             {
                 success = true,
                 data = new
+				Logger.LogDebug("SaveContact(viewModel={ViewModel}): success → {Success}", viewModel, success);
                 {
                     contactId = contact.ContactId
+					Logger.LogDebug("SaveContact(viewModel={ViewModel}): contactId → {ContactId}", viewModel, contactId);
                 }
             };
 
+			Logger.LogDebug("<<< Exiting SaveContact(viewModel={ViewModel})", viewModel);
             return Request.CreateResponse(response);
 
         }

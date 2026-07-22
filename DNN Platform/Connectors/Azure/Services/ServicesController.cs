@@ -24,13 +24,18 @@ namespace Dnn.AzureConnector.Services
     [DnnAuthorize]
     public class ServicesController : DnnApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IFolderMappingController folderMappingController;
 
         /// <summary>Initializes a new instance of the <see cref="ServicesController"/> class.</summary>
         /// <param name="folderMappingController">The folder mapping controller.</param>
         public ServicesController(IFolderMappingController folderMappingController)
         {
+			Logger.LogDebug(">>> Entering ServicesController(folderMappingController={FolderMappingController})", folderMappingController);
             this.folderMappingController = folderMappingController;
+			Logger.LogDebug("<<< Exiting ServicesController(folderMappingController={FolderMappingController})", folderMappingController);
+			Logger.LogDebug("ServicesController(folderMappingController={FolderMappingController}): folderMappingController → {FolderMappingController1}", folderMappingController, folderMappingController);
+			Logger.LogDebug("ServicesController(folderMappingController={FolderMappingController}): this.folderMappingController → {Arg1}", folderMappingController, this.folderMappingController);
         }
 
         /// <summary>Gets all containers.</summary>
@@ -39,12 +44,16 @@ namespace Dnn.AzureConnector.Services
         [HttpGet]
         public HttpResponseMessage GetAllContainers(int id)
         {
+			Logger.LogDebug(">>> Entering GetAllContainers(id={Id})", id);
             try
             {
                 var containers = new List<string>();
                 var folderProvider = ActivatorUtilities.GetServiceOrCreateInstance<AzureFolderProvider>(HttpContextSource.Current.GetScope().ServiceProvider);
+				Logger.LogDebug("GetAllContainers(id={Id}): containers → {Containers}", id, containers);
+				Logger.LogDebug("GetAllContainers(id={Id}): folderProvider → {FolderProvider}", id, folderProvider);
                 var folderMapping = Components.AzureConnector.FindAzureFolderMappingStatic(this.folderMappingController, this.PortalSettings.PortalId, id, false);
                 if (folderMapping != null)
+				Logger.LogDebug("GetAllContainers(id={Id}): folderMapping → {FolderMapping}", id, folderMapping);
                 {
                     containers = folderProvider.GetAllContainers(folderMapping);
                 }
@@ -53,6 +62,7 @@ namespace Dnn.AzureConnector.Services
             }
             catch (StorageException ex)
             {
+				Logger.LogError("Exception in GetAllContainers(id={Id}): {Arg1}", id, ex.Message);
                 Exceptions.LogException(ex);
                 var message = ex.RequestInformation.HttpStatusMessage ?? ex.Message;
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, new { Message = message });
@@ -61,6 +71,8 @@ namespace Dnn.AzureConnector.Services
             {
                 Exceptions.LogException(ex);
                 const string message = "An error has occurred connecting to the Azure account.";
+				Logger.LogDebug("GetAllContainers(id={Id}): message → {Message}", id, message);
+				Logger.LogDebug("<<< Exiting GetAllContainers(id={Id})", id);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, new { Message = message });
             }
         }
@@ -70,6 +82,8 @@ namespace Dnn.AzureConnector.Services
         [HttpGet]
         public HttpResponseMessage GetFolderMappingId()
         {
+			Logger.LogDebug(">>> Entering GetFolderMappingId()");
+			Logger.LogDebug("<<< Exiting GetFolderMappingId()");
             return this.Request.CreateResponse(
                 HttpStatusCode.OK,
                 Components.AzureConnector.FindAzureFolderMappingStatic(this.folderMappingController, this.PortalSettings.PortalId).FolderMappingID);

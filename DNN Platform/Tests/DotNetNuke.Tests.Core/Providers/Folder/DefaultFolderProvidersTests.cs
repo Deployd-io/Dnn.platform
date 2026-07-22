@@ -12,14 +12,19 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
     [TestFixture]
     public class DefaultFolderProvidersTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [Test]
         public void GetDefaultProviders_Should_Return_3_Valid_Providers()
         {
+			Logger.LogDebug(">>> Entering GetDefaultProviders_Should_Return_3_Valid_Providers()");
             var expectedValues = new List<string> { "StandardFolderProvider", "SecureFolderProvider", "DatabaseFolderProvider" };
 
+			Logger.LogDebug("GetDefaultProviders_Should_Return_3_Valid_Providers(): expectedValues → {ExpectedValues}", expectedValues);
             var defaultProviders = DefaultFolderProviders.GetDefaultProviders();
 
+			Logger.LogDebug("GetDefaultProviders_Should_Return_3_Valid_Providers(): defaultProviders → {DefaultProviders}", defaultProviders);
             Assert.That(defaultProviders, Is.EqualTo(expectedValues).AsCollection);
+			Logger.LogDebug("<<< Exiting GetDefaultProviders_Should_Return_3_Valid_Providers()");
         }
     }
 }

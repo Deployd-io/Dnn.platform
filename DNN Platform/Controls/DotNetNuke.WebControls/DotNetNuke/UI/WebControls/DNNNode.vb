@@ -1,5 +1,6 @@
 ﻿' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports DotNetNuke.UI.Utilities
 Imports Microsoft.VisualBasic
@@ -14,17 +15,22 @@ Namespace DotNetNuke.UI.WebControls
 
         ' Methods
         Public Sub New()
+			Logger.LogDebug(">>> Entering New()")
             Me.New(New XmlDocument().CreateNode(XmlNodeType.Element, "n", ""))
         End Sub
+		Logger.LogDebug("<<< Exiting New()")
 
         Public Sub New(ByVal strText As String)
             Me.New()
             Me.Text = strText
+			Logger.LogDebug("New(strText={StrText}): Me.Text → {Arg1}", strText, Me.Text)
         End Sub
 
         Public Sub New(ByVal objXmlNode As XmlNode)
             Me.m_objXMLNode = objXmlNode
             Me.m_objXMLDoc = objXmlNode.OwnerDocument
+			Logger.LogDebug("New(objXmlNode={ObjXmlNode}): Me.m_objXMLDoc → {Arg1}", objXmlNode, Me.m_objXMLDoc)
+			Logger.LogDebug("New(objXmlNode={ObjXmlNode}): Me.m_objXMLNode → {Arg1}", objXmlNode, Me.m_objXMLNode)
         End Sub
 
         Public Sub New(ByVal NodeText As String, ByVal navigateUrl As String)
@@ -35,31 +41,41 @@ Namespace DotNetNuke.UI.WebControls
                 Throw New ArgumentNullException(NameOf(navigateUrl))
             End If
             Me.Text = NodeText
+			Logger.LogDebug("New(NodeText={NodeText},navigateUrl={NavigateUrl}): Me.Text → {Arg2}", NodeText, navigateUrl, Me.Text)
             navigateUrl = navigateUrl
         End Sub
 
         Friend Sub AssociateXmlNode(ByVal objXmlNode As XmlNode)
+			Logger.LogDebug(">>> Entering AssociateXmlNode(objXmlNode={ObjXmlNode})", objXmlNode)
             Me.m_objXMLNode = objXmlNode
             Me.m_objXMLDoc = objXmlNode.OwnerDocument
+			Logger.LogDebug("AssociateXmlNode(objXmlNode={ObjXmlNode}): Me.m_objXMLDoc → {Arg1}", objXmlNode, Me.m_objXMLDoc)
+			Logger.LogDebug("AssociateXmlNode(objXmlNode={ObjXmlNode}): Me.m_objXMLNode → {Arg1}", objXmlNode, Me.m_objXMLNode)
         End Sub
+		Logger.LogDebug("<<< Exiting AssociateXmlNode(objXmlNode={ObjXmlNode})", objXmlNode)
 
         Public Function Clone() As DNNNode
+			Logger.LogDebug(">>> Entering Clone()")
             Return Me.Clone(True)
         End Function
+		Logger.LogDebug("<<< Exiting Clone()")
 
         Public Function Clone(ByVal blnDeep As Boolean) As DNNNode
             Return New DNNNode(Me.XmlNode.CloneNode(blnDeep))
         End Function
 
         Public Function ToJSON() As String
+			Logger.LogDebug(">>> Entering ToJSON()")
             Return Me.ToJSON(True)
         End Function
 
         Public Function ToJSON(ByVal blnDeep As Boolean) As String
             Dim enumerator As IEnumerator = Nothing
+			Logger.LogDebug("<<< Exiting ToJSON()")
             Dim builder As New StringBuilder
             Try 
                 enumerator = Me.XmlNode.Attributes.GetEnumerator
+				Logger.LogDebug("ToJSON(blnDeep={BlnDeep}): enumerator → {Enumerator}", blnDeep, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -101,8 +117,10 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Public Function ToXML() As String
+			Logger.LogDebug(">>> Entering ToXML()")
             Return Me.XmlNode.OuterXml
         End Function
+		Logger.LogDebug("<<< Exiting ToXML()")
 
 
         ' Properties

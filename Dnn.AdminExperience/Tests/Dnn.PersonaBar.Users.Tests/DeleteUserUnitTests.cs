@@ -21,6 +21,7 @@ namespace Dnn.PersonaBar.Users.Tests
 
     public class DeleteUserUnitTests : CommandTests<DeleteUser>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private Mock<IUserValidator> _userValidatorMock;
         private Mock<IUserControllerWrapper> _userControllerWrapperMock;
         private FakeServiceProvider serviceProvider;
@@ -30,11 +31,14 @@ namespace Dnn.PersonaBar.Users.Tests
         [Test]
         public void Run_DeleteValidUserId_ReturnSuccessResponse()
         {
+			Logger.LogDebug(">>> Entering Run_DeleteValidUserId_ReturnSuccessResponse()");
             // Arrange
             int userId = 2;
 
+			Logger.LogDebug("Run_DeleteValidUserId_ReturnSuccessResponse(): userId → {UserId}", userId);
             UserInfo userInfo = this.GetUser(userId, false);
 
+			Logger.LogDebug("Run_DeleteValidUserId_ReturnSuccessResponse(): userInfo → {UserInfo}", userInfo);
             this._userValidatorMock
                 .Setup(u => u.ValidateUser(userId, this.portalSettings, null, out userInfo))
                 .Returns(this.errorResultModel);
@@ -52,18 +56,23 @@ namespace Dnn.PersonaBar.Users.Tests
             // Act
             var result = this.RunCommand(userId.ToString());
 
+			Logger.LogDebug("Run_DeleteValidUserId_ReturnSuccessResponse(): result → {Result}", result);
             // Assert
             Assert.That(result.IsError, Is.False);
+			Logger.LogDebug("<<< Exiting Run_DeleteValidUserId_ReturnSuccessResponse()");
         }
 
         [Test]
         public void Run_DeleteAlreadyDeletedUser_ReturnErrorResponse()
         {
+			Logger.LogDebug(">>> Entering Run_DeleteAlreadyDeletedUser_ReturnErrorResponse()");
             // Arrange
             int userId = 2;
 
+			Logger.LogDebug("Run_DeleteAlreadyDeletedUser_ReturnErrorResponse(): userId → {UserId}", userId);
             UserInfo userInfo = this.GetUser(userId, true);
 
+			Logger.LogDebug("Run_DeleteAlreadyDeletedUser_ReturnErrorResponse(): userInfo → {UserInfo}", userInfo);
             this._userValidatorMock
                 .Setup(u => u.ValidateUser(userId, this.portalSettings, null, out userInfo))
                 .Returns(this.errorResultModel);
@@ -71,18 +80,23 @@ namespace Dnn.PersonaBar.Users.Tests
             // Act
             var result = this.RunCommand(userId.ToString());
 
+			Logger.LogDebug("Run_DeleteAlreadyDeletedUser_ReturnErrorResponse(): result → {Result}", result);
             // Assert
             Assert.That(result.IsError, Is.True);
+			Logger.LogDebug("<<< Exiting Run_DeleteAlreadyDeletedUser_ReturnErrorResponse()");
         }
 
         [Test]
         public void Run_DeleteUserFailed_ReturnErrorResponse()
         {
+			Logger.LogDebug(">>> Entering Run_DeleteUserFailed_ReturnErrorResponse()");
             // Arrange
             int userId = 2;
 
+			Logger.LogDebug("Run_DeleteUserFailed_ReturnErrorResponse(): userId → {UserId}", userId);
             UserInfo userInfo = this.GetUser(userId, false);
 
+			Logger.LogDebug("Run_DeleteUserFailed_ReturnErrorResponse(): userInfo → {UserInfo}", userInfo);
             this._userValidatorMock
                 .Setup(u => u.ValidateUser(userId, this.portalSettings, null, out userInfo))
                 .Returns(this.errorResultModel);
@@ -97,13 +111,16 @@ namespace Dnn.PersonaBar.Users.Tests
             // Act
             var result = this.RunCommand(userId.ToString());
 
+			Logger.LogDebug("Run_DeleteUserFailed_ReturnErrorResponse(): result → {Result}", result);
             // Assert
             Assert.That(result.IsError, Is.True);
+			Logger.LogDebug("<<< Exiting Run_DeleteUserFailed_ReturnErrorResponse()");
         }
 
         [Test]
         public void Run_DeleteNullUserId_ReturnErrorResponse()
         {
+			Logger.LogDebug(">>> Entering Run_DeleteNullUserId_ReturnErrorResponse()");
             // Arrange
             UserInfo userinfo;
             this.errorResultModel = new ConsoleErrorResultModel();
@@ -114,26 +131,37 @@ namespace Dnn.PersonaBar.Users.Tests
             // Act
             var result = this.RunCommand();
 
+			Logger.LogDebug("Run_DeleteNullUserId_ReturnErrorResponse(): result → {Result}", result);
             // Assert
             Assert.That(result.IsError, Is.True);
+			Logger.LogDebug("<<< Exiting Run_DeleteNullUserId_ReturnErrorResponse()");
         }
 
         protected override DeleteUser CreateCommand()
         {
+			Logger.LogDebug(">>> Entering CreateCommand()");
+			Logger.LogDebug("<<< Exiting CreateCommand()");
             return new DeleteUser(this._userValidatorMock.Object, this._userControllerWrapperMock.Object);
         }
 
         protected override void ChildSetup()
         {
+			Logger.LogDebug(">>> Entering ChildSetup()");
             this._userValidatorMock = new Mock<IUserValidator>();
             this._userControllerWrapperMock = new Mock<IUserControllerWrapper>();
+			Logger.LogDebug("ChildSetup(): _userControllerWrapperMock → {_userControllerWrapperMock}", _userControllerWrapperMock);
+			Logger.LogDebug("ChildSetup(): _userValidatorMock → {_userValidatorMock}", _userValidatorMock);
             this.serviceProvider = FakeServiceProvider.Setup(services => services.AddSingleton(Mock.Of<IHostSettings>()));
+			Logger.LogDebug("<<< Exiting ChildSetup()");
+			Logger.LogDebug("ChildSetup(): serviceProvider → {ServiceProvider}", serviceProvider);
         }
 
         [TearDown]
         protected override void ChildTearDown()
         {
+			Logger.LogDebug(">>> Entering ChildTearDown()");
             this.serviceProvider.Dispose();
+			Logger.LogDebug("<<< Exiting ChildTearDown()");
         }
     }
 }

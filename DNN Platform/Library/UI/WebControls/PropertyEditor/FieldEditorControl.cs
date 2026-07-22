@@ -20,6 +20,7 @@ namespace DotNetNuke.UI.WebControls
     /// </summary>
     public enum EditorDisplayMode
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Displays the control in a div.
         /// </summary>
@@ -70,6 +71,7 @@ namespace DotNetNuke.UI.WebControls
         public FieldEditorControl()
             : this(Globals.GetCurrentServiceProvider())
         {
+		Logger.LogDebug(">>> Entering FieldEditorControl()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="FieldEditorControl"/> class.</summary>
@@ -78,17 +80,27 @@ namespace DotNetNuke.UI.WebControls
         {
             this.serviceProvider = serviceProvider;
             this.ValidationExpression = Null.NullString;
+			Logger.LogDebug("FieldEditorControl(serviceProvider={ServiceProvider}): this.serviceProvider → {Arg1}", serviceProvider, this.serviceProvider);
+			Logger.LogDebug("FieldEditorControl(serviceProvider={ServiceProvider}): this.ValidationExpression → {Arg1}", serviceProvider, this.ValidationExpression);
+			Logger.LogDebug("FieldEditorControl(serviceProvider={ServiceProvider}): serviceProvider → {ServiceProvider1}", serviceProvider, serviceProvider);
             this.ShowRequired = true;
             this.LabelMode = LabelMode.None;
             this.EditorTypeName = Null.NullString;
+			Logger.LogDebug("FieldEditorControl(serviceProvider={ServiceProvider}): this.ShowRequired → {Arg1}", serviceProvider, this.ShowRequired);
+			Logger.LogDebug("FieldEditorControl(serviceProvider={ServiceProvider}): this.LabelMode → {Arg1}", serviceProvider, this.LabelMode);
+			Logger.LogDebug("FieldEditorControl(serviceProvider={ServiceProvider}): this.EditorTypeName → {Arg1}", serviceProvider, this.EditorTypeName);
             this.EditorDisplayMode = EditorDisplayMode.Div;
             this.HelpDisplayMode = HelpDisplayMode.Always;
             this.VisibilityStyle = new Style();
             this.LabelStyle = new Style();
             this.HelpStyle = new Style();
             this.EditControlStyle = new Style();
+			Logger.LogDebug("FieldEditorControl(serviceProvider={ServiceProvider}): this.EditorDisplayMode → {Arg1}", serviceProvider, this.EditorDisplayMode);
+			Logger.LogDebug("FieldEditorControl(serviceProvider={ServiceProvider}): this.HelpDisplayMode → {Arg1}", serviceProvider, this.HelpDisplayMode);
             this.ErrorStyle = new Style();
             this.ViewStateMode = ViewStateMode.Disabled;
+			Logger.LogDebug("<<< Exiting FieldEditorControl(serviceProvider={ServiceProvider})", serviceProvider);
+			Logger.LogDebug("FieldEditorControl(serviceProvider={ServiceProvider}): this.ViewStateMode → {Arg1}", serviceProvider, this.ViewStateMode);
         }
 
         /// <summary>
@@ -288,6 +300,7 @@ namespace DotNetNuke.UI.WebControls
         /// <summary>Binds the controls to the DataSource.</summary>
         public override void DataBind()
         {
+			Logger.LogDebug(">>> Entering DataBind()");
             // Invoke OnDataBinding so DataBinding Event is raised
             this.OnDataBinding(EventArgs.Empty);
 
@@ -305,17 +318,22 @@ namespace DotNetNuke.UI.WebControls
 
             // Set flag so CreateChildConrols should not be invoked later in control's lifecycle
             this.ChildControlsCreated = true;
+			Logger.LogDebug("<<< Exiting DataBind()");
+			Logger.LogDebug("DataBind(): this.ChildControlsCreated → {Arg0}", this.ChildControlsCreated);
         }
 
         /// <summary>Validates the data, and sets the IsValid Property.</summary>
         public virtual void Validate()
         {
+			Logger.LogDebug(">>> Entering Validate()");
             this.isValid = this.Editor.IsValid;
 
+			Logger.LogDebug("Validate(): this.isValid → {Arg0}", this.isValid);
             if (this.isValid)
             {
                 IEnumerator valEnumerator = this.validators.GetEnumerator();
                 while (valEnumerator.MoveNext())
+				Logger.LogDebug("Validate(): valEnumerator → {ValEnumerator}", valEnumerator);
                 {
                     var validator = (IValidator)valEnumerator.Current;
                     validator.Validate();
@@ -327,53 +345,66 @@ namespace DotNetNuke.UI.WebControls
                 }
 
                 this.validated = true;
+				Logger.LogDebug("Validate(): this.validated → {Arg0}", this.validated);
             }
+			Logger.LogDebug("<<< Exiting Validate()");
         }
 
         /// <summary>CreateEditor creates the control collection for this control.</summary>
         protected virtual void CreateEditor()
         {
+			Logger.LogDebug(">>> Entering CreateEditor()");
             EditorInfo editInfo = this.EditorInfoAdapter.CreateEditControl();
 
+			Logger.LogDebug("CreateEditor(): editInfo → {EditInfo}", editInfo);
             this.ID = editInfo.Name;
+			Logger.LogDebug("CreateEditor(): ID → {ID}", ID);
+			Logger.LogDebug("CreateEditor(): this.ID → {Arg0}", this.ID);
 
             if (editInfo != null)
             {
                 editInfo.User = this.User;
+				Logger.LogDebug("CreateEditor(): editInfo.User → {Arg0}", editInfo.User);
 
                 if (editInfo.EditMode == PropertyEditorMode.Edit)
                 {
                     editInfo.EditMode = this.EditMode;
+					Logger.LogDebug("CreateEditor(): editInfo.EditMode → {Arg0}", editInfo.EditMode);
                 }
 
                 // Get the Editor Type to use (if specified)
                 if (!string.IsNullOrEmpty(this.EditorTypeName))
                 {
                     editInfo.Editor = this.EditorTypeName;
+					Logger.LogDebug("CreateEditor(): editInfo.Editor → {Arg0}", editInfo.Editor);
                 }
 
                 // Get the Label Mode to use (if specified)
                 if (this.LabelMode != LabelMode.Left)
                 {
                     editInfo.LabelMode = this.LabelMode;
+					Logger.LogDebug("CreateEditor(): editInfo.LabelMode → {Arg0}", editInfo.LabelMode);
                 }
 
                 // if Required is specified set editors property
                 if (this.Required)
                 {
                     editInfo.Required = this.Required;
+					Logger.LogDebug("CreateEditor(): editInfo.Required → {Arg0}", editInfo.Required);
                 }
 
                 // Get the ValidationExpression to use (if specified)
                 if (!string.IsNullOrEmpty(this.ValidationExpression))
                 {
                     editInfo.ValidationExpression = this.ValidationExpression;
+					Logger.LogDebug("CreateEditor(): editInfo.ValidationExpression → {Arg0}", editInfo.ValidationExpression);
                 }
 
                 // Raise the ItemCreated Event
                 this.OnItemCreated(new PropertyEditorItemEventArgs(editInfo));
 
                 this.Visible = editInfo.Visible;
+				Logger.LogDebug("CreateEditor(): this.Visible → {Arg0}", this.Visible);
 
                 if (this.EditorDisplayMode == EditorDisplayMode.Div)
                 {
@@ -384,6 +415,7 @@ namespace DotNetNuke.UI.WebControls
                     this.BuildTable(editInfo);
                 }
             }
+			Logger.LogDebug("<<< Exiting CreateEditor()");
         }
 
         /// <summary>
@@ -393,7 +425,9 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">The event arguments <see cref="PropertyEditorEventArgs"/>.</param>
         protected virtual void CollectionItemAdded(object sender, PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering CollectionItemAdded(sender={Sender},e={E})", sender, e);
             this.OnItemAdded(e);
+			Logger.LogDebug("<<< Exiting CollectionItemAdded(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>
@@ -403,7 +437,9 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">The event arguments <see cref="PropertyEditorEventArgs"/>.</param>
         protected virtual void CollectionItemDeleted(object sender, PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering CollectionItemDeleted(sender={Sender},e={E})", sender, e);
             this.OnItemDeleted(e);
+			Logger.LogDebug("<<< Exiting CollectionItemDeleted(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>
@@ -412,10 +448,12 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">The event arguments <see cref="PropertyEditorEventArgs"/>.</param>
         protected virtual void OnItemAdded(PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnItemAdded(e={E})", e);
             if (this.ItemAdded != null)
             {
                 this.ItemAdded(this, e);
             }
+			Logger.LogDebug("<<< Exiting OnItemAdded(e={E})", e);
         }
 
         /// <summary>
@@ -424,10 +462,12 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">The event arguments <see cref="PropertyEditorItemEventArgs"/>.</param>
         protected virtual void OnItemCreated(PropertyEditorItemEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnItemCreated(e={E})", e);
             if (this.ItemCreated != null)
             {
                 this.ItemCreated(this, e);
             }
+			Logger.LogDebug("<<< Exiting OnItemCreated(e={E})", e);
         }
 
         /// <summary>
@@ -436,21 +476,26 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">The event arguments <see cref="PropertyEditorEventArgs"/>.</param>
         protected virtual void OnItemDeleted(PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnItemDeleted(e={E})", e);
             if (this.ItemDeleted != null)
             {
                 this.ItemDeleted(this, e);
             }
+			Logger.LogDebug("<<< Exiting OnItemDeleted(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             if (string.IsNullOrEmpty(this.CssClass))
             {
                 this.CssClass = "dnnFormItem";
+				Logger.LogDebug("OnPreRender(e={E}): this.CssClass → {Arg1}", e, this.CssClass);
             }
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <summary>
@@ -460,7 +505,9 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">The event arguments <see cref="PropertyEditorEventArgs"/>.</param>
         protected virtual void ValueChanged(object sender, PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering ValueChanged(sender={Sender},e={E})", sender, e);
             this.IsDirty = this.EditorInfoAdapter.UpdateValue(e);
+			Logger.LogDebug("<<< Exiting ValueChanged(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>
@@ -470,7 +517,9 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">The event arguments <see cref="PropertyEditorEventArgs"/>.</param>
         protected virtual void VisibilityChanged(object sender, PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering VisibilityChanged(sender={Sender},e={E})", sender, e);
             this.IsDirty = this.EditorInfoAdapter.UpdateVisibility(e);
+			Logger.LogDebug("<<< Exiting VisibilityChanged(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>
@@ -481,10 +530,12 @@ namespace DotNetNuke.UI.WebControls
         /// <remarks>Raises an ItemChanged event.</remarks>
         protected virtual void ListItemChanged(object sender, PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering ListItemChanged(sender={Sender},e={E})", sender, e);
             if (this.ItemChanged != null)
             {
                 this.ItemChanged(this, e);
             }
+			Logger.LogDebug("<<< Exiting ListItemChanged(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>BuildDiv creates the Control as a Div.</summary>

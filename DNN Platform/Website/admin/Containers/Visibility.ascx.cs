@@ -24,6 +24,7 @@ namespace DotNetNuke.UI.Containers
     /// </summary>
     public partial class Visibility : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private int animationFrames = 5;
         private Panel pnlModuleContent;
 
@@ -141,6 +142,7 @@ namespace DotNetNuke.UI.Containers
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.cmdVisibility.Click += this.CmdVisibility_Click;
@@ -182,6 +184,7 @@ namespace DotNetNuke.UI.Containers
                                 else
                                 {
                                     this.Visible = false;
+									Logger.LogDebug("OnLoad(e={E}): this.Visible → {Arg1}", e, this.Visible);
                                 }
                             }
                         }
@@ -210,13 +213,16 @@ namespace DotNetNuke.UI.Containers
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
             if (this.ModuleContent != null && this.ModuleControl != null && !Globals.IsAdminControl())
             {
@@ -236,10 +242,12 @@ namespace DotNetNuke.UI.Containers
                         break;
                 }
             }
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private void CmdVisibility_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering CmdVisibility_Click(sender={Sender},e={E})", sender, e);
             try
             {
                 if (this.ModuleContent != null)
@@ -247,6 +255,7 @@ namespace DotNetNuke.UI.Containers
                     if (this.ModuleContent.Visible)
                     {
                         this.ContentVisible = false;
+						Logger.LogDebug("CmdVisibility_Click(sender={Sender},e={E}): this.ContentVisible → {Arg2}", sender, e, this.ContentVisible);
                     }
                     else
                     {
@@ -256,8 +265,10 @@ namespace DotNetNuke.UI.Containers
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in CmdVisibility_Click(sender={Sender},e={E}): {Arg2}", sender, e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting CmdVisibility_Click(sender={Sender},e={E})", sender, e);
         }
     }
 }

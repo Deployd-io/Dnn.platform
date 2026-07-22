@@ -47,6 +47,7 @@ namespace log4net.Util
     [Serializable] public class ReadOnlyPropertiesDictionary : ISerializable, IDictionary
 #endif
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>The Hashtable used to store the properties data</summary>
         private readonly Hashtable m_hashtable = new Hashtable();
 
@@ -58,6 +59,8 @@ namespace log4net.Util
         /// </remarks>
         public ReadOnlyPropertiesDictionary()
         {
+		Logger.LogDebug(">>> Entering ReadOnlyPropertiesDictionary()");
+		Logger.LogDebug("<<< Exiting ReadOnlyPropertiesDictionary()");
         }
 
         /// <summary>Copy Constructor</summary>
@@ -69,10 +72,12 @@ namespace log4net.Util
         /// </remarks>
         public ReadOnlyPropertiesDictionary(ReadOnlyPropertiesDictionary propertiesDictionary)
         {
+			Logger.LogDebug(">>> Entering ReadOnlyPropertiesDictionary(propertiesDictionary={PropertiesDictionary})", propertiesDictionary);
             foreach(DictionaryEntry entry in propertiesDictionary)
             {
                 this.InnerHashtable.Add(entry.Key, entry.Value);
             }
+			Logger.LogDebug("<<< Exiting ReadOnlyPropertiesDictionary(propertiesDictionary={PropertiesDictionary})", propertiesDictionary);
         }
 
 #if !NETCF
@@ -87,11 +92,13 @@ namespace log4net.Util
         /// </remarks>
         protected ReadOnlyPropertiesDictionary(SerializationInfo info, StreamingContext context)
         {
+			Logger.LogDebug(">>> Entering ReadOnlyPropertiesDictionary(info={Info},context={Context})", info, context);
             foreach(var entry in info)
             {
                 // The keys are stored as Xml encoded names
                 this.InnerHashtable[XmlConvert.DecodeName(entry.Name)] = entry.Value;
             }
+			Logger.LogDebug("<<< Exiting ReadOnlyPropertiesDictionary(info={Info},context={Context})", info, context);
         }
 #endif
 
@@ -104,8 +111,10 @@ namespace log4net.Util
         /// </remarks>
         public string[] GetKeys()
         {
+			Logger.LogDebug(">>> Entering GetKeys()");
             var keys = new String[this.InnerHashtable.Count];
             this.InnerHashtable.Keys.CopyTo(keys, 0);
+			Logger.LogDebug("<<< Exiting GetKeys()");
             return keys;
         }
 
@@ -137,6 +146,8 @@ namespace log4net.Util
         /// </remarks>
         public bool Contains(string key)
         {
+			Logger.LogDebug(">>> Entering Contains(key={Key})", key);
+			Logger.LogDebug("<<< Exiting Contains(key={Key})", key);
             return this.InnerHashtable.Contains(key);
         }
 
@@ -171,6 +182,7 @@ namespace log4net.Util
 #endif
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
+			Logger.LogDebug(">>> Entering GetObjectData(info={Info},context={Context})", info, context);
             foreach(DictionaryEntry entry in this.InnerHashtable.Clone() as IDictionary)
             {
                 var entryKey = entry.Key as string;
@@ -185,6 +197,7 @@ namespace log4net.Util
 #if NETSTANDARD1_3
                 var isSerializable = entryValue?.GetType().GetTypeInfo().IsSerializable ?? false;
 #else
+				Logger.LogDebug("GetObjectData(info={Info},context={Context}): isSerializable → {IsSerializable}", info, context, isSerializable);
                 var isSerializable = entryValue?.GetType().IsSerializable ?? false;
 #endif
                 if (!isSerializable)
@@ -198,10 +211,12 @@ namespace log4net.Util
                 // to know the implementation details of all the possible transport layers.
                 var localKeyName = XmlConvert.EncodeLocalName(entryKey);
                 if (localKeyName != null)
+				Logger.LogDebug("GetObjectData(info={Info},context={Context}): localKeyName → {LocalKeyName}", info, context, localKeyName);
                 {
                     info.AddValue(localKeyName, entryValue);
                 }
             }
+			Logger.LogDebug("<<< Exiting GetObjectData(info={Info},context={Context})", info, context);
         }
 #endif
 
@@ -229,6 +244,7 @@ namespace log4net.Util
         /// <summary>Remove all properties from the properties collection</summary>
         public virtual void Clear()
         {
+			Logger.LogDebug(">>> Entering Clear()");
             throw new NotSupportedException("This is a Read Only Dictionary and can not be modified");
         }
 

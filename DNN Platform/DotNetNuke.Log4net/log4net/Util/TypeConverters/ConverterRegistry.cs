@@ -26,6 +26,7 @@ using System.Reflection;
 
 namespace log4net.Util.TypeConverters
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Register of type converters for specific types.
     /// </summary>
@@ -55,6 +56,8 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         private ConverterRegistry() 
         {
+		Logger.LogDebug(">>> Entering ConverterRegistry()");
+		Logger.LogDebug("<<< Exiting ConverterRegistry()");
         }
 
         /// <summary>
@@ -67,6 +70,7 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         static ConverterRegistry()
         {
+			Logger.LogDebug(">>> Entering ConverterRegistry()");
             // Add predefined converters here
             AddConverter(typeof(bool), typeof(BooleanConverter));
             AddConverter(typeof(System.Text.Encoding), typeof(EncodingConverter));
@@ -74,6 +78,7 @@ namespace log4net.Util.TypeConverters
             AddConverter(typeof(Layout.PatternLayout), typeof(PatternLayoutConverter));
             AddConverter(typeof(PatternString), typeof(PatternStringConverter));
             AddConverter(typeof(System.Net.IPAddress), typeof(IPAddressConverter));
+			Logger.LogDebug("<<< Exiting ConverterRegistry()");
         }
 
         /// <summary>
@@ -128,6 +133,7 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public static IConvertTo GetConvertTo(Type sourceType, Type destinationType)
         {
+			Logger.LogDebug(">>> Entering GetConvertTo(sourceType={SourceType},destinationType={DestinationType})", sourceType, destinationType);
             // TODO: Support inheriting type converters.
             // i.e. getting a type converter for a base of sourceType
 
@@ -138,6 +144,7 @@ namespace log4net.Util.TypeConverters
                 // Lookup in the static registry
                 IConvertTo converter = s_type2converter[sourceType] as IConvertTo;
 
+				Logger.LogDebug("GetConvertTo(sourceType={SourceType},destinationType={DestinationType}): converter → {Converter}", sourceType, destinationType, converter);
                 if (converter == null)
                 {
                     // Lookup using attributes
@@ -150,6 +157,7 @@ namespace log4net.Util.TypeConverters
                     }
                 }
 
+				Logger.LogDebug("<<< Exiting GetConvertTo(sourceType={SourceType},destinationType={DestinationType})", sourceType, destinationType);
                 return converter;
             }
         }
@@ -169,6 +177,7 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public static IConvertFrom GetConvertFrom(Type destinationType)
         {
+			Logger.LogDebug(">>> Entering GetConvertFrom(destinationType={DestinationType})", destinationType);
             // TODO: Support inheriting type converters.
             // i.e. getting a type converter for a base of destinationType
 
@@ -177,6 +186,7 @@ namespace log4net.Util.TypeConverters
                 // Lookup in the static registry
                 IConvertFrom converter = s_type2converter[destinationType] as IConvertFrom;
 
+				Logger.LogDebug("GetConvertFrom(destinationType={DestinationType}): converter → {Converter}", destinationType, converter);
                 if (converter == null)
                 {
                     // Lookup using attributes
@@ -189,6 +199,7 @@ namespace log4net.Util.TypeConverters
                     }
                 }
 
+				Logger.LogDebug("<<< Exiting GetConvertFrom(destinationType={DestinationType})", destinationType);
                 return converter;
             }
         }
@@ -204,6 +215,7 @@ namespace log4net.Util.TypeConverters
         /// </returns>
         private static object GetConverterFromAttribute(Type destinationType)
         {
+			Logger.LogDebug(">>> Entering GetConverterFromAttribute(destinationType={DestinationType})", destinationType);
             // Look for an attribute on the destination type
             var attributes = destinationType
 #if NETSTANDARD1_3
@@ -227,6 +239,7 @@ namespace log4net.Util.TypeConverters
             }
 
             // Not found converter using attributes
+			Logger.LogDebug("<<< Exiting GetConverterFromAttribute(destinationType={DestinationType})", destinationType);
             return null;
         }
 
@@ -269,6 +282,7 @@ namespace log4net.Util.TypeConverters
             {
                 LogLog.Error(declaringType, "Cannot CreateConverterInstance of type ["+converterType.FullName+"], type does not implement IConvertFrom or IConvertTo");
             }
+			Logger.LogDebug("<<< Exiting CreateConverterInstance(converterType={ConverterType})", converterType);
             return null;
         }
 

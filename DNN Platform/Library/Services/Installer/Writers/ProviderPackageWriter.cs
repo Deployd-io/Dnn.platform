@@ -13,15 +13,20 @@ namespace DotNetNuke.Services.Installer.Writers
     /// <summary>The ProviderPackageWriter class.</summary>
     public class ProviderPackageWriter : PackageWriterBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ProviderPackageWriter"/> class.</summary>
         /// <param name="package">The package info.</param>
         public ProviderPackageWriter(PackageInfo package)
             : base(package)
         {
+			Logger.LogDebug(">>> Entering ProviderPackageWriter(package={Package})", package);
             XmlDocument configDoc = Config.Load();
             XPathNavigator providerNavigator = configDoc.CreateNavigator().SelectSingleNode(XmlUtils.CreateXPathExpression("/configuration/dotnetnuke/*/providers/add[@name=$packageName]", new KeyValuePair<string, object>("packageName", package.Name)));
+			Logger.LogDebug("ProviderPackageWriter(package={Package}): configDoc → {ConfigDoc}", package, configDoc);
+			Logger.LogDebug("ProviderPackageWriter(package={Package}): providerNavigator → {ProviderNavigator}", package, providerNavigator);
             string providerPath = Null.NullString;
             if (providerNavigator != null)
+			Logger.LogDebug("ProviderPackageWriter(package={Package}): providerPath → {ProviderPath}", package, providerPath);
             {
                 providerPath = Util.ReadAttribute(providerNavigator, "providerPath");
             }
@@ -30,12 +35,15 @@ namespace DotNetNuke.Services.Installer.Writers
             {
                 this.BasePath = providerPath.Replace("~/", string.Empty).Replace("/", @"\");
             }
+			Logger.LogDebug("<<< Exiting ProviderPackageWriter(package={Package})", package);
         }
 
         /// <inheritdoc />
         protected override void GetFiles(bool includeSource, bool includeAppCode)
         {
+			Logger.LogDebug(">>> Entering GetFiles(includeSource={IncludeSource},includeAppCode={IncludeAppCode})", includeSource, includeAppCode);
             base.GetFiles(includeSource, false);
+			Logger.LogDebug("<<< Exiting GetFiles(includeSource={IncludeSource},includeAppCode={IncludeAppCode})", includeSource, includeAppCode);
         }
     }
 }

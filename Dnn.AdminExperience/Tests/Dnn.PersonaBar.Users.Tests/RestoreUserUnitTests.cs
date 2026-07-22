@@ -22,6 +22,7 @@ namespace Dnn.PersonaBar.Users.Tests
 
     public class RestoreUserUnitTests : CommandTests<RestoreUser>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private Mock<IUserValidator> _userValidatorMock;
         private Mock<IRecyclebinController> _recyclebinControllerMock;
         private FakeServiceProvider serviceProvider;
@@ -31,9 +32,12 @@ namespace Dnn.PersonaBar.Users.Tests
         [Test]
         public void Run_RestoreValidUserId_ReturnSuccessResponse()
         {
+			Logger.LogDebug(">>> Entering Run_RestoreValidUserId_ReturnSuccessResponse()");
             // Arrange
             var userId = 2;
             UserInfo userInfo = this.GetUser(userId, true);
+			Logger.LogDebug("Run_RestoreValidUserId_ReturnSuccessResponse(): userId → {UserId}", userId);
+			Logger.LogDebug("Run_RestoreValidUserId_ReturnSuccessResponse(): userInfo → {UserInfo}", userInfo);
             this._userValidatorMock
                 .Setup(u => u.ValidateUser(userId, this.portalSettings, null, out userInfo))
                 .Returns(this.errorResultModel);
@@ -43,16 +47,21 @@ namespace Dnn.PersonaBar.Users.Tests
             // Act
             var result = this.RunCommand(userId.ToString());
 
+			Logger.LogDebug("Run_RestoreValidUserId_ReturnSuccessResponse(): result → {Result}", result);
             // Assert
             Assert.That(result.IsError, Is.False);
+			Logger.LogDebug("<<< Exiting Run_RestoreValidUserId_ReturnSuccessResponse()");
         }
 
         [Test]
         public void Run_RecycleBinControllerRestoringError_ReturnErrorResponse()
         {
+			Logger.LogDebug(">>> Entering Run_RecycleBinControllerRestoringError_ReturnErrorResponse()");
             // Arrange
             var userId = 2;
             UserInfo userInfo = this.GetUser(userId, true);
+			Logger.LogDebug("Run_RecycleBinControllerRestoringError_ReturnErrorResponse(): userId → {UserId}", userId);
+			Logger.LogDebug("Run_RecycleBinControllerRestoringError_ReturnErrorResponse(): userInfo → {UserInfo}", userInfo);
             this._userValidatorMock
                 .Setup(u => u.ValidateUser(userId, this.portalSettings, null, out userInfo))
                 .Returns(this.errorResultModel);
@@ -62,16 +71,21 @@ namespace Dnn.PersonaBar.Users.Tests
             // Act
             var result = this.RunCommand(userId.ToString());
 
+			Logger.LogDebug("Run_RecycleBinControllerRestoringError_ReturnErrorResponse(): result → {Result}", result);
             // Assert
             Assert.That(result.IsError, Is.True);
+			Logger.LogDebug("<<< Exiting Run_RecycleBinControllerRestoringError_ReturnErrorResponse()");
         }
 
         [Test]
         public void Run_RestoreNotDeletedUser_ReturnErrorResponse()
         {
+			Logger.LogDebug(">>> Entering Run_RestoreNotDeletedUser_ReturnErrorResponse()");
             // Arrange
             var userId = 2;
             UserInfo userinfo = this.GetUser(userId, false);
+			Logger.LogDebug("Run_RestoreNotDeletedUser_ReturnErrorResponse(): userId → {UserId}", userId);
+			Logger.LogDebug("Run_RestoreNotDeletedUser_ReturnErrorResponse(): userinfo → {Userinfo}", userinfo);
             this._userValidatorMock
                 .Setup(u => u.ValidateUser(userId, this.portalSettings, null, out userinfo))
                 .Returns(this.errorResultModel);
@@ -79,13 +93,16 @@ namespace Dnn.PersonaBar.Users.Tests
             // Act
             var result = this.RunCommand(userId.ToString());
 
+			Logger.LogDebug("Run_RestoreNotDeletedUser_ReturnErrorResponse(): result → {Result}", result);
             // Assert
             Assert.That(result.IsError, Is.True);
+			Logger.LogDebug("<<< Exiting Run_RestoreNotDeletedUser_ReturnErrorResponse()");
         }
 
         [Test]
         public void Run_RestoreNullUserId_ReturnErrorResponse()
         {
+			Logger.LogDebug(">>> Entering Run_RestoreNullUserId_ReturnErrorResponse()");
             // Arrange
             this.errorResultModel = new ConsoleErrorResultModel();
 
@@ -97,27 +114,38 @@ namespace Dnn.PersonaBar.Users.Tests
             // Act
             var result = this.RunCommand();
 
+			Logger.LogDebug("Run_RestoreNullUserId_ReturnErrorResponse(): result → {Result}", result);
             // Assert
             Assert.That(result.IsError, Is.True);
+			Logger.LogDebug("<<< Exiting Run_RestoreNullUserId_ReturnErrorResponse()");
         }
 
         protected override RestoreUser CreateCommand()
         {
+			Logger.LogDebug(">>> Entering CreateCommand()");
+			Logger.LogDebug("<<< Exiting CreateCommand()");
             return new RestoreUser(this._userValidatorMock.Object, this._recyclebinControllerMock.Object);
         }
 
         [SetUp]
         protected override void ChildSetup()
         {
+			Logger.LogDebug(">>> Entering ChildSetup()");
             this._userValidatorMock = new Mock<IUserValidator>();
             this._recyclebinControllerMock = new Mock<IRecyclebinController>();
+			Logger.LogDebug("ChildSetup(): _recyclebinControllerMock → {_recyclebinControllerMock}", _recyclebinControllerMock);
+			Logger.LogDebug("ChildSetup(): _userValidatorMock → {_userValidatorMock}", _userValidatorMock);
             this.serviceProvider = FakeServiceProvider.Setup(services => services.AddSingleton(Mock.Of<IHostSettings>()));
+			Logger.LogDebug("<<< Exiting ChildSetup()");
+			Logger.LogDebug("ChildSetup(): serviceProvider → {ServiceProvider}", serviceProvider);
         }
 
         [TearDown]
         protected override void ChildTearDown()
         {
+			Logger.LogDebug(">>> Entering ChildTearDown()");
             this.serviceProvider.Dispose();
+			Logger.LogDebug("<<< Exiting ChildTearDown()");
         }
     }
 }

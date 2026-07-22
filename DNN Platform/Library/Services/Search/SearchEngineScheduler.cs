@@ -26,7 +26,9 @@ namespace DotNetNuke.Services.Search
         public SearchEngineScheduler(ScheduleHistoryItem objScheduleHistoryItem)
             : this(objScheduleHistoryItem, null)
         {
+		Logger.LogDebug(">>> Entering SearchEngineScheduler(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
         }
+		Logger.LogDebug("<<< Exiting SearchEngineScheduler(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
 
         /// <summary>Initializes a new instance of the <see cref="SearchEngineScheduler"/> class.</summary>
         /// <param name="objScheduleHistoryItem">The schedule history item.</param>
@@ -35,6 +37,8 @@ namespace DotNetNuke.Services.Search
         {
             this.businessControllerProvider = businessControllerProvider ?? Globals.DependencyProvider.GetRequiredService<IBusinessControllerProvider>();
             this.ScheduleHistoryItem = objScheduleHistoryItem;
+			Logger.LogDebug("SearchEngineScheduler(objScheduleHistoryItem={ObjScheduleHistoryItem},businessControllerProvider={BusinessControllerProvider}): this.ScheduleHistoryItem → {Arg2}", objScheduleHistoryItem, businessControllerProvider, this.ScheduleHistoryItem);
+			Logger.LogDebug("SearchEngineScheduler(objScheduleHistoryItem={ObjScheduleHistoryItem},businessControllerProvider={BusinessControllerProvider}): businessControllerProvider → {BusinessControllerProvider1}", objScheduleHistoryItem, businessControllerProvider, businessControllerProvider);
         }
 
         /// <summary>DoWork runs the scheduled item.</summary>
@@ -44,10 +48,12 @@ namespace DotNetNuke.Services.Search
             {
                 var lastSuccessFulDateTime = SearchHelper.Instance.GetLastSuccessfulIndexingDateTime(this.ScheduleHistoryItem.ScheduleID);
                 Logger.Trace("Search: Site Crawler - Starting. Content change start time " + lastSuccessFulDateTime.ToString("g", CultureInfo.InvariantCulture));
+				Logger.LogDebug("DoWork(): lastSuccessFulDateTime → {LastSuccessFulDateTime}", lastSuccessFulDateTime);
                 this.ScheduleHistoryItem.AddLogNote(string.Format(CultureInfo.InvariantCulture, "Starting. Content change start time <b>{0:g}</b>", lastSuccessFulDateTime));
 
                 var searchEngine = new SearchEngine(this.ScheduleHistoryItem, lastSuccessFulDateTime, this.businessControllerProvider);
                 try
+				Logger.LogDebug("DoWork(): searchEngine → {SearchEngine}", searchEngine);
                 {
                     searchEngine.DeleteOldDocsBeforeReindex();
                     searchEngine.DeleteRemovedObjects();
@@ -67,6 +73,7 @@ namespace DotNetNuke.Services.Search
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in DoWork(): {Arg0}", ex.Message);
                 this.ScheduleHistoryItem.Succeeded = false;
                 this.ScheduleHistoryItem.AddLogNote("<br/>EXCEPTION: " + ex.Message);
                 this.Errored(ref ex);
@@ -75,6 +82,7 @@ namespace DotNetNuke.Services.Search
                     Exceptions.Exceptions.LogException(ex);
                 }
             }
+			Logger.LogDebug("<<< Exiting DoWork()");
         }
     }
 }

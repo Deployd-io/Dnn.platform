@@ -23,6 +23,7 @@ using log4net.Core;
 
 namespace log4net.Filter
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Subclass this type to implement customized logging event filtering
     /// </summary>
@@ -101,6 +102,8 @@ namespace log4net.Filter
         /// </remarks>
         public virtual void ActivateOptions() 
         {
+		Logger.LogDebug(">>> Entering ActivateOptions()");
+		Logger.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>

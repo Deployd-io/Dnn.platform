@@ -19,6 +19,7 @@ namespace Dnn.ContactList.Mvc.Controllers
     [DnnHandleError]
     public class ContactController : DnnController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IContactRepository _repository;
 
         /// <summary>
@@ -31,9 +32,12 @@ namespace Dnn.ContactList.Mvc.Controllers
         /// </summary>
         public ContactController(IContactRepository repository)
         {
+			Logger.LogDebug(">>> Entering ContactController(repository={Repository})", repository);
             Requires.NotNull(repository);
 
             _repository = repository;
+			Logger.LogDebug("<<< Exiting ContactController(repository={Repository})", repository);
+			Logger.LogDebug("ContactController(repository={Repository}): _repository → {_repository}", repository, _repository);
         }
 
         /// <summary>
@@ -44,10 +48,15 @@ namespace Dnn.ContactList.Mvc.Controllers
         [HttpGet]
         public ActionResult Delete(int contactId)
         {
+			Logger.LogDebug(">>> Entering Delete(contactId={ContactId})", contactId);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var contact = _repository.GetContact(contactId, PortalSettings.PortalId);
 
+			Logger.LogInformation("Delete(contactId)={ContactId}: find query executed in {Arg1} ms", contactId, __logStart.ElapsedMilliseconds);
             _repository.DeleteContact(contact);
 
+			Logger.LogDebug("Delete(contactId={ContactId}): contact → {Contact}", contactId, contact);
+			Logger.LogDebug("<<< Exiting Delete(contactId={ContactId})", contactId);
             return RedirectToDefaultRoute();
         }
 
@@ -58,9 +67,12 @@ namespace Dnn.ContactList.Mvc.Controllers
         [HttpGet]
         public ActionResult Edit(int contactId = -1)
         {
+			Logger.LogDebug(">>> Entering Edit(contactId={ContactId})", contactId);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var contact = (contactId == -1)
                         ? new Contact { PortalId = PortalSettings.PortalId }
                         : _repository.GetContact(contactId, PortalSettings.PortalId);
+						Logger.LogInformation("Edit(contactId)={ContactId}: find query executed in {Arg1} ms", contactId, __logStart.ElapsedMilliseconds);
 
             return View(contact);
         }
@@ -111,13 +123,19 @@ namespace Dnn.ContactList.Mvc.Controllers
         [ModuleAction(ControlKey = "Edit", TitleKey = "AddContact")]
         public ActionResult Index(string searchTerm = "", int pageIndex = 0)
         {
+			Logger.LogDebug(">>> Entering Index(searchTerm={SearchTerm},pageIndex={PageIndex})", searchTerm, pageIndex);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var contacts = _repository.GetContacts(searchTerm, PortalSettings.PortalId, pageIndex, ModuleContext.Configuration.ModuleSettings.GetValueOrDefault("PageSize", 6));
 
+			Logger.LogDebug("Index(searchTerm={SearchTerm},pageIndex={PageIndex}): contacts → {Contacts}", searchTerm, pageIndex, contacts);
+			Logger.LogDebug("<<< Exiting Index(searchTerm={SearchTerm},pageIndex={PageIndex})", searchTerm, pageIndex);
             return View(contacts);
         }
 
         public JsonResult GetJsonResult()
         {
+			Logger.LogDebug(">>> Entering GetJsonResult()");
+			Logger.LogDebug("<<< Exiting GetJsonResult()");
             return new JsonResult()
             {
                 Data = new
@@ -133,10 +151,13 @@ namespace Dnn.ContactList.Mvc.Controllers
 
         public ActionResult GetDemoPartial()
         {
+			Logger.LogDebug(">>> Entering GetDemoPartial()");
             TempData["UserID"] = User.UserID;
             ViewData["PortalId"] = PortalSettings.PortalId;
             ViewBag.Alias = PortalSettings.PortalAlias.HTTPAlias;
+			Logger.LogDebug("GetDemoPartial(): ViewBag.Alias → {Arg0}", ViewBag.Alias);
 
+			Logger.LogDebug("<<< Exiting GetDemoPartial()");
             return PartialView("_DemoPartial", DateTime.Now);
         }
     }

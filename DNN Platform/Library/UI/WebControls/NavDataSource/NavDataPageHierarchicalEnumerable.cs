@@ -11,6 +11,7 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>A collection of PageHierarchyData objects.</summary>
     public class NavDataPageHierarchicalEnumerable : ArrayList, IHierarchicalEnumerable, IList<NavDataPageHierarchyData>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         NavDataPageHierarchyData IList<NavDataPageHierarchyData>.this[int index]
         {
@@ -23,6 +24,8 @@ namespace DotNetNuke.UI.WebControls
         /// <returns><paramref name="enumeratedItem"/>.</returns>
         public virtual IHierarchyData GetHierarchyData(object enumeratedItem)
         {
+			Logger.LogDebug(">>> Entering GetHierarchyData(enumeratedItem={EnumeratedItem})", enumeratedItem);
+			Logger.LogDebug("<<< Exiting GetHierarchyData(enumeratedItem={EnumeratedItem})", enumeratedItem);
             return (IHierarchyData)enumeratedItem;
         }
 
@@ -38,12 +41,14 @@ namespace DotNetNuke.UI.WebControls
         /// <inheritdoc />
         public bool Remove(NavDataPageHierarchyData item)
         {
+			Logger.LogDebug(">>> Entering Remove(item={Item})", item);
             if (!this.Contains(item))
             {
                 return false;
             }
 
             base.Remove(item);
+			Logger.LogDebug("<<< Exiting Remove(item={Item})", item);
             return true;
         }
 
@@ -61,12 +66,15 @@ namespace DotNetNuke.UI.WebControls
 
         private class NavDataPageHierarchyDataEnumerator(IEnumerator enumerator) : IEnumerator<NavDataPageHierarchyData>
         {
+			Logger.LogDebug(">>> Entering NavDataPageHierarchyDataEnumerator(enumerator={Enumerator})", enumerator);
             /// <inheritdoc />
             public NavDataPageHierarchyData Current => (NavDataPageHierarchyData)enumerator.Current;
 
+			Logger.LogDebug("NavDataPageHierarchyDataEnumerator(enumerator={Enumerator}): Current → {Current}", enumerator, Current);
             /// <inheritdoc />
             object IEnumerator.Current => this.Current;
 
+			Logger.LogDebug("<<< Exiting NavDataPageHierarchyDataEnumerator(enumerator={Enumerator})", enumerator);
             /// <inheritdoc />
             public void Dispose() => (enumerator as IDisposable)?.Dispose();
 

@@ -36,6 +36,7 @@ namespace log4net.Core
     /// <author>Nicko Cadell</author>
     public class LevelEvaluator : ITriggeringEventEvaluator 
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>The threshold for triggering</summary>
         private Level m_threshold;
 
@@ -53,6 +54,10 @@ namespace log4net.Core
         /// </remarks>
         public LevelEvaluator() : this(Level.Off)
         {
+		Logger.DebugFormat(">>> Entering LevelEvaluator()");
+		Logger.DebugFormat("<<< Exiting LevelEvaluator()");
+		Logger.DebugFormat(">>> Entering LevelEvaluator(threshold={0})", threshold);
+		Logger.DebugFormat("<<< Exiting LevelEvaluator(threshold={0})", threshold);
         }
 
         /// <summary>Create a new evaluator using the specified <see cref="Level"/> threshold.</summary>
@@ -76,6 +81,8 @@ namespace log4net.Core
             }
 
             this.m_threshold = threshold;
+			Logger.DebugFormat("LevelEvaluator(threshold={0}): m_threshold → {1}", threshold, m_threshold);
+			Logger.DebugFormat("LevelEvaluator(threshold={0}): this.m_threshold → {1}", threshold, this.m_threshold);
         }
 
         /// <summary>the threshold to trigger at</summary>
@@ -111,11 +118,13 @@ namespace log4net.Core
         /// </remarks>
         public bool IsTriggeringEvent(LoggingEvent loggingEvent) 
         {
+			Logger.DebugFormat(">>> Entering IsTriggeringEvent(loggingEvent={0})", loggingEvent);
             if (loggingEvent == null)
             {
                 throw new ArgumentNullException("loggingEvent");
             }
 
+			Logger.DebugFormat("<<< Exiting IsTriggeringEvent(loggingEvent={0})", loggingEvent);
             return (loggingEvent.Level >= this.m_threshold); 
         }
     }

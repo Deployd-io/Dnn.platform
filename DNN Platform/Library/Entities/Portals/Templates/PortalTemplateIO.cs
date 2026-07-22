@@ -22,42 +22,51 @@ namespace DotNetNuke.Entities.Portals.Internal
         /// <inheritdoc />
         public IEnumerable<string> EnumerateTemplates()
         {
+			Logger.LogDebug(">>> Entering EnumerateTemplates()");
             string path = Globals.HostMapPath;
             if (Directory.Exists(path))
             {
                 return Directory.GetFiles(path, "*.template").Where(x => Path.GetFileNameWithoutExtension(x) != "admin");
             }
 
+			Logger.LogDebug("<<< Exiting EnumerateTemplates()");
             return [];
         }
 
         /// <inheritdoc />
         public IEnumerable<string> EnumerateLanguageFiles()
         {
+			Logger.LogDebug(">>> Entering EnumerateLanguageFiles()");
             string path = Globals.HostMapPath;
             if (Directory.Exists(path))
             {
                 return Directory.GetFiles(path, "*.template.??-??.resx");
             }
 
+			Logger.LogDebug("<<< Exiting EnumerateLanguageFiles()");
             return [];
         }
 
         /// <inheritdoc />
         public string GetResourceFilePath(string templateFilePath)
         {
+			Logger.LogDebug(">>> Entering GetResourceFilePath(templateFilePath={TemplateFilePath})", templateFilePath);
+			Logger.LogDebug("<<< Exiting GetResourceFilePath(templateFilePath={TemplateFilePath})", templateFilePath);
             return CheckFilePath(templateFilePath + ".resources");
         }
 
         /// <inheritdoc />
         public string GetLanguageFilePath(string templateFilePath, string cultureCode)
         {
+			Logger.LogDebug(">>> Entering GetLanguageFilePath(templateFilePath={TemplateFilePath},cultureCode={CultureCode})", templateFilePath, cultureCode);
+			Logger.LogDebug("<<< Exiting GetLanguageFilePath(templateFilePath={TemplateFilePath},cultureCode={CultureCode})", templateFilePath, cultureCode);
             return CheckFilePath($"{templateFilePath}.{cultureCode}.resx");
         }
 
         /// <inheritdoc />
         public TextReader OpenTextReader(string filePath)
         {
+			Logger.LogDebug(">>> Entering OpenTextReader(filePath={FilePath})", filePath);
             StreamReader reader = null;
 
             var retryable = new RetryableAction(
@@ -68,6 +77,7 @@ namespace DotNetNuke.Entities.Portals.Internal
                 2);
 
             retryable.TryIt();
+			Logger.LogDebug("<<< Exiting OpenTextReader(filePath={FilePath})", filePath);
             return reader;
         }
 
@@ -85,6 +95,7 @@ namespace DotNetNuke.Entities.Portals.Internal
             var node = templateXml.SelectSingleNode("//settings/defaultlanguage");
             if (node != null)
             {
+				private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                 defaultLanguage = node.InnerText;
             }
 
@@ -103,11 +114,15 @@ namespace DotNetNuke.Entities.Portals.Internal
         /// <inheritdoc />
         protected override Func<IPortalTemplateIO> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new PortalTemplateIO();
         }
 
         private static string CheckFilePath(string path)
         {
+			Logger.LogDebug(">>> Entering CheckFilePath(path={Path})", path);
+			Logger.LogDebug("<<< Exiting CheckFilePath(path={Path})", path);
             return File.Exists(path) ? path : string.Empty;
         }
     }

@@ -12,12 +12,15 @@ namespace DotNetNuke.Entities.Profile
     /// </summary>
     public class ProfilePropertyDefinitionComparer : IComparer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Compares two <see cref="ProfilePropertyDefinition"/> objects.</summary>
         /// <param name="x">A <see cref="ProfilePropertyDefinition"/> object.</param>
         /// <param name="y">The other <see cref="ProfilePropertyDefinition"/> object.</param>
         /// <returns>An integer indicating whether x greater than y, x=y or x less than y.</returns>
         public int Compare(object x, object y)
         {
+			Logger.LogDebug(">>> Entering Compare(x={X},y={Y})", x, y);
+			Logger.LogDebug("<<< Exiting Compare(x={X},y={Y})", x, y);
             return ((ProfilePropertyDefinition)x).ViewOrder.CompareTo(((ProfilePropertyDefinition)y).ViewOrder);
         }
     }

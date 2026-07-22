@@ -14,6 +14,7 @@ namespace DotNetNuke.Tests.Authentication
     [TestFixture]
     public class FacebookUserDataTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string SampleUserJson = @"{
     ""id"": ""220439"",
     ""name"": ""Bret the Taylor"",
@@ -28,25 +29,31 @@ namespace DotNetNuke.Tests.Authentication
         [Test]
         public void FacebookUserData_Populates_Inherited_Name_Properties_When_Deserialized()
         {
+			Logger.LogDebug(">>> Entering FacebookUserData_Populates_Inherited_Name_Properties_When_Deserialized()");
             // Act
             UserData sampleUser = Json.Deserialize<FacebookUserData>(SampleUserJson);
 
+			Logger.LogDebug("FacebookUserData_Populates_Inherited_Name_Properties_When_Deserialized(): sampleUser → {SampleUser}", sampleUser);
             using (Assert.EnterMultipleScope())
             {
                 // Assert
                 Assert.That(sampleUser.FirstName, Is.EqualTo("Bret"), "Should correctly pull first name from first_name field, not by parsing name");
                 Assert.That(sampleUser.LastName, Is.EqualTo("Taylor"), "Should correctly pull first name from first_name field, not by parsing name");
             }
+			Logger.LogDebug("<<< Exiting FacebookUserData_Populates_Inherited_Name_Properties_When_Deserialized()");
         }
 
         [Test]
         public void FacebookUserData_Populates_Link_Property_When_Deserialized()
         {
+			Logger.LogDebug(">>> Entering FacebookUserData_Populates_Link_Property_When_Deserialized()");
             // Act
             var sampleUser = Json.Deserialize<FacebookUserData>(SampleUserJson);
 
+			Logger.LogDebug("FacebookUserData_Populates_Link_Property_When_Deserialized(): sampleUser → {SampleUser}", sampleUser);
             // Assert
             Assert.That(sampleUser.Link, Is.EqualTo(new Uri("https://www.facebook.com/btaylor", UriKind.Absolute)));
+			Logger.LogDebug("<<< Exiting FacebookUserData_Populates_Link_Property_When_Deserialized()");
         }
     }
 }

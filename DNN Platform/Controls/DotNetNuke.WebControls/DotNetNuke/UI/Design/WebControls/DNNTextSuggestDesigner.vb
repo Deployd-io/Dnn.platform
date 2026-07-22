@@ -13,13 +13,16 @@ Namespace DotNetNuke.UI.Design.WebControls
         Inherits ControlDesigner
         ' Methods
         Public Overrides Function GetDesignTimeHtml() As String
+			Logger.LogDebug(">>> Entering GetDesignTimeHtml()")
             Dim str As String
             Dim component As DNNTextSuggest = DirectCast(Me.Component, DNNTextSuggest)
             If (component.ID.Length <= 0) Then
                 str = Nothing
+				Logger.LogDebug("GetDesignTimeHtml(): str → {Str}", str)
             Else
                 Dim writer As New StringWriter
                 Dim textbox As New TextBox() With {
+					private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                     .Text = component.Text
                 }
                 textbox.RenderControl(New HtmlTextWriter(writer))
@@ -27,6 +30,7 @@ Namespace DotNetNuke.UI.Design.WebControls
             End If
             Return str
         End Function
+		Logger.LogDebug("<<< Exiting GetDesignTimeHtml()")
 
 
         ' Properties

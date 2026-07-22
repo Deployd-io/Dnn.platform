@@ -11,13 +11,16 @@ namespace Dnn.ContactList.Spa.Services
     /// </summary>
     public class ServiceRouteMapper : IServiceRouteMapper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// RegisterRoutes is used to register the module's routes
         /// </summary>
         /// <param name="mapRouteManager"></param>
         public void RegisterRoutes(IMapRoute mapRouteManager)
         {
+			Logger.LogDebug(">>> Entering RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
             mapRouteManager.MapHttpRoute("Dnn/ContactList", "default", "{controller}/{action}", new[] { "Dnn.ContactList.Spa.Services" });
+			Logger.LogDebug("<<< Exiting RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
         }
     }
 }

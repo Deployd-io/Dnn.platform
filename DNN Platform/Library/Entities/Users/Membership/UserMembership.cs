@@ -12,6 +12,7 @@ namespace DotNetNuke.Entities.Users
     [Serializable]
     public class UserMembership
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly UserInfo user;
         private bool approved;
 
@@ -19,6 +20,10 @@ namespace DotNetNuke.Entities.Users
         public UserMembership()
             : this(new UserInfo())
         {
+		Logger.LogDebug(">>> Entering UserMembership()");
+		Logger.LogDebug("<<< Exiting UserMembership()");
+		Logger.LogDebug(">>> Entering UserMembership(user={User})", user);
+		Logger.LogDebug("<<< Exiting UserMembership(user={User})", user);
         }
 
         /// <summary>Initializes a new instance of the <see cref="UserMembership"/> class.</summary>
@@ -27,6 +32,9 @@ namespace DotNetNuke.Entities.Users
         {
             this.approved = true;
             this.user = user;
+			Logger.LogDebug("UserMembership(user={User}): this.approved → {Arg1}", user, this.approved);
+			Logger.LogDebug("UserMembership(user={User}): user → {User1}", user, user);
+			Logger.LogDebug("UserMembership(user={User}): this.user → {Arg1}", user, this.user);
         }
 
         /// <summary>Gets or sets a value indicating whether the User is Approved.</summary>
@@ -92,7 +100,10 @@ namespace DotNetNuke.Entities.Users
 
         internal void ConfirmApproved()
         {
+			Logger.LogDebug(">>> Entering ConfirmApproved()");
             this.Approving = false;
+			Logger.LogDebug("<<< Exiting ConfirmApproved()");
+			Logger.LogDebug("ConfirmApproved(): this.Approving → {Arg0}", this.Approving);
         }
     }
 }

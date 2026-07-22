@@ -18,6 +18,7 @@ namespace Dnn.ExportImport.Components.Entities
     [PrimaryKey("JobId")]
     public class ExportImportJob : IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Gets or sets the job ID.</summary>
         public int JobId { get; set; }
 
@@ -67,6 +68,7 @@ namespace Dnn.ExportImport.Components.Entities
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.JobId = Null.SetNullInteger(dr[nameof(this.JobId)]);
             this.PortalId = Null.SetNullInteger(dr[nameof(this.PortalId)]);
             this.JobType = (JobType)Null.SetNullInteger(dr[nameof(this.JobType)]);
@@ -106,6 +108,7 @@ namespace Dnn.ExportImport.Components.Entities
                     this.LastModifiedOnDate.Millisecond,
                     DateTimeKind.Utc);
             }
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

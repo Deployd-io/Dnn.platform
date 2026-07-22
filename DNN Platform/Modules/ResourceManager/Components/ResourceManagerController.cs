@@ -19,6 +19,7 @@ namespace Dnn.Modules.ResourceManager.Components
         /// <inheritdoc />
         public string UpgradeModule(string version)
         {
+			Logger.LogDebug(">>> Entering UpgradeModule(version={Version})", version);
             try
             {
                 switch (version)
@@ -27,6 +28,7 @@ namespace Dnn.Modules.ResourceManager.Components
                         Logger.Info("Adding Global Assets host menu item.");
                         ModuleDefinitionInfo mDef = ModuleDefinitionController.GetModuleDefinitionByFriendlyName("ResourceManager");
 
+						Logger.LogDebug("UpgradeModule(version={Version}): mDef → {MDef}", version, mDef);
                         // Add tab to Admin Menu
                         if (mDef != null)
                         {
@@ -40,6 +42,7 @@ namespace Dnn.Modules.ResourceManager.Components
                             // Add module to page
                             var moduleId = Upgrade.AddModuleToPage(hostPage, mDef.ModuleDefID, "Global Assets Management", "~/Icons/Sigma/Files_32X32_Standard.png", true);
                             ModuleController.Instance.UpdateModuleSetting(moduleId, Constants.HomeFolderSettingName, "1");
+							Logger.LogDebug("UpgradeModule(version={Version}): moduleId → {ModuleId}", version, moduleId);
                             ModuleController.Instance.UpdateModuleSetting(moduleId, Constants.ModeSettingName, "0");
                             Logger.Info("Added Global Assets host menu item.");
                         }
@@ -57,6 +60,7 @@ namespace Dnn.Modules.ResourceManager.Components
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting UpgradeModule(version={Version})", version);
                 return "Failed";
             }
         }

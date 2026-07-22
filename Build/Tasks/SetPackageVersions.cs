@@ -15,9 +15,11 @@ namespace DotNetNuke.Build.Tasks
     [IsDependentOn(typeof(SetVersion))]
     public sealed class SetPackageVersions : FrostingTask<Context>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override void Run(Context context)
         {
+			Logger.LogDebug(">>> Entering Run(context={Context})", context);
             if (context.Settings.Version == "off")
             {
                 return;
@@ -25,6 +27,7 @@ namespace DotNetNuke.Build.Tasks
 
             var packages = context.GetFiles("./Dnn.AdminExperience/ClientSide/*.Web/package.json");
             packages.Add(context.GetFiles("./Dnn.AdminExperience/ClientSide/Dnn.React.Common/package.json"));
+			Logger.LogDebug("Run(context={Context}): packages → {Packages}", context, packages);
             packages.Add(context.GetFiles("./Dnn.AdminExperience/ClientSide/*.Web/**/_exportables/package.json"));
             packages.Add(context.GetFiles("./DNN Platform/Modules/ResourceManager/ResourceManager.Web/package.json"));
             packages.Add(context.GetFiles("./DNN Platform/Skins/Aperture/package.json"));
@@ -42,6 +45,7 @@ namespace DotNetNuke.Build.Tasks
                     @"""@dnnsoftware\/dnn-react-common"": "".*""",
                     $@"""@dnnsoftware/dnn-react-common"": ""{context.Version.MajorMinorPatch}""");
             }
+			Logger.LogDebug("<<< Exiting Run(context={Context})", context);
         }
     }
 }

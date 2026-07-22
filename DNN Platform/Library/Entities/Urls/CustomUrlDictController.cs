@@ -86,7 +86,9 @@ namespace DotNetNuke.Entities.Urls
 
         internal static void InvalidateDictionary()
         {
+			Logger.LogDebug(">>> Entering InvalidateDictionary()");
             CacheController.FlushPageIndexFromCache();
+			Logger.LogDebug("<<< Exiting InvalidateDictionary()");
         }
 
         /// <summary>
@@ -203,6 +205,7 @@ namespace DotNetNuke.Entities.Urls
                         {
                             if (entry.ContainsKey(cultureKey) == false)
                             {
+								private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                                 // add the culture and set in parent dictionary
                                 // 871 : use lower case culture code as key
                                 entry.Add(cultureKey, url);

@@ -23,10 +23,15 @@ namespace DotNetNuke.Services.Social.Subscriptions
     public class SubscriptionTypeController(IDataService dataService, IHostSettings hostSettings)
         : ServiceLocator<ISubscriptionTypeController, SubscriptionTypeController>, ISubscriptionTypeController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IDataService dataService = dataService ?? DataService.Instance;
+		Logger.LogDebug(">>> Entering SubscriptionTypeController(dataService={DataService},hostSettings={HostSettings})", dataService, hostSettings);
+		Logger.LogDebug("SubscriptionTypeController(dataService={DataService},hostSettings={HostSettings}): dataService → {DataService1}", dataService, hostSettings, dataService);
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
 
+		Logger.LogDebug("SubscriptionTypeController(dataService={DataService},hostSettings={HostSettings}): hostSettings → {HostSettings1}", dataService, hostSettings, hostSettings);
         /// <summary>Initializes a new instance of the <see cref="SubscriptionTypeController"/> class.</summary>
+		Logger.LogDebug("<<< Exiting SubscriptionTypeController(dataService={DataService},hostSettings={HostSettings})", dataService, hostSettings);
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public SubscriptionTypeController()
             : this(null, null)
@@ -36,6 +41,7 @@ namespace DotNetNuke.Services.Social.Subscriptions
         /// <inheritdoc />
         public void AddSubscriptionType(SubscriptionType subscriptionType)
         {
+			Logger.LogDebug(">>> Entering AddSubscriptionType(subscriptionType={SubscriptionType})", subscriptionType);
             Requires.NotNull("subscriptionType", subscriptionType);
 
             subscriptionType.SubscriptionTypeId = this.dataService.AddSubscriptionType(
@@ -44,6 +50,7 @@ namespace DotNetNuke.Services.Social.Subscriptions
                 subscriptionType.DesktopModuleId);
 
             CleanCache();
+			Logger.LogDebug("<<< Exiting AddSubscriptionType(subscriptionType={SubscriptionType})", subscriptionType);
         }
 
         /// <inheritdoc />
@@ -57,11 +64,13 @@ namespace DotNetNuke.Services.Social.Subscriptions
         /// <inheritdoc />
         public IEnumerable<SubscriptionType> GetSubscriptionTypes()
         {
+			Logger.LogDebug(">>> Entering GetSubscriptionTypes()");
             var cacheArgs = new CacheItemArgs(
                 DataCache.SubscriptionTypesCacheKey,
                 DataCache.SubscriptionTypesTimeOut,
                 DataCache.SubscriptionTypesCachePriority);
 
+			Logger.LogDebug("<<< Exiting GetSubscriptionTypes()");
             return CBO.GetCachedObject<IEnumerable<SubscriptionType>>(
                 this.hostSettings,
                 cacheArgs,
@@ -79,22 +88,28 @@ namespace DotNetNuke.Services.Social.Subscriptions
         /// <inheritdoc />
         public void DeleteSubscriptionType(SubscriptionType subscriptionType)
         {
+			Logger.LogDebug(">>> Entering DeleteSubscriptionType(subscriptionType={SubscriptionType})", subscriptionType);
             Requires.NotNull("subscriptionType", subscriptionType);
             Requires.NotNegative("subscriptionType.SubscriptionTypeId", subscriptionType.SubscriptionTypeId);
 
             this.dataService.DeleteSubscriptionType(subscriptionType.SubscriptionTypeId);
             CleanCache();
+			Logger.LogDebug("<<< Exiting DeleteSubscriptionType(subscriptionType={SubscriptionType})", subscriptionType);
         }
 
         /// <inheritdoc />
         protected override Func<ISubscriptionTypeController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => Globals.DependencyProvider.GetRequiredService<ISubscriptionTypeController>();
         }
 
         private static void CleanCache()
         {
+			Logger.LogDebug(">>> Entering CleanCache()");
             DataCache.RemoveCache(DataCache.SubscriptionTypesCacheKey);
+			Logger.LogDebug("<<< Exiting CleanCache()");
         }
     }
 }
