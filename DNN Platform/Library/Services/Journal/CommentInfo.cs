@@ -14,6 +14,7 @@ namespace DotNetNuke.Services.Journal
 
     public class CommentInfo : IHydratable, IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public CacheLevel Cacheability
         {
@@ -56,6 +57,7 @@ namespace DotNetNuke.Services.Journal
         /// <inheritdoc />
         public void Fill(System.Data.IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.CommentId = Null.SetNullInteger(dr["CommentId"]);
             this.JournalId = Null.SetNullInteger(dr["JournalId"]);
             this.Comment = Null.SetNullString(dr["Comment"]);
@@ -64,17 +66,21 @@ namespace DotNetNuke.Services.Journal
             if (!string.IsNullOrEmpty(Null.SetNullString(dr["CommentXML"])))
             {
                 this.CommentXML = new XmlDocument { XmlResolver = null };
+				Logger.LogDebug("Fill(dr={Dr}): this.CommentXML → {Arg1}", dr, this.CommentXML);
                 using var commentReader = XmlReader.Create(new StringReader(dr["CommentXML"].ToString()), new XmlReaderSettings { XmlResolver = null, });
                 this.CommentXML.Load(commentReader);
+				Logger.LogDebug("Fill(dr={Dr}): commentReader → {CommentReader}", dr, commentReader);
             }
 
             this.UserId = Null.SetNullInteger(dr["UserId"]);
             this.DisplayName = Null.SetNullString(dr["DisplayName"]);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
 
         /// <inheritdoc />
         public string GetProperty(string propertyName, string format, System.Globalization.CultureInfo formatProvider, Entities.Users.UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			Logger.LogDebug(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             throw new NotImplementedException();
         }
     }

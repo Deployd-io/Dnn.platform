@@ -24,6 +24,7 @@ using log4net.Core;
 
 namespace log4net.Util
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>A SecurityContext used when a SecurityContext is not required</summary>
     /// <remarks>
     /// <para>
@@ -51,6 +52,8 @@ namespace log4net.Util
         /// </remarks>
         private NullSecurityContext()
         {
+		Logger.LogDebug(">>> Entering NullSecurityContext()");
+		Logger.LogDebug("<<< Exiting NullSecurityContext()");
         }
 
         /// <summary>Impersonate this SecurityContext</summary>
@@ -63,6 +66,8 @@ namespace log4net.Util
         /// </remarks>
         public override IDisposable Impersonate(object state)
         {
+			Logger.LogDebug(">>> Entering Impersonate(state={State})", state);
+			Logger.LogDebug("<<< Exiting Impersonate(state={State})", state);
             return null;
         }
     }

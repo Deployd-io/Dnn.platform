@@ -12,10 +12,13 @@ namespace DotNetNuke.Build.Tasks
     [IsDependentOn(typeof(SetVersion))]
     public sealed class BuildServerSetVersion : FrostingTask<Context>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override void Run(Context context)
         {
+			Logger.LogDebug(">>> Entering Run(context={Context})", context);
             Console.WriteLine($"##vso[build.updatebuildnumber]{context.Version.FullSemVer}.{context.BuildId}");
+			Logger.LogDebug("<<< Exiting Run(context={Context})", context);
         }
     }
 }

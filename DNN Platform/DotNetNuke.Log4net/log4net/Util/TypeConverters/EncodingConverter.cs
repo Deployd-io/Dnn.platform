@@ -23,6 +23,7 @@ using System.Text;
 
 namespace log4net.Util.TypeConverters
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Supports conversion from string to <see cref="Encoding"/> type.
     /// </summary>
@@ -51,6 +52,9 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public bool CanConvertFrom(Type sourceType) 
         {
+			Logger.LogDebug(">>> Entering CanConvertFrom(sourceType={SourceType})", sourceType);
+			Logger.LogDebug(">>> Entering ConvertFrom(source={Source})", source);
+			Logger.LogDebug("<<< Exiting ConvertFrom(source={Source})", source);
             return (sourceType == typeof(string));
         }
 

@@ -19,6 +19,7 @@ namespace DotNetNuke.Entities.Modules
     /// <summary>ModuleControlController provides the Business Layer for Module Controls.</summary>
     public partial class SkinControlController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly DataProvider DataProvider = DataProvider.Instance();
 
         /// <summary>DeleteSkinControl deletes a Skin Control in the database.</summary>
@@ -26,9 +27,11 @@ namespace DotNetNuke.Entities.Modules
         [DnnDeprecated(10, 2, 2, "Use overload taking IEventLogger")]
         public static partial void DeleteSkinControl(SkinControlInfo skinControl)
             => DeleteSkinControl(Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>(), skinControl);
+			Logger.LogDebug(">>> Entering DeleteSkinControl(skinControl={SkinControl})", skinControl);
 
         /// <summary>DeleteSkinControl deletes a Skin Control in the database.</summary>
         /// <param name="eventLogger">The event logger.</param>
+		Logger.LogDebug("<<< Exiting DeleteSkinControl(skinControl={SkinControl})", skinControl);
         /// <param name="skinControl">The Skin Control to delete.</param>
         public static void DeleteSkinControl(IEventLogger eventLogger, SkinControlInfo skinControl)
         {
@@ -49,6 +52,8 @@ namespace DotNetNuke.Entities.Modules
         /// <returns>The <see cref="SkinControlInfo"/> or <see langword="null"/>.</returns>
         public static SkinControlInfo GetSkinControlByPackageID(int packageID)
         {
+			Logger.LogDebug(">>> Entering GetSkinControlByPackageID(packageID={PackageID})", packageID);
+			Logger.LogDebug("<<< Exiting GetSkinControlByPackageID(packageID={PackageID})", packageID);
             return CBO.FillObject<SkinControlInfo>(DataProvider.GetSkinControlByPackageID(packageID));
         }
 
@@ -57,6 +62,8 @@ namespace DotNetNuke.Entities.Modules
         /// <returns>The <see cref="SkinControlInfo"/> or <see langword="null"/>.</returns>
         public static SkinControlInfo GetSkinControlByKey(string key)
         {
+			Logger.LogDebug(">>> Entering GetSkinControlByKey(key={Key})", key);
+			Logger.LogDebug("<<< Exiting GetSkinControlByKey(key={Key})", key);
             return CBO.FillObject<SkinControlInfo>(DataProvider.GetSkinControlByKey(key));
         }
 
@@ -73,6 +80,7 @@ namespace DotNetNuke.Entities.Modules
         [DnnDeprecated(10, 2, 2, "Use overload taking IEventLogger")]
         public static partial int SaveSkinControl(SkinControlInfo skinControl)
             => SaveSkinControl(Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>(), skinControl);
+			Logger.LogDebug(">>> Entering SaveSkinControl(skinControl={SkinControl})", skinControl);
 
         /// <summary>SaveSkinControl updates a Skin Control in the database.</summary>
         /// <param name="eventLogger">The event logger.</param>
@@ -105,6 +113,7 @@ namespace DotNetNuke.Entities.Modules
                 eventLogger.AddLog(skinControl, PortalController.Instance.GetCurrentSettings(), UserController.Instance.GetCurrentUserInfo().UserID, string.Empty, EventLogType.SKINCONTROL_UPDATED);
             }
 
+			Logger.LogDebug("<<< Exiting SaveSkinControl(skinControl={SkinControl})", skinControl);
             return skinControlID;
         }
     }

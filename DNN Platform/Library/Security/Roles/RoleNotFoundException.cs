@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class RoleNotFoundException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public RoleNotFoundException()
     {
+	Logger.LogDebug(">>> Entering RoleNotFoundException()");
+	Logger.LogDebug("<<< Exiting RoleNotFoundException()");
     }
 
     /// <inheritdoc />
     public RoleNotFoundException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering RoleNotFoundException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting RoleNotFoundException(message={Message})", message);
 
     /// <inheritdoc />
     public RoleNotFoundException(string message, Exception innerException)

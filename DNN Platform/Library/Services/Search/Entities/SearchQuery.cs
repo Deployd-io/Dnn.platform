@@ -11,20 +11,31 @@ namespace DotNetNuke.Services.Search.Entities
     [Serializable]
     public class SearchQuery
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="SearchQuery"/> class.</summary>
         public SearchQuery()
         {
+			Logger.LogDebug(">>> Entering SearchQuery()");
             this.Tags = [];
             this.PortalIds = [];
+			Logger.LogDebug("SearchQuery(): this.Tags → {Arg0}", this.Tags);
+			Logger.LogDebug("SearchQuery(): this.PortalIds → {Arg0}", this.PortalIds);
             this.SearchTypeIds = [];
             this.ModuleDefIds = [];
             this.TitleSnippetLength = 60;
+			Logger.LogDebug("SearchQuery(): this.SearchTypeIds → {Arg0}", this.SearchTypeIds);
+			Logger.LogDebug("SearchQuery(): this.ModuleDefIds → {Arg0}", this.ModuleDefIds);
+			Logger.LogDebug("SearchQuery(): this.TitleSnippetLength → {Arg0}", this.TitleSnippetLength);
             this.BodySnippetLength = 100;
             this.PageSize = 10;
             this.PageIndex = 1;
             this.SearchContext = new Dictionary<string, string>();
             this.CustomKeywords = new Dictionary<string, string>();
             this.NumericKeys = new Dictionary<string, int>();
+			Logger.LogDebug("<<< Exiting SearchQuery()");
+			Logger.LogDebug("SearchQuery(): this.BodySnippetLength → {Arg0}", this.BodySnippetLength);
+			Logger.LogDebug("SearchQuery(): this.PageSize → {Arg0}", this.PageSize);
+			Logger.LogDebug("SearchQuery(): this.PageIndex → {Arg0}", this.PageIndex);
         }
 
         /// <summary>Gets or sets a key to uniquely identify a document in the Index.</summary>

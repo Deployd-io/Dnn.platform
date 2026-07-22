@@ -35,13 +35,18 @@ namespace DotNetNuke.Services.Localization
     {
         private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LocalizationProvider));
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+		Logger.LogDebug("LocalizationProvider(hostSettings={HostSettings},appStatus={AppStatus}): Logger → {Logger}", hostSettings, appStatus, Logger);
+		Logger.LogDebug("LocalizationProvider(hostSettings={HostSettings},appStatus={AppStatus}): hostSettings → {HostSettings1}", hostSettings, appStatus, hostSettings);
         private readonly IApplicationStatusInfo appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
 
+		Logger.LogDebug("LocalizationProvider(hostSettings={HostSettings},appStatus={AppStatus}): appStatus → {AppStatus1}", hostSettings, appStatus, appStatus);
         /// <summary>Initializes a new instance of the <see cref="LocalizationProvider"/> class.</summary>
+		Logger.LogDebug("<<< Exiting LocalizationProvider(hostSettings={HostSettings},appStatus={AppStatus})", hostSettings, appStatus);
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public LocalizationProvider()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering LocalizationProvider()");
         }
 
         public enum CustomizedLocale
@@ -59,12 +64,15 @@ namespace DotNetNuke.Services.Localization
         /// <inheritdoc />
         public string GetString(string key, string resourceFileRoot)
         {
+			Logger.LogDebug(">>> Entering GetString(key={Key},resourceFileRoot={ResourceFileRoot})", key, resourceFileRoot);
+			Logger.LogDebug("<<< Exiting GetString(key={Key},resourceFileRoot={ResourceFileRoot})", key, resourceFileRoot);
             return this.GetString(key, resourceFileRoot, null, PortalSettings.Current, false);
         }
 
         /// <inheritdoc />
         public string GetString(string key, string resourceFileRoot, string language)
         {
+			Logger.LogDebug("<<< Exiting GetString(key={Key},resourceFileRoot={ResourceFileRoot},language={Language})", key, resourceFileRoot, language);
             return this.GetString(key, resourceFileRoot, language, PortalSettings.Current, false);
         }
 
@@ -217,14 +225,21 @@ namespace DotNetNuke.Services.Localization
 
         private static object GetCompiledResourceFileCallBack(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogDebug(">>> Entering GetCompiledResourceFileCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             var resourceFile = (string)cacheItemArgs.Params[0];
             var locale = (string)cacheItemArgs.Params[1];
+			Logger.LogDebug("GetCompiledResourceFileCallBack(cacheItemArgs={CacheItemArgs}): resourceFile → {ResourceFile}", cacheItemArgs, resourceFile);
+			Logger.LogDebug("GetCompiledResourceFileCallBack(cacheItemArgs={CacheItemArgs}): locale → {Locale}", cacheItemArgs, locale);
             var portalSettings = (IPortalSettings)cacheItemArgs.Params[2];
             var hostSettings = (IHostSettings)cacheItemArgs.Params[3];
+			Logger.LogDebug("GetCompiledResourceFileCallBack(cacheItemArgs={CacheItemArgs}): portalSettings → {PortalSettings}", cacheItemArgs, portalSettings);
+			Logger.LogDebug("GetCompiledResourceFileCallBack(cacheItemArgs={CacheItemArgs}): hostSettings → {HostSettings}", cacheItemArgs, hostSettings);
             string systemLanguage = Localization.SystemLocale;
             string defaultLanguage = portalSettings.DefaultLanguage;
             string fallbackLanguage = Localization.SystemLocale;
             Locale targetLocale = LocaleController.Instance.GetLocale(locale);
+			Logger.LogDebug("GetCompiledResourceFileCallBack(cacheItemArgs={CacheItemArgs}): fallbackLanguage → {FallbackLanguage}", cacheItemArgs, fallbackLanguage);
+			Logger.LogDebug("GetCompiledResourceFileCallBack(cacheItemArgs={CacheItemArgs}): targetLocale → {TargetLocale}", cacheItemArgs, targetLocale);
             if (!string.IsNullOrEmpty(targetLocale.Fallback))
             {
                 fallbackLanguage = targetLocale.Fallback;
@@ -233,6 +248,7 @@ namespace DotNetNuke.Services.Localization
             // get system default and merge the specific ones one by one
             var res = GetResourceFile(hostSettings, resourceFile);
             if (res == null)
+			Logger.LogDebug("GetCompiledResourceFileCallBack(cacheItemArgs={CacheItemArgs}): res → {Res}", cacheItemArgs, res);
             {
                 return new Dictionary<string, string>();
             }
@@ -263,6 +279,7 @@ namespace DotNetNuke.Services.Localization
                 res = MergeResourceFile(hostSettings, res, GetResourceFileName(resourceFile, locale, portalSettings.PortalId));
             }
 
+			Logger.LogDebug("<<< Exiting GetCompiledResourceFileCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return res;
         }
 
@@ -295,23 +312,30 @@ namespace DotNetNuke.Services.Localization
         /// <param name="nodeValue">The node value (text value to use).</param>
         private static void AddResourceFileNode(ref XmlNode resxRoot, string elementName, string nodeName, string nodeValue)
         {
+			Logger.LogDebug(">>> Entering AddResourceFileNode(resxRoot={ResxRoot},elementName={ElementName},nodeName={NodeName},nodeValue={NodeValue})", resxRoot, elementName, nodeName, nodeValue);
             XmlNode newNode = resxRoot.AddElement(elementName, string.Empty).AddAttribute("name", nodeName);
             if (elementName == "data")
+			Logger.LogDebug("AddResourceFileNode(resxRoot={ResxRoot},elementName={ElementName},nodeName={NodeName},nodeValue={NodeValue}): newNode → {NewNode}", resxRoot, elementName, nodeName, nodeValue, newNode);
             {
                 newNode = newNode.AddAttribute("xml:space", "preserve");
             }
 
             newNode.AddElement("value", nodeValue);
+			Logger.LogDebug("<<< Exiting AddResourceFileNode(resxRoot={ResxRoot},elementName={ElementName},nodeName={NodeName},nodeValue={NodeValue})", resxRoot, elementName, nodeName, nodeValue);
         }
 
         private static object GetResourceFileCallBack(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogDebug(">>> Entering GetResourceFileCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             var hostSettings = (IHostSettings)cacheItemArgs.ParamList[0];
             string cacheKey = cacheItemArgs.CacheKey;
+			Logger.LogDebug("GetResourceFileCallBack(cacheItemArgs={CacheItemArgs}): hostSettings → {HostSettings}", cacheItemArgs, hostSettings);
             Dictionary<string, string> resources = null;
 
+			Logger.LogDebug("GetResourceFileCallBack(cacheItemArgs={CacheItemArgs}): resources → {Resources}", cacheItemArgs, resources);
             string filePath = null;
             try
+			Logger.LogDebug("GetResourceFileCallBack(cacheItemArgs={CacheItemArgs}): filePath → {FilePath}", cacheItemArgs, filePath);
             {
                 // Get resource file lookup to determine if the resource file even exists
                 SharedDictionary<string, bool> resourceFileExistsLookup = GetResourceFileLookupDictionary(hostSettings);
@@ -343,6 +367,7 @@ namespace DotNetNuke.Services.Localization
                             using (var xmlReader = XmlReader.Create(filePath))
                             {
                                 doc = new XPathDocument(xmlReader);
+								Logger.LogDebug("GetResourceFileCallBack(cacheItemArgs={CacheItemArgs}): doc → {Doc}", cacheItemArgs, doc);
                             }
 
                             resources = new Dictionary<string, string>();
@@ -352,6 +377,7 @@ namespace DotNetNuke.Services.Localization
                                 {
                                     var selectSingleNode = nav.SelectSingleNode("value");
                                     if (selectSingleNode != null)
+									Logger.LogDebug("GetResourceFileCallBack(cacheItemArgs={CacheItemArgs}): selectSingleNode → {SelectSingleNode}", cacheItemArgs, selectSingleNode);
                                     {
                                         resources[nav.GetAttribute("name", string.Empty)] = selectSingleNode.Value;
                                     }
@@ -379,9 +405,12 @@ namespace DotNetNuke.Services.Localization
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in LocalizationProvider(hostSettings={HostSettings},appStatus={AppStatus}): {Arg2}", hostSettings, appStatus, ex.Message);
+				Logger.LogError("Exception in GetResourceFileCallBack(cacheItemArgs={CacheItemArgs}): {Arg1}", cacheItemArgs, ex.Message);
                 throw new ResourceFileException($"The following resource file caused an error while reading: {filePath}", ex);
             }
 
+			Logger.LogDebug("<<< Exiting GetResourceFileCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return resources;
         }
 
@@ -406,9 +435,12 @@ namespace DotNetNuke.Services.Localization
 
         private static string GetResourceFileNameHost(string resourceFileRoot, string language)
         {
+			Logger.LogDebug(">>> Entering GetResourceFileNameHost(resourceFileRoot={ResourceFileRoot},language={Language})", resourceFileRoot, language);
             string resourceFile = GetResourceFileName(resourceFileRoot, language);
             resourceFile = resourceFile.Replace(".resx", ".Host.resx");
+			Logger.LogDebug("GetResourceFileNameHost(resourceFileRoot={ResourceFileRoot},language={Language}): resourceFile → {ResourceFile}", resourceFileRoot, language, resourceFile);
 
+			Logger.LogDebug("<<< Exiting GetResourceFileNameHost(resourceFileRoot={ResourceFileRoot},language={Language})", resourceFileRoot, language);
             return resourceFile;
         }
 
@@ -420,6 +452,7 @@ namespace DotNetNuke.Services.Localization
                 resourceFile = resourceFile.Replace(".resx", ".Portal-" + portalId + ".resx");
             }
 
+			Logger.LogDebug("<<< Exiting GetResourceFileName(resourceFileRoot={ResourceFileRoot},language={Language})", resourceFileRoot, language);
             return resourceFile;
         }
 

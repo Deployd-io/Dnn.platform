@@ -57,14 +57,22 @@ namespace Dnn.ExportImport.Components.Services
     public class PagesExportService(IBusinessControllerProvider businessControllerProvider, IPortalAliasService portalAliasService, IApplicationStatusInfo appStatus, IEventLogger eventLogger, IHostSettings hostSettings)
         : BasePortableService
     {
+		Logger.LogDebug(">>> Entering PagesExportService(businessControllerProvider={BusinessControllerProvider},portalAliasService={PortalAliasService},appStatus={AppStatus},eventLogger={EventLogger},hostSettings={HostSettings})", businessControllerProvider, portalAliasService, appStatus, eventLogger, hostSettings);
         private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ExportImportEngine));
 
+		Logger.LogDebug("PagesExportService(businessControllerProvider={BusinessControllerProvider},portalAliasService={PortalAliasService},appStatus={AppStatus},eventLogger={EventLogger},hostSettings={HostSettings}): Logger → {Logger}", businessControllerProvider, portalAliasService, appStatus, eventLogger, hostSettings, Logger);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         private readonly IBusinessControllerProvider businessControllerProvider = businessControllerProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<IBusinessControllerProvider>();
         private readonly IPortalAliasService portalAliasService = portalAliasService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalAliasService>();
+		Logger.LogDebug("PagesExportService(businessControllerProvider={BusinessControllerProvider},portalAliasService={PortalAliasService},appStatus={AppStatus},eventLogger={EventLogger},hostSettings={HostSettings}): businessControllerProvider → {BusinessControllerProvider1}", businessControllerProvider, portalAliasService, appStatus, eventLogger, hostSettings, businessControllerProvider);
+		Logger.LogDebug("PagesExportService(businessControllerProvider={BusinessControllerProvider},portalAliasService={PortalAliasService},appStatus={AppStatus},eventLogger={EventLogger},hostSettings={HostSettings}): portalAliasService → {PortalAliasService1}", businessControllerProvider, portalAliasService, appStatus, eventLogger, hostSettings, portalAliasService);
         private readonly IApplicationStatusInfo appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
         private readonly IEventLogger eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+		Logger.LogDebug("PagesExportService(businessControllerProvider={BusinessControllerProvider},portalAliasService={PortalAliasService},appStatus={AppStatus},eventLogger={EventLogger},hostSettings={HostSettings}): appStatus → {AppStatus1}", businessControllerProvider, portalAliasService, appStatus, eventLogger, hostSettings, appStatus);
+		Logger.LogDebug("PagesExportService(businessControllerProvider={BusinessControllerProvider},portalAliasService={PortalAliasService},appStatus={AppStatus},eventLogger={EventLogger},hostSettings={HostSettings}): eventLogger → {EventLogger1}", businessControllerProvider, portalAliasService, appStatus, eventLogger, hostSettings, eventLogger);
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
         private ProgressTotals totals;
+		Logger.LogDebug("PagesExportService(businessControllerProvider={BusinessControllerProvider},portalAliasService={PortalAliasService},appStatus={AppStatus},eventLogger={EventLogger},hostSettings={HostSettings}): hostSettings → {HostSettings1}", businessControllerProvider, portalAliasService, appStatus, eventLogger, hostSettings, hostSettings);
         private DataProvider dataProvider;
         private ITabController tabController;
         private IModuleController moduleController;
@@ -89,6 +97,8 @@ namespace Dnn.ExportImport.Components.Services
         public PagesExportService(IBusinessControllerProvider businessControllerProvider)
             : this(businessControllerProvider, null, null, null)
         {
+		Logger.LogInformation("PagesExportService(businessControllerProvider,portalAliasService,appStatus,eventLogger,hostSettings)={BusinessControllerProvider},{PortalAliasService},{AppStatus},{EventLogger},{HostSettings}: update query executed in {Arg5} ms", businessControllerProvider, portalAliasService, appStatus, eventLogger, hostSettings, __logStart.ElapsedMilliseconds);
+		Logger.LogDebug("<<< Exiting PagesExportService(businessControllerProvider={BusinessControllerProvider},portalAliasService={PortalAliasService},appStatus={AppStatus},eventLogger={EventLogger},hostSettings={HostSettings})", businessControllerProvider, portalAliasService, appStatus, eventLogger, hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PagesExportService"/> class.</summary>
@@ -124,11 +134,14 @@ namespace Dnn.ExportImport.Components.Services
         /// <param name="repository">The repository.</param>
         public static void ResetContentsFlag(ExportImportRepository repository)
         {
+			Logger.LogDebug(">>> Entering ResetContentsFlag(repository={Repository})", repository);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             // reset restored flag; if it same extracted db is reused, then content will be restored
             var toSkip = 0;
             const int batchSize = 100;
             var totalCount = repository.GetCount<ExportModuleContent>();
             while (totalCount > 0)
+			Logger.LogDebug("ResetContentsFlag(repository={Repository}): totalCount → {TotalCount}", repository, totalCount);
             {
                 var items = repository.GetAllItems<ExportModuleContent>(skip: toSkip, max: batchSize)
                     .Where(item => item.IsRestored).ToList();
@@ -136,16 +149,20 @@ namespace Dnn.ExportImport.Components.Services
                 {
                     items.ForEach(item => item.IsRestored = false);
                     repository.UpdateItems(items);
+					Logger.LogInformation("PagesExportService(businessControllerProvider,portalAliasService,appStatus,eventLogger,hostSettings)={BusinessControllerProvider},{PortalAliasService},{AppStatus},{EventLogger},{HostSettings}: update query executed in {Arg5} ms", businessControllerProvider, portalAliasService, appStatus, eventLogger, hostSettings, __logStart.ElapsedMilliseconds);
                 }
+				Logger.LogInformation("ResetContentsFlag(repository)={Repository}: update query executed in {Arg1} ms", repository, __logStart.ElapsedMilliseconds);
 
                 toSkip += batchSize;
                 totalCount -= batchSize;
             }
+			Logger.LogDebug("<<< Exiting ResetContentsFlag(repository={Repository})", repository);
         }
 
         /// <inheritdoc />
         public override void ExportData(ExportImportJob exportJob, ExportDto exportDto)
         {
+			Logger.LogDebug(">>> Entering ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
             if (this.CheckPoint.Stage > 0)
             {
                 return;
@@ -158,24 +175,35 @@ namespace Dnn.ExportImport.Components.Services
 
             var checkedPages = exportDto.Pages.Where(p => p.CheckedState == TriCheckedState.Checked || p.CheckedState == TriCheckedState.CheckedWithAllChildren);
             if (checkedPages.Any())
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): checkedPages → {CheckedPages}", exportJob, exportDto, checkedPages);
             {
                 this.exportImportJob = exportJob;
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): exportImportJob → {ExportImportJob}", exportJob, exportDto, exportImportJob);
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): this.exportImportJob → {Arg2}", exportJob, exportDto, this.exportImportJob);
                 this.exportDto = exportDto;
                 this.tabController = TabController.Instance;
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): exportDto → {ExportDto1}", exportJob, exportDto, exportDto);
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): this.exportDto → {Arg2}", exportJob, exportDto, this.exportDto);
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): tabController → {TabController}", exportJob, exportDto, tabController);
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): this.tabController → {Arg2}", exportJob, exportDto, this.tabController);
                 this.moduleController = ModuleController.Instance;
                 this.ProcessExportPages();
             }
 
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): moduleController → {ModuleController}", exportJob, exportDto, moduleController);
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): this.moduleController → {Arg2}", exportJob, exportDto, this.moduleController);
             this.CheckPoint.Progress = 100;
             this.CheckPoint.Completed = true;
             this.CheckPoint.Stage++;
             this.CheckPoint.StageData = null;
             this.CheckPointStageCallback(this);
+			Logger.LogDebug("<<< Exiting ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
         }
 
         /// <inheritdoc />
         public override void ImportData(ExportImportJob importJob, ImportDto importDto)
         {
+			Logger.LogDebug(">>> Entering ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
             if (this.CheckPoint.Stage > 0)
             {
                 return;
@@ -187,8 +215,17 @@ namespace Dnn.ExportImport.Components.Services
             }
 
             this.exportImportJob = importJob;
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): exportImportJob → {ExportImportJob}", importJob, importDto, exportImportJob);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): this.exportImportJob → {Arg2}", importJob, importDto, this.exportImportJob);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): exportDto → {ExportDto}", importJob, importDto, exportDto);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): this.exportDto → {Arg2}", importJob, importDto, this.exportDto);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): tabController → {TabController}", importJob, importDto, tabController);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): this.tabController → {Arg2}", importJob, importDto, this.tabController);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): moduleController → {ModuleController}", importJob, importDto, moduleController);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): this.moduleController → {Arg2}", importJob, importDto, this.moduleController);
             this.ImportDto = importDto;
             this.exportDto = importDto.ExportDto;
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): this.ImportDto → {Arg2}", importJob, importDto, this.ImportDto);
             this.tabController = TabController.Instance;
             this.moduleController = ModuleController.Instance;
 
@@ -199,11 +236,14 @@ namespace Dnn.ExportImport.Components.Services
             this.CheckPoint.Stage++;
             this.CheckPoint.StageData = null;
             this.CheckPointStageCallback(this);
+			Logger.LogDebug("<<< Exiting ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
         }
 
         /// <inheritdoc />
         public override int GetImportTotal()
         {
+			Logger.LogDebug(">>> Entering GetImportTotal()");
+			Logger.LogDebug("<<< Exiting GetImportTotal()");
             return this.Repository.GetCount<ExportTab>(x => x.IsSystem == this.IncludeSystem);
         }
 
@@ -409,6 +449,7 @@ namespace Dnn.ExportImport.Components.Services
             }
 
             this.UpdateParentInPartialImportTabs(localTab, otherTab, portalId, exportedTabs, localTabs);
+			Logger.LogDebug("<<< Exiting ProcessImportPage(otherTab={OtherTab},exportedTabs={ExportedTabs},localTabs={LocalTabs},referenceTabs={ReferenceTabs})", otherTab, exportedTabs, localTabs, referenceTabs);
         }
 
         private static int TryFindLocalParentTabId(ExportTab exportedTab, IEnumerable<ExportTab> exportedTabs, IEnumerable<TabInfo> localTabs)
@@ -457,6 +498,8 @@ namespace Dnn.ExportImport.Components.Services
             sourceCultureCode = !string.IsNullOrWhiteSpace(sourceCultureCode) ? sourceCultureCode : Localization.SystemLocale;
             targetCultureCode = !string.IsNullOrWhiteSpace(targetCultureCode) ? targetCultureCode : Localization.SystemLocale;
 
+			Logger.LogDebug("IsSameCulture(sourceCultureCode={SourceCultureCode},targetCultureCode={TargetCultureCode}): targetCultureCode → {TargetCultureCode1}", sourceCultureCode, targetCultureCode, targetCultureCode);
+			Logger.LogDebug("<<< Exiting IsSameCulture(sourceCultureCode={SourceCultureCode},targetCultureCode={TargetCultureCode})", sourceCultureCode, targetCultureCode);
             return sourceCultureCode == targetCultureCode;
         }
 
@@ -637,15 +680,19 @@ namespace Dnn.ExportImport.Components.Services
 
         private void ProcessImportPages()
         {
+			Logger.LogDebug(">>> Entering ProcessImportPages()");
             this.dataProvider = DataProvider.Instance();
             this.totals = string.IsNullOrEmpty(this.CheckPoint.StageData)
                 ? new ProgressTotals()
                 : JsonConvert.DeserializeObject<ProgressTotals>(this.CheckPoint.StageData);
+				Logger.LogDebug("ProcessImportPages(): totals → {Totals}", totals);
+				Logger.LogDebug("ProcessImportPages(): dataProvider → {DataProvider}", dataProvider);
 
             var portalId = this.exportImportJob.PortalId;
 
             var localTabs = this.tabController.GetTabsByPortal(portalId).Values.ToList();
 
+			Logger.LogDebug("ProcessImportPages(): localTabs → {LocalTabs}", localTabs);
             var exportedTabs = this.Repository.GetItems<ExportTab>(x => x.IsSystem == (this.Category == Constants.Category_Templates))
                 .OrderBy(t => t.Level).ThenBy(t => t.ParentId).ThenBy(t => t.TabOrder).ToList();
 
@@ -658,9 +705,11 @@ namespace Dnn.ExportImport.Components.Services
 
             var progressStep = 100.0 / exportedTabs.OrderByDescending(x => x.Id).Count(x => x.Id < this.totals.LastProcessedId);
 
+			Logger.LogDebug("ProcessImportPages(): progressStep → {ProgressStep}", progressStep);
             var index = 0;
             var referenceTabs = new List<int>();
             this.importContentList.Clear();
+			Logger.LogDebug("ProcessImportPages(): referenceTabs → {ReferenceTabs}", referenceTabs);
             foreach (var otherTab in exportedTabs)
             {
                 if (this.CheckCancelled(this.exportImportJob))
@@ -691,6 +740,7 @@ namespace Dnn.ExportImport.Components.Services
 
             this.searchedParentTabs.Clear();
             this.ReportImportTotals();
+			Logger.LogDebug("<<< Exiting ProcessImportPages()");
         }
 
         /// <summary>Updates the default language unique identifier for the local page.</summary>
@@ -735,6 +785,7 @@ namespace Dnn.ExportImport.Components.Services
             }
 
             localTab.DefaultLanguageGuid = exportedTab.DefaultLanguageGuid ?? Null.NullGuid;
+			Logger.LogDebug("<<< Exiting UpdateDefaultLanguageGuid(portalId={PortalId},localTab={LocalTab},exportedTab={ExportedTab},exportedTabs={ExportedTabs})", portalId, localTab, exportedTab, exportedTabs);
         }
 
         private void TriggerImportEvent(TabInfo localTab)
@@ -1014,6 +1065,7 @@ namespace Dnn.ExportImport.Components.Services
         {
             var count = 0;
             var exportedModules = this.Repository.GetRelatedItems<ExportModule>(otherTab.Id).ToList();
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var exportedTabModules = this.Repository.GetRelatedItems<ExportTabModule>(otherTab.Id)
                 .OrderBy(m => m.PaneName?.ToLowerInvariant()).ThenBy(m => m.ModuleOrder).ToList();
             var localExportModules = isNew ? new List<ExportModule>()
@@ -1344,12 +1396,15 @@ namespace Dnn.ExportImport.Components.Services
         */
         private void UpdateModuleWithIsDeletedHandling(ExportTabModule exportTabModule, ExportModule exportModule, ModuleInfo importModule)
         {
+			Logger.LogDebug(">>> Entering UpdateModuleWithIsDeletedHandling(exportTabModule={ExportTabModule},exportModule={ExportModule},importModule={ImportModule})", exportTabModule, exportModule, importModule);
             importModule.IsDeleted = exportModule.IsDeleted;
             this.ActionInWorkflowlessContext(importModule.TabID, () =>
             {
+			Logger.LogDebug("UpdateModuleWithIsDeletedHandling(exportTabModule={ExportTabModule},exportModule={ExportModule},importModule={ImportModule}): importModule.IsDeleted → {Arg3}", exportTabModule, exportModule, importModule, importModule.IsDeleted);
                 this.moduleController.UpdateModule(importModule);
             });
             importModule.IsDeleted = exportTabModule.IsDeleted;
+			Logger.LogDebug("<<< Exiting UpdateModuleWithIsDeletedHandling(exportTabModule={ExportTabModule},exportModule={ExportModule},importModule={ImportModule})", exportTabModule, exportModule, importModule);
         }
 
         private int ImportModuleSettings(ModuleInfo localModule, ExportModule otherModule, bool isNew)
@@ -1478,6 +1533,7 @@ namespace Dnn.ExportImport.Components.Services
 
         private int ImportPortableContent(int tabId, ModuleInfo localModule, ExportModule otherModule, bool isNew)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var exportedContent = this.Repository.FindItems<ExportModuleContent>(m => m.ModuleID == otherModule.ModuleID).ToList();
             if (exportedContent.Count <= 0)
             {
@@ -1584,6 +1640,7 @@ namespace Dnn.ExportImport.Components.Services
 
         private void ActionInWorkflowlessContext(int tabId, Action action)
         {
+			Logger.LogDebug(">>> Entering ActionInWorkflowlessContext(tabId={TabId},action={Action})", tabId, action);
             bool versionEnabledPortalLevel, versionEnabledTabLevel, workflowEnabledPortalLevel, workflowEnabledTabLevel;
             this.DisableVersioning(tabId, out versionEnabledPortalLevel, out versionEnabledTabLevel, out workflowEnabledPortalLevel, out workflowEnabledTabLevel);
 
@@ -1595,6 +1652,7 @@ namespace Dnn.ExportImport.Components.Services
             {
                 this.RestoreVersioning(tabId, versionEnabledPortalLevel, versionEnabledTabLevel, workflowEnabledPortalLevel, workflowEnabledTabLevel);
             }
+			Logger.LogDebug("<<< Exiting ActionInWorkflowlessContext(tabId={TabId},action={Action})", tabId, action);
         }
 
         private void DisableVersioning(
@@ -1632,17 +1690,23 @@ namespace Dnn.ExportImport.Components.Services
 
         private int ImportTabModuleSettings(ModuleInfo localTabModule, ExportTabModule otherTabModule, bool isNew)
         {
+			Logger.LogDebug(">>> Entering ImportTabModuleSettings(localTabModule={LocalTabModule},otherTabModule={OtherTabModule},isNew={IsNew})", localTabModule, otherTabModule, isNew);
             var count = 0;
             var tabModuleSettings = this.Repository.GetRelatedItems<ExportTabModuleSetting>(otherTabModule.Id).ToList();
+			Logger.LogDebug("ImportTabModuleSettings(localTabModule={LocalTabModule},otherTabModule={OtherTabModule},isNew={IsNew}): count → {Count}", localTabModule, otherTabModule, isNew, count);
+			Logger.LogDebug("ImportTabModuleSettings(localTabModule={LocalTabModule},otherTabModule={OtherTabModule},isNew={IsNew}): tabModuleSettings → {TabModuleSettings}", localTabModule, otherTabModule, isNew, tabModuleSettings);
             foreach (var other in tabModuleSettings)
             {
                 var localValue = isNew ? string.Empty : Convert.ToString(localTabModule.TabModuleSettings[other.SettingName], CultureInfo.InvariantCulture);
                 if (string.IsNullOrEmpty(localValue))
+				Logger.LogDebug("ImportTabModuleSettings(localTabModule={LocalTabModule},otherTabModule={OtherTabModule},isNew={IsNew}): localValue → {LocalValue}", localTabModule, otherTabModule, isNew, localValue);
                 {
                     // the next will clear the cache
                     this.moduleController.UpdateTabModuleSetting(localTabModule.TabModuleID, other.SettingName, other.SettingValue);
                     var createdBy = Util.GetUserIdByName(this.exportImportJob, other.CreatedByUserID, other.CreatedByUserName);
                     var modifiedBy = Util.GetUserIdByName(this.exportImportJob, other.LastModifiedByUserID, other.LastModifiedByUserName);
+					Logger.LogDebug("ImportTabModuleSettings(localTabModule={LocalTabModule},otherTabModule={OtherTabModule},isNew={IsNew}): createdBy → {CreatedBy}", localTabModule, otherTabModule, isNew, createdBy);
+					Logger.LogDebug("ImportTabModuleSettings(localTabModule={LocalTabModule},otherTabModule={OtherTabModule},isNew={IsNew}): modifiedBy → {ModifiedBy}", localTabModule, otherTabModule, isNew, modifiedBy);
                     this.dataProvider.UpdateSettingRecordChangers(
                         "TabModuleSettings",
                         "TabModuleID",
@@ -1689,6 +1753,7 @@ namespace Dnn.ExportImport.Components.Services
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ImportTabModuleSettings(localTabModule={LocalTabModule},otherTabModule={OtherTabModule},isNew={IsNew})", localTabModule, otherTabModule, isNew);
             return count;
         }
 
@@ -1739,25 +1804,33 @@ namespace Dnn.ExportImport.Components.Services
 
         private void UpdateTabUniqueId(int tabId, Guid uniqueId)
         {
+			Logger.LogDebug(">>> Entering UpdateTabUniqueId(tabId={TabId},uniqueId={UniqueId})", tabId, uniqueId);
             this.dataProvider.UpdateUniqueId("Tabs", "TabID", tabId, uniqueId);
+			Logger.LogDebug("<<< Exiting UpdateTabUniqueId(tabId={TabId},uniqueId={UniqueId})", tabId, uniqueId);
         }
 
         private void UpdateModuleUniqueId(int tabModuleId, Guid uniqueId)
         {
+			Logger.LogDebug(">>> Entering UpdateModuleUniqueId(tabModuleId={TabModuleId},uniqueId={UniqueId})", tabModuleId, uniqueId);
             this.dataProvider.UpdateUniqueId("TabModules", "TabModuleID", tabModuleId, uniqueId);
+			Logger.LogDebug("<<< Exiting UpdateModuleUniqueId(tabModuleId={TabModuleId},uniqueId={UniqueId})", tabModuleId, uniqueId);
         }
 
         private void ProcessExportPages()
         {
+			Logger.LogDebug(">>> Entering ProcessExportPages()");
             var selectedPages = this.exportDto.Pages;
             this.totals = string.IsNullOrEmpty(this.CheckPoint.StageData)
                 ? new ProgressTotals()
                 : JsonConvert.DeserializeObject<ProgressTotals>(this.CheckPoint.StageData);
+				Logger.LogDebug("ProcessExportPages(): totals → {Totals}", totals);
 
             var portalId = this.exportImportJob.PortalId;
 
             var toDate = this.exportImportJob.CreatedOnDate.ToLocalTime();
             var fromDate = (this.exportDto.FromDateUtc ?? Constants.MinDbTime).ToLocalTime();
+			Logger.LogDebug("ProcessExportPages(): toDate → {ToDate}", toDate);
+			Logger.LogDebug("ProcessExportPages(): fromDate → {FromDate}", fromDate);
             var isAllIncluded =
                 selectedPages.Any(p => p.TabId == -1 && p.CheckedState == TriCheckedState.CheckedWithAllChildren);
 
@@ -1783,6 +1856,7 @@ namespace Dnn.ExportImport.Components.Services
                 ? allTabs.Length
                 : allTabs.Count(otherPg => IsTabIncluded(otherPg, allTabs, selectedPages));
 
+			Logger.LogDebug("ProcessExportPages(): otherPg → {OtherPg}", otherPg);
             // Note: We assume no new tabs were added while running; otherwise, some tabs might get skipped.
             for (var index = 0; index < allTabs.Length; index++)
             {
@@ -1801,11 +1875,13 @@ namespace Dnn.ExportImport.Components.Services
                 {
                     var tab = this.tabController.GetTab(otherPg.TabID, portalId);
 
+					Logger.LogDebug("ProcessExportPages(): tab → {Tab}", tab);
                     // Do not export tab which has never been published.
                     if (tab.HasBeenPublished)
                     {
                         var exportPage = this.SaveExportPage(tab);
 
+						Logger.LogDebug("ProcessExportPages(): exportPage → {ExportPage}", exportPage);
                         this.totals.TotalTabSettings +=
                             this.ExportTabSettings(exportPage, toDate, fromDate);
 
@@ -1840,12 +1916,14 @@ namespace Dnn.ExportImport.Components.Services
 
             this.ReportExportTotals();
             this.UpdateTotalProcessedPackages();
+			Logger.LogDebug("<<< Exiting ProcessExportPages()");
         }
 
         private int ExportTabSettings(ExportTab exportPage, DateTime toDate, DateTime? fromDate)
         {
             var tabSettings = EntitiesController.Instance.GetTabSettings(exportPage.TabId, toDate, fromDate);
             if (tabSettings.Count > 0)
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             {
                 this.Repository.CreateItems(tabSettings, exportPage.Id);
             }
@@ -1855,6 +1933,7 @@ namespace Dnn.ExportImport.Components.Services
 
         private int ExportTabPermissions(ExportTab exportPage, DateTime toDate, DateTime? fromDate)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (!this.exportDto.IncludePermissions)
             {
                 return 0;
@@ -1873,6 +1952,7 @@ namespace Dnn.ExportImport.Components.Services
         {
             var tabUrls = EntitiesController.Instance.GetTabUrls(exportPage.TabId, toDate, fromDate);
             if (tabUrls.Count > 0)
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             {
                 this.Repository.CreateItems(tabUrls, exportPage.Id);
             }
@@ -1884,6 +1964,7 @@ namespace Dnn.ExportImport.Components.Services
         {
             var tabModules = EntitiesController.Instance.GetTabModules(exportPage.TabId, includeDeleted, toDate, fromDate);
             if (tabModules.Count > 0)
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             {
                 this.Repository.CreateItems(tabModules, exportPage.Id);
             }
@@ -1895,6 +1976,7 @@ namespace Dnn.ExportImport.Components.Services
         {
             var tabModuleSettings = EntitiesController.Instance.GetTabModuleSettings(exportPage.TabId, includeDeleted, toDate, fromDate);
             if (tabModuleSettings.Count > 0)
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             {
                 this.Repository.CreateItems(tabModuleSettings, exportPage.Id);
             }
@@ -1906,6 +1988,7 @@ namespace Dnn.ExportImport.Components.Services
         {
             var modules = EntitiesController.Instance.GetModules(exportPage.TabId, this.exportDto.IncludeDeletions, toDate, fromDate);
             if (modules.Count > 0)
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             {
                 this.Repository.CreateItems(modules, exportPage.Id);
                 foreach (var exportModule in modules)
@@ -1932,21 +2015,29 @@ namespace Dnn.ExportImport.Components.Services
 
         private int ExportModulePackage(ExportModule exportModule)
         {
+			Logger.LogDebug(">>> Entering ExportModulePackage(exportModule={ExportModule})", exportModule);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (!this.exportedModuleDefinitions.Contains(exportModule.ModuleDefID) && this.exportDto.IncludeExtensions)
             {
                 var packageZipFile = $"{this.appStatus.ApplicationMapPath}{Constants.ExportFolder}{this.exportImportJob.Directory.TrimEnd('\\', '/')}\\{Constants.ExportZipPackages}";
                 var moduleDefinition = ModuleDefinitionController.GetModuleDefinitionByID(exportModule.ModuleDefID);
+				Logger.LogDebug("ExportModulePackage(exportModule={ExportModule}): packageZipFile → {PackageZipFile}", exportModule, packageZipFile);
+				Logger.LogDebug("ExportModulePackage(exportModule={ExportModule}): moduleDefinition → {ModuleDefinition}", exportModule, moduleDefinition);
                 var desktopModuleId = moduleDefinition.DesktopModuleID;
                 var desktopModule = DesktopModuleController.GetDesktopModule(this.hostSettings, desktopModuleId, Null.NullInteger);
                 var package = PackageController.Instance.GetExtensionPackage(Null.NullInteger, p => p.PackageID == desktopModule.PackageID);
+				Logger.LogDebug("ExportModulePackage(exportModule={ExportModule}): desktopModule → {DesktopModule}", exportModule, desktopModule);
+				Logger.LogDebug("ExportModulePackage(exportModule={ExportModule}): package → {Package}", exportModule, package);
 
                 var filePath = InstallerUtil.GetPackageBackupPath(package);
                 if (File.Exists(filePath))
+				Logger.LogDebug("ExportModulePackage(exportModule={ExportModule}): filePath → {FilePath}", exportModule, filePath);
                 {
                     try
                     {
                         var offset = Path.GetDirectoryName(filePath)?.Length + 1;
                         CompressionUtil.AddFileToArchive(filePath, packageZipFile, offset.GetValueOrDefault(0));
+						Logger.LogDebug("ExportModulePackage(exportModule={ExportModule}): offset → {Offset}", exportModule, offset);
 
                         this.Repository.CreateItem(
                             new ExportPackage
@@ -1957,6 +2048,7 @@ namespace Dnn.ExportImport.Components.Services
                                 PackageFileName = InstallerUtil.GetPackageBackupName(package),
                             },
                             null);
+							Logger.LogInformation("ExportModulePackage(exportModule)={ExportModule}: database query executed in {Arg1} ms", exportModule, __logStart.ElapsedMilliseconds);
 
                         this.exportedModuleDefinitions.Add(exportModule.ModuleDefID);
                         return 1;
@@ -1969,6 +2061,7 @@ namespace Dnn.ExportImport.Components.Services
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ExportModulePackage(exportModule={ExportModule})", exportModule);
             return 0;
         }
 
@@ -1976,6 +2069,7 @@ namespace Dnn.ExportImport.Components.Services
         {
             var moduleSettings = EntitiesController.Instance.GetModuleSettings(exportModule.ModuleID, toDate, fromDate);
             if (moduleSettings.Count > 0)
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             {
                 this.Repository.CreateItems(moduleSettings, exportModule.Id);
             }
@@ -1987,6 +2081,7 @@ namespace Dnn.ExportImport.Components.Services
         {
             var modulePermission = EntitiesController.Instance.GetModulePermissions(exportModule.ModuleID, toDate, fromDate);
             if (modulePermission.Count > 0)
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             {
                 this.Repository.CreateItems(modulePermission, exportModule.Id);
             }
@@ -1998,6 +2093,7 @@ namespace Dnn.ExportImport.Components.Services
         // ReSharper disable once UnusedParameter.Local
         private int ExportPortableContent(ExportTab exportPage, ExportModule exportModule, DateTime toDate, DateTime? fromDat)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             // check if module's content was exported before
             var existingItems = this.Repository.FindItems<ExportModuleContent>(m => m.ModuleID == exportModule.ModuleID);
             if (existingItems.Any())
@@ -2059,6 +2155,7 @@ namespace Dnn.ExportImport.Components.Services
 
         private ExportTab SaveExportPage(TabInfo tab)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var exportPage = new ExportTab
             {
                 TabId = tab.TabID,
@@ -2107,16 +2204,21 @@ namespace Dnn.ExportImport.Components.Services
 
         private void ReportExportTotals()
         {
+			Logger.LogDebug(">>> Entering ReportExportTotals()");
             this.ReportTotals("Exported");
+			Logger.LogDebug("<<< Exiting ReportExportTotals()");
         }
 
         private void ReportImportTotals()
         {
+			Logger.LogDebug(">>> Entering ReportImportTotals()");
             this.ReportTotals("Imported");
+			Logger.LogDebug("<<< Exiting ReportImportTotals()");
         }
 
         private void ReportTotals(string prefix)
         {
+			Logger.LogDebug(">>> Entering ReportTotals(prefix={Prefix})", prefix);
             this.Result.AddSummary(prefix + " Tabs", this.totals.TotalTabs.ToString(CultureInfo.InvariantCulture));
             this.Result.AddLogEntry(prefix + " Tab Settings", this.totals.TotalTabSettings.ToString(CultureInfo.InvariantCulture));
             this.Result.AddLogEntry(prefix + " Tab Permissions", this.totals.TotalTabPermissions.ToString(CultureInfo.InvariantCulture));
@@ -2127,10 +2229,12 @@ namespace Dnn.ExportImport.Components.Services
             this.Result.AddLogEntry(prefix + " Tab Modules", this.totals.TotalTabModules.ToString(CultureInfo.InvariantCulture));
             this.Result.AddLogEntry(prefix + " Tab Module Settings", this.totals.TotalTabModuleSettings.ToString(CultureInfo.InvariantCulture));
             this.Result.AddLogEntry(prefix + " Module Packages", this.totals.TotalPackages.ToString(CultureInfo.InvariantCulture));
+			Logger.LogDebug("<<< Exiting ReportTotals(prefix={Prefix})", prefix);
         }
 
         private void UpdateTotalProcessedPackages()
         {
+			Logger.LogDebug(">>> Entering UpdateTotalProcessedPackages()");
             // HACK: get skin packages checkpoint and add "totals.TotalPackages" to it
             var packagesCheckpoint = EntitiesController.Instance.GetJobChekpoints(this.exportImportJob.JobId).FirstOrDefault(
                 cp => cp.Category == Constants.Category_Packages);
@@ -2141,12 +2245,15 @@ namespace Dnn.ExportImport.Components.Services
                 packagesCheckpoint.ProcessedItems += this.totals.TotalPackages;
                 EntitiesController.Instance.UpdateJobChekpoint(packagesCheckpoint);
             }
+			Logger.LogDebug("<<< Exiting UpdateTotalProcessedPackages()");
         }
 
         private int GetLocalStateId(int exportedStateId)
         {
+			Logger.LogDebug(">>> Entering GetLocalStateId(exportedStateId={ExportedStateId})", exportedStateId);
             var exportWorkflowState = this.Repository.GetItem<ExportWorkflowState>(item => item.StateID == exportedStateId);
             var stateId = exportWorkflowState?.LocalId ?? Null.NullInteger;
+			Logger.LogDebug("GetLocalStateId(exportedStateId={ExportedStateId}): exportWorkflowState → {ExportWorkflowState}", exportedStateId, exportWorkflowState);
             if (stateId <= 0)
             {
                 return stateId;
@@ -2154,16 +2261,19 @@ namespace Dnn.ExportImport.Components.Services
 
             var state = WorkflowStateManager.Instance.GetWorkflowState(stateId);
             if (state == null)
+			Logger.LogDebug("GetLocalStateId(exportedStateId={ExportedStateId}): state → {State}", exportedStateId, state);
             {
                 return -1;
             }
 
             var workflow = WorkflowManager.Instance.GetWorkflow(state.WorkflowID);
             if (workflow == null)
+			Logger.LogDebug("GetLocalStateId(exportedStateId={ExportedStateId}): workflow → {Workflow}", exportedStateId, workflow);
             {
                 return -1;
             }
 
+			Logger.LogDebug("<<< Exiting GetLocalStateId(exportedStateId={ExportedStateId})", exportedStateId);
             return workflow.FirstState.StateID;
         }
 
@@ -2240,10 +2350,12 @@ namespace Dnn.ExportImport.Components.Services
 
         private void AddToParentSearched(int tabId, bool isParentId)
         {
+			Logger.LogDebug(">>> Entering AddToParentSearched(tabId={TabId},isParentId={IsParentId})", tabId, isParentId);
             if (!this.searchedParentTabs.ContainsKey(tabId))
             {
                 this.searchedParentTabs.Add(tabId, isParentId);
             }
+			Logger.LogDebug("<<< Exiting AddToParentSearched(tabId={TabId},isParentId={IsParentId})", tabId, isParentId);
         }
 
         private void UpdateParentInPartialImportTabs(TabInfo localTab, ExportTab parentExportedTab, int portalId, IList<ExportTab> exportTabs, IList<TabInfo> localTabs)
@@ -2287,6 +2399,7 @@ namespace Dnn.ExportImport.Components.Services
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting UpdateParentInPartialImportTabs(localTab={LocalTab},parentExportedTab={ParentExportedTab},portalId={PortalId},exportTabs={ExportTabs},localTabs={LocalTabs})", localTab, parentExportedTab, portalId, exportTabs, localTabs);
         }
 
         private void SetPartialImportSettings(ExportTab exportedTab, TabInfo localTab)
@@ -2300,8 +2413,10 @@ namespace Dnn.ExportImport.Components.Services
 
         private void CheckForPartialImportedTabs(ExportTab tabToExport)
         {
+			Logger.LogDebug(">>> Entering CheckForPartialImportedTabs(tabToExport={TabToExport})", tabToExport);
             var exportTabParentId = tabToExport.ParentId.GetValueOrDefault(Null.NullInteger);
 
+			Logger.LogDebug("CheckForPartialImportedTabs(tabToExport={TabToExport}): exportTabParentId → {ExportTabParentId}", tabToExport, exportTabParentId);
             if (exportTabParentId == -1)
             {
                 if (int.TryParse(tabToExport.Url, out exportTabParentId))
@@ -2313,6 +2428,7 @@ namespace Dnn.ExportImport.Components.Services
             {
                 this.AddToPartialImportedTabs(tabToExport.LocalId.GetValueOrDefault(Null.NullInteger), exportTabParentId);
             }
+			Logger.LogDebug("<<< Exiting CheckForPartialImportedTabs(tabToExport={TabToExport})", tabToExport);
         }
 
         private void AddToPartialImportedTabs(int localTabId, int exportTabParentId)

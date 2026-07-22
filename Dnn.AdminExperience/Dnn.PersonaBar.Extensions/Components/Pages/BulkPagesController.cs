@@ -32,6 +32,7 @@ namespace Dnn.PersonaBar.Pages.Components
 
     public class BulkPagesController : ServiceLocator<IBulkPagesController, BulkPagesController>, IBulkPagesController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string DefaultPageTemplate = "Default.page.template";
         private static readonly Regex TabNameRegex = new Regex(">*(.*)", RegexOptions.Compiled);
         private readonly IBusinessControllerProvider businessControllerProvider;
@@ -42,7 +43,9 @@ namespace Dnn.PersonaBar.Pages.Components
         public BulkPagesController()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering BulkPagesController()");
         }
+		Logger.LogDebug("<<< Exiting BulkPagesController()");
 
         /// <summary>Initializes a new instance of the <see cref="BulkPagesController"/> class.</summary>
         /// <param name="businessControllerProvider">The business controller provider.</param>
@@ -50,6 +53,8 @@ namespace Dnn.PersonaBar.Pages.Components
         public BulkPagesController(IBusinessControllerProvider businessControllerProvider)
             : this(businessControllerProvider, null)
         {
+		Logger.LogDebug(">>> Entering BulkPagesController(businessControllerProvider={BusinessControllerProvider})", businessControllerProvider);
+		Logger.LogDebug("<<< Exiting BulkPagesController(businessControllerProvider={BusinessControllerProvider})", businessControllerProvider);
         }
 
         /// <summary>Initializes a new instance of the <see cref="BulkPagesController"/> class.</summary>
@@ -59,19 +64,26 @@ namespace Dnn.PersonaBar.Pages.Components
         {
             this.businessControllerProvider = businessControllerProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<IBusinessControllerProvider>();
             this.permissionDefinitionService = permissionDefinitionService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPermissionDefinitionService>();
+			Logger.LogDebug("BulkPagesController(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService}): permissionDefinitionService → {PermissionDefinitionService1}", businessControllerProvider, permissionDefinitionService, permissionDefinitionService);
+			Logger.LogDebug("BulkPagesController(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService}): businessControllerProvider → {BusinessControllerProvider1}", businessControllerProvider, permissionDefinitionService, businessControllerProvider);
         }
 
         /// <inheritdoc />
         public BulkPageResponse AddBulkPages(BulkPage page, bool validateOnly)
         {
+			Logger.LogDebug(">>> Entering AddBulkPages(page={Page},validateOnly={ValidateOnly})", page, validateOnly);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
             var portalId = portalSettings.PortalId;
+			Logger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): portalSettings → {PortalSettings}", page, validateOnly, portalSettings);
             var response = new BulkPageResponse();
             var parentId = page.ParentId;
+			Logger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): response → {Response}", page, validateOnly, response);
             var rootTab = TabController.Instance.GetTab(parentId, portalId, true);
 
+			Logger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): rootTab → {RootTab}", page, validateOnly, rootTab);
             var strValue = page.BulkPages;
             strValue = strValue.Replace("\r", "\n").Replace("\n\n", "\n").Trim();
+			Logger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): strValue → {StrValue}", page, validateOnly, strValue);
 
             if (!TabController.IsValidTabName(strValue, out var invalidType))
             {
@@ -85,6 +97,8 @@ namespace Dnn.PersonaBar.Pages.Components
 
             var pages = strValue.Split('\n');
             var tabs = new List<TabInfo>();
+			Logger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): pages → {Pages}", page, validateOnly, pages);
+			Logger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): tabs → {Tabs}", page, validateOnly, tabs);
 
             foreach (var strLine in pages)
             {
@@ -105,12 +119,14 @@ namespace Dnn.PersonaBar.Pages.Components
             var bulkPageItems = new List<BulkPageResponseItem>();
             foreach (var oTab in tabs)
             {
+			Logger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): bulkPageItems → {BulkPageItems}", page, validateOnly, bulkPageItems);
                 currentIndex += 1;
 
                 try
                 {
                     string errorMessage = null;
 
+					Logger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): errorMessage → {ErrorMessage}", page, validateOnly, errorMessage);
                     if (currentIndex == 0 && oTab.Level > 0)
                     {
                         errorMessage = Localization.GetString("NoParentTabName");
@@ -138,6 +154,7 @@ namespace Dnn.PersonaBar.Pages.Components
                     {
                         var parentTabId = GetParentTabId(tabs, currentIndex, oTab.Level - 1);
                         if (parentTabId != Null.NullInteger)
+						Logger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): parentTabId → {ParentTabId}", page, validateOnly, parentTabId);
                         {
                             oTab.TabID = this.CreateTabFromParent(portalSettings, rootTab, oTab, parentTabId, validateOnly, out errorMessage);
                         }
@@ -147,18 +164,23 @@ namespace Dnn.PersonaBar.Pages.Components
                 }
                 catch (Exception ex)
                 {
+					Logger.LogError("Exception in AddBulkPages(page={Page},validateOnly={ValidateOnly}): {Arg2}", page, validateOnly, ex.Message);
                     throw new DotNetNukeException("Unable to process page.", ex, DotNetNukeErrorCode.DeserializePanesFailed);
                 }
             }
 
             response.Pages = bulkPageItems;
+			Logger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): response.Pages → {Arg2}", page, validateOnly, response.Pages);
 
+			Logger.LogDebug("<<< Exiting AddBulkPages(page={Page},validateOnly={ValidateOnly})", page, validateOnly);
             return response;
         }
 
         /// <inheritdoc />
         protected override Func<IBulkPagesController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return Globals.DependencyProvider.GetRequiredService<IBulkPagesController>;
         }
 
@@ -431,6 +453,7 @@ namespace Dnn.PersonaBar.Pages.Components
             {
                 throw new DotNetNukeException("Unable to process page template.", ex, DotNetNukeErrorCode.DeserializePanesFailed);
             }
+			Logger.LogDebug("<<< Exiting ApplyDefaultTabTemplate(tab={Tab})", tab);
         }
     }
 }

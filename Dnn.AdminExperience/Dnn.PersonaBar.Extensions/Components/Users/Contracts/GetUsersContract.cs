@@ -11,10 +11,15 @@ namespace Dnn.PersonaBar.Users.Components.Contracts
     [DataContract]
     public class GetUsersContract
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public GetUsersContract()
         {
+			Logger.LogDebug(">>> Entering GetUsersContract()");
             this.SortColumn = "Joined";
             this.SortAscending = false;
+			Logger.LogDebug("<<< Exiting GetUsersContract()");
+			Logger.LogDebug("GetUsersContract(): this.SortColumn → {Arg0}", this.SortColumn);
+			Logger.LogDebug("GetUsersContract(): this.SortAscending → {Arg0}", this.SortAscending);
         }
 
         public int PortalId { get; set; }

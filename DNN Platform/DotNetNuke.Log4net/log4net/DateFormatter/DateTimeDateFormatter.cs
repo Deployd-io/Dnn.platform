@@ -39,6 +39,7 @@ namespace log4net.DateFormatter
     /// <author>Angelika Schnagl</author>
     public class DateTimeDateFormatter : AbsoluteTimeDateFormatter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Default constructor.
         /// </summary>
@@ -49,7 +50,11 @@ namespace log4net.DateFormatter
         /// </remarks>
         public DateTimeDateFormatter()
         {
+			Logger.LogDebug(">>> Entering DateTimeDateFormatter()");
             this.m_dateTimeFormatInfo = DateTimeFormatInfo.InvariantInfo;
+			Logger.LogDebug("<<< Exiting DateTimeDateFormatter()");
+			Logger.LogDebug("DateTimeDateFormatter(): m_dateTimeFormatInfo → {M_dateTimeFormatInfo}", m_dateTimeFormatInfo);
+			Logger.LogDebug("DateTimeDateFormatter(): this.m_dateTimeFormatInfo → {Arg0}", this.m_dateTimeFormatInfo);
         }
 
         /// <summary>
@@ -69,6 +74,7 @@ namespace log4net.DateFormatter
         /// </remarks>
         protected override void FormatDateWithoutMillis(DateTime dateToFormat, StringBuilder buffer)
         {
+			Logger.LogDebug(">>> Entering FormatDateWithoutMillis(dateToFormat={DateToFormat},buffer={Buffer})", dateToFormat, buffer);
             int day = dateToFormat.Day;
             if (day < 10) 
             {
@@ -85,6 +91,7 @@ namespace log4net.DateFormatter
 
             // Append the 'HH:mm:ss'
             base.FormatDateWithoutMillis(dateToFormat, buffer);
+			Logger.LogDebug("<<< Exiting FormatDateWithoutMillis(dateToFormat={DateToFormat},buffer={Buffer})", dateToFormat, buffer);
         }
 
         /// <summary>

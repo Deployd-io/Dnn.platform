@@ -15,6 +15,7 @@ namespace DotNetNuke.HttpModules.UsersOnline
     [DnnDeprecated(8, 0, 0, "Other solutions exist outside of the DNN Platform", RemovalVersion = 11)]
     public partial class UsersOnlineModule : IHttpModule
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Gets the HttpModule module name.</summary>
         public string ModuleName => "UsersOnlineModule";
 
@@ -22,12 +23,16 @@ namespace DotNetNuke.HttpModules.UsersOnline
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void Init(HttpApplication application)
         {
+			Logger.LogDebug(">>> Entering Init(application={Application})", application);
             application.AuthorizeRequest += this.OnAuthorizeRequest;
+			Logger.LogDebug("<<< Exiting Init(application={Application})", application);
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+		Logger.LogDebug(">>> Entering Dispose()");
+		Logger.LogDebug("<<< Exiting Dispose()");
         }
 
         /// <summary>Handles the <see cref="HttpApplication.AuthorizeRequest"/> event.</summary>
@@ -35,9 +40,11 @@ namespace DotNetNuke.HttpModules.UsersOnline
         /// <param name="e">The event args.</param>
         public void OnAuthorizeRequest(object s, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnAuthorizeRequest(s={S},e={E})", s, e);
             // First check if we are upgrading/installing
             var app = (HttpApplication)s;
             HttpRequest request = app.Request;
+			Logger.LogDebug("OnAuthorizeRequest(s={S},e={E}): app → {App}", s, e, app);
 
             // check if we are upgrading/installing or if this is a captcha request
             if (!Initialize.ProcessHttpModule(request, false, false))
@@ -48,11 +55,13 @@ namespace DotNetNuke.HttpModules.UsersOnline
             // Create a Users Online Controller
             var objUserOnlineController = new UserOnlineController();
 
+			Logger.LogDebug("OnAuthorizeRequest(s={S},e={E}): objUserOnlineController → {ObjUserOnlineController}", s, e, objUserOnlineController);
             // Is Users Online Enabled?
             if (objUserOnlineController.IsEnabled())
             {
                 objUserOnlineController.TrackUsers();
             }
+			Logger.LogDebug("<<< Exiting OnAuthorizeRequest(s={S},e={E})", s, e);
         }
     }
 }

@@ -17,6 +17,7 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
 
     public class PurgeUser : ConsoleCommandBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [FlagParameter("id", "Prompt_PurgeUser_FlagId", "Integer", true)]
         private const string FlagId = "id";
 
@@ -34,8 +35,10 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             var userInfo = UserController.Instance.GetUser(this.PortalId, this.UserId);
             if (userInfo == null)
+			Logger.LogDebug("Run(): userInfo → {UserInfo}", userInfo);
             {
                 return new ConsoleErrorResultModel(string.Format(CultureInfo.CurrentCulture, this.LocalizeString("UserNotFound"), this.UserId));
             }
@@ -46,6 +49,7 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
             }
 
             RecyclebinController.Instance.DeleteUsers(new List<UserInfo> { userInfo });
+			Logger.LogDebug("<<< Exiting Run()");
             return new ConsoleResultModel(this.LocalizeString("Prompt_UserPurged")) { Records = 1, };
         }
     }

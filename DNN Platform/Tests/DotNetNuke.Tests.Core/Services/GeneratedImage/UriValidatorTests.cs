@@ -16,6 +16,7 @@ namespace DotNetNuke.Tests.Core.Services.GeneratedImage
     [TestFixture]
     public class UriValidatorTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [TestCase("https://mysite.com/page", true)]
         [TestCase("http://mysite.com/page", true)]
         [TestCase("https://mysite.com", true)]
@@ -34,9 +35,11 @@ namespace DotNetNuke.Tests.Core.Services.GeneratedImage
         [TestCase("http://mysite.com.badactor.com/siteB/page", false)]
         public void UriBelongsToSite_MultipleScenarios(string uriString, bool expected)
         {
+			Logger.LogDebug(">>> Entering UriBelongsToSite_MultipleScenarios(uriString={UriString},expected={Expected})", uriString, expected);
             // Arrange
             var mockPortalAliasController = new Mock<IPortalAliasService>();
             mockPortalAliasController
+				Logger.LogDebug("UriBelongsToSite_MultipleScenarios(uriString={UriString},expected={Expected}): mockPortalAliasController → {MockPortalAliasController}", uriString, expected, mockPortalAliasController);
                 .Setup(controller => controller.GetPortalAliases())
                 .Returns(new Dictionary<string, IPortalAliasInfo>
                 {
@@ -46,12 +49,16 @@ namespace DotNetNuke.Tests.Core.Services.GeneratedImage
 
             var validator = new UriValidator(mockPortalAliasController.Object);
 
+			Logger.LogDebug("UriBelongsToSite_MultipleScenarios(uriString={UriString},expected={Expected}): validator → {Validator}", uriString, expected, validator);
             var testUri = new Uri(uriString);
 
+			Logger.LogDebug("UriBelongsToSite_MultipleScenarios(uriString={UriString},expected={Expected}): testUri → {TestUri}", uriString, expected, testUri);
             // Act
             var result = validator.UriBelongsToSite(testUri);
 
+			Logger.LogDebug("UriBelongsToSite_MultipleScenarios(uriString={UriString},expected={Expected}): result → {Result}", uriString, expected, result);
             Assert.That(result, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting UriBelongsToSite_MultipleScenarios(uriString={UriString},expected={Expected})", uriString, expected);
         }
     }
 }

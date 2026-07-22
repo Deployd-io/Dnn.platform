@@ -26,6 +26,7 @@ using log4net.Core;
 
 namespace log4net.Layout.Pattern
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Converter for logger name</summary>
     /// <remarks>
     /// <para>
@@ -45,6 +46,8 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         protected override string GetFullyQualifiedName(LoggingEvent loggingEvent) 
         {
+			Logger.LogDebug(">>> Entering GetFullyQualifiedName(loggingEvent={LoggingEvent})", loggingEvent);
+			Logger.LogDebug("<<< Exiting GetFullyQualifiedName(loggingEvent={LoggingEvent})", loggingEvent);
             return loggingEvent.LoggerName;
         }
     }

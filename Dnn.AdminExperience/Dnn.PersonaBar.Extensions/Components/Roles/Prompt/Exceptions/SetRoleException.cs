@@ -8,9 +8,12 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Exceptions
 
     public class SetRoleException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public SetRoleException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering SetRoleException(message={Message})", message);
+		Logger.LogDebug("<<< Exiting SetRoleException(message={Message})", message);
         }
     }
 }

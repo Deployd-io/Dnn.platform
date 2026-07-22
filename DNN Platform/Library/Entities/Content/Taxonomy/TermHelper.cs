@@ -13,12 +13,15 @@ namespace DotNetNuke.Entities.Content.Taxonomy
 
     public class TermHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public const string PageTagsVocabulary = "PageTags";
 
         public static List<Term> ToTabTerms(string pageSettingsTags, int tabPortalId)
         {
+			Logger.LogDebug(">>> Entering ToTabTerms(pageSettingsTags={PageSettingsTags},tabPortalId={TabPortalId})", pageSettingsTags, tabPortalId);
             var terms = new List<Term>();
 
+			Logger.LogDebug("ToTabTerms(pageSettingsTags={PageSettingsTags},tabPortalId={TabPortalId}): terms → {Terms}", pageSettingsTags, tabPortalId, terms);
             if (string.IsNullOrEmpty(pageSettingsTags))
             {
                 return terms;
@@ -26,6 +29,8 @@ namespace DotNetNuke.Entities.Content.Taxonomy
 
             var termController = new TermController();
             var vocabularyController = Util.GetVocabularyController();
+			Logger.LogDebug("ToTabTerms(pageSettingsTags={PageSettingsTags},tabPortalId={TabPortalId}): termController → {TermController}", pageSettingsTags, tabPortalId, termController);
+			Logger.LogDebug("ToTabTerms(pageSettingsTags={PageSettingsTags},tabPortalId={TabPortalId}): vocabularyController → {VocabularyController}", pageSettingsTags, tabPortalId, vocabularyController);
             var vocabulary = vocabularyController.GetVocabularies()
                                 .Cast<Vocabulary>()
                                 .Where(v => v.Name == PageTagsVocabulary && v.ScopeId == tabPortalId)
@@ -33,9 +38,11 @@ namespace DotNetNuke.Entities.Content.Taxonomy
 
             var vocabularyId = Null.NullInteger;
             if (vocabulary == null)
+			Logger.LogDebug("ToTabTerms(pageSettingsTags={PageSettingsTags},tabPortalId={TabPortalId}): vocabularyId → {VocabularyId}", pageSettingsTags, tabPortalId, vocabularyId);
             {
                 var scopeType = Util.GetScopeTypeController().GetScopeTypes().SingleOrDefault(s => s.ScopeType == "Portal");
                 if (scopeType == null)
+				Logger.LogDebug("ToTabTerms(pageSettingsTags={PageSettingsTags},tabPortalId={TabPortalId}): scopeType → {ScopeType}", pageSettingsTags, tabPortalId, scopeType);
                 {
                     throw new ScopeNotFoundException("Can't create default vocabulary as scope type 'Portal' can't be found.");
                 }
@@ -57,6 +64,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
             var vocabularies = from v in vocabularyController.GetVocabularies()
                                where v.ScopeType.ScopeType == "Portal" && v.ScopeId == tabPortalId && !v.Name.Equals("Tags", StringComparison.OrdinalIgnoreCase)
                                select v;
+							Logger.LogDebug("ToTabTerms(pageSettingsTags={PageSettingsTags},tabPortalId={TabPortalId}): allTerms → {AllTerms}", pageSettingsTags, tabPortalId, allTerms);
             foreach (var v in vocabularies)
             {
                 allTerms.AddRange(termController.GetTermsByVocabulary(v.VocabularyId));
@@ -68,15 +76,18 @@ namespace DotNetNuke.Entities.Content.Taxonomy
                 {
                     var term = allTerms.FirstOrDefault(t => t.Name.Equals(tag, StringComparison.OrdinalIgnoreCase));
                     if (term == null)
+					Logger.LogDebug("ToTabTerms(pageSettingsTags={PageSettingsTags},tabPortalId={TabPortalId}): term → {Term}", pageSettingsTags, tabPortalId, term);
                     {
                         var termId = termController.AddTerm(new Term(tag, string.Empty, vocabularyId));
                         term = termController.GetTerm(termId);
+						Logger.LogDebug("ToTabTerms(pageSettingsTags={PageSettingsTags},tabPortalId={TabPortalId}): termId → {TermId}", pageSettingsTags, tabPortalId, termId);
                     }
 
                     terms.Add(term);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ToTabTerms(pageSettingsTags={PageSettingsTags},tabPortalId={TabPortalId})", pageSettingsTags, tabPortalId);
             return terms;
         }
     }

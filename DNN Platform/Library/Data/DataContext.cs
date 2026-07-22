@@ -19,26 +19,33 @@ namespace DotNetNuke.Data
     /// <summary>A class for creating <see cref="IDataContext"/> instances.</summary>
     public partial class DataContext
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Get an <see cref="IDataContext"/> instance.</summary>
         /// <returns>The data context.</returns>
         [DnnDeprecated(10, 2, 2, "Use the overload taking IHostSettings")]
         public static partial IDataContext Instance()
             => Instance(Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>());
+			Logger.LogDebug(">>> Entering Instance()");
 
         /// <summary>Get an <see cref="IDataContext"/> instance.</summary>
         /// <param name="hostSettings">The host settings.</param>
         /// <returns>The data context.</returns>
         public static IDataContext Instance(IHostSettings hostSettings)
         {
+			Logger.LogDebug(">>> Entering Instance(hostSettings={HostSettings})", hostSettings);
             IDataContext instance = ComponentFactory.GetComponent<IDataContext>();
 
+			Logger.LogDebug("Instance(hostSettings={HostSettings}): instance → {Instance}", hostSettings, instance);
             if (instance == null)
             {
                 var defaultConnectionStringName = DataProvider.Instance().Settings["connectionStringName"];
 
+				Logger.LogDebug("Instance(hostSettings={HostSettings}): defaultConnectionStringName → {DefaultConnectionStringName}", hostSettings, defaultConnectionStringName);
                 instance = new PetaPocoDataContext(hostSettings, defaultConnectionStringName, DataProvider.Instance().ObjectQualifier);
             }
 
+			Logger.LogDebug("<<< Exiting Instance()");
+			Logger.LogDebug("<<< Exiting Instance(hostSettings={HostSettings})", hostSettings);
             return instance;
         }
 

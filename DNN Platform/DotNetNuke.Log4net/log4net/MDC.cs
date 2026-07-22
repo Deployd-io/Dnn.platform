@@ -23,6 +23,7 @@ using System.Collections;
 
 namespace log4net
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Implementation of Mapped Diagnostic Contexts.</summary>
     /// <remarks>
     /// <note>
@@ -55,6 +56,8 @@ namespace log4net
         /// </remarks>
         private MDC()
         {
+		Logger.LogDebug(">>> Entering MDC()");
+		Logger.LogDebug("<<< Exiting MDC()");
         }
 
         /// <summary>Gets the context value identified by the <paramref name="key" /> parameter.</summary>
@@ -75,11 +78,13 @@ namespace log4net
         /*[Obsolete("MDC has been replaced by ThreadContext.Properties")]*/
         public static string Get(string key)
         {
+			Logger.LogDebug(">>> Entering Get(key={Key})", key);
             object obj = ThreadContext.Properties[key];
             if (obj == null)
             {
                 return null;
             }
+			Logger.LogDebug("<<< Exiting Get(key={Key})", key);
             return obj.ToString();
         }
 
@@ -107,7 +112,9 @@ namespace log4net
         /*[Obsolete("MDC has been replaced by ThreadContext.Properties")]*/
         public static void Set(string key, string value)
         {
+			Logger.LogDebug(">>> Entering Set(key={Key},value={Value})", key, value);
             ThreadContext.Properties[key] = value;
+			Logger.LogDebug("<<< Exiting Set(key={Key},value={Value})", key, value);
         }
 
         /// <summary>Removes the key value mapping for the key specified.</summary>
@@ -126,7 +133,9 @@ namespace log4net
         /*[Obsolete("MDC has been replaced by ThreadContext.Properties")]*/
         public static void Remove(string key)
         {
+			Logger.LogDebug(">>> Entering Remove(key={Key})", key);
             ThreadContext.Properties.Remove(key);
+			Logger.LogDebug("<<< Exiting Remove(key={Key})", key);
         }
 
         /// <summary>Clear all entries in the MDC</summary>
@@ -144,7 +153,9 @@ namespace log4net
         /*[Obsolete("MDC has been replaced by ThreadContext.Properties")]*/
         public static void Clear()
         {
+			Logger.LogDebug(">>> Entering Clear()");
             ThreadContext.Properties.Clear();
+			Logger.LogDebug("<<< Exiting Clear()");
         }
     }
 }

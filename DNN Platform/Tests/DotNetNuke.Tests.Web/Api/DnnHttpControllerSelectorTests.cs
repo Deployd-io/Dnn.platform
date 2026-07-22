@@ -21,18 +21,24 @@ namespace DotNetNuke.Tests.Web.Api
     [TestFixture]
     public class DnnHttpControllerSelectorTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private FakeServiceProvider serviceProvider;
 
         [SetUp]
         public void Setup()
         {
+			Logger.LogDebug(">>> Entering Setup()");
             this.serviceProvider = FakeServiceProvider.Setup();
+			Logger.LogDebug("<<< Exiting Setup()");
+			Logger.LogDebug("Setup(): serviceProvider → {ServiceProvider}", serviceProvider);
         }
 
         [TearDown]
         public void TearDown()
         {
+			Logger.LogDebug(">>> Entering TearDown()");
             this.serviceProvider.Dispose();
+			Logger.LogDebug("<<< Exiting TearDown()");
         }
 
         [TestCase("Sample")]
@@ -40,104 +46,137 @@ namespace DotNetNuke.Tests.Web.Api
         [TestCase("SAMPLE")]
         public void SelectControllerIsCaseInsensitive(string controllerTypeName)
         {
+			Logger.LogDebug(">>> Entering SelectControllerIsCaseInsensitive(controllerTypeName={ControllerTypeName})", controllerTypeName);
             const string expectedNamespace = "ExpectedNamespace";
 
             var configuration = new HttpConfiguration();
             var controllerTypeResolver = new Mock<IHttpControllerTypeResolver>();
+			Logger.LogDebug("SelectControllerIsCaseInsensitive(controllerTypeName={ControllerTypeName}): configuration → {Configuration}", controllerTypeName, configuration);
+			Logger.LogDebug("SelectControllerIsCaseInsensitive(controllerTypeName={ControllerTypeName}): controllerTypeResolver → {ControllerTypeResolver}", controllerTypeName, controllerTypeResolver);
             configuration.Services.Replace(typeof(IHttpControllerTypeResolver), controllerTypeResolver.Object);
 
             Type controllerType = GetMockControllerType("Sample", expectedNamespace);
             controllerTypeResolver
+				Logger.LogDebug("SelectControllerIsCaseInsensitive(controllerTypeName={ControllerTypeName}): controllerType → {ControllerType}", controllerTypeName, controllerType);
                 .Setup(c => c.GetControllerTypes(It.IsAny<IAssembliesResolver>()))
                 .Returns(new Collection<Type> { controllerType });
 
             var request = new HttpRequestMessage();
             IHttpRouteData routeData = GetRouteData();
+			Logger.LogDebug("SelectControllerIsCaseInsensitive(controllerTypeName={ControllerTypeName}): request → {Request}", controllerTypeName, request);
+			Logger.LogDebug("SelectControllerIsCaseInsensitive(controllerTypeName={ControllerTypeName}): routeData → {RouteData}", controllerTypeName, routeData);
             routeData.Values["controller"] = controllerTypeName;
             routeData.Route.SetNameSpaces(new[] { expectedNamespace });
             request.Properties[HttpPropertyKeys.HttpRouteDataKey] = routeData;
 
             var selector = new DnnHttpControllerSelector(configuration);
 
+			Logger.LogDebug("SelectControllerIsCaseInsensitive(controllerTypeName={ControllerTypeName}): selector → {Selector}", controllerTypeName, selector);
             // Act
             HttpControllerDescriptor descriptor = selector.SelectController(request);
 
+			Logger.LogDebug("SelectControllerIsCaseInsensitive(controllerTypeName={ControllerTypeName}): descriptor → {Descriptor}", controllerTypeName, descriptor);
             // Assert
             Assert.That(descriptor.ControllerType, Is.EqualTo(controllerType));
+			Logger.LogDebug("<<< Exiting SelectControllerIsCaseInsensitive(controllerTypeName={ControllerTypeName})", controllerTypeName);
         }
 
         [Test]
         public void SelectControllerIgnoresControllersInUnexpectedNamespaces()
         {
+			Logger.LogDebug(">>> Entering SelectControllerIgnoresControllersInUnexpectedNamespaces()");
             const string expectedNamespace = "ExpectedNamespace";
             const string unexpectedNamespace = "UnexpectedNamespace";
             const string controllerName = "Sample";
 
             var configuration = new HttpConfiguration();
             var controllerTypeResolver = new Mock<IHttpControllerTypeResolver>();
+			Logger.LogDebug("SelectControllerIgnoresControllersInUnexpectedNamespaces(): configuration → {Configuration}", configuration);
+			Logger.LogDebug("SelectControllerIgnoresControllersInUnexpectedNamespaces(): controllerTypeResolver → {ControllerTypeResolver}", controllerTypeResolver);
             configuration.Services.Replace(typeof(IHttpControllerTypeResolver), controllerTypeResolver.Object);
 
             Type controllerType = GetMockControllerType(controllerName, unexpectedNamespace);
             controllerTypeResolver
+				Logger.LogDebug("SelectControllerIgnoresControllersInUnexpectedNamespaces(): controllerType → {ControllerType}", controllerType);
                 .Setup(c => c.GetControllerTypes(It.IsAny<IAssembliesResolver>()))
                 .Returns(new Collection<Type> { controllerType });
 
             var request = new HttpRequestMessage();
             IHttpRouteData routeData = GetRouteData();
+			Logger.LogDebug("SelectControllerIgnoresControllersInUnexpectedNamespaces(): request → {Request}", request);
+			Logger.LogDebug("SelectControllerIgnoresControllersInUnexpectedNamespaces(): routeData → {RouteData}", routeData);
             routeData.Values["controller"] = controllerName;
             routeData.Route.SetNameSpaces(new[] { expectedNamespace });
             request.Properties[HttpPropertyKeys.HttpRouteDataKey] = routeData;
 
             var selector = new DnnHttpControllerSelector(configuration);
 
+			Logger.LogDebug("SelectControllerIgnoresControllersInUnexpectedNamespaces(): selector → {Selector}", selector);
             // Act
             Assert.Throws<HttpResponseException>(() => selector.SelectController(request));
+			Logger.LogDebug("<<< Exiting SelectControllerIgnoresControllersInUnexpectedNamespaces()");
         }
 
         [Test]
         public void SelectControllerThrowsOnAmgiuousControllers()
         {
+			Logger.LogDebug(">>> Entering SelectControllerThrowsOnAmgiuousControllers()");
             const string expectedNamespace = "ExpectedNamespace";
             const string expectedNamespace2 = "ExpectedNamespace2";
             const string controllerName = "Sample";
 
             var configuration = new HttpConfiguration();
             var controllerTypeResolver = new Mock<IHttpControllerTypeResolver>();
+			Logger.LogDebug("SelectControllerThrowsOnAmgiuousControllers(): configuration → {Configuration}", configuration);
+			Logger.LogDebug("SelectControllerThrowsOnAmgiuousControllers(): controllerTypeResolver → {ControllerTypeResolver}", controllerTypeResolver);
             configuration.Services.Replace(typeof(IHttpControllerTypeResolver), controllerTypeResolver.Object);
 
             Type controllerType = GetMockControllerType(controllerName, expectedNamespace);
             Type controllerType2 = GetMockControllerType(controllerName, expectedNamespace2);
+			Logger.LogDebug("SelectControllerThrowsOnAmgiuousControllers(): controllerType → {ControllerType}", controllerType);
+			Logger.LogDebug("SelectControllerThrowsOnAmgiuousControllers(): controllerType2 → {ControllerType2}", controllerType2);
             controllerTypeResolver
                 .Setup(c => c.GetControllerTypes(It.IsAny<IAssembliesResolver>()))
                 .Returns(new Collection<Type> { controllerType, controllerType2 });
 
             var request = new HttpRequestMessage();
             IHttpRouteData routeData = GetRouteData();
+			Logger.LogDebug("SelectControllerThrowsOnAmgiuousControllers(): request → {Request}", request);
+			Logger.LogDebug("SelectControllerThrowsOnAmgiuousControllers(): routeData → {RouteData}", routeData);
             routeData.Values["controller"] = controllerName;
             routeData.Route.SetNameSpaces(new[] { expectedNamespace, expectedNamespace2 });
             request.Properties[HttpPropertyKeys.HttpRouteDataKey] = routeData;
 
             var selector = new DnnHttpControllerSelector(configuration);
 
+			Logger.LogDebug("SelectControllerThrowsOnAmgiuousControllers(): selector → {Selector}", selector);
             // Act
             Assert.Throws<HttpResponseException>(() => selector.SelectController(request));
+			Logger.LogDebug("<<< Exiting SelectControllerThrowsOnAmgiuousControllers()");
         }
 
         private static IHttpRouteData GetRouteData()
         {
+			Logger.LogDebug(">>> Entering GetRouteData()");
             var mockRoute = new Mock<IHttpRoute>();
             mockRoute.SetupGet(x => x.DataTokens).Returns(new Dictionary<string, object>());
+			Logger.LogDebug("GetRouteData(): mockRoute → {MockRoute}", mockRoute);
             var routeData = new HttpRouteData(mockRoute.Object);
 
+			Logger.LogDebug("GetRouteData(): routeData → {RouteData}", routeData);
+			Logger.LogDebug("<<< Exiting GetRouteData()");
             return routeData;
         }
 
         private static Type GetMockControllerType(string controllerName, string @namespace)
         {
+			Logger.LogDebug(">>> Entering GetMockControllerType(controllerName={ControllerName})", controllerName);
             var mockType = new Mock<Type>();
 
+			Logger.LogDebug("GetMockControllerType(controllerName={ControllerName}): mockType → {MockType}", controllerName, mockType);
             mockType.Setup(t => t.Name).Returns(controllerName + "Controller");
             mockType.Setup(t => t.FullName).Returns(string.Format("{0}.{1}Controller", @namespace, controllerName));
+			Logger.LogDebug("<<< Exiting GetMockControllerType(controllerName={ControllerName})", controllerName);
             return mockType.Object;
         }
     }

@@ -28,6 +28,7 @@ using log4net.Repository;
 
 namespace log4net.Layout.Pattern
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Property pattern converter</summary>
     /// <remarks>
     /// <para>
@@ -59,6 +60,7 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         protected override void Convert(TextWriter writer, LoggingEvent loggingEvent)
         {
+			Logger.LogDebug(">>> Entering Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             if (this.Option != null)
             {
                 // Write the value for the specified key
@@ -69,6 +71,7 @@ namespace log4net.Layout.Pattern
                 // Write all the key value pairs
                 WriteDictionary(writer, loggingEvent.Repository, loggingEvent.GetProperties());
             }
+			Logger.LogDebug("<<< Exiting Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
     }
 }

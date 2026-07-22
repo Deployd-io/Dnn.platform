@@ -28,10 +28,12 @@ namespace DotNetNuke.Modules.Journal
         [ValidateAntiForgeryToken]
         public HttpResponseMessage ViewJournal(NotificationDTO postData)
         {
+			Logger.LogDebug(">>> Entering ViewJournal(postData={PostData})", postData);
             try
             {
                 var notification = NotificationsController.Instance.GetNotification(postData.NotificationId);
 
+				Logger.LogDebug("ViewJournal(postData={PostData}): notification → {Notification}", postData, notification);
                 if (notification != null && notification.Context != null && notification.Context.Contains("_"))
                 {
                     // Dismiss the notification
@@ -39,8 +41,12 @@ namespace DotNetNuke.Modules.Journal
 
                     var context = notification.Context.Split('_');
                     var userId = Convert.ToInt32(context[0]);
+					Logger.LogDebug("ViewJournal(postData={PostData}): context → {Context}", postData, context);
+					Logger.LogDebug("ViewJournal(postData={PostData}): userId → {UserId}", postData, userId);
                     var journalId = Convert.ToInt32(context[1]);
                     var ji = JournalController.Instance.GetJournalItem(this.PortalSettings.PortalId, userId, journalId);
+					Logger.LogDebug("ViewJournal(postData={PostData}): journalId → {JournalId}", postData, journalId);
+					Logger.LogDebug("ViewJournal(postData={PostData}): ji → {Ji}", postData, ji);
                     if (ji.ProfileId != Null.NullInteger)
                     {
                         return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", Link = Globals.UserProfileURL(ji.ProfileId) });
@@ -54,6 +60,7 @@ namespace DotNetNuke.Modules.Journal
                 Logger.Error(exc);
             }
 
+			Logger.LogDebug("<<< Exiting ViewJournal(postData={PostData})", postData);
             return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "unable to process notification");
         }
 

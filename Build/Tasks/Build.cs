@@ -30,12 +30,16 @@ namespace DotNetNuke.Build.Tasks
         /// <inheritdoc />
         public override void Run(Context context)
         {
+			Logger.LogDebug(">>> Entering Run(context={Context})", context);
             var cleanLog = context.ArtifactsDir.Path.CombineWithFilePath("clean.binlog");
             var buildLog = context.ArtifactsDir.Path.CombineWithFilePath("rebuild.binlog");
+			Logger.LogDebug("Run(context={Context}): cleanLog → {CleanLog}", context, cleanLog);
+			Logger.LogDebug("Run(context={Context}): buildLog → {BuildLog}", context, buildLog);
             try
             {
                 var cleanSettings = CreateMsBuildSettings(context, cleanLog).WithTarget("Clean");
                 context.MSBuild(context.DnnSolutionPath, cleanSettings);
+				Logger.LogDebug("Run(context={Context}): cleanSettings → {CleanSettings}", context, cleanSettings);
 
                 var buildSettings = CreateMsBuildSettings(context, buildLog)
                     .SetPlatformTarget(PlatformTarget.MSIL)
@@ -47,10 +51,13 @@ namespace DotNetNuke.Build.Tasks
             {
                 ReportIssuesToCI(context, cleanLog, buildLog);
             }
+			Logger.LogDebug("<<< Exiting Run(context={Context})", context);
         }
 
         private static MSBuildSettings CreateMsBuildSettings(Context context, FilePath binLogPath)
         {
+			Logger.LogDebug(">>> Entering CreateMsBuildSettings(context={Context},binLogPath={BinLogPath})", context, binLogPath);
+			Logger.LogDebug("<<< Exiting CreateMsBuildSettings(context={Context},binLogPath={BinLogPath})", context, binLogPath);
             return new MSBuildSettings().SetConfiguration(context.BuildConfiguration)
                 .SetMaxCpuCount(0)
                 .EnableBinaryLogger(binLogPath.FullPath)
@@ -67,6 +74,7 @@ namespace DotNetNuke.Build.Tasks
 
             if (context.AzurePipelines().IsRunningOnAzurePipelines)
             {
+				private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                 ReportIssuesToAzurePipelines(context, issueProviders);
             }
             else if (context.GitHubActions().IsRunningOnGitHubActions)

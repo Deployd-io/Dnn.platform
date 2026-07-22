@@ -22,6 +22,7 @@ namespace DotNetNuke.Web.Mvc.Framework
     /// <summary>Extension methods for <see langword="ViewEngineCollection"/>.</summary>
     public static partial class ViewEngineCollectionExt
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Finds the specified view by using the specified controller context.</summary>
         /// <param name="viewEngineCollection">The view engine collection.</param>
         /// <param name="controllerContext">The controller context.</param>
@@ -32,6 +33,7 @@ namespace DotNetNuke.Web.Mvc.Framework
         [DnnDeprecated(10, 2, 2, "Please use overload taking IHostSettings")]
         public static partial ViewEngineResult FindView(this ViewEngineCollection viewEngineCollection, ControllerContext controllerContext, string viewName, string masterName, bool useCache)
             => viewEngineCollection.FindView(Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>(), controllerContext, viewName, masterName, useCache);
+			Logger.LogDebug(">>> Entering FindView(viewEngineCollection={ViewEngineCollection},controllerContext={ControllerContext},viewName={ViewName},masterName={MasterName},useCache={UseCache})", viewEngineCollection, controllerContext, viewName, masterName, useCache);
 
         /// <summary>Finds the specified view by using the specified controller context.</summary>
         /// <param name="viewEngineCollection">The view engine collection.</param>
@@ -47,16 +49,21 @@ namespace DotNetNuke.Web.Mvc.Framework
             {
                 var cacheKey = CreateCacheKey(controllerContext, "View", viewName, masterName, (controllerContext.Controller as IDnnController)?.ModuleContext.PortalId ?? 0);
                 var parameters = new object[]
+				Logger.LogDebug("FindView(viewEngineCollection={ViewEngineCollection},hostSettings={HostSettings},controllerContext={ControllerContext},viewName={ViewName},masterName={MasterName},useCache={UseCache}): cacheKey → {CacheKey}", viewEngineCollection, hostSettings, controllerContext, viewName, masterName, useCache, cacheKey);
                 {
                     new Func<IViewEngine, ViewEngineResult>(e => e.FindView(controllerContext, viewName, masterName, false)),
                     false,
                 };
                 var cacheArg = new CacheItemArgs(cacheKey, 120, CacheItemPriority.Default, "Find", viewEngineCollection, parameters);
 
+				Logger.LogDebug("FindView(viewEngineCollection={ViewEngineCollection},hostSettings={HostSettings},controllerContext={ControllerContext},viewName={ViewName},masterName={MasterName},useCache={UseCache}): cacheArg → {CacheArg}", viewEngineCollection, hostSettings, controllerContext, viewName, masterName, useCache, cacheArg);
                 return useCache ? CBO.GetCachedObject<ViewEngineResult>(hostSettings, cacheArg, CallFind) : CallFind(cacheArg);
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in FindView(viewEngineCollection={ViewEngineCollection},controllerContext={ControllerContext},viewName={ViewName},masterName={MasterName},useCache={UseCache}): {Arg5}", viewEngineCollection, controllerContext, viewName, masterName, useCache, ex.Message);
+				Logger.LogError("Exception in FindView(viewEngineCollection={ViewEngineCollection},hostSettings={HostSettings},controllerContext={ControllerContext},viewName={ViewName},masterName={MasterName},useCache={UseCache}): {Arg6}", viewEngineCollection, hostSettings, controllerContext, viewName, masterName, useCache, ex.Message);
+				Logger.LogDebug("<<< Exiting FindView(viewEngineCollection={ViewEngineCollection},controllerContext={ControllerContext},viewName={ViewName},masterName={MasterName},useCache={UseCache})", viewEngineCollection, controllerContext, viewName, masterName, useCache);
                 return viewEngineCollection.FindView(controllerContext, viewName, masterName);
             }
         }
@@ -70,6 +77,7 @@ namespace DotNetNuke.Web.Mvc.Framework
         [DnnDeprecated(10, 2, 2, "Please use overload taking IHostSettings")]
         public static partial ViewEngineResult FindPartialView(this ViewEngineCollection viewEngineCollection, ControllerContext controllerContext, string partialViewName, bool useCache)
             => viewEngineCollection.FindPartialView(Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>(), controllerContext, partialViewName, useCache);
+			Logger.LogDebug(">>> Entering FindPartialView(viewEngineCollection={ViewEngineCollection},controllerContext={ControllerContext},partialViewName={PartialViewName},useCache={UseCache})", viewEngineCollection, controllerContext, partialViewName, useCache);
 
         public static ViewEngineResult FindPartialView(this ViewEngineCollection viewEngineCollection, IHostSettings hostSettings, ControllerContext controllerContext, string partialViewName, bool useCache)
         {
@@ -77,27 +85,37 @@ namespace DotNetNuke.Web.Mvc.Framework
             {
                 var cacheKey = CreateCacheKey(controllerContext, "Partial", partialViewName, string.Empty, (controllerContext.Controller as IDnnController)?.ModuleContext.PortalId ?? 0);
                 var parameters = new object[]
+				Logger.LogDebug("FindPartialView(viewEngineCollection={ViewEngineCollection},hostSettings={HostSettings},controllerContext={ControllerContext},partialViewName={PartialViewName},useCache={UseCache}): cacheKey → {CacheKey}", viewEngineCollection, hostSettings, controllerContext, partialViewName, useCache, cacheKey);
                 {
                     new Func<IViewEngine, ViewEngineResult>(e => e.FindPartialView(controllerContext, partialViewName, false)),
                     false,
                 };
                 var cacheArg = new CacheItemArgs(cacheKey, 120, CacheItemPriority.Default, "Find", viewEngineCollection, parameters);
 
+				Logger.LogDebug("FindPartialView(viewEngineCollection={ViewEngineCollection},hostSettings={HostSettings},controllerContext={ControllerContext},partialViewName={PartialViewName},useCache={UseCache}): cacheArg → {CacheArg}", viewEngineCollection, hostSettings, controllerContext, partialViewName, useCache, cacheArg);
                 return useCache ? CBO.GetCachedObject<ViewEngineResult>(hostSettings, cacheArg, CallFind) : CallFind(cacheArg);
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in FindPartialView(viewEngineCollection={ViewEngineCollection},controllerContext={ControllerContext},partialViewName={PartialViewName},useCache={UseCache}): {Arg4}", viewEngineCollection, controllerContext, partialViewName, useCache, ex.Message);
+				Logger.LogError("Exception in FindPartialView(viewEngineCollection={ViewEngineCollection},hostSettings={HostSettings},controllerContext={ControllerContext},partialViewName={PartialViewName},useCache={UseCache}): {Arg5}", viewEngineCollection, hostSettings, controllerContext, partialViewName, useCache, ex.Message);
+				Logger.LogDebug("<<< Exiting FindPartialView(viewEngineCollection={ViewEngineCollection},controllerContext={ControllerContext},partialViewName={PartialViewName},useCache={UseCache})", viewEngineCollection, controllerContext, partialViewName, useCache);
                 return viewEngineCollection.FindPartialView(controllerContext, partialViewName);
             }
         }
 
         private static ViewEngineResult CallFind(CacheItemArgs cacheItem)
         {
+			Logger.LogDebug(">>> Entering CallFind(cacheItem={CacheItem})", cacheItem);
             var factoryType = Reflection.CreateType("System.Web.Mvc.ViewEngineCollection");
             var name = cacheItem.Params[0] as string;
+			Logger.LogDebug("CallFind(cacheItem={CacheItem}): factoryType → {FactoryType}", cacheItem, factoryType);
+			Logger.LogDebug("CallFind(cacheItem={CacheItem}): name → {Name}", cacheItem, name);
             var target = cacheItem.Params[1];
             var parameters = cacheItem.Params[2] as object[];
             var result = factoryType.InvokeMember(name, BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.NonPublic, null, target, parameters, CultureInfo.InvariantCulture);
+			Logger.LogDebug("CallFind(cacheItem={CacheItem}): result → {Result}", cacheItem, result);
+			Logger.LogDebug("<<< Exiting CallFind(cacheItem={CacheItem})", cacheItem);
             return result as ViewEngineResult;
         }
 

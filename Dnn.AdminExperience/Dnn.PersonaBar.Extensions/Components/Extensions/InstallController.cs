@@ -30,10 +30,14 @@ namespace Dnn.PersonaBar.Extensions.Components
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public ParseResultDto ParsePackage(PortalSettings portalSettings, UserInfo user, string filePath, Stream stream)
         {
+			Logger.LogDebug(">>> Entering ParsePackage(portalSettings={PortalSettings},user={User},filePath={FilePath},stream={Stream})", portalSettings, user, filePath, stream);
             var parseResult = new ParseResultDto();
             var fileName = Path.GetFileName(filePath);
+			Logger.LogDebug("ParsePackage(portalSettings={PortalSettings},user={User},filePath={FilePath},stream={Stream}): parseResult → {ParseResult}", portalSettings, user, filePath, stream, parseResult);
+			Logger.LogDebug("ParsePackage(portalSettings={PortalSettings},user={User},filePath={FilePath},stream={Stream}): fileName → {FileName}", portalSettings, user, filePath, stream, fileName);
             var extension = Path.GetExtension(fileName ?? string.Empty).ToLowerInvariant();
 
+			Logger.LogDebug("ParsePackage(portalSettings={PortalSettings},user={User},filePath={FilePath},stream={Stream}): extension → {Extension}", portalSettings, user, filePath, stream, extension);
             if (extension != ".zip" && extension != ".resources")
             {
                 parseResult.Failed("InvalidExt");
@@ -44,6 +48,7 @@ namespace Dnn.PersonaBar.Extensions.Components
                 {
                     var installer = GetInstaller(stream, fileName, portalSettings.PortalId);
 
+					Logger.LogDebug("ParsePackage(portalSettings={PortalSettings},user={User},filePath={FilePath},stream={Stream}): installer → {Installer}", portalSettings, user, filePath, stream, installer);
                     try
                     {
                         if (installer.IsValid)
@@ -56,6 +61,9 @@ namespace Dnn.PersonaBar.Extensions.Components
                             parseResult.AzureCompact = AzureCompact(installer).GetValueOrDefault(false);
                             parseResult.NoManifest = string.IsNullOrEmpty(installer.InstallerInfo.ManifestFile.TempFileName);
                             parseResult.LegacyError = installer.InstallerInfo.LegacyError;
+							Logger.LogDebug("ParsePackage(portalSettings={PortalSettings},user={User},filePath={FilePath},stream={Stream}): parseResult.LegacyError → {Arg4}", portalSettings, user, filePath, stream, parseResult.LegacyError);
+							Logger.LogDebug("ParsePackage(portalSettings={PortalSettings},user={User},filePath={FilePath},stream={Stream}): parseResult.HasInvalidFiles → {Arg4}", portalSettings, user, filePath, stream, parseResult.HasInvalidFiles);
+							Logger.LogDebug("ParsePackage(portalSettings={PortalSettings},user={User},filePath={FilePath},stream={Stream}): parseResult.AlreadyInstalled → {Arg4}", portalSettings, user, filePath, stream, parseResult.AlreadyInstalled);
                             parseResult.HasInvalidFiles = !installer.InstallerInfo.HasValidFiles;
                             parseResult.AlreadyInstalled = installer.InstallerInfo.Installed;
                             parseResult.AddLogs(installer.InstallerInfo.Log.Logs);
@@ -74,6 +82,7 @@ namespace Dnn.PersonaBar.Extensions.Components
                             {
                                 // we still can install when the manifest is missing
                                 parseResult.Success = true;
+								Logger.LogDebug("ParsePackage(portalSettings={PortalSettings},user={User},filePath={FilePath},stream={Stream}): parseResult.Success → {Arg4}", portalSettings, user, filePath, stream, parseResult.Success);
                             }
                         }
                     }
@@ -84,10 +93,12 @@ namespace Dnn.PersonaBar.Extensions.Components
                 }
                 catch (InvalidDataException)
                 {
+					Logger.LogError("Exception in ParsePackage(portalSettings={PortalSettings},user={User},filePath={FilePath},stream={Stream}): {Arg4}", portalSettings, user, filePath, stream, ex.Message);
                     parseResult.Failed("ZipCriticalError");
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ParsePackage(portalSettings={PortalSettings},user={User},filePath={FilePath},stream={Stream})", portalSettings, user, filePath, stream);
             return parseResult;
         }
 
@@ -95,10 +106,14 @@ namespace Dnn.PersonaBar.Extensions.Components
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public InstallResultDto InstallPackage(PortalSettings portalSettings, UserInfo user, string legacySkin, string filePath, Stream stream, bool isPortalPackage = false)
         {
+			Logger.LogDebug(">>> Entering InstallPackage(portalSettings={PortalSettings},user={User},legacySkin={LegacySkin},filePath={FilePath},stream={Stream},isPortalPackage={IsPortalPackage})", portalSettings, user, legacySkin, filePath, stream, isPortalPackage);
             var installResult = new InstallResultDto();
             var fileName = Path.GetFileName(filePath);
+			Logger.LogDebug("InstallPackage(portalSettings={PortalSettings},user={User},legacySkin={LegacySkin},filePath={FilePath},stream={Stream},isPortalPackage={IsPortalPackage}): installResult → {InstallResult}", portalSettings, user, legacySkin, filePath, stream, isPortalPackage, installResult);
+			Logger.LogDebug("InstallPackage(portalSettings={PortalSettings},user={User},legacySkin={LegacySkin},filePath={FilePath},stream={Stream},isPortalPackage={IsPortalPackage}): fileName → {FileName}", portalSettings, user, legacySkin, filePath, stream, isPortalPackage, fileName);
             var extension = Path.GetExtension(fileName ?? string.Empty).ToLowerInvariant();
 
+			Logger.LogDebug("InstallPackage(portalSettings={PortalSettings},user={User},legacySkin={LegacySkin},filePath={FilePath},stream={Stream},isPortalPackage={IsPortalPackage}): extension → {Extension}", portalSettings, user, legacySkin, filePath, stream, isPortalPackage, extension);
             if (extension != ".zip" && extension != ".resources")
             {
                 installResult.Failed("InvalidExt");
@@ -109,6 +124,7 @@ namespace Dnn.PersonaBar.Extensions.Components
                 {
                     var installer = GetInstaller(stream, fileName, portalSettings.PortalId, legacySkin, isPortalPackage);
 
+					Logger.LogDebug("InstallPackage(portalSettings={PortalSettings},user={User},legacySkin={LegacySkin},filePath={FilePath},stream={Stream},isPortalPackage={IsPortalPackage}): installer → {Installer}", portalSettings, user, legacySkin, filePath, stream, isPortalPackage, installer);
                     try
                     {
                         if (installer.IsValid)
@@ -151,16 +167,20 @@ namespace Dnn.PersonaBar.Extensions.Components
                 }
                 catch (InvalidDataException)
                 {
+					Logger.LogError("Exception in InstallPackage(portalSettings={PortalSettings},user={User},legacySkin={LegacySkin},filePath={FilePath},stream={Stream},isPortalPackage={IsPortalPackage}): {Arg6}", portalSettings, user, legacySkin, filePath, stream, isPortalPackage, ex.Message);
                     installResult.Failed("ZipCriticalError");
                 }
             }
 
+			Logger.LogDebug("<<< Exiting InstallPackage(portalSettings={PortalSettings},user={User},legacySkin={LegacySkin},filePath={FilePath},stream={Stream},isPortalPackage={IsPortalPackage})", portalSettings, user, legacySkin, filePath, stream, isPortalPackage);
             return installResult;
         }
 
         /// <inheritdoc />
         protected override Func<IInstallController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new InstallController();
         }
 
@@ -232,6 +252,7 @@ namespace Dnn.PersonaBar.Extensions.Components
 
         private static void DeleteInstallFile(string installerFile)
         {
+			Logger.LogDebug(">>> Entering DeleteInstallFile(installerFile={InstallerFile})", installerFile);
             try
             {
                 if (File.Exists(installerFile))
@@ -244,6 +265,7 @@ namespace Dnn.PersonaBar.Extensions.Components
             {
                 Logger.Error(ex);
             }
+			Logger.LogDebug("<<< Exiting DeleteInstallFile(installerFile={InstallerFile})", installerFile);
         }
 
         private static bool? AzureCompact(Installer installer)
@@ -295,6 +317,8 @@ namespace Dnn.PersonaBar.Extensions.Components
 
         private static bool IsAzureDatabase()
         {
+			Logger.LogDebug(">>> Entering IsAzureDatabase()");
+			Logger.LogDebug("<<< Exiting IsAzureDatabase()");
             return PetaPocoHelper.ExecuteScalar<int>(DataProvider.Instance().ConnectionString, CommandType.Text, "SELECT CAST(ServerProperty('EngineEdition') as INT)") == 5;
         }
     }

@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class PortalNotFoundException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public PortalNotFoundException()
     {
+	Logger.LogDebug(">>> Entering PortalNotFoundException()");
+	Logger.LogDebug("<<< Exiting PortalNotFoundException()");
     }
 
     /// <inheritdoc />
     public PortalNotFoundException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering PortalNotFoundException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting PortalNotFoundException(message={Message})", message);
 
     /// <inheritdoc />
     public PortalNotFoundException(string message, Exception innerException)

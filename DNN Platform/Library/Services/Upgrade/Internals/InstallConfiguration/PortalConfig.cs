@@ -8,10 +8,13 @@ namespace DotNetNuke.Services.Upgrade.Internals.InstallConfiguration
     /// <summary>PortalConfig - A class that represents Install/DotNetNuke.Install.Config/Portals/Portal.</summary>
     public class PortalConfig
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="PortalConfig"/> class.</summary>
         public PortalConfig()
         {
+			Logger.LogDebug(">>> Entering PortalConfig()");
             this.PortAliases = new List<string>();
+			Logger.LogDebug("<<< Exiting PortalConfig()");
         }
 
         public string PortalName { get; set; }

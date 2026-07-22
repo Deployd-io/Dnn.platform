@@ -18,9 +18,11 @@ namespace DotNetNuke.Web.Mvc
 
     public class Startup : IDnnStartup
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public void ConfigureServices(IServiceCollection services)
         {
+			Logger.LogDebug(">>> Entering ConfigureServices(services={Services})", services);
             services.AddTransient<IDesktopModuleController, DesktopModuleControllerAdapter>();
             services.AddTransient<IModuleControlController, ModuleControlControllerAdapter>();
 
@@ -31,6 +33,7 @@ namespace DotNetNuke.Web.Mvc
             services.AddMvcControllers();
 
             DependencyResolver.SetResolver(new DnnMvcDependencyResolver(Globals.DependencyProvider));
+			Logger.LogDebug("<<< Exiting ConfigureServices(services={Services})", services);
         }
     }
 }

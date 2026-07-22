@@ -10,6 +10,7 @@ namespace Dnn.PersonaBar.Security.Components.Checks
 
     public class CheckViewstatemac : IAuditCheck
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public string Id => "CheckViewstatemac";
 
@@ -19,14 +20,17 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc />
         public CheckResult Execute()
         {
+			Logger.LogDebug(">>> Entering Execute()");
             var result = new CheckResult(SeverityEnum.Unverified, this.Id);
             var page = HttpContext.Current.Handler as Page;
+			Logger.LogDebug("Execute(): result → {Result}", result);
 
             if (page != null)
             {
                 if (page.EnableViewStateMac == false)
                 {
                     result.Severity = SeverityEnum.Failure;
+					Logger.LogDebug("Execute(): result.Severity → {Arg0}", result.Severity);
                 }
                 else
                 {
@@ -34,6 +38,7 @@ namespace Dnn.PersonaBar.Security.Components.Checks
                 }
             }
 
+			Logger.LogDebug("<<< Exiting Execute()");
             return result;
         }
     }

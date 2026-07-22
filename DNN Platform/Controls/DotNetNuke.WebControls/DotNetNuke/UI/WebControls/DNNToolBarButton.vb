@@ -1,5 +1,6 @@
 ﻿' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports DotNetNuke.UI.Design.WebControls
 Imports Microsoft.VisualBasic
@@ -19,13 +20,17 @@ Namespace DotNetNuke.UI.WebControls
         Implements ICustomTypeDescriptor
         ' Methods
         Public Sub New()
+			Logger.LogDebug(">>> Entering New()")
             DNNToolBarButton.__ENCAddToList(Me)
             Me.m_blnMarked = False
+			Logger.LogDebug("New(): Me.m_blnMarked → {Arg0}", Me.m_blnMarked)
             Me.CommonActions = New String() { "js", "navigate" }
         End Sub
+		Logger.LogDebug("<<< Exiting New()")
 
         <DebuggerNonUserCode> _
         Private Shared Sub __ENCAddToList(ByVal value As Object)
+			Logger.LogDebug(">>> Entering __ENCAddToList(value={Value})", value)
             SyncLock DNNToolBarButton.__ENCList
                 If (DNNToolBarButton.__ENCList.Count = DNNToolBarButton.__ENCList.Capacity) Then
                     Dim index As Integer = 0
@@ -51,49 +56,70 @@ Namespace DotNetNuke.UI.WebControls
                 DNNToolBarButton.__ENCList.Add(New WeakReference(value))
             End SyncLock
         End Sub
+		Logger.LogDebug("<<< Exiting __ENCAddToList(value={Value})", value)
 
         Public Function GetAttributes() As ComponentModel.AttributeCollection Implements ICustomTypeDescriptor.GetAttributes
+			Logger.LogDebug(">>> Entering GetAttributes()")
             Return TypeDescriptor.GetAttributes(Me.GetType)
         End Function
+		Logger.LogDebug("<<< Exiting GetAttributes()")
 
         Public Function GetClassName() As String Implements ICustomTypeDescriptor.GetClassName
+			Logger.LogDebug(">>> Entering GetClassName()")
             Return TypeDescriptor.GetClassName(Me.GetType)
         End Function
+		Logger.LogDebug("<<< Exiting GetClassName()")
 
         Public Function GetComponentName() As String Implements ICustomTypeDescriptor.GetComponentName
+			Logger.LogDebug(">>> Entering GetComponentName()")
             Return TypeDescriptor.GetComponentName(Me.GetType)
         End Function
+		Logger.LogDebug("<<< Exiting GetComponentName()")
 
         Public Function GetConverter() As TypeConverter Implements ICustomTypeDescriptor.GetConverter
+			Logger.LogDebug(">>> Entering GetConverter()")
             Return TypeDescriptor.GetConverter(Me.GetType)
         End Function
+		Logger.LogDebug("<<< Exiting GetConverter()")
 
         Public Function GetDefaultEvent() As EventDescriptor Implements ICustomTypeDescriptor.GetDefaultEvent
+			Logger.LogDebug(">>> Entering GetDefaultEvent()")
             Return TypeDescriptor.GetDefaultEvent(Me.GetType)
         End Function
+		Logger.LogDebug("<<< Exiting GetDefaultEvent()")
 
         Public Function GetDefaultProperty() As PropertyDescriptor Implements ICustomTypeDescriptor.GetDefaultProperty
+			Logger.LogDebug(">>> Entering GetDefaultProperty()")
             Return TypeDescriptor.GetDefaultProperty(Me.GetType)
         End Function
+		Logger.LogDebug("<<< Exiting GetDefaultProperty()")
 
         Public Function GetEditor(ByVal editorBaseType As Type) As Object Implements ICustomTypeDescriptor.GetEditor
+			Logger.LogDebug(">>> Entering GetEditor(editorBaseType={EditorBaseType})", editorBaseType)
             Return TypeDescriptor.GetEditor(Me.GetType, editorBaseType)
         End Function
+		Logger.LogDebug("<<< Exiting GetEditor(editorBaseType={EditorBaseType})", editorBaseType)
 
         Public Function GetEvents(ByVal attributes As Attribute()) As EventDescriptorCollection Implements ICustomTypeDescriptor.GetEvents
+			Logger.LogDebug(">>> Entering GetEvents(attributes={Attributes})", attributes)
             Return TypeDescriptor.GetEvents(Me.GetType, attributes)
         End Function
+		Logger.LogDebug("<<< Exiting GetEvents(attributes={Attributes})", attributes)
 
         Public Function GetEvents2() As EventDescriptorCollection Implements ICustomTypeDescriptor.GetEvents
+			Logger.LogDebug(">>> Entering GetEvents2()")
             Return TypeDescriptor.GetEvents(Me.GetType)
         End Function
+		Logger.LogDebug("<<< Exiting GetEvents2()")
 
         Public Function GetProperties(ByVal attributes As Attribute()) As PropertyDescriptorCollection Implements ICustomTypeDescriptor.GetProperties
+			Logger.LogDebug(">>> Entering GetProperties(attributes={Attributes})", attributes)
             Dim enumerator As IEnumerator = Nothing
             Dim descriptors3 As New PropertyDescriptorCollection(Nothing)
             Dim properties As PropertyDescriptorCollection = TypeDescriptor.GetProperties(Me.GetType, attributes)
             Try 
                 enumerator = properties.GetEnumerator
+				Logger.LogDebug("GetProperties(attributes={Attributes}): enumerator → {Enumerator}", attributes, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -133,34 +159,47 @@ Namespace DotNetNuke.UI.WebControls
             End Try
             Return descriptors3
         End Function
+		Logger.LogDebug("<<< Exiting GetProperties(attributes={Attributes})", attributes)
 
         Public Function GetProperties2() As PropertyDescriptorCollection Implements ICustomTypeDescriptor.GetProperties
+			Logger.LogDebug(">>> Entering GetProperties2()")
             Return TypeDescriptor.GetProperties(Me.GetType)
         End Function
+		Logger.LogDebug("<<< Exiting GetProperties2()")
 
         Public Function GetPropertyOwner(ByVal pd As PropertyDescriptor) As Object Implements ICustomTypeDescriptor.GetPropertyOwner
+			Logger.LogDebug(">>> Entering GetPropertyOwner(pd={Pd})", pd)
             Return Me
         End Function
+		Logger.LogDebug("<<< Exiting GetPropertyOwner(pd={Pd})", pd)
 
         Private Sub HandlePropertyFilters(ByVal pd As PropertyDescriptor, ByVal x As PropertyDescriptorCollection)
+			Logger.LogDebug(">>> Entering HandlePropertyFilters(pd={Pd},x={X})", pd, x)
             pd.GetValue(Me)
             x.Add(pd)
         End Sub
+		Logger.LogDebug("<<< Exiting HandlePropertyFilters(pd={Pd},x={X})", pd, x)
 
         Private Sub NotifyDesigner()
+			Logger.LogDebug(">>> Entering NotifyDesigner()")
             If (If(((Me.Owner Is Nothing) OrElse Not WebControls.IsDesignMode), 0, 1) <> 0) Then
                 Me.Owner.NotifyDesigner
             End If
         End Sub
+		Logger.LogDebug("<<< Exiting NotifyDesigner()")
 
         Protected Overrides Sub Render(ByVal writer As HtmlTextWriter)
+		Logger.LogDebug(">>> Entering Render(writer={Writer})", writer)
         End Sub
 
         Private Function SafeJSONString(ByVal strString As String) As String
+			Logger.LogDebug(">>> Entering SafeJSONString(strString={StrString})", strString)
             Return ("'" & Strings.Replace(strString, "'", "\'", 1, -1, CompareMethod.Binary) & "'")
         End Function
+		Logger.LogDebug("<<< Exiting SafeJSONString(strString={StrString})", strString)
 
         Public Function ToJSON() As String
+			Logger.LogDebug(">>> Entering ToJSON()")
             Dim enumerator As IEnumerator = Nothing
             Dim hashtable As New Hashtable
             Dim builder As New StringBuilder
@@ -197,6 +236,7 @@ Namespace DotNetNuke.UI.WebControls
             builder.Append("{"c)
             Try 
                 enumerator = hashtable.Keys.GetEnumerator
+				Logger.LogDebug("ToJSON(): enumerator → {Enumerator}", enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -215,6 +255,7 @@ Namespace DotNetNuke.UI.WebControls
             builder.Append("}"c)
             Return builder.ToString
         End Function
+		Logger.LogDebug("<<< Exiting ToJSON()")
 
 
         ' Properties

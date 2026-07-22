@@ -12,6 +12,7 @@ namespace DotNetNuke.Services.Installer.Dependencies
 
     public class ManagedPackageDependency : DependencyBase, IManagedPackageDependency
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override string ErrorMessage
         {
@@ -48,11 +49,14 @@ namespace DotNetNuke.Services.Installer.Dependencies
         /// <inheritdoc />
         public override void ReadManifest(XPathNavigator dependencyNav)
         {
+			Logger.LogDebug(">>> Entering ReadManifest(dependencyNav={DependencyNav})", dependencyNav);
             this.PackageDependency = new PackageDependencyInfo
             {
+				Logger.LogDebug("ReadManifest(dependencyNav={DependencyNav}): this.PackageDependency → {Arg1}", dependencyNav, this.PackageDependency);
                 PackageName = dependencyNav.Value,
                 Version = new Version(Util.ReadAttribute(dependencyNav, "version")),
             };
+			Logger.LogDebug("<<< Exiting ReadManifest(dependencyNav={DependencyNav})", dependencyNav);
         }
     }
 }

@@ -37,12 +37,15 @@ namespace log4net.Layout
     /// <author>Nicko Cadell</author>
     public class XmlLayoutSchemaLog4j : XmlLayoutBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>The 1st of January 1970 in UTC</summary>
         private static readonly DateTime s_date1970 = new DateTime(1970, 1, 1);
 
         /// <summary>Constructs an XMLLayoutSchemaLog4j</summary>
         public XmlLayoutSchemaLog4j() : base()
         {
+		Logger.LogDebug(">>> Entering XmlLayoutSchemaLog4j()");
+		Logger.LogDebug("<<< Exiting XmlLayoutSchemaLog4j()");
         }
 
         /// <summary>Constructs an XMLLayoutSchemaLog4j.</summary>
@@ -115,6 +118,7 @@ method="run" file="Generator.java" line="94"/>
         /// </remarks>
         protected override void FormatXml(XmlWriter writer, LoggingEvent loggingEvent)
         {
+			Logger.LogDebug(">>> Entering FormatXml(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             // Translate logging events for log4j
 
             // Translate hostname property
@@ -170,6 +174,7 @@ method="run" file="Generator.java" line="94"/>
 
             object ndcObj = loggingEvent.LookupProperty("NDC");
             if (ndcObj != null)
+			Logger.LogDebug("FormatXml(writer={Writer},loggingEvent={LoggingEvent}): ndcObj → {NdcObj}", writer, loggingEvent, ndcObj);
             {
                 string valueStr = loggingEvent.Repository.RendererMap.FindAndRender(ndcObj);
 
@@ -185,6 +190,7 @@ method="run" file="Generator.java" line="94"/>
             // Append the properties text
             PropertiesDictionary properties = loggingEvent.GetProperties();
             if (properties.Count > 0)
+			Logger.LogDebug("FormatXml(writer={Writer},loggingEvent={LoggingEvent}): properties → {Properties}", writer, loggingEvent, properties);
             {
                 writer.WriteStartElement("log4j", "properties", "log4net");
                 foreach(System.Collections.DictionaryEntry entry in properties)
@@ -223,6 +229,7 @@ method="run" file="Generator.java" line="94"/>
             }
 
             writer.WriteEndElement();
+			Logger.LogDebug("<<< Exiting FormatXml(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
     }
 }

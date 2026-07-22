@@ -18,6 +18,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
     /// <summary>This control is only for internal use, please don't reference it in any other place as it may be removed in the future.</summary>
     public class DnnFormToggleButtonItem : DnnFormItemBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         // private DnnRadButton _checkBox;
         private CheckBox checkBox;
 
@@ -26,7 +27,9 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         public DnnFormToggleButtonItem()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering DnnFormToggleButtonItem()");
         }
+		Logger.LogDebug("<<< Exiting DnnFormToggleButtonItem()");
 
         /// <summary>Initializes a new instance of the <see cref="DnnFormToggleButtonItem"/> class.</summary>
         /// <param name="appStatus">The application status.</param>
@@ -35,6 +38,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
             : base(appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>(), eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>())
         {
             this.Mode = CheckBoxMode.TrueFalse;
+			Logger.LogDebug("DnnFormToggleButtonItem(appStatus={AppStatus},eventLogger={EventLogger}): this.Mode → {Arg2}", appStatus, eventLogger, this.Mode);
         }
 
         /// <summary>The checkbox mode.</summary>
@@ -56,8 +60,11 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <inheritdoc />
         protected override WebControl CreateControlInternal(Control container)
         {
+			Logger.LogDebug(">>> Entering CreateControlInternal(container={Container})", container);
             // _checkBox = new DnnRadButton {ID = ID + "_CheckBox", ButtonType = RadButtonType.ToggleButton, ToggleType = ButtonToggleType.CheckBox, AutoPostBack = false};
             this.checkBox = new CheckBox { ID = this.ID + "_CheckBox", AutoPostBack = false };
+			Logger.LogDebug("CreateControlInternal(container={Container}): checkBox → {CheckBox}", container, checkBox);
+			Logger.LogDebug("CreateControlInternal(container={Container}): this.checkBox → {Arg1}", container, this.checkBox);
 
             this.checkBox.CheckedChanged += this.CheckedChanged;
             container.Controls.Add(this.checkBox);
@@ -82,24 +89,30 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
                     break;
             }
 
+			Logger.LogDebug("<<< Exiting CreateControlInternal(container={Container})", container);
             return this.checkBox;
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.FormMode = DnnFormMode.Short;
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
+			Logger.LogDebug("OnInit(e={E}): this.FormMode → {Arg1}", e, this.FormMode);
         }
 
         private void CheckedChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering CheckedChanged(sender={Sender},e={E})", sender, e);
             string newValue;
             switch (this.Mode)
             {
                 case CheckBoxMode.YN:
                     newValue = this.checkBox.Checked ? "Y" : "N";
+					Logger.LogDebug("CheckedChanged(sender={Sender},e={E}): newValue → {NewValue}", sender, e, newValue);
                     break;
                 case CheckBoxMode.YesNo:
                     newValue = this.checkBox.Checked ? "Yes" : "No";
@@ -110,6 +123,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
             }
 
             this.UpdateDataSource(this.Value, newValue, this.DataField);
+			Logger.LogDebug("<<< Exiting CheckedChanged(sender={Sender},e={E})", sender, e);
         }
     }
 }

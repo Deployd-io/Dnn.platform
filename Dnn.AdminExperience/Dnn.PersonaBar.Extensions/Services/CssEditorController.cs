@@ -34,6 +34,7 @@ namespace Dnn.PersonaBar.CssEditor.Services
         [HttpGet]
         public HttpResponseMessage GetStyleSheet(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetStyleSheet(portalId={PortalId})", portalId);
             try
             {
                 if (!PortalSettings.Current.UserInfo.IsSuperUser && PortalSettings.Current.UserInfo.PortalID != portalId)
@@ -44,9 +45,13 @@ namespace Dnn.PersonaBar.CssEditor.Services
                 {
                     var activeLanguage = LocaleController.Instance.GetDefaultLocale(portalId).Code;
                     var portal = PortalController.Instance.GetPortal(portalId, activeLanguage);
+					Logger.LogDebug("GetStyleSheet(portalId={PortalId}): activeLanguage → {ActiveLanguage}", portalId, activeLanguage);
+					Logger.LogDebug("GetStyleSheet(portalId={PortalId}): portal → {Portal}", portalId, portal);
 
                     string uploadDirectory = string.Empty;
                     string styleSheetContent = string.Empty;
+					Logger.LogDebug("GetStyleSheet(portalId={PortalId}): uploadDirectory → {UploadDirectory}", portalId, uploadDirectory);
+					Logger.LogDebug("GetStyleSheet(portalId={PortalId}): styleSheetContent → {StyleSheetContent}", portalId, styleSheetContent);
                     if (portal != null)
                     {
                         uploadDirectory = portal.HomeDirectoryMapPath;
@@ -67,6 +72,7 @@ namespace Dnn.PersonaBar.CssEditor.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetStyleSheet(portalId={PortalId})", portalId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -79,6 +85,7 @@ namespace Dnn.PersonaBar.CssEditor.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage UpdateStyleSheet(UpdateCssRequest request)
         {
+			Logger.LogDebug(">>> Entering UpdateStyleSheet(request={Request})", request);
             if (!PortalSettings.Current.UserInfo.IsSuperUser && PortalSettings.Current.UserInfo.PortalID != request.PortalId)
             {
                 throw new SecurityException("No Permission");
@@ -89,9 +96,12 @@ namespace Dnn.PersonaBar.CssEditor.Services
                 {
                     string strUploadDirectory = string.Empty;
                     var relativePath = string.Empty;
+					Logger.LogDebug("UpdateStyleSheet(request={Request}): strUploadDirectory → {StrUploadDirectory}", request, strUploadDirectory);
+					Logger.LogDebug("UpdateStyleSheet(request={Request}): relativePath → {RelativePath}", request, relativePath);
 
                     PortalInfo objPortal = PortalController.Instance.GetPortal(request.PortalId);
                     if (objPortal != null)
+					Logger.LogDebug("UpdateStyleSheet(request={Request}): objPortal → {ObjPortal}", request, objPortal);
                     {
                         strUploadDirectory = objPortal.HomeDirectoryMapPath;
                         relativePath = $"{Globals.ApplicationPath}/{objPortal.HomeDirectory}/portal.css";
@@ -137,6 +147,7 @@ namespace Dnn.PersonaBar.CssEditor.Services
                 catch (Exception exc)
                 {
                     Logger.Error(exc);
+					Logger.LogDebug("<<< Exiting UpdateStyleSheet(request={Request})", request);
                     return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
                 }
             }
@@ -150,6 +161,7 @@ namespace Dnn.PersonaBar.CssEditor.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage RestoreStyleSheet(RestoreCssRequest request)
         {
+			Logger.LogDebug(">>> Entering RestoreStyleSheet(request={Request})", request);
             if (!PortalSettings.Current.UserInfo.IsSuperUser &&
                 PortalSettings.Current.UserInfo.PortalID != request.PortalId)
             {
@@ -161,6 +173,7 @@ namespace Dnn.PersonaBar.CssEditor.Services
                 {
                     PortalInfo portal = PortalController.Instance.GetPortal(request.PortalId);
                     if (portal != null)
+					Logger.LogDebug("RestoreStyleSheet(request={Request}): portal → {Portal}", request, portal);
                     {
                         if (File.Exists(portal.HomeDirectoryMapPath + "portal.css"))
                         {
@@ -179,11 +192,13 @@ namespace Dnn.PersonaBar.CssEditor.Services
 
                     var content = LoadStyleSheet(request.PortalId);
 
+					Logger.LogDebug("RestoreStyleSheet(request={Request}): content → {Content}", request, content);
                     return this.Request.CreateResponse(HttpStatusCode.OK, new { Success = true, StyleSheetContent = content });
                 }
                 catch (Exception exc)
                 {
                     Logger.Error(exc);
+					Logger.LogDebug("<<< Exiting RestoreStyleSheet(request={Request})", request);
                     return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
                 }
             }
@@ -191,11 +206,16 @@ namespace Dnn.PersonaBar.CssEditor.Services
 
         private static string LoadStyleSheet(int portalId)
         {
+			Logger.LogDebug(">>> Entering LoadStyleSheet(portalId={PortalId})", portalId);
             var activeLanguage = LocaleController.Instance.GetDefaultLocale(portalId).Code;
             var portal = PortalController.Instance.GetPortal(portalId, activeLanguage);
+			Logger.LogDebug("LoadStyleSheet(portalId={PortalId}): activeLanguage → {ActiveLanguage}", portalId, activeLanguage);
+			Logger.LogDebug("LoadStyleSheet(portalId={PortalId}): portal → {Portal}", portalId, portal);
 
             string uploadDirectory = string.Empty;
             string styleSheetContent = string.Empty;
+			Logger.LogDebug("LoadStyleSheet(portalId={PortalId}): uploadDirectory → {UploadDirectory}", portalId, uploadDirectory);
+			Logger.LogDebug("LoadStyleSheet(portalId={PortalId}): styleSheetContent → {StyleSheetContent}", portalId, styleSheetContent);
             if (portal != null)
             {
                 uploadDirectory = portal.HomeDirectoryMapPath;
@@ -210,6 +230,7 @@ namespace Dnn.PersonaBar.CssEditor.Services
                 }
             }
 
+			Logger.LogDebug("<<< Exiting LoadStyleSheet(portalId={PortalId})", portalId);
             return styleSheetContent;
         }
     }

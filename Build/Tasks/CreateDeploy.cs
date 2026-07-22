@@ -13,21 +13,27 @@ namespace DotNetNuke.Build.Tasks
     [IsDependentOn(typeof(OtherPackages))]
     public sealed class CreateDeploy : FrostingTask<Context>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly string[] IncludeAll = ["**/*",];
 
         /// <inheritdoc />
         public override void Run(Context context)
         {
+			Logger.LogDebug(">>> Entering Run(context={Context})", context);
             context.CreateDirectory(context.ArtifactsDir);
             var packageZip = context.ArtifactsDir + context.File($"DNN_Platform_{context.GetBuildNumber()}_Deploy.zip");
 
+			Logger.LogDebug("Run(context={Context}): packageZip → {PackageZip}", context, packageZip);
             var deployDir = context.Directory("./DotNetNuke/");
             context.MoveDirectory(context.WebsiteDir, deployDir);
+			Logger.LogDebug("Run(context={Context}): deployDir → {DeployDir}", context, deployDir);
             var files = context.GetFilesByPatterns(deployDir, IncludeAll, context.PackagingPatterns.InstallExclude);
             files.Add(context.GetFilesByPatterns(deployDir, context.PackagingPatterns.InstallInclude));
+			Logger.LogDebug("Run(context={Context}): files → {Files}", context, files);
             context.Zip(string.Empty, packageZip, files);
             context.AddFilesToZip(packageZip, "./Build/Deploy", context.GetFiles("./Build/Deploy/*"), append: true);
             context.MoveDirectory(deployDir, context.WebsiteDir);
+			Logger.LogDebug("<<< Exiting Run(context={Context})", context);
         }
     }
 }

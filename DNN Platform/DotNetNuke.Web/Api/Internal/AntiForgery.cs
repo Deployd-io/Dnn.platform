@@ -12,9 +12,12 @@ namespace DotNetNuke.Web.Api.Internal
     /// <summary>The <see cref="IAntiForgery"/> service locator.</summary>
     public class AntiForgery : ServiceLocator<IAntiForgery, AntiForgery>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         protected override Func<IAntiForgery> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new AntiForgeryImpl();
         }
     }

@@ -28,6 +28,7 @@ namespace Dnn.PersonaBar.SqlConsole.Services
     [MenuPermission(Scope = ServiceScope.Host)]
     public class SqlConsoleController : PersonaBarApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string ScriptDelimiterRegex = "(?<=(?:[^\\w]+|^))GO(?=(?: |\\t)*?(?:\\r?\\n|$))";
 
         private static readonly Regex SqlObjRegex = new Regex(
@@ -40,6 +41,8 @@ namespace Dnn.PersonaBar.SqlConsole.Services
         [HttpGet]
         public HttpResponseMessage GetSavedQueries()
         {
+			Logger.LogDebug(">>> Entering GetSavedQueries()");
+			Logger.LogDebug("<<< Exiting GetSavedQueries()");
             return this.Request.CreateResponse(HttpStatusCode.OK, new
             {
                 queries = this.controller.GetQueries(),
@@ -50,6 +53,8 @@ namespace Dnn.PersonaBar.SqlConsole.Services
         [HttpGet]
         public HttpResponseMessage GetSavedQuery(int id)
         {
+			Logger.LogDebug(">>> Entering GetSavedQuery(id={Id})", id);
+			Logger.LogDebug("<<< Exiting GetSavedQuery(id={Id})", id);
             return this.Request.CreateResponse(HttpStatusCode.OK, this.controller.GetQuery(id));
         }
 
@@ -57,8 +62,13 @@ namespace Dnn.PersonaBar.SqlConsole.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage SaveQuery(SqlQuery query)
         {
+			Logger.LogDebug(">>> Entering SaveQuery(query={Query})");
             query.CreatedOnDate = DateTime.Now;
             query.CreatedByUserId = this.UserInfo.UserID;
+			Logger.LogDebug("SaveQuery(query={Query}): query.CreatedByUserId → {Arg1}", query.CreatedByUserId);
+			Logger.LogDebug("SaveQuery(query={Query}): query.LastModifiedOnDate → {Arg1}", query.LastModifiedOnDate);
+			Logger.LogDebug("SaveQuery(query={Query}): query.LastModifiedByUserId → {Arg1}", query.LastModifiedByUserId);
+			Logger.LogDebug("SaveQuery(query={Query}): query.CreatedOnDate → {Arg1}", query.CreatedOnDate);
             query.LastModifiedOnDate = DateTime.Now;
             query.LastModifiedByUserId = this.UserInfo.UserID;
 
@@ -66,9 +76,12 @@ namespace Dnn.PersonaBar.SqlConsole.Services
             {
                 var saveQueries = this.controller.GetQueries();
                 var saveQuery = saveQueries.FirstOrDefault(q => q.Name.Equals(query.Name, StringComparison.OrdinalIgnoreCase));
+				Logger.LogDebug("SaveQuery(query={Query}): saveQueries → {SaveQueries}", saveQueries);
+				Logger.LogDebug("SaveQuery(query={Query}): saveQuery → {SaveQuery}", saveQuery);
                 if (saveQuery != null)
                 {
                     query.QueryId = saveQuery.QueryId;
+					Logger.LogDebug("SaveQuery(query={Query}): query.QueryId → {Arg1}", query.QueryId);
                 }
             }
 
@@ -81,6 +94,7 @@ namespace Dnn.PersonaBar.SqlConsole.Services
                 this.controller.AddQuery(query);
             }
 
+			Logger.LogDebug("<<< Exiting SaveQuery(query={Query})");
             return this.Request.CreateResponse(HttpStatusCode.OK, query);
         }
 
@@ -88,14 +102,17 @@ namespace Dnn.PersonaBar.SqlConsole.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage DeleteQuery(SqlQuery query)
         {
+			Logger.LogDebug(">>> Entering DeleteQuery(query={Query})");
             var savedQuery = this.controller.GetQuery(query.QueryId);
             if (savedQuery != null)
+			Logger.LogDebug("DeleteQuery(query={Query}): savedQuery → {SavedQuery}", savedQuery);
             {
                 this.controller.DeleteQuery(savedQuery);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { });
             }
 
+			Logger.LogDebug("<<< Exiting DeleteQuery(query={Query})");
             return this.Request.CreateResponse(HttpStatusCode.NoContent);
         }
 
@@ -103,15 +120,20 @@ namespace Dnn.PersonaBar.SqlConsole.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage RunQuery(AdhocSqlQuery query)
         {
+			Logger.LogDebug(">>> Entering RunQuery(query={Query})");
             var connectionstring = Config.GetConnectionString(query.ConnectionStringName);
 
+			Logger.LogDebug("RunQuery(query={Query}): connectionstring → {Connectionstring}", connectionstring);
             var outputTables = new List<DataTable>();
             string errorMessage;
+			Logger.LogDebug("RunQuery(query={Query}): outputTables → {OutputTables}", outputTables);
 
             var runAsQuery = RunAsScript(query.Query);
             if (runAsQuery)
+			Logger.LogDebug("RunQuery(query={Query}): runAsQuery → {RunAsQuery}", runAsQuery);
             {
                 errorMessage = DataProvider.Instance().ExecuteScript(connectionstring, query.Query, query.Timeout);
+				Logger.LogDebug("RunQuery(query={Query}): errorMessage → {ErrorMessage}", errorMessage);
             }
             else
             {
@@ -119,6 +141,7 @@ namespace Dnn.PersonaBar.SqlConsole.Services
                 {
                     var dr = DataProvider.Instance().ExecuteSQLTemp(connectionstring, query.Query, query.Timeout, out errorMessage);
                     if (dr != null)
+					Logger.LogDebug("RunQuery(query={Query}): dr → {Dr}", dr);
                     {
                         do
                         {
@@ -138,18 +161,24 @@ namespace Dnn.PersonaBar.SqlConsole.Services
             this.RecordAuditEventLog(query.Query);
 
             var statusCode = string.IsNullOrEmpty(errorMessage) ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
+			Logger.LogDebug("RunQuery(query={Query}): statusCode → {StatusCode}", statusCode);
+			Logger.LogDebug("<<< Exiting RunQuery(query={Query})");
             return this.Request.CreateResponse(statusCode, new { Data = runAsQuery ? null : outputTables, Error = errorMessage });
         }
 
         private static bool RunAsScript(string query)
         {
+			Logger.LogDebug(">>> Entering RunAsScript(query={Query})");
+			Logger.LogDebug("<<< Exiting RunAsScript(query={Query})");
             return SqlObjRegex.IsMatch(query);
         }
 
         private void RecordAuditEventLog(string query)
         {
+			Logger.LogDebug(">>> Entering RecordAuditEventLog(query={Query})");
             var props = new LogProperties { new LogDetailInfo("User", this.UserInfo.Username), new LogDetailInfo("SQL Query", query) };
 
+			Logger.LogDebug("RecordAuditEventLog(query={Query}): props → {Props}", props);
             // Add the event log with host portal id.
             var log = new LogInfo
             {
@@ -161,6 +190,7 @@ namespace Dnn.PersonaBar.SqlConsole.Services
             };
 
             LogController.Instance.AddLog(log);
+			Logger.LogDebug("<<< Exiting RecordAuditEventLog(query={Query})");
         }
     }
 }

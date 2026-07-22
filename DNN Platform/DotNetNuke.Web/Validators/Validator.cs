@@ -9,12 +9,17 @@ namespace DotNetNuke.Web.Validators
     /// <summary>A validator which applies multiple <see cref="ObjectValidator"/> instances to an object.</summary>
     public class Validator
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly List<ObjectValidator> validators;
 
         /// <summary>Initializes a new instance of the <see cref="Validator"/> class.</summary>
         public Validator()
         {
+			Logger.LogDebug(">>> Entering Validator()");
             this.validators = [];
+			Logger.LogDebug("<<< Exiting Validator()");
+			Logger.LogDebug("Validator(): validators → {Validators}", validators);
+			Logger.LogDebug("Validator(): this.validators → {Arg0}", this.validators);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Validator"/> class.</summary>
@@ -39,6 +44,8 @@ namespace DotNetNuke.Web.Validators
         /// <returns>A new <see cref="ValidationResult"/>.</returns>
         public ValidationResult ValidateObject(object target)
         {
+			Logger.LogDebug(">>> Entering ValidateObject(target={Target})", target);
+			Logger.LogDebug("<<< Exiting ValidateObject(target={Target})", target);
             return this.validators.Aggregate(ValidationResult.Successful, (result, validator) => result.CombineWith(validator.ValidateObject(target) ?? ValidationResult.Successful));
         }
     }

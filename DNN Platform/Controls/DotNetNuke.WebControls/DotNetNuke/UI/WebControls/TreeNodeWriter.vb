@@ -1,5 +1,6 @@
 ﻿' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports DotNetNuke.UI.Utilities
 Imports Microsoft.VisualBasic
@@ -14,9 +15,11 @@ Namespace DotNetNuke.UI.WebControls
         Implements ITreeNodeWriter
         ' Methods
         Private Function GetNodeCss(ByVal oNode As TreeNode) As String
+			Logger.LogDebug(">>> Entering GetNodeCss(oNode={ONode})", oNode)
             Dim cssClass As String = oNode.DNNTree.CssClass
             If (oNode.Level > 0) Then
                 cssClass = oNode.DNNTree.DefaultChildNodeCssClass
+				Logger.LogDebug("GetNodeCss(oNode={ONode}): cssClass → {CssClass}", oNode, cssClass)
             End If
             If (Strings.Len(oNode.CssClass) > 0) Then
                 cssClass = oNode.CssClass
@@ -26,8 +29,10 @@ Namespace DotNetNuke.UI.WebControls
             End If
             Return cssClass
         End Function
+		Logger.LogDebug("<<< Exiting GetNodeCss(oNode={ONode})", oNode)
 
         Protected Sub Render(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer)
             Me.RenderContents(writer)
             If (If((Not Me._Node.HasNodes OrElse (Not Me._Node.IsExpanded AndAlso Not Me._Node.DNNTree.IsCrawler)), 0, 1) <> 0) Then
                 writer.AddAttribute(HtmlTextWriterAttribute.Class, "Child")
@@ -37,11 +42,14 @@ Namespace DotNetNuke.UI.WebControls
                 writer.RenderEndTag
             End If
         End Sub
+		Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer)
 
         Protected Sub RenderChildren(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderChildren(writer={Writer})", writer)
             Dim enumerator As IEnumerator = Nothing
             Try 
                 enumerator = Me._Node.TreeNodes.GetEnumerator
+				Logger.LogDebug("RenderChildren(writer={Writer}): enumerator → {Enumerator}", writer, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -54,8 +62,10 @@ Namespace DotNetNuke.UI.WebControls
                 End If
             End Try
         End Sub
+		Logger.LogDebug("<<< Exiting RenderChildren(writer={Writer})", writer)
 
         Protected Sub RenderContents(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderContents(writer={Writer})", writer)
             Me.RenderOpenTag(writer)
             If (Me._Node.DNNTree.IndentWidth = 0) Then
                 Me._Node.DNNTree.IndentWidth = 9
@@ -69,8 +79,10 @@ Namespace DotNetNuke.UI.WebControls
             Me.RenderNodeText(writer)
             writer.RenderEndTag
         End Sub
+		Logger.LogDebug("<<< Exiting RenderContents(writer={Writer})", writer)
 
         Protected Sub RenderExpandNodeIcon(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderExpandNodeIcon(writer={Writer})", writer)
             If Not Me._Node.HasNodes Then
                 Me.RenderSpacer(writer, Me._Node.DNNTree.ExpandCollapseImageWidth)
             Else
@@ -80,6 +92,7 @@ Namespace DotNetNuke.UI.WebControls
                     link.Text = TreeNodeWriter._expcol(1)
                     If (Strings.Len(Me._Node.DNNTree.ExpandedNodeImage) > 0) Then
                         image.ImageUrl = Me._Node.DNNTree.ExpandedNodeImage
+						Logger.LogDebug("RenderExpandNodeIcon(writer={Writer}): image.ImageUrl → {Arg1}", writer, image.ImageUrl)
                     End If
                 Else
                     link.Text = TreeNodeWriter._expcol(0)
@@ -96,17 +109,24 @@ Namespace DotNetNuke.UI.WebControls
                     link.RenderEndTag(writer)
                 End If
                 image = Nothing
+				Logger.LogDebug("RenderExpandNodeIcon(writer={Writer}): image → {Image}", writer, image)
+				Logger.LogDebug("RenderExpandNodeIcon(writer={Writer}): link → {Link}", writer, link)
                 link = Nothing
             End If
             writer.Write("&nbsp;")
         End Sub
+		Logger.LogDebug("<<< Exiting RenderExpandNodeIcon(writer={Writer})", writer)
 
         Public Sub RenderNode(ByVal writer As HtmlTextWriter, ByVal Node As TreeNode) Implements ITreeNodeWriter.RenderNode
+			Logger.LogDebug(">>> Entering RenderNode(writer={Writer},Node={Node})", writer, Node)
             Me._Node = Node
             Me.Render(writer)
+			Logger.LogDebug("RenderNode(writer={Writer},Node={Node}): Me._Node → {Arg2}", writer, Node, Me._Node)
         End Sub
+		Logger.LogDebug("<<< Exiting RenderNode(writer={Writer},Node={Node})", writer, Node)
 
         Protected Sub RenderNodeCheckbox(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderNodeCheckbox(writer={Writer})", writer)
             If Me._Node.DNNTree.CheckBoxes Then
                 Dim box As New CheckBox With { _
                     .ID = (Me._Node.ID & TreeNode._separator & TreeNode._checkboxIDSufix), _
@@ -114,11 +134,13 @@ Namespace DotNetNuke.UI.WebControls
                 }
                 Dim expression As String = ""
                 If (Strings.Len(Me._Node.JSFunction) > 0) Then
+					Logger.LogDebug("RenderNodeCheckbox(writer={Writer}): String → {String}", writer, String)
                     If Not Me._Node.JSFunction.EndsWith(";", StringComparison.Ordinal) Then
                         Dim node As TreeNode = Me._Node
                         node.JSFunction = (node.JSFunction & ";")
                     End If
                     expression = (expression & Me._Node.JSFunction)
+					Logger.LogDebug("RenderNodeCheckbox(writer={Writer}): expression → {Expression}", writer, expression)
                 End If
                 If (Strings.Len(Me._Node.DNNTree.JSFunction) > 0) Then
                     If Not Me._Node.DNNTree.JSFunction.EndsWith(";", StringComparison.Ordinal) Then
@@ -133,14 +155,18 @@ Namespace DotNetNuke.UI.WebControls
                 box.Attributes.Add("onclick", expression)
                 box.RenderControl(writer)
                 box = Nothing
+				Logger.LogDebug("RenderNodeCheckbox(writer={Writer}): box → {Box}", writer, box)
                 writer.Write("&nbsp;")
             End If
         End Sub
+		Logger.LogDebug("<<< Exiting RenderNodeCheckbox(writer={Writer})", writer)
 
         Protected Sub RenderNodeIcon(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderNodeIcon(writer={Writer})", writer)
             Dim label As New Label
             If (Strings.Len(Me._Node.CSSIcon) > 0) Then
                 label.CssClass = Me._Node.CSSIcon
+				Logger.LogDebug("RenderNodeIcon(writer={Writer}): label.CssClass → {Arg1}", writer, label.CssClass)
             ElseIf (Strings.Len(Me._Node.DNNTree.DefaultIconCssClass) > 0) Then
                 label.CssClass = Me._Node.DNNTree.DefaultIconCssClass
             End If
@@ -157,17 +183,21 @@ Namespace DotNetNuke.UI.WebControls
             End If
             label.RenderEndTag(writer)
         End Sub
+		Logger.LogDebug("<<< Exiting RenderNodeIcon(writer={Writer})", writer)
 
         Protected Sub RenderNodeText(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderNodeText(writer={Writer})", writer)
             Dim link As New HyperLink
             Dim expression As String = ""
             link.Text = Me._Node.Text
+			Logger.LogDebug("RenderNodeText(writer={Writer}): link.Text → {Arg1}", writer, link.Text)
             If (Strings.Len(Me._Node.JSFunction) > 0) Then
                 If Not Me._Node.JSFunction.EndsWith(";", StringComparison.Ordinal) Then
                     Dim node As TreeNode = Me._Node
                     node.JSFunction = (node.JSFunction & ";")
                 End If
                 expression = (expression & Me._Node.JSFunction)
+				Logger.LogDebug("RenderNodeText(writer={Writer}): expression → {Expression}", writer, expression)
             ElseIf (Strings.Len(Me._Node.DNNTree.JSFunction) > 0) Then
                 If Not Me._Node.DNNTree.JSFunction.EndsWith(";", StringComparison.Ordinal) Then
                     Dim dNNTree As DnnTree = Me._Node.DNNTree
@@ -201,27 +231,34 @@ Namespace DotNetNuke.UI.WebControls
             End If
             If (Strings.Len(Me._Node.ToolTip) > 0) Then
                 link.ToolTip = Me._Node.ToolTip
+				Logger.LogDebug("RenderNodeText(writer={Writer}): link.ToolTip → {Arg1}", writer, link.ToolTip)
             End If
             Dim nodeCss As String = Me.GetNodeCss(Me._Node)
             If (Strings.Len(nodeCss) > 0) Then
                 link.CssClass = nodeCss
+				Logger.LogDebug("RenderNodeText(writer={Writer}): link.CssClass → {Arg1}", writer, link.CssClass)
             End If
             link.RenderControl(writer)
         End Sub
+		Logger.LogDebug("<<< Exiting RenderNodeText(writer={Writer})", writer)
 
         Protected Sub RenderOpenTag(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderOpenTag(writer={Writer})", writer)
             writer.AddAttribute(HtmlTextWriterAttribute.Name, Me._Node.ID)
             writer.AddAttribute(HtmlTextWriterAttribute.Id, Me._Node.ID.Replace(TreeNode._separator, "_"))
             writer.RenderBeginTag(HtmlTextWriterTag.Div)
         End Sub
+		Logger.LogDebug("<<< Exiting RenderOpenTag(writer={Writer})", writer)
 
         Protected Sub RenderSpacer(ByVal writer As HtmlTextWriter, ByVal Width As Integer)
+			Logger.LogDebug(">>> Entering RenderSpacer(writer={Writer},Width={Width})", writer, Width)
             writer.AddStyleAttribute("width", (Width.ToString(CultureInfo.InvariantCulture) & "px"))
             writer.AddStyleAttribute("height", "1px")
             writer.AddAttribute("src", (Me._Node.DNNTree.SystemImagesPath & "spacer.gif"))
             writer.RenderBeginTag(HtmlTextWriterTag.Img)
             writer.RenderEndTag
         End Sub
+		Logger.LogDebug("<<< Exiting RenderSpacer(writer={Writer},Width={Width})", writer, Width)
 
 
         ' Fields

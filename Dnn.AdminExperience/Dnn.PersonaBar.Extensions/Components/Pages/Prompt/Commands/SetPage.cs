@@ -20,6 +20,7 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
     [ConsoleCommand("set-page", Constants.PagesCategory, "Prompt_SetPage_Description")]
     public class SetPage : ConsoleCommandBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [FlagParameter("id", "Prompt_SetPage_FlagId", "Integer", true)]
         private const string FlagId = "id";
 
@@ -51,13 +52,17 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
         public SetPage()
             : this(PagesController.Instance)
         {
+		Logger.LogDebug(">>> Entering SetPage()");
         }
+		Logger.LogDebug("<<< Exiting SetPage()");
 
         /// <summary>Initializes a new instance of the <see cref="SetPage"/> class.</summary>
         /// <param name="pagesController">The pages controller.</param>
         public SetPage(IPagesController pagesController)
         {
             this.pagesController = pagesController;
+			Logger.LogDebug("SetPage(pagesController={PagesController}): pagesController → {PagesController1}", pagesController, pagesController);
+			Logger.LogDebug("SetPage(pagesController={PagesController}): this.pagesController → {Arg1}", pagesController, this.pagesController);
         }
 
         /// <inheritdoc />
@@ -81,6 +86,7 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
 
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.PageId = this.GetFlagValue(FlagId, "Page Id", -1, true, true, true);
             this.ParentId = this.GetFlagValue<int?>(FlagParentId, "Parent Id", null);
             this.Title = this.GetFlagValue(FlagTitle, "Title", string.Empty);
@@ -93,14 +99,17 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
             {
                 this.AddMessage(string.Format(CultureInfo.InvariantCulture, this.LocalizeString("Prompt_NothingToUpdate"), FlagTitle, FlagDescription, FlagName, FlagVisible));
             }
+			Logger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             try
             {
                 var pageSettings = this.pagesController.GetPageSettings(this.PageId, this.PortalSettings);
                 if (pageSettings == null)
+				Logger.LogDebug("Run(): pageSettings → {PageSettings}", pageSettings);
                 {
                     return new ConsoleErrorResultModel(this.LocalizeString("PageNotFound"));
                 }
@@ -111,6 +120,8 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
                 pageSettings.Description = !string.IsNullOrEmpty(this.Description) ? this.Description : pageSettings.Description;
                 pageSettings.Keywords = !string.IsNullOrEmpty(this.Keywords) ? this.Keywords : pageSettings.Keywords;
                 pageSettings.ParentId = this.ParentId.HasValue ? this.ParentId : pageSettings.ParentId;
+				Logger.LogDebug("Run(): pageSettings.ParentId → {Arg0}", pageSettings.ParentId);
+				Logger.LogDebug("Run(): pageSettings.IncludeInMenu → {Arg0}", pageSettings.IncludeInMenu);
                 pageSettings.IncludeInMenu = this.Visible ?? pageSettings.IncludeInMenu;
                 if (!SecurityService.Instance.CanSavePageDetails(pageSettings))
                 {
@@ -119,15 +130,18 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
 
                 var updatedTab = this.pagesController.SavePageDetails(this.PortalSettings, pageSettings);
 
+				Logger.LogDebug("Run(): updatedTab → {UpdatedTab}", updatedTab);
                 var lstResults = new List<PageModel> { new PageModel(updatedTab) };
                 return new ConsoleResultModel(this.LocalizeString("PageUpdatedMessage")) { Data = lstResults, Records = lstResults.Count };
             }
             catch (PageNotFoundException)
             {
+				Logger.LogError("Exception in Run(): {Arg0}", ex.Message);
                 return new ConsoleErrorResultModel(this.LocalizeString("PageNotFound"));
             }
             catch (PageValidationException ex)
             {
+				Logger.LogDebug("<<< Exiting Run()");
                 return new ConsoleErrorResultModel(ex.Message);
             }
         }
