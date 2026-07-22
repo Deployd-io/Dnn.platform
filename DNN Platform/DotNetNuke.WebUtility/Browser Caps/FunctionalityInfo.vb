@@ -1,5 +1,6 @@
 ﻿' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports System.Xml.Serialization
 
@@ -53,10 +54,12 @@ Namespace DotNetNuke.UI.Utilities
         End Property
 
         Public Function HasMatch(ByVal strAgent As String, ByVal strBrowser As String, ByVal dblVersion As Double) As Boolean
+			Logger.LogDebug(">>> Entering HasMatch(strAgent={StrAgent},strBrowser={StrBrowser},dblVersion={DblVersion})", strAgent, strBrowser, dblVersion)
             Dim _hasMatch As Boolean = False
 
             'Parse through the supported browsers to find a match
             _hasMatch = HasMatch(Supports, strAgent, strBrowser, dblVersion)
+			Logger.LogDebug("HasMatch(strAgent={StrAgent},strBrowser={StrBrowser},dblVersion={DblVersion}): _hasMatch → {_hasMatch}", strAgent, strBrowser, dblVersion, _hasMatch)
 
             'If has Match check the excluded browsers to find a match
             If _hasMatch Then
@@ -68,12 +71,14 @@ Namespace DotNetNuke.UI.Utilities
 
         Private Shared Function HasMatch(ByVal browsers As BrowserCollection, ByVal strAgent As String, ByVal strBrowser As String, ByVal dblVersion As Double) As Boolean
             Dim _hasMatch As Boolean = False
+			Logger.LogDebug("<<< Exiting HasMatch(strAgent={StrAgent},strBrowser={StrBrowser},dblVersion={DblVersion})", strAgent, strBrowser, dblVersion)
 
             'Parse through the browsers to find a match based on name/minversion
             For Each browser As Browser In browsers
                 'Check by browser name and min version
                 If (Not String.IsNullOrEmpty(browser.Name) AndAlso browser.Name.Equals(strBrowser, StringComparison.OrdinalIgnoreCase) AndAlso browser.MinVersion <= dblVersion) Then
                     _hasMatch = True
+					Logger.LogDebug("HasMatch(browsers={Browsers},strAgent={StrAgent},strBrowser={StrBrowser},dblVersion={DblVersion}): _hasMatch → {_hasMatch}", browsers, strAgent, strBrowser, dblVersion, _hasMatch)
                     Exit For
                 End If
 

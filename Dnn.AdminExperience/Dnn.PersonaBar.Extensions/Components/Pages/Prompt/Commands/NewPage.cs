@@ -21,6 +21,7 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
     [ConsoleCommand("new-page", Constants.PagesCategory, "Prompt_NewPage_Description")]
     public class NewPage : ConsoleCommandBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [FlagParameter("parentid", "Prompt_NewPage_FlagParentId", "Integer")]
         private const string FlagParentId = "parentid";
 
@@ -49,13 +50,17 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
         public NewPage()
             : this(PagesController.Instance)
         {
+		Logger.LogDebug(">>> Entering NewPage()");
         }
+		Logger.LogDebug("<<< Exiting NewPage()");
 
         /// <summary>Initializes a new instance of the <see cref="NewPage"/> class.</summary>
         /// <param name="pagesController">The pages controller.</param>
         public NewPage(IPagesController pagesController)
         {
             this.pagesController = pagesController;
+			Logger.LogDebug("NewPage(pagesController={PagesController}): pagesController → {PagesController1}", pagesController, pagesController);
+			Logger.LogDebug("NewPage(pagesController={PagesController}): this.pagesController → {Arg1}", pagesController, this.pagesController);
         }
 
         /// <inheritdoc />
@@ -78,6 +83,7 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.ParentId = this.GetFlagValue<int?>(FlagParentId, "Parent Id", null, false, false, true);
             this.Title = this.GetFlagValue(FlagTitle, "Title", string.Empty);
             this.Name = this.GetFlagValue(FlagName, "Page Name", string.Empty, true, true);
@@ -94,23 +100,30 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
 
             var testTab = TabController.Instance.GetTab((int)this.ParentId, this.PortalId);
             if (testTab == null)
+			Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): testTab → {TestTab}", args, portalSettings, userInfo, activeTabId, testTab);
             {
                 this.AddMessage(string.Format(CultureInfo.CurrentCulture, this.LocalizeString("Prompt_UnableToFindSpecified"), FlagParentId, this.ParentId));
             }
+			Logger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             try
             {
                 var pageSettings = this.pagesController.GetDefaultSettings();
                 pageSettings.Name = !string.IsNullOrEmpty(this.Name) ? this.Name : pageSettings.Name;
+				Logger.LogDebug("Run(): pageSettings → {PageSettings}", pageSettings);
                 pageSettings.Title = !string.IsNullOrEmpty(this.Title) ? this.Title : pageSettings.Title;
                 pageSettings.Url = !string.IsNullOrEmpty(this.Url) ? this.Url : pageSettings.Url;
                 pageSettings.Description = !string.IsNullOrEmpty(this.Description) ? this.Description : pageSettings.Description;
                 pageSettings.Keywords = !string.IsNullOrEmpty(this.Keywords) ? this.Keywords : pageSettings.Keywords;
                 pageSettings.ParentId = this.ParentId.HasValue ? this.ParentId : pageSettings.ParentId;
+				Logger.LogDebug("Run(): pageSettings.ParentId → {Arg0}", pageSettings.ParentId);
+				Logger.LogDebug("Run(): pageSettings.HasParent → {Arg0}", pageSettings.HasParent);
+				Logger.LogDebug("Run(): pageSettings.IncludeInMenu → {Arg0}", pageSettings.IncludeInMenu);
                 pageSettings.HasParent = this.ParentId.HasValue;
                 pageSettings.IncludeInMenu = this.Visible ?? pageSettings.IncludeInMenu;
                 pageSettings.IncludeInMenu = this.Visible ?? true;
@@ -118,8 +131,10 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
                 {
                     var parentTab = this.pagesController.GetPageSettings(pageSettings.ParentId.Value);
                     if (parentTab != null)
+					Logger.LogDebug("Run(): parentTab → {ParentTab}", parentTab);
                     {
                         pageSettings.Permissions = parentTab.Permissions;
+						Logger.LogDebug("Run(): pageSettings.Permissions → {Arg0}", pageSettings.Permissions);
                     }
                 }
 
@@ -130,9 +145,11 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
 
                 var newTab = this.pagesController.SavePageDetails(this.PortalSettings, pageSettings);
 
+				Logger.LogDebug("Run(): newTab → {NewTab}", newTab);
                 // create the tab
                 var lstResults = new List<PageModel>();
                 if (newTab != null && newTab.TabID > 0)
+				Logger.LogDebug("Run(): lstResults → {LstResults}", lstResults);
                 {
                     lstResults.Add(new PageModel(newTab));
                 }
@@ -145,10 +162,12 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
             }
             catch (PageNotFoundException)
             {
+				Logger.LogError("Exception in Run(): {Arg0}", ex.Message);
                 return new ConsoleErrorResultModel(this.LocalizeString("PageNotFound"));
             }
             catch (PageValidationException ex)
             {
+				Logger.LogDebug("<<< Exiting Run()");
                 return new ConsoleErrorResultModel(ex.Message);
             }
         }

@@ -15,6 +15,7 @@ namespace Dnn.PersonaBar.Security.Components.Checks
 
     public class CheckDiskAcccessPermissions : IAuditCheck
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const char Yes = 'Y';
         private const char No = 'N';
 
@@ -27,14 +28,18 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc />
         public CheckResult Execute()
         {
+			Logger.LogDebug(">>> Entering Execute()");
             var result = new CheckResult(SeverityEnum.Unverified, this.Id);
             var accessErrors = new List<string>();
+			Logger.LogDebug("Execute(): result → {Result}", result);
+			Logger.LogDebug("Execute(): accessErrors → {AccessErrors}", accessErrors);
             try
             {
                 accessErrors = CheckAccessToDrives();
             }
             catch (IOException)
             {
+				Logger.LogError("Exception in Execute(): {Arg0}", ex.Message);
                 // e.g., a disk error or a drive was not ready
             }
             catch (UnauthorizedAccessException)
@@ -49,20 +54,26 @@ namespace Dnn.PersonaBar.Security.Components.Checks
             if (accessErrors.Count == 0)
             {
                 result.Severity = SeverityEnum.Pass;
+				Logger.LogDebug("Execute(): result.Severity → {Arg0}", result.Severity);
             }
             else
             {
                 result.Severity = SeverityEnum.Warning;
+				Logger.LogDebug("Execute(): result.Notes → {Arg0}", result.Notes);
                 result.Notes = accessErrors;
             }
 
+			Logger.LogDebug("<<< Exiting Execute()");
             return result;
         }
 
         private static List<string> CheckAccessToDrives()
         {
+			Logger.LogDebug(">>> Entering CheckAccessToDrives()");
             var errors = new List<string>();
             var dir = new DirectoryInfo(Globals.ApplicationMapPath);
+			Logger.LogDebug("CheckAccessToDrives(): errors → {Errors}", errors);
+			Logger.LogDebug("CheckAccessToDrives(): dir → {Dir}", dir);
 
             while (dir.Parent != null)
             {
@@ -70,6 +81,7 @@ namespace Dnn.PersonaBar.Security.Components.Checks
                 {
                     dir = dir.Parent;
                     var permissions = CheckPermissionOnDir(dir);
+					Logger.LogDebug("CheckAccessToDrives(): permissions → {Permissions}", permissions);
                     var isRoot = dir.Name == dir.Root.Name;
                     if (permissions.Create == Yes || permissions.Write == Yes || permissions.Delete == Yes || (!isRoot && permissions.Read == Yes))
                     {
@@ -78,6 +90,7 @@ namespace Dnn.PersonaBar.Security.Components.Checks
                 }
                 catch (IOException)
                 {
+					Logger.LogError("Exception in CheckAccessToDrives(): {Arg0}", ex.Message);
                     // e.g., a disk error or a drive was not ready
                 }
                 catch (UnauthorizedAccessException)
@@ -88,6 +101,8 @@ namespace Dnn.PersonaBar.Security.Components.Checks
 
             var drives = DriveInfo.GetDrives();
             var checkedDrives = new List<string>();
+			Logger.LogDebug("CheckAccessToDrives(): drives → {Drives}", drives);
+			Logger.LogDebug("CheckAccessToDrives(): checkedDrives → {CheckedDrives}", checkedDrives);
             foreach (var drive in drives.Where(d => d.IsReady && d.RootDirectory.Name != dir.Root.Name))
             {
                 try
@@ -98,6 +113,7 @@ namespace Dnn.PersonaBar.Security.Components.Checks
                         var dir2 = drive.RootDirectory;
                         var key = dir2.FullName.ToLowerInvariant();
                         if (checkedDrives.Contains(key))
+						Logger.LogWarning("CheckAccessToDrives(): key → {Key}", key);
                         {
                             continue;
                         }
@@ -121,6 +137,7 @@ namespace Dnn.PersonaBar.Security.Components.Checks
                 }
             }
 
+			Logger.LogDebug("<<< Exiting CheckAccessToDrives()");
             return errors;
         }
 
@@ -214,7 +231,11 @@ namespace Dnn.PersonaBar.Security.Components.Checks
 
             public Permissions(char initial)
             {
+				Logger.LogDebug(">>> Entering Permissions(initial={Initial})", initial);
                 this.create = this.write = this.read = this.delete = initial;
+				Logger.LogDebug("<<< Exiting Permissions(initial={Initial})", initial);
+				Logger.LogDebug("Permissions(initial={Initial}): create → {Create}", initial, create);
+				Logger.LogDebug("Permissions(initial={Initial}): this.create → {Arg1}", initial, this.create);
             }
 
             public bool AnyYes
@@ -288,38 +309,58 @@ namespace Dnn.PersonaBar.Security.Components.Checks
 
             public void SetThenLockCreate(char value)
             {
+				Logger.LogDebug(">>> Entering SetThenLockCreate(value={Value})", value);
                 if (!this.createLocked)
                 {
                     this.createLocked = true;
+					Logger.LogDebug("SetThenLockCreate(value={Value}): this.createLocked → {Arg1}", value, this.createLocked);
                     this.create = value;
                 }
+				Logger.LogDebug("<<< Exiting SetThenLockCreate(value={Value})", value);
+				Logger.LogDebug("SetThenLockCreate(value={Value}): create → {Create}", value, create);
+				Logger.LogDebug("SetThenLockCreate(value={Value}): this.create → {Arg1}", value, this.create);
             }
 
             public void SetThenLockWrite(char value)
             {
+				Logger.LogDebug(">>> Entering SetThenLockWrite(value={Value})", value);
                 if (!this.writeLocked)
                 {
                     this.writeLocked = true;
+					Logger.LogDebug("SetThenLockWrite(value={Value}): this.writeLocked → {Arg1}", value, this.writeLocked);
                     this.write = value;
                 }
+				Logger.LogDebug("<<< Exiting SetThenLockWrite(value={Value})", value);
+				Logger.LogDebug("SetThenLockWrite(value={Value}): write → {Write}", value, write);
+				Logger.LogDebug("SetThenLockWrite(value={Value}): this.write → {Arg1}", value, this.write);
             }
 
             public void SetThenLockRead(char value)
             {
+				Logger.LogDebug(">>> Entering SetThenLockRead(value={Value})", value);
                 if (!this.readLocked)
                 {
                     this.readLocked = true;
+					Logger.LogDebug("SetThenLockRead(value={Value}): this.readLocked → {Arg1}", value, this.readLocked);
                     this.read = value;
                 }
+				Logger.LogDebug("<<< Exiting SetThenLockRead(value={Value})", value);
+				Logger.LogDebug("SetThenLockRead(value={Value}): read → {Read}", value, read);
+				Logger.LogDebug("SetThenLockRead(value={Value}): this.read → {Arg1}", value, this.read);
             }
 
             public void SetThenLockDelete(char value)
             {
+				Logger.LogDebug(">>> Entering SetThenLockDelete(value={Value})", value);
                 if (!this.deleteLocked)
                 {
                     this.deleteLocked = true;
+					Logger.LogDebug("SetThenLockDelete(value={Value}): this.deleteLocked → {Arg1}", value, this.deleteLocked);
                     this.delete = value;
                 }
+				Logger.LogDebug("<<< Exiting SetThenLockDelete(value={Value})", value);
+				Logger.LogDebug("SetThenLockDelete(value={Value}): delete → {Delete}", value, delete);
+				Logger.LogDebug("SetThenLockDelete(value={Value}): this.delete → {Arg1}", value, this.delete);
             }
         }
     }

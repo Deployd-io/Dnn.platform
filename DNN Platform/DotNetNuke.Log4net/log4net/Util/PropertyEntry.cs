@@ -28,6 +28,7 @@ namespace log4net.Util
     /// </remarks>
     public class PropertyEntry
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private string m_key = null;
         private object m_value = null;
 
@@ -65,6 +66,8 @@ namespace log4net.Util
         /// <returns>string info about this object</returns>
         public override string ToString()
         {
+			Logger.LogDebug(">>> Entering ToString()");
+			Logger.LogDebug("<<< Exiting ToString()");
             return "PropertyEntry(Key=" + this.m_key + ", Value=" + this.m_value + ")";
         }
     }

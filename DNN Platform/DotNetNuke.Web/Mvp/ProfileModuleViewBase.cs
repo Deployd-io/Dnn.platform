@@ -23,10 +23,13 @@ namespace DotNetNuke.Web.Mvp
     public abstract partial class ProfileModuleViewBase<TModel> : ModuleView<TModel>, IProfileModule
         where TModel : class, new()
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ProfileModuleViewBase{TModel}"/> class.</summary>
         public ProfileModuleViewBase()
         {
+			Logger.LogDebug(">>> Entering ProfileModuleViewBase()");
             this.NavigationManager = Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
+			Logger.LogDebug("<<< Exiting ProfileModuleViewBase()");
         }
 
         /// <inheritdoc />
@@ -68,6 +71,7 @@ namespace DotNetNuke.Web.Mvp
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             if (this.ProfileUserId == Null.NullInteger &&
                             (this.ModuleContext.PortalSettings.ActiveTab.TabID == this.ModuleContext.PortalSettings.UserTabId
                                 || this.ModuleContext.PortalSettings.ActiveTab.ParentId == this.ModuleContext.PortalSettings.UserTabId))
@@ -80,10 +84,12 @@ namespace DotNetNuke.Web.Mvp
             }
 
             base.OnInit(e);
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         private string GetRedirectUrl()
         {
+			Logger.LogDebug(">>> Entering GetRedirectUrl()");
             // redirect user to default page if not specific the home tab, do this action to prevent loop redirect.
             var homeTabId = this.ModuleContext.PortalSettings.HomeTabId;
             string redirectUrl;
@@ -91,12 +97,14 @@ namespace DotNetNuke.Web.Mvp
             if (homeTabId > Null.NullInteger)
             {
                 redirectUrl = TestableGlobals.Instance.NavigateURL(homeTabId);
+				Logger.LogDebug("GetRedirectUrl(): redirectUrl → {RedirectUrl}", redirectUrl);
             }
             else
             {
                 redirectUrl = TestableGlobals.Instance.GetPortalDomainName(PortalSettings.Current.PortalAlias.HTTPAlias, this.Request, true) + "/" + Globals.glbDefaultPage;
             }
 
+			Logger.LogDebug("<<< Exiting GetRedirectUrl()");
             return redirectUrl;
         }
     }

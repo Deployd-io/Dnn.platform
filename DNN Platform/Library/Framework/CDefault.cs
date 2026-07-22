@@ -22,6 +22,7 @@ namespace DotNetNuke.Framework
 
     public class CDefault : PageBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
         public string Author = string.Empty;
@@ -59,7 +60,9 @@ namespace DotNetNuke.Framework
         public CDefault()
             : this(null, null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering CDefault()");
         }
+		Logger.LogDebug("<<< Exiting CDefault()");
 
         /// <summary>Initializes a new instance of the <see cref="CDefault"/> class.</summary>
         /// <param name="portalController">The portal controller.</param>
@@ -81,6 +84,7 @@ namespace DotNetNuke.Framework
             : base(portalController, appStatus, hostSettings, userController)
         {
             this.hostSettingsService = hostSettingsService ?? DotNetNuke.Common.Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
+			Logger.LogDebug("CDefault(portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},userController={UserController},hostSettingsService={HostSettingsService}): hostSettingsService → {HostSettingsService1}", portalController, appStatus, hostSettings, userController, hostSettingsService, hostSettingsService);
         }
 
         protected string AdvancedSettingsPageUrl
@@ -109,17 +113,20 @@ namespace DotNetNuke.Framework
         /// <param name="objControl">Control to scroll to.</param>
         public void ScrollToControl(Control objControl)
         {
+			Logger.LogDebug(">>> Entering ScrollToControl(objControl={ObjControl})", objControl);
             if (ClientAPI.BrowserSupportsFunctionality(ClientAPI.ClientFunctionality.Positioning))
             {
                 JavaScript.RegisterClientReference(this, ClientAPI.ClientNamespaceReferences.dnn_dom_positioning);
                 ClientAPI.RegisterClientVariable(this, "ScrollToControl", objControl.ClientID, true);
                 DNNClientAPI.SetScrollTop(this.Page);
             }
+			Logger.LogDebug("<<< Exiting ScrollToControl(objControl={ObjControl})", objControl);
         }
 
         /// <inheritdoc />
         protected override void RegisterAjaxScript()
         {
+			Logger.LogDebug(">>> Entering RegisterAjaxScript()");
             if (this.Page.Form != null)
             {
                 if (ServicesFrameworkInternal.Instance.IsAjaxScriptSupportRequired)
@@ -127,11 +134,13 @@ namespace DotNetNuke.Framework
                     ServicesFrameworkInternal.Instance.RegisterAjaxScript(this.Page);
                 }
             }
+			Logger.LogDebug("<<< Exiting RegisterAjaxScript()");
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         protected void ManageInstallerFiles()
         {
+			Logger.LogDebug(">>> Entering ManageInstallerFiles()");
             if (this.hostSettingsService.GetBoolean("InstallerFilesRemoved"))
             {
                 return;
@@ -145,6 +154,7 @@ namespace DotNetNuke.Framework
                     this.hostSettingsService.Update("InstallerFilesRemoved", "True", true);
                 }
             }
+			Logger.LogDebug("<<< Exiting ManageInstallerFiles()");
         }
     }
 }

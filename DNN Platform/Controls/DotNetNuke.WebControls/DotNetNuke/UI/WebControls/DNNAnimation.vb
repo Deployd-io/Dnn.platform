@@ -1,5 +1,6 @@
 ﻿' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports DotNetNuke.UI.Utilities
 Imports DotNetNuke.UI.Utilities.Animation
@@ -15,26 +16,36 @@ Namespace DotNetNuke.UI.WebControls
         Implements IStateManager, IUrlResolutionService
         ' Methods
         Protected Sub LoadViewState(ByVal state As Object) Implements IStateManager.LoadViewState
+			Logger.LogDebug(">>> Entering LoadViewState(state={State})", state)
             If (Not state Is Nothing) Then
                 DirectCast(Me.ViewState, IStateManager).LoadViewState(state)
             End If
         End Sub
+		Logger.LogDebug("<<< Exiting LoadViewState(state={State})", state)
 
         Public Function ResolveClientUrl(ByVal Url As String) As String Implements IUrlResolutionService.ResolveClientUrl
+			Logger.LogDebug(">>> Entering ResolveClientUrl(Url={Url})", Url)
             Return Url
         End Function
+		Logger.LogDebug("<<< Exiting ResolveClientUrl(Url={Url})", Url)
 
         Protected Function SaveViewState() As Object Implements IStateManager.SaveViewState
+			Logger.LogDebug(">>> Entering SaveViewState()")
             Dim obj2 As Object = Nothing
             If Not Object.ReferenceEquals(Me.m_State, Nothing) Then
                 obj2 = DirectCast(Me.m_State, IStateManager).SaveViewState
+				Logger.LogDebug("SaveViewState(): obj2 → {Obj2}", obj2)
             End If
             Return obj2
         End Function
+		Logger.LogDebug("<<< Exiting SaveViewState()")
 
         Protected Sub TrackViewState() Implements IStateManager.TrackViewState
+			Logger.LogDebug(">>> Entering TrackViewState()")
             Me.m_Marked = True
         End Sub
+		Logger.LogDebug("<<< Exiting TrackViewState()")
+		Logger.LogDebug("TrackViewState(): Me.m_Marked → {Arg0}", Me.m_Marked)
 
 
         ' Properties

@@ -61,7 +61,9 @@ namespace DotNetNuke.Web.InternalServices
         public FileUploadController()
             : this(null, null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering FileUploadController()");
         }
+		Logger.LogDebug("<<< Exiting FileUploadController()");
 
         /// <summary>Initializes a new instance of the <see cref="FileUploadController"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -69,6 +71,8 @@ namespace DotNetNuke.Web.InternalServices
         public FileUploadController(IHostSettings hostSettings)
             : this(hostSettings, null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering FileUploadController(hostSettings={HostSettings})", hostSettings);
+		Logger.LogDebug("<<< Exiting FileUploadController(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="FileUploadController"/> class.</summary>
@@ -81,7 +85,12 @@ namespace DotNetNuke.Web.InternalServices
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.cryptographyProvider = cryptographyProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<ICryptographyProvider>();
+			Logger.LogDebug("FileUploadController(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): cryptographyProvider → {CryptographyProvider1}", hostSettings, cryptographyProvider, portalController, appStatus, portalGroupController, cryptographyProvider);
+			Logger.LogDebug("FileUploadController(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): appStatus → {AppStatus1}", hostSettings, cryptographyProvider, portalController, appStatus, portalGroupController, appStatus);
+			Logger.LogDebug("FileUploadController(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalGroupController → {PortalGroupController1}", hostSettings, cryptographyProvider, portalController, appStatus, portalGroupController, portalGroupController);
+			Logger.LogDebug("FileUploadController(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): hostSettings → {HostSettings1}", hostSettings, cryptographyProvider, portalController, appStatus, portalGroupController, hostSettings);
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+			Logger.LogDebug("FileUploadController(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalController → {PortalController1}", hostSettings, cryptographyProvider, portalController, appStatus, portalGroupController, portalController);
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
             this.portalGroupController = portalGroupController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalGroupController>();
         }
@@ -91,7 +100,10 @@ namespace DotNetNuke.Web.InternalServices
         /// <returns>The URL.</returns>
         public static string GetUrl(int fileId)
         {
+			Logger.LogDebug(">>> Entering GetUrl(fileId={FileId})", fileId);
             var file = FileManager.Instance.GetFile(fileId, true);
+			Logger.LogDebug("GetUrl(fileId={FileId}): file → {File}", fileId, file);
+			Logger.LogDebug("<<< Exiting GetUrl(fileId={FileId})", fileId);
             return FileManager.Instance.GetUrl(file);
         }
 
@@ -101,8 +113,10 @@ namespace DotNetNuke.Web.InternalServices
         [HttpPost]
         public HttpResponseMessage LoadFiles(FolderItemDTO folderItem)
         {
+			Logger.LogDebug(">>> Entering LoadFiles(folderItem={FolderItem})", folderItem);
             int effectivePortalId = this.PortalSettings.PortalId;
 
+			Logger.LogDebug("LoadFiles(folderItem={FolderItem}): effectivePortalId → {EffectivePortalId}", folderItem, effectivePortalId);
             if (folderItem.FolderId <= 0)
             {
                 return this.Request.CreateResponse(HttpStatusCode.BadRequest);
@@ -110,6 +124,7 @@ namespace DotNetNuke.Web.InternalServices
 
             var folder = FolderManager.Instance.GetFolder(folderItem.FolderId);
 
+			Logger.LogDebug("LoadFiles(folderItem={FolderItem}): folder → {Folder}", folderItem, folder);
             if (folder == null)
             {
                 return this.Request.CreateResponse(HttpStatusCode.BadRequest);
@@ -119,6 +134,7 @@ namespace DotNetNuke.Web.InternalServices
             {
                 var user = UserController.GetUserById(this.hostSettings, effectivePortalId, userId);
                 if (user is { IsSuperUser: true, })
+				Logger.LogDebug("LoadFiles(folderItem={FolderItem}): user → {User}", folderItem, user);
                 {
                     effectivePortalId = Null.NullInteger;
                 }
@@ -130,7 +146,10 @@ namespace DotNetNuke.Web.InternalServices
 
             var list = Globals.GetFileList(effectivePortalId, folderItem.FileFilter, !folderItem.Required, folder.FolderPath);
             var fileItems = list.OfType<FileItem>().ToList();
+			Logger.LogDebug("LoadFiles(folderItem={FolderItem}): list → {List}", folderItem, list);
+			Logger.LogDebug("LoadFiles(folderItem={FolderItem}): fileItems → {FileItems}", folderItem, fileItems);
 
+			Logger.LogDebug("<<< Exiting LoadFiles(folderItem={FolderItem})", folderItem);
             return this.Request.CreateResponse(HttpStatusCode.OK, fileItems);
         }
 
@@ -140,6 +159,7 @@ namespace DotNetNuke.Web.InternalServices
         [HttpGet]
         public HttpResponseMessage LoadImage(string fileId)
         {
+			Logger.LogDebug(">>> Entering LoadImage(fileId={FileId})", fileId);
             if (!string.IsNullOrEmpty(fileId))
             {
                 int file;
@@ -150,6 +170,7 @@ namespace DotNetNuke.Web.InternalServices
                 }
             }
 
+			Logger.LogDebug("<<< Exiting LoadImage(fileId={FileId})", fileId);
             return this.Request.CreateResponse(HttpStatusCode.InternalServerError);
         }
 
@@ -160,6 +181,7 @@ namespace DotNetNuke.Web.InternalServices
         [IFrameSupportedValidateAntiForgeryToken]
         public Task<HttpResponseMessage> PostFile()
         {
+			Logger.LogDebug(">>> Entering PostFile()");
             HttpRequestMessage request = this.Request;
 
             if (!request.Content.IsMimeMultipartContent())
@@ -169,6 +191,7 @@ namespace DotNetNuke.Web.InternalServices
 
             var provider = new MultipartMemoryStreamProvider();
 
+			Logger.LogDebug("PostFile(): provider → {Provider}", provider);
             // local references for use in closure
             IPortalSettings portalSettings = this.PortalSettings;
             var currentSynchronizationContext = SynchronizationContext.Current;
@@ -178,17 +201,26 @@ namespace DotNetNuke.Web.InternalServices
                     {
                         string folder = string.Empty;
                         string filter = string.Empty;
+						Logger.LogDebug("PostFile(): folder → {Folder}", folder);
+						Logger.LogDebug("PostFile(): filter → {Filter}", filter);
                         string fileName = string.Empty;
                         bool overwrite = false;
+						Logger.LogDebug("PostFile(): fileName → {FileName}", fileName);
+						Logger.LogDebug("PostFile(): overwrite → {Overwrite}", overwrite);
                         bool isHostMenu = false;
                         bool extract = false;
+						Logger.LogDebug("PostFile(): isHostMenu → {IsHostMenu}", isHostMenu);
+						Logger.LogDebug("PostFile(): extract → {Extract}", extract);
                         Stream stream = null;
                         var returnFileDto = new SavedFileDTO();
+						Logger.LogDebug("PostFile(): stream → {Stream}", stream);
+						Logger.LogDebug("PostFile(): returnFileDto → {ReturnFileDto}", returnFileDto);
 
                         foreach (var item in provider.Contents)
                         {
                             var name = item.Headers.ContentDisposition.Name;
                             switch (name.ToUpperInvariant())
+							Logger.LogDebug("PostFile(): name → {Name}", name);
                             {
                                 case "\"FOLDER\"":
                                     folder = item.ReadAsStringAsync().Result ?? string.Empty;
@@ -255,6 +287,7 @@ namespace DotNetNuke.Web.InternalServices
                          */
                         var mediaTypeFormatter = new JsonMediaTypeFormatter();
                         mediaTypeFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/plain"));
+						Logger.LogDebug("PostFile(): mediaTypeFormatter → {MediaTypeFormatter}", mediaTypeFormatter);
 
                         if (!string.IsNullOrEmpty(errorMessage))
                         {
@@ -271,11 +304,14 @@ namespace DotNetNuke.Web.InternalServices
                                 },
                                 mediaTypeFormatter,
                                 "text/plain");
+									Logger.LogDebug("PostFile(): AlreadyExists → {AlreadyExists}", AlreadyExists);
+									Logger.LogDebug("PostFile(): Message → {Message}", Message);
                         }
 
                         return this.Request.CreateResponse(HttpStatusCode.OK, returnFileDto, mediaTypeFormatter, "text/plain");
                     });
 
+			Logger.LogDebug("<<< Exiting PostFile()");
             return task;
         }
 
@@ -286,6 +322,8 @@ namespace DotNetNuke.Web.InternalServices
         [AllowAnonymous]
         public Task<HttpResponseMessage> UploadFromLocal()
         {
+			Logger.LogDebug(">>> Entering UploadFromLocal()");
+			Logger.LogDebug("<<< Exiting UploadFromLocal()");
             return this.UploadFromLocal(this.PortalSettings.PortalId);
         }
 
@@ -426,6 +464,7 @@ namespace DotNetNuke.Web.InternalServices
                         "text/plain");
                 });
 
+			Logger.LogDebug("<<< Exiting UploadFromLocal(portalId={PortalId})", portalId);
             return task;
         }
 
@@ -516,28 +555,37 @@ namespace DotNetNuke.Web.InternalServices
 
         private static string GetLocalizedString(string key)
         {
+			Logger.LogDebug(">>> Entering GetLocalizedString(key={Key})", key);
             const string resourceFile = "/App_GlobalResources/FileUpload.resx";
+			Logger.LogDebug("<<< Exiting GetLocalizedString(key={Key})", key);
             return Localization.GetString(key, resourceFile);
         }
 
         private static bool IsUserFolder(string folderPath, out int userId)
         {
+			Logger.LogDebug(">>> Entering IsUserFolder(folderPath={FolderPath})", folderPath);
             var match = UserFolderEx.Match(folderPath);
             userId = match.Success ? int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture) : Null.NullInteger;
+			Logger.LogDebug("IsUserFolder(folderPath={FolderPath}): match → {Match}", folderPath, match);
+			Logger.LogDebug("IsUserFolder(folderPath={FolderPath}): userId → {UserId}", folderPath, userId);
 
+			Logger.LogDebug("<<< Exiting IsUserFolder(folderPath={FolderPath})", folderPath);
             return match.Success;
         }
 
         private static string ShowImage(int fileId)
         {
+			Logger.LogDebug(">>> Entering ShowImage(fileId={FileId})", fileId);
             var image = (FileInfo)FileManager.Instance.GetFile(fileId);
 
+			Logger.LogDebug("ShowImage(fileId={FileId}): image → {Image}", fileId, image);
             if (image != null && IsImageExtension(image.Extension))
             {
                 var imageUrl = FileManager.Instance.GetUrl(image);
                 return imageUrl;
             }
 
+			Logger.LogDebug("<<< Exiting ShowImage(fileId={FileId})", fileId);
             return null;
         }
 
@@ -708,6 +756,8 @@ namespace DotNetNuke.Web.InternalServices
 
         private static IPortalInfo[] GetMyPortalGroup()
         {
+			Logger.LogDebug(">>> Entering GetMyPortalGroup()");
+			Logger.LogDebug("<<< Exiting GetMyPortalGroup()");
             return (
                 from @group in PortalGroupController.Instance.GetPortalGroups().ToArray()
                 select PortalGroupController.Instance.GetPortalsByGroup(@group.PortalGroupId) into portals
@@ -718,6 +768,7 @@ namespace DotNetNuke.Web.InternalServices
 
         private bool IsPortalIdValid(int portalId)
         {
+			Logger.LogDebug(">>> Entering IsPortalIdValid(portalId={PortalId})", portalId);
             if (this.UserInfo.IsSuperUser)
             {
                 return true;
@@ -730,11 +781,14 @@ namespace DotNetNuke.Web.InternalServices
 
             var isAdminUser = PortalSecurity.IsInRole(this.PortalSettings.AdministratorRoleName);
             if (!isAdminUser)
+			Logger.LogDebug("IsPortalIdValid(portalId={PortalId}): isAdminUser → {IsAdminUser}", portalId, isAdminUser);
             {
                 return false;
             }
 
             var myGroup = GetMyPortalGroup();
+			Logger.LogDebug("IsPortalIdValid(portalId={PortalId}): myGroup → {MyGroup}", portalId, myGroup);
+			Logger.LogDebug("<<< Exiting IsPortalIdValid(portalId={PortalId})", portalId);
             return myGroup != null && myGroup.Any(p => p.PortalId == portalId);
         }
 

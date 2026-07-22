@@ -29,10 +29,12 @@ namespace DotNetNuke.Web.InternalServices
         [ValidateAntiForgeryToken]
         public HttpResponseMessage Dismiss(NotificationDTO postData)
         {
+			Logger.LogDebug(">>> Entering Dismiss(postData={PostData})", postData);
             try
             {
                 var recipient = InternalMessagingController.Instance.GetMessageRecipient(postData.NotificationId, this.UserInfo.UserID);
                 if (recipient != null)
+				Logger.LogDebug("Dismiss(postData={PostData}): recipient → {Recipient}", postData, recipient);
                 {
                     NotificationsController.Instance.DeleteNotificationRecipient(postData.NotificationId, this.UserInfo.UserID);
                     return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success" });
@@ -43,6 +45,7 @@ namespace DotNetNuke.Web.InternalServices
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting Dismiss(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -52,13 +55,19 @@ namespace DotNetNuke.Web.InternalServices
         [HttpGet]
         public HttpResponseMessage GetToasts()
         {
+			Logger.LogDebug(">>> Entering GetToasts()");
             var toasts = NotificationsController.Instance.GetToasts(this.UserInfo);
             IList<object> convertedObjects = toasts.Select(this.ToExpandoObject).ToList();
+			Logger.LogDebug("GetToasts(): toasts → {Toasts}", toasts);
+			Logger.LogDebug("GetToasts(): convertedObjects → {ConvertedObjects}", convertedObjects);
+			Logger.LogDebug("<<< Exiting GetToasts()");
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Success = true, Toasts = convertedObjects.Take(3) });
         }
 
         private object ToExpandoObject(Notification notification)
         {
+			Logger.LogDebug(">>> Entering ToExpandoObject(notification={Notification})", notification);
+			Logger.LogDebug("<<< Exiting ToExpandoObject(notification={Notification})", notification);
             return new { Subject = notification.Subject, Body = notification.Body };
         }
     }

@@ -12,13 +12,16 @@ namespace DotNetNuke.Common
     /// <summary>Base class of XmlValidator.</summary>
     public class XmlValidatorBase : IDisposable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private XmlTextReader reader;
 
         /// <summary>Initializes a new instance of the <see cref="XmlValidatorBase"/> class.</summary>
         public XmlValidatorBase()
         {
+			Logger.LogDebug(">>> Entering XmlValidatorBase()");
             this.Errors = new ArrayList();
             this.SchemaSet = new XmlSchemaSet();
+			Logger.LogDebug("<<< Exiting XmlValidatorBase()");
         }
 
         /// <summary>Gets the schema set.</summary>
@@ -32,6 +35,7 @@ namespace DotNetNuke.Common
         /// <returns><see langword="true"/> if this instance is valid; otherwise, <see langword="false"/>.</returns>
         public bool IsValid()
         {
+			Logger.LogDebug(">>> Entering IsValid()");
             // There is a bug here which I haven't been able to fix.
             // If the XML Instance does not include a reference to the
             // schema, then the validation fails.  If the reference exists
@@ -40,18 +44,23 @@ namespace DotNetNuke.Common
             // Create a validating reader
             var settings = new XmlReaderSettings();
             settings.Schemas = this.SchemaSet;
+			Logger.LogDebug("IsValid(): settings → {Settings}", settings);
+			Logger.LogDebug("IsValid(): settings.Schemas → {Arg0}", settings.Schemas);
+			Logger.LogDebug("IsValid(): settings.ValidationType → {Arg0}", settings.ValidationType);
             settings.ValidationType = ValidationType.Schema;
 
             // Set the validation event handler.
             settings.ValidationEventHandler += this.ValidationCallBack;
             using var vreader = XmlReader.Create(this.reader, settings);
 
+			Logger.LogDebug("IsValid(): vreader → {Vreader}", vreader);
             // Read and validate the XML data.
             while (vreader.Read())
             {
             }
 
             vreader.Close();
+			Logger.LogDebug("<<< Exiting IsValid()");
             return this.Errors.Count == 0;
         }
 
@@ -60,12 +69,15 @@ namespace DotNetNuke.Common
         /// <returns><see langword="true"/> if the XML is valid, otherwise <see langword="false"/>.</returns>
         public virtual bool Validate(Stream xmlStream)
         {
+			Logger.LogDebug(">>> Entering Validate(xmlStream={XmlStream})", xmlStream);
             xmlStream.Seek(0, SeekOrigin.Begin);
             this.reader = new XmlTextReader(xmlStream)
             {
+			Logger.LogDebug("Validate(xmlStream={XmlStream}): reader → {Reader}", xmlStream, reader);
                 XmlResolver = null,
                 DtdProcessing = DtdProcessing.Prohibit,
             };
+			Logger.LogDebug("<<< Exiting Validate(xmlStream={XmlStream})", xmlStream);
             return this.IsValid();
         }
 
@@ -79,22 +91,27 @@ namespace DotNetNuke.Common
                 XmlResolver = null,
                 DtdProcessing = DtdProcessing.Prohibit,
             };
+			Logger.LogDebug("<<< Exiting Validate(filename={Filename})", filename);
             return this.IsValid();
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+			Logger.LogDebug(">>> Entering Dispose()");
             this.Dispose(true);
             GC.SuppressFinalize(this);
+			Logger.LogDebug("<<< Exiting Dispose()");
         }
 
         protected virtual void Dispose(bool disposing)
         {
+			Logger.LogDebug(">>> Entering Dispose(disposing={Disposing})", disposing);
             if (disposing)
             {
                 this.reader?.Dispose();
             }
+			Logger.LogDebug("<<< Exiting Dispose(disposing={Disposing})", disposing);
         }
 
         /// <summary>Validations the call back.</summary>
@@ -102,7 +119,9 @@ namespace DotNetNuke.Common
         /// <param name="args">The <see cref="System.Xml.Schema.ValidationEventArgs"/> instance containing the event data.</param>
         protected void ValidationCallBack(object sender, ValidationEventArgs args)
         {
+			Logger.LogDebug(">>> Entering ValidationCallBack(sender={Sender},args={Args})", sender, args);
             this.Errors.Add(args.Message);
+			Logger.LogDebug("<<< Exiting ValidationCallBack(sender={Sender},args={Args})", sender, args);
         }
     }
 }

@@ -24,6 +24,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Application
 
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             try
             {
                 var log = new LogInfo
@@ -41,6 +42,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Application
                 return new ConsoleErrorResultModel(this.LocalizeString("Prompt_UserRestart_Error"));
             }
 
+			Logger.LogDebug("<<< Exiting Run()");
             return new ConsoleResultModel(this.LocalizeString("Prompt_UserRestart_Success")) { MustReload = true };
         }
     }

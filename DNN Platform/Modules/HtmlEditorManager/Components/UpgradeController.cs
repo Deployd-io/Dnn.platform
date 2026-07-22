@@ -30,11 +30,14 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
     public class UpgradeController(IApplicationStatusInfo applicationStatusInfo, IHostSettings hostSettings)
         : IUpgradeable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>The module folder location.</summary>
+		Logger.LogDebug(">>> Entering UpgradeController(applicationStatusInfo={ApplicationStatusInfo},hostSettings={HostSettings})", applicationStatusInfo, hostSettings);
         private const string ModuleFolder = "~/DesktopModules/Admin/HtmlEditorManager";
 
         private readonly IApplicationStatusInfo applicationStatusInfo = applicationStatusInfo ?? new ApplicationStatusInfo(new Application());
         private readonly IHostSettings hostSettings = hostSettings ??
+													Logger.LogDebug("UpgradeController(applicationStatusInfo={ApplicationStatusInfo},hostSettings={HostSettings}): applicationStatusInfo → {ApplicationStatusInfo1}", applicationStatusInfo, hostSettings, applicationStatusInfo);
                                                       new HostSettings(
                                                           new HostController(
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -43,6 +46,7 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
                                                               new Lazy<IPortalController>(() => PortalController.Instance)));
 
         /// <summary> Initializes a new instance of the <see cref="UpgradeController"/> class.</summary>
+		Logger.LogDebug("<<< Exiting UpgradeController(applicationStatusInfo={ApplicationStatusInfo},hostSettings={HostSettings})", applicationStatusInfo, hostSettings);
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public UpgradeController()
             : this(null, null)
@@ -55,6 +59,7 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
         public UpgradeController(IApplicationStatusInfo applicationStatusInfo)
             : this(applicationStatusInfo, null)
         {
+		Logger.LogError("Exception in UpgradeController(applicationStatusInfo={ApplicationStatusInfo},hostSettings={HostSettings}): {Arg2}", applicationStatusInfo, hostSettings, ex.Message);
         }
 
         /// <summary>Called when a module is upgraded.</summary>
@@ -62,6 +67,7 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
         /// <returns>Success if all goes well, otherwise, Failed.</returns>
         public string UpgradeModule(string version)
         {
+			Logger.LogDebug(">>> Entering UpgradeModule(version={Version})", version);
             try
             {
                 switch (version)
@@ -69,17 +75,21 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
                     case "07.04.00":
                         const string ResourceFile = ModuleFolder + "/App_LocalResources/ProviderConfiguration.ascx.resx";
                         var pageName = Localization.GetString("HTMLEditorPageName", ResourceFile);
+						Logger.LogDebug("UpgradeModule(version={Version}): pageName → {PageName}", version, pageName);
                         var pageDescription = Localization.GetString("HTMLEditorPageDescription", ResourceFile);
 
+						Logger.LogDebug("UpgradeModule(version={Version}): pageDescription → {PageDescription}", version, pageDescription);
                         // Create HTML Editor Config Page (or get existing one)
                         var editorPage = Upgrade.AddHostPage(pageName, pageDescription, ModuleFolder + "/images/HtmlEditorManager_Standard_16x16.png", ModuleFolder + "/images/HtmlEditorManager_Standard_32x32.png", false);
 
+						Logger.LogDebug("UpgradeModule(version={Version}): editorPage → {EditorPage}", version, editorPage);
                         // Find the RadEditor control and remove it
                         Upgrade.RemoveModule("RadEditor Manager", editorPage.TabName, editorPage.ParentId, false);
 
                         // Add Module To Page
                         var moduleDefId = this.GetModuleDefinitionId("DotNetNuke.HtmlEditorManager", "Html Editor Management");
                         Upgrade.AddModuleToPage(editorPage, moduleDefId, pageName, ModuleFolder + "/images/HtmlEditorManager_Standard_32x32.png", true);
+						Logger.LogDebug("UpgradeModule(version={Version}): moduleDefId → {ModuleDefId}", version, moduleDefId);
 
                         foreach (var item in DesktopModuleController.GetDesktopModules(this.hostSettings, Null.NullInteger))
                         {
@@ -88,6 +98,7 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
                             if (moduleInfo.ModuleName == "DotNetNuke.HtmlEditorManager")
                             {
                                 moduleInfo.Category = "Host";
+								Logger.LogDebug("UpgradeModule(version={Version}): moduleInfo.Category → {Arg1}", version, moduleInfo.Category);
                                 DesktopModuleController.SaveDesktopModule(moduleInfo, false, false);
                             }
                         }
@@ -125,17 +136,22 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
             {
                 var xlc = new ExceptionLogController();
                 xlc.AddLog(ex);
+				Logger.LogDebug("UpgradeModule(version={Version}): xlc → {Xlc}", version, xlc);
 
                 return "Failed";
             }
 
+			Logger.LogDebug("<<< Exiting UpgradeModule(version={Version})", version);
             return "Success";
         }
 
         private static void UpdateRadCfgFiles()
         {
+			Logger.LogDebug(">>> Entering UpdateRadCfgFiles()");
             var folder = Path.Combine(HostingEnvironment.ApplicationPhysicalPath, @"DesktopModules\Admin\RadEditorProvider\ConfigFile");
             UpdateRadCfgFiles(folder, "*ConfigFile*.xml");
+			Logger.LogDebug("UpdateRadCfgFiles(): folder → {Folder}", folder);
+			Logger.LogDebug("<<< Exiting UpdateRadCfgFiles()");
         }
 
         private static void UpdateRadCfgFiles(string folder, string mask)
@@ -195,43 +211,53 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
 
         private string UpdateWebConfigFile()
         {
+			Logger.LogDebug(">>> Entering UpdateWebConfigFile()");
+			Logger.LogDebug("<<< Exiting UpdateWebConfigFile()");
             return this.UpdateTelerikEncryptionKey("Telerik.AsyncUpload.ConfigurationEncryptionKey");
         }
 
         private string UpdateTelerikEncryptionKey(string keyName)
         {
+			Logger.LogDebug(">>> Entering UpdateTelerikEncryptionKey(keyName={KeyName})", keyName);
             const string DefaultValue = "MDEyMzQ1Njc4OUFCQ0RFRjAxMjM0NTY3ODlBQkNERUYwMTIzNDU2Nzg5QUJDREVG";
 
             var strError = string.Empty;
             var currentKey = Config.GetSetting(keyName);
             if (string.IsNullOrEmpty(currentKey) || DefaultValue.Equals(currentKey) || currentKey.Length < 40)
+			Logger.LogDebug("UpdateTelerikEncryptionKey(keyName={KeyName}): currentKey → {CurrentKey}", keyName, currentKey);
             {
                 try
                 {
                     // open the web.config
                     var xmlConfig = Config.Load(this.applicationStatusInfo);
 
+					Logger.LogDebug("UpdateTelerikEncryptionKey(keyName={KeyName}): xmlConfig → {XmlConfig}", keyName, xmlConfig);
                     // save the current config file
                     Config.BackupConfig(this.applicationStatusInfo);
 
                     // create a random Telerik encryption key and add it under <appSettings>
                     var newKey = PortalSecurity.Instance.CreateKey(32);
                     newKey = Convert.ToBase64String(Encoding.ASCII.GetBytes(newKey));
+					Logger.LogDebug("UpdateTelerikEncryptionKey(keyName={KeyName}): newKey → {NewKey}", keyName, newKey);
                     Config.AddAppSetting(xmlConfig, keyName, newKey);
 
                     // save a copy of the existing web.config
                     var backupFolder = string.Concat(Globals.glbConfigFolder, "Backup_", DateTime.Now.ToString("yyyyMMddHHmm"), @"\");
                     strError += Config.Save(this.applicationStatusInfo, xmlConfig, backupFolder + "web_.config") + Environment.NewLine;
+					Logger.LogDebug("UpdateTelerikEncryptionKey(keyName={KeyName}): backupFolder → {BackupFolder}", keyName, backupFolder);
 
                     // save the web.config
                     strError += Config.Save(this.applicationStatusInfo, xmlConfig) + Environment.NewLine;
                 }
                 catch (Exception ex)
                 {
+					Logger.LogError("Exception in UpgradeController(applicationStatusInfo={ApplicationStatusInfo},hostSettings={HostSettings}): {Arg2}", applicationStatusInfo, hostSettings, ex.Message);
                     strError += ex.Message;
+					Logger.LogError("Exception in UpdateTelerikEncryptionKey(keyName={KeyName}): {Arg1}", keyName, ex.Message);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting UpdateTelerikEncryptionKey(keyName={KeyName})", keyName);
             return strError;
         }
 
@@ -241,9 +267,11 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
         /// <returns>The Module ID for the HTML Editor Management module.</returns>
         private int GetModuleDefinitionId(string moduleName, string moduleDefinitionName)
         {
+			Logger.LogDebug(">>> Entering GetModuleDefinitionId(moduleName={ModuleName},moduleDefinitionName={ModuleDefinitionName})", moduleName, moduleDefinitionName);
             // get desktop module
             var desktopModule = DesktopModuleController.GetDesktopModuleByModuleName(this.hostSettings, moduleName, Null.NullInteger);
             if (desktopModule == null)
+			Logger.LogDebug("GetModuleDefinitionId(moduleName={ModuleName},moduleDefinitionName={ModuleDefinitionName}): desktopModule → {DesktopModule}", moduleName, moduleDefinitionName, desktopModule);
             {
                 return -1;
             }
@@ -257,16 +285,21 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
                 return -1;
             }
 
+			Logger.LogDebug("<<< Exiting GetModuleDefinitionId(moduleName={ModuleName},moduleDefinitionName={ModuleDefinitionName})", moduleName, moduleDefinitionName);
             return moduleDefinition.ModuleDefID;
         }
 
         private bool RadEditorProviderInstalled()
         {
+			Logger.LogDebug(">>> Entering RadEditorProviderInstalled()");
+			Logger.LogDebug("<<< Exiting RadEditorProviderInstalled()");
             return PackageController.Instance.GetExtensionPackage(Null.NullInteger, p => p.Name.Equals("DotNetNuke.RadEditorProvider")) != null;
         }
 
         private bool TelerikAssemblyExists()
         {
+			Logger.LogDebug(">>> Entering TelerikAssemblyExists()");
+			Logger.LogDebug("<<< Exiting TelerikAssemblyExists()");
             return File.Exists(Path.Combine(HostingEnvironment.ApplicationPhysicalPath, "bin\\Telerik.Web.UI.dll"));
         }
     }

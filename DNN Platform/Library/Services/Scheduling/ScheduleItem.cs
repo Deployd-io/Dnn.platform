@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.Scheduling
     [Serializable]
     public class ScheduleItem : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly DateTime MinNextTime = DateTime.Now;
         private DateTime? nextStart;
         private Hashtable scheduleItemSettings;
@@ -23,21 +24,38 @@ namespace DotNetNuke.Services.Scheduling
         /// <summary>Initializes a new instance of the <see cref="ScheduleItem"/> class.</summary>
         public ScheduleItem()
         {
+			Logger.LogDebug(">>> Entering ScheduleItem()");
             this.ScheduleID = Null.NullInteger;
             this.TypeFullName = Null.NullString;
+			Logger.LogDebug("ScheduleItem(): this.ScheduleID → {Arg0}", this.ScheduleID);
+			Logger.LogDebug("ScheduleItem(): this.TypeFullName → {Arg0}", this.TypeFullName);
             this.TimeLapse = Null.NullInteger;
             this.TimeLapseMeasurement = Null.NullString;
             this.RetryTimeLapse = Null.NullInteger;
+			Logger.LogDebug("ScheduleItem(): this.TimeLapse → {Arg0}", this.TimeLapse);
+			Logger.LogDebug("ScheduleItem(): this.TimeLapseMeasurement → {Arg0}", this.TimeLapseMeasurement);
+			Logger.LogDebug("ScheduleItem(): this.RetryTimeLapse → {Arg0}", this.RetryTimeLapse);
             this.RetryTimeLapseMeasurement = Null.NullString;
             this.ObjectDependencies = Null.NullString;
             this.RetainHistoryNum = Null.NullInteger;
             this.CatchUpEnabled = Null.NullBoolean;
             this.Enabled = Null.NullBoolean;
             this.AttachToEvent = Null.NullString;
+			Logger.LogDebug("ScheduleItem(): this.RetryTimeLapseMeasurement → {Arg0}", this.RetryTimeLapseMeasurement);
+			Logger.LogDebug("ScheduleItem(): this.ObjectDependencies → {Arg0}", this.ObjectDependencies);
+			Logger.LogDebug("ScheduleItem(): this.RetainHistoryNum → {Arg0}", this.RetainHistoryNum);
+			Logger.LogDebug("ScheduleItem(): this.CatchUpEnabled → {Arg0}", this.CatchUpEnabled);
+			Logger.LogDebug("ScheduleItem(): this.Enabled → {Arg0}", this.Enabled);
+			Logger.LogDebug("ScheduleItem(): this.AttachToEvent → {Arg0}", this.AttachToEvent);
             this.ThreadID = Null.NullInteger;
             this.ProcessGroup = Null.NullInteger;
             this.Servers = Null.NullString;
             this.ScheduleStartDate = Null.NullDate;
+			Logger.LogDebug("<<< Exiting ScheduleItem()");
+			Logger.LogDebug("ScheduleItem(): this.ThreadID → {Arg0}", this.ThreadID);
+			Logger.LogDebug("ScheduleItem(): this.ProcessGroup → {Arg0}", this.ProcessGroup);
+			Logger.LogDebug("ScheduleItem(): this.Servers → {Arg0}", this.Servers);
+			Logger.LogDebug("ScheduleItem(): this.ScheduleStartDate → {Arg0}", this.ScheduleStartDate);
         }
 
         /// <summary>Gets or sets the event this item attaches to.</summary>
@@ -184,7 +202,9 @@ namespace DotNetNuke.Services.Scheduling
         /// <inheritdoc />
         public virtual void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.FillInternal(dr);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
 
         /// <summary>Gets or sets a value indicating whether the item has object dependencies.</summary>
@@ -192,10 +212,12 @@ namespace DotNetNuke.Services.Scheduling
         /// <returns>A value indicating whether the item has object dependencies.</returns>
         public bool HasObjectDependencies(string strObjectDependencies)
         {
+			Logger.LogDebug(">>> Entering HasObjectDependencies(strObjectDependencies={StrObjectDependencies})", strObjectDependencies);
             if (strObjectDependencies.IndexOf(",", StringComparison.Ordinal) > -1)
             {
                 var dependencies = strObjectDependencies.Split(',');
                 for (var i = 0; i <= dependencies.Length - 1; i++)
+				Logger.LogDebug("HasObjectDependencies(strObjectDependencies={StrObjectDependencies}): dependencies → {Dependencies}", strObjectDependencies, dependencies);
                 {
                     if (this.ObjectDependencies.Contains(dependencies[i].Trim(), StringComparison.OrdinalIgnoreCase))
                     {
@@ -208,6 +230,7 @@ namespace DotNetNuke.Services.Scheduling
                 return true;
             }
 
+			Logger.LogDebug("<<< Exiting HasObjectDependencies(strObjectDependencies={StrObjectDependencies})", strObjectDependencies);
             return false;
         }
 
@@ -216,7 +239,9 @@ namespace DotNetNuke.Services.Scheduling
         /// <param name="value">The value of the setting.</param>
         public void AddSetting(string key, string value)
         {
+			Logger.LogDebug(">>> Entering AddSetting(key={Key},value={Value})", key, value);
             this.scheduleItemSettings.Add(key, value);
+			Logger.LogDebug("<<< Exiting AddSetting(key={Key},value={Value})", key, value);
         }
 
         /// <summary>Gets a specific setting.</summary>
@@ -224,6 +249,7 @@ namespace DotNetNuke.Services.Scheduling
         /// <returns>The value of the setting.</returns>
         public virtual string GetSetting(string key)
         {
+			Logger.LogDebug(">>> Entering GetSetting(key={Key})", key);
             if (this.scheduleItemSettings == null)
             {
                 this.GetSettings();
@@ -235,6 +261,7 @@ namespace DotNetNuke.Services.Scheduling
             }
             else
             {
+				Logger.LogDebug("<<< Exiting GetSetting(key={Key})", key);
                 return string.Empty;
             }
         }
@@ -243,13 +270,17 @@ namespace DotNetNuke.Services.Scheduling
         /// <returns>An <see cref="Hashtable"/> of all the settings.</returns>
         public virtual Hashtable GetSettings()
         {
+			Logger.LogDebug(">>> Entering GetSettings()");
             this.scheduleItemSettings = SchedulingProvider.Instance().GetScheduleItemSettings(this.ScheduleID);
+			Logger.LogDebug("GetSettings(): scheduleItemSettings → {ScheduleItemSettings}", scheduleItemSettings);
+			Logger.LogDebug("<<< Exiting GetSettings()");
             return this.scheduleItemSettings;
         }
 
         /// <inheritdoc />
         protected override void FillInternal(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering FillInternal(dr={Dr})", dr);
             this.ScheduleID = Null.SetNullInteger(dr["ScheduleID"]);
             this.FriendlyName = Null.SetNullString(dr["FriendlyName"]);
             this.TypeFullName = Null.SetNullString(dr["TypeFullName"]);
@@ -266,6 +297,7 @@ namespace DotNetNuke.Services.Scheduling
 
             var schema = dr.GetSchemaTable();
             if (schema != null)
+			Logger.LogDebug("FillInternal(dr={Dr}): schema → {Schema}", dr, schema);
             {
                 if (schema.Select("ColumnName = 'NextStart'").Length > 0)
                 {
@@ -280,6 +312,7 @@ namespace DotNetNuke.Services.Scheduling
 
             // Fill BaseEntityInfo
             base.FillInternal(dr);
+			Logger.LogDebug("<<< Exiting FillInternal(dr={Dr})", dr);
         }
     }
 }

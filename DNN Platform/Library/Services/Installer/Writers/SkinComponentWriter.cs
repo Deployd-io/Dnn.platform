@@ -11,6 +11,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// <summary>The SkinComponentWriter class handles creating the manifest for Skin Component(s).</summary>
     public class SkinComponentWriter : FileComponentWriter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly string skinName;
 
         /// <summary>
@@ -74,7 +75,9 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="writer">The Xmlwriter to use.</param>
         protected override void WriteCustomManifest(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteCustomManifest(writer={Writer})", writer);
             writer.WriteElementString(this.SkinNameNodeName, this.skinName);
+			Logger.LogDebug("<<< Exiting WriteCustomManifest(writer={Writer})", writer);
         }
     }
 }

@@ -15,6 +15,7 @@ namespace DotNetNuke.Tests.Core.Collections
     [TestFixture]
     public class NaiveLockingListTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         // Most of the tests here are very simple, as the real functionality is provided by List<T>
         // these tests only ensure that the methods are actually wired up
         // Complicated threading tests would be nice, but are not practical as the
@@ -23,25 +24,31 @@ namespace DotNetNuke.Tests.Core.Collections
         [Test]
         public void Add()
         {
+			Logger.LogDebug(">>> Entering Add()");
             var list = new NaiveLockingList<string>();
 
+			Logger.LogDebug("Add(): list → {List}", list);
             list.Add("sumthin");
 
             Assert.That(list, Is.EqualTo(new[] { "sumthin" }).AsCollection);
+			Logger.LogDebug("<<< Exiting Add()");
         }
 
         [Test]
         public void Clear()
         {
+			Logger.LogDebug(">>> Entering Clear()");
             var list = new NaiveLockingList<int> { 0, 1, 2, 3 };
             list.Clear();
 
             Assert.That(list, Is.EqualTo(new int[] { }).AsCollection);
+			Logger.LogDebug("<<< Exiting Clear()");
         }
 
         [Test]
         public void Contains()
         {
+			Logger.LogDebug(">>> Entering Contains()");
             var list = new NaiveLockingList<int> { 0, 1, 2, 3 };
 
             using (Assert.EnterMultipleScope())
@@ -49,89 +56,107 @@ namespace DotNetNuke.Tests.Core.Collections
                 Assert.That(list, Has.Some.EqualTo(2));
                 Assert.That(list, Has.None.EqualTo(9999));
             }
+			Logger.LogDebug("<<< Exiting Contains()");
         }
 
         [Test]
         public void CopyTo()
         {
+			Logger.LogDebug(">>> Entering CopyTo()");
             var list = new NaiveLockingList<int> { 0, 1, 2, 3 };
 
             var dest = new int[4];
             list.CopyTo(dest, 0);
 
             Assert.That(dest, Is.EqualTo(list).AsCollection);
+			Logger.LogDebug("<<< Exiting CopyTo()");
         }
 
         [Test]
         public void Remove()
         {
+			Logger.LogDebug(">>> Entering Remove()");
             var list = new NaiveLockingList<int> { 0, 1, 2, 3 };
 
             list.Remove(2);
 
             Assert.That(list, Is.EqualTo(new[] { 0, 1, 3 }).AsCollection);
+			Logger.LogDebug("<<< Exiting Remove()");
         }
 
         [Test]
         public void Count()
         {
+			Logger.LogDebug(">>> Entering Count()");
             var list = new NaiveLockingList<int> { 0, 1, 2, 3 };
 
             Assert.That(list, Has.Count.EqualTo(4));
+			Logger.LogDebug("<<< Exiting Count()");
         }
 
         [Test]
         public void IndexOf()
         {
+			Logger.LogDebug(">>> Entering IndexOf()");
             var list = new NaiveLockingList<int> { 0, 1, 2, 3 };
 
             Assert.That(list.IndexOf(2), Is.EqualTo(2));
+			Logger.LogDebug("<<< Exiting IndexOf()");
         }
 
         [Test]
         public void Insert()
         {
+			Logger.LogDebug(">>> Entering Insert()");
             var list = new NaiveLockingList<int> { 0, 1, 2, 3 };
 
             list.Insert(2, 999);
 
             Assert.That(list, Is.EqualTo(new[] { 0, 1, 999, 2, 3 }).AsCollection);
+			Logger.LogDebug("<<< Exiting Insert()");
         }
 
         [Test]
         public void RemoveAt()
         {
+			Logger.LogDebug(">>> Entering RemoveAt()");
             var list = new NaiveLockingList<int> { 0, 1, 999, 2, 3 };
 
             list.RemoveAt(2);
 
             Assert.That(list, Is.EqualTo(new[] { 0, 1, 2, 3 }).AsCollection);
+			Logger.LogDebug("<<< Exiting RemoveAt()");
         }
 
         [Test]
         public void IndexOperator()
         {
+			Logger.LogDebug(">>> Entering IndexOperator()");
             var list = new NaiveLockingList<int> { 0, 1, 2, 3 };
 
             list[2] = 999;
 
             Assert.That(list[2], Is.EqualTo(999));
+			Logger.LogDebug("<<< Exiting IndexOperator()");
         }
 
         [Test]
         public void NoWritesWhileEnumerating()
         {
+			Logger.LogDebug(">>> Entering NoWritesWhileEnumerating()");
             var list = new NaiveLockingList<int> { 0, 1, 2, 3 };
 
             using (list.GetEnumerator())
             {
                 Assert.Throws<LockRecursionException>(() => list.Add(4));
             }
+			Logger.LogDebug("<<< Exiting NoWritesWhileEnumerating()");
         }
 
         [Test]
         public void CanWriteAfterEnumerating()
         {
+			Logger.LogDebug(">>> Entering CanWriteAfterEnumerating()");
             var list = new NaiveLockingList<int> { 0, 1, 2, 3 };
 
             using (IEnumerator<int> e = list.GetEnumerator())
@@ -142,6 +167,7 @@ namespace DotNetNuke.Tests.Core.Collections
             }
 
             list.Add(4);
+			Logger.LogDebug("<<< Exiting CanWriteAfterEnumerating()");
         }
     }
 }

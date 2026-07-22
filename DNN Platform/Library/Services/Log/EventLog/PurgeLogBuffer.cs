@@ -9,16 +9,21 @@ namespace DotNetNuke.Services.Log.EventLog
 
     public class PurgeLogBuffer : SchedulerClient
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="PurgeLogBuffer"/> class.</summary>
         /// <param name="objScheduleHistoryItem">The schedule history item.</param>
         public PurgeLogBuffer(ScheduleHistoryItem objScheduleHistoryItem)
         {
+			Logger.LogDebug(">>> Entering PurgeLogBuffer(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
             this.ScheduleHistoryItem = objScheduleHistoryItem;
+			Logger.LogDebug("<<< Exiting PurgeLogBuffer(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
+			Logger.LogDebug("PurgeLogBuffer(objScheduleHistoryItem={ObjScheduleHistoryItem}): this.ScheduleHistoryItem → {Arg1}", objScheduleHistoryItem, this.ScheduleHistoryItem);
         }
 
         /// <inheritdoc />
         public override void DoWork()
         {
+			Logger.LogDebug(">>> Entering DoWork()");
             try
             {
                 // notification that the event is progressing
@@ -29,6 +34,7 @@ namespace DotNetNuke.Services.Log.EventLog
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in DoWork(): {Arg0}", ex.Message);
                 this.ScheduleHistoryItem.Succeeded = false; // REQUIRED
                 this.ScheduleHistoryItem.AddLogNote("EXCEPTION: " + exc); // OPTIONAL
                 this.Errored(ref exc); // REQUIRED
@@ -36,6 +42,7 @@ namespace DotNetNuke.Services.Log.EventLog
                 // log the exception
                 Exceptions.Exceptions.LogException(exc); // OPTIONAL
             }
+			Logger.LogDebug("<<< Exiting DoWork()");
         }
     }
 }

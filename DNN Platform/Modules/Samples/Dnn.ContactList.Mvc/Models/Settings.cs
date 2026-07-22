@@ -13,14 +13,19 @@ namespace Dnn.ContactList.Mvc.Models
     [JsonObject(MemberSerialization.OptIn)]
     public class Settings
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Settings constructor
         /// </summary>
         public Settings()
         {
+			Logger.LogDebug(">>> Entering Settings()");
             PageSize = 10;
             AllowContactCreation = true;
+			Logger.LogDebug("Settings(): AllowContactCreation → {AllowContactCreation}", AllowContactCreation);
+			Logger.LogDebug("Settings(): PageSize → {PageSize}", PageSize);
             
+			Logger.LogDebug("<<< Exiting Settings()");
         }
 
         /// <summary>

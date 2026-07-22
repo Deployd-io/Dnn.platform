@@ -1,5 +1,6 @@
 ﻿' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports Microsoft.VisualBasic
 Imports Microsoft.VisualBasic.CompilerServices
@@ -14,11 +15,13 @@ Namespace DotNetNuke.UI.WebControls
         Inherits DNNNode
         ' Methods
         Public Sub New()
+		Logger.LogDebug(">>> Entering New()")
         End Sub
 
         Public Sub New(ByVal strText As String)
             MyBase.New(strText)
         End Sub
+		Logger.LogDebug("<<< Exiting New(strText={StrText})", strText)
 
         Friend Sub New(ByVal ctlOwner As Control)
             Me.m_DNNMenu = DirectCast(ctlOwner, DNNMenu)
@@ -30,11 +33,14 @@ Namespace DotNetNuke.UI.WebControls
         End Sub
 
         Public Sub Click()
+			Logger.LogDebug(">>> Entering Click()")
             Me.Selected = Not Me.Selected
             If Me.DNNMenu.IsDownLevel Then
+				Logger.LogDebug("Click(): Me.Selected → {Arg0}", Me.Selected)
                 Dim enumerator As IEnumerator = Nothing
                 Try 
                     enumerator = Me.DNNMenu.SelectedMenuNodes.GetEnumerator
+					Logger.LogDebug("Click(): enumerator → {Enumerator}", enumerator)
                     Do While True
                         If Not enumerator.MoveNext Then
                             Exit Do
@@ -42,6 +48,7 @@ Namespace DotNetNuke.UI.WebControls
                         Dim current As MenuNode = DirectCast(enumerator.Current, MenuNode)
                         If (If(((current.Level < Me.Level) OrElse (current.ID = Me.ID)), 0, 1) <> 0) Then
                             current.Selected = False
+							Logger.LogDebug("Click(): current.Selected → {Arg0}", current.Selected)
                         End If
                     Loop
                 Finally
@@ -52,14 +59,20 @@ Namespace DotNetNuke.UI.WebControls
             End If
             Me.DNNMenu.OnNodeClick(New DNNMenuNodeClickEventArgs(Me))
         End Sub
+		Logger.LogDebug("<<< Exiting Click()")
 
         Public Overridable Sub Render(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer)
             Me.NodeWriter.RenderNode(writer, Me)
         End Sub
+		Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer)
 
         Friend Sub SetDNNMenu(ByVal objMenu As DNNMenu)
+			Logger.LogDebug(">>> Entering SetDNNMenu(objMenu={ObjMenu})", objMenu)
             Me.m_DNNMenu = objMenu
         End Sub
+		Logger.LogDebug("<<< Exiting SetDNNMenu(objMenu={ObjMenu})", objMenu)
+		Logger.LogDebug("SetDNNMenu(objMenu={ObjMenu}): Me.m_DNNMenu → {Arg1}", objMenu, Me.m_DNNMenu)
 
 
         ' Properties

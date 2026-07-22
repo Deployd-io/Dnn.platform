@@ -11,13 +11,18 @@ namespace DotNetNuke.Services.Tokens
 
     public class ArrayListPropertyAccess : IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly ArrayList custom;
 
         /// <summary>Initializes a new instance of the <see cref="ArrayListPropertyAccess"/> class.</summary>
         /// <param name="list">The list of custom properties.</param>
         public ArrayListPropertyAccess(ArrayList list)
         {
+			Logger.LogDebug(">>> Entering ArrayListPropertyAccess(list={List})", list);
             this.custom = list;
+			Logger.LogDebug("<<< Exiting ArrayListPropertyAccess(list={List})", list);
+			Logger.LogDebug("ArrayListPropertyAccess(list={List}): custom → {Custom}", list, custom);
+			Logger.LogDebug("ArrayListPropertyAccess(list={List}): this.custom → {Arg1}", list, this.custom);
         }
 
         /// <inheritdoc />
@@ -32,6 +37,7 @@ namespace DotNetNuke.Services.Tokens
         /// <inheritdoc />
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			Logger.LogDebug(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             if (this.custom == null)
             {
                 return string.Empty;
@@ -39,6 +45,8 @@ namespace DotNetNuke.Services.Tokens
 
             object valueObject = null;
             string outputFormat = format;
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): valueObject → {ValueObject}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, valueObject);
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): outputFormat → {OutputFormat}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, outputFormat);
             if (string.IsNullOrEmpty(format))
             {
                 outputFormat = "g";
@@ -46,6 +54,7 @@ namespace DotNetNuke.Services.Tokens
 
             int intIndex = int.Parse(propertyName, CultureInfo.InvariantCulture);
             if ((this.custom != null) && this.custom.Count > intIndex)
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): intIndex → {IntIndex}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, intIndex);
             {
                 valueObject = this.custom[intIndex].ToString();
             }
@@ -71,6 +80,7 @@ namespace DotNetNuke.Services.Tokens
             else
             {
                 propertyNotFound = true;
+				Logger.LogDebug("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
                 return string.Empty;
             }
         }

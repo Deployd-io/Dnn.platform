@@ -107,12 +107,15 @@ namespace log4net.Appender
     /// <author>Nicko Cadell</author>
     public class UdpAppender : AppenderSkeleton
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="UdpAppender" /> class.</summary>
         /// <remarks>
         /// The default constructor initializes all fields to their default values.
         /// </remarks>
         public UdpAppender() 
         {
+		Logger.LogDebug(">>> Entering UdpAppender()");
+		Logger.LogDebug("<<< Exiting UdpAppender()");
         }
 
         /// <summary>
@@ -326,6 +329,7 @@ namespace log4net.Appender
         /// <exception cref="ArgumentOutOfRangeException">The TCP port number assigned to <see cref="LocalPort" /> or <see cref="RemotePort" /> is less than <see cref="IPEndPoint.MinPort" /> or greater than <see cref="IPEndPoint.MaxPort" />.</exception>
         public override void ActivateOptions()
         {
+			Logger.LogDebug(">>> Entering ActivateOptions()");
             base.ActivateOptions();
 
             if (this.RemoteAddress == null) 
@@ -353,6 +357,7 @@ namespace log4net.Appender
                 this.RemoteEndPoint = new IPEndPoint(this.RemoteAddress, this.RemotePort);
                 this.InitializeClientConnection();
             }
+			Logger.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>This method is called by the <see cref="M:AppenderSkeleton.DoAppend(LoggingEvent)"/> method.</summary>
@@ -367,6 +372,8 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent loggingEvent) 
         {
+			Logger.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             try 
             {
                 Byte [] buffer = this.m_encoding.GetBytes(this.RenderLoggingEvent(loggingEvent).ToCharArray());
@@ -378,6 +385,7 @@ namespace log4net.Appender
             } 
             catch (Exception ex) 
             {
+				Logger.LogError("Exception in Append(loggingEvent={LoggingEvent}): {Arg1}", loggingEvent, ex.Message);
                 this.ErrorHandler.Error(
                     "Unable to send logging event to remote host " + 
                     this.RemoteAddress.ToString() + 
@@ -386,6 +394,8 @@ namespace log4net.Appender
                     ex, 
                     ErrorCode.WriteFailure);
             }
+			Logger.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
+			Logger.LogInformation("Append(loggingEvent)={LoggingEvent}: external service call took {Arg1} ms", loggingEvent, __logStart.ElapsedMilliseconds);
         }
 
         /// <summary>This appender requires a <see cref="Layout"/> to be set.</summary>
@@ -412,12 +422,14 @@ namespace log4net.Appender
         /// </remarks>
         protected override void OnClose() 
         {
+			Logger.LogDebug(">>> Entering OnClose()");
             base.OnClose();
 
             if (this.Client != null) 
             {
                 this.Client.Close();
             }
+			Logger.LogDebug("<<< Exiting OnClose()");
         }
 
         /// <summary>Initializes the underlying  <see cref="UdpClient" /> connection.</summary>
@@ -432,6 +444,7 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual void InitializeClientConnection() 
         {
+			Logger.LogDebug(">>> Entering InitializeClientConnection()");
             try 
             {
                 if (this.LocalPort == 0)
@@ -453,6 +466,7 @@ namespace log4net.Appender
             } 
             catch (Exception ex) 
             {
+				Logger.LogError("Exception in InitializeClientConnection(): {Arg0}", ex.Message);
                 this.ErrorHandler.Error(
                     "Could not initialize the UdpClient connection on port " + 
                     this.LocalPort.ToString(NumberFormatInfo.InvariantInfo) + ".", 
@@ -460,7 +474,9 @@ namespace log4net.Appender
                     ErrorCode.GenericFailure);
 
                 this.Client = null;
+				Logger.LogDebug("InitializeClientConnection(): this.Client → {Arg0}", this.Client);
             }
+			Logger.LogDebug("<<< Exiting InitializeClientConnection()");
         }
 
         /// <summary>

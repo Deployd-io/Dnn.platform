@@ -38,8 +38,10 @@ namespace DotNetNuke.Services.FileSystem
         /// <summary>Initializes a new instance of the <see cref="FileInfo"/> class.</summary>
         public FileInfo()
         {
+			Logger.LogDebug(">>> Entering FileInfo()");
             this.UniqueId = Guid.NewGuid();
             this.VersionGuid = Guid.NewGuid();
+			Logger.LogDebug("<<< Exiting FileInfo()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="FileInfo"/> class.</summary>
@@ -459,6 +461,7 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.ContentType = Null.SetNullString(dr["ContentType"]);
             this.Extension = Null.SetNullString(dr["Extension"]);
             this.FileId = Null.SetNullInteger(dr["FileId"]);
@@ -485,19 +488,25 @@ namespace DotNetNuke.Services.FileSystem
             this.PublishedVersion = Null.SetNullInteger(dr["PublishedVersion"]);
             this.HasBeenPublished = Convert.ToBoolean(dr["HasBeenPublished"], CultureInfo.InvariantCulture);
             this.FillBaseProperties(dr);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
 
         private void LoadImageProperties()
         {
+			Logger.LogDebug(">>> Entering LoadImageProperties()");
             var fileManager = (FileManager)FileManager.Instance;
             if (!fileManager.IsImageFile(this))
+			Logger.LogDebug("LoadImageProperties(): fileManager → {FileManager}", fileManager);
             {
                 this.width = this.height = 0;
+				Logger.LogDebug("LoadImageProperties(): width → {Width}", width);
+				Logger.LogDebug("LoadImageProperties(): this.width → {Arg0}", this.width);
                 return;
             }
 
             var fileContent = fileManager.GetFileContent(this);
 
+			Logger.LogDebug("LoadImageProperties(): fileContent → {FileContent}", fileContent);
             if (fileContent == null)
             {
                 // If can't get file content then just exit the function, so it will load again next time.
@@ -513,9 +522,14 @@ namespace DotNetNuke.Services.FileSystem
 
             Image image = null;
             try
+			Logger.LogDebug("LoadImageProperties(): image → {Image}", image);
             {
                 image = fileManager.GetImageFromStream(fileContent);
 
+				Logger.LogDebug("LoadImageProperties(): height → {Height}", height);
+				Logger.LogDebug("LoadImageProperties(): this.height → {Arg0}", this.height);
+				Logger.LogError("Exception in LoadImageProperties(): {Arg0}", ex.Message);
+				Logger.LogDebug("LoadImageProperties(): this.ContentType → {Arg0}", this.ContentType);
                 this.width = image.Width;
                 this.height = image.Height;
             }
@@ -533,20 +547,27 @@ namespace DotNetNuke.Services.FileSystem
                 }
 
                 fileContent.Position = 0;
+				Logger.LogDebug("LoadImageProperties(): fileContent.Position → {Arg0}", fileContent.Position);
             }
 
             fileContent.Close();
+			Logger.LogDebug("<<< Exiting LoadImageProperties()");
         }
 
         private void LoadHashProperty()
         {
+			Logger.LogDebug(">>> Entering LoadHashProperty()");
             var fileManager = (FileManager)FileManager.Instance;
             var currentHashCode = FolderProvider.Instance(FolderMappingController.Instance.GetFolderMapping(this.FolderMappingID).FolderProviderType).GetHashCode(this);
+			Logger.LogDebug("LoadHashProperty(): fileManager → {FileManager}", fileManager);
+			Logger.LogDebug("LoadHashProperty(): currentHashCode → {CurrentHashCode}", currentHashCode);
             if (currentHashCode != this.sha1Hash)
             {
                 this.sha1Hash = currentHashCode;
+				Logger.LogDebug("LoadHashProperty(): this.sha1Hash → {Arg0}", this.sha1Hash);
                 fileManager.UpdateFile(this);
             }
+			Logger.LogDebug("<<< Exiting LoadHashProperty()");
         }
     }
 }

@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class RegistrationException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public RegistrationException()
     {
+	Logger.LogDebug(">>> Entering RegistrationException()");
+	Logger.LogDebug("<<< Exiting RegistrationException()");
     }
 
     /// <inheritdoc />
     public RegistrationException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering RegistrationException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting RegistrationException(message={Message})", message);
 
     /// <inheritdoc />
     public RegistrationException(string message, Exception innerException)

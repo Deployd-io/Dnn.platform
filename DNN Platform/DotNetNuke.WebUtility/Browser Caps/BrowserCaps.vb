@@ -1,5 +1,6 @@
 ﻿' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports System
 Imports System.Globalization
@@ -47,6 +48,7 @@ Namespace DotNetNuke.UI.Utilities
 #Region "Private Shared Methods"
 
         Private Shared Function GetBrowser(ByVal objNav As XPathNavigator) As Browser
+			Logger.LogDebug(">>> Entering GetBrowser(objNav={ObjNav})", objNav)
             Dim objBrowser As New Browser()
             objBrowser.Contains = objNav.GetAttribute("contains", "")
             objBrowser.Name = objNav.GetAttribute("nm", "")
@@ -57,12 +59,14 @@ Namespace DotNetNuke.UI.Utilities
             End If
             Return objBrowser
         End Function
+		Logger.LogDebug("<<< Exiting GetBrowser(objNav={ObjNav})", objNav)
 
 #End Region
 
 #Region "Shared Methods"
 
         Public Shared Function GetBrowserCaps() As BrowserCaps
+		Logger.LogDebug(">>> Entering GetBrowserCaps()")
 
             Dim objCaps As BrowserCaps = CType(DataCache.GetCache(CLIENTAPI_CACHE_KEY), BrowserCaps)
             Dim objFunc As FunctionalityInfo = Nothing
@@ -72,13 +76,16 @@ Namespace DotNetNuke.UI.Utilities
 
                 Try
                     strPath = System.Web.HttpContext.Current.Server.MapPath(ClientAPI.ScriptPath & "/ClientAPICaps.config")
+					Logger.LogDebug("GetBrowserCaps(): strPath → {StrPath}", strPath)
                 Catch ex As Exception
                     'ignore error - worried about people with reverse proxies and such...
+					Logger.LogError("Exception in GetBrowserCaps(): {Arg0}", ex.Message)
                 End Try
 
                 Dim objDoc As XPathDocument = Nothing
                 Dim fileExists As Boolean = File.Exists(strPath)
                     objCaps = New BrowserCaps()
+					Logger.LogDebug("GetBrowserCaps(): objCaps → {ObjCaps}", objCaps)
                     objCaps.Functionality = New FunctionalityCollection()
                     If fileExists Then
 
@@ -86,6 +93,7 @@ Namespace DotNetNuke.UI.Utilities
                         Using objReader = New FileStream(strPath, FileMode.Open, FileAccess.Read, FileShare.Read)
                             Using xmlReader As XmlReader = XmlReader.Create(objReader)
                                 objDoc = New XPathDocument(xmlReader)
+								Logger.LogDebug("GetBrowserCaps(): objDoc → {ObjDoc}", objDoc)
                             End Using
                         End Using
                     Else
@@ -99,6 +107,7 @@ Namespace DotNetNuke.UI.Utilities
                     If Not objDoc Is Nothing Then
                         For Each objNavFunc As XPathNavigator In objDoc.CreateNavigator.Select("//functionality")
                             objFunc = New FunctionalityInfo()
+							Logger.LogDebug("GetBrowserCaps(): objFunc → {ObjFunc}", objFunc)
                             objFunc.Functionality = DirectCast(System.Enum.Parse(GetType(ClientAPI.ClientFunctionality), objNavFunc.GetAttribute("nm", "")), ClientAPI.ClientFunctionality)
                             objFunc.Desc = objNavFunc.GetAttribute("desc", "")
 
@@ -125,6 +134,7 @@ Namespace DotNetNuke.UI.Utilities
             Return objCaps
 
         End Function
+		Logger.LogDebug("<<< Exiting GetBrowserCaps()")
 
 #End Region
 

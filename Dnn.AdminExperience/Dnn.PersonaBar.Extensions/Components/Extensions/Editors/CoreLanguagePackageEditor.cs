@@ -24,7 +24,9 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
 
         public CoreLanguagePackageEditor()
         {
+			Logger.LogDebug(">>> Entering CoreLanguagePackageEditor()");
             this.NavigationManager = Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
+			Logger.LogDebug("<<< Exiting CoreLanguagePackageEditor()");
         }
 
         protected INavigationManager NavigationManager { get; }
@@ -32,8 +34,11 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
         /// <inheritdoc />
         public PackageInfoDto GetPackageDetail(int portalId, PackageInfo package)
         {
+			Logger.LogDebug(">>> Entering GetPackageDetail(portalId={PortalId},package={Package})", portalId, package);
             var languagePack = LanguagePackController.GetLanguagePackByPackage(package.PackageID);
             var languagesTab = TabController.GetTabByTabPath(portalId, "//Admin//Languages", Null.NullString);
+			Logger.LogDebug("GetPackageDetail(portalId={PortalId},package={Package}): languagePack → {LanguagePack}", portalId, package, languagePack);
+			Logger.LogDebug("GetPackageDetail(portalId={PortalId},package={Package}): languagesTab → {LanguagesTab}", portalId, package, languagesTab);
 
             var detail = new CoreLanguagePackageDetailDto(portalId, package)
             {
@@ -48,18 +53,23 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
                 detail.Packages = Utility.GetAllPackagesListExceptLangPacks();
             }
 
+			Logger.LogDebug("<<< Exiting GetPackageDetail(portalId={PortalId},package={Package})", portalId, package);
             return detail;
         }
 
         /// <inheritdoc />
         public bool SavePackageSettings(PackageSettingsDto packageSettings, out string errorMessage)
         {
+			Logger.LogDebug(">>> Entering SavePackageSettings(packageSettings={PackageSettings})", packageSettings);
             errorMessage = string.Empty;
 
+			Logger.LogDebug("SavePackageSettings(packageSettings={PackageSettings}): errorMessage → {ErrorMessage}", packageSettings, errorMessage);
             try
             {
                 var changed = false;
                 var languagePack = LanguagePackController.GetLanguagePackByPackage(packageSettings.PackageId);
+				Logger.LogDebug("SavePackageSettings(packageSettings={PackageSettings}): changed → {Changed}", packageSettings, changed);
+				Logger.LogDebug("SavePackageSettings(packageSettings={PackageSettings}): languagePack → {LanguagePack}", packageSettings, languagePack);
                 if (packageSettings.EditorActions.TryGetValue("languageId", out var value)
                     && !string.IsNullOrEmpty(value) && value != languagePack.LanguageID.ToString(CultureInfo.InvariantCulture))
                 {
@@ -78,6 +88,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
             {
                 Logger.Error(ex);
                 errorMessage = ex.Message;
+				Logger.LogDebug("<<< Exiting SavePackageSettings(packageSettings={PackageSettings})", packageSettings);
                 return false;
             }
         }

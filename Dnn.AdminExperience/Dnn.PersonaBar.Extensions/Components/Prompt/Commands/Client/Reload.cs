@@ -17,6 +17,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Client
 
     public class Reload : IConsoleCommand
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public string LocalResourceFile => Constants.LocalResourcesFile;
 
         public string ResultHtml => Localization.GetString("Prompt_Reload_ResultHtml", this.LocalResourceFile);
@@ -31,16 +32,19 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Client
 
         public void Initialize(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             throw new NotImplementedException();
         }
 
         public bool IsValid()
         {
+			Logger.LogDebug(">>> Entering IsValid()");
             throw new NotImplementedException();
         }
 
         public ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             throw new NotImplementedException();
         }
     }

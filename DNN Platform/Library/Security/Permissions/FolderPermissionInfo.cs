@@ -15,6 +15,7 @@ namespace DotNetNuke.Security.Permissions
     [Serializable]
     public class FolderPermissionInfo : PermissionInfoBase, IHydratable, IFolderPermissionInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         // local property declarations
         private int folderId;
         private string folderPath;
@@ -27,10 +28,19 @@ namespace DotNetNuke.Security.Permissions
         /// </summary>
         public FolderPermissionInfo()
         {
+			Logger.LogDebug(">>> Entering FolderPermissionInfo()");
             this.folderPermissionId = Null.NullInteger;
             this.folderPath = Null.NullString;
+			Logger.LogDebug("FolderPermissionInfo(): this.folderPermissionId → {Arg0}", this.folderPermissionId);
+			Logger.LogDebug("FolderPermissionInfo(): this.folderPath → {Arg0}", this.folderPath);
+			Logger.LogDebug("FolderPermissionInfo(): folderPermissionId → {FolderPermissionId}", folderPermissionId);
             this.portalId = Null.NullInteger;
             this.folderId = Null.NullInteger;
+			Logger.LogDebug("<<< Exiting FolderPermissionInfo()");
+			Logger.LogDebug("FolderPermissionInfo(): portalId → {PortalId}", portalId);
+			Logger.LogDebug("FolderPermissionInfo(): this.portalId → {Arg0}", this.portalId);
+			Logger.LogDebug("FolderPermissionInfo(): folderId → {FolderId}", folderId);
+			Logger.LogDebug("FolderPermissionInfo(): this.folderId → {Arg0}", this.folderId);
         }
 
         /// <summary>
@@ -51,12 +61,14 @@ namespace DotNetNuke.Security.Permissions
         public FolderPermissionInfo(IPermissionDefinitionInfo permission)
             : this()
         {
+			Logger.LogDebug(">>> Entering FolderPermissionInfo(permission={Permission})", permission);
             IPermissionDefinitionInfo @this = this;
             @this.ModuleDefId = permission.ModuleDefId;
             @this.PermissionCode = permission.PermissionCode;
             @this.PermissionId = permission.PermissionId;
             @this.PermissionKey = permission.PermissionKey;
             @this.PermissionName = permission.PermissionName;
+			Logger.LogDebug("<<< Exiting FolderPermissionInfo(permission={Permission})", permission);
         }
 
         [XmlIgnore]
@@ -139,6 +151,7 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="dr">The Data Reader to use.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.FillInternal(dr);
 
             IFolderPermissionInfo @this = this;
@@ -146,6 +159,7 @@ namespace DotNetNuke.Security.Permissions
             @this.FolderId = Null.SetNullInteger(dr["FolderID"]);
             @this.PortalId = Null.SetNullInteger(dr["PortalID"]);
             @this.FolderPath = Null.SetNullString(dr["FolderPath"]);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

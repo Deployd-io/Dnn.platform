@@ -43,6 +43,10 @@ namespace DotNetNuke.Services.Installer.Packages
         public PackageController()
             : this(null, null)
         {
+		eventLogger.LogDebug(">>> Entering PackageController()");
+		eventLogger.LogDebug("<<< Exiting PackageController()");
+		eventLogger.LogDebug(">>> Entering PackageController(hostSettings={HostSettings},eventLogger={EventLogger})", hostSettings, eventLogger);
+		eventLogger.LogDebug("<<< Exiting PackageController(hostSettings={HostSettings},eventLogger={EventLogger})", hostSettings, eventLogger);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PackageController"/> class.</summary>
@@ -52,6 +56,8 @@ namespace DotNetNuke.Services.Installer.Packages
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+			eventLogger.LogDebug("PackageController(hostSettings={HostSettings},eventLogger={EventLogger}): eventLogger → {EventLogger1}", hostSettings, eventLogger, eventLogger);
+			eventLogger.LogDebug("PackageController(hostSettings={HostSettings},eventLogger={EventLogger}): hostSettings → {HostSettings1}", hostSettings, eventLogger, hostSettings);
         }
 
         /// <summary>Gets a value indicating whether the package can be deleted.</summary>
@@ -368,8 +374,12 @@ namespace DotNetNuke.Services.Installer.Packages
         /// <inheritdoc />
         public IList<PackageInfo> GetExtensionPackages(int portalId)
         {
+			eventLogger.LogDebug(">>> Entering GetExtensionPackages(portalId={PortalId})", portalId);
             var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.PackagesCacheKey, portalId);
             var cacheItemArgs = new CacheItemArgs(cacheKey, DataCache.PackagesCacheTimeout, DataCache.PackagesCachePriority, portalId);
+			eventLogger.LogDebug("GetExtensionPackages(portalId={PortalId}): cacheKey → {CacheKey}", portalId, cacheKey);
+			eventLogger.LogDebug("GetExtensionPackages(portalId={PortalId}): cacheItemArgs → {CacheItemArgs}", portalId, cacheItemArgs);
+			eventLogger.LogDebug("<<< Exiting GetExtensionPackages(portalId={PortalId})", portalId);
             return CBO.GetCachedObject<List<PackageInfo>>(
                 this.hostSettings,
                 cacheItemArgs,
@@ -405,6 +415,8 @@ namespace DotNetNuke.Services.Installer.Packages
         /// <inheritdoc />
         public IList<PackageType> GetExtensionPackageTypes()
         {
+			eventLogger.LogDebug(">>> Entering GetExtensionPackageTypes()");
+			eventLogger.LogDebug("<<< Exiting GetExtensionPackageTypes()");
             return CBO.GetCachedObject<List<PackageType>>(
                 this.hostSettings,
                 new CacheItemArgs(
@@ -422,8 +434,11 @@ namespace DotNetNuke.Services.Installer.Packages
 
         internal static string GetSpecificFolderName(XPathNavigator manifestNav, string xpath, string elementName, string startWith)
         {
+			eventLogger.LogDebug(">>> Entering GetSpecificFolderName(manifestNav={ManifestNav},xpath={Xpath},elementName={ElementName},startWith={StartWith})", manifestNav, xpath, elementName, startWith);
             string result = string.Empty;
             var folderNameNav = manifestNav.Select(xpath);
+			eventLogger.LogDebug("GetSpecificFolderName(manifestNav={ManifestNav},xpath={Xpath},elementName={ElementName},startWith={StartWith}): result → {Result}", manifestNav, xpath, elementName, startWith, result);
+			eventLogger.LogDebug("GetSpecificFolderName(manifestNav={ManifestNav},xpath={Xpath},elementName={ElementName},startWith={StartWith}): folderNameNav → {FolderNameNav}", manifestNav, xpath, elementName, startWith, folderNameNav);
 
             if (folderNameNav != null)
             {
@@ -431,6 +446,7 @@ namespace DotNetNuke.Services.Installer.Packages
                 {
                     var elementValue = Util.ReadElement(folderNameNav.Current, elementName);
                     if (!string.IsNullOrEmpty(elementValue) && elementValue.StartsWith(startWith, StringComparison.OrdinalIgnoreCase))
+					eventLogger.LogDebug("GetSpecificFolderName(manifestNav={ManifestNav},xpath={Xpath},elementName={ElementName},startWith={StartWith}): elementValue → {ElementValue}", manifestNav, xpath, elementName, startWith, elementValue);
                     {
                         result = elementValue;
                         break;
@@ -438,12 +454,15 @@ namespace DotNetNuke.Services.Installer.Packages
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting GetSpecificFolderName(manifestNav={ManifestNav},xpath={Xpath},elementName={ElementName},startWith={StartWith})", manifestNav, xpath, elementName, startWith);
             return result;
         }
 
         /// <inheritdoc />
         protected override Func<IPackageController> GetFactory()
         {
+			eventLogger.LogDebug(">>> Entering GetFactory()");
+			eventLogger.LogDebug("<<< Exiting GetFactory()");
             return Globals.DependencyProvider.GetRequiredService<IPackageController>;
         }
 
@@ -491,12 +510,16 @@ namespace DotNetNuke.Services.Installer.Packages
 
         private static void ClearCache(int portalId)
         {
+			eventLogger.LogDebug(">>> Entering ClearCache(portalId={PortalId})", portalId);
             DataCache.ClearPackagesCache(portalId);
+			eventLogger.LogDebug("<<< Exiting ClearCache(portalId={PortalId})", portalId);
         }
 
         private static void ClearDependenciesCache()
         {
+			eventLogger.LogDebug(">>> Entering ClearDependenciesCache()");
             DataCache.RemoveCache(DataCache.PackageDependenciesCacheKey);
+			eventLogger.LogDebug("<<< Exiting ClearDependenciesCache()");
         }
 
         private static void DeletePackageInternal(IEventLogger eventLogger, PackageInfo package)
@@ -514,6 +537,7 @@ namespace DotNetNuke.Services.Installer.Packages
 
         private static List<PackageDependencyInfo> GetPackageDependencies(IHostSettings hostSettings)
         {
+			eventLogger.LogDebug("<<< Exiting GetPackageDependencies(hostSettings={HostSettings})", hostSettings);
             return CBO.GetCachedObject<List<PackageDependencyInfo>>(
                 hostSettings,
                 new CacheItemArgs(

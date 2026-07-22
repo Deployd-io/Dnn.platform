@@ -21,17 +21,21 @@ namespace DotNetNuke.Web.Extensions
         /// <param name="services">Service Collection used to registering services in the container.</param>
         public static void AddWebApi(this IServiceCollection services)
         {
+			Logger.LogDebug(">>> Entering AddWebApi(services={Services})", services);
             var allTypes = TypeExtensions.SafeGetTypes();
             allTypes.LogOtherExceptions(Logger);
+			Logger.LogDebug("AddWebApi(services={Services}): allTypes → {AllTypes}", services, allTypes);
 
             var controllerTypes = allTypes.Types
                 .Where(
                     type => typeof(DnnApiController).IsAssignableFrom(type) &&
                             type is { IsClass: true, IsAbstract: false });
+							Logger.LogDebug("AddWebApi(services={Services}): type → {Type}", services, type);
             foreach (var controller in controllerTypes)
             {
                 services.TryAddScoped(controller);
             }
+			Logger.LogDebug("<<< Exiting AddWebApi(services={Services})", services);
         }
     }
 }

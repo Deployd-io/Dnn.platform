@@ -27,27 +27,35 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 
     public class TemplateDefinition(IApplicationStatusInfo appStatus, IEventLogger eventLogger)
     {
+		eventLogger.LogDebug(">>> Entering TemplateDefinition(appStatus={AppStatus},eventLogger={EventLogger})", appStatus, eventLogger);
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
         public List<ClientOption> ClientOptions = new List<ClientOption>();
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
+		eventLogger.LogDebug("TemplateDefinition(appStatus={AppStatus},eventLogger={EventLogger}): ClientOptions → {ClientOptions}", appStatus, eventLogger, ClientOptions);
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
         public List<TemplateArgument> TemplateArguments = new List<TemplateArgument>();
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
+		eventLogger.LogDebug("TemplateDefinition(appStatus={AppStatus},eventLogger={EventLogger}): TemplateArguments → {TemplateArguments}", appStatus, eventLogger, TemplateArguments);
         internal readonly Dictionary<string, Tuple<Version, SpecificVersion?>> ScriptLibraries = new Dictionary<string, Tuple<Version, SpecificVersion?>>();
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         internal readonly List<string> ScriptUrls = new List<string>();
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
+		eventLogger.LogDebug("TemplateDefinition(appStatus={AppStatus},eventLogger={EventLogger}): ScriptUrls → {ScriptUrls}", appStatus, eventLogger, ScriptUrls);
         internal readonly List<string> ScriptKeys = new List<string>();
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
+		eventLogger.LogDebug("TemplateDefinition(appStatus={AppStatus},eventLogger={EventLogger}): ScriptKeys → {ScriptKeys}", appStatus, eventLogger, ScriptKeys);
         internal readonly Dictionary<string, string> Scripts = new Dictionary<string, string>();
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         internal readonly List<string> StyleSheets = new List<string>();
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
+		eventLogger.LogDebug("TemplateDefinition(appStatus={AppStatus},eventLogger={EventLogger}): StyleSheets → {StyleSheets}", appStatus, eventLogger, StyleSheets);
         internal readonly List<ClientOption> DefaultClientOptions = new List<ClientOption>();
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
+		eventLogger.LogDebug("TemplateDefinition(appStatus={AppStatus},eventLogger={EventLogger}): DefaultClientOptions → {DefaultClientOptions}", appStatus, eventLogger, DefaultClientOptions);
         internal readonly List<TemplateArgument> DefaultTemplateArguments = new List<TemplateArgument>();
 
+		eventLogger.LogDebug("TemplateDefinition(appStatus={AppStatus},eventLogger={EventLogger}): DefaultTemplateArguments → {DefaultTemplateArguments}", appStatus, eventLogger, DefaultTemplateArguments);
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         internal string Folder;
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
@@ -66,8 +74,11 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 
         private readonly IApplicationStatusInfo appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
         private readonly IEventLogger eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+		eventLogger.LogDebug("TemplateDefinition(appStatus={AppStatus},eventLogger={EventLogger}): appStatus → {AppStatus1}", appStatus, eventLogger, appStatus);
+		eventLogger.LogDebug("TemplateDefinition(appStatus={AppStatus},eventLogger={EventLogger}): eventLogger → {EventLogger1}", appStatus, eventLogger, eventLogger);
 
         /// <summary>Initializes a new instance of the <see cref="TemplateDefinition"/> class.</summary>
+		eventLogger.LogDebug("<<< Exiting TemplateDefinition(appStatus={AppStatus},eventLogger={EventLogger})", appStatus, eventLogger);
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IClientResourceController. Scheduled removal in v12.0.0.")]
         public TemplateDefinition()
             : this(null, null, null)
@@ -86,17 +97,24 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 
         public TemplateDefinition Clone()
         {
+			eventLogger.LogDebug(">>> Entering Clone()");
+			eventLogger.LogDebug("<<< Exiting Clone()");
             return (TemplateDefinition)this.MemberwiseClone();
         }
 
         public void Reset()
         {
+			eventLogger.LogDebug(">>> Entering Reset()");
             this.ClientOptions = new List<ClientOption>(this.DefaultClientOptions);
             this.TemplateArguments = new List<TemplateArgument>(this.DefaultTemplateArguments);
+			eventLogger.LogDebug("<<< Exiting Reset()");
+			eventLogger.LogDebug("Reset(): TemplateArguments → {TemplateArguments}", TemplateArguments);
+			eventLogger.LogDebug("Reset(): ClientOptions → {ClientOptions}", ClientOptions);
         }
 
         public void AddClientOptions(List<ClientOption> options, bool replace)
         {
+			eventLogger.LogDebug(">>> Entering AddClientOptions(options={Options},replace={Replace})", options, replace);
             if (options != null)
             {
                 foreach (var option in options)
@@ -113,10 +131,12 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
                     }
                 }
             }
+			eventLogger.LogDebug("<<< Exiting AddClientOptions(options={Options},replace={Replace})", options, replace);
         }
 
         public void AddTemplateArguments(List<TemplateArgument> args, bool replace)
         {
+			eventLogger.LogDebug(">>> Entering AddTemplateArguments(args={Args},replace={Replace})", args, replace);
             if (args != null)
             {
                 foreach (var arg in args)
@@ -133,10 +153,12 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
                     }
                 }
             }
+			eventLogger.LogDebug("<<< Exiting AddTemplateArguments(args={Args},replace={Replace})", args, replace);
         }
 
         internal static TemplateDefinition FromName(IHostSettings hostSettings, string templateName, string manifestName)
         {
+			eventLogger.LogDebug(">>> Entering FromName(hostSettings={HostSettings},templateName={TemplateName},manifestName={ManifestName})", hostSettings, templateName, manifestName);
             var manifestUrl = new PathResolver(hostSettings, null).Resolve(
                 templateName + "/" + manifestName,
                 PathResolver.RelativeTo.Container,
@@ -144,6 +166,7 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
                 PathResolver.RelativeTo.Portal,
                 PathResolver.RelativeTo.Module,
                 PathResolver.RelativeTo.Dnn);
+			eventLogger.LogDebug("<<< Exiting FromName(hostSettings={HostSettings},templateName={TemplateName},manifestName={ManifestName})", hostSettings, templateName, manifestName);
             return FromManifest(hostSettings, manifestUrl);
         }
 
@@ -316,11 +339,13 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 
         internal void PreRender()
         {
+			eventLogger.LogDebug(">>> Entering PreRender()");
             var page = DNNContext.Current.Page;
 
             var clientResourcesController = GetClientResourcesController();
             foreach (var stylesheet in this.StyleSheets)
             {
+			eventLogger.LogDebug("PreRender(): clientResourcesController → {ClientResourcesController}", clientResourcesController);
                 clientResourcesController.RegisterStylesheet(stylesheet);
             }
 
@@ -358,16 +383,23 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 
             var headContent = string.IsNullOrEmpty(this.TemplateHeadPath) ? string.Empty : Utilities.CachedFileContent(this.TemplateHeadPath);
             var expandedHead = RegexLinks.Replace(headContent, "$1" + DNNContext.Current.ActiveTab.SkinPath + "$3");
+			eventLogger.LogDebug("PreRender(): headContent → {HeadContent}", headContent);
+			eventLogger.LogDebug("PreRender(): expandedHead → {ExpandedHead}", expandedHead);
             page.Header.Controls.Add(new LiteralControl(expandedHead));
+			eventLogger.LogDebug("<<< Exiting PreRender()");
         }
 
         internal void Render(object source, HtmlTextWriter htmlWriter)
         {
+			eventLogger.LogDebug(">>> Entering Render(source={Source},htmlWriter={HtmlWriter})", source, htmlWriter);
             this.Processor.Render(source, htmlWriter, this);
+			eventLogger.LogDebug("<<< Exiting Render(source={Source},htmlWriter={HtmlWriter})", source, htmlWriter);
         }
 
         private static string GetResolvedPath(XmlNode scriptElt, PathResolver pathResolver)
         {
+			eventLogger.LogDebug(">>> Entering GetResolvedPath(scriptElt={ScriptElt},pathResolver={PathResolver})", scriptElt, pathResolver);
+			eventLogger.LogDebug("<<< Exiting GetResolvedPath(scriptElt={ScriptElt},pathResolver={PathResolver})", scriptElt, pathResolver);
             return pathResolver.Resolve(
                 scriptElt.InnerText.Trim(),
                 PathResolver.RelativeTo.Manifest,
@@ -413,6 +445,7 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
                                 scriptPath);
             }
 
+			eventLogger.LogDebug("<<< Exiting CreateScript(jsObject={JsObject},scriptPath={ScriptPath})", jsObject, scriptPath);
             return result;
         }
 
@@ -432,7 +465,10 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 
         private static IClientResourceController GetClientResourcesController()
         {
+			eventLogger.LogDebug(">>> Entering GetClientResourcesController()");
             var serviceProvider = Globals.GetCurrentServiceProvider();
+			eventLogger.LogDebug("GetClientResourcesController(): serviceProvider → {ServiceProvider}", serviceProvider);
+			eventLogger.LogDebug("<<< Exiting GetClientResourcesController()");
             return serviceProvider.GetRequiredService<IClientResourceController>();
         }
     }

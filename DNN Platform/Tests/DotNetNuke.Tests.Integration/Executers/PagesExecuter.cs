@@ -6,19 +6,24 @@ namespace DotNetNuke.Tests.Integration.Executers
 {
     public class PagesExecuter : WebApiExecuter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public PagesExecuter GetPageDetails(int pageId)
         {
+			Logger.LogDebug(">>> Entering GetPageDetails(pageId={PageId})", pageId);
             this.Responses.Add(this.Connector.GetContent(
                     "API/PersonaBar/Pages/GetPageDetails?pageId=" + pageId));
 
+			Logger.LogDebug("<<< Exiting GetPageDetails(pageId={PageId})", pageId);
             return this;
         }
 
         public dynamic SavePageDetails(dynamic pageDetails)
         {
+			Logger.LogDebug(">>> Entering SavePageDetails(pageDetails={PageDetails})", pageDetails);
             this.Responses.Add(this.Connector.PostJson(
                 "API/PersonaBar/Pages/SavePageDetails",
                 pageDetails));
+			Logger.LogDebug("<<< Exiting SavePageDetails(pageDetails={PageDetails})", pageDetails);
             return this.GetLastDeserializeResponseMessage();
         }
     }

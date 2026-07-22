@@ -12,9 +12,11 @@ namespace DotNetNuke.Build.Tasks
     /// <summary>Builds the npm packages for the entire solution.</summary>
     public sealed class BuildNpmPackages : FrostingTask<Context>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override void Run(Context context)
         {
+			Logger.LogDebug(">>> Entering Run(context={Context})", context);
             var corepackCommand = new CommandSettings
             {
                 ToolName = "Corepack",
@@ -35,6 +37,7 @@ namespace DotNetNuke.Build.Tasks
                     .Append("yarn")
                     .Append("run")
                     .Append("build"));
+					Logger.LogDebug("<<< Exiting Run(context={Context})", context);
         }
     }
 }

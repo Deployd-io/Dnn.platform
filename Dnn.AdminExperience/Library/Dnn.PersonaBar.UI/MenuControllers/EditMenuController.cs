@@ -22,14 +22,19 @@ namespace Dnn.PersonaBar.UI.MenuControllers
     [DnnPageEditor]
     public class EditMenuController : IMenuItemController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public void UpdateParameters(MenuItem menuItem)
         {
+		Logger.LogDebug(">>> Entering UpdateParameters(menuItem={MenuItem})", menuItem);
+		Logger.LogDebug("<<< Exiting UpdateParameters(menuItem={MenuItem})", menuItem);
         }
 
         /// <inheritdoc />
         public bool Visible(MenuItem menuItem)
         {
+			Logger.LogDebug(">>> Entering Visible(menuItem={MenuItem})", menuItem);
+			Logger.LogDebug("<<< Exiting Visible(menuItem={MenuItem})", menuItem);
             return IsPageAdmin() || IsModuleAdmin();
         }
 
@@ -41,6 +46,7 @@ namespace Dnn.PersonaBar.UI.MenuControllers
 
         private static bool IsModuleAdmin()
         {
+			Logger.LogDebug(">>> Entering IsModuleAdmin()");
             var moduleAdmin = TabController.CurrentPage.Modules.Cast<ModuleInfo>()
                 .Where(module => !module.IsDeleted)
                 .Any(module => ModulePermissionController.HasModuleAccess(
@@ -48,11 +54,14 @@ namespace Dnn.PersonaBar.UI.MenuControllers
                     Null.NullString,
                     module));
 
+			Logger.LogDebug("<<< Exiting IsModuleAdmin()");
             return PortalSettings.Current.ControlPanelSecurity == PortalSettings.ControlPanelPermission.ModuleEditor && moduleAdmin;
         }
 
         private static bool IsPageAdmin()
         {
+			Logger.LogDebug(">>> Entering IsPageAdmin()");
+			Logger.LogDebug("<<< Exiting IsPageAdmin()");
             return TabPermissionController.CanAddContentToPage()
                     || TabPermissionController.CanAddPage()
                     || TabPermissionController.CanAdminPage()

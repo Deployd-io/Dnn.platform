@@ -27,6 +27,7 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
     [TestFixture]
     public class SearchHelperTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const int OtherSearchTypeId = 2;
         private const string TermDNN = "DNN";
         private const string TermDotNetNuke = "DotnetNuke";
@@ -45,53 +46,67 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
         [SetUp]
         public void SetUp()
         {
+			Logger.LogDebug(">>> Entering SetUp()");
             ComponentFactory.Container = new SimpleContainer();
             this.cachingProvider = MockComponentProvider.CreateDataCacheProvider();
+			Logger.LogDebug("SetUp(): cachingProvider → {CachingProvider}", cachingProvider);
             this.dataProvider = MockComponentProvider.CreateDataProvider();
+			Logger.LogDebug("SetUp(): dataProvider → {DataProvider}", dataProvider);
             this.SetupDataProvider();
             this.searchHelper = new SearchHelperImpl(Mock.Of<IHostSettings>(), Mock.Of<IHostSettingsService>(), Mock.Of<IPortalController>(), Mock.Of<IApplicationStatusInfo>());
+			Logger.LogDebug("SetUp(): searchHelper → {SearchHelper}", searchHelper);
 
             this.serviceProvider = FakeServiceProvider.Setup(
                 services =>
                 {
+				Logger.LogDebug("SetUp(): serviceProvider → {ServiceProvider}", serviceProvider);
+				Logger.LogDebug("SetUp(): services → {Services}", services);
                     services.AddSingleton(this.cachingProvider.Object);
                     services.AddSingleton(this.dataProvider.Object);
                     services.AddSingleton(this.searchHelper);
                 });
 
             DataCache.ClearCache();
+			Logger.LogDebug("<<< Exiting SetUp()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			Logger.LogDebug(">>> Entering TearDown()");
             this.serviceProvider.Dispose();
+			Logger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void SearchHelper_GetSynonyms_Two_Terms_Returns_Correct_Results()
         {
+			Logger.LogDebug(">>> Entering SearchHelper_GetSynonyms_Two_Terms_Returns_Correct_Results()");
             // Arrange
 
             // Act
             var synonyms = this.searchHelper.GetSynonyms(PortalId0, CultureEnUs, TermDNN).ToArray();
 
+			Logger.LogDebug("SearchHelper_GetSynonyms_Two_Terms_Returns_Correct_Results(): synonyms → {Synonyms}", synonyms);
             using (Assert.EnterMultipleScope())
             {
                 // Assert
                 Assert.That(synonyms.Count(), Is.EqualTo(1));
                 Assert.That(synonyms[0], Is.EqualTo(TermDotNetNuke.ToLowerInvariant()));
             }
+			Logger.LogDebug("<<< Exiting SearchHelper_GetSynonyms_Two_Terms_Returns_Correct_Results()");
         }
 
         [Test]
         public void SearchHelper_GetSynonyms_Three_Terms_Returns_Correct_Results()
         {
+			Logger.LogDebug(">>> Entering SearchHelper_GetSynonyms_Three_Terms_Returns_Correct_Results()");
             // Arrange
 
             // Act
             var synonyms = this.searchHelper.GetSynonyms(PortalId0, CultureEnUs, TermHop).ToArray();
 
+			Logger.LogDebug("SearchHelper_GetSynonyms_Three_Terms_Returns_Correct_Results(): synonyms → {Synonyms}", synonyms);
             using (Assert.EnterMultipleScope())
             {
                 // Assert
@@ -99,11 +114,13 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
                 Assert.That(synonyms[0], Is.EqualTo(TermJump.ToLowerInvariant()));
                 Assert.That(synonyms[1], Is.EqualTo(TermLeap.ToLowerInvariant()));
             }
+			Logger.LogDebug("<<< Exiting SearchHelper_GetSynonyms_Three_Terms_Returns_Correct_Results()");
         }
 
         [Test]
         public void SearchHelper_Rephrase_NoWildCardButExact_1()
         {
+			Logger.LogDebug(">>> Entering SearchHelper_Rephrase_NoWildCardButExact_1()");
             // Arrange
             const string inPhrase = "\"brown fox\"";
             const string expected = inPhrase;
@@ -111,13 +128,16 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             // Act
             var analyzed = this.searchHelper.RephraseSearchText(inPhrase, false);
 
+			Logger.LogDebug("SearchHelper_Rephrase_NoWildCardButExact_1(): analyzed → {Analyzed}", analyzed);
             // Assert
             Assert.That(analyzed, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting SearchHelper_Rephrase_NoWildCardButExact_1()");
         }
 
         [Test]
         public void SearchHelper_Rephrase_NoWildCardButExact_2()
         {
+			Logger.LogDebug(">>> Entering SearchHelper_Rephrase_NoWildCardButExact_2()");
             // Arrange
             const string inPhrase = "\"brown fox\" -\"(Lazy) dog\" jumps";
             const string expected = inPhrase;
@@ -125,13 +145,16 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             // Act
             var analyzed = this.searchHelper.RephraseSearchText(inPhrase, false);
 
+			Logger.LogDebug("SearchHelper_Rephrase_NoWildCardButExact_2(): analyzed → {Analyzed}", analyzed);
             // Assert
             Assert.That(analyzed, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting SearchHelper_Rephrase_NoWildCardButExact_2()");
         }
 
         [Test]
         public void SearchHelper_Rephrase_NoWildCardNoExact()
         {
+			Logger.LogDebug(">>> Entering SearchHelper_Rephrase_NoWildCardNoExact()");
             // Arrange
             const string inPhrase = "(brown) OR (fox AND dog) +jumbs";
             const string expected = inPhrase;
@@ -139,13 +162,16 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             // Act
             var analyzed = this.searchHelper.RephraseSearchText(inPhrase, false);
 
+			Logger.LogDebug("SearchHelper_Rephrase_NoWildCardNoExact(): analyzed → {Analyzed}", analyzed);
             // Assert
             Assert.That(analyzed, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting SearchHelper_Rephrase_NoWildCardNoExact()");
         }
 
         [Test]
         public void SearchHelper_Rephrase_WildCardNoExact_0()
         {
+			Logger.LogDebug(">>> Entering SearchHelper_Rephrase_WildCardNoExact_0()");
             // Arrange
             const string inPhrase = "fox dog";
             const string expected = "(fox OR fox*) (dog OR dog*)";
@@ -153,13 +179,16 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             // Act
             var analyzed = this.searchHelper.RephraseSearchText(inPhrase, true);
 
+			Logger.LogDebug("SearchHelper_Rephrase_WildCardNoExact_0(): analyzed → {Analyzed}", analyzed);
             // Assert
             Assert.That(analyzed, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting SearchHelper_Rephrase_WildCardNoExact_0()");
         }
 
         [Test]
         public void SearchHelper_Rephrase_WildCardNoExact_1()
         {
+			Logger.LogDebug(">>> Entering SearchHelper_Rephrase_WildCardNoExact_1()");
             // Arrange
             const string inPhrase = "(lazy-dog)";
             const string expected = "(lazy-dog OR lazy-dog*)";
@@ -167,13 +196,16 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             // Act
             var analyzed = this.searchHelper.RephraseSearchText(inPhrase, true);
 
+			Logger.LogDebug("SearchHelper_Rephrase_WildCardNoExact_1(): analyzed → {Analyzed}", analyzed);
             // Assert
             Assert.That(analyzed, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting SearchHelper_Rephrase_WildCardNoExact_1()");
         }
 
         [Test]
         public void SearchHelper_Rephrase_WildCardNoExact_2()
         {
+			Logger.LogDebug(">>> Entering SearchHelper_Rephrase_WildCardNoExact_2()");
             // Arrange
             const string inPhrase = "fox (dog)";
             const string expected = "(fox OR fox*) (dog OR dog*)";
@@ -181,13 +213,16 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             // Act
             var analyzed = this.searchHelper.RephraseSearchText(inPhrase, true);
 
+			Logger.LogDebug("SearchHelper_Rephrase_WildCardNoExact_2(): analyzed → {Analyzed}", analyzed);
             // Assert
             Assert.That(analyzed, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting SearchHelper_Rephrase_WildCardNoExact_2()");
         }
 
         [Test]
         public void SearchHelper_Rephrase_WildCardNoExact_3()
         {
+			Logger.LogDebug(">>> Entering SearchHelper_Rephrase_WildCardNoExact_3()");
             // Arrange
             const string inPhrase = "(dog) fox";
             const string expected = "(dog OR dog*) (fox OR fox*)";
@@ -195,13 +230,16 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             // Act
             var analyzed = this.searchHelper.RephraseSearchText(inPhrase, true);
 
+			Logger.LogDebug("SearchHelper_Rephrase_WildCardNoExact_3(): analyzed → {Analyzed}", analyzed);
             // Assert
             Assert.That(analyzed, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting SearchHelper_Rephrase_WildCardNoExact_3()");
         }
 
         [Test]
         public void SearchHelper_Rephrase_WildCardNoExact_4()
         {
+			Logger.LogDebug(">>> Entering SearchHelper_Rephrase_WildCardNoExact_4()");
             // Arrange
             const string inPhrase = "brown fox (lazy) dog";
             const string expected = "(brown OR brown*) (fox OR fox*) (lazy OR lazy*) (dog OR dog*)";
@@ -209,13 +247,16 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             // Act
             var analyzed = this.searchHelper.RephraseSearchText(inPhrase, true);
 
+			Logger.LogDebug("SearchHelper_Rephrase_WildCardNoExact_4(): analyzed → {Analyzed}", analyzed);
             // Assert
             Assert.That(analyzed, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting SearchHelper_Rephrase_WildCardNoExact_4()");
         }
 
         [Test]
         public void SearchHelper_Rephrase_WildCardNoExact_5()
         {
+			Logger.LogDebug(">>> Entering SearchHelper_Rephrase_WildCardNoExact_5()");
             // Arrange
             const string inPhrase = "(brown fox) lazy dog";
             const string expected = "((brown OR brown*) (fox OR fox*)) (lazy OR lazy*) (dog OR dog*)";
@@ -223,13 +264,16 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             // Act
             var analyzed = this.searchHelper.RephraseSearchText(inPhrase, true);
 
+			Logger.LogDebug("SearchHelper_Rephrase_WildCardNoExact_5(): analyzed → {Analyzed}", analyzed);
             // Assert
             Assert.That(analyzed, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting SearchHelper_Rephrase_WildCardNoExact_5()");
         }
 
         [Test]
         public void SearchHelper_Rephrase_WildCardNoExact_6()
         {
+			Logger.LogDebug(">>> Entering SearchHelper_Rephrase_WildCardNoExact_6()");
             // Arrange
             const string inPhrase = "brown fox (lazy dog)";
             const string expected = "(brown OR brown*) (fox OR fox*) ((lazy OR lazy*) (dog OR dog*))";
@@ -237,13 +281,16 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             // Act
             var analyzed = this.searchHelper.RephraseSearchText(inPhrase, true);
 
+			Logger.LogDebug("SearchHelper_Rephrase_WildCardNoExact_6(): analyzed → {Analyzed}", analyzed);
             // Assert
             Assert.That(analyzed, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting SearchHelper_Rephrase_WildCardNoExact_6()");
         }
 
         [Test]
         public void SearchHelper_Rephrase_WildCardNoExact_7()
         {
+			Logger.LogDebug(">>> Entering SearchHelper_Rephrase_WildCardNoExact_7()");
             // Arrange
             const string inPhrase = "brown fox (lazy AND dog)";
             const string expected = "(brown OR brown*) (fox OR fox*) ((lazy OR lazy*) AND (dog OR dog*))";
@@ -251,13 +298,16 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             // Act
             var analyzed = this.searchHelper.RephraseSearchText(inPhrase, true);
 
+			Logger.LogDebug("SearchHelper_Rephrase_WildCardNoExact_7(): analyzed → {Analyzed}", analyzed);
             // Assert
             Assert.That(analyzed, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting SearchHelper_Rephrase_WildCardNoExact_7()");
         }
 
         [Test]
         public void SearchHelper_Rephrase_WildCardNoExact_8()
         {
+			Logger.LogDebug(">>> Entering SearchHelper_Rephrase_WildCardNoExact_8()");
             // Arrange
             const string inPhrase = "brown fox (lazy and dog)";
             const string expected = "(brown OR brown*) (fox OR fox*) ((lazy OR lazy*) (and OR and*) (dog OR dog*))";
@@ -265,13 +315,16 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             // Act
             var analyzed = this.searchHelper.RephraseSearchText(inPhrase, true);
 
+			Logger.LogDebug("SearchHelper_Rephrase_WildCardNoExact_8(): analyzed → {Analyzed}", analyzed);
             // Assert
             Assert.That(analyzed, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting SearchHelper_Rephrase_WildCardNoExact_8()");
         }
 
         [Test]
         public void SearchHelper_Rephrase_WildCardWithExact_1()
         {
+			Logger.LogDebug(">>> Entering SearchHelper_Rephrase_WildCardWithExact_1()");
             // Arrange
             const string inPhrase = "\"brown fox\"";
             const string expected = inPhrase;
@@ -279,13 +332,16 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             // Act
             var analyzed = this.searchHelper.RephraseSearchText(inPhrase, true);
 
+			Logger.LogDebug("SearchHelper_Rephrase_WildCardWithExact_1(): analyzed → {Analyzed}", analyzed);
             // Assert
             Assert.That(analyzed, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting SearchHelper_Rephrase_WildCardWithExact_1()");
         }
 
         [Test]
         public void SearchHelper_Rephrase_WildCardWithExact_2()
         {
+			Logger.LogDebug(">>> Entering SearchHelper_Rephrase_WildCardWithExact_2()");
             // Arrange
             const string inPhrase = "\"brown fox\" dog";
             const string expected = "\"brown fox\" (dog OR dog*)";
@@ -293,13 +349,16 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             // Act
             var analyzed = this.searchHelper.RephraseSearchText(inPhrase, true);
 
+			Logger.LogDebug("SearchHelper_Rephrase_WildCardWithExact_2(): analyzed → {Analyzed}", analyzed);
             // Assert
             Assert.That(analyzed, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting SearchHelper_Rephrase_WildCardWithExact_2()");
         }
 
         [Test]
         public void SearchHelper_Rephrase_WildCardWithExact_3()
         {
+			Logger.LogDebug(">>> Entering SearchHelper_Rephrase_WildCardWithExact_3()");
             // Arrange
             const string inPhrase = "The +\"brown fox\" -\"Lazy dog\" jumps";
             const string expected = "(The OR The*) +\"brown fox\" -\"Lazy dog\" (jumps OR jumps*)";
@@ -307,13 +366,16 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             // Act
             var analyzed = this.searchHelper.RephraseSearchText(inPhrase, true);
 
+			Logger.LogDebug("SearchHelper_Rephrase_WildCardWithExact_3(): analyzed → {Analyzed}", analyzed);
             // Assert
             Assert.That(analyzed, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting SearchHelper_Rephrase_WildCardWithExact_3()");
         }
 
         [Test]
         public void SearchHelper_Rephrase_WildCardWithTilde_4()
         {
+			Logger.LogDebug(">>> Entering SearchHelper_Rephrase_WildCardWithTilde_4()");
             // Arrange
             const string inPhrase = "dog jump~2";
             const string expected = "(dog OR dog*) jump~2";
@@ -321,8 +383,10 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             // Act
             var analyzed = this.searchHelper.RephraseSearchText(inPhrase, true);
 
+			Logger.LogDebug("SearchHelper_Rephrase_WildCardWithTilde_4(): analyzed → {Analyzed}", analyzed);
             // Assert
             Assert.That(analyzed, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting SearchHelper_Rephrase_WildCardWithTilde_4()");
         }
 
         [Test]
@@ -333,15 +397,19 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
         [TestCase("Ãbcdef", "(Abcdef OR Abcdef*)")]
         public void SearchHelper_Rephrase_AccentedCharsReplaced_Replaced(string inPhrase, string expected)
         {
+			Logger.LogDebug(">>> Entering SearchHelper_Rephrase_AccentedCharsReplaced_Replaced(inPhrase={InPhrase},expected={Expected})", inPhrase, expected);
             // Act
             var analyzed = this.searchHelper.RephraseSearchText(inPhrase, true);
 
+			Logger.LogDebug("SearchHelper_Rephrase_AccentedCharsReplaced_Replaced(inPhrase={InPhrase},expected={Expected}): analyzed → {Analyzed}", inPhrase, expected, analyzed);
             // Assert
             Assert.That(analyzed, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting SearchHelper_Rephrase_AccentedCharsReplaced_Replaced(inPhrase={InPhrase},expected={Expected})", inPhrase, expected);
         }
 
         private void SetupDataProvider()
         {
+			Logger.LogDebug(">>> Entering SetupDataProvider()");
             // Standard DataProvider Path for Logging
             this.dataProvider.Setup(d => d.GetProviderPath()).Returns(string.Empty);
 
@@ -351,6 +419,8 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
 
             var dataTable = new DataTable("SynonymsGroups");
             var pkId = dataTable.Columns.Add("SynonymsGroupID", typeof(int));
+			Logger.LogDebug("SetupDataProvider(): dataTable → {DataTable}", dataTable);
+			Logger.LogDebug("SetupDataProvider(): pkId → {PkId}", pkId);
             dataTable.Columns.Add("SynonymsTags", typeof(string));
             dataTable.Columns.Add("CreatedByUserID", typeof(int));
             dataTable.Columns.Add("CreatedOnDate", typeof(DateTime));
@@ -359,6 +429,7 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             dataTable.Columns.Add("PortalID", typeof(int));
 
             dataTable.PrimaryKey = new[] { pkId };
+			Logger.LogDebug("SetupDataProvider(): dataTable.PrimaryKey → {Arg0}", dataTable.PrimaryKey);
 
             // Create some test data
             var now = DateTime.Now;
@@ -367,12 +438,15 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             dataTable.Rows.Add(3, string.Join(",", new[] { TermJump, TermLeap, TermHop }), 1, now, 1, now, 0);
 
             this.dataProvider.Setup(x => x.GetAllSynonymsGroups(0, It.IsAny<string>())).Returns(dataTable.CreateDataReader());
+			Logger.LogDebug("<<< Exiting SetupDataProvider()");
         }
 
         private IDataReader GetPortalSettingsCallBack(int portalId, string culture)
         {
+			Logger.LogDebug(">>> Entering GetPortalSettingsCallBack(portalId={PortalId},culture={Culture})", portalId, culture);
             var table = new DataTable("PortalSettings");
 
+			Logger.LogDebug("GetPortalSettingsCallBack(portalId={PortalId},culture={Culture}): table → {Table}", portalId, culture, table);
             var cols = new string[]
                            {
                             "SettingName", "SettingValue", "CreatedByUserID", "CreatedOnDate", "LastModifiedByUserID", "LastModifiedOnDate", "CultureCode",
@@ -385,18 +459,23 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
 
             table.Rows.Add("SearchAdminInitialization", "true", "-1", DateTime.Now, "-1", DateTime.Now, CultureEnUs);
 
+			Logger.LogDebug("<<< Exiting GetPortalSettingsCallBack(portalId={PortalId},culture={Culture})", portalId, culture);
             return table.CreateDataReader();
         }
 
         private IDataReader GetPortalsCallBack(string culture)
         {
+			Logger.LogDebug(">>> Entering GetPortalsCallBack(culture={Culture})", culture);
+			Logger.LogDebug("<<< Exiting GetPortalsCallBack(culture={Culture})", culture);
             return this.GetPortalCallBack(PortalId0, CultureEnUs);
         }
 
         private IDataReader GetPortalCallBack(int portalId, string culture)
         {
+			Logger.LogDebug(">>> Entering GetPortalCallBack(portalId={PortalId},culture={Culture})", portalId, culture);
             DataTable table = new DataTable("Portal");
 
+			Logger.LogDebug("GetPortalCallBack(portalId={PortalId},culture={Culture}): table → {Table}", portalId, culture, table);
             var cols = new string[]
                            {
                                "PortalID", "PortalGroupID", "PortalName", "LogoFile", "FooterText", "ExpiryDate", "UserRegistration", "BannerAdvertising", "AdministratorId", "Currency", "HostFee",
@@ -413,6 +492,7 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             var homePage = 1;
             table.Rows.Add(portalId, null, "My Website", "Logo.png", "Copyright 2011 by DotNetNuke Corporation", null, "2", "0", "2", "USD", "0", "0", "0", "0", "0", "1", "My Website", "DotNetNuke, DNN, Content, Management, CMS", null, "1057AC7A-3C08-4849-A3A6-3D2AB4662020", null, null, null, "0", "admin@changeme.invalid", "en-US", "-8", "58", "Portals/0", null, homePage.ToString(), null, null, "57", "56", "-1", "-1", null, null, "7", "-1", "2011-08-25 07:34:11", "-1", "2011-08-25 07:34:29", culture);
 
+			Logger.LogDebug("<<< Exiting GetPortalCallBack(portalId={PortalId},culture={Culture})", portalId, culture);
             return table.CreateDataReader();
         }
     }

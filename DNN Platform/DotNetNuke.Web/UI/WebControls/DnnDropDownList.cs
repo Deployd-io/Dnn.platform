@@ -27,6 +27,7 @@ namespace DotNetNuke.Web.UI.WebControls
     [ToolboxData("<{0}:DnnDropDownList runat='server'></{0}:DnnDropDownList>")]
     public class DnnDropDownList : Panel, INamingContainer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly object EventSelectionChanged = new object();
 
         private readonly Lazy<DnnDropDownListOptions> options = new Lazy<DnnDropDownListOptions>(() => new DnnDropDownListOptions());
@@ -41,7 +42,9 @@ namespace DotNetNuke.Web.UI.WebControls
         public DnnDropDownList()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering DnnDropDownList()");
         }
+		Logger.LogDebug("<<< Exiting DnnDropDownList()");
 
         /// <summary>Initializes a new instance of the <see cref="DnnDropDownList"/> class.</summary>
         /// <param name="clientResourceController">The client resource controller.</param>
@@ -50,6 +53,8 @@ namespace DotNetNuke.Web.UI.WebControls
         {
             this.clientResourceController = clientResourceController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>();
             this.servicesFramework = servicesFramework ?? Globals.GetCurrentServiceProvider().GetRequiredService<IServicesFramework>();
+			Logger.LogDebug("DnnDropDownList(clientResourceController={ClientResourceController},servicesFramework={ServicesFramework}): servicesFramework → {ServicesFramework1}", clientResourceController, servicesFramework, servicesFramework);
+			Logger.LogDebug("DnnDropDownList(clientResourceController={ClientResourceController},servicesFramework={ServicesFramework}): clientResourceController → {ClientResourceController1}", clientResourceController, servicesFramework, clientResourceController);
         }
 
         /// <summary>Occurs when the selection from the list control changes between posts to the server.</summary>
@@ -223,6 +228,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <param name="skin">The skin.</param>
         internal static void RegisterClientScript(IClientResourceController clientResourceController, string skin)
         {
+			Logger.LogDebug(">>> Entering RegisterClientScript(clientResourceController={ClientResourceController},skin={Skin})", clientResourceController, skin);
             clientResourceController.RegisterStylesheet("~/Resources/Shared/components/DropDownList/dnn.DropDownList.css", FileOrder.Css.ResourceCss);
             if (!string.IsNullOrEmpty(skin))
             {
@@ -239,37 +245,47 @@ namespace DotNetNuke.Web.UI.WebControls
             clientResourceController.RegisterScript("~/Resources/Shared/scripts/TreeView/dnn.TreeView.js");
             clientResourceController.RegisterScript("~/Resources/Shared/scripts/TreeView/dnn.DynamicTreeView.js");
             clientResourceController.RegisterScript("~/Resources/Shared/Components/DropDownList/dnn.DropDownList.js");
+			Logger.LogDebug("<<< Exiting RegisterClientScript(clientResourceController={ClientResourceController},skin={Skin})", clientResourceController, skin);
         }
 
         /// <inheritdoc />
         protected override void CreateChildControls()
         {
+			Logger.LogDebug(">>> Entering CreateChildControls()");
             this.Controls.Clear();
 
             var selectedItemPanel = new Panel { CssClass = "selected-item", };
 
+			Logger.LogDebug("CreateChildControls(): selectedItemPanel → {SelectedItemPanel}", selectedItemPanel);
             this.selectedValue = new HtmlAnchor { HRef = "javascript:void(0);", Title = LocalizeString("DropDownList.SelectedItemExpandTooltip"), };
+			Logger.LogDebug("CreateChildControls(): selectedValue → {SelectedValue}", selectedValue);
             this.selectedValue.Attributes.Add(nameof(HtmlTextWriterAttribute.Class), "selected-value");
             this.selectedValue.ViewStateMode = ViewStateMode.Disabled;
             selectedItemPanel.Controls.Add(this.selectedValue);
             this.Controls.Add(selectedItemPanel);
 
             this.stateControl = new DnnGenericHiddenField<DnnDropDownListState> { ID = "state", };
+			Logger.LogDebug("CreateChildControls(): stateControl → {StateControl}", stateControl);
+			Logger.LogDebug("CreateChildControls(): this.stateControl → {Arg0}", this.stateControl);
             this.stateControl.ValueChanged += (sender, args) => this.OnSelectionChanged(EventArgs.Empty);
             this.Controls.Add(this.stateControl);
+			Logger.LogDebug("<<< Exiting CreateChildControls()");
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
             this.StateControl.Value = string.Empty; // for state persistence (stateControl)
             this.servicesFramework.RequestAjaxAntiForgerySupport();
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             RegisterClientScript(this.clientResourceController, this.Skin);
 
             this.AddCssClass("dnnDropDownList");
@@ -277,25 +293,33 @@ namespace DotNetNuke.Web.UI.WebControls
             base.OnPreRender(e);
 
             this.RegisterStartupScript();
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <summary>A method called when the <see cref="SelectionChanged"/> event triggers.</summary>
         /// <param name="e">The event args.</param>
         protected virtual void OnSelectionChanged(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnSelectionChanged(e={E})", e);
             var eventHandler = (EventHandler)this.Events[EventSelectionChanged];
             eventHandler?.Invoke(this, e);
+			Logger.LogDebug("<<< Exiting OnSelectionChanged(e={E})", e);
+			Logger.LogDebug("OnSelectionChanged(e={E}): eventHandler → {EventHandler}", e, eventHandler);
         }
 
         private static string LocalizeString(string key)
         {
+			Logger.LogDebug(">>> Entering LocalizeString(key={Key})", key);
+			Logger.LogDebug("<<< Exiting LocalizeString(key={Key})", key);
             return Localization.GetString(key, Localization.SharedResourceFile);
         }
 
         private string GetPostBackScript()
         {
+			Logger.LogDebug(">>> Entering GetPostBackScript()");
             var script = string.Empty;
             if (this.HasAttributes)
+			Logger.LogDebug("GetPostBackScript(): script → {Script}", script);
             {
                 script = this.Attributes["onchange"];
                 if (script != null)
@@ -306,27 +330,36 @@ namespace DotNetNuke.Web.UI.WebControls
 
             var postBackOptions = new PostBackOptions(this, string.Empty);
             if (this.CausesValidation)
+			Logger.LogDebug("GetPostBackScript(): postBackOptions → {PostBackOptions}", postBackOptions);
             {
                 postBackOptions.PerformValidation = true;
+				Logger.LogDebug("GetPostBackScript(): postBackOptions.PerformValidation → {Arg0}", postBackOptions.PerformValidation);
+				Logger.LogDebug("GetPostBackScript(): postBackOptions.ValidationGroup → {Arg0}", postBackOptions.ValidationGroup);
                 postBackOptions.ValidationGroup = this.ValidationGroup;
             }
 
             if (this.Page.Form != null)
             {
                 postBackOptions.AutoPostBack = true;
+				Logger.LogDebug("GetPostBackScript(): postBackOptions.AutoPostBack → {Arg0}", postBackOptions.AutoPostBack);
+				Logger.LogDebug("GetPostBackScript(): postBackOptions.TrackFocus → {Arg0}", postBackOptions.TrackFocus);
                 postBackOptions.TrackFocus = true;
             }
 
+			Logger.LogDebug("<<< Exiting GetPostBackScript()");
             return script.Append(this.Page.ClientScript.GetPostBackEventReference(postBackOptions), "; ");
         }
 
         private void RegisterStartupScript()
         {
+			Logger.LogDebug(">>> Entering RegisterStartupScript()");
             this.Options.InternalStateFieldId = this.StateControl.ClientID;
 
             if (this.SelectedItem == null && this.UseUndefinedItem)
             {
                 this.SelectedItem = this.UndefinedItem;
+				Logger.LogDebug("RegisterStartupScript(): SelectedItem → {SelectedItem}", SelectedItem);
+				Logger.LogDebug("RegisterStartupScript(): this.SelectedItem → {Arg0}", this.SelectedItem);
             }
 
             this.Options.InitialState = new DnnDropDownListState
@@ -340,16 +373,20 @@ namespace DotNetNuke.Web.UI.WebControls
 
             var optionsAsJsonString = Json.Serialize(this.Options);
 
+			Logger.LogDebug("RegisterStartupScript(): optionsAsJsonString → {OptionsAsJsonString}", optionsAsJsonString);
             var methods = new JavaScriptObjectDictionary();
             if (this.AutoPostBack)
+			Logger.LogDebug("RegisterStartupScript(): methods → {Methods}", methods);
             {
                 methods.AddMethodBody("onSelectionChangedBackScript", this.GetPostBackScript());
             }
 
             var methodsAsJsonString = methods.ToJsonString();
 
+			Logger.LogDebug("RegisterStartupScript(): methodsAsJsonString → {MethodsAsJsonString}", methodsAsJsonString);
             var script = $"dnn.createDropDownList('#{this.ClientID}', {optionsAsJsonString}, {methodsAsJsonString});{Environment.NewLine}";
 
+			Logger.LogDebug("RegisterStartupScript(): script → {Script}", script);
             if (ScriptManager.GetCurrent(this.Page) != null)
             {
                 // respect MS AJAX
@@ -359,6 +396,7 @@ namespace DotNetNuke.Web.UI.WebControls
             {
                 this.Page.ClientScript.RegisterStartupScript(this.GetType(), this.ClientID + "DnnDropDownList", script, true);
             }
+			Logger.LogDebug("<<< Exiting RegisterStartupScript()");
         }
     }
 }

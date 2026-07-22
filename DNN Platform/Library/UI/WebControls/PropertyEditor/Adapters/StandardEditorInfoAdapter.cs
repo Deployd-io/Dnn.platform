@@ -15,6 +15,7 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>The StandardEditorInfoAdapter control provides an Adapter for standard datasources.</summary>
     public class StandardEditorInfoAdapter : IEditorInfoAdapter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly object dataSource;
         private readonly string fieldName;
 
@@ -23,34 +24,46 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="fieldName">The field/property name.</param>
         public StandardEditorInfoAdapter(object dataSource, string fieldName)
         {
+			Logger.LogDebug(">>> Entering StandardEditorInfoAdapter(dataSource={DataSource},fieldName={FieldName})", dataSource, fieldName);
             this.dataSource = dataSource;
             this.fieldName = fieldName;
+			Logger.LogDebug("<<< Exiting StandardEditorInfoAdapter(dataSource={DataSource},fieldName={FieldName})", dataSource, fieldName);
+			Logger.LogDebug("StandardEditorInfoAdapter(dataSource={DataSource},fieldName={FieldName}): this.dataSource → {Arg2}", dataSource, fieldName, this.dataSource);
+			Logger.LogDebug("StandardEditorInfoAdapter(dataSource={DataSource},fieldName={FieldName}): this.fieldName → {Arg2}", dataSource, fieldName, this.fieldName);
+			Logger.LogDebug("StandardEditorInfoAdapter(dataSource={DataSource},fieldName={FieldName}): dataSource → {DataSource1}", dataSource, fieldName, dataSource);
         }
 
         /// <inheritdoc />
         public EditorInfo CreateEditControl()
         {
+			Logger.LogDebug(">>> Entering CreateEditControl()");
             EditorInfo editInfo = null;
             PropertyInfo objProperty = GetProperty(this.dataSource, this.fieldName);
+			Logger.LogDebug("CreateEditControl(): editInfo → {EditInfo}", editInfo);
+			Logger.LogDebug("CreateEditControl(): objProperty → {ObjProperty}", objProperty);
             if (objProperty != null)
             {
                 editInfo = GetEditorInfo(this.dataSource, objProperty);
             }
 
+			Logger.LogDebug("<<< Exiting CreateEditControl()");
             return editInfo;
         }
 
         /// <inheritdoc />
         public bool UpdateValue(PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering UpdateValue(e={E})", e);
             bool changed = e.Changed;
             object oldValue = e.OldValue;
             object newValue = e.Value;
             bool isDirty = Null.NullBoolean;
             if (this.dataSource != null)
+			Logger.LogDebug("UpdateValue(e={E}): isDirty → {IsDirty}", e, isDirty);
             {
                 PropertyInfo objProperty = this.dataSource.GetType().GetProperty(e.Name);
                 if (objProperty != null)
+				Logger.LogDebug("UpdateValue(e={E}): objProperty → {ObjProperty}", e, objProperty);
                 {
                     if ((!ReferenceEquals(newValue, oldValue)) || changed)
                     {
@@ -60,12 +73,15 @@ namespace DotNetNuke.UI.WebControls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting UpdateValue(e={E})", e);
             return isDirty;
         }
 
         /// <inheritdoc />
         public bool UpdateVisibility(PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering UpdateVisibility(e={E})", e);
+			Logger.LogDebug("<<< Exiting UpdateVisibility(e={E})", e);
             return false;
         }
 
@@ -191,6 +207,7 @@ namespace DotNetNuke.UI.WebControls
         /// <summary>GetProperty returns the property that is being "bound" to.</summary>
         private static PropertyInfo GetProperty(object dataSource, string fieldName)
         {
+			Logger.LogDebug(">>> Entering GetProperty(dataSource={DataSource},fieldName={FieldName})", dataSource, fieldName);
             if (dataSource != null)
             {
                 BindingFlags bindings = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
@@ -199,6 +216,7 @@ namespace DotNetNuke.UI.WebControls
             }
             else
             {
+				Logger.LogDebug("<<< Exiting GetProperty(dataSource={DataSource},fieldName={FieldName})", dataSource, fieldName);
                 return null;
             }
         }

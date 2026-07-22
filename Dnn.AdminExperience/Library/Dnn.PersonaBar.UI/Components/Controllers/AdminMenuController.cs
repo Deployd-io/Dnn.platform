@@ -29,11 +29,16 @@ namespace Dnn.PersonaBar.UI.Components.Controllers
     public class AdminMenuController(IApplicationStatusInfo appStatus, IHostSettings hostSettings)
         : ServiceLocator<IAdminMenuController, AdminMenuController>, IAdminMenuController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IApplicationStatusInfo appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+		Logger.LogDebug(">>> Entering AdminMenuController(appStatus={AppStatus},hostSettings={HostSettings})", appStatus, hostSettings);
+		Logger.LogDebug("AdminMenuController(appStatus={AppStatus},hostSettings={HostSettings}): appStatus → {AppStatus1}", appStatus, hostSettings, appStatus);
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
         private Dictionary<string, IList<string>> knownPages;
+		Logger.LogDebug("AdminMenuController(appStatus={AppStatus},hostSettings={HostSettings}): hostSettings → {HostSettings1}", appStatus, hostSettings, hostSettings);
 
         /// <summary>Initializes a new instance of the <see cref="AdminMenuController"/> class.</summary>
+		Logger.LogDebug("<<< Exiting AdminMenuController(appStatus={AppStatus},hostSettings={HostSettings})", appStatus, hostSettings);
         [Obsolete("Deprecated in IApplicationStatusInfo 10.0.2. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public AdminMenuController()
             : this(null)
@@ -51,6 +56,7 @@ namespace Dnn.PersonaBar.UI.Components.Controllers
         /// <inheritdoc />
         public void CreateLinkMenu(TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering CreateLinkMenu(tab={Tab})", tab);
             if (!this.ValidateTab(tab))
             {
                 return;
@@ -61,6 +67,7 @@ namespace Dnn.PersonaBar.UI.Components.Controllers
 
             var identifier = $"Link_{portalId}_{tabId}";
             if (PersonaBarRepository.Instance.GetMenuItem(identifier) != null)
+			Logger.LogDebug("CreateLinkMenu(tab={Tab}): identifier → {Identifier}", tab, identifier);
             {
                 return;
             }
@@ -84,28 +91,36 @@ namespace Dnn.PersonaBar.UI.Components.Controllers
             {
                 var portal = PortalController.Instance.GetPortal(portalId);
                 PersonaBarRepository.Instance.SaveMenuDefaultPermissions(menuItem, portal.AdministratorRoleName);
+				Logger.LogDebug("CreateLinkMenu(tab={Tab}): portal → {Portal}", tab, portal);
             }
+			Logger.LogDebug("<<< Exiting CreateLinkMenu(tab={Tab})", tab);
         }
 
         /// <inheritdoc />
         public void DeleteLinkMenu(TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering DeleteLinkMenu(tab={Tab})", tab);
             var portalId = tab.PortalID;
             var tabId = tab.TabID;
 
             var identifier = $"Link_{portalId}_{tabId}";
 
+			Logger.LogDebug("DeleteLinkMenu(tab={Tab}): identifier → {Identifier}", tab, identifier);
             PersonaBarRepository.Instance.DeleteMenuItem(identifier);
+			Logger.LogDebug("<<< Exiting DeleteLinkMenu(tab={Tab})", tab);
         }
 
         /// <inheritdoc />
         protected override Func<IAdminMenuController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => Globals.DependencyProvider.GetRequiredService<IAdminMenuController>();
         }
 
         private bool ValidateTab(TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering ValidateTab(tab={Tab})", tab);
             if (tab.IsDeleted || tab.DisableLink || !tab.IsVisible)
             {
                 return false;
@@ -113,10 +128,12 @@ namespace Dnn.PersonaBar.UI.Components.Controllers
 
             var type = tab.IsSuperTab ? "host" : "admin";
             var portalId = tab.PortalID;
+			Logger.LogDebug("ValidateTab(tab={Tab}): type → {Type}", tab, type);
             var tabName = tab.TabName;
 
             var knownPages = this.GetKnownPages(type);
             if (knownPages.Contains(tabName, StringComparer.InvariantCultureIgnoreCase))
+			Logger.LogDebug("ValidateTab(tab={Tab}): knownPages → {KnownPages}", tab, knownPages);
             {
                 return false;
             }
@@ -125,6 +142,7 @@ namespace Dnn.PersonaBar.UI.Components.Controllers
             {
                 var adminPage = TabController.GetTabByTabPath(this.hostSettings, portalId, "//Admin", string.Empty);
                 if (adminPage == Null.NullInteger)
+				Logger.LogDebug("ValidateTab(tab={Tab}): adminPage → {AdminPage}", tab, adminPage);
                 {
                     return false;
                 }
@@ -132,6 +150,7 @@ namespace Dnn.PersonaBar.UI.Components.Controllers
                 return tab.ParentId == adminPage;
             }
 
+			Logger.LogDebug("<<< Exiting ValidateTab(tab={Tab})", tab);
             return true;
         }
 

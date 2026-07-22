@@ -9,6 +9,7 @@ namespace DotNetNuke.Services.Syndication
     /// <summary>Internal representation of parsed RSS channel.</summary>
     internal sealed class RssChannelDom
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="RssChannelDom"/> class.</summary>
         /// <param name="channel">The channel attributes.</param>
         /// <param name="image">The image attributes.</param>
@@ -37,7 +38,10 @@ namespace DotNetNuke.Services.Syndication
         /// <param name="utcExpiry">The expiration on UTC.</param>
         internal void SetExpiry(DateTime utcExpiry)
         {
+			Logger.LogDebug(">>> Entering SetExpiry(utcExpiry={UtcExpiry})", utcExpiry);
             this.UtcExpiry = utcExpiry;
+			Logger.LogDebug("<<< Exiting SetExpiry(utcExpiry={UtcExpiry})", utcExpiry);
+			Logger.LogDebug("SetExpiry(utcExpiry={UtcExpiry}): this.UtcExpiry → {Arg1}", utcExpiry, this.UtcExpiry);
         }
     }
 }

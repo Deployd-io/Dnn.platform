@@ -15,14 +15,18 @@ namespace DNN.Integration.Test.Framework.Helpers
     /// </summary>
     public static class MockComponentHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static Mock<CachingProvider> CreateDataCacheProvider()
         {
+			Logger.LogDebug(">>> Entering CreateDataCacheProvider()");
+			Logger.LogDebug("<<< Exiting CreateDataCacheProvider()");
             return CreateNew<CachingProvider>();
         }
 
         public static Mock<T> CreateNew<T>()
             where T : class
         {
+			Logger.LogDebug(">>> Entering CreateNew()");
             if (ComponentFactory.Container == null)
             {
                 ComponentFactory.Container = new SimpleContainer();
@@ -31,6 +35,8 @@ namespace DNN.Integration.Test.Framework.Helpers
             // Try and get mock
             var mockComp = ComponentFactory.GetComponent<Mock<T>>();
             var objComp = ComponentFactory.GetComponent<T>();
+			Logger.LogDebug("CreateNew(): mockComp → {MockComp}", mockComp);
+			Logger.LogDebug("CreateNew(): objComp → {ObjComp}", objComp);
 
             if (mockComp == null)
             {

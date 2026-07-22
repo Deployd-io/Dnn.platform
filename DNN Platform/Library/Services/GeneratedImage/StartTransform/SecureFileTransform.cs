@@ -19,15 +19,22 @@ namespace DotNetNuke.Services.GeneratedImage.StartTransform
     /// <summary>Secure File ImageTransform class.</summary>
     public class SecureFileTransform : ImageTransform
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly HashSet<string> ImageExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".JPG", ".JPE", ".BMP", ".GIF", ".PNG", ".JPEG", ".ICO", };
 
         /// <summary>Initializes a new instance of the <see cref="SecureFileTransform"/> class.</summary>
         public SecureFileTransform()
         {
+			Logger.LogDebug(">>> Entering SecureFileTransform()");
             this.InterpolationMode = InterpolationMode.HighQualityBicubic;
             this.SmoothingMode = SmoothingMode.HighQuality;
+			Logger.LogDebug("SecureFileTransform(): this.InterpolationMode → {Arg0}", this.InterpolationMode);
+			Logger.LogDebug("SecureFileTransform(): this.SmoothingMode → {Arg0}", this.SmoothingMode);
             this.PixelOffsetMode = PixelOffsetMode.HighQuality;
             this.CompositingQuality = CompositingQuality.HighQuality;
+			Logger.LogDebug("<<< Exiting SecureFileTransform()");
+			Logger.LogDebug("SecureFileTransform(): this.PixelOffsetMode → {Arg0}", this.PixelOffsetMode);
+			Logger.LogDebug("SecureFileTransform(): this.CompositingQuality → {Arg0}", this.CompositingQuality);
         }
 
         /// <summary>Gets provides an Unique String for the image transformation.</summary>
@@ -47,6 +54,7 @@ namespace DotNetNuke.Services.GeneratedImage.StartTransform
         /// </remarks>
         public override Image ProcessImage(Image image)
         {
+			Logger.LogDebug(">>> Entering ProcessImage(image={Image})", image);
             // if SecureFile is no ImageFile return FileType-Image instead
             if (!IsImageExtension(this.SecureFile.Extension))
             {
@@ -54,6 +62,8 @@ namespace DotNetNuke.Services.GeneratedImage.StartTransform
             }
 
             using var content = FileManager.Instance.GetFileContent(this.SecureFile);
+			Logger.LogDebug("ProcessImage(image={Image}): content → {Content}", image, content);
+			Logger.LogDebug("<<< Exiting ProcessImage(image={Image})", image);
             return this.CopyImage(content);
         }
 
@@ -63,23 +73,31 @@ namespace DotNetNuke.Services.GeneratedImage.StartTransform
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public bool DoesHaveReadFolderPermission(IFolderInfo folder)
         {
+			Logger.LogDebug(">>> Entering DoesHaveReadFolderPermission(folder={Folder})", folder);
+			Logger.LogDebug("<<< Exiting DoesHaveReadFolderPermission(folder={Folder})", folder);
             return FolderPermissionController.HasFolderPermission(folder.FolderPermissions, "Read");
         }
 
         private static bool IsImageExtension(string extension)
         {
+			Logger.LogDebug(">>> Entering IsImageExtension(extension={Extension})", extension);
             if (!extension.StartsWith(".", StringComparison.Ordinal))
             {
                 extension = $".{extension}";
             }
+			Logger.LogDebug("IsImageExtension(extension={Extension}): extension → {Extension1}", extension, extension);
 
+			Logger.LogDebug("<<< Exiting IsImageExtension(extension={Extension})", extension);
             return ImageExtensions.Contains(extension);
         }
 
         private Image GetSecureFileExtensionIconImage()
         {
+			Logger.LogDebug(">>> Entering GetSecureFileExtensionIconImage()");
             var iconLocation = PortalSettings.Current.DefaultIconLocation.Replace("/", @"\");
             var extensionImageAbsolutePath = $@"{Globals.ApplicationMapPath}\{iconLocation}\Ext{this.SecureFile.Extension}_32x32_Standard.png";
+			Logger.LogDebug("GetSecureFileExtensionIconImage(): iconLocation → {IconLocation}", iconLocation);
+			Logger.LogDebug("GetSecureFileExtensionIconImage(): extensionImageAbsolutePath → {ExtensionImageAbsolutePath}", extensionImageAbsolutePath);
 
             if (!File.Exists(extensionImageAbsolutePath))
             {
@@ -87,6 +105,8 @@ namespace DotNetNuke.Services.GeneratedImage.StartTransform
             }
 
             using var stream = new FileStream(extensionImageAbsolutePath, FileMode.Open);
+			Logger.LogDebug("GetSecureFileExtensionIconImage(): stream → {Stream}", stream);
+			Logger.LogDebug("<<< Exiting GetSecureFileExtensionIconImage()");
             return this.CopyImage(stream);
         }
     }

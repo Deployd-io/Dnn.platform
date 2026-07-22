@@ -7,16 +7,21 @@ namespace DotNetNuke.Services.Scheduling
 
     public class PurgeScheduleHistory : SchedulerClient
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="PurgeScheduleHistory"/> class.</summary>
         /// <param name="objScheduleHistoryItem">The schedule history item.</param>
         public PurgeScheduleHistory(ScheduleHistoryItem objScheduleHistoryItem)
         {
+			Logger.LogDebug(">>> Entering PurgeScheduleHistory(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
             this.ScheduleHistoryItem = objScheduleHistoryItem;
+			Logger.LogDebug("<<< Exiting PurgeScheduleHistory(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
+			Logger.LogDebug("PurgeScheduleHistory(objScheduleHistoryItem={ObjScheduleHistoryItem}): this.ScheduleHistoryItem → {Arg1}", objScheduleHistoryItem, this.ScheduleHistoryItem);
         }
 
         /// <inheritdoc />
         public override void DoWork()
         {
+			Logger.LogDebug(">>> Entering DoWork()");
             try
             {
                 // notification that the event is progressing
@@ -30,6 +35,7 @@ namespace DotNetNuke.Services.Scheduling
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in DoWork(): {Arg0}", ex.Message);
                 this.ScheduleHistoryItem.Succeeded = false;
                 this.ScheduleHistoryItem.AddLogNote("Schedule history purge failed." + exc);
                 this.ScheduleHistoryItem.Succeeded = false;
@@ -40,6 +46,7 @@ namespace DotNetNuke.Services.Scheduling
                 // log the exception
                 Exceptions.Exceptions.LogException(exc);
             }
+			Logger.LogDebug("<<< Exiting DoWork()");
         }
     }
 }

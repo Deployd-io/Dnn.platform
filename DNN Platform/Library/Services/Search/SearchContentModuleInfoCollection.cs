@@ -8,16 +8,21 @@ namespace DotNetNuke.Services.Search
     /// <summary>Represents a collection of <see cref="SearchContentModuleInfo">SearchContentModuleInfo</see> objects.</summary>
     public class SearchContentModuleInfoCollection : GenericCollectionBase<SearchContentModuleInfo>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="SearchContentModuleInfoCollection"/> class.</summary>
         public SearchContentModuleInfoCollection()
         {
+		Logger.LogDebug(">>> Entering SearchContentModuleInfoCollection()");
+		Logger.LogDebug("<<< Exiting SearchContentModuleInfoCollection()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="SearchContentModuleInfoCollection"/> class containing the elements of the specified source collection.</summary>
         /// <param name="value">A <see cref="SearchContentModuleInfoCollection">SearchContentModuleInfoCollection</see> with which to initialize the collection.</param>
         public SearchContentModuleInfoCollection(SearchContentModuleInfoCollection value)
         {
+			Logger.LogDebug(">>> Entering SearchContentModuleInfoCollection(value={Value})", value);
             this.AddRange(value);
+			Logger.LogDebug("<<< Exiting SearchContentModuleInfoCollection(value={Value})", value);
         }
 
         /// <summary>Initializes a new instance of the <see cref="SearchContentModuleInfoCollection"/> class containing the specified array of <see cref="SearchContentModuleInfo">SearchContentModuleInfo</see> objects.</summary>
@@ -35,6 +40,8 @@ namespace DotNetNuke.Services.Search
             {
                 this.Add(value[i]);
             }
+			Logger.LogDebug(">>> Entering AddRange(value={Value})", value);
+			Logger.LogDebug("<<< Exiting AddRange(value={Value})", value);
         }
 
         /// <summary>Adds the contents of another <see cref="SearchContentModuleInfoCollection">SearchContentModuleInfoCollection</see> to the end of the collection.</summary>
@@ -51,8 +58,10 @@ namespace DotNetNuke.Services.Search
         /// <returns>Array of type SearchContentModuleInfo.</returns>
         public SearchContentModuleInfo[] ToArray()
         {
+			Logger.LogDebug(">>> Entering ToArray()");
             var arr = new SearchContentModuleInfo[this.Count];
             this.CopyTo(arr, 0);
+			Logger.LogDebug("<<< Exiting ToArray()");
             return arr;
         }
     }

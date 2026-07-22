@@ -43,12 +43,16 @@ namespace Dnn.ExportImport.Components.Controllers
 
         static BaseController()
         {
+			Logger.LogDebug(">>> Entering BaseController()");
             var appStatus = Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
             ExportFolder = appStatus.ApplicationMapPath + Constants.ExportFolder;
+			Logger.LogDebug("BaseController(): appStatus → {AppStatus}", appStatus);
+			Logger.LogDebug("BaseController(): ExportFolder → {ExportFolder}", ExportFolder);
             if (!Directory.Exists(ExportFolder))
             {
                 Directory.CreateDirectory(ExportFolder);
             }
+			Logger.LogDebug("<<< Exiting BaseController()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="BaseController"/> class.</summary>
@@ -62,7 +66,9 @@ namespace Dnn.ExportImport.Components.Controllers
         /// <param name="portableServices">The portable services.</param>
         public BaseController(IEnumerable<BasePortableService> portableServices)
         {
+			Logger.LogDebug(">>> Entering BaseController(portableServices={PortableServices})", portableServices);
             this.PortableServices = portableServices ?? Globals.GetCurrentServiceProvider().GetServices<BasePortableService>();
+			Logger.LogDebug("<<< Exiting BaseController(portableServices={PortableServices})", portableServices);
         }
 
         /// <summary>Gets the portable services.</summary>
@@ -75,15 +81,18 @@ namespace Dnn.ExportImport.Components.Controllers
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public bool CancelJob(int portalId, int jobId)
         {
+			Logger.LogDebug(">>> Entering CancelJob(portalId={PortalId},jobId={JobId})", portalId, jobId);
             var controller = EntitiesController.Instance;
             var job = controller.GetJobById(jobId);
             if (job == null || (job.PortalId != portalId && portalId != -1))
+			Logger.LogDebug("CancelJob(portalId={PortalId},jobId={JobId}): job → {Job}", portalId, jobId, job);
             {
                 return false;
             }
 
             controller.SetJobCancelled(job);
             CachingProvider.Instance().Remove(Util.GetExpImpJobCacheKey(job));
+			Logger.LogDebug("<<< Exiting CancelJob(portalId={PortalId},jobId={JobId})", portalId, jobId);
             return true;
         }
 
@@ -94,9 +103,11 @@ namespace Dnn.ExportImport.Components.Controllers
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public bool RemoveJob(int portalId, int jobId)
         {
+			Logger.LogDebug(">>> Entering RemoveJob(portalId={PortalId},jobId={JobId})", portalId, jobId);
             var controller = EntitiesController.Instance;
             var job = controller.GetJobById(jobId);
             if (job == null || (job.PortalId != portalId && portalId != -1))
+			Logger.LogDebug("RemoveJob(portalId={PortalId},jobId={JobId}): job → {Job}", portalId, jobId, job);
             {
                 return false;
             }
@@ -106,6 +117,7 @@ namespace Dnn.ExportImport.Components.Controllers
             // if the job is running; then it will create few exceptions in the log file
             controller.RemoveJob(job);
             DeleteJobData(job);
+			Logger.LogDebug("<<< Exiting RemoveJob(portalId={PortalId},jobId={JobId})", portalId, jobId);
             return true;
         }
 
@@ -120,6 +132,7 @@ namespace Dnn.ExportImport.Components.Controllers
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public AllJobsResult GetAllJobs(int portalId, int currentPortalId, int? pageSize, int? pageIndex, int? jobType, string keywords)
         {
+			Logger.LogDebug(">>> Entering GetAllJobs(portalId={PortalId},currentPortalId={CurrentPortalId},pageSize={PageSize},pageIndex={PageIndex},jobType={JobType},keywords={Keywords})", portalId, currentPortalId, pageSize, pageIndex, jobType, keywords);
             if (pageIndex < 0)
             {
                 pageIndex = 0;
@@ -129,6 +142,7 @@ namespace Dnn.ExportImport.Components.Controllers
             {
                 pageSize = 1;
             }
+			Logger.LogDebug("GetAllJobs(portalId={PortalId},currentPortalId={CurrentPortalId},pageSize={PageSize},pageIndex={PageIndex},jobType={JobType},keywords={Keywords}): pageSize → {PageSize1}", portalId, currentPortalId, pageSize, pageIndex, jobType, keywords, pageSize);
             else if (pageSize > 100)
             {
                 pageSize = 100;
@@ -136,10 +150,13 @@ namespace Dnn.ExportImport.Components.Controllers
 
             var count = EntitiesController.Instance.GetAllJobsCount(portalId, jobType, keywords);
             var jobs = count <= 0
+				Logger.LogDebug("GetAllJobs(portalId={PortalId},currentPortalId={CurrentPortalId},pageSize={PageSize},pageIndex={PageIndex},jobType={JobType},keywords={Keywords}): count → {Count}", portalId, currentPortalId, pageSize, pageIndex, jobType, keywords, count);
                 ? null
                 : EntitiesController.Instance.GetAllJobs(portalId, pageSize, pageIndex, jobType, keywords);
 
             var portal = PortalController.Instance.GetPortal(currentPortalId);
+			Logger.LogDebug("GetAllJobs(portalId={PortalId},currentPortalId={CurrentPortalId},pageSize={PageSize},pageIndex={PageIndex},jobType={JobType},keywords={Keywords}): portal → {Portal}", portalId, currentPortalId, pageSize, pageIndex, jobType, keywords, portal);
+			Logger.LogDebug("<<< Exiting GetAllJobs(portalId={PortalId},currentPortalId={CurrentPortalId},pageSize={PageSize},pageIndex={PageIndex},jobType={JobType},keywords={Keywords})", portalId, currentPortalId, pageSize, pageIndex, jobType, keywords);
             return new AllJobsResult
             {
                 LastExportTime = portalId > -1 ? EntitiesController.Instance.GetLastJobTime(portalId, JobType.Export) : null,
@@ -157,15 +174,19 @@ namespace Dnn.ExportImport.Components.Controllers
         /// <returns>A <see cref="JobItem"/> instance.</returns>
         public JobItem GetJobDetails(int portalId, int jobId)
         {
+			Logger.LogDebug(">>> Entering GetJobDetails(portalId={PortalId},jobId={JobId})", portalId, jobId);
             var controller = EntitiesController.Instance;
             var job = controller.GetJobById(jobId);
             if (portalId != -1 && job?.PortalId != portalId)
+			Logger.LogDebug("GetJobDetails(portalId={PortalId},jobId={JobId}): job → {Job}", portalId, jobId, job);
             {
                 return null;
             }
 
             var jobItem = ToJobItem(job);
             jobItem.Summary = BuildJobSummary(this.PortableServices, jobId);
+			Logger.LogDebug("GetJobDetails(portalId={PortalId},jobId={JobId}): jobItem → {JobItem}", portalId, jobId, jobItem);
+			Logger.LogDebug("<<< Exiting GetJobDetails(portalId={PortalId},jobId={JobId})", portalId, jobId);
             return jobItem;
         }
 
@@ -180,6 +201,8 @@ namespace Dnn.ExportImport.Components.Controllers
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public DateTime? GetLastJobTime(int portalId, JobType jobType)
         {
+			Logger.LogDebug(">>> Entering GetLastJobTime(portalId={PortalId},jobType={JobType})", portalId, jobType);
+			Logger.LogDebug("<<< Exiting GetLastJobTime(portalId={PortalId},jobType={JobType})", portalId, jobType);
             return EntitiesController.Instance.GetLastJobTime(portalId, jobType);
         }
 
@@ -190,12 +213,16 @@ namespace Dnn.ExportImport.Components.Controllers
         /// <param name="summary">The summary to build.</param>
         protected internal static void BuildJobSummary(IEnumerable<BasePortableService> portableServices, string packageId, IExportImportRepository repository, ImportExportSummary summary)
         {
+			Logger.LogDebug(">>> Entering BuildJobSummary(portableServices={PortableServices},packageId={PackageId},repository={Repository},summary={Summary})", portableServices, packageId, repository, summary);
             var summaryItems = new SummaryList();
             var exportDto = repository.GetSingleItem<ExportDto>();
+			Logger.LogDebug("BuildJobSummary(portableServices={PortableServices},packageId={PackageId},repository={Repository},summary={Summary}): summaryItems → {SummaryItems}", portableServices, packageId, repository, summary, summaryItems);
+			Logger.LogDebug("BuildJobSummary(portableServices={PortableServices},packageId={PackageId},repository={Repository},summary={Summary}): exportDto → {ExportDto}", portableServices, packageId, repository, summary, exportDto);
 
             foreach (var implementor in portableServices)
             {
                 implementor.Repository = repository;
+				Logger.LogDebug("BuildJobSummary(portableServices={PortableServices},packageId={PackageId},repository={Repository},summary={Summary}): implementor.Repository → {Arg4}", portableServices, packageId, repository, summary, implementor.Repository);
                 summaryItems.Add(new SummaryItem
                 {
                     TotalItems = implementor.GetImportTotal(),
@@ -206,6 +233,14 @@ namespace Dnn.ExportImport.Components.Controllers
 
             summary.ExportFileInfo = GetExportFileInfo(Path.Combine(ExportFolder, Path.GetFileName(packageId), Constants.ExportManifestName));
             summary.FromDate = exportDto.FromDateUtc;
+			Logger.LogDebug("BuildJobSummary(portableServices={PortableServices},packageId={PackageId},repository={Repository},summary={Summary}): summary.FromDate → {Arg4}", portableServices, packageId, repository, summary, summary.FromDate);
+			Logger.LogDebug("BuildJobSummary(portableServices={PortableServices},packageId={PackageId},repository={Repository},summary={Summary}): summary.ToDate → {Arg4}", portableServices, packageId, repository, summary, summary.ToDate);
+			Logger.LogDebug("BuildJobSummary(portableServices={PortableServices},packageId={PackageId},repository={Repository},summary={Summary}): summary.SummaryItems → {Arg4}", portableServices, packageId, repository, summary, summary.SummaryItems);
+			Logger.LogDebug("BuildJobSummary(portableServices={PortableServices},packageId={PackageId},repository={Repository},summary={Summary}): summary.IncludeDeletions → {Arg4}", portableServices, packageId, repository, summary, summary.IncludeDeletions);
+			Logger.LogDebug("BuildJobSummary(portableServices={PortableServices},packageId={PackageId},repository={Repository},summary={Summary}): summary.IncludeContent → {Arg4}", portableServices, packageId, repository, summary, summary.IncludeContent);
+			Logger.LogDebug("BuildJobSummary(portableServices={PortableServices},packageId={PackageId},repository={Repository},summary={Summary}): summary.IncludeExtensions → {Arg4}", portableServices, packageId, repository, summary, summary.IncludeExtensions);
+			Logger.LogDebug("BuildJobSummary(portableServices={PortableServices},packageId={PackageId},repository={Repository},summary={Summary}): summary.IncludePermissions → {Arg4}", portableServices, packageId, repository, summary, summary.IncludePermissions);
+			Logger.LogDebug("BuildJobSummary(portableServices={PortableServices},packageId={PackageId},repository={Repository},summary={Summary}): summary.IncludeProfileProperties → {Arg4}", portableServices, packageId, repository, summary, summary.IncludeProfileProperties);
             summary.ToDate = exportDto.ToDateUtc;
             summary.SummaryItems = summaryItems;
             summary.IncludeDeletions = exportDto.IncludeDeletions;
@@ -214,6 +249,8 @@ namespace Dnn.ExportImport.Components.Controllers
             summary.IncludePermissions = exportDto.IncludePermissions;
             summary.IncludeProfileProperties = exportDto.IncludeProperfileProperties;
             summary.ExportMode = exportDto.ExportMode;
+			Logger.LogDebug("BuildJobSummary(portableServices={PortableServices},packageId={PackageId},repository={Repository},summary={Summary}): summary.ExportMode → {Arg4}", portableServices, packageId, repository, summary, summary.ExportMode);
+			Logger.LogDebug("<<< Exiting BuildJobSummary(portableServices={PortableServices},packageId={PackageId},repository={Repository},summary={Summary})", portableServices, packageId, repository, summary);
         }
 
         /// <summary>Builds a job summary.</summary>
@@ -222,10 +259,13 @@ namespace Dnn.ExportImport.Components.Controllers
         /// <returns>An <see cref="ImportExportSummary"/> instance.</returns>
         protected static ImportExportSummary BuildJobSummary(IEnumerable<BasePortableService> portableServices, int jobId)
         {
+			Logger.LogDebug(">>> Entering BuildJobSummary(portableServices={PortableServices},jobId={JobId})", portableServices, jobId);
             var summaryItems = new SummaryList();
+			Logger.LogDebug("BuildJobSummary(portableServices={PortableServices},jobId={JobId}): summaryItems → {SummaryItems}", portableServices, jobId, summaryItems);
             var controller = EntitiesController.Instance;
             var job = controller.GetJobById(jobId);
             var exportDto = job.JobType == JobType.Export
+				Logger.LogDebug("BuildJobSummary(portableServices={PortableServices},jobId={JobId}): job → {Job}", portableServices, jobId, job);
                 ? JsonConvert.DeserializeObject<ExportDto>(job.JobObject)
                 : JsonConvert.DeserializeObject<ImportDto>(job.JobObject).ExportDto;
 
@@ -246,6 +286,7 @@ namespace Dnn.ExportImport.Components.Controllers
 
             var checkpoints = EntitiesController.Instance.GetJobChekpoints(jobId);
             if (!checkpoints.Any())
+			Logger.LogDebug("BuildJobSummary(portableServices={PortableServices},jobId={JobId}): checkpoints → {Checkpoints}", portableServices, jobId, checkpoints);
             {
                 return importExportSummary;
             }
@@ -260,6 +301,7 @@ namespace Dnn.ExportImport.Components.Controllers
                 Completed = checkpoint.Completed,
             }));
             importExportSummary.SummaryItems = summaryItems;
+			Logger.LogDebug("BuildJobSummary(portableServices={PortableServices},jobId={JobId}): importExportSummary.SummaryItems → {Arg2}", portableServices, jobId, importExportSummary.SummaryItems);
             return importExportSummary;
         }
 
@@ -268,8 +310,10 @@ namespace Dnn.ExportImport.Components.Controllers
         /// <returns>An <see cref="ExportFileInfo"/> instance.</returns>
         protected static ExportFileInfo GetExportFileInfo(string manifestPath)
         {
+			Logger.LogDebug(">>> Entering GetExportFileInfo(manifestPath={ManifestPath})", manifestPath);
             ImportPackageInfo packageInfo = null;
             Util.ReadJson(manifestPath, ref packageInfo);
+			Logger.LogDebug("<<< Exiting GetExportFileInfo(manifestPath={ManifestPath})", manifestPath);
             return packageInfo?.Summary.ExportFileInfo;
         }
 
@@ -278,8 +322,10 @@ namespace Dnn.ExportImport.Components.Controllers
         /// <returns>An <see cref="ImportPackageInfo"/> instance.</returns>
         protected static ImportPackageInfo GetPackageInfo(string manifestPath)
         {
+			Logger.LogDebug(">>> Entering GetPackageInfo(manifestPath={ManifestPath})", manifestPath);
             ImportPackageInfo packageInfo = null;
             Util.ReadJson(manifestPath, ref packageInfo);
+			Logger.LogDebug("<<< Exiting GetPackageInfo(manifestPath={ManifestPath})", manifestPath);
             return packageInfo;
         }
 
@@ -291,9 +337,12 @@ namespace Dnn.ExportImport.Components.Controllers
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         protected void AddEventLog(int portalId, int userId, int jobId, string logTypeKey)
         {
+			Logger.LogDebug(">>> Entering AddEventLog(portalId={PortalId},userId={UserId},jobId={JobId},logTypeKey={LogTypeKey})", portalId, userId, jobId, logTypeKey);
             var objSecurity = PortalSecurity.Instance;
             var portalInfo = PortalController.Instance.GetPortal(portalId);
             var userInfo = UserController.Instance.GetUser(portalId, userId);
+			Logger.LogDebug("AddEventLog(portalId={PortalId},userId={UserId},jobId={JobId},logTypeKey={LogTypeKey}): portalInfo → {PortalInfo}", portalId, userId, jobId, logTypeKey, portalInfo);
+			Logger.LogDebug("AddEventLog(portalId={PortalId},userId={UserId},jobId={JobId},logTypeKey={LogTypeKey}): userInfo → {UserInfo}", portalId, userId, jobId, logTypeKey, userInfo);
 #pragma warning disable CS0618 // Type or member is obsolete
             var username = objSecurity.InputFilter(
                 userInfo.Username,
@@ -307,10 +356,13 @@ namespace Dnn.ExportImport.Components.Controllers
                 LogUserName = username,
             };
             log.LogPortalId = portalId;
+			Logger.LogDebug("AddEventLog(portalId={PortalId},userId={UserId},jobId={JobId},logTypeKey={LogTypeKey}): log.LogPortalId → {Arg4}", portalId, userId, jobId, logTypeKey, log.LogPortalId);
+			Logger.LogDebug("AddEventLog(portalId={PortalId},userId={UserId},jobId={JobId},logTypeKey={LogTypeKey}): log.LogUserId → {Arg4}", portalId, userId, jobId, logTypeKey, log.LogUserId);
             log.LogUserId = userId;
 
             log.AddProperty("JobID", jobId.ToString(CultureInfo.InvariantCulture));
             LogController.Instance.AddLog((LogInfo)log);
+			Logger.LogDebug("<<< Exiting AddEventLog(portalId={PortalId},userId={UserId},jobId={JobId},logTypeKey={LogTypeKey})", portalId, userId, jobId, logTypeKey);
         }
 
         private static JobItem ToJobItem(ExportImportJob job)
@@ -355,6 +407,7 @@ namespace Dnn.ExportImport.Components.Controllers
                 Logger.Error(
                     $"Failed to delete the job data. Error:{ex.Message}. It will need to be deleted manually. Folder Path:{jobFolder}");
             }
+			Logger.LogDebug("<<< Exiting DeleteJobData(job={Job})", job);
         }
     }
 }

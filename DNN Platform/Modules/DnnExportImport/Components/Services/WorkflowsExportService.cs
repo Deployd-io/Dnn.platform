@@ -27,6 +27,7 @@ namespace Dnn.ExportImport.Components.Services
     /// <summary>An export service for workflows.</summary>
     public class WorkflowsExportService : BasePortableService
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override string Category => Constants.Category_Workflows;
 
@@ -39,12 +40,16 @@ namespace Dnn.ExportImport.Components.Services
         /// <inheritdoc />
         public override int GetImportTotal()
         {
+			Logger.LogDebug(">>> Entering GetImportTotal()");
+			Logger.LogDebug("<<< Exiting GetImportTotal()");
             return this.Repository.GetCount<TaxonomyVocabulary>() + this.Repository.GetCount<TaxonomyTerm>();
         }
 
         /// <inheritdoc />
         public override void ExportData(ExportImportJob exportJob, ExportDto exportDto)
         {
+			Logger.LogDebug(">>> Entering ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (this.CheckPoint.Stage > 0)
             {
                 return;
@@ -57,27 +62,35 @@ namespace Dnn.ExportImport.Components.Services
 
             var fromDate = (exportDto.FromDateUtc ?? Constants.MinDbTime).ToLocalTime();
             var toDate = exportDto.ToDateUtc.ToLocalTime();
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): fromDate → {FromDate}", exportJob, exportDto, fromDate);
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): toDate → {ToDate}", exportJob, exportDto, toDate);
 
             var contentWorkflows = GetWorkflows(exportDto.PortalId, exportDto.IncludeDeletions);
             if (contentWorkflows.Count > 0)
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): contentWorkflows → {ContentWorkflows}", exportJob, exportDto, contentWorkflows);
             {
                 var defaultWorkflowId = TabWorkflowSettings.Instance.GetDefaultTabWorkflowId(exportDto.PortalId);
                 var defaultWorkflow = contentWorkflows.FirstOrDefault(w => w.WorkflowID == defaultWorkflowId);
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): defaultWorkflowId → {DefaultWorkflowId}", exportJob, exportDto, defaultWorkflowId);
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): defaultWorkflow → {DefaultWorkflow}", exportJob, exportDto, defaultWorkflow);
                 defaultWorkflow?.IsDefault = true;
 
                 this.CheckPoint.TotalItems = contentWorkflows.Count;
                 this.Repository.CreateItems(contentWorkflows);
+				Logger.LogInformation("ExportData(exportJob,exportDto)={ExportJob},{ExportDto}: database query executed in {Arg2} ms", exportJob, exportDto, __logStart.ElapsedMilliseconds);
                 this.Result.AddLogEntry("Exported ContentWorkflows", contentWorkflows.Count.ToString(CultureInfo.InvariantCulture));
 
                 foreach (var workflow in contentWorkflows)
                 {
                     var contentWorkflowStates = GetWorkflowStates(workflow.WorkflowID);
                     this.Repository.CreateItems(contentWorkflowStates, workflow.Id);
+					Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): contentWorkflowStates → {ContentWorkflowStates}", exportJob, exportDto, contentWorkflowStates);
 
                     foreach (var workflowState in contentWorkflowStates)
                     {
                         var contentWorkflowStatePermissions = GetWorkflowStatePermissions(workflowState.StateID, toDate, fromDate);
                         this.Repository.CreateItems(contentWorkflowStatePermissions, workflowState.Id);
+						Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): contentWorkflowStatePermissions → {ContentWorkflowStatePermissions}", exportJob, exportDto, contentWorkflowStatePermissions);
                     }
                 }
             }
@@ -87,11 +100,14 @@ namespace Dnn.ExportImport.Components.Services
             this.CheckPoint.Stage++;
             this.CheckPoint.StageData = null;
             this.CheckPointStageCallback(this);
+			Logger.LogDebug("<<< Exiting ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
         }
 
         /// <inheritdoc />
         public override void ImportData(ExportImportJob importJob, ImportDto importDto)
         {
+			Logger.LogDebug(">>> Entering ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (this.CheckCancelled(importJob) || this.CheckPoint.Stage >= 1 || this.CheckPoint.Completed || this.CheckPointStageCallback(this))
             {
                 return;
@@ -102,12 +118,16 @@ namespace Dnn.ExportImport.Components.Services
             var portalId = importJob.PortalId;
             var importWorkflows = this.Repository.GetAllItems<ExportWorkflow>().ToList();
             var existWorkflows = workflowManager.GetWorkflows(portalId).ToList();
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): importWorkflows → {ImportWorkflows}", importJob, importDto, importWorkflows);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): existWorkflows → {ExistWorkflows}", importJob, importDto, existWorkflows);
             var defaultTabWorkflowId = importWorkflows.FirstOrDefault(w => w.IsDefault)?.WorkflowID ?? 1;
             this.CheckPoint.TotalItems = this.CheckPoint.TotalItems <= 0 ? importWorkflows.Count : this.CheckPoint.TotalItems;
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): defaultTabWorkflowId → {DefaultTabWorkflowId}", importJob, importDto, defaultTabWorkflowId);
             foreach (var importWorkflow in importWorkflows)
             {
                 var workflow = existWorkflows.FirstOrDefault(w => w.WorkflowName == importWorkflow.WorkflowName);
                 if (workflow != null)
+				Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): workflow → {Workflow}", importJob, importDto, workflow);
                 {
                     if (!importWorkflow.IsSystem && importDto.CollisionResolution == CollisionResolution.Overwrite)
                     {
@@ -115,6 +135,8 @@ namespace Dnn.ExportImport.Components.Services
                             workflow.WorkflowKey != importWorkflow.WorkflowKey)
                         {
                             workflow.Description = importWorkflow.Description;
+							Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): workflow.Description → {Arg2}", importJob, importDto, workflow.Description);
+							Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): workflow.WorkflowKey → {Arg2}", importJob, importDto, workflow.WorkflowKey);
                             workflow.WorkflowKey = importWorkflow.WorkflowKey;
                             workflowManager.UpdateWorkflow(workflow);
                             this.Result.AddLogEntry("Updated workflow", workflow.WorkflowName);
@@ -141,15 +163,22 @@ namespace Dnn.ExportImport.Components.Services
                 }
 
                 importWorkflow.LocalId = workflow.WorkflowID;
+				Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): importWorkflow.LocalId → {Arg2}", importJob, importDto, importWorkflow.LocalId);
                 var importStates = this.Repository.GetRelatedItems<ExportWorkflowState>(importWorkflow.Id).ToList();
                 foreach (var importState in importStates)
                 {
+				Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): importStates → {ImportStates}", importJob, importDto, importStates);
                     var workflowState = workflow.States.FirstOrDefault(s => s.StateName == importState.StateName);
                     if (workflowState != null)
+					Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): workflowState → {WorkflowState}", importJob, importDto, workflowState);
                     {
                         if (!workflowState.IsSystem)
                         {
                             workflowState.Order = importState.Order;
+							Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): workflowState.Order → {Arg2}", importJob, importDto, workflowState.Order);
+							Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): workflowState.IsSystem → {Arg2}", importJob, importDto, workflowState.IsSystem);
+							Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): workflowState.SendNotification → {Arg2}", importJob, importDto, workflowState.SendNotification);
+							Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): workflowState.SendNotificationToAdministrators → {Arg2}", importJob, importDto, workflowState.SendNotificationToAdministrators);
                             workflowState.IsSystem = false;
                             workflowState.SendNotification = importState.SendNotification;
                             workflowState.SendNotificationToAdministrators = importState.SendNotificationToAdministrators;
@@ -173,11 +202,13 @@ namespace Dnn.ExportImport.Components.Services
                     }
 
                     importState.LocalId = workflowState.StateID;
+					Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): importState.LocalId → {Arg2}", importJob, importDto, importState.LocalId);
                     if (!workflowState.IsSystem)
                     {
                         var importPermissions = this.Repository.GetRelatedItems<ExportWorkflowStatePermission>(importState.Id).ToList();
                         foreach (var importPermission in importPermissions)
                         {
+						Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): importPermissions → {ImportPermissions}", importJob, importDto, importPermissions);
                             var permissionId = DataProvider.Instance().GetPermissionId(
                                 importPermission.PermissionCode, importPermission.PermissionKey, importPermission.PermissionName);
 
@@ -185,14 +216,20 @@ namespace Dnn.ExportImport.Components.Services
                             {
                                 var noRole = Convert.ToInt32(Globals.glbRoleNothing, CultureInfo.InvariantCulture);
                                 var userId = UserController.GetUserByName(importDto.PortalId, importPermission.Username)?.UserID;
+								Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): noRole → {NoRole}", importJob, importDto, noRole);
+								Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): userId → {UserId}", importJob, importDto, userId);
                                 var roleId = Util.GetRoleIdByName(importDto.PortalId, importPermission.RoleID ?? noRole, importPermission.RoleName);
 
+								Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): roleId → {RoleId}", importJob, importDto, roleId);
                                 IPermissionInfo permission = new WorkflowStatePermission
                                 {
                                     StateID = workflowState.StateID,
                                     AllowAccess = importPermission.AllowAccess,
                                 };
                                 permission.PermissionId = permissionId ?? -1;
+								Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): permission.PermissionId → {Arg2}", importJob, importDto, permission.PermissionId);
+								Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): permission.RoleId → {Arg2}", importJob, importDto, permission.RoleId);
+								Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): permission.UserId → {Arg2}", importJob, importDto, permission.UserId);
                                 permission.RoleId = noRole;
                                 permission.UserId = -1;
 
@@ -229,6 +266,7 @@ namespace Dnn.ExportImport.Components.Services
                                     var existingPermissions = workflowStateManager.GetWorkflowStatePermissionByState(workflowState.StateID);
                                     var local = existingPermissions.FirstOrDefault(
                                         x => x.PermissionCode == importPermission.PermissionCode && x.PermissionKey == importPermission.PermissionKey
+										Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): existingPermissions → {ExistingPermissions}", importJob, importDto, existingPermissions);
                                         && x.PermissionName.Equals(importPermission.PermissionName, StringComparison.OrdinalIgnoreCase) &&
                                         ((IPermissionInfo)x).RoleId == roleId && ((IPermissionInfo)x).UserId == userId);
 
@@ -236,6 +274,8 @@ namespace Dnn.ExportImport.Components.Services
                                     {
                                         var workflowStatePermission = (WorkflowStatePermission)permission;
                                         workflowStateManager.AddWorkflowStatePermission(workflowStatePermission, -1);
+										Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): workflowStatePermission → {WorkflowStatePermission}", importJob, importDto, workflowStatePermission);
+										Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): importPermission.LocalId → {Arg2}", importJob, importDto, importPermission.LocalId);
                                         importPermission.LocalId = workflowStatePermission.WorkflowStatePermissionID;
                                         this.Result.AddLogEntry(
                                             "Added workflow state permission",
@@ -248,6 +288,7 @@ namespace Dnn.ExportImport.Components.Services
                                 }
                                 catch (Exception ex)
                                 {
+									Logger.LogError("Exception in ImportData(importJob={ImportJob},importDto={ImportDto}): {Arg2}", importJob, importDto, ex.Message);
                                     this.Result.AddLogEntry("Exception adding workflow state permission", ex.Message, ReportLevel.Error);
                                 }
                             }
@@ -256,6 +297,7 @@ namespace Dnn.ExportImport.Components.Services
                 }
 
                 this.Repository.UpdateItems(importStates);
+				Logger.LogInformation("ImportData(importJob,importDto)={ImportJob},{ImportDto}: update query executed in {Arg2} ms", importJob, importDto, __logStart.ElapsedMilliseconds);
                 this.Result.AddSummary("Imported Workflow", importWorkflows.Count.ToString(CultureInfo.InvariantCulture));
                 this.CheckPoint.ProcessedItems++;
                 this.CheckPointStageCallback(this); // no need to return; very small amount of data processed
@@ -269,6 +311,7 @@ namespace Dnn.ExportImport.Components.Services
             this.CheckPoint.TotalItems = importWorkflows.Count;
             this.CheckPoint.ProcessedItems = importWorkflows.Count;
             this.CheckPointStageCallback(this);
+			Logger.LogDebug("<<< Exiting ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
         }
 
         private static List<ExportWorkflow> GetWorkflows(int portalId, bool includeDeletions)
@@ -279,6 +322,8 @@ namespace Dnn.ExportImport.Components.Services
 
         private static List<ExportWorkflowState> GetWorkflowStates(int workflowId)
         {
+			Logger.LogDebug(">>> Entering GetWorkflowStates(workflowId={WorkflowId})", workflowId);
+			Logger.LogDebug("<<< Exiting GetWorkflowStates(workflowId={WorkflowId})", workflowId);
             return CBO.FillCollection<ExportWorkflowState>(
                 DataProvider.Instance().GetAllWorkflowStates(workflowId));
         }

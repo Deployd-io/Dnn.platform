@@ -13,6 +13,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
     /// <summary>Represents support for making selections in a list.</summary>
     public static class HtmlSelectExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         // DropDownList
 
         /// <summary>Returns a single-selection select element using the specified HTML helper and the name of the form field.</summary>
@@ -22,6 +23,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <exception cref="System.ArgumentException">The <paramref name="name"/> parameter is null or empty.</exception>
         public static MvcHtmlString DropDownList(this DnnHtmlHelper html, string name)
         {
+			Logger.LogDebug(">>> Entering DropDownList(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting DropDownList(html={Html},name={Name})", html, name);
             return html.HtmlHelper.DropDownList(name);
         }
 
@@ -33,6 +36,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <exception cref="System.ArgumentException">The <paramref name="name"/> parameter is null or empty.</exception>
         public static MvcHtmlString DropDownList(this DnnHtmlHelper html, string name, string optionLabel)
         {
+			Logger.LogDebug("<<< Exiting DropDownList(html={Html},name={Name},optionLabel={OptionLabel})", html, name, optionLabel);
             return html.HtmlHelper.DropDownList(name, optionLabel);
         }
 
@@ -44,6 +48,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <exception cref="System.ArgumentException">The <paramref name="name"/> parameter is null or empty.</exception>
         public static MvcHtmlString DropDownList(this DnnHtmlHelper html, string name, IEnumerable<SelectListItem> selectList)
         {
+			Logger.LogDebug("<<< Exiting DropDownList(html={Html},name={Name},selectList={SelectList})", html, name, selectList);
             return html.HtmlHelper.DropDownList(name, selectList);
         }
 
@@ -56,6 +61,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <exception cref="System.ArgumentException">The <paramref name="name"/> parameter is null or empty.</exception>
         public static MvcHtmlString DropDownList(this DnnHtmlHelper html, string name, IEnumerable<SelectListItem> selectList, object htmlAttributes)
         {
+			Logger.LogDebug("<<< Exiting DropDownList(html={Html},name={Name},selectList={SelectList},htmlAttributes={HtmlAttributes})", html, name, selectList, htmlAttributes);
             return html.HtmlHelper.DropDownList(name, selectList, htmlAttributes);
         }
 
@@ -80,6 +86,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <exception cref="System.ArgumentException">The <paramref name="name"/> parameter is null or empty.</exception>
         public static MvcHtmlString DropDownList(this DnnHtmlHelper html, string name, IEnumerable<SelectListItem> selectList, string optionLabel)
         {
+			Logger.LogDebug("<<< Exiting DropDownList(html={Html},name={Name},selectList={SelectList},optionLabel={OptionLabel})", html, name, selectList, optionLabel);
             return html.HtmlHelper.DropDownList(name, selectList, optionLabel);
         }
 
@@ -91,6 +98,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <exception cref="System.ArgumentException">The <paramref name="name"/> parameter is null or empty.</exception>
         public static MvcHtmlString DropDownList(this DnnHtmlHelper html, string name, IEnumerable<SelectListItem> selectList, string optionLabel, object htmlAttributes)
         {
+			Logger.LogDebug("<<< Exiting DropDownList(html={Html},name={Name},selectList={SelectList},optionLabel={OptionLabel},htmlAttributes={HtmlAttributes})", html, name, selectList, optionLabel, htmlAttributes);
             return html.HtmlHelper.DropDownList(name, selectList, optionLabel, htmlAttributes);
         }
 
@@ -274,6 +282,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <exception cref="System.ArgumentException">The <paramref name="name"/> parameter is null or empty.</exception>
         public static MvcHtmlString ListBox(this DnnHtmlHelper html, string name)
         {
+			Logger.LogDebug(">>> Entering ListBox(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting ListBox(html={Html},name={Name})", html, name);
             return html.HtmlHelper.ListBox(name);
         }
 
@@ -285,6 +295,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <exception cref="System.ArgumentException">The <paramref name="name"/> parameter is null or empty.</exception>
         public static MvcHtmlString ListBox(this DnnHtmlHelper html, string name, IEnumerable<SelectListItem> selectList)
         {
+			Logger.LogDebug("<<< Exiting ListBox(html={Html},name={Name},selectList={SelectList})", html, name, selectList);
             return html.HtmlHelper.ListBox(name, selectList);
         }
 
@@ -297,6 +308,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <exception cref="System.ArgumentException">The <paramref name="name"/> parameter is null or empty.</exception>
         public static MvcHtmlString ListBox(this DnnHtmlHelper html, string name, IEnumerable<SelectListItem> selectList, object htmlAttributes)
         {
+			Logger.LogDebug("<<< Exiting ListBox(html={Html},name={Name},selectList={SelectList},htmlAttributes={HtmlAttributes})", html, name, selectList, htmlAttributes);
             return html.HtmlHelper.ListBox(name, selectList, htmlAttributes);
         }
 

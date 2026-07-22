@@ -32,6 +32,7 @@ namespace Dnn.ExportImport.Components.Services
     /// <summary>An export service for assets.</summary>
     public class AssetsExportService : BasePortableService
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string DefaultUsersFoldersPath = "Users";
 
         private const string UsersAssetsTempFolder = "{0}\\TempUsers\\";
@@ -48,7 +49,9 @@ namespace Dnn.ExportImport.Components.Services
         public AssetsExportService()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering AssetsExportService()");
         }
+		Logger.LogDebug("<<< Exiting AssetsExportService()");
 
         /// <summary>Initializes a new instance of the <see cref="AssetsExportService"/> class.</summary>
         /// <param name="appStatus">The application status.</param>
@@ -56,6 +59,8 @@ namespace Dnn.ExportImport.Components.Services
         public AssetsExportService(IApplicationStatusInfo appStatus)
             : this(appStatus, null)
         {
+		Logger.LogDebug(">>> Entering AssetsExportService(appStatus={AppStatus})", appStatus);
+		Logger.LogDebug("<<< Exiting AssetsExportService(appStatus={AppStatus})", appStatus);
         }
 
         /// <summary>Initializes a new instance of the <see cref="AssetsExportService"/> class.</summary>
@@ -65,7 +70,9 @@ namespace Dnn.ExportImport.Components.Services
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             appStatus ??= Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			Logger.LogDebug("AssetsExportService(appStatus={AppStatus},hostSettings={HostSettings}): hostSettings → {HostSettings1}", appStatus, hostSettings, hostSettings);
             this.assetsFolder = $"{appStatus.ApplicationMapPath}{Constants.ExportFolder}{{0}}\\{Constants.ExportZipFiles}";
+			Logger.LogDebug("AssetsExportService(appStatus={AppStatus},hostSettings={HostSettings}): this.assetsFolder → {Arg2}", appStatus, hostSettings, this.assetsFolder);
         }
 
         /// <inheritdoc />
@@ -80,6 +87,8 @@ namespace Dnn.ExportImport.Components.Services
         /// <inheritdoc />
         public override void ExportData(ExportImportJob exportJob, ExportDto exportDto)
         {
+			Logger.LogDebug(">>> Entering ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (this.CheckCancelled(exportJob))
             {
                 return;
@@ -94,6 +103,8 @@ namespace Dnn.ExportImport.Components.Services
             // Create Zip File to hold files
             var skip = this.GetCurrentSkip();
             var currentIndex = skip;
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): skip → {Skip}", exportJob, exportDto, skip);
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): currentIndex → {CurrentIndex}", exportJob, exportDto, currentIndex);
             var totalFolderExported = 0;
             var totalFolderPermissionsExported = 0;
             var totalFilesExported = 0;
@@ -102,15 +113,20 @@ namespace Dnn.ExportImport.Components.Services
             {
                 var assetsFile = string.Format(CultureInfo.InvariantCulture, this.assetsFolder, exportJob.Directory.TrimEnd('\\').TrimEnd('/'));
 
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): assetsFile → {AssetsFile}", exportJob, exportDto, assetsFile);
                 if (this.CheckPoint.Stage == 0)
                 {
                     var fromDate = (exportDto.FromDateUtc ?? Constants.MinDbTime).ToLocalTime();
                     var toDate = exportDto.ToDateUtc.ToLocalTime();
+					Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): fromDate → {FromDate}", exportJob, exportDto, fromDate);
+					Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): toDate → {ToDate}", exportJob, exportDto, toDate);
                     var portal = PortalController.Instance.GetPortal(portalId);
 
+					Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): portal → {Portal}", exportJob, exportDto, portal);
                     var folders =
                         CBO.FillCollection<ExportFolder>(DataProvider.Instance()
                             .GetFolders(portalId, toDate, fromDate)).ToList();
+							Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): folders → {Folders}", exportJob, exportDto, folders);
                     var totalFolders = folders.Count != 0 ? folders.Count : 0;
                     folders = folders.Skip(skip).ToList();
 
@@ -134,6 +150,7 @@ namespace Dnn.ExportImport.Components.Services
 
                             var isUserFolder = false;
 
+							Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): isUserFolder → {IsUserFolder}", exportJob, exportDto, isUserFolder);
                             var files =
                                 CBO.FillCollection<ExportFile>(
                                     DataProvider.Instance()
@@ -142,6 +159,7 @@ namespace Dnn.ExportImport.Components.Services
                             {
                                 isUserFolder = true;
                                 folder.UserId = userId;
+								Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): folder.UserId → {Arg2}", exportJob, exportDto, folder.UserId);
                                 folder.Username =
                                     UserController.GetUserById(this.hostSettings, portalId, userId)?.Username;
                             }
@@ -153,6 +171,7 @@ namespace Dnn.ExportImport.Components.Services
                             }
 
                             this.Repository.CreateItem(folder, null);
+							Logger.LogInformation("ExportData(exportJob,exportDto)={ExportJob},{ExportDto}: database query executed in {Arg2} ms", exportJob, exportDto, __logStart.ElapsedMilliseconds);
                             totalFolderExported++;
 
                             // Include permissions only if IncludePermissions=true
@@ -169,12 +188,14 @@ namespace Dnn.ExportImport.Components.Services
                             totalFilesExported += files.Count;
                             var folderOffset = portal.HomeDirectoryMapPath.Length + (portal.HomeDirectoryMapPath.EndsWith(@"\", StringComparison.Ordinal) ? 0 : 1);
 
+							Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): folderOffset → {FolderOffset}", exportJob, exportDto, folderOffset);
                             if (folder.StorageLocation != (int)FolderController.StorageLocationTypes.DatabaseSecure)
                             {
                                 CompressionUtil.AddFilesToArchive(
                                     zipArchive,
                                     files.Select(
                                         file => portal.HomeDirectoryMapPath
+												Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): file → {File}", exportJob, exportDto, file);
                                                 + folder.FolderPath
                                                 + GetActualFileName(file)),
                                     folderOffset,
@@ -217,6 +238,7 @@ namespace Dnn.ExportImport.Components.Services
         /// <inheritdoc />
         public override void ImportData(ExportImportJob importJob, ImportDto importDto)
         {
+			Logger.LogDebug(">>> Entering ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
             if (this.CheckCancelled(importJob))
             {
                 return;
@@ -236,11 +258,16 @@ namespace Dnn.ExportImport.Components.Services
             var totalFilesImported = 0;
             var skip = this.GetCurrentSkip();
             var currentIndex = skip;
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): skip → {Skip}", importJob, importDto, skip);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): currentIndex → {CurrentIndex}", importJob, importDto, currentIndex);
             var portalId = importJob.PortalId;
             var portal = PortalController.Instance.GetPortal(portalId);
             var assetsFile = string.Format(CultureInfo.InvariantCulture, this.assetsFolder, importJob.Directory.TrimEnd('\\').TrimEnd('/'));
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): portal → {Portal}", importJob, importDto, portal);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): assetsFile → {AssetsFile}", importJob, importDto, assetsFile);
             var userFolderPath = string.Format(CultureInfo.InvariantCulture, UsersAssetsTempFolder, portal.HomeDirectoryMapPath.TrimEnd('\\'));
             if (this.CheckPoint.Stage == 0)
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): userFolderPath → {UserFolderPath}", importJob, importDto, userFolderPath);
             {
                 if (!File.Exists(assetsFile))
                 {
@@ -276,6 +303,7 @@ namespace Dnn.ExportImport.Components.Services
                     // Stage 2 starts
                     var sourceFolders = this.Repository.GetAllItems<ExportFolder>(x => x.CreatedOnDate, true, skip).ToList();
 
+					Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): sourceFolders → {SourceFolders}", importJob, importDto, sourceFolders);
                     var totalFolders = sourceFolders.Count != 0 ? sourceFolders.Count : 0;
 
                     // Update the total items count in the check points. This should be updated only once.
@@ -310,6 +338,7 @@ namespace Dnn.ExportImport.Components.Services
                                 {
                                     x.FolderId = Convert.ToInt32(sourceFolder.FolderId);
                                     x.FolderPath = sourceFolder.FolderPath;
+									Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): x.FolderPath → {Arg2}", importJob, importDto, x.FolderPath);
                                 });
 
                                 // PROCESS FOLDER PERMISSIONS
@@ -344,6 +373,7 @@ namespace Dnn.ExportImport.Components.Services
                             {
                                 x.FolderId = Convert.ToInt32(sourceFolder.FolderId);
                                 x.Folder = sourceFolder.FolderPath;
+								Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): x.Folder → {Arg2}", importJob, importDto, x.Folder);
                             });
 
                             // File local files in the system related to the folder
@@ -402,18 +432,24 @@ namespace Dnn.ExportImport.Components.Services
         /// <inheritdoc />
         public override int GetImportTotal()
         {
+			Logger.LogDebug(">>> Entering GetImportTotal()");
+			Logger.LogDebug("<<< Exiting GetImportTotal()");
             return this.Repository.GetCount<ExportFolder>();
         }
 
         private static bool IsUserFolder(string folderPath, out int userId)
         {
+			Logger.LogDebug(">>> Entering IsUserFolder(folderPath={FolderPath})", folderPath);
             userId = -1;
             var match = UserFolderEx.Match(folderPath);
+			Logger.LogDebug("IsUserFolder(folderPath={FolderPath}): userId → {UserId}", folderPath, userId);
+			Logger.LogDebug("IsUserFolder(folderPath={FolderPath}): match → {Match}", folderPath, match);
             if (match.Success)
             {
                 userId = int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
             }
 
+			Logger.LogDebug("<<< Exiting IsUserFolder(folderPath={FolderPath})", folderPath);
             return match.Success;
         }
 
@@ -517,6 +553,7 @@ namespace Dnn.ExportImport.Components.Services
             }
 
             folderPermission.LocalId = folderPermission.FolderPermissionId;
+			Logger.LogDebug("<<< Exiting ProcessFolderPermission(importJob={ImportJob},importDto={ImportDto},folderPermission={FolderPermission},localPermissions={LocalPermissions})", importJob, importDto, folderPermission, localPermissions);
         }
 
         private static void ProcessFiles(ExportImportJob importJob, ImportDto importDto, ExportFile file, IEnumerable<ExportFile> localFiles)
@@ -607,6 +644,7 @@ namespace Dnn.ExportImport.Components.Services
                     DotNetNuke.Data.DataProvider.Instance().UpdateFileContent(file.FileId, file.Content);
                 }
             }
+			Logger.LogDebug("<<< Exiting ProcessFiles(importJob={ImportJob},importDto={ImportDto},file={File},localFiles={LocalFiles})", importJob, importDto, file, localFiles);
         }
 
         private static void SyncUserFolder(int portalId, ExportFolder folder)
@@ -642,6 +680,8 @@ namespace Dnn.ExportImport.Components.Services
 
         private static string GetActualFileName(ExportFile objFile)
         {
+			Logger.LogDebug(">>> Entering GetActualFileName(objFile={ObjFile})", objFile);
+			Logger.LogDebug("<<< Exiting GetActualFileName(objFile={ObjFile})", objFile);
             return (objFile.StorageLocation == (int)FolderController.StorageLocationTypes.SecureFileSystem)
                 ? objFile.FileName + Globals.glbProtectedExtension
                 : objFile.FileName;
@@ -649,6 +689,7 @@ namespace Dnn.ExportImport.Components.Services
 
         private bool ProcessFolder(ExportImportJob importJob, ImportDto importDto, ExportFolder folder)
         {
+			Logger.LogDebug(">>> Entering ProcessFolder(importJob={ImportJob},importDto={ImportDto},folder={Folder})", importJob, importDto, folder);
             var portalId = importJob.PortalId;
             if (folder == null)
             {
@@ -657,8 +698,11 @@ namespace Dnn.ExportImport.Components.Services
 
             var existingFolder = CBO.FillObject<ExportFolder>(DotNetNuke.Data.DataProvider.Instance().GetFolder(portalId, folder.FolderPath ?? string.Empty));
             var isUpdate = false;
+			Logger.LogDebug("ProcessFolder(importJob={ImportJob},importDto={ImportDto},folder={Folder}): existingFolder → {ExistingFolder}", importJob, importDto, folder, existingFolder);
+			Logger.LogDebug("ProcessFolder(importJob={ImportJob},importDto={ImportDto},folder={Folder}): isUpdate → {IsUpdate}", importJob, importDto, folder, isUpdate);
             var modifiedBy = Util.GetUserIdByName(importJob, folder.LastModifiedByUserId, folder.LastModifiedByUserName);
             if (existingFolder != null)
+			Logger.LogDebug("ProcessFolder(importJob={ImportJob},importDto={ImportDto},folder={Folder}): modifiedBy → {ModifiedBy}", importJob, importDto, folder, modifiedBy);
             {
                 switch (importDto.CollisionResolution)
                 {
@@ -675,12 +719,14 @@ namespace Dnn.ExportImport.Components.Services
             folder.FolderPath = string.IsNullOrEmpty(folder.FolderPath) ? string.Empty : folder.FolderPath;
             var folderMapping = FolderMappingController.Instance.GetFolderMapping(portalId, folder.FolderMappingName);
             if (folderMapping == null)
+			Logger.LogDebug("ProcessFolder(importJob={ImportJob},importDto={ImportDto},folder={Folder}): folderMapping → {FolderMapping}", importJob, importDto, folder, folderMapping);
             {
                 return false;
             }
 
             var workFlowId = this.GetLocalWorkFlowId(folder.WorkflowId);
             if (isUpdate)
+			Logger.LogDebug("ProcessFolder(importJob={ImportJob},importDto={ImportDto},folder={Folder}): workFlowId → {WorkFlowId}", importJob, importDto, folder, workFlowId);
             {
                 Util.FixDateTime(existingFolder);
                 DotNetNuke.Data.DataProvider.Instance()
@@ -701,6 +747,7 @@ namespace Dnn.ExportImport.Components.Services
                         existingFolder.ParentId ?? Null.NullInteger);
 
                 folder.FolderId = existingFolder.FolderId;
+				Logger.LogDebug("ProcessFolder(importJob={ImportJob},importDto={ImportDto},folder={Folder}): folder.FolderId → {Arg3}", importJob, importDto, folder, folder.FolderId);
 
                 if (folder.UserId != null && folder.UserId > 0 && !string.IsNullOrEmpty(folder.Username))
                 {
@@ -710,8 +757,10 @@ namespace Dnn.ExportImport.Components.Services
             else
             {
                 folder.FolderMappingId = folderMapping.FolderMappingID;
+				Logger.LogDebug("ProcessFolder(importJob={ImportJob},importDto={ImportDto},folder={Folder}): folder.FolderMappingId → {Arg3}", importJob, importDto, folder, folder.FolderMappingId);
                 var createdBy = Util.GetUserIdByName(importJob, folder.CreatedByUserId, folder.CreatedByUserName);
                 if (folder.ParentId is > 0)
+				Logger.LogDebug("ProcessFolder(importJob={ImportJob},importDto={ImportDto},folder={Folder}): createdBy → {CreatedBy}", importJob, importDto, folder, createdBy);
                 {
                     // Find the previously created parent folder id.
                     folder.ParentId = CBO.FillObject<ExportFolder>(DotNetNuke.Data.DataProvider.Instance().GetFolder(portalId, folder.ParentFolderPath ?? string.Empty))?.FolderId;
@@ -743,14 +792,18 @@ namespace Dnn.ExportImport.Components.Services
                 {
                     var userInfo = UserController.GetUserByName(portalId, folder.Username);
                     if (userInfo == null)
+					Logger.LogDebug("ProcessFolder(importJob={ImportJob},importDto={ImportDto},folder={Folder}): userInfo → {UserInfo}", importJob, importDto, folder, userInfo);
                     {
                         folder.FolderId = 0;
                         return false;
                     }
 
                     userInfo.IsSuperUser = false;
+					Logger.LogDebug("ProcessFolder(importJob={ImportJob},importDto={ImportDto},folder={Folder}): userInfo.IsSuperUser → {Arg3}", importJob, importDto, folder, userInfo.IsSuperUser);
                     var newFolder = FolderManager.Instance.GetUserFolder(userInfo);
                     folder.FolderId = newFolder.FolderID;
+					Logger.LogDebug("ProcessFolder(importJob={ImportJob},importDto={ImportDto},folder={Folder}): newFolder → {NewFolder}", importJob, importDto, folder, newFolder);
+					Logger.LogDebug("ProcessFolder(importJob={ImportJob},importDto={ImportDto},folder={Folder}): folder.FolderPath → {Arg3}", importJob, importDto, folder, folder.FolderPath);
                     folder.FolderPath = newFolder.FolderPath;
                     SyncUserFolder(importJob.PortalId, folder);
                     return true;
@@ -762,22 +815,26 @@ namespace Dnn.ExportImport.Components.Services
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ProcessFolder(importJob={ImportJob},importDto={ImportDto},folder={Folder})", importJob, importDto, folder);
             return true;
         }
 
         private int GetCurrentSkip()
         {
+			Logger.LogDebug(">>> Entering GetCurrentSkip()");
             if (!string.IsNullOrEmpty(this.CheckPoint.StageData))
             {
                 dynamic stageData = JsonConvert.DeserializeObject(this.CheckPoint.StageData);
                 return Convert.ToInt32(stageData.skip) ?? 0;
             }
 
+			Logger.LogDebug("<<< Exiting GetCurrentSkip()");
             return 0;
         }
 
         private int GetLocalWorkFlowId(int? exportedWorkFlowId)
         {
+			Logger.LogDebug(">>> Entering GetLocalWorkFlowId(exportedWorkFlowId={ExportedWorkFlowId})", exportedWorkFlowId);
             const int directPublishWorkflowId = 1;
             if (exportedWorkFlowId is > directPublishWorkflowId)
             {
@@ -785,6 +842,7 @@ namespace Dnn.ExportImport.Components.Services
                 return state?.LocalId ?? -1;
             }
 
+			Logger.LogDebug("<<< Exiting GetLocalWorkFlowId(exportedWorkFlowId={ExportedWorkFlowId})", exportedWorkFlowId);
             return -1;
         }
     }
