@@ -10,16 +10,22 @@ namespace DotNetNuke.Common.Controls
     /// <summary>A control which displays a message.</summary>
     public partial class Message : PortalModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
             this.InitializeComponent();
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         private void InitializeComponent()
         {
+			Logger.LogDebug(">>> Entering InitializeComponent()");
             this.ID = "Message";
+			Logger.LogDebug("<<< Exiting InitializeComponent()");
+			Logger.LogDebug("InitializeComponent(): this.ID → {Arg0}", this.ID);
         }
     }
 }

@@ -14,17 +14,20 @@ namespace Dnn.EditBar.UI.Services
 
     public class ServiceRouteMapper : IServiceRouteMapper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly string[] Namespaces = ["Dnn.EditBar.UI.Services",];
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void RegisterRoutes(IMapRoute routeManager)
         {
+			Logger.LogDebug(">>> Entering RegisterRoutes(routeManager={RouteManager})", routeManager);
             routeManager.MapHttpRoute(
                 "editBar/Common",
                 "default",
                 "{controller}/{action}",
                 Namespaces);
+				Logger.LogDebug("<<< Exiting RegisterRoutes(routeManager={RouteManager})", routeManager);
         }
     }
 }

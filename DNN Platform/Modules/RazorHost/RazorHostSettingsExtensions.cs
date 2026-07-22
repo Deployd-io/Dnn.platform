@@ -14,6 +14,7 @@ namespace DotNetNuke.Modules.RazorHost
     [DnnDeprecated(9, 3, 2, "Use Razor Pages instead")]
     public static partial class RazorHostSettingsExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Loads the razor host settings control.</summary>
         /// <param name="parent">The parent user control.</param>
         /// <param name="configuration">The module configuration, <see cref="ModuleInfo"/>.</param>
@@ -21,15 +22,21 @@ namespace DotNetNuke.Modules.RazorHost
         /// <returns>Razor Host Settings, <see cref="Settings"/>.</returns>
         public static Settings LoadRazorSettingsControl(this UserControl parent, ModuleInfo configuration, string localResourceFile)
         {
+			Logger.LogDebug(">>> Entering LoadRazorSettingsControl(parent={Parent},configuration={Configuration},localResourceFile={LocalResourceFile})", parent, configuration, localResourceFile);
             var control = (Settings)parent.LoadControl("~/DesktopModules/RazorModules/RazorHost/Settings.ascx");
             control.ModuleConfiguration = configuration;
+			Logger.LogDebug("LoadRazorSettingsControl(parent={Parent},configuration={Configuration},localResourceFile={LocalResourceFile}): control → {Control}", parent, configuration, localResourceFile, control);
+			Logger.LogDebug("LoadRazorSettingsControl(parent={Parent},configuration={Configuration},localResourceFile={LocalResourceFile}): control.ModuleConfiguration → {Arg3}", parent, configuration, localResourceFile, control.ModuleConfiguration);
+			Logger.LogDebug("LoadRazorSettingsControl(parent={Parent},configuration={Configuration},localResourceFile={LocalResourceFile}): control.LocalResourceFile → {Arg3}", parent, configuration, localResourceFile, control.LocalResourceFile);
             control.LocalResourceFile = localResourceFile;
             EnsureEditScriptControlIsRegistered(configuration.ModuleDefID);
+			Logger.LogDebug("<<< Exiting LoadRazorSettingsControl(parent={Parent},configuration={Configuration},localResourceFile={LocalResourceFile})", parent, configuration, localResourceFile);
             return control;
         }
 
         private static void EnsureEditScriptControlIsRegistered(int moduleDefId)
         {
+			Logger.LogDebug(">>> Entering EnsureEditScriptControlIsRegistered(moduleDefId={ModuleDefId})", moduleDefId);
             if (ModuleControlController.GetModuleControlByControlKey("EditRazorScript", moduleDefId) != null)
             {
                 return;
@@ -44,6 +51,7 @@ namespace DotNetNuke.Modules.RazorHost
                 ModuleDefID = moduleDefId,
             };
             ModuleControlController.UpdateModuleControl(m);
+			Logger.LogDebug("<<< Exiting EnsureEditScriptControlIsRegistered(moduleDefId={ModuleDefId})", moduleDefId);
         }
     }
 }

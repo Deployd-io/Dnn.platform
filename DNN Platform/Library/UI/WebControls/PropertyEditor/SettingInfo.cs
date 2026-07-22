@@ -19,12 +19,16 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="value">The setting value.</param>
         public SettingInfo(object name, object value)
         {
+			Logger.LogDebug(">>> Entering SettingInfo(name={Name},value={Value})", name, value);
             this.Name = Convert.ToString(name, CultureInfo.InvariantCulture);
             this.Value = value;
+			Logger.LogDebug("SettingInfo(name={Name},value={Value}): this.Value → {Arg2}", name, value, this.Value);
             this.type = value.GetType();
             this.Editor = EditorInfo.GetEditor(-1);
+			Logger.LogDebug("SettingInfo(name={Name},value={Value}): type → {Type}", name, value, type);
             string strValue = Convert.ToString(value, CultureInfo.InvariantCulture);
             bool isFound = false;
+			Logger.LogDebug("SettingInfo(name={Name},value={Value}): isFound → {IsFound}", name, value, isFound);
             if (this.type.IsEnum)
             {
                 isFound = true;
@@ -50,6 +54,7 @@ namespace DotNetNuke.UI.WebControls
                 {
                     int intValue = int.Parse(strValue, CultureInfo.InvariantCulture);
                     this.Editor = EditorInfo.GetEditor("Integer");
+					Logger.LogDebug("SettingInfo(name={Name},value={Value}): intValue → {IntValue}", name, value, intValue);
                     isFound = true;
                 }
                 catch (Exception exc)
@@ -57,6 +62,7 @@ namespace DotNetNuke.UI.WebControls
                     Logger.Error(exc);
                 }
             }
+			Logger.LogDebug("<<< Exiting SettingInfo(name={Name},value={Value})", name, value);
         }
 
         public string Name { get; set; }

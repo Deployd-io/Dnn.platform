@@ -11,20 +11,33 @@ namespace DNNConnect.CKEditorProvider.Objects
     /// <summary>The Editor Provider Settings.</summary>
     public class EditorProviderSettings : object
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="EditorProviderSettings"/> class.</summary>
         public EditorProviderSettings()
         {
+			Logger.LogDebug(">>> Entering EditorProviderSettings()");
             this.OverrideFileOnUpload = false;
             this.UseAnchorSelector = true;
+			Logger.LogDebug("EditorProviderSettings(): this.OverrideFileOnUpload → {Arg0}", this.OverrideFileOnUpload);
+			Logger.LogDebug("EditorProviderSettings(): this.UseAnchorSelector → {Arg0}", this.UseAnchorSelector);
             this.FileListPageSize = 20;
             this.FileListViewMode = FileListView.DetailView;
             this.SettingMode = SettingsMode.Portal;
+			Logger.LogDebug("EditorProviderSettings(): this.FileListPageSize → {Arg0}", this.FileListPageSize);
+			Logger.LogDebug("EditorProviderSettings(): this.FileListViewMode → {Arg0}", this.FileListViewMode);
+			Logger.LogDebug("EditorProviderSettings(): this.SettingMode → {Arg0}", this.SettingMode);
             this.DefaultLinkMode = LinkMode.RelativeURL;
             this.DefaultLinkProtocol = LinkProtocol.Https;
             this.InjectSyntaxJs = true;
             this.BrowserRootDirId = -1;
             this.BrowserRootDirForImgId = -1;
             this.UploadDirId = -1;
+			Logger.LogDebug("EditorProviderSettings(): this.DefaultLinkMode → {Arg0}", this.DefaultLinkMode);
+			Logger.LogDebug("EditorProviderSettings(): this.DefaultLinkProtocol → {Arg0}", this.DefaultLinkProtocol);
+			Logger.LogDebug("EditorProviderSettings(): this.InjectSyntaxJs → {Arg0}", this.InjectSyntaxJs);
+			Logger.LogDebug("EditorProviderSettings(): this.BrowserRootDirId → {Arg0}", this.BrowserRootDirId);
+			Logger.LogDebug("EditorProviderSettings(): this.BrowserRootDirForImgId → {Arg0}", this.BrowserRootDirForImgId);
+			Logger.LogDebug("EditorProviderSettings(): this.UploadDirId → {Arg0}", this.UploadDirId);
             this.UploadDirForImgId = -1;
             this.ResizeHeight = -1;
             this.ResizeWidthUpload = -1;
@@ -37,10 +50,22 @@ namespace DNNConnect.CKEditorProvider.Objects
             this.ToolBarRoles = new List<ToolbarRoles> { new ToolbarRoles { RoleId = 0, Toolbar = "Full" } };
             this.UploadSizeRoles = new List<UploadSizeRoles>
                                        {
+										Logger.LogDebug("EditorProviderSettings(): this.UploadDirForImgId → {Arg0}", this.UploadDirForImgId);
+										Logger.LogDebug("EditorProviderSettings(): this.ResizeHeight → {Arg0}", this.ResizeHeight);
+										Logger.LogDebug("EditorProviderSettings(): this.ResizeWidthUpload → {Arg0}", this.ResizeWidthUpload);
+										Logger.LogDebug("EditorProviderSettings(): this.ResizeHeightUpload → {Arg0}", this.ResizeHeightUpload);
+										Logger.LogDebug("EditorProviderSettings(): this.ResizeWidth → {Arg0}", this.ResizeWidth);
+										Logger.LogDebug("EditorProviderSettings(): this.BrowserAllowFollowFolderPerms → {Arg0}", this.BrowserAllowFollowFolderPerms);
+										Logger.LogDebug("EditorProviderSettings(): this.BrowserRoles → {Arg0}", this.BrowserRoles);
+										Logger.LogDebug("EditorProviderSettings(): this.Browser → {Arg0}", this.Browser);
+										Logger.LogDebug("EditorProviderSettings(): this.ImageButton → {Arg0}", this.ImageButton);
+										Logger.LogDebug("EditorProviderSettings(): this.ToolBarRoles → {Arg0}", this.ToolBarRoles);
+										Logger.LogDebug("EditorProviderSettings(): this.UploadSizeRoles → {Arg0}", this.UploadSizeRoles);
                                            new UploadSizeRoles { RoleId = 0, UploadFileLimit = -1 },
                                        };
 
             this.Config = new EditorConfig();
+			Logger.LogDebug("<<< Exiting EditorProviderSettings()");
         }
 
         /// <summary>Gets or sets a value indicating whether [override file on upload].</summary>

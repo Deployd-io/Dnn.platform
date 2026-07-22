@@ -9,6 +9,7 @@ namespace DotNetNuke.HttpModules.Compression
     /// <summary>This is a little filter to support HTTP compression using GZip.</summary>
     public class GZipFilter : CompressingFilter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly GZipStream stream;
 
         /// <summary>Initializes a new instance of the <see cref="GZipFilter"/> class.</summary>
@@ -16,7 +17,10 @@ namespace DotNetNuke.HttpModules.Compression
         public GZipFilter(Stream baseStream)
             : base(baseStream)
         {
+			Logger.LogDebug(">>> Entering GZipFilter(baseStream={BaseStream})", baseStream);
             this.stream = new GZipStream(baseStream, CompressionMode.Compress);
+			Logger.LogDebug("<<< Exiting GZipFilter(baseStream={BaseStream})", baseStream);
+			Logger.LogDebug("GZipFilter(baseStream={BaseStream}): stream → {Stream}", baseStream, stream);
         }
 
         /// <inheritdoc />
@@ -31,24 +35,30 @@ namespace DotNetNuke.HttpModules.Compression
         /// <inheritdoc />
         public override void Write(byte[] buffer, int offset, int count)
         {
+			Logger.LogDebug(">>> Entering Write(buffer={Buffer},offset={Offset},count={Count})", buffer, offset, count);
             if (!this.HasWrittenHeaders)
             {
                 this.WriteHeaders();
             }
 
             this.stream.Write(buffer, offset, count);
+			Logger.LogDebug("<<< Exiting Write(buffer={Buffer},offset={Offset},count={Count})", buffer, offset, count);
         }
 
         /// <inheritdoc />
         public override void Close()
         {
+			Logger.LogDebug(">>> Entering Close()");
             this.stream.Close();
+			Logger.LogDebug("<<< Exiting Close()");
         }
 
         /// <inheritdoc />
         public override void Flush()
         {
+			Logger.LogDebug(">>> Entering Flush()");
             this.stream.Flush();
+			Logger.LogDebug("<<< Exiting Flush()");
         }
     }
 }

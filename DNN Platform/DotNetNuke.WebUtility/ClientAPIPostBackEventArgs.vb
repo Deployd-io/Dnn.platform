@@ -21,17 +21,22 @@ Namespace DotNetNuke.UI.Utilities
     ''' -----------------------------------------------------------------------------
     <SuppressMessage("Microsoft.Design", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix", Justification := "Breaking change")>
     Public Class ClientAPIPostBackEventArgs
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(ClientAPIPostBackEventArgs))
         <SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification := "Breaking change")>
         Public EventName As String
         <SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification := "Breaking change")>
         Public EventArguments As Hashtable = New Hashtable
 
         Public Sub New()
+		Logger.LogDebug(">>> Entering New()")
 
+		Logger.LogDebug(">>> Entering New(strEventArgument={StrEventArgument})", strEventArgument)
+		Logger.LogDebug("<<< Exiting New()")
         End Sub
 
         Public Sub New(ByVal strEventArgument As String)
             Dim aryArgs() As String = Split(strEventArgument, ClientAPI.COLUMN_DELIMITER)
+			Logger.LogDebug("<<< Exiting New()")
             Dim i As Integer
 
             If (aryArgs.Length > 0) Then Me.EventName = aryArgs(0)

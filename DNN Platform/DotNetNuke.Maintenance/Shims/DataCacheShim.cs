@@ -9,10 +9,13 @@ namespace DotNetNuke.Maintenance.Shims
     /// <summary>Implementation of <see cref="IDataCache"/> that relies on the <see cref="DataCache"/> class.</summary>
     internal sealed class DataCacheShim : IDataCache
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public void ClearCache()
         {
+			Logger.LogDebug(">>> Entering ClearCache()");
             DataCache.ClearCache();
+			Logger.LogDebug("<<< Exiting ClearCache()");
         }
     }
 }

@@ -34,18 +34,24 @@ namespace log4net.Core
     [Serializable]
     public class StackFrameItem
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>returns a stack frame item from a stack frame. This </summary>
         /// <param name="frame"></param>
         /// <returns></returns>
         public StackFrameItem(StackFrame frame)
         {
+			Logger.LogDebug(">>> Entering StackFrameItem(frame={Frame})", frame);
             // set default values
             this.m_lineNumber = NA;
+			Logger.LogDebug("StackFrameItem(frame={Frame}): this.m_lineNumber → {Arg1}", frame, this.m_lineNumber);
             this.m_fileName = NA;
             this.m_method = new MethodItem();
+			Logger.LogDebug("StackFrameItem(frame={Frame}): this.m_fileName → {Arg1}", frame, this.m_fileName);
+			Logger.LogDebug("StackFrameItem(frame={Frame}): m_method → {M_method}", frame, m_method);
             this.m_className = NA;
 
             try
+			Logger.LogDebug("StackFrameItem(frame={Frame}): this.m_className → {Arg1}", frame, this.m_className);
             {
                 // get frame values
                 this.m_lineNumber = frame.GetFileLineNumber().ToString(System.Globalization.NumberFormatInfo.InvariantInfo);
@@ -53,6 +59,7 @@ namespace log4net.Core
                 // get method values
                 MethodBase method = frame.GetMethod();
                 if (method != null)
+				Logger.LogDebug("StackFrameItem(frame={Frame}): method → {Method}", frame, method);
                 {
                     if(method.DeclaringType != null)
                     {
@@ -69,6 +76,7 @@ namespace log4net.Core
 
             // set full info
             this.m_fullInfo = this.m_className + '.' + this.m_method.Name + '(' + this.m_fileName + ':' + this.m_lineNumber + ')';
+			Logger.LogDebug("<<< Exiting StackFrameItem(frame={Frame})", frame);
         }
 
         /// <summary>

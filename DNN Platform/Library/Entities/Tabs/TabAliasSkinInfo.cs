@@ -13,6 +13,7 @@ namespace DotNetNuke.Entities.Tabs
     [Serializable]
     public class TabAliasSkinInfo : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public int TabAliasSkinId { get; set; }
 
         public string HttpAlias { get; set; }
@@ -33,6 +34,7 @@ namespace DotNetNuke.Entities.Tabs
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.FillInternal(dr);
 
             this.TabAliasSkinId = Null.SetNullInteger(dr["TabAliasSkinId"]);
@@ -40,6 +42,7 @@ namespace DotNetNuke.Entities.Tabs
             this.PortalAliasId = Null.SetNullInteger(dr["PortalAliasId"]);
             this.SkinSrc = Null.SetNullString(dr["SkinSrc"]);
             this.TabId = Null.SetNullInteger(dr["TabId"]);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

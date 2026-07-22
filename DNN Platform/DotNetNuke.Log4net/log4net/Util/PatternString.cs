@@ -254,6 +254,7 @@ namespace log4net.Util
     /// <author>Nicko Cadell</author>
     public class PatternString : IOptionHandler
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Internal map of converter identifiers to converter types.</summary>
         private static Hashtable s_globalRulesRegistry;
 
@@ -269,8 +270,10 @@ namespace log4net.Util
         /// <summary>Initialize the global registry</summary>
         static PatternString()
         {
+			Logger.LogDebug(">>> Entering PatternString()");
             s_globalRulesRegistry = new Hashtable(18);
 
+			Logger.LogDebug("PatternString(): s_globalRulesRegistry → {S_globalRulesRegistry}", s_globalRulesRegistry);
             s_globalRulesRegistry.Add("appdomain", typeof(AppDomainPatternConverter));
             s_globalRulesRegistry.Add("date", typeof(DatePatternConverter));
 #if !NETCF
@@ -297,6 +300,7 @@ namespace log4net.Util
             s_globalRulesRegistry.Add("appSetting", typeof(AppSettingPatternConverter));
             s_globalRulesRegistry.Add("AppSetting", typeof(AppSettingPatternConverter));
 #endif
+		Logger.LogDebug("<<< Exiting PatternString()");
         }
 
         /// <summary>Default constructor</summary>
@@ -318,8 +322,11 @@ namespace log4net.Util
         /// </remarks>
         public PatternString(string pattern)
         {
+			Logger.LogDebug(">>> Entering PatternString(pattern={Pattern})", pattern);
             this.m_pattern = pattern;
             this.ActivateOptions();
+			Logger.LogDebug("<<< Exiting PatternString(pattern={Pattern})", pattern);
+			Logger.LogDebug("PatternString(pattern={Pattern}): this.m_pattern → {Arg1}", pattern, this.m_pattern);
         }
 
         /// <summary>Gets or sets the pattern formatting string</summary>
@@ -355,7 +362,10 @@ namespace log4net.Util
         /// </remarks>
         public virtual void ActivateOptions() 
         {
+			Logger.LogDebug(">>> Entering ActivateOptions()");
             this.m_head = this.CreatePatternParser(this.m_pattern).Parse();
+			Logger.LogDebug("<<< Exiting ActivateOptions()");
+			Logger.LogDebug("ActivateOptions(): m_head → {M_head}", m_head);
         }
 
         /// <summary>Create the <see cref="PatternParser"/> used to parse the pattern</summary>
@@ -370,13 +380,16 @@ namespace log4net.Util
         /// </remarks>
         private PatternParser CreatePatternParser(string pattern) 
         {
+			Logger.LogDebug(">>> Entering CreatePatternParser(pattern={Pattern})", pattern);
             PatternParser patternParser = new PatternParser(pattern);
 
+			Logger.LogDebug("CreatePatternParser(pattern={Pattern}): patternParser → {PatternParser}", pattern, patternParser);
             // Add all the builtin patterns
             foreach(DictionaryEntry entry in s_globalRulesRegistry)
             {
                 ConverterInfo converterInfo = new ConverterInfo();
                 converterInfo.Name = (string)entry.Key;
+				Logger.LogDebug("CreatePatternParser(pattern={Pattern}): converterInfo → {ConverterInfo}", pattern, converterInfo);
                 converterInfo.Type = (Type)entry.Value;
                 patternParser.PatternConverters.Add(entry.Key, converterInfo);
             }
@@ -386,6 +399,7 @@ namespace log4net.Util
                 patternParser.PatternConverters[entry.Key] = entry.Value;
             }
 
+			Logger.LogDebug("<<< Exiting CreatePatternParser(pattern={Pattern})", pattern);
             return patternParser;
         }
   
@@ -398,6 +412,7 @@ namespace log4net.Util
         /// </remarks>
         public void Format(TextWriter writer) 
         {
+			Logger.LogDebug(">>> Entering Format(writer={Writer})", writer);
             if (writer == null)
             {
                 throw new ArgumentNullException("writer");
@@ -405,12 +420,16 @@ namespace log4net.Util
 
             PatternConverter c = this.m_head;
 
+			Logger.LogDebug("Format(writer={Writer}): c → {C}", writer, c);
             // loop through the chain of pattern converters
             while(c != null) 
             {
                 c.Format(writer, null);
                 c = c.Next;
             }
+			Logger.LogDebug("<<< Exiting Format(writer={Writer})", writer);
+			Logger.LogDebug(">>> Entering Format()");
+			Logger.LogDebug("<<< Exiting Format()");
         }
 
         /// <summary>Format the pattern as a string</summary>
@@ -450,6 +469,7 @@ namespace log4net.Util
             }
 
             this.m_instanceRulesRegistry[converterInfo.Name] = converterInfo;
+			Logger.LogDebug("<<< Exiting AddConverter(converterInfo={ConverterInfo})", converterInfo);
         }
 
         /// <summary>Add a converter to this PatternString</summary>
@@ -462,6 +482,7 @@ namespace log4net.Util
         /// </remarks>
         public void AddConverter(string name, Type type)
         {
+			Logger.LogDebug(">>> Entering AddConverter(name={Name},type={Type})", name, type);
             if (name == null)
             {
                 throw new ArgumentNullException("name");
@@ -474,9 +495,13 @@ namespace log4net.Util
 
             ConverterInfo converterInfo = new ConverterInfo();
             converterInfo.Name = name;
+			Logger.LogDebug("AddConverter(name={Name},type={Type}): converterInfo → {ConverterInfo}", name, type, converterInfo);
+			Logger.LogDebug("AddConverter(name={Name},type={Type}): converterInfo.Name → {Arg2}", name, type, converterInfo.Name);
+			Logger.LogDebug("AddConverter(name={Name},type={Type}): converterInfo.Type → {Arg2}", name, type, converterInfo.Type);
             converterInfo.Type = type;
 
             this.AddConverter(converterInfo);
+			Logger.LogDebug("<<< Exiting AddConverter(name={Name},type={Type})", name, type);
         }
     }
 }

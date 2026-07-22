@@ -17,6 +17,7 @@ namespace DNN.Connectors.GoogleAnalytics4
     /// <summary>Connector to provide configuration for Google Tag Manager support.</summary>
     public class GoogleAnalytics4Connector : IConnector
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string DefaultDisplayName = "Google Analytics 4";
 
         private string displayName;
@@ -68,19 +69,26 @@ namespace DNN.Connectors.GoogleAnalytics4
         /// <inheritdoc />
         public IEnumerable<IConnector> GetConnectors(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetConnectors(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetConnectors(portalId={PortalId})", portalId);
             return new List<IConnector> { this };
         }
 
         /// <inheritdoc />
         public void DeleteConnector(int portalId)
         {
+		Logger.LogDebug(">>> Entering DeleteConnector(portalId={PortalId})", portalId);
+		Logger.LogDebug("<<< Exiting DeleteConnector(portalId={PortalId})", portalId);
         }
 
         /// <inheritdoc />
         public bool HasConfig(int portalId)
         {
+			Logger.LogDebug(">>> Entering HasConfig(portalId={PortalId})", portalId);
             var config = this.GetConfig(portalId);
 
+			Logger.LogDebug("HasConfig(portalId={PortalId}): config → {Config}", portalId, config);
+			Logger.LogDebug("<<< Exiting HasConfig(portalId={PortalId})", portalId);
             return config.ContainsKey("Ga4ID") && !string.IsNullOrEmpty(config["Ga4ID"]);
         }
 
@@ -198,17 +206,22 @@ namespace DNN.Connectors.GoogleAnalytics4
         /// <summary>Check if there's an AnalyticsEngine element in siteanalytics.config for this connector. If not, adds the default one.</summary>
         private static void EnsureScriptInConfig()
         {
+			Logger.LogDebug(">>> Entering EnsureScriptInConfig()");
             var applicationMapPath = HttpContext.Current.Server.MapPath(@"\");
             var file = applicationMapPath + @"\SiteAnalytics.config";
+			Logger.LogDebug("EnsureScriptInConfig(): applicationMapPath → {ApplicationMapPath}", applicationMapPath);
+			Logger.LogDebug("EnsureScriptInConfig(): file → {File}", file);
             var xdoc = new XmlDocument();
             using (var siteConfigReader = XmlReader.Create(file, new XmlReaderSettings { XmlResolver = null, }))
             {
+			Logger.LogDebug("EnsureScriptInConfig(): xdoc → {Xdoc}", xdoc);
                 xdoc.Load(siteConfigReader);
             }
 
             var found = false;
             foreach (XmlNode engineTypeNode in xdoc.SelectNodes("/AnalyticsEngineConfig/Engines/AnalyticsEngine/EngineType"))
             {
+			Logger.LogDebug("EnsureScriptInConfig(): found → {Found}", found);
                 if (engineTypeNode.InnerText.Contains("DotNetNuke.Services.Analytics.GoogleAnalytics4Engine"))
                 {
                     found = true;
@@ -220,6 +233,8 @@ namespace DNN.Connectors.GoogleAnalytics4
             {
                 var fileGa4 = applicationMapPath + @"\DesktopModules\Connectors\GoogleAnalytics4\GoogleAnalytics4.config";
                 var xdocGa4 = new XmlDocument();
+				Logger.LogDebug("EnsureScriptInConfig(): fileGa4 → {FileGa4}", fileGa4);
+				Logger.LogDebug("EnsureScriptInConfig(): xdocGa4 → {XdocGa4}", xdocGa4);
                 using (var googleConfigReader = XmlReader.Create(fileGa4, new XmlReaderSettings { XmlResolver = null, }))
                 {
                     xdocGa4.Load(googleConfigReader);
@@ -228,13 +243,17 @@ namespace DNN.Connectors.GoogleAnalytics4
                 var enginesElement = xdoc.SelectSingleNode("/AnalyticsEngineConfig/Engines");
                 foreach (XmlNode engineNode in xdocGa4.SelectNodes("/AnalyticsEngineConfig/Engines/AnalyticsEngine"))
                 {
+				Logger.LogDebug("EnsureScriptInConfig(): enginesElement → {EnginesElement}", enginesElement);
                     var engineFrag = xdoc.CreateDocumentFragment();
                     engineFrag.InnerXml = engineNode.OuterXml;
+					Logger.LogDebug("EnsureScriptInConfig(): engineFrag → {EngineFrag}", engineFrag);
+					Logger.LogDebug("EnsureScriptInConfig(): engineFrag.InnerXml → {Arg0}", engineFrag.InnerXml);
                     enginesElement.AppendChild(engineFrag);
                 }
 
                 xdoc.Save(file);
             }
+			Logger.LogDebug("<<< Exiting EnsureScriptInConfig()");
         }
 
         /// <summary>
@@ -245,11 +264,13 @@ namespace DNN.Connectors.GoogleAnalytics4
         /// <returns>The string representing a boolean after the correction.</returns>
         private static string HandleCustomBoolean(string value)
         {
+			Logger.LogDebug(">>> Entering HandleCustomBoolean(value={Value})", value);
             if ((value ?? string.Empty).Trim().Equals("true", StringComparison.OrdinalIgnoreCase))
             {
                 return "true";
             }
 
+			Logger.LogDebug("<<< Exiting HandleCustomBoolean(value={Value})", value);
             return string.Empty;
         }
     }

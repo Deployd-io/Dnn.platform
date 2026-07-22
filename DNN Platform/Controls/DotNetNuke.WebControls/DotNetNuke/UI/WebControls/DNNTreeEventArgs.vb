@@ -6,9 +6,13 @@ Imports System
 Namespace DotNetNuke.UI.WebControls
     Public Class DNNTreeEventArgs
         Inherits EventArgs
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(DNNTreeEventArgs))
         ' Methods
         Public Sub New(ByVal node As TreeNode)
+			Logger.LogDebug(">>> Entering New(node={Node})", node)
             Me._node = node
+			Logger.LogDebug("<<< Exiting New(node={Node})", node)
+			Logger.LogDebug("New(node={Node}): Me._node → {Arg1}", node, Me._node)
         End Sub
 
 

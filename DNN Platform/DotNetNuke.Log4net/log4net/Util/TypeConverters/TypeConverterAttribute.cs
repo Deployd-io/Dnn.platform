@@ -22,6 +22,7 @@ using System;
 
 namespace log4net.Util.TypeConverters
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Attribute used to associate a type converter</summary>
     /// <remarks>
     /// <para>
@@ -50,6 +51,8 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public TypeConverterAttribute()
         {
+		Logger.LogDebug(">>> Entering TypeConverterAttribute()");
+		Logger.LogDebug("<<< Exiting TypeConverterAttribute()");
         }
 
         /// <summary>Create a new type converter attribute for the specified type name</summary>
@@ -62,7 +65,10 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public TypeConverterAttribute(string typeName)
         {
+			Logger.LogDebug(">>> Entering TypeConverterAttribute(typeName={TypeName})", typeName);
             this.m_typeName = typeName;
+			Logger.LogDebug("<<< Exiting TypeConverterAttribute(typeName={TypeName})", typeName);
+			Logger.LogDebug("TypeConverterAttribute(typeName={TypeName}): this.m_typeName → {Arg1}", typeName, this.m_typeName);
         }
 
         /// <summary>Create a new type converter attribute for the specified type</summary>
@@ -75,7 +81,9 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public TypeConverterAttribute(Type converterType)
         {
+			Logger.LogDebug(">>> Entering TypeConverterAttribute(converterType={ConverterType})", converterType);
             this.m_typeName = SystemInfo.AssemblyQualifiedName(converterType);
+			Logger.LogDebug("<<< Exiting TypeConverterAttribute(converterType={ConverterType})", converterType);
         }
 
         /// <summary>The string type name of the type converter </summary>

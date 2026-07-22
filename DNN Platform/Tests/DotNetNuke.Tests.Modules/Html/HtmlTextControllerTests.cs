@@ -9,100 +9,120 @@ namespace DotNetNuke.Tests.Modules.Html
     [TestFixture]
     public class HtmlTextControllerTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [Test]
         public void ManageRelativePaths_DoesNotChangePlainHtml()
         {
+			Logger.LogDebug(">>> Entering ManageRelativePaths_DoesNotChangePlainHtml()");
             var actual = HtmlTextController.ManageRelativePaths(
                 "<p>Hello</p>",
                 "/portals/0/",
                 "src");
             Assert.That(actual, Is.EqualTo("<p>Hello</p>"));
+			Logger.LogDebug("<<< Exiting ManageRelativePaths_DoesNotChangePlainHtml()");
         }
 
         [Test]
         public void ManageRelativePaths_AdjustsRelativeImgSrc()
         {
+			Logger.LogDebug(">>> Entering ManageRelativePaths_AdjustsRelativeImgSrc()");
             var actual = HtmlTextController.ManageRelativePaths(
                 "<img src=\"image.jpg\"/>",
                 "/portals/0/",
                 "src");
             Assert.That(actual, Is.EqualTo("<img src=\"/portals/0/image.jpg\"/>"));
+			Logger.LogDebug("<<< Exiting ManageRelativePaths_AdjustsRelativeImgSrc()");
         }
 
         [Test]
         public void ManageRelativePaths_DoesNotAdjustImgSrcWithCorrectPathCaseInsensitive()
         {
+			Logger.LogDebug(">>> Entering ManageRelativePaths_DoesNotAdjustImgSrcWithCorrectPathCaseInsensitive()");
             var actual = HtmlTextController.ManageRelativePaths(
                 "<img src=\"/Portals/0/image.jpg\"/>",
                 "/portals/0/",
                 "src");
             Assert.That(actual, Is.EqualTo("<img src=\"/portals/0/image.jpg\"/>"));
+			Logger.LogDebug("<<< Exiting ManageRelativePaths_DoesNotAdjustImgSrcWithCorrectPathCaseInsensitive()");
         }
 
         [Test]
         public void ManageRelativePaths_DoesNotAdjustImgSrcWithAbsoluteUrl()
         {
+			Logger.LogDebug(">>> Entering ManageRelativePaths_DoesNotAdjustImgSrcWithAbsoluteUrl()");
             var actual = HtmlTextController.ManageRelativePaths(
                 "<img src=\"https://example.com/image.jpg\"/>",
                 "/portals/0/",
                 "src");
             Assert.That(actual, Is.EqualTo("<img src=\"https://example.com/image.jpg\"/>"));
+			Logger.LogDebug("<<< Exiting ManageRelativePaths_DoesNotAdjustImgSrcWithAbsoluteUrl()");
         }
 
         [Test]
         public void ManageRelativePaths_DoesNotAdjustImgSrcWithAbsoluteUrlInContent()
         {
+			Logger.LogDebug(">>> Entering ManageRelativePaths_DoesNotAdjustImgSrcWithAbsoluteUrlInContent()");
             var actual = HtmlTextController.ManageRelativePaths(
                 "src=\"https://example.com/image.jpg\" is how you indicate a URL",
                 "/portals/0/",
                 "src");
             Assert.That(actual, Is.EqualTo("src=\"https://example.com/image.jpg\" is how you indicate a URL"));
+			Logger.LogDebug("<<< Exiting ManageRelativePaths_DoesNotAdjustImgSrcWithAbsoluteUrlInContent()");
         }
 
         [Test]
         public void ManageRelativePaths_DoesNotAdjustContentEndingInImgSrc()
         {
+			Logger.LogDebug(">>> Entering ManageRelativePaths_DoesNotAdjustContentEndingInImgSrc()");
             var actual = HtmlTextController.ManageRelativePaths(
                 "src=\"image.jpg\"",
                 "/portals/0/",
                 "src");
             Assert.That(actual, Is.EqualTo("src=\"image.jpg\""));
+			Logger.LogDebug("<<< Exiting ManageRelativePaths_DoesNotAdjustContentEndingInImgSrc()");
         }
 
         [Test]
         public void ManageRelativePaths_DoesNotAdjustContentEndingInUnclosedImgSrc()
         {
+			Logger.LogDebug(">>> Entering ManageRelativePaths_DoesNotAdjustContentEndingInUnclosedImgSrc()");
             var actual = HtmlTextController.ManageRelativePaths(
                 "src=\"image.jpg",
                 "/portals/0/",
                 "src");
             Assert.That(actual, Is.EqualTo("src=\"image.jpg"));
+			Logger.LogDebug("<<< Exiting ManageRelativePaths_DoesNotAdjustContentEndingInUnclosedImgSrc()");
         }
 
         [Test]
         public void ManageRelativePaths_DoesAdjustImgSrcWithRelativeUrlInContent()
         {
+			Logger.LogDebug(">>> Entering ManageRelativePaths_DoesAdjustImgSrcWithRelativeUrlInContent()");
             // TODO: should we attempt to avoid making this change?
             var actual = HtmlTextController.ManageRelativePaths(
                 "src=\"image.jpg\" is how you indicate a URL",
                 "/portals/0/",
                 "src");
             Assert.That(actual, Is.EqualTo("src=\"/portals/0/image.jpg\" is how you indicate a URL"));
+			Logger.LogDebug("<<< Exiting ManageRelativePaths_DoesAdjustImgSrcWithRelativeUrlInContent()");
         }
 
         [Test]
         public void ManageRelativePaths_DoesNotAdjustImgSrcWithDataUrl()
         {
+			Logger.LogDebug(">>> Entering ManageRelativePaths_DoesNotAdjustImgSrcWithDataUrl()");
             var actual = HtmlTextController.ManageRelativePaths(
                 "<img src=\"data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7\"/>",
                 "/portals/0/",
                 "src");
             Assert.That(actual, Is.EqualTo("<img src=\"data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7\"/>"));
+			Logger.LogDebug("<<< Exiting ManageRelativePaths_DoesNotAdjustImgSrcWithDataUrl()");
         }
 
         [Test]
         public void ManageRelativePaths_AdjustsNonRootedRelativePathsAndDoesNotAdjustOtherPaths()
         {
+			Logger.LogDebug(">>> Entering ManageRelativePaths_AdjustsNonRootedRelativePathsAndDoesNotAdjustOtherPaths()");
             const string HtmlContent = @"
 <img alt=""a data URI"" src=""data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7""/>
 <img alt=""a non-rooted relative path"" src=""images/image.png"" />
@@ -129,6 +149,7 @@ namespace DotNetNuke.Tests.Modules.Html
 <img alt=""another absolute path"" src=""https://dnncommunity.org/DesktopModules/ActiveForums/images/feedicon.gif"" />
 ";
             Assert.That(actual, Is.EqualTo(Expected));
+			Logger.LogDebug("<<< Exiting ManageRelativePaths_AdjustsNonRootedRelativePathsAndDoesNotAdjustOtherPaths()");
         }
     }
 }

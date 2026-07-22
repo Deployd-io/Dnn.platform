@@ -11,8 +11,13 @@ Imports System.Web.UI
 
 Namespace DotNetNuke.UI.WebControls
     Public Class ScriptGenerator
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(ScriptGenerator))
         ' Methods
         Public Shared Function GetMarshalledProperties(ByVal instance As Object) As Hashtable
+			Logger.LogDebug(">>> Entering GetMarshalledProperties(instance={Instance})", instance)
+			Logger.LogDebug(">>> Entering GetMarshalledProperties(instance={Instance},properties={Properties})", instance, properties)
+			Logger.LogDebug("<<< Exiting GetMarshalledProperties(instance={Instance})", instance)
+			Logger.LogDebug("<<< Exiting GetMarshalledProperties(instance={Instance},properties={Properties})", instance, properties)
             Return ScriptGenerator.GetMarshalledProperties(instance, New Hashtable)
         End Function
 
@@ -90,7 +95,11 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Public Shared Function GetMarshalledPropertyJSON(ByVal instance As Object) As String
+			Logger.LogDebug(">>> Entering GetMarshalledPropertyJSON(instance={Instance})", instance)
             Dim properties As New Hashtable
+			Logger.LogDebug(">>> Entering GetMarshalledPropertyJSON(instance={Instance},properties={Properties})", instance, properties)
+			Logger.LogDebug("<<< Exiting GetMarshalledPropertyJSON(instance={Instance})", instance)
+			Logger.LogDebug("<<< Exiting GetMarshalledPropertyJSON(instance={Instance},properties={Properties})", instance, properties)
             Return ScriptGenerator.GetMarshalledPropertyJSON(instance, properties)
         End Function
 

@@ -9,9 +9,12 @@ namespace DotNetNuke.Entities.Portals
     /// <summary>The PortalTemplateValidator Class is used to validate the Portal Template.</summary>
     public class PortalTemplateValidator : XmlValidatorBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public bool Validate(string xmlFilename, string schemaFileName)
         {
+			Logger.LogDebug(">>> Entering Validate(xmlFilename={XmlFilename},schemaFileName={SchemaFileName})", xmlFilename, schemaFileName);
             this.SchemaSet.Add(string.Empty, schemaFileName);
+			Logger.LogDebug("<<< Exiting Validate(xmlFilename={XmlFilename},schemaFileName={SchemaFileName})", xmlFilename, schemaFileName);
             return this.Validate(xmlFilename);
         }
     }

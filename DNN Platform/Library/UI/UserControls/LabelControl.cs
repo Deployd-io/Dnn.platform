@@ -25,6 +25,7 @@ namespace DotNetNuke.UI.UserControls
     /// </remarks>
     public abstract class LabelControl : UserControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
         protected LinkButton cmdHelp;
@@ -132,6 +133,7 @@ namespace DotNetNuke.UI.UserControls
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             try
             {
@@ -139,13 +141,16 @@ namespace DotNetNuke.UI.UserControls
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             // get the localised text
@@ -153,14 +158,17 @@ namespace DotNetNuke.UI.UserControls
             {
                 // Set Resource Key to the ID of the control
                 this.ResourceKey = this.ID;
+				Logger.LogDebug("OnPreRender(e={E}): this.ResourceKey → {Arg1}", e, this.ResourceKey);
             }
 
             if (!string.IsNullOrEmpty(this.ResourceKey))
             {
                 var localText = Localization.GetString(this.ResourceKey, this);
                 if (!string.IsNullOrEmpty(localText))
+				Logger.LogDebug("OnPreRender(e={E}): localText → {LocalText}", e, localText);
                 {
                     this.Text = localText + this.Suffix;
+					Logger.LogDebug("OnPreRender(e={E}): this.Text → {Arg1}", e, this.Text);
 
                     ////NoHelpLabelText = Text;
                 }
@@ -176,12 +184,15 @@ namespace DotNetNuke.UI.UserControls
             if (string.IsNullOrEmpty(this.HelpKey))
             {
                 this.HelpKey = this.ResourceKey + ".Help";
+				Logger.LogDebug("OnPreRender(e={E}): this.HelpKey → {Arg1}", e, this.HelpKey);
             }
 
             var helpText = Localization.GetString(this.HelpKey, this);
             if ((!string.IsNullOrEmpty(helpText)) || string.IsNullOrEmpty(this.HelpText))
+			Logger.LogDebug("OnPreRender(e={E}): helpText → {HelpText}", e, helpText);
             {
                 this.HelpText = helpText;
+				Logger.LogDebug("OnPreRender(e={E}): this.HelpText → {Arg1}", e, this.HelpText);
             }
 
             if (string.IsNullOrEmpty(this.HelpText))
@@ -202,6 +213,8 @@ namespace DotNetNuke.UI.UserControls
             {
                 var c = this.Parent.FindControl(this.ControlName);
                 var clientId = this.ControlName;
+				Logger.LogDebug("OnPreRender(e={E}): c → {C}", e, c);
+				Logger.LogDebug("OnPreRender(e={E}): clientId → {ClientId}", e, clientId);
                 if (c != null)
                 {
                     clientId = c.ClientID;
@@ -214,14 +227,17 @@ namespace DotNetNuke.UI.UserControls
 
                 this.label.Attributes["for"] = clientId;
             }
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private void RegisterClientDependencies()
         {
+			Logger.LogDebug(">>> Entering RegisterClientDependencies()");
             JavaScript.RegisterClientReference(this.Page, ClientAPI.ClientNamespaceReferences.dnn);
             JavaScript.RequestRegistration(CommonJs.DnnPlugins);
 
             ////ClientResourceManager.RegisterScript(this.Page, "~/Resources/Shared/Scripts/initTooltips.js");
+			Logger.LogDebug("<<< Exiting RegisterClientDependencies()");
         }
     }
 }

@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class LockTimeoutException : ApplicationException
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public LockTimeoutException()
     {
+	Logger.LogDebug(">>> Entering LockTimeoutException()");
+	Logger.LogDebug("<<< Exiting LockTimeoutException()");
     }
 
     /// <inheritdoc />
     public LockTimeoutException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering LockTimeoutException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting LockTimeoutException(message={Message})", message);
 
     /// <inheritdoc />
     public LockTimeoutException(string message, Exception innerException)

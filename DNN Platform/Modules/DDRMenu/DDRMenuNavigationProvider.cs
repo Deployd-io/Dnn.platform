@@ -23,6 +23,7 @@ namespace DotNetNuke.Web.DDRMenu
     /// <summary>Implements the DDR Menu navigation provider.</summary>
     public class DDRMenuNavigationProvider : NavigationProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly ILocaliser localiser;
         private readonly IHostSettings hostSettings;
         private readonly ITabController tabController;
@@ -33,6 +34,10 @@ namespace DotNetNuke.Web.DDRMenu
         public DDRMenuNavigationProvider()
             : this(null, null, null)
         {
+		Logger.LogDebug(">>> Entering DDRMenuNavigationProvider()");
+		Logger.LogDebug("<<< Exiting DDRMenuNavigationProvider()");
+		Logger.LogDebug(">>> Entering DDRMenuNavigationProvider(localiser={Localiser})", localiser);
+		Logger.LogDebug("<<< Exiting DDRMenuNavigationProvider(localiser={Localiser})", localiser);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DDRMenuNavigationProvider"/> class.</summary>
@@ -51,7 +56,10 @@ namespace DotNetNuke.Web.DDRMenu
         {
             this.localiser = localiser ?? Globals.GetCurrentServiceProvider().GetRequiredService<ILocaliser>();
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("DDRMenuNavigationProvider(localiser={Localiser},hostSettings={HostSettings},tabController={TabController}): hostSettings → {HostSettings1}", localiser, hostSettings, tabController, hostSettings);
+			Logger.LogDebug("DDRMenuNavigationProvider(localiser={Localiser},hostSettings={HostSettings},tabController={TabController}): localiser → {Localiser1}", localiser, hostSettings, tabController, localiser);
             this.tabController = tabController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ITabController>();
+			Logger.LogDebug("DDRMenuNavigationProvider(localiser={Localiser},hostSettings={HostSettings},tabController={TabController}): tabController → {TabController1}", localiser, hostSettings, tabController, tabController);
         }
 
         /// <inheritdoc />
@@ -312,14 +320,19 @@ namespace DotNetNuke.Web.DDRMenu
         /// <inheritdoc />
         public override void Initialize()
         {
+			Logger.LogDebug(">>> Entering Initialize()");
             this.menuControl = new DDRMenuControl(this.localiser, this.hostSettings, this.tabController) { ID = this.ControlID, EnableViewState = false, };
             this.menuControl.NodeClick += this.RaiseEvent_NodeClick;
+			Logger.LogDebug("<<< Exiting Initialize()");
+			Logger.LogDebug("Initialize(): menuControl → {MenuControl}", menuControl);
         }
 
         /// <inheritdoc />
         public override void Bind(DNNNodeCollection objNodes)
         {
+			Logger.LogDebug(">>> Entering Bind(objNodes={ObjNodes})", objNodes);
             this.Bind(objNodes, true);
+			Logger.LogDebug("<<< Exiting Bind(objNodes={ObjNodes})", objNodes);
         }
 
         /// <summary>Binds the menu nodes.</summary>
@@ -327,7 +340,9 @@ namespace DotNetNuke.Web.DDRMenu
         /// <param name="localise">A value indicating whether the menu should be localized.</param>
         public void Bind(DNNNodeCollection objNodes, bool localise)
         {
+			Logger.LogDebug(">>> Entering Bind(objNodes={ObjNodes},localise={Localise})", objNodes, localise);
             var clientOptions = new List<ClientOption>();
+			Logger.LogDebug("Bind(objNodes={ObjNodes},localise={Localise}): clientOptions → {ClientOptions}", objNodes, localise, clientOptions);
 
             var ignoreProperties = new List<string>
                                    {
@@ -350,6 +365,7 @@ namespace DotNetNuke.Web.DDRMenu
                 {
                     var propValue = prop.GetValue(this, null);
                     if (propValue != null)
+					Logger.LogDebug("Bind(objNodes={ObjNodes},localise={Localise}): propValue → {PropValue}", objNodes, localise, propValue);
                     {
                         if (propValue is bool)
                         {
@@ -382,6 +398,7 @@ namespace DotNetNuke.Web.DDRMenu
             {
                 objNodes = this.localiser.LocaliseDNNNodeCollection(objNodes);
             }
+			Logger.LogDebug("Bind(objNodes={ObjNodes},localise={Localise}): objNodes → {ObjNodes1}", objNodes, localise, objNodes);
 
             this.menuControl.RootNode = new MenuNode(objNodes);
             this.menuControl.SkipLocalisation = !localise;
@@ -398,20 +415,25 @@ namespace DotNetNuke.Web.DDRMenu
                 ClientOptions = clientOptions,
                 TemplateArguments = this.TemplateArguments,
             };
+			Logger.LogDebug("<<< Exiting Bind(objNodes={ObjNodes},localise={Localise})", objNodes, localise);
         }
 
         private string GetCustomAttribute(string attributeName)
         {
+			Logger.LogDebug(">>> Entering GetCustomAttribute(attributeName={AttributeName})", attributeName);
             string xmlValue = null;
             if (this.CustomAttributes != null)
+			Logger.LogDebug("GetCustomAttribute(attributeName={AttributeName}): xmlValue → {XmlValue}", attributeName, xmlValue);
             {
                 var xmlAttr = this.CustomAttributes.Find(a => a.Name.Equals(attributeName, StringComparison.InvariantCultureIgnoreCase));
                 if (xmlAttr != null)
+				Logger.LogDebug("GetCustomAttribute(attributeName={AttributeName}): xmlAttr → {XmlAttr}", attributeName, xmlAttr);
                 {
                     xmlValue = xmlAttr.Value;
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetCustomAttribute(attributeName={AttributeName})", attributeName);
             return xmlValue;
         }
     }

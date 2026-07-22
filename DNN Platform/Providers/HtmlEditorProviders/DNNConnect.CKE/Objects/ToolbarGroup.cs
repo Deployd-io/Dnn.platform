@@ -8,10 +8,13 @@ namespace DNNConnect.CKEditorProvider.Objects
     /// <summary>Toolbar Group Class.</summary>
     public class ToolbarGroup
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ToolbarGroup" /> class.</summary>
         public ToolbarGroup()
         {
+			Logger.LogDebug(">>> Entering ToolbarGroup()");
             this.items = new List<string>();
+			Logger.LogDebug("<<< Exiting ToolbarGroup()");
         }
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter

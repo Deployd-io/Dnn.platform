@@ -12,17 +12,20 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Utilities
 
     public class Echo : ConsoleCommandBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override string LocalResourceFile => Constants.LocalResourcesFile;
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             if (this.Args.Length > 1)
             {
                 return new ConsoleResultModel(this.Args[1]);
             }
 
+			Logger.LogDebug("<<< Exiting Run()");
             return new ConsoleErrorResultModel(this.LocalizeString("Prompt_Echo_Nothing"));
         }
     }

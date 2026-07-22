@@ -53,6 +53,7 @@ namespace log4net.Appender
     /// <author>Gert Driesen</author>
     public class ConsoleAppender : AppenderSkeleton
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsoleAppender" /> class.
         /// </summary>
@@ -62,6 +63,8 @@ namespace log4net.Appender
         /// </remarks>
         public ConsoleAppender() 
         {
+		Logger.LogDebug(">>> Entering ConsoleAppender()");
+		Logger.LogDebug("<<< Exiting ConsoleAppender()");
         }
 
         /// <summary>
@@ -76,6 +79,7 @@ namespace log4net.Appender
         [Obsolete("Instead use the default constructor and set the Layout property")]
         public ConsoleAppender(ILayout layout) : this(layout, false)
         {
+		Logger.LogDebug(">>> Entering ConsoleAppender(layout={Layout})", layout);
         }
 
         /// <summary>
@@ -92,8 +96,12 @@ namespace log4net.Appender
         [Obsolete("Instead use the default constructor and set the Layout & Target properties")]
         public ConsoleAppender(ILayout layout, bool writeToErrorStream) 
         {
+			Logger.LogDebug(">>> Entering ConsoleAppender(layout={Layout},writeToErrorStream={WriteToErrorStream})", layout, writeToErrorStream);
             this.Layout = layout;
             this.m_writeToErrorStream = writeToErrorStream;
+			Logger.LogDebug("<<< Exiting ConsoleAppender(layout={Layout},writeToErrorStream={WriteToErrorStream})", layout, writeToErrorStream);
+			Logger.LogDebug("ConsoleAppender(layout={Layout},writeToErrorStream={WriteToErrorStream}): this.Layout → {Arg2}", layout, writeToErrorStream, this.Layout);
+			Logger.LogDebug("ConsoleAppender(layout={Layout},writeToErrorStream={WriteToErrorStream}): this.m_writeToErrorStream → {Arg2}", layout, writeToErrorStream, this.m_writeToErrorStream);
         }
 
         /// <summary>
@@ -142,6 +150,7 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent loggingEvent) 
         {
+		Logger.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
 #if NETCF_1_0
             // Write to the output stream
             Console.Write(RenderLoggingEvent(loggingEvent));
@@ -157,6 +166,7 @@ namespace log4net.Appender
                 Console.Write(this.RenderLoggingEvent(loggingEvent));
             }
 #endif
+		Logger.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
         }
 
         /// <summary>

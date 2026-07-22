@@ -14,10 +14,13 @@ namespace Dnn.EditBar.UI.Helpers
 
     public static class LocalizationHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string ResourcesFile = "~/DesktopModules/admin/Dnn.EditBar/App_LocalResources/EditBar.resx";
 
         public static string GetString(string key, string resourcesFile = ResourcesFile)
         {
+			Logger.LogDebug(">>> Entering GetString(key={Key},resourcesFile={ResourcesFile})", key, resourcesFile);
+			Logger.LogDebug("<<< Exiting GetString(key={Key},resourcesFile={ResourcesFile})", key, resourcesFile);
             return Localization.GetString(key, resourcesFile);
         }
     }

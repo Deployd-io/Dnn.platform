@@ -22,6 +22,7 @@ using System;
 
 namespace log4net.Util
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Wrapper class used to map converter names to converter types
     /// </summary>
@@ -42,6 +43,8 @@ namespace log4net.Util
         /// </summary>
         public ConverterInfo()
         {
+		Logger.LogDebug(">>> Entering ConverterInfo()");
+		Logger.LogDebug("<<< Exiting ConverterInfo()");
         }
 
         /// <summary>
@@ -79,7 +82,9 @@ namespace log4net.Util
         /// <param name="entry"></param>
         public void AddProperty(PropertyEntry entry)
         {
+			Logger.LogDebug(">>> Entering AddProperty(entry={Entry})", entry);
             this.properties[entry.Key] = entry.Value;
+			Logger.LogDebug("<<< Exiting AddProperty(entry={Entry})", entry);
         }
 
         /// <summary>

@@ -43,6 +43,7 @@ namespace log4net.Layout
     /// <author>Gert Driesen</author>
     public class ExceptionLayout : LayoutSkeleton
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Default constructor
         /// </summary>
@@ -53,7 +54,10 @@ namespace log4net.Layout
         /// </remarks>
         public ExceptionLayout()
         {
+			Logger.LogDebug(">>> Entering ExceptionLayout()");
             this.IgnoresException = false;
+			Logger.LogDebug("<<< Exiting ExceptionLayout()");
+			Logger.LogDebug("ExceptionLayout(): this.IgnoresException → {Arg0}", this.IgnoresException);
         }
 
         /// <summary>
@@ -70,7 +74,9 @@ namespace log4net.Layout
         /// </remarks>
         public override void ActivateOptions() 
         {
+			Logger.LogDebug(">>> Entering ActivateOptions()");
             // nothing to do.
+			Logger.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>
@@ -86,12 +92,14 @@ namespace log4net.Layout
         /// </remarks>
         public override void Format(TextWriter writer, LoggingEvent loggingEvent) 
         {
+			Logger.LogDebug(">>> Entering Format(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             if (loggingEvent == null)
             {
                 throw new ArgumentNullException("loggingEvent");
             }
 
             writer.Write(loggingEvent.GetExceptionString());
+			Logger.LogDebug("<<< Exiting Format(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
     }
 }

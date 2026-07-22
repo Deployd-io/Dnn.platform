@@ -16,32 +16,44 @@ namespace Dnn.PersonaBar.Vocabularies.Components
 
     public class VocabulariesController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private TermController termController;
         private VocabularyController vocabularyController;
         private Validator validator;
 
         public VocabulariesController()
         {
+			Logger.LogDebug(">>> Entering VocabulariesController()");
             this.termController = new TermController();
             this.vocabularyController = new VocabularyController();
+			Logger.LogDebug("VocabulariesController(): vocabularyController → {VocabularyController}", vocabularyController);
+			Logger.LogDebug("VocabulariesController(): termController → {TermController}", termController);
             this.validator = new Validator(new DataAnnotationsObjectValidator());
+			Logger.LogDebug("VocabulariesController(): validator → {Validator}", validator);
             this.validator.Validators.Add(new VocabularyNameValidator(this.vocabularyController, this.termController));
+			Logger.LogDebug("<<< Exiting VocabulariesController()");
         }
 
         public List<Vocabulary> GetVocabularies(int portalId, int pageIndex, int pageSize, int scopeTypeId, out int total)
         {
+			Logger.LogDebug(">>> Entering GetVocabularies(portalId={PortalId},pageIndex={PageIndex},pageSize={PageSize},scopeTypeId={ScopeTypeId})", portalId, pageIndex, pageSize, scopeTypeId);
             var vocabularies = this.vocabularyController.GetVocabularies().Where(v => v.ScopeType.ScopeType == "Application" || (v.ScopeType.ScopeType == "Portal" && v.ScopeId == portalId));
             if (scopeTypeId != Null.NullInteger)
+			Logger.LogDebug("GetVocabularies(portalId={PortalId},pageIndex={PageIndex},pageSize={PageSize},scopeTypeId={ScopeTypeId}): vocabularies → {Vocabularies}", portalId, pageIndex, pageSize, scopeTypeId, vocabularies);
             {
                 vocabularies = vocabularies.Where(v => v.ScopeTypeId == scopeTypeId);
             }
 
             total = vocabularies.Count();
+			Logger.LogDebug("GetVocabularies(portalId={PortalId},pageIndex={PageIndex},pageSize={PageSize},scopeTypeId={ScopeTypeId}): total → {Total}", portalId, pageIndex, pageSize, scopeTypeId, total);
+			Logger.LogDebug("<<< Exiting GetVocabularies(portalId={PortalId},pageIndex={PageIndex},pageSize={PageSize},scopeTypeId={ScopeTypeId})", portalId, pageIndex, pageSize, scopeTypeId);
             return vocabularies.Skip(pageIndex * pageSize).Take(pageSize).ToList();
         }
 
         public bool IsSystemVocabulary(int vocabularyId)
         {
+			Logger.LogDebug(">>> Entering IsSystemVocabulary(vocabularyId={VocabularyId})", vocabularyId);
+			Logger.LogDebug("<<< Exiting IsSystemVocabulary(vocabularyId={VocabularyId})", vocabularyId);
             return this.vocabularyController.GetVocabularies().Any(v => v.VocabularyId == vocabularyId && v.IsSystem);
         }
 
@@ -61,6 +73,7 @@ namespace Dnn.PersonaBar.Vocabularies.Components
             {
                 throw new VocabularyNameAlreadyExistsException();
             }
+			Logger.LogDebug("<<< Exiting AddVocabulary(vocabulary={Vocabulary})", vocabulary);
         }
 
         public void UpdateVocabulary(Vocabulary vocabulary)
@@ -88,14 +101,19 @@ namespace Dnn.PersonaBar.Vocabularies.Components
 
         public List<Term> GetTermsByVocabulary(int vocabularyId)
         {
+			Logger.LogDebug(">>> Entering GetTermsByVocabulary(vocabularyId={VocabularyId})", vocabularyId);
             var vocabulary = this.vocabularyController.GetVocabularies().SingleOrDefault(v => v.VocabularyId == vocabularyId);
+			Logger.LogDebug("GetTermsByVocabulary(vocabularyId={VocabularyId}): vocabulary → {Vocabulary}", vocabularyId, vocabulary);
+			Logger.LogDebug("<<< Exiting GetTermsByVocabulary(vocabularyId={VocabularyId})", vocabularyId);
             return this.termController.GetTermsByVocabulary(vocabularyId).ToList();
         }
 
         public int AddTerm(Term term)
         {
+			Logger.LogDebug(">>> Entering AddTerm(term={Term})", term);
             var result = this.validator.ValidateObject(term);
             if (result.IsValid)
+			Logger.LogDebug("AddTerm(term={Term}): result → {Result}", term, result);
             {
                 return this.termController.AddTerm(term);
             }
@@ -103,12 +121,15 @@ namespace Dnn.PersonaBar.Vocabularies.Components
             {
                 throw new TermValidationException();
             }
+			Logger.LogDebug("<<< Exiting AddTerm(term={Term})", term);
         }
 
         public void UpdateTerm(Term term)
         {
+			Logger.LogDebug(">>> Entering UpdateTerm(term={Term})", term);
             var result = this.validator.ValidateObject(term);
             if (result.IsValid)
+			Logger.LogDebug("UpdateTerm(term={Term}): result → {Result}", term, result);
             {
                 this.termController.UpdateTerm(term);
             }
@@ -116,26 +137,33 @@ namespace Dnn.PersonaBar.Vocabularies.Components
             {
                 throw new TermValidationException();
             }
+			Logger.LogDebug("<<< Exiting UpdateTerm(term={Term})", term);
         }
 
         public void DeleteTerm(Term term)
         {
+			Logger.LogDebug(">>> Entering DeleteTerm(term={Term})", term);
             this.termController.DeleteTerm(term);
+			Logger.LogDebug("<<< Exiting DeleteTerm(term={Term})", term);
         }
 
         public Term GetTerm(int termId)
         {
+			Logger.LogDebug(">>> Entering GetTerm(termId={TermId})", termId);
+			Logger.LogDebug("<<< Exiting GetTerm(termId={TermId})", termId);
             return this.termController.GetTerm(termId);
         }
 
         private static void AddChildNodes(List<Term> termList, TermDto parentNode)
         {
+			Logger.LogDebug(">>> Entering AddChildNodes(termList={TermList},parentNode={ParentNode})", termList, parentNode);
             if (parentNode.ChildTerms != null)
             {
                 parentNode.ChildTerms.Clear();
                 var parentId = parentNode.TermId;
                 var terms = termList.Where(v => v.ParentTermId == parentId);
 
+				Logger.LogDebug("AddChildNodes(termList={TermList},parentNode={ParentNode}): terms → {Terms}", termList, parentNode, terms);
                 foreach (var term in terms)
                 {
                     if (term.ParentTermId == parentId)
@@ -154,6 +182,7 @@ namespace Dnn.PersonaBar.Vocabularies.Components
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting AddChildNodes(termList={TermList},parentNode={ParentNode})", termList, parentNode);
         }
     }
 }

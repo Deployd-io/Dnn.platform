@@ -18,6 +18,7 @@ namespace DotNetNuke.UI.WebControls
     [ToolboxData("<{0}:DateTimeEditControl runat=server></{0}:DateTimeEditControl>")]
     public class DateTimeEditControl : DateEditControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private DropDownList ampmField;
         private DropDownList hourField;
         private bool is24HourClock;
@@ -40,14 +41,17 @@ namespace DotNetNuke.UI.WebControls
         /// <inheritdoc />
         public override bool LoadPostData(string postDataKey, NameValueCollection postCollection)
         {
+			Logger.LogDebug(">>> Entering LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             bool dataChanged = false;
             DateTime presentValue = this.OldDateValue;
+			Logger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): dataChanged → {DataChanged}", postDataKey, postCollection, dataChanged);
             string postedDate = postCollection[postDataKey + "date"];
             string postedHours = postCollection[postDataKey + "hours"];
             string postedMinutes = postCollection[postDataKey + "minutes"];
             string postedAMPM = postCollection[postDataKey + "ampm"];
             DateTime postedValue = Null.NullDate;
             if (!string.IsNullOrEmpty(postedDate))
+			Logger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): postedValue → {PostedValue}", postDataKey, postCollection, postedValue);
             {
                 if (!DateTime.TryParse(postedDate, out postedValue))
                 {
@@ -75,27 +79,35 @@ namespace DotNetNuke.UI.WebControls
                 dataChanged = true;
             }
 
+			Logger.LogDebug("<<< Exiting LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             return dataChanged;
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
             if (string.IsNullOrEmpty(CultureInfo.CurrentCulture.DateTimeFormat.AMDesignator))
             {
                 this.is24HourClock = true;
+				Logger.LogDebug("OnInit(e={E}): this.is24HourClock → {Arg1}", e, this.is24HourClock);
             }
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void CreateChildControls()
         {
+			Logger.LogDebug(">>> Entering CreateChildControls()");
             base.CreateChildControls();
             this.Controls.Add(new LiteralControl("<br/>"));
             this.hourField = new DropDownList();
+			Logger.LogDebug("CreateChildControls(): hourField → {HourField}", hourField);
             int maxHour = 12;
             int minHour = 1;
+			Logger.LogDebug("CreateChildControls(): maxHour → {MaxHour}", maxHour);
+			Logger.LogDebug("CreateChildControls(): minHour → {MinHour}", minHour);
             if (this.is24HourClock)
             {
                 minHour = 0;
@@ -112,6 +124,7 @@ namespace DotNetNuke.UI.WebControls
             this.Controls.Add(this.hourField);
             this.Controls.Add(new LiteralControl("&nbsp"));
             this.minutesField = new DropDownList();
+			Logger.LogDebug("CreateChildControls(): minutesField → {MinutesField}", minutesField);
             for (int i = 0; i <= 59; i++)
             {
                 this.minutesField.Items.Add(new ListItem(i.ToString("00", CultureInfo.CurrentCulture), i.ToString(CultureInfo.InvariantCulture)));
@@ -124,22 +137,27 @@ namespace DotNetNuke.UI.WebControls
             {
                 this.Controls.Add(new LiteralControl("&nbsp"));
                 this.ampmField = new DropDownList();
+				Logger.LogDebug("CreateChildControls(): ampmField → {AmpmField}", ampmField);
                 this.ampmField.Items.Add(new ListItem("AM", "AM"));
                 this.ampmField.Items.Add(new ListItem("PM", "PM"));
                 this.ampmField.ControlStyle.CopyFrom(this.ControlStyle);
                 this.ampmField.ID = this.ID + "ampm";
                 this.Controls.Add(this.ampmField);
             }
+			Logger.LogDebug("<<< Exiting CreateChildControls()");
         }
 
         /// <inheritdoc />
         protected override void LoadDateControls()
         {
+			Logger.LogDebug(">>> Entering LoadDateControls()");
             base.LoadDateControls();
             int hour = this.DateValue.Hour;
             int minute = this.DateValue.Minute;
+			Logger.LogDebug("LoadDateControls(): hour → {Hour}", hour);
             bool isAM = true;
             if (!this.is24HourClock)
+			Logger.LogDebug("LoadDateControls(): isAM → {IsAM}", isAM);
             {
                 if (hour >= 12)
                 {
@@ -167,6 +185,7 @@ namespace DotNetNuke.UI.WebControls
                     this.ampmField.SelectedIndex = 1;
                 }
             }
+			Logger.LogDebug("<<< Exiting LoadDateControls()");
         }
     }
 }

@@ -17,6 +17,7 @@ using System.Collections.Generic;
 [Serializable]
 public abstract class GenericCollectionBase<TElement> : CollectionBase, IList<TElement>
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public bool IsReadOnly => this.InnerList.IsReadOnly;
 
@@ -39,12 +40,14 @@ public abstract class GenericCollectionBase<TElement> : CollectionBase, IList<TE
     /// <inheritdoc />
     public bool Remove(TElement item)
     {
+		Logger.LogDebug(">>> Entering Remove(item={Item})", item);
         if (!this.Contains(item))
         {
             return false;
         }
 
         this.InnerList.Remove(item);
+		Logger.LogDebug("<<< Exiting Remove(item={Item})", item);
         return true;
     }
 
@@ -68,12 +71,15 @@ public abstract class GenericCollectionBase<TElement> : CollectionBase, IList<TE
 
     private class GenericEnumerator(IEnumerator enumerator) : IEnumerator<TElement>
     {
+		Logger.LogDebug(">>> Entering GenericEnumerator(enumerator={Enumerator})", enumerator);
         /// <inheritdoc />
         public TElement Current => (TElement)enumerator.Current;
 
+		Logger.LogDebug("GenericEnumerator(enumerator={Enumerator}): Current → {Current}", enumerator, Current);
         /// <inheritdoc />
         object IEnumerator.Current => this.Current;
 
+		Logger.LogDebug("<<< Exiting GenericEnumerator(enumerator={Enumerator})", enumerator);
         /// <inheritdoc />
         public void Dispose() => (enumerator as IDisposable)?.Dispose();
 

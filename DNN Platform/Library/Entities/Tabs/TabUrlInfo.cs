@@ -10,10 +10,14 @@ namespace DotNetNuke.Entities.Tabs
     [Serializable] // 584 support sql session state
     public class TabUrlInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="TabUrlInfo"/> class.</summary>
         public TabUrlInfo()
         {
+			Logger.LogDebug(">>> Entering TabUrlInfo()");
             this.PortalAliasUsage = PortalAliasUsageType.Default;
+			Logger.LogDebug("<<< Exiting TabUrlInfo()");
+			Logger.LogDebug("TabUrlInfo(): this.PortalAliasUsage → {Arg0}", this.PortalAliasUsage);
         }
 
         public string CultureCode { get; set; }

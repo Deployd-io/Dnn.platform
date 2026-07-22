@@ -11,6 +11,7 @@ namespace DotNetNuke.UI.WebControls
     /// </summary>
     public class PropertyEditorEventArgs : EventArgs
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyEditorEventArgs"/> class.
         /// Constructs a new PropertyEditorEventArgs.
@@ -19,6 +20,10 @@ namespace DotNetNuke.UI.WebControls
         public PropertyEditorEventArgs(string name)
             : this(name, null, null)
         {
+		Logger.LogDebug(">>> Entering PropertyEditorEventArgs(name={Name})", name);
+		Logger.LogDebug("<<< Exiting PropertyEditorEventArgs(name={Name})", name);
+		Logger.LogDebug(">>> Entering PropertyEditorEventArgs(name={Name},newValue={NewValue},oldValue={OldValue})", name, newValue, oldValue);
+		Logger.LogDebug("<<< Exiting PropertyEditorEventArgs(name={Name},newValue={NewValue},oldValue={OldValue})", name, newValue, oldValue);
         }
 
         /// <summary>
@@ -32,7 +37,10 @@ namespace DotNetNuke.UI.WebControls
         {
             this.Name = name;
             this.Value = newValue;
+			Logger.LogDebug("PropertyEditorEventArgs(name={Name},newValue={NewValue},oldValue={OldValue}): this.Name → {Arg3}", name, newValue, oldValue, this.Name);
+			Logger.LogDebug("PropertyEditorEventArgs(name={Name},newValue={NewValue},oldValue={OldValue}): this.Value → {Arg3}", name, newValue, oldValue, this.Value);
             this.OldValue = oldValue;
+			Logger.LogDebug("PropertyEditorEventArgs(name={Name},newValue={NewValue},oldValue={OldValue}): this.OldValue → {Arg3}", name, newValue, oldValue, this.OldValue);
         }
 
         /// <summary>Gets or sets a value indicating whether the proeprty has changed.</summary>

@@ -29,6 +29,7 @@ using log4net.Core;
 
 namespace log4net.Appender
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Abstract base class implementation of <see cref="IAppender"/>. 
     /// </summary>
@@ -55,7 +56,10 @@ namespace log4net.Appender
         /// </remarks>
         protected AppenderSkeleton()
         {
+			Logger.LogDebug(">>> Entering AppenderSkeleton()");
             this.m_errorHandler = new OnlyOnceErrorHandler(this.GetType().Name);
+			Logger.LogDebug("<<< Exiting AppenderSkeleton()");
+			Logger.LogDebug("AppenderSkeleton(): m_errorHandler → {M_errorHandler}", m_errorHandler);
         }
 
         /// <summary>
@@ -182,6 +186,8 @@ namespace log4net.Appender
         /// </remarks>
         public virtual void ActivateOptions() 
         {
+		Logger.LogDebug(">>> Entering ActivateOptions()");
+		Logger.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>
@@ -218,6 +224,7 @@ namespace log4net.Appender
         /// </remarks>
         public void Close()
         {
+			Logger.LogDebug(">>> Entering Close()");
             // This lock prevents the appender being closed while it is still appending
             lock(this)
             {
@@ -225,8 +232,10 @@ namespace log4net.Appender
                 {
                     this.OnClose();
                     this.m_closed = true;
+					Logger.LogDebug("Close(): this.m_closed → {Arg0}", this.m_closed);
                 }
             }
+			Logger.LogDebug("<<< Exiting Close()");
         }
 
         /// <summary>
@@ -272,6 +281,7 @@ namespace log4net.Appender
         /// </remarks>
         public void DoAppend(LoggingEvent loggingEvent) 
         {
+			Logger.LogDebug(">>> Entering DoAppend(loggingEvent={LoggingEvent})", loggingEvent);
             // This lock is absolutely critical for correct formatting
             // of the message in a multi-threaded environment.  Without
             // this, the message may be broken up into elements from
@@ -294,6 +304,7 @@ namespace log4net.Appender
                 try
                 {
                     this.m_recursiveGuard = true;
+					Logger.LogDebug("DoAppend(loggingEvent={LoggingEvent}): this.m_recursiveGuard → {Arg1}", loggingEvent, this.m_recursiveGuard);
 
                     if (this.FilterEvent(loggingEvent) && this.PreAppendCheck())
                     {
@@ -302,6 +313,7 @@ namespace log4net.Appender
                 }
                 catch(Exception ex)
                 {
+					Logger.LogError("Exception in DoAppend(loggingEvent={LoggingEvent}): {Arg1}", loggingEvent, ex.Message);
                     this.ErrorHandler.Error("Failed in DoAppend", ex);
                 }
 #if !MONO && !NET_2_0 && !NETSTANDARD
@@ -320,6 +332,7 @@ namespace log4net.Appender
                     this.m_recursiveGuard = false;
                 }
             }
+			Logger.LogDebug("<<< Exiting DoAppend(loggingEvent={LoggingEvent})", loggingEvent);
         }
 
         /// <summary>
@@ -365,6 +378,7 @@ namespace log4net.Appender
         /// </remarks>
         public void DoAppend(LoggingEvent[] loggingEvents) 
         {
+			Logger.LogDebug(">>> Entering DoAppend(loggingEvents={LoggingEvents})", loggingEvents);
             // This lock is absolutely critical for correct formatting
             // of the message in a multi-threaded environment.  Without
             // this, the message may be broken up into elements from
@@ -387,9 +401,11 @@ namespace log4net.Appender
                 try
                 {
                     this.m_recursiveGuard = true;
+					Logger.LogDebug("DoAppend(loggingEvents={LoggingEvents}): this.m_recursiveGuard → {Arg1}", loggingEvents, this.m_recursiveGuard);
 
                     ArrayList filteredEvents = new ArrayList(loggingEvents.Length);
 
+					Logger.LogDebug("DoAppend(loggingEvents={LoggingEvents}): filteredEvents → {FilteredEvents}", loggingEvents, filteredEvents);
                     foreach(LoggingEvent loggingEvent in loggingEvents)
                     {
                         if (this.FilterEvent(loggingEvent))
@@ -405,6 +421,7 @@ namespace log4net.Appender
                 }
                 catch(Exception ex)
                 {
+					Logger.LogError("Exception in DoAppend(loggingEvents={LoggingEvents}): {Arg1}", loggingEvents, ex.Message);
                     this.ErrorHandler.Error("Failed in Bulk DoAppend", ex);
                 }
 #if !MONO && !NET_2_0 && !NETSTANDARD
@@ -458,6 +475,7 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual bool FilterEvent(LoggingEvent loggingEvent)
         {
+			Logger.LogDebug(">>> Entering FilterEvent(loggingEvent={LoggingEvent})", loggingEvent);
             if (!this.IsAsSevereAsThreshold(loggingEvent.Level)) 
             {
                 return false;
@@ -465,6 +483,7 @@ namespace log4net.Appender
 
             IFilter f = this.FilterHead;
 
+			Logger.LogDebug("FilterEvent(loggingEvent={LoggingEvent}): f → {F}", loggingEvent, f);
             while(f != null) 
             {
                 switch(f.Decide(loggingEvent)) 
@@ -482,6 +501,7 @@ namespace log4net.Appender
                 }
             }
 
+			Logger.LogDebug("<<< Exiting FilterEvent(loggingEvent={LoggingEvent})", loggingEvent);
             return true;
         }
 
@@ -500,6 +520,7 @@ namespace log4net.Appender
         /// </remarks>
         public virtual void AddFilter(IFilter filter)
         {
+			Logger.LogDebug(">>> Entering AddFilter(filter={Filter})", filter);
             if (filter == null)
             {
                 throw new ArgumentNullException("filter param must not be null");
@@ -508,12 +529,17 @@ namespace log4net.Appender
             if (this.m_headFilter == null) 
             {
                 this.m_headFilter = this.m_tailFilter = filter;
+				Logger.LogDebug("AddFilter(filter={Filter}): m_headFilter → {M_headFilter}", filter, m_headFilter);
+				Logger.LogDebug("AddFilter(filter={Filter}): this.m_headFilter → {Arg1}", filter, this.m_headFilter);
             } 
             else 
             {
                 this.m_tailFilter.Next = filter;
                 this.m_tailFilter = filter;	
+				Logger.LogDebug("AddFilter(filter={Filter}): m_tailFilter → {M_tailFilter}", filter, m_tailFilter);
+				Logger.LogDebug("AddFilter(filter={Filter}): this.m_tailFilter → {Arg1}", filter, this.m_tailFilter);
             }
+			Logger.LogDebug("<<< Exiting AddFilter(filter={Filter})", filter);
         }
 
         /// <summary>
@@ -526,7 +552,11 @@ namespace log4net.Appender
         /// </remarks>
         public virtual void ClearFilters()
         {
+			Logger.LogDebug(">>> Entering ClearFilters()");
             this.m_headFilter = this.m_tailFilter = null;
+			Logger.LogDebug("<<< Exiting ClearFilters()");
+			Logger.LogDebug("ClearFilters(): m_headFilter → {M_headFilter}", m_headFilter);
+			Logger.LogDebug("ClearFilters(): this.m_headFilter → {Arg0}", this.m_headFilter);
         }
 
         /// <summary>
@@ -544,6 +574,8 @@ namespace log4net.Appender
         /// </returns>
         protected virtual bool IsAsSevereAsThreshold(Level level) 
         {
+			Logger.LogDebug(">>> Entering IsAsSevereAsThreshold(level={Level})", level);
+			Logger.LogDebug("<<< Exiting IsAsSevereAsThreshold(level={Level})", level);
             return ((this.m_threshold == null) || level >= this.m_threshold);
         }
 
@@ -562,7 +594,9 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual void OnClose() 
         {
+			Logger.LogDebug(">>> Entering OnClose()");
             // Do nothing by default
+			Logger.LogDebug("<<< Exiting OnClose()");
         }
 
         /// <summary>
@@ -601,6 +635,7 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual void Append(LoggingEvent[] loggingEvents)
         {
+			Logger.LogDebug(">>> Entering Append(loggingEvents={LoggingEvents})", loggingEvents);
             foreach(LoggingEvent loggingEvent in loggingEvents)
             {
                 this.Append(loggingEvent);
@@ -627,12 +662,14 @@ namespace log4net.Appender
         /// <returns><c>true</c> if the call to <see cref="M:Append(LoggingEvent)"/> should proceed.</returns>
         protected virtual bool PreAppendCheck()
         {
+			Logger.LogDebug(">>> Entering PreAppendCheck()");
             if ((this.m_layout == null) && this.RequiresLayout)
             {
                 this.ErrorHandler.Error("AppenderSkeleton: No layout set for the appender named ["+ this.m_name+"].");
                 return false;
             }
 
+			Logger.LogDebug("<<< Exiting PreAppendCheck()");
             return true;
         }
 
@@ -662,10 +699,12 @@ namespace log4net.Appender
         /// </remarks>
         protected string RenderLoggingEvent(LoggingEvent loggingEvent)
         {
+			Logger.LogDebug(">>> Entering RenderLoggingEvent(loggingEvent={LoggingEvent})", loggingEvent);
             // Create the render writer on first use
             if (this.m_renderWriter == null)
             {
                 this.m_renderWriter = new ReusableStringWriter(System.Globalization.CultureInfo.InvariantCulture);
+				Logger.LogDebug("RenderLoggingEvent(loggingEvent={LoggingEvent}): m_renderWriter → {M_renderWriter}", loggingEvent, m_renderWriter);
             }
 
             lock (this.m_renderWriter)
@@ -674,6 +713,7 @@ namespace log4net.Appender
                 this.m_renderWriter.Reset(c_renderBufferMaxCapacity, c_renderBufferSize);
 
                 this.RenderLoggingEvent(this.m_renderWriter, loggingEvent);
+				Logger.LogDebug("<<< Exiting RenderLoggingEvent(loggingEvent={LoggingEvent})", loggingEvent);
                 return this.m_renderWriter.ToString();
             }
         }
@@ -760,6 +800,8 @@ namespace log4net.Appender
             /// <returns><c>True</c> if all logging events were flushed successfully, else <c>false</c>.</returns>
             public virtual bool Flush(int millisecondsTimeout)
             {
+			Logger.LogDebug(">>> Entering Flush(millisecondsTimeout={MillisecondsTimeout})", millisecondsTimeout);
+			Logger.LogDebug("<<< Exiting Flush(millisecondsTimeout={MillisecondsTimeout})", millisecondsTimeout);
             return true;
             }
 

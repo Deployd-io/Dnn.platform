@@ -36,9 +36,12 @@ namespace log4net.Layout
     /// <author>Gert Driesen</author>
     public class RawTimeStampLayout : IRawLayout
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Constructs a RawTimeStampLayout</summary>
         public RawTimeStampLayout()
         {
+		Logger.LogDebug(">>> Entering RawTimeStampLayout()");
+		Logger.LogDebug("<<< Exiting RawTimeStampLayout()");
         }
 
         /// <summary>Gets the <see cref="LoggingEvent.TimeStamp"/> as a <see cref="DateTime"/>.</summary>
@@ -55,6 +58,8 @@ namespace log4net.Layout
         /// </remarks>
         public virtual object Format(LoggingEvent loggingEvent)
         {
+			Logger.LogDebug(">>> Entering Format(loggingEvent={LoggingEvent})", loggingEvent);
+			Logger.LogDebug("<<< Exiting Format(loggingEvent={LoggingEvent})", loggingEvent);
             return loggingEvent.TimeStamp;
         }
     }

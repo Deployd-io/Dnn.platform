@@ -16,11 +16,16 @@ namespace DotNetNuke.Entities.Profile
     [Serializable]
     public class ProfileVisibility
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ProfileVisibility"/> class.</summary>
         public ProfileVisibility()
         {
+			Logger.LogDebug(">>> Entering ProfileVisibility()");
             this.RoleVisibilities = new List<RoleInfo>();
             this.RelationshipVisibilities = new List<Relationship>();
+			Logger.LogDebug("ProfileVisibility(): RelationshipVisibilities → {RelationshipVisibilities}", RelationshipVisibilities);
+			Logger.LogDebug("ProfileVisibility(): RoleVisibilities → {RoleVisibilities}", RoleVisibilities);
+			Logger.LogDebug("<<< Exiting ProfileVisibility()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ProfileVisibility"/> class.</summary>
@@ -33,15 +38,20 @@ namespace DotNetNuke.Entities.Profile
             {
                 var relationshipController = new RelationshipController();
 
+				Logger.LogDebug("ProfileVisibility(portalId={PortalId},extendedVisibility={ExtendedVisibility}): relationshipController → {RelationshipController}", portalId, extendedVisibility, relationshipController);
                 var lists = extendedVisibility.Split(';');
 
+				Logger.LogDebug("ProfileVisibility(portalId={PortalId},extendedVisibility={ExtendedVisibility}): lists → {Lists}", portalId, extendedVisibility, lists);
                 if (!string.IsNullOrEmpty(lists[0].Substring(2).TrimEnd(',')))
                 {
                     var roles = lists[0].Substring(2).TrimEnd(',').Split(',');
                     foreach (var role in roles)
                     {
+					Logger.LogDebug("ProfileVisibility(portalId={PortalId},extendedVisibility={ExtendedVisibility}): roles → {Roles}", portalId, extendedVisibility, roles);
                         int roleId = int.Parse(role, CultureInfo.InvariantCulture);
                         RoleInfo userRole = RoleController.Instance.GetRole(portalId, r => r.RoleID == roleId);
+						Logger.LogDebug("ProfileVisibility(portalId={PortalId},extendedVisibility={ExtendedVisibility}): roleId → {RoleId}", portalId, extendedVisibility, roleId);
+						Logger.LogDebug("ProfileVisibility(portalId={PortalId},extendedVisibility={ExtendedVisibility}): userRole → {UserRole}", portalId, extendedVisibility, userRole);
                         this.RoleVisibilities.Add(userRole);
                     }
                 }
@@ -51,8 +61,10 @@ namespace DotNetNuke.Entities.Profile
                     var relationships = lists[1].Substring(2).TrimEnd(',').Split(',');
                     foreach (var relationship in relationships)
                     {
+					Logger.LogDebug("ProfileVisibility(portalId={PortalId},extendedVisibility={ExtendedVisibility}): relationships → {Relationships}", portalId, extendedVisibility, relationships);
                         Relationship userRelationship = RelationshipController.Instance.GetRelationship(int.Parse(relationship, CultureInfo.InvariantCulture));
                         this.RelationshipVisibilities.Add(userRelationship);
+						Logger.LogDebug("ProfileVisibility(portalId={PortalId},extendedVisibility={ExtendedVisibility}): userRelationship → {UserRelationship}", portalId, extendedVisibility, userRelationship);
                     }
                 }
             }
@@ -66,21 +78,25 @@ namespace DotNetNuke.Entities.Profile
 
         public ProfileVisibility Clone()
         {
+			Logger.LogDebug(">>> Entering Clone()");
             var pv = new ProfileVisibility()
             {
                 VisibilityMode = this.VisibilityMode,
                 RoleVisibilities = new List<RoleInfo>(this.RoleVisibilities),
                 RelationshipVisibilities = new List<Relationship>(this.RelationshipVisibilities),
             };
+			Logger.LogDebug("<<< Exiting Clone()");
             return pv;
         }
 
         public string ExtendedVisibilityString()
         {
+			Logger.LogDebug(">>> Entering ExtendedVisibilityString()");
             if (this.VisibilityMode == UserVisibilityMode.FriendsAndGroups)
             {
                 var sb = new StringBuilder();
                 sb.Append("G:");
+				Logger.LogDebug("ExtendedVisibilityString(): sb → {Sb}", sb);
                 foreach (var role in this.RoleVisibilities)
                 {
                     sb.Append(role.RoleID.ToString(CultureInfo.InvariantCulture) + ",");
@@ -95,6 +111,7 @@ namespace DotNetNuke.Entities.Profile
                 return sb.ToString();
             }
 
+			Logger.LogDebug("<<< Exiting ExtendedVisibilityString()");
             return string.Empty;
         }
     }
