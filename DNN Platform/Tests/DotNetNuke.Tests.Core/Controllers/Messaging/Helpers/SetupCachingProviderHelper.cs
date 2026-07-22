@@ -12,8 +12,10 @@ namespace DotNetNuke.Tests.Core.Controllers.Messaging.Helpers
 
     public class SetupCachingProviderHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static void SetupCachingProvider(Mock<CachingProvider> mockCachingProvider)
         {
+			Logger.LogDebug(">>> Entering SetupCachingProvider(mockCachingProvider={MockCachingProvider})", mockCachingProvider);
             mockCachingProvider.Setup(c => c.GetItem(It.IsAny<string>()))
                 .Returns<string>(key =>
                 {
@@ -21,11 +23,13 @@ namespace DotNetNuke.Tests.Core.Controllers.Messaging.Helpers
                     {
                         var portals = new List<PortalInfo> { new PortalInfo() { PortalID = 0 } };
 
+						Logger.LogDebug("SetupCachingProvider(mockCachingProvider={MockCachingProvider}): portals → {Portals}", mockCachingProvider, portals);
                         return portals;
                     }
 
                     return key.Contains("PortalGroups") ? new List<PortalGroupInfo>() : null;
                 });
+				Logger.LogDebug("<<< Exiting SetupCachingProvider(mockCachingProvider={MockCachingProvider})", mockCachingProvider);
         }
     }
 }

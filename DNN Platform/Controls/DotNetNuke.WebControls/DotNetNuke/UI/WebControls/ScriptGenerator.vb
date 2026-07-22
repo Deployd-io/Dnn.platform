@@ -1,5 +1,6 @@
 ﻿' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports Microsoft.VisualBasic
 Imports Microsoft.VisualBasic.CompilerServices
@@ -13,11 +14,13 @@ Namespace DotNetNuke.UI.WebControls
     Public Class ScriptGenerator
         ' Methods
         Public Shared Function GetMarshalledProperties(ByVal instance As Object) As Hashtable
+			Logger.LogDebug(">>> Entering GetMarshalledProperties(instance={Instance})", instance)
             Return ScriptGenerator.GetMarshalledProperties(instance, New Hashtable)
         End Function
 
         Public Shared Function GetMarshalledProperties(ByVal instance As Object, ByVal properties As Hashtable) As Hashtable
             Dim objA As ClientEventAttribute = Nothing
+			Logger.LogDebug("<<< Exiting GetMarshalledProperties(instance={Instance})", instance)
             Dim attribute2 As ClientPropertyNameAttribute = Nothing
             Dim attribute3 As ClientPropertyAttribute = Nothing
             Dim enumerator As IEnumerator = Nothing
@@ -26,21 +29,27 @@ Namespace DotNetNuke.UI.WebControls
             Dim descriptors As PropertyDescriptorCollection = TypeDescriptor.GetProperties(instance)
             Try 
                 enumerator = descriptors.GetEnumerator
+				Logger.LogDebug("GetMarshalledProperties(instance={Instance},properties={Properties}): enumerator → {Enumerator}", instance, properties, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
                     End If
                     Dim current As PropertyDescriptor = DirectCast(enumerator.Current, PropertyDescriptor)
                     attribute3 = TryCast(current.Attributes(GetType(ClientPropertyAttribute)),ClientPropertyAttribute)
+					Logger.LogDebug("GetMarshalledProperties(instance={Instance},properties={Properties}): attribute3 → {Attribute3}", instance, properties, attribute3)
                     Dim flag As Boolean = True
                     If Object.ReferenceEquals(attribute3, Nothing) Then
                         objA = TryCast(current.Attributes(GetType(ClientEventAttribute)),ClientEventAttribute)
+						Logger.LogDebug("GetMarshalledProperties(instance={Instance},properties={Properties}): objA → {ObjA}", instance, properties, objA)
                         If Object.ReferenceEquals(objA, Nothing) Then
                             flag = False
+							Logger.LogDebug("GetMarshalledProperties(instance={Instance},properties={Properties}): flag → {Flag}", instance, properties, flag)
                         End If
                     End If
                     If flag Then
                         key = current.Name
+						Logger.LogWarning("GetMarshalledProperties(instance={Instance},properties={Properties}): key → {Key}", instance, properties, key)
+						Logger.LogDebug("GetMarshalledProperties(instance={Instance},properties={Properties}): attribute2 → {Attribute2}", instance, properties, attribute2)
                         attribute2 = TryCast(current.Attributes(GetType(ClientPropertyNameAttribute)),ClientPropertyNameAttribute)
                         If Not Object.ReferenceEquals(attribute2, Nothing) Then
                             key = attribute2.Name
@@ -54,12 +63,14 @@ Namespace DotNetNuke.UI.WebControls
                                 Dim color1 As Color
                                 If (Not obj2 Is Nothing) Then
                                     color1 = DirectCast(obj2, Color)
+									Logger.LogDebug("GetMarshalledProperties(instance={Instance},properties={Properties}): color1 → {Color1}", instance, properties, color1)
                                 Else
                                     Dim color As Color
                                     Dim local1 As Object = obj2
                                     color1 = color
                                 End If
                                 obj2 = ColorTranslator.ToHtml(color1)
+								Logger.LogDebug("GetMarshalledProperties(instance={Instance},properties={Properties}): obj2 → {Obj2}", instance, properties, obj2)
                             End If
                             If Object.ReferenceEquals(current.PropertyType, GetType(Boolean)) Then
                                 obj2 = If(Not Conversions.ToBoolean(obj2), "0", "1")
@@ -90,9 +101,11 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Public Shared Function GetMarshalledPropertyJSON(ByVal instance As Object) As String
+			Logger.LogDebug(">>> Entering GetMarshalledPropertyJSON(instance={Instance})", instance)
             Dim properties As New Hashtable
             Return ScriptGenerator.GetMarshalledPropertyJSON(instance, properties)
         End Function
+		Logger.LogDebug("<<< Exiting GetMarshalledPropertyJSON(instance={Instance})", instance)
 
         Public Shared Function GetMarshalledPropertyJSON(ByVal instance As Object, ByVal properties As Hashtable) As String
             Return WebControls.ToJSON(ScriptGenerator.GetMarshalledProperties(instance, properties))

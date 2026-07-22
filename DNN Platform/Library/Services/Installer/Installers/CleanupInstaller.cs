@@ -36,6 +36,8 @@ namespace DotNetNuke.Services.Installer.Installers
                 Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>(),
                 Globals.GetCurrentServiceProvider().GetRequiredService<IFileSystemUtils>())
         {
+		Logger.LogDebug(">>> Entering CleanupInstaller()");
+		Logger.LogDebug("<<< Exiting CleanupInstaller()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="CleanupInstaller"/> class.</summary>
@@ -62,18 +64,22 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <inheritdoc />
         public override void Commit()
         {
+			Logger.LogDebug(">>> Entering Commit()");
             // Do nothing
             base.Commit();
+			Logger.LogDebug("<<< Exiting Commit()");
         }
 
         /// <remarks>The Install method cleans up the files.</remarks>
         /// <inheritdoc />
         public override void Install()
         {
+			Logger.LogDebug(">>> Entering Install()");
             try
             {
                 bool bSuccess = true;
                 if (string.IsNullOrEmpty(this.fileName) && string.IsNullOrEmpty(this.glob))
+				Logger.LogDebug("Install(): bSuccess → {BSuccess}", bSuccess);
                 {
                     // No attribute: use the xml files definition.
                     foreach (InstallFile file in this.Files)
@@ -102,16 +108,19 @@ namespace DotNetNuke.Services.Installer.Installers
                 }
 
                 this.Completed = bSuccess;
+				Logger.LogDebug("Install(): this.Completed → {Arg0}", this.Completed);
             }
             catch (Exception ex)
             {
                 this.Log.AddFailure(Util.EXCEPTION + " - " + ex.Message);
             }
+			Logger.LogDebug("<<< Exiting Install()");
         }
 
         /// <inheritdoc />
         public override void ReadManifest(XPathNavigator manifestNav)
         {
+			Logger.LogDebug(">>> Entering ReadManifest(manifestNav={ManifestNav})", manifestNav);
             this.fileName = Util.ReadAttribute(manifestNav, "fileName");
             this.glob = Util.ReadAttribute(manifestNav, "glob");
 
@@ -121,19 +130,24 @@ namespace DotNetNuke.Services.Installer.Installers
             }
 
             base.ReadManifest(manifestNav);
+			Logger.LogDebug("<<< Exiting ReadManifest(manifestNav={ManifestNav})", manifestNav);
         }
 
         /// <remarks>There is no uninstall for this component.</remarks>
         /// <inheritdoc />
         public override void UnInstall()
         {
+		Logger.LogDebug(">>> Entering UnInstall()");
+		Logger.LogDebug("<<< Exiting UnInstall()");
         }
 
         /// <summary>Adds a folder path to the list.</summary>
         /// <param name="path">The folder path.</param>
         internal void ProcessFolder(string path)
         {
+			Logger.LogDebug(">>> Entering ProcessFolder(path={Path})", path);
             this.Folders.Add(path);
+			Logger.LogDebug("<<< Exiting ProcessFolder(path={Path})", path);
         }
 
         /// <summary>Validates a folder path for cleanup.</summary>
@@ -142,8 +156,10 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <returns>Whether or not the folder path is valid.</returns>
         internal bool IsValidFolderPath(string path, out string validPath)
         {
+			Logger.LogDebug(">>> Entering IsValidFolderPath(path={Path})", path);
             validPath = null;
 
+			Logger.LogDebug("IsValidFolderPath(path={Path}): validPath → {ValidPath}", path, validPath);
             if (string.IsNullOrWhiteSpace(path))
             {
                 return false;
@@ -166,9 +182,11 @@ namespace DotNetNuke.Services.Installer.Installers
 
             path = path.Trim();
 
+			Logger.LogDebug("IsValidFolderPath(path={Path}): path → {Path1}", path, path);
             // normalize slashes
             var appPath = Path.GetFullPath(this.applicationStatusInfo.ApplicationMapPath);
 
+			Logger.LogDebug("IsValidFolderPath(path={Path}): appPath → {AppPath}", path, appPath);
             // ensure trailing slash
             appPath = appPath.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
 
@@ -178,6 +196,7 @@ namespace DotNetNuke.Services.Installer.Installers
             }
             catch
             {
+				Logger.LogError("Exception in IsValidFolderPath(path={Path}): {Arg1}", path, ex.Message);
                 return false; // no malformed paths
             }
 
@@ -190,6 +209,7 @@ namespace DotNetNuke.Services.Installer.Installers
                 return false; // not the app root or paths outside the app root
             }
 
+			Logger.LogDebug("<<< Exiting IsValidFolderPath(path={Path})", path);
             return true;
         }
 
@@ -198,6 +218,7 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <returns><see langword="true"/> if the file was deleted, otherwise <see langword="false"/>.</returns>
         protected bool CleanupFile(InstallFile insFile)
         {
+			Logger.LogDebug(">>> Entering CleanupFile(insFile={InsFile})", insFile);
             try
             {
                 // Backup File
@@ -214,6 +235,7 @@ namespace DotNetNuke.Services.Installer.Installers
             {
                 Logger.Error(exc);
 
+				Logger.LogDebug("<<< Exiting CleanupFile(insFile={InsFile})", insFile);
                 return false;
             }
         }
@@ -222,6 +244,7 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <param name="path">The root folder path.</param>
         protected virtual void CleanupFolder(string path)
         {
+			Logger.LogDebug(">>> Entering CleanupFolder(path={Path})", path);
             try
             {
                 if (this.IsValidFolderPath(path, out string validPath))
@@ -237,6 +260,7 @@ namespace DotNetNuke.Services.Installer.Installers
             {
                 Logger.Error(ex);
             }
+			Logger.LogDebug("<<< Exiting CleanupFolder(path={Path})", path);
         }
 
         /// <summary>The ProcessFile method determines what to do with parsed "file" node.</summary>
@@ -244,46 +268,57 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <param name="nav">The XPathNavigator representing the node.</param>
         protected override void ProcessFile(InstallFile file, XPathNavigator nav)
         {
+			Logger.LogDebug(">>> Entering ProcessFile(file={File},nav={Nav})", file, nav);
             if (file != null)
             {
                 this.Files.Add(file);
             }
+			Logger.LogDebug("<<< Exiting ProcessFile(file={File},nav={Nav})", file, nav);
         }
 
         /// <summary>Determines what to do with the parsed "folder" node.</summary>
         /// <param name="nav">The XPathNavigator representing the node.</param>
         protected virtual void ProcessFolder(XPathNavigator nav)
         {
+			Logger.LogDebug(">>> Entering ProcessFolder(nav={Nav})", nav);
             var pathNav = nav.SelectSingleNode("path");
 
+			Logger.LogDebug("ProcessFolder(nav={Nav}): pathNav → {PathNav}", nav, pathNav);
             if (pathNav != null)
             {
                 this.ProcessFolder(pathNav.Value);
             }
+			Logger.LogDebug("<<< Exiting ProcessFolder(nav={Nav})", nav);
         }
 
         /// <inheritdoc />
         protected override InstallFile ReadManifestItem(XPathNavigator nav, bool checkFileExists)
         {
+			Logger.LogDebug(">>> Entering ReadManifestItem(nav={Nav},checkFileExists={CheckFileExists})", nav, checkFileExists);
+			Logger.LogDebug("<<< Exiting ReadManifestItem(nav={Nav},checkFileExists={CheckFileExists})", nav, checkFileExists);
             return base.ReadManifestItem(nav, false);
         }
 
         /// <inheritdoc />
         protected override void RollbackFile(InstallFile installFile)
         {
+			Logger.LogDebug(">>> Entering RollbackFile(installFile={InstallFile})", installFile);
             if (File.Exists(installFile.BackupFileName))
             {
                 Util.RestoreFile(installFile, this.PhysicalBasePath, this.Log);
             }
+			Logger.LogDebug("<<< Exiting RollbackFile(installFile={InstallFile})", installFile);
         }
 
         private bool ProcessCleanupFile()
         {
+			Logger.LogDebug(">>> Entering ProcessCleanupFile()");
             this.Log.AddInfo(string.Format(CultureInfo.InvariantCulture, Util.CLEANUP_Processing, this.Version.ToString(3)));
             try
             {
                 var strListFile = Path.Combine(this.Package.InstallerInfo.TempInstallFolder, this.fileName);
                 if (File.Exists(strListFile))
+				Logger.LogDebug("ProcessCleanupFile(): strListFile → {StrListFile}", strListFile);
                 {
                     FileSystemUtils.DeleteFiles(File.ReadAllLines(strListFile));
                 }
@@ -297,11 +332,13 @@ namespace DotNetNuke.Services.Installer.Installers
             }
 
             this.Log.AddInfo(string.Format(CultureInfo.InvariantCulture, Util.CLEANUP_ProcessComplete, this.Version.ToString(3)));
+			Logger.LogDebug("<<< Exiting ProcessCleanupFile()");
             return true;
         }
 
         private bool ProcessGlob()
         {
+			Logger.LogDebug(">>> Entering ProcessGlob()");
             this.Log.AddInfo(string.Format(CultureInfo.InvariantCulture, Util.CLEANUP_Processing, this.Version.ToString(3)));
             try
             {
@@ -313,8 +350,10 @@ namespace DotNetNuke.Services.Installer.Installers
                 {
                     var globs = new Matcher(StringComparison.InvariantCultureIgnoreCase);
                     globs.AddIncludePatterns(this.glob.Split(';'));
+					Logger.LogDebug("ProcessGlob(): globs → {Globs}", globs);
                     var files = globs.GetResultsInFullPath(Globals.ApplicationMapPath).ToArray();
                     FileSystemUtils.DeleteFiles(files);
+					Logger.LogDebug("ProcessGlob(): files → {Files}", files);
                 }
             }
             catch (Exception ex)
@@ -323,6 +362,7 @@ namespace DotNetNuke.Services.Installer.Installers
             }
 
             this.Log.AddInfo(string.Format(CultureInfo.InvariantCulture, Util.CLEANUP_ProcessComplete, this.Version.ToString(3)));
+			Logger.LogDebug("<<< Exiting ProcessGlob()");
             return true;
         }
     }

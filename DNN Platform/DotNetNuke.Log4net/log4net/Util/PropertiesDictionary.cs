@@ -24,6 +24,7 @@ using System.Runtime.Serialization;
 
 namespace log4net.Util
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>String keyed object map.</summary>
     /// <remarks>
     /// <para>
@@ -49,6 +50,8 @@ namespace log4net.Util
         /// </remarks>
         public PropertiesDictionary()
         {
+		Logger.LogDebug(">>> Entering PropertiesDictionary()");
+		Logger.LogDebug("<<< Exiting PropertiesDictionary()");
         }
 
         /// <summary>Constructor</summary>
@@ -60,6 +63,7 @@ namespace log4net.Util
         /// </remarks>
         public PropertiesDictionary(ReadOnlyPropertiesDictionary propertiesDictionary) : base(propertiesDictionary)
         {
+		Logger.LogDebug(">>> Entering PropertiesDictionary(propertiesDictionary={PropertiesDictionary})", propertiesDictionary);
         }
 
 #if !NETCF
@@ -76,6 +80,7 @@ namespace log4net.Util
         /// </remarks>
         private PropertiesDictionary(SerializationInfo info, StreamingContext context) : base(info, context)
         {
+		Logger.LogDebug(">>> Entering PropertiesDictionary(info={Info},context={Context})", info, context);
         }
 #endif
 
@@ -106,7 +111,9 @@ namespace log4net.Util
         /// </remarks>
         public void Remove(string key)
         {
+			Logger.LogDebug(">>> Entering Remove(key={Key})", key);
             this.InnerHashtable.Remove(key);
+			Logger.LogDebug("<<< Exiting Remove(key={Key})", key);
         }
 
         /// <summary>See <see cref="IDictionary.GetEnumerator"/></summary>
@@ -154,7 +161,9 @@ namespace log4net.Util
         /// </remarks>
         public override void Clear()
         {
+			Logger.LogDebug(">>> Entering Clear()");
             this.InnerHashtable.Clear();
+			Logger.LogDebug("<<< Exiting Clear()");
         }
 
         /// <summary>See <see cref="IDictionary.Add"/></summary>

@@ -48,7 +48,9 @@ namespace DotNetNuke.Modules.Admin.Users
         public User()
             : this(null, null, null, null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering User()");
         }
+		Logger.LogDebug("<<< Exiting User()");
 
         /// <summary>Initializes a new instance of the <see cref="User"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -57,6 +59,13 @@ namespace DotNetNuke.Modules.Admin.Users
         public User(IHostSettings hostSettings, IJavaScriptLibraryHelper javaScript)
             : this(hostSettings, javaScript, null, null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering User(hostSettings={HostSettings},javaScript={JavaScript})", hostSettings, javaScript);
+		Logger.LogDebug("<<< Exiting User(hostSettings={HostSettings},javaScript={JavaScript})", hostSettings, javaScript);
+		Logger.LogDebug("User(hostSettings={HostSettings},javaScript={JavaScript},portalController={PortalController},dataProvider={DataProvider},clientResourceController={ClientResourceController},eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService}): javaScript → {JavaScript1}", hostSettings, javaScript, portalController, dataProvider, clientResourceController, eventLogger, permissionDefinitionService, javaScript);
+		Logger.LogDebug("User(hostSettings={HostSettings},javaScript={JavaScript},portalController={PortalController},dataProvider={DataProvider},clientResourceController={ClientResourceController},eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService}): portalController → {PortalController1}", hostSettings, javaScript, portalController, dataProvider, clientResourceController, eventLogger, permissionDefinitionService, portalController);
+		Logger.LogDebug("User(hostSettings={HostSettings},javaScript={JavaScript},portalController={PortalController},dataProvider={DataProvider},clientResourceController={ClientResourceController},eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService}): dataProvider → {DataProvider1}", hostSettings, javaScript, portalController, dataProvider, clientResourceController, eventLogger, permissionDefinitionService, dataProvider);
+		Logger.LogDebug("User(hostSettings={HostSettings},javaScript={JavaScript},portalController={PortalController},dataProvider={DataProvider},clientResourceController={ClientResourceController},eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService}): clientResourceController → {ClientResourceController1}", hostSettings, javaScript, portalController, dataProvider, clientResourceController, eventLogger, permissionDefinitionService, clientResourceController);
+		Logger.LogDebug("User(hostSettings={HostSettings},javaScript={JavaScript},portalController={PortalController},dataProvider={DataProvider},clientResourceController={ClientResourceController},eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService}): eventLogger → {EventLogger1}", hostSettings, javaScript, portalController, dataProvider, clientResourceController, eventLogger, permissionDefinitionService, eventLogger);
         }
 
         /// <summary>Initializes a new instance of the <see cref="User"/> class.</summary>
@@ -83,6 +92,8 @@ namespace DotNetNuke.Modules.Admin.Users
         {
             this.hostSettings = hostSettings ?? this.DependencyProvider.GetRequiredService<IHostSettings>();
             this.javaScript = javaScript ?? this.DependencyProvider.GetRequiredService<IJavaScriptLibraryHelper>();
+			Logger.LogDebug("User(hostSettings={HostSettings},javaScript={JavaScript},portalController={PortalController},dataProvider={DataProvider},clientResourceController={ClientResourceController},eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService}): permissionDefinitionService → {PermissionDefinitionService1}", hostSettings, javaScript, portalController, dataProvider, clientResourceController, eventLogger, permissionDefinitionService, permissionDefinitionService);
+			Logger.LogDebug("User(hostSettings={HostSettings},javaScript={JavaScript},portalController={PortalController},dataProvider={DataProvider},clientResourceController={ClientResourceController},eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService}): hostSettings → {HostSettings1}", hostSettings, javaScript, portalController, dataProvider, clientResourceController, eventLogger, permissionDefinitionService, hostSettings);
             this.portalController = portalController ?? this.DependencyProvider.GetRequiredService<IPortalController>();
             this.dataProvider = dataProvider ?? this.DependencyProvider.GetRequiredService<DataProvider>();
             this.clientResourceController = clientResourceController ?? this.DependencyProvider.GetRequiredService<IClientResourceController>();
@@ -127,6 +138,7 @@ namespace DotNetNuke.Modules.Admin.Users
         /// <summary>CreateUser creates a new user in the Database.</summary>
         public void CreateUser()
         {
+			Logger.LogDebug(">>> Entering CreateUser()");
             // Update DisplayName to conform to Format
             this.UpdateDisplayName();
 
@@ -146,26 +158,32 @@ namespace DotNetNuke.Modules.Admin.Users
             if (PortalController.GetPortalSettingAsBoolean(this.portalController, "Registration_UseEmailAsUserName", this.PortalId, false))
             {
                 user.Username = this.User.Email;
+				Logger.LogDebug("CreateUser(): user.Username → {Arg0}", user.Username);
                 this.User.Username = this.User.Email;
             }
 
             var createStatus = UserController.CreateUser(ref user);
 
+			Logger.LogDebug("CreateUser(): createStatus → {CreateStatus}", createStatus);
             var args = (createStatus == UserCreateStatus.Success)
                                             ? new UserCreatedEventArgs(this.User) { Notify = this.chkNotify.Checked }
                                             : new UserCreatedEventArgs(null);
             args.CreateStatus = createStatus;
+			Logger.LogDebug("CreateUser(): args.CreateStatus → {Arg0}", args.CreateStatus);
             this.OnUserCreated(args);
             this.OnUserCreateCompleted(args);
+			Logger.LogDebug("<<< Exiting CreateUser()");
         }
 
         /// <summary>DataBind binds the data to the controls.</summary>
         public override void DataBind()
         {
+			Logger.LogDebug(">>> Entering DataBind()");
             if (this.Page.IsPostBack == false)
             {
                 string confirmString = Localization.GetString("DeleteItem");
                 if (this.IsUser)
+				Logger.LogDebug("DataBind(): confirmString → {ConfirmString}", confirmString);
                 {
                     confirmString = Localization.GetString("ConfirmUnRegister", this.LocalResourceFile);
                 }
@@ -181,6 +199,7 @@ namespace DotNetNuke.Modules.Admin.Users
             {
                 var deletePermitted = (this.User.UserID != this.PortalSettings.AdministratorId) && !(this.IsUser && this.User.IsSuperUser);
                 if (deletePermitted)
+				Logger.LogDebug("DataBind(): deletePermitted → {DeletePermitted}", deletePermitted);
                 {
                     if (this.User.IsDeleted)
                     {
@@ -242,6 +261,7 @@ namespace DotNetNuke.Modules.Admin.Users
 
                 ArrayList portals = PortalController.GetPortalsByUser(this.dataProvider, this.User.UserID);
                 if (portals.Count > 1)
+				Logger.LogDebug("DataBind(): portals → {Portals}", portals);
                 {
                     this.numSites.Text = string.Format(CultureInfo.CurrentCulture, Localization.GetString("UpdateUserName", this.LocalResourceFile), portals.Count.ToString());
                     this.cboSites.Visible = true;
@@ -293,21 +313,25 @@ namespace DotNetNuke.Modules.Admin.Users
                 this.userForm.DataBind();
                 this.renameUserName.Value = this.User.Username;
             }
+			Logger.LogDebug("<<< Exiting DataBind()");
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             this.cmdDelete.Click += this.CmdDelete_Click;
             this.cmdUpdate.Click += this.CmdUpdate_Click;
             this.cmdRemove.Click += this.CmdRemove_Click;
             this.cmdRestore.Click += this.CmdRestore_Click;
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             this.clientResourceController.RegisterScript("~/Resources/Shared/scripts/dnn.jquery.extensions.js");
             this.clientResourceController.RegisterScript("~/Resources/Shared/scripts/dnn.jquery.tooltip.js");
             this.clientResourceController.RegisterScript("~/Resources/Shared/scripts/dnn.PasswordStrength.js");
@@ -327,6 +351,8 @@ namespace DotNetNuke.Modules.Admin.Users
 
                 var options = new DnnPaswordStrengthOptions();
                 var optionsAsJsonString = Json.Serialize(options);
+				Logger.LogDebug("OnPreRender(e={E}): options → {Options}", e, options);
+				Logger.LogDebug("OnPreRender(e={E}): optionsAsJsonString → {OptionsAsJsonString}", e, optionsAsJsonString);
                 var passwordScript =
                     $"dnn.initializePasswordStrength('.{"password-strength"}', {optionsAsJsonString});{Environment.NewLine}";
 
@@ -352,6 +378,8 @@ namespace DotNetNuke.Modules.Admin.Users
 
             var confirmOptionsAsJsonString = Json.Serialize(confirmPasswordOptions);
             var confirmScript = string.Format("dnn.initializePasswordComparer({0});{1}", confirmOptionsAsJsonString, Environment.NewLine);
+			Logger.LogDebug("OnPreRender(e={E}): confirmOptionsAsJsonString → {ConfirmOptionsAsJsonString}", e, confirmOptionsAsJsonString);
+			Logger.LogDebug("OnPreRender(e={E}): confirmScript → {ConfirmScript}", e, confirmScript);
 
             if (ScriptManager.GetCurrent(this.Page) != null)
             {
@@ -362,6 +390,7 @@ namespace DotNetNuke.Modules.Admin.Users
             {
                 this.Page.ClientScript.RegisterStartupScript(this.GetType(), "ConfirmPassword", confirmScript, true);
             }
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <summary>
@@ -371,6 +400,7 @@ namespace DotNetNuke.Modules.Admin.Users
         /// <returns><see langword="true"/> if the user can update their username, otherwise <see langword="false"/>.</returns>
         private bool CanUpdateUsername()
         {
+			Logger.LogDebug(">>> Entering CanUpdateUsername()");
             // do not allow for non-logged in users
             if (this.Request.IsAuthenticated == false || this.AddUser)
             {
@@ -402,28 +432,34 @@ namespace DotNetNuke.Modules.Admin.Users
                 }
             }
 
+			Logger.LogDebug("<<< Exiting CanUpdateUsername()");
             return false;
         }
 
         private void UpdateDisplayName()
         {
+			Logger.LogDebug(">>> Entering UpdateDisplayName()");
             // Update DisplayName to conform to Format
             if (!string.IsNullOrEmpty(this.PortalSettings.Registration.DisplayNameFormat))
             {
                 this.User.UpdateDisplayName(this.PortalSettings.Registration.DisplayNameFormat);
             }
+			Logger.LogDebug("<<< Exiting UpdateDisplayName()");
         }
 
         /// <summary>Validate validates the User.</summary>
         private bool Validate()
         {
+			Logger.LogDebug(">>> Entering Validate()");
             // Check User Editor
             bool isValid = this.userForm.IsValid;
 
+			Logger.LogDebug("Validate(): isValid → {IsValid}", isValid);
             // Check Password is valid
             if (this.AddUser && this.ShowPassword)
             {
                 this.CreateStatus = UserCreateStatus.AddUser;
+				Logger.LogDebug("Validate(): this.CreateStatus → {Arg0}", this.CreateStatus);
                 if (!this.chkRandom.Checked)
                 {
                     // 1. Check Password is Valid
@@ -476,12 +512,14 @@ namespace DotNetNuke.Modules.Admin.Users
                 }
             }
 
+			Logger.LogDebug("<<< Exiting Validate()");
             return isValid;
         }
 
         /// <summary>cmdDelete_Click runs when the delete Button is clicked.</summary>
         private void CmdDelete_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering CmdDelete_Click(sender={Sender},e={E})", sender, e);
             if (!this.IsUserOrAdmin)
             {
                 return;
@@ -489,6 +527,8 @@ namespace DotNetNuke.Modules.Admin.Users
 
             string name = this.User.Username;
             int id = this.UserId;
+			Logger.LogDebug("CmdDelete_Click(sender={Sender},e={E}): name → {Name}", sender, e, name);
+			Logger.LogDebug("CmdDelete_Click(sender={Sender},e={E}): id → {Id}", sender, e, id);
             UserInfo user = this.User;
             if (UserController.DeleteUser(this.eventLogger, ref user, true, false))
             {
@@ -498,10 +538,12 @@ namespace DotNetNuke.Modules.Admin.Users
             {
                 this.OnUserDeleteError(new UserUpdateErrorArgs(id, name, "UserDeleteError"));
             }
+			Logger.LogDebug("<<< Exiting CmdDelete_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void CmdRestore_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering CmdRestore_Click(sender={Sender},e={E})", sender, e);
             if (this.IsUserOrAdmin == false)
             {
                 return;
@@ -509,6 +551,8 @@ namespace DotNetNuke.Modules.Admin.Users
 
             var name = this.User.Username;
             var id = this.UserId;
+			Logger.LogDebug("CmdRestore_Click(sender={Sender},e={E}): name → {Name}", sender, e, name);
+			Logger.LogDebug("CmdRestore_Click(sender={Sender},e={E}): id → {Id}", sender, e, id);
 
             var userInfo = this.User;
             if (UserController.RestoreUser(this.eventLogger, this.permissionDefinitionService, ref userInfo))
@@ -519,10 +563,12 @@ namespace DotNetNuke.Modules.Admin.Users
             {
                 this.OnUserRestoreError(new UserUpdateErrorArgs(id, name, "UserRestoreError"));
             }
+			Logger.LogDebug("<<< Exiting CmdRestore_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void CmdRemove_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering CmdRemove_Click(sender={Sender},e={E})", sender, e);
             if (this.IsUserOrAdmin == false)
             {
                 return;
@@ -530,6 +576,8 @@ namespace DotNetNuke.Modules.Admin.Users
 
             var name = this.User.Username;
             var id = this.UserId;
+			Logger.LogDebug("CmdRemove_Click(sender={Sender},e={E}): name → {Name}", sender, e, name);
+			Logger.LogDebug("CmdRemove_Click(sender={Sender},e={E}): id → {Id}", sender, e, id);
 
             if (UserController.RemoveUser(this.User))
             {
@@ -539,11 +587,13 @@ namespace DotNetNuke.Modules.Admin.Users
             {
                 this.OnUserRemoveError(new UserUpdateErrorArgs(id, name, "UserRemoveError"));
             }
+			Logger.LogDebug("<<< Exiting CmdRemove_Click(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>cmdUpdate_Click runs when the Update Button is clicked.</summary>
         private void CmdUpdate_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering CmdUpdate_Click(sender={Sender},e={E})", sender, e);
             if (this.IsUserOrAdmin == false)
             {
                 return;
@@ -608,6 +658,7 @@ namespace DotNetNuke.Modules.Admin.Users
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting CmdUpdate_Click(sender={Sender},e={E})", sender, e);
         }
     }
 }

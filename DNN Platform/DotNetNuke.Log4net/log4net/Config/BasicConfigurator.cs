@@ -73,6 +73,8 @@ namespace log4net.Config
         /// </remarks>
         private BasicConfigurator()
         {
+		Logger.LogDebug(">>> Entering BasicConfigurator()");
+		Logger.LogDebug("<<< Exiting BasicConfigurator()");
         }
 
 #if !NETSTANDARD1_3
@@ -90,6 +92,8 @@ namespace log4net.Config
         /// </remarks>
         public static ICollection Configure()
         {
+			Logger.LogDebug(">>> Entering Configure()");
+			Logger.LogDebug("<<< Exiting Configure()");
             return Configure(LogManager.GetRepository(Assembly.GetCallingAssembly()));
         }
 
@@ -115,6 +119,7 @@ namespace log4net.Config
 
             repository.ConfigurationMessages = configurationMessages;
 
+			Logger.LogDebug("<<< Exiting Configure(appenders={Appenders})", appenders);
             return configurationMessages;
         }
 
@@ -211,7 +216,9 @@ namespace log4net.Config
         
         private static void InternalConfigure(ILoggerRepository repository, params IAppender[] appenders) 
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
             IBasicRepositoryConfigurator configurableRepository = repository as IBasicRepositoryConfigurator;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (configurableRepository != null)
             {
                 configurableRepository.Configure(appenders);

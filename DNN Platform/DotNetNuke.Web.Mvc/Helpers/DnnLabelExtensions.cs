@@ -12,8 +12,10 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
     public static class DnnLabelExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static MvcHtmlString Label<TModel>(this DnnHelper<TModel> dnnHelper, string expression, string labelText, string helpText)
         {
+			Logger.LogDebug(">>> Entering Label(dnnHelper={DnnHelper},expression={Expression},labelText={LabelText},helpText={HelpText})", dnnHelper, expression, labelText, helpText);
             return Label(dnnHelper, expression, labelText, helpText, null);
         }
 
@@ -25,6 +27,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         public static MvcHtmlString Label<TModel>(this DnnHelper<TModel> dnnHelper, string expression, string labelText, string helpText, IDictionary<string, object> htmlAttributes)
         {
             var htmlHelper = dnnHelper.HtmlHelper as HtmlHelper<TModel>;
+			Logger.LogDebug("<<< Exiting Label(dnnHelper={DnnHelper},expression={Expression},labelText={LabelText},helpText={HelpText},htmlAttributes={HtmlAttributes})", dnnHelper, expression, labelText, helpText, htmlAttributes);
 
             return LabelHelper(
                 htmlHelper,

@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.FileSystem
     [Serializable]
     public class FileAlreadyExistsException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="FileAlreadyExistsException"/> class.</summary>
         public FileAlreadyExistsException()
         {
+		Logger.LogDebug(">>> Entering FileAlreadyExistsException()");
+		Logger.LogDebug("<<< Exiting FileAlreadyExistsException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="FileAlreadyExistsException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Services.FileSystem
         public FileAlreadyExistsException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering FileAlreadyExistsException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting FileAlreadyExistsException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="FileAlreadyExistsException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

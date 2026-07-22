@@ -12,6 +12,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
     /// <summary>Provides a way to render object values as HTML.</summary>
     public static class HtmlDisplayTextExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Returns HTML markup for each property in the object that is represented by the specified expression.</summary>
         ///
         /// <returns>
@@ -20,6 +21,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">An expression that identifies the object that contains the properties to display.</param>
         public static MvcHtmlString DisplayText(this DnnHtmlHelper html, string name)
         {
+			Logger.LogDebug(">>> Entering DisplayText(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting DisplayText(html={Html},name={Name})", html, name);
             return html.HtmlHelper.DisplayText(name);
         }
 

@@ -18,6 +18,7 @@ namespace DotNetNuke.UI.UserControls
     /// </summary>
     public abstract class LocaleSelectorControl : UserControlBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
         protected DropDownList ddlPortalDefaultLanguage;
@@ -74,15 +75,18 @@ namespace DotNetNuke.UI.UserControls
 
         public void BindDefaultLanguageSelector()
         {
+			Logger.LogDebug(">>> Entering BindDefaultLanguageSelector()");
             if (this.Page.IsPostBack == false)
             {
                 Localization.LoadCultureDropDownList(this.ddlPortalDefaultLanguage, this.DisplayType, this.PortalSettings.DefaultLanguage, true);
             }
+			Logger.LogDebug("<<< Exiting BindDefaultLanguageSelector()");
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.rbViewType.SelectedIndexChanged += this.RbViewType_SelectedIndexChanged;
@@ -91,11 +95,13 @@ namespace DotNetNuke.UI.UserControls
             {
                 ListItem item = default(ListItem);
 
+				Logger.LogDebug("OnLoad(e={E}): item → {Item}", e, item);
                 item = new ListItem(Localization.GetString("NativeName.Text", Localization.GetResourceFile(this, this.myFileName)), "NATIVE");
                 this.rbViewType.Items.Add(item);
                 if (this.ViewType == "NATIVE")
                 {
                     item.Selected = true;
+					Logger.LogDebug("OnLoad(e={E}): item.Selected → {Arg1}", e, item.Selected);
                 }
 
                 item = new ListItem(Localization.GetString("EnglishName.Text", Localization.GetResourceFile(this, this.myFileName)), "ENGLISH");
@@ -105,22 +111,28 @@ namespace DotNetNuke.UI.UserControls
                     item.Selected = true;
                 }
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             if (this.Visible)
             {
                 this.BindDefaultLanguageSelector();
             }
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private void RbViewType_SelectedIndexChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering RbViewType_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
             this.viewType = this.rbViewType.SelectedValue;
+			Logger.LogDebug("<<< Exiting RbViewType_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
+			Logger.LogDebug("RbViewType_SelectedIndexChanged(sender={Sender},e={E}): this.viewType → {Arg2}", sender, e, this.viewType);
         }
     }
 }

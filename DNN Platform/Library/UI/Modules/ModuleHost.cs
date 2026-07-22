@@ -62,10 +62,18 @@ namespace DotNetNuke.UI.Modules
         /// <param name="container">The container for the module.</param>
         public ModuleHost(ModuleInfo moduleConfiguration, Skins.Skin skin, Containers.Container container)
         {
+			Logger.LogDebug(">>> Entering ModuleHost(moduleConfiguration={ModuleConfiguration},skin={Skin},container={Container})", moduleConfiguration, skin, container);
             this.ID = "ModuleContent";
             this.Container = container;
+			Logger.LogDebug("ModuleHost(moduleConfiguration={ModuleConfiguration},skin={Skin},container={Container}): this.ID → {Arg3}", moduleConfiguration, skin, container, this.ID);
+			Logger.LogDebug("ModuleHost(moduleConfiguration={ModuleConfiguration},skin={Skin},container={Container}): this.Container → {Arg3}", moduleConfiguration, skin, container, this.Container);
+			Logger.LogDebug("ModuleHost(moduleConfiguration={ModuleConfiguration},skin={Skin},container={Container}): ID → {ID}", moduleConfiguration, skin, container, ID);
             this.moduleConfiguration = moduleConfiguration;
             this.Skin = skin;
+			Logger.LogDebug("<<< Exiting ModuleHost(moduleConfiguration={ModuleConfiguration},skin={Skin},container={Container})", moduleConfiguration, skin, container);
+			Logger.LogDebug("ModuleHost(moduleConfiguration={ModuleConfiguration},skin={Skin},container={Container}): moduleConfiguration → {ModuleConfiguration1}", moduleConfiguration, skin, container, moduleConfiguration);
+			Logger.LogDebug("ModuleHost(moduleConfiguration={ModuleConfiguration},skin={Skin},container={Container}): this.moduleConfiguration → {Arg3}", moduleConfiguration, skin, container, this.moduleConfiguration);
+			Logger.LogDebug("ModuleHost(moduleConfiguration={ModuleConfiguration},skin={Skin},container={Container}): this.Skin → {Arg3}", moduleConfiguration, skin, container, this.Skin);
         }
 
         /// <summary>Gets the attached ModuleControl.</summary>
@@ -94,23 +102,27 @@ namespace DotNetNuke.UI.Modules
         /// <returns>A Boolean.</returns>
         internal static bool IsViewMode(ModuleInfo moduleInfo, PortalSettings settings)
         {
+			Logger.LogDebug(">>> Entering IsViewMode(moduleInfo={ModuleInfo},settings={Settings})", moduleInfo, settings);
             bool viewMode;
 
             if (ModulePermissionController.HasModuleAccess(SecurityAccessLevel.ViewPermissions, Null.NullString, moduleInfo))
             {
                 viewMode = false;
+				Logger.LogDebug("IsViewMode(moduleInfo={ModuleInfo},settings={Settings}): viewMode → {ViewMode}", moduleInfo, settings, viewMode);
             }
             else
             {
                 viewMode = !ModulePermissionController.HasModuleAccess(SecurityAccessLevel.Edit, Null.NullString, moduleInfo);
             }
 
+			Logger.LogDebug("<<< Exiting IsViewMode(moduleInfo={ModuleInfo},settings={Settings})", moduleInfo, settings);
             return viewMode || Personalization.GetUserMode() == PortalSettings.Mode.View;
         }
 
         /// <summary>CreateChildControls builds the control tree.</summary>
         protected override void CreateChildControls()
         {
+			Logger.LogDebug(">>> Entering CreateChildControls()");
             this.Controls.Clear();
 
             // Load Module Control (or cached control)
@@ -135,28 +147,33 @@ namespace DotNetNuke.UI.Modules
                     this.InjectModuleContent(this.control);
                 }
             }
+			Logger.LogDebug("<<< Exiting CreateChildControls()");
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             if (Host.EnableCustomModuleCssClass)
             {
                 string moduleName = this.ModuleControl.ModuleContext.Configuration.DesktopModule.ModuleName;
                 if (moduleName != null)
+				Logger.LogDebug("OnPreRender(e={E}): moduleName → {ModuleName}", e, moduleName);
                 {
                     moduleName = Globals.CleanName(moduleName);
                 }
 
                 this.Attributes.Add("class", $"DNNModuleContent Mod{moduleName}C");
             }
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void RenderContents(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering RenderContents(writer={Writer})", writer);
             if (this.isCached)
             {
                 // Render the cached control to the output stream
@@ -169,6 +186,7 @@ namespace DotNetNuke.UI.Modules
                     // Render to cache
                     var tempWriter = new StringWriter();
 
+					Logger.LogDebug("RenderContents(writer={Writer}): tempWriter → {TempWriter}", writer, tempWriter);
                     this.control.RenderControl(new HtmlTextWriter(tempWriter));
                     string cachedOutput = tempWriter.ToString();
 
@@ -177,11 +195,15 @@ namespace DotNetNuke.UI.Modules
                         // Save content to cache
                         var moduleContent = Encoding.UTF8.GetBytes(cachedOutput);
                         var cache = ModuleCachingProvider.Instance(this.moduleConfiguration.GetEffectiveCacheMethod());
+						Logger.LogDebug("RenderContents(writer={Writer}): moduleContent → {ModuleContent}", writer, moduleContent);
+						Logger.LogDebug("RenderContents(writer={Writer}): cache → {Cache}", writer, cache);
 
                         var varyBy = new SortedDictionary<string, string> { { "locale", Thread.CurrentThread.CurrentUICulture.ToString() } };
 
+						Logger.LogDebug("RenderContents(writer={Writer}): varyBy → {VaryBy}", writer, varyBy);
                         var cacheKey = cache.GenerateCacheKey(this.moduleConfiguration.TabModuleID, varyBy);
                         cache.SetModule(this.moduleConfiguration.TabModuleID, cacheKey, new TimeSpan(0, 0, this.moduleConfiguration.CacheTime), moduleContent);
+						Logger.LogDebug("RenderContents(writer={Writer}): cacheKey → {CacheKey}", writer, cacheKey);
                     }
 
                     // Render the cached content to Response
@@ -193,19 +215,24 @@ namespace DotNetNuke.UI.Modules
                     base.RenderContents(writer);
                 }
             }
+			Logger.LogDebug("<<< Exiting RenderContents(writer={Writer})", writer);
         }
 
         private static void InjectMessageControl(Control container)
         {
+			Logger.LogDebug(">>> Entering InjectMessageControl(container={Container})", container);
             // inject a message placeholder for common module messaging - UI.Skins.Skin.AddModuleMessage
             var messagePlaceholder = new PlaceHolder { ID = "MessagePlaceHolder", Visible = false };
             container.Controls.Add(messagePlaceholder);
+			Logger.LogDebug("<<< Exiting InjectMessageControl(container={Container})", container);
+			Logger.LogDebug("InjectMessageControl(container={Container}): messagePlaceholder → {MessagePlaceholder}", container, messagePlaceholder);
         }
 
         private static bool IsVersionRequest() => TabVersionUtils.TryGetUrlVersion(out _);
 
         private void InjectVersionToTheModuleIfSupported()
         {
+			Logger.LogDebug(">>> Entering InjectVersionToTheModuleIfSupported()");
             if (this.control is not IVersionableControl versionableControl)
             {
                 return;
@@ -215,6 +242,7 @@ namespace DotNetNuke.UI.Modules
             {
                 versionableControl.SetModuleVersion(this.moduleConfiguration.ModuleVersion);
             }
+			Logger.LogDebug("<<< Exiting InjectVersionToTheModuleIfSupported()");
         }
 
         private void InjectModuleContent(Control content) => this.Controls.Add(content);
@@ -223,9 +251,11 @@ namespace DotNetNuke.UI.Modules
         /// <returns>A Boolean.</returns>
         private bool DisplayContent()
         {
+			Logger.LogDebug(">>> Entering DisplayContent()");
             // module content visibility options
             var content = Personalization.GetUserMode() != PortalSettings.Mode.Layout;
             if (this.Page.Request.QueryString["content"] != null)
+			Logger.LogDebug("DisplayContent(): content → {Content}", content);
             {
                 switch (this.Page.Request.QueryString["Content"].ToLowerInvariant())
                 {
@@ -245,12 +275,14 @@ namespace DotNetNuke.UI.Modules
                 content = true;
             }
 
+			Logger.LogDebug("<<< Exiting DisplayContent()");
             return content;
         }
 
         /// <summary>LoadModuleControl loads the ModuleControl (PortalModuelBase).</summary>
         private void LoadModuleControl()
         {
+			Logger.LogDebug(">>> Entering LoadModuleControl()");
             try
             {
                 if (this.DisplayContent())
@@ -266,6 +298,7 @@ namespace DotNetNuke.UI.Modules
                     {
                         // load the control dynamically
                         this.control = this.moduleControlPipeline.LoadModuleControl(this.Page, this.moduleConfiguration);
+						Logger.LogDebug("LoadModuleControl(): control → {Control}", control);
                     }
                 }
                 else
@@ -310,19 +343,23 @@ namespace DotNetNuke.UI.Modules
 
             // Enable ViewState
             this.control.ViewStateMode = ViewStateMode.Enabled;
+			Logger.LogDebug("<<< Exiting LoadModuleControl()");
         }
 
         /// <summary>LoadUpdatePanel optionally loads an AJAX Update Panel.</summary>
         private void LoadUpdatePanel()
         {
+			Logger.LogDebug(">>> Entering LoadUpdatePanel()");
             // register AJAX
             AJAX.RegisterScriptManager();
 
             // enable Partial Rendering
             var scriptManager = AJAX.GetScriptManager(this.Page);
             if (scriptManager != null)
+			Logger.LogDebug("LoadUpdatePanel(): scriptManager → {ScriptManager}", scriptManager);
             {
                 scriptManager.EnablePartialRendering = true;
+				Logger.LogDebug("LoadUpdatePanel(): scriptManager.EnablePartialRendering → {Arg0}", scriptManager.EnablePartialRendering);
             }
 
             // create update panel
@@ -356,12 +393,15 @@ namespace DotNetNuke.UI.Modules
                 ProgressTemplate = new LiteralTemplate(progressTemplate),
             };
             this.Controls.Add(updateProgress);
+			Logger.LogDebug("<<< Exiting LoadUpdatePanel()");
         }
 
         /// <summary>Gets a flag that indicates whether the Module Instance supports Caching.</summary>
         /// <returns>A Boolean.</returns>
         private bool SupportsCaching()
         {
+			Logger.LogDebug(">>> Entering SupportsCaching()");
+			Logger.LogDebug("<<< Exiting SupportsCaching()");
             return this.moduleConfiguration.CacheTime > 0;
         }
 
@@ -369,15 +409,21 @@ namespace DotNetNuke.UI.Modules
         /// <returns>A Boolean that indicates whether the cahed content was loaded.</returns>
         private bool TryLoadCached()
         {
+			Logger.LogDebug(">>> Entering TryLoadCached()");
             bool success = false;
             string cachedContent = string.Empty;
+			Logger.LogDebug("TryLoadCached(): success → {Success}", success);
+			Logger.LogDebug("TryLoadCached(): cachedContent → {CachedContent}", cachedContent);
             try
             {
                 var cache = ModuleCachingProvider.Instance(this.moduleConfiguration.GetEffectiveCacheMethod());
                 var varyBy = new SortedDictionary<string, string> { { "locale", Thread.CurrentThread.CurrentUICulture.ToString() } };
+				Logger.LogDebug("TryLoadCached(): cache → {Cache}", cache);
+				Logger.LogDebug("TryLoadCached(): varyBy → {VaryBy}", varyBy);
 
                 string cacheKey = cache.GenerateCacheKey(this.moduleConfiguration.TabModuleID, varyBy);
                 byte[] cachedBytes = ModuleCachingProvider.Instance(this.moduleConfiguration.GetEffectiveCacheMethod()).GetModule(this.moduleConfiguration.TabModuleID, cacheKey);
+				Logger.LogDebug("TryLoadCached(): cacheKey → {CacheKey}", cacheKey);
 
                 if (cachedBytes != null && cachedBytes.Length > 0)
                 {
@@ -387,6 +433,7 @@ namespace DotNetNuke.UI.Modules
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in TryLoadCached(): {Arg0}", ex.Message);
                 cachedContent = string.Empty;
                 Exceptions.LogException(ex);
                 success = false;
@@ -396,9 +443,11 @@ namespace DotNetNuke.UI.Modules
             {
                 this.RestoreCachedClientResourceRegistrations(cachedContent);
                 this.control = this.moduleControlPipeline.CreateCachedControl(cachedContent, this.moduleConfiguration);
+				Logger.LogDebug("TryLoadCached(): control → {Control}", control);
                 this.Controls.Add(this.control);
             }
 
+			Logger.LogDebug("<<< Exiting TryLoadCached()");
             return success;
         }
 
@@ -420,10 +469,15 @@ namespace DotNetNuke.UI.Modules
             {
                 cachedContent = cachedContent.Replace(match.Value, string.Empty);
                 var dependencyType = match.Groups["type"].Value.ToUpperInvariant();
+				Logger.LogDebug("RestoreCachedClientResourceRegistrations(cachedContent={CachedContent}): cachedContent → {CachedContent1}", cachedContent, cachedContent);
+				Logger.LogDebug("RestoreCachedClientResourceRegistrations(cachedContent={CachedContent}): dependencyType → {DependencyType}", cachedContent, dependencyType);
                 var filePath = match.Groups["path"].Value;
                 var forceProvider = string.Empty;
+				Logger.LogDebug("RestoreCachedClientResourceRegistrations(cachedContent={CachedContent}): filePath → {FilePath}", cachedContent, filePath);
+				Logger.LogDebug("RestoreCachedClientResourceRegistrations(cachedContent={CachedContent}): forceProvider → {ForceProvider}", cachedContent, forceProvider);
                 var priority = Null.NullInteger;
 
+				Logger.LogDebug("RestoreCachedClientResourceRegistrations(cachedContent={CachedContent}): priority → {Priority}", cachedContent, priority);
                 if (match.Groups["provider"].Success)
                 {
                     forceProvider = match.Groups["provider"].Value;
@@ -465,6 +519,7 @@ namespace DotNetNuke.UI.Modules
                     case "JS-LIBRARY":
                         var args = filePath.Split(ArgsSeparator, StringSplitOptions.None);
                         if (string.IsNullOrEmpty(args[1]))
+						Logger.LogDebug("RestoreCachedClientResourceRegistrations(cachedContent={CachedContent}): args → {Args}", cachedContent, args);
                         {
                             JavaScript.RequestRegistration(args[0]);
                         }
@@ -480,6 +535,7 @@ namespace DotNetNuke.UI.Modules
                         break;
                 }
             }
+			Logger.LogDebug("<<< Exiting RestoreCachedClientResourceRegistrations(cachedContent={CachedContent})", cachedContent);
         }
     }
 }

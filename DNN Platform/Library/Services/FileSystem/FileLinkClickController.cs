@@ -29,12 +29,18 @@ namespace DotNetNuke.Services.FileSystem
     public class FileLinkClickController(ICryptographyProvider cryptographyProvider, IHostSettings hostSettings, IHostSettingsService hostSettingsService)
         : ServiceLocator<IFileLinkClickController, FileLinkClickController>, IFileLinkClickController
     {
+		logger.LogDebug(">>> Entering FileLinkClickController(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},hostSettingsService={HostSettingsService})", cryptographyProvider, hostSettings, hostSettingsService);
         private readonly ILog logger = LoggerSource.Instance.GetLogger(typeof(FileLinkClickController));
         private readonly ICryptographyProvider cryptographyProvider = cryptographyProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<ICryptographyProvider>();
+		logger.LogDebug("FileLinkClickController(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): logger → {Logger}", cryptographyProvider, hostSettings, hostSettingsService, logger);
+		logger.LogDebug("FileLinkClickController(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): cryptographyProvider → {CryptographyProvider1}", cryptographyProvider, hostSettings, hostSettingsService, cryptographyProvider);
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
         private readonly IHostSettingsService hostSettingsService = hostSettingsService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
+		logger.LogDebug("FileLinkClickController(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): hostSettings → {HostSettings1}", cryptographyProvider, hostSettings, hostSettingsService, hostSettings);
+		logger.LogDebug("FileLinkClickController(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): hostSettingsService → {HostSettingsService1}", cryptographyProvider, hostSettings, hostSettingsService, hostSettingsService);
 
         /// <summary>Initializes a new instance of the <see cref="FileLinkClickController"/> class.</summary>
+		logger.LogDebug("<<< Exiting FileLinkClickController(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},hostSettingsService={HostSettingsService})", cryptographyProvider, hostSettings, hostSettingsService);
         [Obsolete("Deprecated in DotNetNuke 10.4.0. Use overload with IICryptographyProvider. Scheduled removal in v12.0.0.")]
         public FileLinkClickController()
             : this(null, null, null)
@@ -44,10 +50,13 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         public string GetFileLinkClick(IFileInfo file)
         {
+			logger.LogDebug(">>> Entering GetFileLinkClick(file={File})", file);
             Requires.NotNull("file", file);
             var portalId = file.PortalId;
             var linkClickPortalSettings = this.GetPortalSettingsForLinkClick(portalId);
 
+			logger.LogDebug("GetFileLinkClick(file={File}): linkClickPortalSettings → {LinkClickPortalSettings}", file, linkClickPortalSettings);
+			logger.LogDebug("<<< Exiting GetFileLinkClick(file={File})", file);
             return TestableGlobals.Instance.LinkClick(
                 $"fileid={file.FileId.ToString(CultureInfo.InvariantCulture)}",
                 Null.NullInteger,
@@ -62,15 +71,20 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         public int GetFileIdFromLinkClick(NameValueCollection queryParams)
         {
+			logger.LogDebug(">>> Entering GetFileIdFromLinkClick(queryParams={QueryParams})", queryParams);
             var linkClickPortalSettings = this.GetPortalSettingsForLinkClick(GetPortalIdFromLinkClick(queryParams));
             var fileTicket = queryParams["fileticket"];
+			logger.LogDebug("GetFileIdFromLinkClick(queryParams={QueryParams}): linkClickPortalSettings → {LinkClickPortalSettings}", queryParams, linkClickPortalSettings);
+			logger.LogDebug("GetFileIdFromLinkClick(queryParams={QueryParams}): fileTicket → {FileTicket}", queryParams, fileTicket);
             var encryptionKey = linkClickPortalSettings.PortalGUID;
             var strFileId = UrlUtils.DecryptParameter(this.cryptographyProvider, fileTicket, encryptionKey);
             if (string.IsNullOrEmpty(strFileId))
+			logger.LogDebug("GetFileIdFromLinkClick(queryParams={QueryParams}): strFileId → {StrFileId}", queryParams, strFileId);
             {
 #pragma warning disable CS0618 // Type or member is obsolete
                 string obsoleteFileId = null;
                 if (this.cryptographyProvider is DeprecatedCryptographyProvider deprecatedCryptographyProvider)
+				logger.LogDebug("GetFileIdFromLinkClick(queryParams={QueryParams}): obsoleteFileId → {ObsoleteFileId}", queryParams, obsoleteFileId);
                 {
                     obsoleteFileId = UrlUtils.DecryptParameter(deprecatedCryptographyProvider.DecryptParameter, fileTicket, encryptionKey);
                 }
@@ -91,17 +105,21 @@ namespace DotNetNuke.Services.FileSystem
                 }
             }
 
+			logger.LogDebug("<<< Exiting GetFileIdFromLinkClick(queryParams={QueryParams})", queryParams);
             return int.TryParse(strFileId, out var fileId) ? fileId : -1;
         }
 
         /// <inheritdoc />
         protected override Func<IFileLinkClickController> GetFactory()
         {
+			logger.LogDebug(">>> Entering GetFactory()");
+			logger.LogDebug("<<< Exiting GetFactory()");
             return () => Globals.DependencyProvider.GetRequiredService<IFileLinkClickController>();
         }
 
         private static int GetPortalIdFromLinkClick(NameValueCollection queryParams)
         {
+			logger.LogDebug(">>> Entering GetPortalIdFromLinkClick(queryParams={QueryParams})", queryParams);
             if (queryParams["hf"] != null && queryParams["hf"] == "1")
             {
                 return Null.NullInteger;
@@ -115,6 +133,7 @@ namespace DotNetNuke.Services.FileSystem
                 }
             }
 
+			logger.LogDebug("<<< Exiting GetPortalIdFromLinkClick(queryParams={QueryParams})", queryParams);
             return PortalSettings.Current.PortalId;
         }
 
@@ -130,6 +149,8 @@ namespace DotNetNuke.Services.FileSystem
             }
 
             var portalSettings = new PortalSettings(portalId);
+			logger.LogDebug("GetPortalSettingsForLinkClick(portalId={PortalId}): portalSettings → {PortalSettings}", portalId, portalSettings);
+			logger.LogDebug("<<< Exiting GetPortalSettingsForLinkClick(portalId={PortalId})", portalId);
             return new LinkClickPortalSettings
             {
                 PortalGUID = portalSettings.GUID.ToString(),

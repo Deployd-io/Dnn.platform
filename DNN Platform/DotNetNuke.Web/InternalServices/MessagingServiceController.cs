@@ -42,7 +42,9 @@ namespace DotNetNuke.Web.InternalServices
         public MessagingServiceController()
             : this(null, null, null)
         {
+		Logger.LogDebug(">>> Entering MessagingServiceController()");
         }
+		Logger.LogDebug("<<< Exiting MessagingServiceController()");
 
         /// <summary>Initializes a new instance of the <see cref="MessagingServiceController"/> class.</summary>
         /// <param name="portalController">The portal controller.</param>
@@ -52,7 +54,10 @@ namespace DotNetNuke.Web.InternalServices
         {
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			Logger.LogDebug("MessagingServiceController(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): appStatus → {AppStatus1}", portalController, appStatus, portalGroupController, appStatus);
+			Logger.LogDebug("MessagingServiceController(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalController → {PortalController1}", portalController, appStatus, portalGroupController, portalController);
             this.portalGroupController = portalGroupController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalGroupController>();
+			Logger.LogDebug("MessagingServiceController(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalGroupController → {PortalGroupController1}", portalController, appStatus, portalGroupController, portalGroupController);
         }
 
         /// <summary>Gets how long a user needs to wait before being allowed to send a message.</summary>
@@ -60,6 +65,7 @@ namespace DotNetNuke.Web.InternalServices
         [HttpGet]
         public HttpResponseMessage WaitTimeForNextMessage()
         {
+			Logger.LogDebug(">>> Entering WaitTimeForNextMessage()");
             try
             {
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", Value = InternalMessagingController.Instance.WaitTimeForNextMessage(this.UserInfo) });
@@ -67,6 +73,7 @@ namespace DotNetNuke.Web.InternalServices
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting WaitTimeForNextMessage()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -78,12 +85,17 @@ namespace DotNetNuke.Web.InternalServices
         [HttpPost]
         public HttpResponseMessage Create(CreateDTO postData)
         {
+			Logger.LogDebug(">>> Entering Create(postData={PostData})", postData);
             try
             {
                 var portalId = PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, this.PortalSettings.PortalId);
                 var roleIdsList = string.IsNullOrEmpty(postData.RoleIds) ? null : postData.RoleIds.FromJson<IList<int>>();
+				Logger.LogDebug("Create(postData={PostData}): portalId → {PortalId}", postData, portalId);
+				Logger.LogDebug("Create(postData={PostData}): roleIdsList → {RoleIdsList}", postData, roleIdsList);
                 var userIdsList = string.IsNullOrEmpty(postData.UserIds) ? null : postData.UserIds.FromJson<IList<int>>();
                 var fileIdsList = string.IsNullOrEmpty(postData.FileIds) ? null : postData.FileIds.FromJson<IList<int>>();
+				Logger.LogDebug("Create(postData={PostData}): userIdsList → {UserIdsList}", postData, userIdsList);
+				Logger.LogDebug("Create(postData={PostData}): fileIdsList → {FileIdsList}", postData, fileIdsList);
 
                 var roles = roleIdsList is { Count: > 0, }
                     ? roleIdsList.Select(id => RoleController.Instance.GetRole(portalId, r => r.RoleID == id)).Where(role => role != null).ToList()
@@ -91,21 +103,25 @@ namespace DotNetNuke.Web.InternalServices
 
                 List<UserInfo> users = null;
                 if (userIdsList != null)
+				Logger.LogDebug("Create(postData={PostData}): users → {Users}", postData, users);
                 {
                     users = userIdsList.Select(id => UserController.Instance.GetUser(portalId, id)).Where(user => user != null).ToList();
                 }
 
                 var body = HttpUtility.UrlDecode(postData.Body);
 #pragma warning disable CS0618 // Type or member is obsolete
+				Logger.LogDebug("Create(postData={PostData}): body → {Body}", postData, body);
                 body = PortalSecurity.Instance.InputFilter(body, PortalSecurity.FilterFlag.NoMarkup);
 #pragma warning restore CS0618 // Type or member is obsolete
                 var message = new Message { Subject = HttpUtility.UrlDecode(postData.Subject), Body = body, };
                 MessagingController.Instance.SendMessage(message, roles, users, fileIdsList);
+				Logger.LogDebug("Create(postData={PostData}): message → {Message}", postData, message);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", Value = message.MessageID });
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting Create(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -116,15 +132,19 @@ namespace DotNetNuke.Web.InternalServices
         [HttpGet]
         public HttpResponseMessage Search(string q)
         {
+			Logger.LogDebug(">>> Entering Search(q={Q})", q);
             try
             {
                 var portalId = PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, this.PortalSettings.PortalId);
                 var isAdmin = this.UserInfo.IsSuperUser || this.UserInfo.IsInRole("Administrators");
+				Logger.LogDebug("Search(q={Q}): portalId → {PortalId}", q, portalId);
+				Logger.LogDebug("Search(q={Q}): isAdmin → {IsAdmin}", q, isAdmin);
                 const int numResults = 10;
 
                 // GetUsersAdvancedSearch doesn't accept a comma or a single quote in the query so we have to remove them for now. See issue 20224.
                 q = q.Replace(",", string.Empty).Replace("'", string.Empty);
                 if (q.Length == 0)
+				Logger.LogDebug("Search(q={Q}): q → {Q1}", q, q);
                 {
                     return this.Request.CreateResponse<object>(HttpStatusCode.OK, null);
                 }
@@ -136,11 +156,14 @@ namespace DotNetNuke.Web.InternalServices
                         name = user.DisplayName,
                         iconfile = UserController.Instance.GetUserProfilePictureUrl(user.UserID, 32, 32),
                     }).ToList();
+						Logger.LogDebug("Search(q={Q}): name → {Name}", q, name);
+						Logger.LogDebug("Search(q={Q}): iconfile → {Iconfile}", q, iconfile);
 
                 // Roles should be visible to Administrators or User in the Role.
                 var roles = RoleController.Instance.GetRolesBasicSearch(portalId, numResults, q);
                 results.AddRange(from roleInfo in roles
                                  where
+								Logger.LogDebug("Search(q={Q}): roles → {Roles}", q, roles);
                                      isAdmin ||
                                      this.UserInfo.Social.Roles.SingleOrDefault(ur => ur.RoleID == roleInfo.RoleID && ur.IsOwner) != null
                                  select new
@@ -157,6 +180,7 @@ namespace DotNetNuke.Web.InternalServices
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting Search(q={Q})", q);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }

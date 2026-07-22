@@ -49,7 +49,9 @@ namespace Dnn.Modules.Console
         public ViewConsole()
             : this(null, null, null)
         {
+		Logger.LogDebug(">>> Entering ViewConsole()");
         }
+		Logger.LogDebug("<<< Exiting ViewConsole()");
 
         /// <summary>Initializes a new instance of the <see cref="ViewConsole"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
@@ -59,6 +61,10 @@ namespace Dnn.Modules.Console
         public ViewConsole(INavigationManager navigationManager, IJavaScriptLibraryHelper javaScript, IClientResourceController clientResourceController)
             : this(navigationManager, javaScript, clientResourceController, null)
         {
+		Logger.LogDebug(">>> Entering ViewConsole(navigationManager={NavigationManager},javaScript={JavaScript},clientResourceController={ClientResourceController})", navigationManager, javaScript, clientResourceController);
+		Logger.LogDebug("<<< Exiting ViewConsole(navigationManager={NavigationManager},javaScript={JavaScript},clientResourceController={ClientResourceController})", navigationManager, javaScript, clientResourceController);
+		Logger.LogDebug("ViewConsole(navigationManager={NavigationManager},javaScript={JavaScript},clientResourceController={ClientResourceController},hostSettings={HostSettings}): javaScript → {JavaScript1}", navigationManager, javaScript, clientResourceController, hostSettings, javaScript);
+		Logger.LogDebug("ViewConsole(navigationManager={NavigationManager},javaScript={JavaScript},clientResourceController={ClientResourceController},hostSettings={HostSettings}): clientResourceController → {ClientResourceController1}", navigationManager, javaScript, clientResourceController, hostSettings, clientResourceController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ViewConsole"/> class.</summary>
@@ -70,6 +76,8 @@ namespace Dnn.Modules.Console
         {
             this.navigationManager = navigationManager ?? this.DependencyProvider.GetRequiredService<INavigationManager>();
             this.javaScript = javaScript ?? this.DependencyProvider.GetRequiredService<IJavaScriptLibraryHelper>();
+			Logger.LogDebug("ViewConsole(navigationManager={NavigationManager},javaScript={JavaScript},clientResourceController={ClientResourceController},hostSettings={HostSettings}): hostSettings → {HostSettings1}", navigationManager, javaScript, clientResourceController, hostSettings, hostSettings);
+			Logger.LogDebug("ViewConsole(navigationManager={NavigationManager},javaScript={JavaScript},clientResourceController={ClientResourceController},hostSettings={HostSettings}): navigationManager → {NavigationManager1}", navigationManager, javaScript, clientResourceController, hostSettings, navigationManager);
             this.clientResourceController = clientResourceController ?? this.DependencyProvider.GetRequiredService<IClientResourceController>();
             this.hostSettings = hostSettings ?? this.DependencyProvider.GetRequiredService<IHostSettings>();
         }
@@ -185,6 +193,7 @@ namespace Dnn.Modules.Console
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             try
@@ -200,13 +209,16 @@ namespace Dnn.Modules.Console
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnInit(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             try
             {
@@ -237,14 +249,17 @@ namespace Dnn.Modules.Console
                                         : TabController.GetTabsBySortOrder(this.PortalId).OrderBy(t => t.Level).ThenBy(t => t.LocalizedTabName).ToList();
 
                     this.tabs = new List<TabInfo>();
+					Logger.LogDebug("OnLoad(e={E}): tabs → {Tabs}", e, tabs);
 
                     IList<int> tabIdList = new List<int>();
                     tabIdList.Add(this.ConsoleTabID);
+					Logger.LogDebug("OnLoad(e={E}): tabIdList → {TabIdList}", e, tabIdList);
 
                     if (this.IncludeParent)
                     {
                         TabInfo consoleTab = TabController.Instance.GetTab(this.ConsoleTabID, this.PortalId);
                         if (consoleTab != null)
+						Logger.LogDebug("OnLoad(e={E}): consoleTab → {ConsoleTab}", e, consoleTab);
                         {
                             this.tabs.Add(consoleTab);
                         }
@@ -277,6 +292,7 @@ namespace Dnn.Modules.Console
 
                     int minLevel = -1;
                     if (this.tabs.Count > 0)
+					Logger.LogDebug("OnLoad(e={E}): minLevel → {MinLevel}", e, minLevel);
                     {
                         minLevel = this.tabs.Min(t => t.Level);
                     }
@@ -292,8 +308,10 @@ namespace Dnn.Modules.Console
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <summary>Gets the HTML rendering of the console view according to the module settings.</summary>
@@ -372,12 +390,15 @@ namespace Dnn.Modules.Console
         /// </returns>
         protected string GetClientSideSettings()
         {
+			Logger.LogDebug(">>> Entering GetClientSideSettings()");
             string tabModuleId = "-1";
             if (this.UserId > -1)
+			Logger.LogDebug("GetClientSideSettings(): tabModuleId → {TabModuleId}", tabModuleId);
             {
                 tabModuleId = this.TabModuleId.ToString(CultureInfo.InvariantCulture);
             }
 
+			Logger.LogDebug("<<< Exiting GetClientSideSettings()");
             return string.Format(
                 "allowIconSizeChange: {0}, allowDetailChange: {1}, selectedSize: '{2}', showDetails: '{3}', tabModuleID: {4}, showTooltip: {5}",
                 this.AllowSizeChange.ToString(CultureInfo.InvariantCulture).ToLowerInvariant(),
@@ -426,16 +447,19 @@ namespace Dnn.Modules.Console
 
         private string GetIconUrl(string iconURL, string size)
         {
+			Logger.LogDebug(">>> Entering GetIconUrl(iconURL={IconURL},size={Size})", iconURL, size);
             if (string.IsNullOrEmpty(iconURL))
             {
                 iconURL = (size == "IconFile") ? "~/images/icon_unknown_16px.gif" : "~/images/icon_unknown_32px.gif";
             }
+			Logger.LogDebug("GetIconUrl(iconURL={IconURL},size={Size}): iconURL → {IconURL1}", iconURL, size, iconURL);
 
             if (iconURL.Contains("~") == false)
             {
                 iconURL = Path.Combine(this.PortalSettings.HomeDirectory, iconURL);
             }
 
+			Logger.LogDebug("<<< Exiting GetIconUrl(iconURL={IconURL},size={Size})", iconURL, size);
             return this.ResolveUrl(iconURL);
         }
 
@@ -446,13 +470,16 @@ namespace Dnn.Modules.Console
 
         private bool IsHostTab()
         {
+			Logger.LogDebug(">>> Entering IsHostTab()");
             var returnValue = false;
             if (this.ConsoleTabID != this.TabId)
+			Logger.LogDebug("IsHostTab(): returnValue → {ReturnValue}", returnValue);
             {
                 if (this.UserInfo != null && this.UserInfo.IsSuperUser)
                 {
                     var hostTabs = TabController.Instance.GetTabsByPortal(Null.NullInteger);
                     if (hostTabs.Keys.Any(key => key == this.ConsoleTabID))
+					Logger.LogDebug("IsHostTab(): hostTabs → {HostTabs}", hostTabs);
                     {
                         returnValue = true;
                     }
@@ -463,6 +490,7 @@ namespace Dnn.Modules.Console
                 returnValue = this.PortalSettings.ActiveTab.IsSuperTab;
             }
 
+			Logger.LogDebug("<<< Exiting IsHostTab()");
             return returnValue;
         }
 
@@ -473,10 +501,12 @@ namespace Dnn.Modules.Console
 
         private void SavePersonalizedSettings()
         {
+			Logger.LogDebug(">>> Entering SavePersonalizedSettings()");
             if (this.UserId > -1)
             {
                 int consoleModuleID = -1;
                 try
+				Logger.LogDebug("SavePersonalizedSettings(): consoleModuleID → {ConsoleModuleID}", consoleModuleID);
                 {
                     if (this.Request.QueryString["CTMID"] != null)
                     {
@@ -494,12 +524,14 @@ namespace Dnn.Modules.Console
                 {
                     string consoleSize = string.Empty;
                     if (this.Request.QueryString["CS"] != null)
+					Logger.LogDebug("SavePersonalizedSettings(): consoleSize → {ConsoleSize}", consoleSize);
                     {
                         consoleSize = this.Request.QueryString["CS"];
                     }
 
                     string consoleView = string.Empty;
                     if (this.Request.QueryString["CV"] != null)
+					Logger.LogDebug("SavePersonalizedSettings(): consoleView → {ConsoleView}", consoleView);
                     {
                         consoleView = this.Request.QueryString["CV"];
                     }
@@ -515,6 +547,7 @@ namespace Dnn.Modules.Console
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting SavePersonalizedSettings()");
         }
 
         private void SaveUserSetting(string key, object val)
@@ -524,16 +557,20 @@ namespace Dnn.Modules.Console
 
         private void RepeaterItemDataBound(object sender, RepeaterItemEventArgs e)
         {
+			Logger.LogDebug(">>> Entering RepeaterItemDataBound(sender={Sender},e={E})", sender, e);
             var tab = (TabInfo)e.Item.DataItem;
             e.Item.Controls.Add(new Literal() { Text = this.GetHtml(tab) });
+			Logger.LogDebug("RepeaterItemDataBound(sender={Sender},e={E}): tab → {Tab}", sender, e, tab);
             if (this.tabs.Any(t => t.ParentId == tab.TabID))
             {
                 var repeater = new Repeater();
                 repeater.ItemDataBound += this.RepeaterItemDataBound;
+				Logger.LogDebug("RepeaterItemDataBound(sender={Sender},e={E}): repeater → {Repeater}", sender, e, repeater);
                 e.Item.Controls.Add(repeater);
                 repeater.DataSource = this.tabs.Where(t => t.ParentId == tab.TabID);
                 repeater.DataBind();
             }
+			Logger.LogDebug("<<< Exiting RepeaterItemDataBound(sender={Sender},e={E})", sender, e);
         }
     }
 }

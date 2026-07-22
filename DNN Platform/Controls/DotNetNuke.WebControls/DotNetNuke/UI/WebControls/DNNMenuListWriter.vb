@@ -1,5 +1,6 @@
 ﻿' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports System
 Imports System.Collections
@@ -14,12 +15,15 @@ Namespace DotNetNuke.UI.WebControls
         Implements IDNNMenuWriter
         ' Methods
         Public Sub New()
+			Logger.LogDebug(">>> Entering New()")
             MyBase.New(HtmlTextWriterTag.Div)
             DNNMenuListWriter.__ENCAddToList(Me)
         End Sub
+		Logger.LogDebug("<<< Exiting New()")
 
         <DebuggerNonUserCode> _
         Private Shared Sub __ENCAddToList(ByVal value As Object)
+			Logger.LogDebug(">>> Entering __ENCAddToList(value={Value})", value)
             SyncLock DNNMenuListWriter.__ENCList
                 If (DNNMenuListWriter.__ENCList.Count = DNNMenuListWriter.__ENCList.Capacity) Then
                     Dim index As Integer = 0
@@ -45,11 +49,14 @@ Namespace DotNetNuke.UI.WebControls
                 DNNMenuListWriter.__ENCList.Add(New WeakReference(value))
             End SyncLock
         End Sub
+		Logger.LogDebug("<<< Exiting __ENCAddToList(value={Value})", value)
 
         Protected Overrides Sub RenderChildren(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderChildren(writer={Writer})", writer)
             Dim enumerator As IEnumerator = Nothing
             Try 
                 enumerator = Me.m_Menu.MenuNodes.GetEnumerator
+				Logger.LogDebug("RenderChildren(writer={Writer}): enumerator → {Enumerator}", writer, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -62,19 +69,25 @@ Namespace DotNetNuke.UI.WebControls
                 End If
             End Try
         End Sub
+		Logger.LogDebug("<<< Exiting RenderChildren(writer={Writer})", writer)
 
         Protected Overrides Sub RenderContents(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderContents(writer={Writer})", writer)
             writer.AddAttribute(HtmlTextWriterAttribute.Class, Me.m_Menu.CssClass)
             writer.AddAttribute(HtmlTextWriterAttribute.Id, Me.m_Menu.ClientID)
             writer.RenderBeginTag(HtmlTextWriterTag.Ul)
             Me.RenderChildren(writer)
             writer.RenderEndTag
         End Sub
+		Logger.LogDebug("<<< Exiting RenderContents(writer={Writer})", writer)
 
         Public Sub RenderMenu(ByVal writer As HtmlTextWriter, ByVal Menu As DNNMenu) Implements IDNNMenuWriter.RenderMenu
+			Logger.LogDebug(">>> Entering RenderMenu(writer={Writer},Menu={Menu})", writer, Menu)
             Me.m_Menu = Menu
             Me.RenderControl(writer)
+			Logger.LogDebug("RenderMenu(writer={Writer},Menu={Menu}): Me.m_Menu → {Arg2}", writer, Menu, Me.m_Menu)
         End Sub
+		Logger.LogDebug("<<< Exiting RenderMenu(writer={Writer},Menu={Menu})", writer, Menu)
 
 
         ' Fields

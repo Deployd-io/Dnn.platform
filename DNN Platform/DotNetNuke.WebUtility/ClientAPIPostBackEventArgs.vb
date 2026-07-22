@@ -1,5 +1,6 @@
 ﻿' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports System.Diagnostics.CodeAnalysis
 
@@ -27,11 +28,13 @@ Namespace DotNetNuke.UI.Utilities
         Public EventArguments As Hashtable = New Hashtable
 
         Public Sub New()
+		Logger.LogDebug(">>> Entering New()")
 
         End Sub
 
         Public Sub New(ByVal strEventArgument As String)
             Dim aryArgs() As String = Split(strEventArgument, ClientAPI.COLUMN_DELIMITER)
+			Logger.LogDebug("<<< Exiting New()")
             Dim i As Integer
 
             If (aryArgs.Length > 0) Then Me.EventName = aryArgs(0)

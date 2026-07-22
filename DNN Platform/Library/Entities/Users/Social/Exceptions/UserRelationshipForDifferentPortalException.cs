@@ -10,9 +10,12 @@ namespace DotNetNuke.Entities.Users
     [Serializable]
     public class UserRelationshipForDifferentPortalException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="UserRelationshipForDifferentPortalException"/> class.</summary>
         public UserRelationshipForDifferentPortalException()
         {
+		Logger.LogDebug(">>> Entering UserRelationshipForDifferentPortalException()");
+		Logger.LogDebug("<<< Exiting UserRelationshipForDifferentPortalException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="UserRelationshipForDifferentPortalException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Entities.Users
         public UserRelationshipForDifferentPortalException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering UserRelationshipForDifferentPortalException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting UserRelationshipForDifferentPortalException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="UserRelationshipForDifferentPortalException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

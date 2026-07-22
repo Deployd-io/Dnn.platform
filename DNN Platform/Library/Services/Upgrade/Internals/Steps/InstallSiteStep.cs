@@ -21,17 +21,22 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
     /// <summary>InstallSiteStep - Step that installs Website.</summary>
     public class InstallSiteStep : BaseInstallationStep
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Main method to execute the step.</summary>
         public override void Execute()
         {
+			Logger.LogDebug(">>> Entering Execute()");
             this.Percentage = 0;
             this.Status = StepStatus.Running;
+			Logger.LogDebug("Execute(): this.Percentage → {Arg0}", this.Percentage);
+			Logger.LogDebug("Execute(): this.Status → {Arg0}", this.Status);
 
             // Set Status to None
             Globals.SetStatus(Globals.UpgradeStatus.None);
 
             var installConfig = InstallController.Instance.GetInstallConfig();
             var percentForEachStep = 100 / installConfig.Portals.Count;
+			Logger.LogDebug("Execute(): installConfig → {InstallConfig}", installConfig);
             var counter = 0;
             foreach (var portal in installConfig.Portals)
             {
@@ -46,6 +51,7 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
             Globals.ResetAppStartElapseTime();
 
             this.Status = StepStatus.Done;
+			Logger.LogDebug("<<< Exiting Execute()");
         }
 
         private void CreateSite(PortalConfig portal, InstallConfig installConfig)
@@ -169,6 +175,7 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
             UserController.UserLogin(portalId, userInfo.Username, installConfig.SuperUser.Password, string.Empty, string.Empty, string.Empty, ref loginStatus, false);
 
             InstallController.Instance.RemoveFromInstallConfig("//dotnetnuke/superuser/password");
+			Logger.LogDebug("<<< Exiting CreateSite(portal={Portal},installConfig={InstallConfig})", portal, installConfig);
         }
 
         ////private void CreateFolderMappingConfig(string folderMappinsSettings)

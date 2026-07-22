@@ -22,6 +22,7 @@ using System;
 
 namespace log4net.Repository.Hierarchy
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Used internally to accelerate hash table searches.</summary>
     /// <remarks>
     /// <para>
@@ -59,13 +60,17 @@ namespace log4net.Repository.Hierarchy
         /// <param name="name">The name of the logger.</param>
         internal LoggerKey(string name) 
         {
+		Logger.LogDebug(">>> Entering LoggerKey(name={Name})", name);
 #if NETCF || NETSTANDARD1_3
             // NETCF: String.Intern causes Native Exception
             m_name = name;
+			Logger.LogDebug("LoggerKey(name={Name}): m_name → {M_name}", name, m_name);
 #else
             this.m_name = string.Intern(name);
 #endif
             this.m_hashCache = name.GetHashCode();
+			Logger.LogDebug("<<< Exiting LoggerKey(name={Name})", name);
+			Logger.LogDebug("LoggerKey(name={Name}): m_hashCache → {M_hashCache}", name, m_hashCache);
         }
 
         /// <summary>Returns a hash code for the current instance.</summary>
@@ -77,6 +82,8 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public override int GetHashCode() 
         {
+			Logger.LogDebug(">>> Entering GetHashCode()");
+			Logger.LogDebug("<<< Exiting GetHashCode()");
             return this.m_hashCache;
         }
 
@@ -95,6 +102,7 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public override bool Equals(object obj) 
         {
+			Logger.LogDebug(">>> Entering Equals(obj={Obj})", obj);
             // Compare reference type of this against argument
             if (((object)this) == obj)
             {
@@ -111,6 +119,7 @@ namespace log4net.Repository.Hierarchy
                 return ( ((object)this.m_name) == ((object)objKey.m_name) );
 #endif
             }
+			Logger.LogDebug("<<< Exiting Equals(obj={Obj})", obj);
             return false;
         }
 

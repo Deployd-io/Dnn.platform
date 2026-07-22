@@ -8,10 +8,13 @@ namespace DotNetNuke.Services.FileSystem
     /// <summary>HostSettingConfig - A class that represents Install/DotNetNuke.Install.Config/Settings.</summary>
     public class FolderTypeConfig
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="FolderTypeConfig"/> class.</summary>
         public FolderTypeConfig()
         {
+			Logger.LogDebug(">>> Entering FolderTypeConfig()");
             this.Settings = new List<FolderTypeSettingConfig>();
+			Logger.LogDebug("<<< Exiting FolderTypeConfig()");
         }
 
         public string Name { get; set; }

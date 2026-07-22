@@ -20,6 +20,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
     [ConsoleCommand("set-user", Constants.UsersCategory, "Prompt_SetUser_Description")]
     public class SetUser : ConsoleCommandBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [FlagParameter("id", "Prompt_SetUser_FlagId", "Integer", true)]
         private const string FlagId = "id";
 
@@ -52,7 +53,9 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         public SetUser()
             : this(new UserValidator(), UsersController.Instance, new UserControllerWrapper())
         {
+		Logger.LogDebug(">>> Entering SetUser()");
         }
+		Logger.LogDebug("<<< Exiting SetUser()");
 
         /// <summary>Initializes a new instance of the <see cref="SetUser"/> class.</summary>
         /// <param name="userValidator">The user validator.</param>
@@ -62,7 +65,13 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         {
             this.userValidator = userValidator;
             this.usersController = usersController;
+			Logger.LogDebug("SetUser(userValidator={UserValidator},usersController={UsersController},userControllerWrapper={UserControllerWrapper}): this.userValidator → {Arg3}", userValidator, usersController, userControllerWrapper, this.userValidator);
+			Logger.LogDebug("SetUser(userValidator={UserValidator},usersController={UsersController},userControllerWrapper={UserControllerWrapper}): usersController → {UsersController1}", userValidator, usersController, userControllerWrapper, usersController);
+			Logger.LogDebug("SetUser(userValidator={UserValidator},usersController={UsersController},userControllerWrapper={UserControllerWrapper}): this.usersController → {Arg3}", userValidator, usersController, userControllerWrapper, this.usersController);
+			Logger.LogDebug("SetUser(userValidator={UserValidator},usersController={UsersController},userControllerWrapper={UserControllerWrapper}): userValidator → {UserValidator1}", userValidator, usersController, userControllerWrapper, userValidator);
             this.userControllerWrapper = userControllerWrapper;
+			Logger.LogDebug("SetUser(userValidator={UserValidator},usersController={UsersController},userControllerWrapper={UserControllerWrapper}): userControllerWrapper → {UserControllerWrapper1}", userValidator, usersController, userControllerWrapper, userControllerWrapper);
+			Logger.LogDebug("SetUser(userValidator={UserValidator},usersController={UsersController},userControllerWrapper={UserControllerWrapper}): this.userControllerWrapper → {Arg3}", userValidator, usersController, userControllerWrapper, this.userControllerWrapper);
         }
 
         /// <inheritdoc />
@@ -87,9 +96,13 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.UserId = this.GetFlagValue(FlagId, "User Id", -1, true, true, true);
             this.Email = this.GetFlagValue(FlagEmail, "Email", string.Empty);
+			Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): Email → {Email}", args, portalSettings, userInfo, activeTabId, Email);
+			Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): UserId → {UserId}", args, portalSettings, userInfo, activeTabId, UserId);
             this.Username = this.GetFlagValue(FlagUsername, "Username", string.Empty);
+			Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): Username → {Username}", args, portalSettings, userInfo, activeTabId, Username);
             this.DisplayName = this.GetFlagValue(FlagDisplayname, "DisplayName", string.Empty);
             this.FirstName = this.GetFlagValue(FlagFirstname, "FirstName", string.Empty);
             this.LastName = this.GetFlagValue(FlagLastname, "LastName", string.Empty);
@@ -107,13 +120,16 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             {
                 this.AddMessage(this.LocalizeString("Prompt_NothingToSetUser"));
             }
+			Logger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             var sbResults = new StringBuilder();
 
+			Logger.LogDebug("Run(): sbResults → {SbResults}", sbResults);
             ConsoleErrorResultModel errorResultModel;
             UserInfo userInfo;
 
@@ -138,6 +154,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
                 }
                 catch (Exception ex)
                 {
+					Logger.LogError("Exception in Run(): {Arg0}", ex.Message);
                     return new ConsoleErrorResultModel(ex.Message);
                 }
             }
@@ -150,6 +167,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
 
             var basicUpdated = !string.IsNullOrEmpty(this.Username) || !string.IsNullOrEmpty(this.DisplayName) || !string.IsNullOrEmpty(this.FirstName) || !string.IsNullOrEmpty(this.LastName) || !string.IsNullOrEmpty(this.Email);
             var userBasicDto = new UserBasicDto
+			Logger.LogDebug("Run(): basicUpdated → {BasicUpdated}", basicUpdated);
             {
                 Displayname = userInfo.DisplayName,
                 UserId = userInfo.UserID,
@@ -164,27 +182,32 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             if (!string.IsNullOrEmpty(this.Username))
             {
                 userBasicDto.Username = this.Username;
+				Logger.LogDebug("Run(): userBasicDto.Username → {Arg0}", userBasicDto.Username);
             }
 
             // Update other properties
             if (!string.IsNullOrEmpty(this.DisplayName))
             {
                 userBasicDto.Displayname = this.DisplayName;
+				Logger.LogDebug("Run(): userBasicDto.Displayname → {Arg0}", userBasicDto.Displayname);
             }
 
             if (!string.IsNullOrEmpty(this.FirstName))
             {
                 userBasicDto.Firstname = this.FirstName;
+				Logger.LogDebug("Run(): userBasicDto.Firstname → {Arg0}", userBasicDto.Firstname);
             }
 
             if (!string.IsNullOrEmpty(this.LastName))
             {
                 userBasicDto.Lastname = this.LastName;
+				Logger.LogDebug("Run(): userBasicDto.Lastname → {Arg0}", userBasicDto.Lastname);
             }
 
             if (!string.IsNullOrEmpty(this.Email))
             {
                 userBasicDto.Email = this.Email;
+				Logger.LogDebug("Run(): userBasicDto.Email → {Arg0}", userBasicDto.Email);
             }
 
             if (basicUpdated)
@@ -206,8 +229,11 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             // retrieve the updated user
             var updatedUser = this.userControllerWrapper.GetUserById(userInfo.PortalID, userInfo.UserID);
 
+			Logger.LogDebug("Run(): updatedUser → {UpdatedUser}", updatedUser);
             var lst = new List<UserModel> { new UserModel(updatedUser) };
 
+			Logger.LogDebug("Run(): lst → {Lst}", lst);
+			Logger.LogDebug("<<< Exiting Run()");
             return new ConsoleResultModel(string.Empty)
             {
                 Data = lst,

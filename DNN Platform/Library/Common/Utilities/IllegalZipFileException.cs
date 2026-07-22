@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class IllegalZipFileException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public IllegalZipFileException()
     {
+	Logger.LogDebug(">>> Entering IllegalZipFileException()");
+	Logger.LogDebug("<<< Exiting IllegalZipFileException()");
     }
 
     /// <inheritdoc />
     public IllegalZipFileException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering IllegalZipFileException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting IllegalZipFileException(message={Message})", message);
 
     /// <inheritdoc />
     public IllegalZipFileException(string message, Exception innerException)

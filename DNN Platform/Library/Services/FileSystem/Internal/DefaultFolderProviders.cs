@@ -14,11 +14,14 @@ namespace DotNetNuke.Services.FileSystem.Internal
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class DefaultFolderProviders
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Returns a list with the names of the default folder providers.</summary>
         /// <returns>The list of names of the default folder providers.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static List<string> GetDefaultProviders()
         {
+			Logger.LogDebug(">>> Entering GetDefaultProviders()");
+			Logger.LogDebug("<<< Exiting GetDefaultProviders()");
             return new List<string> { "StandardFolderProvider", "SecureFolderProvider", "DatabaseFolderProvider" };
         }
     }

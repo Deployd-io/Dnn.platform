@@ -18,6 +18,7 @@ namespace Dnn.ContactList.Mvc.Controllers
     [DnnHandleError]
     public class SettingsController : DnnController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// The Index action renders the default Settings View
         /// </summary>
@@ -25,9 +26,12 @@ namespace Dnn.ContactList.Mvc.Controllers
         [HttpGet]
         public ActionResult Index()
         {
+			Logger.LogDebug(">>> Entering Index()");
             var settings = new Settings();
             settings.PageSize = ModuleContext.Configuration.ModuleSettings.GetValueOrDefault("PageSize", 9);
+			Logger.LogDebug("Index(): settings → {Settings}", settings);
             settings.AllowContactCreation = ModuleContext.Configuration.ModuleSettings.GetValueOrDefault("AllowContactCreation", false);
+			Logger.LogDebug("<<< Exiting Index()");
             return View(settings);
         }
 

@@ -8,9 +8,13 @@ namespace DNN.Integration.Test.Framework.Helpers
 
     public static class HostSettingsHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static string GetHostSettingValue(string hostSettingName)
         {
+			Logger.LogDebug(">>> Entering GetHostSettingValue(hostSettingName={HostSettingName})", hostSettingName);
             var query = string.Format("SELECT TOP(1) SettingValue FROM {{objectQualifier}}HostSettings WHERE SettingName='" + hostSettingName + "';");
+			Logger.LogDebug("GetHostSettingValue(hostSettingName={HostSettingName}): query → {Query}", hostSettingName, query);
+			Logger.LogDebug("<<< Exiting GetHostSettingValue(hostSettingName={HostSettingName})", hostSettingName);
             return DatabaseHelper.ExecuteScalar<string>(query);
         }
 

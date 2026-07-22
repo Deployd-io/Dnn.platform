@@ -12,9 +12,11 @@ namespace DotNetNuke.Tests.Core.Collections
     [TestFixture]
     public class ReaderWriterSlimLockTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [Test]
         public void DoubleDisposeAllowed()
         {
+			Logger.LogDebug(">>> Entering DoubleDisposeAllowed()");
             using (var l = new ReaderWriterLockSlim())
             {
                 var scl = new ReaderWriterSlimLock(l);
@@ -24,6 +26,7 @@ namespace DotNetNuke.Tests.Core.Collections
 
                 // no exception on 2nd dispose
             }
+			Logger.LogDebug("<<< Exiting DoubleDisposeAllowed()");
         }
     }
 }

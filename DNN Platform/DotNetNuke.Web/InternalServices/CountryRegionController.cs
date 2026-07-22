@@ -27,13 +27,17 @@ namespace DotNetNuke.Web.InternalServices
     public class CountryRegionController(ListController listController)
         : DnnApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly ListController listController = listController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ListController>();
+		Logger.LogDebug(">>> Entering CountryRegionController(listController={ListController})", listController);
+		Logger.LogDebug("CountryRegionController(listController={ListController}): listController → {ListController1}", listController, listController);
 
         /// <summary>Initializes a new instance of the <see cref="CountryRegionController"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with ListController. Scheduled removal in v12.0.0.")]
         public CountryRegionController()
             : this(null)
         {
+		Logger.LogDebug("<<< Exiting CountryRegionController(listController={ListController})", listController);
         }
 
         /// <summary>Gets the countries.</summary>
@@ -41,8 +45,12 @@ namespace DotNetNuke.Web.InternalServices
         [HttpGet]
         public HttpResponseMessage Countries()
         {
+			Logger.LogDebug(">>> Entering Countries()");
             var searchString = (HttpContext.Current.Request.Params["SearchString"] ?? string.Empty).NormalizeString();
             var countries = CachedCountryList.GetCountryList(this.listController);
+			Logger.LogDebug("Countries(): searchString → {SearchString}", searchString);
+			Logger.LogDebug("Countries(): countries → {Countries}", countries);
+			Logger.LogDebug("<<< Exiting Countries()");
             return this.Request.CreateResponse(HttpStatusCode.OK, countries.Values.Where(
                 x => x.NormalizedFullName.IndexOf(searchString, StringComparison.CurrentCulture) > -1).OrderBy(x => x.NormalizedFullName));
         }
@@ -53,6 +61,7 @@ namespace DotNetNuke.Web.InternalServices
         [HttpGet]
         public HttpResponseMessage Regions(int country)
         {
+			Logger.LogDebug(">>> Entering Regions(country={Country})", country);
             List<Region> res = [];
             foreach (ListEntryInfo r in this.listController.GetListEntryInfoItems("Region").Where(l => l.ParentID == country))
             {
@@ -63,6 +72,7 @@ namespace DotNetNuke.Web.InternalServices
                 });
             }
 
+			Logger.LogDebug("<<< Exiting Regions(country={Country})", country);
             return this.Request.CreateResponse(HttpStatusCode.OK, res.OrderBy(r => r.Text));
         }
 

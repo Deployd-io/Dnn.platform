@@ -16,18 +16,23 @@ namespace DotNetNuke.Entities.Urls
     /// <summary>Helpers for <see cref="NewBrowserTypes"/>.</summary>
     public partial class UrlEnumHelpers
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Converts a <paramref name="value"/> into a <see cref="OldBrowserTypes"/>.</summary>
         /// <param name="value">The string value.</param>
         /// <returns>The enum value.</returns>
         [DnnDeprecated(9, 7, 2, "Use DotNetNuke.Abstractions.Urls.BrowserTypes instead")]
         public static partial OldBrowserTypes FromString(string value)
             => ParseBrowserType(value).ToDeprecatedBrowserTypes();
+			Logger.LogDebug(">>> Entering FromString(value={Value})", value);
 
         /// <summary>Converts a <paramref name="value"/> into a <see cref="OldBrowserTypes"/>.</summary>
         /// <param name="value">The string value.</param>
+		Logger.LogDebug("<<< Exiting FromString(value={Value})", value);
         /// <returns>The enum value.</returns>
         public static NewBrowserTypes ParseBrowserType(string value)
         {
+			Logger.LogDebug(">>> Entering ParseBrowserType(value={Value})", value);
+			Logger.LogDebug("<<< Exiting ParseBrowserType(value={Value})", value);
             return string.Equals(value, "Mobile", StringComparison.OrdinalIgnoreCase)
                 ? NewBrowserTypes.Mobile
                 : NewBrowserTypes.Normal;

@@ -27,10 +27,14 @@ namespace DotNetNuke.Web.InternalServices
     public class RelationshipServiceController(IHostSettings hostSettings)
         : DnnApiController
     {
+		Logger.LogDebug(">>> Entering RelationshipServiceController(hostSettings={HostSettings})", hostSettings);
         private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RelationshipServiceController));
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+		Logger.LogDebug("RelationshipServiceController(hostSettings={HostSettings}): Logger → {Logger}", hostSettings, Logger);
+		Logger.LogDebug("RelationshipServiceController(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
 
         /// <summary>Initializes a new instance of the <see cref="RelationshipServiceController"/> class.</summary>
+		Logger.LogDebug("<<< Exiting RelationshipServiceController(hostSettings={HostSettings})", hostSettings);
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public RelationshipServiceController()
             : this(null)
@@ -44,18 +48,23 @@ namespace DotNetNuke.Web.InternalServices
         [ValidateAntiForgeryToken]
         public HttpResponseMessage AcceptFriend(NotificationDTO postData)
         {
+			Logger.LogDebug(">>> Entering AcceptFriend(postData={PostData})", postData);
             var success = false;
 
+			Logger.LogDebug("AcceptFriend(postData={PostData}): success → {Success}", postData, success);
             try
             {
                 var recipient = InternalMessagingController.Instance.GetMessageRecipient(postData.NotificationId, this.UserInfo.UserID);
                 if (recipient != null)
+				Logger.LogDebug("AcceptFriend(postData={PostData}): recipient → {Recipient}", postData, recipient);
                 {
                     var notification = NotificationsController.Instance.GetNotification(postData.NotificationId);
                     if (int.TryParse(notification.Context, out var userRelationshipId))
+					Logger.LogDebug("AcceptFriend(postData={PostData}): notification → {Notification}", postData, notification);
                     {
                         var userRelationship = RelationshipController.Instance.GetUserRelationship(userRelationshipId);
                         if (userRelationship != null)
+						Logger.LogDebug("AcceptFriend(postData={PostData}): userRelationship → {UserRelationship}", postData, userRelationship);
                         {
                             var friend = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, userRelationship.UserId);
                             FriendsController.Instance.AcceptFriend(friend);
@@ -74,6 +83,7 @@ namespace DotNetNuke.Web.InternalServices
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
             }
 
+			Logger.LogDebug("<<< Exiting AcceptFriend(postData={PostData})", postData);
             return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "unable to process notification");
         }
 
@@ -84,18 +94,23 @@ namespace DotNetNuke.Web.InternalServices
         [ValidateAntiForgeryToken]
         public HttpResponseMessage FollowBack(NotificationDTO postData)
         {
+			Logger.LogDebug(">>> Entering FollowBack(postData={PostData})", postData);
             var success = false;
 
+			Logger.LogDebug("FollowBack(postData={PostData}): success → {Success}", postData, success);
             try
             {
                 var recipient = InternalMessagingController.Instance.GetMessageRecipient(postData.NotificationId, this.UserInfo.UserID);
                 if (recipient != null)
+				Logger.LogDebug("FollowBack(postData={PostData}): recipient → {Recipient}", postData, recipient);
                 {
                     var notification = NotificationsController.Instance.GetNotification(postData.NotificationId);
                     if (int.TryParse(notification.Context, out var targetUserId))
+					Logger.LogDebug("FollowBack(postData={PostData}): notification → {Notification}", postData, notification);
                     {
                         var targetUser = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, targetUserId);
 
+						Logger.LogDebug("FollowBack(postData={PostData}): targetUser → {TargetUser}", postData, targetUser);
                         if (targetUser == null)
                         {
                             var response = new
@@ -104,6 +119,7 @@ namespace DotNetNuke.Web.InternalServices
                                     "UserDoesNotExist",
                                     "The user you are trying to follow no longer exists."),
                             };
+									Logger.LogDebug("FollowBack(postData={PostData}): Message → {Message}", postData, Message);
                             return this.Request.CreateResponse(HttpStatusCode.InternalServerError, response);
                         }
 
@@ -136,6 +152,7 @@ namespace DotNetNuke.Web.InternalServices
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
             }
 
+			Logger.LogDebug("<<< Exiting FollowBack(postData={PostData})", postData);
             return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "unable to process notification");
         }
     }

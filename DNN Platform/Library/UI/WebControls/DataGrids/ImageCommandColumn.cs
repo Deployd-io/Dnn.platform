@@ -14,6 +14,7 @@ namespace DotNetNuke.UI.WebControls
     /// </summary>
     public class ImageCommandColumn : TemplateColumn
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private ImageCommandColumnEditMode editMode = ImageCommandColumnEditMode.Command;
         private bool showImage = true;
         private string imageURL = string.Empty;
@@ -101,6 +102,7 @@ namespace DotNetNuke.UI.WebControls
         /// <summary>Initialises the Column.</summary>
         public override void Initialize()
         {
+			Logger.LogDebug(">>> Entering Initialize()");
             this.ItemTemplate = this.CreateTemplate(ListItemType.Item);
             this.EditItemTemplate = this.CreateTemplate(ListItemType.EditItem);
             this.HeaderTemplate = this.CreateTemplate(ListItemType.Header);
@@ -114,26 +116,39 @@ namespace DotNetNuke.UI.WebControls
 
             this.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
             this.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+			Logger.LogDebug("<<< Exiting Initialize()");
         }
 
         /// <summary>Creates a ImageCommandColumnTemplate.</summary>
         /// <returns>A ImageCommandColumnTemplate.</returns>
         private ImageCommandColumnTemplate CreateTemplate(ListItemType type)
         {
+			Logger.LogDebug(">>> Entering CreateTemplate(type={Type})", type);
             bool isDesignMode = HttpContext.Current == null;
             var template = new ImageCommandColumnTemplate(type);
             if (type != ListItemType.Header)
+			Logger.LogDebug("CreateTemplate(type={Type}): template → {Template}", type, template);
             {
                 template.ImageURL = this.ImageURL;
+				Logger.LogDebug("CreateTemplate(type={Type}): template.ImageURL → {Arg1}", type, template.ImageURL);
                 if (!isDesignMode)
                 {
                     template.CommandName = this.CommandName;
+					Logger.LogDebug("CreateTemplate(type={Type}): template.CommandName → {Arg1}", type, template.CommandName);
+					Logger.LogDebug("CreateTemplate(type={Type}): template.VisibleField → {Arg1}", type, template.VisibleField);
+					Logger.LogDebug("CreateTemplate(type={Type}): template.KeyField → {Arg1}", type, template.KeyField);
                     template.VisibleField = this.VisibleField;
                     template.KeyField = this.KeyField;
                 }
             }
 
             template.EditMode = this.EditMode;
+			Logger.LogDebug("CreateTemplate(type={Type}): template.EditMode → {Arg1}", type, template.EditMode);
+			Logger.LogDebug("CreateTemplate(type={Type}): template.NavigateURL → {Arg1}", type, template.NavigateURL);
+			Logger.LogDebug("CreateTemplate(type={Type}): template.NavigateURLFormatString → {Arg1}", type, template.NavigateURLFormatString);
+			Logger.LogDebug("CreateTemplate(type={Type}): template.OnClickJS → {Arg1}", type, template.OnClickJS);
+			Logger.LogDebug("CreateTemplate(type={Type}): template.ShowImage → {Arg1}", type, template.ShowImage);
+			Logger.LogDebug("CreateTemplate(type={Type}): template.Visible → {Arg1}", type, template.Visible);
             template.NavigateURL = this.NavigateURL;
             template.NavigateURLFormatString = this.NavigateURLFormatString;
             template.OnClickJS = this.OnClickJS;
@@ -144,7 +159,9 @@ namespace DotNetNuke.UI.WebControls
 
             // Set Design Mode to True
             template.DesignMode = isDesignMode;
+			Logger.LogDebug("CreateTemplate(type={Type}): template.DesignMode → {Arg1}", type, template.DesignMode);
 
+			Logger.LogDebug("<<< Exiting CreateTemplate(type={Type})", type);
             return template;
         }
     }

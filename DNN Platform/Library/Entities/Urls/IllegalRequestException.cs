@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class IllegalRequestException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public IllegalRequestException()
     {
+	Logger.LogDebug(">>> Entering IllegalRequestException()");
+	Logger.LogDebug("<<< Exiting IllegalRequestException()");
     }
 
     /// <inheritdoc />
     public IllegalRequestException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering IllegalRequestException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting IllegalRequestException(message={Message})", message);
 
     /// <inheritdoc />
     public IllegalRequestException(string message, Exception innerException)

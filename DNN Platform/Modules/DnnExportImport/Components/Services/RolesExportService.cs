@@ -37,6 +37,7 @@ namespace Dnn.ExportImport.Components.Services
         public RolesExportService()
             : this(null, null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering RolesExportService()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="RolesExportService"/> class.</summary>
@@ -48,8 +49,13 @@ namespace Dnn.ExportImport.Components.Services
         {
             this.roleProvider = roleProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<RoleProvider>();
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+			eventLogger.LogDebug("RolesExportService(roleProvider={RoleProvider},eventLogger={EventLogger},userController={UserController},portalController={PortalController}): eventLogger → {EventLogger1}", roleProvider, eventLogger, userController, portalController, eventLogger);
+			eventLogger.LogDebug("RolesExportService(roleProvider={RoleProvider},eventLogger={EventLogger},userController={UserController},portalController={PortalController}): portalController → {PortalController1}", roleProvider, eventLogger, userController, portalController, portalController);
+			eventLogger.LogDebug("RolesExportService(roleProvider={RoleProvider},eventLogger={EventLogger},userController={UserController},portalController={PortalController}): roleProvider → {RoleProvider1}", roleProvider, eventLogger, userController, portalController, roleProvider);
             this.userController = userController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IUserController>();
+			eventLogger.LogDebug("RolesExportService(roleProvider={RoleProvider},eventLogger={EventLogger},userController={UserController},portalController={PortalController}): userController → {UserController1}", roleProvider, eventLogger, userController, portalController, userController);
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+			eventLogger.LogDebug("<<< Exiting RolesExportService(roleProvider={RoleProvider},eventLogger={EventLogger},userController={UserController},portalController={PortalController})", roleProvider, eventLogger, userController, portalController);
         }
 
         /// <inheritdoc />
@@ -64,8 +70,12 @@ namespace Dnn.ExportImport.Components.Services
         /// <inheritdoc />
         public override void ExportData(ExportImportJob exportJob, ExportDto exportDto)
         {
+			eventLogger.LogDebug(">>> Entering ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
             var fromDate = (exportDto.FromDateUtc ?? Constants.MinDbTime).ToLocalTime();
             var toDate = exportDto.ToDateUtc.ToLocalTime();
+			eventLogger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): fromDate → {FromDate}", exportJob, exportDto, fromDate);
+			eventLogger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): toDate → {ToDate}", exportJob, exportDto, toDate);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (this.CheckPoint.Stage > 2)
             {
                 return;
@@ -97,6 +107,7 @@ namespace Dnn.ExportImport.Components.Services
                 this.CheckPointStageCallback(this);
 
                 this.Repository.CreateItems(roleGroups);
+				eventLogger.LogInformation("ExportData(exportJob,exportDto)={ExportJob},{ExportDto}: database query executed in {Arg2} ms", exportJob, exportDto, __logStart.ElapsedMilliseconds);
                 this.Result.AddSummary("Exported Role Groups", roleGroups.Count.ToString(CultureInfo.InvariantCulture));
                 this.CheckPoint.ProcessedItems = roleGroups.Count;
                 this.CheckPoint.Progress = 30;
@@ -152,11 +163,14 @@ namespace Dnn.ExportImport.Components.Services
                 this.CheckPoint.Stage++;
                 this.CheckPointStageCallback(this);
             }
+			eventLogger.LogDebug("<<< Exiting ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
         }
 
         /// <inheritdoc />
         public override void ImportData(ExportImportJob importJob, ImportDto importDto)
         {
+			eventLogger.LogDebug(">>> Entering ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (this.CheckPoint.Stage > 2)
             {
                 return;
@@ -173,9 +187,11 @@ namespace Dnn.ExportImport.Components.Services
 
             var otherRoleGroups = this.Repository.GetAllItems<ExportRoleGroup>().ToList();
             if (this.CheckPoint.Stage == 0)
+			eventLogger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): otherRoleGroups → {OtherRoleGroups}", importJob, importDto, otherRoleGroups);
             {
                 this.ProcessRoleGroups(importJob, importDto, otherRoleGroups);
                 this.Repository.UpdateItems(otherRoleGroups);
+				eventLogger.LogInformation("ImportData(importJob,importDto)={ImportJob},{ImportDto}: update query executed in {Arg2} ms", importJob, importDto, __logStart.ElapsedMilliseconds);
                 this.Result.AddSummary("Imported Role Groups", otherRoleGroups.Count.ToString(CultureInfo.InvariantCulture));
                 this.CheckPoint.Progress = 40;
                 this.CheckPoint.ProcessedItems = otherRoleGroups.Count;
@@ -193,6 +209,7 @@ namespace Dnn.ExportImport.Components.Services
 
             var otherRoles = this.Repository.GetAllItems<ExportRole>().ToList();
             if (this.CheckPoint.Stage == 1)
+			eventLogger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): otherRoles → {OtherRoles}", importJob, importDto, otherRoles);
             {
                 this.Result.AddSummary("Imported Roles", otherRoles.Count.ToString(CultureInfo.InvariantCulture));
                 this.ProcessRoles(importJob, importDto, otherRoleGroups, otherRoles);
@@ -215,6 +232,7 @@ namespace Dnn.ExportImport.Components.Services
 
                 var otherRoleSettings = this.Repository.GetAllItems<ExportRoleSetting>().ToList();
                 this.ProcessRoleSettings(importJob, importDto, otherRoles, otherRoleSettings);
+				eventLogger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): otherRoleSettings → {OtherRoleSettings}", importJob, importDto, otherRoleSettings);
                 this.Repository.UpdateItems(otherRoleSettings);
                 this.Result.AddSummary("Imported Role Settings", otherRoleSettings.Count.ToString(CultureInfo.InvariantCulture));
                 this.CheckPoint.Progress = 100;
@@ -223,20 +241,25 @@ namespace Dnn.ExportImport.Components.Services
                 this.CheckPoint.Stage++;
                 this.CheckPointStageCallback(this);
             }
+			eventLogger.LogDebug("<<< Exiting ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
         }
 
         /// <inheritdoc />
         public override int GetImportTotal()
         {
+			eventLogger.LogDebug(">>> Entering GetImportTotal()");
+			eventLogger.LogDebug("<<< Exiting GetImportTotal()");
             return this.Repository.GetCount<ExportRoleGroup>() + this.Repository.GetCount<ExportRole>() +
                    this.Repository.GetCount<ExportRoleSetting>();
         }
 
         private static void RefreshRecordsUserIds(IEnumerable<RoleGroupItem> roleGroupItems)
         {
+			eventLogger.LogDebug(">>> Entering RefreshRecordsUserIds(roleGroupItems={RoleGroupItems})", roleGroupItems);
             var provider = DataProvider.Instance();
             foreach (var roleGroupItem in roleGroupItems)
             {
+			eventLogger.LogDebug("RefreshRecordsUserIds(roleGroupItems={RoleGroupItems}): provider → {Provider}", roleGroupItems, provider);
                 provider.UpdateRecordChangers(
                     "RoleGroups",
                     "RoleGroupID",
@@ -244,6 +267,7 @@ namespace Dnn.ExportImport.Components.Services
                     roleGroupItem.CreatedBy,
                     roleGroupItem.ModifiedBy);
             }
+			eventLogger.LogDebug("<<< Exiting RefreshRecordsUserIds(roleGroupItems={RoleGroupItems})", roleGroupItems);
         }
 
         private static void RefreshRecordsUserIds(IEnumerable<RoleItem> roleItems)
@@ -262,7 +286,9 @@ namespace Dnn.ExportImport.Components.Services
 
         private static void RefreshRecordsUserIds(IEnumerable<SettingItem> settingItems)
         {
+			eventLogger.LogDebug(">>> Entering RefreshRecordsUserIds(settingItems={SettingItems})", settingItems);
             var provider = DataProvider.Instance();
+			eventLogger.LogDebug("RefreshRecordsUserIds(settingItems={SettingItems}): provider → {Provider}", settingItems, provider);
             foreach (var item in settingItems)
             {
                 provider.UpdateSettingRecordChangers(
@@ -273,6 +299,7 @@ namespace Dnn.ExportImport.Components.Services
                     item.CreatedBy,
                     item.ModifiedBy);
             }
+			eventLogger.LogDebug("<<< Exiting RefreshRecordsUserIds(settingItems={SettingItems})", settingItems);
         }
 
         private void ProcessRoleGroups(ExportImportJob importJob, ImportDto importDto, IEnumerable<ExportRoleGroup> otherRoleGroups)
@@ -332,6 +359,7 @@ namespace Dnn.ExportImport.Components.Services
             {
                 RefreshRecordsUserIds(changedGroups);
             }
+			eventLogger.LogDebug("<<< Exiting ProcessRoleGroups(importJob={ImportJob},importDto={ImportDto},otherRoleGroups={OtherRoleGroups})", importJob, importDto, otherRoleGroups);
         }
 
         private void ProcessRoles(ExportImportJob importJob, ImportDto importDto, List<ExportRoleGroup> otherRoleGroups, IEnumerable<ExportRole> otherRoles)
@@ -434,6 +462,7 @@ namespace Dnn.ExportImport.Components.Services
             {
                 RefreshRecordsUserIds(roleItems);
             }
+			eventLogger.LogDebug("<<< Exiting ProcessRoles(importJob={ImportJob},importDto={ImportDto},otherRoleGroups={OtherRoleGroups},otherRoles={OtherRoles})", importJob, importDto, otherRoleGroups, otherRoles);
         }
 
         private void ProcessRoleSettings(ExportImportJob importJob, ImportDto importDto, IList<ExportRole> otherRoles, IEnumerable<ExportRoleSetting> otherRoleSettings)
@@ -495,6 +524,7 @@ namespace Dnn.ExportImport.Components.Services
             }
 
             RoleController.Instance.ClearRoleCache(importJob.PortalId);
+			eventLogger.LogDebug("<<< Exiting ProcessRoleSettings(importJob={ImportJob},importDto={ImportDto},otherRoles={OtherRoles},otherRoleSettings={OtherRoleSettings})", importJob, importDto, otherRoles, otherRoleSettings);
         }
 
         private struct RoleGroupItem

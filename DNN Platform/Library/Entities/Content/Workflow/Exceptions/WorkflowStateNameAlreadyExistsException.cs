@@ -8,10 +8,13 @@ namespace DotNetNuke.Entities.Content.Workflow.Exceptions
 
     public class WorkflowStateNameAlreadyExistsException : WorkflowException
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="WorkflowStateNameAlreadyExistsException"/> class.</summary>
         public WorkflowStateNameAlreadyExistsException()
             : base(Localization.GetString("WorkflowStateNameAlreadyExistsException", Localization.ExceptionsResourceFile))
         {
+		Logger.LogDebug(">>> Entering WorkflowStateNameAlreadyExistsException()");
+		Logger.LogDebug("<<< Exiting WorkflowStateNameAlreadyExistsException()");
         }
     }
 }

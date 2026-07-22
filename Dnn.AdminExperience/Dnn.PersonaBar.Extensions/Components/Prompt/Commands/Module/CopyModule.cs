@@ -23,6 +23,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Module
     [ConsoleCommand("copy-module", Constants.ModulesCategory, "Prompt_CopyModule_Description")]
     public class CopyModule : ConsoleCommandBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [FlagParameter("id", "Prompt_CopyModule_FlagId", "Integer", true)]
         private const string FlagId = "id";
 
@@ -52,6 +53,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Module
 
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.ModuleId = this.GetFlagValue(FlagId, "Module Id", -1, true, true, true);
             this.PageId = this.GetFlagValue(FlagPageId, "Page Id", -1, true, false, true);
             this.TargetPageId = this.GetFlagValue(FlagToPageId, "To Page Id", -1, true, false, true);
@@ -61,12 +63,15 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Module
             {
                 this.AddMessage(this.LocalizeString("Prompt_SourceAndTargetPagesAreSame"));
             }
+			Logger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             var lst = new List<ModuleInfoModel>();
             KeyValuePair<HttpStatusCode, string> message;
+			Logger.LogDebug("Run(): lst → {Lst}", lst);
             var copiedModule = ModulesControllerLibrary.Instance.CopyModule(
                 this.PortalSettings,
                 this.ModuleId,
@@ -81,6 +86,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Module
             }
 
             lst.Add(ModuleInfoModel.FromDnnModuleInfo(copiedModule));
+			Logger.LogDebug("<<< Exiting Run()");
             return new ConsoleResultModel(this.LocalizeString("Prompt_ModuleCopied")) { Data = lst, Records = lst.Count };
         }
     }

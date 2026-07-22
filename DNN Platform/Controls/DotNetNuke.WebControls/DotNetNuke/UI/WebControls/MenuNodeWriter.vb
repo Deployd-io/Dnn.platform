@@ -14,21 +14,28 @@ Namespace DotNetNuke.UI.WebControls
         Implements IMenuNodeWriter
         ' Methods
         Public Sub New()
+		Logger.LogDebug(">>> Entering New()")
         End Sub
 
         Public Sub New(ByVal blnForceFullMenu As Boolean)
             Me.ForceFullMenu = blnForceFullMenu
         End Sub
+		Logger.LogDebug("<<< Exiting New(blnForceFullMenu={BlnForceFullMenu})", blnForceFullMenu)
+		Logger.LogDebug("New(blnForceFullMenu={BlnForceFullMenu}): Me.ForceFullMenu → {Arg1}", blnForceFullMenu, Me.ForceFullMenu)
 
         Public Sub New(ByVal blnForceFullMenu As Boolean, ByVal eOrientation As Orientation)
             Me.ForceFullMenu = blnForceFullMenu
             Me.Orientation = eOrientation
+			Logger.LogDebug("New(blnForceFullMenu={BlnForceFullMenu},eOrientation={EOrientation}): Me.Orientation → {Arg2}", blnForceFullMenu, eOrientation, Me.Orientation)
+			Logger.LogDebug("New(blnForceFullMenu={BlnForceFullMenu},eOrientation={EOrientation}): Me.ForceFullMenu → {Arg2}", blnForceFullMenu, eOrientation, Me.ForceFullMenu)
         End Sub
 
         Private Function GetNodeCss(ByVal oNode As MenuNode) As String
+			Logger.LogDebug(">>> Entering GetNodeCss(oNode={ONode})", oNode)
             Dim cssClass As String = oNode.DNNMenu.CssClass
             If (oNode.Level > 0) Then
                 cssClass = oNode.DNNMenu.DefaultChildNodeCssClass
+				Logger.LogDebug("GetNodeCss(oNode={ONode}): cssClass → {CssClass}", oNode, cssClass)
             End If
             If (Strings.Len(oNode.CSSClass) > 0) Then
                 cssClass = oNode.CSSClass
@@ -38,12 +45,15 @@ Namespace DotNetNuke.UI.WebControls
             End If
             Return cssClass
         End Function
+		Logger.LogDebug("<<< Exiting GetNodeCss(oNode={ONode})", oNode)
 
         Protected Sub Render(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer)
             Dim node As MenuNode = Nothing
             Dim iD As String = Nothing
             If (Me.m_Node.DNNMenu.SelectedMenuNodes.Count > 0) Then
                 node = DirectCast(Me.m_Node.DNNMenu.SelectedMenuNodes(Me.m_Node.DNNMenu.SelectedMenuNodes.Count), MenuNode)
+				Logger.LogDebug("Render(writer={Writer}): node → {Node}", writer, node)
             End If
             If Not Object.ReferenceEquals(Me.m_Node.Parent, Nothing) Then
                 iD = Me.m_Node.Parent.ID
@@ -70,11 +80,14 @@ Namespace DotNetNuke.UI.WebControls
                 writer.RenderEndTag
             End If
         End Sub
+		Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer)
 
         Protected Sub RenderChildren(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderChildren(writer={Writer})", writer)
             Dim enumerator As IEnumerator = Nothing
             Try 
                 enumerator = Me.m_Node.MenuNodes.GetEnumerator
+				Logger.LogDebug("RenderChildren(writer={Writer}): enumerator → {Enumerator}", writer, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -87,27 +100,35 @@ Namespace DotNetNuke.UI.WebControls
                 End If
             End Try
         End Sub
+		Logger.LogDebug("<<< Exiting RenderChildren(writer={Writer})", writer)
 
         Protected Sub RenderContents(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderContents(writer={Writer})", writer)
             Me.RenderOpenTag(writer)
             Me.RenderNodeIcon(writer)
             Me.RenderNodeText(writer)
             Me.RenderNodeArrow(writer)
             writer.RenderEndTag
         End Sub
+		Logger.LogDebug("<<< Exiting RenderContents(writer={Writer})", writer)
 
         Public Sub RenderNode(ByVal writer As HtmlTextWriter, ByVal Node As MenuNode) Implements IMenuNodeWriter.RenderNode
+			Logger.LogDebug(">>> Entering RenderNode(writer={Writer},Node={Node})", writer, Node)
             Me.m_Node = Node
             Me.Render(writer)
+			Logger.LogDebug("RenderNode(writer={Writer},Node={Node}): Me.m_Node → {Arg2}", writer, Node, Me.m_Node)
         End Sub
+		Logger.LogDebug("<<< Exiting RenderNode(writer={Writer},Node={Node})", writer, Node)
 
         Protected Sub RenderNodeArrow(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderNodeArrow(writer={Writer})", writer)
             If Me.m_Node.HasNodes Then
                 Dim label As New Label
                 label.RenderBeginTag(writer)
                 If (Me.m_Node.Level = 0) Then
                     If (Strings.Len(Me.m_Node.DNNMenu.RootArrowImage) > 0) Then
                         Dim image As New Image() With {
+							private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                             .ImageUrl = Me.m_Node.DNNMenu.RootArrowImage
                         }
                         image.RenderControl(writer)
@@ -121,11 +142,14 @@ Namespace DotNetNuke.UI.WebControls
                 label.RenderEndTag(writer)
             End If
         End Sub
+		Logger.LogDebug("<<< Exiting RenderNodeArrow(writer={Writer})", writer)
 
         Protected Sub RenderNodeIcon(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderNodeIcon(writer={Writer})", writer)
             Dim label As New Label
             If (Strings.Len(Me.m_Node.CSSIcon) > 0) Then
                 label.CssClass = Me.m_Node.CSSIcon
+				Logger.LogDebug("RenderNodeIcon(writer={Writer}): label.CssClass → {Arg1}", writer, label.CssClass)
             ElseIf (Strings.Len(Me.m_Node.DNNMenu.DefaultIconCssClass) > 0) Then
                 label.CssClass = Me.m_Node.DNNMenu.DefaultIconCssClass
             End If
@@ -142,24 +166,31 @@ Namespace DotNetNuke.UI.WebControls
             End If
             label.RenderEndTag(writer)
         End Sub
+		Logger.LogDebug("<<< Exiting RenderNodeIcon(writer={Writer})", writer)
 
         Protected Sub RenderNodeText(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderNodeText(writer={Writer})", writer)
             Dim link As New HyperLink
             Dim dNNMenu As DNNMenu = Me.m_Node.DNNMenu
             Dim str As String = WebControls.GetNodeJS(dNNMenu, Me.m_Node, dNNMenu.JSFunction, dNNMenu.Target, True)
             link.Text = Me.m_Node.Text
+			Logger.LogDebug("RenderNodeText(writer={Writer}): link.Text → {Arg1}", writer, link.Text)
             link.NavigateUrl = If(Not Me.m_Node.Enabled, ClientAPI.GetPostBackClientHyperlink(dNNMenu, (Me.m_Node.ID & ClientAPI.COLUMN_DELIMITER & "Click")), If(Not String.IsNullOrEmpty(str), ("javascript:" & str), Me.m_Node.NavigateURL))
             If (Strings.Len(Me.m_Node.ToolTip) > 0) Then
                 link.ToolTip = Me.m_Node.ToolTip
+				Logger.LogDebug("RenderNodeText(writer={Writer}): link.ToolTip → {Arg1}", writer, link.ToolTip)
             End If
             Dim nodeCss As String = Me.GetNodeCss(Me.m_Node)
             If (Strings.Len(nodeCss) > 0) Then
                 link.CssClass = nodeCss
+				Logger.LogDebug("RenderNodeText(writer={Writer}): link.CssClass → {Arg1}", writer, link.CssClass)
             End If
             link.RenderControl(writer)
         End Sub
+		Logger.LogDebug("<<< Exiting RenderNodeText(writer={Writer})", writer)
 
         Protected Sub RenderOpenTag(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderOpenTag(writer={Writer})", writer)
             writer.AddAttribute(HtmlTextWriterAttribute.Name, Me.m_Node.ID)
             writer.AddAttribute(HtmlTextWriterAttribute.Id, Me.m_Node.ID)
             If (If((Me.ForceFullMenu OrElse (Me.Orientation = Orientation.Vertical)), 1, 0) = 0) Then
@@ -169,14 +200,17 @@ Namespace DotNetNuke.UI.WebControls
                 writer.RenderBeginTag(HtmlTextWriterTag.Div)
             End If
         End Sub
+		Logger.LogDebug("<<< Exiting RenderOpenTag(writer={Writer})", writer)
 
         Protected Sub RenderParentLink(ByVal writer As HtmlTextWriter, ByVal ID As String)
+			Logger.LogDebug(">>> Entering RenderParentLink(writer={Writer},ID={ID})", writer, ID)
             Dim hyperlink As New HyperLink() With { _
                 .Text = "..\", _
                 .NavigateUrl = ClientAPI.GetPostBackClientHyperlink(Me.m_Node.DNNMenu, (ID & ClientAPI.COLUMN_DELIMITER & "Click")) _
             }
             hyperlink.RenderControl(writer)
         End Sub
+		Logger.LogDebug("<<< Exiting RenderParentLink(writer={Writer},ID={ID})", writer, ID)
 
 
         ' Properties

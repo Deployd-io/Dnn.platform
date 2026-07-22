@@ -31,9 +31,13 @@ namespace DotNetNuke.Entities.Content
     /// </example>
     public class ContentTypeController(IDataService dataService, IHostSettings hostSettings) : IContentTypeController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IDataService dataService = dataService ?? Util.GetDataService();
+		Logger.LogDebug(">>> Entering ContentTypeController(dataService={DataService},hostSettings={HostSettings})", dataService, hostSettings);
+		Logger.LogDebug("ContentTypeController(dataService={DataService},hostSettings={HostSettings}): dataService → {DataService1}", dataService, hostSettings, dataService);
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
 
+		Logger.LogDebug("ContentTypeController(dataService={DataService},hostSettings={HostSettings}): hostSettings → {HostSettings1}", dataService, hostSettings, hostSettings);
         /// <summary>Initializes a new instance of the <see cref="ContentTypeController"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public ContentTypeController()
@@ -56,6 +60,7 @@ namespace DotNetNuke.Entities.Content
         /// <exception cref="System.ArgumentException">contentType.ContentType is empty.</exception>
         public int AddContentType(ContentType contentType)
         {
+			Logger.LogDebug(">>> Entering AddContentType(contentType={ContentType})", contentType);
             // Argument Contract
             Requires.NotNull("contentType", contentType);
             Requires.PropertyNotNullOrEmpty("contentType", "ContentType", contentType.ContentType);
@@ -65,13 +70,16 @@ namespace DotNetNuke.Entities.Content
             // Refresh cached collection of types
             this.ClearContentTypeCache();
 
+			Logger.LogDebug("<<< Exiting AddContentType(contentType={ContentType})", contentType);
             return contentType.ContentTypeId;
         }
 
         /// <summary>Clears the content type cache.</summary>
         public void ClearContentTypeCache()
         {
+			Logger.LogDebug(">>> Entering ClearContentTypeCache()");
             DataCache.RemoveCache(DataCache.ContentTypesCacheKey);
+			Logger.LogDebug("<<< Exiting ClearContentTypeCache()");
         }
 
         /// <summary>Deletes the type of the content.</summary>
@@ -80,6 +88,7 @@ namespace DotNetNuke.Entities.Content
         /// <exception cref="System.ArgumentOutOfRangeException">content type id is less than 0.</exception>
         public void DeleteContentType(ContentType contentType)
         {
+			Logger.LogDebug(">>> Entering DeleteContentType(contentType={ContentType})", contentType);
             // Argument Contract
             Requires.NotNull("contentType", contentType);
             Requires.PropertyNotNegative("contentType", "ContentTypeId", contentType.ContentTypeId);
@@ -88,16 +97,19 @@ namespace DotNetNuke.Entities.Content
 
             // Refresh cached collection of types
             this.ClearContentTypeCache();
+			Logger.LogDebug("<<< Exiting DeleteContentType(contentType={ContentType})", contentType);
         }
 
         /// <summary>Gets the content types.</summary>
         /// <returns>content type collection.</returns>
         public IQueryable<ContentType> GetContentTypes()
         {
+			Logger.LogDebug(">>> Entering GetContentTypes()");
             var contentTypes = CBO.GetCachedObject<List<ContentType>>(
                 this.hostSettings,
                 new CacheItemArgs(DataCache.ContentTypesCacheKey, DataCache.ContentTypesCacheTimeOut, DataCache.ContentTypesCachePriority),
                 _ => CBO.FillQueryable<ContentType>(this.dataService.GetContentTypes()).ToList());
+			Logger.LogDebug("<<< Exiting GetContentTypes()");
             return contentTypes.AsQueryable();
         }
 
@@ -108,6 +120,7 @@ namespace DotNetNuke.Entities.Content
         /// <exception cref="System.ArgumentException">contentType.ContentType is empty.</exception>
         public void UpdateContentType(ContentType contentType)
         {
+			Logger.LogDebug(">>> Entering UpdateContentType(contentType={ContentType})", contentType);
             // Argument Contract
             Requires.NotNull("contentType", contentType);
             Requires.PropertyNotNegative("contentType", "ContentTypeId", contentType.ContentTypeId);
@@ -117,6 +130,8 @@ namespace DotNetNuke.Entities.Content
 
             // Refresh cached collection of types
             this.ClearContentTypeCache();
+			Logger.LogDebug("<<< Exiting UpdateContentType(contentType={ContentType})", contentType);
         }
+		Logger.LogDebug("<<< Exiting ContentTypeController(dataService={DataService},hostSettings={HostSettings})", dataService, hostSettings);
     }
 }

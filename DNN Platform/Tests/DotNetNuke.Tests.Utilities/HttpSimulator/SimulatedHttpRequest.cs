@@ -14,6 +14,7 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
     /// <summary>Used to simulate an HttpRequest.</summary>
     public class SimulatedHttpRequest : SimpleWorkerRequest
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly string _host;
         private readonly string _verb;
         private readonly int _port;
@@ -36,6 +37,7 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
         public SimulatedHttpRequest(string applicationPath, string physicalAppPath, string physicalFilePath, string page, string query, TextWriter output, string host, int port, string verb)
             : base(applicationPath, physicalAppPath, page, query, output)
         {
+			Logger.LogDebug(">>> Entering SimulatedHttpRequest(applicationPath={ApplicationPath},physicalAppPath={PhysicalAppPath},physicalFilePath={PhysicalFilePath},page={Page},query={Query},output={Output},host={Host},port={Port},verb={Verb})", applicationPath, physicalAppPath, physicalFilePath, page, output, host, port, verb);
             this.Form = new NameValueCollection();
             this.Headers = new NameValueCollection();
             if (host == null)
@@ -54,13 +56,19 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
             }
 
             this._host = host;
+			Logger.LogDebug("SimulatedHttpRequest(applicationPath={ApplicationPath},physicalAppPath={PhysicalAppPath},physicalFilePath={PhysicalFilePath},page={Page},query={Query},output={Output},host={Host},port={Port},verb={Verb}): this._host → {Arg9}", applicationPath, physicalAppPath, physicalFilePath, page, output, host, port, verb, this._host);
             this._verb = verb;
             this._port = port;
+			Logger.LogDebug("SimulatedHttpRequest(applicationPath={ApplicationPath},physicalAppPath={PhysicalAppPath},physicalFilePath={PhysicalFilePath},page={Page},query={Query},output={Output},host={Host},port={Port},verb={Verb}): this._verb → {Arg9}", applicationPath, physicalAppPath, physicalFilePath, page, output, host, port, verb, this._verb);
+			Logger.LogDebug("SimulatedHttpRequest(applicationPath={ApplicationPath},physicalAppPath={PhysicalAppPath},physicalFilePath={PhysicalFilePath},page={Page},query={Query},output={Output},host={Host},port={Port},verb={Verb}): _port → {_port}", applicationPath, physicalAppPath, physicalFilePath, page, output, host, port, verb, _port);
+			Logger.LogDebug("SimulatedHttpRequest(applicationPath={ApplicationPath},physicalAppPath={PhysicalAppPath},physicalFilePath={PhysicalFilePath},page={Page},query={Query},output={Output},host={Host},port={Port},verb={Verb}): this._port → {Arg9}", applicationPath, physicalAppPath, physicalFilePath, page, output, host, port, verb, this._port);
             this._physicalFilePath = physicalFilePath;
+			Logger.LogDebug("<<< Exiting SimulatedHttpRequest(applicationPath={ApplicationPath},physicalAppPath={PhysicalAppPath},physicalFilePath={PhysicalFilePath},page={Page},query={Query},output={Output},host={Host},port={Port},verb={Verb})", applicationPath, physicalAppPath, physicalFilePath, page, output, host, port, verb);
         }
 
         // public override string GetProtocol()
         // {
+		Logger.LogDebug("SimulatedHttpRequest(applicationPath={ApplicationPath},physicalAppPath={PhysicalAppPath},physicalFilePath={PhysicalFilePath},page={Page},query={Query},output={Output},host={Host},port={Port},verb={Verb}): this._physicalFilePath → {Arg9}", applicationPath, physicalAppPath, physicalFilePath, page, output, host, port, verb, this._physicalFilePath);
         //    return (_port == 443) ? "https:" : "http:";
         // }
 
@@ -79,6 +87,8 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
         /// </returns>
         public override string GetHttpVerbName()
         {
+			Logger.LogDebug(">>> Entering GetHttpVerbName()");
+			Logger.LogDebug("<<< Exiting GetHttpVerbName()");
             return this._verb;
         }
 
@@ -86,16 +96,22 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
         /// <returns></returns>
         public override string GetServerName()
         {
+			Logger.LogDebug(">>> Entering GetServerName()");
+			Logger.LogDebug("<<< Exiting GetServerName()");
             return this._host;
         }
 
         public override int GetLocalPort()
         {
+			Logger.LogDebug(">>> Entering GetLocalPort()");
+			Logger.LogDebug("<<< Exiting GetLocalPort()");
             return this._port;
         }
 
         public override bool IsSecure()
         {
+			Logger.LogDebug(">>> Entering IsSecure()");
+			Logger.LogDebug("<<< Exiting IsSecure()");
             return (this._port == 443) ? true : false;
         }
 
@@ -103,6 +119,7 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
         /// <returns>An array of header name-value pairs.</returns>
         public override string[][] GetUnknownRequestHeaders()
         {
+			Logger.LogDebug(">>> Entering GetUnknownRequestHeaders()");
             if (this.Headers == null || this.Headers.Count == 0)
             {
                 return null;
@@ -116,11 +133,13 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
                 headersArray[i][1] = this.Headers[i];
             }
 
+			Logger.LogDebug("<<< Exiting GetUnknownRequestHeaders()");
             return headersArray;
         }
 
         public override string GetKnownRequestHeader(int index)
         {
+			Logger.LogDebug(">>> Entering GetKnownRequestHeader(index={Index})", index);
             if (index == 0x24)
             {
                 return this._referer == null ? string.Empty : this._referer.ToString();
@@ -131,11 +150,14 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
                 return "application/x-www-form-urlencoded";
             }
 
+			Logger.LogDebug("<<< Exiting GetKnownRequestHeader(index={Index})", index);
             return base.GetKnownRequestHeader(index);
         }
 
         public override string GetFilePathTranslated()
         {
+			Logger.LogDebug(">>> Entering GetFilePathTranslated()");
+			Logger.LogDebug("<<< Exiting GetFilePathTranslated()");
             return this._physicalFilePath;
         }
 
@@ -143,6 +165,7 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
         /// <returns>The number of bytes read.</returns>
         public override byte[] GetPreloadedEntityBody()
         {
+			Logger.LogDebug(">>> Entering GetPreloadedEntityBody()");
             return Encoding.UTF8.GetBytes(this.Form.Keys.Cast<string>().Aggregate(string.Empty, (current, key) => current + string.Format("{0}={1}&", key, this.Form[key])));
         }
 
@@ -156,12 +179,18 @@ namespace DotNetNuke.Tests.Instance.Utilities.HttpSimulator
         /// </returns>
         public override bool IsEntireEntityBodyIsPreloaded()
         {
+			Logger.LogDebug(">>> Entering IsEntireEntityBodyIsPreloaded()");
+			Logger.LogDebug("<<< Exiting IsEntireEntityBodyIsPreloaded()");
             return true;
         }
 
         internal void SetReferer(Uri referer)
         {
+			Logger.LogDebug(">>> Entering SetReferer(referer={Referer})", referer);
             this._referer = referer;
+			Logger.LogDebug("<<< Exiting SetReferer(referer={Referer})", referer);
+			Logger.LogDebug("SetReferer(referer={Referer}): _referer → {_referer}", referer, _referer);
+			Logger.LogDebug("SetReferer(referer={Referer}): this._referer → {Arg1}", referer, this._referer);
         }
     }
 }

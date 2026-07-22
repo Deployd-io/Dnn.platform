@@ -37,18 +37,21 @@ namespace DotNetNuke.Services.GeneratedImage
         /// <returns>Image object.</returns>
         public virtual Bitmap CopyImage(Stream imgStream)
         {
+			Logger.LogDebug(">>> Entering CopyImage(imgStream={ImgStream})", imgStream);
             using (var srcImage = new Bitmap(imgStream))
             {
                 var destImage = new Bitmap(srcImage.Width, srcImage.Height);
                 using (var graph = Graphics.FromImage(destImage))
                 {
                     graph.CompositingMode = CompositingMode.SourceCopy;
+					private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                     graph.CompositingQuality = this.CompositingQuality;
                     graph.InterpolationMode = this.InterpolationMode;
                     graph.SmoothingMode = this.SmoothingMode;
                     graph.DrawImage(srcImage, new Rectangle(0, 0, srcImage.Width, srcImage.Height));
                 }
 
+				Logger.LogDebug("<<< Exiting CopyImage(imgStream={ImgStream})", imgStream);
                 return destImage;
             }
         }

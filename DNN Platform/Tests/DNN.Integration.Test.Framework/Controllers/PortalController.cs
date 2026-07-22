@@ -14,10 +14,12 @@ namespace DNN.Integration.Test.Framework.Controllers
 
     public static class PortalController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string PortalIdMarker = @"'$[portal_id]'";
 
         public static TimeZoneInfo GetTimeZone(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetTimeZone(portalId={PortalId})", portalId);
             const string fileContent = SqlScripts.PortalGetTimeZone;
             var script = new StringBuilder(fileContent)
                 .Replace(PortalIdMarker, portalId.ToString(CultureInfo.InvariantCulture))
@@ -26,6 +28,8 @@ namespace DNN.Integration.Test.Framework.Controllers
 
             var timeZoneString = DatabaseHelper.ExecuteQuery(script).First()["SettingValue"].ToString();
 
+			Logger.LogDebug("GetTimeZone(portalId={PortalId}): timeZoneString → {TimeZoneString}", portalId, timeZoneString);
+			Logger.LogDebug("<<< Exiting GetTimeZone(portalId={PortalId})", portalId);
             return TimeZoneInfo.FindSystemTimeZoneById(timeZoneString);
         }
     }

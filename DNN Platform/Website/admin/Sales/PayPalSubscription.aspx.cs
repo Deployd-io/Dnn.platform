@@ -28,6 +28,8 @@ namespace DotNetNuke.Modules.Admin.Sales
         public PayPalSubscription()
             : this(null, null, null)
         {
+		Logger.LogDebug(">>> Entering PayPalSubscription()");
+		Logger.LogDebug("<<< Exiting PayPalSubscription()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="PayPalSubscription"/> class.</summary>
@@ -42,14 +44,17 @@ namespace DotNetNuke.Modules.Admin.Sales
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.InitializeComponent();
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             try
             {
@@ -85,6 +90,7 @@ namespace DotNetNuke.Modules.Admin.Sales
                     if (settings.ContainsKey("paypalsandbox") && !string.IsNullOrEmpty(settings["paypalsandbox"]) && settings["paypalsandbox"].ToLowerInvariant() == "true")
                     {
                         strPayPalURL = "https://www.sandbox.paypal.com/cgi-bin/webscr?";
+						Logger.LogDebug("OnLoad(e={E}): strPayPalURL → {StrPayPalURL}", e, strPayPalURL);
                     }
                     else
                     {
@@ -233,12 +239,16 @@ namespace DotNetNuke.Modules.Admin.Sales
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessPageLoadException(exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         private void InitializeComponent()
         {
+		Logger.LogDebug(">>> Entering InitializeComponent()");
+		Logger.LogDebug("<<< Exiting InitializeComponent()");
         }
 
         /// <summary>This methods return the text description of the Frequency value.</summary>
@@ -246,8 +256,12 @@ namespace DotNetNuke.Modules.Admin.Sales
         /// <returns>text of the Frequency.</returns>
         private string GetBillingFrequencyText(string value)
         {
+			Logger.LogDebug(">>> Entering GetBillingFrequencyText(value={Value})", value);
             var ctlEntry = new ListController();
             ListEntryInfo entry = ctlEntry.GetListEntryInfo("Frequency", value);
+			Logger.LogDebug("GetBillingFrequencyText(value={Value}): ctlEntry → {CtlEntry}", value, ctlEntry);
+			Logger.LogDebug("GetBillingFrequencyText(value={Value}): entry → {Entry}", value, entry);
+			Logger.LogDebug("<<< Exiting GetBillingFrequencyText(value={Value})", value);
             return entry.Text;
         }
     }

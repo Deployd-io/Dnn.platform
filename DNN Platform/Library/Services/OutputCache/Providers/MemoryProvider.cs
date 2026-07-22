@@ -18,6 +18,7 @@ namespace DotNetNuke.Services.OutputCache.Providers
     /// <summary>MemoryResponseFilter implements the OutputCachingProvider for memory storage.</summary>
     public class MemoryProvider : OutputCachingProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1303:ConstFieldNamesMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
 
         // ReSharper disable once InconsistentNaming
@@ -48,25 +49,32 @@ namespace DotNetNuke.Services.OutputCache.Providers
         /// <inheritdoc />
         public override int GetItemCount(int tabId)
         {
+			Logger.LogDebug(">>> Entering GetItemCount(tabId={TabId})", tabId);
+			Logger.LogDebug("<<< Exiting GetItemCount(tabId={TabId})", tabId);
             return GetCacheKeys(tabId).Count;
         }
 
         /// <inheritdoc />
         public override byte[] GetOutput(int tabId, string cacheKey)
         {
+			Logger.LogDebug(">>> Entering GetOutput(tabId={TabId},cacheKey={CacheKey})", tabId, cacheKey);
             object output = Cache[cacheKey];
+			Logger.LogDebug("<<< Exiting GetOutput(tabId={TabId},cacheKey={CacheKey})", tabId, cacheKey);
             return (byte[])output;
         }
 
         /// <inheritdoc />
         public override OutputCacheResponseFilter GetResponseFilter(int tabId, int maxVaryByCount, Stream responseFilter, string cacheKey, TimeSpan cacheDuration)
         {
+			Logger.LogDebug(">>> Entering GetResponseFilter(tabId={TabId},maxVaryByCount={MaxVaryByCount},responseFilter={ResponseFilter},cacheKey={CacheKey},cacheDuration={CacheDuration})", tabId, maxVaryByCount, responseFilter, cacheKey, cacheDuration);
+			Logger.LogDebug("<<< Exiting GetResponseFilter(tabId={TabId},maxVaryByCount={MaxVaryByCount},responseFilter={ResponseFilter},cacheKey={CacheKey},cacheDuration={CacheDuration})", tabId, maxVaryByCount, responseFilter, cacheKey, cacheDuration);
             return new MemoryResponseFilter(tabId, maxVaryByCount, responseFilter, cacheKey, cacheDuration);
         }
 
         /// <inheritdoc />
         public override void PurgeCache(int portalId)
         {
+			Logger.LogDebug(">>> Entering PurgeCache(portalId={PortalId})", portalId);
             foreach (string key in GetCacheKeys())
             {
                 Cache.Remove(key);
@@ -76,15 +84,18 @@ namespace DotNetNuke.Services.OutputCache.Providers
         /// <inheritdoc />
         public override void PurgeExpiredItems(int portalId)
         {
+			Logger.LogDebug(">>> Entering PurgeExpiredItems(portalId={PortalId})", portalId);
             throw new NotSupportedException();
         }
 
         /// <inheritdoc />
         public override void Remove(int tabId)
         {
+			Logger.LogDebug(">>> Entering Remove(tabId={TabId})", tabId);
             foreach (string key in GetCacheKeys(tabId))
             {
                 Cache.Remove(key);
+				Logger.LogDebug(">>> Entering GetCacheKeys()");
             }
         }
 
@@ -97,19 +108,24 @@ namespace DotNetNuke.Services.OutputCache.Providers
         /// <inheritdoc />
         public override bool StreamOutput(int tabId, string cacheKey, HttpContext context)
         {
+			Logger.LogDebug(">>> Entering StreamOutput(tabId={TabId},cacheKey={CacheKey},context={Context})", tabId, cacheKey, context);
             if (Cache[cacheKey] == null)
             {
                 return false;
             }
 
             context.Response.BinaryWrite(Encoding.Default.GetBytes(Cache[cacheKey].ToString()));
+			Logger.LogDebug("<<< Exiting StreamOutput(tabId={TabId},cacheKey={CacheKey},context={Context})", tabId, cacheKey, context);
             return true;
         }
 
         internal static List<string> GetCacheKeys()
         {
+			Logger.LogDebug(">>> Entering GetCacheKeys()");
             var keys = new List<string>();
             IDictionaryEnumerator cacheEnum = Cache.GetEnumerator();
+			Logger.LogDebug("GetCacheKeys(): keys → {Keys}", keys);
+			Logger.LogDebug("GetCacheKeys(): cacheEnum → {CacheEnum}", cacheEnum);
             while (cacheEnum.MoveNext())
             {
                 if (cacheEnum.Key.ToString().StartsWith(cachePrefix, StringComparison.Ordinal))
@@ -123,9 +139,13 @@ namespace DotNetNuke.Services.OutputCache.Providers
 
         internal static List<string> GetCacheKeys(int tabId)
         {
+			Logger.LogDebug(">>> Entering GetCacheKeys(tabId={TabId})", tabId);
             var keys = new List<string>();
+			Logger.LogDebug("<<< Exiting GetCacheKeys()");
+			Logger.LogDebug("GetCacheKeys(tabId={TabId}): keys → {Keys}", tabId, keys);
             IDictionaryEnumerator cacheEnum = Cache.GetEnumerator();
             while (cacheEnum.MoveNext())
+			Logger.LogDebug("GetCacheKeys(tabId={TabId}): cacheEnum → {CacheEnum}", tabId, cacheEnum);
             {
                 if (cacheEnum.Key.ToString().StartsWith($"{cachePrefix}{tabId.ToString(CultureInfo.InvariantCulture)}_", StringComparison.Ordinal))
                 {
@@ -138,11 +158,13 @@ namespace DotNetNuke.Services.OutputCache.Providers
 
         private static string GetCacheKey(string cacheKey)
         {
+			Logger.LogDebug(">>> Entering GetCacheKey(cacheKey={CacheKey})", cacheKey);
             if (string.IsNullOrEmpty(cacheKey))
             {
                 throw new ArgumentException("Argument cannot be null or an empty string", nameof(cacheKey));
             }
 
+			Logger.LogDebug("<<< Exiting GetCacheKey(cacheKey={CacheKey})", cacheKey);
             return string.Concat(cachePrefix, cacheKey);
         }
     }

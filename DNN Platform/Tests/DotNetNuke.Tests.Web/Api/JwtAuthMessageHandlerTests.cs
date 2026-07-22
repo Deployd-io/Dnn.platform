@@ -34,6 +34,7 @@ namespace DotNetNuke.Tests.Web.Api
     [TestFixture]
     public class JwtAuthMessageHandlerTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         // { "type":"JWT","alg":"HS256"} . {"sub":"host","nbf":1,"exp":4102444799,"sid":"0123456789ABCDEF"} . (HS256_KEY="secret")
         private const string ValidToken =
             "eyJ0eXBlIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJzdWIiOiJ1c2VybmFtZSIsIm5iZiI6MSwiZXhwIjo0MTAyNDQ0Nzk5LCJzaWQiOiIwMTIzNDU2Nzg5QUJDREVGIn0.nfWCOVNk5M7L7EPDe3i3j4aAPRerbxgmcjOxaC-LWUQ";
@@ -49,13 +50,19 @@ namespace DotNetNuke.Tests.Web.Api
         [SetUp]
         public void SetupMockServices()
         {
+			Logger.LogDebug(">>> Entering SetupMockServices()");
             MockComponentProvider.CreateDataCacheProvider();
 
             this.mockDataService = new Mock<Entities.Portals.Data.IDataService>();
+			Logger.LogDebug("SetupMockServices(): mockDataService → {MockDataService}", mockDataService);
             this.mockDataProvider = MockComponentProvider.CreateDataProvider();
+			Logger.LogDebug("SetupMockServices(): mockDataProvider → {MockDataProvider}", mockDataProvider);
             this.mockPortalController = new Mock<IPortalController>();
+			Logger.LogDebug("SetupMockServices(): mockPortalController → {MockPortalController}", mockPortalController);
             this.mockUserController = new Mock<IUserController>();
+			Logger.LogDebug("SetupMockServices(): mockUserController → {MockUserController}", mockUserController);
             this.mockMembership = MockComponentProvider.CreateNew<MembershipProvider>();
+			Logger.LogDebug("SetupMockServices(): mockMembership → {MockMembership}", mockMembership);
 
             this.mockDataProvider.Setup(d => d.GetProviderPath()).Returns(string.Empty);
             this.mockDataProvider.Setup(d => d.GetPortals(It.IsAny<string>())).Returns<string>(GetPortalsCallBack);
@@ -67,6 +74,7 @@ namespace DotNetNuke.Tests.Web.Api
             this.mockMembership.Setup(m => m.GetUser(It.IsAny<int>(), It.IsAny<int>())).Returns((int portalId, int userId) => GetUserByIdCallback(portalId, userId));
 
             this.mockJwtDataService = new Mock<IDataService>();
+			Logger.LogDebug("SetupMockServices(): mockJwtDataService → {MockJwtDataService}", mockJwtDataService);
             this.mockJwtDataService.Setup(x => x.GetTokenById(It.IsAny<string>())).Returns((string sid) => GetPersistedToken(sid));
             DataService.RegisterInstance(this.mockJwtDataService.Object);
 
@@ -83,123 +91,163 @@ namespace DotNetNuke.Tests.Web.Api
 
             this.serviceProvider =
                 FakeServiceProvider.Setup(services => services.AddSingleton(Mock.Of<IHostSettings>()));
+				Logger.LogDebug("<<< Exiting SetupMockServices()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			Logger.LogDebug(">>> Entering TearDown()");
             this.serviceProvider.Dispose();
+			Logger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void ReturnsResponseAsReceived()
         {
+			Logger.LogDebug(">>> Entering ReturnsResponseAsReceived()");
             // Arrange
             var response = new HttpResponseMessage(HttpStatusCode.OK) { RequestMessage = new HttpRequestMessage() };
 
+			Logger.LogDebug("ReturnsResponseAsReceived(): response → {Response}", response);
             // Act
             var handler = new JwtAuthMessageHandler(true, false);
             var response2 = handler.OnOutboundResponse(response, CancellationToken.None);
+			Logger.LogDebug("ReturnsResponseAsReceived(): handler → {Handler}", handler);
+			Logger.LogDebug("ReturnsResponseAsReceived(): response2 → {Response2}", response2);
 
             // Assert
             Assert.That(response2, Is.EqualTo(response));
+			Logger.LogDebug("<<< Exiting ReturnsResponseAsReceived()");
         }
 
         [Test]
         public void MissingAuthorizationHeaderReturnsNullResponse()
         {
+			Logger.LogDebug(">>> Entering MissingAuthorizationHeaderReturnsNullResponse()");
             // Arrange
             var request = new HttpRequestMessage(HttpMethod.Get, "http://localhost/anyuri");
 
+			Logger.LogDebug("MissingAuthorizationHeaderReturnsNullResponse(): request → {Request}", request);
             // Act
             var handler = new JwtAuthMessageHandler(true, false);
             var response = handler.OnInboundRequest(request, CancellationToken.None);
+			Logger.LogDebug("MissingAuthorizationHeaderReturnsNullResponse(): handler → {Handler}", handler);
+			Logger.LogDebug("MissingAuthorizationHeaderReturnsNullResponse(): response → {Response}", response);
 
             // Assert
             Assert.That(response, Is.Null);
+			Logger.LogDebug("<<< Exiting MissingAuthorizationHeaderReturnsNullResponse()");
         }
 
         [Test]
         public void WrongAuthorizationSchemeReturnsNullResponse()
         {
+			Logger.LogDebug(">>> Entering WrongAuthorizationSchemeReturnsNullResponse()");
             // Arrange
             var request = new HttpRequestMessage(HttpMethod.Get, "http://localhost/anyuri");
             request.Headers.Authorization = AuthenticationHeaderValue.Parse("Basic ");
+			Logger.LogDebug("WrongAuthorizationSchemeReturnsNullResponse(): request → {Request}", request);
 
             // Act
             var handler = new JwtAuthMessageHandler(true, false);
             var response = handler.OnInboundRequest(request, CancellationToken.None);
+			Logger.LogDebug("WrongAuthorizationSchemeReturnsNullResponse(): handler → {Handler}", handler);
+			Logger.LogDebug("WrongAuthorizationSchemeReturnsNullResponse(): response → {Response}", response);
 
             // Assert
             Assert.That(response, Is.Null);
+			Logger.LogDebug("<<< Exiting WrongAuthorizationSchemeReturnsNullResponse()");
         }
 
         [Test]
         public void MissingAuthorizationTokenReturnsNullResponse()
         {
+			Logger.LogDebug(">>> Entering MissingAuthorizationTokenReturnsNullResponse()");
             // Arrange
             var request = new HttpRequestMessage(HttpMethod.Get, "http://localhost/anyuri");
             request.Headers.Authorization = AuthenticationHeaderValue.Parse("Bearer ");
+			Logger.LogDebug("MissingAuthorizationTokenReturnsNullResponse(): request → {Request}", request);
 
             // Act
             var handler = new JwtAuthMessageHandler(true, false);
             var response = handler.OnInboundRequest(request, CancellationToken.None);
+			Logger.LogDebug("MissingAuthorizationTokenReturnsNullResponse(): handler → {Handler}", handler);
+			Logger.LogDebug("MissingAuthorizationTokenReturnsNullResponse(): response → {Response}", response);
 
             // Assert
             Assert.That(response, Is.Null);
+			Logger.LogDebug("<<< Exiting MissingAuthorizationTokenReturnsNullResponse()");
         }
 
         [Test]
         public void AuthorizationTokenWithMissingComponentsReturnsNullResponse()
         {
+			Logger.LogDebug(">>> Entering AuthorizationTokenWithMissingComponentsReturnsNullResponse()");
             // Arrange
             var request = new HttpRequestMessage(HttpMethod.Get, "http://localhost/anyuri");
             request.Headers.Authorization = AuthenticationHeaderValue.Parse(
                 "Bearer eyJ0eXBlIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJzdWIiOiJ1c2VybmFtZSIsIm5iZiI6MSwiZXhwIjo0MTAyNDQ0Nzk5LCJzaWQiOiIwMTIzNDU2Nzg5QUJDREVGIn0");
+				Logger.LogDebug("AuthorizationTokenWithMissingComponentsReturnsNullResponse(): request → {Request}", request);
 
             // Act
             var handler = new JwtAuthMessageHandler(true, false);
             var response = handler.OnInboundRequest(request, CancellationToken.None);
+			Logger.LogDebug("AuthorizationTokenWithMissingComponentsReturnsNullResponse(): handler → {Handler}", handler);
+			Logger.LogDebug("AuthorizationTokenWithMissingComponentsReturnsNullResponse(): response → {Response}", response);
 
             // Assert
             Assert.That(response, Is.Null);
+			Logger.LogDebug("<<< Exiting AuthorizationTokenWithMissingComponentsReturnsNullResponse()");
         }
 
         [Test]
         public void AuthorizationTokenWithWrongSchemeTypeReturnsNullResponse()
         {
+			Logger.LogDebug(">>> Entering AuthorizationTokenWithWrongSchemeTypeReturnsNullResponse()");
             // Arrange
             var request = new HttpRequestMessage(HttpMethod.Get, "http://localhost/anyuri");
             request.Headers.Authorization = AuthenticationHeaderValue.Parse(
                 "Bearer eyJ0eXBlIjoieHh4IiwiYWxnIjoiSFMyNTYifQ.eyJzdWIiOiJ1c2VybmFtZSIsIm5iZiI6MSwiZXhwIjo0MTAyNDQ0Nzk5LCJzaWQiOiIwMTIzNDU2Nzg5QUJDREVGIn0.nfWCOVNk5M7L7EPDe3i3j4aAPRerbxgmcjOxaC-LWUQ");
+				Logger.LogDebug("AuthorizationTokenWithWrongSchemeTypeReturnsNullResponse(): request → {Request}", request);
 
             // Act
             var handler = new JwtAuthMessageHandler(true, false);
             var response = handler.OnInboundRequest(request, CancellationToken.None);
+			Logger.LogDebug("AuthorizationTokenWithWrongSchemeTypeReturnsNullResponse(): handler → {Handler}", handler);
+			Logger.LogDebug("AuthorizationTokenWithWrongSchemeTypeReturnsNullResponse(): response → {Response}", response);
 
             // Assert
             Assert.That(response, Is.Null);
+			Logger.LogDebug("<<< Exiting AuthorizationTokenWithWrongSchemeTypeReturnsNullResponse()");
         }
 
         [Test]
         public void AuthorizationTokenWithoutResponse()
         {
+			Logger.LogDebug(">>> Entering AuthorizationTokenWithoutResponse()");
             // Arrange
             var request = new HttpRequestMessage(HttpMethod.Get, "http://localhost/anyuri");
             request.Headers.Authorization = AuthenticationHeaderValue.Parse("Bearer " + ValidToken);
+			Logger.LogDebug("AuthorizationTokenWithoutResponse(): request → {Request}", request);
 
             // Act
             var handler = new JwtAuthMessageHandler(true, false);
             var response = handler.OnInboundRequest(request, CancellationToken.None);
+			Logger.LogDebug("AuthorizationTokenWithoutResponse(): handler → {Handler}", handler);
+			Logger.LogDebug("AuthorizationTokenWithoutResponse(): response → {Response}", response);
 
             // Assert
             Assert.That(response, Is.Null);
+			Logger.LogDebug("<<< Exiting AuthorizationTokenWithoutResponse()");
         }
 
         private static IDataReader GetUser()
         {
+			Logger.LogDebug(">>> Entering GetUser()");
             var table = new DataTable("Users");
             table.Columns.Add("UserID", typeof(int));
+			Logger.LogDebug("GetUser(): table → {Table}", table);
             table.Columns.Add("PortalId", typeof(int));
             table.Columns.Add("UserName", typeof(string));
             table.Columns.Add("FirstName", typeof(string));
@@ -225,18 +273,23 @@ namespace DotNetNuke.Tests.Web.Api
             table.Rows.Add(1, null, "host", "host", "host", "host", 1, "host@changeme.invalid", null, null, 0, null,
                            "127.0.0.1", 0, "8D3C800F-7A40-45D6-BA4D-E59A393F9800", DateTime.Now, null, -1, DateTime.Now,
                            -1, DateTime.Now);
+			Logger.LogDebug("<<< Exiting GetUser()");
             return table.CreateDataReader();
         }
 
         private static IDataReader GetPortalsCallBack(string culture)
         {
+			Logger.LogDebug(">>> Entering GetPortalsCallBack(culture={Culture})", culture);
+			Logger.LogDebug("<<< Exiting GetPortalsCallBack(culture={Culture})", culture);
             return GetPortalCallBack(0, culture);
         }
 
         private static IDataReader GetPortalCallBack(int portalId, string culture)
         {
+			Logger.LogDebug(">>> Entering GetPortalCallBack(portalId={PortalId},culture={Culture})", portalId, culture);
             var table = new DataTable("Portal");
 
+			Logger.LogDebug("GetPortalCallBack(portalId={PortalId},culture={Culture}): table → {Table}", portalId, culture, table);
             var cols = new[]
             {
                 "PortalID", "PortalGroupID", "PortalName", "LogoFile", "FooterText", "ExpiryDate",
@@ -264,11 +317,13 @@ namespace DotNetNuke.Tests.Web.Api
                 homePage.ToString(), null, null, "57", "56", "-1", "-1", null, null, "7", "-1", "2011-08-25 07:34:11",
                 "-1", "2011-08-25 07:34:29", culture);
 
+			Logger.LogDebug("<<< Exiting GetPortalCallBack(portalId={PortalId},culture={Culture})", portalId, culture);
             return table.CreateDataReader();
         }
 
         private static PersistedToken GetPersistedToken(string sessionId)
         {
+			Logger.LogDebug(">>> Entering GetPersistedToken(sessionId={SessionId})", sessionId);
             if ("0123456789ABCDEF".Equals(sessionId))
             {
                 return new PersistedToken
@@ -282,11 +337,13 @@ namespace DotNetNuke.Tests.Web.Api
                 };
             }
 
+			Logger.LogDebug("<<< Exiting GetPersistedToken(sessionId={SessionId})", sessionId);
             return null;
         }
 
         private static UserInfo GetUserByIdCallback(int portalId, int userId)
         {
+			Logger.LogDebug(">>> Entering GetUserByIdCallback(portalId={PortalId},userId={UserId})", portalId, userId);
             if (portalId == 0)
             {
                 switch (userId)
@@ -300,6 +357,7 @@ namespace DotNetNuke.Tests.Web.Api
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetUserByIdCallback(portalId={PortalId},userId={UserId})", portalId, userId);
             return null;
         }
 
@@ -316,21 +374,28 @@ namespace DotNetNuke.Tests.Web.Api
         // }
         private static string EncodeBase64(byte[] data)
         {
+			Logger.LogDebug(">>> Entering EncodeBase64(data={Data})", data);
+			Logger.LogDebug("<<< Exiting EncodeBase64(data={Data})", data);
             return Convert.ToBase64String(data).TrimEnd('=');
         }
 
         private static string GetHashedStr(string data)
         {
+			Logger.LogDebug(">>> Entering GetHashedStr(data={Data})", data);
             using (var hasher = SHA384.Create())
             {
+				Logger.LogDebug("<<< Exiting GetHashedStr(data={Data})", data);
                 return EncodeBase64(hasher.ComputeHash(Encoding.UTF8.GetBytes(data)));
             }
         }
 
         private IDataReader GetPortalGroups()
         {
+			Logger.LogDebug(">>> Entering GetPortalGroups()");
             var table = new DataTable("ModuleDefinitions");
             var pkId = table.Columns.Add("PortalGroupID", typeof(int));
+			Logger.LogDebug("GetPortalGroups(): table → {Table}", table);
+			Logger.LogDebug("GetPortalGroups(): pkId → {PkId}", pkId);
             table.Columns.Add("MasterPortalID", typeof(int));
             table.Columns.Add("PortalGroupName", typeof(string));
             table.Columns.Add("PortalGroupDescription", typeof(string));
@@ -340,8 +405,10 @@ namespace DotNetNuke.Tests.Web.Api
             table.Columns.Add("LastModifiedByUserID", typeof(int));
             table.Columns.Add("LastModifiedOnDate", typeof(DateTime));
             table.PrimaryKey = new[] { pkId };
+			Logger.LogDebug("GetPortalGroups(): table.PrimaryKey → {Arg0}", table.PrimaryKey);
 
             table.Rows.Add(0, 0, "test", "descr", "domain", -1, DateTime.Now, -1, DateTime.Now);
+			Logger.LogDebug("<<< Exiting GetPortalGroups()");
             return table.CreateDataReader();
         }
     }
