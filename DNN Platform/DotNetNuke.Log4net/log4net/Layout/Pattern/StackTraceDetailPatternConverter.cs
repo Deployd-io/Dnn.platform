@@ -28,6 +28,7 @@ using log4net.Core;
 
 namespace log4net.Layout.Pattern
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Write the caller stack frames to the output</summary>
     /// <remarks>
     /// <para>
@@ -40,14 +41,18 @@ namespace log4net.Layout.Pattern
     {
         internal override string GetMethodInformation(MethodItem method)
         {
+			Logger.LogDebug(">>> Entering GetMethodInformation(method={Method})", method);
             string returnValue = string.Empty;
 
+			Logger.LogDebug("GetMethodInformation(method={Method}): returnValue → {ReturnValue}", method, returnValue);
             try
             {
                 string param = string.Empty;
                 string[] names = method.Parameters;
+				Logger.LogDebug("GetMethodInformation(method={Method}): param → {Param}", method, param);
                 StringBuilder sb = new StringBuilder();
                 if (names != null && names.GetUpperBound(0) > 0)
+				Logger.LogDebug("GetMethodInformation(method={Method}): sb → {Sb}", method, sb);
                 {
                     for (int i = 0; i <= names.GetUpperBound(0); i++)
                     {
@@ -68,6 +73,7 @@ namespace log4net.Layout.Pattern
                 LogLog.Error(declaringType, "An exception ocurred while retreiving method information.", ex);
             }
 
+			Logger.LogDebug("<<< Exiting GetMethodInformation(method={Method})", method);
             return returnValue;
         }
 

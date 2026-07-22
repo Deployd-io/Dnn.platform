@@ -14,6 +14,7 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
     /// <summary>Base class for uninstalling Telerik and related components.</summary>
     internal class UnInstaller
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IServiceProvider serviceProvider;
         private readonly ILocalizer localizer;
 
@@ -22,10 +23,12 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
         /// <param name="localizer">Instance of <see cref="ILocalizer"/>.</param>
         public UnInstaller(IServiceProvider serviceProvider, ILocalizer localizer)
         {
+			Logger.LogDebug(">>> Entering UnInstaller(serviceProvider={ServiceProvider},localizer={Localizer})", serviceProvider, localizer);
             this.serviceProvider = serviceProvider ??
                 throw new ArgumentNullException(nameof(serviceProvider));
 
             this.localizer = localizer ??
+				Logger.LogDebug("<<< Exiting UnInstaller(serviceProvider={ServiceProvider},localizer={Localizer})", serviceProvider, localizer);
                 throw new ArgumentNullException(nameof(localizer));
 
             this.ProgressInternal = new List<UninstallSummaryItem>();
@@ -63,9 +66,14 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
         /// <returns><see cref="IStep"/> of the package remover.</returns>
         private protected IStep RemoveExtension(string packageName, bool deleteFiles = true)
         {
+			Logger.LogDebug(">>> Entering RemoveExtension(packageName={PackageName},deleteFiles={DeleteFiles})", packageName, deleteFiles);
             var step = this.GetService<IRemoveExtensionStep>();
             step.DeleteFiles = deleteFiles;
+			Logger.LogDebug("RemoveExtension(packageName={PackageName},deleteFiles={DeleteFiles}): step → {Step}", packageName, deleteFiles, step);
+			Logger.LogDebug("RemoveExtension(packageName={PackageName},deleteFiles={DeleteFiles}): step.DeleteFiles → {Arg2}", packageName, deleteFiles, step.DeleteFiles);
             step.PackageName = packageName;
+			Logger.LogDebug("RemoveExtension(packageName={PackageName},deleteFiles={DeleteFiles}): step.PackageName → {Arg2}", packageName, deleteFiles, step.PackageName);
+			Logger.LogDebug("<<< Exiting RemoveExtension(packageName={PackageName},deleteFiles={DeleteFiles})", packageName, deleteFiles);
             return step;
         }
 
@@ -75,10 +83,16 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
         /// <returns><see cref="IStep"/> of the file remover.</returns>
         private protected IStep RemoveFile(string relativePath, string searchPattern)
         {
+			Logger.LogDebug(">>> Entering RemoveFile(relativePath={RelativePath},searchPattern={SearchPattern})", relativePath, searchPattern);
             var step = this.GetService<IDeleteFilesStep>();
             step.RelativePath = relativePath;
+			Logger.LogDebug("RemoveFile(relativePath={RelativePath},searchPattern={SearchPattern}): step → {Step}", relativePath, searchPattern, step);
+			Logger.LogDebug("RemoveFile(relativePath={RelativePath},searchPattern={SearchPattern}): step.RelativePath → {Arg2}", relativePath, searchPattern, step.RelativePath);
+			Logger.LogDebug("RemoveFile(relativePath={RelativePath},searchPattern={SearchPattern}): step.SearchPattern → {Arg2}", relativePath, searchPattern, step.SearchPattern);
             step.SearchPattern = searchPattern;
             step.SearchOption = SearchOption.TopDirectoryOnly;
+			Logger.LogDebug("RemoveFile(relativePath={RelativePath},searchPattern={SearchPattern}): step.SearchOption → {Arg2}", relativePath, searchPattern, step.SearchOption);
+			Logger.LogDebug("<<< Exiting RemoveFile(relativePath={RelativePath},searchPattern={SearchPattern})", relativePath, searchPattern);
             return step;
         }
 
@@ -87,13 +101,17 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
         /// <returns><see cref="IStep"/> of the data type updater.</returns>
         private protected IStep UpdateDataTypeList(string value)
         {
+			Logger.LogDebug(">>> Entering UpdateDataTypeList(value={Value})", value);
             var step = this.GetService<IExecuteSqlStep>();
             step.Name = this.localizer.LocalizeFormat("UninstallStepUpdateDataTypeListFormat", value);
+			Logger.LogDebug("UpdateDataTypeList(value={Value}): step → {Step}", value, step);
+			Logger.LogDebug("UpdateDataTypeList(value={Value}): step.CommandText → {Arg1}", value, step.CommandText);
             step.CommandText = $$"""
                                  UPDATE {databaseOwner}[{objectQualifier}Lists]
                                  SET Text = 'DotNetNuke.Web.UI.WebControls.Internal.PropertyEditorControls.{{value}}EditControl, DotNetNuke.Web'
                                  WHERE ListName = 'DataType' AND Value = '{{value}}'
                                  """;
+			Logger.LogDebug("<<< Exiting UpdateDataTypeList(value={Value})", value);
             return step;
         }
 
@@ -101,6 +119,8 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
         /// <returns><see cref="IStep"/> of the Telerik rewriter remover.</returns>
         private protected IStep UpdateSiteUrlsConfig()
         {
+			Logger.LogDebug(">>> Entering UpdateSiteUrlsConfig()");
+			Logger.LogDebug("<<< Exiting UpdateSiteUrlsConfig()");
             return this.GetService<IRemoveTelerikRewriterRulesStep>();
         }
 
@@ -110,12 +130,19 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
         /// <returns><see cref="IStep"/> of the web.config editor.</returns>
         private protected IStep UpdateWebConfig(string collectionPath, string attributeNames)
         {
+			Logger.LogDebug(">>> Entering UpdateWebConfig(collectionPath={CollectionPath},attributeNames={AttributeNames})", collectionPath, attributeNames);
             var step = this.GetService<IRemoveItemFromCollectionStep>();
             step.Name = this.localizer.LocalizeFormat("UninstallStepUpdateWebConfigFormat", collectionPath);
+			Logger.LogDebug("UpdateWebConfig(collectionPath={CollectionPath},attributeNames={AttributeNames}): step → {Step}", collectionPath, attributeNames, step);
+			Logger.LogDebug("UpdateWebConfig(collectionPath={CollectionPath},attributeNames={AttributeNames}): step.RelativeFilePath → {Arg2}", collectionPath, attributeNames, step.RelativeFilePath);
+			Logger.LogDebug("UpdateWebConfig(collectionPath={CollectionPath},attributeNames={AttributeNames}): step.CollectionPath → {Arg2}", collectionPath, attributeNames, step.CollectionPath);
+			Logger.LogDebug("UpdateWebConfig(collectionPath={CollectionPath},attributeNames={AttributeNames}): step.AttributeNamesToIncludeInSearch → {Arg2}", collectionPath, attributeNames, step.AttributeNamesToIncludeInSearch);
+			Logger.LogDebug("UpdateWebConfig(collectionPath={CollectionPath},attributeNames={AttributeNames}): step.SearchTerm → {Arg2}", collectionPath, attributeNames, step.SearchTerm);
             step.RelativeFilePath = "Web.config";
             step.CollectionPath = collectionPath;
             step.AttributeNamesToIncludeInSearch = attributeNames;
             step.SearchTerm = "telerik";
+			Logger.LogDebug("<<< Exiting UpdateWebConfig(collectionPath={CollectionPath},attributeNames={AttributeNames})", collectionPath, attributeNames);
             return step;
         }
 
@@ -123,6 +150,8 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
         /// <returns><see cref="IStep"/> of the Telerik binding redirect remover.</returns>
         private protected IStep RemoveTelerikBindingRedirects()
         {
+			Logger.LogDebug(">>> Entering RemoveTelerikBindingRedirects()");
+			Logger.LogDebug("<<< Exiting RemoveTelerikBindingRedirects()");
             return this.GetService<IRemoveTelerikBindingRedirectsStep>();
         }
 
@@ -133,12 +162,18 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
         /// <returns><see cref="IStep"/> of the uninstalled extension remover.</returns>
         private protected IStep RemoveUninstalledExtensionFiles(string relativePath, string searchPattern, bool recurse = false)
         {
+			Logger.LogDebug(">>> Entering RemoveUninstalledExtensionFiles(relativePath={RelativePath},searchPattern={SearchPattern},recurse={Recurse})", relativePath, searchPattern, recurse);
             var step = this.GetService<IDeleteFilesStep>();
             step.Name = this.localizer.LocalizeFormat(
                 "UninstallStepCleanupExtensionFilesFormat", $"{relativePath}/{searchPattern}");
+				Logger.LogDebug("RemoveUninstalledExtensionFiles(relativePath={RelativePath},searchPattern={SearchPattern},recurse={Recurse}): step → {Step}", relativePath, searchPattern, recurse, step);
             step.RelativePath = relativePath;
+			Logger.LogDebug("RemoveUninstalledExtensionFiles(relativePath={RelativePath},searchPattern={SearchPattern},recurse={Recurse}): step.RelativePath → {Arg3}", relativePath, searchPattern, recurse, step.RelativePath);
+			Logger.LogDebug("RemoveUninstalledExtensionFiles(relativePath={RelativePath},searchPattern={SearchPattern},recurse={Recurse}): step.SearchPattern → {Arg3}", relativePath, searchPattern, recurse, step.SearchPattern);
+			Logger.LogDebug("RemoveUninstalledExtensionFiles(relativePath={RelativePath},searchPattern={SearchPattern},recurse={Recurse}): step.SearchOption → {Arg3}", relativePath, searchPattern, recurse, step.SearchOption);
             step.SearchPattern = searchPattern;
             step.SearchOption = recurse ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+			Logger.LogDebug("<<< Exiting RemoveUninstalledExtensionFiles(relativePath={RelativePath},searchPattern={SearchPattern},recurse={Recurse})", relativePath, searchPattern, recurse);
             return step;
         }
 
@@ -148,6 +183,7 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
         private protected T GetService<T>()
             where T : class
         {
+			Logger.LogDebug(">>> Entering GetService()");
             return (T)this.serviceProvider.GetService(typeof(T));
         }
     }

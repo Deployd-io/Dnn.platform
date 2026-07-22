@@ -11,14 +11,21 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
     [XmlInclude(typeof(ClientString))]
     public class ClientOption
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public ClientOption()
         {
+		Logger.LogDebug(">>> Entering ClientOption()");
+		Logger.LogDebug("<<< Exiting ClientOption()");
         }
 
         public ClientOption(string name, string value)
         {
+			Logger.LogDebug(">>> Entering ClientOption(name={Name},value={Value})", name, value);
             this.Name = name;
             this.Value = value;
+			Logger.LogDebug("<<< Exiting ClientOption(name={Name},value={Value})", name, value);
+			Logger.LogDebug("ClientOption(name={Name},value={Value}): this.Name → {Arg2}", name, value, this.Name);
+			Logger.LogDebug("ClientOption(name={Name},value={Value}): this.Value → {Arg2}", name, value, this.Value);
         }
 
         public string Name { get; set; }

@@ -17,14 +17,17 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Host
     [ConsoleCommand("get-host", Constants.HostCategory, "Prompt_GetHost_Description")]
     public class GetHost : ConsoleCommandBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override string LocalResourceFile => Constants.LocalResourcesFile;
 
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             var sbErrors = new StringBuilder();
 
+			Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): sbErrors → {SbErrors}", args, portalSettings, userInfo, activeTabId, sbErrors);
             // HOST-ONLY ACCESS
             if (!userInfo.IsSuperUser)
             {
@@ -40,19 +43,23 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Host
             }
 
             this.AddMessage(sbErrors.ToString());
+			Logger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             var lst = new List<HostModel>();
 
+			Logger.LogDebug("Run(): lst → {Lst}", lst);
             // double-check host access:
             if (this.User.IsSuperUser)
             {
                 lst.Add(HostModel.Current());
             }
 
+			Logger.LogDebug("<<< Exiting Run()");
             return new ConsoleResultModel(string.Empty) { Data = lst, Output = this.LocalizeString("Prompt_GetHost_OkMessage") };
         }
     }

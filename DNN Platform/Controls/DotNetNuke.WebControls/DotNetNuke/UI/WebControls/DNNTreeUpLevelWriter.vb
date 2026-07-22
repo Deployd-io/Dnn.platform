@@ -1,5 +1,6 @@
 ﻿' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports DotNetNuke.UI.Utilities
 Imports Microsoft.VisualBasic
@@ -17,11 +18,14 @@ Namespace DotNetNuke.UI.WebControls
         Implements IDNNTreeWriter
         ' Methods
         Public Sub New()
+			Logger.LogDebug(">>> Entering New()")
             DNNTreeUpLevelWriter.__ENCAddToList(Me)
         End Sub
+		Logger.LogDebug("<<< Exiting New()")
 
         <DebuggerNonUserCode> _
         Private Shared Sub __ENCAddToList(ByVal value As Object)
+			Logger.LogDebug(">>> Entering __ENCAddToList(value={Value})", value)
             SyncLock DNNTreeUpLevelWriter.__ENCList
                 If (DNNTreeUpLevelWriter.__ENCList.Count = DNNTreeUpLevelWriter.__ENCList.Capacity) Then
                     Dim index As Integer = 0
@@ -47,8 +51,10 @@ Namespace DotNetNuke.UI.WebControls
                 DNNTreeUpLevelWriter.__ENCList.Add(New WeakReference(value))
             End SyncLock
         End Sub
+		Logger.LogDebug("<<< Exiting __ENCAddToList(value={Value})", value)
 
         Protected Function MarshalledProperties() As Hashtable Implements IDNNTreeWriter.MarshalledProperties
+			Logger.LogDebug(">>> Entering MarshalledProperties()")
             Dim hashtable2 As New Hashtable
             Dim flag As Boolean = (Me._tree.ImageList.Count > 0)
             If flag Then
@@ -56,13 +62,16 @@ Namespace DotNetNuke.UI.WebControls
                 Dim expression As String = ""
                 Try 
                     enumerator = Me._tree.ImageList.GetEnumerator
+					Logger.LogDebug("MarshalledProperties(): enumerator → {Enumerator}", enumerator)
                     Do While True
                         flag = enumerator.MoveNext
+						Logger.LogDebug("MarshalledProperties(): flag → {Flag}", flag)
                         If Not flag Then
                             Exit Do
                         End If
                         Dim current As NodeImage = DirectCast(enumerator.Current, NodeImage)
                         expression = (expression & Conversions.ToString(Interaction.IIf((Strings.Len(expression) > 0), ",", "")) & current.ImageUrl)
+						Logger.LogDebug("MarshalledProperties(): expression → {Expression}", expression)
                     Loop
                 Finally
                     If Not Object.ReferenceEquals(TryCast(enumerator,IDisposable), Nothing) Then
@@ -84,11 +93,14 @@ Namespace DotNetNuke.UI.WebControls
             End If
             Return hashtable2
         End Function
+		Logger.LogDebug("<<< Exiting MarshalledProperties()")
 
         Protected Overrides Sub RenderChildren(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderChildren(writer={Writer})", writer)
             Dim enumerator As IEnumerator = Nothing
             Try 
                 enumerator = Me._tree.TreeNodes.GetEnumerator
+				Logger.LogDebug("RenderChildren(writer={Writer}): enumerator → {Enumerator}", writer, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -101,8 +113,10 @@ Namespace DotNetNuke.UI.WebControls
                 End If
             End Try
         End Sub
+		Logger.LogDebug("<<< Exiting RenderChildren(writer={Writer})", writer)
 
         Protected Overrides Sub RenderContents(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderContents(writer={Writer})", writer)
             writer.AddAttribute(HtmlTextWriterAttribute.Width, "100%")
             writer.AddAttribute(HtmlTextWriterAttribute.Class, "DNNTree")
             writer.AddAttribute(HtmlTextWriterAttribute.Name, Me._tree.UniqueID)
@@ -110,11 +124,15 @@ Namespace DotNetNuke.UI.WebControls
             writer.RenderBeginTag(HtmlTextWriterTag.Div)
             writer.RenderEndTag
         End Sub
+		Logger.LogDebug("<<< Exiting RenderContents(writer={Writer})", writer)
 
         Public Sub RenderTree(ByVal writer As HtmlTextWriter, ByVal tree As DnnTree) Implements IDNNTreeWriter.RenderTree
+			Logger.LogDebug(">>> Entering RenderTree(writer={Writer},tree={Tree})", writer, tree)
             Me._tree = tree
             Me.RenderControl(writer)
+			Logger.LogDebug("RenderTree(writer={Writer},tree={Tree}): Me._tree → {Arg2}", writer, tree, Me._tree)
         End Sub
+		Logger.LogDebug("<<< Exiting RenderTree(writer={Writer},tree={Tree})", writer, tree)
 
 
         ' Fields

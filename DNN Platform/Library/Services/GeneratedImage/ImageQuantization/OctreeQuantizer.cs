@@ -11,6 +11,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
     /// <summary>Quantize using an Octree.</summary>
     public class OctreeQuantizer : Quantizer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Stores the tree.</summary>
         private Octree octree;
 
@@ -27,6 +28,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
         public OctreeQuantizer(int maxColors, int maxColorBits)
             : base(false)
         {
+			Logger.LogDebug(">>> Entering OctreeQuantizer(maxColors={MaxColors},maxColorBits={MaxColorBits})", maxColors, maxColorBits);
             if (maxColors > 255)
             {
                 throw new ArgumentOutOfRangeException(nameof(maxColors), maxColors, "The number of colors should be less than 256");
@@ -39,21 +41,29 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
 
             // Construct the octree
             this.octree = new Octree(maxColorBits);
+			Logger.LogDebug("OctreeQuantizer(maxColors={MaxColors},maxColorBits={MaxColorBits}): octree → {Octree}", maxColors, maxColorBits, octree);
             this.maxColors = maxColors;
+			Logger.LogDebug("<<< Exiting OctreeQuantizer(maxColors={MaxColors},maxColorBits={MaxColorBits})", maxColors, maxColorBits);
+			Logger.LogDebug("OctreeQuantizer(maxColors={MaxColors},maxColorBits={MaxColorBits}): maxColors → {MaxColors1}", maxColors, maxColorBits, maxColors);
+			Logger.LogDebug("OctreeQuantizer(maxColors={MaxColors},maxColorBits={MaxColorBits}): this.maxColors → {Arg2}", maxColors, maxColorBits, this.maxColors);
         }
 
         /// <inheritdoc />
         protected override void InitialQuantizePixel(Color32 pixel)
         {
+			Logger.LogDebug(">>> Entering InitialQuantizePixel(pixel={Pixel})", pixel);
             // Add the color to the octree
             this.octree.AddColor(pixel);
+			Logger.LogDebug("<<< Exiting InitialQuantizePixel(pixel={Pixel})", pixel);
         }
 
         /// <inheritdoc />
         protected override byte QuantizePixel(Color32 pixel)
         {
+			Logger.LogDebug(">>> Entering QuantizePixel(pixel={Pixel})", pixel);
             byte paletteIndex = (byte)this.maxColors;   // The color at [_maxColors] is set to transparent
 
+			Logger.LogDebug("QuantizePixel(pixel={Pixel}): paletteIndex → {PaletteIndex}", pixel, paletteIndex);
             // Get the palette index if this non-transparent
             if (pixel.Alpha > 0)
             {
@@ -66,9 +76,11 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
         /// <inheritdoc />
         protected override ColorPalette GetPalette(ColorPalette original)
         {
+			Logger.LogDebug(">>> Entering GetPalette(original={Original})", original);
             // First off convert the octree to _maxColors colors
             ArrayList palette = this.octree.Palletize(this.maxColors - 1);
 
+			Logger.LogDebug("GetPalette(original={Original}): palette → {Palette}", original, palette);
             // Then convert the palette based on those colors
             for (int index = 0; index < palette.Count; index++)
             {
@@ -78,6 +90,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
             // Add the transparent color
             original.Entries[this.maxColors] = Color.FromArgb(0, 0, 0, 0);
 
+			Logger.LogDebug("<<< Exiting GetPalette(original={Original})", original);
             return original;
         }
 
@@ -109,12 +122,24 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
             /// <param name="maxColorBits">The maximum number of significant bits in the image.</param>
             public Octree(int maxColorBits)
             {
+				Logger.LogDebug(">>> Entering Octree(maxColorBits={MaxColorBits})", maxColorBits);
                 this.maxColorBits = maxColorBits;
                 this.leafCount = 0;
+				Logger.LogDebug("Octree(maxColorBits={MaxColorBits}): this.maxColorBits → {Arg1}", maxColorBits, this.maxColorBits);
+				Logger.LogDebug("Octree(maxColorBits={MaxColorBits}): leafCount → {LeafCount}", maxColorBits, leafCount);
+				Logger.LogDebug("Octree(maxColorBits={MaxColorBits}): this.leafCount → {Arg1}", maxColorBits, this.leafCount);
+				Logger.LogDebug("Octree(maxColorBits={MaxColorBits}): maxColorBits → {MaxColorBits1}", maxColorBits, maxColorBits);
                 this.reducibleNodes = new OctreeNode[9];
                 this.root = new OctreeNode(0, this.maxColorBits, this);
                 this.previousColor = 0;
+				Logger.LogDebug("Octree(maxColorBits={MaxColorBits}): this.reducibleNodes → {Arg1}", maxColorBits, this.reducibleNodes);
+				Logger.LogWarning("Octree(maxColorBits={MaxColorBits}): root → {Root}", maxColorBits, root);
+				Logger.LogDebug("Octree(maxColorBits={MaxColorBits}): previousColor → {PreviousColor}", maxColorBits, previousColor);
+				Logger.LogDebug("Octree(maxColorBits={MaxColorBits}): this.previousColor → {Arg1}", maxColorBits, this.previousColor);
                 this.previousNode = null;
+				Logger.LogDebug("<<< Exiting Octree(maxColorBits={MaxColorBits})", maxColorBits);
+				Logger.LogDebug("Octree(maxColorBits={MaxColorBits}): previousNode → {PreviousNode}", maxColorBits, previousNode);
+				Logger.LogDebug("Octree(maxColorBits={MaxColorBits}): this.previousNode → {Arg1}", maxColorBits, this.previousNode);
             }
 
             /// <summary>Gets or sets the number of leaves in the tree.</summary>
@@ -134,6 +159,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
             /// <param name="pixel">The pixel color.</param>
             public void AddColor(Color32 pixel)
             {
+				Logger.LogDebug(">>> Entering AddColor(pixel={Pixel})", pixel);
                 // Check if this request is for the same color as the last
                 if (this.previousColor == pixel.ARGB)
                 {
@@ -142,6 +168,8 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
                     if (this.previousNode == null)
                     {
                         this.previousColor = pixel.ARGB;
+						Logger.LogDebug("AddColor(pixel={Pixel}): previousColor → {PreviousColor}", pixel, previousColor);
+						Logger.LogDebug("AddColor(pixel={Pixel}): this.previousColor → {Arg1}", pixel, this.previousColor);
                         this.root.AddColor(pixel, this.maxColorBits, 0, this);
                     }
                     else
@@ -155,6 +183,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
                     this.previousColor = pixel.ARGB;
                     this.root.AddColor(pixel, this.maxColorBits, 0, this);
                 }
+				Logger.LogDebug("<<< Exiting AddColor(pixel={Pixel})", pixel);
             }
 
             /// <summary>Reduce the depth of the tree.</summary>
@@ -177,6 +206,8 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
                 // And just in case I've reduced the last color to be added, and the next color to
                 // be added is the same, invalidate the previousNode...
                 this.previousNode = null;
+				Logger.LogDebug(">>> Entering Reduce()");
+				Logger.LogDebug("<<< Exiting Reduce()");
             }
 
             /// <summary>Convert the nodes in the octree to a palette with a maximum of colorCount colors.</summary>
@@ -184,6 +215,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
             /// <returns>An arraylist with the palettized colors.</returns>
             public ArrayList Palletize(int colorCount)
             {
+				Logger.LogDebug(">>> Entering Palletize(colorCount={ColorCount})", colorCount);
                 while (this.Leaves > colorCount)
                 {
                     this.Reduce();
@@ -192,9 +224,11 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
                 // Now palettize the nodes
                 ArrayList palette = new ArrayList(this.Leaves);
                 int paletteIndex = 0;
+				Logger.LogDebug("Palletize(colorCount={ColorCount}): palette → {Palette}", colorCount, palette);
                 this.root.ConstructPalette(palette, ref paletteIndex);
 
                 // And return the palette
+				Logger.LogDebug("<<< Exiting Palletize(colorCount={ColorCount})", colorCount);
                 return palette;
             }
 
@@ -203,6 +237,8 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
             /// <returns>The index.</returns>
             public int GetPaletteIndex(Color32 pixel)
             {
+				Logger.LogDebug(">>> Entering GetPaletteIndex(pixel={Pixel})", pixel);
+				Logger.LogDebug("<<< Exiting GetPaletteIndex(pixel={Pixel})", pixel);
                 return this.root.GetPaletteIndex(pixel, 0);
             }
 
@@ -246,19 +282,28 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
                 /// <param name="octree">The tree to which this node belongs.</param>
                 public OctreeNode(int level, int colorBits, Octree octree)
                 {
+					Logger.LogDebug(">>> Entering OctreeNode(level={Level},colorBits={ColorBits},octree={Octree})", level, colorBits, octree);
                     // Construct the new node
                     this.leaf = level == colorBits;
 
                     this.red = this.green = this.blue = 0;
+					Logger.LogDebug("OctreeNode(level={Level},colorBits={ColorBits},octree={Octree}): red → {Red}", level, colorBits, octree, red);
+					Logger.LogDebug("OctreeNode(level={Level},colorBits={ColorBits},octree={Octree}): this.red → {Arg3}", level, colorBits, octree, this.red);
                     this.pixelCount = 0;
 
+					Logger.LogDebug("OctreeNode(level={Level},colorBits={ColorBits},octree={Octree}): pixelCount → {PixelCount}", level, colorBits, octree, pixelCount);
+					Logger.LogDebug("OctreeNode(level={Level},colorBits={ColorBits},octree={Octree}): this.pixelCount → {Arg3}", level, colorBits, octree, this.pixelCount);
                     // If a leaf, increment the leaf count
                     if (this.leaf)
                     {
                         octree.Leaves++;
                         this.nextReducible = null;
+						Logger.LogDebug("OctreeNode(level={Level},colorBits={ColorBits},octree={Octree}): nextReducible → {NextReducible}", level, colorBits, octree, nextReducible);
+						Logger.LogDebug("OctreeNode(level={Level},colorBits={ColorBits},octree={Octree}): this.nextReducible → {Arg3}", level, colorBits, octree, this.nextReducible);
                         this.children = null;
                     }
+					Logger.LogDebug("OctreeNode(level={Level},colorBits={ColorBits},octree={Octree}): children → {Children}", level, colorBits, octree, children);
+					Logger.LogDebug("OctreeNode(level={Level},colorBits={ColorBits},octree={Octree}): this.children → {Arg3}", level, colorBits, octree, this.children);
                     else
                     {
                         // Otherwise add this to the reducible nodes
@@ -266,6 +311,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
                         octree.ReducibleNodes[level] = this;
                         this.children = new OctreeNode[8];
                     }
+					Logger.LogDebug("<<< Exiting OctreeNode(level={Level},colorBits={ColorBits},octree={Octree})", level, colorBits, octree);
                 }
 
                 /// <summary>Gets return the child nodes.</summary>
@@ -288,6 +334,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
                 /// <param name="octree">The tree to which this node belongs.</param>
                 public void AddColor(Color32 pixel, int colorBits, int level, Octree octree)
                 {
+					Logger.LogDebug(">>> Entering AddColor(pixel={Pixel},colorBits={ColorBits},level={Level},octree={Octree})", pixel, colorBits, level, octree);
                     // Update the color information if this is a leaf
                     if (this.leaf)
                     {
@@ -306,6 +353,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
 
                         OctreeNode child = this.children[index];
 
+						Logger.LogDebug("AddColor(pixel={Pixel},colorBits={ColorBits},level={Level},octree={Octree}): child → {Child}", pixel, colorBits, level, octree, child);
                         if (child == null)
                         {
                             // Create a new child node & store in the array
@@ -316,14 +364,18 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
                         // Add the color to the child node
                         child.AddColor(pixel, colorBits, level + 1, octree);
                     }
+					Logger.LogDebug("<<< Exiting AddColor(pixel={Pixel},colorBits={ColorBits},level={Level},octree={Octree})", pixel, colorBits, level, octree);
                 }
 
                 /// <summary>Reduce this node by removing all of its children.</summary>
                 /// <returns>The number of leaves removed.</returns>
                 public int Reduce()
                 {
+					Logger.LogDebug(">>> Entering Reduce()");
                     this.red = this.green = this.blue = 0;
                     int children = 0;
+					Logger.LogDebug("Reduce(): this.red → {Arg0}", this.red);
+					Logger.LogDebug("Reduce(): red → {Red}", red);
 
                     // Loop through all children and add their information to this node
                     for (int index = 0; index < 8; index++)
@@ -341,6 +393,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
 
                     // Now change this to a leaf node
                     this.leaf = true;
+					Logger.LogDebug("Reduce(): this.leaf → {Arg0}", this.leaf);
 
                     // Return the number of nodes to decrement the leaf count by
                     return children - 1;
@@ -394,16 +447,19 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
                         }
                     }
 
+					Logger.LogDebug("<<< Exiting GetPaletteIndex(pixel={Pixel},level={Level})", pixel, level);
                     return paletteIndex;
                 }
 
                 /// <summary>Increment the pixel count and add to the color information.</summary>
                 public void Increment(Color32 pixel)
                 {
+					Logger.LogDebug(">>> Entering Increment(pixel={Pixel})", pixel);
                     this.pixelCount++;
                     this.red += pixel.Red;
                     this.green += pixel.Green;
                     this.blue += pixel.Blue;
+					Logger.LogDebug("<<< Exiting Increment(pixel={Pixel})", pixel);
                 }
             }
         }

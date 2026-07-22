@@ -21,19 +21,23 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
     /// </summary>
     internal abstract class TabActionBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Removes the cache for the tab.
         /// </summary>
         /// <param name="stateTransaction">The state transaction.</param>
         internal static void RemoveCache(StateTransaction stateTransaction)
         {
+			Logger.LogDebug(">>> Entering RemoveCache(stateTransaction={StateTransaction})", stateTransaction);
             var tab = GetTab(stateTransaction.ContentItemId);
             if (tab == null)
+			Logger.LogDebug("RemoveCache(stateTransaction={StateTransaction}): tab → {Tab}", stateTransaction, tab);
             {
                 return;
             }
 
             DataCache.RemoveCache($"Tab_Tabs{tab.PortalID}");
+			Logger.LogDebug("<<< Exiting RemoveCache(stateTransaction={StateTransaction})", stateTransaction);
         }
 
         /// <summary>
@@ -43,21 +47,29 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
         /// <returns>The content item.</returns>
         internal static ContentItem GetContentItem(int contentItemId)
             => Util.GetContentController().GetContentItem(contentItemId);
+			Logger.LogDebug(">>> Entering GetContentItem(contentItemId={ContentItemId})", contentItemId);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         /// <summary>
         /// Gets the tab information by content item ID.
         /// </summary>
         /// <param name="contentItemId">The content item ID.</param>
+		Logger.LogDebug("<<< Exiting GetContentItem(contentItemId={ContentItemId})", contentItemId);
         /// <returns>The tab information.</returns>
         internal static TabInfo GetTab(int contentItemId)
         {
+			Logger.LogDebug(">>> Entering GetTab(contentItemId={ContentItemId})", contentItemId);
             const string Sql = "SELECT * FROM dbo.vw_Tabs WHERE ContentItemId = @ContentItemId";
+			Logger.LogInformation("GetContentItem(contentItemId)={ContentItemId}: find query executed in {Arg1} ms", contentItemId, __logStart.ElapsedMilliseconds);
 
             IDataParameter[] parameters =
             [
                 new SqlParameter("@ContentItemId", SqlDbType.Int) { Value = contentItemId },
             ];
+				Logger.LogInformation("GetTab(contentItemId)={ContentItemId}: find query executed in {Arg1} ms", contentItemId, __logStart.ElapsedMilliseconds);
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
+			Logger.LogDebug("<<< Exiting GetTab(contentItemId={ContentItemId})", contentItemId);
             return CBO.FillObject<TabInfo>(DataProvider.Instance().ExecuteSQL(Sql, parameters));
         }
 
@@ -69,7 +81,10 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
         /// <returns>The localized string value.</returns>
         internal static string GetString(string key, string defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetString(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             var content = Localization.GetString(key, Localization.GlobalResourceFile);
+			Logger.LogDebug("GetString(key={Key},defaultValue={DefaultValue}): content → {Content}", key, defaultValue, content);
+			Logger.LogDebug("<<< Exiting GetString(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             return string.IsNullOrEmpty(content) ? defaultValue : content;
         }
 

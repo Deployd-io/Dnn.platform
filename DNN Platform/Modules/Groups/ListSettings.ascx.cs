@@ -20,6 +20,7 @@ namespace DotNetNuke.Modules.Groups
     /// <summary>The Settings class manages Module Settings.</summary>
     public partial class ListSettings : GroupsSettingsBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly RoleProvider roleProvider;
 
         /// <summary>Initializes a new instance of the <see cref="ListSettings"/> class.</summary>
@@ -27,6 +28,10 @@ namespace DotNetNuke.Modules.Groups
         public ListSettings()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering ListSettings()");
+		Logger.LogDebug("<<< Exiting ListSettings()");
+		Logger.LogDebug(">>> Entering ListSettings(roleProvider={RoleProvider})", roleProvider);
+		Logger.LogDebug("<<< Exiting ListSettings(roleProvider={RoleProvider})", roleProvider);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ListSettings"/> class.</summary>
@@ -34,11 +39,13 @@ namespace DotNetNuke.Modules.Groups
         public ListSettings(RoleProvider roleProvider)
         {
             this.roleProvider = roleProvider ?? this.DependencyProvider.GetRequiredService<RoleProvider>();
+			Logger.LogDebug("ListSettings(roleProvider={RoleProvider}): roleProvider → {RoleProvider1}", roleProvider, roleProvider);
         }
 
         /// <summary>LoadSettings loads the settings from the Database and displays them.</summary>
         public override void LoadSettings()
         {
+			Logger.LogDebug(">>> Entering LoadSettings()");
             try
             {
                 if (this.Page.IsPostBack == false)
@@ -104,13 +111,16 @@ namespace DotNetNuke.Modules.Groups
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in LoadSettings(): {Arg0}", ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting LoadSettings()");
         }
 
         /// <summary>UpdateSettings saves the modified settings to the Database.</summary>
         public override void UpdateSettings()
         {
+			Logger.LogDebug(">>> Entering UpdateSettings()");
             try
             {
                 ModuleController.Instance.UpdateTabModuleSetting(this.TabModuleId, Constants.DefaultRoleGroupSetting, this.drpRoleGroup.SelectedItem.Value);
@@ -127,30 +137,37 @@ namespace DotNetNuke.Modules.Groups
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in UpdateSettings(): {Arg0}", ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting UpdateSettings()");
         }
 
         private void BindGroups()
         {
+			Logger.LogDebug(">>> Entering BindGroups()");
             var arrGroups = RoleController.GetRoleGroups(this.roleProvider, this.PortalId);
             this.drpRoleGroup.Items.Add(new ListItem(Localization.GetString("AllRoles"), "-2"));
+			Logger.LogDebug("BindGroups(): arrGroups → {ArrGroups}", arrGroups);
             this.drpRoleGroup.Items.Add(new ListItem(Localization.GetString("GlobalRoles"), "-1"));
 
             foreach (RoleGroupInfo roleGroup in arrGroups)
             {
                 this.drpRoleGroup.Items.Add(new ListItem(roleGroup.RoleGroupName, roleGroup.RoleGroupID.ToString()));
             }
+			Logger.LogDebug("<<< Exiting BindGroups()");
         }
 
         private void BindPages()
         {
+			Logger.LogDebug(">>> Entering BindPages()");
             foreach (ModuleInfo moduleInfo in ModuleController.Instance.GetModules(this.PortalId))
             {
                 if (moduleInfo.DesktopModule.ModuleName.Contains("Social Groups") && moduleInfo.IsDeleted == false)
                 {
                     TabInfo tabInfo = TabController.Instance.GetTab(moduleInfo.TabID, this.PortalId, false);
                     if (tabInfo != null)
+					Logger.LogDebug("BindPages(): tabInfo → {TabInfo}", tabInfo);
                     {
                         if (tabInfo.IsDeleted == false)
                         {
@@ -168,6 +185,7 @@ namespace DotNetNuke.Modules.Groups
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting BindPages()");
         }
     }
 }

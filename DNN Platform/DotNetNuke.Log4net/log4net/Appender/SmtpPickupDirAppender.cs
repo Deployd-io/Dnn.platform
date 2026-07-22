@@ -51,6 +51,7 @@ namespace log4net.Appender
     /// <author>Nicko Cadell</author>
     public class SmtpPickupDirAppender : BufferingAppenderSkeleton
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Default constructor</summary>
         /// <remarks>
         /// <para>
@@ -59,7 +60,10 @@ namespace log4net.Appender
         /// </remarks>
         public SmtpPickupDirAppender()
         {
+			Logger.LogDebug(">>> Entering SmtpPickupDirAppender()");
             this.m_fileExtension = string.Empty; // Default to empty string, not null
+			Logger.LogDebug("<<< Exiting SmtpPickupDirAppender()");
+			Logger.LogDebug("SmtpPickupDirAppender(): this.m_fileExtension → {Arg0}", this.m_fileExtension);
         }
 
         /// <summary>Gets or sets a semicolon-delimited list of recipient e-mail addresses.</summary>
@@ -178,12 +182,15 @@ namespace log4net.Appender
         /// </remarks>
         protected override void SendBuffer(LoggingEvent[] events) 
         {
+			Logger.LogDebug(">>> Entering SendBuffer(events={Events})", events);
             // Note: this code already owns the monitor for this
             // appender. This frees us from needing to synchronize again.
             try 
             {
                 string filePath = null;
                 StreamWriter writer = null;
+				Logger.LogDebug("SendBuffer(events={Events}): filePath → {FilePath}", events, filePath);
+				Logger.LogDebug("SendBuffer(events={Events}): writer → {Writer}", events, writer);
 
                 // Impersonate to open the file
                 using(this.SecurityContext.Impersonate(this))
@@ -208,6 +215,7 @@ namespace log4net.Appender
 
                         string t = this.Layout.Header;
                         if (t != null)
+						Logger.LogDebug("SendBuffer(events={Events}): t → {T}", events, t);
                         {
                             writer.Write(t);
                         }
@@ -231,8 +239,10 @@ namespace log4net.Appender
             } 
             catch(Exception e) 
             {
+				Logger.LogError("Exception in SendBuffer(events={Events}): {Arg1}", events, ex.Message);
                 this.ErrorHandler.Error("Error occurred while sending e-mail notification.", e);
             }
+			Logger.LogDebug("<<< Exiting SendBuffer(events={Events})", events);
         }
 
         /// <summary>Activate the options on this appender. </summary>
@@ -251,17 +261,20 @@ namespace log4net.Appender
         /// </remarks>
         public override void ActivateOptions() 
         {	
+			Logger.LogDebug(">>> Entering ActivateOptions()");
             base.ActivateOptions();
 
             if (this.m_securityContext == null)
             {
                 this.m_securityContext = SecurityContextProvider.DefaultProvider.CreateSecurityContext(this);
+				Logger.LogDebug("ActivateOptions(): m_securityContext → {M_securityContext}", m_securityContext);
             }
 
             using(this.SecurityContext.Impersonate(this))
             {
                 this.m_pickupDir = ConvertToFullPath(this.m_pickupDir.Trim());
             }
+			Logger.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>This appender requires a <see cref="Layout"/> to be set.</summary>
@@ -289,6 +302,8 @@ namespace log4net.Appender
         /// </remarks>
         protected static string ConvertToFullPath(string path)
         {
+			Logger.LogDebug(">>> Entering ConvertToFullPath(path={Path})", path);
+			Logger.LogDebug("<<< Exiting ConvertToFullPath(path={Path})", path);
             return SystemInfo.ConvertToFullPath(path);
         }
 

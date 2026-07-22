@@ -8,13 +8,19 @@ namespace DNN.Integration.Test.Framework
 
     internal class CachedWebPage
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private string[] _inputFields;
 
         public CachedWebPage(string token, string[] fields)
         {
+			Logger.LogDebug(">>> Entering CachedWebPage(token={Token},fields={Fields})", token, fields);
             this.FetchDateTime = DateTime.Now;
             this.VerificationToken = token;
+			Logger.LogDebug("CachedWebPage(token={Token},fields={Fields}): this.FetchDateTime → {Arg2}", token, fields, this.FetchDateTime);
+			Logger.LogDebug("CachedWebPage(token={Token},fields={Fields}): this.VerificationToken → {Arg2}", token, fields, this.VerificationToken);
             this.InputFields = fields;
+			Logger.LogDebug("<<< Exiting CachedWebPage(token={Token},fields={Fields})", token, fields);
+			Logger.LogDebug("CachedWebPage(token={Token},fields={Fields}): this.InputFields → {Arg2}", token, fields, this.InputFields);
         }
 
         public DateTime FetchDateTime { get; private set; } // when was this loaded

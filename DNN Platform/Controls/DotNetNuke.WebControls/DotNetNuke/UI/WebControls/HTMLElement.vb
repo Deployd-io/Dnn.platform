@@ -1,5 +1,6 @@
 ﻿' Copyright (c) .NET Foundation. All rights reserved.
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
+private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 
 Imports Microsoft.VisualBasic
 Imports Microsoft.VisualBasic.CompilerServices
@@ -11,18 +12,25 @@ Namespace DotNetNuke.UI.WebControls
     Public Class HTMLElement
         ' Methods
         Public Sub New(ByVal TagName As String)
+			Logger.LogDebug(">>> Entering New(TagName={TagName})", TagName)
             Me.m_strTagName = TagName
         End Sub
+		Logger.LogDebug("<<< Exiting New(TagName={TagName})", TagName)
+		Logger.LogDebug("New(TagName={TagName}): Me.m_strTagName → {Arg1}", TagName, Me.m_strTagName)
 
         Private Function SafeJSONString(ByVal strString As String) As String
+			Logger.LogDebug(">>> Entering SafeJSONString(strString={StrString})", strString)
             Return ("'" & Strings.Replace(Strings.Replace(Strings.Replace(strString, ChrW(13), "\r", 1, -1, CompareMethod.Binary), ChrW(10), "\n", 1, -1, CompareMethod.Binary), "'", "\'", 1, -1, CompareMethod.Binary) & "'")
         End Function
+		Logger.LogDebug("<<< Exiting SafeJSONString(strString={StrString})", strString)
 
         Public Function ToJSON() As String
+			Logger.LogDebug(">>> Entering ToJSON()")
             Dim enumerator As IEnumerator = Nothing
             Dim builder As New StringBuilder
             Try 
                 enumerator = Me.Attributes.Keys.GetEnumerator
+				Logger.LogDebug("ToJSON(): enumerator → {Enumerator}", enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -51,6 +59,7 @@ Namespace DotNetNuke.UI.WebControls
             builder.Append("}"c)
             Return builder.ToString
         End Function
+		Logger.LogDebug("<<< Exiting ToJSON()")
 
 
         ' Properties

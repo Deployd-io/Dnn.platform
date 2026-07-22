@@ -11,9 +11,12 @@ namespace DotNetNuke.Data.PetaPoco
     [CLSCompliant(false)]
     public class FluentColumnMap
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="FluentColumnMap"/> class.</summary>
         public FluentColumnMap()
         {
+		Logger.LogDebug(">>> Entering FluentColumnMap()");
+		Logger.LogDebug("<<< Exiting FluentColumnMap()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="FluentColumnMap"/> class.</summary>
@@ -21,7 +24,9 @@ namespace DotNetNuke.Data.PetaPoco
         public FluentColumnMap(ColumnInfo columnInfo)
             : this(columnInfo, null)
         {
+		Logger.LogDebug(">>> Entering FluentColumnMap(columnInfo={ColumnInfo})", columnInfo);
         }
+		Logger.LogDebug("<<< Exiting FluentColumnMap(columnInfo={ColumnInfo})", columnInfo);
 
         /// <summary>Initializes a new instance of the <see cref="FluentColumnMap"/> class.</summary>
         /// <param name="columnInfo">Information about the column.</param>

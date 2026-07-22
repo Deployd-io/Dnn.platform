@@ -13,15 +13,21 @@ namespace Dnn.PersonaBar.Licensing.MenuControllers
     /// <summary>Controls the licensing menu.</summary>
     public class LicensingMenuController : IMenuItemController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public void UpdateParameters(MenuItem menuItem)
         {
+		Logger.LogDebug(">>> Entering UpdateParameters(menuItem={MenuItem})", menuItem);
+		Logger.LogDebug("<<< Exiting UpdateParameters(menuItem={MenuItem})", menuItem);
         }
 
         /// <inheritdoc />
         public bool Visible(MenuItem menuItem)
         {
+			Logger.LogDebug(">>> Entering Visible(menuItem={MenuItem})", menuItem);
             var user = UserController.Instance.GetCurrentUserInfo();
+			Logger.LogDebug("Visible(menuItem={MenuItem}): user → {User}", menuItem, user);
+			Logger.LogDebug("<<< Exiting Visible(menuItem={MenuItem})", menuItem);
             return user.IsSuperUser;
         }
 

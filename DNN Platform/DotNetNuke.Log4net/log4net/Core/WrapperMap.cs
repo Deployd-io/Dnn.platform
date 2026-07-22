@@ -69,10 +69,15 @@ namespace log4net.Core
         /// </remarks>
         public WrapperMap(WrapperCreationHandler createWrapperHandler) 
         {
+			m_shutdownHandler.LogDebug(">>> Entering WrapperMap(createWrapperHandler={CreateWrapperHandler})", createWrapperHandler);
             this.m_createWrapperHandler = createWrapperHandler;
 
+			m_shutdownHandler.LogDebug("WrapperMap(createWrapperHandler={CreateWrapperHandler}): this.m_createWrapperHandler → {Arg1}", createWrapperHandler, this.m_createWrapperHandler);
+			m_shutdownHandler.LogDebug("WrapperMap(createWrapperHandler={CreateWrapperHandler}): m_createWrapperHandler → {M_createWrapperHandler}", createWrapperHandler, m_createWrapperHandler);
             // Create the delegates for the event callbacks
             this.m_shutdownHandler = new LoggerRepositoryShutdownEventHandler(this.ILoggerRepository_Shutdown);
+			m_shutdownHandler.LogDebug("<<< Exiting WrapperMap(createWrapperHandler={CreateWrapperHandler})", createWrapperHandler);
+			m_shutdownHandler.LogDebug("WrapperMap(createWrapperHandler={CreateWrapperHandler}): m_shutdownHandler → {M_shutdownHandler}", createWrapperHandler, m_shutdownHandler);
         }
 
         /// <summary>Gets the wrapper object for the specified logger.</summary>
@@ -90,6 +95,7 @@ namespace log4net.Core
         /// </remarks>
         public virtual ILoggerWrapper GetWrapper(ILogger logger)
         {
+			m_shutdownHandler.LogDebug(">>> Entering GetWrapper(logger={Logger})", logger);
             // If the logger is null then the corresponding wrapper is null
             if (logger == null)
             {
@@ -101,6 +107,7 @@ namespace log4net.Core
                 // Lookup hierarchy in map.
                 Hashtable wrappersMap = (Hashtable)this.m_repositories[logger.Repository];
 
+				m_shutdownHandler.LogDebug("GetWrapper(logger={Logger}): wrappersMap → {WrappersMap}", logger, wrappersMap);
                 if (wrappersMap == null)
                 {
                     // Hierarchy does not exist in map.
@@ -116,6 +123,7 @@ namespace log4net.Core
                 // Look for the wrapper object in the map
                 ILoggerWrapper wrapperObject = wrappersMap[logger] as ILoggerWrapper;
 
+				m_shutdownHandler.LogDebug("GetWrapper(logger={Logger}): wrapperObject → {WrapperObject}", logger, wrapperObject);
                 if (wrapperObject == null)
                 {
                     // No wrapper object exists for the specified logger
@@ -127,6 +135,7 @@ namespace log4net.Core
                     wrappersMap[logger] = wrapperObject;
                 }
 
+				m_shutdownHandler.LogDebug("<<< Exiting GetWrapper(logger={Logger})", logger);
                 return wrapperObject;
             }
         }
@@ -159,10 +168,12 @@ namespace log4net.Core
         /// </remarks>
         protected virtual ILoggerWrapper CreateNewWrapperObject(ILogger logger)
         {
+			m_shutdownHandler.LogDebug(">>> Entering CreateNewWrapperObject(logger={Logger})", logger);
             if (this.m_createWrapperHandler != null)
             {
                 return this.m_createWrapperHandler(logger);
             }
+			m_shutdownHandler.LogDebug("<<< Exiting CreateNewWrapperObject(logger={Logger})", logger);
             return null;
         }
 
@@ -194,12 +205,14 @@ namespace log4net.Core
         /// <param name="e">The event args.</param>
         private void ILoggerRepository_Shutdown(object sender, EventArgs e)
         {
+			m_shutdownHandler.LogDebug(">>> Entering ILoggerRepository_Shutdown(sender={Sender},e={E})", sender, e);
             ILoggerRepository repository = sender as ILoggerRepository;
             if (repository != null)
             {
                 // Remove all repository from map
                 this.RepositoryShutdown(repository);
             }
+			m_shutdownHandler.LogDebug("<<< Exiting ILoggerRepository_Shutdown(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Map of logger repositories to hashtables of ILogger to ILoggerWrapper mappings</summary>

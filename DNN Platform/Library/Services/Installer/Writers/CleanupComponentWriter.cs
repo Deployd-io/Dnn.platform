@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// </summary>
     public class CleanupComponentWriter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly SortedList<string, InstallFile> files;
         private string basePath;
 
@@ -30,6 +31,7 @@ namespace DotNetNuke.Services.Installer.Writers
 
         public virtual void WriteManifest(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteManifest(writer={Writer})", writer);
             foreach (KeyValuePair<string, InstallFile> kvp in this.files)
             {
                 // Start component Element
@@ -41,6 +43,7 @@ namespace DotNetNuke.Services.Installer.Writers
                 // End component Element
                 writer.WriteEndElement();
             }
+			Logger.LogDebug("<<< Exiting WriteManifest(writer={Writer})", writer);
         }
     }
 }

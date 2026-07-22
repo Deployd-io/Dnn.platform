@@ -14,9 +14,12 @@ namespace Dnn.PersonaBar.Servers.Components.PerformanceSettings
 
     public class PerformanceController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public object GetPageStatePersistenceOptions()
         {
+			Logger.LogDebug(">>> Entering GetPageStatePersistenceOptions()");
+			Logger.LogDebug("<<< Exiting GetPageStatePersistenceOptions()");
             return new[]
             {
                 new KeyValuePair<string, string>("Page", "P"),
@@ -47,6 +50,8 @@ namespace Dnn.PersonaBar.Servers.Components.PerformanceSettings
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public object GetCacheSettingOptions()
         {
+			Logger.LogDebug(">>> Entering GetCacheSettingOptions()");
+			Logger.LogDebug("<<< Exiting GetCacheSettingOptions()");
             return new[]
             {
                 new KeyValuePair<string, int>("NoCaching", 0),
@@ -59,6 +64,8 @@ namespace Dnn.PersonaBar.Servers.Components.PerformanceSettings
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public object GetCacheabilityOptions()
         {
+			Logger.LogDebug(">>> Entering GetCacheabilityOptions()");
+			Logger.LogDebug("<<< Exiting GetCacheabilityOptions()");
             return new[]
             {
                 new KeyValuePair<string, int>("NoCache", 1),
@@ -72,6 +79,8 @@ namespace Dnn.PersonaBar.Servers.Components.PerformanceSettings
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public string GetCachingProvider()
         {
+			Logger.LogDebug(">>> Entering GetCachingProvider()");
+			Logger.LogDebug("<<< Exiting GetCachingProvider()");
             return ProviderConfiguration.GetProviderConfiguration("caching").DefaultProvider;
         }
 

@@ -28,6 +28,7 @@ using log4net.DateFormatter;
 
 namespace log4net.Util.PatternStringConverters
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Write the UTC date time to the output</summary>
     /// <remarks>
     /// <para>
@@ -57,6 +58,7 @@ namespace log4net.Util.PatternStringConverters
         /// <seealso cref="DatePatternConverter"/>
         protected override void Convert(TextWriter writer, object state)
         {
+			Logger.LogDebug(">>> Entering Convert(writer={Writer},state={State})", writer, state);
             try 
             {
                 this.m_dateFormatter.FormatDate(DateTime.UtcNow, writer);
@@ -65,6 +67,7 @@ namespace log4net.Util.PatternStringConverters
             {
                 LogLog.Error(declaringType, "Error occurred while converting date.", ex);
             }
+			Logger.LogDebug("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
         }
 
         /// <summary>The fully qualified type of the UtcDatePatternConverter class.</summary>

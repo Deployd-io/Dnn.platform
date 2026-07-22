@@ -343,6 +343,7 @@ namespace DotNetNuke.Common.Utilities
 
         public static void ClearCache()
         {
+			Logger.LogDebug(">>> Entering ClearCache()");
             CachingProvider.Instance().Clear("Prefix", "DNN_");
             using (DictionaryCache.GetWriteLock())
             {
@@ -352,21 +353,28 @@ namespace DotNetNuke.Common.Utilities
             // log the cache clear event
             var log = new LogInfo { LogTypeKey = nameof(EventLogType.CACHE_REFRESH), };
             log.LogProperties.Add(new LogDetailInfo("*", "Refresh"));
+			Logger.LogDebug("ClearCache(): log → {Log}", log);
             LogController.Instance.AddLog(log);
+			Logger.LogDebug("<<< Exiting ClearCache()");
         }
 
         public static void ClearCache(string cachePrefix)
         {
+			Logger.LogDebug(">>> Entering ClearCache(cachePrefix={CachePrefix})", cachePrefix);
             CachingProvider.Instance().Clear("Prefix", GetDnnCacheKey(cachePrefix));
+			Logger.LogDebug("<<< Exiting ClearCache(cachePrefix={CachePrefix})", cachePrefix);
         }
 
         public static void ClearFolderCache(int portalId)
         {
+			Logger.LogDebug(">>> Entering ClearFolderCache(portalId={PortalId})", portalId);
             CachingProvider.Instance().Clear("Folder", portalId.ToString(CultureInfo.InvariantCulture));
+			Logger.LogDebug("<<< Exiting ClearFolderCache(portalId={PortalId})", portalId);
         }
 
         public static void ClearHostCache(bool cascade)
         {
+			Logger.LogDebug(">>> Entering ClearHostCache(cascade={Cascade})", cascade);
             if (cascade)
             {
                 ClearCache();
@@ -375,6 +383,7 @@ namespace DotNetNuke.Common.Utilities
             {
                 CachingProvider.Instance().Clear("Host", string.Empty);
             }
+			Logger.LogDebug("<<< Exiting ClearHostCache(cascade={Cascade})", cascade);
         }
 
         /// <summary>Clear the module cache.</summary>
@@ -385,6 +394,7 @@ namespace DotNetNuke.Common.Utilities
                 Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>(),
                 Globals.GetCurrentServiceProvider().GetRequiredService<DataProvider>(),
                 tabId);
+			Logger.LogDebug(">>> Entering ClearModuleCache(tabId={TabId})", tabId);
 
         /// <summary>Clear the module cache.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -393,14 +403,18 @@ namespace DotNetNuke.Common.Utilities
         public static void ClearModuleCache(IHostSettings hostSettings, DataProvider dataProvider, int tabId)
         {
             CachingProvider.Instance().Clear("Module", tabId.ToString(CultureInfo.InvariantCulture));
+			Logger.LogDebug("<<< Exiting ClearModuleCache(tabId={TabId})", tabId);
             var portals = PortalController.GetPortalDictionary(hostSettings, dataProvider);
             if (portals.TryGetValue(tabId, out var portalId))
+			Logger.LogDebug("ClearModuleCache(hostSettings={HostSettings},dataProvider={DataProvider},tabId={TabId}): portals → {Portals}", hostSettings, dataProvider, tabId, portals);
             {
                 var tabSettings = TabController.Instance.GetTabSettings(tabId);
                 if (tabSettings["CacheProvider"] != null && tabSettings["CacheProvider"].ToString().Length > 0)
+				Logger.LogDebug("ClearModuleCache(hostSettings={HostSettings},dataProvider={DataProvider},tabId={TabId}): tabSettings → {TabSettings}", hostSettings, dataProvider, tabId, tabSettings);
                 {
                     var outputProvider = OutputCachingProvider.Instance(tabSettings["CacheProvider"].ToString());
                     outputProvider?.Remove(tabId);
+					Logger.LogDebug("ClearModuleCache(hostSettings={HostSettings},dataProvider={DataProvider},tabId={TabId}): outputProvider → {OutputProvider}", hostSettings, dataProvider, tabId, outputProvider);
                 }
 
                 RemoveCache(string.Format(CultureInfo.InvariantCulture, SharedModulesByPortalCacheKey, portalId));
@@ -410,75 +424,105 @@ namespace DotNetNuke.Common.Utilities
 
         public static void ClearModulePermissionsCachesByPortal(int portalId)
         {
+			Logger.LogDebug(">>> Entering ClearModulePermissionsCachesByPortal(portalId={PortalId})", portalId);
             CachingProvider.Instance().Clear("ModulePermissionsByPortal", portalId.ToString(CultureInfo.InvariantCulture));
+			Logger.LogDebug("<<< Exiting ClearModulePermissionsCachesByPortal(portalId={PortalId})", portalId);
         }
 
         public static void ClearPortalCache(int portalId, bool cascade)
         {
+			Logger.LogDebug(">>> Entering ClearPortalCache(portalId={PortalId},cascade={Cascade})", portalId, cascade);
             CachingProvider.Instance().Clear(cascade ? "PortalCascade" : "Portal", portalId.ToString(CultureInfo.InvariantCulture));
+			Logger.LogDebug("<<< Exiting ClearPortalCache(portalId={PortalId},cascade={Cascade})", portalId, cascade);
         }
 
         public static void ClearTabsCache(int portalId)
         {
+			Logger.LogDebug(">>> Entering ClearTabsCache(portalId={PortalId})", portalId);
             CachingProvider.Instance().Clear("Tab", portalId.ToString(CultureInfo.InvariantCulture));
+			Logger.LogDebug("<<< Exiting ClearTabsCache(portalId={PortalId})", portalId);
         }
 
         public static void ClearDefinitionsCache(int portalId)
         {
+			Logger.LogDebug(">>> Entering ClearDefinitionsCache(portalId={PortalId})", portalId);
             RemoveCache(string.Format(CultureInfo.InvariantCulture, ProfileDefinitionsCacheKey, portalId));
+			Logger.LogDebug("<<< Exiting ClearDefinitionsCache(portalId={PortalId})", portalId);
         }
 
         public static void ClearDesktopModulePermissionsCache()
         {
+			Logger.LogDebug(">>> Entering ClearDesktopModulePermissionsCache()");
             RemoveCache(DesktopModulePermissionCacheKey);
+			Logger.LogDebug("<<< Exiting ClearDesktopModulePermissionsCache()");
         }
 
         public static void ClearFolderPermissionsCache(int portalId)
         {
+			Logger.LogDebug(">>> Entering ClearFolderPermissionsCache(portalId={PortalId})", portalId);
             PermissionProvider.ResetCacheDependency(
                 portalId,
                 () => RemoveCache(string.Format(CultureInfo.InvariantCulture, FolderPermissionCacheKey, portalId)));
+				Logger.LogDebug("<<< Exiting ClearFolderPermissionsCache(portalId={PortalId})", portalId);
         }
 
         public static void ClearListsCache(int portalId)
         {
+			Logger.LogDebug(">>> Entering ClearListsCache(portalId={PortalId})", portalId);
             RemoveCache(string.Format(CultureInfo.InvariantCulture, ListsCacheKey, portalId));
+			Logger.LogDebug("<<< Exiting ClearListsCache(portalId={PortalId})", portalId);
+			Logger.LogDebug(">>> Entering RemoveCache(cacheKey={CacheKey})", cacheKey);
+			Logger.LogDebug("<<< Exiting RemoveCache(cacheKey={CacheKey})", cacheKey);
         }
 
         public static void ClearModulePermissionsCache(int tabId)
         {
+			Logger.LogDebug(">>> Entering ClearModulePermissionsCache(tabId={TabId})", tabId);
             RemoveCache(string.Format(CultureInfo.InvariantCulture, ModulePermissionCacheKey, tabId));
+			Logger.LogDebug("<<< Exiting ClearModulePermissionsCache(tabId={TabId})", tabId);
         }
 
         public static void ClearTabPermissionsCache(int portalId)
         {
+			Logger.LogDebug(">>> Entering ClearTabPermissionsCache(portalId={PortalId})", portalId);
             RemoveCache(string.Format(CultureInfo.InvariantCulture, TabPermissionCacheKey, portalId));
+			Logger.LogDebug("<<< Exiting ClearTabPermissionsCache(portalId={PortalId})", portalId);
         }
 
         public static void ClearPortalPermissionsCache(int portalId)
         {
+			Logger.LogDebug(">>> Entering ClearPortalPermissionsCache(portalId={PortalId})", portalId);
             RemoveCache(string.Format(CultureInfo.InvariantCulture, PortalPermissionCacheKey, portalId));
+			Logger.LogDebug("<<< Exiting ClearPortalPermissionsCache(portalId={PortalId})", portalId);
         }
 
         public static void ClearUserCache(int portalId, string username)
         {
+			Logger.LogDebug(">>> Entering ClearUserCache(portalId={PortalId},username={Username})", portalId, username);
             RemoveCache(string.Format(CultureInfo.InvariantCulture, UserCacheKey, portalId, username));
             RemoveCache(string.Format(CultureInfo.InvariantCulture, UserProfileCacheKey, portalId, username));
+			Logger.LogDebug("<<< Exiting ClearUserCache(portalId={PortalId},username={Username})", portalId, username);
         }
 
         public static void ClearPortalUserCountCache(int portalID)
         {
+			Logger.LogDebug(">>> Entering ClearPortalUserCountCache(portalID={PortalID})", portalID);
             CachingProvider.Instance().Remove(string.Format(CultureInfo.InvariantCulture, PortalUserCountCacheKey, portalID));
+			Logger.LogDebug("<<< Exiting ClearPortalUserCountCache(portalID={PortalID})", portalID);
         }
 
         public static void ClearUserPersonalizationCache(int portalId, int userId)
         {
+			Logger.LogDebug(">>> Entering ClearUserPersonalizationCache(portalId={PortalId},userId={UserId})", portalId, userId);
             RemoveCache(string.Format(CultureInfo.InvariantCulture, UserPersonalizationCacheKey, portalId, userId));
+			Logger.LogDebug("<<< Exiting ClearUserPersonalizationCache(portalId={PortalId},userId={UserId})", portalId, userId);
         }
 
         public static void ClearPackagesCache(int portalId)
         {
+			Logger.LogDebug(">>> Entering ClearPackagesCache(portalId={PortalId})", portalId);
             RemoveCache(string.Format(CultureInfo.InvariantCulture, PackagesCacheKey, portalId));
+			Logger.LogDebug("<<< Exiting ClearPackagesCache(portalId={PortalId})", portalId);
         }
 
         /// <summary>Get cached data.</summary>
@@ -489,7 +533,9 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(10, 0, 2, "Use overload taking IHostSettings")]
         public static partial TObject GetCachedData<TObject>(CacheItemArgs cacheItemArgs, CacheItemExpiredCallback cacheItemExpired)
             => GetCachedData<TObject>(Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>(), cacheItemArgs, cacheItemExpired);
+			Logger.LogDebug(">>> Entering GetCachedData(cacheItemArgs={CacheItemArgs},cacheItemExpired={CacheItemExpired})", cacheItemArgs, cacheItemExpired);
 
+		Logger.LogDebug("<<< Exiting GetCachedData(cacheItemArgs={CacheItemArgs},cacheItemExpired={CacheItemExpired})", cacheItemArgs, cacheItemExpired);
         public static TObject GetCachedData<TObject>(IHostSettings hostSettings, CacheItemArgs cacheItemArgs, CacheItemExpiredCallback cacheItemExpired)
         {
             // declare local object and try and retrieve item from the cache
@@ -498,8 +544,10 @@ namespace DotNetNuke.Common.Utilities
 
         public static TObject GetCache<TObject>(string cacheKey)
         {
+			Logger.LogDebug(">>> Entering GetCache(cacheKey={CacheKey})", cacheKey);
             object objObject = GetCache(cacheKey);
             if (objObject == null)
+			Logger.LogDebug("GetCache(cacheKey={CacheKey}): objObject → {ObjObject}", cacheKey, objObject);
             {
                 return default(TObject);
             }
@@ -509,6 +557,7 @@ namespace DotNetNuke.Common.Utilities
 
         public static object GetCache(string cacheKey)
         {
+			Logger.LogDebug("<<< Exiting GetCache(cacheKey={CacheKey})", cacheKey);
             return CachingProvider.Instance().GetItem(GetDnnCacheKey(cacheKey));
         }
 
@@ -519,10 +568,12 @@ namespace DotNetNuke.Common.Utilities
 
         public static void RemoveFromPrivateDictionary(string dnnCacheKey)
         {
+			Logger.LogDebug(">>> Entering RemoveFromPrivateDictionary(dnnCacheKey={DnnCacheKey})", dnnCacheKey);
             using (DictionaryCache.GetWriteLock())
             {
                 DictionaryCache.Remove(CleanCacheKey(dnnCacheKey));
             }
+			Logger.LogDebug("<<< Exiting RemoveFromPrivateDictionary(dnnCacheKey={DnnCacheKey})", dnnCacheKey);
         }
 
         public static void SetCache(string cacheKey, object objObject)
@@ -566,6 +617,7 @@ namespace DotNetNuke.Common.Utilities
 
         internal static void ItemRemovedCallback(string key, object value, CacheItemRemovedReason removedReason)
         {
+			Logger.LogDebug(">>> Entering ItemRemovedCallback(key={Key},value={Value},removedReason={RemovedReason})", key, value, removedReason);
             // if the item was removed from the cache, log the key and reason to the event log
             try
             {
@@ -573,6 +625,7 @@ namespace DotNetNuke.Common.Utilities
                 {
                     var log = new LogInfo();
                     switch (removedReason)
+					Logger.LogDebug("ItemRemovedCallback(key={Key},value={Value},removedReason={RemovedReason}): log → {Log}", key, value, removedReason, log);
                     {
                         case CacheItemRemovedReason.Removed:
                             log.LogTypeKey = nameof(EventLogType.CACHE_REMOVED);
@@ -597,6 +650,7 @@ namespace DotNetNuke.Common.Utilities
                 // Swallow exception
                 Logger.Error(exc);
             }
+			Logger.LogDebug("<<< Exiting ItemRemovedCallback(key={Key},value={Value},removedReason={RemovedReason})", key, value, removedReason);
         }
 
         internal static TObject GetCachedData<TObject>(PerformanceSettings performance, CacheItemArgs cacheItemArgs, CacheItemExpiredCallback cacheItemExpired, bool storeInDictionary)
@@ -616,18 +670,24 @@ namespace DotNetNuke.Common.Utilities
 
         private static string GetDnnCacheKey(string cacheKey)
         {
+			Logger.LogDebug(">>> Entering GetDnnCacheKey(cacheKey={CacheKey})", cacheKey);
+			Logger.LogDebug("<<< Exiting GetDnnCacheKey(cacheKey={CacheKey})", cacheKey);
             return CachingProvider.GetCacheKey(cacheKey);
         }
 
         private static string CleanCacheKey(string cacheKey)
         {
+			Logger.LogDebug(">>> Entering CleanCacheKey(cacheKey={CacheKey})", cacheKey);
+			Logger.LogDebug("<<< Exiting CleanCacheKey(cacheKey={CacheKey})", cacheKey);
             return CachingProvider.CleanCacheKey(cacheKey);
         }
 
         private static object GetCachedDataFromRuntimeCache(PerformanceSettings performance, CacheItemArgs cacheItemArgs, CacheItemExpiredCallback cacheItemExpired)
         {
+			Logger.LogDebug(">>> Entering GetCachedDataFromRuntimeCache(performance={Performance},cacheItemArgs={CacheItemArgs},cacheItemExpired={CacheItemExpired})", performance, cacheItemArgs, cacheItemExpired);
             object objObject = GetCache(cacheItemArgs.CacheKey);
 
+			Logger.LogDebug("GetCachedDataFromRuntimeCache(performance={Performance},cacheItemArgs={CacheItemArgs},cacheItemExpired={CacheItemExpired}): objObject → {ObjObject}", performance, cacheItemArgs, cacheItemExpired, objObject);
             // if item is not cached
             if (objObject == null)
             {
@@ -650,6 +710,7 @@ namespace DotNetNuke.Common.Utilities
                         }
                         catch (Exception ex)
                         {
+							Logger.LogError("Exception in GetCachedDataFromRuntimeCache(performance={Performance},cacheItemArgs={CacheItemArgs},cacheItemExpired={CacheItemExpired}): {Arg3}", performance, cacheItemArgs, cacheItemExpired, ex.Message);
                             objObject = null;
                             Exceptions.LogException(ex);
                         }
@@ -657,6 +718,7 @@ namespace DotNetNuke.Common.Utilities
                         // set cache timeout
                         int timeOut = cacheItemArgs.CacheTimeOut * (int)performance;
 
+						Logger.LogDebug("GetCachedDataFromRuntimeCache(performance={Performance},cacheItemArgs={CacheItemArgs},cacheItemExpired={CacheItemExpired}): timeOut → {TimeOut}", performance, cacheItemArgs, cacheItemExpired, timeOut);
                         // if we retrieved a valid object and we are using caching
                         if (objObject != null && timeOut > 0)
                         {
@@ -676,6 +738,7 @@ namespace DotNetNuke.Common.Utilities
                                 // log the event if the item was not saved in the cache ( likely because we are out of memory )
                                 var log = new LogInfo { LogTypeKey = nameof(EventLogType.CACHE_OVERFLOW) };
                                 log.LogProperties.Add(new LogDetailInfo(cacheItemArgs.CacheKey, "Overflow - Item Not Cached"));
+								Logger.LogDebug("GetCachedDataFromRuntimeCache(performance={Performance},cacheItemArgs={CacheItemArgs},cacheItemExpired={CacheItemExpired}): log → {Log}", performance, cacheItemArgs, cacheItemExpired, log);
                                 LogController.Instance.AddLog(log);
                             }
                         }
@@ -686,17 +749,20 @@ namespace DotNetNuke.Common.Utilities
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetCachedDataFromRuntimeCache(performance={Performance},cacheItemArgs={CacheItemArgs},cacheItemExpired={CacheItemExpired})", performance, cacheItemArgs, cacheItemExpired);
             return objObject;
         }
 
         private static object GetCachedDataFromDictionary(CacheItemArgs cacheItemArgs, CacheItemExpiredCallback cacheItemExpired)
         {
+			Logger.LogDebug(">>> Entering GetCachedDataFromDictionary(cacheItemArgs={CacheItemArgs},cacheItemExpired={CacheItemExpired})", cacheItemArgs, cacheItemExpired);
             object cachedObject;
 
             bool isFound;
             using (DictionaryCache.GetReadLock())
             {
                 isFound = DictionaryCache.TryGetValue(cacheItemArgs.CacheKey, out cachedObject);
+				Logger.LogDebug("GetCachedDataFromDictionary(cacheItemArgs={CacheItemArgs},cacheItemExpired={CacheItemExpired}): isFound → {IsFound}", cacheItemArgs, cacheItemExpired, isFound);
             }
 
             if (!isFound)
@@ -706,8 +772,10 @@ namespace DotNetNuke.Common.Utilities
                 {
                     cachedObject = cacheItemExpired != null ? cacheItemExpired(cacheItemArgs) : null;
                 }
+				Logger.LogDebug("GetCachedDataFromDictionary(cacheItemArgs={CacheItemArgs},cacheItemExpired={CacheItemExpired}): cachedObject → {CachedObject}", cacheItemArgs, cacheItemExpired, cachedObject);
                 catch (Exception ex)
                 {
+					Logger.LogError("Exception in GetCachedDataFromDictionary(cacheItemArgs={CacheItemArgs},cacheItemExpired={CacheItemExpired}): {Arg2}", cacheItemArgs, cacheItemExpired, ex.Message);
                     cachedObject = null;
                     Exceptions.LogException(ex);
                 }
@@ -724,11 +792,13 @@ namespace DotNetNuke.Common.Utilities
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetCachedDataFromDictionary(cacheItemArgs={CacheItemArgs},cacheItemExpired={CacheItemExpired})", cacheItemArgs, cacheItemExpired);
             return cachedObject;
         }
 
         private static object GetUniqueLockObject(string key)
         {
+			Logger.LogDebug(">>> Entering GetUniqueLockObject(key={Key})", key);
             object @lock = null;
             if (DictionaryLock.TryEnterReadLock(FiveSeconds))
             {
@@ -757,6 +827,7 @@ namespace DotNetNuke.Common.Utilities
                         {
                             // Create new lock
                             value = new object();
+							Logger.LogDebug("GetUniqueLockObject(key={Key}): value → {Value}", key, value);
                             LockDictionary[key] = value;
                         }
 
@@ -770,11 +841,13 @@ namespace DotNetNuke.Common.Utilities
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetUniqueLockObject(key={Key})", key);
             return @lock;
         }
 
         private static void RemoveUniqueLockObject(string key)
         {
+			Logger.LogDebug(">>> Entering RemoveUniqueLockObject(key={Key})", key);
             if (!DictionaryLock.TryEnterWriteLock(FiveSeconds))
             {
                 return;
@@ -793,6 +866,7 @@ namespace DotNetNuke.Common.Utilities
             {
                 DictionaryLock.ExitWriteLock();
             }
+			Logger.LogDebug("<<< Exiting RemoveUniqueLockObject(key={Key})", key);
         }
     }
 }

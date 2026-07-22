@@ -22,6 +22,7 @@ namespace DotNetNuke.Services.Installer.Installers
     /// <summary>The ModuleInstaller installs Module Components to a DotNetNuke site.</summary>
     public class ModuleInstaller : ComponentInstallerBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private DesktopModuleInfo desktopModule;
         private EventMessage eventMessage;
         private DesktopModuleInfo installedDesktopModule;
@@ -40,6 +41,7 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <remarks>In the case of Modules this is not neccessary.</remarks>
         public override void Commit()
         {
+			Logger.LogDebug(">>> Entering Commit()");
             // Add CodeSubDirectory
             if (!string.IsNullOrEmpty(this.desktopModule.CodeSubDirectory))
             {
@@ -119,15 +121,18 @@ namespace DotNetNuke.Services.Installer.Installers
                     this.Log.AddInfo(string.Format(CultureInfo.InvariantCulture, Util.MODULE_HostPagemoduleAdded, this.desktopModule.HostPage));
                 }
             }
+			Logger.LogDebug("<<< Exiting Commit()");
         }
 
         /// <summary>The Install method installs the Module component.</summary>
         public override void Install()
         {
+			Logger.LogDebug(">>> Entering Install()");
             try
             {
                 // Attempt to get the Desktop Module
                 this.installedDesktopModule = DesktopModuleController.GetDesktopModuleByModuleName(this.desktopModule.ModuleName, this.Package.InstallerInfo.PortalID);
+				Logger.LogDebug("Install(): installedDesktopModule → {InstalledDesktopModule}", installedDesktopModule);
 
                 if (this.installedDesktopModule != null)
                 {
@@ -146,20 +151,24 @@ namespace DotNetNuke.Services.Installer.Installers
                 this.desktopModule.DesktopModuleID = DesktopModuleController.SaveDesktopModule(this.desktopModule, true, false);
 
                 this.Completed = true;
+				Logger.LogDebug("Install(): this.Completed → {Arg0}", this.Completed);
                 this.Log.AddInfo(string.Format(CultureInfo.InvariantCulture, Util.MODULE_Registered, this.desktopModule.ModuleName));
             }
             catch (Exception ex)
             {
                 this.Log.AddFailure(ex);
             }
+			Logger.LogDebug("<<< Exiting Install()");
         }
 
         /// <summary>The ReadManifest method reads the manifest file for the Module component.</summary>
         /// <param name="manifestNav">The XPath navigator for the Module section of the manifest.</param>
         public override void ReadManifest(XPathNavigator manifestNav)
         {
+			Logger.LogDebug(">>> Entering ReadManifest(manifestNav={ManifestNav})", manifestNav);
             // Load the Desktop Module from the manifest
             this.desktopModule = CBO.DeserializeObject<DesktopModuleInfo>(new StringReader(manifestNav.InnerXml));
+			Logger.LogDebug("ReadManifest(manifestNav={ManifestNav}): desktopModule → {DesktopModule}", manifestNav, desktopModule);
 
             // Allow a <component type="Module"> (i.e. a DesktopModule) to have its own friendlyname / description.
             // This allows multiple DesktopModules in one Package, allowing large MVC packages which share one assembly
@@ -184,6 +193,7 @@ namespace DotNetNuke.Services.Installer.Installers
             }
 
             this.eventMessage = this.ReadEventMessageNode(manifestNav);
+			Logger.LogDebug("ReadManifest(manifestNav={ManifestNav}): eventMessage → {EventMessage}", manifestNav, eventMessage);
 
             // Load permissions (to add)
             foreach (XPathNavigator moduleDefinitionNav in manifestNav.Select("desktopModule/moduleDefinitions/moduleDefinition"))
@@ -193,6 +203,7 @@ namespace DotNetNuke.Services.Installer.Installers
                 {
                     var permission = new PermissionInfo();
                     permission.PermissionCode = Util.ReadAttribute(permissionNav, "code");
+					Logger.LogWarning("ReadManifest(manifestNav={ManifestNav}): permission → {Permission}", manifestNav, permission);
                     permission.PermissionKey = Util.ReadAttribute(permissionNav, "key");
                     permission.PermissionName = Util.ReadAttribute(permissionNav, "name");
                     ModuleDefinitionInfo moduleDefinition = this.desktopModule.ModuleDefinitions[friendlyName];
@@ -207,6 +218,7 @@ namespace DotNetNuke.Services.Installer.Installers
             {
                 this.Log.AddInfo(Util.MODULE_ReadSuccess);
             }
+			Logger.LogDebug("<<< Exiting ReadManifest(manifestNav={ManifestNav})", manifestNav);
         }
 
         /// <summary>
@@ -215,6 +227,7 @@ namespace DotNetNuke.Services.Installer.Installers
         /// </summary>
         public override void Rollback()
         {
+			Logger.LogDebug(">>> Entering Rollback()");
             // If Temp Module exists then we need to update the DataStore with this
             if (this.installedDesktopModule == null)
             {
@@ -226,25 +239,31 @@ namespace DotNetNuke.Services.Installer.Installers
                 // Temp Module - Rollback to Temp
                 DesktopModuleController.SaveDesktopModule(this.installedDesktopModule, true, false);
             }
+			Logger.LogDebug("<<< Exiting Rollback()");
         }
 
         /// <summary>The UnInstall method uninstalls the Module component.</summary>
         public override void UnInstall()
         {
+			Logger.LogDebug(">>> Entering UnInstall()");
             this.DeleteModule();
+			Logger.LogDebug("<<< Exiting UnInstall()");
         }
 
         /// <summary>The DeleteModule method deletes the Module from the data Store.</summary>
         private void DeleteModule()
         {
+			Logger.LogDebug(">>> Entering DeleteModule()");
             try
             {
                 // Attempt to get the Desktop Module
                 DesktopModuleInfo tempDesktopModule = DesktopModuleController.GetDesktopModuleByPackageID(this.Package.PackageID);
                 if (tempDesktopModule != null)
+				Logger.LogDebug("DeleteModule(): tempDesktopModule → {TempDesktopModule}", tempDesktopModule);
                 {
                     var modules = ModuleController.Instance.GetModulesByDesktopModuleId(tempDesktopModule.DesktopModuleID);
 
+					Logger.LogDebug("DeleteModule(): modules → {Modules}", modules);
                     // Remove CodeSubDirectory
                     if ((this.desktopModule != null) && (!string.IsNullOrEmpty(this.desktopModule.CodeSubDirectory)))
                     {
@@ -253,6 +272,7 @@ namespace DotNetNuke.Services.Installer.Installers
 
                     var controller = new DesktopModuleController();
 
+					Logger.LogDebug("DeleteModule(): controller → {Controller}", controller);
                     this.Log.AddInfo(string.Format(CultureInfo.InvariantCulture, Util.MODULE_UnRegistered, tempDesktopModule.ModuleName));
 
                     // remove admin/host pages
@@ -262,18 +282,24 @@ namespace DotNetNuke.Services.Installer.Installers
                         {
                             var adminTabId = TabController.GetTabByTabPath(portal.PortalId, "//Admin", Null.NullString);
                             if (adminTabId == Null.NullInteger)
+							Logger.LogDebug("DeleteModule(): adminTabId → {AdminTabId}", adminTabId);
                             {
                                 continue;
                             }
 
                             var tabPath = Globals.GenerateTabPath(adminTabId, tempDesktopModule.AdminPage);
                             var moduleAdminTabId = TabController.GetTabByTabPath(portal.PortalId, tabPath, Null.NullString);
+							Logger.LogDebug("DeleteModule(): tabPath → {TabPath}", tabPath);
+							Logger.LogDebug("DeleteModule(): moduleAdminTabId → {ModuleAdminTabId}", moduleAdminTabId);
 
                             TabInfo moduleAdminTab = TabController.Instance.GetTab(moduleAdminTabId, portal.PortalId);
                             if (moduleAdminTab != null)
+							Logger.LogDebug("DeleteModule(): moduleAdminTab → {ModuleAdminTab}", moduleAdminTab);
                             {
                                 var mods = TabModulesController.Instance.GetTabModules(moduleAdminTab);
                                 bool noOtherTabModule = true;
+								Logger.LogDebug("DeleteModule(): mods → {Mods}", mods);
+								Logger.LogDebug("DeleteModule(): noOtherTabModule → {NoOtherTabModule}", noOtherTabModule);
                                 foreach (ModuleInfo mod in mods)
                                 {
                                     if (mod.DesktopModuleID != tempDesktopModule.DesktopModuleID)
@@ -316,6 +342,7 @@ namespace DotNetNuke.Services.Installer.Installers
             {
                 this.Log.AddFailure(ex);
             }
+			Logger.LogDebug("<<< Exiting DeleteModule()");
         }
     }
 }

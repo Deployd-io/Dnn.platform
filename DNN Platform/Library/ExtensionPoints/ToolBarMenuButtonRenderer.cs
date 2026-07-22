@@ -13,15 +13,19 @@ namespace DotNetNuke.ExtensionPoints
 
     public class ToolBarMenuButtonRenderer : IExtensionControlRenderer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public string GetOutput(IExtensionPoint extensionPoint)
         {
+			Logger.LogDebug(">>> Entering GetOutput(extensionPoint={ExtensionPoint})", extensionPoint);
             var extension = (IToolBarMenuButtonExtensionPoint)extensionPoint;
 
+			Logger.LogDebug("GetOutput(extensionPoint={ExtensionPoint}): extension → {Extension}", extensionPoint, extension);
             var cssClass = extension.CssClass;
             var action = extension.Action;
             if (!extension.Enabled)
+			Logger.LogDebug("GetOutput(extensionPoint={ExtensionPoint}): action → {Action}", extensionPoint, action);
             {
                 cssClass += " disabled";
                 action = "void(0);";
@@ -29,12 +33,14 @@ namespace DotNetNuke.ExtensionPoints
 
             var icon = extension.Icon;
             if (icon.StartsWith("~/", StringComparison.Ordinal))
+			Logger.LogDebug("GetOutput(extensionPoint={ExtensionPoint}): icon → {Icon}", extensionPoint, icon);
             {
                 icon = Globals.ResolveUrl(icon);
             }
 
             var str = new StringBuilder();
             str.AppendFormat(CultureInfo.InvariantCulture, "<div id='{0}_wrapper' class='{1}_wrapper'>", extension.ButtonId, extension.MenuCssClass);
+			Logger.LogDebug("GetOutput(extensionPoint={ExtensionPoint}): str → {Str}", extensionPoint, str);
             str.AppendFormat(
                 CultureInfo.InvariantCulture,
                 "<button id='{0}' class='{1} {2}' onclick='{3}; return false;' title='{4}'>",
@@ -63,16 +69,19 @@ namespace DotNetNuke.ExtensionPoints
             str.AppendLine("</div>");
             str.AppendLine("</div>");
 
+			Logger.LogDebug("<<< Exiting GetOutput(extensionPoint={ExtensionPoint})", extensionPoint);
             return str.ToString();
         }
 
         private static string GetItemOutput(IMenuButtonItemExtensionPoint item)
         {
+			Logger.LogDebug(">>> Entering GetItemOutput(item={Item})", item);
             if (string.IsNullOrEmpty(item.Type))
             {
                 return $"<li class='{item.CssClass}' id='{item.ItemId}' ><a href='#' onclick='{item.Action}; return false;'><span {item.Attributes}>{item.Text}</span></a></li>";
             }
 
+			Logger.LogDebug("<<< Exiting GetItemOutput(item={Item})", item);
             return $"<li><input type='{item.Type}' name='{item.ItemId}' id='{item.ItemId}' value='{item.Text}' {item.Attributes} onclick='{item.Action}; return false;'/>{item.Text}</li>";
         }
     }

@@ -13,9 +13,11 @@ namespace DotNetNuke.Modules.MemberDirectory.Components
 
     public class UpgradeController : IUpgradeable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public string UpgradeModule(string version)
         {
+			Logger.LogDebug(">>> Entering UpgradeModule(version={Version})", version);
             try
             {
                 switch (version)
@@ -29,15 +31,18 @@ namespace DotNetNuke.Modules.MemberDirectory.Components
             {
                 ExceptionLogController xlc = new ExceptionLogController();
                 xlc.AddLog(ex);
+				Logger.LogDebug("UpgradeModule(version={Version}): xlc → {Xlc}", version, xlc);
 
                 return "Failed";
             }
 
+			Logger.LogDebug("<<< Exiting UpgradeModule(version={Version})", version);
             return "Success";
         }
 
         private static void UpdateDisplaySearchSettings()
         {
+			Logger.LogDebug(">>> Entering UpdateDisplaySearchSettings()");
             foreach (IPortalInfo portal in PortalController.Instance.GetPortals())
             {
                 foreach (ModuleInfo module in ModuleController.Instance.GetModulesByDefinition(portal.PortalId, "Member Directory"))
@@ -51,6 +56,7 @@ namespace DotNetNuke.Modules.MemberDirectory.Components
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting UpdateDisplaySearchSettings()");
         }
     }
 }

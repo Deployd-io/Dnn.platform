@@ -15,17 +15,21 @@ namespace Dnn.PersonaBar.Security.Attributes
     [AttributeUsage(AttributeTargets.Property)]
     internal class UserExistAttribute : ValidationAttribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public string[] RoleNames { get; set; }
 
         /// <inheritdoc />
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
+			Logger.LogDebug(">>> Entering IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             var propertyName = validationContext.DisplayName;
 
             if (int.TryParse(value.ToString(), out var userId))
             {
                 var portalSetting = PortalController.Instance.GetCurrentSettings();
                 var user = UserController.Instance.GetUserById(portalSetting.PortalId, userId);
+				Logger.LogDebug("IsValid(value={Value},validationContext={ValidationContext}): portalSetting → {PortalSetting}", value, validationContext, portalSetting);
+				Logger.LogDebug("IsValid(value={Value},validationContext={ValidationContext}): user → {User}", value, validationContext, user);
 
                 if (user != null)
                 {
@@ -41,6 +45,7 @@ namespace Dnn.PersonaBar.Security.Attributes
                 }
             }
 
+			Logger.LogDebug("<<< Exiting IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             return new ValidationResult(string.Format(CultureInfo.CurrentCulture, Localization.GetString(Components.Constants.NotValid, Components.Constants.LocalResourcesFile), propertyName, value.ToString()));
         }
     }

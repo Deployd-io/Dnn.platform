@@ -29,6 +29,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Commands
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             try
             {
                 var lstNewCommands = DotNetNuke.Prompt.CommandRepository.Instance.GetCommands().Select(c => new Command
@@ -42,6 +43,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Commands
                 var lstOut = CommandRepository.Instance.GetCommands().Values.Concat(lstNewCommands).OrderBy(c => c.Name + '.' + c.Name).ToList();
                 return new ConsoleResultModel(string.Format(CultureInfo.InvariantCulture, this.LocalizeString("Prompt_ListCommands_Found"), lstOut.Count))
                 {
+				Logger.LogDebug("Run(): lstOut → {LstOut}", lstOut);
                     Records = lstOut.Count,
                     Data = lstOut,
                     FieldOrder = ["Name", "Description", "Version", "Category",],
@@ -50,6 +52,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Commands
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting Run()");
                 return new ConsoleErrorResultModel(this.LocalizeString("Prompt_ListCommands_Error"));
             }
         }

@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.FileSystem
     [Serializable]
     public class InvalidFolderPathException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="InvalidFolderPathException"/> class.</summary>
         public InvalidFolderPathException()
         {
+		Logger.LogDebug(">>> Entering InvalidFolderPathException()");
+		Logger.LogDebug("<<< Exiting InvalidFolderPathException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="InvalidFolderPathException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Services.FileSystem
         public InvalidFolderPathException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering InvalidFolderPathException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting InvalidFolderPathException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="InvalidFolderPathException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

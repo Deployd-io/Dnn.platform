@@ -10,13 +10,18 @@ namespace DotNetNuke.UI.WebControls
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class MaxLengthAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly int length = Null.NullInteger;
 
         /// <summary>Initializes a new instance of the <see cref="MaxLengthAttribute"/> class.</summary>
         /// <param name="length">The maximum length.</param>
         public MaxLengthAttribute(int length)
         {
+			Logger.LogDebug(">>> Entering MaxLengthAttribute(length={Length})", length);
             this.length = length;
+			Logger.LogDebug("<<< Exiting MaxLengthAttribute(length={Length})", length);
+			Logger.LogDebug("MaxLengthAttribute(length={Length}): length → {Length1}", length, length);
+			Logger.LogDebug("MaxLengthAttribute(length={Length}): this.length → {Arg1}", length, this.length);
         }
 
         public int Length

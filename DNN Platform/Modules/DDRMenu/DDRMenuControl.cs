@@ -30,7 +30,11 @@ namespace DotNetNuke.Web.DDRMenu
         public DDRMenuControl(ILocaliser localiser)
             : this(localiser, null, null)
         {
+			Logger.LogDebug(">>> Entering DDRMenuControl(localiser={Localiser})", localiser);
             this.localiser = localiser;
+			Logger.LogDebug("<<< Exiting DDRMenuControl(localiser={Localiser})", localiser);
+			Logger.LogDebug("DDRMenuControl(localiser={Localiser}): localiser → {Localiser1}", localiser, localiser);
+			Logger.LogDebug("DDRMenuControl(localiser={Localiser}): this.localiser → {Arg1}", localiser, this.localiser);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DDRMenuControl"/> class.</summary>
@@ -41,7 +45,10 @@ namespace DotNetNuke.Web.DDRMenu
         {
             this.localiser = localiser ?? Globals.GetCurrentServiceProvider().GetRequiredService<ILocaliser>();
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("DDRMenuControl(localiser={Localiser},hostSettings={HostSettings},tabController={TabController}): hostSettings → {HostSettings1}", localiser, hostSettings, tabController, hostSettings);
+			Logger.LogDebug("DDRMenuControl(localiser={Localiser},hostSettings={HostSettings},tabController={TabController}): localiser → {Localiser1}", localiser, hostSettings, tabController, localiser);
             this.tabController = tabController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ITabController>();
+			Logger.LogDebug("DDRMenuControl(localiser={Localiser},hostSettings={HostSettings},tabController={TabController}): tabController → {TabController1}", localiser, hostSettings, tabController, tabController);
         }
 
         /// <summary>Handles a click on the menu.</summary>
@@ -70,6 +77,7 @@ namespace DotNetNuke.Web.DDRMenu
         /// <inheritdoc />
         public void RaisePostBackEvent(string eventArgument)
         {
+			Logger.LogDebug(">>> Entering RaisePostBackEvent(eventArgument={EventArgument})", eventArgument);
             using (new DNNContext(this))
             {
                 if (this.NodeClick != null)
@@ -77,11 +85,13 @@ namespace DotNetNuke.Web.DDRMenu
                     this.NodeClick(eventArgument);
                 }
             }
+			Logger.LogDebug("<<< Exiting RaisePostBackEvent(eventArgument={EventArgument})", eventArgument);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             using (new DNNContext(this))
             {
                 base.OnPreRender(e);
@@ -94,15 +104,19 @@ namespace DotNetNuke.Web.DDRMenu
 
                 this.menu.PreRender();
             }
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter htmlWriter)
         {
+			Logger.LogDebug(">>> Entering Render(htmlWriter={HtmlWriter})", htmlWriter);
             using (new DNNContext(this))
             {
                 this.menu.Render(htmlWriter);
+				private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
             }
+			Logger.LogDebug("<<< Exiting Render(htmlWriter={HtmlWriter})", htmlWriter);
         }
     }
 }

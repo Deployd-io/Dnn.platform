@@ -46,6 +46,7 @@ namespace log4net.Util.TypeConverters
     public class ConversionNotSupportedException : ApplicationException 
 #endif
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Constructor
         /// </summary>
@@ -56,6 +57,8 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public ConversionNotSupportedException()
         {
+		Logger.LogDebug(">>> Entering ConversionNotSupportedException()");
+		Logger.LogDebug("<<< Exiting ConversionNotSupportedException()");
         }
 
         /// <summary>
@@ -70,6 +73,7 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public ConversionNotSupportedException(String message) : base(message) 
         {
+		Logger.LogDebug(">>> Entering ConversionNotSupportedException(message={Message})", message);
         }
         
         /// <summary>
@@ -85,6 +89,7 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public ConversionNotSupportedException(String message, Exception innerException) : base(message, innerException) 
         {
+		Logger.LogDebug(">>> Entering ConversionNotSupportedException(message={Message},innerException={InnerException})", message, innerException);
         }
 
 #if !NETCF && !NETSTANDARD1_3
@@ -101,6 +106,7 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         protected ConversionNotSupportedException(SerializationInfo info, StreamingContext context) : base(info, context) 
         {
+		Logger.LogDebug(">>> Entering ConversionNotSupportedException(info={Info},context={Context})", info, context);
         }
 #endif
 
@@ -117,6 +123,8 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public static ConversionNotSupportedException Create(Type destinationType, object sourceValue)
         {
+			Logger.LogDebug(">>> Entering Create(destinationType={DestinationType},sourceValue={SourceValue})", destinationType, sourceValue);
+			Logger.LogDebug("<<< Exiting Create(destinationType={DestinationType},sourceValue={SourceValue})", destinationType, sourceValue);
             return Create(destinationType, sourceValue, null);
         }
 
@@ -140,6 +148,7 @@ namespace log4net.Util.TypeConverters
             }
             else
             {
+				Logger.LogDebug("<<< Exiting Create(destinationType={DestinationType},sourceValue={SourceValue},innerException={InnerException})", destinationType, sourceValue, innerException);
                 return new ConversionNotSupportedException("Cannot convert from type [" + sourceValue.GetType() + "] value [" + sourceValue + "] to type [" + destinationType + "]", innerException);
             }
         }

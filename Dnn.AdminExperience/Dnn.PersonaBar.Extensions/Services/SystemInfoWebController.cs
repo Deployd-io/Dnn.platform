@@ -22,11 +22,13 @@ namespace Dnn.PersonaBar.Servers.Services
         [HttpGet]
         public HttpResponseMessage GetWebServerInfo()
         {
+			Logger.LogDebug(">>> Entering GetWebServerInfo()");
             try
             {
                 var serverInfo = new ServerInfo();
                 return this.Request.CreateResponse(HttpStatusCode.OK, new
                 {
+				Logger.LogDebug("GetWebServerInfo(): serverInfo → {ServerInfo}", serverInfo);
                     osVersion = serverInfo.OSVersion,
                     iisVersion = serverInfo.IISVersion,
                     framework = serverInfo.Framework,
@@ -38,10 +40,21 @@ namespace Dnn.PersonaBar.Servers.Services
                     relativePath = serverInfo.RelativePath,
                     serverTime = serverInfo.ServerTime,
                 });
+					Logger.LogDebug("GetWebServerInfo(): osVersion → {OsVersion}", osVersion);
+					Logger.LogDebug("GetWebServerInfo(): iisVersion → {IisVersion}", iisVersion);
+					Logger.LogDebug("GetWebServerInfo(): framework → {Framework}", framework);
+					Logger.LogDebug("GetWebServerInfo(): netFrameworkVersion → {NetFrameworkVersion}", netFrameworkVersion);
+					Logger.LogDebug("GetWebServerInfo(): identity → {Identity}", identity);
+					Logger.LogDebug("GetWebServerInfo(): hostName → {HostName}", hostName);
+					Logger.LogDebug("GetWebServerInfo(): physicalPath → {PhysicalPath}", physicalPath);
+					Logger.LogInformation("GetWebServerInfo(): url → {Url}", url);
+					Logger.LogDebug("GetWebServerInfo(): relativePath → {RelativePath}", relativePath);
+					Logger.LogDebug("GetWebServerInfo(): serverTime → {ServerTime}", serverTime);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetWebServerInfo()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }

@@ -7,13 +7,18 @@ namespace DotNetNuke.Entities.Urls
     /// <summary>Class used as a utility to help manage paging in database queries.</summary>
     public class PagingInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="PagingInfo"/> class.</summary>
         /// <param name="pageNumber">The page number.</param>
         /// <param name="pageSize">The page size.</param>
         public PagingInfo(int pageNumber, int pageSize)
         {
+			Logger.LogDebug(">>> Entering PagingInfo(pageNumber={PageNumber},pageSize={PageSize})", pageNumber, pageSize);
             this.PageNumber = pageNumber;
             this.PageSize = pageSize;
+			Logger.LogDebug("<<< Exiting PagingInfo(pageNumber={PageNumber},pageSize={PageSize})", pageNumber, pageSize);
+			Logger.LogDebug("PagingInfo(pageNumber={PageNumber},pageSize={PageSize}): this.PageNumber → {Arg2}", pageNumber, pageSize, this.PageNumber);
+			Logger.LogDebug("PagingInfo(pageNumber={PageNumber},pageSize={PageSize}): this.PageSize → {Arg2}", pageNumber, pageSize, this.PageSize);
         }
 
         public bool IsLastPage
@@ -45,10 +50,14 @@ namespace DotNetNuke.Entities.Urls
 
         public void UpdatePageResults(int firstRow, int lastRow, int totalRows, int totalPages)
         {
+			Logger.LogDebug(">>> Entering UpdatePageResults(firstRow={FirstRow},lastRow={LastRow},totalRows={TotalRows},totalPages={TotalPages})", firstRow, lastRow, totalRows, totalPages);
             this.FirstRow = firstRow;
             this.LastRow = lastRow;
+			Logger.LogDebug("UpdatePageResults(firstRow={FirstRow},lastRow={LastRow},totalRows={TotalRows},totalPages={TotalPages}): this.FirstRow → {Arg4}", firstRow, lastRow, totalRows, totalPages, this.FirstRow);
+			Logger.LogDebug("UpdatePageResults(firstRow={FirstRow},lastRow={LastRow},totalRows={TotalRows},totalPages={TotalPages}): this.LastRow → {Arg4}", firstRow, lastRow, totalRows, totalPages, this.LastRow);
             this.TotalRows = totalRows;
             this.TotalPages = totalPages;
+			Logger.LogDebug("<<< Exiting UpdatePageResults(firstRow={FirstRow},lastRow={LastRow},totalRows={TotalRows},totalPages={TotalPages})", firstRow, lastRow, totalRows, totalPages);
         }
     }
 }

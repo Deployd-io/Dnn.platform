@@ -47,6 +47,7 @@ namespace log4net.Plugin
     /// <author>Gert Driesen</author>
     public class RemoteLoggingServerPlugin : PluginSkeleton
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Default constructor</summary>
         /// <remarks>
         /// <para>
@@ -58,6 +59,10 @@ namespace log4net.Plugin
         /// </remarks>
         public RemoteLoggingServerPlugin() : base("RemoteLoggingServerPlugin:Unset URI")
         {
+		Logger.LogDebug(">>> Entering RemoteLoggingServerPlugin()");
+		Logger.LogDebug("<<< Exiting RemoteLoggingServerPlugin()");
+		Logger.LogDebug(">>> Entering RemoteLoggingServerPlugin(sinkUri={SinkUri})", sinkUri);
+		Logger.LogDebug("<<< Exiting RemoteLoggingServerPlugin(sinkUri={SinkUri})", sinkUri);
         }
 
         /// <summary>Construct with sink Uri.</summary>
@@ -72,6 +77,7 @@ namespace log4net.Plugin
         public RemoteLoggingServerPlugin(string sinkUri) : base("RemoteLoggingServerPlugin:"+sinkUri)
         {
             this.m_sinkUri = sinkUri;
+			Logger.LogDebug("RemoteLoggingServerPlugin(sinkUri={SinkUri}): this.m_sinkUri → {Arg1}", sinkUri, this.m_sinkUri);
         }
 
         /// <summary>Gets or sets the URI of this sink.</summary>
@@ -105,10 +111,12 @@ namespace log4net.Plugin
 #endif
         public override void Attach(ILoggerRepository repository)
         {
+			Logger.LogDebug(">>> Entering Attach(repository={Repository})", repository);
             base.Attach(repository);
 
             // Create the sink and marshal it
             this.m_sink = new RemoteLoggingSinkImpl(repository); 
+			Logger.LogDebug("Attach(repository={Repository}): m_sink → {M_sink}", repository, m_sink);
 
             try
             {
@@ -118,6 +126,7 @@ namespace log4net.Plugin
             {
                 LogLog.Error(declaringType, "Failed to Marshal remoting sink", ex);
             }
+			Logger.LogDebug("<<< Exiting Attach(repository={Repository})", repository);
         }
 
         /// <summary>Is called when the plugin is to shutdown.</summary>
@@ -132,11 +141,15 @@ namespace log4net.Plugin
 #endif
         public override void Shutdown()
         {
+			Logger.LogDebug(">>> Entering Shutdown()");
             // Stops the sink from receiving messages
             RemotingServices.Disconnect(this.m_sink);
             this.m_sink = null;
+			Logger.LogDebug("Shutdown(): m_sink → {M_sink}", m_sink);
+			Logger.LogDebug("Shutdown(): this.m_sink → {Arg0}", this.m_sink);
 
             base.Shutdown();
+			Logger.LogDebug("<<< Exiting Shutdown()");
         }
 
         private RemoteLoggingSinkImpl m_sink;
@@ -168,7 +181,11 @@ namespace log4net.Plugin
             /// </remarks>
             public RemoteLoggingSinkImpl(ILoggerRepository repository)
             {
+				Logger.LogDebug(">>> Entering RemoteLoggingSinkImpl(repository={Repository})", repository);
                 this.m_repository = repository;
+				Logger.LogDebug("<<< Exiting RemoteLoggingSinkImpl(repository={Repository})", repository);
+				Logger.LogDebug("RemoteLoggingSinkImpl(repository={Repository}): m_repository → {M_repository}", repository, m_repository);
+				Logger.LogDebug("RemoteLoggingSinkImpl(repository={Repository}): this.m_repository → {Arg1}", repository, this.m_repository);
             }
 
             /// <summary>Logs the events to the repository.</summary>
@@ -180,6 +197,8 @@ namespace log4net.Plugin
             /// </remarks>
             public void LogEvents(LoggingEvent[] events)
             {
+				Logger.LogDebug(">>> Entering LogEvents(events={Events})", events);
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
                 if (events != null)
                 {
                     foreach(LoggingEvent logEvent in events)
@@ -187,9 +206,11 @@ namespace log4net.Plugin
                         if (logEvent != null)
                         {
                             this.m_repository.Log(logEvent);
+							Logger.LogInformation("LogEvents(events)={Events}: database query executed in {Arg1} ms", events, __logStart.ElapsedMilliseconds);
                         }
                     }
                 }
+				Logger.LogDebug("<<< Exiting LogEvents(events={Events})", events);
             }
 
             /// <summary>
@@ -209,6 +230,8 @@ namespace log4net.Plugin
 #endif
             public override object InitializeLifetimeService()
             {
+				Logger.LogDebug(">>> Entering InitializeLifetimeService()");
+				Logger.LogDebug("<<< Exiting InitializeLifetimeService()");
                 return null;
             }
 

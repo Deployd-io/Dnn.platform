@@ -9,24 +9,32 @@ namespace DotNetNuke.Modules.Html.Components
     /// </summary>
     public class MigrateHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Executes the migration of HTML workflows, including running the migration procedure,
         /// dropping obsolete tables and procedures, and adding required foreign keys.
         /// </summary>
         public static void MigrateHtmlWorkflows()
         {
+			Logger.LogDebug(">>> Entering MigrateHtmlWorkflows()");
             var db = Data.DataProvider.Instance();
             var databaseOwner = db.DatabaseOwner;
+			Logger.LogDebug("MigrateHtmlWorkflows(): db → {Db}", db);
+			Logger.LogDebug("MigrateHtmlWorkflows(): databaseOwner → {DatabaseOwner}", databaseOwner);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var objectQualifier = db.ObjectQualifier;
 
             var localizationHelper = new LocalizationHelper();
 
+			Logger.LogDebug("MigrateHtmlWorkflows(): localizationHelper → {LocalizationHelper}", localizationHelper);
             // "Published|veröffentlicht|Publicado|Publié|Pubblicato|Publiceren"
             var publishedLocalizations = string.Join("|", localizationHelper.StateLocalizations("DefaultWorkflowState3.StateName"));
 
+			Logger.LogDebug("MigrateHtmlWorkflows(): publishedLocalizations → {PublishedLocalizations}", publishedLocalizations);
             // "Draft|Entwurf|Borrador|Brouillon|Bozza|Concept"
             var draftLocalizations = string.Join("|", localizationHelper.StateLocalizations("DefaultWorkflowState1.StateName"));
 
+			Logger.LogDebug("MigrateHtmlWorkflows(): draftLocalizations → {DraftLocalizations}", draftLocalizations);
             // 1. Execute the migration procedure
             db.ExecuteNonQuery("MigrateHtmlWorkflows", publishedLocalizations, draftLocalizations);
 
@@ -34,6 +42,7 @@ namespace DotNetNuke.Modules.Html.Components
             db.ExecuteSQL($@"
 IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'FK_{objectQualifier}HtmlText_{objectQualifier}WorkflowStates') AND parent_object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}HtmlText'))
     ALTER TABLE {databaseOwner}{objectQualifier}HtmlText WITH NOCHECK ADD CONSTRAINT FK_{objectQualifier}HtmlText_{objectQualifier}WorkflowStates FOREIGN KEY (StateID) REFERENCES {databaseOwner}{objectQualifier}ContentWorkflowStates (StateID);
+	Logger.LogInformation("MigrateHtmlWorkflows(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 ");
 
             // 3. Add FK_HtmlTextLog_WorkflowStates if it does not exist
@@ -75,6 +84,7 @@ IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwne
 IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}Workflow') AND type in (N'U'))
     DROP TABLE {databaseOwner}{objectQualifier}Workflow;
 ");
+		Logger.LogDebug("<<< Exiting MigrateHtmlWorkflows()");
         }
     }
 }

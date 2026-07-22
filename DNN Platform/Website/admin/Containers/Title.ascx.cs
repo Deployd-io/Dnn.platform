@@ -21,6 +21,7 @@ namespace DotNetNuke.UI.Containers
     /// <summary>A container object which displays the module's title.</summary>
     public partial class Title : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string MyFileName = "Title.ascx";
         private readonly IHostSettings hostSettings;
 
@@ -28,6 +29,10 @@ namespace DotNetNuke.UI.Containers
         public Title()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering Title()");
+		Logger.LogDebug("<<< Exiting Title()");
+		Logger.LogDebug(">>> Entering Title(hostSettings={HostSettings})", hostSettings);
+		Logger.LogDebug("<<< Exiting Title(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Title"/> class.</summary>
@@ -35,6 +40,8 @@ namespace DotNetNuke.UI.Containers
         public Title(IHostSettings hostSettings)
         {
             this.hostSettings = hostSettings;
+			Logger.LogDebug("Title(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
+			Logger.LogDebug("Title(hostSettings={HostSettings}): this.hostSettings → {Arg1}", hostSettings, this.hostSettings);
         }
 
         /// <summary>Gets or sets the CSS class applied to the element containing the title.</summary>
@@ -43,14 +50,17 @@ namespace DotNetNuke.UI.Containers
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.titleLabel.UpdateLabel += this.UpdateTitle;
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             // public attributes
@@ -61,6 +71,7 @@ namespace DotNetNuke.UI.Containers
 
             string moduleTitle = Null.NullString;
             if (this.ModuleControl != null)
+			Logger.LogDebug("OnPreRender(e={E}): moduleTitle → {ModuleTitle}", e, moduleTitle);
             {
                 moduleTitle = Localization.LocalizeControlTitle(this.ModuleControl);
             }
@@ -87,31 +98,39 @@ namespace DotNetNuke.UI.Containers
                 this.titleLabel.EditEnabled = true;
                 this.titleToolbar.Visible = true;
             }
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private bool CanEditModule()
         {
+			Logger.LogDebug(">>> Entering CanEditModule()");
             var canEdit = false;
             if (this.ModuleControl != null && this.ModuleControl.ModuleContext.ModuleId > Null.NullInteger)
+			Logger.LogDebug("CanEditModule(): canEdit → {CanEdit}", canEdit);
             {
                 canEdit = (Personalization.GetUserMode() == PortalSettings.Mode.Edit) && TabPermissionController.CanAdminPage() && !Globals.IsAdminControl();
             }
 
+			Logger.LogDebug("<<< Exiting CanEditModule()");
             return canEdit;
         }
 
         private void UpdateTitle(object source, DNNLabelEditEventArgs e)
         {
+			Logger.LogDebug(">>> Entering UpdateTitle(source={Source},e={E})", source, e);
             if (this.CanEditModule())
             {
                 ModuleInfo moduleInfo = ModuleController.Instance.GetModule(this.ModuleControl.ModuleContext.ModuleId, this.ModuleControl.ModuleContext.TabId, false);
 
+				Logger.LogDebug("UpdateTitle(source={Source},e={E}): moduleInfo → {ModuleInfo}", source, e, moduleInfo);
                 if (this.hostSettings.AllowRichTextModuleTitle)
                 {
 #pragma warning disable CS0618 // PortalSecurity.FilterFlag.NoScripting is deprecated
                     var ps = PortalSecurity.Instance;
                     var mt = ps.InputFilter(e.Text, PortalSecurity.FilterFlag.NoScripting);
                     moduleInfo.ModuleTitle = mt;
+					Logger.LogDebug("UpdateTitle(source={Source},e={E}): mt → {Mt}", source, e, mt);
+					Logger.LogDebug("UpdateTitle(source={Source},e={E}): moduleInfo.ModuleTitle → {Arg2}", source, e, moduleInfo.ModuleTitle);
 #pragma warning restore CS0618 // PortalSecurity.FilterFlag.NoScripting is deprecated
                 }
                 else
@@ -121,6 +140,7 @@ namespace DotNetNuke.UI.Containers
 
                 ModuleController.Instance.UpdateModule(moduleInfo);
             }
+			Logger.LogDebug("<<< Exiting UpdateTitle(source={Source},e={E})", source, e);
         }
     }
 }

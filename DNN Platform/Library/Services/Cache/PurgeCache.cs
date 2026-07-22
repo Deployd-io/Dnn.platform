@@ -10,16 +10,21 @@ namespace DotNetNuke.Services.Cache
 
     public class PurgeCache : SchedulerClient
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="PurgeCache"/> class.</summary>
         /// <param name="objScheduleHistoryItem">The schedule history item.</param>
         public PurgeCache(ScheduleHistoryItem objScheduleHistoryItem)
         {
+			Logger.LogDebug(">>> Entering PurgeCache(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
             this.ScheduleHistoryItem = objScheduleHistoryItem; // REQUIRED
+			Logger.LogDebug("<<< Exiting PurgeCache(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
+			Logger.LogDebug("PurgeCache(objScheduleHistoryItem={ObjScheduleHistoryItem}): this.ScheduleHistoryItem → {Arg1}", objScheduleHistoryItem, this.ScheduleHistoryItem);
         }
 
         /// <inheritdoc />
         public override void DoWork()
         {
+			Logger.LogDebug(">>> Entering DoWork()");
             try
             {
                 string str = CachingProvider.Instance().PurgeCache();
@@ -29,6 +34,7 @@ namespace DotNetNuke.Services.Cache
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in DoWork(): {Arg0}", ex.Message);
                 this.ScheduleHistoryItem.Succeeded = false; // REQUIRED
 
                 this.ScheduleHistoryItem.AddLogNote(string.Format(CultureInfo.InvariantCulture, "Purging cache task failed: {0}.", exc.ToString()));
@@ -39,6 +45,7 @@ namespace DotNetNuke.Services.Cache
                 // log the exception
                 Exceptions.Exceptions.LogException(exc); // OPTIONAL
             }
+			Logger.LogDebug("<<< Exiting DoWork()");
         }
     }
 }

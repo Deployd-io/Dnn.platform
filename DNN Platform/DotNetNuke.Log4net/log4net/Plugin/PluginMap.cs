@@ -26,6 +26,7 @@ using log4net.Repository;
 
 namespace log4net.Plugin
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Map of repository plugins.</summary>
     /// <remarks>
     /// <para>
@@ -47,7 +48,11 @@ namespace log4net.Plugin
         /// </remarks>
         public PluginMap(ILoggerRepository repository)
         {
+			Logger.LogDebug(">>> Entering PluginMap(repository={Repository})", repository);
             this.m_repository = repository;
+			Logger.LogDebug("<<< Exiting PluginMap(repository={Repository})", repository);
+			Logger.LogDebug("PluginMap(repository={Repository}): m_repository → {M_repository}", repository, m_repository);
+			Logger.LogDebug("PluginMap(repository={Repository}): this.m_repository → {Arg1}", repository, this.m_repository);
         }
 
         /// <summary>Gets a <see cref="IPlugin" /> by name.</summary>
@@ -111,6 +116,7 @@ namespace log4net.Plugin
         /// </remarks>
         public void Add(IPlugin plugin)
         {
+			Logger.LogDebug(">>> Entering Add(plugin={Plugin})", plugin);
             if (plugin == null)
             {
                 throw new ArgumentNullException("plugin");
@@ -118,6 +124,7 @@ namespace log4net.Plugin
 
             IPlugin curPlugin = null;
 
+			Logger.LogDebug("Add(plugin={Plugin}): curPlugin → {CurPlugin}", plugin, curPlugin);
             lock(this)
             {
                 // Get the current plugin if it exists
@@ -135,6 +142,7 @@ namespace log4net.Plugin
 
             // Attach new plugin to repository
             plugin.Attach(this.m_repository);
+			Logger.LogDebug("<<< Exiting Add(plugin={Plugin})", plugin);
         }
 
         /// <summary>Removes a <see cref="IPlugin" /> from the map.</summary>
@@ -146,6 +154,7 @@ namespace log4net.Plugin
         /// </remarks>
         public void Remove(IPlugin plugin)
         {
+			Logger.LogDebug(">>> Entering Remove(plugin={Plugin})", plugin);
             if (plugin == null)
             {
                 throw new ArgumentNullException("plugin");
@@ -154,6 +163,7 @@ namespace log4net.Plugin
             {
                 this.m_mapName2Plugin.Remove(plugin.Name);
             }
+			Logger.LogDebug("<<< Exiting Remove(plugin={Plugin})", plugin);
         }
 
         private readonly Hashtable m_mapName2Plugin = new Hashtable();

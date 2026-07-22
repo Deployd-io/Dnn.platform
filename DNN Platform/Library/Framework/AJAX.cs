@@ -22,6 +22,7 @@ namespace DotNetNuke.Framework
         [DnnDeprecated(10, 2, 2, "Use overload with IHostSettings")]
         public static partial void AddScriptManager(Page page)
             => AddScriptManager(page, true);
+			Logger.LogDebug(">>> Entering AddScriptManager(page={Page})", page);
 
         /// <summary>AddScriptManager is used internally by the framework to add a ScriptManager control to the page.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -56,6 +57,7 @@ namespace DotNetNuke.Framework
                     scriptManager.SupportsPartialRendering = true;
                     if (checkCdn)
                     {
+						private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                         scriptManager.EnableCdn = hostSettings.EnableMsAjaxCdn;
                         scriptManager.EnableCdnFallback = hostSettings.EnableMsAjaxCdn;
                     }
@@ -70,8 +72,15 @@ namespace DotNetNuke.Framework
             }
             catch
             {
+				Logger.LogError("Exception in AddScriptManager(page={Page}): {Arg1}", page, ex.Message);
+				Logger.LogError("Exception in AddScriptManager(hostSettings={HostSettings},page={Page}): {Arg2}", hostSettings, page, ex.Message);
+				Logger.LogError("Exception in AddScriptManager(page={Page},checkCdn={CheckCdn}): {Arg2}", page, checkCdn, ex.Message);
+				Logger.LogError("Exception in AddScriptManager(hostSettings={HostSettings},page={Page},checkCdn={CheckCdn}): {Arg3}", hostSettings, page, checkCdn, ex.Message);
                 // suppress error adding script manager to support edge-case of module developers custom aspx pages that inherit from basepage and use code blocks
             }
+			Logger.LogError("Exception in AddScriptManager(page={Page},checkCdn={CheckCdn}): {Arg2}", page, checkCdn, ex.Message);
+			Logger.LogError("Exception in AddScriptManager(hostSettings={HostSettings},page={Page},checkCdn={CheckCdn}): {Arg3}", hostSettings, page, checkCdn, ex.Message);
+			Logger.LogDebug("<<< Exiting AddScriptManager(page={Page})", page);
         }
 
         /// <summary>Gets the current ScriptManager on the page.</summary>
@@ -79,6 +88,8 @@ namespace DotNetNuke.Framework
         /// <returns>The ScriptManager instance, or <c>null</c>.</returns>
         public static ScriptManager GetScriptManager(Page objPage)
         {
+			Logger.LogDebug(">>> Entering GetScriptManager(objPage={ObjPage})", objPage);
+			Logger.LogDebug("<<< Exiting GetScriptManager(objPage={ObjPage})", objPage);
             return objPage.FindControl("ScriptManager") as ScriptManager;
         }
 
@@ -86,11 +97,13 @@ namespace DotNetNuke.Framework
         /// <returns><see langword="true"/> if the current request has enabled the script manager, otherwise <see langword="false"/>.</returns>
         public static bool IsEnabled()
         {
+			Logger.LogDebug(">>> Entering IsEnabled()");
             if (HttpContext.Current.Items["System.Web.UI.ScriptManager"] == null)
             {
                 return false;
             }
 
+			Logger.LogDebug("<<< Exiting IsEnabled()");
             return (bool)HttpContext.Current.Items["System.Web.UI.ScriptManager"];
         }
 
@@ -98,6 +111,8 @@ namespace DotNetNuke.Framework
         /// <returns><see langword="true"/> if ASP.NET AJAX is installed (always), otherwise <see langword="false"/> (never).</returns>
         public static bool IsInstalled()
         {
+			Logger.LogDebug(">>> Entering IsInstalled()");
+			Logger.LogDebug("<<< Exiting IsInstalled()");
             return true;
         }
 
@@ -112,24 +127,29 @@ namespace DotNetNuke.Framework
         /// <summary>RegisterScriptManager must be used by developers to instruct the framework that AJAX is required on the page.</summary>
         public static void RegisterScriptManager()
         {
+			Logger.LogDebug(">>> Entering RegisterScriptManager()");
             if (!IsEnabled())
             {
                 HttpContext.Current.Items.Add("System.Web.UI.ScriptManager", true);
             }
+			Logger.LogDebug("<<< Exiting RegisterScriptManager()");
         }
 
         /// <summary>RemoveScriptManager will remove the <see cref="ScriptManager"/> control during Page Render if the RegisterScriptManager has not been called.</summary>
         /// <param name="objPage">The page from which to remove the <see cref="ScriptManager"/>.</param>
         public static void RemoveScriptManager(Page objPage)
         {
+			Logger.LogDebug(">>> Entering RemoveScriptManager(objPage={ObjPage})", objPage);
             if (!IsEnabled())
             {
                 Control objControl = objPage.FindControl("ScriptManager");
                 if (objControl != null)
+				Logger.LogDebug("RemoveScriptManager(objPage={ObjPage}): objControl → {ObjControl}", objPage, objControl);
                 {
                     objPage.Form.Controls.Remove(objControl);
                 }
             }
+			Logger.LogDebug("<<< Exiting RemoveScriptManager(objPage={ObjPage})", objPage);
         }
 
         /// <summary>Wraps a control in an update panel.</summary>

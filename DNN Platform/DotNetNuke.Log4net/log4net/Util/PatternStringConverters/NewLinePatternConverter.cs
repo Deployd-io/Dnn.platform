@@ -22,6 +22,7 @@ using log4net.Core;
 
 namespace log4net.Util.PatternStringConverters
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Writes a newline to the output</summary>
     /// <remarks>
     /// <para>
@@ -62,9 +63,11 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         public void ActivateOptions()
         {
+			Logger.LogDebug(">>> Entering ActivateOptions()");
             if (SystemInfo.EqualsIgnoringCase(this.Option, "DOS"))
             {
                 this.Option = "\r\n";
+				Logger.LogDebug("ActivateOptions(): this.Option → {Arg0}", this.Option);
             }
             else if (SystemInfo.EqualsIgnoringCase(this.Option, "UNIX"))
             {
@@ -74,6 +77,7 @@ namespace log4net.Util.PatternStringConverters
             {
                 this.Option = SystemInfo.NewLine;
             }
+			Logger.LogDebug("<<< Exiting ActivateOptions()");
         }
     }
 }

@@ -8,19 +8,26 @@ namespace DotNetNuke.Prompt
     /// <summary>This is used to return the results of a command error to the client.</summary>
     public class ConsoleErrorResultModel : ConsoleResultModel
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ConsoleErrorResultModel"/> class.</summary>
         public ConsoleErrorResultModel()
         {
+			Logger.LogDebug(">>> Entering ConsoleErrorResultModel()");
             this.IsError = true;
             this.Output = Localization.GetString("Prompt_InvalidSyntax", Constants.DefaultPromptResourceFile, true);
+			Logger.LogDebug("<<< Exiting ConsoleErrorResultModel()");
+			Logger.LogDebug("ConsoleErrorResultModel(): this.IsError → {Arg0}", this.IsError);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ConsoleErrorResultModel"/> class.</summary>
         /// <param name="errMessage">The error message.</param>
         public ConsoleErrorResultModel(string errMessage)
         {
+			Logger.LogDebug(">>> Entering ConsoleErrorResultModel(errMessage={ErrMessage})", errMessage);
             this.IsError = true;
             this.Output = errMessage;
+			Logger.LogDebug("<<< Exiting ConsoleErrorResultModel(errMessage={ErrMessage})", errMessage);
+			Logger.LogDebug("ConsoleErrorResultModel(errMessage={ErrMessage}): this.IsError → {Arg1}", errMessage, this.IsError);
         }
     }
 }

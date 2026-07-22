@@ -14,19 +14,27 @@ namespace DotNetNuke.Data.PetaPoco
     [CLSCompliant(false)]
     public class FluentMapper<TModel> : IMapper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly string tablePrefix;
 
         /// <summary>Initializes a new instance of the <see cref="FluentMapper{TModel}"/> class.</summary>
         /// <param name="tablePrefix">The prefix for the table.</param>
         public FluentMapper(string tablePrefix)
         {
+			Logger.LogDebug(">>> Entering FluentMapper(tablePrefix={TablePrefix})", tablePrefix);
             this.CacheKey = string.Empty;
             this.CachePriority = CacheItemPriority.Default;
+			Logger.LogDebug("FluentMapper(tablePrefix={TablePrefix}): this.CacheKey → {Arg1}", tablePrefix, this.CacheKey);
+			Logger.LogDebug("FluentMapper(tablePrefix={TablePrefix}): this.CachePriority → {Arg1}", tablePrefix, this.CachePriority);
             this.CacheTimeOut = 0;
             this.Mappings = new Dictionary<string, FluentColumnMap>();
             this.Scope = string.Empty;
+			Logger.LogDebug("FluentMapper(tablePrefix={TablePrefix}): this.CacheTimeOut → {Arg1}", tablePrefix, this.CacheTimeOut);
+			Logger.LogDebug("FluentMapper(tablePrefix={TablePrefix}): this.Scope → {Arg1}", tablePrefix, this.Scope);
             this.TableInfo = new TableInfo();
             this.tablePrefix = tablePrefix;
+			Logger.LogDebug("<<< Exiting FluentMapper(tablePrefix={TablePrefix})", tablePrefix);
+			Logger.LogDebug("FluentMapper(tablePrefix={TablePrefix}): this.tablePrefix → {Arg1}", tablePrefix, this.tablePrefix);
         }
 
         public string CacheKey { get; set; }
@@ -44,18 +52,23 @@ namespace DotNetNuke.Data.PetaPoco
         /// <inheritdoc />
         public TableInfo GetTableInfo(Type pocoType)
         {
+			Logger.LogDebug(">>> Entering GetTableInfo(pocoType={PocoType})", pocoType);
+			Logger.LogDebug("<<< Exiting GetTableInfo(pocoType={PocoType})", pocoType);
             return this.TableInfo;
         }
 
         /// <inheritdoc />
         public ColumnInfo GetColumnInfo(PropertyInfo pocoProperty)
         {
+			Logger.LogDebug(">>> Entering GetColumnInfo(pocoProperty={PocoProperty})", pocoProperty);
             var fluentMap = default(FluentColumnMap);
             if (this.Mappings.TryGetValue(pocoProperty.Name, out fluentMap))
+			Logger.LogDebug("GetColumnInfo(pocoProperty={PocoProperty}): fluentMap → {FluentMap}", pocoProperty, fluentMap);
             {
                 return fluentMap.ColumnInfo;
             }
 
+			Logger.LogDebug("<<< Exiting GetColumnInfo(pocoProperty={PocoProperty})", pocoProperty);
             return null;
         }
 
@@ -87,6 +100,8 @@ namespace DotNetNuke.Data.PetaPoco
 
         public string GetTablePrefix()
         {
+			Logger.LogDebug(">>> Entering GetTablePrefix()");
+			Logger.LogDebug("<<< Exiting GetTablePrefix()");
             return this.tablePrefix;
         }
     }

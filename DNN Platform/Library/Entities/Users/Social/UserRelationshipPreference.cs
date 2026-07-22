@@ -18,10 +18,14 @@ namespace DotNetNuke.Entities.Users.Social
     [Serializable]
     public class UserRelationshipPreference : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="UserRelationshipPreference"/> class.</summary>
         public UserRelationshipPreference()
         {
+			Logger.LogDebug(">>> Entering UserRelationshipPreference()");
             this.PreferenceId = -1;
+			Logger.LogDebug("<<< Exiting UserRelationshipPreference()");
+			Logger.LogDebug("UserRelationshipPreference(): this.PreferenceId → {Arg0}", this.PreferenceId);
         }
 
         /// <summary>Gets or sets preferenceId - The primary key.</summary>
@@ -60,6 +64,7 @@ namespace DotNetNuke.Entities.Users.Social
         /// <param name="dr">the data reader.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.PreferenceId = Convert.ToInt32(dr["PreferenceID"], CultureInfo.InvariantCulture);
             this.UserId = Convert.ToInt32(dr["UserID"], CultureInfo.InvariantCulture);
             this.RelationshipId = Convert.ToInt32(dr["RelationshipID"], CultureInfo.InvariantCulture);
@@ -67,6 +72,7 @@ namespace DotNetNuke.Entities.Users.Social
 
             // add audit column data
             this.FillInternal(dr);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

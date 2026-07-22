@@ -10,6 +10,7 @@ using System.Reflection;
 /// <summary>The result of a request to get types from assemblies.</summary>
 public class TypesResult
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Initializes a new instance of the <see cref="TypesResult"/> class.</summary>
     /// <param name="types">The types.</param>
     /// <param name="loadExceptions">The <see cref="ReflectionTypeLoadException"/> instances that were occurred while loading the assemblies.</param>

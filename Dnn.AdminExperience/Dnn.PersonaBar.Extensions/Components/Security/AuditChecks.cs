@@ -19,6 +19,7 @@ namespace Dnn.PersonaBar.Security.Components
     /// </summary>
     public class AuditChecks
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IHostSettings hostSettings;
         private readonly IPagesController pagesController;
         private readonly IEnumerable<IAuditCheck> auditChecks;
@@ -28,7 +29,9 @@ namespace Dnn.PersonaBar.Security.Components
         public AuditChecks()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering AuditChecks()");
         }
+		Logger.LogDebug("<<< Exiting AuditChecks()");
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AuditChecks"/> class.
@@ -38,6 +41,9 @@ namespace Dnn.PersonaBar.Security.Components
         public AuditChecks(IPagesController pagesController)
             : this(pagesController, null)
         {
+		Logger.LogDebug(">>> Entering AuditChecks(pagesController={PagesController})", pagesController);
+		Logger.LogDebug("<<< Exiting AuditChecks(pagesController={PagesController})", pagesController);
+		Logger.LogDebug("AuditChecks(pagesController={PagesController},hostSettings={HostSettings}): pagesController → {PagesController1}", pagesController, hostSettings, pagesController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="AuditChecks"/> class.</summary>
@@ -47,6 +53,7 @@ namespace Dnn.PersonaBar.Security.Components
         {
             this.pagesController = pagesController ?? Globals.DependencyProvider.GetRequiredService<IPagesController>();
             this.hostSettings = hostSettings ?? Globals.DependencyProvider.GetRequiredService<IHostSettings>();
+			Logger.LogDebug("AuditChecks(pagesController={PagesController},hostSettings={HostSettings}): hostSettings → {HostSettings1}", pagesController, hostSettings, hostSettings);
 
             var checks = new List<IAuditCheck>
             {
@@ -75,11 +82,13 @@ namespace Dnn.PersonaBar.Security.Components
 
             var knownHostGuidCheck = new CheckKnownHostGuid(this.hostSettings);
             if (knownHostGuidCheck.ShouldAlert)
+			Logger.LogDebug("AuditChecks(pagesController={PagesController},hostSettings={HostSettings}): knownHostGuidCheck → {KnownHostGuidCheck}", pagesController, hostSettings, knownHostGuidCheck);
             {
                 checks.Add(knownHostGuidCheck);
             }
 
             this.auditChecks = checks.AsReadOnly();
+			Logger.LogDebug("AuditChecks(pagesController={PagesController},hostSettings={HostSettings}): auditChecks → {AuditChecks}", pagesController, hostSettings, auditChecks);
         }
 
         /// <summary>
@@ -91,22 +100,27 @@ namespace Dnn.PersonaBar.Security.Components
         /// severity and status of the corresponding check.</returns>
         public List<CheckResult> DoChecks(bool checkAll = false)
         {
+			Logger.LogDebug(">>> Entering DoChecks(checkAll={CheckAll})", checkAll);
             var results = new List<CheckResult>();
             foreach (var check in this.auditChecks)
             {
+			Logger.LogDebug("DoChecks(checkAll={CheckAll}): results → {Results}", checkAll, results);
                 try
                 {
                     var result = checkAll || !check.LazyLoad ? check.Execute() : new CheckResult(SeverityEnum.Unverified, check.Id);
                     results.Add(result);
+					Logger.LogDebug("DoChecks(checkAll={CheckAll}): result → {Result}", checkAll, result);
                 }
                 catch (Exception ex)
                 {
+					Logger.LogError("Exception in DoChecks(checkAll={CheckAll}): {Arg1}", checkAll, ex.Message);
                     var result = new CheckResult(SeverityEnum.Unverified, check.Id);
                     result.Notes.Add("An error occurred, Message: " + HttpUtility.HtmlEncode(ex.Message));
                     results.Add(result);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting DoChecks(checkAll={CheckAll})", checkAll);
             return results;
         }
 
@@ -119,6 +133,7 @@ namespace Dnn.PersonaBar.Security.Components
         /// cref="SeverityEnum.Unverified"/> and the specified ID.</returns>
         public CheckResult DoCheck(string id)
         {
+			Logger.LogDebug(">>> Entering DoCheck(id={Id})", id);
             try
             {
                 var check = this.auditChecks.FirstOrDefault(c => c.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
@@ -126,6 +141,8 @@ namespace Dnn.PersonaBar.Security.Components
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in DoCheck(id={Id}): {Arg1}", id, ex.Message);
+				Logger.LogDebug("<<< Exiting DoCheck(id={Id})", id);
                 return new CheckResult(SeverityEnum.Unverified, id);
             }
         }

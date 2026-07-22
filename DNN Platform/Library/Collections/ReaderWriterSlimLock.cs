@@ -9,6 +9,7 @@ namespace DotNetNuke.Collections.Internal
     /// <summary>Provides read/write slimlock functionality.</summary>
     internal class ReaderWriterSlimLock : ISharedCollectionLock
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private bool disposed;
         private ReaderWriterLockSlim @lock;
 
@@ -16,7 +17,9 @@ namespace DotNetNuke.Collections.Internal
         /// <param name="lock">The reference to <see cref="ReaderWriterLockSlim"/>.</param>
         public ReaderWriterSlimLock(ReaderWriterLockSlim @lock)
         {
+			Logger.LogDebug(">>> Entering ReaderWriterSlimLock()");
             this.@lock = @lock;
+			Logger.LogDebug("<<< Exiting ReaderWriterSlimLock()");
         }
 
         /// <summary>Finalizes an instance of the <see cref="ReaderWriterSlimLock"/> class.</summary>
@@ -28,15 +31,18 @@ namespace DotNetNuke.Collections.Internal
         /// <inheritdoc />
         public void Dispose()
         {
+			Logger.LogDebug(">>> Entering Dispose()");
             this.Dispose(true);
 
             GC.SuppressFinalize(this);
+			Logger.LogDebug("<<< Exiting Dispose()");
         }
 
         /// <summary>Disposes this instance resources.</summary>
         /// <param name="disposing">A value indicating whether this instance is currently disposing.</param>
         protected virtual void Dispose(bool disposing)
         {
+			Logger.LogDebug(">>> Entering Dispose(disposing={Disposing})", disposing);
             if (!this.disposed)
             {
                 if (disposing)
@@ -60,15 +66,19 @@ namespace DotNetNuke.Collections.Internal
 
                 this.@lock = null;
                 this.disposed = true;
+				Logger.LogDebug("Dispose(disposing={Disposing}): this.disposed → {Arg1}", disposing, this.disposed);
             }
+			Logger.LogDebug("<<< Exiting Dispose(disposing={Disposing})", disposing);
         }
 
         private void EnsureNotDisposed()
         {
+			Logger.LogDebug(">>> Entering EnsureNotDisposed()");
             if (this.disposed)
             {
                 throw new ObjectDisposedException("ReaderWriterSlimLock");
             }
+			Logger.LogDebug("<<< Exiting EnsureNotDisposed()");
         }
     }
 }

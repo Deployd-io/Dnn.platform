@@ -13,6 +13,7 @@ namespace DotNetNuke.Web.Mvc.Common
 
     internal static class DictionaryExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Remove entries from dictionary that match the removeCondition.</summary>
         /// <param name="dictionary">The dictionary.</param>
         /// <param name="removeCondition">A function determining whether to remove the <see cref="KeyValuePair{TKey,TValue}"/>.</param>

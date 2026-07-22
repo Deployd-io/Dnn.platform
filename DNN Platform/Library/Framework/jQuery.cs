@@ -29,6 +29,7 @@ namespace DotNetNuke.Framework
     // ReSharper disable once InconsistentNaming
     public partial class jQuery
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Returns the default URL for a hosted version of the jQuery script.</summary>
         /// <remarks>
         /// Google hosts versions of many popular javascript libraries on their CDN.
@@ -86,8 +87,10 @@ namespace DotNetNuke.Framework
         /// <param name="page">The page instance.</param>
         public static void KeepAlive(Page page)
         {
+			Logger.LogDebug(">>> Entering KeepAlive(page={Page})", page);
             var cookieTimeout = Config.GetAuthCookieTimeout();
             if (cookieTimeout <= 0 || page.ClientScript.IsClientScriptBlockRegistered("PageKeepAlive"))
+			Logger.LogDebug("KeepAlive(page={Page}): cookieTimeout → {CookieTimeout}", page, cookieTimeout);
             {
                 return;
             }
@@ -101,25 +104,32 @@ namespace DotNetNuke.Framework
 
             var seconds = ((cookieTimeout * 60) - 30) * 1000; // ping server 30 seconds before cookie is time out.
             var scriptBlock = string.Format(CultureInfo.InvariantCulture, "(function($){{setInterval(function(){{$.get(location.href)}}, {1});}}(jQuery));", Globals.ApplicationPath, seconds);
+			Logger.LogDebug("KeepAlive(page={Page}): seconds → {Seconds}", page, seconds);
             ScriptManager.RegisterClientScriptBlock(page, page.GetType(), "PageKeepAlive", scriptBlock, true);
+			Logger.LogDebug("<<< Exiting KeepAlive(page={Page})", page);
         }
 
         private static bool GetSettingAsBoolean(string key, bool defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetSettingAsBoolean(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             bool retValue = defaultValue;
             try
+			Logger.LogDebug("GetSettingAsBoolean(key={Key},defaultValue={DefaultValue}): retValue → {RetValue}", key, defaultValue, retValue);
             {
                 object setting = HttpContext.Current.Items[key];
                 if (setting != null)
+				Logger.LogDebug("GetSettingAsBoolean(key={Key},defaultValue={DefaultValue}): setting → {Setting}", key, defaultValue, setting);
                 {
                     retValue = Convert.ToBoolean(setting, CultureInfo.InvariantCulture);
                 }
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in GetSettingAsBoolean(key={Key},defaultValue={DefaultValue}): {Arg2}", key, defaultValue, ex.Message);
                 Exceptions.LogException(ex);
             }
 
+			Logger.LogDebug("<<< Exiting GetSettingAsBoolean(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             return retValue;
         }
     }

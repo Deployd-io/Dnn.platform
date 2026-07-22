@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.Syndication
         where TRssItemType : RssElementBase, new()
         where TRssImageType : RssElementBase, new()
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private TRssImageType image;
 
         /// <summary>Gets the channel items.</summary>
@@ -25,6 +26,8 @@ namespace DotNetNuke.Services.Syndication
         /// <returns>A new <see cref="XmlDocument"/> instance.</returns>
         public XmlDocument SaveAsXml()
         {
+			Logger.LogDebug(">>> Entering SaveAsXml()");
+			Logger.LogDebug("<<< Exiting SaveAsXml()");
             return this.SaveAsXml(RssXmlHelper.CreateEmptyRssXml());
         }
 
@@ -46,6 +49,7 @@ namespace DotNetNuke.Services.Syndication
                 RssXmlHelper.SaveRssElementAsXml(channelNode, item, "item");
             }
 
+			Logger.LogDebug("<<< Exiting SaveAsXml(emptyRssXml={EmptyRssXml})", emptyRssXml);
             return doc;
         }
 
@@ -77,14 +81,18 @@ namespace DotNetNuke.Services.Syndication
         /// <param name="url">The URL to load the channel from.</param>
         protected void LoadFromUrl(string url)
         {
+			Logger.LogDebug(">>> Entering LoadFromUrl(url={Url})", url);
             // download the feed
             RssChannelDom dom = RssDownloadManager.GetChannel(url);
 
+			Logger.LogDebug("LoadFromUrl(url={Url}): dom → {Dom}", url, dom);
             // create the channel
             this.LoadFromDom(dom);
 
             // remember the url
             this.Url = url;
+			Logger.LogDebug("<<< Exiting LoadFromUrl(url={Url})", url);
+			Logger.LogDebug("LoadFromUrl(url={Url}): this.Url → {Arg1}", url, this.Url);
         }
 
         /// <summary>Loads a channel from a <paramref name="doc"/> into this channel.</summary>
@@ -102,11 +110,14 @@ namespace DotNetNuke.Services.Syndication
         /// <returns>An <typeparamref name="TRssImageType"/> instance.</returns>
         protected TRssImageType GetImage()
         {
+			Logger.LogDebug(">>> Entering GetImage()");
             if (this.image == null)
             {
                 this.image = new TRssImageType();
+				Logger.LogDebug("GetImage(): image → {Image}", image);
             }
 
+			Logger.LogDebug("<<< Exiting GetImage()");
             return this.image;
         }
     }

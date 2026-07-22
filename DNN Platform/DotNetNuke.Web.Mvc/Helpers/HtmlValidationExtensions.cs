@@ -13,13 +13,16 @@ namespace DotNetNuke.Web.Mvc.Helpers
     /// <summary>Provides support for validating the input from an HTML form.</summary>
     public static class HtmlValidationExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         // Validate
 
         /// <summary>Retrieves the validation metadata for the specified model and applies each rule to the data field.</summary>
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="modelName">The name of the property or model object that is being validated.</param><exception cref="System.ArgumentNullException">The <paramref name="modelName"/> parameter is null.</exception>
         public static void Validate(this DnnHtmlHelper html, string modelName)
         {
+			Logger.LogDebug(">>> Entering Validate(html={Html},modelName={ModelName})", html, modelName);
             html.HtmlHelper.Validate(modelName);
+			Logger.LogDebug("<<< Exiting Validate(html={Html},modelName={ModelName})", html, modelName);
         }
 
         /// <summary>Retrieves the validation metadata for the specified model and applies each rule to the data field.</summary>
@@ -40,6 +43,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="modelName">The name of the property or model object that is being validated.</param>
         public static MvcHtmlString ValidationMessage(this DnnHtmlHelper html, string modelName)
         {
+			Logger.LogDebug(">>> Entering ValidationMessage(html={Html},modelName={ModelName})", html, modelName);
+			Logger.LogDebug("<<< Exiting ValidationMessage(html={Html},modelName={ModelName})", html, modelName);
             return html.HtmlHelper.ValidationMessage(modelName);
         }
 
@@ -51,6 +56,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="modelName">The name of the property or model object that is being validated.</param><param name="htmlAttributes">An object that contains the HTML attributes for the element. </param>
         public static MvcHtmlString ValidationMessage(this DnnHtmlHelper html, string modelName, object htmlAttributes)
         {
+			Logger.LogDebug("<<< Exiting ValidationMessage(html={Html},modelName={ModelName},htmlAttributes={HtmlAttributes})", html, modelName, htmlAttributes);
             return html.HtmlHelper.ValidationMessage(modelName, htmlAttributes);
         }
 
@@ -62,6 +68,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="modelName">The name of the property or model object that is being validated.</param><param name="validationMessage">The message to display if the specified field contains an error.</param>
         public static MvcHtmlString ValidationMessage(this DnnHtmlHelper html, string modelName, string validationMessage)
         {
+			Logger.LogDebug("<<< Exiting ValidationMessage(html={Html},modelName={ModelName},validationMessage={ValidationMessage})", html, modelName, validationMessage);
             return html.HtmlHelper.ValidationMessage(modelName, validationMessage);
         }
 
@@ -73,6 +80,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="modelName">The name of the property or model object that is being validated.</param><param name="validationMessage">The message to display if the specified field contains an error.</param><param name="htmlAttributes">An object that contains the HTML attributes for the element. </param>
         public static MvcHtmlString ValidationMessage(this DnnHtmlHelper html, string modelName, string validationMessage, object htmlAttributes)
         {
+			Logger.LogDebug("<<< Exiting ValidationMessage(html={Html},modelName={ModelName},validationMessage={ValidationMessage},htmlAttributes={HtmlAttributes})", html, modelName, validationMessage, htmlAttributes);
             return html.HtmlHelper.ValidationMessage(modelName, validationMessage, htmlAttributes);
         }
 
@@ -156,6 +164,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param>
         public static MvcHtmlString ValidationSummary(this DnnHtmlHelper html)
         {
+			Logger.LogDebug(">>> Entering ValidationSummary(html={Html})", html);
+			Logger.LogDebug("<<< Exiting ValidationSummary(html={Html})", html);
             return html.HtmlHelper.ValidationSummary();
         }
 
@@ -167,6 +177,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="excludePropertyErrors">true to have the summary display model-level errors only, or false to have the summary display all errors.</param>
         public static MvcHtmlString ValidationSummary(this DnnHtmlHelper html, bool excludePropertyErrors)
         {
+			Logger.LogDebug("<<< Exiting ValidationSummary(html={Html},excludePropertyErrors={ExcludePropertyErrors})", html, excludePropertyErrors);
             return html.HtmlHelper.ValidationSummary(excludePropertyErrors);
         }
 
@@ -178,6 +189,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HMTL helper instance that this method extends.</param><param name="message">The message to display if the specified field contains an error.</param>
         public static MvcHtmlString ValidationSummary(this DnnHtmlHelper html, string message)
         {
+			Logger.LogDebug("<<< Exiting ValidationSummary(html={Html},message={Message})", html, message);
             return html.HtmlHelper.ValidationSummary(message);
         }
 
@@ -189,6 +201,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="excludePropertyErrors">true to have the summary display model-level errors only, or false to have the summary display all errors.</param><param name="message">The message to display with the validation summary.</param>
         public static MvcHtmlString ValidationSummary(this DnnHtmlHelper html, bool excludePropertyErrors, string message)
         {
+			Logger.LogDebug("<<< Exiting ValidationSummary(html={Html},excludePropertyErrors={ExcludePropertyErrors},message={Message})", html, excludePropertyErrors, message);
             return html.HtmlHelper.ValidationSummary(excludePropertyErrors, message);
         }
 
@@ -200,6 +213,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="message">The message to display if the specified field contains an error.</param><param name="htmlAttributes">An object that contains the HTML attributes for the element. </param>
         public static MvcHtmlString ValidationSummary(this DnnHtmlHelper html, string message, object htmlAttributes)
         {
+			Logger.LogDebug("<<< Exiting ValidationSummary(html={Html},message={Message},htmlAttributes={HtmlAttributes})", html, message, htmlAttributes);
             return html.HtmlHelper.ValidationSummary(message, htmlAttributes);
         }
 
@@ -211,6 +225,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="excludePropertyErrors">true to have the summary display model-level errors only, or false to have the summary display all errors.</param><param name="message">The message to display with the validation summary.</param><param name="htmlAttributes">An object that contains the HTML attributes for the element.</param>
         public static MvcHtmlString ValidationSummary(this DnnHtmlHelper html, bool excludePropertyErrors, string message, object htmlAttributes)
         {
+			Logger.LogDebug("<<< Exiting ValidationSummary(html={Html},excludePropertyErrors={ExcludePropertyErrors},message={Message},htmlAttributes={HtmlAttributes})", html, excludePropertyErrors, message, htmlAttributes);
             return html.HtmlHelper.ValidationSummary(excludePropertyErrors, message, htmlAttributes);
         }
 
