@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class OAuthException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public OAuthException()
     {
+	Logger.LogDebug(">>> Entering OAuthException()");
+	Logger.LogDebug("<<< Exiting OAuthException()");
     }
 
     /// <inheritdoc />
     public OAuthException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering OAuthException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting OAuthException(message={Message})", message);
 
     /// <inheritdoc />
     public OAuthException(string message, Exception innerException)

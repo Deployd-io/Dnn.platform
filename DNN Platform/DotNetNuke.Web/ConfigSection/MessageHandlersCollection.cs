@@ -12,6 +12,7 @@ namespace DotNetNuke.Web.ConfigSection
     /// <summary>A collection of <see cref="MessageHandlerEntry"/> instances.</summary>
     public class MessageHandlersCollection : ConfigurationElementCollection, ICollection<ConfigurationElement>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         bool ICollection<ConfigurationElement>.IsReadOnly => this.IsReadOnly();
 
@@ -47,12 +48,14 @@ namespace DotNetNuke.Web.ConfigSection
         /// <inheritdoc />
         public bool Remove(ConfigurationElement item)
         {
+			Logger.LogDebug(">>> Entering Remove(item={Item})", item);
             if (!this.Contains(item))
             {
                 return false;
             }
 
             this.BaseRemove(this.GetElementKey(item));
+			Logger.LogDebug("<<< Exiting Remove(item={Item})", item);
             return true;
         }
 
@@ -65,23 +68,30 @@ namespace DotNetNuke.Web.ConfigSection
         /// <inheritdoc />
         protected override ConfigurationElement CreateNewElement()
         {
+			Logger.LogDebug(">>> Entering CreateNewElement()");
+			Logger.LogDebug("<<< Exiting CreateNewElement()");
             return new MessageHandlerEntry();
         }
 
         /// <inheritdoc />
         protected override object GetElementKey(ConfigurationElement element)
         {
+			Logger.LogDebug(">>> Entering GetElementKey(element={Element})", element);
+			Logger.LogDebug("<<< Exiting GetElementKey(element={Element})", element);
             return (element as MessageHandlerEntry ?? new MessageHandlerEntry()).Name;
         }
 
         private class ConfigurationElementEnumerator(IEnumerator enumerator) : IEnumerator<ConfigurationElement>
         {
+			Logger.LogDebug(">>> Entering ConfigurationElementEnumerator(enumerator={Enumerator})", enumerator);
             /// <inheritdoc />
             public ConfigurationElement Current => (ConfigurationElement)enumerator.Current;
 
+			Logger.LogDebug("ConfigurationElementEnumerator(enumerator={Enumerator}): Current → {Current}", enumerator, Current);
             /// <inheritdoc />
             object IEnumerator.Current => this.Current;
 
+			Logger.LogDebug("<<< Exiting ConfigurationElementEnumerator(enumerator={Enumerator})", enumerator);
             /// <inheritdoc />
             public void Dispose() => (enumerator as IDisposable)?.Dispose();
 

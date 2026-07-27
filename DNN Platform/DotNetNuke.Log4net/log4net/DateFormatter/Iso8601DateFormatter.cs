@@ -33,6 +33,7 @@ namespace log4net.DateFormatter
     /// <author>Gert Driesen</author>
     public class Iso8601DateFormatter : AbsoluteTimeDateFormatter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Default constructor</summary>
         /// <remarks>
         /// <para>
@@ -41,6 +42,8 @@ namespace log4net.DateFormatter
         /// </remarks>
         public Iso8601DateFormatter()
         {
+		Logger.LogDebug(">>> Entering Iso8601DateFormatter()");
+		Logger.LogDebug("<<< Exiting Iso8601DateFormatter()");
         }
 
         /// <summary>Formats the date without the milliseconds part</summary>
@@ -57,6 +60,7 @@ namespace log4net.DateFormatter
         /// </remarks>
         protected override void FormatDateWithoutMillis(DateTime dateToFormat, StringBuilder buffer)
         {
+			Logger.LogDebug(">>> Entering FormatDateWithoutMillis(dateToFormat={DateToFormat},buffer={Buffer})", dateToFormat, buffer);
             buffer.Append(dateToFormat.Year);
 
             buffer.Append('-');
@@ -78,6 +82,7 @@ namespace log4net.DateFormatter
 
             // Append the 'HH:mm:ss'
             base.FormatDateWithoutMillis(dateToFormat, buffer);
+			Logger.LogDebug("<<< Exiting FormatDateWithoutMillis(dateToFormat={DateToFormat},buffer={Buffer})", dateToFormat, buffer);
         }
     }
 }

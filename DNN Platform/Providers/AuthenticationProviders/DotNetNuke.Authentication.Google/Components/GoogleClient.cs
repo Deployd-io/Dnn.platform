@@ -14,40 +14,54 @@ namespace DotNetNuke.Authentication.Google.Components
     /// <inheritdoc />
     public class GoogleClient : OAuthClientBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="GoogleClient"/> class.</summary>
         /// <param name="portalId">The portal ID.</param>
         /// <param name="mode">The auth mode.</param>
         public GoogleClient(int portalId, AuthMode mode)
             : base(portalId, mode, "Google")
         {
+			Logger.LogDebug(">>> Entering GoogleClient(portalId={PortalId},mode={Mode})", portalId, mode);
             this.TokenEndpoint = new Uri("https://accounts.google.com/o/oauth2/token");
             this.TokenMethod = HttpMethod.POST;
+			Logger.LogDebug("GoogleClient(portalId={PortalId},mode={Mode}): this.TokenMethod → {Arg2}", portalId, mode, this.TokenMethod);
             this.AuthorizationEndpoint = new Uri("https://accounts.google.com/o/oauth2/auth");
             this.MeGraphEndpoint = new Uri("https://www.googleapis.com/oauth2/v1/userinfo");
 
             this.Scope = HttpUtility.UrlEncode("https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email");
 
             this.AuthTokenName = "GoogleUserToken";
+			Logger.LogDebug("GoogleClient(portalId={PortalId},mode={Mode}): this.AuthTokenName → {Arg2}", portalId, mode, this.AuthTokenName);
 
             this.OAuthVersion = "2.0";
+			Logger.LogDebug("GoogleClient(portalId={PortalId},mode={Mode}): this.OAuthVersion → {Arg2}", portalId, mode, this.OAuthVersion);
 
             this.LoadTokenCookie(string.Empty);
+			Logger.LogDebug("<<< Exiting GoogleClient(portalId={PortalId},mode={Mode})", portalId, mode);
         }
 
         /// <inheritdoc />
         protected override TimeSpan GetExpiry(string responseText)
         {
+			Logger.LogDebug(">>> Entering GetExpiry(responseText={ResponseText})", responseText);
             var jsonSerializer = new JavaScriptSerializer();
             var tokenDictionary = jsonSerializer.DeserializeObject(responseText) as Dictionary<string, object>;
+			Logger.LogDebug("GetExpiry(responseText={ResponseText}): jsonSerializer → {JsonSerializer}", responseText, jsonSerializer);
+			Logger.LogDebug("GetExpiry(responseText={ResponseText}): tokenDictionary → {TokenDictionary}", responseText, tokenDictionary);
 
+			Logger.LogDebug("<<< Exiting GetExpiry(responseText={ResponseText})", responseText);
             return new TimeSpan(0, 0, Convert.ToInt32(tokenDictionary["expires_in"]));
         }
 
         /// <inheritdoc />
         protected override string GetToken(string responseText)
         {
+			Logger.LogDebug(">>> Entering GetToken(responseText={ResponseText})", responseText);
             var jsonSerializer = new JavaScriptSerializer();
             var tokenDictionary = jsonSerializer.DeserializeObject(responseText) as Dictionary<string, object>;
+			Logger.LogDebug("GetToken(responseText={ResponseText}): jsonSerializer → {JsonSerializer}", responseText, jsonSerializer);
+			Logger.LogDebug("GetToken(responseText={ResponseText}): tokenDictionary → {TokenDictionary}", responseText, tokenDictionary);
+			Logger.LogDebug("<<< Exiting GetToken(responseText={ResponseText})", responseText);
             return Convert.ToString(tokenDictionary["access_token"]);
         }
     }

@@ -11,9 +11,12 @@ namespace DotNetNuke.Data
 
     public class SqlDatabaseConnectionProvider : DatabaseConnectionProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override int ExecuteNonQuery(string connectionString, CommandType commandType, int commandTimeout, string query)
         {
+			Logger.LogDebug(">>> Entering ExecuteNonQuery(connectionString={ConnectionString},commandType={CommandType},commandTimeout={CommandTimeout},query={Query})", connectionString, commandType, commandTimeout);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             using (var connection = new SqlConnection(connectionString))
             using (var command = new SqlCommand(query, connection))
             {
@@ -25,6 +28,7 @@ namespace DotNetNuke.Data
                 connection.Open();
                 try
                 {
+					Logger.LogDebug("<<< Exiting ExecuteNonQuery(connectionString={ConnectionString},commandType={CommandType},commandTimeout={CommandTimeout},query={Query})", connectionString, commandType, commandTimeout);
                     return command.ExecuteNonQuery();
                 }
                 finally
@@ -38,31 +42,40 @@ namespace DotNetNuke.Data
         public override void ExecuteNonQuery(string connectionString, CommandType commandType, int commandTimeout, string procedure, object[] commandParameters)
         {
             PetaPocoHelper.ExecuteNonQuery(connectionString, commandType, commandTimeout, procedure, commandParameters);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			Logger.LogInformation("ExecuteNonQuery(connectionString,commandType,commandTimeout,procedure,commandParameters)={ConnectionString},{CommandType},{CommandTimeout},{Procedure},{CommandParameters}: database query executed in {Arg5} ms", connectionString, commandType, commandTimeout, procedure, commandParameters, __logStart.ElapsedMilliseconds);
         }
 
         /// <inheritdoc />
         public override IDataReader ExecuteSql(string connectionString, CommandType commandType, int commandTimeout, string query)
         {
+			Logger.LogDebug(">>> Entering ExecuteSql(connectionString={ConnectionString},commandType={CommandType},commandTimeout={CommandTimeout},query={Query})", connectionString, commandType, commandTimeout);
             ////return SqlHelper.ExecuteReader(ConnectionString, CommandType, Query);
+			Logger.LogDebug("<<< Exiting ExecuteSql(connectionString={ConnectionString},commandType={CommandType},commandTimeout={CommandTimeout},query={Query})", connectionString, commandType, commandTimeout);
             return PetaPocoHelper.ExecuteReader(connectionString, commandType, commandTimeout, query);
         }
 
         /// <inheritdoc />
         public override IDataReader ExecuteReader(string connectionString, CommandType commandType, int commandTimeout, string procedureName, params object[] commandParameters)
         {
+			Logger.LogDebug(">>> Entering ExecuteReader(connectionString={ConnectionString},commandType={CommandType},commandTimeout={CommandTimeout},procedureName={ProcedureName},commandParameters={CommandParameters})", connectionString, commandType, commandTimeout, procedureName, commandParameters);
+			Logger.LogDebug("<<< Exiting ExecuteReader(connectionString={ConnectionString},commandType={CommandType},commandTimeout={CommandTimeout},procedureName={ProcedureName},commandParameters={CommandParameters})", connectionString, commandType, commandTimeout, procedureName, commandParameters);
             return PetaPocoHelper.ExecuteReader(connectionString, commandType, commandTimeout, procedureName, commandParameters);
         }
 
         /// <inheritdoc />
         public override T ExecuteScalar<T>(string connectionString, CommandType commandType, int commandTimeout, string procedureName, params object[] commandParameters)
         {
+			Logger.LogDebug(">>> Entering ExecuteScalar(connectionString={ConnectionString},commandType={CommandType},commandTimeout={CommandTimeout},procedureName={ProcedureName},commandParameters={CommandParameters})", connectionString, commandType, commandTimeout, procedureName, commandParameters);
             return PetaPocoHelper.ExecuteScalar<T>(connectionString, commandType, commandTimeout, procedureName, commandParameters);
         }
 
         /// <inheritdoc />
         public override void BulkInsert(string connectionString, int commandTimeout, string procedureName, string tableParameterName, DataTable dataTable)
         {
+			Logger.LogDebug(">>> Entering BulkInsert(connectionString={ConnectionString},commandTimeout={CommandTimeout},procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable})", connectionString, commandTimeout, procedureName, tableParameterName, dataTable);
             PetaPocoHelper.BulkInsert(connectionString, commandTimeout, procedureName, tableParameterName, dataTable);
+			Logger.LogDebug("<<< Exiting BulkInsert(connectionString={ConnectionString},commandTimeout={CommandTimeout},procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable})", connectionString, commandTimeout, procedureName, tableParameterName, dataTable);
         }
 
         /// <inheritdoc />

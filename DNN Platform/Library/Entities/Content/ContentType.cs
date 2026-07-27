@@ -19,6 +19,7 @@ namespace DotNetNuke.Entities.Content
     [Serializable]
     public class ContentType : ContentTypeMemberNameFixer, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string DesktopModuleContentTypeName = "DesktopModule";
         private const string ModuleContentTypeName = "Module";
         private const string TabContentTypeName = "Tab";
@@ -31,7 +32,9 @@ namespace DotNetNuke.Entities.Content
         public ContentType()
             : this(Null.NullString)
         {
+		Logger.LogDebug(">>> Entering ContentType()");
         }
+		Logger.LogDebug("<<< Exiting ContentType()");
 
         /// <summary>Initializes a new instance of the <see cref="ContentType"/> class.</summary>
         /// <param name="contentType">The name of the content type.</param>
@@ -39,6 +42,8 @@ namespace DotNetNuke.Entities.Content
         {
             this.ContentTypeId = Null.NullInteger;
             this.ContentType = contentType;
+			Logger.LogDebug("ContentType(contentType={ContentType}): this.ContentTypeId → {Arg1}", contentType, this.ContentTypeId);
+			Logger.LogDebug("ContentType(contentType={ContentType}): this.ContentType → {Arg1}", contentType, this.ContentType);
         }
 
         public static ContentType DesktopModule
@@ -93,8 +98,10 @@ namespace DotNetNuke.Entities.Content
         /// <seealso cref="IHydratable.Fill"/>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.ContentTypeId = Null.SetNullInteger(dr["ContentTypeID"]);
             this.ContentType = Null.SetNullString(dr["ContentType"]);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
 
         /// <summary>override ToString to return content type.</summary>
@@ -103,6 +110,8 @@ namespace DotNetNuke.Entities.Content
         /// </returns>
         public override string ToString()
         {
+			Logger.LogDebug(">>> Entering ToString()");
+			Logger.LogDebug("<<< Exiting ToString()");
             return this.ContentType;
         }
     }

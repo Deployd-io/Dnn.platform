@@ -8,8 +8,11 @@ namespace DotNetNuke.Tests.Web.Mvc.Fakes
 
     public class FakeController : Controller
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public ActionResult Index()
         {
+			Logger.LogDebug(">>> Entering Index()");
+			Logger.LogDebug("<<< Exiting Index()");
             return new ViewResult();
         }
     }

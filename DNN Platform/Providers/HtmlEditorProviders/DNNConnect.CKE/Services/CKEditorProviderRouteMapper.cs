@@ -8,10 +8,13 @@ namespace DNNConnect.CKEditorProvider.Services
     /// <inheritdoc />
     public class CKEditorProviderRouteMapper : IServiceRouteMapper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public void RegisterRoutes(IMapRoute mapRouteManager)
         {
+			Logger.LogDebug(">>> Entering RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
             mapRouteManager.MapHttpRoute("CKEditorProvider", "default", "{controller}/{action}", new[] { "DNNConnect.CKEditorProvider.Services" });
+			Logger.LogDebug("<<< Exiting RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
         }
     }
 }

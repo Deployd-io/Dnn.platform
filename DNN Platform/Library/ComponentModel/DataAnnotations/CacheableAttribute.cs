@@ -11,11 +11,16 @@ namespace DotNetNuke.ComponentModel.DataAnnotations
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
     public class CacheableAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="CacheableAttribute"/> class.</summary>
         public CacheableAttribute()
         {
+			Logger.LogDebug(">>> Entering CacheableAttribute()");
             this.CachePriority = CacheItemPriority.Default;
             this.CacheTimeOut = 20;
+			Logger.LogDebug("<<< Exiting CacheableAttribute()");
+			Logger.LogDebug("CacheableAttribute(): this.CachePriority → {Arg0}", this.CachePriority);
+			Logger.LogDebug("CacheableAttribute(): this.CacheTimeOut → {Arg0}", this.CacheTimeOut);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CacheableAttribute"/> class.</summary>
@@ -23,7 +28,9 @@ namespace DotNetNuke.ComponentModel.DataAnnotations
         public CacheableAttribute(string cacheKey)
             : this(cacheKey, CacheItemPriority.Default, 20)
         {
+		Logger.LogDebug(">>> Entering CacheableAttribute(cacheKey={CacheKey})", cacheKey);
         }
+		Logger.LogDebug("<<< Exiting CacheableAttribute(cacheKey={CacheKey})", cacheKey);
 
         /// <summary>Initializes a new instance of the <see cref="CacheableAttribute"/> class.</summary>
         /// <param name="cacheKey">The cacheKey to use.</param>
@@ -31,6 +38,7 @@ namespace DotNetNuke.ComponentModel.DataAnnotations
         public CacheableAttribute(string cacheKey, CacheItemPriority priority)
             : this(cacheKey, priority, 20)
         {
+		Logger.LogDebug(">>> Entering CacheableAttribute(cacheKey={CacheKey},priority={Priority})", cacheKey, priority);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CacheableAttribute"/> class.</summary>
@@ -41,7 +49,11 @@ namespace DotNetNuke.ComponentModel.DataAnnotations
         {
             this.CacheKey = cacheKey;
             this.CachePriority = priority;
+			Logger.LogDebug("CacheableAttribute(cacheKey={CacheKey},priority={Priority},timeOut={TimeOut}): this.CacheKey → {Arg3}", cacheKey, priority, timeOut, this.CacheKey);
+			Logger.LogDebug("CacheableAttribute(cacheKey={CacheKey},priority={Priority},timeOut={TimeOut}): this.CachePriority → {Arg3}", cacheKey, priority, timeOut, this.CachePriority);
             this.CacheTimeOut = timeOut;
+			Logger.LogDebug("<<< Exiting CacheableAttribute(cacheKey={CacheKey},priority={Priority},timeOut={TimeOut})", cacheKey, priority, timeOut);
+			Logger.LogDebug("CacheableAttribute(cacheKey={CacheKey},priority={Priority},timeOut={TimeOut}): this.CacheTimeOut → {Arg3}", cacheKey, priority, timeOut, this.CacheTimeOut);
         }
 
         /// <summary>Gets or sets the root key to use for the cache.</summary>

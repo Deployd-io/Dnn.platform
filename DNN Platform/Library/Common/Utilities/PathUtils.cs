@@ -17,11 +17,14 @@ namespace DotNetNuke.Common.Utilities
     /// <summary>The default <see cref="IPathUtils"/> implementation.</summary>
     public class PathUtils : ComponentBase<IPathUtils, PathUtils>, IPathUtils
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly Regex FolderPathRx = new Regex("^0\\\\", RegexOptions.Compiled);
 
         /// <summary>Initializes a new instance of the <see cref="PathUtils"/> class.</summary>
         internal PathUtils()
         {
+		Logger.LogDebug(">>> Entering PathUtils()");
+		Logger.LogDebug("<<< Exiting PathUtils()");
         }
 
         /// <summary>The parts of a user folder path.</summary>
@@ -37,14 +40,17 @@ namespace DotNetNuke.Common.Utilities
         /// <inheritdoc />
         public virtual string AddTrailingSlash(string source)
         {
+			Logger.LogDebug(">>> Entering AddTrailingSlash(source={Source})", source);
             Requires.PropertyNotNull("source", source);
 
+			Logger.LogDebug("<<< Exiting AddTrailingSlash(source={Source})", source);
             return source.EndsWith(@"\", StringComparison.Ordinal) ? source : $@"{source}\";
         }
 
         /// <inheritdoc />
         public virtual string FormatFolderPath(string folderPath)
         {
+			Logger.LogDebug(">>> Entering FormatFolderPath(folderPath={FolderPath})", folderPath);
             // Can not call trim on folderPath since folder passed in might have a legit space
             // at the beginning of its name " MyFolder/Test" is not same physical folder as "MyFolder/Test"
             if (string.IsNullOrEmpty(folderPath) || string.IsNullOrEmpty(folderPath.Trim()))
@@ -52,16 +58,20 @@ namespace DotNetNuke.Common.Utilities
                 return string.Empty;
             }
 
+			Logger.LogDebug("<<< Exiting FormatFolderPath(folderPath={FolderPath})", folderPath);
             return folderPath.EndsWith("/", StringComparison.Ordinal) ? folderPath.Trim() : folderPath.Trim() + "/";
         }
 
         /// <inheritdoc />
         public virtual string GetPhysicalPath(int portalID, string relativePath)
         {
+			Logger.LogDebug(">>> Entering GetPhysicalPath(portalID={PortalID},relativePath={RelativePath})", portalID, relativePath);
             Requires.PropertyNotNull("relativePath", relativePath);
 
             var path1 = this.GetRootFolderMapPath(portalID);
             var path2 = relativePath.Replace("/", @"\");
+			Logger.LogDebug("GetPhysicalPath(portalID={PortalID},relativePath={RelativePath}): path1 → {Path1}", portalID, relativePath, path1);
+			Logger.LogDebug("GetPhysicalPath(portalID={PortalID},relativePath={RelativePath}): path2 → {Path2}", portalID, relativePath, path2);
 
             if (Path.IsPathRooted(path2))
             {
@@ -70,6 +80,8 @@ namespace DotNetNuke.Common.Utilities
 
             var physicalPath = Path.Combine(path1, path2);
 
+			Logger.LogDebug("GetPhysicalPath(portalID={PortalID},relativePath={RelativePath}): physicalPath → {PhysicalPath}", portalID, relativePath, physicalPath);
+			Logger.LogDebug("<<< Exiting GetPhysicalPath(portalID={PortalID},relativePath={RelativePath})", portalID, relativePath);
             return this.RemoveTrailingSlash(physicalPath);
         }
 
@@ -109,6 +121,9 @@ namespace DotNetNuke.Common.Utilities
         /// <inheritdoc />
         public virtual string GetRootFolderMapPath(int portalID)
         {
+			Logger.LogDebug(">>> Entering GetRootFolderMapPath(portalID={PortalID})", portalID);
+			Logger.LogDebug(">>> Entering MapPath(path={Path})", path);
+			Logger.LogDebug("<<< Exiting MapPath(path={Path})", path);
             return (portalID == Null.NullInteger) ? GetHostMapPath() : GetPortalMapPath(portalID);
         }
 
@@ -117,12 +132,16 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The path to a user folder.</returns>
         public virtual string GetUserFolderPath(UserInfo user)
         {
+			Logger.LogDebug(">>> Entering GetUserFolderPath(user={User})", user);
+			Logger.LogDebug("<<< Exiting GetUserFolderPath(user={User})", user);
             return FolderManager.Instance.GetUserFolder(user).FolderPath;
         }
 
         /// <inheritdoc />
         public virtual bool IsDefaultProtectedPath(string folderPath)
         {
+			Logger.LogDebug(">>> Entering IsDefaultProtectedPath(folderPath={FolderPath})", folderPath);
+			Logger.LogDebug("<<< Exiting IsDefaultProtectedPath(folderPath={FolderPath})", folderPath);
             return string.IsNullOrEmpty(folderPath) ||
                    folderPath.Equals("skins", StringComparison.OrdinalIgnoreCase) ||
                    folderPath.Equals("containers", StringComparison.OrdinalIgnoreCase) ||
@@ -165,6 +184,7 @@ namespace DotNetNuke.Common.Utilities
         /// <inheritdoc />
         public virtual string RemoveTrailingSlash(string source)
         {
+			Logger.LogDebug(">>> Entering RemoveTrailingSlash(source={Source})", source);
             if (string.IsNullOrEmpty(source))
             {
                 return string.Empty;
@@ -175,12 +195,14 @@ namespace DotNetNuke.Common.Utilities
                 return source.Substring(0, source.Length - 1);
             }
 
+			Logger.LogDebug("<<< Exiting RemoveTrailingSlash(source={Source})", source);
             return source;
         }
 
         /// <inheritdoc />
         public virtual string StripFolderPath(string originalPath)
         {
+			Logger.LogDebug(">>> Entering StripFolderPath(originalPath={OriginalPath})", originalPath);
             Requires.PropertyNotNull("originalPath", originalPath);
 
             if (originalPath.IndexOf(@"\", StringComparison.InvariantCulture) >= 0)
@@ -188,6 +210,7 @@ namespace DotNetNuke.Common.Utilities
                 return FolderPathRx.Replace(originalPath, string.Empty);
             }
 
+			Logger.LogDebug("<<< Exiting StripFolderPath(originalPath={OriginalPath})", originalPath);
             return originalPath;
         }
 
@@ -197,9 +220,12 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The element from the user folder path.</returns>
         internal static string GetUserFolderPathElement(int userId, UserFolderElement mode)
         {
+			Logger.LogDebug(">>> Entering GetUserFolderPathElement(userId={UserId},mode={Mode})", userId, mode);
             const int SubfolderSeedLength = 2;
             const int ByteOffset = 255;
 
+			Logger.LogDebug("GetUserFolderPathElement(userId={UserId},mode={Mode}): UserFolderElement.SubFolder → {Arg2}", userId, mode, UserFolderElement.SubFolder);
+			Logger.LogDebug("<<< Exiting GetUserFolderPathElement(userId={UserId},mode={Mode})", userId, mode);
             return mode switch
             {
                 UserFolderElement.Root => (userId & ByteOffset).ToString("000", CultureInfo.InvariantCulture),
@@ -217,22 +243,32 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The path.</returns>
         internal static string GetUserFolderPathInternal(UserInfo user)
         {
+			Logger.LogDebug(">>> Entering GetUserFolderPathInternal(user={User})", user);
             var rootFolder = GetUserFolderPathElement(user.UserID, UserFolderElement.Root);
             var subFolder = GetUserFolderPathElement(user.UserID, UserFolderElement.SubFolder);
+			Logger.LogDebug("GetUserFolderPathInternal(user={User}): rootFolder → {RootFolder}", user, rootFolder);
+			Logger.LogDebug("GetUserFolderPathInternal(user={User}): subFolder → {SubFolder}", user, subFolder);
 
             var fullPath = Path.Combine(Path.Combine(rootFolder, subFolder), user.UserID.ToString(CultureInfo.InvariantCulture));
 
+			Logger.LogDebug("GetUserFolderPathInternal(user={User}): fullPath → {FullPath}", user, fullPath);
+			Logger.LogDebug("<<< Exiting GetUserFolderPathInternal(user={User})", user);
             return $"Users/{fullPath.Replace(@"\", "/")}/";
         }
 
         private static string GetHostMapPath()
         {
+			Logger.LogDebug(">>> Entering GetHostMapPath()");
+			Logger.LogDebug("<<< Exiting GetHostMapPath()");
             return Globals.HostMapPath;
         }
 
         private static string GetPortalMapPath(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetPortalMapPath(portalId={PortalId})", portalId);
             var portalInfo = PortalController.Instance.GetPortal(portalId);
+			Logger.LogDebug("GetPortalMapPath(portalId={PortalId}): portalInfo → {PortalInfo}", portalId, portalInfo);
+			Logger.LogDebug("<<< Exiting GetPortalMapPath(portalId={PortalId})", portalId);
             return portalInfo.HomeDirectoryMapPath;
         }
     }

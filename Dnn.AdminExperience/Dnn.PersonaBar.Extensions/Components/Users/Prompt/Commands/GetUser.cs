@@ -17,6 +17,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
     [ConsoleCommand("get-user", Constants.UsersCategory, "Prompt_GetUser_Description")]
     public class GetUser : ConsoleCommandBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [FlagParameter("id", "Prompt_GetUser_FlagId", "Integer")]
         private const string FlagId = "id";
 
@@ -35,7 +36,9 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         public GetUser()
             : this(new UserValidator(), new UserControllerWrapper())
         {
+		Logger.LogDebug(">>> Entering GetUser()");
         }
+		Logger.LogDebug("<<< Exiting GetUser()");
 
         /// <summary>Initializes a new instance of the <see cref="GetUser"/> class.</summary>
         /// <param name="userValidator">The user validator.</param>
@@ -44,6 +47,10 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         {
             this.userValidator = userValidator;
             this.userControllerWrapper = userControllerWrapper;
+			Logger.LogDebug("GetUser(userValidator={UserValidator},userControllerWrapper={UserControllerWrapper}): this.userValidator → {Arg2}", userValidator, userControllerWrapper, this.userValidator);
+			Logger.LogDebug("GetUser(userValidator={UserValidator},userControllerWrapper={UserControllerWrapper}): userControllerWrapper → {UserControllerWrapper1}", userValidator, userControllerWrapper, userControllerWrapper);
+			Logger.LogDebug("GetUser(userValidator={UserValidator},userControllerWrapper={UserControllerWrapper}): this.userControllerWrapper → {Arg2}", userValidator, userControllerWrapper, this.userControllerWrapper);
+			Logger.LogDebug("GetUser(userValidator={UserValidator},userControllerWrapper={UserControllerWrapper}): userValidator → {UserValidator1}", userValidator, userControllerWrapper, userValidator);
         }
 
         /// <inheritdoc />
@@ -58,6 +65,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.UserId = this.GetFlagValue<int?>(FlagId, "User Id", null);
             this.Email = this.GetFlagValue(FlagEmail, "Email", string.Empty);
             this.Username = this.GetFlagValue(FlagUsername, "Username", string.Empty);
@@ -70,6 +78,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
                     if (args[1].Contains("@"))
                     {
                         this.Email = args[1];
+						Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): this.Email → {Arg4}", args, portalSettings, userInfo, activeTabId, this.Email);
                     }
                     else
                     {
@@ -77,11 +86,13 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
                         if (int.TryParse(args[1], out tmpId))
                         {
                             this.UserId = tmpId;
+							Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): this.UserId → {Arg4}", args, portalSettings, userInfo, activeTabId, this.UserId);
                         }
                         else
                         {
                             // assume it's a username
                             this.Username = args[1];
+							Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): this.Username → {Arg4}", args, portalSettings, userInfo, activeTabId, this.Username);
                         }
                     }
                 }
@@ -91,13 +102,16 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
                     this.AddMessage(this.LocalizeString("Prompt_SearchUserParameterRequired"));
                 }
             }
+			Logger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             var lst = new List<UserModel>();
 
+			Logger.LogDebug("Run(): lst → {Lst}", lst);
             // if no argument, default to current user
             if (this.Args.Length == 1)
             {
@@ -108,10 +122,12 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
                 var recCount = 0;
                 var userId = this.UserId;
                 if (!userId.HasValue && !string.IsNullOrEmpty(this.Username))
+				Logger.LogDebug("Run(): userId → {UserId}", userId);
                 {
                     // do username lookup
                     var searchTerm = this.Username.Replace("%", string.Empty).Replace("*", "%");
 
+					Logger.LogDebug("Run(): searchTerm → {SearchTerm}", searchTerm);
                     userId = this.userControllerWrapper.GetUsersByUserName(this.PortalId, searchTerm, -1, int.MaxValue, ref recCount, true, false) ?? UserIdZero;
 
                     // search against superusers if no regular user found
@@ -147,6 +163,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
                 lst.Add(new UserModel(userInfo));
             }
 
+			Logger.LogDebug("<<< Exiting Run()");
             return new ConsoleResultModel(string.Empty)
             {
                 Data = lst,

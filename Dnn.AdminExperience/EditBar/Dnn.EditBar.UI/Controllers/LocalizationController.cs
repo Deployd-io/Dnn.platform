@@ -49,25 +49,31 @@ namespace Dnn.EditBar.UI.Controllers
         /// <inheritdoc />
         protected override Func<ILocalizationController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new LocalizationController();
         }
 
         private static string GetNameAttribute(XmlNode node)
         {
+			Logger.LogDebug(">>> Entering GetNameAttribute(node={Node})", node);
             if (node.Attributes != null)
             {
                 var attribute = node.Attributes.GetNamedItem("name");
                 if (attribute != null)
+				Logger.LogDebug("GetNameAttribute(node={Node}): attribute → {Attribute}", node, attribute);
                 {
                     return attribute.Value;
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetNameAttribute(node={Node})", node);
             return null;
         }
 
         private static string GetNameAttribute(XPathNavigator navigator)
         {
+			Logger.LogDebug("<<< Exiting GetNameAttribute(navigator={Navigator})", navigator);
             return navigator.GetAttribute("name", string.Empty);
         }
 
@@ -104,6 +110,7 @@ namespace Dnn.EditBar.UI.Controllers
             // ReSharper disable once AssignNullToNotNullAttribute
             foreach (XPathNavigator navigator in document.CreateNavigator().Select("/root/data"))
             {
+				private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                 if (navigator.NodeType == XPathNodeType.Comment)
                 {
                     continue;

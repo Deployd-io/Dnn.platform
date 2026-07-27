@@ -24,6 +24,7 @@ namespace DotNetNuke.Modules.CoreMessaging
     /// <summary>Implements the logic for the default view.</summary>
     public partial class View : PortalModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IJavaScriptLibraryHelper javaScript;
         private readonly IPortalController portalController;
         private readonly IClientResourceController clientResourceController;
@@ -34,7 +35,9 @@ namespace DotNetNuke.Modules.CoreMessaging
         public View()
             : this(null, null, null)
         {
+		Logger.LogDebug(">>> Entering View()");
         }
+		Logger.LogDebug("<<< Exiting View()");
 
         /// <summary>Initializes a new instance of the <see cref="View"/> class.</summary>
         /// <param name="javaScript">The JavaScript library helper.</param>
@@ -42,6 +45,8 @@ namespace DotNetNuke.Modules.CoreMessaging
         public View(IJavaScriptLibraryHelper javaScript)
             : this(javaScript, null, null)
         {
+		Logger.LogDebug(">>> Entering View(javaScript={JavaScript})", javaScript);
+		Logger.LogDebug("<<< Exiting View(javaScript={JavaScript})", javaScript);
         }
 
         /// <summary>Initializes a new instance of the <see cref="View"/> class.</summary>
@@ -63,7 +68,11 @@ namespace DotNetNuke.Modules.CoreMessaging
         {
             this.javaScript = javaScript ?? this.DependencyProvider.GetRequiredService<IJavaScriptLibraryHelper>();
             this.portalController = portalController ?? this.DependencyProvider.GetRequiredService<IPortalController>();
+			Logger.LogDebug("View(javaScript={JavaScript},portalController={PortalController},clientResourceController={ClientResourceController},servicesFramework={ServicesFramework}): portalController → {PortalController1}", javaScript, portalController, clientResourceController, servicesFramework, portalController);
+			Logger.LogDebug("View(javaScript={JavaScript},portalController={PortalController},clientResourceController={ClientResourceController},servicesFramework={ServicesFramework}): servicesFramework → {ServicesFramework1}", javaScript, portalController, clientResourceController, servicesFramework, servicesFramework);
+			Logger.LogDebug("View(javaScript={JavaScript},portalController={PortalController},clientResourceController={ClientResourceController},servicesFramework={ServicesFramework}): javaScript → {JavaScript1}", javaScript, portalController, clientResourceController, servicesFramework, javaScript);
             this.clientResourceController = clientResourceController ?? this.DependencyProvider.GetRequiredService<IClientResourceController>();
+			Logger.LogDebug("View(javaScript={JavaScript},portalController={PortalController},clientResourceController={ClientResourceController},servicesFramework={ServicesFramework}): clientResourceController → {ClientResourceController1}", javaScript, portalController, clientResourceController, servicesFramework, clientResourceController);
             this.servicesFramework = servicesFramework ?? this.DependencyProvider.GetRequiredService<IServicesFramework>();
         }
 
@@ -99,6 +108,7 @@ namespace DotNetNuke.Modules.CoreMessaging
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             if (!this.Request.IsAuthenticated)
             {
                 // Do not redirect but hide the content of the module and display a message.
@@ -128,37 +138,46 @@ namespace DotNetNuke.Modules.CoreMessaging
             this.AddIe7StyleSheet();
 
             base.OnInit(e);
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         private static bool PermissionPredicate(PermissionInfoBase p)
         {
+			Logger.LogDebug(">>> Entering PermissionPredicate(p={P})", p);
+			Logger.LogDebug("<<< Exiting PermissionPredicate(p={P})", p);
             return p.PermissionKey == "VIEW" && p.AllowAccess && (p.RoleName == Globals.glbRoleAllUsersName || p.RoleName == Globals.glbRoleUnauthUserName);
         }
 
         private void AddIe7StyleSheet()
         {
+			Logger.LogDebug(">>> Entering AddIe7StyleSheet()");
             var browser = this.Request.Browser;
             if (browser.Type == "IE" || browser.MajorVersion < 8)
             {
                 const string cssLink = "<link href=\"/ie-messages.css\" rel=\"stylesheet\" type=\"text/css\" />";
                 this.Page.Header.Controls.Add(new LiteralControl(cssLink));
             }
+			Logger.LogDebug("<<< Exiting AddIe7StyleSheet()");
         }
 
         private bool PermissionsNotProperlySet()
         {
+			Logger.LogDebug(">>> Entering PermissionsNotProperlySet()");
             List<PermissionInfoBase> permissions;
 
             if (this.ModuleConfiguration.InheritViewPermissions)
             {
                 var tabPermissionCollection = TabPermissionController.GetTabPermissions(this.TabId, this.PortalId);
                 permissions = tabPermissionCollection.ToList();
+				Logger.LogDebug("PermissionsNotProperlySet(): tabPermissionCollection → {TabPermissionCollection}", tabPermissionCollection);
+				Logger.LogDebug("PermissionsNotProperlySet(): permissions → {Permissions}", permissions);
             }
             else
             {
                 permissions = this.ModuleConfiguration.ModulePermissions.ToList();
             }
 
+			Logger.LogDebug("<<< Exiting PermissionsNotProperlySet()");
             return permissions.Find(PermissionPredicate) != null;
         }
     }

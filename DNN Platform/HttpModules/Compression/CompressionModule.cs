@@ -11,6 +11,7 @@ namespace DotNetNuke.HttpModules.Compression
     [DnnDeprecated(9, 2, 0, "No replacement")]
     public partial class CompressionModule : IHttpModule
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Init the handler and fulfill <see cref="IHttpModule"/>.</summary>
         /// <remarks>
         /// This implementation hooks the ReleaseRequestState and PreSendRequestHeaders events to
@@ -20,6 +21,8 @@ namespace DotNetNuke.HttpModules.Compression
         /// <param name="context">The <see cref="HttpApplication"/> this handler is working for.</param>
         public void Init(HttpApplication context)
         {
+		Logger.LogDebug(">>> Entering Init(context={Context})", context);
+		Logger.LogDebug("<<< Exiting Init(context={Context})", context);
         }
 
         /// <summary>Implementation of <see cref="IHttpModule"/>.</summary>
@@ -28,6 +31,8 @@ namespace DotNetNuke.HttpModules.Compression
         /// </remarks>
         public void Dispose()
         {
+		Logger.LogDebug(">>> Entering Dispose()");
+		Logger.LogDebug("<<< Exiting Dispose()");
         }
     }
 }

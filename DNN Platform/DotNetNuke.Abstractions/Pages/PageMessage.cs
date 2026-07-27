@@ -34,6 +34,7 @@ namespace DotNetNuke.Abstractions.Pages
     /// </example>
     public class PageMessage
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Initializes a new instance of the <see cref="PageMessage"/> class.
         /// </summary>
@@ -44,11 +45,18 @@ namespace DotNetNuke.Abstractions.Pages
         /// <param name="priority">The priority of the message. Use values from <see cref="PagePriority"/> for consistency.</param>
         public PageMessage(string heading, string message, PageMessageType messageType, string iconSrc, int priority)
         {
+			Logger.LogDebug(">>> Entering PageMessage(heading={Heading},message={Message},messageType={MessageType},iconSrc={IconSrc},priority={Priority})", heading, message, messageType, iconSrc, priority);
             this.Heading = heading;
             this.Message = message;
+			Logger.LogDebug("PageMessage(heading={Heading},message={Message},messageType={MessageType},iconSrc={IconSrc},priority={Priority}): this.Heading → {Arg5}", heading, message, messageType, iconSrc, priority, this.Heading);
+			Logger.LogDebug("PageMessage(heading={Heading},message={Message},messageType={MessageType},iconSrc={IconSrc},priority={Priority}): this.Message → {Arg5}", heading, message, messageType, iconSrc, priority, this.Message);
             this.MessageType = messageType;
             this.IconSrc = iconSrc;
             this.Priority = priority;
+			Logger.LogDebug("<<< Exiting PageMessage(heading={Heading},message={Message},messageType={MessageType},iconSrc={IconSrc},priority={Priority})", heading, message, messageType, iconSrc, priority);
+			Logger.LogDebug("PageMessage(heading={Heading},message={Message},messageType={MessageType},iconSrc={IconSrc},priority={Priority}): this.MessageType → {Arg5}", heading, message, messageType, iconSrc, priority, this.MessageType);
+			Logger.LogDebug("PageMessage(heading={Heading},message={Message},messageType={MessageType},iconSrc={IconSrc},priority={Priority}): this.IconSrc → {Arg5}", heading, message, messageType, iconSrc, priority, this.IconSrc);
+			Logger.LogDebug("PageMessage(heading={Heading},message={Message},messageType={MessageType},iconSrc={IconSrc},priority={Priority}): this.Priority → {Arg5}", heading, message, messageType, iconSrc, priority, this.Priority);
         }
 
         /// <summary>

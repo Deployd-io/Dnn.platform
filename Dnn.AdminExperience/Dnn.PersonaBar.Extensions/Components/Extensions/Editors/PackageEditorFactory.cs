@@ -8,8 +8,10 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
 
     public sealed class PackageEditorFactory
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static IPackageEditor GetPackageEditor(string packageType)
         {
+			Logger.LogDebug(">>> Entering GetPackageEditor(packageType={PackageType})", packageType);
             PackageTypes pkgType;
             Enum.TryParse(packageType, true, out pkgType);
 
@@ -32,6 +34,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
                     return new SkinObjectPackageEditor();
             }
 
+			Logger.LogDebug("<<< Exiting GetPackageEditor(packageType={PackageType})", packageType);
             return null;
         }
     }

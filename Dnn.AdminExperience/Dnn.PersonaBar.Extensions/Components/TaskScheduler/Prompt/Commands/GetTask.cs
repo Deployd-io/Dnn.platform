@@ -33,16 +33,20 @@ namespace Dnn.PersonaBar.TaskScheduler.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.TaskId = this.GetFlagValue(FlagId, "Task Id", -1, true, true, true);
+			Logger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             try
             {
                 var task = SchedulingProvider.Instance().GetSchedule(this.TaskId);
                 if (task == null)
+				Logger.LogDebug("Run(): task → {Task}", task);
                 {
                     return new ConsoleErrorResultModel(
                         string.Format(
@@ -53,6 +57,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Components.Prompt.Commands
 
                 var tasks = new List<TaskModel> { new TaskModel(task) };
                 return new ConsoleResultModel
+				Logger.LogDebug("Run(): tasks → {Tasks}", tasks);
                 {
                     Data = tasks,
                     Records = tasks.Count,
@@ -65,6 +70,7 @@ namespace Dnn.PersonaBar.TaskScheduler.Components.Prompt.Commands
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting Run()");
                 return new ConsoleErrorResultModel(this.LocalizeString("Prompt_FetchTaskFailed"));
             }
         }

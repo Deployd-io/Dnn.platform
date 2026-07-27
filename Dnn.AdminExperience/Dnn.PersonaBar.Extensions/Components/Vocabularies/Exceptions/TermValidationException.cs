@@ -8,10 +8,13 @@ namespace Dnn.PersonaBar.Vocabularies.Exceptions
 
     public class TermValidationException : VocabulariesException
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="TermValidationException"/> class.</summary>
         public TermValidationException()
             : base(Constants.TermValidationError)
         {
+		Logger.LogDebug(">>> Entering TermValidationException()");
+		Logger.LogDebug("<<< Exiting TermValidationException()");
         }
     }
 }

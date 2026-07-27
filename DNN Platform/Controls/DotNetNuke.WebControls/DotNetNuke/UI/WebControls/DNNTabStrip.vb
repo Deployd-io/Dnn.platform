@@ -25,19 +25,26 @@ Namespace DotNetNuke.UI.WebControls
     Public Class DNNTabStrip
         Inherits WebControl
         Implements IClientAPICallbackEventHandler, IPostBackEventHandler, IPostBackDataHandler
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(DNNTabStrip))
         ' Methods
         Public Sub New()
+			Logger.LogDebug(">>> Entering New()")
             MyBase.New(HtmlTextWriterTag.Div)
             AddHandler MyBase.Init, New EventHandler(AddressOf Me.DNNTabStrip_Init)
             AddHandler MyBase.PreRender, New EventHandler(AddressOf Me.DNNTabStrip_PreRender)
             DNNTabStrip.__ENCAddToList(Me)
             Me.m_objPostedTabData = New Hashtable
+			Logger.LogDebug("New(): Me.m_objPostedTabData → {Arg0}", Me.m_objPostedTabData)
+			Logger.LogDebug("New(): Me.m_objDefaultDNNTabLabel → {Arg0}", Me.m_objDefaultDNNTabLabel)
+			Logger.LogDebug("New(): Me.m_iSelectedIndex → {Arg0}", Me.m_iSelectedIndex)
             Me.m_objDefaultDNNTabLabel = New DNNTabLabel
             Me.m_iSelectedIndex = -1
+			Logger.LogDebug("<<< Exiting New()")
         End Sub
 
         <DebuggerNonUserCode> _
         Private Shared Sub __ENCAddToList(ByVal value As Object)
+			Logger.LogDebug(">>> Entering __ENCAddToList(value={Value})", value)
             SyncLock DNNTabStrip.__ENCList
                 If (DNNTabStrip.__ENCList.Count = DNNTabStrip.__ENCList.Capacity) Then
                     Dim index As Integer = 0
@@ -62,19 +69,25 @@ Namespace DotNetNuke.UI.WebControls
                 End If
                 DNNTabStrip.__ENCList.Add(New WeakReference(value))
             End SyncLock
+			Logger.LogDebug("<<< Exiting __ENCAddToList(value={Value})", value)
         End Sub
 
         Protected Overrides Sub AddAttributesToRender(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering AddAttributesToRender(writer={Writer})", writer)
             MyBase.AddAttributesToRender(writer)
+			Logger.LogDebug("<<< Exiting AddAttributesToRender(writer={Writer})", writer)
         End Sub
 
         Protected Overrides Sub AddParsedSubObject(ByVal obj As Object)
+			Logger.LogDebug(">>> Entering AddParsedSubObject(obj={Obj})", obj)
             If TypeOf obj Is DNNTab Then
                 MyBase.AddParsedSubObject(obj)
             End If
+			Logger.LogDebug("<<< Exiting AddParsedSubObject(obj={Obj})", obj)
         End Sub
 
         Private Sub AssignSelectedIndex()
+			Logger.LogDebug(">>> Entering AssignSelectedIndex()")
             Dim num2 As Integer = (Me.Tabs.Count - 1)
             Dim num As Integer = 0
             Do While True
@@ -85,6 +98,7 @@ Namespace DotNetNuke.UI.WebControls
                 If Me.m_objPostedTabData.ContainsKey(Me.Tabs(num).ID) Then
                     If ((Conversions.ToInteger(Me.m_objPostedTabData(Me.Tabs(num).ID)) And 2) <> 0) Then
                         Me.SelectedIndex = num
+						Logger.LogDebug("AssignSelectedIndex(): Me.SelectedIndex → {Arg0}", Me.SelectedIndex)
                     End If
                     If ((Conversions.ToInteger(Me.m_objPostedTabData(Me.Tabs(num).ID)) And 1) <> 0) Then
                         Me.Tabs(num).SetTabState(True)
@@ -93,34 +107,42 @@ Namespace DotNetNuke.UI.WebControls
                 End If
                 num += 1
             Loop
+			Logger.LogDebug("<<< Exiting AssignSelectedIndex()")
         End Sub
 
         Private Sub DNNTabStrip_Init(ByVal sender As Object, ByVal e As EventArgs)
+			Logger.LogDebug(">>> Entering DNNTabStrip_Init(sender={Sender},e={E})", sender, e)
             If ClientAPI.NeedsDNNVariable(Me) Then
                 AddHandler Me.Page.Load, New EventHandler(AddressOf Me.ParentOnLoad)
             End If
             Me.LoadPostedVars
             Me.RaisePreLoadPostDataEvents
+			Logger.LogDebug("<<< Exiting DNNTabStrip_Init(sender={Sender},e={E})", sender, e)
         End Sub
 
         Private Sub DNNTabStrip_PreRender(ByVal sender As Object, ByVal e As EventArgs)
+			Logger.LogDebug(">>> Entering DNNTabStrip_PreRender(sender={Sender},e={E})", sender, e)
             Me.RegisterClientScript
             Me.Page.RegisterRequiresPostBack(Me)
             If ClientAPI.BrowserSupportsFunctionality(ClientAPI.ClientFunctionality.DHTML) Then
                 ClientAPI.RegisterClientReference(Me.Page, ClientAPI.ClientNamespaceReferences.dnn)
                 ClientAPI.RegisterClientVariable(Me.Page, (Me.ClientID & "_json"), ("{" & Me.Tabs.ToJSON & "}"), True)
             End If
+			Logger.LogDebug("<<< Exiting DNNTabStrip_PreRender(sender={Sender},e={E})", sender, e)
         End Sub
 
         Private Shared Function FindForm(ByVal tabStrip As DNNTabStrip) As HtmlForm
+			Logger.LogDebug(">>> Entering FindForm(tabStrip={TabStrip})", tabStrip)
             Dim oCtl As Control = tabStrip
             Do While True
                 Dim form As HtmlForm
                 If TypeOf oCtl Is HtmlForm Then
                     form = DirectCast(oCtl, HtmlForm)
+					Logger.LogDebug("FindForm(tabStrip={TabStrip}): form → {Form}", tabStrip, form)
                 Else
                     If (If(((oCtl Is Nothing) OrElse TypeOf oCtl Is Page), 1, 0) = 0) Then
                         oCtl = oCtl.Parent
+						Logger.LogDebug("FindForm(tabStrip={TabStrip}): oCtl → {OCtl}", tabStrip, oCtl)
                         Continue Do
                     End If
                     form = Nothing
@@ -128,10 +150,12 @@ Namespace DotNetNuke.UI.WebControls
                 Return form
             Loop
 
+			Logger.LogDebug("<<< Exiting FindForm(tabStrip={TabStrip})", tabStrip)
             Return Nothing
         End Function
 
         Private Function GetFormHTML() As String
+			Logger.LogDebug(">>> Entering GetFormHTML()")
             Dim sb As New StringBuilder
             Dim writer As New HtmlTextWriter(New StringWriter(sb))
             Dim str2 As String = ""
@@ -140,16 +164,20 @@ Namespace DotNetNuke.UI.WebControls
                 objA.Controls.Clear
                 objA.RenderControl(writer)
                 str2 = sb.ToString
+				Logger.LogDebug("GetFormHTML(): str2 → {Str2}", str2)
             End If
+			Logger.LogDebug("<<< Exiting GetFormHTML()")
             Return str2
         End Function
 
         Private Function GetScripts(ByVal HTML As String) As HTMLElementCollection
+			Logger.LogDebug(">>> Entering GetScripts(HTML={HTML})", HTML)
             Dim enumerator As IEnumerator = Nothing
             Dim regex As New Regex("(?i:" & ChrW(9) & "(?<element>(?:<script" & ChrW(9) & ChrW(9) & "(?:\s*" & ChrW(9) & ChrW(9) & "(?:" & ChrW(9) & ChrW(9) & ChrW(9) & "(?<attr>[^=>]*?)" & ChrW(9) & ChrW(9) & ChrW(9) & "=(?:""|')" & ChrW(9) & ChrW(9) & ChrW(9) & "(?<attrv>[^""|']*?)" & ChrW(9) & ChrW(9) & ChrW(9) & "(?:""|')" & ChrW(9) & ChrW(9) & "))*        )" & ChrW(9) & "((?(?=\s*?/>)\s*?/>|                (?:\s*?>" & ChrW(9) & "(?:[\s\r\n]*?<!--)?(?<text>[\s\S]*?)                </script>))" & ChrW(9) & ")))", (RegexOptions.IgnorePatternWhitespace Or (RegexOptions.Singleline Or RegexOptions.IgnoreCase)))
             Dim elements2 As New HTMLElementCollection
             Try 
                 enumerator = regex.Matches(HTML).GetEnumerator
+				Logger.LogDebug("GetScripts(HTML={HTML}): enumerator → {Enumerator}", HTML, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -171,10 +199,12 @@ Namespace DotNetNuke.UI.WebControls
                         Dim str2 As String = regex.GroupNameFromNumber(i)
                         If (str2 = "attr") Then
                             collection = New Collection
+							Logger.LogDebug("GetScripts(HTML={HTML}): collection → {Collection}", HTML, collection)
                         End If
                         Dim num As Integer = 1
                         Try 
                             enumerator2 = current.Groups(i).Captures.GetEnumerator
+							Logger.LogDebug("GetScripts(HTML={HTML}): enumerator2 → {Enumerator2}", HTML, enumerator2)
                             Do While True
                                 If Not enumerator2.MoveNext Then
                                     Exit Do
@@ -184,6 +214,7 @@ Namespace DotNetNuke.UI.WebControls
                                 If (str3 = "element") Then
                                     Dim htmlElement As New HTMLElement(capture.Value)
                                     htmlElement.Raw = current.Value
+									Logger.LogDebug("GetScripts(HTML={HTML}): htmlElement.Raw → {Arg1}", HTML, htmlElement.Raw)
                                     Continue Do
                                 End If
                                 If (str3 = "attr") Then
@@ -195,6 +226,7 @@ Namespace DotNetNuke.UI.WebControls
                                         Continue Do
                                     End If
                                     objA.Text = capture.Value
+									Logger.LogDebug("GetScripts(HTML={HTML}): objA.Text → {Arg1}", HTML, objA.Text)
                                     Continue Do
                                 End If
                                 If (Conversions.ToString(collection(num)) = "src") Then
@@ -217,10 +249,12 @@ Namespace DotNetNuke.UI.WebControls
                     TryCast(enumerator,IDisposable).Dispose
                 End If
             End Try
+			Logger.LogDebug("<<< Exiting GetScripts(HTML={HTML})", HTML)
             Return elements2
         End Function
 
         Private Function GetTabContents(ByVal objTab As DNNTab) As String
+			Logger.LogDebug(">>> Entering GetTabContents(objTab={ObjTab})", objTab)
             objTab.RaiseSetupDefaultsEvent(True)
             Dim sb As New StringBuilder
             Dim writer As New HtmlTextWriter(New StringWriter(sb))
@@ -230,14 +264,17 @@ Namespace DotNetNuke.UI.WebControls
                 objA.Controls.Clear
             Else
                 objA = New HtmlForm
+				Logger.LogDebug("GetTabContents(objTab={ObjTab}): objA → {ObjA}", objTab, objA)
                 objPage.Controls.Add(objA)
             End If
             objTab.ID = objTab.UniqueID
+			Logger.LogDebug("GetTabContents(objTab={ObjTab}): objTab.ID → {Arg1}", objTab, objTab.ID)
             objA.Controls.Add(New LiteralControl("~`~`~`~`~`~`"))
             objA.Controls.Add(objTab)
             objA.Controls.Add(New LiteralControl("~`~`~`~`~`~`"))
             objTab.SetParent(Me)
             objTab.Enabled = True
+			Logger.LogDebug("GetTabContents(objTab={ObjTab}): objTab.Enabled → {Arg1}", objTab, objTab.Enabled)
             objA.RenderControl(writer)
             Dim dictionary As New Dictionary(Of String, String)
             Dim str2 As String = Strings.Split(sb.ToString, "~`~`~`~`~`~`", -1, CompareMethod.Binary)(1)
@@ -248,35 +285,43 @@ Namespace DotNetNuke.UI.WebControls
             End If
             Dim clientVariableList As Dictionary(Of String, String) = ClientAPI.GetClientVariableList(objPage)
             dictionary.Add("vars", MSAJAX.Serialize(clientVariableList))
+			Logger.LogDebug("<<< Exiting GetTabContents(objTab={ObjTab})", objTab)
             Return MSAJAX.Serialize(dictionary)
         End Function
 
         Private Function GetTabIds() As String
+			Logger.LogDebug(">>> Entering GetTabIds()")
             Dim enumerator As IEnumerator = Nothing
             Dim expression As String = ""
             Try 
                 enumerator = Me.Tabs.GetEnumerator
+				Logger.LogDebug("GetTabIds(): enumerator → {Enumerator}", enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
                     End If
                     Dim current As DNNTab = DirectCast(enumerator.Current, DNNTab)
                     expression = (expression & current.ClientID & ",")
+					Logger.LogDebug("GetTabIds(): expression → {Expression}", expression)
                 Loop
             Finally
                 If Not Object.ReferenceEquals(TryCast(enumerator,IDisposable), Nothing) Then
                     TryCast(enumerator,IDisposable).Dispose
                 End If
             End Try
+			Logger.LogDebug("<<< Exiting GetTabIds()")
             Return If((Strings.Len(expression) <= 0), "", expression.Substring(0, (expression.Length - 1)))
         End Function
 
         Public Function LoadPostData(ByVal postDataKey As String, ByVal postCollection As NameValueCollection) As Boolean Implements IPostBackDataHandler.LoadPostData
+			Logger.LogDebug(">>> Entering LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection)
             Dim flag As Boolean
+			Logger.LogDebug("<<< Exiting LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection)
             Return flag
         End Function
 
         Private Sub LoadPostedVars()
+			Logger.LogDebug(">>> Entering LoadPostedVars()")
             Dim strArray3 As String() = Strings.Split(ClientAPI.GetClientVariable(Me.Page, (Me.ClientID & "_tabs")), ",", -1, CompareMethod.Binary)
             Dim index As Integer = 0
             Do While True
@@ -291,9 +336,11 @@ Namespace DotNetNuke.UI.WebControls
                 End If
                 index += 1
             Loop
+			Logger.LogDebug("<<< Exiting LoadPostedVars()")
         End Sub
 
         Protected Function MarshalledProperties() As Hashtable
+			Logger.LogDebug(">>> Entering MarshalledProperties()")
             Dim hashtable2 As New Hashtable From { { "tabs", Me.GetTabIds } }
             If Not Me.IsDownLevel Then
                 Select Case Me.TabRenderMode
@@ -305,6 +352,7 @@ Namespace DotNetNuke.UI.WebControls
                             Dim str As String = ClientAPI.GetCallbackEventReference(Me, "'[TABID]'", "this.callBackSuccess", "this", "this.callBackFail", "this.callBackStatus", "[POST]", ClientAPICallBackResponse.CallBackTypeCode.Simple)
                             Dim length As Integer = ((str.IndexOf("'[POST]'", StringComparison.Ordinal) + "'[POST]'".Length) + 1)
                             str = (str.Substring(0, length) & "'[CBTYPE]'" & str.Substring((length + 1)))
+							Logger.LogDebug("MarshalledProperties(): str → {Str}", str)
                             hashtable2.Add("callback", str)
                         ElseIf Me.IsDownLevel Then
                             hashtable2.Add("callback", ClientAPI.GetPostBackClientHyperlink(Me, ("[TABID]" & ClientAPI.COLUMN_DELIMITER & "OnDemand")))
@@ -314,41 +362,53 @@ Namespace DotNetNuke.UI.WebControls
                         Exit Select
                 End Select
             End If
+			Logger.LogDebug("<<< Exiting MarshalledProperties()")
             Return hashtable2
         End Function
 
         Private Sub ParentOnLoad(ByVal Sender As Object, ByVal e As EventArgs)
+			Logger.LogDebug(">>> Entering ParentOnLoad(Sender={Sender},e={E})", Sender, e)
             ClientAPI.RegisterDNNVariableControl(Me)
+			Logger.LogDebug("<<< Exiting ParentOnLoad(Sender={Sender},e={E})", Sender, e)
         End Sub
 
         Public Function RaiseClientAPICallbackEvent(ByVal eventArgument As String) As String Implements IClientAPICallbackEventHandler.RaiseClientAPICallbackEvent
+			Logger.LogDebug(">>> Entering RaiseClientAPICallbackEvent(eventArgument={EventArgument})", eventArgument)
             Dim tabContents As String = Nothing
             Dim objA As DNNTab = Me.Tabs.FindTab(eventArgument)
             If Not Object.ReferenceEquals(objA, Nothing) Then
                 tabContents = Me.GetTabContents(objA)
+				Logger.LogDebug("RaiseClientAPICallbackEvent(eventArgument={EventArgument}): tabContents → {TabContents}", eventArgument, tabContents)
             End If
+			Logger.LogDebug("<<< Exiting RaiseClientAPICallbackEvent(eventArgument={EventArgument})", eventArgument)
             Return tabContents
         End Function
 
         Public Overridable Sub RaisePostBackEvent(ByVal eventArgument As String) Implements IPostBackEventHandler.RaisePostBackEvent
+			Logger.LogDebug(">>> Entering RaisePostBackEvent(eventArgument={EventArgument})", eventArgument)
             Dim strArray As String() = Strings.Split(eventArgument, ClientAPI.COLUMN_DELIMITER, -1, CompareMethod.Binary)
             Dim objA As DNNTab = Me.Tabs.FindTab(strArray(0))
             If Not Object.ReferenceEquals(objA, Nothing) Then
                 If (strArray.Length <= 1) Then
                     Me.SelectedTab = objA
+					Logger.LogDebug("RaisePostBackEvent(eventArgument={EventArgument}): Me.SelectedTab → {Arg1}", eventArgument, Me.SelectedTab)
                 ElseIf (strArray(1) = "OnDemand") Then
                     Me.SelectedTab = objA
                 End If
             End If
+			Logger.LogDebug("<<< Exiting RaisePostBackEvent(eventArgument={EventArgument})", eventArgument)
         End Sub
 
         Public Sub RaisePostDataChangedEvent() Implements IPostBackDataHandler.RaisePostDataChangedEvent
+		Logger.LogDebug(">>> Entering RaisePostDataChangedEvent()")
         End Sub
 
         Private Sub RaisePreLoadPostDataEvents()
+			Logger.LogDebug(">>> Entering RaisePreLoadPostDataEvents()")
             Dim enumerator As IEnumerator = Nothing
             Try 
                 enumerator = Me.Tabs.GetEnumerator
+				Logger.LogDebug("RaisePreLoadPostDataEvents(): enumerator → {Enumerator}", enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -363,9 +423,11 @@ Namespace DotNetNuke.UI.WebControls
                     TryCast(enumerator,IDisposable).Dispose
                 End If
             End Try
+			Logger.LogDebug("<<< Exiting RaisePreLoadPostDataEvents()")
         End Sub
 
         Private Sub RegisterClientScript()
+			Logger.LogDebug(">>> Entering RegisterClientScript()")
             Dim flag2 As Boolean = Not Me.IsDownLevel
             If flag2 Then
                 Dim enumerator As IEnumerator = Nothing
@@ -373,12 +435,15 @@ Namespace DotNetNuke.UI.WebControls
                 Dim flag As Boolean = (Me.TabRenderMode = eTabRenderMode.CallBack)
                 Try 
                     enumerator = Me.Tabs.GetEnumerator
+					Logger.LogDebug("RegisterClientScript(): enumerator → {Enumerator}", enumerator)
                     Do While True
                         flag2 = enumerator.MoveNext
+						Logger.LogDebug("RegisterClientScript(): flag2 → {Flag2}", flag2)
                         If flag2 Then
                             Dim current As DNNTab = DirectCast(enumerator.Current, DNNTab)
                             If (current.TabRenderMode = eTabRenderMode.CallBack) Then
                                 flag = True
+								Logger.LogDebug("RegisterClientScript(): flag → {Flag}", flag)
                             End If
                             If Not flag Then
                                 Continue Do
@@ -397,9 +462,11 @@ Namespace DotNetNuke.UI.WebControls
                 WebControls.RegisterClientScriptBlock(Me.Page, "dnn.controls.js", FileOrder.Js.DnnControlsLabelEdit)
                 WebControls.RegisterClientScriptBlock(Me.Page, "dnn.controls.dnntabstrip.js")
             End If
+			Logger.LogDebug("<<< Exiting RegisterClientScript()")
         End Sub
 
         Protected Overrides Sub Render(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer)
             MyBase.Render(writer)
             If Not Me.IsDownLevel Then
                 Dim properties As Hashtable = Me.MarshalledProperties
@@ -407,9 +474,11 @@ Namespace DotNetNuke.UI.WebControls
                 Dim marshalledPropertyJSON As String = ScriptGenerator.GetMarshalledPropertyJSON(Me, properties)
                 BaseWebControl.RegisterInitialize(Me, "initTabStrip", marshalledPropertyJSON)
             End If
+			Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer)
         End Sub
 
         Protected Overrides Sub RenderContents(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderContents(writer={Writer})", writer)
             Dim enumerator As IEnumerator = Nothing
             Select Case Me.TabAlignment
                 Case Alignment.Top, Alignment.Left
@@ -425,6 +494,7 @@ Namespace DotNetNuke.UI.WebControls
             writer.RenderBeginTag("div")
             Try 
                 enumerator = Me.Tabs.GetEnumerator
+				Logger.LogDebug("RenderContents(writer={Writer}): enumerator → {Enumerator}", writer, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -434,6 +504,7 @@ Namespace DotNetNuke.UI.WebControls
                         current.RaiseSetupDefaultsEvent(False)
                         If Not current.Visible Then
                             current.Visible = True
+							Logger.LogDebug("RenderContents(writer={Writer}): current.Visible → {Arg1}", writer, current.Visible)
                             current.Style.Add("display", "none")
                         ElseIf (current.IsSelected AndAlso Not Object.ReferenceEquals(current.Style("display"), Nothing)) Then
                             current.Style.Remove("display")
@@ -454,9 +525,11 @@ Namespace DotNetNuke.UI.WebControls
                 Case Else
                     Exit Select
             End Select
+			Logger.LogDebug("<<< Exiting RenderContents(writer={Writer})", writer)
         End Sub
 
         Private Sub RenderTabs(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderTabs(writer={Writer})", writer)
             Dim enumerator As IEnumerator = Nothing
             writer.AddAttribute("id", (Me.ClientID & "_lc"))
             If (Strings.Len(Me.CssTabContainer) > 0) Then
@@ -465,6 +538,7 @@ Namespace DotNetNuke.UI.WebControls
             writer.RenderBeginTag("div ")
             Try 
                 enumerator = Me.Tabs.GetEnumerator
+				Logger.LogDebug("RenderTabs(writer={Writer}): enumerator → {Enumerator}", writer, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -477,6 +551,7 @@ Namespace DotNetNuke.UI.WebControls
                 End If
             End Try
             writer.RenderEndTag
+			Logger.LogDebug("<<< Exiting RenderTabs(writer={Writer})", writer)
         End Sub
 
 

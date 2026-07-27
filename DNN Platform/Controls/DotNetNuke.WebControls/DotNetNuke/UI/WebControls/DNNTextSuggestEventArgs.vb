@@ -6,10 +6,15 @@ Imports System
 Namespace DotNetNuke.UI.WebControls
     Public Class DNNTextSuggestEventArgs
         Inherits EventArgs
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(DNNTextSuggestEventArgs))
         ' Methods
         Public Sub New(ByVal nodes As DNNNodeCollection, ByVal [text] As String)
+			Logger.LogDebug(">>> Entering New(nodes={Nodes},[text]={Arg})", nodes, [text])
             Me._nodes = nodes
             Me._text = [text]
+			Logger.LogDebug("New(nodes={Nodes},[text]={Arg1}): Me._text → {Arg2}", nodes, [text], Me._text)
+			Logger.LogDebug("New(nodes={Nodes},[text]={Arg1}): Me._nodes → {Arg2}", nodes, [text], Me._nodes)
+			Logger.LogDebug("<<< Exiting New(nodes={Nodes},[text]={Arg})", nodes, [text])
         End Sub
 
 

@@ -32,6 +32,7 @@ namespace Dnn.ExportImport.Components.Services
     /// <summary>Service to export/import users.</summary>
     public class UsersExportService : BasePortableService
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly Tuple<string, Type>[] UsersDatasetColumns =
         [
             Tuple.Create("PortalId", typeof(int)),
@@ -77,13 +78,18 @@ namespace Dnn.ExportImport.Components.Services
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public UsersExportService()
         {
+		Logger.LogDebug(">>> Entering UsersExportService()");
+		Logger.LogDebug("<<< Exiting UsersExportService()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="UsersExportService"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
         public UsersExportService(IHostSettings hostSettings)
         {
+			Logger.LogDebug(">>> Entering UsersExportService(hostSettings={HostSettings})", hostSettings);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("<<< Exiting UsersExportService(hostSettings={HostSettings})", hostSettings);
+			Logger.LogDebug("UsersExportService(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
         }
 
         /// <inheritdoc />
@@ -98,6 +104,8 @@ namespace Dnn.ExportImport.Components.Services
         /// <inheritdoc />
         public override void ExportData(ExportImportJob exportJob, ExportDto exportDto)
         {
+			Logger.LogDebug(">>> Entering ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (this.CheckCancelled(exportJob))
             {
                 return;
@@ -109,6 +117,7 @@ namespace Dnn.ExportImport.Components.Services
             var portalId = exportJob.PortalId;
             var pageIndex = 0;
             const int pageSize = Constants.DefaultPageSize;
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): pageIndex → {PageIndex}", exportJob, exportDto, pageIndex);
             var totalUsersExported = 0;
             var totalUserRolesExported = 0;
             var totalPortalsExported = 0;
@@ -118,6 +127,7 @@ namespace Dnn.ExportImport.Components.Services
             var totalAspnetMembershipExported = 0;
             var totalUsers = DataProvider.Instance().GetUsersCount(portalId, exportDto.IncludeDeletions, toDateUtc, fromDateUtc);
             if (totalUsers == 0)
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): totalUsers → {TotalUsers}", exportJob, exportDto, totalUsers);
             {
                 this.CheckPoint.Completed = true;
                 this.CheckPointStageCallback(this);
@@ -126,6 +136,7 @@ namespace Dnn.ExportImport.Components.Services
 
             var totalPages = Util.CalculateTotalPages(totalUsers, pageSize);
 
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): totalPages → {TotalPages}", exportJob, exportDto, totalPages);
             // Skip the export if all the users has been processed already.
             if (this.CheckPoint.Stage >= totalPages)
             {
@@ -158,12 +169,19 @@ namespace Dnn.ExportImport.Components.Services
 
                     var exportUsersList = new List<ExportUser>();
                     var exportAspnetUserList = new List<ExportAspnetUser>();
+					Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): exportUsersList → {ExportUsersList}", exportJob, exportDto, exportUsersList);
+					Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): exportAspnetUserList → {ExportAspnetUserList}", exportJob, exportDto, exportAspnetUserList);
                     var exportAspnetMembershipList = new List<ExportAspnetMembership>();
                     var exportUserRoleList = new List<ExportUserRole>();
+					Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): exportAspnetMembershipList → {ExportAspnetMembershipList}", exportJob, exportDto, exportAspnetMembershipList);
+					Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): exportUserRoleList → {ExportUserRoleList}", exportJob, exportDto, exportUserRoleList);
                     var exportUserPortalList = new List<ExportUserPortal>();
                     var exportUserAuthenticationList = new List<ExportUserAuthentication>();
+					Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): exportUserPortalList → {ExportUserPortalList}", exportJob, exportDto, exportUserPortalList);
+					Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): exportUserAuthenticationList → {ExportUserAuthenticationList}", exportJob, exportDto, exportUserAuthenticationList);
                     var exportUserProfileList = new List<ExportUserProfile>();
                     try
+					Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): exportUserProfileList → {ExportUserProfileList}", exportJob, exportDto, exportUserProfileList);
                     {
                         using (var reader = DataProvider.Instance()
                             .GetAllUsers(portalId, pageIndex, pageSize, exportDto.IncludeDeletions, toDateUtc, fromDateUtc))
@@ -194,6 +212,7 @@ namespace Dnn.ExportImport.Components.Services
                         }
 
                         this.Repository.CreateItems(exportUsersList, null);
+						Logger.LogInformation("ExportData(exportJob,exportDto)={ExportJob},{ExportDto}: database query executed in {Arg2} ms", exportJob, exportDto, __logStart.ElapsedMilliseconds);
                         totalUsersExported += exportUsersList.Count;
 
                         exportUserAuthenticationList.ForEach(
@@ -250,6 +269,7 @@ namespace Dnn.ExportImport.Components.Services
                     }
                     catch (Exception ex)
                     {
+						Logger.LogError("Exception in ExportData(exportJob={ExportJob},exportDto={ExportDto}): {Arg2}", exportJob, exportDto, ex.Message);
                         this.Result.AddLogEntry($"Exporting Users from {pageIndex * pageSize} to {(pageIndex * pageSize) + pageSize} exception", ex.Message, ReportLevel.Error);
                     }
 
@@ -293,11 +313,13 @@ namespace Dnn.ExportImport.Components.Services
                 this.Result.AddSummary("Exported Aspnet User", totalAspnetUserExported.ToString(CultureInfo.InvariantCulture));
                 this.Result.AddSummary("Exported Aspnet Membership", totalAspnetMembershipExported.ToString(CultureInfo.InvariantCulture));
             }
+			Logger.LogDebug("<<< Exiting ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
         }
 
         /// <inheritdoc />
         public override void ImportData(ExportImportJob importJob, ImportDto importDto)
         {
+			Logger.LogDebug(">>> Entering ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
             if (this.CheckCancelled(importJob))
             {
                 return;
@@ -311,6 +333,7 @@ namespace Dnn.ExportImport.Components.Services
             var totalUserAuthenticationCount = 0;
             var totalUsers = this.Repository.GetCount<ExportUser>();
             if (totalUsers == 0)
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): totalUsers → {TotalUsers}", importJob, importDto, totalUsers);
             {
                 this.CheckPoint.Completed = true;
                 this.CheckPointStageCallback(this);
@@ -319,6 +342,7 @@ namespace Dnn.ExportImport.Components.Services
 
             var totalPages = Util.CalculateTotalPages(totalUsers, pageSize);
 
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): totalPages → {TotalPages}", importJob, importDto, totalPages);
             // Skip the import if all the users has been processed already.
             if (this.CheckPoint.Stage >= totalPages)
             {
@@ -329,6 +353,7 @@ namespace Dnn.ExportImport.Components.Services
 
             var totalUsersToBeProcessed = totalUsers - (pageIndex * pageSize);
 
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): totalUsersToBeProcessed → {TotalUsersToBeProcessed}", importJob, importDto, totalUsersToBeProcessed);
             // Update the total items count in the check points. This should be updated only once.
             this.CheckPoint.TotalItems = this.CheckPoint.TotalItems <= 0 ? totalUsers : this.CheckPoint.TotalItems;
             if (this.CheckPointStageCallback(this))
@@ -347,6 +372,7 @@ namespace Dnn.ExportImport.Components.Services
                 var dataProvider = DotNetNuke.Data.DataProvider.Instance();
                 using (var table = new DataTable("Users"))
                 {
+				Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): dataProvider → {DataProvider}", importJob, importDto, dataProvider);
                     // must create the columns from scratch with each iteration
                     table.Columns.AddRange(
                         UsersDatasetColumns.Select(column => new DataColumn(column.Item1, column.Item2)).ToArray());
@@ -485,6 +511,7 @@ namespace Dnn.ExportImport.Components.Services
                         }
                         catch (Exception ex)
                         {
+							Logger.LogError("Exception in ImportData(importJob={ImportJob},importDto={ImportDto}): {Arg2}", importJob, importDto, ex.Message);
                             this.Result.AddLogEntry($"Importing Users from {pageIndex * pageSize} to {(pageIndex * pageSize) + pageSize} exception", ex.Message, ReportLevel.Error);
                         }
 
@@ -512,21 +539,27 @@ namespace Dnn.ExportImport.Components.Services
                 this.Result.AddSummary("Imported Aspnet Users", totalAspnetUserImported.ToString(CultureInfo.InvariantCulture));
                 this.Result.AddSummary("Imported Aspnet Memberships", totalAspnetMembershipImported.ToString(CultureInfo.InvariantCulture));
             }
+			Logger.LogDebug("<<< Exiting ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
         }
 
         /// <inheritdoc />
         public override int GetImportTotal()
         {
+			Logger.LogDebug(">>> Entering GetImportTotal()");
+			Logger.LogDebug("<<< Exiting GetImportTotal()");
             return this.Repository.GetCount<ExportUser>();
         }
 
         private static Guid GetApplicationId(IHostSettings hostSettings)
         {
+			Logger.LogDebug(">>> Entering GetApplicationId(hostSettings={HostSettings})", hostSettings);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             using var db =
                 new PetaPocoDataContext(
                     hostSettings,
                     DotNetNuke.Data.DataProvider.Instance().Settings["connectionStringName"],
                     "aspnet_");
+			Logger.LogDebug("<<< Exiting GetApplicationId(hostSettings={HostSettings})", hostSettings);
             return db.ExecuteScalar<Guid>(
                 CommandType.Text,
                 "SELECT TOP 1 ApplicationId FROM aspnet_Applications");

@@ -20,35 +20,44 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
         /// <inheritdoc />
         public PackageInfoDto GetPackageDetail(int portalId, PackageInfo package)
         {
+			Logger.LogDebug(">>> Entering GetPackageDetail(portalId={PortalId},package={Package})", portalId, package);
             var isHostUser = UserController.Instance.GetCurrentUserInfo().IsSuperUser;
             var skin = SkinController.GetSkinByPackageID(package.PackageID);
+			Logger.LogDebug("GetPackageDetail(portalId={PortalId},package={Package}): isHostUser → {IsHostUser}", portalId, package, isHostUser);
+			Logger.LogDebug("GetPackageDetail(portalId={PortalId},package={Package}): skin → {Skin}", portalId, package, skin);
             var detail = new SkinPackageDetailDto(portalId, package)
             {
                 ThemePackageName = skin.SkinName,
                 ReadOnly = !isHostUser,
             };
 
+			Logger.LogDebug("<<< Exiting GetPackageDetail(portalId={PortalId},package={Package})", portalId, package);
             return detail;
         }
 
         /// <inheritdoc />
         public bool SavePackageSettings(PackageSettingsDto packageSettings, out string errorMessage)
         {
+			Logger.LogDebug(">>> Entering SavePackageSettings(packageSettings={PackageSettings})", packageSettings);
             errorMessage = string.Empty;
 
+			Logger.LogDebug("SavePackageSettings(packageSettings={PackageSettings}): errorMessage → {ErrorMessage}", packageSettings, errorMessage);
             try
             {
                 var isHostUser = UserController.Instance.GetCurrentUserInfo().IsSuperUser;
 
+				Logger.LogDebug("SavePackageSettings(packageSettings={PackageSettings}): isHostUser → {IsHostUser}", packageSettings, isHostUser);
                 if (isHostUser)
                 {
                     string value;
                     var skin = SkinController.GetSkinByPackageID(packageSettings.PackageId);
 
+					Logger.LogDebug("SavePackageSettings(packageSettings={PackageSettings}): skin → {Skin}", packageSettings, skin);
                     if (packageSettings.EditorActions.TryGetValue("themePackageName", out value)
                         && !string.IsNullOrEmpty(value))
                     {
                         skin.SkinName = value;
+						Logger.LogDebug("SavePackageSettings(packageSettings={PackageSettings}): skin.SkinName → {Arg1}", packageSettings, skin.SkinName);
                         SkinController.UpdateSkinPackage(skin);
                     }
                 }
@@ -59,6 +68,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
             {
                 Logger.Error(ex);
                 errorMessage = ex.Message;
+				Logger.LogDebug("<<< Exiting SavePackageSettings(packageSettings={PackageSettings})", packageSettings);
                 return false;
             }
         }

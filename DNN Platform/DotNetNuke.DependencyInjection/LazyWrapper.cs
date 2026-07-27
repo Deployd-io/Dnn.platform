@@ -11,15 +11,20 @@ using Microsoft.Extensions.DependencyInjection;
 /// <typeparam name="T">The type of service to conditionally instantiate.</typeparam>
 public class LazyWrapper<T> : Lazy<T>
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Initializes a new instance of the <see cref="LazyWrapper{T}"/> class.</summary>
     /// <param name="serviceProvider">The DI container.</param>
     public LazyWrapper(IServiceProvider serviceProvider)
         : base(() => GetValue(serviceProvider))
     {
+	Logger.LogDebug(">>> Entering LazyWrapper(serviceProvider={ServiceProvider})", serviceProvider);
+	Logger.LogDebug(">>> Entering GetValue(serviceProvider={ServiceProvider})", serviceProvider);
+	Logger.LogDebug("<<< Exiting GetValue(serviceProvider={ServiceProvider})", serviceProvider);
     }
 
     private static T GetValue(IServiceProvider serviceProvider)
     {
+		Logger.LogDebug(">>> Entering GetValue(serviceProvider={ServiceProvider})", serviceProvider);
         var service = serviceProvider.GetService<T>();
         return service;
     }

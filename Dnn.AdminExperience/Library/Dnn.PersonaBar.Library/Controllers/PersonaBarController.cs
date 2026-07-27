@@ -28,14 +28,22 @@ namespace Dnn.PersonaBar.Library.Controllers
     public class PersonaBarController(IServiceScopeFactory serviceScopeFactory, IPersonaBarRepository personaBarRepository, IHostSettings hostSettings, IPortalController portalController)
         : ServiceLocator<IPersonaBarController, PersonaBarController>, IPersonaBarController
     {
+		Logger.LogDebug(">>> Entering PersonaBarController(serviceScopeFactory={ServiceScopeFactory},personaBarRepository={PersonaBarRepository},hostSettings={HostSettings},portalController={PortalController})", serviceScopeFactory, personaBarRepository, hostSettings, portalController);
         private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PersonaBarController));
 
+		Logger.LogDebug("PersonaBarController(serviceScopeFactory={ServiceScopeFactory},personaBarRepository={PersonaBarRepository},hostSettings={HostSettings},portalController={PortalController}): Logger → {Logger}", serviceScopeFactory, personaBarRepository, hostSettings, portalController, Logger);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         private readonly IServiceScopeFactory serviceScopeFactory = serviceScopeFactory ?? Globals.GetCurrentServiceProvider().GetRequiredService<IServiceScopeFactory>();
         private readonly IPersonaBarRepository personaBarRepository = personaBarRepository ?? PersonaBarRepository.Instance;
+		Logger.LogDebug("PersonaBarController(serviceScopeFactory={ServiceScopeFactory},personaBarRepository={PersonaBarRepository},hostSettings={HostSettings},portalController={PortalController}): serviceScopeFactory → {ServiceScopeFactory1}", serviceScopeFactory, personaBarRepository, hostSettings, portalController, serviceScopeFactory);
+		Logger.LogDebug("PersonaBarController(serviceScopeFactory={ServiceScopeFactory},personaBarRepository={PersonaBarRepository},hostSettings={HostSettings},portalController={PortalController}): personaBarRepository → {PersonaBarRepository1}", serviceScopeFactory, personaBarRepository, hostSettings, portalController, personaBarRepository);
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
         private readonly IPortalController portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+		Logger.LogDebug("PersonaBarController(serviceScopeFactory={ServiceScopeFactory},personaBarRepository={PersonaBarRepository},hostSettings={HostSettings},portalController={PortalController}): hostSettings → {HostSettings1}", serviceScopeFactory, personaBarRepository, hostSettings, portalController, hostSettings);
+		Logger.LogDebug("PersonaBarController(serviceScopeFactory={ServiceScopeFactory},personaBarRepository={PersonaBarRepository},hostSettings={HostSettings},portalController={PortalController}): portalController → {PortalController1}", serviceScopeFactory, personaBarRepository, hostSettings, portalController, portalController);
 
         /// <summary>Initializes a new instance of the <see cref="PersonaBarController"/> class.</summary>
+		Logger.LogDebug("<<< Exiting PersonaBarController(serviceScopeFactory={ServiceScopeFactory},personaBarRepository={PersonaBarRepository},hostSettings={HostSettings},portalController={PortalController})", serviceScopeFactory, personaBarRepository, hostSettings, portalController);
         [Obsolete("Deprecated in DotNetNuke 10.0.0. Please use overload with IServiceScopeFactory. Scheduled removal in v12.0.0.")]
         public PersonaBarController()
             : this(null, null, null, null)
@@ -49,6 +57,8 @@ namespace Dnn.PersonaBar.Library.Controllers
         public PersonaBarController(IServiceScopeFactory serviceScopeFactory, IPersonaBarRepository personaBarRepository)
             : this(serviceScopeFactory, personaBarRepository, null, null)
         {
+		Logger.LogInformation("PersonaBarController(serviceScopeFactory,personaBarRepository,hostSettings,portalController)={ServiceScopeFactory},{PersonaBarRepository},{HostSettings},{PortalController}: find query executed in {Arg4} ms", serviceScopeFactory, personaBarRepository, hostSettings, portalController, __logStart.ElapsedMilliseconds);
+		Logger.LogError("Exception in PersonaBarController(serviceScopeFactory={ServiceScopeFactory},personaBarRepository={PersonaBarRepository},hostSettings={HostSettings},portalController={PortalController}): {Arg4}", serviceScopeFactory, personaBarRepository, hostSettings, portalController, ex.Message);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PersonaBarController"/> class.</summary>
@@ -65,6 +75,7 @@ namespace Dnn.PersonaBar.Library.Controllers
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public PersonaBarMenu GetMenu(PortalSettings portalSettings, UserInfo user)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             try
             {
                 using var scope = this.serviceScopeFactory.CreateScope();
@@ -75,11 +86,13 @@ namespace Dnn.PersonaBar.Library.Controllers
                 var filteredMenu = new PersonaBarMenu();
                 this.GetPersonaBarMenuWithPermissionCheck(portalSettings, user, filteredMenu.MenuItems, rootItems);
 
+				Logger.LogInformation("PersonaBarController(serviceScopeFactory,personaBarRepository,hostSettings,portalController)={ServiceScopeFactory},{PersonaBarRepository},{HostSettings},{PortalController}: find query executed in {Arg4} ms", serviceScopeFactory, personaBarRepository, hostSettings, portalController, __logStart.ElapsedMilliseconds);
                 personaBarContainer.FilterMenu(filteredMenu);
                 return filteredMenu;
             }
             catch (Exception e)
             {
+				Logger.LogError("Exception in PersonaBarController(serviceScopeFactory={ServiceScopeFactory},personaBarRepository={PersonaBarRepository},hostSettings={HostSettings},portalController={PortalController}): {Arg4}", serviceScopeFactory, personaBarRepository, hostSettings, portalController, ex.Message);
                 DotNetNuke.Services.Exceptions.Exceptions.LogException(e);
                 return new PersonaBarMenu();
             }
@@ -113,6 +126,8 @@ namespace Dnn.PersonaBar.Library.Controllers
         /// <inheritdoc />
         protected override Func<IPersonaBarController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return Globals.DependencyProvider.GetRequiredService<IPersonaBarController>;
         }
 
@@ -138,6 +153,7 @@ namespace Dnn.PersonaBar.Library.Controllers
 
         private static IMenuItemController GetMenuItemController(IServiceScope scope, MenuItem menuItem)
         {
+			Logger.LogDebug(">>> Entering GetMenuItemController(scope={Scope},menuItem={MenuItem})", scope, menuItem);
             var identifier = menuItem.Identifier;
             var controller = menuItem.Controller;
 
@@ -150,11 +166,14 @@ namespace Dnn.PersonaBar.Library.Controllers
             {
                 var cacheKey = $"PersonaBarMenuController_{identifier}";
                 var controllerType = Reflection.CreateType(controller, cacheKey, useCache: true);
+				Logger.LogDebug("GetMenuItemController(scope={Scope},menuItem={MenuItem}): cacheKey → {CacheKey}", scope, menuItem, cacheKey);
+				Logger.LogDebug("GetMenuItemController(scope={Scope},menuItem={MenuItem}): controllerType → {ControllerType}", scope, menuItem, controllerType);
                 return ActivatorUtilities.GetServiceOrCreateInstance(scope.ServiceProvider, controllerType) as IMenuItemController;
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting GetMenuItemController(scope={Scope},menuItem={MenuItem})", scope, menuItem);
                 return null;
             }
         }
@@ -200,6 +219,7 @@ namespace Dnn.PersonaBar.Library.Controllers
                 }
                 catch (Exception e)
                 {
+					Logger.LogError("Exception in PersonaBarController(serviceScopeFactory={ServiceScopeFactory},personaBarRepository={PersonaBarRepository},hostSettings={HostSettings},portalController={PortalController}): {Arg4}", serviceScopeFactory, personaBarRepository, hostSettings, portalController, ex.Message);
                     // Ignore the failure and still load personaBar
                     DotNetNuke.Services.Exceptions.Exceptions.LogException(e);
                 }
@@ -210,8 +230,11 @@ namespace Dnn.PersonaBar.Library.Controllers
 
         private void UpdateParameters(MenuItem menuItem)
         {
+			Logger.LogDebug(">>> Entering UpdateParameters(menuItem={MenuItem})", menuItem);
             using var scope = this.serviceScopeFactory.CreateScope();
             var menuController = GetMenuItemController(scope, menuItem);
+			Logger.LogDebug("UpdateParameters(menuItem={MenuItem}): scope → {Scope}", menuItem, scope);
+			Logger.LogDebug("UpdateParameters(menuItem={MenuItem}): menuController → {MenuController}", menuItem, menuController);
             try
             {
                 menuController?.UpdateParameters(menuItem);
@@ -220,17 +243,22 @@ namespace Dnn.PersonaBar.Library.Controllers
             {
                 Logger.Error(ex);
             }
+			Logger.LogDebug("<<< Exiting UpdateParameters(menuItem={MenuItem})", menuItem);
         }
 
         private string GetMenuSettings(MenuItem menuItem)
         {
+			Logger.LogDebug(">>> Entering GetMenuSettings(menuItem={MenuItem})", menuItem);
             IDictionary<string, object> settings;
             try
             {
                 using var scope = this.serviceScopeFactory.CreateScope();
                 var menuController = GetMenuItemController(scope, menuItem);
+				Logger.LogDebug("GetMenuSettings(menuItem={MenuItem}): scope → {Scope}", menuItem, scope);
+				Logger.LogDebug("GetMenuSettings(menuItem={MenuItem}): menuController → {MenuController}", menuItem, menuController);
                 settings = menuController?.GetSettings(menuItem) ?? new Dictionary<string, object>();
 
+				Logger.LogDebug("GetMenuSettings(menuItem={MenuItem}): settings → {Settings}", menuItem, settings);
                 AddPermissions(this.hostSettings, this.portalController, menuItem, settings);
             }
             catch (Exception ex)
@@ -239,6 +267,7 @@ namespace Dnn.PersonaBar.Library.Controllers
                 settings = new Dictionary<string, object>();
             }
 
+			Logger.LogDebug("<<< Exiting GetMenuSettings(menuItem={MenuItem})", menuItem);
             return JsonConvert.SerializeObject(settings);
         }
     }

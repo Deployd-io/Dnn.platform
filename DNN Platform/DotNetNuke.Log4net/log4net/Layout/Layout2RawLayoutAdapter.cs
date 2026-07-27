@@ -37,6 +37,7 @@ namespace log4net.Layout
     /// <author>Gert Driesen</author>
     public class Layout2RawLayoutAdapter : IRawLayout
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>The layout to adapt</summary>
         private ILayout m_layout;
 
@@ -49,7 +50,11 @@ namespace log4net.Layout
         /// </remarks>
         public Layout2RawLayoutAdapter(ILayout layout)
         {
+			Logger.DebugFormat(">>> Entering Layout2RawLayoutAdapter(layout={0})", layout);
             this.m_layout = layout;
+			Logger.DebugFormat("<<< Exiting Layout2RawLayoutAdapter(layout={0})", layout);
+			Logger.DebugFormat("Layout2RawLayoutAdapter(layout={0}): m_layout → {1}", layout, m_layout);
+			Logger.DebugFormat("Layout2RawLayoutAdapter(layout={0}): this.m_layout → {1}", layout, this.m_layout);
         }
 
         /// <summary>Format the logging event as an object.</summary>
@@ -66,9 +71,11 @@ namespace log4net.Layout
         /// </remarks>
         public virtual object Format(LoggingEvent loggingEvent)
         {
+			Logger.DebugFormat(">>> Entering Format(loggingEvent={0})", loggingEvent);
             using (var writer = new StringWriter(System.Globalization.CultureInfo.InvariantCulture))
             {
                 this.m_layout.Format(writer, loggingEvent);
+				Logger.DebugFormat("<<< Exiting Format(loggingEvent={0})", loggingEvent);
                 return writer.ToString();
             }
         }

@@ -10,11 +10,16 @@ namespace DNNConnect.CKEditorProvider.Objects
     /// <summary>WordCount Plugin Config.</summary>
     public class WordCountConfig
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="WordCountConfig" /> class.</summary>
         public WordCountConfig()
         {
+			Logger.LogDebug(">>> Entering WordCountConfig()");
             this.ShowWordCount = true;
             this.ShowCharCount = false;
+			Logger.LogDebug("<<< Exiting WordCountConfig()");
+			Logger.LogDebug("WordCountConfig(): this.ShowWordCount → {Arg0}", this.ShowWordCount);
+			Logger.LogDebug("WordCountConfig(): this.ShowCharCount → {Arg0}", this.ShowCharCount);
         }
 
         /// <summary>Gets or sets a value indicating whether [show char count].</summary>

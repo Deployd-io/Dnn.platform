@@ -25,6 +25,7 @@ using log4net.Core;
 
 namespace log4net.Util
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>An entry in the <see cref="LevelMapping"/></summary>
     /// <remarks>
     /// <para>
@@ -43,6 +44,8 @@ namespace log4net.Util
         /// </remarks>
         protected LevelMappingEntry() 
         {
+		Logger.LogDebug(">>> Entering LevelMappingEntry()");
+		Logger.LogDebug("<<< Exiting LevelMappingEntry()");
         }
 
         /// <summary>The level that is the key for this mapping </summary>
@@ -69,7 +72,9 @@ namespace log4net.Util
         /// </remarks>
         public virtual void ActivateOptions()
         {
+			Logger.LogDebug(">>> Entering ActivateOptions()");
             // default implementation is to do nothing
+			Logger.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         private Level m_level;

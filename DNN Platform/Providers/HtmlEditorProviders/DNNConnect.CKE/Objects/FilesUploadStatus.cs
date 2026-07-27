@@ -10,6 +10,7 @@ namespace DNNConnect.CKEditorProvider.Objects
     /// <summary>FileUploadStatus Class.</summary>
     public class FilesUploadStatus
     {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 #pragma warning disable SA1300 // Element should begin with upper-case letter
         /// <summary>The handler path.</summary>
         public const string HandlerPath = "/";
@@ -17,13 +18,17 @@ namespace DNNConnect.CKEditorProvider.Objects
         /// <summary>Initializes a new instance of the <see cref="FilesUploadStatus"/> class.</summary>
         public FilesUploadStatus()
         {
+		Logger.LogDebug(">>> Entering FilesUploadStatus()");
+		Logger.LogDebug("<<< Exiting FilesUploadStatus()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="FilesUploadStatus"/> class.</summary>
         /// <param name="fileInfo">The file information.</param>
         public FilesUploadStatus(FileInfo fileInfo)
         {
+			Logger.LogDebug(">>> Entering FilesUploadStatus(fileInfo={FileInfo})", fileInfo);
             this.SetValues(fileInfo.Name, (int)fileInfo.Length);
+			Logger.LogDebug("<<< Exiting FilesUploadStatus(fileInfo={FileInfo})", fileInfo);
         }
 
         /// <summary>Initializes a new instance of the <see cref="FilesUploadStatus"/> class.</summary>
@@ -31,7 +36,9 @@ namespace DNNConnect.CKEditorProvider.Objects
         /// <param name="fileLength">Length of the file.</param>
         public FilesUploadStatus(string fileName, int fileLength)
         {
+			Logger.LogDebug(">>> Entering FilesUploadStatus(fileName={FileName},fileLength={FileLength})", fileName, fileLength);
             this.SetValues(fileName, fileLength);
+			Logger.LogDebug("<<< Exiting FilesUploadStatus(fileName={FileName},fileLength={FileLength})", fileName, fileLength);
         }
 
         /// <summary>Gets or sets the group.</summary>
@@ -99,11 +106,16 @@ namespace DNNConnect.CKEditorProvider.Objects
         /// <param name="fileLength">Length of the file.</param>
         private void SetValues(string fileName, int fileLength)
         {
+			Logger.LogDebug(">>> Entering SetValues(fileName={FileName},fileLength={FileLength})", fileName, fileLength);
             this.name = fileName;
             this.type = "image/png";
+			Logger.LogDebug("SetValues(fileName={FileName},fileLength={FileLength}): this.name → {Arg2}", fileName, fileLength, this.name);
+			Logger.LogDebug("SetValues(fileName={FileName},fileLength={FileLength}): this.type → {Arg2}", fileName, fileLength, this.type);
             this.size = fileLength;
             this.progress = "1.0";
             this.url = string.Format("{0}FileTransferHandler.ashx?f={1}", HandlerPath, fileName);
+			Logger.LogDebug("<<< Exiting SetValues(fileName={FileName},fileLength={FileLength})", fileName, fileLength);
+			Logger.LogDebug("SetValues(fileName={FileName},fileLength={FileLength}): this.size → {Arg2}", fileName, fileLength, this.size);
         }
 #pragma warning restore SA1300 // Element should begin with upper-case letter
     }

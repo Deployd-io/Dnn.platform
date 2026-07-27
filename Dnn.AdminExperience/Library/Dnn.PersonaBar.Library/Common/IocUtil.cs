@@ -25,6 +25,7 @@ namespace Dnn.PersonaBar.Library.Common
             where TContract : class
             where TConcrete : class, new()
         {
+			Logger.LogDebug(">>> Entering RegisterComponent(name={Name})", name);
             try
             {
                 if (!string.IsNullOrEmpty(name))
@@ -34,6 +35,7 @@ namespace Dnn.PersonaBar.Library.Common
 
                 var component = GetInstanceLocal<TContract>(name);
 
+				Logger.LogDebug("RegisterComponent(name={Name}): component → {Component}", name, component);
                 if (component != null)
                 {
                     return false;
@@ -55,6 +57,7 @@ namespace Dnn.PersonaBar.Library.Common
                 Logger.Error(e);
                 return false;
             }
+			Logger.LogDebug("<<< Exiting RegisterComponent(name={Name})", name);
         }
 
         /// <summary>Register a specific instance into the IOC container for later use.</summary>
@@ -99,6 +102,7 @@ namespace Dnn.PersonaBar.Library.Common
         public static TContract GetInstance<TContract>(string name = null)
             where TContract : class
         {
+			Logger.LogDebug(">>> Entering GetInstance(name={Name})", name);
             if (!string.IsNullOrEmpty(name))
             {
                 name += "." + typeof(TContract).FullName;
@@ -106,6 +110,7 @@ namespace Dnn.PersonaBar.Library.Common
 
             var instance = GetInstanceLocal<TContract>(name);
             if (instance == null)
+			Logger.LogDebug("GetInstance(name={Name}): instance → {Instance}", name, instance);
             {
                 Logger.WarnFormat(
                     CultureInfo.InvariantCulture,
@@ -123,6 +128,7 @@ namespace Dnn.PersonaBar.Library.Common
         public static IEnumerable<TContract> GetInstanceContracts<TContract>()
             where TContract : class
         {
+			Logger.LogDebug(">>> Entering GetInstanceContracts()");
             var instances = ComponentFactory.GetComponents<TContract>();
             return instances.Values;
         }
@@ -130,9 +136,11 @@ namespace Dnn.PersonaBar.Library.Common
         private static TContract GetInstanceLocal<TContract>(string name)
             where TContract : class
         {
+			Logger.LogDebug(">>> Entering GetInstanceLocal(name={Name})", name);
             return string.IsNullOrEmpty(name)
                 ? ComponentFactory.GetComponent<TContract>()
                 : ComponentFactory.GetComponent<TContract>(name);
+			Logger.LogDebug("<<< Exiting GetInstanceLocal(name={Name})", name);
         }
     }
 }

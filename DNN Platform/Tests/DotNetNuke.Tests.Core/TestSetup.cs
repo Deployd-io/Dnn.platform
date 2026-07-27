@@ -11,14 +11,19 @@ using NUnit.Framework;
 [SetUpFixture]
 internal class TestSetup
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     [OneTimeSetUp]
     public void SetUp()
     {
+	Logger.LogDebug(">>> Entering SetUp()");
+	Logger.LogDebug("<<< Exiting SetUp()");
     }
 
     [OneTimeTearDown]
     public void TearDown()
     {
+		Logger.LogDebug(">>> Entering TearDown()");
         MockComponentProvider.ResetContainer();
+		Logger.LogDebug("<<< Exiting TearDown()");
     }
 }

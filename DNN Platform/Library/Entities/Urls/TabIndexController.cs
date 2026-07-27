@@ -207,13 +207,16 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>A <see cref="List{T}"/> of alias strings.</returns>
         internal static List<string> GetCustomPortalAliases(FriendlyUrlSettings settings)
         {
+			Logger.LogDebug(">>> Entering GetCustomPortalAliases(settings={Settings})", settings);
             List<string> aliases = CacheController.GetCustomAliasesFromCache();
             if (aliases == null)
+			Logger.LogDebug("GetCustomPortalAliases(settings={Settings}): aliases → {Aliases}", settings, aliases);
             {
                 aliases = FriendlyUrlController.GetCustomAliasesForTabs();
                 CacheController.StoreCustomAliasesInCache(aliases, settings);
             }
 
+			Logger.LogDebug("<<< Exiting GetCustomPortalAliases(settings={Settings})", settings);
             return aliases;
         }
 
@@ -289,14 +292,17 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>An <see cref="OrderedDictionary"/> where the keys are <see cref="string"/> aliases and the values are <see cref="PortalAliasInfo"/> instances.</returns>
         internal static OrderedDictionary GetPortalAliases(FriendlyUrlSettings settings)
         {
+			Logger.LogDebug(">>> Entering GetPortalAliases(settings={Settings})", settings);
             // object to return
             OrderedDictionary aliasList = CacheController.GetPortalAliasesFromCache();
             if (aliasList == null)
+			Logger.LogDebug("GetPortalAliases(settings={Settings}): aliasList → {AliasList}", settings, aliasList);
             {
                 aliasList = BuildPortalAliasesDictionary();
                 CacheController.StorePortalAliasesInCache(aliasList, settings);
             }
 
+			Logger.LogDebug("<<< Exiting GetPortalAliases(settings={Settings})", settings);
             return aliasList;
         }
 
@@ -1176,6 +1182,7 @@ namespace DotNetNuke.Entities.Urls
             {
                 if (tabIndex.ContainsKey(tabKey))
                 {
+					private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                     // it's possible for a tab to be deleted and the tab path repeated.
                     // the dictionary must be checked to ascertain whether the existing tab
                     // should be replaced or not.  If the action is 'TabOK' it means
@@ -1305,8 +1312,10 @@ namespace DotNetNuke.Entities.Urls
 
         private static OrderedDictionary BuildPortalAliasesDictionary()
         {
+			Logger.LogDebug(">>> Entering BuildPortalAliasesDictionary()");
             var aliases = PortalAliasController.Instance.GetPortalAliases();
 
+			Logger.LogDebug("BuildPortalAliasesDictionary(): aliases → {Aliases}", aliases);
             // create a new OrderedDictionary.  We use this because we
             // want to key by the correct regex pattern and return the
             // portalAlias that matches, and we want to preserve the
@@ -1314,6 +1323,8 @@ namespace DotNetNuke.Entities.Urls
             // is at the front of the list.
             var aliasList = new OrderedDictionary(aliases.Count);
             var pathLengths = new List<int>();
+			Logger.LogDebug("BuildPortalAliasesDictionary(): aliasList → {AliasList}", aliasList);
+			Logger.LogDebug("BuildPortalAliasesDictionary(): pathLengths → {PathLengths}", pathLengths);
             foreach (string aliasKey in aliases.Keys)
             {
                 PortalAliasInfo alias = aliases[aliasKey];
@@ -1347,18 +1358,22 @@ namespace DotNetNuke.Entities.Urls
                 int count = 0;
                 foreach (string aliasToAdd in aliasesToAdd)
                 {
+				Logger.LogDebug("BuildPortalAliasesDictionary(): count → {Count}", count);
                     // set flag on object to know whether to redirect or not
                     count++;
                     var aliasObject = new PortalAliasInfo(alias) { Redirect = count != 1 };
 
+					Logger.LogDebug("BuildPortalAliasesDictionary(): aliasObject → {AliasObject}", aliasObject);
                     // work out how many path separators there are in the portalAlias (ie myalias/mychild = 1 path)
                     int pathLength = plainAlias.Split('/').GetUpperBound(0);
 
+					Logger.LogDebug("BuildPortalAliasesDictionary(): pathLength → {PathLength}", pathLength);
                     // now work out where in the list we should put this portalAlias regex pattern
                     // the list is to be sorted so that those aliases with the most paths
                     // are at the front of the list : ie, they are tested first
                     int insertPoint = pathLengths.Count - 1;
 
+					Logger.LogDebug("BuildPortalAliasesDictionary(): insertPoint → {InsertPoint}", insertPoint);
                     // walk through the existing list of path lengths,
                     // and ascertain where in the list this one falls
                     // if they are all the same path length, then place them in portal alias order
@@ -1389,6 +1404,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting BuildPortalAliasesDictionary()");
             return aliasList;
         }
 

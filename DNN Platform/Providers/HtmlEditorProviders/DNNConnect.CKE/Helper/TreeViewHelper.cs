@@ -11,6 +11,7 @@ namespace DNNConnect.CKEditorProvider.Helper
     /// <typeparam name="TIdentifier">Type of the ID.</typeparam>
     internal class TreeViewHelper<TIdentifier>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly Dictionary<TIdentifier, TreeNodeWithParentId<TIdentifier>> nodes = new Dictionary<TIdentifier, TreeNodeWithParentId<TIdentifier>>();
 
         /// <summary>
@@ -100,6 +101,8 @@ namespace DNNConnect.CKEditorProvider.Helper
 
         private TreeNodeWithParentId<TIdentifier> GetTreeNodeWithParentId(TIdentifier key)
         {
+			Logger.LogDebug(">>> Entering GetTreeNodeWithParentId(key={Key})", key);
+			Logger.LogDebug("<<< Exiting GetTreeNodeWithParentId(key={Key})", key);
             return this.nodes.TryGetValue(key, out var node) ? node : null;
         }
 

@@ -12,13 +12,18 @@ namespace DotNetNuke.UI.Modules.Html5
 
     public class ModuleContextPropertyAccess : IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly ModuleInstanceContext moduleContext;
 
         /// <summary>Initializes a new instance of the <see cref="ModuleContextPropertyAccess"/> class.</summary>
         /// <param name="moduleContext">The module context.</param>
         public ModuleContextPropertyAccess(ModuleInstanceContext moduleContext)
         {
+			Logger.LogDebug(">>> Entering ModuleContextPropertyAccess(moduleContext={ModuleContext})", moduleContext);
             this.moduleContext = moduleContext;
+			Logger.LogDebug("<<< Exiting ModuleContextPropertyAccess(moduleContext={ModuleContext})", moduleContext);
+			Logger.LogDebug("ModuleContextPropertyAccess(moduleContext={ModuleContext}): moduleContext → {ModuleContext1}", moduleContext, moduleContext);
+			Logger.LogDebug("ModuleContextPropertyAccess(moduleContext={ModuleContext}): this.moduleContext → {Arg1}", moduleContext, this.moduleContext);
         }
 
         /// <inheritdoc />
@@ -30,6 +35,7 @@ namespace DotNetNuke.UI.Modules.Html5
         /// <inheritdoc />
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			Logger.LogDebug(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             switch (propertyName.ToLowerInvariant())
             {
                 case "moduleid":
@@ -54,6 +60,7 @@ namespace DotNetNuke.UI.Modules.Html5
             }
 
             propertyNotFound = true;
+			Logger.LogDebug("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             return string.Empty;
         }
     }

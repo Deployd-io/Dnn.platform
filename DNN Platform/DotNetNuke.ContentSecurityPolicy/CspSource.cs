@@ -13,6 +13,7 @@ namespace DotNetNuke.ContentSecurityPolicy
     /// </summary>
     public class CspSource
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Compiled regex for validating host sources (domain with wildcard, IPv4 and IPv6).
         /// </summary>
@@ -26,8 +27,11 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="checkSyntax">Check syntax of value.</param>
         public CspSource(CspSourceType type, string value = null, bool checkSyntax = false)
         {
+			Logger.LogDebug(">>> Entering CspSource(type={Type},value={Value},checkSyntax={CheckSyntax})", type, value, checkSyntax);
             this.Type = type;
             this.Value = ValidateSource(type, value, checkSyntax);
+			Logger.LogDebug("<<< Exiting CspSource(type={Type},value={Value},checkSyntax={CheckSyntax})", type, value, checkSyntax);
+			Logger.LogDebug("CspSource(type={Type},value={Value},checkSyntax={CheckSyntax}): this.Type → {Arg3}", type, value, checkSyntax, this.Type);
         }
 
         /// <summary>
@@ -51,6 +55,7 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// </summary>
         private static string ValidateSource(CspSourceType type, string value, bool checkSyntax)
         {
+			Logger.LogDebug(">>> Entering ValidateSource(type={Type},value={Value},checkSyntax={CheckSyntax})", type, value, checkSyntax);
             switch (type)
             {
                 case CspSourceType.Host:
@@ -73,6 +78,7 @@ namespace DotNetNuke.ContentSecurityPolicy
                 default:
                     throw new ArgumentException("Invalid source type");
             }
+			Logger.LogDebug("<<< Exiting ValidateSource(type={Type},value={Value},checkSyntax={CheckSyntax})", type, value, checkSyntax);
         }
 
         /// <summary>
@@ -80,6 +86,7 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// </summary>
         private static string ValidateHostSource(string value, bool checkSyntax)
         {
+			Logger.LogDebug(">>> Entering ValidateHostSource(value={Value},checkSyntax={CheckSyntax})", value, checkSyntax);
             if (string.IsNullOrWhiteSpace(value))
             {
                 throw new ArgumentException("Host source cannot be empty");
@@ -91,6 +98,7 @@ namespace DotNetNuke.ContentSecurityPolicy
                 throw new ArgumentException($"Invalid host source: {value}");
             }
 
+			Logger.LogDebug("<<< Exiting ValidateHostSource(value={Value},checkSyntax={CheckSyntax})", value, checkSyntax);
             return value;
         }
 
@@ -99,12 +107,15 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// </summary>
         private static string ValidateSchemeSource(string value, bool checkSyntax)
         {
+			Logger.LogDebug(">>> Entering ValidateSchemeSource(value={Value},checkSyntax={CheckSyntax})", value, checkSyntax);
             var validSchemes = new string[] { "http:", "https:", "data:", "blob:", "filesystem:", "wss:", "ws:" };
             if (!validSchemes.Contains(value))
+			Logger.LogDebug("ValidateSchemeSource(value={Value},checkSyntax={CheckSyntax}): validSchemes → {ValidSchemes}", value, checkSyntax, validSchemes);
             {
                 throw new ArgumentException($"Invalid scheme: {value}");
             }
 
+			Logger.LogDebug("<<< Exiting ValidateSchemeSource(value={Value},checkSyntax={CheckSyntax})", value, checkSyntax);
             return value;
         }
 
@@ -113,6 +124,7 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// </summary>
         private static string ValidateNonceSource(string value)
         {
+			Logger.LogDebug(">>> Entering ValidateNonceSource(value={Value})", value);
             if (string.IsNullOrWhiteSpace(value))
             {
                 throw new ArgumentException("Nonce cannot be empty");
@@ -120,6 +132,7 @@ namespace DotNetNuke.ContentSecurityPolicy
 
             // Basic nonce validation - allow any non-empty string for flexibility
             // In real-world scenarios, nonces might not always be strict base64
+			Logger.LogDebug("<<< Exiting ValidateNonceSource(value={Value})", value);
             return $"'nonce-{value}'";
         }
 
@@ -128,8 +141,10 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// </summary>
         private static string ValidateHashSource(string value, bool checkSyntax)
         {
+			Logger.LogDebug(">>> Entering ValidateHashSource(value={Value},checkSyntax={CheckSyntax})", value, checkSyntax);
             var hashPrefixes = new string[] { "sha256-", "sha384-", "sha512-" };
 
+			Logger.LogDebug("ValidateHashSource(value={Value},checkSyntax={CheckSyntax}): hashPrefixes → {HashPrefixes}", value, checkSyntax, hashPrefixes);
             if (string.IsNullOrWhiteSpace(value))
             {
                 throw new ArgumentException("Hash cannot be empty");
@@ -144,6 +159,7 @@ namespace DotNetNuke.ContentSecurityPolicy
                 throw new ArgumentException($"Invalid hash format: {value}");
             }
 
+			Logger.LogDebug("<<< Exiting ValidateHashSource(value={Value},checkSyntax={CheckSyntax})", value, checkSyntax);
             return $"'{value}'";
         }
     }

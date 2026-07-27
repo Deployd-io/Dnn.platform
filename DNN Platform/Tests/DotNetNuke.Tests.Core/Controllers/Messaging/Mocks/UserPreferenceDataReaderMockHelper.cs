@@ -10,30 +10,41 @@ namespace DotNetNuke.Tests.Core.Controllers.Messaging.Mocks
 
     internal class UserPreferenceDataReaderMockHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         internal static IDataReader CreateEmptyUserPreferenceReader()
         {
+			Logger.LogDebug(">>> Entering CreateEmptyUserPreferenceReader()");
+			Logger.LogDebug("<<< Exiting CreateEmptyUserPreferenceReader()");
             return CreateUserPreferenceTable().CreateDataReader();
         }
 
         internal static IDataReader CreateUserPreferenceReader(UserPreference userPreference)
         {
+			Logger.LogDebug(">>> Entering CreateUserPreferenceReader(userPreference={UserPreference})", userPreference);
             var table = CreateUserPreferenceTable();
             AddUserPreferenceToTable(table, userPreference);
+			Logger.LogDebug("CreateUserPreferenceReader(userPreference={UserPreference}): table → {Table}", userPreference, table);
+			Logger.LogDebug("<<< Exiting CreateUserPreferenceReader(userPreference={UserPreference})", userPreference);
             return table.CreateDataReader();
         }
 
         private static DataTable CreateUserPreferenceTable()
         {
+			Logger.LogDebug(">>> Entering CreateUserPreferenceTable()");
             var table = new DataTable();
 
+			Logger.LogDebug("CreateUserPreferenceTable(): table → {Table}", table);
             var idColumn = table.Columns.Add("UserPreferenceId", typeof(int));
             table.Columns.Add("PortalId", typeof(int));
+			Logger.LogDebug("CreateUserPreferenceTable(): idColumn → {IdColumn}", idColumn);
             table.Columns.Add("UserId", typeof(string));
             table.Columns.Add("MessagesEmailFrequency", typeof(int));
             table.Columns.Add("NotificationsEmailFrequency", typeof(int));
 
             table.PrimaryKey = new[] { idColumn };
+			Logger.LogDebug("CreateUserPreferenceTable(): table.PrimaryKey → {Arg0}", table.PrimaryKey);
 
+			Logger.LogDebug("<<< Exiting CreateUserPreferenceTable()");
             return table;
         }
 

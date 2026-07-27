@@ -10,17 +10,22 @@ namespace DNN.Integration.Test.Framework.Helpers
 
     public static class FileHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static string GetAbsoluteDir(string relativePathIn)
         {
+			Logger.LogDebug(">>> Entering GetAbsoluteDir(relativePathIn={RelativePathIn})", relativePathIn);
             if (!relativePathIn.StartsWith(@"\", StringComparison.Ordinal))
             {
                 relativePathIn = @"\" + relativePathIn;
             }
+			Logger.LogDebug("GetAbsoluteDir(relativePathIn={RelativePathIn}): relativePathIn → {RelativePathIn1}", relativePathIn, relativePathIn);
 
             var rootDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
+			Logger.LogDebug("GetAbsoluteDir(relativePathIn={RelativePathIn}): rootDirectory → {RootDirectory}", relativePathIn, rootDirectory);
             var pathOut = rootDirectory + relativePathIn;
 
+			Logger.LogDebug("<<< Exiting GetAbsoluteDir(relativePathIn={RelativePathIn})", relativePathIn);
             return pathOut;
         }
     }

@@ -13,9 +13,11 @@ namespace DotNetNuke.Build.Tasks
     /// <summary>A cake task to copy the <c>web.config</c> file to the local dev site with appropriate transformations.</summary>
     public sealed class CopyWebConfigToDevSite : FrostingTask<Context>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override void Run(Context context)
         {
+			Logger.LogDebug(">>> Entering Run(context={Context})", context);
             if (string.IsNullOrWhiteSpace(context.Settings.DnnConnectionString))
             {
                 throw new InvalidOperationException("DnnConnectionString was blank and must have a value when the CopyWebConfigToDevSite task is run");
@@ -23,6 +25,8 @@ namespace DotNetNuke.Build.Tasks
 
             var conf = context.FileReadText("./Website/web.config");
             var transFile = "./Build/Tasks/webconfig-transform.local.xsl";
+			Logger.LogDebug("Run(context={Context}): conf → {Conf}", context, conf);
+			Logger.LogDebug("Run(context={Context}): transFile → {TransFile}", context, transFile);
             if (!context.FileExists(transFile))
             {
                 transFile = "./Build/Tasks/webconfig-transform.xsl";
@@ -32,9 +36,13 @@ namespace DotNetNuke.Build.Tasks
             trans = trans.Replace("{ConnectionString}", context.Settings.DnnConnectionString)
                 .Replace("{DbOwner}", context.Settings.DbOwner)
                 .Replace("{ObjectQualifier}", context.Settings.ObjectQualifier);
+				Logger.LogDebug("Run(context={Context}): trans → {Trans}", context, trans);
             var res = context.XmlTransform(trans, conf);
             var webConfig = System.IO.Path.Combine(context.Settings.WebsitePath, "web.config");
+			Logger.LogDebug("Run(context={Context}): res → {Res}", context, res);
+			Logger.LogDebug("Run(context={Context}): webConfig → {WebConfig}", context, webConfig);
             context.FileWriteText(webConfig, res);
+			Logger.LogDebug("<<< Exiting Run(context={Context})", context);
         }
     }
 }

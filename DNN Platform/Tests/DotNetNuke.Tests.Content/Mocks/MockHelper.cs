@@ -62,44 +62,60 @@ namespace DotNetNuke.Tests.Content.Mocks
 
         internal static IDataReader CreateEmptyContentItemReader()
         {
+			Logger.LogDebug(">>> Entering CreateEmptyContentItemReader()");
+			Logger.LogDebug("<<< Exiting CreateEmptyContentItemReader()");
             return CreateContentItemTable().CreateDataReader();
         }
 
         internal static IDataReader CreateEmptyContentTypeReader()
         {
+			Logger.LogDebug(">>> Entering CreateEmptyContentTypeReader()");
+			Logger.LogDebug("<<< Exiting CreateEmptyContentTypeReader()");
             return CreateContentTypeTable().CreateDataReader();
         }
 
         internal static IDataReader CreateEmptyScopeTypeReader()
         {
+			Logger.LogDebug(">>> Entering CreateEmptyScopeTypeReader()");
+			Logger.LogDebug("<<< Exiting CreateEmptyScopeTypeReader()");
             return CreateScopeTypeTable().CreateDataReader();
         }
 
         internal static IDataReader CreateEmptyTermReader()
         {
+			Logger.LogDebug(">>> Entering CreateEmptyTermReader()");
+			Logger.LogDebug("<<< Exiting CreateEmptyTermReader()");
             return CreateTermTable().CreateDataReader();
         }
 
         internal static Mock<HttpContextBase> CreateMockHttpContext()
         {
+			Logger.LogDebug(">>> Entering CreateMockHttpContext()");
             Mock<HttpContextBase> httpContext = new Mock<HttpContextBase>();
             Mock<HttpResponseBase> httpResponse = new Mock<HttpResponseBase>();
+			Logger.LogDebug("CreateMockHttpContext(): httpContext → {HttpContext}", httpContext);
+			Logger.LogDebug("CreateMockHttpContext(): httpResponse → {HttpResponse}", httpResponse);
             httpContext.Setup(h => h.Response).Returns(httpResponse.Object);
 
+			Logger.LogDebug("<<< Exiting CreateMockHttpContext()");
             return httpContext;
         }
 
         internal static Mock<IVocabularyController> CreateMockVocabularyController()
         {
+			Logger.LogDebug(">>> Entering CreateMockVocabularyController()");
             var needsServiceProvider = Globals.DependencyProvider is null;
             var provider = needsServiceProvider ? FakeServiceProvider.Setup(services => services.AddSingleton(Mock.Of<ICryptographyProvider>())) : Globals.DependencyProvider;
             try
+			Logger.LogDebug("CreateMockVocabularyController(): provider → {Provider}", provider);
             {
                 // Create the mock
                 var mockVocabularies = new Mock<IVocabularyController>();
                 mockVocabularies.Setup(v => v.GetVocabularies()).Returns(TestVocabularies);
+				Logger.LogDebug("CreateMockVocabularyController(): mockVocabularies → {MockVocabularies}", mockVocabularies);
 
                 // Register Mock
+				Logger.LogDebug("<<< Exiting CreateMockVocabularyController()");
                 return RegisterMockController(mockVocabularies);
             }
             finally
@@ -113,6 +129,7 @@ namespace DotNetNuke.Tests.Content.Mocks
 
         internal static IDataReader CreateValidContentItemReader()
         {
+			Logger.LogDebug(">>> Entering CreateValidContentItemReader()");
             DataTable table = CreateContentItemTable();
             AddContentItemToTable(
                 table,
@@ -122,7 +139,9 @@ namespace DotNetNuke.Tests.Content.Mocks
                 true,
                 Constants.USER_ValidId,
                 Null.NullString);
+				Logger.LogDebug("CreateValidContentItemReader(): table → {Table}", table);
 
+			Logger.LogDebug("<<< Exiting CreateValidContentItemReader()");
             return table.CreateDataReader();
         }
 
@@ -139,61 +158,76 @@ namespace DotNetNuke.Tests.Content.Mocks
                 Constants.USER_ValidId,
                 Null.NullString);
 
+			Logger.LogDebug("<<< Exiting CreateValidContentItemReader(contentItem={ContentItem})", contentItem);
             return table.CreateDataReader();
         }
 
         internal static IDataReader CreateValidContentItemsReader(int count, bool indexed, int startUserId, string term)
         {
+			Logger.LogDebug(">>> Entering CreateValidContentItemsReader(count={Count},indexed={Indexed},startUserId={StartUserId},term={Term})", count, indexed, startUserId, term);
             DataTable table = CreateContentItemTable();
             for (int i = Constants.CONTENT_ValidContentItemId; i < Constants.CONTENT_ValidContentItemId + count; i++)
+			Logger.LogDebug("CreateValidContentItemsReader(count={Count},indexed={Indexed},startUserId={StartUserId},term={Term}): table → {Table}", count, indexed, startUserId, term, table);
             {
                 string content = (count == 1) ? Constants.CONTENT_ValidContent : ContentTestHelper.GetContent(i);
                 string contentKey = (count == 1) ? Constants.CONTENT_ValidContentKey : ContentTestHelper.GetContentKey(i);
                 int userId = (startUserId == Null.NullInteger) ? Constants.USER_ValidId + i : startUserId;
 
+				Logger.LogDebug("CreateValidContentItemsReader(count={Count},indexed={Indexed},startUserId={StartUserId},term={Term}): userId → {UserId}", count, indexed, startUserId, term, userId);
                 AddContentItemToTable(table, i, content, contentKey, indexed, startUserId, term);
             }
 
+			Logger.LogDebug("<<< Exiting CreateValidContentItemsReader(count={Count},indexed={Indexed},startUserId={StartUserId},term={Term})", count, indexed, startUserId, term);
             return table.CreateDataReader();
         }
 
         internal static IDataReader CreateValidContentTypesReader(int count)
         {
+			Logger.LogDebug(">>> Entering CreateValidContentTypesReader(count={Count})", count);
             DataTable table = CreateContentTypeTable();
             for (int i = Constants.CONTENTTYPE_ValidContentTypeId; i < Constants.CONTENTTYPE_ValidContentTypeId + count; i++)
+			Logger.LogDebug("CreateValidContentTypesReader(count={Count}): table → {Table}", count, table);
             {
                 string contentType = (count == 1) ? Constants.CONTENTTYPE_ValidContentType : ContentTestHelper.GetContentType(i);
 
                 AddContentTypeToTable(table, i, contentType);
             }
 
+			Logger.LogDebug("<<< Exiting CreateValidContentTypesReader(count={Count})", count);
             return table.CreateDataReader();
         }
 
         internal static IDataReader CreateValidScopeTypesReader(int count)
         {
+			Logger.LogDebug(">>> Entering CreateValidScopeTypesReader(count={Count})", count);
             DataTable table = CreateScopeTypeTable();
             for (int i = Constants.SCOPETYPE_ValidScopeTypeId; i < Constants.SCOPETYPE_ValidScopeTypeId + count; i++)
+			Logger.LogDebug("CreateValidScopeTypesReader(count={Count}): table → {Table}", count, table);
             {
                 string scopeType = (count == 1) ? Constants.SCOPETYPE_ValidScopeType : ContentTestHelper.GetScopeType(i);
 
                 AddScopeTypeToTable(table, i, scopeType);
             }
 
+			Logger.LogDebug("<<< Exiting CreateValidScopeTypesReader(count={Count})", count);
             return table.CreateDataReader();
         }
 
         internal static DataTable CreateMetaDataTable()
         {
+			Logger.LogDebug(">>> Entering CreateMetaDataTable()");
             var table = new DataTable();
             table.Columns.Add("MetaDataName", typeof(string));
+			Logger.LogDebug("CreateMetaDataTable(): table → {Table}", table);
             table.Columns.Add("MetaDataValue", typeof(string));
 
+			Logger.LogDebug("<<< Exiting CreateMetaDataTable()");
             return table;
         }
 
         internal static IDataReader CreateValidMetaDataReader()
         {
+			Logger.LogDebug(">>> Entering CreateValidMetaDataReader()");
             // Create Categories table.
             using (var table = CreateMetaDataTable())
             {
@@ -202,6 +236,7 @@ namespace DotNetNuke.Tests.Content.Mocks
                     table.Rows.Add(new object[] { string.Format("{0} {1}", Constants.CONTENT_ValidMetaDataName, i), Constants.CONTENT_ValidMetaDataValue });
                 }
 
+				Logger.LogDebug("<<< Exiting CreateValidMetaDataReader()");
                 return table.CreateDataReader();
             }
         }
@@ -244,15 +279,19 @@ namespace DotNetNuke.Tests.Content.Mocks
 
         internal static IDataReader CreateEmptyMetaDataReader()
         {
+			Logger.LogDebug(">>> Entering CreateEmptyMetaDataReader()");
             using (var table = CreateMetaDataTable())
             {
+				Logger.LogDebug("<<< Exiting CreateEmptyMetaDataReader()");
                 return table.CreateDataReader();
             }
         }
 
         internal static IDataReader CreateValidTermReader()
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
             DataTable table = CreateTermTable();
+			Logger.LogDebug(">>> Entering CreateValidTermReader()");
             AddTermToTable(
                 table,
                 Constants.TERM_ValidTermId,
@@ -263,6 +302,7 @@ namespace DotNetNuke.Tests.Content.Mocks
                 Constants.TERM_ValidWeight,
                 Constants.TERM_ValidParentTermId);
 
+			Logger.LogDebug("<<< Exiting CreateValidTermReader()");
             return table.CreateDataReader();
         }
 
@@ -283,8 +323,10 @@ namespace DotNetNuke.Tests.Content.Mocks
 
         internal static IDataReader CreateValidVocabulariesReader(int count)
         {
+			Logger.LogDebug(">>> Entering CreateValidVocabulariesReader(count={Count})", count);
             DataTable table = CreateVocabularyTable();
             for (int i = Constants.VOCABULARY_ValidVocabularyId; i < Constants.VOCABULARY_ValidVocabularyId + count; i++)
+			Logger.LogDebug("CreateValidVocabulariesReader(count={Count}): table → {Table}", count, table);
             {
                 string name = (count == 1) ? Constants.VOCABULARY_ValidName : ContentTestHelper.GetVocabularyName(i);
                 int typeId = Constants.VOCABULARY_SimpleTypeId;
@@ -293,17 +335,22 @@ namespace DotNetNuke.Tests.Content.Mocks
                 AddVocabularyToTable(table, i, typeId, name, description, Constants.VOCABULARY_ValidScopeId, Constants.VOCABULARY_ValidScopeTypeId, weight);
             }
 
+			Logger.LogDebug("<<< Exiting CreateValidVocabulariesReader(count={Count})", count);
             return table.CreateDataReader();
         }
 
         internal static IFileInfo CreateRandomFile(int fileId)
         {
+			Logger.LogDebug(">>> Entering CreateRandomFile(fileId={FileId})", fileId);
             var files = Directory.EnumerateFiles(@"C:\").ToArray();
 
+			Logger.LogDebug("CreateRandomFile(fileId={FileId}): files → {Files}", fileId, files);
             var random = new Random((int)DateTime.UtcNow.Ticks);
 
+			Logger.LogDebug("CreateRandomFile(fileId={FileId}): random → {Random}", fileId, random);
             var fileInfo = new Mock<IFileInfo>();
 
+			Logger.LogDebug("CreateRandomFile(fileId={FileId}): fileInfo → {FileInfo}", fileId, fileInfo);
             fileInfo.SetupGet(f => f.FileId).Returns(fileId);
             fileInfo.SetupGet(f => f.Extension).Returns(".txt");
             fileInfo.SetupGet(f => f.FileName).Returns(random.Next() + ".txt");
@@ -319,14 +366,18 @@ namespace DotNetNuke.Tests.Content.Mocks
             fileInfo.SetupGet(f => f.VersionGuid).Returns(Guid.NewGuid());
             fileInfo.SetupGet(f => f.Size).Returns(random.Next() % (1024 * 1024));
 
+			Logger.LogDebug("<<< Exiting CreateRandomFile(fileId={FileId})", fileId);
             return fileInfo.Object;
         }
 
         internal static Mock<IFileManager> CreateMockFileManager()
         {
+			Logger.LogDebug(">>> Entering CreateMockFileManager()");
             var fm = new Mock<IFileManager>();
 
+			Logger.LogDebug("CreateMockFileManager(): fm → {Fm}", fm);
             fm.Setup(f => f.GetFile(It.IsAny<int>())).Returns((int fileId) => CreateRandomFile(fileId));
+			Logger.LogDebug("<<< Exiting CreateMockFileManager()");
             return fm;
         }
 
@@ -365,12 +416,15 @@ namespace DotNetNuke.Tests.Content.Mocks
 
         private static DataTable CreateContentItemTable()
         {
+			Logger.LogDebug(">>> Entering CreateContentItemTable()");
             // Create Categories table.
             DataTable table = new DataTable();
 
+			Logger.LogDebug("CreateContentItemTable(): table → {Table}", table);
             // Create columns, ID and Name.
             DataColumn idColumn = table.Columns.Add("ContentItemID", typeof(int));
             table.Columns.Add("Content", typeof(string));
+			Logger.LogDebug("CreateContentItemTable(): idColumn → {IdColumn}", idColumn);
             table.Columns.Add("ContentTypeID", typeof(int));
             table.Columns.Add("TabID", typeof(int));
             table.Columns.Add("ModuleID", typeof(int));
@@ -383,48 +437,63 @@ namespace DotNetNuke.Tests.Content.Mocks
 
             // Set the ID column as the primary key column.
             table.PrimaryKey = new[] { idColumn };
+			Logger.LogDebug("CreateContentItemTable(): table.PrimaryKey → {Arg0}", table.PrimaryKey);
 
+			Logger.LogDebug("<<< Exiting CreateContentItemTable()");
             return table;
         }
 
         private static DataTable CreateContentTypeTable()
         {
+			Logger.LogDebug(">>> Entering CreateContentTypeTable()");
             // Create ContentTypes table.
             DataTable table = new DataTable();
 
+			Logger.LogDebug("CreateContentTypeTable(): table → {Table}", table);
             // Create columns, ID and Name.
             DataColumn idColumn = table.Columns.Add("ContentTypeID", typeof(int));
             table.Columns.Add("ContentType", typeof(string));
+			Logger.LogDebug("CreateContentTypeTable(): idColumn → {IdColumn}", idColumn);
 
             // Set the ID column as the primary key column.
             table.PrimaryKey = new[] { idColumn };
+			Logger.LogDebug("CreateContentTypeTable(): table.PrimaryKey → {Arg0}", table.PrimaryKey);
 
+			Logger.LogDebug("<<< Exiting CreateContentTypeTable()");
             return table;
         }
 
         private static DataTable CreateScopeTypeTable()
         {
+			Logger.LogDebug(">>> Entering CreateScopeTypeTable()");
             // Create ScopeTypes table.
             DataTable table = new DataTable();
 
+			Logger.LogDebug("CreateScopeTypeTable(): table → {Table}", table);
             // Create columns, ID and Name.
             DataColumn idColumn = table.Columns.Add("ScopeTypeID", typeof(int));
             table.Columns.Add("ScopeType", typeof(string));
+			Logger.LogDebug("CreateScopeTypeTable(): idColumn → {IdColumn}", idColumn);
 
             // Set the ID column as the primary key column.
             table.PrimaryKey = new[] { idColumn };
+			Logger.LogDebug("CreateScopeTypeTable(): table.PrimaryKey → {Arg0}", table.PrimaryKey);
 
+			Logger.LogDebug("<<< Exiting CreateScopeTypeTable()");
             return table;
         }
 
         private static DataTable CreateTermTable()
         {
+			Logger.LogDebug(">>> Entering CreateTermTable()");
             // Create Vocabulary table.
             DataTable table = new DataTable();
 
+			Logger.LogDebug("CreateTermTable(): table → {Table}", table);
             // Create columns, ID and Name.
             DataColumn idColumn = table.Columns.Add("TermID", typeof(int));
             table.Columns.Add("ContentItemID", typeof(int));
+			Logger.LogDebug("CreateTermTable(): idColumn → {IdColumn}", idColumn);
             table.Columns.Add("VocabularyID", typeof(int));
             table.Columns.Add("Name", typeof(string));
             table.Columns.Add("Description", typeof(string));
@@ -436,18 +505,23 @@ namespace DotNetNuke.Tests.Content.Mocks
 
             // Set the ID column as the primary key column.
             table.PrimaryKey = new[] { idColumn };
+			Logger.LogDebug("CreateTermTable(): table.PrimaryKey → {Arg0}", table.PrimaryKey);
 
+			Logger.LogDebug("<<< Exiting CreateTermTable()");
             return table;
         }
 
         private static DataTable CreateVocabularyTable()
         {
+			Logger.LogDebug(">>> Entering CreateVocabularyTable()");
             // Create Vocabulary table.
             DataTable table = new DataTable();
 
+			Logger.LogDebug("CreateVocabularyTable(): table → {Table}", table);
             // Create columns, ID and Name.
             DataColumn idColumn = table.Columns.Add("VocabularyID", typeof(int));
             table.Columns.Add("VocabularyTypeID", typeof(int));
+			Logger.LogDebug("CreateVocabularyTable(): idColumn → {IdColumn}", idColumn);
             table.Columns.Add("IsSystem", typeof(bool));
             table.Columns.Add("Name", typeof(string));
             table.Columns.Add("Description", typeof(string));
@@ -458,13 +532,16 @@ namespace DotNetNuke.Tests.Content.Mocks
 
             // Set the ID column as the primary key column.
             table.PrimaryKey = new[] { idColumn };
+			Logger.LogDebug("CreateVocabularyTable(): table.PrimaryKey → {Arg0}", table.PrimaryKey);
 
+			Logger.LogDebug("<<< Exiting CreateVocabularyTable()");
             return table;
         }
 
         private static Mock<TMock> RegisterMockController<TMock>(Mock<TMock> mock)
             where TMock : class
         {
+			Logger.LogDebug(">>> Entering RegisterMockController(mock={Mock})", mock);
             if (ComponentFactory.Container == null)
             {
                 // Create a Container
@@ -474,6 +551,7 @@ namespace DotNetNuke.Tests.Content.Mocks
             // Try and get mock
             var getMock = ComponentFactory.GetComponent<Mock<TMock>>();
 
+			Logger.LogDebug("RegisterMockController(mock={Mock}): getMock → {GetMock}", mock, getMock);
             if (getMock == null)
             {
                 // Create the mock

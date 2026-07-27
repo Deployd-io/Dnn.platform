@@ -11,6 +11,7 @@ namespace DotNetNuke.Tests.Instance.Utilities
     /// <summary>Used to simulate an HttpRequest.</summary>
     public class SimulatedHttpRequest : SimpleWorkerRequest
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly string _host;
 
         /// <summary>
@@ -26,18 +27,23 @@ namespace DotNetNuke.Tests.Instance.Utilities
         public SimulatedHttpRequest(string appVirtualDir, string appPhysicalDir, string page, string query, TextWriter output, string host)
             : base(appVirtualDir, appPhysicalDir, page, query, output)
         {
+			Logger.LogDebug(">>> Entering SimulatedHttpRequest(appVirtualDir={AppVirtualDir},appPhysicalDir={AppPhysicalDir},page={Page},query={Query},output={Output},host={Host})", appVirtualDir, appPhysicalDir, page, output, host);
             if (string.IsNullOrEmpty(host))
             {
                 throw new ArgumentNullException("host", "Host cannot be null nor empty.");
             }
 
             this._host = host;
+			Logger.LogDebug("<<< Exiting SimulatedHttpRequest(appVirtualDir={AppVirtualDir},appPhysicalDir={AppPhysicalDir},page={Page},query={Query},output={Output},host={Host})", appVirtualDir, appPhysicalDir, page, output, host);
+			Logger.LogDebug("SimulatedHttpRequest(appVirtualDir={AppVirtualDir},appPhysicalDir={AppPhysicalDir},page={Page},query={Query},output={Output},host={Host}): this._host → {Arg6}", appVirtualDir, appPhysicalDir, page, output, host, this._host);
         }
 
         /// <summary>Gets the name of the server.</summary>
         /// <returns></returns>
         public override string GetServerName()
         {
+			Logger.LogDebug(">>> Entering GetServerName()");
+			Logger.LogDebug("<<< Exiting GetServerName()");
             return this._host;
         }
 
@@ -46,14 +52,18 @@ namespace DotNetNuke.Tests.Instance.Utilities
         /// <returns></returns>
         public override string MapPath(string virtualPath)
         {
+			Logger.LogDebug(">>> Entering MapPath(virtualPath={VirtualPath})", virtualPath);
             var path = string.Empty;
             var appPath = this.GetAppPath();
+			Logger.LogDebug("MapPath(virtualPath={VirtualPath}): path → {Path}", virtualPath, path);
+			Logger.LogDebug("MapPath(virtualPath={VirtualPath}): appPath → {AppPath}", virtualPath, appPath);
 
             if (appPath != null)
             {
                 path = Path.Combine(appPath, virtualPath);
             }
 
+			Logger.LogDebug("<<< Exiting MapPath(virtualPath={VirtualPath})", virtualPath);
             return path;
         }
     }

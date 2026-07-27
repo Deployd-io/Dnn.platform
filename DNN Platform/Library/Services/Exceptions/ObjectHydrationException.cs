@@ -10,6 +10,7 @@ namespace DotNetNuke.Services.Exceptions
 
     public class ObjectHydrationException : BasePortalException
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private List<string> columns;
         private Type type;
 
@@ -19,6 +20,11 @@ namespace DotNetNuke.Services.Exceptions
         public ObjectHydrationException(string message, Exception innerException)
             : base(message, innerException)
         {
+		Logger.LogDebug(">>> Entering ObjectHydrationException(message={Message},innerException={InnerException})", message, innerException);
+		Logger.LogDebug(">>> Entering ObjectHydrationException(message={Message},innerException={InnerException},type={Type},dr={Dr})", message, innerException, type, dr);
+		Logger.LogDebug("ObjectHydrationException(message={Message},innerException={InnerException},type={Type},dr={Dr}): type → {Type1}", message, innerException, type, dr, type);
+		Logger.LogDebug("<<< Exiting ObjectHydrationException(message={Message},innerException={InnerException})", message, innerException);
+		Logger.LogDebug("<<< Exiting ObjectHydrationException(message={Message},innerException={InnerException},type={Type},dr={Dr})", message, innerException, type, dr);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ObjectHydrationException"/> class.</summary>
@@ -31,6 +37,8 @@ namespace DotNetNuke.Services.Exceptions
         {
             this.type = type;
             this.columns = new List<string>();
+			Logger.LogDebug("ObjectHydrationException(message={Message},innerException={InnerException},type={Type},dr={Dr}): this.type → {Arg4}", message, innerException, type, dr, this.type);
+			Logger.LogDebug("ObjectHydrationException(message={Message},innerException={InnerException},type={Type},dr={Dr}): columns → {Columns}", message, innerException, type, dr, columns);
             foreach (DataRow row in dr.GetSchemaTable().Rows)
             {
                 this.columns.Add(row["ColumnName"].ToString());

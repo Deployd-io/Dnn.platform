@@ -38,6 +38,7 @@ namespace log4net.Util
     /// <author>Gert Driesen</author>
     public class FormattingInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Defaut Constructor
         /// </summary>
@@ -48,6 +49,8 @@ namespace log4net.Util
         /// </remarks>
         public FormattingInfo() 
         {
+		Logger.LogDebug(">>> Entering FormattingInfo()");
+		Logger.LogDebug("<<< Exiting FormattingInfo()");
         }
 
         /// <summary>
@@ -61,9 +64,16 @@ namespace log4net.Util
         /// </remarks>
         public FormattingInfo(int min, int max, bool leftAlign) 
         {
+			Logger.LogDebug(">>> Entering FormattingInfo(min={Min},max={Max},leftAlign={LeftAlign})", min, max, leftAlign);
             this.m_min = min;
             this.m_max = max;
+			Logger.LogDebug("FormattingInfo(min={Min},max={Max},leftAlign={LeftAlign}): this.m_min → {Arg3}", min, max, leftAlign, this.m_min);
+			Logger.LogDebug("FormattingInfo(min={Min},max={Max},leftAlign={LeftAlign}): m_max → {M_max}", min, max, leftAlign, m_max);
+			Logger.LogDebug("FormattingInfo(min={Min},max={Max},leftAlign={LeftAlign}): this.m_max → {Arg3}", min, max, leftAlign, this.m_max);
+			Logger.LogDebug("FormattingInfo(min={Min},max={Max},leftAlign={LeftAlign}): m_min → {M_min}", min, max, leftAlign, m_min);
             this.m_leftAlign = leftAlign;
+			Logger.LogDebug("<<< Exiting FormattingInfo(min={Min},max={Max},leftAlign={LeftAlign})", min, max, leftAlign);
+			Logger.LogDebug("FormattingInfo(min={Min},max={Max},leftAlign={LeftAlign}): this.m_leftAlign → {Arg3}", min, max, leftAlign, this.m_leftAlign);
         }
 
         /// <summary>

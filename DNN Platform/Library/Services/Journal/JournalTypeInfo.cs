@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.Journal
     [Serializable]
     public class JournalTypeInfo : IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public int JournalTypeId { get; set; }
 
         public int PortalId { get; set; }
@@ -55,6 +56,7 @@ namespace DotNetNuke.Services.Journal
         /// <inheritdoc />
         public void Fill(System.Data.IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.JournalTypeId = Null.SetNullInteger(dr["JournalTypeId"]);
             this.PortalId = Null.SetNullInteger(dr["PortalId"]);
             this.JournalType = Null.SetNullString(dr["JournalType"]);
@@ -66,6 +68,7 @@ namespace DotNetNuke.Services.Journal
             this.Options = Null.SetNullString(dr["Options"]);
             this.IsEnabled = Null.SetNullBoolean(dr["IsEnabled"]);
             this.EnableComments = Null.SetNullBoolean(dr["EnableComments"]);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

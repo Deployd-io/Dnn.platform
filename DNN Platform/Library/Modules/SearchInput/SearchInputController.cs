@@ -11,9 +11,12 @@ namespace DotNetNuke.Modules.SearchInput
 
     public class SearchInputController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public ArrayList GetSearchResultModules(int portalID)
         {
+			Logger.LogDebug(">>> Entering GetSearchResultModules(portalID={PortalID})", portalID);
+			Logger.LogDebug("<<< Exiting GetSearchResultModules(portalID={PortalID})", portalID);
             return CBO.FillCollection(DataProvider.Instance().GetSearchResultModules(portalID), typeof(SearchResultsModuleInfo));
         }
     }

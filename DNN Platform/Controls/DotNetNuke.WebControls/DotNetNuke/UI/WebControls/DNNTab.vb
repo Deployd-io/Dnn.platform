@@ -20,24 +20,31 @@ Namespace DotNetNuke.UI.WebControls
     Public Class DNNTab
         Inherits WebControl
         Implements INamingContainer
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(DNNTab))
         ' Events
         Public Event PreLoadPostData As PreLoadPostDataEventHandler
         Public Event SetupDefaults As SetupDefaultsEventHandler
 
         ' Methods
         Public Sub New()
+			Logger.LogDebug(">>> Entering New()")
             MyBase.New(HtmlTextWriterTag.Div)
             DNNTab.__ENCAddToList(Me)
             Me.m_oDNNTabLabel = New DNNTabLabel
+			Logger.LogDebug("New(): Me.m_oDNNTabLabel → {Arg0}", Me.m_oDNNTabLabel)
+			Logger.LogDebug("<<< Exiting New()")
+			Logger.LogDebug(">>> Entering New(LabelText={LabelText})", LabelText)
         End Sub
 
         Public Sub New(ByVal LabelText As String)
             Me.New()
             Me.Label.Text = LabelText
+			Logger.LogDebug("<<< Exiting New(LabelText={LabelText})", LabelText)
         End Sub
 
         <DebuggerNonUserCode> _
         Private Shared Sub __ENCAddToList(ByVal value As Object)
+			Logger.LogDebug(">>> Entering __ENCAddToList(value={Value})", value)
             SyncLock DNNTab.__ENCList
                 If (DNNTab.__ENCList.Count = DNNTab.__ENCList.Capacity) Then
                     Dim index As Integer = 0
@@ -62,9 +69,11 @@ Namespace DotNetNuke.UI.WebControls
                 End If
                 DNNTab.__ENCList.Add(New WeakReference(value))
             End SyncLock
+			Logger.LogDebug("<<< Exiting __ENCAddToList(value={Value})", value)
         End Sub
 
         Protected Overrides Sub AddAttributesToRender(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering AddAttributesToRender(writer={Writer})", writer)
             If Not Me.IsSelected Then
                 Me.Style.Add("display", "none")
             End If
@@ -72,9 +81,11 @@ Namespace DotNetNuke.UI.WebControls
             If (If(((Strings.Len(Me.ParentControl.DefaultContainerCssClass) <= 0) OrElse (Strings.Len(Me.CssClass) <> 0)), 0, 1) <> 0) Then
                 writer.AddAttribute("class", Me.ParentControl.DefaultContainerCssClass)
             End If
+			Logger.LogDebug("<<< Exiting AddAttributesToRender(writer={Writer})", writer)
         End Sub
 
         Protected Overrides Sub LoadViewState(ByVal savedState As Object)
+			Logger.LogDebug(">>> Entering LoadViewState(savedState={SavedState})", savedState)
             If (savedState Is Nothing) Then
                 MyBase.LoadViewState(savedState)
             Else
@@ -89,9 +100,11 @@ Namespace DotNetNuke.UI.WebControls
                     DirectCast(Me.Label, IStateManager).LoadViewState(objArray(1))
                 End If
             End If
+			Logger.LogDebug("<<< Exiting LoadViewState(savedState={SavedState})", savedState)
         End Sub
 
         Friend Function MarshalledProperties() As Hashtable
+			Logger.LogDebug(">>> Entering MarshalledProperties()")
             Dim hashtable2 As New Hashtable From { { "tid", Me.ID }, { "tcid", Me.ClientID } }
             If (Not WebControls.IsDesignMode AndAlso Not Me.ParentControl.IsDownLevel) Then
                 If (Me.TabRenderMode = DNNTabStrip.eTabRenderMode.CallBack) Then
@@ -107,6 +120,7 @@ Namespace DotNetNuke.UI.WebControls
                             Do While True
                                 If Not TypeOf parentControl Is HtmlForm Then
                                     parentControl = parentControl.Parent
+									Logger.LogDebug("MarshalledProperties(): parentControl → {ParentControl}", parentControl)
                                     If Not Object.ReferenceEquals(parentControl, Nothing) Then
                                         Continue Do
                                     End If
@@ -126,25 +140,32 @@ Namespace DotNetNuke.UI.WebControls
                     hashtable2.Add("cbtype", CInt(Me.CallBackType).ToString(CultureInfo.InvariantCulture))
                 End If
             End If
+			Logger.LogDebug("<<< Exiting MarshalledProperties()")
             Return hashtable2
         End Function
 
         Friend Sub RaisePreLoadPostData()
+			Logger.LogDebug(">>> Entering RaisePreLoadPostData()")
             Dim preLoadPostDataEvent As PreLoadPostDataEventHandler = Me.PreLoadPostDataEvent
             If Not Object.ReferenceEquals(preLoadPostDataEvent, Nothing) Then
                 preLoadPostDataEvent.Invoke
             End If
+			Logger.LogDebug("<<< Exiting RaisePreLoadPostData()")
         End Sub
 
         Friend Sub RaiseSetupDefaultsEvent(ByVal IsCallBack As Boolean)
+			Logger.LogDebug(">>> Entering RaiseSetupDefaultsEvent(IsCallBack={IsCallBack})", IsCallBack)
             Me.m_blnIsCallBack = IsCallBack
             Dim setupDefaultsEvent As SetupDefaultsEventHandler = Me.SetupDefaultsEvent
+			Logger.LogDebug("RaiseSetupDefaultsEvent(IsCallBack={IsCallBack}): Me.m_blnIsCallBack → {Arg1}", IsCallBack, Me.m_blnIsCallBack)
             If Not Object.ReferenceEquals(setupDefaultsEvent, Nothing) Then
                 setupDefaultsEvent.Invoke
             End If
+			Logger.LogDebug("<<< Exiting RaiseSetupDefaultsEvent(IsCallBack={IsCallBack})", IsCallBack)
         End Sub
 
         Friend Sub RenderLabel(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderLabel(writer={Writer})", writer)
             Dim cssClassSelected As String = Nothing
             Dim flag As Boolean = Not Object.ReferenceEquals(Me.ParentControl, Nothing)
             Dim label As New Label
@@ -152,6 +173,7 @@ Namespace DotNetNuke.UI.WebControls
             label.ID = (Me.ClientID & "_l")
             If Not Me.IsSelected Then
                 cssClassSelected = If(Me.Enabled, Me.Label.CssClass, Me.Label.CssClassDisabled)
+				Logger.LogDebug("RenderLabel(writer={Writer}): cssClassSelected → {CssClassSelected}", writer, cssClassSelected)
             ElseIf (If(((Strings.Len(Me.Label.CssClassSelected) <> 0) OrElse Not flag), 0, 1) <> 0) Then
                 cssClassSelected = Me.ParentControl.DefaultLabel.CssClassSelected
             End If
@@ -171,6 +193,7 @@ Namespace DotNetNuke.UI.WebControls
             End If
             If (Strings.Len(cssClassSelected) > 0) Then
                 label.CssClass = cssClassSelected
+				Logger.LogDebug("RenderLabel(writer={Writer}): label.CssClass → {Arg1}", writer, label.CssClass)
             End If
             If Not Me.Visible Then
                 label.Style.Add("display", "none")
@@ -185,6 +208,7 @@ Namespace DotNetNuke.UI.WebControls
                 }
                 If (Strings.Len(child.ImageUrl) = 0) Then
                     child.ImageUrl = Me.ParentControl.DefaultLabel.ImageUrl
+					Logger.LogDebug("RenderLabel(writer={Writer}): child.ImageUrl → {Arg1}", writer, child.ImageUrl)
                 End If
                 label.Controls.Add(child)
             End If
@@ -198,9 +222,11 @@ Namespace DotNetNuke.UI.WebControls
             End If
             label.Controls.Add(New LiteralControl(Me.Label.Text))
             label.RenderControl(writer)
+			Logger.LogDebug("<<< Exiting RenderLabel(writer={Writer})", writer)
         End Sub
 
         Protected Overrides Function SaveViewState() As Object
+			Logger.LogDebug(">>> Entering SaveViewState()")
             Dim objArray As Object() = New Object(1) {}
             objArray(0) = MyBase.SaveViewState
             objArray(1) = If(Object.ReferenceEquals(Me.m_oDNNTabLabel, Nothing), Nothing, DirectCast(Me.Label, IStateManager).SaveViewState)
@@ -211,6 +237,7 @@ Namespace DotNetNuke.UI.WebControls
                 Dim num3 As Integer = num2
                 If (index > num3) Then
                     obj2 = Nothing
+					Logger.LogDebug("SaveViewState(): obj2 → {Obj2}", obj2)
                 Else
                     If (objArray(index) Is Nothing) Then
                         index += 1
@@ -221,23 +248,32 @@ Namespace DotNetNuke.UI.WebControls
                 Return obj2
             Loop
 
+			Logger.LogDebug("<<< Exiting SaveViewState()")
             Return Nothing
         End Function
 
         Friend Sub SetParent(ByVal Parent As DNNTabStrip)
+			Logger.LogDebug(">>> Entering SetParent(Parent={Parent})", Parent)
             Me.m_oParentTabStrip = Parent
+			Logger.LogDebug("<<< Exiting SetParent(Parent={Parent})", Parent)
+			Logger.LogDebug("SetParent(Parent={Parent}): Me.m_oParentTabStrip → {Arg1}", Parent, Me.m_oParentTabStrip)
         End Sub
 
         Friend Sub SetTabState(ByVal IsPostBack As Boolean)
+			Logger.LogDebug(">>> Entering SetTabState(IsPostBack={IsPostBack})", IsPostBack)
             Me.m_blnIsPostBack = IsPostBack
+			Logger.LogDebug("<<< Exiting SetTabState(IsPostBack={IsPostBack})", IsPostBack)
+			Logger.LogDebug("SetTabState(IsPostBack={IsPostBack}): Me.m_blnIsPostBack → {Arg1}", IsPostBack, Me.m_blnIsPostBack)
         End Sub
 
         Protected Overrides Sub TrackViewState()
+			Logger.LogDebug(">>> Entering TrackViewState()")
             MyBase.TrackViewState()
 
             If Not Object.ReferenceEquals(Me.Label, Nothing) Then
                 DirectCast(Me.Label, IStateManager).TrackViewState()
             End If
+			Logger.LogDebug("<<< Exiting TrackViewState()")
         End Sub
 
 

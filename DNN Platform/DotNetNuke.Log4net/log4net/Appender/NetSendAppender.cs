@@ -141,6 +141,7 @@ namespace log4net.Appender
     /// <author>Gert Driesen</author>
     public class NetSendAppender : AppenderSkeleton 
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>The DNS or NetBIOS name of the server on which the function is to execute.</summary>
         private string m_server;
 
@@ -159,6 +160,8 @@ namespace log4net.Appender
         /// </remarks>
         public NetSendAppender() 
         {
+		Logger.LogDebug(">>> Entering NetSendAppender()");
+		Logger.LogDebug("<<< Exiting NetSendAppender()");
         }
 
         /// <summary>Gets or sets the sender of the message.</summary>
@@ -243,6 +246,7 @@ namespace log4net.Appender
         /// <exception cref="ArgumentNullException">The required property <see cref="Recipient" /> was not specified.</exception>
         public override void ActivateOptions()
         {
+			Logger.LogDebug(">>> Entering ActivateOptions()");
             base.ActivateOptions();
     
             if (this.Recipient == null) 
@@ -253,7 +257,9 @@ namespace log4net.Appender
             if (this.m_securityContext == null)
             {
                 this.m_securityContext = SecurityContextProvider.DefaultProvider.CreateSecurityContext(this);
+				Logger.LogDebug("ActivateOptions(): m_securityContext → {M_securityContext}", m_securityContext);
             }
+			Logger.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>This method is called by the <see cref="M:AppenderSkeleton.DoAppend(LoggingEvent)"/> method.</summary>
@@ -271,8 +277,10 @@ namespace log4net.Appender
 #endif
         protected override void Append(LoggingEvent loggingEvent) 
         {
+			Logger.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             NativeError nativeError = null;
 
+			Logger.LogDebug("Append(loggingEvent={LoggingEvent}): nativeError → {NativeError}", loggingEvent, nativeError);
             // Render the event in the callers security context
             string renderedLoggingEvent = this.RenderLoggingEvent(loggingEvent);
 
@@ -281,6 +289,7 @@ namespace log4net.Appender
                 // Send the message
                 int returnValue = NetMessageBufferSend(this.Server, this.Recipient, this.Sender, renderedLoggingEvent, renderedLoggingEvent.Length * Marshal.SystemDefaultCharSize);   
 
+				Logger.LogDebug("Append(loggingEvent={LoggingEvent}): returnValue → {ReturnValue}", loggingEvent, returnValue);
                 // Log the error if the message could not be sent
                 if (returnValue != 0) 
                 {
@@ -294,6 +303,7 @@ namespace log4net.Appender
                 // Handle the error over to the ErrorHandler
                 this.ErrorHandler.Error(nativeError.ToString() + " (Params: Server=" + this.Server + ", Recipient=" + this.Recipient + ", Sender=" + this.Sender + ")");
             }
+			Logger.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
         }
 
         /// <summary>This appender requires a <see cref="Layout"/> to be set.</summary>

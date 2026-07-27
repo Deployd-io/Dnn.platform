@@ -6,11 +6,14 @@ namespace DotNetNuke.Entities.Content.Workflow.Exceptions
 {
     public class WorkflowSecurityException : WorkflowException
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="WorkflowSecurityException"/> class.</summary>
         /// <param name="message">A message that describes the error.</param>
         public WorkflowSecurityException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering WorkflowSecurityException(message={Message})", message);
+		Logger.LogDebug("<<< Exiting WorkflowSecurityException(message={Message})", message);
         }
     }
 }

@@ -18,6 +18,7 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
 
     public class Member
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private UserInfo user;
         private UserInfo viewer;
         private PortalSettings settings;
@@ -27,9 +28,17 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         /// <param name="settings">The portal settings.</param>
         public Member(UserInfo user, PortalSettings settings)
         {
+			Logger.LogDebug(">>> Entering Member(user={User},settings={Settings})", user, settings);
             this.user = user;
             this.settings = settings;
+			Logger.LogDebug("Member(user={User},settings={Settings}): this.user → {Arg2}", user, settings, this.user);
+			Logger.LogDebug("Member(user={User},settings={Settings}): settings → {Settings1}", user, settings, settings);
+			Logger.LogDebug("Member(user={User},settings={Settings}): this.settings → {Arg2}", user, settings, this.settings);
+			Logger.LogDebug("Member(user={User},settings={Settings}): user → {User1}", user, settings, user);
             this.viewer = settings.UserInfo;
+			Logger.LogDebug("<<< Exiting Member(user={User},settings={Settings})", user, settings);
+			Logger.LogDebug("Member(user={User},settings={Settings}): viewer → {Viewer}", user, settings, viewer);
+			Logger.LogDebug("Member(user={User},settings={Settings}): this.viewer → {Arg2}", user, settings, this.viewer);
         }
 
         public int MemberId
@@ -146,9 +155,11 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         /// <returns>property value.</returns>
         private string GetProfileProperty(string propertyName)
         {
+			Logger.LogDebug(">>> Entering GetProfileProperty(propertyName={PropertyName})", propertyName);
             var profileProperties = this.ProfileProperties;
             string value;
 
+			Logger.LogDebug("<<< Exiting GetProfileProperty(propertyName={PropertyName})", propertyName);
             return profileProperties.TryGetValue(propertyName, out value) ? value : string.Empty;
         }
     }

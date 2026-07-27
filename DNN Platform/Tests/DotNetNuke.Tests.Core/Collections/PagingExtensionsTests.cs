@@ -13,17 +13,22 @@ namespace DotNetNuke.Tests.Core.Collections
     [TestFixture]
     public class PagingExtensionsTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [Test]
         public void PagingExtensions_InPagesOf_Returns_PageSelector()
         {
+			Logger.LogDebug(">>> Entering PagingExtensions_InPagesOf_Returns_PageSelector()");
             // Arrange
             IQueryable<int> queryable = Util.CreateIntegerList(Constants.PAGE_TotalCount).AsQueryable();
 
+			Logger.LogDebug("PagingExtensions_InPagesOf_Returns_PageSelector(): queryable → {Queryable}", queryable);
             // Act
             PageSelector<int> pageSelector = queryable.InPagesOf(Constants.PAGE_RecordCount);
 
+			Logger.LogDebug("PagingExtensions_InPagesOf_Returns_PageSelector(): pageSelector → {PageSelector}", pageSelector);
             // Assert
             Assert.That(pageSelector, Is.InstanceOf<PageSelector<int>>());
+			Logger.LogDebug("<<< Exiting PagingExtensions_InPagesOf_Returns_PageSelector()");
         }
 
         [Test]
@@ -33,14 +38,18 @@ namespace DotNetNuke.Tests.Core.Collections
         [TestCase(4, 4)]
         public void PagingExtensions_ToPagedList_Returns_PagedList_From_Enumerable(int index, int pageSize)
         {
+			Logger.LogDebug(">>> Entering PagingExtensions_ToPagedList_Returns_PagedList_From_Enumerable(index={Index},pageSize={PageSize})", index, pageSize);
             // Arrange
             List<int> enumerable = Util.CreateIntegerList(Constants.PAGE_TotalCount);
 
+			Logger.LogDebug("PagingExtensions_ToPagedList_Returns_PagedList_From_Enumerable(index={Index},pageSize={PageSize}): enumerable → {Enumerable}", index, pageSize, enumerable);
             // Act
             IPagedList<int> pagedList = enumerable.ToPagedList(index, pageSize);
 
+			Logger.LogDebug("PagingExtensions_ToPagedList_Returns_PagedList_From_Enumerable(index={Index},pageSize={PageSize}): pagedList → {PagedList}", index, pageSize, pagedList);
             // Assert
             Assert.That(pagedList, Is.InstanceOf<IPagedList<int>>());
+			Logger.LogDebug("<<< Exiting PagingExtensions_ToPagedList_Returns_PagedList_From_Enumerable(index={Index},pageSize={PageSize})", index, pageSize);
         }
 
         [Test]
@@ -72,14 +81,18 @@ namespace DotNetNuke.Tests.Core.Collections
         [TestCase(4, 4)]
         public void PagingExtensions_ToPagedList_Returns_PagedList_From_Queryable(int index, int pageSize)
         {
+			Logger.LogDebug(">>> Entering PagingExtensions_ToPagedList_Returns_PagedList_From_Queryable(index={Index},pageSize={PageSize})", index, pageSize);
             // Arrange
             IQueryable<int> queryable = Util.CreateIntegerList(Constants.PAGE_TotalCount).AsQueryable();
 
+			Logger.LogDebug("PagingExtensions_ToPagedList_Returns_PagedList_From_Queryable(index={Index},pageSize={PageSize}): queryable → {Queryable}", index, pageSize, queryable);
             // Act
             IPagedList<int> pagedList = queryable.ToPagedList(index, pageSize);
 
+			Logger.LogDebug("PagingExtensions_ToPagedList_Returns_PagedList_From_Queryable(index={Index},pageSize={PageSize}): pagedList → {PagedList}", index, pageSize, pagedList);
             // Assert
             Assert.That(pagedList, Is.InstanceOf<IPagedList<int>>());
+			Logger.LogDebug("<<< Exiting PagingExtensions_ToPagedList_Returns_PagedList_From_Queryable(index={Index},pageSize={PageSize})", index, pageSize);
         }
 
         [Test]

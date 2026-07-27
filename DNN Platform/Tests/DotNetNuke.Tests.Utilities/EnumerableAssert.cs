@@ -13,7 +13,9 @@ namespace DotNetNuke.Tests.Utilities
     {
         public static void ElementsAreEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual)
         {
+			Logger.LogDebug(">>> Entering ElementsAreEqual(expected={Expected},actual={Actual})", expected, actual);
             ElementsMatch(expected, actual, (e, a) => Equals(e, a));
+			Logger.LogDebug("<<< Exiting ElementsAreEqual(expected={Expected},actual={Actual})", expected, actual);
         }
 
         public static void ElementsAreEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual, string message)
@@ -46,6 +48,7 @@ namespace DotNetNuke.Tests.Utilities
                 using (Assert.EnterMultipleScope())
                 {
                     Assert.That(expectedEnumerator.MoveNext(), Is.True);
+					private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                     Assert.That(matcher(expectedEnumerator.Current, actualEnumerator.Current), Is.True, () => string.Format(message, args));
                 }
             }

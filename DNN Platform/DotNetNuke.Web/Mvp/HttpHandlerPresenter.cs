@@ -14,11 +14,14 @@ namespace DotNetNuke.Web.Mvp
     public abstract partial class HttpHandlerPresenter<TView> : Presenter<TView>
         where TView : class, IHttpHandlerView
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="HttpHandlerPresenter{TView}"/> class.</summary>
         /// <param name="view">The view.</param>
         protected HttpHandlerPresenter(TView view)
             : base(view)
         {
+		Logger.LogDebug(">>> Entering HttpHandlerPresenter(view={View})", view);
+		Logger.LogDebug("<<< Exiting HttpHandlerPresenter(view={View})", view);
         }
     }
 }

@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.Localization.Internal
 
     public class TestableLocalization : ServiceLocator<ILocalization, TestableLocalization>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         protected override Func<ILocalization> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new LocalizationImpl();
         }
     }
