@@ -15,6 +15,7 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
     /// <summary>Deletes files.</summary>
     internal sealed class DeleteFilesStep : StepBase, IDeleteFilesStep
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IFileSystemProvider fileSystemProvider;
         private readonly IApplicationStatusInfo applicationStatusInfo;
 
@@ -52,10 +53,15 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         /// <inheritdoc />
         protected override void ExecuteInternal()
         {
+			Logger.LogDebug(">>> Entering ExecuteInternal()");
             var count = 0;
             var appPath = this.applicationStatusInfo.ApplicationMapPath + @"\";
+			Logger.LogDebug("ExecuteInternal(): count → {Count}", count);
+			Logger.LogDebug("ExecuteInternal(): appPath → {AppPath}", appPath);
             var fullPath = Path.GetFullPath(Path.Combine(appPath, this.RelativePath));
             var files = this.fileSystemProvider.EnumerateFiles(fullPath, this.SearchPattern, this.SearchOption);
+			Logger.LogDebug("ExecuteInternal(): fullPath → {FullPath}", fullPath);
+			Logger.LogDebug("ExecuteInternal(): files → {Files}", files);
 
             foreach (var file in files)
             {
@@ -64,7 +70,9 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
             }
 
             this.Success = true;
+			Logger.LogDebug("ExecuteInternal(): this.Success → {Arg0}", this.Success);
             this.Notes = this.LocalizeFormat("UninstallStepCountOfFilesDeleted", count);
+			Logger.LogDebug("<<< Exiting ExecuteInternal()");
         }
     }
 }

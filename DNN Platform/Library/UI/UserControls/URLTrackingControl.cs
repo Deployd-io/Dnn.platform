@@ -21,6 +21,7 @@ namespace DotNetNuke.UI.UserControls
 
     public abstract class URLTrackingControl : UserControlBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         // ReSharper disable InconsistentNaming
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Breaking Change")]
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
@@ -161,6 +162,7 @@ namespace DotNetNuke.UI.UserControls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.cmdDisplay.Click += this.CmdDisplay_Click;
@@ -177,20 +179,27 @@ namespace DotNetNuke.UI.UserControls
                         this.lblLogURL.Text = this.URL; // saved for loading Log grid
                         TabType urlType = Globals.GetURLType(this.URL);
                         if (urlType == TabType.File && !this.URL.StartsWith("fileid=", StringComparison.OrdinalIgnoreCase))
+						Logger.LogDebug("OnLoad(e={E}): urlType → {UrlType}", e, urlType);
                         {
                             // to handle legacy scenarios before the introduction of the FileServerHandler
                             var fileName = Path.GetFileName(this.URL);
 
+							Logger.LogDebug("OnLoad(e={E}): fileName → {FileName}", e, fileName);
                             var folderPath = this.URL.Substring(0, this.URL.LastIndexOf(fileName, StringComparison.OrdinalIgnoreCase));
                             var folder = FolderManager.Instance.GetFolder(this.PortalSettings.PortalId, folderPath);
+							Logger.LogDebug("OnLoad(e={E}): folderPath → {FolderPath}", e, folderPath);
+							Logger.LogDebug("OnLoad(e={E}): folder → {Folder}", e, folder);
 
                             var file = FileManager.Instance.GetFile(folder, fileName);
 
+							Logger.LogDebug("OnLoad(e={E}): file → {File}", e, file);
                             this.lblLogURL.Text = "FileID=" + file.FileId;
                         }
 
                         var objUrls = new UrlController();
                         UrlTrackingInfo objUrlTracking = objUrls.GetUrlTracking(this.PortalSettings.PortalId, this.lblLogURL.Text, this.ModuleID);
+						Logger.LogDebug("OnLoad(e={E}): objUrls → {ObjUrls}", e, objUrls);
+						Logger.LogDebug("OnLoad(e={E}): objUrlTracking → {ObjUrlTracking}", e, objUrlTracking);
                         if (objUrlTracking != null)
                         {
                             if (string.IsNullOrEmpty(this.FormattedURL))
@@ -244,33 +253,40 @@ namespace DotNetNuke.UI.UserControls
                     else
                     {
                         this.Visible = false;
+						Logger.LogDebug("OnLoad(e={E}): this.Visible → {Arg1}", e, this.Visible);
                     }
                 }
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         private void CmdDisplay_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering CmdDisplay_Click(sender={Sender},e={E})", sender, e);
             try
             {
                 string strStartDate = this.txtStartDate.Text;
                 if (!string.IsNullOrEmpty(strStartDate))
+				Logger.LogDebug("CmdDisplay_Click(sender={Sender},e={E}): strStartDate → {StrStartDate}", sender, e, strStartDate);
                 {
                     strStartDate = strStartDate + " 00:00";
                 }
 
                 string strEndDate = this.txtEndDate.Text;
                 if (!string.IsNullOrEmpty(strEndDate))
+				Logger.LogDebug("CmdDisplay_Click(sender={Sender},e={E}): strEndDate → {StrEndDate}", sender, e, strEndDate);
                 {
                     strEndDate = strEndDate + " 23:59";
                 }
 
                 var objUrls = new UrlController();
 
+				Logger.LogDebug("CmdDisplay_Click(sender={Sender},e={E}): objUrls → {ObjUrls}", sender, e, objUrls);
                 // localize datagrid
                 Localization.LocalizeDataGrid(ref this.grdLog, this.LocalResourceFile);
                 this.grdLog.DataSource = objUrls.GetUrlLog(
@@ -283,8 +299,10 @@ namespace DotNetNuke.UI.UserControls
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in CmdDisplay_Click(sender={Sender},e={E}): {Arg2}", sender, e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting CmdDisplay_Click(sender={Sender},e={E})", sender, e);
         }
     }
 }

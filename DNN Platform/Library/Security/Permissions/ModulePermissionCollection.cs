@@ -17,9 +17,12 @@ namespace DotNetNuke.Security.Permissions
     [Serializable]
     public class ModulePermissionCollection : GenericCollectionBase<ModulePermissionInfo>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ModulePermissionCollection"/> class.</summary>
         public ModulePermissionCollection()
         {
+		Logger.LogDebug(">>> Entering ModulePermissionCollection()");
+		Logger.LogDebug("<<< Exiting ModulePermissionCollection()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModulePermissionCollection"/> class.</summary>
@@ -27,6 +30,8 @@ namespace DotNetNuke.Security.Permissions
         public ModulePermissionCollection(ArrayList modulePermissions)
         {
             this.AddRange(modulePermissions);
+			Logger.LogDebug(">>> Entering ModulePermissionCollection(modulePermissions={ModulePermissions})", modulePermissions);
+			Logger.LogDebug("<<< Exiting ModulePermissionCollection(modulePermissions={ModulePermissions})", modulePermissions);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModulePermissionCollection"/> class.</summary>
@@ -41,6 +46,7 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="moduleID">The ID of the module by which to filter <paramref name="modulePermissions"/>.</param>
         public ModulePermissionCollection(ArrayList modulePermissions, int moduleID)
         {
+			Logger.LogDebug(">>> Entering ModulePermissionCollection(modulePermissions={ModulePermissions},moduleID={ModuleID})", modulePermissions, moduleID);
             foreach (ModulePermissionInfo permission in modulePermissions)
             {
                 if (permission.ModuleID == moduleID)
@@ -48,12 +54,14 @@ namespace DotNetNuke.Security.Permissions
                     this.Add(permission);
                 }
             }
+			Logger.LogDebug("<<< Exiting ModulePermissionCollection(modulePermissions={ModulePermissions},moduleID={ModuleID})", modulePermissions, moduleID);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModulePermissionCollection"/> class.</summary>
         /// <param name="objModule">A module from which to copy <see cref="ModuleInfo.ModulePermissions"/>.</param>
         public ModulePermissionCollection(ModuleInfo objModule)
         {
+			Logger.LogDebug(">>> Entering ModulePermissionCollection(objModule={ObjModule})", objModule);
             foreach (ModulePermissionInfo permission in objModule.ModulePermissions)
             {
                 if (permission.ModuleID == objModule.ModuleID)
@@ -61,12 +69,15 @@ namespace DotNetNuke.Security.Permissions
                     this.Add(permission);
                 }
             }
+			Logger.LogDebug("<<< Exiting ModulePermissionCollection(objModule={ObjModule})", objModule);
         }
 
         public int Add(ModulePermissionInfo value, bool checkForDuplicates)
         {
+			Logger.LogDebug(">>> Entering Add(value={Value},checkForDuplicates={CheckForDuplicates})", value, checkForDuplicates);
             int id = Null.NullInteger;
             if (!checkForDuplicates)
+			Logger.LogDebug("Add(value={Value},checkForDuplicates={CheckForDuplicates}): id → {Id}", value, checkForDuplicates, id);
             {
                 id = this.Add(value);
             }
@@ -75,6 +86,7 @@ namespace DotNetNuke.Security.Permissions
                 bool isMatch = false;
                 foreach (IPermissionInfo permission in this.List)
                 {
+				Logger.LogDebug("Add(value={Value},checkForDuplicates={CheckForDuplicates}): isMatch → {IsMatch}", value, checkForDuplicates, isMatch);
                     if (permission.PermissionId == value.PermissionID && permission.UserId == value.UserID && permission.RoleId == value.RoleID)
                     {
                         isMatch = true;
@@ -88,6 +100,7 @@ namespace DotNetNuke.Security.Permissions
                 }
             }
 
+			Logger.LogDebug("<<< Exiting Add(value={Value},checkForDuplicates={CheckForDuplicates})", value, checkForDuplicates);
             return id;
         }
 
@@ -97,6 +110,8 @@ namespace DotNetNuke.Security.Permissions
             {
                 this.Add(permission);
             }
+			Logger.LogDebug(">>> Entering AddRange(modulePermissions={ModulePermissions})", modulePermissions);
+			Logger.LogDebug("<<< Exiting AddRange(modulePermissions={ModulePermissions})", modulePermissions);
         }
 
         public void AddRange(ModulePermissionCollection modulePermissions)
@@ -109,6 +124,7 @@ namespace DotNetNuke.Security.Permissions
 
         public bool CompareTo(ModulePermissionCollection objModulePermissionCollection)
         {
+			Logger.LogDebug(">>> Entering CompareTo(objModulePermissionCollection={ObjModulePermissionCollection})", objModulePermissionCollection);
             if (objModulePermissionCollection.Count != this.Count)
             {
                 return false;
@@ -124,11 +140,13 @@ namespace DotNetNuke.Security.Permissions
                 }
             }
 
+			Logger.LogDebug("<<< Exiting CompareTo(objModulePermissionCollection={ObjModulePermissionCollection})", objModulePermissionCollection);
             return true;
         }
 
         public void Remove(int permissionID, int roleID, int userID)
         {
+			Logger.LogDebug(">>> Entering Remove(permissionID={PermissionID},roleID={RoleID},userID={UserID})", permissionID, roleID, userID);
             var idx = 0;
             foreach (PermissionInfoBase permission in this.List)
             {
@@ -140,15 +158,20 @@ namespace DotNetNuke.Security.Permissions
 
                 idx++;
             }
+			Logger.LogDebug("<<< Exiting Remove(permissionID={PermissionID},roleID={RoleID},userID={UserID})", permissionID, roleID, userID);
         }
 
         public List<PermissionInfoBase> ToList()
         {
+			Logger.LogDebug(">>> Entering ToList()");
+			Logger.LogDebug("<<< Exiting ToList()");
             return [..this.List.Cast<PermissionInfoBase>()];
         }
 
         public string ToString(string key)
         {
+			Logger.LogDebug(">>> Entering ToString(key={Key})", key);
+			Logger.LogDebug("<<< Exiting ToString(key={Key})", key);
             return PermissionController.BuildPermissions(this.List, key);
         }
 

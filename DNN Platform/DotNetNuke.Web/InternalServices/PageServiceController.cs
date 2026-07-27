@@ -28,6 +28,7 @@ namespace DotNetNuke.Web.InternalServices
     [DnnPageEditor]
     public class PageServiceController : DnnApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IPortalController portalController;
         private readonly IHostSettings hostSettings;
         private readonly IHostSettingsService hostSettingsService;
@@ -38,6 +39,11 @@ namespace DotNetNuke.Web.InternalServices
         public PageServiceController()
             : this(null, null, null)
         {
+		Logger.LogDebug(">>> Entering PageServiceController()");
+		Logger.LogDebug("<<< Exiting PageServiceController()");
+		Logger.LogDebug(">>> Entering PageServiceController(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService})", portalController, hostSettings, hostSettingsService);
+		Logger.LogDebug("PageServiceController(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): hostSettings → {HostSettings1}", portalController, hostSettings, hostSettingsService, hostSettings);
+		Logger.LogDebug("<<< Exiting PageServiceController(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService})", portalController, hostSettings, hostSettingsService);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PageServiceController"/> class.</summary>
@@ -48,7 +54,9 @@ namespace DotNetNuke.Web.InternalServices
         {
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("PageServiceController(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): portalController → {PortalController1}", portalController, hostSettings, hostSettingsService, portalController);
             this.hostSettingsService = hostSettingsService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
+			Logger.LogDebug("PageServiceController(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): hostSettingsService → {HostSettingsService1}", portalController, hostSettings, hostSettingsService, hostSettingsService);
         }
 
         /// <summary>Gets the portal ID.</summary>
@@ -73,10 +81,13 @@ namespace DotNetNuke.Web.InternalServices
         [DnnPagePermission]
         public HttpResponseMessage PublishPage(PublishPageDto dto)
         {
+			Logger.LogDebug(">>> Entering PublishPage(dto={Dto})", dto);
             var tabId = this.Request.FindTabId();
 
+			Logger.LogDebug("PublishPage(dto={Dto}): tabId → {TabId}", dto, tabId);
             TabPublishingController.Instance.SetTabPublishing(tabId, this.PortalId, dto.Publish);
 
+			Logger.LogDebug("<<< Exiting PublishPage(dto={Dto})", dto);
             return this.Request.CreateResponse(HttpStatusCode.OK);
         }
 
@@ -87,11 +98,14 @@ namespace DotNetNuke.Web.InternalServices
         [ValidateAntiForgeryToken]
         public HttpResponseMessage UpdateCustomUrl(SaveUrlDto dto)
         {
+			Logger.LogDebug(">>> Entering UpdateCustomUrl(dto={Dto})", dto);
             var urlPath = dto.Path.ValueOrEmpty().TrimStart('/');
 
+			Logger.LogDebug("UpdateCustomUrl(dto={Dto}): urlPath → {UrlPath}", dto, urlPath);
             // Clean Url
             var options = UrlRewriterUtils.ExtendOptionsForCustomURLs(UrlRewriterUtils.GetOptionsFromSettings(new FriendlyUrlSettings(this.portalController, this.hostSettings, this.hostSettingsService, this.PortalSettings.PortalId)));
 
+			Logger.LogDebug("UpdateCustomUrl(dto={Dto}): options → {Options}", dto, options);
             // now clean the path
             urlPath = FriendlyUrlController.CleanNameForUrl(urlPath, options, out var modified);
             if (modified)
@@ -104,6 +118,9 @@ namespace DotNetNuke.Web.InternalServices
                         ErrorMessage = Localization.GetString("CustomUrlPathCleaned.Error", Localization.GlobalResourceFile),
                         SuggestedUrlPath = "/" + urlPath,
                     });
+						Logger.LogDebug("UpdateCustomUrl(dto={Dto}): Success → {Success}", dto, Success);
+						Logger.LogDebug("UpdateCustomUrl(dto={Dto}): ErrorMessage → {ErrorMessage}", dto, ErrorMessage);
+						Logger.LogDebug("UpdateCustomUrl(dto={Dto}): SuggestedUrlPath → {SuggestedUrlPath}", dto, SuggestedUrlPath);
             }
 
             // Validate for uniqueness
@@ -152,6 +169,8 @@ namespace DotNetNuke.Web.InternalServices
                 {
                     // Change the original 200 url to a redirect
                     tabUrl.HttpStatus = "301";
+					Logger.LogDebug("UpdateCustomUrl(dto={Dto}): tabUrl.HttpStatus → {Arg1}", dto, tabUrl.HttpStatus);
+					Logger.LogDebug("UpdateCustomUrl(dto={Dto}): tabUrl.SeqNum → {Arg1}", dto, tabUrl.SeqNum);
                     tabUrl.SeqNum = dto.Id;
                     TabController.Instance.SaveTabUrl(tabUrl, this.PortalId, true);
 
@@ -185,6 +204,7 @@ namespace DotNetNuke.Web.InternalServices
                 Success = true,
             };
 
+			Logger.LogDebug("<<< Exiting UpdateCustomUrl(dto={Dto})", dto);
             return this.Request.CreateResponse(HttpStatusCode.OK, response);
         }
     }

@@ -8,14 +8,17 @@ namespace DotNetNuke.Services.Authentication.OAuth
     /// <summary>Comparer class used to perform the sorting of the query parameters.</summary>
     internal class QueryParameterComparer : IComparer<QueryParameter>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public int Compare(QueryParameter x, QueryParameter y)
         {
+			Logger.LogDebug(">>> Entering Compare(x={X},y={Y})", x, y);
             if (x.Name == y.Name)
             {
                 return string.CompareOrdinal(x.Value, y.Value);
             }
 
+			Logger.LogDebug("<<< Exiting Compare(x={X},y={Y})", x, y);
             return string.CompareOrdinal(x.Name, y.Name);
         }
     }

@@ -14,6 +14,7 @@ namespace DotNetNuke.Framework.Reflections
 
     public class TypeLocator : ITypeLocator, IAssemblyLocator
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly HashSet<string> IgnoreAssemblies = new(StringComparer.OrdinalIgnoreCase)
         {
             "DotNetNuke.Authentication.Facebook",
@@ -64,20 +65,25 @@ namespace DotNetNuke.Framework.Reflections
         {
             get { return this.assemblyLocator ?? (this.assemblyLocator = this); }
             set { this.assemblyLocator = value; }
+			Logger.LogDebug(">>> Entering CanScan(assembly={Assembly})", assembly);
+			Logger.LogDebug("<<< Exiting CanScan(assembly={Assembly})", assembly);
         }
 
         /// <inheritdoc />
         public IEnumerable<Type> GetAllMatchingTypes(Predicate<Type> predicate)
         {
+			Logger.LogDebug(">>> Entering GetAllMatchingTypes(predicate={Predicate})", predicate);
             foreach (var assembly in this.AssemblyLocator.Assemblies)
             {
                 Type[] types;
                 try
                 {
                     types = assembly.GetTypes();
+					Logger.LogDebug("GetAllMatchingTypes(predicate={Predicate}): types → {Types}", predicate, types);
                 }
                 catch (ReflectionTypeLoadException ex)
                 {
+					Logger.LogError("Exception in GetAllMatchingTypes(predicate={Predicate}): {Arg1}", predicate, ex.Message);
                     // some assemblies don't want to be reflected, but they still
                     // expose types in the exception
                     types = ex.Types ?? [];
@@ -94,6 +100,7 @@ namespace DotNetNuke.Framework.Reflections
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting GetAllMatchingTypes(predicate={Predicate})", predicate);
         }
 
         private static bool CanScan(Assembly assembly)

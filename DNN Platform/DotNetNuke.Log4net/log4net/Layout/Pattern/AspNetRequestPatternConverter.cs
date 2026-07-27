@@ -30,6 +30,7 @@ using log4net.Util;
 
 namespace log4net.Layout.Pattern
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Converter for items in the ASP.Net Cache.
     /// </summary>
@@ -56,13 +57,16 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         protected override void Convert(TextWriter writer, LoggingEvent loggingEvent, HttpContext httpContext)
         {
+			Logger.LogDebug(">>> Entering Convert(writer={Writer},loggingEvent={LoggingEvent},httpContext={HttpContext})", writer, loggingEvent, httpContext);
             HttpRequest request = null;
             try 
+			Logger.LogDebug("Convert(writer={Writer},loggingEvent={LoggingEvent},httpContext={HttpContext}): request → {Request}", writer, loggingEvent, httpContext, request);
             {
             request = httpContext.Request;
             } 
             catch (HttpException)
             {
+			Logger.LogError("Exception in Convert(writer={Writer},loggingEvent={LoggingEvent},httpContext={HttpContext}): {Arg3}", writer, loggingEvent, httpContext, ex.Message);
             // likely a case of running in IIS integrated mode
             // when inside an Application_Start event.
             // treat it like a case of the Request
@@ -84,6 +88,7 @@ namespace log4net.Layout.Pattern
             {
                 writer.Write(SystemInfo.NotAvailableText);
             }
+			Logger.LogDebug("<<< Exiting Convert(writer={Writer},loggingEvent={LoggingEvent},httpContext={HttpContext})", writer, loggingEvent, httpContext);
         }
     }
 }

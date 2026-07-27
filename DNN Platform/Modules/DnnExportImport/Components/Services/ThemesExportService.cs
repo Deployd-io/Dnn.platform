@@ -39,13 +39,16 @@ namespace Dnn.ExportImport.Components.Services
         public ThemesExportService()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering ThemesExportService()");
         }
+		Logger.LogDebug("<<< Exiting ThemesExportService()");
 
         /// <summary>Initializes a new instance of the <see cref="ThemesExportService"/> class.</summary>
         /// <param name="appStatus">The application status.</param>
         public ThemesExportService(IApplicationStatusInfo appStatus)
         {
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			Logger.LogDebug("ThemesExportService(appStatus={AppStatus}): appStatus → {AppStatus1}", appStatus, appStatus);
         }
 
         /// <inheritdoc />
@@ -60,6 +63,7 @@ namespace Dnn.ExportImport.Components.Services
         /// <inheritdoc />
         public override void ExportData(ExportImportJob exportJob, ExportDto exportDto)
         {
+			Logger.LogDebug(">>> Entering ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
             if (this.CheckCancelled(exportJob))
             {
                 return;
@@ -72,8 +76,11 @@ namespace Dnn.ExportImport.Components.Services
             }
 
             this.exportImportJob = exportJob;
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): exportImportJob → {ExportImportJob}", exportJob, exportDto, exportImportJob);
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): this.exportImportJob → {Arg2}", exportJob, exportDto, this.exportImportJob);
             this.portalSettings = new PortalSettings(exportJob.PortalId);
 
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): portalSettings → {PortalSettings}", exportJob, exportDto, portalSettings);
             // Create Zip File to hold files
             var currentIndex = 0;
             var totalThemesExported = 0;
@@ -81,12 +88,15 @@ namespace Dnn.ExportImport.Components.Services
             {
                 var packagesZipFileFormat = $@"{this.appStatus.ApplicationMapPath}{Constants.ExportFolder}{{0}}\{Constants.ExportZipThemes}";
                 var packagesZipFile = string.Format(CultureInfo.InvariantCulture, packagesZipFileFormat, exportJob.Directory.TrimEnd('\\').TrimEnd('/'));
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): packagesZipFileFormat → {PackagesZipFileFormat}", exportJob, exportDto, packagesZipFileFormat);
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): packagesZipFile → {PackagesZipFile}", exportJob, exportDto, packagesZipFile);
 
                 if (this.CheckPoint.Stage == 0)
                 {
                     // export skin packages.
                     var exportThemes = this.GetExportThemes();
                     var totalThemes = exportThemes.Count;
+					Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): exportThemes → {ExportThemes}", exportJob, exportDto, exportThemes);
 
                     // Update the total items count in the check points. This should be updated only once.
                     this.CheckPoint.TotalItems = this.CheckPoint.TotalItems <= 0 ? totalThemes : this.CheckPoint.TotalItems;
@@ -101,12 +111,15 @@ namespace Dnn.ExportImport.Components.Services
                         {
                             var filePath = SkinController.FormatSkinSrc(theme, this.portalSettings);
                             var physicalPath = Path.Combine(this.appStatus.ApplicationMapPath, filePath.TrimStart('/'));
+							Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): filePath → {FilePath}", exportJob, exportDto, filePath);
+							Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): physicalPath → {PhysicalPath}", exportJob, exportDto, physicalPath);
                             if (Directory.Exists(physicalPath))
                             {
                                 foreach (var file in Directory.GetFiles(physicalPath, "*.*", SearchOption.AllDirectories))
                                 {
                                     var folderOffset = Path.Combine(this.appStatus.ApplicationMapPath, "Portals").Length + 1;
                                     CompressionUtil.AddFileToArchive(archive, file, folderOffset);
+									Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): folderOffset → {FolderOffset}", exportJob, exportDto, folderOffset);
                                 }
 
                                 totalThemesExported += 1;
@@ -139,6 +152,7 @@ namespace Dnn.ExportImport.Components.Services
         /// <inheritdoc />
         public override void ImportData(ExportImportJob importJob, ImportDto importDto)
         {
+			Logger.LogDebug(">>> Entering ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
             if (this.CheckCancelled(importJob))
             {
                 return;
@@ -151,16 +165,24 @@ namespace Dnn.ExportImport.Components.Services
             }
 
             this.exportImportJob = importJob;
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): exportImportJob → {ExportImportJob}", importJob, importDto, exportImportJob);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): this.exportImportJob → {Arg2}", importJob, importDto, this.exportImportJob);
 
             var packageZipFile = $"{this.appStatus.ApplicationMapPath}{Constants.ExportFolder}{this.exportImportJob.Directory.TrimEnd('\\', '/')}\\{Constants.ExportZipThemes}";
             var tempFolder = $"{Path.GetDirectoryName(packageZipFile)}\\{DateTime.Now.Ticks}";
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): packageZipFile → {PackageZipFile}", importJob, importDto, packageZipFile);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): tempFolder → {TempFolder}", importJob, importDto, tempFolder);
             if (File.Exists(packageZipFile))
             {
                 CompressionUtil.UnZipArchive(packageZipFile, tempFolder);
                 var exporeFiles = Directory.Exists(tempFolder) ? Directory.GetFiles(tempFolder, "*.*", SearchOption.AllDirectories) : [];
                 var portalSettings = new PortalSettings(importDto.PortalId);
+				Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): exporeFiles → {ExporeFiles}", importJob, importDto, exporeFiles);
+				Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): portalSettings → {PortalSettings}", importJob, importDto, portalSettings);
                 this.importCount = exporeFiles.Length;
 
+				Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): importCount → {ImportCount}", importJob, importDto, importCount);
+				Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): this.importCount → {Arg2}", importJob, importDto, this.importCount);
                 this.CheckPoint.TotalItems = this.CheckPoint.TotalItems <= 0 ? exporeFiles.Length : this.CheckPoint.TotalItems;
                 if (this.CheckPointStageCallback(this))
                 {
@@ -177,11 +199,14 @@ namespace Dnn.ExportImport.Components.Services
                             {
                                 var checkFolder = file.Replace($@"{tempFolder}\", string.Empty).Split('\\')[0];
                                 var relativePath = file.Substring($@"{tempFolder}\{checkFolder}\".Length);
+								Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): checkFolder → {CheckFolder}", importJob, importDto, checkFolder);
+								Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): relativePath → {RelativePath}", importJob, importDto, relativePath);
                                 string targetPath;
 
                                 if (checkFolder == "_default")
                                 {
                                     targetPath = Path.Combine(Globals.HostMapPath, relativePath);
+									Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): targetPath → {TargetPath}", importJob, importDto, targetPath);
                                 }
                                 else if (checkFolder.EndsWith("-System", StringComparison.OrdinalIgnoreCase))
                                 {
@@ -197,6 +222,7 @@ namespace Dnn.ExportImport.Components.Services
                                 {
                                     var directory = Path.GetDirectoryName(targetPath);
                                     if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+									Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): directory → {Directory}", importJob, importDto, directory);
                                     {
                                         Directory.CreateDirectory(directory);
                                     }
@@ -237,11 +263,14 @@ namespace Dnn.ExportImport.Components.Services
         /// <inheritdoc />
         public override int GetImportTotal()
         {
+			Logger.LogDebug(">>> Entering GetImportTotal()");
+			Logger.LogDebug("<<< Exiting GetImportTotal()");
             return this.importCount;
         }
 
         private List<string> GetExportThemes()
         {
+			Logger.LogDebug(">>> Entering GetExportThemes()");
             var exportThemes = new List<string>
             {
                 // get site level themes
@@ -266,20 +295,25 @@ namespace Dnn.ExportImport.Components.Services
             var themePackages = new List<string>();
             foreach (var theme in exportThemes)
             {
+			Logger.LogDebug("GetExportThemes(): themePackages → {ThemePackages}", themePackages);
                 var packageName = theme.Substring(0, theme.LastIndexOf("/", StringComparison.InvariantCultureIgnoreCase));
                 if (!themePackages.Any(p => p.Equals(packageName, StringComparison.OrdinalIgnoreCase)))
+				Logger.LogDebug("GetExportThemes(): packageName → {PackageName}", packageName);
                 {
                     themePackages.Add(packageName);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetExportThemes()");
             return themePackages;
         }
 
         private List<string> LoadExportThemesForPages()
         {
+			Logger.LogDebug(">>> Entering LoadExportThemesForPages()");
             var exportThemes = new List<string>();
 
+			Logger.LogDebug("LoadExportThemesForPages(): exportThemes → {ExportThemes}", exportThemes);
             foreach (var exportTab in this.Repository.GetAllItems<ExportTab>())
             {
                 if (!string.IsNullOrEmpty(exportTab.SkinSrc) && !exportThemes.Contains(exportTab.SkinSrc))
@@ -293,13 +327,16 @@ namespace Dnn.ExportImport.Components.Services
                 }
             }
 
+			Logger.LogDebug("<<< Exiting LoadExportThemesForPages()");
             return exportThemes;
         }
 
         private List<string> LoadExportContainersForModules()
         {
+			Logger.LogDebug(">>> Entering LoadExportContainersForModules()");
             var exportThemes = new List<string>();
 
+			Logger.LogDebug("LoadExportContainersForModules(): exportThemes → {ExportThemes}", exportThemes);
             foreach (var module in this.Repository.GetAllItems<ExportTabModule>())
             {
                 if (!string.IsNullOrEmpty(module.ContainerSrc) && !exportThemes.Contains(module.ContainerSrc))
@@ -308,6 +345,7 @@ namespace Dnn.ExportImport.Components.Services
                 }
             }
 
+			Logger.LogDebug("<<< Exiting LoadExportContainersForModules()");
             return exportThemes;
         }
     }

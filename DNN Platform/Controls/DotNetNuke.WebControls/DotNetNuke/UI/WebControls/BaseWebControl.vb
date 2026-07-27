@@ -11,14 +11,18 @@ Imports System.Web.UI.WebControls
 Namespace DotNetNuke.UI.WebControls
     Public Class BaseWebControl
         Inherits WebControl
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(BaseWebControl))
         ' Methods
         <DebuggerNonUserCode> _
         Public Sub New()
+			Logger.LogDebug(">>> Entering New()")
             BaseWebControl.__ENCAddToList(Me)
+			Logger.LogDebug("<<< Exiting New()")
         End Sub
 
         <DebuggerNonUserCode> _
         Private Shared Sub __ENCAddToList(ByVal value As Object)
+			Logger.LogDebug(">>> Entering __ENCAddToList(value={Value})", value)
             SyncLock BaseWebControl.__ENCList
                 If (BaseWebControl.__ENCList.Count = BaseWebControl.__ENCList.Capacity) Then
                     Dim index As Integer = 0
@@ -43,11 +47,17 @@ Namespace DotNetNuke.UI.WebControls
                 End If
                 BaseWebControl.__ENCList.Add(New WeakReference(value))
             End SyncLock
+			Logger.LogDebug("<<< Exiting __ENCAddToList(value={Value})", value)
         End Sub
 
         Public Shared Sub RegisterInitialize(ByVal ctl As Control, ByVal func As String, ByVal propJson As String)
+			Logger.LogDebug(">>> Entering RegisterInitialize(ctl={Ctl},func={Func},propJson={PropJson})", ctl, func, propJson)
             Dim str As String = $"dnn.setVar('{ctl.ClientID}_p', '{ClientAPI.EscapeForJavascript(propJson)}');"
             ClientAPI.RegisterStartUpScript(ctl.Page, (ctl.ClientID & "_startup"), $"<script type=""text/javascript"">{str}dnn.controls.{func}($get('{ctl.ClientID}'));</script>")
+			Logger.LogDebug("RegisterInitialize(ctl={Ctl},func={Func},propJson={PropJson}): String → {String}", ctl, func, propJson, String)
+			Logger.LogDebug("RegisterInitialize(ctl={Ctl},func={Func},propJson={PropJson}): type → {Type}", ctl, func, propJson, type)
+			Logger.LogDebug("RegisterInitialize(ctl={Ctl},func={Func},propJson={PropJson}): dnn → {Dnn}", ctl, func, propJson, dnn)
+			Logger.LogDebug("<<< Exiting RegisterInitialize(ctl={Ctl},func={Func},propJson={PropJson})", ctl, func, propJson)
         End Sub
 
 

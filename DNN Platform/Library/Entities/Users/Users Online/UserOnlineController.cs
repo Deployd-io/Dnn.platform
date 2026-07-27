@@ -28,14 +28,18 @@ namespace DotNetNuke.Entities.Users
         /// <summary>Clears the cached Users Online Information.</summary>
         public void ClearUserList()
         {
+			Logger.LogDebug(">>> Entering ClearUserList()");
             string key = "OnlineUserList";
             DataCache.RemoveCache(key);
+			Logger.LogDebug("<<< Exiting ClearUserList()");
         }
 
         /// <summary>Gets the Online time window.</summary>
         /// <returns>The window to use in minutes when determining if the user is online.</returns>
         public int GetOnlineTimeWindow()
         {
+			Logger.LogDebug(">>> Entering GetOnlineTimeWindow()");
+			Logger.LogDebug("<<< Exiting GetOnlineTimeWindow()");
             return Host.Host.UsersOnlineTimeWindow;
         }
 
@@ -43,8 +47,10 @@ namespace DotNetNuke.Entities.Users
         /// <returns>A <see cref="Hashtable"/> with <see cref="string"/> keys for the user ID (a GUID for anonymous users) and <see cref="BaseUserInfo"/> instances for the values.</returns>
         public Hashtable GetUserList()
         {
+			Logger.LogDebug(">>> Entering GetUserList()");
             var userList = (Hashtable)DataCache.GetCache(CacheKey);
             if (userList == null)
+			Logger.LogDebug("GetUserList(): userList → {UserList}", userList);
             {
                 lock (Locker)
                 {
@@ -57,6 +63,7 @@ namespace DotNetNuke.Entities.Users
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetUserList()");
             return userList;
         }
 
@@ -64,6 +71,8 @@ namespace DotNetNuke.Entities.Users
         /// <returns><see langword="true"/> if the Users Online functionality is enabled, otherwise <see langword="false"/>.</returns>
         public bool IsEnabled()
         {
+			Logger.LogDebug(">>> Entering IsEnabled()");
+			Logger.LogDebug("<<< Exiting IsEnabled()");
             return Host.Host.EnableUsersOnline;
         }
 
@@ -91,6 +100,7 @@ namespace DotNetNuke.Entities.Users
         /// <summary>Tracks an online User.</summary>
         public void TrackUsers()
         {
+			Logger.LogDebug(">>> Entering TrackUsers()");
             HttpContext context = HttpContext.Current;
 
             // Have we already done the work for this request?
@@ -111,17 +121,21 @@ namespace DotNetNuke.Entities.Users
             {
                 this.TrackAnonymousUser(context);
             }
+			Logger.LogDebug("<<< Exiting TrackUsers()");
         }
 
         /// <summary>Update the Users Online information.</summary>
         public void UpdateUsersOnline()
         {
+			Logger.LogDebug(">>> Entering UpdateUsersOnline()");
             // Get a Current User List
             Hashtable userList = this.GetUserList();
 
+			Logger.LogDebug("UpdateUsersOnline(): userList → {UserList}", userList);
             // Create a shallow copy of the list to Process
             var listToProcess = (Hashtable)userList.Clone();
 
+			Logger.LogDebug("UpdateUsersOnline(): listToProcess → {ListToProcess}", listToProcess);
             // Clear the list
             this.ClearUserList();
 
@@ -137,6 +151,7 @@ namespace DotNetNuke.Entities.Users
 
             // Remove users that have expired
             MemberProvider.DeleteUsersOnline(this.GetOnlineTimeWindow());
+			Logger.LogDebug("<<< Exiting UpdateUsersOnline()");
         }
 
         /// <summary>Tracks an Anonymous User.</summary>
@@ -222,6 +237,7 @@ namespace DotNetNuke.Entities.Users
                 };
                 context.Response.Cookies.Add(cookie);
             }
+			Logger.LogDebug("<<< Exiting TrackAnonymousUser(context={Context})", context);
         }
 
         /// <summary>Tracks an Authenticated User.</summary>
@@ -258,6 +274,7 @@ namespace DotNetNuke.Entities.Users
 
             userList[objUserInfo.UserID.ToString(CultureInfo.InvariantCulture)] = user;
             this.SetUserList(userList);
+			Logger.LogDebug("<<< Exiting TrackAuthenticatedUser(context={Context})", context);
         }
     }
 }

@@ -27,6 +27,7 @@ using log4net.Repository;
 
 namespace log4net.Util
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Abstract class that provides the formatting functionality that 
     /// derived classes need.
@@ -50,6 +51,8 @@ namespace log4net.Util
         /// </remarks>
         protected PatternConverter() 
         {  
+		Logger.LogDebug(">>> Entering PatternConverter()");
+		Logger.LogDebug("<<< Exiting PatternConverter()");
         }
 
         /// <summary>Get the next pattern converter in the chain</summary>
@@ -121,7 +124,11 @@ namespace log4net.Util
         /// </remarks>
         public virtual PatternConverter SetNext(PatternConverter patternConverter)
         {
+			Logger.LogDebug(">>> Entering SetNext(patternConverter={PatternConverter})", patternConverter);
             this.m_next = patternConverter;
+			Logger.LogDebug("SetNext(patternConverter={PatternConverter}): this.m_next → {Arg1}", patternConverter, this.m_next);
+			Logger.LogDebug("SetNext(patternConverter={PatternConverter}): m_next → {M_next}", patternConverter, m_next);
+			Logger.LogDebug("<<< Exiting SetNext(patternConverter={PatternConverter})", patternConverter);
             return this.m_next;
         }
 
@@ -138,6 +145,7 @@ namespace log4net.Util
         /// </remarks>
         public virtual void Format(TextWriter writer, object state) 
         {
+			Logger.LogDebug(">>> Entering Format(writer={Writer},state={State})", writer, state);
             if (this.m_min < 0 && this.m_max == int.MaxValue)
             {
                 // Formatting options are not in use
@@ -147,6 +155,7 @@ namespace log4net.Util
             {
                 string msg = null;
                 int len;
+				Logger.LogDebug("Format(writer={Writer},state={State}): msg → {Msg}", writer, state, msg);
                 lock (this.m_formatWriter)
                 {
                     this.m_formatWriter.Reset(c_renderBufferMaxCapacity, c_renderBufferSize);
@@ -155,6 +164,8 @@ namespace log4net.Util
 
                     StringBuilder buf = this.m_formatWriter.GetStringBuilder();
                     len = buf.Length;
+					Logger.LogDebug("Format(writer={Writer},state={State}): buf → {Buf}", writer, state, buf);
+					Logger.LogDebug("Format(writer={Writer},state={State}): len → {Len}", writer, state, len);
                     if (len > this.m_max)
                     {
                         msg = buf.ToString(len - this.m_max, this.m_max);
@@ -184,6 +195,7 @@ namespace log4net.Util
                     writer.Write(msg);
                 }
             }
+			Logger.LogDebug("<<< Exiting Format(writer={Writer},state={State})", writer, state);
         }	
 
         private static readonly string[] SPACES = {	" ", "  ", "    ", "        ",			// 1,2,4,8 spaces
@@ -200,6 +212,7 @@ namespace log4net.Util
         /// </remarks>
         protected static void SpacePad(TextWriter writer, int length) 
         {
+			Logger.LogDebug(">>> Entering SpacePad(writer={Writer},length={Length})", writer, length);
             while(length >= 32) 
             {
                 writer.Write(SPACES[5]);
@@ -213,6 +226,7 @@ namespace log4net.Util
                     writer.Write(SPACES[i]);
                 }
             }
+			Logger.LogDebug("<<< Exiting SpacePad(writer={Writer},length={Length})", writer, length);
         }
 
         private PatternConverter m_next;
@@ -251,6 +265,8 @@ namespace log4net.Util
         protected static void WriteDictionary(TextWriter writer, ILoggerRepository repository, IDictionary value)
         {
             WriteDictionary(writer, repository, value.GetEnumerator());
+			Logger.LogDebug(">>> Entering WriteDictionary(writer={Writer},repository={Repository},value={Value})", writer, repository, value);
+			Logger.LogDebug("<<< Exiting WriteDictionary(writer={Writer},repository={Repository},value={Value})", writer, repository, value);
         }
 
         /// <summary>Write an dictionary to a <see cref="TextWriter"/></summary>
@@ -276,6 +292,7 @@ namespace log4net.Util
 
             bool first = true;
 
+			Logger.LogDebug("WriteDictionary(writer={Writer},repository={Repository},value={Value}): first → {First}", writer, repository, value, first);
             // Write out all the dictionary key value pairs
             while (value.MoveNext())
             {
@@ -308,6 +325,7 @@ namespace log4net.Util
         /// </remarks>
         protected static void WriteObject(TextWriter writer, ILoggerRepository repository, object value)
         {
+			Logger.LogDebug(">>> Entering WriteObject(writer={Writer},repository={Repository},value={Value})", writer, repository, value);
             if (repository != null)
             {
                 repository.RendererMap.FindAndRender(value, writer);
@@ -324,6 +342,7 @@ namespace log4net.Util
                     writer.Write( value.ToString() );
                 }
             }
+			Logger.LogDebug("<<< Exiting WriteObject(writer={Writer},repository={Repository},value={Value})", writer, repository, value);
         }
 
         private PropertiesDictionary properties;

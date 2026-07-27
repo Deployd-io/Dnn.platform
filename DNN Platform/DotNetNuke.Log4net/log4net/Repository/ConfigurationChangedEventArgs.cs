@@ -28,6 +28,7 @@ namespace log4net.Repository
     /// </summary>
     public class ConfigurationChangedEventArgs : EventArgs
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly ICollection configurationMessages;
 
         /// <summary>
@@ -36,7 +37,11 @@ namespace log4net.Repository
         /// <param name="configurationMessages"></param>
         public ConfigurationChangedEventArgs(ICollection configurationMessages)
         {
+			Logger.LogDebug(">>> Entering ConfigurationChangedEventArgs(configurationMessages={ConfigurationMessages})", configurationMessages);
             this.configurationMessages = configurationMessages;
+			Logger.LogDebug("<<< Exiting ConfigurationChangedEventArgs(configurationMessages={ConfigurationMessages})", configurationMessages);
+			Logger.LogDebug("ConfigurationChangedEventArgs(configurationMessages={ConfigurationMessages}): configurationMessages → {ConfigurationMessages1}", configurationMessages, configurationMessages);
+			Logger.LogDebug("ConfigurationChangedEventArgs(configurationMessages={ConfigurationMessages}): this.configurationMessages → {Arg1}", configurationMessages, this.configurationMessages);
         }
 
         /// <summary>

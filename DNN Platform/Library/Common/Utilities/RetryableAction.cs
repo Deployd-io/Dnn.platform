@@ -20,7 +20,10 @@ namespace DotNetNuke.Common.Utilities.Internal
 
         static RetryableAction()
         {
+			Logger.LogDebug(">>> Entering RetryableAction()");
             SleepAction = GoToSleep;
+			Logger.LogDebug("<<< Exiting RetryableAction()");
+			Logger.LogDebug("RetryableAction(): SleepAction → {SleepAction}", SleepAction);
         }
 
         /// <summary>Initializes a new instance of the <see cref="RetryableAction"/> class.</summary>
@@ -31,7 +34,9 @@ namespace DotNetNuke.Common.Utilities.Internal
         public RetryableAction(Action action, string description, int maxRetries, TimeSpan delay)
             : this(action, description, maxRetries, delay, 1)
         {
+		Logger.LogDebug(">>> Entering RetryableAction(action={Action},description={Description},maxRetries={MaxRetries},delay={Delay})", action, description, maxRetries, delay);
         }
+		Logger.LogDebug("<<< Exiting RetryableAction(action={Action},description={Description},maxRetries={MaxRetries},delay={Delay})", action, description, maxRetries, delay);
 
         /// <summary>Initializes a new instance of the <see cref="RetryableAction"/> class.</summary>
         /// <param name="action">The action to execute.</param>
@@ -47,10 +52,15 @@ namespace DotNetNuke.Common.Utilities.Internal
             }
 
             this.Action = action;
+			Logger.LogDebug("RetryableAction(action={Action},description={Description},maxRetries={MaxRetries},delay={Delay},delayMultiplier={DelayMultiplier}): this.Action → {Arg5}", action, description, maxRetries, delay, delayMultiplier, this.Action);
             this.Description = description;
             this.MaxRetries = maxRetries;
+			Logger.LogDebug("RetryableAction(action={Action},description={Description},maxRetries={MaxRetries},delay={Delay},delayMultiplier={DelayMultiplier}): this.Description → {Arg5}", action, description, maxRetries, delay, delayMultiplier, this.Description);
+			Logger.LogDebug("RetryableAction(action={Action},description={Description},maxRetries={MaxRetries},delay={Delay},delayMultiplier={DelayMultiplier}): this.MaxRetries → {Arg5}", action, description, maxRetries, delay, delayMultiplier, this.MaxRetries);
             this.Delay = delay;
             this.DelayMultiplier = delayMultiplier;
+			Logger.LogDebug("RetryableAction(action={Action},description={Description},maxRetries={MaxRetries},delay={Delay},delayMultiplier={DelayMultiplier}): this.Delay → {Arg5}", action, description, maxRetries, delay, delayMultiplier, this.Delay);
+			Logger.LogDebug("RetryableAction(action={Action},description={Description},maxRetries={MaxRetries},delay={Delay},delayMultiplier={DelayMultiplier}): this.DelayMultiplier → {Arg5}", action, description, maxRetries, delay, delayMultiplier, this.DelayMultiplier);
         }
 
         /// <summary>Gets or sets method that allows thread to sleep until next retry meant for unit testing purposes.</summary>
@@ -80,18 +90,24 @@ namespace DotNetNuke.Common.Utilities.Internal
 
         public static void RetryEverySecondFor30Seconds(Action action, string description)
         {
+			Logger.LogDebug(">>> Entering RetryEverySecondFor30Seconds(action={Action},description={Description})", action, description);
             new RetryableAction(action, description, 30, TimeSpan.FromSeconds(1)).TryIt();
+			Logger.LogDebug("<<< Exiting RetryEverySecondFor30Seconds(action={Action},description={Description})", action, description);
         }
 
         public static void Retry5TimesWith2SecondsDelay(Action action, string description)
         {
+			Logger.LogDebug(">>> Entering Retry5TimesWith2SecondsDelay(action={Action},description={Description})", action, description);
             new RetryableAction(action, description, 5, TimeSpan.FromSeconds(2)).TryIt();
+			Logger.LogDebug("<<< Exiting Retry5TimesWith2SecondsDelay(action={Action},description={Description})", action, description);
         }
 
         public void TryIt()
         {
+			Logger.LogDebug(">>> Entering TryIt()");
             var currentDelay = (int)this.Delay.TotalMilliseconds;
             var retriesRemaining = this.MaxRetries;
+			Logger.LogDebug("TryIt(): currentDelay → {CurrentDelay}", currentDelay);
 
             do
             {
@@ -130,11 +146,14 @@ namespace DotNetNuke.Common.Utilities.Internal
                 retriesRemaining--;
             }
             while (true);
+			Logger.LogDebug("<<< Exiting TryIt()");
         }
 
         private static void GoToSleep(int delay)
         {
+			Logger.LogDebug(">>> Entering GoToSleep(delay={Delay})", delay);
             Thread.Sleep(delay);
+			Logger.LogDebug("<<< Exiting GoToSleep(delay={Delay})", delay);
         }
     }
 }

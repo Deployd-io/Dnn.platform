@@ -79,7 +79,9 @@ namespace DotNetNuke.Security.Permissions
         public PermissionProvider()
             : this(null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering PermissionProvider()");
         }
+		eventLogger.LogDebug("<<< Exiting PermissionProvider()");
 
         /// <summary>Initializes a new instance of the <see cref="PermissionProvider"/> class.</summary>
         /// <param name="eventLogger">The event logger.</param>
@@ -89,7 +91,10 @@ namespace DotNetNuke.Security.Permissions
         {
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
             this.permissionDefinitionService = permissionDefinitionService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPermissionDefinitionService>();
+			eventLogger.LogDebug("PermissionProvider(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings}): permissionDefinitionService → {PermissionDefinitionService1}", eventLogger, permissionDefinitionService, hostSettings, permissionDefinitionService);
+			eventLogger.LogDebug("PermissionProvider(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings}): eventLogger → {EventLogger1}", eventLogger, permissionDefinitionService, hostSettings, eventLogger);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			eventLogger.LogDebug("PermissionProvider(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings}): hostSettings → {HostSettings1}", eventLogger, permissionDefinitionService, hostSettings, hostSettings);
         }
 
         // return the provider
@@ -97,11 +102,15 @@ namespace DotNetNuke.Security.Permissions
 
         public static PermissionProvider Instance()
         {
+			eventLogger.LogDebug(">>> Entering Instance()");
+			eventLogger.LogDebug("<<< Exiting Instance()");
             return ComponentFactory.GetComponent<PermissionProvider>();
         }
 
         public virtual bool SupportsFullControl()
         {
+			eventLogger.LogDebug(">>> Entering SupportsFullControl()");
+			eventLogger.LogDebug("<<< Exiting SupportsFullControl()");
             return true;
         }
 
@@ -109,7 +118,10 @@ namespace DotNetNuke.Security.Permissions
         /// <returns><see langword="true"/> if the current user is in the administrator role for the current portal, otherwise <see langword="false"/>.</returns>
         public virtual bool IsPortalEditor()
         {
+			eventLogger.LogDebug(">>> Entering IsPortalEditor()");
             var settings = PortalController.Instance.GetCurrentSettings();
+			eventLogger.LogDebug("IsPortalEditor(): settings → {Settings}", settings);
+			eventLogger.LogDebug("<<< Exiting IsPortalEditor()");
             return settings != null && PortalSecurity.IsInRole(settings.AdministratorRoleName);
         }
 
@@ -118,6 +130,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public virtual bool CanAddFolder(FolderInfo folder)
         {
+			eventLogger.LogDebug(">>> Entering CanAddFolder(folder={Folder})", folder);
+			eventLogger.LogDebug("<<< Exiting CanAddFolder(folder={Folder})", folder);
             return HasFolderPermission(folder, AddFolderPermissionKey);
         }
 
@@ -126,11 +140,13 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public virtual bool CanBrowseFolder(FolderInfo folder)
         {
+			eventLogger.LogDebug(">>> Entering CanBrowseFolder(folder={Folder})", folder);
             if (folder == null)
             {
                 return false;
             }
 
+			eventLogger.LogDebug("<<< Exiting CanBrowseFolder(folder={Folder})", folder);
             return (PortalSecurity.IsInRoles(folder.FolderPermissions.ToString(BrowseFolderPermissionKey))
                     || PortalSecurity.IsInRoles(folder.FolderPermissions.ToString(ViewFolderPermissionKey)))
                    && !PortalSecurity.IsDenied(folder.FolderPermissions.ToString(BrowseFolderPermissionKey));
@@ -141,11 +157,13 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public virtual bool CanAdminFolder(FolderInfo folder)
         {
+			eventLogger.LogDebug(">>> Entering CanAdminFolder(folder={Folder})", folder);
             if (folder == null)
             {
                 return false;
             }
 
+			eventLogger.LogDebug("<<< Exiting CanAdminFolder(folder={Folder})", folder);
             return PortalSecurity.IsInRoles(folder.FolderPermissions.ToString(AdminFolderPermissionKey));
         }
 
@@ -154,6 +172,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public virtual bool CanCopyFolder(FolderInfo folder)
         {
+			eventLogger.LogDebug(">>> Entering CanCopyFolder(folder={Folder})", folder);
+			eventLogger.LogDebug("<<< Exiting CanCopyFolder(folder={Folder})", folder);
             return HasFolderPermission(folder, CopyFolderPermissionKey);
         }
 
@@ -162,6 +182,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public virtual bool CanDeleteFolder(FolderInfo folder)
         {
+			eventLogger.LogDebug(">>> Entering CanDeleteFolder(folder={Folder})", folder);
+			eventLogger.LogDebug("<<< Exiting CanDeleteFolder(folder={Folder})", folder);
             return HasFolderPermission(folder, DeleteFolderPermissionKey);
         }
 
@@ -170,6 +192,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public virtual bool CanManageFolder(FolderInfo folder)
         {
+			eventLogger.LogDebug(">>> Entering CanManageFolder(folder={Folder})", folder);
+			eventLogger.LogDebug("<<< Exiting CanManageFolder(folder={Folder})", folder);
             return HasFolderPermission(folder, ManageFolderPermissionKey);
         }
 
@@ -178,32 +202,41 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public virtual bool CanViewFolder(FolderInfo folder)
         {
+			eventLogger.LogDebug(">>> Entering CanViewFolder(folder={Folder})", folder);
+			eventLogger.LogDebug("<<< Exiting CanViewFolder(folder={Folder})", folder);
             return HasFolderPermission(folder, ViewFolderPermissionKey);
         }
 
         public virtual void DeleteFolderPermissionsByUser(UserInfo objUser)
         {
+			eventLogger.LogDebug(">>> Entering DeleteFolderPermissionsByUser(objUser={ObjUser})", objUser);
             this.dataProvider.DeleteFolderPermissionsByUserID(objUser.PortalID, objUser.UserID);
+			eventLogger.LogDebug("<<< Exiting DeleteFolderPermissionsByUser(objUser={ObjUser})", objUser);
         }
 
         public virtual FolderPermissionCollection GetFolderPermissionsCollectionByFolder(int portalID, string folder)
         {
+		eventLogger.LogDebug(">>> Entering GetFolderPermissionsCollectionByFolder(portalID={PortalID},folder={Folder})", portalID, folder);
 #if fale
             string dictionaryKey = Folder;
             if (string.IsNullOrEmpty(dictionaryKey))
+			eventLogger.LogDebug("GetFolderPermissionsCollectionByFolder(portalID={PortalID},folder={Folder}): dictionaryKey → {DictionaryKey}", portalID, folder, dictionaryKey);
             {
                 dictionaryKey = "[PortalRoot]";
             }
             //Get the Portal FolderPermission Dictionary
             Dictionary<string, FolderPermissionCollection> dicFolderPermissions = GetFolderPermissions(PortalID);
 
+			eventLogger.LogDebug("GetFolderPermissionsCollectionByFolder(portalID={PortalID},folder={Folder}): dicFolderPermissions → {DicFolderPermissions}", portalID, folder, dicFolderPermissions);
             //Get the Collection from the Dictionary
             FolderPermissionCollection folderPermissions;
             bool bFound = dicFolderPermissions.TryGetValue(dictionaryKey, out folderPermissions);
             if (!bFound)
+			eventLogger.LogDebug("GetFolderPermissionsCollectionByFolder(portalID={PortalID},folder={Folder}): bFound → {BFound}", portalID, folder, bFound);
             {
                 //Return empty collection
                 folderPermissions = new FolderPermissionCollection();
+				eventLogger.LogDebug("GetFolderPermissionsCollectionByFolder(portalID={PortalID},folder={Folder}): folderPermissions → {FolderPermissions}", portalID, folder, folderPermissions);
             }
             return folderPermissions;
 #else
@@ -230,16 +263,20 @@ namespace DotNetNuke.Security.Permissions
                     }
                     catch (Exception exc)
                     {
+						eventLogger.LogError("Exception in GetFolderPermissionsCollectionByFolder(portalID={PortalID},folder={Folder}): {Arg2}", portalID, folder, ex.Message);
                         Exceptions.LogException(exc);
                     }
 
                     return collection;
                 });
 #endif
+		eventLogger.LogDebug("<<< Exiting GetFolderPermissionsCollectionByFolder(portalID={PortalID},folder={Folder})", portalID, folder);
         }
 
         public virtual bool HasFolderPermission(FolderPermissionCollection objFolderPermissions, string permissionKey)
         {
+			eventLogger.LogDebug(">>> Entering HasFolderPermission(objFolderPermissions={ObjFolderPermissions},permissionKey={PermissionKey})", objFolderPermissions, permissionKey);
+			eventLogger.LogDebug("<<< Exiting HasFolderPermission(objFolderPermissions={ObjFolderPermissions},permissionKey={PermissionKey})", objFolderPermissions, permissionKey);
             return PortalSecurity.IsInRoles(objFolderPermissions.ToString(permissionKey));
         }
 
@@ -248,6 +285,8 @@ namespace DotNetNuke.Security.Permissions
         public virtual void SaveFolderPermissions(FolderInfo folder)
         {
             this.SaveFolderPermissions((IFolderInfo)folder);
+			eventLogger.LogDebug(">>> Entering SaveFolderPermissions(folder={Folder})", folder);
+			eventLogger.LogDebug("<<< Exiting SaveFolderPermissions(folder={Folder})", folder);
         }
 
         /// <summary>SaveFolderPermissions updates a Folder's permissions.</summary>
@@ -259,10 +298,13 @@ namespace DotNetNuke.Security.Permissions
                 // Ensure that if role/user has been given a permission that is not Read/Browse then they also need Read/Browse
                 var readPerm = this.permissionDefinitionService.GetDefinitionsByCodeAndKey("SYSTEM_FOLDER", "READ").FirstOrDefault();
                 var browsePerm = this.permissionDefinitionService.GetDefinitionsByCodeAndKey("SYSTEM_FOLDER", "BROWSE").FirstOrDefault();
+				eventLogger.LogDebug("SaveFolderPermissions(folder={Folder}): readPerm → {ReadPerm}", folder, readPerm);
+				eventLogger.LogDebug("SaveFolderPermissions(folder={Folder}): browsePerm → {BrowsePerm}", folder, browsePerm);
 
                 var additionalPermissions = new FolderPermissionCollection();
                 foreach (IFolderPermissionInfo folderPermission in folder.FolderPermissions)
                 {
+				eventLogger.LogDebug("SaveFolderPermissions(folder={Folder}): additionalPermissions → {AdditionalPermissions}", folder, additionalPermissions);
                     if (folderPermission.PermissionKey != "BROWSE" && folderPermission.PermissionKey != "READ" && folderPermission.AllowAccess)
                     {
                         // Try to add Read permission
@@ -314,6 +356,8 @@ namespace DotNetNuke.Security.Permissions
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", Justification = "Breaking change")]
         public virtual bool CanAdminModule(ModuleInfo module)
         {
+			eventLogger.LogDebug(">>> Entering CanAdminModule(module={Module})", module);
+			eventLogger.LogDebug("<<< Exiting CanAdminModule(module={Module})", module);
             return PortalSecurity.IsInRoles(module.ModulePermissions.ToString(AdminModulePermissionKey));
         }
 
@@ -323,6 +367,8 @@ namespace DotNetNuke.Security.Permissions
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", Justification = "Breaking change")]
         public virtual bool CanDeleteModule(ModuleInfo module)
         {
+			eventLogger.LogDebug(">>> Entering CanDeleteModule(module={Module})", module);
+			eventLogger.LogDebug("<<< Exiting CanDeleteModule(module={Module})", module);
             return PortalSecurity.IsInRoles(module.ModulePermissions.ToString(DeleteModulePermissionKey));
         }
 
@@ -332,6 +378,8 @@ namespace DotNetNuke.Security.Permissions
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", Justification = "Breaking change")]
         public virtual bool CanEditModuleContent(ModuleInfo module)
         {
+			eventLogger.LogDebug(">>> Entering CanEditModuleContent(module={Module})", module);
+			eventLogger.LogDebug("<<< Exiting CanEditModuleContent(module={Module})", module);
             return PortalSecurity.IsInRoles(module.ModulePermissions.ToString(ContentModulePermissionKey));
         }
 
@@ -341,6 +389,8 @@ namespace DotNetNuke.Security.Permissions
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", Justification = "Breaking change")]
         public virtual bool CanExportModule(ModuleInfo module)
         {
+			eventLogger.LogDebug(">>> Entering CanExportModule(module={Module})", module);
+			eventLogger.LogDebug("<<< Exiting CanExportModule(module={Module})", module);
             return PortalSecurity.IsInRoles(module.ModulePermissions.ToString(ExportModulePermissionKey));
         }
 
@@ -350,6 +400,8 @@ namespace DotNetNuke.Security.Permissions
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", Justification = "Breaking change")]
         public virtual bool CanImportModule(ModuleInfo module)
         {
+			eventLogger.LogDebug(">>> Entering CanImportModule(module={Module})", module);
+			eventLogger.LogDebug("<<< Exiting CanImportModule(module={Module})", module);
             return PortalSecurity.IsInRoles(module.ModulePermissions.ToString(ImportModulePermissionKey));
         }
 
@@ -359,6 +411,8 @@ namespace DotNetNuke.Security.Permissions
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", Justification = "Breaking change")]
         public virtual bool CanManageModule(ModuleInfo module)
         {
+			eventLogger.LogDebug(">>> Entering CanManageModule(module={Module})", module);
+			eventLogger.LogDebug("<<< Exiting CanManageModule(module={Module})", module);
             return PortalSecurity.IsInRoles(module.ModulePermissions.ToString(ManageModulePermissionKey));
         }
 
@@ -368,17 +422,21 @@ namespace DotNetNuke.Security.Permissions
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", Justification = "Breaking change")]
         public virtual bool CanViewModule(ModuleInfo module)
         {
+			eventLogger.LogDebug(">>> Entering CanViewModule(module={Module})", module);
             bool canView;
             if (module.InheritViewPermissions)
             {
                 TabInfo objTab = TabController.Instance.GetTab(module.TabID, module.PortalID, false);
                 canView = TabPermissionController.CanViewPage(objTab);
+				eventLogger.LogDebug("CanViewModule(module={Module}): objTab → {ObjTab}", module, objTab);
+				eventLogger.LogDebug("CanViewModule(module={Module}): canView → {CanView}", module, canView);
             }
             else
             {
                 canView = PortalSecurity.IsInRoles(module.ModulePermissions.ToString(ViewModulePermissionKey));
             }
 
+			eventLogger.LogDebug("<<< Exiting CanViewModule(module={Module})", module);
             return canView;
         }
 
@@ -386,8 +444,10 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="user">The user.</param>
         public virtual void DeleteModulePermissionsByUser(UserInfo user)
         {
+			eventLogger.LogDebug(">>> Entering DeleteModulePermissionsByUser(user={User})", user);
             this.dataProvider.DeleteModulePermissionsByUserID(user.PortalID, user.UserID);
             DataCache.ClearModulePermissionsCachesByPortal(user.PortalID);
+			eventLogger.LogDebug("<<< Exiting DeleteModulePermissionsByUser(user={User})", user);
         }
 
         /// <summary>GetModulePermissions gets a ModulePermissionCollection.</summary>
@@ -396,9 +456,11 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A <see cref="ModulePermissionCollection"/> with the module permissions, or an empty <see cref="ModulePermissionCollection"/> if the module wasn't found.</returns>
         public virtual ModulePermissionCollection GetModulePermissions(int moduleID, int tabID)
         {
+			eventLogger.LogDebug(">>> Entering GetModulePermissions(moduleID={ModuleID},tabID={TabID})", moduleID, tabID);
             // Get the Tab ModulePermission Dictionary
             Dictionary<int, ModulePermissionCollection> dictionary = this.GetModulePermissions(tabID);
 
+			eventLogger.LogDebug("GetModulePermissions(moduleID={ModuleID},tabID={TabID}): dictionary → {Dictionary}", moduleID, tabID, dictionary);
             // Get the Collection from the Dictionary
             ModulePermissionCollection modulePermissions;
             bool found = dictionary.TryGetValue(moduleID, out modulePermissions);
@@ -406,8 +468,10 @@ namespace DotNetNuke.Security.Permissions
             {
                 // Return empty collection
                 modulePermissions = new ModulePermissionCollection();
+				eventLogger.LogDebug("GetModulePermissions(moduleID={ModuleID},tabID={TabID}): modulePermissions → {ModulePermissions}", moduleID, tabID, modulePermissions);
             }
 
+			eventLogger.LogDebug("<<< Exiting GetModulePermissions(moduleID={ModuleID},tabID={TabID})", moduleID, tabID);
             return modulePermissions;
         }
 
@@ -422,10 +486,14 @@ namespace DotNetNuke.Security.Permissions
         /// designated AccessLevel.</remarks>
         public virtual bool HasModuleAccess(SecurityAccessLevel accessLevel, string permissionKey, ModuleInfo moduleConfiguration)
         {
+			eventLogger.LogDebug(">>> Entering HasModuleAccess(accessLevel={AccessLevel},permissionKey={PermissionKey},moduleConfiguration={ModuleConfiguration})", accessLevel, permissionKey, moduleConfiguration);
             bool isAuthorized = false;
             UserInfo userInfo = UserController.Instance.GetCurrentUserInfo();
+			eventLogger.LogDebug("HasModuleAccess(accessLevel={AccessLevel},permissionKey={PermissionKey},moduleConfiguration={ModuleConfiguration}): isAuthorized → {IsAuthorized}", accessLevel, permissionKey, moduleConfiguration, isAuthorized);
+			eventLogger.LogDebug("HasModuleAccess(accessLevel={AccessLevel},permissionKey={PermissionKey},moduleConfiguration={ModuleConfiguration}): userInfo → {UserInfo}", accessLevel, permissionKey, moduleConfiguration, userInfo);
             TabInfo tab = TabController.Instance.GetTab(moduleConfiguration.TabID, moduleConfiguration.PortalID, false);
             if (userInfo != null && userInfo.IsSuperUser)
+			eventLogger.LogDebug("HasModuleAccess(accessLevel={AccessLevel},permissionKey={PermissionKey},moduleConfiguration={ModuleConfiguration}): tab → {Tab}", accessLevel, permissionKey, moduleConfiguration, tab);
             {
                 isAuthorized = true;
             }
@@ -453,6 +521,7 @@ namespace DotNetNuke.Security.Permissions
                             {
                                 permissionKey = "CONTENT,DELETE,EXPORT,IMPORT,MANAGE";
                             }
+							eventLogger.LogDebug("HasModuleAccess(accessLevel={AccessLevel},permissionKey={PermissionKey},moduleConfiguration={ModuleConfiguration}): permissionKey → {PermissionKey1}", accessLevel, permissionKey, moduleConfiguration, permissionKey);
 
                             if (TabPermissionController.CanAddContentToPage(tab))
                             {
@@ -489,6 +558,7 @@ namespace DotNetNuke.Security.Permissions
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting HasModuleAccess(accessLevel={AccessLevel},permissionKey={PermissionKey},moduleConfiguration={ModuleConfiguration})", accessLevel, permissionKey, moduleConfiguration);
             return isAuthorized;
         }
 
@@ -523,10 +593,12 @@ namespace DotNetNuke.Security.Permissions
         [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", Justification = "Breaking change")]
         public virtual void SaveModulePermissions(ModuleInfo module)
         {
+			eventLogger.LogDebug(">>> Entering SaveModulePermissions(module={Module})", module);
             if (module.ModulePermissions != null)
             {
                 ModulePermissionCollection modulePermissions = ModulePermissionController.GetModulePermissions(module.ModuleID, module.TabID);
                 if (!modulePermissions.CompareTo(module.ModulePermissions))
+				eventLogger.LogDebug("SaveModulePermissions(module={Module}): modulePermissions → {ModulePermissions}", module, modulePermissions);
                 {
                     this.dataProvider.DeleteModulePermissionsByModuleID(module.ModuleID, module.PortalID);
 
@@ -550,6 +622,7 @@ namespace DotNetNuke.Security.Permissions
                     }
                 }
             }
+			eventLogger.LogDebug("<<< Exiting SaveModulePermissions(module={Module})", module);
         }
 
         /// <summary>Returns a list with all roles with implicit permissions on Tabs.</summary>
@@ -680,8 +753,10 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="user">The user.</param>
         public virtual void DeleteTabPermissionsByUser(UserInfo user)
         {
+			eventLogger.LogDebug(">>> Entering DeleteTabPermissionsByUser(user={User})", user);
             this.dataProvider.DeleteTabPermissionsByUserID(user.PortalID, user.UserID);
             DataCache.ClearTabPermissionsCache(user.PortalID);
+			eventLogger.LogDebug("<<< Exiting DeleteTabPermissionsByUser(user={User})", user);
         }
 
         /// <summary>GetTabPermissions gets a TabPermissionCollection.</summary>
@@ -711,8 +786,10 @@ namespace DotNetNuke.Security.Permissions
         /// <returns><see langword="true"/> if the current user has the requested permission, otherwise <see langword="false"/>.</returns>
         public virtual bool HasTabPermission(TabPermissionCollection tabPermissions, string permissionKey)
         {
+			eventLogger.LogDebug(">>> Entering HasTabPermission(tabPermissions={TabPermissions},permissionKey={PermissionKey})", tabPermissions, permissionKey);
             bool hasPermission = PortalSecurity.IsInRoles(tabPermissions.ToString("EDIT"));
             if (!hasPermission)
+			eventLogger.LogDebug("HasTabPermission(tabPermissions={TabPermissions},permissionKey={PermissionKey}): hasPermission → {HasPermission}", tabPermissions, permissionKey, hasPermission);
             {
                 if (permissionKey.Contains(","))
                 {
@@ -731,6 +808,7 @@ namespace DotNetNuke.Security.Permissions
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting HasTabPermission(tabPermissions={TabPermissions},permissionKey={PermissionKey})", tabPermissions, permissionKey);
             return hasPermission;
         }
 
@@ -773,6 +851,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A <see cref="DesktopModulePermissionInfo"/> or <see langword="null"/>.</returns>
         public virtual DesktopModulePermissionInfo GetDesktopModulePermission(int desktopModulePermissionId)
         {
+			eventLogger.LogDebug(">>> Entering GetDesktopModulePermission(desktopModulePermissionId={DesktopModulePermissionId})", desktopModulePermissionId);
+			eventLogger.LogDebug("<<< Exiting GetDesktopModulePermission(desktopModulePermissionId={DesktopModulePermissionId})", desktopModulePermissionId);
             return CBO.FillObject<DesktopModulePermissionInfo>(DataProvider.Instance().GetDesktopModulePermission(desktopModulePermissionId));
         }
 
@@ -781,18 +861,23 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A <see cref="DesktopModulePermissionCollection"/> with the desktop module permissions, or an empty <see cref="DesktopModulePermissionCollection"/> if the desktop module wasn't found.</returns>
         public virtual DesktopModulePermissionCollection GetDesktopModulePermissions(int portalDesktopModuleId)
         {
+			eventLogger.LogDebug(">>> Entering GetDesktopModulePermissions(portalDesktopModuleId={PortalDesktopModuleId})", portalDesktopModuleId);
             // Get the Tab DesktopModulePermission Dictionary
             Dictionary<int, DesktopModulePermissionCollection> dicDesktopModulePermissions = GetDesktopModulePermissions(this.hostSettings);
 
+			eventLogger.LogDebug("GetDesktopModulePermissions(portalDesktopModuleId={PortalDesktopModuleId}): dicDesktopModulePermissions → {DicDesktopModulePermissions}", portalDesktopModuleId, dicDesktopModulePermissions);
             // Get the Collection from the Dictionary
             DesktopModulePermissionCollection desktopModulePermissions;
             bool bFound = dicDesktopModulePermissions.TryGetValue(portalDesktopModuleId, out desktopModulePermissions);
             if (!bFound)
+			eventLogger.LogDebug("GetDesktopModulePermissions(portalDesktopModuleId={PortalDesktopModuleId}): bFound → {BFound}", portalDesktopModuleId, bFound);
             {
                 // Return empty collection
                 desktopModulePermissions = new DesktopModulePermissionCollection();
+				eventLogger.LogDebug("GetDesktopModulePermissions(portalDesktopModuleId={PortalDesktopModuleId}): desktopModulePermissions → {DesktopModulePermissions}", portalDesktopModuleId, desktopModulePermissions);
             }
 
+			eventLogger.LogDebug("<<< Exiting GetDesktopModulePermissions(portalDesktopModuleId={PortalDesktopModuleId})", portalDesktopModuleId);
             return desktopModulePermissions;
         }
 
@@ -802,6 +887,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns><see langword="true"/> if the current user has the requested permission, otherwise <see langword="false"/>.</returns>
         public virtual bool HasDesktopModulePermission(DesktopModulePermissionCollection desktopModulePermissions, string permissionKey)
         {
+			eventLogger.LogDebug(">>> Entering HasDesktopModulePermission(desktopModulePermissions={DesktopModulePermissions},permissionKey={PermissionKey})", desktopModulePermissions, permissionKey);
+			eventLogger.LogDebug("<<< Exiting HasDesktopModulePermission(desktopModulePermissions={DesktopModulePermissions},permissionKey={PermissionKey})", desktopModulePermissions, permissionKey);
             return PortalSecurity.IsInRoles(desktopModulePermissions.ToString(permissionKey));
         }
 
@@ -809,8 +896,10 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="user">The user.</param>
         public virtual void DeletePortalPermissionsByUser(UserInfo user)
         {
+			eventLogger.LogDebug(">>> Entering DeletePortalPermissionsByUser(user={User})", user);
             this.dataProvider.DeletePortalPermissionsByUserID(user.PortalID, user.UserID);
             DataCache.ClearPortalPermissionsCache(user.PortalID);
+			eventLogger.LogDebug("<<< Exiting DeletePortalPermissionsByUser(user={User})", user);
         }
 
         /// <summary>GetPortalPermissions gets a PortalPermissionCollection.</summary>
@@ -838,8 +927,10 @@ namespace DotNetNuke.Security.Permissions
         /// <returns><see langword="true"/> if the current user has the requested permission, otherwise <see langword="false"/>.</returns>
         public virtual bool HasPortalPermission(PortalPermissionCollection portalPermissions, string permissionKey)
         {
+			eventLogger.LogDebug(">>> Entering HasPortalPermission(portalPermissions={PortalPermissions},permissionKey={PermissionKey})", portalPermissions, permissionKey);
             bool hasPermission = false;
             if (permissionKey.Contains(","))
+			eventLogger.LogDebug("HasPortalPermission(portalPermissions={PortalPermissions},permissionKey={PermissionKey}): hasPermission → {HasPermission}", portalPermissions, permissionKey, hasPermission);
             {
                 if (permissionKey.Split(',').Any(permission => PortalSecurity.IsInRoles(portalPermissions.ToString(permission))))
                 {
@@ -851,6 +942,7 @@ namespace DotNetNuke.Security.Permissions
                 hasPermission = PortalSecurity.IsInRoles(portalPermissions.ToString(permissionKey));
             }
 
+			eventLogger.LogDebug("<<< Exiting HasPortalPermission(portalPermissions={PortalPermissions},permissionKey={PermissionKey})", portalPermissions, permissionKey);
             return hasPermission;
         }
 
@@ -911,6 +1003,7 @@ namespace DotNetNuke.Security.Permissions
 
         protected bool HasModulePermission(ModuleInfo moduleConfiguration, string permissionKey)
         {
+			eventLogger.LogDebug("<<< Exiting HasModulePermission(moduleConfiguration={ModuleConfiguration},permissionKey={PermissionKey})", moduleConfiguration, permissionKey);
             return this.CanViewModule(moduleConfiguration) &&
                    (this.HasModulePermission(moduleConfiguration.ModulePermissions, permissionKey)
                     || this.HasModulePermission(moduleConfiguration.ModulePermissions, "EDIT"));
@@ -919,6 +1012,8 @@ namespace DotNetNuke.Security.Permissions
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         protected bool IsDeniedModulePermission(ModuleInfo moduleConfiguration, string permissionKey)
         {
+			eventLogger.LogDebug(">>> Entering IsDeniedModulePermission(moduleConfiguration={ModuleConfiguration},permissionKey={PermissionKey})", moduleConfiguration, permissionKey);
+			eventLogger.LogDebug("<<< Exiting IsDeniedModulePermission(moduleConfiguration={ModuleConfiguration},permissionKey={PermissionKey})", moduleConfiguration, permissionKey);
             return IsDeniedModulePermission(moduleConfiguration.ModulePermissions, "VIEW")
                    || IsDeniedModulePermission(moduleConfiguration.ModulePermissions, permissionKey)
                    || IsDeniedModulePermission(moduleConfiguration.ModulePermissions, "EDIT");
@@ -969,22 +1064,30 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="cacheItemArgs">The CacheItemArgs object that contains the parameters needed for the database call.</param>
         private static object GetDesktopModulePermissionsCallBack(CacheItemArgs cacheItemArgs)
         {
+			eventLogger.LogDebug(">>> Entering GetDesktopModulePermissionsCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
+			eventLogger.LogDebug("<<< Exiting GetDesktopModulePermissionsCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return FillDesktopModulePermissionDictionary(DataProvider.Instance().GetDesktopModulePermissions());
         }
 
 #if false
         private object GetFolderPermissionsCallBack(CacheItemArgs cacheItemArgs)
         {
+			eventLogger.LogDebug(">>> Entering GetFolderPermissionsCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             var PortalID = (int)cacheItemArgs.ParamList[0];
             IDataReader dr = dataProvider.GetFolderPermissionsByPortal(PortalID);
+			eventLogger.LogDebug("GetFolderPermissionsCallBack(cacheItemArgs={CacheItemArgs}): PortalID → {PortalID}", cacheItemArgs, PortalID);
+			eventLogger.LogDebug("GetFolderPermissionsCallBack(cacheItemArgs={CacheItemArgs}): dr → {Dr}", cacheItemArgs, dr);
             var dic = new Dictionary<string, FolderPermissionCollection>();
             try
+			eventLogger.LogDebug("GetFolderPermissionsCallBack(cacheItemArgs={CacheItemArgs}): dic → {Dic}", cacheItemArgs, dic);
             {
                 while (dr.Read())
                 {
                     //fill business object
                     var folderPermissionInfo = CBO.FillObject<FolderPermissionInfo>(dr, false);
                     string dictionaryKey = folderPermissionInfo.FolderPath;
+					eventLogger.LogDebug("GetFolderPermissionsCallBack(cacheItemArgs={CacheItemArgs}): folderPermissionInfo → {FolderPermissionInfo}", cacheItemArgs, folderPermissionInfo);
+					eventLogger.LogDebug("GetFolderPermissionsCallBack(cacheItemArgs={CacheItemArgs}): dictionaryKey → {DictionaryKey}", cacheItemArgs, dictionaryKey);
                     if (string.IsNullOrEmpty(dictionaryKey))
                     {
                         dictionaryKey = "[PortalRoot]";
@@ -1010,12 +1113,14 @@ namespace DotNetNuke.Security.Permissions
             }
             catch (Exception exc)
             {
+				eventLogger.LogError("Exception in GetFolderPermissionsCallBack(cacheItemArgs={CacheItemArgs}): {Arg1}", cacheItemArgs, ex.Message);
                 Exceptions.LogException(exc);
             }
             finally
             {
                 CBO.CloseDataReader(dr, true);
             }
+			eventLogger.LogDebug("<<< Exiting GetFolderPermissionsCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return dic;
         }
 
@@ -1075,6 +1180,7 @@ namespace DotNetNuke.Security.Permissions
                 return false;
             }
 
+			eventLogger.LogDebug("<<< Exiting HasFolderPermission(folder={Folder},permissionKey={PermissionKey})", folder, permissionKey);
             return (PortalSecurity.IsInRoles(folder.FolderPermissions.ToString(permissionKey))
                     || PortalSecurity.IsInRoles(folder.FolderPermissions.ToString(AdminFolderPermissionKey)))
                    && !PortalSecurity.IsDenied(folder.FolderPermissions.ToString(permissionKey));
@@ -1144,6 +1250,7 @@ namespace DotNetNuke.Security.Permissions
                 isDenied = PortalSecurity.IsDenied(tabPermissions.ToString(permissionKey));
             }
 
+			eventLogger.LogDebug("<<< Exiting IsDeniedTabPermission(tabPermissions={TabPermissions},permissionKey={PermissionKey})", tabPermissions, permissionKey);
             return isDenied;
         }
 
@@ -1172,16 +1279,21 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="cacheItemArgs">The CacheItemArgs object that contains the parameters needed for the database call.</param>
         private object GetModulePermissionsCallBack(CacheItemArgs cacheItemArgs)
         {
+			eventLogger.LogDebug(">>> Entering GetModulePermissionsCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             var tabId = (int)cacheItemArgs.ParamList[0];
             IDataReader dr = this.dataProvider.GetModulePermissionsByTabID(tabId);
+			eventLogger.LogDebug("GetModulePermissionsCallBack(cacheItemArgs={CacheItemArgs}): tabId → {TabId}", cacheItemArgs, tabId);
+			eventLogger.LogDebug("GetModulePermissionsCallBack(cacheItemArgs={CacheItemArgs}): dr → {Dr}", cacheItemArgs, dr);
             var dic = new Dictionary<int, ModulePermissionCollection>();
             try
+			eventLogger.LogDebug("GetModulePermissionsCallBack(cacheItemArgs={CacheItemArgs}): dic → {Dic}", cacheItemArgs, dic);
             {
                 while (dr.Read())
                 {
                     // fill business object
                     var modulePermissionInfo = CBO.FillObject<ModulePermissionInfo>(dr, false);
 
+					eventLogger.LogDebug("GetModulePermissionsCallBack(cacheItemArgs={CacheItemArgs}): modulePermissionInfo → {ModulePermissionInfo}", cacheItemArgs, modulePermissionInfo);
                     // add Module Permission to dictionary
                     if (dic.TryGetValue(modulePermissionInfo.ModuleID, out var permissions))
                     {
@@ -1201,6 +1313,7 @@ namespace DotNetNuke.Security.Permissions
             }
             catch (Exception exc)
             {
+				eventLogger.LogError("Exception in GetModulePermissionsCallBack(cacheItemArgs={CacheItemArgs}): {Arg1}", cacheItemArgs, ex.Message);
                 Exceptions.LogException(exc);
             }
             finally
@@ -1209,6 +1322,7 @@ namespace DotNetNuke.Security.Permissions
                 CBO.CloseDataReader(dr, true);
             }
 
+			eventLogger.LogDebug("<<< Exiting GetModulePermissionsCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return dic;
         }
 
@@ -1227,19 +1341,24 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="cacheItemArgs">The CacheItemArgs object that contains the parameters needed for the database call.</param>
         private object GetTabPermissionsCallBack(CacheItemArgs cacheItemArgs)
         {
+			eventLogger.LogDebug(">>> Entering GetTabPermissionsCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             var portalId = (int)cacheItemArgs.ParamList[0];
             var dic = new Dictionary<int, TabPermissionCollection>();
+			eventLogger.LogDebug("GetTabPermissionsCallBack(cacheItemArgs={CacheItemArgs}): portalId → {PortalId}", cacheItemArgs, portalId);
+			eventLogger.LogDebug("GetTabPermissionsCallBack(cacheItemArgs={CacheItemArgs}): dic → {Dic}", cacheItemArgs, dic);
 
             if (portalId > -1)
             {
                 IDataReader dr = this.dataProvider.GetTabPermissionsByPortal(portalId);
                 try
+				eventLogger.LogDebug("GetTabPermissionsCallBack(cacheItemArgs={CacheItemArgs}): dr → {Dr}", cacheItemArgs, dr);
                 {
                     while (dr.Read())
                     {
                         // fill business object
                         var tabPermissionInfo = CBO.FillObject<TabPermissionInfo>(dr, false);
 
+						eventLogger.LogDebug("GetTabPermissionsCallBack(cacheItemArgs={CacheItemArgs}): tabPermissionInfo → {TabPermissionInfo}", cacheItemArgs, tabPermissionInfo);
                         // add Tab Permission to dictionary
                         if (dic.TryGetValue(tabPermissionInfo.TabID, out var permissions))
                         {
@@ -1257,6 +1376,7 @@ namespace DotNetNuke.Security.Permissions
                 }
                 catch (Exception exc)
                 {
+					eventLogger.LogError("Exception in GetTabPermissionsCallBack(cacheItemArgs={CacheItemArgs}): {Arg1}", cacheItemArgs, ex.Message);
                     Exceptions.LogException(exc);
                 }
                 finally
@@ -1266,6 +1386,7 @@ namespace DotNetNuke.Security.Permissions
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting GetTabPermissionsCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return dic;
         }
 
@@ -1284,19 +1405,24 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="cacheItemArgs">The CacheItemArgs object that contains the parameters needed for the database call.</param>
         private object GetPortalPermissionsCallBack(CacheItemArgs cacheItemArgs)
         {
+			eventLogger.LogDebug(">>> Entering GetPortalPermissionsCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             var portalId = (int)cacheItemArgs.ParamList[0];
             var dic = new Dictionary<int, PortalPermissionCollection>();
+			eventLogger.LogDebug("GetPortalPermissionsCallBack(cacheItemArgs={CacheItemArgs}): portalId → {PortalId}", cacheItemArgs, portalId);
+			eventLogger.LogDebug("GetPortalPermissionsCallBack(cacheItemArgs={CacheItemArgs}): dic → {Dic}", cacheItemArgs, dic);
 
             if (portalId > -1)
             {
                 var dr = this.dataProvider.GetPortalPermissionsByPortal(portalId);
                 try
+				eventLogger.LogDebug("GetPortalPermissionsCallBack(cacheItemArgs={CacheItemArgs}): dr → {Dr}", cacheItemArgs, dr);
                 {
                     while (dr.Read())
                     {
                         // fill business object
                         var portalPermissionInfo = CBO.FillObject<PortalPermissionInfo>(dr, false);
 
+						eventLogger.LogDebug("GetPortalPermissionsCallBack(cacheItemArgs={CacheItemArgs}): portalPermissionInfo → {PortalPermissionInfo}", cacheItemArgs, portalPermissionInfo);
                         // add Portal Permission to dictionary
                         if (dic.TryGetValue(portalPermissionInfo.PortalID, out var permissions))
                         {
@@ -1314,6 +1440,7 @@ namespace DotNetNuke.Security.Permissions
                 }
                 catch (Exception exc)
                 {
+					eventLogger.LogError("Exception in GetPortalPermissionsCallBack(cacheItemArgs={CacheItemArgs}): {Arg1}", cacheItemArgs, ex.Message);
                     Exceptions.LogException(exc);
                 }
                 finally
@@ -1323,6 +1450,7 @@ namespace DotNetNuke.Security.Permissions
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting GetPortalPermissionsCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return dic;
         }
     }

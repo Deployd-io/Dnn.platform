@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.FileSystem
     [Serializable]
     public class PermissionsNotMetException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="PermissionsNotMetException"/> class.</summary>
         public PermissionsNotMetException()
         {
+		Logger.LogDebug(">>> Entering PermissionsNotMetException()");
+		Logger.LogDebug("<<< Exiting PermissionsNotMetException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="PermissionsNotMetException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Services.FileSystem
         public PermissionsNotMetException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering PermissionsNotMetException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting PermissionsNotMetException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="PermissionsNotMetException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

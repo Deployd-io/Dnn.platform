@@ -10,6 +10,7 @@ namespace Dnn.PersonaBar.Security.Components.Checks
 
     public class CheckRarelyUsedSuperuser : IAuditCheck
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public string Id => "CheckRarelyUsedSuperuser";
 
@@ -19,13 +20,17 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc />
         public CheckResult Execute()
         {
+			Logger.LogDebug(">>> Entering Execute()");
             var result = new CheckResult(SeverityEnum.Unverified, this.Id);
             try
+			Logger.LogDebug("Execute(): result → {Result}", result);
             {
                 var totalRecords = 0;
 
                 var superUsers = UserController.GetUsers(-1, 1, int.MaxValue, ref totalRecords, false, true);
                 result.Severity = SeverityEnum.Pass;
+				Logger.LogDebug("Execute(): superUsers → {SuperUsers}", superUsers);
+				Logger.LogDebug("Execute(): result.Severity → {Arg0}", result.Severity);
                 foreach (UserInfo user in superUsers)
                 {
                     if (DateTime.Now.AddMonths(-6) > user.Membership.LastLoginDate ||
@@ -38,9 +43,11 @@ namespace Dnn.PersonaBar.Security.Components.Checks
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in Execute(): {Arg0}", ex.Message);
                 throw;
             }
 
+			Logger.LogDebug("<<< Exiting Execute()");
             return result;
         }
     }

@@ -11,12 +11,15 @@ namespace DotNetNuke.Web.Razor
 
     public class Startup : IDnnStartup
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public void ConfigureServices(IServiceCollection services)
         {
+		Logger.LogDebug(">>> Entering ConfigureServices(services={Services})", services);
 #pragma warning disable CS0618 // Type or member is obsolete
             services.TryAddEnumerable(ServiceDescriptor.Singleton<IModuleControlFactory, RazorModuleControlFactory>());
 #pragma warning restore CS0618 // Type or member is obsolete
+		Logger.LogDebug("<<< Exiting ConfigureServices(services={Services})", services);
         }
     }
 }

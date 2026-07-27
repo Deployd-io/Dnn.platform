@@ -30,27 +30,34 @@ namespace DotNetNuke.Build.Tasks
     [IsDependentOn(typeof(PackageMicrosoftCodeDomProvidersDotNetCompilerPlatform))]
     public sealed class OtherPackages : FrostingTask<Context>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly string[] IncludeAll = ["**/*",];
 
         /// <inheritdoc />
         public override void Run(Context context)
         {
+			Logger.LogDebug(">>> Entering Run(context={Context})", context);
             var otherPackages = context.DeserializeJsonFromFile<IEnumerable<OtherPackage>>("./Build/Tasks/thirdparty.json");
             foreach (var op in otherPackages)
             {
+			Logger.LogDebug("Run(context={Context}): otherPackages → {OtherPackages}", context, otherPackages);
                 PackageOtherPackage(context, op);
             }
+			Logger.LogDebug("<<< Exiting Run(context={Context})", context);
         }
 
         private static void PackageOtherPackage(Context context, OtherPackage package)
         {
+			Logger.LogDebug(">>> Entering PackageOtherPackage(context={Context},package={Package})", context, package);
             var srcFolder = context.RootDir + context.Directory(package.Folder);
             var files = package.Excludes.Length == 0
+							Logger.LogDebug("PackageOtherPackage(context={Context},package={Package}): srcFolder → {SrcFolder}", context, package, srcFolder);
                             ? context.GetFiles($"{srcFolder}/**/*")
                             : context.GetFilesByPatterns(srcFolder, IncludeAll, package.Excludes);
             var version = "00.00.00";
             foreach (var dnn in context.GetFiles($"{srcFolder}/**/*.dnn"))
             {
+			Logger.LogDebug("PackageOtherPackage(context={Context},package={Package}): version → {Version}", context, package, version);
                 version = context.XmlPeek(dnn, "dotnetnuke/packages/package/@version");
             }
 
@@ -58,9 +65,12 @@ namespace DotNetNuke.Build.Tasks
 
             var destination = context.WebsiteDir + context.Directory(package.Destination);
             var packageZipName = context.File($"{package.Name}_{version}_Install.{package.Extension}");
+			Logger.LogDebug("PackageOtherPackage(context={Context},package={Package}): destination → {Destination}", context, package, destination);
+			Logger.LogDebug("PackageOtherPackage(context={Context},package={Package}): packageZipName → {PackageZipName}", context, package, packageZipName);
             var packageZipPath = destination + packageZipName;
             context.Information("Packaging {0}", packageZipPath);
             context.Zip(srcFolder, packageZipPath, files);
+			Logger.LogDebug("<<< Exiting PackageOtherPackage(context={Context},package={Package})", context, package);
         }
 
         private sealed class OtherPackage

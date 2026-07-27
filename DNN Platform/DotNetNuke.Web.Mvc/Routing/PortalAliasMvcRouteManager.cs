@@ -19,20 +19,27 @@ namespace DotNetNuke.Web.Mvc.Routing
     /// <summary>Gets MVC routes.</summary>
     internal partial class PortalAliasMvcRouteManager : IPortalAliasMvcRouteManager
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IPortalAliasService portalAliasService;
         private List<int> prefixCounts;
 
         public PortalAliasMvcRouteManager(IPortalAliasService portalAliasService)
         {
+			Logger.LogDebug(">>> Entering PortalAliasMvcRouteManager(portalAliasService={PortalAliasService})", portalAliasService);
             this.portalAliasService = portalAliasService;
+			Logger.LogDebug("<<< Exiting PortalAliasMvcRouteManager(portalAliasService={PortalAliasService})", portalAliasService);
+			Logger.LogDebug("PortalAliasMvcRouteManager(portalAliasService={PortalAliasService}): portalAliasService → {PortalAliasService1}", portalAliasService, portalAliasService);
+			Logger.LogDebug("PortalAliasMvcRouteManager(portalAliasService={PortalAliasService}): this.portalAliasService → {Arg1}", portalAliasService, this.portalAliasService);
         }
 
         /// <inheritdoc />
         public string GetRouteName(string moduleFolderName, string routeName, int count)
         {
+			Logger.LogDebug(">>> Entering GetRouteName(moduleFolderName={ModuleFolderName},routeName={RouteName},count={Count})", moduleFolderName, routeName, count);
             Requires.NotNullOrEmpty("moduleFolderName", moduleFolderName);
             Requires.NotNegative("count", count);
 
+			Logger.LogDebug("<<< Exiting GetRouteName(moduleFolderName={ModuleFolderName},routeName={RouteName},count={Count})", moduleFolderName, routeName, count);
             return moduleFolderName + "-" + routeName + "-" + count.ToString(CultureInfo.InvariantCulture);
         }
 
@@ -40,6 +47,7 @@ namespace DotNetNuke.Web.Mvc.Routing
         [DnnDeprecated(9, 10, 0, "Use overload taking DotNetNuke.Abstractions.Portals.IPortalAliasInfo instead")]
         public partial string GetRouteName(string moduleFolderName, string routeName, PortalAliasInfo portalAlias)
         {
+			Logger.LogDebug("<<< Exiting GetRouteName(moduleFolderName={ModuleFolderName},routeName={RouteName},portalAlias={PortalAlias})", moduleFolderName, routeName, portalAlias);
             return this.GetRouteName(moduleFolderName, routeName, (IPortalAliasInfo)portalAlias);
         }
 
@@ -63,6 +71,7 @@ namespace DotNetNuke.Web.Mvc.Routing
         [DnnDeprecated(9, 10, 0, "Use overload taking DotNetNuke.Abstractions.Portals.IPortalAliasInfo instead")]
         public partial RouteValueDictionary GetAllRouteValues(PortalAliasInfo portalAliasInfo, object routeValues)
         {
+			Logger.LogDebug("<<< Exiting GetAllRouteValues(portalAliasInfo={PortalAliasInfo},routeValues={RouteValues})", portalAliasInfo, routeValues);
             return this.GetAllRouteValues((IPortalAliasInfo)portalAliasInfo, routeValues);
         }
 
@@ -91,21 +100,28 @@ namespace DotNetNuke.Web.Mvc.Routing
         /// <inheritdoc />
         public string GetRouteUrl(string moduleFolderName, string url, int count)
         {
+			Logger.LogDebug(">>> Entering GetRouteUrl(moduleFolderName={ModuleFolderName},url={Url},count={Count})", moduleFolderName, url, count);
             Requires.NotNegative("count", count);
             Requires.NotNullOrEmpty("moduleFolderName", moduleFolderName);
 
+			Logger.LogDebug("<<< Exiting GetRouteUrl(moduleFolderName={ModuleFolderName},url={Url},count={Count})", moduleFolderName, url, count);
             return $"{GeneratePrefixString(count)}DesktopModules/MVC/{moduleFolderName}/{url}";
         }
 
         /// <inheritdoc />
         public void ClearCachedData()
         {
+			Logger.LogDebug(">>> Entering ClearCachedData()");
             this.prefixCounts = null;
+			Logger.LogDebug("<<< Exiting ClearCachedData()");
+			Logger.LogDebug("ClearCachedData(): prefixCounts → {PrefixCounts}", prefixCounts);
+			Logger.LogDebug("ClearCachedData(): this.prefixCounts → {Arg0}", this.prefixCounts);
         }
 
         /// <inheritdoc />
         public IEnumerable<int> GetRoutePrefixCounts()
         {
+			Logger.LogDebug(">>> Entering GetRoutePrefixCounts()");
             if (this.prefixCounts != null)
             {
                 return this.prefixCounts;
@@ -115,6 +131,8 @@ namespace DotNetNuke.Web.Mvc.Routing
             // when a new portal is added so cache them until that time
             var portals = PortalController.Instance.GetPortals();
             var segmentCounts1 = new List<int>();
+			Logger.LogDebug("GetRoutePrefixCounts(): portals → {Portals}", portals);
+			Logger.LogDebug("GetRoutePrefixCounts(): segmentCounts1 → {SegmentCounts1}", segmentCounts1);
 
             foreach (
                 var count in
@@ -128,12 +146,15 @@ namespace DotNetNuke.Web.Mvc.Routing
 
             IEnumerable<int> segmentCounts = segmentCounts1;
             this.prefixCounts = segmentCounts.OrderByDescending(x => x).ToList();
+			Logger.LogDebug("GetRoutePrefixCounts(): prefixCounts → {PrefixCounts}", prefixCounts);
 
+			Logger.LogDebug("<<< Exiting GetRoutePrefixCounts()");
             return this.prefixCounts;
         }
 
         private static string GeneratePrefixString(int count)
         {
+			Logger.LogDebug(">>> Entering GeneratePrefixString(count={Count})", count);
             if (count == 0)
             {
                 return string.Empty;
@@ -141,11 +162,13 @@ namespace DotNetNuke.Web.Mvc.Routing
 
             var prefix = string.Empty;
 
+			Logger.LogDebug("GeneratePrefixString(count={Count}): prefix → {Prefix}", count, prefix);
             for (var i = count - 1; i >= 0; i--)
             {
                 prefix = "{prefix" + i + "}/" + prefix;
             }
 
+			Logger.LogDebug("<<< Exiting GeneratePrefixString(count={Count})", count);
             return prefix;
         }
 
@@ -173,8 +196,10 @@ namespace DotNetNuke.Web.Mvc.Routing
 
         private IEnumerable<string> StripApplicationPath(IEnumerable<string> aliases)
         {
+			Logger.LogDebug(">>> Entering StripApplicationPath(aliases={Aliases})", aliases);
             var appPath = TestableGlobals.Instance.ApplicationPath;
 
+			Logger.LogDebug("<<< Exiting StripApplicationPath(aliases={Aliases})", aliases);
             return string.IsNullOrEmpty(appPath) ? aliases : StripApplicationPathIterable(aliases, appPath);
         }
     }

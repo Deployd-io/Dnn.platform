@@ -20,15 +20,18 @@ namespace DNNConnect.CKEditorProvider.Utilities
     /// <summary>Toolbar Helper Class.</summary>
     public class ToolbarUtil
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Loads the tool bar buttons.</summary>
         /// <param name="homeDirPath">The home folder path.</param>
         /// <returns>Returns the Toolbar Button List.</returns>
         public static List<ToolbarButton> LoadToolBarButtons(string homeDirPath)
         {
+			Logger.LogDebug(">>> Entering LoadToolBarButtons(homeDirPath={HomeDirPath})", homeDirPath);
             List<ToolbarButton> buttons;
 
             var serializer = new XmlSerializer(typeof(List<ToolbarButton>));
 
+			Logger.LogDebug("LoadToolBarButtons(homeDirPath={HomeDirPath}): serializer → {Serializer}", homeDirPath, serializer);
             using (
                 TextReader textReader =
                     new StreamReader(
@@ -39,6 +42,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                             FileShare.Read)))
             {
                 buttons = (List<ToolbarButton>)serializer.Deserialize(textReader);
+				Logger.LogDebug("LoadToolBarButtons(homeDirPath={HomeDirPath}): buttons → {Buttons}", homeDirPath, buttons);
 
                 textReader.Close();
             }
@@ -46,8 +50,10 @@ namespace DNNConnect.CKEditorProvider.Utilities
             foreach (var button in buttons.Where(button => button.ToolbarName.Equals("oEmbed")))
             {
                 button.ToolbarName = "oembed";
+				Logger.LogDebug("LoadToolBarButtons(homeDirPath={HomeDirPath}): button.ToolbarName → {Arg1}", homeDirPath, button.ToolbarName);
             }
 
+			Logger.LogDebug("<<< Exiting LoadToolBarButtons(homeDirPath={HomeDirPath})", homeDirPath);
             return buttons;
         }
 
@@ -56,10 +62,13 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// <returns>Returns the ToolbarSet.</returns>
         public static ToolbarSet ConvertStringToToolbarSet(string inputString)
         {
+			Logger.LogDebug(">>> Entering ConvertStringToToolbarSet(inputString={InputString})", inputString);
             inputString = inputString.Replace(" ", string.Empty).Replace("\"", "'");
 
+			Logger.LogDebug("ConvertStringToToolbarSet(inputString={InputString}): inputString → {InputString1}", inputString, inputString);
             var toolbarSet = new ToolbarSet();
 
+			Logger.LogDebug("ConvertStringToToolbarSet(inputString={InputString}): toolbarSet → {ToolbarSet}", inputString, toolbarSet);
             // Import old toolbar set older then CKEditor 3.6
             if (inputString.StartsWith("["))
             {
@@ -67,13 +76,16 @@ namespace DNNConnect.CKEditorProvider.Utilities
 
                 var matchOld = Regex.Match(inputString, @"\[(?<group>[^\]]*)\]");
 
+				Logger.LogDebug("ConvertStringToToolbarSet(inputString={InputString}): matchOld → {MatchOld}", inputString, matchOld);
                 while (matchOld.Success)
                 {
                     var group =
                         matchOld.Groups["group"].Value.Replace("'", string.Empty).Replace(" ", string.Empty).Split(',');
+						Logger.LogDebug("ConvertStringToToolbarSet(inputString={InputString}): group → {Group}", inputString, group);
 
                     var toolBarGroup = new ToolbarGroup
                     {
+						Logger.LogDebug("ConvertStringToToolbarSet(inputString={InputString}): toolBarGroup → {ToolBarGroup}", inputString, toolBarGroup);
                         items = new List<string>(),
                         name = string.Format("Group{0}", groupId),
                     };
@@ -93,6 +105,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
 
             var match = Regex.Match(inputString, @"\{name:'(?<groupName>(.+?))',items:\[(?<group>[^\]]*)\]\}");
 
+			Logger.LogDebug("ConvertStringToToolbarSet(inputString={InputString}): match → {Match}", inputString, match);
             while (match.Success)
             {
                 var group = match.Groups["group"].Value.Replace("'", string.Empty).Replace(" ", string.Empty).Split(',');
@@ -109,6 +122,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 match = match.NextMatch();
             }
 
+			Logger.LogDebug("<<< Exiting ConvertStringToToolbarSet(inputString={InputString})", inputString);
             return toolbarSet;
         }
 
@@ -160,6 +174,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// <param name="savePath">The save path.</param>
         public static void CreateDefaultToolbarButtonXml(string savePath)
         {
+			Logger.LogDebug(">>> Entering CreateDefaultToolbarButtonXml(savePath={SavePath})", savePath);
             List<ToolbarButton> toolbarButtons = new List<ToolbarButton>
                                                      {
                                                          new ToolbarButton
@@ -555,12 +570,14 @@ namespace DNNConnect.CKEditorProvider.Utilities
             // Save the file
             var serializer = new XmlSerializer(typeof(List<ToolbarButton>));
 
+			Logger.LogDebug("CreateDefaultToolbarButtonXml(savePath={SavePath}): serializer → {Serializer}", savePath, serializer);
             using (var textWriter = new StreamWriter(Path.Combine(savePath, SettingConstants.ToolbarButtonXmlFileName)))
             {
                 serializer.Serialize(textWriter, toolbarButtons);
 
                 textWriter.Close();
             }
+			Logger.LogDebug("<<< Exiting CreateDefaultToolbarButtonXml(savePath={SavePath})", savePath);
         }
 
         /// <summary>Gets the default toolbar.</summary>
@@ -568,12 +585,14 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// <returns>Gets the Default Toolbar Based on the toolbarName.</returns>
         public static ToolbarSet GetDefaultToolbar(string toolbarName)
         {
+			Logger.LogDebug(">>> Entering GetDefaultToolbar(toolbarName={ToolbarName})", toolbarName);
             switch (toolbarName)
             {
                 case "Basic":
                     {
                         var toolbarSetBasic = new ToolbarSet("Basic", 10);
 
+						Logger.LogDebug("GetDefaultToolbar(toolbarName={ToolbarName}): toolbarSetBasic → {ToolbarSetBasic}", toolbarName, toolbarSetBasic);
                         // Basic Toolbar
                         var toolBarGroup = new ToolbarGroup
                         {
@@ -606,6 +625,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     {
                         var toolbarSetStandard = new ToolbarSet("Standard", 15);
 
+						Logger.LogDebug("GetDefaultToolbar(toolbarName={ToolbarName}): toolbarSetStandard → {ToolbarSetStandard}", toolbarName, toolbarSetStandard);
                         // Standard Toolbar
                         toolbarSetStandard.ToolbarGroups.Add(
                             new ToolbarGroup
@@ -684,6 +704,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     {
                         var toolbarSetFull = new ToolbarSet("Full", 20);
 
+						Logger.LogDebug("GetDefaultToolbar(toolbarName={ToolbarName}): toolbarSetFull → {ToolbarSetFull}", toolbarName, toolbarSetFull);
                         // Full Toolbar
                         toolbarSetFull.ToolbarGroups.Add(
                             new ToolbarGroup
@@ -826,6 +847,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     }
             }
 
+			Logger.LogDebug("<<< Exiting GetDefaultToolbar(toolbarName={ToolbarName})", toolbarName);
             return null;
         }
 
@@ -835,6 +857,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </param>
         public static void CreateDefaultToolbarSetXml(string savePath)
         {
+			Logger.LogDebug(">>> Entering CreateDefaultToolbarSetXml(savePath={SavePath})", savePath);
             var listToolbarsSets = new List<ToolbarSet>
                                        {
                                            GetDefaultToolbar("Basic"),
@@ -844,12 +867,14 @@ namespace DNNConnect.CKEditorProvider.Utilities
 
             var serializer = new XmlSerializer(typeof(List<ToolbarSet>));
 
+			Logger.LogDebug("CreateDefaultToolbarSetXml(savePath={SavePath}): serializer → {Serializer}", savePath, serializer);
             using (var textWriter = new StreamWriter(Path.Combine(savePath, SettingConstants.ToolbarSetXmlFileName)))
             {
                 serializer.Serialize(textWriter, listToolbarsSets);
 
                 textWriter.Close();
             }
+			Logger.LogDebug("<<< Exiting CreateDefaultToolbarSetXml(savePath={SavePath})", savePath);
         }
 
         /// <summary>Find the Toolbar Set with the x Value.</summary>
@@ -864,6 +889,8 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         internal static ToolbarSet FindHighestToolbar(List<ToolbarSet> toolbars, int maxPriority)
         {
+			Logger.LogDebug(">>> Entering FindHighestToolbar(toolbars={Toolbars},maxPriority={MaxPriority})", toolbars, maxPriority);
+			Logger.LogDebug("<<< Exiting FindHighestToolbar(toolbars={Toolbars},maxPriority={MaxPriority})", toolbars, maxPriority);
             return toolbars.Find(toolbarSel => toolbarSel.Priority.Equals(maxPriority));
         }
 
@@ -879,10 +906,12 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         internal static List<ToolbarSet> GetToolbars(string homeDirPath, string alternateConfigSubFolder)
         {
+			Logger.LogDebug(">>> Entering GetToolbars(homeDirPath={HomeDirPath},alternateConfigSubFolder={AlternateConfigSubFolder})", homeDirPath, alternateConfigSubFolder);
             if (!string.IsNullOrEmpty(alternateConfigSubFolder))
             {
                 var alternatePath = Path.Combine(homeDirPath, alternateConfigSubFolder);
 
+				Logger.LogDebug("GetToolbars(homeDirPath={HomeDirPath},alternateConfigSubFolder={AlternateConfigSubFolder}): alternatePath → {AlternatePath}", homeDirPath, alternateConfigSubFolder, alternatePath);
                 if (!Directory.Exists(alternatePath))
                 {
                     Directory.CreateDirectory(alternatePath);
@@ -893,6 +922,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
 
             bool createDefault = false;
 
+Logger.LogDebug("GetToolbars(homeDirPath={HomeDirPath},alternateConfigSubFolder={AlternateConfigSubFolder}): createDefault → {CreateDefault}", homeDirPath, alternateConfigSubFolder, createDefault);
 #pragma warning disable CS0618 // Type or member is obsolete
             // Import old ToolbarXmlFileName first if exist
             if (File.Exists(Path.Combine(homeDirPath, SettingConstants.ToolbarXmlFileName)))
@@ -929,8 +959,10 @@ namespace DNNConnect.CKEditorProvider.Utilities
 
             var serializer = new XmlSerializer(typeof(List<ToolbarSet>));
 
+			Logger.LogDebug("GetToolbars(homeDirPath={HomeDirPath},alternateConfigSubFolder={AlternateConfigSubFolder}): serializer → {Serializer}", homeDirPath, alternateConfigSubFolder, serializer);
             var toolBarSets = new List<ToolbarSet>();
 
+			Logger.LogDebug("GetToolbars(homeDirPath={HomeDirPath},alternateConfigSubFolder={AlternateConfigSubFolder}): toolBarSets → {ToolBarSets}", homeDirPath, alternateConfigSubFolder, toolBarSets);
             try
             {
                 using (
@@ -949,6 +981,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in GetToolbars(homeDirPath={HomeDirPath},alternateConfigSubFolder={AlternateConfigSubFolder}): {Arg2}", homeDirPath, alternateConfigSubFolder, ex.Message);
                 if (!createDefault)
                 {
                     // Delete Wrong Xml
@@ -988,6 +1021,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetToolbars(homeDirPath={HomeDirPath},alternateConfigSubFolder={AlternateConfigSubFolder})", homeDirPath, alternateConfigSubFolder);
             return toolBarSets;
         }
 
@@ -1018,6 +1052,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
         [Obsolete("Deprecated in DotNetNuke 7.0.0. Legacy XML file. Scheduled removal in v11.0.0.")]
         internal static void ImportOldToolbarXml(string homeDirPath)
         {
+			Logger.LogDebug(">>> Entering ImportOldToolbarXml(homeDirPath={HomeDirPath})", homeDirPath);
             // Delete old XML file in Host Path
             if (File.Exists(Path.Combine(Globals.HostMapPath, SettingConstants.ToolbarXmlFileName)))
             {
@@ -1027,8 +1062,10 @@ namespace DNNConnect.CKEditorProvider.Utilities
             // Import old XML file
             var oldXmlPath = Path.Combine(homeDirPath, SettingConstants.ToolbarXmlFileName);
 
+			Logger.LogDebug("ImportOldToolbarXml(homeDirPath={HomeDirPath}): oldXmlPath → {OldXmlPath}", homeDirPath, oldXmlPath);
             var oldSerializer = new XmlSerializer(typeof(List<Toolbar>));
 
+			Logger.LogDebug("ImportOldToolbarXml(homeDirPath={HomeDirPath}): oldSerializer → {OldSerializer}", homeDirPath, oldSerializer);
             List<Toolbar> toolBars;
 
             using (var textReader = new StreamReader(new FileStream(oldXmlPath, FileMode.Open, FileAccess.Read, FileShare.Read)))
@@ -1040,6 +1077,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
 
             var listToolbarsSets = new List<ToolbarSet>();
 
+			Logger.LogDebug("ImportOldToolbarXml(homeDirPath={HomeDirPath}): listToolbarsSets → {ListToolbarsSets}", homeDirPath, listToolbarsSets);
             // Migrate toolbars
             foreach (var toolbar in toolBars)
             {
@@ -1049,6 +1087,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 {
                     case "Basic":
                         toolbarSet = GetDefaultToolbar("Basic");
+						Logger.LogDebug("ImportOldToolbarXml(homeDirPath={HomeDirPath}): toolbarSet → {ToolbarSet}", homeDirPath, toolbarSet);
                         break;
                     case "Standard":
                         toolbarSet = GetDefaultToolbar("Standard");
@@ -1066,6 +1105,8 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 }
 
                 toolbarSet.Name = toolbar.sToolbarName;
+				Logger.LogDebug("ImportOldToolbarXml(homeDirPath={HomeDirPath}): toolbarSet.Name → {Arg1}", homeDirPath, toolbarSet.Name);
+				Logger.LogDebug("ImportOldToolbarXml(homeDirPath={HomeDirPath}): toolbarSet.Priority → {Arg1}", homeDirPath, toolbarSet.Priority);
                 toolbarSet.Priority = toolbar.iPriority;
 
                 listToolbarsSets.Add(toolbarSet);
@@ -1074,6 +1115,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
             // Save update new XML file
             var newSerializer = new XmlSerializer(typeof(List<ToolbarSet>));
 
+			Logger.LogDebug("ImportOldToolbarXml(homeDirPath={HomeDirPath}): newSerializer → {NewSerializer}", homeDirPath, newSerializer);
             using (var textWriter = new StreamWriter(Path.Combine(homeDirPath, SettingConstants.ToolbarSetXmlFileName)))
             {
                 newSerializer.Serialize(textWriter, listToolbarsSets);
@@ -1083,6 +1125,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
 
             // Delete old XML file
             File.Delete(Path.Combine(homeDirPath, SettingConstants.ToolbarXmlFileName));
+			Logger.LogDebug("<<< Exiting ImportOldToolbarXml(homeDirPath={HomeDirPath})", homeDirPath);
         }
     }
 }

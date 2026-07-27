@@ -16,9 +16,12 @@ namespace DotNetNuke.Modules.Groups
 
     public class GroupsModuleBase : PortalModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public GroupsModuleBase()
         {
+			Logger.LogDebug(">>> Entering GroupsModuleBase()");
             this.NavigationManager = this.DependencyProvider.GetRequiredService<INavigationManager>();
+			Logger.LogDebug("<<< Exiting GroupsModuleBase()");
         }
 
         public enum GroupMode
@@ -276,16 +279,22 @@ namespace DotNetNuke.Modules.Groups
 
         public string GetCreateUrl()
         {
+			Logger.LogDebug(">>> Entering GetCreateUrl()");
+			Logger.LogDebug("<<< Exiting GetCreateUrl()");
             return this.ModuleContext.EditUrl("Create"); ////.NavigateUrl(GroupCreateTabId,"",true,null);
         }
 
         public string GetClearFilterUrl()
         {
+			Logger.LogDebug(">>> Entering GetClearFilterUrl()");
+			Logger.LogDebug("<<< Exiting GetClearFilterUrl()");
             return this.NavigationManager.NavigateURL(this.TabId, string.Empty);
         }
 
         public string GetEditUrl()
         {
+			Logger.LogDebug(">>> Entering GetEditUrl()");
+			Logger.LogDebug("<<< Exiting GetEditUrl()");
             return this.ModuleContext.EditUrl("GroupId", this.GroupId.ToString("D"), "Edit");
         }
     }

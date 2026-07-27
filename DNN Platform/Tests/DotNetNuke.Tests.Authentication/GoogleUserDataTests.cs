@@ -12,6 +12,7 @@ namespace DotNetNuke.Tests.Authentication
     [TestFixture]
     public class GoogleUserDataTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string SampleUserJson = @"{
  ""id"": ""108453011160062628399"",
  ""name"": ""Fred the Dinosaur"",
@@ -26,25 +27,31 @@ namespace DotNetNuke.Tests.Authentication
         [Test]
         public void GoogleUserData_Populates_Inherited_Name_Properties_When_Deserialized()
         {
+			Logger.LogDebug(">>> Entering GoogleUserData_Populates_Inherited_Name_Properties_When_Deserialized()");
             // Act
             UserData dukesUser = Json.Deserialize<GoogleUserData>(SampleUserJson);
 
+			Logger.LogDebug("GoogleUserData_Populates_Inherited_Name_Properties_When_Deserialized(): dukesUser → {DukesUser}", dukesUser);
             using (Assert.EnterMultipleScope())
             {
                 // Assert
                 Assert.That(dukesUser.FirstName, Is.EqualTo("Frederick"), "Should correctly pull first name from given_name field, not by parsing name");
                 Assert.That(dukesUser.LastName, Is.EqualTo("Franklin"), "Should correctly pull first name from family_name field, not by parsing name");
             }
+			Logger.LogDebug("<<< Exiting GoogleUserData_Populates_Inherited_Name_Properties_When_Deserialized()");
         }
 
         [Test]
         public void GoogleUserData_Populates_Inherited_ProfileImage_Property_When_Deserialized()
         {
+			Logger.LogDebug(">>> Entering GoogleUserData_Populates_Inherited_ProfileImage_Property_When_Deserialized()");
             // Act
             UserData dukesUser = Json.Deserialize<GoogleUserData>(SampleUserJson);
 
+			Logger.LogDebug("GoogleUserData_Populates_Inherited_ProfileImage_Property_When_Deserialized(): dukesUser → {DukesUser}", dukesUser);
             // Assert
             Assert.That(dukesUser.ProfileImage, Is.EqualTo("https://lh3.googleusercontent.com/-aii-uOqdr1M/AAAAAAAAAAI/AAAAAAAAADg/dNL75Dg7lbc/photo.jpg"));
+			Logger.LogDebug("<<< Exiting GoogleUserData_Populates_Inherited_ProfileImage_Property_When_Deserialized()");
         }
     }
 }

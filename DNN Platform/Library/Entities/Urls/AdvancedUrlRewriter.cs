@@ -43,12 +43,18 @@ namespace DotNetNuke.Entities.Urls
     public class AdvancedUrlRewriter(IHostSettings hostSettings, IPortalAliasService portalAliasService, IHostSettingsService hostSettingsService, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController)
         : UrlRewriterBase(hostSettings, portalAliasService, hostSettingsService, portalController)
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string ProductName = "AdvancedUrlRewriter";
+		Logger.LogDebug(">>> Entering AdvancedUrlRewriter(hostSettings={HostSettings},portalAliasService={PortalAliasService},hostSettingsService={HostSettingsService},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController})", hostSettings, portalAliasService, hostSettingsService, portalController, appStatus, portalGroupController);
         private static readonly Regex DefaultPageRegex = new Regex(@"(?<!(\?.+))/" + Globals.glbDefaultPage, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
         private static readonly Regex AumDebugRegex = new Regex(@"(&|\?)_aumdebug=[A-Z]+(?:&|$)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
+		Logger.LogDebug("AdvancedUrlRewriter(hostSettings={HostSettings},portalAliasService={PortalAliasService},hostSettingsService={HostSettingsService},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): DefaultPageRegex → {DefaultPageRegex}", hostSettings, portalAliasService, hostSettingsService, portalController, appStatus, portalGroupController, DefaultPageRegex);
+		Logger.LogDebug("AdvancedUrlRewriter(hostSettings={HostSettings},portalAliasService={PortalAliasService},hostSettingsService={HostSettingsService},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): AumDebugRegex → {AumDebugRegex}", hostSettings, portalAliasService, hostSettingsService, portalController, appStatus, portalGroupController, AumDebugRegex);
         private static readonly Regex RewritePathRx = new Regex("(?:&(?<parm>.[^&]+)=$)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
         private static readonly Regex UrlSlashesRegex = new Regex("[\\\\/]\\.\\.[\\\\/]", RegexOptions.Compiled);
         private static readonly Regex AliasUrlRegex = new Regex(@"(?:^(?<http>http[s]{0,1}://){0,1})(?:(?<alias>_ALIAS_)(?<path>$|\?[\w]*|/[\w]*))", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
+		Logger.LogDebug("AdvancedUrlRewriter(hostSettings={HostSettings},portalAliasService={PortalAliasService},hostSettingsService={HostSettingsService},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): RewritePathRx → {RewritePathRx}", hostSettings, portalAliasService, hostSettingsService, portalController, appStatus, portalGroupController, RewritePathRx);
+		Logger.LogDebug("AdvancedUrlRewriter(hostSettings={HostSettings},portalAliasService={PortalAliasService},hostSettingsService={HostSettingsService},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): UrlSlashesRegex → {UrlSlashesRegex}", hostSettings, portalAliasService, hostSettingsService, portalController, appStatus, portalGroupController, UrlSlashesRegex);
         private readonly IPortalAliasService portalAliasService = portalAliasService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalAliasService>();
         private readonly IApplicationStatusInfo appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
         private readonly IPortalGroupController portalGroupController = portalGroupController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalGroupController>();
@@ -70,6 +76,7 @@ namespace DotNetNuke.Entities.Urls
         public AdvancedUrlRewriter(IHostSettings hostSettings, IPortalAliasService portalAliasService, IHostSettingsService hostSettingsService, IPortalController portalController)
             : this(hostSettings, portalAliasService, hostSettingsService, portalController, null, null)
         {
+		Logger.LogDebug("<<< Exiting AdvancedUrlRewriter(hostSettings={HostSettings},portalAliasService={PortalAliasService},hostSettingsService={HostSettingsService},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController})", hostSettings, portalAliasService, hostSettingsService, portalController, appStatus, portalGroupController);
         }
 
         public void ProcessTestRequestWithContext(
@@ -211,12 +218,16 @@ namespace DotNetNuke.Entities.Urls
         /// <inheritdoc />
         internal override void RewriteUrl(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering RewriteUrl(sender={Sender},e={E})", sender, e);
             Guid parentTraceId = Guid.Empty;
             const bool debug = true;
             bool failedInitialization = false;
             bool ignoreForInstall = false;
+			Logger.LogDebug("RewriteUrl(sender={Sender},e={E}): failedInitialization → {FailedInitialization}", sender, e, failedInitialization);
+			Logger.LogDebug("RewriteUrl(sender={Sender},e={E}): ignoreForInstall → {IgnoreForInstall}", sender, e, ignoreForInstall);
             var app = (HttpApplication)sender;
             try
+			Logger.LogDebug("RewriteUrl(sender={Sender},e={E}): app → {App}", sender, e, app);
             {
                 // 875 : completely ignore install/upgrade requests immediately
                 ignoreForInstall = IgnoreRequestForInstall(app.Request);
@@ -224,6 +235,7 @@ namespace DotNetNuke.Entities.Urls
                 if (ignoreForInstall == false)
                 {
                     this.settings = new FriendlyUrlSettings(-1);
+					Logger.LogDebug("RewriteUrl(sender={Sender},e={E}): settings → {Settings}", sender, e, settings);
 
                     SecurityCheck(app);
                 }
@@ -238,6 +250,7 @@ namespace DotNetNuke.Entities.Urls
                     ShowDebugData(app.Context, app.Request.Url.AbsoluteUri, null, ex);
                     var action = new UrlAction(app.Request) { Action = ActionType.Output404 };
                     Handle404OrException(this.settings, app.Context, ex, action, false, debug);
+					Logger.LogDebug("RewriteUrl(sender={Sender},e={E}): action → {Action}", sender, e, action);
                 }
                 else
                 {
@@ -266,6 +279,7 @@ namespace DotNetNuke.Entities.Urls
                     true,
                     parentTraceId);
             }
+			Logger.LogDebug("<<< Exiting RewriteUrl(sender={Sender},e={E})", sender, e);
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
@@ -946,19 +960,24 @@ namespace DotNetNuke.Entities.Urls
 
         private static GenericPrincipal GetCurrentPrincipal(HttpContext context)
         {
+			Logger.LogDebug(">>> Entering GetCurrentPrincipal(context={Context})", context);
             // Extract the forms authentication cookie
             var authCookie = context.Request.Cookies[FormsAuthentication.FormsCookieName];
             var currentPrincipal = new GenericPrincipal(new GenericIdentity(string.Empty), []);
 
+			Logger.LogDebug("GetCurrentPrincipal(context={Context}): currentPrincipal → {CurrentPrincipal}", context, currentPrincipal);
             try
             {
                 if (authCookie != null)
                 {
                     var authTicket = FormsAuthentication.Decrypt(authCookie.Value);
                     if (authTicket is { Expired: false, })
+					Logger.LogDebug("GetCurrentPrincipal(context={Context}): authTicket → {AuthTicket}", context, authTicket);
                     {
                         var roles = authTicket.UserData.Split('|');
                         var id = new FormsIdentity(authTicket);
+						Logger.LogDebug("GetCurrentPrincipal(context={Context}): roles → {Roles}", context, roles);
+						Logger.LogDebug("GetCurrentPrincipal(context={Context}): id → {Id}", context, id);
                         currentPrincipal = new GenericPrincipal(id, roles);
                     }
                 }
@@ -968,6 +987,7 @@ namespace DotNetNuke.Entities.Urls
                 // do nothing here.
             }
 
+			Logger.LogDebug("<<< Exiting GetCurrentPrincipal(context={Context})", context);
             return currentPrincipal;
         }
 
@@ -1410,6 +1430,8 @@ namespace DotNetNuke.Entities.Urls
 
         private static string MakeUrlWithAlias(Uri requestUri, string httpAlias)
         {
+			Logger.LogDebug(">>> Entering MakeUrlWithAlias(requestUri={RequestUri},httpAlias={HttpAlias})", requestUri, httpAlias);
+			Logger.LogDebug("<<< Exiting MakeUrlWithAlias(requestUri={RequestUri},httpAlias={HttpAlias})", requestUri, httpAlias);
             return requestUri.AbsoluteUri.StartsWith("https://", StringComparison.InvariantCultureIgnoreCase)
                              ? "https://" + httpAlias.Replace("*.", string.Empty) + "/"
                              : "http://" + httpAlias.Replace("*.", string.Empty) + "/";
@@ -1458,6 +1480,7 @@ namespace DotNetNuke.Entities.Urls
 
         private static bool IgnoreRequestForWebServer(IPortalAliasService portalAliasService, string requestedPath)
         {
+			Logger.LogDebug(">>> Entering IgnoreRequestForWebServer(portalAliasService={PortalAliasService},requestedPath={RequestedPath})", portalAliasService, requestedPath);
             // Should standardize comparison methods
             if (requestedPath.IndexOf("synchronizecache.aspx", StringComparison.OrdinalIgnoreCase) > 1
                 || requestedPath.EndsWith("keepalive.aspx", StringComparison.OrdinalIgnoreCase))
@@ -1468,11 +1491,13 @@ namespace DotNetNuke.Entities.Urls
             // Get the root
             var rootPath = requestedPath.Substring(0, requestedPath.LastIndexOf("/", StringComparison.Ordinal));
             rootPath = rootPath.Substring(rootPath.IndexOf("://", StringComparison.Ordinal) + 3);
+			Logger.LogDebug("IgnoreRequestForWebServer(portalAliasService={PortalAliasService},requestedPath={RequestedPath}): rootPath → {RootPath}", portalAliasService, requestedPath, rootPath);
 
             // Check if this is a WebServer and not a portalalias.
             // if can auto add portal alias enabled, then return false, alias will add later.
             var alias = portalAliasService.GetPortalAlias(rootPath);
             if (alias != null || CanAutoAddPortalAlias())
+			Logger.LogDebug("IgnoreRequestForWebServer(portalAliasService={PortalAliasService},requestedPath={RequestedPath}): alias → {Alias}", portalAliasService, requestedPath, alias);
             {
                 return false;
             }
@@ -1480,10 +1505,12 @@ namespace DotNetNuke.Entities.Urls
             // Check if this is a WebServer
             var server = ServerController.GetEnabledServers().SingleOrDefault(s => s.Url == rootPath);
             if (server != null)
+			Logger.LogDebug("IgnoreRequestForWebServer(portalAliasService={PortalAliasService},requestedPath={RequestedPath}): server → {Server}", portalAliasService, requestedPath, server);
             {
                 return true;
             }
 
+			Logger.LogDebug("<<< Exiting IgnoreRequestForWebServer(portalAliasService={PortalAliasService},requestedPath={RequestedPath})", portalAliasService, requestedPath);
             return false;
         }
 
@@ -2011,20 +2038,28 @@ namespace DotNetNuke.Entities.Urls
 
         private static PortalAliasInfo GetPortalAlias(FriendlyUrlSettings settings, string requestUrl, out bool redirectAlias, out bool isPrimaryAlias, out string wrongAlias)
         {
+			Logger.LogDebug(">>> Entering GetPortalAlias(settings={Settings},requestUrl={RequestUrl})", settings, requestUrl);
             PortalAliasInfo aliasInfo = null;
             redirectAlias = false;
+			Logger.LogDebug("GetPortalAlias(settings={Settings},requestUrl={RequestUrl}): aliasInfo → {AliasInfo}", settings, requestUrl, aliasInfo);
+			Logger.LogDebug("GetPortalAlias(settings={Settings},requestUrl={RequestUrl}): redirectAlias → {RedirectAlias}", settings, requestUrl, redirectAlias);
             wrongAlias = null;
             isPrimaryAlias = false;
+			Logger.LogDebug("GetPortalAlias(settings={Settings},requestUrl={RequestUrl}): wrongAlias → {WrongAlias}", settings, requestUrl, wrongAlias);
+			Logger.LogDebug("GetPortalAlias(settings={Settings},requestUrl={RequestUrl}): isPrimaryAlias → {IsPrimaryAlias}", settings, requestUrl, isPrimaryAlias);
             OrderedDictionary portalAliases = TabIndexController.GetPortalAliases(settings);
             foreach (string alias in portalAliases.Keys)
             {
+			Logger.LogDebug("GetPortalAlias(settings={Settings},requestUrl={RequestUrl}): portalAliases → {PortalAliases}", settings, requestUrl, portalAliases);
                 var urlToMatch = requestUrl;
+				Logger.LogDebug("GetPortalAlias(settings={Settings},requestUrl={RequestUrl}): urlToMatch → {UrlToMatch}", settings, requestUrl, urlToMatch);
 
                 // in fact, requested url should contain alias
                 // for better performance, need to check whether we want to proceed with a whole url matching or not
                 // if alias is not a part of url -> let's proceed to the next iteration
                 var aliasIndex = urlToMatch.IndexOf(alias, StringComparison.InvariantCultureIgnoreCase);
                 if (aliasIndex < 0)
+				Logger.LogDebug("GetPortalAlias(settings={Settings},requestUrl={RequestUrl}): aliasIndex → {AliasIndex}", settings, requestUrl, aliasIndex);
                 {
                     continue;
                 }
@@ -2033,6 +2068,7 @@ namespace DotNetNuke.Entities.Urls
                     // we do not accept URL if the first occurence of alias is presented somewhere in the query string
                     var queryIndex = urlToMatch.IndexOf("?", StringComparison.InvariantCultureIgnoreCase);
                     if (queryIndex >= 0 && queryIndex < aliasIndex)
+					Logger.LogDebug("GetPortalAlias(settings={Settings},requestUrl={RequestUrl}): queryIndex → {QueryIndex}", settings, requestUrl, queryIndex);
                     {
                         // alias is in the query string, go to the next alias
                         continue;
@@ -2047,10 +2083,12 @@ namespace DotNetNuke.Entities.Urls
                 // in the below expression we will validate following value http://_ALIAS_/query?string=test
                 var aliasMatch = AliasUrlRegex.Match(urlToMatch);
                 if (aliasMatch.Success)
+				Logger.LogDebug("GetPortalAlias(settings={Settings},requestUrl={RequestUrl}): aliasMatch → {AliasMatch}", settings, requestUrl, aliasMatch);
                 {
                     // check for mobile browser and matching
                     var aliasEx = (PortalAliasInfo)portalAliases[alias];
                     redirectAlias = aliasEx.Redirect;
+					Logger.LogDebug("GetPortalAlias(settings={Settings},requestUrl={RequestUrl}): aliasEx → {AliasEx}", settings, requestUrl, aliasEx);
                     if (redirectAlias)
                     {
                         wrongAlias = alias;
@@ -2062,6 +2100,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetPortalAlias(settings={Settings},requestUrl={RequestUrl})", settings, requestUrl);
             return aliasInfo;
         }
 
@@ -2189,9 +2228,11 @@ namespace DotNetNuke.Entities.Urls
                 {
                     string replaceFind = @"(?<=https?://)" + Regex.Escape(replaceDomain);
                     url = Regex.Replace(url, replaceFind, withDomain, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+					Logger.LogDebug("ReplaceDomainName(url={Url},replaceDomain={ReplaceDomain},withDomain={WithDomain}): url → {Url1}", url, replaceDomain, withDomain, url);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ReplaceDomainName(url={Url},replaceDomain={ReplaceDomain},withDomain={WithDomain})", url, replaceDomain, withDomain);
             return url;
         }
 

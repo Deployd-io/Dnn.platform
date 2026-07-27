@@ -16,12 +16,15 @@ namespace DotNetNuke.UI.WebControls
     /// </summary>
     public partial class EditControlFactory
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>CreateEditControl creates the appropriate Control based on the EditorField or TypeDataField. </summary>
         /// <param name="editorInfo">An EditorInfo object.</param>
         /// <returns>A new <see cref="EditControl"/> instance.</returns>
         [DnnDeprecated(10, 0, 0, "Please use overload with IServiceProvider")]
         public static partial EditControl CreateEditControl(EditorInfo editorInfo)
         {
+			Logger.LogDebug(">>> Entering CreateEditControl(editorInfo={EditorInfo})", editorInfo);
+			Logger.LogDebug("<<< Exiting CreateEditControl(editorInfo={EditorInfo})", editorInfo);
             return CreateEditControl(Globals.GetCurrentServiceProvider(), editorInfo);
         }
 
@@ -66,16 +69,20 @@ namespace DotNetNuke.UI.WebControls
 
             propEditor.CustomAttributes = editorInfo.Attributes;
 
+			Logger.LogDebug("<<< Exiting CreateEditControl(serviceProvider={ServiceProvider},editorInfo={EditorInfo})", serviceProvider, editorInfo);
             return propEditor;
         }
 
         private static EditControl CreateEditControlInternal(string systemType)
         {
+			Logger.LogDebug(">>> Entering CreateEditControlInternal(systemType={SystemType})", systemType);
             EditControl propEditor = null;
             try
+			Logger.LogDebug("CreateEditControlInternal(systemType={SystemType}): propEditor → {PropEditor}", systemType, propEditor);
             {
                 var type = Type.GetType(systemType);
                 if (type != null)
+				Logger.LogDebug("CreateEditControlInternal(systemType={SystemType}): type → {Type}", systemType, type);
                 {
                     switch (type.FullName)
                     {
@@ -101,9 +108,11 @@ namespace DotNetNuke.UI.WebControls
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in CreateEditControlInternal(systemType={SystemType}): {Arg1}", systemType, ex.Message);
                 // ignore
             }
 
+			Logger.LogDebug("<<< Exiting CreateEditControlInternal(systemType={SystemType})", systemType);
             return propEditor ?? new TextEditControl(systemType);
         }
     }

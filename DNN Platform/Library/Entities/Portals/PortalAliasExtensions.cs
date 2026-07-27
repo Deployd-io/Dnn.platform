@@ -21,8 +21,11 @@ namespace DotNetNuke.Entities.Portals
     /// <summary>Extensions for portal aliases.</summary>
     public static partial class PortalAliasExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static bool ContainsAlias(this IEnumerable<PortalAliasInfo> aliases, int portalId, string httpAlias)
         {
+			Logger.LogDebug(">>> Entering ContainsAlias(aliases={Aliases},portalId={PortalId},httpAlias={HttpAlias})", aliases, portalId, httpAlias);
+			Logger.LogDebug("<<< Exiting ContainsAlias(aliases={Aliases},portalId={PortalId},httpAlias={HttpAlias})", aliases, portalId, httpAlias);
             return aliases.Cast<IPortalAliasInfo>()
                 .Where(alias => alias.PortalId == portalId || portalId == -1)
                 .Any(alias => string.Equals(alias.HttpAlias, httpAlias, StringComparison.OrdinalIgnoreCase));
@@ -30,6 +33,8 @@ namespace DotNetNuke.Entities.Portals
 
         public static bool ContainsSpecificSkins(this IEnumerable<PortalAliasInfo> aliases)
         {
+			Logger.LogDebug(">>> Entering ContainsSpecificSkins(aliases={Aliases})", aliases);
+			Logger.LogDebug("<<< Exiting ContainsSpecificSkins(aliases={Aliases})", aliases);
             return aliases.Any(alias => !string.IsNullOrEmpty(alias.Skin));
         }
 
@@ -96,6 +101,7 @@ namespace DotNetNuke.Entities.Portals
                 };
             }
 
+			Logger.LogDebug("<<< Exiting GetAliasByPortalIdAndSettings(aliases={Aliases},portalId={PortalId},requestedAlias={RequestedAlias},cultureCode={CultureCode},settings={Settings})", aliases, portalId, requestedAlias, cultureCode, settings);
             return GetAliasByPortalIdAndSettings(aliases, portalId, result, cultureCode, browserType.ToAbstractionsBrowserTypes());
         }
 
@@ -209,17 +215,22 @@ namespace DotNetNuke.Entities.Portals
 
         public static List<string> GetAliasesForPortalId(this IEnumerable<PortalAliasInfo> aliases, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetAliasesForPortalId(aliases={Aliases},portalId={PortalId})", aliases, portalId);
             var httpAliases = new List<string>();
             foreach (var cpa in aliases.Where((IPortalAliasInfo cpa) => !httpAliases.Contains(cpa.HttpAlias)))
             {
+			Logger.LogDebug("GetAliasesForPortalId(aliases={Aliases},portalId={PortalId}): httpAliases → {HttpAliases}", aliases, portalId, httpAliases);
                 httpAliases.Add(cpa.HttpAlias.ToLowerInvariant());
             }
 
+			Logger.LogDebug("<<< Exiting GetAliasesForPortalId(aliases={Aliases},portalId={PortalId})", aliases, portalId);
             return httpAliases;
         }
 
         public static string GetCultureByPortalIdAndAlias(this IEnumerable<PortalAliasInfo> aliases, int portalId, string alias)
         {
+			Logger.LogDebug(">>> Entering GetCultureByPortalIdAndAlias(aliases={Aliases},portalId={PortalId},alias={Alias})", aliases, portalId, alias);
+			Logger.LogDebug("<<< Exiting GetCultureByPortalIdAndAlias(aliases={Aliases},portalId={PortalId},alias={Alias})", aliases, portalId, alias);
             return (from IPortalAliasInfo portalAlias in aliases
                     where portalAlias.PortalId == portalId && string.Equals(alias, portalAlias.HttpAlias, StringComparison.OrdinalIgnoreCase)
                     select portalAlias.CultureCode)
@@ -238,6 +249,8 @@ namespace DotNetNuke.Entities.Portals
         {
             aliases.GetSettingsByPortalIdAndAlias(portalId, alias, out culture, out NewBrowserTypes newBrowserType, out skin);
             browserType = newBrowserType.ToDeprecatedBrowserTypes();
+			Logger.LogDebug(">>> Entering GetSettingsByPortalIdAndAlias(aliases={Aliases},portalId={PortalId},alias={Alias})", aliases, portalId, alias);
+			Logger.LogDebug("<<< Exiting GetSettingsByPortalIdAndAlias(aliases={Aliases},portalId={PortalId},alias={Alias})", aliases, portalId, alias);
         }
 
         /// <summary>Gets the culture, browser type, and skin for the given <paramref name="portalId"/> and <paramref name="alias"/>.</summary>
@@ -251,9 +264,12 @@ namespace DotNetNuke.Entities.Portals
         {
             culture = null;
             browserType = NewBrowserTypes.Normal;
+			Logger.LogDebug("GetSettingsByPortalIdAndAlias(aliases={Aliases},portalId={PortalId},alias={Alias}): culture → {Culture}", aliases, portalId, alias, culture);
+			Logger.LogDebug("GetSettingsByPortalIdAndAlias(aliases={Aliases},portalId={PortalId},alias={Alias}): browserType → {BrowserType}", aliases, portalId, alias, browserType);
             skin = string.Empty;
             foreach (IPortalAliasInfo portalAlias in aliases)
             {
+			Logger.LogDebug("GetSettingsByPortalIdAndAlias(aliases={Aliases},portalId={PortalId},alias={Alias}): skin → {Skin}", aliases, portalId, alias, skin);
                 if (portalAlias.PortalId == portalId && string.Equals(alias, portalAlias.HttpAlias, StringComparison.OrdinalIgnoreCase))
                 {
                     // this is a match

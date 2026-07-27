@@ -15,6 +15,7 @@ namespace DotNetNuke.Authentication.Facebook
     /// <inheritdoc />
     public partial class Login : OAuthLoginBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override bool SupportsRegistration
         {
@@ -30,12 +31,15 @@ namespace DotNetNuke.Authentication.Facebook
         /// <inheritdoc />
         protected override UserData GetCurrentUser()
         {
+			Logger.LogDebug(">>> Entering GetCurrentUser()");
+			Logger.LogDebug("<<< Exiting GetCurrentUser()");
             return this.OAuthClient.GetCurrentUser<FacebookUserData>();
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.loginButton.Click += this.LoginButton_Click;
@@ -45,27 +49,34 @@ namespace DotNetNuke.Authentication.Facebook
 
             this.loginItem.Visible = this.Mode == AuthMode.Login;
             this.registerItem.Visible = this.Mode == AuthMode.Register;
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void AddCustomProperties(NameValueCollection properties)
         {
+			Logger.LogDebug(">>> Entering AddCustomProperties(properties={Properties})", properties);
             base.AddCustomProperties(properties);
 
             var facebookUserData = this.OAuthClient.GetCurrentUser<FacebookUserData>();
             if (facebookUserData.Link != null)
+			Logger.LogDebug("AddCustomProperties(properties={Properties}): facebookUserData → {FacebookUserData}", properties, facebookUserData);
             {
                 properties.Add("Facebook", facebookUserData.Link.ToString());
             }
+			Logger.LogDebug("<<< Exiting AddCustomProperties(properties={Properties})", properties);
         }
 
         private void LoginButton_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering LoginButton_Click(sender={Sender},e={E})", sender, e);
             AuthorisationResult result = this.OAuthClient.Authorize();
             if (result == AuthorisationResult.Denied)
+			Logger.LogDebug("LoginButton_Click(sender={Sender},e={E}): result → {Result}", sender, e, result);
             {
                 UI.Skins.Skin.AddModuleMessage(this, Localization.GetString("PrivateConfirmationMessage", Localization.SharedResourceFile), ModuleMessage.ModuleMessageType.YellowWarning);
             }
+			Logger.LogDebug("<<< Exiting LoginButton_Click(sender={Sender},e={E})", sender, e);
         }
     }
 }

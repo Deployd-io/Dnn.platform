@@ -11,14 +11,19 @@ namespace DotNetNuke.Build.Tasks
     [IsDependentOn(typeof(SetVersion))]
     public sealed class GenerateSqlDataProvider : FrostingTask<Context>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override void Run(Context context)
         {
+			Logger.LogDebug(">>> Entering Run(context={Context})", context);
             var fileName = context.File($"{context.GetTwoDigitsVersionNumber()[..8]}.SqlDataProvider");
             var filePath = context.Directory("./Dnn Platform/Website/Providers/DataProviders/SqlDataProvider/") + fileName;
+			Logger.LogDebug("Run(context={Context}): fileName → {FileName}", context, fileName);
+			Logger.LogDebug("Run(context={Context}): filePath → {FilePath}", context, filePath);
             if (context.FileExists(filePath))
             {
                 context.SqlDataProviderExists = true;
+				Logger.LogDebug("Run(context={Context}): context.SqlDataProviderExists → {Arg1}", context, context.SqlDataProviderExists);
                 return;
             }
 
@@ -37,6 +42,7 @@ namespace DotNetNuke.Build.Tasks
                 /************************************************************/
                 """;
             context.FileWriteText(filePath, DefaultSqlFileContents);
+			Logger.LogDebug("<<< Exiting Run(context={Context})", context);
         }
     }
 }

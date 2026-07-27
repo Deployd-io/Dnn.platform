@@ -76,6 +76,8 @@ namespace Dnn.PersonaBar.Users.Components
         /// <inheritdoc />
         public IEnumerable<UserBasicDto> GetUsers(GetUsersContract usersContract, bool isSuperUser, out int totalRecords)
         {
+			Logger.LogDebug(">>> Entering GetUsers(usersContract={UsersContract},isSuperUser={IsSuperUser})", usersContract, isSuperUser);
+			Logger.LogDebug("<<< Exiting GetUsers(usersContract={UsersContract},isSuperUser={IsSuperUser})", usersContract, isSuperUser);
             return this.GetUsersFromDb(usersContract, isSuperUser, out totalRecords) ?? new List<UserBasicDto>();
         }
 
@@ -188,8 +190,11 @@ namespace Dnn.PersonaBar.Users.Components
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public UserBasicDto UpdateUserBasicInfo(UserBasicDto userBasicDto, int requestPortalId = -1)
         {
+			Logger.LogDebug(">>> Entering UpdateUserBasicInfo(userBasicDto={UserBasicDto},requestPortalId={RequestPortalId})", userBasicDto, requestPortalId);
             int portalId = PortalSettings.PortalId;
             PortalSettings requestPortalSettings = PortalSettings;
+			Logger.LogDebug("UpdateUserBasicInfo(userBasicDto={UserBasicDto},requestPortalId={RequestPortalId}): portalId → {PortalId}", userBasicDto, requestPortalId, portalId);
+			Logger.LogDebug("UpdateUserBasicInfo(userBasicDto={UserBasicDto},requestPortalId={RequestPortalId}): requestPortalSettings → {RequestPortalSettings}", userBasicDto, requestPortalId, requestPortalSettings);
 
             if (requestPortalId != -1)
             {
@@ -199,6 +204,7 @@ namespace Dnn.PersonaBar.Users.Components
 
             var user = UserController.Instance.GetUser(portalId, userBasicDto.UserId);
 
+			Logger.LogDebug("UpdateUserBasicInfo(userBasicDto={UserBasicDto},requestPortalId={RequestPortalId}): user → {User}", userBasicDto, requestPortalId, user);
             if (user == null)
             {
                 throw new ArgumentException("UserNotExist");
@@ -216,6 +222,8 @@ namespace Dnn.PersonaBar.Users.Components
             }
 
             user.DisplayName = userBasicDto.Displayname;
+			Logger.LogDebug("UpdateUserBasicInfo(userBasicDto={UserBasicDto},requestPortalId={RequestPortalId}): user.DisplayName → {Arg2}", userBasicDto, requestPortalId, user.DisplayName);
+			Logger.LogDebug("UpdateUserBasicInfo(userBasicDto={UserBasicDto},requestPortalId={RequestPortalId}): user.Email → {Arg2}", userBasicDto, requestPortalId, user.Email);
             user.Email = userBasicDto.Email;
             user.FirstName = !string.IsNullOrEmpty(userBasicDto.Firstname) ? userBasicDto.Firstname : user.FirstName;
             user.LastName = !string.IsNullOrEmpty(userBasicDto.Lastname) ? userBasicDto.Lastname : user.LastName;
@@ -232,6 +240,7 @@ namespace Dnn.PersonaBar.Users.Components
             {
                 UserController.ChangeUsername(user.UserID, userBasicDto.Username);
                 user.Username = userBasicDto.Username;
+				Logger.LogDebug("UpdateUserBasicInfo(userBasicDto={UserBasicDto},requestPortalId={RequestPortalId}): user.Username → {Arg2}", userBasicDto, requestPortalId, user.Username);
             }
 
             // DNN-5874 Check if unique display name is required
@@ -239,6 +248,7 @@ namespace Dnn.PersonaBar.Users.Components
             {
                 var usersWithSameDisplayName = (List<UserInfo>)MembershipProvider.Instance().GetUsersBasicSearch(portalId, 0, 2, "DisplayName", true, "DisplayName", user.DisplayName);
                 if (usersWithSameDisplayName.Any(u => u.UserID != user.UserID))
+				Logger.LogDebug("UpdateUserBasicInfo(userBasicDto={UserBasicDto},requestPortalId={RequestPortalId}): usersWithSameDisplayName → {UsersWithSameDisplayName}", userBasicDto, requestPortalId, usersWithSameDisplayName);
                 {
                     throw new ArgumentException("DisplayNameNotUnique");
                 }
@@ -251,6 +261,7 @@ namespace Dnn.PersonaBar.Users.Components
                 UserController.ChangeUsername(user.UserID, user.Email);
             }
 
+				Logger.LogDebug("<<< Exiting UpdateUserBasicInfo(userBasicDto={UserBasicDto},requestPortalId={RequestPortalId})", userBasicDto, requestPortalId);
             return
                 UserBasicDto.FromUserInfo(UserController.Instance.GetUser(requestPortalSettings.PortalId, userBasicDto.UserId));
         }
@@ -302,6 +313,7 @@ namespace Dnn.PersonaBar.Users.Components
                 };
             }
 
+			Logger.LogDebug("<<< Exiting SaveUserRole(portalId={PortalId},currentUserInfo={CurrentUserInfo},userRoleDto={UserRoleDto},notifyUser={NotifyUser},isOwner={IsOwner})", portalId, currentUserInfo, userRoleDto, notifyUser, isOwner);
             throw new SecurityException(Localization.GetString("InSufficientPermissions", Constants.LocalResourcesFile));
         }
 
@@ -327,16 +339,22 @@ namespace Dnn.PersonaBar.Users.Components
         /// <inheritdoc />
         public void AddUserToRoles(UserInfo currentUserInfo, int userId, int portalId, string roleNames, string roleDelimiter = ",", DateTime? effectiveDate = null, DateTime? expiryDate = null)
         {
+			Logger.LogDebug(">>> Entering AddUserToRoles(currentUserInfo={CurrentUserInfo},userId={UserId},portalId={PortalId},roleNames={RoleNames},roleDelimiter={RoleDelimiter},effectiveDate={EffectiveDate},expiryDate={ExpiryDate})", currentUserInfo, userId, portalId, roleNames, roleDelimiter, effectiveDate, expiryDate);
             var effDate = effectiveDate.GetValueOrDefault(Null.NullDate);
             var expDate = expiryDate.GetValueOrDefault(Null.NullDate);
+			Logger.LogDebug("AddUserToRoles(currentUserInfo={CurrentUserInfo},userId={UserId},portalId={PortalId},roleNames={RoleNames},roleDelimiter={RoleDelimiter},effectiveDate={EffectiveDate},expiryDate={ExpiryDate}): effDate → {EffDate}", currentUserInfo, userId, portalId, roleNames, roleDelimiter, effectiveDate, expiryDate, effDate);
+			Logger.LogDebug("AddUserToRoles(currentUserInfo={CurrentUserInfo},userId={UserId},portalId={PortalId},roleNames={RoleNames},roleDelimiter={RoleDelimiter},effectiveDate={EffectiveDate},expiryDate={ExpiryDate}): expDate → {ExpDate}", currentUserInfo, userId, portalId, roleNames, roleDelimiter, effectiveDate, expiryDate, expDate);
 
             // get the specified RoleName
             var roleController = new RoleController();
             var lstRoles = roleNames.Split(roleDelimiter.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+			Logger.LogDebug("AddUserToRoles(currentUserInfo={CurrentUserInfo},userId={UserId},portalId={PortalId},roleNames={RoleNames},roleDelimiter={RoleDelimiter},effectiveDate={EffectiveDate},expiryDate={ExpiryDate}): roleController → {RoleController}", currentUserInfo, userId, portalId, roleNames, roleDelimiter, effectiveDate, expiryDate, roleController);
+			Logger.LogDebug("AddUserToRoles(currentUserInfo={CurrentUserInfo},userId={UserId},portalId={PortalId},roleNames={RoleNames},roleDelimiter={RoleDelimiter},effectiveDate={EffectiveDate},expiryDate={ExpiryDate}): lstRoles → {LstRoles}", currentUserInfo, userId, portalId, roleNames, roleDelimiter, effectiveDate, expiryDate, lstRoles);
             foreach (var curRole in lstRoles)
             {
                 var role = roleController.GetRoleByName(portalId, curRole);
                 if (role == null)
+				Logger.LogDebug("AddUserToRoles(currentUserInfo={CurrentUserInfo},userId={UserId},portalId={PortalId},roleNames={RoleNames},roleDelimiter={RoleDelimiter},effectiveDate={EffectiveDate},expiryDate={ExpiryDate}): role → {Role}", currentUserInfo, userId, portalId, roleNames, roleDelimiter, effectiveDate, expiryDate, role);
                 {
                     continue;
                 }
@@ -351,6 +369,7 @@ namespace Dnn.PersonaBar.Users.Components
                 };
                 Instance.SaveUserRole(portalId, currentUserInfo, userRoleDto, false, false);
             }
+			Logger.LogDebug("<<< Exiting AddUserToRoles(currentUserInfo={CurrentUserInfo},userId={UserId},portalId={PortalId},roleNames={RoleNames},roleDelimiter={RoleDelimiter},effectiveDate={EffectiveDate},expiryDate={ExpiryDate})", currentUserInfo, userId, portalId, roleNames, roleDelimiter, effectiveDate, expiryDate);
         }
 
         /// <inheritdoc />
@@ -418,13 +437,19 @@ namespace Dnn.PersonaBar.Users.Components
         /// <inheritdoc />
         protected override Func<IUsersController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new UsersController();
         }
 
         protected virtual IDataReader CallGetUsersBySearchTerm(GetUsersContract usersContract, bool? includeAuthorized, bool? includeDeleted, bool? includeSuperUsers, bool? hasAgreedToTerms, bool? requestsRemoval)
         {
+			Logger.LogDebug(">>> Entering CallGetUsersBySearchTerm(usersContract={UsersContract},includeAuthorized={IncludeAuthorized},includeDeleted={IncludeDeleted},includeSuperUsers={IncludeSuperUsers},hasAgreedToTerms={HasAgreedToTerms},requestsRemoval={RequestsRemoval})", usersContract, includeAuthorized, includeDeleted, includeSuperUsers, hasAgreedToTerms, requestsRemoval);
             var parsedSearchText = string.IsNullOrEmpty(usersContract.SearchText) ? string.Empty : SearchTextFilter.CleanWildcards(usersContract.SearchText.Trim());
 
+			Logger.LogDebug("CallGetUsersBySearchTerm(usersContract={UsersContract},includeAuthorized={IncludeAuthorized},includeDeleted={IncludeDeleted},includeSuperUsers={IncludeSuperUsers},hasAgreedToTerms={HasAgreedToTerms},requestsRemoval={RequestsRemoval}): parsedSearchText → {ParsedSearchText}", usersContract, includeAuthorized, includeDeleted, includeSuperUsers, hasAgreedToTerms, requestsRemoval, parsedSearchText);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			Logger.LogDebug("<<< Exiting CallGetUsersBySearchTerm(usersContract={UsersContract},includeAuthorized={IncludeAuthorized},includeDeleted={IncludeDeleted},includeSuperUsers={IncludeSuperUsers},hasAgreedToTerms={HasAgreedToTerms},requestsRemoval={RequestsRemoval})", usersContract, includeAuthorized, includeDeleted, includeSuperUsers, hasAgreedToTerms, requestsRemoval);
             return DataProvider.Instance().ExecuteReader(
                     "Personabar_GetUsersBySearchTerm",
                     usersContract.PortalId,
@@ -511,8 +536,11 @@ namespace Dnn.PersonaBar.Users.Components
 
         private IEnumerable<UserBasicDto> GetUsersFromDb(GetUsersContract usersContract, bool isSuperUser, out int totalRecords)
         {
+			Logger.LogDebug(">>> Entering GetUsersFromDb(usersContract={UsersContract},isSuperUser={IsSuperUser})", usersContract, isSuperUser);
             totalRecords = 0;
             IEnumerable<UserBasicDto> users = null;
+			Logger.LogDebug("GetUsersFromDb(usersContract={UsersContract},isSuperUser={IsSuperUser}): totalRecords → {TotalRecords}", usersContract, isSuperUser, totalRecords);
+			Logger.LogDebug("GetUsersFromDb(usersContract={UsersContract},isSuperUser={IsSuperUser}): users → {Users}", usersContract, isSuperUser, users);
 
             var portalId = usersContract.PortalId;
             var pageIndex = usersContract.PageIndex;
@@ -557,6 +585,7 @@ namespace Dnn.PersonaBar.Users.Components
                         {
                             userInfos = (IList<UserInfo>)userInfos?.Where(x => !x.IsSuperUser);
                         }
+						Logger.LogDebug("GetUsersFromDb(usersContract={UsersContract},isSuperUser={IsSuperUser}): userInfos → {UserInfos}", usersContract, isSuperUser, userInfos);
 
                         if (userInfos != null)
                         {
@@ -574,6 +603,7 @@ namespace Dnn.PersonaBar.Users.Components
                     throw new ArgumentOutOfRangeException(nameof(usersContract), usersContract, $"Filter was an unexpected value, supported values include {nameof(UserFilters.All)}, {nameof(UserFilters.Authorized)}, {nameof(UserFilters.SuperUsers)}, {nameof(UserFilters.UnAuthorized)}, {nameof(UserFilters.Deleted)}, {nameof(UserFilters.HasAgreedToTerms)}, {nameof(UserFilters.HasNotAgreedToTerms)}, {nameof(UserFilters.RequestedRemoval)}, and {nameof(UserFilters.RegisteredUsers)}.");
             }
 
+			Logger.LogDebug("<<< Exiting GetUsersFromDb(usersContract={UsersContract},isSuperUser={IsSuperUser})", usersContract, isSuperUser);
             return users;
         }
 
@@ -598,6 +628,7 @@ namespace Dnn.PersonaBar.Users.Components
             }
 
             totalRecords = records.Count == 0 ? 0 : records[0].TotalCount;
+			Logger.LogDebug("<<< Exiting GetUsers(usersContract={UsersContract},includeAuthorized={IncludeAuthorized},includeDeleted={IncludeDeleted},includeSuperUsers={IncludeSuperUsers},hasAgreedToTerms={HasAgreedToTerms},requestsRemoval={RequestsRemoval})", usersContract, includeAuthorized, includeDeleted, includeSuperUsers, hasAgreedToTerms, requestsRemoval);
             return records;
         }
     }

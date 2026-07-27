@@ -21,7 +21,9 @@ namespace DNNConnect.CKEditorProvider.Module
     /// <param name="hostSettings">The host settings.</param>
     public class UpgradeController(IHostSettings hostSettings) : IUpgradeable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IHostSettings hostSettings = hostSettings ??
+													Logger.LogDebug(">>> Entering UpgradeController(hostSettings={HostSettings})", hostSettings);
                                                       new HostSettings(
                                                           new HostController(
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -30,6 +32,7 @@ namespace DNNConnect.CKEditorProvider.Module
                                                               new Lazy<IPortalController>(() => PortalController.Instance)));
 
         /// <summary>Initializes a new instance of the <see cref="UpgradeController"/> class.</summary>
+		Logger.LogDebug("<<< Exiting UpgradeController(hostSettings={HostSettings})", hostSettings);
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public UpgradeController()
             : this(null)
@@ -41,6 +44,7 @@ namespace DNNConnect.CKEditorProvider.Module
         /// <returns>Returns if Upgrade was Successfully or not.</returns>
         public string UpgradeModule(string version)
         {
+			Logger.LogDebug(">>> Entering UpgradeModule(version={Version})", version);
             try
             {
                 const string ResourceFile =
@@ -48,8 +52,11 @@ namespace DNNConnect.CKEditorProvider.Module
 
                 var pageName = Localization.GetString("EditorMangerPageName.Text", ResourceFile);
                 var moduleTitle = Localization.GetString("EditorMangerName.Text", ResourceFile);
+				Logger.LogDebug("UpgradeModule(version={Version}): pageName → {PageName}", version, pageName);
+				Logger.LogDebug("UpgradeModule(version={Version}): moduleTitle → {ModuleTitle}", version, moduleTitle);
                 var pageDescription = Localization.GetString("EditorMangerPageDescription.Text", ResourceFile);
 
+				Logger.LogDebug("UpgradeModule(version={Version}): pageDescription → {PageDescription}", version, pageDescription);
                 // Remove wrongly created Host Page
                 Upgrade.RemoveHostPage(moduleTitle);
 
@@ -64,6 +71,7 @@ namespace DNNConnect.CKEditorProvider.Module
                 // Add Module To Page
                 var moduleDefId = GetModuleDefinitionID(this.hostSettings);
 
+				Logger.LogDebug("UpgradeModule(version={Version}): moduleDefId → {ModuleDefId}", version, moduleDefId);
                 Upgrade.AddModuleToPage(
                     editorManagerPage,
                     moduleDefId,
@@ -78,6 +86,7 @@ namespace DNNConnect.CKEditorProvider.Module
                 return "Failed";
             }
 
+			Logger.LogDebug("<<< Exiting UpgradeModule(version={Version})", version);
             return "Success";
         }
 
@@ -85,6 +94,7 @@ namespace DNNConnect.CKEditorProvider.Module
         /// <returns>Returns the module definition ID.</returns>
         private static int GetModuleDefinitionID(IHostSettings hostSettings)
         {
+			Logger.LogDebug(">>> Entering GetModuleDefinitionID(hostSettings={HostSettings})", hostSettings);
             var editorDesktopModule =
                 DesktopModuleController.GetDesktopModuleByModuleName(hostSettings, "CKEditor.EditorConfigManager", Null.NullInteger);
 
@@ -98,6 +108,7 @@ namespace DNNConnect.CKEditorProvider.Module
                 ModuleDefinitionController.GetModuleDefinitionByFriendlyName(
                     "CKEditor Config Manager", editorDesktopModule.DesktopModuleID);
 
+			Logger.LogDebug("<<< Exiting GetModuleDefinitionID(hostSettings={HostSettings})", hostSettings);
             return editorModuleDefinition?.ModuleDefID ?? -1;
         }
     }

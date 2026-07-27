@@ -24,6 +24,7 @@ namespace DotNetNuke.UI.Skins.Controls
     /// </remarks>
     public partial class BreadCrumb : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string MyFileName = "BreadCrumb.ascx";
         private const string HomeTabName = "Root";
         private const string UrlRegex = """(href|src)=(\"|'|)(.[^\"']*)(\"|'|)""";
@@ -38,6 +39,10 @@ namespace DotNetNuke.UI.Skins.Controls
         public BreadCrumb()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering BreadCrumb()");
+		Logger.LogDebug("<<< Exiting BreadCrumb()");
+		Logger.LogDebug(">>> Entering BreadCrumb(navigationManager={NavigationManager},tabController={TabController})", navigationManager, tabController);
+		Logger.LogDebug("<<< Exiting BreadCrumb(navigationManager={NavigationManager},tabController={TabController})", navigationManager, tabController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="BreadCrumb"/> class.</summary>
@@ -47,6 +52,8 @@ namespace DotNetNuke.UI.Skins.Controls
         {
             this.navigationManager = navigationManager ?? Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
             this.tabController = tabController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ITabController>();
+			Logger.LogDebug("BreadCrumb(navigationManager={NavigationManager},tabController={TabController}): tabController → {TabController1}", navigationManager, tabController, tabController);
+			Logger.LogDebug("BreadCrumb(navigationManager={NavigationManager},tabController={TabController}): navigationManager → {NavigationManager1}", navigationManager, tabController, navigationManager);
         }
 
         /// <summary>
@@ -128,6 +135,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.ResolveSeparatorPaths();
@@ -142,6 +150,7 @@ namespace DotNetNuke.UI.Skins.Controls
             this.lblBreadCrumb.Text = this.RenderingVersion >= 2
                 ? this.BuildListMarkup(crumbCount)
                 : this.BuildLegacyMarkup(crumbCount);
+				Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         private string BuildLegacyMarkup(int crumbCount)
@@ -303,8 +312,11 @@ namespace DotNetNuke.UI.Skins.Controls
 
         private void ResolveHome(out string homeUrl, out string homeNameEncoded)
         {
+			Logger.LogDebug(">>> Entering ResolveHome()");
             homeUrl = Globals.AddHTTP(this.CurrentPortalAlias.HttpAlias);
             var homeName = HomeTabName;
+			Logger.LogDebug("ResolveHome(): homeUrl → {HomeUrl}", homeUrl);
+			Logger.LogDebug("ResolveHome(): homeName → {HomeName}", homeName);
 
             if (this.PortalSettings.HomeTabId != -1)
             {
@@ -312,6 +324,7 @@ namespace DotNetNuke.UI.Skins.Controls
 
                 var homeTab = this.tabController.GetTab(this.PortalSettings.HomeTabId, this.PortalSettings.PortalId, false);
                 homeName = homeTab?.LocalizedTabName ?? homeName;
+				Logger.LogDebug("ResolveHome(): homeTab → {HomeTab}", homeTab);
 
                 if (this.UseTitle && homeTab != null && !string.IsNullOrEmpty(homeTab.Title))
                 {
@@ -320,6 +333,8 @@ namespace DotNetNuke.UI.Skins.Controls
             }
 
             homeNameEncoded = HttpUtility.HtmlEncode(homeName ?? string.Empty);
+			Logger.LogDebug("<<< Exiting ResolveHome()");
+			Logger.LogDebug("ResolveHome(): homeNameEncoded → {HomeNameEncoded}", homeNameEncoded);
         }
 
         private string GetTabDisplayName(TabInfo tab)
@@ -358,14 +373,18 @@ namespace DotNetNuke.UI.Skins.Controls
 
         private string GetAriaLabel()
         {
+			Logger.LogDebug(">>> Entering GetAriaLabel()");
             // resource key (example):
             ////BreadCrumbAriaLabel.Text = Breadcrumb
             var localized = Localization.GetString("BreadCrumbAriaLabel.Text", Localization.GetResourceFile(this, MyFileName));
+			Logger.LogDebug("GetAriaLabel(): localized → {Localized}", localized);
+			Logger.LogDebug("<<< Exiting GetAriaLabel()");
             return string.IsNullOrWhiteSpace(localized) ? "Breadcrumb" : localized;
         }
 
         private void ResolveSeparatorPaths()
         {
+			Logger.LogDebug(">>> Entering ResolveSeparatorPaths()");
             if (string.IsNullOrEmpty(this.Separator))
             {
                 return;
@@ -373,11 +392,14 @@ namespace DotNetNuke.UI.Skins.Controls
 
             var urlMatches = Regex.Matches(this.Separator, UrlRegex, RegexOptions.IgnoreCase);
             if (urlMatches.Count > 0)
+			Logger.LogDebug("ResolveSeparatorPaths(): urlMatches → {UrlMatches}", urlMatches);
             {
                 foreach (Match match in urlMatches)
                 {
                     var url = match.Groups[3].Value;
                     var changed = false;
+					Logger.LogDebug("ResolveSeparatorPaths(): url → {Url}", url);
+					Logger.LogDebug("ResolveSeparatorPaths(): changed → {Changed}", changed);
 
                     if (url.StartsWith("/", StringComparison.Ordinal))
                     {
@@ -412,6 +434,7 @@ namespace DotNetNuke.UI.Skins.Controls
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting ResolveSeparatorPaths()");
         }
     }
 }

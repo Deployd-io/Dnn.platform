@@ -19,10 +19,13 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
         /// <summary>Main method to execute the step.</summary>
         public override void Execute()
         {
+			Logger.LogDebug(">>> Entering Execute()");
             var packages = Upgrade.GetInstallPackages();
             if (packages.Count == 0)
+			Logger.LogDebug("Execute(): packages → {Packages}", packages);
             {
                 this.Percentage = 100;
+				Logger.LogDebug("Execute(): this.Percentage → {Arg0}", this.Percentage);
                 this.Status = StepStatus.Done;
                 return;
             }
@@ -30,6 +33,7 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
             this.Percentage = 0;
             this.Status = StepStatus.Running;
 
+			Logger.LogDebug("Execute(): this.Status → {Arg0}", this.Status);
             var percentForEachStep = 100 / packages.Count;
             var counter = 0;
             foreach (var package in packages)
@@ -38,9 +42,12 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
                 var packageType = package.Value.PackageType;
                 var message = string.Format(CultureInfo.CurrentCulture, Localization.GetString("InstallingExtension", this.LocalInstallResourceFile), packageType, Path.GetFileName(file));
                 this.Details = message;
+				Logger.LogDebug("Execute(): message → {Message}", message);
+				Logger.LogDebug("Execute(): this.Details → {Arg0}", this.Details);
                 Logger.Trace(this.Details);
                 var success = Upgrade.InstallPackage(file, packageType, false);
                 if (!success)
+				Logger.LogDebug("Execute(): success → {Success}", success);
                 {
                     this.Errors.Add(message);
                     break;
@@ -50,6 +57,7 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
             }
 
             this.Status = this.Errors.Count > 0 ? StepStatus.Retry : StepStatus.Done;
+			Logger.LogDebug("<<< Exiting Execute()");
         }
     }
 }

@@ -52,6 +52,8 @@ namespace DotNetNuke.Services.EventQueue
         /// <returns>event message collection.</returns>
         public static EventMessageCollection GetMessages(string eventName)
         {
+			eventLogger.LogDebug(">>> Entering GetMessages(eventName={EventName})", eventName);
+			eventLogger.LogDebug("<<< Exiting GetMessages(eventName={EventName})", eventName);
             return FillMessageCollection(DataProvider.Instance().GetEventMessages(eventName));
         }
 
@@ -61,6 +63,7 @@ namespace DotNetNuke.Services.EventQueue
         /// <returns>An <see cref="EventMessageCollection"/>.</returns>
         public static EventMessageCollection GetMessages(string eventName, string subscriberId)
         {
+			eventLogger.LogDebug("<<< Exiting GetMessages(eventName={EventName},subscriberId={SubscriberId})", eventName, subscriberId);
             return FillMessageCollection(DataProvider.Instance().GetEventMessagesBySubscriber(eventName, subscriberId));
         }
 
@@ -70,7 +73,10 @@ namespace DotNetNuke.Services.EventQueue
         [DnnDeprecated(10, 0, 0, "Please use overload with IServiceProvider")]
         public static partial bool ProcessMessages(string eventName)
         {
+			eventLogger.LogDebug(">>> Entering ProcessMessages(eventName={EventName})", eventName);
             using var scope = Globals.GetOrCreateServiceScope();
+			eventLogger.LogDebug("ProcessMessages(eventName={EventName}): scope → {Scope}", eventName, scope);
+			eventLogger.LogDebug("<<< Exiting ProcessMessages(eventName={EventName})", eventName);
             return ProcessMessages(scope.ServiceProvider, eventName);
         }
 
@@ -80,6 +86,7 @@ namespace DotNetNuke.Services.EventQueue
         /// <returns><see langword="true"/> if any message is successfully sent, otherwise <see langword="false"/>.</returns>
         public static bool ProcessMessages(IServiceProvider serviceProvider, string eventName)
         {
+			eventLogger.LogDebug("<<< Exiting ProcessMessages(serviceProvider={ServiceProvider},eventName={EventName})", serviceProvider, eventName);
             return ProcessMessages(serviceProvider, GetMessages(eventName));
         }
 
@@ -90,6 +97,7 @@ namespace DotNetNuke.Services.EventQueue
         [DnnDeprecated(10, 0, 0, "Please use overload with IServiceProvider")]
         public static partial bool ProcessMessages(string eventName, string subscriberId)
         {
+			eventLogger.LogDebug("<<< Exiting ProcessMessages(eventName={EventName},subscriberId={SubscriberId})", eventName, subscriberId);
             return ProcessMessages(GetMessages(eventName, subscriberId));
         }
 
@@ -100,6 +108,7 @@ namespace DotNetNuke.Services.EventQueue
         /// <returns><see langword="true"/> if any message is successfully sent, otherwise <see langword="false"/>.</returns>
         public static bool ProcessMessages(IServiceProvider serviceProvider, string eventName, string subscriberId)
         {
+			eventLogger.LogDebug("<<< Exiting ProcessMessages(serviceProvider={ServiceProvider},eventName={EventName},subscriberId={SubscriberId})", serviceProvider, eventName, subscriberId);
             return ProcessMessages(serviceProvider, GetMessages(eventName, subscriberId));
         }
 
@@ -110,6 +119,8 @@ namespace DotNetNuke.Services.EventQueue
         public static partial bool ProcessMessages(EventMessageCollection eventMessages)
         {
             using var scope = Globals.GetOrCreateServiceScope();
+			eventLogger.LogDebug("ProcessMessages(eventMessages={EventMessages}): scope → {Scope}", eventMessages, scope);
+			eventLogger.LogDebug("<<< Exiting ProcessMessages(eventMessages={EventMessages})", eventMessages);
             return ProcessMessages(scope.ServiceProvider, eventMessages);
         }
 
@@ -164,6 +175,7 @@ namespace DotNetNuke.Services.EventQueue
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting ProcessMessages(serviceProvider={ServiceProvider},eventMessages={EventMessages})", serviceProvider, eventMessages);
             return success;
         }
 
@@ -215,11 +227,13 @@ namespace DotNetNuke.Services.EventQueue
 
         private static EventMessage FillMessage(IDataReader dr, bool checkForOpenDataReader)
         {
+			eventLogger.LogDebug(">>> Entering FillMessage(dr={Dr},checkForOpenDataReader={CheckForOpenDataReader})", dr, checkForOpenDataReader);
             EventMessage message;
 
             // read datareader
             bool canContinue = true;
             if (checkForOpenDataReader)
+			eventLogger.LogDebug("FillMessage(dr={Dr},checkForOpenDataReader={CheckForOpenDataReader}): canContinue → {CanContinue}", dr, checkForOpenDataReader, canContinue);
             {
                 canContinue = false;
                 if (dr.Read())
@@ -231,6 +245,7 @@ namespace DotNetNuke.Services.EventQueue
             if (canContinue)
             {
                 message = new EventMessage();
+				eventLogger.LogDebug("FillMessage(dr={Dr},checkForOpenDataReader={CheckForOpenDataReader}): message → {Message}", dr, checkForOpenDataReader, message);
                 message.EventMessageID = Convert.ToInt32(Null.SetNull(dr["EventMessageID"], message.EventMessageID), CultureInfo.InvariantCulture);
                 message.Priority = (MessagePriority)Enum.Parse(typeof(MessagePriority), Convert.ToString(Null.SetNull(dr["Priority"], message.Priority), CultureInfo.InvariantCulture));
                 message.ProcessorType = Convert.ToString(Null.SetNull(dr["ProcessorType"], message.ProcessorType), CultureInfo.InvariantCulture);
@@ -246,6 +261,7 @@ namespace DotNetNuke.Services.EventQueue
                 // Deserialize Attributes
                 string xmlAttributes = Null.NullString;
                 xmlAttributes = Convert.ToString(Null.SetNull(dr["Attributes"], xmlAttributes), CultureInfo.InvariantCulture);
+				eventLogger.LogDebug("FillMessage(dr={Dr},checkForOpenDataReader={CheckForOpenDataReader}): xmlAttributes → {XmlAttributes}", dr, checkForOpenDataReader, xmlAttributes);
                 message.DeserializeAttributes(xmlAttributes);
             }
             else
@@ -253,19 +269,23 @@ namespace DotNetNuke.Services.EventQueue
                 message = null;
             }
 
+			eventLogger.LogDebug("<<< Exiting FillMessage(dr={Dr},checkForOpenDataReader={CheckForOpenDataReader})", dr, checkForOpenDataReader);
             return message;
         }
 
         private static EventMessageCollection FillMessageCollection(IDataReader dr)
         {
+			eventLogger.LogDebug(">>> Entering FillMessageCollection(dr={Dr})", dr);
             var arr = new EventMessageCollection();
             try
+			eventLogger.LogDebug("FillMessageCollection(dr={Dr}): arr → {Arr}", dr, arr);
             {
                 EventMessage obj;
                 while (dr.Read())
                 {
                     // fill business object
                     obj = FillMessage(dr, false);
+					eventLogger.LogDebug("FillMessageCollection(dr={Dr}): obj → {Obj}", dr, obj);
 
                     // add to collection
                     arr.Add(obj);
@@ -273,6 +293,7 @@ namespace DotNetNuke.Services.EventQueue
             }
             catch (Exception exc)
             {
+				eventLogger.LogError("Exception in FillMessageCollection(dr={Dr}): {Arg1}", dr, ex.Message);
                 Exceptions.Exceptions.LogException(exc);
             }
             finally
@@ -281,22 +302,26 @@ namespace DotNetNuke.Services.EventQueue
                 CBO.CloseDataReader(dr, true);
             }
 
+			eventLogger.LogDebug("<<< Exiting FillMessageCollection(dr={Dr})", dr);
             return arr;
         }
 
         private static string[] GetSubscribers(string eventName)
         {
+			eventLogger.LogDebug(">>> Entering GetSubscribers(eventName={EventName})", eventName);
             // Get the subscribers to this event
             string[] subscribers;
             if (EventQueueConfiguration.GetConfig().PublishedEvents.TryGetValue(eventName, out var publishedEvent))
             {
                 subscribers = publishedEvent.Subscribers.Split(";".ToCharArray());
             }
+			eventLogger.LogDebug("GetSubscribers(eventName={EventName}): subscribers → {Subscribers}", eventName, subscribers);
             else
             {
                 subscribers = [];
             }
 
+			eventLogger.LogDebug("<<< Exiting GetSubscribers(eventName={EventName})", eventName);
             return subscribers;
         }
     }

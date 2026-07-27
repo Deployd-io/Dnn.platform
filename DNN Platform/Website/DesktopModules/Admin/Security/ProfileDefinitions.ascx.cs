@@ -51,7 +51,9 @@ namespace DotNetNuke.Modules.Admin.Users
         public ProfileDefinitions()
             : this(null, null, null, null, null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering ProfileDefinitions()");
         }
+		eventLogger.LogDebug("<<< Exiting ProfileDefinitions()");
 
         /// <summary>Initializes a new instance of the <see cref="ProfileDefinitions"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
@@ -60,6 +62,13 @@ namespace DotNetNuke.Modules.Admin.Users
         public ProfileDefinitions(INavigationManager navigationManager, IHostSettings hostSettings)
             : this(navigationManager, hostSettings, null, null, null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering ProfileDefinitions(navigationManager={NavigationManager},hostSettings={HostSettings})", navigationManager, hostSettings);
+		eventLogger.LogDebug("<<< Exiting ProfileDefinitions(navigationManager={NavigationManager},hostSettings={HostSettings})", navigationManager, hostSettings);
+		eventLogger.LogDebug("ProfileDefinitions(navigationManager={NavigationManager},hostSettings={HostSettings},eventLogger={EventLogger},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): hostSettings → {HostSettings1}", navigationManager, hostSettings, eventLogger, listController, portalController, appStatus, portalGroupController, hostSettings);
+		eventLogger.LogDebug("ProfileDefinitions(navigationManager={NavigationManager},hostSettings={HostSettings},eventLogger={EventLogger},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): eventLogger → {EventLogger1}", navigationManager, hostSettings, eventLogger, listController, portalController, appStatus, portalGroupController, eventLogger);
+		eventLogger.LogDebug("ProfileDefinitions(navigationManager={NavigationManager},hostSettings={HostSettings},eventLogger={EventLogger},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): listController → {ListController1}", navigationManager, hostSettings, eventLogger, listController, portalController, appStatus, portalGroupController, listController);
+		eventLogger.LogDebug("ProfileDefinitions(navigationManager={NavigationManager},hostSettings={HostSettings},eventLogger={EventLogger},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalController → {PortalController1}", navigationManager, hostSettings, eventLogger, listController, portalController, appStatus, portalGroupController, portalController);
+		eventLogger.LogDebug("ProfileDefinitions(navigationManager={NavigationManager},hostSettings={HostSettings},eventLogger={EventLogger},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): appStatus → {AppStatus1}", navigationManager, hostSettings, eventLogger, listController, portalController, appStatus, portalGroupController, appStatus);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ProfileDefinitions"/> class.</summary>
@@ -84,6 +93,8 @@ namespace DotNetNuke.Modules.Admin.Users
         {
             this.navigationManager = navigationManager ?? this.DependencyProvider.GetRequiredService<INavigationManager>();
             this.hostSettings = hostSettings ?? this.DependencyProvider.GetRequiredService<IHostSettings>();
+			eventLogger.LogDebug("ProfileDefinitions(navigationManager={NavigationManager},hostSettings={HostSettings},eventLogger={EventLogger},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalGroupController → {PortalGroupController1}", navigationManager, hostSettings, eventLogger, listController, portalController, appStatus, portalGroupController, portalGroupController);
+			eventLogger.LogDebug("ProfileDefinitions(navigationManager={NavigationManager},hostSettings={HostSettings},eventLogger={EventLogger},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): navigationManager → {NavigationManager1}", navigationManager, hostSettings, eventLogger, listController, portalController, appStatus, portalGroupController, navigationManager);
             this.eventLogger = eventLogger ?? this.DependencyProvider.GetRequiredService<IEventLogger>();
             this.listController = listController ?? this.DependencyProvider.GetRequiredService<ListController>();
             this.portalController = portalController ?? this.DependencyProvider.GetRequiredService<IPortalController>();
@@ -184,29 +195,37 @@ namespace DotNetNuke.Modules.Admin.Users
 
         public string DisplayDataType(ProfilePropertyDefinition definition)
         {
+			eventLogger.LogDebug(">>> Entering DisplayDataType(definition={Definition})", definition);
             string retValue = Null.NullString;
             ListEntryInfo definitionEntry = this.listController.GetListEntryInfo("DataType", definition.DataType);
+			eventLogger.LogDebug("DisplayDataType(definition={Definition}): retValue → {RetValue}", definition, retValue);
+			eventLogger.LogDebug("DisplayDataType(definition={Definition}): definitionEntry → {DefinitionEntry}", definition, definitionEntry);
             if (definitionEntry != null)
             {
                 retValue = definitionEntry.Value;
             }
 
+			eventLogger.LogDebug("<<< Exiting DisplayDataType(definition={Definition})", definition);
             return retValue;
         }
 
         public string DisplayDefaultVisibility(ProfilePropertyDefinition definition)
         {
+			eventLogger.LogDebug(">>> Entering DisplayDefaultVisibility(definition={Definition})", definition);
             string retValue = Null.NullString;
             if (!string.IsNullOrEmpty(definition.DefaultVisibility.ToString()))
+			eventLogger.LogDebug("DisplayDefaultVisibility(definition={Definition}): retValue → {RetValue}", definition, retValue);
             {
                 retValue = this.LocalizeText(definition.DefaultVisibility.ToString()) ?? definition.DefaultVisibility.ToString();
             }
 
+			eventLogger.LogDebug("<<< Exiting DisplayDefaultVisibility(definition={Definition})", definition);
             return retValue;
         }
 
         public void Update()
         {
+			eventLogger.LogDebug(">>> Entering Update()");
             try
             {
                 this.UpdateProperties();
@@ -216,18 +235,22 @@ namespace DotNetNuke.Modules.Admin.Users
             }
             catch (Exception exc)
             {
+				eventLogger.LogError("Exception in Update(): {Arg0}", ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			eventLogger.LogDebug("<<< Exiting Update()");
         }
 
         /// <inheritdoc />
         protected override void LoadViewState(object savedState)
         {
+			eventLogger.LogDebug(">>> Entering LoadViewState(savedState={SavedState})", savedState);
             if (savedState != null)
             {
                 // Load State from the array of objects that was saved with SaveViewState.
                 var myState = (object[])savedState;
 
+				eventLogger.LogDebug("LoadViewState(savedState={SavedState}): myState → {MyState}", savedState, myState);
                 // Load Base Controls ViewState
                 if (myState[0] != null)
                 {
@@ -238,19 +261,23 @@ namespace DotNetNuke.Modules.Admin.Users
                 if (myState[1] != null)
                 {
                     this.profileProperties = (ProfilePropertyDefinitionCollection)myState[1];
+					eventLogger.LogDebug("LoadViewState(savedState={SavedState}): profileProperties → {ProfileProperties}", savedState, profileProperties);
                 }
             }
+			eventLogger.LogDebug("<<< Exiting LoadViewState(savedState={SavedState})", savedState);
         }
 
         /// <inheritdoc />
         protected override object SaveViewState()
         {
+			eventLogger.LogDebug(">>> Entering SaveViewState()");
             var allStates = new object[2];
 
             // Save the Base Controls ViewState
             allStates[0] = base.SaveViewState();
             allStates[1] = this.ProfileProperties;
 
+			eventLogger.LogDebug("<<< Exiting SaveViewState()");
             return allStates;
         }
 
@@ -258,6 +285,7 @@ namespace DotNetNuke.Modules.Admin.Users
         /// <param name="e">The event arguments.</param>
         protected override void OnInit(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             foreach (DataGridColumn column in this.grdProfileProperties.Columns)
@@ -266,9 +294,12 @@ namespace DotNetNuke.Modules.Admin.Users
                 {
                     var checkBoxColumn = (CheckBoxColumn)column;
                     if (checkBoxColumn.DataField == "Required" && this.UsersPortalId == Null.NullInteger)
+					eventLogger.LogDebug("OnInit(e={E}): checkBoxColumn → {CheckBoxColumn}", e, checkBoxColumn);
                     {
                         checkBoxColumn.Visible = false;
+						eventLogger.LogDebug("OnInit(e={E}): checkBoxColumn.Visible → {Arg1}", e, checkBoxColumn.Visible);
                         this.requiredColumnHidden = true;
+						eventLogger.LogDebug("OnInit(e={E}): this.requiredColumnHidden → {Arg1}", e, this.requiredColumnHidden);
                     }
 
                     if (this.SupportsRichClient() == false)
@@ -281,6 +312,7 @@ namespace DotNetNuke.Modules.Admin.Users
                     // Manage Delete Confirm JS
                     var imageColumn = (ImageCommandColumn)column;
                     switch (imageColumn.CommandName)
+					eventLogger.LogDebug("OnInit(e={E}): imageColumn → {ImageColumn}", e, imageColumn);
                     {
                         case "Delete":
                             imageColumn.OnClickJS = Localization.GetString("DeleteItem");
@@ -292,6 +324,8 @@ namespace DotNetNuke.Modules.Admin.Users
                             // replace the fake value with the FormatString place holder
                             string formatString = this.EditUrl("PropertyDefinitionID", "KEYFIELD", "EditProfileProperty");
                             formatString = formatString.Replace("KEYFIELD", "{0}");
+							eventLogger.LogDebug("OnInit(e={E}): formatString → {FormatString}", e, formatString);
+							eventLogger.LogDebug("OnInit(e={E}): imageColumn.NavigateURLFormatString → {Arg1}", e, imageColumn.NavigateURLFormatString);
                             imageColumn.NavigateURLFormatString = formatString;
                             imageColumn.Text = Localization.GetString("Edit", this.LocalResourceFile);
                             break;
@@ -304,11 +338,13 @@ namespace DotNetNuke.Modules.Admin.Users
                     }
                 }
             }
+			eventLogger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.cmdRefresh.Click += this.CmdRefresh_Click;
@@ -328,8 +364,10 @@ namespace DotNetNuke.Modules.Admin.Users
             }
             catch (Exception exc)
             {
+				eventLogger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			eventLogger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <summary>grdProfileProperties_ItemDataBound runs when a row in the grid is bound to its data source Grid.</summary>
@@ -340,6 +378,7 @@ namespace DotNetNuke.Modules.Admin.Users
         // ReSharper disable once InconsistentNaming
         protected void grdProfileProperties_ItemDataBound(object sender, DataGridItemEventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering grdProfileProperties_ItemDataBound(sender={Sender},e={E})", sender, e);
             DataGridItem item = e.Item;
             if (item.ItemType == ListItemType.Item || item.ItemType == ListItemType.AlternatingItem || item.ItemType == ListItemType.SelectedItem)
             {
@@ -348,6 +387,8 @@ namespace DotNetNuke.Modules.Admin.Users
                 {
                     var delImage = (ImageButton)imgColumnControl;
                     var profProperty = (ProfilePropertyDefinition)item.DataItem;
+					eventLogger.LogDebug("grdProfileProperties_ItemDataBound(sender={Sender},e={E}): delImage → {DelImage}", sender, e, delImage);
+					eventLogger.LogDebug("grdProfileProperties_ItemDataBound(sender={Sender},e={E}): profProperty → {ProfProperty}", sender, e, profProperty);
 
                     switch (profProperty.PropertyName.ToLowerInvariant())
                     {
@@ -356,6 +397,7 @@ namespace DotNetNuke.Modules.Admin.Users
                         case "preferredtimezone":
                         case "preferredlocale":
                             delImage.Visible = false;
+							eventLogger.LogDebug("grdProfileProperties_ItemDataBound(sender={Sender},e={E}): delImage.Visible → {Arg2}", sender, e, delImage.Visible);
                             break;
                         default:
                             delImage.Visible = true;
@@ -363,11 +405,14 @@ namespace DotNetNuke.Modules.Admin.Users
                     }
                 }
             }
+			eventLogger.LogDebug("<<< Exiting grdProfileProperties_ItemDataBound(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Helper function that determines whether the client-side functionality is possible.</summary>
         private bool SupportsRichClient()
         {
+			eventLogger.LogDebug(">>> Entering SupportsRichClient()");
+			eventLogger.LogDebug("<<< Exiting SupportsRichClient()");
             return ClientAPI.BrowserSupportsFunctionality(ClientAPI.ClientFunctionality.DHTML);
         }
 
@@ -417,8 +462,11 @@ namespace DotNetNuke.Modules.Admin.Users
         /// <summary>Binds the Property Collection to the Grid.</summary>
         private void BindGrid()
         {
+			eventLogger.LogDebug(">>> Entering BindGrid()");
             bool allRequired = true;
             bool allVisible = true;
+			eventLogger.LogDebug("BindGrid(): allRequired → {AllRequired}", allRequired);
+			eventLogger.LogDebug("BindGrid(): allVisible → {AllVisible}", allVisible);
 
             // Check whether the checkbox column headers are true or false
             foreach (ProfilePropertyDefinition profProperty in this.ProfileProperties)
@@ -446,8 +494,10 @@ namespace DotNetNuke.Modules.Admin.Users
                     // Manage CheckBox column events
                     var checkBoxColumn = (CheckBoxColumn)column;
                     if (checkBoxColumn.DataField == "Required")
+					eventLogger.LogDebug("BindGrid(): checkBoxColumn → {CheckBoxColumn}", checkBoxColumn);
                     {
                         checkBoxColumn.Checked = allRequired;
+						eventLogger.LogDebug("BindGrid(): checkBoxColumn.Checked → {Arg0}", checkBoxColumn.Checked);
                     }
 
                     if (checkBoxColumn.DataField == "Visible")
@@ -459,18 +509,24 @@ namespace DotNetNuke.Modules.Admin.Users
 
             this.grdProfileProperties.DataSource = this.ProfileProperties;
             this.grdProfileProperties.DataBind();
+			eventLogger.LogDebug("<<< Exiting BindGrid()");
         }
 
         /// <summary>Refresh the Property Collection to the Grid.</summary>
         private void RefreshGrid()
         {
+			eventLogger.LogDebug(">>> Entering RefreshGrid()");
             this.profileProperties = null;
             this.BindGrid();
+			eventLogger.LogDebug("<<< Exiting RefreshGrid()");
+			eventLogger.LogDebug("RefreshGrid(): this.profileProperties → {Arg0}", this.profileProperties);
+			eventLogger.LogDebug("RefreshGrid(): profileProperties → {ProfileProperties}", profileProperties);
         }
 
         /// <summary>Updates any "dirty" properties.</summary>
         private void UpdateProperties()
         {
+			eventLogger.LogDebug(">>> Entering UpdateProperties()");
             this.ProcessPostBack();
             foreach (ProfilePropertyDefinition property in this.ProfileProperties)
             {
@@ -479,11 +535,13 @@ namespace DotNetNuke.Modules.Admin.Users
                     if (this.UsersPortalId == Null.NullInteger)
                     {
                         property.Required = false;
+						eventLogger.LogDebug("UpdateProperties(): property.Required → {Arg0}", property.Required);
                     }
 
                     ProfileController.UpdatePropertyDefinition(this.eventLogger, this.portalController, this.appStatus, this.portalGroupController, property);
                 }
             }
+			eventLogger.LogDebug("<<< Exiting UpdateProperties()");
         }
 
         /// <summary>
@@ -492,13 +550,18 @@ namespace DotNetNuke.Modules.Admin.Users
         /// </summary>
         private void ProcessPostBack()
         {
+			eventLogger.LogDebug(">>> Entering ProcessPostBack()");
             string[] newOrder = ClientAPI.GetClientSideReorder(this.grdProfileProperties.ClientID, this.Page);
             for (int i = 0; i <= this.grdProfileProperties.Items.Count - 1; i++)
             {
                 DataGridItem dataGridItem = this.grdProfileProperties.Items[i];
                 ProfilePropertyDefinition profileProperty = this.ProfileProperties[i];
+				eventLogger.LogDebug("ProcessPostBack(): dataGridItem → {DataGridItem}", dataGridItem);
                 CheckBox checkBox = (CheckBox)dataGridItem.Cells[COLUMNREQUIRED].Controls[0];
                 profileProperty.Required = checkBox.Checked;
+				eventLogger.LogDebug("ProcessPostBack(): checkBox → {CheckBox}", checkBox);
+				eventLogger.LogDebug("ProcessPostBack(): profileProperty.Required → {Arg0}", profileProperty.Required);
+				eventLogger.LogDebug("ProcessPostBack(): profileProperty.Visible → {Arg0}", profileProperty.Visible);
                 checkBox = (CheckBox)dataGridItem.Cells[COLUMNVISIBLE].Controls[0];
                 profileProperty.Visible = checkBox.Checked;
             }
@@ -510,15 +573,19 @@ namespace DotNetNuke.Modules.Admin.Users
             }
 
             this.ProfileProperties.Sort();
+			eventLogger.LogDebug("<<< Exiting ProcessPostBack()");
         }
 
         private void CmdRefresh_Click(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering CmdRefresh_Click(sender={Sender},e={E})", sender, e);
             this.RefreshGrid();
+			eventLogger.LogDebug("<<< Exiting CmdRefresh_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void GrdProfileProperties_ItemCheckedChanged(object sender, DNNDataGridCheckChangedEventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering GrdProfileProperties_ItemCheckedChanged(sender={Sender},e={E})", sender, e);
             string propertyName = e.Field;
             bool propertyValue = e.Checked;
 
@@ -546,18 +613,22 @@ namespace DotNetNuke.Modules.Admin.Users
                 {
                     case "Required":
                         profileProperty.Required = propertyValue;
+						eventLogger.LogDebug("GrdProfileProperties_ItemCheckedChanged(sender={Sender},e={E}): profileProperty.Required → {Arg2}", sender, e, profileProperty.Required);
                         break;
                     case "Visible":
                         profileProperty.Visible = propertyValue;
+						eventLogger.LogDebug("GrdProfileProperties_ItemCheckedChanged(sender={Sender},e={E}): profileProperty.Visible → {Arg2}", sender, e, profileProperty.Visible);
                         break;
                 }
             }
 
             this.BindGrid();
+			eventLogger.LogDebug("<<< Exiting GrdProfileProperties_ItemCheckedChanged(sender={Sender},e={E})", sender, e);
         }
 
         private void GrdProfileProperties_ItemCommand(object source, DataGridCommandEventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering GrdProfileProperties_ItemCommand(source={Source},e={E})", source, e);
             int index = e.Item.ItemIndex;
 
             switch (e.CommandName)
@@ -572,6 +643,7 @@ namespace DotNetNuke.Modules.Admin.Users
                     this.MovePropertyDown(index);
                     break;
             }
+			eventLogger.LogDebug("<<< Exiting GrdProfileProperties_ItemCommand(source={Source},e={E})", source, e);
         }
 
         /// <summary>
@@ -581,6 +653,7 @@ namespace DotNetNuke.Modules.Admin.Users
         /// </summary>
         private void GrdProfileProperties_ItemCreated(object sender, DataGridItemEventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering GrdProfileProperties_ItemCreated(sender={Sender},e={E})", sender, e);
             if (this.SupportsRichClient())
             {
                 switch (e.Item.ItemType)
@@ -603,6 +676,7 @@ namespace DotNetNuke.Modules.Admin.Users
                         break;
                 }
             }
+			eventLogger.LogDebug("<<< Exiting GrdProfileProperties_ItemCreated(sender={Sender},e={E})", sender, e);
         }
     }
 }

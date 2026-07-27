@@ -20,6 +20,7 @@ namespace DotNetNuke.Web.Api
     /// <summary>The default <see cref="IPortalAliasRouteManager"/> implementation.</summary>
     internal partial class PortalAliasRouteManager : IPortalAliasRouteManager
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IPortalAliasService portalAliasService;
         private List<int> prefixCounts;
 
@@ -28,6 +29,10 @@ namespace DotNetNuke.Web.Api
         public PortalAliasRouteManager()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering PortalAliasRouteManager()");
+		Logger.LogDebug("<<< Exiting PortalAliasRouteManager()");
+		Logger.LogDebug(">>> Entering PortalAliasRouteManager(portalAliasService={PortalAliasService})", portalAliasService);
+		Logger.LogDebug("<<< Exiting PortalAliasRouteManager(portalAliasService={PortalAliasService})", portalAliasService);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PortalAliasRouteManager"/> class.</summary>
@@ -35,6 +40,7 @@ namespace DotNetNuke.Web.Api
         public PortalAliasRouteManager(IPortalAliasService portalAliasService)
         {
             this.portalAliasService = portalAliasService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalAliasService>();
+			Logger.LogDebug("PortalAliasRouteManager(portalAliasService={PortalAliasService}): portalAliasService → {PortalAliasService1}", portalAliasService, portalAliasService);
         }
 
         /// <summary>Gets the route URL for the old-style web API route.</summary>
@@ -57,19 +63,24 @@ namespace DotNetNuke.Web.Api
         /// <returns>A new <see cref="HttpRouteValueDictionary"/> with prefixes added.</returns>
         public static HttpRouteValueDictionary GetAllRouteValues(IPortalAliasInfo portalAliasInfo, object routeValues)
         {
+			Logger.LogDebug(">>> Entering GetAllRouteValues(portalAliasInfo={PortalAliasInfo},routeValues={RouteValues})", portalAliasInfo, routeValues);
             var allRouteValues = new HttpRouteValueDictionary(routeValues);
 
+			Logger.LogDebug("GetAllRouteValues(portalAliasInfo={PortalAliasInfo},routeValues={RouteValues}): allRouteValues → {AllRouteValues}", portalAliasInfo, routeValues, allRouteValues);
             var segments = portalAliasInfo.HttpAlias.Split('/');
             if (segments.Length > 1)
+			Logger.LogDebug("GetAllRouteValues(portalAliasInfo={PortalAliasInfo},routeValues={RouteValues}): segments → {Segments}", portalAliasInfo, routeValues, segments);
             {
                 for (int i = 1; i < segments.Length; i++)
                 {
                     var key = "prefix" + (i - 1).ToString(CultureInfo.InvariantCulture);
                     var value = segments[i];
+					Logger.LogWarning("GetAllRouteValues(portalAliasInfo={PortalAliasInfo},routeValues={RouteValues}): key → {Key}", portalAliasInfo, routeValues, key);
                     allRouteValues.Add(key, value);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetAllRouteValues(portalAliasInfo={PortalAliasInfo},routeValues={RouteValues})", portalAliasInfo, routeValues);
             return allRouteValues;
         }
 
@@ -104,6 +115,7 @@ namespace DotNetNuke.Web.Api
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetRouteName(moduleFolderName={ModuleFolderName},routeName={RouteName},portalAlias={PortalAlias})", moduleFolderName, routeName, portalAlias);
             return this.GetRouteName(moduleFolderName, routeName, CalcAliasPrefixCount(alias));
         }
 
@@ -123,12 +135,17 @@ namespace DotNetNuke.Web.Api
         /// <inheritdoc />
         public void ClearCachedData()
         {
+			Logger.LogDebug(">>> Entering ClearCachedData()");
             this.prefixCounts = null;
+			Logger.LogDebug("<<< Exiting ClearCachedData()");
+			Logger.LogDebug("ClearCachedData(): prefixCounts → {PrefixCounts}", prefixCounts);
+			Logger.LogDebug("ClearCachedData(): this.prefixCounts → {Arg0}", this.prefixCounts);
         }
 
         /// <inheritdoc />
         public IEnumerable<int> GetRoutePrefixCounts()
         {
+			Logger.LogDebug(">>> Entering GetRoutePrefixCounts()");
             if (this.prefixCounts != null)
             {
                 return this.prefixCounts;
@@ -138,15 +155,18 @@ namespace DotNetNuke.Web.Api
             // when a new portal is added so cache them until that time
             var segmentCounts = new List<int>();
 
+			Logger.LogDebug("GetRoutePrefixCounts(): segmentCounts → {SegmentCounts}", segmentCounts);
             foreach (IPortalInfo portal in PortalController.Instance.GetPortals())
             {
                 var aliases = this.portalAliasService.GetPortalAliasesByPortalId(portal.PortalId).Select(x => x.HttpAlias);
                 aliases = StripApplicationPath(aliases);
+				Logger.LogDebug("GetRoutePrefixCounts(): aliases → {Aliases}", aliases);
 
                 foreach (var alias in aliases)
                 {
                     var count = CalcAliasPrefixCount(alias);
 
+					Logger.LogDebug("GetRoutePrefixCounts(): count → {Count}", count);
                     if (!segmentCounts.Contains(count))
                     {
                         segmentCounts.Add(count);
@@ -155,7 +175,9 @@ namespace DotNetNuke.Web.Api
             }
 
             this.prefixCounts = segmentCounts.OrderByDescending(x => x).ToList();
+			Logger.LogDebug("GetRoutePrefixCounts(): prefixCounts → {PrefixCounts}", prefixCounts);
 
+			Logger.LogDebug("<<< Exiting GetRoutePrefixCounts()");
             return this.prefixCounts;
         }
 
@@ -202,11 +224,13 @@ namespace DotNetNuke.Web.Api
 
             string prefix = string.Empty;
 
+			Logger.LogDebug("GeneratePrefixString(count={Count}): prefix → {Prefix}", count, prefix);
             for (int i = count - 1; i >= 0; i--)
             {
                 prefix = "{prefix" + i + "}/" + prefix;
             }
 
+			Logger.LogDebug("<<< Exiting GeneratePrefixString(count={Count})", count);
             return prefix;
         }
     }

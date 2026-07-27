@@ -10,6 +10,7 @@
 <dnn:DnnScriptBlock ID="confirmScript" runat="server">
 	<script type="text/javascript">
 	(function($) {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
 		$(document).ready(function() {
 		    //Regular Confirm
 			var confirmString = "confirm('<%= Localization.GetSafeJSString("DeleteModule.Confirm")%>')";
@@ -40,6 +41,7 @@
 <script runat="server">
 	protected override void OnLoad(EventArgs e)
 	{
+		Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
 		base.OnLoad(e);
         
 		if(!Context.Items.Contains("ActionsMenuLoaded"))
@@ -49,6 +51,7 @@
 		else
 		{
 			confirmScript.Visible = false;
+			Logger.LogDebug("OnLoad(e={E}): confirmScript.Visible → {Arg1}", e, confirmScript.Visible);
 		}
 
 	    JavaScript.RequestRegistration(CommonJs.jQuery);
@@ -56,5 +59,6 @@
 	    JavaScript.RequestRegistration(CommonJs.jQueryUI);
 	    JavaScript.RequestRegistration(CommonJs.HoverIntent);
 	    JavaScript.RequestRegistration(CommonJs.DnnPlugins);
+		Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
 	}
 </script>

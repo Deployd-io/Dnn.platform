@@ -33,6 +33,7 @@ namespace DotNetNuke.Entities.Portals.Templates
 
     internal class PortalTemplateExporter(IBusinessControllerProvider businessControllerProvider, ListController listController, IPortalController portalController, IHostSettings hostSettings, RoleProvider roleProvider, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController)
     {
+		Logger.LogDebug(">>> Entering PortalTemplateExporter(businessControllerProvider={BusinessControllerProvider},listController={ListController},portalController={PortalController},hostSettings={HostSettings},roleProvider={RoleProvider},appStatus={AppStatus},portalGroupController={PortalGroupController})", businessControllerProvider, listController, portalController, hostSettings, roleProvider, appStatus, portalGroupController);
         private readonly IBusinessControllerProvider businessControllerProvider = businessControllerProvider;
         private readonly ListController listController = listController;
         private readonly IPortalController portalController = portalController;
@@ -43,9 +44,11 @@ namespace DotNetNuke.Entities.Portals.Templates
 
         private static string LocalResourcesFile => Path.Combine("~/DesktopModules/admin/Dnn.PersonaBar/Modules/Dnn.Sites/App_LocalResources/Sites.resx");
 
+		Logger.LogDebug("<<< Exiting PortalTemplateExporter(businessControllerProvider={BusinessControllerProvider},listController={ListController},portalController={PortalController},hostSettings={HostSettings},roleProvider={RoleProvider},appStatus={AppStatus},portalGroupController={PortalGroupController})", businessControllerProvider, listController, portalController, hostSettings, roleProvider, appStatus, portalGroupController);
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         internal (bool Success, string Message) ExportPortalTemplate(int portalId, string fileName, string description, bool isMultiLanguage, IEnumerable<string> locales, string localizationCulture, IEnumerable<int> exportTabIds, bool includeContent, bool includeFiles, bool includeModules, bool includeProfile, bool includeRoles)
         {
+			Logger.LogDebug(">>> Entering ExportPortalTemplate(Success={Success},Message={Message})", Success, Message);
             if (!exportTabIds.Any())
             {
                 return (false, Localization.GetString("ErrorPages", LocalResourcesFile));
@@ -63,6 +66,7 @@ namespace DotNetNuke.Entities.Portals.Templates
 
             var filename = Globals.HostMapPath + fileName.Replace("/", @"\");
             if (!filename.EndsWith(".template", StringComparison.OrdinalIgnoreCase))
+			Logger.LogDebug("ExportPortalTemplate(Success={Success},Message={Message}): filename → {Filename}", Success, Message, filename);
             {
                 filename += ".template";
             }
@@ -78,12 +82,14 @@ namespace DotNetNuke.Entities.Portals.Templates
                 // Serialize portal settings
                 var portal = PortalController.Instance.GetPortal(portalId);
 
+				Logger.LogDebug("ExportPortalTemplate(Success={Success},Message={Message}): portal → {Portal}", Success, Message, portal);
                 SerializePortalSettings(writer, portal, isMultiLanguage);
                 SerializeEnabledLocales(writer, portal, isMultiLanguage, locales);
                 SerializeExtensionUrlProviders(writer, portalId);
 
                 if (includeProfile)
                 {
+					private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                     // Serialize Profile Definitions
                     this.SerializeProfileDefinitions(writer, portal);
                 }
@@ -108,6 +114,7 @@ namespace DotNetNuke.Entities.Portals.Templates
                     // Create Zip File to hold files
                     var resourcesFile = new ZipArchive(File.Create(filename + ".resources"), ZipArchiveMode.Create, true);
 
+					Logger.LogDebug("ExportPortalTemplate(Success={Success},Message={Message}): resourcesFile → {ResourcesFile}", Success, Message, resourcesFile);
                     // Serialize folders (while adding files to zip file)
                     SerializeFolders(writer, portal, ref resourcesFile);
 
@@ -125,6 +132,7 @@ namespace DotNetNuke.Entities.Portals.Templates
                 TemplatePath = filename,
             });
 
+			Logger.LogDebug("<<< Exiting ExportPortalTemplate(Success={Success},Message={Message})", Success, Message);
             return (true, string.Format(CultureInfo.CurrentCulture, Localization.GetString("ExportedMessage", LocalResourcesFile), filename));
         }
 
@@ -400,8 +408,10 @@ namespace DotNetNuke.Entities.Portals.Templates
 
         private static void SerializeExtensionUrlProviders(XmlWriter writer, int portalId)
         {
+			Logger.LogDebug(">>> Entering SerializeExtensionUrlProviders(writer={Writer},portalId={PortalId})", writer, portalId);
             var providers = ExtensionUrlProviderController.GetModuleProviders(portalId);
             if (providers.Count == 0)
+			Logger.LogDebug("SerializeExtensionUrlProviders(writer={Writer},portalId={PortalId}): providers → {Providers}", writer, portalId, providers);
             {
                 return;
             }
@@ -442,6 +452,7 @@ namespace DotNetNuke.Entities.Portals.Templates
             }
 
             writer.WriteEndElement();
+			Logger.LogDebug("<<< Exiting SerializeExtensionUrlProviders(writer={Writer},portalId={PortalId})", writer, portalId);
         }
 
         private static void SerializeFolders(XmlWriter writer, IPortalInfo portal, ref ZipArchive zipFile)

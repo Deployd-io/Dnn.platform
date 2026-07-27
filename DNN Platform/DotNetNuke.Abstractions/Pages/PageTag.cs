@@ -34,6 +34,7 @@ namespace DotNetNuke.Abstractions.Pages
     /// </example>
     public class PageTag
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Initializes a new instance of the <see cref="PageTag"/> class.
         /// </summary>
@@ -42,8 +43,12 @@ namespace DotNetNuke.Abstractions.Pages
         /// <exception cref="System.ArgumentNullException">Thrown when value is null.</exception>
         public PageTag(string value, int priority)
         {
+			Logger.LogDebug(">>> Entering PageTag(value={Value},priority={Priority})", value, priority);
             this.Value = value;
             this.Priority = priority;
+			Logger.LogDebug("<<< Exiting PageTag(value={Value},priority={Priority})", value, priority);
+			Logger.LogDebug("PageTag(value={Value},priority={Priority}): this.Value → {Arg2}", value, priority, this.Value);
+			Logger.LogDebug("PageTag(value={Value},priority={Priority}): this.Priority → {Arg2}", value, priority, this.Priority);
         }
 
         /// <summary>

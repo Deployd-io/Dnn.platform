@@ -21,9 +21,13 @@ namespace DotNetNuke.Entities.Users.Membership
 
     public class MembershipPasswordController(ListController listController, DataProvider dataProvider)
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly ListController listController = listController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ListController>();
+		Logger.LogDebug(">>> Entering MembershipPasswordController(listController={ListController},dataProvider={DataProvider})", listController, dataProvider);
+		Logger.LogDebug("MembershipPasswordController(listController={ListController},dataProvider={DataProvider}): listController → {ListController1}", listController, dataProvider, listController);
         private readonly DataProvider dataProvider = dataProvider ?? DataProvider.Instance();
 
+		Logger.LogDebug("MembershipPasswordController(listController={ListController},dataProvider={DataProvider}): dataProvider → {DataProvider1}", listController, dataProvider, dataProvider);
         /// <summary> Initializes a new instance of the <see cref="MembershipPasswordController"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with ListController. Scheduled removal in v12.0.0.")]
         public MembershipPasswordController()
@@ -36,6 +40,8 @@ namespace DotNetNuke.Entities.Users.Membership
         /// <returns>list of PasswordHistory objects.</returns>
         public List<PasswordHistory> GetPasswordHistory(int userId)
         {
+			Logger.LogDebug(">>> Entering GetPasswordHistory(userId={UserId})", userId);
+			Logger.LogDebug("<<< Exiting GetPasswordHistory(userId={UserId})", userId);
             return this.GetPasswordHistory(userId, Null.NullInteger);
         }
 
@@ -48,6 +54,7 @@ namespace DotNetNuke.Entities.Users.Membership
             var settings = new MembershipPasswordSettings(portalId);
             List<PasswordHistory> history =
                 CBO.FillCollection<PasswordHistory>(this.dataProvider.GetPasswordHistory(userId, settings.NumberOfPasswordsStored, settings.NumberOfDaysBeforePasswordReuse));
+			Logger.LogDebug("<<< Exiting GetPasswordHistory(userId={UserId},portalId={PortalId})", userId, portalId);
             return history;
         }
 
@@ -58,6 +65,8 @@ namespace DotNetNuke.Entities.Users.Membership
         /// <returns>true if password has not been used in users history, false otherwise.</returns>
         public bool IsPasswordInHistory(int userId, int portalId, string newPassword)
         {
+			Logger.LogDebug(">>> Entering IsPasswordInHistory(userId={UserId},portalId={PortalId},newPassword={NewPassword})", userId, portalId, newPassword);
+			Logger.LogDebug("<<< Exiting IsPasswordInHistory(userId={UserId},portalId={PortalId},newPassword={NewPassword})", userId, portalId, newPassword);
             return this.IsPasswordInHistory(userId, portalId, newPassword, true);
         }
 
@@ -87,6 +96,7 @@ namespace DotNetNuke.Entities.Users.Membership
                 }
             }
 
+			Logger.LogDebug("<<< Exiting IsPasswordInHistory(userId={UserId},portalId={PortalId},newPassword={NewPassword},autoAdd={AutoAdd})", userId, portalId, newPassword, autoAdd);
             return isPreviouslyUsed;
         }
 
@@ -96,14 +106,17 @@ namespace DotNetNuke.Entities.Users.Membership
         /// <returns>true if previously used, false otherwise.</returns>
         public bool IsPasswordPreviouslyUsed(int userId, string password)
         {
+			Logger.LogDebug(">>> Entering IsPasswordPreviouslyUsed(userId={UserId},password={Password})", userId, password);
             bool foundMatch = false;
 
+			Logger.LogDebug("IsPasswordPreviouslyUsed(userId={UserId},password={Password}): foundMatch → {FoundMatch}", userId, password, foundMatch);
             // use default algorithm (SHA1CryptoServiceProvider )
             using (HashAlgorithm ha = HashAlgorithm.Create())
             {
                 List<PasswordHistory> history = this.GetPasswordHistory(userId);
                 foreach (PasswordHistory ph in history)
                 {
+				Logger.LogDebug("IsPasswordPreviouslyUsed(userId={UserId},password={Password}): history → {History}", userId, password, history);
                     string oldEncodedPassword = ph.Password;
                     string oldEncodedSalt = ph.PasswordSalt;
                     byte[] oldSalt = Convert.FromBase64String(oldEncodedSalt);
@@ -120,6 +133,7 @@ namespace DotNetNuke.Entities.Users.Membership
                 }
             }
 
+			Logger.LogDebug("<<< Exiting IsPasswordPreviouslyUsed(userId={UserId},password={Password})", userId, password);
             return foundMatch;
         }
 
@@ -130,12 +144,14 @@ namespace DotNetNuke.Entities.Users.Membership
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public bool IsValidToken(int userId, Guid resetToken)
         {
+			Logger.LogDebug(">>> Entering IsValidToken(userId={UserId},resetToken={ResetToken})", userId, resetToken);
             if (UserController.Instance.GetCurrentUserInfo().PasswordResetToken == resetToken &&
                 UserController.Instance.GetCurrentUserInfo().PasswordResetExpiration <= DateTime.Now)
             {
                 return true;
             }
 
+			Logger.LogDebug("<<< Exiting IsValidToken(userId={UserId},resetToken={ResetToken})", userId, resetToken);
             return false;
         }
 
@@ -148,35 +164,45 @@ namespace DotNetNuke.Entities.Users.Membership
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public bool FoundBannedPassword(string inputString)
         {
+			Logger.LogDebug(">>> Entering FoundBannedPassword(inputString={InputString})", inputString);
             const string ListName = "BannedPasswords";
 
             var settings = PortalController.Instance.GetCurrentSettings();
 
+			Logger.LogDebug("FoundBannedPassword(inputString={InputString}): settings → {Settings}", inputString, settings);
             IEnumerable<ListEntryInfo> listEntryHostInfos = this.listController.GetListEntryInfoItems(ListName, string.Empty, Null.NullInteger);
             IEnumerable<ListEntryInfo> listEntryPortalInfos =
                 this.listController.GetListEntryInfoItems($"{ListName}-{settings.PortalId}", string.Empty, settings.PortalId);
+				Logger.LogDebug("FoundBannedPassword(inputString={InputString}): listEntryHostInfos → {ListEntryHostInfos}", inputString, listEntryHostInfos);
 
             IEnumerable<ListEntryInfo> query2 = listEntryHostInfos.Where(test => test.Text == inputString);
             IEnumerable<ListEntryInfo> query3 = listEntryPortalInfos.Where(test => test.Text == inputString);
+			Logger.LogDebug("FoundBannedPassword(inputString={InputString}): query2 → {Query2}", inputString, query2);
+			Logger.LogDebug("FoundBannedPassword(inputString={InputString}): query3 → {Query3}", inputString, query3);
 
             if (query2.Any() || query3.Any())
             {
                 return true;
             }
 
+			Logger.LogDebug("<<< Exiting FoundBannedPassword(inputString={InputString})", inputString);
             return false;
         }
 
         private static byte[] GetRandomSaltValue()
         {
+			Logger.LogDebug(">>> Entering GetRandomSaltValue()");
             using var rcsp = new RNGCryptoServiceProvider();
             var bSalt = new byte[16];
+			Logger.LogDebug("GetRandomSaltValue(): rcsp → {Rcsp}", rcsp);
             rcsp.GetBytes(bSalt);
+			Logger.LogDebug("<<< Exiting GetRandomSaltValue()");
             return bSalt;
         }
 
         private void AddPasswordHistory(int userId, string password, int passwordsRetained, int daysRetained)
         {
+			Logger.LogDebug(">>> Entering AddPasswordHistory(userId={UserId},password={Password},passwordsRetained={PasswordsRetained},daysRetained={DaysRetained})", userId, password, passwordsRetained, daysRetained);
             using (HashAlgorithm ha = HashAlgorithm.Create())
             {
                 byte[] newSalt = GetRandomSaltValue();
@@ -189,6 +215,8 @@ namespace DotNetNuke.Entities.Users.Membership
 
                 this.dataProvider.AddPasswordHistory(userId, hashedPassword, Convert.ToBase64String(newSalt), passwordsRetained, daysRetained);
             }
+			Logger.LogDebug("<<< Exiting AddPasswordHistory(userId={UserId},password={Password},passwordsRetained={PasswordsRetained},daysRetained={DaysRetained})", userId, password, passwordsRetained, daysRetained);
         }
+		Logger.LogDebug("<<< Exiting MembershipPasswordController(listController={ListController},dataProvider={DataProvider})", listController, dataProvider);
     }
 }

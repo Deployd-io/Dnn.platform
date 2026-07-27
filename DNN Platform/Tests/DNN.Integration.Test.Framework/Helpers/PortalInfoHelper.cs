@@ -11,13 +11,17 @@ namespace DNN.Integration.Test.Framework.Helpers
 
     public class PortalInfoHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static PortalInfo GetPortalInfo(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetPortalInfo(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetPortalInfo(portalId={PortalId})", portalId);
             return DatabaseHelper.ExecuteStoredProcedure<PortalInfo>("GetPortals", "en-US").First(p => p.PortalID == portalId);
         }
 
         public static void UpdatePortalInfo(PortalInfo portal)
         {
+			Logger.LogDebug(">>> Entering UpdatePortalInfo(portal={Portal})", portal);
             DatabaseHelper.ExecuteStoredProcedure(
                 "UpdatePortalInfo",
                 portal.PortalID,
@@ -55,6 +59,7 @@ namespace DNN.Integration.Test.Framework.Helpers
                 portal.HomeDirectory,
                 portal.LastModifiedByUserID,
                 portal.CultureCode);
+				Logger.LogDebug("<<< Exiting UpdatePortalInfo(portal={Portal})", portal);
         }
     }
 }

@@ -13,15 +13,19 @@ namespace DotNetNuke.ExtensionPoints
 
     public class SafeDirectoryCatalog : ComposablePartCatalog
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly AggregateCatalog catalog;
 
         /// <summary>Initializes a new instance of the <see cref="SafeDirectoryCatalog"/> class.</summary>
         /// <param name="directory">The directory path in which to search for assemblies (recursively).</param>
         public SafeDirectoryCatalog(string directory)
         {
+			Logger.LogDebug(">>> Entering SafeDirectoryCatalog(directory={Directory})", directory);
             var files = Directory.EnumerateFiles(directory, "*.dll", SearchOption.AllDirectories);
 
+			Logger.LogDebug("SafeDirectoryCatalog(directory={Directory}): files → {Files}", directory, files);
             this.catalog = new AggregateCatalog();
+			Logger.LogDebug("SafeDirectoryCatalog(directory={Directory}): catalog → {Catalog}", directory, catalog);
 
             foreach (var file in files)
             {
@@ -29,6 +33,7 @@ namespace DotNetNuke.ExtensionPoints
                 {
                     var asmCat = new AssemblyCatalog(file);
 
+					Logger.LogDebug("SafeDirectoryCatalog(directory={Directory}): asmCat → {AsmCat}", directory, asmCat);
                     // Force MEF to load the plugin and figure out if there are any exports
                     // good assemblies will not throw the RTLE exception and can be added to the catalog
                     if (asmCat.Parts.ToList().Count > 0)
@@ -38,15 +43,18 @@ namespace DotNetNuke.ExtensionPoints
                 }
                 catch (ReflectionTypeLoadException)
                 {
+				Logger.LogError("Exception in SafeDirectoryCatalog(directory={Directory}): {Arg1}", directory, ex.Message);
                 }
                 catch (BadImageFormatException)
                 {
                 }
                 catch (FileLoadException)
                 {
+					Logger.LogError("Exception in SafeDirectoryCatalog(directory={Directory}): {Arg1}", directory, ex.Message);
                     // ignore when the assembly load failed.
                 }
             }
+			Logger.LogDebug("<<< Exiting SafeDirectoryCatalog(directory={Directory})", directory);
         }
 
         /// <inheritdoc />

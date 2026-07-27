@@ -84,6 +84,7 @@ namespace Dnn.PersonaBar.Library.Permissions
         [DnnDeprecated(10, 2, 2, "Please use overload taking IHostSettings")]
         public static partial MenuPermissionCollection GetMenuPermissions(int portalId)
             => GetMenuPermissions(Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>(), portalId);
+			Logger.LogDebug(">>> Entering GetMenuPermissions(portalId={PortalId})", portalId);
 
         /// <summary>Gets the menu permissions.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -92,6 +93,7 @@ namespace Dnn.PersonaBar.Library.Permissions
         [DnnDeprecated(10, 2, 4, "Please use overload taking IPortalController")]
         public static partial MenuPermissionCollection GetMenuPermissions(IHostSettings hostSettings, int portalId)
             => GetMenuPermissions(hostSettings, Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>(), portalId);
+			Logger.LogDebug(">>> Entering GetMenuPermissions(hostSettings={HostSettings},portalId={PortalId})", hostSettings, portalId);
 
         /// <summary>Gets the menu permissions.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -100,9 +102,12 @@ namespace Dnn.PersonaBar.Library.Permissions
         /// <returns>A <see cref="MenuPermissionCollection"/>.</returns>
         public static MenuPermissionCollection GetMenuPermissions(IHostSettings hostSettings, IPortalController portalController, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetMenuPermissions(hostSettings={HostSettings},portalController={PortalController},portalId={PortalId})", hostSettings, portalController, portalId);
             var cacheKey = GetCacheKey(portalId);
             var permissions = DataCache.GetCache<MenuPermissionCollection>(cacheKey);
+			Logger.LogDebug("GetMenuPermissions(hostSettings={HostSettings},portalController={PortalController},portalId={PortalId}): cacheKey → {CacheKey}", hostSettings, portalController, portalId, cacheKey);
             if (permissions == null)
+			Logger.LogDebug("GetMenuPermissions(hostSettings={HostSettings},portalController={PortalController},portalId={PortalId}): permissions → {Permissions}", hostSettings, portalController, portalId, permissions);
             {
                 lock (ThreadLocker)
                 {
@@ -113,11 +118,13 @@ namespace Dnn.PersonaBar.Library.Permissions
                         EnsureMenuDefaultPermissions(hostSettings, portalController, portalId);
                         var reader = DataService.GetPersonbaBarMenuPermissionsByPortal(portalId);
                         try
+						Logger.LogDebug("GetMenuPermissions(hostSettings={HostSettings},portalController={PortalController},portalId={PortalId}): reader → {Reader}", hostSettings, portalController, portalId, reader);
                         {
                             while (reader.Read())
                             {
                                 var permissionInfo = CBO.FillObject<MenuPermissionInfo>(reader, false);
                                 permissions.Add(permissionInfo, true);
+								Logger.LogDebug("GetMenuPermissions(hostSettings={HostSettings},portalController={PortalController},portalId={PortalId}): permissionInfo → {PermissionInfo}", hostSettings, portalController, portalId, permissionInfo);
                             }
 
                             DataCache.SetCache(cacheKey, permissions);
@@ -134,6 +141,9 @@ namespace Dnn.PersonaBar.Library.Permissions
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetMenuPermissions(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetMenuPermissions(hostSettings={HostSettings},portalId={PortalId})", hostSettings, portalId);
+			Logger.LogDebug("<<< Exiting GetMenuPermissions(hostSettings={HostSettings},portalController={PortalController},portalId={PortalId})", hostSettings, portalController, portalId);
             return permissions;
         }
 
@@ -275,6 +285,7 @@ namespace Dnn.PersonaBar.Library.Permissions
         [DnnDeprecated(10, 2, 2, "Please use overload with IHostSettings")]
         public static partial IList<PermissionInfo> GetPermissions(int menuId)
             => GetPermissions(Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>(), menuId);
+			Logger.LogDebug(">>> Entering GetPermissions(menuId={MenuId})", menuId);
 
         /// <summary>Gets the permissions for the menu.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -282,6 +293,7 @@ namespace Dnn.PersonaBar.Library.Permissions
         /// <returns>A list of permissions.</returns>
         public static IList<PermissionInfo> GetPermissions(IHostSettings hostSettings, int menuId)
         {
+			Logger.LogDebug("<<< Exiting GetPermissions(menuId={MenuId})", menuId);
             return GetAllPermissions(hostSettings)
                 .Where(p => p.MenuId == Null.NullInteger || p.MenuId == menuId)
                 .ToList();
@@ -294,12 +306,14 @@ namespace Dnn.PersonaBar.Library.Permissions
         [DnnDeprecated(10, 2, 2, "Please use overload taking IHostSettings")]
         public static partial void SaveMenuDefaultPermissions(int portalId, MenuItem menuItem, string roleName)
             => SaveMenuDefaultPermissions(Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>(), portalId, menuItem, roleName);
+			Logger.LogDebug(">>> Entering SaveMenuDefaultPermissions(portalId={PortalId},menuItem={MenuItem},roleName={RoleName})", portalId, menuItem, roleName);
 
         /// <summary>Saves the menu's default permissions.</summary>
         /// <param name="hostSettings">The host settings.</param>
         /// <param name="portalId">The portal ID.</param>
         /// <param name="menuItem">The menu item.</param>
         /// <param name="roleName">The role name.</param>
+		Logger.LogDebug("<<< Exiting SaveMenuDefaultPermissions(portalId={PortalId},menuItem={MenuItem},roleName={RoleName})", portalId, menuItem, roleName);
         [DnnDeprecated(10, 2, 4, "Please use overload taking IPortalController")]
         public static partial void SaveMenuDefaultPermissions(IHostSettings hostSettings, int portalId, MenuItem menuItem, string roleName)
             => SaveMenuDefaultPermissions(hostSettings, Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>(), portalId, menuItem, roleName);
@@ -315,19 +329,24 @@ namespace Dnn.PersonaBar.Library.Permissions
 
         public static void SavePersonaBarPermission(string menuIdentifier, string permissionKey, string permissionName)
         {
+			Logger.LogDebug(">>> Entering SavePersonaBarPermission(menuIdentifier={MenuIdentifier},permissionKey={PermissionKey},permissionName={PermissionName})", menuIdentifier, permissionKey, permissionName);
             var menu = PersonaBarRepository.Instance.GetMenuItem(menuIdentifier);
             if (menu == null)
+			Logger.LogDebug("SavePersonaBarPermission(menuIdentifier={MenuIdentifier},permissionKey={PermissionKey},permissionName={PermissionName}): menu → {Menu}", menuIdentifier, permissionKey, permissionName, menu);
             {
                 return;
             }
 
             SavePersonaBarPermission(menu.MenuId, permissionKey, permissionName);
+			Logger.LogDebug("<<< Exiting SavePersonaBarPermission(menuIdentifier={MenuIdentifier},permissionKey={PermissionKey},permissionName={PermissionName})", menuIdentifier, permissionKey, permissionName);
         }
 
         public static void SavePersonaBarPermission(int menuId, string permissionKey, string permissionName)
         {
+			Logger.LogDebug(">>> Entering SavePersonaBarPermission(menuId={MenuId},permissionKey={PermissionKey},permissionName={PermissionName})", menuId, permissionKey, permissionName);
             var user = UserController.Instance.GetCurrentUserInfo();
 
+			Logger.LogDebug("SavePersonaBarPermission(menuId={MenuId},permissionKey={PermissionKey},permissionName={PermissionName}): user → {User}", menuId, permissionKey, permissionName, user);
             DataService.SavePersonaBarPermission(menuId, permissionKey, permissionName, user.UserID);
 
             ClearCache(Null.NullInteger);
@@ -339,15 +358,18 @@ namespace Dnn.PersonaBar.Library.Permissions
         [DnnDeprecated(10, 2, 2, "Please use overload with IHostSettings")]
         public static partial void DeletePersonaBarPermission(int menuId, string permissionKey)
             => DeletePersonaBarPermission(Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>(), menuId, permissionKey);
+			Logger.LogDebug(">>> Entering DeletePersonaBarPermission(menuId={MenuId},permissionKey={PermissionKey})", menuId, permissionKey);
 
         /// <summary>Deletes a menu permission.</summary>
         /// <param name="hostSettings">The host settings.</param>
         /// <param name="menuId">The menu ID.</param>
+		Logger.LogDebug("<<< Exiting DeletePersonaBarPermission(menuId={MenuId},permissionKey={PermissionKey})", menuId, permissionKey);
         /// <param name="permissionKey">The permission key.</param>
         public static void DeletePersonaBarPermission(IHostSettings hostSettings, int menuId, string permissionKey)
         {
             var permission = GetAllPermissions(hostSettings).FirstOrDefault(p => p.MenuId == menuId && p.PermissionKey == permissionKey);
 
+			Logger.LogWarning("DeletePersonaBarPermission(hostSettings={HostSettings},menuId={MenuId},permissionKey={PermissionKey}): permission → {Permission}", hostSettings, menuId, permissionKey, permission);
             if (permission != null)
             {
                 DataService.DeletePersonaBarPermission(permission.PermissionId);
@@ -358,20 +380,26 @@ namespace Dnn.PersonaBar.Library.Permissions
 
         public static bool PermissionAlreadyInitialized(int portalId)
         {
+			Logger.LogDebug(">>> Entering PermissionAlreadyInitialized(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting PermissionAlreadyInitialized(portalId={PortalId})", portalId);
             return PortalController.Instance.GetPortalSettings(portalId).ContainsKey(PermissionInitializedKey);
         }
 
         private static void SetPermissionInitialized(IPortalController portalController, int portalId)
         {
+			Logger.LogDebug(">>> Entering SetPermissionInitialized(portalController={PortalController},portalId={PortalId})", portalController, portalId);
             PortalController.UpdatePortalSetting(portalController, portalId, PermissionInitializedKey, "Y");
+			Logger.LogDebug("<<< Exiting SetPermissionInitialized(portalController={PortalController},portalId={PortalId})", portalController, portalId);
         }
 
         private static void EnsureMenuDefaultPermissions(IHostSettings hostSettings, IPortalController portalController, int portalId)
         {
+			Logger.LogDebug(">>> Entering EnsureMenuDefaultPermissions(hostSettings={HostSettings},portalController={PortalController},portalId={PortalId})", hostSettings, portalController, portalId);
             try
             {
                 var permissionInitialized = PermissionAlreadyInitialized(portalId);
                 if (!permissionInitialized)
+				Logger.LogDebug("EnsureMenuDefaultPermissions(hostSettings={HostSettings},portalController={PortalController},portalId={PortalId}): permissionInitialized → {PermissionInitialized}", hostSettings, portalController, portalId, permissionInitialized);
                 {
                     lock (DefaultPermissionLocker)
                     {
@@ -381,8 +409,10 @@ namespace Dnn.PersonaBar.Library.Permissions
                             var menuItems = PersonaBarRepository.Instance.GetMenu().AllItems;
                             foreach (var menuItem in menuItems)
                             {
+							Logger.LogDebug("EnsureMenuDefaultPermissions(hostSettings={HostSettings},portalController={PortalController},portalId={PortalId}): menuItems → {MenuItems}", hostSettings, portalController, portalId, menuItems);
                                 var defaultPermissions = PersonaBarRepository.Instance.GetMenuDefaultPermissions(menuItem.MenuId);
                                 if (!string.IsNullOrEmpty(defaultPermissions))
+								Logger.LogDebug("EnsureMenuDefaultPermissions(hostSettings={HostSettings},portalController={PortalController},portalId={PortalId}): defaultPermissions → {DefaultPermissions}", hostSettings, portalController, portalId, defaultPermissions);
                                 {
                                     foreach (var roleName in defaultPermissions.Split(','))
                                     {
@@ -403,6 +433,7 @@ namespace Dnn.PersonaBar.Library.Permissions
             {
                 Logger.Error(ex);
             }
+			Logger.LogDebug("<<< Exiting EnsureMenuDefaultPermissions(hostSettings={HostSettings},portalController={PortalController},portalId={PortalId})", hostSettings, portalController, portalId);
         }
 
         private static void SaveMenuDefaultPermissions(IHostSettings hostSettings, IPortalController portalController, int portalId, MenuItem menuItem, string roleName, bool ignoreExists)
@@ -479,25 +510,33 @@ namespace Dnn.PersonaBar.Library.Permissions
 
         private static void ClearCache(int portalId)
         {
+			Logger.LogDebug(">>> Entering ClearCache(portalId={PortalId})", portalId);
             if (portalId > Null.NullInteger)
             {
                 var cacheKey = GetCacheKey(portalId);
                 DataCache.RemoveCache(cacheKey);
+				Logger.LogDebug("ClearCache(portalId={PortalId}): cacheKey → {CacheKey}", portalId, cacheKey);
             }
             else
             {
                 DataCache.RemoveCache(PersonaBarPermissionsCacheKey);
             }
+			Logger.LogDebug("<<< Exiting ClearCache(portalId={PortalId})", portalId);
         }
 
         private static string GetCacheKey(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetCacheKey(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetCacheKey(portalId={PortalId})", portalId);
             return string.Format(CultureInfo.InvariantCulture, PersonaBarMenuPermissionsCacheKey, portalId);
         }
 
         private static IList<PermissionInfo> GetAllPermissions(IHostSettings hostSettings)
         {
+			Logger.LogDebug(">>> Entering GetAllPermissions(hostSettings={HostSettings})", hostSettings);
             var cacheItemArgs = new CacheItemArgs(PersonaBarPermissionsCacheKey, 20, CacheItemPriority.AboveNormal);
+			Logger.LogDebug("GetAllPermissions(hostSettings={HostSettings}): cacheItemArgs → {CacheItemArgs}", hostSettings, cacheItemArgs);
+			Logger.LogDebug("<<< Exiting GetAllPermissions(hostSettings={HostSettings})", hostSettings);
             return CBO.GetCachedObject<IList<PermissionInfo>>(
                 hostSettings,
                 cacheItemArgs,

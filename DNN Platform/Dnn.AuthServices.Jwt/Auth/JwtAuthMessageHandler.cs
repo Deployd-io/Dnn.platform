@@ -31,10 +31,13 @@ namespace Dnn.AuthServices.Jwt.Auth
         public JwtAuthMessageHandler(bool includeByDefault, bool forceSsl)
             : base(includeByDefault, forceSsl)
         {
+			Logger.LogDebug(">>> Entering JwtAuthMessageHandler(includeByDefault={IncludeByDefault},forceSsl={ForceSsl})", includeByDefault, forceSsl);
             // Once an instance is enabled and gets registered in
             // ServicesRoutingManager.RegisterAuthenticationHandlers()
             // this scheme gets marked as enabled.
             IsEnabled = true;
+			Logger.LogDebug("<<< Exiting JwtAuthMessageHandler(includeByDefault={IncludeByDefault},forceSsl={ForceSsl})", includeByDefault, forceSsl);
+			Logger.LogDebug("JwtAuthMessageHandler(includeByDefault={IncludeByDefault},forceSsl={ForceSsl}): IsEnabled → {IsEnabled}", includeByDefault, forceSsl, IsEnabled);
         }
 
         /// <inheritdoc />
@@ -49,20 +52,24 @@ namespace Dnn.AuthServices.Jwt.Auth
         /// <inheritdoc />
         public override HttpResponseMessage OnInboundRequest(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+			Logger.LogDebug(">>> Entering OnInboundRequest(request={Request},cancellationToken={CancellationToken})", request, cancellationToken);
             if (this.NeedsAuthentication(request))
             {
                 this.TryToAuthenticate(request);
             }
 
+			Logger.LogDebug("<<< Exiting OnInboundRequest(request={Request},cancellationToken={CancellationToken})", request, cancellationToken);
             return base.OnInboundRequest(request, cancellationToken);
         }
 
         private void TryToAuthenticate(HttpRequestMessage request)
         {
+			Logger.LogDebug(">>> Entering TryToAuthenticate(request={Request})", request);
             try
             {
                 var username = this.jwtController.ValidateToken(request);
                 if (!string.IsNullOrEmpty(username))
+				Logger.LogDebug("TryToAuthenticate(request={Request}): username → {Username}", request, username);
                 {
                     if (Logger.IsTraceEnabled)
                     {
@@ -76,6 +83,7 @@ namespace Dnn.AuthServices.Jwt.Auth
             {
                 Logger.Error("Unexpected error in authenticating the user. " + ex);
             }
+			Logger.LogDebug("<<< Exiting TryToAuthenticate(request={Request})", request);
         }
     }
 }

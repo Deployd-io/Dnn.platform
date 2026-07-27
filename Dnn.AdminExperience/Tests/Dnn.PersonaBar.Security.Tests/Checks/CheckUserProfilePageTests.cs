@@ -35,9 +35,12 @@
         [TestCase("pagesController")]
         public void Constructor_WhenArgumentIsNull_ThrowsArgumentNullException(string nullParamName)
         {
+			permissionProviderMock.LogDebug(">>> Entering Constructor_WhenArgumentIsNull_ThrowsArgumentNullException(nullParamName={NullParamName})", nullParamName);
             // arrange
             var argumentNullException = default(ArgumentNullException);
             var unexpectedException = default(Exception);
+			permissionProviderMock.LogDebug("Constructor_WhenArgumentIsNull_ThrowsArgumentNullException(nullParamName={NullParamName}): argumentNullException → {ArgumentNullException}", nullParamName, argumentNullException);
+			permissionProviderMock.LogDebug("Constructor_WhenArgumentIsNull_ThrowsArgumentNullException(nullParamName={NullParamName}): unexpectedException → {UnexpectedException}", nullParamName, unexpectedException);
 
             // act
             try
@@ -49,6 +52,7 @@
             }
             catch (ArgumentNullException ex)
             {
+				permissionProviderMock.LogError("Exception in Constructor_WhenArgumentIsNull_ThrowsArgumentNullException(nullParamName={NullParamName}): {Arg1}", nullParamName, ex.Message);
                 argumentNullException = ex;
             }
             catch (Exception ex)
@@ -63,16 +67,21 @@
                 Assert.That(argumentNullException, Is.Not.Null);
             }
             Assert.That(argumentNullException.ParamName, Is.EqualTo(nullParamName));
+			permissionProviderMock.LogDebug("<<< Exiting Constructor_WhenArgumentIsNull_ThrowsArgumentNullException(nullParamName={NullParamName})", nullParamName);
         }
 
         [Test]
         public void Execute_WhenNotFound_ReturnsPass()
         {
+			permissionProviderMock.LogDebug(">>> Entering Execute_WhenNotFound_ReturnsPass()");
             // arrange
             var portalControllerMock = SetupPortalControllerMock(PortalId, userTabId: 1);
             var tabControllerMock = SetupTabControllerMock();
+			permissionProviderMock.LogDebug("Execute_WhenNotFound_ReturnsPass(): portalControllerMock → {PortalControllerMock}", portalControllerMock);
+			permissionProviderMock.LogDebug("Execute_WhenNotFound_ReturnsPass(): tabControllerMock → {TabControllerMock}", tabControllerMock);
             var pagesControllerMock = new Mock<IPagesController>();
 
+			permissionProviderMock.LogDebug("Execute_WhenNotFound_ReturnsPass(): pagesControllerMock → {PagesControllerMock}", pagesControllerMock);
             var sut = new CheckUserProfilePage(
                 portalControllerMock.Object,
                 tabControllerMock.Object,
@@ -81,20 +90,26 @@
             // act
             var result = sut.Execute();
 
+			permissionProviderMock.LogDebug("Execute_WhenNotFound_ReturnsPass(): result → {Result}", result);
             // assert
             Assert.That(result.Severity, Is.EqualTo(SeverityEnum.Pass));
+			permissionProviderMock.LogDebug("<<< Exiting Execute_WhenNotFound_ReturnsPass()");
         }
 
         [Test]
         public void Execute_WhenDeleted_ReturnsPass()
         {
+			permissionProviderMock.LogDebug(">>> Entering Execute_WhenDeleted_ReturnsPass()");
             // arrange
             var portalControllerMock = SetupPortalControllerMock(PortalId, userTabId: 1);
 
+			permissionProviderMock.LogDebug("Execute_WhenDeleted_ReturnsPass(): portalControllerMock → {PortalControllerMock}", portalControllerMock);
             var tabControllerMock = SetupTabControllerMock(profilePage: new TabInfo { IsDeleted = true });
 
+			permissionProviderMock.LogDebug("Execute_WhenDeleted_ReturnsPass(): tabControllerMock → {TabControllerMock}", tabControllerMock);
             var pagesControllerMock = new Mock<IPagesController>();
 
+			permissionProviderMock.LogDebug("Execute_WhenDeleted_ReturnsPass(): pagesControllerMock → {PagesControllerMock}", pagesControllerMock);
             var sut = new CheckUserProfilePage(
                 portalControllerMock.Object,
                 tabControllerMock.Object,
@@ -103,20 +118,27 @@
             // act
             var result = sut.Execute();
 
+			permissionProviderMock.LogDebug("Execute_WhenDeleted_ReturnsPass(): result → {Result}", result);
             // assert
             Assert.That(result.Severity, Is.EqualTo(SeverityEnum.Pass));
+			permissionProviderMock.LogDebug("<<< Exiting Execute_WhenDeleted_ReturnsPass()");
         }
 
         [Test]
         public void Execute_WhenPublic_ReturnsWarning()
         {
+			permissionProviderMock.LogDebug(">>> Entering Execute_WhenPublic_ReturnsWarning()");
             // arrange
             RegisterTestablePermissionProvider();
 
             var portalControllerMock = SetupPortalControllerMock(PortalId, userTabId: 1);
             var activityFeedPage = BuildActivityFeedTabInfo();
+			permissionProviderMock.LogDebug("Execute_WhenPublic_ReturnsWarning(): portalControllerMock → {PortalControllerMock}", portalControllerMock);
+			permissionProviderMock.LogDebug("Execute_WhenPublic_ReturnsWarning(): activityFeedPage → {ActivityFeedPage}", activityFeedPage);
             var tabControllerMock = SetupTabControllerMock(activityFeedPage);
             var pagesControllerMock = SetupPagesControllerMock(userProfilePageIsPublic: true);
+			permissionProviderMock.LogDebug("Execute_WhenPublic_ReturnsWarning(): tabControllerMock → {TabControllerMock}", tabControllerMock);
+			permissionProviderMock.LogDebug("Execute_WhenPublic_ReturnsWarning(): pagesControllerMock → {PagesControllerMock}", pagesControllerMock);
 
             var sut = new CheckUserProfilePage(
                 portalControllerMock.Object,
@@ -126,20 +148,27 @@
             // act
             var result = sut.Execute();
 
+			permissionProviderMock.LogDebug("Execute_WhenPublic_ReturnsWarning(): result → {Result}", result);
             // assert
             Assert.That(result.Severity, Is.EqualTo(SeverityEnum.Warning));
+			permissionProviderMock.LogDebug("<<< Exiting Execute_WhenPublic_ReturnsWarning()");
         }
 
         [Test]
         public void Execute_WhenNeitherPublicNorActivityFeed_ReturnsPass()
         {
+			permissionProviderMock.LogDebug(">>> Entering Execute_WhenNeitherPublicNorActivityFeed_ReturnsPass()");
             // arrange
             RegisterTestablePermissionProvider();
 
             var portalControllerMock = SetupPortalControllerMock(PortalId, userTabId: 1);
             var customProfilePage = BuildCustomProfileTabInfo();
+			permissionProviderMock.LogDebug("Execute_WhenNeitherPublicNorActivityFeed_ReturnsPass(): portalControllerMock → {PortalControllerMock}", portalControllerMock);
+			permissionProviderMock.LogDebug("Execute_WhenNeitherPublicNorActivityFeed_ReturnsPass(): customProfilePage → {CustomProfilePage}", customProfilePage);
             var tabControllerMock = SetupTabControllerMock(customProfilePage);
             var pagesControllerMock = SetupPagesControllerMock(userProfilePageIsPublic: false);
+			permissionProviderMock.LogDebug("Execute_WhenNeitherPublicNorActivityFeed_ReturnsPass(): tabControllerMock → {TabControllerMock}", tabControllerMock);
+			permissionProviderMock.LogDebug("Execute_WhenNeitherPublicNorActivityFeed_ReturnsPass(): pagesControllerMock → {PagesControllerMock}", pagesControllerMock);
 
             var sut = new CheckUserProfilePage(
                 portalControllerMock.Object,
@@ -149,20 +178,27 @@
             // act
             var result = sut.Execute();
 
+			permissionProviderMock.LogDebug("Execute_WhenNeitherPublicNorActivityFeed_ReturnsPass(): result → {Result}", result);
             // assert
             Assert.That(result.Severity, Is.EqualTo(SeverityEnum.Pass));
+			permissionProviderMock.LogDebug("<<< Exiting Execute_WhenNeitherPublicNorActivityFeed_ReturnsPass()");
         }
 
         [Test]
         public void Execute_WhenNotPublicAndActivityFeedAndMyProfileNotFound_ReturnsPass()
         {
+			permissionProviderMock.LogDebug(">>> Entering Execute_WhenNotPublicAndActivityFeedAndMyProfileNotFound_ReturnsPass()");
             // arrange
             RegisterTestablePermissionProvider();
 
             var portalControllerMock = SetupPortalControllerMock(PortalId, userTabId: 1);
             var activityFeedPage = BuildActivityFeedTabInfo();
+			permissionProviderMock.LogDebug("Execute_WhenNotPublicAndActivityFeedAndMyProfileNotFound_ReturnsPass(): portalControllerMock → {PortalControllerMock}", portalControllerMock);
+			permissionProviderMock.LogDebug("Execute_WhenNotPublicAndActivityFeedAndMyProfileNotFound_ReturnsPass(): activityFeedPage → {ActivityFeedPage}", activityFeedPage);
             var tabControllerMock = SetupTabControllerMock(activityFeedPage, myProfilePage: null);
             var pagesControllerMock = SetupPagesControllerMock(userProfilePageIsPublic: false);
+			permissionProviderMock.LogDebug("Execute_WhenNotPublicAndActivityFeedAndMyProfileNotFound_ReturnsPass(): tabControllerMock → {TabControllerMock}", tabControllerMock);
+			permissionProviderMock.LogDebug("Execute_WhenNotPublicAndActivityFeedAndMyProfileNotFound_ReturnsPass(): pagesControllerMock → {PagesControllerMock}", pagesControllerMock);
 
             var sut = new CheckUserProfilePage(
                 portalControllerMock.Object,
@@ -172,22 +208,30 @@
             // act
             var result = sut.Execute();
 
+			permissionProviderMock.LogDebug("Execute_WhenNotPublicAndActivityFeedAndMyProfileNotFound_ReturnsPass(): result → {Result}", result);
             // assert
             Assert.That(result.Severity, Is.EqualTo(SeverityEnum.Pass));
+			permissionProviderMock.LogDebug("<<< Exiting Execute_WhenNotPublicAndActivityFeedAndMyProfileNotFound_ReturnsPass()");
         }
 
         [Test]
         public void Execute_WhenNotPublicAndActivityFeedAndMyProfileDeleted_ReturnsPass()
         {
+			permissionProviderMock.LogDebug(">>> Entering Execute_WhenNotPublicAndActivityFeedAndMyProfileDeleted_ReturnsPass()");
             // arrange
             RegisterTestablePermissionProvider();
 
             var portalControllerMock = SetupPortalControllerMock(PortalId, userTabId: 1);
             var activityFeedPage = BuildActivityFeedTabInfo();
+			permissionProviderMock.LogDebug("Execute_WhenNotPublicAndActivityFeedAndMyProfileDeleted_ReturnsPass(): portalControllerMock → {PortalControllerMock}", portalControllerMock);
+			permissionProviderMock.LogDebug("Execute_WhenNotPublicAndActivityFeedAndMyProfileDeleted_ReturnsPass(): activityFeedPage → {ActivityFeedPage}", activityFeedPage);
             var myProfilePage = BuildMyProfileTabInfo(deleted: true);
             var tabControllerMock = SetupTabControllerMock(activityFeedPage, myProfilePage);
+			permissionProviderMock.LogDebug("Execute_WhenNotPublicAndActivityFeedAndMyProfileDeleted_ReturnsPass(): myProfilePage → {MyProfilePage}", myProfilePage);
+			permissionProviderMock.LogDebug("Execute_WhenNotPublicAndActivityFeedAndMyProfileDeleted_ReturnsPass(): tabControllerMock → {TabControllerMock}", tabControllerMock);
             var pagesControllerMock = SetupPagesControllerMock(userProfilePageIsPublic: false);
 
+			permissionProviderMock.LogDebug("Execute_WhenNotPublicAndActivityFeedAndMyProfileDeleted_ReturnsPass(): pagesControllerMock → {PagesControllerMock}", pagesControllerMock);
             var sut = new CheckUserProfilePage(
                 portalControllerMock.Object,
                 tabControllerMock.Object,
@@ -196,8 +240,10 @@
             // act
             var result = sut.Execute();
 
+			permissionProviderMock.LogDebug("Execute_WhenNotPublicAndActivityFeedAndMyProfileDeleted_ReturnsPass(): result → {Result}", result);
             // assert
             Assert.That(result.Severity, Is.EqualTo(SeverityEnum.Pass));
+			permissionProviderMock.LogDebug("<<< Exiting Execute_WhenNotPublicAndActivityFeedAndMyProfileDeleted_ReturnsPass()");
         }
 
         [Test]
@@ -229,36 +275,45 @@
 
         private static TabInfo BuildActivityFeedTabInfo(bool deleted = false) => new TabInfo
         {
+			permissionProviderMock.LogDebug(">>> Entering BuildActivityFeedTabInfo(deleted={Deleted})", deleted);
             TabID = 1,
             IsDeleted = deleted,
             TabPath = CheckUserProfilePage.ActivityFeedTabPath,
             PortalID = PortalId,
         };
+			permissionProviderMock.LogDebug("<<< Exiting BuildActivityFeedTabInfo(deleted={Deleted})", deleted);
 
         private static TabInfo BuildCustomProfileTabInfo(bool deleted = false) => new TabInfo
         {
+			permissionProviderMock.LogDebug(">>> Entering BuildCustomProfileTabInfo(deleted={Deleted})", deleted);
             TabID = 1,
             IsDeleted = deleted,
             TabPath = CustomUserProfilePageTabPath,
             PortalID = PortalId,
         };
+			permissionProviderMock.LogDebug("<<< Exiting BuildCustomProfileTabInfo(deleted={Deleted})", deleted);
 
         private static TabInfo BuildMyProfileTabInfo(bool deleted = false) => new TabInfo
         {
+			permissionProviderMock.LogDebug(">>> Entering BuildMyProfileTabInfo(deleted={Deleted})", deleted);
             TabID = 2,
             IsDeleted = deleted,
             TabPath = CheckUserProfilePage.MyProfileTabPath,
             PortalID = PortalId,
         };
+			permissionProviderMock.LogDebug("<<< Exiting BuildMyProfileTabInfo(deleted={Deleted})", deleted);
 
         private static void RegisterTestablePermissionProvider()
         {
+			permissionProviderMock.LogDebug(">>> Entering RegisterTestablePermissionProvider()");
             var permissionProviderMock = new Mock<PermissionProvider>(Mock.Of<IEventLogger>(), Mock.Of<IPermissionDefinitionService>(), Mock.Of<IHostSettings>());
 
+			permissionProviderMock.LogDebug("RegisterTestablePermissionProvider(): permissionProviderMock → {PermissionProviderMock}", permissionProviderMock);
             permissionProviderMock.Setup(x => x.ImplicitRolesForPages(It.IsAny<int>()))
                 .Returns(new List<RoleInfo>());
 
             ComponentFactory.RegisterComponentInstance<PermissionProvider>(permissionProviderMock.Object);
+			permissionProviderMock.LogDebug("<<< Exiting RegisterTestablePermissionProvider()");
         }
 
         private static Mock<IPagesController> SetupPagesControllerMock(
@@ -282,8 +337,10 @@
 
         private static PagePermissions BuildPermissionsData(bool allUsersCanView)
         {
+			permissionProviderMock.LogDebug(">>> Entering BuildPermissionsData(allUsersCanView={AllUsersCanView})", allUsersCanView);
             var permissionsData = new PagePermissions(Mock.Of<IPermissionDefinitionService>(), false);
             if (allUsersCanView)
+			permissionProviderMock.LogDebug("BuildPermissionsData(allUsersCanView={AllUsersCanView}): permissionsData → {PermissionsData}", allUsersCanView, permissionsData);
             {
                 permissionsData.RolePermissions =
                 [
@@ -295,21 +352,27 @@
                 ];
             }
 
+			permissionProviderMock.LogDebug("<<< Exiting BuildPermissionsData(allUsersCanView={AllUsersCanView})", allUsersCanView);
             return permissionsData;
         }
 
         private static Mock<IPortalSettings> SetupPortalSettingsMock(int portalId, int userTabId)
         {
+			permissionProviderMock.LogDebug(">>> Entering SetupPortalSettingsMock(portalId={PortalId},userTabId={UserTabId})", portalId, userTabId);
             var mock = new Mock<IPortalSettings>();
             mock.SetupGet(x => x.PortalId).Returns(portalId);
+			permissionProviderMock.LogDebug("SetupPortalSettingsMock(portalId={PortalId},userTabId={UserTabId}): mock → {Mock}", portalId, userTabId, mock);
             mock.SetupGet(x => x.UserTabId).Returns(userTabId);
+			permissionProviderMock.LogDebug("<<< Exiting SetupPortalSettingsMock(portalId={PortalId},userTabId={UserTabId})", portalId, userTabId);
             return mock;
         }
 
         private static Mock<IPortalController> SetupPortalControllerMock(int portalId, int userTabId)
         {
+			permissionProviderMock.LogDebug(">>> Entering SetupPortalControllerMock(portalId={PortalId},userTabId={UserTabId})", portalId, userTabId);
             var settingsMock = SetupPortalSettingsMock(portalId, userTabId);
 
+			permissionProviderMock.LogDebug("SetupPortalControllerMock(portalId={PortalId},userTabId={UserTabId}): settingsMock → {SettingsMock}", portalId, userTabId, settingsMock);
             var settingsDictionary = new Dictionary<string, string>
             {
                 {
@@ -325,12 +388,14 @@
 
             var mock = new Mock<IPortalController>();
 
+			permissionProviderMock.LogDebug("SetupPortalControllerMock(portalId={PortalId},userTabId={UserTabId}): mock → {Mock}", portalId, userTabId, mock);
             mock.Setup(x => x.GetCurrentSettings()).Returns(settingsMock.Object);
             mock.Setup(x => x.GetPortalSettings(It.IsAny<int>())).Returns(settingsDictionary);
             mock.Setup(x => x.GetCurrentPortalSettings()).Returns(portalSettings);
 
             PortalController.SetTestableInstance(mock.Object);
 
+			permissionProviderMock.LogDebug("<<< Exiting SetupPortalControllerMock(portalId={PortalId},userTabId={UserTabId})", portalId, userTabId);
             return mock;
         }
 

@@ -12,6 +12,7 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>Provides the ability to lookup a country from an IP address.</summary>
     public class CountryLookup
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly string[] CountryName = new[]
                                                            {
                                                                "N/A", "Asia/Pacific Region", "Europe", "Andorra", "United Arab Emirates", "Afghanistan", "Antigua and Barbuda", "Anguilla", "Albania",
@@ -66,13 +67,17 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="ms">A memory stream with the GeoIP data file.</param>
         public CountryLookup(MemoryStream ms)
         {
+			Logger.LogDebug(">>> Entering CountryLookup(ms={Ms})", ms);
             this.m_MemoryStream = ms;
+			Logger.LogDebug("CountryLookup(ms={Ms}): this.m_MemoryStream → {Arg1}", ms, this.m_MemoryStream);
+			Logger.LogDebug("<<< Exiting CountryLookup(ms={Ms})", ms);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CountryLookup"/> class.</summary>
         /// <param name="fileLocation">The file path to the GeoIP data file.</param>
         public CountryLookup(string fileLocation)
         {
+			Logger.LogDebug(">>> Entering CountryLookup(fileLocation={FileLocation})", fileLocation);
             //------------------------------------------------------------------------------------------------
             // Load the passed in GeoIP Data file to the memorystream
             //------------------------------------------------------------------------------------------------
@@ -87,6 +92,7 @@ namespace DotNetNuke.UI.WebControls
 
                 fileStream.Close();
             }
+			Logger.LogDebug("<<< Exiting CountryLookup(fileLocation={FileLocation})", fileLocation);
         }
 
         /// <summary>Gets the GeoIP data file stream.</summary>
@@ -100,9 +106,11 @@ namespace DotNetNuke.UI.WebControls
         /// <returns>A <see cref="MemoryStream"/> instance.</returns>
         public static MemoryStream FileToMemory(string fileLocation)
         {
+			Logger.LogDebug(">>> Entering FileToMemory(fileLocation={FileLocation})", fileLocation);
             // Read a given file into a Memory Stream to return as the result
             var memStream = new MemoryStream();
             var bytes = new byte[256];
+			Logger.LogDebug("FileToMemory(fileLocation={FileLocation}): memStream → {MemStream}", fileLocation, memStream);
             try
             {
                 FileStream fileStream;
@@ -118,9 +126,11 @@ namespace DotNetNuke.UI.WebControls
             }
             catch (FileNotFoundException exc)
             {
+				Logger.LogError("Exception in FileToMemory(fileLocation={FileLocation}): {Arg1}", fileLocation, ex.Message);
                 throw new GeoIPFileNotFoundException("Please set the \"GeoIPFile\" Property to specify the location of this file.  The property value must be set to the virtual path to GeoIP.dat (i.e. \"/controls/CountryListBox/Data/GeoIP.dat\")", exc);
             }
 
+			Logger.LogDebug("<<< Exiting FileToMemory(fileLocation={FileLocation})", fileLocation);
             return memStream;
         }
 
@@ -131,6 +141,7 @@ namespace DotNetNuke.UI.WebControls
         /// <returns>CountryCode.</returns>
         public static string CodeByName(string stringValue)
         {
+			Logger.LogDebug(">>> Entering CodeByName(stringValue={StringValue})", stringValue);
             for (int i = 0; i < CountryName.Length; i++)
             {
                 if (stringValue == CountryName[i])
@@ -139,6 +150,7 @@ namespace DotNetNuke.UI.WebControls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting CodeByName(stringValue={StringValue})", stringValue);
             return "--";
         }
 
@@ -148,6 +160,7 @@ namespace DotNetNuke.UI.WebControls
         public string LookupCountryCode(IPAddress ipAddress)
         {
             // Look up the country code, e.g. US, for the passed in IP Address
+			Logger.LogDebug("<<< Exiting LookupCountryCode(ipAddress={IpAddress})", ipAddress);
             return CountryCode[Convert.ToInt32(this.SeekCountry(0, ConvertIPAddressToNumber(ipAddress), 31))];
         }
 
@@ -175,7 +188,9 @@ namespace DotNetNuke.UI.WebControls
         /// <returns>The country name.</returns>
         public string LookupCountryName(IPAddress addr)
         {
+			Logger.LogDebug(">>> Entering LookupCountryName(addr={Addr})", addr);
             // Look up the country name, e.g. United States, for the IP Address
+			Logger.LogDebug("<<< Exiting LookupCountryName(addr={Addr})", addr);
             return CountryName[Convert.ToInt32(this.SeekCountry(0, ConvertIPAddressToNumber(addr), 31))];
         }
 
@@ -195,6 +210,7 @@ namespace DotNetNuke.UI.WebControls
                 return "N/A";
             }
 
+			Logger.LogDebug("<<< Exiting LookupCountryName(ipAddress={IpAddress})", ipAddress);
             return this.LookupCountryName(address);
         }
 
@@ -205,6 +221,7 @@ namespace DotNetNuke.UI.WebControls
         /// <returns>The index.</returns>
         public int SeekCountry(int offset, long ipNum, short depth)
         {
+			Logger.LogDebug(">>> Entering SeekCountry(offset={Offset},ipNum={IpNum},depth={Depth})", offset, ipNum, depth);
             try
             {
                 var buffer = new byte[6];
@@ -220,6 +237,7 @@ namespace DotNetNuke.UI.WebControls
                 this.m_MemoryStream.Seek(6 * offset, 0);
                 var len = this.m_MemoryStream.Read(buffer, 0, 6);
                 if (len == 6)
+				Logger.LogDebug("SeekCountry(offset={Offset},ipNum={IpNum},depth={Depth}): len → {Len}", offset, ipNum, depth, len);
                 {
                     for (i = 0; i <= 1; i++)
                     {
@@ -228,6 +246,7 @@ namespace DotNetNuke.UI.WebControls
                         {
                             y = buffer[(i * 3) + j];
                             if (y < 0)
+							Logger.LogDebug("SeekCountry(offset={Offset},ipNum={IpNum},depth={Depth}): y → {Y}", offset, ipNum, depth, y);
                             {
                                 y = Convert.ToByte(y + 256);
                             }
@@ -260,6 +279,7 @@ namespace DotNetNuke.UI.WebControls
                         return Convert.ToInt32(x[0] - countryBegin);
                     }
 
+					Logger.LogDebug("<<< Exiting SeekCountry(offset={Offset},ipNum={IpNum},depth={Depth})", offset, ipNum, depth);
                     return this.SeekCountry(x[0], ipNum, Convert.ToInt16(depth - 1));
                 }
             }
@@ -271,25 +291,30 @@ namespace DotNetNuke.UI.WebControls
 
         private static long ConvertIPAddressToNumber(IPAddress ipAddress)
         {
+			Logger.LogDebug(">>> Entering ConvertIPAddressToNumber(ipAddress={IpAddress})", ipAddress);
             // Convert an IP Address, (e.g. 127.0.0.1), to the numeric equivalent
             var address = ipAddress.ToString().Split('.');
             if (address.Length == 4)
+			Logger.LogDebug("ConvertIPAddressToNumber(ipAddress={IpAddress}): address → {Address}", ipAddress, address);
             {
                 return Convert.ToInt64((16777216 * Convert.ToDouble(address[0], CultureInfo.InvariantCulture)) + (65536 * Convert.ToDouble(address[1], CultureInfo.InvariantCulture)) + (256 * Convert.ToDouble(address[2], CultureInfo.InvariantCulture)) + Convert.ToDouble(address[3], CultureInfo.InvariantCulture));
             }
             else
             {
+				Logger.LogDebug("<<< Exiting ConvertIPAddressToNumber(ipAddress={IpAddress})", ipAddress);
                 return 0;
             }
         }
 
         private static string ConvertIPNumberToAddress(long ipNumber)
         {
+			Logger.LogDebug(">>> Entering ConvertIPNumberToAddress(ipNumber={IpNumber})", ipNumber);
             // Convert an IP Number to the IP Address equivalent
             string ipNumberPart1 = Convert.ToString(((int)(ipNumber / 16777216)) % 256, CultureInfo.InvariantCulture);
             string ipNumberPart2 = Convert.ToString(((int)(ipNumber / 65536)) % 256, CultureInfo.InvariantCulture);
             string ipNumberPart3 = Convert.ToString(((int)(ipNumber / 256)) % 256, CultureInfo.InvariantCulture);
             string ipNumberPart4 = Convert.ToString(((int)ipNumber) % 256, CultureInfo.InvariantCulture);
+			Logger.LogDebug("<<< Exiting ConvertIPNumberToAddress(ipNumber={IpNumber})", ipNumber);
             return $"{ipNumberPart1}.{ipNumberPart2}.{ipNumberPart3}.{ipNumberPart4}";
         }
     }

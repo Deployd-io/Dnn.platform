@@ -25,6 +25,7 @@ using System;
 
 namespace log4net.Config
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Assembly level attribute that specifies the logging domain for the assembly.
     /// </summary>
@@ -63,6 +64,9 @@ namespace log4net.Config
         /// </remarks>
         public DomainAttribute() : base()
         {
+		Logger.LogDebug(">>> Entering DomainAttribute()");
+		Logger.LogDebug("<<< Exiting DomainAttribute()");
+		Logger.LogDebug(">>> Entering DomainAttribute(name={Name})", name);
         }
 
         /// <summary>
@@ -77,6 +81,7 @@ namespace log4net.Config
         /// </remarks>
         public DomainAttribute(string name) : base(name)
         {
+		Logger.LogDebug("<<< Exiting DomainAttribute(name={Name})", name);
         }
     }
 }

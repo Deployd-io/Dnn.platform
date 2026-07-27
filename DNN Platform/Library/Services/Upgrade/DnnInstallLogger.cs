@@ -49,27 +49,37 @@ namespace DotNetNuke.Services.Upgrade
 
         public static void InstallLogError(object message)
         {
+			Logger.LogDebug(">>> Entering InstallLogError(message={Message})", message);
             LogInstaller("[ERROR]", message.ToString());
+			Logger.LogDebug("<<< Exiting InstallLogError(message={Message})", message);
         }
 
         public static void InstallLogError(string message, Exception exception)
         {
+			Logger.LogDebug(">>> Entering InstallLogError(message={Message},exception={Exception})", message, exception);
             LogInstaller("[ERROR]", message.ToString(CultureInfo.InvariantCulture) + " : " + exception);
+			Logger.LogDebug("<<< Exiting InstallLogError(message={Message},exception={Exception})", message, exception);
         }
 
         public static void InstallLogInfo(object message)
         {
+			Logger.LogDebug(">>> Entering InstallLogInfo(message={Message})", message);
             LogInstaller("[INFO]", message.ToString());
+			Logger.LogDebug("<<< Exiting InstallLogInfo(message={Message})", message);
         }
 
         private static void LogInstaller(string logType, string message)
         {
+			Logger.LogDebug(">>> Entering LogInstaller(logType={LogType},message={Message})", logType, message);
             var logFile = InstallController.Instance.InstallerLogName;
             var logfilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Portals\_default\Logs\" + logFile);
             using (var writer = new StreamWriter(logfilePath, true))
             {
+			Logger.LogDebug("LogInstaller(logType={LogType},message={Message}): logfilePath → {LogfilePath}", logType, message, logfilePath);
                 writer.WriteLine(DateTime.UtcNow.ToString(CultureInfo.InvariantCulture) + " " + logType + " " + CallingType + " " + message);
+				private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
             }
+			Logger.LogDebug("<<< Exiting LogInstaller(logType={LogType},message={Message})", logType, message);
         }
     }
 }

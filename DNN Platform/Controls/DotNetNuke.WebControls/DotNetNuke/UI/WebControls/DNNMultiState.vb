@@ -8,13 +8,26 @@ Imports System.Web.UI
 Namespace DotNetNuke.UI.WebControls
     <PersistChildren(True), ParseChildren(False)> _
     Public Class DNNMultiState
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(DNNMultiState))
         ' Methods
         Public Sub New()
+			Logger.LogDebug(">>> Entering New()")
             Me.m_Key = ""
             Me.m_Text = ""
+			Logger.LogDebug("New(): Me.m_Text → {Arg0}", Me.m_Text)
+			Logger.LogDebug("New(): Me.m_ImageUrl → {Arg0}", Me.m_ImageUrl)
+			Logger.LogDebug("New(): Me.m_DisabledImageUrl → {Arg0}", Me.m_DisabledImageUrl)
+			Logger.LogDebug("New(): Me.m_ToolTip → {Arg0}", Me.m_ToolTip)
             Me.m_ImageUrl = ""
             Me.m_DisabledImageUrl = ""
             Me.m_ToolTip = ""
+			Logger.LogDebug("New(): Me.m_Key → {Arg0}", Me.m_Key)
+			Logger.LogDebug(">>> Entering New(Key={Key},[Text]={Arg},ImageUrl={ImageUrl},DisabledImageUrl={DisabledImageUrl},ToolTip={ToolTip})", Key, [Text], ImageUrl, DisabledImageUrl, ToolTip)
+			Logger.LogDebug("New(Key={Key},[Text]={Arg1},ImageUrl={ImageUrl},DisabledImageUrl={DisabledImageUrl},ToolTip={ToolTip}): Me.m_Text → {Arg5}", Key, [Text], ImageUrl, DisabledImageUrl, ToolTip, Me.m_Text)
+			Logger.LogDebug("New(Key={Key},[Text]={Arg1},ImageUrl={ImageUrl},DisabledImageUrl={DisabledImageUrl},ToolTip={ToolTip}): Me.m_ImageUrl → {Arg5}", Key, [Text], ImageUrl, DisabledImageUrl, ToolTip, Me.m_ImageUrl)
+			Logger.LogDebug("New(Key={Key},[Text]={Arg1},ImageUrl={ImageUrl},DisabledImageUrl={DisabledImageUrl},ToolTip={ToolTip}): Me.m_DisabledImageUrl → {Arg5}", Key, [Text], ImageUrl, DisabledImageUrl, ToolTip, Me.m_DisabledImageUrl)
+			Logger.LogDebug("New(Key={Key},[Text]={Arg1},ImageUrl={ImageUrl},DisabledImageUrl={DisabledImageUrl},ToolTip={ToolTip}): Me.m_ToolTip → {Arg5}", Key, [Text], ImageUrl, DisabledImageUrl, ToolTip, Me.m_ToolTip)
+			Logger.LogDebug("New(Key={Key},[Text]={Arg1},ImageUrl={ImageUrl},DisabledImageUrl={DisabledImageUrl},ToolTip={ToolTip}): Me.m_Key → {Arg5}", Key, [Text], ImageUrl, DisabledImageUrl, ToolTip, Me.m_Key)
         End Sub
 
         Public Sub New(ByVal Key As String, ByVal [Text] As String, ByVal ImageUrl As String, ByVal DisabledImageUrl As String, ByVal ToolTip As String)
@@ -28,12 +41,16 @@ Namespace DotNetNuke.UI.WebControls
             Me.m_ImageUrl = ImageUrl
             Me.m_DisabledImageUrl = DisabledImageUrl
             Me.m_ToolTip = ToolTip
+			Logger.LogDebug("<<< Exiting New(Key={Key},[Text]={Arg},ImageUrl={ImageUrl},DisabledImageUrl={DisabledImageUrl},ToolTip={ToolTip})", Key, [Text], ImageUrl, DisabledImageUrl, ToolTip)
+			Logger.LogDebug("<<< Exiting New()")
         End Sub
 
         Friend Sub NotifyDesigner()
+			Logger.LogDebug(">>> Entering NotifyDesigner()")
             If Not Object.ReferenceEquals(Me.Parent, Nothing) Then
                 Me.Parent.NotifyDesigner
             End If
+			Logger.LogDebug("<<< Exiting NotifyDesigner()")
         End Sub
 
 

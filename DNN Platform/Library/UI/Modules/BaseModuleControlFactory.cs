@@ -12,6 +12,7 @@ namespace DotNetNuke.UI.Modules
 
     public abstract class BaseModuleControlFactory : IModuleControlFactory
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public abstract int Priority { get; }
 
@@ -27,13 +28,16 @@ namespace DotNetNuke.UI.Modules
         /// <inheritdoc />
         public virtual ModuleControlBase CreateModuleControl(ModuleInfo moduleConfiguration)
         {
+			Logger.LogDebug(">>> Entering CreateModuleControl(moduleConfiguration={ModuleConfiguration})", moduleConfiguration);
             var moduleControl = new ModuleControlBase();
             moduleControl.ModuleContext.Configuration = moduleConfiguration;
+			Logger.LogDebug("CreateModuleControl(moduleConfiguration={ModuleConfiguration}): moduleControl → {ModuleControl}", moduleConfiguration, moduleControl);
 
             moduleControl.LocalResourceFile = moduleConfiguration.ModuleControl.ControlSrc.Replace(Path.GetFileName(moduleConfiguration.ModuleControl.ControlSrc), string.Empty) +
                                        Localization.LocalResourceDirectory + "/" +
                                        Path.GetFileName(moduleConfiguration.ModuleControl.ControlSrc);
 
+			Logger.LogDebug("<<< Exiting CreateModuleControl(moduleConfiguration={ModuleConfiguration})", moduleConfiguration);
             return moduleControl;
         }
 

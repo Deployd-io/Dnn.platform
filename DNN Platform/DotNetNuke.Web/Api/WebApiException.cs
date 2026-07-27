@@ -13,13 +13,17 @@ namespace DotNetNuke.Web.Api
     /// <summary>Represents a non-successful response while executing a WebApi call.</summary>
     public class WebApiException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="WebApiException"/> class, with the specified inner exception and response message that caused the exception.</summary>
         /// <param name="innerException">The original exception.</param>
         /// <param name="result">The result of the request.</param>
         public WebApiException(Exception innerException, HttpResponseMessage result)
             : base(innerException.Message, innerException)
         {
+			Logger.LogDebug(">>> Entering WebApiException(innerException={InnerException},result={Result})", innerException, result);
             this.Result = result;
+			Logger.LogDebug("<<< Exiting WebApiException(innerException={InnerException},result={Result})", innerException, result);
+			Logger.LogDebug("WebApiException(innerException={InnerException},result={Result}): this.Result → {Arg2}", innerException, result, this.Result);
         }
 
         /// <summary>Initializes a new instance of the <see cref="WebApiException"/> class.</summary>
@@ -30,6 +34,7 @@ namespace DotNetNuke.Web.Api
             : this(innerException, result)
         {
             this.Body = body;
+			Logger.LogDebug("WebApiException(innerException={InnerException},result={Result},body={Body}): this.Body → {Arg3}", innerException, result, body, this.Body);
         }
 
         /// <summary>Gets body from the Get Response. Available when exception is thrown as well.</summary>
@@ -42,6 +47,8 @@ namespace DotNetNuke.Web.Api
         /// <returns>A dynamic <see cref="JContainer"/>.</returns>
         public dynamic BodyAsJson()
         {
+			Logger.LogDebug(">>> Entering BodyAsJson()");
+			Logger.LogDebug("<<< Exiting BodyAsJson()");
             return JsonConvert.DeserializeObject<JContainer>(this.Body);
         }
     }

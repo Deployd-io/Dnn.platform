@@ -12,13 +12,17 @@ namespace DotNetNuke.UI.Modules
     /// <summary>Determines whether any given module can be injected into the page.</summary>
     internal class ModuleInjectionManager
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IEnumerable<IModuleInjectionFilter> filters;
 
         /// <summary>Initializes a new instance of the <see cref="ModuleInjectionManager"/> class.</summary>
         /// <param name="filters">The filters.</param>
         public ModuleInjectionManager(IEnumerable<IModuleInjectionFilter> filters)
         {
+			Logger.LogDebug(">>> Entering ModuleInjectionManager(filters={Filters})", filters);
             this.filters = filters.ToList();
+			Logger.LogDebug("<<< Exiting ModuleInjectionManager(filters={Filters})", filters);
+			Logger.LogDebug("ModuleInjectionManager(filters={Filters}): filters → {Filters1}", filters, filters);
         }
 
         /// <summary>Determines whether the given <paramref name="module"/> passes all of the module injection filters.</summary>
@@ -27,6 +31,8 @@ namespace DotNetNuke.UI.Modules
         /// <returns><see langword="true"/> if the module can be injected, otherwise <see langword="false"/>.</returns>
         public bool CanInjectModule(ModuleInfo module, PortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering CanInjectModule(module={Module},portalSettings={PortalSettings})", module, portalSettings);
+			Logger.LogDebug("<<< Exiting CanInjectModule(module={Module},portalSettings={PortalSettings})", module, portalSettings);
             return this.filters.All(filter => filter.CanInjectModule(module, portalSettings));
         }
     }

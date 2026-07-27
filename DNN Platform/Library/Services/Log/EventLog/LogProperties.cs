@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.Log.EventLog
     /// <inheritdoc cref="ILogProperties" />
     public class LogProperties : ArrayList, ILogProperties, IList<ILogDetailInfo>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public string Summary
         {
@@ -41,19 +42,27 @@ namespace DotNetNuke.Services.Log.EventLog
         /// <inheritdoc />
         public void Add(ILogDetailInfo item) =>
             base.Add(item);
+			Logger.LogDebug(">>> Entering Add(item={Item})", item);
 
+		Logger.LogDebug("<<< Exiting Add(item={Item})", item);
         /// <inheritdoc />
         public bool Contains(ILogDetailInfo item) =>
             base.Contains(item);
+			Logger.LogDebug(">>> Entering Contains(item={Item})", item);
 
+		Logger.LogDebug("<<< Exiting Contains(item={Item})", item);
         /// <inheritdoc />
         public void CopyTo(ILogDetailInfo[] array, int arrayIndex) =>
             base.CopyTo(array, arrayIndex);
+			Logger.LogDebug(">>> Entering CopyTo(array={Array},arrayIndex={ArrayIndex})", array, arrayIndex);
 
+		Logger.LogDebug("<<< Exiting CopyTo(array={Array},arrayIndex={ArrayIndex})", array, arrayIndex);
         /// <inheritdoc />
         public int IndexOf(ILogDetailInfo item)
             => base.IndexOf(item);
+			Logger.LogDebug(">>> Entering IndexOf(item={Item})", item);
 
+		Logger.LogDebug("<<< Exiting IndexOf(item={Item})", item);
         /// <inheritdoc />
         public void Insert(int index, ILogDetailInfo item)
             => base.Insert(index, item);
@@ -65,6 +74,7 @@ namespace DotNetNuke.Services.Log.EventLog
         /// <inheritdoc />
         public bool Remove(ILogDetailInfo item)
         {
+			Logger.LogDebug(">>> Entering Remove(item={Item})", item);
             var index = this.IndexOf(item);
             if (index >= 0)
             {
@@ -72,23 +82,28 @@ namespace DotNetNuke.Services.Log.EventLog
                 return true;
             }
 
+			Logger.LogDebug("<<< Exiting Remove(item={Item})", item);
             return false;
         }
 
         public void Deserialize(string content)
         {
+			Logger.LogDebug(">>> Entering Deserialize(content={Content})", content);
             using var reader = XmlReader.Create(new StringReader(content));
             reader.ReadStartElement("LogProperties");
+			Logger.LogDebug("Deserialize(content={Content}): reader → {Reader}", content, reader);
             if (reader.ReadState != ReadState.EndOfFile && reader.NodeType != XmlNodeType.None && !string.IsNullOrEmpty(reader.LocalName))
             {
                 this.ReadXml(reader);
             }
 
             reader.Close();
+			Logger.LogDebug("<<< Exiting Deserialize(content={Content})", content);
         }
 
         public void ReadXml(XmlReader reader)
         {
+			Logger.LogDebug(">>> Entering ReadXml(reader={Reader})", reader);
             do
             {
                 reader.ReadStartElement("LogProperty");
@@ -96,6 +111,7 @@ namespace DotNetNuke.Services.Log.EventLog
                 // Create new LogDetailInfo object
                 var logDetail = new LogDetailInfo();
 
+				Logger.LogDebug("ReadXml(reader={Reader}): logDetail → {LogDetail}", reader, logDetail);
                 // Load it from the Xml
                 logDetail.ReadXml(reader);
 
@@ -103,33 +119,42 @@ namespace DotNetNuke.Services.Log.EventLog
                 this.Add(logDetail);
             }
             while (reader.ReadToNextSibling("LogProperty"));
+			Logger.LogDebug("<<< Exiting ReadXml(reader={Reader})", reader);
         }
 
         public string Serialize()
         {
+			Logger.LogDebug(">>> Entering Serialize()");
             var settings = new XmlWriterSettings { ConformanceLevel = ConformanceLevel.Fragment, OmitXmlDeclaration = true, };
             var sb = new StringBuilder();
 
+			Logger.LogDebug("Serialize(): sb → {Sb}", sb);
             using var writer = XmlWriter.Create(sb, settings);
             this.WriteXml(writer);
+			Logger.LogDebug("Serialize(): writer → {Writer}", writer);
             writer.Close();
+			Logger.LogDebug("<<< Exiting Serialize()");
             return sb.ToString();
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
+			Logger.LogDebug(">>> Entering ToString()");
             var sb = new StringBuilder();
             foreach (LogDetailInfo logDetail in this)
             {
+			Logger.LogDebug("ToString(): sb → {Sb}", sb);
                 sb.Append(logDetail.ToString());
             }
 
+			Logger.LogDebug("<<< Exiting ToString()");
             return sb.ToString();
         }
 
         public void WriteXml(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteXml(writer={Writer})", writer);
             writer.WriteStartElement("LogProperties");
             foreach (LogDetailInfo logDetail in this)
             {
@@ -137,6 +162,7 @@ namespace DotNetNuke.Services.Log.EventLog
             }
 
             writer.WriteEndElement();
+			Logger.LogDebug("<<< Exiting WriteXml(writer={Writer})", writer);
         }
     }
 }

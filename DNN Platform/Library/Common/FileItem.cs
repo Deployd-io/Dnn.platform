@@ -7,13 +7,18 @@ namespace DotNetNuke.Common
     /// <summary>This class handles basic elements about File Items. Is is a basic Get/Set for Value and Text.</summary>
     public class FileItem
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="FileItem" /> class.</summary>
         /// <param name="value">The value.</param>
         /// <param name="text">The text.</param>
         public FileItem(string value, string text)
         {
+			Logger.LogDebug(">>> Entering FileItem(value={Value},text={Text})", value, text);
             this.Value = value;
             this.Text = text;
+			Logger.LogDebug("<<< Exiting FileItem(value={Value},text={Text})", value, text);
+			Logger.LogDebug("FileItem(value={Value},text={Text}): this.Value → {Arg2}", value, text, this.Value);
+			Logger.LogDebug("FileItem(value={Value},text={Text}): this.Text → {Arg2}", value, text, this.Text);
         }
 
         /// <summary>Gets the text.</summary>

@@ -10,6 +10,7 @@ namespace DotNetNuke.Tests.Web.DependencyInjection
 
     public partial class BuildUpExtensionsTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private class PrivateFilterAttribute : ActionFilterAttribute
         {
             [Dependency]
@@ -67,6 +68,8 @@ namespace DotNetNuke.Tests.Web.DependencyInjection
             {
                 this.EventLogger.AddLog("Test", "Message", EventLogType.ADMIN_ALERT);
                 base.OnActionExecuted(actionExecutedContext);
+				Logger.LogDebug(">>> Entering OnActionExecuted(actionExecutedContext={ActionExecutedContext})", actionExecutedContext);
+				Logger.LogDebug("<<< Exiting OnActionExecuted(actionExecutedContext={ActionExecutedContext})", actionExecutedContext);
             }
         }
 

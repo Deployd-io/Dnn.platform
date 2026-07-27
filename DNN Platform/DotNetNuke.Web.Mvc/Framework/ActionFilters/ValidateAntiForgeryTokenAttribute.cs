@@ -15,8 +15,10 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
 
     public class ValidateAntiForgeryTokenAttribute : AuthorizeAttributeBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public virtual bool IsAuthenticated(HttpContextBase httpContext)
         {
+			Logger.LogDebug(">>> Entering IsAuthenticated(httpContext={HttpContext})", httpContext);
             try
             {
                 if (Thread.CurrentPrincipal.Identity.IsAuthenticated)
@@ -28,8 +30,10 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
                     // If not found then fetch it from form fields. (Would be used with standard MVC call).
                     var token = headers.GetValues("RequestVerificationToken")?.FirstOrDefault() ?? form.GetValues("__RequestVerificationToken")?.FirstOrDefault();
 
+					Logger.LogWarning("IsAuthenticated(httpContext={HttpContext}): token → {Token}", httpContext, token);
                     var cookieValue = this.GetAntiForgeryCookieValue(httpContext);
                     if (token != null)
+					Logger.LogDebug("IsAuthenticated(httpContext={HttpContext}): cookieValue → {CookieValue}", httpContext, cookieValue);
                     {
                         AntiForgery.Instance.Validate(cookieValue, token);
                     }
@@ -45,19 +49,23 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in IsAuthenticated(httpContext={HttpContext}): {Arg1}", httpContext, ex.Message);
                 return false;
             }
 
+			Logger.LogDebug("<<< Exiting IsAuthenticated(httpContext={HttpContext})", httpContext);
             return true;
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         protected string GetAntiForgeryCookieValue(HttpContextBase context)
         {
+			Logger.LogDebug(">>> Entering GetAntiForgeryCookieValue(context={Context})", context);
             foreach (var cookieValue in context.Request.Headers.GetValues("Cookie"))
             {
                 var nameIndex = cookieValue.IndexOf(AntiForgery.Instance.CookieName, StringComparison.InvariantCultureIgnoreCase);
 
+				Logger.LogDebug("GetAntiForgeryCookieValue(context={Context}): nameIndex → {NameIndex}", context, nameIndex);
                 if (nameIndex > -1)
                 {
                     var valueIndex = nameIndex + AntiForgery.Instance.CookieName.Length + 1;
@@ -66,17 +74,20 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetAntiForgeryCookieValue(context={Context})", context);
             return string.Empty;
         }
 
         /// <inheritdoc />
         protected override bool AuthorizeCore(HttpContextBase httpContext)
         {
+			Logger.LogDebug(">>> Entering AuthorizeCore(httpContext={HttpContext})", httpContext);
             if (!this.IsAuthenticated(httpContext))
             {
                 return false;
             }
 
+			Logger.LogDebug("<<< Exiting AuthorizeCore(httpContext={HttpContext})", httpContext);
             return true;
         }
     }

@@ -17,8 +17,12 @@ namespace DotNetNuke.Entities.Content.Workflow.Repositories
         /// <inheritdoc />
         public WorkflowAction GetWorkflowAction(int contentTypeId, string type)
         {
+			Logger.LogDebug(">>> Entering GetWorkflowAction(contentTypeId={ContentTypeId},type={Type})", contentTypeId, type);
             using var context = DataContext.Instance();
             var rep = context.GetRepository<WorkflowAction>();
+			Logger.LogDebug("GetWorkflowAction(contentTypeId={ContentTypeId},type={Type}): context → {Context}", contentTypeId, type, context);
+			Logger.LogDebug("GetWorkflowAction(contentTypeId={ContentTypeId},type={Type}): rep → {Rep}", contentTypeId, type, rep);
+			Logger.LogDebug("<<< Exiting GetWorkflowAction(contentTypeId={ContentTypeId},type={Type})", contentTypeId, type);
             return rep.Find("WHERE ContentTypeId = @0 AND ActionType = @1", contentTypeId, type).SingleOrDefault()
                 ?? GetWorkflowActionsDefaultsOrNull(contentTypeId, type); // fallback to default action (not in db)
         }
@@ -26,14 +30,23 @@ namespace DotNetNuke.Entities.Content.Workflow.Repositories
         /// <inheritdoc />
         public void AddWorkflowAction(WorkflowAction action)
         {
+			Logger.LogDebug(">>> Entering AddWorkflowAction(action={Action})", action);
             using var context = DataContext.Instance();
             var rep = context.GetRepository<WorkflowAction>();
+			Logger.LogDebug("AddWorkflowAction(action={Action}): context → {Context}", action, context);
+			Logger.LogDebug("AddWorkflowAction(action={Action}): rep → {Rep}", action, rep);
             rep.Insert(action);
+			Logger.LogDebug("<<< Exiting AddWorkflowAction(action={Action})", action);
+			Logger.LogDebug(">>> Entering GetWorkflowActionsDefaultsOrNull(contentTypeId={ContentTypeId},type={Type})", contentTypeId, type);
+			Logger.LogDebug("<<< Exiting GetWorkflowActionsDefaultsOrNull(contentTypeId={ContentTypeId},type={Type})", contentTypeId, type);
         }
 
         /// <inheritdoc />
         protected override Func<IWorkflowActionRepository> GetFactory()
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new WorkflowActionRepository();
         }
 

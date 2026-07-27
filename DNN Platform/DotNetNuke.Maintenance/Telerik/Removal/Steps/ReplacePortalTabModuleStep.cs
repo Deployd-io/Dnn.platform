@@ -18,6 +18,7 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
     /// <inheritdoc cref="IReplacePortalTabModuleStep" />
     internal sealed class ReplacePortalTabModuleStep : StepBase, IReplacePortalTabModuleStep
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IModuleController moduleController;
         private readonly ITabController tabController;
         private readonly IDesktopModuleController desktopModuleController;
@@ -76,6 +77,7 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         /// <inheritdoc />
         protected override void ExecuteInternal()
         {
+			Logger.LogDebug(">>> Entering ExecuteInternal()");
             var modules = this.moduleController.GetModulesByDefinition(this.PortalId, this.OldModuleName)
                 .Cast<ModuleInfo>();
 
@@ -86,10 +88,14 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
             }
 
             this.Success = true;
+			Logger.LogDebug("<<< Exiting ExecuteInternal()");
+			Logger.LogDebug("ExecuteInternal(): this.Success → {Arg0}", this.Success);
         }
 
         private static ModuleInfo CloneModule(ModuleInfo module)
         {
+			Logger.LogDebug(">>> Entering CloneModule(module={Module})", module);
+			Logger.LogDebug("<<< Exiting CloneModule(module={Module})", module);
             return new ModuleInfo
             {
                 Alignment = module.Alignment,
@@ -128,14 +134,17 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
 
         private int AddTheNewModule(ModuleInfo oldModule)
         {
+			Logger.LogDebug(">>> Entering AddTheNewModule(oldModule={OldModule})", oldModule);
             var tabModuleId = Null.NullInteger;
 
+			Logger.LogDebug("AddTheNewModule(oldModule={OldModule}): tabModuleId → {TabModuleId}", oldModule, tabModuleId);
             var desktopModule = this.desktopModuleController.GetDesktopModuleByModuleName(
                 this.NewModuleName,
                 oldModule.PortalID);
 
             var position = oldModule.ModuleOrder;
             var permissionType = oldModule.InheritViewPermissions ? 0 : 1;
+			Logger.LogDebug("AddTheNewModule(oldModule={OldModule}): position → {Position}", oldModule, position);
 
             var definitions = this.moduleDefinitionController
                 .GetModuleDefinitionsByDesktopModuleID(desktopModule.DesktopModuleID)
@@ -145,6 +154,11 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
             {
                 var newModule = CloneModule(oldModule);
 
+				Logger.LogDebug("AddTheNewModule(oldModule={OldModule}): newModule → {NewModule}", oldModule, newModule);
+				Logger.LogDebug("AddTheNewModule(oldModule={OldModule}): newModule.DesktopModuleID → {Arg1}", oldModule, newModule.DesktopModuleID);
+				Logger.LogDebug("AddTheNewModule(oldModule={OldModule}): newModule.ModuleDefID → {Arg1}", oldModule, newModule.ModuleDefID);
+				Logger.LogDebug("AddTheNewModule(oldModule={OldModule}): newModule.ModuleOrder → {Arg1}", oldModule, newModule.ModuleOrder);
+				Logger.LogDebug("AddTheNewModule(oldModule={OldModule}): newModule.ModuleTitle → {Arg1}", oldModule, newModule.ModuleTitle);
                 newModule.DesktopModuleID = desktopModule.DesktopModuleID;
                 newModule.ModuleDefID = definition.ModuleDefID;
                 newModule.ModuleOrder = position;
@@ -171,13 +185,16 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
 
             this.moduleController.ClearCache(oldModule.TabID);
 
+			Logger.LogDebug("<<< Exiting AddTheNewModule(oldModule={OldModule})", oldModule);
             return tabModuleId;
         }
 
         private void DeleteTheOldModule(ModuleInfo module)
         {
+			Logger.LogDebug(">>> Entering DeleteTheOldModule(module={Module})", module);
             this.moduleController.DeleteTabModule(module.TabID, module.KeyID, softDelete: false);
             this.moduleController.ClearCache(module.TabID);
+			Logger.LogDebug("<<< Exiting DeleteTheOldModule(module={Module})", module);
         }
     }
 }

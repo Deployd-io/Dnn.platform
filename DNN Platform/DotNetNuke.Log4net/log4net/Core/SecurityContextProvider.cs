@@ -56,6 +56,7 @@ namespace log4net.Core
     /// <author>Nicko Cadell</author>
     public class SecurityContextProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>The default provider</summary>
         private static SecurityContextProvider s_defaultProvider = new SecurityContextProvider();
 
@@ -93,6 +94,8 @@ namespace log4net.Core
         /// </remarks>
         protected SecurityContextProvider()
         {
+		Logger.LogDebug(">>> Entering SecurityContextProvider()");
+		Logger.LogDebug("<<< Exiting SecurityContextProvider()");
         }
 
         /// <summary>Create a SecurityContext for a consumer</summary>
@@ -109,6 +112,8 @@ namespace log4net.Core
         /// </remarks>
         public virtual SecurityContext CreateSecurityContext(object consumer)
         {
+			Logger.LogDebug(">>> Entering CreateSecurityContext(consumer={Consumer})", consumer);
+			Logger.LogDebug("<<< Exiting CreateSecurityContext(consumer={Consumer})", consumer);
             return NullSecurityContext.Instance;
         }
     }

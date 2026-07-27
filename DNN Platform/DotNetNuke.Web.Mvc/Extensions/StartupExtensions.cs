@@ -21,17 +21,21 @@ namespace DotNetNuke.Web.Mvc.Extensions
         /// <param name="services">Service Collection used to registering services in the container.</param>
         public static void AddMvcControllers(this IServiceCollection services)
         {
+			Logger.LogDebug(">>> Entering AddMvcControllers(services={Services})", services);
             var allTypes = TypeExtensions.SafeGetTypes();
             allTypes.LogOtherExceptions(Logger);
+			Logger.LogDebug("AddMvcControllers(services={Services}): allTypes → {AllTypes}", services, allTypes);
 
             var controllerTypes = allTypes.Types
                 .Where(
                     type => typeof(IDnnController).IsAssignableFrom(type) &&
                             type is { IsClass: true, IsAbstract: false });
+							Logger.LogDebug("AddMvcControllers(services={Services}): type → {Type}", services, type);
             foreach (var controller in controllerTypes)
             {
                 services.TryAddTransient(controller);
             }
+			Logger.LogDebug("<<< Exiting AddMvcControllers(services={Services})", services);
         }
     }
 }

@@ -52,6 +52,7 @@ namespace log4net.Layout
     /// </remarks>
     public class DynamicPatternLayout: PatternLayout
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// The header PatternString
         /// </summary>
@@ -73,6 +74,8 @@ namespace log4net.Layout
         public DynamicPatternLayout()
             : base()
         {
+		Logger.LogDebug(">>> Entering DynamicPatternLayout()");
+		Logger.LogDebug("<<< Exiting DynamicPatternLayout()");
         }
 
         /// <summary>

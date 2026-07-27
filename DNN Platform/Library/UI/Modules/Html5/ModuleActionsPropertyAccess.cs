@@ -13,6 +13,7 @@ namespace DotNetNuke.UI.Modules.Html5
 
     public class ModuleActionsPropertyAccess : JsonPropertyAccess<ModuleActionDto>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly ModuleActionCollection moduleActions;
         private readonly ModuleInstanceContext moduleContext;
 
@@ -21,19 +22,27 @@ namespace DotNetNuke.UI.Modules.Html5
         /// <param name="moduleActions">The module actions.</param>
         public ModuleActionsPropertyAccess(ModuleInstanceContext moduleContext, ModuleActionCollection moduleActions)
         {
+			Logger.LogDebug(">>> Entering ModuleActionsPropertyAccess(moduleContext={ModuleContext},moduleActions={ModuleActions})", moduleContext, moduleActions);
             this.moduleContext = moduleContext;
             this.moduleActions = moduleActions;
+			Logger.LogDebug("<<< Exiting ModuleActionsPropertyAccess(moduleContext={ModuleContext},moduleActions={ModuleActions})", moduleContext, moduleActions);
+			Logger.LogDebug("ModuleActionsPropertyAccess(moduleContext={ModuleContext},moduleActions={ModuleActions}): this.moduleContext → {Arg2}", moduleContext, moduleActions, this.moduleContext);
+			Logger.LogDebug("ModuleActionsPropertyAccess(moduleContext={ModuleContext},moduleActions={ModuleActions}): moduleActions → {ModuleActions1}", moduleContext, moduleActions, moduleActions);
+			Logger.LogDebug("ModuleActionsPropertyAccess(moduleContext={ModuleContext},moduleActions={ModuleActions}): this.moduleActions → {Arg2}", moduleContext, moduleActions, this.moduleActions);
+			Logger.LogDebug("ModuleActionsPropertyAccess(moduleContext={ModuleContext},moduleActions={ModuleActions}): moduleContext → {ModuleContext1}", moduleContext, moduleActions, moduleContext);
         }
 
         /// <inheritdoc />
         protected override string ProcessToken(ModuleActionDto model, UserInfo accessingUser, Scope accessLevel)
         {
+			Logger.LogDebug(">>> Entering ProcessToken(model={Model},accessingUser={AccessingUser},accessLevel={AccessLevel})", model, accessingUser, accessLevel);
             var title = (!string.IsNullOrEmpty(model.TitleKey) && !string.IsNullOrEmpty(model.LocalResourceFile))
                                 ? Localization.GetString(model.TitleKey, model.LocalResourceFile)
                                 : model.Title;
 
             SecurityAccessLevel securityAccessLevel = SecurityAccessLevel.View;
 
+			Logger.LogDebug("ProcessToken(model={Model},accessingUser={AccessingUser},accessLevel={AccessLevel}): securityAccessLevel → {SecurityAccessLevel}", model, accessingUser, accessLevel, securityAccessLevel);
             if (!string.IsNullOrEmpty(model.SecurityAccessLevel))
             {
                 switch (model.SecurityAccessLevel)
@@ -74,6 +83,7 @@ namespace DotNetNuke.UI.Modules.Html5
 
             this.moduleActions.Add(moduleAction);
 
+			Logger.LogDebug("<<< Exiting ProcessToken(model={Model},accessingUser={AccessingUser},accessLevel={AccessLevel})", model, accessingUser, accessLevel);
             return string.Empty;
         }
     }

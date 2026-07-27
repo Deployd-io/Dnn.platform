@@ -19,6 +19,7 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
     [TestFixture]
     public class SecureFolderProviderTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private SecureFolderProvider _sfp;
         private Mock<IFolderInfo> _folderInfo;
         private Mock<IFileInfo> _fileInfo;
@@ -31,34 +32,49 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
         [SetUp]
         public void Setup()
         {
+			Logger.LogDebug(">>> Entering Setup()");
             this._sfp = new SecureFolderProvider();
             this._folderInfo = new Mock<IFolderInfo>();
+			Logger.LogDebug("Setup(): _folderInfo → {_folderInfo}", _folderInfo);
+			Logger.LogDebug("Setup(): _sfp → {_sfp}", _sfp);
             this._fileInfo = new Mock<IFileInfo>();
+			Logger.LogDebug("Setup(): _fileInfo → {_fileInfo}", _fileInfo);
             this._fileWrapper = new Mock<IFile>();
+			Logger.LogDebug("Setup(): _fileWrapper → {_fileWrapper}", _fileWrapper);
             this._directoryWrapper = new Mock<IDirectory>();
+			Logger.LogDebug("Setup(): _directoryWrapper → {_directoryWrapper}", _directoryWrapper);
             this._folderManager = new Mock<IFolderManager>();
+			Logger.LogDebug("Setup(): _folderManager → {_folderManager}", _folderManager);
             this._fileManager = new Mock<IFileManager>();
+			Logger.LogDebug("Setup(): _fileManager → {_fileManager}", _fileManager);
             this._pathUtils = new Mock<IPathUtils>();
+			Logger.LogDebug("Setup(): _pathUtils → {_pathUtils}", _pathUtils);
 
             FileWrapper.RegisterInstance(this._fileWrapper.Object);
             DirectoryWrapper.RegisterInstance(this._directoryWrapper.Object);
             FolderManager.RegisterInstance(this._folderManager.Object);
             FileManager.RegisterInstance(this._fileManager.Object);
             PathUtils.RegisterInstance(this._pathUtils.Object);
+			Logger.LogDebug("<<< Exiting Setup()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			Logger.LogDebug(">>> Entering TearDown()");
             MockComponentProvider.ResetContainer();
+			Logger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void AddFile_Throws_On_Null_Folder()
         {
+			Logger.LogDebug(">>> Entering AddFile_Throws_On_Null_Folder()");
             var stream = new Mock<Stream>();
 
+			Logger.LogDebug("AddFile_Throws_On_Null_Folder(): stream → {Stream}", stream);
             Assert.Throws<ArgumentNullException>(() => this._sfp.AddFile(null, Constants.FOLDER_ValidFileName, stream.Object));
+			Logger.LogDebug("<<< Exiting AddFile_Throws_On_Null_Folder()");
         }
 
         [Test]
@@ -66,26 +82,34 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
         [TestCase("")]
         public void AddFile_Throws_On_NullOrEmpty_FileName(string fileName)
         {
+			Logger.LogDebug(">>> Entering AddFile_Throws_On_NullOrEmpty_FileName(fileName={FileName})", fileName);
             var stream = new Mock<Stream>();
 
+			Logger.LogDebug("AddFile_Throws_On_NullOrEmpty_FileName(fileName={FileName}): stream → {Stream}", fileName, stream);
             Assert.Throws<ArgumentException>(() => this._sfp.AddFile(this._folderInfo.Object, fileName, stream.Object));
+			Logger.LogDebug("<<< Exiting AddFile_Throws_On_NullOrEmpty_FileName(fileName={FileName})", fileName);
         }
 
         [Test]
         public void AddFile_Throws_On_Null_Content()
         {
+			Logger.LogDebug(">>> Entering AddFile_Throws_On_Null_Content()");
             Assert.Throws<ArgumentNullException>(() => this._sfp.AddFile(this._folderInfo.Object, Constants.FOLDER_ValidFileName, null));
+			Logger.LogDebug("<<< Exiting AddFile_Throws_On_Null_Content()");
         }
 
         [Test]
         public void DeleteFile_Throws_On_Null_File()
         {
+			Logger.LogDebug(">>> Entering DeleteFile_Throws_On_Null_File()");
             Assert.Throws<ArgumentNullException>(() => this._sfp.DeleteFile(null));
+			Logger.LogDebug("<<< Exiting DeleteFile_Throws_On_Null_File()");
         }
 
         [Test]
         public void DeleteFile_Calls_FileWrapper_Delete_When_File_Exists()
         {
+			Logger.LogDebug(">>> Entering DeleteFile_Calls_FileWrapper_Delete_When_File_Exists()");
             this._fileInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFilePath);
 
             this._fileWrapper.Setup(fw => fw.Exists(Constants.FOLDER_ValidSecureFilePath)).Returns(true);
@@ -93,11 +117,13 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             this._sfp.DeleteFile(this._fileInfo.Object);
 
             this._fileWrapper.Verify(fw => fw.Delete(Constants.FOLDER_ValidSecureFilePath), Times.Once());
+			Logger.LogDebug("<<< Exiting DeleteFile_Calls_FileWrapper_Delete_When_File_Exists()");
         }
 
         [Test]
         public void DeleteFile_Does_Not_Call_FileWrapper_Delete_When_File_Does_Not_Exists()
         {
+			Logger.LogDebug(">>> Entering DeleteFile_Does_Not_Call_FileWrapper_Delete_When_File_Does_Not_Exists()");
             this._fileInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFilePath);
 
             this._fileWrapper.Setup(fw => fw.Exists(Constants.FOLDER_ValidFilePath)).Returns(false);
@@ -105,71 +131,90 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             this._sfp.DeleteFile(this._fileInfo.Object);
 
             this._fileWrapper.Verify(fw => fw.Delete(Constants.FOLDER_ValidFilePath), Times.Never());
+			Logger.LogDebug("<<< Exiting DeleteFile_Does_Not_Call_FileWrapper_Delete_When_File_Does_Not_Exists()");
         }
 
         [Test]
         public void ExistsFile_Throws_On_Null_Folder()
         {
+			Logger.LogDebug(">>> Entering ExistsFile_Throws_On_Null_Folder()");
             Assert.Throws<ArgumentNullException>(() => this._sfp.FileExists(null, Constants.FOLDER_ValidFileName));
+			Logger.LogDebug("<<< Exiting ExistsFile_Throws_On_Null_Folder()");
         }
 
         [Test]
         public void ExistsFile_Throws_On_Null_FileName()
         {
+			Logger.LogDebug(">>> Entering ExistsFile_Throws_On_Null_FileName()");
             Assert.Throws<ArgumentNullException>(() => this._sfp.FileExists(this._folderInfo.Object, null));
+			Logger.LogDebug("<<< Exiting ExistsFile_Throws_On_Null_FileName()");
         }
 
         [Test]
         public void ExistsFile_Calls_FileWrapper_Exists()
         {
+			Logger.LogDebug(">>> Entering ExistsFile_Calls_FileWrapper_Exists()");
             this._folderInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFolderPath);
 
             this._sfp.FileExists(this._folderInfo.Object, Constants.FOLDER_ValidFileName);
 
             this._fileWrapper.Verify(fw => fw.Exists(Constants.FOLDER_ValidSecureFilePath), Times.Once());
+			Logger.LogDebug("<<< Exiting ExistsFile_Calls_FileWrapper_Exists()");
         }
 
         [Test]
         public void ExistsFile_Returns_True_When_File_Exists()
         {
+			Logger.LogDebug(">>> Entering ExistsFile_Returns_True_When_File_Exists()");
             this._folderInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFolderPath);
 
             this._fileWrapper.Setup(fw => fw.Exists(Constants.FOLDER_ValidSecureFilePath)).Returns(true);
 
             var result = this._sfp.FileExists(this._folderInfo.Object, Constants.FOLDER_ValidFileName);
 
+			Logger.LogDebug("ExistsFile_Returns_True_When_File_Exists(): result → {Result}", result);
             Assert.That(result, Is.True);
+			Logger.LogDebug("<<< Exiting ExistsFile_Returns_True_When_File_Exists()");
         }
 
         [Test]
         public void ExistsFile_Returns_False_When_File_Does_Not_Exist()
         {
+			Logger.LogDebug(">>> Entering ExistsFile_Returns_False_When_File_Does_Not_Exist()");
             this._folderInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFolderPath);
 
             this._fileWrapper.Setup(fw => fw.Exists(Constants.FOLDER_ValidSecureFilePath)).Returns(false);
 
             var result = this._sfp.FileExists(this._folderInfo.Object, Constants.FOLDER_ValidFileName);
 
+			Logger.LogDebug("ExistsFile_Returns_False_When_File_Does_Not_Exist(): result → {Result}", result);
             Assert.That(result, Is.False);
+			Logger.LogDebug("<<< Exiting ExistsFile_Returns_False_When_File_Does_Not_Exist()");
         }
 
         [Test]
         public void ExistsFolder_Throws_On_Null_FolderMapping()
         {
+			Logger.LogDebug(">>> Entering ExistsFolder_Throws_On_Null_FolderMapping()");
             Assert.Throws<ArgumentNullException>(() => this._sfp.FolderExists(Constants.FOLDER_ValidFolderPath, null));
+			Logger.LogDebug("<<< Exiting ExistsFolder_Throws_On_Null_FolderMapping()");
         }
 
         [Test]
         public void ExistsFolder_Throws_On_Null_FolderPath()
         {
+			Logger.LogDebug(">>> Entering ExistsFolder_Throws_On_Null_FolderPath()");
             var folderMapping = new FolderMappingInfo();
 
+			Logger.LogDebug("ExistsFolder_Throws_On_Null_FolderPath(): folderMapping → {FolderMapping}", folderMapping);
             Assert.Throws<ArgumentNullException>(() => this._sfp.FolderExists(null, folderMapping));
+			Logger.LogDebug("<<< Exiting ExistsFolder_Throws_On_Null_FolderPath()");
         }
 
         [Test]
         public void ExistsFolder_Calls_DirectoryWrapper_Exists()
         {
+			Logger.LogDebug(">>> Entering ExistsFolder_Calls_DirectoryWrapper_Exists()");
             var folderMapping = new FolderMappingInfo { PortalID = Constants.CONTENT_ValidPortalId };
 
             this._pathUtils.Setup(pu => pu.GetPhysicalPath(folderMapping.PortalID, Constants.FOLDER_ValidFolderRelativePath)).Returns(Constants.FOLDER_ValidFolderPath);
@@ -177,11 +222,13 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             this._sfp.FolderExists(Constants.FOLDER_ValidFolderRelativePath, folderMapping);
 
             this._directoryWrapper.Verify(dw => dw.Exists(Constants.FOLDER_ValidFolderPath), Times.Once());
+			Logger.LogDebug("<<< Exiting ExistsFolder_Calls_DirectoryWrapper_Exists()");
         }
 
         [Test]
         public void ExistsFolder_Returns_True_When_Folder_Exists()
         {
+			Logger.LogDebug(">>> Entering ExistsFolder_Returns_True_When_Folder_Exists()");
             var folderMapping = new FolderMappingInfo { PortalID = Constants.CONTENT_ValidPortalId };
 
             this._pathUtils.Setup(pu => pu.GetPhysicalPath(Constants.CONTENT_ValidPortalId, Constants.FOLDER_ValidFolderRelativePath)).Returns(Constants.FOLDER_ValidFolderPath);
@@ -190,12 +237,15 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
 
             var result = this._sfp.FolderExists(Constants.FOLDER_ValidFolderRelativePath, folderMapping);
 
+			Logger.LogDebug("ExistsFolder_Returns_True_When_Folder_Exists(): result → {Result}", result);
             Assert.That(result, Is.True);
+			Logger.LogDebug("<<< Exiting ExistsFolder_Returns_True_When_Folder_Exists()");
         }
 
         [Test]
         public void ExistsFolder_Returns_False_When_Folder_Does_Not_Exist()
         {
+			Logger.LogDebug(">>> Entering ExistsFolder_Returns_False_When_Folder_Does_Not_Exist()");
             var folderMapping = new FolderMappingInfo { PortalID = Constants.CONTENT_ValidPortalId };
 
             this._pathUtils.Setup(pu => pu.GetPhysicalPath(Constants.CONTENT_ValidPortalId, Constants.FOLDER_ValidFolderRelativePath)).Returns(Constants.FOLDER_ValidFolderPath);
@@ -204,28 +254,35 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
 
             var result = this._sfp.FolderExists(Constants.FOLDER_ValidFolderRelativePath, folderMapping);
 
+			Logger.LogDebug("ExistsFolder_Returns_False_When_Folder_Does_Not_Exist(): result → {Result}", result);
             Assert.That(result, Is.False);
+			Logger.LogDebug("<<< Exiting ExistsFolder_Returns_False_When_Folder_Does_Not_Exist()");
         }
 
         [Test]
         public void GetFileAttributes_Throws_On_Null_File()
         {
+			Logger.LogDebug(">>> Entering GetFileAttributes_Throws_On_Null_File()");
             Assert.Throws<ArgumentNullException>(() => this._sfp.GetFileAttributes(null));
+			Logger.LogDebug("<<< Exiting GetFileAttributes_Throws_On_Null_File()");
         }
 
         [Test]
         public void GetFileAttributes_Calls_FileWrapper_GetAttributes()
         {
+			Logger.LogDebug(">>> Entering GetFileAttributes_Calls_FileWrapper_GetAttributes()");
             this._fileInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFilePath);
 
             this._sfp.GetFileAttributes(this._fileInfo.Object);
 
             this._fileWrapper.Verify(fw => fw.GetAttributes(Constants.FOLDER_ValidSecureFilePath), Times.Once());
+			Logger.LogDebug("<<< Exiting GetFileAttributes_Calls_FileWrapper_GetAttributes()");
         }
 
         [Test]
         public void GetFileAttributes_Returns_File_Attributes_When_File_Exists()
         {
+			Logger.LogDebug(">>> Entering GetFileAttributes_Returns_File_Attributes_When_File_Exists()");
             var expectedFileAttributes = FileAttributes.Normal;
 
             this._fileInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFilePath);
@@ -234,100 +291,130 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
 
             var result = this._sfp.GetFileAttributes(this._fileInfo.Object);
 
+			Logger.LogDebug("GetFileAttributes_Returns_File_Attributes_When_File_Exists(): result → {Result}", result);
             Assert.That(result, Is.EqualTo(expectedFileAttributes));
+			Logger.LogDebug("<<< Exiting GetFileAttributes_Returns_File_Attributes_When_File_Exists()");
         }
 
         [Test]
         public void GetFileAttributes_Returns_Null_When_File_Does_Not_Exist()
         {
+			Logger.LogDebug(">>> Entering GetFileAttributes_Returns_Null_When_File_Does_Not_Exist()");
             this._fileInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFilePath);
 
             this._fileWrapper.Setup(fw => fw.GetAttributes(Constants.FOLDER_ValidSecureFilePath)).Throws<FileNotFoundException>();
 
             var result = this._sfp.GetFileAttributes(this._fileInfo.Object);
 
+			Logger.LogDebug("GetFileAttributes_Returns_Null_When_File_Does_Not_Exist(): result → {Result}", result);
             Assert.That(result, Is.Null);
+			Logger.LogDebug("<<< Exiting GetFileAttributes_Returns_Null_When_File_Does_Not_Exist()");
         }
 
         [Test]
         public void GetFiles_Throws_On_Null_Folder()
         {
+			Logger.LogDebug(">>> Entering GetFiles_Throws_On_Null_Folder()");
             Assert.Throws<ArgumentNullException>(() => this._sfp.GetFiles(null));
+			Logger.LogDebug("<<< Exiting GetFiles_Throws_On_Null_Folder()");
         }
 
         [Test]
         public void GetFiles_Calls_DirectoryWrapper_GetFiles()
         {
+			Logger.LogDebug(">>> Entering GetFiles_Calls_DirectoryWrapper_GetFiles()");
             this._folderInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFolderPath);
 
             this._sfp.GetFiles(this._folderInfo.Object);
 
             this._directoryWrapper.Verify(dw => dw.GetFiles(Constants.FOLDER_ValidFolderPath));
+			Logger.LogDebug("<<< Exiting GetFiles_Calls_DirectoryWrapper_GetFiles()");
         }
 
         [Test]
         public void GetFiles_Count_Equals_DirectoryWrapper_GetFiles_Count()
         {
+			Logger.LogDebug(">>> Entering GetFiles_Count_Equals_DirectoryWrapper_GetFiles_Count()");
             this._folderInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFolderPath);
 
             var filesReturned = new string[] { "C:\\folder\\file1.txt.resources", "C:\\folder\\file2.txt.resources", "C:\\folder\\file3.txt.resources" };
 
+			Logger.LogDebug("GetFiles_Count_Equals_DirectoryWrapper_GetFiles_Count(): filesReturned → {FilesReturned}", filesReturned);
             this._directoryWrapper.Setup(dw => dw.GetFiles(Constants.FOLDER_ValidFolderPath)).Returns(filesReturned);
 
             var files = this._sfp.GetFiles(this._folderInfo.Object);
 
+			Logger.LogDebug("GetFiles_Count_Equals_DirectoryWrapper_GetFiles_Count(): files → {Files}", files);
             Assert.That(files, Has.Length.EqualTo(filesReturned.Length));
+			Logger.LogDebug("<<< Exiting GetFiles_Count_Equals_DirectoryWrapper_GetFiles_Count()");
         }
 
         [Test]
         public void GetFiles_Return_Valid_FileNames_When_Folder_Contains_Files()
         {
+			Logger.LogDebug(">>> Entering GetFiles_Return_Valid_FileNames_When_Folder_Contains_Files()");
             this._folderInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFolderPath);
 
             var filesReturned = new string[] { "C:\\folder\\file1.txt.resources", "C:\\folder\\file2.txt.resources", "C:\\folder\\file3.txt.resources" };
             var expectedValues = new string[] { "file1.txt", "file2.txt", "file3.txt" };
+			Logger.LogDebug("GetFiles_Return_Valid_FileNames_When_Folder_Contains_Files(): filesReturned → {FilesReturned}", filesReturned);
+			Logger.LogDebug("GetFiles_Return_Valid_FileNames_When_Folder_Contains_Files(): expectedValues → {ExpectedValues}", expectedValues);
 
             this._directoryWrapper.Setup(dw => dw.GetFiles(Constants.FOLDER_ValidFolderPath)).Returns(filesReturned);
 
             var files = this._sfp.GetFiles(this._folderInfo.Object);
 
+			Logger.LogDebug("GetFiles_Return_Valid_FileNames_When_Folder_Contains_Files(): files → {Files}", files);
             Assert.That(files, Is.EqualTo(expectedValues).AsCollection);
+			Logger.LogDebug("<<< Exiting GetFiles_Return_Valid_FileNames_When_Folder_Contains_Files()");
         }
 
         [Test]
         public void GetFileStream_Throws_On_Null_Folder()
         {
+			Logger.LogDebug(">>> Entering GetFileStream_Throws_On_Null_Folder()");
             Assert.Throws<ArgumentNullException>(() => this._sfp.GetFileStream(null, Constants.FOLDER_ValidFileName));
+			Logger.LogDebug("<<< Exiting GetFileStream_Throws_On_Null_Folder()");
         }
 
         [Test]
         public void GetFileStream_Throws_On_Null_FileName()
         {
+			Logger.LogDebug(">>> Entering GetFileStream_Throws_On_Null_FileName()");
             Assert.Throws<ArgumentException>(() => this._sfp.GetFileStream(this._folderInfo.Object, null));
+			Logger.LogDebug("<<< Exiting GetFileStream_Throws_On_Null_FileName()");
         }
 
         [Test]
         public void GetFileStream_Calls_FileWrapper_OpenRead()
         {
+			Logger.LogDebug(">>> Entering GetFileStream_Calls_FileWrapper_OpenRead()");
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             this._folderInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFolderPath);
 
             this._sfp.GetFileStream(this._folderInfo.Object, Constants.FOLDER_ValidFileName);
 
             this._fileWrapper.Verify(fw => fw.OpenRead(Constants.FOLDER_ValidSecureFilePath), Times.Once());
+			Logger.LogDebug("<<< Exiting GetFileStream_Calls_FileWrapper_OpenRead()");
+			Logger.LogInformation("GetFileStream_Calls_FileWrapper_OpenRead(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
         }
 
         [Test]
         public void GetFileStream_Returns_Valid_Stream_When_File_Exists()
         {
+			Logger.LogDebug(">>> Entering GetFileStream_Returns_Valid_Stream_When_File_Exists()");
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var validFileBytes = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
             var memoryStream = new MemoryStream(validFileBytes);
 
+			Logger.LogDebug("GetFileStream_Returns_Valid_Stream_When_File_Exists(): memoryStream → {MemoryStream}", memoryStream);
             this._folderInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFolderPath);
 
             this._fileWrapper.Setup(fw => fw.OpenRead(Constants.FOLDER_ValidSecureFilePath)).Returns(memoryStream);
 
             var result = this._sfp.GetFileStream(this._folderInfo.Object, Constants.FOLDER_ValidFileName);
 
+			Logger.LogDebug("GetFileStream_Returns_Valid_Stream_When_File_Exists(): result → {Result}", result);
             byte[] resultBytes;
             var buffer = new byte[16 * 1024];
             using (var ms = new MemoryStream())
@@ -342,50 +429,65 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             }
 
             Assert.That(resultBytes, Is.EqualTo(validFileBytes));
+			Logger.LogDebug("<<< Exiting GetFileStream_Returns_Valid_Stream_When_File_Exists()");
+			Logger.LogInformation("GetFileStream_Returns_Valid_Stream_When_File_Exists(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
         }
 
         [Test]
         public void GetFileStream_Returns_Null_When_File_Does_Not_Exist()
         {
+			Logger.LogDebug(">>> Entering GetFileStream_Returns_Null_When_File_Does_Not_Exist()");
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             this._folderInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFolderPath);
 
             this._fileWrapper.Setup(fw => fw.OpenRead(Constants.FOLDER_ValidSecureFilePath)).Throws<FileNotFoundException>();
 
             var result = this._sfp.GetFileStream(this._folderInfo.Object, Constants.FOLDER_ValidFileName);
 
+			Logger.LogDebug("GetFileStream_Returns_Null_When_File_Does_Not_Exist(): result → {Result}", result);
+			Logger.LogInformation("GetFileStream_Returns_Null_When_File_Does_Not_Exist(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
             Assert.That(result, Is.Null);
+			Logger.LogDebug("<<< Exiting GetFileStream_Returns_Null_When_File_Does_Not_Exist()");
         }
 
         [Test]
         public void GetImageUrl_Calls_IconControllerWrapper_IconURL()
         {
+			Logger.LogDebug(">>> Entering GetImageUrl_Calls_IconControllerWrapper_IconURL()");
             var iconControllerWrapper = new Mock<IIconController>();
             IconControllerWrapper.RegisterInstance(iconControllerWrapper.Object);
+			Logger.LogDebug("GetImageUrl_Calls_IconControllerWrapper_IconURL(): iconControllerWrapper → {IconControllerWrapper}", iconControllerWrapper);
 
             this._sfp.GetFolderProviderIconPath();
 
             iconControllerWrapper.Verify(icw => icw.IconURL("FolderSecure", "32x32"), Times.Once());
+			Logger.LogDebug("<<< Exiting GetImageUrl_Calls_IconControllerWrapper_IconURL()");
         }
 
         [Test]
         public void GetLastModificationTime_Throws_On_Null_File()
         {
+			Logger.LogDebug(">>> Entering GetLastModificationTime_Throws_On_Null_File()");
             Assert.Throws<ArgumentNullException>(() => this._sfp.GetLastModificationTime(null));
+			Logger.LogDebug("<<< Exiting GetLastModificationTime_Throws_On_Null_File()");
         }
 
         [Test]
         public void GetLastModificationTime_Calls_FileWrapper_GetLastWriteTime()
         {
+			Logger.LogDebug(">>> Entering GetLastModificationTime_Calls_FileWrapper_GetLastWriteTime()");
             this._fileInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFilePath);
 
             this._sfp.GetLastModificationTime(this._fileInfo.Object);
 
             this._fileWrapper.Verify(fw => fw.GetLastWriteTime(Constants.FOLDER_ValidSecureFilePath), Times.Once());
+			Logger.LogDebug("<<< Exiting GetLastModificationTime_Calls_FileWrapper_GetLastWriteTime()");
         }
 
         [Test]
         public void GetLastModificationTime_Returns_Valid_Date_When_File_Exists()
         {
+			Logger.LogDebug(">>> Entering GetLastModificationTime_Returns_Valid_Date_When_File_Exists()");
             var expectedDate = DateTime.Now;
 
             this._fileInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFilePath);
@@ -394,12 +496,15 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
 
             var result = this._sfp.GetLastModificationTime(this._fileInfo.Object);
 
+			Logger.LogDebug("GetLastModificationTime_Returns_Valid_Date_When_File_Exists(): result → {Result}", result);
             Assert.That(result, Is.EqualTo(expectedDate));
+			Logger.LogDebug("<<< Exiting GetLastModificationTime_Returns_Valid_Date_When_File_Exists()");
         }
 
         [Test]
         public void GetLastModificationTime_Returns_Null_Date_When_File_Does_Not_Exist()
         {
+			Logger.LogDebug(">>> Entering GetLastModificationTime_Returns_Null_Date_When_File_Does_Not_Exist()");
             var expectedDate = Null.NullDate;
 
             this._fileInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFilePath);
@@ -408,26 +513,34 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
 
             var result = this._sfp.GetLastModificationTime(this._fileInfo.Object);
 
+			Logger.LogDebug("GetLastModificationTime_Returns_Null_Date_When_File_Does_Not_Exist(): result → {Result}", result);
             Assert.That(result, Is.EqualTo(expectedDate));
+			Logger.LogDebug("<<< Exiting GetLastModificationTime_Returns_Null_Date_When_File_Does_Not_Exist()");
         }
 
         [Test]
         public void GetSubFolders_Throws_On_Null_FolderMapping()
         {
+			Logger.LogDebug(">>> Entering GetSubFolders_Throws_On_Null_FolderMapping()");
             Assert.Throws<ArgumentNullException>(() => this._sfp.GetSubFolders(Constants.FOLDER_ValidFolderPath, null).ToList());
+			Logger.LogDebug("<<< Exiting GetSubFolders_Throws_On_Null_FolderMapping()");
         }
 
         [Test]
         public void GetSubFolders_Throws_On_Null_FolderPath()
         {
+			Logger.LogDebug(">>> Entering GetSubFolders_Throws_On_Null_FolderPath()");
             var folderMapping = new FolderMappingInfo();
 
+			Logger.LogDebug("GetSubFolders_Throws_On_Null_FolderPath(): folderMapping → {FolderMapping}", folderMapping);
             Assert.Throws<ArgumentNullException>(() => this._sfp.GetSubFolders(null, folderMapping).ToList());
+			Logger.LogDebug("<<< Exiting GetSubFolders_Throws_On_Null_FolderPath()");
         }
 
         [Test]
         public void GetSubFolders_Calls_DirectoryWrapper_GetFiles()
         {
+			Logger.LogDebug(">>> Entering GetSubFolders_Calls_DirectoryWrapper_GetFiles()");
             var folderMapping = new FolderMappingInfo { PortalID = Constants.CONTENT_ValidPortalId };
 
             this._pathUtils.Setup(pu => pu.GetPhysicalPath(folderMapping.PortalID, Constants.FOLDER_ValidFolderRelativePath)).Returns(Constants.FOLDER_ValidFolderPath);
@@ -435,11 +548,13 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             this._sfp.GetSubFolders(Constants.FOLDER_ValidFolderRelativePath, folderMapping).ToList();
 
             this._directoryWrapper.Verify(dw => dw.GetDirectories(Constants.FOLDER_ValidFolderPath), Times.Once());
+			Logger.LogDebug("<<< Exiting GetSubFolders_Calls_DirectoryWrapper_GetFiles()");
         }
 
         [Test]
         public void GetSubFolders_Count_Equals_DirectoryWrapper_GetDirectories_Count()
         {
+			Logger.LogDebug(">>> Entering GetSubFolders_Count_Equals_DirectoryWrapper_GetDirectories_Count()");
             var folderMapping = new FolderMappingInfo { PortalID = Constants.CONTENT_ValidPortalId };
 
             this._pathUtils.Setup(pu => pu.GetPhysicalPath(Constants.CONTENT_ValidPortalId, Constants.FOLDER_ValidFolderRelativePath)).Returns(Constants.FOLDER_ValidFolderPath);
@@ -456,12 +571,15 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
 
             var result = this._sfp.GetSubFolders(Constants.FOLDER_ValidFolderRelativePath, folderMapping).ToList();
 
+			Logger.LogDebug("GetSubFolders_Count_Equals_DirectoryWrapper_GetDirectories_Count(): result → {Result}", result);
             Assert.That(result, Has.Count.EqualTo(subFolders.Length));
+			Logger.LogDebug("<<< Exiting GetSubFolders_Count_Equals_DirectoryWrapper_GetDirectories_Count()");
         }
 
         [Test]
         public void GetSubFolders_Returns_Valid_SubFolders_When_Folder_Is_Not_Empty()
         {
+			Logger.LogDebug(">>> Entering GetSubFolders_Returns_Valid_SubFolders_When_Folder_Is_Not_Empty()");
             var expectedSubFolders = new[]
             {
                 Constants.FOLDER_ValidSubFolderRelativePath,
@@ -484,18 +602,23 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
 
             var result = this._sfp.GetSubFolders(Constants.FOLDER_ValidFolderRelativePath, folderMapping).ToList();
 
+			Logger.LogDebug("GetSubFolders_Returns_Valid_SubFolders_When_Folder_Is_Not_Empty(): result → {Result}", result);
             Assert.That(result, Is.EqualTo(expectedSubFolders).AsCollection);
+			Logger.LogDebug("<<< Exiting GetSubFolders_Returns_Valid_SubFolders_When_Folder_Is_Not_Empty()");
         }
 
         [Test]
         public void IsInSync_Throws_On_Null_File()
         {
+			Logger.LogDebug(">>> Entering IsInSync_Throws_On_Null_File()");
             Assert.Throws<ArgumentNullException>(() => this._sfp.IsInSync(null));
+			Logger.LogDebug("<<< Exiting IsInSync_Throws_On_Null_File()");
         }
 
         [Test]
         public void IsInSync_Returns_True_When_File_Is_In_Sync()
         {
+			Logger.LogDebug(">>> Entering IsInSync_Returns_True_When_File_Is_In_Sync()");
             this._fileInfo.Setup(fi => fi.SHA1Hash).Returns(Constants.FOLDER_UnmodifiedFileHash);
 
             var sfp = new Mock<SecureFolderProvider> { CallBase = true };
@@ -503,12 +626,15 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
 
             var result = sfp.Object.IsInSync(this._fileInfo.Object);
 
+			Logger.LogDebug("IsInSync_Returns_True_When_File_Is_In_Sync(): result → {Result}", result);
             Assert.That(result, Is.True);
+			Logger.LogDebug("<<< Exiting IsInSync_Returns_True_When_File_Is_In_Sync()");
         }
 
         [Test]
         public void IsInSync_Returns_True_When_File_Is_Not_In_Sync()
         {
+			Logger.LogDebug(">>> Entering IsInSync_Returns_True_When_File_Is_Not_In_Sync()");
             this._fileInfo.Setup(fi => fi.SHA1Hash).Returns(Constants.FOLDER_UnmodifiedFileHash);
 
             var sfp = new Mock<SecureFolderProvider> { CallBase = true };
@@ -516,13 +642,17 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
 
             var result = sfp.Object.IsInSync(this._fileInfo.Object);
 
+			Logger.LogDebug("IsInSync_Returns_True_When_File_Is_Not_In_Sync(): result → {Result}", result);
             Assert.That(result, Is.True);
+			Logger.LogDebug("<<< Exiting IsInSync_Returns_True_When_File_Is_Not_In_Sync()");
         }
 
         [Test]
         public void RenameFile_Throws_On_Null_File()
         {
+			Logger.LogDebug(">>> Entering RenameFile_Throws_On_Null_File()");
             Assert.Throws<ArgumentNullException>(() => this._sfp.RenameFile(null, Constants.FOLDER_ValidFileName));
+			Logger.LogDebug("<<< Exiting RenameFile_Throws_On_Null_File()");
         }
 
         [Test]
@@ -530,12 +660,15 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
         [TestCase("")]
         public void RenameFile_Throws_On_NullOrEmpty_NewFileName(string newFileName)
         {
+			Logger.LogDebug(">>> Entering RenameFile_Throws_On_NullOrEmpty_NewFileName(newFileName={NewFileName})", newFileName);
             Assert.Throws<ArgumentException>(() => this._sfp.RenameFile(this._fileInfo.Object, newFileName));
+			Logger.LogDebug("<<< Exiting RenameFile_Throws_On_NullOrEmpty_NewFileName(newFileName={NewFileName})", newFileName);
         }
 
         [Test]
         public void RenameFile_Calls_FileWrapper_Move_When_FileNames_Are_Not_Equal()
         {
+			Logger.LogDebug(">>> Entering RenameFile_Calls_FileWrapper_Move_When_FileNames_Are_Not_Equal()");
             this._fileInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFilePath);
             this._fileInfo.Setup(fi => fi.FileName).Returns(Constants.FOLDER_ValidFileName);
             this._fileInfo.Setup(fi => fi.FolderId).Returns(Constants.FOLDER_ValidFolderId);
@@ -545,28 +678,34 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             this._sfp.RenameFile(this._fileInfo.Object, Constants.FOLDER_OtherValidFileName);
 
             this._fileWrapper.Verify(fw => fw.Move(Constants.FOLDER_ValidSecureFilePath, Constants.FOLDER_OtherValidSecureFilePath), Times.Once());
+			Logger.LogDebug("<<< Exiting RenameFile_Calls_FileWrapper_Move_When_FileNames_Are_Not_Equal()");
         }
 
         [Test]
         public void RenameFile_Does_Not_Call_FileWrapper_Move_When_FileNames_Are_Equal()
         {
+			Logger.LogDebug(">>> Entering RenameFile_Does_Not_Call_FileWrapper_Move_When_FileNames_Are_Equal()");
             this._fileInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFilePath);
             this._fileInfo.Setup(fi => fi.FileName).Returns(Constants.FOLDER_ValidFileName);
 
             this._sfp.RenameFile(this._fileInfo.Object, Constants.FOLDER_ValidFileName);
 
             this._fileWrapper.Verify(fw => fw.Move(It.IsAny<string>(), It.IsAny<string>()), Times.Never());
+			Logger.LogDebug("<<< Exiting RenameFile_Does_Not_Call_FileWrapper_Move_When_FileNames_Are_Equal()");
         }
 
         [Test]
         public void SetFileAttributes_Throws_On_Null_File()
         {
+			Logger.LogDebug(">>> Entering SetFileAttributes_Throws_On_Null_File()");
             Assert.Throws<ArgumentNullException>(() => this._sfp.SetFileAttributes(null, FileAttributes.Archive));
+			Logger.LogDebug("<<< Exiting SetFileAttributes_Throws_On_Null_File()");
         }
 
         [Test]
         public void SetFileAttributes_Calls_FileWrapper_SetAttributes()
         {
+			Logger.LogDebug(">>> Entering SetFileAttributes_Calls_FileWrapper_SetAttributes()");
             const FileAttributes validFileAttributes = FileAttributes.Archive;
 
             this._fileInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFilePath);
@@ -574,22 +713,29 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             this._sfp.SetFileAttributes(this._fileInfo.Object, validFileAttributes);
 
             this._fileWrapper.Verify(fw => fw.SetAttributes(Constants.FOLDER_ValidSecureFilePath, validFileAttributes), Times.Once());
+			Logger.LogDebug("<<< Exiting SetFileAttributes_Calls_FileWrapper_SetAttributes()");
         }
 
         [Test]
         public void SupportsFileAttributes_Returns_True()
         {
+			Logger.LogDebug(">>> Entering SupportsFileAttributes_Returns_True()");
             var result = this._sfp.SupportsFileAttributes();
 
+			Logger.LogDebug("SupportsFileAttributes_Returns_True(): result → {Result}", result);
             Assert.That(result, Is.True);
+			Logger.LogDebug("<<< Exiting SupportsFileAttributes_Returns_True()");
         }
 
         [Test]
         public void UpdateFile_Throws_On_Null_Folder()
         {
+			Logger.LogDebug(">>> Entering UpdateFile_Throws_On_Null_Folder()");
             var stream = new Mock<Stream>();
 
+			Logger.LogDebug("UpdateFile_Throws_On_Null_Folder(): stream → {Stream}", stream);
             Assert.Throws<ArgumentNullException>(() => this._sfp.UpdateFile(null, Constants.FOLDER_ValidFileName, stream.Object));
+			Logger.LogDebug("<<< Exiting UpdateFile_Throws_On_Null_Folder()");
         }
 
         [Test]
@@ -597,43 +743,54 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
         [TestCase("")]
         public void UpdateFile_Throws_On_NullOrEmpty_FileName(string fileName)
         {
+			Logger.LogDebug(">>> Entering UpdateFile_Throws_On_NullOrEmpty_FileName(fileName={FileName})", fileName);
             var stream = new Mock<Stream>();
 
+			Logger.LogDebug("UpdateFile_Throws_On_NullOrEmpty_FileName(fileName={FileName}): stream → {Stream}", fileName, stream);
             Assert.Throws<ArgumentException>(() => this._sfp.UpdateFile(this._folderInfo.Object, fileName, stream.Object));
+			Logger.LogDebug("<<< Exiting UpdateFile_Throws_On_NullOrEmpty_FileName(fileName={FileName})", fileName);
         }
 
         [Test]
         public void UpdateFile_Throws_On_Null_Content()
         {
+			Logger.LogDebug(">>> Entering UpdateFile_Throws_On_Null_Content()");
             Assert.Throws<ArgumentNullException>(() => this._sfp.UpdateFile(this._folderInfo.Object, Constants.FOLDER_ValidFileName, null));
+			Logger.LogDebug("<<< Exiting UpdateFile_Throws_On_Null_Content()");
         }
 
         [Test]
         public void UpdateFile_Calls_FileWrapper_Delete_When_File_Exists()
         {
+			Logger.LogDebug(">>> Entering UpdateFile_Calls_FileWrapper_Delete_When_File_Exists()");
             this._folderInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFolderPath);
 
             this._fileWrapper.Setup(fw => fw.Exists(Constants.FOLDER_ValidSecureFilePath)).Returns(true);
 
             var stream = new Mock<Stream>();
 
+			Logger.LogDebug("UpdateFile_Calls_FileWrapper_Delete_When_File_Exists(): stream → {Stream}", stream);
             this._sfp.UpdateFile(this._folderInfo.Object, Constants.FOLDER_ValidFileName, stream.Object);
 
             this._fileWrapper.Verify(fw => fw.Delete(Constants.FOLDER_ValidSecureFilePath), Times.Once());
+			Logger.LogDebug("<<< Exiting UpdateFile_Calls_FileWrapper_Delete_When_File_Exists()");
         }
 
         [Test]
         public void UpdateFile_Calls_FileWrapper_Create()
         {
+			Logger.LogDebug(">>> Entering UpdateFile_Calls_FileWrapper_Create()");
             this._folderInfo.Setup(fi => fi.PhysicalPath).Returns(Constants.FOLDER_ValidFolderPath);
 
             this._fileWrapper.Setup(fw => fw.Exists(Constants.FOLDER_ValidSecureFilePath)).Returns(false);
 
             var stream = new Mock<Stream>();
 
+			Logger.LogDebug("UpdateFile_Calls_FileWrapper_Create(): stream → {Stream}", stream);
             this._sfp.UpdateFile(this._folderInfo.Object, Constants.FOLDER_ValidFileName, stream.Object);
 
             this._fileWrapper.Verify(fw => fw.Create(Constants.FOLDER_ValidSecureFilePath), Times.Once());
+			Logger.LogDebug("<<< Exiting UpdateFile_Calls_FileWrapper_Create()");
         }
     }
 }

@@ -21,9 +21,11 @@ namespace DotNetNuke.Tests.Core.Services.Search.Internals
 
     public class LuceneControllerImplTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [Test]
         public void GetCustomAnalyzer_WithTheProvidedAnalyzer_ReturnsTheAnalyzerCorrectly()
         {
+			Logger.LogDebug(">>> Entering GetCustomAnalyzer_WithTheProvidedAnalyzer_ReturnsTheAnalyzerCorrectly()");
             FakeServiceProvider serviceProvider = null;
             try
             {
@@ -36,19 +38,25 @@ namespace DotNetNuke.Tests.Core.Services.Search.Internals
                 const string CzechAnalyzerTypeName = "Lucene.Net.Analysis.Cz.CzechAnalyzer, Lucene.Net.Contrib.Analyzers";
                 var mockData = MockComponentProvider.CreateDataProvider();
                 var hostSettings = new DataTable(HostSettingsTableName);
+				Logger.LogDebug("GetCustomAnalyzer_WithTheProvidedAnalyzer_ReturnsTheAnalyzerCorrectly(): mockData → {MockData}", mockData);
+				Logger.LogDebug("GetCustomAnalyzer_WithTheProvidedAnalyzer_ReturnsTheAnalyzerCorrectly(): hostSettings → {HostSettings}", hostSettings);
                 var nameCol = hostSettings.Columns.Add(SettingNameColumnName);
                 hostSettings.Columns.Add(SettingValueColumnName);
+				Logger.LogDebug("GetCustomAnalyzer_WithTheProvidedAnalyzer_ReturnsTheAnalyzerCorrectly(): nameCol → {NameCol}", nameCol);
                 hostSettings.Columns.Add(SettingIsSecureColumnName);
                 hostSettings.PrimaryKey = [nameCol];
+				Logger.LogDebug("GetCustomAnalyzer_WithTheProvidedAnalyzer_ReturnsTheAnalyzerCorrectly(): hostSettings.PrimaryKey → {Arg0}", hostSettings.PrimaryKey);
                 hostSettings.Rows.Add(CustomAnalyzerCacheKeyName, CzechAnalyzerTypeName, true);
                 mockData.Setup(c => c.GetHostSettings()).Returns(hostSettings.CreateDataReader());
                 var mockedApplicationStatusInfo = new Mock<IApplicationStatusInfo>();
                 mockedApplicationStatusInfo.Setup(s => s.Status).Returns(UpgradeStatus.Install);
+				Logger.LogDebug("GetCustomAnalyzer_WithTheProvidedAnalyzer_ReturnsTheAnalyzerCorrectly(): mockedApplicationStatusInfo → {MockedApplicationStatusInfo}", mockedApplicationStatusInfo);
                 mockedApplicationStatusInfo.Setup(s => s.ApplicationMapPath).Returns(string.Empty);
 
                 serviceProvider = FakeServiceProvider.Setup(
                     services =>
                     {
+					Logger.LogDebug("GetCustomAnalyzer_WithTheProvidedAnalyzer_ReturnsTheAnalyzerCorrectly(): services → {Services}", services);
                         services.AddSingleton(mockData.Object);
                         services.AddSingleton(mockedApplicationStatusInfo.Object);
                     });
@@ -57,9 +65,11 @@ namespace DotNetNuke.Tests.Core.Services.Search.Internals
                 DataCache.ClearCache();
                 var luceneController = new LuceneControllerImpl(new FakeHostController(new Dictionary<string, IConfigurationSetting>(0)), mockedApplicationStatusInfo.Object);
 
+				Logger.LogDebug("GetCustomAnalyzer_WithTheProvidedAnalyzer_ReturnsTheAnalyzerCorrectly(): luceneController → {LuceneController}", luceneController);
                 // Act
                 var analyzer = luceneController.GetCustomAnalyzer();
 
+				Logger.LogDebug("GetCustomAnalyzer_WithTheProvidedAnalyzer_ReturnsTheAnalyzerCorrectly(): analyzer → {Analyzer}", analyzer);
                 // Assert
                 Assert.That(analyzer, Is.InstanceOf<CzechAnalyzer>());
             }
@@ -67,6 +77,7 @@ namespace DotNetNuke.Tests.Core.Services.Search.Internals
             {
                 serviceProvider?.Dispose();
             }
+			Logger.LogDebug("<<< Exiting GetCustomAnalyzer_WithTheProvidedAnalyzer_ReturnsTheAnalyzerCorrectly()");
         }
     }
 }

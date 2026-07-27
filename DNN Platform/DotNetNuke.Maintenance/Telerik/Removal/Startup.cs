@@ -20,11 +20,13 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
     /// <inheritdoc />
     public class Startup : IDnnStartup
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
 #pragma warning disable CS3001 // Argument type is not CLS-compliant
         public void ConfigureServices(IServiceCollection services)
 #pragma warning restore CS3001 // Argument type is not CLS-compliant
         {
+			Logger.LogDebug(">>> Entering ConfigureServices(services={Services})", services);
             services.AddTransient<ITelerikUtils, TelerikUtils>();
             services.AddTransient<IDamUninstaller, DamUninstaller>();
             services.AddTransient<ITelerikUninstaller, TelerikUninstaller>();
@@ -57,6 +59,7 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
             services.AddTransient<IReplacePortalTabModuleStep, ReplacePortalTabModuleStep>();
             services.AddTransient<IReplaceTabModuleStep, ReplaceTabModuleStep>();
             services.AddTransient<IUninstallPackageStep, UninstallPackageStep>();
+			Logger.LogDebug("<<< Exiting ConfigureServices(services={Services})", services);
         }
 
         private Func<PackageInfo, string, IInstaller> InstallerFactory(IServiceProvider provider) =>

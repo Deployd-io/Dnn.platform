@@ -23,19 +23,24 @@ Namespace DotNetNuke.UI.WebControls
     Public Class DNNMenu
         Inherits WebControl
         Implements IPostBackEventHandler, IPostBackDataHandler, IClientAPICallbackEventHandler
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(DNNMenu))
         ' Events
         Public Event NodeClick As DNNMenuNodeClickHandler
         Public Event PopulateOnDemand As DNNMenuEventHandler
 
         ' Methods
         Public Sub New()
+			Logger.LogDebug(">>> Entering New()")
             AddHandler MyBase.PreRender, New EventHandler(AddressOf Me.DNNMenu_PreRender)
             DNNMenu.__ENCAddToList(Me)
             Me.m_DNNAnimation = New DNNAnimation
+			Logger.LogDebug("New(): Me.m_DNNAnimation → {Arg0}", Me.m_DNNAnimation)
+			Logger.LogDebug("<<< Exiting New()")
         End Sub
 
         <DebuggerNonUserCode> _
         Private Shared Sub __ENCAddToList(ByVal value As Object)
+			Logger.LogDebug(">>> Entering __ENCAddToList(value={Value})", value)
             SyncLock DNNMenu.__ENCList
                 If (DNNMenu.__ENCList.Count = DNNMenu.__ENCList.Capacity) Then
                     Dim index As Integer = 0
@@ -60,9 +65,11 @@ Namespace DotNetNuke.UI.WebControls
                 End If
                 DNNMenu.__ENCList.Add(New WeakReference(value))
             End SyncLock
+			Logger.LogDebug("<<< Exiting __ENCAddToList(value={Value})", value)
         End Sub
 
         Private Sub DNNMenu_PreRender(ByVal sender As Object, ByVal e As EventArgs)
+			Logger.LogDebug(">>> Entering DNNMenu_PreRender(sender={Sender},e={E})", sender, e)
             Me.RegisterClientScript
             Me.Page.RegisterRequiresPostBack(Me)
             Me.UpdateNodes(Me.MenuNodes)
@@ -71,33 +78,46 @@ Namespace DotNetNuke.UI.WebControls
             Else
                 Me.ViewState("xml") = Me.MenuNodes.ToXml
             End If
+			Logger.LogDebug("<<< Exiting DNNMenu_PreRender(sender={Sender},e={E})", sender, e)
         End Sub
 
         Protected Overrides Sub Finalize()
+			Logger.LogDebug(">>> Entering Finalize()")
             MyBase.Finalize
+			Logger.LogDebug("<<< Exiting Finalize()")
         End Sub
 
         Public Function FindNode(ByVal strID As String) As MenuNode
+			Logger.LogDebug(">>> Entering FindNode(strID={StrID})", strID)
+			Logger.LogDebug("<<< Exiting FindNode(strID={StrID})", strID)
             Return Me.MenuNodes.FindNode(strID)
         End Function
 
         Public Function FindNodeByKey(ByVal strKey As String) As MenuNode
+			Logger.LogDebug(">>> Entering FindNodeByKey(strKey={StrKey})", strKey)
+			Logger.LogDebug("<<< Exiting FindNodeByKey(strKey={StrKey})", strKey)
             Return Me.MenuNodes.FindNodeByKey(strKey)
         End Function
 
         Public Sub LoadJSON(ByVal dict As Dictionary(Of String, Object))
+			Logger.LogDebug(">>> Entering LoadJSON(dict={Dict},Object={Object})", dict, Object)
             Me.m_Nodes = New MenuNodeCollection(dict, Me)
+			Logger.LogDebug("<<< Exiting LoadJSON(dict={Dict},Object={Object})", dict, Object)
         End Sub
 
         Public Function LoadPostData(ByVal postDataKey As String, ByVal postCollection As NameValueCollection) As Boolean Implements IPostBackDataHandler.LoadPostData
+			Logger.LogDebug(">>> Entering LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection)
             Dim flag As Boolean
+			Logger.LogDebug("<<< Exiting LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection)
             Return flag
         End Function
 
         Private Sub LoadPostedJSON()
+			Logger.LogDebug(">>> Entering LoadPostedJSON()")
             Dim clientVariable As String = ""
             If Not Me.IsDownLevel Then
                 clientVariable = ClientAPI.GetClientVariable(Me.Page, (Me.ClientID & "_json"))
+				Logger.LogDebug("LoadPostedJSON(): clientVariable → {ClientVariable}", clientVariable)
             End If
             If Not String.IsNullOrEmpty(clientVariable) Then
                 Dim dict As Dictionary(Of String, Object) = MSAJAX.Deserialize(Of Dictionary(Of String, Object))(clientVariable)
@@ -105,19 +125,24 @@ Namespace DotNetNuke.UI.WebControls
                     Me.LoadJSON(dict)
                 End If
             End If
+			Logger.LogDebug("<<< Exiting LoadPostedJSON()")
         End Sub
 
         Private Sub LoadPostedXML()
+			Logger.LogDebug(">>> Entering LoadPostedXML()")
             Dim expression As String = ""
             If Not Me.IsDownLevel Then
                 expression = ClientAPI.GetClientVariable(Me.Page, (Me.ClientID & "_xml"))
+				Logger.LogDebug("LoadPostedXML(): expression → {Expression}", expression)
             End If
             If (Strings.Len(expression) > 0) Then
                 Me.LoadXml(expression)
             End If
+			Logger.LogDebug("<<< Exiting LoadPostedXML()")
         End Sub
 
         Protected Overrides Sub LoadViewState(ByVal state As Object)
+			Logger.LogDebug(">>> Entering LoadViewState(state={State})", state)
             If (Not state Is Nothing) Then
                 Dim objArray As Object() = DirectCast(state, Object())
                 If (Not objArray(0) Is Nothing) Then
@@ -127,13 +152,17 @@ Namespace DotNetNuke.UI.WebControls
                     DirectCast(Me.ImageList, IStateManager).LoadViewState(objArray(1))
                 End If
             End If
+			Logger.LogDebug("<<< Exiting LoadViewState(state={State})", state)
         End Sub
 
         Public Sub LoadXml(ByVal strXml As String)
+			Logger.LogDebug(">>> Entering LoadXml(strXml={StrXml})", strXml)
             Me.m_Nodes = New MenuNodeCollection(strXml, "", Me)
+			Logger.LogDebug("<<< Exiting LoadXml(strXml={StrXml})", strXml)
         End Sub
 
         Private Function MarshalledProperties() As Hashtable
+			Logger.LogDebug(">>> Entering MarshalledProperties()")
             Dim hashtable2 As New Hashtable
             Dim flag As Boolean = (Me.ImageList.Count > 0)
             If flag Then
@@ -143,8 +172,10 @@ Namespace DotNetNuke.UI.WebControls
                 Dim str As String = ""
                 Try 
                     enumerator = Me.ImageList.GetEnumerator
+					Logger.LogDebug("MarshalledProperties(): enumerator → {Enumerator}", enumerator)
                     Do While True
                         flag = enumerator.MoveNext
+						Logger.LogDebug("MarshalledProperties(): flag → {Flag}", flag)
                         If Not flag Then
                             Exit Do
                         End If
@@ -158,6 +189,7 @@ Namespace DotNetNuke.UI.WebControls
                             current.ImageUrl = $"[{list.IndexOfValue(str4).ToString(CultureInfo.InvariantCulture)}]{str3}"
                         End If
                         expression = (expression & Conversions.ToString(Interaction.IIf((Strings.Len(expression) > 0), ",", "")) & current.ImageUrl)
+						Logger.LogDebug("MarshalledProperties(): expression → {Expression}", expression)
                     Loop
                 Finally
                     If Not Object.ReferenceEquals(TryCast(enumerator,IDisposable), Nothing) Then
@@ -174,6 +206,7 @@ Namespace DotNetNuke.UI.WebControls
                         Exit Do
                     End If
                     str = (str & Conversions.ToString(Interaction.IIf((Strings.Len(str) > 0), ",", "")) & Conversions.ToString(list.GetByIndex(index)))
+					Logger.LogDebug("MarshalledProperties(): str → {Str}", str)
                     index += 1
                 Loop
             End If
@@ -188,43 +221,54 @@ Namespace DotNetNuke.UI.WebControls
                     hashtable2.Add("callbacksf", Me.CallbackStatusFunction)
                 End If
             End If
+			Logger.LogDebug("<<< Exiting MarshalledProperties()")
             Return hashtable2
         End Function
 
         Protected Overrides Sub OnInit(ByVal e As EventArgs)
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e)
             MyBase.OnInit(e)
             If ClientAPI.NeedsDNNVariable(Me) Then
                 AddHandler Me.Page.Load, New EventHandler(AddressOf Me.ParentOnLoad)
             Else
                 Me.LoadPostedJSON
             End If
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e)
         End Sub
 
         Protected Overrides Sub OnLoad(ByVal e As EventArgs)
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e)
             If (If((Not Me.IsDownLevel OrElse (Strings.Len(Me.ViewState("xml")) <= 0)), 0, 1) <> 0) Then
                 Me.m_Nodes = New MenuNodeCollection(Conversions.ToString(Me.ViewState("xml")), "", Me)
             End If
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e)
         End Sub
 
         Public Overridable Sub OnNodeClick(ByVal e As DNNMenuNodeClickEventArgs)
+			Logger.LogDebug(">>> Entering OnNodeClick(e={E})", e)
             Dim nodeClickEvent As DNNMenuNodeClickHandler = Me.NodeClickEvent
             If Not Object.ReferenceEquals(nodeClickEvent, Nothing) Then
                 nodeClickEvent.Invoke(Me, e)
             End If
+			Logger.LogDebug("<<< Exiting OnNodeClick(e={E})", e)
         End Sub
 
         Protected Sub ParentOnLoad(ByVal Sender As Object, ByVal e As EventArgs)
+			Logger.LogDebug(">>> Entering ParentOnLoad(Sender={Sender},e={E})", Sender, e)
             ClientAPI.RegisterDNNVariableControl(Me)
             Me.LoadPostedJSON
+			Logger.LogDebug("<<< Exiting ParentOnLoad(Sender={Sender},e={E})", Sender, e)
         End Sub
 
         Public Function RaiseClientAPICallbackEvent(ByVal eventArgument As String) As String Implements IClientAPICallbackEventHandler.RaiseClientAPICallbackEvent
+			Logger.LogDebug(">>> Entering RaiseClientAPICallbackEvent(eventArgument={EventArgument})", eventArgument)
             Dim str As String
             Dim strArray As String() = Strings.Split(eventArgument, ClientAPI.COLUMN_DELIMITER, -1, CompareMethod.Binary)
             Dim collection =  New MenuNodeCollection(("<root>" & strArray(0) & "</root>"), "", Me)
             Dim objA As MenuNode = collection(0)
             If Object.ReferenceEquals(objA, Nothing) Then
                 str = Nothing
+				Logger.LogDebug("RaiseClientAPICallbackEvent(eventArgument={EventArgument}): str → {Str}", eventArgument, str)
             Else
                 Dim populateOnDemandEvent As DNNMenuEventHandler = Me.PopulateOnDemandEvent
                 If Not Object.ReferenceEquals(populateOnDemandEvent, Nothing) Then
@@ -233,10 +277,12 @@ Namespace DotNetNuke.UI.WebControls
                 Dim node2 As MenuNode = Me.FindNode(objA.ID)
                 str = If(Object.ReferenceEquals(node2, Nothing), objA.MenuNodes.ToJSON, node2.MenuNodes.ToJSON)
             End If
+			Logger.LogDebug("<<< Exiting RaiseClientAPICallbackEvent(eventArgument={EventArgument})", eventArgument)
             Return str
         End Function
 
         Public Overridable Sub RaisePostBackEvent(ByVal eventArgument As String) Implements IPostBackEventHandler.RaisePostBackEvent
+			Logger.LogDebug(">>> Entering RaisePostBackEvent(eventArgument={EventArgument})", eventArgument)
             Dim strArray As String() = Strings.Split(eventArgument, ClientAPI.COLUMN_DELIMITER, -1, CompareMethod.Binary)
             Dim objA As MenuNode = Me.MenuNodes.FindNode(strArray(0))
             If Not Object.ReferenceEquals(objA, Nothing) Then
@@ -248,6 +294,7 @@ Namespace DotNetNuke.UI.WebControls
                         objA.Click
                     ElseIf (str = "Checked") Then
                         objA.Selected = Not objA.Selected
+						Logger.LogDebug("RaisePostBackEvent(eventArgument={EventArgument}): objA.Selected → {Arg1}", eventArgument, objA.Selected)
                     ElseIf (str = "OnDemand") Then
                         Dim populateOnDemandEvent As DNNMenuEventHandler = Me.PopulateOnDemandEvent
                         If Not Object.ReferenceEquals(populateOnDemandEvent, Nothing) Then
@@ -256,12 +303,15 @@ Namespace DotNetNuke.UI.WebControls
                     End If
                 End If
             End If
+			Logger.LogDebug("<<< Exiting RaisePostBackEvent(eventArgument={EventArgument})", eventArgument)
         End Sub
 
         Public Sub RaisePostDataChangedEvent() Implements IPostBackDataHandler.RaisePostDataChangedEvent
+		Logger.LogDebug(">>> Entering RaisePostDataChangedEvent()")
         End Sub
 
         Public Sub RegisterClientScript()
+			Logger.LogDebug(">>> Entering RegisterClientScript()")
             If Not Me.IsDownLevel Then
                 ClientAPI.RegisterClientReference(Me.Page, ClientAPI.ClientNamespaceReferences.dnn_dom)
                 ClientAPI.RegisterClientReference(Me.Page, ClientAPI.ClientNamespaceReferences.dnn_dom_positioning)
@@ -275,18 +325,23 @@ Namespace DotNetNuke.UI.WebControls
                 WebControls.RegisterClientScriptBlock(Me.Page, "dnn.controls.js", FileOrder.Js.DnnControlsLabelEdit)
                 WebControls.RegisterClientScriptBlock(Me.Page, "dnn.controls.dnnmenu.js")
             End If
+			Logger.LogDebug("<<< Exiting RegisterClientScript()")
         End Sub
 
         <Obsolete("RegisterDNNVariableControl on control level is now obsolete.  Use RegisterDNNVariableControl.WebControls")> _
         Public Sub RegisterDNNVariableControl()
+			Logger.LogDebug(">>> Entering RegisterDNNVariableControl()")
             ClientAPI.RegisterDNNVariableControl(Me)
+			Logger.LogDebug("<<< Exiting RegisterDNNVariableControl()")
         End Sub
 
         Protected Overrides Sub Render(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer)
             Dim enumerator As IEnumerator = Nothing
             Me.MenuWriter.RenderMenu(writer, Me)
             Try 
                 enumerator = Me.Controls.GetEnumerator
+				Logger.LogDebug("Render(writer={Writer}): enumerator → {Enumerator}", writer, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -304,20 +359,27 @@ Namespace DotNetNuke.UI.WebControls
                 Dim marshalledPropertyJSON As String = ScriptGenerator.GetMarshalledPropertyJSON(Me, properties)
                 BaseWebControl.RegisterInitialize(Me, "initMenu", marshalledPropertyJSON)
             End If
+			Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer)
         End Sub
 
         Protected Overrides Function SaveViewState() As Object
+			Logger.LogDebug(">>> Entering SaveViewState()")
+			Logger.LogDebug("<<< Exiting SaveViewState()")
             Return New Object() { MyBase.SaveViewState, DirectCast(Me.ImageList, IStateManager).SaveViewState }
         End Function
 
         Protected Overrides Sub TrackViewState()
+			Logger.LogDebug(">>> Entering TrackViewState()")
             MyBase.TrackViewState
+			Logger.LogDebug("<<< Exiting TrackViewState()")
         End Sub
 
         Private Sub UpdateNodes(ByVal objNodes As MenuNodeCollection)
+			Logger.LogDebug(">>> Entering UpdateNodes(objNodes={ObjNodes})", objNodes)
             Dim enumerator As IEnumerator = Nothing
             Try 
                 enumerator = objNodes.GetEnumerator
+				Logger.LogDebug("UpdateNodes(objNodes={ObjNodes}): enumerator → {Enumerator}", objNodes, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -326,6 +388,7 @@ Namespace DotNetNuke.UI.WebControls
                     If (Strings.Len(current.Image) > 0) Then
                         current.ImageIndex = If(Me.ImageList.Contains(New NodeImage(current.Image)), Me.ImageList.IndexOf(New NodeImage(current.Image)), Me.ImageList.Add(current.Image))
                         current.Image = Nothing
+						Logger.LogDebug("UpdateNodes(objNodes={ObjNodes}): current.Image → {Arg1}", objNodes, current.Image)
                     End If
                     If (current.DNNNodes.Count > 0) Then
                         Me.UpdateNodes(current.MenuNodes)
@@ -336,6 +399,7 @@ Namespace DotNetNuke.UI.WebControls
                     TryCast(enumerator,IDisposable).Dispose
                 End If
             End Try
+			Logger.LogDebug("<<< Exiting UpdateNodes(objNodes={ObjNodes})", objNodes)
         End Sub
 
 

@@ -14,6 +14,7 @@ namespace DotNetNuke.Tests.Utilities.Fakes
 
     public class FakeCachingProvider : CachingProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private Dictionary<string, object> _dictionary;
 
         public FakeCachingProvider(Dictionary<string, object> dictionary)
@@ -30,6 +31,8 @@ namespace DotNetNuke.Tests.Utilities.Fakes
 
         public override object GetItem(string cacheKey)
         {
+			Logger.LogDebug(">>> Entering GetItem(cacheKey={CacheKey})", cacheKey);
+			Logger.LogDebug("<<< Exiting GetItem(cacheKey={CacheKey})", cacheKey);
             return this._dictionary.ContainsKey(cacheKey) ? this._dictionary[cacheKey] : null;
         }
     }

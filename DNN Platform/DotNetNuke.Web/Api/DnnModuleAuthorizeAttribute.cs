@@ -13,10 +13,14 @@ namespace DotNetNuke.Web.Api
     /// <summary>Determines web API authorization based on module permissions.</summary>
     public class DnnModuleAuthorizeAttribute : AuthorizeAttributeBase, IOverrideDefaultAuthLevel
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="DnnModuleAuthorizeAttribute"/> class.</summary>
         public DnnModuleAuthorizeAttribute()
         {
+			Logger.LogDebug(">>> Entering DnnModuleAuthorizeAttribute()");
             this.AccessLevel = SecurityAccessLevel.Host;
+			Logger.LogDebug("<<< Exiting DnnModuleAuthorizeAttribute()");
+			Logger.LogDebug("DnnModuleAuthorizeAttribute(): this.AccessLevel → {Arg0}", this.AccessLevel);
         }
 
         /// <summary>Gets or sets a custom permission key to check for access.</summary>
@@ -28,13 +32,16 @@ namespace DotNetNuke.Web.Api
         /// <inheritdoc />
         public override bool IsAuthorized(AuthFilterContext context)
         {
+			Logger.LogDebug(">>> Entering IsAuthorized(context={Context})", context);
             var activeModule = this.FindModuleInfo(context.ActionContext.Request);
 
+			Logger.LogDebug("IsAuthorized(context={Context}): activeModule → {ActiveModule}", context, activeModule);
             if (activeModule != null)
             {
                 return ModulePermissionController.HasModuleAccess(this.AccessLevel, this.PermissionKey, activeModule);
             }
 
+			Logger.LogDebug("<<< Exiting IsAuthorized(context={Context})", context);
             return false;
         }
 
@@ -43,6 +50,8 @@ namespace DotNetNuke.Web.Api
         /// <returns>A <see cref="ModuleInfo"/> instance or <see langword="null"/>.</returns>
         protected virtual ModuleInfo FindModuleInfo(HttpRequestMessage request)
         {
+			Logger.LogDebug(">>> Entering FindModuleInfo(request={Request})", request);
+			Logger.LogDebug("<<< Exiting FindModuleInfo(request={Request})", request);
             return request.FindModuleInfo();
         }
     }

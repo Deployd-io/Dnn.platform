@@ -10,17 +10,22 @@ namespace Dnn.PersonaBar.Prompt.Common
 
     internal class PortalHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         internal static bool IsRequestForSiteGroup(int portalId, int portalIdSiteGroup)
         {
+			Logger.LogDebug(">>> Entering IsRequestForSiteGroup(portalId={PortalId},portalIdSiteGroup={PortalIdSiteGroup})", portalId, portalIdSiteGroup);
             const int NO_SITE_GROUPID = -1;
             var isSiteGroupPage = false;
             var portal = PortalController.Instance.GetPortal(portalIdSiteGroup);
+			Logger.LogDebug("IsRequestForSiteGroup(portalId={PortalId},portalIdSiteGroup={PortalIdSiteGroup}): isSiteGroupPage → {IsSiteGroupPage}", portalId, portalIdSiteGroup, isSiteGroupPage);
+			Logger.LogDebug("IsRequestForSiteGroup(portalId={PortalId},portalIdSiteGroup={PortalIdSiteGroup}): portal → {Portal}", portalId, portalIdSiteGroup, portal);
 
             if (portal.PortalGroupID != NO_SITE_GROUPID)
             {
                 isSiteGroupPage = PortalGroupController.Instance.GetPortalsByGroup(portal.PortalGroupID).Any(p => p.PortalID == portalId);
             }
 
+			Logger.LogDebug("<<< Exiting IsRequestForSiteGroup(portalId={PortalId},portalIdSiteGroup={PortalIdSiteGroup})", portalId, portalIdSiteGroup);
             return isSiteGroupPage;
         }
     }

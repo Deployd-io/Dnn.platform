@@ -17,10 +17,13 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
     [Obsolete("Deprecated in DotNetNuke 10.3.0. Please use TextBox with TextMode=TextBoxMode.DateTimeLocal. Scheduled removal in v12.0.0.")]
     public class DnnDateTimePicker : DnnDatePicker
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="DnnDateTimePicker"/> class.</summary>
         public DnnDateTimePicker()
             : this(null, null, null)
         {
+		Logger.LogDebug(">>> Entering DnnDateTimePicker()");
+		Logger.LogDebug("<<< Exiting DnnDateTimePicker()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnDateTimePicker"/> class.</summary>

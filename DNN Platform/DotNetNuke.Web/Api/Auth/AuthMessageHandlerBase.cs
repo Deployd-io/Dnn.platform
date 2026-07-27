@@ -24,8 +24,12 @@ namespace DotNetNuke.Web.Api.Auth
         /// <param name="forceSsl">A value indicating whether this handler should enforce SSL usage.</param>
         protected AuthMessageHandlerBase(bool includeByDefault, bool forceSsl)
         {
+			Logger.LogDebug(">>> Entering AuthMessageHandlerBase(includeByDefault={IncludeByDefault},forceSsl={ForceSsl})", includeByDefault, forceSsl);
             this.DefaultInclude = includeByDefault;
             this.ForceSsl = forceSsl;
+			Logger.LogDebug("<<< Exiting AuthMessageHandlerBase(includeByDefault={IncludeByDefault},forceSsl={ForceSsl})", includeByDefault, forceSsl);
+			Logger.LogDebug("AuthMessageHandlerBase(includeByDefault={IncludeByDefault},forceSsl={ForceSsl}): this.DefaultInclude → {Arg2}", includeByDefault, forceSsl, this.DefaultInclude);
+			Logger.LogDebug("AuthMessageHandlerBase(includeByDefault={IncludeByDefault},forceSsl={ForceSsl}): this.ForceSsl → {Arg2}", includeByDefault, forceSsl, this.ForceSsl);
         }
 
         /// <summary>Gets the name of the authentication scheme.</summary>
@@ -46,6 +50,8 @@ namespace DotNetNuke.Web.Api.Auth
         /// <returns>null normally, if a response is returned all inbound processing is terminated and the resposne is returned.</returns>
         public virtual HttpResponseMessage OnInboundRequest(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+			Logger.LogDebug(">>> Entering OnInboundRequest(request={Request},cancellationToken={CancellationToken})", request, cancellationToken);
+			Logger.LogDebug("<<< Exiting OnInboundRequest(request={Request},cancellationToken={CancellationToken})", request, cancellationToken);
             return null;
         }
 
@@ -63,13 +69,16 @@ namespace DotNetNuke.Web.Api.Auth
         /// <returns>A value indicating whether the request is an XmlHttpRequest.</returns>
         protected static bool IsXmlHttpRequest(HttpRequestMessage request)
         {
+			Logger.LogDebug(">>> Entering IsXmlHttpRequest(request={Request})", request);
             string value = null;
             IEnumerable<string> values;
+			Logger.LogDebug("IsXmlHttpRequest(request={Request}): value → {Value}", request, value);
             if (request != null && request.Headers.TryGetValues("X-REQUESTED-WITH", out values))
             {
                 value = values.FirstOrDefault();
             }
 
+			Logger.LogDebug("<<< Exiting IsXmlHttpRequest(request={Request})", request);
             return !string.IsNullOrEmpty(value) &&
                    value.Equals("XmlHttpRequest", StringComparison.OrdinalIgnoreCase);
         }
@@ -79,8 +88,11 @@ namespace DotNetNuke.Web.Api.Auth
         /// <param name="request">The current request.</param>
         protected static void SetCurrentPrincipal(IPrincipal principal, HttpRequestMessage request)
         {
+			Logger.LogDebug(">>> Entering SetCurrentPrincipal(principal={Principal},request={Request})", principal, request);
             Thread.CurrentPrincipal = principal;
             request.GetHttpContext().User = principal;
+			Logger.LogDebug("<<< Exiting SetCurrentPrincipal(principal={Principal},request={Request})", principal, request);
+			Logger.LogDebug("SetCurrentPrincipal(principal={Principal},request={Request}): Thread.CurrentPrincipal → {Arg2}", principal, request, Thread.CurrentPrincipal);
         }
 
         /// <summary>Asynchronously sends a response.</summary>
@@ -89,13 +101,18 @@ namespace DotNetNuke.Web.Api.Auth
         /// <returns>An HttpResponseMessage Task.</returns>
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+			Logger.LogDebug(">>> Entering SendAsync(request={Request},cancellationToken={CancellationToken})", request, cancellationToken);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var response = this.OnInboundRequest(request, cancellationToken);
             if (response != null)
+			Logger.LogDebug("SendAsync(request={Request},cancellationToken={CancellationToken}): response → {Response}", request, cancellationToken, response);
             {
                 response.RequestMessage = response.RequestMessage ?? request; // if someone returns new HttpResponseMessage(), fill in the requestMessage for other handlers in the chain
                 return Task<HttpResponseMessage>.Factory.StartNew(() => response, cancellationToken);
             }
 
+			Logger.LogInformation("SendAsync(request,cancellationToken)={Request},{CancellationToken}: external service call took {Arg2} ms", request, cancellationToken, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting SendAsync(request={Request},cancellationToken={CancellationToken})", request, cancellationToken);
             return base.SendAsync(request, cancellationToken).ContinueWith(x => this.OnOutboundResponse(x.Result, cancellationToken), cancellationToken);
         }
 
@@ -104,6 +121,7 @@ namespace DotNetNuke.Web.Api.Auth
         /// <returns>A value indication whether the current request needs authentication.</returns>
         protected bool NeedsAuthentication(HttpRequestMessage request)
         {
+			Logger.LogDebug(">>> Entering NeedsAuthentication(request={Request})", request);
             if (this.MustEnforceSslInRequest(request))
             {
                 return !Thread.CurrentPrincipal.Identity.IsAuthenticated;
@@ -115,6 +133,7 @@ namespace DotNetNuke.Web.Api.Auth
             }
 
             // will let callers to return without authenticating the user
+			Logger.LogDebug("<<< Exiting NeedsAuthentication(request={Request})", request);
             return false;
         }
 
@@ -122,6 +141,8 @@ namespace DotNetNuke.Web.Api.Auth
         /// <returns>True if <see cref="ForceSsl"/> matcher the request scheme; false otherwise.</returns>
         private bool MustEnforceSslInRequest(HttpRequestMessage request)
         {
+			Logger.LogDebug(">>> Entering MustEnforceSslInRequest(request={Request})", request);
+			Logger.LogDebug("<<< Exiting MustEnforceSslInRequest(request={Request})", request);
             return !this.ForceSsl || request.RequestUri.Scheme.Equals("HTTPS", StringComparison.OrdinalIgnoreCase);
         }
     }

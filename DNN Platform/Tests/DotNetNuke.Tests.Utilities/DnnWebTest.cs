@@ -36,6 +36,7 @@ using RoleProvider = DotNetNuke.Security.Roles.RoleProvider;
 
 public class DnnWebTest : DnnUnitTest
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     private static bool alreadyLoaded;
 
     public int PortalId { get; private set; }
@@ -43,37 +44,47 @@ public class DnnWebTest : DnnUnitTest
     /// <inheritdoc />
     public override void OneTimeSetUp()
     {
+		Logger.LogDebug(">>> Entering OneTimeSetUp()");
         base.OneTimeSetUp();
 
         var simulator = new Instance.Utilities.HttpSimulator.HttpSimulator("/", this.WebsitePhysicalAppPath);
         simulator.SimulateRequest(new Uri(this.WebsiteAppPath));
+		Logger.LogDebug("OneTimeSetUp(): simulator → {Simulator}", simulator);
 
         SetupContainer();
         InstallComponents();
 
         HttpContextBase httpContextBase = new HttpContextWrapper(HttpContext.Current);
         HttpContextSource.RegisterInstance(httpContextBase);
+		Logger.LogDebug("OneTimeSetUp(): httpContextBase → {HttpContextBase}", httpContextBase);
 
         LoadDnnProviders("data", "logging", "caching", "authentication", "members", "roles", "profiles", "permissions", "folder", "clientcapability");
 
         // fix membership
         var providerProp = typeof(Membership).GetField("s_Provider", BindingFlags.Static | BindingFlags.NonPublic);
         providerProp.SetValue(null, Membership.Providers["AspNetSqlMembershipProvider"]);
+		Logger.LogDebug("OneTimeSetUp(): providerProp → {ProviderProp}", providerProp);
 
         var objPortalAliasInfo = new Entities.Portals.PortalAliasInfo { PortalID = Constants.PORTAL_Zero, };
         var ps = new Entities.Portals.PortalSettings(59, objPortalAliasInfo);
         httpContextBase.Items.Add("PortalSettings", ps);
+		Logger.LogDebug("OneTimeSetUp(): ps → {Ps}", ps);
 
         this.PortalId = Constants.PORTAL_Zero;
+		Logger.LogDebug("<<< Exiting OneTimeSetUp()");
+		Logger.LogDebug("OneTimeSetUp(): this.PortalId → {Arg0}", this.PortalId);
     }
 
     private static void SetupContainer()
     {
+		Logger.LogDebug(">>> Entering SetupContainer()");
         Globals.DependencyProvider = DependencyInjectionInitialize.BuildServiceProvider();
+		Logger.LogDebug("<<< Exiting SetupContainer()");
     }
 
     private static void InstallComponents()
     {
+		Logger.LogDebug(">>> Entering InstallComponents()");
         Globals.ServerName = string.IsNullOrEmpty(Config.GetSetting("ServerName"))
             ? Dns.GetHostName()
             : Config.GetSetting("ServerName");
@@ -102,11 +113,13 @@ public class DnnWebTest : DnnUnitTest
         ComponentFactory.InstallComponents(new ProviderInstaller("htmlEditor", typeof(HtmlEditorProvider), ComponentLifeStyleType.Transient));
         ComponentFactory.InstallComponents(new ProviderInstaller("navigationControl", typeof(NavigationProvider), ComponentLifeStyleType.Transient));
         ComponentFactory.InstallComponents(new ProviderInstaller("clientcapability", typeof(ClientCapabilityProvider)));
+		Logger.LogDebug("<<< Exiting InstallComponents()");
     }
 
     private static void RegisterIfNotAlreadyRegistered<TConcrete>()
         where TConcrete : class, new()
     {
+		Logger.LogDebug(">>> Entering RegisterIfNotAlreadyRegistered()");
         RegisterIfNotAlreadyRegistered<TConcrete, TConcrete>(string.Empty);
     }
 
@@ -115,7 +128,9 @@ public class DnnWebTest : DnnUnitTest
         where TConcrete : class, new()
     {
         var provider = ComponentFactory.GetComponent<TAbstract>();
+		Logger.LogDebug("<<< Exiting RegisterIfNotAlreadyRegistered()");
         if (provider == null)
+		Logger.LogDebug("RegisterIfNotAlreadyRegistered(name={Name}): provider → {Provider}", name, provider);
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -134,12 +149,14 @@ public class DnnWebTest : DnnUnitTest
     /// </summary>
     private static void LoadDnnProviders(params string[] providers)
     {
+		Logger.LogDebug(">>> Entering LoadDnnProviders(providers={Providers})", providers);
         if (alreadyLoaded)
         {
             return;
         }
 
         alreadyLoaded = true;
+		Logger.LogDebug("LoadDnnProviders(providers={Providers}): alreadyLoaded → {AlreadyLoaded}", providers, alreadyLoaded);
         foreach (var provider in providers)
         {
             if (provider.Length <= 0)
@@ -149,6 +166,7 @@ public class DnnWebTest : DnnUnitTest
 
             var config = DotNetNuke.Framework.Providers.ProviderConfiguration.GetProviderConfiguration(provider);
             if (config == null)
+			Logger.LogDebug("LoadDnnProviders(providers={Providers}): config → {Config}", providers, config);
             {
                 continue;
             }
@@ -157,6 +175,8 @@ public class DnnWebTest : DnnUnitTest
             {
                 var providerValue = (DotNetNuke.Framework.Providers.Provider)config.Providers[providerName];
                 var type = providerValue.Type;
+				Logger.LogDebug("LoadDnnProviders(providers={Providers}): providerValue → {ProviderValue}", providers, providerValue);
+				Logger.LogDebug("LoadDnnProviders(providers={Providers}): type → {Type}", providers, type);
 
                 if (type.Contains(", ")) // get the straight typename, no assembly, for the cache key
                 {
@@ -168,5 +188,6 @@ public class DnnWebTest : DnnUnitTest
                 DotNetNuke.Framework.Reflection.CreateType(providerValue.Type, cacheKey, true, false);
             }
         }
+		Logger.LogDebug("<<< Exiting LoadDnnProviders(providers={Providers})", providers);
     }
 }
