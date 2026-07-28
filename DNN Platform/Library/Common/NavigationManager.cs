@@ -19,6 +19,7 @@ namespace DotNetNuke.Common
     /// <summary>The default <see cref="INavigationManager"/> implementation.</summary>
     internal class NavigationManager : INavigationManager
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IPortalController portalController;
         private readonly IHostSettings hostSettings;
 
@@ -27,7 +28,9 @@ namespace DotNetNuke.Common
         public NavigationManager(IPortalController portalController)
             : this(portalController, null)
         {
+		Logger.LogDebug(">>> Entering NavigationManager(portalController={PortalController})", portalController);
         }
+		Logger.LogDebug("<<< Exiting NavigationManager(portalController={PortalController})", portalController);
 
         /// <summary>Initializes a new instance of the <see cref="NavigationManager"/> class.</summary>
         /// <param name="portalController">An <see cref="IPortalController"/> instance.</param>
@@ -36,12 +39,17 @@ namespace DotNetNuke.Common
         {
             this.portalController = portalController;
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("NavigationManager(portalController={PortalController},hostSettings={HostSettings}): this.portalController → {Arg2}", portalController, hostSettings, this.portalController);
+			Logger.LogDebug("NavigationManager(portalController={PortalController},hostSettings={HostSettings}): hostSettings → {HostSettings1}", portalController, hostSettings, hostSettings);
+			Logger.LogDebug("NavigationManager(portalController={PortalController},hostSettings={HostSettings}): portalController → {PortalController1}", portalController, hostSettings, portalController);
         }
 
         /// <summary>Gets the URL to the current page.</summary>
         /// <returns>Formatted URL.</returns>
         public string NavigateURL()
         {
+			Logger.LogDebug(">>> Entering NavigateURL()");
+			Logger.LogDebug("<<< Exiting NavigateURL()");
             return this.NavigateURL(TabController.CurrentPage.TabID, Null.NullString);
         }
 
@@ -50,6 +58,7 @@ namespace DotNetNuke.Common
         /// <returns>Formatted URL.</returns>
         public string NavigateURL(int tabID)
         {
+			Logger.LogDebug("<<< Exiting NavigateURL(tabID={TabID})", tabID);
             return this.NavigateURL(tabID, Null.NullString);
         }
 
@@ -74,6 +83,7 @@ namespace DotNetNuke.Common
                 return Globals.AccessDeniedURL();
             }
 
+			Logger.LogDebug("<<< Exiting NavigateURL(controlKey={ControlKey})", controlKey);
             return this.NavigateURL(TabController.CurrentPage.TabID, controlKey);
         }
 
@@ -83,6 +93,7 @@ namespace DotNetNuke.Common
         /// <returns>Formatted URL.</returns>
         public string NavigateURL(string controlKey, params string[] additionalParameters)
         {
+			Logger.LogDebug("<<< Exiting NavigateURL(controlKey={ControlKey},additionalParameters={AdditionalParameters})", controlKey, additionalParameters);
             return this.NavigateURL(TabController.CurrentPage?.TabID ?? -1, controlKey, additionalParameters);
         }
 
@@ -92,6 +103,7 @@ namespace DotNetNuke.Common
         /// <returns>Formatted URL.</returns>
         public string NavigateURL(int tabID, string controlKey)
         {
+			Logger.LogDebug("<<< Exiting NavigateURL(tabID={TabID},controlKey={ControlKey})", tabID, controlKey);
             return this.NavigateURL(tabID, this.portalController.GetCurrentSettings(), controlKey, null);
         }
 
@@ -102,6 +114,7 @@ namespace DotNetNuke.Common
         /// <returns>Formatted URL.</returns>
         public string NavigateURL(int tabID, string controlKey, params string[] additionalParameters)
         {
+			Logger.LogDebug("<<< Exiting NavigateURL(tabID={TabID},controlKey={ControlKey},additionalParameters={AdditionalParameters})", tabID, controlKey, additionalParameters);
             return this.NavigateURL(tabID, this.portalController.GetCurrentSettings(), controlKey, additionalParameters);
         }
 
@@ -114,6 +127,8 @@ namespace DotNetNuke.Common
         public string NavigateURL(int tabID, IPortalSettings settings, string controlKey, params string[] additionalParameters)
         {
             var isSuperTab = Globals.IsHostTab(tabID);
+			Logger.LogDebug("NavigateURL(tabID={TabID},settings={Settings},controlKey={ControlKey},additionalParameters={AdditionalParameters}): isSuperTab → {IsSuperTab}", tabID, settings, controlKey, additionalParameters, isSuperTab);
+			Logger.LogDebug("<<< Exiting NavigateURL(tabID={TabID},settings={Settings},controlKey={ControlKey},additionalParameters={AdditionalParameters})", tabID, settings, controlKey, additionalParameters);
             return this.NavigateURL(tabID, isSuperTab, settings, controlKey, additionalParameters);
         }
 

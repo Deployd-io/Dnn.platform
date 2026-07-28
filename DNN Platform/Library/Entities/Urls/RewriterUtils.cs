@@ -13,11 +13,15 @@ namespace DotNetNuke.Entities.Urls
 
     public class RewriterUtils
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         internal static void RewriteUrl(HttpContext context, string sendToUrl)
         {
+			Logger.LogDebug(">>> Entering RewriteUrl(context={Context},sendToUrl={SendToUrl})", context, sendToUrl);
             // first strip the querystring, if any
             var queryString = string.Empty;
             string sendToUrlLessQString = sendToUrl;
+			Logger.LogDebug("RewriteUrl(context={Context},sendToUrl={SendToUrl}): queryString → {QueryString}", context, sendToUrl, queryString);
+			Logger.LogDebug("RewriteUrl(context={Context},sendToUrl={SendToUrl}): sendToUrlLessQString → {SendToUrlLessQString}", context, sendToUrl, sendToUrlLessQString);
             if (sendToUrl.IndexOf("?", StringComparison.Ordinal) > 0)
             {
                 sendToUrlLessQString = sendToUrl.Substring(0, sendToUrl.IndexOf("?", StringComparison.Ordinal));
@@ -27,11 +31,13 @@ namespace DotNetNuke.Entities.Urls
                 var parameters = new List<string>();
                 foreach (var parameter in queryString.Split('&'))
                 {
+				Logger.LogDebug("RewriteUrl(context={Context},sendToUrl={SendToUrl}): parameters → {Parameters}", context, sendToUrl, parameters);
                     var i = parameter.IndexOf('=');
                     if (i >= 0)
                     {
                         var value = HttpUtility.UrlEncode(HttpUtility.UrlDecode(parameter.Substring(i + 1)));
                         parameters.Add(parameter.Substring(0, i) + "=" + value);
+						Logger.LogDebug("RewriteUrl(context={Context},sendToUrl={SendToUrl}): value → {Value}", context, sendToUrl, value);
                     }
                     else
                     {
@@ -48,10 +54,12 @@ namespace DotNetNuke.Entities.Urls
             // NOTE!  The above RewritePath() overload is only supported in the .NET Framework 1.1
             // If you are using .NET Framework 1.0, use the below form instead:
             // context.RewritePath(sendToUrl);
+			Logger.LogDebug("<<< Exiting RewriteUrl(context={Context},sendToUrl={SendToUrl})", context, sendToUrl);
         }
 
         internal static string ResolveUrl(string appPath, string url)
         {
+			Logger.LogDebug(">>> Entering ResolveUrl(appPath={AppPath},url={Url})", appPath, url);
             // String is Empty, just return Url
             if (string.IsNullOrEmpty(url))
             {
@@ -72,6 +80,7 @@ namespace DotNetNuke.Entities.Urls
 
             var separatorChar = url.ToCharArray()[1];
             if (separatorChar is '/' or '\\')
+			Logger.LogDebug("ResolveUrl(appPath={AppPath},url={Url}): separatorChar → {SeparatorChar}", appPath, url, separatorChar);
             {
                 // Url looks like ~/ or ~\
                 if (appPath.Length > 1)
@@ -88,13 +97,16 @@ namespace DotNetNuke.Entities.Urls
                 return appPath + "/" + url.Substring(1);
             }
 
+			Logger.LogDebug("<<< Exiting ResolveUrl(appPath={AppPath},url={Url})", appPath, url);
             return appPath + url.Substring(1);
         }
 
         internal static bool OmitFromRewriteProcessing(string localPath)
         {
+			Logger.LogDebug(">>> Entering OmitFromRewriteProcessing(localPath={LocalPath})", localPath);
             var omitSettings = string.Empty;
             if (Globals.Status == Globals.UpgradeStatus.None)
+			Logger.LogDebug("OmitFromRewriteProcessing(localPath={LocalPath}): omitSettings → {OmitSettings}", localPath, omitSettings);
             {
                 omitSettings = HostController.Instance.GetString("OmitFromRewriteProcessing");
             }
@@ -106,15 +118,19 @@ namespace DotNetNuke.Entities.Urls
 
             omitSettings = omitSettings.ToLowerInvariant();
             localPath = localPath.ToLowerInvariant();
+			Logger.LogDebug("OmitFromRewriteProcessing(localPath={LocalPath}): localPath → {LocalPath1}", localPath, localPath);
 
             var omissions = omitSettings.Split('|');
 
+			Logger.LogDebug("OmitFromRewriteProcessing(localPath={LocalPath}): omissions → {Omissions}", localPath, omissions);
             bool shouldOmit = omissions.Any(x => localPath.EndsWith(x, StringComparison.OrdinalIgnoreCase));
             if (!shouldOmit)
+			Logger.LogDebug("OmitFromRewriteProcessing(localPath={LocalPath}): shouldOmit → {ShouldOmit}", localPath, shouldOmit);
             {
                 shouldOmit = Globals.ServicesFrameworkRegex.IsMatch(localPath);
             }
 
+			Logger.LogDebug("<<< Exiting OmitFromRewriteProcessing(localPath={LocalPath})", localPath);
             return shouldOmit;
         }
     }

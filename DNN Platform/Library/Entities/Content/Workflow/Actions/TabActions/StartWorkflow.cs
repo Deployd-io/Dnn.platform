@@ -13,22 +13,29 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
     /// </summary>
     internal class StartWorkflow : TabActionBase, IWorkflowAction
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public void DoActionOnStateChanging(StateTransaction stateTransaction)
         {
+			Logger.LogDebug(">>> Entering DoActionOnStateChanging(stateTransaction={StateTransaction})", stateTransaction);
             // nothing
+			Logger.LogDebug("<<< Exiting DoActionOnStateChanging(stateTransaction={StateTransaction})", stateTransaction);
         }
 
         /// <inheritdoc />
         public void DoActionOnStateChanged(StateTransaction stateTransaction)
             => RemoveCache(stateTransaction);
+			Logger.LogDebug(">>> Entering DoActionOnStateChanged(stateTransaction={StateTransaction})", stateTransaction);
 
+		Logger.LogDebug("<<< Exiting DoActionOnStateChanged(stateTransaction={StateTransaction})", stateTransaction);
         /// <inheritdoc />
         public ActionMessage GetActionMessage(StateTransaction stateTransaction, WorkflowState currentState)
             => new ActionMessage()
             {
+				Logger.LogDebug(">>> Entering GetActionMessage(stateTransaction={StateTransaction},currentState={CurrentState})", stateTransaction, currentState);
                 Subject = GetString($"{nameof(StartWorkflow)}{nameof(ActionMessage.Subject)}", "Page Submitted"),
                 Body = GetString($"{nameof(StartWorkflow)}{nameof(ActionMessage.Body)}", "Page '{0}' is in the '{1}' state and waiting to be submitted.", GetTab(stateTransaction.ContentItemId).LocalizedTabName, currentState.StateName),
             };
+				Logger.LogDebug("<<< Exiting GetActionMessage(stateTransaction={StateTransaction},currentState={CurrentState})", stateTransaction, currentState);
     }
 }

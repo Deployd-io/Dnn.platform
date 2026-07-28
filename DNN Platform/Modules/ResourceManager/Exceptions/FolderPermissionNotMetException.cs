@@ -8,11 +8,14 @@ namespace Dnn.Modules.ResourceManager.Exceptions
     /// <summary>Exception thrown when a folder permission is not met.</summary>
     public class FolderPermissionNotMetException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="FolderPermissionNotMetException"/> class.</summary>
         /// <param name="message">The exception message.</param>
         public FolderPermissionNotMetException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering FolderPermissionNotMetException(message={Message})", message);
+		Logger.LogDebug("<<< Exiting FolderPermissionNotMetException(message={Message})", message);
         }
     }
 }

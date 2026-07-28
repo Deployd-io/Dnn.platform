@@ -25,6 +25,7 @@ namespace DotNetNuke.Modules.Groups.Controls
     [ToolboxData("<{0}:GroupListControl runat=server></{0}:GroupListControl>")]
     public class GroupListControl : WebControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1307:AccessibleFieldsMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
 
@@ -87,13 +88,17 @@ namespace DotNetNuke.Modules.Groups.Controls
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
             this.currentUser = UserController.Instance.GetCurrentUserInfo();
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
+			Logger.LogDebug("OnInit(e={E}): currentUser → {CurrentUser}", e, currentUser);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter output)
         {
+			Logger.LogDebug(">>> Entering Render(output={Output})", output);
             var whereCls = new List<Func<RoleInfo, bool>>
             {
                 grp => grp.SecurityMode != SecurityMode.SecurityRole && grp.Status == RoleStatus.Approved,
@@ -120,6 +125,7 @@ namespace DotNetNuke.Modules.Groups.Controls
 
             var roles = RoleController.Instance.GetRoles(this.PortalSettings.PortalId, grp => TestPredicateGroup(whereCls, grp));
 
+			Logger.LogDebug("Render(output={Output}): roles → {Roles}", output, roles);
             if (this.SortDirection.ToLowerInvariant() == "asc")
             {
                 roles = roles.OrderBy(info => GetOrderByProperty(info, this.SortField)).ToList();
@@ -127,6 +133,8 @@ namespace DotNetNuke.Modules.Groups.Controls
             else
             {
                 roles = roles.OrderByDescending(info => GetOrderByProperty(info, this.SortField)).ToList();
+				Logger.LogDebug(">>> Entering GetOrderByProperty(obj={Obj},property={Property})", obj, property);
+				Logger.LogDebug("<<< Exiting GetOrderByProperty(obj={Obj},property={Property})", obj, property);
             }
 
             decimal pages = (decimal)roles.Count / (decimal)this.PageSize;
@@ -152,10 +160,13 @@ namespace DotNetNuke.Modules.Groups.Controls
             {
                 this.CurrentIndex = Convert.ToInt32(HttpContext.Current.Request.QueryString["page"].ToString());
                 this.CurrentIndex = this.CurrentIndex - 1;
+				Logger.LogDebug("Render(output={Output}): this.CurrentIndex → {Arg1}", output, this.CurrentIndex);
             }
 
             int rowItem = 0;
             int recordStart = this.CurrentIndex * this.PageSize;
+			Logger.LogDebug("Render(output={Output}): rowItem → {RowItem}", output, rowItem);
+			Logger.LogDebug("Render(output={Output}): recordStart → {RecordStart}", output, recordStart);
 
             if (this.CurrentIndex == 0)
             {
@@ -180,6 +191,7 @@ namespace DotNetNuke.Modules.Groups.Controls
 
                 var groupParser = new GroupViewParser(this.PortalSettings, role, this.currentUser, rowTemplate, this.GroupViewTabId);
                 output.Write(groupParser.ParseView());
+				Logger.LogDebug("Render(output={Output}): groupParser → {GroupParser}", output, groupParser);
 
                 rowItem += 1;
 
@@ -199,6 +211,7 @@ namespace DotNetNuke.Modules.Groups.Controls
 
             int totalPages = Convert.ToInt32(System.Math.Ceiling(pages));
 
+			Logger.LogDebug("Render(output={Output}): totalPages → {TotalPages}", output, totalPages);
             if (totalPages == 0)
             {
                 totalPages = 1;
@@ -209,6 +222,7 @@ namespace DotNetNuke.Modules.Groups.Controls
 
             StringBuilder sb = new StringBuilder();
 
+			Logger.LogDebug("Render(output={Output}): sb → {Sb}", output, sb);
             if (totalPages > 1)
             {
                 for (int x = 1; x <= totalPages; x++)
@@ -232,6 +246,7 @@ namespace DotNetNuke.Modules.Groups.Controls
 
                     string cssClass = "pagerItem";
 
+					Logger.LogDebug("Render(output={Output}): cssClass → {CssClass}", output, cssClass);
                     if (x - 1 == this.CurrentIndex)
                     {
                         cssClass = "pagerItemSelected";
@@ -244,6 +259,7 @@ namespace DotNetNuke.Modules.Groups.Controls
             output.Write("<div class=\"dnnClear groupPager\">");
             output.Write(sb.ToString());
             output.Write("</div>");
+			Logger.LogDebug("<<< Exiting Render(output={Output})", output);
         }
 
         private static bool TestPredicateGroup(IEnumerable<Func<RoleInfo, bool>> predicates, RoleInfo ri)
@@ -253,7 +269,10 @@ namespace DotNetNuke.Modules.Groups.Controls
 
         private static object GetOrderByProperty(object obj, string property)
         {
+			Logger.LogDebug(">>> Entering GetOrderByProperty(obj={Obj},property={Property})", obj, property);
             var propertyInfo = obj.GetType().GetProperty(property, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+			Logger.LogDebug("GetOrderByProperty(obj={Obj},property={Property}): propertyInfo → {PropertyInfo}", obj, property, propertyInfo);
+			Logger.LogDebug("<<< Exiting GetOrderByProperty(obj={Obj},property={Property})", obj, property);
             return propertyInfo == null ? null : propertyInfo.GetValue(obj, null);
         }
     }

@@ -11,6 +11,7 @@ namespace DotNetNuke.Services.Installer.Dependencies
     /// <summary>The CoreVersionDependency determines whether the CoreVersion is correct.</summary>
     public class CoreVersionDependency : DependencyBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private Version minVersion;
 
         /// <inheritdoc />
@@ -34,7 +35,10 @@ namespace DotNetNuke.Services.Installer.Dependencies
         /// <inheritdoc />
         public override void ReadManifest(XPathNavigator dependencyNav)
         {
+			Logger.LogDebug(">>> Entering ReadManifest(dependencyNav={DependencyNav})", dependencyNav);
             this.minVersion = new Version(dependencyNav.Value);
+			Logger.LogDebug("<<< Exiting ReadManifest(dependencyNav={DependencyNav})", dependencyNav);
+			Logger.LogDebug("ReadManifest(dependencyNav={DependencyNav}): minVersion → {MinVersion}", dependencyNav, minVersion);
         }
     }
 }

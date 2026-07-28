@@ -35,6 +35,7 @@ namespace DotNetNuke.Services.Search.Internals
     internal class SearchHelperImpl(IHostSettings hostSettings, IHostSettingsService hostSettingsService, IPortalController portalController, IApplicationStatusInfo appStatus)
         : ISearchHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string SearchTypesCacheKey = "SearchTypes";
         private const string SynonymTermsCacheKey = "SynonymTerms";
         private const string SynonymGroupsCacheKey = "SynonymsGroups";
@@ -48,17 +49,23 @@ namespace DotNetNuke.Services.Search.Internals
         private readonly IPortalController portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
         private readonly IApplicationStatusInfo appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
 
+		Logger.LogDebug("SearchHelperImpl(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},appStatus={AppStatus}): appStatus → {AppStatus1}", hostSettings, hostSettingsService, portalController, appStatus, appStatus);
         /// <summary>Initializes a new instance of the <see cref="SearchHelperImpl"/> class.</summary>
+		Logger.LogDebug("<<< Exiting SearchHelperImpl(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},appStatus={AppStatus})", hostSettings, hostSettingsService, portalController, appStatus);
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public SearchHelperImpl()
             : this(null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering SearchHelperImpl()");
         }
 
         /// <inheritdoc />
         public IEnumerable<SearchType> GetSearchTypes()
         {
+			Logger.LogDebug(">>> Entering GetSearchTypes()");
             var cacheArg = new CacheItemArgs(SearchTypesCacheKey, 120, CacheItemPriority.Default);
+			Logger.LogDebug("GetSearchTypes(): cacheArg → {CacheArg}", cacheArg);
+			Logger.LogDebug("<<< Exiting GetSearchTypes()");
             return CBO.GetCachedObject<IList<SearchType>>(
                 this.hostSettings,
                 cacheArg,
@@ -68,6 +75,8 @@ namespace DotNetNuke.Services.Search.Internals
         /// <inheritdoc />
         public SearchType GetSearchTypeByName(string searchTypeName)
         {
+			Logger.LogDebug(">>> Entering GetSearchTypeByName(searchTypeName={SearchTypeName})", searchTypeName);
+			Logger.LogDebug("<<< Exiting GetSearchTypeByName(searchTypeName={SearchTypeName})", searchTypeName);
             return this.GetSearchTypes().Single(t => t.SearchTypeName == searchTypeName);
         }
 
@@ -193,6 +202,7 @@ namespace DotNetNuke.Services.Search.Internals
 
             cacheKey = string.Format(CultureInfo.InvariantCulture, CacheKeyFormat, SynonymTermsCacheKey, portalId, cultureCode);
             DataCache.ClearCache(cacheKey);
+			Logger.LogDebug("<<< Exiting DeleteSynonymsGroup(synonymsGroupId={SynonymsGroupId},portalId={PortalId},cultureCode={CultureCode})", synonymsGroupId, portalId, cultureCode);
         }
 
         /// <inheritdoc />
@@ -282,6 +292,7 @@ namespace DotNetNuke.Services.Search.Internals
             DataProvider.Instance().DeleteSearchStopWords(stopWordsId);
             var cacheKey = string.Format(CultureInfo.InvariantCulture, CacheKeyFormat, SearchStopWordsCacheKey, portalId, cultureCode);
             DataCache.ClearCache(cacheKey);
+			Logger.LogDebug("<<< Exiting DeleteSearchStopWords(stopWordsId={StopWordsId},portalId={PortalId},cultureCode={CultureCode})", stopWordsId, portalId, cultureCode);
         }
 
         /// <inheritdoc />
@@ -324,6 +335,8 @@ namespace DotNetNuke.Services.Search.Internals
         /// <inheritdoc />
         public bool GetSearchCompactFlag()
         {
+			Logger.LogDebug(">>> Entering GetSearchCompactFlag()");
+			Logger.LogDebug("<<< Exiting GetSearchCompactFlag()");
             return this.hostSettingsService.GetString(Constants.SearchOptimizeFlagName, Null.NullString) == "1";
         }
 
@@ -345,9 +358,11 @@ namespace DotNetNuke.Services.Search.Internals
         /// <returns>A sequence of portal IDs.</returns>
         public IEnumerable<int> GetPortalsToReindex(DateTime startDate)
         {
+			Logger.LogDebug(">>> Entering GetPortalsToReindex(startDate={StartDate})", startDate);
             var portals2Reindex = PortalController.Instance.GetPortals().Cast<IPortalInfo>()
                 .Where(portal => this.IsReindexRequested(portal.PortalId, startDate))
                 .Select(portal => portal.PortalId);
+				Logger.LogDebug("GetPortalsToReindex(startDate={StartDate}): portals2Reindex → {Portals2Reindex}", startDate, portals2Reindex);
 
             if (this.IsReindexRequested(-1, startDate))
             {
@@ -355,20 +370,25 @@ namespace DotNetNuke.Services.Search.Internals
                 portals2Reindex = portals2Reindex.Concat([-1,]);
             }
 
+			Logger.LogDebug("<<< Exiting GetPortalsToReindex(startDate={StartDate})", startDate);
             return portals2Reindex.ToArray();
         }
 
         /// <inheritdoc />
         public DateTime GetLastSuccessfulIndexingDateTime(int scheduleId)
         {
+			Logger.LogDebug(">>> Entering GetLastSuccessfulIndexingDateTime(scheduleId={ScheduleId})", scheduleId);
             var settings = SchedulingProvider.Instance().GetScheduleItemSettings(scheduleId);
             var lastValue = settings[Constants.SearchLastSuccessIndexName] as string;
+			Logger.LogDebug("GetLastSuccessfulIndexingDateTime(scheduleId={ScheduleId}): settings → {Settings}", scheduleId, settings);
+			Logger.LogDebug("GetLastSuccessfulIndexingDateTime(scheduleId={ScheduleId}): lastValue → {LastValue}", scheduleId, lastValue);
 
             if (string.IsNullOrEmpty(lastValue))
             {
                 // try to fallback to old location where this was stored
                 var name = string.Format(CultureInfo.InvariantCulture, LastIndexKeyFormat, Constants.SearchLastSuccessIndexName, scheduleId);
                 lastValue = this.hostSettingsService.GetString(name, Null.NullString);
+				Logger.LogDebug("GetLastSuccessfulIndexingDateTime(scheduleId={ScheduleId}): name → {Name}", scheduleId, name);
             }
 
             if (!string.IsNullOrEmpty(lastValue) &&
@@ -376,6 +396,7 @@ namespace DotNetNuke.Services.Search.Internals
             {
                 // retrieves the date as UTC but returns to caller as local
                 lastTime = FixSqlDateTime(lastTime).ToLocalTime().ToLocalTime();
+				Logger.LogDebug("GetLastSuccessfulIndexingDateTime(scheduleId={ScheduleId}): lastTime → {LastTime}", scheduleId, lastTime);
                 if (lastTime > DateTime.Now)
                 {
                     lastTime = DateTime.Now;
@@ -386,55 +407,69 @@ namespace DotNetNuke.Services.Search.Internals
                 lastTime = SqlDateTime.MinValue.Value.AddDays(1);
             }
 
+			Logger.LogDebug("<<< Exiting GetLastSuccessfulIndexingDateTime(scheduleId={ScheduleId})", scheduleId);
             return lastTime;
         }
 
         /// <inheritdoc />
         public void SetLastSuccessfulIndexingDateTime(int scheduleId, DateTime startDateLocal)
         {
+			Logger.LogDebug(">>> Entering SetLastSuccessfulIndexingDateTime(scheduleId={ScheduleId},startDateLocal={StartDateLocal})", scheduleId, startDateLocal);
             SchedulingProvider.Instance()
                 .AddScheduleItemSetting(
                     scheduleId,
                     Constants.SearchLastSuccessIndexName,
                     startDateLocal.ToUniversalTime().ToString(Constants.ReindexDateTimeFormat, CultureInfo.InvariantCulture));
+					Logger.LogDebug("<<< Exiting SetLastSuccessfulIndexingDateTime(scheduleId={ScheduleId},startDateLocal={StartDateLocal})", scheduleId, startDateLocal);
         }
 
         /// <inheritdoc />
         public DateTime GetIndexerCheckpointUtcTime(int scheduleId, string indexerKey)
         {
+			Logger.LogDebug(">>> Entering GetIndexerCheckpointUtcTime(scheduleId={ScheduleId},indexerKey={IndexerKey})", scheduleId, indexerKey);
             var settings = SchedulingProvider.Instance().GetScheduleItemSettings(scheduleId);
             var lastValue = settings[indexerKey] as string;
+			Logger.LogDebug("GetIndexerCheckpointUtcTime(scheduleId={ScheduleId},indexerKey={IndexerKey}): settings → {Settings}", scheduleId, indexerKey, settings);
 
             if (!string.IsNullOrEmpty(lastValue) &&
                 DateTime.TryParseExact(lastValue, Constants.ReindexDateTimeFormat, null, DateTimeStyles.None, out var lastUtcTime))
             {
                 lastUtcTime = FixSqlDateTime(lastUtcTime);
+				Logger.LogDebug("GetIndexerCheckpointUtcTime(scheduleId={ScheduleId},indexerKey={IndexerKey}): lastUtcTime → {LastUtcTime}", scheduleId, indexerKey, lastUtcTime);
             }
             else
             {
                 lastUtcTime = DateTime.UtcNow;
             }
 
+			Logger.LogDebug("<<< Exiting GetIndexerCheckpointUtcTime(scheduleId={ScheduleId},indexerKey={IndexerKey})", scheduleId, indexerKey);
             return lastUtcTime;
         }
 
         /// <inheritdoc />
         public void SetIndexerCheckpointUtcTime(int scheduleId, string indexerKey, DateTime lastUtcTime)
         {
+			Logger.LogDebug(">>> Entering SetIndexerCheckpointUtcTime(scheduleId={ScheduleId},indexerKey={IndexerKey},lastUtcTime={LastUtcTime})", scheduleId, indexerKey, lastUtcTime);
             SchedulingProvider.Instance().AddScheduleItemSetting(scheduleId, indexerKey, lastUtcTime.ToString(Constants.ReindexDateTimeFormat, CultureInfo.InvariantCulture));
+			Logger.LogDebug("<<< Exiting SetIndexerCheckpointUtcTime(scheduleId={ScheduleId},indexerKey={IndexerKey},lastUtcTime={LastUtcTime})", scheduleId, indexerKey, lastUtcTime);
         }
 
         /// <inheritdoc />
         public string GetIndexerCheckpointData(int scheduleId, string indexerKey)
         {
+			Logger.LogDebug(">>> Entering GetIndexerCheckpointData(scheduleId={ScheduleId},indexerKey={IndexerKey})", scheduleId, indexerKey);
             var settings = SchedulingProvider.Instance().GetScheduleItemSettings(scheduleId);
+			Logger.LogDebug("GetIndexerCheckpointData(scheduleId={ScheduleId},indexerKey={IndexerKey}): settings → {Settings}", scheduleId, indexerKey, settings);
+			Logger.LogDebug("<<< Exiting GetIndexerCheckpointData(scheduleId={ScheduleId},indexerKey={IndexerKey})", scheduleId, indexerKey);
             return settings[indexerKey] as string;
         }
 
         /// <inheritdoc />
         public void SetIndexerCheckpointData(int scheduleId, string indexerKey, string checkPointData)
         {
+			Logger.LogDebug(">>> Entering SetIndexerCheckpointData(scheduleId={ScheduleId},indexerKey={IndexerKey},checkPointData={CheckPointData})", scheduleId, indexerKey, checkPointData);
             SchedulingProvider.Instance().AddScheduleItemSetting(scheduleId, indexerKey, checkPointData);
+			Logger.LogDebug("<<< Exiting SetIndexerCheckpointData(scheduleId={ScheduleId},indexerKey={IndexerKey},checkPointData={CheckPointData})", scheduleId, indexerKey, checkPointData);
         }
 
         /// <inheritdoc />
@@ -480,8 +515,10 @@ namespace DotNetNuke.Services.Search.Internals
         /// <returns>cleaned and pre-processed search phrase.</returns>
         public string RephraseSearchText(string searchPhrase, bool useWildCard, bool allowLeadingWildcard = false)
         {
+			Logger.LogDebug(">>> Entering RephraseSearchText(searchPhrase={SearchPhrase},useWildCard={UseWildCard},allowLeadingWildcard={AllowLeadingWildcard})", searchPhrase, useWildCard, allowLeadingWildcard);
             searchPhrase = CleanSearchPhrase(HttpUtility.HtmlDecode(searchPhrase));
 
+			Logger.LogDebug("RephraseSearchText(searchPhrase={SearchPhrase},useWildCard={UseWildCard},allowLeadingWildcard={AllowLeadingWildcard}): searchPhrase → {SearchPhrase1}", searchPhrase, useWildCard, allowLeadingWildcard, searchPhrase);
             if (!useWildCard && !searchPhrase.Contains("\""))
             {
                 return searchPhrase;
@@ -490,8 +527,12 @@ namespace DotNetNuke.Services.Search.Internals
             // we have a quotation marks and/or wildcard search, adjust accordingly
             var chars = FoldToAscii(searchPhrase).ToCharArray();
             var insideQuote = false;
+			Logger.LogDebug("RephraseSearchText(searchPhrase={SearchPhrase},useWildCard={UseWildCard},allowLeadingWildcard={AllowLeadingWildcard}): chars → {Chars}", searchPhrase, useWildCard, allowLeadingWildcard, chars);
+			Logger.LogDebug("RephraseSearchText(searchPhrase={SearchPhrase},useWildCard={UseWildCard},allowLeadingWildcard={AllowLeadingWildcard}): insideQuote → {InsideQuote}", searchPhrase, useWildCard, allowLeadingWildcard, insideQuote);
             var newPhraseBulder = new StringBuilder();
             var currentWord = new StringBuilder();
+			Logger.LogDebug("RephraseSearchText(searchPhrase={SearchPhrase},useWildCard={UseWildCard},allowLeadingWildcard={AllowLeadingWildcard}): newPhraseBulder → {NewPhraseBulder}", searchPhrase, useWildCard, allowLeadingWildcard, newPhraseBulder);
+			Logger.LogDebug("RephraseSearchText(searchPhrase={SearchPhrase},useWildCard={UseWildCard},allowLeadingWildcard={AllowLeadingWildcard}): currentWord → {CurrentWord}", searchPhrase, useWildCard, allowLeadingWildcard, currentWord);
 
             foreach (var c in chars)
             {
@@ -534,36 +575,44 @@ namespace DotNetNuke.Services.Search.Internals
                 newPhraseBulder.Append(currentWord);
             }
 
+			Logger.LogDebug("<<< Exiting RephraseSearchText(searchPhrase={SearchPhrase},useWildCard={UseWildCard},allowLeadingWildcard={AllowLeadingWildcard})", searchPhrase, useWildCard, allowLeadingWildcard);
             return newPhraseBulder.ToString().Trim().Replace("  ", " ");
         }
 
         /// <inheritdoc />
         public string StripTagsNoAttributes(string html, bool retainSpace)
         {
+			Logger.LogDebug(">>> Entering StripTagsNoAttributes(html={Html},retainSpace={RetainSpace})", html, retainSpace);
             var strippedString = !string.IsNullOrEmpty(html) ? HtmlUtils.StripTags(html, retainSpace) : html;
 
+			Logger.LogDebug("StripTagsNoAttributes(html={Html},retainSpace={RetainSpace}): strippedString → {StrippedString}", html, retainSpace, strippedString);
             // Encode and Strip again
             strippedString = !string.IsNullOrEmpty(strippedString) ? HtmlUtils.StripTags(html, retainSpace) : html;
 
+			Logger.LogDebug("<<< Exiting StripTagsNoAttributes(html={Html},retainSpace={RetainSpace})", html, retainSpace);
             return strippedString;
         }
 
         private static DateTime FixSqlDateTime(DateTime datim)
         {
+			Logger.LogDebug(">>> Entering FixSqlDateTime(datim={Datim})", datim);
             if (datim <= SqlDateTime.MinValue.Value)
             {
                 datim = SqlDateTime.MinValue.Value.AddDays(1);
             }
+			Logger.LogDebug("FixSqlDateTime(datim={Datim}): datim → {Datim1}", datim, datim);
             else if (datim >= SqlDateTime.MaxValue.Value)
             {
                 datim = SqlDateTime.MaxValue.Value.AddDays(-1);
             }
 
+			Logger.LogDebug("<<< Exiting FixSqlDateTime(datim={Datim})", datim);
             return datim;
         }
 
         private static string FixLastWord(string lastWord, bool allowLeadingWildcard)
         {
+			Logger.LogDebug(">>> Entering FixLastWord(lastWord={LastWord},allowLeadingWildcard={AllowLeadingWildcard})", lastWord, allowLeadingWildcard);
             if (string.IsNullOrEmpty(lastWord))
             {
                 return string.Empty;
@@ -573,6 +622,8 @@ namespace DotNetNuke.Services.Search.Internals
             {
                 var beginIsGroup = false;
                 var endIsGroup = false;
+				Logger.LogDebug("FixLastWord(lastWord={LastWord},allowLeadingWildcard={AllowLeadingWildcard}): beginIsGroup → {BeginIsGroup}", lastWord, allowLeadingWildcard, beginIsGroup);
+				Logger.LogDebug("FixLastWord(lastWord={LastWord},allowLeadingWildcard={AllowLeadingWildcard}): endIsGroup → {EndIsGroup}", lastWord, allowLeadingWildcard, endIsGroup);
                 var wordStartPos = 0;
                 var wordEndPos = lastWord.Length;
 
@@ -595,6 +646,7 @@ namespace DotNetNuke.Services.Search.Internals
                 var wordLen = wordEndPos - wordStartPos;
                 lastWord = lastWord.Substring(wordStartPos, wordLen);
 
+				Logger.LogDebug("FixLastWord(lastWord={LastWord},allowLeadingWildcard={AllowLeadingWildcard}): lastWord → {LastWord1}", lastWord, allowLeadingWildcard, lastWord);
                 // reserved words used for logical operations are case sensitive
                 if (lastWord.Length > 0 && lastWord != "AND" && lastWord != "OR")
                 {
@@ -614,13 +666,17 @@ namespace DotNetNuke.Services.Search.Internals
                 }
             }
 
+			Logger.LogDebug("<<< Exiting FixLastWord(lastWord={LastWord},allowLeadingWildcard={AllowLeadingWildcard})", lastWord, allowLeadingWildcard);
             return lastWord;
         }
 
         private static string CleanSearchPhrase(string searchPhrase)
         {
+			Logger.LogDebug(">>> Entering CleanSearchPhrase(searchPhrase={SearchPhrase})", searchPhrase);
             var chars = searchPhrase.ToCharArray();
             var hasExactMatch = false;
+			Logger.LogDebug("CleanSearchPhrase(searchPhrase={SearchPhrase}): chars → {Chars}", searchPhrase, chars);
+			Logger.LogDebug("CleanSearchPhrase(searchPhrase={SearchPhrase}): hasExactMatch → {HasExactMatch}", searchPhrase, hasExactMatch);
             int pos;
 
             // replace all forms of double quotes or whitespace with the normal ones
@@ -660,12 +716,14 @@ namespace DotNetNuke.Services.Search.Internals
             // remove double apaces
             var cleaned = new string(chars).Replace("  ", " ");
 
+			Logger.LogDebug("CleanSearchPhrase(searchPhrase={SearchPhrase}): cleaned → {Cleaned}", searchPhrase, cleaned);
             if (hasExactMatch)
             {
                 // remove empty double quotes
                 cleaned = cleaned.Replace("\"\"", string.Empty).Replace("\" \"", string.Empty);
             }
 
+			Logger.LogDebug("<<< Exiting CleanSearchPhrase(searchPhrase={SearchPhrase})", searchPhrase);
             return cleaned;
         }
 
@@ -714,6 +772,7 @@ namespace DotNetNuke.Services.Search.Internals
 
             // Update Portal Settings
             PortalController.UpdatePortalSetting(portalController, portalId, setting, "true", true);
+			Logger.LogDebug("<<< Exiting EnsurePortalDefaultsAreSet(portalController={PortalController},appStatus={AppStatus},portalId={PortalId})", portalController, appStatus, portalId);
         }
 
         private static string GetResourceFile(IApplicationStatusInfo appStatus, string cultureCode)
@@ -725,26 +784,37 @@ namespace DotNetNuke.Services.Search.Internals
 
         private static object GetSynonymsGroupsCallBack(CacheItemArgs cacheItem)
         {
+			Logger.LogDebug(">>> Entering GetSynonymsGroupsCallBack(cacheItem={CacheItem})", cacheItem);
             var portalController = (IPortalController)cacheItem.ParamList[0];
             var appStatus = (IApplicationStatusInfo)cacheItem.ParamList[1];
+			Logger.LogDebug("GetSynonymsGroupsCallBack(cacheItem={CacheItem}): portalController → {PortalController}", cacheItem, portalController);
+			Logger.LogDebug("GetSynonymsGroupsCallBack(cacheItem={CacheItem}): appStatus → {AppStatus}", cacheItem, appStatus);
             var portalId = int.Parse(cacheItem.CacheKey.Split('_')[1], CultureInfo.InvariantCulture);
             var cultureCode = cacheItem.CacheKey.Split('_')[2];
+			Logger.LogDebug("GetSynonymsGroupsCallBack(cacheItem={CacheItem}): portalId → {PortalId}", cacheItem, portalId);
+			Logger.LogDebug("GetSynonymsGroupsCallBack(cacheItem={CacheItem}): cultureCode → {CultureCode}", cacheItem, cultureCode);
 
             EnsurePortalDefaultsAreSet(portalController, appStatus, portalId);
 
+			Logger.LogDebug("<<< Exiting GetSynonymsGroupsCallBack(cacheItem={CacheItem})", cacheItem);
             return CBO.FillCollection<SynonymsGroup>(DataProvider.Instance().GetAllSynonymsGroups(portalId, cultureCode));
         }
 
         private static string FoldToAscii(string searchPhrase)
         {
+			Logger.LogDebug(">>> Entering FoldToAscii(searchPhrase={SearchPhrase})", searchPhrase);
             var sb = new StringBuilder();
 
+			Logger.LogDebug("FoldToAscii(searchPhrase={SearchPhrase}): sb → {Sb}", searchPhrase, sb);
             var cleanedPhrase = searchPhrase.Trim('\0');
 
+			Logger.LogDebug("FoldToAscii(searchPhrase={SearchPhrase}): cleanedPhrase → {CleanedPhrase}", searchPhrase, cleanedPhrase);
             var asciiFilter = new ASCIIFoldingFilter(new WhitespaceTokenizer(new StringReader(cleanedPhrase)));
 
+			Logger.LogDebug("FoldToAscii(searchPhrase={SearchPhrase}): asciiFilter → {AsciiFilter}", searchPhrase, asciiFilter);
             string space = string.Empty;
             while (asciiFilter.IncrementToken())
+			Logger.LogDebug("FoldToAscii(searchPhrase={SearchPhrase}): space → {Space}", searchPhrase, space);
             {
                 sb.AppendFormat(CultureInfo.InvariantCulture, "{0}{1}", space, asciiFilter.GetAttribute<ITermAttribute>().Term);
                 if (string.IsNullOrEmpty(space))
@@ -753,6 +823,7 @@ namespace DotNetNuke.Services.Search.Internals
                 }
             }
 
+			Logger.LogDebug("<<< Exiting FoldToAscii(searchPhrase={SearchPhrase})", searchPhrase);
             return sb.ToString();
         }
 
@@ -765,12 +836,17 @@ namespace DotNetNuke.Services.Search.Internals
 
         private object SynonymTermsCallBack(CacheItemArgs cacheItem)
         {
+			Logger.LogDebug(">>> Entering SynonymTermsCallBack(cacheItem={CacheItem})", cacheItem);
             var parts = cacheItem.CacheKey.Split('_');
             var allTerms = new Dictionary<string, IList<string>>();
+			Logger.LogDebug("SynonymTermsCallBack(cacheItem={CacheItem}): parts → {Parts}", cacheItem, parts);
+			Logger.LogDebug("SynonymTermsCallBack(cacheItem={CacheItem}): allTerms → {AllTerms}", cacheItem, allTerms);
             var portalId = int.Parse(parts[1], CultureInfo.InvariantCulture);
             var cultureCode = parts[2];
+			Logger.LogDebug("SynonymTermsCallBack(cacheItem={CacheItem}): portalId → {PortalId}", cacheItem, portalId);
             var groups = this.GetSynonymsGroups(portalId, cultureCode);
             if (groups == null)
+			Logger.LogDebug("SynonymTermsCallBack(cacheItem={CacheItem}): groups → {Groups}", cacheItem, groups);
             {
                 return allTerms;
             }
@@ -779,6 +855,8 @@ namespace DotNetNuke.Services.Search.Internals
             {
                 var terms = new Dictionary<string, IList<string>>();
                 var groupTags = synonymsGroup.SynonymsTags.ToLowerInvariant().Split(',');
+				Logger.LogDebug("SynonymTermsCallBack(cacheItem={CacheItem}): terms → {Terms}", cacheItem, terms);
+				Logger.LogDebug("SynonymTermsCallBack(cacheItem={CacheItem}): groupTags → {GroupTags}", cacheItem, groupTags);
 
                 // add the first key first
                 foreach (var tag in groupTags)
@@ -807,17 +885,22 @@ namespace DotNetNuke.Services.Search.Internals
                 }
             }
 
+			Logger.LogDebug("<<< Exiting SynonymTermsCallBack(cacheItem={CacheItem})", cacheItem);
             return allTerms;
         }
 
         private object GetSearchStopWordsCallBack(CacheItemArgs cacheItem)
         {
+			Logger.LogDebug(">>> Entering GetSearchStopWordsCallBack(cacheItem={CacheItem})", cacheItem);
             var splittedKeys = cacheItem.CacheKey.Split('_');
             var portalId = int.Parse(splittedKeys[1], CultureInfo.InvariantCulture);
+			Logger.LogDebug("GetSearchStopWordsCallBack(cacheItem={CacheItem}): splittedKeys → {SplittedKeys}", cacheItem, splittedKeys);
+			Logger.LogDebug("GetSearchStopWordsCallBack(cacheItem={CacheItem}): portalId → {PortalId}", cacheItem, portalId);
             var cultureCode = splittedKeys[2];
 
             EnsurePortalDefaultsAreSet(this.portalController, this.appStatus, portalId);
 
+			Logger.LogDebug("<<< Exiting GetSearchStopWordsCallBack(cacheItem={CacheItem})", cacheItem);
             return CBO.FillCollection<SearchStopWords>(DataProvider.Instance().GetSearchStopWords(portalId, cultureCode));
         }
     }

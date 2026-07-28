@@ -37,6 +37,10 @@ namespace Dnn.PersonaBar.AdminLogs.Components
         public AdminLogsController()
             : this(null)
         {
+		eventLogger.LogDebug(">>> Entering AdminLogsController()");
+		eventLogger.LogDebug("<<< Exiting AdminLogsController()");
+		eventLogger.LogDebug(">>> Entering AdminLogsController(eventLogger={EventLogger})", eventLogger);
+		eventLogger.LogDebug("<<< Exiting AdminLogsController(eventLogger={EventLogger})", eventLogger);
         }
 
         /// <summary>Initializes a new instance of the <see cref="AdminLogsController"/> class.</summary>
@@ -44,6 +48,7 @@ namespace Dnn.PersonaBar.AdminLogs.Components
         public AdminLogsController(IEventLogger eventLogger)
         {
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+			eventLogger.LogDebug("AdminLogsController(eventLogger={EventLogger}): eventLogger → {EventLogger1}", eventLogger, eventLogger);
         }
 
         protected Dictionary<string, LogTypeInfo> LogTypeDictionary => this.logTypeDictionary = LogController.Instance.GetLogTypeInfoDictionary();
@@ -52,18 +57,23 @@ namespace Dnn.PersonaBar.AdminLogs.Components
 
         public LogTypeInfo GetMyLogType(string logTypeKey)
         {
+			eventLogger.LogDebug(">>> Entering GetMyLogType(logTypeKey={LogTypeKey})", logTypeKey);
             this.LogTypeDictionary.TryGetValue(logTypeKey, out var logType);
 
             logType ??= new LogTypeInfo();
 
+			eventLogger.LogDebug("<<< Exiting GetMyLogType(logTypeKey={LogTypeKey})", logTypeKey);
             return logType;
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public string GetPropertiesText(object obj)
         {
+			eventLogger.LogDebug(">>> Entering GetPropertiesText(obj={Obj})", obj);
             var str = new StringBuilder();
             var objLogInfo = (LogInfo)obj;
+			eventLogger.LogDebug("GetPropertiesText(obj={Obj}): str → {Str}", obj, str);
+			eventLogger.LogDebug("GetPropertiesText(obj={Obj}): objLogInfo → {ObjLogInfo}", obj, objLogInfo);
             if (objLogInfo != null)
             {
                 var objLogProperties = objLogInfo.LogProperties;
@@ -73,6 +83,7 @@ namespace Dnn.PersonaBar.AdminLogs.Components
                     // display the values in the Panel child controls.
                     var ldi = (LogDetailInfo)objLogProperties[i];
                     if (ldi.PropertyName == "Message")
+					eventLogger.LogDebug("GetPropertiesText(obj={Obj}): ldi → {Ldi}", obj, ldi);
                     {
                         str.Append("<p><strong>" + ldi.PropertyName + "</strong>:</br><pre>" +
                                    HttpUtility.HtmlEncode(ldi.PropertyValue) + "</pre></p>");
@@ -93,12 +104,14 @@ namespace Dnn.PersonaBar.AdminLogs.Components
                            HttpUtility.HtmlEncode(objLogInfo.LogServerName) + "</p>");
             }
 
+			eventLogger.LogDebug("<<< Exiting GetPropertiesText(obj={Obj})", obj);
             return str.ToString();
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public void ClearLog()
         {
+			eventLogger.LogDebug(">>> Entering ClearLog()");
             LogController.Instance.ClearLog();
 
             // add entry to log recording it was cleared
@@ -108,6 +121,7 @@ namespace Dnn.PersonaBar.AdminLogs.Components
                 PortalSettings,
                 -1,
                 EventLogType.ADMIN_ALERT);
+				eventLogger.LogDebug("<<< Exiting ClearLog()");
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
@@ -222,24 +236,32 @@ namespace Dnn.PersonaBar.AdminLogs.Components
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public void DeleteLogTypeConfig(string logTypeConfigId)
         {
+			eventLogger.LogDebug(">>> Entering DeleteLogTypeConfig(logTypeConfigId={LogTypeConfigId})", logTypeConfigId);
             var logTypeConfigInfo = new LogTypeConfigInfo();
             logTypeConfigInfo.ID = logTypeConfigId;
+			eventLogger.LogDebug("DeleteLogTypeConfig(logTypeConfigId={LogTypeConfigId}): logTypeConfigInfo → {LogTypeConfigInfo}", logTypeConfigId, logTypeConfigInfo);
+			eventLogger.LogDebug("DeleteLogTypeConfig(logTypeConfigId={LogTypeConfigId}): logTypeConfigInfo.ID → {Arg1}", logTypeConfigId, logTypeConfigInfo.ID);
             LogController.Instance.DeleteLogTypeConfigInfo(logTypeConfigInfo);
+			eventLogger.LogDebug("<<< Exiting DeleteLogTypeConfig(logTypeConfigId={LogTypeConfigId})", logTypeConfigId);
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public LogTypeConfigInfo GetLogTypeConfig(string logTypeConfigId)
         {
+			eventLogger.LogDebug(">>> Entering GetLogTypeConfig(logTypeConfigId={LogTypeConfigId})", logTypeConfigId);
+			eventLogger.LogDebug("<<< Exiting GetLogTypeConfig(logTypeConfigId={LogTypeConfigId})", logTypeConfigId);
             return LogController.Instance.GetLogTypeConfigInfoByID(logTypeConfigId);
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public string EmailLogItems(string subject, string fromEmailAddress, string toEmailAddress, string message, IEnumerable<string> logItemIds, out string error)
         {
+			eventLogger.LogDebug(">>> Entering EmailLogItems(subject={Subject},fromEmailAddress={FromEmailAddress},toEmailAddress={ToEmailAddress},message={Message},logItemIds={LogItemIds})", subject, fromEmailAddress, toEmailAddress, message, logItemIds);
             if (string.IsNullOrEmpty(subject))
             {
                 subject = PortalSettings.PortalName + @" Exceptions";
             }
+			eventLogger.LogDebug("EmailLogItems(subject={Subject},fromEmailAddress={FromEmailAddress},toEmailAddress={ToEmailAddress},message={Message},logItemIds={LogItemIds}): subject → {Subject1}", subject, fromEmailAddress, toEmailAddress, message, logItemIds, subject);
 
             string returnMsg;
             if (Globals.EmailValidatorRegex.IsMatch(fromEmailAddress))
@@ -248,9 +270,11 @@ namespace Dnn.PersonaBar.AdminLogs.Components
                 var filePath = PortalSettings.HomeDirectoryMapPath + tempFileName;
                 var xmlDoc = GetExceptions(logItemIds);
                 xmlDoc.Save(filePath);
+				eventLogger.LogDebug("EmailLogItems(subject={Subject},fromEmailAddress={FromEmailAddress},toEmailAddress={ToEmailAddress},message={Message},logItemIds={LogItemIds}): xmlDoc → {XmlDoc}", subject, fromEmailAddress, toEmailAddress, message, logItemIds, xmlDoc);
 
                 var attachments = new List<Attachment>();
                 var ct = new ContentType { MediaType = MediaTypeNames.Text.Xml, Name = tempFileName };
+				eventLogger.LogDebug("EmailLogItems(subject={Subject},fromEmailAddress={FromEmailAddress},toEmailAddress={ToEmailAddress},message={Message},logItemIds={LogItemIds}): attachments → {Attachments}", subject, fromEmailAddress, toEmailAddress, message, logItemIds, attachments);
 
                 using (var attachment = new Attachment(filePath, ct))
                 {
@@ -258,12 +282,14 @@ namespace Dnn.PersonaBar.AdminLogs.Components
 
                     returnMsg = Mail.SendEmail(fromEmailAddress, fromEmailAddress, toEmailAddress, subject, message, attachments);
                 }
+				eventLogger.LogDebug("EmailLogItems(subject={Subject},fromEmailAddress={FromEmailAddress},toEmailAddress={ToEmailAddress},message={Message},logItemIds={LogItemIds}): returnMsg → {ReturnMsg}", subject, fromEmailAddress, toEmailAddress, message, logItemIds, returnMsg);
 
                 FileSystemUtils.DeleteFile(filePath);
 
                 if (string.IsNullOrEmpty(returnMsg))
                 {
                     error = Localization.GetString("EmailSuccess", Constants.LocalResourcesFile);
+					eventLogger.LogDebug("EmailLogItems(subject={Subject},fromEmailAddress={FromEmailAddress},toEmailAddress={ToEmailAddress},message={Message},logItemIds={LogItemIds}): error → {Error}", subject, fromEmailAddress, toEmailAddress, message, logItemIds, error);
                 }
                 else
                 {
@@ -276,11 +302,13 @@ namespace Dnn.PersonaBar.AdminLogs.Components
                 error = Localization.GetString("EmailFailure", Constants.LocalResourcesFile);
             }
 
+			eventLogger.LogDebug("<<< Exiting EmailLogItems(subject={Subject},fromEmailAddress={FromEmailAddress},toEmailAddress={ToEmailAddress},message={Message},logItemIds={LogItemIds})", subject, fromEmailAddress, toEmailAddress, message, logItemIds);
             return returnMsg;
         }
 
         private static XmlDocument GetExceptions(IEnumerable<string> logIds)
         {
+			eventLogger.LogDebug(">>> Entering GetExceptions(logIds={LogIds})", logIds);
             var objXml = new XmlDocument { XmlResolver = null };
             using (var logEntriesReader = XmlReader.Create(new StringReader("<LogEntries></LogEntries>"), new XmlReaderSettings { XmlResolver = null, }))
             {
@@ -291,20 +319,24 @@ namespace Dnn.PersonaBar.AdminLogs.Components
             {
                 var log = LogController.Instance.GetLog(logId);
                 var xmlDoc = new XmlDocument { XmlResolver = null };
+				eventLogger.LogDebug("GetExceptions(logIds={LogIds}): log → {Log}", logIds, log);
 
                 if (log is LogInfo logInfo)
                 {
                     using var logReader = XmlReader.Create(new StringReader(logInfo.Serialize()), new XmlReaderSettings { XmlResolver = null, });
                     xmlDoc.Load(logReader);
+					eventLogger.LogDebug("GetExceptions(logIds={LogIds}): logReader → {LogReader}", logIds, logReader);
                 }
 
                 var objNode = objXml.ImportNode(xmlDoc.DocumentElement, true);
                 if (objXml.DocumentElement != null)
+				eventLogger.LogDebug("GetExceptions(logIds={LogIds}): objNode → {ObjNode}", logIds, objNode);
                 {
                     objXml.DocumentElement.AppendChild(objNode);
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting GetExceptions(logIds={LogIds})", logIds);
             return objXml;
         }
     }

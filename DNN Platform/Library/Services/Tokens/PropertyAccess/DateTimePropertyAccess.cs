@@ -10,6 +10,7 @@ namespace DotNetNuke.Services.Tokens
 
     public class DateTimePropertyAccess : IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public CacheLevel Cacheability
         {
@@ -22,6 +23,7 @@ namespace DotNetNuke.Services.Tokens
         /// <inheritdoc />
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			Logger.LogDebug(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             TimeZoneInfo userTimeZone = accessingUser.Profile.PreferredTimeZone;
             switch (propertyName.ToLowerInvariant())
             {
@@ -30,6 +32,7 @@ namespace DotNetNuke.Services.Tokens
                     {
                         format = "D";
                     }
+					Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): format → {Format1}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, format);
 
                     return TimeZoneInfo.ConvertTime(DateTime.Now, userTimeZone).ToString(format, formatProvider);
                 case "now":
@@ -55,6 +58,7 @@ namespace DotNetNuke.Services.Tokens
                     return DateTime.Now.ToUniversalTime().ToString(format, formatProvider);
                 default:
                     propertyNotFound = true;
+					Logger.LogDebug("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
                     return string.Empty;
             }
         }

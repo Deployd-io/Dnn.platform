@@ -16,6 +16,7 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A form section template.</summary>
     internal class DnnFormSectionTemplate : ITemplate
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IHostSettings hostSettings;
 
         /// <summary>Initializes a new instance of the <see cref="DnnFormSectionTemplate"/> class.</summary>
@@ -23,7 +24,9 @@ namespace DotNetNuke.Web.UI.WebControls
         public DnnFormSectionTemplate()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering DnnFormSectionTemplate()");
         }
+		Logger.LogDebug("<<< Exiting DnnFormSectionTemplate()");
 
         /// <summary>Initializes a new instance of the <see cref="DnnFormSectionTemplate"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -31,6 +34,8 @@ namespace DotNetNuke.Web.UI.WebControls
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.Items = [];
+			Logger.LogDebug("DnnFormSectionTemplate(hostSettings={HostSettings}): this.Items → {Arg1}", hostSettings, this.Items);
+			Logger.LogDebug("DnnFormSectionTemplate(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
         }
 
         /// <summary>Gets the items.</summary>
@@ -42,10 +47,12 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         public void InstantiateIn(Control container)
         {
+			Logger.LogDebug(">>> Entering InstantiateIn(container={Container})", container);
             if (container is WebControl webControl)
             {
                 DnnFormEditor.SetUpItems(this.hostSettings, this.Items, webControl, false);
             }
+			Logger.LogDebug("<<< Exiting InstantiateIn(container={Container})", container);
         }
     }
 }

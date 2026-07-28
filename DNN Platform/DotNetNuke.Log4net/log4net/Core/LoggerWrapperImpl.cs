@@ -20,6 +20,7 @@
 
 namespace log4net.Core
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Implementation of the <see cref="ILoggerWrapper"/> interface.</summary>
     /// <remarks>
     /// <para>
@@ -39,7 +40,11 @@ namespace log4net.Core
         /// </remarks>
         protected LoggerWrapperImpl(ILogger logger) 
         {
+			Logger.LogDebug(">>> Entering LoggerWrapperImpl(logger={Logger})", logger);
             this.m_logger = logger;
+			Logger.LogDebug("<<< Exiting LoggerWrapperImpl(logger={Logger})", logger);
+			Logger.LogDebug("LoggerWrapperImpl(logger={Logger}): m_logger → {M_logger}", logger, m_logger);
+			Logger.LogDebug("LoggerWrapperImpl(logger={Logger}): this.m_logger → {Arg1}", logger, this.m_logger);
         }
 
         /// <summary>Gets the implementation behind this wrapper object.</summary>

@@ -22,6 +22,7 @@ Namespace DotNetNuke.UI.WebControls
     Public Class DnnTree
         Inherits WebControl
         Implements IPostBackEventHandler, IPostBackDataHandler, IClientAPICallbackEventHandler
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(DnnTree))
         ' Events
         Public Event Collapse As DNNTreeEventHandler
         Public Event Expand As DNNTreeEventHandler
@@ -30,12 +31,15 @@ Namespace DotNetNuke.UI.WebControls
 
         ' Methods
         Public Sub New()
+			Logger.LogDebug(">>> Entering New()")
             AddHandler MyBase.PreRender, New EventHandler(AddressOf Me.DnnTree_PreRender)
             DnnTree.__ENCAddToList(Me)
+			Logger.LogDebug("<<< Exiting New()")
         End Sub
 
         <DebuggerNonUserCode> _
         Private Shared Sub __ENCAddToList(ByVal value As Object)
+			Logger.LogDebug(">>> Entering __ENCAddToList(value={Value})", value)
             SyncLock DnnTree.__ENCList
                 If (DnnTree.__ENCList.Count = DnnTree.__ENCList.Capacity) Then
                     Dim index As Integer = 0
@@ -60,12 +64,15 @@ Namespace DotNetNuke.UI.WebControls
                 End If
                 DnnTree.__ENCList.Add(New WeakReference(value))
             End SyncLock
+			Logger.LogDebug("<<< Exiting __ENCAddToList(value={Value})", value)
         End Sub
 
         Public Sub ClearSelections()
+			Logger.LogDebug(">>> Entering ClearSelections()")
             Dim enumerator As IEnumerator = Nothing
             Try 
                 enumerator = Me.TreeNodes.GetEnumerator
+				Logger.LogDebug("ClearSelections(): enumerator → {Enumerator}", enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -78,6 +85,10 @@ Namespace DotNetNuke.UI.WebControls
                     TryCast(enumerator,IDisposable).Dispose
                 End If
             End Try
+			Logger.LogDebug(">>> Entering ClearSelections(Parent={Parent})", Parent)
+			Logger.LogDebug("<<< Exiting ClearSelections()")
+			Logger.LogDebug("ClearSelections(Parent={Parent}): Parent.Selected → {Arg1}", Parent, Parent.Selected)
+			Logger.LogDebug("ClearSelections(Parent={Parent}): enumerator → {Enumerator}", Parent, enumerator)
         End Sub
 
         Public Sub ClearSelections(ByVal Parent As TreeNode)
@@ -97,9 +108,11 @@ Namespace DotNetNuke.UI.WebControls
                     TryCast(enumerator,IDisposable).Dispose
                 End If
             End Try
+			Logger.LogDebug("<<< Exiting ClearSelections(Parent={Parent})", Parent)
         End Sub
 
         Private Sub DnnTree_PreRender(ByVal sender As Object, ByVal e As EventArgs)
+			Logger.LogDebug(">>> Entering DnnTree_PreRender(sender={Sender},e={E})", sender, e)
             Me.RegisterClientScript
             Me.Page.RegisterRequiresPostBack(Me)
             Me.UpdateNodes(Me.TreeNodes)
@@ -114,29 +127,40 @@ Namespace DotNetNuke.UI.WebControls
                     End If
                 End If
             End If
+			Logger.LogDebug("<<< Exiting DnnTree_PreRender(sender={Sender},e={E})", sender, e)
         End Sub
 
         Public Function FindNode(ByVal strID As String) As TreeNode
+			Logger.LogDebug(">>> Entering FindNode(strID={StrID})", strID)
+			Logger.LogDebug("<<< Exiting FindNode(strID={StrID})", strID)
             Return Me.TreeNodes.FindNode(strID)
         End Function
 
         Public Function FindNodeByKey(ByVal strKey As String) As TreeNode
+			Logger.LogDebug(">>> Entering FindNodeByKey(strKey={StrKey})", strKey)
+			Logger.LogDebug("<<< Exiting FindNodeByKey(strKey={StrKey})", strKey)
             Return Me.TreeNodes.FindNodeByKey(strKey)
         End Function
 
         Public Sub LoadJSON(ByVal dict As Dictionary(Of String, Object))
+			Logger.LogDebug(">>> Entering LoadJSON(dict={Dict},Object={Object})", dict, Object)
             Me.m_Nodes = New TreeNodeCollection(dict, Me)
+			Logger.LogDebug("<<< Exiting LoadJSON(dict={Dict},Object={Object})", dict, Object)
         End Sub
 
         Public Function LoadPostData(ByVal postDataKey As String, ByVal postCollection As NameValueCollection) As Boolean Implements IPostBackDataHandler.LoadPostData
+			Logger.LogDebug(">>> Entering LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection)
             Dim flag As Boolean
+			Logger.LogDebug("<<< Exiting LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection)
             Return flag
         End Function
 
         Private Sub LoadPostedJSON()
+			Logger.LogDebug(">>> Entering LoadPostedJSON()")
             Dim clientVariable As String = ""
             If Not Me.IsDownLevel Then
                 clientVariable = ClientAPI.GetClientVariable(Me.Page, (Me.ClientID & "_json"))
+				Logger.LogDebug("LoadPostedJSON(): clientVariable → {ClientVariable}", clientVariable)
             End If
             If Not String.IsNullOrEmpty(clientVariable) Then
                 Dim dict As Dictionary(Of String, Object) = MSAJAX.Deserialize(Of Dictionary(Of String, Object))(clientVariable)
@@ -144,19 +168,24 @@ Namespace DotNetNuke.UI.WebControls
                     Me.LoadJSON(dict)
                 End If
             End If
+			Logger.LogDebug("<<< Exiting LoadPostedJSON()")
         End Sub
 
         Private Sub LoadPostedXml()
+			Logger.LogDebug(">>> Entering LoadPostedXml()")
             Dim expression As String = ""
             If Not Me.IsDownLevel Then
                 expression = ClientAPI.GetClientVariable(Me.Page, (Me.ClientID & "_xml"))
+				Logger.LogDebug("LoadPostedXml(): expression → {Expression}", expression)
             End If
             If (Strings.Len(expression) > 0) Then
                 Me.LoadXml(expression)
             End If
+			Logger.LogDebug("<<< Exiting LoadPostedXml()")
         End Sub
 
         Protected Overrides Sub LoadViewState(ByVal state As Object)
+			Logger.LogDebug(">>> Entering LoadViewState(state={State})", state)
             If (Not state Is Nothing) Then
                 Dim objArray As Object() = DirectCast(state, Object())
                 If (Not objArray(0) Is Nothing) Then
@@ -169,54 +198,69 @@ Namespace DotNetNuke.UI.WebControls
             If (If((Not Me.IsDownLevel OrElse (Strings.Len(Me.ViewState("xml")) <= 0)), 0, 1) <> 0) Then
                 Me.m_Nodes = New TreeNodeCollection(Conversions.ToString(Me.ViewState("xml")), "", Me)
             End If
+			Logger.LogDebug("<<< Exiting LoadViewState(state={State})", state)
         End Sub
 
         Public Sub LoadXml(ByVal strXml As String)
+			Logger.LogDebug(">>> Entering LoadXml(strXml={StrXml})", strXml)
             Me.m_Nodes = New TreeNodeCollection(strXml, "", Me)
+			Logger.LogDebug("<<< Exiting LoadXml(strXml={StrXml})", strXml)
         End Sub
 
         Public Overridable Sub OnCollapse(ByVal e As DNNTreeEventArgs)
+			Logger.LogDebug(">>> Entering OnCollapse(e={E})", e)
             Dim collapseEvent As DNNTreeEventHandler = Me.CollapseEvent
             If Not Object.ReferenceEquals(collapseEvent, Nothing) Then
                 collapseEvent.Invoke(Me, e)
             End If
+			Logger.LogDebug("<<< Exiting OnCollapse(e={E})", e)
         End Sub
 
         Public Overridable Sub OnExpand(ByVal e As DNNTreeEventArgs)
+			Logger.LogDebug(">>> Entering OnExpand(e={E})", e)
             Dim expandEvent As DNNTreeEventHandler = Me.ExpandEvent
             If Not Object.ReferenceEquals(expandEvent, Nothing) Then
                 expandEvent.Invoke(Me, e)
             End If
+			Logger.LogDebug("<<< Exiting OnExpand(e={E})", e)
         End Sub
 
         Protected Overrides Sub OnInit(ByVal e As EventArgs)
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e)
             MyBase.OnInit(e)
             If ClientAPI.NeedsDNNVariable(Me) Then
                 AddHandler Me.Page.Load, New EventHandler(AddressOf Me.ParentOnLoad)
             Else
                 Me.LoadPostedJSON
             End If
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e)
         End Sub
 
         Public Overridable Sub OnNodeClick(ByVal e As DNNTreeNodeClickEventArgs)
+			Logger.LogDebug(">>> Entering OnNodeClick(e={E})", e)
             Dim nodeClickEvent As DNNTreeNodeClickHandler = Me.NodeClickEvent
             If Not Object.ReferenceEquals(nodeClickEvent, Nothing) Then
                 nodeClickEvent.Invoke(Me, e)
             End If
+			Logger.LogDebug("<<< Exiting OnNodeClick(e={E})", e)
         End Sub
 
         Protected Sub ParentOnLoad(ByVal Sender As Object, ByVal e As EventArgs)
+			Logger.LogDebug(">>> Entering ParentOnLoad(Sender={Sender},e={E})", Sender, e)
             ClientAPI.RegisterDNNVariableControl(Me)
             Me.LoadPostedJSON
+			Logger.LogDebug("<<< Exiting ParentOnLoad(Sender={Sender},e={E})", Sender, e)
         End Sub
 
         Public Function RaiseClientAPICallbackEvent(ByVal eventArgument As String) As String Implements IClientAPICallbackEventHandler.RaiseClientAPICallbackEvent
+			Logger.LogDebug(">>> Entering RaiseClientAPICallbackEvent(eventArgument={EventArgument})", eventArgument)
             Dim str As String
             Dim strArray As String() = Strings.Split(eventArgument, ClientAPI.COLUMN_DELIMITER, -1, CompareMethod.Binary)
             Dim collection = New TreeNodeCollection(("<root>" & strArray(0) & "</root>"), "", Me)
             Dim objA As TreeNode = collection(0)
             If Object.ReferenceEquals(objA, Nothing) Then
                 str = Nothing
+				Logger.LogDebug("RaiseClientAPICallbackEvent(eventArgument={EventArgument}): str → {Str}", eventArgument, str)
             Else
                 Dim populateOnDemandEvent As DNNTreeEventHandler = Me.PopulateOnDemandEvent
                 If Not Object.ReferenceEquals(populateOnDemandEvent, Nothing) Then
@@ -225,10 +269,12 @@ Namespace DotNetNuke.UI.WebControls
                 Dim node2 As TreeNode = Me.FindNode(objA.ID)
                 str = If(Object.ReferenceEquals(node2, Nothing), objA.TreeNodes.ToJSON, node2.TreeNodes.ToJSON)
             End If
+			Logger.LogDebug("<<< Exiting RaiseClientAPICallbackEvent(eventArgument={EventArgument})", eventArgument)
             Return str
         End Function
 
         Public Overridable Sub RaisePostBackEvent(ByVal eventArgument As String) Implements IPostBackEventHandler.RaisePostBackEvent
+			Logger.LogDebug(">>> Entering RaisePostBackEvent(eventArgument={EventArgument})", eventArgument)
             Dim strArray As String() = Strings.Split(eventArgument, ClientAPI.COLUMN_DELIMITER, -1, CompareMethod.Binary)
             Dim objA As TreeNode = Me.TreeNodes.FindNode(strArray(0))
             If Not Object.ReferenceEquals(objA, Nothing) Then
@@ -241,6 +287,7 @@ Namespace DotNetNuke.UI.WebControls
                     End If
                     If (If(((objA.DNNNodes.Count <> 0) OrElse Not Me.PopulateNodesFromClient), 0, 1) <> 0) Then
                         populateOnDemandEvent = Me.PopulateOnDemandEvent
+						Logger.LogDebug("RaisePostBackEvent(eventArgument={EventArgument}): populateOnDemandEvent → {PopulateOnDemandEvent}", eventArgument, populateOnDemandEvent)
                         If Not Object.ReferenceEquals(populateOnDemandEvent, Nothing) Then
                             populateOnDemandEvent.Invoke(Me, New DNNTreeEventArgs(objA))
                         End If
@@ -250,6 +297,7 @@ Namespace DotNetNuke.UI.WebControls
                     If (str <> "Click") Then
                         If (str = "Checked") Then
                             objA.Selected = Not objA.Selected
+							Logger.LogDebug("RaisePostBackEvent(eventArgument={EventArgument}): objA.Selected → {Arg1}", eventArgument, objA.Selected)
                         ElseIf (str = "OnDemand") Then
                             populateOnDemandEvent = Me.PopulateOnDemandEvent
                             If Not Object.ReferenceEquals(populateOnDemandEvent, Nothing) Then
@@ -262,13 +310,16 @@ Namespace DotNetNuke.UI.WebControls
                             Dim enumerator As IEnumerator = Nothing
                             Try 
                                 enumerator = Me.TreeNodes.FindSelectedNodes.GetEnumerator
+								Logger.LogDebug("RaisePostBackEvent(eventArgument={EventArgument}): enumerator → {Enumerator}", eventArgument, enumerator)
                                 Do While True
                                     flag4 = enumerator.MoveNext
+									Logger.LogDebug("RaisePostBackEvent(eventArgument={EventArgument}): flag4 → {Flag4}", eventArgument, flag4)
                                     If Not flag4 Then
                                         Exit Do
                                     End If
                                     Dim current As TreeNode = DirectCast(enumerator.Current, TreeNode)
                                     current.Selected = False
+									Logger.LogDebug("RaisePostBackEvent(eventArgument={EventArgument}): current.Selected → {Arg1}", eventArgument, current.Selected)
                                 Loop
                             Finally
                                 If Not Object.ReferenceEquals(TryCast(enumerator,IDisposable), Nothing) Then
@@ -293,12 +344,15 @@ Namespace DotNetNuke.UI.WebControls
                     End If
                 End If
             End If
+			Logger.LogDebug("<<< Exiting RaisePostBackEvent(eventArgument={EventArgument})", eventArgument)
         End Sub
 
         Public Sub RaisePostDataChangedEvent() Implements IPostBackDataHandler.RaisePostDataChangedEvent
+		Logger.LogDebug(">>> Entering RaisePostDataChangedEvent()")
         End Sub
 
         Public Sub RegisterClientScript()
+			Logger.LogDebug(">>> Entering RegisterClientScript()")
             If Not Me.IsDownLevel Then
                 ClientAPI.RegisterClientReference(Me.Page, ClientAPI.ClientNamespaceReferences.dnn_dom)
                 If Me.PopulateNodesFromClient Then
@@ -308,18 +362,23 @@ Namespace DotNetNuke.UI.WebControls
                 WebControls.RegisterClientScriptBlock(Me.Page, "dnn.controls.js", FileOrder.Js.DnnControlsLabelEdit)
                 WebControls.RegisterClientScriptBlock(Me.Page, "dnn.controls.dnntree.js")
             End If
+			Logger.LogDebug("<<< Exiting RegisterClientScript()")
         End Sub
 
         <Obsolete("RegisterDNNVariableControl on control level is now obsolete.  Use RegisterDNNVariableControl.WebControls")> _
         Public Sub RegisterDNNVariableControl()
+			Logger.LogDebug(">>> Entering RegisterDNNVariableControl()")
             ClientAPI.RegisterDNNVariableControl(Me)
+			Logger.LogDebug("<<< Exiting RegisterDNNVariableControl()")
         End Sub
 
         Protected Overrides Sub Render(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer)
             Dim enumerator As IEnumerator = Nothing
             Me.TreeWriter.RenderTree(writer, Me)
             Try 
                 enumerator = Me.Controls.GetEnumerator
+				Logger.LogDebug("Render(writer={Writer}): enumerator → {Enumerator}", writer, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -336,18 +395,24 @@ Namespace DotNetNuke.UI.WebControls
                 Dim marshalledPropertyJSON As String = ScriptGenerator.GetMarshalledPropertyJSON(Me, properties)
                 BaseWebControl.RegisterInitialize(Me, "initTree", marshalledPropertyJSON)
             End If
+			Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer)
         End Sub
 
         Protected Overrides Function SaveViewState() As Object
+			Logger.LogDebug(">>> Entering SaveViewState()")
+			Logger.LogDebug("<<< Exiting SaveViewState()")
             Return New Object() { MyBase.SaveViewState, DirectCast(Me.ImageList, IStateManager).SaveViewState }
         End Function
 
         Public Function SelectNode(ByVal strID As String) As TreeNode
+			Logger.LogDebug(">>> Entering SelectNode(strID={StrID})", strID)
             Dim objA As TreeNode = Nothing
             If (Me.TreeNodes.Count > 0) Then
                 objA = Me.FindNode(strID)
+				Logger.LogDebug("SelectNode(strID={StrID}): objA → {ObjA}", strID, objA)
                 If Not Object.ReferenceEquals(objA, Nothing) Then
                     objA.Selected = True
+					Logger.LogDebug("SelectNode(strID={StrID}): objA.Selected → {Arg1}", strID, objA.Selected)
                     Dim parent As TreeNode = objA.Parent
                     Do While True
                         If Object.ReferenceEquals(parent, Nothing) Then
@@ -355,18 +420,23 @@ Namespace DotNetNuke.UI.WebControls
                         End If
                         parent.Expand
                         parent = parent.Parent
+						Logger.LogDebug("SelectNode(strID={StrID}): parent → {Parent}", strID, parent)
                     Loop
                 End If
             End If
+			Logger.LogDebug("<<< Exiting SelectNode(strID={StrID})", strID)
             Return objA
         End Function
 
         Public Function SelectNodeByKey(ByVal strKey As String) As TreeNode
+			Logger.LogDebug(">>> Entering SelectNodeByKey(strKey={StrKey})", strKey)
             Dim objA As TreeNode = Nothing
             If (Me.TreeNodes.Count > 0) Then
                 objA = Me.FindNodeByKey(strKey)
+				Logger.LogDebug("SelectNodeByKey(strKey={StrKey}): objA → {ObjA}", strKey, objA)
                 If Not Object.ReferenceEquals(objA, Nothing) Then
                     objA.Selected = True
+					Logger.LogDebug("SelectNodeByKey(strKey={StrKey}): objA.Selected → {Arg1}", strKey, objA.Selected)
                     Dim parent As TreeNode = objA
                     Do While True
                         If Object.ReferenceEquals(parent, Nothing) Then
@@ -374,20 +444,26 @@ Namespace DotNetNuke.UI.WebControls
                         End If
                         parent.Expand
                         parent = parent.Parent
+						Logger.LogDebug("SelectNodeByKey(strKey={StrKey}): parent → {Parent}", strKey, parent)
                     Loop
                 End If
             End If
+			Logger.LogDebug("<<< Exiting SelectNodeByKey(strKey={StrKey})", strKey)
             Return objA
         End Function
 
         Protected Overrides Sub TrackViewState()
+			Logger.LogDebug(">>> Entering TrackViewState()")
             MyBase.TrackViewState
+			Logger.LogDebug("<<< Exiting TrackViewState()")
         End Sub
 
         Private Sub UpdateNodes(ByVal objNodes As TreeNodeCollection)
+			Logger.LogDebug(">>> Entering UpdateNodes(objNodes={ObjNodes})", objNodes)
             Dim enumerator As IEnumerator = Nothing
             Try 
                 enumerator = objNodes.GetEnumerator
+				Logger.LogDebug("UpdateNodes(objNodes={ObjNodes}): enumerator → {Enumerator}", objNodes, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -396,6 +472,7 @@ Namespace DotNetNuke.UI.WebControls
                     If (Strings.Len(current.Image) > 0) Then
                         current.ImageIndex = If(Me.ImageList.Contains(current.Image), Me.ImageList.IndexOf(current.Image), Me.ImageList.Add(current.Image))
                         current.Image = Nothing
+						Logger.LogDebug("UpdateNodes(objNodes={ObjNodes}): current.Image → {Arg1}", objNodes, current.Image)
                     End If
                     If (current.DNNNodes.Count > 0) Then
                         Me.UpdateNodes(current.TreeNodes)
@@ -406,6 +483,7 @@ Namespace DotNetNuke.UI.WebControls
                     TryCast(enumerator,IDisposable).Dispose
                 End If
             End Try
+			Logger.LogDebug("<<< Exiting UpdateNodes(objNodes={ObjNodes})", objNodes)
         End Sub
 
 

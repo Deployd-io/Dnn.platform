@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class InvalidViewStateCacheKeyException : ApplicationException
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public InvalidViewStateCacheKeyException()
     {
+	Logger.LogDebug(">>> Entering InvalidViewStateCacheKeyException()");
+	Logger.LogDebug("<<< Exiting InvalidViewStateCacheKeyException()");
     }
 
     /// <inheritdoc />
     public InvalidViewStateCacheKeyException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering InvalidViewStateCacheKeyException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting InvalidViewStateCacheKeyException(message={Message})", message);
 
     /// <inheritdoc />
     public InvalidViewStateCacheKeyException(string message, Exception innerException)

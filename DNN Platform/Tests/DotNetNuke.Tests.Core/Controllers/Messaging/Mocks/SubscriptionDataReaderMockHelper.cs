@@ -12,28 +12,37 @@ namespace DotNetNuke.Tests.Core.Controllers.Messaging.Mocks
 
     internal class SubscriptionDataReaderMockHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         internal static IDataReader CreateEmptySubscriptionReader()
         {
+			Logger.LogDebug(">>> Entering CreateEmptySubscriptionReader()");
+			Logger.LogDebug("<<< Exiting CreateEmptySubscriptionReader()");
             return CreateSubscriptionTable().CreateDataReader();
         }
 
         internal static IDataReader CreateSubscriptionReader(IEnumerable<Subscription> subscriptions)
         {
+			Logger.LogDebug(">>> Entering CreateSubscriptionReader(subscriptions={Subscriptions})", subscriptions);
             var datatable = CreateSubscriptionTable();
             foreach (var subscription in subscriptions)
             {
+			Logger.LogDebug("CreateSubscriptionReader(subscriptions={Subscriptions}): datatable → {Datatable}", subscriptions, datatable);
                 AddSubscriptionToTable(datatable, subscription);
             }
 
+			Logger.LogDebug("<<< Exiting CreateSubscriptionReader(subscriptions={Subscriptions})", subscriptions);
             return datatable.CreateDataReader();
         }
 
         private static DataTable CreateSubscriptionTable()
         {
+			Logger.LogDebug(">>> Entering CreateSubscriptionTable()");
             var table = new DataTable();
 
+			Logger.LogDebug("CreateSubscriptionTable(): table → {Table}", table);
             var idColumn = table.Columns.Add("SubscriptionId", typeof(int));
             table.Columns.Add("UserId", typeof(int));
+			Logger.LogDebug("CreateSubscriptionTable(): idColumn → {IdColumn}", idColumn);
             table.Columns.Add("PortalId", typeof(int));
             table.Columns.Add("SubscriptionTypeId", typeof(int));
             table.Columns.Add("ObjectKey", typeof(string));
@@ -43,7 +52,9 @@ namespace DotNetNuke.Tests.Core.Controllers.Messaging.Mocks
             table.Columns.Add("TabId", typeof(int));
 
             table.PrimaryKey = new[] { idColumn };
+			Logger.LogDebug("CreateSubscriptionTable(): table.PrimaryKey → {Arg0}", table.PrimaryKey);
 
+			Logger.LogDebug("<<< Exiting CreateSubscriptionTable()");
             return table;
         }
 

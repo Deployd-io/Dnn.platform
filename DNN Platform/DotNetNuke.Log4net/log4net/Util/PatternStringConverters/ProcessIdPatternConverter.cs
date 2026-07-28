@@ -23,6 +23,7 @@ using System.IO;
 
 namespace log4net.Util.PatternStringConverters
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Write the current process ID to the output</summary>
     /// <remarks>
     /// <para>
@@ -45,6 +46,7 @@ namespace log4net.Util.PatternStringConverters
 #endif
         protected override void Convert(TextWriter writer, object state) 
         {
+		Logger.LogDebug(">>> Entering Convert(writer={Writer},state={State})", writer, state);
 #if (NETCF || SSCLI)
             // On compact framework there is no System.Diagnostics.Process class
             writer.Write( SystemInfo.NotAvailableText );
@@ -62,6 +64,7 @@ namespace log4net.Util.PatternStringConverters
                 writer.Write(SystemInfo.NotAvailableText);
             }
 #endif
+		Logger.LogDebug("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
         }
 
         /// <summary>The fully qualified type of the ProcessIdPatternConverter class.</summary>

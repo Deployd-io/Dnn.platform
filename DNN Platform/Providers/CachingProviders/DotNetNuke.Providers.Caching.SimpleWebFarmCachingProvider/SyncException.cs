@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class SyncException : ApplicationException
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public SyncException()
     {
+	Logger.LogDebug(">>> Entering SyncException()");
+	Logger.LogDebug("<<< Exiting SyncException()");
     }
 
     /// <inheritdoc />
     public SyncException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering SyncException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting SyncException(message={Message})", message);
 
     /// <inheritdoc />
     public SyncException(string message, Exception innerException)

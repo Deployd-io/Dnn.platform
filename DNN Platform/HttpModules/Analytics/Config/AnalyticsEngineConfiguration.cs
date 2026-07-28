@@ -37,6 +37,7 @@ namespace DotNetNuke.HttpModules.Config
         [Obsolete("Deprecated in DotNetNuke 10.0.2. Please use overload with IApplicationStatusInfo. Scheduled removal in v12.0.0.")]
         public static AnalyticsEngineConfiguration GetConfig()
             => GetConfig(Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>(), Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>());
+			Logger.LogDebug(">>> Entering GetConfig()");
 
         /// <summary>Gets the site analytics config.</summary>
         /// <param name="appStatus">The application status.</param>
@@ -46,6 +47,8 @@ namespace DotNetNuke.HttpModules.Config
         {
             var config = new AnalyticsEngineConfiguration { AnalyticsEngines = new AnalyticsEngineCollection() };
             string filePath = null;
+			Logger.LogDebug("GetConfig(appStatus={AppStatus},eventLogger={EventLogger}): config → {Config}", appStatus, eventLogger, config);
+			Logger.LogDebug("GetConfig(appStatus={AppStatus},eventLogger={EventLogger}): filePath → {FilePath}", appStatus, eventLogger, filePath);
             try
             {
                 config = (AnalyticsEngineConfiguration)DataCache.GetCache("AnalyticsEngineConfig");
@@ -59,6 +62,7 @@ namespace DotNetNuke.HttpModules.Config
                     using (var xmlReader = XmlReader.Create(fileReader))
                     {
                         doc = new XPathDocument(xmlReader);
+						Logger.LogDebug("GetConfig(appStatus={AppStatus},eventLogger={EventLogger}): doc → {Doc}", appStatus, eventLogger, doc);
                     }
 
                     config = new AnalyticsEngineConfiguration { AnalyticsEngines = new AnalyticsEngineCollection() };
@@ -87,6 +91,7 @@ namespace DotNetNuke.HttpModules.Config
                 // log it
                 var log = new LogInfo { LogTypeKey = nameof(EventLogType.HOST_ALERT), };
                 log.AddProperty("Analytics.AnalyticsEngineConfiguration", "GetConfig Failed");
+				Logger.LogDebug("GetConfig(appStatus={AppStatus},eventLogger={EventLogger}): log → {Log}", appStatus, eventLogger, log);
                 if (!string.IsNullOrEmpty(filePath))
                 {
                     log.AddProperty("FilePath", filePath);
@@ -97,6 +102,7 @@ namespace DotNetNuke.HttpModules.Config
                 Logger.Error(log);
             }
 
+			Logger.LogDebug("<<< Exiting GetConfig()");
             return config;
         }
     }

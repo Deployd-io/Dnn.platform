@@ -8,15 +8,18 @@ namespace Dnn.EditBar.UI.Components
 
     public class BusinessController : IUpgradeable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public string UpgradeModule(string version)
         {
+			Logger.LogDebug(">>> Entering UpgradeModule(version={Version})", version);
             switch (version)
             {
                 case "01.00.00":
                     break;
             }
 
+			Logger.LogDebug("<<< Exiting UpgradeModule(version={Version})", version);
             return "Success";
         }
     }

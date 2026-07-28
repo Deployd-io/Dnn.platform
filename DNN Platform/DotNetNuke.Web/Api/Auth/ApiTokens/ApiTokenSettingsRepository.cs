@@ -26,7 +26,9 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
             hostSettingsService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>(),
             portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>())
     {
+		Logger.LogDebug(">>> Entering ApiTokenSettingsRepository(moduleController={ModuleController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController})", moduleController, hostSettings, hostSettingsService, portalController);
         /// <summary>Initializes a new instance of the <see cref="ApiTokenSettingsRepository"/> class.</summary>
+		Logger.LogDebug("<<< Exiting ApiTokenSettingsRepository(moduleController={ModuleController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController})", moduleController, hostSettings, hostSettingsService, portalController);
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public ApiTokenSettingsRepository()
             : this(null, null, null, null)

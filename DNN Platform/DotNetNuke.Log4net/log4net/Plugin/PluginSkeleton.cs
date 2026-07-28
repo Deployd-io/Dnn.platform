@@ -22,6 +22,7 @@ using log4net.Repository;
 
 namespace log4net.Plugin
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Base implementation of <see cref="IPlugin"/></summary>
     /// <remarks>
     /// <para>
@@ -41,7 +42,10 @@ namespace log4net.Plugin
         /// </remarks>
         protected PluginSkeleton(string name)
         {
+			Logger.LogDebug(">>> Entering PluginSkeleton(name={Name})", name);
             this.m_name = name;
+			Logger.LogDebug("<<< Exiting PluginSkeleton(name={Name})", name);
+			Logger.LogDebug("PluginSkeleton(name={Name}): this.m_name → {Arg1}", name, this.m_name);
         }
 
         /// <summary>Gets or sets the name of the plugin.</summary>
@@ -77,7 +81,11 @@ namespace log4net.Plugin
         /// </remarks>
         public virtual void Attach(ILoggerRepository repository)
         {
+			Logger.LogDebug(">>> Entering Attach(repository={Repository})", repository);
             this.m_repository = repository;
+			Logger.LogDebug("<<< Exiting Attach(repository={Repository})", repository);
+			Logger.LogDebug("Attach(repository={Repository}): m_repository → {M_repository}", repository, m_repository);
+			Logger.LogDebug("Attach(repository={Repository}): this.m_repository → {Arg1}", repository, this.m_repository);
         }
 
         /// <summary>Is called when the plugin is to shutdown.</summary>
@@ -90,6 +98,8 @@ namespace log4net.Plugin
         /// </remarks>
         public virtual void Shutdown()
         {
+		Logger.LogDebug(">>> Entering Shutdown()");
+		Logger.LogDebug("<<< Exiting Shutdown()");
         }
 
         /// <summary>The repository for this plugin</summary>

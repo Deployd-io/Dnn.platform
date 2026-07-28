@@ -9,14 +9,17 @@ namespace DotNetNuke.Web.Api.Internal
     /// <summary>Requires the user to have access to the page.</summary>
     public sealed class DnnPagePermissionAttribute : AuthorizeAttributeBase, IOverrideDefaultAuthLevel
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Gets or sets the permission key for the access.</summary>
         public string PermissionKey { get; set; } = "EDIT";
 
         /// <inheritdoc />
         public override bool IsAuthorized(AuthFilterContext context)
         {
+			Logger.LogDebug(">>> Entering IsAuthorized(context={Context})", context);
             Requires.NotNull("context", context);
 
+			Logger.LogDebug("<<< Exiting IsAuthorized(context={Context})", context);
             return PagePermissionsAttributesHelper.HasTabPermission(this.PermissionKey);
         }
     }

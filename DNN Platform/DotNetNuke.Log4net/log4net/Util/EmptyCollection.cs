@@ -23,6 +23,7 @@ using System.Collections;
 
 namespace log4net.Util
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// An always empty <see cref="ICollection"/>.
     /// </summary>
@@ -49,6 +50,8 @@ namespace log4net.Util
         /// </remarks>
         private EmptyCollection()
         {
+		Logger.LogDebug(">>> Entering EmptyCollection()");
+		Logger.LogDebug("<<< Exiting EmptyCollection()");
         }
 
         /// <summary>
@@ -82,7 +85,9 @@ namespace log4net.Util
         /// </remarks>
         public void CopyTo(Array array, int index)
         {
+			Logger.LogDebug(">>> Entering CopyTo(array={Array},index={Index})", array, index);
             // copy nothing
+			Logger.LogDebug("<<< Exiting CopyTo(array={Array},index={Index})", array, index);
         }
 
         /// <summary>
@@ -148,6 +153,8 @@ namespace log4net.Util
         /// </remarks>
         public IEnumerator GetEnumerator()
         {
+			Logger.LogDebug(">>> Entering GetEnumerator()");
+			Logger.LogDebug("<<< Exiting GetEnumerator()");
             return NullEnumerator.Instance;
         }
 

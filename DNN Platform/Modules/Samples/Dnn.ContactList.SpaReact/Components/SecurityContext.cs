@@ -10,6 +10,7 @@ namespace Dnn.ContactList.SpaReact.Components
 {
     public class SecurityContext
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public bool CanView { get; set; }
         public bool CanEdit { get; set; }
         public bool IsAdmin { get; set; }
@@ -24,14 +25,20 @@ namespace Dnn.ContactList.SpaReact.Components
 
         public SecurityContext(ModuleInfo objModule, UserInfo user)
         {
+			Logger.LogDebug(">>> Entering SecurityContext(objModule={ObjModule},user={User})", objModule, user);
             this.user = user;
             if (user.IsSuperUser)
+			Logger.LogDebug("SecurityContext(objModule={ObjModule},user={User}): this.user → {Arg2}", objModule, user, this.user);
+			Logger.LogDebug("SecurityContext(objModule={ObjModule},user={User}): user → {User1}", objModule, user, user);
             {
                 CanView = CanEdit = IsAdmin = true;
+				Logger.LogDebug("SecurityContext(objModule={ObjModule},user={User}): CanView → {CanView}", objModule, user, CanView);
+				Logger.LogDebug("SecurityContext(objModule={ObjModule},user={User}): CanEdit → {CanEdit}", objModule, user, CanEdit);
             }
             else
             {
                 IsAdmin = user.IsAdmin;
+				Logger.LogDebug("SecurityContext(objModule={ObjModule},user={User}): IsAdmin → {IsAdmin}", objModule, user, IsAdmin);
                 if (IsAdmin)
                 {
                     CanView = CanEdit = true;
@@ -42,6 +49,7 @@ namespace Dnn.ContactList.SpaReact.Components
                     CanEdit = ModulePermissionController.HasModulePermission(objModule.ModulePermissions, "EDIT");
                 }
             }
+			Logger.LogDebug("<<< Exiting SecurityContext(objModule={ObjModule},user={User})", objModule, user);
         }
     }
 }

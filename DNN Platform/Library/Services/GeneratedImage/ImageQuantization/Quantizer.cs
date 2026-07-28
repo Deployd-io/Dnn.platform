@@ -29,8 +29,12 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
         /// </remarks>
         public Quantizer(bool singlePass)
         {
+			Logger.LogDebug(">>> Entering Quantizer(singlePass={SinglePass})", singlePass);
             this.singlePass = singlePass;
             this.pixelSize = Marshal.SizeOf<Color32>();
+			Logger.LogDebug("<<< Exiting Quantizer(singlePass={SinglePass})", singlePass);
+			Logger.LogDebug("Quantizer(singlePass={SinglePass}): this.singlePass → {Arg1}", singlePass, this.singlePass);
+			Logger.LogDebug("Quantizer(singlePass={SinglePass}): pixelSize → {PixelSize}", singlePass, pixelSize);
         }
 
         /// <summary>Quantize an image and return the resulting output bitmap.</summary>
@@ -38,6 +42,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
         /// <returns>A quantized version of the image.</returns>
         public Bitmap Quantize(Image source)
         {
+			Logger.LogDebug(">>> Entering Quantize(source={Source})", source);
             // Get the size of the source image
             int height = source.Height;
             int width = source.Width;
@@ -45,16 +50,20 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
             // And construct a rectangle from these dimensions
             Rectangle bounds = new Rectangle(0, 0, width, height);
 
+			Logger.LogDebug("Quantize(source={Source}): bounds → {Bounds}", source, bounds);
             // First off take a 32bpp copy of the image
             Bitmap copy = new Bitmap(width, height, PixelFormat.Format32bppArgb);
 
+			Logger.LogDebug("Quantize(source={Source}): copy → {Copy}", source, copy);
             // And construct an 8bpp version
             Bitmap output = new Bitmap(width, height, PixelFormat.Format8bppIndexed);
 
+			Logger.LogDebug("Quantize(source={Source}): output → {Output}", source, output);
             // Now lock the bitmap into memory
             using (Graphics g = Graphics.FromImage(copy))
             {
                 g.PageUnit = GraphicsUnit.Pixel;
+				Logger.LogDebug("Quantize(source={Source}): g.PageUnit → {Arg1}", source, g.PageUnit);
 
                 // Draw the source image onto the copy bitmap,
                 // which will effect a widening as appropriate.
@@ -64,8 +73,10 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
             // Define a pointer to the bitmap data
             BitmapData sourceData = null;
 
+			Logger.LogDebug("Quantize(source={Source}): sourceData → {SourceData}", source, sourceData);
             try
             {
+				private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                 // Get the source image bits and lock into memory
                 sourceData = copy.LockBits(bounds, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
@@ -91,6 +102,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
             }
 
             // Last but not least, return the output bitmap
+			Logger.LogDebug("<<< Exiting Quantize(source={Source})", source);
             return output;
         }
 
@@ -205,6 +217,8 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
         /// </remarks>
         protected virtual void InitialQuantizePixel(Color32 pixel)
         {
+		Logger.LogDebug(">>> Entering InitialQuantizePixel(pixel={Pixel})", pixel);
+		Logger.LogDebug("<<< Exiting InitialQuantizePixel(pixel={Pixel})", pixel);
         }
 
         /// <summary>Override this to process the pixel in the second pass of the algorithm.</summary>

@@ -18,8 +18,11 @@ namespace Dnn.EditBar.UI.Items
     public class DiscardWorkflowMenu(IContentController contentController, IWorkflowEngine workflowEngine)
         : WorkflowBaseMenuItem(contentController, workflowEngine)
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="DiscardWorkflowMenu"/> class.</summary>
+		Logger.LogDebug(">>> Entering DiscardWorkflowMenu(contentController={ContentController},workflowEngine={WorkflowEngine})", contentController, workflowEngine);
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IContentController. Scheduled removal in v12.0.0.")]
+		Logger.LogDebug("<<< Exiting DiscardWorkflowMenu(contentController={ContentController},workflowEngine={WorkflowEngine})", contentController, workflowEngine);
         public DiscardWorkflowMenu()
             : this(null, null)
         {
@@ -49,6 +52,7 @@ namespace Dnn.EditBar.UI.Items
         /// <inheritdoc />
         public override bool Visible() => base.Visible()
             && !this.IsDirectPublishWorkflow
+			Logger.LogDebug(">>> Entering Visible()");
             && ((this.IsLastState == false && (this.IsDraftWithPermissions == true || this.IsReviewOrOtherIntermediateStateWithPermissions == true))
             || (this.IsLastState == true && this.HasUnpublishVersion && this.HasDraftPermission)); // handles other workflow scenarios (not Direct Publish)
     }

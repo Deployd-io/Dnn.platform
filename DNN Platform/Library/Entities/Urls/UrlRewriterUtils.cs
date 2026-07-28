@@ -22,6 +22,7 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>A new <see cref="FriendlyUrlOptions"/> instance.</returns>
         public static FriendlyUrlOptions GetOptionsFromSettings(FriendlyUrlSettings settings)
         {
+			Logger.LogDebug(">>> Entering GetOptionsFromSettings(settings={Settings})", settings);
             var options = new FriendlyUrlOptions
             {
                 PunctuationReplacement = (settings.ReplaceSpaceWith != FriendlyUrlSettings.ReplaceSpaceWithNothing)
@@ -39,6 +40,7 @@ namespace DotNetNuke.Entities.Urls
                                             ? string.Empty
                                             : settings.PageExtension,
             };
+			Logger.LogDebug("<<< Exiting GetOptionsFromSettings(settings={Settings})", settings);
             return options;
         }
 
@@ -186,7 +188,9 @@ namespace DotNetNuke.Entities.Urls
         /// <returns><paramref name="value"/> without the extension.</returns>
         public static string CleanExtension(string value, FriendlyUrlSettings settings, string langParms)
         {
+			Logger.LogDebug(">>> Entering CleanExtension(value={Value},settings={Settings},langParms={LangParms})", value, settings, langParms);
             bool replaced;
+			Logger.LogDebug("<<< Exiting CleanExtension(value={Value},settings={Settings},langParms={LangParms})", value, settings, langParms);
             return RewriteController.CleanExtension(value, settings, langParms, out replaced);
         }
     }

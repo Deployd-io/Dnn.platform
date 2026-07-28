@@ -8,9 +8,12 @@ namespace Dnn.PersonaBar.SiteGroups
 
     public class SiteGroups : ServiceLocator<IManagePortalGroups, SiteGroups>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         protected override System.Func<IManagePortalGroups> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new PortalGroupAdapter();
         }
     }

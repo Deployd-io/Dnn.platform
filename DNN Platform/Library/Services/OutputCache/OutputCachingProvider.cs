@@ -24,15 +24,19 @@ namespace DotNetNuke.Services.OutputCache
 
         public static OutputCachingProvider Instance(string friendlyName)
         {
+			Logger.LogDebug(">>> Entering Instance(friendlyName={FriendlyName})", friendlyName);
+			Logger.LogDebug("<<< Exiting Instance(friendlyName={FriendlyName})", friendlyName);
             return ComponentFactory.GetComponent<OutputCachingProvider>(friendlyName);
         }
 
         public static void RemoveItemFromAllProviders(int tabId)
         {
+			Logger.LogDebug(">>> Entering RemoveItemFromAllProviders(tabId={TabId})", tabId);
             foreach (KeyValuePair<string, OutputCachingProvider> kvp in GetProviderList())
             {
                 kvp.Value.Remove(tabId);
             }
+			Logger.LogDebug("<<< Exiting RemoveItemFromAllProviders(tabId={TabId})", tabId);
         }
 
         public abstract int GetItemCount(int tabId);
@@ -68,22 +72,29 @@ namespace DotNetNuke.Services.OutputCache
 
         public virtual void PurgeCache(int portalId)
         {
+		Logger.LogDebug(">>> Entering PurgeCache(portalId={PortalId})", portalId);
+		Logger.LogDebug("<<< Exiting PurgeCache(portalId={PortalId})", portalId);
         }
 
         public virtual void PurgeExpiredItems(int portalId)
         {
+		Logger.LogDebug(">>> Entering PurgeExpiredItems(portalId={PortalId})", portalId);
+		Logger.LogDebug("<<< Exiting PurgeExpiredItems(portalId={PortalId})", portalId);
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         protected string ByteArrayToString(byte[] arrInput)
         {
+			Logger.LogDebug(">>> Entering ByteArrayToString(arrInput={ArrInput})", arrInput);
             int i = 0;
             var sOutput = new StringBuilder(arrInput.Length);
             for (i = 0; i <= arrInput.Length - 1; i++)
+			Logger.LogDebug("ByteArrayToString(arrInput={ArrInput}): sOutput → {SOutput}", arrInput, sOutput);
             {
                 sOutput.Append(arrInput[i].ToString("X2", CultureInfo.InvariantCulture));
             }
 
+			Logger.LogDebug("<<< Exiting ByteArrayToString(arrInput={ArrInput})", arrInput);
             return sOutput.ToString();
         }
 
@@ -98,7 +109,9 @@ namespace DotNetNuke.Services.OutputCache
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         protected void WriteStreamAsText(HttpContext context, Stream stream, long offset, long length)
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
             if (length < 0)
+			Logger.LogDebug(">>> Entering WriteStreamAsText(context={Context},stream={Stream},offset={Offset},length={Length})", context, stream, offset, length);
             {
                 length = stream.Length - offset;
             }
@@ -112,10 +125,13 @@ namespace DotNetNuke.Services.OutputCache
 
                 var buffer = new byte[Convert.ToInt32(length)];
                 int count = stream.Read(buffer, 0, Convert.ToInt32(length));
+				Logger.LogDebug("WriteStreamAsText(context={Context},stream={Stream},offset={Offset},length={Length}): buffer → {Buffer}", context, stream, offset, length, buffer);
+				Logger.LogDebug("WriteStreamAsText(context={Context},stream={Stream},offset={Offset},length={Length}): count → {Count}", context, stream, offset, length, count);
                 char[] output = Encoding.UTF8.GetChars(buffer, 0, count);
                 context.Response.ContentEncoding = Encoding.UTF8;
                 context.Response.Output.Write(output);
             }
+			Logger.LogDebug("<<< Exiting WriteStreamAsText(context={Context},stream={Stream},offset={Offset},length={Length})", context, stream, offset, length);
         }
     }
 }

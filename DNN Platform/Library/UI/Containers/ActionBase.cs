@@ -38,7 +38,9 @@ namespace DotNetNuke.UI.Containers
         protected ActionBase()
             : this(null)
         {
+		EventLogger.LogDebug(">>> Entering ActionBase()");
         }
+		EventLogger.LogDebug("<<< Exiting ActionBase()");
 
         /// <summary>Initializes a new instance of the <see cref="ActionBase"/> class.</summary>
         /// <param name="eventLogger">The event logger.</param>
@@ -95,6 +97,8 @@ namespace DotNetNuke.UI.Containers
         /// <returns>A value indicating whether the control should be displayed.</returns>
         protected bool DisplayControl(DNNNodeCollection objNodes)
         {
+			EventLogger.LogDebug(">>> Entering DisplayControl(objNodes={ObjNodes})", objNodes);
+			EventLogger.LogDebug("<<< Exiting DisplayControl(objNodes={ObjNodes})", objNodes);
             return this.ActionManager.DisplayControl(objNodes);
         }
 
@@ -102,17 +106,21 @@ namespace DotNetNuke.UI.Containers
         /// <param name="e">The action event arguments.</param>
         protected virtual void OnAction(ActionEventArgs e)
         {
+			EventLogger.LogDebug(">>> Entering OnAction(e={E})", e);
             this.Action?.Invoke(this, e);
+			EventLogger.LogDebug("<<< Exiting OnAction(e={E})", e);
         }
 
         /// <summary>ProcessAction processes the action event.</summary>
         /// <param name="actionID">The id of the action.</param>
         protected void ProcessAction(string actionID)
         {
+			EventLogger.LogDebug(">>> Entering ProcessAction(actionID={ActionID})", actionID);
             if (int.TryParse(actionID, out var output))
             {
                 ModuleAction action = this.Actions.GetActionByID(output);
                 if (action != null)
+				EventLogger.LogDebug("ProcessAction(actionID={ActionID}): action → {Action}", actionID, action);
                 {
                     if (!this.ActionManager.ProcessAction(action))
                     {
@@ -120,12 +128,14 @@ namespace DotNetNuke.UI.Containers
                     }
                 }
             }
+			EventLogger.LogDebug("<<< Exiting ProcessAction(actionID={ActionID})", actionID);
         }
 
         /// <summary>Page_Load runs when the class is loaded.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			EventLogger.LogDebug(">>> Entering OnLoad(e={E})", e);
             try
             {
                 if (this.ModuleControl == null)
@@ -137,10 +147,12 @@ namespace DotNetNuke.UI.Containers
             }
             catch (Exception exc)
             {
+				EventLogger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
 
             base.OnLoad(e);
+			EventLogger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
     }
 }

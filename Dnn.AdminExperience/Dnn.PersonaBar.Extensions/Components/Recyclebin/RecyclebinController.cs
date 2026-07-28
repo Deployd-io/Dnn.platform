@@ -42,11 +42,23 @@ namespace Dnn.PersonaBar.Recyclebin.Components
 
         public RecyclebinController()
         {
+			Logger.LogDebug(">>> Entering RecyclebinController()");
             this.tabController = TabController.Instance;
             this.tabVersionSettings = TabVersionSettings.Instance;
+			Logger.LogDebug("RecyclebinController(): this.tabController → {Arg0}", this.tabController);
+			Logger.LogDebug("RecyclebinController(): tabVersionSettings → {TabVersionSettings}", tabVersionSettings);
+			Logger.LogDebug("RecyclebinController(): this.tabVersionSettings → {Arg0}", this.tabVersionSettings);
             this.tabWorkflowSettings = TabWorkflowSettings.Instance;
             this.moduleController = ModuleController.Instance;
             this.tabChangeSettings = TabChangeSettings.Instance;
+			Logger.LogDebug("<<< Exiting RecyclebinController()");
+			Logger.LogDebug("RecyclebinController(): tabWorkflowSettings → {TabWorkflowSettings}", tabWorkflowSettings);
+			Logger.LogDebug("RecyclebinController(): this.tabWorkflowSettings → {Arg0}", this.tabWorkflowSettings);
+			Logger.LogDebug("RecyclebinController(): moduleController → {ModuleController}", moduleController);
+			Logger.LogDebug("RecyclebinController(): this.moduleController → {Arg0}", this.moduleController);
+			Logger.LogDebug("RecyclebinController(): tabChangeSettings → {TabChangeSettings}", tabChangeSettings);
+			Logger.LogDebug("RecyclebinController(): this.tabChangeSettings → {Arg0}", this.tabChangeSettings);
+			Logger.LogDebug("RecyclebinController(): tabController → {TabController}", tabController);
         }
 
         private static PortalSettings PortalSettings => PortalSettings.Current;
@@ -54,6 +66,8 @@ namespace Dnn.PersonaBar.Recyclebin.Components
         /// <inheritdoc />
         public string LocalizeString(string key)
         {
+			Logger.LogDebug(">>> Entering LocalizeString(key={Key})", key);
+			Logger.LogDebug("<<< Exiting LocalizeString(key={Key})", key);
             return Localization.GetString(key, Constants.LocalResourcesFile);
         }
 
@@ -100,12 +114,14 @@ namespace Dnn.PersonaBar.Recyclebin.Components
         /// <inheritdoc />
         public void DeleteModules(IEnumerable<ModuleItem> modules, StringBuilder errors)
         {
+			Logger.LogDebug(">>> Entering DeleteModules(modules={Modules},errors={Errors})", modules, errors);
             if (modules != null)
             {
                 foreach (var mod in modules)
                 {
                     var moduleInfo = ModuleController.Instance.GetModule(mod.Id, mod.TabID, true);
                     if (moduleInfo == null)
+					Logger.LogDebug("DeleteModules(modules={Modules},errors={Errors}): moduleInfo → {ModuleInfo}", modules, errors, moduleInfo);
                     {
                         errors.AppendFormat(CultureInfo.InvariantCulture, this.LocalizeString("ModuleNotFound"), mod.Id, mod.TabID);
                     }
@@ -115,6 +131,7 @@ namespace Dnn.PersonaBar.Recyclebin.Components
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting DeleteModules(modules={Modules},errors={Errors})", modules, errors);
         }
 
         /// <inheritdoc />
@@ -126,8 +143,10 @@ namespace Dnn.PersonaBar.Recyclebin.Components
         /// <inheritdoc />
         public bool RestoreTab(TabInfo tab, out string resultmessage)
         {
+			Logger.LogDebug(">>> Entering RestoreTab(tab={Tab})", tab);
             var changeControlStateForTab = this.tabChangeSettings.GetChangeControlState(tab.PortalID, tab.TabID);
             if (changeControlStateForTab.IsChangeControlEnabledForTab)
+			Logger.LogDebug("RestoreTab(tab={Tab}): changeControlStateForTab → {ChangeControlStateForTab}", tab, changeControlStateForTab);
             {
                 this.tabVersionSettings.SetEnabledVersioningForTab(tab.TabID, false);
                 this.tabWorkflowSettings.SetWorkflowEnabled(tab.PortalID, tab.TabID, false);
@@ -135,10 +154,13 @@ namespace Dnn.PersonaBar.Recyclebin.Components
 
             var success = true;
             resultmessage = null;
+			Logger.LogDebug("RestoreTab(tab={Tab}): success → {Success}", tab, success);
+			Logger.LogDebug("RestoreTab(tab={Tab}): resultmessage → {Resultmessage}", tab, resultmessage);
 
             // if parent of the page is deleted, then can't restore - parent should be restored first
             var deletedTabs = this.GetDeletedTabs(out _);
             if (!Null.IsNull(tab.ParentId) && deletedTabs.Any(t => t.TabID == tab.ParentId))
+			Logger.LogDebug("RestoreTab(tab={Tab}): deletedTabs → {DeletedTabs}", tab, deletedTabs);
             {
                 resultmessage = string.Format(CultureInfo.CurrentCulture, this.LocalizeString("Service_RestoreTabError"), tab.TabName);
                 success = false;
@@ -150,6 +172,7 @@ namespace Dnn.PersonaBar.Recyclebin.Components
                 // restore modules in this tab
                 var tabDeletedModules = this.GetDeletedModules(out _).Where(m => m.TabID == tab.TabID);
 
+				Logger.LogDebug("RestoreTab(tab={Tab}): tabDeletedModules → {TabDeletedModules}", tab, tabDeletedModules);
                 foreach (var m in tabDeletedModules)
                 {
                     success = this.RestoreModule(m.ModuleID, m.TabID, out resultmessage);
@@ -167,21 +190,26 @@ namespace Dnn.PersonaBar.Recyclebin.Components
                 }
             }
 
+			Logger.LogDebug("<<< Exiting RestoreTab(tab={Tab})", tab);
             return success;
         }
 
         /// <inheritdoc />
         public bool RestoreModule(int moduleId, int tabId, out string errorMessage)
         {
+			Logger.LogDebug(">>> Entering RestoreModule(moduleId={ModuleId},tabId={TabId})", moduleId, tabId);
             errorMessage = null;
 
+			Logger.LogDebug("RestoreModule(moduleId={ModuleId},tabId={TabId}): errorMessage → {ErrorMessage}", moduleId, tabId, errorMessage);
             // restore module
             var module = ModulesController.Instance.GetModule(PortalSettings, moduleId, tabId, out _);
 
+			Logger.LogDebug("RestoreModule(moduleId={ModuleId},tabId={TabId}): module → {Module}", moduleId, tabId, module);
             if (module != null)
             {
                 var deletedTab = this.GetDeletedTabs(out _).Where(t => t.TabID == module.TabID).SingleOrDefault();
                 if (deletedTab is not null)
+				Logger.LogDebug("RestoreModule(moduleId={ModuleId},tabId={TabId}): deletedTab → {DeletedTab}", moduleId, tabId, deletedTab);
                 {
                     var title = !string.IsNullOrEmpty(module.ModuleTitle)
                         ? module.ModuleTitle
@@ -210,16 +238,21 @@ namespace Dnn.PersonaBar.Recyclebin.Components
                 return false;
             }
 
+			Logger.LogDebug("<<< Exiting RestoreModule(moduleId={ModuleId},tabId={TabId})", moduleId, tabId);
             return true;
         }
 
         /// <inheritdoc />
         public List<TabInfo> GetDeletedTabs(out int totalRecords, int pageIndex = -1, int pageSize = -1, string sortType = "", string sortDirection = "")
         {
+			Logger.LogDebug(">>> Entering GetDeletedTabs(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection})", pageIndex, pageSize, sortType, sortDirection);
             var adminTabId = PortalSettings.AdminTabId;
             var tabs = TabController.GetPortalTabs(PortalSettings.PortalId, adminTabId, true, true, true, true);
+			Logger.LogDebug("GetDeletedTabs(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): pageIndex → {PageIndex1}", pageIndex, pageSize, sortType, sortDirection, pageIndex);
             var deletedtabs =
                 tabs.Where(t => t.ParentId != adminTabId && t.IsDeleted && TabPermissionController.CanDeletePage(t));
+				Logger.LogDebug("GetDeletedTabs(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): tabs → {Tabs}", pageIndex, pageSize, sortType, sortDirection, tabs);
+				Logger.LogDebug("GetDeletedTabs(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): deletedtabs → {Deletedtabs}", pageIndex, pageSize, sortType, sortDirection, deletedtabs);
             if (sortType == "tab")
             {
                 deletedtabs = sortDirection == "asc" ? deletedtabs = deletedtabs.OrderBy(tab => tab.TabName) : deletedtabs = deletedtabs.OrderByDescending(tab => tab.TabName);
@@ -231,17 +264,22 @@ namespace Dnn.PersonaBar.Recyclebin.Components
             }
 
             totalRecords = deletedtabs.Count();
+			Logger.LogDebug("GetDeletedTabs(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): totalRecords → {TotalRecords}", pageIndex, pageSize, sortType, sortDirection, totalRecords);
+			Logger.LogDebug("<<< Exiting GetDeletedTabs(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection})", pageIndex, pageSize, sortType, sortDirection);
             return pageIndex == -1 || pageSize == -1 ? deletedtabs.ToList() : deletedtabs.Skip(pageIndex * pageSize).Take(pageSize).ToList();
         }
 
         /// <inheritdoc />
         public List<ModuleInfo> GetDeletedModules(out int totalRecords, int pageIndex = -1, int pageSize = -1, string sortType = "", string sortDirection = "")
         {
+			Logger.LogDebug(">>> Entering GetDeletedModules(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection})", pageIndex, pageSize, sortType, sortDirection);
             var deletedModules = this.moduleController.GetModules(PortalSettings.PortalId)
                 .Cast<ModuleInfo>()
                 .Where(module => module.IsDeleted && (
                     TabPermissionController.CanAddContentToPage(TabController.Instance.GetTab(module.TabID, module.PortalID)) ||
                     ModulePermissionController.CanDeleteModule(module)));
+				Logger.LogDebug("GetDeletedModules(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): deletedModules → {DeletedModules}", pageIndex, pageSize, sortType, sortDirection, deletedModules);
+				Logger.LogDebug("GetDeletedModules(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): pageIndex → {PageIndex1}", pageIndex, pageSize, sortType, sortDirection, pageIndex);
             if (sortType == "title")
             {
                 deletedModules = sortDirection == "asc" ? deletedModules = deletedModules.OrderBy(module => module.ModuleTitle) : deletedModules = deletedModules.OrderByDescending(module => module.ModuleTitle);
@@ -258,23 +296,28 @@ namespace Dnn.PersonaBar.Recyclebin.Components
             }
 
             totalRecords = deletedModules.Count();
+			Logger.LogDebug("GetDeletedModules(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): totalRecords → {TotalRecords}", pageIndex, pageSize, sortType, sortDirection, totalRecords);
+			Logger.LogDebug("<<< Exiting GetDeletedModules(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection})", pageIndex, pageSize, sortType, sortDirection);
             return pageIndex == -1 || pageSize == -1 ? deletedModules.ToList() : deletedModules.Skip(pageIndex * pageSize).Take(pageSize).ToList();
         }
 
         /// <inheritdoc />
         public string GetTabStatus(TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering GetTabStatus(tab={Tab})", tab);
             if (tab.DisableLink)
             {
                 return "Disabled";
             }
 
+			Logger.LogDebug("<<< Exiting GetTabStatus(tab={Tab})", tab);
             return tab.IsVisible ? "Visible" : "Hidden";
         }
 
         /// <inheritdoc />
         public List<UserInfo> GetDeletedUsers(out int totalRecords, int pageIndex = -1, int pageSize = -1, string sortType = "", string sortDirection = "")
         {
+			Logger.LogDebug(">>> Entering GetDeletedUsers(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection})", pageIndex, pageSize, sortType, sortDirection);
             var deletedusers = UserController.GetDeletedUsers(PortalSettings.PortalId).Cast<UserInfo>().Where(this.CanManageUser);
             if (sortType == "username")
             {
@@ -298,8 +341,10 @@ namespace Dnn.PersonaBar.Recyclebin.Components
         /// <inheritdoc />
         public void DeleteUsers(IEnumerable<UserInfo> users)
         {
+			Logger.LogDebug(">>> Entering DeleteUsers(users={Users})", users);
             var userInfos = users as IList<UserInfo> ?? users.ToList();
             if (users == null || !userInfos.Any())
+			Logger.LogDebug("DeleteUsers(users={Users}): userInfos → {UserInfos}", users, userInfos);
             {
                 return;
             }
@@ -315,6 +360,7 @@ namespace Dnn.PersonaBar.Recyclebin.Components
                     UserController.RemoveUser(user);
                 }
             }
+			Logger.LogDebug("<<< Exiting DeleteUsers(users={Users})", users);
         }
 
         /// <inheritdoc />
@@ -328,8 +374,11 @@ namespace Dnn.PersonaBar.Recyclebin.Components
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public bool RestoreUser(UserInfo user, out string errorMessage)
         {
+			Logger.LogDebug(">>> Entering RestoreUser(user={User})", user);
             errorMessage = null;
             var deletedUsers = UserController.GetDeletedUsers(user.PortalID).Cast<UserInfo>().Where(this.CanManageUser).ToList();
+			Logger.LogDebug("RestoreUser(user={User}): errorMessage → {ErrorMessage}", user, errorMessage);
+			Logger.LogDebug("RestoreUser(user={User}): deletedUsers → {DeletedUsers}", user, deletedUsers);
             if (deletedUsers.Any(u => u.UserID == user.UserID))
             {
                 UserController.RestoreUser(ref user);
@@ -337,17 +386,21 @@ namespace Dnn.PersonaBar.Recyclebin.Components
             }
 
             errorMessage = this.LocalizeString("Service_RestoreUserError");
+			Logger.LogDebug("<<< Exiting RestoreUser(user={User})", user);
             return false;
         }
 
         /// <inheritdoc />
         protected override Func<IRecyclebinController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new RecyclebinController();
         }
 
         private void HardDeleteTab(TabInfo tab, bool deleteDescendants, StringBuilder errors)
         {
+			Logger.LogDebug(">>> Entering HardDeleteTab(tab={Tab},deleteDescendants={DeleteDescendants},errors={Errors})", tab, deleteDescendants, errors);
             if (TabPermissionController.CanDeletePage(tab) && tab.IsDeleted)
             {
                 if (tab.HasChildren && !deleteDescendants)
@@ -359,6 +412,7 @@ namespace Dnn.PersonaBar.Recyclebin.Components
                 // get tab modules before deleting page
                 var tabModules = this.moduleController.GetTabModules(tab.TabID);
 
+				Logger.LogDebug("HardDeleteTab(tab={Tab},deleteDescendants={DeleteDescendants},errors={Errors}): tabModules → {TabModules}", tab, deleteDescendants, errors, tabModules);
                 // hard delete the tab
                 this.tabController.DeleteTab(tab.TabID, tab.PortalID, deleteDescendants);
 
@@ -368,6 +422,7 @@ namespace Dnn.PersonaBar.Recyclebin.Components
                     // check if all modules instances have been deleted
                     var delModule = this.moduleController.GetModule(kvp.Value.ModuleID, Null.NullInteger, false);
                     if (delModule == null || delModule.TabID == Null.NullInteger)
+					Logger.LogDebug("HardDeleteTab(tab={Tab},deleteDescendants={DeleteDescendants},errors={Errors}): delModule → {DelModule}", tab, deleteDescendants, errors, delModule);
                     {
                         try
                         {
@@ -387,6 +442,7 @@ namespace Dnn.PersonaBar.Recyclebin.Components
                     !tab.IsDeleted ? this.LocalizeString("TabNotSoftDeleted") : this.LocalizeString("CanNotDeleteTab"),
                     tab.TabID);
             }
+			Logger.LogDebug("<<< Exiting HardDeleteTab(tab={Tab},deleteDescendants={DeleteDescendants},errors={Errors})", tab, deleteDescendants, errors);
         }
 
         private void HardDeleteModule(ModuleInfo module, StringBuilder errors)
@@ -418,6 +474,7 @@ namespace Dnn.PersonaBar.Recyclebin.Components
         /// <returns><see langword="true"/> if the current user can manage the given <paramref name="user"/>, otherwise <see langword="false"/>.</returns>
         private bool CanManageUser(UserInfo user)
         {
+			Logger.LogDebug(">>> Entering CanManageUser(user={User})", user);
             if (PortalSettings.UserInfo.IsSuperUser ||
                 (PortalSettings.UserInfo.IsInRole(PortalSettings.AdministratorRoleName) && !user.IsSuperUser) ||
                 (!PortalSettings.UserInfo.IsInRole(PortalSettings.AdministratorRoleName) && !user.IsSuperUser &&
@@ -426,6 +483,7 @@ namespace Dnn.PersonaBar.Recyclebin.Components
                 return true;
             }
 
+			Logger.LogDebug("<<< Exiting CanManageUser(user={User})", user);
             return false;
         }
     }

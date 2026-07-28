@@ -26,6 +26,7 @@ using System.IO;
 
 namespace log4net.Util.PatternStringConverters
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Write an environment variable to the output
     /// </summary>
@@ -54,6 +55,7 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         protected override void Convert(TextWriter writer, object state) 
         {
+			Logger.LogDebug(">>> Entering Convert(writer={Writer},state={State})", writer, state);
             try 
             {
                 if (this.Option != null && this.Option.Length > 0)
@@ -61,6 +63,7 @@ namespace log4net.Util.PatternStringConverters
                     // Lookup the environment variable
                     string envValue = Environment.GetEnvironmentVariable(this.Option);
 
+Logger.LogDebug("Convert(writer={Writer},state={State}): envValue → {EnvValue}", writer, state, envValue);
 #if NET_2_0 || NETSTANDARD2_0
                     // If we didn't see it for the process, try a user level variable.
                     if (envValue == null)
@@ -92,6 +95,7 @@ namespace log4net.Util.PatternStringConverters
             {
                 LogLog.Error(declaringType, "Error occurred while converting environment variable.", ex);
             }
+			Logger.LogDebug("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
         }
 
         /// <summary>

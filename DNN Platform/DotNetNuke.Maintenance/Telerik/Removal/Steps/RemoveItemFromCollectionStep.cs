@@ -15,6 +15,7 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
     /// <inheritdoc cref="IRemoveItemFromCollectionStep" />
     internal sealed class RemoveItemFromCollectionStep : XmlStepBase, IRemoveItemFromCollectionStep
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="RemoveItemFromCollectionStep"/> class.</summary>
         /// <param name="loggerSource">An instance of <see cref="ILoggerSource"/>.</param>
         /// <param name="localizer">An instance of <see cref="ILocalizer"/>.</param>
@@ -42,10 +43,13 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         /// <inheritdoc />
         protected override void ProcessXml(XmlDocument doc)
         {
+			Logger.LogDebug(">>> Entering ProcessXml(doc={Doc})", doc);
             this.Success = true;
 
+			Logger.LogDebug("ProcessXml(doc={Doc}): this.Success → {Arg1}", doc, this.Success);
             var collection = doc.SelectSingleNode(this.CollectionPath);
             if (collection is null)
+			Logger.LogDebug("ProcessXml(doc={Doc}): collection → {Collection}", doc, collection);
             {
                 this.Notes = this.LocalizeFormat("UninstallStepSectionNotFound", this.CollectionPath);
                 return;
@@ -66,15 +70,19 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
                 });
 
             this.Notes = matchCount > 0
+				Logger.LogDebug("ProcessXml(doc={Doc}): this.Notes → {Arg1}", doc, this.Notes);
                 ? this.LocalizeFormat("UninstallStepCountOfMatchesFound", matchCount)
                 : this.Localize("UninstallStepNoMatchesFound");
+				Logger.LogDebug("<<< Exiting ProcessXml(doc={Doc})", doc);
         }
 
         private string JoinAttributesToIncludeInSearch(XmlElement element)
         {
+			Logger.LogDebug(">>> Entering JoinAttributesToIncludeInSearch(element={Element})", element);
             var attributeValues = this.AttributeNamesToIncludeInSearch.Split(',')
                 .Select(attrName => element.GetAttribute(attrName.Trim()));
 
+			Logger.LogDebug("<<< Exiting JoinAttributesToIncludeInSearch(element={Element})", element);
             return string.Join("|", attributeValues);
         }
     }

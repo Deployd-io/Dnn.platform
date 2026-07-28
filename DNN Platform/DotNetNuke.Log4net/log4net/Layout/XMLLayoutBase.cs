@@ -51,7 +51,12 @@ namespace log4net.Layout
         /// </remarks>
         protected XmlLayoutBase() : this(false)
         {
+			Logger.LogDebug(">>> Entering XmlLayoutBase()");
             this.IgnoresException = false;
+			Logger.LogDebug("<<< Exiting XmlLayoutBase()");
+			Logger.LogDebug("XmlLayoutBase(): this.IgnoresException → {Arg0}", this.IgnoresException);
+			Logger.LogDebug(">>> Entering XmlLayoutBase(locationInfo={LocationInfo})", locationInfo);
+			Logger.LogDebug("<<< Exiting XmlLayoutBase(locationInfo={LocationInfo})", locationInfo);
         }
 
         /// <summary>Protected constructor to support subclasses</summary>
@@ -73,6 +78,8 @@ namespace log4net.Layout
         {
             this.IgnoresException = false;
             this.m_locationInfo = locationInfo;
+			Logger.LogDebug("XmlLayoutBase(locationInfo={LocationInfo}): this.IgnoresException → {Arg1}", locationInfo, this.IgnoresException);
+			Logger.LogDebug("XmlLayoutBase(locationInfo={LocationInfo}): this.m_locationInfo → {Arg1}", locationInfo, this.m_locationInfo);
         }
 
         /// <summary>
@@ -135,7 +142,9 @@ namespace log4net.Layout
         /// </remarks>
         public override void ActivateOptions() 
         {
+			Logger.LogDebug(">>> Entering ActivateOptions()");
             // nothing to do
+			Logger.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>Gets the content type output by this layout. </summary>
@@ -168,6 +177,7 @@ namespace log4net.Layout
         /// </remarks>
         public override void Format(TextWriter writer, LoggingEvent loggingEvent) 
         {
+			Logger.LogDebug(">>> Entering Format(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             if (loggingEvent == null)
             {
                 throw new ArgumentNullException("loggingEvent");
@@ -184,6 +194,7 @@ namespace log4net.Layout
             using (var xmlWriter = new XmlTextWriter(new ProtectCloseTextWriter(writer)))
             {
                 xmlWriter.Formatting = Formatting.None;
+				private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                 xmlWriter.Namespaces = false;
 
 #endif
@@ -216,5 +227,6 @@ namespace log4net.Layout
 
         /// <summary>The string to replace invalid chars with</summary>
         private string m_invalidCharReplacement = "?";
+		Logger.LogDebug("<<< Exiting Format(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
     }
 }

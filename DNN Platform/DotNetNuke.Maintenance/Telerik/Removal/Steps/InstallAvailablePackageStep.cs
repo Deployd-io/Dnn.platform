@@ -65,9 +65,11 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         /// <inheritdoc />
         protected override void ExecuteInternal()
         {
+			Logger.LogDebug(">>> Entering ExecuteInternal()");
             if (this.PackageIsAlreadyInstalled())
             {
                 this.Success = true;
+				Logger.LogDebug("ExecuteInternal(): this.Success → {Arg0}", this.Success);
                 this.Notes = this.LocalizeFormat("UninstallStepPackageAlreadyInstalled", this.PackageName);
                 return;
             }
@@ -98,6 +100,7 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
 
                 try
                 {
+					private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                     installer.InstallerInfo.PortalID = Null.NullInteger;
 
                     if (installer.InstallerInfo.ManifestFile != null)
@@ -128,15 +131,18 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
                     this.DeleteTempInstallFiles(installer);
                 }
             }
+			Logger.LogDebug("<<< Exiting ExecuteInternal()");
         }
 
         private void DeleteInstallFile(string installerFile)
         {
+			Logger.LogDebug(">>> Entering DeleteInstallFile(installerFile={InstallerFile})", installerFile);
             if (this.fsProvider.FileExists(installerFile))
             {
                 this.fsProvider.SetFileAttributes(installerFile, FileAttributes.Normal);
                 this.fsProvider.DeleteFile(installerFile);
             }
+			Logger.LogDebug("<<< Exiting DeleteInstallFile(installerFile={InstallerFile})", installerFile);
         }
 
         private void DeleteTempInstallFiles(Installer installer)
@@ -151,10 +157,12 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
 
         private bool PackageIsAlreadyInstalled()
         {
+			Logger.LogDebug(">>> Entering PackageIsAlreadyInstalled()");
             bool WithMatchingPackageName(PackageInfo p) =>
                 "Module".Equals(p.PackageType, StringComparison.OrdinalIgnoreCase) &&
                 this.PackageName.Equals(p.Name, StringComparison.OrdinalIgnoreCase);
 
+			Logger.LogDebug("<<< Exiting PackageIsAlreadyInstalled()");
             return this.packageController.GetExtensionPackages(Null.NullInteger, WithMatchingPackageName).Any();
         }
     }

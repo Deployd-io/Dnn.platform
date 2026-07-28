@@ -15,6 +15,7 @@ namespace DotNetNuke.Services.ModuleCache
 
     public class MemoryProvider : ModuleCachingProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string CachePrefix = "ModuleCache:";
 
         /// <inheritdoc />
@@ -35,6 +36,8 @@ namespace DotNetNuke.Services.ModuleCache
         /// <inheritdoc />
         public override int GetItemCount(int tabModuleId)
         {
+			Logger.LogDebug(">>> Entering GetItemCount(tabModuleId={TabModuleId})", tabModuleId);
+			Logger.LogDebug("<<< Exiting GetItemCount(tabModuleId={TabModuleId})", tabModuleId);
             return GetCacheKeys(tabModuleId).Count;
         }
 
@@ -47,13 +50,17 @@ namespace DotNetNuke.Services.ModuleCache
         /// <inheritdoc />
         public override void PurgeCache(int portalId)
         {
+			Logger.LogDebug(">>> Entering PurgeCache(portalId={PortalId})", portalId);
             DataCache.ClearCache(CachePrefix);
+			Logger.LogDebug("<<< Exiting PurgeCache(portalId={PortalId})", portalId);
         }
 
         /// <inheritdoc />
         public override void Remove(int tabModuleId)
         {
+			Logger.LogDebug(">>> Entering Remove(tabModuleId={TabModuleId})", tabModuleId);
             DataCache.ClearCache($"{CachePrefix}|{tabModuleId.ToString(CultureInfo.InvariantCulture)}");
+			Logger.LogDebug("<<< Exiting Remove(tabModuleId={TabModuleId})", tabModuleId);
         }
 
         /// <inheritdoc />
@@ -66,13 +73,18 @@ namespace DotNetNuke.Services.ModuleCache
         /// <inheritdoc />
         public override void PurgeExpiredItems(int portalId)
         {
+			Logger.LogDebug(">>> Entering PurgeExpiredItems(portalId={PortalId})", portalId);
             // throw new NotSupportedException();
+			Logger.LogDebug("<<< Exiting PurgeExpiredItems(portalId={PortalId})", portalId);
         }
 
         private static List<string> GetCacheKeys(int tabModuleId)
         {
+			Logger.LogDebug(">>> Entering GetCacheKeys(tabModuleId={TabModuleId})", tabModuleId);
             var keys = new List<string>();
             IDictionaryEnumerator cacheEnum = CachingProvider.Instance().GetEnumerator();
+			Logger.LogDebug("GetCacheKeys(tabModuleId={TabModuleId}): keys → {Keys}", tabModuleId, keys);
+			Logger.LogDebug("GetCacheKeys(tabModuleId={TabModuleId}): cacheEnum → {CacheEnum}", tabModuleId, cacheEnum);
             while (cacheEnum.MoveNext())
             {
                 if (cacheEnum.Key.ToString().StartsWith($"{CachePrefix}|{tabModuleId.ToString(CultureInfo.InvariantCulture)}|", StringComparison.Ordinal))
@@ -81,6 +93,7 @@ namespace DotNetNuke.Services.ModuleCache
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetCacheKeys(tabModuleId={TabModuleId})", tabModuleId);
             return keys;
         }
     }

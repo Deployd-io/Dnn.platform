@@ -16,13 +16,17 @@ namespace DotNetNuke.Web.Mvc
     /// </summary>
     internal class DnnMvcDependencyResolver : IDependencyResolver
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IServiceProvider serviceProvider;
 
         /// <summary>Initializes a new instance of the <see cref="DnnMvcDependencyResolver"/> class.</summary>
         /// <param name="serviceProvider">The service provider.</param>
         public DnnMvcDependencyResolver(IServiceProvider serviceProvider)
         {
+			Logger.LogDebug(">>> Entering DnnMvcDependencyResolver(serviceProvider={ServiceProvider})", serviceProvider);
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+			Logger.LogDebug("<<< Exiting DnnMvcDependencyResolver(serviceProvider={ServiceProvider})", serviceProvider);
+			Logger.LogDebug("DnnMvcDependencyResolver(serviceProvider={ServiceProvider}): serviceProvider → {ServiceProvider1}", serviceProvider, serviceProvider);
         }
 
         /// <summary>Returns the specified service from the scope.</summary>
@@ -34,13 +38,17 @@ namespace DotNetNuke.Web.Mvc
         /// </returns>
         public object GetService(Type serviceType)
         {
+			Logger.LogDebug(">>> Entering GetService(serviceType={ServiceType})", serviceType);
             var accessor = this.serviceProvider.GetRequiredService<IScopeAccessor>();
             var scope = accessor.GetScope();
+			Logger.LogDebug("GetService(serviceType={ServiceType}): accessor → {Accessor}", serviceType, accessor);
+			Logger.LogDebug("GetService(serviceType={ServiceType}): scope → {Scope}", serviceType, scope);
             if (scope != null)
             {
                 return scope.ServiceProvider.GetService(serviceType);
             }
 
+			Logger.LogDebug("<<< Exiting GetService(serviceType={ServiceType})", serviceType);
             throw new InvalidOperationException("IServiceScope not provided");
         }
 
@@ -53,13 +61,17 @@ namespace DotNetNuke.Web.Mvc
         /// </returns>
         public IEnumerable<object> GetServices(Type serviceType)
         {
+			Logger.LogDebug(">>> Entering GetServices(serviceType={ServiceType})", serviceType);
             var accessor = this.serviceProvider.GetRequiredService<IScopeAccessor>();
             var scope = accessor.GetScope();
+			Logger.LogDebug("GetServices(serviceType={ServiceType}): accessor → {Accessor}", serviceType, accessor);
+			Logger.LogDebug("GetServices(serviceType={ServiceType}): scope → {Scope}", serviceType, scope);
             if (scope != null)
             {
                 return scope.ServiceProvider.GetServices(serviceType);
             }
 
+			Logger.LogDebug("<<< Exiting GetServices(serviceType={ServiceType})", serviceType);
             throw new InvalidOperationException("IServiceScope not provided");
         }
     }

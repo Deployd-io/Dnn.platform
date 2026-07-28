@@ -10,9 +10,12 @@ namespace DotNetNuke.Entities.Users
     [Serializable]
     public class InvalidVerificationCodeException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="InvalidVerificationCodeException"/> class.</summary>
         public InvalidVerificationCodeException()
         {
+		Logger.LogDebug(">>> Entering InvalidVerificationCodeException()");
+		Logger.LogDebug("<<< Exiting InvalidVerificationCodeException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="InvalidVerificationCodeException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Entities.Users
         public InvalidVerificationCodeException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering InvalidVerificationCodeException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting InvalidVerificationCodeException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="InvalidVerificationCodeException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

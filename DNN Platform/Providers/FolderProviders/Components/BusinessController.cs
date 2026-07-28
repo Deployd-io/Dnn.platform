@@ -17,14 +17,17 @@ namespace DotNetNuke.Providers.FolderProviders.Components
 
     public class BusinessController : IUpgradeable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public string UpgradeModule(string version)
         {
+			Logger.LogDebug(">>> Entering UpgradeModule(version={Version})", version);
             switch (version)
             {
                 case "09.02.00":
                     var package = PackageController.Instance.GetExtensionPackage(Null.NullInteger, p => p.Name == "DotNetNuke.Providers.FolderProviders");
                     if (package != null)
+					Logger.LogDebug("UpgradeModule(version={Version}): package → {Package}", version, package);
                     {
                         DataProvider.Instance().UnRegisterAssembly(package.PackageID, "Microsoft.WindowsAzure.StorageClient.dll");
                     }
@@ -32,6 +35,7 @@ namespace DotNetNuke.Providers.FolderProviders.Components
                     break;
             }
 
+			Logger.LogDebug("<<< Exiting UpgradeModule(version={Version})", version);
             return "Success";
         }
     }

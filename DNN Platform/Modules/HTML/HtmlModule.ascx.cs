@@ -25,6 +25,7 @@ namespace DotNetNuke.Modules.Html
     /// <summary>The HtmlModule Class provides the UI for displaying the HTML.</summary>
     public partial class HtmlModule : HtmlModuleBase, IActionable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IWorkflowManager workflowManager = WorkflowManager.Instance;
         private readonly INavigationManager navigationManager;
         private readonly HtmlTextController htmlTextController;
@@ -36,7 +37,9 @@ namespace DotNetNuke.Modules.Html
         public HtmlModule()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering HtmlModule()");
         }
+		Logger.LogDebug("<<< Exiting HtmlModule()");
 
         /// <summary>Initializes a new instance of the <see cref="HtmlModule"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
@@ -56,6 +59,8 @@ namespace DotNetNuke.Modules.Html
         {
             this.navigationManager = navigationManager ?? this.DependencyProvider.GetRequiredService<INavigationManager>();
             this.htmlTextController = htmlTextController ?? this.DependencyProvider.GetRequiredService<HtmlTextController>();
+			Logger.LogDebug("HtmlModule(settingsRepository={SettingsRepository},navigationManager={NavigationManager},htmlTextController={HtmlTextController}): htmlTextController → {HtmlTextController1}", settingsRepository, navigationManager, htmlTextController, htmlTextController);
+			Logger.LogDebug("HtmlModule(settingsRepository={SettingsRepository},navigationManager={NavigationManager},htmlTextController={HtmlTextController}): navigationManager → {NavigationManager1}", settingsRepository, navigationManager, htmlTextController, navigationManager);
         }
 
         /// <summary>Gets moduleActions is an interface property that returns the module actions collection for the module.</summary>
@@ -92,26 +97,32 @@ namespace DotNetNuke.Modules.Html
         /// <param name="e">The event arguments.</param>
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
             this.lblContent.UpdateLabel += this.LblContent_UpdateLabel;
             this.editorEnabled = this.PortalSettings.InlineEditorEnabled;
+			Logger.LogDebug("OnInit(e={E}): this.editorEnabled → {Arg1}", e, this.editorEnabled);
             try
             {
                 this.workflowId = this.htmlTextController.GetWorkflow(this.ModuleId, this.TabId, this.PortalId).Value;
+				Logger.LogDebug("OnInit(e={E}): workflowId → {WorkflowId}", e, workflowId);
 
                 // Add an Action Event Handler to the Skin
                 this.AddActionHandler(this.ModuleAction_Click);
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnInit(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <summary>Page_Load runs when the control is loaded.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             try
             {
@@ -119,6 +130,7 @@ namespace DotNetNuke.Modules.Html
                 if (this.editorEnabled && this.IsEditable && Personalization.GetUserMode() == PortalSettings.Mode.Edit)
                 {
                     this.editorEnabled = true;
+					Logger.LogDebug("OnLoad(e={E}): this.editorEnabled → {Arg1}", e, this.editorEnabled);
                 }
                 else
                 {
@@ -128,6 +140,8 @@ namespace DotNetNuke.Modules.Html
                 // get content
                 HtmlTextInfo htmlTextInfo = null;
                 string contentString = string.Empty;
+				Logger.LogDebug("OnLoad(e={E}): htmlTextInfo → {HtmlTextInfo}", e, htmlTextInfo);
+				Logger.LogDebug("OnLoad(e={E}): contentString → {ContentString}", e, contentString);
 
                 htmlTextInfo = this.htmlTextController.GetTopHtmlText(this.ModuleId, !this.IsEditable, this.workflowId);
 
@@ -190,6 +204,7 @@ namespace DotNetNuke.Modules.Html
 if(typeof dnn !== 'undefined' && typeof dnn.controls !== 'undefined' && typeof dnn.controls.controls !== 'undefined'){{
     var control = dnn.controls.controls['{HttpUtility.JavaScriptStringEncode(this.lblContent.ClientID)}'];
     if(control && control.container !== $get('{HttpUtility.JavaScriptStringEncode(this.lblContent.ClientID)}')){{
+		Logger.LogDebug("OnLoad(e={E}): control → {Control}", e, control);
         dnn.controls.controls['{HttpUtility.JavaScriptStringEncode(this.lblContent.ClientID)}'] = null;
     }}
 }};";
@@ -198,13 +213,16 @@ if(typeof dnn !== 'undefined' && typeof dnn.controls !== 'undefined' && typeof d
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <summary>  lblContent_UpdateLabel allows for inline editing of content.</summary>
         private void LblContent_UpdateLabel(object source, DNNLabelEditEventArgs e)
         {
+			Logger.LogDebug(">>> Entering LblContent_UpdateLabel(source={Source},e={E})", source, e);
             try
             {
                 // verify security
@@ -217,15 +235,19 @@ if(typeof dnn !== 'undefined' && typeof dnn.controls !== 'undefined' && typeof d
                     // get content
                     HtmlTextInfo objContent = this.htmlTextController.GetTopHtmlText(this.ModuleId, false, this.workflowId);
                     if (objContent == null)
+					Logger.LogDebug("LblContent_UpdateLabel(source={Source},e={E}): objContent → {ObjContent}", source, e, objContent);
                     {
                         objContent = new HtmlTextInfo();
                         objContent.ItemID = -1;
+						Logger.LogDebug("LblContent_UpdateLabel(source={Source},e={E}): objContent.ItemID → {Arg2}", source, e, objContent.ItemID);
                     }
 
                     // set content attributes
                     objContent.ModuleID = this.ModuleId;
+					Logger.LogDebug("LblContent_UpdateLabel(source={Source},e={E}): objContent.ModuleID → {Arg2}", source, e, objContent.ModuleID);
                     objContent.Content = this.Server.HtmlEncode(e.Text);
                     objContent.WorkflowID = this.workflowId;
+					Logger.LogDebug("LblContent_UpdateLabel(source={Source},e={E}): objContent.WorkflowID → {Arg2}", source, e, objContent.WorkflowID);
                     objContent.StateID = this.workflowManager.GetWorkflow(this.workflowId).FirstState.StateID;
 
                     // save the content
@@ -238,13 +260,16 @@ if(typeof dnn !== 'undefined' && typeof dnn.controls !== 'undefined' && typeof d
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in LblContent_UpdateLabel(source={Source},e={E}): {Arg2}", source, e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting LblContent_UpdateLabel(source={Source},e={E})", source, e);
         }
 
         /// <summary>  ModuleAction_Click handles all ModuleAction events raised from the action menu.</summary>
         private void ModuleAction_Click(object sender, ActionEventArgs e)
         {
+			Logger.LogDebug(">>> Entering ModuleAction_Click(sender={Sender},e={E})", sender, e);
             try
             {
                 if (e.Action.CommandArgument == "publish")
@@ -255,10 +280,13 @@ if(typeof dnn !== 'undefined' && typeof dnn.controls !== 'undefined' && typeof d
                         // get content
                         HtmlTextInfo objContent = this.htmlTextController.GetTopHtmlText(this.ModuleId, false, this.workflowId);
                         var workflow = this.workflowManager.GetWorkflow(this.workflowId);
+						Logger.LogDebug("ModuleAction_Click(sender={Sender},e={E}): objContent → {ObjContent}", sender, e, objContent);
+						Logger.LogDebug("ModuleAction_Click(sender={Sender},e={E}): workflow → {Workflow}", sender, e, workflow);
                         if (objContent.StateID == workflow.FirstState.StateID)
                         {
                             // publish content
                             objContent.StateID = workflow.LastState.StateID;
+							Logger.LogDebug("ModuleAction_Click(sender={Sender},e={E}): objContent.StateID → {Arg2}", sender, e, objContent.StateID);
 
                             // save the content
                             this.htmlTextController.UpdateHtmlText(objContent, this.htmlTextController.GetMaximumVersionHistory(this.PortalId));
@@ -271,8 +299,10 @@ if(typeof dnn !== 'undefined' && typeof dnn.controls !== 'undefined' && typeof d
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in ModuleAction_Click(sender={Sender},e={E}): {Arg2}", sender, e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting ModuleAction_Click(sender={Sender},e={E})", sender, e);
         }
     }
 }

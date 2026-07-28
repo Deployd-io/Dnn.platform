@@ -16,10 +16,14 @@ namespace DotNetNuke.Web.Mvp
     [DnnDeprecated(9, 2, 0, "Replace WebFormsMvp and DotNetNuke.Web.Mvp with MVC or SPA patterns instead")]
     public abstract partial class ModuleViewBase : ModuleUserControlBase, IModuleViewBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ModuleViewBase"/> class.</summary>
         protected ModuleViewBase()
         {
+			Logger.LogDebug(">>> Entering ModuleViewBase()");
             this.AutoDataBind = true;
+			Logger.LogDebug("<<< Exiting ModuleViewBase()");
+			Logger.LogDebug("ModuleViewBase(): this.AutoDataBind → {Arg0}", this.AutoDataBind);
         }
 
         /// <inheritdoc />
@@ -40,13 +44,17 @@ namespace DotNetNuke.Web.Mvp
         /// <inheritdoc />
         public void ProcessModuleLoadException(Exception ex)
         {
+			Logger.LogDebug(">>> Entering ProcessModuleLoadException(ex={Ex})", ex);
             Exceptions.ProcessModuleLoadException(this, ex);
+			Logger.LogDebug("<<< Exiting ProcessModuleLoadException(ex={Ex})", ex);
         }
 
         /// <inheritdoc />
         public void ShowMessage(string messageHeader, string message, ModuleMessage.ModuleMessageType messageType)
         {
+			Logger.LogDebug(">>> Entering ShowMessage(messageHeader={MessageHeader},message={Message},messageType={MessageType})", messageHeader, message, messageType);
             DotNetNuke.UI.Skins.Skin.AddModuleMessage(this, messageHeader, message, messageType);
+			Logger.LogDebug("<<< Exiting ShowMessage(messageHeader={MessageHeader},message={Message},messageType={MessageType})", messageHeader, message, messageType);
         }
 
         /// <summary>Gets the data item.</summary>
@@ -55,6 +63,7 @@ namespace DotNetNuke.Web.Mvp
         protected T DataItem<T>()
             where T : class, new()
         {
+			Logger.LogDebug(">>> Entering DataItem()");
             var t = this.Page.GetDataItem() as T ?? new T();
             return t;
         }
@@ -64,6 +73,7 @@ namespace DotNetNuke.Web.Mvp
         /// <returns>The value.</returns>
         protected T DataValue<T>()
         {
+			Logger.LogDebug(">>> Entering DataValue()");
             return (T)this.Page.GetDataItem();
         }
 
@@ -79,6 +89,7 @@ namespace DotNetNuke.Web.Mvp
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             PageViewHost.Register(this, this.Context, false);
 
             base.OnInit(e);
@@ -86,32 +97,39 @@ namespace DotNetNuke.Web.Mvp
             this.Page.InitComplete += this.PageInitComplete;
             this.Page.PreRenderComplete += this.PagePreRenderComplete;
             this.Page.Load += this.PageLoad;
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         private void PageInitComplete(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering PageInitComplete(sender={Sender},e={E})", sender, e);
             if (this.Initialize != null)
             {
                 this.Initialize(this, EventArgs.Empty);
             }
+			Logger.LogDebug("<<< Exiting PageInitComplete(sender={Sender},e={E})", sender, e);
         }
 
         private void PageLoad(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering PageLoad(sender={Sender},e={E})", sender, e);
             if (this.Load != null)
             {
                 this.Load(this, e);
             }
+			Logger.LogDebug("<<< Exiting PageLoad(sender={Sender},e={E})", sender, e);
         }
 
         private void PagePreRenderComplete(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering PagePreRenderComplete(sender={Sender},e={E})", sender, e);
             // This event is raised after any async page tasks have completed, so it
             // is safe to data-bind
             if (this.AutoDataBind)
             {
                 this.DataBind();
             }
+			Logger.LogDebug("<<< Exiting PagePreRenderComplete(sender={Sender},e={E})", sender, e);
         }
     }
 }

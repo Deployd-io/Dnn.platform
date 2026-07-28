@@ -14,6 +14,7 @@ namespace DotNetNuke.Web.DDRMenu
 
     public class Settings
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private List<ClientOption> clientOptions;
 
         private List<TemplateArgument> templateArguments;
@@ -48,82 +49,107 @@ namespace DotNetNuke.Web.DDRMenu
 
         public static Settings FromXml(string xml)
         {
+			Logger.LogDebug(">>> Entering FromXml(xml={Xml})", xml);
             var ser = new XmlSerializer(typeof(Settings));
             using (var reader = new StringReader(xml))
             {
+			Logger.LogDebug("FromXml(xml={Xml}): ser → {Ser}", xml, ser);
+				Logger.LogDebug("<<< Exiting FromXml(xml={Xml})", xml);
                 return (Settings)ser.Deserialize(reader);
             }
         }
 
         public static List<ClientOption> ClientOptionsFromSettingString(string s)
         {
+			Logger.LogDebug(">>> Entering ClientOptionsFromSettingString(s={S})", s);
             var result = new List<ClientOption>();
             if (!string.IsNullOrEmpty(s))
+			Logger.LogDebug("ClientOptionsFromSettingString(s={S}): result → {Result}", s, result);
             {
                 foreach (var clientOption in SplitIntoStrings(s))
                 {
                     var n = clientOption.IndexOf('=');
                     result.Add(new ClientOption(clientOption.Substring(0, n), clientOption.Substring(n + 1)));
+					Logger.LogDebug("ClientOptionsFromSettingString(s={S}): n → {N}", s, n);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ClientOptionsFromSettingString(s={S})", s);
             return result;
         }
 
         public static List<TemplateArgument> TemplateArgumentsFromSettingString(string s)
         {
+			Logger.LogDebug(">>> Entering TemplateArgumentsFromSettingString(s={S})", s);
             var result = new List<TemplateArgument>();
             if (!string.IsNullOrEmpty(s))
+			Logger.LogDebug("TemplateArgumentsFromSettingString(s={S}): result → {Result}", s, result);
             {
                 foreach (var templateArgument in SplitIntoStrings(s))
                 {
                     var n = templateArgument.IndexOf('=');
                     result.Add(new TemplateArgument(templateArgument.Substring(0, n), templateArgument.Substring(n + 1)));
+					Logger.LogDebug("TemplateArgumentsFromSettingString(s={S}): n → {N}", s, n);
+					Logger.LogDebug(">>> Entering SplitIntoStrings(fullString={FullString})", fullString);
+					Logger.LogDebug("<<< Exiting SplitIntoStrings(fullString={FullString})", fullString);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting TemplateArgumentsFromSettingString(s={S})", s);
             return result;
         }
 
         public static string ToSettingString(List<ClientOption> clientOptions)
         {
+			Logger.LogDebug(">>> Entering ToSettingString(clientOptions={ClientOptions})", clientOptions);
+			Logger.LogDebug("<<< Exiting ToSettingString(clientOptions={ClientOptions})", clientOptions);
             return string.Join("\r\n", clientOptions.ConvertAll(o => o.Name + "=" + o.Value).ToArray());
         }
 
         public static string ToSettingString(List<TemplateArgument> templateArguments)
         {
+			Logger.LogDebug("<<< Exiting ToSettingString(templateArguments={TemplateArguments})", templateArguments);
             return string.Join("\r\n", templateArguments.ConvertAll(o => o.Name + "=" + o.Value).ToArray());
         }
 
         public string ToXml()
         {
+			Logger.LogDebug(">>> Entering ToXml()");
             var sb = new StringBuilder();
             var ser = new XmlSerializer(typeof(Settings));
+			Logger.LogDebug("ToXml(): sb → {Sb}", sb);
+			Logger.LogDebug("ToXml(): ser → {Ser}", ser);
             using (var writer = new StringWriter(sb))
             {
                 ser.Serialize(writer, this);
             }
 
+			Logger.LogDebug("<<< Exiting ToXml()");
             return sb.ToString();
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
+			Logger.LogDebug(">>> Entering ToString()");
             try
             {
                 return this.ToXml();
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in ToString(): {Arg0}", ex.Message);
+				Logger.LogDebug("<<< Exiting ToString()");
                 return exc.ToString();
             }
         }
 
         private static IEnumerable<string> SplitIntoStrings(string fullString)
         {
+			Logger.LogDebug(">>> Entering SplitIntoStrings(fullString={FullString})", fullString);
             var strings = new List<string>(fullString.Split('\r', '\n'));
             strings.RemoveAll(string.IsNullOrEmpty);
+			Logger.LogDebug("SplitIntoStrings(fullString={FullString}): strings → {Strings}", fullString, strings);
             return strings;
         }
     }

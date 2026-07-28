@@ -11,10 +11,13 @@ namespace DotNetNuke.Web.Models
     [DataContract]
     public class ModuleDetail
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ModuleDetail"/> class.</summary>
         public ModuleDetail()
         {
+			Logger.LogDebug(">>> Entering ModuleDetail()");
             this.ModuleInstances = new List<ModuleInstance>();
+			Logger.LogDebug("<<< Exiting ModuleDetail()");
         }
 
         /// <summary>Gets or sets the version of the desktop module.</summary>

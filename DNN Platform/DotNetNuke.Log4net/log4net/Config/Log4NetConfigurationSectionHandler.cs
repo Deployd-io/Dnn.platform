@@ -50,6 +50,7 @@ namespace log4net.Config
     /// <author>Gert Driesen</author>
     public class Log4NetConfigurationSectionHandler : IConfigurationSectionHandler
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="Log4NetConfigurationSectionHandler"/> class.</summary>
         /// <remarks>
         /// <para>
@@ -58,6 +59,8 @@ namespace log4net.Config
         /// </remarks>
         public Log4NetConfigurationSectionHandler()
         {
+		Logger.LogDebug(">>> Entering Log4NetConfigurationSectionHandler()");
+		Logger.LogDebug("<<< Exiting Log4NetConfigurationSectionHandler()");
         }
 
         /// <summary>Parses the configuration section.</summary>
@@ -72,6 +75,8 @@ namespace log4net.Config
         /// </remarks>
         public object Create(object parent, object configContext, XmlNode section)
         {
+			Logger.LogDebug(">>> Entering Create(parent={Parent},configContext={ConfigContext},section={Section})", parent, configContext, section);
+			Logger.LogDebug("<<< Exiting Create(parent={Parent},configContext={ConfigContext},section={Section})", parent, configContext, section);
             return section;
         }
     }

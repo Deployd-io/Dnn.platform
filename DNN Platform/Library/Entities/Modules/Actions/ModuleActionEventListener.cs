@@ -7,6 +7,7 @@ namespace DotNetNuke.Entities.Modules.Actions
     /// <summary>An event listener for module actions.</summary>
     public class ModuleActionEventListener
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly ActionEventHandler actionEvent;
         private readonly int moduleID;
 
@@ -15,8 +16,14 @@ namespace DotNetNuke.Entities.Modules.Actions
         /// <param name="e">The event handler.</param>
         public ModuleActionEventListener(int modID, ActionEventHandler e)
         {
+			Logger.LogDebug(">>> Entering ModuleActionEventListener(modID={ModID},e={E})", modID, e);
             this.moduleID = modID;
             this.actionEvent = e;
+			Logger.LogDebug("<<< Exiting ModuleActionEventListener(modID={ModID},e={E})", modID, e);
+			Logger.LogDebug("ModuleActionEventListener(modID={ModID},e={E}): this.moduleID → {Arg2}", modID, e, this.moduleID);
+			Logger.LogDebug("ModuleActionEventListener(modID={ModID},e={E}): actionEvent → {ActionEvent}", modID, e, actionEvent);
+			Logger.LogDebug("ModuleActionEventListener(modID={ModID},e={E}): this.actionEvent → {Arg2}", modID, e, this.actionEvent);
+			Logger.LogDebug("ModuleActionEventListener(modID={ModID},e={E}): moduleID → {ModuleID}", modID, e, moduleID);
         }
 
         public int ModuleID

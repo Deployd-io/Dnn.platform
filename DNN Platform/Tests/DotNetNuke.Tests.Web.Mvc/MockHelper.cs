@@ -16,8 +16,11 @@ namespace DotNetNuke.Tests.Web.Mvc
 
     public class MockHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static HttpContextBase CreateMockHttpContext()
         {
+			Logger.LogDebug(">>> Entering CreateMockHttpContext()");
+			Logger.LogDebug("<<< Exiting CreateMockHttpContext()");
             return CreateMockHttpContext(new Dictionary<string, object>());
         }
 
@@ -63,11 +66,15 @@ namespace DotNetNuke.Tests.Web.Mvc
                 .SetupGet(c => c.Response)
                 .Returns(mockResponse.Object);
 
+			Logger.LogDebug("<<< Exiting CreateMockHttpContext(requestUrl={RequestUrl})", requestUrl);
             return httpContext;
         }
 
         public static ControllerContext CreateMockControllerContext(ControllerBase controller)
         {
+			Logger.LogDebug(">>> Entering CreateMockControllerContext(controller={Controller})", controller);
+			Logger.LogDebug("<<< Exiting CreateMockControllerContext(controller={Controller})", controller);
+			Logger.LogDebug("<<< Exiting CreateMockControllerContext()");
             return new ControllerContext(CreateMockHttpContext(), new RouteData(), controller);
         }
 
@@ -83,6 +90,7 @@ namespace DotNetNuke.Tests.Web.Mvc
 
         public static ControllerContext CreateMockControllerContext(RouteData routeDatae)
         {
+			Logger.LogDebug("<<< Exiting CreateMockControllerContext(routeDatae={RouteDatae})", routeDatae);
             return new ControllerContext(CreateMockHttpContext(), routeDatae, new Mock<ControllerBase>().Object);
         }
 
@@ -93,14 +101,17 @@ namespace DotNetNuke.Tests.Web.Mvc
 
         public static ViewContext CreateViewContext(string url)
         {
+			Logger.LogDebug(">>> Entering CreateViewContext(url={Url})", url);
             var routeData = new RouteData();
             routeData.Values["controller"] = "Controller";
+			Logger.LogDebug("CreateViewContext(url={Url}): routeData → {RouteData}", url, routeData);
             routeData.Values["action"] = "Action";
             routeData.Values["id"] = "Id";
             var controllerContext = new ControllerContext(
                 CreateMockHttpContext(url),
                 routeData,
                 new Mock<ControllerBase>().Object);
+			Logger.LogDebug("<<< Exiting CreateViewContext(url={Url})", url);
             return new ViewContext(
                 controllerContext,
                 new Mock<IView>().Object,

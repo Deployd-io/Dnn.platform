@@ -16,6 +16,7 @@ namespace Dnn.PersonaBar.Library.Controllers
 
     public class PersonaBarUserSettingsController : ServiceLocator<IPersonaBarUserSettingsController, PersonaBarUserSettingsController>, IPersonaBarUserSettingsController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string ContainerName = "AdminPersonaBar";
         private const string UserSettingsKey = "UserSettings";
         private readonly PersonalizationController personalizationController;
@@ -24,13 +25,16 @@ namespace Dnn.PersonaBar.Library.Controllers
         public PersonaBarUserSettingsController()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering PersonaBarUserSettingsController()");
         }
+		Logger.LogDebug("<<< Exiting PersonaBarUserSettingsController()");
 
         /// <summary>Initializes a new instance of the <see cref="PersonaBarUserSettingsController"/> class.</summary>
         /// <param name="personalizationController">The personalization controller.</param>
         public PersonaBarUserSettingsController(PersonalizationController personalizationController)
         {
             this.personalizationController = personalizationController ?? Globals.GetCurrentServiceProvider().GetRequiredService<PersonalizationController>();
+			Logger.LogDebug("PersonaBarUserSettingsController(personalizationController={PersonalizationController}): personalizationController → {PersonalizationController1}", personalizationController, personalizationController);
         }
 
         /// <inheritdoc />
@@ -44,18 +48,25 @@ namespace Dnn.PersonaBar.Library.Controllers
         /// <inheritdoc />
         public UserSettings GetPersonaBarUserSettings()
         {
+			Logger.LogDebug(">>> Entering GetPersonaBarUserSettings()");
             var settings = (UserSettings)Personalization.GetProfile(ContainerName, UserSettingsKey);
+			Logger.LogDebug("GetPersonaBarUserSettings(): settings → {Settings}", settings);
+			Logger.LogDebug("<<< Exiting GetPersonaBarUserSettings()");
             return settings ?? GetDefaultSettings();
         }
 
         /// <inheritdoc />
         protected override Func<IPersonaBarUserSettingsController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => Globals.GetCurrentServiceProvider().GetRequiredService<IPersonaBarUserSettingsController>();
         }
 
         private static UserSettings GetDefaultSettings()
         {
+			Logger.LogDebug(">>> Entering GetDefaultSettings()");
+			Logger.LogDebug("<<< Exiting GetDefaultSettings()");
             return new UserSettings
             {
                 ExpandPersonaBar = false,

@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.FileSystem
     [Serializable]
     public class InvalidFilenameException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="InvalidFilenameException"/> class.</summary>
         public InvalidFilenameException()
         {
+		Logger.LogDebug(">>> Entering InvalidFilenameException()");
+		Logger.LogDebug("<<< Exiting InvalidFilenameException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="InvalidFilenameException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Services.FileSystem
         public InvalidFilenameException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering InvalidFilenameException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting InvalidFilenameException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="InvalidFilenameException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

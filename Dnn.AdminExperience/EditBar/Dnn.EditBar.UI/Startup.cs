@@ -17,11 +17,14 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 /// <summary>Register types for the edit bar.</summary>
 public class Startup : IDnnStartup
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public void ConfigureServices(IServiceCollection services)
     {
+		Logger.LogDebug(">>> Entering ConfigureServices(services={Services})", services);
         var menuTypes = new TypeLocator().GetAllMatchingTypes(
             t => t is { IsClass: true, IsAbstract: false, } && typeof(BaseMenuItem).IsAssignableFrom(t));
         services.TryAddEnumerable(menuTypes.Select(type => ServiceDescriptor.Transient(typeof(BaseMenuItem), type)));
+		Logger.LogDebug("<<< Exiting ConfigureServices(services={Services})", services);
     }
 }

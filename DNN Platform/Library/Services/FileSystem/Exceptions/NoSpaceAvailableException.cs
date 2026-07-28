@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.FileSystem
     [Serializable]
     public class NoSpaceAvailableException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="NoSpaceAvailableException"/> class.</summary>
         public NoSpaceAvailableException()
         {
+		Logger.LogDebug(">>> Entering NoSpaceAvailableException()");
+		Logger.LogDebug("<<< Exiting NoSpaceAvailableException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="NoSpaceAvailableException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Services.FileSystem
         public NoSpaceAvailableException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering NoSpaceAvailableException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting NoSpaceAvailableException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="NoSpaceAvailableException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

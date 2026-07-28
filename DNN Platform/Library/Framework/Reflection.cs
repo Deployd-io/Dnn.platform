@@ -29,6 +29,9 @@ namespace DotNetNuke.Framework
         [DnnDeprecated(9, 11, 3, "Please use overload with IServiceProvider")]
         public static partial object CreateObject(string objectProviderType)
         {
+			Logger.LogDebug(">>> Entering CreateObject(objectProviderType={ObjectProviderType})", objectProviderType);
+			Logger.LogDebug("<<< Exiting CreateObject(objectProviderType={ObjectProviderType})", objectProviderType);
+			Logger.LogDebug("<<< Exiting CreateObject()");
             return CreateObject(objectProviderType, true);
         }
 
@@ -38,6 +41,8 @@ namespace DotNetNuke.Framework
         /// <returns>The created Object.</returns>
         public static object CreateObject(IServiceProvider serviceProvider, string objectProviderType)
         {
+			Logger.LogDebug("<<< Exiting CreateObject(serviceProvider={ServiceProvider},objectProviderType={ObjectProviderType})", serviceProvider, objectProviderType);
+			Logger.LogDebug("<<< Exiting CreateObject(serviceProvider={ServiceProvider})", serviceProvider);
             return CreateObject(serviceProvider, objectProviderType, true);
         }
 
@@ -49,6 +54,7 @@ namespace DotNetNuke.Framework
         [DnnDeprecated(9, 11, 3, "Please use overload with IServiceProvider")]
         public static partial object CreateObject(string objectProviderType, bool useCache)
         {
+			Logger.LogDebug("<<< Exiting CreateObject(objectProviderType={ObjectProviderType},useCache={UseCache})", objectProviderType, useCache);
             return CreateObject(objectProviderType, string.Empty, string.Empty, string.Empty, useCache);
         }
 
@@ -59,6 +65,7 @@ namespace DotNetNuke.Framework
         /// <returns>The created Object.</returns>
         public static object CreateObject(IServiceProvider serviceProvider, string objectProviderType, bool useCache)
         {
+			Logger.LogDebug("<<< Exiting CreateObject(serviceProvider={ServiceProvider},objectProviderType={ObjectProviderType},useCache={UseCache})", serviceProvider, objectProviderType, useCache);
             return CreateObject(serviceProvider, objectProviderType, string.Empty, string.Empty, string.Empty, useCache);
         }
 
@@ -71,6 +78,7 @@ namespace DotNetNuke.Framework
         [DnnDeprecated(9, 11, 3, "Please use overload with IServiceProvider")]
         public static partial object CreateObject(string objectProviderType, string objectNamespace, string objectAssemblyName)
         {
+			Logger.LogDebug("<<< Exiting CreateObject(objectProviderType={ObjectProviderType},objectNamespace={ObjectNamespace},objectAssemblyName={ObjectAssemblyName})", objectProviderType, objectNamespace, objectAssemblyName);
             return CreateObject(objectProviderType, string.Empty, objectNamespace, objectAssemblyName, true);
         }
 
@@ -82,6 +90,7 @@ namespace DotNetNuke.Framework
         /// <returns>The created Object.</returns>
         public static object CreateObject(IServiceProvider serviceProvider, string objectProviderType, string objectNamespace, string objectAssemblyName)
         {
+			Logger.LogDebug("<<< Exiting CreateObject(serviceProvider={ServiceProvider},objectProviderType={ObjectProviderType},objectNamespace={ObjectNamespace},objectAssemblyName={ObjectAssemblyName})", serviceProvider, objectProviderType, objectNamespace, objectAssemblyName);
             return CreateObject(serviceProvider, objectProviderType, string.Empty, objectNamespace, objectAssemblyName, true);
         }
 
@@ -95,6 +104,7 @@ namespace DotNetNuke.Framework
         [DnnDeprecated(9, 11, 3, "Please use overload with IServiceProvider")]
         public static partial object CreateObject(string objectProviderType, string objectNamespace, string objectAssemblyName, bool useCache)
         {
+			Logger.LogDebug("<<< Exiting CreateObject(objectProviderType={ObjectProviderType},objectNamespace={ObjectNamespace},objectAssemblyName={ObjectAssemblyName},useCache={UseCache})", objectProviderType, objectNamespace, objectAssemblyName, useCache);
             return CreateObject(objectProviderType, string.Empty, objectNamespace, objectAssemblyName, useCache);
         }
 
@@ -107,6 +117,7 @@ namespace DotNetNuke.Framework
         /// <returns>The created Object.</returns>
         public static object CreateObject(IServiceProvider serviceProvider, string objectProviderType, string objectNamespace, string objectAssemblyName, bool useCache)
         {
+			Logger.LogDebug("<<< Exiting CreateObject(serviceProvider={ServiceProvider},objectProviderType={ObjectProviderType},objectNamespace={ObjectNamespace},objectAssemblyName={ObjectAssemblyName},useCache={UseCache})", serviceProvider, objectProviderType, objectNamespace, objectAssemblyName, useCache);
             return CreateObject(serviceProvider, objectProviderType, string.Empty, objectNamespace, objectAssemblyName, useCache);
         }
 
@@ -120,6 +131,7 @@ namespace DotNetNuke.Framework
         [DnnDeprecated(9, 11, 3, "Please use overload with IServiceProvider")]
         public static partial object CreateObject(string objectProviderType, string objectProviderName, string objectNamespace, string objectAssemblyName)
         {
+			Logger.LogDebug("<<< Exiting CreateObject(objectProviderType={ObjectProviderType},objectProviderName={ObjectProviderName},objectNamespace={ObjectNamespace},objectAssemblyName={ObjectAssemblyName})", objectProviderType, objectProviderName, objectNamespace, objectAssemblyName);
             return CreateObject(objectProviderType, objectProviderName, objectNamespace, objectAssemblyName, true);
         }
 
@@ -132,6 +144,7 @@ namespace DotNetNuke.Framework
         /// <returns>The created Object.</returns>
         public static object CreateObject(IServiceProvider serviceProvider, string objectProviderType, string objectProviderName, string objectNamespace, string objectAssemblyName)
         {
+			Logger.LogDebug("<<< Exiting CreateObject(serviceProvider={ServiceProvider},objectProviderType={ObjectProviderType},objectProviderName={ObjectProviderName},objectNamespace={ObjectNamespace},objectAssemblyName={ObjectAssemblyName})", serviceProvider, objectProviderType, objectProviderName, objectNamespace, objectAssemblyName);
             return CreateObject(serviceProvider, objectProviderType, objectProviderName, objectNamespace, objectAssemblyName, true);
         }
 
@@ -146,6 +159,7 @@ namespace DotNetNuke.Framework
         [DnnDeprecated(9, 11, 3, "Please use overload with IServiceProvider")]
         public static partial object CreateObject(string objectProviderType, string objectProviderName, string objectNamespace, string objectAssemblyName, bool useCache)
         {
+			Logger.LogDebug("<<< Exiting CreateObject(objectProviderType={ObjectProviderType},objectProviderName={ObjectProviderName},objectNamespace={ObjectNamespace},objectAssemblyName={ObjectAssemblyName},useCache={UseCache})", objectProviderType, objectProviderName, objectNamespace, objectAssemblyName, useCache);
             return CreateObject(objectProviderType, objectProviderName, objectNamespace, objectAssemblyName, useCache, true);
         }
 
@@ -159,6 +173,7 @@ namespace DotNetNuke.Framework
         /// <returns>The created Object.</returns>
         public static object CreateObject(IServiceProvider serviceProvider, string objectProviderType, string objectProviderName, string objectNamespace, string objectAssemblyName, bool useCache)
         {
+			Logger.LogDebug("<<< Exiting CreateObject(serviceProvider={ServiceProvider},objectProviderType={ObjectProviderType},objectProviderName={ObjectProviderName},objectNamespace={ObjectNamespace},objectAssemblyName={ObjectAssemblyName},useCache={UseCache})", serviceProvider, objectProviderType, objectProviderName, objectNamespace, objectAssemblyName, useCache);
             return CreateObject(serviceProvider, objectProviderType, objectProviderName, objectNamespace, objectAssemblyName, useCache, true);
         }
 
@@ -252,6 +267,7 @@ namespace DotNetNuke.Framework
                 }
             }
 
+			Logger.LogDebug("<<< Exiting CreateObject(serviceProvider={ServiceProvider},objectProviderType={ObjectProviderType},objectProviderName={ObjectProviderName},objectNamespace={ObjectNamespace},objectAssemblyName={ObjectAssemblyName},useCache={UseCache},fixAssemblyName={FixAssemblyName})", serviceProvider, objectProviderType, objectProviderName, objectNamespace, objectAssemblyName, useCache, fixAssemblyName);
             return CreateObject(serviceProvider, typeName, typeName, useCache);
         }
 
@@ -486,12 +502,16 @@ namespace DotNetNuke.Framework
         [DnnDeprecated(7, 0, 0, "Please use CreateObject(string objectProviderType, bool useCache)", RemovalVersion = 11)]
         internal static partial object CreateObjectNotCached(string objectProviderType)
         {
+			Logger.LogDebug(">>> Entering CreateObjectNotCached(objectProviderType={ObjectProviderType})", objectProviderType);
             string typeName = string.Empty;
             Type objType = null;
+			Logger.LogDebug("CreateObjectNotCached(objectProviderType={ObjectProviderType}): typeName → {TypeName}", objectProviderType, typeName);
+			Logger.LogDebug("CreateObjectNotCached(objectProviderType={ObjectProviderType}): objType → {ObjType}", objectProviderType, objType);
 
             // get the provider configuration based on the type
             ProviderConfiguration objProviderConfiguration = ProviderConfiguration.GetProviderConfiguration(objectProviderType);
 
+			Logger.LogDebug("CreateObjectNotCached(objectProviderType={ObjectProviderType}): objProviderConfiguration → {ObjProviderConfiguration}", objectProviderType, objProviderConfiguration);
             // get the typename of the Base DataProvider from web.config
             typeName = ((Provider)objProviderConfiguration.Providers[objProviderConfiguration.DefaultProvider]).Type;
             try
@@ -501,11 +521,13 @@ namespace DotNetNuke.Framework
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in CreateObjectNotCached(objectProviderType={ObjectProviderType}): {Arg1}", objectProviderType, ex.Message);
                 // could not load the type
                 Exceptions.LogException(exc);
             }
 
             // dynamically create the object
+			Logger.LogDebug("<<< Exiting CreateObjectNotCached(objectProviderType={ObjectProviderType})", objectProviderType);
             return Activator.CreateInstance(objType);
         }
     }

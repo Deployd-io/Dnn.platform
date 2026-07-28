@@ -14,6 +14,7 @@ namespace DotNetNuke.UI.WebControls
     [ToolboxData("<{0}:CommandButton runat=server></{0}:CommandButton>")]
     public class CommandButton : WebControl, INamingContainer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private ImageButton icon;
         private LinkButton link;
         private LiteralControl separator;
@@ -278,8 +279,10 @@ namespace DotNetNuke.UI.WebControls
 
         public void RegisterForPostback()
         {
+			Logger.LogDebug(">>> Entering RegisterForPostback()");
             AJAX.RegisterPostBackControl(this.link);
             AJAX.RegisterPostBackControl(this.icon);
+			Logger.LogDebug("<<< Exiting RegisterForPostback()");
         }
 
         /// <summary>
@@ -288,22 +291,27 @@ namespace DotNetNuke.UI.WebControls
         /// </summary>
         protected override void CreateChildControls()
         {
+			Logger.LogDebug(">>> Entering CreateChildControls()");
             this.Controls.Clear();
             if (string.IsNullOrEmpty(this.CssClass))
             {
                 this.CssClass = "CommandButton";
+				Logger.LogDebug("CreateChildControls(): this.CssClass → {Arg0}", this.CssClass);
             }
 
             this.icon = new ImageButton();
+			Logger.LogDebug("CreateChildControls(): icon → {Icon}", icon);
             this.icon.Visible = true;
             this.icon.CausesValidation = true;
             this.icon.Click += this.RaiseImageClick;
             this.icon.Command += this.RaiseCommand;
             this.Controls.Add(this.icon);
             this.separator = new LiteralControl();
+			Logger.LogDebug("CreateChildControls(): separator → {Separator}", separator);
             this.separator.Text = "&nbsp;";
             this.Controls.Add(this.separator);
             this.link = new LinkButton();
+			Logger.LogDebug("CreateChildControls(): link → {Link}", link);
             this.link.Visible = true;
             this.link.CausesValidation = true;
             this.link.Click += this.RaiseClick;
@@ -319,32 +327,38 @@ namespace DotNetNuke.UI.WebControls
                 this.link.CssClass = this.CssClass;
                 this.link.EnableViewState = this.EnableViewState;
             }
+			Logger.LogDebug("<<< Exiting CreateChildControls()");
         }
 
         /// <summary>OnButtonClick raises the CommandButton control's <see cref="Click"/> event.</summary>
         /// <param name="e">The event arguments.</param>
         protected virtual void OnButtonClick(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnButtonClick(e={E})", e);
             if (this.Click != null)
             {
                 this.Click(this, e);
             }
+			Logger.LogDebug("<<< Exiting OnButtonClick(e={E})", e);
         }
 
         /// <summary>OnCommand raises the CommandButton control's <see cref="Command"/> event.</summary>
         /// <param name="e">The event arguments.</param>
         protected virtual void OnCommand(CommandEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnCommand(e={E})", e);
             if (this.Command != null)
             {
                 this.Command(this, e);
             }
+			Logger.LogDebug("<<< Exiting OnCommand(e={E})", e);
         }
 
         /// <summary>OnPreRender runs just before the Render phase of the Page Life Cycle.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
             this.EnsureChildControls();
             this.separator.Visible = this.DisplayLink && this.DisplayIcon;
@@ -353,6 +367,7 @@ namespace DotNetNuke.UI.WebControls
 
             var tooltipText = string.Empty;
             if (!string.IsNullOrEmpty(this.ToolTipKey))
+			Logger.LogDebug("OnPreRender(e={E}): tooltipText → {TooltipText}", e, tooltipText);
             {
                 tooltipText = Localization.GetString(this.ToolTipKey, this.LocalResourceFile);
             }
@@ -366,6 +381,7 @@ namespace DotNetNuke.UI.WebControls
             {
                 this.icon.ToolTip = this.link.ToolTip = this.icon.AlternateText = tooltipText;
             }
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <summary>RaiseImageClick runs when the Image button is clicked.</summary>
@@ -375,7 +391,9 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">An ImageClickEventArgs object.</param>
         protected void RaiseImageClick(object sender, ImageClickEventArgs e)
         {
+			Logger.LogDebug(">>> Entering RaiseImageClick(sender={Sender},e={E})", sender, e);
             this.OnButtonClick(new EventArgs());
+			Logger.LogDebug("<<< Exiting RaiseImageClick(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>RaiseClick runs when one of the contained Link buttons is clciked.</summary>
@@ -385,7 +403,9 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">An EventArgs object.</param>
         private void RaiseClick(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering RaiseClick(sender={Sender},e={E})", sender, e);
             this.OnButtonClick(e);
+			Logger.LogDebug("<<< Exiting RaiseClick(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>RaiseCommand runs when one of the contained Link buttons is clicked.</summary>
@@ -395,7 +415,9 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">An CommandEventArgs object.</param>
         private void RaiseCommand(object sender, CommandEventArgs e)
         {
+			Logger.LogDebug(">>> Entering RaiseCommand(sender={Sender},e={E})", sender, e);
             this.OnCommand(e);
+			Logger.LogDebug("<<< Exiting RaiseCommand(sender={Sender},e={E})", sender, e);
         }
     }
 }

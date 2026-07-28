@@ -18,19 +18,23 @@ namespace DotNetNuke.UI.Skins.Controls
     // ReSharper disable once InconsistentNaming
     public partial class jQuery : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IJavaScriptLibraryHelper javaScript;
 
         /// <summary>Initializes a new instance of the <see cref="jQuery"/> class.</summary>
         public jQuery()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering jQuery()");
         }
+		Logger.LogDebug("<<< Exiting jQuery()");
 
         /// <summary>Initializes a new instance of the <see cref="jQuery"/> class.</summary>
         /// <param name="javaScript">The JavaScript library helper.</param>
         public jQuery(IJavaScriptLibraryHelper javaScript)
         {
             this.javaScript = javaScript ?? Globals.GetCurrentServiceProvider().GetRequiredService<IJavaScriptLibraryHelper>();
+			Logger.LogDebug("jQuery(javaScript={JavaScript}): javaScript → {JavaScript1}", javaScript, javaScript);
         }
 
         public bool DnnjQueryPlugins { get; set; }
@@ -48,6 +52,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             this.javaScript.RequestRegistration(CommonJs.jQuery);
             this.javaScript.RequestRegistration(CommonJs.jQueryMigrate);
 
@@ -65,6 +70,7 @@ namespace DotNetNuke.UI.Skins.Controls
             {
                 this.javaScript.RequestRegistration(CommonJs.HoverIntent);
             }
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
     }
 }

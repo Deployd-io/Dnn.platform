@@ -36,6 +36,7 @@ namespace DotNetNuke.Abstractions.Pages
     /// </example>
     public class PageMeta
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Initializes a new instance of the <see cref="PageMeta"/> class.
         /// </summary>
@@ -46,9 +47,14 @@ namespace DotNetNuke.Abstractions.Pages
         /// <exception cref="System.ArgumentException">Thrown when name is empty.</exception>
         public PageMeta(string name, string content, int priority)
         {
+			Logger.LogDebug(">>> Entering PageMeta(name={Name},content={Content},priority={Priority})", name, content, priority);
             this.Name = name;
             this.Content = content;
+			Logger.LogDebug("PageMeta(name={Name},content={Content},priority={Priority}): this.Name → {Arg3}", name, content, priority, this.Name);
+			Logger.LogDebug("PageMeta(name={Name},content={Content},priority={Priority}): this.Content → {Arg3}", name, content, priority, this.Content);
             this.Priority = priority;
+			Logger.LogDebug("<<< Exiting PageMeta(name={Name},content={Content},priority={Priority})", name, content, priority);
+			Logger.LogDebug("PageMeta(name={Name},content={Content},priority={Priority}): this.Priority → {Arg3}", name, content, priority, this.Priority);
         }
 
         /// <summary>

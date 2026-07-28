@@ -13,6 +13,7 @@ namespace Dnn.EditBar.Library.Items
     [DataContract]
     public abstract class BaseMenuItem
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Gets the menu item name.</summary>
         [DataMember(Name = "name")]
         public abstract string Name { get; }
@@ -61,6 +62,8 @@ namespace Dnn.EditBar.Library.Items
         /// <returns><see langword="true"/> if this menu item is visible, otherwise <see langword="false"/>.</returns>
         public virtual bool Visible()
         {
+			Logger.LogDebug(">>> Entering Visible()");
+			Logger.LogDebug("<<< Exiting Visible()");
             return true;
         }
     }

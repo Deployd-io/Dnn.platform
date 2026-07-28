@@ -13,10 +13,14 @@ namespace DotNetNuke.Entities.Host
     [Serializable]
     public class ServerInfo : IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ServerInfo"/> class.</summary>
         public ServerInfo()
             : this(DateTime.Now, DateTime.Now)
         {
+		Logger.LogDebug(">>> Entering ServerInfo()");
+		Logger.LogDebug(">>> Entering ServerInfo(created={Created},lastactivity={Lastactivity})", created, lastactivity);
+		Logger.LogDebug("<<< Exiting ServerInfo(created={Created},lastactivity={Lastactivity})", created, lastactivity);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ServerInfo"/> class.</summary>
@@ -26,10 +30,17 @@ namespace DotNetNuke.Entities.Host
         {
             this.IISAppName = Globals.IISAppName;
             this.ServerName = Globals.ServerName;
+			Logger.LogDebug("ServerInfo(created={Created},lastactivity={Lastactivity}): this.IISAppName → {Arg2}", created, lastactivity, this.IISAppName);
+			Logger.LogDebug("ServerInfo(created={Created},lastactivity={Lastactivity}): this.ServerName → {Arg2}", created, lastactivity, this.ServerName);
             this.ServerGroup = string.Empty;
             this.CreatedDate = created;
             this.LastActivityDate = lastactivity;
+			Logger.LogDebug("ServerInfo(created={Created},lastactivity={Lastactivity}): this.ServerGroup → {Arg2}", created, lastactivity, this.ServerGroup);
+			Logger.LogDebug("ServerInfo(created={Created},lastactivity={Lastactivity}): this.CreatedDate → {Arg2}", created, lastactivity, this.CreatedDate);
+			Logger.LogDebug("ServerInfo(created={Created},lastactivity={Lastactivity}): this.LastActivityDate → {Arg2}", created, lastactivity, this.LastActivityDate);
             this.Enabled = true;
+			Logger.LogDebug("<<< Exiting ServerInfo(created={Created},lastactivity={Lastactivity})", created, lastactivity);
+			Logger.LogDebug("ServerInfo(created={Created},lastactivity={Lastactivity}): this.Enabled → {Arg2}", created, lastactivity, this.Enabled);
         }
 
         public int ServerID { get; set; }
@@ -71,6 +82,7 @@ namespace DotNetNuke.Entities.Host
         /// <param name="dr">The Data Reader to use.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.ServerID = Null.SetNullInteger(dr["ServerID"]);
             this.IISAppName = Null.SetNullString(dr["IISAppName"]);
             this.ServerName = Null.SetNullString(dr["ServerName"]);
@@ -81,6 +93,7 @@ namespace DotNetNuke.Entities.Host
 
             var schema = dr.GetSchemaTable();
             if (schema != null)
+			Logger.LogDebug("Fill(dr={Dr}): schema → {Schema}", dr, schema);
             {
                 if (schema.Select("ColumnName = 'PingFailureCount'").Length > 0)
                 {
@@ -97,6 +110,7 @@ namespace DotNetNuke.Entities.Host
                     this.UniqueId = Null.SetNullString(dr["UniqueId"]);
                 }
             }
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

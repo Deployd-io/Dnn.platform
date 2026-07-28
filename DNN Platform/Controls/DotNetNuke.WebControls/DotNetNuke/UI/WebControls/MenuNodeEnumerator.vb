@@ -8,22 +8,33 @@ Imports System.Xml
 Namespace DotNetNuke.UI.WebControls
     Friend NotInheritable Class MenuNodeEnumerator
         Implements IEnumerator
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(MenuNodeEnumerator))
         ' Methods
         Public Sub New(ByVal objRoot As XmlNode, ByVal objControl As DNNMenu)
+			Logger.LogDebug(">>> Entering New(objRoot={ObjRoot},objControl={ObjControl})", objRoot, objControl)
             Me.m_objXMLNode = objRoot
             Me.m_objDNNMenu = objControl
+			Logger.LogDebug("New(objRoot={ObjRoot},objControl={ObjControl}): Me.m_objDNNMenu → {Arg2}", objRoot, objControl, Me.m_objDNNMenu)
+			Logger.LogDebug("New(objRoot={ObjRoot},objControl={ObjControl}): Me.m_intCursor → {Arg2}", objRoot, objControl, Me.m_intCursor)
+			Logger.LogDebug("New(objRoot={ObjRoot},objControl={ObjControl}): Me.m_objXMLNode → {Arg2}", objRoot, objControl, Me.m_objXMLNode)
             Me.m_intCursor = -1
+			Logger.LogDebug("<<< Exiting New(objRoot={ObjRoot},objControl={ObjControl})", objRoot, objControl)
         End Sub
 
         Public Function MoveNext() As Boolean Implements IEnumerator.MoveNext
+			Logger.LogDebug(">>> Entering MoveNext()")
             If (Me.m_intCursor < Me.m_objXMLNode.ChildNodes.Count) Then
                 Me.m_intCursor += 1
             End If
+			Logger.LogDebug("<<< Exiting MoveNext()")
             Return (Me.m_intCursor <> Me.m_objXMLNode.ChildNodes.Count)
         End Function
 
         Public Sub Reset() Implements IEnumerator.Reset
+			Logger.LogDebug(">>> Entering Reset()")
             Me.m_intCursor = -1
+			Logger.LogDebug("<<< Exiting Reset()")
+			Logger.LogDebug("Reset(): Me.m_intCursor → {Arg0}", Me.m_intCursor)
         End Sub
 
 

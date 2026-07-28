@@ -22,6 +22,7 @@ using log4net.Core;
 
 namespace log4net.Repository.Hierarchy
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Default implementation of <see cref="ILoggerFactory"/>
     /// </summary>
@@ -46,6 +47,8 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         internal DefaultLoggerFactory()
         {
+		Logger.LogDebug(">>> Entering DefaultLoggerFactory()");
+		Logger.LogDebug("<<< Exiting DefaultLoggerFactory()");
         }
 
         /// <summary>
@@ -70,10 +73,12 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public Logger CreateLogger(ILoggerRepository repository, string name) 
         {
+			Logger.LogDebug(">>> Entering CreateLogger(repository={Repository},name={Name})", repository, name);
             if (name == null)
             {
                 return new RootLogger(repository.LevelMap.LookupWithDefault(Level.Debug));
             }
+			Logger.LogDebug("<<< Exiting CreateLogger(repository={Repository},name={Name})", repository, name);
             return new LoggerImpl(name);
         }
 
@@ -101,6 +106,8 @@ namespace log4net.Repository.Hierarchy
             /// </remarks>
             internal LoggerImpl(string name) : base(name)
             {
+			Logger.LogDebug(">>> Entering LoggerImpl(name={Name})", name);
+			Logger.LogDebug("<<< Exiting LoggerImpl(name={Name})", name);
             }
         }
     }

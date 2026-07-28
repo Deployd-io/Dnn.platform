@@ -50,8 +50,11 @@ namespace DotNetNuke.Web.Common.Internal
 
         static DotNetNukeHttpApplication()
         {
+			Logger.LogDebug(">>> Entering DotNetNukeHttpApplication()");
             var dependencyProvider = new LazyServiceProvider();
             Globals.DependencyProvider = dependencyProvider;
+			Logger.LogDebug("DotNetNukeHttpApplication(): dependencyProvider → {DependencyProvider}", dependencyProvider);
+			Logger.LogDebug("DotNetNukeHttpApplication(): Globals.DependencyProvider → {Arg0}", Globals.DependencyProvider);
 
             ComponentFactory.Container = new ContainerWithServiceProviderFallback(new SimpleContainer(Globals.DependencyProvider), Globals.DependencyProvider);
 
@@ -86,11 +89,13 @@ namespace DotNetNuke.Web.Common.Internal
             dependencyProvider.SetProvider(DependencyInjectionInitialize.BuildServiceProvider());
             ServiceRequestScopeModule.SetServiceProvider(Globals.DependencyProvider);
             HttpRuntime.WebObjectActivator = new WebFormsServiceProvider();
+			Logger.LogDebug("<<< Exiting DotNetNukeHttpApplication()");
         }
 
         private static void RegisterIfNotAlreadyRegistered<TConcrete>()
             where TConcrete : class, new()
         {
+			Logger.LogDebug(">>> Entering RegisterIfNotAlreadyRegistered()");
             RegisterIfNotAlreadyRegistered<TConcrete, TConcrete>(string.Empty);
         }
 
@@ -99,6 +104,7 @@ namespace DotNetNuke.Web.Common.Internal
             where TConcrete : class, new()
         {
             var provider = ComponentFactory.GetComponent<TAbstract>();
+			Logger.LogDebug("<<< Exiting RegisterIfNotAlreadyRegistered()");
             if (provider == null)
             {
                 if (string.IsNullOrEmpty(name))
@@ -114,8 +120,10 @@ namespace DotNetNuke.Web.Common.Internal
 
         private static bool IsInstallOrUpgradeRequest(HttpRequest request)
         {
+			Logger.LogDebug(">>> Entering IsInstallOrUpgradeRequest(request={Request})", request);
             var url = request.Url.LocalPath;
 
+			Logger.LogDebug("<<< Exiting IsInstallOrUpgradeRequest(request={Request})", request);
             return url.EndsWith("webresource.axd", StringComparison.OrdinalIgnoreCase)
                    || url.EndsWith("scriptresource.axd", StringComparison.OrdinalIgnoreCase)
                    || url.EndsWith("captcha.aspx", StringComparison.OrdinalIgnoreCase)
@@ -131,6 +139,7 @@ namespace DotNetNuke.Web.Common.Internal
 
         private void Application_End(object sender, EventArgs eventArgs)
         {
+			Logger.LogDebug(">>> Entering Application_End(sender={Sender},eventArgs={EventArgs})", sender, eventArgs);
             Logger.Info("Application Ending");
 
             try
@@ -154,6 +163,7 @@ namespace DotNetNuke.Web.Common.Internal
             // Shutdown Lucene, but not when we are installing
             var appStatus = new ApplicationStatusInfo(new Application());
             if (appStatus.Status != UpgradeStatus.Install)
+			Logger.LogDebug("Application_End(sender={Sender},eventArgs={EventArgs}): appStatus → {AppStatus}", sender, eventArgs, appStatus);
             {
                 Logger.Trace("Disposing Lucene");
                 if (LuceneController.Instance is IDisposable lucene)
@@ -176,6 +186,7 @@ namespace DotNetNuke.Web.Common.Internal
 
             Logger.Trace("End Dumping all Application Errors");
             Logger.Info("Application Ended");
+			Logger.LogDebug("<<< Exiting Application_End(sender={Sender},eventArgs={EventArgs})", sender, eventArgs);
         }
 
         private void Application_Start(object sender, EventArgs eventArgs)
@@ -184,6 +195,7 @@ namespace DotNetNuke.Web.Common.Internal
 
             var name = Config.GetSetting("ServerName");
             Globals.ServerName = string.IsNullOrEmpty(name) ? Dns.GetHostName() : name;
+			Logger.LogDebug("Application_Start(sender={Sender},eventArgs={EventArgs}): name → {Name}", sender, eventArgs, name);
 
             Logger.InfoFormat(CultureInfo.InvariantCulture, "Application Started ({0})", Globals.ElapsedSinceAppStart); // just to start the timer
             DotNetNukeShutdownOverload.InitializeFcnSettings(new ApplicationStatusInfo(new Application()));
@@ -192,10 +204,12 @@ namespace DotNetNuke.Web.Common.Internal
             DotNetNuke.Services.Zip.SharpZipLibRedirect.RegisterSharpZipLibRedirect();
 
             ////DotNetNukeSecurity.Initialize();
+			Logger.LogDebug("<<< Exiting Application_Start(sender={Sender},eventArgs={EventArgs})", sender, eventArgs);
         }
 
         private void Application_Error(object sender, EventArgs eventArgs)
         {
+			Logger.LogDebug(">>> Entering Application_Error(sender={Sender},eventArgs={EventArgs})", sender, eventArgs);
             // Code that runs when an unhandled error occurs
             if (HttpContext.Current != null)
             {
@@ -208,17 +222,21 @@ namespace DotNetNuke.Web.Common.Internal
 
                 Logger.Trace("End Dumping all Application Errors");
             }
+			Logger.LogDebug("<<< Exiting Application_Error(sender={Sender},eventArgs={EventArgs})", sender, eventArgs);
         }
 
         private void Application_BeginRequest(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering Application_BeginRequest(sender={Sender},e={E})", sender, e);
             var app = (HttpApplication)sender;
             var authCookie = app.Request.Cookies[FormsAuthentication.FormsCookieName];
+			Logger.LogDebug("Application_BeginRequest(sender={Sender},e={E}): app → {App}", sender, e, app);
             if (authCookie != null && !IsInstallOrUpgradeRequest(app.Request))
             {
                 // if the cookie is not in the database, then it is from before upgrading to 9.2.0 and don't fail
                 var persisted = AuthCookieController.Instance.Find(authCookie.Value);
                 if (persisted != null && persisted.ExpiresOn <= DateTime.UtcNow)
+				Logger.LogDebug("Application_BeginRequest(sender={Sender},e={E}): persisted → {Persisted}", sender, e, persisted);
                 {
                     app.Response.Cookies[FormsAuthentication.FormsCookieName].Expires = DateTime.Now.AddDays(-1);
                 }
@@ -237,15 +255,19 @@ namespace DotNetNuke.Web.Common.Internal
 
             Initialize.Init(app);
             Initialize.RunSchedule(app.Request);
+			Logger.LogDebug("<<< Exiting Application_BeginRequest(sender={Sender},e={E})", sender, e);
         }
 
         private void Application_PreSendRequestHeaders(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering Application_PreSendRequestHeaders(sender={Sender},e={E})", sender, e);
             if (HttpContext.Current != null && HttpContext.Current.Handler is PageBase)
             {
                 var page = HttpContext.Current.Handler as PageBase;
                 page.HeaderIsWritten = true;
+				Logger.LogDebug("Application_PreSendRequestHeaders(sender={Sender},e={E}): page.HeaderIsWritten → {Arg2}", sender, e, page.HeaderIsWritten);
             }
+			Logger.LogDebug("<<< Exiting Application_PreSendRequestHeaders(sender={Sender},e={E})", sender, e);
         }
     }
 }
