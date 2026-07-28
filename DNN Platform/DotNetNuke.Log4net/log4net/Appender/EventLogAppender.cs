@@ -89,6 +89,7 @@ namespace log4net.Appender
     /// <author>Thomas Voss</author>
     public class EventLogAppender : AppenderSkeleton
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Initializes a new instance of the <see cref="EventLogAppender" /> class.
         /// </summary>
@@ -99,9 +100,11 @@ namespace log4net.Appender
         /// </remarks>
         public EventLogAppender()
         {
+			Logger.LogDebug(">>> Entering EventLogAppender()");
             this.m_applicationName	= System.Threading.Thread.GetDomain().FriendlyName;
             this.m_logName			= "Application";	// Defaults to application log
             this.m_machineName		= ".";	// Only log on the local machine
+			Logger.LogDebug("<<< Exiting EventLogAppender()");
         }
 
         /// <summary>
@@ -117,7 +120,10 @@ namespace log4net.Appender
         [Obsolete("Instead use the default constructor and set the Layout property")]
         public EventLogAppender(ILayout layout) : this()
         {
+			Logger.LogDebug(">>> Entering EventLogAppender(layout={Layout})", layout);
             this.Layout = layout;
+			Logger.LogDebug("<<< Exiting EventLogAppender(layout={Layout})", layout);
+			Logger.LogDebug("EventLogAppender(layout={Layout}): this.Layout → {Arg1}", layout, this.Layout);
         }
 
         /// <summary>
@@ -191,7 +197,9 @@ namespace log4net.Appender
         /// </remarks>
         public void AddMapping(Level2EventLogEntryType mapping)
         {
+			Logger.LogDebug(">>> Entering AddMapping(mapping={Mapping})", mapping);
             this.m_levelMapping.Add(mapping);
+			Logger.LogDebug("<<< Exiting AddMapping(mapping={Mapping})", mapping);
         }
 
         /// <summary>
@@ -270,6 +278,7 @@ namespace log4net.Appender
         /// </remarks>
         public override void ActivateOptions() 
         {
+			Logger.LogDebug(">>> Entering ActivateOptions()");
             try
             {
                 base.ActivateOptions();
@@ -277,10 +286,13 @@ namespace log4net.Appender
                 if (this.m_securityContext == null)
                 {
                     this.m_securityContext = SecurityContextProvider.DefaultProvider.CreateSecurityContext(this);
+					Logger.LogDebug("ActivateOptions(): m_securityContext → {M_securityContext}", m_securityContext);
                 }
 
                 bool sourceAlreadyExists = false;
                 string currentLogName = null;
+				Logger.LogDebug("ActivateOptions(): sourceAlreadyExists → {SourceAlreadyExists}", sourceAlreadyExists);
+				Logger.LogDebug("ActivateOptions(): currentLogName → {CurrentLogName}", currentLogName);
 
                 using (this.SecurityContext.Impersonate(this))
                 {
@@ -301,6 +313,7 @@ namespace log4net.Appender
 
                 string registeredLogName = null;
 
+				Logger.LogDebug("ActivateOptions(): registeredLogName → {RegisteredLogName}", registeredLogName);
                 using (this.SecurityContext.Impersonate(this))
                 {
                     if (sourceAlreadyExists && currentLogName != this.m_logName)
@@ -334,7 +347,9 @@ namespace log4net.Appender
                                         + "  See http://logging.apache.org/log4net/release/faq.html#trouble-EventLog",
                     ex);
                 this.Threshold = Level.Off;
+				Logger.LogDebug("ActivateOptions(): this.Threshold → {Arg0}", this.Threshold);
             }
+			Logger.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>
@@ -345,13 +360,17 @@ namespace log4net.Appender
         /// </remarks>
         private static void CreateEventSource(string source, string logName, string machineName)
         {
+		Logger.LogDebug(">>> Entering CreateEventSource(source={Source},logName={LogName},machineName={MachineName})", source, logName, machineName);
 #if NET_2_0
             EventSourceCreationData eventSourceCreationData = new EventSourceCreationData(source, logName);
             eventSourceCreationData.MachineName = machineName;
+			Logger.LogDebug("CreateEventSource(source={Source},logName={LogName},machineName={MachineName}): eventSourceCreationData → {EventSourceCreationData}", source, logName, machineName, eventSourceCreationData);
+			Logger.LogDebug("CreateEventSource(source={Source},logName={LogName},machineName={MachineName}): eventSourceCreationData.MachineName → {Arg3}", source, logName, machineName, eventSourceCreationData.MachineName);
             EventLog.CreateEventSource(eventSourceCreationData);
 #else
             EventLog.CreateEventSource(source, logName, machineName);
 #endif
+		Logger.LogDebug("<<< Exiting CreateEventSource(source={Source},logName={LogName},machineName={MachineName})", source, logName, machineName);
         }
 
         /// <summary>
@@ -372,14 +391,17 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent loggingEvent) 
         {
+			Logger.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             //
             // Write the resulting string to the event log system
             //
             int eventID = this.m_eventId;
 
+			Logger.LogDebug("Append(loggingEvent={LoggingEvent}): eventID → {EventID}", loggingEvent, eventID);
             // Look for the EventID property
             object eventIDPropertyObj = loggingEvent.LookupProperty("EventID");
             if (eventIDPropertyObj != null)
+			Logger.LogDebug("Append(loggingEvent={LoggingEvent}): eventIDPropertyObj → {EventIDPropertyObj}", loggingEvent, eventIDPropertyObj);
             {
                 if (eventIDPropertyObj is int)
                 {
@@ -389,6 +411,7 @@ namespace log4net.Appender
                 {
                     string eventIDPropertyString = eventIDPropertyObj as string;
                     if (eventIDPropertyString == null)
+					Logger.LogDebug("Append(loggingEvent={LoggingEvent}): eventIDPropertyString → {EventIDPropertyString}", loggingEvent, eventIDPropertyString);
                     {
                         eventIDPropertyString = eventIDPropertyObj.ToString();
                     }
@@ -410,8 +433,10 @@ namespace log4net.Appender
 
             short category = this.m_category;
             // Look for the Category property
+			Logger.LogDebug("Append(loggingEvent={LoggingEvent}): category → {Category}", loggingEvent, category);
             object categoryPropertyObj = loggingEvent.LookupProperty("Category");
             if (categoryPropertyObj != null)
+			Logger.LogDebug("Append(loggingEvent={LoggingEvent}): categoryPropertyObj → {CategoryPropertyObj}", loggingEvent, categoryPropertyObj);
             {
                 if (categoryPropertyObj is short)
                 {
@@ -421,6 +446,7 @@ namespace log4net.Appender
                 {
                     string categoryPropertyString = categoryPropertyObj as string;
                     if (categoryPropertyString == null)
+					Logger.LogDebug("Append(loggingEvent={LoggingEvent}): categoryPropertyString → {CategoryPropertyString}", loggingEvent, categoryPropertyString);
                     {
                         categoryPropertyString = categoryPropertyObj.ToString();
                     }
@@ -445,6 +471,7 @@ namespace log4net.Appender
             {
                 string eventTxt = this.RenderLoggingEvent(loggingEvent);
 
+				Logger.LogDebug("Append(loggingEvent={LoggingEvent}): eventTxt → {EventTxt}", loggingEvent, eventTxt);
                 // There is a limit of about 32K characters for an event log message
                 if (eventTxt.Length > MAX_EVENTLOG_MESSAGE_SIZE)
                 {
@@ -453,6 +480,7 @@ namespace log4net.Appender
 
                 EventLogEntryType entryType = this.GetEntryType(loggingEvent.Level);
 
+				Logger.LogDebug("Append(loggingEvent={LoggingEvent}): entryType → {EntryType}", loggingEvent, entryType);
                 using(this.SecurityContext.Impersonate(this))
                 {
                     EventLog.WriteEntry(this.m_applicationName, eventTxt, entryType, eventID, category);
@@ -460,8 +488,10 @@ namespace log4net.Appender
             }
             catch(Exception ex)
             {
+				Logger.LogError("Exception in Append(loggingEvent={LoggingEvent}): {Arg1}", loggingEvent, ex.Message);
                 this.ErrorHandler.Error("Unable to write to event log [" + this.m_logName + "] using source [" + this.m_applicationName + "]", ex);
             }
+			Logger.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
         } 
 
         /// <summary>
@@ -491,9 +521,11 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual EventLogEntryType GetEntryType(Level level)
         {
+			Logger.LogDebug(">>> Entering GetEntryType(level={Level})", level);
             // see if there is a specified lookup.
             Level2EventLogEntryType entryType = this.m_levelMapping.Lookup(level) as Level2EventLogEntryType;
             if (entryType != null)
+			Logger.LogDebug("GetEntryType(level={Level}): entryType → {EntryType}", level, entryType);
             {
                 return entryType.EventLogEntryType;
             }
@@ -510,6 +542,7 @@ namespace log4net.Appender
             } 
 
             // Default setting
+			Logger.LogDebug("<<< Exiting GetEntryType(level={Level})", level);
             return EventLogEntryType.Information;
         }
 
@@ -652,11 +685,13 @@ namespace log4net.Appender
         /// <returns></returns>
         private static int GetMaxEventLogMessageSize()
         {
+			Logger.LogDebug(">>> Entering GetMaxEventLogMessageSize()");
             if (Environment.OSVersion.Platform == PlatformID.Win32NT && Environment.OSVersion.Version.Major >= 6)
             {
                 return MAX_EVENTLOG_MESSAGE_SIZE_VISTA_OR_NEWER;
             }
 
+			Logger.LogDebug("<<< Exiting GetMaxEventLogMessageSize()");
             return MAX_EVENTLOG_MESSAGE_SIZE_DEFAULT;
         }
     }

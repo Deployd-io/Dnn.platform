@@ -12,13 +12,17 @@ Namespace DotNetNuke.UI.WebControls
     Friend NotInheritable Class DNNTreeWriter
         Inherits WebControl
         Implements IDNNTreeWriter
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(DNNTreeWriter))
         ' Methods
         Public Sub New()
+			Logger.LogDebug(">>> Entering New()")
             DNNTreeWriter.__ENCAddToList(Me)
+			Logger.LogDebug("<<< Exiting New()")
         End Sub
 
         <DebuggerNonUserCode> _
         Private Shared Sub __ENCAddToList(ByVal value As Object)
+			Logger.LogDebug(">>> Entering __ENCAddToList(value={Value})", value)
             SyncLock DNNTreeWriter.__ENCList
                 If (DNNTreeWriter.__ENCList.Count = DNNTreeWriter.__ENCList.Capacity) Then
                     Dim index As Integer = 0
@@ -43,16 +47,21 @@ Namespace DotNetNuke.UI.WebControls
                 End If
                 DNNTreeWriter.__ENCList.Add(New WeakReference(value))
             End SyncLock
+			Logger.LogDebug("<<< Exiting __ENCAddToList(value={Value})", value)
         End Sub
 
         Protected Function MarshalledProperties() As Hashtable Implements IDNNTreeWriter.MarshalledProperties
+			Logger.LogDebug(">>> Entering MarshalledProperties()")
+			Logger.LogDebug("<<< Exiting MarshalledProperties()")
             Return New Hashtable
         End Function
 
         Protected Overrides Sub RenderChildren(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderChildren(writer={Writer})", writer)
             Dim enumerator As IEnumerator = Nothing
             Try 
                 enumerator = Me._tree.TreeNodes.GetEnumerator
+				Logger.LogDebug("RenderChildren(writer={Writer}): enumerator → {Enumerator}", writer, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -64,9 +73,11 @@ Namespace DotNetNuke.UI.WebControls
                     TryCast(enumerator,IDisposable).Dispose
                 End If
             End Try
+			Logger.LogDebug("<<< Exiting RenderChildren(writer={Writer})", writer)
         End Sub
 
         Protected Overrides Sub RenderContents(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderContents(writer={Writer})", writer)
             writer.AddAttribute(HtmlTextWriterAttribute.Width, "100%")
             writer.AddAttribute(HtmlTextWriterAttribute.Class, "DNNTree")
             writer.AddAttribute(HtmlTextWriterAttribute.Name, Me._tree.UniqueID)
@@ -74,11 +85,15 @@ Namespace DotNetNuke.UI.WebControls
             writer.RenderBeginTag(HtmlTextWriterTag.Div)
             Me.RenderChildren(writer)
             writer.RenderEndTag
+			Logger.LogDebug("<<< Exiting RenderContents(writer={Writer})", writer)
         End Sub
 
         Public Sub RenderTree(ByVal writer As HtmlTextWriter, ByVal tree As DnnTree) Implements IDNNTreeWriter.RenderTree
+			Logger.LogDebug(">>> Entering RenderTree(writer={Writer},tree={Tree})", writer, tree)
             Me._tree = tree
             Me.RenderControl(writer)
+			Logger.LogDebug("RenderTree(writer={Writer},tree={Tree}): Me._tree → {Arg2}", writer, tree, Me._tree)
+			Logger.LogDebug("<<< Exiting RenderTree(writer={Writer},tree={Tree})", writer, tree)
         End Sub
 
 

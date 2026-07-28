@@ -87,7 +87,10 @@ namespace DotNetNuke.Entities.Tabs
         [DnnDeprecated(10, 0, 0, "Please use overload with IBusinessControllerProvider")]
         public static partial XmlNode SerializeTab(XmlDocument tabXml, TabInfo objTab, bool includeContent)
         {
+			Logger.LogDebug(">>> Entering SerializeTab(tabXml={TabXml},objTab={ObjTab},includeContent={IncludeContent})", tabXml, objTab, includeContent);
             using var scope = Globals.GetOrCreateServiceScope();
+			Logger.LogDebug("SerializeTab(tabXml={TabXml},objTab={ObjTab},includeContent={IncludeContent}): scope → {Scope}", tabXml, objTab, includeContent, scope);
+			Logger.LogDebug("<<< Exiting SerializeTab(tabXml={TabXml},objTab={ObjTab},includeContent={IncludeContent})", tabXml, objTab, includeContent);
             return SerializeTab(
                 scope.ServiceProvider.GetRequiredService<IBusinessControllerProvider>(),
                 tabXml,
@@ -126,7 +129,10 @@ namespace DotNetNuke.Entities.Tabs
         [DnnDeprecated(9, 11, 1, "Use AddMissingLanguagesWithWarnings")]
         public partial void AddMissingLanguages(int portalId, int tabId)
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
             this.AddMissingLanguagesWithWarnings(portalId, tabId);
+			Logger.LogDebug(">>> Entering AddMissingLanguages(portalId={PortalId},tabId={TabId})", portalId, tabId);
+			Logger.LogDebug("<<< Exiting AddMissingLanguages(portalId={PortalId},tabId={TabId})", portalId, tabId);
         }
     }
 }

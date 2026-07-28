@@ -14,11 +14,14 @@ namespace DotNetNuke.Web.Mvp
         where TView : class, IModuleView<TModel>
         where TModel : class, new()
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ModulePresenter{TView, TModel}"/> class.</summary>
         /// <param name="view">The view.</param>
         protected ModulePresenter(TView view)
             : base(view)
         {
+		Logger.LogDebug(">>> Entering ModulePresenter(view={View})", view);
+		Logger.LogDebug("<<< Exiting ModulePresenter(view={View})", view);
         }
     }
 }

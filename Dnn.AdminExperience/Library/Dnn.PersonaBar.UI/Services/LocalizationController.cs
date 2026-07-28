@@ -27,6 +27,7 @@ namespace Dnn.PersonaBar.UI.Services
     [MenuPermission(Scope = ServiceScope.Regular)]
     public class LocalizationController : PersonaBarApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static object threadLocker = new object();
         private readonly IApplicationStatusInfo appStatus;
 
@@ -35,6 +36,10 @@ namespace Dnn.PersonaBar.UI.Services
         public LocalizationController()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering LocalizationController()");
+		Logger.LogDebug("<<< Exiting LocalizationController()");
+		Logger.LogDebug(">>> Entering LocalizationController(appStatus={AppStatus})", appStatus);
+		Logger.LogDebug("<<< Exiting LocalizationController(appStatus={AppStatus})", appStatus);
         }
 
         /// <summary>Initializes a new instance of the <see cref="LocalizationController"/> class.</summary>
@@ -42,6 +47,8 @@ namespace Dnn.PersonaBar.UI.Services
         public LocalizationController(IApplicationStatusInfo appStatus)
         {
             this.appStatus = appStatus;
+			Logger.LogDebug("LocalizationController(appStatus={AppStatus}): appStatus → {AppStatus1}", appStatus, appStatus);
+			Logger.LogDebug("LocalizationController(appStatus={AppStatus}): this.appStatus → {Arg1}", appStatus, this.appStatus);
         }
 
         /// <summary>Retrieve a list of CMX related Localization Keys with its values for the current culture.</summary>
@@ -50,10 +57,12 @@ namespace Dnn.PersonaBar.UI.Services
         [HttpGet]
         public HttpResponseMessage GetTable(string culture)
         {
+			Logger.LogDebug(">>> Entering GetTable(culture={Culture})", culture);
             try
             {
                 var resources = this.GetResourcesFromFile(culture);
                 if (resources == null)
+				Logger.LogDebug("GetTable(culture={Culture}): resources → {Resources}", culture, resources);
                 {
                     lock (threadLocker)
                     {
@@ -69,20 +78,28 @@ namespace Dnn.PersonaBar.UI.Services
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in GetTable(culture={Culture}): {Arg1}", culture, ex.Message);
                 Exceptions.LogException(ex);
+				Logger.LogDebug("<<< Exiting GetTable(culture={Culture})", culture);
                 return this.Request.CreateErrorResponse(HttpStatusCode.NotFound, ex.Message);
             }
         }
 
         private static string GetJsonFileContent(string culture)
         {
+			Logger.LogDebug(">>> Entering GetJsonFileContent(culture={Culture})", culture);
             var path = GetResourcesJsonFilePath(culture);
+			Logger.LogDebug("GetJsonFileContent(culture={Culture}): path → {Path}", culture, path);
+			Logger.LogDebug("<<< Exiting GetJsonFileContent(culture={Culture})", culture);
             return File.Exists(path) ? File.ReadAllText(path, Encoding.UTF8) : null;
         }
 
         private static string GetResourcesJsonFilePath(string culture)
         {
+			Logger.LogDebug(">>> Entering GetResourcesJsonFilePath(culture={Culture})", culture);
             var path = Path.Combine(Constants.PersonaBarRelativePath, "Resources", $"LocalResources.{culture}.resources");
+			Logger.LogDebug("GetResourcesJsonFilePath(culture={Culture}): path → {Path}", culture, path);
+			Logger.LogDebug("<<< Exiting GetResourcesJsonFilePath(culture={Culture})", culture);
             return HttpContext.Current.Server.MapPath(path);
         }
 
@@ -101,14 +118,18 @@ namespace Dnn.PersonaBar.UI.Services
 
         private bool Expired(string culture)
         {
+			Logger.LogDebug(">>> Entering Expired(culture={Culture})", culture);
             var cacheKey = $"PersonaBarResources{culture}";
             if (DataCache.GetCache(cacheKey) != null)
+			Logger.LogDebug("Expired(culture={Culture}): cacheKey → {CacheKey}", culture, cacheKey);
             {
                 return false;
             }
 
             var jsonFilePath = GetResourcesJsonFilePath(culture);
             var jsonFile = new FileInfo(jsonFilePath);
+			Logger.LogDebug("Expired(culture={Culture}): jsonFilePath → {JsonFilePath}", culture, jsonFilePath);
+			Logger.LogDebug("Expired(culture={Culture}): jsonFile → {JsonFile}", culture, jsonFile);
             if (!jsonFile.Exists)
             {
                 return true;
@@ -117,6 +138,7 @@ namespace Dnn.PersonaBar.UI.Services
             var lastModifiedTime = jsonFile.LastWriteTime;
             var resourceFiles = this.GetAllResourceFiles(culture);
 
+			Logger.LogDebug("Expired(culture={Culture}): resourceFiles → {ResourceFiles}", culture, resourceFiles);
             var expired = resourceFiles.Select(file => new FileInfo(file.Value))
                 .Any(resourceFile => resourceFile.LastWriteTime > lastModifiedTime || resourceFile.CreationTime > lastModifiedTime);
             if (!expired)
@@ -124,6 +146,7 @@ namespace Dnn.PersonaBar.UI.Services
                 DataCache.SetCache(cacheKey, new CacheDto(), TimeSpan.FromMinutes(5));
             }
 
+			Logger.LogDebug("<<< Exiting Expired(culture={Culture})", culture);
             return expired;
         }
 
@@ -190,12 +213,15 @@ namespace Dnn.PersonaBar.UI.Services
 
         private string GetFallbackCulture(string culture)
         {
+			Logger.LogDebug(">>> Entering GetFallbackCulture(culture={Culture})", culture);
             var locale = LocaleController.Instance.GetLocale(this.PortalId, culture);
             if (locale != null && !string.IsNullOrEmpty(locale.Fallback))
+			Logger.LogDebug("GetFallbackCulture(culture={Culture}): locale → {Locale}", culture, locale);
             {
                 return locale.Fallback;
             }
 
+			Logger.LogDebug("<<< Exiting GetFallbackCulture(culture={Culture})", culture);
             return Localization.SystemLocale;
         }
 

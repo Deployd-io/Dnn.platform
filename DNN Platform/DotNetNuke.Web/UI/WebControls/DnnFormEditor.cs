@@ -37,6 +37,12 @@ namespace DotNetNuke.Web.UI.WebControls
         public DnnFormEditor()
             : this(null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering DnnFormEditor()");
+		eventLogger.LogDebug(">>> Entering DnnFormEditor(hostSettings={HostSettings},appStatus={AppStatus},eventLogger={EventLogger})", hostSettings, appStatus, eventLogger);
+		eventLogger.LogDebug("DnnFormEditor(hostSettings={HostSettings},appStatus={AppStatus},eventLogger={EventLogger}): appStatus → {AppStatus1}", hostSettings, appStatus, eventLogger, appStatus);
+		eventLogger.LogDebug("DnnFormEditor(hostSettings={HostSettings},appStatus={AppStatus},eventLogger={EventLogger}): eventLogger → {EventLogger1}", hostSettings, appStatus, eventLogger, eventLogger);
+		eventLogger.LogDebug("DnnFormEditor(hostSettings={HostSettings},appStatus={AppStatus},eventLogger={EventLogger}): hostSettings → {HostSettings1}", hostSettings, appStatus, eventLogger, hostSettings);
+		eventLogger.LogDebug("<<< Exiting DnnFormEditor(hostSettings={HostSettings},appStatus={AppStatus},eventLogger={EventLogger})", hostSettings, appStatus, eventLogger);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnFormEditor"/> class.</summary>
@@ -50,11 +56,17 @@ namespace DotNetNuke.Web.UI.WebControls
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
 
             this.Items = [];
+			eventLogger.LogDebug("DnnFormEditor(hostSettings={HostSettings},appStatus={AppStatus},eventLogger={EventLogger}): this.Items → {Arg3}", hostSettings, appStatus, eventLogger, this.Items);
             this.Sections = [];
             this.Tabs = [];
+			eventLogger.LogDebug("DnnFormEditor(hostSettings={HostSettings},appStatus={AppStatus},eventLogger={EventLogger}): this.Sections → {Arg3}", hostSettings, appStatus, eventLogger, this.Sections);
+			eventLogger.LogDebug("DnnFormEditor(hostSettings={HostSettings},appStatus={AppStatus},eventLogger={EventLogger}): this.Tabs → {Arg3}", hostSettings, appStatus, eventLogger, this.Tabs);
 
             this.FormMode = DnnFormMode.Long;
             this.ViewStateMode = ViewStateMode.Disabled;
+			eventLogger.LogDebug("<<< Exiting DnnFormEditor(hostSettings={HostSettings},appStatus={AppStatus},eventLogger={EventLogger})", hostSettings, appStatus, eventLogger);
+			eventLogger.LogDebug("DnnFormEditor(hostSettings={HostSettings},appStatus={AppStatus},eventLogger={EventLogger}): this.FormMode → {Arg3}", hostSettings, appStatus, eventLogger, this.FormMode);
+			eventLogger.LogDebug("DnnFormEditor(hostSettings={HostSettings},appStatus={AppStatus},eventLogger={EventLogger}): this.ViewStateMode → {Arg3}", hostSettings, appStatus, eventLogger, this.ViewStateMode);
         }
 
         /// <summary>Gets a value indicating whether the editor is valid.</summary>
@@ -143,12 +155,15 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         public override void DataBind()
         {
+			eventLogger.LogDebug(">>> Entering DataBind()");
             this.OnDataBinding(EventArgs.Empty);
             this.Controls.Clear();
             this.ClearChildViewState();
             this.TrackViewState();
             this.CreateControlHierarchy(true);
             this.ChildControlsCreated = true;
+			eventLogger.LogDebug("<<< Exiting DataBind()");
+			eventLogger.LogDebug("DataBind(): this.ChildControlsCreated → {Arg0}", this.ChildControlsCreated);
         }
 
         /// <summary>Sets the items up.</summary>
@@ -172,6 +187,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         protected override void CreateChildControls()
         {
+			eventLogger.LogDebug(">>> Entering CreateChildControls()");
             // CreateChildControls re-creates the children (the items)
             // using the saved view state.
             // First clear any existing child controls.
@@ -183,12 +199,14 @@ namespace DotNetNuke.Web.UI.WebControls
             {
                 this.CreateControlHierarchy(false);
             }
+			eventLogger.LogDebug("<<< Exiting CreateChildControls()");
         }
 
         /// <summary>Creates the control hierarchy.</summary>
         /// <param name="useDataSource">Whether to use the data source.</param>
         protected virtual void CreateControlHierarchy(bool useDataSource)
         {
+			eventLogger.LogDebug(">>> Entering CreateControlHierarchy(useDataSource={UseDataSource})", useDataSource);
             this.CssClass = string.IsNullOrEmpty(this.CssClass)
                 ? "dnnForm"
                 : this.CssClass.Contains("dnnForm")
@@ -202,29 +220,36 @@ namespace DotNetNuke.Web.UI.WebControls
             SetUpItems(this.hostSettings, this.Items, this, this.EncryptIds);
 
             this.DataBindItems(useDataSource);
+			eventLogger.LogDebug("<<< Exiting CreateControlHierarchy(useDataSource={UseDataSource})", useDataSource);
         }
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         protected override void LoadControlState(object state)
         {
+			eventLogger.LogDebug(">>> Entering LoadControlState(state={State})", state);
             if (state != null)
             {
                 this.itemCount = (int)state;
+				eventLogger.LogDebug("LoadControlState(state={State}): itemCount → {ItemCount}", state, itemCount);
             }
+			eventLogger.LogDebug("<<< Exiting LoadControlState(state={State})", state);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnInit(e={E})", e);
             this.Page.RegisterRequiresControlState(this);
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, PortalSettings.Current, CommonJs.DnnPlugins);
             base.OnInit(e);
+			eventLogger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             if (this.Tabs.Count > 0)
@@ -237,6 +262,7 @@ namespace DotNetNuke.Web.UI.WebControls
                     // Render Script
                     var scriptBuilder = new StringBuilder();
                     scriptBuilder.Append("<script language=\"javascript\" type=\"text/javascript\">\r\n");
+					eventLogger.LogDebug("OnPreRender(e={E}): scriptBuilder → {ScriptBuilder}", e, scriptBuilder);
                     scriptBuilder.Append("\t(function ($, Sys) {\r\n");
                     scriptBuilder.Append("\t\tfunction setupFormEditor() {\r\n");
                     scriptBuilder.Append("\t\t\t$('#" + this.ClientID + "').dnnTabs().dnnPanels();\r\n");
@@ -263,18 +289,23 @@ namespace DotNetNuke.Web.UI.WebControls
                     cs.RegisterClientScriptBlock(this.GetType(), scriptName, scriptBuilder.ToString());
                 }
             }
+			eventLogger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override object SaveControlState()
         {
+			eventLogger.LogDebug(">>> Entering SaveControlState()");
+			eventLogger.LogDebug("<<< Exiting SaveControlState()");
             return this.itemCount > 0 ? (object)this.itemCount : null;
         }
 
         private List<DnnFormItemBase> GetAllItems()
         {
+			eventLogger.LogDebug(">>> Entering GetAllItems()");
             var items = new List<DnnFormItemBase>();
 
+			eventLogger.LogDebug("GetAllItems(): items → {Items}", items);
             // iterate over pages
             foreach (DnnFormTab page in this.Tabs)
             {
@@ -300,50 +331,60 @@ namespace DotNetNuke.Web.UI.WebControls
 
         private void SetUpSections(List<DnnFormSection> sections, WebControl parentControl)
         {
+			eventLogger.LogDebug(">>> Entering SetUpSections(sections={Sections},parentControl={ParentControl})", sections, parentControl);
             if (sections.Count > 0)
             {
                 foreach (DnnFormSection section in sections)
                 {
                     var panel = new DnnFormPanel { CssClass = "dnnFormSectionHead" };
                     parentControl.Controls.Add(panel);
+					eventLogger.LogDebug("SetUpSections(sections={Sections},parentControl={ParentControl}): panel → {Panel}", sections, parentControl, panel);
 
                     var resourceKey = section.ResourceKey;
                     if (string.IsNullOrEmpty(resourceKey))
+					eventLogger.LogDebug("SetUpSections(sections={Sections},parentControl={ParentControl}): resourceKey → {ResourceKey}", sections, parentControl, resourceKey);
                     {
                         resourceKey = section.ID;
                     }
 
                     panel.Text = Localization.GetString(resourceKey, this.LocalResourceFile);
                     panel.Expanded = section.Expanded;
+					eventLogger.LogDebug("SetUpSections(sections={Sections},parentControl={ParentControl}): panel.Expanded → {Arg2}", sections, parentControl, panel.Expanded);
 
                     SetUpItems(this.hostSettings, this.Items, panel, this.EncryptIds);
                 }
             }
+			eventLogger.LogDebug("<<< Exiting SetUpSections(sections={Sections},parentControl={ParentControl})", sections, parentControl);
         }
 
         private void SetUpTabs()
         {
+			eventLogger.LogDebug(">>> Entering SetUpTabs()");
             if (this.Tabs.Count > 0)
             {
                 var tabStrip = new DnnFormTabStrip { CssClass = "dnnAdminTabNav dnnClear" };
                 this.Controls.Add(tabStrip);
+				eventLogger.LogDebug("SetUpTabs(): tabStrip → {TabStrip}", tabStrip);
                 tabStrip.Items.Clear();
 
                 foreach (DnnFormTab formTab in this.Tabs)
                 {
                     var resourceKey = formTab.ResourceKey;
                     if (string.IsNullOrEmpty(resourceKey))
+					eventLogger.LogDebug("SetUpTabs(): resourceKey → {ResourceKey}", resourceKey);
                     {
                         resourceKey = formTab.ID;
                     }
 
                     var tab = new Panel { CssClass = formTab.ID + " dnnClear", ID = "tab_" + formTab.ID };
                     this.Controls.Add(tab);
+					eventLogger.LogDebug("SetUpTabs(): tab → {Tab}", tab);
 
                     if (formTab.IncludeExpandAll)
                     {
                         var expandAll = new Panel { CssClass = "dnnFormExpandContent" };
                         string expandAllText = Localization.GetString("ExpandAll", Localization.SharedResourceFile);
+						eventLogger.LogDebug("SetUpTabs(): expandAll → {ExpandAll}", expandAll);
                         expandAll.Controls.Add(new LiteralControl("<a href=\"\">" + expandAllText + "</a>"));
                         tab.Controls.Add(expandAll);
 
@@ -367,32 +408,40 @@ namespace DotNetNuke.Web.UI.WebControls
                     SetUpItems(this.hostSettings, formTab.Items, tab, this.EncryptIds);
                 }
             }
+			eventLogger.LogDebug("<<< Exiting SetUpTabs()");
         }
 
         private void DataBindItems(bool useDataSource)
         {
+			eventLogger.LogDebug(">>> Entering DataBindItems(useDataSource={UseDataSource})", useDataSource);
             var items = this.GetAllItems();
 
+			eventLogger.LogDebug("DataBindItems(useDataSource={UseDataSource}): items → {Items}", useDataSource, items);
             foreach (DnnFormItemBase item in items)
             {
                 if (string.IsNullOrEmpty(item.LocalResourceFile))
                 {
                     item.LocalResourceFile = this.LocalResourceFile;
+					eventLogger.LogDebug("DataBindItems(useDataSource={UseDataSource}): item.LocalResourceFile → {Arg1}", useDataSource, item.LocalResourceFile);
                 }
 
                 if (item.FormMode == DnnFormMode.Inherit)
                 {
                     item.FormMode = this.FormMode;
+					eventLogger.LogDebug("DataBindItems(useDataSource={UseDataSource}): item.FormMode → {Arg1}", useDataSource, item.FormMode);
                 }
 
                 if (this.DataSource != null)
                 {
                     item.DataSource = this.DataSource;
+					eventLogger.LogDebug("DataBindItems(useDataSource={UseDataSource}): item.DataSource → {Arg1}", useDataSource, item.DataSource);
                     item.DataBindItem(useDataSource);
                 }
             }
 
             this.itemCount = this.GetAllItems().Count;
+			eventLogger.LogDebug("<<< Exiting DataBindItems(useDataSource={UseDataSource})", useDataSource);
+			eventLogger.LogDebug("DataBindItems(useDataSource={UseDataSource}): itemCount → {ItemCount}", useDataSource, itemCount);
         }
     }
 }

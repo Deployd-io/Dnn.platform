@@ -17,6 +17,7 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens.Models
     [Scope("PortalId")]
     public class ApiToken : ApiTokenBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Gets or sets the name of the portal of this API token if it is not a host level token.
         /// </summary>
@@ -53,6 +54,8 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens.Models
         /// <returns>An ApiTokenBase instance.</returns>
         public ApiTokenBase ToBase()
         {
+			Logger.LogDebug(">>> Entering ToBase()");
+			Logger.LogDebug("<<< Exiting ToBase()");
             return new ApiTokenBase()
             {
                 ApiTokenId = this.ApiTokenId,

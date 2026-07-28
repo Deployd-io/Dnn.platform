@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.Connections
     /// <summary>The <see cref="IConnectionsController"/> implementation.</summary>
     public class ConnectionsController : ServiceLocator<IConnectionsController, ConnectionsController>, IConnectionsController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IServiceProvider serviceProvider;
         private readonly IConnectionsManager connectionsManager;
 
@@ -24,7 +25,9 @@ namespace DotNetNuke.Services.Connections
         public ConnectionsController()
             : this(Globals.GetCurrentServiceProvider(), null)
         {
+		Logger.LogDebug(">>> Entering ConnectionsController()");
         }
+		Logger.LogDebug("<<< Exiting ConnectionsController()");
 
         /// <summary>Initializes a new instance of the <see cref="ConnectionsController"/> class.</summary>
         /// <param name="serviceProvider">The DI container.</param>
@@ -33,11 +36,16 @@ namespace DotNetNuke.Services.Connections
         {
             this.serviceProvider = serviceProvider;
             this.connectionsManager = connectionsManager ?? serviceProvider.GetRequiredService<IConnectionsManager>();
+			Logger.LogDebug("ConnectionsController(serviceProvider={ServiceProvider},connectionsManager={ConnectionsManager}): this.serviceProvider → {Arg2}", serviceProvider, connectionsManager, this.serviceProvider);
+			Logger.LogDebug("ConnectionsController(serviceProvider={ServiceProvider},connectionsManager={ConnectionsManager}): connectionsManager → {ConnectionsManager1}", serviceProvider, connectionsManager, connectionsManager);
+			Logger.LogDebug("ConnectionsController(serviceProvider={ServiceProvider},connectionsManager={ConnectionsManager}): serviceProvider → {ServiceProvider1}", serviceProvider, connectionsManager, serviceProvider);
         }
 
         /// <inheritdoc />
         public IList<IConnector> GetConnections(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetConnections(portalId={PortalId})", portalId);
+				Logger.LogDebug("<<< Exiting GetConnections(portalId={PortalId})", portalId);
             return
                 this.connectionsManager.GetConnectors(this.serviceProvider)
                     .Where(c => c.HasConfig(portalId))
@@ -58,6 +66,8 @@ namespace DotNetNuke.Services.Connections
         /// <inheritdoc />
         protected override Func<IConnectionsController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return Globals.DependencyProvider.GetRequiredService<IConnectionsController>;
         }
     }

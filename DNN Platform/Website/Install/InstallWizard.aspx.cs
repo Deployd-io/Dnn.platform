@@ -102,7 +102,9 @@ namespace DotNetNuke.Services.Install
         public InstallWizard()
             : this(null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering InstallWizard()");
         }
+		Logger.LogDebug("<<< Exiting InstallWizard()");
 
         /// <summary>Initializes a new instance of the <see cref="InstallWizard"/> class.</summary>
         /// <param name="portalController">The portal controller.</param>
@@ -126,6 +128,8 @@ namespace DotNetNuke.Services.Install
         {
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
             this.portalTemplateController = portalTemplateController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalTemplateController>();
+			Logger.LogDebug("InstallWizard(portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},userController={UserController},portalTemplateController={PortalTemplateController}): portalTemplateController → {PortalTemplateController1}", portalController, appStatus, hostSettings, userController, portalTemplateController, portalTemplateController);
+			Logger.LogDebug("InstallWizard(portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},userController={UserController},portalTemplateController={PortalTemplateController}): appStatus → {AppStatus1}", portalController, appStatus, hostSettings, userController, portalTemplateController, appStatus);
         }
 
         /// <summary>Gets the current application version.</summary>
@@ -230,8 +234,11 @@ namespace DotNetNuke.Services.Install
         [WebMethod]
         public static void RunInstall()
         {
+			Logger.LogDebug(">>> Entering RunInstall()");
             installerRunning = false;
             LaunchAutoInstall(Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>());
+			Logger.LogDebug("<<< Exiting RunInstall()");
+			Logger.LogDebug("RunInstall(): installerRunning → {InstallerRunning}", installerRunning);
         }
 
         /// <summary>Gets the installation log.</summary>
@@ -240,14 +247,18 @@ namespace DotNetNuke.Services.Install
         [WebMethod]
         public static object GetInstallationLog(int startRow)
         {
+			Logger.LogDebug(">>> Entering GetInstallationLog(startRow={StartRow})", startRow);
             const int maxLines = 500;
             var logFile = InstallController.Instance.InstallerLogName;
             try
             {
                 var lines = File.ReadAllLines(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Portals", "_default", "logs", logFile));
                 var sb = new StringBuilder();
+				Logger.LogDebug("GetInstallationLog(startRow={StartRow}): lines → {Lines}", startRow, lines);
+				Logger.LogDebug("GetInstallationLog(startRow={StartRow}): sb → {Sb}", startRow, sb);
                 var errorLogged = false;
                 var lineCount = 0;
+				Logger.LogDebug("GetInstallationLog(startRow={StartRow}): errorLogged → {ErrorLogged}", startRow, errorLogged);
 
                 // Important to return empty string to stop retries.
                 if (startRow > lines.Count())
@@ -285,6 +296,8 @@ namespace DotNetNuke.Services.Install
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in GetInstallationLog(startRow={StartRow}): {Arg1}", startRow, ex.Message);
+				Logger.LogDebug("<<< Exiting GetInstallationLog(startRow={StartRow})", startRow);
                 return string.Empty;
             }
         }
@@ -354,9 +367,11 @@ namespace DotNetNuke.Services.Install
         [WebMethod]
         public static bool ValidatePassword(string password)
         {
+			Logger.LogDebug(">>> Entering ValidatePassword(password={Password})", password);
             // Check Length
             var result = !(password.Length < Membership.MinRequiredPasswordLength);
 
+			Logger.LogDebug("ValidatePassword(password={Password}): result → {Result}", password, result);
             // Check against regex
             if (!string.IsNullOrEmpty(Membership.PasswordStrengthRegularExpression) && !Regex.IsMatch(password, Membership.PasswordStrengthRegularExpression))
             {
@@ -366,10 +381,12 @@ namespace DotNetNuke.Services.Install
             // Check non-alphaNumeric
             var nonAlnumCount = password.Where((t, i) => !char.IsLetterOrDigit(password, i)).Count();
             if (nonAlnumCount < Membership.MinRequiredNonAlphanumericCharacters)
+			Logger.LogDebug("ValidatePassword(password={Password}): nonAlnumCount → {NonAlnumCount}", password, nonAlnumCount);
             {
                 result = false;
             }
 
+			Logger.LogDebug("<<< Exiting ValidatePassword(password={Password})", password);
             return result;
         }
 
@@ -378,6 +395,10 @@ namespace DotNetNuke.Services.Install
         [WebMethod]
         public static bool VerifyDatabaseConnectionOnLoad()
         {
+			Logger.LogDebug(">>> Entering VerifyDatabaseConnectionOnLoad()");
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
+			Logger.LogDebug("OnLoad(e={E}): installerRunning → {InstallerRunning}", e, installerRunning);
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
             return CheckDatabaseConnection();
         }
 
@@ -433,22 +454,26 @@ namespace DotNetNuke.Services.Install
         [WebMethod]
         public static bool IsInstallerRunning()
         {
+			Logger.LogDebug(">>> Entering IsInstallerRunning()");
             bool isRunning;
 
             if (installerRunning || InstallBlocker.Instance.IsInstallInProgress())
             {
                 isRunning = true;
+				Logger.LogDebug("IsInstallerRunning(): isRunning → {IsRunning}", isRunning);
             }
             else if (File.Exists(StatusFile))
             {
                 var file = new FileInfo(StatusFile);
                 isRunning = file.Length > 0;
+				Logger.LogDebug("IsInstallerRunning(): file → {File}", file);
             }
             else
             {
                 isRunning = false;
             }
 
+			Logger.LogDebug("<<< Exiting IsInstallerRunning()");
             return isRunning;
         }
 
@@ -457,6 +482,8 @@ namespace DotNetNuke.Services.Install
         /// <returns>A string representing the result of the action.</returns>
         public string RaiseClientAPICallbackEvent(string eventArgument)
         {
+			Logger.LogDebug(">>> Entering RaiseClientAPICallbackEvent(eventArgument={EventArgument})", eventArgument);
+			Logger.LogDebug("<<< Exiting RaiseClientAPICallbackEvent(eventArgument={EventArgument})", eventArgument);
             return this.ProcessAction(eventArgument);
         }
 
@@ -465,9 +492,11 @@ namespace DotNetNuke.Services.Install
         /// <returns>A string representing the result of the action.</returns>
         public string ProcessAction(string someAction)
         {
+			Logger.LogDebug(">>> Entering ProcessAction(someAction={SomeAction})", someAction);
             // First check that we are not being targeted by an AJAX HttpPost, so get the current DB version
             string strProviderPath = this.dataProvider.GetProviderPath();
             string nextVersion = this.GetNextScriptVersion(strProviderPath, this.DatabaseVersion);
+			Logger.LogDebug("ProcessAction(someAction={SomeAction}): strProviderPath → {StrProviderPath}", someAction, strProviderPath);
             if (someAction != nextVersion)
             {
                 Exceptions.Exceptions.LogException(new Exception("Attempt made to run a Database Script - Possible Attack"));
@@ -478,6 +507,7 @@ namespace DotNetNuke.Services.Install
             {
                 string result = this.InstallDatabase();
                 if (result == "Done")
+				Logger.LogDebug("ProcessAction(someAction={SomeAction}): result → {Result}", someAction, result);
                 {
                     // Complete Installation
                     Upgrade.UpgradeApplication();
@@ -493,10 +523,12 @@ namespace DotNetNuke.Services.Install
                 {
                     ArrayList arrVersions = Upgrade.GetUpgradeScripts(strProviderPath, this.BaseVersion);
                     string strErrorMessage = Null.NullString;
+					Logger.LogDebug("ProcessAction(someAction={SomeAction}): arrVersions → {ArrVersions}", someAction, arrVersions);
                     for (int i = 0; i <= arrVersions.Count - 1; i++)
                     {
                         string strVersion = Path.GetFileNameWithoutExtension(Convert.ToString(arrVersions[i]));
                         var version = new Version(strVersion);
+						Logger.LogDebug("ProcessAction(someAction={SomeAction}): version → {Version}", someAction, version);
 
                         strErrorMessage += Upgrade.UpgradeApplication(strProviderPath, version, false);
 
@@ -519,6 +551,7 @@ namespace DotNetNuke.Services.Install
             }
             else
             {
+				Logger.LogDebug("<<< Exiting ProcessAction(someAction={SomeAction})", someAction);
                 return "Done";
             }
         }
@@ -527,6 +560,8 @@ namespace DotNetNuke.Services.Install
         /// <returns>The database version.</returns>
         protected string GetBaseDatabaseVersion()
         {
+			Logger.LogDebug(">>> Entering GetBaseDatabaseVersion()");
+			Logger.LogDebug("<<< Exiting GetBaseDatabaseVersion()");
             return Upgrade.GetStringVersion(this.BaseVersion);
         }
 
@@ -535,24 +570,30 @@ namespace DotNetNuke.Services.Install
         /// <returns>The localized string.</returns>
         protected string LocalizeString(string key)
         {
+			Logger.LogDebug(">>> Entering LocalizeString(key={Key})", key);
+			Logger.LogDebug("<<< Exiting LocalizeString(key={Key})", key);
             return Localization.GetString(key, localResourceFile, culture);
         }
 
         /// <inheritdoc />
         protected override void OnError(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnError(e={E})", e);
             HttpContext.Current.Response.Clear();
             HttpContext.Current.Server.Transfer("~/ErrorPage.aspx");
+			Logger.LogDebug("<<< Exiting OnError(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             // if previous config deleted create new empty one
             string installConfig = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Install", "DotNetNuke.install.config");
             if (!File.Exists(installConfig))
+			Logger.LogDebug("OnInit(e={E}): installConfig → {InstallConfig}", e, installConfig);
             {
                 File.Copy(installConfig + ".resources", installConfig);
             }
@@ -562,12 +603,15 @@ namespace DotNetNuke.Services.Install
             {
                 InstallWizard.installConfig = InstallController.Instance.GetInstallConfig();
                 connectionConfig = InstallWizard.installConfig.Connection;
+				Logger.LogDebug("OnInit(e={E}): connectionConfig → {ConnectionConfig}", e, connectionConfig);
             }
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             if (!this.SupportLocalization)
@@ -581,6 +625,8 @@ namespace DotNetNuke.Services.Install
 
             var options = new DnnPaswordStrengthOptions();
             var optionsAsJsonString = Json.Serialize(options);
+			Logger.LogDebug("OnPreRender(e={E}): options → {Options}", e, options);
+			Logger.LogDebug("OnPreRender(e={E}): optionsAsJsonString → {OptionsAsJsonString}", e, optionsAsJsonString);
             var script = string.Format(
                 "dnn.initializePasswordStrength('.{0}', {1});{2}",
                 "password-strength",
@@ -601,8 +647,11 @@ namespace DotNetNuke.Services.Install
 
             var confirmOptionsAsJsonString = Json.Serialize(confirmPasswordOptions);
             var confirmScript = string.Format("dnn.initializePasswordComparer({0});{1}", confirmOptionsAsJsonString, Environment.NewLine);
+			Logger.LogDebug("OnPreRender(e={E}): confirmOptionsAsJsonString → {ConfirmOptionsAsJsonString}", e, confirmOptionsAsJsonString);
+			Logger.LogDebug("OnPreRender(e={E}): confirmScript → {ConfirmScript}", e, confirmScript);
 
             this.Page.ClientScript.RegisterStartupScript(this.GetType(), "ConfirmPassword", confirmScript, true);
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
@@ -718,6 +767,7 @@ namespace DotNetNuke.Services.Install
 
         private static void LaunchAutoInstall(IApplicationStatusInfo appStatus)
         {
+			Logger.LogDebug(">>> Entering LaunchAutoInstall(appStatus={AppStatus})", appStatus);
             if (appStatus.Status == UpgradeStatus.None)
             {
                 HttpContext.Current.Response.Redirect("~/");
@@ -739,10 +789,12 @@ namespace DotNetNuke.Services.Install
 
             // restore Script timeout
             HttpContext.Current.Server.ScriptTimeout = scriptTimeOut;
+			Logger.LogDebug("<<< Exiting LaunchAutoInstall(appStatus={AppStatus})", appStatus);
         }
 
         private static void Install(IApplicationStatusInfo appStatus)
         {
+			Logger.LogDebug(">>> Entering Install(appStatus={AppStatus})", appStatus);
             // bail out early if we are already running
             if (installerRunning || InstallBlocker.Instance.IsInstallInProgress() || (appStatus.Status != UpgradeStatus.Install))
             {
@@ -752,16 +804,21 @@ namespace DotNetNuke.Services.Install
             var percentForEachStep = 100 / Steps.Count;
             var useGenericPercent = false;
             var totalPercent = Steps.Sum(step => step.Value);
+			Logger.LogDebug("Install(appStatus={AppStatus}): useGenericPercent → {UseGenericPercent}", appStatus, useGenericPercent);
+			Logger.LogDebug("Install(appStatus={AppStatus}): totalPercent → {TotalPercent}", appStatus, totalPercent);
             if (totalPercent != 100)
             {
                 useGenericPercent = true;
             }
 
             installerRunning = true;
+			Logger.LogDebug("Install(appStatus={AppStatus}): installerRunning → {InstallerRunning}", appStatus, installerRunning);
             installerProgress = 0;
             foreach (var step in Steps)
             {
+			Logger.LogDebug("Install(appStatus={AppStatus}): installerProgress → {InstallerProgress}", appStatus, installerProgress);
                 currentStep = step.Key;
+				Logger.LogDebug("Install(appStatus={AppStatus}): currentStep → {CurrentStep}", appStatus, currentStep);
 
                 try
                 {
@@ -813,12 +870,15 @@ namespace DotNetNuke.Services.Install
 
             // indicate we are done
             installerRunning = false;
+			Logger.LogDebug("<<< Exiting Install(appStatus={AppStatus})", appStatus);
         }
 
         private static void CurrentStepActivity(string status)
         {
+			Logger.LogDebug(">>> Entering CurrentStepActivity(status={Status})", status);
             var percentage = (currentStep == null) ? installerProgress : installerProgress + (currentStep.Percentage / Steps.Count);
             var obj = new
+			Logger.LogDebug("CurrentStepActivity(status={Status}): percentage → {Percentage}", status, percentage);
             {
                 progress = percentage,
                 details = status,
@@ -828,6 +888,8 @@ namespace DotNetNuke.Services.Install
                 check3 = InstallSiteStep.Status.ToString() + (InstallSiteStep.Errors.Count == 0 ? string.Empty : " Errors " + InstallSiteStep.Errors.Count),
                 check4 = InstallSuperUserStep.Status.ToString() + (InstallSuperUserStep.Errors.Count == 0 ? string.Empty : " Errors " + InstallSuperUserStep.Errors.Count),
             };
+				Logger.LogDebug("CurrentStepActivity(status={Status}): progress → {Progress}", status, progress);
+				Logger.LogDebug("CurrentStepActivity(status={Status}): details → {Details}", status, details);
 
             try
             {
@@ -841,22 +903,29 @@ namespace DotNetNuke.Services.Install
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in CurrentStepActivity(status={Status}): {Arg1}", status, ex.Message);
                 // TODO - do something
             }
+			Logger.LogDebug("<<< Exiting CurrentStepActivity(status={Status})", status);
         }
 
         private static void GetInstallerLocales(IApplicationStatusInfo appStatus)
         {
+			Logger.LogDebug(">>> Entering GetInstallerLocales(appStatus={AppStatus})", appStatus);
             var filePath = appStatus.ApplicationMapPath + LocalesFile.Replace("/", @"\");
 
+			Logger.LogDebug("GetInstallerLocales(appStatus={AppStatus}): filePath → {FilePath}", appStatus, filePath);
             if (File.Exists(filePath))
             {
                 var doc = new XPathDocument(filePath);
                 var languages = doc.CreateNavigator().Select("root/language");
+				Logger.LogDebug("GetInstallerLocales(appStatus={AppStatus}): doc → {Doc}", appStatus, doc);
+				Logger.LogDebug("GetInstallerLocales(appStatus={AppStatus}): languages → {Languages}", appStatus, languages);
 
                 if (languages.Count > 0)
                 {
                     supportedLanguages = new string[languages.Count];
+					Logger.LogDebug("GetInstallerLocales(appStatus={AppStatus}): supportedLanguages → {SupportedLanguages}", appStatus, supportedLanguages);
                     var i = 0;
                     foreach (XPathNavigator nav in languages)
                     {
@@ -879,22 +948,29 @@ namespace DotNetNuke.Services.Install
                 supportedLanguages = new string[1];
                 supportedLanguages.SetValue("en-US", 0);
             }
+			Logger.LogDebug("<<< Exiting GetInstallerLocales(appStatus={AppStatus})", appStatus);
         }
 
         private static string LocalizeStringStatic(string key)
         {
+			Logger.LogDebug(">>> Entering LocalizeStringStatic(key={Key})", key);
+			Logger.LogDebug("<<< Exiting LocalizeStringStatic(key={Key})", key);
             return Localization.GetString(key, localResourceFile, culture);
         }
 
         private static bool CheckDatabaseConnection()
         {
+			Logger.LogDebug(">>> Entering CheckDatabaseConnection()");
             var success = false;
             connectionResult = CheckDatabaseConnection(connectionConfig);
+			Logger.LogDebug("CheckDatabaseConnection(): connectionResult → {ConnectionResult}", connectionResult);
             if (!connectionResult.StartsWith("ERROR:"))
             {
                 success = true;
             }
+			Logger.LogDebug("CheckDatabaseConnection(): success → {Success}", success);
 
+			Logger.LogDebug("<<< Exiting CheckDatabaseConnection()");
             return success;
         }
 
@@ -925,8 +1001,10 @@ namespace DotNetNuke.Services.Install
 
         private static void UpdateMachineKey(IApplicationStatusInfo appStatus)
         {
+			Logger.LogDebug(">>> Entering UpdateMachineKey(appStatus={AppStatus})", appStatus);
             var installationDate = Config.GetSetting("InstallationDate");
 
+			Logger.LogDebug("UpdateMachineKey(appStatus={AppStatus}): installationDate → {InstallationDate}", appStatus, installationDate);
             if (string.IsNullOrEmpty(installationDate))
             {
                 string strError = Config.UpdateMachineKey(appStatus);
@@ -940,9 +1018,11 @@ namespace DotNetNuke.Services.Install
                     // 403-3 Error - Redirect to ErrorPage
                     var strUrl = "~/ErrorPage.aspx?status=403_3&error=" + strError;
                     HttpContext.Current.Response.Clear();
+					Logger.LogDebug("UpdateMachineKey(appStatus={AppStatus}): strUrl → {StrUrl}", appStatus, strUrl);
                     HttpContext.Current.Server.Transfer(strUrl);
                 }
             }
+			Logger.LogDebug("<<< Exiting UpdateMachineKey(appStatus={AppStatus})", appStatus);
         }
 
         /// <summary>Updates and synchronizes DotNetNuke.install.config with Web.config.</summary>
@@ -1009,6 +1089,7 @@ namespace DotNetNuke.Services.Install
 
         private void VisitSiteClick(object sender, EventArgs eventArgs)
         {
+			Logger.LogDebug(">>> Entering VisitSiteClick(sender={Sender},eventArgs={EventArgs})", sender, eventArgs);
             // Delete the status file.
             try
             {
@@ -1016,6 +1097,7 @@ namespace DotNetNuke.Services.Install
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in VisitSiteClick(sender={Sender},eventArgs={EventArgs}): {Arg2}", sender, eventArgs, ex.Message);
                 // Do nothing
             }
 
@@ -1024,6 +1106,7 @@ namespace DotNetNuke.Services.Install
             {
                 string installConfig = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Install", "DotNetNuke.install.config");
                 if (File.Exists(installConfig))
+				Logger.LogDebug("VisitSiteClick(sender={Sender},eventArgs={EventArgs}): installConfig → {InstallConfig}", sender, eventArgs, installConfig);
                 {
                     // make sure file is not read-only
                     File.SetAttributes(installConfig, FileAttributes.Normal);
@@ -1037,14 +1120,17 @@ namespace DotNetNuke.Services.Install
 
             Config.Touch(this.appStatus);
             HttpContext.Current.Response.Redirect("../Default.aspx");
+			Logger.LogDebug("<<< Exiting VisitSiteClick(sender={Sender},eventArgs={EventArgs})", sender, eventArgs);
         }
 
         private void SetBrowserLanguage()
         {
+			Logger.LogDebug(">>> Entering SetBrowserLanguage()");
             string cultureCode;
             if (string.IsNullOrEmpty(this.PageLocale.Value) && string.IsNullOrEmpty(culture))
             {
                 cultureCode = !string.IsNullOrEmpty(HttpContext.Current.Request.Params.Get("culture")) ? HttpContext.Current.Request.Params.Get("culture") : TestableLocalization.Instance.BestCultureCodeBasedOnBrowserLanguages(supportedLanguages);
+				Logger.LogDebug("SetBrowserLanguage(): cultureCode → {CultureCode}", cultureCode);
             }
             else if (string.IsNullOrEmpty(this.PageLocale.Value) && !string.IsNullOrEmpty(culture))
             {
@@ -1057,8 +1143,10 @@ namespace DotNetNuke.Services.Install
 
             this.PageLocale.Value = cultureCode;
             culture = cultureCode;
+			Logger.LogDebug("SetBrowserLanguage(): culture → {Culture}", culture);
 
             Thread.CurrentThread.CurrentUICulture = new CultureInfo(cultureCode);
+			Logger.LogDebug("<<< Exiting SetBrowserLanguage()");
         }
 
         private string GetNextScriptVersion(string strProviderPath, Version currentVersion)
@@ -1091,6 +1179,7 @@ namespace DotNetNuke.Services.Install
 
         private void Initialise()
         {
+			Logger.LogDebug(">>> Entering Initialise()");
             if (this.TestDataBaseInstalled())
             {
                 // running current version, so redirect to site home page
@@ -1109,13 +1198,17 @@ namespace DotNetNuke.Services.Install
                     UpdateMachineKey(this.appStatus);
                 }
             }
+			Logger.LogDebug("<<< Exiting Initialise()");
         }
 
         private string InstallDatabase()
         {
+			Logger.LogDebug(">>> Entering InstallDatabase()");
             var strProviderPath = this.dataProvider.GetProviderPath();
             var strErrorMessage = strProviderPath.StartsWith("ERROR:")
                 ? strProviderPath
+				Logger.LogDebug("InstallDatabase(): strProviderPath → {StrProviderPath}", strProviderPath);
+				Logger.LogDebug("InstallDatabase(): strErrorMessage → {StrErrorMessage}", strErrorMessage);
                 : Upgrade.InstallDatabase(this.BaseVersion, strProviderPath, this.InstallTemplate, false);
             if (string.IsNullOrEmpty(strErrorMessage))
             {
@@ -1127,15 +1220,21 @@ namespace DotNetNuke.Services.Install
                 strErrorMessage = "ERROR: " + string.Format(this.LocalizeString("ScriptError"), Upgrade.GetLogFile(strProviderPath, this.BaseVersion));
             }
 
+			Logger.LogDebug("<<< Exiting InstallDatabase()");
             return strErrorMessage;
         }
 
         private string InstallVersion(string strVersion)
         {
+			Logger.LogDebug(">>> Entering InstallVersion(strVersion={StrVersion})", strVersion);
             var strErrorMessage = Null.NullString;
             var version = new Version(strVersion);
+			Logger.LogDebug("InstallVersion(strVersion={StrVersion}): strErrorMessage → {StrErrorMessage}", strVersion, strErrorMessage);
+			Logger.LogDebug("InstallVersion(strVersion={StrVersion}): version → {Version}", strVersion, version);
             var strScriptFile = Null.NullString;
             var strProviderPath = this.dataProvider.GetProviderPath();
+			Logger.LogDebug("InstallVersion(strVersion={StrVersion}): strScriptFile → {StrScriptFile}", strVersion, strScriptFile);
+			Logger.LogDebug("InstallVersion(strVersion={StrVersion}): strProviderPath → {StrProviderPath}", strVersion, strProviderPath);
             if (!strProviderPath.StartsWith("ERROR:"))
             {
                 // Install Version
@@ -1159,27 +1258,35 @@ namespace DotNetNuke.Services.Install
                     .Replace("." + Upgrade.DefaultProvider, ".log") + " for more information)";
             }
 
+			Logger.LogDebug("<<< Exiting InstallVersion(strVersion={StrVersion})", strVersion);
             return strErrorMessage;
         }
 
         private void LocalizePage()
         {
+			Logger.LogDebug(">>> Entering LocalizePage()");
             this.Page.Title = this.LocalizeString("PageTitle");
             this.lblIntroDetail.Text = this.LocalizeString("IntroDetail");
+			Logger.LogDebug("<<< Exiting LocalizePage()");
         }
 
         /// <summary>TestDataBaseInstalled checks whether the Database is the current version.</summary>
         /// <returns>A value indicating whether the database is the current version.</returns>
         private bool TestDataBaseInstalled()
         {
+			Logger.LogDebug(">>> Entering TestDataBaseInstalled()");
             var success = !(this.DatabaseVersion == null || this.DatabaseVersion.Major != this.ApplicationVersion.Major || this.DatabaseVersion.Minor != this.ApplicationVersion.Minor || this.DatabaseVersion.Build != this.ApplicationVersion.Build);
+			Logger.LogDebug("TestDataBaseInstalled(): success → {Success}", success);
+			Logger.LogDebug("<<< Exiting TestDataBaseInstalled()");
             return success;
         }
 
         private void SetupDatabaseInfo()
         {
+			Logger.LogDebug(">>> Entering SetupDatabaseInfo()");
             // Try to use connection information in DotNetNuke.Install.Config. If not found use from web.config
             connectionConfig = installConfig.Connection;
+			Logger.LogDebug("SetupDatabaseInfo(): connectionConfig → {ConnectionConfig}", connectionConfig);
             if (connectionConfig == null || string.IsNullOrEmpty(connectionConfig.Server))
             {
                 connectionConfig = InstallController.Instance.GetConnectionFromWebConfig();
@@ -1216,14 +1323,17 @@ namespace DotNetNuke.Services.Install
                 // Owner or Not
                 this.databaseRunAs.Checked = connectionConfig.RunAsDbowner;
             }
+			Logger.LogDebug("<<< Exiting SetupDatabaseInfo()");
         }
 
         private void BindLanguageList()
         {
+			Logger.LogDebug(">>> Entering BindLanguageList()");
             try
             {
                 var myResponseReader = UpdateService.GetLanguageList();
 
+				Logger.LogDebug("BindLanguageList(): myResponseReader → {MyResponseReader}", myResponseReader);
                 // empty language list
                 this.languageList.Items.Clear();
 
@@ -1236,6 +1346,8 @@ namespace DotNetNuke.Services.Install
 
                 var languages = xmlDoc.SelectNodes("available/language");
                 var packages = new List<PackageInfo>();
+				Logger.LogDebug("BindLanguageList(): languages → {Languages}", languages);
+				Logger.LogDebug("BindLanguageList(): packages → {Packages}", packages);
 
                 if (languages != null)
                 {
@@ -1243,6 +1355,8 @@ namespace DotNetNuke.Services.Install
                     {
                         string cultureCode = string.Empty;
                         string version = string.Empty;
+						Logger.LogDebug("BindLanguageList(): cultureCode → {CultureCode}", cultureCode);
+						Logger.LogDebug("BindLanguageList(): version → {Version}", version);
                         foreach (XmlNode child in language.ChildNodes)
                         {
                             if (child.Name == "culturecode")
@@ -1260,17 +1374,21 @@ namespace DotNetNuke.Services.Install
                         {
                             var myCIintl = new CultureInfo(cultureCode, true);
                             version = version.Insert(4, ".").Insert(2, ".");
+							Logger.LogDebug("BindLanguageList(): myCIintl → {MyCIintl}", myCIintl);
                             var package = new PackageInfo { Name = "LanguagePack-" + myCIintl.Name, FriendlyName = myCIintl.NativeName };
                             package.Name = myCIintl.NativeName;
+							Logger.LogDebug("BindLanguageList(): package → {Package}", package);
                             package.Description = cultureCode;
                             Version ver;
                             Version.TryParse(version, out ver);
                             package.Version = ver;
+							Logger.LogDebug("BindLanguageList(): package.Version → {Arg0}", package.Version);
 
                             if (packages.Any(p => p.Name == package.Name))
                             {
                                 var existPackage = packages.First(p => p.Name == package.Name);
                                 if (package.Version > existPackage.Version)
+								Logger.LogDebug("BindLanguageList(): existPackage → {ExistPackage}", existPackage);
                                 {
                                     packages.Remove(existPackage);
                                     packages.Add(package);
@@ -1288,6 +1406,7 @@ namespace DotNetNuke.Services.Install
                 {
                     var li = new ListItem { Value = package.Description, Text = package.Name };
                     this.languageList.AddItem(li.Text, li.Value);
+					Logger.LogDebug("BindLanguageList(): li → {Li}", li);
                     var lastItem = this.languageList.Items[this.languageList.Items.Count - 1];
                     if (DotNetNukeContext.Current.Application.Version.Major != package.Version.Major
                         || DotNetNukeContext.Current.Application.Version.Minor != package.Version.Minor
@@ -1299,6 +1418,7 @@ namespace DotNetNuke.Services.Install
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in BindLanguageList(): {Arg0}", ex.Message);
                 // suppress for now - need to decide what to do when webservice is unreachable
                 // throw;
             }
@@ -1316,18 +1436,23 @@ namespace DotNetNuke.Services.Install
 
                 var item = this.languageList.FindItemByValue(culture);
                 this.languageList.SelectedIndex = item != null ? this.languageList.Items.IndexOf(item) : this.languageList.Items.IndexOf(this.languageList.FindItemByValue("en-US"));
+				Logger.LogDebug("BindLanguageList(): item → {Item}", item);
             }
+			Logger.LogDebug("<<< Exiting BindLanguageList()");
         }
 
         private void BindTemplates()
         {
+			Logger.LogDebug(">>> Entering BindTemplates()");
             var templates = this.portalTemplateController.GetPortalTemplates();
             foreach (var template in templates)
             {
+			Logger.LogDebug("BindTemplates(): templates → {Templates}", templates);
                 this.templateList.AddItem(template.Name, Path.GetFileName(template.TemplateFilePath));
             }
 
             this.templateList.SelectedIndex = this.templateList.Items.IndexOf(this.templateList.FindItemByValue("Default Website.template"));
+			Logger.LogDebug("<<< Exiting BindTemplates()");
         }
     }
 }

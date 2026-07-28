@@ -25,10 +25,13 @@ namespace Dnn.EditBar.UI.Items
     public abstract class WorkflowBaseMenuItem(IContentController contentController, IWorkflowEngine workflowEngine)
         : BaseMenuItem
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IContentController contentController = contentController ?? ContentController.Instance;
+		Logger.LogDebug(">>> Entering WorkflowBaseMenuItem(contentController={ContentController},workflowEngine={WorkflowEngine})", contentController, workflowEngine);
         private readonly IWorkflowEngine workflowEngine = workflowEngine ?? WorkflowEngine.Instance;
 
         /// <summary>Initializes a new instance of the <see cref="WorkflowBaseMenuItem"/> class.</summary>
+		Logger.LogDebug("<<< Exiting WorkflowBaseMenuItem(contentController={ContentController},workflowEngine={WorkflowEngine})", contentController, workflowEngine);
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IContentController. Scheduled removal in v12.0.0.")]
         protected WorkflowBaseMenuItem()
             : this(null, null)

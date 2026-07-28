@@ -10,6 +10,7 @@ namespace DNNConnect.CKEditorProvider.Extensions
     /// <summary>Custom Attribute Extensions.</summary>
     public static class CustomAttributeExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Gets the custom attribute of <typeparamref name="T"/>.</summary>
         /// <typeparam name="T">The Type.</typeparam>
         /// <param name="propertyInfo">The property info.</param>
@@ -20,6 +21,7 @@ namespace DNNConnect.CKEditorProvider.Extensions
         public static T GetCustomAttribute<T>(this PropertyInfo propertyInfo, bool inherit)
             where T : Attribute
         {
+			Logger.LogDebug(">>> Entering GetCustomAttribute(propertyInfo={PropertyInfo},inherit={Inherit})", propertyInfo, inherit);
             object[] attributes = propertyInfo.GetCustomAttributes(typeof(T), inherit);
 
             return attributes.Length == 0 ? null : attributes[0] as T;

@@ -13,6 +13,7 @@ namespace DotNetNuke.Common.Utilities
     /// <summary>Provides utility methods to work with Dates.</summary>
     public partial class DateUtils
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static DateTime lastUpdateUtc = DateTime.MinValue;
         private static DateTime lastUpdateLocal = DateTime.MinValue;
 
@@ -25,6 +26,8 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(9, 1, 0, "Replaced by GetDatabaseUtcTime")]
         public static partial DateTime GetDatabaseTime()
         {
+			Logger.LogDebug(">>> Entering GetDatabaseTime()");
+			Logger.LogDebug("<<< Exiting GetDatabaseTime()");
             return GetDatabaseUtcTime();
         }
 
@@ -32,9 +35,13 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>DateTimeOffset object.</returns>
         public static TimeZoneInfo GetDatabaseDateTimeOffset()
         {
+			Logger.LogDebug(">>> Entering GetDatabaseDateTimeOffset()");
             var dateTimeOffset = DataProvider.Instance().GetDatabaseTimeOffset();
             var offset = dateTimeOffset.Offset;
+			Logger.LogDebug("GetDatabaseDateTimeOffset(): dateTimeOffset → {DateTimeOffset}", dateTimeOffset);
             var id = $"UTC {offset}";
+			Logger.LogDebug("GetDatabaseDateTimeOffset(): id → {Id}", id);
+			Logger.LogDebug("<<< Exiting GetDatabaseDateTimeOffset()");
             return TimeZoneInfo.CreateCustomTimeZone(id, offset, id, id);
         }
 
@@ -42,21 +49,26 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>Date/time of the database in UTC.</returns>
         public static DateTime GetDatabaseUtcTime()
         {
+			Logger.LogDebug(">>> Entering GetDatabaseUtcTime()");
             try
             {
                 // Also We check that drift is not the initial value, and it is not out of the maximum UTC offset
                 if (DateTime.UtcNow >= lastUpdateUtc + TimeSpan.FromMinutes(15) || !(TimeSpan.FromHours(-26) <= driftUtc && driftUtc <= TimeSpan.FromHours(26)) || driftUtc == TimeSpan.MinValue)
                 {
                     lastUpdateUtc = DateTime.UtcNow;
+					Logger.LogDebug("GetDatabaseUtcTime(): lastUpdateUtc → {LastUpdateUtc}", lastUpdateUtc);
                     driftUtc = DateTime.UtcNow - DataProvider.Instance().GetDatabaseTimeUtc();
                 }
+				Logger.LogDebug("GetDatabaseUtcTime(): driftUtc → {DriftUtc}", driftUtc);
             }
             catch (ArgumentOutOfRangeException)
             {
+				Logger.LogError("Exception in GetDatabaseUtcTime(): {Arg0}", ex.Message);
                 lastUpdateUtc = DateTime.UtcNow;
                 driftUtc = DateTime.UtcNow - DataProvider.Instance().GetDatabaseTimeUtc();
             }
 
+			Logger.LogDebug("<<< Exiting GetDatabaseUtcTime()");
             return DateTime.UtcNow + driftUtc;
         }
 
@@ -64,21 +76,26 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>Date/time of the database in UTC.</returns>
         public static DateTime GetDatabaseLocalTime()
         {
+			Logger.LogDebug(">>> Entering GetDatabaseLocalTime()");
             try
             {
                 // Also We check that drift is not the initial value and it is not out of the maximum UTC offset
                 if (DateTime.UtcNow >= lastUpdateLocal + TimeSpan.FromMinutes(15) || !(TimeSpan.FromHours(-26) <= driftLocal && driftLocal <= TimeSpan.FromHours(26)) || driftLocal == TimeSpan.MinValue)
                 {
                     lastUpdateLocal = DateTime.Now;
+					Logger.LogDebug("GetDatabaseLocalTime(): lastUpdateLocal → {LastUpdateLocal}", lastUpdateLocal);
                     driftLocal = DateTime.Now - DataProvider.Instance().GetDatabaseTime();
                 }
+				Logger.LogDebug("GetDatabaseLocalTime(): driftLocal → {DriftLocal}", driftLocal);
             }
             catch (ArgumentOutOfRangeException)
             {
+				Logger.LogError("Exception in GetDatabaseLocalTime(): {Arg0}", ex.Message);
                 lastUpdateLocal = DateTime.Now;
                 driftLocal = DateTime.Now - DataProvider.Instance().GetDatabaseTime();
             }
 
+			Logger.LogDebug("<<< Exiting GetDatabaseLocalTime()");
             return DateTime.Now + driftLocal;
         }
 
@@ -87,8 +104,10 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>String representing the required date for display.</returns>
         public static string CalculateDateForDisplay(DateTime date)
         {
+			Logger.LogDebug(">>> Entering CalculateDateForDisplay(date={Date})", date);
             var utcTimeDifference = GetDatabaseUtcTime() - date;
 
+			Logger.LogDebug("CalculateDateForDisplay(date={Date}): utcTimeDifference → {UtcTimeDifference}", date, utcTimeDifference);
             if (utcTimeDifference.TotalSeconds < 60)
             {
                 return string.Format(CultureInfo.CurrentCulture, Localization.GetString("SecondsAgo"), (int)utcTimeDifference.TotalSeconds);
@@ -145,6 +164,7 @@ namespace DotNetNuke.Common.Utilities
             }
 
             // anything else (this is the only time we have to personalize it to the user)
+			Logger.LogDebug("<<< Exiting CalculateDateForDisplay(date={Date})", date);
             return date.ToShortDateString();
         }
     }

@@ -14,6 +14,7 @@ namespace DotNetNuke.Services.Localization
     /// <summary><para>The LocaleCollection class is a collection of Locale objects.  It stores the supported locales.</para></summary>
     public class LocaleCollection : NameObjectCollectionBase, IDictionary<string, Locale>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private DictionaryEntry de;
 
         /// <summary>Gets a String array that contains all the keys in the collection.</summary>
@@ -56,13 +57,16 @@ namespace DotNetNuke.Services.Localization
         /// <inheritdoc />
         public bool TryGetValue(string key, out Locale value)
         {
+			Logger.LogDebug(">>> Entering TryGetValue(key={Key})", key);
             if (!this.ContainsKey(key))
             {
                 value = null;
+				Logger.LogDebug("TryGetValue(key={Key}): value → {Value}", key, value);
                 return false;
             }
 
             value = this[key];
+			Logger.LogDebug("<<< Exiting TryGetValue(key={Key})", key);
             return true;
         }
 
@@ -71,14 +75,18 @@ namespace DotNetNuke.Services.Localization
         /// <param name="value">The value.</param>
         public void Add(string key, object value)
         {
+			Logger.LogDebug(">>> Entering Add(key={Key},value={Value})", key, value);
             this.BaseAdd(key, value);
+			Logger.LogDebug("<<< Exiting Add(key={Key},value={Value})", key, value);
         }
 
         /// <summary>Removes an entry with the specified key from the collection.</summary>
         /// <param name="key">The key.</param>
         public void Remove(string key)
         {
+			Logger.LogDebug(">>> Entering Remove(key={Key})", key);
             this.BaseRemove(key);
+			Logger.LogDebug("<<< Exiting Remove(key={Key})", key);
         }
 
         /// <inheritdoc />
@@ -154,6 +162,7 @@ namespace DotNetNuke.Services.Localization
 
         private class KeyValuePairEnumerator(LocaleCollection locales, IEnumerator enumerator) : IEnumerator<KeyValuePair<string, Locale>>
         {
+			Logger.LogDebug(">>> Entering KeyValuePairEnumerator(locales={Locales},enumerator={Enumerator})", locales, enumerator);
             /// <inheritdoc />
             public KeyValuePair<string, Locale> Current =>
                 new KeyValuePair<string, Locale>((string)enumerator.Current, locales[(string)enumerator.Current]);
@@ -161,6 +170,7 @@ namespace DotNetNuke.Services.Localization
             /// <inheritdoc />
             object IEnumerator.Current => this.Current;
 
+			Logger.LogDebug("<<< Exiting KeyValuePairEnumerator(locales={Locales},enumerator={Enumerator})", locales, enumerator);
             /// <inheritdoc />
             public void Dispose() => (enumerator as IDisposable)?.Dispose();
 

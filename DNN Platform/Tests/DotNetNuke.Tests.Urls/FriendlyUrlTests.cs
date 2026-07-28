@@ -21,6 +21,7 @@ using NUnit.Framework;
 [TestFixture]
 public class FriendlyUrlTests : UrlTestBase
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     private const string _defaultPage = Globals.glbDefaultPage;
     private const string _aboutUsPageName = "About Us";
     private int _tabId;
@@ -31,6 +32,7 @@ public class FriendlyUrlTests : UrlTestBase
     [SetUp]
     public override void SetUp()
     {
+		Logger.LogDebug(">>> Entering SetUp()");
         base.SetUp();
 
         this.UpdateTabName(this._tabId, "About Us");
@@ -38,22 +40,31 @@ public class FriendlyUrlTests : UrlTestBase
         this.GetDefaultAlias();
         this._redirectMode = PortalController.GetPortalSetting("PortalAliasMapping", this.PortalId, "CANONICALURL");
         this._primaryAlias = null;
+		Logger.LogDebug("SetUp(): _primaryAlias → {_primaryAlias}", _primaryAlias);
+		Logger.LogDebug("SetUp(): this._primaryAlias → {Arg0}", this._primaryAlias);
         this._customLocale = null;
+		Logger.LogDebug("<<< Exiting SetUp()");
+		Logger.LogDebug("SetUp(): _customLocale → {_customLocale}", _customLocale);
+		Logger.LogDebug("SetUp(): this._customLocale → {Arg0}", this._customLocale);
     }
 
     [OneTimeSetUp]
     public override void OneTimeSetUp()
     {
+		Logger.LogDebug(">>> Entering OneTimeSetUp()");
         base.OneTimeSetUp();
 
         var tab = TabController.Instance.GetTabByName(_aboutUsPageName, this.PortalId);
         if (tab == null)
+		Logger.LogDebug("OneTimeSetUp(): tab → {Tab}", tab);
         {
             this.CreateTab(_aboutUsPageName);
             tab = TabController.Instance.GetTabByName(_aboutUsPageName, this.PortalId);
         }
 
         this._tabId = tab.TabID;
+		Logger.LogDebug("OneTimeSetUp(): _tabId → {_tabId}", _tabId);
+		Logger.LogDebug("OneTimeSetUp(): this._tabId → {Arg0}", this._tabId);
 
         // Add Portal Aliases
         var aliasController = PortalAliasController.Instance;
@@ -61,7 +72,9 @@ public class FriendlyUrlTests : UrlTestBase
         {
             var fields = line.Split(',');
             var alias = aliasController.GetPortalAlias(fields[0], this.PortalId);
+			Logger.LogDebug("OneTimeSetUp(): fields → {Fields}", fields);
             if (alias == null)
+			Logger.LogDebug("OneTimeSetUp(): alias → {Alias}", alias);
             {
                 alias = new PortalAliasInfo
                 {
@@ -76,11 +89,13 @@ public class FriendlyUrlTests : UrlTestBase
             var fields = line.Split(',');
             TestUtil.AddUser(this.PortalId, fields[0].Trim(), fields[1].Trim(), fields[2].Trim());
         });
+		Logger.LogDebug("<<< Exiting OneTimeSetUp()");
     }
 
     [TearDown]
     public override void TearDown()
     {
+		Logger.LogDebug(">>> Entering TearDown()");
         base.TearDown();
 
         this.UpdateTabName(this._tabId, "About Us");
@@ -103,11 +118,13 @@ public class FriendlyUrlTests : UrlTestBase
         {
             TabController.Instance.DeleteTabUrl(tabUrl, this.PortalId, true);
         }
+		Logger.LogDebug("<<< Exiting TearDown()");
     }
 
     [OneTimeTearDown]
     public override void OneTimeTearDown()
     {
+		Logger.LogDebug(">>> Entering OneTimeTearDown()");
         base.OneTimeTearDown();
 
         var aliasController = PortalAliasController.Instance;
@@ -115,6 +132,8 @@ public class FriendlyUrlTests : UrlTestBase
         {
             var fields = line.Split(',');
             var alias = aliasController.GetPortalAlias(fields[0], this.PortalId);
+			Logger.LogDebug("OneTimeTearDown(): fields → {Fields}", fields);
+			Logger.LogDebug("OneTimeTearDown(): alias → {Alias}", alias);
             PortalAliasController.Instance.DeletePortalAlias(alias);
         });
         TestUtil.ReadStream("Users", (line, header) =>
@@ -123,6 +142,7 @@ public class FriendlyUrlTests : UrlTestBase
 
             TestUtil.DeleteUser(this.PortalId, fields[0]);
         });
+		Logger.LogDebug("<<< Exiting OneTimeTearDown()");
     }
 
     [Test]
@@ -444,8 +464,12 @@ public class FriendlyUrlTests : UrlTestBase
 
     private void UpdateTabName(int tabId, string newName)
     {
+		Logger.LogDebug(">>> Entering UpdateTabName(tabId={TabId},newName={NewName})", tabId, newName);
         var tab = TabController.Instance.GetTab(tabId, this.PortalId, false);
         tab.TabName = newName;
+		Logger.LogDebug("UpdateTabName(tabId={TabId},newName={NewName}): tab → {Tab}", tabId, newName, tab);
+		Logger.LogDebug("UpdateTabName(tabId={TabId},newName={NewName}): tab.TabName → {Arg2}", tabId, newName, tab.TabName);
         TabController.Instance.UpdateTab(tab);
+		Logger.LogDebug("<<< Exiting UpdateTabName(tabId={TabId},newName={NewName})", tabId, newName);
     }
 }

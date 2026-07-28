@@ -29,6 +29,7 @@ namespace DotNetNuke.Modules.Admin.Modules
     /// <summary>The view for the global export module action.</summary>
     public partial class Export : PortalModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IBusinessControllerProvider businessControllerProvider;
         private readonly INavigationManager navigationManager;
         private readonly IHostSettings hostSettings;
@@ -41,7 +42,9 @@ namespace DotNetNuke.Modules.Admin.Modules
         public Export()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering Export()");
         }
+		Logger.LogDebug("<<< Exiting Export()");
 
         /// <summary>Initializes a new instance of the <see cref="Export"/> class.</summary>
         /// <param name="businessControllerProvider">The business controller provider.</param>
@@ -50,6 +53,9 @@ namespace DotNetNuke.Modules.Admin.Modules
         public Export(IBusinessControllerProvider businessControllerProvider, INavigationManager navigationManager)
             : this(businessControllerProvider, navigationManager, null)
         {
+		Logger.LogDebug(">>> Entering Export(businessControllerProvider={BusinessControllerProvider},navigationManager={NavigationManager})", businessControllerProvider, navigationManager);
+		Logger.LogDebug("<<< Exiting Export(businessControllerProvider={BusinessControllerProvider},navigationManager={NavigationManager})", businessControllerProvider, navigationManager);
+		Logger.LogDebug("Export(businessControllerProvider={BusinessControllerProvider},navigationManager={NavigationManager},hostSettings={HostSettings}): navigationManager → {NavigationManager1}", businessControllerProvider, navigationManager, hostSettings, navigationManager);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Export"/> class.</summary>
@@ -60,7 +66,9 @@ namespace DotNetNuke.Modules.Admin.Modules
         {
             this.businessControllerProvider = businessControllerProvider ?? this.DependencyProvider.GetRequiredService<IBusinessControllerProvider>();
             this.navigationManager = navigationManager ?? this.DependencyProvider.GetRequiredService<INavigationManager>();
+			Logger.LogDebug("Export(businessControllerProvider={BusinessControllerProvider},navigationManager={NavigationManager},hostSettings={HostSettings}): businessControllerProvider → {BusinessControllerProvider1}", businessControllerProvider, navigationManager, hostSettings, businessControllerProvider);
             this.hostSettings = hostSettings ?? this.DependencyProvider.GetRequiredService<IHostSettings>();
+			Logger.LogDebug("Export(businessControllerProvider={BusinessControllerProvider},navigationManager={NavigationManager},hostSettings={HostSettings}): hostSettings → {HostSettings1}", businessControllerProvider, navigationManager, hostSettings, hostSettings);
         }
 
         private ModuleInfo Module => this.module ??= ModuleController.Instance.GetModule(this.moduleId, this.TabId, false);
@@ -76,6 +84,7 @@ namespace DotNetNuke.Modules.Admin.Modules
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             if (this.Request.QueryString["moduleid"] != null)
@@ -87,11 +96,13 @@ namespace DotNetNuke.Modules.Admin.Modules
             {
                 this.Response.Redirect(Globals.AccessDeniedURL(), true);
             }
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.cmdExport.Click += this.OnExportClick;
@@ -117,16 +128,20 @@ namespace DotNetNuke.Modules.Admin.Modules
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         protected void OnExportClick(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnExportClick(sender={Sender},e={E})", sender, e);
             try
             {
                 IFolderInfo folder = null;
                 if (this.cboFolders.SelectedItem != null && !string.IsNullOrEmpty(this.txtFile.Text))
+				Logger.LogDebug("OnExportClick(sender={Sender},e={E}): folder → {Folder}", sender, e, folder);
                 {
                     folder = FolderManager.Instance.GetFolder(this.cboFolders.SelectedItemValueAsInt);
                 }
@@ -135,6 +150,8 @@ namespace DotNetNuke.Modules.Admin.Modules
                 {
                     var strFile = $"content.{CleanName(this.Module.DesktopModule.ModuleName)}.{CleanName(this.txtFile.Text)}.export";
                     var strMessage = this.ExportModule(this.moduleId, strFile, folder);
+					Logger.LogDebug("OnExportClick(sender={Sender},e={E}): strFile → {StrFile}", sender, e, strFile);
+					Logger.LogDebug("OnExportClick(sender={Sender},e={E}): strMessage → {StrMessage}", sender, e, strMessage);
                     if (string.IsNullOrEmpty(strMessage))
                     {
                         this.Response.Redirect(this.ReturnURL, true);
@@ -151,14 +168,18 @@ namespace DotNetNuke.Modules.Admin.Modules
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnExportClick(sender={Sender},e={E}): {Arg2}", sender, e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnExportClick(sender={Sender},e={E})", sender, e);
         }
 
         private static string CleanName(string name)
         {
+			Logger.LogDebug(">>> Entering CleanName(name={Name})", name);
             var strName = name;
             const string strBadChars = ". ~`!@#$%^&*()-_+={[}]|\\:;<,>?/\"'";
+			Logger.LogDebug("CleanName(name={Name}): strName → {StrName}", name, strName);
 
             int intCounter;
             for (intCounter = 0; intCounter <= strBadChars.Length - 1; intCounter++)
@@ -166,6 +187,7 @@ namespace DotNetNuke.Modules.Admin.Modules
                 strName = strName.Replace(strBadChars.Substring(intCounter, 1), string.Empty);
             }
 
+			Logger.LogDebug("<<< Exiting CleanName(name={Name})", name);
             return strName;
         }
 

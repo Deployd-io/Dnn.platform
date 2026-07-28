@@ -8,8 +8,10 @@ namespace DotNetNuke.Modules.Journal.Components
 
     public class JournalItemTokenReplace : Services.Tokens.BaseCustomTokenReplace
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public JournalItemTokenReplace(JournalItem journalItem, JournalControl journalControl)
         {
+			Logger.LogDebug(">>> Entering JournalItemTokenReplace(journalItem={JournalItem},journalControl={JournalControl})", journalItem, journalControl);
             this.AddPropertySource("journalitem", journalItem);
             this.AddRawPropertySource("journalcontrol", journalControl);
             if (journalItem.ItemData != null)
@@ -22,10 +24,13 @@ namespace DotNetNuke.Modules.Journal.Components
                 this.AddPropertySource("journalauthor", journalItem.JournalAuthor);
                 this.AddPropertySource("journalprofile", new ProfilePicPropertyAccess(journalItem.JournalAuthor.Id));
             }
+			Logger.LogDebug("<<< Exiting JournalItemTokenReplace(journalItem={JournalItem},journalControl={JournalControl})", journalItem, journalControl);
         }
 
         public string ReplaceJournalItemTokens(string source)
         {
+			Logger.LogDebug(">>> Entering ReplaceJournalItemTokens(source={Source})", source);
+			Logger.LogDebug("<<< Exiting ReplaceJournalItemTokens(source={Source})", source);
             return this.ReplaceTokens(source);
         }
     }

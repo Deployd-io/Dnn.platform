@@ -32,6 +32,7 @@ using System.Threading;
 
 namespace log4net.Util
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Implementation of Properties collection for the <see cref="log4net.LogicalThreadContext"/></summary>
     /// <remarks>
     /// <para>
@@ -75,6 +76,8 @@ namespace log4net.Util
         /// </remarks>
         internal LogicalThreadContextProperties()
         {
+		Logger.LogDebug(">>> Entering LogicalThreadContextProperties()");
+		Logger.LogDebug("<<< Exiting LogicalThreadContextProperties()");
         }
 
         /// <summary>Gets or sets the value of a property</summary>
@@ -119,13 +122,16 @@ namespace log4net.Util
         /// </remarks>
         public void Remove(string key)
         {
+			Logger.LogDebug(">>> Entering Remove(key={Key})", key);
             PropertiesDictionary dictionary = this.GetProperties(false);
             if (dictionary != null)
+			Logger.LogDebug("Remove(key={Key}): dictionary → {Dictionary}", key, dictionary);
             {
                 PropertiesDictionary immutableProps = new PropertiesDictionary(dictionary);
                 immutableProps.Remove(key);
                 SetLogicalProperties(immutableProps);
             }
+			Logger.LogDebug("<<< Exiting Remove(key={Key})", key);
         }
 
         /// <summary>Clear all the context properties</summary>
@@ -136,12 +142,16 @@ namespace log4net.Util
         /// </remarks>
         public void Clear()
         {
+			Logger.LogDebug(">>> Entering Clear()");
             PropertiesDictionary dictionary = this.GetProperties(false);
             if (dictionary != null)
+			Logger.LogDebug("Clear(): dictionary → {Dictionary}", dictionary);
             {
                 PropertiesDictionary immutableProps = new PropertiesDictionary();
                 SetLogicalProperties(immutableProps);
+				Logger.LogDebug("Clear(): immutableProps → {ImmutableProps}", immutableProps);
             }
+			Logger.LogDebug("<<< Exiting Clear()");
         }
 
         /// <summary>Get the PropertiesDictionary stored in the LocalDataStoreSlot for this thread.</summary>
@@ -156,12 +166,14 @@ namespace log4net.Util
         /// </remarks>
         internal PropertiesDictionary GetProperties(bool create)
         {
+			Logger.LogDebug(">>> Entering GetProperties(create={Create})", create);
             if (!this.m_disabled)
             {
                 try
                 {
                     PropertiesDictionary properties = GetLogicalProperties();
                     if (properties == null && create)
+					Logger.LogDebug("GetProperties(create={Create}): properties → {Properties}", create, properties);
                     {
                         properties = new PropertiesDictionary();
                         SetLogicalProperties(properties);
@@ -171,6 +183,7 @@ namespace log4net.Util
                 catch (SecurityException secEx)
                 {
                     this.m_disabled = true;
+					Logger.LogDebug("GetProperties(create={Create}): this.m_disabled → {Arg1}", create, this.m_disabled);
                     
                     // Thrown if we don't have permission to read or write the CallContext
                     LogLog.Warn(declaringType, "SecurityException while accessing CallContext. Disabling LogicalThreadContextProperties", secEx);
@@ -182,6 +195,7 @@ namespace log4net.Util
             {
                 return new PropertiesDictionary();
             }
+			Logger.LogDebug("<<< Exiting GetProperties(create={Create})", create);
             return null;
         }
 
@@ -197,9 +211,11 @@ namespace log4net.Util
 #endif
         private static PropertiesDictionary GetLogicalProperties()
         {
+		Logger.LogDebug(">>> Entering GetLogicalProperties()");
 #if NETSTANDARD
             return AsyncLocalDictionary.Value;
 #elif NET_2_0 || MONO_2_0 || MONO_3_5 || MONO_4_0
+			Logger.LogDebug("<<< Exiting GetLogicalProperties()");
             return CallContext.LogicalGetData(c_SlotName) as PropertiesDictionary;
 #else
             return CallContext.GetData(c_SlotName) as PropertiesDictionary;

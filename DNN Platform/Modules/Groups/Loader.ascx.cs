@@ -16,8 +16,10 @@ namespace DotNetNuke.Modules.Groups
     /// <summary>Display the configured group view.</summary>
     public partial class Loader : GroupsModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         protected void Page_Load(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering Page_Load(sender={Sender},e={E})", sender, e);
             string path = Constants.ModulePath;
             switch (this.LoadView)
             {
@@ -34,8 +36,11 @@ namespace DotNetNuke.Modules.Groups
 
             GroupsModuleBase ctl = new GroupsModuleBase();
             ctl = (GroupsModuleBase)this.LoadControl(path);
+			Logger.LogDebug("Page_Load(sender={Sender},e={E}): ctl → {Ctl}", sender, e, ctl);
+			Logger.LogDebug("Page_Load(sender={Sender},e={E}): ctl.ModuleConfiguration → {Arg2}", sender, e, ctl.ModuleConfiguration);
             ctl.ModuleConfiguration = this.ModuleConfiguration;
             this.plhContent.Controls.Add(ctl);
+			Logger.LogDebug("<<< Exiting Page_Load(sender={Sender},e={E})", sender, e);
         }
     }
 }

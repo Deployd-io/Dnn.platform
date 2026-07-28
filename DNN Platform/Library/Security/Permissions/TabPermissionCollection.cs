@@ -18,9 +18,12 @@ namespace DotNetNuke.Security.Permissions
     [XmlRoot("tabpermissions")]
     public class TabPermissionCollection : GenericCollectionBase<TabPermissionInfo>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="TabPermissionCollection"/> class.</summary>
         public TabPermissionCollection()
         {
+		Logger.LogDebug(">>> Entering TabPermissionCollection()");
+		Logger.LogDebug("<<< Exiting TabPermissionCollection()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="TabPermissionCollection"/> class.</summary>
@@ -28,6 +31,8 @@ namespace DotNetNuke.Security.Permissions
         public TabPermissionCollection(ArrayList tabPermissions)
         {
             this.AddRange(tabPermissions);
+			Logger.LogDebug(">>> Entering TabPermissionCollection(tabPermissions={TabPermissions})", tabPermissions);
+			Logger.LogDebug("<<< Exiting TabPermissionCollection(tabPermissions={TabPermissions})", tabPermissions);
         }
 
         /// <summary>Initializes a new instance of the <see cref="TabPermissionCollection"/> class.</summary>
@@ -42,6 +47,7 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="tabId">The ID of the tab by which to filter <paramref name="tabPermissions"/>.</param>
         public TabPermissionCollection(ArrayList tabPermissions, int tabId)
         {
+			Logger.LogDebug(">>> Entering TabPermissionCollection(tabPermissions={TabPermissions},tabId={TabId})", tabPermissions, tabId);
             foreach (TabPermissionInfo permission in tabPermissions)
             {
                 if (permission.TabID == tabId)
@@ -49,12 +55,15 @@ namespace DotNetNuke.Security.Permissions
                     this.Add(permission);
                 }
             }
+			Logger.LogDebug("<<< Exiting TabPermissionCollection(tabPermissions={TabPermissions},tabId={TabId})", tabPermissions, tabId);
         }
 
         public int Add(TabPermissionInfo value, bool checkForDuplicates)
         {
+			Logger.LogDebug(">>> Entering Add(value={Value},checkForDuplicates={CheckForDuplicates})", value, checkForDuplicates);
             int id = Null.NullInteger;
 
+			Logger.LogDebug("Add(value={Value},checkForDuplicates={CheckForDuplicates}): id → {Id}", value, checkForDuplicates, id);
             if (!checkForDuplicates)
             {
                 id = this.Add(value);
@@ -64,6 +73,7 @@ namespace DotNetNuke.Security.Permissions
                 bool isMatch = false;
                 foreach (IPermissionInfo permission in this.List)
                 {
+				Logger.LogDebug("Add(value={Value},checkForDuplicates={CheckForDuplicates}): isMatch → {IsMatch}", value, checkForDuplicates, isMatch);
                     if (permission.PermissionId == value.PermissionID && permission.UserId == value.UserID && permission.RoleId == value.RoleID)
                     {
                         isMatch = true;
@@ -77,6 +87,7 @@ namespace DotNetNuke.Security.Permissions
                 }
             }
 
+			Logger.LogDebug("<<< Exiting Add(value={Value},checkForDuplicates={CheckForDuplicates})", value, checkForDuplicates);
             return id;
         }
 
@@ -86,6 +97,8 @@ namespace DotNetNuke.Security.Permissions
             {
                 this.Add(permission);
             }
+			Logger.LogDebug(">>> Entering AddRange(tabPermissions={TabPermissions})", tabPermissions);
+			Logger.LogDebug("<<< Exiting AddRange(tabPermissions={TabPermissions})", tabPermissions);
         }
 
         public void AddRange(IEnumerable<TabPermissionInfo> tabPermissions)
@@ -106,6 +119,7 @@ namespace DotNetNuke.Security.Permissions
 
         public bool CompareTo(TabPermissionCollection objTabPermissionCollection)
         {
+			Logger.LogDebug(">>> Entering CompareTo(objTabPermissionCollection={ObjTabPermissionCollection})", objTabPermissionCollection);
             if (objTabPermissionCollection.Count != this.Count)
             {
                 return false;
@@ -125,11 +139,13 @@ namespace DotNetNuke.Security.Permissions
                 }
             }
 
+			Logger.LogDebug("<<< Exiting CompareTo(objTabPermissionCollection={ObjTabPermissionCollection})", objTabPermissionCollection);
             return true;
         }
 
         public void Remove(int permissionID, int roleID, int userID)
         {
+			Logger.LogDebug(">>> Entering Remove(permissionID={PermissionID},roleID={RoleID},userID={UserID})", permissionID, roleID, userID);
             foreach (PermissionInfoBase permission in this.List)
             {
                 if (permission.PermissionID == permissionID && permission.UserID == userID && permission.RoleID == roleID)
@@ -138,15 +154,20 @@ namespace DotNetNuke.Security.Permissions
                     break;
                 }
             }
+			Logger.LogDebug("<<< Exiting Remove(permissionID={PermissionID},roleID={RoleID},userID={UserID})", permissionID, roleID, userID);
         }
 
         public List<PermissionInfoBase> ToList()
         {
+			Logger.LogDebug(">>> Entering ToList()");
+			Logger.LogDebug("<<< Exiting ToList()");
             return [..this.List.Cast<PermissionInfoBase>()];
         }
 
         public string ToString(string key)
         {
+			Logger.LogDebug(">>> Entering ToString(key={Key})", key);
+			Logger.LogDebug("<<< Exiting ToString(key={Key})", key);
             return PermissionController.BuildPermissions(this.List, key);
         }
 

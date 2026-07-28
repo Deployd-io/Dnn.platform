@@ -77,10 +77,15 @@ namespace DotNetNuke.Services.Scheduling
 
             static CoreScheduler()
             {
+				Logger.LogDebug(">>> Entering CoreScheduler()");
                 var lockStrategy = new ReaderWriterLockStrategy(LockRecursionPolicy.SupportsRecursion);
 
+				Logger.LogDebug("CoreScheduler(): lockStrategy → {LockStrategy}", lockStrategy);
                 ScheduleQueue = new SharedList<ScheduleItem>(lockStrategy);
+				Logger.LogDebug("CoreScheduler(): ScheduleQueue → {ScheduleQueue}", ScheduleQueue);
                 ScheduleInProgress = new SharedList<ScheduleHistoryItem>(lockStrategy);
+				Logger.LogDebug("<<< Exiting CoreScheduler()");
+				Logger.LogDebug("CoreScheduler(): ScheduleInProgress → {ScheduleInProgress}", ScheduleInProgress);
             }
 
             private delegate void AddToScheduleInProgressDelegate(ScheduleHistoryItem item);
@@ -120,6 +125,7 @@ namespace DotNetNuke.Services.Scheduling
             /// </remarks>
             public static bool ValidateServersAreActiveForScheduledItem(ScheduleItem scheduleItem)
             {
+				Logger.LogDebug(">>> Entering ValidateServersAreActiveForScheduledItem(scheduleItem={ScheduleItem})", scheduleItem);
                 // If this scheduled items runs on all servers, continue.
                 if (string.IsNullOrEmpty(scheduleItem.Servers))
                 {
@@ -129,9 +135,11 @@ namespace DotNetNuke.Services.Scheduling
                 // Get the individual server names from the scheduled item
                 var servers = scheduleItem.Servers.ToLowerInvariant().Split(ServerSeparator, StringSplitOptions.RemoveEmptyEntries);
 
+				Logger.LogDebug("ValidateServersAreActiveForScheduledItem(scheduleItem={ScheduleItem}): servers → {Servers}", scheduleItem, servers);
                 // Get the enabled servers with recent activity.
                 var enabledServers = ServerController.GetEnabledServersWithActivity();
 
+				Logger.LogDebug("ValidateServersAreActiveForScheduledItem(scheduleItem={ScheduleItem}): enabledServers → {EnabledServers}", scheduleItem, enabledServers);
                 // Validate that any server in the scheduled item is in the enabled server list with activity in the last 10 minutes.
                 bool serverHasRecentActivity = enabledServers.Any(i => servers.Contains(i.ServerName.ToLowerInvariant()));
 
@@ -146,6 +154,7 @@ namespace DotNetNuke.Services.Scheduling
                     return false;
                 }
 
+				Logger.LogDebug("<<< Exiting ValidateServersAreActiveForScheduledItem(scheduleItem={ScheduleItem})", scheduleItem);
                 return true;
             }
 
@@ -183,6 +192,7 @@ namespace DotNetNuke.Services.Scheduling
 
             public static void FireEvents()
             {
+				Logger.LogDebug(">>> Entering FireEvents()");
                 // This method uses a thread pool to
                 // call the SchedulerClient methods that need
                 // to be called.
@@ -198,6 +208,7 @@ namespace DotNetNuke.Services.Scheduling
                     var scheduleList = new List<ScheduleItem>();
                     using (ScheduleQueue.GetReadLock(LockTimeout))
                     {
+					Logger.LogDebug("FireEvents(): scheduleList → {ScheduleList}", scheduleList);
                         foreach (ScheduleItem scheduleItem in ScheduleQueue)
                         {
                             scheduleList.Add(scheduleItem);
@@ -216,6 +227,7 @@ namespace DotNetNuke.Services.Scheduling
 
                         int processGroup = GetProcessGroup();
 
+						Logger.LogDebug("FireEvents(): processGroup → {ProcessGroup}", processGroup);
                         if (scheduleItem.NextStart <= DateTime.Now &&
                             scheduleItem.Enabled &&
                             !IsInProgress(scheduleItem) &&
@@ -223,11 +235,13 @@ namespace DotNetNuke.Services.Scheduling
                             numRun < numToRun)
                         {
                             scheduleItem.ProcessGroup = processGroup;
+							Logger.LogDebug("FireEvents(): scheduleItem.ProcessGroup → {Arg0}", scheduleItem.ProcessGroup);
                             if (scheduleItem.ScheduleSource == ScheduleSource.NOT_SET)
                             {
                                 if (SchedulingProvider.SchedulerMode == SchedulerMode.TIMER_METHOD)
                                 {
                                     scheduleItem.ScheduleSource = ScheduleSource.STARTED_FROM_TIMER;
+									Logger.LogDebug("FireEvents(): scheduleItem.ScheduleSource → {Arg0}", scheduleItem.ScheduleSource);
                                 }
                                 else if (SchedulingProvider.SchedulerMode == SchedulerMode.REQUEST_METHOD)
                                 {
@@ -237,6 +251,9 @@ namespace DotNetNuke.Services.Scheduling
 
                             var delegateFunc = new AddToScheduleInProgressDelegate(AddToScheduleInProgress);
                             var scheduleHistoryItem = new ScheduleHistoryItem(scheduleItem);
+							Logger.LogDebug("FireEvents(): delegateFunc → {DelegateFunc}", delegateFunc);
+							Logger.LogDebug("FireEvents(): scheduleHistoryItem → {ScheduleHistoryItem}", scheduleHistoryItem);
+							Logger.LogDebug("FireEvents(): scheduleHistoryItem.StartDate → {Arg0}", scheduleHistoryItem.StartDate);
                             scheduleHistoryItem.StartDate = DateTime.Now;
                             delegateFunc.BeginInvoke(scheduleHistoryItem, null, null);
                             Thread.Sleep(1000);
@@ -252,20 +269,27 @@ namespace DotNetNuke.Services.Scheduling
                         }
                     }
                 }
+				Logger.LogDebug("<<< Exiting FireEvents()");
             }
 
             public static int GetActiveThreadCount()
             {
+				Logger.LogDebug(">>> Entering GetActiveThreadCount()");
+				Logger.LogDebug("<<< Exiting GetActiveThreadCount()");
                 return activeThreadCount;
             }
 
             public static int GetFreeThreadCount()
             {
+				Logger.LogDebug(">>> Entering GetFreeThreadCount()");
+				Logger.LogDebug("<<< Exiting GetFreeThreadCount()");
                 return FreeThreads;
             }
 
             public static int GetMaxThreadCount()
             {
+				Logger.LogDebug(">>> Entering GetMaxThreadCount()");
+				Logger.LogDebug("<<< Exiting GetMaxThreadCount()");
                 return maxThreadCount;
             }
 
@@ -274,8 +298,10 @@ namespace DotNetNuke.Services.Scheduling
             /// <remarks>This is a snapshot of the collection scheduled items could start or complete at any time.</remarks>
             public static Collection GetScheduleInProgress()
             {
+				Logger.LogDebug(">>> Entering GetScheduleInProgress()");
                 var c = new Collection();
                 try
+				Logger.LogDebug("GetScheduleInProgress(): c → {C}", c);
                 {
                     using (ScheduleInProgress.GetReadLock(LockTimeout))
                     {
@@ -287,11 +313,13 @@ namespace DotNetNuke.Services.Scheduling
                 }
                 catch (ApplicationException ex)
                 {
+					Logger.LogError("Exception in GetScheduleInProgress(): {Arg0}", ex.Message);
                     // The reader lock request timed out.
                     Interlocked.Increment(ref readerTimeouts);
                     Exceptions.Exceptions.LogException(ex);
                 }
 
+				Logger.LogDebug("<<< Exiting GetScheduleInProgress()");
                 return c;
             }
 
@@ -302,6 +330,7 @@ namespace DotNetNuke.Services.Scheduling
             /// </remarks>
             public static int GetScheduleInProgressCount()
             {
+				Logger.LogDebug(">>> Entering GetScheduleInProgressCount()");
                 try
                 {
                     using (ScheduleInProgress.GetReadLock(LockTimeout))
@@ -318,6 +347,7 @@ namespace DotNetNuke.Services.Scheduling
                         Logger.Debug(ex);
                     }
 
+					Logger.LogDebug("<<< Exiting GetScheduleInProgressCount()");
                     return 0;
                 }
             }
@@ -329,8 +359,10 @@ namespace DotNetNuke.Services.Scheduling
             /// </remarks>
             public static Collection GetScheduleQueue()
             {
+				Logger.LogDebug(">>> Entering GetScheduleQueue()");
                 var c = new Collection();
                 try
+				Logger.LogDebug("GetScheduleQueue(): c → {C}", c);
                 {
                     using (ScheduleQueue.GetReadLock(LockTimeout))
                     {
@@ -344,10 +376,12 @@ namespace DotNetNuke.Services.Scheduling
                 }
                 catch (ApplicationException ex)
                 {
+					Logger.LogError("Exception in GetScheduleQueue(): {Arg0}", ex.Message);
                     Interlocked.Increment(ref readerTimeouts);
                     Exceptions.Exceptions.LogException(ex);
                 }
 
+				Logger.LogDebug("<<< Exiting GetScheduleQueue()");
                 return c;
             }
 
@@ -358,6 +392,7 @@ namespace DotNetNuke.Services.Scheduling
             /// </remarks>
             public static int GetScheduleQueueCount()
             {
+				Logger.LogDebug(">>> Entering GetScheduleQueueCount()");
                 try
                 {
                     using (ScheduleQueue.GetReadLock(LockTimeout))
@@ -367,14 +402,17 @@ namespace DotNetNuke.Services.Scheduling
                 }
                 catch (ApplicationException)
                 {
+					Logger.LogError("Exception in GetScheduleQueueCount(): {Arg0}", ex.Message);
                     // The reader lock request timed out.
                     Interlocked.Increment(ref readerTimeouts);
+					Logger.LogDebug("<<< Exiting GetScheduleQueueCount()");
                     return 0;
                 }
             }
 
             public static ScheduleStatus GetScheduleStatus()
             {
+				Logger.LogDebug(">>> Entering GetScheduleStatus()");
                 try
                 {
                     if (StatusLock.TryEnterReadLock(LockTimeout))
@@ -392,10 +430,12 @@ namespace DotNetNuke.Services.Scheduling
                 }
                 catch (ApplicationException)
                 {
+					Logger.LogError("Exception in GetScheduleStatus(): {Arg0}", ex.Message);
                     // The reader lock request timed out.
                     Interlocked.Increment(ref readerTimeouts);
                 }
 
+				Logger.LogDebug("<<< Exiting GetScheduleStatus()");
                 return ScheduleStatus.NOT_SET;
             }
 
@@ -403,9 +443,11 @@ namespace DotNetNuke.Services.Scheduling
             /// <param name="sourceOfHalt">Initiator of Halt.</param>
             public static void Halt(string sourceOfHalt)
             {
+				Logger.LogDebug(">>> Entering Halt(sourceOfHalt={SourceOfHalt})", sourceOfHalt);
                 // should do nothing if the scheduler havn't start yet.
                 var currentStatus = GetScheduleStatus();
                 if (currentStatus == ScheduleStatus.NOT_SET || currentStatus == ScheduleStatus.STOPPED)
+				Logger.LogDebug("Halt(sourceOfHalt={SourceOfHalt}): currentStatus → {CurrentStatus}", sourceOfHalt, currentStatus);
                 {
                     return;
                 }
@@ -413,9 +455,11 @@ namespace DotNetNuke.Services.Scheduling
                 SetScheduleStatus(ScheduleStatus.SHUTTING_DOWN);
                 var log = new LogInfo { LogTypeKey = "SCHEDULER_SHUTTING_DOWN" };
                 log.AddProperty("Initiator", sourceOfHalt);
+				Logger.LogDebug("Halt(sourceOfHalt={SourceOfHalt}): log → {Log}", sourceOfHalt, log);
                 LogController.Instance.AddLog(log);
 
                 KeepRunning = false;
+				Logger.LogDebug("Halt(sourceOfHalt={SourceOfHalt}): KeepRunning → {KeepRunning}", sourceOfHalt, KeepRunning);
 
                 // wait for up to 120 seconds for thread
                 // to shut down
@@ -430,10 +474,13 @@ namespace DotNetNuke.Services.Scheduling
                 }
 
                 activeThreadCount = 0;
+				Logger.LogDebug("Halt(sourceOfHalt={SourceOfHalt}): activeThreadCount → {ActiveThreadCount}", sourceOfHalt, activeThreadCount);
+				Logger.LogDebug("<<< Exiting Halt(sourceOfHalt={SourceOfHalt})", sourceOfHalt);
             }
 
             public static bool HasDependenciesConflict(ScheduleItem scheduleItem)
             {
+				Logger.LogDebug(">>> Entering HasDependenciesConflict(scheduleItem={ScheduleItem})", scheduleItem);
                 try
                 {
                     using (ScheduleInProgress.GetReadLock(LockTimeout))
@@ -463,12 +510,16 @@ namespace DotNetNuke.Services.Scheduling
 
                     return false;
                 }
+				Logger.LogDebug("<<< Exiting HasDependenciesConflict(scheduleItem={ScheduleItem})", scheduleItem);
             }
 
             public static void LoadQueueFromEvent(EventName eventName)
             {
+				Logger.LogDebug(">>> Entering LoadQueueFromEvent(eventName={EventName})", eventName);
                 var executingServer = ServerController.GetExecutingServerName();
                 List<ScheduleItem> schedule = SchedulingController.GetScheduleByEvent(eventName.ToString(), executingServer);
+				Logger.LogDebug("LoadQueueFromEvent(eventName={EventName}): executingServer → {ExecutingServer}", eventName, executingServer);
+				Logger.LogDebug("LoadQueueFromEvent(eventName={EventName}): schedule → {Schedule}", eventName, schedule);
                 if (Logger.IsDebugEnabled)
                 {
                     Logger.Debug("loadqueue executingServer:" + executingServer);
@@ -476,6 +527,7 @@ namespace DotNetNuke.Services.Scheduling
 
                 var thisServer = GetServer(executingServer);
                 if (thisServer == null)
+				Logger.LogDebug("LoadQueueFromEvent(eventName={EventName}): thisServer → {ThisServer}", eventName, thisServer);
                 {
                     return;
                 }
@@ -484,38 +536,48 @@ namespace DotNetNuke.Services.Scheduling
 
                 var serverGroupServers = ServerGroupServers(thisServer);
 
+				Logger.LogDebug("LoadQueueFromEvent(eventName={EventName}): serverGroupServers → {ServerGroupServers}", eventName, serverGroupServers);
                 foreach (ScheduleItem scheduleItem in schedule)
                 {
                     if (runningInAGroup && string.IsNullOrEmpty(scheduleItem.Servers))
                     {
                         scheduleItem.Servers = serverGroupServers;
+						Logger.LogDebug("LoadQueueFromEvent(eventName={EventName}): scheduleItem.Servers → {Arg1}", eventName, scheduleItem.Servers);
                     }
 
                     var historyItem = new ScheduleHistoryItem(scheduleItem);
 
+					Logger.LogDebug("LoadQueueFromEvent(eventName={EventName}): historyItem → {HistoryItem}", eventName, historyItem);
                     if (!IsInQueue(historyItem) &&
                         !IsInProgress(historyItem) &&
                         !HasDependenciesConflict(historyItem) &&
                         historyItem.Enabled)
                     {
                         historyItem.ScheduleSource = ScheduleSource.STARTED_FROM_EVENT;
+						Logger.LogDebug("LoadQueueFromEvent(eventName={EventName}): historyItem.ScheduleSource → {Arg1}", eventName, historyItem.ScheduleSource);
                         AddToScheduleQueue(historyItem);
                     }
                 }
+				Logger.LogDebug("<<< Exiting LoadQueueFromEvent(eventName={EventName})", eventName);
             }
 
             public static void LoadQueueFromTimer()
             {
+				Logger.LogDebug(">>> Entering LoadQueueFromTimer()");
                 forceReloadSchedule = false;
                 var executingServer = ServerController.GetExecutingServerName();
+				Logger.LogDebug("LoadQueueFromTimer(): forceReloadSchedule → {ForceReloadSchedule}", forceReloadSchedule);
+				Logger.LogDebug("LoadQueueFromTimer(): executingServer → {ExecutingServer}", executingServer);
                 List<ScheduleItem> schedule = SchedulingController.GetSchedule(executingServer);
                 if (Logger.IsDebugEnabled)
+				Logger.LogDebug("LoadQueueFromTimer(): schedule → {Schedule}", schedule);
                 {
                     Logger.Debug("LoadQueueFromTimer executingServer:" + executingServer);
                 }
 
                 var thisServer = GetServer(executingServer);
                 if (thisServer == null)
+				Logger.LogDebug("LoadQueueFromTimer(): thisServer → {ThisServer}", thisServer);
                 {
                     return;
                 }
@@ -524,15 +586,18 @@ namespace DotNetNuke.Services.Scheduling
 
                 var serverGroupServers = ServerGroupServers(thisServer);
 
+				Logger.LogDebug("LoadQueueFromTimer(): serverGroupServers → {ServerGroupServers}", serverGroupServers);
                 foreach (ScheduleItem scheduleItem in schedule)
                 {
                     if (runningInAGroup && string.IsNullOrEmpty(scheduleItem.Servers))
                     {
                         scheduleItem.Servers = serverGroupServers;
+						Logger.LogDebug("LoadQueueFromTimer(): scheduleItem.Servers → {Arg0}", scheduleItem.Servers);
                     }
 
                     var historyItem = new ScheduleHistoryItem(scheduleItem);
 
+					Logger.LogDebug("LoadQueueFromTimer(): historyItem → {HistoryItem}", historyItem);
                     if (!IsInQueue(historyItem) &&
                         historyItem.TimeLapse != Null.NullInteger &&
                         historyItem.TimeLapseMeasurement != Null.NullString &&
@@ -541,6 +606,7 @@ namespace DotNetNuke.Services.Scheduling
                         if (SchedulingProvider.SchedulerMode == SchedulerMode.TIMER_METHOD)
                         {
                             historyItem.ScheduleSource = ScheduleSource.STARTED_FROM_TIMER;
+							Logger.LogDebug("LoadQueueFromTimer(): historyItem.ScheduleSource → {Arg0}", historyItem.ScheduleSource);
                         }
                         else if (SchedulingProvider.SchedulerMode == SchedulerMode.REQUEST_METHOD)
                         {
@@ -550,22 +616,29 @@ namespace DotNetNuke.Services.Scheduling
                         AddToScheduleQueue(historyItem);
                     }
                 }
+				Logger.LogDebug("<<< Exiting LoadQueueFromTimer()");
             }
 
             public static void PurgeScheduleHistory()
             {
+				Logger.LogDebug(">>> Entering PurgeScheduleHistory()");
                 SchedulingController.PurgeScheduleHistory();
+				Logger.LogDebug("<<< Exiting PurgeScheduleHistory()");
             }
 
             public static void ReloadSchedule()
             {
+				Logger.LogDebug(">>> Entering ReloadSchedule()");
                 forceReloadSchedule = true;
+				Logger.LogDebug("<<< Exiting ReloadSchedule()");
+				Logger.LogDebug("ReloadSchedule(): forceReloadSchedule → {ForceReloadSchedule}", forceReloadSchedule);
             }
 
             /// <summary>Removes an item from the collection of schedule items in queue.</summary>
             /// <param name="scheduleItem">Item to remove.</param>
             public static void RemoveFromScheduleQueue(ScheduleItem scheduleItem)
             {
+				Logger.LogDebug(">>> Entering RemoveFromScheduleQueue(scheduleItem={ScheduleItem})", scheduleItem);
                 try
                 {
                     using (ScheduleQueue.GetWriteLock(LockTimeout))
@@ -573,6 +646,7 @@ namespace DotNetNuke.Services.Scheduling
                         // the scheduleitem instances may not be equal even though the scheduleids are equal
                         var item = ScheduleQueue.FirstOrDefault(si => si.ScheduleID == scheduleItem.ScheduleID);
                         if (item != null)
+						Logger.LogDebug("RemoveFromScheduleQueue(scheduleItem={ScheduleItem}): item → {Item}", scheduleItem, item);
                         {
                             ScheduleQueue.Remove(item);
                         }
@@ -580,18 +654,22 @@ namespace DotNetNuke.Services.Scheduling
                 }
                 catch (ApplicationException ex)
                 {
+					Logger.LogError("Exception in RemoveFromScheduleQueue(scheduleItem={ScheduleItem}): {Arg1}", scheduleItem, ex.Message);
                     // The writer lock request timed out.
                     Interlocked.Increment(ref writerTimeouts);
                     Exceptions.Exceptions.LogException(ex);
                 }
+				Logger.LogDebug("<<< Exiting RemoveFromScheduleQueue(scheduleItem={ScheduleItem})", scheduleItem);
             }
 
             public static void RunEventSchedule(EventName eventName)
             {
+				Logger.LogDebug(">>> Entering RunEventSchedule(eventName={EventName})", eventName);
                 try
                 {
                     var log = new LogInfo { LogTypeKey = "SCHEDULE_FIRED_FROM_EVENT" };
                     log.AddProperty("EVENT", eventName.ToString());
+					Logger.LogDebug("RunEventSchedule(eventName={EventName}): log → {Log}", eventName, log);
                     LogController.Instance.AddLog(log);
 
                     // We allow for three threads to run simultaneously.
@@ -624,6 +702,7 @@ namespace DotNetNuke.Services.Scheduling
 
                         if (GetScheduleQueueCount() == 0)
                         {
+							Logger.LogDebug("<<< Exiting RunEventSchedule(eventName={EventName})", eventName);
                             return;
                         }
                     }
@@ -636,6 +715,7 @@ namespace DotNetNuke.Services.Scheduling
 
             public static void SetScheduleStatus(ScheduleStatus newStatus)
             {
+				Logger.LogDebug(">>> Entering SetScheduleStatus(newStatus={NewStatus})", newStatus);
                 try
                 {
                     // note:locking inside this method is highly misleading
@@ -649,6 +729,7 @@ namespace DotNetNuke.Services.Scheduling
                             // It is safe for this thread to read or write
                             // from the shared resource.
                             status = newStatus;
+							Logger.LogDebug("SetScheduleStatus(newStatus={NewStatus}): status → {Status}", newStatus, status);
                         }
                         finally
                         {
@@ -659,19 +740,23 @@ namespace DotNetNuke.Services.Scheduling
                 }
                 catch (ApplicationException ex)
                 {
+					Logger.LogError("Exception in SetScheduleStatus(newStatus={NewStatus}): {Arg1}", newStatus, ex.Message);
                     // The writer lock request timed out.
                     Interlocked.Increment(ref writerTimeouts);
                     Exceptions.Exceptions.LogException(ex);
                 }
+				Logger.LogDebug("<<< Exiting SetScheduleStatus(newStatus={NewStatus})", newStatus);
             }
 
             public static void Start()
             {
+				Logger.LogDebug(">>> Entering Start()");
                 try
                 {
                     AppDomain.CurrentDomain.SetPrincipalPolicy(PrincipalPolicy.WindowsPrincipal);
 
                     activeThreadCount = 0;
+					Logger.LogDebug("Start(): activeThreadCount → {ActiveThreadCount}", activeThreadCount);
 
                     // This is where the action begins.
                     ////Loop until KeepRunning = false
@@ -679,6 +764,8 @@ namespace DotNetNuke.Services.Scheduling
                     {
                         var log = new LogInfo();
                         log.LogTypeKey = "SCHEDULER_STARTED";
+						Logger.LogDebug("Start(): log → {Log}", log);
+						Logger.LogDebug("Start(): log.LogTypeKey → {Arg0}", log.LogTypeKey);
                         LogController.Instance.AddLog(log);
                     }
 
@@ -715,6 +802,7 @@ namespace DotNetNuke.Services.Scheduling
                             DateTime lastQueueRefresh = DateTime.Now;
                             bool refreshQueueSchedule = false;
 
+							Logger.LogDebug("Start(): refreshQueueSchedule → {RefreshQueueSchedule}", refreshQueueSchedule);
                             // We allow for [MaxThreadCount] threads to run
                             // simultaneously.  As long as we have an open thread
                             // and we don't have to refresh the queue, continue
@@ -793,6 +881,7 @@ namespace DotNetNuke.Services.Scheduling
                             }
                             else
                             {
+								Logger.LogDebug("<<< Exiting Start()");
                                 return;
                             }
                         }
@@ -838,6 +927,7 @@ namespace DotNetNuke.Services.Scheduling
 
             public static void WorkCompleted(SchedulerClient schedulerClient)
             {
+				Logger.LogDebug(">>> Entering WorkCompleted(schedulerClient={SchedulerClient})", schedulerClient);
                 try
                 {
                     ScheduleHistoryItem scheduleHistoryItem = schedulerClient.ScheduleHistoryItem;
@@ -852,10 +942,12 @@ namespace DotNetNuke.Services.Scheduling
                     // Update the schedule item object property
                     // to note the end time and next start
                     scheduleHistoryItem.EndDate = DateTime.Now;
+					Logger.LogDebug("WorkCompleted(schedulerClient={SchedulerClient}): scheduleHistoryItem.EndDate → {Arg1}", schedulerClient, scheduleHistoryItem.EndDate);
 
                     if (scheduleHistoryItem.ScheduleSource == ScheduleSource.STARTED_FROM_EVENT)
                     {
                         scheduleHistoryItem.NextStart = Null.NullDate;
+						Logger.LogDebug("WorkCompleted(schedulerClient={SchedulerClient}): scheduleHistoryItem.NextStart → {Arg1}", schedulerClient, scheduleHistoryItem.NextStart);
                     }
                     else
                     {
@@ -923,6 +1015,9 @@ namespace DotNetNuke.Services.Scheduling
                         // Put the object back into the ScheduleQueue
                         // collection with the new NextStart date.
                         scheduleHistoryItem.StartDate = Null.NullDate;
+						Logger.LogDebug("WorkCompleted(schedulerClient={SchedulerClient}): scheduleHistoryItem.StartDate → {Arg1}", schedulerClient, scheduleHistoryItem.StartDate);
+						Logger.LogDebug("WorkCompleted(schedulerClient={SchedulerClient}): scheduleHistoryItem.LogNotes → {Arg1}", schedulerClient, scheduleHistoryItem.LogNotes);
+						Logger.LogDebug("WorkCompleted(schedulerClient={SchedulerClient}): scheduleHistoryItem.ProcessGroup → {Arg1}", schedulerClient, scheduleHistoryItem.ProcessGroup);
                         scheduleHistoryItem.EndDate = Null.NullDate;
                         scheduleHistoryItem.LogNotes = string.Empty;
                         scheduleHistoryItem.ProcessGroup = -1;
@@ -933,6 +1028,7 @@ namespace DotNetNuke.Services.Scheduling
                     {
                         var log = new LogInfo { LogTypeKey = "SCHEDULER_EVENT_COMPLETED" };
                         log.AddProperty("TYPE", schedulerClient.GetType().FullName);
+						Logger.LogDebug("WorkCompleted(schedulerClient={SchedulerClient}): log → {Log}", schedulerClient, log);
                         log.AddProperty("THREAD ID", Thread.CurrentThread.GetHashCode().ToString(CultureInfo.InvariantCulture));
                         log.AddProperty("NEXT START", Convert.ToString(scheduleHistoryItem.NextStart, CultureInfo.InvariantCulture));
                         log.AddProperty("SOURCE", schedulerClient.ScheduleHistoryItem.ScheduleSource.ToString());
@@ -947,13 +1043,17 @@ namespace DotNetNuke.Services.Scheduling
                 }
                 catch (Exception exc)
                 {
+					Logger.LogError("Exception in WorkCompleted(schedulerClient={SchedulerClient}): {Arg1}", schedulerClient, ex.Message);
                     Exceptions.Exceptions.ProcessSchedulerException(exc);
                 }
+				Logger.LogDebug("<<< Exiting WorkCompleted(schedulerClient={SchedulerClient})", schedulerClient);
             }
 
             public static void WorkErrored(SchedulerClient schedulerClient, Exception exception)
             {
+				Logger.LogDebug(">>> Entering WorkErrored(schedulerClient={SchedulerClient},exception={Exception})", schedulerClient, exception);
                 WorkErrored(schedulerClient.ScheduleHistoryItem, exception);
+				Logger.LogDebug("<<< Exiting WorkErrored(schedulerClient={SchedulerClient},exception={Exception})", schedulerClient, exception);
             }
 
             public static void WorkErrored(ScheduleHistoryItem scheduleHistoryItem, Exception exception)
@@ -1048,6 +1148,7 @@ namespace DotNetNuke.Services.Scheduling
 
             public static void WorkProgressing(SchedulerClient schedulerClient)
             {
+				Logger.LogDebug(">>> Entering WorkProgressing(schedulerClient={SchedulerClient})", schedulerClient);
                 try
                 {
                     // A SchedulerClient is notifying us that their
@@ -1057,6 +1158,7 @@ namespace DotNetNuke.Services.Scheduling
                         // Write out the log entry for this event
                         var log = new LogInfo { LogTypeKey = "SCHEDULER_EVENT_PROGRESSING" };
                         log.AddProperty("THREAD ID", Thread.CurrentThread.GetHashCode().ToString(CultureInfo.InvariantCulture));
+						Logger.LogDebug("WorkProgressing(schedulerClient={SchedulerClient}): log → {Log}", schedulerClient, log);
                         log.AddProperty("TYPE", schedulerClient.GetType().FullName);
                         log.AddProperty("SOURCE", schedulerClient.ScheduleHistoryItem.ScheduleSource.ToString());
                         log.AddProperty("ACTIVE THREADS", activeThreadCount.ToString(CultureInfo.InvariantCulture));
@@ -1070,13 +1172,17 @@ namespace DotNetNuke.Services.Scheduling
                 }
                 catch (Exception exc)
                 {
+					Logger.LogError("Exception in WorkProgressing(schedulerClient={SchedulerClient}): {Arg1}", schedulerClient, ex.Message);
                     Exceptions.Exceptions.ProcessSchedulerException(exc);
                 }
+				Logger.LogDebug("<<< Exiting WorkProgressing(schedulerClient={SchedulerClient})", schedulerClient);
             }
 
             public static void WorkStarted(SchedulerClient schedulerClient)
             {
+				Logger.LogDebug(">>> Entering WorkStarted(schedulerClient={SchedulerClient})", schedulerClient);
                 WorkStarted(schedulerClient.ScheduleHistoryItem);
+				Logger.LogDebug("<<< Exiting WorkStarted(schedulerClient={SchedulerClient})", schedulerClient);
             }
 
             public static void WorkStarted(ScheduleHistoryItem scheduleHistoryItem)
@@ -1135,6 +1241,7 @@ namespace DotNetNuke.Services.Scheduling
             // DNN-5001
             public static void StopScheduleInProgress(ScheduleItem scheduleItem, ScheduleHistoryItem runningscheduleHistoryItem)
             {
+				Logger.LogDebug(">>> Entering StopScheduleInProgress(scheduleItem={ScheduleItem},runningscheduleHistoryItem={RunningscheduleHistoryItem})", scheduleItem, runningscheduleHistoryItem);
                 try
                 {
                     // attempt to stop task only if it is still in progress
@@ -1142,6 +1249,9 @@ namespace DotNetNuke.Services.Scheduling
                     {
                         var scheduleHistoryItem = GetScheduleItemFromScheduleInProgress(scheduleItem);
                         scheduleHistoryItem.ScheduleHistoryID = runningscheduleHistoryItem.ScheduleHistoryID;
+						Logger.LogDebug("StopScheduleInProgress(scheduleItem={ScheduleItem},runningscheduleHistoryItem={RunningscheduleHistoryItem}): scheduleHistoryItem → {ScheduleHistoryItem}", scheduleItem, runningscheduleHistoryItem, scheduleHistoryItem);
+						Logger.LogDebug("StopScheduleInProgress(scheduleItem={ScheduleItem},runningscheduleHistoryItem={RunningscheduleHistoryItem}): scheduleHistoryItem.ScheduleHistoryID → {Arg2}", scheduleItem, runningscheduleHistoryItem, scheduleHistoryItem.ScheduleHistoryID);
+						Logger.LogDebug("StopScheduleInProgress(scheduleItem={ScheduleItem},runningscheduleHistoryItem={RunningscheduleHistoryItem}): scheduleHistoryItem.StartDate → {Arg2}", scheduleItem, runningscheduleHistoryItem, scheduleHistoryItem.StartDate);
                         scheduleHistoryItem.StartDate = runningscheduleHistoryItem.StartDate;
 
                         // Remove the object in the ScheduleInProgress collection
@@ -1154,10 +1264,12 @@ namespace DotNetNuke.Services.Scheduling
                         // Update the schedule item object property
                         // to note the end time and next start
                         scheduleHistoryItem.EndDate = DateTime.Now;
+						Logger.LogDebug("StopScheduleInProgress(scheduleItem={ScheduleItem},runningscheduleHistoryItem={RunningscheduleHistoryItem}): scheduleHistoryItem.EndDate → {Arg2}", scheduleItem, runningscheduleHistoryItem, scheduleHistoryItem.EndDate);
 
                         if (scheduleHistoryItem.ScheduleSource == ScheduleSource.STARTED_FROM_EVENT)
                         {
                             scheduleHistoryItem.NextStart = Null.NullDate;
+							Logger.LogDebug("StopScheduleInProgress(scheduleItem={ScheduleItem},runningscheduleHistoryItem={RunningscheduleHistoryItem}): scheduleHistoryItem.NextStart → {Arg2}", scheduleItem, runningscheduleHistoryItem, scheduleHistoryItem.NextStart);
                         }
                         else
                         {
@@ -1239,6 +1351,8 @@ namespace DotNetNuke.Services.Scheduling
                             // Put the object back into the ScheduleQueue
                             // collection with the new NextStart date.
                             scheduleHistoryItem.StartDate = Null.NullDate;
+							Logger.LogDebug("StopScheduleInProgress(scheduleItem={ScheduleItem},runningscheduleHistoryItem={RunningscheduleHistoryItem}): scheduleHistoryItem.LogNotes → {Arg2}", scheduleItem, runningscheduleHistoryItem, scheduleHistoryItem.LogNotes);
+							Logger.LogDebug("StopScheduleInProgress(scheduleItem={ScheduleItem},runningscheduleHistoryItem={RunningscheduleHistoryItem}): scheduleHistoryItem.ProcessGroup → {Arg2}", scheduleItem, runningscheduleHistoryItem, scheduleHistoryItem.ProcessGroup);
                             scheduleHistoryItem.EndDate = Null.NullDate;
                             scheduleHistoryItem.LogNotes = string.Empty;
                             scheduleHistoryItem.ProcessGroup = -1;
@@ -1248,6 +1362,7 @@ namespace DotNetNuke.Services.Scheduling
                         // Write out the log entry for this event
                         var log = new LogInfo { LogTypeKey = "SCHEDULER_EVENT_COMPLETED" };
                         log.AddProperty("REASON", "Scheduler task has been stopped manually");
+						Logger.LogDebug("StopScheduleInProgress(scheduleItem={ScheduleItem},runningscheduleHistoryItem={RunningscheduleHistoryItem}): log → {Log}", scheduleItem, runningscheduleHistoryItem, log);
                         log.AddProperty("TYPE", scheduleHistoryItem.TypeFullName);
                         log.AddProperty("THREAD ID", Thread.CurrentThread.GetHashCode().ToString(CultureInfo.InvariantCulture));
                         log.AddProperty("NEXT START", Convert.ToString(scheduleHistoryItem.NextStart, CultureInfo.InvariantCulture));
@@ -1256,12 +1371,15 @@ namespace DotNetNuke.Services.Scheduling
                 }
                 catch (Exception exc)
                 {
+					Logger.LogError("Exception in StopScheduleInProgress(scheduleItem={ScheduleItem},runningscheduleHistoryItem={RunningscheduleHistoryItem}): {Arg2}", scheduleItem, runningscheduleHistoryItem, ex.Message);
                     Exceptions.Exceptions.ProcessSchedulerException(exc);
                 }
+				Logger.LogDebug("<<< Exiting StopScheduleInProgress(scheduleItem={ScheduleItem},runningscheduleHistoryItem={RunningscheduleHistoryItem})", scheduleItem, runningscheduleHistoryItem);
             }
 
             internal static bool IsInQueue(ScheduleItem scheduleItem)
             {
+				Logger.LogDebug(">>> Entering IsInQueue(scheduleItem={ScheduleItem})", scheduleItem);
                 try
                 {
                     using (ScheduleQueue.GetReadLock(LockTimeout))
@@ -1271,8 +1389,10 @@ namespace DotNetNuke.Services.Scheduling
                 }
                 catch (ApplicationException)
                 {
+					Logger.LogError("Exception in IsInQueue(scheduleItem={ScheduleItem}): {Arg1}", scheduleItem, ex.Message);
                     // The reader lock request timed out.
                     Interlocked.Increment(ref readerTimeouts);
+					Logger.LogDebug("<<< Exiting IsInQueue(scheduleItem={ScheduleItem})", scheduleItem);
                     return false;
                 }
             }
@@ -1293,19 +1413,24 @@ namespace DotNetNuke.Services.Scheduling
 
             internal static void InitializeThreadPool(bool boolDebug, int maxThreads)
             {
+				Logger.LogDebug(">>> Entering InitializeThreadPool(boolDebug={BoolDebug},maxThreads={MaxThreads})", boolDebug, maxThreads);
                 debug = boolDebug;
                 lock (typeof(CoreScheduler))
                 {
+				Logger.LogDebug("InitializeThreadPool(boolDebug={BoolDebug},maxThreads={MaxThreads}): debug → {Debug}", boolDebug, maxThreads, debug);
                     if (!threadPoolInitialized)
                     {
                         threadPoolInitialized = true;
+						Logger.LogDebug("InitializeThreadPool(boolDebug={BoolDebug},maxThreads={MaxThreads}): threadPoolInitialized → {ThreadPoolInitialized}", boolDebug, maxThreads, threadPoolInitialized);
                         if (maxThreads == -1)
                         {
                             maxThreads = 1;
                         }
 
                         numberOfProcessGroups = maxThreads;
+						Logger.LogDebug("InitializeThreadPool(boolDebug={BoolDebug},maxThreads={MaxThreads}): numberOfProcessGroups → {NumberOfProcessGroups}", boolDebug, maxThreads, numberOfProcessGroups);
                         maxThreadCount = maxThreads;
+						Logger.LogDebug("InitializeThreadPool(boolDebug={BoolDebug},maxThreads={MaxThreads}): maxThreadCount → {MaxThreadCount}", boolDebug, maxThreads, maxThreadCount);
                         for (int i = 0; i < numberOfProcessGroups; i++)
                         {
                             Array.Resize(ref processGroup, i + 1);
@@ -1313,6 +1438,7 @@ namespace DotNetNuke.Services.Scheduling
                         }
                     }
                 }
+				Logger.LogDebug("<<< Exiting InitializeThreadPool(boolDebug={BoolDebug},maxThreads={MaxThreads})", boolDebug, maxThreads);
             }
 
             /// <summary>adds an item to the collection of schedule items in progress.</summary>
@@ -1343,13 +1469,17 @@ namespace DotNetNuke.Services.Scheduling
 
             private static int GetProcessGroup()
             {
+				Logger.LogDebug(">>> Entering GetProcessGroup()");
                 // return a random process group
                 var r = new Random();
+				Logger.LogDebug("GetProcessGroup(): r → {R}", r);
+				Logger.LogDebug("<<< Exiting GetProcessGroup()");
                 return r.Next(0, numberOfProcessGroups - 1);
             }
 
             private static bool IsInProgress(ScheduleItem scheduleItem)
             {
+				Logger.LogDebug(">>> Entering IsInProgress(scheduleItem={ScheduleItem})", scheduleItem);
                 try
                 {
                     using (ScheduleInProgress.GetReadLock(LockTimeout))
@@ -1368,6 +1498,7 @@ namespace DotNetNuke.Services.Scheduling
 
                     return false;
                 }
+				Logger.LogDebug("<<< Exiting IsInProgress(scheduleItem={ScheduleItem})", scheduleItem);
             }
 
             /// <summary>Removes an item from the collection of schedule items in progress.</summary>
@@ -1375,12 +1506,14 @@ namespace DotNetNuke.Services.Scheduling
             /// <remarks>Thread Safe.</remarks>
             private static void RemoveFromScheduleInProgress(ScheduleItem scheduleItem)
             {
+				Logger.LogDebug(">>> Entering RemoveFromScheduleInProgress(scheduleItem={ScheduleItem})", scheduleItem);
                 try
                 {
                     using (ScheduleInProgress.GetWriteLock(LockTimeout))
                     {
                         var item = ScheduleInProgress.FirstOrDefault(si => si.ScheduleID == scheduleItem.ScheduleID);
                         if (item != null)
+						Logger.LogDebug("RemoveFromScheduleInProgress(scheduleItem={ScheduleItem}): item → {Item}", scheduleItem, item);
                         {
                             ScheduleInProgress.Remove(item);
                         }
@@ -1388,10 +1521,12 @@ namespace DotNetNuke.Services.Scheduling
                 }
                 catch (ApplicationException ex)
                 {
+					Logger.LogError("Exception in RemoveFromScheduleInProgress(scheduleItem={ScheduleItem}): {Arg1}", scheduleItem, ex.Message);
                     // The writer lock request timed out.
                     Interlocked.Increment(ref writerTimeouts);
                     Exceptions.Exceptions.LogException(ex);
                 }
+				Logger.LogDebug("<<< Exiting RemoveFromScheduleInProgress(scheduleItem={ScheduleItem})", scheduleItem);
             }
 
             /// <summary>Gets a schedulehistory item from the collection of schedule items in progress.</summary>
@@ -1399,6 +1534,7 @@ namespace DotNetNuke.Services.Scheduling
             /// <remarks>Thread Safe.</remarks>
             private static ScheduleHistoryItem GetScheduleItemFromScheduleInProgress(ScheduleItem scheduleItem)
             {
+				Logger.LogDebug(">>> Entering GetScheduleItemFromScheduleInProgress(scheduleItem={ScheduleItem})", scheduleItem);
                 try
                 {
                     using (ScheduleInProgress.GetWriteLock(LockTimeout))
@@ -1409,11 +1545,13 @@ namespace DotNetNuke.Services.Scheduling
                 }
                 catch (ApplicationException ex)
                 {
+					Logger.LogError("Exception in GetScheduleItemFromScheduleInProgress(scheduleItem={ScheduleItem}): {Arg1}", scheduleItem, ex.Message);
                     // The writer lock request timed out.
                     Interlocked.Increment(ref writerTimeouts);
                     Exceptions.Exceptions.LogException(ex);
                 }
 
+				Logger.LogDebug("<<< Exiting GetScheduleItemFromScheduleInProgress(scheduleItem={ScheduleItem})", scheduleItem);
                 return null;
             }
 
@@ -1436,6 +1574,7 @@ namespace DotNetNuke.Services.Scheduling
 
             private static bool ScheduleQueueContains(ScheduleItem objScheduleItem)
             {
+				Logger.LogDebug(">>> Entering ScheduleQueueContains(objScheduleItem={ObjScheduleItem})", objScheduleItem);
                 try
                 {
                     using (ScheduleQueue.GetReadLock(LockTimeout))
@@ -1445,18 +1584,23 @@ namespace DotNetNuke.Services.Scheduling
                 }
                 catch (ApplicationException ex)
                 {
+					Logger.LogError("Exception in ScheduleQueueContains(objScheduleItem={ObjScheduleItem}): {Arg1}", objScheduleItem, ex.Message);
                     Interlocked.Increment(ref readerTimeouts);
                     Exceptions.Exceptions.LogException(ex);
+					Logger.LogDebug("<<< Exiting ScheduleQueueContains(objScheduleItem={ObjScheduleItem})", objScheduleItem);
                     return false;
                 }
             }
 
             private static void LogWhyTaskNotRun(ScheduleItem scheduleItem)
             {
+				Logger.LogDebug(">>> Entering LogWhyTaskNotRun(scheduleItem={ScheduleItem})", scheduleItem);
                 if (debug)
                 {
                     bool appended = false;
                     var strDebug = new StringBuilder("Task not run because ");
+					Logger.LogDebug("LogWhyTaskNotRun(scheduleItem={ScheduleItem}): appended → {Appended}", scheduleItem, appended);
+					Logger.LogDebug("LogWhyTaskNotRun(scheduleItem={ScheduleItem}): strDebug → {StrDebug}", scheduleItem, strDebug);
                     if (!(scheduleItem.NextStart <= DateTime.Now))
                     {
                         strDebug.Append(" task is scheduled for " + scheduleItem.NextStart);
@@ -1497,23 +1641,30 @@ namespace DotNetNuke.Services.Scheduling
 
                     var log = new LogInfo();
                     log.AddProperty("EVENT NOT RUN REASON", strDebug.ToString());
+					Logger.LogDebug("LogWhyTaskNotRun(scheduleItem={ScheduleItem}): log → {Log}", scheduleItem, log);
                     log.AddProperty("SCHEDULE ID", scheduleItem.ScheduleID.ToString(CultureInfo.InvariantCulture));
                     log.AddProperty("TYPE FULL NAME", scheduleItem.TypeFullName);
                     log.LogTypeKey = "DEBUG";
+					Logger.LogDebug("LogWhyTaskNotRun(scheduleItem={ScheduleItem}): log.LogTypeKey → {Arg1}", scheduleItem, log.LogTypeKey);
                     LogController.Instance.AddLog(log);
                 }
+				Logger.LogDebug("<<< Exiting LogWhyTaskNotRun(scheduleItem={ScheduleItem})", scheduleItem);
             }
 
             private static void LogEventAddedToProcessGroup(ScheduleItem scheduleItem)
             {
+				Logger.LogDebug(">>> Entering LogEventAddedToProcessGroup(scheduleItem={ScheduleItem})", scheduleItem);
                 if (debug)
                 {
                     var log = new LogInfo();
                     log.AddProperty("EVENT ADDED TO PROCESS GROUP " + scheduleItem.ProcessGroup, scheduleItem.TypeFullName);
+					Logger.LogDebug("LogEventAddedToProcessGroup(scheduleItem={ScheduleItem}): log → {Log}", scheduleItem, log);
                     log.AddProperty("SCHEDULE ID", scheduleItem.ScheduleID.ToString(CultureInfo.InvariantCulture));
                     log.LogTypeKey = "DEBUG";
+					Logger.LogDebug("LogEventAddedToProcessGroup(scheduleItem={ScheduleItem}): log.LogTypeKey → {Arg1}", scheduleItem, log.LogTypeKey);
                     LogController.Instance.AddLog(log);
                 }
+				Logger.LogDebug("<<< Exiting LogEventAddedToProcessGroup(scheduleItem={ScheduleItem})", scheduleItem);
             }
 
             private static string ServerGroupServers(ServerInfo thisServer)

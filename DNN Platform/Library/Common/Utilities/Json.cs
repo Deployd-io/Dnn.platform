@@ -8,13 +8,16 @@ namespace DotNetNuke.Common.Utilities
     /// <summary>Serialize or Deserialize Json.</summary>
     public static class Json
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static T Deserialize<T>(string json)
         {
+			Logger.LogDebug(">>> Entering Deserialize(json={Json})", json);
             return JsonConvert.DeserializeObject<T>(json);
         }
 
         public static string Serialize<T>(T obj)
         {
+			Logger.LogDebug(">>> Entering Serialize(obj={Obj})", obj);
             return JsonConvert.SerializeObject(obj);
         }
     }

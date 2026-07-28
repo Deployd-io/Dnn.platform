@@ -12,17 +12,22 @@ namespace Dnn.PersonaBar.Extensions.Components.Security.Ssl
 
     public class SslController : ServiceLocator<ISSlController, SslController>, ISSlController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public PortalStats GetPortalStats(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetPortalStats(portalId={PortalId})", portalId);
             using (IDataContext context = DataContext.Instance())
             {
+				Logger.LogDebug("<<< Exiting GetPortalStats(portalId={PortalId})", portalId);
                 return context.ExecuteQuery<PortalStats>(System.Data.CommandType.StoredProcedure, "{databaseOwner}{objectQualifier}PersonaBar_GetPortalStats", portalId).FirstOrDefault();
             }
         }
 
         protected override Func<ISSlController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new SslController();
         }
     }

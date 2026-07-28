@@ -25,9 +25,13 @@ namespace DotNetNuke.Web.UI.WebControls
     public class Tags(IVocabularyController vocabularyController, ITermController termController)
         : WebControl, IPostBackEventHandler, IPostBackDataHandler
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IVocabularyController vocabularyController = vocabularyController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IVocabularyController>();
+		Logger.LogDebug(">>> Entering Tags(vocabularyController={VocabularyController},termController={TermController})", vocabularyController, termController);
+		Logger.LogDebug("Tags(vocabularyController={VocabularyController},termController={TermController}): vocabularyController → {VocabularyController1}", vocabularyController, termController, vocabularyController);
         private readonly ITermController termController = termController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ITermController>();
         private string tags;
+		Logger.LogDebug("Tags(vocabularyController={VocabularyController},termController={TermController}): termController → {TermController1}", vocabularyController, termController, termController);
 
         /// <summary>Initializes a new instance of the <see cref="Tags"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IVocabularyController. Scheduled removal in v12.0.0.")]
@@ -95,6 +99,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         public override void RenderControl(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering RenderControl(writer={Writer})", writer);
             // Render Outer Div
             writer.AddAttribute(HtmlTextWriterAttribute.Class, this.RepeatDirection.ToLowerInvariant());
             writer.RenderBeginTag(HtmlTextWriterTag.Div);
@@ -201,28 +206,37 @@ namespace DotNetNuke.Web.UI.WebControls
             }
 
             writer.RenderEndTag();
+			Logger.LogDebug("<<< Exiting RenderControl(writer={Writer})", writer);
         }
 
         /// <inheritdoc />
         public bool LoadPostData(string postDataKey, NameValueCollection postCollection)
         {
+			Logger.LogDebug(">>> Entering LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             this.tags = postCollection[postDataKey];
 
+			Logger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): this.tags → {Arg2}", postDataKey, postCollection, this.tags);
+			Logger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): tags → {Tags}", postDataKey, postCollection, tags);
+			Logger.LogDebug("<<< Exiting LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             return true;
         }
 
         /// <inheritdoc />
         public void RaisePostDataChangedEvent()
         {
+		Logger.LogDebug(">>> Entering RaisePostDataChangedEvent()");
+		Logger.LogDebug("<<< Exiting RaisePostDataChangedEvent()");
         }
 
         /// <inheritdoc />
         public void RaisePostBackEvent(string eventArgument)
         {
+			Logger.LogDebug(">>> Entering RaisePostBackEvent(eventArgument={EventArgument})", eventArgument);
             switch (eventArgument)
             {
                 case "Add":
                     this.IsEditMode = true;
+					Logger.LogDebug("RaisePostBackEvent(eventArgument={EventArgument}): this.IsEditMode → {Arg1}", eventArgument, this.IsEditMode);
                     break;
                 case "Cancel":
                     this.IsEditMode = false;
@@ -234,27 +248,32 @@ namespace DotNetNuke.Web.UI.WebControls
                     this.IsEditMode = false;
                     break;
             }
+			Logger.LogDebug("<<< Exiting RaisePostBackEvent(eventArgument={EventArgument})", eventArgument);
         }
 
         /// <summary>A method which triggers the <see cref="TagsUpdated"/> event.</summary>
         /// <param name="e">The event args.</param>
         protected void OnTagsUpdate(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnTagsUpdate(e={E})", e);
             if (this.TagsUpdated != null)
             {
                 this.TagsUpdated(this, e);
             }
+			Logger.LogDebug("<<< Exiting OnTagsUpdate(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             if (!this.Page.ClientScript.IsClientScriptBlockRegistered(this.UniqueID))
             {
                 StringBuilder sb = new StringBuilder();
 
+				Logger.LogDebug("OnPreRender(e={E}): sb → {Sb}", e, sb);
                 sb.Append("<script language='javascript' type='text/javascript' >");
                 sb.Append(Environment.NewLine);
                 sb.Append("function disableEnterKey(e)");
@@ -270,12 +289,15 @@ namespace DotNetNuke.Web.UI.WebControls
 
                 this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), this.UniqueID, sb.ToString());
             }
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private string LocalizeString(string key)
         {
+			Logger.LogDebug(">>> Entering LocalizeString(key={Key})", key);
             string localResourceFile = Utilities.GetLocalResourceFile(this);
             string localizedString = null;
+			Logger.LogDebug("LocalizeString(key={Key}): localizedString → {LocalizedString}", key, localizedString);
             if (!string.IsNullOrEmpty(key) && !string.IsNullOrEmpty(localResourceFile))
             {
                 localizedString = Localization.GetString(key, localResourceFile);
@@ -285,11 +307,13 @@ namespace DotNetNuke.Web.UI.WebControls
                 localizedString = Null.NullString;
             }
 
+			Logger.LogDebug("<<< Exiting LocalizeString(key={Key})", key);
             return localizedString;
         }
 
         private void RenderButton(HtmlTextWriter writer, string buttonType, string imageUrl)
         {
+			Logger.LogDebug(">>> Entering RenderButton(writer={Writer},buttonType={ButtonType},imageUrl={ImageUrl})", writer, buttonType, imageUrl);
             writer.AddAttribute(HtmlTextWriterAttribute.Title, this.LocalizeString($"{buttonType}.ToolTip"));
             writer.AddAttribute(HtmlTextWriterAttribute.Href, this.Page.ClientScript.GetPostBackClientHyperlink(this, buttonType));
             writer.RenderBeginTag(HtmlTextWriterTag.A);
@@ -304,6 +328,7 @@ namespace DotNetNuke.Web.UI.WebControls
 
             writer.Write(this.LocalizeString(buttonType));
             writer.RenderEndTag();
+			Logger.LogDebug("<<< Exiting RenderButton(writer={Writer},buttonType={ButtonType},imageUrl={ImageUrl})", writer, buttonType, imageUrl);
         }
 
         private void RenderTerm(HtmlTextWriter writer, Term term, bool renderSeparator)
@@ -323,6 +348,7 @@ namespace DotNetNuke.Web.UI.WebControls
 
         private void SaveTags()
         {
+			Logger.LogDebug(">>> Entering SaveTags()");
             string tags = this.tags;
 
             if (!string.IsNullOrEmpty(tags))
@@ -333,12 +359,14 @@ namespace DotNetNuke.Web.UI.WebControls
                     {
                         string tagName = t.Trim(' ');
                         Term existingTerm = (from term in this.ContentItem.Terms.AsQueryable() where term.Name.Equals(tagName, StringComparison.OrdinalIgnoreCase) select term).SingleOrDefault();
+						Logger.LogDebug("SaveTags(): existingTerm → {ExistingTerm}", existingTerm);
 
                         if (existingTerm == null)
                         {
                             // Not tagged
                             Term term = this.termController.GetTermsByVocabulary(this.TagVocabulary.VocabularyId).SingleOrDefault(te => te.Name.Equals(tagName, StringComparison.OrdinalIgnoreCase));
                             if (term == null)
+							Logger.LogDebug("SaveTags(): term → {Term}", term);
                             {
                                 // Add term
                                 term = new Term(this.TagVocabulary.VocabularyId) { Name = tagName, };
@@ -354,9 +382,11 @@ namespace DotNetNuke.Web.UI.WebControls
             }
 
             this.IsEditMode = false;
+			Logger.LogDebug("SaveTags(): this.IsEditMode → {Arg0}", this.IsEditMode);
 
             // Raise the Tags Updated Event
             this.OnTagsUpdate(EventArgs.Empty);
+			Logger.LogDebug("<<< Exiting SaveTags()");
         }
     }
 }

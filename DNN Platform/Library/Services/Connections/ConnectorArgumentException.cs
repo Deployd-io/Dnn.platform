@@ -8,9 +8,12 @@ namespace DotNetNuke.Services.Connections
 
     public class ConnectorArgumentException : ApplicationException
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ConnectorArgumentException"/> class.</summary>
         public ConnectorArgumentException()
         {
+		Logger.LogDebug(">>> Entering ConnectorArgumentException()");
+		Logger.LogDebug("<<< Exiting ConnectorArgumentException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ConnectorArgumentException"/> class.</summary>
@@ -18,7 +21,9 @@ namespace DotNetNuke.Services.Connections
         public ConnectorArgumentException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering ConnectorArgumentException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting ConnectorArgumentException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="ConnectorArgumentException"/> class.</summary>
         /// <param name="message">A message that describes the error.</param>

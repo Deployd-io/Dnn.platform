@@ -14,6 +14,7 @@ namespace DotNetNuke.Web.Client.ResourceManager.Models
     /// </summary>
     public abstract class LinkResource : ResourceBase, ILinkResource
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public bool Preload { get; set; }
 
@@ -26,10 +27,12 @@ namespace DotNetNuke.Web.Client.ResourceManager.Models
         /// <param name="htmlString">The HTML string builder to append to.</param>
         protected void RenderMedia(StringBuilder htmlString)
         {
+			Logger.LogDebug(">>> Entering RenderMedia(htmlString={HtmlString})", htmlString);
             if (!string.IsNullOrEmpty(this.Media) && !this.Attributes.ContainsKey("media"))
             {
                 htmlString.Append($" media=\"{this.Media}\"");
             }
+			Logger.LogDebug("<<< Exiting RenderMedia(htmlString={HtmlString})", htmlString);
         }
     }
 }

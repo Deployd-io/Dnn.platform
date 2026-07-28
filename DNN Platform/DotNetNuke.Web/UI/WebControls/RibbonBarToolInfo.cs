@@ -9,13 +9,20 @@ namespace DotNetNuke.Web.UI.WebControls
     [Serializable]
     public class RibbonBarToolInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="RibbonBarToolInfo"/> class.</summary>
         public RibbonBarToolInfo()
         {
+			Logger.LogDebug(">>> Entering RibbonBarToolInfo()");
             this.ControlKey = string.Empty;
             this.ModuleFriendlyName = string.Empty;
+			Logger.LogDebug("RibbonBarToolInfo(): this.ControlKey → {Arg0}", this.ControlKey);
+			Logger.LogDebug("RibbonBarToolInfo(): this.ModuleFriendlyName → {Arg0}", this.ModuleFriendlyName);
             this.LinkWindowTarget = string.Empty;
             this.ToolName = string.Empty;
+			Logger.LogDebug("<<< Exiting RibbonBarToolInfo()");
+			Logger.LogDebug("RibbonBarToolInfo(): this.LinkWindowTarget → {Arg0}", this.LinkWindowTarget);
+			Logger.LogDebug("RibbonBarToolInfo(): this.ToolName → {Arg0}", this.ToolName);
         }
 
         /// <summary>Initializes a new instance of the <see cref="RibbonBarToolInfo"/> class.</summary>
@@ -28,13 +35,22 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <param name="showAsPopUp"><see langword="true"/> if this tool should display in a pop-up, otherwise <see langword="false"/>.</param>
         public RibbonBarToolInfo(string toolName, bool isHostTool, bool useButton, string linkWindowTarget, string moduleFriendlyName, string controlKey, bool showAsPopUp)
         {
+			Logger.LogDebug(">>> Entering RibbonBarToolInfo(toolName={ToolName},isHostTool={IsHostTool},useButton={UseButton},linkWindowTarget={LinkWindowTarget},moduleFriendlyName={ModuleFriendlyName},controlKey={ControlKey},showAsPopUp={ShowAsPopUp})", toolName, isHostTool, useButton, linkWindowTarget, moduleFriendlyName, controlKey, showAsPopUp);
             this.ToolName = toolName;
             this.IsHostTool = isHostTool;
+			Logger.LogDebug("RibbonBarToolInfo(toolName={ToolName},isHostTool={IsHostTool},useButton={UseButton},linkWindowTarget={LinkWindowTarget},moduleFriendlyName={ModuleFriendlyName},controlKey={ControlKey},showAsPopUp={ShowAsPopUp}): this.ToolName → {Arg7}", toolName, isHostTool, useButton, linkWindowTarget, moduleFriendlyName, controlKey, showAsPopUp, this.ToolName);
+			Logger.LogDebug("RibbonBarToolInfo(toolName={ToolName},isHostTool={IsHostTool},useButton={UseButton},linkWindowTarget={LinkWindowTarget},moduleFriendlyName={ModuleFriendlyName},controlKey={ControlKey},showAsPopUp={ShowAsPopUp}): this.IsHostTool → {Arg7}", toolName, isHostTool, useButton, linkWindowTarget, moduleFriendlyName, controlKey, showAsPopUp, this.IsHostTool);
+			Logger.LogDebug("RibbonBarToolInfo(toolName={ToolName},isHostTool={IsHostTool},useButton={UseButton},linkWindowTarget={LinkWindowTarget},moduleFriendlyName={ModuleFriendlyName},controlKey={ControlKey},showAsPopUp={ShowAsPopUp}): this.LinkWindowTarget → {Arg7}", toolName, isHostTool, useButton, linkWindowTarget, moduleFriendlyName, controlKey, showAsPopUp, this.LinkWindowTarget);
+			Logger.LogDebug("RibbonBarToolInfo(toolName={ToolName},isHostTool={IsHostTool},useButton={UseButton},linkWindowTarget={LinkWindowTarget},moduleFriendlyName={ModuleFriendlyName},controlKey={ControlKey},showAsPopUp={ShowAsPopUp}): this.ModuleFriendlyName → {Arg7}", toolName, isHostTool, useButton, linkWindowTarget, moduleFriendlyName, controlKey, showAsPopUp, this.ModuleFriendlyName);
+			Logger.LogDebug("RibbonBarToolInfo(toolName={ToolName},isHostTool={IsHostTool},useButton={UseButton},linkWindowTarget={LinkWindowTarget},moduleFriendlyName={ModuleFriendlyName},controlKey={ControlKey},showAsPopUp={ShowAsPopUp}): this.ControlKey → {Arg7}", toolName, isHostTool, useButton, linkWindowTarget, moduleFriendlyName, controlKey, showAsPopUp, this.ControlKey);
             this.UseButton = useButton;
             this.LinkWindowTarget = linkWindowTarget;
             this.ModuleFriendlyName = moduleFriendlyName;
+			Logger.LogDebug("RibbonBarToolInfo(toolName={ToolName},isHostTool={IsHostTool},useButton={UseButton},linkWindowTarget={LinkWindowTarget},moduleFriendlyName={ModuleFriendlyName},controlKey={ControlKey},showAsPopUp={ShowAsPopUp}): this.UseButton → {Arg7}", toolName, isHostTool, useButton, linkWindowTarget, moduleFriendlyName, controlKey, showAsPopUp, this.UseButton);
             this.ControlKey = controlKey;
             this.ShowAsPopUp = showAsPopUp;
+			Logger.LogDebug("<<< Exiting RibbonBarToolInfo(toolName={ToolName},isHostTool={IsHostTool},useButton={UseButton},linkWindowTarget={LinkWindowTarget},moduleFriendlyName={ModuleFriendlyName},controlKey={ControlKey},showAsPopUp={ShowAsPopUp})", toolName, isHostTool, useButton, linkWindowTarget, moduleFriendlyName, controlKey, showAsPopUp);
+			Logger.LogDebug("RibbonBarToolInfo(toolName={ToolName},isHostTool={IsHostTool},useButton={UseButton},linkWindowTarget={LinkWindowTarget},moduleFriendlyName={ModuleFriendlyName},controlKey={ControlKey},showAsPopUp={ShowAsPopUp}): this.ShowAsPopUp → {Arg7}", toolName, isHostTool, useButton, linkWindowTarget, moduleFriendlyName, controlKey, showAsPopUp, this.ShowAsPopUp);
         }
 
         /// <summary>Gets or sets the control key.</summary>

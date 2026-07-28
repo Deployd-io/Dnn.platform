@@ -8,6 +8,7 @@ namespace DotNetNuke.ComponentModel
 
     public abstract class AbstractContainer : IContainer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public abstract string Name { get; }
 
@@ -23,6 +24,7 @@ namespace DotNetNuke.ComponentModel
         /// <inheritdoc />
         public virtual TContract GetComponent<TContract>()
         {
+			Logger.LogDebug(">>> Entering GetComponent()");
             return (TContract)this.GetComponent(typeof(TContract));
         }
 
@@ -38,6 +40,7 @@ namespace DotNetNuke.ComponentModel
         /// <inheritdoc />
         public virtual string[] GetComponentList<TContract>()
         {
+			Logger.LogDebug(">>> Entering GetComponentList()");
             return this.GetComponentList(typeof(TContract));
         }
 
@@ -47,6 +50,8 @@ namespace DotNetNuke.ComponentModel
         /// <inheritdoc />
         public virtual IDictionary GetComponentSettings(Type component)
         {
+			Logger.LogDebug(">>> Entering GetComponentSettings(component={Component})", component);
+			Logger.LogDebug("<<< Exiting GetComponentSettings(component={Component})", component);
             return this.GetComponentSettings(component.FullName);
         }
 
@@ -62,7 +67,11 @@ namespace DotNetNuke.ComponentModel
         /// <inheritdoc />
         public virtual void RegisterComponent(string name, Type contractType, Type componentType)
         {
+			Logger.LogDebug(">>> Entering RegisterComponent(name={Name},contractType={ContractType},componentType={ComponentType})", name, contractType, componentType);
             this.RegisterComponent(name, contractType, componentType, ComponentLifeStyleType.Singleton);
+			Logger.LogDebug("<<< Exiting RegisterComponent(name={Name},contractType={ContractType},componentType={ComponentType})", name, contractType, componentType);
+			Logger.LogDebug(">>> Entering RegisterComponent(name={Name},componentType={ComponentType})", name, componentType);
+			Logger.LogDebug("<<< Exiting RegisterComponent(name={Name},componentType={ComponentType})", name, componentType);
         }
 
         /// <inheritdoc />
@@ -74,13 +83,19 @@ namespace DotNetNuke.ComponentModel
         /// <inheritdoc />
         public virtual void RegisterComponent(Type contractType, Type componentType)
         {
+			Logger.LogDebug(">>> Entering RegisterComponent(contractType={ContractType},componentType={ComponentType})", contractType, componentType);
             this.RegisterComponent(componentType.FullName, contractType, componentType, ComponentLifeStyleType.Singleton);
+			Logger.LogDebug("<<< Exiting RegisterComponent(contractType={ContractType},componentType={ComponentType})", contractType, componentType);
         }
 
         /// <inheritdoc />
         public virtual void RegisterComponent(Type contractType, Type componentType, ComponentLifeStyleType lifestyle)
         {
+			Logger.LogDebug(">>> Entering RegisterComponent(contractType={ContractType},componentType={ComponentType},lifestyle={Lifestyle})", contractType, componentType, lifestyle);
             this.RegisterComponent(componentType.FullName, contractType, componentType, lifestyle);
+			Logger.LogDebug("<<< Exiting RegisterComponent(contractType={ContractType},componentType={ComponentType},lifestyle={Lifestyle})", contractType, componentType, lifestyle);
+			Logger.LogDebug(">>> Entering RegisterComponent(componentType={ComponentType})", componentType);
+			Logger.LogDebug("<<< Exiting RegisterComponent(componentType={ComponentType})", componentType);
         }
 
         /// <inheritdoc />
@@ -137,7 +152,9 @@ namespace DotNetNuke.ComponentModel
         /// <inheritdoc />
         public virtual void RegisterComponentSettings(Type component, IDictionary dependencies)
         {
+			Logger.LogDebug(">>> Entering RegisterComponentSettings(component={Component},dependencies={Dependencies})", component, dependencies);
             this.RegisterComponentSettings(component.FullName, dependencies);
+			Logger.LogDebug("<<< Exiting RegisterComponentSettings(component={Component},dependencies={Dependencies})", component, dependencies);
         }
 
         /// <inheritdoc />
@@ -153,6 +170,8 @@ namespace DotNetNuke.ComponentModel
         public void RegisterComponentInstance(string name, object instance)
         {
             this.RegisterComponentInstance(name, instance.GetType(), instance);
+			Logger.LogDebug(">>> Entering RegisterComponentInstance(instance={Instance})", instance);
+			Logger.LogDebug("<<< Exiting RegisterComponentInstance(instance={Instance})", instance);
         }
 
         /// <inheritdoc />
@@ -169,6 +188,7 @@ namespace DotNetNuke.ComponentModel
 
         public virtual IDictionary GetCustomDependencies<TComponent>()
         {
+			Logger.LogDebug(">>> Entering GetCustomDependencies()");
             return this.GetComponentSettings(typeof(TComponent).FullName);
         }
     }

@@ -15,6 +15,7 @@ namespace DotNetNuke.DependencyInjection.Extensions
     /// <summary><see cref="Type"/> specific extensions to be used in Dependency Injection invocations.</summary>
     public static partial class TypeExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Safely Get all Types from the assembly. If there is an error while retrieving the types it will return an empty array of <see cref="Type"/>.</summary>
         /// <param name="assembly">The assembly to retrieve all types from.</param>
         /// <returns>An array of all <see cref="Type"/> in the given <see cref="Assembly"/>.</returns>
@@ -77,6 +78,7 @@ namespace DotNetNuke.DependencyInjection.Extensions
 
                 return 2;
             }
+			Logger.LogDebug("<<< Exiting SafeGetTypes(assembly={Assembly})", assembly);
         }
 
         /// <summary>Safely get all types from a set of assemblies.</summary>
@@ -87,6 +89,7 @@ namespace DotNetNuke.DependencyInjection.Extensions
             var loadExceptions = new Dictionary<Assembly, ReflectionTypeLoadException>();
             var otherExceptions = new Dictionary<Assembly, Exception>();
             var types = assemblies.SafeGetTypes(loadExceptions, otherExceptions);
+			Logger.LogDebug("SafeGetTypes(assemblies={Assemblies}): types → {Types}", assemblies, types);
             return new TypesResult(types.ToList(), loadExceptions, otherExceptions);
         }
 
@@ -95,6 +98,7 @@ namespace DotNetNuke.DependencyInjection.Extensions
         /// <param name="logger">The logger.</param>
         public static void LogOtherExceptions(this TypesResult result, ILog logger)
         {
+			Logger.LogDebug(">>> Entering LogOtherExceptions(result={Result},logger={Logger})", result, logger);
             if (logger is null)
             {
                 return;
@@ -106,6 +110,7 @@ namespace DotNetNuke.DependencyInjection.Extensions
                 var exception = exceptionPair.Value;
                 logger.Error($"Unable to get any types for {assembly.FullName}, see exception for details", exception);
             }
+			Logger.LogDebug("<<< Exiting LogOtherExceptions(result={Result},logger={Logger})", result, logger);
         }
 
         /// <summary>Builds a message to load for a collection of <see cref="ReflectionTypeLoadException"/> instances.</summary>
@@ -122,6 +127,7 @@ namespace DotNetNuke.DependencyInjection.Extensions
                         var loadException = exceptionPair.Value;
                         return BuildLoaderExceptionMessage(builder, assembly, loadException).AppendLine();
                     });
+					Logger.LogDebug("<<< Exiting BuildLoaderExceptionsMessage(IReadOnlyDictionary<Assembly={Arg0},loadExceptions={LoadExceptions})", IReadOnlyDictionary<Assembly, loadExceptions);
         }
 
         private static StringBuilder BuildLoaderExceptionMessage(StringBuilder builder, Assembly assembly, ReflectionTypeLoadException loadException)
@@ -155,14 +161,18 @@ namespace DotNetNuke.DependencyInjection.Extensions
 
         private static (IEnumerable<Type> Types, Exception Exception) GetTypesAndException(this Assembly assembly)
         {
+			Logger.LogDebug(">>> Entering GetTypesAndException(Types={Types},Exception={Exception})", Types, Exception);
             Exception exception = null;
             IEnumerable<Type> types;
+			Logger.LogDebug("GetTypesAndException(Types={Types},Exception={Exception}): exception → {Exception1}", Types, Exception, exception);
             try
             {
                 types = assembly.GetTypes();
+				Logger.LogDebug("GetTypesAndException(Types={Types},Exception={Exception}): types → {Types1}", Types, Exception, types);
             }
             catch (ReflectionTypeLoadException ex)
             {
+				Logger.LogError("Exception in GetTypesAndException(Types={Types},Exception={Exception}): {Arg2}", Types, Exception, ex.Message);
                 exception = ex;
 
                 // Ensure that DNN obtains all types that were loaded, ignoring the failure(s)
@@ -174,6 +184,7 @@ namespace DotNetNuke.DependencyInjection.Extensions
                 types = Enumerable.Empty<Type>();
             }
 
+			Logger.LogDebug("<<< Exiting GetTypesAndException(Types={Types},Exception={Exception})", Types, Exception);
             return (types.OrderBy(type => type.FullName ?? type.Name), exception);
         }
     }

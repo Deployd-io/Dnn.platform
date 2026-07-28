@@ -31,6 +31,7 @@ namespace Dnn.PersonaBar.Security.Components.Checks
     /// </summary>
     public class CheckUserProfilePage : BaseCheck
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>The default "Activity Feed" tab path.</summary>
         public const string ActivityFeedTabPath = "//ActivityFeed";
 
@@ -49,13 +50,17 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         public CheckUserProfilePage()
             : this(PortalController.Instance, TabController.Instance, PagesController.Instance)
         {
+		Logger.LogDebug(">>> Entering CheckUserProfilePage()");
         }
+		Logger.LogDebug("<<< Exiting CheckUserProfilePage()");
 
         /// <summary>Initializes a new instance of the <see cref="CheckUserProfilePage"/> class.</summary>
         /// <param name="pagesController">An instance of the <see cref="IPagesController"/> interface.</param>
         public CheckUserProfilePage(IPagesController pagesController)
             : this(PortalController.Instance, TabController.Instance, pagesController)
         {
+		Logger.LogDebug(">>> Entering CheckUserProfilePage(pagesController={PagesController})", pagesController);
+		Logger.LogDebug("<<< Exiting CheckUserProfilePage(pagesController={PagesController})", pagesController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CheckUserProfilePage"/> class.</summary>
@@ -85,13 +90,17 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc />
         protected override CheckResult ExecuteInternal()
         {
+			Logger.LogDebug(">>> Entering ExecuteInternal()");
+			Logger.LogDebug("<<< Exiting ExecuteInternal()");
             return this.UserProfilePageIsPublic() ? this.Public() : this.NotPublic();
         }
 
         private bool UserProfilePageIsPublic()
         {
+			Logger.LogDebug(">>> Entering UserProfilePageIsPublic()");
             var userProfilePage = this.tabController.GetTab(this.UserTabId, this.PortalId);
 
+			Logger.LogDebug("UserProfilePageIsPublic(): userProfilePage → {UserProfilePage}", userProfilePage);
             if (userProfilePage == null || userProfilePage.IsDeleted)
             {
                 return false; // invalid UserTabId in portal settings somehow
@@ -114,26 +123,34 @@ namespace Dnn.PersonaBar.Security.Components.Checks
 
             var myProfilePage = this.FindTabByPath(MyProfileTabPath, this.PortalId);
 
+			Logger.LogDebug("UserProfilePageIsPublic(): myProfilePage → {MyProfilePage}", myProfilePage);
             if (myProfilePage == null)
             {
                 return false; // "My Profile" page not found, so not public.
             }
 
+			Logger.LogDebug(">>> Entering PageIsPublic(tabInfo={TabInfo})", tabInfo);
+			Logger.LogDebug("<<< Exiting PageIsPublic(tabInfo={TabInfo})", tabInfo);
             return this.PageIsPublic(myProfilePage);
         }
 
         private CheckResult Public()
         {
+			Logger.LogDebug(">>> Entering Public()");
             return new CheckResult(SeverityEnum.Warning, this.Id);
         }
 
         private CheckResult NotPublic()
         {
+			Logger.LogDebug(">>> Entering NotPublic()");
+			Logger.LogDebug("<<< Exiting NotPublic()");
             return new CheckResult(SeverityEnum.Pass, this.Id);
         }
 
         private TabInfo FindTabByPath(string tabPath, int portalId)
         {
+			Logger.LogDebug(">>> Entering FindTabByPath(tabPath={TabPath},portalId={PortalId})", tabPath, portalId);
+			Logger.LogDebug("<<< Exiting FindTabByPath(tabPath={TabPath},portalId={PortalId})", tabPath, portalId);
             return this.tabController.GetTabsByPortal(portalId)
                 .Select(kvp => kvp.Value)
                 .Where(tab => !tab.IsDeleted)
@@ -147,6 +164,7 @@ namespace Dnn.PersonaBar.Security.Components.Checks
 
             var permissions = this.pagesController.GetPermissionsData(tabInfo.TabID);
 
+			Logger.LogDebug("<<< Exiting Public()");
             return permissions.RolePermissions
                 .Any(rp => rp.RoleId == allUsersRoleId &&
                     rp.Permissions.Any(p => p.PermissionName == ViewTab && p.AllowAccess));

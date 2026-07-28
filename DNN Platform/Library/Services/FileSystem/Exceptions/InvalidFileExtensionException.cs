@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.FileSystem
     [Serializable]
     public class InvalidFileExtensionException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="InvalidFileExtensionException"/> class.</summary>
         public InvalidFileExtensionException()
         {
+		Logger.LogDebug(">>> Entering InvalidFileExtensionException()");
+		Logger.LogDebug("<<< Exiting InvalidFileExtensionException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="InvalidFileExtensionException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Services.FileSystem
         public InvalidFileExtensionException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering InvalidFileExtensionException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting InvalidFileExtensionException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="InvalidFileExtensionException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

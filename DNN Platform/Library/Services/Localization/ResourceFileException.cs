@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class ResourceFileException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public ResourceFileException()
     {
+	Logger.LogDebug(">>> Entering ResourceFileException()");
+	Logger.LogDebug("<<< Exiting ResourceFileException()");
     }
 
     /// <inheritdoc />
     public ResourceFileException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering ResourceFileException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting ResourceFileException(message={Message})", message);
 
     /// <inheritdoc />
     public ResourceFileException(string message, Exception innerException)

@@ -18,6 +18,7 @@ namespace DotNetNuke.Entities.Urls
 
     internal class BasicFriendlyUrlProvider : FriendlyUrlProviderBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string RegexMatchExpression = "[^a-zA-Z0-9 ]";
         private static readonly Regex FriendlyPathRx = new Regex("(.[^\\\\?]*)\\\\?(.*)", RegexOptions.CultureInvariant | RegexOptions.Compiled);
         private static readonly Regex DefaultPageRx = new Regex(Globals.glbDefaultPage, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Compiled);
@@ -31,10 +32,12 @@ namespace DotNetNuke.Entities.Urls
         internal BasicFriendlyUrlProvider(NameValueCollection attributes)
             : base(attributes)
         {
+			Logger.LogDebug(">>> Entering BasicFriendlyUrlProvider(attributes={Attributes})", attributes);
             // Read the attributes for this provider
             this.includePageName = string.IsNullOrEmpty(attributes["includePageName"]) || bool.Parse(attributes["includePageName"]);
             this.regexMatch = !string.IsNullOrEmpty(attributes["regexMatch"]) ? attributes["regexMatch"] : RegexMatchExpression;
             this.fileExtension = !string.IsNullOrEmpty(attributes["fileExtension"]) ? attributes["fileExtension"] : ".aspx";
+			Logger.LogDebug("<<< Exiting BasicFriendlyUrlProvider(attributes={Attributes})", attributes);
         }
 
         public string FileExtension
@@ -55,12 +58,15 @@ namespace DotNetNuke.Entities.Urls
         /// <inheritdoc />
         internal override string FriendlyUrl(TabInfo tab, string path)
         {
+			Logger.LogDebug(">>> Entering FriendlyUrl(tab={Tab},path={Path})", tab, path);
+			Logger.LogDebug("<<< Exiting FriendlyUrl(tab={Tab},path={Path})", tab, path);
             return this.FriendlyUrl(tab, path, Globals.glbDefaultPage, PortalSettings.Current);
         }
 
         /// <inheritdoc />
         internal override string FriendlyUrl(TabInfo tab, string path, string pageName)
         {
+			Logger.LogDebug("<<< Exiting FriendlyUrl(tab={Tab},path={Path},pageName={PageName})", tab, path, pageName);
             return this.FriendlyUrl(tab, path, pageName, PortalSettings.Current);
         }
 
@@ -68,12 +74,15 @@ namespace DotNetNuke.Entities.Urls
         internal override string FriendlyUrl(TabInfo tab, string path, string pageName, IPortalSettings settings)
         {
             IPortalAliasInfo portalAliasInfo = ((PortalSettings)settings)?.PortalAlias;
+			Logger.LogDebug("FriendlyUrl(tab={Tab},path={Path},pageName={PageName},settings={Settings}): portalAliasInfo → {PortalAliasInfo}", tab, path, pageName, settings, portalAliasInfo);
+			Logger.LogDebug("<<< Exiting FriendlyUrl(tab={Tab},path={Path},pageName={PageName},settings={Settings})", tab, path, pageName, settings);
             return this.FriendlyUrl(tab, path, pageName, portalAliasInfo?.HttpAlias, settings);
         }
 
         /// <inheritdoc />
         internal override string FriendlyUrl(TabInfo tab, string path, string pageName, string portalAlias)
         {
+			Logger.LogDebug("<<< Exiting FriendlyUrl(tab={Tab},path={Path},pageName={PageName},portalAlias={PortalAlias})", tab, path, pageName, portalAlias);
             return this.FriendlyUrl(tab, path, pageName, portalAlias, null);
         }
 
@@ -83,8 +92,10 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>The formatted url.</returns>
         private static string AddPage(string path, string pageName)
         {
+			Logger.LogDebug(">>> Entering AddPage(path={Path},pageName={PageName})", path, pageName);
             string friendlyPath = path;
             if (friendlyPath.EndsWith("/", StringComparison.Ordinal))
+			Logger.LogDebug("AddPage(path={Path},pageName={PageName}): friendlyPath → {FriendlyPath}", path, pageName, friendlyPath);
             {
                 friendlyPath = $"{friendlyPath}{pageName}";
             }
@@ -93,6 +104,7 @@ namespace DotNetNuke.Entities.Urls
                 friendlyPath = $"{friendlyPath}/{pageName}";
             }
 
+			Logger.LogDebug("<<< Exiting AddPage(path={Path},pageName={PageName})", path, pageName);
             return friendlyPath;
         }
 
@@ -113,12 +125,16 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>The formatted url.</returns>
         private static string GetFriendlyAlias(string path, string portalAlias, bool isPagePath)
         {
+			Logger.LogDebug(">>> Entering GetFriendlyAlias(path={Path},portalAlias={PortalAlias},isPagePath={IsPagePath})", path, portalAlias, isPagePath);
             string friendlyPath = path;
             string matchString = string.Empty;
+			Logger.LogDebug("GetFriendlyAlias(path={Path},portalAlias={PortalAlias},isPagePath={IsPagePath}): friendlyPath → {FriendlyPath}", path, portalAlias, isPagePath, friendlyPath);
+			Logger.LogDebug("GetFriendlyAlias(path={Path},portalAlias={PortalAlias},isPagePath={IsPagePath}): matchString → {MatchString}", path, portalAlias, isPagePath, matchString);
             if (!string.IsNullOrEmpty(portalAlias))
             {
                 string httpAlias = Globals.AddHTTP(portalAlias).ToLowerInvariant();
                 if (HttpContext.Current?.Items["UrlRewrite:OriginalUrl"] != null)
+				Logger.LogDebug("GetFriendlyAlias(path={Path},portalAlias={PortalAlias},isPagePath={IsPagePath}): httpAlias → {HttpAlias}", path, portalAlias, isPagePath, httpAlias);
                 {
                     string originalUrl =
                         HttpContext.Current.Items["UrlRewrite:OriginalUrl"].ToString().ToLowerInvariant();
@@ -134,6 +150,7 @@ namespace DotNetNuke.Entities.Urls
                         // http://www.domain.com/Default.aspx?alias=www.domain.com/child"
                         Match portalMatch = Regex.Match(originalUrl, "^?alias=" + portalAlias, RegexOptions.IgnoreCase);
                         if (!ReferenceEquals(portalMatch, Match.Empty))
+						Logger.LogDebug("GetFriendlyAlias(path={Path},portalAlias={PortalAlias},isPagePath={IsPagePath}): portalMatch → {PortalMatch}", path, portalAlias, isPagePath, portalMatch);
                         {
                             matchString = httpAlias;
                         }
@@ -188,6 +205,7 @@ namespace DotNetNuke.Entities.Urls
                 friendlyPath = friendlyPath.Substring(1);
             }
 
+			Logger.LogDebug("<<< Exiting GetFriendlyAlias(path={Path},portalAlias={PortalAlias},isPagePath={IsPagePath})", path, portalAlias, isPagePath);
             return friendlyPath;
         }
 
@@ -217,8 +235,11 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>The formatted url.</returns>
         private string GetFriendlyQueryString(TabInfo tab, string path, string pageName)
         {
+			Logger.LogDebug(">>> Entering GetFriendlyQueryString(tab={Tab},path={Path},pageName={PageName})", tab, path, pageName);
             string friendlyPath = path;
             Match queryStringMatch = FriendlyPathRx.Match(friendlyPath);
+			Logger.LogDebug("GetFriendlyQueryString(tab={Tab},path={Path},pageName={PageName}): friendlyPath → {FriendlyPath}", tab, path, pageName, friendlyPath);
+			Logger.LogDebug("GetFriendlyQueryString(tab={Tab},path={Path},pageName={PageName}): queryStringMatch → {QueryStringMatch}", tab, path, pageName, queryStringMatch);
             string queryStringSpecialChars = string.Empty;
             if (!ReferenceEquals(queryStringMatch, Match.Empty))
             {
@@ -226,6 +247,7 @@ namespace DotNetNuke.Entities.Urls
                 friendlyPath = DefaultPageRx.Replace(friendlyPath, string.Empty);
                 string queryString = queryStringMatch.Groups[2].Value.Replace("&amp;", "&");
                 if (queryString.StartsWith("?", StringComparison.Ordinal))
+				Logger.LogDebug("GetFriendlyQueryString(tab={Tab},path={Path},pageName={PageName}): queryString → {QueryString}", tab, path, pageName, queryString);
                 {
                     queryString = queryString.TrimStart(Convert.ToChar("?"));
                 }
@@ -235,6 +257,7 @@ namespace DotNetNuke.Entities.Urls
                 {
                     string pathToAppend = string.Empty;
                     string[] pair = nameValuePairs[i].Split(Convert.ToChar("="));
+					Logger.LogDebug("GetFriendlyQueryString(tab={Tab},path={Path},pageName={PageName}): pathToAppend → {PathToAppend}", tab, path, pageName, pathToAppend);
 
                     // Add name part of name/value pair
                     if (friendlyPath.EndsWith("/", StringComparison.Ordinal))
@@ -261,6 +284,7 @@ namespace DotNetNuke.Entities.Urls
                                         {
                                             var tabId = Convert.ToInt32(pair[1], CultureInfo.InvariantCulture);
                                             if (tab.TabID == tabId)
+											Logger.LogDebug("GetFriendlyQueryString(tab={Tab},path={Path},pageName={PageName}): tabId → {TabId}", tab, path, pageName, tabId);
                                             {
                                                 if (!string.IsNullOrEmpty(tab.TabPath) && this.IncludePageName)
                                                 {
@@ -303,6 +327,7 @@ namespace DotNetNuke.Entities.Urls
                 return AddPage(friendlyPath, pageName) + "?" + queryStringSpecialChars;
             }
 
+			Logger.LogDebug("<<< Exiting GetFriendlyQueryString(tab={Tab},path={Path},pageName={PageName})", tab, path, pageName);
             return AddPage(friendlyPath, pageName);
         }
 
@@ -400,6 +425,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting FriendlyUrl(tab={Tab},path={Path},pageName={PageName},portalAlias={PortalAlias},portalSettings={PortalSettings})", tab, path, pageName, portalAlias, portalSettings);
             return friendlyPath;
         }
     }

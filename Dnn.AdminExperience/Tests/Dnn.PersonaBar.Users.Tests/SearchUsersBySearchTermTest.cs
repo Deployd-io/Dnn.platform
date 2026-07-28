@@ -16,14 +16,18 @@ namespace Dnn.PersonaBar.Users.Tests
     [TestFixture]
     public class SearchUsersBySearchTermTest
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private GetUsersContract usersContract;
         private UsersControllerTestable usersCtrl;
 
         [SetUp]
         public void Init()
         {
+			Logger.LogDebug(">>> Entering Init()");
             this.usersContract = new GetUsersContract
             {
+				Logger.LogDebug("Init(): this.usersContract → {Arg0}", this.usersContract);
+				Logger.LogDebug("Init(): usersContract → {UsersContract}", usersContract);
                 SearchText = null,
                 PageIndex = 0,
                 PageSize = 10,
@@ -34,6 +38,8 @@ namespace Dnn.PersonaBar.Users.Tests
             };
 
             this.usersCtrl = new UsersControllerTestable();
+			Logger.LogDebug("<<< Exiting Init()");
+			Logger.LogDebug("Init(): usersCtrl → {UsersCtrl}", usersCtrl);
         }
 
         [Test]
@@ -55,11 +61,13 @@ namespace Dnn.PersonaBar.Users.Tests
         [TestCase("search text", "search text%")]
         public void FilteredSearchTest(string searchText, string expectedFilteredText)
         {
+			Logger.LogDebug(">>> Entering FilteredSearchTest(searchText={SearchText},expectedFilteredText={ExpectedFilteredText})", searchText, expectedFilteredText);
             int totalRecords;
             this.usersContract.SearchText = searchText;
             this.usersCtrl.GetUsers(this.usersContract, true, out totalRecords);
 
             Assert.That(this.usersCtrl.LastSearch, Is.EqualTo(expectedFilteredText));
+			Logger.LogDebug("<<< Exiting FilteredSearchTest(searchText={SearchText},expectedFilteredText={ExpectedFilteredText})", searchText, expectedFilteredText);
         }
 
         private class UsersControllerTestable : UsersController

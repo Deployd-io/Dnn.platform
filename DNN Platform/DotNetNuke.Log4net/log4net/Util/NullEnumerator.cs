@@ -23,6 +23,7 @@ using System.Collections;
 
 namespace log4net.Util
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>An always empty <see cref="IEnumerator"/>.</summary>
     /// <remarks>
     /// <para>
@@ -42,6 +43,8 @@ namespace log4net.Util
         /// </remarks>
         private NullEnumerator()
         {
+		Logger.LogDebug(">>> Entering NullEnumerator()");
+		Logger.LogDebug("<<< Exiting NullEnumerator()");
         }
 
         /// <summary>Get the singleton instance of the <see cref="NullEnumerator" />.</summary>
@@ -86,6 +89,8 @@ namespace log4net.Util
         /// </remarks>
         public bool MoveNext()
         {
+			Logger.LogDebug(">>> Entering MoveNext()");
+			Logger.LogDebug("<<< Exiting MoveNext()");
             return false;
         }
   
@@ -97,6 +102,8 @@ namespace log4net.Util
         /// </remarks>
         public void Reset() 
         {
+		Logger.LogDebug(">>> Entering Reset()");
+		Logger.LogDebug("<<< Exiting Reset()");
         }
 
         /// <summary>The singleton instance of the <see cref="NullEnumerator" />.</summary>

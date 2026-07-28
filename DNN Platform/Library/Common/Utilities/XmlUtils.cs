@@ -28,11 +28,14 @@ namespace DotNetNuke.Common.Utilities
 
         public static void AppendElement(ref XmlDocument objDoc, XmlNode objNode, string attName, string attValue, bool includeIfEmpty)
         {
+			Logger.LogDebug(">>> Entering AppendElement(objDoc={ObjDoc},objNode={ObjNode},attName={AttName},attValue={AttValue},includeIfEmpty={IncludeIfEmpty})", objDoc, objNode, attName, attValue, includeIfEmpty);
             AppendElement(ref objDoc, objNode, attName, attValue, includeIfEmpty, false);
+			Logger.LogDebug("<<< Exiting AppendElement(objDoc={ObjDoc},objNode={ObjNode},attName={AttName},attValue={AttValue},includeIfEmpty={IncludeIfEmpty})", objDoc, objNode, attName, attValue, includeIfEmpty);
         }
 
         public static void AppendElement(ref XmlDocument objDoc, XmlNode objNode, string attName, string attValue, bool includeIfEmpty, bool cdata)
         {
+			Logger.LogDebug(">>> Entering AppendElement(objDoc={ObjDoc},objNode={ObjNode},attName={AttName},attValue={AttValue},includeIfEmpty={IncludeIfEmpty},cdata={Cdata})", objDoc, objNode, attName, attValue, includeIfEmpty, cdata);
             if (string.IsNullOrEmpty(attValue) && !includeIfEmpty)
             {
                 return;
@@ -46,12 +49,17 @@ namespace DotNetNuke.Common.Utilities
             {
                 objNode.AppendChild(CreateElement(objDoc, attName, attValue));
             }
+			Logger.LogDebug("<<< Exiting AppendElement(objDoc={ObjDoc},objNode={ObjNode},attName={AttName},attValue={AttValue},includeIfEmpty={IncludeIfEmpty},cdata={Cdata})", objDoc, objNode, attName, attValue, includeIfEmpty, cdata);
         }
 
         public static XmlAttribute CreateAttribute(XmlDocument objDoc, string attName, string attValue)
         {
+			Logger.LogDebug(">>> Entering CreateAttribute(objDoc={ObjDoc},attName={AttName},attValue={AttValue})", objDoc, attName, attValue);
             XmlAttribute attribute = objDoc.CreateAttribute(attName);
             attribute.Value = attValue;
+			Logger.LogDebug("CreateAttribute(objDoc={ObjDoc},attName={AttName},attValue={AttValue}): attribute → {Attribute}", objDoc, attName, attValue, attribute);
+			Logger.LogDebug("CreateAttribute(objDoc={ObjDoc},attName={AttName},attValue={AttValue}): attribute.Value → {Arg3}", objDoc, attName, attValue, attribute.Value);
+			Logger.LogDebug("<<< Exiting CreateAttribute(objDoc={ObjDoc},attName={AttName},attValue={AttValue})", objDoc, attName, attValue);
             return attribute;
         }
 
@@ -60,26 +68,36 @@ namespace DotNetNuke.Common.Utilities
             XmlAttribute attribute = objDoc.CreateAttribute(attName);
             attribute.Value = attValue;
             objNode.Attributes.Append(attribute);
+			Logger.LogDebug("CreateAttribute(objDoc={ObjDoc},objNode={ObjNode},attName={AttName},attValue={AttValue}): attribute.Value → {Arg4}", objDoc, objNode, attName, attValue, attribute.Value);
         }
 
         public static XmlElement CreateElement(XmlDocument document, string nodeName, string nodeValue)
         {
+			Logger.LogDebug(">>> Entering CreateElement(document={Document},nodeName={NodeName},nodeValue={NodeValue})", document, nodeName, nodeValue);
             XmlElement element = document.CreateElement(nodeName);
             element.InnerText = nodeValue;
+			Logger.LogDebug("CreateElement(document={Document},nodeName={NodeName},nodeValue={NodeValue}): element → {Element}", document, nodeName, nodeValue, element);
+			Logger.LogDebug("CreateElement(document={Document},nodeName={NodeName},nodeValue={NodeValue}): element.InnerText → {Arg3}", document, nodeName, nodeValue, element.InnerText);
+			Logger.LogDebug("<<< Exiting CreateElement(document={Document},nodeName={NodeName},nodeValue={NodeValue})", document, nodeName, nodeValue);
             return element;
         }
 
         public static XmlElement CreateCDataElement(XmlDocument document, string nodeName, string nodeValue)
         {
+			Logger.LogDebug(">>> Entering CreateCDataElement(document={Document},nodeName={NodeName},nodeValue={NodeValue})", document, nodeName, nodeValue);
             XmlElement element = document.CreateElement(nodeName);
             element.AppendChild(document.CreateCDataSection(nodeValue));
+			Logger.LogDebug("CreateCDataElement(document={Document},nodeName={NodeName},nodeValue={NodeValue}): element → {Element}", document, nodeName, nodeValue, element);
+			Logger.LogDebug("<<< Exiting CreateCDataElement(document={Document},nodeName={NodeName},nodeValue={NodeValue})", document, nodeName, nodeValue);
             return element;
         }
 
         public static object Deserialize(Stream objStream, Type type)
         {
+			Logger.LogDebug(">>> Entering Deserialize(objStream={ObjStream},type={Type})", objStream, type);
             var obj = Activator.CreateInstance(type);
             if (obj is Dictionary<int, TabInfo>)
+			Logger.LogDebug("Deserialize(objStream={ObjStream},type={Type}): obj → {Obj}", objStream, type, obj);
             {
                 obj = DeSerializeDictionary<TabInfo>(objStream, "dictionary");
                 return obj;
@@ -105,9 +123,13 @@ namespace DotNetNuke.Common.Utilities
 
             var serializer = new XmlSerializer(type);
             using var tr = new StreamReader(objStream);
+			Logger.LogDebug("Deserialize(objStream={ObjStream},type={Type}): serializer → {Serializer}", objStream, type, serializer);
+			Logger.LogDebug("Deserialize(objStream={ObjStream},type={Type}): tr → {Tr}", objStream, type, tr);
             using var xmlReader = XmlReader.Create(tr);
             obj = serializer.Deserialize(xmlReader);
+			Logger.LogDebug("Deserialize(objStream={ObjStream},type={Type}): xmlReader → {XmlReader}", objStream, type, xmlReader);
             tr.Close();
+			Logger.LogDebug("<<< Exiting Deserialize(objStream={ObjStream},type={Type})", objStream, type);
             return obj;
         }
 
@@ -147,8 +169,10 @@ namespace DotNetNuke.Common.Utilities
 
         public static Hashtable DeSerializeHashtable(string xmlSource, string rootname)
         {
+			Logger.LogDebug(">>> Entering DeSerializeHashtable(xmlSource={XmlSource},rootname={Rootname})", xmlSource, rootname);
             var hashTable = new Hashtable();
 
+			Logger.LogDebug("DeSerializeHashtable(xmlSource={XmlSource},rootname={Rootname}): hashTable → {HashTable}", xmlSource, rootname, hashTable);
             if (!string.IsNullOrEmpty(xmlSource))
             {
                 try
@@ -163,10 +187,12 @@ namespace DotNetNuke.Common.Utilities
                     {
                         string key = xmlItem.GetAttribute("key");
                         string typeName = xmlItem.GetAttribute("type");
+						Logger.LogWarning("DeSerializeHashtable(xmlSource={XmlSource},rootname={Rootname}): key → {Key}", xmlSource, rootname, key);
 
                         // Create the XmlSerializer
                         var serializer = new XmlSerializer(Type.GetType(typeName));
 
+						Logger.LogDebug("DeSerializeHashtable(xmlSource={XmlSource},rootname={Rootname}): serializer → {Serializer}", xmlSource, rootname, serializer);
                         // A reader is needed to read the XML document.
                         var reader = new XmlTextReader(new StringReader(xmlItem.InnerXml))
                         {
@@ -185,6 +211,9 @@ namespace DotNetNuke.Common.Utilities
                 }
             }
 
+			Logger.LogDebug(">>> Entering SerializeHashtable(hashtable={Hashtable},xmlDocument={XmlDocument},rootNode={RootNode},elementName={ElementName},keyField={KeyField},valueField={ValueField})", hashtable, xmlDocument, rootNode, elementName, keyField, valueField);
+			Logger.LogDebug("SerializeHashtable(hashtable={Hashtable},xmlDocument={XmlDocument},rootNode={RootNode},elementName={ElementName},keyField={KeyField},valueField={ValueField}): nodeSettingName.InnerText → {Arg6}", hashtable, xmlDocument, rootNode, elementName, keyField, valueField, nodeSettingName.InnerText);
+			Logger.LogDebug("<<< Exiting SerializeHashtable(hashtable={Hashtable},xmlDocument={XmlDocument},rootNode={RootNode},elementName={ElementName},keyField={KeyField},valueField={ValueField})", hashtable, xmlDocument, rootNode, elementName, keyField, valueField);
             return hashTable;
         }
 
@@ -194,43 +223,57 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The attribute value.</returns>
         public static string GetAttributeValue(XPathNavigator nav, string attributeName)
         {
+			Logger.LogDebug(">>> Entering GetAttributeValue(nav={Nav},attributeName={AttributeName})", nav, attributeName);
+			Logger.LogDebug("<<< Exiting GetAttributeValue(nav={Nav},attributeName={AttributeName})", nav, attributeName);
             return nav.GetAttribute(attributeName, string.Empty);
         }
 
         public static bool GetAttributeValueAsBoolean(XPathNavigator navigator, string attributeName, bool defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetAttributeValueAsBoolean(navigator={Navigator},attributeName={AttributeName},defaultValue={DefaultValue})", navigator, attributeName, defaultValue);
             bool boolValue = defaultValue;
             string strValue = GetAttributeValue(navigator, attributeName);
+			Logger.LogDebug("GetAttributeValueAsBoolean(navigator={Navigator},attributeName={AttributeName},defaultValue={DefaultValue}): boolValue → {BoolValue}", navigator, attributeName, defaultValue, boolValue);
+			Logger.LogDebug("GetAttributeValueAsBoolean(navigator={Navigator},attributeName={AttributeName},defaultValue={DefaultValue}): strValue → {StrValue}", navigator, attributeName, defaultValue, strValue);
             if (!string.IsNullOrEmpty(strValue))
             {
                 boolValue = Convert.ToBoolean(strValue);
             }
 
+			Logger.LogDebug("<<< Exiting GetAttributeValueAsBoolean(navigator={Navigator},attributeName={AttributeName},defaultValue={DefaultValue})", navigator, attributeName, defaultValue);
             return boolValue;
         }
 
         public static int GetAttributeValueAsInteger(XPathNavigator navigator, string attributeName, int defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetAttributeValueAsInteger(navigator={Navigator},attributeName={AttributeName},defaultValue={DefaultValue})", navigator, attributeName, defaultValue);
             int intValue = defaultValue;
             string strValue = GetAttributeValue(navigator, attributeName);
+			Logger.LogDebug("GetAttributeValueAsInteger(navigator={Navigator},attributeName={AttributeName},defaultValue={DefaultValue}): intValue → {IntValue}", navigator, attributeName, defaultValue, intValue);
+			Logger.LogDebug("GetAttributeValueAsInteger(navigator={Navigator},attributeName={AttributeName},defaultValue={DefaultValue}): strValue → {StrValue}", navigator, attributeName, defaultValue, strValue);
             if (!string.IsNullOrEmpty(strValue))
             {
                 intValue = Convert.ToInt32(strValue, CultureInfo.InvariantCulture);
             }
 
+			Logger.LogDebug("<<< Exiting GetAttributeValueAsInteger(navigator={Navigator},attributeName={AttributeName},defaultValue={DefaultValue})", navigator, attributeName, defaultValue);
             return intValue;
         }
 
         public static long GetAttributeValueAsLong(XPathNavigator navigator, string attributeName, long defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetAttributeValueAsLong(navigator={Navigator},attributeName={AttributeName},defaultValue={DefaultValue})", navigator, attributeName, defaultValue);
             long intValue = defaultValue;
 
+			Logger.LogDebug("GetAttributeValueAsLong(navigator={Navigator},attributeName={AttributeName},defaultValue={DefaultValue}): intValue → {IntValue}", navigator, attributeName, defaultValue, intValue);
             string strValue = GetAttributeValue(navigator, attributeName);
             if (!string.IsNullOrEmpty(strValue))
+			Logger.LogDebug("GetAttributeValueAsLong(navigator={Navigator},attributeName={AttributeName},defaultValue={DefaultValue}): strValue → {StrValue}", navigator, attributeName, defaultValue, strValue);
             {
                 intValue = Convert.ToInt64(strValue, CultureInfo.InvariantCulture);
             }
 
+			Logger.LogDebug("<<< Exiting GetAttributeValueAsLong(navigator={Navigator},attributeName={AttributeName},defaultValue={DefaultValue})", navigator, attributeName, defaultValue);
             return intValue;
         }
 
@@ -240,6 +283,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The value of the node or <see cref="string.Empty"/> if the node doesn't exist or doesn't have a value.</returns>
         public static string GetNodeValue(XPathNavigator navigator, string path)
         {
+			Logger.LogDebug(">>> Entering GetNodeValue(navigator={Navigator},path={Path})", navigator, path);
+			Logger.LogDebug("<<< Exiting GetNodeValue(navigator={Navigator},path={Path})", navigator, path);
             return GetNodeValue(navigator, path, string.Empty);
         }
 
@@ -262,6 +307,7 @@ namespace DotNetNuke.Common.Utilities
                 return defaultValue;
             }
 
+			Logger.LogDebug("<<< Exiting GetNodeValue(navigator={Navigator},path={Path},defaultValue={DefaultValue})", navigator, path, defaultValue);
             return strValue;
         }
 
@@ -272,6 +318,7 @@ namespace DotNetNuke.Common.Utilities
         /// <remarks>If the node does not exist or it causes any error the default value will be returned.</remarks>
         public static string GetNodeValue(XmlNode objNode, string nodeName)
         {
+			Logger.LogDebug("<<< Exiting GetNodeValue(objNode={ObjNode},nodeName={NodeName})", objNode, nodeName);
             return GetNodeValue(objNode, nodeName, string.Empty);
         }
 
@@ -293,6 +340,7 @@ namespace DotNetNuke.Common.Utilities
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetNodeValue(objNode={ObjNode},nodeName={NodeName},defaultValue={DefaultValue})", objNode, nodeName, defaultValue);
             return strValue;
         }
 
@@ -304,6 +352,8 @@ namespace DotNetNuke.Common.Utilities
         /// <seealso cref="Convert.ToBoolean(string)"/>
         public static bool GetNodeValueBoolean(XmlNode objNode, string nodeName)
         {
+			Logger.LogDebug(">>> Entering GetNodeValueBoolean(objNode={ObjNode},nodeName={NodeName})", objNode, nodeName);
+			Logger.LogDebug("<<< Exiting GetNodeValueBoolean(objNode={ObjNode},nodeName={NodeName})", objNode, nodeName);
             return GetNodeValueBoolean(objNode, nodeName, false);
         }
 
@@ -326,6 +376,7 @@ namespace DotNetNuke.Common.Utilities
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetNodeValueBoolean(objNode={ObjNode},nodeName={NodeName},defaultValue={DefaultValue})", objNode, nodeName, defaultValue);
             return bValue;
         }
 
@@ -336,6 +387,7 @@ namespace DotNetNuke.Common.Utilities
         /// <seealso cref="Convert.ToBoolean(string)"/>
         public static bool GetNodeValueBoolean(XPathNavigator navigator, string path)
         {
+			Logger.LogDebug("<<< Exiting GetNodeValueBoolean(navigator={Navigator},path={Path})", navigator, path);
             return GetNodeValueBoolean(navigator, path, false);
         }
 
@@ -359,6 +411,7 @@ namespace DotNetNuke.Common.Utilities
                 return defaultValue;
             }
 
+			Logger.LogDebug("<<< Exiting GetNodeValueBoolean(navigator={Navigator},path={Path},defaultValue={DefaultValue})", navigator, path, defaultValue);
             return Convert.ToBoolean(strValue);
         }
 
@@ -371,8 +424,10 @@ namespace DotNetNuke.Common.Utilities
         /// <seealso cref="Convert.ToDateTime(string)"/>
         public static DateTime GetNodeValueDate(XmlNode objNode, string nodeName, DateTime defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetNodeValueDate(objNode={ObjNode},nodeName={NodeName},defaultValue={DefaultValue})", objNode, nodeName, defaultValue);
             DateTime dateValue = defaultValue;
             if (objNode[nodeName] != null)
+			Logger.LogDebug("GetNodeValueDate(objNode={ObjNode},nodeName={NodeName},defaultValue={DefaultValue}): dateValue → {DateValue}", objNode, nodeName, defaultValue, dateValue);
             {
                 string strValue = objNode[nodeName].InnerText;
                 if (!string.IsNullOrEmpty(strValue))
@@ -385,6 +440,7 @@ namespace DotNetNuke.Common.Utilities
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetNodeValueDate(objNode={ObjNode},nodeName={NodeName},defaultValue={DefaultValue})", objNode, nodeName, defaultValue);
             return dateValue;
         }
 
@@ -414,6 +470,7 @@ namespace DotNetNuke.Common.Utilities
                 return Null.NullDate;
             }
 
+			Logger.LogDebug("<<< Exiting GetNodeValueDate(navigator={Navigator},path={Path},defaultValue={DefaultValue})", navigator, path, defaultValue);
             return dateValue;
         }
 
@@ -425,6 +482,8 @@ namespace DotNetNuke.Common.Utilities
         /// <seealso cref="Convert.ToInt32(string)"/>
         public static int GetNodeValueInt(XmlNode node, string nodeName)
         {
+			Logger.LogDebug(">>> Entering GetNodeValueInt(node={Node},nodeName={NodeName})", node, nodeName);
+			Logger.LogDebug("<<< Exiting GetNodeValueInt(node={Node},nodeName={NodeName})", node, nodeName);
             return GetNodeValueInt(node, nodeName, 0);
         }
 
@@ -447,6 +506,7 @@ namespace DotNetNuke.Common.Utilities
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetNodeValueInt(node={Node},nodeName={NodeName},defaultValue={DefaultValue})", node, nodeName, defaultValue);
             return intValue;
         }
 
@@ -457,6 +517,7 @@ namespace DotNetNuke.Common.Utilities
         /// <seealso cref="Convert.ToInt32(string)"/>
         public static int GetNodeValueInt(XPathNavigator navigator, string path)
         {
+			Logger.LogDebug("<<< Exiting GetNodeValueInt(navigator={Navigator},path={Path})", navigator, path);
             return GetNodeValueInt(navigator, path, 0);
         }
 
@@ -480,6 +541,7 @@ namespace DotNetNuke.Common.Utilities
                 return defaultValue;
             }
 
+			Logger.LogDebug("<<< Exiting GetNodeValueInt(navigator={Navigator},path={Path},defaultValue={DefaultValue})", navigator, path, defaultValue);
             return Convert.ToInt32(strValue, CultureInfo.InvariantCulture);
         }
 
@@ -491,6 +553,8 @@ namespace DotNetNuke.Common.Utilities
         /// <seealso cref="Convert.ToSingle(string)"/>
         public static float GetNodeValueSingle(XmlNode node, string nodeName)
         {
+			Logger.LogDebug(">>> Entering GetNodeValueSingle(node={Node},nodeName={NodeName})", node, nodeName);
+			Logger.LogDebug("<<< Exiting GetNodeValueSingle(node={Node},nodeName={NodeName})", node, nodeName);
             return GetNodeValueSingle(node, nodeName, 0);
         }
 
@@ -513,6 +577,7 @@ namespace DotNetNuke.Common.Utilities
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetNodeValueSingle(node={Node},nodeName={NodeName},defaultValue={DefaultValue})", node, nodeName, defaultValue);
             return sValue;
         }
 
@@ -523,6 +588,7 @@ namespace DotNetNuke.Common.Utilities
         /// <seealso cref="Convert.ToSingle(string)"/>
         public static float GetNodeValueSingle(XPathNavigator navigator, string path)
         {
+			Logger.LogDebug("<<< Exiting GetNodeValueSingle(navigator={Navigator},path={Path})", navigator, path);
             return GetNodeValueSingle(navigator, path, 0);
         }
 
@@ -546,6 +612,7 @@ namespace DotNetNuke.Common.Utilities
                 return defaultValue;
             }
 
+			Logger.LogDebug("<<< Exiting GetNodeValueSingle(navigator={Navigator},path={Path},defaultValue={DefaultValue})", navigator, path, defaultValue);
             return Convert.ToSingle(strValue, CultureInfo.InvariantCulture);
         }
 
@@ -554,27 +621,36 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>An XmlWriterSettings.</returns>
         public static XmlWriterSettings GetXmlWriterSettings(ConformanceLevel conformance)
         {
+			Logger.LogDebug(">>> Entering GetXmlWriterSettings(conformance={Conformance})", conformance);
             var settings = new XmlWriterSettings();
             settings.ConformanceLevel = conformance;
+			Logger.LogDebug("GetXmlWriterSettings(conformance={Conformance}): settings → {Settings}", conformance, settings);
+			Logger.LogDebug("GetXmlWriterSettings(conformance={Conformance}): settings.ConformanceLevel → {Arg1}", conformance, settings.ConformanceLevel);
+			Logger.LogDebug("GetXmlWriterSettings(conformance={Conformance}): settings.OmitXmlDeclaration → {Arg1}", conformance, settings.OmitXmlDeclaration);
             settings.OmitXmlDeclaration = true;
             settings.Indent = true;
+			Logger.LogDebug("GetXmlWriterSettings(conformance={Conformance}): settings.Indent → {Arg1}", conformance, settings.Indent);
+			Logger.LogDebug("<<< Exiting GetXmlWriterSettings(conformance={Conformance})", conformance);
             return settings;
         }
 
         public static string SerializeDictionary(IDictionary source, string rootName)
         {
+			Logger.LogDebug(">>> Entering SerializeDictionary(source={Source},rootName={RootName})", source, rootName);
             string strString;
             if (source.Count != 0)
             {
                 var xmlDoc = new XmlDocument { XmlResolver = null };
                 XmlElement xmlRoot = xmlDoc.CreateElement(rootName);
                 xmlDoc.AppendChild(xmlRoot);
+				Logger.LogDebug("SerializeDictionary(source={Source},rootName={RootName}): xmlRoot → {XmlRoot}", source, rootName, xmlRoot);
 
                 foreach (var key in source.Keys)
                 {
                     // Create the item Node
                     XmlElement xmlItem = xmlDoc.CreateElement("item");
 
+					Logger.LogDebug("SerializeDictionary(source={Source},rootName={RootName}): xmlItem → {XmlItem}", source, rootName, xmlItem);
                     // Save the key name and the object type
                     xmlItem.SetAttribute("key", Convert.ToString(key, CultureInfo.InvariantCulture));
                     xmlItem.SetAttribute("type", source[key].GetType().AssemblyQualifiedName);
@@ -583,6 +659,8 @@ namespace DotNetNuke.Common.Utilities
                     var xmlObject = new XmlDocument { XmlResolver = null };
                     var xmlSerializer = new XmlSerializer(source[key].GetType());
                     var sw = new StringWriter();
+					Logger.LogDebug("SerializeDictionary(source={Source},rootName={RootName}): xmlSerializer → {XmlSerializer}", source, rootName, xmlSerializer);
+					Logger.LogDebug("SerializeDictionary(source={Source},rootName={RootName}): sw → {Sw}", source, rootName, sw);
                     xmlSerializer.Serialize(sw, source[key]);
                     using (var xmlReader = XmlReader.Create(new StringReader(sw.ToString()), new XmlReaderSettings { XmlResolver = null, }))
                     {
@@ -596,12 +674,14 @@ namespace DotNetNuke.Common.Utilities
 
                 // Return the OuterXml of the profile
                 strString = xmlDoc.OuterXml;
+				Logger.LogDebug("SerializeDictionary(source={Source},rootName={RootName}): strString → {StrString}", source, rootName, strString);
             }
             else
             {
                 strString = string.Empty;
             }
 
+			Logger.LogDebug("<<< Exiting SerializeDictionary(source={Source},rootName={RootName})", source, rootName);
             return strString;
         }
 
@@ -627,11 +707,14 @@ namespace DotNetNuke.Common.Utilities
 
         public static void UpdateAttribute(XmlNode node, string attName, string attValue)
         {
+			Logger.LogDebug(">>> Entering UpdateAttribute(node={Node},attName={AttName},attValue={AttValue})", node, attName, attValue);
             if (node != null)
             {
                 XmlAttribute attrib = node.Attributes[attName];
                 attrib.InnerText = attValue;
+				Logger.LogDebug("UpdateAttribute(node={Node},attName={AttName},attValue={AttValue}): attrib.InnerText → {Arg3}", node, attName, attValue, attrib.InnerText);
             }
+			Logger.LogDebug("<<< Exiting UpdateAttribute(node={Node},attName={AttName},attValue={AttValue})", node, attName, attValue);
         }
 
         /// <summary>XML Encodes HTML.</summary>
@@ -639,6 +722,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The XML encoded HTML.</returns>
         public static string XMLEncode(string html)
         {
+			Logger.LogDebug(">>> Entering XMLEncode(html={Html})", html);
+			Logger.LogDebug("<<< Exiting XMLEncode(html={Html})", html);
             return "<![CDATA[" + html + "]]>";
         }
 
@@ -647,6 +732,7 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>A string with no control characters or entities above 0x00FD.</returns>
         public static string RemoveInvalidXmlCharacters(string content)
         {
+			Logger.LogDebug(">>> Entering RemoveInvalidXmlCharacters(content={Content})", content);
             if (string.IsNullOrEmpty(content))
             {
                 return content;
@@ -655,22 +741,27 @@ namespace DotNetNuke.Common.Utilities
             StringBuilder newString = new StringBuilder();
             foreach (var ch in content)
             {
+			Logger.LogDebug("RemoveInvalidXmlCharacters(content={Content}): newString → {NewString}", content, newString);
                 if (XmlConvert.IsXmlChar(ch))
                 {
                     newString.Append(ch);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting RemoveInvalidXmlCharacters(content={Content})", content);
             return newString.ToString();
         }
 
         public static void XSLTransform(XmlDocument doc, ref StreamWriter writer, string xsltUrl)
         {
+			Logger.LogDebug(">>> Entering XSLTransform(doc={Doc},writer={Writer},xsltUrl={XsltUrl})", doc, writer, xsltUrl);
             var xslt = new XslCompiledTransform();
             xslt.Load(xsltUrl);
+			Logger.LogDebug("XSLTransform(doc={Doc},writer={Writer},xsltUrl={XsltUrl}): xslt → {Xslt}", doc, writer, xsltUrl, xslt);
 
             // Transform the file.
             xslt.Transform(doc, null, writer);
+			Logger.LogDebug("<<< Exiting XSLTransform(doc={Doc},writer={Writer},xsltUrl={XsltUrl})", doc, writer, xsltUrl);
         }
 
         public static string Serialize(object obj)
@@ -717,6 +808,7 @@ namespace DotNetNuke.Common.Utilities
         /// <remarks>From Stack Overflow (<see href="http://stackoverflow.com/a/1352556/2688"/>).</remarks>
         public static string XPathLiteral(string value)
         {
+			Logger.LogDebug(">>> Entering XPathLiteral(value={Value})", value);
             // if the value contains only single or double quotes, construct
             // an XPath literal
             if (!value.Contains("\""))
@@ -736,11 +828,13 @@ namespace DotNetNuke.Common.Utilities
             //    concat("foo", '"', "bar")
             StringBuilder sb = new StringBuilder();
             sb.Append("concat(");
+			Logger.LogDebug("XPathLiteral(value={Value}): sb → {Sb}", value, sb);
             string[] substrings = value.Split('\"');
             for (int i = 0; i < substrings.Length; i++)
             {
                 bool needComma = i > 0;
                 if (substrings[i] != string.Empty)
+				Logger.LogDebug("XPathLiteral(value={Value}): needComma → {NeedComma}", value, needComma);
                 {
                     if (i > 0)
                     {
@@ -765,6 +859,7 @@ namespace DotNetNuke.Common.Utilities
             }
 
             sb.Append(')');
+			Logger.LogDebug("<<< Exiting XPathLiteral(value={Value})", value);
             return sb.ToString();
         }
 
@@ -774,16 +869,22 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(7, 0, 0, "Use XmlDocument.Load instead", RemovalVersion = 11)]
         public static partial XmlDocument GetXMLContent(string contentUrl)
         {
+			Logger.LogDebug(">>> Entering GetXMLContent(contentUrl={ContentUrl})", contentUrl);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             // This function reads an XML document via a URL and returns it as an XmlDocument object
             var functionReturnValue = new XmlDocument { XmlResolver = null };
             var req = WebRequest.Create(contentUrl);
             var result = req.GetResponse();
+			Logger.LogDebug("GetXMLContent(contentUrl={ContentUrl}): req → {Req}", contentUrl, req);
+			Logger.LogDebug("GetXMLContent(contentUrl={ContentUrl}): result → {Result}", contentUrl, result);
             var objXmlReader = new XmlTextReader(result.GetResponseStream())
             {
                 XmlResolver = null,
                 DtdProcessing = DtdProcessing.Prohibit,
             };
             functionReturnValue.Load(objXmlReader);
+			Logger.LogInformation("GetXMLContent(contentUrl)={ContentUrl}: external service call {ContentUrl1} took {Arg2} ms", contentUrl, contentUrl, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting GetXMLContent(contentUrl={ContentUrl})", contentUrl);
             return functionReturnValue;
         }
 
@@ -815,6 +916,7 @@ namespace DotNetNuke.Common.Utilities
             : XsltContext(table)
         {
             private readonly XsltArgumentList argumentList = argumentList;
+			Logger.LogDebug("<<< Exiting XsltContextWithVariables(table={Table},argumentList={ArgumentList})", table, argumentList);
 
             public XsltContextWithVariables(XsltArgumentList argumentList)
                 : this(new NameTable(), argumentList)
@@ -827,29 +929,38 @@ namespace DotNetNuke.Common.Utilities
             /// <inheritdoc />
             public override IXsltContextVariable ResolveVariable(string prefix, string name)
             {
+				Logger.LogDebug(">>> Entering ResolveVariable(prefix={Prefix},name={Name})", prefix, name);
+				Logger.LogDebug("<<< Exiting ResolveVariable(prefix={Prefix},name={Name})", prefix, name);
                 return new XPathExtensionVariable(prefix, name);
             }
 
             /// <inheritdoc />
             public override IXsltContextFunction ResolveFunction(string prefix, string name, XPathResultType[] ArgTypes)
             {
+				Logger.LogDebug(">>> Entering ResolveFunction(prefix={Prefix},name={Name},ArgTypes={ArgTypes})", prefix, name, ArgTypes);
+				Logger.LogDebug("<<< Exiting ResolveFunction(prefix={Prefix},name={Name},ArgTypes={ArgTypes})", prefix, name, ArgTypes);
                 return null;
             }
 
             /// <inheritdoc />
             public override bool PreserveWhitespace(XPathNavigator node)
             {
+				Logger.LogDebug(">>> Entering PreserveWhitespace(node={Node})", node);
+				Logger.LogDebug("<<< Exiting PreserveWhitespace(node={Node})", node);
                 return false;
             }
 
             /// <inheritdoc />
             public override int CompareDocument(string baseUri, string nextbaseUri)
             {
+				Logger.LogDebug(">>> Entering CompareDocument(baseUri={BaseUri},nextbaseUri={NextbaseUri})", baseUri, nextbaseUri);
+				Logger.LogDebug("<<< Exiting CompareDocument(baseUri={BaseUri},nextbaseUri={NextbaseUri})", baseUri, nextbaseUri);
                 return 0;
             }
 
             private class XPathExtensionVariable(string prefix, string varName) : IXsltContextVariable
             {
+				Logger.LogDebug(">>> Entering XPathExtensionVariable(prefix={Prefix},varName={VarName})", prefix, varName);
                 private readonly string prefix = prefix;
                 private readonly string varName = varName;
 
@@ -862,15 +973,18 @@ namespace DotNetNuke.Common.Utilities
                 /// <inheritdoc />
                 public XPathResultType VariableType => XPathResultType.Any;
 
+				Logger.LogDebug("<<< Exiting XPathExtensionVariable(prefix={Prefix},varName={VarName})", prefix, varName);
                 /// <inheritdoc />
                 public object Evaluate(XsltContext xsltContext)
                 {
+					Logger.LogDebug(">>> Entering Evaluate(xsltContext={XsltContext})", xsltContext);
                     if (xsltContext is XsltContextWithVariables context)
                     {
                         var argumentList = context.argumentList;
                         return argumentList.GetParam(this.varName, this.prefix);
                     }
 
+					Logger.LogDebug("<<< Exiting Evaluate(xsltContext={XsltContext})", xsltContext);
                     return null;
                 }
             }

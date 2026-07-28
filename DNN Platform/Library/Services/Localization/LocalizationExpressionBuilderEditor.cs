@@ -8,9 +8,12 @@ namespace DotNetNuke.Services.Localization
 
     public class LocalizationExpressionBuilderEditor : ExpressionEditor
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override object EvaluateExpression(string expression, object parseTimeData, Type propertyType, IServiceProvider serviceProvider)
         {
+			Logger.LogDebug(">>> Entering EvaluateExpression(expression={Expression},parseTimeData={ParseTimeData},propertyType={PropertyType},serviceProvider={ServiceProvider})", expression, parseTimeData, propertyType, serviceProvider);
+			Logger.LogDebug("<<< Exiting EvaluateExpression(expression={Expression},parseTimeData={ParseTimeData},propertyType={PropertyType},serviceProvider={ServiceProvider})", expression, parseTimeData, propertyType, serviceProvider);
             return string.Concat("[dnnLoc:", expression, "]");
         }
     }

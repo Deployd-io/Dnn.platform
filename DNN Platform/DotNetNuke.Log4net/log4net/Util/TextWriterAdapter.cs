@@ -25,6 +25,7 @@ using System.Globalization;
 
 namespace log4net.Util
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Adapter that extends <see cref="TextWriter"/> and forwards all
     /// messages to an instance of <see cref="TextWriter"/>.
@@ -54,7 +55,11 @@ namespace log4net.Util
         /// </remarks>
         protected TextWriterAdapter(TextWriter writer) : base(CultureInfo.InvariantCulture)
         {
+			Logger.LogDebug(">>> Entering TextWriterAdapter(writer={Writer})", writer);
             this.m_writer = writer;
+			Logger.LogDebug("<<< Exiting TextWriterAdapter(writer={Writer})", writer);
+			Logger.LogDebug("TextWriterAdapter(writer={Writer}): m_writer → {M_writer}", writer, m_writer);
+			Logger.LogDebug("TextWriterAdapter(writer={Writer}): this.m_writer → {Arg1}", writer, this.m_writer);
         }
 
         /// <summary>Gets or sets the underlying <see cref="TextWriter" />.</summary>
@@ -127,7 +132,9 @@ namespace log4net.Util
 #endif
         public void Close() 
         {
+			Logger.LogDebug(">>> Entering Close()");
             this.m_writer.Close();
+			Logger.LogDebug("<<< Exiting Close()");
         }
 
         /// <summary>Dispose this writer</summary>
@@ -139,10 +146,12 @@ namespace log4net.Util
         /// </remarks>
         protected override void Dispose(bool disposing)
         {
+			Logger.LogDebug(">>> Entering Dispose(disposing={Disposing})", disposing);
             if (disposing)
             {
                 ((IDisposable)this.m_writer).Dispose();
             }
+			Logger.LogDebug("<<< Exiting Dispose(disposing={Disposing})", disposing);
         }
 
         /// <summary>Flushes any buffered output</summary>
@@ -154,7 +163,9 @@ namespace log4net.Util
         /// </remarks>
         public override void Flush() 
         {
+			Logger.LogDebug(">>> Entering Flush()");
             this.m_writer.Flush();
+			Logger.LogDebug("<<< Exiting Flush()");
         }
 
         /// <summary>Writes a character to the wrapped TextWriter</summary>
@@ -180,7 +191,9 @@ namespace log4net.Util
         /// </remarks>
         public override void Write(char[] buffer, int index, int count) 
         {
+			Logger.LogDebug(">>> Entering Write(buffer={Buffer},index={Index},count={Count})", buffer, index, count);
             this.m_writer.Write(buffer, index, count);
+			Logger.LogDebug("<<< Exiting Write(buffer={Buffer},index={Index},count={Count})", buffer, index, count);
         }
     
         /// <summary>Writes a string to the wrapped TextWriter</summary>
@@ -192,7 +205,9 @@ namespace log4net.Util
         /// </remarks>
         public override void Write(String value) 
         {
+			Logger.LogDebug(">>> Entering Write(value={Value})", value);
             this.m_writer.Write(value);
+			Logger.LogDebug("<<< Exiting Write(value={Value})", value);
         }
     }
 }

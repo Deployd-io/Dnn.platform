@@ -42,6 +42,7 @@ namespace log4net.Filter
     /// <author>Gert Driesen</author>
     public class LevelRangeFilter : FilterSkeleton
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Flag to indicate the behavior when matching a <see cref="Level"/></summary>
         private bool m_acceptOnMatch = true;
 
@@ -54,6 +55,8 @@ namespace log4net.Filter
         /// <summary>Default constructor</summary>
         public LevelRangeFilter()
         {
+		Logger.DebugFormat(">>> Entering LevelRangeFilter()");
+		Logger.DebugFormat("<<< Exiting LevelRangeFilter()");
         }
 
         /// <summary><see cref="FilterDecision.Accept"/> when matching <see cref="LevelMin"/> and <see cref="LevelMax"/></summary>
@@ -117,6 +120,7 @@ namespace log4net.Filter
         /// </remarks>
         public override FilterDecision Decide(LoggingEvent loggingEvent) 
         {
+			Logger.DebugFormat(">>> Entering Decide(loggingEvent={0})", loggingEvent);
             if (loggingEvent == null)
             {
                 throw new ArgumentNullException("loggingEvent");
@@ -149,6 +153,7 @@ namespace log4net.Filter
             else 
             {
                 // event is ok for this filter; allow later filters to have a look..
+				Logger.DebugFormat("<<< Exiting Decide(loggingEvent={0})", loggingEvent);
                 return FilterDecision.Neutral;
             }
         }

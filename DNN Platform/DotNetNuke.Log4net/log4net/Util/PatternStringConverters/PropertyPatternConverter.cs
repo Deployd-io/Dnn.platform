@@ -22,6 +22,7 @@ using System.IO;
 
 namespace log4net.Util.PatternStringConverters
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Property pattern converter</summary>
     /// <remarks>
     /// <para>
@@ -56,17 +57,21 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         protected override void Convert(TextWriter writer, object state) 
         {
+			Logger.LogDebug(">>> Entering Convert(writer={Writer},state={State})", writer, state);
             CompositeProperties compositeProperties = new CompositeProperties();
 
+Logger.LogDebug("Convert(writer={Writer},state={State}): compositeProperties → {CompositeProperties}", writer, state, compositeProperties);
 #if !NETCF
             PropertiesDictionary logicalThreadProperties = LogicalThreadContext.Properties.GetProperties(false);
             if (logicalThreadProperties != null)
+			Logger.LogDebug("Convert(writer={Writer},state={State}): logicalThreadProperties → {LogicalThreadProperties}", writer, state, logicalThreadProperties);
             {
                 compositeProperties.Add(logicalThreadProperties);
             }
 #endif
             PropertiesDictionary threadProperties = ThreadContext.Properties.GetProperties(false);
             if (threadProperties != null)
+			Logger.LogDebug("Convert(writer={Writer},state={State}): threadProperties → {ThreadProperties}", writer, state, threadProperties);
             {
                 compositeProperties.Add(threadProperties);
             }
@@ -84,6 +89,7 @@ namespace log4net.Util.PatternStringConverters
                 // Write all the key value pairs
                 WriteDictionary(writer, null, compositeProperties.Flatten());
             }
+			Logger.LogDebug("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
         }
     }
 }

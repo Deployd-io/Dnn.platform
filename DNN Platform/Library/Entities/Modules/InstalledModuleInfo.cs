@@ -8,6 +8,7 @@ namespace DotNetNuke.Entities.Modules
 
     public class InstalledModuleInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public int DesktopModuleId { get; set; }
 
         public int Instances { get; set; }
@@ -20,6 +21,7 @@ namespace DotNetNuke.Entities.Modules
 
         public void WriteXml(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteXml(writer={Writer})", writer);
             // Write start of main elements
             writer.WriteStartElement("module");
 
@@ -30,6 +32,7 @@ namespace DotNetNuke.Entities.Modules
 
             // Write end of Host Info
             writer.WriteEndElement();
+			Logger.LogDebug("<<< Exiting WriteXml(writer={Writer})", writer);
         }
     }
 }

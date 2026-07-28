@@ -14,12 +14,17 @@ namespace DotNetNuke.UI.Skins.Controls
     /// <summary>A skin/theme object which displays a link to the DNN website.</summary>
     public partial class DotNetNukeControl : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IHostSettingsService hostSettingsService;
 
         /// <summary>Initializes a new instance of the <see cref="DotNetNukeControl"/> class.</summary>
         public DotNetNukeControl()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering DotNetNukeControl()");
+		Logger.LogDebug("<<< Exiting DotNetNukeControl()");
+		Logger.LogDebug(">>> Entering DotNetNukeControl(hostSettingsService={HostSettingsService})", hostSettingsService);
+		Logger.LogDebug("<<< Exiting DotNetNukeControl(hostSettingsService={HostSettingsService})", hostSettingsService);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DotNetNukeControl"/> class.</summary>
@@ -27,6 +32,7 @@ namespace DotNetNuke.UI.Skins.Controls
         public DotNetNukeControl(IHostSettingsService hostSettingsService)
         {
             this.hostSettingsService = hostSettingsService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
+			Logger.LogDebug("DotNetNukeControl(hostSettingsService={HostSettingsService}): hostSettingsService → {HostSettingsService1}", hostSettingsService, hostSettingsService);
         }
 
         public string CssClass { get; set; }
@@ -34,6 +40,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             if (!string.IsNullOrEmpty(this.CssClass))
             {
@@ -46,6 +53,7 @@ namespace DotNetNuke.UI.Skins.Controls
 
             // show copyright credits?
             this.Visible = this.hostSettingsService.GetBoolean("Copyright", true);
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
     }
 }

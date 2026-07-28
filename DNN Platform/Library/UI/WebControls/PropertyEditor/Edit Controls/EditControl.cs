@@ -16,6 +16,7 @@ namespace DotNetNuke.UI.WebControls
     [ValidationPropertyAttribute("Value")]
     public abstract class EditControl : WebControl, IPostBackDataHandler
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private object[] customAttributes;
 
         public event PropertyChangedEventHandler ItemAdded;
@@ -96,22 +97,28 @@ namespace DotNetNuke.UI.WebControls
         /// <returns><see langword="true"/> if the value has changed, otherwise <see langword="false"/>.</returns>
         public virtual bool LoadPostData(string postDataKey, NameValueCollection postCollection)
         {
+			Logger.LogDebug(">>> Entering LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             bool dataChanged = false;
             string presentValue = this.StringValue;
+			Logger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): dataChanged → {DataChanged}", postDataKey, postCollection, dataChanged);
             string postedValue = postCollection[postDataKey];
             if (!presentValue.Equals(postedValue, StringComparison.Ordinal))
             {
                 this.Value = postedValue;
+				Logger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): this.Value → {Arg2}", postDataKey, postCollection, this.Value);
                 dataChanged = true;
             }
 
+			Logger.LogDebug("<<< Exiting LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             return dataChanged;
         }
 
         /// <summary>RaisePostDataChangedEvent runs when the PostBackData has changed.  It triggers a <see cref="ValueChanged"/> Event.</summary>
         public void RaisePostDataChangedEvent()
         {
+			Logger.LogDebug(">>> Entering RaisePostDataChangedEvent()");
             this.OnDataChanged(EventArgs.Empty);
+			Logger.LogDebug("<<< Exiting RaisePostDataChangedEvent()");
         }
 
         /// <summary>OnDataChanged runs when the PostbackData has changed.  It raises the <see cref="ValueChanged"/> Event.</summary>
@@ -121,42 +128,51 @@ namespace DotNetNuke.UI.WebControls
         /// <summary>OnAttributesChanged runs when the CustomAttributes property has changed.</summary>
         protected virtual void OnAttributesChanged()
         {
+		Logger.LogDebug(">>> Entering OnAttributesChanged()");
+		Logger.LogDebug("<<< Exiting OnAttributesChanged()");
         }
 
         /// <summary>Runs when an item is added to a collection type property. It raises the <see cref="ItemAdded"/> event.</summary>
         /// <param name="e">The event arguments.</param>
         protected virtual void OnItemAdded(PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnItemAdded(e={E})", e);
             if (this.ItemAdded != null)
             {
                 this.ItemAdded(this, e);
             }
+			Logger.LogDebug("<<< Exiting OnItemAdded(e={E})", e);
         }
 
         /// <summary>Runs when an item is deleted from a collection type property. It raises the <see cref="ItemDeleted"/> event.</summary>
         /// <param name="e">The event arguments.</param>
         protected virtual void OnItemDeleted(PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnItemDeleted(e={E})", e);
             if (this.ItemDeleted != null)
             {
                 this.ItemDeleted(this, e);
             }
+			Logger.LogDebug("<<< Exiting OnItemDeleted(e={E})", e);
         }
 
         /// <summary>OnValueChanged runs when the Value has changed.  It raises the <see cref="ValueChanged"/> Event.</summary>
         /// <param name="e">The event arguments.</param>
         protected virtual void OnValueChanged(PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnValueChanged(e={E})", e);
             if (this.ValueChanged != null)
             {
                 this.ValueChanged(this, e);
             }
+			Logger.LogDebug("<<< Exiting OnValueChanged(e={E})", e);
         }
 
         /// <summary>RenderViewMode renders the View (readonly) mode of the control.</summary>
         /// <param name="writer">A HtmlTextWriter.</param>
         protected virtual void RenderViewMode(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering RenderViewMode(writer={Writer})", writer);
             string propValue = this.Page.Server.HtmlDecode(Convert.ToString(this.Value, CultureInfo.InvariantCulture));
 
             this.ControlStyle.AddAttributesToRender(writer);
@@ -166,12 +182,14 @@ namespace DotNetNuke.UI.WebControls
             writer.Write(security.InputFilter(propValue, PortalSecurity.FilterFlag.NoScripting));
 #pragma warning restore CS0618 // Type or member is obsolete
             writer.RenderEndTag();
+			Logger.LogDebug("<<< Exiting RenderViewMode(writer={Writer})", writer);
         }
 
         /// <summary>RenderEditMode renders the Edit mode of the control.</summary>
         /// <param name="writer">A HtmlTextWriter.</param>
         protected virtual void RenderEditMode(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering RenderEditMode(writer={Writer})", writer);
             string propValue = Convert.ToString(this.Value, CultureInfo.InvariantCulture);
 
             this.ControlStyle.AddAttributesToRender(writer);
@@ -181,11 +199,13 @@ namespace DotNetNuke.UI.WebControls
             writer.AddAttribute(HtmlTextWriterAttribute.Id, this.ClientID);
             writer.RenderBeginTag(HtmlTextWriterTag.Input);
             writer.RenderEndTag();
+			Logger.LogDebug("<<< Exiting RenderEditMode(writer={Writer})", writer);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer);
             var strOldValue = this.OldValue as string;
             if (this.EditMode == PropertyEditorMode.Edit || (this.Required && string.IsNullOrEmpty(strOldValue)))
             {
@@ -195,6 +215,7 @@ namespace DotNetNuke.UI.WebControls
             {
                 this.RenderViewMode(writer);
             }
+			Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer);
         }
     }
 }

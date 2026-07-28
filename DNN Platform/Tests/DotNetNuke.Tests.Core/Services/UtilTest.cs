@@ -14,18 +14,23 @@ namespace DotNetNuke.Tests.Core.Services
     [TestFixture]
     public class UtilTest
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [Test]
         [Ignore("The static class calls items in Globals that are not initialized.")]
         public void Dnn_9838_TryToCreateAndExecute_UnsuccesfulRewrite()
         {
+			Logger.LogDebug(">>> Entering Dnn_9838_TryToCreateAndExecute_UnsuccesfulRewrite()");
             this.TryToRewriteFile(lockFileFor: 1000, tryRewriteFileFor: 500, isRewritten: false);
+			Logger.LogDebug("<<< Exiting Dnn_9838_TryToCreateAndExecute_UnsuccesfulRewrite()");
         }
 
         [Test]
         [Ignore("The static class calls items in Globals that are not initialized.")]
         public void Dnn_9838_TryToCreateAndExecute_SuccessfulRewrite()
         {
+			Logger.LogDebug(">>> Entering Dnn_9838_TryToCreateAndExecute_SuccessfulRewrite()");
             this.TryToRewriteFile(lockFileFor: 500, tryRewriteFileFor: 1000, isRewritten: true);
+			Logger.LogDebug("<<< Exiting Dnn_9838_TryToCreateAndExecute_SuccessfulRewrite()");
         }
 
         private void TryToRewriteFile(int lockFileFor, int tryRewriteFileFor, bool isRewritten)
@@ -35,6 +40,7 @@ namespace DotNetNuke.Tests.Core.Services
 
             var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
 
+			Logger.LogDebug("TryToRewriteFile(lockFileFor={LockFileFor},tryRewriteFileFor={TryRewriteFileFor},isRewritten={IsRewritten}): fileStream → {FileStream}", lockFileFor, tryRewriteFileFor, isRewritten, fileStream);
             var task = Task.Run(() =>
             {
                 Debug.WriteLine("fileStream locked");
@@ -53,6 +59,7 @@ namespace DotNetNuke.Tests.Core.Services
 
             Assert.That(result, Is.EqualTo(isRewritten));
             task.Wait();
+			Logger.LogDebug("<<< Exiting TryToRewriteFile(lockFileFor={LockFileFor},tryRewriteFileFor={TryRewriteFileFor},isRewritten={IsRewritten})", lockFileFor, tryRewriteFileFor, isRewritten);
         }
     }
 }

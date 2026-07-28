@@ -14,6 +14,7 @@ namespace DotNetNuke.Tests.Utilities
     [DnnDeprecated(7, 0, 0, "Use Assert.Exception or ExpectedExceptionAttribute", RemovalVersion = 11)]
     public static partial class ExceptionAssert
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         // public static void Throws<TException>(Action act) where TException : Exception
         // {
         //    Throws<TException>(act, ex => true);
@@ -26,6 +27,7 @@ namespace DotNetNuke.Tests.Utilities
         public static void Throws<TException>(string message, Action act, Predicate<TException> checker)
             where TException : Exception
         {
+			Logger.LogDebug(">>> Entering Throws(message={Message},act={Act},checker={Checker})", message, act, checker);
             Throws<TException>(act, ex => ex.Message.Equals(message, StringComparison.Ordinal) && checker(ex));
         }
 
@@ -33,15 +35,20 @@ namespace DotNetNuke.Tests.Utilities
             where TException : Exception
         {
             bool matched = false;
+			Logger.LogDebug("<<< Exiting Throws(message={Message},act={Act},checker={Checker})", message, act, checker);
+			Logger.LogDebug("Throws(act={Act},checker={Checker}): matched → {Matched}", act, checker, matched);
             bool thrown = false;
             try
+			Logger.LogDebug("Throws(act={Act},checker={Checker}): thrown → {Thrown}", act, checker, thrown);
             {
                 act();
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in Throws(act={Act},checker={Checker}): {Arg2}", act, checker, ex.Message);
                 TException tex = ex as TException;
                 if (tex == null)
+				Logger.LogDebug("Throws(act={Act},checker={Checker}): tex → {Tex}", act, checker, tex);
                 {
                     if (typeof(TException) == typeof(TargetInvocationException))
                     {
@@ -83,15 +90,19 @@ namespace DotNetNuke.Tests.Utilities
 
         public static void ThrowsArgNull(string paramName, Action act)
         {
+			Logger.LogDebug(">>> Entering ThrowsArgNull(paramName={ParamName},act={Act})", paramName, act);
             Throws<ArgumentNullException>(act, ex => string.Equals(ex.ParamName, paramName, StringComparison.Ordinal));
+			Logger.LogDebug("<<< Exiting ThrowsArgNull(paramName={ParamName},act={Act})", paramName, act);
         }
 
         public static void ThrowsArgNullOrEmpty(string paramName, Action act)
         {
+			Logger.LogDebug(">>> Entering ThrowsArgNullOrEmpty(paramName={ParamName},act={Act})", paramName, act);
             Throws<ArgumentException>(
                 string.Format("Argument cannot be null or an empty string{1}Parameter name: {0}", paramName, Environment.NewLine),
                 act,
                 ex => string.Equals(ex.ParamName, paramName, StringComparison.Ordinal));
+				Logger.LogDebug("<<< Exiting ThrowsArgNullOrEmpty(paramName={ParamName},act={Act})", paramName, act);
         }
     }
 }

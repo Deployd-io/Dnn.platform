@@ -11,13 +11,18 @@ namespace DotNetNuke.Entities.Users
 
     public class MembershipPropertyAccess : IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly UserInfo objUser;
 
         /// <summary>Initializes a new instance of the <see cref="MembershipPropertyAccess"/> class.</summary>
         /// <param name="user">The user info.</param>
         public MembershipPropertyAccess(UserInfo user)
         {
+			Logger.LogDebug(">>> Entering MembershipPropertyAccess(user={User})", user);
             this.objUser = user;
+			Logger.LogDebug("<<< Exiting MembershipPropertyAccess(user={User})", user);
+			Logger.LogDebug("MembershipPropertyAccess(user={User}): objUser → {ObjUser}", user, objUser);
+			Logger.LogDebug("MembershipPropertyAccess(user={User}): this.objUser → {Arg1}", user, this.objUser);
         }
 
         /// <inheritdoc />
@@ -27,6 +32,7 @@ namespace DotNetNuke.Entities.Users
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope currentScope, ref bool propertyNotFound)
         {
+			Logger.LogDebug(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound);
             UserMembership objMembership = this.objUser.Membership;
             bool userQueriesHimself = this.objUser.UserID == accessingUser.UserID && this.objUser.UserID != -1;
             if (currentScope < Scope.DefaultSettings || (currentScope == Scope.DefaultSettings && !userQueriesHimself) ||
@@ -39,6 +45,7 @@ namespace DotNetNuke.Entities.Users
 
             string outputFormat = string.Empty;
             if (format == string.Empty)
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): outputFormat → {OutputFormat}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, outputFormat);
             {
                 outputFormat = "g";
             }
@@ -83,6 +90,7 @@ namespace DotNetNuke.Entities.Users
                     return PropertyAccess.FormatString(this.objUser.Email, format);
             }
 
+			Logger.LogDebug("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound);
             return PropertyAccess.GetObjectProperty(objMembership, propertyName, format, formatProvider, ref propertyNotFound);
         }
     }

@@ -21,6 +21,7 @@ namespace Dnn.PersonaBar.Styles.Services
     [MenuPermission(MenuName = Components.Constants.MenuName, Scope = ServiceScope.Admin)]
     public class StylesController : PersonaBarApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Gets the styles.
         /// </summary>
@@ -28,6 +29,7 @@ namespace Dnn.PersonaBar.Styles.Services
         [HttpGet]
         public IHttpActionResult GetStyles()
         {
+			Logger.LogDebug(">>> Entering GetStyles()");
             if (!this.CanEdit())
             {
                 return this.Unauthorized();
@@ -35,6 +37,9 @@ namespace Dnn.PersonaBar.Styles.Services
 
             var repo = new PortalStylesRepository();
             var settings = repo.GetSettings(this.PortalId);
+			Logger.LogDebug("GetStyles(): repo → {Repo}", repo);
+			Logger.LogDebug("GetStyles(): settings → {Settings}", settings);
+			Logger.LogDebug("<<< Exiting GetStyles()");
             return this.Ok(settings);
         }
 
@@ -76,6 +81,7 @@ namespace Dnn.PersonaBar.Styles.Services
         [ValidateAntiForgeryToken]
         public IHttpActionResult RestoreStyles()
         {
+			Logger.LogDebug(">>> Entering RestoreStyles()");
             if (!this.CanEdit())
             {
                 return this.Unauthorized();
@@ -83,12 +89,16 @@ namespace Dnn.PersonaBar.Styles.Services
 
             var repo = new PortalStylesRepository();
             var styles = new PortalStyles();
+			Logger.LogDebug("RestoreStyles(): repo → {Repo}", repo);
+			Logger.LogDebug("RestoreStyles(): styles → {Styles}", styles);
             repo.SaveSettings(this.PortalId, styles);
+			Logger.LogDebug("<<< Exiting RestoreStyles()");
             return this.Ok(styles);
         }
 
         private bool CanEdit()
         {
+			Logger.LogDebug(">>> Entering CanEdit()");
             if (this.UserInfo.IsSuperUser)
             {
                 return true;
@@ -96,10 +106,12 @@ namespace Dnn.PersonaBar.Styles.Services
 
             var allowAdminEdits = PortalController.Instance.GetCurrentSettings().GetStyles().AllowAdminEdits;
             if (this.UserInfo.IsAdmin && allowAdminEdits)
+			Logger.LogDebug("CanEdit(): allowAdminEdits → {AllowAdminEdits}", allowAdminEdits);
             {
                 return true;
             }
 
+			Logger.LogDebug("<<< Exiting CanEdit()");
             return false;
         }
     }

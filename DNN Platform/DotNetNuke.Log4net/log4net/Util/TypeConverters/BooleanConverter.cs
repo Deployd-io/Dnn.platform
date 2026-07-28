@@ -22,6 +22,7 @@ using System;
 
 namespace log4net.Util.TypeConverters
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Type converter for Boolean.
     /// </summary>
@@ -50,6 +51,9 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public bool CanConvertFrom(Type sourceType)
         {
+			Logger.LogDebug(">>> Entering CanConvertFrom(sourceType={SourceType})", sourceType);
+			Logger.LogDebug(">>> Entering ConvertFrom(source={Source})", source);
+			Logger.LogDebug("<<< Exiting ConvertFrom(source={Source})", source);
             return (sourceType == typeof(string));
         }
 

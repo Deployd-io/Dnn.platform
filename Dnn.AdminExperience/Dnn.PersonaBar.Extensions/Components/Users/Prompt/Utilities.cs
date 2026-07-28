@@ -11,12 +11,15 @@ namespace Dnn.PersonaBar.Users.Components.Prompt
     /// <summary>Utility methods for the users prompt commands.</summary>
     public partial class Utilities
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly UserValidator UserValidator = new UserValidator();
 
         /// <inheritdoc cref="IUserValidator.ValidateUser"/>
         [DnnDeprecated(9, 2, 1, "Use IUserValidator.ValidateUser.")]
         public static partial ConsoleErrorResultModel ValidateUser(int? userId, PortalSettings portalSettings, UserInfo currentUserInfo, out UserInfo userInfo)
         {
+			Logger.LogDebug(">>> Entering ValidateUser(userId={UserId},portalSettings={PortalSettings},currentUserInfo={CurrentUserInfo})", userId, portalSettings, currentUserInfo);
+			Logger.LogDebug("<<< Exiting ValidateUser(userId={UserId},portalSettings={PortalSettings},currentUserInfo={CurrentUserInfo})", userId, portalSettings, currentUserInfo);
             return UserValidator.ValidateUser(userId, portalSettings, currentUserInfo, out userInfo);
         }
     }

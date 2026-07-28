@@ -134,6 +134,7 @@ namespace log4net.Appender
 #endif
     public class FileAppender : TextWriterAppender
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Write only <see cref="Stream"/> that uses the <see cref="LockingModelBase"/> 
         /// to manage access to an underlying resource.
@@ -148,14 +149,19 @@ namespace log4net.Appender
                 public LockStateException(string message)
                     : base(message)
                 {
+				Logger.LogDebug(">>> Entering LockStateException(message={Message})", message);
                 }
+				Logger.LogDebug("<<< Exiting LockStateException(message={Message})", message);
 
                 public LockStateException()
                 {
+				Logger.LogDebug(">>> Entering LockStateException()");
+				Logger.LogDebug("<<< Exiting LockStateException()");
                 }
 
                 public LockStateException(string message, Exception innerException) : base(message, innerException)
                 {
+				Logger.LogDebug(">>> Entering LockStateException(message={Message},innerException={InnerException})", message, innerException);
                 }
 
 #if !NETCR && !NETSTANDARD1_3
@@ -172,19 +178,25 @@ namespace log4net.Appender
             public LockingStream(LockingModelBase locking)
                 : base()
             {
+				Logger.LogDebug(">>> Entering LockingStream(locking={Locking})", locking);
                 if (locking == null)
                 {
                     throw new ArgumentException("Locking model may not be null", "locking");
                 }
 
                 this.m_lockingModel = locking;
+				Logger.LogDebug("<<< Exiting LockingStream(locking={Locking})", locking);
+				Logger.LogDebug("LockingStream(locking={Locking}): m_lockingModel → {M_lockingModel}", locking, m_lockingModel);
+				Logger.LogDebug("LockingStream(locking={Locking}): this.m_lockingModel → {Arg1}", locking, this.m_lockingModel);
             }
 
 #if NETSTANDARD
             protected override void Dispose(bool disposing)
             {
+				Logger.LogDebug(">>> Entering Dispose(disposing={Disposing})", disposing);
                 m_lockingModel.CloseFile();
                 base.Dispose(disposing);
+				Logger.LogDebug("<<< Exiting Dispose(disposing={Disposing})", disposing);
             }
 #else
 
@@ -193,57 +205,78 @@ namespace log4net.Appender
             // Methods
             public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
             {
+				Logger.LogDebug(">>> Entering BeginRead(buffer={Buffer},offset={Offset},count={Count},callback={Callback},state={State})", buffer, offset, count, callback, state);
                 this.AssertLocked();
                 IAsyncResult ret = this.m_realStream.BeginRead(buffer, offset, count, callback, state);
                 this.m_readTotal = this.EndRead(ret);
+				Logger.LogDebug("BeginRead(buffer={Buffer},offset={Offset},count={Count},callback={Callback},state={State}): ret → {Ret}", buffer, offset, count, callback, state, ret);
+				Logger.LogDebug(">>> Entering Read(buffer={Buffer},offset={Offset},count={Count})", buffer, offset, count);
+				Logger.LogDebug("<<< Exiting Read(buffer={Buffer},offset={Offset},count={Count})", buffer, offset, count);
                 return ret;
             }
 
+			Logger.LogDebug("BeginRead(buffer={Buffer},offset={Offset},count={Count},callback={Callback},state={State}): m_readTotal → {M_readTotal}", buffer, offset, count, callback, state, m_readTotal);
             /// <summary>
             /// True asynchronous writes are not supported, the implementation forces a synchronous write.
             /// </summary>
             public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
             {
+				Logger.LogDebug(">>> Entering BeginWrite(buffer={Buffer},offset={Offset},count={Count},callback={Callback},state={State})", buffer, offset, count, callback, state);
                 this.AssertLocked();
                 IAsyncResult ret = this.m_realStream.BeginWrite(buffer, offset, count, callback, state);
                 this.EndWrite(ret);
+				Logger.LogDebug("BeginWrite(buffer={Buffer},offset={Offset},count={Count},callback={Callback},state={State}): ret → {Ret}", buffer, offset, count, callback, state, ret);
+				Logger.LogDebug(">>> Entering Write(buffer={Buffer},offset={Offset},count={Count})", buffer, offset, count);
+				Logger.LogDebug("<<< Exiting Write(buffer={Buffer},offset={Offset},count={Count})", buffer, offset, count);
                 return ret;
             }
 
             public override void Close()
             {
+				Logger.LogDebug(">>> Entering Close()");
                 this.m_lockingModel.CloseFile();
+				Logger.LogDebug("<<< Exiting Close()");
             }
 
             public override int EndRead(IAsyncResult asyncResult)
             {
+				Logger.LogDebug(">>> Entering EndRead(asyncResult={AsyncResult})", asyncResult);
                 this.AssertLocked();
+				Logger.LogDebug("<<< Exiting EndRead(asyncResult={AsyncResult})", asyncResult);
                 return this.m_readTotal;
             }
             public override void EndWrite(IAsyncResult asyncResult)
             {
+				Logger.LogDebug(">>> Entering EndWrite(asyncResult={AsyncResult})", asyncResult);
                 //No-op, it has already been handled
+				Logger.LogDebug("<<< Exiting EndWrite(asyncResult={AsyncResult})", asyncResult);
             }
 #endif
 
 #if NET_4_5 || NETSTANDARD
             public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
             {
+				Logger.LogDebug(">>> Entering ReadAsync(buffer={Buffer},offset={Offset},count={Count},cancellationToken={CancellationToken})", buffer, offset, count, cancellationToken);
                 this.AssertLocked();
+				Logger.LogDebug("<<< Exiting ReadAsync(buffer={Buffer},offset={Offset},count={Count},cancellationToken={CancellationToken})", buffer, offset, count, cancellationToken);
                 return this.m_realStream.ReadAsync(buffer, offset, count, cancellationToken);
             }
 
             public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
             {
+				Logger.LogDebug(">>> Entering WriteAsync(buffer={Buffer},offset={Offset},count={Count},cancellationToken={CancellationToken})", buffer, offset, count, cancellationToken);
                 this.AssertLocked(); 
+				Logger.LogDebug("<<< Exiting WriteAsync(buffer={Buffer},offset={Offset},count={Count},cancellationToken={CancellationToken})", buffer, offset, count, cancellationToken);
                 return base.WriteAsync(buffer, offset, count, cancellationToken);
             }
 #endif
 
             public override void Flush()
             {
+				Logger.LogDebug(">>> Entering Flush()");
                 this.AssertLocked();
                 this.m_realStream.Flush();
+				Logger.LogDebug("<<< Exiting Flush()");
             }
             public override int Read(byte[] buffer, int offset, int count)
             {
@@ -251,17 +284,23 @@ namespace log4net.Appender
             }
             public override int ReadByte()
             {
+				Logger.LogDebug(">>> Entering ReadByte()");
+				Logger.LogDebug("<<< Exiting ReadByte()");
                 return this.m_realStream.ReadByte();
             }
             public override long Seek(long offset, SeekOrigin origin)
             {
+				Logger.LogDebug(">>> Entering Seek(offset={Offset},origin={Origin})", offset, origin);
                 this.AssertLocked();
+				Logger.LogDebug("<<< Exiting Seek(offset={Offset},origin={Origin})", offset, origin);
                 return this.m_realStream.Seek(offset, origin);
             }
             public override void SetLength(long value)
             {
+				Logger.LogDebug(">>> Entering SetLength(value={Value})", value);
                 this.AssertLocked();
                 this.m_realStream.SetLength(value);
+				Logger.LogDebug("<<< Exiting SetLength(value={Value})", value);
             }
             void IDisposable.Dispose()
             {
@@ -278,8 +317,10 @@ namespace log4net.Appender
             }
             public override void WriteByte(byte value)
             {
+				Logger.LogDebug(">>> Entering WriteByte(value={Value})", value);
                 this.AssertLocked();
                 this.m_realStream.WriteByte(value);
+				Logger.LogDebug("<<< Exiting WriteByte(value={Value})", value);
             }
 
             // Properties
@@ -327,10 +368,12 @@ namespace log4net.Appender
 
             private void AssertLocked()
             {
+				Logger.LogDebug(">>> Entering AssertLocked()");
                 if (this.m_realStream == null)
                 {
                     throw new LockStateException("The file is not currently locked");
                 }
+				Logger.LogDebug("<<< Exiting AssertLocked()");
             }
 
             public bool AcquireLock()
@@ -349,6 +392,7 @@ namespace log4net.Appender
                         ret = true;
                     }
                 }
+				Logger.LogDebug("<<< Exiting AcquireLock()");
                 return ret;
             }
 
@@ -482,6 +526,7 @@ namespace log4net.Appender
             /// <returns></returns>
             protected Stream CreateStream(string filename, bool append, FileShare fileShare)
             {
+				Logger.LogDebug(">>> Entering CreateStream(filename={Filename},append={Append},fileShare={FileShare})", filename, append, fileShare);
                 using (this.CurrentAppender.SecurityContext.Impersonate(this))
                 {
                     // Ensure that the directory structure exists
@@ -495,6 +540,7 @@ namespace log4net.Appender
                     }
 
                     FileMode fileOpenMode = append ? FileMode.Append : FileMode.Create;
+					Logger.LogDebug("<<< Exiting CreateStream(filename={Filename},append={Append},fileShare={FileShare})", filename, append, fileShare);
                     return new FileStream(filename, fileOpenMode, FileAccess.Write, fileShare);
                 }
             }
@@ -508,10 +554,12 @@ namespace log4net.Appender
             /// <param name="stream"></param>
             protected void CloseStream(Stream stream)
             {
+				Logger.LogDebug(">>> Entering CloseStream(stream={Stream})", stream);
                 using (this.CurrentAppender.SecurityContext.Impersonate(this))
                 {
                     stream.Dispose();
                 }
+				Logger.LogDebug("<<< Exiting CloseStream(stream={Stream})", stream);
             }
         }
 
@@ -647,6 +695,10 @@ namespace log4net.Appender
             {
                 this.m_filename = filename;
                 this.m_append = append;
+				Logger.LogDebug(">>> Entering OpenFile(filename={Filename},append={Append},encoding={Encoding})", filename, append, encoding);
+				Logger.LogDebug("OpenFile(filename={Filename},append={Append},encoding={Encoding}): m_stream → {M_stream}", filename, append, encoding, m_stream);
+				Logger.LogError("Exception in OpenFile(filename={Filename},append={Append},encoding={Encoding}): {Arg3}", filename, append, encoding, ex.Message);
+				Logger.LogDebug("<<< Exiting OpenFile(filename={Filename},append={Append},encoding={Encoding})", filename, append, encoding);
             }
 
             /// <summary>
@@ -660,6 +712,10 @@ namespace log4net.Appender
             public override void CloseFile()
             {
                 // NOP
+				Logger.LogDebug(">>> Entering CloseFile()");
+				Logger.LogDebug("CloseFile(): m_stream → {M_stream}", m_stream);
+				Logger.LogDebug("CloseFile(): this.m_stream → {Arg0}", this.m_stream);
+				Logger.LogDebug("<<< Exiting CloseFile()");
             }
 
             /// <summary>
@@ -703,6 +759,8 @@ namespace log4net.Appender
             {
                 this.CloseStream(this.m_stream);
                 this.m_stream = null;
+				Logger.LogDebug(">>> Entering ReleaseLock()");
+				Logger.LogDebug("<<< Exiting ReleaseLock()");
             }
 
             /// <summary>
@@ -711,6 +769,9 @@ namespace log4net.Appender
             public override void ActivateOptions()
             {
                 //NOP
+				Logger.LogDebug(">>> Entering ActivateOptions()");
+				Logger.LogDebug("ActivateOptions(): m_lockingModel → {M_lockingModel}", m_lockingModel);
+				Logger.LogDebug("<<< Exiting ActivateOptions()");
             }
 
             /// <summary>
@@ -719,6 +780,8 @@ namespace log4net.Appender
             public override void OnClose()
             {
                 //NOP
+				Logger.LogDebug(">>> Entering OnClose()");
+				Logger.LogDebug("<<< Exiting OnClose()");
             }
         }
 
@@ -759,8 +822,12 @@ namespace log4net.Appender
                 }
                 catch (Exception e1)
                 {
+					Logger.LogError("Exception in OpenFile(filename={Filename},append={Append},encoding={Encoding}): {Arg3}", filename, append, encoding, ex.Message);
                     this.CurrentAppender.ErrorHandler.Error("Unable to acquire lock on file " + filename + ". " + e1.Message);
                 }
+				Logger.LogDebug(">>> Entering OpenFile(fileName={FileName},append={Append})", fileName, append);
+				Logger.LogDebug("OpenFile(fileName={FileName},append={Append}): m_stream → {M_stream}", fileName, append, m_stream);
+				Logger.LogDebug("<<< Exiting OpenFile(fileName={FileName},append={Append})", fileName, append);
             }
 
             /// <summary>
@@ -875,6 +942,8 @@ namespace log4net.Appender
                     m_mutex.Close();
 #endif
                     this.m_mutex = null;
+					Logger.LogDebug("OnClose(): m_mutex → {M_mutex}", m_mutex);
+					Logger.LogDebug("OnClose(): this.m_mutex → {Arg0}", this.m_mutex);
                 }
                 else
                 {
@@ -894,6 +963,8 @@ namespace log4net.Appender
         /// </remarks>
         public FileAppender()
         {
+		Logger.LogDebug(">>> Entering FileAppender()");
+		Logger.LogDebug("<<< Exiting FileAppender()");
         }
 
         /// <summary>
@@ -910,10 +981,15 @@ namespace log4net.Appender
         [Obsolete("Instead use the default constructor and set the Layout, File & AppendToFile properties")]
         public FileAppender(ILayout layout, string filename, bool append)
         {
+			Logger.LogDebug(">>> Entering FileAppender(layout={Layout},filename={Filename},append={Append})", layout, filename, append);
             this.Layout = layout;
             this.File = filename;
+			Logger.LogDebug("FileAppender(layout={Layout},filename={Filename},append={Append}): this.Layout → {Arg3}", layout, filename, append, this.Layout);
+			Logger.LogDebug("FileAppender(layout={Layout},filename={Filename},append={Append}): this.File → {Arg3}", layout, filename, append, this.File);
             this.AppendToFile = append;
             this.ActivateOptions();
+			Logger.LogDebug("<<< Exiting FileAppender(layout={Layout},filename={Filename},append={Append})", layout, filename, append);
+			Logger.LogDebug("FileAppender(layout={Layout},filename={Filename},append={Append}): this.AppendToFile → {Arg3}", layout, filename, append, this.AppendToFile);
         }
 
         /// <summary>
@@ -1079,11 +1155,13 @@ namespace log4net.Appender
         /// </remarks>
         public override void ActivateOptions()
         {
+			Logger.LogDebug(">>> Entering ActivateOptions()");
             base.ActivateOptions();
 
             if (this.m_securityContext == null)
             {
                 this.m_securityContext = SecurityContextProvider.DefaultProvider.CreateSecurityContext(this);
+				Logger.LogDebug("ActivateOptions(): m_securityContext → {M_securityContext}", m_securityContext);
             }
 
             if (this.m_lockingModel == null)
@@ -1108,6 +1186,7 @@ namespace log4net.Appender
                 LogLog.Warn(declaringType, "FileAppender: File option not set for appender [" + this.Name + "].");
                 LogLog.Warn(declaringType, "FileAppender: Are you using FileAppender instead of ConsoleAppender?");
             }
+			Logger.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>
@@ -1120,8 +1199,11 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Reset()
         {
+			Logger.LogDebug(">>> Entering Reset()");
             base.Reset();
             this.m_fileName = null;
+			Logger.LogDebug("<<< Exiting Reset()");
+			Logger.LogDebug("Reset(): this.m_fileName → {Arg0}", this.m_fileName);
         }
 
         /// <summary>
@@ -1144,7 +1226,9 @@ namespace log4net.Appender
         /// </remarks>
         protected override void PrepareWriter()
         {
+			Logger.LogDebug(">>> Entering PrepareWriter()");
             this.SafeOpenFile(this.m_fileName, this.m_appendToFile);
+			Logger.LogDebug("<<< Exiting PrepareWriter()");
         }
 
         /// <summary>
@@ -1163,6 +1247,7 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent loggingEvent)
         {
+			Logger.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             if (this.m_stream.AcquireLock())
             {
                 try
@@ -1174,6 +1259,7 @@ namespace log4net.Appender
                     this.m_stream.ReleaseLock();
                 }
             }
+			Logger.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
         }
 
         /// <summary>
@@ -1189,6 +1275,7 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent[] loggingEvents)
         {
+			Logger.LogDebug(">>> Entering Append(loggingEvents={LoggingEvents})", loggingEvents);
             if (this.m_stream.AcquireLock())
             {
                 try
@@ -1200,6 +1287,7 @@ namespace log4net.Appender
                     this.m_stream.ReleaseLock();
                 }
             }
+			Logger.LogDebug("<<< Exiting Append(loggingEvents={LoggingEvents})", loggingEvents);
         }
 
         /// <summary>
@@ -1212,6 +1300,7 @@ namespace log4net.Appender
         /// </remarks>
         protected override void WriteFooter()
         {
+			Logger.LogDebug(">>> Entering WriteFooter()");
             if (this.m_stream != null)
             {
                 //WriteFooter can be called even before a file is opened
@@ -1225,6 +1314,7 @@ namespace log4net.Appender
                     this.m_stream.ReleaseLock();
                 }
             }
+			Logger.LogDebug("<<< Exiting WriteFooter()");
         }
 
         /// <summary>
@@ -1237,6 +1327,7 @@ namespace log4net.Appender
         /// </remarks>
         protected override void WriteHeader()
         {
+			Logger.LogDebug(">>> Entering WriteHeader()");
             if (this.m_stream != null)
             {
                 if (this.m_stream.AcquireLock())
@@ -1251,6 +1342,7 @@ namespace log4net.Appender
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting WriteHeader()");
         }
 
         /// <summary>
@@ -1263,6 +1355,7 @@ namespace log4net.Appender
         /// </remarks>
         protected override void CloseWriter()
         {
+			Logger.LogDebug(">>> Entering CloseWriter()");
             if (this.m_stream != null)
             {
                 this.m_stream.AcquireLock();
@@ -1275,6 +1368,7 @@ namespace log4net.Appender
                     this.m_stream.ReleaseLock();
                 }
             }
+			Logger.LogDebug("<<< Exiting CloseWriter()");
         }
 
         /// <summary>
@@ -1304,14 +1398,17 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual void SafeOpenFile(string fileName, bool append)
         {
+			Logger.LogDebug(">>> Entering SafeOpenFile(fileName={FileName},append={Append})", fileName, append);
             try
             {
                 this.OpenFile(fileName, append);
             }
             catch (Exception e)
             {
+				Logger.LogError("Exception in SafeOpenFile(fileName={FileName},append={Append}): {Arg2}", fileName, append, ex.Message);
                 this.ErrorHandler.Error("OpenFile(" + fileName + "," + append + ") call failed.", e, ErrorCode.FileOpenFailure);
             }
+			Logger.LogDebug("<<< Exiting SafeOpenFile(fileName={FileName},append={Append})", fileName, append);
         }
 
         /// <summary>
@@ -1331,12 +1428,14 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual void OpenFile(string fileName, bool append)
         {
+			Logger.LogDebug(">>> Entering OpenFile(fileName={FileName},append={Append})", fileName, append);
             if (LogLog.IsErrorEnabled)
             {
                 // Internal check that the fileName passed in is a rooted path
                 bool isPathRooted = false;
                 using (this.SecurityContext.Impersonate(this))
                 {
+				Logger.LogDebug("OpenFile(fileName={FileName},append={Append}): isPathRooted → {IsPathRooted}", fileName, append, isPathRooted);
                     isPathRooted = Path.IsPathRooted(fileName);
                 }
                 if (!isPathRooted)
@@ -1353,8 +1452,10 @@ namespace log4net.Appender
 
                 // Save these for later, allowing retries if file open fails
                 this.m_fileName = fileName;
+				Logger.LogDebug("OpenFile(fileName={FileName},append={Append}): this.m_fileName → {Arg2}", fileName, append, this.m_fileName);
                 this.m_appendToFile = append;
 
+				Logger.LogDebug("OpenFile(fileName={FileName},append={Append}): this.m_appendToFile → {Arg2}", fileName, append, this.m_appendToFile);
                 this.LockingModel.CurrentAppender = this;
                 this.LockingModel.OpenFile(fileName, append, this.m_encoding);
                 this.m_stream = new LockingStream(this.LockingModel);
@@ -1374,6 +1475,7 @@ namespace log4net.Appender
 
                 this.WriteHeader();
             }
+			Logger.LogDebug("<<< Exiting OpenFile(fileName={FileName},append={Append})", fileName, append);
         }
 
         /// <summary>
@@ -1394,10 +1496,13 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual void SetQWForFiles(Stream fileStream)
         {
+		Logger.LogDebug(">>> Entering SetQWForFiles(fileStream={FileStream})", fileStream);
 #pragma warning disable CA2000 // Dispose objects before losing scope
             StreamWriter writer = new StreamWriter(fileStream, this.m_encoding);
 #pragma warning restore CA2000 // Dispose objects before losing scope
+			Logger.LogDebug("SetQWForFiles(fileStream={FileStream}): writer → {Writer}", fileStream, writer);
             this.SetQWForFiles(writer);
+			Logger.LogDebug("<<< Exiting SetQWForFiles(fileStream={FileStream})", fileStream);
         }
 
         /// <summary>
@@ -1430,6 +1535,8 @@ namespace log4net.Appender
         /// </remarks>
         protected static string ConvertToFullPath(string path)
         {
+			Logger.LogDebug(">>> Entering ConvertToFullPath(path={Path})", path);
+			Logger.LogDebug("<<< Exiting ConvertToFullPath(path={Path})", path);
             return SystemInfo.ConvertToFullPath(path);
         }
 

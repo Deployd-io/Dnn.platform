@@ -67,8 +67,12 @@ namespace DotNetNuke.Entities.Modules
         [DnnDeprecated(10, 0, 0, "Please use overload with IBusinessControllerProvider")]
         public static partial XmlNode SerializeModule(XmlDocument xmlModule, ModuleInfo module, bool includeContent)
         {
+			Logger.LogDebug(">>> Entering SerializeModule(xmlModule={XmlModule},module={Module},includeContent={IncludeContent})", xmlModule, module, includeContent);
             using var scope = Globals.GetOrCreateServiceScope();
+			Logger.LogDebug("SerializeModule(xmlModule={XmlModule},module={Module},includeContent={IncludeContent}): scope → {Scope}", xmlModule, module, includeContent, scope);
+			Logger.LogDebug("<<< Exiting SerializeModule(xmlModule={XmlModule},module={Module},includeContent={IncludeContent})", xmlModule, module, includeContent);
             return SerializeModule(scope.ServiceProvider.GetRequiredService<IBusinessControllerProvider>(), xmlModule, module, includeContent);
         }
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     }
 }

@@ -40,6 +40,8 @@ namespace DotNetNuke.Entities.Icons
         /// <returns>Link to the image, e.g. /Icons/Sigma/edit_16x16_standard.png.</returns>
         public static string IconURL(string key)
         {
+			Logger.LogDebug(">>> Entering IconURL(key={Key})", key);
+			Logger.LogDebug("<<< Exiting IconURL(key={Key})", key);
             return IconURL(key, DefaultIconSize, DefaultIconStyle);
         }
 
@@ -49,6 +51,7 @@ namespace DotNetNuke.Entities.Icons
         /// <returns>Link to the image, e.g. /Icons/Sigma/edit_16x16_standard.png.</returns>
         public static string IconURL(string key, string size)
         {
+			Logger.LogDebug("<<< Exiting IconURL(key={Key},size={Size})", key, size);
             return IconURL(key, size, DefaultIconStyle);
         }
 
@@ -80,16 +83,19 @@ namespace DotNetNuke.Entities.Icons
 #if DEBUG
             CheckIconOnDisk(fileName);
 #endif
+			Logger.LogDebug("<<< Exiting IconURL(key={Key},size={Size},style={Style})", key, size, style);
             return Globals.ApplicationPath + "/" + fileName;
         }
 
         public static string GetFileIconUrl(string extension)
         {
+			Logger.LogDebug(">>> Entering GetFileIconUrl(extension={Extension})", extension);
             if (!string.IsNullOrEmpty(extension) && File.Exists(HostingEnvironment.MapPath(IconURL("Ext" + extension, "32x32", "Standard"))))
             {
                 return IconURL("Ext" + extension, "32x32", "Standard");
             }
 
+			Logger.LogDebug("<<< Exiting GetFileIconUrl(extension={Extension})", extension);
             return IconURL("ExtFile", "32x32", "Standard");
         }
 
@@ -97,6 +103,8 @@ namespace DotNetNuke.Entities.Icons
         [DnnDeprecated(9, 11, 1, "Use overload taking an IApplicationStatusInfo")]
         public static partial string[] GetIconSets()
         {
+			Logger.LogDebug(">>> Entering GetIconSets()");
+			Logger.LogDebug("<<< Exiting GetIconSets()");
             return GetIconSets(
                 Globals.GetCurrentServiceProvider().GetService<IApplicationStatusInfo>() ?? new ApplicationStatusInfo(new Application()));
         }
@@ -115,11 +123,13 @@ namespace DotNetNuke.Entities.Icons
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetIconSets(appStatus={AppStatus})", appStatus);
             return result.Split(Comma, StringSplitOptions.RemoveEmptyEntries);
         }
 
         private static void CheckIconOnDisk(string path)
             => CheckIconOnDisk(Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>(), path);
+			Logger.LogDebug(">>> Entering CheckIconOnDisk(path={Path})", path);
 
         private static void CheckIconOnDisk(IApplicationStatusInfo appStatus, string path)
         {
@@ -138,6 +148,7 @@ namespace DotNetNuke.Entities.Icons
                     IconsStatusOnDisk.Add(path, true);
                     var iconPhysicalPath = Path.Combine(appStatus.ApplicationMapPath, path.Replace('/', '\\'));
                     if (!File.Exists(iconPhysicalPath))
+					Logger.LogDebug("CheckIconOnDisk(appStatus={AppStatus},path={Path}): iconPhysicalPath → {IconPhysicalPath}", appStatus, path, iconPhysicalPath);
                     {
                         Logger.Warn($"Icon Not Present on Disk {iconPhysicalPath}");
                     }

@@ -14,12 +14,15 @@ namespace DotNetNuke.Build.Tasks
     [IsDependentOn(typeof(Build))]
     public sealed class RunUnitTests : FrostingTask<Context>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override void Run(Context context)
         {
+			Logger.LogDebug(">>> Entering Run(context={Context})", context);
             context.NUnit3(
                 "./src/**/bin/" + context.BuildConfiguration + "/*.Test*.dll",
                 new NUnit3Settings { NoResults = false });
+				Logger.LogDebug("<<< Exiting Run(context={Context})", context);
         }
     }
 }

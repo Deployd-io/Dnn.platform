@@ -23,6 +23,7 @@ using System.Collections;
 
 namespace log4net.Util
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Implementation of Stacks collection for the <see cref="log4net.ThreadContext"/></summary>
     /// <remarks>
     /// <para>
@@ -42,7 +43,11 @@ namespace log4net.Util
         /// </remarks>
         internal ThreadContextStacks(ContextPropertiesBase properties)
         {
+			Logger.LogDebug(">>> Entering ThreadContextStacks(properties={Properties})", properties);
             this.m_properties = properties;
+			Logger.LogDebug("<<< Exiting ThreadContextStacks(properties={Properties})", properties);
+			Logger.LogDebug("ThreadContextStacks(properties={Properties}): m_properties → {M_properties}", properties, m_properties);
+			Logger.LogDebug("ThreadContextStacks(properties={Properties}): this.m_properties → {Arg1}", properties, this.m_properties);
         }
 
         /// <summary>Gets the named thread context stack</summary>

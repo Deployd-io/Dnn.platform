@@ -25,6 +25,7 @@ using System.Reflection;
 
 namespace log4net.Util.TypeConverters
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Supports conversion from string to <see cref="Type"/> type.</summary>
     /// <remarks>
     /// <para>
@@ -48,6 +49,9 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public bool CanConvertFrom(Type sourceType) 
         {
+			Logger.LogDebug(">>> Entering CanConvertFrom(sourceType={SourceType})", sourceType);
+			Logger.LogDebug(">>> Entering ConvertFrom(source={Source})", source);
+			Logger.LogDebug("<<< Exiting ConvertFrom(source={Source})", source);
             return (sourceType == typeof(string));
         }
 

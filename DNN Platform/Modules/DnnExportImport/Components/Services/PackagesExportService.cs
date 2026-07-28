@@ -41,13 +41,16 @@ namespace Dnn.ExportImport.Components.Services
         public PackagesExportService()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering PackagesExportService()");
         }
+		Logger.LogDebug("<<< Exiting PackagesExportService()");
 
         /// <summary>Initializes a new instance of the <see cref="PackagesExportService"/> class.</summary>
         /// <param name="appStatus">The application status.</param>
         public PackagesExportService(IApplicationStatusInfo appStatus)
         {
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			Logger.LogDebug("PackagesExportService(appStatus={AppStatus}): appStatus → {AppStatus1}", appStatus, appStatus);
         }
 
         /// <inheritdoc />
@@ -62,6 +65,8 @@ namespace Dnn.ExportImport.Components.Services
         /// <inheritdoc />
         public override void ExportData(ExportImportJob exportJob, ExportDto exportDto)
         {
+			Logger.LogDebug(">>> Entering ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (this.CheckCancelled(exportJob))
             {
                 return;
@@ -76,11 +81,15 @@ namespace Dnn.ExportImport.Components.Services
             // Create Zip File to hold files
             var skip = this.GetCurrentSkip();
             var currentIndex = skip;
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): skip → {Skip}", exportJob, exportDto, skip);
+			Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): currentIndex → {CurrentIndex}", exportJob, exportDto, currentIndex);
             var totalPackagesExported = 0;
             try
             {
                 var packagesZipFileFormat = $@"{this.appStatus.ApplicationMapPath}{Constants.ExportFolder}{{0}}\{Constants.ExportZipPackages}";
                 var packagesZipFile = string.Format(CultureInfo.InvariantCulture, packagesZipFileFormat, exportJob.Directory.TrimEnd('\\').TrimEnd('/'));
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): packagesZipFileFormat → {PackagesZipFileFormat}", exportJob, exportDto, packagesZipFileFormat);
+				Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): packagesZipFile → {PackagesZipFile}", exportJob, exportDto, packagesZipFile);
 
                 if (this.CheckPoint.Stage == 0)
                 {
@@ -90,6 +99,8 @@ namespace Dnn.ExportImport.Components.Services
                     // export skin packages.
                     var extensionPackagesBackupFolder = Path.Combine(this.appStatus.ApplicationMapPath, DotNetNuke.Services.Installer.Util.BackupInstallPackageFolder);
                     var skinPackageFiles = Directory.GetFiles(extensionPackagesBackupFolder).Where(f => IsValidPackage(f, fromDate, toDate)).ToList();
+					Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): extensionPackagesBackupFolder → {ExtensionPackagesBackupFolder}", exportJob, exportDto, extensionPackagesBackupFolder);
+					Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): skinPackageFiles → {SkinPackageFiles}", exportJob, exportDto, skinPackageFiles);
                     var totalPackages = skinPackageFiles.Count;
 
                     // Update the total items count in the check points. This should be updated only once.
@@ -105,11 +116,14 @@ namespace Dnn.ExportImport.Components.Services
                         {
                             var exportPackage = GenerateExportPackage(file);
                             if (exportPackage != null)
+							Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): exportPackage → {ExportPackage}", exportJob, exportDto, exportPackage);
                             {
                                 this.Repository.CreateItem(exportPackage, null);
+								Logger.LogInformation("ExportData(exportJob,exportDto)={ExportJob},{ExportDto}: database query executed in {Arg2} ms", exportJob, exportDto, __logStart.ElapsedMilliseconds);
                                 totalPackagesExported += 1;
                                 var folderOffset = Path.GetDirectoryName(file)?.Length + 1;
 
+								Logger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): folderOffset → {FolderOffset}", exportJob, exportDto, folderOffset);
                                 CompressionUtil.AddFileToArchive(zipArchive, file, folderOffset.GetValueOrDefault(0));
                             }
 
@@ -142,6 +156,7 @@ namespace Dnn.ExportImport.Components.Services
         /// <inheritdoc />
         public override void ImportData(ExportImportJob importJob, ImportDto importDto)
         {
+			Logger.LogDebug(">>> Entering ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
             if (this.CheckCancelled(importJob))
             {
                 return;
@@ -154,13 +169,18 @@ namespace Dnn.ExportImport.Components.Services
             }
 
             this.exportImportJob = importJob;
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): exportImportJob → {ExportImportJob}", importJob, importDto, exportImportJob);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): this.exportImportJob → {Arg2}", importJob, importDto, this.exportImportJob);
 
             this.ProcessImportModulePackages(importDto);
+			Logger.LogDebug("<<< Exiting ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
         }
 
         /// <inheritdoc />
         public override int GetImportTotal()
         {
+			Logger.LogDebug(">>> Entering GetImportTotal()");
+			Logger.LogDebug("<<< Exiting GetImportTotal()");
             return this.Repository.GetCount<ExportPackage>();
         }
 
@@ -197,6 +217,7 @@ namespace Dnn.ExportImport.Components.Services
 
         private static Installer GetInstaller(IApplicationStatusInfo appStatus, Stream stream)
         {
+			Logger.LogDebug(">>> Entering GetInstaller(appStatus={AppStatus},stream={Stream})", appStatus, stream);
             var installer = new Installer(stream, appStatus.ApplicationMapPath, false, false)
             {
                 InstallerInfo = { PortalID = Null.NullInteger },
@@ -208,6 +229,7 @@ namespace Dnn.ExportImport.Components.Services
                 installer.ReadManifest(true);
             }
 
+			Logger.LogDebug("<<< Exiting GetInstaller(appStatus={AppStatus},stream={Stream})", appStatus, stream);
             return installer;
         }
 
@@ -245,12 +267,14 @@ namespace Dnn.ExportImport.Components.Services
 
         private int GetCurrentSkip()
         {
+			Logger.LogDebug(">>> Entering GetCurrentSkip()");
             if (!string.IsNullOrEmpty(this.CheckPoint.StageData))
             {
                 dynamic stageData = JsonConvert.DeserializeObject(this.CheckPoint.StageData);
                 return Convert.ToInt32(stageData.skip) ?? 0;
             }
 
+			Logger.LogDebug("<<< Exiting GetCurrentSkip()");
             return 0;
         }
 
@@ -292,17 +316,22 @@ namespace Dnn.ExportImport.Components.Services
                     $"{exportPackage.PackageName} : {exportPackage.Version} - {ex.Message}");
                 Logger.Error(ex);
             }
+			Logger.LogDebug("<<< Exiting ProcessImportModulePackage(exportPackage={ExportPackage},tempFolder={TempFolder},collisionResolution={CollisionResolution})", exportPackage, tempFolder, collisionResolution);
         }
 
         private void ProcessImportModulePackages(ImportDto importDto)
         {
+			Logger.LogDebug(">>> Entering ProcessImportModulePackages(importDto={ImportDto})", importDto);
             var packageZipFile = $"{this.appStatus.ApplicationMapPath}{Constants.ExportFolder}{this.exportImportJob.Directory.TrimEnd('\\', '/')}\\{Constants.ExportZipPackages}";
             var tempFolder = $"{Path.GetDirectoryName(packageZipFile)}\\{DateTime.Now.Ticks}";
+			Logger.LogDebug("ProcessImportModulePackages(importDto={ImportDto}): packageZipFile → {PackageZipFile}", importDto, packageZipFile);
+			Logger.LogDebug("ProcessImportModulePackages(importDto={ImportDto}): tempFolder → {TempFolder}", importDto, tempFolder);
             if (File.Exists(packageZipFile))
             {
                 CompressionUtil.UnZipArchive(packageZipFile, tempFolder);
                 var exportPackages = this.Repository.GetAllItems<ExportPackage>().ToList();
 
+				Logger.LogDebug("ProcessImportModulePackages(importDto={ImportDto}): exportPackages → {ExportPackages}", importDto, exportPackages);
                 this.CheckPoint.TotalItems = this.CheckPoint.TotalItems <= 0 ? exportPackages.Count : this.CheckPoint.TotalItems;
                 if (this.CheckPointStageCallback(this))
                 {
@@ -337,6 +366,7 @@ namespace Dnn.ExportImport.Components.Services
                         }
                         catch (Exception)
                         {
+							Logger.LogError("Exception in ProcessImportModulePackages(importDto={ImportDto}): {Arg1}", importDto, ex.Message);
                             // ignore
                         }
                     }
@@ -348,6 +378,7 @@ namespace Dnn.ExportImport.Components.Services
                 this.CheckPointStageCallback(this);
                 this.Result.AddLogEntry("PackagesFileNotFound", "Packages file not found. Skipping packages import", ReportLevel.Warn);
             }
+			Logger.LogDebug("<<< Exiting ProcessImportModulePackages(importDto={ImportDto})", importDto);
         }
     }
 }

@@ -11,13 +11,18 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
     /// <summary>Emit a fallback block for a script in the same part of the page.</summary>
     public class DnnJsIncludeFallback : WebControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="DnnJsIncludeFallback"/> class.</summary>
         /// <param name="objectName">The JS object name to verify is defined in global scope.</param>
         /// <param name="fileName">The path to load if the object is not defined.</param>
         public DnnJsIncludeFallback(string objectName, string fileName)
         {
+			Logger.LogDebug(">>> Entering DnnJsIncludeFallback(objectName={ObjectName},fileName={FileName})", objectName, fileName);
             this.ObjectName = objectName;
             this.FileName = fileName;
+			Logger.LogDebug("<<< Exiting DnnJsIncludeFallback(objectName={ObjectName},fileName={FileName})", objectName, fileName);
+			Logger.LogDebug("DnnJsIncludeFallback(objectName={ObjectName},fileName={FileName}): this.ObjectName → {Arg2}", objectName, fileName, this.ObjectName);
+			Logger.LogDebug("DnnJsIncludeFallback(objectName={ObjectName},fileName={FileName}): this.FileName → {Arg2}", objectName, fileName, this.FileName);
         }
 
         /// <summary>Gets or sets the object name.</summary>
@@ -29,6 +34,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <inheritdoc />
         public override void RenderControl(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering RenderControl(writer={Writer})", writer);
             writer.AddAttribute(HtmlTextWriterAttribute.Type, "text/javascript");
             writer.RenderBeginTag(HtmlTextWriterTag.Script);
 
@@ -46,6 +52,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
             writer.Write($"document.write('<script src=\"{this.FileName}\" type=\"text/javascript\"></' + 'script>');");
             writer.Write("}");
             writer.RenderEndTag();
+			Logger.LogDebug("<<< Exiting RenderControl(writer={Writer})", writer);
         }
     }
 }

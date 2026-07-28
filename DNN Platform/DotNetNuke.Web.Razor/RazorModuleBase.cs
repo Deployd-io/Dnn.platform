@@ -15,6 +15,7 @@ namespace DotNetNuke.Web.Razor
     [DnnDeprecated(9, 3, 2, "Use Razor Pages instead")]
     public partial class RazorModuleBase : ModuleUserControlBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         protected virtual string RazorScriptFile
         {
             get
@@ -42,6 +43,7 @@ namespace DotNetNuke.Web.Razor
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
             try
             {
@@ -49,6 +51,8 @@ namespace DotNetNuke.Web.Razor
                 {
                     var razorEngine = new RazorEngine(this.RazorScriptFile, this.ModuleContext, this.LocalResourceFile);
                     var writer = new StringWriter();
+					Logger.LogDebug("OnPreRender(e={E}): razorEngine → {RazorEngine}", e, razorEngine);
+					Logger.LogDebug("OnPreRender(e={E}): writer → {Writer}", e, writer);
                     razorEngine.Render(writer);
 
                     this.Controls.Add(new LiteralControl(writer.ToString()));
@@ -56,8 +60,10 @@ namespace DotNetNuke.Web.Razor
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in OnPreRender(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, ex);
             }
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
     }
 }

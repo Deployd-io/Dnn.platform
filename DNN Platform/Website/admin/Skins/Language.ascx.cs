@@ -26,6 +26,7 @@ namespace DotNetNuke.UI.Skins.Controls
     /// <summary>The Language SkinObject allows the visitor to select the language of the page.</summary>
     public partial class Language : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string MyFileName = "Language.ascx";
         private readonly IPortalController portalController;
         private string selectedItemTemplate;
@@ -45,13 +46,16 @@ namespace DotNetNuke.UI.Skins.Controls
         public Language()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering Language()");
         }
+		Logger.LogDebug("<<< Exiting Language()");
 
         /// <summary>Initializes a new instance of the <see cref="Language"/> class.</summary>
         /// <param name="portalController">The portal controller.</param>
         public Language(IPortalController portalController)
         {
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+			Logger.LogDebug("Language(portalController={PortalController}): portalController → {PortalController1}", portalController, portalController);
         }
 
         public string AlternateTemplate
@@ -256,6 +260,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.selectCulture.SelectedIndexChanged += this.SelectCulture_SelectedIndexChanged;
@@ -265,6 +270,8 @@ namespace DotNetNuke.UI.Skins.Controls
             {
                 var locales = new Dictionary<string, Locale>();
                 IEnumerable<ListItem> cultureListItems = Localization.LoadCultureInListItems(CultureDropDownTypes.NativeName, this.CurrentCulture, string.Empty, false);
+				Logger.LogDebug("OnLoad(e={E}): locales → {Locales}", e, locales);
+				Logger.LogDebug("OnLoad(e={E}): cultureListItems → {CultureListItems}", e, cultureListItems);
                 foreach (Locale loc in LocaleController.Instance.GetLocales(this.PortalSettings.PortalId).Values)
                 {
                     string defaultRoles = PortalController.GetPortalSetting(this.portalController, $"DefaultTranslatorRoles-{loc.Code}", this.PortalSettings.PortalId, "Administrators");
@@ -310,9 +317,11 @@ namespace DotNetNuke.UI.Skins.Controls
                         {
                             ListItem item = this.selectCulture.Items.FindByValue(this.CurrentCulture);
                             if (item != null)
+							Logger.LogDebug("OnLoad(e={E}): item → {Item}", e, item);
                             {
                                 this.selectCulture.SelectedIndex = -1;
                                 item.Selected = true;
+								Logger.LogDebug("OnLoad(e={E}): item.Selected → {Arg1}", e, item.Selected);
                             }
                         }
                     }
@@ -332,8 +341,10 @@ namespace DotNetNuke.UI.Skins.Controls
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessPageLoadException(ex, this.Request.RawUrl);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <summary>Binds data to repeater. a template is used to render the items.</summary>
@@ -344,14 +355,17 @@ namespace DotNetNuke.UI.Skins.Controls
         // ReSharper disable once InconsistentNaming
         protected void rptLanguages_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
+			Logger.LogDebug(">>> Entering rptLanguages_ItemDataBound(sender={Sender},e={E})", sender, e);
             try
             {
                 var litTemplate = e.Item.FindControl("litItemTemplate") as Literal;
                 if (litTemplate != null)
+				Logger.LogDebug("rptLanguages_ItemDataBound(sender={Sender},e={E}): litTemplate → {LitTemplate}", sender, e, litTemplate);
                 {
                     // load proper template for this Item
                     string strTemplate = string.Empty;
                     switch (e.Item.ItemType)
+					Logger.LogDebug("rptLanguages_ItemDataBound(sender={Sender},e={E}): strTemplate → {StrTemplate}", sender, e, strTemplate);
                     {
                         case ListItemType.Item:
                             strTemplate = this.ItemTemplate;
@@ -381,6 +395,7 @@ namespace DotNetNuke.UI.Skins.Controls
                     if (string.IsNullOrEmpty(strTemplate))
                     {
                         litTemplate.Visible = false;
+						Logger.LogDebug("rptLanguages_ItemDataBound(sender={Sender},e={E}): litTemplate.Visible → {Arg2}", sender, e, litTemplate.Visible);
                     }
                     else
                     {
@@ -407,8 +422,10 @@ namespace DotNetNuke.UI.Skins.Controls
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in rptLanguages_ItemDataBound(sender={Sender},e={E}): {Arg2}", sender, e, ex.Message);
                 Exceptions.ProcessPageLoadException(ex, this.Request.RawUrl);
             }
+			Logger.LogDebug("<<< Exiting rptLanguages_ItemDataBound(sender={Sender},e={E})", sender, e);
         }
 
         private string ParseTemplate(string template, string locale)
@@ -440,6 +457,7 @@ namespace DotNetNuke.UI.Skins.Controls
 
         private void HandleCommonTemplates()
         {
+			Logger.LogDebug(">>> Entering HandleCommonTemplates()");
             if (string.IsNullOrEmpty(this.CommonHeaderTemplate))
             {
                 this.litCommonHeaderTemplate.Visible = false;
@@ -457,6 +475,7 @@ namespace DotNetNuke.UI.Skins.Controls
             {
                 this.litCommonFooterTemplate.Text = this.ParseTemplate(this.CommonFooterTemplate, this.CurrentCulture);
             }
+			Logger.LogDebug("<<< Exiting HandleCommonTemplates()");
         }
 
         private bool LocaleIsAvailable(Locale locale)
@@ -474,12 +493,14 @@ namespace DotNetNuke.UI.Skins.Controls
 
         private void SelectCulture_SelectedIndexChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering SelectCulture_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
             // Redirect to same page to update all controls for newly selected culture
             this.LocalTokenReplace.Language = this.selectCulture.SelectedItem.Value;
 
             // DNN-6170 ensure skin value is culture specific in case of  static localization
             DataCache.RemoveCache(string.Format(CultureInfo.InvariantCulture, DataCache.PortalSettingsCacheKey, this.PortalSettings.PortalId, Null.NullString));
             this.Response.Redirect(this.LocalTokenReplace.ReplaceEnvironmentTokens("[URL]"));
+			Logger.LogDebug("<<< Exiting SelectCulture_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
         }
     }
 }

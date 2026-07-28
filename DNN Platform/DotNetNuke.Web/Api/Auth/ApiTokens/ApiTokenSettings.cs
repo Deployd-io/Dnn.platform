@@ -15,6 +15,7 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
     /// <summary>Settings class for storing and retrieving API token settings.</summary>
     public partial class ApiTokenSettings
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Gets or sets the timespan of a token for end users.</summary>
         [PortalSetting(Prefix = "ApiTokens_")]
         public ApiTokenTimespan UserTokenTimespan { get; set; } = ApiTokenTimespan.Days30;
@@ -37,6 +38,8 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
         [DnnDeprecated(10, 2, 4, "Use overload taking ApiTokenSettingsRepository")]
         public static partial ApiTokenSettings GetSettings(int portalId)
             => GetSettings(Globals.GetCurrentServiceProvider().GetRequiredService<ApiTokenSettingsRepository>(), portalId);
+			Logger.LogDebug(">>> Entering GetSettings(portalId={PortalId})", portalId);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         /// <summary>Gets the settings defined for the API tokens.</summary>
         /// <param name="settingsRepository">The settings repository.</param>
@@ -44,6 +47,7 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
         /// <returns>The API token settings for the given portal ID.</returns>
         public static ApiTokenSettings GetSettings(ApiTokenSettingsRepository settingsRepository, int portalId)
         {
+			Logger.LogDebug("<<< Exiting GetSettings(portalId={PortalId})", portalId);
             return settingsRepository.GetSettings(portalId);
         }
 
@@ -52,12 +56,18 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
         [DnnDeprecated(10, 2, 4, "Use overload taking ApiTokenSettingsRepository")]
         public partial void SaveSettings(int portalId)
             => this.SaveSettings(Globals.GetCurrentServiceProvider().GetRequiredService<ApiTokenSettingsRepository>(), portalId);
+			Logger.LogDebug(">>> Entering SaveSettings(portalId={PortalId})", portalId);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         /// <summary>Saves the updated settings for the API tokens.</summary>
         /// <param name="settingsRepository">The settings repository.</param>
+		Logger.LogDebug("<<< Exiting SaveSettings(portalId={PortalId})", portalId);
         /// <param name="portalId">The ID of the portal for the settings.</param>
         public void SaveSettings(ApiTokenSettingsRepository settingsRepository, int portalId)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			Logger.LogInformation("SaveSettings(portalId)={PortalId}: save query executed in {Arg1} ms", portalId, __logStart.ElapsedMilliseconds);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             settingsRepository.SaveSettings(portalId, this);
         }
     }

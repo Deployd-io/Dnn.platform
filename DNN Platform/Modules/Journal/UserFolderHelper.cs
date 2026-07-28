@@ -11,9 +11,12 @@ namespace DotNetNuke.Modules.Journal
 
     public class UserFolderHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public UserFolderHelper(PortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering UserFolderHelper(portalSettings={PortalSettings})", portalSettings);
             this.UserFolder = FolderManager.Instance.GetUserFolder(portalSettings.UserInfo);
+			Logger.LogDebug("<<< Exiting UserFolderHelper(portalSettings={PortalSettings})", portalSettings);
         }
 
         public string UserFolderPhysicalPath
