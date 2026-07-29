@@ -9,9 +9,12 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
     [JsonObject]
     public class ModulePackagePermissionsDto : PackageInfoDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ModulePackagePermissionsDto"/> class.</summary>
         public ModulePackagePermissionsDto()
         {
+		Logger.LogDebug(">>> Entering ModulePackagePermissionsDto()");
+		Logger.LogDebug("<<< Exiting ModulePackagePermissionsDto()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModulePackagePermissionsDto"/> class.</summary>

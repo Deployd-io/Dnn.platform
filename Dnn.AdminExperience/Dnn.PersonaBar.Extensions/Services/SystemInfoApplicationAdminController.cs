@@ -25,6 +25,7 @@ namespace Dnn.PersonaBar.Servers.Services
 
         public static string FirstCharToUpper(string input)
             => FirstCharToUpper(input, CultureInfo.CurrentCulture);
+			Logger.LogDebug(">>> Entering FirstCharToUpper(input={Input})", input);
 
         public static string FirstCharToUpper(string input, CultureInfo culture)
         {
@@ -33,17 +34,20 @@ namespace Dnn.PersonaBar.Servers.Services
                 return input;
             }
 
+			Logger.LogDebug("<<< Exiting FirstCharToUpper(input={Input})", input);
             return input.First().ToString().ToUpper(culture) + string.Join(string.Empty, input.Skip(1));
         }
 
         [HttpGet]
         public HttpResponseMessage GetApplicationInfo()
         {
+			Logger.LogDebug(">>> Entering GetApplicationInfo()");
             try
             {
                 var friendlyUrlProvider = GetProviderConfiguration("friendlyUrl");
                 return this.Request.CreateResponse(HttpStatusCode.OK, new
                 {
+				Logger.LogDebug("GetApplicationInfo(): friendlyUrlProvider → {FriendlyUrlProvider}", friendlyUrlProvider);
                     product = DotNetNukeContext.Current.Application.Description,
                     version = DotNetNukeContext.Current.Application.Version.ToString(3),
                     htmlEditorProvider = GetProviderConfiguration("htmlEditor"),
@@ -57,10 +61,17 @@ namespace Dnn.PersonaBar.Servers.Services
                     webFarmEnabled = DotNetNuke.Services.Cache.CachingProvider.Instance().IsWebFarm().ToString(),
                     casPermissions = SecurityPolicy.Permissions,
                 });
+					Logger.LogDebug("GetApplicationInfo(): product → {Product}", product);
+					Logger.LogDebug("GetApplicationInfo(): version → {Version}", version);
+					Logger.LogDebug("GetApplicationInfo(): htmlEditorProvider → {HtmlEditorProvider}", htmlEditorProvider);
+					Logger.LogDebug("GetApplicationInfo(): dataProvider → {DataProvider}", dataProvider);
+					Logger.LogDebug("GetApplicationInfo(): cachingProvider → {CachingProvider}", cachingProvider);
+					Logger.LogDebug("GetApplicationInfo(): loggingProvider → {LoggingProvider}", loggingProvider);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetApplicationInfo()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -74,6 +85,8 @@ namespace Dnn.PersonaBar.Servers.Services
 
         private static string GetProviderConfiguration(string providerName)
         {
+			Logger.LogDebug(">>> Entering GetProviderConfiguration(providerName={ProviderName})", providerName);
+			Logger.LogDebug("<<< Exiting GetProviderConfiguration(providerName={ProviderName})", providerName);
             return ProviderConfiguration.GetProviderConfiguration(providerName).DefaultProvider;
         }
     }

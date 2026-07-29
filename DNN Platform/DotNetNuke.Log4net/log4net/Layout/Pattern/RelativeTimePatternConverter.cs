@@ -26,6 +26,7 @@ using log4net.Core;
 
 namespace log4net.Layout.Pattern
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Converter to output the relative time of the event</summary>
     /// <remarks>
     /// <para>
@@ -47,7 +48,9 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         protected override void Convert(TextWriter writer, LoggingEvent loggingEvent)
         {
+			Logger.LogDebug(">>> Entering Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             writer.Write(TimeDifferenceInMillis(LoggingEvent.StartTimeUtc, loggingEvent.TimeStampUtc).ToString(System.Globalization.NumberFormatInfo.InvariantInfo));
+			Logger.LogDebug("<<< Exiting Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
 
         /// <summary>Helper method to get the time difference between two DateTime objects</summary>
@@ -56,9 +59,11 @@ namespace log4net.Layout.Pattern
         /// <returns>the time difference in milliseconds</returns>
         private static long TimeDifferenceInMillis(DateTime start, DateTime end)
         {
+			Logger.LogDebug(">>> Entering TimeDifferenceInMillis(start={Start},end={End})", start, end);
             // We must convert all times to UTC before performing any mathematical
             // operations on them. This allows use to take into account discontinuities
             // caused by daylight savings time transitions.
+			Logger.LogDebug("<<< Exiting TimeDifferenceInMillis(start={Start},end={End})", start, end);
             return (long)(end.ToUniversalTime() - start.ToUniversalTime()).TotalMilliseconds;
         }
     }

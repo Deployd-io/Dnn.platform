@@ -33,7 +33,9 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
         public Settings()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering Settings()");
         }
+		Logger.LogDebug("<<< Exiting Settings()");
 
         /// <summary>Initializes a new instance of the <see cref="Settings"/> class.</summary>
         /// <param name="cryptographyProvider">The cryptography provider.</param>
@@ -42,12 +44,15 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
         {
             this.cryptographyProvider = cryptographyProvider ?? this.DependencyProvider.GetRequiredService<ICryptographyProvider>();
             this.hostSettings = hostSettings ?? this.DependencyProvider.GetRequiredService<IHostSettings>();
+			Logger.LogDebug("Settings(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings}): hostSettings → {HostSettings1}", cryptographyProvider, hostSettings, hostSettings);
+			Logger.LogDebug("Settings(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings}): cryptographyProvider → {CryptographyProvider1}", cryptographyProvider, hostSettings, cryptographyProvider);
         }
 
         /// <summary>Loads concrete settings.</summary>
         /// <param name="folderMappingSettings">The Hashtable containing the folder mapping settings.</param>
         public override void LoadSettings(Hashtable folderMappingSettings)
         {
+			Logger.LogDebug(">>> Entering LoadSettings(folderMappingSettings={FolderMappingSettings})", folderMappingSettings);
             if (folderMappingSettings.ContainsKey(Constants.AccountName))
             {
                 this.tbAccountName.Text = FolderProvider.GetEncryptedSetting(this.cryptographyProvider, this.hostSettings, folderMappingSettings, Constants.AccountName);
@@ -62,6 +67,7 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
             {
                 var bucketName = string.Empty;
 
+				Logger.LogDebug("LoadSettings(folderMappingSettings={FolderMappingSettings}): bucketName → {BucketName}", folderMappingSettings, bucketName);
                 if (folderMappingSettings.ContainsKey(Constants.Container))
                 {
                     bucketName = folderMappingSettings[Constants.Container].ToString();
@@ -71,6 +77,7 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
 
                 var bucket = this.ddlContainers.Items.FindByText(bucketName);
 
+				Logger.LogDebug("LoadSettings(folderMappingSettings={FolderMappingSettings}): bucket → {Bucket}", folderMappingSettings, bucket);
                 if (bucket != null)
                 {
                     this.ddlContainers.SelectedIndex = this.ddlContainers.Items.IndexOf(bucket);
@@ -97,12 +104,14 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
             {
                 this.tbSyncBatchSize.Text = Constants.DefaultSyncBatchSize.ToString();
             }
+			Logger.LogDebug("<<< Exiting LoadSettings(folderMappingSettings={FolderMappingSettings})", folderMappingSettings);
         }
 
         /// <summary>Updates concrete settings for the specified folder mapping.</summary>
         /// <param name="folderMappingID">The folder mapping identifier.</param>
         public override void UpdateSettings(int folderMappingID)
         {
+			Logger.LogDebug(">>> Entering UpdateSettings(folderMappingID={FolderMappingID})", folderMappingID);
             this.Page.Validate();
 
             if (!this.Page.IsValid)
@@ -113,8 +122,11 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
             var folderMappingController = FolderMappingController.Instance;
             var folderMapping = folderMappingController.GetFolderMapping(folderMappingID);
 
+			Logger.LogDebug("UpdateSettings(folderMappingID={FolderMappingID}): folderMapping → {FolderMapping}", folderMappingID, folderMapping);
             var accountName = FolderProvider.EncryptValue(this.cryptographyProvider, this.hostSettings, this.tbAccountName.Text).EncryptedMessage;
             var container = this.GetContainer();
+			Logger.LogDebug("UpdateSettings(folderMappingID={FolderMappingID}): accountName → {AccountName}", folderMappingID, accountName);
+			Logger.LogDebug("UpdateSettings(folderMappingID={FolderMappingID}): container → {Container}", folderMappingID, container);
 
             if (AreThereFolderMappingsWithSameSettings(folderMapping, accountName, container))
             {
@@ -133,6 +145,7 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
             folderMapping.FolderMappingSettings[Constants.SyncBatchSize] = this.GetSynchBatchSize();
 
             folderMappingController.UpdateFolderMapping(folderMapping);
+			Logger.LogDebug("<<< Exiting UpdateSettings(folderMappingID={FolderMappingID})", folderMappingID);
         }
 
         /// <summary>Handles the <see cref="ListControl.SelectedIndexChanged"/> event of the Container drop-down list.</summary>
@@ -141,6 +154,7 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
         protected void ddlContainers_SelectedIndexChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering ddlContainers_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
             if (this.ddlContainers.SelectedIndex != 1)
             {
                 return;
@@ -166,6 +180,7 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
                 this.valContainerName.ErrorMessage = Localization.GetString("CredentialsRequired.ErrorMessage", this.LocalResourceFile);
                 this.valContainerName.IsValid = false;
             }
+			Logger.LogDebug("<<< Exiting ddlContainers_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Handles the click event for the New Container button.</summary>
@@ -174,8 +189,10 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
         protected void btnNewContainer_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering btnNewContainer_Click(sender={Sender},e={E})", sender, e);
             this.SelectContainerPanel.Visible = false;
             this.CreateContainerPanel.Visible = true;
+			Logger.LogDebug("<<< Exiting btnNewContainer_Click(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Handles the click event for the Select Existing Container button.</summary>
@@ -184,8 +201,10 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
         protected void btnSelectExistingContainer_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering btnSelectExistingContainer_Click(sender={Sender},e={E})", sender, e);
             this.SelectContainerPanel.Visible = true;
             this.CreateContainerPanel.Visible = false;
+			Logger.LogDebug("<<< Exiting btnSelectExistingContainer_Click(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Handles the <see cref="CustomValidator.ServerValidate"/> event of the Container Name validator.</summary>
@@ -194,11 +213,13 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
         protected void valContainerName_ServerValidate(object source, ServerValidateEventArgs args)
         {
+			Logger.LogDebug(">>> Entering valContainerName_ServerValidate(source={Source},args={Args})", source, args);
             if (this.SelectContainerPanel.Visible)
             {
                 if (this.ddlContainers.SelectedIndex > 1)
                 {
                     args.IsValid = true;
+					Logger.LogDebug("valContainerName_ServerValidate(source={Source},args={Args}): args.IsValid → {Arg2}", source, args, args.IsValid);
                     return;
                 }
             }
@@ -213,6 +234,7 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
 
             this.valContainerName.ErrorMessage = Localization.GetString("valContainerName.ErrorMessage", this.LocalResourceFile);
             args.IsValid = false;
+			Logger.LogDebug("<<< Exiting valContainerName_ServerValidate(source={Source},args={Args})", source, args);
         }
 
         private static bool AreThereFolderMappingsWithSameSettings(FolderMappingInfo folderMapping, string accountName, string container)
@@ -236,16 +258,20 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
 
         private string GetUseHttps()
         {
+			Logger.LogDebug(">>> Entering GetUseHttps()");
+			Logger.LogDebug("<<< Exiting GetUseHttps()");
             return this.chkUseHttps.Checked.ToString();
         }
 
         private string GetContainer()
         {
+			Logger.LogDebug(">>> Entering GetContainer()");
             string container;
 
             if (this.SelectContainerPanel.Visible)
             {
                 container = this.ddlContainers.SelectedValue;
+				Logger.LogDebug("GetContainer(): container → {Container}", container);
             }
             else
             {
@@ -256,13 +282,17 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetContainer()");
             return container;
         }
 
         private bool CreateContainer(string containerName)
         {
+			Logger.LogDebug(">>> Entering CreateContainer(containerName={ContainerName})", containerName);
             var accountName = this.tbAccountName.Text.Trim();
             var accountKey = this.tbAccountKey.Text.Trim();
+			Logger.LogDebug("CreateContainer(containerName={ContainerName}): accountName → {AccountName}", containerName, accountName);
+			Logger.LogDebug("CreateContainer(containerName={ContainerName}): accountKey → {AccountKey}", containerName, accountKey);
             var useHttps = this.chkUseHttps.Checked;
 
             StorageCredentials sc;
@@ -271,6 +301,7 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
             {
                 sc = new StorageCredentials(accountName, accountKey);
             }
+			Logger.LogDebug("CreateContainer(containerName={ContainerName}): sc → {Sc}", containerName, sc);
             catch (Exception ex)
             {
                 Logger.Error(ex);
@@ -283,14 +314,19 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
 
             var csa = new CloudStorageAccount(sc, useHttps);
             var blobClient = csa.CreateCloudBlobClient();
+			Logger.LogDebug("CreateContainer(containerName={ContainerName}): csa → {Csa}", containerName, csa);
+			Logger.LogDebug("CreateContainer(containerName={ContainerName}): blobClient → {BlobClient}", containerName, blobClient);
             var container = blobClient.GetContainerReference(containerName);
 
+			Logger.LogDebug("CreateContainer(containerName={ContainerName}): container → {Container}", containerName, container);
             try
             {
                 if (container.CreateIfNotExists())
                 {
                     var permissions = container.GetPermissions();
                     permissions.PublicAccess = BlobContainerPublicAccessType.Container;
+					Logger.LogDebug("CreateContainer(containerName={ContainerName}): permissions → {Permissions}", containerName, permissions);
+					Logger.LogDebug("CreateContainer(containerName={ContainerName}): permissions.PublicAccess → {Arg1}", containerName, permissions.PublicAccess);
                     container.SetPermissions(permissions);
                 }
 
@@ -298,6 +334,7 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
             }
             catch (StorageException ex)
             {
+				Logger.LogError("Exception in CreateContainer(containerName={ContainerName}): {Arg1}", containerName, ex.Message);
                 if (ex.RequestInformation.ExtendedErrorInformation != null)
                 {
                     switch (ex.RequestInformation.ExtendedErrorInformation.ErrorCode)
@@ -338,18 +375,24 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
             }
 
             this.valContainerName.IsValid = false;
+			Logger.LogDebug("<<< Exiting CreateContainer(containerName={ContainerName})", containerName);
             return false;
         }
 
         private string GetSynchBatchSize()
         {
+			Logger.LogDebug(">>> Entering GetSynchBatchSize()");
+			Logger.LogDebug("<<< Exiting GetSynchBatchSize()");
             return this.tbSyncBatchSize.Text;
         }
 
         private void LoadContainers()
         {
+			Logger.LogDebug(">>> Entering LoadContainers()");
             var accountName = this.tbAccountName.Text.Trim();
             var accountKey = this.tbAccountKey.Text.Trim();
+			Logger.LogDebug("LoadContainers(): accountName → {AccountName}", accountName);
+			Logger.LogDebug("LoadContainers(): accountKey → {AccountKey}", accountKey);
             var useHttps = this.chkUseHttps.Checked;
 
             StorageCredentials sc;
@@ -358,6 +401,7 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
             {
                 sc = new StorageCredentials(accountName, accountKey);
             }
+			Logger.LogDebug("LoadContainers(): sc → {Sc}", sc);
             catch (Exception ex)
             {
                 Logger.Error(ex);
@@ -370,6 +414,8 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
 
             var csa = new CloudStorageAccount(sc, useHttps);
             var blobClient = csa.CreateCloudBlobClient();
+			Logger.LogDebug("LoadContainers(): csa → {Csa}", csa);
+			Logger.LogDebug("LoadContainers(): blobClient → {BlobClient}", blobClient);
 
             try
             {
@@ -380,6 +426,7 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
             }
             catch (StorageException ex)
             {
+				Logger.LogError("Exception in LoadContainers(): {Arg0}", ex.Message);
                 if (ex.RequestInformation.ExtendedErrorInformation != null)
                 {
                     switch (ex.RequestInformation.ExtendedErrorInformation.ErrorCode)
@@ -406,6 +453,7 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
                 this.valContainerName.ErrorMessage = Localization.GetString("ListContainers.ErrorMessage", this.LocalResourceFile);
                 this.valContainerName.IsValid = false;
             }
+			Logger.LogDebug("<<< Exiting LoadContainers()");
         }
     }
 }

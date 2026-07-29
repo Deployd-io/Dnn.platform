@@ -8,22 +8,33 @@ Imports System.Xml
 Namespace DotNetNuke.UI.WebControls
     Friend NotInheritable Class TreeNodeEnumerator
         Implements IEnumerator
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(TreeNodeEnumerator))
         ' Methods
         Public Sub New(ByVal objRoot As XmlNode, ByVal objControl As DnnTree)
+			Logger.LogDebug(">>> Entering New(objRoot={ObjRoot},objControl={ObjControl})", objRoot, objControl)
             Me.m_objXmlNode = objRoot
             Me.m_DNNTree = objControl
+			Logger.LogDebug("New(objRoot={ObjRoot},objControl={ObjControl}): Me.m_DNNTree → {Arg2}", objRoot, objControl, Me.m_DNNTree)
+			Logger.LogDebug("New(objRoot={ObjRoot},objControl={ObjControl}): Me.m_intCursor → {Arg2}", objRoot, objControl, Me.m_intCursor)
+			Logger.LogDebug("New(objRoot={ObjRoot},objControl={ObjControl}): Me.m_objXmlNode → {Arg2}", objRoot, objControl, Me.m_objXmlNode)
             Me.m_intCursor = -1
+			Logger.LogDebug("<<< Exiting New(objRoot={ObjRoot},objControl={ObjControl})", objRoot, objControl)
         End Sub
 
         Public Function MoveNext() As Boolean Implements IEnumerator.MoveNext
+			Logger.LogDebug(">>> Entering MoveNext()")
             If (Me.m_intCursor < Me.m_objXmlNode.ChildNodes.Count) Then
                 Me.m_intCursor += 1
             End If
+			Logger.LogDebug("<<< Exiting MoveNext()")
             Return (Me.m_intCursor <> Me.m_objXmlNode.ChildNodes.Count)
         End Function
 
         Public Sub Reset() Implements IEnumerator.Reset
+			Logger.LogDebug(">>> Entering Reset()")
             Me.m_intCursor = -1
+			Logger.LogDebug("<<< Exiting Reset()")
+			Logger.LogDebug("Reset(): Me.m_intCursor → {Arg0}", Me.m_intCursor)
         End Sub
 
 

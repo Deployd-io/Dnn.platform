@@ -14,6 +14,7 @@ namespace Dnn.PersonaBar.Pages.Services.Dto
     [JsonObject]
     public class DnnPageDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public bool TranslatedVisible => !this.Default && this.TabName != null;
 
         public bool PublishedVisible => !this.Default && this.IsTranslated;
@@ -74,13 +75,16 @@ namespace Dnn.PersonaBar.Pages.Services.Dto
 
         private static bool IsLanguagePublished(int portalId, string code)
         {
+			Logger.LogDebug(">>> Entering IsLanguagePublished(portalId={PortalId},code={Code})", portalId, code);
             var isPublished = Null.NullBoolean;
             Locale enabledLanguage;
+			Logger.LogDebug("IsLanguagePublished(portalId={PortalId},code={Code}): isPublished → {IsPublished}", portalId, code, isPublished);
             if (LocaleController.Instance.GetLocales(portalId).TryGetValue(code, out enabledLanguage))
             {
                 isPublished = enabledLanguage.IsPublished;
             }
 
+			Logger.LogDebug("<<< Exiting IsLanguagePublished(portalId={PortalId},code={Code})", portalId, code);
             return isPublished;
         }
     }

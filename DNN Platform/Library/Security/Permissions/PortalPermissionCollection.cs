@@ -18,9 +18,12 @@ namespace DotNetNuke.Security.Permissions
     [XmlRoot("portalpermissions")]
     public class PortalPermissionCollection : GenericCollectionBase<PortalPermissionInfo>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="PortalPermissionCollection"/> class.</summary>
         public PortalPermissionCollection()
         {
+		Logger.LogDebug(">>> Entering PortalPermissionCollection()");
+		Logger.LogDebug("<<< Exiting PortalPermissionCollection()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="PortalPermissionCollection"/> class.</summary>
@@ -28,6 +31,8 @@ namespace DotNetNuke.Security.Permissions
         public PortalPermissionCollection(ArrayList portalPermissions)
         {
             this.AddRange(portalPermissions);
+			Logger.LogDebug(">>> Entering PortalPermissionCollection(portalPermissions={PortalPermissions})", portalPermissions);
+			Logger.LogDebug("<<< Exiting PortalPermissionCollection(portalPermissions={PortalPermissions})", portalPermissions);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PortalPermissionCollection"/> class.</summary>
@@ -42,6 +47,7 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="portalId">The ID of the portal by which to filter <paramref name="portalPermissions"/>.</param>
         public PortalPermissionCollection(ArrayList portalPermissions, int portalId)
         {
+			Logger.LogDebug(">>> Entering PortalPermissionCollection(portalPermissions={PortalPermissions},portalId={PortalId})", portalPermissions, portalId);
             foreach (PortalPermissionInfo permission in portalPermissions)
             {
                 if (permission.PortalID == portalId)
@@ -49,12 +55,15 @@ namespace DotNetNuke.Security.Permissions
                     this.Add(permission);
                 }
             }
+			Logger.LogDebug("<<< Exiting PortalPermissionCollection(portalPermissions={PortalPermissions},portalId={PortalId})", portalPermissions, portalId);
         }
 
         public int Add(PortalPermissionInfo value, bool checkForDuplicates)
         {
+			Logger.LogDebug(">>> Entering Add(value={Value},checkForDuplicates={CheckForDuplicates})", value, checkForDuplicates);
             int id = Null.NullInteger;
 
+			Logger.LogDebug("Add(value={Value},checkForDuplicates={CheckForDuplicates}): id → {Id}", value, checkForDuplicates, id);
             if (!checkForDuplicates)
             {
                 id = this.Add(value);
@@ -64,6 +73,7 @@ namespace DotNetNuke.Security.Permissions
                 bool isMatch = false;
                 foreach (IPermissionInfo permission in this.List)
                 {
+				Logger.LogDebug("Add(value={Value},checkForDuplicates={CheckForDuplicates}): isMatch → {IsMatch}", value, checkForDuplicates, isMatch);
                     if (permission.PermissionId == value.PermissionID && permission.UserId == value.UserID && permission.RoleId == value.RoleID)
                     {
                         isMatch = true;
@@ -77,6 +87,7 @@ namespace DotNetNuke.Security.Permissions
                 }
             }
 
+			Logger.LogDebug("<<< Exiting Add(value={Value},checkForDuplicates={CheckForDuplicates})", value, checkForDuplicates);
             return id;
         }
 
@@ -86,6 +97,8 @@ namespace DotNetNuke.Security.Permissions
             {
                 this.Add(permission);
             }
+			Logger.LogDebug(">>> Entering AddRange(portalPermissions={PortalPermissions})", portalPermissions);
+			Logger.LogDebug("<<< Exiting AddRange(portalPermissions={PortalPermissions})", portalPermissions);
         }
 
         public void AddRange(IEnumerable<PortalPermissionInfo> portalPermissions)
@@ -106,6 +119,7 @@ namespace DotNetNuke.Security.Permissions
 
         public bool CompareTo(PortalPermissionCollection objPortalPermissionCollection)
         {
+			Logger.LogDebug(">>> Entering CompareTo(objPortalPermissionCollection={ObjPortalPermissionCollection})", objPortalPermissionCollection);
             if (objPortalPermissionCollection.Count != this.Count)
             {
                 return false;
@@ -125,11 +139,13 @@ namespace DotNetNuke.Security.Permissions
                 }
             }
 
+			Logger.LogDebug("<<< Exiting CompareTo(objPortalPermissionCollection={ObjPortalPermissionCollection})", objPortalPermissionCollection);
             return true;
         }
 
         public void Remove(int permissionID, int roleID, int userID)
         {
+			Logger.LogDebug(">>> Entering Remove(permissionID={PermissionID},roleID={RoleID},userID={UserID})", permissionID, roleID, userID);
             foreach (PermissionInfoBase permission in this.List)
             {
                 if (permission.PermissionID == permissionID && permission.UserID == userID && permission.RoleID == roleID)
@@ -138,15 +154,20 @@ namespace DotNetNuke.Security.Permissions
                     break;
                 }
             }
+			Logger.LogDebug("<<< Exiting Remove(permissionID={PermissionID},roleID={RoleID},userID={UserID})", permissionID, roleID, userID);
         }
 
         public List<PermissionInfoBase> ToList()
         {
+			Logger.LogDebug(">>> Entering ToList()");
+			Logger.LogDebug("<<< Exiting ToList()");
             return [..this.List.Cast<PermissionInfoBase>()];
         }
 
         public string ToString(string key)
         {
+			Logger.LogDebug(">>> Entering ToString(key={Key})", key);
+			Logger.LogDebug("<<< Exiting ToString(key={Key})", key);
             return PermissionController.BuildPermissions(this.List, key);
         }
 

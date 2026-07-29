@@ -34,6 +34,7 @@ namespace DotNetNuke.Entities.Modules
 
     public enum DisplayMode
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Display all.</summary>
         All = 0,
 
@@ -63,6 +64,10 @@ namespace DotNetNuke.Entities.Modules
         public UserModuleBase()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering UserModuleBase()");
+		Logger.LogDebug("<<< Exiting UserModuleBase()");
+		Logger.LogDebug(">>> Entering UserModuleBase(listController={ListController},hostSettings={HostSettings})", listController, hostSettings);
+		Logger.LogDebug("<<< Exiting UserModuleBase(listController={ListController},hostSettings={HostSettings})", listController, hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="UserModuleBase"/> class.</summary>
@@ -208,12 +213,15 @@ namespace DotNetNuke.Entities.Modules
         /// <returns>The setting value or <see langword="null"/>.</returns>
         public static object GetSetting(int portalId, string settingKey)
         {
+			Logger.LogDebug(">>> Entering GetSetting(portalId={PortalId},settingKey={SettingKey})", portalId, settingKey);
             Hashtable settings = UserController.GetUserSettings(portalId);
             if (settings[settingKey] == null)
+			Logger.LogDebug("GetSetting(portalId={PortalId},settingKey={SettingKey}): settings → {Settings}", portalId, settingKey, settings);
             {
                 settings = UserController.GetUserSettings(portalId, settings);
             }
 
+			Logger.LogDebug("<<< Exiting GetSetting(portalId={PortalId},settingKey={SettingKey})", portalId, settingKey);
             return settings[settingKey];
         }
 
@@ -398,14 +406,18 @@ namespace DotNetNuke.Entities.Modules
         /// <summary>InitialiseUser initialises a "new" user.</summary>
         private UserInfo InitialiseUser()
         {
+			Logger.LogDebug(">>> Entering InitialiseUser()");
             var newUser = new UserInfo();
             if (this.IsHostMenu && !this.IsRegister)
+			Logger.LogDebug("InitialiseUser(): newUser → {NewUser}", newUser);
             {
                 newUser.IsSuperUser = true;
+				Logger.LogDebug("InitialiseUser(): newUser.IsSuperUser → {Arg0}", newUser.IsSuperUser);
             }
             else
             {
                 newUser.PortalID = this.PortalId;
+				Logger.LogDebug("InitialiseUser(): newUser.PortalID → {Arg0}", newUser.PortalID);
             }
 
             // Initialize the ProfileProperties Collection
@@ -419,9 +431,11 @@ namespace DotNetNuke.Entities.Modules
             // Set default country
             var country = this.LookupCountry();
             if (!string.IsNullOrEmpty(country))
+			Logger.LogDebug("InitialiseUser(): country → {Country}", country);
             {
                 var listItem = this.ListController.GetListEntryInfo("Country", country);
                 if (listItem != null)
+				Logger.LogDebug("InitialiseUser(): listItem → {ListItem}", listItem);
                 {
                     country = listItem.EntryID.ToString(CultureInfo.InvariantCulture);
                 }
@@ -432,24 +446,31 @@ namespace DotNetNuke.Entities.Modules
             // Set AffiliateId
             int affiliateId = Null.NullInteger;
             if (this.Request.Cookies["AffiliateId"] != null)
+			Logger.LogDebug("InitialiseUser(): affiliateId → {AffiliateId}", affiliateId);
             {
                 affiliateId = int.Parse(this.Request.Cookies["AffiliateId"].Value, CultureInfo.InvariantCulture);
             }
 
             newUser.AffiliateID = affiliateId;
+			Logger.LogDebug("InitialiseUser(): newUser.AffiliateID → {Arg0}", newUser.AffiliateID);
+			Logger.LogDebug("<<< Exiting InitialiseUser()");
             return newUser;
         }
 
         private string LookupCountry()
         {
+			Logger.LogDebug(">>> Entering LookupCountry()");
             string ip;
             bool isLocal = false;
             bool cacheGeoIPData = true;
+			Logger.LogDebug("LookupCountry(): isLocal → {IsLocal}", isLocal);
             string geoIPFile;
             geoIPFile = "controls/CountryListBox/Data/GeoIP.dat";
+			Logger.LogDebug("LookupCountry(): geoIPFile → {GeoIPFile}", geoIPFile);
             var userRequestIpAddressController = UserRequestIPAddressController.Instance;
             var ipAddress = userRequestIpAddressController.GetUserRequestIPAddress(new HttpRequestWrapper(this.Request));
             if (ipAddress == "127.0.0.1")
+			Logger.LogDebug("LookupCountry(): ipAddress → {IpAddress}", ipAddress);
             {
                 // 'The country cannot be detected because the user is local.
                 isLocal = true;
@@ -457,6 +478,7 @@ namespace DotNetNuke.Entities.Modules
                 // Set the IP address in case they didn't specify LocalhostCountryCode
                 ip = this.Page.Request.UserHostAddress;
             }
+			Logger.LogDebug("LookupCountry(): ip → {Ip}", ip);
             else
             {
                 // Set the IP address so we can find the country
@@ -487,6 +509,7 @@ namespace DotNetNuke.Entities.Modules
             {
                 // Yes, get it from cache
                 countryLookup = new CountryLookup((MemoryStream)this.Context.Cache.Get("GeoIPData"));
+				Logger.LogDebug("LookupCountry(): countryLookup → {CountryLookup}", countryLookup);
             }
             else
             {
@@ -497,14 +520,17 @@ namespace DotNetNuke.Entities.Modules
             // Get the country code based on the IP address
             string country = Null.NullString;
             try
+			Logger.LogDebug("LookupCountry(): country → {Country}", country);
             {
                 country = countryLookup.LookupCountryName(ip);
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in LookupCountry(): {Arg0}", ex.Message);
                 Exceptions.LogException(ex);
             }
 
+			Logger.LogDebug("<<< Exiting LookupCountry()");
             return country;
         }
     }

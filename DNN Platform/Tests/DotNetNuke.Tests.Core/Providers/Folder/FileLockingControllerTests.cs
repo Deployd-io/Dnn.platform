@@ -21,6 +21,7 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
     [TestFixture]
     public class FileLockingControllerTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private Mock<IWorkflowEngine> mockWorkFlowEngine;
         private Mock<IUserSecurityController> mockUserSecurityController;
         private FileLockingController fileLockingController;
@@ -28,25 +29,33 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
         [SetUp]
         public void Setup()
         {
+			Logger.LogDebug(">>> Entering Setup()");
             this.mockWorkFlowEngine = new Mock<IWorkflowEngine>();
             this.mockUserSecurityController = new Mock<IUserSecurityController>();
+			Logger.LogDebug("Setup(): mockUserSecurityController → {MockUserSecurityController}", mockUserSecurityController);
+			Logger.LogDebug("Setup(): mockWorkFlowEngine → {MockWorkFlowEngine}", mockWorkFlowEngine);
 
             WorkflowEngine.SetTestableInstance(this.mockWorkFlowEngine.Object);
             UserSecurityController.SetTestableInstance(this.mockUserSecurityController.Object);
 
             this.fileLockingController = new FileLockingController();
+			Logger.LogDebug("<<< Exiting Setup()");
+			Logger.LogDebug("Setup(): fileLockingController → {FileLockingController}", fileLockingController);
         }
 
         [TearDown]
         public void TearDown()
         {
+			Logger.LogDebug(">>> Entering TearDown()");
             UserSecurityController.ClearInstance();
             MockComponentProvider.ResetContainer();
+			Logger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void IsFileLocked_ReturnsTrue_WhenPublishPeriodIsOut()
         {
+			Logger.LogDebug(">>> Entering IsFileLocked_ReturnsTrue_WhenPublishPeriodIsOut()");
             // Arrange
             ////_fileInfo.Setup(fi => fi.PortalId).Returns(Constants.CONTENT_ValidPortalId);
             ////_fileInfo.Setup(fi => fi.FolderId).Returns(Constants.FOLDER_ValidFolderId);
@@ -66,17 +75,20 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             string someReason;
             var result = this.fileLockingController.IsFileLocked(fileInfo, out someReason);
 
+			Logger.LogDebug("IsFileLocked_ReturnsTrue_WhenPublishPeriodIsOut(): result → {Result}", result);
             using (Assert.EnterMultipleScope())
             {
                 // Assert
                 Assert.That(result, Is.True);
                 Assert.That(someReason, Is.EqualTo("FileLockedOutOfPublishPeriodError"));
             }
+			Logger.LogDebug("<<< Exiting IsFileLocked_ReturnsTrue_WhenPublishPeriodIsOut()");
         }
 
         [Test]
         public void IsFileLocked_ReturnsTrue_WhenWorkflowIsNotComplete()
         {
+			Logger.LogDebug(">>> Entering IsFileLocked_ReturnsTrue_WhenWorkflowIsNotComplete()");
             // Arrange
             var fileInfo = new FileInfoBuilder()
                 .WithEndDate(DateTime.Today.AddDays(2))
@@ -91,17 +103,20 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             string someReason;
             var result = this.fileLockingController.IsFileLocked(fileInfo, out someReason);
 
+			Logger.LogDebug("IsFileLocked_ReturnsTrue_WhenWorkflowIsNotComplete(): result → {Result}", result);
             using (Assert.EnterMultipleScope())
             {
                 // Assert
                 Assert.That(result, Is.True);
                 Assert.That(someReason, Is.EqualTo("FileLockedRunningWorkflowError"));
             }
+			Logger.LogDebug("<<< Exiting IsFileLocked_ReturnsTrue_WhenWorkflowIsNotComplete()");
         }
 
         [Test]
         public void IsFileLocked_ReturnsFalse_WhenUserIsHostOrAdmin()
         {
+			Logger.LogDebug(">>> Entering IsFileLocked_ReturnsFalse_WhenUserIsHostOrAdmin()");
             // Arrange
             var fileInfo = new FileInfoBuilder()
                 .WithStartDate(DateTime.Today.AddDays(-2))
@@ -114,13 +129,16 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             string someReason;
             var result = this.fileLockingController.IsFileLocked(fileInfo, out someReason);
 
+			Logger.LogDebug("IsFileLocked_ReturnsFalse_WhenUserIsHostOrAdmin(): result → {Result}", result);
             // Assert
             Assert.That(result, Is.False);
+			Logger.LogDebug("<<< Exiting IsFileLocked_ReturnsFalse_WhenUserIsHostOrAdmin()");
         }
 
         [Test]
         public void IsFileLocked_ReturnsFalse_WhenPublishPeriodIsIn()
         {
+			Logger.LogDebug(">>> Entering IsFileLocked_ReturnsFalse_WhenPublishPeriodIsIn()");
             // Arrange
             var fileInfo = new FileInfoBuilder()
                 .WithEndDate(DateTime.Today.AddDays(2))
@@ -132,13 +150,16 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             string someReason;
             var result = this.fileLockingController.IsFileLocked(fileInfo, out someReason);
 
+			Logger.LogDebug("IsFileLocked_ReturnsFalse_WhenPublishPeriodIsIn(): result → {Result}", result);
             // Assert
             Assert.That(result, Is.False);
+			Logger.LogDebug("<<< Exiting IsFileLocked_ReturnsFalse_WhenPublishPeriodIsIn()");
         }
 
         [Test]
         public void IsFileLocked_ReturnsFalse_WhenPublishPeriodHasNotEndDate()
         {
+			Logger.LogDebug(">>> Entering IsFileLocked_ReturnsFalse_WhenPublishPeriodHasNotEndDate()");
             // Arrange
             var fileInfo = new FileInfoBuilder()
                 .WithEndDate(DateTime.Today.AddDays(2))
@@ -150,28 +171,35 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             string someReason;
             var result = this.fileLockingController.IsFileLocked(fileInfo, out someReason);
 
+			Logger.LogDebug("IsFileLocked_ReturnsFalse_WhenPublishPeriodHasNotEndDate(): result → {Result}", result);
             // Assert
             Assert.That(result, Is.False);
+			Logger.LogDebug("<<< Exiting IsFileLocked_ReturnsFalse_WhenPublishPeriodHasNotEndDate()");
         }
 
         [Test]
         public void IsFileLocked_ReturnsFalse_WhenPublishPeriodIsDisabled()
         {
+			Logger.LogDebug(">>> Entering IsFileLocked_ReturnsFalse_WhenPublishPeriodIsDisabled()");
             // Arrange
             var fileInfo = new FileInfoBuilder().Build();
             this.mockUserSecurityController.Setup(msc => msc.IsHostAdminUser(Constants.CONTENT_ValidPortalId)).Returns(false);
+			Logger.LogDebug("IsFileLocked_ReturnsFalse_WhenPublishPeriodIsDisabled(): fileInfo → {FileInfo}", fileInfo);
 
             // Act
             string someReason;
             var result = this.fileLockingController.IsFileLocked(fileInfo, out someReason);
 
+			Logger.LogDebug("IsFileLocked_ReturnsFalse_WhenPublishPeriodIsDisabled(): result → {Result}", result);
             // Assert
             Assert.That(result, Is.False);
+			Logger.LogDebug("<<< Exiting IsFileLocked_ReturnsFalse_WhenPublishPeriodIsDisabled()");
         }
 
         [Test]
         public void IsFileOutOfPublishPeriod_ReturnsTrue_WhenPublishPeriodIsOut()
         {
+			Logger.LogDebug(">>> Entering IsFileOutOfPublishPeriod_ReturnsTrue_WhenPublishPeriodIsOut()");
             // Arrange
             var fileInfo = new FileInfoBuilder()
                 .WithStartDate(DateTime.Today.AddDays(-2))
@@ -183,13 +211,16 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             // Act
             var result = this.fileLockingController.IsFileOutOfPublishPeriod(fileInfo, It.IsAny<int>(), It.IsAny<int>());
 
+			Logger.LogDebug("IsFileOutOfPublishPeriod_ReturnsTrue_WhenPublishPeriodIsOut(): result → {Result}", result);
             // Assert
             Assert.That(result, Is.True);
+			Logger.LogDebug("<<< Exiting IsFileOutOfPublishPeriod_ReturnsTrue_WhenPublishPeriodIsOut()");
         }
 
         [Test]
         public void IsFileOutOfPublishPeriod_ReturnsFalse_WhenUserIsHostOrAdmin()
         {
+			Logger.LogDebug(">>> Entering IsFileOutOfPublishPeriod_ReturnsFalse_WhenUserIsHostOrAdmin()");
             // Arrange
             var fileInfo = new FileInfoBuilder()
                 .WithStartDate(DateTime.Today.AddDays(-2))
@@ -201,13 +232,16 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             // Act
             var result = this.fileLockingController.IsFileOutOfPublishPeriod(fileInfo, It.IsAny<int>(), It.IsAny<int>());
 
+			Logger.LogDebug("IsFileOutOfPublishPeriod_ReturnsFalse_WhenUserIsHostOrAdmin(): result → {Result}", result);
             // Assert
             Assert.That(result, Is.False);
+			Logger.LogDebug("<<< Exiting IsFileOutOfPublishPeriod_ReturnsFalse_WhenUserIsHostOrAdmin()");
         }
 
         [Test]
         public void IsFileOutOfPublishPeriod_ReturnsFalse_WhenPublishPeriodIsIn()
         {
+			Logger.LogDebug(">>> Entering IsFileOutOfPublishPeriod_ReturnsFalse_WhenPublishPeriodIsIn()");
             // Arrange
             var fileInfo = new FileInfoBuilder()
                 .WithEndDate(DateTime.Today.AddDays(2))
@@ -218,13 +252,16 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             // Act
             var result = this.fileLockingController.IsFileOutOfPublishPeriod(fileInfo, It.IsAny<int>(), It.IsAny<int>());
 
+			Logger.LogDebug("IsFileOutOfPublishPeriod_ReturnsFalse_WhenPublishPeriodIsIn(): result → {Result}", result);
             // Assert
             Assert.That(result, Is.False);
+			Logger.LogDebug("<<< Exiting IsFileOutOfPublishPeriod_ReturnsFalse_WhenPublishPeriodIsIn()");
         }
 
         [Test]
         public void IsFileOutOfPublishPeriod_ReturnsFalse_WhenPublishPeriodHasNotEndDate()
         {
+			Logger.LogDebug(">>> Entering IsFileOutOfPublishPeriod_ReturnsFalse_WhenPublishPeriodHasNotEndDate()");
             // Arrange
             var fileInfo = new FileInfoBuilder()
                 .WithEndDate(DateTime.Today.AddDays(2))
@@ -235,22 +272,28 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             // Act
             var result = this.fileLockingController.IsFileOutOfPublishPeriod(fileInfo, It.IsAny<int>(), It.IsAny<int>());
 
+			Logger.LogDebug("IsFileOutOfPublishPeriod_ReturnsFalse_WhenPublishPeriodHasNotEndDate(): result → {Result}", result);
             // Assert
             Assert.That(result, Is.False);
+			Logger.LogDebug("<<< Exiting IsFileOutOfPublishPeriod_ReturnsFalse_WhenPublishPeriodHasNotEndDate()");
         }
 
         [Test]
         public void IsFileOutOfPublishPeriod_ReturnsFalse_WhenPublishPeriodIsDisabled()
         {
+			Logger.LogDebug(">>> Entering IsFileOutOfPublishPeriod_ReturnsFalse_WhenPublishPeriodIsDisabled()");
             // Arrange
             var fileInfo = new FileInfoBuilder().Build();
             this.mockUserSecurityController.Setup(msc => msc.IsHostAdminUser(It.IsAny<int>(), It.IsAny<int>())).Returns(false);
+			Logger.LogDebug("IsFileOutOfPublishPeriod_ReturnsFalse_WhenPublishPeriodIsDisabled(): fileInfo → {FileInfo}", fileInfo);
 
             // Act
             var result = this.fileLockingController.IsFileOutOfPublishPeriod(fileInfo, It.IsAny<int>(), It.IsAny<int>());
 
+			Logger.LogDebug("IsFileOutOfPublishPeriod_ReturnsFalse_WhenPublishPeriodIsDisabled(): result → {Result}", result);
             // Assert
             Assert.That(result, Is.False);
+			Logger.LogDebug("<<< Exiting IsFileOutOfPublishPeriod_ReturnsFalse_WhenPublishPeriodIsDisabled()");
         }
     }
 }

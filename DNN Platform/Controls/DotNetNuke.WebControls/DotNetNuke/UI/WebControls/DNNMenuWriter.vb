@@ -13,18 +13,25 @@ Namespace DotNetNuke.UI.WebControls
     Friend NotInheritable Class DNNMenuWriter
         Inherits WebControl
         Implements IDNNMenuWriter
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(DNNMenuWriter))
         ' Methods
         Public Sub New()
+			Logger.LogDebug(">>> Entering New()")
             DNNMenuWriter.__ENCAddToList(Me)
+			Logger.LogDebug("<<< Exiting New()")
+			Logger.LogDebug(">>> Entering New(blnForceFullMenu={BlnForceFullMenu})", blnForceFullMenu)
+			Logger.LogDebug("New(blnForceFullMenu={BlnForceFullMenu}): Me.ForceFullMenu → {Arg1}", blnForceFullMenu, Me.ForceFullMenu)
         End Sub
 
         Public Sub New(ByVal blnForceFullMenu As Boolean)
             DNNMenuWriter.__ENCAddToList(Me)
             Me.ForceFullMenu = blnForceFullMenu
+			Logger.LogDebug("<<< Exiting New(blnForceFullMenu={BlnForceFullMenu})", blnForceFullMenu)
         End Sub
 
         <DebuggerNonUserCode> _
         Private Shared Sub __ENCAddToList(ByVal value As Object)
+			Logger.LogDebug(">>> Entering __ENCAddToList(value={Value})", value)
             SyncLock DNNMenuWriter.__ENCList
                 If (DNNMenuWriter.__ENCList.Count = DNNMenuWriter.__ENCList.Capacity) Then
                     Dim index As Integer = 0
@@ -49,12 +56,15 @@ Namespace DotNetNuke.UI.WebControls
                 End If
                 DNNMenuWriter.__ENCList.Add(New WeakReference(value))
             End SyncLock
+			Logger.LogDebug("<<< Exiting __ENCAddToList(value={Value})", value)
         End Sub
 
         Protected Overrides Sub RenderChildren(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderChildren(writer={Writer})", writer)
             Dim enumerator As IEnumerator = Nothing
             Try 
                 enumerator = Me.m_objMenu.MenuNodes.GetEnumerator
+				Logger.LogDebug("RenderChildren(writer={Writer}): enumerator → {Enumerator}", writer, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -66,13 +76,16 @@ Namespace DotNetNuke.UI.WebControls
                     TryCast(enumerator,IDisposable).Dispose
                 End If
             End Try
+			Logger.LogDebug("<<< Exiting RenderChildren(writer={Writer})", writer)
         End Sub
 
         Protected Overrides Sub RenderContents(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering RenderContents(writer={Writer})", writer)
             Dim str As String = "DNNMenu "
             If (Me.m_objMenu.SelectedMenuNodes.Count = 0) Then
                 If (Strings.Len(Me.m_objMenu.MenuBarCssClass) > 0) Then
                     str = (str & Me.m_objMenu.MenuBarCssClass)
+					Logger.LogDebug("RenderContents(writer={Writer}): str → {Str}", writer, str)
                 End If
             ElseIf (Strings.Len(Me.m_objMenu.MenuCssClass) > 0) Then
                 str = (str & Me.m_objMenu.MenuCssClass)
@@ -84,11 +97,15 @@ Namespace DotNetNuke.UI.WebControls
             writer.RenderBeginTag(HtmlTextWriterTag.Div)
             Me.RenderChildren(writer)
             writer.RenderEndTag
+			Logger.LogDebug("<<< Exiting RenderContents(writer={Writer})", writer)
         End Sub
 
         Public Sub RenderMenu(ByVal writer As HtmlTextWriter, ByVal Menu As DNNMenu) Implements IDNNMenuWriter.RenderMenu
+			Logger.LogDebug(">>> Entering RenderMenu(writer={Writer},Menu={Menu})", writer, Menu)
             Me.m_objMenu = Menu
             Me.RenderControl(writer)
+			Logger.LogDebug("RenderMenu(writer={Writer},Menu={Menu}): Me.m_objMenu → {Arg2}", writer, Menu, Me.m_objMenu)
+			Logger.LogDebug("<<< Exiting RenderMenu(writer={Writer},Menu={Menu})", writer, Menu)
         End Sub
 
 

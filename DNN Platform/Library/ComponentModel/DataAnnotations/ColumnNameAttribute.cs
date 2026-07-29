@@ -8,11 +8,15 @@ namespace DotNetNuke.ComponentModel.DataAnnotations
     [AttributeUsage(AttributeTargets.Property)]
     public class ColumnNameAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ColumnNameAttribute"/> class.</summary>
         /// <param name="columnName">The name of the column.</param>
         public ColumnNameAttribute(string columnName)
         {
+			Logger.LogDebug(">>> Entering ColumnNameAttribute(columnName={ColumnName})", columnName);
             this.ColumnName = columnName;
+			Logger.LogDebug("<<< Exiting ColumnNameAttribute(columnName={ColumnName})", columnName);
+			Logger.LogDebug("ColumnNameAttribute(columnName={ColumnName}): this.ColumnName → {Arg1}", columnName, this.ColumnName);
         }
 
         public string ColumnName { get; set; }

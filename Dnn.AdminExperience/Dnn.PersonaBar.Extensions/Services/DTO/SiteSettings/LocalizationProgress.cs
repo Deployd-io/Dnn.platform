@@ -9,6 +9,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services.Dto
     [JsonObject]
     public class LocalizationProgress
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public string CurrentOperationText { get; set; }
 
         public bool InProgress { get; set; }
@@ -31,8 +32,12 @@ namespace Dnn.PersonaBar.SiteSettings.Services.Dto
 
         public LocalizationProgress Reset()
         {
+			Logger.LogDebug(">>> Entering Reset()");
             this.InProgress = false;
             this.CurrentOperationText = string.Empty;
+			Logger.LogDebug("Reset(): this.InProgress → {Arg0}", this.InProgress);
+			Logger.LogDebug("Reset(): this.CurrentOperationText → {Arg0}", this.CurrentOperationText);
+			Logger.LogDebug("<<< Exiting Reset()");
             return this;
         }
     }

@@ -17,6 +17,7 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
     /// <inheritdoc cref="IUninstallPackageStep" />
     internal sealed class UninstallPackageStep : StepBase, IUninstallPackageStep
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IPackageController packageController;
         private readonly IApplicationStatusInfo applicationStatusInfo;
         private readonly Func<PackageInfo, string, IInstaller> installerFactory;
@@ -58,6 +59,7 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         /// <inheritdoc />
         protected override void ExecuteInternal()
         {
+			Logger.LogDebug(">>> Entering ExecuteInternal()");
             bool WithMatchingName(PackageInfo p) =>
                 p.Name.Equals(this.PackageName, StringComparison.OrdinalIgnoreCase);
 
@@ -68,6 +70,7 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
             if (packageInfo == default)
             {
                 this.Success = true;
+				Logger.LogDebug("ExecuteInternal(): this.Success → {Arg0}", this.Success);
                 this.Notes = this.LocalizeFormat("UninstallStepPackageAlreadyUninstalled", this.PackageName);
                 return;
             }
@@ -75,6 +78,8 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
             var physicalPath = this.applicationStatusInfo.ApplicationMapPath;
             var installer = this.installerFactory(packageInfo, physicalPath);
             this.Success = installer.UnInstall(this.DeleteFiles);
+			Logger.LogDebug("ExecuteInternal(): installer → {Installer}", installer);
+			Logger.LogDebug("<<< Exiting ExecuteInternal()");
         }
     }
 }

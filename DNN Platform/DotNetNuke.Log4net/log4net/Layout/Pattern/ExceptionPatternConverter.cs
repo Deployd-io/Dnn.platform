@@ -24,6 +24,7 @@ using log4net.Core;
 
 namespace log4net.Layout.Pattern
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Write the exception text to the output
     /// </summary>
@@ -48,8 +49,11 @@ namespace log4net.Layout.Pattern
         /// </summary>
         public ExceptionPatternConverter()
         {
+			Logger.LogDebug(">>> Entering ExceptionPatternConverter()");
             // This converter handles the exception
             this.IgnoresException = false;
+			Logger.LogDebug("<<< Exiting ExceptionPatternConverter()");
+			Logger.LogDebug("ExceptionPatternConverter(): this.IgnoresException → {Arg0}", this.IgnoresException);
         }
 
         /// <summary>
@@ -93,6 +97,7 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         protected override void Convert(TextWriter writer, LoggingEvent loggingEvent)
         {
+			Logger.LogDebug(">>> Entering Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             if (loggingEvent.ExceptionObject != null && this.Option != null && this.Option.Length > 0)
             {
                 switch (this.Option.ToLower())
@@ -133,6 +138,7 @@ namespace log4net.Layout.Pattern
                     // do not output SystemInfo.NotAvailableText
                 }
             }
+			Logger.LogDebug("<<< Exiting Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
     }
 }

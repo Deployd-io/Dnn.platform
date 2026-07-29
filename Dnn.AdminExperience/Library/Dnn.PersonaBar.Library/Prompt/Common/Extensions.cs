@@ -9,18 +9,25 @@ namespace Dnn.PersonaBar.Library.Prompt.Common
 
     public static class Extensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static string ToPromptShortDateString(this DateTime input)
         {
+			Logger.LogDebug(">>> Entering ToPromptShortDateString(input={Input})", input);
+			Logger.LogDebug("<<< Exiting ToPromptShortDateString(input={Input})", input);
             return input.ToString("yyyy-MM-dd", CultureInfo.CurrentCulture);
         }
 
         public static string ToPromptShortDateAndTimeString(this DateTime input)
         {
+			Logger.LogDebug(">>> Entering ToPromptShortDateAndTimeString(input={Input})", input);
+			Logger.LogDebug("<<< Exiting ToPromptShortDateAndTimeString(input={Input})", input);
             return input.ToString("yyyy-MM-dd HH:mm", CultureInfo.CurrentCulture);
         }
 
         public static string ToPromptLongDateString(this DateTime input)
         {
+			Logger.LogDebug(">>> Entering ToPromptLongDateString(input={Input})", input);
+			Logger.LogDebug("<<< Exiting ToPromptLongDateString(input={Input})", input);
             return input.ToString("F", CultureInfo.CurrentCulture);
         }
     }

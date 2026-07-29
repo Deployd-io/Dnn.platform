@@ -26,6 +26,7 @@ namespace DNN.Integration.Test.Framework
 
     internal class WebApiConnector : IWebApiConnector, IDisposable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public const string FileFilters =
             "swf,jpg,jpeg,jpe,gif,bmp,png,doc,docx,xls,xlsx,ppt,pptx,pdf,txt,xml," +
             "xsl,xsd,css,zip,template,htmtemplate,ico,avi,mpg,mpeg,mp3,wmv,mov,wav";
@@ -63,13 +64,20 @@ namespace DNN.Integration.Test.Framework
 
         private WebApiConnector(string siteUrl)
         {
+			Logger.LogDebug(">>> Entering WebApiConnector(siteUrl={SiteUrl})", siteUrl);
             this.Timeout = TimeSpan.FromMinutes(1);
             this.Domain = new Uri(siteUrl);
+			Logger.LogInformation("WebApiConnector(siteUrl={SiteUrl}): Timeout → {Timeout}", siteUrl, Timeout);
             this.IsLoggedIn = false;
+			Logger.LogDebug("WebApiConnector(siteUrl={SiteUrl}): this.IsLoggedIn → {Arg1}", siteUrl, this.IsLoggedIn);
             this.ResetUserId();
             this._sessionCookiesContainer = new CookieContainer();
+			Logger.LogDebug("WebApiConnector(siteUrl={SiteUrl}): _sessionCookiesContainer → {_sessionCookiesContainer}", siteUrl, _sessionCookiesContainer);
             this._cookieVerificationToken = new Cookie(RqVerifTokenName, string.Empty, "/", this.Domain.Host);
+			Logger.LogDebug("WebApiConnector(siteUrl={SiteUrl}): _cookieVerificationToken → {_cookieVerificationToken}", siteUrl, _cookieVerificationToken);
             this.AvoidCaching = false;
+			Logger.LogDebug("<<< Exiting WebApiConnector(siteUrl={SiteUrl})", siteUrl);
+			Logger.LogDebug("WebApiConnector(siteUrl={SiteUrl}): this.AvoidCaching → {Arg1}", siteUrl, this.AvoidCaching);
         }
 
         /// <summary>
@@ -121,6 +129,8 @@ namespace DNN.Integration.Test.Framework
 
         public static WebApiConnector GetWebConnector(string siteUrl, string userName)
         {
+			Logger.LogDebug(">>> Entering GetWebConnector(siteUrl={SiteUrl},userName={UserName})", siteUrl, userName);
+			Logger.LogDebug("<<< Exiting GetWebConnector(siteUrl={SiteUrl},userName={UserName})", siteUrl, userName);
             return new WebApiConnector(siteUrl)
             {
                 UserName = (userName ?? string.Empty).Replace("'", string.Empty),
@@ -129,20 +139,33 @@ namespace DNN.Integration.Test.Framework
 
         public void Dispose()
         {
+			Logger.LogDebug(">>> Entering Dispose()");
             this.Logout();
+			Logger.LogDebug("<<< Exiting Dispose()");
         }
 
         public void Logout()
         {
+			Logger.LogDebug(">>> Entering Logout()");
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (this.IsLoggedIn)
             {
                 this.LoggedInAtTime = DateTime.MinValue;
+				Logger.LogDebug("Logout(): this.LoggedInAtTime → {Arg0}", this.LoggedInAtTime);
                 this.IsLoggedIn = false;
                 this.ResetUserId();
+				Logger.LogDebug("Logout(): this.IsLoggedIn → {Arg0}", this.IsLoggedIn);
                 try
                 {
                     var requestUriString = CombineUrlPath(this.Domain, LogoffPath);
                     var httpWebRequest1 = (HttpWebRequest)WebRequest.Create(requestUriString);
+					Logger.LogDebug("Logout(): requestUriString → {RequestUriString}", requestUriString);
+					Logger.LogDebug("Logout(): httpWebRequest1 → {HttpWebRequest1}", httpWebRequest1);
+					Logger.LogDebug("Logout(): httpWebRequest1.Method → {Arg0}", httpWebRequest1.Method);
+					Logger.LogDebug("Logout(): httpWebRequest1.KeepAlive → {Arg0}", httpWebRequest1.KeepAlive);
+					Logger.LogDebug("Logout(): httpWebRequest1.CookieContainer → {Arg0}", httpWebRequest1.CookieContainer);
+					Logger.LogDebug("Logout(): httpWebRequest1.ReadWriteTimeout → {Arg0}", httpWebRequest1.ReadWriteTimeout);
+					Logger.LogDebug("Logout(): httpWebRequest1.UserAgent → {Arg0}", httpWebRequest1.UserAgent);
                     httpWebRequest1.Method = "GET";
                     httpWebRequest1.KeepAlive = false;
                     httpWebRequest1.CookieContainer = this._sessionCookiesContainer;
@@ -156,14 +179,19 @@ namespace DNN.Integration.Test.Framework
                 finally
                 {
                     this._cookieVerificationToken = null;
+					Logger.LogDebug("Logout(): _cookieVerificationToken → {_cookieVerificationToken}", _cookieVerificationToken);
+					Logger.LogDebug("Logout(): this._cookieVerificationToken → {Arg0}", this._cookieVerificationToken);
                     this._sessionCookiesContainer = new CookieContainer();
 
+					Logger.LogDebug("Logout(): _sessionCookiesContainer → {_sessionCookiesContainer}", _sessionCookiesContainer);
                     var url = CombineUrlPath(this.Domain, "/");
                     CachedWebPage cachedPage;
+					Logger.LogDebug("Logout(): url → {Url}", url);
                     if (!this.AvoidCaching && CachedPages.TryGetValue(url, out cachedPage) &&
                         cachedPage.FetchDateTime < DateTime.Now.AddMinutes(-19.5))
                     {
                         this._inputFieldVerificationToken = cachedPage.VerificationToken;
+						Logger.LogDebug("Logout(): this._inputFieldVerificationToken → {Arg0}", this._inputFieldVerificationToken);
                     }
                     else
                     {
@@ -171,10 +199,13 @@ namespace DNN.Integration.Test.Framework
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting Logout()");
+			Logger.LogInformation("Logout(): external service call {RequestUriString} took {Arg1} ms", requestUriString, __logStart.ElapsedMilliseconds);
         }
 
         public bool Login(string password)
         {
+			Logger.LogDebug(">>> Entering Login(password={Password})", password);
             if (this.IsLoggedIn)
             {
                 return true;
@@ -195,6 +226,7 @@ namespace DNN.Integration.Test.Framework
 
             var excludedInputPrefixes = new List<string>();
 
+			Logger.LogDebug("Login(password={Password}): excludedInputPrefixes → {ExcludedInputPrefixes}", password, excludedInputPrefixes);
             // CombineUrlPath(_domain, LoginPath);
             using (var httpResponse2 = this.PostUserForm(LoginPath, postData, excludedInputPrefixes, false))
             {
@@ -210,8 +242,10 @@ namespace DNN.Integration.Test.Framework
             if (this.IsLoggedIn)
             {
                 this.LoggedInAtTime = DateTime.Now;
+				Logger.LogDebug("Login(password={Password}): this.LoggedInAtTime → {Arg1}", password, this.LoggedInAtTime);
             }
 
+			Logger.LogDebug("<<< Exiting Login(password={Password})", password);
             return this.IsLoggedIn;
         }
 
@@ -241,8 +275,13 @@ namespace DNN.Integration.Test.Framework
 
         public async Task<bool> UploadCmsFile(string fileName, string portalFolder)
         {
+			Logger.LogDebug(">>> Entering UploadCmsFile(fileName={FileName},portalFolder={PortalFolder})", fileName, portalFolder);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             this.EnsureLoggedIn();
             var result = await this.UploadFile(fileName, portalFolder);
+			Logger.LogInformation("UploadCmsFile(fileName,portalFolder)={FileName},{PortalFolder}: external service call took {Arg2} ms", fileName, portalFolder, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("UploadCmsFile(fileName={FileName},portalFolder={PortalFolder}): result → {Result}", fileName, portalFolder, result);
+			Logger.LogDebug("<<< Exiting UploadCmsFile(fileName={FileName},portalFolder={PortalFolder})", fileName, portalFolder);
             return result.IsSuccessStatusCode;
         }
 
@@ -279,6 +318,9 @@ namespace DNN.Integration.Test.Framework
 
                 var requestUriString = CombineUrlPath(this.Domain, relativeUrl);
                 var result = client.PostAsJsonAsync(requestUriString, content).Result;
+				Logger.LogDebug(">>> Entering CreateHttpClient(path={Path},autoRedirect={AutoRedirect})", path, autoRedirect);
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				Logger.LogDebug("<<< Exiting CreateHttpClient(path={Path},autoRedirect={AutoRedirect})", path, autoRedirect);
                 return !waitHttpResponse
                     ? result
                     : EnsureSuccessResponse(result, "PostJson", requestUriString);
@@ -498,10 +540,12 @@ namespace DNN.Integration.Test.Framework
 
         private static string GetVerificationToken(string pageData)
         {
+			Logger.LogDebug(">>> Entering GetVerificationToken(pageData={PageData})", pageData);
             if (!string.IsNullOrEmpty(pageData))
             {
                 const string str1 = "<input name=\"" + RqVerifTokenName + "\" type=\"hidden\" value=\"";
                 var startIndex1 = pageData.IndexOf(str1, StringComparison.Ordinal) + str1.Length;
+				Logger.LogDebug("GetVerificationToken(pageData={PageData}): startIndex1 → {StartIndex1}", pageData, startIndex1);
                 if (startIndex1 >= str1.Length)
                 {
                     var num1 = pageData.IndexOf("\"", startIndex1, StringComparison.Ordinal);
@@ -509,20 +553,24 @@ namespace DNN.Integration.Test.Framework
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetVerificationToken(pageData={PageData})", pageData);
             return string.Empty;
         }
 
         private static string GetCurrentTabId(string pageData)
         {
+			Logger.LogDebug(">>> Entering GetCurrentTabId(pageData={PageData})", pageData);
             if (!string.IsNullOrEmpty(pageData))
             {
                 var match = Regex.Match(pageData, "`sf_tabId`:`(\\d+)`");
                 if (match.Success)
+				Logger.LogDebug("GetCurrentTabId(pageData={PageData}): match → {Match}", pageData, match);
                 {
                     return match.Groups[1].Value;
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetCurrentTabId(pageData={PageData})", pageData);
             return string.Empty;
         }
 
@@ -592,6 +640,7 @@ namespace DNN.Integration.Test.Framework
 
         private static string CombineUrlPath(Uri domain, string path)
         {
+			Logger.LogDebug(">>> Entering CombineUrlPath(domain={Domain},path={Path})", domain, path);
             if (path.StartsWith("http"))
             {
                 return path;
@@ -613,15 +662,18 @@ namespace DNN.Integration.Test.Framework
                 return url + path.Substring(1);
             }
 
+			Logger.LogDebug("<<< Exiting CombineUrlPath(domain={Domain},path={Path})", domain, path);
             return new Uri(url + path).AbsoluteUri;
         }
 
         private static string QueryStringFromObject(object query)
         {
+			Logger.LogDebug(">>> Entering QueryStringFromObject(query={Query})");
             var properties = from p in query.GetType().GetProperties()
                              where p.GetValue(query, null) != null
                              select p.Name + "=" + HttpUtility.UrlEncode(p.GetValue(query, null).ToString());
 
+			Logger.LogDebug("<<< Exiting QueryStringFromObject(query={Query})");
             return string.Join("&", properties.ToArray());
         }
 
@@ -648,11 +700,16 @@ namespace DNN.Integration.Test.Framework
 
         private void ResetUserId()
         {
+			Logger.LogDebug(">>> Entering ResetUserId()");
             this._userId = -1;
+			Logger.LogDebug("<<< Exiting ResetUserId()");
+			Logger.LogDebug("ResetUserId(): _userId → {_userId}", _userId);
+			Logger.LogDebug("ResetUserId(): this._userId → {Arg0}", this._userId);
         }
 
         private void EnsureLoggedIn()
         {
+			Logger.LogDebug(">>> Entering EnsureLoggedIn()");
             if (!this.IsLoggedIn)
             {
                 Console.WriteLine(@"User not logged in yet");
@@ -660,15 +717,18 @@ namespace DNN.Integration.Test.Framework
                     new HttpRequestException("User not logged in yet."),
                     new HttpResponseMessage(HttpStatusCode.Unauthorized));
             }
+			Logger.LogDebug("<<< Exiting EnsureLoggedIn()");
         }
 
         private void VerifyLogInCookie(HttpWebResponse httpResponse)
         {
+			Logger.LogDebug(">>> Entering VerifyLogInCookie(httpResponse={HttpResponse})", httpResponse);
             var cookie = AppConfigHelper.LoginCookie;
             var loginCookie = httpResponse.Cookies[cookie];
             if (loginCookie != null)
             {
                 this.IsLoggedIn = true;
+				Logger.LogDebug("VerifyLogInCookie(httpResponse={HttpResponse}): this.IsLoggedIn → {Arg1}", httpResponse, this.IsLoggedIn);
                 this.ExtractVerificationCookie(httpResponse.Headers["Set-Cookie"] ?? string.Empty);
                 using (var rs = httpResponse.GetResponseStream())
                 {
@@ -686,18 +746,22 @@ namespace DNN.Integration.Test.Framework
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting VerifyLogInCookie(httpResponse={HttpResponse})", httpResponse);
         }
 
         private void ExtractVerificationCookie(string cookiesString)
         {
+			Logger.LogDebug(">>> Entering ExtractVerificationCookie(cookiesString={CookiesString})", cookiesString);
             var parts1 = cookiesString.Split(',');
             foreach (var part1 in parts1)
             {
+			Logger.LogDebug("ExtractVerificationCookie(cookiesString={CookiesString}): parts1 → {Parts1}", cookiesString, parts1);
                 if (part1.Contains(RqVerifTokenName))
                 {
                     var parts2 = part1.Split(';');
                     foreach (var part2 in parts2)
                     {
+					Logger.LogDebug("ExtractVerificationCookie(cookiesString={CookiesString}): parts2 → {Parts2}", cookiesString, parts2);
                         if (part2.Contains(RqVerifTokenName))
                         {
                             this._cookieVerificationToken.Value = part2.Split('=')[1];
@@ -715,10 +779,13 @@ namespace DNN.Integration.Test.Framework
                     break;
                 }
             }
+			Logger.LogDebug("<<< Exiting ExtractVerificationCookie(cookiesString={CookiesString})", cookiesString);
         }
 
         private async Task<HttpResponseMessage> UploadFile(string fileName, string portalFolder, bool waitHttpResponse = true)
         {
+			Logger.LogDebug(">>> Entering UploadFile(fileName={FileName},portalFolder={PortalFolder},waitHttpResponse={WaitHttpResponse})", fileName, portalFolder, waitHttpResponse);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             using (var client = this.CreateHttpClient("/", true))
             {
                 var headers = client.DefaultRequestHeaders;
@@ -730,6 +797,8 @@ namespace DNN.Integration.Test.Framework
                 {
                     var resultGet = await client.GetAsync("/");
                     var data = await resultGet.Content.ReadAsStringAsync();
+					Logger.LogDebug("UploadFile(fileName={FileName},portalFolder={PortalFolder},waitHttpResponse={WaitHttpResponse}): resultGet → {ResultGet}", fileName, portalFolder, waitHttpResponse, resultGet);
+					Logger.LogDebug("UploadFile(fileName={FileName},portalFolder={PortalFolder},waitHttpResponse={WaitHttpResponse}): data → {Data}", fileName, portalFolder, waitHttpResponse, data);
                     this._inputFieldVerificationToken = GetVerificationToken(data);
 
                     if (!string.IsNullOrEmpty(this._inputFieldVerificationToken))
@@ -744,6 +813,7 @@ namespace DNN.Integration.Test.Framework
 
                 var content = new MultipartFormDataContent();
                 var values = new[]
+				Logger.LogDebug("UploadFile(fileName={FileName},portalFolder={PortalFolder},waitHttpResponse={WaitHttpResponse}): content → {Content}", fileName, portalFolder, waitHttpResponse, content);
                 {
                     new KeyValuePair<string, string>("\"folder\"", portalFolder),
                     new KeyValuePair<string, string>("\"filter\"", FileFilters),
@@ -757,6 +827,8 @@ namespace DNN.Integration.Test.Framework
 
                 var fi = new FileInfo(fileName);
                 var fileContent = new ByteArrayContent(File.ReadAllBytes(fileName));
+				Logger.LogDebug("UploadFile(fileName={FileName},portalFolder={PortalFolder},waitHttpResponse={WaitHttpResponse}): fi → {Fi}", fileName, portalFolder, waitHttpResponse, fi);
+				Logger.LogDebug("UploadFile(fileName={FileName},portalFolder={PortalFolder},waitHttpResponse={WaitHttpResponse}): fileContent → {FileContent}", fileName, portalFolder, waitHttpResponse, fileContent);
                 fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
                 {
                     FileName = fi.Name,
@@ -767,6 +839,9 @@ namespace DNN.Integration.Test.Framework
 
                 client.DefaultRequestHeaders.UserAgent.ParseAdd(this.UserAgentValue);
                 var result = await client.PostAsync(UploadFileRequestPath, content);
+				Logger.LogDebug("UploadFile(fileName={FileName},portalFolder={PortalFolder},waitHttpResponse={WaitHttpResponse}): result → {Result}", fileName, portalFolder, waitHttpResponse, result);
+				Logger.LogInformation("UploadFile(fileName,portalFolder,waitHttpResponse)={FileName},{PortalFolder},{WaitHttpResponse}: external service call took {Arg3} ms", fileName, portalFolder, waitHttpResponse, __logStart.ElapsedMilliseconds);
+				Logger.LogDebug("<<< Exiting UploadFile(fileName={FileName},portalFolder={PortalFolder},waitHttpResponse={WaitHttpResponse})", fileName, portalFolder, waitHttpResponse);
                 return !waitHttpResponse
                     ? result
                     : EnsureSuccessResponse(result, "UploadFile", UploadFileRequestPath);
@@ -861,6 +936,7 @@ namespace DNN.Integration.Test.Framework
 
         private string[] GetPageInputFields(HttpClient client, string path)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             CachedWebPage cachedPage = null;
             var url = CombineUrlPath(this.Domain, path);
             if (!this.IsLoggedIn || this.AvoidCaching ||
@@ -916,6 +992,7 @@ namespace DNN.Integration.Test.Framework
 
         private HttpWebResponse PostForm(string postUrl, string userAgent, string contentType, IDictionary<string, string> headers, byte[] formData, bool followRedirect)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var request = WebRequest.Create(postUrl) as HttpWebRequest;
 
             if (request == null)

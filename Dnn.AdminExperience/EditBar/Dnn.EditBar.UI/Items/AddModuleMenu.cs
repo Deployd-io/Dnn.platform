@@ -20,6 +20,7 @@ namespace Dnn.EditBar.UI.Items
     [Serializable]
     public class AddModuleMenu : BaseMenuItem
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override string Name { get; } = "AddModule";
 
@@ -56,12 +57,14 @@ namespace Dnn.EditBar.UI.Items
         /// <inheritdoc />
         public override bool Visible()
         {
+			Logger.LogDebug(">>> Entering Visible()");
             var portalSettings = PortalSettings.Current;
             if (portalSettings == null)
             {
                 return false;
             }
 
+			Logger.LogDebug("<<< Exiting Visible()");
             return Personalization.GetUserMode() == PortalSettings.Mode.Edit
                 && ControlBarController.Instance.GetCategoryDesktopModules(portalSettings.PortalId, "All", string.Empty).Any();
         }

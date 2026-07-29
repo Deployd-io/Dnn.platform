@@ -22,6 +22,7 @@ using System;
 
 namespace log4net.Util.TypeConverters
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Convert between string and <see cref="PatternString"/></summary>
     /// <remarks>
     /// <para>
@@ -50,6 +51,9 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public bool CanConvertTo(Type targetType)
         {
+			Logger.LogDebug(">>> Entering CanConvertTo(targetType={TargetType})", targetType);
+			Logger.LogDebug(">>> Entering ConvertTo(source={Source},targetType={TargetType})", source, targetType);
+			Logger.LogDebug("<<< Exiting ConvertTo(source={Source},targetType={TargetType})", source, targetType);
             return (typeof(string).IsAssignableFrom(targetType));
         }
 
@@ -89,6 +93,9 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public bool CanConvertFrom(Type sourceType)
         {
+			Logger.LogDebug(">>> Entering CanConvertFrom(sourceType={SourceType})", sourceType);
+			Logger.LogDebug(">>> Entering ConvertFrom(source={Source})", source);
+			Logger.LogDebug("<<< Exiting ConvertFrom(source={Source})", source);
             return (sourceType == typeof(string));
         }
 

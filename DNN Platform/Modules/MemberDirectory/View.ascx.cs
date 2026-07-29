@@ -25,6 +25,7 @@ namespace DotNetNuke.Modules.MemberDirectory
     /// <summary>Display member directory.</summary>
     public partial class View : ProfileModuleUserControlBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IClientResourceController clientResourceController;
         private readonly IApplicationStatusInfo appStatus;
         private readonly IEventLogger eventLogger;
@@ -34,6 +35,7 @@ namespace DotNetNuke.Modules.MemberDirectory
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IClientResourceController. Scheduled removal in v12.0.0.")]
         public View()
         {
+		Logger.LogDebug(">>> Entering View()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="View"/> class.</summary>
@@ -43,10 +45,21 @@ namespace DotNetNuke.Modules.MemberDirectory
         /// <param name="servicesFramework">The web API service framework.</param>
         public View(IClientResourceController clientResourceController, IApplicationStatusInfo appStatus, IEventLogger eventLogger, IServicesFramework servicesFramework)
         {
+			Logger.LogDebug(">>> Entering View(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework})", clientResourceController, appStatus, eventLogger, servicesFramework);
             this.clientResourceController = clientResourceController;
             this.appStatus = appStatus;
+			Logger.LogDebug("View(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework}): this.clientResourceController → {Arg4}", clientResourceController, appStatus, eventLogger, servicesFramework, this.clientResourceController);
+			Logger.LogDebug("View(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework}): appStatus → {AppStatus1}", clientResourceController, appStatus, eventLogger, servicesFramework, appStatus);
+			Logger.LogDebug("View(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework}): this.appStatus → {Arg4}", clientResourceController, appStatus, eventLogger, servicesFramework, this.appStatus);
+			Logger.LogDebug("View(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework}): servicesFramework → {ServicesFramework1}", clientResourceController, appStatus, eventLogger, servicesFramework, servicesFramework);
+			Logger.LogDebug("View(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework}): clientResourceController → {ClientResourceController1}", clientResourceController, appStatus, eventLogger, servicesFramework, clientResourceController);
             this.eventLogger = eventLogger;
             this.servicesFramework = servicesFramework;
+			Logger.LogDebug("<<< Exiting View(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework})", clientResourceController, appStatus, eventLogger, servicesFramework);
+			Logger.LogDebug("View(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework}): eventLogger → {EventLogger1}", clientResourceController, appStatus, eventLogger, servicesFramework, eventLogger);
+			Logger.LogDebug("View(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework}): this.eventLogger → {Arg4}", clientResourceController, appStatus, eventLogger, servicesFramework, this.eventLogger);
+			Logger.LogDebug("View(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},servicesFramework={ServicesFramework}): this.servicesFramework → {Arg4}", clientResourceController, appStatus, eventLogger, servicesFramework, this.servicesFramework);
+			Logger.LogDebug("<<< Exiting View()");
         }
 
         /// <inheritdoc />
@@ -130,6 +143,7 @@ namespace DotNetNuke.Modules.MemberDirectory
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             this.servicesFramework.RequestAjaxAntiForgerySupport();
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, this.PortalSettings, CommonJs.DnnPlugins);
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, this.PortalSettings, CommonJs.jQueryFileUpload);
@@ -144,38 +158,47 @@ namespace DotNetNuke.Modules.MemberDirectory
             this.loadMore.Visible = !this.DisablePaging;
 
             base.OnInit(e);
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         private static string GetSetting(Hashtable settings, string key, string defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetSetting(settings={Settings},key={Key},defaultValue={DefaultValue})", settings, key, defaultValue);
             string setting = defaultValue;
             if (settings[key] != null)
+			Logger.LogDebug("GetSetting(settings={Settings},key={Key},defaultValue={DefaultValue}): setting → {Setting}", settings, key, defaultValue, setting);
             {
                 setting = Convert.ToString(settings[key]);
             }
 
+			Logger.LogDebug("<<< Exiting GetSetting(settings={Settings},key={Key},defaultValue={DefaultValue})", settings, key, defaultValue);
             return setting;
         }
 
         private static int GetSettingAsInt32(Hashtable settings, string key, int defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetSettingAsInt32(settings={Settings},key={Key},defaultValue={DefaultValue})", settings, key, defaultValue);
             int setting = defaultValue;
             if (settings[key] != null)
+			Logger.LogDebug("GetSettingAsInt32(settings={Settings},key={Key},defaultValue={DefaultValue}): setting → {Setting}", settings, key, defaultValue, setting);
             {
                 setting = Convert.ToInt32(settings[key]);
             }
 
+			Logger.LogDebug("<<< Exiting GetSettingAsInt32(settings={Settings},key={Key},defaultValue={DefaultValue})", settings, key, defaultValue);
             return setting;
         }
 
         private void AddIe7StyleSheet()
         {
+			Logger.LogDebug(">>> Entering AddIe7StyleSheet()");
             var browser = this.Request.Browser;
             if (browser.Type == "IE" || browser.MajorVersion < 8)
             {
                 const string cssLink = """<link href="/DesktopModules/MemberDirectory/ie-member-directory.css" rel="stylesheet" type="text/css" />""";
                 this.Page.Header.Controls.Add(new LiteralControl(cssLink));
             }
+			Logger.LogDebug("<<< Exiting AddIe7StyleSheet()");
         }
     }
 }

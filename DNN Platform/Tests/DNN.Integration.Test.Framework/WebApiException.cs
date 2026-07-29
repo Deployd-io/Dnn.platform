@@ -13,6 +13,7 @@ namespace DNN.Integration.Test.Framework
     /// <summary>Represents a non successful response while executing a WebApi call.</summary>
     public class WebApiException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiException"/> class, with the specified inner exception and response.
         /// message that caused the exception.
@@ -22,13 +23,17 @@ namespace DNN.Integration.Test.Framework
         public WebApiException(Exception innerException, HttpResponseMessage result)
             : base(innerException.Message, innerException)
         {
+			Logger.LogDebug(">>> Entering WebApiException(innerException={InnerException},result={Result})", innerException, result);
             this.Result = result;
+			Logger.LogDebug("<<< Exiting WebApiException(innerException={InnerException},result={Result})", innerException, result);
+			Logger.LogDebug("WebApiException(innerException={InnerException},result={Result}): this.Result → {Arg2}", innerException, result, this.Result);
         }
 
         public WebApiException(Exception innerException, HttpResponseMessage result, string body)
             : this(innerException, result)
         {
             this.Body = body;
+			Logger.LogDebug("WebApiException(innerException={InnerException},result={Result},body={Body}): this.Body → {Arg3}", innerException, result, body, this.Body);
         }
 
         /// <summary>Gets the result of the request. Can be used to retrieve additional info like HTTP status code.</summary>
@@ -39,6 +44,8 @@ namespace DNN.Integration.Test.Framework
 
         public dynamic BodyAsJson()
         {
+			Logger.LogDebug(">>> Entering BodyAsJson()");
+			Logger.LogDebug("<<< Exiting BodyAsJson()");
             return JsonConvert.DeserializeObject<JContainer>(this.Body);
         }
     }

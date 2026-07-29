@@ -14,28 +14,38 @@ namespace Dnn.PersonaBar.Users.Components
 
     public class UserControllerWrapper : IUserControllerWrapper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public UserInfo GetUserById(int portalId, int userId)
         {
+			Logger.LogDebug(">>> Entering GetUserById(portalId={PortalId},userId={UserId})", portalId, userId);
+			Logger.LogDebug("<<< Exiting GetUserById(portalId={PortalId},userId={UserId})", portalId, userId);
             return UserController.GetUserById(portalId, userId);
         }
 
         public UserInfo GetUser(int userId, PortalSettings portalSettings, UserInfo currentUserInfo, out KeyValuePair<HttpStatusCode, string> response)
         {
+			Logger.LogDebug(">>> Entering GetUser(userId={UserId},portalSettings={PortalSettings},currentUserInfo={CurrentUserInfo},response={Response})", userId, portalSettings, currentUserInfo, response);
+			Logger.LogDebug("<<< Exiting GetUser(userId={UserId},portalSettings={PortalSettings},currentUserInfo={CurrentUserInfo},response={Response})", userId, portalSettings, currentUserInfo, response);
             return UsersController.GetUser(userId, portalSettings, currentUserInfo, out response);
         }
 
         public int? GetUsersByEmail(int portalId, string searchTerm, int pageIndex, int pageSize, ref int recCount, bool includeDeleted, bool isSuperUserOnly)
         {
+			Logger.LogDebug(">>> Entering GetUsersByEmail(portalId={PortalId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize},recCount={RecCount},includeDeleted={IncludeDeleted},isSuperUserOnly={IsSuperUserOnly})", portalId, searchTerm, pageIndex, pageSize, recCount, includeDeleted, isSuperUserOnly);
+			Logger.LogDebug("<<< Exiting GetUsersByEmail(portalId={PortalId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize},recCount={RecCount},includeDeleted={IncludeDeleted},isSuperUserOnly={IsSuperUserOnly})", portalId, searchTerm, pageIndex, pageSize, recCount, includeDeleted, isSuperUserOnly);
             return (UserController.GetUsersByEmail(portalId, searchTerm, pageIndex, pageSize, ref recCount, includeDeleted, isSuperUserOnly).ToArray().FirstOrDefault() as UserInfo)?.UserID;
         }
 
         public int? GetUsersByUserName(int portalId, string searchTerm, int pageIndex, int pageSize, ref int recCount, bool includeDeleted, bool isSuperUserOnly)
         {
+			Logger.LogDebug(">>> Entering GetUsersByUserName(portalId={PortalId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize},recCount={RecCount},includeDeleted={IncludeDeleted},isSuperUserOnly={IsSuperUserOnly})", portalId, searchTerm, pageIndex, pageSize, recCount, includeDeleted, isSuperUserOnly);
+			Logger.LogDebug("<<< Exiting GetUsersByUserName(portalId={PortalId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize},recCount={RecCount},includeDeleted={IncludeDeleted},isSuperUserOnly={IsSuperUserOnly})", portalId, searchTerm, pageIndex, pageSize, recCount, includeDeleted, isSuperUserOnly);
             return (UserController.GetUsersByUserName(portalId, searchTerm, pageIndex, pageSize, ref recCount, includeDeleted, isSuperUserOnly).ToArray().FirstOrDefault() as UserInfo)?.UserID;
         }
 
         public bool DeleteUserAndClearCache(ref UserInfo userInfo, bool notify, bool deleteAdmin)
         {
+			Logger.LogDebug(">>> Entering DeleteUserAndClearCache(userInfo={UserInfo},notify={Notify},deleteAdmin={DeleteAdmin})", userInfo, notify, deleteAdmin);
             bool isDeleted = UserController.DeleteUser(ref userInfo, notify, deleteAdmin);
 
             if (isDeleted)
@@ -46,6 +56,7 @@ namespace Dnn.PersonaBar.Users.Components
                 DataCache.ClearUserCache(userInfo.PortalID, userInfo.Username);
             }
 
+			Logger.LogDebug("<<< Exiting DeleteUserAndClearCache(userInfo={UserInfo},notify={Notify},deleteAdmin={DeleteAdmin})", userInfo, notify, deleteAdmin);
             return isDeleted;
         }
     }

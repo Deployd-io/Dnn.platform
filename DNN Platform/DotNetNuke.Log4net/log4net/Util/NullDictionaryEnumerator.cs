@@ -23,6 +23,7 @@ using System.Collections;
 
 namespace log4net.Util
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>An always empty <see cref="IDictionaryEnumerator"/>.</summary>
     /// <remarks>
     /// <para>
@@ -42,6 +43,8 @@ namespace log4net.Util
         /// </remarks>
         private NullDictionaryEnumerator()
         {
+		Logger.LogDebug(">>> Entering NullDictionaryEnumerator()");
+		Logger.LogDebug("<<< Exiting NullDictionaryEnumerator()");
         }
 
         /// <summary>Gets the singleton instance of the <see cref="NullDictionaryEnumerator" />.</summary>
@@ -86,6 +89,8 @@ namespace log4net.Util
         /// </remarks>
         public bool MoveNext()
         {
+			Logger.LogDebug(">>> Entering MoveNext()");
+			Logger.LogDebug("<<< Exiting MoveNext()");
             return false;
         }
   
@@ -97,6 +102,8 @@ namespace log4net.Util
         /// </remarks>
         public void Reset() 
         {
+		Logger.LogDebug(">>> Entering Reset()");
+		Logger.LogDebug("<<< Exiting Reset()");
         }
 
         /// <summary>Gets the current key from the enumerator.</summary>

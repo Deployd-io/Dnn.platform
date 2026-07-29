@@ -44,6 +44,8 @@ namespace DotNetNuke.HttpModules.Membership
         /// <summary>Initializes a new instance of the <see cref="MembershipModule"/> class.</summary>
         public MembershipModule()
         {
+		Logger.LogDebug(">>> Entering MembershipModule()");
+		Logger.LogDebug("<<< Exiting MembershipModule()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="MembershipModule"/> class.</summary>
@@ -69,9 +71,13 @@ namespace DotNetNuke.HttpModules.Membership
         [Obsolete("This method has been deprecated. No equivalent. Scheduled removal in v11.0.0.")]
         public static void OnUnverifiedUserSkinInit(object sender, SkinEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnUnverifiedUserSkinInit(sender={Sender},e={E})", sender, e);
             var pageService = Globals.GetCurrentServiceProvider().GetRequiredService<IPageService>();
             var strMessage = Localization.GetString("UnverifiedUser", Localization.SharedResourceFile, Thread.CurrentThread.CurrentCulture.Name);
+			Logger.LogDebug("OnUnverifiedUserSkinInit(sender={Sender},e={E}): pageService → {PageService}", sender, e, pageService);
+			Logger.LogDebug("OnUnverifiedUserSkinInit(sender={Sender},e={E}): strMessage → {StrMessage}", sender, e, strMessage);
             pageService.AddMessage(new PageMessage(string.Empty, strMessage, PageMessageType.Warning, string.Empty, PagePriority.Site));
+			Logger.LogDebug("<<< Exiting OnUnverifiedUserSkinInit(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Authenticates the request.</summary>
@@ -86,6 +92,7 @@ namespace DotNetNuke.HttpModules.Membership
                 Globals.GetCurrentServiceProvider().GetRequiredService<IRoleController>(),
                 context,
                 allowUnknownExtensions);
+			Logger.LogDebug(">>> Entering AuthenticateRequest(context={Context},allowUnknownExtensions={AllowUnknownExtensions})", context, allowUnknownExtensions);
 
         /// <summary>Authenticates the request.</summary>
         /// <param name="hostSettingsService">The host settings service.</param>
@@ -205,6 +212,7 @@ namespace DotNetNuke.HttpModules.Membership
             {
                 context.Items.Add("UserInfo", new UserInfo());
             }
+			Logger.LogDebug("<<< Exiting AuthenticateRequest(context={Context},allowUnknownExtensions={AllowUnknownExtensions})", context, allowUnknownExtensions);
         }
 
         /// <summary>Initializes the specified application.</summary>
@@ -220,12 +228,16 @@ namespace DotNetNuke.HttpModules.Membership
         /// <summary>Disposes of the resources (other than memory) used by the module that implements <see cref="System.Web.IHttpModule" />.</summary>
         public void Dispose()
         {
+		Logger.LogDebug(">>> Entering Dispose()");
+		Logger.LogDebug("<<< Exiting Dispose()");
         }
 
         private static bool IsActiveDirectoryAuthHeaderPresent()
         {
+			Logger.LogDebug(">>> Entering IsActiveDirectoryAuthHeaderPresent()");
             var auth = HttpContext.Current.Request.Headers.Get("Authorization");
             if (!string.IsNullOrEmpty(auth))
+			Logger.LogWarning("IsActiveDirectoryAuthHeaderPresent(): auth → {Auth}", auth);
             {
                 if (auth.StartsWith("Negotiate", StringComparison.OrdinalIgnoreCase))
                 {
@@ -233,6 +245,7 @@ namespace DotNetNuke.HttpModules.Membership
                 }
             }
 
+			Logger.LogDebug("<<< Exiting IsActiveDirectoryAuthHeaderPresent()");
             return false;
         }
 
@@ -249,6 +262,7 @@ namespace DotNetNuke.HttpModules.Membership
 
                 var forceLogout = hostSettingsService.GetBoolean("ForceLogoutAfterPasswordChanged");
                 if (!forceLogout)
+				Logger.LogDebug("RequireLogout(hostSettingsService={HostSettingsService},context={Context},user={User}): forceLogout → {ForceLogout}", hostSettingsService, context, user, forceLogout);
                 {
                     return false;
                 }
@@ -258,6 +272,7 @@ namespace DotNetNuke.HttpModules.Membership
                 if (context.User.Identity is FormsIdentity formsIdentity)
                 {
                     issueDate = formsIdentity.Ticket.IssueDate;
+					Logger.LogDebug("RequireLogout(hostSettingsService={HostSettingsService},context={Context},user={User}): issueDate → {IssueDate}", hostSettingsService, context, user, issueDate);
                 }
 
                 return !Null.IsNull(issueDate) && issueDate < user.Membership.LastPasswordChangeDate;
@@ -265,14 +280,18 @@ namespace DotNetNuke.HttpModules.Membership
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting RequireLogout(hostSettingsService={HostSettingsService},context={Context},user={User})", hostSettingsService, context, user);
                 return true;
             }
         }
 
         private static void OnAuthenticateRequest(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnAuthenticateRequest(sender={Sender},e={E})", sender, e);
             var application = (HttpApplication)sender;
             var serviceProvider = application.Context.GetScope().ServiceProvider;
+			Logger.LogDebug("OnAuthenticateRequest(sender={Sender},e={E}): application → {Application}", sender, e, application);
+			Logger.LogDebug("OnAuthenticateRequest(sender={Sender},e={E}): serviceProvider → {ServiceProvider}", sender, e, serviceProvider);
 
             AuthenticateRequest(
                 serviceProvider.GetRequiredService<IHostSettingsService>(),
@@ -283,23 +302,30 @@ namespace DotNetNuke.HttpModules.Membership
                 serviceProvider.GetRequiredService<IHostSettings>(),
                 new HttpContextWrapper(application.Context),
                 false);
+				Logger.LogDebug("<<< Exiting OnAuthenticateRequest(sender={Sender},e={E})", sender, e);
         }
 
         // DNN-6973: if the authentication cookie set by cookie slide in membership,
         // then use SignIn method instead if current portal is in portal group.
         private static void OnPreSendRequestHeaders(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreSendRequestHeaders(sender={Sender},e={E})", sender, e);
             var application = (HttpApplication)sender;
             var serviceProvider = GetOrCreateServiceProvider(application.Context);
+			Logger.LogDebug("OnPreSendRequestHeaders(sender={Sender},e={E}): application → {Application}", sender, e, application);
+			Logger.LogDebug("OnPreSendRequestHeaders(sender={Sender},e={E}): serviceProvider → {ServiceProvider}", sender, e, serviceProvider);
             var portalController = serviceProvider.GetRequiredService<IPortalController>();
 
+			Logger.LogDebug("OnPreSendRequestHeaders(sender={Sender},e={E}): portalController → {PortalController}", sender, e, portalController);
             var portalSettings = portalController.GetCurrentSettings();
             var hasAuthCookie = application.Response.Headers["Set-Cookie"] != null
+									Logger.LogDebug("OnPreSendRequestHeaders(sender={Sender},e={E}): portalSettings → {PortalSettings}", sender, e, portalSettings);
                                     && application.Response.Headers["Set-Cookie"].Contains(FormsAuthentication.FormsCookieName);
             if (portalSettings != null && hasAuthCookie && !application.Context.Items.Contains("DNN_UserSignIn"))
             {
                 var isInPortalGroup = PortalController.IsMemberOfPortalGroup(portalController, portalSettings.PortalId);
                 if (isInPortalGroup)
+				Logger.LogDebug("OnPreSendRequestHeaders(sender={Sender},e={E}): isInPortalGroup → {IsInPortalGroup}", sender, e, isInPortalGroup);
                 {
                     var authCookie = application.Response.Cookies[FormsAuthentication.FormsCookieName];
                     if (authCookie != null && !string.IsNullOrEmpty(authCookie.Value) && string.IsNullOrEmpty(authCookie.Domain))
@@ -309,18 +335,25 @@ namespace DotNetNuke.HttpModules.Membership
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting OnPreSendRequestHeaders(sender={Sender},e={E})", sender, e);
         }
 
         private static void Context_PreRequestHandlerExecute(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering Context_PreRequestHandlerExecute(sender={Sender},e={E})", sender, e);
             var content = HttpContextSource.Current;
             var request = content.Request;
             var serviceProvider = content.GetScope().ServiceProvider;
             var portalController = serviceProvider.GetRequiredService<IPortalController>();
+			Logger.LogDebug("Context_PreRequestHandlerExecute(sender={Sender},e={E}): serviceProvider → {ServiceProvider}", sender, e, serviceProvider);
+			Logger.LogDebug("Context_PreRequestHandlerExecute(sender={Sender},e={E}): portalController → {PortalController}", sender, e, portalController);
             var userController = serviceProvider.GetRequiredService<IUserController>();
 
+			Logger.LogDebug("Context_PreRequestHandlerExecute(sender={Sender},e={E}): userController → {UserController}", sender, e, userController);
             var portalSettings = portalController.GetCurrentSettings();
             var user = userController.GetCurrentUserInfo();
+			Logger.LogDebug("Context_PreRequestHandlerExecute(sender={Sender},e={E}): portalSettings → {PortalSettings}", sender, e, portalSettings);
+			Logger.LogDebug("Context_PreRequestHandlerExecute(sender={Sender},e={E}): user → {User}", sender, e, user);
             if (!request.IsAuthenticated || IsActiveDirectoryAuthHeaderPresent() || portalSettings == null)
             {
                 return;
@@ -337,12 +370,16 @@ namespace DotNetNuke.HttpModules.Membership
                 contextItems.Add(Skin.OnInitMessage, Localization.GetString("VerificationSuccess", Localization.SharedResourceFile, Thread.CurrentThread.CurrentCulture.Name));
                 contextItems.Add(Skin.OnInitMessageType, ModuleMessage.ModuleMessageType.GreenSuccess);
             }
+			Logger.LogDebug("<<< Exiting Context_PreRequestHandlerExecute(sender={Sender},e={E})", sender, e);
         }
 
         private static IServiceProvider GetOrCreateServiceProvider(HttpContext context)
         {
+			Logger.LogDebug(">>> Entering GetOrCreateServiceProvider(context={Context})", context);
             // NOTE: Using HttpContextDependencyInjectionExtensions.GetScope can cause an infinite loop/stack overflow, presumably due to timing issues
             var scope = context.Items[typeof(IServiceScope)] as IServiceScope ?? Globals.DependencyProvider.CreateScope();
+			Logger.LogDebug("GetOrCreateServiceProvider(context={Context}): scope → {Scope}", context, scope);
+			Logger.LogDebug("<<< Exiting GetOrCreateServiceProvider(context={Context})", context);
             return scope.ServiceProvider;
         }
     }

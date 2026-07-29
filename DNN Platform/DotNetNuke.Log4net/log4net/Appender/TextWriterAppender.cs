@@ -43,6 +43,7 @@ namespace log4net.Appender
     /// <author>Douglas de la Torre</author>
     public class TextWriterAppender : AppenderSkeleton
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="TextWriterAppender" /> class.</summary>
         /// <remarks>
         /// <para>
@@ -51,6 +52,8 @@ namespace log4net.Appender
         /// </remarks>
         public TextWriterAppender() 
         {
+		Logger.LogDebug(">>> Entering TextWriterAppender()");
+		Logger.LogDebug("<<< Exiting TextWriterAppender()");
         }
 
         /// <summary>
@@ -68,6 +71,7 @@ namespace log4net.Appender
         [Obsolete("Instead use the default constructor and set the Layout & Writer properties")]
         public TextWriterAppender(ILayout layout, Stream os) : this(layout, new StreamWriter(os))
         {
+		Logger.LogDebug(">>> Entering TextWriterAppender(layout={Layout},os={Os})", layout, os);
         }
 
         /// <summary>
@@ -87,8 +91,12 @@ namespace log4net.Appender
         [Obsolete("Instead use the default constructor and set the Layout & Writer properties")]
         public TextWriterAppender(ILayout layout, TextWriter writer) 
         {
+			Logger.LogDebug(">>> Entering TextWriterAppender(layout={Layout},writer={Writer})", layout, writer);
             this.Layout = layout;
             this.Writer = writer;
+			Logger.LogDebug("<<< Exiting TextWriterAppender(layout={Layout},writer={Writer})", layout, writer);
+			Logger.LogDebug("TextWriterAppender(layout={Layout},writer={Writer}): this.Layout → {Arg2}", layout, writer, this.Layout);
+			Logger.LogDebug("TextWriterAppender(layout={Layout},writer={Writer}): this.Writer → {Arg2}", layout, writer, this.Writer);
         }
 
         /// <summary>
@@ -160,6 +168,7 @@ namespace log4net.Appender
         /// <returns><c>false</c> if any of the preconditions fail.</returns>
         protected override bool PreAppendCheck() 
         {
+			Logger.LogDebug(">>> Entering PreAppendCheck()");
             if (!base.PreAppendCheck()) 
             {
                 return false;
@@ -182,6 +191,7 @@ namespace log4net.Appender
                 return false;
             }
 
+			Logger.LogDebug("<<< Exiting PreAppendCheck()");
             return true;
         }
 
@@ -201,12 +211,14 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent loggingEvent) 
         {
+			Logger.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             this.RenderLoggingEvent(this.m_qtw, loggingEvent);
 
             if (this.m_immediateFlush) 
             {
                 this.m_qtw.Flush();
             } 
+			Logger.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
         }
 
         /// <summary>
@@ -222,6 +234,7 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent[] loggingEvents) 
         {
+			Logger.LogDebug(">>> Entering Append(loggingEvents={LoggingEvents})", loggingEvents);
             foreach(LoggingEvent loggingEvent in loggingEvents)
             {
                 this.RenderLoggingEvent(this.m_qtw, loggingEvent);
@@ -231,6 +244,7 @@ namespace log4net.Appender
             {
                 this.m_qtw.Flush();
             } 
+			Logger.LogDebug("<<< Exiting Append(loggingEvents={LoggingEvents})", loggingEvents);
         }
 
         /// <summary>Close this appender instance. The underlying stream or writer is also closed.</summary>
@@ -239,10 +253,12 @@ namespace log4net.Appender
         /// </remarks>
         protected override void OnClose() 
         {
+			Logger.LogDebug(">>> Entering OnClose()");
             lock(this)
             {
                 this.Reset();
             }
+			Logger.LogDebug("<<< Exiting OnClose()");
         }
 
         /// <summary>
@@ -295,8 +311,10 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual void WriteFooterAndCloseWriter()
         {
+			Logger.LogDebug(">>> Entering WriteFooterAndCloseWriter()");
             this.WriteFooter();
             this.CloseWriter();
+			Logger.LogDebug("<<< Exiting WriteFooterAndCloseWriter()");
         }
 
         /// <summary>Closes the underlying <see cref="TextWriter"/>.</summary>
@@ -307,6 +325,7 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual void CloseWriter() 
         {
+			Logger.LogDebug(">>> Entering CloseWriter()");
             if (this.m_qtw != null) 
             {
                 try 
@@ -315,11 +334,13 @@ namespace log4net.Appender
                 } 
                 catch(Exception e) 
                 {
+					Logger.LogError("Exception in CloseWriter(): {Arg0}", ex.Message);
                     this.ErrorHandler.Error("Could not close writer [" + this.m_qtw + "]", e); 
                     // do need to invoke an error handler
                     // at this late stage
                 }
             }
+			Logger.LogDebug("<<< Exiting CloseWriter()");
         }
 
         /// <summary>
@@ -333,8 +354,12 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual void Reset() 
         {
+			Logger.LogDebug(">>> Entering Reset()");
             this.WriteFooterAndCloseWriter();
             this.m_qtw = null;
+			Logger.LogDebug("<<< Exiting Reset()");
+			Logger.LogDebug("Reset(): m_qtw → {M_qtw}", m_qtw);
+			Logger.LogDebug("Reset(): this.m_qtw → {Arg0}", this.m_qtw);
         }
 
         /// <summary>Writes a footer as produced by the embedded layout's <see cref="ILayout.Footer"/> property.</summary>
@@ -345,6 +370,7 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual void WriteFooter() 
         {
+			Logger.LogDebug(">>> Entering WriteFooter()");
             if (this.Layout != null && this.m_qtw != null && !this.m_qtw.Closed) 
             {
                 string f = this.Layout.Footer;
@@ -353,6 +379,7 @@ namespace log4net.Appender
                     this.m_qtw.Write(f);
                 }
             }
+			Logger.LogDebug("<<< Exiting WriteFooter()");
         }
 
         /// <summary>Writes a header produced by the embedded layout's <see cref="ILayout.Header"/> property.</summary>
@@ -363,6 +390,7 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual void WriteHeader() 
         {
+			Logger.LogDebug(">>> Entering WriteHeader()");
             if (this.Layout != null && this.m_qtw != null && !this.m_qtw.Closed) 
             {
                 string h = this.Layout.Header;
@@ -371,6 +399,7 @@ namespace log4net.Appender
                     this.m_qtw.Write(h);
                 }
             }
+			Logger.LogDebug("<<< Exiting WriteHeader()");
         }
 
         /// <summary>Called to allow a subclass to lazily initialize the writer</summary>
@@ -383,6 +412,8 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual void PrepareWriter()
         {
+		Logger.LogDebug(">>> Entering PrepareWriter()");
+		Logger.LogDebug("<<< Exiting PrepareWriter()");
         }
 
         /// <summary>
@@ -440,6 +471,7 @@ namespace log4net.Appender
             /// <returns><c>True</c> if all logging events were flushed successfully, else <c>false</c>.</returns>
             public override bool Flush(int millisecondsTimeout)
             {
+				Logger.LogDebug(">>> Entering Flush(millisecondsTimeout={MillisecondsTimeout})", millisecondsTimeout);
                 // Nothing to do if ImmediateFlush is true
                 if (this.m_immediateFlush)
                 {
@@ -452,6 +484,7 @@ namespace log4net.Appender
                     this.m_qtw.Flush();
                 }
 
+				Logger.LogDebug("<<< Exiting Flush(millisecondsTimeout={MillisecondsTimeout})", millisecondsTimeout);
                 return true;
             }
     }

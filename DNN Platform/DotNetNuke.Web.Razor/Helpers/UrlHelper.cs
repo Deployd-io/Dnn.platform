@@ -15,14 +15,19 @@ namespace DotNetNuke.Web.Razor.Helpers
     [DnnDeprecated(9, 3, 2, "Use Razor Pages instead")]
     public partial class UrlHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly ModuleInstanceContext context;
 
         /// <summary>Initializes a new instance of the <see cref="UrlHelper"/> class.</summary>
         /// <param name="context">The module context.</param>
         public UrlHelper(ModuleInstanceContext context)
         {
+			Logger.LogDebug(">>> Entering UrlHelper(context={Context})", context);
             this.context = context;
             this.NavigationManager = Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
+			Logger.LogDebug("<<< Exiting UrlHelper(context={Context})", context);
+			Logger.LogDebug("UrlHelper(context={Context}): this.context → {Arg1}", context, this.context);
+			Logger.LogDebug("UrlHelper(context={Context}): context → {Context1}", context, context);
         }
 
         protected INavigationManager NavigationManager { get; }
@@ -32,6 +37,8 @@ namespace DotNetNuke.Web.Razor.Helpers
         [DnnDeprecated(9, 3, 2, "Use Razor Pages instead")]
         public partial string NavigateToControl()
         {
+			Logger.LogDebug(">>> Entering NavigateToControl()");
+			Logger.LogDebug("<<< Exiting NavigateToControl()");
             return this.NavigationManager.NavigateURL(this.context.TabId);
         }
 
@@ -41,6 +48,7 @@ namespace DotNetNuke.Web.Razor.Helpers
         [DnnDeprecated(9, 3, 2, "Use Razor Pages instead")]
         public partial string NavigateToControl(string controlKey)
         {
+			Logger.LogDebug("<<< Exiting NavigateToControl(controlKey={ControlKey})", controlKey);
             return this.NavigationManager.NavigateURL(this.context.TabId, controlKey, "mid=" + this.context.ModuleId);
         }
     }

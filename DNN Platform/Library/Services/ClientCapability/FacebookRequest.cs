@@ -14,6 +14,7 @@ namespace DotNetNuke.Services.ClientCapability
     /// </summary>
     public class FacebookRequest
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary> Gets or sets mechanism used to sign the request.</summary>
         public string Algorithm { get; set; }
 
@@ -64,6 +65,8 @@ namespace DotNetNuke.Services.ClientCapability
 
         public bool IsValidSignature(string secretKey)
         {
+			Logger.LogDebug(">>> Entering IsValidSignature(secretKey={SecretKey})", secretKey);
+			Logger.LogDebug("<<< Exiting IsValidSignature(secretKey={SecretKey})", secretKey);
             return FacebookRequestController.IsValidSignature(this.RawSignedRequest, secretKey);
         }
     }

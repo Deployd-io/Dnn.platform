@@ -13,6 +13,7 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>The DNNMultiStateBoxColumnTemplate provides a Template for the DNNMultiStateBoxColumn.</summary>
     public class DNNMultiStateBoxColumnTemplate : ITemplate
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private string mDataField = Null.NullString;
         private bool mEnabled = true;
         private string mEnabledField = Null.NullString;
@@ -26,13 +27,16 @@ namespace DotNetNuke.UI.WebControls
         public DNNMultiStateBoxColumnTemplate()
             : this(ListItemType.Item)
         {
+		Logger.LogDebug(">>> Entering DNNMultiStateBoxColumnTemplate()");
         }
+		Logger.LogDebug("<<< Exiting DNNMultiStateBoxColumnTemplate()");
 
         /// <summary>Initializes a new instance of the <see cref="DNNMultiStateBoxColumnTemplate"/> class.</summary>
         /// <param name="itemType">The list item type.</param>
         public DNNMultiStateBoxColumnTemplate(ListItemType itemType)
         {
             this.ItemType = itemType;
+			Logger.LogDebug("DNNMultiStateBoxColumnTemplate(itemType={ItemType}): this.ItemType → {Arg1}", itemType, this.ItemType);
         }
 
         /// <summary>Gets or sets a value indicating whether the column fires a postback when the control changes.</summary>
@@ -201,13 +205,17 @@ namespace DotNetNuke.UI.WebControls
         /// <summary>Called when the template item is Data Bound.</summary>
         private void Item_DataBinding(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering Item_DataBinding(sender={Sender},e={E})", sender, e);
             var box = (DNNMultiStateBox)sender;
             var container = (DataGridItem)box.NamingContainer;
+			Logger.LogDebug("Item_DataBinding(sender={Sender},e={E}): box → {Box}", sender, e, box);
+			Logger.LogDebug("Item_DataBinding(sender={Sender},e={E}): container → {Container}", sender, e, container);
             if (!string.IsNullOrEmpty(this.DataField) && this.ItemType != ListItemType.Header)
             {
                 if (this.DesignMode)
                 {
                     box.SelectedStateKey = string.Empty;
+					Logger.LogDebug("Item_DataBinding(sender={Sender},e={E}): box.SelectedStateKey → {Arg2}", sender, e, box.SelectedStateKey);
                 }
                 else
                 {
@@ -224,6 +232,7 @@ namespace DotNetNuke.UI.WebControls
                 if (this.DesignMode)
                 {
                     box.Enabled = false;
+					Logger.LogDebug("Item_DataBinding(sender={Sender},e={E}): box.Enabled → {Arg2}", sender, e, box.Enabled);
                 }
                 else
                 {
@@ -234,6 +243,7 @@ namespace DotNetNuke.UI.WebControls
             {
                 box.Enabled = this.Enabled;
             }
+			Logger.LogDebug("<<< Exiting Item_DataBinding(sender={Sender},e={E})", sender, e);
         }
     }
 }

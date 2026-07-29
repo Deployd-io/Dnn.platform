@@ -50,7 +50,9 @@ internal class JournalControllerImpl : IJournalController
     public JournalControllerImpl()
         : this(null, null, null, null, null, null, null, null, null)
     {
+	Logger.LogDebug(">>> Entering JournalControllerImpl()");
     }
+	Logger.LogDebug("<<< Exiting JournalControllerImpl()");
 
     /// <summary>Initializes a new instance of the <see cref="JournalControllerImpl"/> class.</summary>
     /// <param name="journalDataService">The journal data service.</param>
@@ -66,7 +68,16 @@ internal class JournalControllerImpl : IJournalController
     {
         this.dataService = journalDataService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IJournalDataService>();
         this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+		Logger.LogDebug("JournalControllerImpl(journalDataService={JournalDataService},hostSettings={HostSettings},roleController={RoleController},searchHelper={SearchHelper},dataProvider={DataProvider},folderManager={FolderManager},fileManager={FileManager},fileContentTypeManager={FileContentTypeManager},portalSecurity={PortalSecurity}): hostSettings → {HostSettings1}", journalDataService, hostSettings, roleController, searchHelper, dataProvider, folderManager, fileManager, fileContentTypeManager, portalSecurity, hostSettings);
+		Logger.LogDebug("JournalControllerImpl(journalDataService={JournalDataService},hostSettings={HostSettings},roleController={RoleController},searchHelper={SearchHelper},dataProvider={DataProvider},folderManager={FolderManager},fileManager={FileManager},fileContentTypeManager={FileContentTypeManager},portalSecurity={PortalSecurity}): searchHelper → {SearchHelper1}", journalDataService, hostSettings, roleController, searchHelper, dataProvider, folderManager, fileManager, fileContentTypeManager, portalSecurity, searchHelper);
+		Logger.LogDebug("JournalControllerImpl(journalDataService={JournalDataService},hostSettings={HostSettings},roleController={RoleController},searchHelper={SearchHelper},dataProvider={DataProvider},folderManager={FolderManager},fileManager={FileManager},fileContentTypeManager={FileContentTypeManager},portalSecurity={PortalSecurity}): dataProvider → {DataProvider1}", journalDataService, hostSettings, roleController, searchHelper, dataProvider, folderManager, fileManager, fileContentTypeManager, portalSecurity, dataProvider);
+		Logger.LogDebug("JournalControllerImpl(journalDataService={JournalDataService},hostSettings={HostSettings},roleController={RoleController},searchHelper={SearchHelper},dataProvider={DataProvider},folderManager={FolderManager},fileManager={FileManager},fileContentTypeManager={FileContentTypeManager},portalSecurity={PortalSecurity}): folderManager → {FolderManager1}", journalDataService, hostSettings, roleController, searchHelper, dataProvider, folderManager, fileManager, fileContentTypeManager, portalSecurity, folderManager);
+		Logger.LogDebug("JournalControllerImpl(journalDataService={JournalDataService},hostSettings={HostSettings},roleController={RoleController},searchHelper={SearchHelper},dataProvider={DataProvider},folderManager={FolderManager},fileManager={FileManager},fileContentTypeManager={FileContentTypeManager},portalSecurity={PortalSecurity}): fileManager → {FileManager1}", journalDataService, hostSettings, roleController, searchHelper, dataProvider, folderManager, fileManager, fileContentTypeManager, portalSecurity, fileManager);
+		Logger.LogDebug("JournalControllerImpl(journalDataService={JournalDataService},hostSettings={HostSettings},roleController={RoleController},searchHelper={SearchHelper},dataProvider={DataProvider},folderManager={FolderManager},fileManager={FileManager},fileContentTypeManager={FileContentTypeManager},portalSecurity={PortalSecurity}): fileContentTypeManager → {FileContentTypeManager1}", journalDataService, hostSettings, roleController, searchHelper, dataProvider, folderManager, fileManager, fileContentTypeManager, portalSecurity, fileContentTypeManager);
+		Logger.LogDebug("JournalControllerImpl(journalDataService={JournalDataService},hostSettings={HostSettings},roleController={RoleController},searchHelper={SearchHelper},dataProvider={DataProvider},folderManager={FolderManager},fileManager={FileManager},fileContentTypeManager={FileContentTypeManager},portalSecurity={PortalSecurity}): portalSecurity → {PortalSecurity1}", journalDataService, hostSettings, roleController, searchHelper, dataProvider, folderManager, fileManager, fileContentTypeManager, portalSecurity, portalSecurity);
+		Logger.LogDebug("JournalControllerImpl(journalDataService={JournalDataService},hostSettings={HostSettings},roleController={RoleController},searchHelper={SearchHelper},dataProvider={DataProvider},folderManager={FolderManager},fileManager={FileManager},fileContentTypeManager={FileContentTypeManager},portalSecurity={PortalSecurity}): dataService → {DataService}", journalDataService, hostSettings, roleController, searchHelper, dataProvider, folderManager, fileManager, fileContentTypeManager, portalSecurity, dataService);
         this.roleController = roleController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IRoleController>();
+		Logger.LogDebug("JournalControllerImpl(journalDataService={JournalDataService},hostSettings={HostSettings},roleController={RoleController},searchHelper={SearchHelper},dataProvider={DataProvider},folderManager={FolderManager},fileManager={FileManager},fileContentTypeManager={FileContentTypeManager},portalSecurity={PortalSecurity}): roleController → {RoleController1}", journalDataService, hostSettings, roleController, searchHelper, dataProvider, folderManager, fileManager, fileContentTypeManager, portalSecurity, roleController);
         this.searchHelper = searchHelper ?? Globals.GetCurrentServiceProvider().GetRequiredService<ISearchHelper>();
         this.dataProvider = dataProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<DataProvider>();
         this.folderManager = folderManager ?? Globals.GetCurrentServiceProvider().GetRequiredService<IFolderManager>();
@@ -367,36 +378,44 @@ internal class JournalControllerImpl : IJournalController
     /// <inheritdoc />
     public JournalItem GetJournalItem(int portalId, int currentUserId, int journalId)
     {
+		Logger.LogDebug(">>> Entering GetJournalItem(portalId={PortalId},currentUserId={CurrentUserId},journalId={JournalId})", portalId, currentUserId, journalId);
+		Logger.LogDebug("<<< Exiting GetJournalItem(portalId={PortalId},currentUserId={CurrentUserId},journalId={JournalId})", portalId, currentUserId, journalId);
         return this.GetJournalItem(portalId, currentUserId, journalId, false, false);
     }
 
     /// <inheritdoc />
     public JournalItem GetJournalItem(int portalId, int currentUserId, int journalId, bool includeAllItems)
     {
+		Logger.LogDebug("<<< Exiting GetJournalItem(portalId={PortalId},currentUserId={CurrentUserId},journalId={JournalId},includeAllItems={IncludeAllItems})", portalId, currentUserId, journalId, includeAllItems);
         return this.GetJournalItem(portalId, currentUserId, journalId, includeAllItems, false);
     }
 
     /// <inheritdoc />
     public JournalItem GetJournalItem(int portalId, int currentUserId, int journalId, bool includeAllItems, bool isDeleted)
     {
+		Logger.LogDebug("<<< Exiting GetJournalItem(portalId={PortalId},currentUserId={CurrentUserId},journalId={JournalId},includeAllItems={IncludeAllItems},isDeleted={IsDeleted})", portalId, currentUserId, journalId, includeAllItems, isDeleted);
         return this.GetJournalItem(portalId, currentUserId, journalId, includeAllItems, isDeleted, false);
     }
 
     /// <inheritdoc />
     public JournalItem GetJournalItem(int portalId, int currentUserId, int journalId, bool includeAllItems, bool isDeleted, bool securityCheck)
     {
+		Logger.LogDebug("<<< Exiting GetJournalItem(portalId={PortalId},currentUserId={CurrentUserId},journalId={JournalId},includeAllItems={IncludeAllItems},isDeleted={IsDeleted},securityCheck={SecurityCheck})", portalId, currentUserId, journalId, includeAllItems, isDeleted, securityCheck);
         return CBO.FillObject<JournalItem>(this.dataService.Journal_Get(portalId, currentUserId, journalId, includeAllItems, isDeleted, securityCheck));
     }
 
     /// <inheritdoc />
     public JournalItem GetJournalItemByKey(int portalId, string objectKey)
     {
+		Logger.LogDebug(">>> Entering GetJournalItemByKey(portalId={PortalId},objectKey={ObjectKey})", portalId, objectKey);
+		Logger.LogDebug("<<< Exiting GetJournalItemByKey(portalId={PortalId},objectKey={ObjectKey})", portalId, objectKey);
         return this.GetJournalItemByKey(portalId, objectKey, false, false);
     }
 
     /// <inheritdoc />
     public JournalItem GetJournalItemByKey(int portalId, string objectKey, bool includeAllItems)
     {
+		Logger.LogDebug("<<< Exiting GetJournalItemByKey(portalId={PortalId},objectKey={ObjectKey},includeAllItems={IncludeAllItems})", portalId, objectKey, includeAllItems);
         return this.GetJournalItemByKey(portalId, objectKey, includeAllItems, false);
     }
 
@@ -408,22 +427,29 @@ internal class JournalControllerImpl : IJournalController
             return null;
         }
 
+		Logger.LogDebug("<<< Exiting GetJournalItemByKey(portalId={PortalId},objectKey={ObjectKey},includeAllItems={IncludeAllItems},isDeleted={IsDeleted})", portalId, objectKey, includeAllItems, isDeleted);
         return CBO.FillObject<JournalItem>(this.dataService.Journal_GetByKey(portalId, objectKey, includeAllItems, isDeleted));
     }
 
     /// <inheritdoc />
     public IFileInfo SaveJourmalFile(ModuleInfo module, UserInfo userInfo, string fileName, Stream fileContent)
     {
+		Logger.LogDebug(">>> Entering SaveJourmalFile(module={Module},userInfo={UserInfo},fileName={FileName},fileContent={FileContent})", module, userInfo, fileName, fileContent);
         var userFolder = this.folderManager.GetUserFolder(userInfo);
 
+		Logger.LogDebug("SaveJourmalFile(module={Module},userInfo={UserInfo},fileName={FileName},fileContent={FileContent}): userFolder → {UserFolder}", module, userInfo, fileName, fileContent, userFolder);
         Stream fileContentStream = null;
         try
+		Logger.LogDebug("SaveJourmalFile(module={Module},userInfo={UserInfo},fileName={FileName},fileContent={FileContent}): fileContentStream → {FileContentStream}", module, userInfo, fileName, fileContent, fileContentStream);
         {
             if (IsImageFile(fileName) && IsResizePhotosEnabled(module))
             {
                 fileContentStream = GetJournalImageContent(fileContent);
+				Logger.LogDebug(">>> Entering IsResizePhotosEnabled(module={Module})", module);
+				Logger.LogDebug("<<< Exiting IsResizePhotosEnabled(module={Module})", module);
             }
 
+			Logger.LogDebug("<<< Exiting SaveJourmalFile(module={Module},userInfo={UserInfo},fileName={FileName},fileContent={FileContent})", module, userInfo, fileName, fileContent);
             return this.fileManager.AddFile(userFolder, fileName, fileContentStream ?? fileContent, true, true, this.fileContentTypeManager.GetContentType(Path.GetExtension(fileName)));
         }
         finally
@@ -435,43 +461,55 @@ internal class JournalControllerImpl : IJournalController
     /// <inheritdoc />
     public void SaveJournalItem(JournalItem journalItem, ModuleInfo module)
     {
+		Logger.LogDebug(">>> Entering SaveJournalItem(journalItem={JournalItem},module={Module})", journalItem, module);
         var tabId = module?.TabID ?? Null.NullInteger;
         var tabModuleId = module?.TabModuleID ?? Null.NullInteger;
 
         this.SaveJournalItem(journalItem, tabId, tabModuleId);
+		Logger.LogDebug("<<< Exiting SaveJournalItem(journalItem={JournalItem},module={Module})", journalItem, module);
     }
 
     /// <inheritdoc />
     public void UpdateJournalItem(JournalItem journalItem, ModuleInfo module)
     {
+		Logger.LogDebug(">>> Entering UpdateJournalItem(journalItem={JournalItem},module={Module})", journalItem, module);
         var tabId = module?.TabID ?? Null.NullInteger;
         var tabModuleId = module?.TabModuleID ?? Null.NullInteger;
 
         this.UpdateJournalItem(journalItem, tabId, tabModuleId);
+		Logger.LogDebug("<<< Exiting UpdateJournalItem(journalItem={JournalItem},module={Module})", journalItem, module);
     }
 
     /// <inheritdoc />
     public void DisableComments(int portalId, int journalId)
     {
+		Logger.LogDebug(">>> Entering DisableComments(portalId={PortalId},journalId={JournalId})", portalId, journalId);
         this.dataService.Journal_Comments_ToggleDisable(portalId, journalId, true);
+		Logger.LogDebug("<<< Exiting DisableComments(portalId={PortalId},journalId={JournalId})", portalId, journalId);
     }
 
     /// <inheritdoc />
     public void EnableComments(int portalId, int journalId)
     {
+		Logger.LogDebug(">>> Entering EnableComments(portalId={PortalId},journalId={JournalId})", portalId, journalId);
         this.dataService.Journal_Comments_ToggleDisable(portalId, journalId, false);
+		Logger.LogDebug("<<< Exiting EnableComments(portalId={PortalId},journalId={JournalId})", portalId, journalId);
     }
 
     /// <inheritdoc />
     public void HideComments(int portalId, int journalId)
     {
+		Logger.LogDebug(">>> Entering HideComments(portalId={PortalId},journalId={JournalId})", portalId, journalId);
         this.dataService.Journal_Comments_ToggleHidden(portalId, journalId, true);
+		Logger.LogDebug("<<< Exiting HideComments(portalId={PortalId},journalId={JournalId})", portalId, journalId);
     }
 
     /// <inheritdoc />
     public void ShowComments(int portalId, int journalId)
     {
+		Logger.LogDebug(">>> Entering ShowComments(portalId={PortalId},journalId={JournalId})", portalId, journalId);
         this.dataService.Journal_Comments_ToggleHidden(portalId, journalId, false);
+		Logger.LogDebug("<<< Exiting ShowComments(portalId={PortalId},journalId={JournalId})", portalId, journalId);
     }
 
     // Delete Journal Items
@@ -482,7 +520,9 @@ internal class JournalControllerImpl : IJournalController
     /// <param name="journalId">The journal ID.</param>
     public void DeleteJournalItem(int portalId, int currentUserId, int journalId)
     {
+		Logger.LogDebug(">>> Entering DeleteJournalItem(portalId={PortalId},currentUserId={CurrentUserId},journalId={JournalId})", portalId, currentUserId, journalId);
         this.DeleteJournalItem(portalId, currentUserId, journalId, false);
+		Logger.LogDebug("<<< Exiting DeleteJournalItem(portalId={PortalId},currentUserId={CurrentUserId},journalId={JournalId})", portalId, currentUserId, journalId);
     }
 
     /// <summary>HARD deletes journal items based on item key.</summary>
@@ -490,7 +530,9 @@ internal class JournalControllerImpl : IJournalController
     /// <param name="objectKey">The key.</param>
     public void DeleteJournalItemByKey(int portalId, string objectKey)
     {
+		Logger.LogDebug(">>> Entering DeleteJournalItemByKey(portalId={PortalId},objectKey={ObjectKey})", portalId, objectKey);
         this.dataService.Journal_DeleteByKey(portalId, objectKey);
+		Logger.LogDebug("<<< Exiting DeleteJournalItemByKey(portalId={PortalId},objectKey={ObjectKey})", portalId, objectKey);
     }
 
     /// <summary>HARD deletes journal items based on group ID.</summary>
@@ -507,7 +549,9 @@ internal class JournalControllerImpl : IJournalController
     /// <param name="journalId">The journal ID.</param>
     public void SoftDeleteJournalItem(int portalId, int currentUserId, int journalId)
     {
+		Logger.LogDebug(">>> Entering SoftDeleteJournalItem(portalId={PortalId},currentUserId={CurrentUserId},journalId={JournalId})", portalId, currentUserId, journalId);
         this.DeleteJournalItem(portalId, currentUserId, journalId, true);
+		Logger.LogDebug("<<< Exiting SoftDeleteJournalItem(portalId={PortalId},currentUserId={CurrentUserId},journalId={JournalId})", portalId, currentUserId, journalId);
     }
 
     /// <summary>SOFT deletes journal items based on item key.</summary>
@@ -515,7 +559,9 @@ internal class JournalControllerImpl : IJournalController
     /// <param name="objectKey">The key.</param>
     public void SoftDeleteJournalItemByKey(int portalId, string objectKey)
     {
+		Logger.LogDebug(">>> Entering SoftDeleteJournalItemByKey(portalId={PortalId},objectKey={ObjectKey})", portalId, objectKey);
         this.dataService.Journal_SoftDeleteByKey(portalId, objectKey);
+		Logger.LogDebug("<<< Exiting SoftDeleteJournalItemByKey(portalId={PortalId},objectKey={ObjectKey})", portalId, objectKey);
     }
 
     /// <summary>SOFT deletes journal items based on group ID.</summary>
@@ -529,19 +575,25 @@ internal class JournalControllerImpl : IJournalController
     /// <inheritdoc />
     public IList<CommentInfo> GetCommentsByJournalIds(List<int> journalIdList)
     {
+		Logger.LogDebug(">>> Entering GetCommentsByJournalIds(journalIdList={JournalIdList})", journalIdList);
         var journalIds = journalIdList.Aggregate(string.Empty, (current, journalId) => current + journalId + ";");
+		Logger.LogDebug("GetCommentsByJournalIds(journalIdList={JournalIdList}): journalIds → {JournalIds}", journalIdList, journalIds);
+		Logger.LogDebug("<<< Exiting GetCommentsByJournalIds(journalIdList={JournalIdList})", journalIdList);
         return CBO.FillCollection<CommentInfo>(this.dataService.Journal_Comment_ListByJournalIds(journalIds));
     }
 
     /// <inheritdoc />
     public void LikeJournalItem(int journalId, int userId, string displayName)
     {
+		Logger.LogDebug(">>> Entering LikeJournalItem(journalId={JournalId},userId={UserId},displayName={DisplayName})", journalId, userId, displayName);
         this.dataService.Journal_Like(journalId, userId, displayName);
+		Logger.LogDebug("<<< Exiting LikeJournalItem(journalId={JournalId},userId={UserId},displayName={DisplayName})", journalId, userId, displayName);
     }
 
     /// <inheritdoc />
     public void SaveComment(CommentInfo comment)
     {
+		Logger.LogDebug(">>> Entering SaveComment(comment={Comment})", comment);
         if (!string.IsNullOrEmpty(comment.Comment))
         {
             comment.Comment =
@@ -554,6 +606,7 @@ internal class JournalControllerImpl : IJournalController
         ////objCommentInfo.Comment = portalSecurity.Remove(objCommentInfo.Comment, DotNetNuke.Security.PortalSecurity.ConfigType.ListController, "ProfanityFilter", DotNetNuke.Security.PortalSecurity.FilterScope.PortalList);
         string xml = null;
         if (comment.CommentXML != null)
+		Logger.LogDebug("SaveComment(comment={Comment}): xml → {Xml}", comment, xml);
         {
             xml = comment.CommentXML.OuterXml;
         }
@@ -562,44 +615,60 @@ internal class JournalControllerImpl : IJournalController
 
         var newComment = this.GetComment(comment.CommentId);
         comment.DateCreated = newComment.DateCreated;
+		Logger.LogDebug("SaveComment(comment={Comment}): newComment → {NewComment}", comment, newComment);
+		Logger.LogDebug("SaveComment(comment={Comment}): comment.DateCreated → {Arg1}", comment, comment.DateCreated);
+		Logger.LogDebug("SaveComment(comment={Comment}): comment.DateUpdated → {Arg1}", comment, comment.DateUpdated);
         comment.DateUpdated = newComment.DateUpdated;
+		Logger.LogDebug("<<< Exiting SaveComment(comment={Comment})", comment);
     }
 
     /// <inheritdoc />
     public CommentInfo GetComment(int commentId)
     {
+		Logger.LogDebug(">>> Entering GetComment(commentId={CommentId})", commentId);
+		Logger.LogDebug("<<< Exiting GetComment(commentId={CommentId})", commentId);
         return CBO.FillObject<CommentInfo>(this.dataService.Journal_Comment_Get(commentId));
     }
 
     /// <inheritdoc />
     public void DeleteComment(int journalId, int commentId)
     {
+		Logger.LogDebug(">>> Entering DeleteComment(journalId={JournalId},commentId={CommentId})", journalId, commentId);
         this.dataService.Journal_Comment_Delete(journalId, commentId);
 
         // UNDONE: update the parent journal item and content item so this comment gets removed from search index
+		Logger.LogDebug("<<< Exiting DeleteComment(journalId={JournalId},commentId={CommentId})", journalId, commentId);
     }
 
     /// <inheritdoc />
     public void LikeComment(int journalId, int commentId, int userId, string displayName)
     {
+		Logger.LogDebug(">>> Entering LikeComment(journalId={JournalId},commentId={CommentId},userId={UserId},displayName={DisplayName})", journalId, commentId, userId, displayName);
         this.dataService.Journal_Comment_Like(journalId, commentId, userId, displayName);
+		Logger.LogDebug("<<< Exiting LikeComment(journalId={JournalId},commentId={CommentId},userId={UserId},displayName={DisplayName})", journalId, commentId, userId, displayName);
     }
 
     /// <inheritdoc />
     public JournalTypeInfo GetJournalType(string journalType)
     {
+		Logger.LogDebug(">>> Entering GetJournalType(journalType={JournalType})", journalType);
+		Logger.LogDebug("<<< Exiting GetJournalType(journalType={JournalType})", journalType);
         return CBO.FillObject<JournalTypeInfo>(this.dataService.Journal_Types_Get(journalType));
     }
 
     /// <inheritdoc />
     public JournalTypeInfo GetJournalTypeById(int journalTypeId)
     {
+		Logger.LogDebug(">>> Entering GetJournalTypeById(journalTypeId={JournalTypeId})", journalTypeId);
+		Logger.LogDebug("<<< Exiting GetJournalTypeById(journalTypeId={JournalTypeId})", journalTypeId);
         return CBO.FillObject<JournalTypeInfo>(this.dataService.Journal_Types_GetById(journalTypeId));
     }
 
     /// <inheritdoc />
     public IEnumerable<JournalTypeInfo> GetJournalTypes(int portalId)
     {
+		Logger.LogDebug(">>> Entering GetJournalTypes(portalId={PortalId})", portalId);
+		Logger.LogDebug("<<< Exiting GetJournalTypes(portalId={PortalId})", portalId);
         return CBO.GetCachedObject<IEnumerable<JournalTypeInfo>>(
             this.hostSettings,
             new CacheItemArgs(
@@ -628,13 +697,18 @@ internal class JournalControllerImpl : IJournalController
 
     private static MemoryStream GetJournalImageContent(Stream fileContent)
     {
+		Logger.LogDebug(">>> Entering GetJournalImageContent(fileContent={FileContent})", fileContent);
         Image image = new Bitmap(fileContent);
         var thumbnailWidth = 400;
+		Logger.LogDebug("GetJournalImageContent(fileContent={FileContent}): image → {Image}", fileContent, image);
         var thumbnailHeight = 400;
         GetThumbnailSize(image.Width, image.Height, ref thumbnailWidth, ref thumbnailHeight);
         var thumbnail = image.GetThumbnailImage(thumbnailWidth, thumbnailHeight, () => true, IntPtr.Zero);
         var result = new MemoryStream();
+		Logger.LogDebug("GetJournalImageContent(fileContent={FileContent}): thumbnail → {Thumbnail}", fileContent, thumbnail);
+		Logger.LogDebug("GetJournalImageContent(fileContent={FileContent}): result → {Result}", fileContent, result);
         thumbnail.Save(result, image.RawFormat);
+		Logger.LogDebug("<<< Exiting GetJournalImageContent(fileContent={FileContent})", fileContent);
         return result;
     }
 
@@ -644,32 +718,42 @@ internal class JournalControllerImpl : IJournalController
         {
             thumbnailWidth = Math.Min(imageWidth, thumbnailWidth);
             thumbnailHeight = GetMinorSize(imageHeight, imageWidth, thumbnailWidth);
+			Logger.LogDebug("GetThumbnailSize(imageWidth={ImageWidth},imageHeight={ImageHeight},thumbnailWidth={ThumbnailWidth},thumbnailHeight={ThumbnailHeight}): thumbnailWidth → {ThumbnailWidth1}", imageWidth, imageHeight, thumbnailWidth, thumbnailHeight, thumbnailWidth);
+			Logger.LogDebug("GetThumbnailSize(imageWidth={ImageWidth},imageHeight={ImageHeight},thumbnailWidth={ThumbnailWidth},thumbnailHeight={ThumbnailHeight}): thumbnailHeight → {ThumbnailHeight1}", imageWidth, imageHeight, thumbnailWidth, thumbnailHeight, thumbnailHeight);
         }
         else
         {
             thumbnailHeight = Math.Min(imageHeight, thumbnailHeight);
             thumbnailWidth = GetMinorSize(imageWidth, imageHeight, thumbnailHeight);
         }
+		Logger.LogDebug("<<< Exiting GetThumbnailSize(imageWidth={ImageWidth},imageHeight={ImageHeight},thumbnailWidth={ThumbnailWidth},thumbnailHeight={ThumbnailHeight})", imageWidth, imageHeight, thumbnailWidth, thumbnailHeight);
     }
 
     private static int GetMinorSize(int imageMinorSize, int imageMajorSize, int thumbnailMajorSize)
     {
+		Logger.LogDebug(">>> Entering GetMinorSize(imageMinorSize={ImageMinorSize},imageMajorSize={ImageMajorSize},thumbnailMajorSize={ThumbnailMajorSize})", imageMinorSize, imageMajorSize, thumbnailMajorSize);
         if (imageMajorSize == thumbnailMajorSize)
         {
             return imageMinorSize;
         }
 
         double calculated = (Convert.ToDouble(imageMinorSize) * Convert.ToDouble(thumbnailMajorSize)) / Convert.ToDouble(imageMajorSize);
+		Logger.LogDebug("GetMinorSize(imageMinorSize={ImageMinorSize},imageMajorSize={ImageMajorSize},thumbnailMajorSize={ThumbnailMajorSize}): calculated → {Calculated}", imageMinorSize, imageMajorSize, thumbnailMajorSize, calculated);
+		Logger.LogDebug("<<< Exiting GetMinorSize(imageMinorSize={ImageMinorSize},imageMajorSize={ImageMajorSize},thumbnailMajorSize={ThumbnailMajorSize})", imageMinorSize, imageMajorSize, thumbnailMajorSize);
         return Convert.ToInt32(Math.Round(calculated));
     }
 
     private static bool IsImageFile(string fileName)
     {
+		Logger.LogDebug(">>> Entering IsImageFile(fileName={FileName})", fileName);
+		Logger.LogDebug("<<< Exiting IsImageFile(fileName={FileName})", fileName);
         return (Globals.ImageFileTypes + ",").IndexOf(Path.GetExtension(fileName).Replace(".", string.Empty) + ",", StringComparison.InvariantCultureIgnoreCase) > -1;
     }
 
     private static bool IsResizePhotosEnabled(ModuleInfo module)
     {
+		Logger.LogDebug(">>> Entering IsResizePhotosEnabled(module={Module})", module);
+		Logger.LogDebug("<<< Exiting IsResizePhotosEnabled(module={Module})", module);
         return GetBooleanSetting(AllowResizePhotosSetting, false, module) &&
                GetBooleanSetting(AllowPhotosSetting, true, module) &&
                GetBooleanSetting(EditorEnabledSetting, true, module);
@@ -688,12 +772,14 @@ internal class JournalControllerImpl : IJournalController
     // none of the parameters should be null; checked before calling this method
     private void PrepareSecuritySet(JournalItem journalItem)
     {
+		Logger.LogDebug(">>> Entering PrepareSecuritySet(journalItem={JournalItem})", journalItem);
         var originalSecuritySet =
             journalItem.SecuritySet = (journalItem.SecuritySet ?? string.Empty).ToUpperInvariant();
 
         if (string.IsNullOrEmpty(journalItem.SecuritySet))
         {
             journalItem.SecuritySet = "E,";
+			Logger.LogDebug("PrepareSecuritySet(journalItem={JournalItem}): journalItem.SecuritySet → {Arg1}", journalItem, journalItem.SecuritySet);
         }
         else if (!journalItem.SecuritySet.EndsWith(",", StringComparison.Ordinal))
         {
@@ -763,6 +849,7 @@ internal class JournalControllerImpl : IJournalController
 
         // TODO: validate existence and visibility/accessability of all Roles added to the set (if any)
         journalItem.SecuritySet = string.Join(",", parts);
+		Logger.LogDebug("<<< Exiting PrepareSecuritySet(journalItem={JournalItem})", journalItem);
     }
 
     private void UpdateGroupStats(int portalId, int groupId)
@@ -786,6 +873,7 @@ internal class JournalControllerImpl : IJournalController
         {
             while (dr.Read())
             {
+				private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                 var settingName = "stat_" + dr["JournalType"];
                 if (role.Settings.ContainsKey(settingName))
                 {
@@ -801,12 +889,15 @@ internal class JournalControllerImpl : IJournalController
         }
 
         this.roleController.UpdateRoleSettings(role, true);
+		Logger.LogDebug("<<< Exiting UpdateGroupStats(portalId={PortalId},groupId={GroupId})", portalId, groupId);
     }
 
     private void DeleteJournalItem(int portalId, int currentUserId, int journalId, bool softDelete)
     {
+		Logger.LogDebug(">>> Entering DeleteJournalItem(portalId={PortalId},currentUserId={CurrentUserId},journalId={JournalId},softDelete={SoftDelete})", portalId, currentUserId, journalId, softDelete);
         var ji = this.GetJournalItem(portalId, currentUserId, journalId, !softDelete);
         if (ji == null)
+		Logger.LogDebug("DeleteJournalItem(portalId={PortalId},currentUserId={CurrentUserId},journalId={JournalId},softDelete={SoftDelete}): ji → {Ji}", portalId, currentUserId, journalId, softDelete, ji);
         {
             return;
         }
@@ -841,8 +932,10 @@ internal class JournalControllerImpl : IJournalController
         if (groupId > 0)
         {
             document.RoleId = groupId;
+			Logger.LogDebug("DeleteJournalItem(portalId={PortalId},currentUserId={CurrentUserId},journalId={JournalId},softDelete={SoftDelete}): document.RoleId → {Arg4}", portalId, currentUserId, journalId, softDelete, document.RoleId);
         }
 
         this.dataProvider.AddSearchDeletedItems(document);
+		Logger.LogDebug("<<< Exiting DeleteJournalItem(portalId={PortalId},currentUserId={CurrentUserId},journalId={JournalId},softDelete={SoftDelete})", portalId, currentUserId, journalId, softDelete);
     }
 }

@@ -16,14 +16,17 @@ namespace DotNetNuke.Tests.Integration.PersonaBar.Content.Pages
     [TestFixture]
     public class AddPageTests : IntegrationTestBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string AddBulkPagesApi = "/API/PersonaBar/Pages/SaveBulkPages";
         private const string VerifyBulkPagesApi = "/API/PersonaBar/Pages/PreSaveBulkPagesValidate";
 
         [Test]
         public void Add_Multi_Pages_For_Existing_Should_Return_Results()
         {
+			Logger.LogDebug(">>> Entering Add_Multi_Pages_For_Existing_Should_Return_Results()");
             var rnd = new Random().Next(1000, 10000);
             var addPagesDto = new BulkPage
+			Logger.LogDebug("Add_Multi_Pages_For_Existing_Should_Return_Results(): rnd → {Rnd}", rnd);
             {
                 BulkPages = "Page_" + rnd,
                 ParentId = -1,
@@ -36,8 +39,11 @@ namespace DotNetNuke.Tests.Integration.PersonaBar.Content.Pages
 
             Console.WriteLine(@"Add bulk pages request = {0}", JsonConvert.SerializeObject(addPagesDto));
             var connector = WebApiTestHelper.LoginHost();
+			Logger.LogDebug("Add_Multi_Pages_For_Existing_Should_Return_Results(): connector → {Connector}", connector);
             var response = connector.PostJson(AddBulkPagesApi, addPagesDto).Content.ReadAsStringAsync().Result;
             var result = JsonConvert.DeserializeObject<BulkPageResponseWrapper>(response);
+			Logger.LogDebug("Add_Multi_Pages_For_Existing_Should_Return_Results(): response → {Response}", response);
+			Logger.LogDebug("Add_Multi_Pages_For_Existing_Should_Return_Results(): result → {Result}", result);
             Console.WriteLine(@"Add bulk pages ersponse = {0}", response);
             using (Assert.EnterMultipleScope())
             {
@@ -47,12 +53,15 @@ namespace DotNetNuke.Tests.Integration.PersonaBar.Content.Pages
 
             var response2 = connector.PostJson(VerifyBulkPagesApi, addPagesDto).Content.ReadAsStringAsync().Result;
             var result2 = JsonConvert.DeserializeObject<BulkPageResponseWrapper>(response2);
+			Logger.LogDebug("Add_Multi_Pages_For_Existing_Should_Return_Results(): response2 → {Response2}", response2);
+			Logger.LogDebug("Add_Multi_Pages_For_Existing_Should_Return_Results(): result2 → {Result2}", result2);
             Console.WriteLine(@"Verify bulk pages ersponse = {0}", response2);
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(int.Parse(result2.Status.ToString()), Is.EqualTo(0));
                 Assert.That(result2.Response.Pages.First().ErrorMessage, Is.Not.Null.And.Not.Empty);
             }
+			Logger.LogDebug("<<< Exiting Add_Multi_Pages_For_Existing_Should_Return_Results()");
         }
 
         [JsonObject]

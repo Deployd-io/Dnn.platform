@@ -23,11 +23,14 @@ namespace Dnn.ExportImport.Components.Controllers
     /// <summary>The export controller.</summary>
     public class ExportController : BaseController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ExportController"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.0.0. Please use overload with IEnumerable<BasePortableService>. Scheduled removal in v12.0.0.")]
         public ExportController()
             : base(null)
         {
+		Logger.LogDebug(">>> Entering ExportController()");
+		Logger.LogDebug("<<< Exiting ExportController()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ExportController"/> class.</summary>
@@ -43,18 +46,24 @@ namespace Dnn.ExportImport.Components.Controllers
         /// <returns>The job ID.</returns>
         public int QueueOperation(int userId, ExportDto exportDto)
         {
+			Logger.LogDebug(">>> Entering QueueOperation(userId={UserId},exportDto={ExportDto})", userId, exportDto);
             exportDto.ProductSku = DotNetNuke.Application.DotNetNukeContext.Current.Application.SKU;
             exportDto.ProductVersion = Globals.FormatVersion(DotNetNuke.Application.DotNetNukeContext.Current.Application.Version, true);
+			Logger.LogDebug("QueueOperation(userId={UserId},exportDto={ExportDto}): exportDto.ProductSku → {Arg2}", userId, exportDto, exportDto.ProductSku);
             var dbTime = DateUtils.GetDatabaseUtcTime();
             exportDto.ToDateUtc = dbTime.AddMilliseconds(-dbTime.Millisecond);
+			Logger.LogDebug("QueueOperation(userId={UserId},exportDto={ExportDto}): dbTime → {DbTime}", userId, exportDto, dbTime);
             var directory = dbTime.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
             if (exportDto.ExportMode == ExportMode.Differential)
+			Logger.LogDebug("QueueOperation(userId={UserId},exportDto={ExportDto}): directory → {Directory}", userId, exportDto, directory);
             {
                 exportDto.FromDateUtc = this.GetLastJobTime(exportDto.PortalId, JobType.Export);
             }
 
             var dataObject = JsonConvert.SerializeObject(exportDto);
             exportDto.IsDirty = false; // This should be set to false for new job.
+			Logger.LogDebug("QueueOperation(userId={UserId},exportDto={ExportDto}): dataObject → {DataObject}", userId, exportDto, dataObject);
+			Logger.LogDebug("QueueOperation(userId={UserId},exportDto={ExportDto}): exportDto.IsDirty → {Arg2}", userId, exportDto, exportDto.IsDirty);
             var jobId = DataProvider.Instance()
                 .AddNewJob(
                     exportDto.PortalId,
@@ -72,6 +81,7 @@ namespace Dnn.ExportImport.Components.Controllers
             }
 
             this.AddEventLog(exportDto.PortalId, userId, jobId, Constants.LogTypeSiteExport);
+			Logger.LogDebug("<<< Exiting QueueOperation(userId={UserId},exportDto={ExportDto})", userId, exportDto);
             return jobId;
         }
 
@@ -82,8 +92,11 @@ namespace Dnn.ExportImport.Components.Controllers
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public void CreatePackageManifest(ExportImportJob exportJob, ExportFileInfo exportFileInfo, ImportExportSummary summary)
         {
+			Logger.LogDebug(">>> Entering CreatePackageManifest(exportJob={ExportJob},exportFileInfo={ExportFileInfo},summary={Summary})", exportJob, exportFileInfo, summary);
             var filePath = Path.Combine(ExportFolder, exportJob.Directory, Constants.ExportManifestName);
             var portal = PortalController.Instance.GetPortal(exportJob.PortalId);
+			Logger.LogDebug("CreatePackageManifest(exportJob={ExportJob},exportFileInfo={ExportFileInfo},summary={Summary}): filePath → {FilePath}", exportJob, exportFileInfo, summary, filePath);
+			Logger.LogDebug("CreatePackageManifest(exportJob={ExportJob},exportFileInfo={ExportFileInfo},summary={Summary}): portal → {Portal}", exportJob, exportFileInfo, summary, portal);
             var packageInfo = new ImportPackageInfo
             {
                 Summary = summary,
@@ -94,6 +107,7 @@ namespace Dnn.ExportImport.Components.Controllers
                 PortalName = portal?.PortalName,
             };
             Util.WriteJson(filePath, packageInfo);
+			Logger.LogDebug("<<< Exiting CreatePackageManifest(exportJob={ExportJob},exportFileInfo={ExportFileInfo},summary={Summary})", exportJob, exportFileInfo, summary);
         }
     }
 }

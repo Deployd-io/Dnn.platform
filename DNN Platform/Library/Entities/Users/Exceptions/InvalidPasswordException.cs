@@ -10,9 +10,12 @@ namespace DotNetNuke.Entities.Users
     [Serializable]
     public class InvalidPasswordException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="InvalidPasswordException"/> class.</summary>
         public InvalidPasswordException()
         {
+		Logger.LogDebug(">>> Entering InvalidPasswordException()");
+		Logger.LogDebug("<<< Exiting InvalidPasswordException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="InvalidPasswordException"/> class with a message.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Entities.Users
         public InvalidPasswordException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering InvalidPasswordException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting InvalidPasswordException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="InvalidPasswordException"/> class with a message and an inner exception.</summary>
         /// <param name="message">Exception message.</param>

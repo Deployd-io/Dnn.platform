@@ -13,15 +13,21 @@ namespace DotNetNuke.Web.Api
     /// <summary>Attribute to authorize apis based on the api token used.</summary>
     public class ApiTokenAuthorizeAttribute : AuthorizeAttributeBase, IOverrideDefaultAuthLevel
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ApiTokenAuthorizeAttribute"/> class.</summary>
         /// <param name="key">The Key to authenticate api.</param>
         /// <param name="resourceFile">The resource file for the token api.</param>
         /// <param name="scope">The required api token scope.</param>
         public ApiTokenAuthorizeAttribute(string key, string resourceFile, ApiTokenScope scope)
         {
+			Logger.LogDebug(">>> Entering ApiTokenAuthorizeAttribute(key={Key},resourceFile={ResourceFile},scope={Scope})", key, resourceFile, scope);
             this.Key = key;
             this.ResourceFile = resourceFile;
+			Logger.LogDebug("ApiTokenAuthorizeAttribute(key={Key},resourceFile={ResourceFile},scope={Scope}): this.Key → {Arg3}", key, resourceFile, scope, this.Key);
+			Logger.LogDebug("ApiTokenAuthorizeAttribute(key={Key},resourceFile={ResourceFile},scope={Scope}): this.ResourceFile → {Arg3}", key, resourceFile, scope, this.ResourceFile);
             this.Scope = scope;
+			Logger.LogDebug("<<< Exiting ApiTokenAuthorizeAttribute(key={Key},resourceFile={ResourceFile},scope={Scope})", key, resourceFile, scope);
+			Logger.LogDebug("ApiTokenAuthorizeAttribute(key={Key},resourceFile={ResourceFile},scope={Scope}): this.Scope → {Arg3}", key, resourceFile, scope, this.Scope);
         }
 
         /// <summary>Gets or sets the Key for the api token.</summary>
@@ -44,8 +50,10 @@ namespace DotNetNuke.Web.Api
         /// <returns><see langword="true"/> if authorized, <see langword="false"/> otherwise.</returns>
         public override bool IsAuthorized(AuthFilterContext context)
         {
+			Logger.LogDebug(">>> Entering IsAuthorized(context={Context})", context);
             var token = this.ApiTokenController.GetCurrentThreadApiToken();
             if (token == null)
+			Logger.LogWarning("IsAuthorized(context={Context}): token → {Token}", context, token);
             {
                 return false;
             }
@@ -54,6 +62,7 @@ namespace DotNetNuke.Web.Api
             {
                 var settings = ApiTokenSettings.GetSettings(this.ApiTokenSettingsRepository, PortalController.Instance.GetCurrentSettings().PortalId);
                 if (!settings.AllowApiTokens)
+				Logger.LogDebug("IsAuthorized(context={Context}): settings → {Settings}", context, settings);
                 {
                     return false;
                 }
@@ -61,6 +70,7 @@ namespace DotNetNuke.Web.Api
 
             var scopeMatch = false;
             switch (this.Scope)
+			Logger.LogDebug("IsAuthorized(context={Context}): scopeMatch → {ScopeMatch}", context, scopeMatch);
             {
                 case ApiTokenScope.Host:
                     scopeMatch = token.Scope == ApiTokenScope.Host;
@@ -78,6 +88,7 @@ namespace DotNetNuke.Web.Api
                 return token.TokenKeys.Contains(this.Key.ToLowerInvariant());
             }
 
+			Logger.LogDebug("<<< Exiting IsAuthorized(context={Context})", context);
             return false;
         }
     }

@@ -19,6 +19,7 @@ namespace DotNetNuke.Services.GeneratedImage
     /// <summary>Image Handler abstract class.</summary>
     public abstract class ImageHandler : IHttpHandler
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ImageHandler"/> class.</summary>
         /// <param name="eventLogger">The event logger.</param>
         /// <param name="imageStore">The image store.</param>
@@ -26,13 +27,17 @@ namespace DotNetNuke.Services.GeneratedImage
         internal ImageHandler(IEventLogger eventLogger, IImageStore imageStore, DateTime now)
             : this(new ImageHandlerInternal(eventLogger, imageStore, now))
         {
+		Logger.LogDebug(">>> Entering ImageHandler(eventLogger={EventLogger},imageStore={ImageStore},now={Now})", eventLogger, imageStore, now);
         }
+		Logger.LogDebug("<<< Exiting ImageHandler(eventLogger={EventLogger},imageStore={ImageStore},now={Now})", eventLogger, imageStore, now);
 
         /// <summary>Initializes a new instance of the <see cref="ImageHandler"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IEventLogger. Scheduled removal in v12.0.0.")]
         protected ImageHandler()
             : this(Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>())
         {
+		Logger.LogDebug(">>> Entering ImageHandler()");
+		Logger.LogDebug("<<< Exiting ImageHandler()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ImageHandler"/> class.</summary>
@@ -45,6 +50,7 @@ namespace DotNetNuke.Services.GeneratedImage
         private ImageHandler(ImageHandlerInternal implementation)
         {
             this.Implementation = implementation;
+			Logger.LogDebug("ImageHandler(implementation={Implementation}): this.Implementation → {Arg1}", implementation, this.Implementation);
         }
 
         /// <inheritdoc />
@@ -138,6 +144,7 @@ namespace DotNetNuke.Services.GeneratedImage
         /// <inheritdoc />
         public void ProcessRequest(HttpContext context)
         {
+			Logger.LogDebug(">>> Entering ProcessRequest(context={Context})", context);
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));
@@ -145,6 +152,7 @@ namespace DotNetNuke.Services.GeneratedImage
 
             HttpContextBase contextWrapper = new HttpContextWrapper(context);
             this.ProcessRequest(contextWrapper);
+			Logger.LogDebug("<<< Exiting ProcessRequest(context={Context})", context);
         }
 
         internal void ProcessRequest(HttpContextBase context)

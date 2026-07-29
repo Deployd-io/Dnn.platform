@@ -14,10 +14,13 @@ namespace DotNetNuke.Build.Tasks
     /// <summary>A cake task to clean the temp directory.</summary>
     public sealed class CleanTemp : FrostingTask<Context>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override void Run(Context context)
         {
+			Logger.LogDebug(">>> Entering Run(context={Context})", context);
             context.CleanDirectory(context.TempDir);
+			Logger.LogDebug("<<< Exiting Run(context={Context})", context);
         }
     }
 }

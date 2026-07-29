@@ -10,25 +10,44 @@ namespace DNNConnect.CKEditorProvider.Objects
     /// <summary>CodeMirror Plugin Options.</summary>
     public class CodeMirror
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="CodeMirror" /> class.</summary>
         public CodeMirror()
         {
+			Logger.LogDebug(">>> Entering CodeMirror()");
             this.Theme = "default";
             this.LineNumbers = true;
+			Logger.LogDebug("CodeMirror(): this.Theme → {Arg0}", this.Theme);
+			Logger.LogDebug("CodeMirror(): this.LineNumbers → {Arg0}", this.LineNumbers);
             this.LineWrapping = true;
             this.MatchBrackets = true;
             this.AutoCloseTags = false;
+			Logger.LogDebug("CodeMirror(): this.LineWrapping → {Arg0}", this.LineWrapping);
+			Logger.LogDebug("CodeMirror(): this.MatchBrackets → {Arg0}", this.MatchBrackets);
+			Logger.LogDebug("CodeMirror(): this.AutoCloseTags → {Arg0}", this.AutoCloseTags);
             this.EnableSearchTools = true;
             this.EnableCodeFolding = true;
             this.EnableCodeFormatting = true;
             this.AutoFormatOnStart = false;
             this.AutoFormatOnUncomment = true;
             this.HighlightActiveLine = true;
+			Logger.LogDebug("CodeMirror(): this.EnableSearchTools → {Arg0}", this.EnableSearchTools);
+			Logger.LogDebug("CodeMirror(): this.EnableCodeFolding → {Arg0}", this.EnableCodeFolding);
+			Logger.LogDebug("CodeMirror(): this.EnableCodeFormatting → {Arg0}", this.EnableCodeFormatting);
+			Logger.LogDebug("CodeMirror(): this.AutoFormatOnStart → {Arg0}", this.AutoFormatOnStart);
+			Logger.LogDebug("CodeMirror(): this.AutoFormatOnUncomment → {Arg0}", this.AutoFormatOnUncomment);
+			Logger.LogDebug("CodeMirror(): this.HighlightActiveLine → {Arg0}", this.HighlightActiveLine);
             this.HighlightMatches = true;
             this.ShowTabs = false;
             this.ShowFormatButton = true;
             this.ShowCommentButton = true;
             this.ShowUncommentButton = true;
+			Logger.LogDebug("<<< Exiting CodeMirror()");
+			Logger.LogDebug("CodeMirror(): this.HighlightMatches → {Arg0}", this.HighlightMatches);
+			Logger.LogDebug("CodeMirror(): this.ShowTabs → {Arg0}", this.ShowTabs);
+			Logger.LogDebug("CodeMirror(): this.ShowFormatButton → {Arg0}", this.ShowFormatButton);
+			Logger.LogDebug("CodeMirror(): this.ShowCommentButton → {Arg0}", this.ShowCommentButton);
+			Logger.LogDebug("CodeMirror(): this.ShowUncommentButton → {Arg0}", this.ShowUncommentButton);
         }
 
         /// <summary>Gets or sets the theme.</summary>

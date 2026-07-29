@@ -4,12 +4,17 @@
 
 namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     public struct ComplexType
     {
         public ComplexType(int x, int y)
         {
+			Logger.LogDebug(">>> Entering ComplexType(x={X},y={Y})", x, y);
             this.X = x;
             this.Y = y;
+			Logger.LogDebug("<<< Exiting ComplexType(x={X},y={Y})", x, y);
+			Logger.LogDebug("ComplexType(x={X},y={Y}): this.X → {Arg2}", x, y, this.X);
+			Logger.LogDebug("ComplexType(x={X},y={Y}): this.Y → {Arg2}", x, y, this.Y);
         }
 
         public int X { get; private set; }

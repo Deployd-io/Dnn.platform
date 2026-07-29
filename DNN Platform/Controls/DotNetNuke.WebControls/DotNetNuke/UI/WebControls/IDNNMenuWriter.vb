@@ -3,11 +3,13 @@
 
 Imports System
 Imports System.Web.UI
+Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(IDNNMenuWriter))
 
 Namespace DotNetNuke.UI.WebControls
     Friend Interface IDNNMenuWriter
         ' Methods
         Sub RenderMenu(ByVal writer As HtmlTextWriter, ByVal menu As DNNMenu)
+		Logger.LogDebug(">>> Entering RenderMenu(writer={Writer},menu={Menu})", writer, menu)
     End Interface
 End Namespace
 

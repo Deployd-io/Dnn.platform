@@ -18,12 +18,14 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
     [JsonObject]
     public class PermissionsDto : Permissions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="PermissionsDto"/> class.</summary>
         /// <param name="needDefinitions">Whether to load the permission definitions.</param>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IPermissionDefinitionService. Scheduled removal in v12.0.0.")]
         public PermissionsDto(bool needDefinitions)
             : this(null, needDefinitions)
         {
+		Logger.LogDebug(">>> Entering PermissionsDto(needDefinitions={NeedDefinitions})", needDefinitions);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PermissionsDto"/> class.</summary>
@@ -34,6 +36,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
         {
             foreach (var role in PermissionProvider.Instance().ImplicitRolesForPages(PortalSettings.Current.PortalId))
             {
+			Logger.LogDebug("<<< Exiting PermissionsDto(needDefinitions={NeedDefinitions})", needDefinitions);
                 this.EnsureRole(role, true, true);
             }
         }
@@ -50,6 +53,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
         /// <inheritdoc />
         protected override void LoadPermissionDefinitions()
         {
+			Logger.LogDebug(">>> Entering LoadPermissionDefinitions()");
             foreach (var permission in this.PermissionDefinitionService.GetDefinitionsByPortalDesktopModule())
             {
                 this.PermissionDefinitions.Add(new Permission
@@ -60,6 +64,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
                     View = PermissionHelper.IsViewPermission(permission),
                 });
             }
+			Logger.LogDebug("<<< Exiting LoadPermissionDefinitions()");
         }
     }
 }

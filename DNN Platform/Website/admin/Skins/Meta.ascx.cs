@@ -51,6 +51,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             // if(!string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(Content))
@@ -64,17 +65,21 @@ namespace DotNetNuke.UI.Skins.Controls
             {
                 var metaTag = new HtmlMeta();
 
+				Logger.LogDebug("OnPreRender(e={E}): metaTag → {MetaTag}", e, metaTag);
                 if (!string.IsNullOrEmpty(this.HttpEquiv))
                 {
                     metaTag.HttpEquiv = this.HttpEquiv;
+					Logger.LogDebug("OnPreRender(e={E}): metaTag.HttpEquiv → {Arg1}", e, metaTag.HttpEquiv);
                 }
 
                 if (!string.IsNullOrEmpty(this.Name))
                 {
                     metaTag.Name = this.Name;
+					Logger.LogDebug("OnPreRender(e={E}): metaTag.Name → {Arg1}", e, metaTag.Name);
                 }
 
                 metaTag.Content = this.Content;
+				Logger.LogDebug("OnPreRender(e={E}): metaTag.Content → {Arg1}", e, metaTag.Content);
 
                 if (this.InsertFirst)
                 {
@@ -85,6 +90,7 @@ namespace DotNetNuke.UI.Skins.Controls
                     this.Page.Header.Controls.Add(metaTag);
                 }
             }
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <summary>
@@ -94,6 +100,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// </summary>
         public class HttpPlaceholder
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
             /// <summary>
             /// Gets or sets the <see cref="Meta.HttpEquiv"/> of the parent
             /// <c>meta</c> element.

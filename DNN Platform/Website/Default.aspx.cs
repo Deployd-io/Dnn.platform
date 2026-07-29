@@ -72,7 +72,9 @@ namespace DotNetNuke.Framework
         public DefaultPage()
             : this(null, null, null, null, null, null, null, null, null, null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering DefaultPage()");
         }
+		Logger.LogDebug("<<< Exiting DefaultPage()");
 
         /// <summary>Initializes a new instance of the <see cref="DefaultPage"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
@@ -221,8 +223,10 @@ namespace DotNetNuke.Framework
         /// <inheritdoc />
         public string RaiseClientAPICallbackEvent(string eventArgument)
         {
+			Logger.LogDebug(">>> Entering RaiseClientAPICallbackEvent(eventArgument={EventArgument})", eventArgument);
             var dict = this.ParsePageCallBackArgs(eventArgument);
             if (!dict.ContainsKey("type"))
+			Logger.LogDebug("RaiseClientAPICallbackEvent(eventArgument={EventArgument}): dict → {Dict}", eventArgument, dict);
             {
                 return string.Empty;
             }
@@ -242,12 +246,15 @@ namespace DotNetNuke.Framework
                 default:
                     throw new Exception("Unknown Callback Type");
             }
+			Logger.LogDebug("<<< Exiting RaiseClientAPICallbackEvent(eventArgument={EventArgument})", eventArgument);
         }
 
         /// <summary>Checks if the current version is not a production version.</summary>
         /// <returns>A value indicating whether the current version is not a production version.</returns>
         protected bool NonProductionVersion()
         {
+			Logger.LogDebug(">>> Entering NonProductionVersion()");
+			Logger.LogDebug("<<< Exiting NonProductionVersion()");
             return this.appInfo.Status != ReleaseMode.Stable;
         }
 
@@ -261,6 +268,7 @@ namespace DotNetNuke.Framework
         /// </remarks>
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             // set global page settings
@@ -379,6 +387,7 @@ namespace DotNetNuke.Framework
             if (this.User.Identity.IsAuthenticated)
             {
                 this.ViewStateUserKey = this.User.Identity.Name;
+				Logger.LogDebug("OnInit(e={E}): this.ViewStateUserKey → {Arg1}", e, this.ViewStateUserKey);
             }
 
             // set the async postback timeout.
@@ -390,12 +399,14 @@ namespace DotNetNuke.Framework
             this.DnnResources1.ApplicationPath = Globals.ApplicationPath;
             this.DnnResources2.ApplicationPath = Globals.ApplicationPath;
             this.DnnResources3.ApplicationPath = Globals.ApplicationPath;
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <summary>Initialize the Scrolltop html control which controls the open / closed nature of each module.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.ManageInstallerFiles();
@@ -405,11 +416,13 @@ namespace DotNetNuke.Framework
                 DNNClientAPI.SetScrollTop(this.Page);
                 this.ScrollTop.Value = this.ScrollTop.Value;
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs evt)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(evt={Evt})", evt);
             base.OnPreRender(evt);
 
             // Set the Head tags
@@ -448,6 +461,7 @@ namespace DotNetNuke.Framework
                 {
                     var header = "Content-Security-Policy";
                     if (this.PortalSettings.CspHeaderMode == PortalSettings.CspMode.ReportOnly)
+					Logger.LogDebug("OnPreRender(evt={Evt}): header → {Header}", evt, header);
                     {
                         header = "Content-Security-Policy-Report-Only";
                     }
@@ -462,6 +476,7 @@ namespace DotNetNuke.Framework
 
                     var policy = this.ContentSecurityPolicy.GeneratePolicy();
                     if (!string.IsNullOrEmpty(policy))
+					Logger.LogDebug("OnPreRender(evt={Evt}): policy → {Policy}", evt, policy);
                     {
                         this.Page.Response.AddHeader(header, policy);
                     }
@@ -481,6 +496,8 @@ namespace DotNetNuke.Framework
                 // Add Canonical <link> using the primary alias
                 var canonicalLink = new HtmlLink();
                 canonicalLink.Href = this.CanonicalLinkUrl;
+				Logger.LogDebug("OnPreRender(evt={Evt}): canonicalLink → {CanonicalLink}", evt, canonicalLink);
+				Logger.LogDebug("OnPreRender(evt={Evt}): canonicalLink.Href → {Arg1}", evt, canonicalLink.Href);
                 canonicalLink.Attributes.Add("rel", "canonical");
 
                 // Add the HtmlLink to the Head section of the page.
@@ -501,15 +518,18 @@ namespace DotNetNuke.Framework
             {
                 Skin.AddPageMessage(this, item.Heading, item.Message, item.MessageType.ToModuleMessageType(), item.IconSrc);
             }
+			Logger.LogDebug("<<< Exiting OnPreRender(evt={Evt})", evt);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer);
             if (Personalization.GetUserMode() == PortalSettings.Mode.Edit)
             {
                 var editClass = "dnnEditState";
 
+				Logger.LogDebug("Render(writer={Writer}): editClass → {EditClass}", writer, editClass);
                 var bodyClass = this.Body.Attributes["class"];
                 if (!string.IsNullOrEmpty(bodyClass))
                 {
@@ -522,6 +542,7 @@ namespace DotNetNuke.Framework
             }
 
             base.Render(writer);
+			Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer);
         }
 
         /// <summary>
@@ -538,6 +559,7 @@ namespace DotNetNuke.Framework
         /// </remarks>
         private void InitializePage()
         {
+			Logger.LogDebug(">>> Entering InitializePage()");
             // There could be a pending installation/upgrade process
             if (InstallBlocker.Instance.IsInstallInProgress())
             {
@@ -555,9 +577,11 @@ namespace DotNetNuke.Framework
             {
                 TabInfo tab = TabController.Instance.GetTabByName(this.Request.QueryString["TabName"], this.PortalSettings.PortalId);
                 if (tab != null)
+				Logger.LogDebug("InitializePage(): tab → {Tab}", tab);
                 {
                     var parameters = new List<string>(); // maximum number of elements
                     for (int intParam = 0; intParam <= this.Request.QueryString.Count - 1; intParam++)
+					Logger.LogDebug("InitializePage(): parameters → {Parameters}", parameters);
                     {
                         switch (this.Request.QueryString.Keys[intParam].ToLowerInvariant())
                         {
@@ -621,22 +645,28 @@ namespace DotNetNuke.Framework
             {
                 var strTitle = new StringBuilder(this.PortalSettings.PortalName);
                 var slaveModule = UIUtilities.GetSlaveModule(this.PortalSettings.ActiveTab.TabID);
+				Logger.LogDebug("InitializePage(): strTitle → {StrTitle}", strTitle);
+				Logger.LogDebug("InitializePage(): slaveModule → {SlaveModule}", slaveModule);
 
                 // Skip is popup is just a tab (no slave module)
                 if (slaveModule.DesktopModuleID != Null.NullInteger)
                 {
                     var control = (IModuleControl)this.moduleControlPipeline.CreateModuleControl(slaveModule);
                     string extension = Path.GetExtension(slaveModule.ModuleControl.ControlSrc.ToLowerInvariant());
+					Logger.LogDebug("InitializePage(): control → {Control}", control);
                     switch (extension)
                     {
                         case ".mvc":
                             var segments = slaveModule.ModuleControl.ControlSrc.Replace(".mvc", string.Empty).Split('/');
                             control.LocalResourceFile =
                                 $"~/DesktopModules/MVC/{slaveModule.DesktopModule.FolderName}/{Localization.LocalResourceDirectory}/{segments[0]}.resx";
+								Logger.LogDebug("InitializePage(): segments → {Segments}", segments);
                             break;
                         default:
                             var controlFileName = Path.GetFileName(slaveModule.ModuleControl.ControlSrc);
                             var controlSrcPath = slaveModule.ModuleControl.ControlSrc.Replace(controlFileName, string.Empty);
+							Logger.LogDebug("InitializePage(): controlFileName → {ControlFileName}", controlFileName);
+							Logger.LogDebug("InitializePage(): controlSrcPath → {ControlSrcPath}", controlSrcPath);
                             control.LocalResourceFile =
                                 $"{controlSrcPath}{Localization.LocalResourceDirectory}/{controlFileName}";
                             break;
@@ -644,6 +674,7 @@ namespace DotNetNuke.Framework
 
                     var title = Localization.LocalizeControlTitle(control);
 
+					Logger.LogDebug("InitializePage(): title → {Title}", title);
                     strTitle.Append(string.Concat(" > ", this.PortalSettings.ActiveTab.LocalizedTabName));
                     strTitle.Append(string.Concat(" > ", title));
                 }
@@ -661,6 +692,7 @@ namespace DotNetNuke.Framework
                 if (!string.IsNullOrEmpty(this.PortalSettings.ActiveTab.Title))
                 {
                     this.Title = this.PortalSettings.ActiveTab.Title;
+					Logger.LogDebug("InitializePage(): this.Title → {Arg0}", this.Title);
                 }
                 else
                 {
@@ -682,6 +714,8 @@ namespace DotNetNuke.Framework
                 {
                     var fileInfo = this.GetBackgroundFileInfo();
                     var url = FileManager.Instance.GetUrl(fileInfo);
+					Logger.LogDebug("InitializePage(): fileInfo → {FileInfo}", fileInfo);
+					Logger.LogDebug("InitializePage(): url → {Url}", url);
 
                     ((HtmlGenericControl)this.FindControl("Body")).Attributes["style"] = string.Concat("background-image: url('", url, "')");
                 }
@@ -703,6 +737,7 @@ namespace DotNetNuke.Framework
             if (!string.IsNullOrEmpty(this.PortalSettings.ActiveTab.Description))
             {
                 this.Description = this.PortalSettings.ActiveTab.Description;
+				Logger.LogDebug("InitializePage(): this.Description → {Arg0}", this.Description);
             }
             else
             {
@@ -713,6 +748,7 @@ namespace DotNetNuke.Framework
             if (!string.IsNullOrEmpty(this.PortalSettings.ActiveTab.KeyWords))
             {
                 this.KeyWords = this.PortalSettings.ActiveTab.KeyWords;
+				Logger.LogDebug("InitializePage(): this.KeyWords → {Arg0}", this.KeyWords);
             }
             else
             {
@@ -731,6 +767,7 @@ namespace DotNetNuke.Framework
 
             // META generator
             this.Generator = string.Empty;
+			Logger.LogDebug("InitializePage(): this.Generator → {Arg0}", this.Generator);
 
             // META Robots - hide it inside popups and if PageHeadText of current tab already contains a robots meta tag
             if (!UrlUtils.InPopUp() &&
@@ -764,15 +801,18 @@ namespace DotNetNuke.Framework
             // register css variables
             var cssVariablesStyleSheet = this.GetCssVariablesStylesheet();
             this.clientResourceController.RegisterStylesheet(cssVariablesStyleSheet, FileOrder.Css.DefaultCss);
+			Logger.LogDebug("InitializePage(): cssVariablesStyleSheet → {CssVariablesStyleSheet}", cssVariablesStyleSheet);
 
             // register the custom stylesheet of current page
             if (this.PortalSettings.ActiveTab.TabSettings.ContainsKey("CustomStylesheet") && !string.IsNullOrEmpty(this.PortalSettings.ActiveTab.TabSettings["CustomStylesheet"].ToString()))
             {
                 var styleSheet = this.PortalSettings.ActiveTab.TabSettings["CustomStylesheet"].ToString();
 
+				Logger.LogDebug("InitializePage(): styleSheet → {StyleSheet}", styleSheet);
                 // Try and go through the FolderProvider first
                 var stylesheetFile = this.GetPageStylesheetFileInfo(styleSheet);
                 if (stylesheetFile != null)
+				Logger.LogDebug("InitializePage(): stylesheetFile → {StylesheetFile}", stylesheetFile);
                 {
                     this.clientResourceController.RegisterStylesheet(FileManager.Instance.GetUrl(stylesheetFile));
                 }
@@ -794,6 +834,7 @@ namespace DotNetNuke.Framework
                 this.clientResourceController.RegisterStylesheet("~/Resources/Shared/Components/CookieConsent/cookieconsent.min.css", FileOrder.Css.ResourceCss);
                 this.clientResourceController.RegisterScript("~/js/dnn.cookieconsent.js");
             }
+			Logger.LogDebug("<<< Exiting InitializePage()");
         }
 
         /// <summary>
@@ -803,6 +844,7 @@ namespace DotNetNuke.Framework
         /// </summary>
         private void SetSkinDoctype()
         {
+			Logger.LogDebug(">>> Entering SetSkinDoctype()");
             string strLang = CultureInfo.CurrentCulture.ToString();
             string strDocType = this.PortalSettings.ActiveTab.SkinDoctype;
             string strDir = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft ? "rtl" : "ltr";
@@ -838,10 +880,12 @@ namespace DotNetNuke.Framework
                 string existingClass = this.Body.Attributes["class"] ?? string.Empty;
                 this.Body.Attributes["class"] = (existingClass + " rtl").Trim();
             }
+			Logger.LogDebug("<<< Exiting SetSkinDoctype()");
         }
 
         private Skin GetSkin()
         {
+			Logger.LogDebug(">>> Entering GetSkin()");
             // We want the popup scripts to be loaded only if popups are enabled.
             this.LoadPopupScriptsIfNeeded();
 
@@ -851,11 +895,13 @@ namespace DotNetNuke.Framework
                 return Skin.GetPopUpSkin(this);
             }
 
+			Logger.LogDebug("<<< Exiting GetSkin()");
             return Skin.GetSkin(this.hostSettings, this);
         }
 
         private void LoadPopupScriptsIfNeeded()
         {
+			Logger.LogDebug(">>> Entering LoadPopupScriptsIfNeeded()");
             if (this.PortalSettings.EnablePopUps)
             {
                 JavaScript.RequestRegistration(this.appStatus, this.eventLogger, this.PortalSettings, CommonJs.jQueryUI);
@@ -864,16 +910,19 @@ namespace DotNetNuke.Framework
                                    : "~/js/dnn.modalpopup.js";
                 this.clientResourceController.RegisterScript(popupFilePath, FileOrder.Js.DnnModalPopup);
             }
+			Logger.LogDebug("<<< Exiting LoadPopupScriptsIfNeeded()");
         }
 
         private void ManageFavicon()
         {
+			Logger.LogDebug(">>> Entering ManageFavicon()");
             string headerLink = FavIcon.GetHeaderLink(this.hostSettings, this.PortalSettings.PortalId);
 
             if (!string.IsNullOrEmpty(headerLink))
             {
                 this.Page.Header.Controls.Add(new Literal { Text = headerLink });
             }
+			Logger.LogDebug("<<< Exiting ManageFavicon()");
         }
 
         // I realize the parsing of this is rather primitive.  A better solution would be to use json serialization
@@ -906,17 +955,22 @@ namespace DotNetNuke.Framework
 
         private IFileInfo GetBackgroundFileInfo()
         {
+			Logger.LogDebug(">>> Entering GetBackgroundFileInfo()");
             string cacheKey = string.Format(Common.Utilities.DataCache.PortalCacheKey, this.PortalSettings.PortalId, "BackgroundFile");
             var file = CBO.GetCachedObject<Services.FileSystem.FileInfo>(
                 this.hostSettings,
                 new CacheItemArgs(cacheKey, Common.Utilities.DataCache.PortalCacheTimeOut, Common.Utilities.DataCache.PortalCachePriority),
                 this.GetBackgroundFileInfoCallBack);
+				Logger.LogDebug("GetBackgroundFileInfo(): cacheKey → {CacheKey}", cacheKey);
 
+			Logger.LogDebug("<<< Exiting GetBackgroundFileInfo()");
             return file;
         }
 
         private IFileInfo GetBackgroundFileInfoCallBack(CacheItemArgs itemArgs)
         {
+			Logger.LogDebug(">>> Entering GetBackgroundFileInfoCallBack(itemArgs={ItemArgs})", itemArgs);
+			Logger.LogDebug("<<< Exiting GetBackgroundFileInfoCallBack(itemArgs={ItemArgs})", itemArgs);
             return FileManager.Instance.GetFile(this.PortalSettings.PortalId, this.PortalSettings.BackgroundFile);
         }
 
@@ -933,26 +987,34 @@ namespace DotNetNuke.Framework
 
         private IFileInfo GetPageStylesheetInfoCallBack(CacheItemArgs itemArgs)
         {
+			Logger.LogDebug(">>> Entering GetPageStylesheetInfoCallBack(itemArgs={ItemArgs})", itemArgs);
             var styleSheet = itemArgs.Params[0].ToString();
+			Logger.LogDebug("GetPageStylesheetInfoCallBack(itemArgs={ItemArgs}): styleSheet → {StyleSheet}", itemArgs, styleSheet);
+			Logger.LogDebug("<<< Exiting GetPageStylesheetInfoCallBack(itemArgs={ItemArgs})", itemArgs);
             return FileManager.Instance.GetFile(this.PortalSettings.PortalId, styleSheet);
         }
 
         private string GetCssVariablesStylesheet()
         {
+			Logger.LogDebug(">>> Entering GetCssVariablesStylesheet()");
             var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.PortalStylesCacheKey, this.PortalSettings.PortalId);
             var cacheArgs = new CacheItemArgs(
                 cacheKey,
                 DataCache.PortalCacheTimeOut,
                 DataCache.PortalCachePriority,
                 this.PortalSettings.GetStyles());
+				Logger.LogDebug("GetCssVariablesStylesheet(): cacheKey → {CacheKey}", cacheKey);
             string filePath = CBO.GetCachedObject<string>(this.hostSettings, cacheArgs, this.GetCssVariablesStylesheetCallback);
+			Logger.LogDebug("<<< Exiting GetCssVariablesStylesheet()");
             return filePath;
         }
 
         private string GetCssVariablesStylesheetCallback(CacheItemArgs args)
         {
+			Logger.LogDebug(">>> Entering GetCssVariablesStylesheetCallback(args={Args})", args);
             var portalStyles = (PortalStyles)args.Params[0];
 
+			Logger.LogDebug("GetCssVariablesStylesheetCallback(args={Args}): portalStyles → {PortalStyles}", args, portalStyles);
             var directory = this.PortalSettings.HomeSystemDirectoryMapPath;
             if (!Directory.Exists(directory))
             {
@@ -961,20 +1023,25 @@ namespace DotNetNuke.Framework
 
             var webPath = $"{this.PortalSettings.HomeSystemDirectory}{portalStyles.FileName}";
 
+			Logger.LogDebug("GetCssVariablesStylesheetCallback(args={Args}): webPath → {WebPath}", args, webPath);
             var physicalPath = $"{directory}{portalStyles.FileName}";
             if (File.Exists(physicalPath))
+			Logger.LogDebug("GetCssVariablesStylesheetCallback(args={Args}): physicalPath → {PhysicalPath}", args, physicalPath);
             {
                 return webPath;
             }
 
             var styles = portalStyles.ToString();
             File.WriteAllText(physicalPath, styles);
+			Logger.LogDebug("GetCssVariablesStylesheetCallback(args={Args}): styles → {Styles}", args, styles);
 
+			Logger.LogDebug("<<< Exiting GetCssVariablesStylesheetCallback(args={Args})", args);
             return webPath;
         }
 
         private void AddCspHeaders()
         {
+			Logger.LogDebug(">>> Entering AddCspHeaders()");
             if (!string.IsNullOrEmpty(this.PortalSettings.CspHeader))
             {
                 this.ContentSecurityPolicy.AddHeader(this.PortalSettings.CspHeader);
@@ -986,6 +1053,7 @@ namespace DotNetNuke.Framework
             }
 
             this.ContentSecurityPolicy.AddWebformsSupport();
+			Logger.LogDebug("<<< Exiting AddCspHeaders()");
         }
     }
 }

@@ -24,9 +24,15 @@ namespace DotNetNuke.ComponentModel
         /// <param name="providerInterface">The <see cref="Type"/> of the provider interface.</param>
         public ProviderInstaller(string providerType, Type providerInterface)
         {
+			Logger.LogDebug(">>> Entering ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface})", providerType, providerInterface);
             this.componentLifeStyle = ComponentLifeStyleType.Singleton;
             this.providerType = providerType;
+			Logger.LogDebug("ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface}): this.componentLifeStyle → {Arg2}", providerType, providerInterface, this.componentLifeStyle);
             this.providerInterface = providerInterface;
+			Logger.LogDebug("ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface}): this.providerType → {Arg2}", providerType, providerInterface, this.providerType);
+			Logger.LogDebug("ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface}): providerInterface → {ProviderInterface1}", providerType, providerInterface, providerInterface);
+			Logger.LogDebug("ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface}): this.providerInterface → {Arg2}", providerType, providerInterface, this.providerInterface);
+			Logger.LogDebug("ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface}): componentLifeStyle → {ComponentLifeStyle}", providerType, providerInterface, componentLifeStyle);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ProviderInstaller"/> class.</summary>
@@ -35,10 +41,20 @@ namespace DotNetNuke.ComponentModel
         /// <param name="defaultProvider">The default <see cref="Type"/> for the implementation.</param>
         public ProviderInstaller(string providerType, Type providerInterface, Type defaultProvider)
         {
+			Logger.LogDebug(">>> Entering ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface},defaultProvider={DefaultProvider})", providerType, providerInterface, defaultProvider);
             this.componentLifeStyle = ComponentLifeStyleType.Singleton;
             this.providerType = providerType;
+			Logger.LogDebug("ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface},defaultProvider={DefaultProvider}): this.componentLifeStyle → {Arg3}", providerType, providerInterface, defaultProvider, this.componentLifeStyle);
+			Logger.LogDebug("ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface},defaultProvider={DefaultProvider}): this.providerType → {Arg3}", providerType, providerInterface, defaultProvider, this.providerType);
+			Logger.LogDebug("ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface},defaultProvider={DefaultProvider}): defaultProvider → {DefaultProvider1}", providerType, providerInterface, defaultProvider, defaultProvider);
+			Logger.LogDebug("ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface},defaultProvider={DefaultProvider}): componentLifeStyle → {ComponentLifeStyle}", providerType, providerInterface, defaultProvider, componentLifeStyle);
             this.providerInterface = providerInterface;
             this.defaultProvider = defaultProvider;
+			Logger.LogDebug("<<< Exiting ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface},defaultProvider={DefaultProvider})", providerType, providerInterface, defaultProvider);
+			Logger.LogDebug("ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface},defaultProvider={DefaultProvider}): providerInterface → {ProviderInterface1}", providerType, providerInterface, defaultProvider, providerInterface);
+			Logger.LogDebug("ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface},defaultProvider={DefaultProvider}): this.providerInterface → {Arg3}", providerType, providerInterface, defaultProvider, this.providerInterface);
+			Logger.LogDebug("ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface},defaultProvider={DefaultProvider}): this.defaultProvider → {Arg3}", providerType, providerInterface, defaultProvider, this.defaultProvider);
+			Logger.LogDebug("<<< Exiting ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface})", providerType, providerInterface);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ProviderInstaller"/> class.</summary>
@@ -47,16 +63,24 @@ namespace DotNetNuke.ComponentModel
         /// <param name="lifeStyle">The <see cref="ComponentLifeStyleType"/> of the instance.</param>
         public ProviderInstaller(string providerType, Type providerInterface, ComponentLifeStyleType lifeStyle)
         {
+		Logger.LogDebug("<<< Exiting ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface})", providerType, providerInterface);
             this.componentLifeStyle = lifeStyle;
             this.providerType = providerType;
+			Logger.LogDebug("ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface},lifeStyle={LifeStyle}): this.componentLifeStyle → {Arg3}", providerType, providerInterface, lifeStyle, this.componentLifeStyle);
+			Logger.LogDebug("ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface},lifeStyle={LifeStyle}): this.providerType → {Arg3}", providerType, providerInterface, lifeStyle, this.providerType);
             this.providerInterface = providerInterface;
+			Logger.LogDebug("ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface},lifeStyle={LifeStyle}): providerInterface → {ProviderInterface1}", providerType, providerInterface, lifeStyle, providerInterface);
+			Logger.LogDebug("ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface},lifeStyle={LifeStyle}): this.providerInterface → {Arg3}", providerType, providerInterface, lifeStyle, this.providerInterface);
+			Logger.LogDebug("ProviderInstaller(providerType={ProviderType},providerInterface={ProviderInterface},lifeStyle={LifeStyle}): componentLifeStyle → {ComponentLifeStyle}", providerType, providerInterface, lifeStyle, componentLifeStyle);
         }
 
         /// <inheritdoc />
         public void InstallComponents(IContainer container)
         {
+			Logger.LogDebug(">>> Entering InstallComponents(container={Container})", container);
             ProviderConfiguration config = ProviderConfiguration.GetProviderConfiguration(this.providerType);
 
+			Logger.LogDebug("InstallComponents(container={Container}): config → {Config}", container, config);
             // Register the default provider first (so it is the first component registered for its service interface
             if (config != null)
             {
@@ -72,10 +96,12 @@ namespace DotNetNuke.ComponentModel
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting InstallComponents(container={Container})", container);
         }
 
         private void InstallProvider(IContainer container, Provider provider)
         {
+			Logger.LogDebug(">>> Entering InstallProvider(container={Container},provider={Provider})", container, provider);
             if (provider != null)
             {
                 Type type = null;
@@ -87,6 +113,7 @@ namespace DotNetNuke.ComponentModel
                 }
                 catch (TypeLoadException)
                 {
+					Logger.LogError("Exception in InstallProvider(container={Container},provider={Provider}): {Arg2}", container, provider, ex.Message);
                     if (this.defaultProvider != null)
                     {
                         type = this.defaultProvider;
@@ -113,6 +140,7 @@ namespace DotNetNuke.ComponentModel
                     container.RegisterComponentSettings(type.FullName, settingsDict);
                 }
             }
+			Logger.LogDebug("<<< Exiting InstallProvider(container={Container},provider={Provider})", container, provider);
         }
     }
 }

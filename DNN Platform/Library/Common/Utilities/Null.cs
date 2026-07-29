@@ -9,6 +9,7 @@ namespace DotNetNuke.Common.Utilities
 
     public class Null
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static short NullShort
         {
             get
@@ -92,8 +93,10 @@ namespace DotNetNuke.Common.Utilities
         // sets a field to an application encoded null value ( used in BLL layer )
         public static object SetNull(object objValue, object objField)
         {
+			Logger.LogDebug(">>> Entering SetNull(objValue={ObjValue},objField={ObjField})", objValue, objField);
             object returnValue = null;
             if (objValue == DBNull.Value)
+			Logger.LogDebug("SetNull(objValue={ObjValue},objField={ObjField}): returnValue → {ReturnValue}", objValue, objField, returnValue);
             {
                 if (objField is short)
                 {
@@ -147,6 +150,7 @@ namespace DotNetNuke.Common.Utilities
                 returnValue = objValue;
             }
 
+			Logger.LogDebug("<<< Exiting SetNull(objValue={ObjValue},objField={ObjField})", objValue, objField);
             return returnValue;
         }
 
@@ -206,21 +210,27 @@ namespace DotNetNuke.Common.Utilities
                     break;
             }
 
+			Logger.LogDebug("<<< Exiting SetNull(objPropertyInfo={ObjPropertyInfo})", objPropertyInfo);
             return returnValue;
         }
 
         public static bool SetNullBoolean(object objValue)
         {
+			Logger.LogDebug(">>> Entering SetNullBoolean(objValue={ObjValue})", objValue);
+			Logger.LogDebug("<<< Exiting SetNullBoolean(objValue={ObjValue})", objValue);
             return objValue != DBNull.Value ? Convert.ToBoolean(objValue, CultureInfo.InvariantCulture) : NullBoolean;
         }
 
         public static DateTime SetNullDateTime(object objValue)
         {
+			Logger.LogDebug(">>> Entering SetNullDateTime(objValue={ObjValue})", objValue);
+			Logger.LogDebug("<<< Exiting SetNullDateTime(objValue={ObjValue})", objValue);
             return objValue != DBNull.Value ? Convert.ToDateTime(objValue, CultureInfo.InvariantCulture) : NullDate;
         }
 
         public static DateTime SetNullDateTime(object objValue, DateTimeKind dateTimeKind)
         {
+			Logger.LogDebug("<<< Exiting SetNullDateTime(objValue={ObjValue},dateTimeKind={DateTimeKind})", objValue, dateTimeKind);
             return objValue != DBNull.Value
                 ? DateTime.SpecifyKind(Convert.ToDateTime(objValue, CultureInfo.InvariantCulture), dateTimeKind)
                 : NullDate;
@@ -228,37 +238,47 @@ namespace DotNetNuke.Common.Utilities
 
         public static int SetNullInteger(object objValue)
         {
+			Logger.LogDebug(">>> Entering SetNullInteger(objValue={ObjValue})", objValue);
+			Logger.LogDebug("<<< Exiting SetNullInteger(objValue={ObjValue})", objValue);
             return objValue != DBNull.Value ? Convert.ToInt32(objValue, CultureInfo.InvariantCulture) : NullInteger;
         }
 
         public static float SetNullSingle(object objValue)
         {
+			Logger.LogDebug(">>> Entering SetNullSingle(objValue={ObjValue})", objValue);
+			Logger.LogDebug("<<< Exiting SetNullSingle(objValue={ObjValue})", objValue);
             return objValue != DBNull.Value ? Convert.ToSingle(objValue, CultureInfo.InvariantCulture) : NullSingle;
         }
 
         public static string SetNullString(object objValue)
         {
+			Logger.LogDebug(">>> Entering SetNullString(objValue={ObjValue})", objValue);
+			Logger.LogDebug("<<< Exiting SetNullString(objValue={ObjValue})", objValue);
             return objValue != DBNull.Value ? Convert.ToString(objValue, CultureInfo.InvariantCulture) : NullString;
         }
 
         public static Guid SetNullGuid(object objValue)
         {
+			Logger.LogDebug(">>> Entering SetNullGuid(objValue={ObjValue})", objValue);
             if ((objValue != DBNull.Value) && !string.IsNullOrEmpty(objValue.ToString()))
             {
                 return new Guid(objValue.ToString());
             }
 
+			Logger.LogDebug("<<< Exiting SetNullGuid(objValue={ObjValue})", objValue);
             return Guid.Empty;
         }
 
         // convert an application encoded null value to a database null value ( used in DAL )
         public static object GetNull(object objField, object objDBNull)
             => GetNull(objField, objDBNull, CultureInfo.CurrentCulture);
+			Logger.LogDebug(">>> Entering GetNull(objField={ObjField},objDBNull={ObjDBNull})", objField, objDBNull);
 
         public static object GetNull(object objField, object objDBNull, IFormatProvider provider)
         {
             object returnValue = objField;
             if (objField == null)
+			Logger.LogDebug("GetNull(objField={ObjField},objDBNull={ObjDBNull},provider={Provider}): returnValue → {ReturnValue}", objField, objDBNull, provider, returnValue);
             {
                 returnValue = objDBNull;
             }
@@ -341,14 +361,17 @@ namespace DotNetNuke.Common.Utilities
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetNull(objField={ObjField},objDBNull={ObjDBNull})", objField, objDBNull);
             return returnValue;
         }
 
         // checks if a field contains an application encoded null value
         public static bool IsNull(object objField)
         {
+			Logger.LogDebug(">>> Entering IsNull(objField={ObjField})", objField);
             bool isNull = false;
             if (objField != null)
+			Logger.LogDebug("IsNull(objField={ObjField}): isNull → {IsNull}", objField, isNull);
             {
                 if (objField is int)
                 {
@@ -401,6 +424,7 @@ namespace DotNetNuke.Common.Utilities
                 isNull = true;
             }
 
+			Logger.LogDebug("<<< Exiting IsNull(objField={ObjField})", objField);
             return isNull;
         }
     }

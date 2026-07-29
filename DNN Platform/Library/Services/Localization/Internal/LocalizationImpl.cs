@@ -15,9 +15,11 @@ namespace DotNetNuke.Services.Localization.Internal
 
     internal class LocalizationImpl : ILocalization
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public string BestCultureCodeBasedOnBrowserLanguages(IEnumerable<string> cultureCodes, string fallback)
         {
+			Logger.LogDebug(">>> Entering BestCultureCodeBasedOnBrowserLanguages(cultureCodes={CultureCodes},fallback={Fallback})", cultureCodes, fallback);
             if (cultureCodes == null)
             {
                 throw new ArgumentException("cultureCodes cannot be null");
@@ -30,10 +32,12 @@ namespace DotNetNuke.Services.Localization.Internal
 
             var values = cultureCodes.ToList();
 
+			Logger.LogDebug("BestCultureCodeBasedOnBrowserLanguages(cultureCodes={CultureCodes},fallback={Fallback}): values → {Values}", cultureCodes, fallback, values);
             foreach (string langHeader in HttpContextSource.Current.Request.UserLanguages ?? [])
             {
                 string lang = langHeader;
 
+				Logger.LogDebug("BestCultureCodeBasedOnBrowserLanguages(cultureCodes={CultureCodes},fallback={Fallback}): lang → {Lang}", cultureCodes, fallback, lang);
                 // strip any ;q=xx
                 lang = lang.Split(';')[0];
 
@@ -42,6 +46,7 @@ namespace DotNetNuke.Services.Localization.Internal
                 {
                     var match = values.FirstOrDefault(x => x == lang);
                     if (match != null)
+					Logger.LogDebug("BestCultureCodeBasedOnBrowserLanguages(cultureCodes={CultureCodes},fallback={Fallback}): match → {Match}", cultureCodes, fallback, match);
                     {
                         return match;
                     }
@@ -61,6 +66,8 @@ namespace DotNetNuke.Services.Localization.Internal
                 }
             }
 
+			Logger.LogDebug("<<< Exiting BestCultureCodeBasedOnBrowserLanguages(cultureCodes={CultureCodes},fallback={Fallback})", cultureCodes, fallback);
+			Logger.LogDebug("<<< Exiting BestCultureCodeBasedOnBrowserLanguages(cultureCodes={CultureCodes})", cultureCodes);
             return fallback;
         }
 
@@ -73,13 +80,17 @@ namespace DotNetNuke.Services.Localization.Internal
         /// <inheritdoc />
         public CultureInfo GetPageLocale(PortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering GetPageLocale(portalSettings={PortalSettings})", portalSettings);
+			Logger.LogDebug("<<< Exiting GetPageLocale(portalSettings={PortalSettings})", portalSettings);
             return Localization.GetPageLocale((IPortalSettings)portalSettings);
         }
 
         /// <inheritdoc />
         public void SetThreadCultures(CultureInfo cultureInfo, PortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering SetThreadCultures(cultureInfo={CultureInfo},portalSettings={PortalSettings})", cultureInfo, portalSettings);
             Localization.SetThreadCultures(cultureInfo, (IPortalSettings)portalSettings);
+			Logger.LogDebug("<<< Exiting SetThreadCultures(cultureInfo={CultureInfo},portalSettings={PortalSettings})", cultureInfo, portalSettings);
         }
     }
 }

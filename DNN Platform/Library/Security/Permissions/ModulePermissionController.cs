@@ -13,6 +13,7 @@ namespace DotNetNuke.Security.Permissions
     /// <summary>ModulePermissionController provides the Business Layer for Module Permissions.</summary>
     public class ModulePermissionController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly PermissionProvider Provider = PermissionProvider.Instance();
 
         /// <summary>Returns a list with all roles with implicit permissions on Modules.</summary>
@@ -20,6 +21,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A List with the implicit roles.</returns>
         public static IEnumerable<RoleInfo> ImplicitRoles(int portalId)
         {
+			Logger.LogDebug(">>> Entering ImplicitRoles(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting ImplicitRoles(portalId={PortalId})", portalId);
             return Provider.ImplicitRolesForPages(portalId);
         }
 
@@ -28,6 +31,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanAdminModule(ModuleInfo module)
         {
+			Logger.LogDebug(">>> Entering CanAdminModule(module={Module})", module);
+			Logger.LogDebug("<<< Exiting CanAdminModule(module={Module})", module);
             return Provider.CanAdminModule(module);
         }
 
@@ -36,6 +41,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanDeleteModule(ModuleInfo module)
         {
+			Logger.LogDebug(">>> Entering CanDeleteModule(module={Module})", module);
+			Logger.LogDebug("<<< Exiting CanDeleteModule(module={Module})", module);
             return Provider.CanDeleteModule(module);
         }
 
@@ -44,6 +51,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanEditModuleContent(ModuleInfo module)
         {
+			Logger.LogDebug(">>> Entering CanEditModuleContent(module={Module})", module);
+			Logger.LogDebug("<<< Exiting CanEditModuleContent(module={Module})", module);
             return Provider.CanEditModuleContent(module);
         }
 
@@ -52,6 +61,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanExportModule(ModuleInfo module)
         {
+			Logger.LogDebug(">>> Entering CanExportModule(module={Module})", module);
+			Logger.LogDebug("<<< Exiting CanExportModule(module={Module})", module);
             return Provider.CanExportModule(module);
         }
 
@@ -60,6 +71,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanImportModule(ModuleInfo module)
         {
+			Logger.LogDebug(">>> Entering CanImportModule(module={Module})", module);
+			Logger.LogDebug("<<< Exiting CanImportModule(module={Module})", module);
             return Provider.CanImportModule(module);
         }
 
@@ -68,6 +81,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanManageModule(ModuleInfo module)
         {
+			Logger.LogDebug(">>> Entering CanManageModule(module={Module})", module);
+			Logger.LogDebug("<<< Exiting CanManageModule(module={Module})", module);
             return Provider.CanManageModule(module);
         }
 
@@ -76,6 +91,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanViewModule(ModuleInfo module)
         {
+			Logger.LogDebug(">>> Entering CanViewModule(module={Module})", module);
+			Logger.LogDebug("<<< Exiting CanViewModule(module={Module})", module);
             return Provider.CanViewModule(module);
         }
 
@@ -83,8 +100,10 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="user">The user.</param>
         public static void DeleteModulePermissionsByUser(UserInfo user)
         {
+			Logger.LogDebug(">>> Entering DeleteModulePermissionsByUser(user={User})", user);
             Provider.DeleteModulePermissionsByUser(user);
             DataCache.ClearModulePermissionsCachesByPortal(user.PortalID);
+			Logger.LogDebug("<<< Exiting DeleteModulePermissionsByUser(user={User})", user);
         }
 
         /// <summary>GetModulePermissions gets a ModulePermissionCollection.</summary>
@@ -93,6 +112,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A <see cref="ModulePermissionCollection"/> with the module permissions, or an empty <see cref="ModulePermissionCollection"/> if the module wasn't found.</returns>
         public static ModulePermissionCollection GetModulePermissions(int moduleId, int tabId)
         {
+			Logger.LogDebug(">>> Entering GetModulePermissions(moduleId={ModuleId},tabId={TabId})", moduleId, tabId);
+			Logger.LogDebug("<<< Exiting GetModulePermissions(moduleId={ModuleId},tabId={TabId})", moduleId, tabId);
             return Provider.GetModulePermissions(moduleId, tabId);
         }
 
@@ -104,6 +125,8 @@ namespace DotNetNuke.Security.Permissions
         /// <returns><see langword="true"/> if the current user has the requested permission, otherwise <see langword="false"/>.</returns>
         public static bool HasModulePermission(ModulePermissionCollection modulePermissions, string permissionKey)
         {
+			Logger.LogDebug(">>> Entering HasModulePermission(modulePermissions={ModulePermissions},permissionKey={PermissionKey})", modulePermissions, permissionKey);
+			Logger.LogDebug("<<< Exiting HasModulePermission(modulePermissions={ModulePermissions},permissionKey={PermissionKey})", modulePermissions, permissionKey);
             return Provider.HasModulePermission(modulePermissions, permissionKey);
         }
 
@@ -118,6 +141,8 @@ namespace DotNetNuke.Security.Permissions
         /// designated AccessLevel.</remarks>
         public static bool HasModuleAccess(SecurityAccessLevel accessLevel, string permissionKey, ModuleInfo moduleConfiguration)
         {
+			Logger.LogDebug(">>> Entering HasModuleAccess(accessLevel={AccessLevel},permissionKey={PermissionKey},moduleConfiguration={ModuleConfiguration})", accessLevel, permissionKey, moduleConfiguration);
+			Logger.LogDebug("<<< Exiting HasModuleAccess(accessLevel={AccessLevel},permissionKey={PermissionKey},moduleConfiguration={ModuleConfiguration})", accessLevel, permissionKey, moduleConfiguration);
             return Provider.HasModuleAccess(accessLevel, permissionKey, moduleConfiguration);
         }
 
@@ -125,14 +150,19 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="module">The Module to update.</param>
         public static void SaveModulePermissions(ModuleInfo module)
         {
+			Logger.LogDebug(">>> Entering SaveModulePermissions(module={Module})", module);
             Provider.SaveModulePermissions(module);
             DataCache.ClearModulePermissionsCache(module.TabID);
+			Logger.LogDebug("<<< Exiting SaveModulePermissions(module={Module})", module);
         }
 
         private static void ClearPermissionCache(int moduleId)
         {
+			Logger.LogDebug(">>> Entering ClearPermissionCache(moduleId={ModuleId})", moduleId);
             ModuleInfo objModule = ModuleController.Instance.GetModule(moduleId, Null.NullInteger, false);
             DataCache.ClearModulePermissionsCache(objModule.TabID);
+			Logger.LogDebug("<<< Exiting ClearPermissionCache(moduleId={ModuleId})", moduleId);
+			Logger.LogDebug("ClearPermissionCache(moduleId={ModuleId}): objModule → {ObjModule}", moduleId, objModule);
         }
     }
 }

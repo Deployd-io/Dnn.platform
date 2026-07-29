@@ -35,6 +35,8 @@ namespace DotNetNuke.Services.Cryptography
         /// <returns>A <see cref="CryptographyProvider"/> instance.</returns>
         public static CryptographyProvider Instance()
         {
+			Logger.LogDebug(">>> Entering Instance()");
+			Logger.LogDebug("<<< Exiting Instance()");
             return ComponentFactory.GetComponent<CryptographyProvider>();
         }
 
@@ -57,6 +59,7 @@ namespace DotNetNuke.Services.Cryptography
         /// <inheritdoc cref="DotNetNuke.Abstractions.Security.ICryptographyProvider.DecryptParameter" />
         public string DecryptParameter(string message, string passphrase, string algorithmName)
         {
+			Logger.LogDebug(">>> Entering DecryptParameter(message={Message},passphrase={Passphrase},algorithmName={AlgorithmName})", message, passphrase, algorithmName);
             if (string.IsNullOrEmpty(passphrase) || string.IsNullOrEmpty(message))
             {
                 return string.Empty;
@@ -67,8 +70,11 @@ namespace DotNetNuke.Services.Cryptography
             {
                 using var algorithm = CreateSymmetricAlgorithm(algorithmName);
                 var keyLength = BitsToBytes(algorithm.KeySize);
+				Logger.LogDebug("DecryptParameter(message={Message},passphrase={Passphrase},algorithmName={AlgorithmName}): algorithm → {Algorithm}", message, passphrase, algorithmName, algorithm);
+				Logger.LogDebug("DecryptParameter(message={Message},passphrase={Passphrase},algorithmName={AlgorithmName}): keyLength → {KeyLength}", message, passphrase, algorithmName, keyLength);
                 var blockLength = BitsToBytes(algorithm.BlockSize);
                 if (passphrase.Length < keyLength + blockLength)
+				Logger.LogDebug("DecryptParameter(message={Message},passphrase={Passphrase},algorithmName={AlgorithmName}): blockLength → {BlockLength}", message, passphrase, algorithmName, blockLength);
                 {
                     passphrase += new string('X', (keyLength + blockLength) - passphrase.Length);
                 }
@@ -83,6 +89,7 @@ namespace DotNetNuke.Services.Cryptography
                 using var objMemoryStream = new MemoryStream();
                 using (var objCryptoStream = new CryptoStream(objMemoryStream, algorithm.CreateDecryptor(byteKey, byteVector), CryptoStreamMode.Write))
                 {
+				Logger.LogDebug("DecryptParameter(message={Message},passphrase={Passphrase},algorithmName={AlgorithmName}): objMemoryStream → {ObjMemoryStream}", message, passphrase, algorithmName, objMemoryStream);
                     objCryptoStream.Write(byteData, 0, byteData.Length);
                     objCryptoStream.FlushFinalBlock();
                 }
@@ -93,7 +100,9 @@ namespace DotNetNuke.Services.Cryptography
             }
             catch
             {
+				Logger.LogError("Exception in DecryptParameter(message={Message},passphrase={Passphrase},algorithmName={AlgorithmName}): {Arg3}", message, passphrase, algorithmName, ex.Message);
                 // decryption error
+				Logger.LogDebug("<<< Exiting DecryptParameter(message={Message},passphrase={Passphrase},algorithmName={AlgorithmName})", message, passphrase, algorithmName);
                 return string.Empty;
             }
         }
@@ -136,11 +145,14 @@ namespace DotNetNuke.Services.Cryptography
         /// <returns>The encrypted string.</returns>
         protected static string EncryptParameter(string message, string passphrase, SymmetricAlgorithm algorithm)
         {
+			Logger.LogDebug(">>> Entering EncryptParameter(message={Message},passphrase={Passphrase},algorithm={Algorithm})", message, passphrase, algorithm);
             string value;
             if (!string.IsNullOrEmpty(passphrase))
             {
                 var keyLength = BitsToBytes(algorithm.KeySize);
                 var blockLength = BitsToBytes(algorithm.BlockSize);
+				Logger.LogDebug("EncryptParameter(message={Message},passphrase={Passphrase},algorithm={Algorithm}): keyLength → {KeyLength}", message, passphrase, algorithm, keyLength);
+				Logger.LogDebug("EncryptParameter(message={Message},passphrase={Passphrase},algorithm={Algorithm}): blockLength → {BlockLength}", message, passphrase, algorithm, blockLength);
                 if (passphrase.Length < keyLength + blockLength)
                 {
                     passphrase += new string('X', (keyLength + blockLength) - passphrase.Length);
@@ -156,17 +168,21 @@ namespace DotNetNuke.Services.Cryptography
                 // encrypt
                 using var objMemoryStream = new MemoryStream();
                 using var objCryptoStream = new CryptoStream(objMemoryStream, algorithm.CreateEncryptor(byteKey, byteVector), CryptoStreamMode.Write);
+				Logger.LogDebug("EncryptParameter(message={Message},passphrase={Passphrase},algorithm={Algorithm}): objMemoryStream → {ObjMemoryStream}", message, passphrase, algorithm, objMemoryStream);
+				Logger.LogDebug("EncryptParameter(message={Message},passphrase={Passphrase},algorithm={Algorithm}): objCryptoStream → {ObjCryptoStream}", message, passphrase, algorithm, objCryptoStream);
                 objCryptoStream.Write(byteData, 0, byteData.Length);
                 objCryptoStream.FlushFinalBlock();
 
                 // convert to string and Base64 encode
                 value = Convert.ToBase64String(objMemoryStream.ToArray());
+				Logger.LogDebug("EncryptParameter(message={Message},passphrase={Passphrase},algorithm={Algorithm}): value → {Value}", message, passphrase, algorithm, value);
             }
             else
             {
                 value = message;
             }
 
+			Logger.LogDebug("<<< Exiting EncryptParameter(message={Message},passphrase={Passphrase},algorithm={Algorithm})", message, passphrase, algorithm);
             return value;
         }
 
@@ -180,12 +196,16 @@ namespace DotNetNuke.Services.Cryptography
         /// <returns>A tuple of the encrypted string, the name of the algorithm used, and the initialization vector (or <see langword="null"/> if the algorithm doesn't require an IV).</returns>
         protected static (string EncryptedMessage, string AlgorithmName, string InitializationVector) EncryptString(string message, string passphrase, HashAlgorithm hashAlgorithm, string hashAlgorithmName, Func<byte[], SymmetricAlgorithm> createSymmetricAlgorithm, string symmetricAlgorithmName)
         {
+			Logger.LogDebug(">>> Entering EncryptString(EncryptedMessage={EncryptedMessage},AlgorithmName={AlgorithmName},InitializationVector={InitializationVector})", EncryptedMessage, AlgorithmName, InitializationVector);
             byte[] results;
             var utf8 = new UTF8Encoding();
 
+			Logger.LogDebug("EncryptString(EncryptedMessage={EncryptedMessage},AlgorithmName={AlgorithmName},InitializationVector={InitializationVector}): utf8 → {Utf8}", EncryptedMessage, AlgorithmName, InitializationVector, utf8);
             byte[] key = hashAlgorithm.ComputeHash(utf8.GetBytes(passphrase));
             using var symmetricAlgorithm = createSymmetricAlgorithm(key);
             var initializationVector = Convert.ToBase64String(symmetricAlgorithm.IV);
+			Logger.LogDebug("EncryptString(EncryptedMessage={EncryptedMessage},AlgorithmName={AlgorithmName},InitializationVector={InitializationVector}): symmetricAlgorithm → {SymmetricAlgorithm}", EncryptedMessage, AlgorithmName, InitializationVector, symmetricAlgorithm);
+			Logger.LogDebug("EncryptString(EncryptedMessage={EncryptedMessage},AlgorithmName={AlgorithmName},InitializationVector={InitializationVector}): initializationVector → {InitializationVector1}", EncryptedMessage, AlgorithmName, InitializationVector, initializationVector);
 
             byte[] dataToEncrypt = utf8.GetBytes(message);
 
@@ -193,15 +213,20 @@ namespace DotNetNuke.Services.Cryptography
             {
                 using var encryptor = symmetricAlgorithm.CreateEncryptor();
                 results = encryptor.TransformFinalBlock(dataToEncrypt, 0, dataToEncrypt.Length);
+				Logger.LogDebug("EncryptString(EncryptedMessage={EncryptedMessage},AlgorithmName={AlgorithmName},InitializationVector={InitializationVector}): encryptor → {Encryptor}", EncryptedMessage, AlgorithmName, InitializationVector, encryptor);
+				Logger.LogDebug("EncryptString(EncryptedMessage={EncryptedMessage},AlgorithmName={AlgorithmName},InitializationVector={InitializationVector}): results → {Results}", EncryptedMessage, AlgorithmName, InitializationVector, results);
             }
             finally
             {
+				private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                 symmetricAlgorithm.Clear();
                 hashAlgorithm.Clear();
             }
 
             // Return the encrypted string as a base64 encoded string
             var encryptedMessage = Convert.ToBase64String(results);
+			Logger.LogDebug("EncryptString(EncryptedMessage={EncryptedMessage},AlgorithmName={AlgorithmName},InitializationVector={InitializationVector}): encryptedMessage → {EncryptedMessage1}", EncryptedMessage, AlgorithmName, InitializationVector, encryptedMessage);
+			Logger.LogDebug("<<< Exiting EncryptString(EncryptedMessage={EncryptedMessage},AlgorithmName={AlgorithmName},InitializationVector={InitializationVector})", EncryptedMessage, AlgorithmName, InitializationVector);
             return (encryptedMessage, $"{hashAlgorithmName}|{symmetricAlgorithmName}", initializationVector);
         }
 
@@ -211,6 +236,8 @@ namespace DotNetNuke.Services.Cryptography
         /// <exception cref="ArgumentOutOfRangeException">An unsupported algorithm name was provided. Only <c>DESCryptoServiceProvider</c> and <c>Aes</c> are supported.</exception>
         protected static SymmetricAlgorithm CreateSymmetricAlgorithm(string algorithmName)
         {
+			Logger.LogDebug(">>> Entering CreateSymmetricAlgorithm(algorithmName={AlgorithmName})", algorithmName);
+			Logger.LogDebug("<<< Exiting CreateSymmetricAlgorithm(algorithmName={AlgorithmName})", algorithmName);
             return algorithmName switch
             {
 #pragma warning disable CA5351
@@ -254,6 +281,7 @@ namespace DotNetNuke.Services.Cryptography
 
             static IEnumerable<int> GetValidKeySizes(KeySizes[] keySizes)
             {
+				Logger.LogDebug(">>> Entering GetValidKeySizes(keySizes={KeySizes})", keySizes);
                 foreach (var sizes in keySizes)
                 {
                     var size = sizes.MaxSize;
@@ -265,6 +293,7 @@ namespace DotNetNuke.Services.Cryptography
                     }
                     while (size >= sizes.MinSize);
                 }
+				Logger.LogDebug("<<< Exiting GetValidKeySizes(keySizes={KeySizes})", keySizes);
             }
 
             static SymmetricAlgorithm WithKey(SymmetricAlgorithm algorithm, byte[] key)
@@ -289,6 +318,8 @@ namespace DotNetNuke.Services.Cryptography
                 }
 
                 algorithm.Key = key;
+				Logger.LogDebug("WithKey(algorithm={Algorithm},key={Key}): algorithm.Key → {Arg2}", algorithm, key, algorithm.Key);
+				Logger.LogDebug("<<< Exiting WithKey(algorithm={Algorithm},key={Key})", algorithm, key);
                 return algorithm;
             }
         }
@@ -299,6 +330,8 @@ namespace DotNetNuke.Services.Cryptography
         /// <exception cref="ArgumentOutOfRangeException">An unsupported algorithm name was provided. Only <c>MD5CryptoServiceProvider</c> and <c>SHA512</c> are supported.</exception>
         protected static HashAlgorithm CreateHashAlgorithm(string algorithmName)
         {
+			Logger.LogDebug(">>> Entering CreateHashAlgorithm(algorithmName={AlgorithmName})", algorithmName);
+			Logger.LogDebug("<<< Exiting CreateHashAlgorithm(algorithmName={AlgorithmName})", algorithmName);
             return algorithmName switch
             {
 #pragma warning disable CA5351

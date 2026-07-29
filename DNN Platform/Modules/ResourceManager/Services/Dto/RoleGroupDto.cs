@@ -16,10 +16,15 @@ namespace Dnn.Modules.ResourceManager.Services.Dto
     [DataContract]
     public class RoleGroupDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="RoleGroupDto"/> class.</summary>
         public RoleGroupDto()
         {
+			Logger.LogDebug(">>> Entering RoleGroupDto()");
             this.Id = -2;
+			Logger.LogDebug("<<< Exiting RoleGroupDto()");
+			Logger.LogDebug("RoleGroupDto(): Id → {Id}", Id);
+			Logger.LogDebug("RoleGroupDto(): this.Id → {Arg0}", this.Id);
         }
 
         /// <summary>Gets or sets the ID for this role group.</summary>
@@ -43,6 +48,8 @@ namespace Dnn.Modules.ResourceManager.Services.Dto
         /// <returns><see cref="RoleGroupDto"/>.</returns>
         public static RoleGroupDto FromRoleGroupInfo(RoleGroupInfo roleGroup)
         {
+			Logger.LogDebug(">>> Entering FromRoleGroupInfo(roleGroup={RoleGroup})", roleGroup);
+			Logger.LogDebug("<<< Exiting FromRoleGroupInfo(roleGroup={RoleGroup})", roleGroup);
             return new RoleGroupDto()
             {
                 Id = roleGroup.RoleGroupID,
@@ -56,6 +63,8 @@ namespace Dnn.Modules.ResourceManager.Services.Dto
         /// <returns><see cref="RoleGroupInfo"/>.</returns>
         public RoleGroupInfo ToRoleGroupInfo()
         {
+			Logger.LogDebug(">>> Entering ToRoleGroupInfo()");
+			Logger.LogDebug("<<< Exiting ToRoleGroupInfo()");
             return new RoleGroupInfo()
             {
                 RoleGroupID = this.Id,

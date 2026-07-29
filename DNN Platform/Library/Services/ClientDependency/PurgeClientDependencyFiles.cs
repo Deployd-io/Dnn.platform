@@ -10,16 +10,21 @@ namespace DotNetNuke.Services.ClientDependency
 
     internal class PurgeClientDependencyFiles : SchedulerClient
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="PurgeClientDependencyFiles"/> class.</summary>
         /// <param name="objScheduleHistoryItem">The schedule history item.</param>
         public PurgeClientDependencyFiles(ScheduleHistoryItem objScheduleHistoryItem)
         {
+			Logger.LogDebug(">>> Entering PurgeClientDependencyFiles(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
             this.ScheduleHistoryItem = objScheduleHistoryItem; // REQUIRED
+			Logger.LogDebug("<<< Exiting PurgeClientDependencyFiles(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
+			Logger.LogDebug("PurgeClientDependencyFiles(objScheduleHistoryItem={ObjScheduleHistoryItem}): this.ScheduleHistoryItem → {Arg1}", objScheduleHistoryItem, this.ScheduleHistoryItem);
         }
 
         /// <inheritdoc />
         public override void DoWork()
         {
+			Logger.LogDebug(">>> Entering DoWork()");
             try
             {
                 string[] filePaths = Directory.GetFiles($"{Common.Globals.ApplicationMapPath}/App_Data/ClientDependency");
@@ -33,6 +38,7 @@ namespace DotNetNuke.Services.ClientDependency
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in DoWork(): {Arg0}", ex.Message);
                 this.ScheduleHistoryItem.Succeeded = false; // REQUIRED
 
                 this.ScheduleHistoryItem.AddLogNote($"Purging client dependency files task failed: {exc.ToString()}.");
@@ -43,6 +49,7 @@ namespace DotNetNuke.Services.ClientDependency
                 // log the exception
                 Exceptions.Exceptions.LogException(exc); // OPTIONAL
             }
+			Logger.LogDebug("<<< Exiting DoWork()");
         }
     }
 }

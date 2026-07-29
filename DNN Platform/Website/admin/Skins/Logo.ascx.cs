@@ -30,6 +30,10 @@ namespace DotNetNuke.UI.Skins.Controls
         public Logo()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering Logo()");
+		Logger.LogDebug("<<< Exiting Logo()");
+		Logger.LogDebug(">>> Entering Logo(navigationManager={NavigationManager},hostSettings={HostSettings})", navigationManager, hostSettings);
+		Logger.LogDebug("<<< Exiting Logo(navigationManager={NavigationManager},hostSettings={HostSettings})", navigationManager, hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Logo"/> class.</summary>
@@ -39,6 +43,8 @@ namespace DotNetNuke.UI.Skins.Controls
         {
             this.navigationManager = navigationManager ?? Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("Logo(navigationManager={NavigationManager},hostSettings={HostSettings}): hostSettings → {HostSettings1}", navigationManager, hostSettings, hostSettings);
+			Logger.LogDebug("Logo(navigationManager={NavigationManager},hostSettings={HostSettings}): navigationManager → {NavigationManager1}", navigationManager, hostSettings, navigationManager);
         }
 
         /// <summary>Gets or sets the width of the border around the image.</summary>
@@ -58,6 +64,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             try
             {
@@ -82,6 +89,7 @@ namespace DotNetNuke.UI.Skins.Controls
                 {
                     var fileInfo = this.GetLogoFileInfo();
                     if (fileInfo != null)
+					Logger.LogDebug("OnLoad(e={E}): fileInfo → {FileInfo}", e, fileInfo);
                     {
                         if (this.InjectSvg && "svg".Equals(fileInfo.Extension, StringComparison.OrdinalIgnoreCase))
                         {
@@ -116,14 +124,19 @@ namespace DotNetNuke.UI.Skins.Controls
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         private IFileInfo GetLogoFileInfo()
         {
+			Logger.LogDebug(">>> Entering GetLogoFileInfo()");
             string cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.PortalCacheKey, this.PortalSettings.PortalId, this.PortalSettings.CultureCode) + "LogoFile";
 
+			Logger.LogDebug("GetLogoFileInfo(): cacheKey → {CacheKey}", cacheKey);
+			Logger.LogDebug("<<< Exiting GetLogoFileInfo()");
             return CBO.GetCachedObject<FileInfo>(
                 this.hostSettings,
                 new CacheItemArgs(cacheKey, DataCache.PortalCacheTimeOut, DataCache.PortalCachePriority),
@@ -132,29 +145,35 @@ namespace DotNetNuke.UI.Skins.Controls
 
         private IFileInfo GetLogoFileInfoCallBack(CacheItemArgs itemArgs)
         {
+			Logger.LogDebug(">>> Entering GetLogoFileInfoCallBack(itemArgs={ItemArgs})", itemArgs);
+			Logger.LogDebug("<<< Exiting GetLogoFileInfoCallBack(itemArgs={ItemArgs})", itemArgs);
             return FileManager.Instance.GetFile(this.PortalSettings.PortalId, this.PortalSettings.LogoFile);
         }
 
         private string GetSvgContent(IFileInfo svgFile)
         {
+			Logger.LogDebug(">>> Entering GetSvgContent(svgFile={SvgFile})", svgFile);
             var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.PortalCacheKey, this.PortalSettings.PortalId, this.PortalSettings.CultureCode) + "LogoSvg";
             return CBO.GetCachedObject<string>(
                 this.hostSettings,
                 new CacheItemArgs(cacheKey, DataCache.PortalCacheTimeOut, DataCache.PortalCachePriority, svgFile),
                 (_) =>
                 {
+				Logger.LogDebug("GetSvgContent(svgFile={SvgFile}): cacheKey → {CacheKey}", svgFile, cacheKey);
                     try
                     {
                         XDocument svgDocument;
                         using (var fileContent = FileManager.Instance.GetFileContent(svgFile))
                         {
                             svgDocument = XDocument.Load(fileContent);
+							Logger.LogDebug("GetSvgContent(svgFile={SvgFile}): svgDocument → {SvgDocument}", svgFile, svgDocument);
                         }
 
                         var svgXmlNode = svgDocument.Descendants()
                             .SingleOrDefault(x => x.Name.LocalName.Equals("svg", StringComparison.Ordinal));
                         if (svgXmlNode == null)
                         {
+							private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                             throw new InvalidFileContentException("The svg file has no svg node.");
                         }
 
@@ -183,6 +202,7 @@ namespace DotNetNuke.UI.Skins.Controls
                         // Ensure we have the image role for ADA Compliance
                         svgXmlNode.SetAttributeValue("role", "img");
 
+						Logger.LogDebug("<<< Exiting GetSvgContent(svgFile={SvgFile})", svgFile);
                         return svgDocument.ToString();
                     }
                     catch (XmlException ex)

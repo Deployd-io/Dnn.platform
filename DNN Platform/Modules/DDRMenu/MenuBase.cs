@@ -50,7 +50,9 @@ namespace DotNetNuke.Web.DDRMenu
         public MenuBase()
             : this(null, null, null)
         {
+		Logger.LogDebug(">>> Entering MenuBase()");
         }
+		Logger.LogDebug("<<< Exiting MenuBase()");
 
         /// <summary>Initializes a new instance of the <see cref="MenuBase"/> class.</summary>
         /// <param name="localiser">The tab localizer.</param>
@@ -58,6 +60,8 @@ namespace DotNetNuke.Web.DDRMenu
         public MenuBase(ILocaliser localiser)
             : this(localiser, null, null)
         {
+		Logger.LogDebug(">>> Entering MenuBase(localiser={Localiser})", localiser);
+		Logger.LogDebug("<<< Exiting MenuBase(localiser={Localiser})", localiser);
         }
 
         /// <summary>Initializes a new instance of the <see cref="MenuBase"/> class.</summary>
@@ -68,7 +72,10 @@ namespace DotNetNuke.Web.DDRMenu
         {
             this.localiser = localiser ?? Globals.GetCurrentServiceProvider().GetRequiredService<ILocaliser>();
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("MenuBase(localiser={Localiser},hostSettings={HostSettings},tabController={TabController}): hostSettings → {HostSettings1}", localiser, hostSettings, tabController, hostSettings);
+			Logger.LogDebug("MenuBase(localiser={Localiser},hostSettings={HostSettings},tabController={TabController}): localiser → {Localiser1}", localiser, hostSettings, tabController, localiser);
             this.tabController = tabController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ITabController>();
+			Logger.LogDebug("MenuBase(localiser={Localiser},hostSettings={HostSettings},tabController={TabController}): tabController → {TabController1}", localiser, hostSettings, tabController, tabController);
         }
 
         /// <summary>Gets or sets the template definition.</summary>
@@ -93,6 +100,7 @@ namespace DotNetNuke.Web.DDRMenu
         [DnnDeprecated(10, 0, 0, "Please use overload with ILocaliser")]
         public static partial MenuBase Instantiate(string menuStyle) =>
             Instantiate(Globals.GetCurrentServiceProvider().GetRequiredService<ILocaliser>(), menuStyle);
+			Logger.LogDebug(">>> Entering Instantiate(menuStyle={MenuStyle})", menuStyle);
 
         /// <summary>Instantiates the MenuBase.</summary>
         /// <param name="localiser">The tab localizer.</param>
@@ -113,6 +121,8 @@ namespace DotNetNuke.Web.DDRMenu
             try
             {
                 var templateDef = TemplateDefinition.FromName(hostSettings, menuStyle, "*menudef.xml");
+				Logger.LogDebug("Instantiate(localiser={Localiser},hostSettings={HostSettings},tabController={TabController},menuStyle={MenuStyle}): templateDef → {TemplateDef}", localiser, hostSettings, tabController, menuStyle, templateDef);
+				Logger.LogDebug("<<< Exiting Instantiate(menuStyle={MenuStyle})", menuStyle);
                 return new MenuBase(localiser, hostSettings, tabController) { TemplateDef = templateDef, };
             }
             catch (Exception exc)
@@ -125,12 +135,17 @@ namespace DotNetNuke.Web.DDRMenu
         /// <param name="settings">The settings to apply.</param>
         internal void ApplySettings(Settings settings)
         {
+			Logger.LogDebug(">>> Entering ApplySettings(settings={Settings})", settings);
             this.menuSettings = settings;
+			Logger.LogDebug("<<< Exiting ApplySettings(settings={Settings})", settings);
+			Logger.LogDebug("ApplySettings(settings={Settings}): menuSettings → {MenuSettings}", settings, menuSettings);
+			Logger.LogDebug("ApplySettings(settings={Settings}): this.menuSettings → {Arg1}", settings, this.menuSettings);
         }
 
         /// <summary>Runs menu initialization logic that should be done before rendering the menu.</summary>
         internal virtual void PreRender()
         {
+			Logger.LogDebug(">>> Entering PreRender()");
             this.TemplateDef.AddTemplateArguments(this.menuSettings.TemplateArguments, true);
             this.TemplateDef.AddClientOptions(this.menuSettings.ClientOptions, true);
 
@@ -179,12 +194,14 @@ namespace DotNetNuke.Web.DDRMenu
                 imagePathOption == null ? DNNContext.Current.PortalSettings.HomeDirectory : imagePathOption.Value);
 
             this.TemplateDef.PreRender();
+			Logger.LogDebug("<<< Exiting PreRender()");
         }
 
         /// <summary>Renders the menu.</summary>
         /// <param name="htmlWriter">The HTML writer to which to render the menu.</param>
         internal void Render(HtmlTextWriter htmlWriter)
         {
+			Logger.LogDebug(">>> Entering Render(htmlWriter={HtmlWriter})", htmlWriter);
             if (this.hostSettings.DebugMode)
             {
                 htmlWriter.Write("<!-- DDRmenu v07.04.01 - {0} template -->", this.menuSettings.MenuStyle);
@@ -192,14 +209,17 @@ namespace DotNetNuke.Web.DDRMenu
 
             UserInfo user = null;
             if (this.menuSettings.IncludeContext)
+			Logger.LogDebug("Render(htmlWriter={HtmlWriter}): user → {User}", htmlWriter, user);
             {
                 user = UserController.Instance.GetCurrentUserInfo();
                 user.Roles = user.Roles; // Touch roles to populate
+				Logger.LogDebug("Render(htmlWriter={HtmlWriter}): user.Roles → {Arg1}", htmlWriter, user.Roles);
             }
 
             this.TemplateDef.AddClientOptions(new List<ClientOption> { new ClientString("MenuStyle", this.menuSettings.MenuStyle) }, false);
 
             this.TemplateDef.Render(new MenuXml { root = this.RootNode, user = user }, htmlWriter);
+			Logger.LogDebug("<<< Exiting Render(htmlWriter={HtmlWriter})", htmlWriter);
         }
 
         /// <summary>Gets the physical path from a virtual path.</summary>
@@ -207,16 +227,21 @@ namespace DotNetNuke.Web.DDRMenu
         /// <returns>The full physical path to the file.</returns>
         protected string MapPath(string path)
         {
+			Logger.LogDebug(">>> Entering MapPath(path={Path})", path);
+			Logger.LogDebug("<<< Exiting MapPath(path={Path})", path);
             return string.IsNullOrEmpty(path) ? string.Empty : Path.GetFullPath(this.CurrentContext.Server.MapPath(path));
         }
 
         private static List<string> SplitAndTrim(string str)
         {
+			Logger.LogDebug(">>> Entering SplitAndTrim(str={Str})", str);
+			Logger.LogDebug("<<< Exiting SplitAndTrim(str={Str})", str);
             return new List<string>(str.Split(',')).ConvertAll(s => s.Trim().ToLowerInvariant());
         }
 
         private void LoadNodeXml()
         {
+			Logger.LogDebug(">>> Entering LoadNodeXml()");
             this.menuSettings.NodeXmlPath =
                 this.MapPath(
                     new PathResolver(this.hostSettings, this.TemplateDef.Folder).Resolve(
@@ -229,6 +254,7 @@ namespace DotNetNuke.Web.DDRMenu
 
             var cache = this.CurrentContext.Cache;
             this.RootNode = cache[this.menuSettings.NodeXmlPath] as MenuNode;
+			Logger.LogDebug("LoadNodeXml(): this.RootNode → {Arg0}", this.RootNode);
             if (this.RootNode != null)
             {
                 return;
@@ -241,13 +267,18 @@ namespace DotNetNuke.Web.DDRMenu
             }
 
             cache.Insert(this.menuSettings.NodeXmlPath, this.RootNode, new CacheDependency(this.menuSettings.NodeXmlPath));
+			Logger.LogDebug("<<< Exiting LoadNodeXml()");
         }
 
         private void FilterNodes(string nodeString, bool exclude)
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
             var nodeTextStrings = SplitAndTrim(nodeString);
+			Logger.LogDebug(">>> Entering FilterNodes(nodeString={NodeString},exclude={Exclude})", nodeString, exclude);
             var filteredNodes = new List<MenuNode>();
             var flattenedNodes = new MenuNode();
+			Logger.LogDebug("FilterNodes(nodeString={NodeString},exclude={Exclude}): filteredNodes → {FilteredNodes}", nodeString, exclude, filteredNodes);
+			Logger.LogDebug("FilterNodes(nodeString={NodeString},exclude={Exclude}): flattenedNodes → {FlattenedNodes}", nodeString, exclude, flattenedNodes);
 
             foreach (var nodeText in nodeTextStrings)
             {
@@ -258,6 +289,7 @@ namespace DotNetNuke.Web.DDRMenu
                         this.RootNode.Children.FindAll(
                             n =>
                             {
+						Logger.LogDebug("FilterNodes(nodeString={NodeString},exclude={Exclude}): roleName → {RoleName}", nodeString, exclude, roleName);
                                 // no need to check when the node is not a page
                                 if (n.TabId <= 0)
                                 {
@@ -267,6 +299,7 @@ namespace DotNetNuke.Web.DDRMenu
                                 var tab = TabController.Instance.GetTab(n.TabId, Null.NullInteger, false);
                                 foreach (IPermissionInfo perm in tab.TabPermissions)
                                 {
+								Logger.LogDebug("FilterNodes(nodeString={NodeString},exclude={Exclude}): tab → {Tab}", nodeString, exclude, tab);
                                     if (perm.AllowAccess &&
                                         perm.PermissionKey == "VIEW" &&
                                         (perm.RoleId == -1 || perm.RoleName.Equals(roleName, StringComparison.OrdinalIgnoreCase)))
@@ -282,6 +315,7 @@ namespace DotNetNuke.Web.DDRMenu
                 {
                     var tagName = nodeText.Substring(1, nodeText.Length - 1);
                     if (!string.IsNullOrEmpty(tagName))
+					Logger.LogDebug("FilterNodes(nodeString={NodeString},exclude={Exclude}): tagName → {TagName}", nodeString, exclude, tagName);
                     {
                         // flatten nodes first. tagged pages should be flattened and not heirarchical
                         if (flattenedNodes != new MenuNode())
@@ -308,6 +342,7 @@ namespace DotNetNuke.Web.DDRMenu
             if (flattenedNodes.HasChildren())
             {
                 this.RootNode = flattenedNodes;
+				Logger.LogDebug("FilterNodes(nodeString={NodeString},exclude={Exclude}): this.RootNode → {Arg2}", nodeString, exclude, this.RootNode);
             }
 
             if (exclude)
@@ -318,12 +353,16 @@ namespace DotNetNuke.Web.DDRMenu
             {
                 this.RootNode.Children.RemoveAll(n => filteredNodes.Contains(n) == exclude);
             }
+			Logger.LogDebug("<<< Exiting FilterNodes(nodeString={NodeString},exclude={Exclude})", nodeString, exclude);
         }
 
         private void FilterHiddenNodes(MenuNode parentNode)
         {
+			Logger.LogDebug(">>> Entering FilterHiddenNodes(parentNode={ParentNode})", parentNode);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
             var filteredNodes = new List<MenuNode>();
+			Logger.LogDebug("FilterHiddenNodes(parentNode={ParentNode}): portalSettings → {PortalSettings}", parentNode, portalSettings);
+			Logger.LogDebug("FilterHiddenNodes(parentNode={ParentNode}): filteredNodes → {FilteredNodes}", parentNode, filteredNodes);
             filteredNodes.AddRange(
                 parentNode.Children.FindAll(
                     n =>
@@ -335,22 +374,27 @@ namespace DotNetNuke.Web.DDRMenu
             parentNode.Children.RemoveAll(n => filteredNodes.Contains(n));
 
             parentNode.Children.ForEach(this.FilterHiddenNodes);
+			Logger.LogDebug("<<< Exiting FilterHiddenNodes(parentNode={ParentNode})", parentNode);
         }
 
         private void ApplyNodeSelector()
         {
+			Logger.LogDebug(">>> Entering ApplyNodeSelector()");
             string selector;
             if (!this.nodeSelectorAliases.TryGetValue(this.menuSettings.NodeSelector.ToLowerInvariant(), out selector))
             {
                 selector = this.menuSettings.NodeSelector;
+				Logger.LogDebug("ApplyNodeSelector(): selector → {Selector}", selector);
             }
 
             var selectorSplit = SplitAndTrim(selector);
 
+			Logger.LogDebug("ApplyNodeSelector(): selectorSplit → {SelectorSplit}", selectorSplit);
             var currentTabId = TabController.CurrentPage.TabID;
 
             var newRoot = this.RootNode;
 
+			Logger.LogDebug("ApplyNodeSelector(): newRoot → {NewRoot}", newRoot);
             var rootSelector = selectorSplit[0];
             if (rootSelector != "*")
             {
@@ -358,10 +402,12 @@ namespace DotNetNuke.Web.DDRMenu
                 {
                     var depth = Convert.ToInt32(rootSelector);
                     newRoot = this.RootNode;
+					Logger.LogDebug("ApplyNodeSelector(): depth → {Depth}", depth);
                     for (var i = 0; i <= depth; i++)
                     {
                         newRoot = newRoot.Children.Find(n => n.Breadcrumb);
                         if (newRoot == null)
+						Logger.LogDebug("ApplyNodeSelector(): n → {N}", n);
                         {
                             this.RootNode = new MenuNode();
                             return;
@@ -410,6 +456,7 @@ namespace DotNetNuke.Web.DDRMenu
                     var newChildren = new List<MenuNode>();
                     foreach (var child in this.RootNode.Children)
                     {
+					Logger.LogDebug("ApplyNodeSelector(): newChildren → {NewChildren}", newChildren);
                         newChildren.AddRange(child.Children);
                     }
 
@@ -425,6 +472,7 @@ namespace DotNetNuke.Web.DDRMenu
                     var nextChildren = new List<MenuNode>();
                     foreach (var child in newChildren)
                     {
+					Logger.LogDebug("ApplyNodeSelector(): nextChildren → {NextChildren}", nextChildren);
                         nextChildren.AddRange(child.Children);
                     }
 
@@ -434,12 +482,15 @@ namespace DotNetNuke.Web.DDRMenu
                 foreach (var node in newChildren)
                 {
                     node.Children = null;
+					Logger.LogDebug("ApplyNodeSelector(): node.Children → {Arg0}", node.Children);
                 }
             }
+			Logger.LogDebug("<<< Exiting ApplyNodeSelector()");
         }
 
         private void ApplyNodeManipulator()
         {
+			Logger.LogDebug(">>> Entering ApplyNodeManipulator()");
             // TODO: In Dnn v11, replace this.HostPortalSettings to use IPortalSettings private field instantiate in constructor
 #pragma warning disable CS0618 // Type or member is obsolete
             this.RootNode =
@@ -447,6 +498,7 @@ namespace DotNetNuke.Web.DDRMenu
                     ((INodeManipulator)Activator.CreateInstance(BuildManager.GetType(this.menuSettings.NodeManipulator, true, true))).
                         ManipulateNodes(this.RootNode.Children, this.HostPortalSettings));
 #pragma warning restore CS0618 // Type or member is obsolete
+		Logger.LogDebug("<<< Exiting ApplyNodeManipulator()");
         }
     }
 }

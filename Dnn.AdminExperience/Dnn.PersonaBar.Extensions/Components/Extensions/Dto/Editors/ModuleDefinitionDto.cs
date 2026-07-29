@@ -11,22 +11,33 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
     [JsonObject]
     public class ModuleDefinitionDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public ModuleDefinitionDto()
         {
+		Logger.LogDebug(">>> Entering ModuleDefinitionDto()");
         }
 
         public ModuleDefinitionDto(ModuleDefinitionInfo definition)
         {
+			Logger.LogDebug(">>> Entering ModuleDefinitionDto(definition={Definition})", definition);
             this.Id = definition.ModuleDefID;
             this.DesktopModuleId = definition.DesktopModuleID;
+			Logger.LogDebug("ModuleDefinitionDto(definition={Definition}): this.Id → {Arg1}", definition, this.Id);
+			Logger.LogDebug("ModuleDefinitionDto(definition={Definition}): this.DesktopModuleId → {Arg1}", definition, this.DesktopModuleId);
             this.Name = definition.DefinitionName;
             this.FriendlyName = definition.FriendlyName;
             this.CacheTime = definition.DefaultCacheTime;
+			Logger.LogDebug("ModuleDefinitionDto(definition={Definition}): this.Name → {Arg1}", definition, this.Name);
+			Logger.LogDebug("ModuleDefinitionDto(definition={Definition}): FriendlyName → {FriendlyName}", definition, FriendlyName);
+			Logger.LogDebug("ModuleDefinitionDto(definition={Definition}): this.FriendlyName → {Arg1}", definition, this.FriendlyName);
+			Logger.LogDebug("ModuleDefinitionDto(definition={Definition}): this.CacheTime → {Arg1}", definition, this.CacheTime);
 
             foreach (var moduleControlInfo in definition.ModuleControls.Values)
             {
                 this.Controls.Add(new ModuleControlDto(moduleControlInfo));
             }
+			Logger.LogDebug("<<< Exiting ModuleDefinitionDto(definition={Definition})", definition);
+			Logger.LogDebug("<<< Exiting ModuleDefinitionDto()");
         }
 
         [JsonProperty("id")]
@@ -49,6 +60,8 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
 
         public ModuleDefinitionInfo ToModuleDefinitionInfo()
         {
+			Logger.LogDebug(">>> Entering ToModuleDefinitionInfo()");
+			Logger.LogDebug("<<< Exiting ToModuleDefinitionInfo()");
             return new ModuleDefinitionInfo
             {
                 ModuleDefID = this.Id,

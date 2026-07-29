@@ -22,9 +22,12 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
     [JsonObject]
     public class PackageInfoDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="PackageInfoDto"/> class.</summary>
         public PackageInfoDto()
         {
+		Logger.LogDebug(">>> Entering PackageInfoDto()");
+		Logger.LogDebug("<<< Exiting PackageInfoDto()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="PackageInfoDto"/> class.</summary>
@@ -33,7 +36,9 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
         public PackageInfoDto(int portalId, PackageInfo package)
             : this(null, null, null, portalId, package)
         {
+		Logger.LogDebug(">>> Entering PackageInfoDto(portalId={PortalId},package={Package})", portalId, package);
         }
+		Logger.LogDebug("<<< Exiting PackageInfoDto(portalId={PortalId},package={Package})", portalId, package);
 
         /// <summary>Initializes a new instance of the <see cref="PackageInfoDto"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -46,18 +51,35 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
             this.NavigationManager = Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
 
             this.PackageType = package.PackageType;
+			Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): PackageType → {PackageType}", hostSettings, hostSettingsService, portalController, portalId, package, PackageType);
+			Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.PackageType → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.PackageType);
             this.FriendlyName = package.FriendlyName;
             this.Name = package.Name;
+			Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): FriendlyName → {FriendlyName}", hostSettings, hostSettingsService, portalController, portalId, package, FriendlyName);
+			Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.FriendlyName → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.FriendlyName);
+			Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): Name → {Name}", hostSettings, hostSettingsService, portalController, portalId, package, Name);
+			Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.Name → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.Name);
             this.PackageId = package.PackageID;
             this.Description = package.Description;
             this.IsInUse = ExtensionsController.IsPackageInUse(package, portalId);
             this.Version = package.Version.ToString(3);
+			Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.PackageId → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.PackageId);
+			Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): Description → {Description}", hostSettings, hostSettingsService, portalController, portalId, package, Description);
+			Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.Description → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.Description);
+			Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): Version → {Version}", hostSettings, hostSettingsService, portalController, portalId, package, Version);
             this.UpgradeUrl = ExtensionsController.UpgradeRedirect(package.Version, package.PackageType, package.Name);
             this.UpgradeIndicator = ExtensionsController.UpgradeIndicator(hostSettings, hostSettingsService, portalController, package.Version, package.PackageType, package.Name);
             this.PackageIcon = ExtensionsController.GetPackageIcon(package);
             this.License = package.License;
             this.ReleaseNotes = package.ReleaseNotes;
             this.Owner = package.Owner;
+			Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): License → {License}", hostSettings, hostSettingsService, portalController, portalId, package, License);
+			Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.License → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.License);
+			Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): ReleaseNotes → {ReleaseNotes}", hostSettings, hostSettingsService, portalController, portalId, package, ReleaseNotes);
+			Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.ReleaseNotes → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.ReleaseNotes);
+			Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): Owner → {Owner}", hostSettings, hostSettingsService, portalController, portalId, package, Owner);
+			Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.Owner → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.Owner);
+			Logger.LogInformation("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): Url → {Url}", hostSettings, hostSettingsService, portalController, portalId, package, Url);
             this.Organization = package.Organization;
             this.Url = package.Url;
             this.Email = package.Email;
@@ -67,6 +89,9 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
 
             var authService = AuthenticationController.GetAuthenticationServiceByPackageID(this.PackageId);
             this.ReadOnly = authService != null && authService.AuthenticationType == Constants.DnnAuthTypeName;
+			Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): authService → {AuthService}", hostSettings, hostSettingsService, portalController, portalId, package, authService);
+			Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): Organization → {Organization}", hostSettings, hostSettingsService, portalController, portalId, package, Organization);
+			Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.Organization → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.Organization);
 
             var currentPage = TabController.CurrentPage;
             var tabId = currentPage.TabID;
@@ -76,6 +101,10 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
                 $"packageid={this.PackageId}",
                 "Display=editor",
                 "popUp=true");
+				Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.Url → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.Url);
+				Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): Email → {Email}", hostSettings, hostSettingsService, portalController, portalId, package, Email);
+				Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.Email → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.Email);
+				Logger.LogDebug("PackageInfoDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.CanDelete → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.CanDelete);
         }
 
         [JsonProperty("packageId")]
@@ -139,11 +168,14 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
 
         public PackageInfo ToPackageInfo()
         {
+			Logger.LogDebug(">>> Entering ToPackageInfo()");
             if (!System.Version.TryParse(this.Version, out var ver))
             {
                 ver = null;
+				Logger.LogDebug("ToPackageInfo(): ver → {Ver}", ver);
             }
 
+			Logger.LogDebug("<<< Exiting ToPackageInfo()");
             return new PackageInfo
             {
                 PackageType = this.PackageType,

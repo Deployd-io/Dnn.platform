@@ -22,12 +22,17 @@ namespace Dnn.EditBar.UI.Items
     [Serializable]
     public class PageSettingsMenu : BaseMenuItem
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IHostSettings hostSettings;
 
         /// <summary>Initializes a new instance of the <see cref="PageSettingsMenu"/> class.</summary>
         public PageSettingsMenu()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering PageSettingsMenu()");
+		Logger.LogDebug("<<< Exiting PageSettingsMenu()");
+		Logger.LogDebug(">>> Entering PageSettingsMenu(hostSettings={HostSettings})", hostSettings);
+		Logger.LogDebug("<<< Exiting PageSettingsMenu(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PageSettingsMenu"/> class.</summary>
@@ -35,6 +40,7 @@ namespace Dnn.EditBar.UI.Items
         public PageSettingsMenu(IHostSettings hostSettings)
         {
             this.hostSettings = hostSettings ?? HttpContextSource.Current?.GetScope().ServiceProvider.GetRequiredService<IHostSettings>();
+			Logger.LogDebug("PageSettingsMenu(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
         }
 
         /// <inheritdoc />
@@ -55,15 +61,22 @@ namespace Dnn.EditBar.UI.Items
         /// <inheritdoc />
         public override bool Visible()
         {
+			Logger.LogDebug(">>> Entering Visible()");
             var isInEditMode = Personalization.GetUserMode() == PortalSettings.Mode.Edit;
             var isCurrentControlPanel = this.hostSettings.ControlPanel.EndsWith("PersonaBarContainer.ascx", StringComparison.InvariantCultureIgnoreCase);
+			Logger.LogDebug("Visible(): isInEditMode → {IsInEditMode}", isInEditMode);
+			Logger.LogDebug("Visible(): isCurrentControlPanel → {IsCurrentControlPanel}", isCurrentControlPanel);
             var canEditPageSettings = CanEditPageSettings();
 
+			Logger.LogDebug("Visible(): canEditPageSettings → {CanEditPageSettings}", canEditPageSettings);
+			Logger.LogDebug("<<< Exiting Visible()");
             return isInEditMode && isCurrentControlPanel && canEditPageSettings;
         }
 
         private static bool CanEditPageSettings()
         {
+			Logger.LogDebug(">>> Entering CanEditPageSettings()");
+				Logger.LogDebug("<<< Exiting CanEditPageSettings()");
             return
                 TabPermissionController.CanAddPage() ||
                 TabPermissionController.CanAdminPage() ||

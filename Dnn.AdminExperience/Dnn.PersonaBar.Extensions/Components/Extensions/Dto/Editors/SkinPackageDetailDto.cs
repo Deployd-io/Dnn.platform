@@ -9,9 +9,12 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
     [JsonObject]
     public class SkinPackageDetailDto : PackageInfoDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="SkinPackageDetailDto"/> class.</summary>
         public SkinPackageDetailDto()
         {
+		Logger.LogDebug(">>> Entering SkinPackageDetailDto()");
+		Logger.LogDebug("<<< Exiting SkinPackageDetailDto()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="SkinPackageDetailDto"/> class.</summary>

@@ -23,18 +23,24 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
     [TestFixture]
     public class PropertyAccessTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private FakeServiceProvider serviceProvider;
 
         [SetUp]
         public void SetUp()
         {
+			Logger.LogDebug(">>> Entering SetUp()");
             this.serviceProvider = FakeServiceProvider.Setup(services => services.AddSingleton(Mock.Of<IPortalController>()));
+			Logger.LogDebug("<<< Exiting SetUp()");
+			Logger.LogDebug("SetUp(): serviceProvider → {ServiceProvider}", serviceProvider);
         }
 
         [TearDown]
         public void TearDown()
         {
+			Logger.LogDebug(">>> Entering TearDown()");
             this.serviceProvider.Dispose();
+			Logger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
@@ -62,12 +68,16 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
         [TestCase("ticksperday")]
         public void TicksPropertyAccess_GetProperty_Returns_Correct_String(string propertyName)
         {
+			Logger.LogDebug(">>> Entering TicksPropertyAccess_GetProperty_Returns_Correct_String(propertyName={PropertyName})", propertyName);
             // Arrange
             var ticksPropertyAccess = new TicksPropertyAccess();
             var accessingUser = new UserInfo();
+			Logger.LogDebug("TicksPropertyAccess_GetProperty_Returns_Correct_String(propertyName={PropertyName}): ticksPropertyAccess → {TicksPropertyAccess}", propertyName, ticksPropertyAccess);
+			Logger.LogDebug("TicksPropertyAccess_GetProperty_Returns_Correct_String(propertyName={PropertyName}): accessingUser → {AccessingUser}", propertyName, accessingUser);
 
             long expected = DateTime.MinValue.Ticks;
             switch (propertyName)
+			Logger.LogDebug("TicksPropertyAccess_GetProperty_Returns_Correct_String(propertyName={PropertyName}): expected → {Expected}", propertyName, expected);
             {
                 case "now":
                     expected = DateTime.Now.Ticks;
@@ -86,6 +96,7 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
 
             // Assert
             Assert.That(propertyValue, Is.EqualTo(expected.ToString(CultureInfo.InvariantCulture)));
+			Logger.LogDebug("<<< Exiting TicksPropertyAccess_GetProperty_Returns_Correct_String(propertyName={PropertyName})", propertyName);
         }
 
         [Test]
@@ -120,13 +131,17 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
         [TestCase("utc", "it")]
         public void DateTimePropertyAccess_GetProperty_Returns_Correct_String_For_Culture(string propertyName, string cultureName)
         {
+			Logger.LogDebug(">>> Entering DateTimePropertyAccess_GetProperty_Returns_Correct_String_For_Culture(propertyName={PropertyName},cultureName={CultureName})", propertyName, cultureName);
             // Arrange
             var dtPropertyAccess = new DateTimePropertyAccess();
             var accessingUser = new UserInfo { Profile = new UserProfile { PreferredTimeZone = TimeZoneInfo.Local } };
+			Logger.LogDebug("DateTimePropertyAccess_GetProperty_Returns_Correct_String_For_Culture(propertyName={PropertyName},cultureName={CultureName}): dtPropertyAccess → {DtPropertyAccess}", propertyName, cultureName, dtPropertyAccess);
             var culture = new CultureInfo(cultureName);
 
+			Logger.LogDebug("DateTimePropertyAccess_GetProperty_Returns_Correct_String_For_Culture(propertyName={PropertyName},cultureName={CultureName}): culture → {Culture}", propertyName, cultureName, culture);
             string expected = string.Empty;
 
+			Logger.LogDebug("DateTimePropertyAccess_GetProperty_Returns_Correct_String_For_Culture(propertyName={PropertyName},cultureName={CultureName}): expected → {Expected}", propertyName, cultureName, expected);
             switch (propertyName)
             {
                 case "current":
@@ -149,6 +164,7 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
 
             // Assert
             Assert.That(propertyValue, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting DateTimePropertyAccess_GetProperty_Returns_Correct_String_For_Culture(propertyName={PropertyName},cultureName={CultureName})", propertyName, cultureName);
         }
 
         [Test]
@@ -162,13 +178,17 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
         [TestCase("utc", "it", "mmm dd, yyyy")]
         public void DateTimePropertyAccess_GetProperty_Returns_Correct_String_Given_Format_And_Culture(string propertyName, string cultureName, string format)
         {
+			Logger.LogDebug(">>> Entering DateTimePropertyAccess_GetProperty_Returns_Correct_String_Given_Format_And_Culture(propertyName={PropertyName},cultureName={CultureName},format={Format})", propertyName, cultureName, format);
             // Arrange
             var dtPropertyAccess = new DateTimePropertyAccess();
             var accessingUser = new UserInfo { Profile = new UserProfile { PreferredTimeZone = TimeZoneInfo.Local } };
+			Logger.LogDebug("DateTimePropertyAccess_GetProperty_Returns_Correct_String_Given_Format_And_Culture(propertyName={PropertyName},cultureName={CultureName},format={Format}): dtPropertyAccess → {DtPropertyAccess}", propertyName, cultureName, format, dtPropertyAccess);
             var culture = new CultureInfo(cultureName);
 
+			Logger.LogDebug("DateTimePropertyAccess_GetProperty_Returns_Correct_String_Given_Format_And_Culture(propertyName={PropertyName},cultureName={CultureName},format={Format}): culture → {Culture}", propertyName, cultureName, format, culture);
             string expected = string.Empty;
 
+			Logger.LogDebug("DateTimePropertyAccess_GetProperty_Returns_Correct_String_Given_Format_And_Culture(propertyName={PropertyName},cultureName={CultureName},format={Format}): expected → {Expected}", propertyName, cultureName, format, expected);
             switch (propertyName)
             {
                 case "current":
@@ -191,6 +211,7 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
 
             // Assert
             Assert.That(propertyValue, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting DateTimePropertyAccess_GetProperty_Returns_Correct_String_Given_Format_And_Culture(propertyName={PropertyName},cultureName={CultureName},format={Format})", propertyName, cultureName, format);
         }
 
         [Test]
@@ -198,9 +219,12 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
         [TestCase("now", "Azores Standard Time")]
         public void DateTimePropertyAccess_GetProperty_Adjusts_For_TimeZone(string propertyName, string timeZoneId)
         {
+			Logger.LogDebug(">>> Entering DateTimePropertyAccess_GetProperty_Adjusts_For_TimeZone(propertyName={PropertyName},timeZoneId={TimeZoneId})", propertyName, timeZoneId);
             // Arrange
             var dtPropertyAccess = new DateTimePropertyAccess();
             var userTimeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+			Logger.LogDebug("DateTimePropertyAccess_GetProperty_Adjusts_For_TimeZone(propertyName={PropertyName},timeZoneId={TimeZoneId}): dtPropertyAccess → {DtPropertyAccess}", propertyName, timeZoneId, dtPropertyAccess);
+			Logger.LogDebug("DateTimePropertyAccess_GetProperty_Adjusts_For_TimeZone(propertyName={PropertyName},timeZoneId={TimeZoneId}): userTimeZone → {UserTimeZone}", propertyName, timeZoneId, userTimeZone);
             var timeZoneProfileProperty = new ProfilePropertyDefinition(Constants.PORTAL_Zero)
             {
                 PropertyName = "PreferredTimeZone",
@@ -208,12 +232,14 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
             };
             var userProfile = new UserProfile();
             userProfile.ProfileProperties.Add(timeZoneProfileProperty);
+			Logger.LogDebug("DateTimePropertyAccess_GetProperty_Adjusts_For_TimeZone(propertyName={PropertyName},timeZoneId={TimeZoneId}): userProfile → {UserProfile}", propertyName, timeZoneId, userProfile);
 
             var accessingUser = new UserInfo { Profile = userProfile };
             var culture = CultureInfo.InvariantCulture;
 
             string expected = string.Empty;
 
+			Logger.LogDebug("DateTimePropertyAccess_GetProperty_Adjusts_For_TimeZone(propertyName={PropertyName},timeZoneId={TimeZoneId}): expected → {Expected}", propertyName, timeZoneId, expected);
             switch (propertyName)
             {
                 case "current":
@@ -236,6 +262,7 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
 
             // Assert
             Assert.That(propertyValue, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting DateTimePropertyAccess_GetProperty_Adjusts_For_TimeZone(propertyName={PropertyName},timeZoneId={TimeZoneId})", propertyName, timeZoneId);
         }
     }
 }

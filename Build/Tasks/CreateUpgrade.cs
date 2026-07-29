@@ -17,21 +17,26 @@ namespace DotNetNuke.Build.Tasks
     [IsDependentOn(typeof(CreateDeploy))] // This is to ensure CreateUpgrade runs last and not in parallel, can be removed when we get to v11 where the telerik workaround is no longer needed
     public sealed class CreateUpgrade : FrostingTask<Context>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly string[] IncludeAll = ["**/*",];
 
         /// <inheritdoc />
         public override void Run(Context context)
         {
+			Logger.LogDebug(">>> Entering Run(context={Context})", context);
             context.CreateDirectory(context.ArtifactsDir);
             var excludes = new string[context.PackagingPatterns.InstallExclude.Length + context.PackagingPatterns.UpgradeExclude.Length];
             context.PackagingPatterns.InstallExclude.CopyTo(excludes, 0);
             context.PackagingPatterns.UpgradeExclude.CopyTo(excludes, context.PackagingPatterns.InstallExclude.Length);
             var files = context.GetFilesByPatterns(context.WebsiteDir, IncludeAll, excludes);
             files.Add(context.GetFilesByPatterns(context.WebsiteDir, context.PackagingPatterns.UpgradeInclude));
+			Logger.LogDebug("Run(context={Context}): files → {Files}", context, files);
             context.Information("Zipping {0} files for Upgrade zip", files.Count);
 
             var packageZip = context.ArtifactsDir + context.File($"DNN_Platform_{context.GetBuildNumber()}_Upgrade.zip");
             context.Zip(context.WebsiteDir, packageZip, files);
+			Logger.LogDebug("<<< Exiting Run(context={Context})", context);
+			Logger.LogDebug("Run(context={Context}): packageZip → {PackageZip}", context, packageZip);
         }
     }
 }

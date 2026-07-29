@@ -9,6 +9,7 @@ namespace DotNetNuke.Tests.Urls
 
     public static class Extensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static string GetValue(this Dictionary<string, string> dic, string key)
         {
             return GetValue(dic, key, string.Empty);

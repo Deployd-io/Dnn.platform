@@ -47,6 +47,7 @@ namespace DotNetNuke.UI.Skins
         /// <param name="controlSrc">The control source path.</param>
         public SkinFileProcessor(string controlKey, string controlSrc)
         {
+			Logger.LogDebug(">>> Entering SkinFileProcessor(controlKey={ControlKey},controlSrc={ControlSrc})", controlKey, controlSrc);
             this.controlList.Add(controlKey, controlSrc);
 
             // Instantiate the control parser with the list of skin objects
@@ -54,6 +55,7 @@ namespace DotNetNuke.UI.Skins
 
             // Instantiate the object parser with the list of skin objects
             this.ObjectFactory = new ObjectParser(this.controlList);
+			Logger.LogDebug("<<< Exiting SkinFileProcessor(controlKey={ControlKey},controlSrc={ControlSrc})", controlKey, controlSrc);
         }
 
         /// <summary>
@@ -75,12 +77,16 @@ namespace DotNetNuke.UI.Skins
         /// </remarks>
         public SkinFileProcessor(string skinPath, string skinRoot, string skinName)
         {
+			Logger.LogDebug(">>> Entering SkinFileProcessor(skinPath={SkinPath},skinRoot={SkinRoot},skinName={SkinName})", skinPath, skinRoot, skinName);
             this.Message += SkinController.FormatMessage(this.iNITIALIZEPROCESSOR, $"{skinRoot} :: {skinName}", 0, false);
 
             // Save path information for future use
             this.SkinRoot = skinRoot;
+			Logger.LogDebug("SkinFileProcessor(skinPath={SkinPath},skinRoot={SkinRoot},skinName={SkinName}): this.SkinRoot → {Arg3}", skinPath, skinRoot, skinName, this.SkinRoot);
             this.SkinPath = skinPath;
             this.SkinName = skinName;
+			Logger.LogDebug("SkinFileProcessor(skinPath={SkinPath},skinRoot={SkinRoot},skinName={SkinName}): this.SkinPath → {Arg3}", skinPath, skinRoot, skinName, this.SkinPath);
+			Logger.LogDebug("SkinFileProcessor(skinPath={SkinPath},skinRoot={SkinRoot},skinName={SkinName}): this.SkinName → {Arg3}", skinPath, skinRoot, skinName, this.SkinName);
 
             // Check for and read skin package level attribute information file
             string fileName =
@@ -109,6 +115,7 @@ namespace DotNetNuke.UI.Skins
             {
                 var token = objSkinControl.ControlKey.ToUpperInvariant();
 
+				Logger.LogWarning("SkinFileProcessor(skinPath={SkinPath},skinRoot={SkinRoot},skinName={SkinName}): token → {Token}", skinPath, skinRoot, skinName, token);
                 // If the control is already in the hash table
                 if (this.controlList.ContainsKey(token))
                 {
@@ -131,6 +138,7 @@ namespace DotNetNuke.UI.Skins
 
             // Instantiate the object parser with the list of skin objects
             this.ObjectFactory = new ObjectParser(this.controlList);
+			Logger.LogDebug("<<< Exiting SkinFileProcessor(skinPath={SkinPath},skinRoot={SkinRoot},skinName={SkinName})", skinPath, skinRoot, skinName);
         }
 
         public string SkinRoot { get; }
@@ -151,8 +159,10 @@ namespace DotNetNuke.UI.Skins
 
         public string ProcessFile(string fileName, SkinParser parseOption)
         {
+			Logger.LogDebug(">>> Entering ProcessFile(fileName={FileName},parseOption={ParseOption})", fileName, parseOption);
             string strMessage = SkinController.FormatMessage(this.fILEBEGIN, Path.GetFileName(fileName), 0, false);
             var objSkinFile = new SkinFile(this.SkinRoot, fileName, this.SkinAttributes);
+			Logger.LogDebug("ProcessFile(fileName={FileName},parseOption={ParseOption}): objSkinFile → {ObjSkinFile}", fileName, parseOption, objSkinFile);
             switch (objSkinFile.FileExtension)
             {
                 case ".htm":
@@ -162,8 +172,10 @@ namespace DotNetNuke.UI.Skins
                     strMessage += this.PathFactory.Parse(ref contents, this.PathFactory.HtmlList, objSkinFile.SkinRootPath, parseOption);
                     strMessage += this.ControlFactory.Parse(ref contents, objSkinFile.Attributes);
                     objSkinFile.Contents = contents;
+					Logger.LogDebug("ProcessFile(fileName={FileName},parseOption={ParseOption}): objSkinFile.Contents → {Arg2}", fileName, parseOption, objSkinFile.Contents);
                     var registrations = new ArrayList();
                     registrations.AddRange(this.ControlFactory.Registrations);
+					Logger.LogDebug("ProcessFile(fileName={FileName},parseOption={ParseOption}): registrations → {Registrations}", fileName, parseOption, registrations);
                     registrations.AddRange(this.ObjectFactory.Registrations);
                     strMessage += objSkinFile.PrependASCXDirectives(registrations);
                     break;
@@ -172,6 +184,7 @@ namespace DotNetNuke.UI.Skins
             objSkinFile.Write();
             strMessage += objSkinFile.Messages;
             strMessage += SkinController.FormatMessage(this.fILEEND, Path.GetFileName(fileName), 1, false);
+			Logger.LogDebug("<<< Exiting ProcessFile(fileName={FileName},parseOption={ParseOption})", fileName, parseOption);
             return strMessage;
         }
 
@@ -180,6 +193,8 @@ namespace DotNetNuke.UI.Skins
         /// <returns>HTML formatted string of informational messages.</returns>
         public string ProcessList(ArrayList fileList)
         {
+			Logger.LogDebug(">>> Entering ProcessList(fileList={FileList})", fileList);
+			Logger.LogDebug("<<< Exiting ProcessList(fileList={FileList})", fileList);
             return this.ProcessList(fileList, SkinParser.Localized);
         }
 
@@ -191,15 +206,19 @@ namespace DotNetNuke.UI.Skins
             }
 
             this.Message += SkinController.FormatMessage(this.fILESEND, this.SkinRoot + " :: " + this.SkinName, 0, false);
+			Logger.LogDebug("<<< Exiting ProcessList(fileList={FileList},parseOption={ParseOption})", fileList, parseOption);
             return this.Message;
         }
 
         public string ProcessSkin(string skinSource, XmlDocument skinAttributes, SkinParser parseOption)
         {
+			Logger.LogDebug(">>> Entering ProcessSkin(skinSource={SkinSource},skinAttributes={SkinAttributes},parseOption={ParseOption})", skinSource, skinAttributes, parseOption);
             var objSkinFile = new SkinFile(skinSource, skinAttributes);
             string contents = objSkinFile.Contents;
+			Logger.LogDebug("ProcessSkin(skinSource={SkinSource},skinAttributes={SkinAttributes},parseOption={ParseOption}): objSkinFile → {ObjSkinFile}", skinSource, skinAttributes, parseOption, objSkinFile);
             this.Message += this.ControlFactory.Parse(ref contents, objSkinFile.Attributes);
             this.Message += objSkinFile.PrependASCXDirectives(this.ControlFactory.Registrations);
+			Logger.LogDebug("<<< Exiting ProcessSkin(skinSource={SkinSource},skinAttributes={SkinAttributes},parseOption={ParseOption})", skinSource, skinAttributes, parseOption);
             return contents;
         }
 
@@ -228,7 +247,9 @@ namespace DotNetNuke.UI.Skins
             /// </remarks>
             public ControlParser(Hashtable controlList)
             {
+				Logger.LogDebug(">>> Entering ControlParser(controlList={ControlList})", controlList);
                 this.ControlList = (Hashtable)controlList.Clone();
+				Logger.LogDebug("<<< Exiting ControlParser(controlList={ControlList})", controlList);
             }
 
             /// <summary>    Gets registration directives generated as a result of the Parse method.</summary>
@@ -276,6 +297,7 @@ namespace DotNetNuke.UI.Skins
 
                 // parse the file
                 source = FindTokenInstance.Replace(source, this.Handler);
+				Logger.LogDebug("<<< Exiting Parse(source={Source})", source);
                 return this.Messages;
             }
 
@@ -292,6 +314,7 @@ namespace DotNetNuke.UI.Skins
             /// </remarks>
             private string TokenMatchHandler(Match m)
             {
+				Logger.LogDebug(">>> Entering TokenMatchHandler(m={M})", m);
                 string tokenProc = Util.GetLocalizedString("ProcessToken");
                 string tokenSkin = Util.GetLocalizedString("SkinToken");
                 string tokenPane = Util.GetLocalizedString("PaneToken");
@@ -303,10 +326,13 @@ namespace DotNetNuke.UI.Skins
 
                 string token = m.Groups["token"].Value.ToUpperInvariant();
                 string controlName = token + m.Groups["instance"].Value;
+				Logger.LogWarning("TokenMatchHandler(m={M}): token → {Token}", m, token);
+				Logger.LogDebug("TokenMatchHandler(m={M}): controlName → {ControlName}", m, controlName);
 
                 // if the token has an instance name, use it to look for the corresponding attributes
                 string attributeNode = token + (string.IsNullOrEmpty(m.Groups["instance"].Value) ? string.Empty : ":" + m.Groups["instance"].Value);
 
+				Logger.LogDebug("TokenMatchHandler(m={M}): attributeNode → {AttributeNode}", m, attributeNode);
                 this.Messages += SkinController.FormatMessage(tokenProc, $"[{attributeNode}]", 2, false);
 
                 // if the token is a recognized skin control
@@ -314,6 +340,7 @@ namespace DotNetNuke.UI.Skins
                 {
                     string skinControl = string.Empty;
 
+					Logger.LogDebug("TokenMatchHandler(m={M}): skinControl → {SkinControl}", m, skinControl);
                     if (this.ControlList.ContainsKey(token))
                     {
                         this.Messages += SkinController.FormatMessage(tokenSkin, (string)this.ControlList[token], 2, false);
@@ -329,6 +356,7 @@ namespace DotNetNuke.UI.Skins
                         // look for the node of this instance of the token
                         var xmlSkinAttributeRoot = this.Attributes.DocumentElement.SelectSingleNode($"descendant::Object[Token='[{attributeNode}]']");
 
+						Logger.LogDebug("TokenMatchHandler(m={M}): xmlSkinAttributeRoot → {XmlSkinAttributeRoot}", m, xmlSkinAttributeRoot);
                         // if the token is found
                         if (xmlSkinAttributeRoot != null)
                         {
@@ -339,6 +367,7 @@ namespace DotNetNuke.UI.Skins
                             {
                                 var value = xmlSkinAttribute.SelectSingleNode("Value").InnerText;
                                 if (!string.IsNullOrEmpty(value))
+								Logger.LogDebug("TokenMatchHandler(m={M}): value → {Value}", m, value);
                                 {
                                     // append the formatted attribute to the inner contents of the control statement
                                     var name = xmlSkinAttribute.SelectSingleNode("Name").InnerText;
@@ -347,6 +376,7 @@ namespace DotNetNuke.UI.Skins
                                         $"{name}=\"{value}\"",
                                         2,
                                         false);
+										Logger.LogDebug("TokenMatchHandler(m={M}): name → {Name}", m, name);
                                     skinControl += $" {name}=\"{value.Replace("\"", "&quot;")}\"";
                                 }
                             }
@@ -397,6 +427,8 @@ namespace DotNetNuke.UI.Skins
                     // note that this is currently protecting array syntax in embedded javascript
                     // should be fixed in the regular expressions but is not, currently.
                     this.Messages += SkinController.FormatMessage(tokenNotFound, $"[{m.Groups["token"].Value}]", 2, false);
+					Logger.LogDebug(">>> Entering MatchHandler(m={M})", m);
+					Logger.LogDebug("<<< Exiting MatchHandler(m={M})", m);
                     return $"[{m.Groups["token"].Value}]";
                 }
             }
@@ -430,7 +462,9 @@ namespace DotNetNuke.UI.Skins
             /// </remarks>
             public ObjectParser(Hashtable controlList)
             {
+				Logger.LogDebug(">>> Entering ObjectParser(controlList={ControlList})", controlList);
                 this.ControlList = (Hashtable)controlList.Clone();
+				Logger.LogDebug("<<< Exiting ObjectParser(controlList={ControlList})", controlList);
             }
 
             /// <summary>    Gets registration directives generated as a result of the Parse method.</summary>
@@ -485,6 +519,7 @@ namespace DotNetNuke.UI.Skins
             /// </remarks>
             private string ObjectMatchHandler(Match m)
             {
+				Logger.LogDebug(">>> Entering ObjectMatchHandler(m={M})", m);
                 string processObject = Util.GetLocalizedString("ProcessObject");
                 string skinObject = Util.GetLocalizedString("SkinObject");
                 string pangeObject = Util.GetLocalizedString("PaneObject");
@@ -503,8 +538,11 @@ namespace DotNetNuke.UI.Skins
                 // declare skin object elements
                 string attributeNode = string.Empty;
                 string token = string.Empty;
+				Logger.LogDebug("ObjectMatchHandler(m={M}): attributeNode → {AttributeNode}", m, attributeNode);
+				Logger.LogWarning("ObjectMatchHandler(m={M}): token → {Token}", m, token);
                 string controlName = string.Empty;
 
+				Logger.LogDebug("ObjectMatchHandler(m={M}): controlName → {ControlName}", m, controlName);
                 // iterate and process valid attributes
                 foreach (string strAttribute in attributes)
                 {
@@ -512,8 +550,11 @@ namespace DotNetNuke.UI.Skins
                     {
                         var attribute = strAttribute.Split('=');
                         var attributeName = attribute[0].Trim();
+						Logger.LogDebug("ObjectMatchHandler(m={M}): attribute → {Attribute}", m, attribute);
+						Logger.LogDebug("ObjectMatchHandler(m={M}): attributeName → {AttributeName}", m, attributeName);
                         var attributeValue = attribute[1].Trim().Replace("\"", string.Empty);
                         switch (attributeName.ToLowerInvariant())
+						Logger.LogDebug("ObjectMatchHandler(m={M}): attributeValue → {AttributeValue}", m, attributeValue);
                         {
                             case "id":
                                 controlName = attributeValue;
@@ -539,6 +580,7 @@ namespace DotNetNuke.UI.Skins
                     {
                         string skinControl = string.Empty;
 
+						Logger.LogDebug("ObjectMatchHandler(m={M}): skinControl → {SkinControl}", m, skinControl);
                         if (this.ControlList.ContainsKey(token))
                         {
                             this.Messages += SkinController.FormatMessage(skinObject, (string)this.ControlList[token], 2, false);
@@ -551,7 +593,9 @@ namespace DotNetNuke.UI.Skins
                         // process embedded object params
                         string parameters = m.Groups["token"].Value.Substring(m.Groups["token"].Value.IndexOf(">", StringComparison.Ordinal) + 1);
                         parameters = parameters.Replace("<param name=\"", string.Empty);
+						Logger.LogDebug("ObjectMatchHandler(m={M}): parameters → {Parameters}", m, parameters);
                         parameters = parameters.Replace("\" value", string.Empty);
+						Logger.LogDebug("ObjectMatchHandler(m={M}): name → {Name}", m, name);
                         parameters = parameters.Replace("/>", string.Empty);
 
                         // convert multiple spaces and carriage returns into single spaces
@@ -610,6 +654,7 @@ namespace DotNetNuke.UI.Skins
                 else
                 {
                     // return unmodified embedded object
+					Logger.LogDebug("<<< Exiting ObjectMatchHandler(m={M})", m);
                     return "<object" + m.Groups["token"].Value + "</object>";
                 }
             }
@@ -736,6 +781,7 @@ namespace DotNetNuke.UI.Skins
                     source = ((Regex)regexList[i]).Replace(source, this.Handler);
                 }
 
+				Logger.LogDebug("<<< Exiting Parse(source={Source},regexList={RegexList},skinPath={SkinPath},parseOption={ParseOption})", source, regexList, skinPath, parseOption);
                 return this.messages;
             }
 
@@ -825,8 +871,13 @@ namespace DotNetNuke.UI.Skins
             /// </remarks>
             public SkinFile(string skinContents, XmlDocument skinAttributes)
             {
+				Logger.LogDebug(">>> Entering SkinFile(skinContents={SkinContents},skinAttributes={SkinAttributes})", skinContents, skinAttributes);
                 this.fileAttributes = skinAttributes;
                 this.Contents = skinContents;
+				Logger.LogDebug("<<< Exiting SkinFile(skinContents={SkinContents},skinAttributes={SkinAttributes})", skinContents, skinAttributes);
+				Logger.LogDebug("SkinFile(skinContents={SkinContents},skinAttributes={SkinAttributes}): this.fileAttributes → {Arg2}", skinContents, skinAttributes, this.fileAttributes);
+				Logger.LogDebug("SkinFile(skinContents={SkinContents},skinAttributes={SkinAttributes}): this.Contents → {Arg2}", skinContents, skinAttributes, this.Contents);
+				Logger.LogDebug("SkinFile(skinContents={SkinContents},skinAttributes={SkinAttributes}): fileAttributes → {FileAttributes}", skinContents, skinAttributes, fileAttributes);
             }
 
             /// <summary>Initializes a new instance of the <see cref="SkinFile"/> class.</summary>
@@ -840,15 +891,21 @@ namespace DotNetNuke.UI.Skins
             /// </remarks>
             public SkinFile(string skinRoot, string fileName, XmlDocument skinAttributes)
             {
+				Logger.LogDebug(">>> Entering SkinFile(skinRoot={SkinRoot},fileName={FileName},skinAttributes={SkinAttributes})", skinRoot, fileName, skinAttributes);
                 // capture file information
                 this.fileName = fileName;
+				Logger.LogDebug("SkinFile(skinRoot={SkinRoot},fileName={FileName},skinAttributes={SkinAttributes}): this.fileName → {Arg3}", skinRoot, fileName, skinAttributes, this.fileName);
+				Logger.LogDebug("SkinFile(skinRoot={SkinRoot},fileName={FileName},skinAttributes={SkinAttributes}): fileAttributes → {FileAttributes}", skinRoot, fileName, skinAttributes, fileAttributes);
+				Logger.LogDebug("SkinFile(skinRoot={SkinRoot},fileName={FileName},skinAttributes={SkinAttributes}): this.fileAttributes → {Arg3}", skinRoot, fileName, skinAttributes, this.fileAttributes);
                 this.fileExtension = Path.GetExtension(fileName);
                 this.skinRoot = skinRoot;
                 this.fileAttributes = skinAttributes;
 
+				Logger.LogDebug("SkinFile(skinRoot={SkinRoot},fileName={FileName},skinAttributes={SkinAttributes}): this.skinRoot → {Arg3}", skinRoot, fileName, skinAttributes, this.skinRoot);
                 // determine and store path to portals skin root folder
                 string strTemp = fileName.Replace(Path.GetFileName(fileName), string.Empty);
                 strTemp = strTemp.Replace(@"\", "/");
+				Logger.LogDebug("SkinFile(skinRoot={SkinRoot},fileName={FileName},skinAttributes={SkinAttributes}): strTemp → {StrTemp}", skinRoot, fileName, skinAttributes, strTemp);
                 this.skinRootPath = Globals.ApplicationPath + strTemp.Substring(strTemp.IndexOf("/PORTALS", StringComparison.OrdinalIgnoreCase));
 
                 // read file contents
@@ -893,8 +950,10 @@ namespace DotNetNuke.UI.Skins
                     default:
                         // output file name is same as input file name
                         this.writeFileName = fileName;
+						Logger.LogDebug("SkinFile(skinRoot={SkinRoot},fileName={FileName},skinAttributes={SkinAttributes}): this.writeFileName → {Arg3}", skinRoot, fileName, skinAttributes, this.writeFileName);
                         break;
                 }
+				Logger.LogDebug("<<< Exiting SkinFile(skinRoot={SkinRoot},fileName={FileName},skinAttributes={SkinAttributes})", skinRoot, fileName, skinAttributes);
             }
 
             public string SkinRoot
@@ -957,6 +1016,7 @@ namespace DotNetNuke.UI.Skins
 
             public void Write()
             {
+				Logger.LogDebug(">>> Entering Write()");
                 // delete the file before attempting to write
                 if (File.Exists(this.WriteFileName))
                 {
@@ -970,6 +1030,7 @@ namespace DotNetNuke.UI.Skins
                     objStreamWriter.Flush();
                     objStreamWriter.Close();
                 }
+				Logger.LogDebug("<<< Exiting Write()");
             }
 
             /// <summary>    Prepend ascx control directives to file contents.</summary>
@@ -1016,9 +1077,12 @@ namespace DotNetNuke.UI.Skins
 
             private static string Read(string fileName)
             {
+				Logger.LogDebug(">>> Entering Read(fileName={FileName})", fileName);
                 using var objStreamReader = new StreamReader(fileName);
                 string strFileContents = objStreamReader.ReadToEnd();
+				Logger.LogDebug("Read(fileName={FileName}): objStreamReader → {ObjStreamReader}", fileName, objStreamReader);
                 objStreamReader.Close();
+				Logger.LogDebug("<<< Exiting Read(fileName={FileName})", fileName);
                 return strFileContents;
             }
         }

@@ -16,6 +16,7 @@ namespace DotNetNuke.UI.Skins.Controls
     /// <summary>A skin/theme object which allows affecting the styles of the page.</summary>
     public partial class Styles : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IHostSettings hostSettings;
 
         /// <summary>Initializes a new instance of the <see cref="Styles"/> class.</summary>
@@ -23,13 +24,16 @@ namespace DotNetNuke.UI.Skins.Controls
         public Styles()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering Styles()");
         }
+		Logger.LogDebug("<<< Exiting Styles()");
 
         /// <summary>Initializes a new instance of the <see cref="Styles"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
         public Styles(IHostSettings hostSettings)
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("Styles(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
         }
 
         public string Condition { get; set; }
@@ -47,31 +51,39 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             this.AddStyleSheet();
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         protected void AddStyleSheet()
         {
+			Logger.LogDebug(">>> Entering AddStyleSheet()");
             // Find the placeholder control
             Control objCSS = this.Page.FindControl("CSS");
             if (objCSS != null)
+			Logger.LogDebug("AddStyleSheet(): objCSS → {ObjCSS}", objCSS);
             {
                 // First see if we have already added the <LINK> control
                 Control objCtrl = this.Page.Header.FindControl(this.ID);
                 if (objCtrl == null)
+				Logger.LogDebug("AddStyleSheet(): objCtrl → {ObjCtrl}", objCtrl);
                 {
                     string skinpath = string.Empty;
                     if (this.UseSkinPath)
+					Logger.LogDebug("AddStyleSheet(): skinpath → {Skinpath}", skinpath);
                     {
                         skinpath = ((Skin)this.Parent).SkinPath;
                     }
 
                     var objLink = new HtmlLink();
                     objLink.ID = Globals.CreateValidID(this.hostSettings, this.Name);
+					Logger.LogDebug("AddStyleSheet(): objLink → {ObjLink}", objLink);
                     objLink.Attributes["rel"] = "stylesheet";
                     objLink.Attributes["type"] = "text/css";
                     objLink.Href = skinpath + this.StyleSheet;
+					Logger.LogDebug("AddStyleSheet(): objLink.Href → {Arg0}", objLink.Href);
                     if (this.Media != string.Empty)
                     {
                         objLink.Attributes["media"] = this.Media; // NWS: add support for "media" attribute
@@ -97,10 +109,12 @@ namespace DotNetNuke.UI.Skins.Controls
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting AddStyleSheet()");
         }
 
         protected void AddLink(Control cssRoot, int insertAt, HtmlLink link)
         {
+			Logger.LogDebug(">>> Entering AddLink(cssRoot={CssRoot},insertAt={InsertAt},link={Link})", cssRoot, insertAt, link);
             if (string.IsNullOrEmpty(this.Condition))
             {
                 if (insertAt == -1)
@@ -116,8 +130,11 @@ namespace DotNetNuke.UI.Skins.Controls
             {
                 var openif = new Literal();
                 openif.Text = string.Format("<!--[if {0}]>", this.Condition);
+				Logger.LogDebug("AddLink(cssRoot={CssRoot},insertAt={InsertAt},link={Link}): openif → {Openif}", cssRoot, insertAt, link, openif);
                 var closeif = new Literal();
                 closeif.Text = "<![endif]-->";
+				Logger.LogDebug("AddLink(cssRoot={CssRoot},insertAt={InsertAt},link={Link}): closeif → {Closeif}", cssRoot, insertAt, link, closeif);
+				Logger.LogDebug("AddLink(cssRoot={CssRoot},insertAt={InsertAt},link={Link}): closeif.Text → {Arg3}", cssRoot, insertAt, link, closeif.Text);
                 if (insertAt == -1)
                 {
                     cssRoot.Controls.Add(openif);
@@ -133,6 +150,7 @@ namespace DotNetNuke.UI.Skins.Controls
                     cssRoot.Controls.AddAt(insertAt, openif);
                 }
             }
+			Logger.LogDebug("<<< Exiting AddLink(cssRoot={CssRoot},insertAt={InsertAt},link={Link})", cssRoot, insertAt, link);
         }
     }
 }

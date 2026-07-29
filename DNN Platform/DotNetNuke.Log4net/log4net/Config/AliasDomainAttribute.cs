@@ -25,6 +25,7 @@ using System;
 
 namespace log4net.Config
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Assembly level attribute that specifies a domain to alias to this assembly's repository.
     /// </summary>
@@ -64,6 +65,8 @@ namespace log4net.Config
         /// </remarks>
         public AliasDomainAttribute(string name) : base(name)
         {
+		Logger.LogDebug(">>> Entering AliasDomainAttribute(name={Name})", name);
+		Logger.LogDebug("<<< Exiting AliasDomainAttribute(name={Name})", name);
         }
     }
 }

@@ -13,14 +13,21 @@ namespace Dnn.PersonaBar.Themes.Components.DTO
     [DataContract]
     public class ListItemInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public ListItemInfo()
         {
+		Logger.LogDebug(">>> Entering ListItemInfo()");
+		Logger.LogDebug("<<< Exiting ListItemInfo()");
         }
 
         public ListItemInfo(string text, string value)
         {
+			Logger.LogDebug(">>> Entering ListItemInfo(text={Text},value={Value})", text, value);
             this.Text = text;
             this.Value = value;
+			Logger.LogDebug("<<< Exiting ListItemInfo(text={Text},value={Value})", text, value);
+			Logger.LogDebug("ListItemInfo(text={Text},value={Value}): this.Text → {Arg2}", text, value, this.Text);
+			Logger.LogDebug("ListItemInfo(text={Text},value={Value}): this.Value → {Arg2}", text, value, this.Value);
         }
 
         [DataMember(Name = "text")]

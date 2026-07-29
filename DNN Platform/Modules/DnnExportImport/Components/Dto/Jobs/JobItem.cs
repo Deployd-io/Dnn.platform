@@ -15,6 +15,7 @@ namespace Dnn.ExportImport.Components.Dto.Jobs
     [JsonObject]
     public class JobItem : IDateTimeConverter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Gets a formatted string version of <see cref="CreatedOn"/>.</summary>
         public string CreatedOnString => Util.GetDateTimeString(this.CreatedOn);
 
@@ -65,6 +66,7 @@ namespace Dnn.ExportImport.Components.Dto.Jobs
         /// <inheritdoc />
         public void ConvertToLocal(UserInfo userInfo)
         {
+			Logger.LogDebug(">>> Entering ConvertToLocal(userInfo={UserInfo})", userInfo);
             if (userInfo == null)
             {
                 return;
@@ -76,6 +78,7 @@ namespace Dnn.ExportImport.Components.Dto.Jobs
             {
                 this.CompletedOn = Util.ToLocalDateTime(this.CompletedOn.Value, userInfo);
             }
+			Logger.LogDebug("<<< Exiting ConvertToLocal(userInfo={UserInfo})", userInfo);
         }
     }
 }

@@ -8,11 +8,14 @@ namespace DotNetNuke.Services.Exceptions
 
     public class PageLoadException : BasePortalException
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         // default constructor
 
         /// <summary>Initializes a new instance of the <see cref="PageLoadException"/> class.</summary>
         public PageLoadException()
         {
+		Logger.LogDebug(">>> Entering PageLoadException()");
+		Logger.LogDebug("<<< Exiting PageLoadException()");
         }
 
         // constructor with exception message
@@ -22,7 +25,9 @@ namespace DotNetNuke.Services.Exceptions
         public PageLoadException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering PageLoadException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting PageLoadException(message={Message})", message);
 
         // constructor with message and inner exception
 

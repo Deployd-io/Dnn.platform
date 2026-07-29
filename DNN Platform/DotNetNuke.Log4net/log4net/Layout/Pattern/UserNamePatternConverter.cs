@@ -26,6 +26,7 @@ using log4net.Core;
 
 namespace log4net.Layout.Pattern
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Converter to include event user name</summary>
     /// <author>Douglas de la Torre</author>
     /// <author>Nicko Cadell</author>
@@ -36,7 +37,9 @@ namespace log4net.Layout.Pattern
         /// <param name="loggingEvent">the event being logged</param>
         protected override void Convert(TextWriter writer, LoggingEvent loggingEvent)
         {
+			Logger.LogDebug(">>> Entering Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             writer.Write(loggingEvent.UserName);
+			Logger.LogDebug("<<< Exiting Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
     }
 }

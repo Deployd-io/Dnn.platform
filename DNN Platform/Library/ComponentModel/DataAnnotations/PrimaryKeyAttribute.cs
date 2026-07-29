@@ -8,11 +8,16 @@ namespace DotNetNuke.ComponentModel.DataAnnotations
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
     public class PrimaryKeyAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="PrimaryKeyAttribute"/> class.</summary>
         /// <param name="columnName">The name of the column (or a comma-delimited list of column names) of the primary key for the table.</param>
         public PrimaryKeyAttribute(string columnName)
             : this(columnName, columnName)
         {
+		Logger.LogDebug(">>> Entering PrimaryKeyAttribute(columnName={ColumnName})", columnName);
+		Logger.LogDebug("<<< Exiting PrimaryKeyAttribute(columnName={ColumnName})", columnName);
+		Logger.LogDebug(">>> Entering PrimaryKeyAttribute(columnName={ColumnName},propertyName={PropertyName})", columnName, propertyName);
+		Logger.LogDebug("<<< Exiting PrimaryKeyAttribute(columnName={ColumnName},propertyName={PropertyName})", columnName, propertyName);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PrimaryKeyAttribute"/> class.</summary>
@@ -22,7 +27,10 @@ namespace DotNetNuke.ComponentModel.DataAnnotations
         {
             this.ColumnName = columnName;
             this.PropertyName = propertyName;
+			Logger.LogDebug("PrimaryKeyAttribute(columnName={ColumnName},propertyName={PropertyName}): this.ColumnName → {Arg2}", columnName, propertyName, this.ColumnName);
+			Logger.LogDebug("PrimaryKeyAttribute(columnName={ColumnName},propertyName={PropertyName}): this.PropertyName → {Arg2}", columnName, propertyName, this.PropertyName);
             this.AutoIncrement = true;
+			Logger.LogDebug("PrimaryKeyAttribute(columnName={ColumnName},propertyName={PropertyName}): this.AutoIncrement → {Arg2}", columnName, propertyName, this.AutoIncrement);
         }
 
         public bool AutoIncrement { get; set; }

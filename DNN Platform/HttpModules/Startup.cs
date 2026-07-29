@@ -12,9 +12,12 @@ using Microsoft.Extensions.DependencyInjection;
 /// <summary>The <see cref="IDnnStartup"/> for <c>DotNetNuke.HttpModules</c>.</summary>
 public class Startup : IDnnStartup
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public void ConfigureServices(IServiceCollection services)
     {
+		Logger.LogDebug(">>> Entering ConfigureServices(services={Services})", services);
         services.AddScoped<UrlRewriterBase>(serviceProvider => UrlRewriteModule.GetUrlRewriterInstance(serviceProvider));
+		Logger.LogDebug("<<< Exiting ConfigureServices(services={Services})", services);
     }
 }
