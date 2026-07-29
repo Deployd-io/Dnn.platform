@@ -16,31 +16,39 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
     /// </summary>
     internal class CompleteWorkflow : TabActionBase, IWorkflowAction
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Publishes the tab version.
         /// </summary>
         /// <param name="stateTransaction">The state transaction.</param>
         public void DoActionOnStateChanging(StateTransaction stateTransaction)
         {
+			Logger.LogDebug(">>> Entering DoActionOnStateChanging(stateTransaction={StateTransaction})", stateTransaction);
             var tab = GetTab(stateTransaction.ContentItemId);
             if (tab == null)
+			Logger.LogDebug("DoActionOnStateChanging(stateTransaction={StateTransaction}): tab → {Tab}", stateTransaction, tab);
             {
                 return;
             }
 
             TabVersionBuilder.Instance.Publish(tab.PortalID, tab.TabID, stateTransaction.UserId);
+			Logger.LogDebug("<<< Exiting DoActionOnStateChanging(stateTransaction={StateTransaction})", stateTransaction);
         }
 
         /// <inheritdoc />
         public void DoActionOnStateChanged(StateTransaction stateTransaction)
             => RemoveCache(stateTransaction);
+			Logger.LogDebug(">>> Entering DoActionOnStateChanged(stateTransaction={StateTransaction})", stateTransaction);
 
+		Logger.LogDebug("<<< Exiting DoActionOnStateChanged(stateTransaction={StateTransaction})", stateTransaction);
         /// <inheritdoc />
         public ActionMessage GetActionMessage(StateTransaction stateTransaction, WorkflowState currentState)
             => new ActionMessage()
             {
+				Logger.LogDebug(">>> Entering GetActionMessage(stateTransaction={StateTransaction},currentState={CurrentState})", stateTransaction, currentState);
                 Subject = GetString($"{nameof(CompleteWorkflow)}{nameof(ActionMessage.Subject)}", "Page Published"),
                 Body = GetString($"{nameof(CompleteWorkflow)}{nameof(ActionMessage.Body)}", "Page '{0}' has been published and is now live.", GetTab(stateTransaction.ContentItemId).LocalizedTabName),
             };
+				Logger.LogDebug("<<< Exiting GetActionMessage(stateTransaction={StateTransaction},currentState={CurrentState})", stateTransaction, currentState);
     }
 }

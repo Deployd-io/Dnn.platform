@@ -4,6 +4,7 @@
 
 namespace DotNetNuke.Web.Api.Internal
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>The default <see cref="IAntiForgery"/> implementation.</summary>
     internal class AntiForgeryImpl : IAntiForgery
     {
@@ -13,7 +14,9 @@ namespace DotNetNuke.Web.Api.Internal
         /// <inheritdoc />
         public void Validate(string cookieToken, string headerToken)
         {
+			Logger.LogDebug(">>> Entering Validate(cookieToken={CookieToken},headerToken={HeaderToken})", cookieToken, headerToken);
             System.Web.Helpers.AntiForgery.Validate(cookieToken, headerToken);
+			Logger.LogDebug("<<< Exiting Validate(cookieToken={CookieToken},headerToken={HeaderToken})", cookieToken, headerToken);
         }
     }
 }

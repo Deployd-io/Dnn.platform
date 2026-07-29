@@ -17,6 +17,7 @@ namespace Dnn.EditBar.UI.Items
     [Serializable]
     public class ExitEditModeMenu : BaseMenuItem
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override string Name => "ExitEditMode";
 
@@ -41,6 +42,8 @@ namespace Dnn.EditBar.UI.Items
         /// <inheritdoc />
         public override bool Visible()
         {
+			Logger.LogDebug(">>> Entering Visible()");
+			Logger.LogDebug("<<< Exiting Visible()");
             return Personalization.GetUserMode() == PortalSettings.Mode.Edit;
         }
     }

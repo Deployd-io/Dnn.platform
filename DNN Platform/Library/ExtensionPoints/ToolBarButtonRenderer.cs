@@ -14,15 +14,19 @@ namespace DotNetNuke.ExtensionPoints
 
     public class ToolBarButtonRenderer : IExtensionControlRenderer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public string GetOutput(IExtensionPoint extensionPoint)
         {
+			Logger.LogDebug(">>> Entering GetOutput(extensionPoint={ExtensionPoint})", extensionPoint);
             var extension = (IToolBarButtonExtensionPoint)extensionPoint;
 
+			Logger.LogDebug("GetOutput(extensionPoint={ExtensionPoint}): extension → {Extension}", extensionPoint, extension);
             var cssClass = extension.CssClass;
             var action = extension.Action;
             if (!extension.Enabled)
+			Logger.LogDebug("GetOutput(extensionPoint={ExtensionPoint}): action → {Action}", extensionPoint, action);
             {
                 cssClass += " disabled";
                 action = "void(0);";
@@ -30,6 +34,7 @@ namespace DotNetNuke.ExtensionPoints
 
             var icon = extension.Icon;
             if (icon.StartsWith("~/", StringComparison.Ordinal))
+			Logger.LogDebug("GetOutput(extensionPoint={ExtensionPoint}): icon → {Icon}", extensionPoint, icon);
             {
                 icon = Globals.ResolveUrl(icon);
             }
@@ -42,6 +47,7 @@ namespace DotNetNuke.ExtensionPoints
                 cssClass,
                 HttpUtility.HtmlAttributeEncode($"{action}; return false;"),
                 extension.Text);
+				Logger.LogDebug("GetOutput(extensionPoint={ExtensionPoint}): str → {Str}", extensionPoint, str);
 
             str.AppendFormat(
                 CultureInfo.InvariantCulture,
@@ -53,6 +59,7 @@ namespace DotNetNuke.ExtensionPoints
 
             str.AppendLine("</button>");
 
+			Logger.LogDebug("<<< Exiting GetOutput(extensionPoint={ExtensionPoint})", extensionPoint);
             return str.ToString();
         }
     }

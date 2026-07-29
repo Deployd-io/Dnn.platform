@@ -24,10 +24,15 @@ namespace DotNetNuke.Services.Installer.Log
         /// <summary>Initializes a new instance of the <see cref="Logger"/> class.</summary>
         public Logger()
         {
+			DnnLogger.LogDebug(">>> Entering Logger()");
             this.logs = new List<LogEntry>();
 
+			DnnLogger.LogDebug("Logger(): logs → {Logs}", logs);
             this.valid = true;
+			DnnLogger.LogDebug("Logger(): this.valid → {Arg0}", this.valid);
             this.hasWarnings = Null.NullBoolean;
+			DnnLogger.LogDebug("<<< Exiting Logger()");
+			DnnLogger.LogDebug("Logger(): this.hasWarnings → {Arg0}", this.hasWarnings);
         }
 
         public bool HasWarnings
@@ -118,54 +123,72 @@ namespace DotNetNuke.Services.Installer.Log
         /// <param name="failure">The description of the LogEntry.</param>
         public void AddFailure(string failure)
         {
+			DnnLogger.LogDebug(">>> Entering AddFailure(failure={Failure})", failure);
             this.logs.Add(new LogEntry(LogType.Failure, failure));
             DnnLogger.Error(failure);
             this.valid = false;
+			DnnLogger.LogDebug("<<< Exiting AddFailure(failure={Failure})", failure);
+			DnnLogger.LogDebug("AddFailure(failure={Failure}): this.valid → {Arg1}", failure, this.valid);
         }
 
         public void AddFailure(Exception ex)
         {
+			DnnLogger.LogDebug(">>> Entering AddFailure(ex={Ex})", ex);
             this.AddFailure(Util.EXCEPTION + ex);
             Exceptions.Exceptions.LogException(ex);
+			DnnLogger.LogDebug("<<< Exiting AddFailure(ex={Ex})", ex);
         }
 
         /// <summary>The AddInfo method adds a new LogEntry of type Info to the Logs collection.</summary>
         /// <param name="info">The description of the LogEntry.</param>
         public void AddInfo(string info)
         {
+			DnnLogger.LogDebug(">>> Entering AddInfo(info={Info})", info);
             this.logs.Add(new LogEntry(LogType.Info, info));
             DnnLogger.Info(info);
+			DnnLogger.LogDebug("<<< Exiting AddInfo(info={Info})", info);
         }
 
         /// <summary>The AddWarning method adds a new LogEntry of type Warning to the Logs collection.</summary>
         /// <param name="warning">The description of the LogEntry.</param>
         public void AddWarning(string warning)
         {
+			DnnLogger.LogDebug(">>> Entering AddWarning(warning={Warning})", warning);
             this.logs.Add(new LogEntry(LogType.Warning, warning));
             DnnLogger.Warn(warning);
             this.hasWarnings = true;
+			DnnLogger.LogDebug("<<< Exiting AddWarning(warning={Warning})", warning);
+			DnnLogger.LogDebug("AddWarning(warning={Warning}): this.hasWarnings → {Arg1}", warning, this.hasWarnings);
         }
 
         /// <summary>The EndJob method adds a new LogEntry of type EndJob to the Logs collection.</summary>
         /// <param name="job">The description of the LogEntry.</param>
         public void EndJob(string job)
         {
+			DnnLogger.LogDebug(">>> Entering EndJob(job={Job})", job);
             this.logs.Add(new LogEntry(LogType.EndJob, job));
             DnnLogger.Info(job);
+			DnnLogger.LogDebug("<<< Exiting EndJob(job={Job})", job);
         }
 
         /// <summary>GetLogsTable formats log entries in an HtmlTable.</summary>
         /// <returns>An <see cref="HtmlTable"/> instance.</returns>
         public HtmlTable GetLogsTable()
         {
+			DnnLogger.LogDebug(">>> Entering GetLogsTable()");
             var arrayTable = new HtmlTable();
             foreach (LogEntry entry in this.Logs)
             {
+			DnnLogger.LogDebug("GetLogsTable(): arrayTable → {ArrayTable}", arrayTable);
                 var tr = new HtmlTableRow();
                 var tdType = new HtmlTableCell();
+				DnnLogger.LogDebug("GetLogsTable(): tr → {Tr}", tr);
+				DnnLogger.LogDebug("GetLogsTable(): tdType → {TdType}", tdType);
                 tdType.InnerText = Util.GetLocalizedString("LOG.PALogger." + entry.Type);
                 var tdDescription = new HtmlTableCell();
                 tdDescription.InnerText = entry.Description;
+				DnnLogger.LogDebug("GetLogsTable(): tdDescription → {TdDescription}", tdDescription);
+				DnnLogger.LogDebug("GetLogsTable(): tdDescription.InnerText → {Arg0}", tdDescription.InnerText);
                 tr.Cells.Add(tdType);
                 tr.Cells.Add(tdDescription);
                 switch (entry.Type)
@@ -191,24 +214,31 @@ namespace DotNetNuke.Services.Installer.Log
                 {
                     var spaceTR = new HtmlTableRow();
                     spaceTR.Cells.Add(new HtmlTableCell { ColSpan = 2, InnerHtml = "&nbsp;" });
+					DnnLogger.LogDebug("GetLogsTable(): spaceTR → {SpaceTR}", spaceTR);
                     arrayTable.Rows.Add(spaceTR);
                 }
             }
 
+			DnnLogger.LogDebug("<<< Exiting GetLogsTable()");
             return arrayTable;
         }
 
         public void ResetFlags()
         {
+			DnnLogger.LogDebug(">>> Entering ResetFlags()");
             this.valid = true;
+			DnnLogger.LogDebug("<<< Exiting ResetFlags()");
+			DnnLogger.LogDebug("ResetFlags(): this.valid → {Arg0}", this.valid);
         }
 
         /// <summary>The StartJob method adds a new LogEntry of type StartJob to the Logs collection.</summary>
         /// <param name="job">The description of the LogEntry.</param>
         public void StartJob(string job)
         {
+			DnnLogger.LogDebug(">>> Entering StartJob(job={Job})", job);
             this.logs.Add(new LogEntry(LogType.StartJob, job));
             DnnLogger.Info(job);
+			DnnLogger.LogDebug("<<< Exiting StartJob(job={Job})", job);
         }
     }
 }

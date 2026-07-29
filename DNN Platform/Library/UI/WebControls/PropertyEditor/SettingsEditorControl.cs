@@ -17,12 +17,15 @@ namespace DotNetNuke.UI.WebControls
     [ToolboxData("<{0}:SettingsEditorControl runat=server></{0}:SettingsEditorControl>")]
     public class SettingsEditorControl : PropertyEditorControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="SettingsEditorControl"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.0.0. Please use overload with IServiceProvider. Scheduled removal in v12.0.0.")]
         public SettingsEditorControl()
             : this(Globals.GetCurrentServiceProvider())
         {
+		Logger.LogDebug(">>> Entering SettingsEditorControl()");
         }
+		Logger.LogDebug("<<< Exiting SettingsEditorControl()");
 
         /// <summary>Initializes a new instance of the <see cref="SettingsEditorControl"/> class.</summary>
         /// <param name="serviceProvider">The DI container.</param>
@@ -53,15 +56,21 @@ namespace DotNetNuke.UI.WebControls
         /// <inheritdoc />
         protected override void AddEditorRow(Table table, object obj)
         {
+			Logger.LogDebug(">>> Entering AddEditorRow(table={Table},obj={Obj})", table, obj);
             var info = (SettingInfo)obj;
             this.AddEditorRow(table, info.Name, new SettingsEditorInfoAdapter(this.DataSource, obj, this.ID));
+			Logger.LogDebug("<<< Exiting AddEditorRow(table={Table},obj={Obj})", table, obj);
         }
 
         /// <inheritdoc />
         protected override void AddEditorRow(Panel container, object obj)
         {
+			Logger.LogDebug(">>> Entering AddEditorRow(container={Container},obj={Obj})", container, obj);
             var info = (SettingInfo)obj;
             this.AddEditorRow(container, info.Name, new SettingsEditorInfoAdapter(this.DataSource, obj, this.ID));
+			Logger.LogDebug("<<< Exiting AddEditorRow(container={Container},obj={Obj})", container, obj);
+			Logger.LogDebug(">>> Entering AddEditorRow(obj={Obj})", obj);
+			Logger.LogDebug("<<< Exiting AddEditorRow(obj={Obj})", obj);
         }
 
         /// <inheritdoc />
@@ -76,26 +85,35 @@ namespace DotNetNuke.UI.WebControls
         /// <returns><see langword="true"/> if the row is visible, otherwise <see langword="false"/>.</returns>
         protected override bool GetRowVisibility(object obj)
         {
+			Logger.LogDebug(">>> Entering GetRowVisibility(obj={Obj})", obj);
             var info = (SettingInfo)obj;
             var isVisible = true;
+			Logger.LogDebug("GetRowVisibility(obj={Obj}): info → {Info}", obj, info);
+			Logger.LogDebug("GetRowVisibility(obj={Obj}): isVisible → {IsVisible}", obj, isVisible);
             if (this.Visibility?[info.Name] != null)
             {
                 isVisible = Convert.ToBoolean(this.Visibility[info.Name], CultureInfo.InvariantCulture);
             }
 
+			Logger.LogDebug("<<< Exiting GetRowVisibility(obj={Obj})", obj);
             return isVisible;
         }
 
         /// <summary>GetSettings converts the DataSource into an ArrayList (IEnumerable).</summary>
         private ArrayList GetSettings()
         {
+			Logger.LogDebug(">>> Entering GetSettings()");
             var settings = (Hashtable)this.DataSource;
             var arrSettings = new ArrayList();
+			Logger.LogDebug("GetSettings(): settings → {Settings}", settings);
+			Logger.LogDebug("GetSettings(): arrSettings → {ArrSettings}", arrSettings);
             var settingsEnumerator = settings.GetEnumerator();
             while (settingsEnumerator.MoveNext())
+			Logger.LogDebug("GetSettings(): settingsEnumerator → {SettingsEnumerator}", settingsEnumerator);
             {
                 var info = new SettingInfo(settingsEnumerator.Key, settingsEnumerator.Value);
                 if (this.CustomEditors?[settingsEnumerator.Key] != null)
+				Logger.LogDebug("GetSettings(): info → {Info}", info);
                 {
                     info.Editor = Convert.ToString(this.CustomEditors[settingsEnumerator.Key], CultureInfo.InvariantCulture);
                 }
@@ -104,6 +122,7 @@ namespace DotNetNuke.UI.WebControls
             }
 
             arrSettings.Sort(new SettingNameComparer());
+			Logger.LogDebug("<<< Exiting GetSettings()");
             return arrSettings;
         }
     }

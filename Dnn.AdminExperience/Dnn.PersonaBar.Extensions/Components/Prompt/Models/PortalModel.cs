@@ -10,8 +10,11 @@ namespace Dnn.PersonaBar.Prompt.Components.Models
 
     public class PortalModel : PortalModelBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public PortalModel()
         {
+		Logger.LogDebug(">>> Entering PortalModel()");
+		Logger.LogDebug("<<< Exiting PortalModel()");
         }
 
         public PortalModel(PortalInfo portal)
@@ -20,6 +23,8 @@ namespace Dnn.PersonaBar.Prompt.Components.Models
             // get portal settings for specified portal
             var ps = new PortalSettings(portal);
             this.CdfVersion = ps.CdfVersion;
+			Logger.LogDebug("PortalModel(portal={Portal}): ps → {Ps}", portal, ps);
+			Logger.LogDebug("PortalModel(portal={Portal}): this.CdfVersion → {Arg1}", portal, this.CdfVersion);
             this.SiteTheme = Utilities.FormatSkinName(ps.DefaultPortalSkin);
             this.AdminTheme = Utilities.FormatSkinName(ps.DefaultAdminSkin);
             this.Container = Utilities.FormatContainerName(ps.DefaultPortalContainer);

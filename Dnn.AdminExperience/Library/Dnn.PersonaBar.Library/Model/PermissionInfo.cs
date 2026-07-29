@@ -16,6 +16,7 @@ namespace Dnn.PersonaBar.Library.Model
     [Serializable]
     public class PermissionInfo : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [XmlElement("permissionId")]
         public int PermissionId { get; set; }
 
@@ -49,12 +50,14 @@ namespace Dnn.PersonaBar.Library.Model
         /// <param name="dr">The Data Reader to use.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.FillInternal(dr);
 
             this.PermissionId = Null.SetNullInteger(dr["PermissionId"]);
             this.MenuId = Null.SetNullInteger(dr["MenuId"]);
             this.PermissionKey = Null.SetNullString(dr["PermissionKey"]);
             this.PermissionName = Null.SetNullString(dr["PermissionName"]);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

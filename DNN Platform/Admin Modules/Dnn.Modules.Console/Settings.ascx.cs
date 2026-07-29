@@ -28,6 +28,7 @@ namespace Dnn.Modules.Console
         /// <inheritdoc />
         public override void LoadSettings()
         {
+			Logger.LogDebug(">>> Entering LoadSettings()");
             try
             {
                 if (this.Page.IsPostBack == false)
@@ -36,6 +37,7 @@ namespace Dnn.Modules.Console
                     {
                         var tabId = Convert.ToInt32(this.Settings["ParentTabId"]);
                         this.ParentTab.SelectedPage = TabController.Instance.GetTab(tabId, this.PortalId);
+						Logger.LogDebug("LoadSettings(): tabId → {TabId}", tabId);
                     }
 
                     foreach (string val in ConsoleController.GetSizeValues())
@@ -93,18 +95,22 @@ namespace Dnn.Modules.Console
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in LoadSettings(): {Arg0}", ex.Message);
                 Exceptions.ProcessModuleLoadException(this, ex);
             }
+			Logger.LogDebug("<<< Exiting LoadSettings()");
         }
 
         /// <inheritdoc />
         public override void UpdateSettings()
         {
+			Logger.LogDebug(">>> Entering UpdateSettings()");
             try
             {
                 // validate console width value
                 var width = string.Empty;
                 if (this.ConsoleWidth.Text.Trim().Length > 0)
+				Logger.LogDebug("UpdateSettings(): width → {Width}", width);
                 {
                     try
                     {
@@ -144,27 +150,34 @@ namespace Dnn.Modules.Console
                     {
                         var tabPath = (item.FindControl("tabPath") as HiddenField).Value;
                         var visibility = (item.FindControl("tabVisibility") as DnnComboBox).SelectedValue;
+						Logger.LogDebug("UpdateSettings(): tabPath → {TabPath}", tabPath);
+						Logger.LogDebug("UpdateSettings(): visibility → {Visibility}", visibility);
 
                         var key = string.Format("TabVisibility{0}", tabPath.Replace("//", "-"));
                         ModuleController.Instance.UpdateModuleSetting(this.ModuleId, key, visibility);
+						Logger.LogWarning("UpdateSettings(): key → {Key}", key);
                     }
                 }
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in UpdateSettings(): {Arg0}", ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting UpdateSettings()");
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.tabs.ItemDataBound += this.TabsItemDataBound;
             this.modeList.SelectedIndexChanged += this.ModeListSelectedIndexChanged;
 
             this.ParentTab.UndefinedItem = new ListItem(DynamicSharedConstants.Unspecified, string.Empty);
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         private void BindTabs(int tabId, bool includeParent)
@@ -213,8 +226,10 @@ namespace Dnn.Modules.Console
 
         private void SwitchMode()
         {
+			Logger.LogDebug(">>> Entering SwitchMode()");
             int parentTabId = -1;
             if (this.Settings.ContainsKey("ParentTabID") && !string.IsNullOrEmpty(Convert.ToString(this.Settings["ParentTabID"])))
+			Logger.LogDebug("SwitchMode(): parentTabId → {ParentTabId}", parentTabId);
             {
                 parentTabId = Convert.ToInt32(this.Settings["ParentTabID"]);
             }
@@ -241,22 +256,30 @@ namespace Dnn.Modules.Console
 
             this.ParentTab.SelectedPage = TabController.Instance.GetTab(parentTabId, this.PortalId);
             this.BindTabs(parentTabId, this.IncludeParent.Checked);
+			Logger.LogDebug("<<< Exiting SwitchMode()");
         }
 
         private void ModeListSelectedIndexChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering ModeListSelectedIndexChanged(sender={Sender},e={E})", sender, e);
             this.SwitchMode();
+			Logger.LogDebug("<<< Exiting ModeListSelectedIndexChanged(sender={Sender},e={E})", sender, e);
         }
 
         private void TabsItemDataBound(object sender, RepeaterItemEventArgs e)
         {
+			Logger.LogDebug(">>> Entering TabsItemDataBound(sender={Sender},e={E})", sender, e);
             if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
             {
                 var tab = (TabInfo)e.Item.DataItem;
                 DnnComboBox visibilityDropDown = (DnnComboBox)e.Item.FindControl("tabVisibility");
+				Logger.LogDebug("TabsItemDataBound(sender={Sender},e={E}): tab → {Tab}", sender, e, tab);
+				Logger.LogDebug("TabsItemDataBound(sender={Sender},e={E}): visibilityDropDown → {VisibilityDropDown}", sender, e, visibilityDropDown);
 
                 var tabLabel = (Label)e.Item.FindControl("tabLabel");
                 var tabPathField = (HiddenField)e.Item.FindControl("tabPath");
+				Logger.LogDebug("TabsItemDataBound(sender={Sender},e={E}): tabLabel → {TabLabel}", sender, e, tabLabel);
+				Logger.LogDebug("TabsItemDataBound(sender={Sender},e={E}): tabPathField → {TabPathField}", sender, e, tabPathField);
 
                 visibilityDropDown.Items.Clear();
 
@@ -273,11 +296,15 @@ namespace Dnn.Modules.Console
                 }
 
                 tabLabel.Text = tab.TabName;
+				Logger.LogDebug("TabsItemDataBound(sender={Sender},e={E}): tabLabel.Text → {Arg2}", sender, e, tabLabel.Text);
+				Logger.LogDebug("TabsItemDataBound(sender={Sender},e={E}): tabPathField.Value → {Arg2}", sender, e, tabPathField.Value);
                 tabPathField.Value = tab.TabPath;
 
                 var key = string.Format("TabVisibility{0}", tab.TabPath.Replace("//", "-"));
                 this.SelectDropDownListItem(ref visibilityDropDown, key);
+				Logger.LogWarning("TabsItemDataBound(sender={Sender},e={E}): key → {Key}", sender, e, key);
             }
+			Logger.LogDebug("<<< Exiting TabsItemDataBound(sender={Sender},e={E})", sender, e);
         }
 
         private void SelectDropDownListItem(ref DnnComboBox ddl, string key)

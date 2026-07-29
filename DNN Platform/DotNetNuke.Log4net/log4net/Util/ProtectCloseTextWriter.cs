@@ -36,6 +36,7 @@ namespace log4net.Util
     /// <author>Nicko Cadell</author>
     public class ProtectCloseTextWriter : TextWriterAdapter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Constructor</summary>
         /// <param name="writer">the writer to actually write to</param>
         /// <remarks>
@@ -45,6 +46,8 @@ namespace log4net.Util
         /// </remarks>
         public ProtectCloseTextWriter(TextWriter writer) : base(writer)
         {
+		Logger.LogDebug(">>> Entering ProtectCloseTextWriter(writer={Writer})", writer);
+		Logger.LogDebug("<<< Exiting ProtectCloseTextWriter(writer={Writer})", writer);
         }
 
         /// <summary>Attach this instance to a different underlying <see cref="TextWriter"/></summary>
@@ -56,7 +59,10 @@ namespace log4net.Util
         /// </remarks>
         public void Attach(TextWriter writer)
         {
+			Logger.LogDebug(">>> Entering Attach(writer={Writer})", writer);
             this.Writer = writer;
+			Logger.LogDebug("<<< Exiting Attach(writer={Writer})", writer);
+			Logger.LogDebug("Attach(writer={Writer}): this.Writer → {Arg1}", writer, this.Writer);
         }
 
         /// <summary>Does not close the underlying output writer.</summary>
@@ -68,7 +74,9 @@ namespace log4net.Util
         /// </remarks>
         public override void Close()
         {
+			Logger.LogDebug(">>> Entering Close()");
             // do nothing
+			Logger.LogDebug("<<< Exiting Close()");
         }
     }
 }

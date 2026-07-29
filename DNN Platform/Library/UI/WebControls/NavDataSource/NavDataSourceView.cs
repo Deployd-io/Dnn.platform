@@ -9,15 +9,18 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>The NavDataSourceView class encapsulates the capabilities of the NavDataSource data source control.</summary>
     public class NavDataSourceView : HierarchicalDataSourceView
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly string sKey;
 
         /// <summary>Initializes a new instance of the <see cref="NavDataSourceView"/> class.</summary>
         /// <param name="viewPath">The view path by which to filter nav nodes.</param>
         public NavDataSourceView(string viewPath)
         {
+			Logger.LogDebug(">>> Entering NavDataSourceView(viewPath={ViewPath})", viewPath);
             if (string.IsNullOrEmpty(viewPath))
             {
                 this.sKey = string.Empty;
+				Logger.LogDebug("NavDataSourceView(viewPath={ViewPath}): this.sKey → {Arg1}", viewPath, this.sKey);
             }
             else if (viewPath.IndexOf(@"\", StringComparison.Ordinal) > -1)
             {
@@ -27,6 +30,7 @@ namespace DotNetNuke.UI.WebControls
             {
                 this.sKey = viewPath;
             }
+			Logger.LogDebug("<<< Exiting NavDataSourceView(viewPath={ViewPath})", viewPath);
         }
 
         public string Namespace { get; set; } = "MyNS";
@@ -40,9 +44,12 @@ namespace DotNetNuke.UI.WebControls
         /// <returns>A collection of navigation nodes.</returns>
         public override IHierarchicalEnumerable Select()
         {
+			Logger.LogDebug(">>> Entering Select()");
             var objPages = new NavDataPageHierarchicalEnumerable();
             DNNNodeCollection objNodes;
+			Logger.LogDebug("Select(): objPages → {ObjPages}", objPages);
             objNodes = Navigation.GetNavigationNodes(this.Namespace);
+			Logger.LogDebug("Select(): objNodes → {ObjNodes}", objNodes);
             if (!string.IsNullOrEmpty(this.sKey))
             {
                 objNodes = objNodes.FindNodeByKey(this.sKey).DNNNodes;
@@ -53,6 +60,7 @@ namespace DotNetNuke.UI.WebControls
                 objPages.Add(new NavDataPageHierarchyData(objNode));
             }
 
+			Logger.LogDebug("<<< Exiting Select()");
             return objPages;
         }
     }

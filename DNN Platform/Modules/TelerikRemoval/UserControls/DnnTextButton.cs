@@ -17,12 +17,15 @@ namespace Dnn.Modules.TelerikRemoval.UserControls
     /// <summary>A simple wrapper around <see cref="DnnButton"/> to implement <see cref="ITextControl"/>.</summary>
     public class DnnTextButton : DnnButton, ITextControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="DnnTextButton"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IClientResourceController. Scheduled removal in v12.0.0.")]
         public DnnTextButton()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering DnnTextButton()");
         }
+		Logger.LogDebug("<<< Exiting DnnTextButton()");
 
         /// <summary>Initializes a new instance of the <see cref="DnnTextButton"/> class.</summary>
         /// <param name="clientResourceController">The client resource controller.</param>

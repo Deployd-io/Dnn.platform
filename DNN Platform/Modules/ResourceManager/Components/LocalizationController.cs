@@ -22,6 +22,7 @@ namespace Dnn.Modules.ResourceManager.Components
     /// <summary>Provides localization services.</summary>
     public class LocalizationController : ServiceLocator<ILocalizationController, LocalizationController>, ILocalizationController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public string CultureName => Instance.CultureName;
 
@@ -40,6 +41,8 @@ namespace Dnn.Modules.ResourceManager.Components
         /// <inheritdoc />
         protected override Func<ILocalizationController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new LocalizationControllerImplementation();
         }
 
@@ -58,6 +61,8 @@ namespace Dnn.Modules.ResourceManager.Components
             /// <inheritdoc />
             public long GetResxTimeStamp(string resourceFile, Localization localization)
             {
+				Logger.LogDebug(">>> Entering GetResxTimeStamp(resourceFile={ResourceFile},localization={Localization})", resourceFile, localization);
+				Logger.LogDebug("<<< Exiting GetResxTimeStamp(resourceFile={ResourceFile},localization={Localization})", resourceFile, localization);
                 return this.GetLastModifiedTime(resourceFile, this.CultureName, localization).Ticks;
             }
 
@@ -129,15 +134,18 @@ namespace Dnn.Modules.ResourceManager.Components
 
             private static string GetNameAttribute(XmlNode node)
             {
+				Logger.LogDebug(">>> Entering GetNameAttribute(node={Node})", node);
                 if (node.Attributes != null)
                 {
                     var attribute = node.Attributes.GetNamedItem("name");
                     if (attribute != null)
+					Logger.LogDebug("GetNameAttribute(node={Node}): attribute → {Attribute}", node, attribute);
                     {
                         return attribute.Value;
                     }
                 }
 
+				Logger.LogDebug("<<< Exiting GetNameAttribute(node={Node})", node);
                 return null;
             }
 
@@ -206,10 +214,13 @@ namespace Dnn.Modules.ResourceManager.Components
 
             private DateTime GetLastModifiedTime(string resourceFile, string culture, Localization localization)
             {
+				Logger.LogDebug(">>> Entering GetLastModifiedTime(resourceFile={ResourceFile},culture={Culture},localization={Localization})", resourceFile, culture, localization);
                 Requires.NotNullOrEmpty("culture", culture);
 
                 var cacheKey = string.Format(CultureInfo.CurrentCulture, localization.ResxModifiedDateCacheKey, culture);
                 var cachedData = DataCache.GetCache(cacheKey);
+				Logger.LogDebug("GetLastModifiedTime(resourceFile={ResourceFile},culture={Culture},localization={Localization}): cacheKey → {CacheKey}", resourceFile, culture, localization, cacheKey);
+				Logger.LogDebug("GetLastModifiedTime(resourceFile={ResourceFile},culture={Culture},localization={Localization}): cachedData → {CachedData}", resourceFile, culture, localization, cachedData);
                 if (cachedData is DateTime)
                 {
                     return (DateTime)DataCache.GetCache(cacheKey);
@@ -217,6 +228,7 @@ namespace Dnn.Modules.ResourceManager.Components
 
                 var lastModifiedDate = this.GetLastModifiedTimeInternal(resourceFile, culture);
 
+				Logger.LogDebug("GetLastModifiedTime(resourceFile={ResourceFile},culture={Culture},localization={Localization}): lastModifiedDate → {LastModifiedDate}", resourceFile, culture, localization, lastModifiedDate);
                 DataCache.SetCache(
                     cacheKey,
                     lastModifiedDate,
@@ -226,15 +238,18 @@ namespace Dnn.Modules.ResourceManager.Components
                     CacheItemPriority.Normal,
                     null);
 
+				Logger.LogDebug("<<< Exiting GetLastModifiedTime(resourceFile={ResourceFile},culture={Culture},localization={Localization})", resourceFile, culture, localization);
                 return lastModifiedDate;
             }
 
             private DateTime GetLastModifiedTimeInternal(string resourceFile, string culture)
             {
+				Logger.LogDebug(">>> Entering GetLastModifiedTimeInternal(resourceFile={ResourceFile},culture={Culture})", resourceFile, culture);
                 var cultureSpecificFile = System.Web.HttpContext.Current.Server.MapPath(
                     resourceFile.Replace(".resx", string.Empty) + "." + culture + ".resx");
                 var lastModifiedDate = DateTime.MinValue;
 
+				Logger.LogDebug("GetLastModifiedTimeInternal(resourceFile={ResourceFile},culture={Culture}): lastModifiedDate → {LastModifiedDate}", resourceFile, culture, lastModifiedDate);
                 if (File.Exists(cultureSpecificFile))
                 {
                     lastModifiedDate = File.GetLastWriteTime(cultureSpecificFile);
@@ -243,11 +258,13 @@ namespace Dnn.Modules.ResourceManager.Components
                 {
                     var cultureNeutralFile = System.Web.HttpContext.Current.Server.MapPath(resourceFile);
                     if (File.Exists(cultureNeutralFile))
+					Logger.LogDebug("GetLastModifiedTimeInternal(resourceFile={ResourceFile},culture={Culture}): cultureNeutralFile → {CultureNeutralFile}", resourceFile, culture, cultureNeutralFile);
                     {
                         lastModifiedDate = File.GetLastWriteTime(cultureNeutralFile);
                     }
                 }
 
+				Logger.LogDebug("<<< Exiting GetLastModifiedTimeInternal(resourceFile={ResourceFile},culture={Culture})", resourceFile, culture);
                 return lastModifiedDate;
             }
         }

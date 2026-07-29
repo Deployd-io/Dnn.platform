@@ -23,6 +23,7 @@ namespace DotNetNuke.Tests.Core.Services.Mobile
     [TestFixture]
     public class PreviewProfileControllerTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private Mock<DataProvider> dataProvider;
         private FakeServiceProvider serviceProvider;
 
@@ -31,15 +32,19 @@ namespace DotNetNuke.Tests.Core.Services.Mobile
         [SetUp]
         public void SetUp()
         {
+			Logger.LogDebug(">>> Entering SetUp()");
             ComponentFactory.Container = new SimpleContainer();
             this.dataProvider = MockComponentProvider.CreateDataProvider();
+			Logger.LogDebug("SetUp(): dataProvider → {DataProvider}", dataProvider);
             this.dataProvider.Setup(d => d.GetProviderPath()).Returns(string.Empty);
             MockComponentProvider.CreateDataCacheProvider();
             MockComponentProvider.CreateEventLogController();
 
             this.dtProfiles = new DataTable("PreviewProfiles");
+			Logger.LogDebug("SetUp(): dtProfiles → {DtProfiles}", dtProfiles);
             var pkCol = this.dtProfiles.Columns.Add("Id", typeof(int));
             this.dtProfiles.Columns.Add("PortalId", typeof(int));
+			Logger.LogDebug("SetUp(): pkCol → {PkCol}", pkCol);
             this.dtProfiles.Columns.Add("Name", typeof(string));
             this.dtProfiles.Columns.Add("Width", typeof(int));
             this.dtProfiles.Columns.Add("Height", typeof(int));
@@ -66,6 +71,7 @@ namespace DotNetNuke.Tests.Core.Services.Mobile
                                                                     {
                                                                         id = 1;
                                                                     }
+																	Logger.LogDebug("SetUp(): id → {Id}", id);
                                                                     else
                                                                     {
                                                                         id = Convert.ToInt32(this.dtProfiles.Select(string.Empty, "Id Desc")[0]["Id"]) + 1;
@@ -86,6 +92,7 @@ namespace DotNetNuke.Tests.Core.Services.Mobile
                                                                 {
                                                                     var rows = this.dtProfiles.Select("Id = " + id);
                                                                     if (rows.Length == 1)
+																	Logger.LogDebug("SetUp(): rows → {Rows}", rows);
                                                                     {
                                                                         var row = rows[0];
 
@@ -113,74 +120,94 @@ namespace DotNetNuke.Tests.Core.Services.Mobile
             this.serviceProvider = FakeServiceProvider.Setup(
                 services =>
                 {
+				Logger.LogDebug("SetUp(): serviceProvider → {ServiceProvider}", serviceProvider);
+				Logger.LogDebug("SetUp(): services → {Services}", services);
                     services.AddSingleton(this.dataProvider.Object);
                     services.AddSingleton(Mock.Of<IPortalController>());
                 });
+				Logger.LogDebug("<<< Exiting SetUp()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			Logger.LogDebug(">>> Entering TearDown()");
             this.serviceProvider.Dispose();
             this.dtProfiles?.Dispose();
+			Logger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void PreviewProfileController_Save_Valid_Profile()
         {
+			Logger.LogDebug(">>> Entering PreviewProfileController_Save_Valid_Profile()");
             var profile = new PreviewProfile { Name = "Test R", PortalId = 0, Width = 800, Height = 480 };
             new PreviewProfileController().Save(profile);
+			Logger.LogDebug("PreviewProfileController_Save_Valid_Profile(): profile → {Profile}", profile);
 
             var dataReader = this.dataProvider.Object.GetPreviewProfiles(0);
             var affectedCount = 0;
+			Logger.LogDebug("PreviewProfileController_Save_Valid_Profile(): dataReader → {DataReader}", dataReader);
             while (dataReader.Read())
             {
                 affectedCount++;
             }
 
             Assert.That(affectedCount, Is.EqualTo(1));
+			Logger.LogDebug("<<< Exiting PreviewProfileController_Save_Valid_Profile()");
         }
 
         [Test]
         public void PreviewProfileController_GetProfilesByPortal_With_Valid_PortalID()
         {
+			Logger.LogDebug(">>> Entering PreviewProfileController_GetProfilesByPortal_With_Valid_PortalID()");
             this.PrepareData();
 
             IList<IPreviewProfile> list = new PreviewProfileController().GetProfilesByPortal(0);
 
+			Logger.LogDebug("PreviewProfileController_GetProfilesByPortal_With_Valid_PortalID(): list → {List}", list);
             Assert.That(list, Has.Count.EqualTo(3));
+			Logger.LogDebug("<<< Exiting PreviewProfileController_GetProfilesByPortal_With_Valid_PortalID()");
         }
 
         [Test]
         public void PreviewProfileController_Delete_With_ValidID()
         {
+			Logger.LogDebug(">>> Entering PreviewProfileController_Delete_With_ValidID()");
             this.PrepareData();
             new PreviewProfileController().Delete(0, 1);
 
             IList<IPreviewProfile> list = new PreviewProfileController().GetProfilesByPortal(0);
 
+			Logger.LogDebug("PreviewProfileController_Delete_With_ValidID(): list → {List}", list);
             Assert.That(list, Has.Count.EqualTo(2));
+			Logger.LogDebug("<<< Exiting PreviewProfileController_Delete_With_ValidID()");
         }
 
         private IDataReader GetProfilesCallBack(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetProfilesCallBack(portalId={PortalId})", portalId);
             var dtCheck = this.dtProfiles.Clone();
             foreach (var row in this.dtProfiles.Select("PortalId = " + portalId))
             {
+			Logger.LogDebug("GetProfilesCallBack(portalId={PortalId}): dtCheck → {DtCheck}", portalId, dtCheck);
                 dtCheck.Rows.Add(row.ItemArray);
             }
 
+			Logger.LogDebug("<<< Exiting GetProfilesCallBack(portalId={PortalId})", portalId);
             return dtCheck.CreateDataReader();
         }
 
         private void PrepareData()
         {
+			Logger.LogDebug(">>> Entering PrepareData()");
             this.dtProfiles.Rows.Add(1, 0, "R1", 640, 480, string.Empty, 1);
             this.dtProfiles.Rows.Add(2, 0, "R2", 640, 480, string.Empty, 2);
             this.dtProfiles.Rows.Add(3, 0, "R3", 640, 480, string.Empty, 3);
             this.dtProfiles.Rows.Add(4, 1, "R4", 640, 480, string.Empty, 4);
             this.dtProfiles.Rows.Add(5, 1, "R5", 640, 480, string.Empty, 5);
             this.dtProfiles.Rows.Add(6, 1, "R6", 640, 480, string.Empty, 6);
+			Logger.LogDebug("<<< Exiting PrepareData()");
         }
     }
 }

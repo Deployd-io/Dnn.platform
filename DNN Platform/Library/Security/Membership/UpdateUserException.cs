@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class UpdateUserException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public UpdateUserException()
     {
+	Logger.LogDebug(">>> Entering UpdateUserException()");
+	Logger.LogDebug("<<< Exiting UpdateUserException()");
     }
 
     /// <inheritdoc />
     public UpdateUserException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering UpdateUserException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting UpdateUserException(message={Message})", message);
 
     /// <inheritdoc />
     public UpdateUserException(string message, Exception innerException)

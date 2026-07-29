@@ -11,13 +11,18 @@ namespace DotNetNuke.Common
 
     internal struct ServiceScopeContainer : IDisposable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ServiceScopeContainer"/> struct.</summary>
         /// <param name="serviceScope">The <see cref="IServiceScope"/> instance to use.</param>
         /// <param name="shouldDispose">A value indicating whether to dispose the <see cref="ServiceScope"/> when this instance is disposed.</param>
         public ServiceScopeContainer(IServiceScope serviceScope, bool shouldDispose)
         {
+			Logger.LogDebug(">>> Entering ServiceScopeContainer(serviceScope={ServiceScope},shouldDispose={ShouldDispose})", serviceScope, shouldDispose);
             this.ServiceScope = serviceScope;
             this.ShouldDispose = shouldDispose;
+			Logger.LogDebug("<<< Exiting ServiceScopeContainer(serviceScope={ServiceScope},shouldDispose={ShouldDispose})", serviceScope, shouldDispose);
+			Logger.LogDebug("ServiceScopeContainer(serviceScope={ServiceScope},shouldDispose={ShouldDispose}): this.ServiceScope → {Arg2}", serviceScope, shouldDispose, this.ServiceScope);
+			Logger.LogDebug("ServiceScopeContainer(serviceScope={ServiceScope},shouldDispose={ShouldDispose}): this.ShouldDispose → {Arg2}", serviceScope, shouldDispose, this.ShouldDispose);
         }
 
         /// <summary>    Gets service scope that the container holds.</summary>
@@ -30,23 +35,28 @@ namespace DotNetNuke.Common
         /// <returns>The service scope container.</returns>
         public static ServiceScopeContainer GetRequestOrCreateScope()
         {
+			Logger.LogDebug(">>> Entering GetRequestOrCreateScope()");
             var requestScope = HttpContextSource.Current?.GetScope();
 
+			Logger.LogDebug("GetRequestOrCreateScope(): requestScope → {RequestScope}", requestScope);
             if (requestScope != null)
             {
                 return new ServiceScopeContainer(requestScope, false);
             }
 
+			Logger.LogDebug("<<< Exiting GetRequestOrCreateScope()");
             return new ServiceScopeContainer(Globals.DependencyProvider.CreateScope(), true);
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+			Logger.LogDebug(">>> Entering Dispose()");
             if (this.ShouldDispose)
             {
                 this.ServiceScope.Dispose();
             }
+			Logger.LogDebug("<<< Exiting Dispose()");
         }
     }
 }

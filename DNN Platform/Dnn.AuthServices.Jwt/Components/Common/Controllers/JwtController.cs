@@ -36,6 +36,7 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
     internal class JwtController(IHostSettings hostSettings)
         : ServiceLocator<IJwtController, JwtController>, IJwtController
     {
+		Logger.LogDebug(">>> Entering JwtController(hostSettings={HostSettings})", hostSettings);
         /// <summary>The name of the authentication scheme header.</summary>
         public const string AuthScheme = "Bearer";
 
@@ -46,9 +47,12 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
 
         private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(JwtController));
         private static readonly HashAlgorithm Hasher = SHA384.Create();
+		Logger.LogDebug("JwtController(hostSettings={HostSettings}): Logger → {Logger}", hostSettings, Logger);
+		Logger.LogDebug("JwtController(hostSettings={HostSettings}): Hasher → {Hasher}", hostSettings, Hasher);
         private static readonly Encoding TextEncoder = Encoding.UTF8;
         private static object hasherLock = new object();
 
+		Logger.LogDebug("JwtController(hostSettings={HostSettings}): hasherLock → {HasherLock}", hostSettings, hasherLock);
         private readonly IHostSettings hostSettings = hostSettings ??
                                                       new HostSettings(
                                                           new HostController(
@@ -57,6 +61,7 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
 #pragma warning restore CS0618 // Type or member is obsolete
                                                               new Lazy<IPortalController>(() => PortalController.Instance)));
 
+		Logger.LogDebug("<<< Exiting JwtController(hostSettings={HostSettings})", hostSettings);
         /// <summary>Initializes static members of the <see cref="JwtController"/> class.</summary>
         static JwtController()
         {
@@ -113,6 +118,7 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
         /// <inheritdoc />
         public string ValidateToken(HttpRequestMessage request)
         {
+			Logger.LogDebug(">>> Entering ValidateToken(request={Request})", request);
             if (!JwtAuthMessageHandler.IsEnabled)
             {
                 Logger.Trace(this.SchemeType + " is not registered/enabled in web.config file");
@@ -120,12 +126,15 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
             }
 
             var authorization = this.ValidateAuthHeader(request?.Headers.Authorization);
+			Logger.LogDebug("ValidateToken(request={Request}): authorization → {Authorization}", request, authorization);
+			Logger.LogDebug("<<< Exiting ValidateToken(request={Request})", request);
             return string.IsNullOrEmpty(authorization) ? null : this.ValidateAuthorizationValue(authorization);
         }
 
         /// <inheritdoc />
         public bool LogoutUser(HttpRequestMessage request)
         {
+			Logger.LogDebug(">>> Entering LogoutUser(request={Request})", request);
             if (!JwtAuthMessageHandler.IsEnabled)
             {
                 Logger.Trace(this.SchemeType + " is not registered/enabled in web.config file");
@@ -134,12 +143,15 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
 
             var rawToken = this.ValidateAuthHeader(request?.Headers.Authorization);
             if (string.IsNullOrEmpty(rawToken))
+			Logger.LogDebug("LogoutUser(request={Request}): rawToken → {RawToken}", request, rawToken);
             {
                 return false;
             }
 
             var jwt = new JsonWebToken(rawToken);
             var sessionId = GetJwtSessionValue(jwt);
+			Logger.LogDebug("LogoutUser(request={Request}): jwt → {Jwt}", request, jwt);
+			Logger.LogDebug("LogoutUser(request={Request}): sessionId → {SessionId}", request, sessionId);
             if (string.IsNullOrEmpty(sessionId))
             {
                 if (Logger.IsTraceEnabled)
@@ -151,12 +163,14 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
             }
 
             this.DataProvider.DeleteToken(sessionId);
+			Logger.LogDebug("<<< Exiting LogoutUser(request={Request})", request);
             return true;
         }
 
         /// <inheritdoc />
         public LoginResultData LoginUser(HttpRequestMessage request, LoginData loginData)
         {
+			Logger.LogDebug(">>> Entering LoginUser(request={Request},loginData={LoginData})", request, loginData);
             if (!JwtAuthMessageHandler.IsEnabled)
             {
                 Logger.Trace(this.SchemeType + " is not registered/enabled in web.config file");
@@ -174,6 +188,8 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
             IPortalAliasInfo portalAlias = obsoletePortalSettings.PortalAlias;
             var status = UserLoginStatus.LOGIN_FAILURE;
             var ipAddress = request.GetIPAddress() ?? string.Empty;
+			Logger.LogDebug("LoginUser(request={Request},loginData={LoginData}): status → {Status}", request, loginData, status);
+			Logger.LogDebug("LoginUser(request={Request},loginData={LoginData}): ipAddress → {IpAddress}", request, loginData, ipAddress);
             var userInfo = UserController.ValidateUser(
                 portalSettings.PortalId,
                 loginData.Username,
@@ -211,6 +227,7 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
             lock (hasherLock)
             {
                 renewalToken = EncodeBase64(Hasher.ComputeHash(Guid.NewGuid().ToByteArray()));
+				Logger.LogDebug("LoginUser(request={Request},loginData={LoginData}): renewalToken → {RenewalToken}", request, loginData, renewalToken);
             }
 
             var persistedToken = new PersistedToken
@@ -228,10 +245,12 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
                 portalAlias.HttpAlias,
                 persistedToken,
                 userInfo.Roles);
+				Logger.LogWarning("LoginUser(request={Request},loginData={LoginData}): secret → {Secret}", request, loginData, secret);
 
             persistedToken.TokenHash = GetHashedStr(accessToken);
             this.DataProvider.AddToken(persistedToken);
 
+			Logger.LogDebug("<<< Exiting LoginUser(request={Request},loginData={LoginData})", request, loginData);
             return new LoginResultData
             {
                 UserId = userInfo.UserID,
@@ -244,6 +263,7 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
         /// <inheritdoc />
         public LoginResultData RenewToken(HttpRequestMessage request, string renewalToken)
         {
+			Logger.LogDebug(">>> Entering RenewToken(request={Request},renewalToken={RenewalToken})", request, renewalToken);
             if (!JwtAuthMessageHandler.IsEnabled)
             {
                 Logger.Trace(this.SchemeType + " is not registered/enabled in web.config file");
@@ -252,18 +272,21 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
 
             var rawToken = this.ValidateAuthHeader(request?.Headers.Authorization);
             if (string.IsNullOrEmpty(rawToken))
+			Logger.LogDebug("RenewToken(request={Request},renewalToken={RenewalToken}): rawToken → {RawToken}", request, renewalToken, rawToken);
             {
                 return EmptyWithError("bad-credentials");
             }
 
             var jwt = GetAndValidateJwt(rawToken, false);
             if (jwt == null)
+			Logger.LogDebug("RenewToken(request={Request},renewalToken={RenewalToken}): jwt → {Jwt}", request, renewalToken, jwt);
             {
                 return EmptyWithError("bad-jwt");
             }
 
             var sessionId = GetJwtSessionValue(jwt);
             if (string.IsNullOrEmpty(sessionId))
+			Logger.LogDebug("RenewToken(request={Request},renewalToken={RenewalToken}): sessionId → {SessionId}", request, renewalToken, sessionId);
             {
                 if (Logger.IsTraceEnabled)
                 {
@@ -275,6 +298,7 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
 
             var persistedToken = this.DataProvider.GetTokenById(sessionId);
             if (persistedToken == null)
+			Logger.LogDebug("RenewToken(request={Request},renewalToken={RenewalToken}): persistedToken → {PersistedToken}", request, renewalToken, persistedToken);
             {
                 if (Logger.IsTraceEnabled)
                 {
@@ -316,6 +340,7 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
 
             var userInfo = this.TryGetUser(jwt, false);
             if (userInfo == null)
+			Logger.LogDebug("RenewToken(request={Request},renewalToken={RenewalToken}): userInfo → {UserInfo}", request, renewalToken, userInfo);
             {
                 if (Logger.IsTraceEnabled)
                 {
@@ -335,17 +360,22 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
                 return EmptyWithError("bad-token");
             }
 
+			Logger.LogDebug("<<< Exiting RenewToken(request={Request},renewalToken={RenewalToken})", request, renewalToken);
             return this.UpdateToken(renewalToken, persistedToken, userInfo);
         }
 
         /// <inheritdoc />
         protected override Func<IJwtController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new JwtController(null);
         }
 
         private static LoginResultData EmptyWithError(string error)
         {
+			Logger.LogDebug(">>> Entering EmptyWithError(error={Error})", error);
+			Logger.LogDebug("<<< Exiting EmptyWithError(error={Error})", error);
             return new LoginResultData { Error = error, };
         }
 
@@ -442,6 +472,7 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
 
         private static string DecodeBase64(string b64Str)
         {
+			Logger.LogDebug(">>> Entering DecodeBase64(b64Str={B64Str})", b64Str);
             // fix Base64 string padding
             var mod = b64Str.Length % 4;
             if (mod != 0)
@@ -449,28 +480,35 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
                 b64Str += new string('=', 4 - mod);
             }
 
+			Logger.LogDebug("<<< Exiting DecodeBase64(b64Str={B64Str})", b64Str);
             return TextEncoder.GetString(Convert.FromBase64String(b64Str));
         }
 
         private static string EncodeBase64(byte[] data)
         {
+			Logger.LogDebug(">>> Entering EncodeBase64(data={Data})", data);
+			Logger.LogDebug("<<< Exiting EncodeBase64(data={Data})", data);
             return Convert.ToBase64String(data).TrimEnd('=');
         }
 
         private static string GetHashedStr(string data)
         {
+			Logger.LogDebug(">>> Entering GetHashedStr(data={Data})", data);
             string hash;
             lock (hasherLock)
             {
                 hash = EncodeBase64(Hasher.ComputeHash(TextEncoder.GetBytes(data)));
+				Logger.LogDebug("GetHashedStr(data={Data}): hash → {Hash}", data, hash);
             }
 
+			Logger.LogDebug("<<< Exiting GetHashedStr(data={Data})", data);
             return hash;
         }
 
         /// <summary>Validates the JWT configuration settings at startup.</summary>
         private static void ValidateConfiguration()
         {
+			Logger.LogDebug(">>> Entering ValidateConfiguration()");
             var sessionTtl = SessionTokenTtlMinutes;
             var renewalTtl = RenewalTokenTtlMinutes;
 
@@ -519,6 +557,7 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
             Logger.Info(
                 $"JWT Token Configuration: SessionTokenTtlMinutes={sessionTtl} ({sessionTtl / 60.0:F1} hours), " +
                 $"RenewalTokenTtlMinutes={renewalTtl} ({renewalTtl / 1440.0:F1} days)");
+				Logger.LogDebug("<<< Exiting ValidateConfiguration()");
         }
 
         private LoginResultData UpdateToken(string renewalToken, PersistedToken persistedToken, UserInfo userInfo)
@@ -556,6 +595,7 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
         /// <returns>The JWT passed in the request; otherwise, it returns null.</returns>
         private string ValidateAuthHeader(AuthenticationHeaderValue authHdr)
         {
+			Logger.LogDebug(">>> Entering ValidateAuthHeader(authHdr={AuthHdr})", authHdr);
             if (authHdr == null)
             {
                 ////if (Logger.IsTraceEnabled) Logger.Trace("Authorization header not present in the request"); // too verbose; shows in all web requests
@@ -583,6 +623,7 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
                 return null;
             }
 
+			Logger.LogDebug("<<< Exiting ValidateAuthHeader(authHdr={AuthHdr})", authHdr);
             return authorization;
         }
 
@@ -627,6 +668,7 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
 
         private bool IsValidSchemeType(JsonWebToken token)
         {
+			Logger.LogDebug(">>> Entering IsValidSchemeType(token={Token})", token);
             if (!this.SchemeType.Equals(token.Typ, StringComparison.OrdinalIgnoreCase))
             {
                 if (Logger.IsTraceEnabled)
@@ -637,6 +679,7 @@ namespace Dnn.AuthServices.Jwt.Components.Common.Controllers
                 return false;
             }
 
+			Logger.LogDebug("<<< Exiting IsValidSchemeType(token={Token})", token);
             return true;
         }
 

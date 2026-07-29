@@ -17,10 +17,14 @@ namespace DotNetNuke.Services.Installer.Installers
     /// <summary>The ComponentInstallerBase is a base class for all Component Installers.</summary>
     public abstract class ComponentInstallerBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ComponentInstallerBase"/> class.</summary>
         protected ComponentInstallerBase()
         {
+			Logger.LogDebug(">>> Entering ComponentInstallerBase()");
             this.Completed = Null.NullBoolean;
+			Logger.LogDebug("<<< Exiting ComponentInstallerBase()");
+			Logger.LogDebug("ComponentInstallerBase(): this.Completed → {Arg0}", this.Completed);
         }
 
         /// <summary>Gets a list of allowable file extensions (in addition to the Host's List).</summary>
@@ -93,10 +97,12 @@ namespace DotNetNuke.Services.Installer.Installers
 
         public EventMessage ReadEventMessageNode(XPathNavigator manifestNav)
         {
+			Logger.LogDebug(">>> Entering ReadEventMessageNode(manifestNav={ManifestNav})", manifestNav);
             EventMessage eventMessage = null;
 
             XPathNavigator eventMessageNav = manifestNav.SelectSingleNode("eventMessage");
             if (eventMessageNav != null)
+			Logger.LogDebug("ReadEventMessageNode(manifestNav={ManifestNav}): eventMessageNav → {EventMessageNav}", manifestNav, eventMessageNav);
             {
                 eventMessage = new EventMessage
                 {
@@ -112,6 +118,7 @@ namespace DotNetNuke.Services.Installer.Installers
                     var attribName = attributeNav.Name;
                     var attribValue = attributeNav.Value;
                     if (attribName == "upgradeVersionsList")
+					Logger.LogDebug("ReadEventMessageNode(manifestNav={ManifestNav}): attribValue → {AttribValue}", manifestNav, attribValue);
                     {
                         if (!string.IsNullOrEmpty(attribValue))
                         {
@@ -138,6 +145,7 @@ namespace DotNetNuke.Services.Installer.Installers
                                     default:
                                         Version upgradeVersion = null;
                                         try
+										Logger.LogDebug("ReadEventMessageNode(manifestNav={ManifestNav}): upgradeVersion → {UpgradeVersion}", manifestNav, upgradeVersion);
                                         {
                                             upgradeVersion = new Version(version);
                                         }
@@ -168,6 +176,7 @@ namespace DotNetNuke.Services.Installer.Installers
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ReadEventMessageNode(manifestNav={ManifestNav})", manifestNav);
             return eventMessage;
         }
 

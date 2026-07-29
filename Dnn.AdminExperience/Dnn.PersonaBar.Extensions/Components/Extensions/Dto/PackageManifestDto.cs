@@ -11,9 +11,12 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
     [JsonObject]
     public class PackageManifestDto : PackageInfoDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="PackageManifestDto"/> class.</summary>
         public PackageManifestDto()
         {
+		Logger.LogDebug(">>> Entering PackageManifestDto()");
+		Logger.LogDebug("<<< Exiting PackageManifestDto()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="PackageManifestDto"/> class.</summary>

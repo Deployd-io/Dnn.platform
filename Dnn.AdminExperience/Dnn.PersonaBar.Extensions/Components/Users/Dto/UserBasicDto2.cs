@@ -8,8 +8,11 @@ namespace Dnn.PersonaBar.Users.Components.Dto
 
     public class UserBasicDto2 : UserBasicDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public UserBasicDto2()
         {
+		Logger.LogDebug(">>> Entering UserBasicDto2()");
+		Logger.LogDebug("<<< Exiting UserBasicDto2()");
         }
 
         public UserBasicDto2(UserInfo user)

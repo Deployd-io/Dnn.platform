@@ -36,6 +36,7 @@ namespace log4net.Util
     /// <author>Gert Driesen</author>
     public class CyclicBuffer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Constructor
         /// </summary>
@@ -49,16 +50,28 @@ namespace log4net.Util
         /// <exception cref="ArgumentOutOfRangeException">The <paramref name="maxSize"/> argument is not a positive integer.</exception>
         public CyclicBuffer(int maxSize) 
         {
+			Logger.LogDebug(">>> Entering CyclicBuffer(maxSize={MaxSize})", maxSize);
             if (maxSize < 1) 
             {
                 throw SystemInfo.CreateArgumentOutOfRangeException("maxSize", (object)maxSize, "Parameter: maxSize, Value: [" + maxSize + "] out of range. Non zero positive integer required");
             }
 
             this.m_maxSize = maxSize;
+			Logger.LogDebug("CyclicBuffer(maxSize={MaxSize}): m_maxSize → {M_maxSize}", maxSize, m_maxSize);
+			Logger.LogDebug("CyclicBuffer(maxSize={MaxSize}): this.m_maxSize → {Arg1}", maxSize, this.m_maxSize);
             this.m_events = new LoggingEvent[maxSize];
             this.m_first = 0;
+			Logger.LogDebug("CyclicBuffer(maxSize={MaxSize}): m_events → {M_events}", maxSize, m_events);
+			Logger.LogDebug("CyclicBuffer(maxSize={MaxSize}): this.m_events → {Arg1}", maxSize, this.m_events);
+			Logger.LogDebug("CyclicBuffer(maxSize={MaxSize}): m_first → {M_first}", maxSize, m_first);
+			Logger.LogDebug("CyclicBuffer(maxSize={MaxSize}): this.m_first → {Arg1}", maxSize, this.m_first);
             this.m_last = 0;
             this.m_numElems = 0;
+			Logger.LogDebug("<<< Exiting CyclicBuffer(maxSize={MaxSize})", maxSize);
+			Logger.LogDebug("CyclicBuffer(maxSize={MaxSize}): m_last → {M_last}", maxSize, m_last);
+			Logger.LogDebug("CyclicBuffer(maxSize={MaxSize}): this.m_last → {Arg1}", maxSize, this.m_last);
+			Logger.LogDebug("CyclicBuffer(maxSize={MaxSize}): m_numElems → {M_numElems}", maxSize, m_numElems);
+			Logger.LogDebug("CyclicBuffer(maxSize={MaxSize}): this.m_numElems → {Arg1}", maxSize, this.m_numElems);
         }
 
         /// <summary>
@@ -75,6 +88,7 @@ namespace log4net.Util
         /// </remarks>
         public LoggingEvent Append(LoggingEvent loggingEvent)
         {	
+			Logger.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             if (loggingEvent == null)
             {
                 throw new ArgumentNullException("loggingEvent");
@@ -90,6 +104,8 @@ namespace log4net.Util
                 if (++this.m_last == this.m_maxSize)
                 {
                     this.m_last = 0;
+					Logger.LogDebug("Append(loggingEvent={LoggingEvent}): m_last → {M_last}", loggingEvent, m_last);
+					Logger.LogDebug("Append(loggingEvent={LoggingEvent}): this.m_last → {Arg1}", loggingEvent, this.m_last);
                 }
 
                 if (this.m_numElems < this.m_maxSize)
@@ -99,6 +115,8 @@ namespace log4net.Util
                 else if (++this.m_first == this.m_maxSize)
                 {
                     this.m_first = 0;
+					Logger.LogDebug("Append(loggingEvent={LoggingEvent}): m_first → {M_first}", loggingEvent, m_first);
+					Logger.LogDebug("Append(loggingEvent={LoggingEvent}): this.m_first → {Arg1}", loggingEvent, this.m_first);
                 }
 
                 if (this.m_numElems < this.m_maxSize)
@@ -109,6 +127,7 @@ namespace log4net.Util
                 else
                 {
                     // Buffer is full and discarding an event
+					Logger.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
                     return discardedLoggingEvent;
                 }
             }
@@ -126,10 +145,12 @@ namespace log4net.Util
         /// </remarks>
         public LoggingEvent PopOldest() 
         {
+			Logger.LogDebug(">>> Entering PopOldest()");
             lock(this)
             {
                 LoggingEvent ret = null;
                 if (this.m_numElems > 0) 
+				Logger.LogDebug("PopOldest(): ret → {Ret}", ret);
                 {
                     this.m_numElems--;
                     ret = this.m_events[this.m_first];
@@ -137,8 +158,11 @@ namespace log4net.Util
                     if (++this.m_first == this.m_maxSize)
                     {
                         this.m_first = 0;
+						Logger.LogDebug("PopOldest(): m_first → {M_first}", m_first);
+						Logger.LogDebug("PopOldest(): this.m_first → {Arg0}", this.m_first);
                     }
                 } 
+				Logger.LogDebug("<<< Exiting PopOldest()");
                 return ret;
             }
         }
@@ -154,6 +178,7 @@ namespace log4net.Util
         /// </remarks>
         public LoggingEvent[] PopAll()
         {
+			Logger.LogDebug(">>> Entering PopAll()");
             lock(this)
             {
                 LoggingEvent[] ret = new LoggingEvent[this.m_numElems];
@@ -173,6 +198,7 @@ namespace log4net.Util
 
                 this.Clear();
 
+				Logger.LogDebug("<<< Exiting PopAll()");
                 return ret;
             }
         }
@@ -187,15 +213,23 @@ namespace log4net.Util
         /// </remarks>
         public void Clear()
         {
+			Logger.LogDebug(">>> Entering Clear()");
             lock(this)
             {
                 // Set all the elements to null
                 Array.Clear(this.m_events, 0, this.m_events.Length);
 
                 this.m_first = 0;
+				Logger.LogDebug("Clear(): m_first → {M_first}", m_first);
+				Logger.LogDebug("Clear(): this.m_first → {Arg0}", this.m_first);
+				Logger.LogDebug("Clear(): m_numElems → {M_numElems}", m_numElems);
+				Logger.LogDebug("Clear(): this.m_numElems → {Arg0}", this.m_numElems);
                 this.m_last = 0;
                 this.m_numElems = 0;
+				Logger.LogDebug("Clear(): m_last → {M_last}", m_last);
+				Logger.LogDebug("Clear(): this.m_last → {Arg0}", this.m_last);
             }
+			Logger.LogDebug("<<< Exiting Clear()");
         }
 
 #if RESIZABLE_CYCLIC_BUFFER
@@ -214,6 +248,7 @@ namespace log4net.Util
         /// <exception cref="ArgumentOutOfRangeException">The <paramref name="newSize"/> argument is not a positive integer.</exception>
         public void Resize(int newSize) 
         {
+			Logger.LogDebug(">>> Entering Resize(newSize={NewSize})", newSize);
             lock(this)
             {
                 if (newSize < 0) 
@@ -229,6 +264,7 @@ namespace log4net.Util
 
                 int loopLen = (newSize < m_numElems) ? newSize : m_numElems;
     
+				Logger.LogDebug("Resize(newSize={NewSize}): loopLen → {LoopLen}", newSize, loopLen);
                 for(int i = 0; i < loopLen; i++) 
                 {
                     temp[i] = m_events[m_first];
@@ -237,10 +273,14 @@ namespace log4net.Util
                     if (++m_first == m_numElems) 
                     {
                         m_first = 0;
+						Logger.LogDebug("Resize(newSize={NewSize}): m_first → {M_first}", newSize, m_first);
                     }
                 }
 
                 m_events = temp;
+				Logger.LogDebug("Resize(newSize={NewSize}): m_events → {M_events}", newSize, m_events);
+				Logger.LogDebug("Resize(newSize={NewSize}): m_numElems → {M_numElems}", newSize, m_numElems);
+				Logger.LogDebug("Resize(newSize={NewSize}): m_maxSize → {M_maxSize}", newSize, m_maxSize);
                 m_first = 0;
                 m_numElems = loopLen;
                 m_maxSize = newSize;
@@ -248,12 +288,14 @@ namespace log4net.Util
                 if (loopLen == newSize) 
                 {
                     m_last = 0;
+					Logger.LogDebug("Resize(newSize={NewSize}): m_last → {M_last}", newSize, m_last);
                 } 
                 else 
                 {
                     m_last = loopLen;
                 }
             }
+			Logger.LogDebug("<<< Exiting Resize(newSize={NewSize})", newSize);
         }
 #endif
 

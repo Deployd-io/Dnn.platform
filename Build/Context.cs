@@ -21,11 +21,13 @@ namespace DotNetNuke.Build
     /// <inheritdoc />
     public class Context : FrostingContext
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="Context"/> class.</summary>
         /// <param name="context">The base context.</param>
         public Context(ICakeContext context)
             : base(context)
         {
+			Logger.LogDebug(">>> Entering Context(context={Context})", context);
             try
             {
                 //////////////////////////////////////////////////////////////////////
@@ -56,13 +58,16 @@ namespace DotNetNuke.Build
 
                 // Global information variables
                 this.IsRunningInCI = false;
+				Logger.LogDebug("Context(context={Context}): this.IsRunningInCI → {Arg1}", context, this.IsRunningInCI);
 
                 this.DnnSolutionPath = context.File("./DNN_Platform.sln");
 
                 this.SqlDataProviderExists = false;
+				Logger.LogDebug("Context(context={Context}): this.SqlDataProviderExists → {Arg1}", context, this.SqlDataProviderExists);
 
                 var settingsFile = context.File("./settings.local.json");
                 this.Settings = LoadSettings(context, settingsFile);
+				Logger.LogDebug("Context(context={Context}): settingsFile → {SettingsFile}", context, settingsFile);
                 this.WriteSettings(context, settingsFile);
 
                 this.BuildId = context.AzurePipelines().IsRunningOnAzurePipelines
@@ -72,13 +77,17 @@ namespace DotNetNuke.Build
                         : "0";
                 context.Information($"BuildId: {this.BuildId}");
                 this.BuildNumber = string.Empty;
+				Logger.LogDebug("Context(context={Context}): this.BuildNumber → {Arg1}", context, this.BuildNumber);
+				Logger.LogError("Exception in Context(context={Context}): {Arg1}", context, ex.Message);
                 this.ProductVersion = string.Empty;
             }
+			Logger.LogDebug("Context(context={Context}): this.ProductVersion → {Arg1}", context, this.ProductVersion);
             catch (Exception exc)
             {
                 this.Error(exc);
                 throw;
             }
+			Logger.LogDebug("<<< Exiting Context(context={Context})", context);
         }
 
         /// <summary>Gets or sets the DNN version.</summary>
@@ -130,6 +139,8 @@ namespace DotNetNuke.Build
         /// <returns>The version of the build.</returns>
         public string GetBuildNumber()
         {
+			Logger.LogDebug(">>> Entering GetBuildNumber()");
+			Logger.LogDebug("<<< Exiting GetBuildNumber()");
             return this.BuildNumber;
         }
 
@@ -137,8 +148,11 @@ namespace DotNetNuke.Build
         /// <returns>The version with leading zeroes.</returns>
         public string GetTwoDigitsVersionNumber()
         {
+			Logger.LogDebug(">>> Entering GetTwoDigitsVersionNumber()");
             var fullVer = this.GetBuildNumber().Split('-')[0]; // Gets rid of the -unstable, -beta, etc.
             var numbers = fullVer.Split('.');
+			Logger.LogDebug("GetTwoDigitsVersionNumber(): fullVer → {FullVer}", fullVer);
+			Logger.LogDebug("GetTwoDigitsVersionNumber(): numbers → {Numbers}", numbers);
             for (var i = 0; i < numbers.Length; i++)
             {
                 if (numbers[i].Length < 2)
@@ -147,6 +161,7 @@ namespace DotNetNuke.Build
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetTwoDigitsVersionNumber()");
             return string.Join(".", numbers);
         }
 
@@ -154,6 +169,8 @@ namespace DotNetNuke.Build
         /// <returns>The version of DNN being built.</returns>
         public string GetProductVersion()
         {
+			Logger.LogDebug(">>> Entering GetProductVersion()");
+			Logger.LogDebug("<<< Exiting GetProductVersion()");
             return this.ProductVersion;
         }
 

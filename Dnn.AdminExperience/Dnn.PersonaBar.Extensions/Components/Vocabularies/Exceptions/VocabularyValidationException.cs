@@ -8,10 +8,13 @@ namespace Dnn.PersonaBar.Vocabularies.Exceptions
 
     public class VocabularyValidationException : VocabulariesException
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="VocabularyValidationException"/> class.</summary>
         public VocabularyValidationException()
             : base(Constants.VocabularyValidationError)
         {
+		Logger.LogDebug(">>> Entering VocabularyValidationException()");
+		Logger.LogDebug("<<< Exiting VocabularyValidationException()");
         }
     }
 }

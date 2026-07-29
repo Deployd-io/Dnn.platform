@@ -13,6 +13,7 @@ namespace DotNetNuke.Entities.DataStructures
     [DataContract]
     public class NTree<T>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [DataMember(Name = "data")]
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
@@ -26,11 +27,16 @@ namespace DotNetNuke.Entities.DataStructures
         /// <summary>Initializes a new instance of the <see cref="NTree{T}"/> class.</summary>
         public NTree()
         {
+			Logger.LogDebug(">>> Entering NTree()");
             this.Children = new List<NTree<T>>();
+			Logger.LogDebug("<<< Exiting NTree()");
+			Logger.LogDebug("NTree(): Children → {Children}", Children);
         }
 
         public bool HasChildren()
         {
+			Logger.LogDebug(">>> Entering HasChildren()");
+			Logger.LogDebug("<<< Exiting HasChildren()");
             return this.Children != null && this.Children.Count > 0;
         }
     }

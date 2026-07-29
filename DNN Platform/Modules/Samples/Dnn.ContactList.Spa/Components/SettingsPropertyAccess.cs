@@ -17,6 +17,7 @@ namespace Dnn.ContactList.Spa.Components
     /// </summary>
     public class SettingsPropertyAccess : IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly ISettingsService _service;
         private readonly int _moduleId;
         private readonly int _tabId;
@@ -26,7 +27,11 @@ namespace Dnn.ContactList.Spa.Components
         /// </summary>
         public SettingsPropertyAccess(int moduleId, int tabId) : this(moduleId, tabId, SettingsService.Instance)
         {
+		Logger.LogDebug(">>> Entering SettingsPropertyAccess(moduleId={ModuleId},tabId={TabId})", moduleId, tabId);
 
+		Logger.LogDebug(">>> Entering SettingsPropertyAccess(moduleId={ModuleId},tabId={TabId},service={Service})", moduleId, tabId, service);
+		Logger.LogDebug("<<< Exiting SettingsPropertyAccess(moduleId={ModuleId},tabId={TabId})", moduleId, tabId);
+		Logger.LogDebug("<<< Exiting SettingsPropertyAccess(moduleId={ModuleId},tabId={TabId},service={Service})", moduleId, tabId, service);
         }
 
         /// <summary>
@@ -37,8 +42,11 @@ namespace Dnn.ContactList.Spa.Components
             Requires.NotNull(service);
 
             _service = service;
+			Logger.LogDebug("SettingsPropertyAccess(moduleId={ModuleId},tabId={TabId},service={Service}): _service → {_service}", moduleId, tabId, service, _service);
             _tabId = tabId;
+			Logger.LogDebug("SettingsPropertyAccess(moduleId={ModuleId},tabId={TabId},service={Service}): _tabId → {_tabId}", moduleId, tabId, service, _tabId);
             _moduleId = moduleId;
+			Logger.LogDebug("SettingsPropertyAccess(moduleId={ModuleId},tabId={TabId},service={Service}): _moduleId → {_moduleId}", moduleId, tabId, service, _moduleId);
         }
 
         /// <summary>
@@ -61,8 +69,10 @@ namespace Dnn.ContactList.Spa.Components
         /// <returns></returns>
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			Logger.LogDebug(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             string propertyValue = "";
 
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): propertyValue → {PropertyValue}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, propertyValue);
             switch (propertyName)
             {
                 case "IsFormEnabled":
@@ -76,6 +86,7 @@ namespace Dnn.ContactList.Spa.Components
                     break;
             }
 
+			Logger.LogDebug("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             return propertyValue;
         }
     }

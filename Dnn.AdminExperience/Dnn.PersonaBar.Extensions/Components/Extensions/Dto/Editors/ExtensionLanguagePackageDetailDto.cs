@@ -9,8 +9,11 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
     [JsonObject]
     public class ExtensionLanguagePackageDetailDto : CoreLanguagePackageDetailDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public ExtensionLanguagePackageDetailDto()
         {
+		Logger.LogDebug(">>> Entering ExtensionLanguagePackageDetailDto()");
+		Logger.LogDebug("<<< Exiting ExtensionLanguagePackageDetailDto()");
         }
 
         public ExtensionLanguagePackageDetailDto(int portalId, PackageInfo package)

@@ -25,6 +25,7 @@ using System.Collections;
 
 namespace log4net.Util
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Implementation of Properties collection for the <see cref="log4net.ThreadContext"/></summary>
     /// <remarks>
     /// <para>
@@ -52,6 +53,8 @@ namespace log4net.Util
         /// </remarks>
         internal ThreadContextProperties()
         {
+		Logger.LogDebug(">>> Entering ThreadContextProperties()");
+		Logger.LogDebug("<<< Exiting ThreadContextProperties()");
         }
 
         /// <summary>Gets or sets the value of a property</summary>
@@ -91,13 +94,16 @@ namespace log4net.Util
         /// </remarks>
         public void Remove(string key)
         {
+		Logger.LogDebug(">>> Entering Remove(key={Key})", key);
 #if NETCF
             PropertiesDictionary _dictionary = GetProperties(false);
 #endif
+			Logger.LogDebug("Remove(key={Key}): _dictionary → {_dictionary}", key, _dictionary);
             if (_dictionary != null)
             {
                 _dictionary.Remove(key);
             }
+			Logger.LogDebug("<<< Exiting Remove(key={Key})", key);
         }
 
         /// <summary>Get the keys stored in the properties.</summary>
@@ -107,13 +113,16 @@ namespace log4net.Util
         /// <returns>a set of the defined keys</returns>
         public string[] GetKeys()
         {
+		Logger.LogDebug(">>> Entering GetKeys()");
 #if NETCF
             PropertiesDictionary _dictionary = GetProperties(false);
 #endif
+			Logger.LogDebug("GetKeys(): _dictionary → {_dictionary}", _dictionary);
             if (_dictionary != null)
             {
                 return _dictionary.GetKeys();
             }
+			Logger.LogDebug("<<< Exiting GetKeys()");
             return null;
         }
 
@@ -125,13 +134,16 @@ namespace log4net.Util
         /// </remarks>
         public void Clear()
         {
+		Logger.LogDebug(">>> Entering Clear()");
 #if NETCF
             PropertiesDictionary _dictionary = GetProperties(false);
 #endif
+			Logger.LogDebug("Clear(): _dictionary → {_dictionary}", _dictionary);
             if (_dictionary != null)
             {
                 _dictionary.Clear();
             }
+			Logger.LogDebug("<<< Exiting Clear()");
         }
 
         /// <summary>Get the <c>PropertiesDictionary</c> for this thread.</summary>
@@ -146,9 +158,11 @@ namespace log4net.Util
         /// </remarks>
         internal PropertiesDictionary GetProperties(bool create)
         {
+		Logger.LogDebug(">>> Entering GetProperties(create={Create})", create);
 #if NETCF
             PropertiesDictionary _dictionary = (PropertiesDictionary)System.Threading.Thread.GetData(s_threadLocalSlot);
 #endif
+			Logger.LogDebug("GetProperties(create={Create}): _dictionary → {_dictionary}", create, _dictionary);
             if (_dictionary == null && create)
             {
                 _dictionary  = new PropertiesDictionary();
@@ -156,6 +170,7 @@ namespace log4net.Util
                 System.Threading.Thread.SetData(s_threadLocalSlot, _dictionary);
 #endif
             }
+			Logger.LogDebug("<<< Exiting GetProperties(create={Create})", create);
             return _dictionary;
         }
     }

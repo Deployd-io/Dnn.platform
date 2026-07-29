@@ -9,9 +9,12 @@ namespace Dnn.ContactList.Spa.Services.ViewModels
     [JsonObject(MemberSerialization.OptIn)]
     public class SettingsViewModel
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public SettingsViewModel()
         {
+			Logger.LogDebug(">>> Entering SettingsViewModel()");
             
+			Logger.LogDebug("<<< Exiting SettingsViewModel()");
         }
 
         [JsonProperty("isFormEnabled")]

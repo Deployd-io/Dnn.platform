@@ -10,6 +10,7 @@ namespace Dnn.PersonaBar.Security.Components.Checks
 
     public class CheckSiteRegistration : IAuditCheck
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public string Id => "CheckSiteRegistration";
 
@@ -19,11 +20,15 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc />
         public CheckResult Execute()
         {
+			Logger.LogDebug(">>> Entering Execute()");
             var result = new CheckResult(SeverityEnum.Unverified, this.Id);
             try
+			Logger.LogDebug("Execute(): result → {Result}", result);
             {
                 var portalController = new PortalController();
                 result.Severity = SeverityEnum.Pass;
+				Logger.LogDebug("Execute(): portalController → {PortalController}", portalController);
+				Logger.LogDebug("Execute(): result.Severity → {Arg0}", result.Severity);
                 foreach (PortalInfo portal in portalController.GetPortals())
                 {
                     // check for public registration
@@ -36,9 +41,11 @@ namespace Dnn.PersonaBar.Security.Components.Checks
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in Execute(): {Arg0}", ex.Message);
                 throw;
             }
 
+			Logger.LogDebug("<<< Exiting Execute()");
             return result;
         }
     }

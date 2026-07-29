@@ -11,9 +11,11 @@ namespace Dnn.ExportImport.Components.Controllers
     /// <inheritdoc />
     public class BusinessController : IUpgradeable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public string UpgradeModule(string version)
         {
+			Logger.LogDebug(">>> Entering UpgradeModule(version={Version})", version);
             try
             {
                 switch (version)
@@ -27,6 +29,8 @@ namespace Dnn.ExportImport.Components.Controllers
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in UpgradeModule(version={Version}): {Arg1}", version, ex.Message);
+				Logger.LogDebug("<<< Exiting UpgradeModule(version={Version})", version);
                 return "Failed";
             }
         }
@@ -34,6 +38,7 @@ namespace Dnn.ExportImport.Components.Controllers
         /*
         private static void AddNewLogTypes()
         {
+			Logger.LogDebug(">>> Entering AddNewLogTypes()");
             var logTypeInfo = new LogTypeInfo
             {
                 LogTypeKey = Constants.LogTypeSiteExport,
@@ -45,6 +50,8 @@ namespace Dnn.ExportImport.Components.Controllers
             LogController.Instance.AddLogType(logTypeInfo);
 
             logTypeInfo.LogTypeKey = Constants.LogTypeSiteImport;
+			Logger.LogDebug("AddNewLogTypes(): logTypeInfo.LogTypeKey → {Arg0}", logTypeInfo.LogTypeKey);
+			Logger.LogDebug("AddNewLogTypes(): logTypeInfo.LogTypeFriendlyName → {Arg0}", logTypeInfo.LogTypeFriendlyName);
             logTypeInfo.LogTypeFriendlyName = "Site Import Request";
             LogController.Instance.AddLogType(logTypeInfo);
 
@@ -63,7 +70,9 @@ namespace Dnn.ExportImport.Components.Controllers
             LogController.Instance.AddLogTypeConfigInfo(logTypeConf);
 
             logTypeConf.LogTypeKey = Constants.LogTypeSiteImport;
+			Logger.LogDebug("AddNewLogTypes(): logTypeConf.LogTypeKey → {Arg0}", logTypeConf.LogTypeKey);
             LogController.Instance.AddLogTypeConfigInfo(logTypeConf);
+			Logger.LogDebug("<<< Exiting AddNewLogTypes()");
         }
          */
     }

@@ -9,9 +9,12 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
     [JsonObject]
     public class AuthSystemPackageDetailDto : PackageInfoDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="AuthSystemPackageDetailDto"/> class.</summary>
         public AuthSystemPackageDetailDto()
         {
+		Logger.LogDebug(">>> Entering AuthSystemPackageDetailDto()");
+		Logger.LogDebug("<<< Exiting AuthSystemPackageDetailDto()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="AuthSystemPackageDetailDto"/> class.</summary>

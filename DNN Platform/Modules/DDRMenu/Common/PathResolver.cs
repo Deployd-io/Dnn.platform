@@ -19,11 +19,15 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
     /// <param name="manifestFolder">The folder where the manifest is located.</param>
     public class PathResolver(IHostSettings hostSettings, string manifestFolder)
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+		Logger.LogDebug(">>> Entering PathResolver(hostSettings={HostSettings},manifestFolder={ManifestFolder})", hostSettings, manifestFolder);
+		Logger.LogDebug("PathResolver(hostSettings={HostSettings},manifestFolder={ManifestFolder}): hostSettings → {HostSettings1}", hostSettings, manifestFolder, hostSettings);
         private readonly string manifestFolder = manifestFolder;
 
         /// <summary>Initializes a new instance of the <see cref="PathResolver"/> class.</summary>
         /// <param name="manifestFolder">The folder where the manifest is located.</param>
+		Logger.LogDebug("<<< Exiting PathResolver(hostSettings={HostSettings},manifestFolder={ManifestFolder})", hostSettings, manifestFolder);
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public PathResolver(string manifestFolder)
             : this(null, manifestFolder)
@@ -58,6 +62,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         /// <returns>A resolved path.</returns>
         public string Resolve(string path, params RelativeTo[] roots)
         {
+			Logger.LogDebug(">>> Entering Resolve(path={Path},roots={Roots})", path, roots);
             var context = DNNContext.Current;
 
             var mappings = new Dictionary<string, RelativeTo>
@@ -76,6 +81,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
                 {
                     path = path.Substring(key.Length);
                     roots = [mappings[key],];
+					Logger.LogDebug("Resolve(path={Path},roots={Roots}): path → {Path1}", path, roots, path);
                     break;
                 }
             }
@@ -91,10 +97,12 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
                 {
                     string resolvedPath = null;
                     switch (root)
+					Logger.LogDebug("Resolve(path={Path},roots={Roots}): resolvedPath → {ResolvedPath}", path, roots, resolvedPath);
                     {
                         case RelativeTo.Container:
                             var container = context.HostControl;
                             while (container != null && container is not UI.Containers.Container)
+							Logger.LogDebug("Resolve(path={Path},roots={Roots}): container → {Container}", path, roots, container);
                             {
                                 container = container.Parent;
                             }
@@ -129,10 +137,14 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
                     {
                         var sep = resolvedPath.LastIndexOf('/');
                         var dirName = resolvedPath.Substring(0, sep + 1);
+						Logger.LogDebug("Resolve(path={Path},roots={Roots}): sep → {Sep}", path, roots, sep);
+						Logger.LogDebug("Resolve(path={Path},roots={Roots}): dirName → {DirName}", path, roots, dirName);
                         var fileName = resolvedPath.Substring(sep + 1);
 
+						Logger.LogDebug("Resolve(path={Path},roots={Roots}): fileName → {FileName}", path, roots, fileName);
                         var mappedDir = HttpContext.Current.Server.MapPath(dirName);
                         mappedDir = mappedDir.Remove(mappedDir.Length - 1);
+						Logger.LogDebug("Resolve(path={Path},roots={Roots}): mappedDir → {MappedDir}", path, roots, mappedDir);
                         if (Directory.Exists(mappedDir))
                         {
                             if (string.IsNullOrEmpty(fileName))
@@ -142,6 +154,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
 
                             var matches = Directory.GetFileSystemEntries(mappedDir, fileName);
                             if (matches.Length > 0)
+							Logger.LogDebug("Resolve(path={Path},roots={Roots}): matches → {Matches}", path, roots, matches);
                             {
                                 resolvedPath = (dirName + Path.GetFileName(matches[0])).Replace('\\', '/');
                                 return resolvedPath;
@@ -151,6 +164,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
                 }
             }
 
+			Logger.LogDebug("<<< Exiting Resolve(path={Path},roots={Roots})", path, roots);
             return path;
         }
     }

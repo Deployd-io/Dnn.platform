@@ -16,6 +16,7 @@ namespace Dnn.Modules.TelerikRemoval.UserControls
     /// </summary>
     public class DnnCheckBox : WrappedDnnCheckBox, ILocalizable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private bool localize = true;
 
         /// <inheritdoc />
@@ -43,6 +44,7 @@ namespace Dnn.Modules.TelerikRemoval.UserControls
         /// <inheritdoc />
         public virtual void LocalizeStrings()
         {
+			Logger.LogDebug(">>> Entering LocalizeStrings()");
             if (!this.Localize)
             {
                 return;
@@ -60,6 +62,7 @@ namespace Dnn.Modules.TelerikRemoval.UserControls
                 if (string.IsNullOrEmpty(this.Text))
                 {
                     this.Text = unlocalizedText;
+					Logger.LogDebug("LocalizeStrings(): this.Text → {Arg0}", this.Text);
                 }
 
                 if (string.IsNullOrEmpty(this.ToolTip))
@@ -68,16 +71,20 @@ namespace Dnn.Modules.TelerikRemoval.UserControls
                     if (string.IsNullOrEmpty(this.ToolTip))
                     {
                         this.ToolTip = unlocalizedText;
+						Logger.LogDebug("LocalizeStrings(): this.ToolTip → {Arg0}", this.ToolTip);
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting LocalizeStrings()");
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer);
             this.LocalizeStrings();
             base.Render(writer);
+			Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer);
         }
     }
 }

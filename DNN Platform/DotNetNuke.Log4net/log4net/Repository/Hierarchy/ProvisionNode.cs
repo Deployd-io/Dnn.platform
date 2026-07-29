@@ -23,6 +23,7 @@ using System.Collections;
 
 namespace log4net.Repository.Hierarchy
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Provision nodes are used where no logger instance has been specified</summary>
     /// <remarks>
     /// <para>
@@ -49,7 +50,9 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         internal ProvisionNode(Logger log) : base()
         {
+			Logger.LogDebug(">>> Entering ProvisionNode(log={Log})", log);
             this.Add(log);
+			Logger.LogDebug("<<< Exiting ProvisionNode(log={Log})", log);
         }
     }
 }

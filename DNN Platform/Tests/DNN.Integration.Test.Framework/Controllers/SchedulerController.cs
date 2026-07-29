@@ -14,6 +14,7 @@ namespace DNN.Integration.Test.Framework.Controllers
 
     public enum SchedulingMode
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         Disabled = 0,
         Timer = 1,
         Request = 2,
@@ -24,54 +25,76 @@ namespace DNN.Integration.Test.Framework.Controllers
         // private const string SchedulerModeName = "SchedulerMode";
         public static void DisableAllSchedulers(bool clearCache = true)
         {
+			Logger.LogDebug(">>> Entering DisableAllSchedulers(clearCache={ClearCache})", clearCache);
             SetSchedulingMode(SchedulingMode.Disabled, clearCache);
+			Logger.LogDebug("<<< Exiting DisableAllSchedulers(clearCache={ClearCache})", clearCache);
         }
 
         public static void DisableAppStartDelay(bool clearCache = true)
         {
+			Logger.LogDebug(">>> Entering DisableAppStartDelay(clearCache={ClearCache})", clearCache);
             DatabaseHelper.ExecuteStoredProcedure("UpdateHostSetting", "SchedulerdelayAtAppStart", "0", false, 1);
             if (clearCache)
             {
                 WebApiTestHelper.ClearHostCache();
             }
+			Logger.LogDebug("<<< Exiting DisableAppStartDelay(clearCache={ClearCache})", clearCache);
         }
 
         public static void DisableScheduler(string schedulerName, bool clearCache = false)
         {
+			Logger.LogDebug(">>> Entering DisableScheduler(schedulerName={SchedulerName},clearCache={ClearCache})", schedulerName, clearCache);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var query = string.Format(
                 "UPDATE {{objectQualifier}}Schedule SET Enabled=0 WHERE FriendlyName = '{0}';", schedulerName);
             DatabaseHelper.ExecuteNonQuery(query);
             if (clearCache)
+			Logger.LogDebug("DisableScheduler(schedulerName={SchedulerName},clearCache={ClearCache}): Enabled → {Enabled}", schedulerName, clearCache, Enabled);
+			Logger.LogInformation("DisableScheduler(schedulerName,clearCache)={SchedulerName},{ClearCache}: update query executed in {Arg2} ms", schedulerName, clearCache, __logStart.ElapsedMilliseconds);
             {
                 WebApiTestHelper.ClearHostCache();
             }
+			Logger.LogDebug("<<< Exiting DisableScheduler(schedulerName={SchedulerName},clearCache={ClearCache})", schedulerName, clearCache);
         }
 
         public static void EnableScheduler(string schedulerName, bool clearCache = false)
         {
+			Logger.LogDebug(">>> Entering EnableScheduler(schedulerName={SchedulerName},clearCache={ClearCache})", schedulerName, clearCache);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var query = string.Format(
                 "UPDATE {{objectQualifier}}Schedule SET Enabled=1 WHERE FriendlyName = '{0}';", schedulerName);
             DatabaseHelper.ExecuteNonQuery(query);
             if (clearCache)
+			Logger.LogDebug("EnableScheduler(schedulerName={SchedulerName},clearCache={ClearCache}): Enabled → {Enabled}", schedulerName, clearCache, Enabled);
+			Logger.LogInformation("EnableScheduler(schedulerName,clearCache)={SchedulerName},{ClearCache}: update query executed in {Arg2} ms", schedulerName, clearCache, __logStart.ElapsedMilliseconds);
             {
                 WebApiTestHelper.ClearHostCache();
             }
+			Logger.LogDebug("<<< Exiting EnableScheduler(schedulerName={SchedulerName},clearCache={ClearCache})", schedulerName, clearCache);
         }
 
         public static SchedulingMode GetSchedulingMode()
         {
+			Logger.LogDebug(">>> Entering GetSchedulingMode()");
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             const string query = @"SELECT SettingValue FROM {objectQualifier}HostSettings WHERE SettingName='SchedulerMode';";
             var modeStr = DatabaseHelper.ExecuteScalar<string>(query);
 
+			Logger.LogDebug("GetSchedulingMode(): query → {Query}", query);
+			Logger.LogDebug("GetSchedulingMode(): modeStr → {ModeStr}", modeStr);
+			Logger.LogInformation("GetSchedulingMode(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
             SchedulingMode mode;
             Enum.TryParse(modeStr, out mode);
+			Logger.LogDebug("<<< Exiting GetSchedulingMode()");
             return mode;
         }
 
         public static void SetSchedulingMode(SchedulingMode mode, bool clearCache = true)
         {
+			Logger.LogDebug(">>> Entering SetSchedulingMode(mode={Mode},clearCache={ClearCache})", mode, clearCache);
             var current = GetSchedulingMode();
             if (current != mode)
+			Logger.LogDebug("SetSchedulingMode(mode={Mode},clearCache={ClearCache}): current → {Current}", mode, clearCache, current);
             {
                 DatabaseHelper.ExecuteStoredProcedure("UpdateHostSetting", "SchedulerMode", mode.ToString("D"), false, 1);
                 if (clearCache)
@@ -79,14 +102,20 @@ namespace DNN.Integration.Test.Framework.Controllers
                     WebApiTestHelper.ClearHostCache(); // must clear the site Cache afterwards
                 }
             }
+			Logger.LogDebug("<<< Exiting SetSchedulingMode(mode={Mode},clearCache={ClearCache})", mode, clearCache);
         }
 
         public static int GetSchedulerIdByName(string schedulerName)
         {
+			Logger.LogDebug(">>> Entering GetSchedulerIdByName(schedulerName={SchedulerName})", schedulerName);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var query = string.Format(
                 "SELECT TOP(1) ISNULL(ScheduleId, -1) FROM {{objectQualifier}}Schedule WHERE FriendlyName = '{0}';",
                 schedulerName);
+				Logger.LogDebug("GetSchedulerIdByName(schedulerName={SchedulerName}): FriendlyName → {FriendlyName}", schedulerName, FriendlyName);
+				Logger.LogInformation("GetSchedulerIdByName(schedulerName)={SchedulerName}: find query executed in {Arg1} ms", schedulerName, __logStart.ElapsedMilliseconds);
 
+			Logger.LogDebug("<<< Exiting GetSchedulerIdByName(schedulerName={SchedulerName})", schedulerName);
             return DatabaseHelper.ExecuteScalar<int>(query);
         }
 
@@ -111,6 +140,7 @@ namespace DNN.Integration.Test.Framework.Controllers
         /// </remarks>
         public static bool RunScheduler(string schedulerName, int maxWaitSeconds = 0)
         {
+			Logger.LogDebug(">>> Entering RunScheduler(schedulerName={SchedulerName},maxWaitSeconds={MaxWaitSeconds})", schedulerName, maxWaitSeconds);
             var disabled = false;
             EnableScheduler(schedulerName);
             SetSchedulingMode(SchedulingMode.Timer);
@@ -158,6 +188,7 @@ namespace DNN.Integration.Test.Framework.Controllers
 
                 // wait for task to finish
                 var latestRunInfo = WaitForTaskToFinish(lastRunInfo, maxWaitSeconds);
+				Logger.LogDebug("<<< Exiting RunScheduler(schedulerName={SchedulerName},maxWaitSeconds={MaxWaitSeconds})", schedulerName, maxWaitSeconds);
                 return latestRunInfo.Succeeded;
             }
             finally
@@ -231,6 +262,7 @@ namespace DNN.Integration.Test.Framework.Controllers
         /// <remarks>If no previous run exists, it returns ID as -1.</remarks>
         private static ScheduleHistoryInfo LastRunningScheduleItem(int scheduleId)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             const string script = @"IF EXISTS (SELECT 1 FROM {{objectQualifier}}ScheduleHistory WHERE ScheduleId = {0})
 	                SELECT TOP(1) ScheduleId, ScheduleHistoryId, COALESCE(Succeeded, CAST(0 AS BIT)) AS Succeeded,
                            COALESCE(EndDate, {{ts '2000-01-01 00:00:00'}}) AS EndDate, LogNotes

@@ -22,6 +22,7 @@ namespace DotNetNuke.DependencyInjection.Extensions
         /// <param name="filter">The <see cref="IFilter"/> to inject properties.</param>
         internal static void BuildUp(this IServiceProvider container, IFilter filter)
         {
+			Logger.LogDebug(">>> Entering BuildUp(container={Container},filter={Filter})", container, filter);
             if (container == null || filter == null)
             {
                 return;
@@ -30,8 +31,10 @@ namespace DotNetNuke.DependencyInjection.Extensions
             var properties = GetDependencyProperties(filter.GetType());
             foreach (var property in properties)
             {
+			Logger.LogDebug("BuildUp(container={Container},filter={Filter}): properties → {Properties}", container, filter, properties);
                 var service = container.GetService(property.PropertyType);
                 if (service != null)
+				Logger.LogDebug("BuildUp(container={Container},filter={Filter}): service → {Service}", container, filter, service);
                 {
                     try
                     {
@@ -46,6 +49,7 @@ namespace DotNetNuke.DependencyInjection.Extensions
 
             IEnumerable<PropertyInfo> GetDependencyProperties(Type type)
             {
+				Logger.LogDebug("<<< Exiting BuildUp(container={Container},filter={Filter})", container, filter);
                 return CBO.Instance.GetCachedObject<IEnumerable<PropertyInfo>>(
                     new CacheItemArgs($"WebApiDependencyProperties_{type.FullName}"),
                     (args) => type

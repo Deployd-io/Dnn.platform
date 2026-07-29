@@ -18,6 +18,7 @@ namespace DotNetNuke.Services.UserProfile
 
     public class UserProfilePicHandler : IHttpHandler
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly object ResizeLocker = new object();
 
         private static readonly HashSet<string> ImageExtensions = new(StringComparer.OrdinalIgnoreCase)
@@ -43,10 +44,13 @@ namespace DotNetNuke.Services.UserProfile
         /// <inheritdoc />
         public void ProcessRequest(HttpContext context)
         {
+			Logger.LogDebug(">>> Entering ProcessRequest(context={Context})", context);
             SetupCulture();
 
             var userId = -1;
             var height = 55;
+			Logger.LogDebug("ProcessRequest(context={Context}): userId → {UserId}", context, userId);
+			Logger.LogDebug("ProcessRequest(context={Context}): height → {Height}", context, height);
             try
             {
                 if (!string.IsNullOrEmpty(context.Request.QueryString["userid"]))
@@ -61,6 +65,7 @@ namespace DotNetNuke.Services.UserProfile
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in ProcessRequest(context={Context}): {Arg1}", context, ex.Message);
                 Exceptions.Exceptions.ProcessHttpException(context.Request);
             }
 
@@ -73,9 +78,12 @@ namespace DotNetNuke.Services.UserProfile
 
             var settings = PortalController.Instance.GetCurrentSettings();
             var user = UserController.Instance.GetUser(settings.PortalId, userId);
+			Logger.LogDebug("ProcessRequest(context={Context}): settings → {Settings}", context, settings);
+			Logger.LogDebug("ProcessRequest(context={Context}): user → {User}", context, user);
 
             var photoLoaded = false;
             if (user != null && TryGetPhotoFile(user, out var photoFile))
+			Logger.LogDebug("ProcessRequest(context={Context}): photoLoaded → {PhotoLoaded}", context, photoLoaded);
             {
                 if (!IsImageExtension(photoFile.Extension))
                 {
@@ -85,14 +93,18 @@ namespace DotNetNuke.Services.UserProfile
                     }
                     catch (ThreadAbortException)
                     {
+						Logger.LogError("Exception in ProcessRequest(context={Context}): {Arg1}", context, ex.Message);
                         // if ThreadAbortException will shown, should catch it and do nothing.
                     }
                 }
 
                 var folder = FolderManager.Instance.GetFolder(photoFile.FolderId);
                 var extension = $".{photoFile.Extension}";
+				Logger.LogDebug("ProcessRequest(context={Context}): folder → {Folder}", context, folder);
+				Logger.LogDebug("ProcessRequest(context={Context}): extension → {Extension}", context, extension);
                 var sizedPhoto = photoFile.FileName.Replace(extension, $"_{size}{extension}");
                 if (!FileManager.Instance.FileExists(folder, sizedPhoto))
+				Logger.LogDebug("ProcessRequest(context={Context}): sizedPhoto → {SizedPhoto}", context, sizedPhoto);
                 {
                     lock (ResizeLocker)
                     {
@@ -100,6 +112,8 @@ namespace DotNetNuke.Services.UserProfile
                         {
                             using var fileContent = FileManager.Instance.GetFileContent(photoFile);
                             using var sizedContent = ImageUtils.CreateImage(fileContent, height, width, extension);
+							Logger.LogDebug("ProcessRequest(context={Context}): fileContent → {FileContent}", context, fileContent);
+							Logger.LogDebug("ProcessRequest(context={Context}): sizedContent → {SizedContent}", context, sizedContent);
 
                             const bool operationDoesNotRequirePermissionsCheck = true;
                             FileManager.Instance.AddFile(folder, sizedPhoto, sizedContent, false, !operationDoesNotRequirePermissionsCheck, FileContentTypeManager.Instance.GetContentType(Path.GetExtension(sizedPhoto)));
@@ -110,6 +124,7 @@ namespace DotNetNuke.Services.UserProfile
                 using var content = FileManager.Instance.GetFileContent(FileManager.Instance.GetFile(folder, sizedPhoto));
                 context.Response.ContentType =
                     photoFile.Extension.ToLowerInvariant() switch
+					Logger.LogDebug("ProcessRequest(context={Context}): content → {Content}", context, content);
                     {
                         "png" => "image/png",
                         "jpeg" or "jpg" => "image/jpeg",
@@ -124,6 +139,8 @@ namespace DotNetNuke.Services.UserProfile
                 }
 
                 photoLoaded = true;
+				Logger.LogDebug(">>> Entering TryGetPhotoFile(targetUser={TargetUser})", targetUser);
+				Logger.LogDebug("<<< Exiting TryGetPhotoFile(targetUser={TargetUser})", targetUser);
             }
 
             if (!photoLoaded)
@@ -137,23 +154,30 @@ namespace DotNetNuke.Services.UserProfile
             context.Response.Cache.SetMaxAge(new TimeSpan(0, 1, 0));
             context.Response.AddHeader("Last-Modified", DateTime.Now.ToString("r"));
             context.ApplicationInstance.CompleteRequest();
+			Logger.LogDebug("<<< Exiting ProcessRequest(context={Context})", context);
         }
 
         // whether current user has permission to view target user's photo.
         private static bool TryGetPhotoFile(UserInfo targetUser, out IFileInfo photoFile)
         {
+			Logger.LogDebug(">>> Entering TryGetPhotoFile(targetUser={TargetUser})", targetUser);
             photoFile = null;
 
+			Logger.LogDebug("TryGetPhotoFile(targetUser={TargetUser}): photoFile → {PhotoFile}", targetUser, photoFile);
             UserInfo user = UserController.Instance.GetCurrentUserInfo();
             var settings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogDebug("TryGetPhotoFile(targetUser={TargetUser}): user → {User}", targetUser, user);
+			Logger.LogDebug("TryGetPhotoFile(targetUser={TargetUser}): settings → {Settings}", targetUser, settings);
             var photoProperty = targetUser.Profile.GetProperty("Photo");
             if (photoProperty == null)
+			Logger.LogDebug("TryGetPhotoFile(targetUser={TargetUser}): photoProperty → {PhotoProperty}", targetUser, photoProperty);
             {
                 return false;
             }
 
             var isVisible = ProfilePropertyAccess.CheckAccessLevel(settings, photoProperty, user, targetUser);
             if (!string.IsNullOrEmpty(photoProperty.PropertyValue) && isVisible)
+			Logger.LogDebug("TryGetPhotoFile(targetUser={TargetUser}): isVisible → {IsVisible}", targetUser, isVisible);
             {
                 photoFile = FileManager.Instance.GetFile(int.Parse(photoProperty.PropertyValue, CultureInfo.InvariantCulture));
                 if (photoFile == null)
@@ -166,6 +190,7 @@ namespace DotNetNuke.Services.UserProfile
                 isVisible = false;
             }
 
+			Logger.LogDebug("<<< Exiting TryGetPhotoFile(targetUser={TargetUser})", targetUser);
             return isVisible;
         }
 
@@ -176,10 +201,13 @@ namespace DotNetNuke.Services.UserProfile
                 case > 0 and <= 32:
                     height = 32;
                     width = 32;
+					Logger.LogDebug("CalculateSize(height={Height}): height → {Height1}", height, height);
+					Logger.LogDebug("CalculateSize(height={Height}): width → {Width}", height, width);
                     size = "xs";
                     break;
                 case > 32 and <= 50:
                     height = 50;
+					Logger.LogDebug("CalculateSize(height={Height}): size → {Size}", height, size);
                     width = 50;
                     size = "s";
                     break;
@@ -199,6 +227,7 @@ namespace DotNetNuke.Services.UserProfile
                     size = "xs";
                     break;
             }
+			Logger.LogDebug("<<< Exiting CalculateSize(height={Height})", height);
         }
 
         private static bool IsImageExtension(string extension)
@@ -207,12 +236,15 @@ namespace DotNetNuke.Services.UserProfile
             {
                 extension = $".{extension}";
             }
+			Logger.LogDebug("IsImageExtension(extension={Extension}): extension → {Extension1}", extension, extension);
 
+			Logger.LogDebug("<<< Exiting IsImageExtension(extension={Extension})", extension);
             return ImageExtensions.Contains(extension);
         }
 
         private static void SetupCulture()
         {
+			Logger.LogDebug(">>> Entering SetupCulture()");
             PortalSettings settings = PortalSettings.Current;
             if (settings is null)
             {
@@ -221,9 +253,11 @@ namespace DotNetNuke.Services.UserProfile
 
             CultureInfo pageLocale = TestableLocalization.Instance.GetPageLocale(settings);
             if (pageLocale is not null)
+			Logger.LogDebug("SetupCulture(): pageLocale → {PageLocale}", pageLocale);
             {
                 TestableLocalization.Instance.SetThreadCultures(pageLocale, settings);
             }
+			Logger.LogDebug("<<< Exiting SetupCulture()");
         }
     }
 }

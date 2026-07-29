@@ -11,6 +11,7 @@ namespace DotNetNuke.Tests.Integration.Executers.Dto
 
     public class CopyModuleItem : IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public int Id { get; set; }
 
         public string Title { get; set; }
@@ -23,8 +24,10 @@ namespace DotNetNuke.Tests.Integration.Executers.Dto
 
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.Id = Convert.ToInt32(dr["ModuleId"]);
             this.Title = Convert.ToString(dr["ModuleTitle"]);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

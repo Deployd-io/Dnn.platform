@@ -15,12 +15,17 @@ namespace DotNetNuke.Web.Api
     /// <summary>A MediaTypeFormatter that simply allows strings to pass through WebAPI and be associated with the specified MIME type.</summary>
     public class StringPassThroughMediaTypeFormatter : MediaTypeFormatter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly string[] DefaultMediaTypes = ["text/plain", "text/html",];
 
         /// <summary>Initializes a new instance of the <see cref="StringPassThroughMediaTypeFormatter"/> class that can handle text/plain and text/html.</summary>
         public StringPassThroughMediaTypeFormatter()
             : this(DefaultMediaTypes)
         {
+		Logger.LogDebug(">>> Entering StringPassThroughMediaTypeFormatter()");
+		Logger.LogDebug("<<< Exiting StringPassThroughMediaTypeFormatter()");
+		Logger.LogDebug(">>> Entering StringPassThroughMediaTypeFormatter(mediaTypes={MediaTypes})", mediaTypes);
+		Logger.LogDebug("<<< Exiting StringPassThroughMediaTypeFormatter(mediaTypes={MediaTypes})", mediaTypes);
         }
 
         /// <summary>Initializes a new instance of the <see cref="StringPassThroughMediaTypeFormatter"/> class that can handle the specified media types.</summary>

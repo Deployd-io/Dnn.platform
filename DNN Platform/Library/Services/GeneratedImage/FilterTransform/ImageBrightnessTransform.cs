@@ -10,14 +10,22 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
     /// <summary>Brightness ImageTransform class.</summary>
     public class ImageBrightnessTransform : ImageTransform
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ImageBrightnessTransform"/> class.</summary>
         public ImageBrightnessTransform()
         {
+			Logger.LogDebug(">>> Entering ImageBrightnessTransform()");
             this.InterpolationMode = InterpolationMode.HighQualityBicubic;
             this.SmoothingMode = SmoothingMode.HighQuality;
+			Logger.LogDebug("ImageBrightnessTransform(): this.InterpolationMode → {Arg0}", this.InterpolationMode);
+			Logger.LogDebug("ImageBrightnessTransform(): this.SmoothingMode → {Arg0}", this.SmoothingMode);
             this.PixelOffsetMode = PixelOffsetMode.HighQuality;
             this.CompositingQuality = CompositingQuality.HighQuality;
             this.Brightness = 0;
+			Logger.LogDebug("<<< Exiting ImageBrightnessTransform()");
+			Logger.LogDebug("ImageBrightnessTransform(): this.PixelOffsetMode → {Arg0}", this.PixelOffsetMode);
+			Logger.LogDebug("ImageBrightnessTransform(): this.CompositingQuality → {Arg0}", this.CompositingQuality);
+			Logger.LogDebug("ImageBrightnessTransform(): this.Brightness → {Arg0}", this.Brightness);
         }
 
         /// <summary>Gets provides an Unique String for this class.</summary>
@@ -31,11 +39,14 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
         /// <returns>Image result after image transformation.</returns>
         public override Image ProcessImage(Image image)
         {
+			Logger.LogDebug(">>> Entering ProcessImage(image={Image})", image);
             var temp = (Bitmap)image;
             var bmap = (Bitmap)temp.Clone();
             if (this.Brightness < -255)
+			Logger.LogDebug("ProcessImage(image={Image}): bmap → {Bmap}", image, bmap);
             {
                 this.Brightness = -255;
+				Logger.LogDebug("ProcessImage(image={Image}): this.Brightness → {Arg1}", image, this.Brightness);
             }
 
             if (this.Brightness > 255)
@@ -50,8 +61,12 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
                 {
                     c = bmap.GetPixel(i, j);
                     int cR = c.R + this.Brightness;
+					Logger.LogDebug("ProcessImage(image={Image}): c → {C}", image, c);
+					Logger.LogDebug("ProcessImage(image={Image}): cR → {CR}", image, cR);
                     int cG = c.G + this.Brightness;
                     int cB = c.B + this.Brightness;
+					Logger.LogDebug("ProcessImage(image={Image}): cG → {CG}", image, cG);
+					Logger.LogDebug("ProcessImage(image={Image}): cB → {CB}", image, cB);
 
                     if (cR < 0)
                     {
@@ -87,6 +102,7 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ProcessImage(image={Image})", image);
             return (Bitmap)bmap.Clone();
         }
     }

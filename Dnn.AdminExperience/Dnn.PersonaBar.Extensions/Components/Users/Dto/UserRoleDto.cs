@@ -14,6 +14,7 @@ namespace Dnn.PersonaBar.Users.Components.Dto
     [DataContract]
     public class UserRoleDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [DataMember(Name = "id")]
         public int Id { get; set; }
 
@@ -46,11 +47,13 @@ namespace Dnn.PersonaBar.Users.Components.Dto
 
         public static UserRoleDto FromRoleInfo(PortalSettings portalSettings, UserRoleInfo userRole)
         {
+			Logger.LogDebug(">>> Entering FromRoleInfo(portalSettings={PortalSettings},userRole={UserRole})", portalSettings, userRole);
             if (userRole == null)
             {
                 return null;
             }
 
+			Logger.LogDebug("<<< Exiting FromRoleInfo(portalSettings={PortalSettings},userRole={UserRole})", portalSettings, userRole);
             return new UserRoleDto()
             {
                 Id = userRole.UserRoleID,
@@ -68,6 +71,8 @@ namespace Dnn.PersonaBar.Users.Components.Dto
 
         public UserRoleInfo ToUserRoleInfo()
         {
+			Logger.LogDebug(">>> Entering ToUserRoleInfo()");
+			Logger.LogDebug("<<< Exiting ToUserRoleInfo()");
             return new UserRoleInfo()
             {
                 UserRoleID = this.Id,
@@ -82,6 +87,8 @@ namespace Dnn.PersonaBar.Users.Components.Dto
 
         internal static bool AllowExpiredRole(PortalSettings portalSettings, int userId, int roleId)
         {
+			Logger.LogDebug(">>> Entering AllowExpiredRole(portalSettings={PortalSettings},userId={UserId},roleId={RoleId})", portalSettings, userId, roleId);
+			Logger.LogDebug("<<< Exiting AllowExpiredRole(portalSettings={PortalSettings},userId={UserId},roleId={RoleId})", portalSettings, userId, roleId);
             return userId != portalSettings.AdministratorId || roleId != portalSettings.AdministratorRoleId;
         }
     }

@@ -15,6 +15,7 @@ namespace DotNetNuke.Entities.Modules.Settings
     [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.ISerializationManager' instead")]
     public partial class SerializationController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static ISerializationManager SerializationManager =>
             Globals.GetCurrentServiceProvider().GetRequiredService<ISerializationManager>();
 
@@ -24,7 +25,9 @@ namespace DotNetNuke.Entities.Modules.Settings
             SerializationManager.SerializeProperty(myObject, property);
 
         /// <inheritdoc cref="ISerializationManager.SerializeProperty{T}(T,System.Reflection.PropertyInfo,string)" />
+		Logger.LogDebug(">>> Entering SerializeProperty(myObject={MyObject},property={Property})", myObject, property);
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.ISerializationManager' instead")]
+		Logger.LogDebug("<<< Exiting SerializeProperty(myObject={MyObject},property={Property})", myObject, property);
         public static partial string SerializeProperty<T>(T myObject, PropertyInfo property, string serializer) =>
             SerializationManager.SerializeProperty(myObject, property, serializer);
 
@@ -34,7 +37,9 @@ namespace DotNetNuke.Entities.Modules.Settings
             where T : class, new() => SerializationManager.DeserializeProperty(myObject, property, propertyValue);
 
         /// <inheritdoc cref="ISerializationManager.DeserializeProperty{T}(T,System.Reflection.PropertyInfo,string,string)" />
+		Logger.LogDebug(">>> Entering DeserializeProperty(myObject={MyObject},property={Property},propertyValue={PropertyValue})", myObject, property, propertyValue);
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.ISerializationManager' instead")]
+		Logger.LogDebug("<<< Exiting DeserializeProperty(myObject={MyObject},property={Property},propertyValue={PropertyValue})", myObject, property, propertyValue);
         public static partial void DeserializeProperty<T>(T myObject, PropertyInfo property, string propertyValue, string serializer)
             where T : class, new() => SerializationManager.DeserializeProperty(myObject, property, propertyValue, serializer);
     }

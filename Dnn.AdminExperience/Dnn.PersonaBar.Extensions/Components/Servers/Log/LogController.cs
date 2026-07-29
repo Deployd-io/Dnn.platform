@@ -17,18 +17,26 @@ namespace Dnn.PersonaBar.Servers.Components.Log
 
     public class LogController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public List<LogFile> GetLogFilesList()
         {
+			Logger.LogDebug(">>> Entering GetLogFilesList()");
             var logPath = Globals.ApplicationMapPath + @"\portals\_default\logs";
+			Logger.LogDebug("GetLogFilesList(): logPath → {LogPath}", logPath);
+			Logger.LogDebug("<<< Exiting GetLogFilesList()");
             return GetLogList(logPath, "*.resources");
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public List<LogFile> GetUpgradeLogList()
         {
+			Logger.LogDebug(">>> Entering GetUpgradeLogList()");
             var objProviderConfiguration = ProviderConfiguration.GetProviderConfiguration("data");
             var strProviderPath = DataProvider.Instance().GetProviderPath();
+			Logger.LogDebug("GetUpgradeLogList(): objProviderConfiguration → {ObjProviderConfiguration}", objProviderConfiguration);
+			Logger.LogDebug("GetUpgradeLogList(): strProviderPath → {StrProviderPath}", strProviderPath);
+			Logger.LogDebug("<<< Exiting GetUpgradeLogList()");
             return GetLogList(strProviderPath, "*.log.resources");
         }
 

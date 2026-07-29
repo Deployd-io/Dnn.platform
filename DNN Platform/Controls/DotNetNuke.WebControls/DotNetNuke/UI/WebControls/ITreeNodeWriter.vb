@@ -3,11 +3,13 @@
 
 Imports System
 Imports System.Web.UI
+Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(ITreeNodeWriter))
 
 Namespace DotNetNuke.UI.WebControls
     Friend Interface ITreeNodeWriter
         ' Methods
         Sub RenderNode(ByVal writer As HtmlTextWriter, ByVal Node As TreeNode)
+		Logger.LogDebug(">>> Entering RenderNode(writer={Writer},Node={Node})", writer, Node)
     End Interface
 End Namespace
 

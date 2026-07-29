@@ -21,6 +21,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
     /// <summary>Provides DNN context for the DDR Menu.</summary>
     public class DNNContext : IDisposable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static string moduleName;
         private static string moduleFolder;
         private static string dataName;
@@ -36,10 +37,16 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         /// <param name="hostControl">The control that hosts the menu.</param>
         public DNNContext(Control hostControl)
         {
+			Logger.LogDebug(">>> Entering DNNContext(hostControl={HostControl})", hostControl);
             this.HostControl = hostControl;
 
+			Logger.LogDebug("DNNContext(hostControl={HostControl}): this.HostControl → {Arg1}", hostControl, this.HostControl);
             this.savedContext = Current;
+			Logger.LogDebug("DNNContext(hostControl={HostControl}): savedContext → {SavedContext}", hostControl, savedContext);
+			Logger.LogDebug("DNNContext(hostControl={HostControl}): this.savedContext → {Arg1}", hostControl, this.savedContext);
             Current = this;
+			Logger.LogDebug("<<< Exiting DNNContext(hostControl={HostControl})", hostControl);
+			Logger.LogDebug("DNNContext(hostControl={HostControl}): Current → {Current}", hostControl, Current);
         }
 
         /// <summary>Gets the module name.</summary>
@@ -54,6 +61,8 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         {
             get { return (DNNContext)HttpContext.Current.Items[DataName]; }
             private set { HttpContext.Current.Items[DataName] = value; }
+			Logger.LogDebug(">>> Entering GetModuleFolder(hostSettings={HostSettings})", hostSettings);
+			Logger.LogDebug("<<< Exiting GetModuleFolder(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <summary>Gets a reference to the page.</summary>
@@ -79,6 +88,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         public static string GetModuleFolder(IHostSettings hostSettings)
         {
             var desktopModule = DesktopModuleController.GetDesktopModuleByModuleName(hostSettings, ModuleName, PortalSettings.Current.PortalId);
+			Logger.LogDebug("GetModuleFolder(hostSettings={HostSettings}): desktopModule → {DesktopModule}", hostSettings, desktopModule);
             return moduleFolder ??= $"~/DesktopModules/{desktopModule.FolderName}/";
         }
 
@@ -87,20 +97,25 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         /// <returns>The converted url.</returns>
         public string ResolveUrl(string relativeUrl)
         {
+			Logger.LogDebug(">>> Entering ResolveUrl(relativeUrl={RelativeUrl})", relativeUrl);
+			Logger.LogDebug("<<< Exiting ResolveUrl(relativeUrl={RelativeUrl})", relativeUrl);
             return this.HostControl.ResolveUrl(relativeUrl);
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+			Logger.LogDebug(">>> Entering Dispose()");
             this.Dispose(true);
             GC.SuppressFinalize(this);
+			Logger.LogDebug("<<< Exiting Dispose()");
         }
 
         /// <summary>Disposes this instance resources.</summary>
         /// <param name="disposing">A value indicating if the current instance is disposing.</param>
         protected virtual void Dispose(bool disposing)
         {
+			Logger.LogDebug(">>> Entering Dispose(disposing={Disposing})", disposing);
             if (this.isDisposed)
             {
                 return;
@@ -112,13 +127,19 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
             }
 
             Current = this.savedContext;
+			Logger.LogDebug("Dispose(disposing={Disposing}): Current → {Current}", disposing, Current);
             this.isDisposed = true;
+			Logger.LogDebug("<<< Exiting Dispose(disposing={Disposing})", disposing);
+			Logger.LogDebug("Dispose(disposing={Disposing}): this.isDisposed → {Arg1}", disposing, this.isDisposed);
         }
 
         private static string GetModuleNameFromAssembly()
         {
+			Logger.LogDebug(">>> Entering GetModuleNameFromAssembly()");
             var moduleFullName = Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().CodeBase);
 
+			Logger.LogDebug("GetModuleNameFromAssembly(): moduleFullName → {ModuleFullName}", moduleFullName);
+			Logger.LogDebug("<<< Exiting GetModuleNameFromAssembly()");
             return moduleFullName.Substring(moduleFullName.LastIndexOf('.') + 1);
         }
     }

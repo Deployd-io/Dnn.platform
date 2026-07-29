@@ -16,6 +16,7 @@ namespace Dnn.PersonaBar.Pages.Services.Dto
     [JsonObject]
     public class DnnModuleDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public bool TranslatedVisible => !this.ErrorVisible && this.CultureCode != null
                                                             && this.DefaultLanguageGuid != Null.NullGuid && this.ModuleId != this.DefaultModuleId;
 
@@ -151,8 +152,11 @@ namespace Dnn.PersonaBar.Pages.Services.Dto
 
         public void SetModuleInfoHelp()
         {
+			Logger.LogDebug(">>> Entering SetModuleInfoHelp()");
             var returnValue = string.Empty;
             var moduleInfo = ModuleController.Instance.GetModule(this.ModuleId, Null.NullInteger, true);
+			Logger.LogDebug("SetModuleInfoHelp(): returnValue → {ReturnValue}", returnValue);
+			Logger.LogDebug("SetModuleInfoHelp(): moduleInfo → {ModuleInfo}", moduleInfo);
             if (moduleInfo != null)
             {
                 if (moduleInfo.IsDeleted)
@@ -173,10 +177,14 @@ namespace Dnn.PersonaBar.Pages.Services.Dto
             }
 
             this.ModuleInfoHelp = returnValue;
+			Logger.LogDebug("<<< Exiting SetModuleInfoHelp()");
+			Logger.LogDebug("SetModuleInfoHelp(): this.ModuleInfoHelp → {Arg0}", this.ModuleInfoHelp);
         }
 
         private string LocalizeString(string localizationKey)
         {
+			Logger.LogDebug(">>> Entering LocalizeString(localizationKey={LocalizationKey})", localizationKey);
+			Logger.LogDebug("<<< Exiting LocalizeString(localizationKey={LocalizationKey})", localizationKey);
             return Localization.GetString(localizationKey, this.LocalResourceFile) ?? string.Empty;
         }
     }

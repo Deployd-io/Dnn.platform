@@ -13,6 +13,7 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
     /// <inheritdoc cref="IClearCacheStep" />
     internal sealed class ClearCacheStep : StepBase, IClearCacheStep
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IDataCache dataCache;
 
         /// <summary>Initializes a new instance of the <see cref="ClearCacheStep"/> class.</summary>
@@ -22,10 +23,15 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         public ClearCacheStep(ILoggerSource loggerSource, ILocalizer localizer, IDataCache dataCache)
             : base(loggerSource, localizer)
         {
+			Logger.LogDebug(">>> Entering ClearCacheStep(loggerSource={LoggerSource},localizer={Localizer},dataCache={DataCache})", loggerSource, localizer, dataCache);
             this.dataCache = dataCache ??
+				Logger.LogDebug("<<< Exiting ClearCacheStep(loggerSource={LoggerSource},localizer={Localizer},dataCache={DataCache})", loggerSource, localizer, dataCache);
+				Logger.LogDebug("ClearCacheStep(loggerSource={LoggerSource},localizer={Localizer},dataCache={DataCache}): dataCache → {DataCache1}", loggerSource, localizer, dataCache, dataCache);
+				Logger.LogDebug("ClearCacheStep(loggerSource={LoggerSource},localizer={Localizer},dataCache={DataCache}): this.dataCache → {Arg3}", loggerSource, localizer, dataCache, this.dataCache);
                 throw new ArgumentNullException(nameof(dataCache));
 
             this.Quiet = true;
+			Logger.LogDebug("ClearCacheStep(loggerSource={LoggerSource},localizer={Localizer},dataCache={DataCache}): this.Quiet → {Arg3}", loggerSource, localizer, dataCache, this.Quiet);
         }
 
         /// <inheritdoc />
@@ -34,8 +40,11 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         /// <inheritdoc />
         protected override void ExecuteInternal()
         {
+			Logger.LogDebug(">>> Entering ExecuteInternal()");
             this.dataCache.ClearCache();
             this.Success = true;
+			Logger.LogDebug("<<< Exiting ExecuteInternal()");
+			Logger.LogDebug("ExecuteInternal(): this.Success → {Arg0}", this.Success);
         }
     }
 }

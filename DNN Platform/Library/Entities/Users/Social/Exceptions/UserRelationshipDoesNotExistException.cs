@@ -10,9 +10,12 @@ namespace DotNetNuke.Entities.Users
     [Serializable]
     public class UserRelationshipDoesNotExistException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="UserRelationshipDoesNotExistException"/> class.</summary>
         public UserRelationshipDoesNotExistException()
         {
+		Logger.LogDebug(">>> Entering UserRelationshipDoesNotExistException()");
+		Logger.LogDebug("<<< Exiting UserRelationshipDoesNotExistException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="UserRelationshipDoesNotExistException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Entities.Users
         public UserRelationshipDoesNotExistException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering UserRelationshipDoesNotExistException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting UserRelationshipDoesNotExistException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="UserRelationshipDoesNotExistException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

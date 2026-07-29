@@ -10,6 +10,7 @@ namespace DotNetNuke.Framework.Providers
 
     public class ProviderConfiguration
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly Hashtable providers = new Hashtable();
         private string defaultProvider;
 
@@ -31,20 +32,26 @@ namespace DotNetNuke.Framework.Providers
 
         public static ProviderConfiguration GetProviderConfiguration(string strProvider)
         {
+			Logger.LogDebug(">>> Entering GetProviderConfiguration(strProvider={StrProvider})", strProvider);
+			Logger.LogDebug("<<< Exiting GetProviderConfiguration(strProvider={StrProvider})", strProvider);
             return (ProviderConfiguration)Config.GetSection("dotnetnuke/" + strProvider);
         }
 
         public Provider GetDefaultProvider()
         {
+			Logger.LogDebug(">>> Entering GetDefaultProvider()");
+			Logger.LogDebug("<<< Exiting GetDefaultProvider()");
             return (Provider)this.providers[this.defaultProvider];
         }
 
         internal void LoadValuesFromConfigurationXml(XmlNode node)
         {
+			Logger.LogDebug(">>> Entering LoadValuesFromConfigurationXml(node={Node})", node);
             XmlAttributeCollection attributeCollection = node.Attributes;
 
             // Get the default provider
             this.defaultProvider = attributeCollection["defaultProvider"].Value;
+			Logger.LogDebug("LoadValuesFromConfigurationXml(node={Node}): this.defaultProvider → {Arg1}", node, this.defaultProvider);
 
             // Read child nodes
             foreach (XmlNode child in node.ChildNodes)
@@ -54,10 +61,12 @@ namespace DotNetNuke.Framework.Providers
                     this.GetProviders(child);
                 }
             }
+			Logger.LogDebug("<<< Exiting LoadValuesFromConfigurationXml(node={Node})", node);
         }
 
         internal void GetProviders(XmlNode node)
         {
+			Logger.LogDebug(">>> Entering GetProviders(node={Node})", node);
             foreach (XmlNode provider in node.ChildNodes)
             {
                 switch (provider.Name)
@@ -73,6 +82,7 @@ namespace DotNetNuke.Framework.Providers
                         break;
                 }
             }
+			Logger.LogDebug("<<< Exiting GetProviders(node={Node})", node);
         }
     }
 }

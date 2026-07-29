@@ -12,20 +12,27 @@ namespace DotNetNuke.Common.Controls
     /// <summary>The Form will reset action to raw url instead of rewrite url.</summary>
     public class Form : HtmlForm
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         protected override void RenderAttributes(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering RenderAttributes(writer={Writer})", writer);
             var stringWriter = new StringWriter();
             var htmlWriter = new HtmlTextWriter(stringWriter);
+			Logger.LogDebug("RenderAttributes(writer={Writer}): stringWriter → {StringWriter}", writer, stringWriter);
+			Logger.LogDebug("RenderAttributes(writer={Writer}): htmlWriter → {HtmlWriter}", writer, htmlWriter);
             base.RenderAttributes(htmlWriter);
             string html = stringWriter.ToString();
 
+			Logger.LogDebug("RenderAttributes(writer={Writer}): html → {Html}", writer, html);
             // Locate and replace action attribute
             int startPoint = html.IndexOf("action=\"", StringComparison.OrdinalIgnoreCase);
             if (startPoint >= 0)
+			Logger.LogDebug("RenderAttributes(writer={Writer}): startPoint → {StartPoint}", writer, startPoint);
             {
                 int endPoint = html.IndexOf("\"", startPoint + 8, StringComparison.Ordinal) + 1;
                 html = html.Remove(startPoint, endPoint - startPoint);
+				Logger.LogDebug("RenderAttributes(writer={Writer}): endPoint → {EndPoint}", writer, endPoint);
                 html = html.Insert(startPoint, "action=\"" + HttpUtility.HtmlEncode(HttpContext.Current.Request.RawUrl) + "\"");
             }
 
@@ -42,6 +49,7 @@ namespace DotNetNuke.Common.Controls
             }
 
             writer.Write(html);
+			Logger.LogDebug("<<< Exiting RenderAttributes(writer={Writer})", writer);
         }
     }
 }

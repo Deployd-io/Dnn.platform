@@ -49,7 +49,10 @@ namespace DotNetNuke.Modules.Html
     public partial class HtmlTextController(INavigationManager navigationManager, IPortalAliasService portalAliasService, IPortalController portalController, IApplicationStatusInfo appStatus, IHostSettings hostSettings, HtmlModuleSettingsRepository settingsRepository)
         : ModuleSearchBase, IPortable, IUpgradeable, IVersionable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1310:FieldNamesMustNotContainUnderscore", Justification = "Breaking Change")]
+		Logger.LogDebug(">>> Entering HtmlTextController(navigationManager={NavigationManager},portalAliasService={PortalAliasService},portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},settingsRepository={SettingsRepository})", navigationManager, portalAliasService, portalController, appStatus, hostSettings, settingsRepository);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         public const int MAX_DESCRIPTION_LENGTH = 100;
 
         private const string PortalRootToken = "{{PortalRoot}}";
@@ -57,10 +60,15 @@ namespace DotNetNuke.Modules.Html
         private readonly IWorkflowManager workflowManager = WorkflowManager.Instance;
         private readonly IPortalAliasService portalAliasService = portalAliasService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalAliasService>();
         private readonly IPortalController portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+		Logger.LogDebug("HtmlTextController(navigationManager={NavigationManager},portalAliasService={PortalAliasService},portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},settingsRepository={SettingsRepository}): portalAliasService → {PortalAliasService1}", navigationManager, portalAliasService, portalController, appStatus, hostSettings, settingsRepository, portalAliasService);
+		Logger.LogDebug("HtmlTextController(navigationManager={NavigationManager},portalAliasService={PortalAliasService},portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},settingsRepository={SettingsRepository}): portalController → {PortalController1}", navigationManager, portalAliasService, portalController, appStatus, hostSettings, settingsRepository, portalController);
         private readonly IApplicationStatusInfo appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+		Logger.LogDebug("HtmlTextController(navigationManager={NavigationManager},portalAliasService={PortalAliasService},portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},settingsRepository={SettingsRepository}): appStatus → {AppStatus1}", navigationManager, portalAliasService, portalController, appStatus, hostSettings, settingsRepository, appStatus);
+		Logger.LogDebug("HtmlTextController(navigationManager={NavigationManager},portalAliasService={PortalAliasService},portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},settingsRepository={SettingsRepository}): hostSettings → {HostSettings1}", navigationManager, portalAliasService, portalController, appStatus, hostSettings, settingsRepository, hostSettings);
         private readonly HtmlModuleSettingsRepository settingsRepository = settingsRepository ?? Globals.GetCurrentServiceProvider().GetRequiredService<HtmlModuleSettingsRepository>();
 
+		Logger.LogDebug("HtmlTextController(navigationManager={NavigationManager},portalAliasService={PortalAliasService},portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},settingsRepository={SettingsRepository}): settingsRepository → {SettingsRepository1}", navigationManager, portalAliasService, portalController, appStatus, hostSettings, settingsRepository, settingsRepository);
         /// <summary>Initializes a new instance of the <see cref="HtmlTextController"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IPortalAliasService. Scheduled removal in v12.0.0.")]
         public HtmlTextController()
@@ -74,6 +82,9 @@ namespace DotNetNuke.Modules.Html
         public HtmlTextController(INavigationManager navigationManager)
             : this(navigationManager, null, null, null, null, null)
         {
+		Logger.LogInformation("HtmlTextController(navigationManager,portalAliasService,portalController,appStatus,hostSettings,settingsRepository)={NavigationManager},{PortalAliasService},{PortalController},{AppStatus},{HostSettings},{SettingsRepository}: find query executed in {Arg6} ms", navigationManager, portalAliasService, portalController, appStatus, hostSettings, settingsRepository, __logStart.ElapsedMilliseconds);
+		Logger.LogError("Exception in HtmlTextController(navigationManager={NavigationManager},portalAliasService={PortalAliasService},portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},settingsRepository={SettingsRepository}): {Arg6}", navigationManager, portalAliasService, portalController, appStatus, hostSettings, settingsRepository, ex.Message);
+		Logger.LogDebug("<<< Exiting HtmlTextController(navigationManager={NavigationManager},portalAliasService={PortalAliasService},portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},settingsRepository={SettingsRepository})", navigationManager, portalAliasService, portalController, appStatus, hostSettings, settingsRepository);
         }
 
         /// <summary>Initializes a new instance of the <see cref="HtmlTextController"/> class.</summary>
@@ -212,8 +223,10 @@ namespace DotNetNuke.Modules.Html
 
         public string ReplaceWithRootToken(Match m)
         {
+			Logger.LogDebug(">>> Entering ReplaceWithRootToken(m={M})", m);
             var domain = m.Groups["domain"].Value;
 
+			Logger.LogDebug("ReplaceWithRootToken(m={M}): domain → {Domain}", m, domain);
             // Relative url
             if (string.IsNullOrEmpty(domain))
             {
@@ -222,6 +235,7 @@ namespace DotNetNuke.Modules.Html
 
             var aliases = this.portalAliasService.GetPortalAliases();
             if (!aliases.ContainsKey(domain))
+			Logger.LogDebug("ReplaceWithRootToken(m={M}): aliases → {Aliases}", m, aliases);
             {
                 // this is no not a portal url so even if it contains /portals/..
                 // we do not need to replace it with a token
@@ -231,6 +245,9 @@ namespace DotNetNuke.Modules.Html
             // full qualified portal url that needs to be tokenized
             var result = domain + PortalRootToken;
             var protocol = m.Groups["protocol"].Value;
+			Logger.LogDebug("ReplaceWithRootToken(m={M}): result → {Result}", m, result);
+			Logger.LogDebug("ReplaceWithRootToken(m={M}): protocol → {Protocol}", m, protocol);
+			Logger.LogDebug("<<< Exiting ReplaceWithRootToken(m={M})", m);
             return string.IsNullOrEmpty(protocol) ? result : protocol + result;
         }
 
@@ -239,14 +256,17 @@ namespace DotNetNuke.Modules.Html
         /// <param name="itemID">The ID of the Item.</param>
         public void DeleteHtmlText(int moduleID, int itemID)
         {
+			Logger.LogDebug(">>> Entering DeleteHtmlText(moduleID={ModuleID},itemID={ItemID})", moduleID, itemID);
             var moduleVersion = this.GetHtmlText(moduleID, itemID).Version;
 
+			Logger.LogDebug("DeleteHtmlText(moduleID={ModuleID},itemID={ItemID}): moduleVersion → {ModuleVersion}", moduleID, itemID, moduleVersion);
             DataProvider.Instance().DeleteHtmlText(moduleID, itemID);
 
             // refresh output cache
             ModuleController.SynchronizeModule(moduleID);
 
             TrackModuleModification(moduleID, moduleVersion);
+			Logger.LogDebug("<<< Exiting DeleteHtmlText(moduleID={ModuleID},itemID={ItemID})", moduleID, itemID);
         }
 
         /// <summary>GetAllHtmlText gets a collection of HtmlTextInfo objects for the Module and Workflow.</summary>
@@ -254,6 +274,8 @@ namespace DotNetNuke.Modules.Html
         /// <returns>A <see cref="List{T}"/> of <see cref="HtmlTextInfo"/> instances.</returns>
         public List<HtmlTextInfo> GetAllHtmlText(int moduleID)
         {
+			Logger.LogDebug(">>> Entering GetAllHtmlText(moduleID={ModuleID})", moduleID);
+			Logger.LogDebug("<<< Exiting GetAllHtmlText(moduleID={ModuleID})", moduleID);
             return CBO.FillCollection<HtmlTextInfo>(DataProvider.Instance().GetAllHtmlText(moduleID));
         }
 
@@ -263,6 +285,8 @@ namespace DotNetNuke.Modules.Html
         /// <returns>An <see cref="HtmlTextInfo"/> instance or <see langword="null"/>.</returns>
         public HtmlTextInfo GetHtmlText(int moduleID, int itemID)
         {
+			Logger.LogDebug(">>> Entering GetHtmlText(moduleID={ModuleID},itemID={ItemID})", moduleID, itemID);
+			Logger.LogDebug("<<< Exiting GetHtmlText(moduleID={ModuleID},itemID={ItemID})", moduleID, itemID);
             return CBO.FillObject<HtmlTextInfo>(DataProvider.Instance().GetHtmlText(moduleID, itemID));
         }
 
@@ -373,14 +397,21 @@ namespace DotNetNuke.Modules.Html
             // refresh to get version
             htmlContent = this.GetHtmlText(htmlContent.ModuleID, htmlContent.ItemID);
 
+			Logger.LogDebug("UpdateHtmlText(htmlContent={HtmlContent},maximumVersionHistory={MaximumVersionHistory}): htmlContent → {HtmlContent1}", htmlContent, maximumVersionHistory, htmlContent);
             // add log history
             var logInfo = new HtmlTextLogInfo();
             logInfo.ItemID = htmlContent.ItemID;
+			Logger.LogDebug("UpdateHtmlText(htmlContent={HtmlContent},maximumVersionHistory={MaximumVersionHistory}): logInfo → {LogInfo}", htmlContent, maximumVersionHistory, logInfo);
+			Logger.LogDebug("UpdateHtmlText(htmlContent={HtmlContent},maximumVersionHistory={MaximumVersionHistory}): logInfo.ItemID → {Arg2}", htmlContent, maximumVersionHistory, logInfo.ItemID);
+			Logger.LogDebug("UpdateHtmlText(htmlContent={HtmlContent},maximumVersionHistory={MaximumVersionHistory}): logInfo.StateID → {Arg2}", htmlContent, maximumVersionHistory, logInfo.StateID);
+			Logger.LogDebug("UpdateHtmlText(htmlContent={HtmlContent},maximumVersionHistory={MaximumVersionHistory}): logInfo.Approved → {Arg2}", htmlContent, maximumVersionHistory, logInfo.Approved);
+			Logger.LogDebug("UpdateHtmlText(htmlContent={HtmlContent},maximumVersionHistory={MaximumVersionHistory}): logInfo.Comment → {Arg2}", htmlContent, maximumVersionHistory, logInfo.Comment);
             logInfo.StateID = htmlContent.StateID;
             logInfo.Approved = htmlContent.Approved;
             logInfo.Comment = htmlContent.Comment;
             var objLogs = new HtmlTextLogController();
             objLogs.AddHtmlTextLog(logInfo);
+			Logger.LogDebug("UpdateHtmlText(htmlContent={HtmlContent},maximumVersionHistory={MaximumVersionHistory}): objLogs → {ObjLogs}", htmlContent, maximumVersionHistory, objLogs);
 
             // create user notifications
             this.CreateUserNotifications(htmlContent);
@@ -391,6 +422,7 @@ namespace DotNetNuke.Modules.Html
             var moduleVersion = htmlContent.Version < 1 ? 1 : htmlContent.Version;
 
             TrackModuleModification(htmlContent.ModuleID, moduleVersion);
+			Logger.LogDebug("<<< Exiting UpdateHtmlText(htmlContent={HtmlContent},maximumVersionHistory={MaximumVersionHistory})", htmlContent, maximumVersionHistory);
         }
 
         /// <summary>GetMaximumVersionHistory retrieves the maximum number of versions to store for a module.</summary>
@@ -398,8 +430,10 @@ namespace DotNetNuke.Modules.Html
         /// <returns>The maximum number of versions for the portal (defaults to <c>5</c>).</returns>
         public int GetMaximumVersionHistory(int portalID)
         {
+			Logger.LogDebug(">>> Entering GetMaximumVersionHistory(portalID={PortalID})", portalID);
             int intMaximumVersionHistory = -1;
 
+			Logger.LogDebug("GetMaximumVersionHistory(portalID={PortalID}): intMaximumVersionHistory → {IntMaximumVersionHistory}", portalID, intMaximumVersionHistory);
             // get from portal settings
             intMaximumVersionHistory = int.Parse(PortalController.GetPortalSetting(this.portalController, "MaximumVersionHistory", portalID, "-1"));
 
@@ -412,6 +446,7 @@ namespace DotNetNuke.Modules.Html
                 PortalController.UpdatePortalSetting(this.portalController, portalID, "MaximumVersionHistory", intMaximumVersionHistory.ToString());
             }
 
+			Logger.LogDebug("<<< Exiting GetMaximumVersionHistory(portalID={PortalID})", portalID);
             return intMaximumVersionHistory;
         }
 
@@ -420,6 +455,7 @@ namespace DotNetNuke.Modules.Html
         /// <param name="maximumVersionHistory">The MaximumVersionHistory.</param>
         public void UpdateMaximumVersionHistory(int portalID, int maximumVersionHistory)
         {
+			Logger.LogDebug(">>> Entering UpdateMaximumVersionHistory(portalID={PortalID},maximumVersionHistory={MaximumVersionHistory})", portalID, maximumVersionHistory);
             // data integrity check
             if (maximumVersionHistory < 0)
             {
@@ -431,58 +467,78 @@ namespace DotNetNuke.Modules.Html
             // save portal setting
             var objPortalSettings = PortalController.Instance.GetCurrentSettings();
             if (PortalSecurity.IsInRole(objPortalSettings.AdministratorRoleName))
+			Logger.LogDebug("UpdateMaximumVersionHistory(portalID={PortalID},maximumVersionHistory={MaximumVersionHistory}): objPortalSettings → {ObjPortalSettings}", portalID, maximumVersionHistory, objPortalSettings);
             {
                 PortalController.UpdatePortalSetting(this.portalController, portalID, "MaximumVersionHistory", maximumVersionHistory.ToString());
             }
+			Logger.LogDebug("<<< Exiting UpdateMaximumVersionHistory(portalID={PortalID},maximumVersionHistory={MaximumVersionHistory})", portalID, maximumVersionHistory);
         }
 
         public void DeleteVersion(int moduleId, int version)
         {
+			Logger.LogDebug(">>> Entering DeleteVersion(moduleId={ModuleId},version={Version})", moduleId, version);
             var htmlContent = this.GetAllHtmlText(moduleId).First(h => h.Version == version || h.Version == this.GetLatestVersion(moduleId));
 
+			Logger.LogDebug("DeleteVersion(moduleId={ModuleId},version={Version}): htmlContent → {HtmlContent}", moduleId, version, htmlContent);
             this.DeleteHtmlText(moduleId, htmlContent.ItemID);
+			Logger.LogDebug("<<< Exiting DeleteVersion(moduleId={ModuleId},version={Version})", moduleId, version);
         }
 
         public int RollBackVersion(int moduleId, int version)
         {
+			Logger.LogDebug(">>> Entering RollBackVersion(moduleId={ModuleId},version={Version})", moduleId, version);
             throw new NotImplementedException();
         }
 
         public void PublishVersion(int moduleId, int version)
         {
+			Logger.LogDebug(">>> Entering PublishVersion(moduleId={ModuleId},version={Version})", moduleId, version);
             var htmlContent = this.GetAllHtmlText(moduleId).First(h => h.Version == version || h.Version == this.GetLatestVersion(moduleId));
             htmlContent.StateID = this.workflowManager.GetWorkflow(htmlContent.WorkflowID).LastState.StateID;
+			Logger.LogDebug("PublishVersion(moduleId={ModuleId},version={Version}): htmlContent → {HtmlContent}", moduleId, version, htmlContent);
             this.UpdateHtmlText(htmlContent, this.GetMaximumVersionHistory(htmlContent.PortalID));
+			Logger.LogDebug("<<< Exiting PublishVersion(moduleId={ModuleId},version={Version})", moduleId, version);
         }
 
         public int GetPublishedVersion(int moduleId)
         {
+			Logger.LogDebug(">>> Entering GetPublishedVersion(moduleId={ModuleId})", moduleId);
             var htmlText = CBO.FillObject<HtmlTextInfo>(DataProvider.Instance().GetTopHtmlText(moduleId, true));
+			Logger.LogDebug("GetPublishedVersion(moduleId={ModuleId}): htmlText → {HtmlText}", moduleId, htmlText);
+			Logger.LogDebug("<<< Exiting GetPublishedVersion(moduleId={ModuleId})", moduleId);
             return htmlText.Version;
         }
 
         public int GetLatestVersion(int moduleId)
         {
+			Logger.LogDebug(">>> Entering GetLatestVersion(moduleId={ModuleId})", moduleId);
             var htmlText = CBO.FillObject<HtmlTextInfo>(DataProvider.Instance().GetTopHtmlText(moduleId, false));
+			Logger.LogDebug("GetLatestVersion(moduleId={ModuleId}): htmlText → {HtmlText}", moduleId, htmlText);
+			Logger.LogDebug("<<< Exiting GetLatestVersion(moduleId={ModuleId})", moduleId);
             return htmlText.Version;
         }
 
         /// <inheritdoc />
         public string ExportModule(int moduleId)
         {
+			Logger.LogDebug(">>> Entering ExportModule(moduleId={ModuleId})", moduleId);
             string xml = string.Empty;
 
             ModuleInfo module = ModuleController.Instance.GetModule(moduleId, Null.NullInteger, true);
             int workflowID = this.GetWorkflow(moduleId, module.TabID, module.PortalID).Value;
+			Logger.LogDebug("ExportModule(moduleId={ModuleId}): module → {Module}", moduleId, module);
+			Logger.LogDebug("ExportModule(moduleId={ModuleId}): workflowID → {WorkflowID}", moduleId, workflowID);
 
             HtmlTextInfo content = this.GetTopHtmlText(moduleId, true, workflowID);
             if (content != null)
+			Logger.LogDebug("ExportModule(moduleId={ModuleId}): content → {Content}", moduleId, content);
             {
                 xml += "<htmltext>";
                 xml += "<content>" + XmlUtils.XMLEncode(this.TokeniseLinks(content.Content, module.PortalID)) + "</content>";
                 xml += "</htmltext>";
             }
 
+			Logger.LogDebug("<<< Exiting ExportModule(moduleId={ModuleId})", moduleId);
             return xml;
         }
 
@@ -519,20 +575,29 @@ namespace DotNetNuke.Modules.Html
         /// <inheritdoc />
         public override IList<SearchDocument> GetModifiedSearchDocuments(ModuleInfo modInfo, DateTime beginDateUtc)
         {
+			Logger.LogDebug(">>> Entering GetModifiedSearchDocuments(modInfo={ModInfo},beginDateUtc={BeginDateUtc})", modInfo, beginDateUtc);
             var workflowId = this.GetWorkflow(modInfo.ModuleID, modInfo.TabID, modInfo.PortalID).Value;
             var searchDocuments = new List<SearchDocument>();
+			Logger.LogDebug("GetModifiedSearchDocuments(modInfo={ModInfo},beginDateUtc={BeginDateUtc}): workflowId → {WorkflowId}", modInfo, beginDateUtc, workflowId);
+			Logger.LogDebug("GetModifiedSearchDocuments(modInfo={ModInfo},beginDateUtc={BeginDateUtc}): searchDocuments → {SearchDocuments}", modInfo, beginDateUtc, searchDocuments);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var htmlTextInfo = this.GetTopHtmlText(modInfo.ModuleID, true, workflowId);
             var settings = this.settingsRepository.GetSettings(modInfo);
 
+			Logger.LogDebug("GetModifiedSearchDocuments(modInfo={ModInfo},beginDateUtc={BeginDateUtc}): htmlTextInfo → {HtmlTextInfo}", modInfo, beginDateUtc, htmlTextInfo);
+			Logger.LogDebug("GetModifiedSearchDocuments(modInfo={ModInfo},beginDateUtc={BeginDateUtc}): settings → {Settings}", modInfo, beginDateUtc, settings);
             if (htmlTextInfo != null &&
                 (htmlTextInfo.LastModifiedOnDate.ToUniversalTime() > beginDateUtc &&
                  htmlTextInfo.LastModifiedOnDate.ToUniversalTime() < DateTime.UtcNow))
             {
+				Logger.LogInformation("HtmlTextController(navigationManager,portalAliasService,portalController,appStatus,hostSettings,settingsRepository)={NavigationManager},{PortalAliasService},{PortalController},{AppStatus},{HostSettings},{SettingsRepository}: find query executed in {Arg6} ms", navigationManager, portalAliasService, portalController, appStatus, hostSettings, settingsRepository, __logStart.ElapsedMilliseconds);
                 var strContent = HtmlUtils.Clean(htmlTextInfo.Content, false);
 
+				Logger.LogDebug("GetModifiedSearchDocuments(modInfo={ModInfo},beginDateUtc={BeginDateUtc}): strContent → {StrContent}", modInfo, beginDateUtc, strContent);
                 // Get the description string
                 var description = strContent.Length <= settings.SearchDescLength ? strContent : HtmlUtils.Shorten(strContent, settings.SearchDescLength, "...");
 
+				Logger.LogDebug("GetModifiedSearchDocuments(modInfo={ModInfo},beginDateUtc={BeginDateUtc}): description → {Description}", modInfo, beginDateUtc, description);
                 var searchDoc = new SearchDocument
                 {
                     UniqueKey = modInfo.ModuleID.ToString(),
@@ -551,12 +616,14 @@ namespace DotNetNuke.Modules.Html
                 searchDocuments.Add(searchDoc);
             }
 
+			Logger.LogDebug("<<< Exiting GetModifiedSearchDocuments(modInfo={ModInfo},beginDateUtc={BeginDateUtc})", modInfo, beginDateUtc);
             return searchDocuments;
         }
 
         /// <inheritdoc />
         public string UpgradeModule(string version)
         {
+			Logger.LogDebug(">>> Entering UpgradeModule(version={Version})", version);
             switch (version)
             {
                 case "05.01.02":
@@ -571,6 +638,8 @@ namespace DotNetNuke.Modules.Html
                 case "06.00.00":
                     DesktopModuleInfo desktopModule = DesktopModuleController.GetDesktopModuleByModuleName(this.hostSettings, "DNN_HTML", Null.NullInteger);
                     desktopModule.Category = "Common";
+					Logger.LogDebug("UpgradeModule(version={Version}): desktopModule → {DesktopModule}", version, desktopModule);
+					Logger.LogDebug("UpgradeModule(version={Version}): desktopModule.Category → {Arg1}", version, desktopModule.Category);
                     DesktopModuleController.SaveDesktopModule(desktopModule, false, false);
                     break;
 
@@ -583,24 +652,32 @@ namespace DotNetNuke.Modules.Html
                     break;
             }
 
+			Logger.LogDebug("<<< Exiting UpgradeModule(version={Version})", version);
             return "Success";
         }
 
         private static void AddHtmlNotification(IHostSettings hostSettings, string subject, string body, UserInfo user)
         {
+			Logger.LogDebug(">>> Entering AddHtmlNotification(hostSettings={HostSettings},subject={Subject},body={Body},user={User})", hostSettings, subject, body, user);
             var notificationType = NotificationsController.Instance.GetNotificationType("HtmlNotification");
             var portalSettings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogDebug("AddHtmlNotification(hostSettings={HostSettings},subject={Subject},body={Body},user={User}): notificationType → {NotificationType}", hostSettings, subject, body, user, notificationType);
+			Logger.LogDebug("AddHtmlNotification(hostSettings={HostSettings},subject={Subject},body={Body},user={User}): portalSettings → {PortalSettings}", hostSettings, subject, body, user, portalSettings);
             var sender = UserController.GetUserById(hostSettings, portalSettings.PortalId, portalSettings.AdministratorId);
 
+			Logger.LogDebug("AddHtmlNotification(hostSettings={HostSettings},subject={Subject},body={Body},user={User}): sender → {Sender}", hostSettings, subject, body, user, sender);
             var notification = new Notification { NotificationTypeID = notificationType.NotificationTypeId, Subject = subject, Body = body, IncludeDismissAction = true, SenderUserID = sender.UserID };
             NotificationsController.Instance.SendNotification(notification, portalSettings.PortalId, null, new List<UserInfo> { user });
+			Logger.LogDebug("<<< Exiting AddHtmlNotification(hostSettings={HostSettings},subject={Subject},body={Body},user={User})", hostSettings, subject, body, user);
         }
 
         private static List<string> CollectHierarchicalTags(List<Term> terms)
         {
+			Logger.LogDebug(">>> Entering CollectHierarchicalTags(terms={Terms})", terms);
             Func<List<Term>, List<string>, List<string>> collectTagsFunc = null;
             collectTagsFunc = (ts, tags) =>
             {
+			Logger.LogDebug("CollectHierarchicalTags(terms={Terms}): collectTagsFunc → {CollectTagsFunc}", terms, collectTagsFunc);
                 if (ts != null && ts.Count > 0)
                 {
                     foreach (var t in ts)
@@ -613,6 +690,7 @@ namespace DotNetNuke.Modules.Html
                 return tags;
             };
 
+			Logger.LogDebug("<<< Exiting CollectHierarchicalTags(terms={Terms})", terms);
             return collectTagsFunc(terms, new List<string>());
         }
 
@@ -634,17 +712,21 @@ namespace DotNetNuke.Modules.Html
         /// <param name="objHtmlText">An HtmlTextInfo object.</param>
         private void CreateUserNotifications(HtmlTextInfo objHtmlText)
         {
+			Logger.LogDebug(">>> Entering CreateUserNotifications(objHtmlText={ObjHtmlText})", objHtmlText);
             var htmlTextUserController = new HtmlTextUserController();
 
+			Logger.LogDebug("CreateUserNotifications(objHtmlText={ObjHtmlText}): htmlTextUserController → {HtmlTextUserController}", objHtmlText, htmlTextUserController);
             // clean up old user notification records
             htmlTextUserController.DeleteHtmlTextUsers();
 
             // ensure we have latest htmltext object loaded
             objHtmlText = this.GetHtmlText(objHtmlText.ModuleID, objHtmlText.ItemID);
 
+			Logger.LogDebug("CreateUserNotifications(objHtmlText={ObjHtmlText}): objHtmlText → {ObjHtmlText1}", objHtmlText, objHtmlText);
             // build collection of users to notify
             var arrUsers = new ArrayList();
 
+			Logger.LogDebug("CreateUserNotifications(objHtmlText={ObjHtmlText}): arrUsers → {ArrUsers}", objHtmlText, arrUsers);
             // if not published
             if (!objHtmlText.IsPublished)
             {
@@ -664,6 +746,7 @@ namespace DotNetNuke.Modules.Html
                             int roleId = permission.RoleId;
                             RoleInfo objRole = RoleController.Instance.GetRole(objHtmlText.PortalID, r => r.RoleID == roleId);
                             if (objRole != null)
+							Logger.LogDebug("CreateUserNotifications(objHtmlText={ObjHtmlText}): objRole → {ObjRole}", objHtmlText, objRole);
                             {
                                 foreach (UserRoleInfo objUserRole in RoleController.Instance.GetUserRoles(objHtmlText.PortalID, null, objRole.RoleName))
                                 {
@@ -691,14 +774,17 @@ namespace DotNetNuke.Modules.Html
                 // get tabid from module
                 ModuleInfo objModule = ModuleController.Instance.GetModule(objHtmlText.ModuleID, Null.NullInteger, true);
 
+				Logger.LogDebug("CreateUserNotifications(objHtmlText={ObjHtmlText}): objModule → {ObjModule}", objHtmlText, objModule);
                 var objPortalSettings = PortalController.Instance.GetCurrentSettings();
                 if (objPortalSettings != null)
+				Logger.LogDebug("CreateUserNotifications(objHtmlText={ObjHtmlText}): objPortalSettings → {ObjPortalSettings}", objHtmlText, objPortalSettings);
                 {
                     string strResourceFile =
                         $"{Globals.ApplicationPath}/DesktopModules/{objModule.DesktopModule.FolderName}/{Localization.LocalResourceDirectory}/{Localization.LocalSharedResourceFile}";
                     string strSubject = Localization.GetString("NotificationSubject", strResourceFile);
                     string strBody = Localization.GetString("NotificationBody", strResourceFile);
                     strBody = strBody.Replace("[URL]", this.NavigationManager.NavigateURL(objModule.TabID));
+					Logger.LogDebug("CreateUserNotifications(objHtmlText={ObjHtmlText}): strBody → {StrBody}", objHtmlText, strBody);
                     strBody = strBody.Replace("[STATE]", objHtmlText.StateName);
 
                     // process user notification collection
@@ -720,6 +806,7 @@ namespace DotNetNuke.Modules.Html
                         if (objHtmlText.Notify)
                         {
                             user = UserController.GetUserById(this.hostSettings, objHtmlText.PortalID, intUserID);
+							Logger.LogDebug("CreateUserNotifications(objHtmlText={ObjHtmlText}): user → {User}", objHtmlText, user);
                             if (user != null)
                             {
                                 AddHtmlNotification(this.hostSettings, strSubject, strBody, user);
@@ -740,12 +827,15 @@ namespace DotNetNuke.Modules.Html
                             }
                             catch (Exception exc)
                             {
+								Logger.LogError("Exception in HtmlTextController(navigationManager={NavigationManager},portalAliasService={PortalAliasService},portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},settingsRepository={SettingsRepository}): {Arg6}", navigationManager, portalAliasService, portalController, appStatus, hostSettings, settingsRepository, ex.Message);
                                 Exceptions.LogException(exc);
+								Logger.LogError("Exception in CreateUserNotifications(objHtmlText={ObjHtmlText}): {Arg1}", objHtmlText, ex.Message);
                             }
                         }
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting CreateUserNotifications(objHtmlText={ObjHtmlText})", objHtmlText);
         }
 
         private string DeTokeniseLinks(string content, int portalId)
@@ -764,6 +854,9 @@ namespace DotNetNuke.Modules.Html
 
             content = Regex.Replace(content, PortalRootToken + "\\/{0,1}", portalRoot, RegexOptions.IgnoreCase);
 
+			Logger.LogDebug("DeTokeniseLinks(content={Content},portalId={PortalId}): content → {Content1}", content, portalId, content);
+			Logger.LogDebug(">>> Entering TokeniseLinks(content={Content},portalId={PortalId})", content, portalId);
+			Logger.LogDebug("<<< Exiting TokeniseLinks(content={Content},portalId={PortalId})", content, portalId);
             return content;
         }
 
@@ -796,11 +889,14 @@ namespace DotNetNuke.Modules.Html
 
         private void AddNotificationTypes()
         {
+			Logger.LogDebug(">>> Entering AddNotificationTypes()");
             var type = new NotificationType { Name = "HtmlNotification", Description = "Html Module Notification" };
             if (NotificationsController.Instance.GetNotificationType(type.Name) == null)
+			Logger.LogDebug("AddNotificationTypes(): type → {Type}", type);
             {
                 NotificationsController.Instance.CreateNotificationType(type);
             }
+			Logger.LogDebug("<<< Exiting AddNotificationTypes()");
         }
     }
 }

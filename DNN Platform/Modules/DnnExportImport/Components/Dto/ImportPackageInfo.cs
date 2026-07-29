@@ -14,6 +14,7 @@ namespace Dnn.ExportImport.Components.Dto
     [JsonObject]
     public class ImportPackageInfo : IDateTimeConverter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Gets package file name. It is just fake name for UI representation.</summary>
         public string FileName => this.PackageId;
 
@@ -44,6 +45,7 @@ namespace Dnn.ExportImport.Components.Dto
         /// <inheritdoc />
         public void ConvertToLocal(UserInfo userInfo)
         {
+			Logger.LogDebug(">>> Entering ConvertToLocal(userInfo={UserInfo})", userInfo);
             if (userInfo == null)
             {
                 return;
@@ -51,6 +53,7 @@ namespace Dnn.ExportImport.Components.Dto
 
             this.ExporTime = Util.ToLocalDateTime(this.ExporTime, userInfo);
             this.Summary?.ConvertToLocal(userInfo);
+			Logger.LogDebug("<<< Exiting ConvertToLocal(userInfo={UserInfo})", userInfo);
         }
     }
 }

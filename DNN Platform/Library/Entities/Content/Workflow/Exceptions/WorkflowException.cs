@@ -8,9 +8,12 @@ namespace DotNetNuke.Entities.Content.Workflow.Exceptions
 
     public class WorkflowException : ApplicationException
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="WorkflowException"/> class.</summary>
         public WorkflowException()
         {
+		Logger.LogDebug(">>> Entering WorkflowException()");
+		Logger.LogDebug("<<< Exiting WorkflowException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="WorkflowException"/> class.</summary>
@@ -18,7 +21,9 @@ namespace DotNetNuke.Entities.Content.Workflow.Exceptions
         public WorkflowException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering WorkflowException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting WorkflowException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="WorkflowException"/> class.</summary>
         /// <param name="message">A message that describes the error.</param>

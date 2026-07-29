@@ -40,7 +40,9 @@ namespace DotNetNuke.Web.UI.WebControls
         public DnnFileUpload()
             : this(null, null, null, null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering DnnFileUpload()");
         }
+		eventLogger.LogDebug("<<< Exiting DnnFileUpload()");
 
         /// <summary>Initializes a new instance of the <see cref="DnnFileUpload"/> class.</summary>
         /// <param name="clientResourceController">The client resource controller.</param>
@@ -53,9 +55,14 @@ namespace DotNetNuke.Web.UI.WebControls
         {
             this.clientResourceController = clientResourceController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>();
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			eventLogger.LogDebug("DnnFileUpload(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},hostSettings={HostSettings},cryptographyProvider={CryptographyProvider},servicesFramework={ServicesFramework}): appStatus → {AppStatus1}", clientResourceController, appStatus, eventLogger, hostSettings, cryptographyProvider, servicesFramework, appStatus);
+			eventLogger.LogDebug("DnnFileUpload(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},hostSettings={HostSettings},cryptographyProvider={CryptographyProvider},servicesFramework={ServicesFramework}): servicesFramework → {ServicesFramework1}", clientResourceController, appStatus, eventLogger, hostSettings, cryptographyProvider, servicesFramework, servicesFramework);
+			eventLogger.LogDebug("DnnFileUpload(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},hostSettings={HostSettings},cryptographyProvider={CryptographyProvider},servicesFramework={ServicesFramework}): clientResourceController → {ClientResourceController1}", clientResourceController, appStatus, eventLogger, hostSettings, cryptographyProvider, servicesFramework, clientResourceController);
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+			eventLogger.LogDebug("DnnFileUpload(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},hostSettings={HostSettings},cryptographyProvider={CryptographyProvider},servicesFramework={ServicesFramework}): eventLogger → {EventLogger1}", clientResourceController, appStatus, eventLogger, hostSettings, cryptographyProvider, servicesFramework, eventLogger);
             this.servicesFramework = servicesFramework ?? Globals.GetCurrentServiceProvider().GetRequiredService<IServicesFramework>();
             this.options = new Lazy<DnnFileUploadOptions>(() => new DnnFileUploadOptions(hostSettings, this.appStatus, cryptographyProvider));
+			eventLogger.LogDebug("DnnFileUpload(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},hostSettings={HostSettings},cryptographyProvider={CryptographyProvider},servicesFramework={ServicesFramework}): options → {Options}", clientResourceController, appStatus, eventLogger, hostSettings, cryptographyProvider, servicesFramework, options);
         }
 
         /// <summary>Gets the options.</summary>
@@ -109,25 +116,31 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <returns>The control instance or <see langword="null"/>.</returns>
         public static DnnFileUpload GetCurrent(Page page)
         {
+			eventLogger.LogDebug(">>> Entering GetCurrent(page={Page})", page);
+			eventLogger.LogDebug("<<< Exiting GetCurrent(page={Page})", page);
             return page.Items[typeof(DnnFileUpload)] as DnnFileUpload;
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.servicesFramework.RequestAjaxAntiForgerySupport();
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, PortalSettings.Current, CommonJs.jQueryFileUpload);
+			eventLogger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             RegisterClientScript(this.clientResourceController, this.appStatus, this.eventLogger, PortalSettings.Current, this.Skin);
             this.RegisterStartupScript();
+			eventLogger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private static void RegisterClientScript(IClientResourceController clientResourceController, IApplicationStatusInfo appStatus, IEventLogger eventLogger, IPortalSettings portalSettings, string skin)
@@ -149,6 +162,7 @@ namespace DotNetNuke.Web.UI.WebControls
 
         private void RegisterStartupScript()
         {
+			eventLogger.LogDebug(">>> Entering RegisterStartupScript()");
             this.Options.ClientId = this.ClientID;
 
             var portalSettings = PortalSettings.Current;
@@ -157,6 +171,8 @@ namespace DotNetNuke.Web.UI.WebControls
             {
                 var folder = FolderManager.Instance.GetFolder(portalSettings.PortalId, string.Empty);
                 var rootFolder = (this.SupportHost && portalSettings.ActiveTab.IsSuperTab) ? DynamicSharedConstants.HostRootFolder : DynamicSharedConstants.RootFolder;
+				eventLogger.LogDebug("RegisterStartupScript(): folder → {Folder}", folder);
+				eventLogger.LogDebug("RegisterStartupScript(): rootFolder → {RootFolder}", rootFolder);
 
                 this.Options.FolderPicker.InitialState = new DnnDropDownListState
                 {
@@ -168,6 +184,7 @@ namespace DotNetNuke.Web.UI.WebControls
             {
                 var extensionsText = this.Options.Extensions.Aggregate(string.Empty, (current, extension) => current.Append(extension, ", "));
                 this.Options.Resources.InvalidFileExtensions = string.Format(CultureInfo.CurrentCulture, this.Options.Resources.InvalidFileExtensions, extensionsText);
+				eventLogger.LogDebug("RegisterStartupScript(): extensionsText → {ExtensionsText}", extensionsText);
             }
 
             if (this.Options.MaxFiles > 0)
@@ -189,6 +206,7 @@ namespace DotNetNuke.Web.UI.WebControls
 
             var script = $"dnn.createFileUpload({Json.Serialize(this.Options)});{Environment.NewLine}";
 
+			eventLogger.LogDebug("RegisterStartupScript(): script → {Script}", script);
             if (ScriptManager.GetCurrent(this.Page) != null)
             {
                 // respect MS AJAX
@@ -198,6 +216,7 @@ namespace DotNetNuke.Web.UI.WebControls
             {
                 this.Page.ClientScript.RegisterStartupScript(this.GetType(), this.ClientID + "DnnFileUpload", script, true);
             }
+			eventLogger.LogDebug("<<< Exiting RegisterStartupScript()");
         }
     }
 }

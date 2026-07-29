@@ -13,6 +13,7 @@ namespace DotNetNuke.Web.Client.ResourceManager
     /// </summary>
     public static class StylesheetResourceExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Sets the priority of the resource.
         /// </summary>
@@ -23,6 +24,7 @@ namespace DotNetNuke.Web.Client.ResourceManager
         public static T SetPriority<T>(this T input, FileOrder.Css priority)
             where T : IStylesheetResource
         {
+			Logger.LogDebug(">>> Entering SetPriority(input={Input},priority={Priority})", input, priority);
             if (input == null)
             {
                 throw new ArgumentNullException(nameof(input));
@@ -39,12 +41,15 @@ namespace DotNetNuke.Web.Client.ResourceManager
         /// <returns>The stylesheet resource with the disabled attribute set.</returns>
         public static IStylesheetResource SetDisabled(this IStylesheetResource input)
         {
+			Logger.LogDebug(">>> Entering SetDisabled(input={Input})", input);
             if (input == null)
             {
                 throw new ArgumentNullException(nameof(input));
             }
 
             input.Disabled = true;
+			Logger.LogDebug("SetDisabled(input={Input}): input.Disabled → {Arg1}", input, input.Disabled);
+			Logger.LogDebug("<<< Exiting SetDisabled(input={Input})", input);
             return input;
         }
     }

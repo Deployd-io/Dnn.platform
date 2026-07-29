@@ -26,6 +26,7 @@ namespace DotNetNuke.Security.Permissions
     [Serializable]
     public abstract class PermissionInfoBase : PermissionInfo, IPermissionInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private bool allowAccess;
         private string displayName;
         private int roleId;
@@ -36,12 +37,21 @@ namespace DotNetNuke.Security.Permissions
         /// <summary>Initializes a new instance of the <see cref="PermissionInfoBase"/> class.</summary>
         public PermissionInfoBase()
         {
+			Logger.LogDebug(">>> Entering PermissionInfoBase()");
             this.roleId = int.Parse(Globals.glbRoleNothing, CultureInfo.InvariantCulture);
             this.allowAccess = false;
+			Logger.LogDebug("PermissionInfoBase(): this.allowAccess → {Arg0}", this.allowAccess);
+			Logger.LogDebug("PermissionInfoBase(): roleId → {RoleId}", roleId);
             this.roleName = Null.NullString;
             this.userId = Null.NullInteger;
+			Logger.LogDebug("PermissionInfoBase(): this.roleName → {Arg0}", this.roleName);
+			Logger.LogDebug("PermissionInfoBase(): userId → {UserId}", userId);
+			Logger.LogDebug("PermissionInfoBase(): this.userId → {Arg0}", this.userId);
             this.username = Null.NullString;
             this.displayName = Null.NullString;
+			Logger.LogDebug("<<< Exiting PermissionInfoBase()");
+			Logger.LogDebug("PermissionInfoBase(): this.username → {Arg0}", this.username);
+			Logger.LogDebug("PermissionInfoBase(): this.displayName → {Arg0}", this.displayName);
         }
 
         /// <inheritdoc />
@@ -158,6 +168,7 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="dr">The Data Reader to use.</param>
         protected override void FillInternal(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering FillInternal(dr={Dr})", dr);
             // Call the base classes fill method to populate base class properties
             base.FillInternal(dr);
 
@@ -177,6 +188,7 @@ namespace DotNetNuke.Security.Permissions
             }
 
             @this.AllowAccess = Null.SetNullBoolean(dr["AllowAccess"]);
+			Logger.LogDebug("<<< Exiting FillInternal(dr={Dr})", dr);
         }
     }
 }

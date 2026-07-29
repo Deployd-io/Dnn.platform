@@ -61,6 +61,7 @@ namespace Dnn.PersonaBar.Extensions.Services
         [HttpGet]
         public HttpResponseMessage GetPackageTypes()
         {
+			Logger.LogDebug(">>> Entering GetPackageTypes()");
             try
             {
                 var packageTypes = this.controller.GetPackageTypes()
@@ -75,18 +76,24 @@ namespace Dnn.PersonaBar.Extensions.Services
                             HasAvailablePackages = this.controller.HasAvailablePackage(packageType, out rootPath),
                             DisplayName = Localization.GetString(packageType + ".Type", Constants.SharedResources),
                         };
+							Logger.LogDebug("GetPackageTypes(): Type → {Type}", Type);
+							Logger.LogDebug("GetPackageTypes(): HasAvailablePackages → {HasAvailablePackages}", HasAvailablePackages);
+							Logger.LogDebug("GetPackageTypes(): DisplayName → {DisplayName}", DisplayName);
                     });
                 var response = new
                 {
                     Success = true,
                     Results = packageTypes,
                 };
+					Logger.LogDebug("GetPackageTypes(): Success → {Success}", Success);
+					Logger.LogDebug("GetPackageTypes(): Results → {Results}", Results);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting GetPackageTypes()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -97,6 +104,7 @@ namespace Dnn.PersonaBar.Extensions.Services
         [HttpGet]
         public HttpResponseMessage GetAllPackagesListExceptLangPacks()
         {
+			Logger.LogDebug(">>> Entering GetAllPackagesListExceptLangPacks()");
             try
             {
                 var packages = Utility.GetAllPackagesListExceptLangPacks();
@@ -105,6 +113,7 @@ namespace Dnn.PersonaBar.Extensions.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting GetAllPackagesListExceptLangPacks()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -196,10 +205,12 @@ namespace Dnn.PersonaBar.Extensions.Services
         [RequireHost]
         public HttpResponseMessage GetSourceFolders(/*int moduleControlId*/)
         {
+			Logger.LogDebug(">>> Entering GetSourceFolders(moduleControlId*/={Arg0})", moduleControlId*/);
             var path = Path.Combine(Globals.ApplicationMapPath, "DesktopModules");
             var controlFolders = (
                 from subdirectory in Directory.GetDirectories(path, "*", SearchOption.AllDirectories)
                 select subdirectory).ToList();
+				Logger.LogDebug("GetSourceFolders(moduleControlId*/={Arg0}): path → {Path}", moduleControlId*/, path);
 
             controlFolders.Insert(0, Path.Combine(Globals.ApplicationMapPath, @"Admin\Skins"));
 
@@ -208,6 +219,7 @@ namespace Dnn.PersonaBar.Extensions.Services
             ////   (Path.GetDirectoryName(moduleControl.ControlSrc.ToLower()) ?? "").Replace('\\', '/');
             var response = new List<KeyValuePair<string, string>>();
             var appPathLen = Globals.ApplicationMapPath.Length + 1;
+			Logger.LogDebug("GetSourceFolders(moduleControlId*/={Arg0}): response → {Response}", moduleControlId*/, response);
             foreach (var folder in controlFolders)
             {
                 var moduleControls = Directory.EnumerateFiles(folder, "*.*", SearchOption.TopDirectoryOnly)
@@ -220,10 +232,13 @@ namespace Dnn.PersonaBar.Extensions.Services
                 {
                     var shortFolder = folder.Substring(appPathLen).Replace('\\', '/');
                     var item = new KeyValuePair<string, string>(shortFolder.ToLowerInvariant(), shortFolder);
+					Logger.LogDebug("GetSourceFolders(moduleControlId*/={Arg0}): shortFolder → {ShortFolder}", moduleControlId*/, shortFolder);
+					Logger.LogDebug("GetSourceFolders(moduleControlId*/={Arg0}): item → {Item}", moduleControlId*/, item);
                     response.Add(item);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetSourceFolders(moduleControlId*/={Arg0})", moduleControlId*/);
             return this.Request.CreateResponse(HttpStatusCode.OK, response);
         }
 
@@ -256,6 +271,7 @@ namespace Dnn.PersonaBar.Extensions.Services
         [RequireHost]
         public HttpResponseMessage LoadIcons(string controlPath)
         {
+			Logger.LogDebug(">>> Entering LoadIcons(controlPath={ControlPath})", controlPath);
             var response = new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>(string.Empty, "<" + Localization.GetString("None_Specified") + ">"),
@@ -265,17 +281,24 @@ namespace Dnn.PersonaBar.Extensions.Services
             {
                 var idx = controlPath.LastIndexOf("/", StringComparison.Ordinal);
                 var root = controlPath.Substring(0, Math.Max(0, idx));
+				Logger.LogDebug("LoadIcons(controlPath={ControlPath}): idx → {Idx}", controlPath, idx);
+				Logger.LogWarning("LoadIcons(controlPath={ControlPath}): root → {Root}", controlPath, root);
                 var path = Path.Combine(Globals.ApplicationMapPath, root.Replace('/', '\\'));
                 if (Directory.Exists(path))
+				Logger.LogDebug("LoadIcons(controlPath={ControlPath}): path → {Path}", controlPath, path);
                 {
                     var files = Directory.GetFiles(path);
                     if (files.Length > 0)
+					Logger.LogDebug("LoadIcons(controlPath={ControlPath}): files → {Files}", controlPath, files);
                     {
                         var extensions = Globals.glbImageFileTypes.ToLowerInvariant().Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                         foreach (var file in files)
                         {
+						Logger.LogDebug("LoadIcons(controlPath={ControlPath}): extensions → {Extensions}", controlPath, extensions);
                             var ext = Path.GetExtension(file) ?? string.Empty;
                             var extension = ext.Length <= 1 ? string.Empty : ext.Substring(1).ToLowerInvariant();
+							Logger.LogDebug("LoadIcons(controlPath={ControlPath}): ext → {Ext}", controlPath, ext);
+							Logger.LogDebug("LoadIcons(controlPath={ControlPath}): extension → {Extension}", controlPath, extension);
                             if (extensions.Contains(extension))
                             {
                                 path = Path.GetFileName(file);
@@ -283,6 +306,7 @@ namespace Dnn.PersonaBar.Extensions.Services
                                 {
                                     var item = new KeyValuePair<string, string>(path.ToLowerInvariant(), Path.GetFileName(file));
                                     response.Add(item);
+									Logger.LogDebug("LoadIcons(controlPath={ControlPath}): item → {Item}", controlPath, item);
                                 }
                             }
                         }
@@ -290,12 +314,15 @@ namespace Dnn.PersonaBar.Extensions.Services
                 }
             }
 
+			Logger.LogDebug("<<< Exiting LoadIcons(controlPath={ControlPath})", controlPath);
             return this.Request.CreateResponse(HttpStatusCode.OK, response);
         }
 
         [HttpGet]
         public HttpResponseMessage GetLanguagesList()
         {
+			Logger.LogDebug(">>> Entering GetLanguagesList()");
+			Logger.LogDebug("<<< Exiting GetLanguagesList()");
             return this.Request.CreateResponse(HttpStatusCode.OK, Utility.GetAllLanguagesList());
         }
 
@@ -303,9 +330,13 @@ namespace Dnn.PersonaBar.Extensions.Services
         [RequireHost]
         public HttpResponseMessage GetModuleCategories()
         {
+			Logger.LogDebug(">>> Entering GetModuleCategories()");
             var termController = Util.GetTermController();
             var categories = termController.GetTermsByVocabulary("Module_Categories").OrderBy(t => t.Weight).Select(t => t.Name);
+			Logger.LogDebug("GetModuleCategories(): termController → {TermController}", termController);
+			Logger.LogDebug("GetModuleCategories(): categories → {Categories}", categories);
 
+			Logger.LogDebug("<<< Exiting GetModuleCategories()");
             return this.Request.CreateResponse(HttpStatusCode.OK, categories);
         }
 
@@ -341,10 +372,12 @@ namespace Dnn.PersonaBar.Extensions.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage SavePackageSettings(PackageSettingsDto packageSettings)
         {
+			Logger.LogDebug(">>> Entering SavePackageSettings(packageSettings={PackageSettings})", packageSettings);
             try
             {
                 var package = PackageController.Instance.GetExtensionPackage(Null.NullInteger, p => p.PackageID == packageSettings.PackageId);
                 if (package == null)
+				Logger.LogDebug("SavePackageSettings(packageSettings={PackageSettings}): package → {Package}", packageSettings, package);
                 {
                     return this.Request.CreateErrorResponse(
                         HttpStatusCode.InternalServerError,
@@ -355,6 +388,8 @@ namespace Dnn.PersonaBar.Extensions.Services
                 {
                     var authService = AuthenticationController.GetAuthenticationServiceByPackageID(package.PackageID);
                     var isReadOnly = authService != null && authService.AuthenticationType == Constants.DnnAuthTypeName;
+					Logger.LogDebug("SavePackageSettings(packageSettings={PackageSettings}): authService → {AuthService}", packageSettings, authService);
+					Logger.LogDebug("SavePackageSettings(packageSettings={PackageSettings}): isReadOnly → {IsReadOnly}", packageSettings, isReadOnly);
                     if (isReadOnly)
                     {
                         return this.Request.CreateErrorResponse(
@@ -364,14 +399,18 @@ namespace Dnn.PersonaBar.Extensions.Services
 
                     var type = package.GetType();
                     var needUpdate = false;
+					Logger.LogDebug("SavePackageSettings(packageSettings={PackageSettings}): type → {Type}", packageSettings, type);
+					Logger.LogDebug("SavePackageSettings(packageSettings={PackageSettings}): needUpdate → {NeedUpdate}", packageSettings, needUpdate);
                     foreach (var kvp in packageSettings.Settings)
                     {
                         var property = type.GetProperty(kvp.Key, BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.Public);
                         if (property != null && property.CanWrite)
+						Logger.LogDebug("SavePackageSettings(packageSettings={PackageSettings}): property → {Property}", packageSettings, property);
                         {
                             var value = kvp.Value;
                             var propValue = property.GetValue(package);
                             if (propValue == null || propValue.ToString() != value)
+							Logger.LogDebug("SavePackageSettings(packageSettings={PackageSettings}): propValue → {PropValue}", packageSettings, propValue);
                             {
                                 var nativeValue = property.PropertyType == typeof(Version)
                                     ? new Version(value) : Convert.ChangeType(value, property.PropertyType, CultureInfo.InvariantCulture);
@@ -389,6 +428,7 @@ namespace Dnn.PersonaBar.Extensions.Services
 
                 var packageEditor = PackageEditorFactory.GetPackageEditor(package.PackageType);
                 if (packageEditor != null)
+				Logger.LogDebug("SavePackageSettings(packageSettings={PackageSettings}): packageEditor → {PackageEditor}", packageSettings, packageEditor);
                 {
                     string error;
                     packageEditor.SavePackageSettings(packageSettings, out error);
@@ -405,6 +445,7 @@ namespace Dnn.PersonaBar.Extensions.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting SavePackageSettings(packageSettings={PackageSettings})", packageSettings);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -441,22 +482,26 @@ namespace Dnn.PersonaBar.Extensions.Services
         [RequireHost]
         public HttpResponseMessage DeletePackage(DeletePackageDto deletePackage)
         {
+			Logger.LogDebug(">>> Entering DeletePackage(deletePackage={DeletePackage})", deletePackage);
             try
             {
                 var package = PackageController.Instance.GetExtensionPackage(Null.NullInteger, p => p.PackageID == deletePackage.Id);
                 if (package == null)
+				Logger.LogDebug("DeletePackage(deletePackage={DeletePackage}): package → {Package}", deletePackage, package);
                 {
                     return this.Request.CreateErrorResponse(HttpStatusCode.NotFound, string.Empty);
                 }
 
                 var installer = new Installer(package, Globals.ApplicationMapPath);
                 installer.UnInstall(deletePackage.DeleteFiles);
+				Logger.LogDebug("DeletePackage(deletePackage={DeletePackage}): installer → {Installer}", deletePackage, installer);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Success = true, });
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting DeletePackage(deletePackage={DeletePackage})", deletePackage);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -466,6 +511,7 @@ namespace Dnn.PersonaBar.Extensions.Services
         [RequireHost]
         public Task<HttpResponseMessage> InstallPackage([FromUri] string legacySkin = null, [FromUri] bool isPortalPackage = false)
         {
+			Logger.LogDebug(">>> Entering InstallPackage(legacySkin={LegacySkin},isPortalPackage={IsPortalPackage})", legacySkin, isPortalPackage);
             try
             {
                 return
@@ -475,6 +521,7 @@ namespace Dnn.PersonaBar.Extensions.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting InstallPackage(legacySkin={LegacySkin},isPortalPackage={IsPortalPackage})", legacySkin, isPortalPackage);
                 return Task.FromResult(this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message));
             }
         }
@@ -484,6 +531,7 @@ namespace Dnn.PersonaBar.Extensions.Services
         [RequireHost]
         public Task<HttpResponseMessage> ParsePackage()
         {
+			Logger.LogDebug(">>> Entering ParsePackage()");
             try
             {
                 return
@@ -493,6 +541,7 @@ namespace Dnn.PersonaBar.Extensions.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting ParsePackage()");
                 return Task.FromResult(this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message));
             }
         }
@@ -531,17 +580,20 @@ namespace Dnn.PersonaBar.Extensions.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage ParseLanguagePackage([FromUri] string cultureCode)
         {
+			Logger.LogDebug(">>> Entering ParseLanguagePackage(cultureCode={CultureCode})", cultureCode);
             try
             {
                 DotNetNuke.Services.Upgrade.Internals.InstallController.Instance.IsAvailableLanguagePack(cultureCode);
                 const string packageFileName = "installlanguage.resources";
                 var packagePath = Path.Combine(Globals.ApplicationMapPath, "Install/Language/" + packageFileName);
+				Logger.LogDebug("ParseLanguagePackage(cultureCode={CultureCode}): packagePath → {PackagePath}", cultureCode, packagePath);
                 var result = this.ParsePackageFile(packagePath);
                 return this.Request.CreateResponse(result.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest, result);
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting ParseLanguagePackage(cultureCode={CultureCode})", cultureCode);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -624,13 +676,16 @@ namespace Dnn.PersonaBar.Extensions.Services
         [RequireHost]
         public HttpResponseMessage DownloadLanguagePackage([FromUri] string cultureCode)
         {
+			Logger.LogDebug(">>> Entering DownloadLanguagePackage(cultureCode={CultureCode})", cultureCode);
             try
             {
                 const string packageFileName = "installlanguage.resources";
                 var packagePath = Path.Combine(Globals.ApplicationMapPath, "Install/Language/" + packageFileName);
+				Logger.LogDebug("DownloadLanguagePackage(cultureCode={CultureCode}): packagePath → {PackagePath}", cultureCode, packagePath);
 
                 var parsePackage = this.ParsePackageFile(packagePath);
                 var invalidPackage = !parsePackage.Success
+										Logger.LogDebug("DownloadLanguagePackage(cultureCode={CultureCode}): parsePackage → {ParsePackage}", cultureCode, parsePackage);
                                         || !parsePackage.PackageType.Equals("CoreLanguagePack", StringComparison.Ordinal)
                                         || !parsePackage.Name.EndsWith(cultureCode, StringComparison.InvariantCultureIgnoreCase);
 
@@ -644,6 +699,7 @@ namespace Dnn.PersonaBar.Extensions.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting DownloadLanguagePackage(cultureCode={CultureCode})", cultureCode);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -651,11 +707,13 @@ namespace Dnn.PersonaBar.Extensions.Services
         [HttpGet]
         public HttpResponseMessage GetPackageUsageFilter()
         {
+			Logger.LogDebug(">>> Entering GetPackageUsageFilter()");
             try
             {
                 var portals = this.UserInfo.IsSuperUser ? PortalController.Instance.GetPortals().OfType<PortalInfo>() : PortalController.Instance.GetPortals().OfType<PortalInfo>().Where(p => p.PortalID == this.PortalId);
                 var availablePortals = portals.Select(v => new
                 {
+				Logger.LogDebug("GetPackageUsageFilter(): portals → {Portals}", portals);
                     v.PortalID,
                     v.PortalName,
                     IsCurrentPortal = this.PortalId == v.PortalID,
@@ -669,6 +727,9 @@ namespace Dnn.PersonaBar.Extensions.Services
                         PortalName = "Host",
                         IsCurrentPortal = false,
                     });
+						Logger.LogDebug("GetPackageUsageFilter(): PortalID → {PortalID}", PortalID);
+						Logger.LogDebug("GetPackageUsageFilter(): PortalName → {PortalName}", PortalName);
+						Logger.LogDebug("GetPackageUsageFilter(): IsCurrentPortal → {IsCurrentPortal}", IsCurrentPortal);
                 }
 
                 var response = new
@@ -677,12 +738,16 @@ namespace Dnn.PersonaBar.Extensions.Services
                     Results = availablePortals,
                     TotalResults = availablePortals.Count,
                 };
+					Logger.LogDebug("GetPackageUsageFilter(): Success → {Success}", Success);
+					Logger.LogDebug("GetPackageUsageFilter(): Results → {Results}", Results);
+					Logger.LogDebug("GetPackageUsageFilter(): TotalResults → {TotalResults}", TotalResults);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetPackageUsageFilter()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -731,18 +796,22 @@ namespace Dnn.PersonaBar.Extensions.Services
         [RequireHost]
         public HttpResponseMessage CreateExtension(PackageSettingsDto packageSettings)
         {
+			Logger.LogDebug(">>> Entering CreateExtension(packageSettings={PackageSettings})", packageSettings);
             try
             {
                 var package = new PackageInfo { PortalID = packageSettings.PortalId, };
                 var type = package.GetType();
                 foreach (var kvp in packageSettings.Settings.Where(kpv => kpv.Value != null))
                 {
+				Logger.LogDebug("CreateExtension(packageSettings={PackageSettings}): type → {Type}", packageSettings, type);
                     var property = type.GetProperty(kvp.Key, BindingFlags.Instance | BindingFlags.GetProperty | BindingFlags.Public);
                     if (property != null && property.CanWrite)
+					Logger.LogDebug("CreateExtension(packageSettings={PackageSettings}): property → {Property}", packageSettings, property);
                     {
                         var value = kvp.Value;
                         var propValue = property.GetValue(package);
                         if (propValue == null || propValue.ToString() != value)
+						Logger.LogDebug("CreateExtension(packageSettings={PackageSettings}): propValue → {PropValue}", packageSettings, propValue);
                         {
                             var nativeValue = property.PropertyType == typeof(Version)
                                 ? new Version(value)
@@ -754,12 +823,14 @@ namespace Dnn.PersonaBar.Extensions.Services
 
                 var tmpPackage = PackageController.Instance.GetExtensionPackage(Null.NullInteger, p => p.Name == package.Name);
                 if (tmpPackage != null)
+				Logger.LogDebug("CreateExtension(packageSettings={PackageSettings}): tmpPackage → {TmpPackage}", packageSettings, tmpPackage);
                 {
                     return this.Request.CreateResponse(HttpStatusCode.BadRequest, new { Success = false, Error = "DuplicateName" });
                 }
 
                 PackageController.Instance.SaveExtensionPackage(package);
                 packageSettings.PackageId = package.PackageID;
+				Logger.LogDebug("CreateExtension(packageSettings={PackageSettings}): packageSettings.PackageId → {Arg1}", packageSettings, packageSettings.PackageId);
 
                 Locale locale;
                 LanguagePackInfo languagePack;
@@ -790,8 +861,10 @@ namespace Dnn.PersonaBar.Extensions.Services
                         break;
                     case PackageTypes.CoreLanguagePack:
                         locale = LocaleController.Instance.GetLocale(PortalController.Instance.GetCurrentSettings().DefaultLanguage);
+						Logger.LogDebug("CreateExtension(packageSettings={PackageSettings}): locale → {Locale}", packageSettings, locale);
                         languagePack = new LanguagePackInfo
                         {
+							Logger.LogDebug("CreateExtension(packageSettings={PackageSettings}): languagePack → {LanguagePack}", packageSettings, languagePack);
                             PackageID = package.PackageID,
                             LanguageID = locale.LanguageId,
                             DependentPackageID = -2,
@@ -822,6 +895,7 @@ namespace Dnn.PersonaBar.Extensions.Services
                         };
                         var desktopModuleId = DesktopModuleController.SaveDesktopModule(desktopModule, false, true);
                         if (desktopModuleId > Null.NullInteger)
+						Logger.LogDebug("CreateExtension(packageSettings={PackageSettings}): desktopModuleId → {DesktopModuleId}", packageSettings, desktopModuleId);
                         {
                             DesktopModuleController.AddDesktopModuleToPortals(desktopModuleId);
                         }
@@ -835,6 +909,7 @@ namespace Dnn.PersonaBar.Extensions.Services
 
                 var packageEditor = PackageEditorFactory.GetPackageEditor(package.PackageType);
                 if (packageEditor != null)
+				Logger.LogDebug("CreateExtension(packageSettings={PackageSettings}): packageEditor → {PackageEditor}", packageSettings, packageEditor);
                 {
                     string error;
                     packageEditor.SavePackageSettings(packageSettings, out error);
@@ -850,6 +925,7 @@ namespace Dnn.PersonaBar.Extensions.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting CreateExtension(packageSettings={PackageSettings})", packageSettings);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -858,19 +934,25 @@ namespace Dnn.PersonaBar.Extensions.Services
         [RequireHost]
         public HttpResponseMessage GetOwnerFolders()
         {
+			Logger.LogDebug(">>> Entering GetOwnerFolders()");
             try
             {
                 var folders = new List<string>();
                 foreach (var folder in GetRootModuleDefinitionFolders())
                 {
+				Logger.LogDebug("GetOwnerFolders(): folders → {Folders}", folders);
                     var files = Directory.GetFiles(folder.Path, "*.ascx");
 
+					Logger.LogDebug("GetOwnerFolders(): files → {Files}", files);
                     // exclude module folders
                     if (files.Length == 0 || folder.Path.Equals("admin", StringComparison.OrdinalIgnoreCase))
                     {
                         var path = GetFolderPath(folder);
                         folders.Add(path);
+						Logger.LogDebug("GetOwnerFolders(): path → {Path}", path);
                     }
+					Logger.LogDebug(">>> Entering GetRootModuleDefinitionFolders()");
+					Logger.LogDebug("<<< Exiting GetRootModuleDefinitionFolders()");
                 }
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, folders);
@@ -878,6 +960,7 @@ namespace Dnn.PersonaBar.Extensions.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting GetOwnerFolders()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -886,6 +969,7 @@ namespace Dnn.PersonaBar.Extensions.Services
         [RequireHost]
         public HttpResponseMessage GetModuleFolders(string ownerFolder)
         {
+			Logger.LogDebug(">>> Entering GetModuleFolders(ownerFolder={OwnerFolder})", ownerFolder);
             if (!string.IsNullOrEmpty(ownerFolder) &&
                 (ownerFolder.Replace(@"\", "/").Contains("/", StringComparison.Ordinal)
                  || ownerFolder.StartsWith(".", StringComparison.Ordinal)))
@@ -898,8 +982,12 @@ namespace Dnn.PersonaBar.Extensions.Services
                 var folders = new List<string>();
                 foreach (var moduleFolder in GetModulesFolders(ownerFolder))
                 {
+				Logger.LogDebug("GetModuleFolders(ownerFolder={OwnerFolder}): folders → {Folders}", ownerFolder, folders);
                     var path = GetFolderPath(moduleFolder);
                     folders.Add(path);
+					Logger.LogDebug("GetModuleFolders(ownerFolder={OwnerFolder}): path → {Path}", ownerFolder, path);
+					Logger.LogDebug(">>> Entering GetModulesFolders(ownerFolder={OwnerFolder})", ownerFolder);
+					Logger.LogDebug("<<< Exiting GetModulesFolders(ownerFolder={OwnerFolder})", ownerFolder);
                 }
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, folders);
@@ -907,6 +995,7 @@ namespace Dnn.PersonaBar.Extensions.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting GetModuleFolders(ownerFolder={OwnerFolder})", ownerFolder);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -955,6 +1044,7 @@ namespace Dnn.PersonaBar.Extensions.Services
         [RequireHost]
         public HttpResponseMessage CreateFolder([FromUri] string ownerFolder, [FromUri] string moduleFolder)
         {
+			Logger.LogDebug(">>> Entering CreateFolder(ownerFolder={OwnerFolder},moduleFolder={ModuleFolder})", ownerFolder, moduleFolder);
             if ((!string.IsNullOrEmpty(ownerFolder) && (ownerFolder.Replace(@"\", "/").Contains("/", StringComparison.Ordinal) || ownerFolder.StartsWith(".", StringComparison.Ordinal)))
                 || (!string.IsNullOrEmpty(moduleFolder) && (moduleFolder.Replace(@"\", "/").Contains("/", StringComparison.Ordinal) || moduleFolder.StartsWith(".", StringComparison.Ordinal))))
             {
@@ -965,6 +1055,7 @@ namespace Dnn.PersonaBar.Extensions.Services
             {
                 var parentFolderPath = $@"{Globals.ApplicationMapPath}\DesktopModules";
                 if (!string.IsNullOrEmpty(ownerFolder))
+				Logger.LogDebug("CreateFolder(ownerFolder={OwnerFolder},moduleFolder={ModuleFolder}): parentFolderPath → {ParentFolderPath}", ownerFolder, moduleFolder, parentFolderPath);
                 {
                     parentFolderPath += @"\" + ownerFolder;
 
@@ -989,6 +1080,7 @@ namespace Dnn.PersonaBar.Extensions.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting CreateFolder(ownerFolder={OwnerFolder},moduleFolder={ModuleFolder})", ownerFolder, moduleFolder);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -998,6 +1090,7 @@ namespace Dnn.PersonaBar.Extensions.Services
         [RequireHost]
         public HttpResponseMessage CreateModule(CreateModuleDto createModuleDto)
         {
+			Logger.LogDebug(">>> Entering CreateModule(createModuleDto={CreateModuleDto})", createModuleDto);
             try
             {
                 string errorMessage;
@@ -1005,6 +1098,7 @@ namespace Dnn.PersonaBar.Extensions.Services
 
                 var packageId = CreateModuleController.Instance.CreateModule(createModuleDto, out newPageUrl, out errorMessage);
                 var newPackage = packageId > Null.NullInteger
+					Logger.LogDebug("CreateModule(createModuleDto={CreateModuleDto}): packageId → {PackageId}", createModuleDto, packageId);
                     ? PackageController.Instance.GetExtensionPackage(Null.NullInteger, p => p.PackageID == packageId)
                     : null;
 
@@ -1015,12 +1109,14 @@ namespace Dnn.PersonaBar.Extensions.Services
                     NewPageUrl = newPageUrl,
                     Error = errorMessage,
                 };
+					Logger.LogDebug("CreateModule(createModuleDto={CreateModuleDto}): Success → {Success}", createModuleDto, Success);
 
                 return this.Request.CreateResponse(result.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest, result);
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting CreateModule(createModuleDto={CreateModuleDto})", createModuleDto);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -1272,8 +1368,10 @@ namespace Dnn.PersonaBar.Extensions.Services
         [RequireHost]
         public HttpResponseMessage RefreshPackageFiles(PackageFilesQueryDto packageData)
         {
+			Logger.LogDebug(">>> Entering RefreshPackageFiles(packageData={PackageData})", packageData);
             var baseFolder = Path.Combine(Globals.ApplicationMapPath, packageData.PackageFolder.Replace('/', '\\'));
             if (!Directory.Exists(baseFolder))
+			Logger.LogDebug("RefreshPackageFiles(packageData={PackageData}): baseFolder → {BaseFolder}", packageData, baseFolder);
             {
                 return this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "InvalidFolder");
             }
@@ -1282,11 +1380,15 @@ namespace Dnn.PersonaBar.Extensions.Services
             {
                 var package = packageData.ToPackageInfo();
                 var writer = PackageWriterFactory.GetWriter(package);
+				Logger.LogDebug("RefreshPackageFiles(packageData={PackageData}): package → {Package}", packageData, package);
+				Logger.LogDebug("RefreshPackageFiles(packageData={PackageData}): writer → {Writer}", packageData, writer);
+				Logger.LogDebug("RefreshPackageFiles(packageData={PackageData}): writer.BasePath → {Arg1}", packageData, writer.BasePath);
                 writer.BasePath = packageData.PackageFolder;
                 writer.GetFiles(packageData.IncludeSource);
 
                 var files = new List<string>();
                 if (packageData.IncludeAppCode)
+				Logger.LogDebug("RefreshPackageFiles(packageData={PackageData}): files → {Files}", packageData, files);
                 {
                     // add app-code files
                     files.AddRange(writer.AppCodeFiles.Values.Select(file => "[app_code]" + file.FullName));
@@ -1304,17 +1406,21 @@ namespace Dnn.PersonaBar.Extensions.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting RefreshPackageFiles(packageData={PackageData})", packageData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
 
         protected string GetFormattedLink(object dataItem)
         {
+			Logger.LogDebug(">>> Entering GetFormattedLink(dataItem={DataItem})", dataItem);
             var returnValue = new StringBuilder();
             if (dataItem is TabInfo)
+			Logger.LogDebug("GetFormattedLink(dataItem={DataItem}): returnValue → {ReturnValue}", dataItem, returnValue);
             {
                 var tab = (TabInfo)dataItem;
                 {
+					Logger.LogDebug("GetFormattedLink(dataItem={DataItem}): tab → {Tab}", dataItem, tab);
                     var index = 0;
                     TabController.Instance.PopulateBreadCrumbs(ref tab);
                     foreach (TabInfo t in tab.BreadCrumbs)
@@ -1328,6 +1434,7 @@ namespace Dnn.PersonaBar.Extensions.Services
                         {
                             var url = Globals.AddHTTP(t.PortalID == Null.NullInteger ? this.PortalSettings.PortalAlias.HTTPAlias : PortalAliasController.Instance.GetPortalAliasesByPortalId(t.PortalID).ToList().OrderByDescending(a => a.IsPrimary).FirstOrDefault().HTTPAlias) + "/Default.aspx?tabId=" + t.TabID;
                             returnValue.AppendFormat(CultureInfo.InvariantCulture, "<a target=\"_blank\" href=\"{0}\">{1}</a>", url, t.LocalizedTabName);
+							Logger.LogDebug("GetFormattedLink(dataItem={DataItem}): url → {Url}", dataItem, url);
                         }
                         else
                         {
@@ -1339,6 +1446,7 @@ namespace Dnn.PersonaBar.Extensions.Services
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetFormattedLink(dataItem={DataItem})", dataItem);
             return returnValue.ToString();
         }
 
@@ -1365,6 +1473,7 @@ namespace Dnn.PersonaBar.Extensions.Services
             {
                 AddChildTabsToList(tab, ref allPortalTabs, ref tabsWithModule, ref tabsInOrder);
             }
+			Logger.LogDebug("<<< Exiting AddChildTabsToList(currentTab={CurrentTab},allPortalTabs={AllPortalTabs},IDictionary<int={Arg2},tabsWithModule={TabsWithModule},IDictionary<int={Arg4},tabsInOrder={TabsInOrder})", currentTab, allPortalTabs, IDictionary<int, tabsWithModule, IDictionary<int, tabsInOrder);
         }
 
         private static string GetFolderPath(ModuleFolderDto folder)
@@ -1382,11 +1491,14 @@ namespace Dnn.PersonaBar.Extensions.Services
         {
             var moduleFolders = new List<ModuleFolderDto>();
             var rootFolders = Directory.GetDirectories($@"{Globals.ApplicationMapPath}\DesktopModules\").ToList();
+			Logger.LogDebug("GetRootModuleDefinitionFolders(): moduleFolders → {ModuleFolders}", moduleFolders);
+			Logger.LogDebug("GetRootModuleDefinitionFolders(): rootFolders → {RootFolders}", rootFolders);
 
             foreach (var folderPath in rootFolders)
             {
                 var folderName = folderPath.Replace($@"{Path.GetDirectoryName(folderPath)}\", string.Empty);
                 if (IsSpecialFolder(folderName))
+				Logger.LogDebug("GetRootModuleDefinitionFolders(): folderName → {FolderName}", folderName);
                 {
                     Directory.GetDirectories(folderPath).ToList()
                         .ForEach(specialFolderChild =>
@@ -1417,6 +1529,7 @@ namespace Dnn.PersonaBar.Extensions.Services
 
         private static List<ModuleFolderDto> GetModulesFolders(string ownerFolder)
         {
+			Logger.LogDebug(">>> Entering GetModulesFolders(ownerFolder={OwnerFolder})", ownerFolder);
             if (!string.IsNullOrEmpty(ownerFolder))
             {
                 return Directory.GetDirectories($@"{Globals.ApplicationMapPath}\DesktopModules\{ownerFolder}")
@@ -1594,6 +1707,7 @@ namespace Dnn.PersonaBar.Extensions.Services
 
         private HttpResponseMessage DownLoadFile(string packagePath)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (!File.Exists(packagePath))
             {
                 return this.Request.CreateErrorResponse(HttpStatusCode.NotFound, "FileNotFound");

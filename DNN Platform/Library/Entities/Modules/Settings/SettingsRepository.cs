@@ -26,6 +26,7 @@ namespace DotNetNuke.Entities.Modules.Settings
     public abstract class SettingsRepository<T> : ISettingsRepository<T>
         where T : class, new()
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IModuleController moduleController;
         private readonly IHostSettings hostSettings;
         private readonly IHostSettingsService hostSettingsService;
@@ -36,6 +37,11 @@ namespace DotNetNuke.Entities.Modules.Settings
         protected SettingsRepository()
             : this(null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering SettingsRepository()");
+		Logger.LogDebug(">>> Entering SettingsRepository(moduleController={ModuleController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController})", moduleController, hostSettings, hostSettingsService, portalController);
+		Logger.LogDebug("SettingsRepository(moduleController={ModuleController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController}): moduleController → {ModuleController1}", moduleController, hostSettings, hostSettingsService, portalController, moduleController);
+		Logger.LogDebug("SettingsRepository(moduleController={ModuleController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController}): hostSettings → {HostSettings1}", moduleController, hostSettings, hostSettingsService, portalController, hostSettings);
+		Logger.LogDebug("<<< Exiting SettingsRepository(moduleController={ModuleController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController})", moduleController, hostSettings, hostSettingsService, portalController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="SettingsRepository{T}"/> class.</summary>
@@ -47,9 +53,13 @@ namespace DotNetNuke.Entities.Modules.Settings
         {
             this.Mapping = this.LoadMapping();
             this.moduleController = moduleController ?? ModuleController.Instance;
+			Logger.LogDebug("SettingsRepository(moduleController={ModuleController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController}): this.moduleController → {Arg4}", moduleController, hostSettings, hostSettingsService, portalController, this.moduleController);
+			Logger.LogDebug("SettingsRepository(moduleController={ModuleController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController}): hostSettingsService → {HostSettingsService1}", moduleController, hostSettings, hostSettingsService, portalController, hostSettingsService);
+			Logger.LogDebug("SettingsRepository(moduleController={ModuleController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController}): portalController → {PortalController1}", moduleController, hostSettings, hostSettingsService, portalController, portalController);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.hostSettingsService = hostSettingsService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+			Logger.LogDebug("<<< Exiting SettingsRepository(moduleController={ModuleController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController})", moduleController, hostSettings, hostSettingsService, portalController);
         }
 
         /// <summary>Gets cache key for this class. Used for parameter mapping storage as well as entire class persistence.</summary>
@@ -62,6 +72,8 @@ namespace DotNetNuke.Entities.Modules.Settings
         /// <inheritdoc />
         public T GetSettings(ModuleInfo moduleContext)
         {
+			Logger.LogDebug(">>> Entering GetSettings(moduleContext={ModuleContext})", moduleContext);
+			Logger.LogDebug("<<< Exiting GetSettings(moduleContext={ModuleContext})", moduleContext);
             return CBO.GetCachedObject<T>(
                 this.hostSettings,
                 new CacheItemArgs(this.CacheKey(moduleContext.PortalID, moduleContext.TabModuleID), 20, CacheItemPriority.AboveNormal, moduleContext),
@@ -98,9 +110,11 @@ namespace DotNetNuke.Entities.Modules.Settings
         /// <returns>List of parameters.</returns>
         protected IList<ParameterMapping> LoadMapping()
         {
+			Logger.LogDebug(">>> Entering LoadMapping()");
             var cacheKey = this.MappingCacheKey;
             var mapping = CachingProvider.Instance().GetItem(cacheKey) as IList<ParameterMapping>;
             if (mapping == null)
+			Logger.LogDebug("LoadMapping(): mapping → {Mapping}", mapping);
             {
                 mapping = this.CreateMapping();
 
@@ -109,6 +123,7 @@ namespace DotNetNuke.Entities.Modules.Settings
                 CachingProvider.Instance().Insert(cacheKey, mapping, (DNNCacheDependency)null, DateTime.Now.AddHours(2), Cache.NoSlidingExpiration);
             }
 
+			Logger.LogDebug("<<< Exiting LoadMapping()");
             return mapping;
         }
 
@@ -116,16 +131,22 @@ namespace DotNetNuke.Entities.Modules.Settings
         /// <returns>List of parameters.</returns>
         protected virtual IList<ParameterMapping> CreateMapping()
         {
+			Logger.LogDebug(">>> Entering CreateMapping()");
             var mapping = new List<ParameterMapping>();
             var type = typeof(T);
+			Logger.LogDebug("CreateMapping(): mapping → {Mapping}", mapping);
+			Logger.LogDebug("CreateMapping(): type → {Type}", type);
             var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.SetProperty);
 
+			Logger.LogDebug("CreateMapping(): properties → {Properties}", properties);
             properties.ForEach(property =>
             {
                 var attributes = property.GetCustomAttributes<ParameterAttributeBase>(true);
                 attributes.ForEach(attribute => mapping.Add(new ParameterMapping(attribute, property)));
+				Logger.LogDebug("CreateMapping(): attributes → {Attributes}", attributes);
             });
 
+			Logger.LogDebug("<<< Exiting CreateMapping()");
             return mapping;
         }
 
@@ -208,20 +229,29 @@ namespace DotNetNuke.Entities.Modules.Settings
 
         private T Load(CacheItemArgs args)
         {
+			Logger.LogDebug(">>> Entering Load(args={Args})", args);
             var ctlModule = (ModuleInfo)args.ParamList[0];
             var portalId = ctlModule?.PortalID ?? (int)args.ParamList[1];
+			Logger.LogDebug("Load(args={Args}): ctlModule → {CtlModule}", args, ctlModule);
+			Logger.LogDebug("Load(args={Args}): portalId → {PortalId}", args, portalId);
             var settings = new T();
             var hostSettingsDictionary = this.hostSettingsService.GetSettings();
+			Logger.LogDebug("Load(args={Args}): settings → {Settings}", args, settings);
+			Logger.LogDebug("Load(args={Args}): hostSettingsDictionary → {HostSettingsDictionary}", args, hostSettingsDictionary);
             var portalSettingsDictionary = this.portalController.GetPortalSettings(portalId);
 
+			Logger.LogDebug("Load(args={Args}): portalSettingsDictionary → {PortalSettingsDictionary}", args, portalSettingsDictionary);
             this.Mapping.ForEach(mapping =>
             {
                 string settingValue = null;
                 string algorithmName = null;
+				Logger.LogDebug("Load(args={Args}): settingValue → {SettingValue}", args, settingValue);
+				Logger.LogDebug("Load(args={Args}): algorithmName → {AlgorithmName}", args, algorithmName);
 
                 var attribute = mapping.Attribute;
                 var property = mapping.Property;
 
+				Logger.LogDebug("Load(args={Args}): property → {Property}", args, property);
                 // TODO: Make more extensible, enable other attributes to be defined
                 if (attribute is HostSettingAttribute && hostSettingsDictionary.TryGetValue(mapping.FullParameterName, out var hostSetting))
                 {
@@ -259,11 +289,13 @@ namespace DotNetNuke.Entities.Modules.Settings
                 {
                     var algorithm = string.IsNullOrWhiteSpace(algorithmName) ? HashAlgorithmName.SHA1 : new HashAlgorithmName(algorithmName);
                     try
+					Logger.LogDebug("Load(args={Args}): algorithm → {Algorithm}", args, algorithm);
                     {
                         settingValue = Security.FIPSCompliant.DecryptAES(algorithm, settingValue, Config.GetDecryptionkey(), this.hostSettings.Guid);
                     }
                     catch (Exception ex)
                     {
+						Logger.LogError("Exception in Load(args={Args}): {Arg1}", args, ex.Message);
                         Exceptions.LogException(new ModuleLoadException(string.Format(CultureInfo.CurrentCulture, Localization.GetString("ErrorDecryptingSetting", Localization.SharedResourceFile), mapping.FullParameterName), ex, ctlModule));
                     }
                 }
@@ -274,6 +306,7 @@ namespace DotNetNuke.Entities.Modules.Settings
                 }
             });
 
+			Logger.LogDebug("<<< Exiting Load(args={Args})", args);
             return settings;
         }
 
@@ -283,10 +316,13 @@ namespace DotNetNuke.Entities.Modules.Settings
         /// <remarks>When <paramref name="tabModuleId"/> is -1, the cache key is for portal settings instead.</remarks>
         /// <returns>The cache key.</returns>
         private string CacheKey(int portalId, int tabModuleId) => $"{this.CacheKeyPortalPrefix(portalId)}{tabModuleId}";
+		Logger.LogDebug(">>> Entering CacheKey(portalId={PortalId},tabModuleId={TabModuleId})", portalId, tabModuleId);
 
         /// <summary>Gets the prefix of the cache key for the given portal.</summary>
         /// <param name="portalId">The portal ID.</param>
+		Logger.LogDebug("<<< Exiting CacheKey(portalId={PortalId},tabModuleId={TabModuleId})", portalId, tabModuleId);
         /// <returns>The cache key prefix.</returns>
         private string CacheKeyPortalPrefix(int portalId) => $"Settings{this.MappingCacheKey}_{portalId}_";
+		Logger.LogDebug(">>> Entering CacheKeyPortalPrefix(portalId={PortalId})", portalId);
     }
 }

@@ -15,6 +15,7 @@ namespace DotNetNuke.Tests.UI.Validation
     [TestFixture]
     public class DataAnnotationsObjectValidatorTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string ErrorMessageConst = "Yo, you have to specify 5 characters for Bar";
 
         public static string ErrorMessage
@@ -28,41 +29,55 @@ namespace DotNetNuke.Tests.UI.Validation
         [Test]
         public void ValidateObject_Returns_Successful_Result_If_All_Attributes_On_All_Properties_Validate()
         {
+			Logger.LogDebug(">>> Entering ValidateObject_Returns_Successful_Result_If_All_Attributes_On_All_Properties_Validate()");
             // Arrange
             TestClass cls = new TestClass { Foo = new object(), Bar = "Baz" };
             DataAnnotationsObjectValidator validator = new DataAnnotationsObjectValidator();
+			Logger.LogDebug("ValidateObject_Returns_Successful_Result_If_All_Attributes_On_All_Properties_Validate(): cls → {Cls}", cls);
+			Logger.LogDebug("ValidateObject_Returns_Successful_Result_If_All_Attributes_On_All_Properties_Validate(): validator → {Validator}", validator);
 
             // Act
             ValidationResult result = validator.ValidateObject(cls);
 
+			Logger.LogDebug("ValidateObject_Returns_Successful_Result_If_All_Attributes_On_All_Properties_Validate(): result → {Result}", result);
             // Assert
             Assert.That(result.IsValid, Is.True);
+			Logger.LogDebug("<<< Exiting ValidateObject_Returns_Successful_Result_If_All_Attributes_On_All_Properties_Validate()");
         }
 
         [Test]
         public void ValidateObject_Returns_Failed_Result_If_Any_Attribute_Does_Not_Validate()
         {
+			Logger.LogDebug(">>> Entering ValidateObject_Returns_Failed_Result_If_Any_Attribute_Does_Not_Validate()");
             // Arrange
             TestClass cls = new TestClass { Foo = new object(), Bar = "BarBaz" };
             DataAnnotationsObjectValidator validator = new DataAnnotationsObjectValidator();
+			Logger.LogDebug("ValidateObject_Returns_Failed_Result_If_Any_Attribute_Does_Not_Validate(): cls → {Cls}", cls);
+			Logger.LogDebug("ValidateObject_Returns_Failed_Result_If_Any_Attribute_Does_Not_Validate(): validator → {Validator}", validator);
 
             // Act
             ValidationResult result = validator.ValidateObject(cls);
 
+			Logger.LogDebug("ValidateObject_Returns_Failed_Result_If_Any_Attribute_Does_Not_Validate(): result → {Result}", result);
             // Assert
             Assert.That(result.IsValid, Is.False);
+			Logger.LogDebug("<<< Exiting ValidateObject_Returns_Failed_Result_If_Any_Attribute_Does_Not_Validate()");
         }
 
         [Test]
         public void ValidateObject_Collects_Error_Messages_From_Validation_Attributes()
         {
+			Logger.LogDebug(">>> Entering ValidateObject_Collects_Error_Messages_From_Validation_Attributes()");
             // Arrange
             TestClass cls = new TestClass { Foo = null, Bar = "BarBaz" };
             DataAnnotationsObjectValidator validator = new DataAnnotationsObjectValidator();
+			Logger.LogDebug("ValidateObject_Collects_Error_Messages_From_Validation_Attributes(): cls → {Cls}", cls);
+			Logger.LogDebug("ValidateObject_Collects_Error_Messages_From_Validation_Attributes(): validator → {Validator}", validator);
 
             // Act
             ValidationResult result = validator.ValidateObject(cls);
 
+			Logger.LogDebug("ValidateObject_Collects_Error_Messages_From_Validation_Attributes(): result → {Result}", result);
             using (Assert.EnterMultipleScope())
             {
                 // Assert
@@ -70,18 +85,23 @@ namespace DotNetNuke.Tests.UI.Validation
                 Assert.That(result.Errors.Where(e => e.PropertyName == "Foo").Single().ErrorMessage, Is.EqualTo("Dude, you forgot to enter a Foo"));
                 Assert.That(result.Errors.Where(e => e.PropertyName == "Bar").Single().ErrorMessage, Is.EqualTo("Yo, you have to specify 5 characters for Bar"));
             }
+			Logger.LogDebug("<<< Exiting ValidateObject_Collects_Error_Messages_From_Validation_Attributes()");
         }
 
         [Test]
         public void ValidateObject_Collects_ValidationAttribute_Objects_From_Failed_Validation()
         {
+			Logger.LogDebug(">>> Entering ValidateObject_Collects_ValidationAttribute_Objects_From_Failed_Validation()");
             // Arrange
             TestClass cls = new TestClass { Foo = null, Bar = "BarBaz" };
             DataAnnotationsObjectValidator validator = new DataAnnotationsObjectValidator();
+			Logger.LogDebug("ValidateObject_Collects_ValidationAttribute_Objects_From_Failed_Validation(): cls → {Cls}", cls);
+			Logger.LogDebug("ValidateObject_Collects_ValidationAttribute_Objects_From_Failed_Validation(): validator → {Validator}", validator);
 
             // Act
             ValidationResult result = validator.ValidateObject(cls);
 
+			Logger.LogDebug("ValidateObject_Collects_ValidationAttribute_Objects_From_Failed_Validation(): result → {Result}", result);
             using (Assert.EnterMultipleScope())
             {
                 // Assert
@@ -89,6 +109,7 @@ namespace DotNetNuke.Tests.UI.Validation
                 Assert.That(result.Errors.Single(e => e.PropertyName == "Foo").Validator, Is.InstanceOf<RequiredAttribute>());
                 Assert.That(result.Errors.Single(e => e.PropertyName == "Bar").Validator, Is.InstanceOf<StringLengthAttribute>());
             }
+			Logger.LogDebug("<<< Exiting ValidateObject_Collects_ValidationAttribute_Objects_From_Failed_Validation()");
         }
 
         public class TestClass

@@ -21,6 +21,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
     [ConsoleCommand("list-users", Constants.UsersCategory, "Prompt_ListUsers_Description")]
     public class ListUsers : ConsoleCommandBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [FlagParameter("email", "Prompt_ListUsers_FlagEmail", "String")]
         private const string FlagEmail = "email";
 
@@ -52,6 +53,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.Email = this.GetFlagValue(FlagEmail, "Email", string.Empty);
             this.Username = this.GetFlagValue(FlagUsername, "Username", string.Empty);
             this.Role = this.GetFlagValue(FlagRole, "Role", string.Empty);
@@ -66,11 +68,13 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
                     {
                         // assume it's an email
                         this.Email = args[1];
+						Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): this.Email → {Arg4}", args, portalSettings, userInfo, activeTabId, this.Email);
                     }
                     else
                     {
                         // assume it's a username
                         this.Username = args[1];
+						Logger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): this.Username → {Arg4}", args, portalSettings, userInfo, activeTabId, this.Username);
                     }
                 }
                 else
@@ -98,18 +102,23 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             var usersList = new List<UserModelBase>();
             var recCount = 0;
+			Logger.LogDebug("Run(): usersList → {UsersList}", usersList);
             var max = this.Max <= 0 ? 10 : (this.Max > 500 ? 500 : this.Max);
 
+			Logger.LogDebug("Run(): max → {Max}", max);
             // We need to cover the site group scenario for child portal
             var portalId = PortalController.GetEffectivePortalId(this.PortalId);
             var getUsersContract = new GetUsersContract
+			Logger.LogDebug("Run(): portalId → {PortalId}", portalId);
             {
                 SearchText = null,
                 PageIndex = this.Page > 0 ? this.Page - 1 : 0,
@@ -123,6 +132,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             {
                 // do username lookup
                 getUsersContract.SearchText = this.Username;
+				Logger.LogDebug("Run(): getUsersContract.SearchText → {Arg0}", getUsersContract.SearchText);
             }
             else if (!string.IsNullOrEmpty(this.Email))
             {
@@ -140,6 +150,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
                 KeyValuePair<HttpStatusCode, string> response;
                 var users = UsersController.Instance.GetUsersInRole(this.PortalSettings, this.Role, out recCount, out response, this.Page, max);
                 if (users != null)
+				Logger.LogDebug("Run(): users → {Users}", users);
                 {
                     usersList = ConvertList(users);
                 }
@@ -161,6 +172,8 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
 
             var totalPages = (recCount / max) + (recCount % max == 0 ? 0 : 1);
             var pageNo = this.Page > 0 ? this.Page : 1;
+			Logger.LogDebug("Run(): totalPages → {TotalPages}", totalPages);
+			Logger.LogDebug("<<< Exiting Run()");
             return new ConsoleResultModel
             {
                 Data = usersList,
@@ -177,6 +190,8 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
 
         private static List<UserModelBase> ConvertList(IEnumerable<UserInfo> lstUserInfos)
         {
+			Logger.LogDebug(">>> Entering ConvertList(lstUserInfos={LstUserInfos})", lstUserInfos);
+			Logger.LogDebug("<<< Exiting ConvertList(lstUserInfos={LstUserInfos})", lstUserInfos);
             return (from UserInfo ui in lstUserInfos select new UserModelBase(ui)).ToList();
         }
 

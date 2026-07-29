@@ -14,6 +14,7 @@ namespace DotNetNuke.Services.Mobile
     [Serializable]
     public class PreviewProfile : IPreviewProfile, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private int id = -1;
 
         /// <summary>Gets or sets primary key.</summary>
@@ -83,6 +84,7 @@ namespace DotNetNuke.Services.Mobile
         /// <param name="dr">the data reader.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.Id = Convert.ToInt32(dr["Id"], CultureInfo.InvariantCulture);
             this.PortalId = Convert.ToInt32(dr["PortalId"], CultureInfo.InvariantCulture);
             this.Name = dr["Name"].ToString();
@@ -90,6 +92,7 @@ namespace DotNetNuke.Services.Mobile
             this.Height = Convert.ToInt32(dr["Height"], CultureInfo.InvariantCulture);
             this.UserAgent = dr["UserAgent"].ToString();
             this.SortOrder = Convert.ToInt32(dr["SortOrder"], CultureInfo.InvariantCulture);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

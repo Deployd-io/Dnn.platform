@@ -15,6 +15,7 @@ namespace Dnn.PersonaBar.Roles.Services.DTO
     [DataContract]
     public class RoleDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [DataMember(Name = "id")]
         public int Id { get; set; }
 
@@ -77,11 +78,13 @@ namespace Dnn.PersonaBar.Roles.Services.DTO
 
         public static RoleDto FromRoleInfo(RoleInfo role)
         {
+			Logger.LogDebug(">>> Entering FromRoleInfo(role={Role})", role);
             if (role == null)
             {
                 return null;
             }
 
+			Logger.LogDebug("<<< Exiting FromRoleInfo(role={Role})", role);
             return new RoleDto()
             {
                 Id = role.RoleID,
@@ -109,6 +112,8 @@ namespace Dnn.PersonaBar.Roles.Services.DTO
 
         public RoleInfo ToRoleInfo()
         {
+			Logger.LogDebug(">>> Entering ToRoleInfo()");
+			Logger.LogDebug("<<< Exiting ToRoleInfo()");
             return new RoleInfo()
             {
                 RoleID = this.Id,

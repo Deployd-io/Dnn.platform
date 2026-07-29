@@ -33,6 +33,7 @@ namespace Dnn.AzureConnector.Components
     /// <inheritdoc />
     public class AzureConnector : IConnector
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string DefaultDisplayName = "Azure Storage";
         private static readonly DataProvider DataProvider = DataProvider.Instance();
 
@@ -46,7 +47,9 @@ namespace Dnn.AzureConnector.Components
         public AzureConnector()
             : this(null, null, null)
         {
+		Logger.LogDebug(">>> Entering AzureConnector()");
         }
+		Logger.LogDebug("<<< Exiting AzureConnector()");
 
         /// <summary>Initializes a new instance of the <see cref="AzureConnector"/> class.</summary>
         /// <param name="folderMappingController">The folder mapping controller.</param>
@@ -54,6 +57,10 @@ namespace Dnn.AzureConnector.Components
         public AzureConnector(IFolderMappingController folderMappingController)
             : this(folderMappingController, null, null)
         {
+		Logger.LogDebug(">>> Entering AzureConnector(folderMappingController={FolderMappingController})", folderMappingController);
+		Logger.LogDebug("<<< Exiting AzureConnector(folderMappingController={FolderMappingController})", folderMappingController);
+		Logger.LogDebug("AzureConnector(folderMappingController={FolderMappingController},cryptographyProvider={CryptographyProvider},hostSettings={HostSettings}): folderMappingController → {FolderMappingController1}", folderMappingController, cryptographyProvider, hostSettings, folderMappingController);
+		Logger.LogDebug("AzureConnector(folderMappingController={FolderMappingController},cryptographyProvider={CryptographyProvider},hostSettings={HostSettings}): hostSettings → {HostSettings1}", folderMappingController, cryptographyProvider, hostSettings, hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="AzureConnector"/> class.</summary>
@@ -64,12 +71,15 @@ namespace Dnn.AzureConnector.Components
         {
             this.folderMappingController = folderMappingController ?? FolderMappingController.Instance;
 #pragma warning disable CS0618 // Type or member is obsolete
+			Logger.LogDebug("AzureConnector(folderMappingController={FolderMappingController},cryptographyProvider={CryptographyProvider},hostSettings={HostSettings}): this.folderMappingController → {Arg3}", folderMappingController, cryptographyProvider, hostSettings, this.folderMappingController);
             this.cryptographyProvider = cryptographyProvider ?? (ICryptographyProvider)CryptographyProvider.Instance();
+			Logger.LogDebug("AzureConnector(folderMappingController={FolderMappingController},cryptographyProvider={CryptographyProvider},hostSettings={HostSettings}): cryptographyProvider → {CryptographyProvider1}", folderMappingController, cryptographyProvider, hostSettings, cryptographyProvider);
 #pragma warning restore CS0618 // Type or member is obsolete
             this.hostSettings = hostSettings ??
                                 new HostSettings(
                                     new HostController(
 #pragma warning disable CS0618 // Type or member is obsolete
+									Logger.LogDebug("AzureConnector(folderMappingController={FolderMappingController},cryptographyProvider={CryptographyProvider},hostSettings={HostSettings}): this.hostSettings → {Arg3}", folderMappingController, cryptographyProvider, hostSettings, this.hostSettings);
                                         new EventLogController(),
 #pragma warning restore CS0618 // Type or member is obsolete
                                         new Lazy<IPortalController>(() => PortalController.Instance)));
@@ -106,25 +116,30 @@ namespace Dnn.AzureConnector.Components
         /// <inheritdoc />
         public IEnumerable<IConnector> GetConnectors(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetConnectors(portalId={PortalId})", portalId);
             var connectors = this.FindAzureFolderMappings(portalId);
             if (connectors != null && connectors.Count != 0)
+			Logger.LogDebug("GetConnectors(portalId={PortalId}): connectors → {Connectors}", portalId, connectors);
             {
                 connectors.ForEach(x => { this.Id = x.FolderMappingID.ToString(CultureInfo.InvariantCulture); });
                 var finalCon = connectors.Select(x => (IConnector)Activator.CreateInstance(this.GetType())).ToList();
                 finalCon.ForEach(x =>
                 {
+				Logger.LogDebug("GetConnectors(portalId={PortalId}): finalCon → {FinalCon}", portalId, finalCon);
                     x.Id = connectors[finalCon.IndexOf(x)].FolderMappingID.ToString(CultureInfo.InvariantCulture);
                     x.DisplayName = connectors[finalCon.IndexOf(x)].MappingName;
                 });
                 return finalCon;
             }
 
+			Logger.LogDebug("<<< Exiting GetConnectors(portalId={PortalId})", portalId);
             return new List<IConnector> { this };
         }
 
         /// <inheritdoc />
         public void DeleteConnector(int portalId)
         {
+			Logger.LogDebug(">>> Entering DeleteConnector(portalId={PortalId})", portalId);
             if (!string.IsNullOrEmpty(this.Id))
             {
                 int mappingId;
@@ -134,13 +149,17 @@ namespace Dnn.AzureConnector.Components
                     this.DeleteAzureFolderMapping(portalId, mappingId);
                 }
             }
+			Logger.LogDebug("<<< Exiting DeleteConnector(portalId={PortalId})", portalId);
         }
 
         /// <inheritdoc />
         public bool HasConfig(int portalId)
         {
+			Logger.LogDebug(">>> Entering HasConfig(portalId={PortalId})", portalId);
             var folderMapping = this.FindAzureFolderMapping(portalId, false, true);
             this.Id = Convert.ToString(folderMapping?.FolderMappingID, CultureInfo.InvariantCulture);
+			Logger.LogDebug("HasConfig(portalId={PortalId}): folderMapping → {FolderMapping}", portalId, folderMapping);
+			Logger.LogDebug("<<< Exiting HasConfig(portalId={PortalId})", portalId);
             return this.GetConfig(portalId)["Connected"] == "true";
         }
 
@@ -288,6 +307,7 @@ namespace Dnn.AzureConnector.Components
         /// <returns>A <see cref="FolderMappingInfo"/> instance.</returns>
         internal static FolderMappingInfo FindAzureFolderMappingStatic(IFolderMappingController folderMappingController, int portalId, int? folderMappingId = null, bool autoCreate = true)
         {
+			Logger.LogDebug(">>> Entering FindAzureFolderMappingStatic(folderMappingController={FolderMappingController},portalId={PortalId},folderMappingId={FolderMappingId},autoCreate={AutoCreate})", folderMappingController, portalId, folderMappingId, autoCreate);
             var folderMappings = folderMappingController.GetFolderMappings(portalId)
                 .Where(f => f.FolderProviderType == Constants.FolderProviderType);
 
@@ -301,11 +321,13 @@ namespace Dnn.AzureConnector.Components
                 return CreateAzureFolderMappingStatic(folderMappingController, portalId);
             }
 
+			Logger.LogDebug("<<< Exiting FindAzureFolderMappingStatic(folderMappingController={FolderMappingController},portalId={PortalId},folderMappingId={FolderMappingId},autoCreate={AutoCreate})", folderMappingController, portalId, folderMappingId, autoCreate);
             return folderMappings.FirstOrDefault();
         }
 
         private static FolderMappingInfo CreateAzureFolderMappingStatic(IFolderMappingController folderMappingController, int portalId, string mappingName = "")
         {
+			Logger.LogDebug(">>> Entering CreateAzureFolderMappingStatic(folderMappingController={FolderMappingController},portalId={PortalId},mappingName={MappingName})", folderMappingController, portalId, mappingName);
             var folderMapping = new FolderMappingInfo
             {
                 PortalID = portalId,
@@ -316,6 +338,7 @@ namespace Dnn.AzureConnector.Components
                 FolderProviderType = Constants.FolderProviderType,
             };
             folderMapping.FolderMappingID = folderMappingController.AddFolderMapping(folderMapping);
+			Logger.LogDebug("<<< Exiting CreateAzureFolderMappingStatic(folderMappingController={FolderMappingController},portalId={PortalId},mappingName={MappingName})", folderMappingController, portalId, mappingName);
             return folderMapping;
         }
 
@@ -396,6 +419,7 @@ namespace Dnn.AzureConnector.Components
 
                 throw new ConnectorArgumentException(Localization.GetString("InvalidAccountKey.ErrorMessage", Constants.LocalResourceFile));
             }
+			Logger.LogDebug("<<< Exiting Validation(azureAccountName={AzureAccountName},azureAccountKey={AzureAccountKey},azureContainerName={AzureContainerName})", azureAccountName, azureAccountKey, azureContainerName);
         }
 
         private string GetSetting(Hashtable settings, string name, bool encrypt = false)
@@ -415,7 +439,11 @@ namespace Dnn.AzureConnector.Components
 
         private void DeleteAzureFolderMapping(int portalId, int folderMappingId)
         {
+			Logger.LogDebug(">>> Entering DeleteAzureFolderMapping(portalId={PortalId},folderMappingId={FolderMappingId})", portalId, folderMappingId);
             this.folderMappingController.DeleteFolderMapping(portalId, folderMappingId);
+			Logger.LogDebug("<<< Exiting DeleteAzureFolderMapping(portalId={PortalId},folderMappingId={FolderMappingId})", portalId, folderMappingId);
+			Logger.LogDebug(">>> Entering DeleteAzureFolderMapping(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting DeleteAzureFolderMapping(portalId={PortalId})", portalId);
         }
 
         private void DeleteAzureFolderMapping(int portalId)
@@ -431,11 +459,14 @@ namespace Dnn.AzureConnector.Components
 
         private void DeleteAzureFolders(int portalId, int folderMappingId)
         {
+			Logger.LogDebug(">>> Entering DeleteAzureFolders(portalId={PortalId},folderMappingId={FolderMappingId})", portalId, folderMappingId);
             var folderManager = FolderManager.Instance;
             var folders = folderManager.GetFolders(portalId);
 
+			Logger.LogDebug("DeleteAzureFolders(portalId={PortalId},folderMappingId={FolderMappingId}): folders → {Folders}", portalId, folderMappingId, folders);
             var folderMappingFolders = folders.Where(f => f.FolderMappingID == folderMappingId);
 
+			Logger.LogDebug("DeleteAzureFolders(portalId={PortalId},folderMappingId={FolderMappingId}): folderMappingFolders → {FolderMappingFolders}", portalId, folderMappingId, folderMappingFolders);
             if (folderMappingFolders.Any())
             {
                 // Delete files in folders with the provided mapping (only in the database)
@@ -473,17 +504,21 @@ namespace Dnn.AzureConnector.Components
                 {
                     var defaultFolderMapping = this.folderMappingController.GetDefaultFolderMapping(portalId);
 
+					Logger.LogDebug("DeleteAzureFolders(portalId={PortalId},folderMappingId={FolderMappingId}): defaultFolderMapping → {DefaultFolderMapping}", portalId, folderMappingId, defaultFolderMapping);
                     foreach (var folderMappingFolder in folderMappingFolders)
                     {
                         folderMappingFolder.FolderMappingID = defaultFolderMapping.FolderMappingID;
+						Logger.LogDebug("DeleteAzureFolders(portalId={PortalId},folderMappingId={FolderMappingId}): folderMappingFolder.FolderMappingID → {Arg2}", portalId, folderMappingId, folderMappingFolder.FolderMappingID);
                         folderManager.UpdateFolder(folderMappingFolder);
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting DeleteAzureFolders(portalId={PortalId},folderMappingId={FolderMappingId})", portalId, folderMappingId);
         }
 
         private FolderMappingInfo FindAzureFolderMapping(int portalId, bool autoCreate = true, bool checkId = false)
         {
+			Logger.LogDebug(">>> Entering FindAzureFolderMapping(portalId={PortalId},autoCreate={AutoCreate},checkId={CheckId})", portalId, autoCreate, checkId);
             var folderMappings = this.folderMappingController.GetFolderMappings(portalId)
                 .Where(f => f.FolderProviderType == Constants.FolderProviderType).ToList();
 
@@ -500,22 +535,28 @@ namespace Dnn.AzureConnector.Components
 
             var folderMapping = folderMappings.FirstOrDefault(x => x.FolderMappingID.ToString(CultureInfo.InvariantCulture) == this.Id);
 
+			Logger.LogDebug("FindAzureFolderMapping(portalId={PortalId},autoCreate={AutoCreate},checkId={CheckId}): folderMapping → {FolderMapping}", portalId, autoCreate, checkId, folderMapping);
             if (folderMapping == null && autoCreate)
             {
                 folderMapping = this.CreateAzureFolderMapping(portalId);
             }
 
+			Logger.LogDebug("<<< Exiting FindAzureFolderMapping(portalId={PortalId},autoCreate={AutoCreate},checkId={CheckId})", portalId, autoCreate, checkId);
             return folderMapping;
         }
 
         private List<FolderMappingInfo> FindAzureFolderMappings(int portalId)
         {
+			Logger.LogDebug(">>> Entering FindAzureFolderMappings(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting FindAzureFolderMappings(portalId={PortalId})", portalId);
             return this.folderMappingController.GetFolderMappings(portalId)
                 .Where(f => f.FolderProviderType == Constants.FolderProviderType).ToList();
         }
 
         private bool FolderMappingNameExists(int portalId, string mappingName, int? exceptMappingId)
         {
+			Logger.LogDebug(">>> Entering FolderMappingNameExists(portalId={PortalId},mappingName={MappingName},exceptMappingId={ExceptMappingId})", portalId, mappingName, exceptMappingId);
+			Logger.LogDebug("<<< Exiting FolderMappingNameExists(portalId={PortalId},mappingName={MappingName},exceptMappingId={ExceptMappingId})", portalId, mappingName, exceptMappingId);
             return this.folderMappingController.GetFolderMappings(portalId)
                 .Any(
                     f =>
@@ -525,8 +566,11 @@ namespace Dnn.AzureConnector.Components
 
         private FolderMappingInfo CreateAzureFolderMapping(int portalId, string mappingName = "")
         {
+			Logger.LogDebug(">>> Entering CreateAzureFolderMapping(portalId={PortalId},mappingName={MappingName})", portalId, mappingName);
             var folderMapping = CreateAzureFolderMappingStatic(this.folderMappingController, portalId, mappingName);
             this.Id = folderMapping.FolderMappingID.ToString(CultureInfo.InvariantCulture);
+			Logger.LogDebug("CreateAzureFolderMapping(portalId={PortalId},mappingName={MappingName}): folderMapping → {FolderMapping}", portalId, mappingName, folderMapping);
+			Logger.LogDebug("<<< Exiting CreateAzureFolderMapping(portalId={PortalId},mappingName={MappingName})", portalId, mappingName);
             return folderMapping;
         }
     }

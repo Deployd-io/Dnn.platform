@@ -13,10 +13,13 @@ using DotNetNuke.Entities.Users;
 /// <param name="implementation">The <see cref="IPropertyAccess"/> implementation that is being wrapped.</param>
 public class UrlEncodingPropertyAccess(IPropertyAccess implementation) : IPropertyAccess
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
+	Logger.LogDebug(">>> Entering UrlEncodingPropertyAccess(implementation={Implementation})", implementation);
     public CacheLevel Cacheability
     {
         get => implementation.Cacheability;
+		Logger.LogDebug("UrlEncodingPropertyAccess(implementation={Implementation}): get → {Get}", implementation, get);
     }
 
     /// <inheritdoc />
@@ -36,6 +39,7 @@ public class UrlEncodingPropertyAccess(IPropertyAccess implementation) : IProper
             accessLevel,
             ref propertyNotFound);
 
+		Logger.LogDebug("<<< Exiting UrlEncodingPropertyAccess(implementation={Implementation})", implementation);
         return WebUtility.UrlEncode(result);
     }
 }

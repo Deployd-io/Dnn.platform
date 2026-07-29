@@ -9,20 +9,28 @@ Imports System.Text
 
 Namespace DotNetNuke.UI.WebControls
     Public Class HTMLElement
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(HTMLElement))
         ' Methods
         Public Sub New(ByVal TagName As String)
+			Logger.LogDebug(">>> Entering New(TagName={TagName})", TagName)
             Me.m_strTagName = TagName
+			Logger.LogDebug("<<< Exiting New(TagName={TagName})", TagName)
+			Logger.LogDebug("New(TagName={TagName}): Me.m_strTagName → {Arg1}", TagName, Me.m_strTagName)
         End Sub
 
         Private Function SafeJSONString(ByVal strString As String) As String
+			Logger.LogDebug(">>> Entering SafeJSONString(strString={StrString})", strString)
+			Logger.LogDebug("<<< Exiting SafeJSONString(strString={StrString})", strString)
             Return ("'" & Strings.Replace(Strings.Replace(Strings.Replace(strString, ChrW(13), "\r", 1, -1, CompareMethod.Binary), ChrW(10), "\n", 1, -1, CompareMethod.Binary), "'", "\'", 1, -1, CompareMethod.Binary) & "'")
         End Function
 
         Public Function ToJSON() As String
+			Logger.LogDebug(">>> Entering ToJSON()")
             Dim enumerator As IEnumerator = Nothing
             Dim builder As New StringBuilder
             Try 
                 enumerator = Me.Attributes.Keys.GetEnumerator
+				Logger.LogDebug("ToJSON(): enumerator → {Enumerator}", enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -49,6 +57,7 @@ Namespace DotNetNuke.UI.WebControls
                 builder.Append($"{"__text"}:{Me.SafeJSONString(Me.Text)}")
             End If
             builder.Append("}"c)
+			Logger.LogDebug("<<< Exiting ToJSON()")
             Return builder.ToString
         End Function
 

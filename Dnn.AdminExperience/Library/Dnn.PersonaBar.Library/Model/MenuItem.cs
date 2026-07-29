@@ -19,6 +19,7 @@ namespace Dnn.PersonaBar.Library.Model
     [Serializable]
     public class MenuItem : IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private string parent;
 
         [DataMember]
@@ -133,6 +134,7 @@ namespace Dnn.PersonaBar.Library.Model
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.MenuId = Convert.ToInt32(dr["MenuId"], CultureInfo.InvariantCulture);
             this.Identifier = dr["Identifier"].ToString();
             this.ModuleName = dr["ModuleName"].ToString();
@@ -147,6 +149,7 @@ namespace Dnn.PersonaBar.Library.Model
             this.Enabled = Convert.ToBoolean(dr["Enabled"], CultureInfo.InvariantCulture);
             this.ParentId = Null.SetNullInteger(dr["ParentId"]);
             this.Order = Null.SetNullInteger(dr["Order"]);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

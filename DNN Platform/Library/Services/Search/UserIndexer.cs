@@ -32,23 +32,35 @@ namespace DotNetNuke.Services.Search
     /// <summary>The UserIndexer is an implementation of the abstract <see cref="IndexingProviderBase"/> class.</summary>
     public class UserIndexer(ListController listController, IPortalController portalController, IHostSettings hostSettings, DataProvider dataProvider, IUserController userController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, IEventLogger eventLogger) : IndexingProviderBase
     {
+		eventLogger.LogDebug(">>> Entering UserIndexer(listController={ListController},portalController={PortalController},hostSettings={HostSettings},dataProvider={DataProvider},userController={UserController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger})", listController, portalController, hostSettings, dataProvider, userController, appStatus, portalGroupController, eventLogger);
         internal const string UserIndexResetFlag = "UserIndexer_ReIndex";
         internal const string ValueSplitFlag = "$$$";
         internal static readonly Regex UsrFirstNameSplitRx = new Regex(Regex.Escape(ValueSplitFlag), RegexOptions.Compiled);
         private const int BatchSize = 250;
+		eventLogger.LogDebug("UserIndexer(listController={ListController},portalController={PortalController},hostSettings={HostSettings},dataProvider={DataProvider},userController={UserController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger}): UsrFirstNameSplitRx → {UsrFirstNameSplitRx}", listController, portalController, hostSettings, dataProvider, userController, appStatus, portalGroupController, eventLogger, UsrFirstNameSplitRx);
         private const int ClauseMaxCount = 1024;
 
         private static readonly int UserSearchTypeId = SearchHelper.Instance.GetSearchTypeByName("user").SearchTypeId;
         private readonly ListController listController = listController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ListController>();
+		eventLogger.LogDebug("UserIndexer(listController={ListController},portalController={PortalController},hostSettings={HostSettings},dataProvider={DataProvider},userController={UserController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger}): UserSearchTypeId → {UserSearchTypeId}", listController, portalController, hostSettings, dataProvider, userController, appStatus, portalGroupController, eventLogger, UserSearchTypeId);
+		eventLogger.LogDebug("UserIndexer(listController={ListController},portalController={PortalController},hostSettings={HostSettings},dataProvider={DataProvider},userController={UserController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger}): listController → {ListController1}", listController, portalController, hostSettings, dataProvider, userController, appStatus, portalGroupController, eventLogger, listController);
         private readonly IPortalController portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+		eventLogger.LogDebug("UserIndexer(listController={ListController},portalController={PortalController},hostSettings={HostSettings},dataProvider={DataProvider},userController={UserController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger}): portalController → {PortalController1}", listController, portalController, hostSettings, dataProvider, userController, appStatus, portalGroupController, eventLogger, portalController);
+		eventLogger.LogDebug("UserIndexer(listController={ListController},portalController={PortalController},hostSettings={HostSettings},dataProvider={DataProvider},userController={UserController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger}): hostSettings → {HostSettings1}", listController, portalController, hostSettings, dataProvider, userController, appStatus, portalGroupController, eventLogger, hostSettings);
         private readonly DataProvider dataProvider = dataProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<DataProvider>();
         private readonly IUserController userController = userController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IUserController>();
+		eventLogger.LogDebug("UserIndexer(listController={ListController},portalController={PortalController},hostSettings={HostSettings},dataProvider={DataProvider},userController={UserController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger}): dataProvider → {DataProvider1}", listController, portalController, hostSettings, dataProvider, userController, appStatus, portalGroupController, eventLogger, dataProvider);
+		eventLogger.LogDebug("UserIndexer(listController={ListController},portalController={PortalController},hostSettings={HostSettings},dataProvider={DataProvider},userController={UserController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger}): userController → {UserController1}", listController, portalController, hostSettings, dataProvider, userController, appStatus, portalGroupController, eventLogger, userController);
         private readonly IApplicationStatusInfo appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
         private readonly IPortalGroupController portalGroupController = portalGroupController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalGroupController>();
+		eventLogger.LogDebug("UserIndexer(listController={ListController},portalController={PortalController},hostSettings={HostSettings},dataProvider={DataProvider},userController={UserController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger}): appStatus → {AppStatus1}", listController, portalController, hostSettings, dataProvider, userController, appStatus, portalGroupController, eventLogger, appStatus);
+		eventLogger.LogDebug("UserIndexer(listController={ListController},portalController={PortalController},hostSettings={HostSettings},dataProvider={DataProvider},userController={UserController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger}): portalGroupController → {PortalGroupController1}", listController, portalController, hostSettings, dataProvider, userController, appStatus, portalGroupController, eventLogger, portalGroupController);
         private readonly IEventLogger eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
 
+		eventLogger.LogDebug("UserIndexer(listController={ListController},portalController={PortalController},hostSettings={HostSettings},dataProvider={DataProvider},userController={UserController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger}): eventLogger → {EventLogger1}", listController, portalController, hostSettings, dataProvider, userController, appStatus, portalGroupController, eventLogger, eventLogger);
         /// <summary>Initializes a new instance of the <see cref="UserIndexer"/> class.</summary>
+		eventLogger.LogDebug("<<< Exiting UserIndexer(listController={ListController},portalController={PortalController},hostSettings={HostSettings},dataProvider={DataProvider},userController={UserController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger})", listController, portalController, hostSettings, dataProvider, userController, appStatus, portalGroupController, eventLogger);
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with ListController. Scheduled removal in v12.0.0.")]
         public UserIndexer()
             : this(null, null, null, null, null, null, null, null)
@@ -63,21 +75,28 @@ namespace DotNetNuke.Services.Search
         /// <returns>Count of indexed records.</returns>
         public override int IndexSearchDocuments(int portalId, ScheduleHistoryItem schedule, DateTime startDateLocal, Action<IEnumerable<SearchDocument>> indexer)
         {
+			eventLogger.LogDebug(">>> Entering IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer})", portalId, schedule, startDateLocal, indexer);
             Requires.NotNull("indexer", indexer);
             const int saveThreshold = BatchSize;
             var totalIndexed = 0;
             var checkpointModified = false;
             startDateLocal = this.GetLocalTimeOfLastIndexedItem(portalId, schedule.ScheduleID, startDateLocal);
+			eventLogger.LogDebug("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): checkpointModified → {CheckpointModified}", portalId, schedule, startDateLocal, indexer, checkpointModified);
+			eventLogger.LogDebug("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): startDateLocal → {StartDateLocal1}", portalId, schedule, startDateLocal, indexer, startDateLocal);
             var searchDocuments = new Dictionary<string, SearchDocument>();
 
+			eventLogger.LogDebug("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): searchDocuments → {SearchDocuments}", portalId, schedule, startDateLocal, indexer, searchDocuments);
             var needReindex = PortalController.GetPortalSettingAsBoolean(this.portalController, UserIndexResetFlag, portalId, false);
             if (needReindex)
+			eventLogger.LogDebug("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): needReindex → {NeedReindex}", portalId, schedule, startDateLocal, indexer, needReindex);
             {
                 startDateLocal = SqlDateTime.MinValue.Value.AddDays(1);
             }
 
             var textDataType = this.listController.GetListEntryInfo("DataType", "Text");
             var richTextDataType = this.listController.GetListEntryInfo("DataType", "RichText");
+			eventLogger.LogDebug("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): textDataType → {TextDataType}", portalId, schedule, startDateLocal, indexer, textDataType);
+			eventLogger.LogDebug("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): richTextDataType → {RichTextDataType}", portalId, schedule, startDateLocal, indexer, richTextDataType);
 
             var profileDefinitions = ProfileController.GetPropertyDefinitionsByPortal(this.hostSettings, this.portalController, this.appStatus, this.portalGroupController, portalId, false, false)
                 .Where(d =>
@@ -88,8 +107,10 @@ namespace DotNetNuke.Services.Search
             {
                 var checkpointData = this.GetLastCheckpointData(portalId, schedule.ScheduleID);
                 if (string.IsNullOrEmpty(checkpointData) || !int.TryParse(checkpointData, out var startUserId))
+				eventLogger.LogDebug("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): checkpointData → {CheckpointData}", portalId, schedule, startDateLocal, indexer, checkpointData);
                 {
                     startUserId = Null.NullInteger;
+					eventLogger.LogDebug("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): startUserId → {StartUserId}", portalId, schedule, startDateLocal, indexer, startUserId);
                 }
 
                 int rowsAffected;
@@ -97,6 +118,7 @@ namespace DotNetNuke.Services.Search
                 do
                 {
                     rowsAffected = FindModifiedUsers(portalId, startDateLocal, searchDocuments, profileDefinitions, out indexedUsers, ref startUserId);
+					eventLogger.LogDebug("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): rowsAffected → {RowsAffected}", portalId, schedule, startDateLocal, indexer, rowsAffected);
 
                     if (rowsAffected > 0 && searchDocuments.Count >= saveThreshold)
                     {
@@ -128,7 +150,9 @@ namespace DotNetNuke.Services.Search
             }
             catch (Exception ex)
             {
+				eventLogger.LogError("Exception in UserIndexer(listController={ListController},portalController={PortalController},hostSettings={HostSettings},dataProvider={DataProvider},userController={UserController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger}): {Arg8}", listController, portalController, hostSettings, dataProvider, userController, appStatus, portalGroupController, eventLogger, ex.Message);
                 checkpointModified = false;
+				eventLogger.LogError("Exception in IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): {Arg4}", portalId, schedule, startDateLocal, indexer, ex.Message);
                 Exceptions.Exceptions.LogException(ex);
             }
 
@@ -139,6 +163,7 @@ namespace DotNetNuke.Services.Search
                 this.SetLocalTimeOfLastIndexedItem(portalId, schedule.ScheduleID, DateTime.Now);
             }
 
+			eventLogger.LogDebug("<<< Exiting IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer})", portalId, schedule, startDateLocal, indexer);
             return totalIndexed;
         }
 
@@ -295,10 +320,13 @@ namespace DotNetNuke.Services.Search
 
         private static UserSearch GetUserSearch(IDataRecord reader)
         {
+			eventLogger.LogDebug(">>> Entering GetUserSearch(reader={Reader})", reader);
             try
             {
                 var createdOn = reader["CreatedOnDate"] as DateTime?;
                 var modifiedOn = reader["LastModifiedOnDate"] as DateTime? ?? createdOn;
+				eventLogger.LogDebug("GetUserSearch(reader={Reader}): createdOn → {CreatedOn}", reader, createdOn);
+				eventLogger.LogDebug("GetUserSearch(reader={Reader}): modifiedOn → {ModifiedOn}", reader, modifiedOn);
                 var userSearch = new UserSearch
                 {
                     UserId = Convert.ToInt32(reader["UserId"], CultureInfo.InvariantCulture),
@@ -320,12 +348,15 @@ namespace DotNetNuke.Services.Search
             catch (Exception ex)
             {
                 Exceptions.Exceptions.LogException(ex);
+				eventLogger.LogError("Exception in GetUserSearch(reader={Reader}): {Arg1}", reader, ex.Message);
+				eventLogger.LogDebug("<<< Exiting GetUserSearch(reader={Reader})", reader);
                 return null;
             }
         }
 
         private static void DeleteDocuments(int portalId, ICollection<int> usersList)
         {
+			eventLogger.LogDebug(">>> Entering DeleteDocuments(portalId={PortalId},usersList={UsersList})", portalId, usersList);
             if (usersList == null || usersList.Count == 0)
             {
                 return;
@@ -333,12 +364,15 @@ namespace DotNetNuke.Services.Search
 
             var values = Enum.GetValues(typeof(UserVisibilityMode));
 
+			eventLogger.LogDebug("DeleteDocuments(portalId={PortalId},usersList={UsersList}): values → {Values}", portalId, usersList, values);
             var clauseCount = 0;
             foreach (var item in values)
             {
+			eventLogger.LogDebug("DeleteDocuments(portalId={PortalId},usersList={UsersList}): clauseCount → {ClauseCount}", portalId, usersList, clauseCount);
                 var keyword = new StringBuilder("(");
                 foreach (var userId in usersList)
                 {
+				eventLogger.LogDebug("DeleteDocuments(portalId={PortalId},usersList={UsersList}): keyword → {Keyword}", portalId, usersList, keyword);
                     var mode = Enum.GetName(typeof(UserVisibilityMode), item);
                     keyword.AppendFormat(
                         CultureInfo.InvariantCulture,
@@ -346,6 +380,7 @@ namespace DotNetNuke.Services.Search
                         userId,
                         mode,
                         keyword.Length > 1 ? "OR " : string.Empty);
+						eventLogger.LogDebug("DeleteDocuments(portalId={PortalId},usersList={UsersList}): mode → {Mode}", portalId, usersList, mode);
                     clauseCount += 2;
                     if (clauseCount >= ClauseMaxCount)
                     {
@@ -363,6 +398,7 @@ namespace DotNetNuke.Services.Search
                     PerformDelete(portalId, keyword.ToString().ToLowerInvariant());
                 }
             }
+			eventLogger.LogDebug("<<< Exiting DeleteDocuments(portalId={PortalId},usersList={UsersList})", portalId, usersList);
         }
 
         private static void PerformDelete(int portalId, string keyword)
@@ -388,7 +424,10 @@ namespace DotNetNuke.Services.Search
 
         private static bool ContainsColumn(string col, IDataReader reader)
         {
+			eventLogger.LogDebug(">>> Entering ContainsColumn(col={Col},reader={Reader})", col, reader);
             var schema = reader.GetSchemaTable();
+			eventLogger.LogDebug("ContainsColumn(col={Col},reader={Reader}): schema → {Schema}", col, reader, schema);
+			eventLogger.LogDebug("<<< Exiting ContainsColumn(col={Col},reader={Reader})", col, reader);
             return schema != null && schema.Select("ColumnName = '" + col + "'").Length > 0;
         }
 

@@ -8,16 +8,19 @@ namespace Dnn.AzureConnector.Services
     /// <inheritdoc />
     public class ServiceRouteMapper : IServiceRouteMapper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly string[] Namespaces = ["Dnn.AzureConnector.Services",];
 
         /// <inheritdoc />
         public void RegisterRoutes(IMapRoute mapRouteManager)
         {
+			Logger.LogDebug(">>> Entering RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
             mapRouteManager.MapHttpRoute(
                 "AzureConnector",
                 "default",
                 "{controller}/{action}",
                 Namespaces);
+				Logger.LogDebug("<<< Exiting RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
         }
     }
 }

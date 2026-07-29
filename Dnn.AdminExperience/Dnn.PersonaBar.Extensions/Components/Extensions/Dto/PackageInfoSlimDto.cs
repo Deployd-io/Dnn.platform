@@ -13,9 +13,12 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
     [JsonObject]
     public class PackageInfoSlimDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="PackageInfoSlimDto"/> class.</summary>
         public PackageInfoSlimDto()
         {
+		Logger.LogDebug(">>> Entering PackageInfoSlimDto()");
+		Logger.LogDebug("<<< Exiting PackageInfoSlimDto()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="PackageInfoSlimDto"/> class.</summary>
@@ -24,7 +27,9 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
         public PackageInfoSlimDto(int portalId, PackageInfo package)
             : this(null, null, null, portalId, package)
         {
+		Logger.LogDebug(">>> Entering PackageInfoSlimDto(portalId={PortalId},package={Package})", portalId, package);
         }
+		Logger.LogDebug("<<< Exiting PackageInfoSlimDto(portalId={PortalId},package={Package})", portalId, package);
 
         /// <summary>Initializes a new instance of the <see cref="PackageInfoSlimDto"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -36,21 +41,28 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
         {
             this.PackageId = package.PackageID;
             this.FriendlyName = package.FriendlyName;
+			Logger.LogDebug("PackageInfoSlimDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.PackageId → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.PackageId);
+			Logger.LogDebug("PackageInfoSlimDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.FriendlyName → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.FriendlyName);
             this.Name = package.Name;
             this.FileName = package.FileName;
             this.Description = package.Description;
+			Logger.LogDebug("PackageInfoSlimDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.Name → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.Name);
+			Logger.LogDebug("PackageInfoSlimDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.FileName → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.FileName);
+			Logger.LogDebug("PackageInfoSlimDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.Description → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.Description);
             this.Version = package.Version.ToString(3);
             this.IsInUse = ExtensionsController.IsPackageInUse(package, portalId);
             this.UpgradeUrl = ExtensionsController.UpgradeRedirect(package.Version, package.PackageType, package.Name);
             this.UpgradeIndicator = ExtensionsController.UpgradeIndicator(hostSettings, hostSettingsService, portalController, package.Version, package.PackageType, package.Name);
             this.PackageIcon = ExtensionsController.GetPackageIcon(package);
             this.Url = package.Url;
+			Logger.LogDebug("PackageInfoSlimDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): this.Url → {Arg5}", hostSettings, hostSettingsService, portalController, portalId, package, this.Url);
             this.CanDelete = package.PackageID != Null.NullInteger && !package.IsSystemPackage && PackageController.CanDeletePackage(package, PortalSettings.Current);
 
             if (package.PackageID != Null.NullInteger)
             {
                 var authService = AuthenticationController.GetAuthenticationServiceByPackageID(this.PackageId);
                 this.ReadOnly = authService != null && authService.AuthenticationType == Constants.DnnAuthTypeName;
+				Logger.LogDebug("PackageInfoSlimDto(hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},package={Package}): authService → {AuthService}", hostSettings, hostSettingsService, portalController, portalId, package, authService);
             }
         }
 

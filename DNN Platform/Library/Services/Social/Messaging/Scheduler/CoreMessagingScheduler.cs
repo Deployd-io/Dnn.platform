@@ -33,6 +33,7 @@ namespace DotNetNuke.Services.Social.Messaging.Scheduler
     /// <summary>A SchedulerClient instance that handles all the offline messaging actions.</summary>
     public class CoreMessagingScheduler : SchedulerClient
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>The setting name for number hours since last hourly digest run.</summary>
         private const string SettingLastHourlyRun = "CoreMessagingLastHourlyDigestRun";
 
@@ -55,6 +56,7 @@ namespace DotNetNuke.Services.Social.Messaging.Scheduler
         public CoreMessagingScheduler(ScheduleHistoryItem objScheduleHistoryItem)
             : this(objScheduleHistoryItem, null, null, null)
         {
+		Logger.LogDebug(">>> Entering CoreMessagingScheduler(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CoreMessagingScheduler"/> class.</summary>
@@ -66,8 +68,13 @@ namespace DotNetNuke.Services.Social.Messaging.Scheduler
         {
             this.ScheduleHistoryItem = scheduleHistoryItem;
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("CoreMessagingScheduler(scheduleHistoryItem={ScheduleHistoryItem},hostSettings={HostSettings},mailSettings={MailSettings},portalController={PortalController}): this.ScheduleHistoryItem → {Arg4}", scheduleHistoryItem, hostSettings, mailSettings, portalController, this.ScheduleHistoryItem);
+			Logger.LogDebug("CoreMessagingScheduler(scheduleHistoryItem={ScheduleHistoryItem},hostSettings={HostSettings},mailSettings={MailSettings},portalController={PortalController}): hostSettings → {HostSettings1}", scheduleHistoryItem, hostSettings, mailSettings, portalController, hostSettings);
+			Logger.LogDebug("CoreMessagingScheduler(scheduleHistoryItem={ScheduleHistoryItem},hostSettings={HostSettings},mailSettings={MailSettings},portalController={PortalController}): portalController → {PortalController1}", scheduleHistoryItem, hostSettings, mailSettings, portalController, portalController);
             this.mailSettings = mailSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IMailSettings>();
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+			Logger.LogDebug("<<< Exiting CoreMessagingScheduler(scheduleHistoryItem={ScheduleHistoryItem},hostSettings={HostSettings},mailSettings={MailSettings},portalController={PortalController})", scheduleHistoryItem, hostSettings, mailSettings, portalController);
+			Logger.LogDebug("CoreMessagingScheduler(scheduleHistoryItem={ScheduleHistoryItem},hostSettings={HostSettings},mailSettings={MailSettings},portalController={PortalController}): mailSettings → {MailSettings1}", scheduleHistoryItem, hostSettings, mailSettings, portalController, mailSettings);
         }
 
         /// <summary>This is the method that kicks off the actual work within the SchedulerClient's subclass.</summary>
@@ -77,6 +84,7 @@ namespace DotNetNuke.Services.Social.Messaging.Scheduler
             {
                 var schedulerInstance = Guid.NewGuid();
                 this.ScheduleHistoryItem.AddLogNote("Messaging Scheduler DoWork Starting " + schedulerInstance);
+				Logger.LogDebug("DoWork(): schedulerInstance → {SchedulerInstance}", schedulerInstance);
 
                 if (string.IsNullOrEmpty(this.mailSettings.GetServer(Null.NullInteger)))
                 {
@@ -89,6 +97,7 @@ namespace DotNetNuke.Services.Social.Messaging.Scheduler
 
                     var instantMessages = this.HandleInstantMessages(schedulerInstance);
                     var remainingMessages = this.hostSettings.MessageSchedulerBatchSize - instantMessages;
+					Logger.LogDebug("DoWork(): instantMessages → {InstantMessages}", instantMessages);
                     if (remainingMessages > 0)
                     {
                         this.HandleFrequentDigests(schedulerInstance, remainingMessages);
@@ -99,10 +108,12 @@ namespace DotNetNuke.Services.Social.Messaging.Scheduler
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in DoWork(): {Arg0}", ex.Message);
                 this.ScheduleHistoryItem.Succeeded = false;
                 this.ScheduleHistoryItem.AddLogNote("<br>Messaging Scheduler Failed: " + ex);
                 this.Errored(ref ex);
             }
+			Logger.LogDebug("<<< Exiting DoWork()");
         }
 
         /// <summary>Determines whether [is send email enable] [the specified portal identifier].</summary>
@@ -111,6 +122,8 @@ namespace DotNetNuke.Services.Social.Messaging.Scheduler
         /// <returns>True if mail is enabled in PortalSettings.</returns>
         private static bool IsSendEmailEnable(IPortalController portalController, int portalId)
         {
+			Logger.LogDebug(">>> Entering IsSendEmailEnable(portalController={PortalController},portalId={PortalId})", portalController, portalId);
+			Logger.LogDebug("<<< Exiting IsSendEmailEnable(portalController={PortalController},portalId={PortalId})", portalController, portalId);
             return PortalController.GetPortalSetting(portalController, "MessagingSendEmail", portalId, "YES") == "YES";
         }
 
@@ -206,10 +219,12 @@ namespace DotNetNuke.Services.Social.Messaging.Scheduler
         /// <param name="messages">The messages.</param>
         private static void MarkMessagesAsDispatched(IEnumerable<MessageRecipient> messages)
         {
+			Logger.LogDebug(">>> Entering MarkMessagesAsDispatched(messages={Messages})", messages);
             foreach (var message in messages)
             {
                 InternalMessagingController.Instance.MarkMessageAsDispatched(message.MessageID, message.RecipientID);
             }
+			Logger.LogDebug("<<< Exiting MarkMessagesAsDispatched(messages={Messages})", messages);
         }
 
         /// <summary>Gets the email body item template.</summary>
@@ -263,6 +278,8 @@ namespace DotNetNuke.Services.Social.Messaging.Scheduler
         /// <returns>Either the display name for the sender or the portal name.</returns>
         private static string GetSenderName(string displayName, string portalName)
         {
+			Logger.LogDebug(">>> Entering GetSenderName(displayName={DisplayName},portalName={PortalName})", displayName, portalName);
+			Logger.LogDebug("<<< Exiting GetSenderName(displayName={DisplayName},portalName={PortalName})", displayName, portalName);
             return string.IsNullOrEmpty(displayName) ? portalName : displayName;
         }
 
@@ -383,10 +400,14 @@ namespace DotNetNuke.Services.Social.Messaging.Scheduler
         /// <returns>The tabId for where the Message Center is installed.</returns>
         private static int GetMessageTab(IHostSettings hostSettings, PortalSettings sendingPortal)
         {
+			Logger.LogDebug(">>> Entering GetMessageTab(hostSettings={HostSettings},sendingPortal={SendingPortal})", hostSettings, sendingPortal);
             var cacheKey = $"MessageTab:{sendingPortal.PortalId}";
 
+			Logger.LogDebug("GetMessageTab(hostSettings={HostSettings},sendingPortal={SendingPortal}): cacheKey → {CacheKey}", hostSettings, sendingPortal, cacheKey);
             var cacheItemArgs = new CacheItemArgs(cacheKey, 30, CacheItemPriority.Default, sendingPortal);
 
+			Logger.LogDebug("GetMessageTab(hostSettings={HostSettings},sendingPortal={SendingPortal}): cacheItemArgs → {CacheItemArgs}", hostSettings, sendingPortal, cacheItemArgs);
+			Logger.LogDebug("<<< Exiting GetMessageTab(hostSettings={HostSettings},sendingPortal={SendingPortal})", hostSettings, sendingPortal);
             return CBO.GetCachedObject<int>(hostSettings, cacheItemArgs, GetMessageTabCallback);
         }
 
@@ -501,6 +522,7 @@ namespace DotNetNuke.Services.Social.Messaging.Scheduler
             Mail.SendEmail(fromAddress, senderAddress, toAddress, subject, body);
 
             MarkMessagesAsDispatched(messageRecipients);
+			Logger.LogDebug("<<< Exiting SendDigest(hostSettings={HostSettings},portalController={PortalController},messages={Messages},portalSettings={PortalSettings},senderUser={SenderUser},recipientUser={RecipientUser})", hostSettings, portalController, messages, portalSettings, senderUser, recipientUser);
         }
 
         /// <summary>Sends the message and attachments if configured to include them.</summary>
@@ -509,10 +531,13 @@ namespace DotNetNuke.Services.Social.Messaging.Scheduler
         /// <param name="messageRecipient">The message recipient.</param>
         private static void SendMessage(IHostSettings hostSettings, IPortalController portalController, MessageRecipient messageRecipient)
         {
+			Logger.LogDebug(">>> Entering SendMessage(hostSettings={HostSettings},portalController={PortalController},messageRecipient={MessageRecipient})", hostSettings, portalController, messageRecipient);
             var message = InternalMessagingController.Instance.GetMessage(messageRecipient.MessageID);
 
+			Logger.LogDebug("SendMessage(hostSettings={HostSettings},portalController={PortalController},messageRecipient={MessageRecipient}): message → {Message}", hostSettings, portalController, messageRecipient, message);
             var toUser = UserController.Instance.GetUser(message.PortalID, messageRecipient.UserID);
             if (!IsUserAbleToReceiveAnEmail(toUser))
+			Logger.LogDebug("SendMessage(hostSettings={HostSettings},portalController={PortalController},messageRecipient={MessageRecipient}): toUser → {ToUser}", hostSettings, portalController, messageRecipient, toUser);
             {
                 InternalMessagingController.Instance.MarkMessageAsDispatched(messageRecipient.MessageID, messageRecipient.RecipientID);
                 return;
@@ -527,11 +552,16 @@ namespace DotNetNuke.Services.Social.Messaging.Scheduler
             var defaultLanguage = toUser.Profile.PreferredLocale;
             var portalSettings = new PortalSettings(message.PortalID);
 
+			Logger.LogDebug("SendMessage(hostSettings={HostSettings},portalController={PortalController},messageRecipient={MessageRecipient}): portalSettings → {PortalSettings}", hostSettings, portalController, messageRecipient, portalSettings);
             var emailBodyTemplate = GetEmailBodyTemplate(portalSettings, defaultLanguage);
             var emailBodyItemTemplate = GetEmailBodyItemTemplate(portalSettings, defaultLanguage);
+			Logger.LogDebug("SendMessage(hostSettings={HostSettings},portalController={PortalController},messageRecipient={MessageRecipient}): emailBodyTemplate → {EmailBodyTemplate}", hostSettings, portalController, messageRecipient, emailBodyTemplate);
+			Logger.LogDebug("SendMessage(hostSettings={HostSettings},portalController={PortalController},messageRecipient={MessageRecipient}): emailBodyItemTemplate → {EmailBodyItemTemplate}", hostSettings, portalController, messageRecipient, emailBodyItemTemplate);
 
             var author = UserController.Instance.GetUser(message.PortalID, message.SenderUserID);
             var user = UserController.GetUserByEmail(portalSettings.PortalId, portalSettings.Email);
+			Logger.LogDebug("SendMessage(hostSettings={HostSettings},portalController={PortalController},messageRecipient={MessageRecipient}): author → {Author}", hostSettings, portalController, messageRecipient, author);
+			Logger.LogDebug("SendMessage(hostSettings={HostSettings},portalController={PortalController},messageRecipient={MessageRecipient}): user → {User}", hostSettings, portalController, messageRecipient, user);
             var fromAddress = (user != null)
                 ? $"{user.DisplayName} < {portalSettings.Email} >"
                 : portalSettings.Email;
@@ -541,8 +571,12 @@ namespace DotNetNuke.Services.Social.Messaging.Scheduler
             {
                 var senderName = GetSenderName(author.DisplayName, portalSettings.PortalName);
                 var senderAddress = GetSenderAddress(senderName, portalSettings.Email);
+				Logger.LogDebug("SendMessage(hostSettings={HostSettings},portalController={PortalController},messageRecipient={MessageRecipient}): senderName → {SenderName}", hostSettings, portalController, messageRecipient, senderName);
+				Logger.LogDebug("SendMessage(hostSettings={HostSettings},portalController={PortalController},messageRecipient={MessageRecipient}): senderAddress → {SenderAddress}", hostSettings, portalController, messageRecipient, senderAddress);
                 var emailBodyItemContent = GetEmailItemContent(portalSettings, messageRecipient, emailBodyItemTemplate);
                 var subject = InternalMessagingController.Instance.GetMessage(message.MessageID).Subject;
+				Logger.LogDebug("SendMessage(hostSettings={HostSettings},portalController={PortalController},messageRecipient={MessageRecipient}): emailBodyItemContent → {EmailBodyItemContent}", hostSettings, portalController, messageRecipient, emailBodyItemContent);
+				Logger.LogDebug("SendMessage(hostSettings={HostSettings},portalController={PortalController},messageRecipient={MessageRecipient}): subject → {Subject}", hostSettings, portalController, messageRecipient, subject);
                 if (string.IsNullOrEmpty(subject))
                 {
                     subject = string.Format(CultureInfo.CurrentCulture, GetEmailSubjectTemplate(portalSettings, defaultLanguage), portalSettings.PortalName);
@@ -550,6 +584,7 @@ namespace DotNetNuke.Services.Social.Messaging.Scheduler
 
                 var body = GetEmailBody(hostSettings, emailBodyTemplate, emailBodyItemContent, portalSettings, toUser);
                 body = RemoveHttpUrlsIfSiteIsSslEnabled(body, portalSettings);
+				Logger.LogDebug("SendMessage(hostSettings={HostSettings},portalController={PortalController},messageRecipient={MessageRecipient}): body → {Body}", hostSettings, portalController, messageRecipient, body);
 
                 // Include the attachment in the email message if configured to do so
                 if (InternalMessagingController.Instance.AttachmentsAllowed(message.PortalID))
@@ -563,6 +598,7 @@ namespace DotNetNuke.Services.Social.Messaging.Scheduler
             }
 
             InternalMessagingController.Instance.MarkMessageAsDispatched(messageRecipient.MessageID, messageRecipient.RecipientID);
+			Logger.LogDebug("<<< Exiting SendMessage(hostSettings={HostSettings},portalController={PortalController},messageRecipient={MessageRecipient})", hostSettings, portalController, messageRecipient);
         }
 
         /// <summary>Creates list of attachments for the specified message.</summary>
@@ -570,17 +606,22 @@ namespace DotNetNuke.Services.Social.Messaging.Scheduler
         /// <returns>A list of attachments.</returns>
         private static IEnumerable<MailAttachment> CreateAttachments(int messageId)
         {
+			Logger.LogDebug(">>> Entering CreateAttachments(messageId={MessageId})", messageId);
             foreach (var fileView in InternalMessagingController.Instance.GetAttachments(messageId))
             {
                 var file = FileManager.Instance.GetFile(fileView.FileId);
                 if (file != null)
+				Logger.LogDebug("CreateAttachments(messageId={MessageId}): file → {File}", messageId, file);
                 {
                     using var fileContent = FileManager.Instance.GetFileContent(file);
                     using var ms = new MemoryStream();
+					Logger.LogDebug("CreateAttachments(messageId={MessageId}): fileContent → {FileContent}", messageId, fileContent);
+					Logger.LogDebug("CreateAttachments(messageId={MessageId}): ms → {Ms}", messageId, ms);
                     fileContent.CopyTo(ms);
                     yield return new MailAttachment(file.FileName, ms.ToArray(), file.ContentType);
                 }
             }
+			Logger.LogDebug("<<< Exiting CreateAttachments(messageId={MessageId})", messageId);
         }
 
         /// <summary>Handles the frequent digests.</summary>
@@ -696,8 +737,11 @@ namespace DotNetNuke.Services.Social.Messaging.Scheduler
         /// <returns>The date the schedule was ran.</returns>
         private DateTime GetScheduleItemDateSetting(string settingKey)
         {
+			Logger.LogDebug(">>> Entering GetScheduleItemDateSetting(settingKey={SettingKey})", settingKey);
             var colScheduleItemSettings = SchedulingProvider.Instance().GetScheduleItemSettings(this.ScheduleHistoryItem.ScheduleID);
             var dateValue = DateTime.Now;
+			Logger.LogDebug("GetScheduleItemDateSetting(settingKey={SettingKey}): colScheduleItemSettings → {ColScheduleItemSettings}", settingKey, colScheduleItemSettings);
+			Logger.LogDebug("GetScheduleItemDateSetting(settingKey={SettingKey}): dateValue → {DateValue}", settingKey, dateValue);
 
             if (colScheduleItemSettings.Count > 0)
             {
@@ -718,6 +762,7 @@ namespace DotNetNuke.Services.Social.Messaging.Scheduler
                    this.ScheduleHistoryItem.ScheduleID, SettingLastMonthlyRun, dateValue.ToString(CultureInfo.InvariantCulture));
             }
 
+			Logger.LogDebug("<<< Exiting GetScheduleItemDateSetting(settingKey={SettingKey})", settingKey);
             return dateValue;
         }
 

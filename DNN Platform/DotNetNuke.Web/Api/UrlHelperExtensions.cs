@@ -16,6 +16,7 @@ namespace DotNetNuke.Web.Api
     /// <summary>Extension methods on <see cref="UrlHelper"/> for generating web API links.</summary>
     public static partial class UrlHelperExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Generate WebAPI Links compatible with DNN Services Framework.</summary>
         /// <param name="urlHelper">The <see cref="UrlHelper"/>.</param>
         /// <param name="moduleFolderName">ModuleFolderName for the route.</param>
@@ -25,6 +26,7 @@ namespace DotNetNuke.Web.Api
         [DnnDeprecated(10, 2, 2, "Please use overload taking IPortalAliasService")]
         public static partial string DnnLink(this UrlHelper urlHelper, string moduleFolderName, string routeName, object routeValues)
             => urlHelper.DnnLink(Globals.GetCurrentServiceProvider().GetRequiredService<IPortalAliasService>(), moduleFolderName, routeName, routeValues);
+			Logger.LogDebug(">>> Entering DnnLink(urlHelper={UrlHelper},moduleFolderName={ModuleFolderName},routeName={RouteName},routeValues={RouteValues})", urlHelper, moduleFolderName, routeName, routeValues);
 
         /// <summary>Generate WebAPI Links compatible with DNN Services Framework.</summary>
         /// <param name="urlHelper">The <see cref="UrlHelper"/>.</param>
@@ -81,8 +83,12 @@ namespace DotNetNuke.Web.Api
         {
             var parm = new PortalAliasRouteManager(portalAliasService);
             var fullName = parm.GetRouteName(moduleFolderName, routeName, (IPortalAliasInfo)PortalSettings.Current.PortalAlias);
+			Logger.LogDebug("DnnLink(urlHelper={UrlHelper},portalAliasService={PortalAliasService},moduleFolderName={ModuleFolderName},routeName={RouteName},routeValues={RouteValues},portalAliasInfo={PortalAliasInfo}): parm → {Parm}", urlHelper, portalAliasService, moduleFolderName, routeName, routeValues, portalAliasInfo, parm);
+			Logger.LogDebug("DnnLink(urlHelper={UrlHelper},portalAliasService={PortalAliasService},moduleFolderName={ModuleFolderName},routeName={RouteName},routeValues={RouteValues},portalAliasInfo={PortalAliasInfo}): fullName → {FullName}", urlHelper, portalAliasService, moduleFolderName, routeName, routeValues, portalAliasInfo, fullName);
             var allRouteValues = PortalAliasRouteManager.GetAllRouteValues(portalAliasInfo, routeValues);
 
+			Logger.LogDebug("DnnLink(urlHelper={UrlHelper},portalAliasService={PortalAliasService},moduleFolderName={ModuleFolderName},routeName={RouteName},routeValues={RouteValues},portalAliasInfo={PortalAliasInfo}): allRouteValues → {AllRouteValues}", urlHelper, portalAliasService, moduleFolderName, routeName, routeValues, portalAliasInfo, allRouteValues);
+			Logger.LogDebug("<<< Exiting DnnLink(urlHelper={UrlHelper},moduleFolderName={ModuleFolderName},routeName={RouteName},routeValues={RouteValues})", urlHelper, moduleFolderName, routeName, routeValues);
             return urlHelper.Link(fullName, allRouteValues);
         }
     }

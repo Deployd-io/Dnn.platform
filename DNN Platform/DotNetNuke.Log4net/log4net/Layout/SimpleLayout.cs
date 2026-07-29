@@ -41,10 +41,14 @@ namespace log4net.Layout
     /// <author>Gert Driesen</author>
     public class SimpleLayout : LayoutSkeleton
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Constructs a SimpleLayout</summary>
         public SimpleLayout()
         {
+			Logger.LogDebug(">>> Entering SimpleLayout()");
             this.IgnoresException = true;
+			Logger.LogDebug("<<< Exiting SimpleLayout()");
+			Logger.LogDebug("SimpleLayout(): this.IgnoresException → {Arg0}", this.IgnoresException);
         }
 
         /// <summary>Initialize layout options</summary>
@@ -63,7 +67,9 @@ namespace log4net.Layout
         /// </remarks>
         public override void ActivateOptions() 
         {
+			Logger.LogDebug(">>> Entering ActivateOptions()");
             // nothing to do.
+			Logger.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>Produces a simple formatted output.</summary>
@@ -78,6 +84,7 @@ namespace log4net.Layout
         /// </remarks>
         public override void Format(TextWriter writer, LoggingEvent loggingEvent) 
         {
+			Logger.LogDebug(">>> Entering Format(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             if (loggingEvent == null)
             {
                 throw new ArgumentNullException("loggingEvent");
@@ -87,6 +94,7 @@ namespace log4net.Layout
             writer.Write(" - ");
             loggingEvent.WriteRenderedMessage(writer);
             writer.WriteLine();
+			Logger.LogDebug("<<< Exiting Format(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
     }
 }

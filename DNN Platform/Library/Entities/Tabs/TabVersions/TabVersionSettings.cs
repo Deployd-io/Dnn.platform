@@ -14,6 +14,7 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
 
     public class TabVersionSettings : ServiceLocator<ITabVersionSettings, TabVersionSettings>, ITabVersionSettings
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const int TabVersionsMaxNumber = 5;
         private const string TabVersionQueryStringParam = "DnnTabVersion";
         private const string TabVersioningSettingKey = "TabVersioningSettingKey";
@@ -42,9 +43,11 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
         /// <inheritdoc />
         public void SetEnabledVersioningForTab(int tabId, bool enabled)
         {
+			Logger.LogDebug(">>> Entering SetEnabledVersioningForTab(tabId={TabId},enabled={Enabled})", tabId, enabled);
             Requires.NotNegative("tabId", tabId);
 
             TabController.Instance.UpdateTabSetting(tabId, TabVersioningSettingKey, enabled.ToString(CultureInfo.InvariantCulture));
+			Logger.LogDebug("<<< Exiting SetEnabledVersioningForTab(tabId={TabId},enabled={Enabled})", tabId, enabled);
         }
 
         /// <inheritdoc />
@@ -90,6 +93,8 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
         /// <inheritdoc />
         protected override Func<ITabVersionSettings> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new TabVersionSettings();
         }
     }

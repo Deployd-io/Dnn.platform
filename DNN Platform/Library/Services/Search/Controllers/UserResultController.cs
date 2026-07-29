@@ -23,6 +23,7 @@ namespace DotNetNuke.Services.Search.Controllers
     [Serializable]
     public class UserResultController : BaseResultController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string LocalizedResxFile = "~/DesktopModules/Admin/SearchResults/App_LocalResources/SearchableModules.resx";
 
         private static readonly Regex SearchResultMatchRegex = new Regex(@"^(\d+)_", RegexOptions.Compiled);
@@ -36,14 +37,17 @@ namespace DotNetNuke.Services.Search.Controllers
         /// <inheritdoc />
         public override bool HasViewPermission(SearchResult searchResult)
         {
+			Logger.LogDebug(">>> Entering HasViewPermission(searchResult={SearchResult})", searchResult);
             var userId = GetUserId(searchResult);
             if (userId == Null.NullInteger)
+			Logger.LogDebug("HasViewPermission(searchResult={SearchResult}): userId → {UserId}", searchResult, userId);
             {
                 return false;
             }
 
             var userInSearchResult = UserController.GetUserById(PortalSettings.PortalId, userId);
             if (userInSearchResult == null || userInSearchResult.IsDeleted)
+			Logger.LogDebug("HasViewPermission(searchResult={SearchResult}): userInSearchResult → {UserInSearchResult}", searchResult, userInSearchResult);
             {
                 return false;
             }
@@ -52,6 +56,7 @@ namespace DotNetNuke.Services.Search.Controllers
             {
                 var currentUser = UserController.Instance.GetCurrentUserInfo();
                 return currentUser.IsSuperUser
+				Logger.LogDebug("HasViewPermission(searchResult={SearchResult}): currentUser → {CurrentUser}", searchResult, currentUser);
                         || currentUser.IsInRole("Administrators")
                         || currentUser.UserID == userId;
             }
@@ -89,19 +94,26 @@ namespace DotNetNuke.Services.Search.Controllers
                 return true;
             }
 
+			Logger.LogDebug("<<< Exiting HasViewPermission(searchResult={SearchResult})", searchResult);
             return false;
         }
 
         /// <inheritdoc />
         public override string GetDocUrl(SearchResult searchResult)
         {
+			Logger.LogDebug(">>> Entering GetDocUrl(searchResult={SearchResult})", searchResult);
             var url = TestableGlobals.Instance.NavigateURL(PortalSettings.UserTabId, string.Empty, "userid=" + GetUserId(searchResult));
+			Logger.LogDebug("GetDocUrl(searchResult={SearchResult}): url → {Url}", searchResult, url);
+			Logger.LogDebug("<<< Exiting GetDocUrl(searchResult={SearchResult})", searchResult);
             return url;
         }
 
         private static int GetUserId(SearchDocumentToDelete searchResult)
         {
+			Logger.LogDebug(">>> Entering GetUserId(searchResult={SearchResult})", searchResult);
             var match = SearchResultMatchRegex.Match(searchResult.UniqueKey);
+			Logger.LogDebug("GetUserId(searchResult={SearchResult}): match → {Match}", searchResult, match);
+			Logger.LogDebug("<<< Exiting GetUserId(searchResult={SearchResult})", searchResult);
             return match.Success ? Convert.ToInt32(match.Groups[1].Value, CultureInfo.InvariantCulture) : Null.NullInteger;
         }
 

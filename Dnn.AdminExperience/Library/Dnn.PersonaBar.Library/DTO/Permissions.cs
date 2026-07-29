@@ -18,15 +18,20 @@ namespace Dnn.PersonaBar.Library.Dto
     [DataContract]
     public abstract class Permissions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IPermissionDefinitionService. Scheduled removal in v12.0.0.")]
         protected Permissions()
             : this(null, false)
         {
+		Logger.LogDebug(">>> Entering Permissions()");
         }
+		Logger.LogDebug("<<< Exiting Permissions()");
 
         protected Permissions(IPermissionDefinitionService permissionDefinitionService)
             : this(permissionDefinitionService, false)
         {
+		Logger.LogDebug(">>> Entering Permissions(permissionDefinitionService={PermissionDefinitionService})", permissionDefinitionService);
+		Logger.LogDebug("<<< Exiting Permissions(permissionDefinitionService={PermissionDefinitionService})", permissionDefinitionService);
         }
 
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IPermissionDefinitionService. Scheduled removal in v12.0.0.")]

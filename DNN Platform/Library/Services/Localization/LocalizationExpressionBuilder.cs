@@ -15,6 +15,7 @@ namespace DotNetNuke.Services.Localization
     [ExpressionEditor("DotNetNuke.Services.Localization.LocalizationExpressionBuilderEditor")]
     public class LocalizationExpressionBuilder : ExpressionBuilder
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override bool SupportsEvaluate
         {
@@ -75,6 +76,7 @@ namespace DotNetNuke.Services.Localization
         /// <inheritdoc />
         public override CodeExpression GetCodeExpression(BoundPropertyEntry entry, object parsedData, ExpressionBuilderContext context)
         {
+			Logger.LogDebug(">>> Entering GetCodeExpression(entry={Entry},parsedData={ParsedData},context={Context})", entry, parsedData, context);
             var inputParams = new CodeExpression[]
                                   {
                                       new CodePrimitiveExpression(entry.Expression.Trim()),
@@ -83,17 +85,20 @@ namespace DotNetNuke.Services.Localization
                                       new CodePrimitiveExpression(context.VirtualPath),
                                   };
 
+			Logger.LogDebug("<<< Exiting GetCodeExpression(entry={Entry},parsedData={ParsedData},context={Context})", entry, parsedData, context);
             return new CodeMethodInvokeExpression(new CodeTypeReferenceExpression(this.GetType()), "GetLocalizedResource", inputParams);
         }
 
         /// <inheritdoc />
         public override object EvaluateExpression(object target, BoundPropertyEntry entry, object parsedData, ExpressionBuilderContext context)
         {
+			Logger.LogDebug(">>> Entering EvaluateExpression(target={Target},entry={Entry},parsedData={ParsedData},context={Context})", target, entry, parsedData, context);
             string key = entry.Expression.Trim();
             Type targetType = entry.DeclaringType;
             string propertyName = entry.PropertyInfo.Name;
             string virtualPath = context.VirtualPath;
 
+			Logger.LogDebug("<<< Exiting EvaluateExpression(target={Target},entry={Entry},parsedData={ParsedData},context={Context})", target, entry, parsedData, context);
             return GetLocalizedResource(key, targetType, propertyName, virtualPath);
         }
     }

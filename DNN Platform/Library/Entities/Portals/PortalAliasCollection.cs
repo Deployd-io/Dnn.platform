@@ -17,6 +17,7 @@ namespace DotNetNuke.Entities.Portals
     [DnnDeprecated(9, 7, 2, "use IDictionary<string, IPortalAliasInfo> instead")]
     public partial class PortalAliasCollection : DictionaryBase, IDictionary<string, PortalAliasInfo>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Gets a value indicating whether the collection contains keys that are not null.</summary>
         public bool HasKeys => this.Dictionary.Keys.Count > 0;
 
@@ -46,13 +47,16 @@ namespace DotNetNuke.Entities.Portals
         /// <inheritdoc />
         public bool TryGetValue(string key, out PortalAliasInfo value)
         {
+			Logger.LogDebug(">>> Entering TryGetValue(key={Key})", key);
             if (!this.ContainsKey(key))
             {
                 value = null;
+				Logger.LogDebug("TryGetValue(key={Key}): value → {Value}", key, value);
                 return false;
             }
 
             value = this[key];
+			Logger.LogDebug("<<< Exiting TryGetValue(key={Key})", key);
             return true;
         }
 
@@ -66,12 +70,14 @@ namespace DotNetNuke.Entities.Portals
         /// <inheritdoc />
         public bool Remove(string key)
         {
+			Logger.LogDebug(">>> Entering Remove(key={Key})", key);
             if (!this.ContainsKey(key))
             {
                 return false;
             }
 
             this.Dictionary.Remove(key);
+			Logger.LogDebug("<<< Exiting Remove(key={Key})", key);
             return true;
         }
 
@@ -122,6 +128,7 @@ namespace DotNetNuke.Entities.Portals
 
         private class PortalAliasEnumerator(IDictionaryEnumerator enumerator) : IEnumerator<KeyValuePair<string, PortalAliasInfo>>
         {
+			Logger.LogDebug(">>> Entering PortalAliasEnumerator(enumerator={Enumerator})", enumerator);
             /// <inheritdoc />
             public KeyValuePair<string, PortalAliasInfo> Current =>
                 new KeyValuePair<string, PortalAliasInfo>((string)enumerator.Key, (PortalAliasInfo)enumerator.Value);
@@ -129,6 +136,7 @@ namespace DotNetNuke.Entities.Portals
             /// <inheritdoc />
             object IEnumerator.Current => this.Current;
 
+			Logger.LogDebug("<<< Exiting PortalAliasEnumerator(enumerator={Enumerator})", enumerator);
             /// <inheritdoc />
             public void Dispose() => (enumerator as IDisposable)?.Dispose();
 

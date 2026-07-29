@@ -10,8 +10,11 @@ namespace DotNetNuke.Data
 
     public abstract class DatabaseConnectionProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static DatabaseConnectionProvider Instance()
         {
+			Logger.LogDebug(">>> Entering Instance()");
+			Logger.LogDebug("<<< Exiting Instance()");
             return ComponentFactory.GetComponent<DatabaseConnectionProvider>();
         }
 
