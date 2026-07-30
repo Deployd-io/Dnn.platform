@@ -12,6 +12,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
     [JsonObject]
     public class InstallResultDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [JsonProperty("newPackageId")]
         public int NewPackageId { get; set; }
 
@@ -26,24 +27,34 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
 
         public void Failed(string message)
         {
+			Logger.LogDebug(">>> Entering Failed(message={Message})", message);
             this.Success = false;
             this.Message = message;
+			Logger.LogDebug("<<< Exiting Failed(message={Message})", message);
+			Logger.LogDebug("Failed(message={Message}): this.Success → {Arg1}", message, this.Success);
+			Logger.LogDebug("Failed(message={Message}): this.Message → {Arg1}", message, this.Message);
         }
 
         public void Succeed()
         {
+			Logger.LogDebug(">>> Entering Succeed()");
             this.Success = true;
             this.Message = string.Empty;
+			Logger.LogDebug("<<< Exiting Succeed()");
+			Logger.LogDebug("Succeed(): this.Success → {Arg0}", this.Success);
+			Logger.LogDebug("Succeed(): this.Message → {Arg0}", this.Message);
         }
 
         public void AddLogs(IEnumerable<LogEntry> logs)
         {
+			Logger.LogDebug(">>> Entering AddLogs(logs={Logs})", logs);
             this.Logs = logs?.Select(
                 l => new InstallerLogEntry
                 {
                     Type = l.Type.ToString(),
                     Description = l.Description,
                 }).ToList() ?? new List<InstallerLogEntry>();
+				Logger.LogDebug("<<< Exiting AddLogs(logs={Logs})", logs);
         }
     }
 }

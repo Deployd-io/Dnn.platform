@@ -47,6 +47,7 @@ using log4net.Util;
 
 namespace log4net.Layout.Pattern
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Abstract class that provides access to the current HttpContext (<see cref="HttpContext.Current" />) that 
     /// derived classes need.
@@ -60,6 +61,7 @@ namespace log4net.Layout.Pattern
     {
         protected override void Convert(TextWriter writer, LoggingEvent loggingEvent)
         {
+			Logger.LogDebug(">>> Entering Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             if (HttpContext.Current == null)
             {
                 writer.Write(SystemInfo.NotAvailableText);
@@ -68,6 +70,7 @@ namespace log4net.Layout.Pattern
             {
                 this.Convert(writer, loggingEvent, HttpContext.Current);
             }
+			Logger.LogDebug("<<< Exiting Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
 
         /// <summary>

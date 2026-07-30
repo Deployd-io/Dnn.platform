@@ -16,12 +16,14 @@ namespace DotNetNuke.Services.Installer.Writers
     /// <summary>The PackageWriterFactory is a factory class that is used to instantiate the appropriate Package Writer.</summary>
     public partial class PackageWriterFactory
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>The GetWriter method instantiates the relevant PackageWriter Installer.</summary>
         /// <param name="package">The associated PackageInfo instance.</param>
         /// <returns>A <see cref="PackageWriterBase"/> instance or <see langword="null"/>.</returns>
         [DnnDeprecated(10, 2, 4, "Please use overload with IServiceProvider")]
         public static partial PackageWriterBase GetWriter(PackageInfo package)
             => GetWriter(Globals.GetCurrentServiceProvider(), package);
+			Logger.LogDebug(">>> Entering GetWriter(package={Package})", package);
 
         /// <summary>The GetWriter method instantiates the relevant PackageWriter Installer.</summary>
         /// <param name="serviceProvider">The dependency injection container from which a custom writer should be created.</param>
@@ -31,6 +33,7 @@ namespace DotNetNuke.Services.Installer.Writers
         {
             PackageWriterBase writer = null;
             switch (package.PackageType)
+			Logger.LogDebug("GetWriter(serviceProvider={ServiceProvider},package={Package}): writer → {Writer}", serviceProvider, package, writer);
             {
                 case "Auth_System":
                     writer = new AuthenticationPackageWriter(package);
@@ -64,6 +67,8 @@ namespace DotNetNuke.Services.Installer.Writers
                     // PackageType is defined in the List
                     var listController = ActivatorUtilities.GetServiceOrCreateInstance<ListController>(serviceProvider);
                     ListEntryInfo entry = listController.GetListEntryInfo("PackageWriter", package.PackageType);
+					Logger.LogDebug("GetWriter(serviceProvider={ServiceProvider},package={Package}): listController → {ListController}", serviceProvider, package, listController);
+					Logger.LogDebug("GetWriter(serviceProvider={ServiceProvider},package={Package}): entry → {Entry}", serviceProvider, package, entry);
 
                     if (entry != null && !string.IsNullOrEmpty(entry.Text))
                     {
@@ -74,6 +79,7 @@ namespace DotNetNuke.Services.Installer.Writers
                     break;
             }
 
+			Logger.LogDebug("<<< Exiting GetWriter(package={Package})", package);
             return writer;
         }
     }

@@ -17,14 +17,17 @@ namespace DotNetNuke.Tests.AspNetClientCapabilityProvider
     [TestFixture]
     public class AspNetClientCapabilityProviderTest
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string iphoneUserAgent = "Mozilla/5.0 (iPod; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7";
         private Providers.AspNetClientCapabilityProvider.AspNetClientCapabilityProvider _clientCapabilityProvider;
 
         [SetUp]
         public void Setup()
         {
+			Logger.LogDebug(">>> Entering Setup()");
             this._clientCapabilityProvider = new Providers.AspNetClientCapabilityProvider.AspNetClientCapabilityProvider();
 
+			Logger.LogDebug("Setup(): _clientCapabilityProvider → {_clientCapabilityProvider}", _clientCapabilityProvider);
             ComponentFactory.Container = new SimpleContainer();
             var dataProvider = MockComponentProvider.CreateDataProvider();
             dataProvider.Setup(d => d.GetProviderPath()).Returns(string.Empty);
@@ -34,30 +37,38 @@ namespace DotNetNuke.Tests.AspNetClientCapabilityProvider
             // create the bin folder
             var folderPath = HostingEnvironment.ApplicationPhysicalPath + "bin";
             if (!Directory.Exists(folderPath))
+			Logger.LogDebug("Setup(): folderPath → {FolderPath}", folderPath);
             {
                 Directory.CreateDirectory(folderPath);
             }
+			Logger.LogDebug("<<< Exiting Setup()");
         }
 
         [TearDown]
         public void TearDown()
         {
+		Logger.LogDebug(">>> Entering TearDown()");
+		Logger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void AspNetClientCapabilityProvider_GetClientCapabilityById_ThrowsException_For_Empty_ClientCapabilityId()
         {
+			Logger.LogDebug(">>> Entering AspNetClientCapabilityProvider_GetClientCapabilityById_ThrowsException_For_Empty_ClientCapabilityId()");
             // Act
             string nullClientCapabilityId = string.Empty;
             Assert.Throws<ArgumentException>(() => this._clientCapabilityProvider.GetClientCapabilityById(nullClientCapabilityId));
+			Logger.LogDebug("<<< Exiting AspNetClientCapabilityProvider_GetClientCapabilityById_ThrowsException_For_Empty_ClientCapabilityId()");
         }
 
         [Test]
         public void AspNetClientCapabilityProvider_GetClientCapabilityById_ThrowsException_For_Null_ClientCapabilityId()
         {
+			Logger.LogDebug(">>> Entering AspNetClientCapabilityProvider_GetClientCapabilityById_ThrowsException_For_Null_ClientCapabilityId()");
             // Act
             string nullClientCapabilityId = null;
             Assert.Throws<ArgumentException>(() => this._clientCapabilityProvider.GetClientCapabilityById(nullClientCapabilityId));
+			Logger.LogDebug("<<< Exiting AspNetClientCapabilityProvider_GetClientCapabilityById_ThrowsException_For_Null_ClientCapabilityId()");
         }
     }
 }

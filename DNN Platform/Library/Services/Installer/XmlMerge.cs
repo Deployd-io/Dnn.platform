@@ -22,6 +22,7 @@ namespace DotNetNuke.Services.Installer
     /// <summary>The XmlMerge class is a utility class for XmlSplicing config files.</summary>
     public class XmlMerge
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private IDictionary<string, XmlDocument> pendingDocuments;
 
         /// <summary>Initializes a new instance of the <see cref="XmlMerge"/> class.</summary>
@@ -30,11 +31,16 @@ namespace DotNetNuke.Services.Installer
         /// <param name="sender">The name of the component responsible for the merge.</param>
         public XmlMerge(string sourceFileName, string version, string sender)
         {
+			Logger.LogDebug(">>> Entering XmlMerge(sourceFileName={SourceFileName},version={Version},sender={Sender})", sourceFileName, version, sender);
             this.Version = version;
             this.Sender = sender;
+			Logger.LogDebug("XmlMerge(sourceFileName={SourceFileName},version={Version},sender={Sender}): this.Version → {Arg3}", sourceFileName, version, sender, this.Version);
+			Logger.LogDebug("XmlMerge(sourceFileName={SourceFileName},version={Version},sender={Sender}): this.Sender → {Arg3}", sourceFileName, version, sender, this.Sender);
             this.SourceConfig = new XmlDocument { XmlResolver = null };
             using var configReader = XmlReader.Create(sourceFileName, new XmlReaderSettings { XmlResolver = null, });
             this.SourceConfig.Load(configReader);
+			Logger.LogDebug("XmlMerge(sourceFileName={SourceFileName},version={Version},sender={Sender}): configReader → {ConfigReader}", sourceFileName, version, sender, configReader);
+			Logger.LogDebug("XmlMerge(sourceFileName={SourceFileName},version={Version},sender={Sender}): this.SourceConfig → {Arg3}", sourceFileName, version, sender, this.SourceConfig);
         }
 
         /// <summary>Initializes a new instance of the <see cref="XmlMerge"/> class.</summary>
@@ -43,35 +49,53 @@ namespace DotNetNuke.Services.Installer
         /// <param name="sender">The name of the component responsible for the merge.</param>
         public XmlMerge(Stream sourceStream, string version, string sender)
         {
+			Logger.LogDebug(">>> Entering XmlMerge(sourceStream={SourceStream},version={Version},sender={Sender})", sourceStream, version, sender);
             this.Version = version;
             this.Sender = sender;
+			Logger.LogDebug("XmlMerge(sourceStream={SourceStream},version={Version},sender={Sender}): this.Version → {Arg3}", sourceStream, version, sender, this.Version);
+			Logger.LogDebug("XmlMerge(sourceStream={SourceStream},version={Version},sender={Sender}): this.Sender → {Arg3}", sourceStream, version, sender, this.Sender);
+			Logger.LogDebug("XmlMerge(sourceStream={SourceStream},version={Version},sender={Sender}): configReader → {ConfigReader}", sourceStream, version, sender, configReader);
             this.SourceConfig = new XmlDocument { XmlResolver = null };
             using var configReader = XmlReader.Create(sourceStream, new XmlReaderSettings { XmlResolver = null, });
             this.SourceConfig.Load(configReader);
+			Logger.LogDebug("XmlMerge(sourceStream={SourceStream},version={Version},sender={Sender}): this.SourceConfig → {Arg3}", sourceStream, version, sender, this.SourceConfig);
         }
 
         /// <summary>Initializes a new instance of the <see cref="XmlMerge"/> class.</summary>
         /// <param name="sourceReader">A reader with the source config.</param>
+		Logger.LogDebug("<<< Exiting XmlMerge(sourceFileName={SourceFileName},version={Version},sender={Sender})", sourceFileName, version, sender);
         /// <param name="version">The version for which the merge is being done.</param>
         /// <param name="sender">The name of the component responsible for the merge.</param>
         public XmlMerge(TextReader sourceReader, string version, string sender)
         {
+			Logger.LogDebug(">>> Entering XmlMerge(sourceReader={SourceReader},version={Version},sender={Sender})", sourceReader, version, sender);
             this.Version = version;
             this.Sender = sender;
+			Logger.LogDebug("XmlMerge(sourceReader={SourceReader},version={Version},sender={Sender}): this.Version → {Arg3}", sourceReader, version, sender, this.Version);
+			Logger.LogDebug("XmlMerge(sourceReader={SourceReader},version={Version},sender={Sender}): this.Sender → {Arg3}", sourceReader, version, sender, this.Sender);
+			Logger.LogDebug("XmlMerge(sourceReader={SourceReader},version={Version},sender={Sender}): configReader → {ConfigReader}", sourceReader, version, sender, configReader);
             this.SourceConfig = new XmlDocument { XmlResolver = null };
             using var configReader = XmlReader.Create(sourceReader, new XmlReaderSettings { XmlResolver = null, });
             this.SourceConfig.Load(configReader);
+			Logger.LogDebug("<<< Exiting XmlMerge(sourceReader={SourceReader},version={Version},sender={Sender})", sourceReader, version, sender);
+			Logger.LogDebug("XmlMerge(sourceReader={SourceReader},version={Version},sender={Sender}): this.SourceConfig → {Arg3}", sourceReader, version, sender, this.SourceConfig);
         }
 
         /// <summary>Initializes a new instance of the <see cref="XmlMerge"/> class.</summary>
         /// <param name="sourceDoc">A document with the source config.</param>
         /// <param name="version">The version for which the merge is being done.</param>
+		Logger.LogDebug("<<< Exiting XmlMerge(sourceStream={SourceStream},version={Version},sender={Sender})", sourceStream, version, sender);
         /// <param name="sender">The name of the component responsible for the merge.</param>
         public XmlMerge(XmlDocument sourceDoc, string version, string sender)
         {
+			Logger.LogDebug(">>> Entering XmlMerge(sourceDoc={SourceDoc},version={Version},sender={Sender})", sourceDoc, version, sender);
             this.Version = version;
             this.Sender = sender;
+			Logger.LogDebug("XmlMerge(sourceDoc={SourceDoc},version={Version},sender={Sender}): this.Version → {Arg3}", sourceDoc, version, sender, this.Version);
+			Logger.LogDebug("XmlMerge(sourceDoc={SourceDoc},version={Version},sender={Sender}): this.Sender → {Arg3}", sourceDoc, version, sender, this.Sender);
             this.SourceConfig = sourceDoc;
+			Logger.LogDebug("<<< Exiting XmlMerge(sourceDoc={SourceDoc},version={Version},sender={Sender})", sourceDoc, version, sender);
+			Logger.LogDebug("XmlMerge(sourceDoc={SourceDoc},version={Version},sender={Sender}): this.SourceConfig → {Arg3}", sourceDoc, version, sender, this.SourceConfig);
         }
 
         public IDictionary<string, XmlDocument> PendingDocuments
@@ -118,14 +142,19 @@ namespace DotNetNuke.Services.Installer
         /// <param name="target">An Xml Document represent the Target Xml File.</param>
         public void UpdateConfig(XmlDocument target)
         {
+			Logger.LogDebug(">>> Entering UpdateConfig(target={Target})", target);
             var changedAnyNodes = false;
             this.TargetConfig = target;
+			Logger.LogDebug("UpdateConfig(target={Target}): changedAnyNodes → {ChangedAnyNodes}", target, changedAnyNodes);
+			Logger.LogDebug("UpdateConfig(target={Target}): this.TargetConfig → {Arg1}", target, this.TargetConfig);
             if (this.TargetConfig != null)
             {
                 changedAnyNodes = this.ProcessNodes(this.SourceConfig.SelectNodes("/configuration/nodes/node"), false);
             }
 
             this.ConfigUpdateChangedNodes = changedAnyNodes;
+			Logger.LogDebug("UpdateConfig(target={Target}): this.ConfigUpdateChangedNodes → {Arg1}", target, this.ConfigUpdateChangedNodes);
+			Logger.LogDebug("<<< Exiting UpdateConfig(target={Target})", target);
         }
 
         /// <summary>
@@ -136,15 +165,21 @@ namespace DotNetNuke.Services.Installer
         /// <param name="fileName">The fileName for the Target Xml File - relative to the webroot.</param>
         public void UpdateConfig(XmlDocument target, string fileName)
         {
+			Logger.LogDebug(">>> Entering UpdateConfig(target={Target},fileName={FileName})", target, fileName);
+			Logger.LogDebug("UpdateConfig(target={Target},fileName={FileName}): this.TargetConfig → {Arg2}", target, fileName, this.TargetConfig);
             var changedAnyNodes = false;
+			Logger.LogDebug("UpdateConfig(target={Target},fileName={FileName}): changedAnyNodes → {ChangedAnyNodes}", target, fileName, changedAnyNodes);
             this.TargetFileName = fileName;
             this.TargetConfig = target;
+			Logger.LogDebug("UpdateConfig(target={Target},fileName={FileName}): this.TargetFileName → {Arg2}", target, fileName, this.TargetFileName);
             if (this.TargetConfig != null)
             {
                 changedAnyNodes = this.ProcessNodes(this.SourceConfig.SelectNodes("/configuration/nodes/node"), true);
             }
 
             this.ConfigUpdateChangedNodes = changedAnyNodes;
+			Logger.LogDebug("<<< Exiting UpdateConfig(target={Target},fileName={FileName})", target, fileName);
+			Logger.LogDebug("UpdateConfig(target={Target},fileName={FileName}): this.ConfigUpdateChangedNodes → {Arg2}", target, fileName, this.ConfigUpdateChangedNodes);
         }
 
         /// <summary>
@@ -153,14 +188,20 @@ namespace DotNetNuke.Services.Installer
         /// </summary>
         public void UpdateConfigs()
         {
+			Logger.LogDebug(">>> Entering UpdateConfigs()");
             this.UpdateConfigs(true);
+			Logger.LogDebug("<<< Exiting UpdateConfigs()");
+			Logger.LogDebug("UpdateConfigs(autoSave={AutoSave}): this.TargetFileName → {Arg1}", autoSave, this.TargetFileName);
+			Logger.LogDebug("UpdateConfigs(autoSave={AutoSave}): this.ConfigUpdateChangedNodes → {Arg1}", autoSave, this.ConfigUpdateChangedNodes);
         }
 
         public void UpdateConfigs(bool autoSave)
         {
             var changedAnyNodes = false;
+			Logger.LogDebug("UpdateConfigs(autoSave={AutoSave}): changedAnyNodes → {ChangedAnyNodes}", autoSave, changedAnyNodes);
             var nodes = this.SourceConfig.SelectNodes("/configuration/nodes");
             if (nodes != null)
+			Logger.LogDebug("UpdateConfigs(autoSave={AutoSave}): nodes → {Nodes}", autoSave, nodes);
             {
                 foreach (XmlNode configNode in nodes)
                 {
@@ -170,6 +211,7 @@ namespace DotNetNuke.Services.Installer
                     this.TargetFileName = configNode.Attributes["configfile"].Value;
                     string targetProductName = string.Empty;
                     if (configNode.Attributes["productName"] != null)
+					Logger.LogDebug("UpdateConfigs(autoSave={AutoSave}): targetProductName → {TargetProductName}", autoSave, targetProductName);
                     {
                         targetProductName = configNode.Attributes["productName"].Value;
                     }
@@ -186,6 +228,7 @@ namespace DotNetNuke.Services.Installer
                     if (string.IsNullOrEmpty(targetProductName) || targetProductName == "All")
                     {
                         isAppliedToProduct = true;
+						Logger.LogDebug("UpdateConfigs(autoSave={AutoSave}): isAppliedToProduct → {IsAppliedToProduct}", autoSave, isAppliedToProduct);
                     }
                     else
                     {
@@ -197,6 +240,7 @@ namespace DotNetNuke.Services.Installer
                     {
                         var changedNodes = this.ProcessNodes(configNode.SelectNodes("node"), autoSave);
                         changedAnyNodes = changedAnyNodes || changedNodes;
+						Logger.LogDebug("UpdateConfigs(autoSave={AutoSave}): changedNodes → {ChangedNodes}", autoSave, changedNodes);
                         if (!autoSave && changedNodes)
                         {
                             this.PendingDocuments.Add(this.TargetFileName, this.TargetConfig);
@@ -210,10 +254,12 @@ namespace DotNetNuke.Services.Installer
 
         public void SavePendingConfigs()
         {
+			Logger.LogDebug(">>> Entering SavePendingConfigs()");
             foreach (var key in this.PendingDocuments.Keys)
             {
                 Config.Save(this.PendingDocuments[key], key);
             }
+			Logger.LogDebug("<<< Exiting SavePendingConfigs()");
         }
 
         private static XmlNode FindNode(XmlNode root, string rootNodePath, XmlNamespaceManager nsmgr)
@@ -271,8 +317,10 @@ namespace DotNetNuke.Services.Installer
 
         private static bool RemoveNode(XmlNode node)
         {
+			Logger.LogDebug(">>> Entering RemoveNode(node={Node})", node);
             var changedNode = false;
             if (node != null)
+			Logger.LogDebug("RemoveNode(node={Node}): changedNode → {ChangedNode}", node, changedNode);
             {
                 // Get Parent
                 XmlNode parentNode = node.ParentNode;
@@ -286,22 +334,28 @@ namespace DotNetNuke.Services.Installer
                 }
             }
 
+			Logger.LogDebug("<<< Exiting RemoveNode(node={Node})", node);
             return changedNode;
         }
 
         private static string GetNodeContentWithoutComment(XmlNode node)
         {
+			Logger.LogDebug(">>> Entering GetNodeContentWithoutComment(node={Node})", node);
             var cloneNode = node.Clone();
             RemoveCommentNodes(cloneNode);
+			Logger.LogDebug("GetNodeContentWithoutComment(node={Node}): cloneNode → {CloneNode}", node, cloneNode);
 
+			Logger.LogDebug("<<< Exiting GetNodeContentWithoutComment(node={Node})", node);
             return cloneNode.OuterXml;
         }
 
         private static void RemoveCommentNodes(XmlNode node)
         {
+			Logger.LogDebug(">>> Entering RemoveCommentNodes(node={Node})", node);
             var commentNodes = new List<XmlNode>();
             foreach (XmlNode childNode in node.ChildNodes)
             {
+			Logger.LogDebug("RemoveCommentNodes(node={Node}): commentNodes → {CommentNodes}", node, commentNodes);
                 if (childNode.NodeType == XmlNodeType.Comment)
                 {
                     commentNodes.Add(childNode);
@@ -316,6 +370,7 @@ namespace DotNetNuke.Services.Installer
             {
                 commentNodes.ForEach(n => { node.RemoveChild(n); });
             }
+			Logger.LogDebug("<<< Exiting RemoveCommentNodes(node={Node})", node);
         }
 
         private bool AddNode(XmlNode rootNode, XmlNode actionNode)
@@ -352,12 +407,14 @@ namespace DotNetNuke.Services.Installer
 
         private bool InsertNode(XmlNode childRootNode, XmlNode actionNode, NodeInsertType mode)
         {
+			Logger.LogDebug(">>> Entering InsertNode(childRootNode={ChildRootNode},actionNode={ActionNode},mode={Mode})", childRootNode, actionNode, mode);
             XmlNode rootNode = childRootNode.ParentNode;
             Debug.Assert(rootNode != null, "Root Node was null");
 
             var changedNode = false;
             foreach (XmlNode child in actionNode.ChildNodes)
             {
+			Logger.LogDebug("InsertNode(childRootNode={ChildRootNode},actionNode={ActionNode},mode={Mode}): changedNode → {ChangedNode}", childRootNode, actionNode, mode, changedNode);
                 if (child.NodeType == XmlNodeType.Element || child.NodeType == XmlNodeType.Comment)
                 {
                     DnnInstallLogger.InstallLogInfo(Localization.GetString("LogStart", Localization.GlobalResourceFile) + "InsertNode:" + child.InnerXml.ToString());
@@ -375,15 +432,18 @@ namespace DotNetNuke.Services.Installer
                 }
             }
 
+			Logger.LogDebug("<<< Exiting InsertNode(childRootNode={ChildRootNode},actionNode={ActionNode},mode={Mode})", childRootNode, actionNode, mode);
             return changedNode;
         }
 
         private bool ProcessNode(XmlNode node, XmlNode targetRoot)
         {
+			Logger.LogDebug(">>> Entering ProcessNode(node={Node},targetRoot={TargetRoot})", node, targetRoot);
             Debug.Assert(node.Attributes != null, "node.Attributes != null");
 
             XmlNode rootNode = this.FindMatchingNode(targetRoot, node, "path");
 
+			Logger.LogDebug("ProcessNode(node={Node},targetRoot={TargetRoot}): rootNode → {RootNode}", node, targetRoot, rootNode);
             string nodeAction = node.Attributes["action"].Value.ToLowerInvariant();
 
             if (rootNode == null)
@@ -410,6 +470,7 @@ namespace DotNetNuke.Services.Installer
                 case "updateattribute":
                     return this.UpdateAttribute(rootNode, node);
                 default:
+					Logger.LogDebug("<<< Exiting ProcessNode(node={Node},targetRoot={TargetRoot})", node, targetRoot);
                     return false;
             }
         }
@@ -481,15 +542,18 @@ namespace DotNetNuke.Services.Installer
 
         private IEnumerable<XmlNode> FindMatchingNodes(XmlNode mergeNode, IEnumerable<XmlNode> rootNodes, string pathAttributeName)
         {
+			Logger.LogDebug(">>> Entering FindMatchingNodes(mergeNode={MergeNode},rootNodes={RootNodes},pathAttributeName={PathAttributeName})", mergeNode, rootNodes, pathAttributeName);
             foreach (var targetRoot in rootNodes)
             {
                 var rootNode = this.FindMatchingNode(targetRoot, mergeNode, pathAttributeName);
 
+				Logger.LogDebug("FindMatchingNodes(mergeNode={MergeNode},rootNodes={RootNodes},pathAttributeName={PathAttributeName}): rootNode → {RootNode}", mergeNode, rootNodes, pathAttributeName, rootNode);
                 if (rootNode != null)
                 {
                     yield return targetRoot;
                 }
             }
+			Logger.LogDebug("<<< Exiting FindMatchingNodes(mergeNode={MergeNode},rootNodes={RootNodes},pathAttributeName={PathAttributeName})", mergeNode, rootNodes, pathAttributeName);
         }
 
         private XmlNode FindMatchingNode(XmlNode rootNode, XmlNode mergeNode, string pathAttributeName)
@@ -520,16 +584,19 @@ namespace DotNetNuke.Services.Installer
 
         private IEnumerable<XmlNode> GetTargetRoots()
         {
+			Logger.LogDebug(">>> Entering GetTargetRoots()");
             yield return this.TargetConfig.DocumentElement;
 
             var locations = this.TargetConfig.SelectNodes("/configuration/location");
             if (locations != null)
+			Logger.LogDebug("GetTargetRoots(): locations → {Locations}", locations);
             {
                 foreach (XmlNode node in locations)
                 {
                     yield return node;
                 }
             }
+			Logger.LogDebug("<<< Exiting GetTargetRoots()");
         }
 
         private bool UpdateAttribute(XmlNode rootNode, XmlNode actionNode)

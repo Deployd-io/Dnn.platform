@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class CreatePortalException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
     public CreatePortalException()
     {
+	Logger.LogDebug(">>> Entering CreatePortalException()");
+	Logger.LogDebug("<<< Exiting CreatePortalException()");
     }
 
     /// <inheritdoc />
     public CreatePortalException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering CreatePortalException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting CreatePortalException(message={Message})", message);
 
     /// <inheritdoc />
     public CreatePortalException(string message, Exception innerException)

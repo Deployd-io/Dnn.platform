@@ -29,6 +29,7 @@ using log4net.Core;
 
 namespace log4net.Layout.Pattern
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Converter for items in the <see cref="HttpContext" />.
     /// </summary>
@@ -55,6 +56,7 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         protected override void Convert(TextWriter writer, LoggingEvent loggingEvent, HttpContext httpContext)
         {
+			Logger.LogDebug(">>> Entering Convert(writer={Writer},loggingEvent={LoggingEvent},httpContext={HttpContext})", writer, loggingEvent, httpContext);
             if (this.Option != null)
             {
                 WriteObject(writer, loggingEvent.Repository, httpContext.Items[this.Option]);
@@ -63,6 +65,7 @@ namespace log4net.Layout.Pattern
             {
                 WriteObject(writer, loggingEvent.Repository, httpContext.Items);
             }
+			Logger.LogDebug("<<< Exiting Convert(writer={Writer},loggingEvent={LoggingEvent},httpContext={HttpContext})", writer, loggingEvent, httpContext);
         }
     }
 }

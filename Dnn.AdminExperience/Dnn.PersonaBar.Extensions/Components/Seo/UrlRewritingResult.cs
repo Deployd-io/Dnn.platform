@@ -10,14 +10,23 @@ namespace Dnn.PersonaBar.Seo.Components
     [JsonObject]
     public class UrlRewritingResult
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public UrlRewritingResult()
         {
+			Logger.LogDebug(">>> Entering UrlRewritingResult()");
             var noneText = Localization.GetString("None", Localization.GlobalResourceFile);
             this.RewritingResult = noneText;
+			Logger.LogDebug("UrlRewritingResult(): noneText → {NoneText}", noneText);
+			Logger.LogDebug("UrlRewritingResult(): this.RewritingResult → {Arg0}", this.RewritingResult);
             this.Culture = noneText;
             this.IdentifiedPage = noneText;
             this.RedirectionResult = noneText;
+			Logger.LogDebug("UrlRewritingResult(): this.Culture → {Arg0}", this.Culture);
+			Logger.LogDebug("UrlRewritingResult(): this.IdentifiedPage → {Arg0}", this.IdentifiedPage);
+			Logger.LogDebug("UrlRewritingResult(): this.RedirectionResult → {Arg0}", this.RedirectionResult);
             this.OperationMessages = noneText;
+			Logger.LogDebug("<<< Exiting UrlRewritingResult()");
+			Logger.LogDebug("UrlRewritingResult(): this.OperationMessages → {Arg0}", this.OperationMessages);
         }
 
         [JsonProperty("rewritingResult")]

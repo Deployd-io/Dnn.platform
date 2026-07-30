@@ -16,9 +16,12 @@ namespace DotNetNuke.Services.Authentication
     [Serializable]
     public abstract class AuthenticationConfigBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="AuthenticationConfigBase"/> class.</summary>
         public AuthenticationConfigBase()
         {
+		Logger.LogDebug(">>> Entering AuthenticationConfigBase()");
+		Logger.LogDebug("<<< Exiting AuthenticationConfigBase()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="AuthenticationConfigBase"/> class.</summary>
@@ -27,6 +30,7 @@ namespace DotNetNuke.Services.Authentication
             : this()
         {
             this.PortalID = portalID;
+			Logger.LogDebug("AuthenticationConfigBase(portalID={PortalID}): this.PortalID → {Arg1}", portalID, this.PortalID);
         }
 
         [Browsable(false)]

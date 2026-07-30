@@ -16,10 +16,15 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
 
     public class JavaScriptLibraryController(IHostSettings hostSettings) : ServiceLocator<IJavaScriptLibraryController, JavaScriptLibraryController>, IJavaScriptLibraryController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+		Logger.LogDebug(">>> Entering JavaScriptLibraryController(hostSettings={HostSettings})", hostSettings);
+		Logger.LogDebug("JavaScriptLibraryController(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         /// <summary>Initializes a new instance of the <see cref="JavaScriptLibraryController"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
+		Logger.LogDebug("<<< Exiting JavaScriptLibraryController(hostSettings={HostSettings})", hostSettings);
         public JavaScriptLibraryController()
             : this(null)
         {
@@ -29,8 +34,13 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         /// <param name="library">Library to be deleted.</param>
         public void DeleteLibrary(JavaScriptLibrary library)
         {
+			Logger.LogDebug(">>> Entering DeleteLibrary(library={Library})", library);
             DataProvider.Instance().ExecuteNonQuery("DeleteJavaScriptLibrary", library.JavaScriptLibraryID);
+			Logger.LogInformation("JavaScriptLibraryController(hostSettings)={HostSettings}: database query executed in {Arg1} ms", hostSettings, __logStart.ElapsedMilliseconds);
             ClearCache();
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			Logger.LogInformation("DeleteLibrary(library)={Library}: database query executed in {Arg1} ms", library, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting DeleteLibrary(library={Library})", library);
         }
 
         /// <summary>Get information about the latest version of a <see cref="JavaScriptLibrary"/> that matches the given <paramref name="predicate"/>.</summary>
@@ -52,6 +62,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         /// <returns>A sequence of <see cref="JavaScriptLibrary"/> instances.</returns>
         public IEnumerable<JavaScriptLibrary> GetLibraries(Func<JavaScriptLibrary, bool> predicate)
         {
+			Logger.LogDebug("<<< Exiting GetLibraries()");
             return this.GetLibraries().Where(predicate);
         }
 
@@ -72,6 +83,7 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
         /// <param name="library">Library to be saved.</param>
         public void SaveLibrary(JavaScriptLibrary library)
         {
+			Logger.LogDebug(">>> Entering SaveLibrary(library={Library})", library);
             library.JavaScriptLibraryID = DataProvider.Instance().ExecuteScalar<int>(
                 "SaveJavaScriptLibrary",
                 library.JavaScriptLibraryID,
@@ -83,17 +95,22 @@ namespace DotNetNuke.Framework.JavaScriptLibraries
                 library.PreferredScriptLocation,
                 library.CDNPath);
             ClearCache();
+			Logger.LogDebug("<<< Exiting SaveLibrary(library={Library})", library);
         }
 
         /// <inheritdoc />
         protected override Func<IJavaScriptLibraryController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => Globals.DependencyProvider.GetRequiredService<IJavaScriptLibraryController>();
         }
 
         private static void ClearCache()
         {
+			Logger.LogDebug(">>> Entering ClearCache()");
             DataCache.RemoveCache(DataCache.JavaScriptLibrariesCacheKey);
+			Logger.LogDebug("<<< Exiting ClearCache()");
         }
     }
 }

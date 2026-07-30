@@ -20,20 +20,27 @@ namespace DotNetNuke.Build.Tasks
     [IsDependentOn(typeof(GeneratePackagesChecksums))]
     public sealed class BuildAll : FrostingTask<Context>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override void Run(Context context)
         {
+			Logger.LogDebug(">>> Entering Run(context={Context})", context);
             RevertSqlDataProvider(context);
+			Logger.LogDebug("<<< Exiting Run(context={Context})", context);
         }
 
         private static void RevertSqlDataProvider(Context context)
         {
+			Logger.LogDebug(">>> Entering RevertSqlDataProvider(context={Context})", context);
             var fileName = context.File($"{context.GetTwoDigitsVersionNumber()}.SqlDataProvider");
             var filePath = context.Directory("./Dnn Platform/Website/Providers/DataProviders/SqlDataProvider/") + fileName;
+			Logger.LogDebug("RevertSqlDataProvider(context={Context}): fileName → {FileName}", context, fileName);
+			Logger.LogDebug("RevertSqlDataProvider(context={Context}): filePath → {FilePath}", context, filePath);
             if (!context.SqlDataProviderExists && context.FileExists(filePath))
             {
                 context.DeleteFile(filePath);
             }
+			Logger.LogDebug("<<< Exiting RevertSqlDataProvider(context={Context})", context);
         }
     }
 }

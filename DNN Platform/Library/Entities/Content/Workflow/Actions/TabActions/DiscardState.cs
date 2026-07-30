@@ -15,22 +15,29 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
     /// </summary>
     internal class DiscardState : TabActionBase, IWorkflowAction
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public void DoActionOnStateChanging(StateTransaction stateTransaction)
         {
+			Logger.LogDebug(">>> Entering DoActionOnStateChanging(stateTransaction={StateTransaction})", stateTransaction);
             // nothing
+			Logger.LogDebug("<<< Exiting DoActionOnStateChanging(stateTransaction={StateTransaction})", stateTransaction);
         }
 
         /// <inheritdoc />
         public void DoActionOnStateChanged(StateTransaction stateTransaction)
             => RemoveCache(stateTransaction);
+			Logger.LogDebug(">>> Entering DoActionOnStateChanged(stateTransaction={StateTransaction})", stateTransaction);
 
+		Logger.LogDebug("<<< Exiting DoActionOnStateChanged(stateTransaction={StateTransaction})", stateTransaction);
         /// <inheritdoc />
         public ActionMessage GetActionMessage(StateTransaction stateTransaction, WorkflowState currentState)
             => new ActionMessage()
             {
+				Logger.LogDebug(">>> Entering GetActionMessage(stateTransaction={StateTransaction},currentState={CurrentState})", stateTransaction, currentState);
                 Subject = GetString($"{nameof(DiscardState)}{nameof(ActionMessage.Subject)}", "Page Rejected"),
                 Body = GetString($"{nameof(DiscardState)}{nameof(ActionMessage.Body)}", "The edits for page '{0}' were rejected, and it is now in '{1}' state.", GetTab(stateTransaction.ContentItemId).LocalizedTabName, currentState.StateName),
             };
+				Logger.LogDebug("<<< Exiting GetActionMessage(stateTransaction={StateTransaction},currentState={CurrentState})", stateTransaction, currentState);
     }
 }

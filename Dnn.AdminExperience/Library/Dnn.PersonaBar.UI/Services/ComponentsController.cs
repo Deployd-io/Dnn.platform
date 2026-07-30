@@ -39,6 +39,10 @@ namespace Dnn.PersonaBar.UI.Services
         public ComponentsController()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering ComponentsController()");
+		Logger.LogDebug("<<< Exiting ComponentsController()");
+		Logger.LogDebug(">>> Entering ComponentsController(roleProvider={RoleProvider})", roleProvider);
+		Logger.LogDebug("<<< Exiting ComponentsController(roleProvider={RoleProvider})", roleProvider);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ComponentsController"/> class.</summary>
@@ -46,6 +50,7 @@ namespace Dnn.PersonaBar.UI.Services
         public ComponentsController(RoleProvider roleProvider)
         {
             this.roleProvider = roleProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<RoleProvider>();
+			Logger.LogDebug("ComponentsController(roleProvider={RoleProvider}): roleProvider → {RoleProvider1}", roleProvider, roleProvider);
         }
 
         /// <summary>Gets the local resource file path.</summary>
@@ -60,6 +65,7 @@ namespace Dnn.PersonaBar.UI.Services
         [HttpGet]
         public HttpResponseMessage GetRoleGroups(bool reload = false)
         {
+			Logger.LogDebug(">>> Entering GetRoleGroups(reload={Reload})", reload);
             try
             {
                 if (!this.UserInfo.IsInRole(this.PortalSettings.AdministratorRoleName) && !PagePermissionsAttributesHelper.HasTabPermission("VIEW"))
@@ -81,6 +87,7 @@ namespace Dnn.PersonaBar.UI.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting GetRoleGroups(reload={Reload})", reload);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, new { Error = ex.Message });
             }
         }
@@ -92,6 +99,7 @@ namespace Dnn.PersonaBar.UI.Services
         [HttpGet]
         public HttpResponseMessage GetSuggestionUsers(string keyword, int count)
         {
+			Logger.LogDebug(">>> Entering GetSuggestionUsers(keyword={Keyword},count={Count})", keyword, count);
             try
             {
                 if (string.IsNullOrEmpty(keyword))
@@ -101,9 +109,11 @@ namespace Dnn.PersonaBar.UI.Services
 
                 var displayMatch = keyword + "%";
                 var totalRecords = 0;
+				Logger.LogDebug("GetSuggestionUsers(keyword={Keyword},count={Count}): displayMatch → {DisplayMatch}", keyword, count, displayMatch);
                 var totalRecords2 = 0;
                 var matchedUsers = UserController.GetUsersByDisplayName(this.PortalId, displayMatch, 0, count, ref totalRecords, false, false);
                 matchedUsers.AddRange(UserController.GetUsersByUserName(this.PortalId, displayMatch, 0, count, ref totalRecords2, false, false));
+				Logger.LogDebug("GetSuggestionUsers(keyword={Keyword},count={Count}): matchedUsers → {MatchedUsers}", keyword, count, matchedUsers);
                 var finalUsers = matchedUsers
                     .Cast<UserInfo>()
                     .Where(x => x.Membership.Approved)
@@ -118,6 +128,7 @@ namespace Dnn.PersonaBar.UI.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting GetSuggestionUsers(keyword={Keyword},count={Count})", keyword, count);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, new { Error = ex.Message });
             }
         }
@@ -129,6 +140,7 @@ namespace Dnn.PersonaBar.UI.Services
         /// <returns>An HTTP response with a list of <see cref="SuggestionDto"/> values.</returns>
         public HttpResponseMessage GetSuggestionRoles(string keyword, int roleGroupId, int count)
         {
+			Logger.LogDebug(">>> Entering GetSuggestionRoles(keyword={Keyword},roleGroupId={RoleGroupId},count={Count})", keyword, roleGroupId, count);
             try
             {
                 if (string.IsNullOrEmpty(keyword))
@@ -150,6 +162,7 @@ namespace Dnn.PersonaBar.UI.Services
                 var roleList = new SortedList<string, int>();
                 foreach (var role in matchedRoles)
                 {
+				Logger.LogDebug("GetSuggestionRoles(keyword={Keyword},roleGroupId={RoleGroupId},count={Count}): roleList → {RoleList}", keyword, roleGroupId, count, roleList);
                     roleList[Localization.LocalizeRole(role.RoleName)] = role.RoleID;
                 }
 
@@ -164,6 +177,7 @@ namespace Dnn.PersonaBar.UI.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting GetSuggestionRoles(keyword={Keyword},roleGroupId={RoleGroupId},count={Count})", keyword, roleGroupId, count);
                 return this.Request.CreateResponse(HttpStatusCode.InternalServerError, new { Error = ex.Message });
             }
         }

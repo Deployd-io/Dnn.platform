@@ -30,8 +30,10 @@ namespace DotNetNuke.Modules.Journal
         [IFrameSupportedValidateAntiForgeryToken]
         public HttpResponseMessage UploadFile()
         {
+			Logger.LogDebug(">>> Entering UploadFile()");
             var statuses = new List<FilesStatus>();
             try
+			Logger.LogDebug("UploadFile(): statuses → {Statuses}", statuses);
             {
                 // todo can we eliminate the HttpContext here
                 this.UploadWholeFile(HttpContextSource.Current, statuses);
@@ -41,11 +43,14 @@ namespace DotNetNuke.Modules.Journal
                 Logger.Error(exc);
             }
 
+			Logger.LogDebug("<<< Exiting UploadFile()");
             return IframeSafeJson(statuses);
         }
 
         private static bool IsImageExtension(string extension)
         {
+			Logger.LogDebug(">>> Entering IsImageExtension(extension={Extension})", extension);
+			Logger.LogDebug("<<< Exiting IsImageExtension(extension={Extension})", extension);
             return ImageExtensions.Contains(extension);
         }
 

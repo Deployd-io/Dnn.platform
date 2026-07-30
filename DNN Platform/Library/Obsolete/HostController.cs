@@ -24,6 +24,7 @@ namespace DotNetNuke.Entities.Controllers
     public partial class HostController : ComponentBase<IHostController, HostController>, IHostController
 #pragma warning restore CS0618 // Type or member is obsolete
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [Obsolete("Deprecated in DotNetNuke 9.7.1. Use DotNetNuke.Abstractions.IHostSettingsService instead. Scheduled removal in v11.0.0.")]
         public static new IHostController Instance
         {
@@ -52,8 +53,10 @@ namespace DotNetNuke.Entities.Controllers
         [DnnDeprecated(9, 7, 1, "use DotNetNuke.Abstractions.IHostSettingsService instead")]
         public partial void Update(ConfigurationSetting config) =>
             ((IHostSettingsService)this).Update(config);
+			Logger.LogDebug(">>> Entering Update(config={Config})", config);
 
         /// <inheritdoc cref="IHostSettingsService.Update(DotNetNuke.Abstractions.Settings.IConfigurationSetting,bool)"/>
+		Logger.LogDebug("<<< Exiting Update(config={Config})", config);
         [DnnDeprecated(9, 7, 1, "use DotNetNuke.Abstractions.IHostSettingsService instead")]
         public partial void Update(ConfigurationSetting config, bool clearCache) =>
             ((IHostSettingsService)this).Update(config, clearCache);

@@ -19,6 +19,7 @@ namespace DotNetNuke.Modules.Journal.Components
 
     public class Utilities
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly Regex PageRegex = new Regex(
             "<(title)[^>]*?>((?:.|\\n)*?)</\\s*\\1\\s*>",
             RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled);
@@ -41,10 +42,14 @@ namespace DotNetNuke.Modules.Journal.Components
 
         public static string LocalizeControl(string controlText)
         {
+			Logger.LogDebug(">>> Entering LocalizeControl(controlText={ControlText})", controlText);
             string sKey = string.Empty;
             string sReplace = string.Empty;
+			Logger.LogDebug("LocalizeControl(controlText={ControlText}): sKey → {SKey}", controlText, sKey);
+			Logger.LogDebug("LocalizeControl(controlText={ControlText}): sReplace → {SReplace}", controlText, sReplace);
             MatchCollection matches = default(MatchCollection);
             matches = ResexRegex.Matches(controlText);
+			Logger.LogDebug("LocalizeControl(controlText={ControlText}): matches → {Matches}", controlText, matches);
             foreach (Match match in matches)
             {
                 sKey = match.Value;
@@ -52,32 +57,39 @@ namespace DotNetNuke.Modules.Journal.Components
 
                 string newValue = match.Value;
                 if (!string.IsNullOrEmpty(sReplace))
+				Logger.LogDebug("LocalizeControl(controlText={ControlText}): newValue → {NewValue}", controlText, newValue);
                 {
                     newValue = sReplace;
                 }
 
                 controlText = controlText.Replace(sKey, newValue);
             }
+			Logger.LogDebug("LocalizeControl(controlText={ControlText}): controlText → {ControlText1}", controlText, controlText);
 
+			Logger.LogDebug("<<< Exiting LocalizeControl(controlText={ControlText})", controlText);
             return controlText;
         }
 
         public static string GetSharedResource(string key)
         {
+			Logger.LogDebug(">>> Entering GetSharedResource(key={Key})", key);
             string sValue = key;
             sValue = DotNetNuke.Services.Localization.Localization.GetString(key, Constants.SharedResourcesPath);
+			Logger.LogDebug("GetSharedResource(key={Key}): sValue → {SValue}", key, sValue);
             if (sValue == string.Empty)
             {
                 return key;
             }
             else
             {
+				Logger.LogDebug("<<< Exiting GetSharedResource(key={Key})", key);
                 return sValue;
             }
         }
 
         public static string RemoveHTML(string sText)
         {
+			Logger.LogDebug(">>> Entering RemoveHTML(sText={SText})", sText);
             if (string.IsNullOrEmpty(sText))
             {
                 return string.Empty;
@@ -85,6 +97,7 @@ namespace DotNetNuke.Modules.Journal.Components
 
             sText = HttpUtility.HtmlDecode(sText);
             sText = HttpUtility.UrlDecode(sText);
+			Logger.LogDebug("RemoveHTML(sText={SText}): sText → {SText1}", sText, sText);
             sText = sText.Trim();
             if (string.IsNullOrEmpty(sText))
             {
@@ -93,24 +106,33 @@ namespace DotNetNuke.Modules.Journal.Components
 
             sText = HtmlTextRegex.Replace(sText, string.Empty);
             sText = HttpUtility.HtmlEncode(sText);
+			Logger.LogDebug("<<< Exiting RemoveHTML(sText={SText})", sText);
             return sText;
         }
 
         public static bool AreFriends(UserInfo profileUser, UserInfo currentUser)
         {
+			Logger.LogDebug(">>> Entering AreFriends(profileUser={ProfileUser},currentUser={CurrentUser})", profileUser, currentUser);
             var friendsRelationShip = RelationshipController.Instance.GetFriendRelationship(profileUser, currentUser);
+			Logger.LogDebug("AreFriends(profileUser={ProfileUser},currentUser={CurrentUser}): friendsRelationShip → {FriendsRelationShip}", profileUser, currentUser, friendsRelationShip);
+			Logger.LogDebug("<<< Exiting AreFriends(profileUser={ProfileUser},currentUser={CurrentUser})", profileUser, currentUser);
             return friendsRelationShip != null && friendsRelationShip.Status == RelationshipStatus.Accepted;
         }
 
         internal static Bitmap GetImageFromURL(string url)
         {
+			Logger.LogDebug(">>> Entering GetImageFromURL(url={Url})", url);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             string sImgName = string.Empty;
             System.Net.WebRequest myRequest = default(System.Net.WebRequest);
             Bitmap bmp = null;
+			Logger.LogDebug("GetImageFromURL(url={Url}): myRequest → {MyRequest}", url, myRequest);
+			Logger.LogDebug("GetImageFromURL(url={Url}): bmp → {Bmp}", url, bmp);
             try
             {
                 myRequest = System.Net.WebRequest.Create(url);
                 myRequest.Proxy = null;
+				Logger.LogDebug("GetImageFromURL(url={Url}): myRequest.Proxy → {Arg1}", url, myRequest.Proxy);
                 using (WebResponse myResponse = myRequest.GetResponse())
                 {
                     using (Stream myStream = myResponse.GetResponseStream())
@@ -118,6 +140,7 @@ namespace DotNetNuke.Modules.Journal.Components
                         string sContentType = myResponse.ContentType;
                         string sExt = string.Empty;
                         if (sContentType.Contains("png"))
+						Logger.LogDebug("GetImageFromURL(url={Url}): sExt → {SExt}", url, sExt);
                         {
                             sExt = ".png";
                         }
@@ -145,14 +168,19 @@ namespace DotNetNuke.Modules.Journal.Components
             }
             catch
             {
+				Logger.LogError("Exception in GetImageFromURL(url={Url}): {Arg1}", url, ex.Message);
+				Logger.LogInformation("GetImageFromURL(url)={Url}: external service call {Url1} took {Arg2} ms", url, url, __logStart.ElapsedMilliseconds);
+				Logger.LogDebug("<<< Exiting GetImageFromURL(url={Url})", url);
                 return null;
             }
         }
 
         internal static string PrepareURL(string url)
         {
+			Logger.LogDebug(">>> Entering PrepareURL(url={Url})", url);
             url = url.Trim();
             if (!url.StartsWith("http"))
+			Logger.LogDebug("PrepareURL(url={Url}): url → {Url1}", url, url);
             {
                 url = "http://" + url;
             }
@@ -174,14 +202,18 @@ namespace DotNetNuke.Modules.Journal.Components
 
             Uri objURI = null;
 
+			Logger.LogDebug("PrepareURL(url={Url}): objURI → {ObjURI}", url, objURI);
             objURI = new Uri(url);
+			Logger.LogDebug("<<< Exiting PrepareURL(url={Url})", url);
             return url;
         }
 
         internal static LinkInfo GetLinkData(string url)
         {
+			Logger.LogDebug(">>> Entering GetLinkData(url={Url})", url);
             string sPage = GetPageFromURL(ref url, string.Empty, string.Empty);
             LinkInfo link = new LinkInfo();
+			Logger.LogDebug("GetLinkData(url={Url}): link → {Link}", url, link);
             if (string.IsNullOrEmpty(sPage))
             {
                 return link;
@@ -191,16 +223,20 @@ namespace DotNetNuke.Modules.Journal.Components
             string sDescription = string.Empty;
             string sImage = string.Empty;
 
+			Logger.LogDebug("GetLinkData(url={Url}): sImage → {SImage}", url, sImage);
+			Logger.LogDebug("GetLinkData(url={Url}): link.URL → {Arg1}", url, link.URL);
             link.URL = url;
             link.Images = new List<ImageInfo>();
             Match m = PageRegex.Match(sPage);
             if (m.Success)
+			Logger.LogDebug("GetLinkData(url={Url}): m → {M}", url, m);
             {
                 link.Title = m.Groups[2].ToString().Trim();
             }
 
             MatchCollection matches = default(MatchCollection);
             matches = MetaRegex.Matches(sPage);
+			Logger.LogDebug("GetLinkData(url={Url}): matches → {Matches}", url, matches);
             int i = 0;
             foreach (Match match in matches)
             {
@@ -210,6 +246,7 @@ namespace DotNetNuke.Modules.Journal.Components
                     if (subM.Groups[4].Value.Equals("OG:DESCRIPTION", StringComparison.InvariantCultureIgnoreCase))
                     {
                         link.Description = subM.Groups[9].Value;
+						Logger.LogDebug("GetLinkData(url={Url}): link.Description → {Arg1}", url, link.Description);
                     }
                     else if (subM.Groups[4].Value.Equals("DESCRIPTION", StringComparison.InvariantCultureIgnoreCase))
                     {
@@ -219,12 +256,15 @@ namespace DotNetNuke.Modules.Journal.Components
                     if (subM.Groups[4].Value.Equals("OG:TITLE", StringComparison.InvariantCultureIgnoreCase))
                     {
                         link.Title = subM.Groups[9].Value;
+						Logger.LogDebug("GetLinkData(url={Url}): link.Title → {Arg1}", url, link.Title);
                     }
 
                     if (subM.Groups[4].Value.Equals("OG:IMAGE", StringComparison.InvariantCultureIgnoreCase))
                     {
                         sImage = subM.Groups[9].Value;
                         ImageInfo img = new ImageInfo();
+						Logger.LogDebug("GetLinkData(url={Url}): img → {Img}", url, img);
+						Logger.LogDebug("GetLinkData(url={Url}): img.URL → {Arg1}", url, img.URL);
                         img.URL = sImage;
                         link.Images.Add(img);
                         i += 1;
@@ -249,12 +289,15 @@ namespace DotNetNuke.Modules.Journal.Components
             string imgList = string.Empty;
             string hostUrl = string.Empty;
             if (!url.Contains("http"))
+			Logger.LogDebug("GetLinkData(url={Url}): hostUrl → {HostUrl}", url, hostUrl);
             {
                 url = "http://" + url;
             }
+			Logger.LogDebug("GetLinkData(url={Url}): url → {Url1}", url, url);
 
             Uri uri = new Uri(url);
             hostUrl = uri.Host;
+			Logger.LogDebug("GetLinkData(url={Url}): uri → {Uri}", url, uri);
             if (url.Contains("https:"))
             {
                 hostUrl = "https://" + hostUrl;
@@ -268,6 +311,7 @@ namespace DotNetNuke.Modules.Journal.Components
             {
                 string sImg = match.Groups[5].Value;
                 if (string.IsNullOrEmpty(sImg))
+				Logger.LogDebug("GetLinkData(url={Url}): sImg → {SImg}", url, sImg);
                 {
                     sImg = match.Groups[8].Value;
                 }
@@ -285,6 +329,7 @@ namespace DotNetNuke.Modules.Journal.Components
                     {
                         Bitmap bmp = Utilities.GetImageFromURL(sImg);
                         if (bmp != null)
+						Logger.LogDebug("GetLinkData(url={Url}): bmp → {Bmp}", url, bmp);
                         {
                             if (bmp.Height > 25 & bmp.Height < 500 & bmp.Width > 25 & bmp.Width < 500)
                             {
@@ -302,17 +347,28 @@ namespace DotNetNuke.Modules.Journal.Components
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetLinkData(url={Url})", url);
             return link;
         }
 
         internal static string GetPageFromURL(ref string url, string username, string password)
         {
+			Logger.LogDebug(">>> Entering GetPageFromURL(url={Url},username={Username},password={Password})", url, username, password);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             url = PrepareURL(url);
             HttpWebRequest objWebRequest = default(HttpWebRequest);
+			Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password={Password}): url → {Url1}", url, username, password, url);
+			Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password={Password}): objWebRequest → {ObjWebRequest}", url, username, password, objWebRequest);
+			Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password={Password}): objWebRequest.KeepAlive → {Arg3}", url, username, password, objWebRequest.KeepAlive);
+			Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password={Password}): objWebRequest.Proxy → {Arg3}", url, username, password, objWebRequest.Proxy);
+			Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password={Password}): objWebRequest.CookieContainer → {Arg3}", url, username, password, objWebRequest.CookieContainer);
             HttpWebResponse objWebResponse = default(HttpWebResponse);
             CookieContainer cookies = new CookieContainer();
+			Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password={Password}): objWebResponse → {ObjWebResponse}", url, username, password, objWebResponse);
+			Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password={Password}): cookies → {Cookies}", url, username, password, cookies);
             Uri objURI = new Uri(url);
             objWebRequest = (HttpWebRequest)HttpWebRequest.Create(objURI);
+			Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password={Password}): objURI → {ObjURI}", url, username, password, objURI);
             objWebRequest.KeepAlive = false;
             objWebRequest.Proxy = null;
             objWebRequest.CookieContainer = cookies;
@@ -320,6 +376,8 @@ namespace DotNetNuke.Modules.Journal.Components
             {
                 NetworkCredential nc = new NetworkCredential(username, password);
                 objWebRequest.Credentials = nc;
+				Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password={Password}): nc → {Nc}", url, username, password, nc);
+				Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password={Password}): objWebRequest.Credentials → {Arg3}", url, username, password, objWebRequest.Credentials);
             }
 
             string sHTML = string.Empty;
@@ -346,9 +404,12 @@ namespace DotNetNuke.Modules.Journal.Components
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in GetPageFromURL(url={Url},username={Username},password={Password}): {Arg3}", url, username, password, ex.Message);
                 Services.Exceptions.Exceptions.LogException(ex);
             }
 
+			Logger.LogInformation("GetPageFromURL(url,username,password)={Url},{Username},{Password}: external service call {Url1} took {Arg4} ms", url, username, password, url, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting GetPageFromURL(url={Url},username={Username},password={Password})", url, username, password);
             return sHTML;
         }
     }

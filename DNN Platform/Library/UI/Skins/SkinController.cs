@@ -46,6 +46,8 @@ namespace DotNetNuke.UI.Skins
 
         public static int AddSkin(int skinPackageID, string skinSrc)
         {
+			Logger.LogDebug(">>> Entering AddSkin(skinPackageID={SkinPackageID},skinSrc={SkinSrc})", skinPackageID, skinSrc);
+			Logger.LogDebug("<<< Exiting AddSkin(skinPackageID={SkinPackageID},skinSrc={SkinSrc})", skinPackageID, skinSrc);
             return DataProvider.Instance().AddSkin(skinPackageID, skinSrc);
         }
 
@@ -55,6 +57,7 @@ namespace DotNetNuke.UI.Skins
         [DnnDeprecated(10, 2, 2, "Use overload taking IEventLogger")]
         public static partial int AddSkinPackage(SkinPackageInfo skinPackage)
             => AddSkinPackage(Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>(), skinPackage);
+			Logger.LogDebug(">>> Entering AddSkinPackage(skinPackage={SkinPackage})", skinPackage);
 
         /// <summary>Adds the skin package.</summary>
         /// <param name="eventLogger">The event logger.</param>
@@ -63,6 +66,7 @@ namespace DotNetNuke.UI.Skins
         public static int AddSkinPackage(IEventLogger eventLogger, SkinPackageInfo skinPackage)
         {
             eventLogger.AddLog(skinPackage, PortalController.Instance.GetCurrentSettings(), UserController.Instance.GetCurrentUserInfo().UserID, string.Empty, EventLogType.SKINPACKAGE_CREATED);
+			Logger.LogDebug("<<< Exiting AddSkinPackage(skinPackage={SkinPackage})", skinPackage);
             return DataProvider.Instance().AddSkinPackage(skinPackage.PackageID, skinPackage.PortalID, skinPackage.SkinName, skinPackage.SkinType, UserController.Instance.GetCurrentUserInfo().UserID);
         }
 
@@ -73,6 +77,7 @@ namespace DotNetNuke.UI.Skins
         [DnnDeprecated(10, 0, 2, "Use overload taking IHostSettings")]
         public static partial bool CanDeleteSkin(string folderPath, string portalHomeDirMapPath)
             => CanDeleteSkin(null, folderPath, portalHomeDirMapPath);
+			Logger.LogDebug(">>> Entering CanDeleteSkin(folderPath={FolderPath},portalHomeDirMapPath={PortalHomeDirMapPath})", folderPath, portalHomeDirMapPath);
 
         /// <summary>Determines whether the given theme folder can be deleted.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -82,15 +87,19 @@ namespace DotNetNuke.UI.Skins
         public static bool CanDeleteSkin(IHostSettings hostSettings, string folderPath, string portalHomeDirMapPath)
         {
             hostSettings ??= Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("<<< Exiting CanDeleteSkin(folderPath={FolderPath},portalHomeDirMapPath={PortalHomeDirMapPath})", folderPath, portalHomeDirMapPath);
 
             string skinType;
             string skinFolder;
             bool canDelete = true;
             if (folderPath.IndexOf(Globals.HostMapPath, StringComparison.InvariantCultureIgnoreCase) != -1)
+			Logger.LogDebug("CanDeleteSkin(hostSettings={HostSettings},folderPath={FolderPath},portalHomeDirMapPath={PortalHomeDirMapPath}): canDelete → {CanDelete}", hostSettings, folderPath, portalHomeDirMapPath, canDelete);
             {
                 skinType = "G";
+				Logger.LogDebug("CanDeleteSkin(hostSettings={HostSettings},folderPath={FolderPath},portalHomeDirMapPath={PortalHomeDirMapPath}): skinType → {SkinType}", hostSettings, folderPath, portalHomeDirMapPath, skinType);
                 skinFolder = folderPath.ToLowerInvariant().Replace(Globals.HostMapPath.ToLowerInvariant(), string.Empty).Replace(@"\", "/");
             }
+			Logger.LogDebug("CanDeleteSkin(hostSettings={HostSettings},folderPath={FolderPath},portalHomeDirMapPath={PortalHomeDirMapPath}): skinFolder → {SkinFolder}", hostSettings, folderPath, portalHomeDirMapPath, skinFolder);
             else if (folderPath.IndexOf(PortalSettings.Current.HomeSystemDirectoryMapPath, StringComparison.InvariantCultureIgnoreCase) != -1)
             {
                 skinType = "S";
@@ -105,6 +114,7 @@ namespace DotNetNuke.UI.Skins
 
             var portalSettings = PortalController.Instance.GetCurrentSettings();
 
+			Logger.LogDebug("CanDeleteSkin(hostSettings={HostSettings},folderPath={FolderPath},portalHomeDirMapPath={PortalHomeDirMapPath}): portalSettings → {PortalSettings}", hostSettings, folderPath, portalHomeDirMapPath, portalSettings);
             string skin = "[" + skinType.ToLowerInvariant() + "]" + skinFolder.ToLowerInvariant();
             if (skinFolder.ToLowerInvariant().Contains("skins"))
             {
@@ -129,6 +139,8 @@ namespace DotNetNuke.UI.Skins
                 canDelete = DataProvider.Instance().CanDeleteSkin(skinType, skinFolder);
             }
 
+			Logger.LogDebug(">>> Entering DeleteSkin(skinID={SkinID})", skinID);
+			Logger.LogDebug("<<< Exiting DeleteSkin(skinID={SkinID})", skinID);
             return canDelete;
         }
 
@@ -142,9 +154,11 @@ namespace DotNetNuke.UI.Skins
         [DnnDeprecated(10, 2, 2, "Use overload taking IEventLogger")]
         public static partial void DeleteSkinPackage(SkinPackageInfo skinPackage)
             => DeleteSkinPackage(Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>(), skinPackage);
+			Logger.LogDebug(">>> Entering DeleteSkinPackage(skinPackage={SkinPackage})", skinPackage);
 
         /// <summary>Deletes the skin package.</summary>
         /// <param name="eventLogger">The event logger.</param>
+		Logger.LogDebug("<<< Exiting DeleteSkinPackage(skinPackage={SkinPackage})", skinPackage);
         /// <param name="skinPackage">The skin package.</param>
         public static void DeleteSkinPackage(IEventLogger eventLogger, SkinPackageInfo skinPackage)
         {
@@ -154,8 +168,10 @@ namespace DotNetNuke.UI.Skins
 
         public static string FormatMessage(string title, string body, int level, bool isError)
         {
+			Logger.LogDebug(">>> Entering FormatMessage(title={Title},body={Body},level={Level},isError={IsError})", title, body, level, isError);
             string message = title;
             if (isError)
+			Logger.LogDebug("FormatMessage(title={Title},body={Body},level={Level},isError={IsError}): message → {Message}", title, body, level, isError, message);
             {
                 message = $"""<span class="NormalRed">{title}</span>""";
             }
@@ -176,17 +192,21 @@ namespace DotNetNuke.UI.Skins
                     break;
             }
 
+			Logger.LogDebug("<<< Exiting FormatMessage(title={Title},body={Body},level={Level},isError={IsError})", title, body, level, isError);
             return $"{message}: {body}{Environment.NewLine}";
         }
 
         public static string FormatSkinPath(string skinSrc)
         {
+			Logger.LogDebug(">>> Entering FormatSkinPath(skinSrc={SkinSrc})", skinSrc);
             string strSkinSrc = skinSrc;
             if (!string.IsNullOrEmpty(strSkinSrc))
+			Logger.LogDebug("FormatSkinPath(skinSrc={SkinSrc}): strSkinSrc → {StrSkinSrc}", skinSrc, strSkinSrc);
             {
                 strSkinSrc = strSkinSrc.Substring(0, strSkinSrc.LastIndexOf("/", StringComparison.Ordinal) + 1);
             }
 
+			Logger.LogDebug("<<< Exiting FormatSkinPath(skinSrc={SkinSrc})", skinSrc);
             return strSkinSrc;
         }
 
@@ -214,35 +234,51 @@ namespace DotNetNuke.UI.Skins
 
         public static string GetDefaultAdminContainer()
         {
+			Logger.LogDebug(">>> Entering GetDefaultAdminContainer()");
             SkinDefaults defaultContainer = SkinDefaults.GetSkinDefaults(SkinDefaultType.ContainerInfo);
+			Logger.LogDebug("GetDefaultAdminContainer(): defaultContainer → {DefaultContainer}", defaultContainer);
+			Logger.LogDebug("<<< Exiting GetDefaultAdminContainer()");
             return "[G]" + RootContainer + defaultContainer.Folder + defaultContainer.AdminDefaultName;
         }
 
         public static string GetDefaultAdminSkin()
         {
+			Logger.LogDebug(">>> Entering GetDefaultAdminSkin()");
             SkinDefaults defaultSkin = SkinDefaults.GetSkinDefaults(SkinDefaultType.SkinInfo);
+			Logger.LogDebug("GetDefaultAdminSkin(): defaultSkin → {DefaultSkin}", defaultSkin);
+			Logger.LogDebug("<<< Exiting GetDefaultAdminSkin()");
             return "[G]" + RootSkin + defaultSkin.Folder + defaultSkin.AdminDefaultName;
         }
 
         public static string GetDefaultPortalContainer()
         {
+			Logger.LogDebug(">>> Entering GetDefaultPortalContainer()");
             SkinDefaults defaultContainer = SkinDefaults.GetSkinDefaults(SkinDefaultType.ContainerInfo);
+			Logger.LogDebug("GetDefaultPortalContainer(): defaultContainer → {DefaultContainer}", defaultContainer);
+			Logger.LogDebug("<<< Exiting GetDefaultPortalContainer()");
             return "[G]" + RootContainer + defaultContainer.Folder + defaultContainer.DefaultName;
         }
 
         public static string GetDefaultPortalSkin()
         {
+			Logger.LogDebug(">>> Entering GetDefaultPortalSkin()");
             SkinDefaults defaultSkin = SkinDefaults.GetSkinDefaults(SkinDefaultType.SkinInfo);
+			Logger.LogDebug("GetDefaultPortalSkin(): defaultSkin → {DefaultSkin}", defaultSkin);
+			Logger.LogDebug("<<< Exiting GetDefaultPortalSkin()");
             return "[G]" + RootSkin + defaultSkin.Folder + defaultSkin.DefaultName;
         }
 
         public static SkinPackageInfo GetSkinByPackageID(int packageID)
         {
+			Logger.LogDebug(">>> Entering GetSkinByPackageID(packageID={PackageID})", packageID);
+			Logger.LogDebug("<<< Exiting GetSkinByPackageID(packageID={PackageID})", packageID);
             return CBO.FillObject<SkinPackageInfo>(DataProvider.Instance().GetSkinByPackageID(packageID));
         }
 
         public static SkinPackageInfo GetSkinPackage(int portalId, string skinName, string skinType)
         {
+			Logger.LogDebug(">>> Entering GetSkinPackage(portalId={PortalId},skinName={SkinName},skinType={SkinType})", portalId, skinName, skinType);
+			Logger.LogDebug("<<< Exiting GetSkinPackage(portalId={PortalId},skinName={SkinName},skinType={SkinType})", portalId, skinName, skinType);
             return CBO.FillObject<SkinPackageInfo>(DataProvider.Instance().GetSkinPackage(portalId, skinName, skinType));
         }
 
@@ -275,13 +311,17 @@ namespace DotNetNuke.UI.Skins
         /// </remarks>
         public static bool IsGlobalSkin(string skinSrc)
         {
+			Logger.LogDebug(">>> Entering IsGlobalSkin(skinSrc={SkinSrc})", skinSrc);
+			Logger.LogDebug("<<< Exiting IsGlobalSkin(skinSrc={SkinSrc})", skinSrc);
             return skinSrc.Contains(Globals.HostPath);
         }
 
         public static void SetSkin(string skinRoot, int portalId, SkinType skinType, string skinSrc)
         {
+			Logger.LogDebug(">>> Entering SetSkin(skinRoot={SkinRoot},portalId={PortalId},skinType={SkinType},skinSrc={SkinSrc})", skinRoot, portalId, skinType, skinSrc);
             var selectedCultureCode = LocaleController.Instance.GetCurrentLocale(portalId).Code;
             switch (skinRoot)
+			Logger.LogDebug("SetSkin(skinRoot={SkinRoot},portalId={PortalId},skinType={SkinType},skinSrc={SkinSrc}): selectedCultureCode → {SelectedCultureCode}", skinRoot, portalId, skinType, skinSrc, selectedCultureCode);
             {
                 case "Skins":
                     if (skinType == SkinType.Admin)
@@ -334,11 +374,14 @@ namespace DotNetNuke.UI.Skins
 
                     break;
             }
+			Logger.LogDebug("<<< Exiting SetSkin(skinRoot={SkinRoot},portalId={PortalId},skinType={SkinType},skinSrc={SkinSrc})", skinRoot, portalId, skinType, skinSrc);
         }
 
         public static void UpdateSkin(int skinID, string skinSrc)
         {
+			Logger.LogDebug(">>> Entering UpdateSkin(skinID={SkinID},skinSrc={SkinSrc})", skinID, skinSrc);
             DataProvider.Instance().UpdateSkin(skinID, skinSrc);
+			Logger.LogDebug("<<< Exiting UpdateSkin(skinID={SkinID},skinSrc={SkinSrc})", skinID, skinSrc);
         }
 
         /// <summary>Updates the skin package.</summary>
@@ -346,6 +389,7 @@ namespace DotNetNuke.UI.Skins
         [DnnDeprecated(10, 2, 2, "Use overload taking IEventLogger")]
         public static partial void UpdateSkinPackage(SkinPackageInfo skinPackage)
             => UpdateSkinPackage(Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>(), skinPackage);
+			Logger.LogDebug(">>> Entering UpdateSkinPackage(skinPackage={SkinPackage})", skinPackage);
 
         /// <summary>Updates the skin package.</summary>
         /// <param name="eventLogger">The event logger.</param>
@@ -359,6 +403,7 @@ namespace DotNetNuke.UI.Skins
                 skinPackage.SkinName,
                 skinPackage.SkinType,
                 UserController.Instance.GetCurrentUserInfo().UserID);
+				Logger.LogDebug("<<< Exiting UpdateSkinPackage(skinPackage={SkinPackage})", skinPackage);
             eventLogger.AddLog(skinPackage, PortalController.Instance.GetCurrentSettings(), UserController.Instance.GetCurrentUserInfo().UserID, string.Empty, EventLogType.SKINPACKAGE_UPDATED);
             foreach (KeyValuePair<int, string> kvp in skinPackage.Skins)
             {
@@ -368,8 +413,10 @@ namespace DotNetNuke.UI.Skins
 
         public static string UploadLegacySkin(string rootPath, string skinRoot, string skinName, Stream inputStream)
         {
+			Logger.LogDebug(">>> Entering UploadLegacySkin(rootPath={RootPath},skinRoot={SkinRoot},skinName={SkinName},inputStream={InputStream})", rootPath, skinRoot, skinName, inputStream);
             var objZipInputStream = new ZipArchive(inputStream, ZipArchiveMode.Read);
 
+			Logger.LogDebug("UploadLegacySkin(rootPath={RootPath},skinRoot={SkinRoot},skinName={SkinName},inputStream={InputStream}): objZipInputStream → {ObjZipInputStream}", rootPath, skinRoot, skinName, inputStream, objZipInputStream);
             string strExtension;
             string strFileName;
             FileStream fileStream;
@@ -377,9 +424,11 @@ namespace DotNetNuke.UI.Skins
             string strMessage = string.Empty;
             var arrSkinFiles = new ArrayList();
 
+			Logger.LogDebug("UploadLegacySkin(rootPath={RootPath},skinRoot={SkinRoot},skinName={SkinName},inputStream={InputStream}): arrSkinFiles → {ArrSkinFiles}", rootPath, skinRoot, skinName, inputStream, arrSkinFiles);
             // Localized Strings
             PortalSettings resourcePortalSettings = Globals.GetPortalSettings();
             string beginMessage = Localization.GetString("BeginZip", resourcePortalSettings);
+			Logger.LogDebug("UploadLegacySkin(rootPath={RootPath},skinRoot={SkinRoot},skinName={SkinName},inputStream={InputStream}): resourcePortalSettings → {ResourcePortalSettings}", rootPath, skinRoot, skinName, inputStream, resourcePortalSettings);
             string createDir = Localization.GetString("CreateDir", resourcePortalSettings);
             string writeFile = Localization.GetString("WriteFile", resourcePortalSettings);
             string fileError = Localization.GetString("FileError", resourcePortalSettings);
@@ -392,6 +441,7 @@ namespace DotNetNuke.UI.Skins
             {
                 // validate file extension
                 strExtension = objZipEntry.FullName.Substring(objZipEntry.FullName.LastIndexOf(".", StringComparison.Ordinal) + 1);
+				Logger.LogDebug("UploadLegacySkin(rootPath={RootPath},skinRoot={SkinRoot},skinName={SkinName},inputStream={InputStream}): strExtension → {StrExtension}", rootPath, skinRoot, skinName, inputStream, strExtension);
                 if (Host.AllowedExtensionWhitelist.IsAllowedExtension(strExtension, LegacySkinExtensions))
                 {
                     // process embedded zip files
@@ -399,6 +449,7 @@ namespace DotNetNuke.UI.Skins
                     {
                         using var objMemoryStream = new MemoryStream();
                         objZipEntry.Open().CopyToStream(objMemoryStream, 25000);
+						Logger.LogDebug("UploadLegacySkin(rootPath={RootPath},skinRoot={SkinRoot},skinName={SkinName},inputStream={InputStream}): objMemoryStream → {ObjMemoryStream}", rootPath, skinRoot, skinName, inputStream, objMemoryStream);
                         objMemoryStream.Seek(0, SeekOrigin.Begin);
                         strMessage += UploadLegacySkin(rootPath, RootSkin, skinName, objMemoryStream);
                     }
@@ -412,6 +463,7 @@ namespace DotNetNuke.UI.Skins
                     else
                     {
                         strFileName = $@"{rootPath}{skinRoot}\{skinName}\{objZipEntry.FullName}";
+						Logger.LogDebug("UploadLegacySkin(rootPath={RootPath},skinRoot={SkinRoot},skinName={SkinName},inputStream={InputStream}): strFileName → {StrFileName}", rootPath, skinRoot, skinName, inputStream, strFileName);
 
                         // create the directory if it does not exist
                         if (!Directory.Exists(Path.GetDirectoryName(strFileName)))
@@ -429,6 +481,7 @@ namespace DotNetNuke.UI.Skins
 
                         // create the new file
                         fileStream = File.Create(strFileName);
+						Logger.LogDebug("UploadLegacySkin(rootPath={RootPath},skinRoot={SkinRoot},skinName={SkinName},inputStream={InputStream}): fileStream → {FileStream}", rootPath, skinRoot, skinName, inputStream, fileStream);
 
                         // unzip the file
                         strMessage += FormatMessage(writeFile, Path.GetFileName(strFileName), 2, false);
@@ -465,15 +518,18 @@ namespace DotNetNuke.UI.Skins
             // process the list of skin files
             var newSkin = new SkinFileProcessor(rootPath, skinRoot, skinName);
             strMessage += newSkin.ProcessList(arrSkinFiles, SkinParser.Portable);
+			Logger.LogDebug("UploadLegacySkin(rootPath={RootPath},skinRoot={SkinRoot},skinName={SkinName},inputStream={InputStream}): newSkin → {NewSkin}", rootPath, skinRoot, skinName, inputStream, newSkin);
 
             // log installation event
             try
             {
                 var log = new LogInfo { LogTypeKey = nameof(EventLogType.HOST_ALERT), };
                 log.LogProperties.Add(new LogDetailInfo("Install Skin:", skinName));
+				Logger.LogDebug("UploadLegacySkin(rootPath={RootPath},skinRoot={SkinRoot},skinName={SkinName},inputStream={InputStream}): log → {Log}", rootPath, skinRoot, skinName, inputStream, log);
                 Array arrMessage = strMessage.Split(MessageSeparator, StringSplitOptions.None);
                 foreach (string strRow in arrMessage)
                 {
+				Logger.LogDebug("UploadLegacySkin(rootPath={RootPath},skinRoot={SkinRoot},skinName={SkinName},inputStream={InputStream}): arrMessage → {ArrMessage}", rootPath, skinRoot, skinName, inputStream, arrMessage);
                     log.LogProperties.Add(new LogDetailInfo("Info:", HtmlUtils.StripTags(strRow, true)));
                 }
 
@@ -484,6 +540,7 @@ namespace DotNetNuke.UI.Skins
                 Logger.Error(exc);
             }
 
+			Logger.LogDebug("<<< Exiting UploadLegacySkin(rootPath={RootPath},skinRoot={SkinRoot},skinName={SkinName},inputStream={InputStream})", rootPath, skinRoot, skinName, inputStream);
             return strMessage;
         }
 
@@ -548,6 +605,7 @@ namespace DotNetNuke.UI.Skins
         /// <param name="skinFile">The File Name without extension.</param>
         private static string FormatSkinName(string skinFolder, string skinFile)
         {
+			Logger.LogDebug(">>> Entering FormatSkinName(skinFolder={SkinFolder},skinFile={SkinFile})", skinFolder, skinFile);
             if (skinFolder.Equals("_default", StringComparison.OrdinalIgnoreCase))
             {
                 // host folder
@@ -562,6 +620,7 @@ namespace DotNetNuke.UI.Skins
                 case "default":
                     return skinFolder;
                 default:
+					Logger.LogDebug("<<< Exiting FormatSkinName(skinFolder={SkinFolder},skinFile={SkinFile})", skinFolder, skinFile);
                     return skinFolder + " - " + skinFile;
             }
         }

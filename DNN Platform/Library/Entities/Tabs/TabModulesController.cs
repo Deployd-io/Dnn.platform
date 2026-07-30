@@ -26,9 +26,13 @@ namespace DotNetNuke.Entities.Tabs
     public class TabModulesController(IHostSettings hostSettings)
         : ServiceLocator<ITabModulesController, TabModulesController>, ITabModulesController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+		Logger.LogDebug(">>> Entering TabModulesController(hostSettings={HostSettings})", hostSettings);
+		Logger.LogDebug("TabModulesController(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
 
         /// <summary>Initializes a new instance of the <see cref="TabModulesController"/> class.</summary>
+		Logger.LogDebug("<<< Exiting TabModulesController(hostSettings={HostSettings})", hostSettings);
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public TabModulesController()
             : this(null)
@@ -38,10 +42,14 @@ namespace DotNetNuke.Entities.Tabs
         /// <inheritdoc />
         public ArrayList GetTabModules(TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering GetTabModules(tab={Tab})", tab);
             var objPaneModules = new Dictionary<string, int>();
 
+			Logger.LogDebug("GetTabModules(tab={Tab}): objPaneModules → {ObjPaneModules}", tab, objPaneModules);
             var modules = GetModules(tab);
             var configuredModules = new ArrayList();
+			Logger.LogDebug("GetTabModules(tab={Tab}): modules → {Modules}", tab, modules);
+			Logger.LogDebug("GetTabModules(tab={Tab}): configuredModules → {ConfiguredModules}", tab, configuredModules);
             foreach (var configuringModule in modules)
             {
                 ConfigureModule(configuringModule, tab);
@@ -52,10 +60,12 @@ namespace DotNetNuke.Entities.Tabs
                 }
 
                 configuringModule.PaneModuleCount = 0;
+				Logger.LogDebug("GetTabModules(tab={Tab}): configuringModule.PaneModuleCount → {Arg1}", tab, configuringModule.PaneModuleCount);
                 if (!configuringModule.IsDeleted)
                 {
                     objPaneModules[configuringModule.PaneName] = objPaneModules[configuringModule.PaneName] + 1;
                     configuringModule.PaneModuleIndex = objPaneModules[configuringModule.PaneName] - 1;
+					Logger.LogDebug("GetTabModules(tab={Tab}): configuringModule.PaneModuleIndex → {Arg1}", tab, configuringModule.PaneModuleIndex);
                 }
 
                 configuredModules.Add(configuringModule);
@@ -70,8 +80,10 @@ namespace DotNetNuke.Entities.Tabs
                 }
 
                 module.PaneModuleCount = objPaneModules[module.PaneName];
+				Logger.LogDebug("GetTabModules(tab={Tab}): module.PaneModuleCount → {Arg1}", tab, module.PaneModuleCount);
             }
 
+			Logger.LogDebug("<<< Exiting GetTabModules(tab={Tab})", tab);
             return configuredModules;
         }
 
@@ -102,10 +114,14 @@ namespace DotNetNuke.Entities.Tabs
         /// <inheritdoc />
         public IList<int> GetTabModuleIdsBySetting(string settingName, string expectedValue)
         {
+			Logger.LogDebug(">>> Entering GetTabModuleIdsBySetting(settingName={SettingName},expectedValue={ExpectedValue})", settingName, expectedValue);
             var items = this.GetTabModuleSettingsByName(settingName);
             var matches = items.Where(e => e.Value.Equals(expectedValue, StringComparison.OrdinalIgnoreCase));
+			Logger.LogDebug("GetTabModuleIdsBySetting(settingName={SettingName},expectedValue={ExpectedValue}): items → {Items}", settingName, expectedValue, items);
+			Logger.LogDebug("GetTabModuleIdsBySetting(settingName={SettingName},expectedValue={ExpectedValue}): matches → {Matches}", settingName, expectedValue, matches);
             var keyValuePairs = matches as KeyValuePair<int, string>[] ?? matches.ToArray();
             if (keyValuePairs.Length != 0)
+			Logger.LogDebug("GetTabModuleIdsBySetting(settingName={SettingName},expectedValue={ExpectedValue}): keyValuePairs → {KeyValuePairs}", settingName, expectedValue, keyValuePairs);
             {
                 return keyValuePairs.Select(kpv => kpv.Key).ToList();
             }
@@ -114,12 +130,15 @@ namespace DotNetNuke.Entities.Tabs
             var dataProvider = DataProvider.Instance();
             using (var dr = dataProvider.GetTabModuleIdsBySettingNameAndValue(PortalSettings.Current.PortalId, settingName, expectedValue))
             {
+			Logger.LogDebug("GetTabModuleIdsBySetting(settingName={SettingName},expectedValue={ExpectedValue}): dataProvider → {DataProvider}", settingName, expectedValue, dataProvider);
                 var result = new List<int>();
                 while (dr.Read())
+				Logger.LogDebug("GetTabModuleIdsBySetting(settingName={SettingName},expectedValue={ExpectedValue}): result → {Result}", settingName, expectedValue, result);
                 {
                     result.Add(dr.GetInt32(0));
                 }
 
+				Logger.LogDebug("<<< Exiting GetTabModuleIdsBySetting(settingName={SettingName},expectedValue={ExpectedValue})", settingName, expectedValue);
                 return result;
             }
         }
@@ -127,32 +146,40 @@ namespace DotNetNuke.Entities.Tabs
         /// <inheritdoc />
         protected override Func<ITabModulesController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => Globals.DependencyProvider.GetRequiredService<ITabModulesController>();
         }
 
         private static void ConfigureModule(ModuleInfo cloneModule, TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering ConfigureModule(cloneModule={CloneModule},tab={Tab})", cloneModule, tab);
             if (Null.IsNull(cloneModule.StartDate))
             {
                 cloneModule.StartDate = DateTime.MinValue;
+				Logger.LogDebug("ConfigureModule(cloneModule={CloneModule},tab={Tab}): cloneModule.StartDate → {Arg2}", cloneModule, tab, cloneModule.StartDate);
             }
 
             if (Null.IsNull(cloneModule.EndDate))
             {
                 cloneModule.EndDate = DateTime.MaxValue;
+				Logger.LogDebug("ConfigureModule(cloneModule={CloneModule},tab={Tab}): cloneModule.EndDate → {Arg2}", cloneModule, tab, cloneModule.EndDate);
             }
 
             if (string.IsNullOrEmpty(cloneModule.ContainerSrc))
             {
                 cloneModule.ContainerSrc = tab.ContainerSrc;
+				Logger.LogDebug("ConfigureModule(cloneModule={CloneModule},tab={Tab}): cloneModule.ContainerSrc → {Arg2}", cloneModule, tab, cloneModule.ContainerSrc);
             }
 
             cloneModule.ContainerSrc = SkinController.FormatSkinSrc(cloneModule.ContainerSrc, PortalSettings.Current);
             cloneModule.ContainerPath = SkinController.FormatSkinPath(cloneModule.ContainerSrc);
+			Logger.LogDebug("<<< Exiting ConfigureModule(cloneModule={CloneModule},tab={Tab})", cloneModule, tab);
         }
 
         private static IEnumerable<ModuleInfo> GetModules(TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering GetModules(tab={Tab})", tab);
             int urlVersion;
             if (TabVersionUtils.TryGetUrlVersion(out urlVersion))
             {
@@ -164,6 +191,7 @@ namespace DotNetNuke.Entities.Tabs
                 return TabVersionBuilder.Instance.GetUnPublishedVersionModules(tab.TabID);
             }
 
+			Logger.LogDebug("<<< Exiting GetModules(tab={Tab})", tab);
             return TabVersionBuilder.Instance.GetCurrentModules(tab.TabID);
         }
     }

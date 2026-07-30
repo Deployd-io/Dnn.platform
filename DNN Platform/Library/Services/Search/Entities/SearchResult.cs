@@ -16,16 +16,20 @@ namespace DotNetNuke.Services.Search.Entities
     [Serializable]
     public class SearchResult : SearchDocument
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Initializes a new instance of the <see cref="SearchResult"/> class.
         /// Empty Constructor.
         /// </summary>
         public SearchResult()
         {
+			Logger.LogDebug(">>> Entering SearchResult()");
             this.Tags = [];
             this.NumericKeys = new Dictionary<string, int>();
+			Logger.LogDebug("SearchResult(): this.Tags → {Arg0}", this.Tags);
             this.Keywords = new Dictionary<string, string>();
             this.SearchContext = new Dictionary<string, string>();
+			Logger.LogDebug("<<< Exiting SearchResult()");
         }
 
         /// <summary>Gets time when Content was last modified (in friendly format).</summary>

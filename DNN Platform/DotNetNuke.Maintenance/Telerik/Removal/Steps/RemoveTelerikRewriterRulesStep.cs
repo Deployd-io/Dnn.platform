@@ -15,6 +15,7 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
     /// <inheritdoc cref="IRemoveTelerikRewriterRulesStep" />
     internal sealed class RemoveTelerikRewriterRulesStep : XmlStepBase, IRemoveTelerikRewriterRulesStep
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="RemoveTelerikRewriterRulesStep"/> class.</summary>
         /// <param name="loggerSource">An instance of <see cref="ILoggerSource"/>.</param>
         /// <param name="localizer">An instance of <see cref="ILocalizer"/>.</param>
@@ -37,12 +38,15 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         /// <inheritdoc />
         protected override void ProcessXml(XmlDocument doc)
         {
+			Logger.LogDebug(">>> Entering ProcessXml(doc={Doc})", doc);
             const string RulesPath = "/RewriterConfig/Rules";
 
             this.Success = true;
+			Logger.LogDebug("ProcessXml(doc={Doc}): this.Success → {Arg1}", doc, this.Success);
 
             var rules = doc.SelectSingleNode(RulesPath);
             if (rules is null)
+			Logger.LogDebug("ProcessXml(doc={Doc}): rules → {Rules}", doc, rules);
             {
                 this.Notes = this.LocalizeFormat("UninstallStepSectionNotFound", RulesPath);
                 return;
@@ -64,8 +68,10 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
                 });
 
             this.Notes = matchCount > 0
+				Logger.LogDebug("ProcessXml(doc={Doc}): this.Notes → {Arg1}", doc, this.Notes);
                 ? this.LocalizeFormat("UninstallStepCountOfMatchesFound", matchCount)
                 : this.Localize("UninstallStepNoMatchesFound");
+				Logger.LogDebug("<<< Exiting ProcessXml(doc={Doc})", doc);
         }
     }
 }

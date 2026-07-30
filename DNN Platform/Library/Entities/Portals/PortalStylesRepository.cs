@@ -25,7 +25,9 @@ namespace DotNetNuke.Entities.Portals
             hostSettingsService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>(),
             portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>())
     {
+		Logger.LogDebug(">>> Entering PortalStylesRepository(moduleController={ModuleController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController})", moduleController, hostSettings, hostSettingsService, portalController);
         /// <summary>Initializes a new instance of the <see cref="PortalStylesRepository"/> class.</summary>
+		Logger.LogDebug("<<< Exiting PortalStylesRepository(moduleController={ModuleController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController})", moduleController, hostSettings, hostSettingsService, portalController);
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public PortalStylesRepository()
             : this(null, null, null, null)

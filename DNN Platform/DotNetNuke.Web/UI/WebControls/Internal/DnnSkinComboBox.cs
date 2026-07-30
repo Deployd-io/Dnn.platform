@@ -24,11 +24,14 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
     [ToolboxData("<{0}:DnnSkinComboBox runat='server'></{0}:DnnSkinComboBox>")]
     public class DnnSkinComboBox : DnnComboBox
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="DnnSkinComboBox"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IApplicationStatusInfo. Scheduled removal in v12.0.0.")]
         public DnnSkinComboBox()
             : this(null, null, null)
         {
+		Logger.LogDebug(">>> Entering DnnSkinComboBox()");
+		Logger.LogDebug("<<< Exiting DnnSkinComboBox()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnSkinComboBox"/> class.</summary>
@@ -42,6 +45,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
                 clientResourceController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>())
         {
             this.PortalId = Null.NullInteger;
+			Logger.LogDebug("DnnSkinComboBox(appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController}): this.PortalId → {Arg3}", appStatus, eventLogger, clientResourceController, this.PortalId);
         }
 
         /// <summary>Gets or sets the portal ID.</summary>
@@ -64,11 +68,14 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.DataTextField = "Key";
+			Logger.LogDebug("OnLoad(e={E}): this.DataTextField → {Arg1}", e, this.DataTextField);
             this.DataValueField = "Value";
 
+			Logger.LogDebug("OnLoad(e={E}): this.DataValueField → {Arg1}", e, this.DataValueField);
             if (!this.Page.IsPostBack && !string.IsNullOrEmpty(this.RootPath))
             {
                 this.DataSource = SkinController.GetSkins(this.Portal, this.RootPath, this.Scope)
@@ -90,22 +97,27 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
             }
 
             this.AttachEvents();
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void PerformDataBinding(IEnumerable dataSource)
         {
+			Logger.LogDebug(">>> Entering PerformDataBinding(dataSource={DataSource})", dataSource);
             // do not select item during data binding, item will select later
             var selectedValue = this.SelectedValue;
             this.SelectedValue = null;
+			Logger.LogDebug("PerformDataBinding(dataSource={DataSource}): this.SelectedValue → {Arg1}", dataSource, this.SelectedValue);
 
             base.PerformDataBinding(dataSource);
 
             this.SelectedValue = selectedValue;
+			Logger.LogDebug("<<< Exiting PerformDataBinding(dataSource={DataSource})", dataSource);
         }
 
         private void AttachEvents()
         {
+			Logger.LogDebug(">>> Entering AttachEvents()");
             if (!UserController.Instance.GetCurrentUserInfo().IsSuperUser)
             {
                 return;
@@ -118,6 +130,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
             var indexChangedMethod = @"function selectedIndexChangedMethod(sender, eventArgs){
     var value = eventArgs.get_item().get_value();
     value = value.replace('[L]', sender.get_attributes().getAttribute('PortalPath'));
+	Logger.LogDebug("AttachEvents(): value → {Value}", value);
     value = value.replace('[G]', sender.get_attributes().getAttribute('HostPath'));
     sender.get_inputDomElement().title = value;
 }";
@@ -142,6 +155,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
             //        ToolTip = tooltip;
             //    }
             // }
+			Logger.LogDebug("<<< Exiting AttachEvents()");
         }
     }
 }

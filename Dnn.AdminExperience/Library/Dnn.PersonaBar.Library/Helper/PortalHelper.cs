@@ -9,6 +9,7 @@ namespace Dnn.PersonaBar.Library.Helper
     /// <summary>A helper for portals.</summary>
     public partial class PortalHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly ContentVerifier ContentVerifier = new ContentVerifier();
 
         /// <inheritdoc cref="IContentVerifier.IsContentExistsForRequestedPortal"/>
@@ -16,6 +17,8 @@ namespace Dnn.PersonaBar.Library.Helper
         [DnnDeprecated(9, 2, 1, "Use IContentVerifier.IsContentExistsForRequestedPortal")]
         public static partial bool IsContentExistsForRequestedPortal(int contentPortalId, PortalSettings portalSettings, bool checkForSiteGroup = false)
         {
+			Logger.LogDebug(">>> Entering IsContentExistsForRequestedPortal(contentPortalId={ContentPortalId},portalSettings={PortalSettings},checkForSiteGroup={CheckForSiteGroup})", contentPortalId, portalSettings, checkForSiteGroup);
+			Logger.LogDebug("<<< Exiting IsContentExistsForRequestedPortal(contentPortalId={ContentPortalId},portalSettings={PortalSettings},checkForSiteGroup={CheckForSiteGroup})", contentPortalId, portalSettings, checkForSiteGroup);
             return ContentVerifier.IsContentExistsForRequestedPortal(contentPortalId, portalSettings, checkForSiteGroup);
         }
 #pragma warning restore CS1066

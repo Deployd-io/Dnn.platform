@@ -14,6 +14,7 @@ namespace DotNetNuke.Collections
     /// <typeparam name = "T">The type of objects contained in this list.</typeparam>
     public class PagedList<T> : List<T>, IPagedList<T>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Initializes a new instance of the <see cref="PagedList{T}"/> class.
         ///  Initializes a new instance of the <see cref="PagedList{T}"/> a paged list containing objects from the selected enumerable source.
@@ -23,8 +24,11 @@ namespace DotNetNuke.Collections
         /// <param name="pageSize">The size of the page to retrieve.</param>
         public PagedList(IEnumerable<T> source, int pageIndex, int pageSize)
         {
+			Logger.LogDebug(">>> Entering PagedList(source={Source},pageIndex={PageIndex},pageSize={PageSize})", source, pageIndex, pageSize);
             var enumerable = source as T[] ?? source.ToArray();
             this.CommonConstruct(enumerable.Skip(pageIndex * pageSize).Take(pageSize).ToList(), enumerable.Length, pageIndex, pageSize);
+			Logger.LogDebug("<<< Exiting PagedList(source={Source},pageIndex={PageIndex},pageSize={PageSize})", source, pageIndex, pageSize);
+			Logger.LogDebug("PagedList(source={Source},pageIndex={PageIndex},pageSize={PageSize}): enumerable → {Enumerable}", source, pageIndex, pageSize, enumerable);
         }
 
         /// <summary>
@@ -37,7 +41,9 @@ namespace DotNetNuke.Collections
         /// <param name="pageSize">The size of the page to retrieve.</param>
         public PagedList(IEnumerable<T> items, int totalCount, int pageIndex, int pageSize)
         {
+			Logger.LogDebug(">>> Entering PagedList(items={Items},totalCount={TotalCount},pageIndex={PageIndex},pageSize={PageSize})", items, totalCount, pageIndex, pageSize);
             this.CommonConstruct(items, totalCount, pageIndex, pageSize);
+			Logger.LogDebug("<<< Exiting PagedList(items={Items},totalCount={TotalCount},pageIndex={PageIndex},pageSize={PageSize})", items, totalCount, pageIndex, pageSize);
         }
 
         /// <summary>  Gets a value indicating whether there is a next page available.</summary>
@@ -66,6 +72,7 @@ namespace DotNetNuke.Collections
 
         private void CommonConstruct(IEnumerable<T> items, int totalCount, int pageIndex, int pageSize)
         {
+			Logger.LogDebug(">>> Entering CommonConstruct(items={Items},totalCount={TotalCount},pageIndex={PageIndex},pageSize={PageSize})", items, totalCount, pageIndex, pageSize);
             this.PageCount = (int)Math.Ceiling(totalCount / (double)pageSize);
 
             if (this.PageCount == 0)
@@ -89,14 +96,19 @@ namespace DotNetNuke.Collections
             }
 
             this.TotalCount = totalCount;
+			Logger.LogDebug("CommonConstruct(items={Items},totalCount={TotalCount},pageIndex={PageIndex},pageSize={PageSize}): this.TotalCount → {Arg4}", items, totalCount, pageIndex, pageSize, this.TotalCount);
             this.PageSize = pageSize;
             this.PageIndex = pageIndex;
+			Logger.LogDebug("CommonConstruct(items={Items},totalCount={TotalCount},pageIndex={PageIndex},pageSize={PageSize}): this.PageSize → {Arg4}", items, totalCount, pageIndex, pageSize, this.PageSize);
+			Logger.LogDebug("CommonConstruct(items={Items},totalCount={TotalCount},pageIndex={PageIndex},pageSize={PageSize}): this.PageIndex → {Arg4}", items, totalCount, pageIndex, pageSize, this.PageIndex);
             this.AddRange(items);
 
             this.HasNextPage = this.PageIndex < (this.PageCount - 1);
             this.HasPreviousPage = this.PageIndex > 0;
+			Logger.LogDebug("CommonConstruct(items={Items},totalCount={TotalCount},pageIndex={PageIndex},pageSize={PageSize}): this.HasPreviousPage → {Arg4}", items, totalCount, pageIndex, pageSize, this.HasPreviousPage);
             this.IsFirstPage = this.PageIndex <= 0;
             this.IsLastPage = this.PageIndex >= (this.PageCount - 1);
+			Logger.LogDebug("<<< Exiting CommonConstruct(items={Items},totalCount={TotalCount},pageIndex={PageIndex},pageSize={PageSize})", items, totalCount, pageIndex, pageSize);
         }
     }
 }

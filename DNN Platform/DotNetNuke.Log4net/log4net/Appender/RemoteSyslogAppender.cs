@@ -68,6 +68,7 @@ namespace log4net.Appender
     /// <author>Nicko Cadell</author>
     public class RemoteSyslogAppender : UdpAppender
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Syslog port 514</summary>
         private const int DefaultSyslogPort = 514;
 
@@ -192,10 +193,14 @@ namespace log4net.Appender
         /// </remarks>
         public RemoteSyslogAppender()
         {
+			Logger.LogDebug(">>> Entering RemoteSyslogAppender()");
             // syslog udp defaults
             this.RemotePort = DefaultSyslogPort;
+			Logger.LogDebug("RemoteSyslogAppender(): this.RemotePort → {Arg0}", this.RemotePort);
             this.RemoteAddress = System.Net.IPAddress.Parse("127.0.0.1");
             this.Encoding = Encoding.ASCII;
+			Logger.LogDebug("<<< Exiting RemoteSyslogAppender()");
+			Logger.LogDebug("RemoteSyslogAppender(): this.Encoding → {Arg0}", this.Encoding);
         }
 
         /// <summary>Message identity</summary>
@@ -234,7 +239,9 @@ namespace log4net.Appender
         /// </remarks>
         public void AddMapping(LevelSeverity mapping)
         {
+			Logger.LogDebug(">>> Entering AddMapping(mapping={Mapping})", mapping);
             this.m_levelMapping.Add(mapping);
+			Logger.LogDebug("<<< Exiting AddMapping(mapping={Mapping})", mapping);
         }
 
         /// <summary>This method is called by the <see cref="M:AppenderSkeleton.DoAppend(LoggingEvent)"/> method.</summary>
@@ -249,17 +256,21 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent loggingEvent)
         {
+			Logger.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             try
             {
                 // Priority
                 int priority = GeneratePriority(this.m_facility, this.GetSeverity(loggingEvent.Level));
 
+				Logger.LogDebug("Append(loggingEvent={LoggingEvent}): priority → {Priority}", loggingEvent, priority);
                 // Identity
                 string identity;
 
                 if (this.m_identity != null)
                 {
                     identity = this.m_identity.Format(loggingEvent);
+					Logger.LogDebug("Append(loggingEvent={LoggingEvent}): identity → {Identity}", loggingEvent, identity);
                 }
                 else
                 {
@@ -275,10 +286,12 @@ namespace log4net.Appender
 
                 StringBuilder builder = new StringBuilder();
 
+				Logger.LogDebug("Append(loggingEvent={LoggingEvent}): builder → {Builder}", loggingEvent, builder);
                 while (i < message.Length)
                 {
                     // Clear StringBuilder
                     builder.Length = 0;
+					Logger.LogDebug("Append(loggingEvent={LoggingEvent}): builder.Length → {Arg1}", loggingEvent, builder.Length);
 
                     // Write priority
                     builder.Append('<');
@@ -313,6 +326,7 @@ namespace log4net.Appender
 
                     // Grab as a byte array
                     buffer = this.Encoding.GetBytes(builder.ToString());
+					Logger.LogDebug("Append(loggingEvent={LoggingEvent}): buffer → {Buffer}", loggingEvent, buffer);
 
 #if NET_4_5 || NETSTANDARD
                     this.Client.SendAsync(buffer, buffer.Length, this.RemoteEndPoint).Wait();
@@ -323,6 +337,7 @@ namespace log4net.Appender
             }
             catch (Exception e)
             {
+				Logger.LogError("Exception in Append(loggingEvent={LoggingEvent}): {Arg1}", loggingEvent, ex.Message);
                 this.ErrorHandler.Error(
                     "Unable to send logging event to remote syslog " +
                     this.RemoteAddress.ToString() +
@@ -331,6 +346,8 @@ namespace log4net.Appender
                     e,
                     ErrorCode.WriteFailure);
             }
+			Logger.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
+			Logger.LogInformation("Append(loggingEvent)={LoggingEvent}: external service call took {Arg1} ms", loggingEvent, __logStart.ElapsedMilliseconds);
         }
 
         /// <summary>Initialize the options for this appender</summary>
@@ -341,8 +358,10 @@ namespace log4net.Appender
         /// </remarks>
         public override void ActivateOptions()
         {
+			Logger.LogDebug(">>> Entering ActivateOptions()");
             base.ActivateOptions();
             this.m_levelMapping.ActivateOptions();
+			Logger.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>Translates a log4net level to a syslog severity.</summary>
@@ -355,8 +374,10 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual SyslogSeverity GetSeverity(Level level)
         {
+			Logger.LogDebug(">>> Entering GetSeverity(level={Level})", level);
             LevelSeverity levelSeverity = this.m_levelMapping.Lookup(level) as LevelSeverity;
             if (levelSeverity != null)
+			Logger.LogDebug("GetSeverity(level={Level}): levelSeverity → {LevelSeverity}", level, levelSeverity);
             {
                 return levelSeverity.Severity;
             }
@@ -390,6 +411,7 @@ namespace log4net.Appender
                 return SyslogSeverity.Informational;
             }
             // Default setting
+			Logger.LogDebug("<<< Exiting GetSeverity(level={Level})", level);
             return SyslogSeverity.Debug;
         }
 
@@ -404,6 +426,7 @@ namespace log4net.Appender
         /// </remarks>
         public static int GeneratePriority(SyslogFacility facility, SyslogSeverity severity)
         {
+			Logger.LogDebug(">>> Entering GeneratePriority(facility={Facility},severity={Severity})", facility, severity);
             if (facility < SyslogFacility.Kernel || facility > SyslogFacility.Local7)
             {
                 throw new ArgumentException("SyslogFacility out of range", "facility");
@@ -416,6 +439,7 @@ namespace log4net.Appender
 
             unchecked
             {
+				Logger.LogDebug("<<< Exiting GeneratePriority(facility={Facility},severity={Severity})", facility, severity);
                 return ((int)facility * 8) + (int)severity;
             }
         }

@@ -11,14 +11,19 @@ namespace Dnn.PersonaBar.Security.Components
 
     public class CheckResult
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="CheckResult"/> class.</summary>
         /// <param name="severity">The result severity.</param>
         /// <param name="checkname">The check name.</param>
         public CheckResult(SeverityEnum severity, string checkname)
         {
+			Logger.LogDebug(">>> Entering CheckResult(severity={Severity},checkname={Checkname})", severity, checkname);
             this.Severity = severity;
             this.CheckName = checkname;
+			Logger.LogDebug("CheckResult(severity={Severity},checkname={Checkname}): this.Severity → {Arg2}", severity, checkname, this.Severity);
+			Logger.LogDebug("CheckResult(severity={Severity},checkname={Checkname}): this.CheckName → {Arg2}", severity, checkname, this.CheckName);
             this.Notes = new List<string>();
+			Logger.LogDebug("<<< Exiting CheckResult(severity={Severity},checkname={Checkname})", severity, checkname);
         }
 
         public string Reason

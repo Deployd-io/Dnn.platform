@@ -26,6 +26,7 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Presenters
     [DnnDeprecated(9, 2, 0, "Replace WebFormsMvp and DotNetNuke.Web.Mvp with MVC or SPA patterns instead")]
     public partial class ProviderConfigurationPresenter : ModulePresenter<IProviderConfigurationView, ProviderConfigurationViewModel>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>The HTML editor node.</summary>
         private const string HtmlEditorNode = "/configuration/dotnetnuke/htmlEditor";
 
@@ -37,9 +38,11 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Presenters
         public ProviderConfigurationPresenter(IProviderConfigurationView view)
             : base(view)
         {
+			Logger.LogDebug(">>> Entering ProviderConfigurationPresenter(view={View})", view);
             this.View.Initialize += this.View_Initialize;
             this.View.SaveEditorChoice += this.View_SaveEditorChoice;
             this.View.EditorChanged += this.View_EditorChanged;
+			Logger.LogDebug("<<< Exiting ProviderConfigurationPresenter(view={View})", view);
         }
 
         /// <summary>Gets the DNN configuration.</summary>
@@ -66,6 +69,7 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Presenters
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void View_Initialize(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering View_Initialize(sender={Sender},e={E})", sender, e);
             this.View.Model.Editors = this.GetAvailableEditors();
             this.View.Model.SelectedEditor = this.GetSelectedEditor();
             this.View.Editor.Controls.Add(this.LoadCurrentEditor());
@@ -73,6 +77,7 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Presenters
             // hack: force DNN to load the Telerik Combobox skin. Needed for the RadEditor provider
             // TODO: Remove as the included file path isn't distributed with installs
             ClientResourceManager.RegisterStyleSheet(this.View.Editor.Page, "~/Portals/_default/Skins/_default/WebControlSkin/Default/ComboBox.Default.css");
+			Logger.LogDebug("<<< Exiting View_Initialize(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Loads the current editor.</summary>
@@ -80,29 +85,38 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Presenters
         /// <returns>The editor based on the current editor settings in the web configuration.</returns>
         private Control LoadCurrentEditor(string editorName)
         {
+			Logger.LogDebug(">>> Entering LoadCurrentEditor(editorName={EditorName})", editorName);
             XmlDocument dnnConfiguration = this.DNNConfiguration;
             XmlNode htmlProviderNode = this.GetHtmlEditorProviderNode(dnnConfiguration);
             XmlNode currentProvider = htmlProviderNode.SelectSingleNode("providers/add[@name='" + editorName + "']");
+			Logger.LogDebug("LoadCurrentEditor(editorName={EditorName}): htmlProviderNode → {HtmlProviderNode}", editorName, htmlProviderNode);
+			Logger.LogDebug("LoadCurrentEditor(editorName={EditorName}): currentProvider → {CurrentProvider}", editorName, currentProvider);
 
             var settingsAttribute = currentProvider.Attributes["settingsControlPath"];
             if (settingsAttribute != null)
+			Logger.LogDebug("LoadCurrentEditor(editorName={EditorName}): settingsAttribute → {SettingsAttribute}", editorName, settingsAttribute);
             {
                 try
                 {
                     var controlPath = settingsAttribute.Value;
                     var control = (PortalModuleBase)((TemplateControl)this.View).LoadControl(controlPath);
                     control.ModuleConfiguration = this.ModuleContext.Configuration;
+					Logger.LogDebug("LoadCurrentEditor(editorName={EditorName}): control → {Control}", editorName, control);
+					Logger.LogDebug("LoadCurrentEditor(editorName={EditorName}): control.ModuleConfiguration → {Arg1}", editorName, control.ModuleConfiguration);
                     control.ID = Path.GetFileNameWithoutExtension(controlPath);
                     this.View.Model.CanSave = true;
                     return control;
                 }
                 catch (Exception)
                 {
+					Logger.LogError("Exception in LoadCurrentEditor(editorName={EditorName}): {Arg1}", editorName, ex.Message);
                     this.View.Model.CanSave = false;
                 }
             }
 
             // Display a nice message to the user that this provider is not supported.
+			Logger.LogDebug("<<< Exiting LoadCurrentEditor(editorName={EditorName})", editorName);
+			Logger.LogDebug("<<< Exiting LoadCurrentEditor()");
             return ((TemplateControl)this.View).LoadControl("~/DesktopModules/Admin/HtmlEditorManager/Controls/InvalidConfiguration.ascx");
         }
 
@@ -118,9 +132,11 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Presenters
         /// <param name="e">The <see cref="EditorEventArgs"/> instance containing the event data.</param>
         private void View_EditorChanged(object sender, EditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering View_EditorChanged(sender={Sender},e={E})", sender, e);
             this.View.Editor.Controls.Clear();
             this.View.Model.SelectedEditor = e.Editor;
             this.View.Model.CanSave = true;
+			Logger.LogDebug("<<< Exiting View_EditorChanged(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Handles the SaveEditorChoice event of the View control.</summary>
@@ -128,25 +144,32 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Presenters
         /// <param name="e">The <see cref="EditorEventArgs"/> instance containing the event data.</param>
         private void View_SaveEditorChoice(object sender, EditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering View_SaveEditorChoice(sender={Sender},e={E})", sender, e);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             this.SaveEditorInConfiguration(e.Editor);
             this.View.Refresh();
+			Logger.LogInformation("View_SaveEditorChoice(sender,e)={Sender},{E}: database query executed in {Arg2} ms", sender, e, __logStart.ElapsedMilliseconds);
             this.View.Editor.Controls.Clear();
             this.View.Editor.Controls.Add(this.LoadCurrentEditor());
             this.View.Model.SelectedEditor = e.Editor;
+			Logger.LogDebug("<<< Exiting View_SaveEditorChoice(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Saves the editor in configuration.</summary>
         /// <param name="name">The name.</param>
         private void SaveEditorInConfiguration(string name)
         {
+			Logger.LogDebug(">>> Entering SaveEditorInConfiguration(name={Name})", name);
             XmlDocument dnnConfiguration = this.DNNConfiguration;
             XmlNode providerNode = this.GetHtmlEditorProviderNode(dnnConfiguration);
 
+			Logger.LogDebug("SaveEditorInConfiguration(name={Name}): providerNode → {ProviderNode}", name, providerNode);
             if (providerNode != null)
             {
                 providerNode.Attributes["defaultProvider"].Value = name;
                 Config.Save(dnnConfiguration);
             }
+			Logger.LogDebug("<<< Exiting SaveEditorInConfiguration(name={Name})", name);
         }
 
         /// <summary>Gets the HTML provider node.</summary>
@@ -166,12 +189,15 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Presenters
         /// <returns>A list of the installed providers.</returns>
         private List<string> GetAvailableEditors()
         {
+			Logger.LogDebug(">>> Entering GetAvailableEditors()");
             var editors = new List<string>();
             XmlDocument xmlConfig = this.DNNConfiguration;
+			Logger.LogDebug("GetAvailableEditors(): editors → {Editors}", editors);
             if (xmlConfig != null && xmlConfig.DocumentElement != null)
             {
                 XmlNodeList editorNodes = xmlConfig.DocumentElement.SelectNodes(HtmlEditorNode + "/providers/add");
                 if (editorNodes != null)
+				Logger.LogDebug("GetAvailableEditors(): editorNodes → {EditorNodes}", editorNodes);
                 {
                     int i = 0;
                     while (i < editorNodes.Count)
@@ -187,6 +213,7 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Presenters
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetAvailableEditors()");
             return editors;
         }
 
@@ -194,6 +221,7 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Presenters
         /// <returns>The currently configured editor.</returns>
         private string GetSelectedEditor()
         {
+			Logger.LogDebug(">>> Entering GetSelectedEditor()");
             XmlDocument xmlConfig = this.DNNConfiguration;
 
             if (xmlConfig != null && xmlConfig.DocumentElement != null)
@@ -202,6 +230,7 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Presenters
                 return editorProviderNode.Attributes["defaultProvider"].Value;
             }
 
+			Logger.LogDebug("<<< Exiting GetSelectedEditor()");
             return string.Empty;
         }
     }

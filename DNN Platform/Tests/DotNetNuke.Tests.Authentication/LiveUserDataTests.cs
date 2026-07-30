@@ -12,6 +12,7 @@ namespace DotNetNuke.Tests.Authentication
     [TestFixture]
     public class LiveUserDataTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string SampleUserJson = @"{
   ""id"" : ""contact.c1678ab4000000000000000000000000"",
   ""first_name"" : ""Frederick"",
@@ -24,15 +25,18 @@ namespace DotNetNuke.Tests.Authentication
         [Test]
         public void LiveUserData_Populates_Inherited_Name_Properties_When_Deserialized()
         {
+			Logger.LogDebug(">>> Entering LiveUserData_Populates_Inherited_Name_Properties_When_Deserialized()");
             // Act
             UserData dukesUser = Json.Deserialize<LiveUserData>(SampleUserJson);
 
+			Logger.LogDebug("LiveUserData_Populates_Inherited_Name_Properties_When_Deserialized(): dukesUser → {DukesUser}", dukesUser);
             using (Assert.EnterMultipleScope())
             {
                 // Assert
                 Assert.That(dukesUser.FirstName, Is.EqualTo("Frederick"), "Should correctly pull first name from first_name field, not by parsing name");
                 Assert.That(dukesUser.LastName, Is.EqualTo("Franklin"), "Should correctly pull first name from last_name field, not by parsing name");
             }
+			Logger.LogDebug("<<< Exiting LiveUserData_Populates_Inherited_Name_Properties_When_Deserialized()");
         }
     }
 }

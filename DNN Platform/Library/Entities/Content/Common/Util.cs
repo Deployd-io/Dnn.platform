@@ -16,17 +16,21 @@ namespace DotNetNuke.Entities.Content.Common
     [DnnDeprecated(10, 2, 4, "Resolve types via Dependency Injection")]
     public static partial class Util
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Gets the data service.</summary>
         /// <returns>data service instance from ComponentFactory.</returns>
         public static IDataService GetDataService()
         {
+			Logger.LogDebug(">>> Entering GetDataService()");
             var ds = ComponentFactory.GetComponent<IDataService>();
             if (ds == null)
+			Logger.LogDebug("GetDataService(): ds → {Ds}", ds);
             {
                 ds = new DataService();
                 ComponentFactory.RegisterComponentInstance<IDataService>(ds);
             }
 
+			Logger.LogDebug("<<< Exiting GetDataService()");
             return ds;
         }
 
@@ -35,6 +39,7 @@ namespace DotNetNuke.Entities.Content.Common
         [DnnDeprecated(10, 2, 4, "Use overload taking IHostSettings")]
         public static partial IContentController GetContentController()
             => GetContentController(null, null);
+			Logger.LogDebug(">>> Entering GetContentController()");
 
         /// <summary>Gets the content controller.</summary>
         /// <param name="dataService">The data service.</param>
@@ -44,6 +49,7 @@ namespace DotNetNuke.Entities.Content.Common
         {
             var ctl = ComponentFactory.GetComponent<IContentController>();
             if (ctl == null)
+			Logger.LogDebug("GetContentController(dataService={DataService},hostSettings={HostSettings}): ctl → {Ctl}", dataService, hostSettings, ctl);
             {
                 ctl = new ContentController(
                     dataService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IDataService>(),
@@ -51,6 +57,7 @@ namespace DotNetNuke.Entities.Content.Common
                 ComponentFactory.RegisterComponentInstance<IContentController>(ctl);
             }
 
+			Logger.LogDebug("<<< Exiting GetContentController()");
             return ctl;
         }
 
@@ -59,6 +66,7 @@ namespace DotNetNuke.Entities.Content.Common
         [DnnDeprecated(10, 2, 4, "Use overload taking IHostSettings")]
         public static partial IScopeTypeController GetScopeTypeController()
             => GetScopeTypeController(null, null);
+			Logger.LogDebug(">>> Entering GetScopeTypeController()");
 
         /// <summary>Gets the scope type controller.</summary>
         /// <param name="dataService">The data service.</param>
@@ -68,6 +76,7 @@ namespace DotNetNuke.Entities.Content.Common
         {
             var ctl = ComponentFactory.GetComponent<IScopeTypeController>();
             if (ctl == null)
+			Logger.LogDebug("GetScopeTypeController(dataService={DataService},hostSettings={HostSettings}): ctl → {Ctl}", dataService, hostSettings, ctl);
             {
                 ctl = new ScopeTypeController(
                     dataService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IDataService>(),
@@ -75,6 +84,7 @@ namespace DotNetNuke.Entities.Content.Common
                 ComponentFactory.RegisterComponentInstance<IScopeTypeController>(ctl);
             }
 
+			Logger.LogDebug("<<< Exiting GetScopeTypeController()");
             return ctl;
         }
 
@@ -83,6 +93,7 @@ namespace DotNetNuke.Entities.Content.Common
         [DnnDeprecated(10, 2, 4, "Use overload taking IHostSettings")]
         public static partial ITermController GetTermController()
             => GetTermController(null, null);
+			Logger.LogDebug(">>> Entering GetTermController()");
 
         /// <summary>Gets the term controller.</summary>
         /// <param name="dataService">The data service.</param>
@@ -92,6 +103,7 @@ namespace DotNetNuke.Entities.Content.Common
         {
             var ctl = ComponentFactory.GetComponent<ITermController>();
             if (ctl == null)
+			Logger.LogDebug("GetTermController(dataService={DataService},hostSettings={HostSettings}): ctl → {Ctl}", dataService, hostSettings, ctl);
             {
                 ctl = new TermController(
                     dataService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IDataService>(),
@@ -99,6 +111,7 @@ namespace DotNetNuke.Entities.Content.Common
                 ComponentFactory.RegisterComponentInstance<ITermController>(ctl);
             }
 
+			Logger.LogDebug("<<< Exiting GetTermController()");
             return ctl;
         }
 
@@ -107,6 +120,7 @@ namespace DotNetNuke.Entities.Content.Common
         [DnnDeprecated(10, 2, 4, "Use overload taking IHostSettings")]
         public static partial IVocabularyController GetVocabularyController()
             => GetVocabularyController(null, null);
+			Logger.LogDebug(">>> Entering GetVocabularyController()");
 
         /// <summary>Gets the vocabulary controller.</summary>
         /// <param name="dataService">The data service.</param>
@@ -116,6 +130,7 @@ namespace DotNetNuke.Entities.Content.Common
         {
             var ctl = ComponentFactory.GetComponent<IVocabularyController>();
             if (ctl == null)
+			Logger.LogDebug("GetVocabularyController(dataService={DataService},hostSettings={HostSettings}): ctl → {Ctl}", dataService, hostSettings, ctl);
             {
                 ctl = new VocabularyController(
                     dataService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IDataService>(),
@@ -123,6 +138,7 @@ namespace DotNetNuke.Entities.Content.Common
                 ComponentFactory.RegisterComponentInstance<IVocabularyController>(ctl);
             }
 
+			Logger.LogDebug("<<< Exiting GetVocabularyController()");
             return ctl;
         }
     }

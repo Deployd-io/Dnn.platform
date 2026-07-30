@@ -55,6 +55,7 @@ namespace log4net.Appender
     /// <author>Gert Driesen</author>
     public class MemoryAppender : AppenderSkeleton
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="MemoryAppender" /> class.</summary>
         /// <remarks>
         /// <para>
@@ -63,7 +64,10 @@ namespace log4net.Appender
         /// </remarks>
         public MemoryAppender() : base()
         {
+			Logger.LogDebug(">>> Entering MemoryAppender()");
             this.m_eventsList = new ArrayList();
+			Logger.LogDebug("<<< Exiting MemoryAppender()");
+			Logger.LogDebug("MemoryAppender(): m_eventsList → {M_eventsList}", m_eventsList);
         }
 
         /// <summary>Gets the events that have been logged.</summary>
@@ -75,8 +79,10 @@ namespace log4net.Appender
         /// </remarks>
         public virtual LoggingEvent[] GetEvents()
         {
+			Logger.LogDebug(">>> Entering GetEvents()");
             lock (this.m_eventsList.SyncRoot)
             {
+				Logger.LogDebug("<<< Exiting GetEvents()");
                 return (LoggingEvent[])this.m_eventsList.ToArray(typeof(LoggingEvent));
             }
         }
@@ -136,15 +142,18 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent loggingEvent) 
         {
+			Logger.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             // Because we are caching the LoggingEvent beyond the
             // lifetime of the Append() method we must fix any
             // volatile data in the event.
             loggingEvent.Fix = this.Fix;
+			Logger.LogDebug("Append(loggingEvent={LoggingEvent}): loggingEvent.Fix → {Arg1}", loggingEvent, loggingEvent.Fix);
 
             lock (this.m_eventsList.SyncRoot)
             {
                 this.m_eventsList.Add(loggingEvent);
             }
+			Logger.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
         }
 
         /// <summary>Clear the list of events</summary>
@@ -153,10 +162,12 @@ namespace log4net.Appender
         /// </remarks>
         public virtual void Clear()
         {
+			Logger.LogDebug(">>> Entering Clear()");
             lock (this.m_eventsList.SyncRoot)
             {
                 this.m_eventsList.Clear();
             }
+			Logger.LogDebug("<<< Exiting Clear()");
         }
 
         /// <summary>Gets the events that have been logged and clears the list of events.</summary>
@@ -168,10 +179,12 @@ namespace log4net.Appender
         /// </remarks>
         public virtual LoggingEvent[] PopAllEvents()
         {
+			Logger.LogDebug(">>> Entering PopAllEvents()");
             lock (this.m_eventsList.SyncRoot)
             {
                 LoggingEvent[] tmp = (LoggingEvent[])this.m_eventsList.ToArray(typeof (LoggingEvent));
                 this.m_eventsList.Clear();
+				Logger.LogDebug("<<< Exiting PopAllEvents()");
                 return tmp;
             }
         }

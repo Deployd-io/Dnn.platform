@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.Social.Messaging.Exceptions
     [Serializable]
     public class MessageOrRecipientNotFoundException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="MessageOrRecipientNotFoundException"/> class.</summary>
         public MessageOrRecipientNotFoundException()
         {
+		Logger.LogDebug(">>> Entering MessageOrRecipientNotFoundException()");
+		Logger.LogDebug("<<< Exiting MessageOrRecipientNotFoundException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="MessageOrRecipientNotFoundException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Services.Social.Messaging.Exceptions
         public MessageOrRecipientNotFoundException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering MessageOrRecipientNotFoundException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting MessageOrRecipientNotFoundException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="MessageOrRecipientNotFoundException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

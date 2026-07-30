@@ -9,6 +9,7 @@ Imports System.Web.UI
 Namespace DotNetNuke.UI.Utilities
 
     Public Class ClientAPICallBackResponse
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(ClientAPICallBackResponse))
         Public Enum CallBackResponseStatusCode
             OK = 200
             GenericFailure = 400
@@ -50,17 +51,23 @@ Namespace DotNetNuke.UI.Utilities
         End Property
 
         Public Sub New(ByVal objPage As Page, ByVal eCallBackType As CallBackTypeCode)
+			Logger.LogDebug(">>> Entering New(objPage={ObjPage},eCallBackType={ECallBackType})", objPage, eCallBackType)
             m_objPage = objPage
             CallBackType = eCallBackType
+			Logger.LogDebug("New(objPage={ObjPage},eCallBackType={ECallBackType}): CallBackType → {CallBackType}", objPage, eCallBackType, CallBackType)
+			Logger.LogDebug("New(objPage={ObjPage},eCallBackType={ECallBackType}): m_objPage → {M_objPage}", objPage, eCallBackType, m_objPage)
+			Logger.LogDebug("<<< Exiting New(objPage={ObjPage},eCallBackType={ECallBackType})", objPage, eCallBackType)
         End Sub
 
         Public Sub Write()
+			Logger.LogDebug(">>> Entering Write()")
             Select Case Me.TransportType
                 Case TransportTypeCode.IFRAMEPost
                     Dim strContextID As String = m_objPage.Request.Form("ctx")                    'if context passed in then we are using IFRAME Implementation
                     If IsNumeric(strContextID) Then
                         m_objPage.Response.Write("<html><head></head><body onload=""window.parent.dnn.xmlhttp.requests['" & strContextID & "'].complete(window.parent.dnn.dom.getById('txt', document).value);""><form>")
                         m_objPage.Response.Write("<input type=""hidden"" id=""" & ClientAPI.SCRIPT_CALLBACKSTATUSID & """ value=""" & CInt(Me.StatusCode).ToString(CultureInfo.InvariantCulture) & """>")
+						Logger.LogDebug("Write(): onload → {Onload}", onload)
                         m_objPage.Response.Write("<input type=""hidden"" id=""" & ClientAPI.SCRIPT_CALLBACKSTATUSDESCID & """ value=""" & Me.StatusDesc & """>")
                         m_objPage.Response.Write("<textarea id=""txt"">")
                         m_objPage.Response.Write(HttpUtility.HtmlEncode(MSAJAX.Serialize(New With {.d = Response})))
@@ -73,6 +80,7 @@ Namespace DotNetNuke.UI.Utilities
                     m_objPage.Response.Write(MSAJAX.Serialize(New With {.d = Response}))    '//don't serialize straight html
             End Select
 
+		Logger.LogDebug("<<< Exiting Write()")
         End Sub
     End Class
 

@@ -18,6 +18,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Client
     [SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", Justification = "Breaking change")]
     public class Exit : IConsoleCommand
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public string LocalResourceFile => Constants.LocalResourcesFile;
 
@@ -36,18 +37,21 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Client
         /// <inheritdoc />
         public void Initialize(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
         public bool IsValid()
         {
+			Logger.LogDebug(">>> Entering IsValid()");
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
         public ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             throw new NotImplementedException();
         }
     }

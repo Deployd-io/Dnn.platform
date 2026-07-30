@@ -23,6 +23,7 @@ using System.IO;
 
 namespace log4net.Util.PatternStringConverters
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Write the current threads username to the output</summary>
     /// <remarks>
     /// <para>
@@ -42,6 +43,7 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         protected override void Convert(TextWriter writer, object state) 
         {
+		Logger.LogDebug(">>> Entering Convert(writer={Writer},state={State})", writer, state);
 #if (NETCF || SSCLI || NETSTANDARD1_3)
             // On compact framework there's no notion of current Windows user
             writer.Write( SystemInfo.NotAvailableText );
@@ -50,6 +52,7 @@ namespace log4net.Util.PatternStringConverters
             {
                 System.Security.Principal.WindowsIdentity windowsIdentity = null;
                 windowsIdentity = System.Security.Principal.WindowsIdentity.GetCurrent();
+				Logger.LogDebug("Convert(writer={Writer},state={State}): windowsIdentity → {WindowsIdentity}", writer, state, windowsIdentity);
                 if (windowsIdentity != null && windowsIdentity.Name != null)
                 {
                     writer.Write(windowsIdentity.Name);
@@ -64,6 +67,7 @@ namespace log4net.Util.PatternStringConverters
                 writer.Write(SystemInfo.NotAvailableText);
             }
 #endif
+		Logger.LogDebug("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
         }
 
         /// <summary>The fully qualified type of the UserNamePatternConverter class.</summary>

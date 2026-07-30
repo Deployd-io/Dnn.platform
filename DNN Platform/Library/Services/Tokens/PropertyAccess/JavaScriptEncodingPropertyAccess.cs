@@ -15,10 +15,13 @@ using DotNetNuke.Entities.Users;
 /// <param name="implementation">The <see cref="IPropertyAccess"/> implementation that is being wrapped.</param>
 public class JavaScriptEncodingPropertyAccess(IPropertyAccess implementation) : IPropertyAccess
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <inheritdoc />
+	Logger.LogDebug(">>> Entering JavaScriptEncodingPropertyAccess(implementation={Implementation})", implementation);
     public CacheLevel Cacheability
     {
         get => implementation.Cacheability;
+		Logger.LogDebug("JavaScriptEncodingPropertyAccess(implementation={Implementation}): get → {Get}", implementation, get);
     }
 
     /// <inheritdoc />
@@ -38,6 +41,7 @@ public class JavaScriptEncodingPropertyAccess(IPropertyAccess implementation) : 
             accessLevel,
             ref propertyNotFound);
 
+		Logger.LogDebug("<<< Exiting JavaScriptEncodingPropertyAccess(implementation={Implementation})", implementation);
         return HttpUtility.JavaScriptStringEncode(result);
     }
 }

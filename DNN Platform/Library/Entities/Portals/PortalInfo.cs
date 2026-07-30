@@ -55,6 +55,7 @@ namespace DotNetNuke.Entities.Portals
     [Serializable]
     public class PortalInfo : BaseEntityInfo, IHydratable, IPortalInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private string administratorRoleName;
         private int pages = Null.NullInteger;
         private string registeredRoleName;
@@ -75,7 +76,10 @@ namespace DotNetNuke.Entities.Portals
         /// </remarks>
         public PortalInfo()
         {
+			Logger.LogDebug(">>> Entering PortalInfo()");
             this.Users = Null.NullInteger;
+			Logger.LogDebug("<<< Exiting PortalInfo()");
+			Logger.LogDebug("PortalInfo(): this.Users → {Arg0}", this.Users);
         }
 
         /// <inheritdoc />
@@ -424,6 +428,7 @@ namespace DotNetNuke.Entities.Portals
         /// <seealso cref="KeyID"></seealso></remarks>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.ThisAsInterface.PortalId = Null.SetNullInteger(dr["PortalID"]);
 
             try
@@ -432,6 +437,7 @@ namespace DotNetNuke.Entities.Portals
             }
             catch (IndexOutOfRangeException)
             {
+				Logger.LogError("Exception in Fill(dr={Dr}): {Arg1}", dr, ex.Message);
                 if (Globals.Status == Globals.UpgradeStatus.None)
                 {
                     // this should not happen outside of an upgrade situation
@@ -464,6 +470,7 @@ namespace DotNetNuke.Entities.Portals
             this.ProcessorUserId = Null.SetNullString(dr["ProcessorUserId"]);
             var p = Null.SetNullString(dr["ProcessorPassword"]);
             try
+			Logger.LogDebug("Fill(dr={Dr}): p → {P}", dr, p);
             {
                 this.ProcessorPassword = string.IsNullOrEmpty(p)
                     ? p
@@ -473,6 +480,7 @@ namespace DotNetNuke.Entities.Portals
             {
                 // for backward compatibility
                 this.ProcessorPassword = p;
+				Logger.LogDebug("Fill(dr={Dr}): this.ProcessorPassword → {Arg1}", dr, this.ProcessorPassword);
             }
 
             this.SplashTabId = Null.SetNullInteger(dr["SplashTabID"]);
@@ -483,8 +491,10 @@ namespace DotNetNuke.Entities.Portals
             this.SearchTabId = Null.SetNullInteger(dr["SearchTabID"]);
 
             this.Custom404TabId = this.Custom500TabId = Null.NullInteger;
+			Logger.LogDebug("Fill(dr={Dr}): this.Custom404TabId → {Arg1}", dr, this.Custom404TabId);
             var schema = dr.GetSchemaTable();
             if (schema != null)
+			Logger.LogDebug("Fill(dr={Dr}): schema → {Schema}", dr, schema);
             {
                 if (schema.Select("ColumnName = 'Custom404TabId'").Length > 0)
                 {
@@ -508,10 +518,14 @@ namespace DotNetNuke.Entities.Portals
 
             this.FillInternal(dr);
             this.AdministratorRoleName = Null.NullString;
+			Logger.LogDebug("Fill(dr={Dr}): this.AdministratorRoleName → {Arg1}", dr, this.AdministratorRoleName);
+			Logger.LogDebug("Fill(dr={Dr}): this.Users → {Arg1}", dr, this.Users);
             this.RegisteredRoleName = Null.NullString;
 
+			Logger.LogDebug("Fill(dr={Dr}): this.RegisteredRoleName → {Arg1}", dr, this.RegisteredRoleName);
             this.Users = Null.NullInteger;
             this.Pages = Null.NullInteger;
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

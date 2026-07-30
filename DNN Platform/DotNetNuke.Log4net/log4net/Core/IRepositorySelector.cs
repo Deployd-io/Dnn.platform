@@ -45,6 +45,7 @@ namespace log4net.Core
     /// </remarks>
     public class LoggerRepositoryCreationEventArgs : EventArgs
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>The <see cref="ILoggerRepository"/> created</summary>
         private ILoggerRepository m_repository;
 
@@ -57,7 +58,11 @@ namespace log4net.Core
         /// </remarks>
         public LoggerRepositoryCreationEventArgs(ILoggerRepository repository)
         {
+			Logger.LogDebug(">>> Entering LoggerRepositoryCreationEventArgs(repository={Repository})", repository);
             this.m_repository = repository;
+			Logger.LogDebug("<<< Exiting LoggerRepositoryCreationEventArgs(repository={Repository})", repository);
+			Logger.LogDebug("LoggerRepositoryCreationEventArgs(repository={Repository}): m_repository → {M_repository}", repository, m_repository);
+			Logger.LogDebug("LoggerRepositoryCreationEventArgs(repository={Repository}): this.m_repository → {Arg1}", repository, this.m_repository);
         }
 
         /// <summary>The <see cref="ILoggerRepository"/> that has been created</summary>

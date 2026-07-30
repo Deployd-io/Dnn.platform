@@ -13,6 +13,7 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A text button control.</summary>
     public class DnnTextButton : LinkButton, ILocalizable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private bool localize = true;
 
         /// <summary>Gets or sets a confirmation message to display when the button is clicked.</summary>
@@ -107,6 +108,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         public virtual void LocalizeStrings()
         {
+			Logger.LogDebug(">>> Entering LocalizeStrings()");
             if (this.Localize)
             {
                 if (!string.IsNullOrEmpty(this.ToolTip))
@@ -126,30 +128,37 @@ namespace DotNetNuke.Web.UI.WebControls
                     if (string.IsNullOrEmpty(this.ToolTip))
                     {
                         this.ToolTip = this.Text;
+						Logger.LogDebug("LocalizeStrings(): this.ToolTip → {Arg0}", this.ToolTip);
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting LocalizeStrings()");
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             this.LocalResourceFile = Utilities.GetLocalResourceFile(this);
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer);
             this.LocalizeStrings();
             if (!this.Enabled && !string.IsNullOrEmpty(this.DisabledCssClass))
             {
                 this.CssClass = this.DisabledCssClass;
+				Logger.LogDebug("Render(writer={Writer}): this.CssClass → {Arg1}", writer, this.CssClass);
             }
 
             writer.AddAttribute("class", this.CssClass.Trim());
             base.Render(writer);
+			Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer);
         }
     }
 }

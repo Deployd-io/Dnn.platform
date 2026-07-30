@@ -11,6 +11,7 @@ namespace DotNetNuke.Abstractions.Portals
     /// <summary>Represents a CSS color and its components.</summary>
     public struct StyleColor
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private static readonly Regex HexColorRegex = new Regex(@"([\da-f]{3}){1,2}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private readonly byte red;
@@ -22,6 +23,10 @@ namespace DotNetNuke.Abstractions.Portals
         public StyleColor()
             : this("FFFFFF")
         {
+		Logger.LogDebug(">>> Entering StyleColor()");
+		Logger.LogDebug(">>> Entering StyleColor(hexValue={HexValue})", hexValue);
+		Logger.LogDebug("<<< Exiting StyleColor()");
+		Logger.LogDebug("<<< Exiting StyleColor(hexValue={HexValue})", hexValue);
         }
 
         /// <summary>Initializes a new instance of the <see cref="StyleColor"/> struct.</summary>
@@ -31,9 +36,13 @@ namespace DotNetNuke.Abstractions.Portals
             AssertIsValidCssColor(hexValue);
 
             this.HexValue = hexValue;
+			Logger.LogDebug("StyleColor(hexValue={HexValue}): this.HexValue → {Arg1}", hexValue, this.HexValue);
             this.red = byte.Parse(this.HexValue.Substring(0, 2), System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture);
             this.green = byte.Parse(this.HexValue.Substring(2, 2), System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+			Logger.LogDebug("StyleColor(hexValue={HexValue}): red → {Red}", hexValue, red);
+			Logger.LogDebug("StyleColor(hexValue={HexValue}): green → {Green}", hexValue, green);
             this.blue = byte.Parse(this.HexValue.Substring(4, 2), System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+			Logger.LogDebug("StyleColor(hexValue={HexValue}): blue → {Blue}", hexValue, blue);
         }
 
         private enum Component
@@ -89,6 +98,7 @@ namespace DotNetNuke.Abstractions.Portals
 
         private static void AssertIsValidCssColor(string hexValue)
         {
+			Logger.LogDebug(">>> Entering AssertIsValidCssColor(hexValue={HexValue})", hexValue);
             if (string.IsNullOrWhiteSpace(hexValue))
             {
                 throw new ArgumentNullException(nameof(hexValue), "You need to provide a CSS color value in the constructor");
@@ -98,10 +108,12 @@ namespace DotNetNuke.Abstractions.Portals
             {
                 throw new ArgumentOutOfRangeException(nameof(hexValue), hexValue, $"The value {hexValue} that was provided is not valid, it needs to be 3 or 6 character long hexadecimal string without the # sing");
             }
+			Logger.LogDebug("<<< Exiting AssertIsValidCssColor(hexValue={HexValue})", hexValue);
         }
 
         private void SetComponent(Component comp, byte value)
         {
+			Logger.LogDebug(">>> Entering SetComponent(comp={Comp},value={Value})", comp, value);
             switch (comp)
             {
                 case Component.Red:
@@ -116,6 +128,7 @@ namespace DotNetNuke.Abstractions.Portals
                 default:
                     break;
             }
+			Logger.LogDebug("<<< Exiting SetComponent(comp={Comp},value={Value})", comp, value);
         }
     }
 }

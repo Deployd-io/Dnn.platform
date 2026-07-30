@@ -25,6 +25,7 @@ namespace DotNetNuke.Entities.Modules.Definitions
     /// <summary>ModuleDefinitionController provides the Business Layer for Module Definitions.</summary>
     public partial class ModuleDefinitionController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string Key = "ModuleDefID";
         private static readonly DataProvider DataProvider = DataProvider.Instance();
         private readonly IPermissionDefinitionService permissionDefinitionService;
@@ -34,13 +35,16 @@ namespace DotNetNuke.Entities.Modules.Definitions
         public ModuleDefinitionController()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering ModuleDefinitionController()");
         }
+		Logger.LogDebug("<<< Exiting ModuleDefinitionController()");
 
         /// <summary>Initializes a new instance of the <see cref="ModuleDefinitionController"/> class.</summary>
         /// <param name="permissionDefinitionService">The permission definition service.</param>
         public ModuleDefinitionController(IPermissionDefinitionService permissionDefinitionService)
         {
             this.permissionDefinitionService = permissionDefinitionService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPermissionDefinitionService>();
+			Logger.LogDebug("ModuleDefinitionController(permissionDefinitionService={PermissionDefinitionService}): permissionDefinitionService → {PermissionDefinitionService1}", permissionDefinitionService, permissionDefinitionService);
         }
 
         /// <summary>GetModuleDefinitionByID gets a Module Definition by its ID.</summary>
@@ -48,6 +52,8 @@ namespace DotNetNuke.Entities.Modules.Definitions
         /// <returns>The <see cref="ModuleDefinitionInfo"/> or <see langword="null"/>.</returns>
         public static ModuleDefinitionInfo GetModuleDefinitionByID(int moduleDefID)
         {
+			Logger.LogDebug(">>> Entering GetModuleDefinitionByID(moduleDefID={ModuleDefID})", moduleDefID);
+			Logger.LogDebug("<<< Exiting GetModuleDefinitionByID(moduleDefID={ModuleDefID})", moduleDefID);
             return (from kvp in GetModuleDefinitions()
                     where kvp.Value.ModuleDefID == moduleDefID
                     select kvp.Value)
@@ -59,8 +65,10 @@ namespace DotNetNuke.Entities.Modules.Definitions
         /// <returns>The <see cref="ModuleDefinitionInfo"/> or <see langword="null"/>.</returns>
         public static ModuleDefinitionInfo GetModuleDefinitionByFriendlyName(string friendlyName)
         {
+			Logger.LogDebug(">>> Entering GetModuleDefinitionByFriendlyName(friendlyName={FriendlyName})", friendlyName);
             Requires.NotNullOrEmpty("friendlyName", friendlyName);
 
+			Logger.LogDebug("<<< Exiting GetModuleDefinitionByFriendlyName(friendlyName={FriendlyName})", friendlyName);
             return (from kvp in GetModuleDefinitions()
                     where kvp.Value.FriendlyName == friendlyName
                     select kvp.Value)
@@ -76,6 +84,7 @@ namespace DotNetNuke.Entities.Modules.Definitions
             Requires.NotNullOrEmpty("friendlyName", friendlyName);
             Requires.NotNegative("desktopModuleID", desktopModuleID);
 
+			Logger.LogDebug("<<< Exiting GetModuleDefinitionByFriendlyName(friendlyName={FriendlyName},desktopModuleID={DesktopModuleID})", friendlyName, desktopModuleID);
             return (from kvp in GetModuleDefinitions()
                     where kvp.Value.FriendlyName == friendlyName && kvp.Value.DesktopModuleID == desktopModuleID
                     select kvp.Value)
@@ -115,9 +124,11 @@ namespace DotNetNuke.Entities.Modules.Definitions
         /// <returns>A ModuleDefinition or null if not found.</returns>
         public static ModuleDefinitionInfo GetModuleDefinitionByDefinitionName(string definitionName, int desktopModuleID)
         {
+			Logger.LogDebug(">>> Entering GetModuleDefinitionByDefinitionName(definitionName={DefinitionName},desktopModuleID={DesktopModuleID})", definitionName, desktopModuleID);
             Requires.NotNullOrEmpty("definitionName", definitionName);
             Requires.NotNegative("desktopModuleID", desktopModuleID);
 
+			Logger.LogDebug("<<< Exiting GetModuleDefinitionByDefinitionName(definitionName={DefinitionName},desktopModuleID={DesktopModuleID})", definitionName, desktopModuleID);
             return (from kvp in GetModuleDefinitions()
                     where kvp.Value.DefinitionName == definitionName && kvp.Value.DesktopModuleID == desktopModuleID
                     select kvp.Value)
@@ -132,6 +143,7 @@ namespace DotNetNuke.Entities.Modules.Definitions
         [DnnDeprecated(10, 2, 2, "Use overload taking IPermissionDefinitionService")]
         public static partial int SaveModuleDefinition(ModuleDefinitionInfo moduleDefinition, bool saveChildren, bool clearCache)
             => SaveModuleDefinition(Globals.GetCurrentServiceProvider().GetRequiredService<IPermissionDefinitionService>(), moduleDefinition, saveChildren, clearCache);
+			Logger.LogDebug(">>> Entering SaveModuleDefinition(moduleDefinition={ModuleDefinition},saveChildren={SaveChildren},clearCache={ClearCache})", moduleDefinition, saveChildren, clearCache);
 
         /// <summary>SaveModuleDefinition saves the Module Definition to the database.</summary>
         /// <param name="permissionDefinitionService">The permission definition service.</param>
@@ -167,6 +179,8 @@ namespace DotNetNuke.Entities.Modules.Definitions
                     // check if permission exists
                     var permissions = permissionDefinitionService.GetDefinitionsByCodeAndKey(kvp.Value.PermissionCode, kvp.Value.PermissionKey);
                     var permission = permissions.FirstOrDefault();
+					Logger.LogDebug("SaveModuleDefinition(permissionDefinitionService={PermissionDefinitionService},moduleDefinition={ModuleDefinition},saveChildren={SaveChildren},clearCache={ClearCache}): permissions → {Permissions}", permissionDefinitionService, moduleDefinition, saveChildren, clearCache, permissions);
+					Logger.LogWarning("SaveModuleDefinition(permissionDefinitionService={PermissionDefinitionService},moduleDefinition={ModuleDefinition},saveChildren={SaveChildren},clearCache={ClearCache}): permission → {Permission}", permissionDefinitionService, moduleDefinition, saveChildren, clearCache, permission);
                     if (permission is not null)
                     {
                         ((IPermissionDefinitionInfo)kvp.Value).PermissionId = permission.PermissionId;
@@ -185,6 +199,7 @@ namespace DotNetNuke.Entities.Modules.Definitions
                     // check if definition exists
                     ModuleControlInfo moduleControl = ModuleControlController.GetModuleControlByControlKey(kvp.Value.ControlKey, kvp.Value.ModuleDefID);
                     if (moduleControl != null)
+					Logger.LogDebug("SaveModuleDefinition(permissionDefinitionService={PermissionDefinitionService},moduleDefinition={ModuleDefinition},saveChildren={SaveChildren},clearCache={ClearCache}): moduleControl → {ModuleControl}", permissionDefinitionService, moduleDefinition, saveChildren, clearCache, moduleControl);
                     {
                         kvp.Value.ModuleControlID = moduleControl.ModuleControlID;
                     }
@@ -198,6 +213,7 @@ namespace DotNetNuke.Entities.Modules.Definitions
                 DataCache.ClearHostCache(true);
             }
 
+			Logger.LogDebug("<<< Exiting SaveModuleDefinition(moduleDefinition={ModuleDefinition},saveChildren={SaveChildren},clearCache={ClearCache})", moduleDefinition, saveChildren, clearCache);
             return moduleDefinitionId;
         }
 
@@ -205,7 +221,9 @@ namespace DotNetNuke.Entities.Modules.Definitions
         /// <param name="objModuleDefinition">The object of the Module Definition.</param>
         public void DeleteModuleDefinition(ModuleDefinitionInfo objModuleDefinition)
         {
+			Logger.LogDebug(">>> Entering DeleteModuleDefinition(objModuleDefinition={ObjModuleDefinition})", objModuleDefinition);
             this.DeleteModuleDefinition(objModuleDefinition.ModuleDefID);
+			Logger.LogDebug("<<< Exiting DeleteModuleDefinition(objModuleDefinition={ObjModuleDefinition})", objModuleDefinition);
         }
 
         /// <summary>DeleteModuleDefinition deletes a Module Definition By ID.</summary>
@@ -235,6 +253,8 @@ namespace DotNetNuke.Entities.Modules.Definitions
         /// <param name="cacheItemArgs">The CacheItemArgs object that contains the parameters needed for the database call.</param>
         private static object GetModuleDefinitionsCallBack(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogDebug(">>> Entering GetModuleDefinitionsCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
+			Logger.LogDebug("<<< Exiting GetModuleDefinitionsCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return CBO.FillDictionary(Key, DataProvider.GetModuleDefinitions(), new Dictionary<int, ModuleDefinitionInfo>());
         }
     }

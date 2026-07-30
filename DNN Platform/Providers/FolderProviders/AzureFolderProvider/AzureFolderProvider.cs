@@ -30,6 +30,7 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
     /// <inheritdoc />
     public class AzureFolderProvider : BaseRemoteStorageProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         internal const string ProviderName = "AzureFolderProvider";
         internal const string ProviderType = "folder";
 
@@ -42,6 +43,7 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
         public AzureFolderProvider()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering AzureFolderProvider()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="AzureFolderProvider"/> class.</summary>
@@ -52,13 +54,19 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
         {
             this.cryptographyProvider = cryptographyProvider ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<ICryptographyProvider>();
 
+			Logger.LogDebug("AzureFolderProvider(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider}): cryptographyProvider → {CryptographyProvider1}", hostSettings, cryptographyProvider, cryptographyProvider);
+			Logger.LogDebug("AzureFolderProvider(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider}): ServicePointManager.DefaultConnectionLimit → {Arg2}", hostSettings, cryptographyProvider, ServicePointManager.DefaultConnectionLimit);
+			Logger.LogDebug("AzureFolderProvider(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider}): ServicePointManager.UseNagleAlgorithm → {Arg2}", hostSettings, cryptographyProvider, ServicePointManager.UseNagleAlgorithm);
+			Logger.LogDebug("AzureFolderProvider(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider}): ServicePointManager.Expect100Continue → {Arg2}", hostSettings, cryptographyProvider, ServicePointManager.Expect100Continue);
             ServicePointManager.DefaultConnectionLimit = 100;
             ServicePointManager.UseNagleAlgorithm = false;
             ServicePointManager.Expect100Continue = false;
 
+			Logger.LogDebug("<<< Exiting AzureFolderProvider()");
             // Read the configuration specific information for this provider
             var objProvider = (Provider)this.providerConfiguration.Providers[ProviderName];
 
+			Logger.LogDebug("AzureFolderProvider(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider}): objProvider → {ObjProvider}", hostSettings, cryptographyProvider, objProvider);
             if (!string.IsNullOrEmpty(objProvider.Attributes["cacheControl"]))
             {
                 this.cacheControl = objProvider.Attributes["cacheControl"].ToLowerInvariant();
@@ -90,26 +98,34 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
         /// <inheritdoc />
         public override string GetFileUrl(IFileInfo file)
         {
+			Logger.LogDebug(">>> Entering GetFileUrl(file={File})", file);
             Requires.NotNull("file", file);
 
             var folderMapping = FolderMappingController.Instance.GetFolderMapping(file.PortalId, file.FolderMappingID);
             var directLink = string.IsNullOrEmpty(GetSetting(folderMapping, Constants.DirectLink)) || GetSetting(folderMapping, Constants.DirectLink).ToLowerInvariant() == "true";
+			Logger.LogDebug("GetFileUrl(file={File}): folderMapping → {FolderMapping}", file, folderMapping);
+			Logger.LogDebug("GetFileUrl(file={File}): directLink → {DirectLink}", file, directLink);
 
             if (directLink)
             {
                 var folder = FolderManager.Instance.GetFolder(file.FolderId);
                 var uri = folder.MappedPath + file.FileName;
+				Logger.LogDebug("GetFileUrl(file={File}): folder → {Folder}", file, folder);
 
                 var container = this.GetContainer(folderMapping);
                 var blob = container.GetBlobReference(uri);
+				Logger.LogDebug("GetFileUrl(file={File}): container → {Container}", file, container);
+				Logger.LogDebug("GetFileUrl(file={File}): blob → {Blob}", file, blob);
                 var absuri = blob.Uri.AbsoluteUri;
                 var customDomain = GetEncryptedSetting(this.cryptographyProvider, this.HostSettings, folderMapping.FolderMappingSettings, Constants.CustomDomain);
 
+				Logger.LogDebug("GetFileUrl(file={File}): customDomain → {CustomDomain}", file, customDomain);
                 if (!string.IsNullOrEmpty(customDomain))
                 {
                     var customUri = new UriBuilder(customDomain).Uri;
                     absuri =
                         new UriBuilder(blob.Uri.AbsoluteUri) { Host = customUri.Host, Scheme = customUri.Scheme, Port = customUri.Port }
+						Logger.LogDebug("GetFileUrl(file={File}): customUri → {CustomUri}", file, customUri);
                             .Uri.AbsoluteUri;
                 }
 
@@ -158,12 +174,15 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
                 return absuri + signature;
             }
 
+			Logger.LogDebug("<<< Exiting GetFileUrl(file={File})", file);
             return FileLinkClickController.Instance.GetFileLinkClick(file);
         }
 
         /// <inheritdoc />
         public override string GetFolderProviderIconPath()
         {
+			Logger.LogDebug(">>> Entering GetFolderProviderIconPath()");
+			Logger.LogDebug("<<< Exiting GetFolderProviderIconPath()");
             return Globals.ResolveUrl("~/Providers/FolderProviders/AzureFolderProvider/images/FolderAzure_32x32_Standard.png");
         }
 
@@ -291,6 +310,7 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
 
                     return list;
                 });
+				Logger.LogDebug("<<< Exiting GetObjectList(folderMapping={FolderMapping})", folderMapping);
         }
 
         /// <inheritdoc />

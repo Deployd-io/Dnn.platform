@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information
 namespace DotNetNuke.Entities.Portals
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     public static class PortalSettingsExtensions
     {
         /// <summary>Detect whether current page is custom error page.</summary>
@@ -10,6 +11,8 @@ namespace DotNetNuke.Entities.Portals
         /// <returns><see langword="true"/> if the current page is an error page, otherwise <see langword="false"/>.</returns>
         public static bool InErrorPageRequest(this PortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering InErrorPageRequest(portalSettings={PortalSettings})", portalSettings);
+			Logger.LogDebug("<<< Exiting InErrorPageRequest(portalSettings={PortalSettings})", portalSettings);
             return portalSettings.ActiveTab.TabID == portalSettings.ErrorPage404
                    || portalSettings.ActiveTab.TabID == portalSettings.ErrorPage500;
         }

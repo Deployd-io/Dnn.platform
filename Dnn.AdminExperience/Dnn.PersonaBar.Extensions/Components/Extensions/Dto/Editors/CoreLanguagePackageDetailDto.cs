@@ -11,9 +11,12 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
     [JsonObject]
     public class CoreLanguagePackageDetailDto : PackageInfoDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="CoreLanguagePackageDetailDto"/> class.</summary>
         public CoreLanguagePackageDetailDto()
         {
+		Logger.LogDebug(">>> Entering CoreLanguagePackageDetailDto()");
+		Logger.LogDebug("<<< Exiting CoreLanguagePackageDetailDto()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="CoreLanguagePackageDetailDto"/> class.</summary>

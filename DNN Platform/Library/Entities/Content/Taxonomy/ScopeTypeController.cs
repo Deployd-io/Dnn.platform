@@ -19,11 +19,16 @@ namespace DotNetNuke.Entities.Content.Taxonomy
     /// <seealso cref="TermController"/>
     public class ScopeTypeController(IDataService dataService, IHostSettings hostSettings) : IScopeTypeController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const int CacheTimeOut = 20;
+		Logger.LogDebug(">>> Entering ScopeTypeController(dataService={DataService},hostSettings={HostSettings})", dataService, hostSettings);
         private readonly IDataService dataService = dataService ?? Util.GetDataService();
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+		Logger.LogDebug("ScopeTypeController(dataService={DataService},hostSettings={HostSettings}): dataService → {DataService1}", dataService, hostSettings, dataService);
+		Logger.LogDebug("ScopeTypeController(dataService={DataService},hostSettings={HostSettings}): hostSettings → {HostSettings1}", dataService, hostSettings, hostSettings);
 
         /// <summary>Initializes a new instance of the <see cref="ScopeTypeController"/> class.</summary>
+		Logger.LogDebug("<<< Exiting ScopeTypeController(dataService={DataService},hostSettings={HostSettings})", dataService, hostSettings);
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public ScopeTypeController()
             : this(null, null)
@@ -41,6 +46,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         /// <inheritdoc />
         public int AddScopeType(ScopeType scopeType)
         {
+			Logger.LogDebug(">>> Entering AddScopeType(scopeType={ScopeType})", scopeType);
             // Argument Contract
             Requires.NotNull("scopeType", scopeType);
             Requires.PropertyNotNullOrEmpty("scopeType", "ScopeType", scopeType.ScopeType);
@@ -50,18 +56,22 @@ namespace DotNetNuke.Entities.Content.Taxonomy
             // Refresh cached collection of types
             DataCache.RemoveCache(DataCache.ScopeTypesCacheKey);
 
+			Logger.LogDebug("<<< Exiting AddScopeType(scopeType={ScopeType})", scopeType);
             return scopeType.ScopeTypeId;
         }
 
         /// <inheritdoc />
         public void ClearScopeTypeCache()
         {
+			Logger.LogDebug(">>> Entering ClearScopeTypeCache()");
             DataCache.RemoveCache(DataCache.ScopeTypesCacheKey);
+			Logger.LogDebug("<<< Exiting ClearScopeTypeCache()");
         }
 
         /// <inheritdoc />
         public void DeleteScopeType(ScopeType scopeType)
         {
+			Logger.LogDebug(">>> Entering DeleteScopeType(scopeType={ScopeType})", scopeType);
             // Argument Contract
             Requires.NotNull("scopeType", scopeType);
             Requires.PropertyNotNegative("scopeType", "ScopeTypeId", scopeType.ScopeTypeId);
@@ -70,21 +80,25 @@ namespace DotNetNuke.Entities.Content.Taxonomy
 
             // Refresh cached collection of types
             DataCache.RemoveCache(DataCache.ScopeTypesCacheKey);
+			Logger.LogDebug("<<< Exiting DeleteScopeType(scopeType={ScopeType})", scopeType);
         }
 
         /// <inheritdoc />
         public IQueryable<ScopeType> GetScopeTypes()
         {
+			Logger.LogDebug(">>> Entering GetScopeTypes()");
             var scopeTypes = CBO.GetCachedObject<List<ScopeType>>(
                 this.hostSettings,
                 new CacheItemArgs(DataCache.ScopeTypesCacheKey, CacheTimeOut),
                 this.GetScopeTypesCallBack);
+			Logger.LogDebug("<<< Exiting GetScopeTypes()");
             return scopeTypes.AsQueryable();
         }
 
         /// <inheritdoc />
         public void UpdateScopeType(ScopeType scopeType)
         {
+			Logger.LogDebug(">>> Entering UpdateScopeType(scopeType={ScopeType})", scopeType);
             // Argument Contract
             Requires.NotNull("scopeType", scopeType);
             Requires.PropertyNotNegative("scopeType", "ScopeTypeId", scopeType.ScopeTypeId);
@@ -94,10 +108,13 @@ namespace DotNetNuke.Entities.Content.Taxonomy
 
             // Refresh cached collection of types
             DataCache.RemoveCache(DataCache.ScopeTypesCacheKey);
+			Logger.LogDebug("<<< Exiting UpdateScopeType(scopeType={ScopeType})", scopeType);
         }
 
         private object GetScopeTypesCallBack(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogDebug(">>> Entering GetScopeTypesCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
+			Logger.LogDebug("<<< Exiting GetScopeTypesCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return CBO.FillQueryable<ScopeType>(this.dataService.GetScopeTypes()).ToList();
         }
     }

@@ -6,6 +6,7 @@ Imports System.Xml.Serialization
 Namespace DotNetNuke.UI.Utilities
 
     Public Class FunctionalityInfo
+	Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(FunctionalityInfo))
 
         Private _desc As String
         Private _functionality As ClientAPI.ClientFunctionality
@@ -53,16 +54,21 @@ Namespace DotNetNuke.UI.Utilities
         End Property
 
         Public Function HasMatch(ByVal strAgent As String, ByVal strBrowser As String, ByVal dblVersion As Double) As Boolean
+			Logger.LogDebug(">>> Entering HasMatch(strAgent={StrAgent},strBrowser={StrBrowser},dblVersion={DblVersion})", strAgent, strBrowser, dblVersion)
             Dim _hasMatch As Boolean = False
 
             'Parse through the supported browsers to find a match
             _hasMatch = HasMatch(Supports, strAgent, strBrowser, dblVersion)
+			Logger.LogDebug("HasMatch(strAgent={StrAgent},strBrowser={StrBrowser},dblVersion={DblVersion}): _hasMatch → {_hasMatch}", strAgent, strBrowser, dblVersion, _hasMatch)
 
             'If has Match check the excluded browsers to find a match
             If _hasMatch Then
                 _hasMatch = Not HasMatch(Excludes, strAgent, strBrowser, dblVersion)
             End If
 
+			Logger.LogDebug(">>> Entering HasMatch(browsers={Browsers},strAgent={StrAgent},strBrowser={StrBrowser},dblVersion={DblVersion})", browsers, strAgent, strBrowser, dblVersion)
+			Logger.LogDebug("<<< Exiting HasMatch(strAgent={StrAgent},strBrowser={StrBrowser},dblVersion={DblVersion})", strAgent, strBrowser, dblVersion)
+			Logger.LogDebug("<<< Exiting HasMatch(browsers={Browsers},strAgent={StrAgent},strBrowser={StrBrowser},dblVersion={DblVersion})", browsers, strAgent, strBrowser, dblVersion)
             Return _hasMatch
         End Function
 

@@ -25,6 +25,7 @@ namespace Dnn.PersonaBar.Pages.Components
 
     public class PageUrlsController : ServiceLocator<IPageUrlsController, PageUrlsController>, IPageUrlsController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private enum SortingFields
         {
             None = 0,
@@ -43,20 +44,27 @@ namespace Dnn.PersonaBar.Pages.Components
         /// <inheritdoc />
         public IEnumerable<Url> GetPageUrls(TabInfo tab, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetPageUrls(tab={Tab},portalId={PortalId})", tab, portalId);
             var locales = new Lazy<Dictionary<string, Locale>>(() => LocaleController.Instance.GetLocales(portalId));
             var customUrls = this.GetSortedUrls(tab, portalId, locales, 1, true, false);
+			Logger.LogDebug("GetPageUrls(tab={Tab},portalId={PortalId}): locales → {Locales}", tab, portalId, locales);
+			Logger.LogDebug("GetPageUrls(tab={Tab},portalId={PortalId}): customUrls → {CustomUrls}", tab, portalId, customUrls);
             var automaticUrls = this.GetSortedUrls(tab, portalId, locales, 1, true, true).ToList();
 
+			Logger.LogDebug("GetPageUrls(tab={Tab},portalId={PortalId}): automaticUrls → {AutomaticUrls}", tab, portalId, automaticUrls);
             automaticUrls.AddRange(customUrls);
+			Logger.LogDebug("<<< Exiting GetPageUrls(tab={Tab},portalId={PortalId})", tab, portalId);
             return automaticUrls.OrderBy(url => url.StatusCode, new KeyValuePairComparer()).ThenBy(url => url.Path);
         }
 
         /// <inheritdoc />
         public PageUrlResult CreateCustomUrl(SaveUrlDto dto, TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering CreateCustomUrl(dto={Dto},tab={Tab})", dto, tab);
             var portalSettings = PortalSettings.Current;
             IPortalInfo aliasPortal = new PortalAliasController().GetPortalByPortalAliasID(dto.SiteAliasKey);
 
+			Logger.LogDebug("CreateCustomUrl(dto={Dto},tab={Tab}): aliasPortal → {AliasPortal}", dto, tab, aliasPortal);
             if (aliasPortal != null && portalSettings.PortalId != aliasPortal.PortalId)
             {
                 return new PageUrlResult
@@ -69,9 +77,11 @@ namespace Dnn.PersonaBar.Pages.Components
 
             var urlPath = dto.Path.ValueOrEmpty().TrimStart('/');
 
+			Logger.LogDebug("CreateCustomUrl(dto={Dto},tab={Tab}): urlPath → {UrlPath}", dto, tab, urlPath);
             // Clean Url
             var options = UrlRewriterUtils.ExtendOptionsForCustomURLs(UrlRewriterUtils.GetOptionsFromSettings(new FriendlyUrlSettings(portalSettings.PortalId)));
 
+			Logger.LogDebug("CreateCustomUrl(dto={Dto},tab={Tab}): options → {Options}", dto, tab, options);
             urlPath = FriendlyUrlController.CleanNameForUrl(urlPath, options, out var modified);
             if (modified)
             {
@@ -107,6 +117,8 @@ namespace Dnn.PersonaBar.Pages.Components
 
             var seqNum = (tab.TabUrls.Count > 0) ? tab.TabUrls.Max(t => t.SeqNum) + 1 : 1;
             var portalLocales = LocaleController.Instance.GetLocales(portalSettings.PortalId);
+			Logger.LogDebug("CreateCustomUrl(dto={Dto},tab={Tab}): seqNum → {SeqNum}", dto, tab, seqNum);
+			Logger.LogDebug("CreateCustomUrl(dto={Dto},tab={Tab}): portalLocales → {PortalLocales}", dto, tab, portalLocales);
 
             // Get the culture code of selected portal alias
             var alias = PortalAliasController.Instance
@@ -129,6 +141,7 @@ namespace Dnn.PersonaBar.Pages.Components
 
             var portalAliasUsage = (PortalAliasUsageType)dto.SiteAliasUsage;
             if (portalAliasUsage == PortalAliasUsageType.Default)
+			Logger.LogDebug("CreateCustomUrl(dto={Dto},tab={Tab}): portalAliasUsage → {PortalAliasUsage}", dto, tab, portalAliasUsage);
             {
                 if (string.IsNullOrEmpty(cultureCode) || alias == null)
                 {
@@ -169,6 +182,7 @@ namespace Dnn.PersonaBar.Pages.Components
 
             TabController.Instance.SaveTabUrl(tabUrl, portalSettings.PortalId, true);
 
+			Logger.LogDebug("<<< Exiting CreateCustomUrl(dto={Dto},tab={Tab})", dto, tab);
             return new PageUrlResult
             {
                 Success = true,
@@ -179,9 +193,11 @@ namespace Dnn.PersonaBar.Pages.Components
         /// <inheritdoc />
         public PageUrlResult UpdateCustomUrl(SaveUrlDto dto, TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering UpdateCustomUrl(dto={Dto},tab={Tab})", dto, tab);
             var portalSettings = PortalSettings.Current;
             var urlPath = dto.Path.ValueOrEmpty().TrimStart('/');
 
+			Logger.LogDebug("UpdateCustomUrl(dto={Dto},tab={Tab}): urlPath → {UrlPath}", dto, tab, urlPath);
             // Clean Url
             var options =
                 UrlRewriterUtils.ExtendOptionsForCustomURLs(
@@ -218,6 +234,8 @@ namespace Dnn.PersonaBar.Pages.Components
 
             var statusCodeKey = dto.StatusCodeKey.ToString(CultureInfo.InvariantCulture);
             var tabUrl = tab.TabUrls.SingleOrDefault(t => t.SeqNum == dto.Id && t.HttpStatus == statusCodeKey);
+			Logger.LogDebug("UpdateCustomUrl(dto={Dto},tab={Tab}): statusCodeKey → {StatusCodeKey}", dto, tab, statusCodeKey);
+			Logger.LogDebug("UpdateCustomUrl(dto={Dto},tab={Tab}): tabUrl → {TabUrl}", dto, tab, tabUrl);
 
             if (statusCodeKey == "200")
             {
@@ -245,6 +263,8 @@ namespace Dnn.PersonaBar.Pages.Components
                     {
                         // Change the original 200 url to a redirect
                         tabUrl.HttpStatus = "301";
+						Logger.LogDebug("UpdateCustomUrl(dto={Dto},tab={Tab}): tabUrl.HttpStatus → {Arg2}", dto, tab, tabUrl.HttpStatus);
+						Logger.LogDebug("UpdateCustomUrl(dto={Dto},tab={Tab}): tabUrl.SeqNum → {Arg2}", dto, tab, tabUrl.SeqNum);
                         tabUrl.SeqNum = dto.Id;
                         TabController.Instance.SaveTabUrl(tabUrl, portalSettings.PortalId, true);
 
@@ -253,6 +273,8 @@ namespace Dnn.PersonaBar.Pages.Components
                         tabUrl.HttpStatus = "200";
                         tabUrl.SeqNum = tab.TabUrls.Max(t => t.SeqNum) + 1;
                         tabUrl.CultureCode = cultureCode;
+						Logger.LogDebug("UpdateCustomUrl(dto={Dto},tab={Tab}): tabUrl.CultureCode → {Arg2}", dto, tab, tabUrl.CultureCode);
+						Logger.LogDebug("UpdateCustomUrl(dto={Dto},tab={Tab}): tabUrl.PortalAliasId → {Arg2}", dto, tab, tabUrl.PortalAliasId);
                         tabUrl.PortalAliasId = dto.SiteAliasKey;
                         tabUrl.PortalAliasUsage = (PortalAliasUsageType)dto.SiteAliasUsage;
                         tabUrl.QueryString = dto.QueryString.ValueOrEmpty();
@@ -300,6 +322,7 @@ namespace Dnn.PersonaBar.Pages.Components
                 }
             }
 
+			Logger.LogDebug("<<< Exiting UpdateCustomUrl(dto={Dto},tab={Tab})", dto, tab);
             return new PageUrlResult
             {
                 Success = true,
@@ -309,11 +332,15 @@ namespace Dnn.PersonaBar.Pages.Components
         /// <inheritdoc />
         public PageUrlResult DeleteCustomUrl(int id, TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering DeleteCustomUrl(id={Id},tab={Tab})", id, tab);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
             var tabUrl = tab.TabUrls.SingleOrDefault(u => u.SeqNum == id);
+			Logger.LogDebug("DeleteCustomUrl(id={Id},tab={Tab}): portalSettings → {PortalSettings}", id, tab, portalSettings);
+			Logger.LogDebug("DeleteCustomUrl(id={Id},tab={Tab}): tabUrl → {TabUrl}", id, tab, tabUrl);
 
             TabController.Instance.DeleteTabUrl(tabUrl, portalSettings.PortalId, true);
 
+			Logger.LogDebug("<<< Exiting DeleteCustomUrl(id={Id},tab={Tab})", id, tab);
             return new PageUrlResult
             {
                 Success = true,
@@ -323,6 +350,8 @@ namespace Dnn.PersonaBar.Pages.Components
         /// <inheritdoc />
         protected override Func<IPageUrlsController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new PageUrlsController();
         }
 

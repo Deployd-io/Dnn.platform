@@ -23,29 +23,37 @@ namespace DotNetNuke.Modules.Journal
     /// <summary>The EditJournal class is used to manage content.</summary>
     public partial class Edit : JournalModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             this.InitializeComponent();
             base.OnInit(e);
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         private void InitializeComponent()
         {
+			Logger.LogDebug(">>> Entering InitializeComponent()");
             this.Load += new System.EventHandler(this.Page_Load);
+			Logger.LogDebug("<<< Exiting InitializeComponent()");
         }
 
         /// <summary>Page_Load runs when the control is loaded.</summary>
         private void Page_Load(object sender, System.EventArgs e)
         {
+			Logger.LogDebug(">>> Entering Page_Load(sender={Sender},e={E})", sender, e);
             try
             {
                 // Implement your edit logic for your module
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in Page_Load(sender={Sender},e={E}): {Arg2}", sender, e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting Page_Load(sender={Sender},e={E})", sender, e);
         }
     }
 }

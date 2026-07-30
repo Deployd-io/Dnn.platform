@@ -9,24 +9,32 @@ namespace DotNetNuke.Web.Mvc
 
     public class MvcSettingsControl : MvcHostControl, ISettingsControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public MvcSettingsControl()
             : base("Settings")
         {
+			Logger.LogDebug(">>> Entering MvcSettingsControl()");
             this.ExecuteModuleImmediately = false;
+			Logger.LogDebug("<<< Exiting MvcSettingsControl()");
+			Logger.LogDebug("MvcSettingsControl(): this.ExecuteModuleImmediately → {Arg0}", this.ExecuteModuleImmediately);
         }
 
         /// <inheritdoc />
         public void LoadSettings()
         {
+			Logger.LogDebug(">>> Entering LoadSettings()");
             this.ExecuteModule();
+			Logger.LogDebug("<<< Exiting LoadSettings()");
         }
 
         /// <inheritdoc />
         public void UpdateSettings()
         {
+			Logger.LogDebug(">>> Entering UpdateSettings()");
             this.ExecuteModule();
 
             ModuleController.Instance.UpdateModule(this.ModuleContext.Configuration);
+			Logger.LogDebug("<<< Exiting UpdateSettings()");
         }
     }
 }

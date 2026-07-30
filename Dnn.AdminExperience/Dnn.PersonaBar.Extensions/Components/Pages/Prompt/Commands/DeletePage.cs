@@ -19,6 +19,7 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
     [ConsoleCommand("delete-page", Constants.PagesCategory, "Prompt_DeletePage_Description")]
     public class DeletePage : ConsoleCommandBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [FlagParameter("name", "Prompt_DeletePage_FlagName", "String")]
         private const string FlagName = "name";
 
@@ -35,13 +36,17 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
         public DeletePage()
             : this(PagesController.Instance)
         {
+		Logger.LogDebug(">>> Entering DeletePage()");
         }
+		Logger.LogDebug("<<< Exiting DeletePage()");
 
         /// <summary>Initializes a new instance of the <see cref="DeletePage"/> class.</summary>
         /// <param name="pagesController">The pages controller.</param>
         public DeletePage(IPagesController pagesController)
         {
             this.pagesController = pagesController;
+			Logger.LogDebug("DeletePage(pagesController={PagesController}): pagesController → {PagesController1}", pagesController, pagesController);
+			Logger.LogDebug("DeletePage(pagesController={PagesController}): this.pagesController → {Arg1}", pagesController, this.pagesController);
         }
 
         /// <inheritdoc />
@@ -56,6 +61,7 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.PageId = this.GetFlagValue(FlagId, "Page Id", -1, false, true);
             this.PageName = this.GetFlagValue(FlagName, "Page Name", string.Empty);
             this.ParentId = this.GetFlagValue(FlagParentId, "Parent Id", -1);
@@ -64,11 +70,13 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
             {
                 this.AddMessage(this.LocalizeString("Prompt_ParameterRequired"));
             }
+			Logger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             this.PageId = this.PageId != -1
                 ? this.PageId
                 : (this.ParentId > 0 ? TabController.Instance.GetTabByName(this.PageName, this.PortalId, this.ParentId) : TabController.Instance.GetTabByName(this.PageName, this.PortalId))?.TabID ?? -1;
@@ -89,9 +97,11 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
             }
             catch (PageNotFoundException)
             {
+				Logger.LogError("Exception in Run(): {Arg0}", ex.Message);
                 return new ConsoleErrorResultModel(this.LocalizeString("Prompt_PageNotFound"));
             }
 
+			Logger.LogDebug("<<< Exiting Run()");
             return new ConsoleResultModel(this.LocalizeString("PageDeletedMessage")) { Records = 1 };
         }
     }

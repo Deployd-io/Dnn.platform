@@ -32,13 +32,18 @@ namespace DotNetNuke.Entities.Users
     /// <summary>Provides access to profile properties.</summary>
     public partial class ProfilePropertyAccess : IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly UserInfo user;
 
         /// <summary>Initializes a new instance of the <see cref="ProfilePropertyAccess"/> class for a user.</summary>
         /// <param name="user">The user to use for these properties, <see cref="UserInfo"/>.</param>
         public ProfilePropertyAccess(UserInfo user)
         {
+			Logger.LogDebug(">>> Entering ProfilePropertyAccess(user={User})", user);
             this.user = user;
+			Logger.LogDebug("<<< Exiting ProfilePropertyAccess(user={User})", user);
+			Logger.LogDebug("ProfilePropertyAccess(user={User}): user → {User1}", user, user);
+			Logger.LogDebug("ProfilePropertyAccess(user={User}): this.user → {Arg1}", user, this.user);
         }
 
         /// <inheritdoc />
@@ -203,6 +208,7 @@ namespace DotNetNuke.Entities.Users
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with ListController. Scheduled removal in v12.0.0.")]
         public static string DisplayDataType(ProfilePropertyDefinition definition)
             => DisplayDataType(Globals.GetCurrentServiceProvider().GetRequiredService<ListController>(), definition);
+			Logger.LogDebug(">>> Entering DisplayDataType(definition={Definition})", definition);
 
         /// <summary>Gets the date type for a profile property definition.</summary>
         /// <param name="listController">The list controller.</param>
@@ -213,11 +219,13 @@ namespace DotNetNuke.Entities.Users
             string cacheKey = string.Format(CultureInfo.InvariantCulture, "DisplayDataType:{0}", definition.DataType);
             string strDataType = Convert.ToString(DataCache.GetCache(cacheKey), CultureInfo.InvariantCulture) + string.Empty;
             if (strDataType == string.Empty)
+			Logger.LogDebug("DisplayDataType(listController={ListController},definition={Definition}): strDataType → {StrDataType}", listController, definition, strDataType);
             {
                 strDataType = listController.GetListEntryInfo("DataType", definition.DataType).Value;
                 DataCache.SetCache(cacheKey, strDataType);
             }
 
+			Logger.LogDebug("<<< Exiting DisplayDataType(definition={Definition})", definition);
             return strDataType;
         }
 
@@ -225,15 +233,18 @@ namespace DotNetNuke.Entities.Users
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope currentScope, ref bool propertyNotFound)
         {
+			Logger.LogDebug(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound);
             if (currentScope >= Scope.DefaultSettings && this.user is { Profile: not null, })
             {
                 var profile = this.user.Profile;
                 var property = profile.ProfileProperties.SingleOrDefault(p => string.Equals(p.PropertyName, propertyName, StringComparison.OrdinalIgnoreCase));
 
+				Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): property → {Property}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, property);
                 if (property != null)
                 {
                     var portalSettings = PortalController.Instance.GetCurrentSettings();
                     if (CheckAccessLevel(portalSettings, property, accessingUser, this.user))
+					Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): portalSettings → {PortalSettings}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, portalSettings);
                     {
                         switch (property.PropertyName.ToLowerInvariant())
                         {
@@ -252,9 +263,11 @@ namespace DotNetNuke.Entities.Users
                 propertyNotFound = true;
                 return property != null && property.PropertyName.Equals("photo", StringComparison.OrdinalIgnoreCase)
                     ? Globals.ApplicationPath + "/images/no_avatar.gif" : PropertyAccess.ContentLocked;
+				Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): propertyNotFound → {PropertyNotFound1}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, propertyNotFound);
             }
 
             propertyNotFound = true;
+			Logger.LogDebug("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound);
             return string.Empty;
         }
 
@@ -283,11 +296,15 @@ namespace DotNetNuke.Entities.Users
 
         private static bool IsMember(UserInfo accessingUser)
         {
+			Logger.LogDebug(">>> Entering IsMember(accessingUser={AccessingUser})", accessingUser);
+			Logger.LogDebug("<<< Exiting IsMember(accessingUser={AccessingUser})", accessingUser);
             return accessingUser != null && accessingUser.UserID != -1;
         }
 
         private static bool IsUser(UserInfo accessingUser, UserInfo targetUser)
         {
+			Logger.LogDebug(">>> Entering IsUser(accessingUser={AccessingUser},targetUser={TargetUser})", accessingUser, targetUser);
+			Logger.LogDebug("<<< Exiting IsUser(accessingUser={AccessingUser},targetUser={TargetUser})", accessingUser, targetUser);
             return accessingUser != null && accessingUser.UserID == targetUser.UserID;
         }
     }

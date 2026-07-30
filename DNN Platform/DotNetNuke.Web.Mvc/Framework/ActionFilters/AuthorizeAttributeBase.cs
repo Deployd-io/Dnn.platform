@@ -15,8 +15,11 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
 
     public abstract class AuthorizeAttributeBase : FilterAttribute, IAuthorizationFilter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static bool IsAnonymousAttributePresent(AuthorizationContext filterContext)
         {
+			Logger.LogDebug(">>> Entering IsAnonymousAttributePresent(filterContext={FilterContext})", filterContext);
+			Logger.LogDebug("<<< Exiting IsAnonymousAttributePresent(filterContext={FilterContext})", filterContext);
             return filterContext.ActionDescriptor.IsDefined(typeof(AllowAnonymousAttribute), inherit: true)
                                      || filterContext.ActionDescriptor.ControllerDescriptor.IsDefined(typeof(AllowAnonymousAttribute), inherit: true);
         }
@@ -24,6 +27,7 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
         /// <inheritdoc />
         public virtual void OnAuthorization(AuthorizationContext filterContext)
         {
+			Logger.LogDebug(">>> Entering OnAuthorization(filterContext={FilterContext})", filterContext);
             Requires.NotNull("filterContext", filterContext);
 
             if (this.SkipAuthorization(filterContext))
@@ -39,34 +43,44 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
             {
                 this.HandleUnauthorizedRequest(filterContext);
             }
+			Logger.LogDebug("<<< Exiting OnAuthorization(filterContext={FilterContext})", filterContext);
         }
 
         protected virtual bool AuthorizeCore(HttpContextBase httpContext)
         {
+			Logger.LogDebug(">>> Entering AuthorizeCore(httpContext={HttpContext})", httpContext);
+			Logger.LogDebug("<<< Exiting AuthorizeCore(httpContext={HttpContext})", httpContext);
             return true;
         }
 
         protected virtual void HandleAuthorizedRequest(AuthorizationContext filterContext)
         {
+			Logger.LogDebug(">>> Entering HandleAuthorizedRequest(filterContext={FilterContext})", filterContext);
             HttpCachePolicyBase cachePolicy = filterContext.HttpContext.Response.Cache;
             cachePolicy.SetProxyMaxAge(new TimeSpan(0));
             cachePolicy.AddValidationCallback(this.CacheValidateHandler, null /* data */);
+			Logger.LogDebug("<<< Exiting HandleAuthorizedRequest(filterContext={FilterContext})", filterContext);
         }
 
         protected virtual void HandleUnauthorizedRequest(AuthorizationContext filterContext)
         {
+			Logger.LogDebug(">>> Entering HandleUnauthorizedRequest(filterContext={FilterContext})", filterContext);
             const string failureMessage = "Authorization has been denied for this request.";
             var authFilterContext = new AuthFilterContext(Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>(), filterContext, failureMessage);
+			Logger.LogDebug("HandleUnauthorizedRequest(filterContext={FilterContext}): authFilterContext → {AuthFilterContext}", filterContext, authFilterContext);
             authFilterContext.HandleUnauthorizedRequest();
 
             ////filterContext.HttpContext.Response.Redirect(Globals.AccessDeniedURL());
+			Logger.LogDebug("<<< Exiting HandleUnauthorizedRequest(filterContext={FilterContext})", filterContext);
         }
 
         protected virtual HttpValidationStatus OnCacheAuthorization(HttpContextBase httpContext)
         {
+			Logger.LogDebug(">>> Entering OnCacheAuthorization(httpContext={HttpContext})", httpContext);
             Requires.NotNull("httpContext", httpContext);
 
             bool isAuthorized = this.AuthorizeCore(httpContext);
+			Logger.LogDebug("<<< Exiting OnCacheAuthorization(httpContext={HttpContext})", httpContext);
             return isAuthorized ? HttpValidationStatus.Valid : HttpValidationStatus.IgnoreThisRequest;
         }
 
@@ -75,12 +89,17 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
         /// <returns>Whether the <see cref="AllowAnonymousAttribute"/> is present.</returns>
         protected virtual bool SkipAuthorization(AuthorizationContext filterContext)
         {
+			Logger.LogDebug(">>> Entering SkipAuthorization(filterContext={FilterContext})", filterContext);
+			Logger.LogDebug("<<< Exiting SkipAuthorization(filterContext={FilterContext})", filterContext);
             return IsAnonymousAttributePresent(filterContext);
         }
 
         private void CacheValidateHandler(HttpContext context, object data, ref HttpValidationStatus validationStatus)
         {
+			Logger.LogDebug(">>> Entering CacheValidateHandler(context={Context},data={Data},validationStatus={ValidationStatus})", context, data, validationStatus);
             validationStatus = this.OnCacheAuthorization(new HttpContextWrapper(context));
+			Logger.LogDebug("<<< Exiting CacheValidateHandler(context={Context},data={Data},validationStatus={ValidationStatus})", context, data, validationStatus);
+			Logger.LogDebug("CacheValidateHandler(context={Context},data={Data},validationStatus={ValidationStatus}): validationStatus → {ValidationStatus1}", context, data, validationStatus, validationStatus);
         }
     }
 }

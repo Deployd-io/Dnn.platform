@@ -46,6 +46,7 @@ namespace log4net.Appender
     /// <author>Gert Driesen</author>
     public class OutputDebugStringAppender : AppenderSkeleton
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="OutputDebugStringAppender" /> class.</summary>
         /// <remarks>
         /// <para>
@@ -54,6 +55,8 @@ namespace log4net.Appender
         /// </remarks>
         public OutputDebugStringAppender()
         {
+		Logger.LogDebug(">>> Entering OutputDebugStringAppender()");
+		Logger.LogDebug("<<< Exiting OutputDebugStringAppender()");
         }
 
         /// <summary>Write the logging event to the output debug string API</summary>
@@ -71,6 +74,7 @@ namespace log4net.Appender
 #endif
         protected override void Append(LoggingEvent loggingEvent) 
         {
+		Logger.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
 #if NETSTANDARD
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -79,6 +83,7 @@ namespace log4net.Appender
 #endif
 
             OutputDebugString(this.RenderLoggingEvent(loggingEvent));
+			Logger.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
         } 
 
         /// <summary>This appender requires a <see cref="Layout"/> to be set.</summary>

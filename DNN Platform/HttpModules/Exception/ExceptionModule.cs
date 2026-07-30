@@ -25,12 +25,16 @@ namespace DotNetNuke.HttpModules.Exceptions
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void Init(HttpApplication application)
         {
+			Logger.LogDebug(">>> Entering Init(application={Application})", application);
             application.Error += this.OnErrorRequest;
+			Logger.LogDebug("<<< Exiting Init(application={Application})", application);
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+		Logger.LogDebug(">>> Entering Dispose()");
+		Logger.LogDebug("<<< Exiting Dispose()");
         }
 
         /// <summary>Called when error handling is requested.</summary>
@@ -38,6 +42,7 @@ namespace DotNetNuke.HttpModules.Exceptions
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         public void OnErrorRequest(object s, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnErrorRequest(s={S},e={E})", s, e);
             try
             {
                 if (HttpContext.Current == null)
@@ -78,6 +83,7 @@ namespace DotNetNuke.HttpModules.Exceptions
                 // in this case we just want to exit since there is nothing else we can do
                 Logger.Error(exc);
             }
+			Logger.LogDebug("<<< Exiting OnErrorRequest(s={S},e={E})", s, e);
         }
     }
 }

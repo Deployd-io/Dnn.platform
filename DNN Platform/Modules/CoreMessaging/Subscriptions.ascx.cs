@@ -35,11 +35,16 @@ namespace DotNetNuke.Modules.CoreMessaging
     public partial class Subscriptions(IClientResourceController clientResourceController, IServicesFramework servicesFramework, IHostSettings hostSettings)
         : UserControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string SharedResources = "~/DesktopModules/CoreMessaging/App_LocalResources/SharedResources.resx";
+		Logger.LogDebug(">>> Entering Subscriptions(clientResourceController={ClientResourceController},servicesFramework={ServicesFramework},hostSettings={HostSettings})", clientResourceController, servicesFramework, hostSettings);
         private readonly IClientResourceController clientResourceController = clientResourceController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>();
         private readonly IServicesFramework servicesFramework = servicesFramework ?? Globals.GetCurrentServiceProvider().GetRequiredService<IServicesFramework>();
+		Logger.LogDebug("Subscriptions(clientResourceController={ClientResourceController},servicesFramework={ServicesFramework},hostSettings={HostSettings}): clientResourceController → {ClientResourceController1}", clientResourceController, servicesFramework, hostSettings, clientResourceController);
+		Logger.LogDebug("Subscriptions(clientResourceController={ClientResourceController},servicesFramework={ServicesFramework},hostSettings={HostSettings}): servicesFramework → {ServicesFramework1}", clientResourceController, servicesFramework, hostSettings, servicesFramework);
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
 
+		Logger.LogDebug("Subscriptions(clientResourceController={ClientResourceController},servicesFramework={ServicesFramework},hostSettings={HostSettings}): hostSettings → {HostSettings1}", clientResourceController, servicesFramework, hostSettings, hostSettings);
         /// <summary>Initializes a new instance of the <see cref="Subscriptions"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.0. Please use overload with IClientResourceController. Scheduled removal in v12.0.0.")]
         public Subscriptions()
@@ -53,6 +58,8 @@ namespace DotNetNuke.Modules.CoreMessaging
         public Subscriptions(IClientResourceController clientResourceController)
             : this(clientResourceController, null, null)
         {
+		Logger.LogDebug("<<< Exiting Subscriptions(clientResourceController={ClientResourceController})", clientResourceController);
+		Logger.LogError("Exception in Subscriptions(clientResourceController={ClientResourceController},servicesFramework={ServicesFramework},hostSettings={HostSettings}): {Arg3}", clientResourceController, servicesFramework, hostSettings, ex.Message);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Subscriptions"/> class.</summary>
@@ -81,9 +88,11 @@ namespace DotNetNuke.Modules.CoreMessaging
         /// <returns>The settings formatted as a JSON string.</returns>
         public string GetSettingsAsJson()
         {
+			Logger.LogDebug(">>> Entering GetSettingsAsJson()");
             var settings = GetModuleSettings(PortalSettings.Current, this.ModuleConfiguration, Null.NullInteger);
             foreach (DictionaryEntry entry in this.GetViewSettings())
             {
+			Logger.LogDebug("GetSettingsAsJson(): settings → {Settings}", settings);
                 if (settings.ContainsKey(entry.Key))
                 {
                     settings[entry.Key] = entry.Value;
@@ -94,6 +103,7 @@ namespace DotNetNuke.Modules.CoreMessaging
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetSettingsAsJson()");
             return settings.ToJson();
         }
 
@@ -102,12 +112,15 @@ namespace DotNetNuke.Modules.CoreMessaging
         /// <returns>The localized value for the provided key.</returns>
         protected string LocalizeString(string key)
         {
+			Logger.LogDebug(">>> Entering LocalizeString(key={Key})", key);
+			Logger.LogDebug("<<< Exiting LocalizeString(key={Key})", key);
             return Localization.GetString(key, this.LocalResourceFile);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.servicesFramework.RequestAjaxAntiForgerySupport();
@@ -123,6 +136,7 @@ namespace DotNetNuke.Modules.CoreMessaging
             {
                 this.Response.Redirect(Globals.AccessDeniedURL(), false);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         private static Hashtable GetModuleSettings(PortalSettings portalSettings, ModuleInfo moduleInfo, int uniqueId)
@@ -179,15 +193,20 @@ namespace DotNetNuke.Modules.CoreMessaging
                        { "returnUrl", HttpContext.Current.Request.UrlReferrer },
                        { "uniqueId", uniqueId },
                    };
+				Logger.LogDebug(">>> Entering GetHistoryNavigationKey(moduleName={ModuleName})", moduleName);
+				Logger.LogDebug("<<< Exiting GetHistoryNavigationKey(moduleName={ModuleName})", moduleName);
         }
 
         private static string GetHistoryNavigationKey(string moduleName)
         {
+			Logger.LogDebug(">>> Entering GetHistoryNavigationKey(moduleName={ModuleName})", moduleName);
+			Logger.LogDebug("<<< Exiting GetHistoryNavigationKey(moduleName={ModuleName})", moduleName);
             return HttpContext.Current.Server.HtmlEncode(moduleName.ToLowerInvariant().Replace(" ", string.Empty));
         }
 
         private static TimeSpan GetSessionTimeout()
         {
+			Logger.LogDebug(">>> Entering GetSessionTimeout()");
             try
             {
                 if (WebConfigurationManager.GetSection("system.web/sessionState") is SessionStateSection sessionSection)
@@ -197,11 +216,14 @@ namespace DotNetNuke.Modules.CoreMessaging
             }
             catch
             {
+				Logger.LogError("Exception in Subscriptions(clientResourceController={ClientResourceController},servicesFramework={ServicesFramework},hostSettings={HostSettings}): {Arg3}", clientResourceController, servicesFramework, hostSettings, ex.Message);
                 // FIXME(cbond): The default configuration doesn't actually let us see this data
+				Logger.LogError("Exception in GetSessionTimeout(): {Arg0}", ex.Message);
                 // FIXME(cbond): It's too annoying seeing this fill the Event Log, we need to add the permission to web.config
                 ////Exceptions.LogException(ex);
             }
 
+			Logger.LogDebug("<<< Exiting GetSessionTimeout()");
             return TimeSpan.FromMinutes(25);
         }
 
@@ -238,10 +260,13 @@ namespace DotNetNuke.Modules.CoreMessaging
         /// </summary>
         private Hashtable GetViewSettings()
         {
+			Logger.LogDebug(">>> Entering GetViewSettings()");
             var portalSettings = PortalSettings.Current;
             var userPreferenceController = UserPreferencesController.Instance;
             var user = UserController.GetUserById(this.hostSettings, portalSettings.PortalId, portalSettings.UserId);
             UserPreference userPreference = null;
+			Logger.LogDebug("GetViewSettings(): user → {User}", user);
+			Logger.LogDebug("GetViewSettings(): userPreference → {UserPreference}", userPreference);
             if (user != null)
             {
                 userPreference = userPreferenceController.GetUserPreference(user);

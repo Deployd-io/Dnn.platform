@@ -11,8 +11,11 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
     [JsonObject]
     public class JsLibraryPackageDetailDto : PackageInfoDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public JsLibraryPackageDetailDto()
         {
+		Logger.LogDebug(">>> Entering JsLibraryPackageDetailDto()");
+		Logger.LogDebug("<<< Exiting JsLibraryPackageDetailDto()");
         }
 
         public JsLibraryPackageDetailDto(int portalId, PackageInfo package)

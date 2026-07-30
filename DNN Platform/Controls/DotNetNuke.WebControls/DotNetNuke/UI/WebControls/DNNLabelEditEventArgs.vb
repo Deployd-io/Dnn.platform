@@ -6,10 +6,15 @@ Imports System
 Namespace DotNetNuke.UI.WebControls
     Public Class DNNLabelEditEventArgs
         Inherits EventArgs
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(DNNLabelEditEventArgs))
         ' Methods
         Public Sub New(ByVal [text] As String)
+			Logger.LogDebug(">>> Entering New([text]={Arg})", [text])
             Me._text = [text]
             Me._returnedText = [text]
+			Logger.LogDebug("New([text]={Arg0}): Me._returnedText → {Arg1}", [text], Me._returnedText)
+			Logger.LogDebug("New([text]={Arg0}): Me._text → {Arg1}", [text], Me._text)
+			Logger.LogDebug("<<< Exiting New([text]={Arg})", [text])
         End Sub
 
 

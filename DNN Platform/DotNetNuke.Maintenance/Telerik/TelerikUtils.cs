@@ -53,10 +53,13 @@ namespace DotNetNuke.Maintenance.Telerik
         /// <inheritdoc />
         public IEnumerable<string> GetAssembliesThatDependOnTelerik()
         {
+			log.LogDebug(">>> Entering GetAssembliesThatDependOnTelerik()");
             // use a temp AppDomain to avoid locking files in the bin folder
             var domain = AppDomain.CreateDomain(nameof(TelerikUtils));
             try
+			log.LogDebug("GetAssembliesThatDependOnTelerik(): domain → {Domain}", domain);
             {
+				log.LogDebug("<<< Exiting GetAssembliesThatDependOnTelerik()");
                 return DirectoryGetFiles(this.BinPath, "*.dll", SearchOption.AllDirectories)
                     .Where(IsNotWellKnownAssembly)
                     .Where(path => this.AssemblyDependsOnTelerik(path, domain))
@@ -71,16 +74,22 @@ namespace DotNetNuke.Maintenance.Telerik
         /// <inheritdoc />
         public bool TelerikIsInstalled()
         {
+			log.LogDebug(">>> Entering TelerikIsInstalled()");
+			log.LogDebug("<<< Exiting TelerikIsInstalled()");
             return FileExists(Path.Combine(this.BinPath, TelerikWebUIFileName));
         }
 
         /// <inheritdoc />
         public Version GetTelerikVersion()
         {
+			log.LogDebug(">>> Entering GetTelerikVersion()");
             var domain = AppDomain.CreateDomain(nameof(TelerikUtils));
             try
+			log.LogDebug("GetTelerikVersion(): domain → {Domain}", domain);
             {
                 var path = Path.Combine(this.BinPath, TelerikWebUIFileName);
+				log.LogDebug("GetTelerikVersion(): path → {Path}", path);
+				log.LogDebug("<<< Exiting GetTelerikVersion()");
                 return domain.Load(File.ReadAllBytes(path)).GetName().Version;
             }
             catch (Exception ex)
@@ -96,6 +105,8 @@ namespace DotNetNuke.Maintenance.Telerik
         /// <inheritdoc />
         public bool IsTelerikVersionVulnerable(Version version)
         {
+			log.LogDebug(">>> Entering IsTelerikVersionVulnerable(version={Version})", version);
+			log.LogDebug("<<< Exiting IsTelerikVersionVulnerable(version={Version})", version);
             return version < new Version(2014, 0);
         }
 

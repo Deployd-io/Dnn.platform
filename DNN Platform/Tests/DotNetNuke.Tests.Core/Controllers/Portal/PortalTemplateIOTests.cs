@@ -21,6 +21,7 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
     [TestFixture]
     public class PortalTemplateIOTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string HostMapPath = @"C:\path";
         private const string DefaultName = "Default";
         private const string DefaultDeName = "Rückstellungs-Web site";
@@ -96,54 +97,68 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
         [SetUp]
         public void SetUp()
         {
+			Logger.LogDebug(">>> Entering SetUp()");
             this.mockPortalTemplateIO = new Mock<IPortalTemplateIO>();
             PortalTemplateIO.SetTestableInstance(this.mockPortalTemplateIO.Object);
+			Logger.LogDebug("SetUp(): mockPortalTemplateIO → {MockPortalTemplateIO}", mockPortalTemplateIO);
 
             this.serviceProvider = FakeServiceProvider.Setup(
                 services =>
                 {
+				Logger.LogDebug("SetUp(): serviceProvider → {ServiceProvider}", serviceProvider);
+				Logger.LogDebug("SetUp(): services → {Services}", services);
                     services.AddSingleton(this.mockPortalTemplateIO.Object);
                     services.AddSingleton(Mock.Of<IPortalController>());
                 });
+				Logger.LogDebug("<<< Exiting SetUp()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			Logger.LogDebug(">>> Entering TearDown()");
             PortalTemplateIO.ClearInstance();
 
             // NOTE: not sure why, but disposing here causes other unrelated tests to fail
             ////this.serviceProvider.Dispose();
+			Logger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void NoTemplatesReturnsEmptyList()
         {
+			Logger.LogDebug(">>> Entering NoTemplatesReturnsEmptyList()");
             // Arrange
 
             // Act
             var templates = CreateController().GetPortalTemplates();
 
+			Logger.LogDebug("NoTemplatesReturnsEmptyList(): templates → {Templates}", templates);
             // Assert
             Assert.That(templates, Is.Empty);
+			Logger.LogDebug("<<< Exiting NoTemplatesReturnsEmptyList()");
         }
 
         [Test]
         public void LanguageFileWithoutATemplateIsIgnored()
         {
+			Logger.LogDebug(">>> Entering LanguageFileWithoutATemplateIsIgnored()");
             // Arrange
             this.mockPortalTemplateIO.Setup(x => x.EnumerateLanguageFiles()).Returns(this.ToEnumerable(DefaultDePath));
 
             // Act
             var templates = CreateController().GetPortalTemplates();
 
+			Logger.LogDebug("LanguageFileWithoutATemplateIsIgnored(): templates → {Templates}", templates);
             // Assert
             Assert.That(templates, Is.Empty);
+			Logger.LogDebug("<<< Exiting LanguageFileWithoutATemplateIsIgnored()");
         }
 
         [Test]
         public void TemplatesWithNoLanguageFilesAreLoaded()
         {
+			Logger.LogDebug(">>> Entering TemplatesWithNoLanguageFilesAreLoaded()");
             // Arrange
             this.mockPortalTemplateIO.Setup(x => x.EnumerateTemplates()).Returns(this.ToEnumerable(StaticPath));
             this.mockPortalTemplateIO.Setup(x => x.OpenTextReader(StaticPath)).Returns(this.CreateTemplateFileReader(StaticDescription));
@@ -151,14 +166,17 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
             // Act
             var templates = CreateController().GetPortalTemplates();
 
+			Logger.LogDebug("TemplatesWithNoLanguageFilesAreLoaded(): templates → {Templates}", templates);
             // Assert
             Assert.That(templates, Has.Count.EqualTo(1));
             AssertTemplateInfo(StaticExpectations, templates[0]);
+			Logger.LogDebug("<<< Exiting TemplatesWithNoLanguageFilesAreLoaded()");
         }
 
         [Test]
         public void TemplateWith2Languages()
         {
+			Logger.LogDebug(">>> Entering TemplateWith2Languages()");
             // Arrange
             this.mockPortalTemplateIO.Setup(x => x.EnumerateTemplates()).Returns(this.ToEnumerable(DefaultPath));
             this.mockPortalTemplateIO.Setup(x => x.EnumerateLanguageFiles()).Returns(this.ToEnumerable(DefaultDePath, DefaultUsPath));
@@ -170,15 +188,18 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
             // Act
             var templates = CreateController().GetPortalTemplates();
 
+			Logger.LogDebug("TemplateWith2Languages(): templates → {Templates}", templates);
             // Assert
             Assert.That(templates, Has.Count.EqualTo(2));
             AssertTemplateInfo(DefaultExpectationsDe, templates[0]);
             AssertTemplateInfo(DefaultExpectationsUs, templates[1]);
+			Logger.LogDebug("<<< Exiting TemplateWith2Languages()");
         }
 
         [Test]
         public void TwoTemplatesAssortedLanguages()
         {
+			Logger.LogDebug(">>> Entering TwoTemplatesAssortedLanguages()");
             // Arrange
             this.mockPortalTemplateIO.Setup(x => x.EnumerateTemplates()).Returns(this.ToEnumerable(DefaultPath, AlternatePath));
             this.mockPortalTemplateIO.Setup(x => x.EnumerateLanguageFiles()).Returns(this.ToEnumerable(DefaultDePath, DefaultUsPath, AlternateDePath));
@@ -192,16 +213,19 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
             // Act
             var templates = CreateController().GetPortalTemplates();
 
+			Logger.LogDebug("TwoTemplatesAssortedLanguages(): templates → {Templates}", templates);
             // Assert
             Assert.That(templates, Has.Count.EqualTo(3));
             AssertTemplateInfo(DefaultExpectationsDe, templates[0]);
             AssertTemplateInfo(DefaultExpectationsUs, templates[1]);
             AssertTemplateInfo(AlternateExpectationsDe, templates[2]);
+			Logger.LogDebug("<<< Exiting TwoTemplatesAssortedLanguages()");
         }
 
         [Test]
         public void ResourceFileIsLocatedWhenPresent()
         {
+			Logger.LogDebug(">>> Entering ResourceFileIsLocatedWhenPresent()");
             // Arrange
             this.mockPortalTemplateIO.Setup(x => x.EnumerateTemplates()).Returns(this.ToEnumerable(ResourcePath));
             this.mockPortalTemplateIO.Setup(x => x.GetResourceFilePath(ResourcePath)).Returns(ResourceFilePath);
@@ -209,14 +233,17 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
             // Act
             var templates = CreateController().GetPortalTemplates();
 
+			Logger.LogDebug("ResourceFileIsLocatedWhenPresent(): templates → {Templates}", templates);
             // Assert
             Assert.That(templates, Has.Count.EqualTo(1));
             AssertTemplateInfo(ResourceExpectations, templates[0]);
+			Logger.LogDebug("<<< Exiting ResourceFileIsLocatedWhenPresent()");
         }
 
         [Test]
         public void SingleTemplateAndLanguage()
         {
+			Logger.LogDebug(">>> Entering SingleTemplateAndLanguage()");
             // Arrange
             this.mockPortalTemplateIO.Setup(x => x.EnumerateTemplates()).Returns(this.ToEnumerable(DefaultPath));
             this.mockPortalTemplateIO.Setup(x => x.EnumerateLanguageFiles()).Returns(this.ToEnumerable(DefaultDePath));
@@ -226,14 +253,17 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
             // Act
             var templates = CreateController().GetPortalTemplates();
 
+			Logger.LogDebug("SingleTemplateAndLanguage(): templates → {Templates}", templates);
             // Assert
             Assert.That(templates, Has.Count.EqualTo(1));
             AssertTemplateInfo(DefaultExpectationsDe, templates[0]);
+			Logger.LogDebug("<<< Exiting SingleTemplateAndLanguage()");
         }
 
         [Test]
         public void ATemplateCanBeLoadedDirectly()
         {
+			Logger.LogDebug(">>> Entering ATemplateCanBeLoadedDirectly()");
             // Arrange
             this.mockPortalTemplateIO.Setup(x => x.EnumerateTemplates()).Returns(this.ToEnumerable(DefaultPath));
             this.mockPortalTemplateIO.Setup(x => x.EnumerateLanguageFiles()).Returns(this.ToEnumerable(DefaultDePath));
@@ -243,13 +273,16 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
             // Act
             var template = CreateController().GetPortalTemplate(DefaultPath, "de-DE");
 
+			Logger.LogDebug("ATemplateCanBeLoadedDirectly(): template → {Template}", template);
             // Assert
             AssertTemplateInfo(DefaultExpectationsDe, template);
+			Logger.LogDebug("<<< Exiting ATemplateCanBeLoadedDirectly()");
         }
 
         [Test]
         public void GetPortalTemplateReturnsNullIfCultureDoesNotMatch()
         {
+			Logger.LogDebug(">>> Entering GetPortalTemplateReturnsNullIfCultureDoesNotMatch()");
             // Arrange
             this.mockPortalTemplateIO.Setup(x => x.EnumerateTemplates()).Returns(this.ToEnumerable(DefaultPath));
             this.mockPortalTemplateIO.Setup(x => x.EnumerateLanguageFiles()).Returns(this.ToEnumerable(DefaultDePath));
@@ -259,13 +292,16 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
             // Act
             var template = CreateController().GetPortalTemplate(DefaultPath, "de");
 
+			Logger.LogDebug("GetPortalTemplateReturnsNullIfCultureDoesNotMatch(): template → {Template}", template);
             // Assert
             Assert.That(template, Is.Null);
+			Logger.LogDebug("<<< Exiting GetPortalTemplateReturnsNullIfCultureDoesNotMatch()");
         }
 
         [Test]
         public void GetPortalTemplateCanReturnAStaticTemplate()
         {
+			Logger.LogDebug(">>> Entering GetPortalTemplateCanReturnAStaticTemplate()");
             // Arrange
             this.mockPortalTemplateIO.Setup(x => x.EnumerateTemplates()).Returns(this.ToEnumerable(StaticPath));
             this.mockPortalTemplateIO.Setup(x => x.OpenTextReader(StaticPath)).Returns(this.CreateTemplateFileReader(StaticDescription));
@@ -273,12 +309,16 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
             // Act
             var template = CreateController().GetPortalTemplate(StaticPath, "en-US");
 
+			Logger.LogDebug("GetPortalTemplateCanReturnAStaticTemplate(): template → {Template}", template);
             // Assert
             AssertTemplateInfo(StaticExpectations, template);
+			Logger.LogDebug("<<< Exiting GetPortalTemplateCanReturnAStaticTemplate()");
         }
 
         private static PortalTemplateController CreateController()
         {
+			Logger.LogDebug(">>> Entering CreateController()");
+			Logger.LogDebug("<<< Exiting CreateController()");
             return new PortalTemplateController(Mock.Of<IBusinessControllerProvider>());
         }
 
@@ -308,17 +348,23 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
 
         private static string MakePath(string name)
         {
+			Logger.LogDebug(">>> Entering MakePath(name={Name})", name);
             var fileName = name + ".template";
+			Logger.LogDebug("MakePath(name={Name}): fileName → {FileName}", name, fileName);
+			Logger.LogDebug("<<< Exiting MakePath(name={Name})", name);
             return Path.Combine(HostMapPath, fileName);
         }
 
         private static string MakePath(string name, string culture)
         {
+			Logger.LogDebug("<<< Exiting MakePath(name={Name},culture={Culture})", name, culture);
             return string.Format(@"{0}.{1}.resx", MakePath(name), culture);
         }
 
         private TextReader CreateLanguageFileReader(string name)
         {
+			Logger.LogDebug(">>> Entering CreateLanguageFileReader(name={Name})", name);
+			Logger.LogDebug("<<< Exiting CreateLanguageFileReader(name={Name})", name);
             return this.CreateLanguageFileReader(name, null);
         }
 
@@ -330,17 +376,23 @@ namespace DotNetNuke.Tests.Core.Controllers.Portal
             }
 
             var xml = string.Format("<root><data name=\"LocalizedTemplateName.Text\" xml:space=\"preserve\"><value>{0}</value></data>{1}</root>", name, description);
+			Logger.LogDebug("CreateLanguageFileReader(name={Name},description={Description}): xml → {Xml}", name, description, xml);
+			Logger.LogDebug("<<< Exiting CreateLanguageFileReader(name={Name},description={Description})", name, description);
             return new StringReader(xml);
         }
 
         private TextReader CreateTemplateFileReader(string description)
         {
+			Logger.LogDebug(">>> Entering CreateTemplateFileReader(description={Description})", description);
             var xml = string.Format("<portal><description>{0}</description></portal>", description);
+			Logger.LogDebug("CreateTemplateFileReader(description={Description}): xml → {Xml}", description, xml);
+			Logger.LogDebug("<<< Exiting CreateTemplateFileReader(description={Description})", description);
             return new StringReader(xml);
         }
 
         private IEnumerable<T> ToEnumerable<T>(params T[] input)
         {
+			Logger.LogDebug(">>> Entering ToEnumerable(input={Input})", input);
             return input;
         }
     }

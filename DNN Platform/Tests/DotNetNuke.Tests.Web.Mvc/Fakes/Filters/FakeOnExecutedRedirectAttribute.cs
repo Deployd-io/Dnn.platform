@@ -8,9 +8,13 @@ namespace DotNetNuke.Tests.Web.Mvc.Fakes.Filters
 
     public class FakeOnExecutedRedirectAttribute : FakeRedirectAttribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
+			Logger.LogDebug(">>> Entering OnActionExecuted(filterContext={FilterContext})", filterContext);
+			Logger.LogDebug("OnActionExecuted(filterContext={FilterContext}): filterContext.Result → {Arg1}", filterContext, filterContext.Result);
             filterContext.Result = Result;
+			Logger.LogDebug("<<< Exiting OnActionExecuted(filterContext={FilterContext})", filterContext);
         }
     }
 }

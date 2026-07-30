@@ -10,23 +10,39 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
     [JsonObject]
     public class ModuleControlDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public ModuleControlDto()
         {
+		Logger.LogDebug(">>> Entering ModuleControlDto()");
         }
 
         public ModuleControlDto(ModuleControlInfo moduleControl)
         {
+			Logger.LogDebug(">>> Entering ModuleControlDto(moduleControl={ModuleControl})", moduleControl);
             this.Id = moduleControl.ModuleControlID;
             this.DefinitionId = moduleControl.ModuleDefID;
+			Logger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.Id → {Arg1}", moduleControl, this.Id);
+			Logger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.DefinitionId → {Arg1}", moduleControl, this.DefinitionId);
             this.Key = moduleControl.ControlKey;
             this.Title = moduleControl.ControlTitle;
             this.Source = moduleControl.ControlSrc;
+			Logger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.Key → {Arg1}", moduleControl, this.Key);
+			Logger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.Title → {Arg1}", moduleControl, this.Title);
+			Logger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.Source → {Arg1}", moduleControl, this.Source);
             this.Type = moduleControl.ControlType;
             this.Order = moduleControl.ViewOrder;
             this.Icon = moduleControl.IconFile;
             this.HelpUrl = moduleControl.HelpURL;
             this.SupportPopups = moduleControl.SupportsPopUps;
             this.SupportPartialRendering = moduleControl.SupportsPartialRendering;
+			Logger.LogDebug("<<< Exiting ModuleControlDto(moduleControl={ModuleControl})", moduleControl);
+			Logger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.Type → {Arg1}", moduleControl, this.Type);
+			Logger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.Order → {Arg1}", moduleControl, this.Order);
+			Logger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.Icon → {Arg1}", moduleControl, this.Icon);
+			Logger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.HelpUrl → {Arg1}", moduleControl, this.HelpUrl);
+			Logger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.SupportPopups → {Arg1}", moduleControl, this.SupportPopups);
+			Logger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.SupportPartialRendering → {Arg1}", moduleControl, this.SupportPartialRendering);
+			Logger.LogDebug("<<< Exiting ModuleControlDto()");
         }
 
         [JsonProperty("id")]
@@ -64,6 +80,8 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
 
         public ModuleControlInfo ToModuleControlInfo()
         {
+			Logger.LogDebug(">>> Entering ToModuleControlInfo()");
+			Logger.LogDebug("<<< Exiting ToModuleControlInfo()");
             return new ModuleControlInfo
             {
                 ModuleControlID = this.Id,

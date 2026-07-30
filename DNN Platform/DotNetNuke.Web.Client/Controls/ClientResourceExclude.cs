@@ -14,6 +14,7 @@ namespace DotNetNuke.Web.Client.Controls
     /// <summary>Represents a control that excludes a client resource from being included in the page.</summary>
     public abstract class ClientResourceExclude : Control
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IClientResourceController clientResourceController;
 
         /// <summary>Initializes a new instance of the <see cref="ClientResourceExclude"/> class.</summary>
@@ -21,13 +22,16 @@ namespace DotNetNuke.Web.Client.Controls
         protected ClientResourceExclude()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering ClientResourceExclude()");
         }
+		Logger.LogDebug("<<< Exiting ClientResourceExclude()");
 
         /// <summary>Initializes a new instance of the <see cref="ClientResourceExclude"/> class.</summary>
         /// <param name="clientResourceController">The client resources controller.</param>
         protected ClientResourceExclude(IClientResourceController clientResourceController)
         {
             this.clientResourceController = clientResourceController ?? DependencyInjection.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>();
+			Logger.LogDebug("ClientResourceExclude(clientResourceController={ClientResourceController}): clientResourceController → {ClientResourceController1}", clientResourceController, clientResourceController);
         }
 
         /// <summary>Gets or sets the name of the client resource to exclude.</summary>
@@ -39,6 +43,7 @@ namespace DotNetNuke.Web.Client.Controls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             switch (this.DependencyType)
             {
                 case ClientDependencyType.Css:
@@ -50,6 +55,7 @@ namespace DotNetNuke.Web.Client.Controls
                 default:
                     throw new InvalidOperationException("DependencyType must be either Css or Javascript");
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
     }
 }

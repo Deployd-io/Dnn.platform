@@ -26,6 +26,7 @@ using log4net.Util;
 
 namespace log4net.Core
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Mapping between string name and Level object</summary>
     /// <remarks>
     /// <para>
@@ -51,6 +52,8 @@ namespace log4net.Core
         /// </remarks>
         public LevelMap()
         {
+		Logger.LogDebug(">>> Entering LevelMap()");
+		Logger.LogDebug("<<< Exiting LevelMap()");
         }
 
         /// <summary>Clear the internal maps of all levels</summary>
@@ -61,8 +64,10 @@ namespace log4net.Core
         /// </remarks>
         public void Clear()
         {
+			Logger.LogDebug(">>> Entering Clear()");
             // Clear all current levels
             this.m_mapName2Level.Clear();
+			Logger.LogDebug("<<< Exiting Clear()");
         }
 
         /// <summary>Lookup a <see cref="Level"/> by name</summary>
@@ -102,7 +107,9 @@ namespace log4net.Core
         /// <seealso cref="M:Add(string,int,string)"/>
         public void Add(string name, int value)
         {
+			Logger.LogDebug(">>> Entering Add(name={Name},value={Value})", name, value);
             this.Add(name, value, null);
+			Logger.LogDebug("<<< Exiting Add(name={Name},value={Value})", name, value);
         }
 
         /// <summary>Create a new Level and add it to the map</summary>
@@ -116,6 +123,7 @@ namespace log4net.Core
         /// </remarks>
         public void Add(string name, int value, string displayName)
         {
+			Logger.LogDebug(">>> Entering Add(name={Name},value={Value},displayName={DisplayName})", name, value, displayName);
             if (name == null)
             {
                 throw new ArgumentNullException("name");
@@ -131,6 +139,7 @@ namespace log4net.Core
             }
 
             this.Add(new Level(value, name, displayName));
+			Logger.LogDebug("<<< Exiting Add(name={Name},value={Value},displayName={DisplayName})", name, value, displayName);
         }
 
         /// <summary>Add a Level to the map</summary>
@@ -150,6 +159,7 @@ namespace log4net.Core
             {
                 this.m_mapName2Level[level.Name] = level;
             }
+			Logger.LogDebug("<<< Exiting Add(level={Level})", level);
         }
 
         /// <summary>Return all possible levels as a list of Level objects.</summary>
@@ -188,6 +198,7 @@ namespace log4net.Core
         /// </remarks>
         public Level LookupWithDefault(Level defaultLevel)
         {
+			Logger.LogDebug(">>> Entering LookupWithDefault(defaultLevel={DefaultLevel})", defaultLevel);
             if (defaultLevel == null)
             {
                 throw new ArgumentNullException("defaultLevel");
@@ -197,10 +208,12 @@ namespace log4net.Core
             {
                 Level level = (Level)this.m_mapName2Level[defaultLevel.Name];
                 if (level == null)
+				Logger.LogDebug("LookupWithDefault(defaultLevel={DefaultLevel}): level → {Level}", defaultLevel, level);
                 {
                     this.m_mapName2Level[defaultLevel.Name] = defaultLevel;
                     return defaultLevel;
                 }
+				Logger.LogDebug("<<< Exiting LookupWithDefault(defaultLevel={DefaultLevel})", defaultLevel);
                 return level;
             }
         }

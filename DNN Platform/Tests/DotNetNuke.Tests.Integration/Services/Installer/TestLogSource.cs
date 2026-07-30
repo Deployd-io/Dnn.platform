@@ -9,13 +9,17 @@ namespace DotNetNuke.Tests.Integration.Services.Installer
 
     internal class TestLogSource : ILoggerSource
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public ILog GetLogger(string name)
         {
+			Logger.LogDebug(">>> Entering GetLogger(name={Name})", name);
+			Logger.LogDebug("<<< Exiting GetLogger(name={Name})", name);
             return new TestLogger();
         }
 
         public ILog GetLogger(Type type)
         {
+			Logger.LogDebug("<<< Exiting GetLogger(type={Type})", type);
             return new TestLogger();
         }
     }

@@ -14,6 +14,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
     [CLSCompliant(false)]
     public class PaletteQuantizer : Quantizer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>List of all colors in the palette.</summary>
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1309:FieldNamesMustNotBeginWithUnderscore", Justification = "Breaking Change")]
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
@@ -31,10 +32,14 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
         public PaletteQuantizer(ArrayList palette)
             : base(true)
         {
+			Logger.LogDebug(">>> Entering PaletteQuantizer(palette={Palette})", palette);
             this.colorMap = new Hashtable();
 
+			Logger.LogDebug("PaletteQuantizer(palette={Palette}): colorMap → {ColorMap}", palette, colorMap);
             this._colors = new Color[palette.Count];
+			Logger.LogDebug("PaletteQuantizer(palette={Palette}): this._colors → {Arg1}", palette, this._colors);
             palette.CopyTo(this._colors);
+			Logger.LogDebug("<<< Exiting PaletteQuantizer(palette={Palette})", palette);
         }
 
         /// <summary>Override this to process the pixel in the second pass of the algorithm.</summary>
@@ -42,8 +47,10 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
         /// <returns>The quantized value.</returns>
         protected override byte QuantizePixel(Color32 pixel)
         {
+			Logger.LogDebug(">>> Entering QuantizePixel(pixel={Pixel})", pixel);
             byte colorIndex = 0;
             int colorHash = pixel.ARGB;
+			Logger.LogDebug("QuantizePixel(pixel={Pixel}): colorIndex → {ColorIndex}", pixel, colorIndex);
 
             // Check if the color is in the lookup table
             if (this.colorMap.ContainsKey(colorHash))
@@ -71,6 +78,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
                     // Not transparent...
                     int leastDistance = int.MaxValue;
                     int red = pixel.Red;
+					Logger.LogDebug("QuantizePixel(pixel={Pixel}): leastDistance → {LeastDistance}", pixel, leastDistance);
                     int green = pixel.Green;
                     int blue = pixel.Blue;
 
@@ -105,6 +113,7 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
                 this.colorMap.Add(colorHash, colorIndex);
             }
 
+			Logger.LogDebug("<<< Exiting QuantizePixel(pixel={Pixel})", pixel);
             return colorIndex;
         }
 
@@ -114,11 +123,13 @@ namespace DotNetNuke.Services.GeneratedImage.ImageQuantization
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         protected override ColorPalette GetPalette(ColorPalette palette)
         {
+			Logger.LogDebug(">>> Entering GetPalette(palette={Palette})", palette);
             for (int index = 0; index < this._colors.Length; index++)
             {
                 palette.Entries[index] = this._colors[index];
             }
 
+			Logger.LogDebug("<<< Exiting GetPalette(palette={Palette})", palette);
             return palette;
         }
     }

@@ -47,6 +47,7 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
 
         public enum TestingEnum
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
             Value1 = 0,
             Value2 = 1,
         }
@@ -56,30 +57,41 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [OneTimeSetUp]
         public virtual void TestFixtureSetUp()
         {
+			Logger.LogDebug(">>> Entering TestFixtureSetUp()");
             this.MockRepository = new MockRepository(MockBehavior.Default);
             this.MockHostController = this.MockRepository.Create<IHostController>();
+			Logger.LogDebug("TestFixtureSetUp(): MockHostController → {MockHostController}", MockHostController);
+			Logger.LogDebug("TestFixtureSetUp(): MockRepository → {MockRepository}", MockRepository);
             this.MockHostController.As<IHostSettingsService>();
+			Logger.LogDebug("<<< Exiting TestFixtureSetUp()");
         }
 
         [SetUp]
         public virtual void SetUp()
         {
+			Logger.LogDebug(">>> Entering SetUp()");
             // Mock Repository and component factory
             this.MockRepository = new MockRepository(MockBehavior.Default);
+			Logger.LogDebug("SetUp(): MockRepository → {MockRepository}", MockRepository);
             ComponentFactory.Container = new SimpleContainer();
 
             // Setup Mock
             this.MockCache = MockComponentProvider.CreateDataCacheProvider();
+			Logger.LogDebug("SetUp(): MockCache → {MockCache}", MockCache);
             HostController.RegisterInstance(this.MockHostController.Object);
 
             this.MockPortalController = this.MockRepository.Create<IPortalController>();
+			Logger.LogDebug("SetUp(): MockPortalController → {MockPortalController}", MockPortalController);
             PortalController.SetTestableInstance(this.MockPortalController.Object);
             this.MockModuleController = this.MockRepository.Create<IModuleController>();
+			Logger.LogDebug("SetUp(): MockModuleController → {MockModuleController}", MockModuleController);
             ModuleController.SetTestableInstance(this.MockModuleController.Object);
 
             this.serviceProvider = FakeServiceProvider.Setup(
                 services =>
                 {
+				Logger.LogDebug("SetUp(): serviceProvider → {ServiceProvider}", serviceProvider);
+				Logger.LogDebug("SetUp(): services → {Services}", services);
                     services.AddSingleton(this.MockCache.Object);
                     services.AddSingleton(this.MockPortalController.Object);
                     services.AddSingleton(this.MockModuleController.Object);
@@ -90,30 +102,39 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
 
             // Setup mock cache
             this.MockCacheCollection = new Hashtable();
+			Logger.LogDebug("SetUp(): MockCacheCollection → {MockCacheCollection}", MockCacheCollection);
             this.MockHostController.Setup(hc => hc.GetString("PerformanceSetting")).Returns("3");
             this.MockCache.Setup(c => c.Insert(It.IsAny<string>(), It.IsAny<object>())).Callback((string cacheKey, object itemToCache) => this.MockCacheCollection[cacheKey] = itemToCache);
             this.MockCache.Setup(c => c.Insert(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<DNNCacheDependency>(), It.IsAny<DateTime>(), It.IsAny<TimeSpan>(), It.IsAny<CacheItemPriority>(), It.IsAny<CacheItemRemovedCallback>()))
                      .Callback((string cacheKey, object itemToCache, DNNCacheDependency dcd, DateTime dt, TimeSpan ts, CacheItemPriority cip, CacheItemRemovedCallback circ) => this.MockCacheCollection[cacheKey] = itemToCache);
             this.MockCache.Setup(c => c.GetItem(It.IsAny<string>())).Returns((string cacheKey) => this.MockCacheCollection[cacheKey]);
+			Logger.LogDebug("<<< Exiting SetUp()");
         }
 
         [TearDown]
         public virtual void TearDown()
         {
+			Logger.LogDebug(">>> Entering TearDown()");
             MockComponentProvider.ResetContainer();
             PortalController.ClearInstance();
             ModuleController.ClearInstance();
             this.serviceProvider?.Dispose();
+			Logger.LogDebug("<<< Exiting TearDown()");
         }
 
         protected static string CacheKey(ModuleInfo moduleInfo) => $"SettingsModule{moduleInfo.TabModuleID}";
+		Logger.LogDebug(">>> Entering CacheKey(moduleInfo={ModuleInfo})", moduleInfo);
 
         protected static string ModuleSettingsCacheKey(ModuleInfo moduleInfo) => $"ModuleSettings{moduleInfo.TabID}";
+		Logger.LogDebug(">>> Entering ModuleSettingsCacheKey(moduleInfo={ModuleInfo})", moduleInfo);
 
         protected static string TabModuleSettingsCacheKey(ModuleInfo moduleInfo) => $"TabModuleSettings{moduleInfo.TabID}";
+		Logger.LogDebug(">>> Entering TabModuleSettingsCacheKey(moduleInfo={ModuleInfo})", moduleInfo);
 
         protected virtual void SetupServiceProvider(IServiceCollection services)
         {
+		Logger.LogDebug(">>> Entering SetupServiceProvider(services={Services})", services);
+		Logger.LogDebug("<<< Exiting SetupServiceProvider(services={Services})", services);
         }
 
         protected void MockPortalSettings(ModuleInfo moduleInfo, Dictionary<string, string> portalSettings)
@@ -123,14 +144,18 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
 
         protected void MockTabModuleSettings(ModuleInfo moduleInfo, Hashtable tabModuleSettings)
         {
+			Logger.LogDebug(">>> Entering MockTabModuleSettings(moduleInfo={ModuleInfo},tabModuleSettings={TabModuleSettings})", moduleInfo, tabModuleSettings);
             this.MockCache.Setup(c => c.GetItem("DNN_" + TabModuleSettingsCacheKey(moduleInfo)))
                 .Returns(new Dictionary<int, Hashtable> { { moduleInfo.TabModuleID, tabModuleSettings } });
+				Logger.LogDebug("<<< Exiting MockTabModuleSettings(moduleInfo={ModuleInfo},tabModuleSettings={TabModuleSettings})", moduleInfo, tabModuleSettings);
         }
 
         protected void MockModuleSettings(ModuleInfo moduleInfo, Hashtable moduleSettings)
         {
+			Logger.LogDebug(">>> Entering MockModuleSettings(moduleInfo={ModuleInfo},moduleSettings={ModuleSettings})", moduleInfo, moduleSettings);
             this.MockCache.Setup(c => c.GetItem("DNN_" + ModuleSettingsCacheKey(moduleInfo)))
                 .Returns(new Dictionary<int, Hashtable> { { moduleInfo.ModuleID, moduleSettings } });
+				Logger.LogDebug("<<< Exiting MockModuleSettings(moduleInfo={ModuleInfo},moduleSettings={ModuleSettings})", moduleInfo, moduleSettings);
         }
     }
 }

@@ -11,6 +11,7 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>The CheckBoxColumn control provides a Check Box column for a Data Grid.</summary>
     public class CheckBoxColumn : TemplateColumn
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private bool mAutoPostBack = true;
         private string mDataField = Null.NullString;
         private bool mEnabled = true;
@@ -23,6 +24,10 @@ namespace DotNetNuke.UI.WebControls
         public CheckBoxColumn()
             : this(false)
         {
+		Logger.LogDebug(">>> Entering CheckBoxColumn()");
+		Logger.LogDebug("<<< Exiting CheckBoxColumn()");
+		Logger.LogDebug(">>> Entering CheckBoxColumn(autoPostBack={AutoPostBack})", autoPostBack);
+		Logger.LogDebug("<<< Exiting CheckBoxColumn(autoPostBack={AutoPostBack})", autoPostBack);
         }
 
         /// <summary>
@@ -34,6 +39,7 @@ namespace DotNetNuke.UI.WebControls
         public CheckBoxColumn(bool autoPostBack)
         {
             this.AutoPostBack = autoPostBack;
+			Logger.LogDebug("CheckBoxColumn(autoPostBack={AutoPostBack}): this.AutoPostBack → {Arg1}", autoPostBack, this.AutoPostBack);
         }
 
         public event DNNDataGridCheckedColumnEventHandler CheckedChanged;
@@ -124,6 +130,7 @@ namespace DotNetNuke.UI.WebControls
         /// <summary>Initialises the Column.</summary>
         public override void Initialize()
         {
+			Logger.LogDebug(">>> Entering Initialize()");
             this.ItemTemplate = this.CreateTemplate(ListItemType.Item);
             this.EditItemTemplate = this.CreateTemplate(ListItemType.EditItem);
             this.HeaderTemplate = this.CreateTemplate(ListItemType.Header);
@@ -136,25 +143,34 @@ namespace DotNetNuke.UI.WebControls
 
             this.ItemStyle.HorizontalAlign = HorizontalAlign.Center;
             this.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+			Logger.LogDebug("<<< Exiting Initialize()");
         }
 
         /// <summary>Creates a CheckBoxColumnTemplate.</summary>
         /// <returns>A CheckBoxColumnTemplate.</returns>
         private CheckBoxColumnTemplate CreateTemplate(ListItemType type)
         {
+			Logger.LogDebug(">>> Entering CreateTemplate(type={Type})", type);
             bool isDesignMode = false;
             if (HttpContext.Current == null)
+			Logger.LogDebug("CreateTemplate(type={Type}): isDesignMode → {IsDesignMode}", type, isDesignMode);
             {
                 isDesignMode = true;
             }
 
             var template = new CheckBoxColumnTemplate(type);
             if (type != ListItemType.Header)
+			Logger.LogDebug("CreateTemplate(type={Type}): template → {Template}", type, template);
             {
                 template.AutoPostBack = this.AutoPostBack;
+				Logger.LogDebug("CreateTemplate(type={Type}): template.AutoPostBack → {Arg1}", type, template.AutoPostBack);
             }
 
             template.Checked = this.Checked;
+			Logger.LogDebug("CreateTemplate(type={Type}): template.Checked → {Arg1}", type, template.Checked);
+			Logger.LogDebug("CreateTemplate(type={Type}): template.DataField → {Arg1}", type, template.DataField);
+			Logger.LogDebug("CreateTemplate(type={Type}): template.Enabled → {Arg1}", type, template.Enabled);
+			Logger.LogDebug("CreateTemplate(type={Type}): template.EnabledField → {Arg1}", type, template.EnabledField);
             template.DataField = this.DataField;
             template.Enabled = this.Enabled;
             template.EnabledField = this.EnabledField;
@@ -162,23 +178,30 @@ namespace DotNetNuke.UI.WebControls
             if (type == ListItemType.Header)
             {
                 template.Text = this.HeaderText;
+				Logger.LogDebug("CreateTemplate(type={Type}): template.Text → {Arg1}", type, template.Text);
+				Logger.LogDebug("CreateTemplate(type={Type}): template.HeaderCheckBox → {Arg1}", type, template.HeaderCheckBox);
                 template.AutoPostBack = true;
                 template.HeaderCheckBox = this.HeaderCheckBox;
             }
 
             template.DesignMode = isDesignMode;
+			Logger.LogDebug("CreateTemplate(type={Type}): template.DesignMode → {Arg1}", type, template.DesignMode);
+			Logger.LogDebug("<<< Exiting CreateTemplate(type={Type})", type);
             return template;
         }
 
         /// <summary>Centralised Event that is raised whenever a check box is changed.</summary>
         private void OnCheckedChanged(object sender, DNNDataGridCheckChangedEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnCheckedChanged(sender={Sender},e={E})", sender, e);
             // Add the column to the Event Args
             e.Column = this;
+			Logger.LogDebug("OnCheckedChanged(sender={Sender},e={E}): e.Column → {Arg2}", sender, e, e.Column);
             if (this.CheckedChanged != null)
             {
                 this.CheckedChanged(sender, e);
             }
+			Logger.LogDebug("<<< Exiting OnCheckedChanged(sender={Sender},e={E})", sender, e);
         }
     }
 }

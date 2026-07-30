@@ -13,13 +13,20 @@ namespace DotNetNuke.Services.GeneratedImage.StartTransform
     /// <summary>Image File ImageTransform class.</summary>
     public class ImageFileTransform : ImageTransform
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ImageFileTransform"/> class.</summary>
         public ImageFileTransform()
         {
+			Logger.LogDebug(">>> Entering ImageFileTransform()");
             this.InterpolationMode = InterpolationMode.HighQualityBicubic;
             this.SmoothingMode = SmoothingMode.HighQuality;
+			Logger.LogDebug("ImageFileTransform(): this.InterpolationMode → {Arg0}", this.InterpolationMode);
+			Logger.LogDebug("ImageFileTransform(): this.SmoothingMode → {Arg0}", this.SmoothingMode);
             this.PixelOffsetMode = PixelOffsetMode.HighQuality;
             this.CompositingQuality = CompositingQuality.HighQuality;
+			Logger.LogDebug("<<< Exiting ImageFileTransform()");
+			Logger.LogDebug("ImageFileTransform(): this.PixelOffsetMode → {Arg0}", this.PixelOffsetMode);
+			Logger.LogDebug("ImageFileTransform(): this.CompositingQuality → {Arg0}", this.CompositingQuality);
         }
 
         /// <summary>Gets provides an Unique String for the image transformation.</summary>
@@ -42,6 +49,8 @@ namespace DotNetNuke.Services.GeneratedImage.StartTransform
         /// <returns>Image result after file image transformation.</returns>
         public override Image ProcessImage(Image image)
         {
+			Logger.LogDebug(">>> Entering ProcessImage(image={Image})", image);
+			Logger.LogDebug("<<< Exiting ProcessImage(image={Image})", image);
             return !string.IsNullOrEmpty(this.ImageUrl) ?
                 this.ProcessImageFromUrl() :
                 this.ProcessImageFilePath();
@@ -49,6 +58,7 @@ namespace DotNetNuke.Services.GeneratedImage.StartTransform
 
         private Image ProcessImageFilePath()
         {
+			Logger.LogDebug(">>> Entering ProcessImageFilePath()");
             try
             {
                 using (var stream = new FileStream(this.ImageFilePath, FileMode.Open))
@@ -58,15 +68,20 @@ namespace DotNetNuke.Services.GeneratedImage.StartTransform
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in ProcessImageFilePath(): {Arg0}", ex.Message);
                 Exceptions.Exceptions.LogException(ex);
+				Logger.LogDebug("<<< Exiting ProcessImageFilePath()");
                 return this.EmptyImage;
             }
         }
 
         private Image ProcessImageFromUrl()
         {
+			Logger.LogDebug(">>> Entering ProcessImageFromUrl()");
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(this.ImageUrl);
 
+			Logger.LogDebug("ProcessImageFromUrl(): httpWebRequest → {HttpWebRequest}", httpWebRequest);
             try
             {
                 using (var httpWebReponse = (HttpWebResponse)httpWebRequest.GetResponse())
@@ -79,7 +94,10 @@ namespace DotNetNuke.Services.GeneratedImage.StartTransform
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in ProcessImageFromUrl(): {Arg0}", ex.Message);
                 Exceptions.Exceptions.LogException(ex);
+				Logger.LogInformation("ProcessImageFromUrl(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+				Logger.LogDebug("<<< Exiting ProcessImageFromUrl()");
                 return this.EmptyImage;
             }
         }

@@ -17,6 +17,7 @@ namespace Dnn.ExportImport.Components.Entities
     [PrimaryKey("CheckpointId")]
     public class ExportImportChekpoint : IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private double progress;
 
         /// <summary>Gets or sets the ID of the checkpoint.</summary>
@@ -86,6 +87,7 @@ namespace Dnn.ExportImport.Components.Entities
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.CheckpointId = Null.SetNullInteger(dr[nameof(this.CheckpointId)]);
             this.JobId = Null.SetNullInteger(dr[nameof(this.JobId)]);
             this.AssemblyName = Null.SetNullString(dr[nameof(this.AssemblyName)]);
@@ -98,6 +100,7 @@ namespace Dnn.ExportImport.Components.Entities
             this.StartDate = Null.SetNullDateTime(dr[nameof(this.StartDate)]);
             this.LastUpdateDate = Null.SetNullDateTime(dr[nameof(this.LastUpdateDate)]);
             this.Completed = Null.SetNullBoolean(dr[nameof(this.Completed)]);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

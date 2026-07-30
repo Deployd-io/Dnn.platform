@@ -13,13 +13,16 @@ namespace Dnn.PersonaBar.Pages.Services.Dto
     [JsonObject]
     public class DnnModulesDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public DnnModulesDto(IEnumerable<string> locales)
         {
+			Logger.LogDebug(">>> Entering DnnModulesDto(locales={Locales})", locales);
             this.Modules = new List<DnnModuleDto>(); // one module for each language
             foreach (var locale in locales)
             {
                 this.Modules.Add(new DnnModuleDto { CultureCode = locale });
             }
+			Logger.LogDebug("<<< Exiting DnnModulesDto(locales={Locales})", locales);
         }
 
         public List<DnnModuleDto> Modules { get; }
@@ -28,6 +31,8 @@ namespace Dnn.PersonaBar.Pages.Services.Dto
 
         public DnnModuleDto Module(string locale)
         {
+			Logger.LogDebug(">>> Entering Module(locale={Locale})", locale);
+			Logger.LogDebug("<<< Exiting Module(locale={Locale})", locale);
             return this.Modules.Single(mo => mo.CultureCode == locale);
         }
     }

@@ -15,9 +15,11 @@ namespace Dnn.PersonaBar.Security.Attributes
     [AttributeUsage(AttributeTargets.Property)]
     internal class AuthProviderSupportedAttribute : ValidationAttribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
+			Logger.LogDebug(">>> Entering IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             var propertyName = validationContext.DisplayName;
 
             if (string.IsNullOrWhiteSpace(value.ToString()))
@@ -27,11 +29,13 @@ namespace Dnn.PersonaBar.Security.Attributes
 
             var allAuthProviders = new SecurityController().GetAuthenticationProviders();
 
+			Logger.LogDebug("IsValid(value={Value},validationContext={ValidationContext}): allAuthProviders → {AllAuthProviders}", value, validationContext, allAuthProviders);
             if (!allAuthProviders.Contains(value))
             {
                 return new ValidationResult(string.Format(CultureInfo.CurrentCulture, Localization.GetString(Constants.NotValid, Constants.LocalResourcesFile), propertyName, value.ToString()));
             }
 
+			Logger.LogDebug("<<< Exiting IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             return ValidationResult.Success;
         }
     }

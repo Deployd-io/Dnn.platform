@@ -14,6 +14,7 @@ namespace DotNetNuke.Services.Messaging.Data
     [Serializable]
     public class Message : IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private string body;
         private Guid conversation;
         private bool emailSent;
@@ -38,9 +39,15 @@ namespace DotNetNuke.Services.Messaging.Data
         /// <summary>Initializes a new instance of the <see cref="Message"/> class.</summary>
         public Message()
         {
+			Logger.LogDebug(">>> Entering Message()");
             this.Conversation = Guid.Empty;
             this.Status = MessageStatusType.Draft;
+			Logger.LogDebug("Message(): this.Conversation → {Arg0}", this.Conversation);
+			Logger.LogDebug("Message(): this.Status → {Arg0}", this.Status);
+			Logger.LogDebug("Message(): Conversation → {Conversation}", Conversation);
             this.MessageDate = DateTime.Now;
+			Logger.LogDebug("<<< Exiting Message()");
+			Logger.LogDebug("Message(): this.MessageDate → {Arg0}", this.MessageDate);
         }
 
         public string FromUserName
@@ -299,6 +306,8 @@ namespace DotNetNuke.Services.Messaging.Data
 
         public Message GetReplyMessage()
         {
+			Logger.LogDebug(">>> Entering GetReplyMessage()");
+			Logger.LogDebug("<<< Exiting GetReplyMessage()");
             return new Message
             {
                 AllowReply = this.AllowReply,
@@ -317,14 +326,24 @@ namespace DotNetNuke.Services.Messaging.Data
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.MessageID = Null.SetNullInteger(dr["MessageID"]);
             this.PortalID = Null.SetNullInteger(dr["PortalID"]);
+			Logger.LogDebug("Fill(dr={Dr}): PortalID → {PortalID}", dr, PortalID);
+			Logger.LogDebug("Fill(dr={Dr}): ToUserID → {ToUserID}", dr, ToUserID);
             this.FromUserID = Null.SetNullInteger(dr["FromUserID"]);
+			Logger.LogDebug("Fill(dr={Dr}): FromUserID → {FromUserID}", dr, FromUserID);
             this.FromUserName = Null.SetNullString(dr["FromUserName"]);
             this.ToUserID = Null.SetNullInteger(dr["ToUserID"]);
 
             ////'_ToUserName = Null.SetNullString(dr.Item("ToUserName"))
             this.ReplyTo = Null.SetNullInteger(dr["ReplyTo"]);
+			Logger.LogDebug("Fill(dr={Dr}): ReplyTo → {ReplyTo}", dr, ReplyTo);
+			Logger.LogDebug("Fill(dr={Dr}): Body → {Body}", dr, Body);
+			Logger.LogDebug("Fill(dr={Dr}): Subject → {Subject}", dr, Subject);
+			Logger.LogDebug("Fill(dr={Dr}): AllowReply → {AllowReply}", dr, AllowReply);
+			Logger.LogDebug("Fill(dr={Dr}): SkipInbox → {SkipInbox}", dr, SkipInbox);
+			Logger.LogDebug("Fill(dr={Dr}): ToUserName → {ToUserName}", dr, ToUserName);
             this.Status = (MessageStatusType)Enum.Parse(typeof(MessageStatusType), Null.SetNullString(dr["Status"]));
             this.Body = Null.SetNullString(dr["Body"]);
             this.Subject = Null.SetNullString(dr["Subject"]);
@@ -336,10 +355,12 @@ namespace DotNetNuke.Services.Messaging.Data
             this.ToUserName = Null.SetNullString(dr["ToUserName"]);
             string g = Null.SetNullString(dr["Conversation"]);
             this.EmailSentDate = Null.SetNullDateTime(dr["EmailSentDate"]);
+			Logger.LogDebug("Fill(dr={Dr}): Conversation → {Conversation}", dr, Conversation);
             this.EmailSchedulerInstance = Null.SetNullGuid(dr["EmailSchedulerInstance"]);
             this.Conversation = Null.SetNullGuid(dr["Conversation"]);
 
             ////'Conversation = New Guid(g)
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }
