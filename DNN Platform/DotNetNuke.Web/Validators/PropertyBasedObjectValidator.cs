@@ -9,9 +9,12 @@ namespace DotNetNuke.Web.Validators
     /// <summary>A validator which validates each property of an object.</summary>
     public abstract class PropertyBasedObjectValidator : ObjectValidator
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public override ValidationResult ValidateObject(object target)
         {
+			Logger.LogDebug(">>> Entering ValidateObject(target={Target})", target);
+			Logger.LogDebug("<<< Exiting ValidateObject(target={Target})", target);
             return target.GetType().GetProperties().Aggregate(ValidationResult.Successful, (result, member) => result.CombineWith(this.ValidateProperty(target, member) ?? ValidationResult.Successful));
         }
 

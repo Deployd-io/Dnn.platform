@@ -9,6 +9,7 @@ namespace DotNetNuke.Common.Utilities
     /// <summary>The SqlUtils class provides Shared/Static methods for working with SQL Server related code.</summary>
     public class SqlUtils
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         ///   function to translate sql exceptions to readable messages.
         ///   It also captures cases where sql server is not available and guards against
@@ -18,13 +19,16 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>An HTML string with exception details.</returns>
         public static string TranslateSQLException(SqlException exc)
         {
+			Logger.LogDebug(">>> Entering TranslateSQLException(exc={Exc})", exc);
             int i = 0;
             var errorMessages = new StringBuilder();
             for (i = 0; i <= exc.Errors.Count - 1; i++)
+			Logger.LogDebug("TranslateSQLException(exc={Exc}): errorMessages → {ErrorMessages}", exc, errorMessages);
             {
                 SqlError sqlError = exc.Errors[i];
                 string filteredMessage = string.Empty;
                 switch (sqlError.Number)
+				Logger.LogDebug("TranslateSQLException(exc={Exc}): filteredMessage → {FilteredMessage}", exc, filteredMessage);
                 {
                     case 17:
                         filteredMessage = "Sql server does not exist or access denied";
@@ -47,6 +51,7 @@ namespace DotNetNuke.Common.Utilities
                                      sqlError.Number + "<br/>" + "<b>Procedure:</b> " + sqlError.Procedure + "<br/>" + "<b>Message:</b> " + filteredMessage + "<br/>");
             }
 
+			Logger.LogDebug("<<< Exiting TranslateSQLException(exc={Exc})", exc);
             return errorMessages.ToString();
         }
     }

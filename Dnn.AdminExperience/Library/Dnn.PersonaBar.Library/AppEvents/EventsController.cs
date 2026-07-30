@@ -27,6 +27,7 @@ namespace Dnn.PersonaBar.Library.AppEvents
         /// <inheritdoc />
         public void ApplicationStartEvent()
         {
+			Logger.LogDebug(">>> Entering ApplicationStartEvent()");
             lock (LockThis)
             {
                 if (isInitialized)
@@ -35,6 +36,7 @@ namespace Dnn.PersonaBar.Library.AppEvents
                 }
 
                 isInitialized = true;
+				Logger.LogDebug("ApplicationStartEvent(): isInitialized → {IsInitialized}", isInitialized);
             }
 
             GetEventsImplements<IAppEvents>().ForEach(instance =>
@@ -53,11 +55,13 @@ namespace Dnn.PersonaBar.Library.AppEvents
                         e.StackTrace);
                 }
             });
+			Logger.LogDebug("<<< Exiting ApplicationStartEvent()");
         }
 
         /// <inheritdoc />
         public void ApplicationEndEvent()
         {
+			Logger.LogDebug(">>> Entering ApplicationEndEvent()");
             GetEventsImplements<IAppEvents>().ForEach(instance =>
             {
                 try
@@ -74,25 +78,31 @@ namespace Dnn.PersonaBar.Library.AppEvents
                         e.StackTrace);
                 }
             });
+			Logger.LogDebug("<<< Exiting ApplicationEndEvent()");
         }
 
         /// <inheritdoc />
         protected override Func<IEventsController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new EventsController();
         }
 
         private static IEnumerable<T> GetEventsImplements<T>()
             where T : class
         {
+			Logger.LogDebug(">>> Entering GetEventsImplements()");
             var types = GetAllEventTypes<T>();
 
+			Logger.LogDebug("GetEventsImplements(): types → {Types}", types);
             foreach (var type in types)
             {
                 T appEventHandler;
                 try
                 {
                     appEventHandler = Activator.CreateInstance(type) as T;
+					Logger.LogDebug("GetEventsImplements(): appEventHandler → {AppEventHandler}", appEventHandler);
                 }
                 catch (Exception e)
                 {
@@ -109,25 +119,32 @@ namespace Dnn.PersonaBar.Library.AppEvents
                     yield return appEventHandler;
                 }
             }
+			Logger.LogDebug("<<< Exiting GetEventsImplements()");
         }
 
         private static IEnumerable<Type> GetAllEventTypes<T>()
             where T : class
         {
+			Logger.LogDebug(">>> Entering GetAllEventTypes()");
             var typeLocator = new TypeLocator();
             return typeLocator.GetAllMatchingTypes(
                 t => t is { IsClass: true, IsAbstract: false, IsVisible: true, } &&
                      typeof(T).IsAssignableFrom(t) &&
                      (IgnoreVersionMatchCheck(t) || VersionMatched(t)));
+			Logger.LogDebug("<<< Exiting GetAllEventTypes()");
+			Logger.LogDebug("GetAllEventTypes(): typeLocator → {TypeLocator}", typeLocator);
         }
 
         private static bool IgnoreVersionMatchCheck(Type type)
         {
+			Logger.LogDebug(">>> Entering IgnoreVersionMatchCheck(type={Type})", type);
+			Logger.LogDebug("<<< Exiting IgnoreVersionMatchCheck(type={Type})", type);
             return type.GetCustomAttributes(true).Any(a => a is IgnoreVersionMatchCheckAttribute);
         }
 
         private static bool VersionMatched(Type t)
         {
+			Logger.LogDebug(">>> Entering VersionMatched(t={T})", t);
             var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
             var typeVersion = t.Assembly.GetName().Version;
 
@@ -145,6 +162,7 @@ namespace Dnn.PersonaBar.Library.AppEvents
                     currentVersion);
             }
 
+			Logger.LogDebug("<<< Exiting VersionMatched(t={T})", t);
             return matched;
         }
     }

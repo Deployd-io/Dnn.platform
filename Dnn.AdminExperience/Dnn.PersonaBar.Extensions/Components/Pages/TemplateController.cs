@@ -28,6 +28,7 @@ namespace Dnn.PersonaBar.Pages.Components
 
     public class TemplateController : ServiceLocator<ITemplateController, TemplateController>, ITemplateController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string TemplatesFolderPath = "Templates/";
 
         private readonly IBusinessControllerProvider businessControllerProvider;
@@ -38,7 +39,11 @@ namespace Dnn.PersonaBar.Pages.Components
         public TemplateController()
             : this(null)
         {
+			Logger.LogDebug(">>> Entering TemplateController()");
             this.tabController = TabController.Instance;
+			Logger.LogDebug("<<< Exiting TemplateController()");
+			Logger.LogDebug("TemplateController(): tabController → {TabController}", tabController);
+			Logger.LogDebug("TemplateController(): this.tabController → {Arg0}", this.tabController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="TemplateController"/> class.</summary>
@@ -47,31 +52,40 @@ namespace Dnn.PersonaBar.Pages.Components
         {
             this.businessControllerProvider = businessControllerProvider ?? Globals.DependencyProvider.GetRequiredService<IBusinessControllerProvider>();
             this.tabController = TabController.Instance;
+			Logger.LogDebug("TemplateController(businessControllerProvider={BusinessControllerProvider}): tabController → {TabController}", businessControllerProvider, tabController);
+			Logger.LogDebug("TemplateController(businessControllerProvider={BusinessControllerProvider}): this.tabController → {Arg1}", businessControllerProvider, this.tabController);
+			Logger.LogDebug("TemplateController(businessControllerProvider={BusinessControllerProvider}): businessControllerProvider → {BusinessControllerProvider1}", businessControllerProvider, businessControllerProvider);
         }
 
         /// <inheritdoc />
         public string SaveAsTemplate(PageTemplate template)
         {
+			Logger.LogDebug(">>> Entering SaveAsTemplate(template={Template})", template);
             string filename;
             try
             {
                 var folder = GetTemplateFolder() ?? CreateTemplateFolder();
 
+				Logger.LogDebug("SaveAsTemplate(template={Template}): folder → {Folder}", template, folder);
                 filename = $"{folder.FolderPath}{template.Name}.page.template";
+				Logger.LogDebug("SaveAsTemplate(template={Template}): filename → {Filename}", template, filename);
                 filename = filename.Replace("/", @"\");
 
                 var xmlTemplate = new XmlDocument { XmlResolver = null };
                 var nodePortal = xmlTemplate.AppendChild(xmlTemplate.CreateElement("portal"));
                 nodePortal.Attributes?.Append(XmlUtils.CreateAttribute(xmlTemplate, "version", "3.0"));
+				Logger.LogDebug("SaveAsTemplate(template={Template}): nodePortal → {NodePortal}", template, nodePortal);
 
                 // Add template description
                 var node = xmlTemplate.CreateElement("description");
                 node.InnerXml = HttpUtility.HtmlEncode(template.Description);
+				Logger.LogDebug("SaveAsTemplate(template={Template}): node → {Node}", template, node);
                 nodePortal.AppendChild(node);
 
                 // Serialize tabs
                 var nodeTabs = nodePortal.AppendChild(xmlTemplate.CreateElement("tabs"));
                 this.SerializeTab(template, xmlTemplate, nodeTabs);
+				Logger.LogDebug("SaveAsTemplate(template={Template}): nodeTabs → {NodeTabs}", template, nodeTabs);
 
                 // add file to Files table
                 const bool permissionsCheckedByCallingMethod = true;
@@ -83,9 +97,11 @@ namespace Dnn.PersonaBar.Pages.Components
                     true,
                     !permissionsCheckedByCallingMethod,
                     "application/octet-stream");
+					Logger.LogDebug("SaveAsTemplate(template={Template}): fileContent → {FileContent}", template, fileContent);
             }
             catch (DotNetNuke.Services.FileSystem.PermissionsNotMetException)
             {
+				Logger.LogError("Exception in SaveAsTemplate(template={Template}): {Arg1}", template, ex.Message);
                 throw new TemplateException("Error accessing to the templates folder.");
             }
             catch (Exception)
@@ -93,15 +109,20 @@ namespace Dnn.PersonaBar.Pages.Components
                 throw new TemplateException("Error accessing to the templates folder.");
             }
 
+			Logger.LogDebug("<<< Exiting SaveAsTemplate(template={Template})", template);
             return filename;
         }
 
         /// <inheritdoc />
         public IEnumerable<Template> GetTemplates()
         {
+			Logger.LogDebug(">>> Entering GetTemplates()");
             var portalSettings = PortalController.Instance.GetCurrentSettings();
             var templateFolder = FolderManager.Instance.GetFolder(portalSettings.PortalId, TemplatesFolderPath);
+			Logger.LogDebug("GetTemplates(): portalSettings → {PortalSettings}", portalSettings);
+			Logger.LogDebug("GetTemplates(): templateFolder → {TemplateFolder}", templateFolder);
 
+			Logger.LogDebug("<<< Exiting GetTemplates()");
             return LoadTemplates(portalSettings.PortalId, templateFolder);
         }
 
@@ -191,22 +212,30 @@ namespace Dnn.PersonaBar.Pages.Components
                 {
                     throw new PageException(exceptions);
                 }
+				Logger.LogDebug(">>> Entering CreateTemplateFolder()");
+				Logger.LogDebug("<<< Exiting CreateTemplateFolder()");
             }
         }
 
         /// <inheritdoc />
         protected override Func<ITemplateController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return Globals.DependencyProvider.GetRequiredService<ITemplateController>;
         }
 
         private static IFolderInfo GetTemplateFolder()
         {
+			Logger.LogDebug(">>> Entering GetTemplateFolder()");
+			Logger.LogDebug("<<< Exiting GetTemplateFolder()");
             return FolderManager.Instance.GetFolder(PortalSettings.Current.PortalId, TemplatesFolderPath);
         }
 
         private static IFolderInfo CreateTemplateFolder()
         {
+			Logger.LogDebug(">>> Entering CreateTemplateFolder()");
+			Logger.LogDebug("<<< Exiting CreateTemplateFolder()");
             return FolderManager.Instance.AddFolder(PortalSettings.Current.PortalId, TemplatesFolderPath);
         }
 
@@ -214,6 +243,7 @@ namespace Dnn.PersonaBar.Pages.Components
         {
             var templates = new List<Template>();
             if (templateFolder == null)
+			Logger.LogDebug("LoadTemplates(portalId={PortalId},templateFolder={TemplateFolder}): templates → {Templates}", portalId, templateFolder, templates);
             {
                 return templates;
             }
@@ -227,6 +257,7 @@ namespace Dnn.PersonaBar.Pages.Components
             var files = Globals.GetFileList(portalId, "page.template", false, templateFolder.FolderPath);
             foreach (FileItem file in files)
             {
+			Logger.LogDebug("LoadTemplates(portalId={PortalId},templateFolder={TemplateFolder}): files → {Files}", portalId, templateFolder, files);
                 if (!int.TryParse(file.Value, out var i))
                 {
                     i = 0;
@@ -239,6 +270,7 @@ namespace Dnn.PersonaBar.Pages.Components
                 });
             }
 
+			Logger.LogDebug("<<< Exiting LoadTemplates(portalId={PortalId},templateFolder={TemplateFolder})", portalId, templateFolder);
             return templates;
         }
 

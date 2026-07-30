@@ -56,6 +56,7 @@ namespace log4net.Appender
     /// <author>Ron Grabowski</author>
     public class AspNetTraceAppender : AppenderSkeleton 
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Initializes a new instance of the <see cref="AspNetTraceAppender" /> class.
         /// </summary>
@@ -66,6 +67,8 @@ namespace log4net.Appender
         /// </remarks>
         public AspNetTraceAppender() 
         {
+		Logger.LogDebug(">>> Entering AspNetTraceAppender()");
+		Logger.LogDebug("<<< Exiting AspNetTraceAppender()");
         }
 
         /// <summary>
@@ -81,6 +84,7 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent loggingEvent) 
         {
+			Logger.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             // check if log4net is running in the context of an ASP.NET application
             if (HttpContext.Current != null) 
             {
@@ -97,6 +101,7 @@ namespace log4net.Appender
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
         }
 
         /// <summary>

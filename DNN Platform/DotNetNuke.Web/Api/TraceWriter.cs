@@ -21,12 +21,16 @@ namespace DotNetNuke.Web.Api
         /// <param name="isTracingEnabled">Whether tracing is enabled.</param>
         public TraceWriter(bool isTracingEnabled)
         {
+			Logger.LogDebug(">>> Entering TraceWriter(isTracingEnabled={IsTracingEnabled})", isTracingEnabled);
             this.enabled = isTracingEnabled;
+			Logger.LogDebug("<<< Exiting TraceWriter(isTracingEnabled={IsTracingEnabled})", isTracingEnabled);
+			Logger.LogDebug("TraceWriter(isTracingEnabled={IsTracingEnabled}): this.enabled → {Arg1}", isTracingEnabled, this.enabled);
         }
 
         /// <inheritdoc />
         public void Trace(HttpRequestMessage request, string category, TraceLevel level, Action<TraceRecord> traceAction)
         {
+			Logger.LogDebug(">>> Entering Trace(request={Request},category={Category},level={Level},traceAction={TraceAction})", request, category, level, traceAction);
             if (!this.enabled || level == TraceLevel.Off)
             {
                 return;
@@ -34,6 +38,7 @@ namespace DotNetNuke.Web.Api
 
             var rec = new TraceRecord(request, category, level);
             traceAction(rec);
+			Logger.LogDebug("Trace(request={Request},category={Category},level={Level},traceAction={TraceAction}): rec → {Rec}", request, category, level, traceAction, rec);
             Log(rec);
         }
 

@@ -16,12 +16,17 @@ namespace DotNetNuke.UI.Skins.Controls
     /// <summary>A control which requests the inclusion of a JavaScript library on the page.</summary>
     public partial class JavaScriptLibraryInclude : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IJavaScriptLibraryHelper javaScript;
 
         /// <summary>Initializes a new instance of the <see cref="JavaScriptLibraryInclude"/> class.</summary>
         public JavaScriptLibraryInclude()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering JavaScriptLibraryInclude()");
+		Logger.LogDebug("<<< Exiting JavaScriptLibraryInclude()");
+		Logger.LogDebug(">>> Entering JavaScriptLibraryInclude(javaScript={JavaScript})", javaScript);
+		Logger.LogDebug("<<< Exiting JavaScriptLibraryInclude(javaScript={JavaScript})", javaScript);
         }
 
         /// <summary>Initializes a new instance of the <see cref="JavaScriptLibraryInclude"/> class.</summary>
@@ -29,6 +34,7 @@ namespace DotNetNuke.UI.Skins.Controls
         public JavaScriptLibraryInclude(IJavaScriptLibraryHelper javaScript)
         {
             this.javaScript = javaScript ?? Globals.GetCurrentServiceProvider().GetRequiredService<IJavaScriptLibraryHelper>();
+			Logger.LogDebug("JavaScriptLibraryInclude(javaScript={JavaScript}): javaScript → {JavaScript1}", javaScript, javaScript);
         }
 
         public string Name { get; set; }
@@ -40,6 +46,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             if (this.Version == null)
             {
                 this.javaScript.RequestRegistration(this.Name);
@@ -52,6 +59,7 @@ namespace DotNetNuke.UI.Skins.Controls
             {
                 this.javaScript.RequestRegistration(this.Name, this.Version, this.SpecificVersion.Value);
             }
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
     }
 }

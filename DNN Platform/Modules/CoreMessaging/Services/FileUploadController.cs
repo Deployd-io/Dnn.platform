@@ -33,8 +33,10 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [IFrameSupportedValidateAntiForgeryToken]
         public HttpResponseMessage UploadFile()
         {
+			Logger.LogDebug(">>> Entering UploadFile()");
             var statuses = new List<FilesStatus>();
             try
+			Logger.LogDebug("UploadFile(): statuses → {Statuses}", statuses);
             {
                 // todo can we eliminate the HttpContext here
                 this.UploadWholeFile(HttpContextSource.Current, statuses);
@@ -44,6 +46,7 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
                 Logger.Error(exc);
             }
 
+			Logger.LogDebug("<<< Exiting UploadFile()");
             return this.IframeSafeJson(statuses);
         }
 

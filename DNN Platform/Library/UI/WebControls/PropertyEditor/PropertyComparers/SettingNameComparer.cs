@@ -8,9 +8,11 @@ namespace DotNetNuke.UI.WebControls
 
     public class SettingNameComparer : IComparer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <inheritdoc />
         public int Compare(object x, object y)
         {
+			Logger.LogDebug(">>> Entering Compare(x={X},y={Y})", x, y);
             if (x is SettingInfo && y is SettingInfo)
             {
                 return string.Compare(((SettingInfo)x).Name, ((SettingInfo)y).Name, StringComparison.Ordinal);
@@ -19,6 +21,7 @@ namespace DotNetNuke.UI.WebControls
             {
                 throw new ArgumentException("Object is not of type SettingInfo");
             }
+			Logger.LogDebug("<<< Exiting Compare(x={X},y={Y})", x, y);
         }
     }
 }

@@ -10,14 +10,22 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
     /// <summary>Constrast ImageTransform class.</summary>
     public class ImageContrastTransform : ImageTransform
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ImageContrastTransform"/> class.</summary>
         public ImageContrastTransform()
         {
+			Logger.LogDebug(">>> Entering ImageContrastTransform()");
             this.InterpolationMode = InterpolationMode.HighQualityBicubic;
             this.SmoothingMode = SmoothingMode.HighQuality;
+			Logger.LogDebug("ImageContrastTransform(): this.InterpolationMode → {Arg0}", this.InterpolationMode);
+			Logger.LogDebug("ImageContrastTransform(): this.SmoothingMode → {Arg0}", this.SmoothingMode);
             this.PixelOffsetMode = PixelOffsetMode.HighQuality;
             this.CompositingQuality = CompositingQuality.HighQuality;
             this.Contrast = 0;
+			Logger.LogDebug("<<< Exiting ImageContrastTransform()");
+			Logger.LogDebug("ImageContrastTransform(): this.PixelOffsetMode → {Arg0}", this.PixelOffsetMode);
+			Logger.LogDebug("ImageContrastTransform(): this.CompositingQuality → {Arg0}", this.CompositingQuality);
+			Logger.LogDebug("ImageContrastTransform(): this.Contrast → {Arg0}", this.Contrast);
         }
 
         /// <summary>Gets provides an Unique String for this class.</summary>
@@ -31,11 +39,14 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
         /// <returns>Image result after image transformation.</returns>
         public override Image ProcessImage(Image image)
         {
+			Logger.LogDebug(">>> Entering ProcessImage(image={Image})", image);
             var temp = (Bitmap)image;
             var bmap = (Bitmap)temp.Clone();
             if (this.Contrast < -100)
+			Logger.LogDebug("ProcessImage(image={Image}): bmap → {Bmap}", image, bmap);
             {
                 this.Contrast = -100;
+				Logger.LogDebug("ProcessImage(image={Image}): this.Contrast → {Arg1}", image, this.Contrast);
             }
 
             if (this.Contrast > 100)
@@ -52,6 +63,8 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
                 {
                     c = bmap.GetPixel(i, j);
                     double pR = c.R / 255.0;
+					Logger.LogDebug("ProcessImage(image={Image}): c → {C}", image, c);
+					Logger.LogDebug("ProcessImage(image={Image}): pR → {PR}", image, pR);
                     pR -= 0.5;
                     pR *= this.Contrast;
                     pR += 0.5;
@@ -68,6 +81,7 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
 
                     double pG = c.G / 255.0;
                     pG -= 0.5;
+					Logger.LogDebug("ProcessImage(image={Image}): pG → {PG}", image, pG);
                     pG *= this.Contrast;
                     pG += 0.5;
                     pG *= 255;
@@ -83,6 +97,7 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
 
                     double pB = c.B / 255.0;
                     pB -= 0.5;
+					Logger.LogDebug("ProcessImage(image={Image}): pB → {PB}", image, pB);
                     pB *= this.Contrast;
                     pB += 0.5;
                     pB *= 255;
@@ -100,6 +115,7 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ProcessImage(image={Image})", image);
             return (Bitmap)bmap.Clone();
         }
     }

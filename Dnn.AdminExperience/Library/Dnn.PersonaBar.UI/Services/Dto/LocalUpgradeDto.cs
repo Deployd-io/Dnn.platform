@@ -15,6 +15,7 @@ using DotNetNuke.Services.Installer;
 [Serializable]
 public class LocalUpgradeDto
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Gets or sets a value indicating whether the package is valid.</summary>
     [DataMember]
     public bool IsValid { get; set; }
@@ -39,6 +40,8 @@ public class LocalUpgradeDto
     /// <returns>A new <see cref="LocalUpgradeDto"/> instance.</returns>
     public static LocalUpgradeDto FromLocalUpgradeInfo(LocalUpgradeInfo info)
     {
+		Logger.LogDebug(">>> Entering FromLocalUpgradeInfo(info={Info})", info);
+		Logger.LogDebug("<<< Exiting FromLocalUpgradeInfo(info={Info})", info);
         return new LocalUpgradeDto
         {
             Version = info.Version,

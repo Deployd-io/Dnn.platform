@@ -108,6 +108,7 @@ namespace DotNetNuke.Collections
         /// <exception cref="ArgumentException"><paramref name="dictionary"/> does not contain a value for <paramref name="key"/>.</exception>
         public static T GetValue<T>(this IDictionary dictionary, string key)
         {
+			Logger.LogDebug(">>> Entering GetValue(dictionary={Dictionary},key={Key})", dictionary, key);
             return dictionary.GetValue(key, ConvertValue<T>);
         }
 
@@ -336,6 +337,7 @@ namespace DotNetNuke.Collections
         /// <exception cref="ArgumentNullException"><paramref name="dictionary"/> is <c>null</c>.</exception>
         public static T GetValueOrDefault<T>(this IDictionary dictionary, string key)
         {
+			Logger.LogDebug(">>> Entering GetValueOrDefault(dictionary={Dictionary},key={Key})", dictionary, key);
             return dictionary.GetValueOrDefault(key, default(T));
         }
 
@@ -840,6 +842,7 @@ namespace DotNetNuke.Collections
         /// <returns>The provided source after the action was performed on each element.</returns>
         public static IEnumerable<TType> ForEach<TType>(this IEnumerable<TType> source, Action<TType> action)
         {
+			Logger.LogDebug(">>> Entering ForEach(source={Source},action={Action})", source, action);
             foreach (TType element in source)
             {
                 action(element);
@@ -856,8 +859,16 @@ namespace DotNetNuke.Collections
         /// <returns>A serializable list of type T.</returns>
         public static SerializablePagedList<T> Serialize<T>(this IPagedList<T> list)
         {
+			Logger.LogDebug(">>> Entering Serialize(list={List})", list);
             var res = new SerializablePagedList<T>();
             res.PageIndex = list.PageIndex;
+			Logger.LogDebug("Serialize(list={List}): res → {Res}", list, res);
+			Logger.LogDebug("Serialize(list={List}): res.PageIndex → {Arg1}", list, res.PageIndex);
+			Logger.LogDebug("Serialize(list={List}): res.PageSize → {Arg1}", list, res.PageSize);
+			Logger.LogDebug("Serialize(list={List}): res.IsFirstPage → {Arg1}", list, res.IsFirstPage);
+			Logger.LogDebug("Serialize(list={List}): res.IsLastPage → {Arg1}", list, res.IsLastPage);
+			Logger.LogDebug("Serialize(list={List}): res.PageCount → {Arg1}", list, res.PageCount);
+			Logger.LogDebug("Serialize(list={List}): res.TotalCount → {Arg1}", list, res.TotalCount);
             res.PageSize = list.PageSize;
             res.IsFirstPage = list.IsFirstPage;
             res.IsLastPage = list.IsLastPage;
@@ -867,6 +878,7 @@ namespace DotNetNuke.Collections
             return res;
         }
 
+		Logger.LogDebug("Serialize(list={List}): res.Data → {Arg1}", list, res.Data);
         /// <summary>
         /// Converts the specified IPagedList to a Serializable Paged List.
         /// </summary>
@@ -899,6 +911,7 @@ namespace DotNetNuke.Collections
         /// </exception>
         private static T ConvertValue<T>(object value)
         {
+			Logger.LogDebug(">>> Entering ConvertValue(value={Value})", value);
             if (value is T)
             {
                 return (T)value;

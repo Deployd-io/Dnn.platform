@@ -15,6 +15,7 @@ namespace DotNetNuke.UI.WebControls
     [ToolboxData("<{0}:CountryListBox runat=server></{0}:CountryListBox>")]
     public class CountryListBox : DropDownList
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private bool cacheGeoIPData = true;
 
         /// <summary>Gets or sets a value indicating whether to cache the GeoIP data.</summary>
@@ -59,14 +60,17 @@ namespace DotNetNuke.UI.WebControls
         /// <inheritdoc />
         protected override void OnDataBinding(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnDataBinding(e={E})", e);
             bool isLocal = false;
             string ip;
+			Logger.LogDebug("OnDataBinding(e={E}): isLocal → {IsLocal}", e, isLocal);
             if (!this.Page.IsPostBack)
             {
                 // If GeoIPFile is not provided, assume they put it in BIN.
                 if (string.IsNullOrEmpty(this.GeoIPFile))
                 {
                     this.GeoIPFile = "controls/CountryListBox/Data/GeoIP.dat";
+					Logger.LogDebug("OnDataBinding(e={E}): this.GeoIPFile → {Arg1}", e, this.GeoIPFile);
                 }
 
                 this.EnsureChildControls();
@@ -77,6 +81,7 @@ namespace DotNetNuke.UI.WebControls
                     // TestIP is specified, let's use it
                     ip = this.TestIP;
                 }
+				Logger.LogDebug("OnDataBinding(e={E}): ip → {Ip}", e, ip);
                 else if (this.Page.Request.UserHostAddress == "127.0.0.1")
                 {
                     // The country cannot be detected because the user is local.
@@ -124,6 +129,7 @@ namespace DotNetNuke.UI.WebControls
                     {
                         // Yes, get it from cache
                         countryLookup = new CountryLookup((MemoryStream)this.Context.Cache.Get("GeoIPData"));
+						Logger.LogDebug("OnDataBinding(e={E}): countryLookup → {CountryLookup}", e, countryLookup);
                     }
                     else
                     {
@@ -153,6 +159,9 @@ namespace DotNetNuke.UI.WebControls
                         {
                             var newItem = new ListItem();
                             newItem.Value = userCountryCode;
+							Logger.LogDebug("OnDataBinding(e={E}): newItem → {NewItem}", e, newItem);
+							Logger.LogDebug("OnDataBinding(e={E}): newItem.Value → {Arg1}", e, newItem.Value);
+							Logger.LogDebug("OnDataBinding(e={E}): newItem.Text → {Arg1}", e, newItem.Text);
                             newItem.Text = userCountry;
                             this.Items.Insert(0, newItem);
 
@@ -162,6 +171,7 @@ namespace DotNetNuke.UI.WebControls
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting OnDataBinding(e={E})", e);
         }
     }
 }

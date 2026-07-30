@@ -14,8 +14,11 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
     [JsonObject]
     public class ModulePackageDetailDto : ModulePackagePermissionsDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public ModulePackageDetailDto()
         {
+		Logger.LogDebug(">>> Entering ModulePackageDetailDto()");
+		Logger.LogDebug("<<< Exiting ModulePackageDetailDto()");
         }
 
         public ModulePackageDetailDto(int portalId, PackageInfo package, DesktopModuleInfo desktopModule)
@@ -23,15 +26,26 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
         {
             this.DesktopModuleId = desktopModule.DesktopModuleID;
             this.ModuleName = desktopModule.ModuleName;
+			Logger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.DesktopModuleId → {Arg3}", portalId, package, desktopModule, this.DesktopModuleId);
+			Logger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.ModuleName → {Arg3}", portalId, package, desktopModule, this.ModuleName);
             this.FolderName = desktopModule.FolderName;
             this.BusinessController = desktopModule.BusinessControllerClass;
             this.Category = desktopModule.Category;
+			Logger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.FolderName → {Arg3}", portalId, package, desktopModule, this.FolderName);
+			Logger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.BusinessController → {Arg3}", portalId, package, desktopModule, this.BusinessController);
+			Logger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.Category → {Arg3}", portalId, package, desktopModule, this.Category);
             this.Dependencies = desktopModule.Dependencies;
             this.HostPermissions = desktopModule.Permissions;
             this.Portable = desktopModule.IsPortable;
             this.Searchable = desktopModule.IsSearchable;
             this.Upgradeable = desktopModule.IsUpgradeable;
             this.PremiumModule = desktopModule.IsPremium;
+			Logger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.Dependencies → {Arg3}", portalId, package, desktopModule, this.Dependencies);
+			Logger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.HostPermissions → {Arg3}", portalId, package, desktopModule, this.HostPermissions);
+			Logger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.Portable → {Arg3}", portalId, package, desktopModule, this.Portable);
+			Logger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.Searchable → {Arg3}", portalId, package, desktopModule, this.Searchable);
+			Logger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.Upgradeable → {Arg3}", portalId, package, desktopModule, this.Upgradeable);
+			Logger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.PremiumModule → {Arg3}", portalId, package, desktopModule, this.PremiumModule);
             this.Shareable = desktopModule.Shareable;
 
             if (!desktopModule.IsAdmin)
@@ -44,8 +58,11 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
                     this.AssignedPortals.Add(new ListItemDto { Id = value.PortalID, Name = value.PortalName });
                 }
 
+				Logger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): this.Shareable → {Arg3}", portalId, package, desktopModule, this.Shareable);
                 var assignedIds = this.AssignedPortals.Select(p => p.Id).ToArray();
                 var allPortals = PortalController.Instance.GetPortals().OfType<PortalInfo>().Where(p => !assignedIds.Contains(p.PortalID));
+				Logger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): assignedIds → {AssignedIds}", portalId, package, desktopModule, assignedIds);
+				Logger.LogDebug("ModulePackageDetailDto(portalId={PortalId},package={Package},desktopModule={DesktopModule}): allPortals → {AllPortals}", portalId, package, desktopModule, allPortals);
 
                 foreach (var portalInfo in allPortals)
                 {

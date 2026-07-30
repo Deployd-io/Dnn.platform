@@ -23,6 +23,7 @@ using System.Collections;
 
 namespace log4net.Util
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Implementation of Properties collection for the <see cref="log4net.GlobalContext"/>
     /// </summary>
@@ -69,6 +70,8 @@ namespace log4net.Util
         /// </remarks>
         internal GlobalContextProperties()
         {
+		Logger.LogDebug(">>> Entering GlobalContextProperties()");
+		Logger.LogDebug("<<< Exiting GlobalContextProperties()");
         }
 
         /// <summary>
@@ -115,17 +118,21 @@ namespace log4net.Util
         /// </remarks>
         public void Remove(string key)
         {
+			Logger.LogDebug(">>> Entering Remove(key={Key})", key);
             lock(this.m_syncRoot)
             {
                 if (this.m_readOnlyProperties.Contains(key))
                 {
                     PropertiesDictionary mutableProps = new PropertiesDictionary(this.m_readOnlyProperties);
 
+					Logger.LogDebug("Remove(key={Key}): mutableProps → {MutableProps}", key, mutableProps);
                     mutableProps.Remove(key);
 
                     this.m_readOnlyProperties = new ReadOnlyPropertiesDictionary(mutableProps);
+					Logger.LogDebug("Remove(key={Key}): m_readOnlyProperties → {M_readOnlyProperties}", key, m_readOnlyProperties);
                 }
             }
+			Logger.LogDebug("<<< Exiting Remove(key={Key})", key);
         }
 
         /// <summary>
@@ -133,10 +140,13 @@ namespace log4net.Util
         /// </summary>
         public void Clear()
         {
+			Logger.LogDebug(">>> Entering Clear()");
             lock(this.m_syncRoot)
             {
                 this.m_readOnlyProperties = new ReadOnlyPropertiesDictionary();
+				Logger.LogDebug("Clear(): m_readOnlyProperties → {M_readOnlyProperties}", m_readOnlyProperties);
             }
+			Logger.LogDebug("<<< Exiting Clear()");
         }
 
         /// <summary>
@@ -151,6 +161,8 @@ namespace log4net.Util
         /// </remarks>
         internal ReadOnlyPropertiesDictionary GetReadOnlyProperties()
         {
+			Logger.LogDebug(">>> Entering GetReadOnlyProperties()");
+			Logger.LogDebug("<<< Exiting GetReadOnlyProperties()");
             return this.m_readOnlyProperties;
         }
     }

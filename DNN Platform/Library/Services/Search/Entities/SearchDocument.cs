@@ -11,11 +11,16 @@ namespace DotNetNuke.Services.Search.Entities
     [Serializable]
     public class SearchDocument : SearchDocumentToDelete
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="SearchDocument"/> class.</summary>
         public SearchDocument()
         {
+			Logger.LogDebug(">>> Entering SearchDocument()");
             this.Tags = [];
             this.IsActive = true;
+			Logger.LogDebug("<<< Exiting SearchDocument()");
+			Logger.LogDebug("SearchDocument(): this.Tags → {Arg0}", this.Tags);
+			Logger.LogDebug("SearchDocument(): this.IsActive → {Arg0}", this.IsActive);
         }
 
         /// <summary>Gets or sets content's Title.</summary>
@@ -62,6 +67,8 @@ namespace DotNetNuke.Services.Search.Entities
         /// <inheritdoc />
         public override string ToString()
         {
+			Logger.LogDebug(">>> Entering ToString()");
+			Logger.LogDebug("<<< Exiting ToString()");
             return string.Join(
                 ", ",
                 "Portal ID: " + this.PortalId,

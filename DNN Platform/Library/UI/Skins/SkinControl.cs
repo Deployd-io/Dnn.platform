@@ -21,6 +21,7 @@ namespace DotNetNuke.UI.Skins
 
     public class SkinControl : UserControlBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
         protected DropDownList cboSkin;
@@ -106,6 +107,7 @@ namespace DotNetNuke.UI.Skins
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             this.optHost.CheckedChanged += this.optHost_CheckedChanged;
             this.optSite.CheckedChanged += this.optSite_CheckedChanged;
@@ -115,6 +117,7 @@ namespace DotNetNuke.UI.Skins
                 if (this.Request.QueryString["pid"] != null && (Globals.IsHostTab(this.PortalSettings.ActiveTab.TabID) || UserController.Instance.GetCurrentUserInfo().IsSuperUser))
                 {
                     this.objPortal = PortalController.Instance.GetPortal(int.Parse(this.Request.QueryString["pid"], CultureInfo.InvariantCulture));
+					Logger.LogDebug("OnLoad(e={E}): objPortal → {ObjPortal}", e, objPortal);
                 }
                 else
                 {
@@ -165,9 +168,11 @@ namespace DotNetNuke.UI.Skins
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, ex.Message);
                 // Module failed to load
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
@@ -176,7 +181,9 @@ namespace DotNetNuke.UI.Skins
         // ReSharper disable once InconsistentNaming
         protected void optHost_CheckedChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering optHost_CheckedChanged(sender={Sender},e={E})", sender, e);
             this.LoadSkins();
+			Logger.LogDebug("<<< Exiting optHost_CheckedChanged(sender={Sender},e={E})", sender, e);
         }
 
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
@@ -185,7 +192,9 @@ namespace DotNetNuke.UI.Skins
         // ReSharper disable once InconsistentNaming
         protected void optSite_CheckedChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering optSite_CheckedChanged(sender={Sender},e={E})", sender, e);
             this.LoadSkins();
+			Logger.LogDebug("<<< Exiting optSite_CheckedChanged(sender={Sender},e={E})", sender, e);
         }
 
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
@@ -194,6 +203,7 @@ namespace DotNetNuke.UI.Skins
         // ReSharper disable once InconsistentNaming
         protected void cmdPreview_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering cmdPreview_Click(sender={Sender},e={E})", sender, e);
             if (!string.IsNullOrEmpty(this.SkinSrc))
             {
                 string strType = this.SkinRoot.Substring(0, this.SkinRoot.Length - 1);
@@ -210,10 +220,12 @@ namespace DotNetNuke.UI.Skins
 
                 this.Response.Redirect(strURL, true);
             }
+			Logger.LogDebug("<<< Exiting cmdPreview_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void LoadSkins()
         {
+			Logger.LogDebug(">>> Entering LoadSkins()");
             this.cboSkin.Items.Clear();
 
             if (this.optHost.Checked)
@@ -245,6 +257,7 @@ namespace DotNetNuke.UI.Skins
                     break;
                 }
             }
+			Logger.LogDebug("<<< Exiting LoadSkins()");
         }
     }
 }

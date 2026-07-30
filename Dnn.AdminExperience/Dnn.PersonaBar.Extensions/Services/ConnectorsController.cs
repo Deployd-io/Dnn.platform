@@ -30,16 +30,24 @@ namespace Dnn.PersonaBar.Connectors.Services
 
         public ConnectorsController(IServiceProvider serviceProvider, IConnectionsManager connectionsManager)
         {
+			Logger.LogDebug(">>> Entering ConnectorsController(serviceProvider={ServiceProvider},connectionsManager={ConnectionsManager})", serviceProvider, connectionsManager);
             this.serviceProvider = serviceProvider;
             this.connectionsManager = connectionsManager;
+			Logger.LogDebug("<<< Exiting ConnectorsController(serviceProvider={ServiceProvider},connectionsManager={ConnectionsManager})", serviceProvider, connectionsManager);
+			Logger.LogDebug("ConnectorsController(serviceProvider={ServiceProvider},connectionsManager={ConnectionsManager}): this.serviceProvider → {Arg2}", serviceProvider, connectionsManager, this.serviceProvider);
+			Logger.LogDebug("ConnectorsController(serviceProvider={ServiceProvider},connectionsManager={ConnectionsManager}): connectionsManager → {ConnectionsManager1}", serviceProvider, connectionsManager, connectionsManager);
+			Logger.LogDebug("ConnectorsController(serviceProvider={ServiceProvider},connectionsManager={ConnectionsManager}): this.connectionsManager → {Arg2}", serviceProvider, connectionsManager, this.connectionsManager);
+			Logger.LogDebug("ConnectorsController(serviceProvider={ServiceProvider},connectionsManager={ConnectionsManager}): serviceProvider → {ServiceProvider1}", serviceProvider, connectionsManager, serviceProvider);
         }
 
         [HttpGet]
         public HttpResponseMessage GetConnections()
         {
+			Logger.LogDebug(">>> Entering GetConnections()");
             var connections = this.GetConnections(this.PortalId);
             connections.ForEach(x =>
             {
+			Logger.LogDebug("GetConnections(): connections → {Connections}", connections);
                 {
                     x.HasConfig(this.PortalSettings.PortalId);
                 }
@@ -60,6 +68,15 @@ namespace Dnn.PersonaBar.Connectors.Services
                 })
                 .OrderBy(connection => connection.name)
                 .ToList();
+					Logger.LogDebug("GetConnections(): name → {Name}", name);
+					Logger.LogDebug("GetConnections(): type → {Type}", type);
+					Logger.LogDebug("GetConnections(): displayName → {DisplayName}", displayName);
+					Logger.LogDebug("GetConnections(): connected → {Connected}", connected);
+					Logger.LogDebug("GetConnections(): icon → {Icon}", icon);
+					Logger.LogDebug("GetConnections(): pluginFolder → {PluginFolder}", pluginFolder);
+					Logger.LogDebug("GetConnections(): configurations → {Configurations}", configurations);
+					Logger.LogDebug("GetConnections(): supportsMultiple → {SupportsMultiple}", supportsMultiple);
+			Logger.LogDebug("<<< Exiting GetConnections()");
             return this.Request.CreateResponse(HttpStatusCode.OK, connectionsResponse);
         }
 
@@ -67,18 +84,24 @@ namespace Dnn.PersonaBar.Connectors.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage SaveConnection(object postData)
         {
+			Logger.LogDebug(">>> Entering SaveConnection(postData={PostData})", postData);
             try
             {
                 var jsonData = DotNetNuke.Common.Utilities.Json.Serialize(postData);
                 var serializer = new JavaScriptSerializer();
+				Logger.LogDebug("SaveConnection(postData={PostData}): jsonData → {JsonData}", postData, jsonData);
+				Logger.LogDebug("SaveConnection(postData={PostData}): serializer → {Serializer}", postData, serializer);
                 serializer.RegisterConverters([new DynamicJsonConverter(),]);
 
                 dynamic postObject = serializer.Deserialize<object>(jsonData);
 
                 var name = postObject.name;
                 var displayName = postObject.displayName;
+				Logger.LogDebug("SaveConnection(postData={PostData}): name → {Name}", postData, name);
                 var id = postObject.id;
                 var connectors = this.GetConnections(this.PortalId);
+				Logger.LogDebug("SaveConnection(postData={PostData}): id → {Id}", postData, id);
+				Logger.LogDebug("SaveConnection(postData={PostData}): connectors → {Connectors}", postData, connectors);
                 connectors.ForEach(x =>
                     {
                         {
@@ -93,11 +116,14 @@ namespace Dnn.PersonaBar.Connectors.Services
                 var connector = connectors.FirstOrDefault(c =>
                     (c.SupportsMultiple && (c.Id == id || string.IsNullOrEmpty(c.Id))) ||
                     !c.SupportsMultiple);
+					Logger.LogDebug("SaveConnection(postData={PostData}): connector → {Connector}", postData, connector);
 
                 if (connector == null && string.IsNullOrEmpty(id) && connectors.Any(x => x.SupportsMultiple))
                 {
                     connector = connectors.First();
                     connector.Id = null;
+					Logger.LogDebug("SaveConnection(postData={PostData}): connector.Id → {Arg1}", postData, connector.Id);
+					Logger.LogDebug("SaveConnection(postData={PostData}): connector.DisplayName → {Arg1}", postData, connector.DisplayName);
                     connector.DisplayName = null;
                 }
 
@@ -111,8 +137,10 @@ namespace Dnn.PersonaBar.Connectors.Services
                 {
                     var configs = GetConfigAsDictionary(postObject.configurations);
                     string customErrorMessage;
+					Logger.LogDebug("SaveConnection(postData={PostData}): configs → {Configs}", postData, configs);
                     var saved = connector.SaveConfig(this.PortalSettings.PortalId, configs, ref validated, out customErrorMessage);
 
+					Logger.LogDebug("SaveConnection(postData={PostData}): saved → {Saved}", postData, saved);
                     if (!saved)
                     {
                         return this.Request.CreateResponse(HttpStatusCode.OK, new
@@ -123,6 +151,9 @@ namespace Dnn.PersonaBar.Connectors.Services
                                 ? Localization.GetString("ErrSavingConnectorSettings.Text", Constants.SharedResources)
                                 : customErrorMessage,
                         });
+							Logger.LogDebug("SaveConnection(postData={PostData}): Success → {Success}", postData, Success);
+							Logger.LogDebug("SaveConnection(postData={PostData}): Validated → {Validated}", postData, Validated);
+							Logger.LogDebug("SaveConnection(postData={PostData}): Message → {Message}", postData, Message);
                     }
                 }
 
@@ -146,6 +177,7 @@ namespace Dnn.PersonaBar.Connectors.Services
                     Logger.Error(ex);
                 }
 
+				Logger.LogDebug("<<< Exiting SaveConnection(postData={PostData})", postData);
                 return this.Request.CreateResponse(
                     HttpStatusCode.InternalServerError,
                     new { Success = false, Message = ex.Message });
@@ -159,18 +191,24 @@ namespace Dnn.PersonaBar.Connectors.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage DeleteConnection(object postData)
         {
+			Logger.LogDebug(">>> Entering DeleteConnection(postData={PostData})", postData);
             try
             {
                 var jsonData = DotNetNuke.Common.Utilities.Json.Serialize(postData);
                 var serializer = new JavaScriptSerializer();
+				Logger.LogDebug("DeleteConnection(postData={PostData}): jsonData → {JsonData}", postData, jsonData);
+				Logger.LogDebug("DeleteConnection(postData={PostData}): serializer → {Serializer}", postData, serializer);
                 serializer.RegisterConverters([new DynamicJsonConverter(),]);
                 dynamic postObject = serializer.Deserialize<object>(jsonData);
 
                 var name = postObject.name;
                 var id = postObject.id;
+				Logger.LogDebug("DeleteConnection(postData={PostData}): name → {Name}", postData, name);
+				Logger.LogDebug("DeleteConnection(postData={PostData}): id → {Id}", postData, id);
                 var connectors = this.GetConnections(this.PortalId);
                 connectors.ForEach(x =>
                 {
+				Logger.LogDebug("DeleteConnection(postData={PostData}): connectors → {Connectors}", postData, connectors);
                     {
                         x.HasConfig(this.PortalSettings.PortalId);
                     }
@@ -179,6 +217,7 @@ namespace Dnn.PersonaBar.Connectors.Services
 
                 var connector = connectors.FirstOrDefault(c => c.SupportsMultiple && c.Id == id);
                 if (connector != null)
+				Logger.LogDebug("DeleteConnection(postData={PostData}): connector → {Connector}", postData, connector);
                 {
                     connector.DeleteConnector(this.PortalId);
                     return this.Request.CreateResponse(
@@ -187,6 +226,7 @@ namespace Dnn.PersonaBar.Connectors.Services
                         {
                             Success = true,
                         });
+							Logger.LogDebug("DeleteConnection(postData={PostData}): Success → {Success}", postData, Success);
                 }
 
                 return this.Request.CreateResponse(
@@ -201,6 +241,7 @@ namespace Dnn.PersonaBar.Connectors.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting DeleteConnection(postData={PostData})", postData);
                 return this.Request.CreateResponse(
                     HttpStatusCode.InternalServerError,
                     new { Success = false, Message = ex.Message });
@@ -267,6 +308,7 @@ namespace Dnn.PersonaBar.Connectors.Services
                 allConnectors.AddRange(con.GetConnectors(portalId));
             }
 
+			Logger.LogDebug("<<< Exiting GetConnections(portalId={PortalId})", portalId);
             return allConnectors;
         }
     }

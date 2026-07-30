@@ -14,19 +14,25 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
 
     public class AuthFilterContext
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IHostSettings hostSettings;
 
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public AuthFilterContext(AuthorizationContext filterContext, string authFailureMessage)
             : this(null, filterContext, authFailureMessage)
         {
+		Logger.LogDebug(">>> Entering AuthFilterContext(filterContext={FilterContext},authFailureMessage={AuthFailureMessage})", filterContext, authFailureMessage);
         }
+		Logger.LogDebug("<<< Exiting AuthFilterContext(filterContext={FilterContext},authFailureMessage={AuthFailureMessage})", filterContext, authFailureMessage);
 
         public AuthFilterContext(IHostSettings hostSettings, AuthorizationContext filterContext, string authFailureMessage)
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.ActionContext = filterContext;
+			Logger.LogDebug("AuthFilterContext(hostSettings={HostSettings},filterContext={FilterContext},authFailureMessage={AuthFailureMessage}): this.ActionContext → {Arg3}", hostSettings, filterContext, authFailureMessage, this.ActionContext);
+			Logger.LogDebug("AuthFilterContext(hostSettings={HostSettings},filterContext={FilterContext},authFailureMessage={AuthFailureMessage}): hostSettings → {HostSettings1}", hostSettings, filterContext, authFailureMessage, hostSettings);
             this.AuthFailureMessage = authFailureMessage;
+			Logger.LogDebug("AuthFilterContext(hostSettings={HostSettings},filterContext={FilterContext},authFailureMessage={AuthFailureMessage}): this.AuthFailureMessage → {Arg3}", hostSettings, filterContext, authFailureMessage, this.AuthFailureMessage);
         }
 
         public AuthorizationContext ActionContext { get; private set; }
@@ -39,11 +45,13 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
         /// </summary>
         public virtual void HandleUnauthorizedRequest()
         {
+			Logger.LogDebug(">>> Entering HandleUnauthorizedRequest()");
             this.ActionContext.Result = new HttpUnauthorizedResult(this.AuthFailureMessage);
             if (!this.hostSettings.DebugMode)
             {
                 this.ActionContext.RequestContext.HttpContext.Response.SuppressFormsAuthenticationRedirect = true;
             }
+			Logger.LogDebug("<<< Exiting HandleUnauthorizedRequest()");
         }
     }
 }

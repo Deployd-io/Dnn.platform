@@ -16,6 +16,7 @@ namespace DNN.Connectors.GoogleAnalytics
     /// <summary>Connector to provide configuration for Google Analytics support.</summary>
     public class GoogleAnalyticsConnector : IConnector
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string DefaultDisplayName = "Google Analytics (Legacy UA)";
 
         private string displayName;
@@ -67,19 +68,26 @@ namespace DNN.Connectors.GoogleAnalytics
         /// <inheritdoc />
         public IEnumerable<IConnector> GetConnectors(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetConnectors(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetConnectors(portalId={PortalId})", portalId);
             return new List<IConnector> { this };
         }
 
         /// <inheritdoc />
         public void DeleteConnector(int portalId)
         {
+		Logger.LogDebug(">>> Entering DeleteConnector(portalId={PortalId})", portalId);
+		Logger.LogDebug("<<< Exiting DeleteConnector(portalId={PortalId})", portalId);
         }
 
         /// <inheritdoc />
         public bool HasConfig(int portalId)
         {
+			Logger.LogDebug(">>> Entering HasConfig(portalId={PortalId})", portalId);
             IDictionary<string, string> config = this.GetConfig(portalId);
 
+			Logger.LogDebug("HasConfig(portalId={PortalId}): config → {Config}", portalId, config);
+			Logger.LogDebug("<<< Exiting HasConfig(portalId={PortalId})", portalId);
             return config.ContainsKey("TrackingID") && !string.IsNullOrEmpty(config["TrackingID"]);
         }
 
@@ -244,11 +252,13 @@ namespace DNN.Connectors.GoogleAnalytics
         /// <returns>The string representing a boolean after the correction.</returns>
         private static string HandleCustomBoolean(string value)
         {
+			Logger.LogDebug(">>> Entering HandleCustomBoolean(value={Value})", value);
             if ((value ?? string.Empty).Trim().Equals("true", StringComparison.OrdinalIgnoreCase))
             {
                 return "true";
             }
 
+			Logger.LogDebug("<<< Exiting HandleCustomBoolean(value={Value})", value);
             return string.Empty;
         }
     }

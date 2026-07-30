@@ -15,25 +15,38 @@ Namespace DotNetNuke.UI.WebControls
     Public Class TreeNodeCollection
         Inherits DNNNodeCollection
         Implements IStateManager
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(TreeNodeCollection))
         ' Methods
         Public Sub New(ByVal JSONDict As Dictionary(Of String, Object), ByVal Tree As DnnTree)
+			Logger.LogDebug(">>> Entering New(JSONDict={JSONDict},Object={Object})", JSONDict, Object)
             MyBase.New(Tree.ClientID, JSONDict)
             Me.m_DNNTree = Tree
+			Logger.LogDebug("New(JSONDict={JSONDict},Object={Object}): Me.m_DNNTree → {Arg2}", JSONDict, Object, Me.m_DNNTree)
+			Logger.LogDebug("<<< Exiting New(JSONDict={JSONDict},Object={Object})", JSONDict, Object)
+			Logger.LogDebug(">>> Entering New(strNamespace={StrNamespace},objControl={ObjControl})", strNamespace, objControl)
+			Logger.LogDebug("New(strNamespace={StrNamespace},objControl={ObjControl}): Me.m_DNNTree → {Arg2}", strNamespace, objControl, Me.m_DNNTree)
         End Sub
 
         Public Sub New(ByVal strNamespace As String, ByVal objControl As DnnTree)
             MyBase.New(strNamespace, objControl)
             Me.m_DNNTree = objControl
+			Logger.LogDebug("<<< Exiting New(strNamespace={StrNamespace},objControl={ObjControl})", strNamespace, objControl)
+			Logger.LogDebug(">>> Entering New(objXmlNode={ObjXmlNode},objControl={ObjControl})", objXmlNode, objControl)
+			Logger.LogDebug("New(objXmlNode={ObjXmlNode},objControl={ObjControl}): Me.m_DNNTree → {Arg2}", objXmlNode, objControl, Me.m_DNNTree)
         End Sub
 
         Public Sub New(ByVal objXmlNode As XmlNode, ByVal objControl As DnnTree)
             MyBase.New(objXmlNode, objControl)
             Me.m_DNNTree = objControl
+			Logger.LogDebug("<<< Exiting New(objXmlNode={ObjXmlNode},objControl={ObjControl})", objXmlNode, objControl)
+			Logger.LogDebug(">>> Entering New(strXML={StrXML},strXSLFile={StrXSLFile},objControl={ObjControl})", strXML, strXSLFile, objControl)
+			Logger.LogDebug("New(strXML={StrXML},strXSLFile={StrXSLFile},objControl={ObjControl}): Me.m_DNNTree → {Arg3}", strXML, strXSLFile, objControl, Me.m_DNNTree)
         End Sub
 
         Public Sub New(ByVal strXML As String, ByVal strXSLFile As String, ByVal objControl As DnnTree)
             MyBase.New(strXML, strXSLFile)
             Me.m_DNNTree = objControl
+			Logger.LogDebug("<<< Exiting New(strXML={StrXML},strXSLFile={StrXSLFile},objControl={ObjControl})", strXML, strXSLFile, objControl)
         End Sub
 
         Public Shadows Function Add() As Integer
@@ -108,6 +121,7 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Public Overrides Function FindSelectedNodes() As Collection
+			Logger.LogDebug(">>> Entering FindSelectedNodes()")
             Dim collection As New Collection
             Dim flag As Boolean = Not Object.ReferenceEquals(Me.XMLNode, Nothing)
             If flag Then
@@ -115,8 +129,10 @@ Namespace DotNetNuke.UI.WebControls
                 Dim list As XmlNodeList = Me.XMLNode.SelectNodes("//n[@selected='1']")
                 Try 
                     enumerator = list.GetEnumerator
+					Logger.LogDebug("FindSelectedNodes(): enumerator → {Enumerator}", enumerator)
                     Do While True
                         flag = enumerator.MoveNext
+						Logger.LogDebug("FindSelectedNodes(): flag → {Flag}", flag)
                         If Not flag Then
                             Exit Do
                         End If
@@ -129,6 +145,7 @@ Namespace DotNetNuke.UI.WebControls
                     End If
                 End Try
             End If
+			Logger.LogDebug("<<< Exiting FindSelectedNodes()")
             Return collection
         End Function
 
@@ -156,10 +173,13 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Public Sub Insert(ByVal index As Integer, ByVal value As TreeNode)
+			Logger.LogDebug(">>> Entering Insert(index={Index},value={Value})", index, value)
             Me.XMLNode.InsertAfter(Me.XMLNode.ChildNodes(index), value.XmlNode)
+			Logger.LogDebug("<<< Exiting Insert(index={Index},value={Value})", index, value)
         End Sub
 
         Public Sub LoadViewState(ByVal state As Object) Implements IStateManager.LoadViewState
+		Logger.LogDebug(">>> Entering LoadViewState(state={State})", state)
         End Sub
 
         Public Shadows Sub Remove(ByVal value As TreeNode)
@@ -167,11 +187,14 @@ Namespace DotNetNuke.UI.WebControls
         End Sub
 
         Public Function SaveViewState() As Object Implements IStateManager.SaveViewState
+			Logger.LogDebug(">>> Entering SaveViewState()")
             Dim obj2 As Object = Nothing
+			Logger.LogDebug("<<< Exiting SaveViewState()")
             Return obj2
         End Function
 
         Public Sub TrackViewState() Implements IStateManager.TrackViewState
+		Logger.LogDebug(">>> Entering TrackViewState()")
         End Sub
 
 

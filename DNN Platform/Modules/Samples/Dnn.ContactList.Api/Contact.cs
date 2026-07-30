@@ -16,9 +16,13 @@ namespace Dnn.ContactList.Api
     [Scope("PortalId")]
     public class Contact
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public Contact()
         {
+			Logger.LogDebug(">>> Entering Contact()");
             ContactId = -1;
+			Logger.LogDebug("<<< Exiting Contact()");
+			Logger.LogDebug("Contact(): ContactId → {ContactId}", ContactId);
         }
 
         public int ContactId { get; set; }

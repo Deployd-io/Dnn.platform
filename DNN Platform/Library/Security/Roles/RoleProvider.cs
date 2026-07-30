@@ -12,19 +12,24 @@ namespace DotNetNuke.Security.Roles
 
     public abstract class RoleProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         // return the provider
         public static RoleProvider Instance()
         {
+			Logger.LogDebug(">>> Entering Instance()");
+			Logger.LogDebug("<<< Exiting Instance()");
             return ComponentFactory.GetComponent<RoleProvider>();
         }
 
         public virtual bool CreateRole(RoleInfo role)
         {
+			Logger.LogDebug(">>> Entering CreateRole(role={Role})", role);
             throw new NotImplementedException();
         }
 
         public virtual void DeleteRole(RoleInfo role)
         {
+			Logger.LogDebug(">>> Entering DeleteRole(role={Role})", role);
             throw new NotImplementedException();
         }
 
@@ -41,6 +46,8 @@ namespace DotNetNuke.Security.Roles
 
         public virtual void UpdateRoleSettings(RoleInfo role)
         {
+		Logger.LogDebug(">>> Entering UpdateRoleSettings(role={Role})", role);
+		Logger.LogDebug("<<< Exiting UpdateRoleSettings(role={Role})", role);
         }
 
         // Role Groups
@@ -68,11 +75,14 @@ namespace DotNetNuke.Security.Roles
 
         public virtual RoleGroupInfo GetRoleGroupByName(int portalID, string roleGroupName)
         {
+			Logger.LogDebug(">>> Entering GetRoleGroupByName(portalID={PortalID},roleGroupName={RoleGroupName})", portalID, roleGroupName);
+			Logger.LogDebug("<<< Exiting GetRoleGroupByName(portalID={PortalID},roleGroupName={RoleGroupName})", portalID, roleGroupName);
             return null;
         }
 
         public virtual IList<UserRoleInfo> GetUserRoles(UserInfo user, bool includePrivate)
         {
+			Logger.LogDebug(">>> Entering GetUserRoles(user={User},includePrivate={IncludePrivate})", user, includePrivate);
             throw new NotImplementedException();
         }
     }

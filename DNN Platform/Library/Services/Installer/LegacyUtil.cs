@@ -42,9 +42,12 @@ namespace DotNetNuke.Services.Installer
 
         public static string CreateSkinManifest(string skinFolder, string skinType, string tempInstallFolder)
         {
+			Logger.LogDebug(">>> Entering CreateSkinManifest(skinFolder={SkinFolder},skinType={SkinType},tempInstallFolder={TempInstallFolder})", skinFolder, skinType, tempInstallFolder);
             // Test if there are Skins and Containers folders in TempInstallFolder (ie it is a legacy combi package)
             bool isCombi = false;
             var installFolder = new DirectoryInfo(tempInstallFolder);
+			Logger.LogDebug("CreateSkinManifest(skinFolder={SkinFolder},skinType={SkinType},tempInstallFolder={TempInstallFolder}): isCombi → {IsCombi}", skinFolder, skinType, tempInstallFolder, isCombi);
+			Logger.LogDebug("CreateSkinManifest(skinFolder={SkinFolder},skinType={SkinType},tempInstallFolder={TempInstallFolder}): installFolder → {InstallFolder}", skinFolder, skinType, tempInstallFolder, installFolder);
             DirectoryInfo[] subFolders = installFolder.GetDirectories();
             if (subFolders.Length > 0)
             {
@@ -58,6 +61,7 @@ namespace DotNetNuke.Services.Installer
             var sb = new StringBuilder();
             using (XmlWriter writer = XmlWriter.Create(sb, XmlUtils.GetXmlWriterSettings(ConformanceLevel.Fragment)))
             {
+			Logger.LogDebug("CreateSkinManifest(skinFolder={SkinFolder},skinType={SkinType},tempInstallFolder={TempInstallFolder}): sb → {Sb}", skinFolder, skinType, tempInstallFolder, sb);
                 PackageWriterBase.WriteManifestStartElement(writer);
                 if (isCombi)
                 {
@@ -85,6 +89,7 @@ namespace DotNetNuke.Services.Installer
                 writer.Close();
 
                 // Return new manifest
+				Logger.LogDebug("<<< Exiting CreateSkinManifest(skinFolder={SkinFolder},skinType={SkinType},tempInstallFolder={TempInstallFolder})", skinFolder, skinType, tempInstallFolder);
                 return sb.ToString();
             }
         }

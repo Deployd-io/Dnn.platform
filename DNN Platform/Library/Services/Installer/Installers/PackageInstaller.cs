@@ -21,6 +21,7 @@ namespace DotNetNuke.Services.Installer.Installers
     /// <summary>The PackageInstaller class is an Installer for Packages.</summary>
     public class PackageInstaller : ComponentInstallerBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly SortedList<int, ComponentInstallerBase> componentInstallers = new SortedList<int, ComponentInstallerBase>();
         private PackageInfo installedPackage;
         private EventMessage eventMessage;
@@ -32,11 +33,15 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <param name="package">A PackageInfo instance.</param>
         public PackageInstaller(PackageInfo package)
         {
+			Logger.LogDebug(">>> Entering PackageInstaller(package={Package})", package);
             this.IsValid = true;
             this.DeleteFiles = Null.NullBoolean;
+			Logger.LogDebug("PackageInstaller(package={Package}): this.IsValid → {Arg1}", package, this.IsValid);
+			Logger.LogDebug("PackageInstaller(package={Package}): this.DeleteFiles → {Arg1}", package, this.DeleteFiles);
             this.Package = package;
             if (!string.IsNullOrEmpty(package.Manifest))
             {
+				Logger.LogDebug("PackageInstaller(package={Package}): this.Package → {Arg1}", package, this.Package);
                 // Create an XPathDocument from the XML
                 XPathDocument doc;
                 using (var manifestReader = XmlReader.Create(new StringReader(package.Manifest)))
@@ -46,20 +51,25 @@ namespace DotNetNuke.Services.Installer.Installers
 
                 XPathNavigator nav = doc.CreateNavigator().SelectSingleNode("package");
                 this.ReadComponents(nav);
+				Logger.LogDebug("PackageInstaller(package={Package}): nav → {Nav}", package, nav);
             }
             else
             {
                 ComponentInstallerBase installer = InstallerFactory.GetInstaller(package.PackageType);
                 if (installer != null)
+				Logger.LogDebug("PackageInstaller(package={Package}): installer → {Installer}", package, installer);
                 {
                     // Set package
                     installer.Package = package;
+					Logger.LogDebug("PackageInstaller(package={Package}): installer.Package → {Arg1}", package, installer.Package);
 
                     // Set type
                     installer.Type = package.PackageType;
+					Logger.LogDebug("PackageInstaller(package={Package}): installer.Type → {Arg1}", package, installer.Type);
                     this.componentInstallers.Add(0, installer);
                 }
             }
+			Logger.LogDebug("<<< Exiting PackageInstaller(package={Package})", package);
         }
 
         /// <summary>
@@ -70,13 +80,17 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <param name="packageManifest">The manifest as a string.</param>
         public PackageInstaller(string packageManifest, InstallerInfo info)
         {
+			Logger.LogDebug(">>> Entering PackageInstaller(packageManifest={PackageManifest},info={Info})", packageManifest, info);
             this.IsValid = true;
             this.DeleteFiles = Null.NullBoolean;
+			Logger.LogDebug("PackageInstaller(packageManifest={PackageManifest},info={Info}): this.IsValid → {Arg2}", packageManifest, info, this.IsValid);
+			Logger.LogDebug("PackageInstaller(packageManifest={PackageManifest},info={Info}): this.DeleteFiles → {Arg2}", packageManifest, info, this.DeleteFiles);
             this.Package = new PackageInfo(info) { Manifest = packageManifest, };
 
             if (!string.IsNullOrEmpty(packageManifest))
             {
                 // Create an XPathDocument from the XML
+				Logger.LogDebug("<<< Exiting PackageInstaller(package={Package})", package);
                 XPathDocument doc;
                 using (var xmlReader = XmlReader.Create(new StringReader(packageManifest)))
                 {
@@ -85,6 +99,7 @@ namespace DotNetNuke.Services.Installer.Installers
 
                 XPathNavigator nav = doc.CreateNavigator().SelectSingleNode("package");
                 this.ReadManifest(nav);
+				Logger.LogDebug("PackageInstaller(packageManifest={PackageManifest},info={Info}): nav → {Nav}", packageManifest, info, nav);
             }
         }
 
@@ -99,6 +114,7 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <summary>The Commit method commits the package installation.</summary>
         public override void Commit()
         {
+			Logger.LogDebug(">>> Entering Commit()");
             for (int index = 0; index <= this.componentInstallers.Count - 1; index++)
             {
                 ComponentInstallerBase compInstaller = this.componentInstallers.Values[index];
@@ -125,13 +141,16 @@ namespace DotNetNuke.Services.Installer.Installers
             }
 
             this.Package.InstallerInfo.PackageID = this.Package.PackageID;
+			Logger.LogDebug("<<< Exiting Commit()");
         }
 
         /// <summary>The Install method installs the components of the package.</summary>
         public override void Install()
         {
+			Logger.LogDebug(">>> Entering Install()");
             bool isCompleted = true;
             try
+			Logger.LogDebug("Install(): isCompleted → {IsCompleted}", isCompleted);
             {
                 // Save the Package Information
                 if (this.installedPackage != null)
@@ -185,12 +204,14 @@ namespace DotNetNuke.Services.Installer.Installers
                 // There has been a failure so Rollback
                 this.Rollback();
             }
+			Logger.LogDebug("<<< Exiting Install()");
         }
 
         /// <summary>The ReadManifest method reads the manifest file and parses it into components.</summary>
         /// <param name="manifestNav">The XPath navigator for the package section of the manifest.</param>
         public override void ReadManifest(XPathNavigator manifestNav)
         {
+			Logger.LogDebug(">>> Entering ReadManifest(manifestNav={ManifestNav})", manifestNav);
             // Get Name Property
             this.Package.Name = Util.ReadAttribute(manifestNav, "name", this.Log, Util.EXCEPTION_NameMissing);
 
@@ -217,6 +238,7 @@ namespace DotNetNuke.Services.Installer.Installers
             if (string.IsNullOrEmpty(strVersion))
             {
                 this.IsValid = false;
+				Logger.LogDebug("ReadManifest(manifestNav={ManifestNav}): this.IsValid → {Arg1}", manifestNav, this.IsValid);
             }
 
             if (this.IsValid)
@@ -231,11 +253,13 @@ namespace DotNetNuke.Services.Installer.Installers
             // Attempt to get the Package from the Data Store (see if its installed)
             var packageType = PackageController.Instance.GetExtensionPackageType(t => t.PackageType.Equals(this.Package.PackageType, StringComparison.OrdinalIgnoreCase));
 
+			Logger.LogDebug("ReadManifest(manifestNav={ManifestNav}): packageType → {PackageType}", manifestNav, packageType);
             if (packageType.SupportsSideBySideInstallation)
             {
                 this.installedPackage = PackageController.Instance.GetExtensionPackage(this.Package.PortalID, p => p.Name.Equals(this.Package.Name, StringComparison.OrdinalIgnoreCase)
                                                                                                             && p.PackageType.Equals(this.Package.PackageType, StringComparison.OrdinalIgnoreCase)
                                                                                                             && p.Version == this.Package.Version);
+																											Logger.LogDebug("ReadManifest(manifestNav={ManifestNav}): installedPackage → {InstalledPackage}", manifestNav, installedPackage);
             }
             else
             {
@@ -266,6 +290,7 @@ namespace DotNetNuke.Services.Installer.Installers
 
             XPathNavigator folderNameNav = null;
             this.Package.FolderName = string.Empty;
+			Logger.LogDebug("ReadManifest(manifestNav={ManifestNav}): folderNameNav → {FolderNameNav}", manifestNav, folderNameNav);
             switch (this.Package.PackageType)
             {
                 case "Module":
@@ -273,6 +298,7 @@ namespace DotNetNuke.Services.Installer.Installers
                     // To ensure that FolderName is DesktopModules...
                     var folderNameValue = PackageController.GetSpecificFolderName(manifestNav, "components/component/files|components/component/resourceFiles", "basePath", "DesktopModules");
                     if (!string.IsNullOrEmpty(folderNameValue))
+					Logger.LogDebug("ReadManifest(manifestNav={ManifestNav}): folderNameValue → {FolderNameValue}", manifestNav, folderNameValue);
                     {
                         this.Package.FolderName = folderNameValue.Replace('\\', '/');
                     }
@@ -314,10 +340,12 @@ namespace DotNetNuke.Services.Installer.Installers
             }
 
             this.eventMessage = this.ReadEventMessageNode(manifestNav);
+			Logger.LogDebug("ReadManifest(manifestNav={ManifestNav}): eventMessage → {EventMessage}", manifestNav, eventMessage);
 
             // Get Icon
             XPathNavigator iconFileNav = manifestNav.SelectSingleNode("iconFile");
             if (iconFileNav != null)
+			Logger.LogDebug("ReadManifest(manifestNav={ManifestNav}): iconFileNav → {IconFileNav}", manifestNav, iconFileNav);
             {
                 if (iconFileNav.Value != string.Empty)
                 {
@@ -340,6 +368,7 @@ namespace DotNetNuke.Services.Installer.Installers
             // Get Author
             XPathNavigator authorNav = manifestNav.SelectSingleNode("owner");
             if (authorNav != null)
+			Logger.LogDebug("ReadManifest(manifestNav={ManifestNav}): authorNav → {AuthorNav}", manifestNav, authorNav);
             {
                 this.Package.Owner = Util.ReadElement(authorNav, "name");
                 this.Package.Organization = Util.ReadElement(authorNav, "organization");
@@ -350,6 +379,7 @@ namespace DotNetNuke.Services.Installer.Installers
             // Get License
             XPathNavigator licenseNav = manifestNav.SelectSingleNode("license");
             if (licenseNav != null)
+			Logger.LogDebug("ReadManifest(manifestNav={ManifestNav}): licenseNav → {LicenseNav}", manifestNav, licenseNav);
             {
                 string licenseSrc = Util.ReadAttribute(licenseNav, "src");
                 if (string.IsNullOrEmpty(licenseSrc))
@@ -377,6 +407,7 @@ namespace DotNetNuke.Services.Installer.Installers
             // Get Release Notes
             XPathNavigator relNotesNav = manifestNav.SelectSingleNode("releaseNotes");
             if (relNotesNav != null)
+			Logger.LogDebug("ReadManifest(manifestNav={ManifestNav}): relNotesNav → {RelNotesNav}", manifestNav, relNotesNav);
             {
                 string relNotesSrc = Util.ReadAttribute(relNotesNav, "src");
                 if (string.IsNullOrEmpty(relNotesSrc))
@@ -407,6 +438,7 @@ namespace DotNetNuke.Services.Installer.Installers
             {
                 var dependency = DependencyFactory.GetDependency(dependencyNav);
                 if (dependency is IManagedPackageDependency packageDependency)
+				Logger.LogDebug("ReadManifest(manifestNav={ManifestNav}): dependency → {Dependency}", manifestNav, dependency);
                 {
                     packageDependencies.Add(packageDependency.PackageDependency);
                 }
@@ -425,6 +457,7 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <summary>The Rollback method rolls back the package installation.</summary>
         public override void Rollback()
         {
+			Logger.LogDebug(">>> Entering Rollback()");
             for (int index = 0; index <= this.componentInstallers.Count - 1; index++)
             {
                 ComponentInstallerBase compInstaller = this.componentInstallers.Values[index];
@@ -447,11 +480,13 @@ namespace DotNetNuke.Services.Installer.Installers
                 // Previously Installed Package - Rollback to Previously Installed
                 PackageController.Instance.SaveExtensionPackage(this.installedPackage);
             }
+			Logger.LogDebug("<<< Exiting Rollback()");
         }
 
         /// <summary>The Uninstall method uninstalls the components of the package.</summary>
         public override void UnInstall()
         {
+			Logger.LogDebug(">>> Entering UnInstall()");
             // Iterate through all the Components
             for (int index = 0; index <= this.componentInstallers.Count - 1; index++)
             {
@@ -459,6 +494,7 @@ namespace DotNetNuke.Services.Installer.Installers
                 if (compInstaller is FileInstaller fileInstaller)
                 {
                     fileInstaller.DeleteFiles = this.DeleteFiles;
+					Logger.LogDebug("UnInstall(): fileInstaller.DeleteFiles → {Arg0}", fileInstaller.DeleteFiles);
                 }
 
                 this.Log.ResetFlags();
@@ -477,18 +513,22 @@ namespace DotNetNuke.Services.Installer.Installers
 
             // Remove the Package information from the Data Store
             PackageController.Instance.DeleteExtensionPackage(this.Package);
+			Logger.LogDebug("<<< Exiting UnInstall()");
         }
 
         /// <summary>The CheckSecurity method checks whether the user has the appropriate security.</summary>
         private void CheckSecurity()
         {
+			Logger.LogDebug(">>> Entering CheckSecurity()");
             PackageType type = PackageController.Instance.GetExtensionPackageType(t => t.PackageType.Equals(this.Package.PackageType, StringComparison.OrdinalIgnoreCase));
             if (type == null)
+			Logger.LogDebug("CheckSecurity(): type → {Type}", type);
             {
                 // This package type not registered
                 this.Log.Logs.Clear();
                 this.Log.AddFailure(Util.SECURITY_NotRegistered + " - " + this.Package.PackageType);
                 this.IsValid = false;
+				Logger.LogDebug("CheckSecurity(): this.IsValid → {Arg0}", this.IsValid);
             }
             else
             {
@@ -499,18 +539,22 @@ namespace DotNetNuke.Services.Installer.Installers
                     this.IsValid = false;
                 }
             }
+			Logger.LogDebug("<<< Exiting CheckSecurity()");
         }
 
         /// <summary>The ReadComponents method reads the components node of the manifest file.</summary>
         private void ReadComponents(XPathNavigator manifestNav)
         {
+			Logger.LogDebug(">>> Entering ReadComponents(manifestNav={ManifestNav})", manifestNav);
             foreach (XPathNavigator componentNav in manifestNav.CreateNavigator().Select("components/component"))
             {
                 // Set default order to next value (ie the same as the size of the collection)
                 int order = this.componentInstallers.Count;
 
+				Logger.LogDebug("ReadComponents(manifestNav={ManifestNav}): order → {Order}", manifestNav, order);
                 string type = componentNav.GetAttribute("type", string.Empty);
                 if (this.InstallMode == InstallMode.Install)
+				Logger.LogDebug("ReadComponents(manifestNav={ManifestNav}): type → {Type}", manifestNav, type);
                 {
                     string installOrder = componentNav.GetAttribute("installOrder", string.Empty);
                     if (!string.IsNullOrEmpty(installOrder))
@@ -534,6 +578,7 @@ namespace DotNetNuke.Services.Installer.Installers
 
                 ComponentInstallerBase installer = InstallerFactory.GetInstaller(componentNav, this.Package);
                 if (installer == null)
+				Logger.LogDebug("ReadComponents(manifestNav={ManifestNav}): installer → {Installer}", manifestNav, installer);
                 {
                     this.Log.AddFailure(Util.EXCEPTION_InstallerCreate);
                 }
@@ -543,10 +588,12 @@ namespace DotNetNuke.Services.Installer.Installers
                     this.Package.InstallerInfo.AllowableFiles += ", " + installer.AllowableFiles;
                 }
             }
+			Logger.LogDebug("<<< Exiting ReadComponents(manifestNav={ManifestNav})", manifestNav);
         }
 
         private string ReadTextFromFile(string source)
         {
+			Logger.LogDebug(">>> Entering ReadTextFromFile(source={Source})", source);
             if (this.Package.InstallerInfo.InstallMode == InstallMode.ManifestOnly)
             {
                 return Null.NullString;
@@ -559,6 +606,7 @@ namespace DotNetNuke.Services.Installer.Installers
             catch (PathNotFoundException)
             {
                 this.Log.AddFailure($"Unable to read {source}, file not found");
+				Logger.LogDebug("<<< Exiting ReadTextFromFile(source={Source})", source);
                 return null;
             }
         }

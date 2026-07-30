@@ -16,8 +16,11 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
     [JsonObject]
     public class ParseResultDto : PackageInfoDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public ParseResultDto()
         {
+		Logger.LogDebug(">>> Entering ParseResultDto()");
+		Logger.LogDebug("<<< Exiting ParseResultDto()");
         }
 
         public ParseResultDto(PackageInfo package)
@@ -57,23 +60,35 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
 
         public void Failed(string message, IList<LogEntry> logs = null)
         {
+			Logger.LogDebug(">>> Entering Failed(message={Message},logs={Logs})", message, logs);
             this.Success = false;
             this.Message = Localization.GetString(message, Constants.SharedResources) ?? message;
+			Logger.LogDebug("Failed(message={Message},logs={Logs}): this.Success → {Arg2}", message, logs, this.Success);
             this.AddLogs(logs);
 
             // UI devs asked for these to be non-null empty for moving to next step
             this.Description = this.Description ?? string.Empty;
+			Logger.LogDebug("Failed(message={Message},logs={Logs}): this.Description → {Arg2}", message, logs, this.Description);
             this.Email = this.Email ?? string.Empty;
             this.FriendlyName = this.FriendlyName ?? string.Empty;
+			Logger.LogDebug("Failed(message={Message},logs={Logs}): this.Email → {Arg2}", message, logs, this.Email);
+			Logger.LogDebug("Failed(message={Message},logs={Logs}): this.FriendlyName → {Arg2}", message, logs, this.FriendlyName);
             this.IsInUse = this.IsInUse ?? string.Empty;
             this.License = this.License ?? string.Empty;
             this.Name = this.Name ?? string.Empty;
             this.Organization = this.Organization ?? string.Empty;
+			Logger.LogDebug("Failed(message={Message},logs={Logs}): this.IsInUse → {Arg2}", message, logs, this.IsInUse);
+			Logger.LogDebug("Failed(message={Message},logs={Logs}): this.License → {Arg2}", message, logs, this.License);
             this.Owner = this.Owner ?? string.Empty;
             this.PackageIcon = this.PackageIcon ?? string.Empty;
             this.PackageType = this.PackageType ?? string.Empty;
             this.ReleaseNotes = this.ReleaseNotes ?? string.Empty;
             this.SiteSettingsLink = this.SiteSettingsLink ?? string.Empty;
+			Logger.LogDebug("Failed(message={Message},logs={Logs}): this.Name → {Arg2}", message, logs, this.Name);
+			Logger.LogDebug("Failed(message={Message},logs={Logs}): this.Organization → {Arg2}", message, logs, this.Organization);
+			Logger.LogDebug("Failed(message={Message},logs={Logs}): this.Owner → {Arg2}", message, logs, this.Owner);
+			Logger.LogDebug("Failed(message={Message},logs={Logs}): this.PackageIcon → {Arg2}", message, logs, this.PackageIcon);
+			Logger.LogDebug("Failed(message={Message},logs={Logs}): this.PackageType → {Arg2}", message, logs, this.PackageType);
             this.UpgradeIndicator = this.UpgradeIndicator ?? string.Empty;
             this.UpgradeUrl = this.UpgradeUrl ?? string.Empty;
             this.Url = this.Url ?? string.Empty;
@@ -81,10 +96,20 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
 
             this.LegacyError = this.LegacyError ?? string.Empty;
             this.Message = this.Message ?? string.Empty;
+			Logger.LogDebug("<<< Exiting Failed(message={Message},logs={Logs})", message, logs);
+			Logger.LogDebug("Failed(message={Message},logs={Logs}): this.ReleaseNotes → {Arg2}", message, logs, this.ReleaseNotes);
+			Logger.LogDebug("Failed(message={Message},logs={Logs}): this.SiteSettingsLink → {Arg2}", message, logs, this.SiteSettingsLink);
+			Logger.LogDebug("Failed(message={Message},logs={Logs}): this.UpgradeIndicator → {Arg2}", message, logs, this.UpgradeIndicator);
+			Logger.LogDebug("Failed(message={Message},logs={Logs}): this.UpgradeUrl → {Arg2}", message, logs, this.UpgradeUrl);
+			Logger.LogDebug("Failed(message={Message},logs={Logs}): this.Version → {Arg2}", message, logs, this.Version);
+			Logger.LogDebug("Failed(message={Message},logs={Logs}): this.LegacyError → {Arg2}", message, logs, this.LegacyError);
+			Logger.LogDebug("Failed(message={Message},logs={Logs}): this.Message → {Arg2}", message, logs, this.Message);
+			Logger.LogDebug("Failed(message={Message},logs={Logs}): this.Url → {Arg2}", message, logs, this.Url);
         }
 
         public void Succeed(IList<LogEntry> logs)
         {
+			Logger.LogDebug(">>> Entering Succeed(logs={Logs})", logs);
             this.Success = true;
             this.Message = string.Empty;
             this.AddLogs(logs);
@@ -92,6 +117,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
 
         public void AddLogs(IEnumerable<LogEntry> logs)
         {
+			Logger.LogDebug(">>> Entering AddLogs(logs={Logs})", logs);
             if (logs == null)
             {
                 this.Logs = new List<InstallerLogEntry>();
@@ -100,6 +126,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
             {
                 this.Logs = logs.Select(l => new InstallerLogEntry { Type = l.Type.ToString(), Description = l.Description }).ToList();
             }
+			Logger.LogDebug("<<< Exiting AddLogs(logs={Logs})", logs);
         }
     }
 }

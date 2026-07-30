@@ -9,6 +9,7 @@ namespace DotNetNuke.Services.Installer.Log
     [Serializable]
     public class LogEntry
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly string description;
 
         /// <summary>
@@ -19,8 +20,12 @@ namespace DotNetNuke.Services.Installer.Log
         /// <param name="type">The type of LogEntry.</param>
         public LogEntry(LogType type, string description)
         {
+			Logger.LogDebug(">>> Entering LogEntry(type={Type},description={Description})", type, description);
             this.Type = type;
             this.description = description;
+			Logger.LogDebug("<<< Exiting LogEntry(type={Type},description={Description})", type, description);
+			Logger.LogDebug("LogEntry(type={Type},description={Description}): this.Type → {Arg2}", type, description, this.Type);
+			Logger.LogDebug("LogEntry(type={Type},description={Description}): this.description → {Arg2}", type, description, this.description);
         }
 
         /// <summary>Gets the description of LogEntry.</summary>
@@ -45,6 +50,8 @@ namespace DotNetNuke.Services.Installer.Log
         /// <inheritdoc />
         public override string ToString()
         {
+			Logger.LogDebug(">>> Entering ToString()");
+			Logger.LogDebug("<<< Exiting ToString()");
             return $"{this.Type}:  {this.Description}";
         }
     }

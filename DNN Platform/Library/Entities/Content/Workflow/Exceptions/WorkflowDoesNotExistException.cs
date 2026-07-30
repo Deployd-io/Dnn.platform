@@ -8,10 +8,13 @@ namespace DotNetNuke.Entities.Content.Workflow.Exceptions
 
     public class WorkflowDoesNotExistException : WorkflowException
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="WorkflowDoesNotExistException"/> class.</summary>
         public WorkflowDoesNotExistException()
             : base(Localization.GetString("WorkflowDoesNotExistException", Localization.ExceptionsResourceFile))
         {
+		Logger.LogDebug(">>> Entering WorkflowDoesNotExistException()");
+		Logger.LogDebug("<<< Exiting WorkflowDoesNotExistException()");
         }
     }
 }

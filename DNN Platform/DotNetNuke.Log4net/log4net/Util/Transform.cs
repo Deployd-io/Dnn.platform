@@ -25,6 +25,7 @@ using System.Text.RegularExpressions;
 
 namespace log4net.Util
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Utility class for transforming strings.</summary>
     /// <remarks>
     /// <para>
@@ -43,6 +44,8 @@ namespace log4net.Util
         /// </remarks>
         private Transform()
         {
+		Logger.LogDebug(">>> Entering Transform()");
+		Logger.LogDebug("<<< Exiting Transform()");
         }
 
         /// <summary>Write a string to an <see cref="XmlWriter"/></summary>
@@ -57,11 +60,14 @@ namespace log4net.Util
         /// </remarks>
         public static void WriteEscapedXmlString(XmlWriter writer, string textData, string invalidCharReplacement)
         {
+			Logger.LogDebug(">>> Entering WriteEscapedXmlString(writer={Writer},textData={TextData},invalidCharReplacement={InvalidCharReplacement})", writer, textData, invalidCharReplacement);
             string stringData = MaskXmlInvalidCharacters(textData, invalidCharReplacement);
             // Write either escaped text or CDATA sections
 
             int weightCData = 12 * (1 + CountSubstrings(stringData, CDATA_END));
             int weightStringEscapes = 3*(CountSubstrings(stringData, "<") + CountSubstrings(stringData, ">")) + 4*CountSubstrings(stringData, "&");
+			Logger.LogDebug("WriteEscapedXmlString(writer={Writer},textData={TextData},invalidCharReplacement={InvalidCharReplacement}): weightCData → {WeightCData}", writer, textData, invalidCharReplacement, weightCData);
+			Logger.LogDebug("WriteEscapedXmlString(writer={Writer},textData={TextData},invalidCharReplacement={InvalidCharReplacement}): weightStringEscapes → {WeightStringEscapes}", writer, textData, invalidCharReplacement, weightStringEscapes);
 
             if (weightStringEscapes <= weightCData)
             {
@@ -74,6 +80,7 @@ namespace log4net.Util
 
                 int end = stringData.IndexOf(CDATA_END);
     
+				Logger.LogDebug("WriteEscapedXmlString(writer={Writer},textData={TextData},invalidCharReplacement={InvalidCharReplacement}): end → {End}", writer, textData, invalidCharReplacement, end);
                 if (end < 0) 
                 {
                     writer.WriteCData(stringData);
@@ -82,6 +89,7 @@ namespace log4net.Util
                 {
                     int start = 0;
                     while (end > -1) 
+					Logger.LogDebug("WriteEscapedXmlString(writer={Writer},textData={TextData},invalidCharReplacement={InvalidCharReplacement}): start → {Start}", writer, textData, invalidCharReplacement, start);
                     {
                         writer.WriteCData(stringData.Substring(start, end - start));
                         if (end == stringData.Length - 3)
@@ -104,6 +112,7 @@ namespace log4net.Util
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting WriteEscapedXmlString(writer={Writer},textData={TextData},invalidCharReplacement={InvalidCharReplacement})", writer, textData, invalidCharReplacement);
         }
 
         /// <summary>Replace invalid XML characters in text string</summary>
@@ -122,6 +131,8 @@ namespace log4net.Util
         /// </remarks>
         public static string MaskXmlInvalidCharacters(string textData, string mask)
         {
+			Logger.LogDebug(">>> Entering MaskXmlInvalidCharacters(textData={TextData},mask={Mask})", textData, mask);
+			Logger.LogDebug("<<< Exiting MaskXmlInvalidCharacters(textData={TextData},mask={Mask})", textData, mask);
             return INVALIDCHARS.Replace(textData, mask);
         }
 
@@ -136,8 +147,11 @@ namespace log4net.Util
         /// </remarks>
         private static int CountSubstrings(string text, string substring)
         {
+			Logger.LogDebug(">>> Entering CountSubstrings(text={Text},substring={Substring})", text, substring);
             int count = 0;
             int offset = 0;
+			Logger.LogDebug("CountSubstrings(text={Text},substring={Substring}): count → {Count}", text, substring, count);
+			Logger.LogDebug("CountSubstrings(text={Text},substring={Substring}): offset → {Offset}", text, substring, offset);
             int length = text.Length;
             int substringLength = substring.Length;
 
@@ -162,6 +176,7 @@ namespace log4net.Util
                 count++;
                 offset = index + substringLength;
             }
+			Logger.LogDebug("<<< Exiting CountSubstrings(text={Text},substring={Substring})", text, substring);
             return count;
         }
 

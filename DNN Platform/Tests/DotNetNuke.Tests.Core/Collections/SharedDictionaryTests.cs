@@ -13,19 +13,23 @@ namespace DotNetNuke.Tests.Core.Collections
 
     public abstract class SharedDictionaryTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public abstract LockingStrategy LockingStrategy { get; }
 
         [Test]
         public void TryAdd()
         {
+			Logger.LogDebug(">>> Entering TryAdd()");
             const string KEY = "key";
             const string VALUE = "value";
 
             var sharedDictionary = new SharedDictionary<string, string>(this.LockingStrategy);
 
+			Logger.LogDebug("TryAdd(): sharedDictionary → {SharedDictionary}", sharedDictionary);
             bool doInsert = false;
             using (ISharedCollectionLock l = sharedDictionary.GetReadLock())
             {
+			Logger.LogDebug("TryAdd(): doInsert → {DoInsert}", doInsert);
                 if (!sharedDictionary.ContainsKey(KEY))
                 {
                     doInsert = true;
@@ -44,6 +48,7 @@ namespace DotNetNuke.Tests.Core.Collections
             }
 
             Assert.That(sharedDictionary.BackingDictionary, Is.EqualTo(new Dictionary<string, string> { { KEY, VALUE } }).AsCollection);
+			Logger.LogDebug("<<< Exiting TryAdd()");
         }
 
         [Test]
@@ -63,68 +68,91 @@ namespace DotNetNuke.Tests.Core.Collections
         [Test]
         public void DisposedReadLockDeniesRead()
         {
+			Logger.LogDebug(">>> Entering DisposedReadLockDeniesRead()");
             var d = new SharedDictionary<string, string>(this.LockingStrategy);
 
+			Logger.LogDebug("DisposedReadLockDeniesRead(): d → {D}", d);
             ISharedCollectionLock l = d.GetReadLock();
             l.Dispose();
+			Logger.LogDebug("DisposedReadLockDeniesRead(): l → {L}", l);
 
             Assert.Throws<ReadLockRequiredException>(() => d.ContainsKey("foo"));
+			Logger.LogDebug("<<< Exiting DisposedReadLockDeniesRead()");
         }
 
         [Test]
         public void DisposedWriteLockDeniesRead()
         {
+			Logger.LogDebug(">>> Entering DisposedWriteLockDeniesRead()");
             var d = new SharedDictionary<string, string>(this.LockingStrategy);
 
+			Logger.LogDebug("DisposedWriteLockDeniesRead(): d → {D}", d);
             ISharedCollectionLock l = d.GetWriteLock();
             l.Dispose();
+			Logger.LogDebug("DisposedWriteLockDeniesRead(): l → {L}", l);
 
             Assert.Throws<ReadLockRequiredException>(() => d.ContainsKey("foo"));
+			Logger.LogDebug("<<< Exiting DisposedWriteLockDeniesRead()");
         }
 
         [Test]
         public void DisposedWriteLockDeniesWrite()
         {
+			Logger.LogDebug(">>> Entering DisposedWriteLockDeniesWrite()");
             var d = new SharedDictionary<string, string>(this.LockingStrategy);
 
+			Logger.LogDebug("DisposedWriteLockDeniesWrite(): d → {D}", d);
             ISharedCollectionLock l = d.GetWriteLock();
             l.Dispose();
+			Logger.LogDebug("DisposedWriteLockDeniesWrite(): l → {L}", l);
 
             Assert.Throws<WriteLockRequiredException>(() => d["ke"] = "foo");
+			Logger.LogDebug("<<< Exiting DisposedWriteLockDeniesWrite()");
         }
 
         [Test]
         public void WriteLockEnablesRead()
         {
+			Logger.LogDebug(">>> Entering WriteLockEnablesRead()");
             var d = this.InitSharedDictionary("key", "value");
 
+			Logger.LogDebug("WriteLockEnablesRead(): d → {D}", d);
             string actualValue = null;
             using (ISharedCollectionLock l = d.GetWriteLock())
             {
+			Logger.LogDebug("WriteLockEnablesRead(): actualValue → {ActualValue}", actualValue);
                 actualValue = d["key"];
             }
 
             Assert.That(actualValue, Is.EqualTo("value"));
+			Logger.LogDebug("<<< Exiting WriteLockEnablesRead()");
         }
 
         [Test]
         public void CanGetAnotherLockAfterDisposingLock()
         {
+			Logger.LogDebug(">>> Entering CanGetAnotherLockAfterDisposingLock()");
             var d = new SharedDictionary<string, string>(this.LockingStrategy);
             ISharedCollectionLock l = d.GetReadLock();
+			Logger.LogDebug("CanGetAnotherLockAfterDisposingLock(): d → {D}", d);
+			Logger.LogDebug("CanGetAnotherLockAfterDisposingLock(): l → {L}", l);
             l.Dispose();
 
             l = d.GetReadLock();
             l.Dispose();
+			Logger.LogDebug("<<< Exiting CanGetAnotherLockAfterDisposingLock()");
         }
 
         [Test]
         public void DoubleDispose()
         {
+			Logger.LogDebug(">>> Entering DoubleDispose()");
             var d = new SharedDictionary<string, string>(this.LockingStrategy);
 
+			Logger.LogDebug("DoubleDispose(): d → {D}", d);
             d.Dispose();
             d.Dispose();
+			Logger.LogDebug("<<< Exiting DoubleDispose()");
         }
 
         [Test]
@@ -140,19 +168,25 @@ namespace DotNetNuke.Tests.Core.Collections
         [Test]
         public void TwoDictsShareALockWriteTest()
         {
+			Logger.LogDebug(">>> Entering TwoDictsShareALockWriteTest()");
             var lockStrategy = LockingStrategyFactory.Create(this.LockingStrategy);
             var dict1 = new SharedDictionary<string, string>(lockStrategy);
+			Logger.LogDebug("TwoDictsShareALockWriteTest(): lockStrategy → {LockStrategy}", lockStrategy);
+			Logger.LogDebug("TwoDictsShareALockWriteTest(): dict1 → {Dict1}", dict1);
             var dict2 = new SharedDictionary<string, string>(lockStrategy);
 
+			Logger.LogDebug("TwoDictsShareALockWriteTest(): dict2 → {Dict2}", dict2);
             using (dict1.GetReadLock())
             {
                 ISharedCollectionLock writeLock = null;
                 try
+				Logger.LogDebug("TwoDictsShareALockWriteTest(): writeLock → {WriteLock}", writeLock);
                 {
                     writeLock = dict2.GetWriteLock();
                 }
                 catch (LockRecursionException)
                 {
+					Logger.LogError("Exception in TwoDictsShareALockWriteTest(): {Arg0}", ex.Message);
                     Assert.Pass();
                 }
                 catch (Exception exception)
@@ -166,6 +200,7 @@ namespace DotNetNuke.Tests.Core.Collections
             }
 
             Assert.Fail("Expected LockRecursionException, did not throw");
+			Logger.LogDebug("<<< Exiting TwoDictsShareALockWriteTest()");
         }
 
         protected static IEnumerable<Action<SharedDictionary<string, string>>> GetObjectDisposedExceptionMethods()

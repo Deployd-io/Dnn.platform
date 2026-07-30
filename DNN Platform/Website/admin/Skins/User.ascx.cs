@@ -26,6 +26,7 @@ namespace DotNetNuke.UI.Skins.Controls
     /// <summary>A skin/theme object which displays a link to the user's profile.</summary>
     public partial class User : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string MyFileName = "User.ascx";
         private readonly INavigationManager navigationManager;
         private readonly IPortalController portalController;
@@ -37,6 +38,7 @@ namespace DotNetNuke.UI.Skins.Controls
         public User()
             : this(null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering User()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="User"/> class.</summary>
@@ -48,11 +50,19 @@ namespace DotNetNuke.UI.Skins.Controls
         {
             this.navigationManager = navigationManager ?? Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+			Logger.LogDebug("User(navigationManager={NavigationManager},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalController → {PortalController1}", navigationManager, portalController, appStatus, portalGroupController, portalController);
+			Logger.LogDebug("User(navigationManager={NavigationManager},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalGroupController → {PortalGroupController1}", navigationManager, portalController, appStatus, portalGroupController, portalGroupController);
+			Logger.LogDebug("User(navigationManager={NavigationManager},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): navigationManager → {NavigationManager1}", navigationManager, portalController, appStatus, portalGroupController, navigationManager);
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			Logger.LogDebug("User(navigationManager={NavigationManager},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): appStatus → {AppStatus1}", navigationManager, portalController, appStatus, portalGroupController, appStatus);
             this.portalGroupController = portalGroupController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalGroupController>();
             this.ShowUnreadMessages = true;
+			Logger.LogDebug("User(navigationManager={NavigationManager},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): this.ShowUnreadMessages → {Arg4}", navigationManager, portalController, appStatus, portalGroupController, this.ShowUnreadMessages);
             this.ShowAvatar = true;
             this.LegacyMode = true;
+			Logger.LogDebug("<<< Exiting User(navigationManager={NavigationManager},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController})", navigationManager, portalController, appStatus, portalGroupController);
+			Logger.LogDebug("User(navigationManager={NavigationManager},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): this.ShowAvatar → {Arg4}", navigationManager, portalController, appStatus, portalGroupController, this.ShowAvatar);
+			Logger.LogDebug("User(navigationManager={NavigationManager},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): this.LegacyMode → {Arg4}", navigationManager, portalController, appStatus, portalGroupController, this.LegacyMode);
         }
 
         public string CssClass { get; set; }
@@ -74,14 +84,17 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.Visible = !this.PortalSettings.InErrorPageRequest() || this.ShowInErrorPage;
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             try
@@ -154,6 +167,7 @@ namespace DotNetNuke.UI.Skins.Controls
                         {
                             var clickEvent = "return " + UrlUtils.PopUpUrl(this.registerLink.NavigateUrl, this, this.PortalSettings, true, false, 600, 950);
                             this.registerLink.Attributes.Add("onclick", clickEvent);
+							Logger.LogDebug("OnLoad(e={E}): clickEvent → {ClickEvent}", e, clickEvent);
                             this.enhancedRegisterLink.Attributes.Add("onclick", clickEvent);
                         }
                     }
@@ -167,6 +181,7 @@ namespace DotNetNuke.UI.Skins.Controls
                 {
                     var userInfo = UserController.Instance.GetCurrentUserInfo();
                     if (userInfo.UserID != -1)
+					Logger.LogDebug("OnLoad(e={E}): userInfo → {UserInfo}", e, userInfo);
                     {
                         this.registerLink.Text = userInfo.DisplayName;
                         this.registerLink.NavigateUrl = Globals.UserProfileURL(userInfo.UserID);
@@ -180,6 +195,8 @@ namespace DotNetNuke.UI.Skins.Controls
                         {
                             var unreadMessages = InternalMessagingController.Instance.CountUnreadMessages(userInfo.UserID, PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, userInfo.PortalID));
                             var unreadAlerts = NotificationsController.Instance.CountNotifications(userInfo.UserID, PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, userInfo.PortalID));
+							Logger.LogDebug("OnLoad(e={E}): unreadMessages → {UnreadMessages}", e, unreadMessages);
+							Logger.LogDebug("OnLoad(e={E}): unreadAlerts → {UnreadAlerts}", e, unreadAlerts);
 
                             this.messageLink.Text = unreadMessages > 0 ? string.Format(CultureInfo.CurrentCulture, Localization.GetString("Messages", Localization.GetResourceFile(this, MyFileName)), unreadMessages) : Localization.GetString("NoMessages", Localization.GetResourceFile(this, MyFileName));
                             this.notificationLink.Text = unreadAlerts > 0 ? string.Format(CultureInfo.CurrentCulture, Localization.GetString("Notifications", Localization.GetResourceFile(this, MyFileName)), unreadAlerts) : Localization.GetString("NoNotifications", Localization.GetResourceFile(this, MyFileName));
@@ -218,8 +235,10 @@ namespace DotNetNuke.UI.Skins.Controls
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         private string GetAvatarUrl(UserInfo userInfo)
@@ -229,8 +248,11 @@ namespace DotNetNuke.UI.Skins.Controls
 
         private int GetMessageTab()
         {
+			Logger.LogDebug(">>> Entering GetMessageTab()");
             var cacheKey = string.Format("MessageCenterTab:{0}:{1}", this.PortalSettings.PortalId, this.PortalSettings.CultureCode);
             var messageTabId = DataCache.GetCache<int>(cacheKey);
+			Logger.LogDebug("GetMessageTab(): cacheKey → {CacheKey}", cacheKey);
+			Logger.LogDebug("GetMessageTab(): messageTabId → {MessageTabId}", messageTabId);
             if (messageTabId > 0)
             {
                 return messageTabId;
@@ -243,19 +265,23 @@ namespace DotNetNuke.UI.Skins.Controls
             // NOTE - This cache is not being cleared. There is no easy way to clear this, except Tools->Clear Cache
             DataCache.SetCache(cacheKey, messageTabId, TimeSpan.FromMinutes(20));
 
+			Logger.LogDebug("<<< Exiting GetMessageTab()");
             return messageTabId;
         }
 
         private int FindMessageTab()
         {
+			Logger.LogDebug(">>> Entering FindMessageTab()");
             // On brand new install the new Message Center Module is on the child page of User Profile Page
             // On Upgrade to 6.2.0, the Message Center module is on the User Profile Page
             var profileTab = TabController.Instance.GetTab(this.PortalSettings.UserTabId, this.PortalSettings.PortalId, false);
             if (profileTab != null)
+			Logger.LogDebug("FindMessageTab(): profileTab → {ProfileTab}", profileTab);
             {
                 var childTabs = TabController.Instance.GetTabsByPortal(profileTab.PortalID).DescendentsOf(profileTab.TabID);
                 foreach (TabInfo tab in childTabs)
                 {
+				Logger.LogDebug("FindMessageTab(): childTabs → {ChildTabs}", childTabs);
                     foreach (KeyValuePair<int, ModuleInfo> kvp in ModuleController.Instance.GetTabModules(tab.TabID))
                     {
                         var module = kvp.Value;
@@ -268,6 +294,7 @@ namespace DotNetNuke.UI.Skins.Controls
             }
 
             // default to User Profile Page
+			Logger.LogDebug("<<< Exiting FindMessageTab()");
             return this.PortalSettings.UserTabId;
         }
     }

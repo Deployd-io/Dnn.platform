@@ -8,10 +8,13 @@ namespace DotNetNuke.Services.Search.Internals
 
     internal class LuceneResults
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="LuceneResults"/> class.</summary>
         public LuceneResults()
         {
+			Logger.LogDebug(">>> Entering LuceneResults()");
             this.Results = new List<LuceneResult>();
+			Logger.LogDebug("<<< Exiting LuceneResults()");
         }
 
         public IEnumerable<LuceneResult> Results { get; set; }

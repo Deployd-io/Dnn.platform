@@ -22,11 +22,16 @@ namespace DotNetNuke.Providers.FolderProviders.Components
     /// <inheritdoc />
     public abstract class BaseRemoteStorageProvider : FolderProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="BaseRemoteStorageProvider"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         protected BaseRemoteStorageProvider()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering BaseRemoteStorageProvider()");
+		Logger.LogDebug("<<< Exiting BaseRemoteStorageProvider()");
+		Logger.LogDebug(">>> Entering BaseRemoteStorageProvider(hostSettings={HostSettings})", hostSettings);
+		Logger.LogDebug("<<< Exiting BaseRemoteStorageProvider(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="BaseRemoteStorageProvider"/> class.</summary>
@@ -76,11 +81,14 @@ namespace DotNetNuke.Providers.FolderProviders.Components
 
         public virtual void ClearCache(int folderMappingId)
         {
+			Logger.LogDebug(">>> Entering ClearCache(folderMappingId={FolderMappingId})", folderMappingId);
             var cacheKey = string.Format(this.ListObjectsCacheKey, folderMappingId);
             DataCache.RemoveCache(cacheKey);
+			Logger.LogDebug("ClearCache(folderMappingId={FolderMappingId}): cacheKey → {CacheKey}", folderMappingId, cacheKey);
 
             // Clear cached objects
             DataCache.ClearCache(string.Format(this.ObjectCacheKey, folderMappingId, string.Empty));
+			Logger.LogDebug("<<< Exiting ClearCache(folderMappingId={FolderMappingId})", folderMappingId);
         }
 
         /// <inheritdoc />
@@ -97,18 +105,23 @@ namespace DotNetNuke.Providers.FolderProviders.Components
             }
 
             this.CopyFileInternal(folderMapping, folderPath + fileName, newFolderPath + fileName);
+			Logger.LogDebug("<<< Exiting CopyFile(folderPath={FolderPath},fileName={FileName},newFolderPath={NewFolderPath},folderMapping={FolderMapping})", folderPath, fileName, newFolderPath, folderMapping);
         }
 
         /// <inheritdoc />
         public override void DeleteFile(IFileInfo file)
         {
+			Logger.LogDebug(">>> Entering DeleteFile(file={File})", file);
             Requires.NotNull("file", file);
 
             var folderMapping = FolderMappingController.Instance.GetFolderMapping(file.PortalId, file.FolderMappingID);
 
+			Logger.LogDebug("DeleteFile(file={File}): folderMapping → {FolderMapping}", file, folderMapping);
             var folder = FolderManager.Instance.GetFolder(file.FolderId);
 
+			Logger.LogDebug("DeleteFile(file={File}): folder → {Folder}", file, folder);
             this.DeleteFileInternal(folderMapping, folder.MappedPath + file.FileName);
+			Logger.LogDebug("<<< Exiting DeleteFile(file={File})", file);
         }
 
         /// <remarks>Azure Storage doesn't support folders, but we need to delete the file added while creating the folder.</remarks>
@@ -154,6 +167,8 @@ namespace DotNetNuke.Providers.FolderProviders.Components
         /// <inheritdoc />
         public override FileAttributes? GetFileAttributes(IFileInfo file)
         {
+			Logger.LogDebug(">>> Entering GetFileAttributes(file={File})", file);
+			Logger.LogDebug("<<< Exiting GetFileAttributes(file={File})", file);
             return null;
         }
 
@@ -182,29 +197,38 @@ namespace DotNetNuke.Providers.FolderProviders.Components
         /// <inheritdoc />
         public override long GetFileSize(IFileInfo file)
         {
+			Logger.LogDebug(">>> Entering GetFileSize(file={File})", file);
             Requires.NotNull("file", file);
 
             var folderMapping = FolderMappingController.Instance.GetFolderMapping(file.PortalId, file.FolderMappingID);
             var folder = FolderManager.Instance.GetFolder(file.FolderId);
+			Logger.LogDebug("GetFileSize(file={File}): folderMapping → {FolderMapping}", file, folderMapping);
+			Logger.LogDebug("GetFileSize(file={File}): folder → {Folder}", file, folder);
 
             var item = this.GetStorageItem(folderMapping, folder.MappedPath + file.FileName);
             if (item == null)
+			Logger.LogDebug("GetFileSize(file={File}): item → {Item}", file, item);
             {
                 throw new FileNotFoundException(this.FileNotFoundMessage, file.RelativePath);
             }
 
+			Logger.LogDebug("<<< Exiting GetFileSize(file={File})", file);
             return item.Size;
         }
 
         /// <inheritdoc />
         public override Stream GetFileStream(IFileInfo file)
         {
+			Logger.LogDebug(">>> Entering GetFileStream(file={File})", file);
             Requires.NotNull("file", file);
 
             var folderMapping = FolderMappingController.Instance.GetFolderMapping(file.PortalId, file.FolderMappingID);
 
+			Logger.LogDebug("GetFileStream(file={File}): folderMapping → {FolderMapping}", file, folderMapping);
             var folder = FolderManager.Instance.GetFolder(file.FolderId);
 
+			Logger.LogDebug("GetFileStream(file={File}): folder → {Folder}", file, folder);
+			Logger.LogDebug("<<< Exiting GetFileStream(file={File})", file);
             return this.GetFileStreamInternal(folderMapping, folder.MappedPath + file.FileName);
         }
 
@@ -222,17 +246,22 @@ namespace DotNetNuke.Providers.FolderProviders.Components
         /// <inheritdoc />
         public override DateTime GetLastModificationTime(IFileInfo file)
         {
+			Logger.LogDebug(">>> Entering GetLastModificationTime(file={File})", file);
             Requires.NotNull("file", file);
 
             var folderMapping = FolderMappingController.Instance.GetFolderMapping(file.PortalId, file.FolderMappingID);
             var folder = FolderManager.Instance.GetFolder(file.FolderId);
+			Logger.LogDebug("GetLastModificationTime(file={File}): folderMapping → {FolderMapping}", file, folderMapping);
+			Logger.LogDebug("GetLastModificationTime(file={File}): folder → {Folder}", file, folder);
 
             var item = this.GetStorageItem(folderMapping, folder.MappedPath + file.FileName);
             if (item == null)
+			Logger.LogDebug("GetLastModificationTime(file={File}): item → {Item}", file, item);
             {
                 throw new FileNotFoundException(this.FileNotFoundMessage, file.RelativePath);
             }
 
+			Logger.LogDebug("<<< Exiting GetLastModificationTime(file={File})", file);
             return item.LastModified;
         }
 
@@ -272,6 +301,8 @@ namespace DotNetNuke.Providers.FolderProviders.Components
         /// <inheritdoc />
         public override bool IsInSync(IFileInfo file)
         {
+			Logger.LogDebug(">>> Entering IsInSync(file={File})", file);
+			Logger.LogDebug("<<< Exiting IsInSync(file={File})", file);
             return Convert.ToInt32((file.LastModificationTime - this.GetLastModificationTime(file)).TotalSeconds) == 0;
         }
 
@@ -288,14 +319,18 @@ namespace DotNetNuke.Providers.FolderProviders.Components
         /// <inheritdoc />
         public override void RenameFile(IFileInfo file, string newFileName)
         {
+			Logger.LogDebug(">>> Entering RenameFile(file={File},newFileName={NewFileName})", file, newFileName);
             Requires.NotNull("file", file);
             Requires.NotNullOrEmpty("newFileName", newFileName);
 
             var folderMapping = FolderMappingController.Instance.GetFolderMapping(file.PortalId, file.FolderMappingID);
 
+			Logger.LogDebug("RenameFile(file={File},newFileName={NewFileName}): folderMapping → {FolderMapping}", file, newFileName, folderMapping);
             var folder = FolderManager.Instance.GetFolder(file.FolderId);
 
+			Logger.LogDebug("RenameFile(file={File},newFileName={NewFileName}): folder → {Folder}", file, newFileName, folder);
             this.MoveFileInternal(folderMapping, folder.MappedPath + file.FileName, folder.MappedPath + newFileName);
+			Logger.LogDebug("<<< Exiting RenameFile(file={File},newFileName={NewFileName})", file, newFileName);
         }
 
         /// <inheritdoc />
@@ -321,26 +356,34 @@ namespace DotNetNuke.Providers.FolderProviders.Components
         /// <inheritdoc />
         public override void SetFileAttributes(IFileInfo file, FileAttributes fileAttributes)
         {
+		Logger.LogDebug(">>> Entering SetFileAttributes(file={File},fileAttributes={FileAttributes})", file, fileAttributes);
+		Logger.LogDebug("<<< Exiting SetFileAttributes(file={File},fileAttributes={FileAttributes})", file, fileAttributes);
         }
 
         /// <remarks>Amazon doesn't support file attributes.</remarks>
         /// <inheritdoc />
         public override bool SupportsFileAttributes()
         {
+			Logger.LogDebug(">>> Entering SupportsFileAttributes()");
+			Logger.LogDebug("<<< Exiting SupportsFileAttributes()");
             return false;
         }
 
         /// <inheritdoc />
         public override void UpdateFile(IFileInfo file, Stream content)
         {
+			Logger.LogDebug(">>> Entering UpdateFile(file={File},content={Content})", file, content);
             Requires.NotNull("file", file);
             Requires.NotNull("content", content);
 
             var folderMapping = FolderMappingController.Instance.GetFolderMapping(file.PortalId, file.FolderMappingID);
 
+			Logger.LogDebug("UpdateFile(file={File},content={Content}): folderMapping → {FolderMapping}", file, content, folderMapping);
             var folder = FolderManager.Instance.GetFolder(file.FolderId);
 
+			Logger.LogDebug("UpdateFile(file={File},content={Content}): folder → {Folder}", file, content, folder);
             this.UpdateFileInternal(content, folderMapping, folder.MappedPath + file.FileName);
+			Logger.LogDebug("<<< Exiting UpdateFile(file={File},content={Content})", file, content);
         }
 
         /// <inheritdoc />
@@ -358,16 +401,21 @@ namespace DotNetNuke.Providers.FolderProviders.Components
         /// <inheritdoc />
         public override string GetHashCode(IFileInfo file)
         {
+			Logger.LogDebug(">>> Entering GetHashCode(file={File})", file);
             Requires.NotNull("file", file);
             var folder = FolderManager.Instance.GetFolder(file.FolderId);
             var folderMapping = FolderMappingController.Instance.GetFolderMapping(folder.PortalID, folder.FolderMappingID);
+			Logger.LogDebug("GetHashCode(file={File}): folder → {Folder}", file, folder);
+			Logger.LogDebug("GetHashCode(file={File}): folderMapping → {FolderMapping}", file, folderMapping);
 
             var item = this.GetStorageItem(folderMapping, folder.MappedPath + file.FileName);
             if (item == null)
+			Logger.LogDebug("GetHashCode(file={File}): item → {Item}", file, item);
             {
                 throw new FileNotFoundException(this.FileNotFoundMessage, file.RelativePath);
             }
 
+			Logger.LogDebug("<<< Exiting GetHashCode(file={File})", file);
             return (item.Size == file.Size) ? item.HashCode : string.Empty;
         }
 
@@ -379,6 +427,7 @@ namespace DotNetNuke.Providers.FolderProviders.Components
                 return this.GetHashCode(file);
             }
 
+			Logger.LogDebug("<<< Exiting GetHashCode(file={File},fileContent={FileContent})", file, fileContent);
             return string.Empty;
         }
 
@@ -449,6 +498,7 @@ namespace DotNetNuke.Providers.FolderProviders.Components
                     ////return list.FirstOrDefault(i => i.Key == key);
                     return list.FirstOrDefault(i => i.Key.Equals(key, StringComparison.InvariantCultureIgnoreCase));
                 });
+				Logger.LogDebug("<<< Exiting GetStorageItemInternal(folderMapping={FolderMapping},key={Key})", folderMapping, key);
         }
     }
 }

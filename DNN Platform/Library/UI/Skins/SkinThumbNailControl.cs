@@ -149,13 +149,16 @@ namespace DotNetNuke.UI.Skins
         /// <summary>Clear clears the radio button list.</summary>
         public void Clear()
         {
+			Logger.LogDebug(">>> Entering Clear()");
             this.OptSkin.Items.Clear();
+			Logger.LogDebug("<<< Exiting Clear()");
         }
 
         /// <summary>LoadAllSkins loads all the available skins (Host and Site) to the radio button list.</summary>
         /// <param name="includeNotSpecified">Optionally include the "Not Specified" option.</param>
         public void LoadAllSkins(bool includeNotSpecified)
         {
+			Logger.LogDebug(">>> Entering LoadAllSkins(includeNotSpecified={IncludeNotSpecified})", includeNotSpecified);
             // default value
             if (includeNotSpecified)
             {
@@ -167,12 +170,14 @@ namespace DotNetNuke.UI.Skins
 
             // load portal skins (includeNotSpecified = false as we have already added it)
             this.LoadPortalSkins(false);
+			Logger.LogDebug("<<< Exiting LoadAllSkins(includeNotSpecified={IncludeNotSpecified})", includeNotSpecified);
         }
 
         /// <summary>LoadHostSkins loads all the available Host skins to the radio button list.</summary>
         /// <param name="includeNotSpecified">Optionally include the "Not Specified" option.</param>
         public void LoadHostSkins(bool includeNotSpecified)
         {
+			Logger.LogDebug(">>> Entering LoadHostSkins(includeNotSpecified={IncludeNotSpecified})", includeNotSpecified);
             // default value
             if (includeNotSpecified)
             {
@@ -186,18 +191,21 @@ namespace DotNetNuke.UI.Skins
                 var arrFolders = Directory.GetDirectories(strRoot);
                 foreach (var strFolder in arrFolders)
                 {
+				Logger.LogDebug("LoadHostSkins(includeNotSpecified={IncludeNotSpecified}): arrFolders → {ArrFolders}", includeNotSpecified, arrFolders);
                     if (!strFolder.EndsWith(Globals.glbHostSkinFolder, StringComparison.OrdinalIgnoreCase))
                     {
                         this.LoadSkins(strFolder, "[G]", false);
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting LoadHostSkins(includeNotSpecified={IncludeNotSpecified})", includeNotSpecified);
         }
 
         /// <summary>LoadHostSkins loads all the available Site/Portal skins to the radio button list.</summary>
         /// <param name="includeNotSpecified">Optionally include the "Not Specified" option.</param>
         public void LoadPortalSkins(bool includeNotSpecified)
         {
+			Logger.LogDebug(">>> Entering LoadPortalSkins(includeNotSpecified={IncludeNotSpecified})", includeNotSpecified);
             // default value
             if (includeNotSpecified)
             {
@@ -211,9 +219,11 @@ namespace DotNetNuke.UI.Skins
                 var arrFolders = Directory.GetDirectories(strRoot);
                 foreach (var strFolder in arrFolders)
                 {
+				Logger.LogDebug("LoadPortalSkins(includeNotSpecified={IncludeNotSpecified}): arrFolders → {ArrFolders}", includeNotSpecified, arrFolders);
                     this.LoadSkins(strFolder, "[L]", false);
                 }
             }
+			Logger.LogDebug("<<< Exiting LoadPortalSkins(includeNotSpecified={IncludeNotSpecified})", includeNotSpecified);
         }
 
         /// <summary>LoadSkins loads all the available skins in a specific folder to the radio button list.</summary>
@@ -222,6 +232,7 @@ namespace DotNetNuke.UI.Skins
         /// <param name="includeNotSpecified">Optionally include the "Not Specified" option.</param>
         public void LoadSkins(string strFolder, string skinType, bool includeNotSpecified)
         {
+			Logger.LogDebug(">>> Entering LoadSkins(strFolder={StrFolder},skinType={SkinType},includeNotSpecified={IncludeNotSpecified})", strFolder, skinType, includeNotSpecified);
             // default value
             if (includeNotSpecified)
             {
@@ -232,12 +243,15 @@ namespace DotNetNuke.UI.Skins
             {
                 var arrFiles = Directory.GetFiles(strFolder, "*.ascx");
                 strFolder = strFolder.Substring(strFolder.LastIndexOf(@"\", StringComparison.Ordinal) + 1);
+				Logger.LogDebug("LoadSkins(strFolder={StrFolder},skinType={SkinType},includeNotSpecified={IncludeNotSpecified}): arrFiles → {ArrFiles}", strFolder, skinType, includeNotSpecified, arrFiles);
+				Logger.LogDebug("LoadSkins(strFolder={StrFolder},skinType={SkinType},includeNotSpecified={IncludeNotSpecified}): strFolder → {StrFolder1}", strFolder, skinType, includeNotSpecified, strFolder);
 
                 foreach (var strFile in arrFiles)
                 {
                     this.AddSkin(skinType + this.SkinRoot, strFolder, strFile);
                 }
             }
+			Logger.LogDebug("<<< Exiting LoadSkins(strFolder={StrFolder},skinType={SkinType},includeNotSpecified={IncludeNotSpecified})", strFolder, skinType, includeNotSpecified);
         }
 
         /// <summary>format skin name.</summary>
@@ -245,6 +259,7 @@ namespace DotNetNuke.UI.Skins
         /// <param name="strSkinFile">The File Name without extension.</param>
         private static string FormatSkinName(string strSkinFolder, string strSkinFile)
         {
+			Logger.LogDebug(">>> Entering FormatSkinName(strSkinFolder={StrSkinFolder},strSkinFile={StrSkinFile})", strSkinFolder, strSkinFile);
             if (strSkinFolder.Equals("_default", StringComparison.OrdinalIgnoreCase))
             {
                 // host folder
@@ -259,6 +274,7 @@ namespace DotNetNuke.UI.Skins
                 case "default":
                     return strSkinFolder;
                 default:
+					Logger.LogDebug("<<< Exiting FormatSkinName(strSkinFolder={StrSkinFolder},strSkinFile={StrSkinFile})", strSkinFolder, strSkinFile);
                     return $"<span class=\"NormalBold\">{strSkinFolder} - {strSkinFile}</span>";
             }
         }
@@ -342,9 +358,12 @@ namespace DotNetNuke.UI.Skins
         /// <summary>AddDefaultSkin adds the not-specified skin to the radio button list.</summary>
         private void AddDefaultSkin()
         {
+			Logger.LogDebug(">>> Entering AddDefaultSkin()");
             var strDefault = Localization.GetString("Not_Specified") + "<br />";
             strDefault += "<img src=\"" + Globals.ApplicationPath.Replace(@"\", "/") + "/images/spacer.gif\" width=\"140\" height=\"135\" border=\"0\">";
+			Logger.LogDebug("AddDefaultSkin(): strDefault → {StrDefault}", strDefault);
             this.OptSkin.Items.Insert(0, new ListItem(strDefault, string.Empty));
+			Logger.LogDebug("<<< Exiting AddDefaultSkin()");
         }
 
         /// <summary>AddSkin adds the skin to the radio button list.</summary>
@@ -353,6 +372,7 @@ namespace DotNetNuke.UI.Skins
         /// <param name="strFile">The Skin File.</param>
         private void AddSkin(string root, string strFolder, string strFile)
         {
+			Logger.LogDebug(">>> Entering AddSkin(root={Root},strFolder={StrFolder},strFile={StrFile})", root, strFolder, strFile);
             var strImage = string.Empty;
             if (File.Exists(strFile.Replace(".ascx", ".jpg")))
             {
@@ -365,6 +385,7 @@ namespace DotNetNuke.UI.Skins
             }
 
             this.OptSkin.Items.Add(new ListItem(FormatSkinName(strFolder, Path.GetFileNameWithoutExtension(strFile)) + "<br />" + strImage, root + "/" + strFolder + "/" + Path.GetFileName(strFile)));
+			Logger.LogDebug("<<< Exiting AddSkin(root={Root},strFolder={StrFolder},strFile={StrFile})", root, strFolder, strFile);
         }
     }
 }

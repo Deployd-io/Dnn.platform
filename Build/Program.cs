@@ -12,6 +12,7 @@ namespace DotNetNuke.Build
     /// <summary>Runs the build process.</summary>
     public class Program
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>The version of the Microsoft.TestPlatform NuGet package.</summary>
         internal const string MicrosoftTestPlatformVersion = "18.4.0";
 
@@ -23,6 +24,8 @@ namespace DotNetNuke.Build
         /// <returns>A status code.</returns>
         public static int Main(string[] args)
         {
+			Logger.LogDebug(">>> Entering Main(args={Args})", args);
+			Logger.LogDebug("<<< Exiting Main(args={Args})", args);
             return new CakeHost()
                 .UseContext<Context>()
                 .UseLifetime<Lifetime>()

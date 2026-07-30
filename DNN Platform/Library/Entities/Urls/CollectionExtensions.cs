@@ -14,6 +14,7 @@ namespace DotNetNuke.Entities.Urls
 
     public static class CollectionExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public static void LoadFromXmlFile(this Dictionary<int, List<ParameterReplaceAction>> actions, string fileName, int portalId, bool portalSpecific, ref List<string> messages)
         {
             if (messages == null)

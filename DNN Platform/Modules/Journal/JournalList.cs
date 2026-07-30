@@ -17,6 +17,7 @@ namespace DotNetNuke.Modules.Journal
     [ToolboxData("<{0}:JournalList runat=server></{0}:JournalList>")]
     public class JournalList : WebControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public int PortalId { get; set; }
 
         public int ProfileId { get; set; }
@@ -28,7 +29,9 @@ namespace DotNetNuke.Modules.Journal
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter output)
         {
+			Logger.LogDebug(">>> Entering Render(output={Output})", output);
             output.Write("Hello World");
+			Logger.LogDebug("<<< Exiting Render(output={Output})", output);
         }
     }
 }

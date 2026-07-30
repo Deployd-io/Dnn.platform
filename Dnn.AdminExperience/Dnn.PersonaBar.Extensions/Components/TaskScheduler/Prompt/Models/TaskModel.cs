@@ -10,9 +10,12 @@ namespace Dnn.PersonaBar.TaskScheduler.Components.Prompt.Models
     /// <summary>Represents a DNN ScheduleItem.</summary>
     public class TaskModel : TaskModelBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="TaskModel"/> class.</summary>
         public TaskModel()
         {
+		Logger.LogDebug(">>> Entering TaskModel()");
+		Logger.LogDebug("<<< Exiting TaskModel(item={Item})", item);
         }
 
         /// <summary>Initializes a new instance of the <see cref="TaskModel"/> class.</summary>
@@ -22,11 +25,13 @@ namespace Dnn.PersonaBar.TaskScheduler.Components.Prompt.Models
         {
             this.NextStart = item.NextStart.ToPromptLongDateString();
             this.CatchUp = item.CatchUpEnabled;
+			Logger.LogDebug("TaskModel(item={Item}): this.CatchUp → {Arg1}", item, this.CatchUp);
             this.Created = item.CreatedOnDate.ToPromptLongDateString();
             this.StartDate = item.ScheduleStartDate.ToPromptLongDateString();
             this.TypeName = item.TypeFullName;
         }
 
+		Logger.LogDebug("TaskModel(item={Item}): this.TypeName → {Arg1}", item, this.TypeName);
         public string TypeName { get; set; }
 
         public bool CatchUp { get; set; }

@@ -18,6 +18,7 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
     [ConsoleCommand("list-pages", Constants.PagesCategory, "Prompt_ListPages_Description")]
     public class ListPages : ConsoleCommandBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [FlagParameter("parentid", "Prompt_ListPages_FlagParentId", "Integer")]
         private const string FlagParentId = "parentid";
 
@@ -52,13 +53,17 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
         public ListPages()
             : this(PagesController.Instance)
         {
+		Logger.LogDebug(">>> Entering ListPages()");
         }
+		Logger.LogDebug("<<< Exiting ListPages()");
 
         /// <summary>Initializes a new instance of the <see cref="ListPages"/> class.</summary>
         /// <param name="pagesController">The pages controller.</param>
         public ListPages(IPagesController pagesController)
         {
             this.pagesController = pagesController;
+			Logger.LogDebug("ListPages(pagesController={PagesController}): pagesController → {PagesController1}", pagesController, pagesController);
+			Logger.LogDebug("ListPages(pagesController={PagesController}): this.pagesController → {Arg1}", pagesController, this.pagesController);
         }
 
         /// <inheritdoc />
@@ -85,6 +90,7 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.ParentId = this.GetFlagValue<int?>(FlagParentId, "Parent Id", null, false, true, true);
             this.Deleted = this.GetFlagValue<bool?>(FlagDeleted, "Deleted", null);
             this.PageVisible = this.GetFlagValue<bool?>(FlagVisible, "Page Visible", null);
@@ -94,23 +100,30 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
             this.PageSkin = this.GetFlagValue(FlagSkin, "Page Skin", string.Empty);
             this.Page = this.GetFlagValue(FlagPage, "Page", 1);
             this.Max = this.GetFlagValue(FlagMax, "Max", 10);
+			Logger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             var max = this.Max <= 0 ? 10 : (this.Max > 500 ? 500 : this.Max);
 
+			Logger.LogDebug("Run(): max → {Max}", max);
             var lstOut = new List<PageModelBase>();
 
+			Logger.LogDebug("Run(): lstOut → {LstOut}", lstOut);
             int total;
 
             IEnumerable<DotNetNuke.Entities.Tabs.TabInfo> lstTabs;
 
             lstTabs = this.pagesController.GetPageList(this.PortalSettings, this.Deleted, this.PageName, this.PageTitle, this.PagePath, this.PageSkin, this.PageVisible, this.ParentId ?? -1, out total, string.Empty, this.Page > 0 ? this.Page - 1 : 0, max, this.ParentId == null);
             var totalPages = (total / max) + (total % max == 0 ? 0 : 1);
+			Logger.LogDebug("Run(): lstTabs → {LstTabs}", lstTabs);
+			Logger.LogDebug("Run(): totalPages → {TotalPages}", totalPages);
             var pageNo = this.Page > 0 ? this.Page : 1;
             lstOut.AddRange(lstTabs.Select(tab => new PageModelBase(tab)));
+			Logger.LogDebug("<<< Exiting Run()");
             return new ConsoleResultModel
             {
                 Data = lstOut,

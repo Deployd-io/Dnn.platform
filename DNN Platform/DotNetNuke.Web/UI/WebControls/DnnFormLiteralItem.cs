@@ -17,12 +17,15 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A literal control.</summary>
     public class DnnFormLiteralItem : DnnFormItemBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="DnnFormLiteralItem"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IApplicationStatusInfo. Scheduled removal in v12.0.0.")]
         public DnnFormLiteralItem()
             : this(Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>(), Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>())
         {
+		Logger.LogDebug(">>> Entering DnnFormLiteralItem()");
         }
+		Logger.LogDebug("<<< Exiting DnnFormLiteralItem()");
 
         /// <summary>Initializes a new instance of the <see cref="DnnFormLiteralItem"/> class.</summary>
         /// <param name="appStatus">The application status.</param>
@@ -31,13 +34,17 @@ namespace DotNetNuke.Web.UI.WebControls
             : base(appStatus, eventLogger)
         {
             this.ViewStateMode = ViewStateMode.Disabled;
+			Logger.LogDebug("DnnFormLiteralItem(appStatus={AppStatus},eventLogger={EventLogger}): this.ViewStateMode → {Arg2}", appStatus, eventLogger, this.ViewStateMode);
         }
 
         /// <inheritdoc />
         protected override WebControl CreateControlInternal(Control container)
         {
+			Logger.LogDebug(">>> Entering CreateControlInternal(container={Container})", container);
             var literal = new Label { ID = this.ID + "_Label", Text = Convert.ToString(this.Value, CultureInfo.InvariantCulture), };
             container.Controls.Add(literal);
+			Logger.LogDebug("CreateControlInternal(container={Container}): literal → {Literal}", container, literal);
+			Logger.LogDebug("<<< Exiting CreateControlInternal(container={Container})", container);
             return literal;
         }
     }

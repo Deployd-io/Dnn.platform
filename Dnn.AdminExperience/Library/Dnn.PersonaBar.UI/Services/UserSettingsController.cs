@@ -28,6 +28,7 @@ namespace Dnn.PersonaBar.UI.Services
     [MenuPermission(Scope = ServiceScope.Regular)]
     public class UserSettingsController : PersonaBarApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IPortalController portalController;
         private readonly IApplicationStatusInfo appStatus;
         private readonly IPortalGroupController portalGroupController;
@@ -37,6 +38,11 @@ namespace Dnn.PersonaBar.UI.Services
         public UserSettingsController()
             : this(null, null, null)
         {
+		Logger.LogDebug(">>> Entering UserSettingsController()");
+		Logger.LogDebug("<<< Exiting UserSettingsController()");
+		Logger.LogDebug(">>> Entering UserSettingsController(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController})", portalController, appStatus, portalGroupController);
+		Logger.LogDebug("UserSettingsController(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): appStatus → {AppStatus1}", portalController, appStatus, portalGroupController, appStatus);
+		Logger.LogDebug("<<< Exiting UserSettingsController(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController})", portalController, appStatus, portalGroupController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="UserSettingsController"/> class.</summary>
@@ -47,7 +53,9 @@ namespace Dnn.PersonaBar.UI.Services
         {
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			Logger.LogDebug("UserSettingsController(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalController → {PortalController1}", portalController, appStatus, portalGroupController, portalController);
             this.portalGroupController = portalGroupController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalGroupController>();
+			Logger.LogDebug("UserSettingsController(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalGroupController → {PortalGroupController1}", portalController, appStatus, portalGroupController, portalGroupController);
         }
 
         /// <summary>Update Persona Bar's User Settings.</summary>

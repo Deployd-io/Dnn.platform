@@ -36,15 +36,18 @@ namespace DotNetNuke.Modules.Journal
     public class ServicesController(IHostSettings hostSettings)
         : DnnApiController
     {
+		Logger.LogDebug(">>> Entering ServicesController(hostSettings={HostSettings})", hostSettings);
         private const string MentionNotificationSuffix = "...";
         private const string MentionIdentityChar = "@";
         private const int MentionNotificationLength = 100;
 
         private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ServicesController));
         private static readonly string[] AcceptedFileExtensions = ["jpg", "png", "gif", "jpe", "jpeg", "tiff", "bmp",];
+		Logger.LogDebug("ServicesController(hostSettings={HostSettings}): Logger → {Logger}", hostSettings, Logger);
 
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
 
+		Logger.LogDebug("ServicesController(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
         /// <summary>Initializes a new instance of the <see cref="ServicesController"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public ServicesController()
@@ -57,14 +60,18 @@ namespace DotNetNuke.Modules.Journal
         [DnnAuthorize(DenyRoles = "Unverified Users")]
         public HttpResponseMessage Create(CreateDTO postData)
         {
+			Logger.LogDebug(">>> Entering Create(postData={PostData})", postData);
             try
             {
                 int userId = this.UserInfo.UserID;
                 IDictionary<string, UserInfo> mentionedUsers = new Dictionary<string, UserInfo>();
+				Logger.LogDebug("Create(postData={PostData}): userId → {UserId}", postData, userId);
+				Logger.LogDebug("Create(postData={PostData}): mentionedUsers → {MentionedUsers}", postData, mentionedUsers);
 
                 if (postData.ProfileId == -1)
                 {
                     postData.ProfileId = userId;
+					Logger.LogDebug("Create(postData={PostData}): postData.ProfileId → {Arg1}", postData, postData.ProfileId);
                 }
 
                 this.CheckProfileAccess(postData.ProfileId, this.UserInfo);
@@ -73,6 +80,7 @@ namespace DotNetNuke.Modules.Journal
 
                 var journalItem = this.PrepareJournalItem(postData, mentionedUsers);
 
+				Logger.LogDebug("Create(postData={PostData}): journalItem → {JournalItem}", postData, journalItem);
                 JournalController.Instance.SaveJournalItem(journalItem, this.ActiveModule);
 
                 var originalSummary = journalItem.Summary;
@@ -83,6 +91,7 @@ namespace DotNetNuke.Modules.Journal
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting Create(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -92,11 +101,13 @@ namespace DotNetNuke.Modules.Journal
         [DnnAuthorize(DenyRoles = "Unverified Users")]
         public HttpResponseMessage Delete(JournalIdDTO postData)
         {
+			Logger.LogDebug(">>> Entering Delete(postData={PostData})", postData);
             try
             {
                 var jc = JournalController.Instance;
                 var ji = jc.GetJournalItem(this.ActiveModule.OwnerPortalID, this.UserInfo.UserID, postData.JournalId);
 
+				Logger.LogDebug("Delete(postData={PostData}): ji → {Ji}", postData, ji);
                 if (ji == null)
                 {
                     return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "invalid request");
@@ -113,6 +124,7 @@ namespace DotNetNuke.Modules.Journal
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting Delete(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -122,11 +134,13 @@ namespace DotNetNuke.Modules.Journal
         [DnnAuthorize(DenyRoles = "Unverified Users")]
         public HttpResponseMessage SoftDelete(JournalIdDTO postData)
         {
+			Logger.LogDebug(">>> Entering SoftDelete(postData={PostData})", postData);
             try
             {
                 var jc = JournalController.Instance;
                 var ji = jc.GetJournalItem(this.ActiveModule.OwnerPortalID, this.UserInfo.UserID, postData.JournalId);
 
+				Logger.LogDebug("SoftDelete(postData={PostData}): ji → {Ji}", postData, ji);
                 if (ji == null)
                 {
                     return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "invalid request");
@@ -143,6 +157,7 @@ namespace DotNetNuke.Modules.Journal
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting SoftDelete(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -152,6 +167,7 @@ namespace DotNetNuke.Modules.Journal
         [DnnAuthorize]
         public HttpResponseMessage PreviewUrl(PreviewDTO postData)
         {
+			Logger.LogDebug(">>> Entering PreviewUrl(postData={PostData})", postData);
             try
             {
                 var link = Utilities.GetLinkData(postData.Url);
@@ -160,6 +176,7 @@ namespace DotNetNuke.Modules.Journal
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting PreviewUrl(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -168,9 +185,12 @@ namespace DotNetNuke.Modules.Journal
         [ValidateAntiForgeryToken]
         public HttpResponseMessage GetListForProfile(GetListForProfileDTO postData)
         {
+			Logger.LogDebug(">>> Entering GetListForProfile(postData={PostData})", postData);
             try
             {
                 var jp = new JournalParser(this.PortalSettings, this.ActiveModule.ModuleID, postData.ProfileId, postData.GroupId, this.UserInfo);
+				Logger.LogDebug("GetListForProfile(postData={PostData}): jp → {Jp}", postData, jp);
+				Logger.LogDebug("<<< Exiting GetListForProfile(postData={PostData})", postData);
                 return this.Request.CreateResponse(HttpStatusCode.OK, jp.GetList(postData.RowIndex, postData.MaxRows), "text/html");
             }
             catch (Exception exc)
@@ -185,19 +205,24 @@ namespace DotNetNuke.Modules.Journal
         [DnnAuthorize(DenyRoles = "Unverified Users")]
         public HttpResponseMessage Like(JournalIdDTO postData)
         {
+			Logger.LogDebug(">>> Entering Like(postData={PostData})", postData);
             try
             {
                 JournalController.Instance.LikeJournalItem(postData.JournalId, this.UserInfo.UserID, this.UserInfo.DisplayName);
                 var ji = JournalController.Instance.GetJournalItem(this.ActiveModule.OwnerPortalID, this.UserInfo.UserID, postData.JournalId);
                 var jp = new JournalParser(this.PortalSettings, this.ActiveModule.ModuleID, ji.ProfileId, -1, this.UserInfo);
+				Logger.LogDebug("Like(postData={PostData}): ji → {Ji}", postData, ji);
+				Logger.LogDebug("Like(postData={PostData}): jp → {Jp}", postData, jp);
                 var isLiked = false;
                 var likeList = jp.GetLikeListHTML(ji, ref isLiked);
                 likeList = Utilities.LocalizeControl(likeList);
+				Logger.LogDebug("Like(postData={PostData}): likeList → {LikeList}", postData, likeList);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { LikeList = likeList, Liked = isLiked });
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting Like(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -207,20 +232,27 @@ namespace DotNetNuke.Modules.Journal
         [DnnAuthorize(DenyRoles = "Unverified Users")]
         public HttpResponseMessage CommentSave(CommentSaveDTO postData)
         {
+			Logger.LogDebug(">>> Entering CommentSave(postData={PostData})", postData);
             try
             {
                 var comment = Utilities.RemoveHTML(HttpUtility.UrlDecode(postData.Comment));
 
+				Logger.LogDebug("CommentSave(postData={PostData}): comment → {Comment}", postData, comment);
                 IDictionary<string, UserInfo> mentionedUsers = new Dictionary<string, UserInfo>();
                 var originalComment = comment;
+				Logger.LogDebug("CommentSave(postData={PostData}): mentionedUsers → {MentionedUsers}", postData, mentionedUsers);
                 comment = this.ParseMentions(comment, postData.Mentions, ref mentionedUsers);
                 var ci = new CommentInfo { JournalId = postData.JournalId, Comment = comment };
+				Logger.LogDebug("CommentSave(postData={PostData}): ci.UserId → {Arg1}", postData, ci.UserId);
+				Logger.LogDebug("CommentSave(postData={PostData}): ci.DisplayName → {Arg1}", postData, ci.DisplayName);
                 ci.UserId = this.UserInfo.UserID;
                 ci.DisplayName = this.UserInfo.DisplayName;
                 JournalController.Instance.SaveComment(ci);
 
                 var ji = JournalController.Instance.GetJournalItem(this.ActiveModule.OwnerPortalID, this.UserInfo.UserID, postData.JournalId);
                 var jp = new JournalParser(this.PortalSettings, this.ActiveModule.ModuleID, ji.ProfileId, -1, this.UserInfo);
+				Logger.LogDebug("CommentSave(postData={PostData}): ji → {Ji}", postData, ji);
+				Logger.LogDebug("CommentSave(postData={PostData}): jp → {Jp}", postData, jp);
 
                 this.SendMentionNotifications(mentionedUsers, ji, originalComment, "Comment");
 
@@ -229,6 +261,7 @@ namespace DotNetNuke.Modules.Journal
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting CommentSave(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -238,16 +271,19 @@ namespace DotNetNuke.Modules.Journal
         [DnnAuthorize(DenyRoles = "Unverified Users")]
         public HttpResponseMessage CommentDelete(CommentDeleteDTO postData)
         {
+			Logger.LogDebug(">>> Entering CommentDelete(postData={PostData})", postData);
             try
             {
                 var ci = JournalController.Instance.GetComment(postData.CommentId);
                 if (ci == null)
+				Logger.LogDebug("CommentDelete(postData={PostData}): ci → {Ci}", postData, ci);
                 {
                     return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "delete failed");
                 }
 
                 var ji = JournalController.Instance.GetJournalItem(this.ActiveModule.OwnerPortalID, this.UserInfo.UserID, postData.JournalId);
 
+				Logger.LogDebug("CommentDelete(postData={PostData}): ji → {Ji}", postData, ji);
                 if (ji == null)
                 {
                     return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "invalid request");
@@ -264,6 +300,7 @@ namespace DotNetNuke.Modules.Journal
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting CommentDelete(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -272,15 +309,20 @@ namespace DotNetNuke.Modules.Journal
         [DnnAuthorize(DenyRoles = "Unverified Users")]
         public HttpResponseMessage GetSuggestions(string keyword)
         {
+			Logger.LogDebug(">>> Entering GetSuggestions(keyword={Keyword})", keyword);
             try
             {
                 var findedUsers = new List<SuggestDTO>();
                 var relations = RelationshipController.Instance.GetUserRelationships(this.UserInfo);
+				Logger.LogDebug("GetSuggestions(keyword={Keyword}): findedUsers → {FindedUsers}", keyword, findedUsers);
+				Logger.LogDebug("GetSuggestions(keyword={Keyword}): relations → {Relations}", keyword, relations);
                 foreach (var ur in relations)
                 {
                     var targetUserId = ur.UserId == this.UserInfo.UserID ? ur.RelatedUserId : ur.UserId;
                     var targetUser = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, targetUserId);
                     var relationship = RelationshipController.Instance.GetRelationship(ur.RelationshipId);
+					Logger.LogDebug("GetSuggestions(keyword={Keyword}): targetUser → {TargetUser}", keyword, targetUser);
+					Logger.LogDebug("GetSuggestions(keyword={Keyword}): relationship → {Relationship}", keyword, relationship);
                     if (ur.Status == RelationshipStatus.Accepted && targetUser != null
                         && ((relationship.RelationshipTypeId == (int)DefaultRelationshipTypes.Followers && ur.RelatedUserId == this.UserInfo.UserID)
                                 || relationship.RelationshipTypeId == (int)DefaultRelationshipTypes.Friends)
@@ -303,12 +345,14 @@ namespace DotNetNuke.Modules.Journal
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetSuggestions(keyword={Keyword})", keyword);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
 
         private static bool IsImageFile(string relativePath)
         {
+			Logger.LogDebug(">>> Entering IsImageFile(relativePath={RelativePath})", relativePath);
             if (relativePath == null)
             {
                 return false;
@@ -324,35 +368,44 @@ namespace DotNetNuke.Modules.Journal
             var extension = relativePath.Substring(relativePath.LastIndexOf(
                 ".",
                 StringComparison.Ordinal) + 1).ToLowerInvariant();
+			Logger.LogDebug("<<< Exiting IsImageFile(relativePath={RelativePath})", relativePath);
             return AcceptedFileExtensions.Contains(extension);
         }
 
         private static bool IsAllowedLink(string url)
         {
+			Logger.LogDebug(">>> Entering IsAllowedLink(url={Url})", url);
+			Logger.LogDebug("<<< Exiting IsAllowedLink(url={Url})", url);
             return !string.IsNullOrEmpty(url) && !url.Contains("//");
         }
 
         // Check if a user can post content on a specific profile's page
         private void CheckProfileAccess(int profileId, UserInfo currentUser)
         {
+			Logger.LogDebug(">>> Entering CheckProfileAccess(profileId={ProfileId},currentUser={CurrentUser})", profileId, currentUser);
             if (profileId != currentUser.UserID)
             {
                 var profileUser = UserController.Instance.GetUser(this.PortalSettings.PortalId, profileId);
                 if (profileUser == null || (!this.UserInfo.IsInRole(this.PortalSettings.AdministratorRoleName) && !Utilities.AreFriends(profileUser, currentUser)))
+				Logger.LogDebug("CheckProfileAccess(profileId={ProfileId},currentUser={CurrentUser}): profileUser → {ProfileUser}", profileId, currentUser, profileUser);
                 {
                     throw new ArgumentException("you have no permission to post journal on current profile page.");
                 }
             }
+			Logger.LogDebug("<<< Exiting CheckProfileAccess(profileId={ProfileId},currentUser={CurrentUser})", profileId, currentUser);
         }
 
         private void CheckGroupAccess(CreateDTO postData)
         {
+			Logger.LogDebug(">>> Entering CheckGroupAccess(postData={PostData})", postData);
             if (postData.GroupId > 0)
             {
                 postData.ProfileId = -1;
+				Logger.LogDebug("CheckGroupAccess(postData={PostData}): postData.ProfileId → {Arg1}", postData, postData.ProfileId);
 
                 RoleInfo roleInfo = RoleController.Instance.GetRoleById(this.ActiveModule.OwnerPortalID, postData.GroupId);
                 if (roleInfo != null)
+				Logger.LogDebug("CheckGroupAccess(postData={PostData}): roleInfo → {RoleInfo}", postData, roleInfo);
                 {
                     if (!this.UserInfo.IsInRole(this.PortalSettings.AdministratorRoleName) && !this.UserInfo.IsInRole(roleInfo.RoleName))
                     {
@@ -362,9 +415,11 @@ namespace DotNetNuke.Modules.Journal
                     if (!roleInfo.IsPublic)
                     {
                         postData.SecuritySet = "R";
+						Logger.LogDebug("CheckGroupAccess(postData={PostData}): postData.SecuritySet → {Arg1}", postData, postData.SecuritySet);
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting CheckGroupAccess(postData={PostData})", postData);
         }
 
         private JournalItem PrepareJournalItem(CreateDTO postData, IDictionary<string, UserInfo> mentionedUsers)
@@ -530,29 +585,38 @@ namespace DotNetNuke.Modules.Journal
 
             var userFolders = this.GetUserFolders();
 
+			Logger.LogDebug("IsCurrentUserFile(file={File}): userFolders → {UserFolders}", file, userFolders);
+			Logger.LogDebug("<<< Exiting IsCurrentUserFile(file={File})", file);
             return userFolders.Any(f => file.FolderId == f.FolderID);
         }
 
         private IList<IFolderInfo> GetUserFolders()
         {
+			Logger.LogDebug(">>> Entering GetUserFolders()");
             var folders = new List<IFolderInfo>();
 
+			Logger.LogDebug("GetUserFolders(): folders → {Folders}", folders);
             var userFolder = FolderManager.Instance.GetUserFolder(this.UserInfo);
             folders.Add(userFolder);
+			Logger.LogDebug("GetUserFolders(): userFolder → {UserFolder}", userFolder);
             folders.AddRange(this.GetSubFolders(userFolder));
 
+			Logger.LogDebug("<<< Exiting GetUserFolders()");
             return folders;
         }
 
         private IList<IFolderInfo> GetSubFolders(IFolderInfo parentFolder)
         {
+			Logger.LogDebug(">>> Entering GetSubFolders(parentFolder={ParentFolder})", parentFolder);
             var folders = new List<IFolderInfo>();
             foreach (var folder in FolderManager.Instance.GetFolders(parentFolder))
             {
+			Logger.LogDebug("GetSubFolders(parentFolder={ParentFolder}): folders → {Folders}", parentFolder, folders);
                 folders.Add(folder);
                 folders.AddRange(this.GetSubFolders(folder));
             }
 
+			Logger.LogDebug("<<< Exiting GetSubFolders(parentFolder={ParentFolder})", parentFolder);
             return folders;
         }
 

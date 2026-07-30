@@ -20,17 +20,24 @@ Namespace DotNetNuke.UI.WebControls
     <PersistChildren(False), ParseChildren(True, "States"), ToolboxData("<{0}:DNNMultiStateBox runat=server></{0}:DNNMultiStateBox>"), Designer(GetType(DNNMultiStateBoxDesigner))> _
     Public Class DNNMultiStateBox
         Inherits CheckBox
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(DNNMultiStateBox))
         ' Methods
         Public Sub New()
+			Logger.LogDebug(">>> Entering New()")
             AddHandler MyBase.PreRender, New EventHandler(AddressOf Me.DNNMultiStateBox_PreRender)
             DNNMultiStateBox.__ENCAddToList(Me)
             Me.m_States = Nothing
+			Logger.LogDebug("New(): Me.m_States → {Arg0}", Me.m_States)
+			Logger.LogDebug("New(): Me.m_Enabled → {Arg0}", Me.m_Enabled)
+			Logger.LogDebug("New(): Me.m_ValueSet → {Arg0}", Me.m_ValueSet)
             Me.m_Enabled = True
             Me.m_ValueSet = False
+			Logger.LogDebug("<<< Exiting New()")
         End Sub
 
         <DebuggerNonUserCode> _
         Private Shared Sub __ENCAddToList(ByVal value As Object)
+			Logger.LogDebug(">>> Entering __ENCAddToList(value={Value})", value)
             SyncLock DNNMultiStateBox.__ENCList
                 If (DNNMultiStateBox.__ENCList.Count = DNNMultiStateBox.__ENCList.Capacity) Then
                     Dim index As Integer = 0
@@ -55,27 +62,36 @@ Namespace DotNetNuke.UI.WebControls
                 End If
                 DNNMultiStateBox.__ENCList.Add(New WeakReference(value))
             End SyncLock
+			Logger.LogDebug("<<< Exiting __ENCAddToList(value={Value})", value)
         End Sub
 
         Private Sub DNNMultiStateBox_PreRender(ByVal sender As Object, ByVal e As EventArgs)
+			Logger.LogDebug(">>> Entering DNNMultiStateBox_PreRender(sender={Sender},e={E})", sender, e)
             Me.RegisterClientScript
             If Not Object.ReferenceEquals(Me.SelectedState, Nothing) Then
                 Me.Text = Me.SelectedState.Text
+				Logger.LogDebug("DNNMultiStateBox_PreRender(sender={Sender},e={E}): Me.Text → {Arg2}", sender, e, Me.Text)
             End If
+			Logger.LogDebug("<<< Exiting DNNMultiStateBox_PreRender(sender={Sender},e={E})", sender, e)
         End Sub
 
         Protected Function MarshalledProperties() As Hashtable
+			Logger.LogDebug(">>> Entering MarshalledProperties()")
+			Logger.LogDebug("<<< Exiting MarshalledProperties()")
             Return New Hashtable From { { "states", MSAJAX.Serialize(Me.States) } }
         End Function
 
         Friend Sub NotifyDesigner()
+			Logger.LogDebug(">>> Entering NotifyDesigner()")
             If (If((Not MyBase.DesignMode OrElse (Me.States Is Nothing)), 0, 1) <> 0) Then
                 Dim designer As ControlDesigner = TryCast(TryCast(MyBase.Site.Container,IDesignerHost).GetDesigner(Me),ControlDesigner)
                 Dim member As PropertyDescriptor = Nothing
                 Try 
                     member = TypeDescriptor.GetProperties(Me)("States")
+					Logger.LogDebug("NotifyDesigner(): member → {Member}", member)
                 Catch exception1 As Exception
                     Dim ex As Exception = exception1
+					Logger.LogError("Exception in NotifyDesigner(): {Arg0}", ex.Message)
                     ProjectData.SetProjectError(ex)
                     Dim exception As Exception = ex
                     ProjectData.ClearProjectError
@@ -84,20 +100,25 @@ Namespace DotNetNuke.UI.WebControls
                 Dim ce As New ComponentChangedEventArgs(Me, member, Nothing, Me.States)
                 designer.OnComponentChanged(Me, ce)
             End If
+			Logger.LogDebug("<<< Exiting NotifyDesigner()")
         End Sub
 
         Public Sub RegisterClientScript()
+			Logger.LogDebug(">>> Entering RegisterClientScript()")
             ClientAPI.RegisterClientReference(Me.Page, ClientAPI.ClientNamespaceReferences.dnn_dom)
             WebControls.RegisterClientScriptBlock(Me.Page, "dnn.controls.js", DotNetNuke.Web.Client.FileOrder.Js.DnnControlsLabelEdit)
             WebControls.RegisterClientScriptBlock(Me.Page, "dnn.controls.dnnmultistatebox.js")
+			Logger.LogDebug("<<< Exiting RegisterClientScript()")
         End Sub
 
         Protected Overrides Sub Render(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer)
             writer.AddAttribute("value", Me.SelectedStateKey)
             MyBase.Render(writer)
             Dim properties As Hashtable = Me.MarshalledProperties
             Dim marshalledPropertyJSON As String = ScriptGenerator.GetMarshalledPropertyJSON(Me, properties)
             BaseWebControl.RegisterInitialize(Me, "initMultiStateBox", marshalledPropertyJSON)
+			Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer)
         End Sub
 
 

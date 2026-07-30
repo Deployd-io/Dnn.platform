@@ -52,6 +52,7 @@ namespace log4net.Appender
     /// <author>Ron Grabowski</author>
     public class TraceAppender : AppenderSkeleton
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="TraceAppender" />.</summary>
         /// <remarks>
         /// <para>
@@ -60,6 +61,8 @@ namespace log4net.Appender
         /// </remarks>
         public TraceAppender()
         {
+		Logger.LogDebug(">>> Entering TraceAppender()");
+		Logger.LogDebug("<<< Exiting TraceAppender()");
         }
 
         /// <summary>
@@ -75,7 +78,10 @@ namespace log4net.Appender
         [System.Obsolete("Instead use the default constructor and set the Layout property")]
         public TraceAppender(ILayout layout)
         {
+			Logger.LogDebug(">>> Entering TraceAppender(layout={Layout})", layout);
             this.Layout = layout;
+			Logger.LogDebug("<<< Exiting TraceAppender(layout={Layout})", layout);
+			Logger.LogDebug("TraceAppender(layout={Layout}): this.Layout → {Arg1}", layout, this.Layout);
         }
 
         /// <summary>
@@ -126,6 +132,7 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent loggingEvent) 
         {
+			Logger.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             //
             // Write the string to the Trace system
             //
@@ -146,6 +153,7 @@ namespace log4net.Appender
                 System.Diagnostics.Trace.Flush();
 #endif
             } 
+			Logger.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
         }
 
         /// <summary>This appender requires a <see cref="Layout"/> to be set.</summary>
@@ -185,6 +193,7 @@ namespace log4net.Appender
         /// <returns><c>True</c> if all logging events were flushed successfully, else <c>false</c>.</returns>
         public override bool Flush(int millisecondsTimeout)
         {
+			Logger.LogDebug(">>> Entering Flush(millisecondsTimeout={MillisecondsTimeout})", millisecondsTimeout);
             // Nothing to do if ImmediateFlush is true
             if (this.m_immediateFlush)
             {
@@ -197,6 +206,7 @@ namespace log4net.Appender
 #else
             System.Diagnostics.Trace.Flush();
 #endif
+			Logger.LogDebug("<<< Exiting Flush(millisecondsTimeout={MillisecondsTimeout})", millisecondsTimeout);
             return true;
         }
     }

@@ -13,14 +13,18 @@ using Cake.Core.IO;
 /// <summary>Provides extensions to <see cref="Context"/>.</summary>
 public static class ContextExtensions
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>Gets the <see cref="FileVersionInfo.FileVersion"/> for an assembly.</summary>
     /// <param name="context">The cake context.</param>
     /// <param name="assemblyPath">The path to the assembly file.</param>
     /// <returns>The file version.</returns>
     public static string GetAssemblyFileVersion(this Context context, FilePath assemblyPath)
     {
+		Logger.LogDebug(">>> Entering GetAssemblyFileVersion(context={Context},assemblyPath={AssemblyPath})", context, assemblyPath);
         var versionInfo = FileVersionInfo.GetVersionInfo(context.MakeAbsolute(assemblyPath).FullPath);
         var fileVersion = versionInfo.FileVersion;
+		Logger.LogDebug("GetAssemblyFileVersion(context={Context},assemblyPath={AssemblyPath}): versionInfo → {VersionInfo}", context, assemblyPath, versionInfo);
+		Logger.LogDebug("<<< Exiting GetAssemblyFileVersion(context={Context},assemblyPath={AssemblyPath})", context, assemblyPath);
         return Version.TryParse(fileVersion, out _) ? fileVersion : $"{versionInfo.FileMajorPart}.{versionInfo.FileMinorPart}.{versionInfo.FileBuildPart}";
     }
 }

@@ -22,9 +22,12 @@ namespace DotNetNuke.Entities.Portals
     [Serializable]
     public class PortalAliasInfo : BaseEntityInfo, IHydratable, IXmlSerializable, IPortalAliasInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="PortalAliasInfo"/> class.</summary>
         public PortalAliasInfo()
         {
+		Logger.LogDebug(">>> Entering PortalAliasInfo()");
+		Logger.LogDebug("<<< Exiting PortalAliasInfo()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="PortalAliasInfo"/> class.</summary>
@@ -38,14 +41,20 @@ namespace DotNetNuke.Entities.Portals
         /// <param name="alias">The alias to clone.</param>
         public PortalAliasInfo(IPortalAliasInfo alias)
         {
+			Logger.LogDebug(">>> Entering PortalAliasInfo(alias={Alias})", alias);
             this.ThisAsInterface.HttpAlias = alias.HttpAlias;
             this.ThisAsInterface.PortalAliasId = alias.PortalAliasId;
             this.ThisAsInterface.PortalId = alias.PortalId;
             this.IsPrimary = alias.IsPrimary;
+			Logger.LogDebug("PortalAliasInfo(alias={Alias}): this.IsPrimary → {Arg1}", alias, this.IsPrimary);
             this.Redirect = alias.Redirect;
             this.ThisAsInterface.BrowserType = alias.BrowserType;
+			Logger.LogDebug("PortalAliasInfo(alias={Alias}): this.Redirect → {Arg1}", alias, this.Redirect);
             this.CultureCode = alias.CultureCode;
             this.Skin = alias.Skin;
+			Logger.LogDebug("<<< Exiting PortalAliasInfo(alias={Alias})", alias);
+			Logger.LogDebug("PortalAliasInfo(alias={Alias}): this.CultureCode → {Arg1}", alias, this.CultureCode);
+			Logger.LogDebug("PortalAliasInfo(alias={Alias}): this.Skin → {Arg1}", alias, this.Skin);
         }
 
         /// <inheritdoc />
@@ -119,6 +128,7 @@ namespace DotNetNuke.Entities.Portals
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.FillInternal(dr);
 
             this.ThisAsInterface.PortalAliasId = Null.SetNullInteger(dr["PortalAliasID"]);
@@ -128,20 +138,25 @@ namespace DotNetNuke.Entities.Portals
             var browserType = Null.SetNullString(dr["BrowserType"]);
             this.BrowserType = string.IsNullOrEmpty(browserType) || browserType.Equals("normal", StringComparison.OrdinalIgnoreCase)
                               ? BrowserTypes.Normal
+							Logger.LogDebug("Fill(dr={Dr}): browserType → {BrowserType}", dr, browserType);
                               : BrowserTypes.Mobile;
             this.CultureCode = Null.SetNullString(dr["CultureCode"]);
             this.Skin = Null.SetNullString(dr["Skin"]);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
 
         /// <inheritdoc />
         public XmlSchema GetSchema()
         {
+			Logger.LogDebug(">>> Entering GetSchema()");
+			Logger.LogDebug("<<< Exiting GetSchema()");
             return null;
         }
 
         /// <inheritdoc />
         public void ReadXml(XmlReader reader)
         {
+			Logger.LogDebug(">>> Entering ReadXml(reader={Reader})", reader);
             while (reader.Read())
             {
                 if (reader.NodeType == XmlNodeType.EndElement)
@@ -189,11 +204,13 @@ namespace DotNetNuke.Entities.Portals
                         break;
                 }
             }
+			Logger.LogDebug("<<< Exiting ReadXml(reader={Reader})", reader);
         }
 
         /// <inheritdoc />
         public void WriteXml(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteXml(writer={Writer})", writer);
             // Write start of main elements
             writer.WriteStartElement("portalAlias");
 
@@ -208,6 +225,7 @@ namespace DotNetNuke.Entities.Portals
 
             // Write end of main element
             writer.WriteEndElement();
+			Logger.LogDebug("<<< Exiting WriteXml(writer={Writer})", writer);
         }
     }
 }

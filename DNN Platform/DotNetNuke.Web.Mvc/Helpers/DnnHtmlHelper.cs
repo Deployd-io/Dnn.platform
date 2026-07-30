@@ -20,6 +20,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
     public class DnnHtmlHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly IServicesFramework servicesFramework;
 
         /// <summary>Initializes a new instance of the <see cref="DnnHtmlHelper"/> class.</summary>
@@ -29,7 +30,9 @@ namespace DotNetNuke.Web.Mvc.Helpers
         public DnnHtmlHelper(ViewContext viewContext, IViewDataContainer viewDataContainer)
             : this(viewContext, viewDataContainer, (IServicesFramework)null)
         {
+		Logger.LogDebug(">>> Entering DnnHtmlHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer})", viewContext, viewDataContainer);
         }
+		Logger.LogDebug("<<< Exiting DnnHtmlHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer})", viewContext, viewDataContainer);
 
         /// <summary>Initializes a new instance of the <see cref="DnnHtmlHelper"/> class.</summary>
         /// <param name="viewContext">The view context.</param>
@@ -38,6 +41,10 @@ namespace DotNetNuke.Web.Mvc.Helpers
         public DnnHtmlHelper(ViewContext viewContext, IViewDataContainer viewDataContainer, IServicesFramework servicesFramework)
             : this(viewContext, viewDataContainer, RouteTable.Routes, servicesFramework)
         {
+		Logger.LogDebug(">>> Entering DnnHtmlHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer},servicesFramework={ServicesFramework})", viewContext, viewDataContainer, servicesFramework);
+		Logger.LogDebug("<<< Exiting DnnHtmlHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer},servicesFramework={ServicesFramework})", viewContext, viewDataContainer, servicesFramework);
+		Logger.LogDebug(">>> Entering DnnHtmlHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer},routeCollection={RouteCollection})", viewContext, viewDataContainer, routeCollection);
+		Logger.LogDebug("<<< Exiting DnnHtmlHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer},routeCollection={RouteCollection})", viewContext, viewDataContainer, routeCollection);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnHtmlHelper"/> class.</summary>
@@ -58,6 +65,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         public DnnHtmlHelper(ViewContext viewContext, IViewDataContainer viewDataContainer, RouteCollection routeCollection, IServicesFramework servicesFramework)
             : this(new HtmlHelper(viewContext, viewDataContainer, routeCollection), servicesFramework)
         {
+		Logger.LogDebug("DnnHtmlHelper(htmlHelper={HtmlHelper},servicesFramework={ServicesFramework}): servicesFramework → {ServicesFramework1}", htmlHelper, servicesFramework, servicesFramework);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnHtmlHelper"/> class.</summary>
@@ -75,6 +83,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
         {
             this.servicesFramework = servicesFramework ?? Globals.GetCurrentServiceProvider().GetRequiredService<IServicesFramework>();
             this.HtmlHelper = htmlHelper;
+			Logger.LogDebug("DnnHtmlHelper(htmlHelper={HtmlHelper},servicesFramework={ServicesFramework}): this.HtmlHelper → {Arg2}", htmlHelper, servicesFramework, this.HtmlHelper);
 
             var controller = htmlHelper.ViewContext.Controller as IDnnController;
 
@@ -84,6 +93,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
             }
 
             this.ModuleContext = controller.ModuleContext;
+			Logger.LogDebug("DnnHtmlHelper(htmlHelper={HtmlHelper},servicesFramework={ServicesFramework}): this.ModuleContext → {Arg2}", htmlHelper, servicesFramework, this.ModuleContext);
         }
 
         public RouteCollection RouteCollection => this.HtmlHelper.RouteCollection;
@@ -102,7 +112,9 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
         public MvcHtmlString AntiForgeryToken()
         {
+			Logger.LogDebug(">>> Entering AntiForgeryToken()");
             this.servicesFramework.RequestAjaxAntiForgerySupport();
+			Logger.LogDebug("<<< Exiting AntiForgeryToken()");
             return new MvcHtmlString(string.Empty);
         }
 

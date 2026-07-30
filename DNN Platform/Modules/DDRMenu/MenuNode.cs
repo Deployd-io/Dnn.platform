@@ -20,26 +20,34 @@ namespace DotNetNuke.Web.DDRMenu
     [XmlRoot("root", Namespace = "")]
     public class MenuNode : IXmlSerializable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private List<MenuNode> children;
 
         /// <summary>Initializes a new instance of the <see cref="MenuNode"/> class.</summary>
         public MenuNode()
         {
+		Logger.LogDebug(">>> Entering MenuNode()");
+		Logger.LogDebug("<<< Exiting MenuNode()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="MenuNode"/> class from existing nodes.</summary>
         /// <param name="dnnNodes">The collection of Dnn nodes.</param>
         public MenuNode(DNNNodeCollection dnnNodes)
         {
+			Logger.LogDebug(">>> Entering MenuNode(dnnNodes={DnnNodes})", dnnNodes);
             this.Children = ConvertDNNNodeCollection(dnnNodes, this);
+			Logger.LogDebug("<<< Exiting MenuNode(dnnNodes={DnnNodes})", dnnNodes);
         }
 
         /// <summary>Initializes a new instance of the <see cref="MenuNode"/> class from existing nodes.</summary>
         /// <param name="nodes">A list of <see cref="MenuNode"/>.</param>
         public MenuNode(List<MenuNode> nodes)
         {
+			Logger.LogDebug(">>> Entering MenuNode(nodes={Nodes})", nodes);
             this.Children = nodes;
             this.Children.ForEach(c => c.Parent = this);
+			Logger.LogDebug("<<< Exiting MenuNode(nodes={Nodes})", nodes);
+			Logger.LogDebug("MenuNode(nodes={Nodes}): this.Children → {Arg1}", nodes, this.Children);
         }
 
         /// <summary>Initializes a new instance of the <see cref="MenuNode"/> class from an existing node and a parent.</summary>
@@ -49,16 +57,24 @@ namespace DotNetNuke.Web.DDRMenu
         {
             this.TabId = Convert.ToInt32(dnnNode.ID);
             this.Text = dnnNode.Text;
+			Logger.LogDebug("MenuNode(dnnNode={DnnNode},parent={Parent}): this.Text → {Arg2}", dnnNode, parent, this.Text);
             this.Url = (dnnNode.ClickAction == eClickAction.PostBack)
                     ? "postback:" + dnnNode.ID
                     : string.IsNullOrEmpty(dnnNode.JSFunction) ? dnnNode.NavigateURL : "javascript:" + dnnNode.JSFunction;
             this.Enabled = dnnNode.Enabled;
+			Logger.LogDebug("MenuNode(dnnNode={DnnNode},parent={Parent}): this.Enabled → {Arg2}", dnnNode, parent, this.Enabled);
             this.Selected = dnnNode.Selected;
             this.Breadcrumb = dnnNode.BreadCrumb;
+			Logger.LogDebug("MenuNode(dnnNode={DnnNode},parent={Parent}): this.Selected → {Arg2}", dnnNode, parent, this.Selected);
+			Logger.LogDebug("MenuNode(dnnNode={DnnNode},parent={Parent}): this.Breadcrumb → {Arg2}", dnnNode, parent, this.Breadcrumb);
             this.Separator = dnnNode.IsBreak;
             this.Icon = dnnNode.Image;
             this.Target = dnnNode.Target;
             this.Title = null;
+			Logger.LogDebug("MenuNode(dnnNode={DnnNode},parent={Parent}): this.Separator → {Arg2}", dnnNode, parent, this.Separator);
+			Logger.LogDebug("MenuNode(dnnNode={DnnNode},parent={Parent}): this.Icon → {Arg2}", dnnNode, parent, this.Icon);
+			Logger.LogDebug("MenuNode(dnnNode={DnnNode},parent={Parent}): this.Target → {Arg2}", dnnNode, parent, this.Target);
+			Logger.LogDebug("MenuNode(dnnNode={DnnNode},parent={Parent}): this.Title → {Arg2}", dnnNode, parent, this.Title);
             this.Keywords = null;
             this.Description = null;
             this.Parent = parent;
@@ -67,12 +83,15 @@ namespace DotNetNuke.Web.DDRMenu
 
             DNNAbstract.DNNNodeToMenuNode(dnnNode, this);
 
+			Logger.LogDebug("MenuNode(dnnNode={DnnNode},parent={Parent}): this.Keywords → {Arg2}", dnnNode, parent, this.Keywords);
+			Logger.LogDebug("MenuNode(dnnNode={DnnNode},parent={Parent}): this.Description → {Arg2}", dnnNode, parent, this.Description);
             if ((dnnNode.DNNNodes != null) && (dnnNode.DNNNodes.Count > 0))
             {
                 this.Children = ConvertDNNNodeCollection(dnnNode.DNNNodes, this);
             }
         }
 
+		Logger.LogDebug("MenuNode(dnnNode={DnnNode},parent={Parent}): this.Parent → {Arg2}", dnnNode, parent, this.Parent);
         /// <summary>Gets a value indicating whether this node is the first of it's level.</summary>
         public bool First
         {
@@ -163,12 +182,15 @@ namespace DotNetNuke.Web.DDRMenu
         /// <returns><see cref="List{MenuNode}"/>.</returns>
         public static List<MenuNode> ConvertDNNNodeCollection(DNNNodeCollection dnnNodes, MenuNode parent)
         {
+			Logger.LogDebug(">>> Entering ConvertDNNNodeCollection(dnnNodes={DnnNodes},parent={Parent})", dnnNodes, parent);
             var result = new List<MenuNode>();
             foreach (DNNNode node in dnnNodes)
             {
+			Logger.LogDebug("ConvertDNNNodeCollection(dnnNodes={DnnNodes},parent={Parent}): result → {Result}", dnnNodes, parent, result);
                 result.Add(new MenuNode(node, parent));
             }
 
+			Logger.LogDebug("<<< Exiting ConvertDNNNodeCollection(dnnNodes={DnnNodes},parent={Parent})", dnnNodes, parent);
             return result;
         }
 
@@ -177,6 +199,7 @@ namespace DotNetNuke.Web.DDRMenu
         /// <returns>The found  <see cref="MenuNode"/> or null.</returns>
         public MenuNode FindById(int tabId)
         {
+			Logger.LogDebug(">>> Entering FindById(tabId={TabId})", tabId);
             if (tabId == this.TabId)
             {
                 return this;
@@ -186,11 +209,13 @@ namespace DotNetNuke.Web.DDRMenu
             {
                 var result = child.FindById(tabId);
                 if (result != null)
+				Logger.LogDebug("FindById(tabId={TabId}): result → {Result}", tabId, result);
                 {
                     return result;
                 }
             }
 
+			Logger.LogDebug("<<< Exiting FindById(tabId={TabId})", tabId);
             return null;
         }
 
@@ -199,6 +224,7 @@ namespace DotNetNuke.Web.DDRMenu
         /// <returns>A <see cref="MenuNode"/> or null.</returns>
         public MenuNode FindByName(string tabName)
         {
+			Logger.LogDebug(">>> Entering FindByName(tabName={TabName})", tabName);
             if (tabName.Equals(this.Text, StringComparison.InvariantCultureIgnoreCase))
             {
                 return this;
@@ -208,11 +234,13 @@ namespace DotNetNuke.Web.DDRMenu
             {
                 var result = child.FindByName(tabName);
                 if (result != null)
+				Logger.LogDebug("FindByName(tabName={TabName}): result → {Result}", tabName, result);
                 {
                     return result;
                 }
             }
 
+			Logger.LogDebug("<<< Exiting FindByName(tabName={TabName})", tabName);
             return null;
         }
 
@@ -221,8 +249,10 @@ namespace DotNetNuke.Web.DDRMenu
         /// <returns>A new flattened list of <see cref="MenuNode"/>.</returns>
         public List<MenuNode> FlattenChildren(MenuNode root)
         {
+			Logger.LogDebug(">>> Entering FlattenChildren(root={Root})", root);
             var flattened = new List<MenuNode>();
             if (root.TabId != 0)
+			Logger.LogDebug("FlattenChildren(root={Root}): flattened → {Flattened}", root, flattened);
             {
                 flattened.Add(root);
             }
@@ -237,6 +267,7 @@ namespace DotNetNuke.Web.DDRMenu
                 }
             }
 
+			Logger.LogDebug("<<< Exiting FlattenChildren(root={Root})", root);
             return flattened;
         }
 
@@ -245,6 +276,7 @@ namespace DotNetNuke.Web.DDRMenu
         /// <returns>The found <see cref="MenuNode"/> or null.</returns>
         public MenuNode FindByNameOrId(string tabNameOrId)
         {
+			Logger.LogDebug(">>> Entering FindByNameOrId(tabNameOrId={TabNameOrId})", tabNameOrId);
             if (tabNameOrId.Equals(this.Text, StringComparison.InvariantCultureIgnoreCase))
             {
                 return this;
@@ -259,11 +291,13 @@ namespace DotNetNuke.Web.DDRMenu
             {
                 var result = child.FindByNameOrId(tabNameOrId);
                 if (result != null)
+				Logger.LogDebug("FindByNameOrId(tabNameOrId={TabNameOrId}): result → {Result}", tabNameOrId, result);
                 {
                     return result;
                 }
             }
 
+			Logger.LogDebug("<<< Exiting FindByNameOrId(tabNameOrId={TabNameOrId})", tabNameOrId);
             return null;
         }
 
@@ -276,6 +310,7 @@ namespace DotNetNuke.Web.DDRMenu
         /// </returns>
         public IEnumerable<MenuNode> FindAllByNameOrId(string tabNameOrId)
         {
+			Logger.LogDebug(">>> Entering FindAllByNameOrId(tabNameOrId={TabNameOrId})", tabNameOrId);
             foreach (var found in this.Children.SelectMany(child => child.FindAllByNameOrId(tabNameOrId)))
             {
                 yield return found;
@@ -286,24 +321,30 @@ namespace DotNetNuke.Web.DDRMenu
             {
                 yield return this;
             }
+			Logger.LogDebug("<<< Exiting FindAllByNameOrId(tabNameOrId={TabNameOrId})", tabNameOrId);
         }
 
         /// <summary>Checks if this node has childrens.</summary>
         /// <returns>A value indicating whether this node has childrens.</returns>
         public bool HasChildren()
         {
+			Logger.LogDebug(">>> Entering HasChildren()");
+			Logger.LogDebug("<<< Exiting HasChildren()");
             return this.Children.Count > 0;
         }
 
         /// <inheritdoc />
         public XmlSchema GetSchema()
         {
+			Logger.LogDebug(">>> Entering GetSchema()");
+			Logger.LogDebug("<<< Exiting GetSchema()");
             return null;
         }
 
         /// <inheritdoc />
         public void ReadXml(XmlReader reader)
         {
+			Logger.LogDebug(">>> Entering ReadXml(reader={Reader})", reader);
             var empty = reader.IsEmptyElement;
 
             if (reader.MoveToFirstAttribute())
@@ -317,12 +358,15 @@ namespace DotNetNuke.Web.DDRMenu
                             break;
                         case "text":
                             this.Text = reader.Value;
+							Logger.LogDebug("ReadXml(reader={Reader}): this.Text → {Arg1}", reader, this.Text);
                             break;
                         case "title":
                             this.Title = reader.Value;
+							Logger.LogDebug("ReadXml(reader={Reader}): this.Title → {Arg1}", reader, this.Title);
                             break;
                         case "url":
                             this.Url = reader.Value;
+							Logger.LogDebug("ReadXml(reader={Reader}): this.Url → {Arg1}", reader, this.Url);
                             break;
                         case "enabled":
                             this.Enabled = reader.Value == "1";
@@ -338,18 +382,23 @@ namespace DotNetNuke.Web.DDRMenu
                             break;
                         case "icon":
                             this.Icon = reader.Value;
+							Logger.LogDebug("ReadXml(reader={Reader}): this.Icon → {Arg1}", reader, this.Icon);
                             break;
                         case "largeimage":
                             this.LargeImage = reader.Value;
+							Logger.LogDebug("ReadXml(reader={Reader}): this.LargeImage → {Arg1}", reader, this.LargeImage);
                             break;
                         case "commandname":
                             this.CommandName = reader.Value;
+							Logger.LogDebug("ReadXml(reader={Reader}): this.CommandName → {Arg1}", reader, this.CommandName);
                             break;
                         case "commandargument":
                             this.CommandArgument = reader.Value;
+							Logger.LogDebug("ReadXml(reader={Reader}): this.CommandArgument → {Arg1}", reader, this.CommandArgument);
                             break;
                         case "target":
                             this.Target = reader.Value;
+							Logger.LogDebug("ReadXml(reader={Reader}): this.Target → {Arg1}", reader, this.Target);
                             break;
 
                             // default:
@@ -391,6 +440,7 @@ namespace DotNetNuke.Web.DDRMenu
                         break;
                     case XmlNodeType.EndElement:
                         reader.ReadEndElement();
+						Logger.LogDebug("<<< Exiting ReadXml(reader={Reader})", reader);
                         return;
                 }
             }
@@ -399,6 +449,7 @@ namespace DotNetNuke.Web.DDRMenu
         /// <inheritdoc />
         public void WriteXml(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteXml(writer={Writer})", writer);
             if (this.Parent != null)
             {
                 writer.WriteStartElement("node");
@@ -430,23 +481,27 @@ namespace DotNetNuke.Web.DDRMenu
             {
                 writer.WriteEndElement();
             }
+			Logger.LogDebug("<<< Exiting WriteXml(writer={Writer})", writer);
         }
 
         /// <summary>Removes all the provided nodes.</summary>
         /// <param name="filteredNodes">The list of nodes to remove.</param>
         internal void RemoveAll(List<MenuNode> filteredNodes)
         {
+			Logger.LogDebug(">>> Entering RemoveAll(filteredNodes={FilteredNodes})", filteredNodes);
             this.Children.RemoveAll(filteredNodes.Contains);
             foreach (var child in this.Children)
             {
                 child.RemoveAll(filteredNodes);
             }
+			Logger.LogDebug("<<< Exiting RemoveAll(filteredNodes={FilteredNodes})", filteredNodes);
         }
 
         /// <summary>Applies context to the node for paths and urls.</summary>
         /// <param name="defaultImagePath">The default location for images.</param>
         internal void ApplyContext(string defaultImagePath)
         {
+			Logger.LogDebug(">>> Entering ApplyContext(defaultImagePath={DefaultImagePath})", defaultImagePath);
             this.Icon = this.ApplyContextToImagePath(this.Icon, defaultImagePath);
             this.LargeImage = this.ApplyContextToImagePath(this.LargeImage, defaultImagePath);
 
@@ -457,14 +512,17 @@ namespace DotNetNuke.Web.DDRMenu
             }
 
             this.Children.ForEach(c => c.ApplyContext(defaultImagePath));
+			Logger.LogDebug("<<< Exiting ApplyContext(defaultImagePath={DefaultImagePath})", defaultImagePath);
         }
 
         private static void AddXmlAttribute(XmlWriter writer, string name, string value)
         {
+			Logger.LogDebug(">>> Entering AddXmlAttribute(writer={Writer},name={Name},value={Value})", writer, name, value);
             if (!string.IsNullOrEmpty(value))
             {
                 writer.WriteAttributeString(name, value);
             }
+			Logger.LogDebug("<<< Exiting AddXmlAttribute(writer={Writer},name={Name},value={Value})", writer, name, value);
         }
 
         private static void AddXmlAttribute(XmlWriter writer, string name, int value)
@@ -479,16 +537,20 @@ namespace DotNetNuke.Web.DDRMenu
 
         private static void AddXmlElement(XmlWriter writer, string name, string value)
         {
+			Logger.LogDebug(">>> Entering AddXmlElement(writer={Writer},name={Name},value={Value})", writer, name, value);
             if (!string.IsNullOrEmpty(value))
             {
                 writer.WriteElementString(name, value);
             }
+			Logger.LogDebug("<<< Exiting AddXmlElement(writer={Writer},name={Name},value={Value})", writer, name, value);
         }
 
         private string ApplyContextToImagePath(string imagePath, string defaultImagePath)
         {
+			Logger.LogDebug(">>> Entering ApplyContextToImagePath(imagePath={ImagePath},defaultImagePath={DefaultImagePath})", imagePath, defaultImagePath);
             var result = imagePath;
             if (!string.IsNullOrEmpty(result))
+			Logger.LogDebug("ApplyContextToImagePath(imagePath={ImagePath},defaultImagePath={DefaultImagePath}): result → {Result}", imagePath, defaultImagePath, result);
             {
                 if (result.StartsWith("~", StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -500,6 +562,7 @@ namespace DotNetNuke.Web.DDRMenu
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ApplyContextToImagePath(imagePath={ImagePath},defaultImagePath={DefaultImagePath})", imagePath, defaultImagePath);
             return result;
         }
     }

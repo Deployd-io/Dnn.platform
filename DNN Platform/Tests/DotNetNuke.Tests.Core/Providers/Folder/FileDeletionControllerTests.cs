@@ -21,6 +21,7 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
 
     public class FileDeletionControllerTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private Mock<IFileLockingController> mockFileLockingController;
         private Mock<DataProvider> mockData;
         private Mock<IFileVersionController> fileVersionController;
@@ -32,33 +33,46 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
         [SetUp]
         public void Setup()
         {
+			Logger.LogDebug(">>> Entering Setup()");
             this.mockFileLockingController = new Mock<IFileLockingController>();
             this.mockData = MockComponentProvider.CreateDataProvider();
+			Logger.LogDebug("Setup(): mockData → {MockData}", mockData);
+			Logger.LogDebug("Setup(): mockFileLockingController → {MockFileLockingController}", mockFileLockingController);
             this.fileVersionController = new Mock<IFileVersionController>();
+			Logger.LogDebug("Setup(): fileVersionController → {FileVersionController}", fileVersionController);
             this.folderMappingController = new Mock<IFolderMappingController>();
+			Logger.LogDebug("Setup(): folderMappingController → {FolderMappingController}", folderMappingController);
             this.mockFolderProvider = MockComponentProvider.CreateFolderProvider(Constants.FOLDER_ValidFolderProviderType);
+			Logger.LogDebug("Setup(): mockFolderProvider → {MockFolderProvider}", mockFolderProvider);
             this.mockContentController = new Mock<IContentController>();
+			Logger.LogDebug("Setup(): mockContentController → {MockContentController}", mockContentController);
             MockComponentProvider.CreateDataCacheProvider();
             FileLockingController.SetTestableInstance(this.mockFileLockingController.Object);
             FileVersionController.RegisterInstance(this.fileVersionController.Object);
             FolderMappingController.RegisterInstance(this.folderMappingController.Object);
 
             this.fileDeletionController = new FileDeletionController(this.mockFileLockingController.Object, this.fileVersionController.Object, this.folderMappingController.Object, this.mockContentController.Object, this.mockData.Object);
+			Logger.LogDebug("<<< Exiting Setup()");
+			Logger.LogDebug("Setup(): fileDeletionController → {FileDeletionController}", fileDeletionController);
         }
 
         [TearDown]
         public void TearDown()
         {
+			Logger.LogDebug(">>> Entering TearDown()");
             FileLockingController.ClearInstance();
             MockComponentProvider.ResetContainer();
+			Logger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void DeleteFile_Calls_FolderProviderDeleteFile()
         {
+			Logger.LogDebug(">>> Entering DeleteFile_Calls_FolderProviderDeleteFile()");
             // Arrange
             var fileInfo = new FileInfoBuilder().Build();
             this.fileVersionController.Setup(fv => fv.DeleteAllUnpublishedVersions(fileInfo, false));
+			Logger.LogDebug("DeleteFile_Calls_FolderProviderDeleteFile(): fileInfo → {FileInfo}", fileInfo);
 
             var folderMapping = new FolderMappingInfo { FolderProviderType = Constants.FOLDER_ValidFolderProviderType };
             this.folderMappingController.Setup(fmc => fmc.GetFolderMapping(Constants.CONTENT_ValidPortalId, Constants.FOLDER_ValidFolderMappingID)).Returns(folderMapping);
@@ -75,27 +89,33 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
 
             // Assert
             this.mockFolderProvider.Verify();
+			Logger.LogDebug("<<< Exiting DeleteFile_Calls_FolderProviderDeleteFile()");
         }
 
         [Test]
         public void DeleteFile_Throws_WhenFileIsLocked()
         {
+			Logger.LogDebug(">>> Entering DeleteFile_Throws_WhenFileIsLocked()");
             // Arrange
             var fileInfo = new FileInfoBuilder().Build();
 
+			Logger.LogDebug("DeleteFile_Throws_WhenFileIsLocked(): fileInfo → {FileInfo}", fileInfo);
             string someString;
             this.mockFileLockingController.Setup(mflc => mflc.IsFileLocked(fileInfo, out someString)).Returns(true);
 
             // Act
             Assert.Throws<FileLockedException>(() => this.fileDeletionController.DeleteFile(fileInfo));
+			Logger.LogDebug("<<< Exiting DeleteFile_Throws_WhenFileIsLocked()");
         }
 
         [Test]
         public void DeleteFile_Throws_WhenFolderProviderThrows()
         {
+			Logger.LogDebug(">>> Entering DeleteFile_Throws_WhenFolderProviderThrows()");
             // Arrange
             var fileInfo = new FileInfoBuilder().Build();
 
+			Logger.LogDebug("DeleteFile_Throws_WhenFolderProviderThrows(): fileInfo → {FileInfo}", fileInfo);
             this.fileVersionController.Setup(fv => fv.DeleteAllUnpublishedVersions(fileInfo, false));
 
             var folderMapping = new FolderMappingInfo { FolderProviderType = Constants.FOLDER_ValidFolderProviderType };
@@ -108,14 +128,17 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             this.mockFolderProvider.Setup(mf => mf.DeleteFile(fileInfo)).Throws<Exception>();
 
             Assert.Throws<FolderProviderException>(() => this.fileDeletionController.DeleteFile(fileInfo));
+			Logger.LogDebug("<<< Exiting DeleteFile_Throws_WhenFolderProviderThrows()");
         }
 
         [Test]
         public void DeleteFileData_Calls_DataProviderDeleteFile()
         {
+			Logger.LogDebug(">>> Entering DeleteFileData_Calls_DataProviderDeleteFile()");
             // Arrange
             var fileInfo = new FileInfoBuilder().Build();
 
+			Logger.LogDebug("DeleteFileData_Calls_DataProviderDeleteFile(): fileInfo → {FileInfo}", fileInfo);
             this.fileVersionController.Setup(fv => fv.DeleteAllUnpublishedVersions(fileInfo, false));
 
             var folderMapping = new FolderMappingInfo { FolderProviderType = Constants.FOLDER_ValidFolderProviderType };
@@ -133,11 +156,13 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
 
             // Assert
             this.mockData.Verify();
+			Logger.LogDebug("<<< Exiting DeleteFileData_Calls_DataProviderDeleteFile()");
         }
 
         [Test]
         public void DeleteFileData_Calls_ContentControllerDeleteContentItem()
         {
+			Logger.LogDebug(">>> Entering DeleteFileData_Calls_ContentControllerDeleteContentItem()");
             // Arrange
             var fileInfo = new FileInfoBuilder()
                 .WithContentItemId(Constants.CONTENT_ValidContentItemId)
@@ -162,6 +187,7 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
 
             // Assert
             this.mockContentController.Verify();
+			Logger.LogDebug("<<< Exiting DeleteFileData_Calls_ContentControllerDeleteContentItem()");
         }
     }
 }

@@ -23,6 +23,7 @@ using System.Collections;
 
 namespace log4net.Util
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// This class aggregates several PropertiesDictionary collections together.
     /// </summary>
@@ -48,6 +49,8 @@ namespace log4net.Util
         /// </remarks>
         internal CompositeProperties()
         {
+		Logger.LogDebug(">>> Entering CompositeProperties()");
+		Logger.LogDebug("<<< Exiting CompositeProperties()");
         }
 
         /// <summary>
@@ -103,8 +106,12 @@ namespace log4net.Util
         /// </remarks>
         public void Add(ReadOnlyPropertiesDictionary properties)
         {
+			Logger.LogDebug(">>> Entering Add(properties={Properties})", properties);
             this.m_flattened = null;
             this.m_nestedProperties.Add(properties);
+			Logger.LogDebug("<<< Exiting Add(properties={Properties})", properties);
+			Logger.LogDebug("Add(properties={Properties}): this.m_flattened → {Arg1}", properties, this.m_flattened);
+			Logger.LogDebug("Add(properties={Properties}): m_flattened → {M_flattened}", properties, m_flattened);
         }
 
         /// <summary>
@@ -119,20 +126,24 @@ namespace log4net.Util
         /// </remarks>
         public PropertiesDictionary Flatten()
         {
+			Logger.LogDebug(">>> Entering Flatten()");
             if (this.m_flattened == null)
             {
                 this.m_flattened = new PropertiesDictionary();
+				Logger.LogDebug("Flatten(): m_flattened → {M_flattened}", m_flattened);
 
                 for(int i = this.m_nestedProperties.Count; --i >= 0; )
                 {
                     ReadOnlyPropertiesDictionary cur = (ReadOnlyPropertiesDictionary)this.m_nestedProperties[i];
 
+					Logger.LogDebug("Flatten(): cur → {Cur}", cur);
                     foreach(DictionaryEntry entry in cur)
                     {
                         this.m_flattened[(string)entry.Key] = entry.Value;
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting Flatten()");
             return this.m_flattened;
         }
     }

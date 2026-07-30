@@ -20,18 +20,22 @@ Namespace DotNetNuke.UI.WebControls
     Public Class DNNTextSuggest
         Inherits TextBox
         Implements IPostBackEventHandler, IClientAPICallbackEventHandler
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(DNNTextSuggest))
         ' Events
         Public Event NodeClick As DNNDNNNodeClickHandler
         Public Event PopulateOnDemand As DNNTextSuggestEventHandler
 
         ' Methods
         Public Sub New()
+			Logger.LogDebug(">>> Entering New()")
             AddHandler MyBase.PreRender, New EventHandler(AddressOf Me.DNNTextSuggest_PreRender)
             DNNTextSuggest.__ENCAddToList(Me)
+			Logger.LogDebug("<<< Exiting New()")
         End Sub
 
         <DebuggerNonUserCode> _
         Private Shared Sub __ENCAddToList(ByVal value As Object)
+			Logger.LogDebug(">>> Entering __ENCAddToList(value={Value})", value)
             SyncLock DNNTextSuggest.__ENCList
                 If (DNNTextSuggest.__ENCList.Count = DNNTextSuggest.__ENCList.Capacity) Then
                     Dim index As Integer = 0
@@ -56,26 +60,36 @@ Namespace DotNetNuke.UI.WebControls
                 End If
                 DNNTextSuggest.__ENCList.Add(New WeakReference(value))
             End SyncLock
+			Logger.LogDebug("<<< Exiting __ENCAddToList(value={Value})", value)
         End Sub
 
         Private Sub DNNTextSuggest_PreRender(ByVal sender As Object, ByVal e As EventArgs)
+			Logger.LogDebug(">>> Entering DNNTextSuggest_PreRender(sender={Sender},e={E})", sender, e)
             Me.RegisterClientScript
             Me.Page.RegisterRequiresPostBack(Me)
+			Logger.LogDebug("<<< Exiting DNNTextSuggest_PreRender(sender={Sender},e={E})", sender, e)
         End Sub
 
         Public Function FindNode(ByVal strID As String) As DNNNode
+			Logger.LogDebug(">>> Entering FindNode(strID={StrID})", strID)
+			Logger.LogDebug("<<< Exiting FindNode(strID={StrID})", strID)
             Return Me.DNNNodes.FindNode(strID)
         End Function
 
         Public Function FindNodeByKey(ByVal strKey As String) As DNNNode
+			Logger.LogDebug(">>> Entering FindNodeByKey(strKey={StrKey})", strKey)
+			Logger.LogDebug("<<< Exiting FindNodeByKey(strKey={StrKey})", strKey)
             Return Me.DNNNodes.FindNodeByKey(strKey)
         End Function
 
         Public Sub LoadXml(ByVal strXml As String)
+			Logger.LogDebug(">>> Entering LoadXml(strXml={StrXml})", strXml)
             Me.m_objNodes = New DNNNodeCollection(strXml, "")
+			Logger.LogDebug("<<< Exiting LoadXml(strXml={StrXml})", strXml)
         End Sub
 
         Protected Function MarshalledProperties() As Hashtable
+			Logger.LogDebug(">>> Entering MarshalledProperties()")
             Dim hashtable2 As New Hashtable
             Select Case Me.IDToken
                 Case eIDTokenChar.Brackets
@@ -91,33 +105,41 @@ Namespace DotNetNuke.UI.WebControls
             If ClientAPI.BrowserSupportsFunctionality(ClientAPI.ClientFunctionality.XMLHTTP) Then
                 hashtable2.Add("callback", ClientAPI.GetCallbackEventReference(Me, "this.getText()", "this.callBackSuccess", "this", "this.callBackFail", "this.callBackStatus", Me.CallBackPostChildrenOf, Me.CallBackType))
             End If
+			Logger.LogDebug("<<< Exiting MarshalledProperties()")
             Return hashtable2
         End Function
 
         Public Overridable Sub OnNodeClick(ByVal e As DNNTextSuggestEventArgs)
+			Logger.LogDebug(">>> Entering OnNodeClick(e={E})", e)
             Dim nodeClickEvent As DNNDNNNodeClickHandler = Me.NodeClickEvent
             If Not Object.ReferenceEquals(nodeClickEvent, Nothing) Then
                 nodeClickEvent.Invoke(Me, e)
             End If
+			Logger.LogDebug("<<< Exiting OnNodeClick(e={E})", e)
         End Sub
 
         Public Function RaiseClientAPICallbackEvent(ByVal eventArgument As String) As String Implements IClientAPICallbackEventHandler.RaiseClientAPICallbackEvent
+			Logger.LogDebug(">>> Entering RaiseClientAPICallbackEvent(eventArgument={EventArgument})", eventArgument)
             Dim populateOnDemandEvent As DNNTextSuggestEventHandler = Me.PopulateOnDemandEvent
             If Not Object.ReferenceEquals(populateOnDemandEvent, Nothing) Then
                 populateOnDemandEvent.Invoke(Me, New DNNTextSuggestEventArgs(Me.DNNNodes, eventArgument))
             End If
+			Logger.LogDebug("<<< Exiting RaiseClientAPICallbackEvent(eventArgument={EventArgument})", eventArgument)
             Return Me.DNNNodes.ToJSON
         End Function
 
         Public Overridable Sub RaisePostBackEvent(ByVal eventArgument As String) Implements IPostBackEventHandler.RaisePostBackEvent
+			Logger.LogDebug(">>> Entering RaisePostBackEvent(eventArgument={EventArgument})", eventArgument)
             Dim strArray As String() = Strings.Split(eventArgument, ClientAPI.COLUMN_DELIMITER, -1, CompareMethod.Binary)
             If ((strArray.Length > 1) AndAlso (strArray(1) = "Click")) Then
                 Dim e As New DNNTextSuggestEventArgs(Me.DNNNodes, strArray(0))
                 Me.OnNodeClick(e)
             End If
+			Logger.LogDebug("<<< Exiting RaisePostBackEvent(eventArgument={EventArgument})", eventArgument)
         End Sub
 
         Public Sub RegisterClientScript()
+			Logger.LogDebug(">>> Entering RegisterClientScript()")
             If Not Me.IsDownLevel Then
                 ClientAPI.RegisterClientReference(Me.Page, ClientAPI.ClientNamespaceReferences.dnn_dom)
                 ClientAPI.RegisterClientReference(Me.Page, ClientAPI.ClientNamespaceReferences.dnn_dom_positioning)
@@ -125,15 +147,18 @@ Namespace DotNetNuke.UI.WebControls
                 WebControls.RegisterClientScriptBlock(Me.Page, "dnn.controls.js", FileOrder.Js.DnnControlsLabelEdit)
                 WebControls.RegisterClientScriptBlock(Me.Page, "dnn.controls.dnntextsuggest.js")
             End If
+			Logger.LogDebug("<<< Exiting RegisterClientScript()")
         End Sub
 
         Protected Overrides Sub Render(ByVal writer As HtmlTextWriter)
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer)
             MyBase.Render(writer)
             If Not Me.IsDownLevel Then
                 Dim properties As Hashtable = Me.MarshalledProperties
                 Dim marshalledPropertyJSON As String = ScriptGenerator.GetMarshalledPropertyJSON(Me, properties)
                 BaseWebControl.RegisterInitialize(Me, "initTextSuggest", marshalledPropertyJSON)
             End If
+			Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer)
         End Sub
 
 

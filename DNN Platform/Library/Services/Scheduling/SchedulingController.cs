@@ -107,6 +107,7 @@ namespace DotNetNuke.Services.Scheduling
         [DnnDeprecated(10, 2, 2, "Use overload taking IEventLogger")]
         public static partial int AddSchedule(string typeFullName, int timeLapse, string timeLapseMeasurement, int retryTimeLapse, string retryTimeLapseMeasurement, int retainHistoryNum, string attachToEvent, bool catchUpEnabled, bool enabled, string objectDependencies, string servers, string friendlyName, DateTime scheduleStartDate)
             => AddSchedule(Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>(), typeFullName, timeLapse, timeLapseMeasurement, retryTimeLapse, retryTimeLapseMeasurement, retainHistoryNum, attachToEvent, catchUpEnabled, enabled, objectDependencies, servers, friendlyName, scheduleStartDate);
+			Logger.LogDebug(">>> Entering AddSchedule(typeFullName={TypeFullName},timeLapse={TimeLapse},timeLapseMeasurement={TimeLapseMeasurement},retryTimeLapse={RetryTimeLapse},retryTimeLapseMeasurement={RetryTimeLapseMeasurement},retainHistoryNum={RetainHistoryNum},attachToEvent={AttachToEvent},catchUpEnabled={CatchUpEnabled},enabled={Enabled},objectDependencies={ObjectDependencies},servers={Servers},friendlyName={FriendlyName},scheduleStartDate={ScheduleStartDate})", typeFullName, timeLapse, timeLapseMeasurement, retryTimeLapse, retryTimeLapseMeasurement, retainHistoryNum, attachToEvent, catchUpEnabled, enabled, objectDependencies, servers, friendlyName, scheduleStartDate);
 
         /// <summary>Add a new scheduled task.</summary>
         /// <param name="eventLogger">The event logger.</param>
@@ -191,6 +192,7 @@ namespace DotNetNuke.Services.Scheduling
         public static int AddSchedule(IEventLogger eventLogger, string typeFullName, int timeLapse, string timeLapseMeasurement, int retryTimeLapse, string retryTimeLapseMeasurement, int retainHistoryNum, string attachToEvent, bool catchUpEnabled, bool enabled, string objectDependencies, string servers, string friendlyName, DateTime scheduleStartDate)
         {
             eventLogger.AddLog("TypeFullName", typeFullName, PortalController.Instance.GetCurrentSettings(), UserController.Instance.GetCurrentUserInfo().UserID, EventLogType.SCHEDULE_CREATED);
+			Logger.LogDebug("<<< Exiting AddSchedule(typeFullName={TypeFullName},timeLapse={TimeLapse},timeLapseMeasurement={TimeLapseMeasurement},retryTimeLapse={RetryTimeLapse},retryTimeLapseMeasurement={RetryTimeLapseMeasurement},retainHistoryNum={RetainHistoryNum},attachToEvent={AttachToEvent},catchUpEnabled={CatchUpEnabled},enabled={Enabled},objectDependencies={ObjectDependencies},servers={Servers},friendlyName={FriendlyName},scheduleStartDate={ScheduleStartDate})", typeFullName, timeLapse, timeLapseMeasurement, retryTimeLapse, retryTimeLapseMeasurement, retainHistoryNum, attachToEvent, catchUpEnabled, enabled, objectDependencies, servers, friendlyName, scheduleStartDate);
             return DataProvider.Instance().AddSchedule(
                 typeFullName,
                 timeLapse,
@@ -210,12 +212,16 @@ namespace DotNetNuke.Services.Scheduling
 
         public static int AddScheduleHistory(ScheduleHistoryItem objScheduleHistoryItem)
         {
+			Logger.LogDebug(">>> Entering AddScheduleHistory(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
+			Logger.LogDebug("<<< Exiting AddScheduleHistory(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
             return DataProvider.Instance().AddScheduleHistory(objScheduleHistoryItem.ScheduleID, objScheduleHistoryItem.StartDate, ServerController.GetExecutingServerName());
         }
 
         public static void AddScheduleItemSetting(int scheduleID, string name, string value)
         {
+			Logger.LogDebug(">>> Entering AddScheduleItemSetting(scheduleID={ScheduleID},name={Name},value={Value})", scheduleID, name, value);
             DataProvider.Instance().AddScheduleItemSetting(scheduleID, name, value);
+			Logger.LogDebug("<<< Exiting AddScheduleItemSetting(scheduleID={ScheduleID},name={Name},value={Value})", scheduleID, name, value);
         }
 
         /// <summary>Delete a scheduled task.</summary>
@@ -223,9 +229,11 @@ namespace DotNetNuke.Services.Scheduling
         [DnnDeprecated(10, 2, 2, "Use overload taking IEventLogger")]
         public static partial void DeleteSchedule(int scheduleID)
             => DeleteSchedule(Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>(), scheduleID);
+			Logger.LogDebug(">>> Entering DeleteSchedule(scheduleID={ScheduleID})", scheduleID);
 
         /// <summary>Delete a scheduled task.</summary>
         /// <param name="eventLogger">The event logger.</param>
+		Logger.LogDebug("<<< Exiting DeleteSchedule(scheduleID={ScheduleID})", scheduleID);
         /// <param name="scheduleId">The schedule ID.</param>
         public static void DeleteSchedule(IEventLogger eventLogger, int scheduleId)
         {
@@ -240,95 +248,126 @@ namespace DotNetNuke.Services.Scheduling
 
         public static int GetActiveThreadCount()
         {
+			Logger.LogDebug(">>> Entering GetActiveThreadCount()");
+			Logger.LogDebug("<<< Exiting GetActiveThreadCount()");
             return Scheduler.CoreScheduler.GetActiveThreadCount();
         }
 
         public static int GetFreeThreadCount()
         {
+			Logger.LogDebug(">>> Entering GetFreeThreadCount()");
+			Logger.LogDebug("<<< Exiting GetFreeThreadCount()");
             return Scheduler.CoreScheduler.GetFreeThreadCount();
         }
 
         public static int GetMaxThreadCount()
         {
+			Logger.LogDebug(">>> Entering GetMaxThreadCount()");
+			Logger.LogDebug("<<< Exiting GetMaxThreadCount()");
             return Scheduler.CoreScheduler.GetMaxThreadCount();
         }
 
         public static ScheduleItem GetNextScheduledTask(string server)
         {
+			Logger.LogDebug(">>> Entering GetNextScheduledTask(server={Server})", server);
+			Logger.LogDebug("<<< Exiting GetNextScheduledTask(server={Server})", server);
             return CBO.FillObject<ScheduleItem>(DataProvider.Instance().GetNextScheduledTask(server));
         }
 
         public static List<ScheduleItem> GetSchedule()
         {
+			Logger.LogDebug(">>> Entering GetSchedule()");
+			Logger.LogDebug("<<< Exiting GetSchedule()");
             return CBO.FillCollection<ScheduleItem>(DataProvider.Instance().GetSchedule());
         }
 
         public static List<ScheduleItem> GetSchedule(string server)
         {
+			Logger.LogDebug("<<< Exiting GetSchedule(server={Server})", server);
             return CBO.FillCollection<ScheduleItem>(DataProvider.Instance().GetSchedule(server));
         }
 
         public static ScheduleItem GetSchedule(string typeFullName, string server)
         {
+			Logger.LogDebug("<<< Exiting GetSchedule(typeFullName={TypeFullName},server={Server})", typeFullName, server);
             return CBO.FillObject<ScheduleItem>(DataProvider.Instance().GetSchedule(typeFullName, server));
         }
 
         public static ScheduleItem GetSchedule(int scheduleID)
         {
+			Logger.LogDebug("<<< Exiting GetSchedule(scheduleID={ScheduleID})", scheduleID);
             return CBO.FillObject<ScheduleItem>(DataProvider.Instance().GetSchedule(scheduleID));
         }
 
         public static List<ScheduleItem> GetScheduleByEvent(string eventName, string server)
         {
+			Logger.LogDebug(">>> Entering GetScheduleByEvent(eventName={EventName},server={Server})", eventName, server);
+			Logger.LogDebug("<<< Exiting GetScheduleByEvent(eventName={EventName},server={Server})", eventName, server);
             return CBO.FillCollection<ScheduleItem>(DataProvider.Instance().GetScheduleByEvent(eventName, server));
         }
 
         public static List<ScheduleHistoryItem> GetScheduleHistory(int scheduleID)
         {
+			Logger.LogDebug(">>> Entering GetScheduleHistory(scheduleID={ScheduleID})", scheduleID);
+			Logger.LogDebug("<<< Exiting GetScheduleHistory(scheduleID={ScheduleID})", scheduleID);
             return CBO.FillCollection<ScheduleHistoryItem>(DataProvider.Instance().GetScheduleHistory(scheduleID));
         }
 
         public static Hashtable GetScheduleItemSettings(int scheduleID)
         {
+			Logger.LogDebug(">>> Entering GetScheduleItemSettings(scheduleID={ScheduleID})", scheduleID);
             var h = new Hashtable();
             using (var r = DataProvider.Instance().GetScheduleItemSettings(scheduleID))
             {
                 while (r.Read())
                 {
+					private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                     h.Add(r["SettingName"], r["SettingValue"]);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetScheduleItemSettings(scheduleID={ScheduleID})", scheduleID);
             return h;
         }
 
         public static Collection GetScheduleProcessing()
         {
+			Logger.LogDebug(">>> Entering GetScheduleProcessing()");
+			Logger.LogDebug("<<< Exiting GetScheduleProcessing()");
             return Scheduler.CoreScheduler.GetScheduleInProgress();
         }
 
         public static Collection GetScheduleQueue()
         {
+			Logger.LogDebug(">>> Entering GetScheduleQueue()");
+			Logger.LogDebug("<<< Exiting GetScheduleQueue()");
             return Scheduler.CoreScheduler.GetScheduleQueue();
         }
 
         public static ScheduleStatus GetScheduleStatus()
         {
+			Logger.LogDebug(">>> Entering GetScheduleStatus()");
+			Logger.LogDebug("<<< Exiting GetScheduleStatus()");
             return Scheduler.CoreScheduler.GetScheduleStatus();
         }
 
         public static void PurgeScheduleHistory()
         {
+			Logger.LogDebug(">>> Entering PurgeScheduleHistory()");
             DataProvider.Instance().PurgeScheduleHistory();
+			Logger.LogDebug("<<< Exiting PurgeScheduleHistory()");
         }
 
         public static void ReloadSchedule()
         {
+			Logger.LogDebug(">>> Entering ReloadSchedule()");
             Scheduler.CoreScheduler.ReloadSchedule();
+			Logger.LogDebug("<<< Exiting ReloadSchedule()");
         }
 
         public static void UpdateSchedule(ScheduleItem scheduleItem)
         {
+		Logger.LogDebug(">>> Entering UpdateSchedule(scheduleItem={ScheduleItem})", scheduleItem);
 #pragma warning disable 618
             UpdateSchedule(
                 scheduleItem.ScheduleID,
@@ -346,6 +385,7 @@ namespace DotNetNuke.Services.Scheduling
                 scheduleItem.FriendlyName,
                 scheduleItem.ScheduleStartDate);
 #pragma warning restore 618
+		Logger.LogDebug("<<< Exiting UpdateSchedule(scheduleItem={ScheduleItem})", scheduleItem);
         }
 
         /// <summary>Updates the scheduled task.</summary>
@@ -430,6 +470,7 @@ namespace DotNetNuke.Services.Scheduling
         [DnnDeprecated(10, 2, 2, "Use overload taking IEventLogger")]
         public static partial void UpdateSchedule(int scheduleID, string typeFullName, int timeLapse, string timeLapseMeasurement, int retryTimeLapse, string retryTimeLapseMeasurement, int retainHistoryNum, string attachToEvent, bool catchUpEnabled, bool enabled, string objectDependencies, string servers, string friendlyName, DateTime scheduleStartDate)
             => UpdateSchedule(Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>(), scheduleID, typeFullName, timeLapse, timeLapseMeasurement, retryTimeLapse, retryTimeLapseMeasurement, retainHistoryNum, attachToEvent, catchUpEnabled, enabled, objectDependencies, servers, friendlyName, scheduleStartDate);
+			Logger.LogDebug(">>> Entering UpdateSchedule(scheduleID={ScheduleID},typeFullName={TypeFullName},timeLapse={TimeLapse},timeLapseMeasurement={TimeLapseMeasurement},retryTimeLapse={RetryTimeLapse},retryTimeLapseMeasurement={RetryTimeLapseMeasurement},retainHistoryNum={RetainHistoryNum},attachToEvent={AttachToEvent},catchUpEnabled={CatchUpEnabled},enabled={Enabled},objectDependencies={ObjectDependencies},servers={Servers},friendlyName={FriendlyName},scheduleStartDate={ScheduleStartDate})", scheduleID, typeFullName, timeLapse, timeLapseMeasurement, retryTimeLapse, retryTimeLapseMeasurement, retainHistoryNum, attachToEvent, catchUpEnabled, enabled, objectDependencies, servers, friendlyName, scheduleStartDate);
 
         /// <summary>Updates the scheduled task.</summary>
         /// <param name="eventLogger">The event logger.</param>
@@ -529,23 +570,28 @@ namespace DotNetNuke.Services.Scheduling
                 UserController.Instance.GetCurrentUserInfo().UserID,
                 friendlyName,
                 scheduleStartDate);
+				Logger.LogDebug("<<< Exiting UpdateSchedule(scheduleID={ScheduleID},typeFullName={TypeFullName},timeLapse={TimeLapse},timeLapseMeasurement={TimeLapseMeasurement},retryTimeLapse={RetryTimeLapse},retryTimeLapseMeasurement={RetryTimeLapseMeasurement},retainHistoryNum={RetainHistoryNum},attachToEvent={AttachToEvent},catchUpEnabled={CatchUpEnabled},enabled={Enabled},objectDependencies={ObjectDependencies},servers={Servers},friendlyName={FriendlyName},scheduleStartDate={ScheduleStartDate})", scheduleID, typeFullName, timeLapse, timeLapseMeasurement, retryTimeLapse, retryTimeLapseMeasurement, retainHistoryNum, attachToEvent, catchUpEnabled, enabled, objectDependencies, servers, friendlyName, scheduleStartDate);
             eventLogger.AddLog("TypeFullName", typeFullName, PortalController.Instance.GetCurrentSettings(), UserController.Instance.GetCurrentUserInfo().UserID, EventLogType.SCHEDULE_UPDATED);
         }
 
         public static void UpdateScheduleHistory(ScheduleHistoryItem objScheduleHistoryItem)
         {
+			Logger.LogDebug(">>> Entering UpdateScheduleHistory(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
             DataProvider.Instance().UpdateScheduleHistory(
                 objScheduleHistoryItem.ScheduleHistoryID,
                 objScheduleHistoryItem.EndDate,
                 objScheduleHistoryItem.Succeeded,
                 objScheduleHistoryItem.LogNotes,
                 objScheduleHistoryItem.NextStart);
+				Logger.LogDebug("<<< Exiting UpdateScheduleHistory(objScheduleHistoryItem={ObjScheduleHistoryItem})", objScheduleHistoryItem);
         }
 
         public static bool CanRunOnThisServer(string servers)
         {
+			Logger.LogDebug(">>> Entering CanRunOnThisServer(servers={Servers})", servers);
             string lwrServers = string.Empty;
             if (servers != null)
+			Logger.LogDebug("CanRunOnThisServer(servers={Servers}): lwrServers → {LwrServers}", servers, lwrServers);
             {
                 lwrServers = servers.ToLowerInvariant();
             }
@@ -555,6 +601,7 @@ namespace DotNetNuke.Services.Scheduling
                 return true;
             }
 
+			Logger.LogDebug("<<< Exiting CanRunOnThisServer(servers={Servers})", servers);
             return false;
         }
 
@@ -565,7 +612,9 @@ namespace DotNetNuke.Services.Scheduling
         /// <param name="newServer">The new server to use.</param>
         internal static void ReplaceServer(ServerInfo oldServer, ServerInfo newServer)
         {
+			Logger.LogDebug(">>> Entering ReplaceServer(oldServer={OldServer},newServer={NewServer})", oldServer, newServer);
             DataProvider.Instance().ReplaceServerOnSchedules(oldServer.ServerName, newServer.ServerName);
+			Logger.LogDebug("<<< Exiting ReplaceServer(oldServer={OldServer},newServer={NewServer})", oldServer, newServer);
         }
     }
 }

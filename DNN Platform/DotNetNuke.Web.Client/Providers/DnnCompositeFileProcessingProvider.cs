@@ -39,6 +39,7 @@ namespace DotNetNuke.Web.Client.Providers
         /// <inheritdoc />
         public override string MinifyFile(Stream fileStream, ClientDependencyType type)
         {
+			Logger.LogDebug(">>> Entering MinifyFile(fileStream={FileStream},type={Type})", fileStream, type);
             Func<Stream, string> streamToString = stream =>
             {
                 if (!stream.CanRead)
@@ -49,6 +50,7 @@ namespace DotNetNuke.Web.Client.Providers
                 if (stream.CanSeek)
                 {
                     stream.Position = 0;
+					Logger.LogDebug("MinifyFile(fileStream={FileStream},type={Type}): stream.Position → {Arg2}", fileStream, type, stream.Position);
                 }
 
                 var reader = new StreamReader(stream);
@@ -62,6 +64,7 @@ namespace DotNetNuke.Web.Client.Providers
                 case ClientDependencyType.Javascript:
                     return this.MinifyJs ? JSMin.CompressJS(fileStream) : streamToString(fileStream);
                 default:
+					Logger.LogDebug("<<< Exiting MinifyFile(fileStream={FileStream},type={Type})", fileStream, type);
                     return streamToString(fileStream);
             }
         }
@@ -90,6 +93,8 @@ namespace DotNetNuke.Web.Client.Providers
                     }
 
                 default:
+					private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
+					Logger.LogDebug("<<< Exiting MinifyFile(fileContents={FileContents},type={Type})", fileContents, type);
                     return fileContents;
             }
         }

@@ -16,24 +16,32 @@ namespace DotNetNuke.Services.Upgrade.Internals.Steps
     /// <summary>InstallSslStep - Step that checks and sets SSL where needed.</summary>
     public class InstallSslStep : BaseInstallationStep
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Main method to execute the step.</summary>
         public override void Execute()
         {
+			Logger.LogDebug(">>> Entering Execute()");
             this.Percentage = 0;
             this.Status = StepStatus.Running;
+			Logger.LogDebug("Execute(): this.Percentage → {Arg0}", this.Percentage);
+			Logger.LogDebug("Execute(): this.Status → {Arg0}", this.Status);
 
             var installConfig = InstallController.Instance.GetInstallConfig();
 
+			Logger.LogDebug("Execute(): installConfig → {InstallConfig}", installConfig);
             var counter = 0;
             var totalSteps = installConfig.Portals.Count;
             var percentForEachStep = 100 / totalSteps;
 
             var portals = PortalController.Instance.GetPortals().Cast<PortalInfo>();
 
+			Logger.LogDebug("Execute(): portals → {Portals}", portals);
             foreach (var portalConfig in installConfig.Portals)
             {
                 IPortalInfo portal = portals.FirstOrDefault(p => p.PortalName == portalConfig.PortalName);
                 var description = Localization.GetString("InstallingSslStep", this.LocalInstallResourceFile);
+				Logger.LogDebug("Execute(): portal → {Portal}", portal);
+				Logger.LogDebug("Execute(): description → {Description}", description);
                 this.Details = string.Format(CultureInfo.CurrentCulture, description, portalConfig.PortalName);
                 if (portal != null)
                 {
@@ -50,6 +58,7 @@ namespace DotNetNuke.Services.Upgrade.Internals.Steps
             }
 
             this.Status = this.Errors.Count > 0 ? StepStatus.Retry : StepStatus.Done;
+			Logger.LogDebug("<<< Exiting Execute()");
         }
     }
 }

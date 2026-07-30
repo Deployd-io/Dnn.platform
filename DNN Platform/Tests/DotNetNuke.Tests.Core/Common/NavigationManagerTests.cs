@@ -24,6 +24,7 @@ namespace DotNetNuke.Tests.Core.Common
     [TestFixture]
     public class NavigationManagerTests
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const int TabID = 100;
         private const int PortalID = 7;
         private const string DefaultURLPattern = "/Default.aspx?tabid={0}";
@@ -36,8 +37,11 @@ namespace DotNetNuke.Tests.Core.Common
         [OneTimeSetUp]
         public void Setup()
         {
+			Logger.LogDebug(">>> Entering Setup()");
             var portalControllerMock = PortalControllerMock();
             this.navigationManager = new NavigationManager(portalControllerMock, Mock.Of<IHostSettings>());
+			Logger.LogDebug("Setup(): portalControllerMock → {PortalControllerMock}", portalControllerMock);
+			Logger.LogDebug("Setup(): navigationManager → {NavigationManager}", navigationManager);
             PortalController.SetTestableInstance(portalControllerMock);
             TabController.SetTestableInstance(TabControllerMock());
             LocaleController.SetTestableInstance(LocaleControllerMock());
@@ -46,6 +50,7 @@ namespace DotNetNuke.Tests.Core.Common
             {
                 var mockPortalController = new Mock<IPortalController>();
                 mockPortalController
+					Logger.LogDebug("Setup(): mockPortalController → {MockPortalController}", mockPortalController);
                     .Setup(x => x.GetCurrentPortalSettings())
                     .Returns(PortalSettingsMock());
                 mockPortalController
@@ -73,6 +78,7 @@ namespace DotNetNuke.Tests.Core.Common
             {
                 var mockTabController = new Mock<ITabController>();
                 mockTabController
+					Logger.LogDebug("Setup(): mockTabController → {MockTabController}", mockTabController);
                     .Setup(x => x.GetTabsByPortal(Null.NullInteger))
                     .Returns(default(TabCollection));
                 mockTabController
@@ -89,6 +95,7 @@ namespace DotNetNuke.Tests.Core.Common
             {
                 var mockLocaleController = new Mock<ILocaleController>();
                 mockLocaleController
+					Logger.LogDebug("Setup(): mockLocaleController → {MockLocaleController}", mockLocaleController);
                     .Setup(x => x.GetLocales(It.IsAny<int>()))
                     .Returns(new Dictionary<string, Locale>
                     {
@@ -102,29 +109,40 @@ namespace DotNetNuke.Tests.Core.Common
             this.serviceProvider = FakeServiceProvider.Setup(
                 services =>
                 {
+				Logger.LogDebug("Setup(): serviceProvider → {ServiceProvider}", serviceProvider);
+				Logger.LogDebug("Setup(): services → {Services}", services);
                     services.AddSingleton(PortalController.Instance);
                     services.AddSingleton(TabController.Instance);
                     services.AddSingleton(LocaleController.Instance);
                 });
+				Logger.LogDebug("<<< Exiting Setup()");
         }
 
         [OneTimeTearDown]
         public void TearDown()
         {
+			Logger.LogDebug(">>> Entering TearDown()");
             this.serviceProvider.Dispose();
             this.navigationManager = null;
+			Logger.LogDebug("TearDown(): navigationManager → {NavigationManager}", navigationManager);
+			Logger.LogDebug("TearDown(): this.navigationManager → {Arg0}", this.navigationManager);
             TabController.ClearInstance();
             LocaleController.ClearInstance();
+			Logger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void NavigateUrlTest()
         {
+			Logger.LogDebug(">>> Entering NavigateUrlTest()");
             var expected = string.Format(DefaultURLPattern, TabID);
             var actual = this.navigationManager.NavigateURL();
+			Logger.LogDebug("NavigateUrlTest(): expected → {Expected}", expected);
+			Logger.LogDebug("NavigateUrlTest(): actual → {Actual}", actual);
 
             Assert.That(actual, Is.Not.Null);
             Assert.That(actual, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting NavigateUrlTest()");
         }
 
         [TestCase(1)]
@@ -140,22 +158,30 @@ namespace DotNetNuke.Tests.Core.Common
         [TestCase(11)]
         public void NavigateUrl_CustomTabID(int tabId)
         {
+			Logger.LogDebug(">>> Entering NavigateUrl_CustomTabID(tabId={TabId})", tabId);
             var expected = string.Format(DefaultURLPattern, tabId);
             var actual = this.navigationManager.NavigateURL(tabId);
+			Logger.LogDebug("NavigateUrl_CustomTabID(tabId={TabId}): expected → {Expected}", tabId, expected);
+			Logger.LogDebug("NavigateUrl_CustomTabID(tabId={TabId}): actual → {Actual}", tabId, actual);
 
             Assert.That(actual, Is.Not.Null);
             Assert.That(actual, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting NavigateUrl_CustomTabID(tabId={TabId})", tabId);
         }
 
         [Test]
         public void NavigateUrl_CustomTab_NotSuperTab()
         {
+			Logger.LogDebug(">>> Entering NavigateUrl_CustomTab_NotSuperTab()");
             var customTabId = 55;
             var expected = string.Format(DefaultURLPattern, customTabId);
             var actual = this.navigationManager.NavigateURL(customTabId, false);
+			Logger.LogDebug("NavigateUrl_CustomTab_NotSuperTab(): expected → {Expected}", expected);
+			Logger.LogDebug("NavigateUrl_CustomTab_NotSuperTab(): actual → {Actual}", actual);
 
             Assert.That(actual, Is.Not.Null);
             Assert.That(actual, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting NavigateUrl_CustomTab_NotSuperTab()");
         }
 
         [TestCase(1)]
@@ -171,56 +197,78 @@ namespace DotNetNuke.Tests.Core.Common
         [TestCase(11)]
         public void NavigateUrl_CustomTab_IsSuperTab(int tabId)
         {
+			Logger.LogDebug(">>> Entering NavigateUrl_CustomTab_IsSuperTab(tabId={TabId})", tabId);
             var expected = string.Format(DefaultURLPattern, tabId) + string.Format(DefaultSuperTabPattern, PortalID);
             var actual = this.navigationManager.NavigateURL(tabId, true);
+			Logger.LogDebug("NavigateUrl_CustomTab_IsSuperTab(tabId={TabId}): expected → {Expected}", tabId, expected);
+			Logger.LogDebug("NavigateUrl_CustomTab_IsSuperTab(tabId={TabId}): actual → {Actual}", tabId, actual);
 
             Assert.That(actual, Is.Not.Null);
             Assert.That(actual, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting NavigateUrl_CustomTab_IsSuperTab(tabId={TabId})", tabId);
         }
 
         [Test]
         [Ignore("TODO - We can't properly test this until we migrate Globals.AccessDeniedURL to an interface in the abstraction project")]
         public void NavigateUrl_ControlKey_AccessDenied()
         {
+			Logger.LogDebug(">>> Entering NavigateUrl_ControlKey_AccessDenied()");
             // The dependencies go very deep and make it very
             // difficult to properly test just the NavigationManager logic.
             var actual = this.navigationManager.NavigateURL("Access Denied");
+			Logger.LogDebug("<<< Exiting NavigateUrl_ControlKey_AccessDenied()");
+			Logger.LogDebug("NavigateUrl_ControlKey_AccessDenied(): actual → {Actual}", actual);
         }
 
         [Test]
         public void NavigateUrl_ControlKey()
         {
+			Logger.LogDebug(">>> Entering NavigateUrl_ControlKey()");
             var controlKey = "My-Control-Key";
             var expected = string.Format(DefaultURLPattern, TabID) + string.Format(ControlKeyPattern, controlKey);
+			Logger.LogDebug("NavigateUrl_ControlKey(): controlKey → {ControlKey}", controlKey);
+			Logger.LogDebug("NavigateUrl_ControlKey(): expected → {Expected}", expected);
             var actual = this.navigationManager.NavigateURL(controlKey);
 
+			Logger.LogDebug("NavigateUrl_ControlKey(): actual → {Actual}", actual);
             Assert.That(actual, Is.Not.Null);
             Assert.That(actual, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting NavigateUrl_ControlKey()");
         }
 
         [Test]
         public void NavigateUrl_ControlKey_EmptyAdditionalParameter()
         {
+			Logger.LogDebug(">>> Entering NavigateUrl_ControlKey_EmptyAdditionalParameter()");
             var controlKey = "My-Control-Key";
             var expected = string.Format(DefaultURLPattern, TabID) + string.Format(ControlKeyPattern, controlKey);
+			Logger.LogDebug("NavigateUrl_ControlKey_EmptyAdditionalParameter(): controlKey → {ControlKey}", controlKey);
+			Logger.LogDebug("NavigateUrl_ControlKey_EmptyAdditionalParameter(): expected → {Expected}", expected);
             var actual = this.navigationManager.NavigateURL(controlKey, []);
 
+			Logger.LogDebug("NavigateUrl_ControlKey_EmptyAdditionalParameter(): actual → {Actual}", actual);
             Assert.That(actual, Is.Not.Null);
             Assert.That(actual, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting NavigateUrl_ControlKey_EmptyAdditionalParameter()");
         }
 
         [Test]
         public void NavigateUrl_ControlKey_SingleAdditionalParameter()
         {
+			Logger.LogDebug(">>> Entering NavigateUrl_ControlKey_SingleAdditionalParameter()");
             var controlKey = "My-Control-Key";
             var parameters = new string[] { "My-Parameter" };
+			Logger.LogDebug("NavigateUrl_ControlKey_SingleAdditionalParameter(): controlKey → {ControlKey}", controlKey);
+			Logger.LogDebug("NavigateUrl_ControlKey_SingleAdditionalParameter(): parameters → {Parameters}", parameters);
             var expected = string.Format(DefaultURLPattern, TabID) +
                 string.Format(ControlKeyPattern, controlKey) +
                 $"&{parameters[0]}";
             var actual = this.navigationManager.NavigateURL(controlKey, parameters);
 
+			Logger.LogDebug("NavigateUrl_ControlKey_SingleAdditionalParameter(): actual → {Actual}", actual);
             Assert.That(actual, Is.Not.Null);
             Assert.That(actual, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting NavigateUrl_ControlKey_SingleAdditionalParameter()");
         }
 
         [TestCase(2)]
@@ -234,6 +282,7 @@ namespace DotNetNuke.Tests.Core.Common
         [TestCase(10)]
         public void NavigateUrl_ControlKey_MultipleAdditionalParameter(int count)
         {
+			Logger.LogDebug(">>> Entering NavigateUrl_ControlKey_MultipleAdditionalParameter(count={Count})", count);
             string[] parameters = new string[count];
             for (int index = 0; index < count; index++)
             {
@@ -244,10 +293,13 @@ namespace DotNetNuke.Tests.Core.Common
             var expected = string.Format(DefaultURLPattern, TabID) +
                 string.Format(ControlKeyPattern, controlKey) +
                 parameters.Select(s => $"&{s}").Aggregate((x, y) => $"{x}{y}");
+				Logger.LogDebug("NavigateUrl_ControlKey_MultipleAdditionalParameter(count={Count}): controlKey → {ControlKey}", count, controlKey);
             var actual = this.navigationManager.NavigateURL(controlKey, parameters);
 
+			Logger.LogDebug("NavigateUrl_ControlKey_MultipleAdditionalParameter(count={Count}): actual → {Actual}", count, actual);
             Assert.That(actual, Is.Not.Null);
             Assert.That(actual, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting NavigateUrl_ControlKey_MultipleAdditionalParameter(count={Count})", count);
         }
 
         [TestCase(1)]
@@ -263,12 +315,17 @@ namespace DotNetNuke.Tests.Core.Common
         [TestCase(11)]
         public void NavigateUrl_TabID_ControlKey(int tabId)
         {
+			Logger.LogDebug(">>> Entering NavigateUrl_TabID_ControlKey(tabId={TabId})", tabId);
             var controlKey = "My-Control-Key";
             var expected = string.Format(DefaultURLPattern, tabId) + string.Format(ControlKeyPattern, controlKey);
+			Logger.LogDebug("NavigateUrl_TabID_ControlKey(tabId={TabId}): controlKey → {ControlKey}", tabId, controlKey);
+			Logger.LogDebug("NavigateUrl_TabID_ControlKey(tabId={TabId}): expected → {Expected}", tabId, expected);
             var actual = this.navigationManager.NavigateURL(tabId, controlKey);
 
+			Logger.LogDebug("NavigateUrl_TabID_ControlKey(tabId={TabId}): actual → {Actual}", tabId, actual);
             Assert.That(actual, Is.Not.Null);
             Assert.That(actual, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting NavigateUrl_TabID_ControlKey(tabId={TabId})", tabId);
         }
 
         [TestCase(1)]
@@ -284,11 +341,15 @@ namespace DotNetNuke.Tests.Core.Common
         [TestCase(11)]
         public void NavigateUrl_TabID_EmptyControlKey(int tabId)
         {
+			Logger.LogDebug(">>> Entering NavigateUrl_TabID_EmptyControlKey(tabId={TabId})", tabId);
             var expected = string.Format(DefaultURLPattern, tabId);
             var actual = this.navigationManager.NavigateURL(tabId, string.Empty);
+			Logger.LogDebug("NavigateUrl_TabID_EmptyControlKey(tabId={TabId}): expected → {Expected}", tabId, expected);
+			Logger.LogDebug("NavigateUrl_TabID_EmptyControlKey(tabId={TabId}): actual → {Actual}", tabId, actual);
 
             Assert.That(actual, Is.Not.Null);
             Assert.That(actual, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting NavigateUrl_TabID_EmptyControlKey(tabId={TabId})", tabId);
         }
 
         [TestCase(1)]
@@ -304,11 +365,15 @@ namespace DotNetNuke.Tests.Core.Common
         [TestCase(11)]
         public void NavigateUrl_TabID_NullControlKey(int tabId)
         {
+			Logger.LogDebug(">>> Entering NavigateUrl_TabID_NullControlKey(tabId={TabId})", tabId);
             var expected = string.Format(DefaultURLPattern, tabId);
             var actual = this.navigationManager.NavigateURL(tabId, string.Empty);
+			Logger.LogDebug("NavigateUrl_TabID_NullControlKey(tabId={TabId}): expected → {Expected}", tabId, expected);
+			Logger.LogDebug("NavigateUrl_TabID_NullControlKey(tabId={TabId}): actual → {Actual}", tabId, actual);
 
             Assert.That(actual, Is.Not.Null);
             Assert.That(actual, Is.EqualTo(expected));
+			Logger.LogDebug("<<< Exiting NavigateUrl_TabID_NullControlKey(tabId={TabId})", tabId);
         }
 
         [TestCase(0, "My-Control-Key-0")]

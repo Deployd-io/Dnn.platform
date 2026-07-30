@@ -9,18 +9,24 @@ namespace DNNConnect.CKEditorProvider.Objects
     /// <summary>Toolbar Set Class.</summary>
     public class ToolbarSet
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ToolbarSet" /> class.</summary>
         public ToolbarSet()
         {
+			Logger.LogDebug(">>> Entering ToolbarSet()");
             this.ToolbarGroups = new List<ToolbarGroup>();
+			Logger.LogDebug("<<< Exiting ToolbarSet()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ToolbarSet" /> class.</summary>
         /// <param name="name">The name.</param>
         public ToolbarSet(string name)
         {
+			Logger.LogDebug(">>> Entering ToolbarSet(name={Name})", name);
             this.Name = name;
             this.ToolbarGroups = new List<ToolbarGroup>();
+			Logger.LogDebug("<<< Exiting ToolbarSet(name={Name})", name);
+			Logger.LogDebug("ToolbarSet(name={Name}): this.Name → {Arg1}", name, this.Name);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ToolbarSet" /> class.</summary>
@@ -28,9 +34,13 @@ namespace DNNConnect.CKEditorProvider.Objects
         /// <param name="priority">The priority.</param>
         public ToolbarSet(string name, int priority)
         {
+			Logger.LogDebug(">>> Entering ToolbarSet(name={Name},priority={Priority})", name, priority);
             this.Name = name;
             this.Priority = priority;
+			Logger.LogDebug("ToolbarSet(name={Name},priority={Priority}): this.Name → {Arg2}", name, priority, this.Name);
+			Logger.LogDebug("ToolbarSet(name={Name},priority={Priority}): this.Priority → {Arg2}", name, priority, this.Priority);
             this.ToolbarGroups = new List<ToolbarGroup>();
+			Logger.LogDebug("<<< Exiting ToolbarSet(name={Name},priority={Priority})", name, priority);
         }
 
         /// <summary>Gets or sets The Name of the Toolbar Set.</summary>

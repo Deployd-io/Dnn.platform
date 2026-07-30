@@ -12,10 +12,14 @@ namespace DotNetNuke.Common.Lists
     [Serializable]
     public class ListInfo : BaseEntityInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Initializes a new instance of the <see cref="ListInfo"/> class.</summary>
         public ListInfo()
             : this(string.Empty)
         {
+		Logger.LogDebug(">>> Entering ListInfo()");
+		Logger.LogDebug(">>> Entering ListInfo(name={Name})", name);
+		Logger.LogDebug("<<< Exiting ListInfo(name={Name})", name);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ListInfo"/> class.</summary>
@@ -24,13 +28,23 @@ namespace DotNetNuke.Common.Lists
         {
             this.SystemList = Null.NullBoolean;
             this.EnableSortOrder = Null.NullBoolean;
+			Logger.LogDebug("ListInfo(name={Name}): this.SystemList → {Arg1}", name, this.SystemList);
+			Logger.LogDebug("ListInfo(name={Name}): this.EnableSortOrder → {Arg1}", name, this.EnableSortOrder);
             this.IsPopulated = Null.NullBoolean;
             this.ParentList = Null.NullString;
             this.Parent = Null.NullString;
+			Logger.LogDebug("ListInfo(name={Name}): this.IsPopulated → {Arg1}", name, this.IsPopulated);
+			Logger.LogDebug("ListInfo(name={Name}): this.ParentList → {Arg1}", name, this.ParentList);
+			Logger.LogDebug("ListInfo(name={Name}): this.Parent → {Arg1}", name, this.Parent);
             this.ParentKey = Null.NullString;
             this.PortalID = Null.NullInteger;
             this.DefinitionID = Null.NullInteger;
             this.Name = name;
+			Logger.LogDebug("<<< Exiting ListInfo(name={Name})", name);
+			Logger.LogDebug("ListInfo(name={Name}): this.ParentKey → {Arg1}", name, this.ParentKey);
+			Logger.LogDebug("ListInfo(name={Name}): this.PortalID → {Arg1}", name, this.PortalID);
+			Logger.LogDebug("ListInfo(name={Name}): this.DefinitionID → {Arg1}", name, this.DefinitionID);
+			Logger.LogDebug("ListInfo(name={Name}): this.Name → {Arg1}", name, this.Name);
         }
 
         /// <summary>Gets the display name, which includes the <see cref="Parent"/> list and this list's <see cref="Name"/>.</summary>

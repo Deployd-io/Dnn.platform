@@ -43,6 +43,7 @@ namespace log4net.Appender
     /// <author>Nicko Cadell</author>
     public class DebugAppender : AppenderSkeleton
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>
         /// Initializes a new instance of the <see cref="DebugAppender" />.
         /// </summary>
@@ -53,6 +54,8 @@ namespace log4net.Appender
         /// </remarks>
         public DebugAppender()
         {
+		Logger.LogDebug(">>> Entering DebugAppender()");
+		Logger.LogDebug("<<< Exiting DebugAppender()");
         }
 
         /// <summary>
@@ -68,7 +71,10 @@ namespace log4net.Appender
         [System.Obsolete("Instead use the default constructor and set the Layout property")]
         public DebugAppender(ILayout layout)
         {
+			Logger.LogDebug(">>> Entering DebugAppender(layout={Layout})", layout);
             this.Layout = layout;
+			Logger.LogDebug("<<< Exiting DebugAppender(layout={Layout})", layout);
+			Logger.LogDebug("DebugAppender(layout={Layout}): this.Layout → {Arg1}", layout, this.Layout);
         }
 
 #if !NETSTANDARD1_3 // System.Diagnostics.Debug has no Flush() in netstandard1.3
@@ -122,6 +128,7 @@ namespace log4net.Appender
             /// <returns><c>True</c> if all logging events were flushed successfully, else <c>false</c>.</returns>
             public override bool Flush(int millisecondsTimeout)
             {
+				Logger.LogDebug(">>> Entering Flush(millisecondsTimeout={MillisecondsTimeout})", millisecondsTimeout);
                 // Nothing to do if ImmediateFlush is true
                 if (this.m_immediateFlush)
                 {
@@ -131,6 +138,7 @@ namespace log4net.Appender
                 // System.Diagnostics.Debug is thread-safe, so no need for lock(this).
                 System.Diagnostics.Debug.Flush();
 
+				Logger.LogDebug("<<< Exiting Flush(millisecondsTimeout={MillisecondsTimeout})", millisecondsTimeout);
                 return true;
             }
 #endif
@@ -160,6 +168,7 @@ namespace log4net.Appender
 #endif
         protected override void Append(LoggingEvent loggingEvent)
         {
+			Logger.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             //
             // Write the string to the Debug system
             //
@@ -188,6 +197,7 @@ namespace log4net.Appender
                 System.Diagnostics.Debug.Flush();
             } 
 #endif
+		Logger.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
         }
 
         /// <summary>

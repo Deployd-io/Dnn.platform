@@ -34,6 +34,7 @@ namespace log4net.Util
     /// <author>Nicko Cadell</author>
     public class ReusableStringWriter : StringWriter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Create an instance of <see cref="ReusableStringWriter"/></summary>
         /// <param name="formatProvider">the format provider to use</param>
         /// <remarks>
@@ -43,6 +44,8 @@ namespace log4net.Util
         /// </remarks>
         public ReusableStringWriter(IFormatProvider formatProvider) : base(formatProvider) 
         {
+		Logger.LogDebug(">>> Entering ReusableStringWriter(formatProvider={FormatProvider})", formatProvider);
+		Logger.LogDebug("<<< Exiting ReusableStringWriter(formatProvider={FormatProvider})", formatProvider);
         }
 
         /// <summary>Override Dispose to prevent closing of writer</summary>
@@ -54,7 +57,9 @@ namespace log4net.Util
         /// </remarks>
         protected override void Dispose(bool disposing)
         {
+			Logger.LogDebug(">>> Entering Dispose(disposing={Disposing})", disposing);
             // Do not close the writer
+			Logger.LogDebug("<<< Exiting Dispose(disposing={Disposing})", disposing);
         }
 
         /// <summary>Reset this string writer so that it can be reused.</summary>
@@ -68,16 +73,21 @@ namespace log4net.Util
         /// </remarks>
         public void Reset(int maxCapacity, int defaultSize)
         {
+			Logger.LogDebug(">>> Entering Reset(maxCapacity={MaxCapacity},defaultSize={DefaultSize})", maxCapacity, defaultSize);
             // Reset working string buffer
             StringBuilder sb = this.GetStringBuilder();
 
+			Logger.LogDebug("Reset(maxCapacity={MaxCapacity},defaultSize={DefaultSize}): sb → {Sb}", maxCapacity, defaultSize, sb);
+			Logger.LogDebug("Reset(maxCapacity={MaxCapacity},defaultSize={DefaultSize}): sb.Length → {Arg2}", maxCapacity, defaultSize, sb.Length);
             sb.Length = 0;
             
             // Check if over max size
             if (sb.Capacity > maxCapacity) 
             {
                 sb.Capacity = defaultSize;
+				Logger.LogDebug("Reset(maxCapacity={MaxCapacity},defaultSize={DefaultSize}): sb.Capacity → {Arg2}", maxCapacity, defaultSize, sb.Capacity);
             } 
+			Logger.LogDebug("<<< Exiting Reset(maxCapacity={MaxCapacity},defaultSize={DefaultSize})", maxCapacity, defaultSize);
         }
     }
 }

@@ -31,7 +31,10 @@ internal partial class FipsCompilanceCryptographyProvider : CryptographyProvider
     [DnnDeprecated(10, 2, 2, "Use DotNetNuke.Abstractions.Security.ICryptographyProvider")]
     public override partial string EncryptParameter(string message, string passphrase)
     {
+		Logger.LogDebug(">>> Entering EncryptParameter(message={Message},passphrase={Passphrase})", message, passphrase);
         using var des = CreateSymmetricAlgorithm(this.EncryptParameterAlgorithmName);
+		Logger.LogDebug("EncryptParameter(message={Message},passphrase={Passphrase}): des → {Des}", message, passphrase, des);
+		Logger.LogDebug("<<< Exiting EncryptParameter(message={Message},passphrase={Passphrase})", message, passphrase);
         return EncryptParameter(message, passphrase, des);
     }
 
@@ -48,6 +51,8 @@ internal partial class FipsCompilanceCryptographyProvider : CryptographyProvider
     [DnnDeprecated(10, 2, 2, "Use DotNetNuke.Abstractions.Security.ICryptographyProvider")]
     public override partial string DecryptParameter(string message, string passphrase)
     {
+		Logger.LogDebug(">>> Entering DecryptParameter(message={Message},passphrase={Passphrase})", message, passphrase);
+		Logger.LogDebug("<<< Exiting DecryptParameter(message={Message},passphrase={Passphrase})", message, passphrase);
         return this.DecryptParameter(message, passphrase, this.EncryptParameterAlgorithmName);
     }
 
@@ -55,7 +60,10 @@ internal partial class FipsCompilanceCryptographyProvider : CryptographyProvider
     [DnnDeprecated(10, 2, 2, "Use DotNetNuke.Abstractions.Security.ICryptographyProvider")]
     public override partial string EncryptString(string message, string passphrase)
     {
+		Logger.LogDebug(">>> Entering EncryptString(message={Message},passphrase={Passphrase})", message, passphrase);
         using var sha512 = CreateHashAlgorithm(this.EncryptStringHashAlgorithmName);
+		Logger.LogDebug("EncryptString(message={Message},passphrase={Passphrase}): sha512 → {Sha512}", message, passphrase, sha512);
+		Logger.LogDebug("<<< Exiting EncryptString(message={Message},passphrase={Passphrase})", message, passphrase);
         return EncryptString(
                 message,
                 passphrase,
@@ -83,6 +91,9 @@ internal partial class FipsCompilanceCryptographyProvider : CryptographyProvider
     [DnnDeprecated(10, 2, 2, "Use DotNetNuke.Abstractions.Security.ICryptographyProvider")]
     public override partial string DecryptString(string message, string passphrase)
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
+		Logger.LogDebug(">>> Entering DecryptString(message={Message},passphrase={Passphrase})", message, passphrase);
+		Logger.LogDebug("<<< Exiting DecryptString(message={Message},passphrase={Passphrase})", message, passphrase);
         return this.DecryptString(message, passphrase, this.EncryptStringAlgorithmName, null);
     }
 }

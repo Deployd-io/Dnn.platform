@@ -15,6 +15,7 @@ namespace DotNetNuke.Services.Log.EventLog
         [Obsolete("Deprecated in DotNetNuke 9.8.0. Use Dependency Injection to resolve 'DotNetNuke.Abstractions.Logging.IEventLogService.GetLog()' instead. Scheduled for removal in v11.0.0.")]
         public enum ReturnType
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
             /// <summary><see cref="LogInfo"/> objects.</summary>
             LogInfoObjects = 0,
 
@@ -25,6 +26,8 @@ namespace DotNetNuke.Services.Log.EventLog
         // return the provider
         public static LoggingProvider Instance()
         {
+			Logger.LogDebug(">>> Entering Instance()");
+			Logger.LogDebug("<<< Exiting Instance()");
             return ComponentFactory.GetComponent<LoggingProvider>();
         }
 

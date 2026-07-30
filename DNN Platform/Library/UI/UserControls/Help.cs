@@ -21,6 +21,7 @@ namespace DotNetNuke.UI.UserControls
 
     public abstract class Help : PortalModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
         protected LinkButton cmdCancel;
@@ -44,10 +45,12 @@ namespace DotNetNuke.UI.UserControls
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             this.cmdCancel.Click += this.cmdCancel_Click;
             int moduleControlId = Null.NullInteger;
 
+			Logger.LogDebug("OnLoad(e={E}): moduleControlId → {ModuleControlId}", e, moduleControlId);
             if (this.Request.QueryString["ctlid"] != null)
             {
                 moduleControlId = int.Parse(this.Request.QueryString["ctlid"], CultureInfo.InvariantCulture);
@@ -59,6 +62,7 @@ namespace DotNetNuke.UI.UserControls
 
             ModuleControlInfo objModuleControl = ModuleControlController.GetModuleControl(moduleControlId);
             if (objModuleControl != null)
+			Logger.LogDebug("OnLoad(e={E}): objModuleControl → {ObjModuleControl}", e, objModuleControl);
             {
                 if (!string.IsNullOrEmpty(objModuleControl.HelpURL) && Host.EnableModuleOnLineHelp)
                 {
@@ -79,22 +83,27 @@ namespace DotNetNuke.UI.UserControls
                 }
 
                 this.key = objModuleControl.ControlKey;
+				Logger.LogDebug("OnLoad(e={E}): this.key → {Arg1}", e, this.key);
 
                 // display module info to Host users
                 if (this.UserInfo.IsSuperUser)
                 {
                     string strInfo = Localization.GetString("lblInfo.Text", Localization.GetResourceFile(this, this.myFileName));
                     strInfo = strInfo.Replace("[CONTROL]", objModuleControl.ControlKey);
+					Logger.LogDebug("OnLoad(e={E}): strInfo → {StrInfo}", e, strInfo);
                     strInfo = strInfo.Replace("[SRC]", objModuleControl.ControlSrc);
                     ModuleDefinitionInfo objModuleDefinition = ModuleDefinitionController.GetModuleDefinitionByID(objModuleControl.ModuleDefID);
                     if (objModuleDefinition != null)
+					Logger.LogDebug("OnLoad(e={E}): objModuleDefinition → {ObjModuleDefinition}", e, objModuleDefinition);
                     {
                         strInfo = strInfo.Replace("[DEFINITION]", objModuleDefinition.FriendlyName);
                         DesktopModuleInfo objDesktopModule = DesktopModuleController.GetDesktopModule(objModuleDefinition.DesktopModuleID, this.PortalId);
+						Logger.LogDebug("OnLoad(e={E}): objDesktopModule → {ObjDesktopModule}", e, objDesktopModule);
                         if (objDesktopModule != null)
                         {
                             PackageInfo objPackage = PackageController.Instance.GetExtensionPackage(Null.NullInteger, p => p.PackageID == objDesktopModule.PackageID);
                             if (objPackage != null)
+							Logger.LogDebug("OnLoad(e={E}): objPackage → {ObjPackage}", e, objPackage);
                             {
                                 strInfo = strInfo.Replace("[ORGANIZATION]", objPackage.Organization);
                                 strInfo = strInfo.Replace("[OWNER]", objPackage.Owner);
@@ -123,6 +132,7 @@ namespace DotNetNuke.UI.UserControls
                     this.ViewState["UrlReferrer"] = string.Empty;
                 }
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <summary>cmdCancel_Click runs when the cancel Button is clicked.</summary>
@@ -134,14 +144,17 @@ namespace DotNetNuke.UI.UserControls
         // ReSharper disable once InconsistentNaming
         protected void cmdCancel_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering cmdCancel_Click(sender={Sender},e={E})", sender, e);
             try
             {
                 this.Response.Redirect(Convert.ToString(this.ViewState["UrlReferrer"], CultureInfo.InvariantCulture), true);
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in cmdCancel_Click(sender={Sender},e={E}): {Arg2}", sender, e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting cmdCancel_Click(sender={Sender},e={E})", sender, e);
         }
     }
 }

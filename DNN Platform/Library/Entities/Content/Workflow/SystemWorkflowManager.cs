@@ -14,6 +14,7 @@ namespace DotNetNuke.Entities.Content.Workflow
 
     public class SystemWorkflowManager : ServiceLocator<ISystemWorkflowManager, SystemWorkflowManager>, ISystemWorkflowManager
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public const string DirectPublishWorkflowKey = "DirectPublish";
         public const string SaveDraftWorkflowKey = "SaveDraft";
         public const string ContentAprovalWorkflowKey = "ContentApproval";
@@ -23,70 +24,99 @@ namespace DotNetNuke.Entities.Content.Workflow
         /// <summary>Initializes a new instance of the <see cref="SystemWorkflowManager"/> class.</summary>
         public SystemWorkflowManager()
         {
+			Logger.LogDebug(">>> Entering SystemWorkflowManager()");
             this.workflowRepository = WorkflowRepository.Instance;
             this.workflowStateRepository = WorkflowStateRepository.Instance;
+			Logger.LogDebug("<<< Exiting SystemWorkflowManager()");
+			Logger.LogDebug("SystemWorkflowManager(): this.workflowRepository → {Arg0}", this.workflowRepository);
+			Logger.LogDebug("SystemWorkflowManager(): workflowStateRepository → {WorkflowStateRepository}", workflowStateRepository);
+			Logger.LogDebug("SystemWorkflowManager(): this.workflowStateRepository → {Arg0}", this.workflowStateRepository);
+			Logger.LogDebug("SystemWorkflowManager(): workflowRepository → {WorkflowRepository}", workflowRepository);
         }
 
         /// <inheritdoc />
         public void CreateSystemWorkflows(int portalId)
         {
+			Logger.LogDebug(">>> Entering CreateSystemWorkflows(portalId={PortalId})", portalId);
             this.CreateDirectPublishWorkflow(portalId);
             this.CreateSaveDraftWorkflow(portalId);
             this.CreateContentApprovalWorkflow(portalId);
+			Logger.LogDebug("<<< Exiting CreateSystemWorkflows(portalId={PortalId})", portalId);
         }
 
         /// <inheritdoc />
         public Entities.Workflow GetDirectPublishWorkflow(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetDirectPublishWorkflow(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetDirectPublishWorkflow(portalId={PortalId})", portalId);
             return this.workflowRepository.GetSystemWorkflows(portalId).SingleOrDefault(sw => sw.WorkflowKey == DirectPublishWorkflowKey);
         }
 
         /// <inheritdoc />
         public Entities.Workflow GetSaveDraftWorkflow(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetSaveDraftWorkflow(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetSaveDraftWorkflow(portalId={PortalId})", portalId);
             return this.workflowRepository.GetSystemWorkflows(portalId).SingleOrDefault(sw => sw.WorkflowKey == SaveDraftWorkflowKey);
         }
 
         /// <inheritdoc />
         public Entities.Workflow GetContentApprovalWorkflow(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetContentApprovalWorkflow(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetContentApprovalWorkflow(portalId={PortalId})", portalId);
             return this.workflowRepository.GetSystemWorkflows(portalId).SingleOrDefault(sw => sw.WorkflowKey == ContentAprovalWorkflowKey);
         }
 
         /// <inheritdoc />
         public WorkflowState GetDraftStateDefinition(int order)
         {
+			Logger.LogDebug(">>> Entering GetDraftStateDefinition(order={Order})", order);
             var state = GetDefaultWorkflowState(order);
             state.StateName = Localization.GetString("DefaultWorkflowState1.StateName");
+			Logger.LogDebug("GetDraftStateDefinition(order={Order}): state → {State}", order, state);
+			Logger.LogDebug("<<< Exiting GetDraftStateDefinition(order={Order})", order);
             return state;
         }
 
         /// <inheritdoc />
         public WorkflowState GetPublishedStateDefinition(int order)
         {
+			Logger.LogDebug(">>> Entering GetPublishedStateDefinition(order={Order})", order);
             var state = GetDefaultWorkflowState(order);
             state.StateName = Localization.GetString("DefaultWorkflowState3.StateName");
+			Logger.LogDebug("GetPublishedStateDefinition(order={Order}): state → {State}", order, state);
+			Logger.LogDebug("<<< Exiting GetPublishedStateDefinition(order={Order})", order);
             return state;
         }
 
         /// <inheritdoc />
         public WorkflowState GetReadyForReviewStateDefinition(int order)
         {
+			Logger.LogDebug(">>> Entering GetReadyForReviewStateDefinition(order={Order})", order);
             var state = GetDefaultWorkflowState(order);
             state.StateName = Localization.GetString("DefaultWorkflowState2.StateName");
+			Logger.LogDebug("GetReadyForReviewStateDefinition(order={Order}): state → {State}", order, state);
+			Logger.LogDebug("GetReadyForReviewStateDefinition(order={Order}): state.SendNotification → {Arg1}", order, state.SendNotification);
+			Logger.LogDebug("GetReadyForReviewStateDefinition(order={Order}): state.SendNotificationToAdministrators → {Arg1}", order, state.SendNotificationToAdministrators);
             state.SendNotification = true;
             state.SendNotificationToAdministrators = true;
+			Logger.LogDebug("<<< Exiting GetReadyForReviewStateDefinition(order={Order})", order);
             return state;
         }
 
         /// <inheritdoc />
         protected override Func<ISystemWorkflowManager> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new SystemWorkflowManager();
         }
 
         private static WorkflowState GetDefaultWorkflowState(int order)
         {
+			Logger.LogDebug(">>> Entering GetDefaultWorkflowState(order={Order})", order);
+			Logger.LogDebug("<<< Exiting GetDefaultWorkflowState(order={Order})", order);
             return new WorkflowState
             {
                 IsSystem = true,
@@ -98,6 +128,8 @@ namespace DotNetNuke.Entities.Content.Workflow
 
         private void CreateDirectPublishWorkflow(int portalId)
         {
+			Logger.LogDebug(">>> Entering CreateDirectPublishWorkflow(portalId={PortalId})", portalId);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var workflow = new Entities.Workflow
             {
                 WorkflowName = Localization.GetString("DefaultDirectPublishWorkflowName"),
@@ -107,13 +139,19 @@ namespace DotNetNuke.Entities.Content.Workflow
                 PortalID = portalId,
             };
             this.workflowRepository.AddWorkflow(workflow);
+			Logger.LogInformation("CreateDirectPublishWorkflow(portalId)={PortalId}: database query executed in {Arg1} ms", portalId, __logStart.ElapsedMilliseconds);
             var publishedState = this.GetPublishedStateDefinition(1);
             publishedState.WorkflowID = workflow.WorkflowID;
+			Logger.LogDebug("CreateDirectPublishWorkflow(portalId={PortalId}): publishedState → {PublishedState}", portalId, publishedState);
+			Logger.LogDebug("CreateDirectPublishWorkflow(portalId={PortalId}): publishedState.WorkflowID → {Arg1}", portalId, publishedState.WorkflowID);
             this.workflowStateRepository.AddWorkflowState(publishedState);
+			Logger.LogDebug("<<< Exiting CreateDirectPublishWorkflow(portalId={PortalId})", portalId);
         }
 
         private void CreateSaveDraftWorkflow(int portalId)
         {
+			Logger.LogDebug(">>> Entering CreateSaveDraftWorkflow(portalId={PortalId})", portalId);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var workflow = new Entities.Workflow
             {
                 WorkflowName = Localization.GetString("DefaultSaveDraftWorkflowName"),
@@ -123,18 +161,24 @@ namespace DotNetNuke.Entities.Content.Workflow
                 PortalID = portalId,
             };
             this.workflowRepository.AddWorkflow(workflow);
+			Logger.LogInformation("CreateSaveDraftWorkflow(portalId)={PortalId}: database query executed in {Arg1} ms", portalId, __logStart.ElapsedMilliseconds);
 
             var state = this.GetDraftStateDefinition(1);
             state.WorkflowID = workflow.WorkflowID;
+			Logger.LogDebug("CreateSaveDraftWorkflow(portalId={PortalId}): state → {State}", portalId, state);
+			Logger.LogDebug("CreateSaveDraftWorkflow(portalId={PortalId}): state.WorkflowID → {Arg1}", portalId, state.WorkflowID);
             this.workflowStateRepository.AddWorkflowState(state);
 
             state = this.GetPublishedStateDefinition(2);
             state.WorkflowID = workflow.WorkflowID;
             this.workflowStateRepository.AddWorkflowState(state);
+			Logger.LogDebug("<<< Exiting CreateSaveDraftWorkflow(portalId={PortalId})", portalId);
         }
 
         private void CreateContentApprovalWorkflow(int portalId)
         {
+			Logger.LogDebug(">>> Entering CreateContentApprovalWorkflow(portalId={PortalId})", portalId);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var workflow = new Entities.Workflow
             {
                 WorkflowName = Localization.GetString("DefaultWorkflowName"),
@@ -144,9 +188,12 @@ namespace DotNetNuke.Entities.Content.Workflow
                 PortalID = portalId,
             };
             this.workflowRepository.AddWorkflow(workflow);
+			Logger.LogInformation("CreateContentApprovalWorkflow(portalId)={PortalId}: database query executed in {Arg1} ms", portalId, __logStart.ElapsedMilliseconds);
 
             var state = this.GetDraftStateDefinition(1);
             state.WorkflowID = workflow.WorkflowID;
+			Logger.LogDebug("CreateContentApprovalWorkflow(portalId={PortalId}): state → {State}", portalId, state);
+			Logger.LogDebug("CreateContentApprovalWorkflow(portalId={PortalId}): state.WorkflowID → {Arg1}", portalId, state.WorkflowID);
             this.workflowStateRepository.AddWorkflowState(state);
 
             state = this.GetReadyForReviewStateDefinition(2);
@@ -156,6 +203,7 @@ namespace DotNetNuke.Entities.Content.Workflow
             state = this.GetPublishedStateDefinition(3);
             state.WorkflowID = workflow.WorkflowID;
             this.workflowStateRepository.AddWorkflowState(state);
+			Logger.LogDebug("<<< Exiting CreateContentApprovalWorkflow(portalId={PortalId})", portalId);
         }
     }
 }

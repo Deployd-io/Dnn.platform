@@ -18,12 +18,15 @@ namespace DotNetNuke.Modules.Admin.Users
     /// <summary>A control which displays a user's profile.</summary>
     public partial class ViewProfile : UserModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly ICryptographyProvider cryptographyProvider;
 
         /// <summary>Initializes a new instance of the <see cref="ViewProfile"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Use overload with ICryptographyProvider. Scheduled for removal in v12.0.0.")]
         public ViewProfile()
         {
+		Logger.LogDebug(">>> Entering ViewProfile()");
+		Logger.LogDebug("<<< Exiting ViewProfile()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ViewProfile"/> class.</summary>
@@ -32,7 +35,9 @@ namespace DotNetNuke.Modules.Admin.Users
         public ViewProfile(ICryptographyProvider cryptographyProvider)
             : this(cryptographyProvider, null, null)
         {
+		Logger.LogDebug(">>> Entering ViewProfile(cryptographyProvider={CryptographyProvider})", cryptographyProvider);
         }
+		Logger.LogDebug("<<< Exiting ViewProfile(cryptographyProvider={CryptographyProvider})", cryptographyProvider);
 
         /// <summary>Initializes a new instance of the <see cref="ViewProfile"/> class.</summary>
         /// <param name="cryptographyProvider">The cryptography provider.</param>
@@ -42,14 +47,17 @@ namespace DotNetNuke.Modules.Admin.Users
             : base(listController, hostSettings)
         {
             this.cryptographyProvider = cryptographyProvider ?? this.DependencyProvider.GetRequiredService<ICryptographyProvider>();
+			Logger.LogDebug("ViewProfile(cryptographyProvider={CryptographyProvider},listController={ListController},hostSettings={HostSettings}): cryptographyProvider → {CryptographyProvider1}", cryptographyProvider, listController, hostSettings, cryptographyProvider);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.UserId = Null.NullInteger;
+			Logger.LogDebug("OnInit(e={E}): this.UserId → {Arg1}", e, this.UserId);
             if (this.Context.Request.QueryString["userticket"] != null)
             {
                 this.UserId = int.Parse(UrlUtils.DecryptParameter(this.cryptographyProvider, this.Context.Request.QueryString["userticket"]));
@@ -57,11 +65,13 @@ namespace DotNetNuke.Modules.Admin.Users
 
             this.ctlProfile.ID = "Profile";
             this.ctlProfile.UserId = this.UserId;
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             try
             {
@@ -79,8 +89,10 @@ namespace DotNetNuke.Modules.Admin.Users
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
     }
 }

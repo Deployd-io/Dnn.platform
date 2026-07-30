@@ -24,11 +24,14 @@ namespace DotNetNuke.Services.Search
         /// <inheritdoc />
         public override int IndexSearchDocuments(int portalId, ScheduleHistoryItem schedule, DateTime startDateLocal, Action<IEnumerable<SearchDocument>> indexer)
         {
+			Logger.LogDebug(">>> Entering IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer})", portalId, schedule, startDateLocal, indexer);
             Requires.NotNull("indexer", indexer);
             const int saveThreshold = 1024;
             var totalIndexed = 0;
             startDateLocal = this.GetLocalTimeOfLastIndexedItem(portalId, schedule.ScheduleID, startDateLocal);
             var searchDocuments = new List<SearchDocument>();
+			Logger.LogDebug("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): startDateLocal → {StartDateLocal1}", portalId, schedule, startDateLocal, indexer, startDateLocal);
+			Logger.LogDebug("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): searchDocuments → {SearchDocuments}", portalId, schedule, startDateLocal, indexer, searchDocuments);
             var tabs = (
                 from t in TabController.Instance.GetTabsByPortal(portalId).AsList()
                 where t.LastModifiedOnDate > startDateLocal && t.AllowIndex
@@ -42,6 +45,7 @@ namespace DotNetNuke.Services.Search
                     {
                         var searchDoc = GetTabSearchDocument(tab);
                         searchDocuments.Add(searchDoc);
+						Logger.LogDebug("IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): searchDoc → {SearchDoc}", portalId, schedule, startDateLocal, indexer, searchDoc);
 
                         if (searchDocuments.Count >= saveThreshold)
                         {
@@ -50,6 +54,7 @@ namespace DotNetNuke.Services.Search
                     }
                     catch (Exception ex)
                     {
+						Logger.LogError("Exception in IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer}): {Arg4}", portalId, schedule, startDateLocal, indexer, ex.Message);
                         Exceptions.Exceptions.LogException(ex);
                     }
                 }
@@ -60,11 +65,13 @@ namespace DotNetNuke.Services.Search
                 }
             }
 
+			Logger.LogDebug("<<< Exiting IndexSearchDocuments(portalId={PortalId},schedule={Schedule},startDateLocal={StartDateLocal},indexer={Indexer})", portalId, schedule, startDateLocal, indexer);
             return totalIndexed;
         }
 
         private static SearchDocument GetTabSearchDocument(TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering GetTabSearchDocument(tab={Tab})", tab);
             var searchDoc = new SearchDocument
             {
                 SearchTypeId = TabSearchTypeId,
@@ -81,6 +88,7 @@ namespace DotNetNuke.Services.Search
 
             // Using TabName for searchDoc.Title due to higher prevalence and relevancy || TabTitle will be stored as a keyword
             searchDoc.Title = tab.TabName;
+			Logger.LogDebug("GetTabSearchDocument(tab={Tab}): searchDoc.Title → {Arg1}", tab, searchDoc.Title);
             searchDoc.Keywords.Add("title", tab.Title);
 
             if (tab.Terms is { Count: > 0 })
@@ -93,6 +101,7 @@ namespace DotNetNuke.Services.Search
                 Logger.Trace($"TabIndexer: Search document for metaData added for page [{tab.Title} tid:{tab.TabID}]");
             }
 
+			Logger.LogDebug("<<< Exiting GetTabSearchDocument(tab={Tab})", tab);
             return searchDoc;
         }
 

@@ -45,7 +45,9 @@ namespace DotNetNuke.Modules.Groups
         public Setup()
             : this(null, null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering Setup()");
         }
+		eventLogger.LogDebug("<<< Exiting Setup()");
 
         /// <summary>Initializes a new instance of the <see cref="Setup"/> class.</summary>
         /// <param name="roleProvider">The role provider.</param>
@@ -56,6 +58,11 @@ namespace DotNetNuke.Modules.Groups
         public Setup(RoleProvider roleProvider, IEventLogger eventLogger, IUserController userController, IPermissionDefinitionService permissionDefinitionService)
             : this(roleProvider, eventLogger, userController, permissionDefinitionService, null)
         {
+		eventLogger.LogDebug(">>> Entering Setup(roleProvider={RoleProvider},eventLogger={EventLogger},userController={UserController},permissionDefinitionService={PermissionDefinitionService})", roleProvider, eventLogger, userController, permissionDefinitionService);
+		eventLogger.LogDebug("Setup(roleProvider={RoleProvider},eventLogger={EventLogger},userController={UserController},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings}): eventLogger → {EventLogger1}", roleProvider, eventLogger, userController, permissionDefinitionService, hostSettings, eventLogger);
+		eventLogger.LogDebug("Setup(roleProvider={RoleProvider},eventLogger={EventLogger},userController={UserController},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings}): userController → {UserController1}", roleProvider, eventLogger, userController, permissionDefinitionService, hostSettings, userController);
+		eventLogger.LogDebug("Setup(roleProvider={RoleProvider},eventLogger={EventLogger},userController={UserController},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings}): permissionDefinitionService → {PermissionDefinitionService1}", roleProvider, eventLogger, userController, permissionDefinitionService, hostSettings, permissionDefinitionService);
+		eventLogger.LogDebug("<<< Exiting Setup(roleProvider={RoleProvider},eventLogger={EventLogger},userController={UserController},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings})", roleProvider, eventLogger, userController, permissionDefinitionService, hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Setup"/> class.</summary>
@@ -68,6 +75,8 @@ namespace DotNetNuke.Modules.Groups
         {
             this.roleProvider = roleProvider ?? this.DependencyProvider.GetRequiredService<RoleProvider>();
             this.eventLogger = eventLogger ?? this.DependencyProvider.GetRequiredService<IEventLogger>();
+			eventLogger.LogDebug("Setup(roleProvider={RoleProvider},eventLogger={EventLogger},userController={UserController},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings}): hostSettings → {HostSettings1}", roleProvider, eventLogger, userController, permissionDefinitionService, hostSettings, hostSettings);
+			eventLogger.LogDebug("Setup(roleProvider={RoleProvider},eventLogger={EventLogger},userController={UserController},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings}): roleProvider → {RoleProvider1}", roleProvider, eventLogger, userController, permissionDefinitionService, hostSettings, roleProvider);
             this.userController = userController ?? this.DependencyProvider.GetRequiredService<IUserController>();
             this.permissionDefinitionService = permissionDefinitionService ?? this.DependencyProvider.GetRequiredService<IPermissionDefinitionService>();
             this.hostSettings = hostSettings ?? this.DependencyProvider.GetRequiredService<IHostSettings>();
@@ -78,20 +87,28 @@ namespace DotNetNuke.Modules.Groups
         // ReSharper disable once InconsistentNaming
         public void btGo_Click(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering btGo_Click(sender={Sender},e={E})", sender, e);
             // Setup Child Page - Main View/Activity
             TabInfo tab = this.CreatePage(this.PortalSettings.ActiveTab, this.PortalId, this.TabId, "Group Activity", false);
 
+			eventLogger.LogDebug("btGo_Click(sender={Sender},e={E}): tab → {Tab}", sender, e, tab);
             // Add Module to Child Page
             int groupViewModuleId = this.AddModule(tab, this.PortalId, "Social Groups", "ContentPane");
             int journalModuleId = this.AddModule(tab, this.PortalId, "Journal", "ContentPane");
+			eventLogger.LogDebug("btGo_Click(sender={Sender},e={E}): groupViewModuleId → {GroupViewModuleId}", sender, e, groupViewModuleId);
+			eventLogger.LogDebug("btGo_Click(sender={Sender},e={E}): journalModuleId → {JournalModuleId}", sender, e, journalModuleId);
             int consoleId = this.AddModule(tab, this.PortalId, "Console", "RightPane");
 
+			eventLogger.LogDebug("btGo_Click(sender={Sender},e={E}): consoleId → {ConsoleId}", sender, e, consoleId);
             ModuleInfo groupConsoleModule = ModuleController.Instance.GetModule(consoleId, tab.TabID, false);
             TabInfo memberTab = this.CreatePage(this.PortalSettings.ActiveTab, this.PortalId, tab.TabID, "Members", true);
+			eventLogger.LogDebug("btGo_Click(sender={Sender},e={E}): groupConsoleModule → {GroupConsoleModule}", sender, e, groupConsoleModule);
+			eventLogger.LogDebug("btGo_Click(sender={Sender},e={E}): memberTab → {MemberTab}", sender, e, memberTab);
             ModuleController.Instance.CopyModule(groupConsoleModule, memberTab, "RightPane", true);
 
             ModuleInfo groupViewModule = ModuleController.Instance.GetModule(groupViewModuleId, tab.TabID, false);
             ModuleController.Instance.CopyModule(groupViewModule, memberTab, "ContentPane", true);
+			eventLogger.LogDebug("btGo_Click(sender={Sender},e={E}): groupViewModule → {GroupViewModule}", sender, e, groupViewModule);
             this.AddModule(memberTab, this.PortalId, "DotNetNuke.Modules.MemberDirectory", "ContentPane");
 
             // List Settings
@@ -101,6 +118,8 @@ namespace DotNetNuke.Modules.Groups
             // Default Social Groups
             var defaultGroup = RoleController.GetRoleGroupByName(this.roleProvider, this.PortalId, Constants.DefaultGroupName);
             var groupId = -2;
+			eventLogger.LogDebug("btGo_Click(sender={Sender},e={E}): defaultGroup → {DefaultGroup}", sender, e, defaultGroup);
+			eventLogger.LogDebug("btGo_Click(sender={Sender},e={E}): groupId → {GroupId}", sender, e, groupId);
             if (defaultGroup != null)
             {
                 groupId = defaultGroup.RoleGroupID;
@@ -109,6 +128,10 @@ namespace DotNetNuke.Modules.Groups
             {
                 var groupInfo = new RoleGroupInfo();
                 groupInfo.PortalID = this.PortalId;
+				eventLogger.LogDebug("btGo_Click(sender={Sender},e={E}): groupInfo → {GroupInfo}", sender, e, groupInfo);
+				eventLogger.LogDebug("btGo_Click(sender={Sender},e={E}): groupInfo.PortalID → {Arg2}", sender, e, groupInfo.PortalID);
+				eventLogger.LogDebug("btGo_Click(sender={Sender},e={E}): groupInfo.RoleGroupName → {Arg2}", sender, e, groupInfo.RoleGroupName);
+				eventLogger.LogDebug("btGo_Click(sender={Sender},e={E}): groupInfo.Description → {Arg2}", sender, e, groupInfo.Description);
                 groupInfo.RoleGroupName = Constants.DefaultGroupName;
                 groupInfo.Description = Constants.DefaultGroupName;
                 groupId = RoleController.AddRoleGroup(this.roleProvider, this.eventLogger, this.userController, this.PortalSettings, groupInfo);
@@ -117,18 +140,24 @@ namespace DotNetNuke.Modules.Groups
             ModuleController.Instance.UpdateTabModuleSetting(this.TabModuleId, Constants.DefaultRoleGroupSetting, groupId.ToString());
 
             this.Response.Redirect(this.Request.RawUrl);
+			eventLogger.LogDebug("<<< Exiting btGo_Click(sender={Sender},e={E})", sender, e);
         }
 
         protected void Page_Load(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering Page_Load(sender={Sender},e={E})", sender, e);
             this.btnGo.Visible = this.Request.IsAuthenticated;
             this.btnGo.Enabled = this.Request.IsAuthenticated;
             this.btnGo.Click += this.btGo_Click;
+			eventLogger.LogDebug("<<< Exiting Page_Load(sender={Sender},e={E})", sender, e);
         }
 
         private static int GetDesktopModuleId(IHostSettings hostSettings, int portalId, string moduleName)
         {
+			eventLogger.LogDebug(">>> Entering GetDesktopModuleId(hostSettings={HostSettings},portalId={PortalId},moduleName={ModuleName})", hostSettings, portalId, moduleName);
             var info = DesktopModuleController.GetDesktopModuleByModuleName(hostSettings, moduleName, portalId);
+			eventLogger.LogDebug("GetDesktopModuleId(hostSettings={HostSettings},portalId={PortalId},moduleName={ModuleName}): info → {Info}", hostSettings, portalId, moduleName, info);
+			eventLogger.LogDebug("<<< Exiting GetDesktopModuleId(hostSettings={HostSettings},portalId={PortalId},moduleName={ModuleName})", hostSettings, portalId, moduleName);
             return info?.DesktopModuleID ?? -1;
         }
 
@@ -205,11 +234,14 @@ namespace DotNetNuke.Modules.Groups
 
         private string GetSkin()
         {
+			eventLogger.LogDebug(">>> Entering GetSkin()");
             // attempt to find and load a  skin from the assigned skinned source
             var skinSource = this.PortalSettings.DefaultPortalSkin;
 
+			eventLogger.LogDebug("GetSkin(): skinSource → {SkinSource}", skinSource);
             var tab = TabController.Instance.GetTab(this.TabId, this.PortalId, false);
 
+			eventLogger.LogDebug("GetSkin(): tab → {Tab}", tab);
             if (!string.IsNullOrEmpty(tab.SkinSrc))
             {
                 skinSource = tab.SkinSrc;
@@ -218,6 +250,7 @@ namespace DotNetNuke.Modules.Groups
             {
                 skinSource = SkinController.FormatSkinPath(skinSource) + "groups.ascx";
                 var physicalSkinFile = SkinController.FormatSkinSrc(skinSource, this.PortalSettings);
+				eventLogger.LogDebug("GetSkin(): physicalSkinFile → {PhysicalSkinFile}", physicalSkinFile);
 
                 if (!File.Exists(HttpContext.Current.Server.MapPath(physicalSkinFile)))
                 {
@@ -225,6 +258,7 @@ namespace DotNetNuke.Modules.Groups
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting GetSkin()");
             return skinSource;
         }
 

@@ -22,13 +22,16 @@ namespace DotNetNuke.Modules.Html
         public Settings()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering Settings()");
         }
+		Logger.LogDebug("<<< Exiting Settings()");
 
         /// <summary>Initializes a new instance of the <see cref="Settings"/> class.</summary>
         /// <param name="settingsRepository">The settings repository.</param>
         public Settings(HtmlModuleSettingsRepository settingsRepository)
         {
             this.settingsRepository = settingsRepository ?? this.DependencyProvider.GetRequiredService<HtmlModuleSettingsRepository>();
+			Logger.LogDebug("Settings(settingsRepository={SettingsRepository}): settingsRepository → {SettingsRepository1}", settingsRepository, settingsRepository);
         }
 
         private new HtmlModuleSettings ModuleSettings => this.moduleSettings ??= this.settingsRepository.GetSettings(this.ModuleConfiguration);
@@ -36,6 +39,7 @@ namespace DotNetNuke.Modules.Html
         /// <summary>LoadSettings loads the settings from the Database and displays them.</summary>
         public override void LoadSettings()
         {
+			Logger.LogDebug(">>> Entering LoadSettings()");
             try
             {
                 if (!this.Page.IsPostBack)
@@ -49,13 +53,17 @@ namespace DotNetNuke.Modules.Html
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in LoadSettings(): {Arg0}", ex.Message);
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting LoadSettings()");
         }
 
         /// <summary>UpdateSettings saves the modified settings to the Database.</summary>
         public override void UpdateSettings()
         {
+			Logger.LogDebug(">>> Entering UpdateSettings()");
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             try
             {
                 // update replace token setting
@@ -63,14 +71,17 @@ namespace DotNetNuke.Modules.Html
                 this.ModuleSettings.UseDecorate = this.cbDecorate.Checked;
                 this.ModuleSettings.SearchDescLength = int.Parse(this.txtSearchDescLength.Text);
                 this.settingsRepository.SaveSettings(this.ModuleConfiguration, this.ModuleSettings);
+				Logger.LogInformation("UpdateSettings(): save query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
                 // disable module caching if token replace is enabled
                 if (this.chkReplaceTokens.Checked)
                 {
                     var module = ModuleController.Instance.GetModule(this.ModuleId, this.TabId, false);
                     if (module.CacheTime > 0)
+					Logger.LogDebug("UpdateSettings(): module → {Module}", module);
                     {
                         module.CacheTime = 0;
+						Logger.LogDebug("UpdateSettings(): module.CacheTime → {Arg0}", module.CacheTime);
                         ModuleController.Instance.UpdateModule(module);
                     }
                 }
@@ -79,8 +90,11 @@ namespace DotNetNuke.Modules.Html
             }
             catch (Exception exc)
             {
+				private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
                 Exceptions.ProcessModuleLoadException(this, exc);
+				Logger.LogError("Exception in UpdateSettings(): {Arg0}", ex.Message);
             }
+			Logger.LogDebug("<<< Exiting UpdateSettings()");
         }
     }
 }

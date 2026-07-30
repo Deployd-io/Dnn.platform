@@ -70,9 +70,12 @@ namespace log4net.Layout
     /// <author>Gert Driesen</author>
     public class XmlLayout : XmlLayoutBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>Constructs an XmlLayout</summary>
         public XmlLayout() : base()
         {
+		Logger.LogDebug(">>> Entering XmlLayout()");
+		Logger.LogDebug("<<< Exiting XmlLayout()");
         }
 
         /// <summary>Constructs an XmlLayout.</summary>
@@ -163,18 +166,26 @@ namespace log4net.Layout
         /// </remarks>
         public override void ActivateOptions() 
         {
+			Logger.LogDebug(">>> Entering ActivateOptions()");
             base.ActivateOptions();
 
             // Cache the full element names including the prefix
             if (this.m_prefix != null && this.m_prefix.Length > 0)
             {
                 this.m_elmEvent = this.m_prefix + ":" + ELM_EVENT;
+				Logger.LogDebug("ActivateOptions(): this.m_elmEvent → {Arg0}", this.m_elmEvent);
                 this.m_elmMessage = this.m_prefix + ":" + ELM_MESSAGE;
                 this.m_elmProperties = this.m_prefix + ":" + ELM_PROPERTIES;
+				Logger.LogDebug("ActivateOptions(): this.m_elmMessage → {Arg0}", this.m_elmMessage);
+				Logger.LogDebug("ActivateOptions(): this.m_elmProperties → {Arg0}", this.m_elmProperties);
                 this.m_elmData = this.m_prefix + ":" + ELM_DATA;
                 this.m_elmException = this.m_prefix + ":" + ELM_EXCEPTION;
                 this.m_elmLocation = this.m_prefix + ":" + ELM_LOCATION;
             }
+			Logger.LogDebug("<<< Exiting ActivateOptions()");
+			Logger.LogDebug("ActivateOptions(): this.m_elmData → {Arg0}", this.m_elmData);
+			Logger.LogDebug("ActivateOptions(): this.m_elmException → {Arg0}", this.m_elmException);
+			Logger.LogDebug("ActivateOptions(): this.m_elmLocation → {Arg0}", this.m_elmLocation);
         }
 
         /// <summary>Does the actual writing of the XML.</summary>
@@ -188,6 +199,7 @@ namespace log4net.Layout
         /// </remarks>
         protected override void FormatXml(XmlWriter writer, LoggingEvent loggingEvent)
         {
+			Logger.LogDebug(">>> Entering FormatXml(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             writer.WriteStartElement(this.m_elmEvent);
             writer.WriteAttributeString(ATTR_LOGGER, loggingEvent.LoggerName);
 
@@ -229,6 +241,7 @@ namespace log4net.Layout
 
             PropertiesDictionary properties = loggingEvent.GetProperties();
 
+			Logger.LogDebug("FormatXml(writer={Writer},loggingEvent={LoggingEvent}): properties → {Properties}", writer, loggingEvent, properties);
             // Append the properties text
             if (properties.Count > 0)
             {
@@ -241,6 +254,7 @@ namespace log4net.Layout
                     // Use an ObjectRenderer to convert the object to a string
                     string valueStr =null;
                     if (!this.Base64EncodeProperties)
+					Logger.LogDebug("FormatXml(writer={Writer},loggingEvent={LoggingEvent}): valueStr → {ValueStr}", writer, loggingEvent, valueStr);
                     {
                         valueStr = Transform.MaskXmlInvalidCharacters(loggingEvent.Repository.RendererMap.FindAndRender(entry.Value),this.InvalidCharReplacement);
                     }
@@ -278,6 +292,7 @@ namespace log4net.Layout
             }
 
             writer.WriteEndElement();
+			Logger.LogDebug("<<< Exiting FormatXml(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
 
         /// <summary>The prefix to use for all generated element names</summary>

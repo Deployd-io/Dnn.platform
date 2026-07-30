@@ -19,6 +19,7 @@ namespace DotNetNuke.Web.Client.Providers
     /// <summary>Registers resources at the top of the body on default.aspx.</summary>
     public class DnnPageHeaderProvider : DnnFileRegistrationProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         /// <summary>The default name of the provider.</summary>
         public const string DefaultName = "DnnPageHeaderProvider";
 
@@ -31,13 +32,16 @@ namespace DotNetNuke.Web.Client.Providers
         /// <inheritdoc />
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
+			Logger.LogDebug(">>> Entering Initialize(name={Name},config={Config})", name, config);
             // Assign the provider a default name if it doesn't have one
             if (string.IsNullOrEmpty(name))
             {
                 name = DefaultName;
             }
+			Logger.LogDebug("Initialize(name={Name},config={Config}): name → {Name1}", name, config, name);
 
             base.Initialize(name, config);
+			Logger.LogDebug("<<< Exiting Initialize(name={Name},config={Config})", name, config);
         }
 
         /// <inheritdoc />
@@ -121,6 +125,7 @@ namespace DotNetNuke.Web.Client.Providers
         /// </remarks>
         protected override void RegisterDependencies(HttpContextBase http, string js, string css)
         {
+			Logger.LogDebug(">>> Entering RegisterDependencies(http={Http},js={Js},css={Css})", http, js, css);
             if (http.CurrentHandler is not Page page)
             {
                 throw new InvalidOperationException("The current HttpHandler in a WebFormsFileRegistrationProvider must be of type Page");
@@ -133,16 +138,22 @@ namespace DotNetNuke.Web.Client.Providers
 
             var jsScriptBlock = new LiteralControl(js.Replace("&", "&amp;"));
             var cssStyleBlock = new LiteralControl(css.Replace("&", "&amp;"));
+			Logger.LogDebug("RegisterDependencies(http={Http},js={Js},css={Css}): jsScriptBlock → {JsScriptBlock}", http, js, css, jsScriptBlock);
+			Logger.LogDebug("RegisterDependencies(http={Http},js={Js},css={Css}): cssStyleBlock → {CssStyleBlock}", http, js, css, cssStyleBlock);
             page.FindControl(JsPlaceHolderName).Controls.Add(jsScriptBlock);
             page.FindControl(CssPlaceHolderName).Controls.Add(cssStyleBlock);
 
             var scriptManager = ScriptManager.GetCurrent(page);
             if (scriptManager is { IsInAsyncPostBack: true })
+			Logger.LogDebug("RegisterDependencies(http={Http},js={Js},css={Css}): scriptManager → {ScriptManager}", http, js, css, scriptManager);
             {
                 var jsHolder = page.FindControl(JsPlaceHolderName);
                 jsHolder.ID = "$crm_" + jsHolder.ID;
+				Logger.LogDebug("RegisterDependencies(http={Http},js={Js},css={Css}): jsHolder → {JsHolder}", http, js, css, jsHolder);
+				Logger.LogDebug("RegisterDependencies(http={Http},js={Js},css={Css}): jsHolder.ID → {Arg3}", http, js, css, jsHolder.ID);
                 scriptManager.RegisterDataItem(jsHolder, $"{jsScriptBlock.Text}{cssStyleBlock.Text}");
             }
+			Logger.LogDebug("<<< Exiting RegisterDependencies(http={Http},js={Js},css={Css})", http, js, css);
         }
     }
 }

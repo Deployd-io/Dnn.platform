@@ -13,13 +13,17 @@ namespace DotNetNuke.UI.Skins.Controls
     /// <summary>A skin/theme object which displays the tabs of a page or module.</summary>
     public partial class Tags : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string MyFileName = "Tags.ascx";
         private readonly INavigationManager navigationManager;
 
         /// <summary>Initializes a new instance of the <see cref="Tags"/> class.</summary>
         public Tags()
         {
+			Logger.LogDebug(">>> Entering Tags()");
             this.navigationManager = Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
+			Logger.LogDebug("<<< Exiting Tags()");
+			Logger.LogDebug("Tags(): navigationManager → {NavigationManager}", navigationManager);
         }
 
         public string AddImageUrl { get; set; } = IconController.IconURL("Add");
@@ -45,6 +49,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             if (this.ObjectType == "Page")
@@ -68,6 +73,7 @@ namespace DotNetNuke.UI.Skins.Controls
             this.tagsControl.Separator = this.Separator;
             this.tagsControl.ShowCategories = this.ShowCategories;
             this.tagsControl.ShowTags = this.ShowTags;
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
     }
 }

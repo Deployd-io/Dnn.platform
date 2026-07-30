@@ -9,8 +9,11 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
     [JsonObject]
     public class SkinObjectPackageDetailDto : PackageInfoDto
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         public SkinObjectPackageDetailDto()
         {
+		Logger.LogDebug(">>> Entering SkinObjectPackageDetailDto()");
+		Logger.LogDebug("<<< Exiting SkinObjectPackageDetailDto()");
         }
 
         public SkinObjectPackageDetailDto(int portalId, PackageInfo package)

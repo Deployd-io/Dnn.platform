@@ -8,6 +8,7 @@ namespace DotNetNuke.UI.WebControls
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class ListAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private readonly string listName;
         private readonly string parentKey;
         private readonly ListBoundField textField;
@@ -20,10 +21,18 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="valueField">Value Field.</param>
         public ListAttribute(string listName, string parentKey, ListBoundField valueField, ListBoundField textField)
         {
+			Logger.LogDebug(">>> Entering ListAttribute(listName={ListName},parentKey={ParentKey},valueField={ValueField},textField={TextField})", listName, parentKey, valueField, textField);
             this.listName = listName;
             this.parentKey = parentKey;
+			Logger.LogDebug("ListAttribute(listName={ListName},parentKey={ParentKey},valueField={ValueField},textField={TextField}): this.listName → {Arg4}", listName, parentKey, valueField, textField, this.listName);
+			Logger.LogDebug("ListAttribute(listName={ListName},parentKey={ParentKey},valueField={ValueField},textField={TextField}): this.parentKey → {Arg4}", listName, parentKey, valueField, textField, this.parentKey);
+			Logger.LogDebug("ListAttribute(listName={ListName},parentKey={ParentKey},valueField={ValueField},textField={TextField}): valueField → {ValueField1}", listName, parentKey, valueField, textField, valueField);
             this.textField = textField;
             this.valueField = valueField;
+			Logger.LogDebug("<<< Exiting ListAttribute(listName={ListName},parentKey={ParentKey},valueField={ValueField},textField={TextField})", listName, parentKey, valueField, textField);
+			Logger.LogDebug("ListAttribute(listName={ListName},parentKey={ParentKey},valueField={ValueField},textField={TextField}): textField → {TextField1}", listName, parentKey, valueField, textField, textField);
+			Logger.LogDebug("ListAttribute(listName={ListName},parentKey={ParentKey},valueField={ValueField},textField={TextField}): this.textField → {Arg4}", listName, parentKey, valueField, textField, this.textField);
+			Logger.LogDebug("ListAttribute(listName={ListName},parentKey={ParentKey},valueField={ValueField},textField={TextField}): this.valueField → {Arg4}", listName, parentKey, valueField, textField, this.valueField);
         }
 
         public string ListName

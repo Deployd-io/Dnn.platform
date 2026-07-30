@@ -27,6 +27,7 @@ using log4net.DateFormatter;
 
 namespace log4net.Layout.Pattern
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
     /// <summary>
     /// Date pattern converter, uses a <see cref="IDateFormatter"/> to format 
     /// the date of a <see cref="LoggingEvent"/>.
@@ -112,8 +113,10 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         public void ActivateOptions()
         {
+			Logger.LogDebug(">>> Entering ActivateOptions()");
             string dateFormatStr = this.Option;
             if (dateFormatStr == null)
+			Logger.LogDebug("ActivateOptions(): dateFormatStr → {DateFormatStr}", dateFormatStr);
             {
                 dateFormatStr = AbsoluteTimeDateFormatter.Iso8601TimeDateFormat;
             }
@@ -121,6 +124,7 @@ namespace log4net.Layout.Pattern
             if (SystemInfo.EqualsIgnoringCase(dateFormatStr, AbsoluteTimeDateFormatter.Iso8601TimeDateFormat))
             {
                 this.m_dateFormatter = new Iso8601DateFormatter();
+				Logger.LogDebug("ActivateOptions(): m_dateFormatter → {M_dateFormatter}", m_dateFormatter);
             }
             else if (SystemInfo.EqualsIgnoringCase(dateFormatStr, AbsoluteTimeDateFormatter.AbsoluteTimeDateFormat))
             {
@@ -142,6 +146,7 @@ namespace log4net.Layout.Pattern
                     this.m_dateFormatter = new Iso8601DateFormatter();
                 }	
             }
+			Logger.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>
@@ -160,6 +165,7 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         protected override void Convert(TextWriter writer, LoggingEvent loggingEvent)
         {
+			Logger.LogDebug(">>> Entering Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             try 
             {
                 this.m_dateFormatter.FormatDate(loggingEvent.TimeStamp, writer);
@@ -168,6 +174,7 @@ namespace log4net.Layout.Pattern
             {
                 LogLog.Error(declaringType, "Error occurred while converting date.", ex);
             }
+			Logger.LogDebug("<<< Exiting Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
 
         /// <summary>

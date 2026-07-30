@@ -56,6 +56,7 @@ namespace DotNetNuke.Services.FileSystem
         public FolderManager()
             : this(null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering FolderManager()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="FolderManager"/> class.</summary>
@@ -67,8 +68,13 @@ namespace DotNetNuke.Services.FileSystem
         {
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
             this.permissionDefinitionService = permissionDefinitionService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPermissionDefinitionService>();
+			Logger.LogDebug("FolderManager(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},portalController={PortalController}): permissionDefinitionService → {PermissionDefinitionService1}", eventLogger, permissionDefinitionService, hostSettings, portalController, permissionDefinitionService);
+			Logger.LogDebug("FolderManager(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},portalController={PortalController}): portalController → {PortalController1}", eventLogger, permissionDefinitionService, hostSettings, portalController, portalController);
+			Logger.LogDebug("FolderManager(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},portalController={PortalController}): eventLogger → {EventLogger1}", eventLogger, permissionDefinitionService, hostSettings, portalController, eventLogger);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("FolderManager(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},portalController={PortalController}): hostSettings → {HostSettings1}", eventLogger, permissionDefinitionService, hostSettings, portalController, hostSettings);
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+			Logger.LogDebug("<<< Exiting FolderManager(eventLogger={EventLogger},permissionDefinitionService={PermissionDefinitionService},hostSettings={HostSettings},portalController={PortalController})", eventLogger, permissionDefinitionService, hostSettings, portalController);
         }
 
         /// <summary>Gets the localization key for MyFolderName.</summary>
@@ -329,6 +335,7 @@ namespace DotNetNuke.Services.FileSystem
         /// <returns>The folder entity or null if the folder cannot be located.</returns>
         public virtual IFolderInfo GetFolder(Guid uniqueId)
         {
+			Logger.LogDebug("<<< Exiting GetFolder(uniqueId={UniqueId})", uniqueId);
             return CBO.Instance.FillObject<FolderInfo>(DataProvider.Instance().GetFolderByUniqueID(uniqueId));
         }
 
@@ -389,6 +396,7 @@ namespace DotNetNuke.Services.FileSystem
         /// <returns>The list of folders the specified user has read permissions.</returns>
         public virtual IEnumerable<IFolderInfo> GetFolders(UserInfo user)
         {
+			Logger.LogDebug("<<< Exiting GetFolders(user={User})", user);
             return this.GetFolders(user, "READ");
         }
 
@@ -431,10 +439,12 @@ namespace DotNetNuke.Services.FileSystem
         /// <returns>The information about the user folder, <see cref="IFolderInfo"></see>.</returns>
         public virtual IFolderInfo GetUserFolder(UserInfo userInfo)
         {
+			Logger.LogDebug(">>> Entering GetUserFolder(userInfo={UserInfo})", userInfo);
             // always use _default portal for a superuser
             int portalId = userInfo.IsSuperUser ? -1 : userInfo.PortalID;
 
             string userFolderPath = PathUtils.GetUserFolderPathInternal(userInfo);
+			Logger.LogDebug("<<< Exiting GetUserFolder(userInfo={UserInfo})", userInfo);
             return this.GetFolder(portalId, userFolderPath) ?? this.AddUserFolder(userInfo);
         }
 
@@ -550,6 +560,7 @@ namespace DotNetNuke.Services.FileSystem
 
             // Notify folder renamed event
             OnFolderRenamed(folder, this.GetCurrentUserId(), currentFolderName);
+			Logger.LogDebug("<<< Exiting RenameFolder(folder={Folder},newFolderName={NewFolderName})", folder, newFolderName);
         }
 
         /// <summary>Search the files contained in the specified folder, for a matching pattern.</summary>
@@ -732,6 +743,7 @@ namespace DotNetNuke.Services.FileSystem
             }
 
             FolderPermissionController.SaveFolderPermissions((FolderInfo)folder);
+			Logger.LogDebug("<<< Exiting CopyParentFolderPermissions(folder={Folder})", folder);
         }
 
         /// <summary>Sets specific folder permissions for the given role to the given folder.</summary>
@@ -809,7 +821,9 @@ namespace DotNetNuke.Services.FileSystem
         /// <param name="eventLogType">The type of log entry.</param>
         internal virtual void AddLogEntry(string propertyName, string propertyValue, EventLogType eventLogType)
         {
+			Logger.LogDebug(">>> Entering AddLogEntry(propertyName={PropertyName},propertyValue={PropertyValue},eventLogType={EventLogType})", propertyName, propertyValue, eventLogType);
             this.eventLogger.AddLog(propertyName, propertyValue, PortalController.Instance.GetCurrentSettings(), this.GetCurrentUserId(), eventLogType);
+			Logger.LogDebug("<<< Exiting AddLogEntry(propertyName={PropertyName},propertyValue={PropertyValue},eventLogType={EventLogType})", propertyName, propertyValue, eventLogType);
         }
 
         /// <summary>This member is reserved for internal use and is not intended to be used directly from your code.</summary>
@@ -833,11 +847,13 @@ namespace DotNetNuke.Services.FileSystem
         /// <param name="user">the user to add a folder for.</param>
         internal virtual IFolderInfo AddUserFolder(UserInfo user)
         {
+			Logger.LogDebug(">>> Entering AddUserFolder(user={User})", user);
             // user _default portal for all super users
             var portalId = user.IsSuperUser ? Null.NullInteger : user.PortalID;
 
             var folderMapping = FolderMappingsConfigController.Instance.GetFolderMapping(portalId, DefaultUsersFoldersPath) ?? FolderMappingController.Instance.GetDefaultFolderMapping(portalId);
 
+			Logger.LogDebug("AddUserFolder(user={User}): folderMapping → {FolderMapping}", user, folderMapping);
             if (!this.FolderExists(portalId, DefaultUsersFoldersPath))
             {
                 this.AddFolder(folderMapping, DefaultUsersFoldersPath);
@@ -845,6 +861,8 @@ namespace DotNetNuke.Services.FileSystem
 
             var rootFolder = PathUtils.GetUserFolderPathElement(user.UserID, PathUtils.UserFolderElement.Root);
             var folderPath = PathUtils.Instance.FormatFolderPath($"{DefaultUsersFoldersPath}/{rootFolder}");
+			Logger.LogDebug("AddUserFolder(user={User}): rootFolder → {RootFolder}", user, rootFolder);
+			Logger.LogDebug("AddUserFolder(user={User}): folderPath → {FolderPath}", user, folderPath);
 
             if (!this.FolderExists(portalId, folderPath))
             {
@@ -868,6 +886,7 @@ namespace DotNetNuke.Services.FileSystem
 
             var folder = this.GetFolder(portalId, folderPath);
 
+			Logger.LogDebug("AddUserFolder(user={User}): folder → {Folder}", user, folder);
             foreach (var permission in this.permissionDefinitionService.GetDefinitionsByFolder())
             {
                 if (!permission.PermissionKey.Equals("READ", StringComparison.OrdinalIgnoreCase) &&
@@ -879,9 +898,11 @@ namespace DotNetNuke.Services.FileSystem
 
                 var folderPermission = new FolderPermissionInfo(permission);
                 ((IFolderPermissionInfo)folderPermission).FolderId = folder.FolderID;
+				Logger.LogDebug("AddUserFolder(user={User}): folderPermission → {FolderPermission}", user, folderPermission);
                 ((IFolderPermissionInfo)folderPermission).UserId = user.UserID;
                 ((IFolderPermissionInfo)folderPermission).RoleId = int.Parse(Globals.glbRoleNothing, CultureInfo.InvariantCulture);
                 folderPermission.AllowAccess = true;
+				Logger.LogDebug("AddUserFolder(user={User}): folderPermission.AllowAccess → {Arg1}", user, folderPermission.AllowAccess);
 
                 folder.FolderPermissions.Add(folderPermission);
 
@@ -893,6 +914,7 @@ namespace DotNetNuke.Services.FileSystem
 
             FolderPermissionController.SaveFolderPermissions((FolderInfo)folder);
 
+			Logger.LogDebug("<<< Exiting AddUserFolder(user={User})", user);
             return this.GetFolder(portalId, folderPath);
         }
 
@@ -1072,6 +1094,8 @@ namespace DotNetNuke.Services.FileSystem
         /// <returns>A value representing the current script timeout.</returns>
         internal virtual int GetCurrentScriptTimeout()
         {
+			Logger.LogDebug(">>> Entering GetCurrentScriptTimeout()");
+			Logger.LogDebug("<<< Exiting GetCurrentScriptTimeout()");
             return HttpContext.Current.Server.ScriptTimeout;
         }
 
@@ -1079,6 +1103,8 @@ namespace DotNetNuke.Services.FileSystem
         /// <returns>The id of the current user.</returns>
         internal virtual int GetCurrentUserId()
         {
+			Logger.LogDebug(">>> Entering GetCurrentUserId()");
+			Logger.LogDebug("<<< Exiting GetCurrentUserId()");
             return UserController.Instance.GetCurrentUserInfo().UserID;
         }
 
@@ -1450,6 +1476,8 @@ namespace DotNetNuke.Services.FileSystem
         /// <returns>A value indicating whether the network is available.</returns>
         internal virtual bool IsNetworkAvailable()
         {
+			Logger.LogDebug(">>> Entering IsNetworkAvailable()");
+			Logger.LogDebug("<<< Exiting IsNetworkAvailable()");
             return NetworkInterface.GetIsNetworkAvailable();
         }
 
@@ -1666,6 +1694,7 @@ namespace DotNetNuke.Services.FileSystem
                     this.DeleteFolder(portalId, item.FolderPath);
                 }
             }
+			Logger.LogDebug("<<< Exiting ProcessMergedTreeItemInDeleteMode(item={Item},portalId={PortalId})", item, portalId);
         }
 
         /// <summary>This member is reserved for internal use and is not intended to be used directly from your code.</summary>
@@ -1712,6 +1741,7 @@ namespace DotNetNuke.Services.FileSystem
 
             var target = PathUtils.Instance.GetPhysicalPath(folder.PortalID, newFolderPath);
             this.MoveDirectory(source, target);
+			Logger.LogDebug("<<< Exiting RenameFolderInFileSystem(folder={Folder},newFolderPath={NewFolderPath})", folder, newFolderPath);
         }
 
         /// <summary>This member is reserved for internal use and is not intended to be used directly from your code.</summary>
@@ -1725,7 +1755,9 @@ namespace DotNetNuke.Services.FileSystem
         /// <param name="timeout">The timeout in seconds.</param>
         internal virtual void SetScriptTimeout(int timeout)
         {
+			Logger.LogDebug(">>> Entering SetScriptTimeout(timeout={Timeout})", timeout);
             HttpContext.Current.Server.ScriptTimeout = timeout;
+			Logger.LogDebug("<<< Exiting SetScriptTimeout(timeout={Timeout})", timeout);
         }
 
         /// <summary>This member is reserved for internal use and is not intended to be used directly from your code.</summary>
@@ -1788,6 +1820,7 @@ namespace DotNetNuke.Services.FileSystem
             {
                 Logger.Error(ex);
             }
+			Logger.LogDebug("<<< Exiting SynchronizeFiles(item={Item},portalId={PortalId})", item, portalId);
         }
 
         /// <summary>This member is reserved for internal use and is not intended to be used directly from your code.</summary>
@@ -1807,6 +1840,7 @@ namespace DotNetNuke.Services.FileSystem
                 // UpdateFolder(objFolder);
                 this.UpdateFolderInternal(objFolder, false);
             }
+			Logger.LogDebug("<<< Exiting UpdateParentFolder(portalId={PortalId},folderPath={FolderPath})", portalId, folderPath);
         }
 
         /// <summary>This member is reserved for internal use and is not intended to be used directly from your code.</summary>
@@ -1879,12 +1913,16 @@ namespace DotNetNuke.Services.FileSystem
 
         private static Regex WildcardToRegex(string pattern)
         {
+			Logger.LogDebug(">>> Entering WildcardToRegex(pattern={Pattern})", pattern);
             pattern = Regex.Escape(pattern).Replace(@"\*", ".*").Replace(@"\?", ".");
+			Logger.LogDebug("WildcardToRegex(pattern={Pattern}): pattern → {Pattern1}", pattern, pattern);
+			Logger.LogDebug("<<< Exiting WildcardToRegex(pattern={Pattern})", pattern);
             return RegexUtils.GetCachedRegex(pattern, RegexOptions.IgnoreCase);
         }
 
         private static bool IsStandardFolderProviderType(FolderMappingInfo folderMappingInfo)
         {
+			Logger.LogDebug(">>> Entering IsStandardFolderProviderType(folderMappingInfo={FolderMappingInfo})", folderMappingInfo);
             var compatibleTypes = new[] { "StandardFolderProvider", "SecureFolderProvider", "DatabaseFolderProvider" };
             return compatibleTypes.Contains(folderMappingInfo.FolderProviderType);
         }
@@ -1994,11 +2032,13 @@ namespace DotNetNuke.Services.FileSystem
 
         private static void RemoveSyncFoldersData()
         {
+			Logger.LogDebug(">>> Entering RemoveSyncFoldersData()");
             var threadId = Environment.CurrentManagedThreadId;
             if (SyncFoldersData.ContainsKey(threadId))
             {
                 SyncFoldersData.TryRemove(threadId, out _);
             }
+			Logger.LogDebug("<<< Exiting RemoveSyncFoldersData()");
         }
 
         private int AddFolderInternal(FolderInfo folder)
@@ -2079,6 +2119,7 @@ namespace DotNetNuke.Services.FileSystem
                 return true;
             }
 
+			Logger.LogDebug("<<< Exiting GetOnlyUnmap(folder={Folder})", folder);
             return FolderProvider.Instance(FolderMappingController.Instance.GetFolderMapping(folder.FolderMappingID).FolderProviderType).SupportsMappedPaths &&
                 this.GetFolder(folder.ParentID).FolderMappingID != folder.FolderMappingID;
         }
@@ -2313,6 +2354,8 @@ namespace DotNetNuke.Services.FileSystem
             /// <inheritdoc />
             public int Compare(string x, string y)
             {
+				Logger.LogDebug(">>> Entering Compare(x={X},y={Y})", x, y);
+				Logger.LogDebug("<<< Exiting Compare(x={X},y={Y})", x, y);
                 return string.Compare(x.ToLowerInvariant(), y.ToLowerInvariant(), StringComparison.Ordinal);
             }
         }

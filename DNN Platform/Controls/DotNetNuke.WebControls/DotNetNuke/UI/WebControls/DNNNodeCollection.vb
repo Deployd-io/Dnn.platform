@@ -17,36 +17,54 @@ Namespace DotNetNuke.UI.WebControls
     <DefaultMember("Item")> _
     Public Class DNNNodeCollection
         Inherits XmlCollectionBase
+		Private Shared ReadOnly Logger As ILog = LoggerSource.Instance.GetLogger(GetType(DNNNodeCollection))
         ' Methods
         Public Sub New(ByVal strNamespace As String)
+			Logger.LogDebug(">>> Entering New(strNamespace={StrNamespace})", strNamespace)
             MyBase.New(strNamespace)
+			Logger.LogDebug("<<< Exiting New(strNamespace={StrNamespace})", strNamespace)
+			Logger.LogDebug(">>> Entering New(objXmlNode={ObjXmlNode})", objXmlNode)
         End Sub
 
         Public Sub New(ByVal objXmlNode As XmlNode)
             MyBase.New(objXmlNode)
+			Logger.LogDebug("<<< Exiting New(objXmlNode={ObjXmlNode})", objXmlNode)
+			Logger.LogDebug(">>> Entering New(strNamespace={StrNamespace},objTreeControl={ObjTreeControl})", strNamespace, objTreeControl)
         End Sub
 
         Public Sub New(ByVal strNamespace As String, ByVal objTreeControl As DnnTree)
             MyBase.New(strNamespace, objTreeControl)
+			Logger.LogDebug("<<< Exiting New(strNamespace={StrNamespace},objTreeControl={ObjTreeControl})", strNamespace, objTreeControl)
+			Logger.LogDebug(">>> Entering New(RootNamespace={RootNamespace},JSONDict={JSONDict},Object={Object})", RootNamespace, JSONDict, Object)
         End Sub
 
         Public Sub New(ByVal RootNamespace As String, ByVal JSONDict As Dictionary(Of String, Object))
             MyBase.New(RootNamespace)
             Me.LoadJSON(DirectCast(JSONDict("nodes"), IEnumerable))
+			Logger.LogDebug("<<< Exiting New(RootNamespace={RootNamespace},JSONDict={JSONDict},Object={Object})", RootNamespace, JSONDict, Object)
+			Logger.LogDebug(">>> Entering New(strXML={StrXML},strXSLFile={StrXSLFile})", strXML, strXSLFile)
         End Sub
 
         Public Sub New(ByVal strXML As String, ByVal strXSLFile As String)
             MyBase.New(strXML, strXSLFile)
+			Logger.LogDebug("<<< Exiting New(strXML={StrXML},strXSLFile={StrXSLFile})", strXML, strXSLFile)
+			Logger.LogDebug(">>> Entering New(objXmlNode={ObjXmlNode},objTreeControl={ObjTreeControl})", objXmlNode, objTreeControl)
         End Sub
 
         Public Sub New(ByVal objXmlNode As XmlNode, ByVal objTreeControl As DnnTree)
             MyBase.New(objXmlNode, objTreeControl)
+			Logger.LogDebug("<<< Exiting New(objXmlNode={ObjXmlNode},objTreeControl={ObjTreeControl})", objXmlNode, objTreeControl)
         End Sub
 
         Public Function Add() As Integer
+			Logger.LogDebug(">>> Entering Add()")
             Dim node As New DNNNode
             Me.XMLNode.AppendChild(Me.XMLDoc.ImportNode(node.XmlNode, False))
             node.ID = (node.ParentNameSpace & "_" & Conversions.ToString(Me.XMLNode.ChildNodes.Count))
+			Logger.LogDebug(">>> Entering Add(objNode={ObjNode})", objNode)
+			Logger.LogDebug("<<< Exiting Add()")
+			Logger.LogDebug("<<< Exiting Add(objNode={ObjNode})", objNode)
+			Logger.LogDebug("<<< Exiting Add(strID={StrID},strKey={StrKey},strText={StrText},strNavigateURL={StrNavigateURL},strJSFunction={StrJSFunction},strTarget={StrTarget},strToolTip={StrToolTip},blnEnabled={BlnEnabled},strCSSClass={StrCSSClass},strCSSClassSelected={StrCSSClassSelected},strCSSClassHover={StrCSSClassHover})", strID, strKey, strText, strNavigateURL, strJSFunction, strTarget, strToolTip, blnEnabled, strCSSClass, strCSSClassSelected, strCSSClassHover)
             Return (Me.XMLNode.ChildNodes.Count - 1)
         End Function
 
@@ -54,6 +72,7 @@ Namespace DotNetNuke.UI.WebControls
             Dim newChild As XmlNode = Me.XMLDoc.ImportNode(objNode.XmlNode, True)
             Me.XMLNode.AppendChild(newChild)
             objNode.AssociateXmlNode(newChild)
+			Logger.LogDebug(">>> Entering Add(strID={StrID},strKey={StrKey},strText={StrText},strNavigateURL={StrNavigateURL},strJSFunction={StrJSFunction},strTarget={StrTarget},strToolTip={StrToolTip},blnEnabled={BlnEnabled},strCSSClass={StrCSSClass},strCSSClassSelected={StrCSSClassSelected},strCSSClassHover={StrCSSClassHover})", strID, strKey, strText, strNavigateURL, strJSFunction, strTarget, strToolTip, blnEnabled, strCSSClass, strCSSClassSelected, strCSSClassHover)
             Return (Me.XMLNode.ChildNodes.Count - 1)
         End Function
 
@@ -77,19 +96,25 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Public Function AddBreak() As Integer
+			Logger.LogDebug(">>> Entering AddBreak()")
             Dim num2 As Integer = Me.Add
             Me(num2).IsBreak = True
+			Logger.LogDebug("<<< Exiting AddBreak()")
             Return num2
         End Function
 
         Public Function Contains(ByVal value As DNNNode) As Boolean
+			Logger.LogDebug(">>> Entering Contains(value={Value})", value)
+			Logger.LogDebug("<<< Exiting Contains(value={Value})", value)
             Return Not Object.ReferenceEquals(Me.FindNode(value.ID), Nothing)
         End Function
 
         Public Sub CopyTo(ByVal myArr As Array, ByVal index As Integer)
+			Logger.LogDebug(">>> Entering CopyTo(myArr={MyArr},index={Index})", myArr, index)
             Dim enumerator As IEnumerator = Nothing
             Try 
                 enumerator = MyBase.InnerXMLNode.ChildNodes.GetEnumerator
+				Logger.LogDebug("CopyTo(myArr={MyArr},index={Index}): enumerator → {Enumerator}", myArr, index, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -103,9 +128,14 @@ Namespace DotNetNuke.UI.WebControls
                     TryCast(enumerator,IDisposable).Dispose
                 End If
             End Try
+			Logger.LogDebug("<<< Exiting CopyTo(myArr={MyArr},index={Index})", myArr, index)
         End Sub
 
         Private Function DoTransform(ByVal XML As String, ByVal XSL As String) As String
+			Logger.LogDebug(">>> Entering DoTransform(XML={XML},XSL={XSL})", XML, XSL)
+			Logger.LogDebug(">>> Entering DoTransform(XML={XML},XSL={XSL},Params={Params})", XML, XSL, Params)
+			Logger.LogDebug("<<< Exiting DoTransform(XML={XML},XSL={XSL})", XML, XSL)
+			Logger.LogDebug("<<< Exiting DoTransform(XML={XML},XSL={XSL},Params={Params})", XML, XSL, Params)
             Return Me.DoTransform(XML, XSL, Nothing)
         End Function
 
@@ -135,10 +165,12 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Friend Function FindFast(ByVal Key As String, ByVal Value As String, ByVal Parent As XmlNode, ByVal OptimizedForSmallData As Boolean) As XmlNode
+			Logger.LogDebug(">>> Entering FindFast(Key={Key},Value={Value},Parent={Parent},OptimizedForSmallData={OptimizedForSmallData})", Key, Value, Parent, OptimizedForSmallData)
             Dim node As XmlNode = Nothing
             Try 
                 If Not OptimizedForSmallData Then
                     node = Parent.SelectSingleNode($".//n[@{Key}='{Value}']")
+					Logger.LogDebug("FindFast(Key={Key},Value={Value},Parent={Parent},OptimizedForSmallData={OptimizedForSmallData}): node → {Node}", Key, Value, Parent, OptimizedForSmallData, node)
                 Else
                     Dim firstChild As XmlNode = Parent.FirstChild
                     Do While True
@@ -154,6 +186,7 @@ Namespace DotNetNuke.UI.WebControls
                                     End If
                                 End If
                                 firstChild = firstChild.NextSibling
+								Logger.LogDebug("FindFast(Key={Key},Value={Value},Parent={Parent},OptimizedForSmallData={OptimizedForSmallData}): firstChild → {FirstChild}", Key, Value, Parent, OptimizedForSmallData, firstChild)
                                 Continue Do
                             End If
                             node = firstChild
@@ -163,23 +196,30 @@ Namespace DotNetNuke.UI.WebControls
                 End If
             Catch exception1 As Exception
                 Dim ex As Exception = exception1
+				Logger.LogError("Exception in FindFast(Key={Key},Value={Value},Parent={Parent},OptimizedForSmallData={OptimizedForSmallData}): {Arg4}", Key, Value, Parent, OptimizedForSmallData, ex.Message)
                 ProjectData.SetProjectError(ex)
                 Throw ex
             End Try
+			Logger.LogDebug("<<< Exiting FindFast(Key={Key},Value={Value},Parent={Parent},OptimizedForSmallData={OptimizedForSmallData})", Key, Value, Parent, OptimizedForSmallData)
             Return node
         End Function
 
         Public Function FindNode(ByVal ID As String) As DNNNode
+			Logger.LogDebug(">>> Entering FindNode(ID={ID})", ID)
             Dim objA As XmlNode = Me.FindFast("id", ID, Me.XMLNode, True)
+			Logger.LogDebug("<<< Exiting FindNode(ID={ID})", ID)
             Return If(Object.ReferenceEquals(objA, Nothing), Nothing, New DNNNode(objA))
         End Function
 
         Public Function FindNodeByKey(ByVal Key As String) As DNNNode
+			Logger.LogDebug(">>> Entering FindNodeByKey(Key={Key})", Key)
             Dim objA As XmlNode = Me.FindFast("key", Key, Me.XMLNode, True)
+			Logger.LogDebug("<<< Exiting FindNodeByKey(Key={Key})", Key)
             Return If(Object.ReferenceEquals(objA, Nothing), Nothing, New DNNNode(objA))
         End Function
 
         Public Overridable Function FindSelectedNodes() As Collection
+			Logger.LogDebug(">>> Entering FindSelectedNodes()")
             Dim collection As New Collection
             Dim flag As Boolean = Not Object.ReferenceEquals(Me.XMLNode, Nothing)
             If flag Then
@@ -187,8 +227,10 @@ Namespace DotNetNuke.UI.WebControls
                 Dim list As XmlNodeList = Me.XMLNode.SelectNodes("//n[@selected='1']")
                 Try 
                     enumerator = list.GetEnumerator
+					Logger.LogDebug("FindSelectedNodes(): enumerator → {Enumerator}", enumerator)
                     Do While True
                         flag = enumerator.MoveNext
+						Logger.LogDebug("FindSelectedNodes(): flag → {Flag}", flag)
                         If Not flag Then
                             Exit Do
                         End If
@@ -201,6 +243,7 @@ Namespace DotNetNuke.UI.WebControls
                     End If
                 End Try
             End If
+			Logger.LogDebug("<<< Exiting FindSelectedNodes()")
             Return collection
         End Function
 
@@ -209,6 +252,10 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Public Function Import(ByVal objNode As DNNNode) As Integer
+			Logger.LogDebug(">>> Entering Import(objNode={ObjNode})", objNode)
+			Logger.LogDebug(">>> Entering Import(objNode={ObjNode},blnDeep={BlnDeep})", objNode, blnDeep)
+			Logger.LogDebug("<<< Exiting Import(objNode={ObjNode})", objNode)
+			Logger.LogDebug("<<< Exiting Import(objNode={ObjNode},blnDeep={BlnDeep})", objNode, blnDeep)
             Return Me.Import(objNode, True)
         End Function
 
@@ -219,6 +266,7 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Public Function IndexOf(ByVal value As DNNNode) As Integer
+			Logger.LogDebug(">>> Entering IndexOf(value={Value})", value)
             Dim num3 As Integer = (Me.XMLNode.ChildNodes.Count - 1)
             Dim num As Integer = 0
             Do While True
@@ -230,21 +278,27 @@ Namespace DotNetNuke.UI.WebControls
                         Continue Do
                     End If
                     num2 = num
+					Logger.LogDebug("IndexOf(value={Value}): num2 → {Num2}", value, num2)
                 End If
                 Return num2
             Loop
 
+			Logger.LogDebug("<<< Exiting IndexOf(value={Value})", value)
             Return Nothing
         End Function
 
         Public Sub InsertAfter(ByVal index As Integer, ByVal value As DNNNode)
+			Logger.LogDebug(">>> Entering InsertAfter(index={Index},value={Value})", index, value)
             Dim newChild As XmlNode = Me.XMLDoc.ImportNode(value.XmlNode, True)
             Me.XMLNode.InsertAfter(newChild, Me.XMLNode.ChildNodes(index))
+			Logger.LogDebug("<<< Exiting InsertAfter(index={Index},value={Value})", index, value)
         End Sub
 
         Public Sub InsertBefore(ByVal index As Integer, ByVal value As DNNNode)
+			Logger.LogDebug(">>> Entering InsertBefore(index={Index},value={Value})", index, value)
             Dim newChild As XmlNode = Me.XMLDoc.ImportNode(value.XmlNode, True)
             Me.XMLNode.InsertBefore(newChild, Me.XMLNode.ChildNodes(index))
+			Logger.LogDebug("<<< Exiting InsertBefore(index={Index},value={Value})", index, value)
         End Sub
 
         <Obsolete("Use LoadJSON IEnumerable instead")> _
@@ -277,6 +331,8 @@ Namespace DotNetNuke.UI.WebControls
                     TryCast(enumerator,IDisposable).Dispose
                 End If
             End Try
+			Logger.LogDebug(">>> Entering LoadJSON(JSONNodes={JSONNodes})", JSONNodes)
+			Logger.LogDebug("LoadJSON(JSONNodes={JSONNodes}): enumerator → {Enumerator}", JSONNodes, enumerator)
         End Sub
 
         Public Sub LoadJSON(ByVal JSONNodes As IEnumerable)
@@ -308,14 +364,19 @@ Namespace DotNetNuke.UI.WebControls
                     TryCast(enumerator,IDisposable).Dispose
                 End If
             End Try
+			Logger.LogDebug("<<< Exiting LoadJSON(JSONNodes={JSONNodes})", JSONNodes)
         End Sub
 
         Public Sub Remove(ByVal value As DNNNode)
+			Logger.LogDebug(">>> Entering Remove(value={Value})", value)
             Me.XMLNode.RemoveChild(value.XmlNode)
+			Logger.LogDebug("<<< Exiting Remove(value={Value})", value)
+			Logger.LogDebug(">>> Entering Remove(index={Index})", index)
         End Sub
 
         Public Sub Remove(ByVal index As Integer)
             Me.XMLNode.RemoveChild(Me.XMLNode.ChildNodes(index))
+			Logger.LogDebug("<<< Exiting Remove(index={Index})", index)
         End Sub
 
         Public Shadows Sub RemoveAt(ByVal index As Integer)
@@ -323,11 +384,13 @@ Namespace DotNetNuke.UI.WebControls
         End Sub
 
         Public Function ToJSON() As String
+			Logger.LogDebug(">>> Entering ToJSON()")
             Dim enumerator As IEnumerator = Nothing
             Dim builder As New StringBuilder
             builder.Append("nodes:[")
             Try 
                 enumerator = Me.GetEnumerator
+				Logger.LogDebug("ToJSON(): enumerator → {Enumerator}", enumerator)
                 Do While True
                     Dim flag As Boolean
                     If Not enumerator.MoveNext Then
@@ -338,6 +401,7 @@ Namespace DotNetNuke.UI.WebControls
                         builder.Append(","c)
                     End If
                     flag = True
+					Logger.LogDebug("ToJSON(): flag → {Flag}", flag)
                     builder.Append(current.ToJSON(True))
                 Loop
             Finally
@@ -346,10 +410,13 @@ Namespace DotNetNuke.UI.WebControls
                 End If
             End Try
             builder.Append("]"c)
+			Logger.LogDebug("<<< Exiting ToJSON()")
             Return builder.ToString
         End Function
 
         Public Function ToXml() As String
+			Logger.LogDebug(">>> Entering ToXml()")
+			Logger.LogDebug("<<< Exiting ToXml()")
             Return Me.XMLDoc.OuterXml
         End Function
 

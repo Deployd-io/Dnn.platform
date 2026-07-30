@@ -13,6 +13,7 @@ namespace DNN.Integration.Test.Framework.Controllers
 
     public static class RoleController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Opml));
         private const string PortalIdMarker = @"'$[portal_id]'";
         private const string RoleNameMarker = @"$[role_name]";
         private const string RoleDescriptionMarker = @"$[role_description]";
@@ -21,17 +22,21 @@ namespace DNN.Integration.Test.Framework.Controllers
 
         public static int CreateBasicRole(string roleName, string roleDescription = "")
         {
+			Logger.LogDebug(">>> Entering CreateBasicRole(roleName={RoleName},roleDescription={RoleDescription})", roleName, roleDescription);
+			Logger.LogDebug("<<< Exiting CreateBasicRole(roleName={RoleName},roleDescription={RoleDescription})", roleName, roleDescription);
             return CreateRole(roleName, roleDescription);
         }
 
         public static int CreateRoleIfNotPresent(string roleName, int portalId = 0)
         {
+			Logger.LogDebug(">>> Entering CreateRoleIfNotPresent(roleName={RoleName},portalId={PortalId})", roleName, portalId);
             if (!string.IsNullOrEmpty(roleName))
             {
                 var roleId = GetRoleId(roleName, portalId);
                 return roleId < 0 ? CreateRole(roleName, roleName, portalId) : roleId;
             }
 
+			Logger.LogDebug("<<< Exiting CreateRoleIfNotPresent(roleName={RoleName},portalId={PortalId})", roleName, portalId);
             return -1;
         }
 
@@ -39,6 +44,8 @@ namespace DNN.Integration.Test.Framework.Controllers
         /// <returns></returns>
         public static int GetRegisteredUsersRoleId(int portalId = 0)
         {
+			Logger.LogDebug(">>> Entering GetRegisteredUsersRoleId(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetRegisteredUsersRoleId(portalId={PortalId})", portalId);
             return GetRoleId("Registered Users", portalId);
         }
 
@@ -46,17 +53,25 @@ namespace DNN.Integration.Test.Framework.Controllers
         /// <returns></returns>
         public static int GetAdministratorsRoleId(int portalId = 0)
         {
+			Logger.LogDebug(">>> Entering GetAdministratorsRoleId(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetAdministratorsRoleId(portalId={PortalId})", portalId);
             return GetRoleId("Administrators", portalId);
         }
 
         public static int GetRoleId(string roleName, int portalId = 0)
         {
+			Logger.LogDebug(">>> Entering GetRoleId(roleName={RoleName},portalId={PortalId})", roleName, portalId);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             // The fix for DNN-4288 prevented virtual roles from getting virtual
             // roles (i.e., with RoleID <= 0 which includes Administrator role).
             // var results = DatabaseHelper.ExecuteStoredProcedure("GetRolesBasicSearch", portalId, 0, 10, roleName);
             roleName = roleName.Replace("'", string.Empty);
             var query = string.Format("SELECT RoleID FROM {{objectQualifier}}Roles WHERE RoleName = N'{0}' AND PortalID={1};", roleName, portalId);
             var results = DatabaseHelper.ExecuteQuery(query).ToArray();
+			Logger.LogDebug("GetRoleId(roleName={RoleName},portalId={PortalId}): roleName → {RoleName1}", roleName, portalId, roleName);
+			Logger.LogDebug("GetRoleId(roleName={RoleName},portalId={PortalId}): query → {Query}", roleName, portalId, query);
+			Logger.LogDebug("GetRoleId(roleName={RoleName},portalId={PortalId}): results → {Results}", roleName, portalId, results);
+			Logger.LogInformation("GetRoleId(roleName,portalId)={RoleName},{PortalId}: find query executed in {Arg2} ms", roleName, portalId, __logStart.ElapsedMilliseconds);
 
             if (!results.Any())
             {
@@ -64,6 +79,7 @@ namespace DNN.Integration.Test.Framework.Controllers
             }
 
             // we could have more than a single role with same name when we have more than one portal
+			Logger.LogDebug("<<< Exiting GetRoleId(roleName={RoleName},portalId={PortalId})", roleName, portalId);
             return results.SelectMany(x => x.Where(y => y.Key == "RoleID").Select(y => (int)y.Value)).FirstOrDefault();
         }
 
@@ -88,6 +104,7 @@ namespace DNN.Integration.Test.Framework.Controllers
 
         private static int CreateRole(string roleName, string roleDescription, int portalId = 0)
         {
+			Logger.LogDebug(">>> Entering CreateRole(roleName={RoleName},roleDescription={RoleDescription},portalId={PortalId})", roleName, roleDescription, portalId);
             var fileContent = SqlScripts.SingleRoleCreation;
             var masterScript = new StringBuilder(fileContent)
                 .Replace(PortalIdMarker, portalId.ToString(CultureInfo.InvariantCulture))
