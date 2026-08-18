@@ -4,36 +4,49 @@ import DayPicker from "../DayPicker/DayPicker.jsx";
 import { Button, GridCell } from "@dnnsoftware/dnn-react-common";
 import "./styles.less";
 import Localization from "../../localization";
+const logger = console;
 
 class DropdownDayPicker extends Component  {
 
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         document.addEventListener("click", this.handleClick.bind(this), false);
         this._isMounted = true;
+		logger.debug(`componentDidMount(): this._isMounted → ${this._isMounted}`);
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
 
     componentWillUnmount() {
+		logger.debug('>>> Entering componentWillUnmount()');
         document.removeEventListener("click", this.handleClick.bind(this), false);
         this._isMounted = false;
+		logger.debug(`componentWillUnmount(): this._isMounted → ${this._isMounted}`);
+		logger.debug('<<< Exiting componentWillUnmount()');
     }
 
     handleClick(e) {
+		logger.debug(`>>> Entering handleClick(e=${e})`);
         const {toggleDropdownCalendar, dropdownIsActive} = this.props;
         if (!this._isMounted) { return; }
         if (!this.node.contains(e.target)) {
             dropdownIsActive ? toggleDropdownCalendar(false) : null;
+			logger.debug(`<<< Exiting handleClick(e=${e})`);
         }
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {dropdownIsActive, onDayClick, applyChanges, clearChanges, startDate, endDate, toggleDropdownCalendar} = this.props;
         const CalendarIcon = this.props.calendarIcon;
+		logger.debug('<<< Exiting render()');
         return (
             <div className="date-picker" ref={node => this.node = node}>
                 <GridCell className="calendar-dropdown-container" columnSize={100} style={{padding: "0px 5px"}}>

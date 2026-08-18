@@ -1,3 +1,4 @@
+const logger = console;
 ﻿/// <reference name="MicrosoftAjax.js" />
 
 Type.registerNamespace('dnn.controls');
@@ -44,6 +45,7 @@ dnn.controls.triStateManager = function (images, toolTips) {
 
         if ($hdn.hasClass('fullControl')) {
             $collection.each(function (index, elem) {
+				logger.debug(`>>> Entering each($elem=${$elem})`);
                 var $elem = jQuery(elem);
                 if (!$elem.hasClass('lockedPerm')) {
                     elem.value = hidden.value;
@@ -114,6 +116,7 @@ dnn.controls.triStateManager = function (images, toolTips) {
         var img = $hdn.siblings('img')[0];
         img.src = images[state];
         img.alt = toolTips[state];
+		logger.debug(`<<< Exiting updateImage($hdn=${$hdn},state=${state})`);
     }
 
     return that;

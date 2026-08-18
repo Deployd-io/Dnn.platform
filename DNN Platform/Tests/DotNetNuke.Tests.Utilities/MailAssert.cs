@@ -10,54 +10,72 @@ namespace DotNetNuke.Tests.Utilities
     using System.Text.RegularExpressions;
 
     using NUnit.Framework;
+	using Microsoft.Extensions.Logging;
 
     public static class MailAssert
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public static void Base64EncodedContentLineContains(string expectedValue, string toAddress, string findByText)
         {
+			_logger.LogDebug(">>> Entering Base64EncodedContentLineContains(expectedValue={ExpectedValue},toAddress={ToAddress},findByText={FindByText})", expectedValue, toAddress, findByText);
             var contentLine = ConvertEmailContentFromBase64ToUnicode(GetEmailFileName(toAddress, findByText));
 
+			_logger.LogDebug("Base64EncodedContentLineContains(expectedValue={ExpectedValue},toAddress={ToAddress},findByText={FindByText}): contentLine → {ContentLine}", expectedValue, toAddress, findByText, contentLine);
             Assert.That(contentLine, Does.Contain(expectedValue));
+			_logger.LogDebug("<<< Exiting Base64EncodedContentLineContains(expectedValue={ExpectedValue},toAddress={ToAddress},findByText={FindByText})", expectedValue, toAddress, findByText);
         }
 
         public static void ContentLineContains(string expectedValue, string toAddress, string findByText)
         {
+			_logger.LogDebug(">>> Entering ContentLineContains(expectedValue={ExpectedValue},toAddress={ToAddress},findByText={FindByText})", expectedValue, toAddress, findByText);
             var contentLine = FindContentUsingRegex(expectedValue, GetEmailFileName(toAddress, findByText));
 
+			_logger.LogDebug("ContentLineContains(expectedValue={ExpectedValue},toAddress={ToAddress},findByText={FindByText}): contentLine → {ContentLine}", expectedValue, toAddress, findByText, contentLine);
             Assert.That(string.IsNullOrEmpty(contentLine), Is.False);
+			_logger.LogDebug("<<< Exiting ContentLineContains(expectedValue={ExpectedValue},toAddress={ToAddress},findByText={FindByText})", expectedValue, toAddress, findByText);
         }
 
         public static void FromLineContains(string expectedValue, string toAddress, string findByText)
         {
+			_logger.LogDebug(">>> Entering FromLineContains(expectedValue={ExpectedValue},toAddress={ToAddress},findByText={FindByText})", expectedValue, toAddress, findByText);
             string fromLine = FindEmailLineUsingRegex("From", GetEmailFileName(toAddress, findByText));
 
             Assert.That(fromLine, Does.Contain(expectedValue));
+			_logger.LogDebug("<<< Exiting FromLineContains(expectedValue={ExpectedValue},toAddress={ToAddress},findByText={FindByText})", expectedValue, toAddress, findByText);
         }
 
         public static void MessageSent(string expectedValue, string toAddress, string message)
         {
+			_logger.LogDebug(">>> Entering MessageSent(expectedValue={ExpectedValue},toAddress={ToAddress},message={Message})", expectedValue, toAddress, message);
             GetEmailFileName(toAddress, expectedValue);
+			_logger.LogDebug("<<< Exiting MessageSent(expectedValue={ExpectedValue},toAddress={ToAddress},message={Message})", expectedValue, toAddress, message);
         }
 
         public static void ReplyToLineContains(string expectedValue, string toAddress, string findByText)
         {
+			_logger.LogDebug(">>> Entering ReplyToLineContains(expectedValue={ExpectedValue},toAddress={ToAddress},findByText={FindByText})", expectedValue, toAddress, findByText);
             string replyToLine = FindEmailLineUsingRegex("Reply-To", GetEmailFileName(toAddress, findByText));
 
             Assert.That(replyToLine, Does.Contain(expectedValue));
+			_logger.LogDebug("<<< Exiting ReplyToLineContains(expectedValue={ExpectedValue},toAddress={ToAddress},findByText={FindByText})", expectedValue, toAddress, findByText);
         }
 
         public static void SubjectLineContains(string expectedValue, string toAddress, string findByText)
         {
+			_logger.LogDebug(">>> Entering SubjectLineContains(expectedValue={ExpectedValue},toAddress={ToAddress},findByText={FindByText})", expectedValue, toAddress, findByText);
             string subjectLine = FindEmailLineUsingRegex("Subject", GetEmailFileName(toAddress, findByText));
 
             Assert.That(subjectLine, Does.Contain(expectedValue));
+			_logger.LogDebug("<<< Exiting SubjectLineContains(expectedValue={ExpectedValue},toAddress={ToAddress},findByText={FindByText})", expectedValue, toAddress, findByText);
         }
 
         public static void ToLineContains(string expectedValue, string toAddress, string findByText)
         {
+			_logger.LogDebug(">>> Entering ToLineContains(expectedValue={ExpectedValue},toAddress={ToAddress},findByText={FindByText})", expectedValue, toAddress, findByText);
             string toLine = FindEmailLineUsingRegex("To", GetEmailFileName(toAddress, findByText));
 
             Assert.That(toLine, Does.Contain(expectedValue));
+			_logger.LogDebug("<<< Exiting ToLineContains(expectedValue={ExpectedValue},toAddress={ToAddress},findByText={FindByText})", expectedValue, toAddress, findByText);
         }
 
         private static string ConvertEmailContentFromBase64ToUnicode(string emailFileName)
@@ -109,6 +127,9 @@ namespace DotNetNuke.Tests.Utilities
 
         private static string GetEmailFileName(string toAddress, string findByText)
         {
+			_logger.LogDebug(">>> Entering GetEmailFileName(toAddress={ToAddress},findByText={FindByText})", toAddress, findByText);
+			_logger.LogDebug("<<< Exiting GetEmailFileName(toAddress={ToAddress},findByText={FindByText})", toAddress, findByText);
+			_logger.LogDebug("<<< Exiting GetEmailFileName(toAddress={ToAddress},findByText={FindByText},message={Message})", toAddress, findByText, message);
             return GetEmailFileName(toAddress, findByText, "The newsletter sent to " + toAddress + " could not be found");
         }
 

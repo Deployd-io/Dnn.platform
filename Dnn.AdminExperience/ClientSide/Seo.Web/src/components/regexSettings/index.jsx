@@ -8,10 +8,12 @@ import { InputGroup, SingleLineInputWithError, Label, Button, Tooltip } from "@d
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 class RegexSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             regexSettings: undefined,
             triedToSubmit: false,
@@ -28,9 +30,11 @@ class RegexSettingsPanelBody extends Component {
                 RegexMatch: false
             }
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {props} = this;
         if (props.regexSettings) {
             this.setState({
@@ -43,18 +47,23 @@ class RegexSettingsPanelBody extends Component {
                 regexSettings: Object.assign({}, data.Settings)
             });
         }));
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     UNSAFE_componentWillReceiveProps(props) {
+		logger.debug(`>>> Entering UNSAFE_componentWillReceiveProps(props=${props})`);
         this.setState({
             regexSettings: Object.assign({}, props.regexSettings),
             triedToSubmit: false
         });
+		logger.debug(`<<< Exiting UNSAFE_componentWillReceiveProps(props=${props})`);
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let {state, props} = this;
         let regexSettings = Object.assign({}, state.regexSettings);
+		logger.debug(`onSettingChange(key=${key},event=${event}): regexSettings → ${regexSettings}`);
 
         regexSettings[key] = typeof (event) === "object" ? event.target.value : event;
 
@@ -64,9 +73,11 @@ class RegexSettingsPanelBody extends Component {
         });
 
         props.dispatch(SeoActions.regexSettingsClientModified(regexSettings));
+		logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
     }
 
     onUpdate(event) {
+		logger.debug(`>>> Entering onUpdate(event=${event})`);
         event.preventDefault();
         const {props, state} = this;
         this.setState({
@@ -94,11 +105,13 @@ class RegexSettingsPanelBody extends Component {
             }
             else {
                 util.utilities.notifyError(resx.get("SettingsError"));
+				logger.debug(`<<< Exiting onUpdate(event=${event})`);
             }
         }));
     }
 
     handleValidationErrors(errors) {
+		logger.debug(`>>> Entering handleValidationErrors(errors=${errors})`);
         let {state} = this;
 
         if (errors.filter(error => { return error.Key === "IgnoreRegex"; }).length > 0) {
@@ -160,6 +173,7 @@ class RegexSettingsPanelBody extends Component {
         }
         else {
             state.error["RegexMatch"] = false;
+			logger.debug(`<<< Exiting handleValidationErrors(errors=${errors})`);
         }
 
         this.setState({
@@ -168,9 +182,11 @@ class RegexSettingsPanelBody extends Component {
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const {props} = this;
         util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SeoActions.getRegexSettings((data) => {
+				logger.debug('<<< Exiting onCancel()');
                 this.setState({
                     regexSettings: Object.assign({}, data.Settings)
                 });
@@ -180,8 +196,10 @@ class RegexSettingsPanelBody extends Component {
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {state} = this;
         if (state.regexSettings) {
+			logger.debug('<<< Exiting render()');
             return (
                 <div className={styles.regexSettings}>
                     <div className="columnTitle">{resx.get("RegularExpressions")}</div>
@@ -414,6 +432,8 @@ RegexSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         regexSettings: state.seo.regexSettings,

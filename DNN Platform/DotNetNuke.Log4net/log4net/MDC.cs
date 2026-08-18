@@ -55,6 +55,8 @@ namespace log4net
         /// </remarks>
         private MDC()
         {
+		value.LogDebug(">>> Entering MDC()");
+		value.LogDebug("<<< Exiting MDC()");
         }
 
         /// <summary>Gets the context value identified by the <paramref name="key" /> parameter.</summary>
@@ -75,9 +77,11 @@ namespace log4net
         /*[Obsolete("MDC has been replaced by ThreadContext.Properties")]*/
         public static string Get(string key)
         {
+			value.LogDebug(">>> Entering Get(key={Key})", key);
             object obj = ThreadContext.Properties[key];
             if (obj == null)
             {
+			value.LogDebug("<<< Exiting Get(key={Key})", key);
                 return null;
             }
             return obj.ToString();
@@ -107,7 +111,9 @@ namespace log4net
         /*[Obsolete("MDC has been replaced by ThreadContext.Properties")]*/
         public static void Set(string key, string value)
         {
+			value.LogDebug(">>> Entering Set(key={Key},value={Value})", key, value);
             ThreadContext.Properties[key] = value;
+			value.LogDebug("<<< Exiting Set(key={Key},value={Value})", key, value);
         }
 
         /// <summary>Removes the key value mapping for the key specified.</summary>
@@ -126,7 +132,9 @@ namespace log4net
         /*[Obsolete("MDC has been replaced by ThreadContext.Properties")]*/
         public static void Remove(string key)
         {
+			value.LogDebug(">>> Entering Remove(key={Key})", key);
             ThreadContext.Properties.Remove(key);
+			value.LogDebug("<<< Exiting Remove(key={Key})", key);
         }
 
         /// <summary>Clear all entries in the MDC</summary>
@@ -144,7 +152,9 @@ namespace log4net
         /*[Obsolete("MDC has been replaced by ThreadContext.Properties")]*/
         public static void Clear()
         {
+			value.LogDebug(">>> Entering Clear()");
             ThreadContext.Properties.Clear();
+			value.LogDebug("<<< Exiting Clear()");
         }
     }
 }

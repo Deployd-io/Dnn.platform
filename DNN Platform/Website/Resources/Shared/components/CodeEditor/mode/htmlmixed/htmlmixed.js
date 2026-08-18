@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("../xml/xml"), require("../javascript/javascript"), require("../css/css"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,12 +13,15 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("htmlmixed", function(config, parserConfig) {
+logger.debug('>>> Entering defineMode()');
   var htmlMode = CodeMirror.getMode(config, {name: "xml",
                                              htmlMode: true,
                                              multilineTagIndentFactor: parserConfig.multilineTagIndentFactor,
                                              multilineTagIndentPastTag: parserConfig.multilineTagIndentPastTag});
   var cssMode = CodeMirror.getMode(config, "css");
+logger.debug(`defineMode(): cssMode → ${cssMode}`);
 
   var scriptTypes = [], scriptTypesConf = parserConfig && parserConfig.scriptTypes;
   scriptTypes.push({matches: /^(?:text|application)\/(?:x-)?(?:java|ecma)script$|^$/i,
@@ -27,6 +32,7 @@ CodeMirror.defineMode("htmlmixed", function(config, parserConfig) {
   }
   scriptTypes.push({matches: /./,
                     mode: CodeMirror.getMode(config, "text/plain")});
+					logger.debug('<<< Exiting defineMode()');
 
   function html(stream, state) {
     var tagName = state.htmlState.tagName;
@@ -86,31 +92,41 @@ CodeMirror.defineMode("htmlmixed", function(config, parserConfig) {
 
   return {
     startState: function() {
+	logger.debug('>>> Entering startState()');
       var state = htmlMode.startState();
+	logger.debug('<<< Exiting startState()');
       return {token: html, localMode: null, localState: null, htmlState: state};
     },
 
     copyState: function(state) {
+	logger.debug(`>>> Entering copyState(state=${state})`);
       if (state.localState)
         var local = CodeMirror.copyState(state.localMode, state.localState);
       return {token: state.token, localMode: state.localMode, localState: local,
               htmlState: CodeMirror.copyState(htmlMode, state.htmlState)};
+			logger.debug(`<<< Exiting copyState(state=${state})`);
     },
 
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
+	logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
       return state.token(stream, state);
     },
 
     indent: function(state, textAfter) {
+	logger.debug(`>>> Entering indent(state=${state},textAfter=${textAfter})`);
       if (!state.localMode || /^\s*<\//.test(textAfter))
         return htmlMode.indent(state.htmlState, textAfter);
       else if (state.localMode.indent)
         return state.localMode.indent(state.localState, textAfter);
       else
+		logger.debug(`<<< Exiting indent(state=${state},textAfter=${textAfter})`);
         return CodeMirror.Pass;
     },
 
     innerMode: function(state) {
+	logger.debug(`>>> Entering innerMode(state=${state})`);
+	logger.debug(`<<< Exiting innerMode(state=${state})`);
       return {state: state.localState || state.htmlState, mode: state.localMode || htmlMode};
     }
   };

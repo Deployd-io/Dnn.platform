@@ -15,9 +15,12 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
     /// <summary>Represents an included client resource.</summary>
     public abstract class ClientResourceInclude : Control
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ClientResourceInclude));
         /// <summary>Initializes a new instance of the <see cref="ClientResourceInclude"/> class.</summary>
         protected ClientResourceInclude()
         {
+		Logger.LogDebug(">>> Entering ClientResourceInclude()");
+		Logger.LogDebug("<<< Exiting ClientResourceInclude()");
         }
 
         /// <summary>Gets the type of client dependency for this resource (e.g., <see cref="ClientDependencyType.Javascript"/> or <see cref="ClientDependencyType.Css"/>).</summary>
@@ -87,6 +90,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <param name="resource">The resource to register.</param>
         protected void RegisterResource(IResource resource)
         {
+			Logger.LogDebug(">>> Entering RegisterResource(resource={Resource})", resource);
             resource = resource
                 .SetNameAndVersion(this.Name, this.Version, this.ForceVersion)
                 .SetProvider(this.ForceProvider)
@@ -99,6 +103,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
             if (this.Blocking)
             {
                 resource = resource.SetBlocking();
+				Logger.LogDebug("RegisterResource(resource={Resource}): resource → {Resource1}", resource, resource);
             }
 
             var attributes = this.HtmlAttributes;
@@ -110,6 +115,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
             }
 
             resource.Register();
+			Logger.LogDebug("<<< Exiting RegisterResource(resource={Resource})", resource);
         }
 
         /// <seealso href="https://github.com/dnnsoftware/ClientDependency/blob/7bf46d9a9b8540e71496fa76ed5d122ec4a16257/src/ClientDependency.Core/HtmlAttributesStringParser.cs" />
@@ -195,6 +201,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
                     destination[key] = val;
                 }
             }
+			Logger.LogDebug("<<< Exiting ParseHtmlAttributesIntoDictionary(attributes={Attributes},destination={Destination})", attributes, destination);
         }
     }
 }

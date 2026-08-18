@@ -64,12 +64,15 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <inheritdoc />
         protected override void CommitFile(InstallFile insFile)
         {
+		Logger.LogDebug("<<< Exiting CommitFile(insFile={InsFile})", insFile);
         }
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         protected override void DeleteFile(InstallFile file)
         {
+		Logger.LogDebug(">>> Entering DeleteFile(file={File})", file);
+		Logger.LogDebug("<<< Exiting DeleteFile(file={File})", file);
         }
 
         /// <inheritdoc />
@@ -164,16 +167,20 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <inheritdoc />
         protected override InstallFile ReadManifestItem(XPathNavigator nav, bool checkFileExists)
         {
+			Logger.LogDebug(">>> Entering ReadManifestItem(nav={Nav},checkFileExists={CheckFileExists})", nav, checkFileExists);
             InstallFile insFile = base.ReadManifestItem(nav, checkFileExists);
 
+			Logger.LogDebug("ReadManifestItem(nav={Nav},checkFileExists={CheckFileExists}): insFile → {InsFile}", nav, checkFileExists, insFile);
             this.manifest = Util.ReadElement(nav, "manifest");
 
             if (string.IsNullOrEmpty(this.manifest))
             {
                 this.manifest = insFile.FullName + DEFAULT_MANIFESTEXT;
             }
+			Logger.LogDebug("ReadManifestItem(nav={Nav},checkFileExists={CheckFileExists}): this.manifest → {Arg2}", nav, checkFileExists, this.manifest);
 
             // Call base method
+			Logger.LogDebug("<<< Exiting ReadManifestItem(nav={Nav},checkFileExists={CheckFileExists})", nav, checkFileExists);
             return base.ReadManifestItem(nav, checkFileExists);
         }
 
@@ -196,17 +203,21 @@ namespace DotNetNuke.Services.Installer.Installers
                     Util.DeleteFile(entry.FullName, this.PhysicalBasePath, this.Log);
                 }
             }
+			Logger.LogDebug("<<< Exiting RollbackFile(insFile={InsFile})", insFile);
         }
 
         /// <inheritdoc />
         protected override void UnInstallFile(InstallFile unInstallFile)
         {
+			Logger.LogDebug(">>> Entering UnInstallFile(unInstallFile={UnInstallFile})", unInstallFile);
             this.manifest = unInstallFile.Name + ".manifest";
             XPathDocument doc;
+			Logger.LogDebug("UnInstallFile(unInstallFile={UnInstallFile}): this.manifest → {Arg1}", unInstallFile, this.manifest);
             using (var xmlReader = XmlReader.Create(Path.Combine(this.PhysicalBasePath, this.Manifest)))
             {
                 doc = new XPathDocument(xmlReader);
             }
+			Logger.LogDebug("UnInstallFile(unInstallFile={UnInstallFile}): doc → {Doc}", unInstallFile, doc);
 
             foreach (XPathNavigator fileNavigator in doc.CreateNavigator().Select("dotnetnuke/files/file"))
             {
@@ -230,6 +241,7 @@ namespace DotNetNuke.Services.Installer.Installers
             {
                 Util.DeleteFile(this.Manifest, this.PhysicalBasePath, this.Log);
             }
+			Logger.LogDebug("<<< Exiting UnInstallFile(unInstallFile={UnInstallFile})", unInstallFile);
         }
     }
 }

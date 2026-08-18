@@ -13,6 +13,8 @@ namespace Dnn.PersonaBar.Pages.Components.Exceptions
         public TemplateException(string message)
             : base(message)
         {
+		eventLogger.LogDebug(">>> Entering TemplateException(message={Message})", message);
+		eventLogger.LogDebug("<<< Exiting TemplateException(message={Message})", message);
         }
     }
 }

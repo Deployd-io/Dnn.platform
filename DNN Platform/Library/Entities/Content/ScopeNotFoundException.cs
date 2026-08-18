@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class ScopeNotFoundException : ApplicationException
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ScopeNotFoundException));
     /// <inheritdoc />
     public ScopeNotFoundException()
     {
+	Logger.LogDebug(">>> Entering ScopeNotFoundException()");
+	Logger.LogDebug("<<< Exiting ScopeNotFoundException()");
     }
 
     /// <inheritdoc />
     public ScopeNotFoundException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering ScopeNotFoundException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting ScopeNotFoundException(message={Message})", message);
 
     /// <inheritdoc />
     public ScopeNotFoundException(string message, Exception innerException)

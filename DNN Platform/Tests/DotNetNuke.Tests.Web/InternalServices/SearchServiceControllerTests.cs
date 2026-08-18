@@ -100,6 +100,7 @@ namespace DotNetNuke.Tests.Web.InternalServices
         [SetUp]
         public void SetUp()
         {
+			eventLogger.LogDebug(">>> Entering SetUp()");
             // Arrange
             Thread.CurrentThread.CurrentCulture = new CultureInfo(CultureEnUs);
 
@@ -107,12 +108,19 @@ namespace DotNetNuke.Tests.Web.InternalServices
             MockComponentProvider.ResetContainer();
 
             this.mockDataProvider = MockComponentProvider.CreateDataProvider();
+			eventLogger.LogDebug("SetUp(): mockDataProvider → {MockDataProvider}", mockDataProvider);
             this.mockLocaleController = MockComponentProvider.CreateLocaleController();
+			eventLogger.LogDebug("SetUp(): mockLocaleController → {MockLocaleController}", mockLocaleController);
             this.mockCachingProvider = MockComponentProvider.CreateDataCacheProvider();
+			eventLogger.LogDebug("SetUp(): mockCachingProvider → {MockCachingProvider}", mockCachingProvider);
             this.mockDataService = new Mock<IDataService>();
+			eventLogger.LogDebug("SetUp(): mockDataService → {MockDataService}", mockDataService);
             this.mockUserController = new Mock<IUserController>();
+			eventLogger.LogDebug("SetUp(): mockUserController → {MockUserController}", mockUserController);
             this.mockModuleController = new Mock<IModuleController>();
+			eventLogger.LogDebug("SetUp(): mockModuleController → {MockModuleController}", mockModuleController);
             this.mockTabController = new Mock<ITabController>();
+			eventLogger.LogDebug("SetUp(): mockTabController → {MockTabController}", mockTabController);
 
             this.SetupDataProvider();
             this.SetupHostController();
@@ -124,8 +132,11 @@ namespace DotNetNuke.Tests.Web.InternalServices
             TabController.SetTestableInstance(this.mockTabController.Object);
 
             this.mockCBO = new Mock<ICBO>();
+			eventLogger.LogDebug("SetUp(): mockCBO → {MockCBO}", mockCBO);
             var tabKey = $"{TabSearchTypeId}-{0}-{CultureEnUs}";
+			eventLogger.LogDebug("SetUp(): tabKey → {TabKey}", tabKey);
             var userKey = $"{UserSearchTypeId}-{0}-{CultureEnUs}";
+			eventLogger.LogDebug("SetUp(): userKey → {UserKey}", userKey);
             this.mockCBO
                 .Setup(c => c.GetCachedObject<IDictionary<string, string>>(It.IsAny<CacheItemArgs>(), It.IsAny<CacheItemExpiredCallback>(), It.IsAny<bool>()))
                 .Returns(new Dictionary<string, string> { { tabKey, TabSearchTypeName }, { userKey, UserSearchTypeName } });
@@ -133,8 +144,11 @@ namespace DotNetNuke.Tests.Web.InternalServices
 
             // create instance of the SearchServiceController
             var request = new HttpRequestMessage();
+			eventLogger.LogDebug("SetUp(): request → {Request}", request);
             var configuration = new HttpConfiguration();
+			eventLogger.LogDebug("SetUp(): configuration → {Configuration}", configuration);
             var provider = new Mock<ITabAndModuleInfoProvider>();
+			eventLogger.LogDebug("SetUp(): provider → {Provider}", provider);
             ModuleInfo expectedModule;
             provider.Setup(x => x.TryFindModuleInfo(request, out expectedModule)).Returns(true);
             configuration.AddTabAndModuleInfoProvider(provider.Object);
@@ -142,6 +156,7 @@ namespace DotNetNuke.Tests.Web.InternalServices
             this.serviceProvider = FakeServiceProvider.Setup(
                 services =>
                 {
+					eventLogger.LogDebug("SetUp(): serviceProvider → {ServiceProvider}", serviceProvider);
                     services.AddSingleton(this.mockDataProvider.Object);
                     services.AddSingleton(this.mockLocaleController.Object);
                     services.AddSingleton(this.mockCachingProvider.Object);
@@ -162,16 +177,22 @@ namespace DotNetNuke.Tests.Web.InternalServices
                 this.fakeHostController,
                 HtmlModDefId)
             {
+				eventLogger.LogDebug("SetUp(): searchServiceController → {SearchServiceController}", searchServiceController);
                 Request = request,
             };
+			eventLogger.LogDebug("SetUp(): Request → {Request}", Request);
 
             this.internalSearchController = InternalSearchController.Instance;
+			eventLogger.LogDebug("SetUp(): internalSearchController → {InternalSearchController}", internalSearchController);
+			eventLogger.LogDebug("SetUp(): this.internalSearchController → {Arg0}", this.internalSearchController);
             this.CreateNewLuceneControllerInstance();
+			eventLogger.LogDebug("<<< Exiting SetUp()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			eventLogger.LogDebug(">>> Entering TearDown()");
             this.serviceProvider.Dispose();
             this.luceneController.Dispose();
             this.searchServiceController?.Dispose();
@@ -183,11 +204,13 @@ namespace DotNetNuke.Tests.Web.InternalServices
             PortalController.ClearInstance();
             ModuleController.ClearInstance();
             HostController.ClearInstance();
+			eventLogger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void GetSearchResultsDetailed()
         {
+			eventLogger.LogDebug(">>> Entering GetSearchResultsDetailed()");
             const string keyword = "super";
             const string moduleBody = "super content is here";
             const string userUrl = "mysite/userid/1";
@@ -196,15 +219,21 @@ namespace DotNetNuke.Tests.Web.InternalServices
 
             // first tab with 2 modules
             var doc1 = new SearchDocument { UniqueKey = "key01", TabId = TabId1, Url = tabUrl1, Title = keyword, SearchTypeId = TabSearchTypeId, ModifiedTimeUtc = DateTime.UtcNow, };
+			eventLogger.LogDebug("GetSearchResultsDetailed(): doc1 → {Doc1}", doc1);
             var doc2 = new SearchDocument { UniqueKey = "key02", TabId = TabId1, Title = keyword, Url = tabUrl1, SearchTypeId = ModuleSearchTypeId, ModifiedTimeUtc = DateTime.UtcNow, ModuleDefId = HtmlModuleDefId, ModuleId = HtmlModuleId2, Body = moduleBody, RoleId = 731, };
+			eventLogger.LogDebug("GetSearchResultsDetailed(): doc2 → {Doc2}", doc2);
             var doc3 = new SearchDocument { UniqueKey = "key03", TabId = TabId1, Title = keyword, Url = tabUrl1, SearchTypeId = ModuleSearchTypeId, ModifiedTimeUtc = DateTime.UtcNow, ModuleDefId = HtmlModuleDefId, ModuleId = HtmlModuleId1, Body = moduleBody, RoleId = 731, };
+			eventLogger.LogDebug("GetSearchResultsDetailed(): doc3 → {Doc3}", doc3);
 
             // second tab with 1 module
             var doc4 = new SearchDocument { UniqueKey = "key04", TabId = TabId2, Url = tabUrl2, Title = keyword, SearchTypeId = TabSearchTypeId, ModifiedTimeUtc = DateTime.UtcNow, RoleId = RoleId0, };
+			eventLogger.LogDebug("GetSearchResultsDetailed(): doc4 → {Doc4}", doc4);
             var doc5 = new SearchDocument { UniqueKey = "key05", TabId = TabId2, Title = keyword, Url = tabUrl2, SearchTypeId = ModuleSearchTypeId, ModuleDefId = HtmlModuleId, ModuleId = HtmlModuleId3, ModifiedTimeUtc = DateTime.UtcNow, Body = moduleBody, RoleId = 731, };
+			eventLogger.LogDebug("GetSearchResultsDetailed(): doc5 → {Doc5}", doc5);
 
             // user doc
             var userDoc = new SearchDocument { UniqueKey = "key06", Url = userUrl, Title = keyword, SearchTypeId = UserSearchTypeId, ModifiedTimeUtc = DateTime.UtcNow, RoleId = RoleId731, };
+			eventLogger.LogDebug("GetSearchResultsDetailed(): userDoc → {UserDoc}", userDoc);
             this.internalSearchController.AddSearchDocument(doc1);
             this.internalSearchController.AddSearchDocument(doc2);
             this.internalSearchController.AddSearchDocument(doc3);
@@ -221,9 +250,11 @@ namespace DotNetNuke.Tests.Web.InternalServices
 
             // Run
             var search = this.GetGroupedDetailViewResults(query);
+			eventLogger.LogDebug("GetSearchResultsDetailed(): search → {Search}", search);
 
             // Assert
             var groupedDetailViews = search as List<GroupedDetailView> ?? search.ToList();
+			eventLogger.LogDebug("GetSearchResultsDetailed(): groupedDetailViews → {GroupedDetailViews}", groupedDetailViews);
 
             using (Assert.EnterMultipleScope())
             {
@@ -239,11 +270,13 @@ namespace DotNetNuke.Tests.Web.InternalServices
                 // UserUrl has 1 DetailViews
                 Assert.That(groupedDetailViews.Single(x => x.DocumentUrl == userUrl).Results, Has.One.Items);
             }
+			eventLogger.LogDebug("<<< Exiting GetSearchResultsDetailed()");
         }
 
         [Test]
         public void GetSearchResultsBasic()
         {
+			eventLogger.LogDebug(">>> Entering GetSearchResultsBasic()");
             const string keyword = "awesome";
             const string userUrl = "mysite/userid/1";
             const string tabUrl1 = "mysite/Home";
@@ -251,8 +284,11 @@ namespace DotNetNuke.Tests.Web.InternalServices
 
             var now = DateTime.UtcNow;
             var doc1 = new SearchDocument { UniqueKey = "key01", TabId = TabId1, Url = tabUrl1, Title = keyword, SearchTypeId = TabSearchTypeId, ModifiedTimeUtc = now, PortalId = PortalId0, RoleId = RoleId731, };
+			eventLogger.LogDebug("GetSearchResultsBasic(): doc1 → {Doc1}", doc1);
             var doc2 = new SearchDocument { UniqueKey = "key02", TabId = TabId2, Url = tabUrl2, Title = keyword, SearchTypeId = TabSearchTypeId, ModifiedTimeUtc = now, PortalId = PortalId0, RoleId = RoleId0, };
+			eventLogger.LogDebug("GetSearchResultsBasic(): doc2 → {Doc2}", doc2);
             var userDoc = new SearchDocument { UniqueKey = "key03", Url = userUrl, Title = keyword, SearchTypeId = UserSearchTypeId, ModifiedTimeUtc = now, PortalId = PortalId0, RoleId = RoleId0, };
+			eventLogger.LogDebug("GetSearchResultsBasic(): userDoc → {UserDoc}", userDoc);
 
             this.internalSearchController.AddSearchDocument(doc1);
             this.internalSearchController.AddSearchDocument(doc2);
@@ -276,15 +312,19 @@ namespace DotNetNuke.Tests.Web.InternalServices
 
             // Run
             var search = this.GetGroupBasicViewResults(query);
+			eventLogger.LogDebug("GetSearchResultsBasic(): search → {Search}", search);
 
             // Assert - overall 2 groups: tabs and users
             var groupedBasicViews = search as List<GroupedBasicView> ?? search.ToList();
+			eventLogger.LogDebug("GetSearchResultsBasic(): groupedBasicViews → {GroupedBasicViews}", groupedBasicViews);
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(groupedBasicViews, Has.Count.EqualTo(2));
 
                 var userResults = groupedBasicViews.Single(x => x.DocumentTypeName == "user").Results;
+				eventLogger.LogDebug("GetSearchResultsBasic(): userResults → {UserResults}", userResults);
                 var tabResults = groupedBasicViews.Single(x => x.DocumentTypeName == "tab").Results;
+				eventLogger.LogDebug("GetSearchResultsBasic(): tabResults → {TabResults}", tabResults);
 
                 // 1 User results
                 Assert.That(userResults, Has.One.Items);
@@ -295,17 +335,20 @@ namespace DotNetNuke.Tests.Web.InternalServices
                 // 2 Tabs results
                 Assert.That(tabResults, Has.Count.EqualTo(2));
             }
+			eventLogger.LogDebug("<<< Exiting GetSearchResultsBasic()");
         }
 
         [Test]
         public void ModifyingDocumentsDoesNotCreateDuplicates()
         {
+			eventLogger.LogDebug(">>> Entering ModifyingDocumentsDoesNotCreateDuplicates()");
             // Arrange
             const string tabUrl = "mysite/ContentUrl";
             const string title = "content title";
             const string contentBody = "content body";
             const string titleModified = title + " modified";
             var uniqueKey = Guid.NewGuid().ToString();
+			eventLogger.LogDebug("ModifyingDocumentsDoesNotCreateDuplicates(): uniqueKey → {UniqueKey}", uniqueKey);
             var now = DateTime.UtcNow;
 
             var originalDocument = new SearchDocument
@@ -361,6 +404,7 @@ namespace DotNetNuke.Tests.Web.InternalServices
 
             // Run
             var searchResults = this.GetGroupedDetailViewResults(query).ToList();
+			eventLogger.LogDebug("ModifyingDocumentsDoesNotCreateDuplicates(): searchResults → {SearchResults}", searchResults);
 
             using (Assert.EnterMultipleScope())
             {
@@ -374,10 +418,12 @@ namespace DotNetNuke.Tests.Web.InternalServices
                 Assert.That(searchResults[0].Results.First().DocumentUrl, Is.EqualTo(tabUrl));
                 Assert.That(searchResults[0].Results.First().Title, Is.EqualTo(titleModified));
             }
+			eventLogger.LogDebug("<<< Exiting ModifyingDocumentsDoesNotCreateDuplicates()");
         }
 
         private void CreateNewLuceneControllerInstance()
         {
+			eventLogger.LogDebug(">>> Entering CreateNewLuceneControllerInstance()");
             if (this.luceneController != null)
             {
                 LuceneController.ClearInstance();
@@ -385,21 +431,27 @@ namespace DotNetNuke.Tests.Web.InternalServices
             }
 
             this.luceneController = new LuceneControllerImpl(this.fakeHostController, new FakeApplicationStatusInfo());
+			eventLogger.LogDebug("CreateNewLuceneControllerInstance(): luceneController → {LuceneController}", luceneController);
             LuceneController.SetTestableInstance(this.luceneController);
+			eventLogger.LogDebug("<<< Exiting CreateNewLuceneControllerInstance()");
         }
 
         private void SetupUserController()
         {
+			eventLogger.LogDebug(">>> Entering SetupUserController()");
             this.mockUserController
                 .Setup(c => c.GetUserById(It.IsAny<int>(), It.IsAny<int>()))
                 .Returns(new UserInfo { UserID = UserId1, Username = UserName1, Profile = new UserProfile(), });
             UserController.SetTestableInstance(this.mockUserController.Object);
+			eventLogger.LogDebug("<<< Exiting SetupUserController()");
         }
 
         private void SetupHostController()
         {
+			eventLogger.LogDebug(">>> Entering SetupHostController()");
             this.fakeHostController = new FakeHostController(new Dictionary<string, string>
             {
+				eventLogger.LogDebug("SetupHostController(): fakeHostController → {FakeHostController}", fakeHostController);
                 { Constants.SearchIndexFolderKey, SearchIndexFolder },
                 { Constants.SearchReaderRefreshTimeKey, this.readerStaleTimeSpan.ToString(CultureInfo.InvariantCulture) },
                 { Constants.SearchTitleBoostSetting, Constants.DefaultSearchTitleBoost.ToString(CultureInfo.InvariantCulture) },
@@ -413,10 +465,12 @@ namespace DotNetNuke.Tests.Web.InternalServices
             });
 
             HostController.SetTestableInstance(this.fakeHostController);
+			eventLogger.LogDebug("<<< Exiting SetupHostController()");
         }
 
         private void SetupDataProvider()
         {
+			eventLogger.LogDebug(">>> Entering SetupDataProvider()");
             // Standard DataProvider Path for Logging
             this.mockDataProvider.Setup(d => d.GetProviderPath()).Returns(string.Empty);
 
@@ -429,19 +483,24 @@ namespace DotNetNuke.Tests.Web.InternalServices
             this.mockDataService.Setup(ds => ds.GetPortalGroups()).Returns(this.GetPortalGroups);
 
             DataService.RegisterInstance(this.mockDataService.Object);
+			eventLogger.LogDebug("<<< Exiting SetupDataProvider()");
         }
 
         private void SetupPortalSettings()
         {
+			eventLogger.LogDebug(">>> Entering SetupPortalSettings()");
             var mockPortalController = new Mock<IPortalController>();
             mockPortalController
                 .Setup(x => x.GetPortal(It.IsAny<int>()))
                 .Returns(new PortalInfo { PortalID = PortalId0, PortalGroupID = -1, UserTabId = TabId1, });
+				eventLogger.LogDebug("SetupPortalSettings(): mockPortalController → {MockPortalController}", mockPortalController);
             PortalController.SetTestableInstance(mockPortalController.Object);
+			eventLogger.LogDebug("<<< Exiting SetupPortalSettings()");
         }
 
         private void SetupModuleController()
         {
+			eventLogger.LogDebug(">>> Entering SetupModuleController()");
             this.mockModuleController
                 .Setup(mc => mc.GetModule(It.Is<int>(m => m == HtmlModuleId1), It.Is<int>(p => p == PortalId0), false))
                 .Returns(new ModuleInfo { ModuleID = HtmlModuleId1, ModuleDefID = HtmlModDefId, ModuleTitle = HtmlModuleTitle1, });
@@ -455,10 +514,12 @@ namespace DotNetNuke.Tests.Web.InternalServices
                 .Setup(mc => mc.GetModule(It.Is<int>(m => m == HtmlModuleId4), It.Is<int>(p => p == PortalId0), false))
                 .Returns(new ModuleInfo { ModuleID = HtmlModuleId4, ModuleDefID = HtmlModDefId, ModuleTitle = HtmlModuleTitle4, });
             ModuleController.SetTestableInstance(this.mockModuleController.Object);
+			eventLogger.LogDebug("<<< Exiting SetupModuleController()");
         }
 
         private void DeleteIndexFolder()
         {
+			eventLogger.LogDebug(">>> Entering DeleteIndexFolder()");
             try
             {
                 if (Directory.Exists(SearchIndexFolder))
@@ -470,12 +531,15 @@ namespace DotNetNuke.Tests.Web.InternalServices
             {
                 Console.WriteLine(ex);
             }
+			eventLogger.LogDebug("<<< Exiting DeleteIndexFolder()");
         }
 
         private IDataReader GetUser()
         {
+			eventLogger.LogDebug(">>> Entering GetUser()");
             var table = new DataTable("Users");
             table.Columns.Add("UserID", typeof(int));
+			eventLogger.LogDebug("GetUser(): table → {Table}", table);
             table.Columns.Add("PortalId", typeof(int));
             table.Columns.Add("UserName", typeof(string));
             table.Columns.Add("FirstName", typeof(string));
@@ -520,13 +584,17 @@ namespace DotNetNuke.Tests.Web.InternalServices
                 DateTime.Now,
                 -1,
                 DateTime.Now);
+			eventLogger.LogDebug("<<< Exiting GetUser()");
             return table.CreateDataReader();
         }
 
         private IDataReader GetPortalGroups()
         {
+			eventLogger.LogDebug(">>> Entering GetPortalGroups()");
             var table = new DataTable("ModuleDefinitions");
             var pkId = table.Columns.Add("PortalGroupID", typeof(int));
+			eventLogger.LogDebug("GetPortalGroups(): pkId → {PkId}", pkId);
+			eventLogger.LogDebug("GetPortalGroups(): table → {Table}", table);
             table.Columns.Add("MasterPortalID", typeof(int));
             table.Columns.Add("PortalGroupName", typeof(string));
             table.Columns.Add("PortalGroupDescription", typeof(string));
@@ -536,16 +604,20 @@ namespace DotNetNuke.Tests.Web.InternalServices
             table.Columns.Add("LastModifiedByUserID", typeof(int));
             table.Columns.Add("LastModifiedOnDate", typeof(DateTime));
             table.PrimaryKey = [pkId,];
+			eventLogger.LogDebug("GetPortalGroups(): table.PrimaryKey → {Arg0}", table.PrimaryKey);
 
             table.Rows.Add(0, 0, "test", "descr", "domain", -1, DateTime.Now, -1, DateTime.Now);
+			eventLogger.LogDebug("<<< Exiting GetPortalGroups()");
             return table.CreateDataReader();
         }
 
         // return 2 test tabs(TabId 56 - Home,  TabId 57 - AboutUs)
         private IDataReader GetTabs()
         {
+			eventLogger.LogDebug(">>> Entering GetTabs()");
             var table = new DataTable("Tabs");
             table.Columns.Add("TabID", typeof(int));
+			eventLogger.LogDebug("GetTabs(): table → {Table}", table);
             table.Columns.Add("TabOrder", typeof(int));
             table.Columns.Add("PortalID", typeof(int));
             table.Columns.Add("TabName", typeof(string));
@@ -591,14 +663,17 @@ namespace DotNetNuke.Tests.Web.InternalServices
             table.Rows.Add(56, 5, 0, "Home", null, 0, "//Home", "C3174A2E-374D-4779-BE5F-BCDFF410E097", "A111A742-C18F-495D-8A23-BD0ECC70BBFE", null, "3A34424A-3CCA-4934-AE15-B9A80EB6D259", 1, null, null, 0, null, null, null, 0, "[G]Skins/Aperture/default.ascx", "[G]Containers/Aperture/none.ascx", null, null, null, "false", null, null, 0, 0, 0.5, 86, "Home", 1, -1, null, 0, null, null, -1, DateTime.Now, -1, DateTime.Now);
             table.Rows.Add(57, 13, 0, "About Us", null, 0, "//AboutUs", "26A4236F-3AAA-4E15-8908-45D35675C677", "8426D3BC-E930-49CA-BDEB-4D41F194B6AC", null, "1461572D-97E8-41F8-BB1A-916DCA48890A", 1, null, null, 0, null, null, null, 0, "[G]Skins/Aperture/default.ascx", "[G]Containers/Aperture/title.ascx", null, null, null, "true", null, null, 0, 0, 0.5, 97, "About Us", 1, -1, null, 0, null, null, -1, DateTime.Now, -1, DateTime.Now);
 
+			eventLogger.LogDebug("<<< Exiting GetTabs()");
             return table.CreateDataReader();
         }
 
         // return 4 html modules (TabId 56 - Home: ModuleIDs:367, 368, 370  TabId 57 - AboutUs: 378//)
         private IDataReader GetSearchModules()
         {
+			eventLogger.LogDebug(">>> Entering GetSearchModules()");
             var table = new DataTable("SearchModules");
             table.Columns.Add("OwnerPortalID", typeof(int));
+			eventLogger.LogDebug("GetSearchModules(): table → {Table}", table);
             table.Columns.Add("PortalID", typeof(int));
             table.Columns.Add("TabID", typeof(int));
             table.Columns.Add("TabModuleID", typeof(int));
@@ -877,14 +952,18 @@ namespace DotNetNuke.Tests.Web.InternalServices
                 null,
                 "664BAA98-7E24-461F-8180-36527619D042",
                 string.Empty);
+			eventLogger.LogDebug("<<< Exiting GetSearchModules()");
             return table.CreateDataReader();
         }
 
         // returns 2 moduledefinitions - Text/HTML and Journal
         private IDataReader GetModuleDefinitions()
         {
+			eventLogger.LogDebug(">>> Entering GetModuleDefinitions()");
             var table = new DataTable("ModuleDefinitions");
             var pkId = table.Columns.Add("ModuleDefID", typeof(int));
+			eventLogger.LogDebug("GetModuleDefinitions(): pkId → {PkId}", pkId);
+			eventLogger.LogDebug("GetModuleDefinitions(): table → {Table}", table);
             table.Columns.Add("FriendlyName", typeof(string));
             table.Columns.Add("DesktopModuleID", typeof(int));
             table.Columns.Add("DefaultCacheTime", typeof(int));
@@ -894,38 +973,49 @@ namespace DotNetNuke.Tests.Web.InternalServices
             table.Columns.Add("LastModifiedOnDate", typeof(DateTime));
             table.Columns.Add("DefinitionName", typeof(string));
             table.PrimaryKey = [pkId,];
+			eventLogger.LogDebug("GetModuleDefinitions(): table.PrimaryKey → {Arg0}", table.PrimaryKey);
 
             table.Rows.Add(116, "Text/HTML", 74, 1200, -1, DateTime.Now, -1, DateTime.Now, "Text/HTML");
             table.Rows.Add(117, "Journal", 75, 0, -1, DateTime.Now, -1, DateTime.Now, "Journal");
 
+			eventLogger.LogDebug("<<< Exiting GetModuleDefinitions()");
             return table.CreateDataReader();
         }
 
         // returns all search types - 3 SearchTypes - module, tab, user
         private IDataReader GetAllSearchTypes()
         {
+			eventLogger.LogDebug(">>> Entering GetAllSearchTypes()");
             var table = new DataTable("SearchTypes");
             var pkId = table.Columns.Add("SearchTypeId", typeof(int));
+			eventLogger.LogDebug("GetAllSearchTypes(): pkId → {PkId}", pkId);
+			eventLogger.LogDebug("GetAllSearchTypes(): table → {Table}", table);
             table.Columns.Add("SearchTypeName", typeof(string));
             table.Columns.Add("SearchResultClass", typeof(string));
             table.Columns.Add("IsPrivate", typeof(byte));
             table.PrimaryKey = [pkId,];
+			eventLogger.LogDebug("GetAllSearchTypes(): table.PrimaryKey → {Arg0}", table.PrimaryKey);
 
             table.Rows.Add(1, "module", FakeResultControllerClass, 0);
             table.Rows.Add(2, "tab", FakeResultControllerClass, 0);
             table.Rows.Add(3, "user", FakeResultControllerClass, 0);
+			eventLogger.LogDebug("<<< Exiting GetAllSearchTypes()");
             return table.CreateDataReader();
         }
 
         private IDataReader GetPortalsCallBack(string culture)
         {
+			eventLogger.LogDebug(">>> Entering GetPortalsCallBack(culture={Culture})", culture);
+			eventLogger.LogDebug("<<< Exiting GetPortalsCallBack(culture={Culture})", culture);
             return this.GetPortalCallBack(PortalId0, CultureEnUs);
         }
 
         private IDataReader GetPortalCallBack(int portalId, string culture)
         {
+			eventLogger.LogDebug(">>> Entering GetPortalCallBack(portalId={PortalId},culture={Culture})", portalId, culture);
             DataTable table = new DataTable("Portal");
 
+			eventLogger.LogDebug("GetPortalCallBack(portalId={PortalId},culture={Culture}): table → {Table}", portalId, culture, table);
             var cols = new[]
                            {
                                "PortalID", "PortalGroupID", "PortalName", "LogoFile", "FooterText", "ExpiryDate",
@@ -993,11 +1083,13 @@ namespace DotNetNuke.Tests.Web.InternalServices
                 "2011-08-25 07:34:29",
                 culture);
 
+			eventLogger.LogDebug("<<< Exiting GetPortalCallBack(portalId={PortalId},culture={Culture})", portalId, culture);
             return table.CreateDataReader();
         }
 
         private IEnumerable<GroupedBasicView> GetGroupBasicViewResults(SearchQuery query)
         {
+			eventLogger.LogDebug(">>> Entering GetGroupBasicViewResults(query={Query})", query);
             var userSearchContentSource = new SearchContentSource
             {
                 SearchTypeId = UrlSearchTypeId,
@@ -1006,11 +1098,14 @@ namespace DotNetNuke.Tests.Web.InternalServices
                 LocalizedName = UserSearchTypeName,
                 ModuleDefinitionId = 0,
             };
+			eventLogger.LogDebug("<<< Exiting GetGroupBasicViewResults(query={Query})", query);
             return this.searchServiceController.GetGroupedBasicViews(query, userSearchContentSource, PortalId0);
         }
 
         private IEnumerable<GroupedDetailView> GetGroupedDetailViewResults(SearchQuery searchQuery)
         {
+			eventLogger.LogDebug(">>> Entering GetGroupedDetailViewResults(searchQuery={SearchQuery})", searchQuery);
+			eventLogger.LogDebug("<<< Exiting GetGroupedDetailViewResults(searchQuery={SearchQuery})", searchQuery);
             return this.searchServiceController.GetGroupedDetailViews(searchQuery, UserSearchTypeId, out _, out _);
         }
     }

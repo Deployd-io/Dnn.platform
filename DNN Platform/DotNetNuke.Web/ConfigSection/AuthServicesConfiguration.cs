@@ -9,6 +9,7 @@ namespace DotNetNuke.Web.ConfigSection
     /// <summary>A <see cref="ConfigurationSection"/> for auth services.</summary>
     public class AuthServicesConfiguration : ConfigurationSection
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AuthServicesConfiguration));
         /// <summary>Gets the message handlers.</summary>
         [ConfigurationProperty("messageHandlers", IsRequired = true)]
         public MessageHandlersCollection MessageHandlers => this["messageHandlers"] as MessageHandlersCollection;
@@ -17,6 +18,8 @@ namespace DotNetNuke.Web.ConfigSection
         /// <returns>The configuration section, or <see langword="null"/> if it doesn't exist.</returns>
         public static AuthServicesConfiguration GetConfig()
         {
+			Logger.LogDebug(">>> Entering GetConfig()");
+			Logger.LogDebug("<<< Exiting GetConfig()");
             return ConfigurationManager.GetSection("dotnetnuke/authServices") as AuthServicesConfiguration;
         }
     }

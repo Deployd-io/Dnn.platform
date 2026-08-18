@@ -39,7 +39,11 @@ namespace log4net.Core
         /// </remarks>
         protected LoggerWrapperImpl(ILogger logger) 
         {
+			logger.LogDebug(">>> Entering LoggerWrapperImpl(logger={Logger})", logger);
             this.m_logger = logger;
+			logger.LogDebug("LoggerWrapperImpl(logger={Logger}): this.m_logger → {Arg1}", logger, this.m_logger);
+			logger.LogDebug("LoggerWrapperImpl(logger={Logger}): m_logger → {M_logger}", logger, m_logger);
+			logger.LogDebug("<<< Exiting LoggerWrapperImpl(logger={Logger})", logger);
         }
 
         /// <summary>Gets the implementation behind this wrapper object.</summary>

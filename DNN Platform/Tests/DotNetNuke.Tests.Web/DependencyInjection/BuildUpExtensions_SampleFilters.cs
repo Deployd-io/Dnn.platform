@@ -19,6 +19,7 @@ namespace DotNetNuke.Tests.Web.DependencyInjection
             {
                 this.EventLogger.AddLog("Test", "Message", EventLogType.ADMIN_ALERT);
                 base.OnActionExecuted(actionExecutedContext);
+				eventLogger.LogDebug("<<< Exiting OnActionExecuted(actionExecutedContext={ActionExecutedContext})", actionExecutedContext);
             }
         }
 
@@ -67,6 +68,7 @@ namespace DotNetNuke.Tests.Web.DependencyInjection
             {
                 this.EventLogger.AddLog("Test", "Message", EventLogType.ADMIN_ALERT);
                 base.OnActionExecuted(actionExecutedContext);
+				eventLogger.LogDebug(">>> Entering OnActionExecuted(actionExecutedContext={ActionExecutedContext})", actionExecutedContext);
             }
         }
 

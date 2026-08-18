@@ -10,8 +10,11 @@ namespace DotNetNuke.Entities.Modules
 
     public class InstalledModulesController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(InstalledModulesController));
         public static List<InstalledModuleInfo> GetInstalledModules()
         {
+			Logger.LogDebug(">>> Entering GetInstalledModules()");
+			Logger.LogDebug("<<< Exiting GetInstalledModules()");
             return CBO.FillCollection<InstalledModuleInfo>(DataProvider.Instance().GetInstalledModules());
         }
     }

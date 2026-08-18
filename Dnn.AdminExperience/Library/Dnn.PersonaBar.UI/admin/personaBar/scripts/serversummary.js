@@ -1,10 +1,13 @@
+const logger = console;
 'use strict';
 define(['jquery', 'knockout', 'jquery.hoverIntent.min'], function ($, ko) {
+logger.debug('>>> Entering define()');
   var mainFrame = window.parent.document.getElementById("personaBar-iframe");
   var personaBarWidth = 80;
   var util = null;
 
   var getSummaryContainer = function () {
+	logger.debug('>>> Entering getSummaryContainer()');
     var $summary = $('.server-summary');
     if (!$summary.length) {
       $summary = $('' +
@@ -24,6 +27,7 @@ define(['jquery', 'knockout', 'jquery.hoverIntent.min'], function ($, ko) {
       $('#personabar').find('.personabarLogo').append($summary);
     }
 
+	logger.debug('<<< Exiting getSummaryContainer()');
     return $summary;
   }
   var showServerSummary = function () {
@@ -58,6 +62,7 @@ define(['jquery', 'knockout', 'jquery.hoverIntent.min'], function ($, ko) {
       return;
     }
     var $logo = $('#personabar').find('.personabarLogo');
+	logger.debug('<<< Exiting define()');
     var $summaryContainer = getSummaryContainer();
 
     getServerInfo(function (info) {

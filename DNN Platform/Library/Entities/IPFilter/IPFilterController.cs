@@ -23,9 +23,12 @@ namespace DotNetNuke.Entities.Host
     /// <summary>Controller to manage IP Filters.</summary>
     public partial class IPFilterController : ComponentBase<IIPFilterController, IPFilterController>, IIPFilterController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(IPFilterController));
         /// <summary>Initializes a new instance of the <see cref="IPFilterController"/> class.</summary>
         internal IPFilterController()
         {
+		Logger.LogDebug(">>> Entering IPFilterController()");
+		Logger.LogDebug("<<< Exiting IPFilterController()");
         }
 
         private enum FilterType
@@ -37,6 +40,7 @@ namespace DotNetNuke.Entities.Host
         /// <inheritdoc />
         public int AddIPFilter(IPFilterInfo ipFilter)
         {
+			Logger.LogDebug(">>> Entering AddIPFilter(ipFilter={IpFilter})", ipFilter);
             Requires.NotNull("ipFilter", ipFilter);
             AssertValidIPFilter(ipFilter);
 
@@ -46,12 +50,14 @@ namespace DotNetNuke.Entities.Host
                 ipFilter.RuleType,
                 UserController.Instance.GetCurrentUserInfo().UserID,
                 ipFilter.Notes);
+			Logger.LogDebug("<<< Exiting AddIPFilter(ipFilter={IpFilter})", ipFilter);
             return id;
         }
 
         /// <inheritdoc />
         public void UpdateIPFilter(IPFilterInfo ipFilter)
         {
+			Logger.LogDebug(">>> Entering UpdateIPFilter(ipFilter={IpFilter})", ipFilter);
             Requires.NotNull("ipFilter", ipFilter);
             AssertValidIPFilter(ipFilter);
 
@@ -62,24 +68,31 @@ namespace DotNetNuke.Entities.Host
                 ipFilter.RuleType,
                 UserController.Instance.GetCurrentUserInfo().UserID,
                 ipFilter.Notes);
+				Logger.LogDebug("<<< Exiting UpdateIPFilter(ipFilter={IpFilter})", ipFilter);
         }
 
         /// <inheritdoc />
         public void DeleteIPFilter(IPFilterInfo ipFilter)
         {
+			Logger.LogDebug(">>> Entering DeleteIPFilter(ipFilter={IpFilter})", ipFilter);
             Requires.PropertyNotNegative("ipFilter", "ipFilter.IPFilterID", ipFilter.IPFilterID);
             DataProvider.Instance().DeleteIPFilter(ipFilter.IPFilterID);
+			Logger.LogDebug("<<< Exiting DeleteIPFilter(ipFilter={IpFilter})", ipFilter);
         }
 
         /// <inheritdoc />
         public IPFilterInfo GetIPFilter(int ipFilter)
         {
+			Logger.LogDebug(">>> Entering GetIPFilter(ipFilter={IpFilter})", ipFilter);
+			Logger.LogDebug("<<< Exiting GetIPFilter(ipFilter={IpFilter})", ipFilter);
             return CBO.FillObject<IPFilterInfo>(DataProvider.Instance().GetIPFilter(ipFilter));
         }
 
         /// <inheritdoc />
         public bool IsIPBanned(string ipAddress)
         {
+			Logger.LogDebug(">>> Entering IsIPBanned(ipAddress={IpAddress})", ipAddress);
+			Logger.LogDebug("<<< Exiting IsIPBanned(ipAddress={IpAddress})", ipAddress);
             return CheckIfBannedIPAddress(ipAddress);
         }
 
@@ -144,6 +157,7 @@ namespace DotNetNuke.Entities.Host
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public bool IsAllowableDeny(string currentIP, IPFilterInfo ipFilter)
         {
+			Logger.LogDebug(">>> Entering IsAllowableDeny(currentIP={CurrentIP},ipFilter={IpFilter})", currentIP, ipFilter);
             if (ipFilter.RuleType == (int)FilterType.Allow)
             {
                 return true;
@@ -151,6 +165,7 @@ namespace DotNetNuke.Entities.Host
 
             if (NetworkUtils.IsIPInRange(currentIP, ipFilter.IPAddress, ipFilter.SubnetMask))
             {
+			Logger.LogDebug("<<< Exiting IsAllowableDeny(currentIP={CurrentIP},ipFilter={IpFilter})", currentIP, ipFilter);
                 return false;
             }
 
@@ -165,23 +180,29 @@ namespace DotNetNuke.Entities.Host
 
         private static void AssertValidIPFilter(IPFilterInfo ipFilter)
         {
+			Logger.LogDebug(">>> Entering AssertValidIPFilter(ipFilter={IpFilter})", ipFilter);
             IPAddress parsed;
             if (IPAddress.TryParse(ipFilter.IPAddress, out parsed) == false)
             {
+				Logger.LogWarning("Throwing ArgumentException from AssertValidIPFilter(ipFilter={IpFilter})", ipFilter);
                 throw new ArgumentException(Localization.GetExceptionMessage("IPAddressIncorrect", "IP address is not in correct format"));
             }
 
             bool isIPRange = string.IsNullOrEmpty(ipFilter.SubnetMask) == false;
             if (isIPRange && IPAddress.TryParse(ipFilter.SubnetMask, out parsed) == false)
             {
+			Logger.LogDebug("<<< Exiting AssertValidIPFilter(ipFilter={IpFilter})", ipFilter);
                 throw new ArgumentException(Localization.GetExceptionMessage("SubnetMaskIncorrect", "Subnet mask is not in correct format"));
             }
         }
 
         private static bool CheckIfBannedIPAddress(string ipAddress)
         {
+			Logger.LogDebug(">>> Entering CheckIfBannedIPAddress(ipAddress={IpAddress})", ipAddress);
             IList<IPFilterInfo> filterList = Instance.GetIPFilters();
             bool ipAllowed = true;
+			Logger.LogDebug("CheckIfBannedIPAddress(ipAddress={IpAddress}): ipAllowed → {IpAllowed}", ipAddress, ipAllowed);
+			Logger.LogDebug("CheckIfBannedIPAddress(ipAddress={IpAddress}): filterList → {FilterList}", ipAddress, filterList);
             foreach (var ipFilterInfo in filterList)
             {
                 // if a single deny exists, this win's
@@ -205,17 +226,20 @@ namespace DotNetNuke.Entities.Host
                 }
             }
 
+			Logger.LogDebug("<<< Exiting CheckIfBannedIPAddress(ipAddress={IpAddress})", ipAddress);
             return ipAllowed;
         }
 
         private static void LogBannedIPAttempt(string ipAddress)
         {
+			Logger.LogDebug(">>> Entering LogBannedIPAttempt(ipAddress={IpAddress})", ipAddress);
             var log = new LogInfo
             {
                 LogTypeKey = nameof(DotNetNuke.Abstractions.Logging.EventLogType.IP_LOGIN_BANNED),
             };
             log.LogProperties.Add(new LogDetailInfo("HostAddress", ipAddress));
             LogController.Instance.AddLog(log);
+			Logger.LogDebug("<<< Exiting LogBannedIPAttempt(ipAddress={IpAddress})", ipAddress);
         }
     }
 }

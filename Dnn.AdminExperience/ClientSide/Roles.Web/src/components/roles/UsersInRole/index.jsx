@@ -10,10 +10,12 @@ import {
     roleUsers as RoleUsersActions
 } from "../../../actions";
 import util from "../../../utils";
+const logger = console;
 
 class UsersInRole extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
 
         this.state = {
             userSelectState: { userId: -1, keyword: "" },
@@ -30,12 +32,15 @@ class UsersInRole extends Component {
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.getUsers();
         if (this.comboBoxRef.childNodes && this.comboBoxRef.childNodes[1])
+			logger.debug('<<< Exiting componentDidMount()');
             this.comboBoxRef.childNodes[1].setAttribute("aria-label", "Suggestion");
     }
 
     getUsers() {
+	logger.debug('>>> Entering getUsers()');
 
         const {props, state} = this;
         this.setState({loading: true});
@@ -47,19 +52,25 @@ class UsersInRole extends Component {
         };
         props.dispatch(RoleUsersActions.getRoleUsers(parameter, () => {
             this.setState({loading: false});
+			logger.debug('<<< Exiting getUsers()');
         }));
     }
 
     getSuggestUsers() {
+		logger.debug('>>> Entering getSuggestUsers()');
         const {props, state} = this;
         let keyword = state.userSelectState.userId > 0 ? "" : state.userSelectState.keyword;
         props.dispatch(RoleUsersActions.getSuggestUsers({ keyword: keyword, roleId: -1, count: 10 }));
+		logger.debug('<<< Exiting getSuggestUsers()');
     }
     debounceGetSuggestUsers() {
+		logger.debug('>>> Entering debounceGetSuggestUsers()');
         this.getSuggestUsers();
+		logger.debug('<<< Exiting debounceGetSuggestUsers()');
     }
 
     onUserSelectorChanged(item) {
+		logger.debug(`>>> Entering onUserSelectorChanged(item=${item})`);
         if (this.state.loading) {
             return;
         }
@@ -68,28 +79,37 @@ class UsersInRole extends Component {
         }
         this.setState({ userSelectState: { userId: -1, keyword: item } });
         this.debounceGetSuggestUsers();
+		logger.debug(`<<< Exiting onUserSelectorChanged(item=${item})`);
     }
 
     onUserSelectorSelected(item) {
+		logger.debug(`>>> Entering onUserSelectorSelected(item=${item})`);
         if (!item.userId || !item.displayName) {
             return;
         }
         this.setState({ userSelectState: { userId: item.userId, keyword: item.displayName } }, function () {
+			logger.debug('>>> Entering setState()');
+			logger.debug('<<< Exiting setState()');
             this.getSuggestUsers();
         });
+		logger.debug(`<<< Exiting onUserSelectorSelected(item=${item})`);
     }
 
     onUserSelectorToggle() {
+	logger.debug('>>> Entering onUserSelectorToggle()');
     }
 
     onAddUser() {
+		logger.debug('>>> Entering onAddUser()');
         const {state} = this;
         let userId = state.userSelectState.userId;
         if (userId === -1) {
             return;
         }
         this.saveUser(true, userId);
+		logger.debug(`onAddUser(): userId → ${userId}`);
         this.setState({ userSelectState: { userId: -1, keyword: "" } });
+		logger.debug('<<< Exiting onAddUser()');
     }
     saveUser(isAdd, userId, startTime, expiresTime) {
         const {props} = this;
@@ -97,6 +117,7 @@ class UsersInRole extends Component {
         let parameter = { userId: userId, roleId: props.roleDetails.id, startTime: startTime, expiresTime: expiresTime, isAdd: isAdd };
         props.dispatch(RoleUsersActions.addUserToRole(parameter, this.state.sendEmail, this.state.isOwner));
         this.setState({ sendEmail: true, isOwner: false });
+		logger.debug(`<<< Exiting saveUser(isAdd=${isAdd},userId=${userId},startTime=${startTime},expiresTime=${expiresTime})`);
     }
 
     onUsersKeywordChanged(keyword) {
@@ -105,9 +126,11 @@ class UsersInRole extends Component {
         this.setState(newState, () => {
             this.getUsers();
         });
+		logger.debug(`<<< Exiting onUsersKeywordChanged(keyword=${keyword})`);
     }
 
     onPageChanged(currentPage, pageSize) {
+		logger.debug(`>>> Entering onPageChanged(currentPage=${currentPage},pageSize=${pageSize})`);
         let {state} = this;
         if (pageSize !== undefined && state.pageSize !== pageSize) {
             state.pageSize = pageSize;
@@ -117,8 +140,10 @@ class UsersInRole extends Component {
             state
         });
         this.getUsers();
+		logger.debug(`<<< Exiting onPageChanged(currentPage=${currentPage},pageSize=${pageSize})`);
     }
     getUserRows() {
+		logger.debug('>>> Entering getUserRows()');
         let roleUsers = this.props.roleUsers;
         let userRows = roleUsers.map((user, index) => {
             return <UserRow
@@ -129,6 +154,7 @@ class UsersInRole extends Component {
             >
             </UserRow>;
         });
+		logger.debug('<<< Exiting getUserRows()');
         return <div className="role-user-body">{(roleUsers.length > 0) ?
             userRows :
             <div className="no-roles-row">{resx.get("NoUsers") }</div> }
@@ -180,8 +206,10 @@ class UsersInRole extends Component {
             />;
     }
     render() {
+		logger.debug('>>> Entering render()');
         const {state} = this;
         const className = "roleusers-form" + (state.loading ? " isloading" : "");
+		logger.debug('<<< Exiting render()');
         return <div className={className}>
             <div className="header">
                 <div className="header-title">{resx.get("PermissionsByRole") }</div>
@@ -241,6 +269,8 @@ UserRow.defaultProps = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         matchedUsers: state.roleUsers.matchedUsers,
         roleUsers: state.roleUsers.roleUsers,

@@ -20,24 +20,39 @@ namespace Dnn.PersonaBar.Users.Components.Dto
         /// <summary>Initializes a new instance of the <see cref="UserBasicDto"/> class.</summary>
         public UserBasicDto()
         {
+		eventLogger.LogDebug(">>> Entering UserBasicDto()");
+		eventLogger.LogDebug("<<< Exiting UserBasicDto()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="UserBasicDto"/> class.</summary>
         /// <param name="user">The user info.</param>
         public UserBasicDto(UserInfo user)
         {
+			eventLogger.LogDebug(">>> Entering UserBasicDto(user={User})", user);
             this.UserId = user.UserID;
             this.Username = user.Username;
+			eventLogger.LogDebug("UserBasicDto(user={User}): this.UserId → {Arg1}", user, this.UserId);
+			eventLogger.LogDebug("UserBasicDto(user={User}): Username → {Username}", user, Username);
+			eventLogger.LogDebug("UserBasicDto(user={User}): this.Username → {Arg1}", user, this.Username);
             this.Displayname = user.DisplayName;
             this.Email = user.Email;
             this.CreatedOnDate = user.CreatedOnDate;
+			eventLogger.LogDebug("UserBasicDto(user={User}): Displayname → {Displayname}", user, Displayname);
+			eventLogger.LogDebug("UserBasicDto(user={User}): this.Displayname → {Arg1}", user, this.Displayname);
+			eventLogger.LogDebug("UserBasicDto(user={User}): Email → {Email}", user, Email);
+			eventLogger.LogDebug("UserBasicDto(user={User}): this.Email → {Arg1}", user, this.Email);
+			eventLogger.LogDebug("UserBasicDto(user={User}): CreatedOnDate → {CreatedOnDate}", user, CreatedOnDate);
+			eventLogger.LogDebug("UserBasicDto(user={User}): this.CreatedOnDate → {Arg1}", user, this.CreatedOnDate);
             this.IsDeleted = user.IsDeleted;
             this.Authorized = user.Membership.Approved;
             this.HasAgreedToTerms = user.HasAgreedToTerms;
             this.RequestsRemoval = user.RequestsRemoval;
             this.IsSuperUser = user.IsSuperUser;
             this.IsAdmin = user.Roles.Contains(PortalSettings.AdministratorRoleName);
+			eventLogger.LogDebug("UserBasicDto(user={User}): IsDeleted → {IsDeleted}", user, IsDeleted);
+			eventLogger.LogDebug("UserBasicDto(user={User}): this.IsDeleted → {Arg1}", user, this.IsDeleted);
             this.AvatarUrl = Utilities.GetProfileAvatar(this.UserId);
+			eventLogger.LogDebug("<<< Exiting UserBasicDto(user={User})", user);
         }
 
         [DataMember(Name = "avatar")]
@@ -86,8 +101,10 @@ namespace Dnn.PersonaBar.Users.Components.Dto
 
         public static UserBasicDto FromUserInfo(UserInfo user)
         {
+			eventLogger.LogDebug(">>> Entering FromUserInfo(user={User})", user);
             if (user == null)
             {
+			eventLogger.LogDebug("<<< Exiting FromUserInfo(user={User})", user);
                 return null;
             }
 
@@ -108,8 +125,10 @@ namespace Dnn.PersonaBar.Users.Components.Dto
 
         public static UserBasicDto FromUserDetails(UserDetailDto user)
         {
+			eventLogger.LogDebug(">>> Entering FromUserDetails(user={User})", user);
             if (user == null)
             {
+			eventLogger.LogDebug("<<< Exiting FromUserDetails(user={User})", user);
                 return null;
             }
 
@@ -130,7 +149,9 @@ namespace Dnn.PersonaBar.Users.Components.Dto
 
         public void PopulateAvatarUrl()
         {
+			eventLogger.LogDebug(">>> Entering PopulateAvatarUrl()");
             this.AvatarUrl = Utilities.GetProfileAvatar(this.UserId);
+			eventLogger.LogDebug("<<< Exiting PopulateAvatarUrl()");
         }
     }
 }

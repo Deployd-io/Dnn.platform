@@ -8,12 +8,17 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
     {
         public ClientBoolean()
         {
+		eventLogger.LogDebug(">>> Entering ClientBoolean()");
+		eventLogger.LogDebug("<<< Exiting ClientBoolean()");
         }
 
         public ClientBoolean(string name, string value)
         {
+			eventLogger.LogDebug(">>> Entering ClientBoolean(name={Name},value={Value})", name, value);
             this.Name = name;
             this.Value = value;
+			eventLogger.LogDebug("ClientBoolean(name={Name},value={Value}): this.Name → {Arg2}", name, value, this.Name);
+			eventLogger.LogDebug("<<< Exiting ClientBoolean(name={Name},value={Value})", name, value);
         }
     }
 }

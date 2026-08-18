@@ -1,4 +1,5 @@
 (function () {
+	logger.debug(`>>> Entering function(ko=${ko},dayjs=${dayjs},ut=${ut},sf=${sf},cf=${cf},extension=${extension},persistent=${persistent},eventEmitter=${eventEmitter},iconLoader=${iconLoader},Gateway=${Gateway})`);
     'use strict';
 
     var debugMode = window.parent['personaBarSettings']['debugMode'] === true;
@@ -52,6 +53,7 @@
             console.error(err);
             throw err;
         }
+	logger.debug(`<<< Exiting function(debugMode=${debugMode})`);
     };
 })();
 
@@ -111,34 +113,45 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
             inAnimation: inAnimation,
 
             setConfirmationDialogPosition: function () {
+				logger.debug('>>> Entering setConfirmationDialogPosition()');
                 var confirmation = document.getElementById('confirmation-dialog');
                 var personaBarPage = document.getElementsByClassName('dnn-persona-bar-page')[0];
                 var condition = personaBarPage.classList.contains('full-width')
                 confirmation.classList.toggle("confirmation-dialog-full-width-center", condition);
+				logger.debug('<<< Exiting setConfirmationDialogPosition()');
             },
 
 
             openSocialTasks: function openTaskWindow(){
+				logger.debug('>>> Entering openTaskWindow()');
                  var taskWindow = $('.socialtasks');
                  taskWindow.css({visibility:'visible'});
+				logger.debug('<<< Exiting openTaskWindow()');
             },
 
             closeSocialTasks: function closeTaskWindow() {
+				logger.debug('>>> Entering closeTaskWindow()');
                  var taskWindow = $('.socialtasks')
                  taskWindow.css({visibility:'hidden'});
+				logger.debug('<<< Exiting closeTaskWindow()');
             },
 
             expandPersonaBarPage: function expandPersonaBar(){
+				logger.debug('>>> Entering expandPersonaBar()');
                 var personaBarPage = $(".dnn-persona-bar-page")
                 personaBarPage.css({width:"1159px"});
+				logger.debug('<<< Exiting expandPersonaBar()');
             },
 
             contractPersonaBarPage: function contractPersonaBar(){
+				logger.debug('>>> Entering contractPersonaBar()');
                 var personaBarPage = $('.dnn-persona-bar-page');
                 personaBarPage.css({width: cachedPersonaBarPageWidth+'px'});
+				logger.debug('<<< Exiting contractPersonaBar()');
             },
 
             closePersonaBar: function handleClosePersonarBar(callback, keepSelection) {
+				logger.debug(`>>> Entering handleClosePersonarBar(callback=${callback},keepSelection=${keepSelection})`);
                 var self = this;
 
                 if ($personaBarPlaceholder.is(":hidden")) {
@@ -165,6 +178,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                 self.leaveCustomModules();
                 var $activePanel = $('#' + utility.getPanelIdFromPath(activePath));
                 $activePanel.animate({ left: -860 }, 189, 'linear', function () {
+					logger.debug(`>>> Entering animate(left=${left},left=${left})`);
                     $('.socialpanel').css({ left: -860 }).hide();
                     $mask.animate({
                         opacity: 0.0
@@ -187,6 +201,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
 
                         if (typeof callback === 'function') {
                             callback();
+							logger.debug(`<<< Exiting animate(left=${left},left=${left})`);
                         }
                     });
                 });
@@ -196,6 +211,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                         expandPersonaBar: false
                     });
                 }
+				logger.debug(`<<< Exiting handleClosePersonarBar(callback=${callback},keepSelection=${keepSelection})`);
             },
             loadPanel: function handleLoadPanel(identifier, params) {
                 if (inAnimation) return;
@@ -338,6 +354,7 @@ require(['jquery', 'knockout', 'dayjs', '../util', '../sf', '../config', './../e
                     }
                 }
                 setCloseButtonClass(panelId);
+				logger.debug(`<<< Exiting handleLoadPanel(identifier=${identifier},params=${params})`);
             },
             panelLoaded: function (params, loaded) {
                 extension.load(util, params);

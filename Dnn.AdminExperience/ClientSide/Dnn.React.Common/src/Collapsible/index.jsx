@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import ReactCollapse from "react-collapse";
 import scroll from "scroll";
 import "./style.less";
+const logger = console;
 
 const defaultDelay = 300;
 
@@ -13,15 +14,20 @@ const page = /Firefox/.test(navigator.userAgent) ?
 export default class Collapsible extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     componentWillUnmount() {
+		logger.debug('>>> Entering componentWillUnmount()');
         if (this.scrollTimeout) {
             clearTimeout(this.scrollTimeout);
             this.scrollTimeout = null;
+			logger.debug('<<< Exiting componentWillUnmount()');
         }
     }
     scroll(contentHeight) {
+		logger.debug(`>>> Entering scroll(contentHeight=${contentHeight})`);
         const {scrollDelay} = this.props;
         const delay = scrollDelay || scrollDelay === 0 ? scrollDelay : defaultDelay;
         if (!this.props.isOpened || !this.props.autoScroll ) {
@@ -30,7 +36,9 @@ export default class Collapsible extends Component {
         this.scrollTimeout = setTimeout(()=> {
             const collapsible = this.collapsibleRef;
             const collapsibleTop = collapsible.getBoundingClientRect().top;
+			logger.debug(`scroll(contentHeight=${contentHeight}): collapsibleTop → ${collapsibleTop}`);
             const bodyTop = document.body.getBoundingClientRect().top;
+			logger.debug(`scroll(contentHeight=${contentHeight}): bodyTop → ${bodyTop}`);
             let bottom = collapsibleTop - bodyTop + contentHeight + 40;
             
             if (bottom > window.innerHeight ) {
@@ -40,11 +48,14 @@ export default class Collapsible extends Component {
                 }
             }
         }, delay);
+		logger.debug(`<<< Exiting scroll(contentHeight=${contentHeight})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {isOpened} = this.props;
         const className = this.props.className || "";
+		logger.debug('<<< Exiting render()');
         return (
             <div ref={(node) => this.collapsibleRef = node} style={{height: "100%", width:"100%"}}>
                 <ReactCollapse

@@ -39,8 +39,10 @@ namespace DotNetNuke.Entities.Controllers
         public HostController()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering HostController()");
         }
 
+		Logger.LogDebug("<<< Exiting HostController()");
         /// <summary>Initializes a new instance of the <see cref="HostController"/> class.</summary>
         /// <param name="eventLogger">The event logger.</param>
         /// <param name="portalController">The portal controller.</param>
@@ -48,6 +50,7 @@ namespace DotNetNuke.Entities.Controllers
         {
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<Lazy<IPortalController>>();
+			Logger.LogDebug("HostController(eventLogger={EventLogger},portalController={PortalController}): portalController → {PortalController1}", eventLogger, portalController, portalController);
         }
 
         /// <inheritdoc cref="IHostSettingsService.GetBoolean(string)" />
@@ -196,6 +199,7 @@ namespace DotNetNuke.Entities.Controllers
         public void Update(IConfigurationSetting config)
         {
             this.Update(config, true);
+			Logger.LogDebug("<<< Exiting Update(config={Config})", config);
         }
 
         /// <inheritdoc />
@@ -263,19 +267,23 @@ namespace DotNetNuke.Entities.Controllers
             var cipherText = Security.FIPSCompliant.EncryptAES(HashAlgorithmName.SHA512, value, passPhrase, HostSettings.GetHostGuid(this));
             this.Update(key, cipherText);
             this.Update(CryptographyUtils.GetAlgorithmNameSettingKey(key), HashAlgorithmName.SHA512.Name);
+			Logger.LogDebug("<<< Exiting UpdateEncryptedString(key={Key},value={Value},passPhrase=<redacted>)", key, value);
         }
 
         /// <inheritdoc cref="IHostSettingsService.IncrementCrmVersion" />
         public void IncrementCrmVersion(bool includeOverridingPortals)
         {
+			Logger.LogDebug(">>> Entering IncrementCrmVersion(includeOverridingPortals={IncludeOverridingPortals})", includeOverridingPortals);
             var currentVersion = HostSettings.GetCrmVersion(this);
             var newVersion = currentVersion + 1;
+			Logger.LogDebug("IncrementCrmVersion(includeOverridingPortals={IncludeOverridingPortals}): currentVersion → {CurrentVersion}", includeOverridingPortals, currentVersion);
             this.Update(ClientResourceSettings.VersionKey, newVersion.ToString(CultureInfo.InvariantCulture), true);
 
             if (includeOverridingPortals)
             {
                 PortalController.IncrementOverridingPortalsCrmVersion(this.portalController.Value);
             }
+			Logger.LogDebug("<<< Exiting IncrementCrmVersion(includeOverridingPortals={IncludeOverridingPortals})", includeOverridingPortals);
         }
 
         /// <summary>Gets all settings from the database.</summary>
@@ -319,6 +327,8 @@ namespace DotNetNuke.Entities.Controllers
 
         private static object GetSettingsDictionaryCallBack(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogDebug(">>> Entering GetSettingsDictionaryCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
+			Logger.LogDebug("<<< Exiting GetSettingsDictionaryCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return GetSettingsFromDatabase();
         }
     }

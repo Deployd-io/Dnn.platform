@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -8,6 +9,7 @@
 // "CodeMirror-selectedtext" when the value is not a string.
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -17,6 +19,7 @@
 })(function(CodeMirror) {
   "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
   CodeMirror.defineOption("styleSelectedText", false, function(cm, val, old) {
     var prev = old && old != CodeMirror.Init;
     if (val && !prev) {
@@ -30,11 +33,14 @@
       cm.off("change", onChange);
       clear(cm);
       cm.state.markedSelection = cm.state.markedSelectionStyle = null;
+	logger.debug(`<<< Exiting defineOption(false=${false},prev=${prev})`);
     }
   });
 
   function onCursorActivity(cm) {
+	logger.debug(`>>> Entering onCursorActivity(cm=${cm})`);
     cm.operation(function() { update(cm); });
+	logger.debug(`<<< Exiting onCursorActivity(cm=${cm})`);
   }
 
   function onChange(cm) {
@@ -60,26 +66,34 @@
       if (atEnd) break;
       line = endLine;
     }
+	logger.debug(`<<< Exiting coverRange(cm=${cm},from=${from},to=${to},addAt=${addAt})`);
   }
 
   function clear(cm) {
+	logger.debug(`>>> Entering clear(cm=${cm})`);
     var array = cm.state.markedSelection;
     for (var i = 0; i < array.length; ++i) array[i].clear();
     array.length = 0;
+	logger.debug(`<<< Exiting clear(cm=${cm})`);
   }
 
   function reset(cm) {
+	logger.debug(`>>> Entering reset(cm=${cm})`);
     clear(cm);
     var ranges = cm.listSelections();
     for (var i = 0; i < ranges.length; i++)
+	logger.debug(`reset(cm=${cm}): ranges → ${ranges}`);
       coverRange(cm, ranges[i].from(), ranges[i].to());
+	logger.debug(`<<< Exiting reset(cm=${cm})`);
   }
 
   function update(cm) {
+	logger.debug(`>>> Entering update(cm=${cm})`);
     if (!cm.somethingSelected()) return clear(cm);
     if (cm.listSelections().length > 1) return reset(cm);
 
     var from = cm.getCursor("start"), to = cm.getCursor("end");
+	logger.debug(`update(cm=${cm}): from → ${from}`);
 
     var array = cm.state.markedSelection;
     if (!array.length) return coverRange(cm, from, to);
@@ -114,5 +128,6 @@
         coverRange(cm, coverEnd.to, to);
       }
     }
+	logger.debug(`<<< Exiting update(cm=${cm})`);
   }
 });

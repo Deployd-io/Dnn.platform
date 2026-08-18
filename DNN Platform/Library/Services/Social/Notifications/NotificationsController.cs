@@ -34,6 +34,7 @@ namespace DotNetNuke.Services.Social.Notifications
     public class NotificationsController(IDataService dataService, Messaging.Data.IDataService messagingDataService, IHostSettings hostSettings)
         : ServiceLocator<INotificationsController, NotificationsController>, INotificationsController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(NotificationsController));
         internal const int ConstMaxSubject = 400;
         internal const int ConstMaxTo = 2000;
         private const string ToastsCacheKey = "GetToasts_{0}";
@@ -46,7 +47,9 @@ namespace DotNetNuke.Services.Social.Notifications
         public NotificationsController()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering NotificationsController()");
         }
+		Logger.LogDebug("<<< Exiting NotificationsController()");
 
         /// <summary>Initializes a new instance of the <see cref="NotificationsController"/> class from a specific data service.</summary>
         /// <param name="dataService">Class with methods to do CRUD in database for the entities of types <see cref="NotificationType"></see>, <see cref="NotificationTypeAction"></see> and <see cref="Notification"></see>.</param>
@@ -88,19 +91,24 @@ namespace DotNetNuke.Services.Social.Notifications
                     this.GetCurrentUserId());
                 action.NotificationTypeId = notificationTypeId;
             }
+			Logger.LogDebug("<<< Exiting SetNotificationTypeActions(actions={Actions},notificationTypeId={NotificationTypeId})", actions, notificationTypeId);
         }
 
         /// <inheritdoc />
         public virtual int CountNotifications(int userId, int portalId)
         {
+			Logger.LogDebug(">>> Entering CountNotifications(userId={UserId},portalId={PortalId})", userId, portalId);
             if (userId <= 0)
             {
                 return 0;
             }
 
             var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.UserNotificationsCountCacheKey, portalId, userId);
+			Logger.LogDebug("CountNotifications(userId={UserId},portalId={PortalId}): cacheKey → {CacheKey}", userId, portalId, cacheKey);
             var cache = CachingProvider.Instance();
+			Logger.LogDebug("CountNotifications(userId={UserId},portalId={PortalId}): cache → {Cache}", userId, portalId, cache);
             var cacheObject = cache.GetItem(cacheKey);
+			Logger.LogDebug("CountNotifications(userId={UserId},portalId={PortalId}): cacheObject → {CacheObject}", userId, portalId, cacheObject);
             if (cacheObject is int count)
             {
                 return count;
@@ -113,15 +121,19 @@ namespace DotNetNuke.Services.Social.Notifications
                 (DNNCacheDependency)null,
                 DateTime.Now.AddSeconds(DataCache.NotificationsCacheTimeInSec),
                 System.Web.Caching.Cache.NoSlidingExpiration);
+				Logger.LogDebug("CountNotifications(userId={UserId},portalId={PortalId}): count → {Count}", userId, portalId, count);
+			Logger.LogDebug("<<< Exiting CountNotifications(userId={UserId},portalId={PortalId})", userId, portalId);
             return count;
         }
 
         /// <inheritdoc />
         public virtual void SendNotification(Notification notification, int portalId, IList<RoleInfo> roles, IList<UserInfo> users)
         {
+			Logger.LogDebug(">>> Entering SendNotification(notification={Notification},portalId={PortalId},roles={Roles},users={Users})", notification, portalId, roles, users);
             Requires.NotNull("notification", notification);
 
             var pid = portalId;
+			Logger.LogDebug("SendNotification(notification={Notification},portalId={PortalId},roles={Roles},users={Users}): pid → {Pid}", notification, portalId, roles, users, pid);
             if (PortalController.IsMemberOfPortalGroup(portalId))
             {
                 pid = PortalController.GetEffectivePortalId(portalId);
@@ -134,6 +146,7 @@ namespace DotNetNuke.Services.Social.Notifications
 
             if (string.IsNullOrEmpty(notification.Subject) && string.IsNullOrEmpty(notification.Body))
             {
+				Logger.LogWarning("Throwing ArgumentException from SendNotification(notification={Notification},portalId={PortalId},roles={Roles},users={Users})", notification, portalId, roles, users);
                 throw new ArgumentException(Localization.GetString("MsgSubjectOrBodyRequiredError", Localization.ExceptionsResourceFile));
             }
 
@@ -148,6 +161,7 @@ namespace DotNetNuke.Services.Social.Notifications
             }
 
             var sbTo = new StringBuilder();
+			Logger.LogDebug("SendNotification(notification={Notification},portalId={PortalId},roles={Roles},users={Users}): sbTo → {SbTo}", notification, portalId, roles, users, sbTo);
             if (roles != null)
             {
                 foreach (var role in roles.Where(role => !string.IsNullOrEmpty(role.RoleName)))
@@ -201,6 +215,7 @@ namespace DotNetNuke.Services.Social.Notifications
             if (users == null)
             {
                 users = new List<UserInfo>();
+				Logger.LogDebug("SendNotification(notification={Notification},portalId={PortalId},roles={Roles},users={Users}): users → {Users1}", notification, portalId, roles, users, users);
             }
 
             var recipients = from user in users
@@ -228,6 +243,7 @@ namespace DotNetNuke.Services.Social.Notifications
                     this.MarkReadyForToast(notification, messageRecipient.UserID);
                 }
             }
+			Logger.LogDebug("<<< Exiting SendNotification(notification={Notification},portalId={PortalId},roles={Roles},users={Users})", notification, portalId, roles, users);
         }
 
         /// <inheritdoc />
@@ -248,46 +264,57 @@ namespace DotNetNuke.Services.Social.Notifications
                 notificationType.DesktopModuleId,
                 this.GetCurrentUserId(),
                 notificationType.IsTask);
+				Logger.LogDebug("<<< Exiting CreateNotificationType(notificationType={NotificationType})", notificationType);
         }
 
         /// <inheritdoc />
         public virtual void DeleteNotification(int notificationId)
         {
+			Logger.LogDebug(">>> Entering DeleteNotification(notificationId={NotificationId})", notificationId);
             var recipients = InternalMessagingController.Instance.GetMessageRecipients(notificationId);
             foreach (var recipient in recipients)
             {
+			Logger.LogDebug("DeleteNotification(notificationId={NotificationId}): recipients → {Recipients}", notificationId, recipients);
                 DataCache.RemoveCache(string.Format(CultureInfo.InvariantCulture, ToastsCacheKey, recipient.UserID));
             }
 
             this.dataService.DeleteNotification(notificationId);
+			Logger.LogDebug("<<< Exiting DeleteNotification(notificationId={NotificationId})", notificationId);
         }
 
         /// <inheritdoc />
         public int DeleteUserNotifications(UserInfo user)
         {
+			Logger.LogDebug(">>> Entering DeleteUserNotifications(user={User})", user);
             DataCache.RemoveCache(string.Format(CultureInfo.InvariantCulture, ToastsCacheKey, user.UserID));
+			Logger.LogDebug("<<< Exiting DeleteUserNotifications(user={User})", user);
             return this.dataService.DeleteUserNotifications(user.UserID, user.PortalID);
         }
 
         /// <inheritdoc />
         public virtual void DeleteNotificationRecipient(int notificationId, int userId)
         {
+			Logger.LogDebug(">>> Entering DeleteNotificationRecipient(notificationId={NotificationId},userId={UserId})", notificationId, userId);
             DataCache.RemoveCache(string.Format(CultureInfo.InvariantCulture, ToastsCacheKey, userId));
             InternalMessagingController.Instance.DeleteMessageRecipient(notificationId, userId);
             var recipients = InternalMessagingController.Instance.GetMessageRecipients(notificationId);
+			Logger.LogDebug("DeleteNotificationRecipient(notificationId={NotificationId},userId={UserId}): recipients → {Recipients}", notificationId, userId, recipients);
             if (recipients.Count == 0)
             {
                 this.DeleteNotification(notificationId);
             }
+			Logger.LogDebug("<<< Exiting DeleteNotificationRecipient(notificationId={NotificationId},userId={UserId})", notificationId, userId);
         }
 
         /// <inheritdoc />
         public virtual void DeleteAllNotificationRecipients(int notificationId)
         {
+			Logger.LogDebug(">>> Entering DeleteAllNotificationRecipients(notificationId={NotificationId})", notificationId);
             foreach (var recipient in InternalMessagingController.Instance.GetMessageRecipients(notificationId))
             {
                 this.DeleteNotificationRecipient(notificationId, recipient.UserID);
             }
+			Logger.LogDebug("<<< Exiting DeleteAllNotificationRecipients(notificationId={NotificationId})", notificationId);
         }
 
         /// <inheritdoc />
@@ -302,12 +329,15 @@ namespace DotNetNuke.Services.Social.Notifications
         /// <inheritdoc />
         public Notification GetNotification(int notificationId)
         {
+			Logger.LogDebug(">>> Entering GetNotification(notificationId={NotificationId})", notificationId);
+			Logger.LogDebug("<<< Exiting GetNotification(notificationId={NotificationId})", notificationId);
             return CBO.FillObject<Notification>(this.dataService.GetNotification(notificationId));
         }
 
         /// <inheritdoc />
         public virtual IList<Notification> GetNotificationByContext(int notificationTypeId, string context)
         {
+			Logger.LogDebug("<<< Exiting GetNotificationByContext(notificationTypeId={NotificationTypeId},context={Context})", notificationTypeId, context);
             return CBO.FillCollection<Notification>(this.dataService.GetNotificationByContext(notificationTypeId, context));
         }
 
@@ -317,6 +347,7 @@ namespace DotNetNuke.Services.Social.Notifications
             this.dataService.DeleteNotificationType(notificationTypeId);
 
             this.RemoveNotificationTypeCache();
+			Logger.LogDebug("<<< Exiting DeleteNotificationType(notificationTypeId={NotificationTypeId})", notificationTypeId);
         }
 
         /// <inheritdoc />
@@ -325,17 +356,21 @@ namespace DotNetNuke.Services.Social.Notifications
             this.dataService.DeleteNotificationTypeAction(notificationTypeActionId);
 
             this.RemoveNotificationTypeActionCache();
+			Logger.LogDebug("<<< Exiting DeleteNotificationTypeAction(notificationTypeActionId={NotificationTypeActionId})", notificationTypeActionId);
         }
 
         /// <inheritdoc />
         public virtual IList<Notification> GetNotifications(int userId, int portalId, int afterNotificationId, int numberOfRecords)
         {
+			Logger.LogDebug(">>> Entering GetNotifications(userId={UserId},portalId={PortalId},afterNotificationId={AfterNotificationId},numberOfRecords={NumberOfRecords})", userId, portalId, afterNotificationId, numberOfRecords);
             var pid = portalId;
             if (PortalController.IsMemberOfPortalGroup(portalId))
+			Logger.LogDebug("GetNotifications(userId={UserId},portalId={PortalId},afterNotificationId={AfterNotificationId},numberOfRecords={NumberOfRecords}): pid → {Pid}", userId, portalId, afterNotificationId, numberOfRecords, pid);
             {
                 pid = PortalController.GetEffectivePortalId(portalId);
             }
 
+			Logger.LogDebug("<<< Exiting GetNotifications(userId={UserId},portalId={PortalId},afterNotificationId={AfterNotificationId},numberOfRecords={NumberOfRecords})", userId, portalId, afterNotificationId, numberOfRecords);
             return userId <= 0
                 ? new List<Notification>(0)
                 : CBO.FillCollection<Notification>(this.dataService.GetNotifications(userId, pid, afterNotificationId, numberOfRecords));
@@ -386,32 +421,43 @@ namespace DotNetNuke.Services.Social.Notifications
         /// <inheritdoc />
         public bool IsToastPending(int notificationId)
         {
+			Logger.LogDebug(">>> Entering IsToastPending(notificationId={NotificationId})", notificationId);
+			Logger.LogDebug("<<< Exiting IsToastPending(notificationId={NotificationId})", notificationId);
             return this.dataService.IsToastPending(notificationId);
         }
 
         /// <inheritdoc />
         public void MarkReadyForToast(Notification notification, UserInfo userInfo)
         {
+			Logger.LogDebug(">>> Entering MarkReadyForToast(notification={Notification},userInfo={UserInfo})", notification, userInfo);
             this.MarkReadyForToast(notification, userInfo.UserID);
+			Logger.LogDebug("<<< Exiting MarkReadyForToast(notification={Notification},userInfo={UserInfo})", notification, userInfo);
         }
 
         public void MarkReadyForToast(Notification notification, int userId)
         {
+			Logger.LogDebug(">>> Entering MarkReadyForToast(notification={Notification},userId={UserId})", notification, userId);
             DataCache.RemoveCache(string.Format(CultureInfo.InvariantCulture, ToastsCacheKey, userId));
             this.dataService.MarkReadyForToast(notification.NotificationID, userId);
+			Logger.LogDebug("<<< Exiting MarkReadyForToast(notification={Notification},userId={UserId})", notification, userId);
         }
 
         /// <inheritdoc />
         public void MarkToastSent(int notificationId, int userId)
         {
+			Logger.LogDebug(">>> Entering MarkToastSent(notificationId={NotificationId},userId={UserId})", notificationId, userId);
             this.dataService.MarkToastSent(notificationId, userId);
+			Logger.LogDebug("<<< Exiting MarkToastSent(notificationId={NotificationId},userId={UserId})", notificationId, userId);
         }
 
         /// <inheritdoc />
         public IList<Notification> GetToasts(UserInfo userInfo)
         {
+			Logger.LogDebug(">>> Entering GetToasts(userInfo={UserInfo})", userInfo);
             var cacheKey = string.Format(CultureInfo.InvariantCulture, ToastsCacheKey, userInfo.UserID);
             var toasts = DataCache.GetCache<IList<Notification>>(cacheKey);
+			Logger.LogDebug("GetToasts(userInfo={UserInfo}): toasts → {Toasts}", userInfo, toasts);
+			Logger.LogDebug("GetToasts(userInfo={UserInfo}): cacheKey → {CacheKey}", userInfo, cacheKey);
 
             if (toasts == null)
             {
@@ -426,12 +472,15 @@ namespace DotNetNuke.Services.Social.Notifications
                 DataCache.SetCache(cacheKey, new List<Notification>());
             }
 
+			Logger.LogDebug("<<< Exiting GetToasts(userInfo={UserInfo})", userInfo);
             return toasts;
         }
 
         internal virtual UserInfo GetAdminUser()
         {
+			Logger.LogDebug(">>> Entering GetAdminUser()");
             var current = PortalSettings.Current;
+			Logger.LogDebug("<<< Exiting GetAdminUser()");
             return current == null
                 ? new UserInfo()
                 : UserController.GetUserById(current.PortalId, current.AdministratorId);
@@ -439,6 +488,8 @@ namespace DotNetNuke.Services.Social.Notifications
 
         internal virtual int GetCurrentUserId()
         {
+			Logger.LogDebug(">>> Entering GetCurrentUserId()");
+			Logger.LogDebug("<<< Exiting GetCurrentUserId()");
             return UserController.Instance.GetCurrentUserInfo().UserID;
         }
 
@@ -478,28 +529,38 @@ namespace DotNetNuke.Services.Social.Notifications
 
         internal virtual string GetPortalSetting(string settingName, int portalId, string defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetPortalSetting(settingName={SettingName},portalId={PortalId},defaultValue={DefaultValue})", settingName, portalId, defaultValue);
+			Logger.LogDebug("<<< Exiting GetPortalSetting(settingName={SettingName},portalId={PortalId},defaultValue={DefaultValue})", settingName, portalId, defaultValue);
             return PortalController.GetPortalSetting(settingName, portalId, defaultValue);
         }
 
         internal virtual string InputFilter(string input)
         {
+			Logger.LogDebug(">>> Entering InputFilter(input={Input})", input);
             var ps = PortalSecurity.Instance;
+			Logger.LogDebug("<<< Exiting InputFilter(input={Input})", input);
             return ps.InputFilter(input, PortalSecurity.FilterFlag.NoProfanity);
         }
 
         internal virtual void RemoveNotificationTypeActionCache()
         {
+			Logger.LogDebug(">>> Entering RemoveNotificationTypeActionCache()");
             DataCache.ClearCache("NotificationTypeActions:");
+			Logger.LogDebug("<<< Exiting RemoveNotificationTypeActionCache()");
         }
 
         internal virtual void RemoveNotificationTypeCache()
         {
+			Logger.LogDebug(">>> Entering RemoveNotificationTypeCache()");
             DataCache.ClearCache("NotificationTypes:");
+			Logger.LogDebug("<<< Exiting RemoveNotificationTypeCache()");
         }
 
         /// <inheritdoc />
         protected override Func<INotificationsController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new NotificationsController();
         }
     }

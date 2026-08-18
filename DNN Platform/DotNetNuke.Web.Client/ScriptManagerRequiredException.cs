@@ -12,16 +12,21 @@ using System.Web.UI;
 [Serializable]
 public class ScriptManagerRequiredException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ScriptManagerRequiredException));
     /// <inheritdoc />
     public ScriptManagerRequiredException()
     {
+	Logger.LogDebug(">>> Entering ScriptManagerRequiredException()");
+	Logger.LogDebug("<<< Exiting ScriptManagerRequiredException()");
     }
 
     /// <inheritdoc />
     public ScriptManagerRequiredException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering ScriptManagerRequiredException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting ScriptManagerRequiredException(message={Message})", message);
 
     /// <inheritdoc />
     public ScriptManagerRequiredException(string message, Exception innerException)

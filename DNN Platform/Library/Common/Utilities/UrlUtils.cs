@@ -23,6 +23,7 @@ namespace DotNetNuke.Common.Utilities
     /// <summary>Provides utilities for dealing with DNN's URLs. Consider using <see cref="System.Uri"/> if applicable.</summary>
     public static partial class UrlUtils
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UrlUtils));
         private static INavigationManager NavigationManager => Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
 
         /// <summary>Combines two URLs, trimming any slashes between them.</summary>
@@ -31,6 +32,7 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>A new URL that combines <paramref name="baseUrl"/> and <paramref name="relativeUrl"/>.</returns>
         public static string Combine(string baseUrl, string relativeUrl)
         {
+			Logger.LogDebug(">>> Entering Combine(baseUrl={BaseUrl},relativeUrl={RelativeUrl})", baseUrl, relativeUrl);
             if (baseUrl.Length == 0)
             {
                 return relativeUrl;
@@ -42,7 +44,10 @@ namespace DotNetNuke.Common.Utilities
             }
 
             baseUrl = baseUrl.TrimEnd('/', '\\');
+			Logger.LogDebug("Combine(baseUrl={BaseUrl},relativeUrl={RelativeUrl}): baseUrl → {BaseUrl1}", baseUrl, relativeUrl, baseUrl);
             relativeUrl = relativeUrl.TrimStart('/', '\\');
+			Logger.LogDebug("Combine(baseUrl={BaseUrl},relativeUrl={RelativeUrl}): relativeUrl → {RelativeUrl1}", baseUrl, relativeUrl, relativeUrl);
+			Logger.LogDebug("<<< Exiting Combine(baseUrl={BaseUrl},relativeUrl={RelativeUrl})", baseUrl, relativeUrl);
             return $"{baseUrl}/{relativeUrl}";
         }
 
@@ -51,8 +56,10 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The decoded value.</returns>
         public static string DecodeParameter(string value)
         {
+			Logger.LogDebug(">>> Entering DecodeParameter(value={Value})", value);
             value = value.Replace('-', '+').Replace('_', '/').Replace('$', '=');
             byte[] arrBytes = Convert.FromBase64String(value);
+			Logger.LogDebug("<<< Exiting DecodeParameter(value={Value})", value);
             return Encoding.UTF8.GetString(arrBytes);
         }
 
@@ -77,6 +84,10 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(10, 2, 2, "Use overload taking ICryptographyProvider")]
         public static partial string DecryptParameter(string value, string encryptionKey)
         {
+			Logger.LogDebug(">>> Entering DecryptParameter(value={Value},encryptionKey=<redacted>)", value);
+			Logger.LogDebug("<<< Exiting DecryptParameter(value={Value},encryptionKey=<redacted>)", value);
+			Logger.LogDebug("<<< Exiting DecryptParameter(cryptographyProvider={CryptographyProvider},value={Value},encryptionKey=<redacted>)", cryptographyProvider, value);
+			Logger.LogDebug("<<< Exiting DecryptParameter(decrypt={Decrypt},value={Value},encryptionKey=<redacted>)", decrypt, value);
             return DecryptParameter(Globals.GetCurrentServiceProvider().GetRequiredService<ICryptographyProvider>(), value, encryptionKey);
         }
 
@@ -100,11 +111,14 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The encoded value.</returns>
         public static string EncodeParameter(string value)
         {
+			Logger.LogDebug(">>> Entering EncodeParameter(value={Value})", value);
             byte[] arrBytes = Encoding.UTF8.GetBytes(value);
             var toEncode = new StringBuilder(Convert.ToBase64String(arrBytes));
+			Logger.LogDebug("EncodeParameter(value={Value}): toEncode → {ToEncode}", value, toEncode);
             toEncode.Replace('+', '-');
             toEncode.Replace('/', '_');
             toEncode.Replace('=', '$');
+			Logger.LogDebug("<<< Exiting EncodeParameter(value={Value})", value);
             return toEncode.ToString();
         }
 
@@ -137,13 +151,17 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The encrypted value.</returns>
         public static string EncryptParameter(ICryptographyProvider cryptographyProvider, string value, string encryptionKey)
         {
+			Logger.LogDebug(">>> Entering EncryptParameter(cryptographyProvider={CryptographyProvider},value={Value},encryptionKey=<redacted>)", cryptographyProvider, value);
             var encryptedValue = cryptographyProvider.EncryptParameter(value, encryptionKey).EncryptedMessage;
             var parameterValue = new StringBuilder(encryptedValue);
+			Logger.LogDebug("EncryptParameter(cryptographyProvider={CryptographyProvider},value={Value},encryptionKey=<redacted>): parameterValue → {ParameterValue}", cryptographyProvider, value, parameterValue);
+			Logger.LogDebug("EncryptParameter(cryptographyProvider={CryptographyProvider},value={Value},encryptionKey=<redacted>): encryptedValue → {EncryptedValue}", cryptographyProvider, value, encryptedValue);
 
             // [DNN-8257] - Can't do URLEncode/URLDecode as it introduces issues on decryption (with / = %2f), so we use a modified Base64
             parameterValue.Replace('/', '_');
             parameterValue.Replace('+', '-');
             parameterValue.Replace("=", "%3d");
+			Logger.LogDebug("<<< Exiting EncryptParameter(cryptographyProvider={CryptographyProvider},value={Value})", cryptographyProvider, value);
             return parameterValue.ToString();
         }
 
@@ -152,12 +170,15 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The name.</returns>
         public static string GetParameterName(string pair)
         {
+			Logger.LogDebug(">>> Entering GetParameterName(pair={Pair})", pair);
             var length = pair.IndexOf('=');
             if (length == -1)
+			Logger.LogDebug("GetParameterName(pair={Pair}): length → {Length}", pair, length);
             {
                 length = pair.Length;
             }
 
+			Logger.LogDebug("<<< Exiting GetParameterName(pair={Pair})", pair);
             return pair.Substring(0, length);
         }
 
@@ -166,9 +187,11 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The value.</returns>
         public static string GetParameterValue(string pair)
         {
+			Logger.LogDebug(">>> Entering GetParameterValue(pair={Pair})", pair);
             var start = pair.IndexOf('=') + 1;
             if (start == 0)
             {
+			Logger.LogDebug("<<< Exiting GetParameterValue(pair={Pair})", pair);
                 return string.Empty;
             }
 
@@ -185,6 +208,7 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The query-string parameters collection in <c>"key=value"</c> format.</returns>
         public static string[] GetQSParamsForNavigateURL()
         {
+			Logger.LogDebug(">>> Entering GetQSParamsForNavigateURL()");
             string returnValue = string.Empty;
             var coll = HttpContext.Current.Request.QueryString;
             string[] keys = coll.AllKeys;
@@ -225,6 +249,7 @@ namespace DotNetNuke.Common.Utilities
             }
 
             // return the new querystring as a string array
+			Logger.LogDebug("<<< Exiting GetQSParamsForNavigateURL()");
             return returnValue.Split('&');
         }
 
@@ -257,6 +282,7 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>true if HTTPS or if HTTP with an SSL offload header value, false otherwise.</returns>
         public static bool IsSecureConnectionOrSslOffload(IHostSettingsService hostSettingsService, HttpRequestBase request)
         {
+			Logger.LogDebug("<<< Exiting IsSecureConnectionOrSslOffload(hostSettingsService={HostSettingsService},request={Request})", hostSettingsService, request);
             return request.IsSecureConnection || IsSslOffloadEnabled(hostSettingsService, request);
         }
 
@@ -304,15 +330,18 @@ namespace DotNetNuke.Common.Utilities
             }
 
             var sslOffload = request.Headers[sslOffloadHeader];
+			Logger.LogDebug("<<< Exiting IsSslOffloadEnabled(request={Request})", request);
             return !string.IsNullOrEmpty(sslOffload) && (string.IsNullOrWhiteSpace(sslOffloadValue) || sslOffloadValue == sslOffload);
         }
 
         public static void OpenNewWindow(Page page, Type type, string url)
         {
+			Logger.LogDebug(">>> Entering OpenNewWindow(page={Page},type={Type},url={Url})", page, type, url);
             page.ClientScript.RegisterStartupScript(
                 type,
                 "DotNetNuke.NewWindow",
                 $"<script>window.open({HttpUtility.JavaScriptStringEncode(url, addDoubleQuotes: true)},'new')</script>");
+				Logger.LogDebug("<<< Exiting OpenNewWindow(page={Page},type={Type},url={Url})", page, type, url);
         }
 
         public static string PopUpUrl(string url, Control control, PortalSettings portalSettings, bool onClickEvent, bool responseRedirect)
@@ -392,9 +421,14 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The URL or script.</returns>
         public static string ClosePopUp(bool refresh, string url, bool onClickEvent)
         {
+			Logger.LogDebug(">>> Entering ClosePopUp(refresh={Refresh},url={Url},onClickEvent={OnClickEvent})", refresh, url, onClickEvent);
             var protocol = onClickEvent ? string.Empty : "javascript:";
             var refreshBool = refresh.ToString().ToLowerInvariant();
+			Logger.LogDebug("ClosePopUp(refresh={Refresh},url={Url},onClickEvent={OnClickEvent}): refreshBool → {RefreshBool}", refresh, url, onClickEvent, refreshBool);
             var urlString = HttpUtility.JavaScriptStringEncode(url);
+			Logger.LogDebug("ClosePopUp(refresh={Refresh},url={Url},onClickEvent={OnClickEvent}): urlString → {UrlString}", refresh, url, onClickEvent, urlString);
+			Logger.LogDebug("ClosePopUp(refresh={Refresh},url={Url},onClickEvent={OnClickEvent}): protocol → {Protocol}", refresh, url, onClickEvent, protocol);
+			Logger.LogDebug("<<< Exiting ClosePopUp(refresh={Refresh},url={Url},onClickEvent={OnClickEvent})", refresh, url, onClickEvent);
             return $"{protocol}dnnModal.closePopUp({refreshBool}, '{urlString}')";
         }
 
@@ -415,14 +449,17 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The updated URL.</returns>
         public static string ReplaceQSParam(IHostSettings hostSettings, string url, string param, string newValue)
         {
+			Logger.LogDebug(">>> Entering ReplaceQSParam(hostSettings={HostSettings},url={Url},param={Param},newValue={NewValue})", hostSettings, url, param, newValue);
             if (hostSettings.UseFriendlyUrls)
             {
                 var escapedReplacementValue = newValue.Replace("$1", "$$1").Replace("$2", "$$2").Replace("$3", "$$3").Replace("$4", "$$4");
+				Logger.LogDebug("ReplaceQSParam(hostSettings={HostSettings},url={Url},param={Param},newValue={NewValue}): escapedReplacementValue → {EscapedReplacementValue}", hostSettings, url, param, newValue, escapedReplacementValue);
                 return Regex.Replace(url, $@"(.*)({Regex.Escape(param)}/)([^/]+)(/.*)", $"$1$2{escapedReplacementValue}$4", RegexOptions.IgnoreCase);
             }
             else
             {
                 var escapedReplacementValue = newValue.Replace("$1", "$$1").Replace("$2", "$$2").Replace("$3", "$$3").Replace("$4", "$$4").Replace("$5", "$$5");
+				Logger.LogDebug("<<< Exiting ReplaceQSParam(url={Url},param={Param},newValue={NewValue})", url, param, newValue);
                 return Regex.Replace(url, $@"(.*)(&|\?)({Regex.Escape(param)}=)([^&\?]+)(.*)", $"$1$2$3{escapedReplacementValue}$5", RegexOptions.IgnoreCase);
             }
         }
@@ -442,12 +479,14 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The updated URL.</returns>
         public static string StripQSParam(IHostSettings hostSettings, string url, string param)
         {
+			Logger.LogDebug(">>> Entering StripQSParam(hostSettings={HostSettings},url={Url},param={Param})", hostSettings, url, param);
             if (hostSettings.UseFriendlyUrls)
             {
                 return Regex.Replace(url, $"(.*)({Regex.Escape(param)}/[^/]+/)(.*)", "$1$3", RegexOptions.IgnoreCase);
             }
             else
             {
+				Logger.LogDebug("<<< Exiting StripQSParam(hostSettings={HostSettings},url={Url},param={Param})", hostSettings, url, param);
                 return Regex.Replace(url, $@"(.*)(&|\?)({Regex.Escape(param)}=)([^&\?]+)([&\?])?(.*)", "$1$2$6", RegexOptions.IgnoreCase).Replace("(.*)([&\\?]$)", "$1");
             }
         }
@@ -457,6 +496,7 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The normalized return URL or <see cref="string.Empty"/>.</returns>
         public static string ValidReturnUrl(string url)
         {
+			Logger.LogDebug(">>> Entering ValidReturnUrl(url={Url})", url);
             try
             {
                 if (string.IsNullOrEmpty(url))
@@ -466,14 +506,17 @@ namespace DotNetNuke.Common.Utilities
                 }
 
                 url = url.Replace('\\', '/');
+				Logger.LogDebug("ValidReturnUrl(url={Url}): url → {Url1}", url, url);
                 if (url.IndexOf("data:", StringComparison.OrdinalIgnoreCase) > -1)
                 {
                     return string.Empty;
                 }
 
+			Logger.LogDebug("<<< Exiting ValidReturnUrl(url={Url})", url);
                 // clean the return url to avoid possible XSS attack.
 #pragma warning disable CS0618 // Type or member is obsolete
                 var cleanUrl = PortalSecurity.Instance.InputFilter(url, PortalSecurity.FilterFlag.NoScripting);
+				Logger.LogDebug("ValidReturnUrl(url={Url}): cleanUrl → {CleanUrl}", url, cleanUrl);
 #pragma warning restore CS0618 // Type or member is obsolete
                 if (url != cleanUrl)
                 {
@@ -482,6 +525,7 @@ namespace DotNetNuke.Common.Utilities
 
                 // redirect url should never contain a protocol ( if it does, it is likely a cross-site request forgery attempt )
                 var urlWithNoQuery = url;
+				Logger.LogDebug("ValidReturnUrl(url={Url}): urlWithNoQuery → {UrlWithNoQuery}", url, urlWithNoQuery);
                 if (urlWithNoQuery.IndexOf('?') > -1)
                 {
                     urlWithNoQuery = urlWithNoQuery.Substring(0, urlWithNoQuery.IndexOf("?", StringComparison.InvariantCultureIgnoreCase));
@@ -491,8 +535,11 @@ namespace DotNetNuke.Common.Utilities
                 {
                     var portalSettings = PortalSettings.Current;
                     var aliasWithHttp = Globals.AddHTTP(((IPortalAliasInfo)portalSettings.PortalAlias).HttpAlias);
+					Logger.LogDebug("ValidReturnUrl(url={Url}): aliasWithHttp → {AliasWithHttp}", url, aliasWithHttp);
                     var uri1 = new Uri(url);
+					Logger.LogDebug("ValidReturnUrl(url={Url}): uri1 → {Uri1}", url, uri1);
                     var uri2 = new Uri(aliasWithHttp);
+					Logger.LogDebug("ValidReturnUrl(url={Url}): uri2 → {Uri2}", url, uri2);
 
                     // protocol switching (HTTP <=> HTTPS) is allowed by not being checked here
                     if (!string.Equals(uri1.DnsSafeHost, uri2.DnsSafeHost, StringComparison.OrdinalIgnoreCase))
@@ -515,6 +562,7 @@ namespace DotNetNuke.Common.Utilities
                 if (url.StartsWith("//", StringComparison.Ordinal))
                 {
                     var urlWithNoProtocol = url.Substring(2);
+					Logger.LogDebug("ValidReturnUrl(url={Url}): urlWithNoProtocol → {UrlWithNoProtocol}", url, urlWithNoProtocol);
                     var portalSettings = PortalSettings.Current;
 
                     // note: this can redirect from parent to child and vice versa
@@ -528,6 +576,7 @@ namespace DotNetNuke.Common.Utilities
             }
             catch (UriFormatException)
             {
+				Logger.LogError("Exception in ValidReturnUrl(url={Url}): {Arg1}", url, UriFormatException.getMessage());
                 return string.Empty;
             }
         }
@@ -536,6 +585,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns><see langword="true"/> if the current page is in a pop-up, otherwise <see langword="false"/>.</returns>
         public static bool InPopUp()
         {
+			Logger.LogDebug(">>> Entering InPopUp()");
+			Logger.LogDebug("<<< Exiting InPopUp()");
             return HttpContext.Current != null && IsPopUp(HttpContext.Current.Request.Url.ToString());
         }
 
@@ -544,6 +595,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns><see langword="true"/> if the URL is for a page in a pop-up, otherwise <see langword="false"/>.</returns>
         public static bool IsPopUp(string url)
         {
+			Logger.LogDebug(">>> Entering IsPopUp(url={Url})", url);
+			Logger.LogDebug("<<< Exiting IsPopUp(url={Url})", url);
             return url.IndexOf("popUp=true", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
@@ -558,6 +611,7 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="portalSetting">The portal settings.</param>
         public static void Handle404Exception(HttpResponseBase response, IPortalSettings portalSetting)
         {
+			Logger.LogDebug(">>> Entering Handle404Exception(response={Response},portalSetting={PortalSetting})", response, portalSetting);
             if (portalSetting?.ErrorPage404 > Null.NullInteger)
             {
                 response.Redirect(NavigationManager.NavigateURL(portalSetting.ErrorPage404, string.Empty, "status=404"));
@@ -566,11 +620,15 @@ namespace DotNetNuke.Common.Utilities
             {
                 response.ClearContent();
                 response.TrySkipIisCustomErrors = true;
+				Logger.LogDebug("Handle404Exception(response={Response},portalSetting={PortalSetting}): response.TrySkipIisCustomErrors → {Arg2}", response, portalSetting, response.TrySkipIisCustomErrors);
+				Logger.LogDebug("Handle404Exception(response={Response},portalSetting={PortalSetting}): response.StatusCode → {Arg2}", response, portalSetting, response.StatusCode);
+				Logger.LogDebug("Handle404Exception(response={Response},portalSetting={PortalSetting}): response.Status → {Arg2}", response, portalSetting, response.Status);
                 response.StatusCode = 404;
                 response.Status = "404 Not Found";
                 response.Write("404 Not Found");
                 response.End();
             }
+			Logger.LogDebug("<<< Exiting Handle404Exception(response={Response},portalSetting={PortalSetting})", response, portalSetting);
         }
 
         /// <summary>Decrypts an encrypted value generated via <see cref="EncryptParameter(ICryptographyProvider,string,string)"/>.</summary>

@@ -18,12 +18,17 @@ namespace DotNetNuke.Services.Authentication
     [Serializable]
     public class UserAuthenticationInfo : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UserAuthenticationInfo));
         /// <summary>Initializes a new instance of the <see cref="UserAuthenticationInfo"/> class.</summary>
         public UserAuthenticationInfo()
         {
+			Logger.LogDebug(">>> Entering UserAuthenticationInfo()");
             this.AuthenticationToken = Null.NullString;
             this.AuthenticationType = Null.NullString;
+			Logger.LogDebug("UserAuthenticationInfo(): this.AuthenticationToken → {Arg0}", this.AuthenticationToken);
+			Logger.LogDebug("UserAuthenticationInfo(): this.AuthenticationType → {Arg0}", this.AuthenticationType);
             this.UserAuthenticationID = Null.NullInteger;
+			Logger.LogDebug("<<< Exiting UserAuthenticationInfo()");
         }
 
         /// <summary>Gets or sets the ID of the User Record in the Authentication System.</summary>
@@ -57,6 +62,7 @@ namespace DotNetNuke.Services.Authentication
         /// <param name="dr">The Data Reader to use.</param>
         public virtual void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.UserAuthenticationID = Null.SetNullInteger(dr["UserAuthenticationID"]);
             this.UserID = Null.SetNullInteger(dr["UserID"]);
             this.AuthenticationType = Null.SetNullString(dr["AuthenticationType"]);
@@ -64,6 +70,7 @@ namespace DotNetNuke.Services.Authentication
 
             // Fill base class fields
             this.FillInternal(dr);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

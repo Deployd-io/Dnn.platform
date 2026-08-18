@@ -76,11 +76,16 @@ namespace log4net.Appender
         /// </returns>
         public static AppenderCollection ReadOnly(AppenderCollection list)
         {
+			value.LogDebug(">>> Entering ReadOnly(list={List})", list);
             if(list == null)
             {
+				value.LogWarning("Throwing ArgumentNullException from ReadOnly(list={List})", list);
+			value.LogDebug("<<< Exiting ReadOnly(list={List})", list);
                 throw new ArgumentNullException("list");
             }
 
+			value.LogDebug(">>> Entering Reset()");
+			value.LogDebug("<<< Exiting Reset()");
             return new ReadOnlyAppenderCollection(list);
         }
 
@@ -95,7 +100,12 @@ namespace log4net.Appender
         /// </summary>
         public AppenderCollection()
         {
+			value.LogDebug(">>> Entering AppenderCollection()");
             this.m_array = new IAppender[DEFAULT_CAPACITY];
+			value.LogDebug("AppenderCollection(capacity={Capacity}): this.m_array → {Arg1}", capacity, this.m_array);
+			value.LogDebug("AppenderCollection(tag={Tag}): this.m_array → {Arg1}", tag, this.m_array);
+			value.LogDebug("AppenderCollection(): this.m_array → {Arg0}", this.m_array);
+			value.LogDebug("<<< Exiting AppenderCollection()");
         }
         
         /// <summary>
@@ -103,11 +113,14 @@ namespace log4net.Appender
         /// that has the specified initial capacity.
         /// </summary>
         /// <param name="capacity">
+		value.LogDebug("<<< Exiting AppenderCollection()");
         /// The number of elements that the new <c>AppenderCollection</c> is initially capable of storing.
         /// </param>
         public AppenderCollection(int capacity)
         {
+			value.LogDebug(">>> Entering AppenderCollection(capacity={Capacity})", capacity);
             this.m_array = new IAppender[capacity];
+			value.LogDebug("<<< Exiting AppenderCollection(capacity={Capacity})", capacity);
         }
 
         /// <summary>
@@ -117,8 +130,11 @@ namespace log4net.Appender
         /// <param name="c">The <c>AppenderCollection</c> whose elements are copied to the new collection.</param>
         public AppenderCollection(AppenderCollection c)
         {
+			value.LogDebug(">>> Entering AppenderCollection(c={C})", c);
             this.m_array = new IAppender[c.Count];
             this.AddRange(c);
+			value.LogDebug("AppenderCollection(c={C}): this.m_array → {Arg1}", c, this.m_array);
+			value.LogDebug("<<< Exiting AppenderCollection(c={C})", c);
         }
 
         /// <summary>
@@ -128,8 +144,11 @@ namespace log4net.Appender
         /// <param name="a">The <see cref="IAppender"/> array whose elements are copied to the new list.</param>
         public AppenderCollection(IAppender[] a)
         {
+			value.LogDebug(">>> Entering AppenderCollection(a={A})", a);
             this.m_array = new IAppender[a.Length];
             this.AddRange(a);
+			value.LogDebug("AppenderCollection(a={A}): this.m_array → {Arg1}", a, this.m_array);
+			value.LogDebug("<<< Exiting AppenderCollection(a={A})", a);
         }
         
         /// <summary>
@@ -139,8 +158,11 @@ namespace log4net.Appender
         /// <param name="col">The <see cref="IAppender"/> collection whose elements are copied to the new list.</param>
         public AppenderCollection(ICollection col)
         {
+			value.LogDebug(">>> Entering AppenderCollection(col={Col})", col);
             this.m_array = new IAppender[col.Count];
             this.AddRange(col);
+			value.LogDebug("AppenderCollection(col={Col}): this.m_array → {Arg1}", col, this.m_array);
+			value.LogDebug("<<< Exiting AppenderCollection(col={Col})", col);
         }
 
         /// <summary>
@@ -163,6 +185,7 @@ namespace log4net.Appender
         /// <exclude/>
         protected internal AppenderCollection(Tag tag)
         {
+			value.LogDebug(">>> Entering AppenderCollection(tag={Tag})", tag);
             this.m_array = null;
         }
 
@@ -182,6 +205,7 @@ namespace log4net.Appender
         public virtual void CopyTo(IAppender[] array)
         {
             this.CopyTo(array, 0);
+			value.LogDebug("<<< Exiting CopyTo(array={Array},start={Start})", array, start);
         }
 
         /// <summary>
@@ -192,12 +216,17 @@ namespace log4net.Appender
         /// <param name="start">The zero-based index in <paramref name="array"/> at which copying begins.</param>
         public virtual void CopyTo(IAppender[] array, int start)
         {
+			value.LogDebug(">>> Entering CopyTo(array={Array},start={Start})", array, start);
             if (this.m_count > array.GetUpperBound(0) + 1 - start)
             {
+				value.LogWarning("Throwing ArgumentException from CopyTo(array={Array},start={Start})", array, start);
                 throw new ArgumentException("Destination array was not long enough.");
             }
             
             Array.Copy(this.m_array, 0, array, start, this.m_count); 
+			value.LogDebug("<<< Exiting CopyTo(array={Array},start={Start})", array, start);
+			value.LogDebug(">>> Entering CopyTo(array={Array})", array);
+			value.LogDebug("<<< Exiting CopyTo(array={Array})", array);
         }
 
         /// <summary>
@@ -248,6 +277,7 @@ namespace log4net.Appender
         /// <returns>The index at which the value has been added.</returns>
         public virtual int Add(IAppender item)
         {
+			value.LogDebug(">>> Entering Add(item={Item})", item);
             if (this.m_count == this.m_array.Length)
             {
                 this.EnsureCapacity(this.m_count + 1);
@@ -256,6 +286,7 @@ namespace log4net.Appender
             this.m_array[this.m_count] = item;
             this.m_version++;
 
+			value.LogDebug("<<< Exiting Add(item={Item})", item);
             return this.m_count++;
         }
         
@@ -266,20 +297,29 @@ namespace log4net.Appender
         {
             ++this.m_version;
             this.m_array = new IAppender[DEFAULT_CAPACITY];
+			value.LogDebug("Clear(): this.m_array → {Arg0}", this.m_array);
             this.m_count = 0;
+			value.LogDebug("Clear(): m_count → {M_count}", m_count);
+			value.LogDebug("<<< Exiting Clear()");
         }
         
+		value.LogDebug("<<< Exiting Clear()");
         /// <summary>
         /// Creates a shallow copy of the <see cref="AppenderCollection"/>.
         /// </summary>
         /// <returns>A new <see cref="AppenderCollection"/> with a shallow copy of the collection data.</returns>
         public virtual object Clone()
         {
+			value.LogDebug(">>> Entering Clone()");
             AppenderCollection newCol = new AppenderCollection(this.m_count);
             Array.Copy(this.m_array, 0, newCol.m_array, 0, this.m_count);
+			value.LogDebug("Clone(): newCol → {NewCol}", newCol);
+			value.LogDebug("Clone(): newCol.m_count → {Arg0}", newCol.m_count);
+			value.LogDebug("Clone(): newCol.m_version → {Arg0}", newCol.m_version);
             newCol.m_count = this.m_count;
             newCol.m_version = this.m_version;
 
+			value.LogDebug("<<< Exiting Clone()");
             return newCol;
         }
 
@@ -290,6 +330,7 @@ namespace log4net.Appender
         /// <returns><c>true</c> if <paramref name="item"/> is found in the <c>AppenderCollection</c>; otherwise, <c>false</c>.</returns>
         public virtual bool Contains(IAppender item)
         {
+			value.LogDebug(">>> Entering Contains(item={Item})", item);
             for (int i = 0; i != this.m_count; ++i)
             {
                 if (this.m_array[i].Equals(item))
@@ -297,6 +338,7 @@ namespace log4net.Appender
                     return true;
                 }
             }
+			value.LogDebug("<<< Exiting Contains(item={Item})", item);
             return false;
         }
 
@@ -311,6 +353,7 @@ namespace log4net.Appender
         /// </returns>
         public virtual int IndexOf(IAppender item)
         {
+			value.LogDebug(">>> Entering IndexOf(item={Item})", item);
             for (int i = 0; i != this.m_count; ++i)
             {
                 if (this.m_array[i].Equals(item))
@@ -318,6 +361,7 @@ namespace log4net.Appender
                     return i;
                 }
             }
+			value.LogDebug("<<< Exiting IndexOf(item={Item})", item);
             return -1;
         }
 
@@ -333,6 +377,7 @@ namespace log4net.Appender
         /// </exception>
         public virtual void Insert(int index, IAppender item)
         {
+			value.LogDebug(">>> Entering Insert(index={Index},item={Item})", index, item);
             this.ValidateIndex(index, true); // throws
             
             if (this.m_count == this.m_array.Length)
@@ -348,6 +393,7 @@ namespace log4net.Appender
             this.m_array[index] = item;
             this.m_count++;
             this.m_version++;
+			value.LogDebug("<<< Exiting Insert(index={Index},item={Item})", index, item);
         }
 
         /// <summary>
@@ -359,14 +405,17 @@ namespace log4net.Appender
         /// </exception>
         public virtual void Remove(IAppender item)
         {		   
+			value.LogDebug(">>> Entering Remove(item={Item})", item);
             int i = this.IndexOf(item);
             if (i < 0)
             {
+				value.LogWarning("Throwing ArgumentException from Remove(item={Item})", item);
                 throw new ArgumentException("Cannot remove the specified item because it was not found in the specified Collection.");
             }
             
             ++this.m_version;
             this.RemoveAt(i);
+			value.LogDebug("<<< Exiting Remove(item={Item})", item);
         }
 
         /// <summary>
@@ -380,6 +429,7 @@ namespace log4net.Appender
         /// </exception>
         public virtual void RemoveAt(int index)
         {
+			value.LogDebug(">>> Entering RemoveAt(index={Index})", index);
             this.ValidateIndex(index); // throws
 
             this.m_count--;
@@ -395,6 +445,7 @@ namespace log4net.Appender
             IAppender[] temp = new IAppender[1];
             Array.Copy(temp, 0, this.m_array, this.m_count, 1);
             this.m_version++;
+			value.LogDebug("<<< Exiting RemoveAt(index={Index})", index);
         }
 
         /// <summary>
@@ -463,6 +514,7 @@ namespace log4net.Appender
         /// <returns>The new <see cref="AppenderCollection.Count"/> of the <c>AppenderCollection</c>.</returns>
         public virtual int AddRange(AppenderCollection x)
         {
+			value.LogDebug(">>> Entering AddRange(x={X})", x);
             if (this.m_count + x.Count >= this.m_array.Length)
             {
                 this.EnsureCapacity(this.m_count + x.Count);
@@ -472,6 +524,8 @@ namespace log4net.Appender
             this.m_count += x.Count;
             this.m_version++;
 
+			value.LogDebug("<<< Exiting AddRange(x={X})", x);
+			value.LogDebug("<<< Exiting AddRange(col={Col})", col);
             return this.m_count;
         }
 
@@ -520,6 +574,9 @@ namespace log4net.Appender
         public virtual void TrimToSize()
         {
             this.Capacity = this.m_count;
+			value.LogDebug(">>> Entering TrimToSize()");
+			value.LogWarning("Throwing NotSupportedException from TrimToSize()");
+			value.LogDebug("<<< Exiting TrimToSize()");
         }
 
         /// <summary>
@@ -528,11 +585,13 @@ namespace log4net.Appender
         /// <returns>the array</returns>
         public virtual IAppender[] ToArray()
         {
+			value.LogDebug(">>> Entering ToArray()");
             IAppender[] resultArray = new IAppender[this.m_count];
             if (this.m_count > 0)
             {
                 Array.Copy(this.m_array, 0, resultArray, 0, this.m_count);
             }
+			value.LogDebug("<<< Exiting ToArray()");
             return resultArray;
         }
 
@@ -544,6 +603,7 @@ namespace log4net.Appender
         private void ValidateIndex(int i)
         {
             this.ValidateIndex(i, false);
+			value.LogDebug("<<< Exiting ValidateIndex(i={I})", i);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">
@@ -562,13 +622,17 @@ namespace log4net.Appender
 
         private void EnsureCapacity(int min)
         {
+			value.LogDebug(">>> Entering EnsureCapacity(min={Min})", min);
             int newCapacity = ((this.m_array.Length == 0) ? DEFAULT_CAPACITY : this.m_array.Length * 2);
             if (newCapacity < min)
+			value.LogDebug("EnsureCapacity(min={Min}): newCapacity → {NewCapacity}", min, newCapacity);
             {
                 newCapacity = min;
             }
 
             this.Capacity = newCapacity;
+			value.LogDebug("EnsureCapacity(min={Min}): this.Capacity → {Arg1}", min, this.Capacity);
+			value.LogDebug("<<< Exiting EnsureCapacity(min={Min})", min);
         }
 
         void ICollection.CopyTo(Array array, int start)
@@ -587,16 +651,22 @@ namespace log4net.Appender
 
         int IList.Add(object x)
         {
+			value.LogDebug(">>> Entering Add(x={X})", x);
+			value.LogDebug("<<< Exiting Add(x={X})", x);
             return this.Add((IAppender)x);
         }
 
         bool IList.Contains(object x)
         {
+			value.LogDebug(">>> Entering Contains(x={X})", x);
+			value.LogDebug("<<< Exiting Contains(x={X})", x);
             return this.Contains((IAppender)x);
         }
 
         int IList.IndexOf(object x)
         {
+			value.LogDebug(">>> Entering IndexOf(x={X})", x);
+			value.LogDebug("<<< Exiting IndexOf(x={X})", x);
             return this.IndexOf((IAppender)x);
         }
 
@@ -617,6 +687,8 @@ namespace log4net.Appender
 
         IEnumerator IEnumerable.GetEnumerator()
         {
+			value.LogDebug(">>> Entering GetEnumerator()");
+			value.LogDebug("<<< Exiting GetEnumerator()");
             return (IEnumerator)(this.GetEnumerator());
         }
 
@@ -636,9 +708,14 @@ namespace log4net.Appender
             /// <param name="tc"></param>
             internal Enumerator(AppenderCollection tc)
             {
+				value.LogDebug(">>> Entering Enumerator(tc={Tc})", tc);
                 this.m_collection = tc;
                 this.m_index = -1;
+				value.LogDebug("Enumerator(tc={Tc}): this.m_collection → {Arg1}", tc, this.m_collection);
+				value.LogDebug("Enumerator(tc={Tc}): this.m_index → {Arg1}", tc, this.m_index);
+				value.LogDebug("Enumerator(tc={Tc}): m_index → {M_index}", tc, m_index);
                 this.m_version = tc.m_version;
+				value.LogDebug("<<< Exiting Enumerator(tc={Tc})", tc);
             }
 
             /// <summary>
@@ -661,12 +738,15 @@ namespace log4net.Appender
             /// </exception>
             public bool MoveNext()
             {
+				value.LogDebug(">>> Entering MoveNext()");
                 if (this.m_version != this.m_collection.m_version)
                 {
+					value.LogWarning("Throwing InvalidOperationException from MoveNext()");
                     throw new InvalidOperationException("Collection was modified; enumeration operation may not execute.");
                 }
 
                 ++this.m_index;
+				value.LogDebug("<<< Exiting MoveNext()");
                 return (this.m_index < this.m_collection.Count);
             }
 
@@ -675,7 +755,11 @@ namespace log4net.Appender
             /// </summary>
             public void Reset()
             {
+				value.LogDebug(">>> Entering Reset()");
                 this.m_index = -1;
+				value.LogDebug("Reset(): m_index → {M_index}", m_index);
+				value.LogDebug("Reset(): this.m_index → {Arg0}", this.m_index);
+				value.LogDebug("<<< Exiting Reset()");
             }
 
             object IEnumerator.Current
@@ -691,12 +775,18 @@ namespace log4net.Appender
 
             internal ReadOnlyAppenderCollection(AppenderCollection list) : base(Tag.Default)
             {
+				value.LogDebug(">>> Entering ReadOnlyAppenderCollection(list={List})", list);
                 this.m_collection = list;
+				value.LogDebug("ReadOnlyAppenderCollection(list={List}): this.m_collection → {Arg1}", list, this.m_collection);
+				value.LogDebug("ReadOnlyAppenderCollection(list={List}): m_collection → {M_collection}", list, m_collection);
+				value.LogDebug("<<< Exiting ReadOnlyAppenderCollection(list={List})", list);
             }
 
             public override void CopyTo(IAppender[] array)
             {
+				value.LogDebug(">>> Entering CopyTo(array={Array})", array);
                 this.m_collection.CopyTo(array);
+				value.LogDebug("<<< Exiting CopyTo(array={Array})", array);
             }
 
             public override void CopyTo(IAppender[] array, int start)
@@ -752,16 +842,25 @@ namespace log4net.Appender
 
             public override void Insert(int pos, IAppender x)
             {
+				value.LogDebug(">>> Entering Insert(pos={Pos},x={X})", pos, x);
+				value.LogWarning("Throwing NotSupportedException from Insert(pos={Pos},x={X})", pos, x);
+				value.LogDebug("<<< Exiting Insert(pos={Pos},x={X})", pos, x);
                 throw new NotSupportedException("This is a Read Only Collection and can not be modified");
             }
 
             public override void Remove(IAppender x)
             {
+				value.LogDebug(">>> Entering Remove(x={X})", x);
+				value.LogWarning("Throwing NotSupportedException from Remove(x={X})", x);
+				value.LogDebug("<<< Exiting Remove(x={X})", x);
                 throw new NotSupportedException("This is a Read Only Collection and can not be modified");
             }
 
             public override void RemoveAt(int pos)
             {
+				value.LogDebug(">>> Entering RemoveAt(pos={Pos})", pos);
+				value.LogWarning("Throwing NotSupportedException from RemoveAt(pos={Pos})", pos);
+				value.LogDebug("<<< Exiting RemoveAt(pos={Pos})", pos);
                 throw new NotSupportedException("This is a Read Only Collection and can not be modified");
             }
 
@@ -804,6 +903,8 @@ namespace log4net.Appender
 
             public override void TrimToSize()
             {
+				value.LogDebug(">>> Entering TrimToSize()");
+				value.LogWarning("Throwing NotSupportedException from TrimToSize()");
                 throw new NotSupportedException("This is a Read Only Collection and can not be modified");
             }
         }

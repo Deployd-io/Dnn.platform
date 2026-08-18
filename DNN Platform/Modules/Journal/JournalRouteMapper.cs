@@ -10,9 +10,12 @@ namespace DotNetNuke.Modules.Journal
 
     public class JournalRouteMapper : IServiceRouteMapper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(JournalRouteMapper));
         public void RegisterRoutes(IMapRoute mapRouteManager)
         {
+			Logger.LogDebug(">>> Entering RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
             mapRouteManager.MapHttpRoute("Journal", "default", "{controller}/{action}", new[] { "DotNetNuke.Modules.Journal" });
+			Logger.LogDebug("<<< Exiting RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
         }
     }
 }

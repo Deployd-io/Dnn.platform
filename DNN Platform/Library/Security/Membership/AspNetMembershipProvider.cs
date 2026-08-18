@@ -53,14 +53,18 @@ namespace DotNetNuke.Security.Membership
         public AspNetMembershipProvider()
             : this(null, null, null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering AspNetMembershipProvider()");
         }
 
+		Logger.LogDebug("<<< Exiting AspNetMembershipProvider()");
         /// <summary>Initializes a new instance of the <see cref="AspNetMembershipProvider"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Use overload with ICryptographyProvider. Scheduled for removal in v12.0.0.")]
         public AspNetMembershipProvider(IHostSettings hostSettings)
             : this(hostSettings, null, null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering AspNetMembershipProvider(hostSettings={HostSettings})", hostSettings);
+		Logger.LogDebug("<<< Exiting AspNetMembershipProvider(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="AspNetMembershipProvider"/> class.</summary>
@@ -74,7 +78,12 @@ namespace DotNetNuke.Security.Membership
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.cryptographyProvider = cryptographyProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<ICryptographyProvider>();
+			Logger.LogDebug("AspNetMembershipProvider(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger}): cryptographyProvider → {CryptographyProvider1}", hostSettings, cryptographyProvider, portalController, appStatus, portalGroupController, eventLogger, cryptographyProvider);
+			Logger.LogDebug("AspNetMembershipProvider(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger}): appStatus → {AppStatus1}", hostSettings, cryptographyProvider, portalController, appStatus, portalGroupController, eventLogger, appStatus);
+			Logger.LogDebug("AspNetMembershipProvider(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger}): portalGroupController → {PortalGroupController1}", hostSettings, cryptographyProvider, portalController, appStatus, portalGroupController, eventLogger, portalGroupController);
+			Logger.LogDebug("AspNetMembershipProvider(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger}): eventLogger → {EventLogger1}", hostSettings, cryptographyProvider, portalController, appStatus, portalGroupController, eventLogger, eventLogger);
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+			Logger.LogDebug("AspNetMembershipProvider(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},eventLogger={EventLogger}): portalController → {PortalController1}", hostSettings, cryptographyProvider, portalController, appStatus, portalGroupController, eventLogger, portalController);
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
             this.portalGroupController = portalGroupController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalGroupController>();
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
@@ -202,25 +211,32 @@ namespace DotNetNuke.Security.Membership
         /// <inheritdoc />
         public override UserInfo GetUserByAuthToken(int portalId, string userToken, string authType)
         {
+			Logger.LogDebug(">>> Entering GetUserByAuthToken(portalId={PortalId},userToken=<redacted>,authType={AuthType})", portalId, authType);
             IDataReader dr = this.dataProvider.GetUserByAuthToken(portalId, userToken, authType);
+			Logger.LogDebug("GetUserByAuthToken(portalId={PortalId},userToken=<redacted>,authType={AuthType}): dr → {Dr}", portalId, authType, dr);
+			Logger.LogDebug("<<< Exiting GetUserByAuthToken(portalId={PortalId},userToken=<redacted>,authType={AuthType})", portalId, authType);
             return FillUserInfo(portalId, dr, true);
         }
 
         /// <inheritdoc />
         public override void AddUserPortal(int portalId, int userId)
         {
+			Logger.LogDebug(">>> Entering AddUserPortal(portalId={PortalId},userId={UserId})", portalId, userId);
             Requires.NotNullOrEmpty("portalId", portalId.ToString(CultureInfo.InvariantCulture));
             Requires.NotNullOrEmpty("userId", userId.ToString(CultureInfo.InvariantCulture));
             this.dataProvider.AddUserPortal(portalId, userId);
+			Logger.LogDebug("<<< Exiting AddUserPortal(portalId={PortalId},userId={UserId})", portalId, userId);
         }
 
         /// <inheritdoc />
         public override void ChangeUsername(int userId, string newUsername)
         {
+			Logger.LogDebug(">>> Entering ChangeUsername(userId={UserId},newUsername={NewUsername})", userId, newUsername);
             Requires.NotNull("userId", userId);
             Requires.NotNullOrEmpty("newUsername", newUsername);
 
             var userName = PortalSecurity.Instance.InputFilter(
+			Logger.LogDebug("<<< Exiting ChangeUsername(userId={UserId},newUsername={NewUsername})", userId, newUsername);
                 newUsername,
 #pragma warning disable CS0618 // Type or member is obsolete
                 PortalSecurity.FilterFlag.NoScripting | PortalSecurity.FilterFlag.NoAngleBrackets | PortalSecurity.FilterFlag.NoMarkup);
@@ -228,10 +244,12 @@ namespace DotNetNuke.Security.Membership
 
             if (!userName.Equals(newUsername, StringComparison.Ordinal))
             {
+				Logger.LogWarning("Throwing ArgumentException from ChangeUsername(userId={UserId},newUsername={NewUsername})", userId, newUsername);
                 throw new ArgumentException(Localization.GetExceptionMessage("InvalidUserName", "The username specified is invalid."));
             }
 
             var valid = UserController.Instance.IsValidUserName(userName);
+			Logger.LogDebug("ChangeUsername(userId={UserId},newUsername={NewUsername}): valid → {Valid}", userId, newUsername, valid);
 
             if (!valid)
             {
@@ -240,16 +258,21 @@ namespace DotNetNuke.Security.Membership
 
             // read all the user account settings
             var portalSettings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogDebug("ChangeUsername(userId={UserId},newUsername={NewUsername}): portalSettings → {PortalSettings}", userId, newUsername, portalSettings);
             if (portalSettings != null)
             {
                 var settings = UserController.GetUserSettings(portalSettings.PortalId);
+				Logger.LogDebug("ChangeUsername(userId={UserId},newUsername={NewUsername}): settings → {Settings}", userId, newUsername, settings);
 
                 // User Name Validation
                 var userNameValidator = GetStringSetting(settings, "Security_UserNameValidation");
+				Logger.LogDebug("ChangeUsername(userId={UserId},newUsername={NewUsername}): userNameValidator → {UserNameValidator}", userId, newUsername, userNameValidator);
                 if (!string.IsNullOrEmpty(userNameValidator))
                 {
                     var regExp = RegexUtils.GetCachedRegex(userNameValidator, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+					Logger.LogDebug("ChangeUsername(userId={UserId},newUsername={NewUsername}): regExp → {RegExp}", userId, newUsername, regExp);
                     var matches = regExp.Matches(userName);
+					Logger.LogDebug("ChangeUsername(userId={UserId},newUsername={NewUsername}): matches → {Matches}", userId, newUsername, matches);
                     if (matches.Count == 0)
                     {
                         throw new ArgumentException(Localization.GetExceptionMessage("InvalidUserName", "The username specified is invalid."));
@@ -420,12 +443,17 @@ namespace DotNetNuke.Security.Membership
         [DnnDeprecated(8, 0, 0, "Other solutions exist outside of the DNN Platform", RemovalVersion = 11)]
         public override partial void DeleteUsersOnline(int timeWindow)
         {
+			Logger.LogDebug(">>> Entering DeleteUsersOnline(timeWindow={TimeWindow})", timeWindow);
             this.dataProvider.DeleteUsersOnline(timeWindow);
+			Logger.LogDebug("<<< Exiting DeleteUsersOnline(timeWindow={TimeWindow})", timeWindow);
         }
 
         /// <inheritdoc />
         public override string GeneratePassword()
         {
+			Logger.LogDebug(">>> Entering GeneratePassword()");
+			Logger.LogDebug("<<< Exiting GeneratePassword()");
+			Logger.LogDebug("<<< Exiting GeneratePassword(length={Length})", length);
             return this.GeneratePassword(this.MinPasswordLength + 4);
         }
 
@@ -438,6 +466,8 @@ namespace DotNetNuke.Security.Membership
         /// <inheritdoc />
         public override ArrayList GetDeletedUsers(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetDeletedUsers(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetDeletedUsers(portalId={PortalId})", portalId);
             return FillUserCollection(portalId, this.dataProvider.GetDeletedUsers(portalId));
         }
 
@@ -445,7 +475,9 @@ namespace DotNetNuke.Security.Membership
         [DnnDeprecated(8, 0, 0, "Other solutions exist outside of the DNN Platform", RemovalVersion = 11)]
         public override partial ArrayList GetOnlineUsers(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetOnlineUsers(portalId={PortalId})", portalId);
             int totalRecords = 0;
+			Logger.LogDebug("<<< Exiting GetOnlineUsers(portalId={PortalId})", portalId);
             return FillUserCollection(portalId, this.dataProvider.GetOnlineUsers(portalId), ref totalRecords);
         }
 
@@ -464,6 +496,9 @@ namespace DotNetNuke.Security.Membership
         /// <inheritdoc />
         public override ArrayList GetUnAuthorizedUsers(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetUnAuthorizedUsers(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetUnAuthorizedUsers(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetUnAuthorizedUsers(portalId={PortalId},includeDeleted={IncludeDeleted},superUsersOnly={SuperUsersOnly})", portalId, includeDeleted, superUsersOnly);
             return this.GetUnAuthorizedUsers(portalId, false, false);
         }
 
@@ -478,8 +513,12 @@ namespace DotNetNuke.Security.Membership
         /// <inheritdoc />
         public override UserInfo GetUser(int portalId, int userId)
         {
+			Logger.LogDebug(">>> Entering GetUser(portalId={PortalId},userId={UserId})", portalId, userId);
             IDataReader dr = this.dataProvider.GetUser(portalId, userId);
             UserInfo objUserInfo = FillUserInfo(portalId, dr, true);
+			Logger.LogDebug("GetUser(portalId={PortalId},userId={UserId}): objUserInfo → {ObjUserInfo}", portalId, userId, objUserInfo);
+			Logger.LogDebug("GetUser(portalId={PortalId},userId={UserId}): dr → {Dr}", portalId, userId, dr);
+			Logger.LogDebug("<<< Exiting GetUser(portalId={PortalId},userId={UserId})", portalId, userId);
             return objUserInfo;
         }
 
@@ -494,6 +533,8 @@ namespace DotNetNuke.Security.Membership
         /// <inheritdoc />
         public override UserInfo GetUserByUserName(int portalId, string username)
         {
+			Logger.LogDebug(">>> Entering GetUserByUserName(portalId={PortalId},username={Username})", portalId, username);
+			Logger.LogDebug("<<< Exiting GetUserByUserName(portalId={PortalId},username={Username})", portalId, username);
             return CBO.GetCachedObject<UserInfo>(
                 this.hostSettings,
                 new CacheItemArgs(
@@ -506,26 +547,34 @@ namespace DotNetNuke.Security.Membership
         /// <inheritdoc />
         public override UserInfo GetUserByVanityUrl(int portalId, string vanityUrl)
         {
+			Logger.LogDebug(">>> Entering GetUserByVanityUrl(portalId={PortalId},vanityUrl={VanityUrl})", portalId, vanityUrl);
             UserInfo user = null;
             if (!string.IsNullOrEmpty(vanityUrl))
+			Logger.LogDebug("GetUserByVanityUrl(portalId={PortalId},vanityUrl={VanityUrl}): user → {User}", portalId, vanityUrl, user);
             {
                 IDataReader dr = this.dataProvider.GetUserByVanityUrl(portalId, vanityUrl);
+				Logger.LogDebug("GetUserByVanityUrl(portalId={PortalId},vanityUrl={VanityUrl}): dr → {Dr}", portalId, vanityUrl, dr);
                 user = FillUserInfo(portalId, dr, true);
             }
 
+			Logger.LogDebug("<<< Exiting GetUserByVanityUrl(portalId={PortalId},vanityUrl={VanityUrl})", portalId, vanityUrl);
             return user;
         }
 
         /// <inheritdoc />
         public override UserInfo GetUserByPasswordResetToken(int portalId, string resetToken)
         {
+			Logger.LogDebug(">>> Entering GetUserByPasswordResetToken(portalId={PortalId},resetToken=<redacted>)", portalId);
             UserInfo user = null;
             if (!string.IsNullOrEmpty(resetToken))
+			Logger.LogDebug("GetUserByPasswordResetToken(portalId={PortalId},resetToken=<redacted>): user → {User}", portalId, user);
             {
                 IDataReader dr = this.dataProvider.GetUserByPasswordResetToken(portalId, resetToken);
+				Logger.LogDebug("GetUserByPasswordResetToken(portalId={PortalId},resetToken=<redacted>): dr → {Dr}", portalId, dr);
                 user = FillUserInfo(portalId, dr, true);
             }
 
+			Logger.LogDebug("<<< Exiting GetUserByPasswordResetToken(portalId={PortalId},resetToken=<redacted>)", portalId);
             return user;
         }
 
@@ -538,9 +587,12 @@ namespace DotNetNuke.Security.Membership
         /// <inheritdoc />
         public override UserInfo GetUserByProviderUserKey(int portalId, string providerUserKey)
         {
+			Logger.LogDebug(">>> Entering GetUserByProviderUserKey(portalId={PortalId},providerUserKey={ProviderUserKey})", portalId, providerUserKey);
             var userName = this.GetMembershipUserByUserKey(providerUserKey)?.UserName ?? string.Empty;
             if (string.IsNullOrEmpty(userName))
+			Logger.LogDebug("GetUserByProviderUserKey(portalId={PortalId},providerUserKey={ProviderUserKey}): userName → {UserName}", portalId, providerUserKey, userName);
             {
+			Logger.LogDebug("<<< Exiting GetUserByProviderUserKey(portalId={PortalId},providerUserKey={ProviderUserKey})", portalId, providerUserKey);
                 return null;
             }
 
@@ -550,6 +602,8 @@ namespace DotNetNuke.Security.Membership
         /// <inheritdoc />
         public override int GetUserCountByPortal(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetUserCountByPortal(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetUserCountByPortal(portalId={PortalId})", portalId);
             return this.dataProvider.GetUserCountByPortal(portalId);
         }
 
@@ -566,6 +620,7 @@ namespace DotNetNuke.Security.Membership
 #pragma warning disable CS0618 // Type or member is obsolete
             user.Membership.IsOnLine = this.IsUserOnline(user);
 #pragma warning restore CS0618 // Type or member is obsolete
+		Logger.LogDebug("<<< Exiting GetUserMembership(user={User})", user);
         }
 
         /// <inheritdoc />
@@ -598,6 +653,8 @@ namespace DotNetNuke.Security.Membership
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public override IList<UserInfo> GetUsersAdvancedSearch(int portalId, int userId, int filterUserId, int filterRoleId, int relationshipTypeId, bool isAdmin, int pageIndex, int pageSize, string sortColumn, bool sortAscending, string propertyNames, string propertyValues)
         {
+			Logger.LogDebug(">>> Entering GetUsersAdvancedSearch(portalId={PortalId},userId={UserId},filterUserId={FilterUserId},filterRoleId={FilterRoleId},relationshipTypeId={RelationshipTypeId},isAdmin={IsAdmin},pageIndex={PageIndex},pageSize={PageSize},sortColumn={SortColumn},sortAscending={SortAscending},propertyNames={PropertyNames},propertyValues={PropertyValues})", portalId, userId, filterUserId, filterRoleId, relationshipTypeId, isAdmin, pageIndex, pageSize, sortColumn, sortAscending, propertyNames, propertyValues);
+			Logger.LogDebug("<<< Exiting GetUsersAdvancedSearch(portalId={PortalId},userId={UserId},filterUserId={FilterUserId},filterRoleId={FilterRoleId},relationshipTypeId={RelationshipTypeId},isAdmin={IsAdmin},pageIndex={PageIndex},pageSize={PageSize},sortColumn={SortColumn},sortAscending={SortAscending},propertyNames={PropertyNames},propertyValues={PropertyValues})", portalId, userId, filterUserId, filterRoleId, relationshipTypeId, isAdmin, pageIndex, pageSize, sortColumn, sortAscending, propertyNames, propertyValues);
             return FillUserList(
                 portalId,
                 this.dataProvider.GetUsersAdvancedSearch(
@@ -618,6 +675,8 @@ namespace DotNetNuke.Security.Membership
         /// <inheritdoc />
         public override IList<UserInfo> GetUsersBasicSearch(int portalId, int pageIndex, int pageSize, string sortColumn, bool sortAscending, string propertyName, string propertyValue)
         {
+			Logger.LogDebug(">>> Entering GetUsersBasicSearch(portalId={PortalId},pageIndex={PageIndex},pageSize={PageSize},sortColumn={SortColumn},sortAscending={SortAscending},propertyName={PropertyName},propertyValue={PropertyValue})", portalId, pageIndex, pageSize, sortColumn, sortAscending, propertyName, propertyValue);
+			Logger.LogDebug("<<< Exiting GetUsersBasicSearch(portalId={PortalId},pageIndex={PageIndex},pageSize={PageSize},sortColumn={SortColumn},sortAscending={SortAscending},propertyName={PropertyName},propertyValue={PropertyValue})", portalId, pageIndex, pageSize, sortColumn, sortAscending, propertyName, propertyValue);
             return FillUserList(
                 portalId,
                 this.dataProvider.GetUsersBasicSearch(
@@ -870,18 +929,22 @@ namespace DotNetNuke.Security.Membership
         {
             var effectivePortalId = PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, user.PortalID);
             this.dataProvider.UserAgreedToTerms(effectivePortalId, user.UserID);
+			Logger.LogDebug("<<< Exiting UserAgreedToTerms(user={User})", user);
         }
 
         /// <inheritdoc />
         public override void ResetTermsAgreement(int portalId)
         {
+			Logger.LogDebug(">>> Entering ResetTermsAgreement(portalId={PortalId})", portalId);
             this.dataProvider.ResetTermsAgreement(portalId);
+			Logger.LogDebug("<<< Exiting ResetTermsAgreement(portalId={PortalId})", portalId);
         }
 
         /// <inheritdoc />
         public override void UserRequestsRemoval(UserInfo user, bool remove)
         {
             this.dataProvider.UserRequestsRemoval(user.PortalID, user.UserID, remove);
+			Logger.LogDebug("<<< Exiting UserRequestsRemoval(user={User},remove={Remove})", user, remove);
         }
 
         /// <inheritdoc />
@@ -954,6 +1017,7 @@ namespace DotNetNuke.Security.Membership
 
             // Persist the Profile to the Data Store
             ProfileController.UpdateUserProfile(user);
+			Logger.LogDebug("<<< Exiting UpdateUser(user={User})", user);
         }
 
         /// <inheritdoc />
@@ -961,11 +1025,15 @@ namespace DotNetNuke.Security.Membership
         public override partial void UpdateUsersOnline(Hashtable userList)
         {
             this.dataProvider.UpdateUsersOnline(userList);
+			Logger.LogDebug("<<< Exiting UpdateUsersOnline(userList={UserList})", userList);
         }
 
         /// <inheritdoc />
         public override UserInfo UserLogin(int portalId, string username, string password, string verificationCode, ref UserLoginStatus loginStatus)
         {
+			Logger.LogDebug(">>> Entering UserLogin(portalId={PortalId},username={Username},password=<redacted>,verificationCode={VerificationCode},loginStatus={LoginStatus})", portalId, username, verificationCode, loginStatus);
+			Logger.LogDebug("<<< Exiting UserLogin(portalId={PortalId},username={Username},password=<redacted>,verificationCode={VerificationCode},loginStatus={LoginStatus})", portalId, username, verificationCode, loginStatus);
+			Logger.LogDebug("<<< Exiting UserLogin(portalId={PortalId},username={Username},password=<redacted>,authType={AuthType},verificationCode={VerificationCode},loginStatus={LoginStatus})", portalId, username, authType, verificationCode, loginStatus);
             return this.UserLogin(portalId, username, password, "DNN", verificationCode, ref loginStatus);
         }
 
@@ -1070,6 +1138,7 @@ namespace DotNetNuke.Security.Membership
 
         private static bool AutoUnlockUser(IHostSettings hostSettings, MembershipUser aspNetUser)
         {
+			Logger.LogDebug(">>> Entering AutoUnlockUser(hostSettings={HostSettings},aspNetUser={AspNetUser})", hostSettings, aspNetUser);
             if (hostSettings.AutoAccountUnlockDuration > TimeSpan.Zero)
             {
                 if (aspNetUser.LastLockoutDate < DateTime.Now.Subtract(hostSettings.AutoAccountUnlockDuration))
@@ -1082,6 +1151,7 @@ namespace DotNetNuke.Security.Membership
                 }
             }
 
+			Logger.LogDebug("<<< Exiting AutoUnlockUser(hostSettings={HostSettings},aspNetUser={AspNetUser})", hostSettings, aspNetUser);
             return false;
         }
 
@@ -1173,6 +1243,7 @@ namespace DotNetNuke.Security.Membership
             {
                 Logger.Error(exc);
             }
+			Logger.LogDebug("<<< Exiting DeleteMembershipUser(user={User})", user);
         }
 
         private static ArrayList FillUserCollection(int portalId, IDataReader dr, ref int totalRecords)
@@ -1439,24 +1510,32 @@ namespace DotNetNuke.Security.Membership
                     user.Membership.Approved = aspNetUser.IsApproved;
                 }
             }
+			Logger.LogDebug("<<< Exiting FillUserMembership(aspNetUser={AspNetUser},user={User})", aspNetUser, user);
         }
 
         private static string GetCacheKey(string cacheKey)
         {
+			Logger.LogDebug(">>> Entering GetCacheKey(cacheKey={CacheKey})", cacheKey);
+			Logger.LogDebug("<<< Exiting GetCacheKey(cacheKey={CacheKey})", cacheKey);
             return $"MembershipUser_{cacheKey}";
         }
 
         private static object GetMembershipUserCallBack(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogDebug(">>> Entering GetMembershipUserCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             string userName = cacheItemArgs.ParamList[0].ToString();
 
+			Logger.LogDebug("GetMembershipUserCallBack(cacheItemArgs={CacheItemArgs}): userName → {UserName}", cacheItemArgs, userName);
+			Logger.LogDebug("<<< Exiting GetMembershipUserCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return System.Web.Security.Membership.GetUser(userName);
         }
 
         private static object GetMembershipUserByUserKeyCallBack(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogDebug(">>> Entering GetMembershipUserByUserKeyCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             string userKey = cacheItemArgs.ParamList[0].ToString();
 
+			Logger.LogDebug("<<< Exiting GetMembershipUserByUserKeyCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return System.Web.Security.Membership.GetUser(new Guid(userKey));
         }
 
@@ -1488,6 +1567,7 @@ namespace DotNetNuke.Security.Membership
             }
 
             DataCache.RemoveCache(GetCacheKey(user.Username));
+			Logger.LogDebug("<<< Exiting UpdateUserMembership(user={User})", user);
         }
 
         private static UserLoginStatus ValidateLogin(string username, string authType, UserInfo user, UserLoginStatus loginStatus, string password, ref bool bValid, int portalId)
@@ -1534,6 +1614,8 @@ namespace DotNetNuke.Security.Membership
 
         private static bool ValidateUser(string username, string password)
         {
+			Logger.LogDebug(">>> Entering ValidateUser(username={Username},password=<redacted>)", username);
+			Logger.LogDebug("<<< Exiting ValidateUser(username={Username},password=<redacted>)", username);
             return System.Web.Security.Membership.ValidateUser(username, password);
         }
 
@@ -1572,7 +1654,9 @@ namespace DotNetNuke.Security.Membership
 
         private static string RandomString(int length)
         {
+			Logger.LogDebug(">>> Entering RandomString(length={Length})", length);
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+			Logger.LogDebug("<<< Exiting RandomString(length={Length})", length);
             return new string(Enumerable.Repeat(chars, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
@@ -1646,6 +1730,8 @@ namespace DotNetNuke.Security.Membership
 
         private MembershipUser GetMembershipUserByUserKey(string userKey)
         {
+			Logger.LogDebug(">>> Entering GetMembershipUserByUserKey(userKey={UserKey})", userKey);
+				Logger.LogDebug("<<< Exiting GetMembershipUserByUserKey(userKey={UserKey})", userKey);
             return
                 CBO.GetCachedObject<MembershipUser>(
                     this.hostSettings,
@@ -1670,6 +1756,7 @@ namespace DotNetNuke.Security.Membership
                     createStatus = UserCreateStatus.DuplicateDisplayName;
                 }
             }
+			Logger.LogDebug("<<< Exiting ValidateForDuplicateDisplayName(user={User},createStatus={CreateStatus})", user, createStatus);
         }
 
         /// <summary>GetUserByUserNameFromDataStore retrieves a User from the DataStore.</summary>
@@ -1678,7 +1765,10 @@ namespace DotNetNuke.Security.Membership
         /// <returns>The User as a UserInfo object.</returns>
         private UserInfo GetUserByUserNameFromDataStore(int portalId, string username)
         {
+			Logger.LogDebug(">>> Entering GetUserByUserNameFromDataStore(portalId={PortalId},username={Username})", portalId, username);
             using var dr = this.dataProvider.GetUserByUsername(portalId, username);
+			Logger.LogDebug("GetUserByUserNameFromDataStore(portalId={PortalId},username={Username}): dr → {Dr}", portalId, username, dr);
+			Logger.LogDebug("<<< Exiting GetUserByUserNameFromDataStore(portalId={PortalId},username={Username})", portalId, username);
             return FillUserInfo(portalId, dr, true);
         }
     }

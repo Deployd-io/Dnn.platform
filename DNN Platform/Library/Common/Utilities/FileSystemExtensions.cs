@@ -27,25 +27,33 @@ namespace DotNetNuke.Common.Utilities
 
         public static string ReadTextFile(this ZipArchiveEntry input)
         {
+			Logger.LogDebug(">>> Entering ReadTextFile(input={Input})", input);
             var text = string.Empty;
             using var reader = new StreamReader(input.Open());
+			Logger.LogDebug("ReadTextFile(input={Input}): reader → {Reader}", input, reader);
             text = reader.ReadToEnd();
+			Logger.LogDebug("ReadTextFile(input={Input}): text → {Text}", input, text);
 
+			Logger.LogDebug("<<< Exiting ReadTextFile(input={Input})", input);
             return text;
         }
 
         public static void CopyToStream(this Stream strIn, Stream strOut, int bufferSize)
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FileSystemExtensions));
             var buffer = new byte[bufferSize];
+			Logger.LogDebug(">>> Entering CopyToStream(strIn={StrIn},strOut={StrOut},bufferSize={BufferSize})", strIn, strOut, bufferSize);
             int bytesRead;
             while ((bytesRead = strIn.Read(buffer, 0, buffer.Length)) > 0)
             {
                 strOut.Write(buffer, 0, bytesRead);
             }
+			Logger.LogDebug("<<< Exiting CopyToStream(strIn={StrIn},strOut={StrOut},bufferSize={BufferSize})", strIn, strOut, bufferSize);
         }
 
         public static IEnumerable<ZipArchiveEntry> FileEntries(this ZipArchive zip)
         {
+			Logger.LogDebug(">>> Entering FileEntries(zip={Zip})", zip);
             foreach (var entry in zip.Entries)
             {
                 entry.CheckZipEntry();
@@ -54,6 +62,7 @@ namespace DotNetNuke.Common.Utilities
                     yield return entry;
                 }
             }
+			Logger.LogDebug("<<< Exiting FileEntries(zip={Zip})", zip);
         }
 
         /// <summary>Check whether the <paramref name="input"/> is invalid.</summary>
@@ -64,9 +73,13 @@ namespace DotNetNuke.Common.Utilities
         public static partial void CheckZipEntry(this ZipEntry input)
 #pragma warning restore CS3001
         {
+			Logger.LogDebug(">>> Entering CheckZipEntry(input={Input})", input);
             var fullName = input.Name.Replace('\\', '/');
             if (fullName.StartsWith("..", StringComparison.Ordinal) || fullName.Contains("/../", StringComparison.Ordinal))
+			Logger.LogDebug("CheckZipEntry(input={Input}): fullName → {FullName}", input, fullName);
             {
+				Logger.LogWarning("Throwing IllegalZipFileException from CheckZipEntry(input={Input})", input);
+			Logger.LogDebug("<<< Exiting CheckZipEntry(input={Input})", input);
                 throw new IllegalZipFileException("Illegal Zip File");
             }
         }

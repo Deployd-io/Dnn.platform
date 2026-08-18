@@ -14,6 +14,7 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
 
     public class TabVersionSettings : ServiceLocator<ITabVersionSettings, TabVersionSettings>, ITabVersionSettings
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabVersionSettings));
         private const int TabVersionsMaxNumber = 5;
         private const string TabVersionQueryStringParam = "DnnTabVersion";
         private const string TabVersioningSettingKey = "TabVersioningSettingKey";
@@ -30,6 +31,7 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
         {
             Requires.NotNegative("portalId", portalId);
             PortalController.UpdatePortalSetting(portalId, "TabVersionsMaxNumber", maxNumberOfVersions.ToString(CultureInfo.InvariantCulture));
+			Logger.LogDebug("<<< Exiting SetMaxNumberOfVersions(portalId={PortalId},maxNumberOfVersions={MaxNumberOfVersions})", portalId, maxNumberOfVersions);
         }
 
         /// <inheritdoc />
@@ -37,14 +39,17 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
         {
             Requires.NotNegative("portalId", portalId);
             PortalController.UpdatePortalSetting(portalId, "TabVersionsEnabled", enabled.ToString(CultureInfo.InvariantCulture));
+			Logger.LogDebug("<<< Exiting SetEnabledVersioningForPortal(portalId={PortalId},enabled={Enabled})", portalId, enabled);
         }
 
         /// <inheritdoc />
         public void SetEnabledVersioningForTab(int tabId, bool enabled)
         {
+			Logger.LogDebug(">>> Entering SetEnabledVersioningForTab(tabId={TabId},enabled={Enabled})", tabId, enabled);
             Requires.NotNegative("tabId", tabId);
 
             TabController.Instance.UpdateTabSetting(tabId, TabVersioningSettingKey, enabled.ToString(CultureInfo.InvariantCulture));
+			Logger.LogDebug("<<< Exiting SetEnabledVersioningForTab(tabId={TabId},enabled={Enabled})", tabId, enabled);
         }
 
         /// <inheritdoc />
@@ -90,6 +95,8 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
         /// <inheritdoc />
         protected override Func<ITabVersionSettings> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new TabVersionSettings();
         }
     }

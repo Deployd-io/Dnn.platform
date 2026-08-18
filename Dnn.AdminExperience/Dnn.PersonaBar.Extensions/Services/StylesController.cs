@@ -28,13 +28,17 @@ namespace Dnn.PersonaBar.Styles.Services
         [HttpGet]
         public IHttpActionResult GetStyles()
         {
+			eventLogger.LogDebug(">>> Entering GetStyles()");
             if (!this.CanEdit())
             {
                 return this.Unauthorized();
             }
 
             var repo = new PortalStylesRepository();
+			eventLogger.LogDebug("GetStyles(): repo → {Repo}", repo);
             var settings = repo.GetSettings(this.PortalId);
+			eventLogger.LogDebug("GetStyles(): settings → {Settings}", settings);
+			eventLogger.LogDebug("<<< Exiting GetStyles()");
             return this.Ok(settings);
         }
 
@@ -76,27 +80,34 @@ namespace Dnn.PersonaBar.Styles.Services
         [ValidateAntiForgeryToken]
         public IHttpActionResult RestoreStyles()
         {
+			eventLogger.LogDebug(">>> Entering RestoreStyles()");
             if (!this.CanEdit())
             {
                 return this.Unauthorized();
             }
 
             var repo = new PortalStylesRepository();
+			eventLogger.LogDebug("RestoreStyles(): repo → {Repo}", repo);
             var styles = new PortalStyles();
             repo.SaveSettings(this.PortalId, styles);
+			eventLogger.LogDebug("RestoreStyles(): styles → {Styles}", styles);
+			eventLogger.LogDebug("<<< Exiting RestoreStyles()");
             return this.Ok(styles);
         }
 
         private bool CanEdit()
         {
+			eventLogger.LogDebug(">>> Entering CanEdit()");
             if (this.UserInfo.IsSuperUser)
             {
                 return true;
             }
 
             var allowAdminEdits = PortalController.Instance.GetCurrentSettings().GetStyles().AllowAdminEdits;
+			eventLogger.LogDebug("CanEdit(): allowAdminEdits → {AllowAdminEdits}", allowAdminEdits);
             if (this.UserInfo.IsAdmin && allowAdminEdits)
             {
+			eventLogger.LogDebug("<<< Exiting CanEdit()");
                 return true;
             }
 

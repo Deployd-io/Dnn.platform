@@ -21,6 +21,7 @@ namespace DotNetNuke.Services.Personalization
 
     public class PersonalizationController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PersonalizationController));
         private const string PersonalizationCookieName = "DNNPersonalization";
         private const string AlgorithmCookieName = "DNNPersonalizationAlg";
         private readonly IHostSettings hostSettings;
@@ -31,6 +32,11 @@ namespace DotNetNuke.Services.Personalization
         public PersonalizationController()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering PersonalizationController()");
+		Logger.LogDebug("<<< Exiting PersonalizationController()");
+		Logger.LogDebug(">>> Entering PersonalizationController(hostSettings={HostSettings})", hostSettings);
+		Logger.LogDebug("PersonalizationController(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
+		Logger.LogDebug("<<< Exiting PersonalizationController(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PersonalizationController"/> class.</summary>
@@ -49,12 +55,14 @@ namespace DotNetNuke.Services.Personalization
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.cryptographyProvider = cryptographyProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<ICryptographyProvider>();
+			Logger.LogDebug("PersonalizationController(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider}): cryptographyProvider → {CryptographyProvider1}", hostSettings, cryptographyProvider, cryptographyProvider);
         }
 
         // default implementation relies on HTTPContext
         public void LoadProfile(HttpContext httpContext, int userId, int portalId)
         {
             this.LoadProfile(new HttpContextWrapper(httpContext), userId, portalId);
+			Logger.LogDebug("<<< Exiting LoadProfile(httpContext={HttpContext},userId={UserId},portalId={PortalId})", httpContext, userId, portalId);
         }
 
         public void LoadProfile(HttpContextBase httpContext, int userId, int portalId)
@@ -117,6 +125,7 @@ namespace DotNetNuke.Services.Personalization
         public void SaveProfile(PersonalizationInfo personalization)
         {
             this.SaveProfile(personalization, personalization.UserId, personalization.PortalId);
+			Logger.LogDebug("<<< Exiting SaveProfile(personalization={Personalization})", personalization);
         }
 
         // default implementation relies on HTTPContext
@@ -172,10 +181,15 @@ namespace DotNetNuke.Services.Personalization
 
         private static object GetCachedUserPersonalizationCallback(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogDebug(">>> Entering GetCachedUserPersonalizationCallback(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             var portalId = (int)cacheItemArgs.ParamList[0];
             var userId = (int)cacheItemArgs.ParamList[1];
+			Logger.LogDebug("GetCachedUserPersonalizationCallback(cacheItemArgs={CacheItemArgs}): userId → {UserId}", cacheItemArgs, userId);
             var returnValue = Null.NullString; // Default is no profile
+			Logger.LogDebug("GetCachedUserPersonalizationCallback(cacheItemArgs={CacheItemArgs}): returnValue → {ReturnValue}", cacheItemArgs, returnValue);
             IDataReader dr = null;
+			Logger.LogDebug("GetCachedUserPersonalizationCallback(cacheItemArgs={CacheItemArgs}): dr → {Dr}", cacheItemArgs, dr);
+			Logger.LogDebug("GetCachedUserPersonalizationCallback(cacheItemArgs={CacheItemArgs}): portalId → {PortalId}", cacheItemArgs, portalId);
             try
             {
                 dr = DataProvider.Instance().GetProfile(userId, portalId);
@@ -191,6 +205,7 @@ namespace DotNetNuke.Services.Personalization
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in GetCachedUserPersonalizationCallback(cacheItemArgs={CacheItemArgs}): {Arg1}", cacheItemArgs, ex.getMessage());
                 Exceptions.Exceptions.LogException(ex);
             }
             finally
@@ -198,11 +213,13 @@ namespace DotNetNuke.Services.Personalization
                 CBO.CloseDataReader(dr, true);
             }
 
+			Logger.LogDebug("<<< Exiting GetCachedUserPersonalizationCallback(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return returnValue;
         }
 
         private string EncryptData(HashAlgorithmName hashAlgorithm, string profileData)
         {
+			Logger.LogDebug("<<< Exiting EncryptData(hashAlgorithm=<redacted>,profileData={ProfileData})", profileData);
             return this.cryptographyProvider.EncryptParameter(profileData, ValidationUtils.GetDecryptionKey(this.hostSettings, hashAlgorithm)).EncryptedMessage;
         }
 

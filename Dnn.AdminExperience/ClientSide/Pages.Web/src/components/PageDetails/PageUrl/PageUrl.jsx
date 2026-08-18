@@ -6,10 +6,12 @@ import PageExisting from "./PageExisting/PageExisting";
 import PageFile from "./PageFile/PageFile";
 import PageExternalUrl from "./PageExternalUrl/PageExternalUrl";
 import styles from "./style.module.less";
+const logger = console;
 
 class PageUrl extends Component {
 
     getDetail(pageType) {        
+		logger.debug(`>>> Entering getDetail(pageType=${pageType})`);
         switch (pageType) {
             case "tab":
                 return PageExisting;
@@ -18,12 +20,15 @@ class PageUrl extends Component {
             case "file":
                 return PageFile;
             default: 
+		logger.debug(`<<< Exiting getDetail(pageType=${pageType})`);
                 throw "invalid page type";                                                                        
         }        
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const DetailComponent = this.getDetail(this.props.page.pageType);
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.pageUrl}>
                 <DetailComponent onChangeField={this.props.onChangeField} />
@@ -38,6 +43,8 @@ PageUrl.propTypes = {
 };
 
 const mapStateToProps = (state) => {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return ({
         page: state.pages.selectedPage
     });

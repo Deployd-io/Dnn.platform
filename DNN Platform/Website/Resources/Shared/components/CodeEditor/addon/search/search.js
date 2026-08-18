@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -26,7 +27,9 @@
       query = new RegExp(query.source, query.ignoreCase ? "gi" : "g");
 
     return {token: function(stream) {
+	logger.debug(`>>> Entering token(stream=${stream})`);
       query.lastIndex = stream.pos;
+	logger.debug(`<<< Exiting token(stream=${stream})`);
       var match = query.exec(stream.string);
       if (match && match.index == stream.pos) {
         stream.pos += match[0].length;
@@ -40,11 +43,15 @@
   }
 
   function SearchState() {
+	logger.debug('>>> Entering SearchState()');
     this.posFrom = this.posTo = this.lastQuery = this.query = null;
     this.overlay = null;
+	logger.debug('<<< Exiting SearchState()');
   }
 
   function getSearchState(cm) {
+	logger.debug(`>>> Entering getSearchState(cm=${cm})`);
+	logger.debug(`<<< Exiting getSearchState(cm=${cm})`);
     return cm.state.search || (cm.state.search = new SearchState());
   }
 
@@ -58,28 +65,38 @@
   }
 
   function persistentDialog(cm, text, deflt, f) {
+	logger.debug(`>>> Entering persistentDialog(cm=${cm},text=${text},deflt=${deflt},f=${f})`);
     cm.openDialog(text, f, {
       value: deflt,
       selectValueOnOpen: true,
       closeOnEnter: false,
       onClose: function() { clearSearch(cm); }
     });
+	logger.debug(`<<< Exiting persistentDialog(cm=${cm},text=${text},deflt=${deflt},f=${f})`);
   }
 
   function dialog(cm, text, shortText, deflt, f) {
+	logger.debug(`>>> Entering dialog(cm=${cm},text=${text},shortText=${shortText},deflt=${deflt},f=${f})`);
     if (cm.openDialog) cm.openDialog(text, f, {value: deflt, selectValueOnOpen: true});
     else f(prompt(shortText, deflt));
+	logger.debug(`<<< Exiting dialog(cm=${cm},text=${text},shortText=${shortText},deflt=${deflt},f=${f})`);
   }
 
   function confirmDialog(cm, text, shortText, fs) {
+	logger.debug(`>>> Entering confirmDialog(cm=${cm},text=${text},shortText=${shortText},fs=${fs})`);
     if (cm.openConfirm) cm.openConfirm(text, fs);
     else if (confirm(shortText)) fs[0]();
+	logger.debug(`<<< Exiting confirmDialog(cm=${cm},text=${text},shortText=${shortText},fs=${fs})`);
   }
 
   function parseString(string) {
+	logger.debug(`>>> Entering parseString(string=${string})`);
     return string.replace(/\\(.)/g, function(_, ch) {
+	logger.debug('>>> Entering function()');
       if (ch == "n") return "\n"
       if (ch == "r") return "\r"
+	logger.debug('<<< Exiting function()');
+	logger.debug(`<<< Exiting parseString(string=${string})`);
       return ch
     })
   }
@@ -94,6 +111,7 @@
     }
     if (typeof query == "string" ? query == "" : query.test(""))
       query = /x^/;
+	logger.debug(`<<< Exiting parseQuery(query=${query})`);
     return query;
   }
 
@@ -110,12 +128,15 @@
       if (state.annotate) { state.annotate.clear(); state.annotate = null; }
       state.annotate = cm.showMatchesOnScrollbar(state.query, queryCaseInsensitive(state.query));
     }
+	logger.debug(`<<< Exiting startSearch(cm=${cm},state=${state},query=${query})`);
   }
 
   function doSearch(cm, rev, persistent) {
+	logger.debug(`>>> Entering doSearch(cm=${cm},rev=${rev},persistent=${persistent})`);
     var state = getSearchState(cm);
     if (state.query) return findNext(cm, rev);
     var q = cm.getSelection() || state.lastQuery;
+	logger.debug(`<<< Exiting doSearch(cm=${cm},rev=${rev},persistent=${persistent})`);
     if (persistent && cm.openDialog) {
       persistentDialog(cm, queryDialog, q, function(query, event) {
         CodeMirror.e_stop(event);
@@ -125,16 +146,20 @@
       });
     } else {
       dialog(cm, queryDialog, "Search for:", q, function(query) {
+		logger.debug(`>>> Entering dialog(cm=${cm},queryDialog=${queryDialog},q=${q})`);
         if (query && !state.query) cm.operation(function() {
+		logger.debug('>>> Entering operation()');
           startSearch(cm, state, query);
           state.posFrom = state.posTo = cm.getCursor();
           findNext(cm, rev);
+		logger.debug('<<< Exiting operation()');
         });
       });
     }
   }
 
   function findNext(cm, rev) {cm.operation(function() {
+	logger.debug(`>>> Entering findNext(cm=${cm},rev=${rev})`);
     var state = getSearchState(cm);
     var cursor = getSearchCursor(cm, state.query, rev ? state.posFrom : state.posTo);
     if (!cursor.find(rev)) {
@@ -143,15 +168,18 @@
     }
     cm.setSelection(cursor.from(), cursor.to());
     cm.scrollIntoView({from: cursor.from(), to: cursor.to()}, 20);
+	logger.debug(`<<< Exiting findNext(cm=${cm},rev=${rev})`);
     state.posFrom = cursor.from(); state.posTo = cursor.to();
   });}
 
   function clearSearch(cm) {cm.operation(function() {
+	logger.debug(`>>> Entering clearSearch(cm=${cm})`);
     var state = getSearchState(cm);
     state.lastQuery = state.query;
     if (!state.query) return;
     state.query = state.queryText = null;
     cm.removeOverlay(state.overlay);
+	logger.debug(`<<< Exiting clearSearch(cm=${cm})`);
     if (state.annotate) { state.annotate.clear(); state.annotate = null; }
   });}
 

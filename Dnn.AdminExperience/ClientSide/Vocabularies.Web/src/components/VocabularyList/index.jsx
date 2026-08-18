@@ -13,6 +13,7 @@ import RightPane from "./RightPane";
 import util from "../../utils";
 import LocalizedResources from "../../resources";
 import "./style.less";
+const logger = console;
 
 const loadMoreButtonStyle = {
     display: "block",
@@ -20,6 +21,8 @@ const loadMoreButtonStyle = {
 };
 
 function getTermUpdates(term) {
+	logger.debug(`>>> Entering getTermUpdates(term=${term})`);
+	logger.debug(`<<< Exiting getTermUpdates(term=${term})`);
     return {
         TermId: term.TermId,
         Name: term.Name,
@@ -29,8 +32,10 @@ function getTermUpdates(term) {
     };
 }
 function getRootParentTerm(termId, term, termList) {
+	logger.debug(`>>> Entering getRootParentTerm(termId=${termId},term=${term},termList=${termList})`);
     while (term.TermId !== termId && term.ParentTermId > -1) {
         term = termList.find(_term => {
+	logger.debug(`<<< Exiting getRootParentTerm(termId=${termId},term=${term},termList=${termList})`);
             return _term.TermId === term.ParentTermId;
         });
     }
@@ -38,6 +43,8 @@ function getRootParentTerm(termId, term, termList) {
 }
 
 function removeTermFromList(termId, vocabularyTermList) {
+	logger.debug(`>>> Entering removeTermFromList(termId=${termId},vocabularyTermList=${vocabularyTermList})`);
+	logger.debug(`<<< Exiting removeTermFromList(termId=${termId},vocabularyTermList=${vocabularyTermList})`);
     return vocabularyTermList.filter((term) => {
         const rootParentTerm = getRootParentTerm(termId, term, vocabularyTermList);
         return rootParentTerm.TermId !== termId;
@@ -47,13 +54,17 @@ function removeTermFromList(termId, vocabularyTermList) {
 class VocabularyListComponent extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.onDescriptionUpdate = this.onDescriptionUpdate.bind(this);
+		logger.debug('<<< Exiting constructor()');
         this.state = {
             vocabularyList: [],
             isOpened: false
         };
     }
     getNextPage(pageIndex, pageSize, scopeTypeId) {
+		logger.debug(`>>> Entering getNextPage(pageIndex=${pageIndex},pageSize=${pageSize},scopeTypeId=${scopeTypeId})`);
+		logger.debug(`<<< Exiting getNextPage(pageIndex=${pageIndex},pageSize=${pageSize},scopeTypeId=${scopeTypeId})`);
         return {
             pageIndex: pageIndex || 0,
             pageSize: pageSize,
@@ -62,13 +73,16 @@ class VocabularyListComponent extends Component {
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const {props} = this;
         props.dispatch(VocabularyActions.getVocabularyList(this.getNextPage(props.pagination.pageIndex, props.pagination.pageSize, props.pagination.scopeTypeId)));
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     getVocabularyTerms(vocabularyId, index) {
         const {props} = this;
         props.dispatch(VocabularyTermListActions.getVocabularyTerms(vocabularyId, index));
+		logger.debug(`<<< Exiting getVocabularyTerms(vocabularyId=${vocabularyId},index=${index})`);
     }
 
     updateVocabulary(vocabularyList, key, index, value) {
@@ -78,6 +92,7 @@ class VocabularyListComponent extends Component {
     }
 
     onUpdateTerm(termBeingEdited, editMode, callback) {
+		logger.debug(`>>> Entering onUpdateTerm(termBeingEdited=${termBeingEdited},editMode=${editMode},callback=${callback})`);
         const {props} = this;
 
         if (editMode) {
@@ -88,6 +103,7 @@ class VocabularyListComponent extends Component {
         } else {
             let {totalTermCount} = props;
             props.dispatch(VocabularyTermListActions.addVocabularyTerm(getTermUpdates(termBeingEdited), totalTermCount + 1, callback));
+			logger.debug(`<<< Exiting onUpdateTerm(termBeingEdited=${termBeingEdited},editMode=${editMode},callback=${callback})`);
         }
     }
 
@@ -96,14 +112,18 @@ class VocabularyListComponent extends Component {
         let vocabularyList = props.vocabularyList;
         const newValue = this.updateVocabulary(vocabularyList, key, index, value);
         props.dispatch(VocabularyActions.updateVocabulary(newValue, index));
+		logger.debug(`<<< Exiting onDescriptionUpdate(key=${key},value=${value},index=${index})`);
     }
     onLoadMore(event) {
+		logger.debug(`>>> Entering onLoadMore(event=${event})`);
         event.preventDefault();
 
         const {props} = this;
         let {pageIndex} = props.pagination; //copy page index
         let nextPage = this.getNextPage(pageIndex + 1, props.pagination.pageSize, props.pagination.scopeTypeId);
         props.dispatch(PaginationActions.loadMore(nextPage));
+		logger.debug(`onLoadMore(event=${event}): nextPage → ${nextPage}`);
+		logger.debug(`<<< Exiting onLoadMore(event=${event})`);
     }
     handleSelect(index /*,last*/) {
         const {props} = this;
@@ -128,21 +148,28 @@ class VocabularyListComponent extends Component {
                     }
                 }));
             });
+			logger.debug(`<<< Exiting onDeleteVocabulary(vocabulary=${vocabulary},index=${index},callback=${callback})`);
     }
 
     onDeleteTerm(termId) {
+		logger.debug(`>>> Entering onDeleteTerm(termId=${termId})`);
         const {props} = this;
         const vocabularyTerms = removeTermFromList(termId, props.vocabularyTerms);
         props.dispatch(VocabularyTermListActions.deleteVocabularyTerm(termId, vocabularyTerms, vocabularyTerms.length));
+		logger.debug(`onDeleteTerm(termId=${termId}): vocabularyTerms → ${vocabularyTerms}`);
+		logger.debug(`<<< Exiting onDeleteTerm(termId=${termId})`);
     }
 
     selectParentTerm(term) {
+		logger.debug(`>>> Entering selectParentTerm(term=${term})`);
         const {props} = this;
 
         const vocabularyTerms = JSON.parse(JSON.stringify(props.vocabularyTerms));
+		logger.debug(`selectParentTerm(term=${term}): vocabularyTerms → ${vocabularyTerms}`);
 
         const previousTerms = vocabularyTerms.map((_term) => {
             delete _term.selected;
+		logger.debug(`selectParentTerm(term=${term}): previousTerms → ${previousTerms}`);
             return _term;
         });
 
@@ -150,15 +177,19 @@ class VocabularyListComponent extends Component {
             return _term.TermId === term.TermId;
         });
         term.selected = true;
+		logger.debug(`selectParentTerm(term=${term}): term.selected → ${term.selected}`);
         props.dispatch(VocabularyTermListActions.clearSelected(previousTerms));
         props.dispatch(VocabularyTermListActions.setTermSelected(term, index));
+		logger.debug(`<<< Exiting selectParentTerm(term=${term})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {vocabularyList} = this.props;
         const {props} = this;
 
         const renderedVocabularyList = vocabularyList.map((term, index) => {
+			logger.debug(`render(): renderedVocabularyList → ${renderedVocabularyList}`);
             return (
                 <TermHeader
                     header={term.Name}
@@ -193,6 +224,7 @@ class VocabularyListComponent extends Component {
             );
         });
         const loadMoreEnabled = props.vocabularyList.length < props.totalCount;
+		logger.debug('<<< Exiting render()');
         return (
             <div className="vocabulary-list">
                 <PersonaBarPageBody>
@@ -226,6 +258,8 @@ VocabularyListComponent.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         vocabularyList: state.vocabulary.vocabularyList,
         totalCount: state.vocabulary.totalCount,

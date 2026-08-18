@@ -1,3 +1,4 @@
+const logger = console;
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
@@ -22,13 +23,16 @@ define(['jquery',
     var pagesCount = 7;
 
     var requestService = function (type, method, params, callback, error) {
+	logger.debug('>>> Entering requestService()');
       utility.sf.moduleRoot = "personaBar";
       utility.sf.controller = "SqlConsole";
 
       utility.sf[type].call(utility.sf, method, params, callback, error);
+	logger.debug('<<< Exiting requestService()');
     }
 
     var getSavedQueries = function (selectedId) {
+	logger.debug(`>>> Entering getSavedQueries(selectedId=${selectedId})`);
       requestService('get', 'GetSavedQueries', {}, function (data) {
         viewModel.connections(data.connections);
         viewModel.connection(data.connections[0]);
@@ -50,11 +54,14 @@ define(['jquery',
 
         if (!viewModel.name()) {
           viewModel.name(newQuery.name);
+		logger.debug('<<< Exiting requestService()');
         }
       });
+	logger.debug(`<<< Exiting getSavedQueries(selectedId=${selectedId})`);
     }
 
     var initUpload = function () {
+	logger.debug('>>> Entering initUpload()');
       var $uploadContainer = $panel.find('.fileupload-wrapper');
       var $uploadControl = $uploadContainer.find('input');
 
@@ -70,7 +77,9 @@ define(['jquery',
           var reader = new FileReader();
 
           reader.onload = function (e) {
+			logger.debug(`>>> Entering function(e=${e})`);
             viewModel.query(reader.result);
+			logger.debug(`<<< Exiting function(e=${e})`);
           }
 
           reader.readAsText(file);
@@ -80,6 +89,8 @@ define(['jquery',
 
         $uploadControl.val('');
       });
+	logger.debug(`<<< Exiting on(file=${file})`);
+	logger.debug('<<< Exiting initUpload()');
     }
 
     var changeTab = function (data) {
@@ -95,16 +106,19 @@ define(['jquery',
       $tableContainer.jScrollPane();
 
       $panel.find('.result-tabs ul li').removeClass('selected').eq(index).addClass('selected');
+	logger.debug(`<<< Exiting changeTab(data=${data})`);
     }
 
     var scrollPaneInitialised = function (table, e) {
       var $table = $panel.find('.tables-container > div#result' + table.index).find('table');
       if (!$table.attr('width') || $table.attr('width') === '0') {
         $table.attr('width', $table.width());
+		logger.debug(`<<< Exiting scrollPaneInitialised(table=${table},e=${e})`);
       }
     }
 
     var savedQueryChanged = function (val) {
+	logger.debug(`>>> Entering savedQueryChanged(val=${val})`);
       var id = viewModel.selectedQuery();
       var query;
       var savedQueries = viewModel.savedQueries();
@@ -123,9 +137,11 @@ define(['jquery',
       viewModel.name(query.name);
       viewModel.connection(query.connection);
       viewModel.id(query.id || -1);
+	logger.debug(`<<< Exiting savedQueryChanged(val=${val})`);
     }
 
     var startSaveQuery = function () {
+	logger.debug('>>> Entering startSaveQuery()');
       viewModel.query(sqlContent.getValue());
 
       if (!viewModel.query()) {
@@ -139,9 +155,11 @@ define(['jquery',
       }
 
       $('#query-name').focus();
+	logger.debug('<<< Exiting startSaveQuery()');
     }
 
     var saveQuery = function () {
+	logger.debug('>>> Entering saveQuery()');
       viewModel.query(sqlContent.getValue());
 
       if (!viewModel.query()) {
@@ -167,17 +185,22 @@ define(['jquery',
         viewModel.saving(false);
         viewModel.loading(false);
       });
+	logger.debug('<<< Exiting saveQuery()');
     }
 
     var cancelSave = function () {
+	logger.debug('>>> Entering cancelSave()');
       viewModel.saving(false);
+	logger.debug('<<< Exiting cancelSave()');
     }
 
     var deleteQuery = function () {
+	logger.debug('>>> Entering deleteQuery()');
       var confirmText = resx.DeleteConfirm;
       var deleteText = resx.Delete;
       var cancelText = resx.Cancel;
 
+	logger.debug('<<< Exiting deleteQuery()');
       utility.confirm(confirmText, deleteText, cancelText, function () {
         viewModel.loading(true);
         requestService('post', 'DeleteQuery', { id: viewModel.id() }, function () {
@@ -499,6 +522,7 @@ define(['jquery',
       }
 
       var exportPdf = function () {
+		logger.debug('>>> Entering exportPdf()');
         viewModel.loading(true);
         var pageSize = table.pageSize();
         var currentPage = table.currentPage();
@@ -522,6 +546,7 @@ define(['jquery',
 
         html2canvas($table[0], {
           onrendered: function (canvas) {
+			logger.debug(`>>> Entering onrendered(canvas=${canvas})`);
             table.pageSize(pageSize);
             table.currentPage(currentPage);
             table.showExportList(false);
@@ -533,32 +558,43 @@ define(['jquery',
             $(document.body).append($wrapper);
 
             var generatePdf = function () {
+			logger.debug('>>> Entering generatePdf()');
               var layout = canvas.height > canvas.width ? 'p' : 'l';
               var pdf = new jsPdf(layout, 'pt', [canvas.width, canvas.height]);
+			logger.debug('<<< Exiting generatePdf()');
               pdf.addHTML($wrapper[0], function () {
+				logger.debug('>>> Entering addHTML()');
                 pdf.save(table.title + '.pdf');
                 $wrapper.remove();
                 $line.remove();
 
                 if (!$container.data('jsp')) {
                   $container.jScrollPane();
+				logger.debug('<<< Exiting addHTML()');
                 }
               });
             }
 
+			logger.debug(`<<< Exiting onrendered(canvas=${canvas})`);
             if (typeof jsPdf === "undefined") {
               require(['main/../modules/dnn.sqlconsole/scripts/jspdf'], function (pdf) {
+				logger.debug(`>>> Entering require(jsPdf=${jsPdf})`);
                 jsPdf = pdf;
                 generatePdf();
+				logger.debug(`<<< Exiting require(jsPdf=${jsPdf})`);
+				logger.debug('>>> Entering require()');
+				logger.debug('<<< Exiting require()');
               });
             } else {
               generatePdf();
+			logger.debug('<<< Exiting exportPdf()');
             }
           }
         });
       }
 
       var exportClipboard = function () {
+		logger.debug('>>> Entering exportClipboard()');
         viewModel.loading(true);
         var pageSize = table.pageSize();
         var currentPage = table.currentPage();
@@ -603,6 +639,7 @@ define(['jquery',
         });
 
         $download[0].click();
+		logger.debug('<<< Exiting exportClipboard()');
       }
 
       var getExportMethods = function () {
@@ -688,10 +725,13 @@ define(['jquery',
       return $('<div />').text(textToDecode).html();
     }
     var queryChanged = function (data) {
+	logger.debug(`>>> Entering queryChanged(data=${data})`);
       sqlContent.setValue(data);
+	logger.debug(`<<< Exiting queryChanged(data=${data})`);
     }
 
     var initViewModel = function () {
+	logger.debug('>>> Entering initViewModel()');
       viewModel = {
         resx: utility.resx.SqlConsole,
         savedQueries: ko.observableArray([]),
@@ -715,6 +755,7 @@ define(['jquery',
       };
 
       viewModel.selectedQuery.subscribe(savedQueryChanged);
+	logger.debug('<<< Exiting initViewModel()');
     }
 
 
@@ -740,6 +781,7 @@ define(['jquery',
     };
 
     var initSqlConsole = function () {
+	logger.debug('>>> Entering initSqlConsole()');
       const personaBarSettings = window.parent['personaBarSettings'];
       const debugMode = personaBarSettings['debugMode'] === true;
       const cdv = personaBarSettings['buildNumber'];
@@ -756,6 +798,7 @@ define(['jquery',
 
         self.MonacoEnvironment = {
           getWorkerUrl: function (moduleId, label) {
+			logger.debug(`>>> Entering getWorkerUrl(moduleId=${moduleId},label=${label})`);
             if (label === 'typescript' || label === 'javascript') {
               return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
                             importScripts('${process.env.ASSET_PATH}/typescript.worker.js');`
@@ -773,9 +816,11 @@ define(['jquery',
         initMonacoEditor();
       });
 
+	logger.debug('<<< Exiting initSqlConsole()');
     }
 
     var initMonacoEditor = function () {
+	logger.debug('>>> Entering initMonacoEditor()');
       var theme = "vs-light";
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         theme = "vs-dark";
@@ -783,6 +828,7 @@ define(['jquery',
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
         theme = e.matches ? "vs-dark" : "vs-light";
       });
+	logger.debug('<<< Exiting initMonacoEditor()');
 
       var monacoEditor = sqlConsole.create(document.getElementById("monaco-editor-sql"), {
         model: sqlContent,
@@ -804,6 +850,7 @@ define(['jquery',
       if (typeof callback === 'function') {
         callback();
       }
+	logger.debug(`<<< Exiting load(params=${params},callback=${callback})`);
     };
 
     return {

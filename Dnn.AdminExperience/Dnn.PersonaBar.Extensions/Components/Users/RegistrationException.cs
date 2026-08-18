@@ -14,13 +14,17 @@ public class RegistrationException : Exception
     /// <inheritdoc />
     public RegistrationException()
     {
+	eventLogger.LogDebug(">>> Entering RegistrationException()");
+	eventLogger.LogDebug("<<< Exiting RegistrationException()");
     }
 
     /// <inheritdoc />
     public RegistrationException(string message)
         : base(message)
     {
+	eventLogger.LogDebug(">>> Entering RegistrationException(message={Message})", message);
     }
+	eventLogger.LogDebug("<<< Exiting RegistrationException(message={Message})", message);
 
     /// <inheritdoc />
     public RegistrationException(string message, Exception innerException)

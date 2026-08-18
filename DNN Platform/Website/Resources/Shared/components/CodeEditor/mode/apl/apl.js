@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,7 +13,9 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(c=${c})`);
 CodeMirror.defineMode("apl", function() {
+logger.debug('>>> Entering defineMode()');
   var builtInOps = {
     ".": "innerProduct",
     "\\": "scan",
@@ -81,11 +85,14 @@ CodeMirror.defineMode("apl", function() {
   var isComment = /[⍝#].*$/;
 
   var stringEater = function(type) {
+	logger.debug(`>>> Entering stringEater(type=${type})`);
     var prev;
+	logger.debug('<<< Exiting defineMode()');
     prev = false;
     return function(c) {
       prev = c;
       if (c === type) {
+	logger.debug(`<<< Exiting stringEater(type=${type})`);
         return prev === "\\";
       }
       return true;
@@ -93,6 +100,7 @@ CodeMirror.defineMode("apl", function() {
   };
   return {
     startState: function() {
+	logger.debug('>>> Entering startState()');
       return {
         prev: false,
         func: false,
@@ -100,8 +108,10 @@ CodeMirror.defineMode("apl", function() {
         string: false,
         escape: false
       };
+	logger.debug('<<< Exiting startState()');
     },
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       var ch, funcName;
       if (stream.eatSpace()) {
         return null;
@@ -111,6 +121,8 @@ CodeMirror.defineMode("apl", function() {
         stream.eatWhile(stringEater(ch));
         stream.next();
         state.prev = true;
+		logger.debug(`function(exports=${exports}): state.prev → ${state.prev}`);
+		logger.debug(`defineMode(): state.prev → ${state.prev}`);
         return "string";
       }
       if (/[\[{\(]/.test(ch)) {
@@ -128,11 +140,14 @@ CodeMirror.defineMode("apl", function() {
       if (/[¯\d]/.test(ch)) {
         if (state.func) {
           state.func = false;
+		logger.debug(`function(exports=${exports}): state.func → ${state.func}`);
           state.prev = false;
         } else {
+		logger.debug(`defineMode(): state.func → ${state.func}`);
           state.prev = true;
         }
         stream.eatWhile(/[\w\.]/);
+		logger.debug(`token(stream=${stream},state=${state}): state.func → ${state.func}`);
         return "number";
       }
       if (isOperator.test(ch)) {
@@ -164,6 +179,7 @@ CodeMirror.defineMode("apl", function() {
       }
       stream.eatWhile(/[\w\$_]/);
       state.prev = true;
+	logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
       return "keyword";
     }
   };

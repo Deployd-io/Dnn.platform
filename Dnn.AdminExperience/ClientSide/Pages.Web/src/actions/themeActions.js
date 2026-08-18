@@ -1,8 +1,11 @@
 import ActionTypes from "../constants/actionTypes/themeActionTypes";
 import ThemeService from "../services/themeService";
+const logger = console;
 
 const themeActions = {
     retrieveThemes() {
+		logger.debug('>>> Entering retrieveThemes()');
+		logger.debug('<<< Exiting retrieveThemes()');
         return (dispatch) => new Promise(function (callback) {
             dispatch({
                 type: ActionTypes.RETRIEVING_THEMES
@@ -21,6 +24,7 @@ const themeActions = {
                 });
                 callback({success: true});
             }).catch((error) => {
+				logger.error('Exception in retrieveThemes()');
                 dispatch({
                     type: ActionTypes.ERROR_RETRIEVING_THEMES,
                     data: {error}
@@ -28,9 +32,12 @@ const themeActions = {
                 callback({success: false});
             });     
         });
+		logger.error(`Exception in Promise(dispatch=${dispatch}): (no error binding)`);
     },
 
     retrieveThemeFiles(themeName, level) {
+		logger.debug(`>>> Entering retrieveThemeFiles(themeName=${themeName},level=${level})`);
+		logger.debug(`<<< Exiting retrieveThemeFiles(themeName=${themeName},level=${level})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.RETRIEVING_THEME_FILES
@@ -45,6 +52,7 @@ const themeActions = {
                     }
                 });  
             }).catch((error) => {
+				logger.error(`Exception in retrieveThemeFiles(themeName=${themeName},level=${level}): (no error binding)`);
                 dispatch({
                     type: ActionTypes.ERROR_RETRIEVING_THEME_FILES,
                     data: {error}

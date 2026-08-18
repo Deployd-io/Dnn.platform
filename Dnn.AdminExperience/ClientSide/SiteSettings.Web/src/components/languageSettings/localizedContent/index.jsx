@@ -9,10 +9,12 @@ import resx from "../../../resources";
 import util from "../../../utils";
 import TranslationProgressBars from "../TranslationProgressBars";
 import "./style.less";
+const logger = console;
 
 class LocalizedContent extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             triedToSubmit: false,
             allPagesTranslatable: false,
@@ -20,28 +22,37 @@ class LocalizedContent extends Component {
             showProgressBars: false
         };
         this.counter = 0;
+		logger.debug(`constructor(): this.state → ${this.state}`);
         this.getProgressData = this.getProgressData.bind(this);
+		logger.debug('<<< Exiting constructor()');
     }
 
     onEnable() {
+		logger.debug('>>> Entering onEnable()');
         const {props, state} = this;
         props.dispatch(LanguagesActions.enableLocalizedContent({ portalId: props.portalId, translatePages: state.allPagesTranslatable }, (data) => {
             this.setState(data);
             const newState = Object.assign(data, { showProgressBars: true });
+			logger.debug(`onEnable(): newState → ${newState}`);
             this.setState(newState);
             this.getProgressData();
         }, (error) => {
             const errorMessage = JSON.parse(error.responseText);
             util.utilities.notifyError(errorMessage.Message);
+			logger.debug(`onEnable(): errorMessage → ${errorMessage}`);
         }));
+		logger.debug('<<< Exiting onEnable()');
     }
 
     onUpdateSettings() {
+		logger.debug('>>> Entering onUpdateSettings()');
         const {props} = this;
         props.dispatch(LanguagesActions.getLanguageSettings(props.languageSettings.PortalId, props.languageSettings.CultureCode));
+		logger.debug('<<< Exiting onUpdateSettings()');
     }
 
     getProgressData() {
+		logger.debug('>>> Entering getProgressData()');
         const {props} = this;
         props.dispatch(LanguagesActions.getLocalizationProgress((data) => {
             this.setState(data);
@@ -52,20 +63,25 @@ class LocalizedContent extends Component {
                 return;
             }
             this.doneProgress();
+			logger.debug('<<< Exiting getProgressData()');
         }));
     }
 
     doneProgress() {
+		logger.debug('>>> Entering doneProgress()');
         if (this.props.isOpen) {
             this.props.closePersonaBarPage();
             this.onUpdateSettings();
         }
         this.setState({ showProgressBars: false });
+		logger.debug('<<< Exiting doneProgress()');
     }
 
     getDefaultLanguage() {
+		logger.debug('>>> Entering getDefaultLanguage()');
         const {languages, languageSettings} = this.props;
         if (!languages || !languageSettings) {
+		logger.debug('<<< Exiting getDefaultLanguage()');
             return;
         }
         return languages.find(l => l.Code === languageSettings.SiteDefaultLanguage);
@@ -78,9 +94,12 @@ class LocalizedContent extends Component {
 
      
     render() {
+		logger.debug('>>> Entering render()');
         
         const defaultLanguage = this.getDefaultLanguage() || {};
+		logger.debug(`render(): defaultLanguage → ${defaultLanguage}`);
         const {props, state} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <PersonaBarPageBody
                 className="create-language-pack-panel enable-localized-content-panel"
@@ -161,7 +180,9 @@ LocalizedContent.propTypes = {
 };
 
 function mapStateToProps(state) {
+logger.debug(`>>> Entering mapStateToProps(state=${state})`);
 
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         languages: state.languages.languageList,
         languageSettings: state.languages.languageSettings

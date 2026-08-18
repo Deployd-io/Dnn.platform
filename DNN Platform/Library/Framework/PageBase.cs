@@ -47,8 +47,10 @@ namespace DotNetNuke.Framework
         protected PageBase()
             : this(null, null, null)
         {
+		Logger.LogDebug(">>> Entering PageBase()");
         }
 
+		Logger.LogDebug("<<< Exiting PageBase()");
         /// <summary>Initializes a new instance of the <see cref="PageBase"/> class.</summary>
         /// <param name="portalController">The portal controller.</param>
         /// <param name="appStatus">The application status.</param>
@@ -57,6 +59,8 @@ namespace DotNetNuke.Framework
         protected PageBase(IPortalController portalController, IApplicationStatusInfo appStatus, IHostSettings hostSettings)
             : this(portalController, appStatus, hostSettings, null)
         {
+		Logger.LogDebug(">>> Entering PageBase(portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings})", portalController, appStatus, hostSettings);
+		Logger.LogDebug("<<< Exiting PageBase(portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings})", portalController, appStatus, hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PageBase"/> class.</summary>
@@ -165,6 +169,7 @@ namespace DotNetNuke.Framework
         /// <param name="affectedControls">ArrayList that hold the controls that have been localized. This is later used for the removal of the key attribute.</param>
         public static void RemoveKeyAttribute(ArrayList affectedControls)
         {
+			Logger.LogDebug(">>> Entering RemoveKeyAttribute(affectedControls={AffectedControls})", affectedControls);
             if (affectedControls == null)
             {
                 return;
@@ -174,11 +179,13 @@ namespace DotNetNuke.Framework
             for (i = 0; i <= affectedControls.Count - 1; i++)
             {
                 var ac = (AttributeCollection)affectedControls[i];
+				Logger.LogDebug("RemoveKeyAttribute(affectedControls={AffectedControls}): ac → {Ac}", affectedControls, ac);
                 ac.Remove(Localization.KeyName);
                 ac.Remove(IconController.IconKeyName);
                 ac.Remove(IconController.IconSizeName);
                 ac.Remove(IconController.IconStyleName);
             }
+			Logger.LogDebug("<<< Exiting RemoveKeyAttribute(affectedControls={AffectedControls})", affectedControls);
         }
 
         /// <summary><para>GetControlAttribute looks at the type of control and does it's best to find an AttributeCollection.</para></summary>
@@ -188,8 +195,11 @@ namespace DotNetNuke.Framework
         /// <returns>A string containing the key for the specified control or null if a key attribute wasn't found.</returns>
         internal static string GetControlAttribute(Control control, ArrayList affectedControls, string attributeName)
         {
+			Logger.LogDebug(">>> Entering GetControlAttribute(control={Control},affectedControls={AffectedControls},attributeName={AttributeName})", control, affectedControls, attributeName);
             AttributeCollection attributeCollection = null;
             string key = null;
+			Logger.LogWarning("GetControlAttribute(control={Control},affectedControls={AffectedControls},attributeName={AttributeName}): key → {Key}", control, affectedControls, attributeName, key);
+			Logger.LogDebug("GetControlAttribute(control={Control},affectedControls={AffectedControls},attributeName={AttributeName}): attributeCollection → {AttributeCollection}", control, affectedControls, attributeName, attributeCollection);
             if (!(control is LiteralControl))
             {
                 if (control is WebControl webControl)
@@ -214,7 +224,9 @@ namespace DotNetNuke.Framework
                         else
                         {
                             var controlType = control.GetType();
+							Logger.LogDebug("GetControlAttribute(control={Control},affectedControls={AffectedControls},attributeName={AttributeName}): controlType → {ControlType}", control, affectedControls, attributeName, controlType);
                             var attributeProperty = controlType.GetProperty("Attributes", typeof(AttributeCollection));
+							Logger.LogDebug("GetControlAttribute(control={Control},affectedControls={AffectedControls},attributeName={AttributeName}): attributeProperty → {AttributeProperty}", control, affectedControls, attributeName, attributeProperty);
                             if (attributeProperty != null)
                             {
                                 attributeCollection = (AttributeCollection)attributeProperty.GetValue(control, null);
@@ -230,6 +242,7 @@ namespace DotNetNuke.Framework
                 affectedControls.Add(attributeCollection);
             }
 
+			Logger.LogDebug("<<< Exiting GetControlAttribute(control={Control},affectedControls={AffectedControls},attributeName={AttributeName})", control, affectedControls, attributeName);
             return key;
         }
 
@@ -240,6 +253,7 @@ namespace DotNetNuke.Framework
         /// <param name="resourceFileRoot">Root Resource File.</param>
         internal void ProcessControl(Control control, ArrayList affectedControls, bool includeChildren, string resourceFileRoot)
         {
+			Logger.LogDebug(">>> Entering ProcessControl(control={Control},affectedControls={AffectedControls},includeChildren={IncludeChildren},resourceFileRoot={ResourceFileRoot})", control, affectedControls, includeChildren, resourceFileRoot);
             if (!control.Visible)
             {
                 return;
@@ -247,10 +261,12 @@ namespace DotNetNuke.Framework
 
             // Perform the substitution if a key was found
             var key = GetControlAttribute(control, affectedControls, Localization.KeyName);
+			Logger.LogWarning("ProcessControl(control={Control},affectedControls={AffectedControls},includeChildren={IncludeChildren},resourceFileRoot={ResourceFileRoot}): key → {Key}", control, affectedControls, includeChildren, resourceFileRoot, key);
             if (!string.IsNullOrEmpty(key))
             {
                 // Translation starts here ....
                 var value = Localization.GetString(key, resourceFileRoot);
+				Logger.LogDebug("ProcessControl(control={Control},affectedControls={AffectedControls},includeChildren={IncludeChildren},resourceFileRoot={ResourceFileRoot}): value → {Value}", control, affectedControls, includeChildren, resourceFileRoot, value);
                 this.LocalizeControl(control, value);
             }
 
@@ -290,8 +306,11 @@ namespace DotNetNuke.Framework
                 if (string.IsNullOrEmpty(image.ImageUrl))
                 {
                     var iconKey = GetControlAttribute(control, affectedControls, IconController.IconKeyName);
+					Logger.LogDebug("ProcessControl(control={Control},affectedControls={AffectedControls},includeChildren={IncludeChildren},resourceFileRoot={ResourceFileRoot}): iconKey → {IconKey}", control, affectedControls, includeChildren, resourceFileRoot, iconKey);
                     var iconSize = GetControlAttribute(control, affectedControls, IconController.IconSizeName);
+					Logger.LogDebug("ProcessControl(control={Control},affectedControls={AffectedControls},includeChildren={IncludeChildren},resourceFileRoot={ResourceFileRoot}): iconSize → {IconSize}", control, affectedControls, includeChildren, resourceFileRoot, iconSize);
                     var iconStyle = GetControlAttribute(control, affectedControls, IconController.IconStyleName);
+					Logger.LogDebug("ProcessControl(control={Control},affectedControls={AffectedControls},includeChildren={IncludeChildren},resourceFileRoot={ResourceFileRoot}): iconStyle → {IconStyle}", control, affectedControls, includeChildren, resourceFileRoot, iconStyle);
                     image.ImageUrl = IconController.IconURL(iconKey, iconSize, iconStyle);
                 }
             }
@@ -349,10 +368,12 @@ namespace DotNetNuke.Framework
             {
                 // Cache results from reflection calls for performance
                 var pi = control.GetType().GetProperty("LocalResourceFile");
+				Logger.LogDebug("ProcessControl(control={Control},affectedControls={AffectedControls},includeChildren={IncludeChildren},resourceFileRoot={ResourceFileRoot}): pi → {Pi}", control, affectedControls, includeChildren, resourceFileRoot, pi);
                 if (pi != null)
                 {
                     // Attempt to get property value
                     var pv = pi.GetValue(control, null);
+					Logger.LogDebug("ProcessControl(control={Control},affectedControls={AffectedControls},includeChildren={IncludeChildren},resourceFileRoot={ResourceFileRoot}): pv → {Pv}", control, affectedControls, includeChildren, resourceFileRoot, pv);
 
                     // If controls has a LocalResourceFile property use this, otherwise pass the resource file root
                     this.IterateControls(control.Controls, affectedControls, pv == null ? resourceFileRoot : pv.ToString());
@@ -368,19 +389,23 @@ namespace DotNetNuke.Framework
                 // Get Resource File Root from Controls LocalResourceFile Property
                 this.IterateControls(control.Controls, affectedControls, objModuleControl.LocalResourceFile);
             }
+			Logger.LogDebug("<<< Exiting ProcessControl(control={Control},affectedControls={AffectedControls},includeChildren={IncludeChildren},resourceFileRoot={ResourceFileRoot})", control, affectedControls, includeChildren, resourceFileRoot);
         }
 
         protected virtual void RegisterAjaxScript()
         {
+			Logger.LogDebug(">>> Entering RegisterAjaxScript()");
             if (ServicesFrameworkInternal.Instance.IsAjaxScriptSupportRequired)
             {
                 ServicesFrameworkInternal.Instance.RegisterAjaxScript(this.Page);
             }
+			Logger.LogDebug("<<< Exiting RegisterAjaxScript()");
         }
 
         /// <inheritdoc />
         protected override void OnError(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnError(e={E})", e);
             base.OnError(e);
             Exception exc = this.Server.GetLastError();
             Logger.Fatal("An error has occurred while loading page.", exc);
@@ -410,6 +435,7 @@ namespace DotNetNuke.Framework
                 }
                 catch (Exception)
                 {
+					Logger.LogError("Exception in OnError(e={E}): {Arg1}", e, Exception.Message);
                     HttpContext.Current.Response.Clear();
                     var errorMessage = Localization.GetString("NoSitesForThisInstallation.Error", Localization.GlobalResourceFile);
                     HttpContext.Current.Server.Transfer($"~/ErrorPage.aspx?status=503&error={HttpUtility.UrlEncode(errorMessage)}");
@@ -418,13 +444,16 @@ namespace DotNetNuke.Framework
 
             strURL = this.GetErrorUrl(strURL, exc);
             Exceptions.ProcessPageLoadException(exc, strURL);
+			Logger.LogDebug("<<< Exiting OnError(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             var isInstallPage = HttpContext.Current.Request.Url.LocalPath.ToLowerInvariant().Contains("installwizard.aspx");
             if (ScriptManager.GetCurrent(this) == null)
+			Logger.LogDebug("OnInit(e={E}): isInstallPage → {IsInstallPage}", e, isInstallPage);
             {
                 AJAX.AddScriptManager(this, !isInstallPage);
             }
@@ -438,11 +467,13 @@ namespace DotNetNuke.Framework
             this.ViewStateUserKey = this.UserController.GetCurrentUserInfo().Username;
 
             base.OnInit(e);
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             // Because we have delayed registration of the jQuery script,
@@ -471,11 +502,13 @@ namespace DotNetNuke.Framework
             }
 
             this.RegisterAjaxScript();
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer);
             this.LogDnnTrace("PageBase.Render", "Start", $"{this.Page.Request.Url.AbsoluteUri}");
 
             this.IterateControls(this.Controls, this.localizedControls, this.LocalResourceFile);
@@ -484,6 +517,7 @@ namespace DotNetNuke.Framework
             base.Render(writer);
 
             this.LogDnnTrace("PageBase.Render", "End", $"{this.Page.Request.Url.AbsoluteUri}");
+			Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer);
         }
 
         private string GetErrorUrl(string url, Exception exc, bool hideContent = true)
@@ -499,8 +533,10 @@ namespace DotNetNuke.Framework
                     ? "An unexpected error has occurred"
                     : exc.Message;
             url = $"{url}{separator}error={WebUtility.UrlEncode(errorMessage)}";
+			Logger.LogDebug("GetErrorUrl(url={Url},exc={Exc},hideContent={HideContent}): url → {Url1}", url, exc, hideContent, url);
             if (!Globals.IsAdminControl() && hideContent)
             {
+			Logger.LogDebug("<<< Exiting GetErrorUrl(url={Url},exc={Exc},hideContent={HideContent})", url, exc, hideContent);
                 return $"{url}&content=0";
             }
 
@@ -509,22 +545,28 @@ namespace DotNetNuke.Framework
 
         private bool IsViewStateFailure(Exception e)
         {
+			Logger.LogDebug(">>> Entering IsViewStateFailure(e={E})", e);
+			Logger.LogDebug("<<< Exiting IsViewStateFailure(e={E})", e);
             return !this.User.Identity.IsAuthenticated && e?.InnerException is ViewStateException;
         }
 
         private void IterateControls(ControlCollection controls, ArrayList affectedControls, string resourceFileRoot)
         {
+			Logger.LogDebug(">>> Entering IterateControls(controls={Controls},affectedControls={AffectedControls},resourceFileRoot={ResourceFileRoot})", controls, affectedControls, resourceFileRoot);
             foreach (Control c in controls)
             {
                 this.ProcessControl(c, affectedControls, true, resourceFileRoot);
                 this.LogDnnTrace("PageBase.IterateControls", "Info", $"ControlId: {c.ID}");
             }
+			Logger.LogDebug("<<< Exiting IterateControls(controls={Controls},affectedControls={AffectedControls},resourceFileRoot={ResourceFileRoot})", controls, affectedControls, resourceFileRoot);
         }
 
         private void LogDnnTrace(string origin, string action, string message)
         {
+			Logger.LogDebug(">>> Entering LogDnnTrace(origin={Origin},action={Action},message={Message})", origin, action, message);
             var tabId = -1;
             if (this.PortalSettings?.ActiveTab != null)
+			Logger.LogDebug("LogDnnTrace(origin={Origin},action={Action},message={Message}): tabId → {TabId}", origin, action, message, tabId);
             {
                 tabId = this.PortalSettings.ActiveTab.TabID;
             }
@@ -533,6 +575,7 @@ namespace DotNetNuke.Framework
             {
                 this.traceLogger.Debug($"{origin} {action} (TabId:{tabId},{message})");
             }
+			Logger.LogDebug("<<< Exiting LogDnnTrace(origin={Origin},action={Action},message={Message})", origin, action, message);
         }
 
         private void LocalizeControl(Control control, string value)
@@ -567,6 +610,7 @@ namespace DotNetNuke.Framework
 
                     var resolvedUrl = this.Page.ResolveUrl(match.Groups[match.Groups.Count - 2].Value);
                     value = value.Replace(match.Groups[match.Groups.Count - 2].Value, resolvedUrl);
+					Logger.LogDebug("LocalizeControl(control={Control},value={Value}): value → {Value1}", control, value, value);
                 }
 
                 linkButton.Text = value;
@@ -619,6 +663,7 @@ namespace DotNetNuke.Framework
             {
                 textBox.ToolTip = value;
             }
+			Logger.LogDebug("<<< Exiting LocalizeControl(control={Control},value={Value})", control, value);
         }
     }
 }

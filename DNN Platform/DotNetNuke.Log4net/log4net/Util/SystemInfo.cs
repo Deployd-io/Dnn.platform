@@ -52,6 +52,8 @@ namespace log4net.Util
         /// </remarks>
         private SystemInfo() 
         {
+		value.LogDebug(">>> Entering SystemInfo()");
+		value.LogDebug("<<< Exiting SystemInfo()");
         }
 
         /// <summary>Initialize default values for private static fields.</summary>
@@ -62,8 +64,11 @@ namespace log4net.Util
         /// </remarks>
         static SystemInfo()
         {
+			value.LogDebug(">>> Entering SystemInfo()");
             string nullText = DEFAULT_NULL_TEXT;
             string notAvailableText = DEFAULT_NOT_AVAILABLE_TEXT;
+			value.LogDebug("SystemInfo(): notAvailableText → {NotAvailableText}", notAvailableText);
+			value.LogDebug("SystemInfo(): nullText → {NullText}", nullText);
 
 #if !NETCF
             // Look for log4net.NullText in AppSettings
@@ -83,7 +88,10 @@ namespace log4net.Util
             }
 #endif
             s_notAvailableText = notAvailableText;
+			value.LogDebug("SystemInfo(): s_notAvailableText → {S_notAvailableText}", s_notAvailableText);
             s_nullText = nullText;
+			value.LogDebug("SystemInfo(): s_nullText → {S_nullText}", s_nullText);
+			value.LogDebug("<<< Exiting SystemInfo()");
         }
 
         /// <summary>Gets the system dependent line terminator.</summary>
@@ -433,6 +441,7 @@ namespace log4net.Util
         /// </remarks>
         public static string AssemblyLocationInfo(Assembly myAssembly)
         {
+		value.LogDebug(">>> Entering AssemblyLocationInfo(myAssembly={MyAssembly})", myAssembly);
 #if NETCF
             return "Not supported on Microsoft .NET Compact Framework";
 #elif NETSTANDARD1_3
@@ -474,12 +483,14 @@ namespace log4net.Util
                 }
                 catch (NotSupportedException)
                 {
+					value.LogError("Exception in AssemblyLocationInfo(myAssembly={MyAssembly}): {Arg1}", myAssembly, NotSupportedException.getMessage());
                     // The location information may be unavailable for dynamic assemblies and a NotSupportedException
                     // is thrown in those cases. See: http://msdn.microsoft.com/de-de/library/system.reflection.assembly.location.aspx
                     return "Dynamic Assembly";
                 }
                 catch (TargetInvocationException ex)
                 {
+					value.LogError("Exception in AssemblyLocationInfo(myAssembly={MyAssembly}): {Arg1}", myAssembly, ex.getMessage());
                     return "Location Detect Failed (" + ex.Message + ")";
                 }
                 catch (ArgumentException ex)
@@ -488,6 +499,8 @@ namespace log4net.Util
                 }
                 catch (System.Security.SecurityException)
                 {
+					value.LogError("Exception in AssemblyLocationInfo(myAssembly={MyAssembly}): {Arg1}", myAssembly, SecurityException.Message);
+					value.LogDebug("<<< Exiting AssemblyLocationInfo(myAssembly={MyAssembly})", myAssembly);
                     return "Location Permission Denied";
                 }
             }
@@ -516,6 +529,7 @@ namespace log4net.Util
 #else
                 + type.Assembly.FullName;
 #endif
+		value.LogDebug("<<< Exiting AssemblyQualifiedName(type={Type})", type);
         }
 
         /// <summary>Gets the short name of the <see cref="Assembly" />.</summary>
@@ -540,12 +554,16 @@ namespace log4net.Util
         /// </remarks>
         public static string AssemblyShortName(Assembly myAssembly)
         {
+			value.LogDebug(">>> Entering AssemblyShortName(myAssembly={MyAssembly})", myAssembly);
             string name = myAssembly.FullName;
             int offset = name.IndexOf(',');
+			value.LogDebug("AssemblyShortName(myAssembly={MyAssembly}): offset → {Offset}", myAssembly, offset);
+			value.LogDebug("AssemblyShortName(myAssembly={MyAssembly}): name → {Name}", myAssembly, name);
             if (offset > 0)
             {
                 name = name.Substring(0, offset);
             }
+			value.LogDebug("<<< Exiting AssemblyShortName(myAssembly={MyAssembly})", myAssembly);
             return name.Trim();
 
             // TODO: Do we need to unescape the assembly name string? 
@@ -563,6 +581,7 @@ namespace log4net.Util
         /// </remarks>
         public static string AssemblyFileName(Assembly myAssembly)
         {
+		value.LogDebug(">>> Entering AssemblyFileName(myAssembly={MyAssembly})", myAssembly);
 #if NETCF || NETSTANDARD1_3 // TODO Assembly.Location is in netstandard1.5 System.Reflection
             // This is not very good because it assumes that only
             // the entry assembly can be an EXE. In fact multiple
@@ -579,6 +598,7 @@ namespace log4net.Util
             else
             {
                 // assembly is not entry assembly
+			value.LogDebug("<<< Exiting AssemblyFileName(myAssembly={MyAssembly})", myAssembly);
                 return assemblyShortName + ".dll";
             }
 #else
@@ -606,7 +626,10 @@ namespace log4net.Util
         /// </remarks>
         public static Type GetTypeFromString(Type relativeType, string typeName, bool throwOnError, bool ignoreCase)
         {
+		value.LogDebug(">>> Entering GetTypeFromString(relativeType={RelativeType},typeName={TypeName},throwOnError={ThrowOnError},ignoreCase={IgnoreCase})", relativeType, typeName, throwOnError, ignoreCase);
 #if NETSTANDARD1_3
+			value.LogDebug("<<< Exiting GetTypeFromString(relativeType={RelativeType},typeName={TypeName},throwOnError={ThrowOnError},ignoreCase={IgnoreCase})", relativeType, typeName, throwOnError, ignoreCase);
+			value.LogDebug("<<< Exiting GetTypeFromString(typeName={TypeName},throwOnError={ThrowOnError},ignoreCase={IgnoreCase})", typeName, throwOnError, ignoreCase);
             return GetTypeFromString(relativeType.GetTypeInfo().Assembly, typeName, throwOnError, ignoreCase);
 #else
             return GetTypeFromString(relativeType.Assembly, typeName, throwOnError, ignoreCase);
@@ -728,6 +751,7 @@ namespace log4net.Util
 #if NETCF
                 // In NETCF 2 and 3 arg versions seem to behave differently
                 // https://issues.apache.org/jira/browse/LOG4NET-113
+				value.LogDebug("<<< Exiting GetTypeFromString(relativeAssembly={RelativeAssembly},typeName={TypeName},throwOnError={ThrowOnError},ignoreCase={IgnoreCase})", relativeAssembly, typeName, throwOnError, ignoreCase);
                 return Type.GetType(typeName, throwOnError);
 #else
                 return Type.GetType(typeName, throwOnError, ignoreCase);
@@ -746,6 +770,7 @@ namespace log4net.Util
         public static Guid NewGuid()
         {
 #if NETCF_1_0
+			value.LogDebug("<<< Exiting NewGuid()");
             return PocketGuid.NewGuid();
 #else
             return Guid.NewGuid();
@@ -771,9 +796,11 @@ namespace log4net.Util
         /// </remarks>
         public static ArgumentOutOfRangeException CreateArgumentOutOfRangeException(string parameterName, object actualValue, string message)
         {
+		value.LogDebug(">>> Entering CreateArgumentOutOfRangeException(parameterName={ParameterName},actualValue={ActualValue},message={Message})", parameterName, actualValue, message);
 #if NETCF_1_0
             return new ArgumentOutOfRangeException(message + " [param=" + parameterName + "] [value=" + actualValue + "]");
 #elif NETCF_2_0
+			value.LogDebug("<<< Exiting CreateArgumentOutOfRangeException(parameterName={ParameterName},actualValue={ActualValue},message={Message})", parameterName, actualValue, message);
             return new ArgumentOutOfRangeException(parameterName, message + " [value=" + actualValue + "]");
 #else
             return new ArgumentOutOfRangeException(parameterName, actualValue, message);
@@ -823,6 +850,7 @@ namespace log4net.Util
                 // Ignore exception, just return false
             }
 
+			value.LogDebug("<<< Exiting TryParse(s={S})", s);
             return false;
 #endif
         }
@@ -929,7 +957,9 @@ namespace log4net.Util
         /// </remarks>
         public static string GetAppSetting(string key)
         {
+			value.LogDebug(">>> Entering GetAppSetting(key={Key})", key);
             try
+			value.LogDebug("<<< Exiting GetAppSetting(key={Key})", key);
             {
 #if NETCF || NETSTANDARD1_3
                 // Configuration APIs are not suported under the Compact Framework
@@ -963,12 +993,15 @@ namespace log4net.Util
         /// </remarks>
         public static string ConvertToFullPath(string path)
         {
+			value.LogDebug(">>> Entering ConvertToFullPath(path={Path})", path);
             if (path == null)
             {
+				value.LogWarning("Throwing ArgumentNullException from ConvertToFullPath(path={Path})", path);
                 throw new ArgumentNullException("path");
             }
 
             string baseDirectory = string.Empty;
+			value.LogDebug("ConvertToFullPath(path={Path}): baseDirectory → {BaseDirectory}", path, baseDirectory);
             try
             {
                 string applicationBaseDirectory = ApplicationBaseDirectory;
@@ -976,6 +1009,7 @@ namespace log4net.Util
                 {
                     // applicationBaseDirectory may be a URI not a local file path
                     Uri applicationBaseDirectoryUri = new Uri(applicationBaseDirectory);
+					value.LogDebug("ConvertToFullPath(path={Path}): applicationBaseDirectoryUri → {ApplicationBaseDirectoryUri}", path, applicationBaseDirectoryUri);
                     if (applicationBaseDirectoryUri.IsFile)
                     {
                         baseDirectory = applicationBaseDirectoryUri.LocalPath;
@@ -984,12 +1018,14 @@ namespace log4net.Util
             }
             catch
             {
+				value.LogError("Exception in ConvertToFullPath(path={Path}): {Arg1}", path, ex.Message);
                 // Ignore URI exceptions & SecurityExceptions from SystemInfo.ApplicationBaseDirectory
             }
 
             if (baseDirectory != null && baseDirectory.Length > 0)
             {
                 // Note that Path.Combine will return the second path if it is rooted
+			value.LogDebug("<<< Exiting ConvertToFullPath(path={Path})", path);
                 return Path.GetFullPath(Path.Combine(baseDirectory, path));
             }
             return Path.GetFullPath(path);
@@ -1004,9 +1040,11 @@ namespace log4net.Util
         /// </remarks>
         public static Hashtable CreateCaseInsensitiveHashtable()
         {
+		value.LogDebug(">>> Entering CreateCaseInsensitiveHashtable()");
 #if NETCF_1_0
             return new Hashtable(CaseInsensitiveHashCodeProvider.Default, CaseInsensitiveComparer.Default);
 #elif NETCF_2_0 || NET_2_0 || MONO_2_0 || MONO_3_5 || MONO_4_0
+			value.LogDebug("<<< Exiting CreateCaseInsensitiveHashtable()");
             return new Hashtable(StringComparer.OrdinalIgnoreCase);
 #else
             return System.Collections.Specialized.CollectionsUtil.CreateCaseInsensitiveHashtable();
@@ -1025,9 +1063,11 @@ namespace log4net.Util
         /// <returns><c>true</c> if the strings are equal, <c>false</c> otherwise.</returns>
         public static Boolean EqualsIgnoringCase(String a, String b)
         {
+		value.LogDebug(">>> Entering EqualsIgnoringCase(a={A},b={B})", a, b);
 #if NET_1_0 || NET_1_1 || NETCF_1_0
             return string.Compare(a, b, true, System.Globalization.CultureInfo.InvariantCulture) == 0
 #elif NETSTANDARD1_3
+			value.LogDebug("<<< Exiting EqualsIgnoringCase(a={A},b={B})", a, b);
             return CultureInfo.InvariantCulture.CompareInfo.Compare(a, b, CompareOptions.IgnoreCase) == 0;
 #else // >= .NET-2.0
             return String.Equals(a, b, StringComparison.OrdinalIgnoreCase);
@@ -1164,6 +1204,8 @@ namespace log4net.Util
             // all static methods
             private PocketGuid()
             {
+			value.LogDebug(">>> Entering PocketGuid()");
+			value.LogDebug("<<< Exiting PocketGuid()");
             }
 
             /// <summary>Return a new System.Guid object.</summary>

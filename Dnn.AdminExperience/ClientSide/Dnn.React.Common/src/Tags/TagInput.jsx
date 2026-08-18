@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+const logger = console;
 
 const KEY = {
     BACKSPACE: 8,
@@ -13,10 +14,13 @@ const KEY = {
 export default class TagInput extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.handleClick = this.handleClick.bind(this);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     handleClick(e) {
+		logger.debug(`>>> Entering handleClick(e=${e})`);
         if (!this.props.container || this.props.container.contains(e.target)) {
             return;
         }   
@@ -26,21 +30,28 @@ export default class TagInput extends Component {
         }
         
         this.close();
+		logger.debug(`<<< Exiting handleClick(e=${e})`);
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.focusInput();
         document.addEventListener("click", this.handleClick, true);
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentWillUnmount() {
+		logger.debug('>>> Entering componentWillUnmount()');
         this.close();
         document.removeEventListener("click", this.handleClick, true);
+		logger.debug('<<< Exiting componentWillUnmount()');
     }
 
     addTag(tag) {
+		logger.debug(`>>> Entering addTag(tag=${tag})`);
         this.props.addTag(tag);
         this.inputField.focus();
+		logger.debug(`<<< Exiting addTag(tag=${tag})`);
     }
 
     onChange(event) {
@@ -48,14 +59,18 @@ export default class TagInput extends Component {
     }
 
     close() {
+		logger.debug('>>> Entering close()');
         this.props.onClose();
+		logger.debug('<<< Exiting close()');
     }
 
     removeLastTag() {
+		logger.debug('>>> Entering removeLastTag()');
         if (this.props.newTagText) {
             return;
         }
         this.props.removeLastTag();
+		logger.debug('<<< Exiting removeLastTag()');
     }
 
     onKeyDown(event) {
@@ -84,14 +99,18 @@ export default class TagInput extends Component {
     }
 
     focusInput() {
+		logger.debug('>>> Entering focusInput()');
         if (typeof(this.props.onFocus) === "function") {
             this.props.onFocus(this.props.newTagText);
+			logger.debug('<<< Exiting focusInput()');
         }
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {opts} = this.props;
 
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 <div className="input-container">

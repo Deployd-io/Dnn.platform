@@ -12,6 +12,7 @@ import { GridCell }  from "@dnnsoftware/dnn-react-common";
 import UsersInRole from "./UsersInRole";
 import RoleEditor from "./RoleEditor";
 import CollapsibleSwitcher from "../common/CollapsibleSwitcher";
+const logger = console;
 import {
     createRoleGroupOptions
 } from "./helpers/roles";
@@ -27,6 +28,7 @@ const tableFields = [
 class RolesPanel extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
 
         this.state = {
             defaultRoleGroup: resx.get("AllGroups"),
@@ -44,21 +46,29 @@ class RolesPanel extends Component {
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const {props} = this;
         props.dispatch(RolesActions.getRoleGroupsList(false));
         this.refreshRolesList();
         let deleteAllowed = (props.rolesList !== undefined && props.rolesList.length === 0);
         this.setState({ deleteAllowed, });
+		logger.debug(`componentDidMount(): deleteAllowed → ${deleteAllowed}`);
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     static getDerivedStateFromProps(props) {
+		logger.debug(`>>> Entering getDerivedStateFromProps(props=${props})`);
         let deleteAllowed = (props.rolesList !== undefined && props.rolesList.length === 0);
+		logger.debug(`getDerivedStateFromProps(props=${props}): deleteAllowed → ${deleteAllowed}`);
+		logger.debug(`<<< Exiting getDerivedStateFromProps(props=${props})`);
         return { deleteAllowed, };
     }
 
     refreshRolesList() {
+		logger.debug('>>> Entering refreshRolesList()');
         const {props, state} = this;
         props.dispatch(RolesActions.getRolesList(state.parameter, (data) => {
+			logger.debug('<<< Exiting refreshRolesList()');
             let rolesList = Object.assign([], data.roles);
             this.setState({
                 rolesList
@@ -67,19 +77,24 @@ class RolesPanel extends Component {
     }
 
     onPageChanged() {
+		logger.debug('>>> Entering onPageChanged()');
         const {props} = this;
         let startIndex = props.rolesList.length;
         let {parameter} = this.state;
         parameter.startIndex = startIndex;
+		logger.debug(`onPageChanged(): parameter.startIndex → ${parameter.startIndex}`);
         parameter.reload = false;
         this.setState({
             parameter
         });
         this.refreshRolesList(startIndex);
+		logger.debug('<<< Exiting onPageChanged()');
     }
 
     onAddRole() {
+		logger.debug('>>> Entering onAddRole()');
         this.toggle(this.state.openId === "add" ? "" : "add", 1);
+		logger.debug('<<< Exiting onAddRole()');
     }
 
     uncollapse(id, index) {
@@ -89,46 +104,61 @@ class RolesPanel extends Component {
                 renderIndex: index
             });
         }, this.timeout);
+		logger.debug(`<<< Exiting uncollapse(id=${id},index=${index})`);
     }
     collapse() {
+		logger.debug('>>> Entering collapse()');
         if (this.state.openId !== "") {
             this.setState({
                 openId: "",
                 renderIndex: -1
             });
+			logger.debug('<<< Exiting collapse()');
         }
     }
     toggle(openId, index) {
+		logger.debug(`>>> Entering toggle(openId=${openId},index=${index})`);
         if (openId !== "") {
             this.uncollapse(openId, index);
         } else {
             this.collapse();
+			logger.debug(`<<< Exiting toggle(openId=${openId},index=${index})`);
         }
     }
     onRoleGroupChanged(group) {
+		logger.debug(`>>> Entering onRoleGroupChanged(group=${group})`);
         let {parameter} = this.state;
         parameter.groupId = group.value;
+		logger.debug(`onRoleGroupChanged(group=${group}): parameter.groupId → ${parameter.groupId}`);
         parameter.startIndex = 0;
+		logger.debug(`onRoleGroupChanged(group=${group}): parameter.startIndex → ${parameter.startIndex}`);
         parameter.reload = true;
         this.setState({
             parameter
         });
         this.refreshRolesList();
+		logger.debug(`<<< Exiting onRoleGroupChanged(group=${group})`);
     }
 
     onKeywordChanged(keyword) {
+		logger.debug(`>>> Entering onKeywordChanged(keyword=${keyword})`);
         let {parameter} = this.state;
         parameter.keyword = keyword;
+		logger.debug(`onKeywordChanged(keyword=${keyword}): parameter.keyword → ${parameter.keyword}`);
         parameter.startIndex = 0;
+		logger.debug(`onKeywordChanged(keyword=${keyword}): parameter.startIndex → ${parameter.startIndex}`);
         parameter.reload = true;
         this.setState({
             parameter
         });
         this.refreshRolesList();
+		logger.debug(`<<< Exiting onKeywordChanged(keyword=${keyword})`);
     }
     GetGroupName(groupId) {
+		logger.debug(`>>> Entering GetGroupName(groupId=${groupId})`);
         const {props} = this;
         if (props.roleGroups.some(group => group.id === groupId)) {
+		logger.debug(`<<< Exiting GetGroupName(groupId=${groupId})`);
             return props.roleGroups.filter(group => group.id === groupId)[0].name;
         }
 
@@ -136,6 +166,7 @@ class RolesPanel extends Component {
     }
 
     renderHeader() {
+		logger.debug('>>> Entering renderHeader()');
         let tableHeaders = tableFields.map((field) => {
             return <GridCell key={field.name} columnSize={field.width} style={{ fontWeight: "bolder" }}>
                 {
@@ -145,6 +176,7 @@ class RolesPanel extends Component {
                 }
             </GridCell>;
         });
+		logger.debug('<<< Exiting renderHeader()');
         return <div id="users-header-row" className="users-header-row">{tableHeaders}</div>;
     }
     renderedRolesList(roleGroupOptions, securityModeOptions, statusOptions) {
@@ -194,6 +226,7 @@ class RolesPanel extends Component {
         }
     }
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
         let opened = (this.state.openId === "add");
         let roleGroupOptions = createRoleGroupOptions(this.props.roleGroups);
@@ -218,6 +251,7 @@ class RolesPanel extends Component {
                 Collapse={this.collapse.bind(this)}
                 currentGroupId={this.state.parameter.groupId}
             />];
+		logger.debug('<<< Exiting render()');
         return (
             props.roleGroups &&
             <div className="roles-list-container">
@@ -266,6 +300,8 @@ RolesPanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         roleGroups: state.roles.roleGroups,
         rolesList: state.roles.rolesList,

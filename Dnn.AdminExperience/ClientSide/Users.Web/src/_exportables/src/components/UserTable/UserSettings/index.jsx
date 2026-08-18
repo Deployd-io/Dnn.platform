@@ -7,6 +7,7 @@ import {formatDate, validateEmail} from "../../../helpers";
 import utilities from "utils";
 import styles from "./style.module.less";
 import ChangePassword from "../ChangePassword";
+const logger = console;
 import {canManagePassword, canEditSettings} from "../../permissionHelpers.js";
 import { GridCell, GridSystem, SingleLineInputWithError, Button } from "@dnnsoftware/dnn-react-common";
 
@@ -21,6 +22,7 @@ const blankAccountSettings = {
 class UserSettings extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             accountSettings: Object.assign(blankAccountSettings),
             userDetails: props.userDetails,
@@ -35,8 +37,10 @@ class UserSettings extends Component {
             },
             ChangePasswordVisible: false
         };
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
     componentWillMount() {
+		logger.debug('>>> Entering componentWillMount()');
         let {props} = this;
         if (props.userDetails === undefined || props.userDetails.userId !== props.userId) {
             this.getUserDetails(props, props.userId);
@@ -44,41 +48,55 @@ class UserSettings extends Component {
         else
         {
             this.updateUserDetailsState(props.userDetails);
+			logger.debug('<<< Exiting componentWillMount()');
         }
     }
     componentWillReceiveProps(newProps) {
+		logger.debug(`>>> Entering componentWillReceiveProps(newProps=${newProps})`);
         if (newProps.userDetails === undefined && newProps.userDetails.userId !== newProps.userId) {
             this.getUserDetails(newProps, newProps.userId);
         }
         else
         {
             this.updateUserDetailsState(newProps.userDetails);
+			logger.debug(`<<< Exiting componentWillReceiveProps(newProps=${newProps})`);
         }
     }
 
     makeBlankObj(obj) {
+		logger.debug(`>>> Entering makeBlankObj(obj=${obj})`);
         let newObject = Object.assign({}, obj);
         const keys = Object.keys(newObject);
+		logger.debug(`makeBlankObj(obj=${obj}): newObject → ${newObject}`);
+		logger.debug(`makeBlankObj(obj=${obj}): keys → ${keys}`);
         keys.forEach(key => newObject[key] = "");
+		logger.debug(`<<< Exiting makeBlankObj(obj=${obj})`);
         return newObject; 
     }
 
     getUserDetails(props, userId) {
+		logger.debug(`>>> Entering getUserDetails(props=${props},userId=${userId})`);
         const accountSettings = this.makeBlankObj(this.state.accountSettings);
         const userDetails = this.makeBlankObj(this.state.userDetails);
+		logger.debug(`getUserDetails(props=${props},userId=${userId}): accountSettings → ${accountSettings}`);
+		logger.debug(`getUserDetails(props=${props},userId=${userId}): userDetails → ${userDetails}`);
         this.setState({accountSettings, userDetails, loading: true});
         props.dispatch(CommonUsersActions.getUserDetails({ userId: userId }, (data) => {
             this.updateUserDetailsState(data);
+			logger.debug(`<<< Exiting getUserDetails(props=${props},userId=${userId})`);
         }));
     }
     updateUserDetailsState(details) {
+		logger.debug(`>>> Entering updateUserDetailsState(details=${details})`);
         let userDetails = Object.assign({}, details);
         let {accountSettings, startingValues} = this.state;
+		logger.debug(`updateUserDetailsState(details=${details}): userDetails → ${userDetails}`);
         accountSettings.displayName = userDetails.displayName;
         accountSettings.userName = userDetails.userName;
         accountSettings.email = userDetails.email;
         accountSettings.userId = userDetails.userId;
         startingValues.userName = userDetails.userName;
+		logger.debug(`<<< Exiting updateUserDetailsState(details=${details})`);
         this.setState({
             accountSettings,
             userDetails,
@@ -99,11 +117,13 @@ class UserSettings extends Component {
     }
 
     save() {
+		logger.debug('>>> Entering save()');
         if (this.validateForm()) {
             this.props.dispatch(CommonUsersActions.updateUserBasicInfo(this.state.accountSettings, () => {
                 utilities.notify(Localization.get("UserUpdated"), 3000);
                 this.getUserDetails(this.props, this.state.accountSettings.userId);
                 this.props.collapse();
+				logger.debug('<<< Exiting save()');
             }));
         }
     }
@@ -136,19 +156,24 @@ class UserSettings extends Component {
         return valid;
     }
     onCancelPassword() {
+		logger.debug('>>> Entering onCancelPassword()');
         this.setState({
             ChangePasswordVisible: false
         });
+		logger.debug('<<< Exiting onCancelPassword()');
     }
     onChangePassword() {
+		logger.debug('>>> Entering onChangePassword()');
         if (this.state.loading) {
             return;
         }
         this.setState({
             ChangePasswordVisible: true
         });
+		logger.debug('<<< Exiting onChangePassword()');
     }
     onForcePasswordChange() {
+		logger.debug('>>> Entering onForcePasswordChange()');
         if (this.state.loading) {
             return;
         }
@@ -158,23 +183,28 @@ class UserSettings extends Component {
             userDetails.needUpdatePassword = true;
             this.setState({ userDetails });
         }));
+		logger.debug('<<< Exiting onForcePasswordChange()');
     }
     onSendPasswordLink() {
+		logger.debug('>>> Entering onSendPasswordLink()');
         if (this.state.loading) {
             return;
         }
         this.props.dispatch(CommonUsersActions.sendPasswordResetLink({ userId: this.props.userId }, () => {
             utilities.notify(Localization.get("PasswordSent"), 3000);
         }));
+		logger.debug('<<< Exiting onSendPasswordLink()');
     }
     stringifyBoolean(value) {
         if (value === "") {
+		logger.debug(`<<< Exiting stringifyBoolean(value=${value})`);
             return "";
         }
         return value ? Localization.get("True") : Localization.get("False");        
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         let {state} = this;
         let agreedToTerms = this.props.appSettings.applicationSettings.settings.dataConsentActive ? (
             <GridSystem>
@@ -199,6 +229,7 @@ class UserSettings extends Component {
         let userRequestedDeletion = state.userDetails.requestsRemoval ? (
             <span className="importantNote">{Localization.get("RequestedRemoval")}</span>
         ) : null;
+		logger.debug('<<< Exiting render()');
         return <GridCell className={styles.userSettings}>
             <GridCell>
                 <GridCell className="outer-box" columnSize={50}>
@@ -385,6 +416,8 @@ UserSettings.propTypes = {
     appSettings: PropTypes.object
 };
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         userDetails: state.users.userDetails
     };

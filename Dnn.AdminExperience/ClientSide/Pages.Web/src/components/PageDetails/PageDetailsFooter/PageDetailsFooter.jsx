@@ -7,6 +7,7 @@ import PageNameInput from "./PageNameInput";
 import DisplayInMenu from "./DisplayInMenu";
 import EnableScheduling from "./EnableScheduling";
 import Template from "./Template";
+const logger = console;
 
 class PageDetailsFooter extends Component {
 
@@ -17,6 +18,7 @@ class PageDetailsFooter extends Component {
         } else {
             onChangeField(key, event.target.value);
         }        
+		logger.debug(`<<< Exiting onChangeField(key=${key},event=${event})`);
     }
 
     onChangeValue(key, value) {
@@ -31,6 +33,7 @@ class PageDetailsFooter extends Component {
         }
 
         onChangeField(key, value);
+		logger.debug(`<<< Exiting onChangeValue(key=${key},value=${value})`);
     }
 
     getLeftColumnComponents(normalPage, pageType, includeTemplates) {
@@ -56,6 +59,8 @@ class PageDetailsFooter extends Component {
 
         const additionalLeftComponents = this.props.components.filter(
             function (component) {
+				logger.debug(`>>> Entering function(component=${component})`);
+				logger.debug(`<<< Exiting function(component=${component})`);
                 return !component.newSection && component.leftSide && (component.pageType === pageType || component.pageType === "all");
             });
 
@@ -64,7 +69,9 @@ class PageDetailsFooter extends Component {
     }
 
     insertElementsInArray(array, elements) {
+		logger.debug(`>>> Entering insertElementsInArray(array=${array},elements=${elements})`);
         for (let i = 0; i < elements.length; i++) {
+			logger.debug(`<<< Exiting insertElementsInArray(array=${array},elements=${elements})`);
             let index = this.getInteger(elements[i].order);
             const Component = elements[i].component;
             const instance = <Component key={"component" + i.toString()} page={this.props.page} onChange={this.onChangeValue.bind(this)} 
@@ -78,10 +85,12 @@ class PageDetailsFooter extends Component {
     }
 
     getInteger(value) {
+		logger.debug(`>>> Entering getInteger(value=${value})`);
         if (value === 0) {
             return 0;
         }
         if (value) {
+		logger.debug(`<<< Exiting getInteger(value=${value})`);
             return parseInt(value.toString());
         }
         return value;
@@ -126,10 +135,14 @@ class PageDetailsFooter extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {page} = this.props;
         const normalPage = page.pageType === "normal";
+		logger.debug(`render(): normalPage → ${normalPage}`);
         const componentsInNewSection= this.getNewSections(normalPage, page.pageType);
+		logger.debug(`render(): componentsInNewSection → ${componentsInNewSection}`);
         const includeTemplates = componentsInNewSection.length === 0;
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.pageDetailsFooter}>                
                 <GridSystem>
@@ -155,6 +168,8 @@ PageDetailsFooter.propTypes = {
 };
 
 const mapStateToProps = (state) => {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         page:state.pages.selectedPage
     };

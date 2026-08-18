@@ -37,13 +37,22 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
             IPackageController packageController)
             : base(loggerSource, localizer)
         {
+			_logger.LogDebug(">>> Entering InstallAvailablePackageStep(loggerSource={LoggerSource},localizer={Localizer},appStatusInfo={AppStatusInfo},fsProvider={FsProvider},packageController={PackageController})", loggerSource, localizer, appStatusInfo, fsProvider, packageController);
             this.appStatusInfo = appStatusInfo ??
+				_logger.LogWarning("Throwing ArgumentNullException from InstallAvailablePackageStep(loggerSource={LoggerSource},localizer={Localizer},appStatusInfo={AppStatusInfo},fsProvider={FsProvider},packageController={PackageController})", loggerSource, localizer, appStatusInfo, fsProvider, packageController);
+				_logger.LogDebug("InstallAvailablePackageStep(loggerSource={LoggerSource},localizer={Localizer},appStatusInfo={AppStatusInfo},fsProvider={FsProvider},packageController={PackageController}): appStatusInfo → {AppStatusInfo1}", loggerSource, localizer, appStatusInfo, fsProvider, packageController, appStatusInfo);
+				_logger.LogDebug("InstallAvailablePackageStep(loggerSource={LoggerSource},localizer={Localizer},appStatusInfo={AppStatusInfo},fsProvider={FsProvider},packageController={PackageController}): this.appStatusInfo → {Arg5}", loggerSource, localizer, appStatusInfo, fsProvider, packageController, this.appStatusInfo);
                 throw new ArgumentNullException(nameof(appStatusInfo));
 
             this.fsProvider = fsProvider ??
+				_logger.LogDebug("InstallAvailablePackageStep(loggerSource={LoggerSource},localizer={Localizer},appStatusInfo={AppStatusInfo},fsProvider={FsProvider},packageController={PackageController}): fsProvider → {FsProvider1}", loggerSource, localizer, appStatusInfo, fsProvider, packageController, fsProvider);
+				_logger.LogDebug("InstallAvailablePackageStep(loggerSource={LoggerSource},localizer={Localizer},appStatusInfo={AppStatusInfo},fsProvider={FsProvider},packageController={PackageController}): this.fsProvider → {Arg5}", loggerSource, localizer, appStatusInfo, fsProvider, packageController, this.fsProvider);
+				_logger.LogDebug("InstallAvailablePackageStep(loggerSource={LoggerSource},localizer={Localizer},appStatusInfo={AppStatusInfo},fsProvider={FsProvider},packageController={PackageController}): packageController → {PackageController1}", loggerSource, localizer, appStatusInfo, fsProvider, packageController, packageController);
                 throw new ArgumentNullException(nameof(fsProvider));
 
             this.packageController = packageController ??
+				_logger.LogDebug("<<< Exiting InstallAvailablePackageStep(loggerSource={LoggerSource},localizer={Localizer},appStatusInfo={AppStatusInfo},fsProvider={FsProvider},packageController={PackageController})", loggerSource, localizer, appStatusInfo, fsProvider, packageController);
+				_logger.LogDebug("InstallAvailablePackageStep(loggerSource={LoggerSource},localizer={Localizer},appStatusInfo={AppStatusInfo},fsProvider={FsProvider},packageController={PackageController}): this.packageController → {Arg5}", loggerSource, localizer, appStatusInfo, fsProvider, packageController, this.packageController);
                 throw new ArgumentNullException(nameof(packageController));
         }
 
@@ -65,9 +74,11 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         /// <inheritdoc />
         protected override void ExecuteInternal()
         {
+			_logger.LogDebug(">>> Entering ExecuteInternal()");
             if (this.PackageIsAlreadyInstalled())
             {
                 this.Success = true;
+				_logger.LogDebug("ExecuteInternal(): this.Success → {Arg0}", this.Success);
                 this.Notes = this.LocalizeFormat("UninstallStepPackageAlreadyInstalled", this.PackageName);
                 return;
             }
@@ -89,6 +100,7 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
             }
 
             using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+			using Microsoft.Extensions.Logging;
             {
                 var installer = new Installer(
                     stream,
@@ -98,6 +110,7 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
 
                 try
                 {
+					private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
                     installer.InstallerInfo.PortalID = Null.NullInteger;
 
                     if (installer.InstallerInfo.ManifestFile != null)
@@ -128,15 +141,18 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
                     this.DeleteTempInstallFiles(installer);
                 }
             }
+			_logger.LogDebug("<<< Exiting ExecuteInternal()");
         }
 
         private void DeleteInstallFile(string installerFile)
         {
+			_logger.LogDebug(">>> Entering DeleteInstallFile(installerFile={InstallerFile})", installerFile);
             if (this.fsProvider.FileExists(installerFile))
             {
                 this.fsProvider.SetFileAttributes(installerFile, FileAttributes.Normal);
                 this.fsProvider.DeleteFile(installerFile);
             }
+			_logger.LogDebug("<<< Exiting DeleteInstallFile(installerFile={InstallerFile})", installerFile);
         }
 
         private void DeleteTempInstallFiles(Installer installer)
@@ -147,14 +163,17 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
             {
                 this.fsProvider.DeleteFolderRecursive(tempFolder);
             }
+			_logger.LogDebug("<<< Exiting DeleteTempInstallFiles(installer={Installer})", installer);
         }
 
         private bool PackageIsAlreadyInstalled()
         {
+			_logger.LogDebug(">>> Entering PackageIsAlreadyInstalled()");
             bool WithMatchingPackageName(PackageInfo p) =>
                 "Module".Equals(p.PackageType, StringComparison.OrdinalIgnoreCase) &&
                 this.PackageName.Equals(p.Name, StringComparison.OrdinalIgnoreCase);
 
+			_logger.LogDebug("<<< Exiting PackageIsAlreadyInstalled()");
             return this.packageController.GetExtensionPackages(Null.NullInteger, WithMatchingPackageName).Any();
         }
     }

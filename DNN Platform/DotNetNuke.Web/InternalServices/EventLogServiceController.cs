@@ -32,6 +32,10 @@ namespace DotNetNuke.Web.InternalServices
         public EventLogServiceController()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering EventLogServiceController()");
+		Logger.LogDebug("<<< Exiting EventLogServiceController()");
+		Logger.LogDebug(">>> Entering EventLogServiceController(eventLogService={EventLogService})", eventLogService);
+		Logger.LogDebug("EventLogServiceController(eventLogService={EventLogService}): eventLogService → {EventLogService1}", eventLogService, eventLogService);
         }
 
         /// <summary>Initializes a new instance of the <see cref="EventLogServiceController"/> class.</summary>
@@ -39,6 +43,7 @@ namespace DotNetNuke.Web.InternalServices
         public EventLogServiceController(IEventLogService eventLogService)
         {
             this.eventLogService = eventLogService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogService>();
+			Logger.LogDebug("<<< Exiting EventLogServiceController(eventLogService={EventLogService})", eventLogService);
         }
 
         /// <summary>Gets event log details.</summary>
@@ -49,6 +54,7 @@ namespace DotNetNuke.Web.InternalServices
         [SuppressMessage("Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", Justification = "Breaking change")]
         public HttpResponseMessage GetLogDetails(string guid)
         {
+			Logger.LogDebug(">>> Entering GetLogDetails(guid={Guid})", guid);
             if (string.IsNullOrEmpty(guid) || !Guid.TryParse(guid, out _))
             {
                 return this.Request.CreateResponse(HttpStatusCode.BadRequest);
@@ -66,19 +72,24 @@ namespace DotNetNuke.Web.InternalServices
                     Title = Localization.GetSafeJSString("CriticalError.Error", Localization.SharedResourceFile),
                     Content = GetPropertiesText(logInfo),
                 });
+				Logger.LogDebug("GetLogDetails(guid={Guid}): Content → {Content}", guid, Content);
+				Logger.LogDebug("GetLogDetails(guid={Guid}): Title → {Title}", guid, Title);
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting GetLogDetails(guid={Guid})", guid);
                 return this.Request.CreateResponse(HttpStatusCode.BadRequest);
             }
         }
 
         private static string GetPropertiesText(ILogInfo logInfo)
         {
+			Logger.LogDebug(">>> Entering GetPropertiesText(logInfo={LogInfo})", logInfo);
             var str = new StringBuilder();
             foreach (var ldi in logInfo.LogProperties)
             {
+			Logger.LogDebug("GetPropertiesText(logInfo={LogInfo}): str → {Str}", logInfo, str);
                 // display the values in the Panel child controls.
                 if (ldi.PropertyName == "Message")
                 {
@@ -91,6 +102,7 @@ namespace DotNetNuke.Web.InternalServices
             }
 
             str.Append($"<p><b>Server Name</b>: {HttpUtility.HtmlEncode(logInfo.LogServerName)}</p>");
+			Logger.LogDebug("<<< Exiting GetPropertiesText(logInfo={LogInfo})", logInfo);
             return str.ToString();
         }
     }

@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -6,6 +7,7 @@
 // declare global: jsonlint
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -25,7 +27,10 @@ CodeMirror.registerHelper("lint", "json", function(text) {
   };
   try { jsonlint.parse(text); }
   catch(e) {}
+logger.debug(`<<< Exiting registerHelper(found=${found})`);
   return found;
 });
+logger.error(`Exception in function(exports=${exports}): ${e.message}`, e);
 
 });
+logger.debug(`<<< Exiting function(exports=${exports})`);

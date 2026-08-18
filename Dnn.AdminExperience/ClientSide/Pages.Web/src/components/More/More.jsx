@@ -7,21 +7,27 @@ import Localization from "../../localization";
 import { pageActions as PageActions } from "../../actions";
 import styles from "./style.module.less";
 import utils from "../../utils";
+const logger = console;
 
 class More extends Component {
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.props.onFetchCacheProviderList();
         if (this.props.page.cacheProvider && !this.props.cachedPageCount) {
             this.props.onGetCachedPageCount(this.props.page.cacheProvider);
+			logger.debug('<<< Exiting componentDidMount()');
         }
     }
 
     onChangeField(key, event) {
+		logger.debug(`>>> Entering onChangeField(key=${key},event=${event})`);
         const { onChangeField } = this.props;
         onChangeField(key, event.target.value);
+		logger.debug(`<<< Exiting onChangeField(key=${key},event=${event})`);
     }
 
     onCacheProviderSelected(option) {
+		logger.debug(`>>> Entering onCacheProviderSelected(option=${option})`);
         this.props.onChangeField("cacheProvider", option.value);
         if (!this.props.page.cacheProvider && option.value) {
             this.props.onChangeField("cacheIncludeExclude", true);
@@ -30,6 +36,7 @@ class More extends Component {
         }
         if (option.value) {
             this.props.onGetCachedPageCount(option.value);
+			logger.debug(`<<< Exiting onCacheProviderSelected(option=${option})`);
         }
         this.setState({
             cacheProvider: option.value
@@ -37,27 +44,37 @@ class More extends Component {
     }
 
     onChangeIncludeExclude(value) {
+		logger.debug(`>>> Entering onChangeIncludeExclude(value=${value})`);
         const include = value === "true";
         this.props.onChangeField("cacheIncludeExclude", include);
+		logger.debug(`onChangeIncludeExclude(value=${value}): include → ${include}`);
+		logger.debug(`<<< Exiting onChangeIncludeExclude(value=${value})`);
     }
 
     onClearCache() {
+		logger.debug('>>> Entering onClearCache()');
         this.props.onClearCache(this.props.page.cacheProvider);
+		logger.debug('<<< Exiting onClearCache()');
     }
 
     getWorkflowOptions() {
+		logger.debug('>>> Entering getWorkflowOptions()');
+		logger.debug('<<< Exiting getWorkflowOptions()');
         return this.props.workflowList.length ? this.props.workflowList.map((item => { return { value: item.workflowId, label: item.workflowName }; })) : null;
     }
 
     onWorkflowDropDownChange(option) {
+		logger.debug(`>>> Entering onWorkflowDropDownChange(option=${option})`);
         this.props.onChangeField("workflowId", option.value);
         this.props.page.workflowId = option.value;
         this.setState({
             page: {...this.props.page},
         });
+		logger.debug(`<<< Exiting onWorkflowDropDownChange(option=${option})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { page, errors, onChangeField, cacheProviderList } = this.props;
         const cacheProviderOptions = cacheProviderList &&
             [{ value: null, label: Localization.get("None") },
@@ -66,6 +83,7 @@ class More extends Component {
             { value: true, label: Localization.get("Include") },
             { value: false, label: Localization.get("Exclude") }];
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.moreContainer}>
                 <div className="title">
@@ -235,6 +253,8 @@ More.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         cacheProviderList: state.pages.cacheProviderList,
         cachedPageCount: state.pages.cachedPageCount,
@@ -243,6 +263,8 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+	logger.debug(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`);
+	logger.debug(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`);
     return bindActionCreators({
         onFetchCacheProviderList: PageActions.fetchCacheProviderList,
         onGetCachedPageCount: PageActions.getCachedPageCount,

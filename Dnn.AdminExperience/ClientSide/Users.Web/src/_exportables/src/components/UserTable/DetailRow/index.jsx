@@ -5,31 +5,39 @@ import {formatDate, sort} from "../../../helpers";
 import UserMenu from "../UserMenu";
 import Localization from "localization";
 import ColumnSizes from "../columnSizes";
+const logger = console;
 import {canManageRoles, canManageProfile, canViewSettings} from "../../permissionHelpers.js";
 import { SvgIcons, GridCell, Collapsible, TextOverflowWrapper } from "@dnnsoftware/dnn-react-common";
 
 class DetailsRow extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.rootElement = React.createRef();
+		logger.debug('<<< Exiting constructor()');
         this.state = {
             opened: false,
             showMenu: false
         };
     }
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this._isMounted = true;
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
         this.setState({
             opened
         });
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentWillUnmount() {
+		logger.debug('>>> Entering componentWillUnmount()');
         this._isMounted = false;
+		logger.debug('<<< Exiting componentWillUnmount()');
     }
 
     handleClick(event) {
+		logger.debug(`>>> Entering handleClick(event=${event})`);
         // Note: this workaround is needed in IE. The remove event listener in the componentWillUnmount is called
         // before the handleClick handler is called, but in spite of that, the handleClick is executed. To avoid
         // the "findDOMNode was called on an unmounted component." error we need to check if the component is mounted before execute this code
@@ -38,19 +46,24 @@ class DetailsRow extends Component {
             && !(event.target.id === "confirmbtn" || event.target.id === "cancelbtn") && this.props.openId !== "add") {
             if ((this.props.openId !== "" && this.props.id === this.props.openId)) {
                 this.props.Collapse();
+				logger.debug(`<<< Exiting handleClick(event=${event})`);
             }
         }
     }
     toggle(index) {
+		logger.debug(`>>> Entering toggle(index=${index})`);
         if ((this.props.openId !== "" && this.props.id === this.props.openId) && this.props.currentIndex === index) {
             this.props.Collapse();
         } else {
             this.props.OpenCollapse(this.props.id, index);
+			logger.debug(`<<< Exiting toggle(index=${index})`);
         }
     }
     toggleUserMenu() {
+		logger.debug('>>> Entering toggleUserMenu()');
         const show = !this.state.showMenu;
         this.setState({ showMenu: show });
+		logger.debug('<<< Exiting toggleUserMenu()');
     }
     
     /* eslint-disable react/no-danger */
@@ -170,15 +183,20 @@ class DetailsRow extends Component {
         ]).concat((extraColumns) || []);
 
         return sort(userColumns, "index").map((column) => {
+		logger.debug(`<<< Exiting getUserColumns(user=${user},id=${id},opened=${opened})`);
             return column.content;
         });
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         let {user} = this.props;
+		logger.debug(`render(): user → ${user}`);
         let opened = (props.openId !== "" && props.id === props.openId);
+		logger.debug(`render(): opened → ${opened}`);
         let uniqueId = "userRow-" + Math.random() + Date.now();
+		logger.debug(`render(): uniqueId → ${uniqueId}`);
         if (user === undefined) {
             user = {
                 avatar: "-",
@@ -190,6 +208,7 @@ class DetailsRow extends Component {
             };
         }
         let userColumns = this.getUserColumns(user, props.id, opened);
+		logger.debug('<<< Exiting render()');
         return (
             /* eslint-disable react/no-danger */
             <GridCell className={"collapsible-component-users"} id={uniqueId} ref={(node) => this.rootElement = node}>

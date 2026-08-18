@@ -3,23 +3,31 @@ import PropTypes from "prop-types";
 import GridCell from "../GridCell";
 import StatusSwitch from "./StatusSwitch";
 import IconButton from "../IconButton";
+const logger = console;
 
 class GridRow extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
 
         this.state = {
         };
         this.columnHeight = 40;
+		logger.debug(`constructor(props=${props}): this.columnHeight → ${this.columnHeight}`);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.columnHeight = this.node.offsetHeight;
+		logger.debug('<<< Exiting componentDidMount()');
     }   
 
     getHeaderColumnText() {
+		logger.debug('>>> Entering getHeaderColumnText()');
         const {props} = this;
 
+		logger.debug('<<< Exiting getHeaderColumnText()');
         return props.type === "role" ? props.permission.roleName : props.permission.displayName;
     }
 
@@ -40,13 +48,16 @@ class GridRow extends Component {
         if (typeof props.onChange === "function") {
             props.onChange(permission);
         }
+		logger.debug(`<<< Exiting onStatusChanged(def=${def},status=${status})`);
     }
 
     onDelete() {
+		logger.debug('>>> Entering onDelete()');
         const {props} = this;
 
         if (typeof props.onDeletePermisson === "function") {
             props.onDeletePermisson(props.permission);
+			logger.debug('<<< Exiting onDelete()');
         }
     }
 
@@ -60,6 +71,7 @@ class GridRow extends Component {
                 props.definitions.forEach(function (d) {
                     let id = d.permissionId;
                     let p = permission.permissions.filter(function (c) {
+						logger.debug('>>> Entering filter()');
                         return c.permissionId === id;
                     });
 
@@ -104,6 +116,7 @@ class GridRow extends Component {
 
                             let id = d.permissionId;
                             let p = permission.permissions.filter(function (c) {
+								logger.debug(`>>> Entering filter(p=${p})`);
                                 return c.permissionId === id;
                             });
 
@@ -133,6 +146,7 @@ class GridRow extends Component {
 
                     let allowAccess = p[0].allowAccess;
 
+					logger.debug(`<<< Exiting filter(p=${p})`);
                     return (!allowAccess && status === 1) || (allowAccess && status === 2);
                 }).length === 0;
 
@@ -156,9 +170,11 @@ class GridRow extends Component {
                 }
             }
         }
+		logger.debug(`<<< Exiting fixPermissionsStatus(permission=${permission},def=${def},status=${status})`);
     }
 
     renderRow() {
+		logger.debug('>>> Entering renderRow()');
         const {props} = this;
         const {roleColumnWidth, columnWidth, actionsWidth} = props;
         let self = this;
@@ -167,11 +183,13 @@ class GridRow extends Component {
             <tr className="grid-row" ref={node => this.node = node}>
                 <td columnSize={roleColumnWidth}><span title={this.getHeaderColumnText() }>{this.getHeaderColumnText() }</span></td>
                 {props.definitions.map(function (def) {
+					logger.debug('<<< Exiting renderRow()');
                     let permission = props.permission.permissions.filter(p => {
                         return p.permissionId === def.permissionId;
                     });
 
                     let status = 0;
+					logger.debug(`map(permission=${permission}): status → ${status}`);
 
                     if (props.permission.locked) {
                         status = 3;
@@ -195,8 +213,10 @@ class GridRow extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
 
+		logger.debug('<<< Exiting render()');
         return (
             this.renderRow()
         );

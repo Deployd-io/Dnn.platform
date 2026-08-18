@@ -16,6 +16,7 @@ namespace Dnn.PersonaBar.Library.Model
     [Serializable]
     public class PersonaBarExtension : IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PersonaBarExtension));
         [DataMember]
         public int ExtensionId { get; set; }
 
@@ -53,6 +54,7 @@ namespace Dnn.PersonaBar.Library.Model
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.ExtensionId = Convert.ToInt32(dr["ExtensionId"], CultureInfo.InvariantCulture);
             this.Identifier = dr["Identifier"].ToString();
             this.FolderName = Null.SetNullString(dr["FolderName"]);
@@ -62,6 +64,7 @@ namespace Dnn.PersonaBar.Library.Model
             this.Path = dr["Path"].ToString();
             this.Order = Null.SetNullInteger(dr["Order"]);
             this.Enabled = Convert.ToBoolean(dr["Enabled"], CultureInfo.InvariantCulture);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

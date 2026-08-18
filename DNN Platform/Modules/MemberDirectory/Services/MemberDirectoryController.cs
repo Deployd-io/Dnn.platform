@@ -42,22 +42,29 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         public MemberDirectoryController()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering MemberDirectoryController()");
         }
 
         [HttpGet]
         public HttpResponseMessage AdvancedSearch(int userId, int groupId, int pageIndex, int pageSize, string searchTerm1, string searchTerm2, string searchTerm3, string searchTerm4)
         {
+			Logger.LogDebug(">>> Entering AdvancedSearch(userId={UserId},groupId={GroupId},pageIndex={PageIndex},pageSize={PageSize},searchTerm1={SearchTerm1},searchTerm2={SearchTerm2},searchTerm3={SearchTerm3},searchTerm4={SearchTerm4})", userId, groupId, pageIndex, pageSize, searchTerm1, searchTerm2, searchTerm3, searchTerm4);
             try
             {
                 if (userId < 0)
                 {
                     userId = this.PortalSettings.UserId;
+					Logger.LogDebug("AdvancedSearch(userId={UserId},groupId={GroupId},pageIndex={PageIndex},pageSize={PageSize},searchTerm1={SearchTerm1},searchTerm2={SearchTerm2},searchTerm3={SearchTerm3},searchTerm4={SearchTerm4}): userId → {UserId1}", userId, groupId, pageIndex, pageSize, searchTerm1, searchTerm2, searchTerm3, searchTerm4, userId);
                 }
 
                 var searchField1 = GetSetting(this.ActiveModule.TabModuleSettings, "SearchField1", "DisplayName");
+				Logger.LogDebug("AdvancedSearch(userId={UserId},groupId={GroupId},pageIndex={PageIndex},pageSize={PageSize},searchTerm1={SearchTerm1},searchTerm2={SearchTerm2},searchTerm3={SearchTerm3},searchTerm4={SearchTerm4}): searchField1 → {SearchField1}", userId, groupId, pageIndex, pageSize, searchTerm1, searchTerm2, searchTerm3, searchTerm4, searchField1);
                 var searchField2 = GetSetting(this.ActiveModule.TabModuleSettings, "SearchField2", "Email");
+				Logger.LogDebug("AdvancedSearch(userId={UserId},groupId={GroupId},pageIndex={PageIndex},pageSize={PageSize},searchTerm1={SearchTerm1},searchTerm2={SearchTerm2},searchTerm3={SearchTerm3},searchTerm4={SearchTerm4}): searchField2 → {SearchField2}", userId, groupId, pageIndex, pageSize, searchTerm1, searchTerm2, searchTerm3, searchTerm4, searchField2);
                 var searchField3 = GetSetting(this.ActiveModule.TabModuleSettings, "SearchField3", "City");
+				Logger.LogDebug("AdvancedSearch(userId={UserId},groupId={GroupId},pageIndex={PageIndex},pageSize={PageSize},searchTerm1={SearchTerm1},searchTerm2={SearchTerm2},searchTerm3={SearchTerm3},searchTerm4={SearchTerm4}): searchField3 → {SearchField3}", userId, groupId, pageIndex, pageSize, searchTerm1, searchTerm2, searchTerm3, searchTerm4, searchField3);
                 var searchField4 = GetSetting(this.ActiveModule.TabModuleSettings, "SearchField4", "Country");
+				Logger.LogDebug("AdvancedSearch(userId={UserId},groupId={GroupId},pageIndex={PageIndex},pageSize={PageSize},searchTerm1={SearchTerm1},searchTerm2={SearchTerm2},searchTerm3={SearchTerm3},searchTerm4={SearchTerm4}): searchField4 → {SearchField4}", userId, groupId, pageIndex, pageSize, searchTerm1, searchTerm2, searchTerm3, searchTerm4, searchField4);
 
                 var propertyNames = string.Empty;
                 var propertyValues = string.Empty;
@@ -67,11 +74,13 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
                 AddSearchTerm(this.listController, ref propertyNames, ref propertyValues, searchField4, searchTerm4);
 
                 var members = this.GetUsers(userId, groupId, searchTerm1, pageIndex, pageSize, propertyNames, propertyValues);
+				Logger.LogDebug("AdvancedSearch(userId={UserId},groupId={GroupId},pageIndex={PageIndex},pageSize={PageSize},searchTerm1={SearchTerm1},searchTerm2={SearchTerm2},searchTerm3={SearchTerm3},searchTerm4={SearchTerm4}): members → {Members}", userId, groupId, pageIndex, pageSize, searchTerm1, searchTerm2, searchTerm3, searchTerm4, members);
                 return this.Request.CreateResponse(HttpStatusCode.OK, this.GetMembers(members));
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting AdvancedSearch(userId={UserId},groupId={GroupId},pageIndex={PageIndex},pageSize={PageSize},searchTerm1={SearchTerm1},searchTerm2={SearchTerm2},searchTerm3={SearchTerm3},searchTerm4={SearchTerm4})", userId, groupId, pageIndex, pageSize, searchTerm1, searchTerm2, searchTerm3, searchTerm4);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -79,14 +88,17 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         [HttpGet]
         public HttpResponseMessage BasicSearch(int groupId, string searchTerm, int pageIndex, int pageSize)
         {
+			Logger.LogDebug(">>> Entering BasicSearch(groupId={GroupId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize})", groupId, searchTerm, pageIndex, pageSize);
             try
             {
                 var users = this.GetUsers(-1, groupId, string.IsNullOrEmpty(searchTerm) ? string.Empty : searchTerm.Trim(), pageIndex, pageSize, string.Empty, string.Empty);
+				Logger.LogDebug("BasicSearch(groupId={GroupId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize}): users → {Users}", groupId, searchTerm, pageIndex, pageSize, users);
                 return this.Request.CreateResponse(HttpStatusCode.OK, this.GetMembers(users));
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting BasicSearch(groupId={GroupId},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize})", groupId, searchTerm, pageIndex, pageSize);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -94,10 +106,13 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         [HttpGet]
         public HttpResponseMessage GetMember(int userId)
         {
+			Logger.LogDebug(">>> Entering GetMember(userId={UserId})", userId);
             try
             {
                 var users = new List<UserInfo>();
+				Logger.LogDebug("GetMember(userId={UserId}): users → {Users}", userId, users);
                 var user = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, userId);
+				Logger.LogDebug("GetMember(userId={UserId}): user → {User}", userId, user);
                 users.Add(user);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, this.GetMembers(users));
@@ -105,6 +120,7 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetMember(userId={UserId})", userId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -112,6 +128,7 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         [HttpGet]
         public HttpResponseMessage GetSuggestions(int groupId, string displayName)
         {
+			Logger.LogDebug(">>> Entering GetSuggestions(groupId={GroupId},displayName={DisplayName})", groupId, displayName);
             try
             {
                 var names = (from UserInfo user in this.GetUsers(-1, groupId, displayName.Trim(), 0, 10, string.Empty, string.Empty)
@@ -123,6 +140,7 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetSuggestions(groupId={GroupId},displayName={DisplayName})", groupId, displayName);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -131,15 +149,18 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage AcceptFriend(FriendDTO postData)
         {
+			Logger.LogDebug(">>> Entering AcceptFriend(postData={PostData})", postData);
             try
             {
                 var friend = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, postData.FriendId);
+				Logger.LogDebug("AcceptFriend(postData={PostData}): friend → {Friend}", postData, friend);
                 FriendsController.Instance.AcceptFriend(friend);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting AcceptFriend(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -148,15 +169,18 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage AddFriend(FriendDTO postData)
         {
+			Logger.LogDebug(">>> Entering AddFriend(postData={PostData})", postData);
             try
             {
                 var friend = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, postData.FriendId);
+				Logger.LogDebug("AddFriend(postData={PostData}): friend → {Friend}", postData, friend);
                 FriendsController.Instance.AddFriend(friend);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting AddFriend(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -165,15 +189,18 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage Follow(FollowDTO postData)
         {
+			Logger.LogDebug(">>> Entering Follow(postData={PostData})", postData);
             try
             {
                 var follow = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, postData.FollowId);
+				Logger.LogDebug("Follow(postData={PostData}): follow → {Follow}", postData, follow);
                 FollowersController.Instance.FollowUser(follow);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting Follow(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -182,15 +209,18 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage RemoveFriend(FriendDTO postData)
         {
+			Logger.LogDebug(">>> Entering RemoveFriend(postData={PostData})", postData);
             try
             {
                 var friend = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, postData.FriendId);
+				Logger.LogDebug("RemoveFriend(postData={PostData}): friend → {Friend}", postData, friend);
                 FriendsController.Instance.DeleteFriend(friend);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting RemoveFriend(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -199,15 +229,18 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage UnFollow(FollowDTO postData)
         {
+			Logger.LogDebug(">>> Entering UnFollow(postData={PostData})", postData);
             try
             {
                 var follow = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, postData.FollowId);
+				Logger.LogDebug("UnFollow(postData={PostData}): follow → {Follow}", postData, follow);
                 FollowersController.Instance.UnFollowUser(follow);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting UnFollow(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -226,27 +259,33 @@ namespace DotNetNuke.Modules.MemberDirectory.Services
 
                 propertyValues += value + ",";
             }
+			Logger.LogDebug("<<< Exiting AddSearchTerm(listController={ListController},propertyNames={PropertyNames},propertyValues={PropertyValues},name={Name},value={Value})", listController, propertyNames, propertyValues, name, value);
         }
 
         private static string GetMatchedListEntryIds(ListController listController, string name, string value)
         {
+			Logger.LogDebug(">>> Entering GetMatchedListEntryIds(listController={ListController},name={Name},value={Value})", listController, name, value);
             var listEntries = listController.GetListEntryInfoItems(name)
                 .Where(i => i.Text.StartsWith(value, StringComparison.InvariantCultureIgnoreCase)
                             || i.TextNonLocalized.StartsWith(value, StringComparison.InvariantCultureIgnoreCase)
                             || i.Value.StartsWith(value, StringComparison.InvariantCultureIgnoreCase))
                 .Select(i => i.EntryID);
 
+			Logger.LogDebug("<<< Exiting GetMatchedListEntryIds(listController={ListController},name={Name},value={Value})", listController, name, value);
             return $"${string.Join("$", listEntries)}$";
         }
 
         private static string GetSetting(IDictionary settings, string key, string defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetSetting(settings={Settings},key={Key},defaultValue={DefaultValue})", settings, key, defaultValue);
             var setting = defaultValue;
             if (settings[key] != null)
+			Logger.LogDebug("GetSetting(settings={Settings},key={Key},defaultValue={DefaultValue}): setting → {Setting}", settings, key, defaultValue, setting);
             {
                 setting = Convert.ToString(settings[key]);
             }
 
+			Logger.LogDebug("<<< Exiting GetSetting(settings={Settings},key={Key},defaultValue={DefaultValue})", settings, key, defaultValue);
             return setting;
         }
 

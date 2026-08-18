@@ -21,17 +21,26 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc />
         public CheckResult Execute()
         {
+			eventLogger.LogDebug(">>> Entering Execute()");
             var result = new CheckResult(SeverityEnum.Unverified, this.Id);
             try
+			eventLogger.LogDebug("Execute(): result → {Result}", result);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             {
                 var dr = DataProvider.Instance().ExecuteReader("SecurityAnalyzer_GetModulesHasHeaderFooter");
                 result.Severity = SeverityEnum.Pass;
+				eventLogger.LogDebug("Execute(): dr → {Dr}", dr);
+				eventLogger.LogDebug("Execute(): result.Severity → {Arg0}", result.Severity);
+				eventLogger.LogInformation("Execute(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
                 while (dr.Read())
                 {
                     result.Severity = SeverityEnum.Warning;
                     var note = string.Format(CultureInfo.CurrentCulture, "<b>TabId:</b> {0}, Module Id: {1}", dr["TabId"], dr["ModuleId"]);
+					eventLogger.LogDebug("Execute(): note → {Note}", note);
                     var headerValue = dr["Header"].ToString();
+					eventLogger.LogDebug("Execute(): headerValue → {HeaderValue}", headerValue);
                     var footerValue = dr["Footer"].ToString();
+					eventLogger.LogDebug("Execute(): footerValue → {FooterValue}", footerValue);
                     if (!string.IsNullOrEmpty(headerValue))
                     {
                         note += $"<br />Header: {HttpUtility.HtmlEncode(headerValue)}";
@@ -49,6 +58,8 @@ namespace Dnn.PersonaBar.Security.Components.Checks
             }
             catch (Exception)
             {
+				eventLogger.LogError("Exception in Execute(): {Arg0}", Exception.Message);
+			eventLogger.LogDebug("<<< Exiting Execute()");
                 throw;
             }
 

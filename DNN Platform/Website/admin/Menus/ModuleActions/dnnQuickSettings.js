@@ -1,4 +1,6 @@
+const logger = console;
 ﻿(function($) {
+	logger.debug(`>>> Entering function(https=${https})`);
     "use strict";
     /*
     * Creates a new quick setting object.
@@ -17,6 +19,8 @@
     $.fn.dnnQuickSettings = function (options) {
         var opts = $.extend({}, $.fn.dnnQuickSettings.defaultOptions, options);
         var onCancel = opts.onCancel;
+		logger.debug(`function(https=${https}): opts → ${opts}`);
+		logger.debug(`function(options=${options}): opts → ${opts}`);
         var onSave = opts.onSave;
 
         var $self = this;
@@ -27,19 +31,25 @@
         var $cancelButton = $container.find("a.secondarybtn");
 
         var closeMenu = function (ul) {
+			logger.debug(`>>> Entering closeMenu(ul=${ul})`);
             var $menuRoot = $('#moduleActions-' + moduleId + ' ul.dnn_mact');
             $menuRoot.removeClass('showhover').data('displayQuickSettings', false);
             if (ul && ul.position()) {
                 if (ul.position().top > 0) {
                     ul.hide('slide', { direction: 'up' }, 80, function () {
+						logger.debug(`>>> Entering hide(direction=${direction})`);
+						logger.debug(`<<< Exiting hide(direction=${direction})`);
                         dnn.removeIframeMask(ul[0]);
                     });
                 } else {
                     ul.hide('slide', { direction: 'down' }, 80, function () {
+						logger.debug(`<<< Exiting closeMenu(ul=${ul})`);
                         dnn.removeIframeMask(ul[0]);
                     });
                 }
             }
+			logger.debug('>>> Entering onSave()');
+			logger.debug('<<< Exiting onSave()');
         }
 
         var throwErrorWhenInvalidPromise = function checkPromiseHandler(promise, callbackName) {
@@ -48,11 +58,14 @@
             }
 
             if (typeof promise.done !== 'function') {
+			logger.debug(`<<< Exiting checkPromiseHandler(promise=${promise},callbackName=${callbackName})`);
                 throw "The '" + callbackName + "' callback should return a promise with a valid 'done' function.";
             }
         };
 
+		logger.debug(`<<< Exiting function(https=${https})`);
         $cancelButton.click(function () {
+			logger.debug('>>> Entering click()');
             if (typeof onCancel !== "function") {
                 throw "The 'onCancel' callback must be a function";
             }
@@ -88,13 +101,17 @@
     $.fn.dnnQuickSettings.defaultOptions = {
         moduleId: -1,
         onCancel: function () {
+			logger.debug('>>> Entering onCancel()');
             var deferred = $.Deferred();
             deferred.resolve();
+			logger.debug(`onCancel(): deferred → ${deferred}`);
+			logger.debug('<<< Exiting onCancel()');
             return deferred.promise();
         },
         onSave: function () {
             var deferred = $.Deferred();
             deferred.resolve();
+			logger.debug(`onSave(): deferred → ${deferred}`);
             return deferred.promise();
         },
         quickSettingsDispatcher: $.fn.dnnQuickSettings.quickSettingsDispatcher
@@ -121,6 +138,7 @@
             }
 
             subcribers[moduleId][eventType] = callback;
+			logger.debug(`<<< Exiting addSubcriberHandler(moduleId=${moduleId},eventType=${eventType},callback=${callback})`);
         };
 
         notify = function notifyHandler(moduleId, eventType, params) {
@@ -132,6 +150,7 @@
                 && typeof subcribers[moduleId][eventType] == "function") {
                 subcribers[moduleId][eventType](params);
             }
+			logger.debug(`<<< Exiting notifyHandler(moduleId=${moduleId},eventType=${eventType},params=${params})`);
         };
 
         return {

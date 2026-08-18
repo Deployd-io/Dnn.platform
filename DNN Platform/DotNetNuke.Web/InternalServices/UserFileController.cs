@@ -31,6 +31,9 @@ namespace DotNetNuke.Web.InternalServices
         [HttpGet]
         public HttpResponseMessage GetItems()
         {
+			Logger.LogDebug(">>> Entering GetItems()");
+			Logger.LogDebug("<<< Exiting GetItems()");
+			Logger.LogDebug("<<< Exiting GetItems(fileExtensions={FileExtensions})", fileExtensions);
             return this.GetItems(null);
         }
 
@@ -70,17 +73,22 @@ namespace DotNetNuke.Web.InternalServices
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("GetItems(fileExtensions={FileExtensions}): modified → {Modified}", fileExtensions, modified);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
 
         private static string GetModifiedTime(DateTime dateTime)
         {
+			Logger.LogDebug(">>> Entering GetModifiedTime(dateTime={DateTime})", dateTime);
+			Logger.LogDebug("<<< Exiting GetModifiedTime(dateTime={DateTime})", dateTime);
             return string.Format(CultureInfo.CurrentCulture, "{0:MMM} {0:dd}, {0:yyyy} at {0:t}", dateTime);
         }
 
         private static string GetTypeName(IFileInfo file)
         {
+			Logger.LogDebug(">>> Entering GetTypeName(file={File})", file);
+			Logger.LogDebug("<<< Exiting GetTypeName(file={File})", file);
             return file.ContentType == null
                        ? string.Empty
                        : (file.ContentType.StartsWith("image/", StringComparison.Ordinal)
@@ -90,35 +98,44 @@ namespace DotNetNuke.Web.InternalServices
 
         private static bool IsImageFile(string relativePath)
         {
+			Logger.LogDebug(">>> Entering IsImageFile(relativePath={RelativePath})", relativePath);
             var extension = relativePath.Substring(relativePath.LastIndexOf(".", StringComparison.Ordinal) + 1);
+			Logger.LogDebug("IsImageFile(relativePath={RelativePath}): extension → {Extension}", relativePath, extension);
+			Logger.LogDebug("<<< Exiting IsImageFile(relativePath={RelativePath})", relativePath);
             return ImageExtensions.Contains(extension);
         }
 
         private static string GetFileSize(int sizeInBytes)
         {
+			Logger.LogDebug(">>> Entering GetFileSize(sizeInBytes={SizeInBytes})", sizeInBytes);
             var size = sizeInBytes / 1024;
             var biggerThanAMegabyte = size > 1024;
+			Logger.LogDebug("GetFileSize(sizeInBytes={SizeInBytes}): size → {Size}", sizeInBytes, size);
             if (biggerThanAMegabyte)
             {
                 size = size / 1024;
             }
 
+			Logger.LogDebug("<<< Exiting GetFileSize(sizeInBytes={SizeInBytes})", sizeInBytes);
             return size.ToString(CultureInfo.InvariantCulture) + (biggerThanAMegabyte ? "Mb" : "k");
         }
 
         private string GetThumbUrl(IFileInfo file)
         {
+			Logger.LogDebug(">>> Entering GetThumbUrl(file={File})", file);
             if (IsImageFile(file.RelativePath))
             {
                 return FileManager.Instance.GetUrl(file);
             }
 
             var fileIcon = IconController.IconURL("Ext" + file.Extension, "32x32");
+			Logger.LogDebug("GetThumbUrl(file={File}): fileIcon → {FileIcon}", file, fileIcon);
             if (!System.IO.File.Exists(this.Request.GetHttpContext().Server.MapPath(fileIcon)))
             {
                 fileIcon = IconController.IconURL("File", "32x32");
             }
 
+			Logger.LogDebug("<<< Exiting GetThumbUrl(file={File})", file);
             return fileIcon;
         }
 

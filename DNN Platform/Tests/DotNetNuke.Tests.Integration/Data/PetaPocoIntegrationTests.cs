@@ -16,10 +16,12 @@ namespace DotNetNuke.Tests.Data
     using DotNetNuke.Tests.Utilities;
     using NUnit.Framework;
     using PetaPoco;
+	using Microsoft.Extensions.Logging;
 
     [TestFixture]
     public class PetaPocoIntegrationTests
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private const string ConnectionStringName = "PetaPoco";
 
         private Dictionary<Type, IMapper> _mappers;
@@ -28,6 +30,7 @@ namespace DotNetNuke.Tests.Data
         [SetUp]
         public void SetUp()
         {
+			_logger.LogDebug(">>> Entering SetUp()");
             ComponentFactory.Container = new SimpleContainer();
             ComponentFactory.RegisterComponentInstance<DataProvider>(new SqlDataProvider());
             ComponentFactory.RegisterComponentSettings<SqlDataProvider>(new Dictionary<string, string>()
@@ -52,18 +55,23 @@ namespace DotNetNuke.Tests.Data
                     .Property(d => d.Name, "Name");
 
             this._mappers = new Dictionary<Type, IMapper> { { typeof(Dog), dogMapper } };
+			_logger.LogDebug("SetUp(): _mappers → {_mappers}", _mappers);
             this._mappers = new Dictionary<Type, IMapper> { { typeof(Cat), catMapper } };
+			_logger.LogDebug("<<< Exiting SetUp()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			_logger.LogDebug(">>> Entering TearDown()");
             DataUtil.DeleteDatabase(Constants.PETAPOCO_DatabaseName);
+			_logger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void PetaPoco_Add_Inserts_Item()
         {
+			_logger.LogDebug(">>> Entering PetaPoco_Add_Inserts_Item()");
             // Arrange
             DataUtil.SetUpDatabase(Constants.PETAPOCO_RecordCount);
 
@@ -78,6 +86,8 @@ namespace DotNetNuke.Tests.Data
                 IRepository<Dog> dogRepository = dataContext.GetRepository<Dog>();
 
                 // Act
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("PetaPoco_Add_Inserts_Item(): save query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
                 dogRepository.Insert(dog);
             }
 
@@ -86,11 +96,13 @@ namespace DotNetNuke.Tests.Data
                 Constants.PETAPOCO_DatabaseName,
                 Constants.PETAPOCO_DogTableName);
             Assert.That(actualCount, Is.EqualTo(Constants.PETAPOCO_RecordCount + 1));
+			_logger.LogDebug("<<< Exiting PetaPoco_Add_Inserts_Item()");
         }
 
         [Test]
         public void PetaPoco_Add_Inserts_Item_Using_FluentMapper()
         {
+			_logger.LogDebug(">>> Entering PetaPoco_Add_Inserts_Item_Using_FluentMapper()");
             // Arrange
             DataUtil.SetUpDatabase(Constants.PETAPOCO_RecordCount);
 
@@ -105,6 +117,8 @@ namespace DotNetNuke.Tests.Data
                 IRepository<Dog> dogRepository = dataContext.GetRepository<Dog>();
 
                 // Act
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("PetaPoco_Add_Inserts_Item_Using_FluentMapper(): save query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
                 dogRepository.Insert(dog);
             }
 
@@ -113,11 +127,13 @@ namespace DotNetNuke.Tests.Data
                 Constants.PETAPOCO_DatabaseName,
                 Constants.PETAPOCO_DogTableName);
             Assert.That(actualCount, Is.EqualTo(Constants.PETAPOCO_RecordCount + 1));
+			_logger.LogDebug("<<< Exiting PetaPoco_Add_Inserts_Item_Using_FluentMapper()");
         }
 
         [Test]
         public void PetaPoco_Delete_Deletes_Item()
         {
+			_logger.LogDebug(">>> Entering PetaPoco_Delete_Deletes_Item()");
             // Arrange
             DataUtil.SetUpDatabase(Constants.PETAPOCO_RecordCount);
 
@@ -133,6 +149,8 @@ namespace DotNetNuke.Tests.Data
                 IRepository<Dog> dogRepository = dataContext.GetRepository<Dog>();
 
                 // Act
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("PetaPoco_Delete_Deletes_Item(): delete query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
                 dogRepository.Delete(dog);
             }
 
@@ -141,11 +159,13 @@ namespace DotNetNuke.Tests.Data
                 Constants.PETAPOCO_DatabaseName,
                 Constants.PETAPOCO_DogTableName);
             Assert.That(actualCount, Is.EqualTo(Constants.PETAPOCO_RecordCount - 1));
+			_logger.LogDebug("<<< Exiting PetaPoco_Delete_Deletes_Item()");
         }
 
         [Test]
         public void PetaPoco_Delete_Deletes_Item_Using_FluentMapper()
         {
+			_logger.LogDebug(">>> Entering PetaPoco_Delete_Deletes_Item_Using_FluentMapper()");
             // Arrange
             DataUtil.SetUpDatabase(Constants.PETAPOCO_RecordCount);
 
@@ -161,6 +181,8 @@ namespace DotNetNuke.Tests.Data
                 IRepository<Dog> dogRepository = dataContext.GetRepository<Dog>();
 
                 // Act
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("PetaPoco_Delete_Deletes_Item_Using_FluentMapper(): delete query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
                 dogRepository.Delete(dog);
             }
 
@@ -169,11 +191,13 @@ namespace DotNetNuke.Tests.Data
                 Constants.PETAPOCO_DatabaseName,
                 Constants.PETAPOCO_DogTableName);
             Assert.That(actualCount, Is.EqualTo(Constants.PETAPOCO_RecordCount - 1));
+			_logger.LogDebug("<<< Exiting PetaPoco_Delete_Deletes_Item_Using_FluentMapper()");
         }
 
         [Test]
         public void PetaPoco_Delete_Overload_Deletes_Item()
         {
+			_logger.LogDebug(">>> Entering PetaPoco_Delete_Overload_Deletes_Item()");
             // Arrange
             DataUtil.SetUpDatabase(Constants.PETAPOCO_RecordCount);
 
@@ -182,6 +206,8 @@ namespace DotNetNuke.Tests.Data
                 IRepository<Dog> dogRepository = dataContext.GetRepository<Dog>();
 
                 // Act
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("PetaPoco_Delete_Overload_Deletes_Item(): delete query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
                 dogRepository.Delete("WHERE ID = @0", Constants.PETAPOCO_DeleteDogId);
             }
 
@@ -190,6 +216,7 @@ namespace DotNetNuke.Tests.Data
                 Constants.PETAPOCO_DatabaseName,
                 Constants.PETAPOCO_DogTableName);
             Assert.That(actualCount, Is.EqualTo(Constants.PETAPOCO_RecordCount - 1));
+			_logger.LogDebug("<<< Exiting PetaPoco_Delete_Overload_Deletes_Item()");
         }
 
         [Test]
@@ -198,6 +225,7 @@ namespace DotNetNuke.Tests.Data
         [TestCase(2, "WHERE Name LIKE @0", "B%")]
         public void PetaPoco_Find_Returns_Correct_Rows(int count, string sqlCondition, object arg)
         {
+			_logger.LogDebug(">>> Entering PetaPoco_Find_Returns_Correct_Rows(count={Count},sqlCondition={SqlCondition},arg={Arg})", count, sqlCondition, arg);
             // Arrange
             DataUtil.SetUpDatabase(Constants.PETAPOCO_RecordCount);
 
@@ -207,11 +235,14 @@ namespace DotNetNuke.Tests.Data
                 IRepository<Dog> dogRepository = dataContext.GetRepository<Dog>();
 
                 // Act
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("PetaPoco_Find_Returns_Correct_Rows(count,arg)={Count},{Arg}: find query executed in {Arg2} ms", count, arg, __logStart.ElapsedMilliseconds);
                 dogs = dogRepository.Find(sqlCondition, arg);
             }
 
             // Assert
             Assert.That(dogs.Count(), Is.EqualTo(count));
+			_logger.LogDebug("<<< Exiting PetaPoco_Find_Returns_Correct_Rows(count={Count},sqlCondition={SqlCondition},arg={Arg})", count, sqlCondition, arg);
         }
 
         [Test]
@@ -220,6 +251,7 @@ namespace DotNetNuke.Tests.Data
         [TestCase(5)]
         public void PetaPoco_Get_Returns_All_Items(int count)
         {
+			_logger.LogDebug(">>> Entering PetaPoco_Get_Returns_All_Items(count={Count})", count);
             // Arrange
             DataUtil.SetUpDatabase(count);
 
@@ -229,11 +261,14 @@ namespace DotNetNuke.Tests.Data
                 IRepository<Dog> dogRepository = dataContext.GetRepository<Dog>();
 
                 // Act
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("PetaPoco_Get_Returns_All_Items(count)={Count}: find query executed in {Arg1} ms", count, __logStart.ElapsedMilliseconds);
                 dogs = dogRepository.Get();
             }
 
             // Assert
             Assert.That(dogs.Count(), Is.EqualTo(count));
+			_logger.LogDebug("<<< Exiting PetaPoco_Get_Returns_All_Items(count={Count})", count);
         }
 
         [Test]
@@ -242,6 +277,7 @@ namespace DotNetNuke.Tests.Data
         [TestCase(Constants.PAGE_Last, Constants.PAGE_RecordCount)]
         public void PetaPoco_GetAll_Overload_Returns_Page_Of_Items(int pageIndex, int pageSize)
         {
+			_logger.LogDebug(">>> Entering PetaPoco_GetAll_Overload_Returns_Page_Of_Items(pageIndex={PageIndex},pageSize={PageSize})", pageIndex, pageSize);
             // Arrange
             DataUtil.SetUpDatabase(Constants.PAGE_TotalCount);
 
@@ -251,16 +287,20 @@ namespace DotNetNuke.Tests.Data
                 IRepository<Dog> dogRepository = dataContext.GetRepository<Dog>();
 
                 // Act
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("PetaPoco_GetAll_Overload_Returns_Page_Of_Items(pageIndex,pageSize)={PageIndex},{PageSize}: find query executed in {Arg2} ms", pageIndex, pageSize, __logStart.ElapsedMilliseconds);
                 dogs = dogRepository.GetPage(pageIndex, pageSize);
             }
 
             // Assert
             Assert.That(dogs.PageSize, Is.EqualTo(pageSize));
+			_logger.LogDebug("<<< Exiting PetaPoco_GetAll_Overload_Returns_Page_Of_Items(pageIndex={PageIndex},pageSize={PageSize})", pageIndex, pageSize);
         }
 
         [Test]
         public void PetaPoco_GetById_Returns_Single_Item()
         {
+			_logger.LogDebug(">>> Entering PetaPoco_GetById_Returns_Single_Item()");
             // Arrange
             DataUtil.SetUpDatabase(Constants.PETAPOCO_RecordCount);
 
@@ -270,6 +310,8 @@ namespace DotNetNuke.Tests.Data
                 IRepository<Dog> dogRepository = dataContext.GetRepository<Dog>();
 
                 // Act
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("PetaPoco_GetById_Returns_Single_Item(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
                 dog = dogRepository.GetById(Constants.PETAPOCO_ValidDogId);
             }
 
@@ -280,11 +322,13 @@ namespace DotNetNuke.Tests.Data
                 Assert.That(dog.Age, Is.EqualTo(Constants.PETAPOCO_ValidDogAge));
                 Assert.That(dog.Name, Is.EqualTo(Constants.PETAPOCO_ValidDogName));
             }
+			_logger.LogDebug("<<< Exiting PetaPoco_GetById_Returns_Single_Item()");
         }
 
         [Test]
         public void PetaPoco_GetById_Returns_Single_Item_Using_FluentMapper()
         {
+			_logger.LogDebug(">>> Entering PetaPoco_GetById_Returns_Single_Item_Using_FluentMapper()");
             // Arrange
             DataUtil.SetUpDatabase(Constants.PETAPOCO_RecordCount);
 
@@ -294,6 +338,8 @@ namespace DotNetNuke.Tests.Data
                 IRepository<Dog> dogRepository = dataContext.GetRepository<Dog>();
 
                 // Act
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("PetaPoco_GetById_Returns_Single_Item_Using_FluentMapper(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
                 dog = dogRepository.GetById(Constants.PETAPOCO_ValidDogId);
             }
 
@@ -304,11 +350,13 @@ namespace DotNetNuke.Tests.Data
                 Assert.That(dog.Age, Is.EqualTo(Constants.PETAPOCO_ValidDogAge));
                 Assert.That(dog.Name, Is.EqualTo(Constants.PETAPOCO_ValidDogName));
             }
+			_logger.LogDebug("<<< Exiting PetaPoco_GetById_Returns_Single_Item_Using_FluentMapper()");
         }
 
         [Test]
         public void PetaPoco_Update_Updates_Item()
         {
+			_logger.LogDebug(">>> Entering PetaPoco_Update_Updates_Item()");
             // Arrange
             DataUtil.SetUpDatabase(Constants.PETAPOCO_RecordCount);
 
@@ -325,11 +373,14 @@ namespace DotNetNuke.Tests.Data
                 IRepository<Dog> dogRepository = dataContext.GetRepository<Dog>();
 
                 // Act
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("PetaPoco_Update_Updates_Item(): update query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
                 dogRepository.Update(dog);
             }
 
             // Assert
             DataTable table = DataUtil.GetTable(Constants.PETAPOCO_DatabaseName, Constants.PETAPOCO_DogTableName);
+			_logger.LogDebug("PetaPoco_Update_Updates_Item(): table → {Table}", table);
 
             Assert.That(table.Rows, Has.Count.EqualTo(Constants.PETAPOCO_RecordCount));
 
@@ -344,11 +395,13 @@ namespace DotNetNuke.Tests.Data
                     }
                 }
             }
+			_logger.LogDebug("<<< Exiting PetaPoco_Update_Updates_Item()");
         }
 
         [Test]
         public void PetaPoco_Update_Updates_Item_Using_FluentMapper()
         {
+			_logger.LogDebug(">>> Entering PetaPoco_Update_Updates_Item_Using_FluentMapper()");
             // Arrange
             DataUtil.SetUpDatabase(Constants.PETAPOCO_RecordCount);
 
@@ -365,11 +418,14 @@ namespace DotNetNuke.Tests.Data
                 IRepository<Dog> dogRepository = dataContext.GetRepository<Dog>();
 
                 // Act
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("PetaPoco_Update_Updates_Item_Using_FluentMapper(): update query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
                 dogRepository.Update(dog);
             }
 
             // Assert
             DataTable table = DataUtil.GetTable(Constants.PETAPOCO_DatabaseName, Constants.PETAPOCO_DogTableName);
+			_logger.LogDebug("PetaPoco_Update_Updates_Item_Using_FluentMapper(): table → {Table}", table);
 
             Assert.That(table.Rows, Has.Count.EqualTo(Constants.PETAPOCO_RecordCount));
 
@@ -384,11 +440,13 @@ namespace DotNetNuke.Tests.Data
                     }
                 }
             }
+			_logger.LogDebug("<<< Exiting PetaPoco_Update_Updates_Item_Using_FluentMapper()");
         }
 
         [Test]
         public void PetaPoco_Update_Overload_Updates_Item()
         {
+			_logger.LogDebug(">>> Entering PetaPoco_Update_Overload_Updates_Item()");
             // Arrange
             DataUtil.SetUpDatabase(Constants.PETAPOCO_RecordCount);
 
@@ -398,11 +456,14 @@ namespace DotNetNuke.Tests.Data
                 IRepository<Dog> dogRepository = dataContext.GetRepository<Dog>();
 
                 // Act
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("PetaPoco_Update_Overload_Updates_Item(): update query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
                 dogRepository.Update("SET Age=@1, Name=@2 WHERE ID=@0", Constants.PETAPOCO_UpdateDogId, Constants.PETAPOCO_UpdateDogAge, Constants.PETAPOCO_UpdateDogName);
             }
 
             // Assert
             DataTable table = DataUtil.GetTable(Constants.PETAPOCO_DatabaseName, Constants.PETAPOCO_DogTableName);
+			_logger.LogDebug("PetaPoco_Update_Overload_Updates_Item(): table → {Table}", table);
 
             Assert.That(table.Rows, Has.Count.EqualTo(Constants.PETAPOCO_RecordCount));
 
@@ -417,6 +478,7 @@ namespace DotNetNuke.Tests.Data
                     }
                 }
             }
+			_logger.LogDebug("<<< Exiting PetaPoco_Update_Overload_Updates_Item()");
         }
 
         // ReSharper restore InconsistentNaming

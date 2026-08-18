@@ -16,6 +16,7 @@ import {
 } from "../../../actions";
 import util from "../../../utils";
 import resx from "../../../resources";
+const logger = console;
 
 const re = /^[1-9][0-9]?[0-9]?[0-9]?[0-9]?[0-9]?$/;
 let retainHistoryNumOptions = [];
@@ -26,6 +27,7 @@ let catchUpEnabledOptions = [];
 class SchedulerEditor extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
 
         this.state = {
             error: {
@@ -38,6 +40,7 @@ class SchedulerEditor extends Component {
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const { props } = this;
         if (props.scheduleId) {
             props.dispatch(TaskActions.getGetScheduleItem({
@@ -76,6 +79,7 @@ class SchedulerEditor extends Component {
         if (catchUpEnabledOptions.length === 0) {
             catchUpEnabledOptions.push({ "value": "false", "label": resx.get("Disabled") });
             catchUpEnabledOptions.push({ "value": "true", "label": resx.get("Enabled.Label") });
+			logger.debug('<<< Exiting componentDidMount()');
         }
 
         this.setState({
@@ -85,27 +89,34 @@ class SchedulerEditor extends Component {
     }
 
     runSchedule() {
+		logger.debug('>>> Entering runSchedule()');
         const { props } = this;
         let { scheduleItemDetail } = props;
         props.dispatch(TaskActions.runScheduleItem(scheduleItemDetail, () => {
             util.utilities.notify(resx.get("RunNow"));
         }, () => {
             util.utilities.notify(resx.get("RunNowError"));
+			logger.debug('<<< Exiting runSchedule()');
         }));
     }
 
     isEmptyDate(date) {
+		logger.debug(`>>> Entering isEmptyDate(date=${date})`);
+		logger.debug(`<<< Exiting isEmptyDate(date=${date})`);
         return !date || new Date(date).getFullYear() < 1970;
     }
 
     getDefaultIfNull(obj, key, defaultValue) {
+		logger.debug(`>>> Entering getDefaultIfNull(obj=${obj},key=${key},defaultValue=${defaultValue})`);
         if (obj && key && obj[key]) {
+		logger.debug(`<<< Exiting getDefaultIfNull(obj=${obj},key=${key},defaultValue=${defaultValue})`);
             return obj[key].toString();
         }
         return defaultValue;
     }
 
     getValue(selectKey) {
+		logger.debug(`>>> Entering getValue(selectKey=${selectKey})`);
         const { props } = this;
         switch (selectKey) {
             case "FriendlyName":
@@ -142,14 +153,18 @@ class SchedulerEditor extends Component {
             default:
                 break;
         }
+		logger.debug(`<<< Exiting getValue(selectKey=${selectKey})`);
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let { state, props } = this;
         let scheduleItemDetail = Object.assign({}, props.scheduleItemDetail);
+		logger.debug(`onSettingChange(key=${key},event=${event}): scheduleItemDetail → ${scheduleItemDetail}`);
 
         if (key === "ScheduleStartDate") {
             scheduleItemDetail[key] = event;
+			logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
         }
         else if (key === "CatchUpEnabled") {
             scheduleItemDetail[key] = event.value === "true" ? true : false;
@@ -194,6 +209,7 @@ class SchedulerEditor extends Component {
     }
 
     onUpdateItem(event) {
+		logger.debug(`>>> Entering onUpdateItem(event=${event})`);
         event.preventDefault();
         const { props, state } = this;
         this.setState({
@@ -204,18 +220,26 @@ class SchedulerEditor extends Component {
         }
 
         this.handleRecommendedServers(() => props.onUpdate(props.scheduleItemDetail));
+		logger.debug(`<<< Exiting onUpdateItem(event=${event})`);
     }
 
     compareIgnoreCase(prev, next) {
+		logger.debug(`>>> Entering compareIgnoreCase(prev=${prev},next=${next})`);
+		logger.debug(`<<< Exiting compareIgnoreCase(prev=${prev},next=${next})`);
         return prev.toLowerCase().localeCompare(next.toLowerCase());
     }
 
     uniqueIgnoreCase(value, index, self) {
+		logger.debug(`>>> Entering uniqueIgnoreCase(value=${value},index=${index},self=${self})`);
         const lower = self.map(x => (x || "").toLowerCase());
+		logger.debug(`uniqueIgnoreCase(value=${value},index=${index},self=${self}): lower → ${lower}`);
+		logger.debug(`<<< Exiting uniqueIgnoreCase(value=${value},index=${index},self=${self})`);
         return lower.indexOf(value.toLowerCase()) === index;
     }
 
     normalizeServers(commaSeparatedServers) {
+		logger.debug(`>>> Entering normalizeServers(commaSeparatedServers=${commaSeparatedServers})`);
+		logger.debug(`<<< Exiting normalizeServers(commaSeparatedServers=${commaSeparatedServers})`);
         return (commaSeparatedServers || "")
             .split(",")
             .map(x => x.trim())
@@ -226,42 +250,54 @@ class SchedulerEditor extends Component {
     }
 
     onServersBlur() {
+		logger.debug('>>> Entering onServersBlur()');
         const { scheduleItemDetail } = this.props;
         this.onSettingChange("Servers", {
             target: {
                 value: this.normalizeServers(scheduleItemDetail.Servers)
             }
         });
+		logger.debug('<<< Exiting onServersBlur()');
     }
 
     handleRecommendedServers(callback) {
+		logger.debug(`>>> Entering handleRecommendedServers(callback=${callback})`);
         const { scheduleItemDetail } = this.props;
         const recommendedServers = scheduleItemDetail.RecommendedServers || [];
 
         const proceed = () => {
+			logger.debug('>>> Entering proceed()');
             if (callback && typeof(callback) === "function") {
                 callback();
             }
+			logger.debug('<<< Exiting proceed()');
         };
 
         if (scheduleItemDetail.Enabled && recommendedServers.length > 0) {
             const servers = this.normalizeServers(scheduleItemDetail.Servers);
+			logger.debug(`handleRecommendedServers(callback=${callback}): servers → ${servers}`);
             const recommended = this.normalizeServers(recommendedServers.join(", "));
+			logger.debug(`handleRecommendedServers(callback=${callback}): recommended → ${recommended}`);
 
             if (this.compareIgnoreCase(servers, recommended) !== 0) {
                 const message = util.formatString(resx.get("RecommendServers"), recommended);
+				logger.debug(`handleRecommendedServers(callback=${callback}): message → ${message}`);
                 const yes = resx.get("Yes");
+				logger.debug(`handleRecommendedServers(callback=${callback}): yes → ${yes}`);
                 const no = resx.get("No");
+				logger.debug(`handleRecommendedServers(callback=${callback}): no → ${no}`);
                 util.utilities.confirm(message, yes, no, () => proceed());
             } else {
                 proceed();
             }
         } else {
             proceed();
+			logger.debug(`<<< Exiting handleRecommendedServers(callback=${callback})`);
         }
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const { props } = this;
         if (props.settingsClientModified) {
             util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
@@ -271,11 +307,13 @@ class SchedulerEditor extends Component {
         }
         else {
             props.Collapse();
+			logger.debug('<<< Exiting onCancel()');
         }
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const { props, state } = this;
         if (props.panelIndex === 1) {
             return <History pageSize={5} scheduleId={props.scheduleId} title={resx.get("HistoryModalTitle")} />;
@@ -410,6 +448,7 @@ class SchedulerEditor extends Component {
                 </div>
             </div>;
 
+			logger.debug('<<< Exiting render()');
             return ( 
                 <div className="scheduler-setting-editor">
                     <div className="scheduler-item-container">
@@ -459,6 +498,8 @@ SchedulerEditor.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         scheduleItemDetail: state.task.scheduleItemDetail,
         settingsClientModified: state.task.settingsClientModified

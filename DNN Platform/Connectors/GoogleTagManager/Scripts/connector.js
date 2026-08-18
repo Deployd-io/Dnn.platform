@@ -1,5 +1,7 @@
+const logger = console;
 ﻿"use strict";
 define(["jquery", "knockout", "templatePath/scripts/config", "templatePath/scripts/PersonaBarDialog"], function ($, ko, cf) {
+	logger.debug('>>> Entering define()');
     var helper,
         bindViewModel,
         rootFolder,
@@ -11,6 +13,7 @@ define(["jquery", "knockout", "templatePath/scripts/config", "templatePath/scrip
     var wasDeactivated = false;
 
     var init = function (koObject, connectionHelper, pluginFolder, util) {
+	logger.debug(`>>> Entering init(koObject=${koObject},connectionHelper=${connectionHelper},pluginFolder=${pluginFolder},util=${util})`);
 
         helper = connectionHelper;
         bindViewModel = koObject;
@@ -20,20 +23,28 @@ define(["jquery", "knockout", "templatePath/scripts/config", "templatePath/scrip
 
         if (typeof dnn === "undefined") {
             window.Sys = !window.Sys ? window.top.Sys : window.Sys;
+			logger.debug(`define(): window.Sys → ${window.Sys}`);
+			logger.debug(`define(): window.String → ${window.String}`);
             window.dnn = !window.dnn ? window.top.dnn : window.dnn;
+			logger.debug(`define(): window.dnn → ${window.dnn}`);
             window.String = !window.String ? window.top.String : window.String;
             window.String.format = !window.String.format ? window.top.String.format : window.String.format;
         }
 
+	logger.debug(`init(koObject=${koObject},connectionHelper=${connectionHelper},pluginFolder=${pluginFolder},util=${util}): window.Sys → ${window.Sys}`);
+	logger.debug(`<<< Exiting init(koObject=${koObject},connectionHelper=${connectionHelper},pluginFolder=${pluginFolder},util=${util})`);
     };
 
     var onSave = function (conn) {
+	logger.debug(`>>> Entering onSave(conn=${conn})`);
 
         // Convert boolean to string as the API requires a dictionary of string values
         conn.configurations[1].value(conn.configurations[1].value() || 'false');
+		logger.debug(`<<< Exiting onSave(conn=${conn})`);
     };
 
     var onSaveComplete = function (conn, id) {
+	logger.debug(`>>> Entering onSaveComplete(conn=${conn},id=${id})`);
 
         // Deactivation / delete handled through the save since the delete function as
         // of v9.2.2 only works with multiple connector support. This should be
@@ -55,10 +66,12 @@ define(["jquery", "knockout", "templatePath/scripts/config", "templatePath/scrip
                 activateDeleteButton(conn);
             }
             utility.notify((utility.resx.Connectors || utility.resx.PersonaBar).txt_Saved, true);
+			logger.debug(`<<< Exiting onSaveComplete(conn=${conn},id=${id})`);
         }
     };
 
     var activateDeleteButton = function (conn) {
+	logger.debug(`>>> Entering activateDeleteButton(conn=${conn})`);
 
         if (conn.buttons().length === 1) {
 
@@ -66,20 +79,24 @@ define(["jquery", "knockout", "templatePath/scripts/config", "templatePath/scrip
                 className: "secondarybtn",
                 text: bindViewModel.resx.btnDelete,
                 action: function (conn, e) {
+				logger.debug(`>>> Entering action(conn=${conn},e=${e})`);
 
                     // Set the isDeactivating flag to true to override the default save behaviour
                     // Temporary workaround until delete functionality on connectors is improved
                     conn.configurations[2].value("true");
                     wasDeactivated = true;
                     conn.save(conn, e, onSaveComplete.bind(this, conn, conn.id));
+					logger.debug(`<<< Exiting action(conn=${conn},e=${e})`);
                 }
             });
 
         }
 
+	logger.debug(`<<< Exiting activateDeleteButton(conn=${conn})`);
     };
 
     var getActionButtons = function () {
+	logger.debug('>>> Entering getActionButtons()');
 
 
         if (bindViewModel.connected()) {
@@ -119,6 +136,7 @@ define(["jquery", "knockout", "templatePath/scripts/config", "templatePath/scrip
                 }
             ];
         }
+		logger.debug('<<< Exiting getActionButtons()');
     };
 
     return {

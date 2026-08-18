@@ -6,6 +6,7 @@ import UrlRow from "./UrlRow";
 import EditUrl from "./EditUrl";
 import styles from "./style.module.less";
 import uniqBy from "lodash/uniqBy";
+const logger = console;
 
 class Table extends Component {
     generateUrlKey(url) {
@@ -13,11 +14,13 @@ class Table extends Component {
     }
 
     getUrlRows(pageUrls) {
+		logger.debug(`>>> Entering getUrlRows(pageUrls=${pageUrls})`);
         if (!pageUrls || pageUrls.length === 0) {
             return null;
         }
 
         const deduplicatedUrls = uniqBy(pageUrls, url => this.generateUrlKey(url));
+		logger.debug(`getUrlRows(pageUrls=${pageUrls}): deduplicatedUrls → ${deduplicatedUrls}`);
 
         const { siteAliases, primaryAliasId, onSave, onCancel, onDelete, onChange, editedUrl,
             pageHasParent, editingUrl, onOpenEditForm } = this.props;
@@ -36,18 +39,24 @@ class Table extends Component {
                 saving={editingUrl}
                 onDelete={onDelete} />;
         });
+		logger.debug(`<<< Exiting getUrlRows(pageUrls=${pageUrls})`);
     }
 
     onAddNewUrl() {
+		logger.debug('>>> Entering onAddNewUrl()');
         this.props.onAddNewUrl(this.props.editedUrl, this.props.primaryAliasId);
+		logger.debug('<<< Exiting onAddNewUrl()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { pageUrls, pageHasParent, addingNewUrl, onOpenNewForm, onCloseNewUrl,
             newFormOpened, onChange, editedUrl, siteAliases, primaryAliasId } = this.props;
         const urlRows = this.getUrlRows(pageUrls);
+		logger.debug(`render(): urlRows → ${urlRows}`);
 
          
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 <div className={styles.addItemRow}>

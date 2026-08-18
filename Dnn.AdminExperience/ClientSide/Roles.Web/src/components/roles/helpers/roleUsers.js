@@ -1,12 +1,16 @@
+const logger = console;
 export function removeRoleUserFromList(roleUsers, userId) {
+	logger.debug(`>>> Entering removeRoleUserFromList(roleUsers=${roleUsers},userId=${userId})`);
     if (roleUsers.some(roleGroup => roleGroup.userId === userId)) {
         roleUsers = roleUsers.filter(roleGroup => {
+	logger.debug(`<<< Exiting removeRoleUserFromList(roleUsers=${roleUsers},userId=${userId})`);
             return roleGroup.userId !== userId;
         });
     }
     return roleUsers;
 }
 export function updateRoleUserList(roleUsers, roleUserDetails) {
+	logger.debug(`>>> Entering updateRoleUserList(roleUsers=${roleUsers},roleUserDetails=${roleUserDetails})`);
     if (roleUsers.some(role => role.userId === roleUserDetails.userId)) {
         roleUsers = roleUsers.filter(role => {
             return role.userId !== roleUserDetails.userId;
@@ -23,6 +27,7 @@ export function updateRoleUserList(roleUsers, roleUserDetails) {
                 return 1;
             return 0;//default return value (no sorting)
         });
+	logger.debug(`<<< Exiting updateRoleUserList(roleUsers=${roleUsers},roleUserDetails=${roleUserDetails})`);
         return roleUsers;
     }
 }

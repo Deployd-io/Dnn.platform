@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -12,14 +14,17 @@
 "use strict";
 
 CodeMirror.defineMode("q",function(config){
+logger.debug('>>> Entering defineMode()');
   var indentUnit=config.indentUnit,
       curPunc,
       keywords=buildRE(["abs","acos","aj","aj0","all","and","any","asc","asin","asof","atan","attr","avg","avgs","bin","by","ceiling","cols","cor","cos","count","cov","cross","csv","cut","delete","deltas","desc","dev","differ","distinct","div","do","each","ej","enlist","eval","except","exec","exit","exp","fby","fills","first","fkeys","flip","floor","from","get","getenv","group","gtime","hclose","hcount","hdel","hopen","hsym","iasc","idesc","if","ij","in","insert","inter","inv","key","keys","last","like","list","lj","load","log","lower","lsq","ltime","ltrim","mavg","max","maxs","mcount","md5","mdev","med","meta","min","mins","mmax","mmin","mmu","mod","msum","neg","next","not","null","or","over","parse","peach","pj","plist","prd","prds","prev","prior","rand","rank","ratios","raze","read0","read1","reciprocal","reverse","rload","rotate","rsave","rtrim","save","scan","select","set","setenv","show","signum","sin","sqrt","ss","ssr","string","sublist","sum","sums","sv","system","tables","tan","til","trim","txf","type","uj","ungroup","union","update","upper","upsert","value","var","view","views","vs","wavg","where","where","while","within","wj","wj1","wsum","xasc","xbar","xcol","xcols","xdesc","xexp","xgroup","xkey","xlog","xprev","xrank"]),
       E=/[|/&^!+:\\\-*%$=~#;@><,?_\'\"\[\(\]\)\s{}]/;
   function buildRE(w){return new RegExp("^("+w.join("|")+")$");}
   function tokenBase(stream,state){
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
     var sol=stream.sol(),c=stream.next();
     curPunc=null;
+	logger.debug(`tokenBase(stream=${stream},state=${state}): sol → ${sol}`);
     if(sol)
       if(c=="/")
         return(state.tokenize=tokenLineComment)(stream,state);
@@ -56,6 +61,7 @@ CodeMirror.defineMode("q",function(config){
     if(/[|/&^!+:\\\-*%$=~#;@><\.,?_\']/.test(c))
       return null;
     if(/[{}\(\[\]\)]/.test(c))
+	logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
       return null;
     return"error";
   }
@@ -130,6 +136,7 @@ CodeMirror.defineMode("q",function(config){
       else if(context.align)
         return context.col+(closing?0:1);
       else
+		logger.debug(`<<< Exiting function(exports=${exports})`);
         return context.indent+(closing?0:indentUnit);
     }
   };

@@ -8,9 +8,12 @@ namespace DotNetNuke.Security.Permissions
     /// <summary>Provides a custom <see cref="IComparer"/> implementation for <see cref="ModulePermissionInfo"/> objects.</summary>
     internal class CompareModulePermissions : IComparer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CompareModulePermissions));
         /// <inheritdoc />
         public int Compare(object x, object y)
         {
+			Logger.LogDebug(">>> Entering Compare(x={X},y={Y})", x, y);
+			Logger.LogDebug("<<< Exiting Compare(x={X},y={Y})", x, y);
             return ((ModulePermissionInfo)x).ModulePermissionID.CompareTo(((ModulePermissionInfo)y).ModulePermissionID);
         }
     }

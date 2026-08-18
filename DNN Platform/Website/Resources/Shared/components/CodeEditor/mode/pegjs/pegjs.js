@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("../javascript/javascript"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,15 +13,22 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("pegjs", function (config) {
+logger.debug('>>> Entering defineMode()');
   var jsMode = CodeMirror.getMode(config, "javascript");
+logger.debug('<<< Exiting defineMode()');
+logger.debug(`defineMode(): jsMode → ${jsMode}`);
 
   function identifier(stream) {
+	logger.debug(`>>> Entering identifier(stream=${stream})`);
+	logger.debug(`<<< Exiting identifier(stream=${stream})`);
     return stream.match(/^[a-zA-Z_][a-zA-Z0-9_]*/);
   }
 
   return {
     startState: function () {
+	logger.debug('>>> Entering startState()');
       return {
         inString: false,
         stringType: null,
@@ -29,8 +38,10 @@ CodeMirror.defineMode("pegjs", function (config) {
         lhs: true,
         localState: null
       };
+	logger.debug('<<< Exiting startState()');
     },
     token: function (stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       if (stream)
 
       //check for state changes
@@ -38,9 +49,11 @@ CodeMirror.defineMode("pegjs", function (config) {
         state.stringType = stream.peek();
         stream.next(); // Skip quote
         state.inString = true; // Update state
+		logger.debug(`token(stream=${stream},state=${state}): state.inString → ${state.inString}`);
       }
       if (!state.inString && !state.inComment && stream.match(/^\/\*/)) {
         state.inComment = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.inComment → ${state.inComment}`);
       }
 
       //return state
@@ -63,6 +76,7 @@ CodeMirror.defineMode("pegjs", function (config) {
             state.inComment = false; // Clear flag
           } else {
             stream.match(/^.[^\*]*/);
+			logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
           }
         }
         return "comment";

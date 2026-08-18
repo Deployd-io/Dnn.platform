@@ -63,6 +63,9 @@ namespace log4net.Config
         /// </remarks>
         public DomainAttribute() : base()
         {
+		value.LogDebug(">>> Entering DomainAttribute()");
+		value.LogDebug("<<< Exiting DomainAttribute()");
+		value.LogDebug(">>> Entering DomainAttribute(name={Name})", name);
         }
 
         /// <summary>
@@ -77,6 +80,7 @@ namespace log4net.Config
         /// </remarks>
         public DomainAttribute(string name) : base(name)
         {
+		value.LogDebug("<<< Exiting DomainAttribute(name={Name})", name);
         }
     }
 }

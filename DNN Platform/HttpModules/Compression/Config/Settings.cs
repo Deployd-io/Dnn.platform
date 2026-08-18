@@ -21,6 +21,7 @@ namespace DotNetNuke.HttpModules.Compression
     [Serializable]
     public class Settings
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Settings));
         private readonly List<string> excludedPaths = new();
 
         /// <summary>Gets the default settings.  Deflate + normal.</summary>
@@ -43,8 +44,10 @@ namespace DotNetNuke.HttpModules.Compression
         /// <returns>A <see cref="Settings"/> instance.</returns>
         public static Settings GetSettings(IHostSettings hostSettings, IApplicationStatusInfo appStatus)
         {
+			Logger.LogDebug(">>> Entering GetSettings(hostSettings={HostSettings},appStatus={AppStatus})", hostSettings, appStatus);
             var settings = (Settings)DataCache.GetCache("CompressionConfig");
             if (settings != null)
+			Logger.LogDebug("GetSettings(hostSettings={HostSettings},appStatus={AppStatus}): settings → {Settings}", hostSettings, appStatus, settings);
             {
                 return settings;
             }
@@ -58,7 +61,9 @@ namespace DotNetNuke.HttpModules.Compression
             }
             catch (Exception e)
             {
+				Logger.LogError("Exception in GetSettings(): {Arg0}", e.Message);
                 if (appStatus.Status != UpgradeStatus.Install)
+				Logger.LogError("Exception in GetSettings(hostSettings={HostSettings},appStatus={AppStatus}): {Arg2}", hostSettings, appStatus, e.Message);
                 {
                     DotNetNuke.Services.Exceptions.Exceptions.LogException(e);
                 }
@@ -71,6 +76,7 @@ namespace DotNetNuke.HttpModules.Compression
             using (var xmlReader = XmlReader.Create(fileReader))
             {
                 var doc = new XPathDocument(xmlReader);
+				Logger.LogDebug("GetSettings(hostSettings={HostSettings},appStatus={AppStatus}): doc → {Doc}", hostSettings, appStatus, doc);
                 foreach (XPathNavigator nav in doc.CreateNavigator().Select("compression/excludedPaths/path"))
                 {
                     settings.excludedPaths.Add(nav.Value.ToLowerInvariant());
@@ -83,6 +89,7 @@ namespace DotNetNuke.HttpModules.Compression
                 DataCache.SetCache("CompressionConfig", settings, new DNNCacheDependency(filePath));
             }
 
+			Logger.LogDebug("<<< Exiting GetSettings()");
             return settings;
         }
 
@@ -91,6 +98,8 @@ namespace DotNetNuke.HttpModules.Compression
         /// <returns>true if excluded, false if not.</returns>
         public bool IsExcludedPath(string relUrl)
         {
+			Logger.LogDebug(">>> Entering IsExcludedPath(relUrl={RelUrl})", relUrl);
+			Logger.LogDebug("<<< Exiting IsExcludedPath(relUrl={RelUrl})", relUrl);
             return this.excludedPaths.Any(path => relUrl.ToLowerInvariant().Contains(path));
         }
     }

@@ -10,6 +10,7 @@ namespace DotNetNuke.Modules.Html
     using DotNetNuke.Services.Exceptions;
 
     using Microsoft.Extensions.DependencyInjection;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>The Settings ModuleSettingsBase is used to manage the settings for the HTML Module.</summary>
     public partial class Settings : ModuleSettingsBase
@@ -22,13 +23,16 @@ namespace DotNetNuke.Modules.Html
         public Settings()
             : this(null)
         {
+		_logger.LogDebug(">>> Entering Settings()");
         }
+		_logger.LogDebug("<<< Exiting Settings()");
 
         /// <summary>Initializes a new instance of the <see cref="Settings"/> class.</summary>
         /// <param name="settingsRepository">The settings repository.</param>
         public Settings(HtmlModuleSettingsRepository settingsRepository)
         {
             this.settingsRepository = settingsRepository ?? this.DependencyProvider.GetRequiredService<HtmlModuleSettingsRepository>();
+			_logger.LogDebug("Settings(settingsRepository={SettingsRepository}): settingsRepository → {SettingsRepository1}", settingsRepository, settingsRepository);
         }
 
         private new HtmlModuleSettings ModuleSettings => this.moduleSettings ??= this.settingsRepository.GetSettings(this.ModuleConfiguration);
@@ -36,6 +40,7 @@ namespace DotNetNuke.Modules.Html
         /// <summary>LoadSettings loads the settings from the Database and displays them.</summary>
         public override void LoadSettings()
         {
+			_logger.LogDebug(">>> Entering LoadSettings()");
             try
             {
                 if (!this.Page.IsPostBack)
@@ -49,28 +54,35 @@ namespace DotNetNuke.Modules.Html
             }
             catch (Exception exc)
             {
+				_logger.LogError("Exception in LoadSettings(): {Arg0}", exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			_logger.LogDebug("<<< Exiting LoadSettings()");
         }
 
         /// <summary>UpdateSettings saves the modified settings to the Database.</summary>
         public override void UpdateSettings()
         {
+			_logger.LogDebug(">>> Entering UpdateSettings()");
             try
             {
                 // update replace token setting
                 this.ModuleSettings.ReplaceTokens = this.chkReplaceTokens.Checked;
                 this.ModuleSettings.UseDecorate = this.cbDecorate.Checked;
                 this.ModuleSettings.SearchDescLength = int.Parse(this.txtSearchDescLength.Text);
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("UpdateSettings(): save query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
                 this.settingsRepository.SaveSettings(this.ModuleConfiguration, this.ModuleSettings);
 
                 // disable module caching if token replace is enabled
                 if (this.chkReplaceTokens.Checked)
                 {
                     var module = ModuleController.Instance.GetModule(this.ModuleId, this.TabId, false);
+					_logger.LogDebug("UpdateSettings(): module → {Module}", module);
                     if (module.CacheTime > 0)
                     {
                         module.CacheTime = 0;
+						_logger.LogDebug("UpdateSettings(): module.CacheTime → {Arg0}", module.CacheTime);
                         ModuleController.Instance.UpdateModule(module);
                     }
                 }
@@ -79,8 +91,11 @@ namespace DotNetNuke.Modules.Html
             }
             catch (Exception exc)
             {
+				private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
                 Exceptions.ProcessModuleLoadException(this, exc);
+				_logger.LogError("Exception in UpdateSettings(): {Arg0}", exc.getMessage());
             }
+			_logger.LogDebug("<<< Exiting UpdateSettings()");
         }
     }
 }

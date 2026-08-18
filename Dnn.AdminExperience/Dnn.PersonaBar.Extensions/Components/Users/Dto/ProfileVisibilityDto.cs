@@ -19,15 +19,20 @@ namespace Dnn.PersonaBar.Users.Components.Dto
         /// <summary>Initializes a new instance of the <see cref="ProfileVisibilityDto"/> class.</summary>
         public ProfileVisibilityDto()
         {
+		eventLogger.LogDebug(">>> Entering ProfileVisibilityDto()");
+		eventLogger.LogDebug("<<< Exiting ProfileVisibilityDto()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ProfileVisibilityDto"/> class.</summary>
         /// <param name="visibility">The profile visibility.</param>
         public ProfileVisibilityDto(ProfileVisibility visibility)
         {
+			eventLogger.LogDebug(">>> Entering ProfileVisibilityDto(visibility={Visibility})", visibility);
             this.VisibilityMode = visibility.VisibilityMode;
             this.RoleVisibilities = visibility.RoleVisibilities.Select(r => r.RoleID).ToList();
+			eventLogger.LogDebug("ProfileVisibilityDto(visibility={Visibility}): this.VisibilityMode → {Arg1}", visibility, this.VisibilityMode);
             this.RelationshipVisibilities = visibility.RelationshipVisibilities.Select(r => r.RelationshipId).ToList();
+			eventLogger.LogDebug("<<< Exiting ProfileVisibilityDto(visibility={Visibility})", visibility);
         }
 
         [DataMember(Name = "visibilityMode")]

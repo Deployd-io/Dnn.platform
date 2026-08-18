@@ -27,7 +27,12 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
             IApplicationStatusInfo applicationStatusInfo)
             : base(loggerSource, localizer)
         {
+			_logger.LogDebug(">>> Entering XmlStepBase(loggerSource={LoggerSource},localizer={Localizer},applicationStatusInfo={ApplicationStatusInfo})", loggerSource, localizer, applicationStatusInfo);
             this.applicationStatusInfo = applicationStatusInfo ??
+				_logger.LogDebug("<<< Exiting XmlStepBase(loggerSource={LoggerSource},localizer={Localizer},applicationStatusInfo={ApplicationStatusInfo})", loggerSource, localizer, applicationStatusInfo);
+				_logger.LogDebug("XmlStepBase(loggerSource={LoggerSource},localizer={Localizer},applicationStatusInfo={ApplicationStatusInfo}): applicationStatusInfo → {ApplicationStatusInfo1}", loggerSource, localizer, applicationStatusInfo, applicationStatusInfo);
+				_logger.LogDebug("XmlStepBase(loggerSource={LoggerSource},localizer={Localizer},applicationStatusInfo={ApplicationStatusInfo}): this.applicationStatusInfo → {Arg3}", loggerSource, localizer, applicationStatusInfo, this.applicationStatusInfo);
+		_logger.LogWarning("Throwing ArgumentNullException from XmlStepBase(loggerSource={LoggerSource},localizer={Localizer},applicationStatusInfo={ApplicationStatusInfo})", loggerSource, localizer, applicationStatusInfo);
                 throw new ArgumentNullException(nameof(applicationStatusInfo));
         }
 
@@ -41,10 +46,14 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         /// <inheritdoc />
         protected override void ExecuteInternal()
         {
+			_logger.LogDebug(">>> Entering ExecuteInternal()");
             var doc = new XmlDocument { PreserveWhitespace = true };
             var root = this.applicationStatusInfo.ApplicationMapPath + @"\";
+			_logger.LogWarning("ExecuteInternal(): root → {Root}", root);
             var fullPath = Path.GetFullPath(Path.Combine(root, this.RelativeFilePath));
+			_logger.LogDebug("ExecuteInternal(): fullPath → {FullPath}", fullPath);
             using (var xmlReader = XmlReader.Create(fullPath, new XmlReaderSettings { XmlResolver = null, }))
+			using Microsoft.Extensions.Logging;
             {
                 doc.Load(xmlReader);
             }
@@ -56,13 +65,17 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
 
             if (this.Success.HasValue && this.Success.Value)
             {
+				private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
                 doc.Save(fullPath);
             }
+			_logger.LogDebug("<<< Exiting ExecuteInternal()");
         }
 
         /// <summary>Provides an opportunity for derived classes to configure the namespace manager.</summary>
         protected virtual void ConfigureNamespaceManager()
         {
+		_logger.LogDebug(">>> Entering ConfigureNamespaceManager()");
+		_logger.LogDebug("<<< Exiting ConfigureNamespaceManager()");
         }
 
         /// <summary>Performs the actual processing of the XML document.</summary>

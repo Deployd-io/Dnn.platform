@@ -1,13 +1,21 @@
 import utilities from "../utils";
+const logger = console;
 const boilerPlate = {
     init() {
+		logger.debug('>>> Entering init()');
         let options = window.dnn.initRoles();
 
+		logger.debug(`init(): options → ${options}`);
         utilities.init(options.utility);
         utilities.moduleName = options.moduleName;
+		logger.debug(`init(): utilities.moduleName → ${utilities.moduleName}`);
         utilities.settings = options.settings;
+		logger.debug(`init(): utilities.settings → ${utilities.settings}`);
+		logger.debug('<<< Exiting init()');
     },
     dispatch() {
+		logger.debug('>>> Entering dispatch()');
+		logger.debug('<<< Exiting dispatch()');
         throw new Error("dispatch method needs to be overwritten from the Redux store");
     }
 };

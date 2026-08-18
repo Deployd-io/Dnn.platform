@@ -29,6 +29,9 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
         public RestoreUser()
             : this(new UserValidator(), RecyclebinController.Instance)
         {
+		eventLogger.LogDebug(">>> Entering RestoreUser()");
+		eventLogger.LogDebug("<<< Exiting RestoreUser()");
+		eventLogger.LogDebug(">>> Entering RestoreUser(userValidator={UserValidator},instance={Instance})", userValidator, instance);
         }
 
         /// <summary>Initializes a new instance of the <see cref="RestoreUser"/> class.</summary>
@@ -38,6 +41,8 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
         {
             this.userValidator = userValidator;
             this.recyclebinController = instance;
+			eventLogger.LogDebug("RestoreUser(userValidator={UserValidator},instance={Instance}): this.userValidator → {Arg2}", userValidator, instance, this.userValidator);
+			eventLogger.LogDebug("<<< Exiting RestoreUser(userValidator={UserValidator},instance={Instance})", userValidator, instance);
         }
 
         /// <inheritdoc />
@@ -48,12 +53,15 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.UserId = this.GetFlagValue(FlagId, "User Id", -1, true, true, true);
+			eventLogger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogDebug(">>> Entering Run()");
             this.userValidator.ValidateUser(this.UserId, this.PortalSettings, this.User, out var userInfo);
 
             if (userInfo == null)
@@ -67,6 +75,8 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
             }
 
             var restoredUser = this.recyclebinController.RestoreUser(userInfo, out var message);
+			eventLogger.LogDebug("Run(): restoredUser → {RestoredUser}", restoredUser);
+			eventLogger.LogDebug("<<< Exiting Run()");
             return restoredUser
                 ? new ConsoleResultModel(this.LocalizeString("UserRestored")) { Records = 1, }
                 : new ConsoleErrorResultModel(message);

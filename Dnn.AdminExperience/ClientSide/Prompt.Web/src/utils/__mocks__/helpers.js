@@ -1,16 +1,21 @@
 import React  from "react";
 import utilities from "./utilities";
+const logger = console;
 
 export function formatString() {
+	logger.debug('>>> Entering formatString()');
     let format = arguments[0];
     let methodsArgs = arguments;
     return format.replace(/[{\[](\d+)[\]}]/gi, function (value, index) {
         let argsIndex = parseInt(index) + 1;
+		logger.debug(`<<< Exiting function(argsIndex=${argsIndex})`);
+	logger.debug('<<< Exiting formatString()');
         return methodsArgs[argsIndex];
     });
 }
 export function sort(items, column, order) {
     order = order === undefined ? "asc" : order;
+	logger.debug(`>>> Entering sort(order=${order})`);
     items = items.sort(function (a, b) {
         if (a[column] > b[column]) //sort string descending
             return order === "asc" ? 1 : -1;
@@ -22,26 +27,32 @@ export function sort(items, column, order) {
 }
 
 export function formatLabel(input) {
+	logger.debug(`>>> Entering formatLabel(input=${input})`);
     if (typeof input === "string") {
         // format camelcase and remove Is from labels
         let output = input.replace("$", "").replace(/^(Is)(.+)/i, "$2");
         output = output.match(/[A-Z][a-z]+/g).join(" "); // rudimentary but should handle normal Camelcase
+		logger.debug(`formatLabel(input=${input}): output → ${output}`);
+	logger.debug(`<<< Exiting formatLabel(input=${input})`);
         return output;
     }
     return "";
 }
 
 export function getColumnsFromRow(row) {
+	logger.debug(`>>> Entering getColumnsFromRow(row=${row})`);
     const columns = [];
     for (let key in row) {
         if (key.indexOf("__") !== 0) {
             columns.push(key);
         }
     }
+	logger.debug(`<<< Exiting getColumnsFromRow(row=${row})`);
     return columns;
 }
 
 export function renderObject(data, fieldOrder) {
+logger.debug(`>>> Entering renderObject(data=${data},fieldOrder=${fieldOrder})`);
 
     const columns = !fieldOrder || fieldOrder.length === 0 ? getColumnsFromRow(data) : fieldOrder;
     const rows = columns.map((fldName, index) => {
@@ -56,6 +67,7 @@ export function renderObject(data, fieldOrder) {
         }
 
     });
+	logger.debug(`<<< Exiting renderObject(data=${data},fieldOrder=${fieldOrder})`);
     return <table className="dnn-prompt-tbl"><tbody>{rows}</tbody></table>;
 }
 

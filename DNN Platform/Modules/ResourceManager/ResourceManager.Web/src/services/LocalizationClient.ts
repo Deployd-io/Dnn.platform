@@ -1,3 +1,4 @@
+const logger = console;
 import { DnnServicesFramework } from "@dnncommunity/dnn-elements";
 
 export class LocalizationClient{
@@ -9,26 +10,35 @@ export class LocalizationClient{
      * @param moduleId The ID of the current module.
      */
     constructor(moduleId: number){
+		logger.debug(`>>> Entering constructor(moduleId=${moduleId})`);
         this.sf = new DnnServicesFramework(moduleId);
         this.requestUrl = `${this.sf.getServiceRoot("ResourceManager")}Localization/`
+		logger.debug(`<<< Exiting constructor(moduleId=${moduleId})`);
     }
 
     /** Gets the localized strings */
     public async getResources(): Promise<LocalizedStrings> {
         const LocalizationStorageKey = "ResourceManagerLocalization";
+		logger.debug(`getResources(): LocalizationStorageKey → ${LocalizationStorageKey}`);
+		logger.debug('>>> Entering getResources()'); const _start = Date.now();
         const localization = sessionStorage.getItem(LocalizationStorageKey);
+		logger.debug(`getResources(): localization → ${localization}`);
         if (localization !== null){
             return JSON.parse(localization) as LocalizedStrings;
         }
 
         const url = `${this.requestUrl}GetResources`;
         const response = await fetch(url, { headers: this.sf.getModuleHeaders()});
+		logger.debug(`getResources(): response → ${response}`);
         if (response.status !== 200){
             throw new Error(`Error getting localized strings: ${response.statusText}`);
         }
 
         const data = await response.json() as LocalizedStrings;
+		logger.debug(`getResources(): data → ${data}`);
+		logger.info(`getResources(): API call took ${Date.now() - _start} ms`);
         sessionStorage.setItem(LocalizationStorageKey, JSON.stringify(data));
+		logger.debug('<<< Exiting getResources()');
         return data;
     }
 }

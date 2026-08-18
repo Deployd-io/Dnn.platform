@@ -29,14 +29,18 @@ namespace DotNetNuke.Web.DDRMenu
         public MenuView()
             : this(null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering MenuView()");
         }
 
+		eventLogger.LogDebug("<<< Exiting MenuView()");
         /// <summary>Initializes a new instance of the <see cref="MenuView"/> class.</summary>
         /// <param name="localiser">The tab localizer.</param>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public MenuView(ILocaliser localiser)
             : this(localiser, null, null)
         {
+		eventLogger.LogDebug(">>> Entering MenuView(localiser={Localiser})", localiser);
+		eventLogger.LogDebug("<<< Exiting MenuView(localiser={Localiser})", localiser);
         }
 
         /// <summary>Initializes a new instance of the <see cref="MenuView"/> class.</summary>
@@ -47,12 +51,15 @@ namespace DotNetNuke.Web.DDRMenu
         {
             this.localiser = localiser ?? Globals.GetCurrentServiceProvider().GetRequiredService<ILocaliser>();
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			eventLogger.LogDebug("MenuView(localiser={Localiser},hostSettings={HostSettings},tabController={TabController}): hostSettings → {HostSettings1}", localiser, hostSettings, tabController, hostSettings);
             this.tabController = tabController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ITabController>();
+			eventLogger.LogDebug("MenuView(localiser={Localiser},hostSettings={HostSettings},tabController={TabController}): tabController → {TabController1}", localiser, hostSettings, tabController, tabController);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             using (new DNNContext(this))
             {
                 try
@@ -104,14 +111,17 @@ namespace DotNetNuke.Web.DDRMenu
                 }
                 catch (Exception exc)
                 {
+					eventLogger.LogError("Exception in OnPreRender(e={E}): {Arg1}", e, exc.getMessage());
                     Exceptions.ProcessModuleLoadException(this, exc);
                 }
             }
+			eventLogger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter htmlWriter)
         {
+			eventLogger.LogDebug(">>> Entering Render(htmlWriter={HtmlWriter})", htmlWriter);
             using (new DNNContext(this))
             {
                 try
@@ -128,9 +138,11 @@ namespace DotNetNuke.Web.DDRMenu
                 }
                 catch (Exception exc)
                 {
+					eventLogger.LogError("Exception in Render(htmlWriter={HtmlWriter}): {Arg1}", htmlWriter, exc.getMessage());
                     Exceptions.ProcessModuleLoadException(this, exc);
                 }
             }
+			eventLogger.LogDebug("<<< Exiting Render(htmlWriter={HtmlWriter})", htmlWriter);
         }
     }
 }

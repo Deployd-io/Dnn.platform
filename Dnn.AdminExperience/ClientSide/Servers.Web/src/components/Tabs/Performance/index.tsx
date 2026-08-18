@@ -16,6 +16,7 @@ import WarningBlock from "../../common/WarningBlock";
 import localization from "../../../localization";
 import PerformanceTabActions from "../../../actions/performanceTab";
 import utils from "../../../utils";
+const logger = console;
 
 interface ISelectOption {
   label: string;
@@ -75,8 +76,11 @@ const Performance: React.FC<IProps> = ({
   onSave,
   onIncrementVersion,
 }) => {
+logger.debug(`>>> Entering Performance(performanceSettings=${performanceSettings},isSaving=${isSaving},incrementingVersion=${incrementingVersion},errorMessage=${errorMessage},infoMessage=${infoMessage},isLoading=${isLoading},onRetrievePerformanceSettings=${onRetrievePerformanceSettings},onChangePerformanceSettingsValue=${onChangePerformanceSettingsValue},onSave=${onSave},onIncrementVersion=${onIncrementVersion})`);
   const prevInfoMessage = useRef(infoMessage);
   const prevErrorMessage = useRef(errorMessage);
+logger.debug(`Performance: prevInfoMessage → ${prevInfoMessage}`);
+logger.debug(`Performance: prevErrorMessage → ${prevErrorMessage}`);
 
   useEffect(() => {
     onRetrievePerformanceSettings();
@@ -89,6 +93,7 @@ const Performance: React.FC<IProps> = ({
     prevInfoMessage.current = infoMessage;
   }, [infoMessage]);
 
+logger.debug(`Performance(performanceSettings=${performanceSettings},isSaving=${isSaving},incrementingVersion=${incrementingVersion},errorMessage=${errorMessage},infoMessage=${infoMessage},isLoading=${isLoading},onRetrievePerformanceSettings=${onRetrievePerformanceSettings},onChangePerformanceSettingsValue=${onChangePerformanceSettingsValue},onSave=${onSave},onIncrementVersion=${onIncrementVersion}): prevInfoMessage.current → ${prevInfoMessage.current}`);
   useEffect(() => {
     if (prevErrorMessage.current !== errorMessage && errorMessage) {
       utils.notifyError(errorMessage);
@@ -96,11 +101,15 @@ const Performance: React.FC<IProps> = ({
     prevErrorMessage.current = errorMessage;
   }, [errorMessage]);
 
+logger.debug(`Performance(performanceSettings=${performanceSettings},isSaving=${isSaving},incrementingVersion=${incrementingVersion},errorMessage=${errorMessage},infoMessage=${infoMessage},isLoading=${isLoading},onRetrievePerformanceSettings=${onRetrievePerformanceSettings},onChangePerformanceSettingsValue=${onChangePerformanceSettingsValue},onSave=${onSave},onIncrementVersion=${onIncrementVersion}): prevErrorMessage.current → ${prevErrorMessage.current}`);
   const handleSave = () => {
+	logger.debug('>>> Entering handleSave()');
     onSave(performanceSettings);
+	logger.debug('<<< Exiting handleSave()');
   };
 
   const handleIncrementVersion = (isGlobalSettings: boolean) => {
+	logger.debug(`>>> Entering handleIncrementVersion(isGlobalSettings=${isGlobalSettings})`);
     utils.confirm(
       localization.get("PerformanceTab_PortalVersionConfirmMessage"),
       localization.get("PerformanceTab_PortalVersionConfirmYes"),
@@ -108,9 +117,11 @@ const Performance: React.FC<IProps> = ({
       () => onIncrementVersion(isGlobalSettings),
       () => {},
     );
+	logger.debug(`<<< Exiting handleIncrementVersion(isGlobalSettings=${isGlobalSettings})`);
   };
 
   const onChangeField = (key: string, event: any) => {
+	logger.debug(`>>> Entering onChangeField(key=${key},event=${event})`);
     let value = event;
     if (event && event.value !== undefined) {
       value = event.value;
@@ -118,6 +129,8 @@ const Performance: React.FC<IProps> = ({
       value = event.target.value;
     }
     onChangePerformanceSettingsValue(key, value);
+	logger.debug(`onChangeField(key=${key},event=${event}): value → ${value}`);
+	logger.debug(`<<< Exiting onChangeField(key=${key},event=${event})`);
   };
 
   if (isLoading) {
@@ -324,6 +337,7 @@ const Performance: React.FC<IProps> = ({
       </div>
     </div>
   );
+logger.debug(`<<< Exiting Performance(performanceSettings=${performanceSettings},isSaving=${isSaving},incrementingVersion=${incrementingVersion},errorMessage=${errorMessage},infoMessage=${infoMessage},isLoading=${isLoading},onRetrievePerformanceSettings=${onRetrievePerformanceSettings},onChangePerformanceSettingsValue=${onChangePerformanceSettingsValue},onSave=${onSave},onIncrementVersion=${onIncrementVersion})`);
 };
 
 const mapStateToProps = (state: any): IStateProps => ({

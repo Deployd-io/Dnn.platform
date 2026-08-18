@@ -1,6 +1,7 @@
 import { Component, Event, EventEmitter, Host, h, Prop, Element } from '@stencil/core';
 import { GetFolderContentResponse, Item } from '../../services/ItemsClient'
 import state from '../../store/store';
+const logger = console;
 import { selectionUtilities } from "../../utilities/selection-utilities";
 import { getFileSize } from '../../utilities/filesize-utilities';
 @Component({
@@ -24,11 +25,13 @@ export class DnnRmItemsListview {
   private contextMenu: HTMLDnnContextMenuElement;
 
   private getLocalDateString(dateString: string) {
+	logger.debug(`>>> Entering getLocalDateString(dateString=${dateString})`);
     const date = new Date(dateString);
     return <div class="date">
       <span>{date.toLocaleDateString()}</span>
       <span>{date.toLocaleTimeString()}</span>
     </div>
+	logger.debug(`<<< Exiting getLocalDateString(dateString=${dateString})`);
   }
 
   private handleRowKeyDown(e: KeyboardEvent, item: Item): void {
@@ -47,19 +50,24 @@ export class DnnRmItemsListview {
         selectionUtilities.toggleItemSelected(item);
         break;
       default:
+		logger.debug(`<<< Exiting handleRowKeyDown(e=${e},item=${item})`);
         break;
     }
   }
 
   private handleDoubleClick(item: Item): void {
     if (item.isFolder) {
+	logger.debug(`>>> Entering handleDoubleClick(item=${item})`);
       this.dnnRmFolderDoubleClicked.emit(item.itemId);
     } else {
       this.dnnRmFileDoubleClicked.emit(item.path);
+	logger.debug(`<<< Exiting handleDoubleClick(item=${item})`);
     }
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         {this.currentItems &&

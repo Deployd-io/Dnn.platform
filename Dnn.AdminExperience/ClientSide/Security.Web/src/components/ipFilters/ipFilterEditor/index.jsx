@@ -5,6 +5,7 @@ import "./style.less";
 import { SingleLineInputWithError, GridSystem, Label, InputGroup, Button, RadioButtons, Dropdown, MultiLineInput } from "@dnnsoftware/dnn-react-common";
 import { security as SecurityActions } from "../../../actions";
 import resx from "../../../resources";
+const logger = console;
 
 let specificityOptions = [];
 let typeOptions = [];
@@ -15,6 +16,7 @@ const IP_RANGE = "IPRange";
 class IpFilterEditor extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             ipFilter: {RuleType: 1},
             error: {
@@ -26,6 +28,7 @@ class IpFilterEditor extends Component {
             ruleSpecificity: SINGLE_IP
         };
 
+		logger.debug(`constructor(): this.state → ${this.state}`);
         specificityOptions = [];
         specificityOptions.push({ label: resx.get(SINGLE_IP), value: SINGLE_IP });
         specificityOptions.push({ label: resx.get(IP_RANGE), value: IP_RANGE });
@@ -33,11 +36,14 @@ class IpFilterEditor extends Component {
         typeOptions = [];
         typeOptions.push({ label: resx.get("AllowIP"), value: 1 });
         typeOptions.push({ label: resx.get("DenyIP"), value: 2 });
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const {props} = this;
         if (props.ipFilterId) {
+			logger.debug('<<< Exiting componentDidMount()');
             props.dispatch(SecurityActions.getIpFilter({
                 filterId: props.ipFilterId
             }, (data) => {
@@ -55,14 +61,17 @@ class IpFilterEditor extends Component {
     }
 
     onRuleSpecificityChange(event) {
+		logger.debug(`>>> Entering onRuleSpecificityChange(event=${event})`);
         this.setState({
             ruleSpecificity: event,
             formModified: true,
             triedToSubmit: false
         });
+		logger.debug(`<<< Exiting onRuleSpecificityChange(event=${event})`);
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let {ipFilter} = this.state;
 
         if (key === "RuleType") {
@@ -70,6 +79,7 @@ class IpFilterEditor extends Component {
         }
         else {
             ipFilter[key] = typeof (event) === "object" ? event.target.value : event;
+			logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
         }
 
         this.setState({
@@ -80,6 +90,7 @@ class IpFilterEditor extends Component {
     }
 
     onUpdateItem(event) {
+		logger.debug(`>>> Entering onUpdateItem(event=${event})`);
         event.preventDefault();
         const {state} = this;
 
@@ -96,9 +107,11 @@ class IpFilterEditor extends Component {
         }
 
         this.props.onUpdate(this.state.ipFilter);
+		logger.debug(`<<< Exiting onUpdateItem(event=${event})`);
     }
 
     validateIPAddressContainsError() {
+		logger.debug('>>> Entering validateIPAddressContainsError()');
         const {state} = this;
 
         state.error["ip"] = !this.isValidIpAddress(state.ipFilter["IPAddress"]);
@@ -113,6 +126,7 @@ class IpFilterEditor extends Component {
             error: state.error
         });
 
+		logger.debug('<<< Exiting validateIPAddressContainsError()');
         return (state.error.ip || state.error.mask);
     }
 
@@ -122,6 +136,7 @@ class IpFilterEditor extends Component {
 
 
     render() {
+		logger.debug('>>> Entering render()');
         const columnOne = <div className="container" key="ip-filter-editor-column">
             <InputGroup>
                 <Label
@@ -181,6 +196,7 @@ class IpFilterEditor extends Component {
             </InputGroup>
         </div>;
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className="ip-filter-setting-editor">
                 <GridSystem
@@ -214,6 +230,8 @@ IpFilterEditor.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         ipFilter: state.security.ipFilter
     };

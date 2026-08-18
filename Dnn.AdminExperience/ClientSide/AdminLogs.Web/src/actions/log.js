@@ -1,8 +1,11 @@
 import {log as ActionTypes}  from "../constants/actionTypes";
 import ApplicationService from "../services/applicationService";
+const logger = console;
 
 const logActions = {
     getLogList(searchParameters, callback) {
+		logger.debug(`>>> Entering getLogList(searchParameters=${searchParameters},callback=${callback})`);
+		logger.debug(`<<< Exiting getLogList(searchParameters=${searchParameters},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getLogList(searchParameters, data => {
                 dispatch({
@@ -21,6 +24,8 @@ const logActions = {
         };
     },
     getPortalList(addAll, callback) {
+		logger.debug(`>>> Entering getPortalList(addAll=${addAll},callback=${callback})`);
+		logger.debug(`<<< Exiting getPortalList(addAll=${addAll},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getPortalList(addAll, data => {
                 dispatch({
@@ -37,6 +42,8 @@ const logActions = {
         };
     },
     getLogTypeList(callback) {
+		logger.debug(`>>> Entering getLogTypeList(callback=${callback})`);
+		logger.debug(`<<< Exiting getLogTypeList(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getLogTypes(data => {
                 dispatch({
@@ -53,6 +60,8 @@ const logActions = {
         };
     },
     deleteLogItems(payload, callback) {
+		logger.debug(`>>> Entering deleteLogItems(payload=${payload},callback=${callback})`);
+		logger.debug(`<<< Exiting deleteLogItems(payload=${payload},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.deleteLogItems(payload, data => {
                 dispatch({
@@ -69,6 +78,8 @@ const logActions = {
         };
     },
     clearLog(callback) {
+		logger.debug(`>>> Entering clearLog(callback=${callback})`);
+		logger.debug(`<<< Exiting clearLog(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.clearLog(data => {
                 dispatch({
@@ -85,6 +96,8 @@ const logActions = {
         };
     },
     emailLogItems(payload, callback) {
+		logger.debug(`>>> Entering emailLogItems(payload=${payload},callback=${callback})`);
+		logger.debug(`<<< Exiting emailLogItems(payload=${payload},callback=${callback})`);
         return (dispatch) => {
             payload.Email = payload.Email.split(/[ ,;]+/).filter((v) => { return v.trim().length > 0; }).join();
             ApplicationService.emailLogItems(payload, data => {
@@ -102,6 +115,8 @@ const logActions = {
         };
     },
     selectRow(rowId) {
+		logger.debug(`>>> Entering selectRow(rowId=${rowId})`);
+		logger.debug(`<<< Exiting selectRow(rowId=${rowId})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SELECTED_ROW,
@@ -112,6 +127,8 @@ const logActions = {
         };
     },
     deselectRow(rowId) {
+		logger.debug(`>>> Entering deselectRow(rowId=${rowId})`);
+		logger.debug(`<<< Exiting deselectRow(rowId=${rowId})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.DESELECTED_ROW,
@@ -122,6 +139,8 @@ const logActions = {
         };
     },
     selectAll() {
+		logger.debug('>>> Entering selectAll()');
+		logger.debug('<<< Exiting selectAll()');
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SELECTED_ALL,
@@ -130,6 +149,8 @@ const logActions = {
         };
     },
     deselectAll() {
+		logger.debug('>>> Entering deselectAll()');
+		logger.debug('<<< Exiting deselectAll()');
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.DESELECTED_ALL,

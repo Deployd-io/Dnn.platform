@@ -1,8 +1,11 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function() {
+logger.debug('>>> Entering function()');
   var mode = CodeMirror.getMode({tabSize: 4}, "stex");
+logger.debug('<<< Exiting function()');
   function MT(name) { test.mode(name, mode, Array.prototype.slice.call(arguments, 1)); }
 
   MT("word",

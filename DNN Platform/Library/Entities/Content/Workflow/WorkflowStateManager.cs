@@ -24,6 +24,7 @@ namespace DotNetNuke.Entities.Content.Workflow
     public class WorkflowStateManager(IDataContext dataContext, DataProvider dataProvider)
         : ServiceLocator<IWorkflowStateManager, WorkflowStateManager>, IWorkflowStateManager
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(WorkflowStateManager));
         private readonly IWorkflowRepository workflowRepository = WorkflowRepository.Instance;
         private readonly IWorkflowStateRepository workflowStateRepository = WorkflowStateRepository.Instance;
         private readonly IWorkflowStatePermissionsRepository workflowStatePermissionsRepository = WorkflowStatePermissionsRepository.Instance;
@@ -35,23 +36,29 @@ namespace DotNetNuke.Entities.Content.Workflow
         public WorkflowStateManager()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering WorkflowStateManager()");
         }
 
         /// <inheritdoc />
         public IEnumerable<WorkflowState> GetWorkflowStates(int workflowId)
         {
+			Logger.LogDebug(">>> Entering GetWorkflowStates(workflowId={WorkflowId})", workflowId);
+			Logger.LogDebug("<<< Exiting GetWorkflowStates(workflowId={WorkflowId})", workflowId);
             return this.workflowStateRepository.GetWorkflowStates(workflowId);
         }
 
         /// <inheritdoc />
         public WorkflowState GetWorkflowState(int stateId)
         {
+			Logger.LogDebug(">>> Entering GetWorkflowState(stateId={StateId})", stateId);
+			Logger.LogDebug("<<< Exiting GetWorkflowState(stateId={StateId})", stateId);
             return this.workflowStateRepository.GetWorkflowStateByID(stateId);
         }
 
         /// <inheritdoc />
         public void AddWorkflowState(WorkflowState state)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var workflow = this.workflowRepository.GetWorkflow(state.WorkflowID);
             if (workflow == null)
             {
@@ -71,11 +78,13 @@ namespace DotNetNuke.Entities.Content.Workflow
             lastState.Order++;
             this.workflowStateRepository.AddWorkflowState(state);
             this.workflowStateRepository.UpdateWorkflowState(lastState); // Update last state order
+			Logger.LogDebug("<<< Exiting AddWorkflowState(state={State})", state);
         }
 
         /// <inheritdoc />
         public void DeleteWorkflowState(WorkflowState state)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var stateToDelete = this.workflowStateRepository.GetWorkflowStateByID(state.StateID);
             if (stateToDelete == null)
             {
@@ -97,6 +106,7 @@ namespace DotNetNuke.Entities.Content.Workflow
             // Reorder states order
             var rep = this.dataContext.GetRepository<WorkflowState>();
             rep.Update("SET [Order] = [Order] - 1 WHERE WorkflowID = @0 AND [Order] > @1", stateToDelete.WorkflowID, stateToDelete.Order);
+			Logger.LogDebug("<<< Exiting DeleteWorkflowState(state={State})", state);
         }
 
         /// <inheritdoc />
@@ -109,26 +119,36 @@ namespace DotNetNuke.Entities.Content.Workflow
             }
 
             this.workflowStateRepository.UpdateWorkflowState(state);
+			Logger.LogDebug("<<< Exiting UpdateWorkflowState(state={State})", state);
         }
 
         /// <inheritdoc />
         public void MoveWorkflowStateDown(int stateId)
         {
+			Logger.LogDebug(">>> Entering MoveWorkflowStateDown(stateId={StateId})", stateId);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var state = this.workflowStateRepository.GetWorkflowStateByID(stateId);
             if (state == null)
             {
+				Logger.LogWarning("Throwing WorkflowDoesNotExistException from MoveWorkflowStateDown(stateId={StateId})", stateId);
+				Logger.LogDebug("MoveWorkflowStateDown(stateId={StateId}): state → {State}", stateId, state);
+				Logger.LogInformation("MoveWorkflowStateDown(stateId)={StateId}: find query executed in {Arg1} ms", stateId, __logStart.ElapsedMilliseconds);
                 throw new WorkflowDoesNotExistException();
             }
 
             var states = this.workflowStateRepository.GetWorkflowStates(state.WorkflowID).ToArray();
+			Logger.LogDebug("MoveWorkflowStateDown(stateId={StateId}): states → {States}", stateId, states);
 
             if (states.Length == 3)
             {
+				Logger.LogWarning("Throwing WorkflowInvalidOperationException from MoveWorkflowStateDown(stateId={StateId})", stateId);
                 throw new WorkflowInvalidOperationException(Localization.GetString("WorkflowStateCannotBeMoved", Localization.ExceptionsResourceFile));
             }
 
             WorkflowState stateToMoveUp = null;
+			Logger.LogDebug("MoveWorkflowStateDown(stateId={StateId}): stateToMoveUp → {StateToMoveUp}", stateId, stateToMoveUp);
             WorkflowState stateToMoveDown = null;
+			Logger.LogDebug("MoveWorkflowStateDown(stateId={StateId}): stateToMoveDown → {StateToMoveDown}", stateId, stateToMoveDown);
 
             for (var i = 0; i < states.Length; i++)
             {
@@ -155,30 +175,43 @@ namespace DotNetNuke.Entities.Content.Workflow
 
             var orderTmp = stateToMoveDown.Order;
             stateToMoveDown.Order = stateToMoveUp.Order;
+			Logger.LogDebug("MoveWorkflowStateDown(stateId={StateId}): stateToMoveDown.Order → {Arg1}", stateId, stateToMoveDown.Order);
+			Logger.LogDebug("MoveWorkflowStateDown(stateId={StateId}): stateToMoveUp.Order → {Arg1}", stateId, stateToMoveUp.Order);
             stateToMoveUp.Order = orderTmp;
 
             this.workflowStateRepository.UpdateWorkflowState(stateToMoveUp);
             this.workflowStateRepository.UpdateWorkflowState(stateToMoveDown);
+			Logger.LogInformation("MoveWorkflowStateDown(stateId)={StateId}: update query executed in {Arg1} ms", stateId, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting MoveWorkflowStateDown(stateId={StateId})", stateId);
         }
 
         /// <inheritdoc />
         public void MoveWorkflowStateUp(int stateId)
         {
+			Logger.LogDebug(">>> Entering MoveWorkflowStateUp(stateId={StateId})", stateId);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var state = this.workflowStateRepository.GetWorkflowStateByID(stateId);
             if (state == null)
             {
+				Logger.LogWarning("Throwing WorkflowDoesNotExistException from MoveWorkflowStateUp(stateId={StateId})", stateId);
+				Logger.LogDebug("MoveWorkflowStateUp(stateId={StateId}): state → {State}", stateId, state);
+				Logger.LogInformation("MoveWorkflowStateUp(stateId)={StateId}: find query executed in {Arg1} ms", stateId, __logStart.ElapsedMilliseconds);
                 throw new WorkflowDoesNotExistException();
             }
 
             var states = this.workflowStateRepository.GetWorkflowStates(state.WorkflowID).ToArray();
+			Logger.LogDebug("MoveWorkflowStateUp(stateId={StateId}): states → {States}", stateId, states);
 
             if (states.Length == 3)
             {
+				Logger.LogWarning("Throwing WorkflowInvalidOperationException from MoveWorkflowStateUp(stateId={StateId})", stateId);
                 throw new WorkflowInvalidOperationException(Localization.GetString("WorkflowStateCannotBeMoved", Localization.ExceptionsResourceFile));
             }
 
             WorkflowState stateToMoveUp = null;
+			Logger.LogDebug("MoveWorkflowStateUp(stateId={StateId}): stateToMoveUp → {StateToMoveUp}", stateId, stateToMoveUp);
             WorkflowState stateToMoveDown = null;
+			Logger.LogDebug("MoveWorkflowStateUp(stateId={StateId}): stateToMoveDown → {StateToMoveDown}", stateId, stateToMoveDown);
 
             for (var i = 0; i < states.Length; i++)
             {
@@ -205,28 +238,40 @@ namespace DotNetNuke.Entities.Content.Workflow
 
             var orderTmp = stateToMoveDown.Order;
             stateToMoveDown.Order = stateToMoveUp.Order;
+			Logger.LogDebug("MoveWorkflowStateUp(stateId={StateId}): stateToMoveDown.Order → {Arg1}", stateId, stateToMoveDown.Order);
+			Logger.LogDebug("MoveWorkflowStateUp(stateId={StateId}): stateToMoveUp.Order → {Arg1}", stateId, stateToMoveUp.Order);
             stateToMoveUp.Order = orderTmp;
 
             this.workflowStateRepository.UpdateWorkflowState(stateToMoveUp);
             this.workflowStateRepository.UpdateWorkflowState(stateToMoveDown);
+			Logger.LogInformation("MoveWorkflowStateUp(stateId)={StateId}: update query executed in {Arg1} ms", stateId, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting MoveWorkflowStateUp(stateId={StateId})", stateId);
         }
 
         /// <inheritdoc />
         public void MoveState(int stateId, int index)
         {
+			Logger.LogDebug(">>> Entering MoveState(stateId={StateId},index={Index})", stateId, index);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var state = this.workflowStateRepository.GetWorkflowStateByID(stateId);
             if (state == null)
             {
+				Logger.LogWarning("Throwing WorkflowDoesNotExistException from MoveState(stateId={StateId},index={Index})", stateId, index);
+				Logger.LogDebug("MoveState(stateId={StateId},index={Index}): state → {State}", stateId, index, state);
+				Logger.LogInformation("MoveState(stateId,index)={StateId},{Index}: find query executed in {Arg2} ms", stateId, index, __logStart.ElapsedMilliseconds);
                 throw new WorkflowDoesNotExistException();
             }
 
             var states = this.workflowStateRepository.GetWorkflowStates(state.WorkflowID).ToArray();
+			Logger.LogDebug("MoveState(stateId={StateId},index={Index}): states → {States}", stateId, index, states);
             if (index < 1 || index > states.Length - 2)
             {
+				Logger.LogWarning("Throwing WorkflowInvalidOperationException from MoveState(stateId={StateId},index={Index})", stateId, index);
                 throw new WorkflowInvalidOperationException(Localization.GetString("WorkflowStateCannotBeMoved", Localization.ExceptionsResourceFile));
             }
 
             var currentIndex = GetStateIndex(states, state);
+			Logger.LogDebug("MoveState(stateId={StateId},index={Index}): currentIndex → {CurrentIndex}", stateId, index, currentIndex);
 
             if (currentIndex == 0
                 || currentIndex == states.Length - 1)
@@ -235,35 +280,46 @@ namespace DotNetNuke.Entities.Content.Workflow
             }
 
             this.MoveState(state, index, currentIndex);
+			Logger.LogDebug("<<< Exiting MoveState(stateId={StateId},index={Index})", stateId, index);
         }
 
         /// <inheritdoc />
         public IEnumerable<WorkflowStatePermission> GetWorkflowStatePermissionByState(int stateId)
         {
+			Logger.LogDebug(">>> Entering GetWorkflowStatePermissionByState(stateId={StateId})", stateId);
+			Logger.LogDebug("<<< Exiting GetWorkflowStatePermissionByState(stateId={StateId})", stateId);
             return this.workflowStatePermissionsRepository.GetWorkflowStatePermissionByState(stateId);
         }
 
         /// <inheritdoc />
         public void AddWorkflowStatePermission(WorkflowStatePermission permission, int userId)
         {
+			Logger.LogDebug(">>> Entering AddWorkflowStatePermission(permission={Permission},userId={UserId})", permission, userId);
             permission.WorkflowStatePermissionID = this.workflowStatePermissionsRepository.AddWorkflowStatePermission(permission, userId);
+			Logger.LogDebug("<<< Exiting AddWorkflowStatePermission(permission={Permission},userId={UserId})", permission, userId);
         }
 
         /// <inheritdoc />
         public void DeleteWorkflowStatePermission(int workflowStatePermissionId)
         {
+			Logger.LogDebug(">>> Entering DeleteWorkflowStatePermission(workflowStatePermissionId={WorkflowStatePermissionId})", workflowStatePermissionId);
             this.workflowStatePermissionsRepository.DeleteWorkflowStatePermission(workflowStatePermissionId);
+			Logger.LogDebug("<<< Exiting DeleteWorkflowStatePermission(workflowStatePermissionId={WorkflowStatePermissionId})", workflowStatePermissionId);
         }
 
         /// <inheritdoc />
         public int GetContentWorkflowStateUsageCount(int stateId)
         {
+			Logger.LogDebug(">>> Entering GetContentWorkflowStateUsageCount(stateId={StateId})", stateId);
+			Logger.LogDebug("<<< Exiting GetContentWorkflowStateUsageCount(stateId={StateId})", stateId);
             return this.dataProvider.GetContentWorkflowStateUsageCount(stateId);
         }
 
         /// <inheritdoc />
         protected override Func<IWorkflowStateManager> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return Globals.DependencyProvider.GetRequiredService<IWorkflowStateManager>;
         }
 

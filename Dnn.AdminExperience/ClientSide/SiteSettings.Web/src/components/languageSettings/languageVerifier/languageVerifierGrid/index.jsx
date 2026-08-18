@@ -4,36 +4,47 @@ import { connect } from "react-redux";
 import LanguageVerifierRow from "./languageVerifierRow";
 import resx from "../../../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 class LanguageVerifierGridPanel extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             openId: ""
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     uncollapse(id) {
+		logger.debug(`>>> Entering uncollapse(id=${id})`);
         this.setState({
             openId: id
         });
+		logger.debug(`<<< Exiting uncollapse(id=${id})`);
     }
 
     collapse() {
+		logger.debug('>>> Entering collapse()');
         if (this.state.openId !== "") {
             this.setState({
                 openId: ""
             });
+			logger.debug('<<< Exiting collapse()');
         }
     }
 
     toggle(openId) {
+		logger.debug(`>>> Entering toggle(openId=${openId})`);
         if (openId !== "") {
             this.uncollapse(openId);
+			logger.debug(`<<< Exiting toggle(openId=${openId})`);
         }
     }
 
     renderBody(list) {
+		logger.debug(`>>> Entering renderBody(list=${list})`);
+		logger.debug(`<<< Exiting renderBody(list=${list})`);
         return list.map((item, i) => {
             return (
                 <div className="resx-file" key={i}>{item}</div>
@@ -43,7 +54,9 @@ class LanguageVerifierGridPanel extends Component {
 
      
     renderedGrid() {
+		logger.debug('>>> Entering renderedGrid()');
         const {props} = this;
+		logger.debug('<<< Exiting renderedGrid()');
         return (
             <div>
                 <div className="verifier-grid">
@@ -131,6 +144,8 @@ class LanguageVerifierGridPanel extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 <div className={styles.verifierItems}>
@@ -158,6 +173,8 @@ LanguageVerifierGridPanel.propTypes = {
 };
 
 function mapStateToProps() {
+	logger.debug('>>> Entering mapStateToProps()');
+	logger.debug('<<< Exiting mapStateToProps()');
     return {
 
     };

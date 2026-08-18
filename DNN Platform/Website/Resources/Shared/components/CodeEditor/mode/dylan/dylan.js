@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,7 +13,9 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("dylan", function(_config) {
+logger.debug('>>> Entering defineMode()');
   // Words
   var words = {
     // Words that introduce unnamed definitions like "define interface"
@@ -102,7 +106,9 @@ CodeMirror.defineMode("dylan", function(_config) {
 
   // Patterns
   var symbolPattern = "[-_a-zA-Z?!*@<>$%]+";
+logger.debug(`defineMode(): symbolPattern → ${symbolPattern}`);
   var symbol = new RegExp("^" + symbolPattern);
+logger.debug(`defineMode(): symbol → ${symbol}`);
   var patterns = {
     // Symbols with special syntax
     symbolKeyword: symbolPattern + ":",
@@ -142,21 +148,29 @@ CodeMirror.defineMode("dylan", function(_config) {
     "simpleDefinition",
     "signalingCalls"
   ].forEach(function(type) {
+	logger.debug('>>> Entering forEach()');
     words[type].forEach(function(word) {
       wordLookup[word] = type;
       styleLookup[word] = styles[type];
+	logger.debug('<<< Exiting forEach()');
     });
   });
 
+logger.debug('<<< Exiting defineMode()');
 
   function chain(stream, state, f) {
+	logger.debug(`>>> Entering chain(stream=${stream},state=${state},f=${f})`);
     state.tokenize = f;
+	logger.debug(`chain(stream=${stream},state=${state},f=${f}): state.tokenize → ${state.tokenize}`);
+	logger.debug(`<<< Exiting chain(stream=${stream},state=${state},f=${f})`);
     return f(stream, state);
   }
 
   function tokenBase(stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
     // String
     var ch = stream.peek();
+	logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
     if (ch == "'" || ch == '"') {
       stream.next();
       return chain(stream, state, tokenString(ch, "string"));
@@ -234,21 +248,26 @@ CodeMirror.defineMode("dylan", function(_config) {
         return "variable";
       } else {
         stream.next();
+		logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
         return "variable-2";
       }
     }
   }
 
   function tokenComment(stream, state) {
+	logger.debug(`>>> Entering tokenComment(stream=${stream},state=${state})`);
     var maybeEnd = false,
     ch;
     while ((ch = stream.next())) {
       if (ch == "/" && maybeEnd) {
         state.tokenize = tokenBase;
+		logger.debug(`tokenComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
         break;
       }
       maybeEnd = (ch == "*");
     }
+	logger.debug(`tokenComment(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`);
+	logger.debug(`<<< Exiting tokenComment(stream=${stream},state=${state})`);
     return "comment";
   }
 
@@ -270,15 +289,19 @@ CodeMirror.defineMode("dylan", function(_config) {
   // Interface
   return {
     startState: function() {
+	logger.debug('>>> Entering startState()');
       return {
         tokenize: tokenBase,
         currentIndent: 0
       };
+	logger.debug('<<< Exiting startState()');
     },
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       if (stream.eatSpace())
         return null;
       var style = state.tokenize(stream, state);
+	logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
       return style;
     },
     blockCommentStart: "/*",

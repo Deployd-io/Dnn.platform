@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.FileSystem
     [Serializable]
     public class NoNetworkAvailableException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(NoNetworkAvailableException));
         /// <summary>Initializes a new instance of the <see cref="NoNetworkAvailableException"/> class.</summary>
         public NoNetworkAvailableException()
         {
+		Logger.LogDebug(">>> Entering NoNetworkAvailableException()");
+		Logger.LogDebug("<<< Exiting NoNetworkAvailableException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="NoNetworkAvailableException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Services.FileSystem
         public NoNetworkAvailableException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering NoNetworkAvailableException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting NoNetworkAvailableException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="NoNetworkAvailableException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

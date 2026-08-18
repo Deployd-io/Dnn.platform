@@ -6,13 +6,17 @@ namespace DotNetNuke.UI.Skins.EventListeners
 {
     public class SkinEventListener
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SkinEventListener));
         /// <summary>Initializes a new instance of the <see cref="SkinEventListener"/> class.</summary>
         /// <param name="type">The event type.</param>
         /// <param name="e">The event handler.</param>
         public SkinEventListener(SkinEventType type, SkinEventHandler e)
         {
+			Logger.LogDebug(">>> Entering SkinEventListener(type={Type},e={E})", type, e);
             this.EventType = type;
             this.SkinEvent = e;
+			Logger.LogDebug("SkinEventListener(type={Type},e={E}): this.EventType → {Arg2}", type, e, this.EventType);
+			Logger.LogDebug("<<< Exiting SkinEventListener(type={Type},e={E})", type, e);
         }
 
         public SkinEventType EventType { get; private set; }

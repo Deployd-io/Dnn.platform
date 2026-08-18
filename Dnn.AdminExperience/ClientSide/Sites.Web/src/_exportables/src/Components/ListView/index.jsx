@@ -10,12 +10,16 @@ import * as dayjs from "dayjs";
 import styles from "./style.module.less";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import relativeTime from "dayjs/plugin/relativeTime";
+const logger = console;
 
 class ListView extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
     onDelete(portal, index) {
+		logger.debug(`>>> Entering onDelete(portal=${portal},index=${index})`);
         const { props } = this;
         utilities.confirm(Localization.get("deletePortal").replace("{0}", portal.PortalName),
             Localization.get("ConfirmPortalDelete"),
@@ -23,15 +27,21 @@ class ListView extends Component {
             () => {
                 props.dispatch(CommonPortalListActions.deletePortal(portal.PortalID, index));
             });
+			logger.debug(`<<< Exiting onDelete(portal=${portal},index=${index})`);
     }
     backToSites() {
+		logger.debug('>>> Entering backToSites()');
         utilities.loadPanel(this.props.sitesModule, {});
+		logger.debug('<<< Exiting backToSites()');
     }
     onSetting(portal /*, index*/) {
+		logger.debug('>>> Entering onSetting()');
         let event = document.createEvent("Event");
         event.initEvent("portalIdChanged", true, true);
+		logger.debug(`onSetting(): event → ${event}`);
 
         let event2 = document.createEvent("Event");
+		logger.debug(`onSetting(): event2 → ${event2}`);
         event2.initEvent("reloadPortalList", true, true);
 
         let settings = {
@@ -57,20 +67,27 @@ class ListView extends Component {
 
         document.dispatchEvent(event);
         document.dispatchEvent(event2);
+		logger.debug('<<< Exiting onSetting()');
     }
     onPreview(portal /*, index*/) {
+		logger.debug('>>> Entering onPreview()');
         if (portal.PortalAliases && portal.PortalAliases.length > 0) {
             window.open(portal.PortalAliases[0].link);
+			logger.debug('<<< Exiting onPreview()');
         }
     }
     navigateMap(page) {
+		logger.debug(`>>> Entering navigateMap(page=${page})`);
         const { props } = this;
         props.dispatch(CommonVisiblePanelActions.selectPanel(page));
+		logger.debug(`<<< Exiting navigateMap(page=${page})`);
     }
 
     onImportExport(portal, type) {
+		logger.debug(`>>> Entering onImportExport(portal=${portal},type=${type})`);
         let event = document.createEvent("Event");
 
+		logger.debug(`onImportExport(portal=${portal},type=${type}): event → ${event}`);
         event.initEvent("siteImportExport", true, true);
 
         let settings = {
@@ -91,9 +108,11 @@ class ListView extends Component {
         });
 
         document.dispatchEvent(event);
+		logger.debug(`<<< Exiting onImportExport(portal=${portal},type=${type})`);
     }
 
     getPortalButtons(portal, index) {
+		logger.debug(`>>> Entering getPortalButtons(portal=${portal},index=${index})`);
         let portalButtons = [
             {
                 icon: SvgIcons.PreviewIcon,
@@ -133,6 +152,7 @@ class ListView extends Component {
 
          
         let i = 0;
+		logger.debug(`<<< Exiting getPortalButtons(portal=${portal},index=${index})`);
         return portalButtons.map((_button) => {
             let ButtonIcon = _button.icon;
             let element = <div key={`portalButton_${i}`} title={_button.title} onClick={_button.onClick}><ButtonIcon /></div>;
@@ -141,11 +161,13 @@ class ListView extends Component {
         });
     }
     getPortalMapping(portal) {
+		logger.debug(`>>> Entering getPortalMapping(portal=${portal})`);
         dayjs.extend(localizedFormat);
         dayjs.extend(relativeTime);
          
         require("dayjs/locale/" + this.props.culture.substring(0,2));
 
+		logger.debug(`<<< Exiting getPortalMapping(portal=${portal})`);
         return [
             {
                 label: Localization.get("SiteDetails_SiteID"),
@@ -166,7 +188,9 @@ class ListView extends Component {
         ].concat((this.props.getPortalMapping && this.props.getPortalMapping(portal)) || []);
     }
     getDetailList() {
+		logger.debug('>>> Entering getDetailList()');
         const { props } = this;
+		logger.debug('<<< Exiting getDetailList()');
         return props.portals.map((portal, index) => {
             return (portal.PortalAliases && <PortalListItem
                 key={"portal-" + portal.PortalID}
@@ -182,10 +206,14 @@ class ListView extends Component {
             portalBeingExported: {}
         });
         this.navigateMap(0);
+		logger.debug(`<<< Exiting cancelExport(event=${event})`);
     }
     render() {
+		logger.debug('>>> Entering render()');
         const portalList = this.getDetailList(), { props } = this;
 
+		logger.debug(`render(): portalList → ${portalList}`);
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={styles.siteList}>
                 <GridCell className={"portal-list-container " + props.className}>
@@ -221,6 +249,8 @@ ListView.defaultProps = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         portals: state.portal.portals,
         totalCount: state.portal.totalCount

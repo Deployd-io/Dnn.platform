@@ -40,7 +40,9 @@ namespace Dnn.PersonaBar.Library.Controllers
         public PersonaBarController()
             : this(null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering PersonaBarController()");
         }
+		Logger.LogDebug("<<< Exiting PersonaBarController()");
 
         /// <summary>Initializes a new instance of the <see cref="PersonaBarController"/> class.</summary>
         /// <param name="serviceScopeFactory">The service scope factory.</param>
@@ -113,11 +115,14 @@ namespace Dnn.PersonaBar.Library.Controllers
         /// <inheritdoc />
         protected override Func<IPersonaBarController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return Globals.DependencyProvider.GetRequiredService<IPersonaBarController>;
         }
 
         private static void AddPermissions(IHostSettings hostSettings, IPortalController portalController, MenuItem menuItem, IDictionary<string, object> settings)
         {
+			Logger.LogDebug(">>> Entering AddPermissions(hostSettings={HostSettings},portalController={PortalController},menuItem={MenuItem},settings={Settings})", hostSettings, portalController, menuItem, settings);
             var portalSettings = PortalSettings.Current;
             if (!settings.ContainsKey("permissions") && portalSettings != null)
             {
@@ -125,19 +130,24 @@ namespace Dnn.PersonaBar.Library.Controllers
                     .Where(p => p.PermissionKey != "VIEW");
                 var portalId = portalSettings.PortalId;
                 var permissions = new Dictionary<string, bool>();
+				Logger.LogDebug("AddPermissions(hostSettings={HostSettings},portalController={PortalController},menuItem={MenuItem},settings={Settings}): permissions → {Permissions}", hostSettings, portalController, menuItem, settings, permissions);
                 foreach (var permission in menuPermissions)
                 {
                     var key = permission.PermissionKey;
+					Logger.LogWarning("AddPermissions(hostSettings={HostSettings},portalController={PortalController},menuItem={MenuItem},settings={Settings}): key → {Key}", hostSettings, portalController, menuItem, settings, key);
                     var hasPermission = MenuPermissionController.HasMenuPermission(hostSettings, portalController, portalId, menuItem, key);
+					Logger.LogDebug("AddPermissions(hostSettings={HostSettings},portalController={PortalController},menuItem={MenuItem},settings={Settings}): hasPermission → {HasPermission}", hostSettings, portalController, menuItem, settings, hasPermission);
                     permissions.Add(key, hasPermission);
                 }
 
                 settings.Add("permissions", permissions);
             }
+			Logger.LogDebug("<<< Exiting AddPermissions(hostSettings={HostSettings},portalController={PortalController},menuItem={MenuItem},settings={Settings})", hostSettings, portalController, menuItem, settings);
         }
 
         private static IMenuItemController GetMenuItemController(IServiceScope scope, MenuItem menuItem)
         {
+			Logger.LogDebug(">>> Entering GetMenuItemController(scope={Scope},menuItem={MenuItem})", scope, menuItem);
             var identifier = menuItem.Identifier;
             var controller = menuItem.Controller;
 
@@ -149,12 +159,15 @@ namespace Dnn.PersonaBar.Library.Controllers
             try
             {
                 var cacheKey = $"PersonaBarMenuController_{identifier}";
+				Logger.LogDebug("GetMenuItemController(scope={Scope},menuItem={MenuItem}): cacheKey → {CacheKey}", scope, menuItem, cacheKey);
                 var controllerType = Reflection.CreateType(controller, cacheKey, useCache: true);
+				Logger.LogDebug("GetMenuItemController(scope={Scope},menuItem={MenuItem}): controllerType → {ControllerType}", scope, menuItem, controllerType);
                 return ActivatorUtilities.GetServiceOrCreateInstance(scope.ServiceProvider, controllerType) as IMenuItemController;
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting GetMenuItemController(scope={Scope},menuItem={MenuItem})", scope, menuItem);
                 return null;
             }
         }
@@ -210,8 +223,11 @@ namespace Dnn.PersonaBar.Library.Controllers
 
         private void UpdateParameters(MenuItem menuItem)
         {
+			Logger.LogDebug(">>> Entering UpdateParameters(menuItem={MenuItem})", menuItem);
             using var scope = this.serviceScopeFactory.CreateScope();
             var menuController = GetMenuItemController(scope, menuItem);
+			Logger.LogDebug("UpdateParameters(menuItem={MenuItem}): menuController → {MenuController}", menuItem, menuController);
+			Logger.LogDebug("UpdateParameters(menuItem={MenuItem}): scope → {Scope}", menuItem, scope);
             try
             {
                 menuController?.UpdateParameters(menuItem);
@@ -220,17 +236,22 @@ namespace Dnn.PersonaBar.Library.Controllers
             {
                 Logger.Error(ex);
             }
+			Logger.LogDebug("<<< Exiting UpdateParameters(menuItem={MenuItem})", menuItem);
         }
 
         private string GetMenuSettings(MenuItem menuItem)
         {
+			Logger.LogDebug(">>> Entering GetMenuSettings(menuItem={MenuItem})", menuItem);
             IDictionary<string, object> settings;
             try
             {
                 using var scope = this.serviceScopeFactory.CreateScope();
+				Logger.LogDebug("GetMenuSettings(menuItem={MenuItem}): scope → {Scope}", menuItem, scope);
                 var menuController = GetMenuItemController(scope, menuItem);
+				Logger.LogDebug("GetMenuSettings(menuItem={MenuItem}): menuController → {MenuController}", menuItem, menuController);
                 settings = menuController?.GetSettings(menuItem) ?? new Dictionary<string, object>();
 
+				Logger.LogDebug("GetMenuSettings(menuItem={MenuItem}): settings → {Settings}", menuItem, settings);
                 AddPermissions(this.hostSettings, this.portalController, menuItem, settings);
             }
             catch (Exception ex)
@@ -239,6 +260,7 @@ namespace Dnn.PersonaBar.Library.Controllers
                 settings = new Dictionary<string, object>();
             }
 
+			Logger.LogDebug("<<< Exiting GetMenuSettings(menuItem={MenuItem})", menuItem);
             return JsonConvert.SerializeObject(settings);
         }
     }

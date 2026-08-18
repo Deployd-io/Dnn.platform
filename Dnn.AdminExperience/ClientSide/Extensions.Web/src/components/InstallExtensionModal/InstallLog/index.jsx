@@ -4,6 +4,7 @@ import { GridCell, Button, Tooltip } from "@dnnsoftware/dnn-react-common";
 import { Scrollbars } from "react-custom-scrollbars";
 import Localization from "localization";
 import "./style.less";
+const logger = console;
 
 const licenseBoxStyle = {
     border: "1px solid #c8c8c8",
@@ -14,9 +15,12 @@ const licenseBoxStyle = {
 
 class EditExtension extends Component {
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         let errorCount = props.logs.filter((log) => { return log.Type === "Failure" || log.Type === "Error"; }).length;
+		logger.debug(`render(): errorCount → ${errorCount}`);
          
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell style={{ padding: 50 }} className={"extension-install-logs" + (errorCount > 0 ? " with-error" : "")}>
                 <h6>{Localization.get("InstallExtension_Logs.Header")}</h6>

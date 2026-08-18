@@ -17,6 +17,7 @@ namespace Dnn.Modules.ResourceManager.Components
     /// <summary>Provides permissions checks.</summary>
     public class PermissionsManager : ServiceLocator<IPermissionsManager, PermissionsManager>, IPermissionsManager
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PermissionsManager));
         private readonly IFolderManager folderManager;
         private readonly IRoleController roleController;
         private readonly IUserController userController;
@@ -24,32 +25,43 @@ namespace Dnn.Modules.ResourceManager.Components
         /// <summary>Initializes a new instance of the <see cref="PermissionsManager"/> class.</summary>
         public PermissionsManager()
         {
+			Logger.LogDebug(">>> Entering PermissionsManager()");
             this.folderManager = FolderManager.Instance;
             this.roleController = RoleController.Instance;
+			Logger.LogDebug("PermissionsManager(): this.folderManager → {Arg0}", this.folderManager);
+			Logger.LogDebug("PermissionsManager(): this.roleController → {Arg0}", this.roleController);
+			Logger.LogDebug("PermissionsManager(): roleController → {RoleController}", roleController);
             this.userController = UserController.Instance;
+			Logger.LogDebug("<<< Exiting PermissionsManager()");
         }
 
         /// <inheritdoc />
         public bool HasFolderContentPermission(int folderId, int moduleMode)
         {
+			Logger.LogDebug(">>> Entering HasFolderContentPermission(folderId={FolderId},moduleMode={ModuleMode})", folderId, moduleMode);
+			Logger.LogDebug("<<< Exiting HasFolderContentPermission(folderId={FolderId},moduleMode={ModuleMode})", folderId, moduleMode);
             return this.HasGroupFolderPublicOrMemberPermission(folderId);
         }
 
         /// <inheritdoc />
         public bool HasGetFileContentPermission(int folderId)
         {
+			Logger.LogDebug(">>> Entering HasGetFileContentPermission(folderId={FolderId})", folderId);
             if (!this.HasGroupFolderPublicOrMemberPermission(folderId))
             {
                 return false;
             }
 
             var folder = this.folderManager.GetFolder(folderId);
+			Logger.LogDebug("HasGetFileContentPermission(folderId={FolderId}): folder → {Folder}", folderId, folder);
+			Logger.LogDebug("<<< Exiting HasGetFileContentPermission(folderId={FolderId})", folderId);
             return HasPermission(folder, "READ");
         }
 
         /// <inheritdoc />
         public bool HasAddFilesPermission(int moduleMode, int folderId)
         {
+			Logger.LogDebug(">>> Entering HasAddFilesPermission(moduleMode={ModuleMode},folderId={FolderId})", moduleMode, folderId);
             if (!this.HasGroupFolderMemberPermission(folderId))
             {
                 return false;
@@ -61,12 +73,15 @@ namespace Dnn.Modules.ResourceManager.Components
             }
 
             var folder = this.folderManager.GetFolder(folderId);
+			Logger.LogDebug("HasAddFilesPermission(moduleMode={ModuleMode},folderId={FolderId}): folder → {Folder}", moduleMode, folderId, folder);
+			Logger.LogDebug("<<< Exiting HasAddFilesPermission(moduleMode={ModuleMode},folderId={FolderId})", moduleMode, folderId);
             return folder != null && HasPermission(folder, "ADD");
         }
 
         /// <inheritdoc />
         public bool HasAddFoldersPermission(int moduleMode, int folderId)
         {
+			Logger.LogDebug(">>> Entering HasAddFoldersPermission(moduleMode={ModuleMode},folderId={FolderId})", moduleMode, folderId);
             if (!this.HasGroupFolderOwnerPermission(folderId))
             {
                 return false;
@@ -78,12 +93,15 @@ namespace Dnn.Modules.ResourceManager.Components
             }
 
             var folder = this.folderManager.GetFolder(folderId);
+			Logger.LogDebug("HasAddFoldersPermission(moduleMode={ModuleMode},folderId={FolderId}): folder → {Folder}", moduleMode, folderId, folder);
+			Logger.LogDebug("<<< Exiting HasAddFoldersPermission(moduleMode={ModuleMode},folderId={FolderId})", moduleMode, folderId);
             return folder != null && HasPermission(folder, "ADD");
         }
 
         /// <inheritdoc />
         public bool HasDeletePermission(int moduleMode, int folderId)
         {
+			Logger.LogDebug(">>> Entering HasDeletePermission(moduleMode={ModuleMode},folderId={FolderId})", moduleMode, folderId);
             if (!this.HasGroupFolderOwnerPermission(folderId))
             {
                 return false;
@@ -95,12 +113,17 @@ namespace Dnn.Modules.ResourceManager.Components
             }
 
             var folder = this.folderManager.GetFolder(folderId);
+			Logger.LogDebug("HasDeletePermission(moduleMode={ModuleMode},folderId={FolderId}): folder → {Folder}", moduleMode, folderId, folder);
+			Logger.LogDebug("<<< Exiting HasDeletePermission(moduleMode={ModuleMode},folderId={FolderId})", moduleMode, folderId);
+			Logger.LogDebug(">>> Entering HasPermission(folder={Folder},permissionKey={PermissionKey})", folder, permissionKey);
+			Logger.LogDebug("<<< Exiting HasPermission(folder={Folder},permissionKey={PermissionKey})", folder, permissionKey);
             return FolderPermissionController.CanDeleteFolder((FolderInfo)folder);
         }
 
         /// <inheritdoc />
         public bool HasManagePermission(int moduleMode, int folderId)
         {
+			Logger.LogDebug(">>> Entering HasManagePermission(moduleMode={ModuleMode},folderId={FolderId})", moduleMode, folderId);
             if (!this.HasGroupFolderOwnerPermission(folderId))
             {
                 return false;
@@ -112,6 +135,8 @@ namespace Dnn.Modules.ResourceManager.Components
             }
 
             var folder = this.folderManager.GetFolder(folderId);
+			Logger.LogDebug("HasManagePermission(moduleMode={ModuleMode},folderId={FolderId}): folder → {Folder}", moduleMode, folderId, folder);
+			Logger.LogDebug("<<< Exiting HasManagePermission(moduleMode={ModuleMode},folderId={FolderId})", moduleMode, folderId);
             return FolderPermissionController.CanManageFolder((FolderInfo)folder);
         }
 
@@ -120,9 +145,12 @@ namespace Dnn.Modules.ResourceManager.Components
         /// <returns>A value indicating whether the user has permission on the group folder.</returns>
         public bool HasGroupFolderMemberPermission(int folderId)
         {
+			Logger.LogDebug(">>> Entering HasGroupFolderMemberPermission(folderId={FolderId})", folderId);
             var groupId = Utils.GetFolderGroupId(folderId);
             if (groupId < 0)
+			Logger.LogDebug("HasGroupFolderMemberPermission(folderId={FolderId}): groupId → {GroupId}", folderId, groupId);
             {
+			Logger.LogDebug("<<< Exiting HasGroupFolderMemberPermission(folderId={FolderId})", folderId);
                 return true;
             }
 
@@ -132,6 +160,8 @@ namespace Dnn.Modules.ResourceManager.Components
         /// <inheritdoc />
         protected override Func<IPermissionsManager> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new PermissionsManager();
         }
 
@@ -153,23 +183,30 @@ namespace Dnn.Modules.ResourceManager.Components
 
         private bool HasGroupFolderPublicOrMemberPermission(int folderId)
         {
+			Logger.LogDebug(">>> Entering HasGroupFolderPublicOrMemberPermission(folderId={FolderId})", folderId);
             var groupId = Utils.GetFolderGroupId(folderId);
             if (groupId < 0)
+			Logger.LogDebug("HasGroupFolderPublicOrMemberPermission(folderId={FolderId}): groupId → {GroupId}", folderId, groupId);
             {
                 return true;
             }
 
             var portalId = PortalSettings.Current.PortalId;
             var folderGroup = this.roleController.GetRoleById(portalId, groupId);
+			Logger.LogDebug("HasGroupFolderPublicOrMemberPermission(folderId={FolderId}): folderGroup → {FolderGroup}", folderId, folderGroup);
 
+			Logger.LogDebug("<<< Exiting HasGroupFolderPublicOrMemberPermission(folderId={FolderId})", folderId);
             return folderGroup.IsPublic || this.UserIsGroupMember(groupId);
         }
 
         private bool HasGroupFolderOwnerPermission(int folderId)
         {
+			Logger.LogDebug(">>> Entering HasGroupFolderOwnerPermission(folderId={FolderId})", folderId);
             var groupId = Utils.GetFolderGroupId(folderId);
             if (groupId < 0)
+			Logger.LogDebug("HasGroupFolderOwnerPermission(folderId={FolderId}): groupId → {GroupId}", folderId, groupId);
             {
+			Logger.LogDebug("<<< Exiting HasGroupFolderOwnerPermission(folderId={FolderId})", folderId);
                 return true;
             }
 
@@ -189,8 +226,12 @@ namespace Dnn.Modules.ResourceManager.Components
 
         private bool IsInUserFolder(int folderId)
         {
+			Logger.LogDebug(">>> Entering IsInUserFolder(folderId={FolderId})", folderId);
             var user = this.userController.GetCurrentUserInfo();
             var userFolder = this.folderManager.GetUserFolder(user);
+			Logger.LogDebug("IsInUserFolder(folderId={FolderId}): userFolder → {UserFolder}", folderId, userFolder);
+			Logger.LogDebug("IsInUserFolder(folderId={FolderId}): user → {User}", folderId, user);
+			Logger.LogDebug("<<< Exiting IsInUserFolder(folderId={FolderId})", folderId);
             return this.IsUserFolder(folderId, userFolder);
         }
 

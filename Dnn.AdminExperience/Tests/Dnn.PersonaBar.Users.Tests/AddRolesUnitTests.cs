@@ -18,10 +18,12 @@ namespace Dnn.PersonaBar.Users.Tests
 
     using Moq;
     using NUnit.Framework;
+	using Microsoft.Extensions.Logging;
 
     [TestFixture]
     public class AddRolesUnitTests : CommandTests<AddRoles>
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private Mock<IUserValidator> userValidatorMock;
         private Mock<IUsersController> usersControllerMock;
         private Mock<IRolesController> rolesControllerMock;
@@ -32,9 +34,12 @@ namespace Dnn.PersonaBar.Users.Tests
         [TestCase]
         public void Run_AddRolesWithValidArguments_ReturnSuccessResponse()
         {
+			_logger.LogDebug(">>> Entering Run_AddRolesWithValidArguments_ReturnSuccessResponse()");
             // Arrange
             var userId = 2;
+			_logger.LogDebug("Run_AddRolesWithValidArguments_ReturnSuccessResponse(): userId → {UserId}", userId);
             var userInfo = this.GetUser(userId, true);
+			_logger.LogDebug("Run_AddRolesWithValidArguments_ReturnSuccessResponse(): userInfo → {UserInfo}", userInfo);
 
             this.userValidatorMock
                 .Setup(u => u.ValidateUser(userId, this.portalSettings, null, out userInfo))
@@ -52,6 +57,7 @@ namespace Dnn.PersonaBar.Users.Tests
                     });
 
             var total = 1;
+			_logger.LogDebug("Run_AddRolesWithValidArguments_ReturnSuccessResponse(): total → {Total}", total);
             this.usersControllerMock
                 .Setup(u => u.GetUserRoles(userInfo, string.Empty, out total, -1, -1))
                 .Returns(userInfoList);
@@ -72,16 +78,20 @@ namespace Dnn.PersonaBar.Users.Tests
 
             // Act
             var result = this.RunCommand(userId.ToString(), "--roles", "Tester");
+			_logger.LogDebug("Run_AddRolesWithValidArguments_ReturnSuccessResponse(): result → {Result}", result);
 
             // Assert
             Assert.That(result.IsError, Is.False);
+			_logger.LogDebug("<<< Exiting Run_AddRolesWithValidArguments_ReturnSuccessResponse()");
         }
 
         [TestCase]
         public void Run_AddRolesWhenUserNotValid_ReturnErrorResponse()
         {
+			_logger.LogDebug(">>> Entering Run_AddRolesWhenUserNotValid_ReturnErrorResponse()");
             // Arrange
             var userId = 2;
+			_logger.LogDebug("Run_AddRolesWhenUserNotValid_ReturnErrorResponse(): userId → {UserId}", userId);
             UserInfo userInfo = null;
 
             this.errorResultModel = new ConsoleErrorResultModel("Invalid userId");
@@ -92,17 +102,22 @@ namespace Dnn.PersonaBar.Users.Tests
 
             // Act
             var result = this.RunCommand(userId.ToString());
+			_logger.LogDebug("Run_AddRolesWhenUserNotValid_ReturnErrorResponse(): result → {Result}", result);
 
             // Assert
             Assert.That(result.IsError, Is.True);
+			_logger.LogDebug("<<< Exiting Run_AddRolesWhenUserNotValid_ReturnErrorResponse()");
         }
 
         [TestCase]
         public void Run_AddRolesWhenRoleNotValid_ThrowsException()
         {
+			_logger.LogDebug(">>> Entering Run_AddRolesWhenRoleNotValid_ThrowsException()");
             // Arrange
             const int UserId = 2;
+			_logger.LogDebug("Run_AddRolesWhenRoleNotValid_ThrowsException(): UserId → {UserId}", UserId);
             var userInfo = this.GetUser(UserId, true);
+			_logger.LogDebug("Run_AddRolesWhenRoleNotValid_ThrowsException(): userInfo → {UserInfo}", userInfo);
 
             this.userValidatorMock
                 .Setup(u => u.ValidateUser(UserId, this.portalSettings, null, out userInfo))
@@ -119,6 +134,7 @@ namespace Dnn.PersonaBar.Users.Tests
             ]);
 
             var total = 1;
+			_logger.LogDebug("Run_AddRolesWhenRoleNotValid_ThrowsException(): total → {Total}", total);
             this.usersControllerMock
                 .Setup(u => u.GetUserRoles(userInfo, string.Empty, out total, -1, -1))
                 .Returns(userInfoList);
@@ -137,30 +153,41 @@ namespace Dnn.PersonaBar.Users.Tests
                 .Returns(rolesList);
 
             Assert.Throws<RoleNotFoundException>(() => this.RunCommand(UserId.ToString(), "--roles", "Not Tester"), "Should throw exception");
+			_logger.LogDebug("<<< Exiting Run_AddRolesWhenRoleNotValid_ThrowsException()");
         }
 
         protected override void ChildSetup()
         {
+			_logger.LogDebug(">>> Entering ChildSetup()");
             this.userValidatorMock = new Mock<IUserValidator>();
             this.usersControllerMock = new Mock<IUsersController>();
+			_logger.LogDebug("ChildSetup(): usersControllerMock → {UsersControllerMock}", usersControllerMock);
             this.rolesControllerMock = new Mock<IRolesController>();
+			_logger.LogDebug("ChildSetup(): rolesControllerMock → {RolesControllerMock}", rolesControllerMock);
             this.serviceProvider = FakeServiceProvider.Setup(
                 services =>
                 {
+					_logger.LogDebug("ChildSetup(): serviceProvider → {ServiceProvider}", serviceProvider);
+					_logger.LogDebug("ChildSetup(): userValidatorMock → {UserValidatorMock}", userValidatorMock);
                     services.AddSingleton(this.userValidatorMock.Object);
                     services.AddSingleton(this.usersControllerMock.Object);
                     services.AddSingleton(this.rolesControllerMock.Object);
                 });
+				_logger.LogDebug("<<< Exiting ChildSetup()");
         }
 
         [TearDown]
         protected override void ChildTearDown()
         {
+			_logger.LogDebug(">>> Entering ChildTearDown()");
             this.serviceProvider.Dispose();
+			_logger.LogDebug("<<< Exiting ChildTearDown()");
         }
 
         protected override AddRoles CreateCommand()
         {
+			_logger.LogDebug(">>> Entering CreateCommand()");
+			_logger.LogDebug("<<< Exiting CreateCommand()");
             return new AddRoles(this.userValidatorMock.Object, this.usersControllerMock.Object, this.rolesControllerMock.Object);
         }
     }

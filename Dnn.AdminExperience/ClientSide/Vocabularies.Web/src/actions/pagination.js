@@ -1,7 +1,10 @@
 import {pagination as ActionTypes}  from "../constants/actionTypes";
 import VocabularyService from "../services/vocabularyService";
+const logger = console;
 const paginationActions = {
     loadMore(searchParameters) {
+		logger.debug(`>>> Entering loadMore(searchParameters=${searchParameters})`);
+		logger.debug(`<<< Exiting loadMore(searchParameters=${searchParameters})`);
         return (dispatch) => {
             VocabularyService.getVocabularyList(searchParameters, data => {
                 dispatch({
@@ -17,6 +20,8 @@ const paginationActions = {
         };
     },
     loadTab(searchParameters) {
+		logger.debug(`>>> Entering loadTab(searchParameters=${searchParameters})`);
+		logger.debug(`<<< Exiting loadTab(searchParameters=${searchParameters})`);
         return (dispatch) => {
             VocabularyService.getVocabularyList(searchParameters, data => {
                 dispatch({

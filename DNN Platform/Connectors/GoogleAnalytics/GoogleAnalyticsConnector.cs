@@ -12,10 +12,12 @@ namespace DNN.Connectors.GoogleAnalytics
     using DotNetNuke.Services.Connections;
     using DotNetNuke.Services.Exceptions;
     using DotNetNuke.Services.Localization;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>Connector to provide configuration for Google Analytics support.</summary>
     public class GoogleAnalyticsConnector : IConnector
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private const string DefaultDisplayName = "Google Analytics (Legacy UA)";
 
         private string displayName;
@@ -67,19 +69,26 @@ namespace DNN.Connectors.GoogleAnalytics
         /// <inheritdoc />
         public IEnumerable<IConnector> GetConnectors(int portalId)
         {
+			_logger.LogDebug(">>> Entering GetConnectors(portalId={PortalId})", portalId);
+			_logger.LogDebug("<<< Exiting GetConnectors(portalId={PortalId})", portalId);
             return new List<IConnector> { this };
         }
 
         /// <inheritdoc />
         public void DeleteConnector(int portalId)
         {
+		_logger.LogDebug(">>> Entering DeleteConnector(portalId={PortalId})", portalId);
+		_logger.LogDebug("<<< Exiting DeleteConnector(portalId={PortalId})", portalId);
         }
 
         /// <inheritdoc />
         public bool HasConfig(int portalId)
         {
+			_logger.LogDebug(">>> Entering HasConfig(portalId={PortalId})", portalId);
             IDictionary<string, string> config = this.GetConfig(portalId);
 
+			_logger.LogDebug("HasConfig(portalId={PortalId}): config → {Config}", portalId, config);
+			_logger.LogDebug("<<< Exiting HasConfig(portalId={PortalId})", portalId);
             return config.ContainsKey("TrackingID") && !string.IsNullOrEmpty(config["TrackingID"]);
         }
 
@@ -145,15 +154,18 @@ namespace DNN.Connectors.GoogleAnalytics
         /// <inheritdoc />
         public bool SaveConfig(int portalId, IDictionary<string, string> values, ref bool validated, out string customErrorMessage)
         {
+			_logger.LogDebug(">>> Entering SaveConfig(portalId={PortalId},values={Values},validated={Validated})", portalId, values, validated);
             // Delete / Deactivation functionality added into SaveConfig because
             // As of DNN 9.2.2 you need to support multiple to get access to the Delete Connection functionality
             customErrorMessage = string.Empty;
 
+			_logger.LogDebug("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): customErrorMessage → {CustomErrorMessage}", portalId, values, validated, customErrorMessage);
             try
             {
                 if (!bool.TryParse(values["isDeactivating"].ToLowerInvariant(), out var isDeactivating))
                 {
                     isDeactivating = false;
+					_logger.LogDebug("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): isDeactivating → {IsDeactivating}", portalId, values, validated, isDeactivating);
                 }
 
                 string trackingId;
@@ -163,6 +175,7 @@ namespace DNN.Connectors.GoogleAnalytics
                 string trackUserId;
 
                 var isValid = true;
+				_logger.LogDebug("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): isValid → {IsValid}", portalId, values, validated, isValid);
 
                 if (isDeactivating)
                 {
@@ -180,6 +193,8 @@ namespace DNN.Connectors.GoogleAnalytics
                     anonymizeIp = values["AnonymizeIp"] != null ? values["AnonymizeIp"].ToLowerInvariant().Trim() : string.Empty;
                     trackUserId = values["TrackUserId"] != null ? values["TrackUserId"].ToLowerInvariant().Trim() : string.Empty;
 
+					_logger.LogDebug("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): anonymizeIp → {AnonymizeIp}", portalId, values, validated, anonymizeIp);
+					_logger.LogDebug("SaveConfig(portalId={PortalId},values={Values},validated={Validated}): trackUserId → {TrackUserId}", portalId, values, validated, trackUserId);
                     if (string.IsNullOrEmpty(trackingId))
                     {
                         isValid = false;
@@ -231,7 +246,9 @@ namespace DNN.Connectors.GoogleAnalytics
             }
             catch (Exception ex)
             {
+				_logger.LogError("Exception in SaveConfig(portalId={PortalId},values={Values},validated={Validated}): {Arg3}", portalId, values, validated, ex.getMessage());
                 Exceptions.LogException(ex);
+				_logger.LogDebug("<<< Exiting SaveConfig(portalId={PortalId},values={Values},validated={Validated})", portalId, values, validated);
                 return false;
             }
         }
@@ -244,8 +261,10 @@ namespace DNN.Connectors.GoogleAnalytics
         /// <returns>The string representing a boolean after the correction.</returns>
         private static string HandleCustomBoolean(string value)
         {
+			_logger.LogDebug(">>> Entering HandleCustomBoolean(value={Value})", value);
             if ((value ?? string.Empty).Trim().Equals("true", StringComparison.OrdinalIgnoreCase))
             {
+			_logger.LogDebug("<<< Exiting HandleCustomBoolean(value={Value})", value);
                 return "true";
             }
 

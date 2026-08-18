@@ -39,19 +39,25 @@ namespace log4net.Core
         /// <returns></returns>
         public StackFrameItem(StackFrame frame)
         {
+			value.LogDebug(">>> Entering StackFrameItem(frame={Frame})", frame);
             // set default values
             this.m_lineNumber = NA;
+			value.LogDebug("StackFrameItem(frame={Frame}): this.m_lineNumber → {Arg1}", frame, this.m_lineNumber);
             this.m_fileName = NA;
             this.m_method = new MethodItem();
+			value.LogDebug("StackFrameItem(frame={Frame}): this.m_fileName → {Arg1}", frame, this.m_fileName);
+			value.LogDebug("StackFrameItem(frame={Frame}): m_method → {M_method}", frame, m_method);
             this.m_className = NA;
 
             try
+			value.LogDebug("StackFrameItem(frame={Frame}): this.m_className → {Arg1}", frame, this.m_className);
             {
                 // get frame values
                 this.m_lineNumber = frame.GetFileLineNumber().ToString(System.Globalization.NumberFormatInfo.InvariantInfo);
                 this.m_fileName = frame.GetFileName();
                 // get method values
                 MethodBase method = frame.GetMethod();
+				value.LogDebug("StackFrameItem(frame={Frame}): method → {Method}", frame, method);
                 if (method != null)
                 {
                     if(method.DeclaringType != null)
@@ -69,6 +75,7 @@ namespace log4net.Core
 
             // set full info
             this.m_fullInfo = this.m_className + '.' + this.m_method.Name + '(' + this.m_fileName + ':' + this.m_lineNumber + ')';
+			value.LogDebug("<<< Exiting StackFrameItem(frame={Frame})", frame);
         }
 
         /// <summary>

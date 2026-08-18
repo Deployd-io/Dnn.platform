@@ -18,20 +18,26 @@ namespace DotNetNuke.Services.Social.Subscriptions
     /// <summary>This controller provides permission info about the User Subscription.</summary>
     public class SubscriptionSecurityController : ServiceLocator<ISubscriptionSecurityController, SubscriptionSecurityController>, ISubscriptionSecurityController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SubscriptionSecurityController));
         /// <inheritdoc />
         public bool HasPermission(Subscription subscription)
         {
+			Logger.LogDebug(">>> Entering HasPermission(subscription={Subscription})", subscription);
             var userInfo = GetUserFromSubscription(subscription);
 
+			Logger.LogDebug("HasPermission(subscription={Subscription}): userInfo → {UserInfo}", subscription, userInfo);
             var moduleInfo = GetModuleFromSubscription(subscription);
+			Logger.LogDebug("HasPermission(subscription={Subscription}): moduleInfo → {ModuleInfo}", subscription, moduleInfo);
             if (moduleInfo != null && !moduleInfo.InheritViewPermissions)
             {
                 return HasUserModuleViewPermission(userInfo, moduleInfo);
             }
 
             var tabInfo = GetTabFromSubscription(subscription);
+			Logger.LogDebug("HasPermission(subscription={Subscription}): tabInfo → {TabInfo}", subscription, tabInfo);
             if (tabInfo != null)
             {
+			Logger.LogDebug("<<< Exiting HasPermission(subscription={Subscription})", subscription);
                 return HasUserTabViewPermission(userInfo, tabInfo);
             }
 
@@ -41,6 +47,8 @@ namespace DotNetNuke.Services.Social.Subscriptions
         /// <inheritdoc />
         protected override Func<ISubscriptionSecurityController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new SubscriptionSecurityController();
         }
 
@@ -58,16 +66,22 @@ namespace DotNetNuke.Services.Social.Subscriptions
 
         private static TabInfo GetTabFromSubscription(Subscription subscription)
         {
+			Logger.LogDebug(">>> Entering GetTabFromSubscription(subscription={Subscription})", subscription);
+			Logger.LogDebug("<<< Exiting GetTabFromSubscription(subscription={Subscription})", subscription);
             return TabController.Instance.GetTab(subscription.TabId, subscription.PortalId, false);
         }
 
         private static ModuleInfo GetModuleFromSubscription(Subscription subscription)
         {
+			Logger.LogDebug(">>> Entering GetModuleFromSubscription(subscription={Subscription})", subscription);
+			Logger.LogDebug("<<< Exiting GetModuleFromSubscription(subscription={Subscription})", subscription);
             return ModuleController.Instance.GetModule(subscription.ModuleId, Null.NullInteger, true);
         }
 
         private static UserInfo GetUserFromSubscription(Subscription subscription)
         {
+			Logger.LogDebug(">>> Entering GetUserFromSubscription(subscription={Subscription})", subscription);
+			Logger.LogDebug("<<< Exiting GetUserFromSubscription(subscription={Subscription})", subscription);
             return UserController.Instance.GetUser(subscription.PortalId, subscription.UserId);
         }
     }

@@ -13,8 +13,10 @@ namespace DotNetNuke.Tests.Core.Controllers
     {
         public override bool Equals(ConfigurationSetting x, ConfigurationSetting y)
         {
+			mockEventLogger.LogDebug(">>> Entering Equals(x={X},y={Y})", x, y);
             if (x.Key == y.Key && x.Value == y.Value && x.IsSecure == y.IsSecure)
             {
+			mockEventLogger.LogDebug("<<< Exiting Equals(x={X},y={Y})", x, y);
                 return true;
             }
 
@@ -23,6 +25,9 @@ namespace DotNetNuke.Tests.Core.Controllers
 
         public override int GetHashCode(ConfigurationSetting obj)
         {
+			mockEventLogger.LogDebug(">>> Entering GetHashCode(obj={Obj})", obj);
+			mockEventLogger.LogWarning("Throwing NotImplementedException from GetHashCode(obj={Obj})", obj);
+			mockEventLogger.LogDebug("<<< Exiting GetHashCode(obj={Obj})", obj);
             throw new NotImplementedException();
         }
     }

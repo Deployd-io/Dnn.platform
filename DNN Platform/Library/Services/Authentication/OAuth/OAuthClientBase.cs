@@ -64,19 +64,23 @@ namespace DotNetNuke.Services.Authentication.OAuth
         /// <param name="service">The service name.</param>
         protected OAuthClientBase(int portalId, AuthMode mode, string service)
         {
+			Logger.LogDebug(">>> Entering OAuthClientBase(portalId={PortalId},mode={Mode},service={Service})", portalId, mode, service);
             // Set default Expiry to 14 days
             // oAuth v1 tokens do not expire
             // oAuth v2 tokens have an expiry
             this.AuthTokenExpiry = new TimeSpan(14, 0, 0, 0);
             this.Service = service;
+			Logger.LogDebug("OAuthClientBase(portalId={PortalId},mode={Mode},service={Service}): this.Service → {Arg3}", portalId, mode, service, this.Service);
 
             this.APIKey = OAuthConfigBase.GetConfig(this.Service, portalId).APIKey;
             this.APISecret = OAuthConfigBase.GetConfig(this.Service, portalId).APISecret;
             this.Mode = mode;
+			Logger.LogDebug("OAuthClientBase(portalId={PortalId},mode={Mode},service={Service}): this.Mode → {Arg3}", portalId, mode, service, this.Mode);
 
             this.CallbackUri = this.Mode == AuthMode.Login
                                     ? new Uri(Globals.LoginURL(string.Empty, false))
                                     : new Uri(Globals.RegisterURL(string.Empty, string.Empty));
+									Logger.LogDebug("<<< Exiting OAuthClientBase(portalId={PortalId},mode={Mode},service={Service})", portalId, mode, service);
         }
 
         public virtual bool PrefixServiceToUserName
@@ -157,8 +161,10 @@ namespace DotNetNuke.Services.Authentication.OAuth
         /// <returns>Returns a URL encoded string.</returns>
         public static string UrlEncode(string value)
         {
+			Logger.LogDebug(">>> Entering UrlEncode(value={Value})", value);
             var result = new StringBuilder();
 
+			Logger.LogDebug("UrlEncode(value={Value}): result → {Result}", value, result);
             foreach (char symbol in value)
             {
                 if (UnreservedChars.IndexOf(symbol) != -1)
@@ -171,6 +177,7 @@ namespace DotNetNuke.Services.Authentication.OAuth
                 }
             }
 
+			Logger.LogDebug("<<< Exiting UrlEncode(value={Value})", value);
             return result.ToString();
         }
 
@@ -286,12 +293,15 @@ namespace DotNetNuke.Services.Authentication.OAuth
             }
 
             onAuthenticated(eventArgs);
+			Logger.LogDebug("<<< Exiting AuthenticateUser(user={User},settings={Settings},ipAddress={IpAddress},addCustomProperties={AddCustomProperties},onAuthenticated={OnAuthenticated})", user, settings, ipAddress, addCustomProperties, onAuthenticated);
         }
 
         public virtual AuthorisationResult Authorize()
         {
+			Logger.LogDebug(">>> Entering Authorize()");
             if (this.OAuthVersion == "1.0")
             {
+			Logger.LogDebug("<<< Exiting Authorize()");
                 return this.AuthorizeV1();
             }
 
@@ -312,17 +322,22 @@ namespace DotNetNuke.Services.Authentication.OAuth
         /// <returns>A base64 string of the hash value.</returns>
         public string GenerateSignature(Uri url, string token, string tokenSecret, string callbackurl, string oauthVerifier, string httpMethod, string timeStamp, string nonce, out string normalizedUrl, out List<QueryParameter> requestParameters)
         {
+			Logger.LogDebug(">>> Entering GenerateSignature(url={Url},token=<redacted>,tokenSecret=<redacted>,callbackurl={Callbackurl},oauthVerifier={OauthVerifier},httpMethod={HttpMethod},timeStamp={TimeStamp},nonce=<redacted>)", url, callbackurl, oauthVerifier, httpMethod, timeStamp);
             string signatureBase = this.GenerateSignatureBase(url, token, callbackurl, oauthVerifier, httpMethod, timeStamp, nonce, out normalizedUrl, out requestParameters);
 
+			Logger.LogDebug("GenerateSignature(url={Url},token=<redacted>,tokenSecret=<redacted>,callbackurl={Callbackurl},oauthVerifier={OauthVerifier},httpMethod={HttpMethod},timeStamp={TimeStamp},nonce=<redacted>): signatureBase → {SignatureBase}", url, callbackurl, oauthVerifier, httpMethod, timeStamp, signatureBase);
             using var hashAlgorithm = this.SignatureMethodAlgorithm();
+			Logger.LogDebug("GenerateSignature(url={Url},token=<redacted>,tokenSecret=<redacted>,callbackurl={Callbackurl},oauthVerifier={OauthVerifier},httpMethod={HttpMethod},timeStamp={TimeStamp},nonce=<redacted>): hashAlgorithm → {HashAlgorithm}", url, callbackurl, oauthVerifier, httpMethod, timeStamp, hashAlgorithm);
             hashAlgorithm.Key = Encoding.ASCII.GetBytes($"{UrlEncode(this.APISecret)}&{(string.IsNullOrEmpty(tokenSecret) ? string.Empty : UrlEncode(tokenSecret))}");
 
+			Logger.LogDebug("<<< Exiting GenerateSignature(url={Url},token=<redacted>,tokenSecret=<redacted>,callbackurl={Callbackurl},oauthVerifier={OauthVerifier},httpMethod={HttpMethod},timeStamp={TimeStamp},nonce=<redacted>)", url, callbackurl, oauthVerifier, httpMethod, timeStamp);
             return GenerateSignatureUsingHash(signatureBase, hashAlgorithm);
         }
 
         public virtual TUserData GetCurrentUser<TUserData>()
             where TUserData : UserData
         {
+			Logger.LogDebug(">>> Entering GetCurrentUser()");
             this.LoadTokenCookie(string.Empty);
 
             if (!this.IsCurrentUserAuthorized())
@@ -331,45 +346,59 @@ namespace DotNetNuke.Services.Authentication.OAuth
             }
 
             var accessToken = string.IsNullOrEmpty(this.AccessToken) ? "access_token=" + this.AuthToken : this.AccessToken + "=" + this.AuthToken;
+			Logger.LogDebug("GetCurrentUser(): accessToken → {AccessToken}", accessToken);
             string responseText = (this.OAuthVersion == "1.0")
                             ? this.ExecuteAuthorizedRequest(HttpMethod.GET, this.MeGraphEndpoint)
                             : this.ExecuteWebRequest(HttpMethod.GET, GenerateRequestUri(this.MeGraphEndpoint.ToString(), accessToken), null, string.Empty);
             var user = Json.Deserialize<TUserData>(responseText);
+			Logger.LogDebug("GetCurrentUser(): user → {User}", user);
+			Logger.LogDebug("<<< Exiting GetCurrentUser()");
             return user;
         }
 
         public bool HaveVerificationCode()
         {
+			Logger.LogDebug(">>> Entering HaveVerificationCode()");
+			Logger.LogDebug("<<< Exiting HaveVerificationCode()");
             return (this.OAuthVersion == "1.0") ? (this.OAuthVerifier != null) : (this.VerificationCode != null);
         }
 
         public bool IsCurrentService()
         {
+			Logger.LogDebug(">>> Entering IsCurrentService()");
             string service = HttpContext.Current.Request.Params["state"];
+			Logger.LogDebug("<<< Exiting IsCurrentService()");
             return !string.IsNullOrEmpty(service) && service == this.Service;
         }
 
         public bool IsCurrentUserAuthorized()
         {
+			Logger.LogDebug(">>> Entering IsCurrentUserAuthorized()");
+			Logger.LogDebug("<<< Exiting IsCurrentUserAuthorized()");
             return !string.IsNullOrEmpty(this.AuthToken);
         }
 
         public void RemoveToken()
         {
+			Logger.LogDebug(">>> Entering RemoveToken()");
             var authTokenCookie = new HttpCookie(this.AuthTokenName)
             {
                 Expires = DateTime.Now.AddDays(-30),
                 Path = !string.IsNullOrEmpty(Globals.ApplicationPath) ? Globals.ApplicationPath : "/",
             };
             HttpContext.Current.Response.SetCookie(authTokenCookie);
+			Logger.LogDebug("<<< Exiting RemoveToken()");
         }
 
         /// <summary>Generate the timestamp for the signature.</summary>
         /// <returns>A string representation of <see cref="DateTime.Now"/> in the Unix timestamp format.</returns>
         protected virtual string GenerateTimeStamp()
         {
+			Logger.LogDebug(">>> Entering GenerateTimeStamp()");
             // Default implementation of UNIX time of the current UTC time
             TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
+			Logger.LogDebug("GenerateTimeStamp(): ts → {Ts}", ts);
+			Logger.LogDebug("<<< Exiting GenerateTimeStamp()");
             return Convert.ToInt64(ts.TotalSeconds).ToString(CultureInfo.InvariantCulture);
         }
 
@@ -377,7 +406,9 @@ namespace DotNetNuke.Services.Authentication.OAuth
         /// <returns>A 6-7 character length nonce string.</returns>
         protected virtual string GenerateNonce()
         {
+			Logger.LogDebug(">>> Entering GenerateNonce()");
             // Just a simple implementation of a random number between 123400 and 9999999
+			Logger.LogDebug("<<< Exiting GenerateNonce()");
             return this.random.Next(123400, 9999999).ToString(CultureInfo.InvariantCulture);
         }
 
@@ -393,22 +424,29 @@ namespace DotNetNuke.Services.Authentication.OAuth
 
         protected void LoadTokenCookie(string suffix)
         {
+			Logger.LogDebug(">>> Entering LoadTokenCookie(suffix={Suffix})", suffix);
             HttpCookie authTokenCookie = HttpContext.Current.Request.Cookies[this.AuthTokenName + suffix];
             if (authTokenCookie != null)
             {
                 if (authTokenCookie.HasKeys)
                 {
                     this.AuthToken = authTokenCookie.Values[OAuthTokenKey];
+					Logger.LogDebug("LoadTokenCookie(suffix={Suffix}): this.AuthToken → {Arg1}", suffix, this.AuthToken);
                     this.TokenSecret = authTokenCookie.Values[OAuthTokenSecretKey];
                     this.UserGuid = authTokenCookie.Values[this.UserGuidKey];
+					Logger.LogDebug("LoadTokenCookie(suffix={Suffix}): this.TokenSecret → {Arg1}", suffix, this.TokenSecret);
+					Logger.LogDebug("LoadTokenCookie(suffix={Suffix}): this.UserGuid → {Arg1}", suffix, this.UserGuid);
                 }
             }
+			Logger.LogDebug("<<< Exiting LoadTokenCookie(suffix={Suffix})", suffix);
         }
 
         private static string ComputeHash(HashAlgorithm hashAlgorithm, string data)
         {
+			Logger.LogDebug(">>> Entering ComputeHash(hashAlgorithm=<redacted>,data={Data})", data);
             if (hashAlgorithm == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from ComputeHash(hashAlgorithm=<redacted>,data={Data})", data);
                 throw new ArgumentNullException(nameof(hashAlgorithm));
             }
 
@@ -420,11 +458,14 @@ namespace DotNetNuke.Services.Authentication.OAuth
             byte[] dataBuffer = Encoding.ASCII.GetBytes(data);
             byte[] hashBytes = hashAlgorithm.ComputeHash(dataBuffer);
 
+			Logger.LogDebug("<<< Exiting ComputeHash(hashAlgorithm=<redacted>,data={Data})", data);
             return Convert.ToBase64String(hashBytes);
         }
 
         private static string GenerateSignatureUsingHash(string signatureBase, HashAlgorithm hash)
         {
+			Logger.LogDebug(">>> Entering GenerateSignatureUsingHash(signatureBase=<redacted>,hash=<redacted>)");
+			Logger.LogDebug("<<< Exiting GenerateSignatureUsingHash(signatureBase=<redacted>,hash=<redacted>)");
             return ComputeHash(hash, signatureBase);
         }
 
@@ -433,6 +474,7 @@ namespace DotNetNuke.Services.Authentication.OAuth
             if (parameters.StartsWith("?", StringComparison.Ordinal))
             {
                 parameters = parameters.Remove(0, 1);
+				Logger.LogDebug("GetQueryParameters(parameters={Parameters}): parameters → {Parameters1}", parameters, parameters);
             }
 
             var result = new List<QueryParameter>();
@@ -473,6 +515,7 @@ namespace DotNetNuke.Services.Authentication.OAuth
 
         private AuthorisationResult AuthorizeV1()
         {
+			Logger.LogDebug(">>> Entering AuthorizeV1()");
             if (!this.IsCurrentUserAuthorized())
             {
                 if (!this.HaveVerificationCode())
@@ -480,16 +523,19 @@ namespace DotNetNuke.Services.Authentication.OAuth
                     string ret = null;
 
                     string response = this.RequestToken();
+					Logger.LogDebug("AuthorizeV1(): response → {Response}", response);
 
                     if (!string.IsNullOrWhiteSpace(response))
                     {
                         // response contains token and token secret. We only need the token.
                         NameValueCollection qs = HttpUtility.ParseQueryString(response);
+						Logger.LogDebug("AuthorizeV1(): qs → {Qs}", qs);
 
                         if (qs[OAuthCallbackConfirmedKey] != null)
                         {
                             if (qs[OAuthCallbackConfirmedKey] != "true")
                             {
+								Logger.LogWarning("Throwing OAuthException from AuthorizeV1()");
                                 throw new OAuthException("OAuth callback not confirmed.");
                             }
                         }
@@ -499,8 +545,10 @@ namespace DotNetNuke.Services.Authentication.OAuth
                             ret = this.AuthorizationEndpoint + "?" + OAuthTokenKey + "=" + qs[OAuthTokenKey];
 
                             this.AuthToken = qs[OAuthTokenKey];
+							Logger.LogDebug("AuthorizeV1(): this.AuthToken → {Arg0}", this.AuthToken);
                             this.TokenSecret = qs[OAuthTokenSecretKey];
                             this.SaveTokenCookie("_request");
+							Logger.LogDebug("AuthorizeV1(): this.TokenSecret → {Arg0}", this.TokenSecret);
                         }
                     }
 
@@ -515,11 +563,13 @@ namespace DotNetNuke.Services.Authentication.OAuth
                 this.ExchangeRequestTokenForToken();
             }
 
+			Logger.LogDebug("<<< Exiting AuthorizeV1()");
             return AuthorisationResult.Authorized;
         }
 
         private AuthorisationResult AuthorizeV2()
         {
+			Logger.LogDebug(">>> Entering AuthorizeV2()");
             string errorReason = HttpContext.Current.Request.Params["error_reason"];
             bool userDenied = errorReason != null;
             if (userDenied)
@@ -544,11 +594,13 @@ namespace DotNetNuke.Services.Authentication.OAuth
 
             this.ExchangeCodeForToken();
 
+			Logger.LogDebug("<<< Exiting AuthorizeV2()");
             return string.IsNullOrEmpty(this.AuthToken) ? AuthorisationResult.Denied : AuthorisationResult.Authorized;
         }
 
         private void ExchangeCodeForToken()
         {
+			Logger.LogDebug(">>> Entering ExchangeCodeForToken()");
             var parameters = new List<QueryParameter>
             {
                 new QueryParameter(OAuthClientIdKey, this.APIKey),
@@ -567,40 +619,50 @@ namespace DotNetNuke.Services.Authentication.OAuth
             }
 
             var responseText = this.ExecuteWebRequest(this.TokenMethod, this.TokenEndpoint, parameters.ToNormalizedString(), string.Empty);
+			Logger.LogDebug("ExchangeCodeForToken(): responseText → {ResponseText}", responseText);
 
             this.AuthToken = this.GetToken(responseText);
             this.AuthTokenExpiry = this.GetExpiry(responseText);
+			Logger.LogDebug("<<< Exiting ExchangeCodeForToken()");
         }
 
         private void ExchangeRequestTokenForToken()
         {
+			Logger.LogDebug(">>> Entering ExchangeRequestTokenForToken()");
             this.LoadTokenCookie("_request");
 
             string response = this.ExecuteAuthorizedRequest(HttpMethod.POST, this.TokenEndpoint);
+			Logger.LogDebug("ExchangeRequestTokenForToken(): response → {Response}", response);
 
             if (response.Length > 0)
             {
                 // Store the Token and Token Secret
                 NameValueCollection qs = HttpUtility.ParseQueryString(response);
+				Logger.LogDebug("ExchangeRequestTokenForToken(): qs → {Qs}", qs);
                 if (qs[OAuthTokenKey] != null)
                 {
                     this.AuthToken = qs[OAuthTokenKey];
+					Logger.LogDebug("ExchangeRequestTokenForToken(): this.AuthToken → {Arg0}", this.AuthToken);
                 }
 
                 if (qs[OAuthTokenSecretKey] != null)
                 {
                     this.TokenSecret = qs[OAuthTokenSecretKey];
+					Logger.LogDebug("ExchangeRequestTokenForToken(): this.TokenSecret → {Arg0}", this.TokenSecret);
                 }
 
                 if (qs[this.UserGuidKey] != null)
                 {
                     this.UserGuid = qs[this.UserGuidKey];
+					Logger.LogDebug("ExchangeRequestTokenForToken(): this.UserGuid → {Arg0}", this.UserGuid);
                 }
             }
+			Logger.LogDebug("<<< Exiting ExchangeRequestTokenForToken()");
         }
 
         private string ExecuteAuthorizedRequest(HttpMethod method, Uri uri)
         {
+			Logger.LogDebug(">>> Entering ExecuteAuthorizedRequest(method={Method},uri={Uri})", method, uri);
             string outUrl;
             List<QueryParameter> requestParameters;
 
@@ -639,6 +701,7 @@ namespace DotNetNuke.Services.Authentication.OAuth
 
             string ret = this.ExecuteWebRequest(method, uri, string.Empty, headerParameters.ToAuthorizationString());
 
+			Logger.LogDebug("<<< Exiting ExecuteAuthorizedRequest(method={Method},uri={Uri})", method, uri);
             return ret;
         }
 
@@ -715,18 +778,22 @@ namespace DotNetNuke.Services.Authentication.OAuth
 
         private string GenerateSignatureBase(Uri url, string token, string callbackUrl, string oauthVerifier, string httpMethod, string timeStamp, string nonce, out string normalizedUrl, out List<QueryParameter> requestParameters)
         {
+			Logger.LogDebug(">>> Entering GenerateSignatureBase(url={Url},token=<redacted>,callbackUrl={CallbackUrl},oauthVerifier={OauthVerifier},httpMethod={HttpMethod},timeStamp={TimeStamp},nonce=<redacted>)", url, callbackUrl, oauthVerifier, httpMethod, timeStamp);
             if (token == null)
             {
                 token = string.Empty;
+				Logger.LogWarning("GenerateSignatureBase(url={Url},token=<redacted>,callbackUrl={CallbackUrl},oauthVerifier={OauthVerifier},httpMethod={HttpMethod},timeStamp={TimeStamp},nonce=<redacted>): token → {Token1}", url, callbackUrl, oauthVerifier, httpMethod, timeStamp, token);
             }
 
             if (string.IsNullOrEmpty(httpMethod))
             {
+				Logger.LogWarning("Throwing ArgumentNullException from GenerateSignatureBase(url={Url},token=<redacted>,callbackUrl={CallbackUrl},oauthVerifier={OauthVerifier},httpMethod={HttpMethod},timeStamp={TimeStamp},nonce=<redacted>)", url, callbackUrl, oauthVerifier, httpMethod, timeStamp);
                 throw new ArgumentNullException(nameof(httpMethod));
             }
 
             requestParameters = GetQueryParameters(url.Query);
             requestParameters.Add(new QueryParameter(OAuthVersionKey, this.OAuthVersion));
+			Logger.LogDebug("GenerateSignatureBase(url={Url},token=<redacted>,callbackUrl={CallbackUrl},oauthVerifier={OauthVerifier},httpMethod={HttpMethod},timeStamp={TimeStamp},nonce=<redacted>): requestParameters → {RequestParameters}", url, callbackUrl, oauthVerifier, httpMethod, timeStamp, requestParameters);
             requestParameters.Add(new QueryParameter(OAuthNonceKey, nonce));
             requestParameters.Add(new QueryParameter(OAuthTimestampKey, timeStamp));
             requestParameters.Add(new QueryParameter(OAuthSignatureMethodKey, this.SignatureMethod));
@@ -751,6 +818,7 @@ namespace DotNetNuke.Services.Authentication.OAuth
 
             normalizedUrl = $"{url.Scheme}://{url.Host}";
             if (!((url.Scheme == "http" && url.Port == 80) || (url.Scheme == "https" && url.Port == 443)))
+			Logger.LogDebug("GenerateSignatureBase(url={Url},token=<redacted>,callbackUrl={CallbackUrl},oauthVerifier={OauthVerifier},httpMethod={HttpMethod},timeStamp={TimeStamp},nonce=<redacted>): normalizedUrl → {NormalizedUrl}", url, callbackUrl, oauthVerifier, httpMethod, timeStamp, normalizedUrl);
             {
                 normalizedUrl += ":" + url.Port;
             }
@@ -759,15 +827,18 @@ namespace DotNetNuke.Services.Authentication.OAuth
             string normalizedRequestParameters = requestParameters.ToNormalizedString();
 
             var signatureBase = new StringBuilder();
+			Logger.LogDebug("GenerateSignatureBase(url={Url},token=<redacted>,callbackUrl={CallbackUrl},oauthVerifier={OauthVerifier},httpMethod={HttpMethod},timeStamp={TimeStamp},nonce=<redacted>): signatureBase → {SignatureBase}", url, callbackUrl, oauthVerifier, httpMethod, timeStamp, signatureBase);
             signatureBase.AppendFormat(CultureInfo.InvariantCulture, "{0}&", httpMethod.ToUpperInvariant());
             signatureBase.AppendFormat(CultureInfo.InvariantCulture, "{0}&", UrlEncode(normalizedUrl));
             signatureBase.AppendFormat(CultureInfo.InvariantCulture, "{0}", UrlEncode(normalizedRequestParameters));
 
+			Logger.LogDebug("<<< Exiting GenerateSignatureBase(url={Url},token=<redacted>,callbackUrl={CallbackUrl},oauthVerifier={OauthVerifier},httpMethod={HttpMethod},timeStamp={TimeStamp},nonce=<redacted>)", url, callbackUrl, oauthVerifier, httpMethod, timeStamp);
             return signatureBase.ToString();
         }
 
         private string RequestToken()
         {
+			Logger.LogDebug(">>> Entering RequestToken()");
             string nonce = this.GenerateNonce();
             string timeStamp = this.GenerateTimeStamp();
 
@@ -796,18 +867,22 @@ namespace DotNetNuke.Services.Authentication.OAuth
 
             string ret = this.ExecuteWebRequest(this.RequestTokenMethod, new Uri(outUrl), string.Empty, headerParameters.ToAuthorizationString());
 
+			Logger.LogDebug("<<< Exiting RequestToken()");
             return ret;
         }
 
         private void SaveTokenCookie(string suffix)
         {
+			Logger.LogDebug(">>> Entering SaveTokenCookie(suffix={Suffix})", suffix);
             var authTokenCookie = new HttpCookie(this.AuthTokenName + suffix) { Path = !string.IsNullOrEmpty(Globals.ApplicationPath) ? Globals.ApplicationPath : "/" };
             authTokenCookie.Values[OAuthTokenKey] = this.AuthToken;
+			Logger.LogDebug("SaveTokenCookie(suffix={Suffix}): authTokenCookie → {AuthTokenCookie}", suffix, authTokenCookie);
             authTokenCookie.Values[OAuthTokenSecretKey] = this.TokenSecret;
             authTokenCookie.Values[this.UserGuidKey] = this.UserGuid;
 
             authTokenCookie.Expires = DateTime.Now.Add(this.AuthTokenExpiry);
             HttpContext.Current.Response.SetCookie(authTokenCookie);
+			Logger.LogDebug("<<< Exiting SaveTokenCookie(suffix={Suffix})", suffix);
         }
     }
 }

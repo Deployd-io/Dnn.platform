@@ -17,6 +17,7 @@ namespace DotNetNuke.Entities.Modules.Settings
     /// <inheritdoc />
     public class SerializationManager : ISerializationManager
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SerializationManager));
         /// <inheritdoc />
         string ISerializationManager.SerializeValue<T>(T value) =>
             this.SerializeValue(value, null, typeof(T));
@@ -73,6 +74,7 @@ namespace DotNetNuke.Entities.Modules.Settings
 
         private static string GetSettingValueAsString<T>(T settingValue)
         {
+			Logger.LogDebug(">>> Entering GetSettingValueAsString(settingValue={SettingValue})", settingValue);
             if (settingValue is DateTime dateTimeValue)
             {
                 return dateTimeValue.ToString("o", CultureInfo.InvariantCulture);
@@ -83,6 +85,7 @@ namespace DotNetNuke.Entities.Modules.Settings
                 return timeSpanValue.ToString("c", CultureInfo.InvariantCulture);
             }
 
+			Logger.LogDebug("<<< Exiting GetSettingValueAsString(settingValue={SettingValue})", settingValue);
             return Convert.ToString(settingValue, CultureInfo.InvariantCulture);
         }
 
@@ -113,27 +116,35 @@ namespace DotNetNuke.Entities.Modules.Settings
 
         private static object CallSerializerMethod(string serializerTypeName, Type typeArgument, object value, string methodName)
         {
+			Logger.LogDebug(">>> Entering CallSerializerMethod(serializerTypeName={SerializerTypeName},typeArgument={TypeArgument},value={Value},methodName={MethodName})", serializerTypeName, typeArgument, value, methodName);
             var serializerType = Framework.Reflection.CreateType(serializerTypeName, true);
             if (serializerType == null)
+			Logger.LogDebug("CallSerializerMethod(serializerTypeName={SerializerTypeName},typeArgument={TypeArgument},value={Value},methodName={MethodName}): serializerType → {SerializerType}", serializerTypeName, typeArgument, value, methodName, serializerType);
             {
                 return null;
             }
 
             var serializer = Framework.Reflection.CreateInstance(serializerType);
+			Logger.LogDebug("CallSerializerMethod(serializerTypeName={SerializerTypeName},typeArgument={TypeArgument},value={Value},methodName={MethodName}): serializer → {Serializer}", serializerTypeName, typeArgument, value, methodName, serializer);
             if (serializer == null)
             {
                 return null;
             }
 
             var serializerInterfaceType = typeof(ISettingsSerializer<>).MakeGenericType(typeArgument);
+			Logger.LogDebug("CallSerializerMethod(serializerTypeName={SerializerTypeName},typeArgument={TypeArgument},value={Value},methodName={MethodName}): serializerInterfaceType → {SerializerInterfaceType}", serializerTypeName, typeArgument, value, methodName, serializerInterfaceType);
             var method = serializerInterfaceType.GetMethod(methodName);
+			Logger.LogDebug("CallSerializerMethod(serializerTypeName={SerializerTypeName},typeArgument={TypeArgument},value={Value},methodName={MethodName}): method → {Method}", serializerTypeName, typeArgument, value, methodName, method);
+			Logger.LogDebug("<<< Exiting CallSerializerMethod(serializerTypeName={SerializerTypeName},typeArgument={TypeArgument},value={Value},methodName={MethodName})", serializerTypeName, typeArgument, value, methodName);
             return method?.Invoke(serializer, new[] { value, });
         }
 
         private string SerializeValue<T>(T value, string serializer, Type valueType)
         {
+			Logger.LogDebug(">>> Entering SerializeValue(value={Value},serializer={Serializer},valueType={ValueType})", value, serializer, valueType);
             string settingValueAsString = null;
             if (!string.IsNullOrEmpty(serializer))
+			Logger.LogDebug("SerializeValue(value={Value},serializer={Serializer},valueType={ValueType}): settingValueAsString → {SettingValueAsString}", value, serializer, valueType, settingValueAsString);
             {
                 settingValueAsString = (string)CallSerializerMethod(serializer, valueType, value, nameof(ISettingsSerializer<T>.Serialize));
             }
@@ -143,6 +154,7 @@ namespace DotNetNuke.Entities.Modules.Settings
                 settingValueAsString = GetSettingValueAsString(value);
             }
 
+			Logger.LogDebug("<<< Exiting SerializeValue(value={Value},serializer={Serializer},valueType={ValueType})", value, serializer, valueType);
             return settingValueAsString;
         }
 
@@ -228,6 +240,7 @@ namespace DotNetNuke.Entities.Modules.Settings
             }
 
             // TODO: Localize exception
+			Logger.LogDebug("<<< Exiting DeserializeValue(value={Value},serializer={Serializer})", value, serializer);
             throw new InvalidCastException($"Could not cast {propertyValue} to {destinationType}");
         }
     }

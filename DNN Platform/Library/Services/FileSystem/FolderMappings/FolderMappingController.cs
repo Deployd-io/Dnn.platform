@@ -25,6 +25,7 @@ namespace DotNetNuke.Services.FileSystem
 
     public class FolderMappingController : ComponentBase<IFolderMappingController, FolderMappingController>, IFolderMappingController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FolderMappingController));
         private const string CacheKeyPrefix = "GetFolderMappingSettings";
         private static readonly DataProvider DataProvider = DataProvider.Instance();
         private readonly IHostSettings hostSettings;
@@ -34,27 +35,33 @@ namespace DotNetNuke.Services.FileSystem
         internal FolderMappingController()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering FolderMappingController()");
         }
+		Logger.LogDebug("<<< Exiting FolderMappingController()");
 
         /// <summary>Initializes a new instance of the <see cref="FolderMappingController"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
         internal FolderMappingController(IHostSettings hostSettings)
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("FolderMappingController(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
         }
 
         /// <inheritdoc />
         public FolderMappingInfo GetDefaultFolderMapping(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetDefaultFolderMapping(portalId={PortalId})", portalId);
             var defaultFolderMapping = Config.GetSection("dotnetnuke/folder") != null ?
                 this.GetFolderMappings(portalId).Find(fm => fm.FolderProviderType == Config.GetDefaultProvider("folder").Name) :
                 this.GetFolderMapping(portalId, "Standard");
+			Logger.LogDebug("<<< Exiting GetDefaultFolderMapping(portalId={PortalId})", portalId);
             return defaultFolderMapping ?? this.GetFolderMapping(portalId, "Standard");
         }
 
         /// <inheritdoc />
         public int AddFolderMapping(FolderMappingInfo objFolderMapping)
         {
+			Logger.LogDebug(">>> Entering AddFolderMapping(objFolderMapping=<redacted>)");
             objFolderMapping.FolderMappingID = DataProvider.AddFolderMapping(
                 objFolderMapping.PortalID,
                 objFolderMapping.MappingName,
@@ -65,6 +72,7 @@ namespace DotNetNuke.Services.FileSystem
 
             ClearFolderMappingCache(objFolderMapping.PortalID);
 
+			Logger.LogDebug("<<< Exiting AddFolderMapping(objFolderMapping=<redacted>)");
             return objFolderMapping.FolderMappingID;
         }
 
@@ -72,10 +80,13 @@ namespace DotNetNuke.Services.FileSystem
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void DeleteFolderMapping(int portalID, int folderMappingID)
         {
+			Logger.LogDebug(">>> Entering DeleteFolderMapping(portalID={PortalID},folderMappingID=<redacted>)", portalID);
             var folderManager = FolderManager.Instance;
             var folders = folderManager.GetFolders(portalID);
+			Logger.LogDebug("DeleteFolderMapping(portalID={PortalID},folderMappingID=<redacted>): folders → {Folders}", portalID, folders);
 
             var folderMappingFolders = folders.Where(f => f.FolderMappingID == folderMappingID);
+			Logger.LogDebug("DeleteFolderMapping(portalID={PortalID},folderMappingID=<redacted>): folderMappingFolders → {FolderMappingFolders}", portalID, folderMappingFolders);
             if (folderMappingFolders.Any())
             {
                 // Delete files in folders with the provided mapping (only in the database)
@@ -110,10 +121,12 @@ namespace DotNetNuke.Services.FileSystem
                 if (folderMappingFolders.Any())
                 {
                     var defaultFolderMapping = this.GetDefaultFolderMapping(portalID);
+					Logger.LogDebug("DeleteFolderMapping(portalID={PortalID},folderMappingID=<redacted>): defaultFolderMapping → {DefaultFolderMapping}", portalID, defaultFolderMapping);
 
                     foreach (var folderMappingFolder in folderMappingFolders)
                     {
                         folderMappingFolder.FolderMappingID = defaultFolderMapping.FolderMappingID;
+						Logger.LogDebug("DeleteFolderMapping(portalID={PortalID},folderMappingID=<redacted>): folderMappingFolder.FolderMappingID → {Arg2}", portalID, folderMappingFolder.FolderMappingID);
                         folderManager.UpdateFolder(folderMappingFolder);
                     }
                 }
@@ -122,11 +135,13 @@ namespace DotNetNuke.Services.FileSystem
             DataProvider.DeleteFolderMapping(folderMappingID);
             ClearFolderMappingCache(portalID);
             ClearFolderMappingSettingsCache(folderMappingID);
+			Logger.LogDebug("<<< Exiting DeleteFolderMapping(portalID={PortalID},folderMappingID=<redacted>)", portalID);
         }
 
         /// <inheritdoc />
         public void UpdateFolderMapping(FolderMappingInfo objFolderMapping)
         {
+			Logger.LogDebug(">>> Entering UpdateFolderMapping(objFolderMapping=<redacted>)");
             DataProvider.UpdateFolderMapping(
                 objFolderMapping.FolderMappingID,
                 objFolderMapping.MappingName,
@@ -135,12 +150,17 @@ namespace DotNetNuke.Services.FileSystem
 
             ClearFolderMappingCache(objFolderMapping.PortalID);
             UpdateFolderMappingSettings(objFolderMapping);
+			Logger.LogDebug("<<< Exiting UpdateFolderMapping(objFolderMapping=<redacted>)");
         }
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public FolderMappingInfo GetFolderMapping(int folderMappingID)
         {
+			Logger.LogDebug(">>> Entering GetFolderMapping(folderMappingID=<redacted>)");
+			Logger.LogDebug("<<< Exiting GetFolderMapping(folderMappingID=<redacted>)");
+			Logger.LogDebug("<<< Exiting GetFolderMapping(portalId={PortalId},folderMappingID=<redacted>)", portalId);
+			Logger.LogDebug("<<< Exiting GetFolderMapping(portalId={PortalId},mappingName=<redacted>)", portalId);
             return CBO.FillObject<FolderMappingInfo>(DataProvider.GetFolderMapping(folderMappingID));
         }
 
@@ -160,7 +180,10 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         public List<FolderMappingInfo> GetFolderMappings(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetFolderMappings(portalId={PortalId})", portalId);
             var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.FolderMappingCacheKey, portalId);
+			Logger.LogDebug("GetFolderMappings(portalId={PortalId}): cacheKey → {CacheKey}", portalId, cacheKey);
+			Logger.LogDebug("<<< Exiting GetFolderMappings(portalId={PortalId})", portalId);
             return CBO.GetCachedObject<List<FolderMappingInfo>>(
                 this.hostSettings,
                 new CacheItemArgs(cacheKey, DataCache.FolderMappingCacheTimeOut, DataCache.FolderMappingCachePriority),
@@ -171,19 +194,24 @@ namespace DotNetNuke.Services.FileSystem
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void AddDefaultFolderTypes(int portalID)
         {
+			Logger.LogDebug(">>> Entering AddDefaultFolderTypes(portalID={PortalID})", portalID);
             DataProvider.AddDefaultFolderTypes(portalID);
+			Logger.LogDebug("<<< Exiting AddDefaultFolderTypes(portalID={PortalID})", portalID);
         }
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public Hashtable GetFolderMappingSettings(int folderMappingID)
         {
+			Logger.LogDebug(">>> Entering GetFolderMappingSettings(folderMappingID=<redacted>)");
             var strCacheKey = CacheKeyPrefix + folderMappingID;
             var objSettings = (Hashtable)DataCache.GetCache(strCacheKey);
+			Logger.LogDebug("GetFolderMappingSettings(folderMappingID=<redacted>): objSettings → {ObjSettings}", objSettings);
             if (objSettings == null)
             {
                 objSettings = new Hashtable();
                 IDataReader dr = null;
+				Logger.LogDebug("GetFolderMappingSettings(folderMappingID=<redacted>): dr → {Dr}", dr);
                 try
                 {
                     dr = DataProvider.GetFolderMappingSettings(folderMappingID);
@@ -201,6 +229,7 @@ namespace DotNetNuke.Services.FileSystem
                 }
                 catch (Exception ex)
                 {
+					Logger.LogError("Exception in GetFolderMappingSettings(folderMappingID=<redacted>): {Arg1}", ex.getMessage());
                     Exceptions.Exceptions.LogException(ex);
                 }
                 finally
@@ -209,26 +238,32 @@ namespace DotNetNuke.Services.FileSystem
                 }
 
                 var intCacheTimeout = 20 * (int)Host.PerformanceSetting;
+				Logger.LogDebug("GetFolderMappingSettings(folderMappingID=<redacted>): intCacheTimeout → {IntCacheTimeout}", intCacheTimeout);
                 DataCache.SetCache(strCacheKey, objSettings, TimeSpan.FromMinutes(intCacheTimeout));
             }
 
+			Logger.LogDebug("<<< Exiting GetFolderMappingSettings(folderMappingID=<redacted>)");
             return objSettings;
         }
 
         private static void UpdateFolderMappingSettings(FolderMappingInfo objFolderMapping)
         {
+			Logger.LogDebug(">>> Entering UpdateFolderMappingSettings(objFolderMapping=<redacted>)");
             foreach (string sKey in objFolderMapping.FolderMappingSettings.Keys)
             {
                 UpdateFolderMappingSetting(objFolderMapping.FolderMappingID, sKey, Convert.ToString(objFolderMapping.FolderMappingSettings[sKey], CultureInfo.InvariantCulture));
             }
 
             ClearFolderMappingSettingsCache(objFolderMapping.FolderMappingID);
+			Logger.LogDebug("<<< Exiting UpdateFolderMappingSettings(objFolderMapping=<redacted>)");
         }
 
         private static void UpdateFolderMappingSetting(int folderMappingId, string settingName, string settingValue)
         {
+			Logger.LogDebug(">>> Entering UpdateFolderMappingSetting(folderMappingId=<redacted>,settingName={SettingName},settingValue={SettingValue})", settingName, settingValue);
             IDataReader dr = null;
             try
+			Logger.LogDebug("UpdateFolderMappingSetting(folderMappingId=<redacted>,settingName={SettingName},settingValue={SettingValue}): dr → {Dr}", settingName, settingValue, dr);
             {
                 dr = DataProvider.GetFolderMappingSetting(folderMappingId, settingName);
                 if (dr.Read())
@@ -242,6 +277,7 @@ namespace DotNetNuke.Services.FileSystem
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in UpdateFolderMappingSetting(folderMappingId=<redacted>,settingName={SettingName},settingValue={SettingValue}): {Arg3}", settingName, settingValue, ex.getMessage());
                 Exceptions.Exceptions.LogException(ex);
             }
             finally
@@ -249,17 +285,23 @@ namespace DotNetNuke.Services.FileSystem
                 // Ensure DataReader is closed
                 CBO.CloseDataReader(dr, true);
             }
+			Logger.LogDebug("<<< Exiting UpdateFolderMappingSetting(folderMappingId=<redacted>,settingName={SettingName},settingValue={SettingValue})", settingName, settingValue);
         }
 
         private static void ClearFolderMappingCache(int portalId)
         {
+			Logger.LogDebug(">>> Entering ClearFolderMappingCache(portalId={PortalId})", portalId);
             var cacheKey = string.Format(CultureInfo.InvariantCulture, DataCache.FolderMappingCacheKey, portalId);
             DataCache.RemoveCache(cacheKey);
+			Logger.LogDebug("ClearFolderMappingCache(portalId={PortalId}): cacheKey → {CacheKey}", portalId, cacheKey);
+			Logger.LogDebug("<<< Exiting ClearFolderMappingCache(portalId={PortalId})", portalId);
         }
 
         private static void ClearFolderMappingSettingsCache(int folderMappingID)
         {
+			Logger.LogDebug(">>> Entering ClearFolderMappingSettingsCache(folderMappingID=<redacted>)");
             DataCache.RemoveCache(CacheKeyPrefix + folderMappingID);
+			Logger.LogDebug("<<< Exiting ClearFolderMappingSettingsCache(folderMappingID=<redacted>)");
         }
     }
 }

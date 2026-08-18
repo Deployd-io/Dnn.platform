@@ -15,6 +15,7 @@ namespace DotNetNuke.Entities.Users
     [Serializable]
     public class RelationshipType : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RelationshipType));
         private int relationshipTypeId = -1;
 
         /// <summary>Gets or sets relationshipId - The primary key.</summary>
@@ -64,6 +65,7 @@ namespace DotNetNuke.Entities.Users
         /// <param name="dr">the data reader.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.RelationshipTypeId = Convert.ToInt32(dr["RelationshipTypeID"], CultureInfo.InvariantCulture);
             this.Name = dr["Name"].ToString();
             this.Description = dr["Description"].ToString();
@@ -71,6 +73,7 @@ namespace DotNetNuke.Entities.Users
 
             // add audit column data
             this.FillInternal(dr);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

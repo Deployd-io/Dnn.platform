@@ -7,22 +7,28 @@ Imports System.Collections.Generic
 Imports System.Diagnostics
 Imports System.Web.UI
 Imports System.Web.UI.WebControls
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.WebControls
     Friend NotInheritable Class DNNTreeWriter
         Inherits WebControl
         Implements IDNNTreeWriter
+		Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
         ' Methods
         Public Sub New()
+			_logger.LogDebug(">>> Entering New()")
             DNNTreeWriter.__ENCAddToList(Me)
+			_logger.LogDebug("<<< Exiting New()")
         End Sub
 
         <DebuggerNonUserCode> _
         Private Shared Sub __ENCAddToList(ByVal value As Object)
+			_logger.LogDebug(">>> Entering __ENCAddToList(value={Value})", value)
             SyncLock DNNTreeWriter.__ENCList
                 If (DNNTreeWriter.__ENCList.Count = DNNTreeWriter.__ENCList.Capacity) Then
                     Dim index As Integer = 0
                     Dim num3 As Integer = (DNNTreeWriter.__ENCList.Count - 1)
+					_logger.LogDebug("__ENCAddToList(value={Value}): num3 → {Num3}", value, num3)
                     Dim num2 As Integer = 0
                     Do While True
                         Dim num4 As Integer = num3
@@ -32,6 +38,7 @@ Namespace DotNetNuke.UI.WebControls
                             Exit Do
                         End If
                         Dim reference As WeakReference = DNNTreeWriter.__ENCList(num2)
+						_logger.LogDebug("__ENCAddToList(value={Value}): reference → {Reference}", value, reference)
                         If reference.IsAlive Then
                             If (num2 <> index) Then
                                 DNNTreeWriter.__ENCList(index) = DNNTreeWriter.__ENCList(num2)
@@ -43,16 +50,21 @@ Namespace DotNetNuke.UI.WebControls
                 End If
                 DNNTreeWriter.__ENCList.Add(New WeakReference(value))
             End SyncLock
+			_logger.LogDebug("<<< Exiting __ENCAddToList(value={Value})", value)
         End Sub
 
         Protected Function MarshalledProperties() As Hashtable Implements IDNNTreeWriter.MarshalledProperties
+			_logger.LogDebug(">>> Entering MarshalledProperties()")
+			_logger.LogDebug("<<< Exiting MarshalledProperties()")
             Return New Hashtable
         End Function
 
         Protected Overrides Sub RenderChildren(ByVal writer As HtmlTextWriter)
+			_logger.LogDebug(">>> Entering RenderChildren(writer={Writer})", writer)
             Dim enumerator As IEnumerator = Nothing
             Try 
                 enumerator = Me._tree.TreeNodes.GetEnumerator
+				_logger.LogDebug("RenderChildren(writer={Writer}): enumerator → {Enumerator}", writer, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -64,9 +76,11 @@ Namespace DotNetNuke.UI.WebControls
                     TryCast(enumerator,IDisposable).Dispose
                 End If
             End Try
+			_logger.LogDebug("<<< Exiting RenderChildren(writer={Writer})", writer)
         End Sub
 
         Protected Overrides Sub RenderContents(ByVal writer As HtmlTextWriter)
+			_logger.LogDebug(">>> Entering RenderContents(writer={Writer})", writer)
             writer.AddAttribute(HtmlTextWriterAttribute.Width, "100%")
             writer.AddAttribute(HtmlTextWriterAttribute.Class, "DNNTree")
             writer.AddAttribute(HtmlTextWriterAttribute.Name, Me._tree.UniqueID)
@@ -74,11 +88,15 @@ Namespace DotNetNuke.UI.WebControls
             writer.RenderBeginTag(HtmlTextWriterTag.Div)
             Me.RenderChildren(writer)
             writer.RenderEndTag
+			_logger.LogDebug("<<< Exiting RenderContents(writer={Writer})", writer)
         End Sub
 
         Public Sub RenderTree(ByVal writer As HtmlTextWriter, ByVal tree As DnnTree) Implements IDNNTreeWriter.RenderTree
+			_logger.LogDebug(">>> Entering RenderTree(writer={Writer},tree={Tree})", writer, tree)
+			_logger.LogDebug("RenderTree(writer={Writer},tree={Tree}): Me._tree → {Arg2}", writer, tree, Me._tree)
             Me._tree = tree
             Me.RenderControl(writer)
+			_logger.LogDebug("<<< Exiting RenderTree(writer={Writer},tree={Tree})", writer, tree)
         End Sub
 
 

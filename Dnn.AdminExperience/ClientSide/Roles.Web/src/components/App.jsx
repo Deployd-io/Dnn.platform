@@ -5,19 +5,27 @@ import { Button, PersonaBarPageHeader, PersonaBarPage}  from "@dnnsoftware/dnn-r
 import RolesPanel from "./roles";
 import resx from "../resources";
 import util from "utils";
+const logger = console;
 let canEdit = false;
 class Root extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         canEdit = util.settings.isHost || util.settings.isAdmin || util.settings.permissions.EDIT;
         this.rolesPanelref = React.createRef();
+		logger.debug(`constructor(): canEdit → ${canEdit}`);
+		logger.debug('<<< Exiting constructor()');
     }
 
     onCreate() {
+		logger.debug('>>> Entering onCreate()');
         this.rolesPanelref.current.onAddRole();
+		logger.debug('<<< Exiting onCreate()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <div className="roles-app">
                 <PersonaBarPage isOpen={true}>
@@ -41,6 +49,8 @@ Root.propTypes = {
 
 
 function mapStateToProps() {
+	logger.debug('>>> Entering mapStateToProps()');
+	logger.debug('<<< Exiting mapStateToProps()');
     return {};
 }
 

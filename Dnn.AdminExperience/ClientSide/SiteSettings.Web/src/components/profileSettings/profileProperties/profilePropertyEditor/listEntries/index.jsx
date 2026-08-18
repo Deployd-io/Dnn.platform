@@ -10,33 +10,40 @@ import { Collapsible, Sortable, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import "./style.less";
 import util from "utils";
 import resx from "resources";
+const logger = console;
 
 let tableFields = [];
 
 class ListEntriesPanel extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             openId: ""
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const { props } = this;
         if (tableFields.length === 0) {
             tableFields.push({ "name": resx.get("ListEntryText"), "id": "Text" });
             tableFields.push({ "name": resx.get("ListEntryValue"), "id": "Value" });
         }
         props.dispatch(SiteBehaviorActions.getListInfo(props.listName, props.portalId));
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     renderHeader() {
+		logger.debug('>>> Entering renderHeader()');
         let tableHeaders = tableFields.map((field) => {
             let className = "list-items header-" + field.id;
             return <div className={className} key={"header-" + field.id}>
                 <span>{field.name}&nbsp; </span>
             </div>;
         });
+		logger.debug('<<< Exiting renderHeader()');
         return <div className="list-header-row">{tableHeaders}</div>;
     }
 
@@ -89,7 +96,9 @@ class ListEntriesPanel extends Component {
 
      
     renderedListEntries() {
+		logger.debug('>>> Entering renderedListEntries()');
         let i = 0;
+		logger.debug('<<< Exiting renderedListEntries()');
         return this.props.entries.map((item, index) => {
             let id = "row-" + i++;
             return (
@@ -123,6 +132,7 @@ class ListEntriesPanel extends Component {
     }
 
     onSort(items) {
+		logger.debug(`>>> Entering onSort(items=${items})`);
         const { props } = this;
         props.dispatch(SiteBehaviorActions.updateListEntryOrders(
             {
@@ -130,11 +140,14 @@ class ListEntriesPanel extends Component {
                 Entries: items
             }, items, () => {
                 this.collapse();
+				logger.debug(`<<< Exiting onSort(items=${items})`);
             }));
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         let opened = (this.state.openId === "add");
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 <div className="list-items">
@@ -212,6 +225,8 @@ ListEntriesPanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         entries: state.siteBehavior.entries,
         enableSortOrder: state.siteBehavior.enableSortOrder

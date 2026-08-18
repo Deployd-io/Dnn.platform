@@ -31,6 +31,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
     /// </example>
     public class TermController(IDataService dataService, IHostSettings hostSettings) : ITermController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TermController));
         private const CacheItemPriority CachePriority = CacheItemPriority.Normal;
         private const int CacheTimeOut = 20;
         private readonly IDataService dataService = dataService ?? Util.GetDataService();
@@ -41,7 +42,9 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         public TermController()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering TermController()");
         }
+		Logger.LogDebug("<<< Exiting TermController()");
 
         /// <summary>Initializes a new instance of the <see cref="TermController"/> class.</summary>
         /// <param name="dataService">The data service.</param>
@@ -59,6 +62,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         /// <exception cref="System.ArgumentException">term.Name is empty.</exception>
         public int AddTerm(Term term)
         {
+			Logger.LogDebug(">>> Entering AddTerm(term={Term})", term);
             // Argument Contract
             Requires.NotNull("term", term);
             Requires.PropertyNotNegative("term", "VocabularyId", term.VocabularyId);
@@ -78,6 +82,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
             // Clear Cache
             DataCache.RemoveCache(string.Format(CultureInfo.InvariantCulture, DataCache.TermCacheKey, term.VocabularyId));
 
+			Logger.LogDebug("<<< Exiting AddTerm(term={Term})", term);
             return term.TermId;
         }
 
@@ -88,6 +93,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         /// <exception cref="System.ArgumentNullException">content item is null.</exception>
         public void AddTermToContent(Term term, ContentItem contentItem)
         {
+			Logger.LogDebug(">>> Entering AddTermToContent(term={Term},contentItem={ContentItem})", term, contentItem);
             // Argument Contract
             Requires.NotNull("term", term);
             Requires.NotNull("contentItem", contentItem);
@@ -96,6 +102,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
 
             // We have adjusted a content item, remove it from cache
             DataCache.RemoveCache(string.Format(CultureInfo.InvariantCulture, DataCache.ContentItemsCacheKey, contentItem.ContentTypeId));
+			Logger.LogDebug("<<< Exiting AddTermToContent(term={Term},contentItem={ContentItem})", term, contentItem);
         }
 
         /// <summary>Deletes the term.</summary>
@@ -104,6 +111,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         /// <exception cref="System.ArgumentOutOfRangeException">term.TermId is less than 0.</exception>
         public void DeleteTerm(Term term)
         {
+			Logger.LogDebug(">>> Entering DeleteTerm(term={Term})", term);
             // Argument Contract
             Requires.NotNull("term", term);
             Requires.PropertyNotNegative("term", "TermId", term.TermId);
@@ -119,6 +127,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
 
             // Clear Cache
             DataCache.RemoveCache(string.Format(CultureInfo.InvariantCulture, DataCache.TermCacheKey, term.VocabularyId));
+			Logger.LogDebug("<<< Exiting DeleteTerm(term={Term})", term);
         }
 
         /// <summary>Gets the term.</summary>
@@ -127,9 +136,11 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         /// <exception cref="System.ArgumentOutOfRangeException">termId is less than 0.</exception>
         public Term GetTerm(int termId)
         {
+			Logger.LogDebug(">>> Entering GetTerm(termId={TermId})", termId);
             // Argument Contract
             Requires.NotNegative("termId", termId);
 
+			Logger.LogDebug("<<< Exiting GetTerm(termId={TermId})", termId);
             return CBO.FillObject<Term>(this.dataService.GetTerm(termId));
         }
 
@@ -138,8 +149,10 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         /// <returns>A <see cref="TermUsage"/> instance or <see langword="null"/>.</returns>
         public TermUsage GetTermUsage(int termId)
         {
+			Logger.LogDebug(">>> Entering GetTermUsage(termId={TermId})", termId);
             Requires.NotNegative("termId", termId);
 
+			Logger.LogDebug("<<< Exiting GetTermUsage(termId={TermId})", termId);
             return CBO.FillObject<TermUsage>(this.dataService.GetTermUsage(termId));
         }
 
@@ -149,9 +162,11 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         /// <exception cref="System.ArgumentOutOfRangeException">ContentItemId is less than 0.</exception>
         public IQueryable<Term> GetTermsByContent(int contentItemId)
         {
+			Logger.LogDebug(">>> Entering GetTermsByContent(contentItemId={ContentItemId})", contentItemId);
             // Argument Contract
             Requires.NotNegative("contentItemId", contentItemId);
 
+			Logger.LogDebug("<<< Exiting GetTermsByContent(contentItemId={ContentItemId})", contentItemId);
             return CBO.FillQueryable<Term>(this.dataService.GetTermsByContent(contentItemId));
         }
 
@@ -188,6 +203,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
 
             if (vocabulary == null)
             {
+			Logger.LogDebug("<<< Exiting GetTermsByVocabulary(vocabularyName={VocabularyName})", vocabularyName);
                 throw new ArgumentException("Vocabulary does not exist.", nameof(vocabularyName));
             }
 
@@ -199,6 +215,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         /// <exception cref="System.ArgumentNullException">content item is null.</exception>
         public void RemoveTermsFromContent(ContentItem contentItem)
         {
+			Logger.LogDebug(">>> Entering RemoveTermsFromContent(contentItem={ContentItem})", contentItem);
             // Argument Contract
             Requires.NotNull("contentItem", contentItem);
 
@@ -206,6 +223,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
 
             // We have adjusted a content item, remove it from cache
             DataCache.RemoveCache(string.Format(CultureInfo.InvariantCulture, DataCache.ContentItemsCacheKey, contentItem.ContentTypeId));
+			Logger.LogDebug("<<< Exiting RemoveTermsFromContent(contentItem={ContentItem})", contentItem);
         }
 
         /// <summary>Updates the term.</summary>
@@ -216,6 +234,7 @@ namespace DotNetNuke.Entities.Content.Taxonomy
         /// <exception cref="System.ArgumentException">term.Name is empty.</exception>
         public void UpdateTerm(Term term)
         {
+			Logger.LogDebug(">>> Entering UpdateTerm(term={Term})", term);
             // Argument Contract
             Requires.NotNull("term", term);
             Requires.PropertyNotNegative("term", "TermId", term.TermId);
@@ -233,11 +252,15 @@ namespace DotNetNuke.Entities.Content.Taxonomy
 
             // Clear Cache
             DataCache.RemoveCache(string.Format(CultureInfo.InvariantCulture, DataCache.TermCacheKey, term.VocabularyId));
+			Logger.LogDebug("<<< Exiting UpdateTerm(term={Term})", term);
         }
 
         private object GetTermsCallBack(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogDebug(">>> Entering GetTermsCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             var vocabularyId = (int)cacheItemArgs.ParamList[0];
+			Logger.LogDebug("GetTermsCallBack(cacheItemArgs={CacheItemArgs}): vocabularyId → {VocabularyId}", cacheItemArgs, vocabularyId);
+			Logger.LogDebug("<<< Exiting GetTermsCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return CBO.FillQueryable<Term>(this.dataService.GetTermsByVocabulary(vocabularyId)).ToList();
         }
     }

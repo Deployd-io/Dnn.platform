@@ -11,11 +11,13 @@ namespace DotNetNuke.Web.Api
     /// <summary>A web API authorization filter which requires the user to be a site administrator.</summary>
     public class RequireAdminAttribute : AuthorizeAttributeBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RequireAdminAttribute));
         /// <summary>Tests if the request passes the authorization requirements.</summary>
         /// <param name="context">The auth filter context.</param>
         /// <returns>True when authorization is successful.</returns>
         public override bool IsAuthorized(AuthFilterContext context)
         {
+			Logger.LogDebug(">>> Entering IsAuthorized(context={Context})", context);
             var principal = Thread.CurrentPrincipal;
             if (!principal.Identity.IsAuthenticated)
             {
@@ -23,6 +25,8 @@ namespace DotNetNuke.Web.Api
             }
 
             var currentUser = UserController.Instance.GetCurrentUserInfo();
+			Logger.LogDebug("IsAuthorized(context={Context}): currentUser → {CurrentUser}", context, currentUser);
+			Logger.LogDebug("<<< Exiting IsAuthorized(context={Context})", context);
             return currentUser.IsSuperUser || currentUser.IsAdmin;
         }
     }

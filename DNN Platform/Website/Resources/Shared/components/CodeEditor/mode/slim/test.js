@@ -1,9 +1,11 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 // Slim Highlighting for CodeMirror copyright (c) HicknHack Software Gmbh
 
 (function() {
+logger.debug('>>> Entering function()');
   var mode = CodeMirror.getMode({tabSize: 4, indentUnit: 2}, "slim");
   function MT(name) { test.mode(name, mode, Array.prototype.slice.call(arguments, 1)); }
 
@@ -93,4 +95,5 @@
 
   MT("interpolationInHTMLAttribute",
      "[tag div]([attribute title]=[string \"]#{[variable test]}[string _]#{[variable ting]()}[string \"]) Test");
+	logger.debug('<<< Exiting function()');
 })();

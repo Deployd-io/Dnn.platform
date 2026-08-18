@@ -9,6 +9,7 @@ import Localization from "localization";
 import utilities from "utils";
 import itemsToExportService from "../../services/itemsToExportService";
 import styles from "./style.module.less";
+const logger = console;
 
 import {
     InputGroup,
@@ -28,6 +29,7 @@ const keysToValidate = ["ExportName"];
 class ExportModal extends Component {
     constructor(props) {
         super();
+		logger.debug(`>>> Entering constructor(props=${props})`);
 
         this.state = {
             wizardStep: 0,
@@ -58,17 +60,23 @@ class ExportModal extends Component {
         };
 
         this.getInitialPortalTabs = props.getInitialPortalTabs;
+		logger.debug(`constructor(props=${props}): this.getInitialPortalTabs → ${this.getInitialPortalTabs}`);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     getRegisteredItemsToExport() {
+		logger.debug('>>> Entering getRegisteredItemsToExport()');
+		logger.debug('<<< Exiting getRegisteredItemsToExport()');
         return itemsToExportService.getRegisteredItemsToExport()
             .filter(x => x.defaultSelected)
             .map(item => item.category);
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const { props, state } = this;
         const { exportRequest } = state;
+		logger.debug('<<< Exiting componentDidMount()');
         exportRequest.PortalId = props.portalId;
         this.setState({
             exportRequest
@@ -76,12 +84,14 @@ class ExportModal extends Component {
     }
 
     componentDidUpdate() {
+		logger.debug('>>> Entering componentDidUpdate()');
         const { props, state } = this;
         const { exportRequest } = state;
         if (exportRequest.PortalId !== props.portalId) {
             exportRequest.PortalId = props.portalId;
             let reloadPages = true;
             this.setState({ exportRequest, reloadPages }, () => {
+				logger.debug('<<< Exiting componentDidUpdate()');
                 this.setState({
                     reloadPages: false
                 });
@@ -90,17 +100,22 @@ class ExportModal extends Component {
     }
 
     goToStep(wizardStep) {
+		logger.debug(`>>> Entering goToStep(wizardStep=${wizardStep})`);
         const { props } = this;
         props.dispatch(ImportExportActions.navigateWizard(wizardStep));
+		logger.debug(`<<< Exiting goToStep(wizardStep=${wizardStep})`);
     }
 
     cancelExport() {
+		logger.debug('>>> Entering cancelExport()');
         const { props } = this;
         this.goToStep(0);
         props.onCancel();
+		logger.debug('<<< Exiting cancelExport()');
     }
 
     onExport() {
+		logger.debug('>>> Entering onExport()');
         const { props, state } = this;
         if (this.Validate()) {
             this.setState({
@@ -125,6 +140,7 @@ class ExportModal extends Component {
                     requestSubmitting: false
                 });
                 utilities.utilities.notifyError(Localization.get("ExportRequestSubmit.ErrorMessage"));
+				logger.debug('<<< Exiting onExport()');
             }));
         }
     }
@@ -140,6 +156,7 @@ class ExportModal extends Component {
 
     getDescendantPortalTabs(PortalTabsParameters, ParentTabId, callback) {
         this.props.dispatch(ImportExportActions.getDescendantPortalTabs(PortalTabsParameters, ParentTabId, callback));
+		logger.debug(`<<< Exiting getDescendantPortalTabs(PortalTabsParameters=${PortalTabsParameters},ParentTabId=${ParentTabId},callback=${callback})`);
     }
 
     ValidateTexts(key) {
@@ -157,10 +174,12 @@ class ExportModal extends Component {
             }
             this.setState({});
         });
+		logger.debug(`<<< Exiting ValidateTexts(key=${key})`);
         return success;
     }
 
     ValidateHasExportItem() {
+		logger.debug('>>> Entering ValidateHasExportItem()');
         let success;
         const { exportRequest } = this.state;
         if (exportRequest.IncludeContent || exportRequest.IncludeFiles || exportRequest.IncludeUsers || exportRequest.IncludeRoles ||
@@ -172,12 +191,15 @@ class ExportModal extends Component {
         else {
             success = false;
         }
+		logger.debug('<<< Exiting ValidateHasExportItem()');
         return success;
     }
 
     getPortalOptions() {
+		logger.debug('>>> Entering getPortalOptions()');
         const { props } = this;
         let options = [{ label: props.portalName, value: props.portalId }];
+		logger.debug('<<< Exiting getPortalOptions()');
         return options;
     }
 
@@ -193,12 +215,14 @@ class ExportModal extends Component {
     }
 
     onChangeItemsToExport(name) {
+		logger.debug(`>>> Entering onChangeItemsToExport(name=${name})`);
         const { exportRequest } = this.state;
         const index = exportRequest.ItemsToExport.indexOf(name);
         if (index !== -1) {
             exportRequest.ItemsToExport.splice(index, 1);
         } else {
             exportRequest.ItemsToExport.push(name);
+			logger.debug(`<<< Exiting onChangeItemsToExport(name=${name})`);
         }
         this.setState({
             exportRequest
@@ -207,10 +231,13 @@ class ExportModal extends Component {
 
 
     updatePagesToExport(selectedPages) {
+		logger.debug(`>>> Entering updatePagesToExport(selectedPages=${selectedPages})`);
         let { exportRequest } = this.state;
         let prevCount = (exportRequest.pages !== null && exportRequest.pages !== undefined) ? exportRequest.pages.length : 0;
+		logger.debug(`updatePagesToExport(selectedPages=${selectedPages}): prevCount → ${prevCount}`);
         exportRequest.pages = selectedPages;
         if (prevCount === 0) {
+			logger.debug(`updatePagesToExport(selectedPages=${selectedPages}): exportRequest.pages → ${exportRequest.pages}`);
             exportRequest["IncludeContent"] = !(selectedPages === undefined || selectedPages.length <= 0);
         }
         this.setState({ exportRequest }, () => {
@@ -220,17 +247,21 @@ class ExportModal extends Component {
             state.IncludeContentEnabled = !(selectedPages === undefined || selectedPages.length <= 0);
             this.setState({ state });
         });
+		logger.debug(`<<< Exiting updatePagesToExport(selectedPages=${selectedPages})`);
     }
 
     getExportModeOptions() {
+		logger.debug('>>> Entering getExportModeOptions()');
         let options = [
             { label: Localization.get("ExportModeDifferential"), value: "Differential" },
             { label: Localization.get("ExportModeComplete"), value: "Full" }
         ];
+		logger.debug('<<< Exiting getExportModeOptions()');
         return options;
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { state, props } = this;
         const PortalTabsParameters = {
             portalId: props.portalId,
@@ -243,6 +274,7 @@ class ExportModal extends Component {
             includeDisabled: true
         };
         const registeredItemsToExport = itemsToExportService.getRegisteredItemsToExport();
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.exportModal}>
                 <div className="pageTitle">{Localization.get("ExportSettings")}</div>
@@ -506,6 +538,8 @@ ExportModal.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         wizardStep: state.importExport.exportWizardStep,
         exportLogs: state.importExport.exportLogs,

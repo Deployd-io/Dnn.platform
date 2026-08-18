@@ -1,6 +1,7 @@
 import { Component, Host, h, Prop } from '@stencil/core';
 import { Item } from '../../../services/ItemsClient';
 import state from "../../../store/store";
+const logger = console;
 
 @Component({
   tag: 'dnn-action-copy-url',
@@ -13,6 +14,7 @@ export class DnnActionCopyUrl {
   @Prop() items!: Item[];
 
   private async handleClick() {
+	logger.debug('>>> Entering handleClick()');
     let t: string;
     if (this.items[0].path.includes(":")) {
       t = this.items[0].path;
@@ -20,9 +22,13 @@ export class DnnActionCopyUrl {
       t = `${window.location.protocol}//${window.location.host}${this.items[0].path}`;
     }   
     await navigator.clipboard.writeText(t);
+	logger.debug(`handleClick(): t → ${t}`);
+	logger.debug('<<< Exiting handleClick()');
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         <button onClick={() => void this.handleClick()}>

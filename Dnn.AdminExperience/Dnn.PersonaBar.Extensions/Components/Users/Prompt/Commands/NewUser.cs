@@ -77,11 +77,13 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             {
                 this.AddMessage(this.LocalizeString("Email.RegExError"));
             }
+			eventLogger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogDebug(">>> Entering Run()");
             var settings = new RegisterationDetails
             {
                 PortalSettings = this.PortalSettings,
@@ -98,6 +100,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             try
             {
                 var userInfo = RegisterController.Instance.Register(settings);
+				eventLogger.LogDebug("Run(): userInfo → {UserInfo}", userInfo);
                 var lstResult = new List<UserModel>
                 {
                     new UserModel(UserController.Instance.GetUser(this.PortalId, userInfo.UserId)),
@@ -106,6 +109,8 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             }
             catch (Exception ex)
             {
+				eventLogger.LogError("Exception in Run(): {Arg0}", ex.getMessage());
+				eventLogger.LogDebug("<<< Exiting Run()");
                 return new ConsoleErrorResultModel(ex.Message);
             }
         }

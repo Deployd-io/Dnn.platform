@@ -17,6 +17,7 @@ namespace DotNetNuke.Entities.Urls
     /// <summary>The UrlAction class keeps state of the current Request throughout the rewriting process.</summary>
     public class UrlAction
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UrlAction));
         private List<string> licensedProviders;
         private PortalAliasInfo portalAlias;
 
@@ -26,22 +27,29 @@ namespace DotNetNuke.Entities.Urls
         /// <param name="request">An HTTP request.</param>
         public UrlAction(HttpRequest request)
         {
+			Logger.LogDebug(">>> Entering UrlAction(request={Request})", request);
             this.BrowserType = BrowserTypes.Normal;
             this.CanRewrite = StateBoolean.NotSet;
+			Logger.LogDebug("UrlAction(request={Request}): this.BrowserType → {Arg1}", request, this.BrowserType);
+			Logger.LogDebug("UrlAction(request={Request}): this.CanRewrite → {Arg1}", request, this.CanRewrite);
             this.Action = ActionType.Continue;
             string physicalPath = string.Empty;
+			Logger.LogDebug("UrlAction(request={Request}): physicalPath → {PhysicalPath}", request, physicalPath);
             try
             {
                 physicalPath = request.PhysicalPath;
             }
             catch (PathTooLongException)
             {
+				Logger.LogError("Exception in UrlAction(request={Request}): {Arg1}", request, PathTooLongException.getMessage());
                 // don't handle exception, but put something into the physical path
                 physicalPath = request.ApplicationPath; // will be no file for this location
                 this.VirtualPath = StateBoolean.True;
+				Logger.LogDebug("UrlAction(request={Request}): this.VirtualPath → {Arg1}", request, this.VirtualPath);
             }
             catch (ArgumentException)
             {
+				Logger.LogError("Exception in UrlAction(request={Request}): {Arg1}", request, ArgumentException.getMessage());
                 // don't handle exception, but put something into the physical path
                 physicalPath = request.ApplicationPath; // will be no file for this location
                 this.VirtualPath = StateBoolean.True;
@@ -50,6 +58,7 @@ namespace DotNetNuke.Entities.Urls
             {
                 this.Constructor(request.Url.Scheme, request.ApplicationPath, physicalPath);
             }
+			Logger.LogDebug("<<< Exiting UrlAction(request={Request})", request);
         }
 
         /// <summary>Initializes a new instance of the <see cref="UrlAction"/> class.</summary>
@@ -177,6 +186,7 @@ namespace DotNetNuke.Entities.Urls
         /// <param name="newAction">The new action type.</param>
         public void SetActionWithNoDowngrade(ActionType newAction)
         {
+			Logger.LogDebug(">>> Entering SetActionWithNoDowngrade(newAction={NewAction})", newAction);
             switch (newAction)
             {
                 case ActionType.CheckFor301:
@@ -186,6 +196,7 @@ namespace DotNetNuke.Entities.Urls
                         && this.Action != ActionType.Output404)
                     {
                         this.Action = newAction;
+						Logger.LogDebug("SetActionWithNoDowngrade(newAction={NewAction}): this.Action → {Arg1}", newAction, this.Action);
                     }
 
                     break;
@@ -193,13 +204,16 @@ namespace DotNetNuke.Entities.Urls
                     this.Action = newAction;
                     break;
             }
+			Logger.LogDebug("<<< Exiting SetActionWithNoDowngrade(newAction={NewAction})", newAction);
         }
 
         public void AddLicensedProviders(List<string> licensedProviders)
         {
+			Logger.LogDebug(">>> Entering AddLicensedProviders(licensedProviders={LicensedProviders})", licensedProviders);
             if (this.licensedProviders == null)
             {
                 this.licensedProviders = new List<string>();
+				Logger.LogDebug("AddLicensedProviders(licensedProviders={LicensedProviders}): licensedProviders → {LicensedProviders1}", licensedProviders, licensedProviders);
             }
 
             foreach (string lp in licensedProviders)
@@ -209,25 +223,31 @@ namespace DotNetNuke.Entities.Urls
                     this.licensedProviders.Add(lp.ToLowerInvariant());
                 }
             }
+			Logger.LogDebug("<<< Exiting AddLicensedProviders(licensedProviders={LicensedProviders})", licensedProviders);
         }
 
         public void AddLicensedProvider(string providerName)
         {
+			Logger.LogDebug(">>> Entering AddLicensedProvider(providerName={ProviderName})", providerName);
             if (this.licensedProviders == null)
             {
                 this.licensedProviders = new List<string>();
+				Logger.LogDebug("AddLicensedProvider(providerName={ProviderName}): licensedProviders → {LicensedProviders}", providerName, licensedProviders);
             }
 
             if (this.licensedProviders.Contains(providerName.ToLowerInvariant()) == false)
             {
                 this.licensedProviders.Add(providerName.ToLowerInvariant());
             }
+			Logger.LogDebug("<<< Exiting AddLicensedProvider(providerName={ProviderName})", providerName);
         }
 
         public bool IsProviderLicensed(string providerName)
         {
+			Logger.LogDebug(">>> Entering IsProviderLicensed(providerName={ProviderName})", providerName);
             if (this.licensedProviders == null)
             {
+			Logger.LogDebug("<<< Exiting IsProviderLicensed(providerName={ProviderName})", providerName);
                 return false;
             }
 
@@ -239,46 +259,58 @@ namespace DotNetNuke.Entities.Urls
         /// <param name="settings">The URL settings.</param>
         public void SetOriginalPath(string path, FriendlyUrlSettings settings)
         {
+			Logger.LogDebug(">>> Entering SetOriginalPath(path={Path},settings={Settings})", path, settings);
             this.OriginalPath = path;
             this.OriginalPathNoAlias = path;
+			Logger.LogDebug("SetOriginalPath(path={Path},settings={Settings}): this.OriginalPath → {Arg2}", path, settings, this.OriginalPath);
+			Logger.LogDebug("SetOriginalPath(path={Path},settings={Settings}): this.OriginalPathNoAlias → {Arg2}", path, settings, this.OriginalPathNoAlias);
             if (!string.IsNullOrEmpty(this.HttpAlias) && path.Contains(this.HttpAlias))
             {
                 this.OriginalPathNoAlias = path.Substring(path.IndexOf(this.HttpAlias, StringComparison.Ordinal) + this.HttpAlias.Length);
             }
+			Logger.LogDebug("<<< Exiting SetOriginalPath(path={Path},settings={Settings})", path, settings);
         }
 
         public void SetBrowserType(HttpRequest request, HttpResponse response, FriendlyUrlSettings settings)
         {
+			Logger.LogDebug(">>> Entering SetBrowserType(request={Request},response={Response},settings={Settings})", request, response, settings);
             // set the mobile browser type
             if (request != null && response != null && settings != null)
             {
                 this.BrowserType = FriendlyUrlController.GetBrowserType(request, response, settings);
             }
+			Logger.LogDebug("<<< Exiting SetBrowserType(request={Request},response={Response},settings={Settings})", request, response, settings);
         }
 
         public void SetRedirectAllowed(string path, FriendlyUrlSettings settings)
         {
+			Logger.LogDebug(">>> Entering SetRedirectAllowed(path={Path},settings={Settings})", path, settings);
             try
             {
                 if (!string.IsNullOrEmpty(settings.DoNotRedirectRegex))
                 {
                     // if a regex match, redirect Not allowed
                     var doNotRedirectRegex = RegexUtils.GetCachedRegex(settings.DoNotRedirectRegex, RegexOptions.IgnoreCase);
+					Logger.LogDebug("SetRedirectAllowed(path={Path},settings={Settings}): doNotRedirectRegex → {DoNotRedirectRegex}", path, settings, doNotRedirectRegex);
                     this.RedirectAllowed = !doNotRedirectRegex.IsMatch(path);
                 }
                 else
                 {
                     this.RedirectAllowed = true;
                 }
+				Logger.LogDebug("SetRedirectAllowed(path={Path},settings={Settings}): this.RedirectAllowed → {Arg2}", path, settings, this.RedirectAllowed);
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in SetRedirectAllowed(path={Path},settings={Settings}): {Arg2}", path, settings, ex.getMessage());
                 this.RedirectAllowed = true; // default : true, unless regex allows it.  So if regex causes an exception
 
                 // then we should allow the redirect
                 UrlRewriterUtils.LogExceptionInRequest(ex, "Not Set", this);
                 this.Ex = ex;
+				Logger.LogDebug("SetRedirectAllowed(path={Path},settings={Settings}): this.Ex → {Arg2}", path, settings, this.Ex);
             }
+			Logger.LogDebug("<<< Exiting SetRedirectAllowed(path={Path},settings={Settings})", path, settings);
         }
 
         private void Constructor(string scheme, string applicationPath, string physicalPath)
@@ -306,6 +338,7 @@ namespace DotNetNuke.Entities.Urls
             this.IsSSLOffloaded = false;
             this.DebugMessages = new List<string>();
             this.CultureCode = null;
+			Logger.LogDebug("<<< Exiting Constructor(scheme={Scheme},applicationPath={ApplicationPath},physicalPath={PhysicalPath})", scheme, applicationPath, physicalPath);
         }
     }
 }

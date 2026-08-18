@@ -1,15 +1,20 @@
+const logger = console;
 'use strict';
 define(['jquery', 'main/config'], function ($, cf) {
+	logger.debug('>>> Entering define()');
     var config = cf.init();
+	logger.debug('<<< Exiting define()');
     var loadImage = function(wrapper, path, alt) {
         wrapper.append($('<img />').attr({
             'src': path,
             'alt': alt
         }));
+		logger.debug(`<<< Exiting loadImage(wrapper=${wrapper},path=${path},alt=${alt})`);
     }
 
     var loadSvg = function (wrapper, path, alt, iconId) {
         $.get(path, {}, function (data) {
+			logger.debug('>>> Entering get()');
             wrapper.html(function () {
                 /* Add a <title> element to the SVG, and an aria-labelledby attribute to help assistive technology */
                 var titleId = iconId + '_title';
@@ -32,6 +37,7 @@ define(['jquery', 'main/config'], function ($, cf) {
             });
 
         }, 'text');
+		logger.debug(`<<< Exiting loadSvg(wrapper=${wrapper},path=${path},alt=${alt},iconId=${iconId})`);
     }
 
     var loadIcons = function() {

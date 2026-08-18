@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -6,6 +7,7 @@
 // highlights keywords, strings, comments (no leveling supported! ("[==[")), tokens, basic indenting
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -15,13 +17,20 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("lua", function(config, parserConfig) {
+logger.debug('>>> Entering defineMode()');
   var indentUnit = config.indentUnit;
+logger.debug('<<< Exiting defineMode()');
 
   function prefixRE(words) {
+	logger.debug(`>>> Entering prefixRE(words=${words})`);
+	logger.debug(`<<< Exiting prefixRE(words=${words})`);
     return new RegExp("^(?:" + words.join("|") + ")", "i");
   }
   function wordRE(words) {
+	logger.debug(`>>> Entering wordRE(words=${words})`);
+	logger.debug(`<<< Exiting wordRE(words=${words})`);
     return new RegExp("^(?:" + words.join("|") + ")$", "i");
   }
   var specials = wordRE(parserConfig.specials || []);
@@ -68,15 +77,19 @@ CodeMirror.defineMode("lua", function(config, parserConfig) {
   var dedentPartial = prefixRE(["end", "until", "\\)", "}", "else", "elseif"]);
 
   function readBracket(stream) {
+	logger.debug(`>>> Entering readBracket(stream=${stream})`);
     var level = 0;
     while (stream.eat("=")) ++level;
     stream.eat("[");
+	logger.debug(`<<< Exiting readBracket(stream=${stream})`);
     return level;
   }
 
   function normal(stream, state) {
+	logger.debug(`>>> Entering normal(stream=${stream},state=${state})`);
     var ch = stream.next();
     if (ch == "-" && stream.eat("-")) {
+	logger.debug(`normal(stream=${stream},state=${state}): ch → ${ch}`);
       if (stream.eat("[") && stream.eat("["))
         return (state.cur = bracketed(readBracket(stream), "comment"))(stream, state);
       stream.skipToEnd();
@@ -92,6 +105,7 @@ CodeMirror.defineMode("lua", function(config, parserConfig) {
     }
     if (/[\w_]/.test(ch)) {
       stream.eatWhile(/[\w\\\-_.]/);
+	logger.debug(`<<< Exiting normal(stream=${stream},state=${state})`);
       return "variable";
     }
     return null;
@@ -111,6 +125,7 @@ CodeMirror.defineMode("lua", function(config, parserConfig) {
   }
 
   function string(quote) {
+	logger.debug(`>>> Entering string(quote=${quote})`);
     return function(stream, state) {
       var escaped = false, ch;
       while ((ch = stream.next()) != null) {
@@ -118,19 +133,25 @@ CodeMirror.defineMode("lua", function(config, parserConfig) {
         escaped = !escaped && ch == "\\";
       }
       if (!escaped) state.cur = normal;
+	logger.debug(`<<< Exiting string(quote=${quote})`);
       return "string";
     };
   }
 
   return {
     startState: function(basecol) {
+	logger.debug(`>>> Entering startState(basecol=${basecol})`);
+	logger.debug(`<<< Exiting startState(basecol=${basecol})`);
       return {basecol: basecol || 0, indentDepth: 0, cur: normal};
     },
 
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       if (stream.eatSpace()) return null;
       var style = state.cur(stream, state);
+	logger.debug(`token(stream=${stream},state=${state}): style → ${style}`);
       var word = stream.current();
+	logger.debug(`token(stream=${stream},state=${state}): word → ${word}`);
       if (style == "variable") {
         if (keywords.test(word)) style = "keyword";
         else if (builtins.test(word)) style = "builtin";
@@ -139,12 +160,16 @@ CodeMirror.defineMode("lua", function(config, parserConfig) {
       if ((style != "comment") && (style != "string")){
         if (indentTokens.test(word)) ++state.indentDepth;
         else if (dedentTokens.test(word)) --state.indentDepth;
+		logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
       }
       return style;
     },
 
     indent: function(state, textAfter) {
+	logger.debug(`>>> Entering indent(state=${state},textAfter=${textAfter})`);
       var closing = dedentPartial.test(textAfter);
+	logger.debug(`indent(state=${state},textAfter=${textAfter}): closing → ${closing}`);
+	logger.debug(`<<< Exiting indent(state=${state},textAfter=${textAfter})`);
       return state.basecol + indentUnit * (state.indentDepth - (closing ? 1 : 0));
     },
 

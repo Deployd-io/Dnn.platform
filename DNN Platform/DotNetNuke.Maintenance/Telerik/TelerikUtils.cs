@@ -42,9 +42,14 @@ namespace DotNetNuke.Maintenance.Telerik
             IApplicationStatusInfo applicationStatusInfo,
             ILoggerSource loggerSource)
         {
+			log.LogDebug(">>> Entering TelerikUtils(applicationStatusInfo={ApplicationStatusInfo},loggerSource={LoggerSource})", applicationStatusInfo, loggerSource);
             this.applicationStatusInfo = applicationStatusInfo
                 ?? throw new ArgumentNullException(nameof(applicationStatusInfo));
+				log.LogDebug("TelerikUtils(applicationStatusInfo={ApplicationStatusInfo},loggerSource={LoggerSource}): this.applicationStatusInfo → {Arg2}", applicationStatusInfo, loggerSource, this.applicationStatusInfo);
+				log.LogDebug("TelerikUtils(applicationStatusInfo={ApplicationStatusInfo},loggerSource={LoggerSource}): applicationStatusInfo → {ApplicationStatusInfo1}", applicationStatusInfo, loggerSource, applicationStatusInfo);
             this.log = loggerSource.GetLogger(nameof(TelerikUtils));
+			log.LogDebug("TelerikUtils(applicationStatusInfo={ApplicationStatusInfo},loggerSource={LoggerSource}): log → {Log}", applicationStatusInfo, loggerSource, log);
+			log.LogDebug("<<< Exiting TelerikUtils(applicationStatusInfo={ApplicationStatusInfo},loggerSource={LoggerSource})", applicationStatusInfo, loggerSource);
         }
 
         /// <inheritdoc />
@@ -53,10 +58,13 @@ namespace DotNetNuke.Maintenance.Telerik
         /// <inheritdoc />
         public IEnumerable<string> GetAssembliesThatDependOnTelerik()
         {
+			log.LogDebug(">>> Entering GetAssembliesThatDependOnTelerik()");
             // use a temp AppDomain to avoid locking files in the bin folder
             var domain = AppDomain.CreateDomain(nameof(TelerikUtils));
+			log.LogDebug("GetAssembliesThatDependOnTelerik(): domain → {Domain}", domain);
             try
             {
+				log.LogDebug("<<< Exiting GetAssembliesThatDependOnTelerik()");
                 return DirectoryGetFiles(this.BinPath, "*.dll", SearchOption.AllDirectories)
                     .Where(IsNotWellKnownAssembly)
                     .Where(path => this.AssemblyDependsOnTelerik(path, domain))
@@ -71,16 +79,22 @@ namespace DotNetNuke.Maintenance.Telerik
         /// <inheritdoc />
         public bool TelerikIsInstalled()
         {
+			log.LogDebug(">>> Entering TelerikIsInstalled()");
+			log.LogDebug("<<< Exiting TelerikIsInstalled()");
             return FileExists(Path.Combine(this.BinPath, TelerikWebUIFileName));
         }
 
         /// <inheritdoc />
         public Version GetTelerikVersion()
         {
+			log.LogDebug(">>> Entering GetTelerikVersion()");
             var domain = AppDomain.CreateDomain(nameof(TelerikUtils));
             try
+			log.LogDebug("GetTelerikVersion(): domain → {Domain}", domain);
             {
                 var path = Path.Combine(this.BinPath, TelerikWebUIFileName);
+				log.LogDebug("GetTelerikVersion(): path → {Path}", path);
+				log.LogDebug("<<< Exiting GetTelerikVersion()");
                 return domain.Load(File.ReadAllBytes(path)).GetName().Version;
             }
             catch (Exception ex)
@@ -96,6 +110,8 @@ namespace DotNetNuke.Maintenance.Telerik
         /// <inheritdoc />
         public bool IsTelerikVersionVulnerable(Version version)
         {
+			log.LogDebug(">>> Entering IsTelerikVersionVulnerable(version={Version})", version);
+			log.LogDebug("<<< Exiting IsTelerikVersionVulnerable(version={Version})", version);
             return version < new Version(2014, 0);
         }
 

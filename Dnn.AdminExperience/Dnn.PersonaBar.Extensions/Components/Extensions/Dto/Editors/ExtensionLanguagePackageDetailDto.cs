@@ -11,6 +11,8 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
     {
         public ExtensionLanguagePackageDetailDto()
         {
+		eventLogger.LogDebug(">>> Entering ExtensionLanguagePackageDetailDto()");
+		eventLogger.LogDebug("<<< Exiting ExtensionLanguagePackageDetailDto()");
         }
 
         public ExtensionLanguagePackageDetailDto(int portalId, PackageInfo package)

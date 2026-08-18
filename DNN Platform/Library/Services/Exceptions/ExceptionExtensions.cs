@@ -12,14 +12,17 @@ namespace DotNetNuke.Services.Exceptions
 
     public static class ExceptionExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ExceptionExtensions));
         public static string Hash(this Exception exc)
         {
+			Logger.LogDebug(">>> Entering Hash(exc={Exc})", exc);
             if (exc == null)
             {
                 return string.Empty;
             }
 
             var sb = new StringBuilder();
+			Logger.LogDebug("Hash(exc={Exc}): sb → {Sb}", exc, sb);
 
             AddException(sb, exc);
 
@@ -28,6 +31,7 @@ namespace DotNetNuke.Services.Exceptions
                 AddException(sb, exc.InnerException);
             }
 
+			Logger.LogDebug("<<< Exiting Hash(exc={Exc})", exc);
             return sb.ToString().ToUpperInvariant().GenerateSha256Hash();
         }
 
@@ -42,6 +46,7 @@ namespace DotNetNuke.Services.Exceptions
             {
                 sb.AppendLine(ex.StackTrace);
             }
+			Logger.LogDebug("<<< Exiting AddException(sb={Sb},ex={Ex})", sb, ex);
         }
     }
 }

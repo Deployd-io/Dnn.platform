@@ -1,3 +1,4 @@
+const logger = console;
 import { Component, Host, h, Prop, Element } from '@stencil/core';
 
 @Component({
@@ -14,21 +15,29 @@ export class DnnRmProgressBar {
   @Prop() max: number = 100;
 
   componentDidLoad() {
+	logger.debug('>>> Entering componentDidLoad()');
     this.adjustProgress();
+	logger.debug('<<< Exiting componentDidLoad()');
   }
 
   componentDidUpdate() {
+	logger.debug('>>> Entering componentDidUpdate()');
     this.adjustProgress();
+	logger.debug('<<< Exiting componentDidUpdate()');
   }
 
   private adjustProgress() {
+	logger.debug('>>> Entering adjustProgress()');
     this.el.style.setProperty('--current-value', this.value.toString());
     this.el.style.setProperty('--max-value', this.max.toString());
+	logger.debug('<<< Exiting adjustProgress()');
   }
 
   @Element() el: HTMLDnnRmProgressBarElement;
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         <div class="progress-container">

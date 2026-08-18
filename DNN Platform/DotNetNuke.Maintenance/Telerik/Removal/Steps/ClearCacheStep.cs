@@ -9,10 +9,12 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
     using DotNetNuke.Instrumentation;
     using DotNetNuke.Maintenance.Shims;
     using DotNetNuke.Maintenance.Telerik.Removal;
+	using Microsoft.Extensions.Logging;
 
     /// <inheritdoc cref="IClearCacheStep" />
     internal sealed class ClearCacheStep : StepBase, IClearCacheStep
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private readonly IDataCache dataCache;
 
         /// <summary>Initializes a new instance of the <see cref="ClearCacheStep"/> class.</summary>
@@ -22,10 +24,16 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         public ClearCacheStep(ILoggerSource loggerSource, ILocalizer localizer, IDataCache dataCache)
             : base(loggerSource, localizer)
         {
+			_logger.LogDebug(">>> Entering ClearCacheStep(loggerSource={LoggerSource},localizer={Localizer},dataCache={DataCache})", loggerSource, localizer, dataCache);
             this.dataCache = dataCache ??
+				_logger.LogDebug("<<< Exiting ClearCacheStep(loggerSource={LoggerSource},localizer={Localizer},dataCache={DataCache})", loggerSource, localizer, dataCache);
+				_logger.LogDebug("ClearCacheStep(loggerSource={LoggerSource},localizer={Localizer},dataCache={DataCache}): dataCache → {DataCache1}", loggerSource, localizer, dataCache, dataCache);
+				_logger.LogDebug("ClearCacheStep(loggerSource={LoggerSource},localizer={Localizer},dataCache={DataCache}): this.dataCache → {Arg3}", loggerSource, localizer, dataCache, this.dataCache);
+				_logger.LogWarning("Throwing ArgumentNullException from ClearCacheStep(loggerSource={LoggerSource},localizer={Localizer},dataCache={DataCache})", loggerSource, localizer, dataCache);
                 throw new ArgumentNullException(nameof(dataCache));
 
             this.Quiet = true;
+			_logger.LogDebug("ClearCacheStep(loggerSource={LoggerSource},localizer={Localizer},dataCache={DataCache}): this.Quiet → {Arg3}", loggerSource, localizer, dataCache, this.Quiet);
         }
 
         /// <inheritdoc />
@@ -34,8 +42,11 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         /// <inheritdoc />
         protected override void ExecuteInternal()
         {
+			_logger.LogDebug(">>> Entering ExecuteInternal()");
             this.dataCache.ClearCache();
             this.Success = true;
+			_logger.LogDebug("ExecuteInternal(): this.Success → {Arg0}", this.Success);
+			_logger.LogDebug("<<< Exiting ExecuteInternal()");
         }
     }
 }

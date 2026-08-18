@@ -73,6 +73,8 @@ namespace log4net.Layout
         /// <summary>Constructs an XmlLayout</summary>
         public XmlLayout() : base()
         {
+		value.LogDebug(">>> Entering XmlLayout()");
+		value.LogDebug("<<< Exiting XmlLayout()");
         }
 
         /// <summary>Constructs an XmlLayout.</summary>
@@ -163,18 +165,24 @@ namespace log4net.Layout
         /// </remarks>
         public override void ActivateOptions() 
         {
+			value.LogDebug(">>> Entering ActivateOptions()");
             base.ActivateOptions();
 
             // Cache the full element names including the prefix
             if (this.m_prefix != null && this.m_prefix.Length > 0)
             {
                 this.m_elmEvent = this.m_prefix + ":" + ELM_EVENT;
+				value.LogDebug("ActivateOptions(): this.m_elmEvent → {Arg0}", this.m_elmEvent);
                 this.m_elmMessage = this.m_prefix + ":" + ELM_MESSAGE;
                 this.m_elmProperties = this.m_prefix + ":" + ELM_PROPERTIES;
+				value.LogDebug("ActivateOptions(): this.m_elmMessage → {Arg0}", this.m_elmMessage);
+				value.LogDebug("ActivateOptions(): this.m_elmProperties → {Arg0}", this.m_elmProperties);
                 this.m_elmData = this.m_prefix + ":" + ELM_DATA;
                 this.m_elmException = this.m_prefix + ":" + ELM_EXCEPTION;
                 this.m_elmLocation = this.m_prefix + ":" + ELM_LOCATION;
             }
+			value.LogDebug("ActivateOptions(): this.m_elmData → {Arg0}", this.m_elmData);
+			value.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>Does the actual writing of the XML.</summary>
@@ -188,7 +196,9 @@ namespace log4net.Layout
         /// </remarks>
         protected override void FormatXml(XmlWriter writer, LoggingEvent loggingEvent)
         {
+			value.LogDebug(">>> Entering FormatXml(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             writer.WriteStartElement(this.m_elmEvent);
+			value.LogDebug("<<< Exiting FormatXml(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             writer.WriteAttributeString(ATTR_LOGGER, loggingEvent.LoggerName);
 
 #if NET_2_0 || NETCF_2_0 || MONO_2_0 || NETSTANDARD
@@ -228,6 +238,7 @@ namespace log4net.Layout
             writer.WriteEndElement();
 
             PropertiesDictionary properties = loggingEvent.GetProperties();
+			value.LogDebug("FormatXml(writer={Writer},loggingEvent={LoggingEvent}): properties → {Properties}", writer, loggingEvent, properties);
 
             // Append the properties text
             if (properties.Count > 0)
@@ -240,6 +251,7 @@ namespace log4net.Layout
 
                     // Use an ObjectRenderer to convert the object to a string
                     string valueStr =null;
+					value.LogDebug("FormatXml(writer={Writer},loggingEvent={LoggingEvent}): valueStr → {ValueStr}", writer, loggingEvent, valueStr);
                     if (!this.Base64EncodeProperties)
                     {
                         valueStr = Transform.MaskXmlInvalidCharacters(loggingEvent.Repository.RendererMap.FindAndRender(entry.Value),this.InvalidCharReplacement);

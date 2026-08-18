@@ -25,10 +25,13 @@ namespace DotNetNuke.Entities.Portals.Templates
         /// <param name="cultureCode">The culture code.</param>
         public PortalTemplateInfo(string templateFilePath, string cultureCode)
         {
+			Logger.LogDebug(">>> Entering PortalTemplateInfo(templateFilePath={TemplateFilePath},cultureCode={CultureCode})", templateFilePath, cultureCode);
             this.TemplateFilePath = templateFilePath;
 
+			Logger.LogDebug("PortalTemplateInfo(templateFilePath={TemplateFilePath},cultureCode={CultureCode}): this.TemplateFilePath → {Arg2}", templateFilePath, cultureCode, this.TemplateFilePath);
             this.InitLocalizationFields(cultureCode);
             this.InitNameAndDescription();
+			Logger.LogDebug("<<< Exiting PortalTemplateInfo(templateFilePath={TemplateFilePath},cultureCode={CultureCode})", templateFilePath, cultureCode);
         }
 
         public string ResourceFilePath
@@ -65,6 +68,7 @@ namespace DotNetNuke.Entities.Portals.Templates
 
         private void InitNameAndDescription()
         {
+			Logger.LogDebug(">>> Entering InitNameAndDescription()");
             if (!string.IsNullOrEmpty(this.LanguageFilePath))
             {
                 this.LoadNameAndDescriptionFromLanguageFile();
@@ -79,10 +83,12 @@ namespace DotNetNuke.Entities.Portals.Templates
             {
                 this.LoadDescriptionFromTemplateFile();
             }
+			Logger.LogDebug("<<< Exiting InitNameAndDescription()");
         }
 
         private void LoadDescriptionFromTemplateFile()
         {
+			Logger.LogDebug(">>> Entering LoadDescriptionFromTemplateFile()");
             try
             {
                 XDocument xmlDoc;
@@ -97,15 +103,18 @@ namespace DotNetNuke.Entities.Portals.Templates
             {
                 Logger.Error("Error while parsing: " + this.TemplateFilePath, e);
             }
+			Logger.LogDebug("<<< Exiting LoadDescriptionFromTemplateFile()");
         }
 
         private void LoadNameAndDescriptionFromLanguageFile()
         {
+			Logger.LogDebug(">>> Entering LoadNameAndDescriptionFromLanguageFile()");
             try
             {
                 using (var reader = PortalTemplateIO.Instance.OpenTextReader(this.LanguageFilePath))
                 {
                     var xmlDoc = XDocument.Load(reader);
+					Logger.LogDebug("LoadNameAndDescriptionFromLanguageFile(): xmlDoc → {XmlDoc}", xmlDoc);
 
                     this.Name = ReadLanguageFileValue(xmlDoc, "LocalizedTemplateName.Text");
                     this.Description = ReadLanguageFileValue(xmlDoc, "PortalDescription.Text");
@@ -115,14 +124,17 @@ namespace DotNetNuke.Entities.Portals.Templates
             {
                 Logger.Error("Error while parsing: " + this.TemplateFilePath, e);
             }
+			Logger.LogDebug("<<< Exiting LoadNameAndDescriptionFromLanguageFile()");
         }
 
         private void InitLocalizationFields(string cultureCode)
         {
+			Logger.LogDebug(">>> Entering InitLocalizationFields(cultureCode={CultureCode})", cultureCode);
             this.LanguageFilePath = PortalTemplateIO.Instance.GetLanguageFilePath(this.TemplateFilePath, cultureCode);
             if (string.IsNullOrEmpty(this.LanguageFilePath))
             {
                 var locales = new List<string>();
+				Logger.LogDebug("InitLocalizationFields(cultureCode={CultureCode}): locales → {Locales}", cultureCode, locales);
                 (cultureCode, locales) = PortalTemplateIO.Instance.GetTemplateLanguages(this.TemplateFilePath);
                 if (string.IsNullOrEmpty(cultureCode))
                 {
@@ -132,6 +144,8 @@ namespace DotNetNuke.Entities.Portals.Templates
             }
 
             this.CultureCode = cultureCode;
+			Logger.LogDebug("InitLocalizationFields(cultureCode={CultureCode}): this.CultureCode → {Arg1}", cultureCode, this.CultureCode);
+			Logger.LogDebug("<<< Exiting InitLocalizationFields(cultureCode={CultureCode})", cultureCode);
         }
     }
 }

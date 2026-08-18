@@ -29,6 +29,7 @@ namespace DotNetNuke.Entities.Content.Workflow
     public class WorkflowEngine(IContentController contentController)
         : ServiceLocator<IWorkflowEngine, WorkflowEngine>, IWorkflowEngine
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(WorkflowEngine));
         private const string ContentWorkflowNotificationType = "ContentWorkflowNotification";
         private const string ContentWorkflowNotificationNoActionType = "ContentWorkflowNoActionNotification";
         private const string ContentWorkflowNotificationStartWorkflowType = "ContentWorkflowStartWorkflowNotification";
@@ -50,6 +51,7 @@ namespace DotNetNuke.Entities.Content.Workflow
         public WorkflowEngine()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering WorkflowEngine()");
         }
 
         /// <inheritdoc />
@@ -67,23 +69,30 @@ namespace DotNetNuke.Entities.Content.Workflow
         /// <inheritdoc />
         public void StartWorkflow(int workflowId, int contentItemId, int userId)
         {
+			Logger.LogDebug(">>> Entering StartWorkflow(workflowId={WorkflowId},contentItemId={ContentItemId},userId={UserId})", workflowId, contentItemId, userId);
             Requires.NotNegative("workflowId", workflowId);
 
             var contentItem = this.contentController.GetContentItem(contentItemId);
+			Logger.LogDebug("StartWorkflow(workflowId={WorkflowId},contentItemId={ContentItemId},userId={UserId}): contentItem → {ContentItem}", workflowId, contentItemId, userId, contentItem);
             var workflow = this.workflowManager.GetWorkflow(contentItem);
+			Logger.LogDebug("StartWorkflow(workflowId={WorkflowId},contentItemId={ContentItemId},userId={UserId}): workflow → {Workflow}", workflowId, contentItemId, userId, workflow);
 
             // If already exists a started workflow
             if (workflow != null && !this.IsWorkflowCompleted(contentItem))
             {
+				Logger.LogWarning("Throwing WorkflowInvalidOperationException from StartWorkflow(workflowId={WorkflowId},contentItemId={ContentItemId},userId={UserId})", workflowId, contentItemId, userId);
                 throw new WorkflowInvalidOperationException(Localization.GetExceptionMessage("WorkflowAlreadyStarted", "Workflow cannot get started for this Content Item. It already has a started workflow."));
             }
 
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (workflow == null || workflow.WorkflowID != workflowId)
             {
                 workflow = this.workflowRepository.GetWorkflow(workflowId);
             }
+			Logger.LogInformation("StartWorkflow(workflowId,contentItemId,userId)={WorkflowId},{ContentItemId},{UserId}: find query executed in {Arg3} ms", workflowId, contentItemId, userId, __logStart.ElapsedMilliseconds);
 
             var initialTransaction = CreateInitialTransaction(contentItemId, workflow.FirstState.StateID, userId);
+			Logger.LogDebug("StartWorkflow(workflowId={WorkflowId},contentItemId={ContentItemId},userId={UserId}): initialTransaction → {InitialTransaction}", workflowId, contentItemId, userId, initialTransaction);
 
             // Perform action before starting workflow
             this.PerformWorkflowActionOnStateChanging(initialTransaction, WorkflowActionTypes.StartWorkflow);
@@ -97,6 +106,7 @@ namespace DotNetNuke.Entities.Content.Workflow
             }
 
             // Delete previous logs
+			Logger.LogInformation("StartWorkflow(workflowId,contentItemId,userId)={WorkflowId},{ContentItemId},{UserId}: delete query executed in {Arg3} ms", workflowId, contentItemId, userId, __logStart.ElapsedMilliseconds);
             this.workflowLogRepository.DeleteWorkflowLogs(contentItemId, workflowId);
 
             // Add logs
@@ -105,13 +115,17 @@ namespace DotNetNuke.Entities.Content.Workflow
 
             // Perform action after starting workflow
             this.PerformWorkflowActionOnStateChanged(initialTransaction, WorkflowActionTypes.StartWorkflow);
+			Logger.LogDebug("<<< Exiting StartWorkflow(workflowId={WorkflowId},contentItemId={ContentItemId},userId={UserId})", workflowId, contentItemId, userId);
         }
 
         /// <inheritdoc />
         public void CompleteState(StateTransaction stateTransaction)
         {
+			Logger.LogDebug(">>> Entering CompleteState(stateTransaction={StateTransaction})", stateTransaction);
             var contentItem = this.contentController.GetContentItem(stateTransaction.ContentItemId);
             var workflow = this.workflowManager.GetWorkflow(contentItem);
+			Logger.LogDebug("CompleteState(stateTransaction={StateTransaction}): workflow → {Workflow}", stateTransaction, workflow);
+			Logger.LogDebug("CompleteState(stateTransaction={StateTransaction}): contentItem → {ContentItem}", stateTransaction, contentItem);
 
             if (workflow == null)
             {
@@ -121,6 +135,7 @@ namespace DotNetNuke.Entities.Content.Workflow
             if (this.IsWorkflowCompleted(contentItem)
                         && !(workflow.IsSystem && workflow.States.Count() == 1))
             {
+				Logger.LogWarning("Throwing WorkflowInvalidOperationException from CompleteState(stateTransaction={StateTransaction})", stateTransaction);
                 throw new WorkflowInvalidOperationException(Localization.GetExceptionMessage("WorkflowSystemWorkflowStateCannotComplete", "System workflow state cannot be completed."));
             }
 
@@ -128,16 +143,22 @@ namespace DotNetNuke.Entities.Content.Workflow
 
             if (!isFirstState && !this.workflowSecurity.HasStateReviewerPermission(workflow.PortalID, stateTransaction.UserId, contentItem.StateID))
             {
+				Logger.LogWarning("Throwing WorkflowSecurityException from CompleteState(stateTransaction={StateTransaction})", stateTransaction);
                 throw new WorkflowSecurityException(Localization.GetExceptionMessage("UserCannotReviewWorkflowState", "User cannot review the workflow state"));
             }
 
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var currentState = this.workflowStateRepository.GetWorkflowStateByID(contentItem.StateID);
             if (currentState.StateID != stateTransaction.CurrentStateId)
+			Logger.LogDebug("CompleteState(stateTransaction={StateTransaction}): currentState → {CurrentState}", stateTransaction, currentState);
+			Logger.LogInformation("CompleteState(stateTransaction)={StateTransaction}: find query executed in {Arg1} ms", stateTransaction, __logStart.ElapsedMilliseconds);
             {
+				Logger.LogWarning("Throwing WorkflowConcurrencyException from CompleteState(stateTransaction={StateTransaction})", stateTransaction);
                 throw new WorkflowConcurrencyException();
             }
 
             var nextState = GetNextWorkflowState(workflow, contentItem.StateID);
+			Logger.LogDebug("CompleteState(stateTransaction={StateTransaction}): nextState → {NextState}", stateTransaction, nextState);
             if (nextState.StateID == workflow.LastState.StateID)
             {
                 this.CompleteWorkflow(stateTransaction);
@@ -166,13 +187,17 @@ namespace DotNetNuke.Entities.Content.Workflow
 
             // after-change action
             this.PerformWorkflowActionOnStateChanged(stateTransaction, WorkflowActionTypes.CompleteState);
+			Logger.LogDebug("<<< Exiting CompleteState(stateTransaction={StateTransaction})", stateTransaction);
         }
 
         /// <inheritdoc />
         public void DiscardState(StateTransaction stateTransaction)
         {
+			Logger.LogDebug(">>> Entering DiscardState(stateTransaction={StateTransaction})", stateTransaction);
             var contentItem = this.contentController.GetContentItem(stateTransaction.ContentItemId);
             var workflow = this.workflowManager.GetWorkflow(contentItem);
+			Logger.LogDebug("DiscardState(stateTransaction={StateTransaction}): workflow → {Workflow}", stateTransaction, workflow);
+			Logger.LogDebug("DiscardState(stateTransaction={StateTransaction}): contentItem → {ContentItem}", stateTransaction, contentItem);
             if (workflow == null)
             {
                 return;
@@ -183,21 +208,28 @@ namespace DotNetNuke.Entities.Content.Workflow
 
             if (isLastState)
             {
+				Logger.LogWarning("Throwing WorkflowInvalidOperationException from DiscardState(stateTransaction={StateTransaction})", stateTransaction);
                 throw new WorkflowInvalidOperationException(Localization.GetExceptionMessage("WorkflowCannotDiscard", "Cannot discard on last workflow state"));
             }
 
             if (!isFirstState && !this.workflowSecurity.HasStateReviewerPermission(workflow.PortalID, stateTransaction.UserId, contentItem.StateID))
             {
+				Logger.LogWarning("Throwing WorkflowSecurityException from DiscardState(stateTransaction={StateTransaction})", stateTransaction);
                 throw new WorkflowSecurityException(Localization.GetExceptionMessage("UserCannotReviewWorkflowState", "User cannot review the workflow state"));
             }
 
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var currentState = this.workflowStateRepository.GetWorkflowStateByID(contentItem.StateID);
             if (currentState.StateID != stateTransaction.CurrentStateId)
+			Logger.LogDebug("DiscardState(stateTransaction={StateTransaction}): currentState → {CurrentState}", stateTransaction, currentState);
+			Logger.LogInformation("DiscardState(stateTransaction)={StateTransaction}: find query executed in {Arg1} ms", stateTransaction, __logStart.ElapsedMilliseconds);
             {
+				Logger.LogWarning("Throwing WorkflowConcurrencyException from DiscardState(stateTransaction={StateTransaction})", stateTransaction);
                 throw new WorkflowConcurrencyException();
             }
 
             var previousState = GetPreviousWorkflowState(workflow, contentItem.StateID);
+			Logger.LogDebug("DiscardState(stateTransaction={StateTransaction}): previousState → {PreviousState}", stateTransaction, previousState);
             if (previousState.StateID == workflow.LastState.StateID)
             {
                 this.DiscardWorkflow(stateTransaction);
@@ -228,12 +260,16 @@ namespace DotNetNuke.Entities.Content.Workflow
 
             // after-change action
             this.PerformWorkflowActionOnStateChanged(stateTransaction, WorkflowActionTypes.DiscardState);
+			Logger.LogDebug("<<< Exiting DiscardState(stateTransaction={StateTransaction})", stateTransaction);
         }
 
         /// <inheritdoc />
         public bool IsWorkflowCompleted(int contentItemId)
         {
+			Logger.LogDebug(">>> Entering IsWorkflowCompleted(contentItemId={ContentItemId})", contentItemId);
             var contentItem = this.contentController.GetContentItem(contentItemId);
+			Logger.LogDebug("IsWorkflowCompleted(contentItemId={ContentItemId}): contentItem → {ContentItem}", contentItemId, contentItem);
+			Logger.LogDebug("<<< Exiting IsWorkflowCompleted(contentItemId={ContentItemId})", contentItemId);
             return this.IsWorkflowCompleted(contentItem);
         }
 
@@ -252,7 +288,10 @@ namespace DotNetNuke.Entities.Content.Workflow
         /// <inheritdoc />
         public bool IsWorkflowOnDraft(int contentItemId)
         {
+			Logger.LogDebug(">>> Entering IsWorkflowOnDraft(contentItemId={ContentItemId})", contentItemId);
             var contentItem = this.contentController.GetContentItem(contentItemId); // Ensure DB values
+			Logger.LogDebug("IsWorkflowOnDraft(contentItemId={ContentItemId}): contentItem → {ContentItem}", contentItemId, contentItem);
+			Logger.LogDebug("<<< Exiting IsWorkflowOnDraft(contentItemId={ContentItemId})", contentItemId);
             return this.IsWorkflowOnDraft(contentItem);
         }
 
@@ -271,11 +310,17 @@ namespace DotNetNuke.Entities.Content.Workflow
         /// <inheritdoc />
         public void DiscardWorkflow(StateTransaction stateTransaction)
         {
+			Logger.LogDebug(">>> Entering DiscardWorkflow(stateTransaction={StateTransaction})", stateTransaction);
             var contentItem = this.contentController.GetContentItem(stateTransaction.ContentItemId);
 
+			Logger.LogDebug("DiscardWorkflow(stateTransaction={StateTransaction}): contentItem → {ContentItem}", stateTransaction, contentItem);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var currentState = this.workflowStateRepository.GetWorkflowStateByID(contentItem.StateID);
             if (currentState.StateID != stateTransaction.CurrentStateId)
+			Logger.LogDebug("DiscardWorkflow(stateTransaction={StateTransaction}): currentState → {CurrentState}", stateTransaction, currentState);
+			Logger.LogInformation("DiscardWorkflow(stateTransaction)={StateTransaction}: find query executed in {Arg1} ms", stateTransaction, __logStart.ElapsedMilliseconds);
             {
+				Logger.LogWarning("Throwing WorkflowConcurrencyException from DiscardWorkflow(stateTransaction={StateTransaction})", stateTransaction);
                 throw new WorkflowConcurrencyException();
             }
 
@@ -283,6 +328,7 @@ namespace DotNetNuke.Entities.Content.Workflow
             this.PerformWorkflowActionOnStateChanging(stateTransaction, WorkflowActionTypes.DiscardWorkflow);
 
             var workflow = this.workflowManager.GetWorkflow(contentItem);
+			Logger.LogDebug("DiscardWorkflow(stateTransaction={StateTransaction}): workflow → {Workflow}", stateTransaction, workflow);
             this.UpdateContentItemWorkflowState(workflow.LastState.StateID, contentItem);
 
             // Logs
@@ -295,16 +341,23 @@ namespace DotNetNuke.Entities.Content.Workflow
 
             // after-change action
             this.PerformWorkflowActionOnStateChanged(stateTransaction, WorkflowActionTypes.DiscardWorkflow);
+			Logger.LogDebug("<<< Exiting DiscardWorkflow(stateTransaction={StateTransaction})", stateTransaction);
         }
 
         /// <inheritdoc />
         public void CompleteWorkflow(StateTransaction stateTransaction)
         {
+			Logger.LogDebug(">>> Entering CompleteWorkflow(stateTransaction={StateTransaction})", stateTransaction);
             var contentItem = this.contentController.GetContentItem(stateTransaction.ContentItemId);
 
+			Logger.LogDebug("CompleteWorkflow(stateTransaction={StateTransaction}): contentItem → {ContentItem}", stateTransaction, contentItem);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var currentState = this.workflowStateRepository.GetWorkflowStateByID(contentItem.StateID);
             if (currentState.StateID != stateTransaction.CurrentStateId)
+			Logger.LogDebug("CompleteWorkflow(stateTransaction={StateTransaction}): currentState → {CurrentState}", stateTransaction, currentState);
+			Logger.LogInformation("CompleteWorkflow(stateTransaction)={StateTransaction}: find query executed in {Arg1} ms", stateTransaction, __logStart.ElapsedMilliseconds);
             {
+				Logger.LogWarning("Throwing WorkflowConcurrencyException from CompleteWorkflow(stateTransaction={StateTransaction})", stateTransaction);
                 throw new WorkflowConcurrencyException();
             }
 
@@ -312,6 +365,7 @@ namespace DotNetNuke.Entities.Content.Workflow
             this.PerformWorkflowActionOnStateChanging(stateTransaction, WorkflowActionTypes.CompleteWorkflow);
 
             var workflow = this.workflowManager.GetWorkflow(contentItem);
+			Logger.LogDebug("CompleteWorkflow(stateTransaction={StateTransaction}): workflow → {Workflow}", stateTransaction, workflow);
             this.UpdateContentItemWorkflowState(workflow.LastState.StateID, contentItem);
 
             // Logs
@@ -324,11 +378,14 @@ namespace DotNetNuke.Entities.Content.Workflow
 
             // after-change action
             this.PerformWorkflowActionOnStateChanged(stateTransaction, WorkflowActionTypes.CompleteWorkflow);
+			Logger.LogDebug("<<< Exiting CompleteWorkflow(stateTransaction={StateTransaction})", stateTransaction);
         }
 
         /// <inheritdoc />
         protected override Func<IWorkflowEngine> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => Globals.DependencyProvider.GetRequiredService<IWorkflowEngine>();
         }
 
@@ -341,6 +398,8 @@ namespace DotNetNuke.Entities.Content.Workflow
 
         private static bool IsAdministratorRoleAlreadyIncluded(PortalSettings settings, IEnumerable<RoleInfo> roles)
         {
+			Logger.LogDebug(">>> Entering IsAdministratorRoleAlreadyIncluded(settings={Settings},roles={Roles})", settings, roles);
+			Logger.LogDebug("<<< Exiting IsAdministratorRoleAlreadyIncluded(settings={Settings},roles={Roles})", settings, roles);
             return roles.Any(r => r.RoleName == settings.AdministratorRoleName);
         }
 
@@ -353,31 +412,41 @@ namespace DotNetNuke.Entities.Content.Workflow
 
         private static List<UserInfo> IncludeSuperUsers(List<UserInfo> users)
         {
+			Logger.LogDebug(">>> Entering IncludeSuperUsers(users={Users})", users);
             var superUsers = UserController.GetUsers(false, true, Null.NullInteger);
             foreach (UserInfo superUser in superUsers)
             {
+			Logger.LogDebug("IncludeSuperUsers(users={Users}): superUsers → {SuperUsers}", users, superUsers);
                 if (IsSuperUserNotIncluded(users, superUser))
                 {
                     users.Add(superUser);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting IncludeSuperUsers(users={Users})", users);
             return users.ToList();
         }
 
         private static bool IsSuperUserNotIncluded(IEnumerable<UserInfo> users, UserInfo superUser)
         {
+			Logger.LogDebug(">>> Entering IsSuperUserNotIncluded(users={Users},superUser={SuperUser})", users, superUser);
+			Logger.LogDebug("<<< Exiting IsSuperUserNotIncluded(users={Users},superUser={SuperUser})", users, superUser);
             return users.All(u => u.UserID != superUser.UserID);
         }
 
         private static string GetWorkflowActionComment(WorkflowLogType logType)
         {
+			Logger.LogDebug(">>> Entering GetWorkflowActionComment(logType={LogType})", logType);
             var logName = Enum.GetName(typeof(WorkflowLogType), logType);
+			Logger.LogDebug("GetWorkflowActionComment(logType={LogType}): logName → {LogName}", logType, logName);
+			Logger.LogDebug("<<< Exiting GetWorkflowActionComment(logType={LogType})", logType);
             return Localization.GetString(logName + ".Comment");
         }
 
         private static StateTransaction CreateInitialTransaction(int contentItemId, int stateId, int userId)
         {
+			Logger.LogDebug(">>> Entering CreateInitialTransaction(contentItemId={ContentItemId},stateId={StateId},userId={UserId})", contentItemId, stateId, userId);
+			Logger.LogDebug("<<< Exiting CreateInitialTransaction(contentItemId={ContentItemId},stateId={StateId},userId={UserId})", contentItemId, stateId, userId);
             return new StateTransaction
             {
                 ContentItemId = contentItemId,
@@ -449,22 +518,30 @@ namespace DotNetNuke.Entities.Content.Workflow
 
         private void PerformWorkflowActionOnStateChanged(StateTransaction stateTransaction, WorkflowActionTypes actionType)
         {
+			Logger.LogDebug(">>> Entering PerformWorkflowActionOnStateChanged(stateTransaction={StateTransaction},actionType={ActionType})", stateTransaction, actionType);
             var contentItem = this.contentController.GetContentItem(stateTransaction.ContentItemId);
             var workflowAction = this.GetWorkflowActionInstance(contentItem, actionType);
+			Logger.LogDebug("PerformWorkflowActionOnStateChanged(stateTransaction={StateTransaction},actionType={ActionType}): workflowAction → {WorkflowAction}", stateTransaction, actionType, workflowAction);
+			Logger.LogDebug("PerformWorkflowActionOnStateChanged(stateTransaction={StateTransaction},actionType={ActionType}): contentItem → {ContentItem}", stateTransaction, actionType, contentItem);
             if (workflowAction != null)
             {
                 workflowAction.DoActionOnStateChanged(stateTransaction);
             }
+			Logger.LogDebug("<<< Exiting PerformWorkflowActionOnStateChanged(stateTransaction={StateTransaction},actionType={ActionType})", stateTransaction, actionType);
         }
 
         private void PerformWorkflowActionOnStateChanging(StateTransaction stateTransaction, WorkflowActionTypes actionType)
         {
+			Logger.LogDebug(">>> Entering PerformWorkflowActionOnStateChanging(stateTransaction={StateTransaction},actionType={ActionType})", stateTransaction, actionType);
             var contentItem = this.contentController.GetContentItem(stateTransaction.ContentItemId);
             var workflowAction = this.GetWorkflowActionInstance(contentItem, actionType);
+			Logger.LogDebug("PerformWorkflowActionOnStateChanging(stateTransaction={StateTransaction},actionType={ActionType}): workflowAction → {WorkflowAction}", stateTransaction, actionType, workflowAction);
+			Logger.LogDebug("PerformWorkflowActionOnStateChanging(stateTransaction={StateTransaction},actionType={ActionType}): contentItem → {ContentItem}", stateTransaction, actionType, contentItem);
             if (workflowAction != null)
             {
                 workflowAction.DoActionOnStateChanging(stateTransaction);
             }
+			Logger.LogDebug("<<< Exiting PerformWorkflowActionOnStateChanging(stateTransaction={StateTransaction},actionType={ActionType})", stateTransaction, actionType);
         }
 
         private IWorkflowAction GetWorkflowActionInstance(ContentItem contentItem, WorkflowActionTypes actionType)
@@ -474,8 +551,11 @@ namespace DotNetNuke.Entities.Content.Workflow
 
         private void UpdateContentItemWorkflowState(int stateId, ContentItem item)
         {
+			Logger.LogDebug(">>> Entering UpdateContentItemWorkflowState(stateId={StateId},item={Item})", stateId, item);
             item.StateID = stateId;
             this.contentController.UpdateContentItem(item);
+			Logger.LogDebug("UpdateContentItemWorkflowState(stateId={StateId},item={Item}): item.StateID → {Arg2}", stateId, item, item.StateID);
+			Logger.LogDebug("<<< Exiting UpdateContentItemWorkflowState(stateId={StateId},item={Item})", stateId, item);
         }
 
         private UserInfo GetUserThatHaveStartedOrSubmittedDraftState(Entities.Workflow workflow, ContentItem contentItem, StateTransaction stateTransaction)
@@ -497,6 +577,7 @@ namespace DotNetNuke.Entities.Content.Workflow
                 return null;
             }
 
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var logs = this.workflowLogRepository.GetWorkflowLogs(contentItem.ContentItemId, workflow.WorkflowID);
 
             var logDraftCompleted = logs
@@ -518,6 +599,7 @@ namespace DotNetNuke.Entities.Content.Workflow
             this.DeleteNotificationsByType(notificationTypeId, context);
             notificationTypeId = this.notificationsController.GetNotificationType(ContentWorkflowNotificationStartWorkflowType).NotificationTypeId;
             this.DeleteNotificationsByType(notificationTypeId, context);
+			Logger.LogDebug("<<< Exiting DeleteWorkflowNotifications(contentItem={ContentItem},state={State})", contentItem, state);
         }
 
         private void DeleteNotificationsByType(int notificationTypeId, string context)
@@ -527,6 +609,7 @@ namespace DotNetNuke.Entities.Content.Workflow
             {
                 this.notificationsController.DeleteAllNotificationRecipients(notification.NotificationID);
             }
+			Logger.LogDebug("<<< Exiting DeleteNotificationsByType(notificationTypeId={NotificationTypeId},context={Context})", notificationTypeId, context);
         }
 
         private void SendNotificationToAuthor(StateTransaction stateTransaction, WorkflowState state, Entities.Workflow workflow, ContentItem contentItem, WorkflowActionTypes workflowActionType)
@@ -566,6 +649,7 @@ namespace DotNetNuke.Entities.Content.Workflow
             {
                 Services.Exceptions.Exceptions.LogException(ex);
             }
+			Logger.LogDebug("<<< Exiting SendNotificationToAuthor(stateTransaction={StateTransaction},state={State},workflow={Workflow},contentItem={ContentItem},workflowActionType={WorkflowActionType})", stateTransaction, state, workflow, contentItem, workflowActionType);
         }
 
         private void SendNotificationToWorkflowStarter(StateTransaction stateTransaction, Entities.Workflow workflow, ContentItem contentItem, int starterUserId, WorkflowActionTypes workflowActionType)
@@ -595,6 +679,7 @@ namespace DotNetNuke.Entities.Content.Workflow
             {
                 Services.Exceptions.Exceptions.LogException(ex);
             }
+			Logger.LogDebug("<<< Exiting SendNotificationToWorkflowStarter(stateTransaction={StateTransaction},workflow={Workflow},contentItem={ContentItem},starterUserId={StarterUserId},workflowActionType={WorkflowActionType})", stateTransaction, workflow, contentItem, starterUserId, workflowActionType);
         }
 
         private void SendNotificationsToReviewers(ContentItem contentItem, WorkflowState state, StateTransaction stateTransaction, WorkflowActionTypes workflowActionType, PortalSettings portalSettings)
@@ -629,6 +714,7 @@ namespace DotNetNuke.Entities.Content.Workflow
             {
                 Services.Exceptions.Exceptions.LogException(ex);
             }
+			Logger.LogDebug("<<< Exiting SendNotificationsToReviewers(contentItem={ContentItem},state={State},stateTransaction={StateTransaction},workflowActionType={WorkflowActionType},portalSettings={PortalSettings})", contentItem, state, stateTransaction, workflowActionType, portalSettings);
         }
 
         private Notification GetNotification(string workflowContext, StateTransaction stateTransaction, ActionMessage message, string notificationType)
@@ -684,6 +770,7 @@ namespace DotNetNuke.Entities.Content.Workflow
 
             var state = this.workflowStateRepository.GetWorkflowStateByID(contentItem.StateID);
             this.AddWorkflowLog(contentItem, state, WorkflowLogType.CommentProvided, userId, userComment);
+			Logger.LogDebug("<<< Exiting AddWorkflowCommentLog(contentItem={ContentItem},userId={UserId},userComment={UserComment})", contentItem, userId, userComment);
         }
 
         private void AddWorkflowCommentLog(ContentItem contentItem, WorkflowState state, int userId, string userComment)
@@ -700,6 +787,7 @@ namespace DotNetNuke.Entities.Content.Workflow
         {
             var state = this.workflowStateRepository.GetWorkflowStateByID(contentItem.StateID);
             this.AddWorkflowLog(contentItem, state, logType, userId, userComment);
+			Logger.LogDebug("<<< Exiting AddWorkflowLog(contentItem={ContentItem},logType={LogType},userId={UserId},userComment={UserComment})", contentItem, logType, userId, userComment);
         }
 
         private void AddWorkflowLog(ContentItem contentItem, WorkflowState state, WorkflowLogType logType, int userId, string userComment = null)
@@ -720,6 +808,7 @@ namespace DotNetNuke.Entities.Content.Workflow
             var logTypeText = GetWorkflowActionComment(logType);
             var logComment = this.ReplaceNotificationTokens(logTypeText, workflow, contentItem, state, userId, userComment);
             this.workflowLogger.AddWorkflowLog(contentItem.ContentItemId, workflow.WorkflowID, logType, logComment, userId);
+			Logger.LogDebug("<<< Exiting TryAddWorkflowLog(contentItem={ContentItem},state={State},logType={LogType},userId={UserId},userComment={UserComment})", contentItem, state, logType, userId, userComment);
         }
 
         private string ReplaceNotificationTokens(string text, Entities.Workflow workflow, ContentItem item, WorkflowState state, int userId, string comment = "")

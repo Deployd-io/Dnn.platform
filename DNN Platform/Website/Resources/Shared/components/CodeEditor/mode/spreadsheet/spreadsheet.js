@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -12,14 +14,19 @@
   "use strict";
 
   CodeMirror.defineMode("spreadsheet", function () {
+	logger.debug('>>> Entering defineMode()');
     return {
       startState: function () {
+		logger.debug('>>> Entering startState()');
+		logger.debug(`<<< Exiting function(exports=${exports})`);
         return {
           stringType: null,
           stack: []
         };
+		logger.debug('<<< Exiting startState()');
       },
       token: function (stream, state) {
+		logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
         if (!stream) return;
 
         //check for state changes
@@ -52,6 +59,7 @@
         case "characterClass":
           while (state.stack[0] === "characterClass" && !stream.eol()) {
             if (!(stream.match(/^[^\]\\]+/) || stream.match(/^\\./)))
+			logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
               state.stack.shift();
           }
           return "operator";

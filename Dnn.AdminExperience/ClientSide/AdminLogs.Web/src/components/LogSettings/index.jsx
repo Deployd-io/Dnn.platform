@@ -11,6 +11,7 @@ import "./style.less";
 import { GridCell, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import util from "../../utils";
 import Localization from "localization";
+const logger = console;
 import {
     createPortalOptions,
     createLogTypeOptions
@@ -21,13 +22,16 @@ let canEdit = false;
 class LogSettingsPanel extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             openId: ""
         };
         canEdit = util.settings.isHost || util.settings.permissions.LOG_SETTINGS_EDIT;
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {props} = this;
         props.dispatch(LogSettingActions.getLogSettings());
         if (canEdit) {
@@ -38,10 +42,12 @@ class LogSettingsPanel extends Component {
                 props.dispatch(LogActions.getPortalList(util.settings.isHost));
             props.dispatch(LogSettingActions.getKeepMostRecentOptions());
             props.dispatch(LogSettingActions.getOccurrenceOptions());
+			logger.debug('<<< Exiting UNSAFE_componentWillMount()');
         }
     }
 
     renderHeader() {
+		logger.debug('>>> Entering renderHeader()');
         const tableFields = [
             { "name": Localization.get("LogType.Header"), "width": 40 },
             { "name": Localization.get("Portal.Header"), "width": 20 },
@@ -54,6 +60,7 @@ class LogSettingsPanel extends Component {
                 <span>{field.name}&nbsp; </span>
             </GridCell>;
         });
+		logger.debug('<<< Exiting renderHeader()');
         return <div id="header-row" className="header-row">{tableHeaders}</div>;
     }
     uncollapse(id) {
@@ -110,12 +117,17 @@ class LogSettingsPanel extends Component {
                 </SettingRow>
             );
         });
+		logger.debug(`<<< Exiting renderedLogSettingList(logTypeOptions=${logTypeOptions},portalOptions=${portalOptions})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         let opened = (this.state.openId === "add");
         let logTypeOptions = createLogTypeOptions(this.props.logTypeList);
+		logger.debug(`render(): opened → ${opened}`);
+		logger.debug(`render(): logTypeOptions → ${logTypeOptions}`);
         let portalOptions = createPortalOptions(this.props.portalList);
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 <div className="log-settings">
@@ -177,6 +189,8 @@ LogSettingsPanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         logSettingList: state.logSettings.logSettingList,
         logTypeList: state.log.logTypeList,

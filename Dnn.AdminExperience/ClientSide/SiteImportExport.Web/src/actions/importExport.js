@@ -1,21 +1,26 @@
 import { importExport as ActionTypes } from "../constants/actionTypes";
 import ApplicationService from "../services/applicationService";
+const logger = console;
 
 const jobsActions = {
 
     getInitialPortalTabs(PortalTabsParameters, callback) {
+		logger.debug(`>>> Entering getInitialPortalTabs(PortalTabsParameters=${PortalTabsParameters},callback=${callback})`);
         ApplicationService.getInitialPortalTabs(PortalTabsParameters, (response) => {
             if (callback) {
                 callback(response);
+				logger.debug(`<<< Exiting getInitialPortalTabs(PortalTabsParameters=${PortalTabsParameters},callback=${callback})`);
             }
         });
     },
 
     getDescendantPortalTabs(PortalTabsParameters, ParentTabId, callback) {
+		logger.debug(`>>> Entering getDescendantPortalTabs(PortalTabsParameters=${PortalTabsParameters},ParentTabId=${ParentTabId},callback=${callback})`);
         const ParentTabIdObj = {parentId: ParentTabId};
         ApplicationService.getDescendantPortalTabs(PortalTabsParameters, ParentTabIdObj, (response) => {
             if (callback) {
                 callback(response);
+				logger.debug(`<<< Exiting getDescendantPortalTabs(PortalTabsParameters=${PortalTabsParameters},ParentTabId=${ParentTabId},callback=${callback})`);
             }
         });
     },
@@ -32,9 +37,12 @@ const jobsActions = {
                 callback();
             }
         };
+		logger.debug(`<<< Exiting siteSelected(portalId=${portalId},portalName=${portalName},callback=${callback})`);
     },
 
     navigateWizard(wizardStep, callback) {
+		logger.debug(`>>> Entering navigateWizard(wizardStep=${wizardStep},callback=${callback})`);
+		logger.debug(`<<< Exiting navigateWizard(wizardStep=${wizardStep},callback=${callback})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.GO_TO_WIZARD_STEP,
@@ -51,6 +59,8 @@ const jobsActions = {
     },
 
     getPortals(callback, errorCallback) {
+		logger.debug(`>>> Entering getPortals(callback=${callback},errorCallback=${errorCallback})`);
+		logger.debug(`<<< Exiting getPortals(callback=${callback},errorCallback=${errorCallback})`);
         return (dispatch) => {
             ApplicationService.getPortals((data) => {
                 dispatch({
@@ -74,9 +84,12 @@ const jobsActions = {
                 callback();
             }
         };
+		logger.debug(`<<< Exiting jobSelected(jobId=${jobId},callback=${callback})`);
     },
 
     getAllJobs(parameters, callback, errorCallback) {
+		logger.debug(`>>> Entering getAllJobs(parameters=${parameters},callback=${callback},errorCallback=${errorCallback})`);
+		logger.debug(`<<< Exiting getAllJobs(parameters=${parameters},callback=${callback},errorCallback=${errorCallback})`);
         return (dispatch) => {
             ApplicationService.getAllJobs(parameters, (data) => {
                 dispatch({
@@ -94,6 +107,8 @@ const jobsActions = {
     },
 
     getLastExportTime(parameters, callback, errorCallback) {
+		logger.debug(`>>> Entering getLastExportTime(parameters=${parameters},callback=${callback},errorCallback=${errorCallback})`);
+		logger.debug(`<<< Exiting getLastExportTime(parameters=${parameters},callback=${callback},errorCallback=${errorCallback})`);
         return (dispatch) => {
             ApplicationService.getLastJobTime(parameters, (data) => {
                 dispatch({
@@ -119,9 +134,12 @@ const jobsActions = {
                 }
             }, errorCallback);
         };
+		logger.debug(`<<< Exiting getJobDetails(jobId=${jobId},callback=${callback},errorCallback=${errorCallback})`);
     },
 
     exportSite(payload, callback, errorCallback) {
+		logger.debug(`>>> Entering exportSite(payload=${payload},callback=${callback},errorCallback=${errorCallback})`);
+		logger.debug(`<<< Exiting exportSite(payload=${payload},callback=${callback},errorCallback=${errorCallback})`);
         return (dispatch) => {
             ApplicationService.exportSite(payload, data => {
                 dispatch({
@@ -140,6 +158,8 @@ const jobsActions = {
     },
 
     importSite(payload, callback, errorCallback) {
+		logger.debug(`>>> Entering importSite(payload=${payload},callback=${callback},errorCallback=${errorCallback})`);
+		logger.debug(`<<< Exiting importSite(payload=${payload},callback=${callback},errorCallback=${errorCallback})`);
         return (dispatch) => {
             ApplicationService.importSite(payload, data => {
                 dispatch({
@@ -159,6 +179,8 @@ const jobsActions = {
     },
 
     importWizardGoToSetp(step, callback) {
+		logger.debug(`>>> Entering importWizardGoToSetp(step=${step},callback=${callback})`);
+		logger.debug(`<<< Exiting importWizardGoToSetp(step=${step},callback=${callback})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.GO_TO_IMPORT_WIZARD_STEP,
@@ -171,6 +193,8 @@ const jobsActions = {
     },
 
     selectPackage(pkg, callback) {
+		logger.debug(`>>> Entering selectPackage(pkg=${pkg},callback=${callback})`);
+		logger.debug(`<<< Exiting selectPackage(pkg=${pkg},callback=${callback})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SELECTED_PACKAGE,
@@ -184,6 +208,8 @@ const jobsActions = {
     },
 
     packageVerified(verified, callback) {
+		logger.debug(`>>> Entering packageVerified(verified=${verified},callback=${callback})`);
+		logger.debug(`<<< Exiting packageVerified(verified=${verified},callback=${callback})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.VERIFIED_PACKAGE,
@@ -196,6 +222,8 @@ const jobsActions = {
     },
 
     getImportPackages(parameters, callback, errorCallback) {
+		logger.debug(`>>> Entering getImportPackages(parameters=${parameters},callback=${callback},errorCallback=${errorCallback})`);
+		logger.debug(`<<< Exiting getImportPackages(parameters=${parameters},callback=${callback},errorCallback=${errorCallback})`);
         return (dispatch) => {
             ApplicationService.getImportPackages(parameters, (data) => {
                 dispatch({
@@ -214,6 +242,8 @@ const jobsActions = {
     },
 
     verifyImportPackage(packageId, callback, errorCallback) {
+		logger.debug(`>>> Entering verifyImportPackage(packageId=${packageId},callback=${callback},errorCallback=${errorCallback})`);
+		logger.debug(`<<< Exiting verifyImportPackage(packageId=${packageId},callback=${callback},errorCallback=${errorCallback})`);
         return (dispatch) => {
             setTimeout(() => {
                 ApplicationService.verifyImportPackage(packageId, (data) => {
@@ -244,6 +274,7 @@ const jobsActions = {
                 }
             });
         };
+		logger.debug(`<<< Exiting cancelJob(jobId=${jobId},callback=${callback},errorCallback=${errorCallback})`);
     },
 
     deleteJob(jobId, callback, errorCallback) {
@@ -261,6 +292,7 @@ const jobsActions = {
                 }
             });
         };
+		logger.debug(`<<< Exiting deleteJob(jobId=${jobId},callback=${callback},errorCallback=${errorCallback})`);
     }
 };
 

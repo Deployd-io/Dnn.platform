@@ -11,6 +11,7 @@ namespace Dnn.PersonaBar.Library.Common
 
     public class Utilities
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Utilities));
         // test sample
         // "&agrave;&aacute;&acirc;&atilde;&auml;&aring;&aelig;&ccedil;&egrave;&eacute;&ecirc;&euml;&igrave;&iacute;&icirc;&iuml;&Alpha;
         // &ETH;&ntilde;&ograve;&oacute;&ocirc;&otilde;&ouml;&oslash;&ugrave;&uacute;&ucirc;&uuml;&yacute;&yuml;&szlig;&thorn;&omicron;"
@@ -28,6 +29,7 @@ namespace Dnn.PersonaBar.Library.Common
         /// <returns>An image URL.</returns>
         public static string GetProfileAvatar(UserInfo user, int width = Constants.AvatarWidth, int height = Constants.AvatarHeight, bool showSuperUsers = true)
         {
+			Logger.LogDebug(">>> Entering GetProfileAvatar(user={User},width={Width},height={Height},showSuperUsers={ShowSuperUsers})", user, width, height, showSuperUsers);
             var userId = user != null && user.UserID > 0 && !user.IsDeleted && (showSuperUsers || !user.IsSuperUser) ? user.UserID : 0;
             return UserController.Instance.GetUserProfilePictureUrl(userId, width, height);
         }
@@ -43,6 +45,8 @@ namespace Dnn.PersonaBar.Library.Common
 
         public static string FixDoublEntityEncoding(string document)
         {
+			Logger.LogDebug(">>> Entering FixDoublEntityEncoding(document={Document})", document);
+			Logger.LogDebug("<<< Exiting FixDoublEntityEncoding(document={Document})", document);
             return string.IsNullOrEmpty(document)
                        ? document
                        : HtmlEntitiesPatternRegex.Replace(document, "&$1;");

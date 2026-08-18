@@ -1,6 +1,9 @@
+const logger = console;
 ﻿(function ($) {
     $(document.body).ready(function () {
+		logger.debug('>>> Entering ready()');
         var loadEditBar = function () {
+			logger.debug('>>> Entering loadEditBar()');
             var w = window,
                 d = document,
                 e = d.documentElement,
@@ -29,8 +32,10 @@
                 }).mouseleave(function () {
                     $iframe.removeClass("small middle");
                 });
+				logger.debug('<<< Exiting loadEditBar()');
         }
 
+		logger.debug('<<< Exiting ready()');
         loadEditBar();
     });
 })(jQuery);

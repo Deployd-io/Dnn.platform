@@ -45,6 +45,7 @@ namespace DNNConnect.CKEditorProvider.Module
         public EditorConfigManager()
             : this(null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering EditorConfigManager()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="EditorConfigManager"/> class.</summary>
@@ -70,8 +71,10 @@ namespace DNNConnect.CKEditorProvider.Module
         /// <param name="e">An <see cref="T:System.EventArgs" /> object that contains the event data.</param>
         protected override void OnInit(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnInit(e={E})", e);
             this.InitializeComponent();
             base.OnInit(e);
+			eventLogger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <summary>Handles the Load event of the Page control.</summary>
@@ -79,6 +82,7 @@ namespace DNNConnect.CKEditorProvider.Module
         /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
         protected void Page_Load(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering Page_Load(sender={Sender},e={E})", sender, e);
             try
             {
                 this.EditorOptions =
@@ -106,8 +110,10 @@ namespace DNNConnect.CKEditorProvider.Module
             }
             catch (Exception exception)
             {
+				eventLogger.LogError("Exception in Page_Load(sender={Sender},e={E}): {Arg2}", sender, e, exception.Message);
                 Exceptions.ProcessPageLoadException(exception);
             }
+			eventLogger.LogDebug("<<< Exiting Page_Load(sender={Sender},e={E})", sender, e);
         }
 
         private static Dictionary<int, HashSet<TreeNode>> GetModuleNodes(int portalId, IModuleController moduleController, List<EditorHostSetting> editorHostSettings)
@@ -169,6 +175,7 @@ namespace DNNConnect.CKEditorProvider.Module
         /// </summary>
         private void InitializeComponent()
         {
+			eventLogger.LogDebug(">>> Entering InitializeComponent()");
             try
             {
                 if (!this.Page.IsPostBack)
@@ -182,8 +189,10 @@ namespace DNNConnect.CKEditorProvider.Module
             }
             catch (Exception exception)
             {
+				eventLogger.LogError("Exception in InitializeComponent(): {Arg0}", exception.Message);
                 Exceptions.ProcessModuleLoadException(this, exception);
             }
+			eventLogger.LogDebug("<<< Exiting InitializeComponent()");
         }
 
         /// <summary>Handles the CheckedChanged event of the PortalOnly control.</summary>
@@ -191,6 +200,7 @@ namespace DNNConnect.CKEditorProvider.Module
         /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
         private void PortalOnly_CheckedChanged(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering PortalOnly_CheckedChanged(sender={Sender},e={E})", sender, e);
             this.BindPortalTabsAndModulesTree();
 
             this.EditorOptions.Visible = true;
@@ -207,7 +217,9 @@ namespace DNNConnect.CKEditorProvider.Module
 
             // Load Portal Settings for the selected Portal if exist
             var portalId = this.PortalTabsAndModulesTree.SelectedValue.Substring(1);
+			eventLogger.LogDebug("PortalOnly_CheckedChanged(sender={Sender},e={E}): portalId → {PortalId}", sender, e, portalId);
             var tabId = this.PortalTabsAndModulesTree.SelectedNode.ChildNodes[0].Value.Substring(1);
+			eventLogger.LogDebug("PortalOnly_CheckedChanged(sender={Sender},e={E}): tabId → {TabId}", sender, e, tabId);
 
             this.EditorOptions.CurrentOrSelectedPortalId = this.EditorOptions.CurrentPortalOnly ? Convert.ToInt32(portalId) : -1;
             this.EditorOptions.CurrentOrSelectedTabId = this.EditorOptions.CurrentPortalOnly ? Convert.ToInt32(tabId) : -1;
@@ -218,6 +230,7 @@ namespace DNNConnect.CKEditorProvider.Module
 
             // Load Settings
             this.EditorOptions.BindOptionsData(true);
+			eventLogger.LogDebug("<<< Exiting PortalOnly_CheckedChanged(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Loads the Settings based on the Selected Portal/Tab/Module.</summary>
@@ -225,6 +238,7 @@ namespace DNNConnect.CKEditorProvider.Module
         /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
         private void PortalTabsAndModulesTree_SelectedNodeChanged(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering PortalTabsAndModulesTree_SelectedNodeChanged(sender={Sender},e={E})", sender, e);
             if (this.PortalTabsAndModulesTree.SelectedNode == null)
             {
                 return;
@@ -245,7 +259,9 @@ namespace DNNConnect.CKEditorProvider.Module
 
                 // Load Portal Settings for the selected Portal if exist
                 var portalId = this.PortalTabsAndModulesTree.SelectedValue.Substring(1);
+				eventLogger.LogDebug("PortalTabsAndModulesTree_SelectedNodeChanged(sender={Sender},e={E}): portalId → {PortalId}", sender, e, portalId);
                 var tabId = this.PortalTabsAndModulesTree.SelectedNode.ChildNodes[0].Value.Substring(1);
+				eventLogger.LogDebug("PortalTabsAndModulesTree_SelectedNodeChanged(sender={Sender},e={E}): tabId → {TabId}", sender, e, tabId);
 
                 int temp;
                 this.EditorOptions.CurrentOrSelectedPortalId = int.TryParse(portalId, out temp) ? temp : -1;
@@ -298,11 +314,13 @@ namespace DNNConnect.CKEditorProvider.Module
                 // Show Info Notice
                 this.ModuleInstanceInfoPlaceHolder.Visible = true;
             }
+			eventLogger.LogDebug("<<< Exiting PortalTabsAndModulesTree_SelectedNodeChanged(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Sets the language for all Controls.</summary>
         private void SetLanguage()
         {
+			eventLogger.LogDebug(">>> Entering SetLanguage()");
             this.ModuleHeader.Text = Localization.GetString("ModuleHeader.Text", this.ResXFile, this.LangCode);
             this.PortalOnlyLabel.Text = Localization.GetString("PortalOnlyLabel.Text", this.ResXFile, this.LangCode);
             this.PortalOnly.Text = Localization.GetString("PortalOnly.Text", this.ResXFile, this.LangCode);
@@ -316,14 +334,17 @@ namespace DNNConnect.CKEditorProvider.Module
             this.ModuleNoSettingLabel.Text = Localization.GetString("ModuleNoSettingLabel.Text", this.ResXFile, this.LangCode);
             this.IconLegendLabel.Text = Localization.GetString("IconLegendLabel.Text", this.ResXFile, this.LangCode);
             this.ModuleInstanceInfo.Text = Localization.GetString("ModuleError.Text", this.ResXFile, this.LangCode);
+			eventLogger.LogDebug("<<< Exiting SetLanguage()");
         }
 
         /// <summary>Renders the Portal <see cref="Tabs"/> and Module Tree.</summary>
         private void BindPortalTabsAndModulesTree()
         {
+			eventLogger.LogDebug(">>> Entering BindPortalTabsAndModulesTree()");
             this.PortalTabsAndModulesTree.Nodes.Clear();
 
             var settingsDictionary = EditorController.GetEditorHostSettings(this.hostSettings);
+			eventLogger.LogDebug("BindPortalTabsAndModulesTree(): settingsDictionary → {SettingsDictionary}", settingsDictionary);
 
             if (this.PortalOnly.Checked)
             {
@@ -332,8 +353,10 @@ namespace DNNConnect.CKEditorProvider.Module
             else
             {
                 var portals = this.portalController.GetPortals().Cast<IPortalInfo>();
+				eventLogger.LogDebug("BindPortalTabsAndModulesTree(): portals → {Portals}", portals);
                 this.RenderHostNode(portals, settingsDictionary);
             }
+			eventLogger.LogDebug("<<< Exiting BindPortalTabsAndModulesTree()");
         }
 
         private void RenderHostNode(IEnumerable<IPortalInfo> portals, List<EditorHostSetting> editorHostSettings)
@@ -358,6 +381,7 @@ namespace DNNConnect.CKEditorProvider.Module
             }
 
             this.PortalTabsAndModulesTree.Nodes.Add(hostNode);
+			eventLogger.LogDebug("<<< Exiting RenderHostNode(portals={Portals},editorHostSettings={EditorHostSettings})", portals, editorHostSettings);
         }
 
         /// <summary>Renders the <paramref name="portal" /> node.</summary>
@@ -366,9 +390,12 @@ namespace DNNConnect.CKEditorProvider.Module
         /// <param name="parentNode">The parent node.</param>
         private void RenderPortalNode(IPortalInfo portal, List<EditorHostSetting> editorHostSettings, TreeNode parentNode = null)
         {
+			eventLogger.LogDebug(">>> Entering RenderPortalNode(portal={Portal},editorHostSettings={EditorHostSettings},parentNode={ParentNode})", portal, editorHostSettings, parentNode);
             var portalKey = SettingConstants.PortalKey(portal.PortalId);
 
+			eventLogger.LogDebug("RenderPortalNode(portal={Portal},editorHostSettings={EditorHostSettings},parentNode={ParentNode}): portalKey → {PortalKey}", portal, editorHostSettings, parentNode, portalKey);
             var portalSettingsExists = SettingsUtil.CheckSettingsExistByKey(editorHostSettings, portalKey);
+			eventLogger.LogDebug("RenderPortalNode(portal={Portal},editorHostSettings={EditorHostSettings},parentNode={ParentNode}): portalSettingsExists → {PortalSettingsExists}", portal, editorHostSettings, parentNode, portalSettingsExists);
 
             // Portals
             var portalNode = new TreeNode
@@ -384,6 +411,7 @@ namespace DNNConnect.CKEditorProvider.Module
 
             Dictionary<int, HashSet<TreeNode>> modulesNodes = GetModuleNodes(portal.PortalId, this.moduleController, editorHostSettings);
             var tabs = TabController.GetPortalTabs(this.hostSettings, this.appStatus, portal.PortalId, -1, false, null, true, false, true, true, false);
+			eventLogger.LogDebug("RenderPortalNode(portal={Portal},editorHostSettings={EditorHostSettings},parentNode={ParentNode}): tabs → {Tabs}", portal, editorHostSettings, parentNode, tabs);
 
             LoadNodesByTreeViewHelper(editorHostSettings, portalNode, modulesNodes, tabs);
 
@@ -395,6 +423,8 @@ namespace DNNConnect.CKEditorProvider.Module
             {
                 parentNode.ChildNodes.Add(portalNode);
             }
+			eventLogger.LogDebug("<<< Exiting RenderPortalNode(portal={Portal},editorHostSettings={EditorHostSettings},parentNode={ParentNode})", portal, editorHostSettings, parentNode);
         }
+		eventLogger.LogDebug("<<< Exiting EditorConfigManager()");
     }
 }

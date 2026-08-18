@@ -11,9 +11,12 @@ namespace DotNetNuke.Common.Internal
     /// <summary>A service locator for <see cref="IGlobals"/>.</summary>
     public class TestableGlobals : ServiceLocator<IGlobals, TestableGlobals>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TestableGlobals));
         /// <inheritdoc />
         protected override Func<IGlobals> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new GlobalsImpl();
         }
     }

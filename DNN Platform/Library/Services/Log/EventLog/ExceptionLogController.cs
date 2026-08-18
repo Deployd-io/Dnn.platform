@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.Log.EventLog
 
     public class ExceptionLogController : LogController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ExceptionLogController));
         public enum ExceptionLogType
         {
 #pragma warning disable CA1707 // Identifiers should not contain underscores
@@ -44,7 +45,9 @@ namespace DotNetNuke.Services.Log.EventLog
 
         public void AddLog(Exception objException)
         {
+			Logger.LogDebug(">>> Entering AddLog(objException={ObjException})", objException);
             this.AddLog(objException, ExceptionLogType.GENERAL_EXCEPTION);
+			Logger.LogDebug("<<< Exiting AddLog(objException={ObjException})", objException);
         }
 
         public void AddLog(BasePortalException objBasePortalException)
@@ -88,8 +91,10 @@ namespace DotNetNuke.Services.Log.EventLog
 
         public void AddLog(Exception objException, ExceptionLogType logType)
         {
+			Logger.LogDebug(">>> Entering AddLog(objException={ObjException},logType={LogType})", objException, logType);
             var log = new LogInfo { Exception = new ExceptionInfo(objException) };
             this.AddLog(objException, log, logType);
+			Logger.LogDebug("<<< Exiting AddLog(objException={ObjException},logType={LogType})", objException, logType);
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]

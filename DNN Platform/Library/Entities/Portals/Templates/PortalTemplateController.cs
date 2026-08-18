@@ -58,7 +58,9 @@ namespace DotNetNuke.Entities.Portals.Templates
         public PortalTemplateController()
             : this(null, null, null, null, null, null, null, null, null, null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering PortalTemplateController()");
         }
+		eventLogger.LogDebug("<<< Exiting PortalTemplateController()");
 
         /// <summary>Initializes a new instance of the <see cref="PortalTemplateController"/> class.</summary>
         /// <param name="businessControllerProvider">The DI container.</param>
@@ -83,22 +85,29 @@ namespace DotNetNuke.Entities.Portals.Templates
         {
             var importer = new PortalTemplateImporter(this.permissionDefinitionService, this.businessControllerProvider, this.listController, this.eventLogger, this.hostSettings, this.portalController, this.appStatus, this.portalGroupController, this.userController, this.fileContentTypeManager, this.roleProvider, this.roleController, template);
             importer.ParseTemplate(portalId, administratorId, mergeTabs, isNewPortal);
+			eventLogger.LogDebug("<<< Exiting ApplyPortalTemplate(portalId={PortalId},template={Template},administratorId={AdministratorId},mergeTabs={MergeTabs},isNewPortal={IsNewPortal})", portalId, template, administratorId, mergeTabs, isNewPortal);
         }
 
         /// <inheritdoc />
         public (bool Success, string Message) ExportPortalTemplate(int portalId, string fileName, string description, bool isMultiLanguage, IEnumerable<string> locales, string localizationCulture, IEnumerable<int> exportTabIds, bool includeContent, bool includeFiles, bool includeModules, bool includeProfile, bool includeRoles)
         {
+			eventLogger.LogDebug(">>> Entering ExportPortalTemplate(Success={Success},Message={Message})", Success, Message);
             var exporter = new PortalTemplateExporter(this.businessControllerProvider, this.listController, this.portalController, this.hostSettings, this.roleProvider, this.appStatus, this.portalGroupController);
+			eventLogger.LogDebug("ExportPortalTemplate(Success={Success},Message={Message}): exporter → {Exporter}", Success, Message, exporter);
+			eventLogger.LogDebug("<<< Exiting ExportPortalTemplate(Success={Success},Message={Message})", Success, Message);
             return exporter.ExportPortalTemplate(portalId, fileName, description, isMultiLanguage, locales, localizationCulture, exportTabIds, includeContent, includeFiles, includeModules, includeProfile, includeRoles);
         }
 
         /// <inheritdoc />
         public IPortalTemplateInfo GetPortalTemplate(string templatePath, string cultureCode)
         {
+			eventLogger.LogDebug(">>> Entering GetPortalTemplate(templatePath={TemplatePath},cultureCode={CultureCode})", templatePath, cultureCode);
             var template = new PortalTemplateInfo(templatePath, cultureCode);
 
+			eventLogger.LogDebug("GetPortalTemplate(templatePath={TemplatePath},cultureCode={CultureCode}): template → {Template}", templatePath, cultureCode, template);
             if (!string.IsNullOrEmpty(cultureCode) && template.CultureCode != cultureCode)
             {
+			eventLogger.LogDebug("<<< Exiting GetPortalTemplate(templatePath={TemplatePath},cultureCode={CultureCode})", templatePath, cultureCode);
                 return null;
             }
 
@@ -107,15 +116,21 @@ namespace DotNetNuke.Entities.Portals.Templates
 
         public IList<IPortalTemplateInfo> GetPortalTemplates()
         {
+			eventLogger.LogDebug(">>> Entering GetPortalTemplates()");
             var list = new List<IPortalTemplateInfo>();
 
+			eventLogger.LogDebug("GetPortalTemplates(): list → {List}", list);
             var templateFilePaths = PortalTemplateIO.Instance.EnumerateTemplates();
+			eventLogger.LogDebug("GetPortalTemplates(): templateFilePaths → {TemplateFilePaths}", templateFilePaths);
             var languageFileNames = PortalTemplateIO.Instance.EnumerateLanguageFiles().Select(Path.GetFileName).ToList();
+			eventLogger.LogDebug("GetPortalTemplates(): languageFileNames → {LanguageFileNames}", languageFileNames);
 
             foreach (string templateFilePath in templateFilePaths)
             {
                 var currentFileName = Path.GetFileName(templateFilePath);
+				eventLogger.LogDebug("GetPortalTemplates(): currentFileName → {CurrentFileName}", currentFileName);
                 var langs = languageFileNames.Where(x => GetTemplateName(x).Equals(currentFileName, StringComparison.OrdinalIgnoreCase)).Select(x => GetCultureCode(x)).Distinct().ToList();
+				eventLogger.LogDebug("GetPortalTemplates(): langs → {Langs}", langs);
 
                 if (langs.Count != 0)
                 {
@@ -127,6 +142,7 @@ namespace DotNetNuke.Entities.Portals.Templates
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting GetPortalTemplates()");
             return list;
         }
 
@@ -134,18 +150,24 @@ namespace DotNetNuke.Entities.Portals.Templates
         /// <returns>An instance of IPortalTemplateController.</returns>
         protected override Func<IPortalTemplateController> GetFactory()
         {
+			eventLogger.LogDebug(">>> Entering GetFactory()");
+			eventLogger.LogDebug("<<< Exiting GetFactory()");
             return Globals.DependencyProvider.GetRequiredService<IPortalTemplateController>;
         }
 
         private static string GetTemplateName(string languageFileName)
         {
+			eventLogger.LogDebug(">>> Entering GetTemplateName(languageFileName={LanguageFileName})", languageFileName);
             // e.g. "default template.template.en-US.resx"
+			eventLogger.LogDebug("<<< Exiting GetTemplateName(languageFileName={LanguageFileName})", languageFileName);
             return languageFileName.GetFileNameFromLocalizedResxFile();
         }
 
         private static string GetCultureCode(string languageFileName)
         {
+			eventLogger.LogDebug(">>> Entering GetCultureCode(languageFileName={LanguageFileName})", languageFileName);
             // e.g. "default template.template.en-US.resx"
+			eventLogger.LogDebug("<<< Exiting GetCultureCode(languageFileName={LanguageFileName})", languageFileName);
             return languageFileName.GetLocaleCodeFromFileName();
         }
     }

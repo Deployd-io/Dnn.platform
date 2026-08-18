@@ -15,12 +15,16 @@ namespace DotNetNuke.Services.FileSystem.Internal
 
     public class FileLockingController : ServiceLocator<IFileLockingController, FileLockingController>, IFileLockingController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FileLockingController));
         /// <inheritdoc />
         public bool IsFileLocked(IFileInfo file, out string lockReasonKey)
         {
+			Logger.LogDebug(">>> Entering IsFileLocked(file={File})", file);
             lockReasonKey = string.Empty;
 
+			Logger.LogDebug("IsFileLocked(file={File}): lockReasonKey → {LockReasonKey}", file, lockReasonKey);
             var allowedUser = UserSecurityController.Instance.IsHostAdminUser(file.PortalId);
+			Logger.LogDebug("IsFileLocked(file={File}): allowedUser → {AllowedUser}", file, allowedUser);
             if (allowedUser)
             {
                 return false;
@@ -29,6 +33,7 @@ namespace DotNetNuke.Services.FileSystem.Internal
             if (file.ContentItemID != Null.NullInteger)
             {
                 var workflowCompleted = WorkflowEngine.Instance.IsWorkflowCompleted(file.ContentItemID);
+				Logger.LogDebug("IsFileLocked(file={File}): workflowCompleted → {WorkflowCompleted}", file, workflowCompleted);
                 if (!workflowCompleted)
                 {
                     lockReasonKey = "FileLockedRunningWorkflowError";
@@ -37,9 +42,11 @@ namespace DotNetNuke.Services.FileSystem.Internal
             }
 
             var outOfPublishPeriod = IsFileOutOfPublishPeriod(file);
+			Logger.LogDebug("IsFileLocked(file={File}): outOfPublishPeriod → {OutOfPublishPeriod}", file, outOfPublishPeriod);
             if (outOfPublishPeriod)
             {
                 lockReasonKey = "FileLockedOutOfPublishPeriodError";
+			Logger.LogDebug("<<< Exiting IsFileLocked(file={File})", file);
                 return true;
             }
 
@@ -49,8 +56,11 @@ namespace DotNetNuke.Services.FileSystem.Internal
         /// <inheritdoc />
         public bool IsFileOutOfPublishPeriod(IFileInfo file, int portalId, int userId)
         {
+			Logger.LogDebug(">>> Entering IsFileOutOfPublishPeriod(file={File},portalId={PortalId},userId={UserId})", file, portalId, userId);
             if (UserSecurityController.Instance.IsHostAdminUser(portalId, userId))
             {
+			Logger.LogDebug("<<< Exiting IsFileOutOfPublishPeriod(file={File},portalId={PortalId},userId={UserId})", file, portalId, userId);
+			Logger.LogDebug("<<< Exiting IsFileOutOfPublishPeriod(file={File})", file);
                 return false;
             }
 
@@ -60,6 +70,8 @@ namespace DotNetNuke.Services.FileSystem.Internal
         /// <inheritdoc />
         protected override Func<IFileLockingController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => Globals.DependencyProvider.GetRequiredService<IFileLockingController>();
         }
 

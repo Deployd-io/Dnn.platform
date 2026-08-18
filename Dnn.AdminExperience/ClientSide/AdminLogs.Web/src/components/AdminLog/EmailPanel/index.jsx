@@ -8,10 +8,12 @@ import {
 } from "../../../actions";
 import Localization from "localization";
 import util from "../../../utils";
+const logger = console;
 
 class EmailPanel extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             emailRequest: {
                 Email: "",
@@ -23,13 +25,17 @@ class EmailPanel extends Component {
                 email: false
             }
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         this.SetErrorState();
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     SetErrorState() {
+		logger.debug('>>> Entering SetErrorState()');
         let {state} = this;
         let {emailRequest} = this.state;
         if (!this.validateEmail(emailRequest.Email)) {
@@ -37,6 +43,7 @@ class EmailPanel extends Component {
         }
         else {
             state.error["email"] = false;
+			logger.debug('<<< Exiting SetErrorState()');
         }
         state.triedToSubmit = false;
         this.setState({
@@ -45,6 +52,7 @@ class EmailPanel extends Component {
     }
 
     onSendEmail(event) {
+		logger.debug(`>>> Entering onSendEmail(event=${event})`);
         event.preventDefault();
         const {props, state} = this;
         const { emailRequest } = this.state;
@@ -66,6 +74,7 @@ class EmailPanel extends Component {
                 this.onCloseEmailPanel();
             }
         }));
+		logger.debug(`<<< Exiting onSendEmail(event=${event})`);
     }
 
     validateEmail(value) {
@@ -74,6 +83,7 @@ class EmailPanel extends Component {
     }
 
     onEmailValueChange(key, event) {
+		logger.debug(`>>> Entering onEmailValueChange(key=${key},event=${event})`);
         const value = event.target.value;
         const { emailRequest } = this.state;
         emailRequest[key] = value;
@@ -81,16 +91,21 @@ class EmailPanel extends Component {
             emailRequest
         });
         this.SetErrorState();
+		logger.debug(`<<< Exiting onEmailValueChange(key=${key},event=${event})`);
     }
 
     onCloseEmailPanel() {
+		logger.debug('>>> Entering onCloseEmailPanel()');
         const {props} = this;
         props.onCloseEmailPanel();
+		logger.debug('<<< Exiting onCloseEmailPanel()');
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <div className="collapsible-content-email">
                 <Collapse
@@ -162,6 +177,8 @@ EmailPanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         logList: state.log.logList
     };

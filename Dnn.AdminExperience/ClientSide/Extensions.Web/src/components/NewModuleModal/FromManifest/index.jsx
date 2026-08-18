@@ -5,14 +5,17 @@ import FolderDropdown from "../common/FolderDropdown";
 import { validationMapNewModule, valueMapNewModule } from "../common/helperFunctions";
 import Localization from "localization";
 import styles from "./style.module.less";
+const logger = console;
 
 const dropdownStyle = { width: "100%", marginBottom: 64 };
 function getValidateRequired(key) {
+	logger.debug(`>>> Entering getValidateRequired(key=${key})`);
     switch (key) {
         case "moduleFolder":
         case "manifest":
             return true;
         default:
+			logger.debug(`<<< Exiting getValidateRequired(key=${key})`);
             return false;
     }
 }
@@ -30,18 +33,24 @@ const emptyNewModule = {
 class FromManifest extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             newModule: validationMapNewModule(emptyNewModule, getValidateRequired),
             triedToSave: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         this.props.retrieveOwnerAndModuleFolders();
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
     UNSAFE_componentWillReceiveProps(props) {
+		logger.debug(`>>> Entering UNSAFE_componentWillReceiveProps(props=${props})`);
         if (props.moduleFiles.length > 0) {
             let { newModule } = this.state;
             newModule.manifest.value = props.moduleFiles[0].value;
+			logger.debug(`<<< Exiting UNSAFE_componentWillReceiveProps(props=${props})`);
             newModule.manifest.error = false;
 
             this.setState({
@@ -51,6 +60,7 @@ class FromManifest extends Component {
     }
 
     onFolderSelect(key, option) {
+		logger.debug(`>>> Entering onFolderSelect(key=${key},option=${option})`);
         const { props, state } = this;
         let {newModule, triedToSave} = this.state;
         if (key === "ownerFolder") {
@@ -73,6 +83,7 @@ class FromManifest extends Component {
         }
         if (newModule[key].required) {
             newModule[key].error = !option.value;
+			logger.debug(`<<< Exiting onFolderSelect(key=${key},option=${option})`);
         }
         newModule[key].value = option.value;
         this.setState({
@@ -94,6 +105,7 @@ class FromManifest extends Component {
     }
 
     validateFields() {
+		logger.debug('>>> Entering validateFields()');
         let {newModule} = this.state;
         let errorCount = 0;
         Object.keys(newModule).forEach((key) => {
@@ -106,10 +118,12 @@ class FromManifest extends Component {
             newModule,
             triedToSave
         });
+		logger.debug('<<< Exiting validateFields()');
         return errorCount === 0;
     }
 
     onCreateNewModule() {
+		logger.debug('>>> Entering onCreateNewModule()');
         let {state, props} = this;
         let triedToSave = true;
         if (!this.validateFields()) {
@@ -119,6 +133,7 @@ class FromManifest extends Component {
             triedToSave
         });
         props.onCreateNewModule(valueMapNewModule(state.newModule));
+		logger.debug('<<< Exiting onCreateNewModule()');
     }
     onAddedNewFolder(data, type) {
         let {newModule} = this.state;
@@ -134,6 +149,7 @@ class FromManifest extends Component {
             newModule.moduleFolder.value = data.moduleFolder;
             newModule.moduleFolder.error = false;
             newModule.manifest.value = "";
+			logger.debug(`<<< Exiting onAddedNewFolder(data=${data},type=${type})`);
             newModule.manifest.error = true;
             this.setState({
                 triedToSave: false
@@ -153,9 +169,12 @@ class FromManifest extends Component {
         payload[type] = value;
 
         this.props.onAddNewFolder(payload, type, callback);
+		logger.debug(`<<< Exiting onAddNewFolder(value=${value},type=${type},callback=${callback})`);
     }
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={styles.fromManifest + " extension-form"} style={{ padding: 0 }}>
                 <GridSystem className="with-right-border top-half">

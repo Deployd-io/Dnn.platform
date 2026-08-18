@@ -303,18 +303,28 @@ namespace log4net.Core
             object message,
             Exception exception)
         {
+			value.LogDebug(">>> Entering LoggingEvent(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},repository={Repository},loggerName={LoggerName},level={Level},message={Message},exception={Exception})", callerStackBoundaryDeclaringType, repository, loggerName, level, message, exception);
             this.m_callerStackBoundaryDeclaringType = callerStackBoundaryDeclaringType;
+			value.LogDebug("LoggingEvent(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},repository={Repository},loggerName={LoggerName},level={Level},message={Message},exception={Exception}): m_callerStackBoundaryDeclaringType → {M_callerStackBoundaryDeclaringType}", callerStackBoundaryDeclaringType, repository, loggerName, level, message, exception, m_callerStackBoundaryDeclaringType);
+			value.LogDebug("LoggingEvent(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},repository={Repository},loggerName={LoggerName},level={Level},message={Message},exception={Exception}): this.m_callerStackBoundaryDeclaringType → {Arg6}", callerStackBoundaryDeclaringType, repository, loggerName, level, message, exception, this.m_callerStackBoundaryDeclaringType);
             this.m_message = message;
             this.m_repository = repository;
+			value.LogDebug("LoggingEvent(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},repository={Repository},loggerName={LoggerName},level={Level},message={Message},exception={Exception}): m_message → {M_message}", callerStackBoundaryDeclaringType, repository, loggerName, level, message, exception, m_message);
+			value.LogDebug("LoggingEvent(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},repository={Repository},loggerName={LoggerName},level={Level},message={Message},exception={Exception}): this.m_message → {Arg6}", callerStackBoundaryDeclaringType, repository, loggerName, level, message, exception, this.m_message);
+			value.LogDebug("LoggingEvent(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},repository={Repository},loggerName={LoggerName},level={Level},message={Message},exception={Exception}): m_repository → {M_repository}", callerStackBoundaryDeclaringType, repository, loggerName, level, message, exception, m_repository);
+			value.LogDebug("LoggingEvent(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},repository={Repository},loggerName={LoggerName},level={Level},message={Message},exception={Exception}): this.m_repository → {Arg6}", callerStackBoundaryDeclaringType, repository, loggerName, level, message, exception, this.m_repository);
             this.m_thrownException = exception;
 
             this.m_data.LoggerName = loggerName;
             this.m_data.Level = level;
+			value.LogDebug("LoggingEvent(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},repository={Repository},loggerName={LoggerName},level={Level},message={Message},exception={Exception}): m_thrownException → {M_thrownException}", callerStackBoundaryDeclaringType, repository, loggerName, level, message, exception, m_thrownException);
+			value.LogDebug("LoggingEvent(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},repository={Repository},loggerName={LoggerName},level={Level},message={Message},exception={Exception}): this.m_thrownException → {Arg6}", callerStackBoundaryDeclaringType, repository, loggerName, level, message, exception, this.m_thrownException);
 
             // Store the event creation time
             this.m_data.TimeStampUtc = DateTime.UtcNow;
         }
 
+		value.LogDebug("<<< Exiting LoggingEvent(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},repository={Repository},loggerName={LoggerName},level={Level},message={Message},exception={Exception})", callerStackBoundaryDeclaringType, repository, loggerName, level, message, exception);
         /// <summary>
         /// Initializes a new instance of the <see cref="LoggingEvent" /> class 
         /// using specific data.
@@ -345,12 +355,18 @@ namespace log4net.Core
             LoggingEventData data,
             FixFlags fixedData)
         {
+			value.LogDebug(">>> Entering LoggingEvent(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},repository={Repository},data={Data},fixedData={FixedData})", callerStackBoundaryDeclaringType, repository, data, fixedData);
             this.m_callerStackBoundaryDeclaringType = callerStackBoundaryDeclaringType;
             this.m_repository = repository;
+			value.LogDebug("LoggingEvent(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},repository={Repository},data={Data},fixedData={FixedData}): this.m_callerStackBoundaryDeclaringType → {Arg4}", callerStackBoundaryDeclaringType, repository, data, fixedData, this.m_callerStackBoundaryDeclaringType);
+			value.LogDebug("LoggingEvent(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},repository={Repository},data={Data},fixedData={FixedData}): m_repository → {M_repository}", callerStackBoundaryDeclaringType, repository, data, fixedData, m_repository);
+			value.LogDebug("LoggingEvent(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},repository={Repository},data={Data},fixedData={FixedData}): this.m_repository → {Arg4}", callerStackBoundaryDeclaringType, repository, data, fixedData, this.m_repository);
 
             this.m_data = data;
             this.m_fixFlags = fixedData;
+			value.LogDebug("LoggingEvent(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},repository={Repository},data={Data},fixedData={FixedData}): m_data → {M_data}", callerStackBoundaryDeclaringType, repository, data, fixedData, m_data);
         }
+		value.LogDebug("<<< Exiting LoggingEvent(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType},repository={Repository},data={Data},fixedData={FixedData})", callerStackBoundaryDeclaringType, repository, data, fixedData);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoggingEvent" /> class 
@@ -442,6 +458,7 @@ namespace log4net.Core
             // We have restored all the values of this instance, i.e. all the values are fixed
             // Set the fix flags otherwise the data values may be overwritten from the current environment.
             this.m_fixFlags = FixFlags.All;
+			value.LogDebug("LoggingEvent(info={Info},context={Context}): m_fixFlags → {M_fixFlags}", info, context, m_fixFlags);
         }
 
 #endif
@@ -630,10 +647,14 @@ namespace log4net.Core
         /// <param name="repository">the value for the repository</param>
         internal void EnsureRepository(ILoggerRepository repository)
         {
+			value.LogDebug(">>> Entering EnsureRepository(repository={Repository})", repository);
             if (repository != null)
             {
                 this.m_repository = repository;
+				value.LogDebug("EnsureRepository(repository={Repository}): m_repository → {M_repository}", repository, m_repository);
+				value.LogDebug("EnsureRepository(repository={Repository}): this.m_repository → {Arg1}", repository, this.m_repository);
             }
+			value.LogDebug("<<< Exiting EnsureRepository(repository={Repository})", repository);
         }
 
         /// <summary>Gets the message, rendered through the <see cref="ILoggerRepository.RendererMap" />.</summary>
@@ -687,6 +708,7 @@ namespace log4net.Core
         /// </remarks>
         public void WriteRenderedMessage(TextWriter writer)
         {
+			value.LogDebug(">>> Entering WriteRenderedMessage(writer={Writer})", writer);
             if (this.m_data.Message != null)
             {
                 writer.Write(this.m_data.Message);
@@ -710,6 +732,7 @@ namespace log4net.Core
                     }
                 }
             }
+			value.LogDebug("<<< Exiting WriteRenderedMessage(writer={Writer})", writer);
         }
 
         /// <summary>Gets the name of the current thread.  </summary>
@@ -830,6 +853,7 @@ namespace log4net.Core
 
         private static string TryGetCurrentUserName()
         {
+		value.LogDebug(">>> Entering TryGetCurrentUserName()");
 #if (NETCF || SSCLI || NETSTANDARD1_3)
                     // On compact framework there's no notion of current Windows user
                     return SystemInfo.NotAvailableText;
@@ -851,6 +875,7 @@ namespace log4net.Core
             catch (PlatformNotSupportedException)
             {
                 _platformDoesNotSupportWindowsIdentity = true;
+				value.LogDebug("TryGetCurrentUserName(): _platformDoesNotSupportWindowsIdentity → {_platformDoesNotSupportWindowsIdentity}", _platformDoesNotSupportWindowsIdentity);
                 return Environment.UserName;
             }
             catch (SecurityException)
@@ -865,6 +890,8 @@ namespace log4net.Core
             }
             catch
             {
+				value.LogError("Exception in TryGetCurrentUserName(): {Arg0}", SecurityException.Message);
+				value.LogDebug("<<< Exiting TryGetCurrentUserName()");
                 return null;
             }
 #endif
@@ -1039,6 +1066,7 @@ namespace log4net.Core
 #endif
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
+			value.LogDebug(">>> Entering GetObjectData(info={Info},context={Context})", info, context);
             // The caller must call FixVolatileData before this object
             // can be serialized.
 
@@ -1048,6 +1076,7 @@ namespace log4net.Core
             info.AddValue("ThreadName", this.m_data.ThreadName);
             // TODO: consider serializing UTC rather than local time.  Not implemented here because it
             // would give an unexpected result if client and server have different versions of this class.
+			value.LogDebug("<<< Exiting GetObjectData(info={Info},context={Context})", info, context);
             // info.AddValue("TimeStamp", m_data.TimeStampUtc);
 #pragma warning disable 618
             info.AddValue("TimeStamp", this.m_data.TimeStamp);
@@ -1076,6 +1105,9 @@ namespace log4net.Core
         /// </remarks>
         public LoggingEventData GetLoggingEventData()
         {
+			value.LogDebug(">>> Entering GetLoggingEventData()");
+			value.LogDebug("<<< Exiting GetLoggingEventData()");
+			value.LogDebug("<<< Exiting GetLoggingEventData(fixFlags={FixFlags})", fixFlags);
             return this.GetLoggingEventData(FixFlags.Partial);
         }
 
@@ -1109,6 +1141,8 @@ namespace log4net.Core
         [Obsolete("Use GetExceptionString instead")]
         public string GetExceptionStrRep()
         {
+			value.LogDebug(">>> Entering GetExceptionStrRep()");
+			value.LogDebug("<<< Exiting GetExceptionStrRep()");
             return this.GetExceptionString();
         }
 
@@ -1127,6 +1161,7 @@ namespace log4net.Core
         /// </remarks>
         public string GetExceptionString()
         {
+			value.LogDebug(">>> Entering GetExceptionString()");
             if (this.m_data.ExceptionString == null && this.m_cacheUpdatable)
             {
                 if (this.m_thrownException != null)
@@ -1148,6 +1183,7 @@ namespace log4net.Core
                 }
             }
 
+			value.LogDebug("<<< Exiting GetExceptionString()");
             return this.m_data.ExceptionString;
         }
 
@@ -1176,10 +1212,14 @@ namespace log4net.Core
         [Obsolete("Use Fix property")]
         public void FixVolatileData()
         {
+			value.LogDebug(">>> Entering FixVolatileData()");
             this.Fix = FixFlags.All;
+			value.LogDebug("FixVolatileData(): this.Fix → {Arg0}", this.Fix);
+			value.LogDebug("<<< Exiting FixVolatileData()");
         }
 
         /// <summary>Fixes instance fields that hold volatile data.</summary>
+		value.LogDebug("<<< Exiting FixVolatileData()");
         /// <param name="fastButLoose">Set to <c>true</c> to not fix data that takes a long time to fix.</param>
         /// <remarks>
         /// <para>
@@ -1208,14 +1248,17 @@ namespace log4net.Core
         [Obsolete("Use Fix property")]
         public void FixVolatileData(bool fastButLoose)
         {
+			value.LogDebug(">>> Entering FixVolatileData(fastButLoose={FastButLoose})", fastButLoose);
             if (fastButLoose)
             {
                 this.Fix = FixFlags.Partial;
+				value.LogDebug("FixVolatileData(fastButLoose={FastButLoose}): this.Fix → {Arg1}", fastButLoose, this.Fix);
             }
             else
             {
                 this.Fix = FixFlags.All;
             }
+			value.LogDebug("<<< Exiting FixVolatileData(fastButLoose={FastButLoose})", fastButLoose);
         }
 
         /// <summary>Fix the fields specified by the <see cref="FixFlags"/> parameter</summary>
@@ -1229,8 +1272,10 @@ namespace log4net.Core
         /// </remarks>
         protected void FixVolatileData(FixFlags flags)
         {
+			value.LogDebug(">>> Entering FixVolatileData(flags={Flags})", flags);
             object forceCreation = null;
 
+			value.LogDebug("FixVolatileData(flags={Flags}): forceCreation → {ForceCreation}", flags, forceCreation);
             //Unlock the cache so that new values can be stored
             //This may not be ideal if we are no longer in the correct context
             //and someone calls fix. 
@@ -1238,6 +1283,7 @@ namespace log4net.Core
 
             // determine the flags that we are actually fixing
             var updateFlags = (FixFlags)((flags ^ this.m_fixFlags) & flags);
+			value.LogDebug("FixVolatileData(flags={Flags}): updateFlags → {UpdateFlags}", flags, updateFlags);
 
             if (updateFlags > 0)
             {
@@ -1316,20 +1362,25 @@ namespace log4net.Core
 
         private void CreateCompositeProperties()
         {
+			value.LogDebug(">>> Entering CreateCompositeProperties()");
             var compositeProperties = new CompositeProperties();
 
+			value.LogDebug("CreateCompositeProperties(): compositeProperties → {CompositeProperties}", compositeProperties);
             if (this.m_eventProperties != null)
             {
                 compositeProperties.Add(this.m_eventProperties);
+			value.LogDebug("<<< Exiting CreateCompositeProperties()");
             }
 #if !NETCF
             var logicalThreadProperties = LogicalThreadContext.Properties.GetProperties(false);
+			value.LogDebug("CreateCompositeProperties(): logicalThreadProperties → {LogicalThreadProperties}", logicalThreadProperties);
             if (logicalThreadProperties != null)
             {
                 compositeProperties.Add(logicalThreadProperties);
             }
 #endif
             var threadProperties = ThreadContext.Properties.GetProperties(false);
+			value.LogDebug("CreateCompositeProperties(): threadProperties → {ThreadProperties}", threadProperties);
             if (threadProperties != null)
             {
                 compositeProperties.Add(threadProperties);
@@ -1339,16 +1390,20 @@ namespace log4net.Core
 
             // event properties
             var eventProperties = new PropertiesDictionary();
+			value.LogDebug("CreateCompositeProperties(): eventProperties → {EventProperties}", eventProperties);
             eventProperties[UserNameProperty] = this.UserName;
             eventProperties[IdentityProperty] = this.Identity;
             compositeProperties.Add(eventProperties);
 
             compositeProperties.Add(GlobalContext.Properties.GetReadOnlyProperties());
             this.m_compositeProperties = compositeProperties;
+			value.LogDebug("CreateCompositeProperties(): m_compositeProperties → {M_compositeProperties}", m_compositeProperties);
+			value.LogDebug("CreateCompositeProperties(): this.m_compositeProperties → {Arg0}", this.m_compositeProperties);
         }
 
         private void CacheProperties()
         {
+			value.LogDebug(">>> Entering CacheProperties()");
             if (this.m_data.Properties == null && this.m_cacheUpdatable)
             {
                 if (this.m_compositeProperties == null)
@@ -1357,17 +1412,21 @@ namespace log4net.Core
                 }
 
                 var flattenedProperties = this.m_compositeProperties.Flatten();
+				value.LogDebug("CacheProperties(): flattenedProperties → {FlattenedProperties}", flattenedProperties);
 
                 var fixedProperties = new PropertiesDictionary();
+				value.LogDebug("CacheProperties(): fixedProperties → {FixedProperties}", fixedProperties);
 
                 // Validate properties
                 foreach (DictionaryEntry entry in flattenedProperties)
                 {
                     var key = entry.Key as string;
+					value.LogWarning("CacheProperties(): key → {Key}", key);
 
                     if (key != null)
                     {
                         var val = entry.Value;
+						value.LogDebug("CacheProperties(): val → {Val}", val);
 
                         // Fix any IFixingRequired objects
                         var fixingRequired = val as IFixingRequired;
@@ -1386,6 +1445,7 @@ namespace log4net.Core
 
                 this.m_data.Properties = fixedProperties;
             }
+			value.LogDebug("<<< Exiting CacheProperties()");
         }
 
         /// <summary>Lookup a composite property in this event</summary>
@@ -1449,6 +1509,7 @@ namespace log4net.Core
         /// </remarks>
         public PropertiesDictionary GetProperties()
         {
+			value.LogDebug(">>> Entering GetProperties()");
             if (this.m_data.Properties != null)
             {
                 return this.m_data.Properties;
@@ -1459,6 +1520,7 @@ namespace log4net.Core
                 this.CreateCompositeProperties();
             }
 
+			value.LogDebug("<<< Exiting GetProperties()");
             return this.m_compositeProperties.Flatten();
         }
 

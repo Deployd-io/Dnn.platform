@@ -2,43 +2,54 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Localization from "localization";
 import "./style.less";
+const logger = console;
 import { Collapsible, SvgIcons, TextOverflowWrapper } from "@dnnsoftware/dnn-react-common";
 
  
 class JobRow extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             collapsed: true,
             collapsedClass: true,
             repainting: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         let opened = (this.props.openId !== "" && this.props.jobId === this.props.openId);
         this.setState({
             opened
         });
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     toggle() {
+		logger.debug('>>> Entering toggle()');
         if ((this.props.openId !== "" && this.props.jobId === this.props.openId)) {
             this.props.Collapse();
         } else {
             this.props.OpenCollapse(this.props.jobId);
+			logger.debug('<<< Exiting toggle()');
         }
     }
 
     getTypeIndicator() {
+		logger.debug('>>> Entering getTypeIndicator()');
         const { props } = this;
+		logger.debug('<<< Exiting getTypeIndicator()');
         return props.jobType.indexOf("Import") >= 0 ? <div className="jobIndicator-import"></div> : <div className="jobIndicator-export"></div>;
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const { props, state } = this;
         let opened = (props.openId !== "" && this.props.jobId === props.openId);
+		logger.debug('<<< Exiting render()');
         return (
             <div className={"collapsible-jobdetail " + !opened + (props.className ? (" " + props.className) : "")}>
                 <div className={"collapsible-jobdetail-header " + state.collapsed}>

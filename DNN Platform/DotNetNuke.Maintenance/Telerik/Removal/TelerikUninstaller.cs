@@ -5,21 +5,26 @@
 namespace DotNetNuke.Maintenance.Telerik.Removal
 {
     using System;
+	using Microsoft.Extensions.Logging;
 
     /// <inheritdoc cref="ITelerikUninstaller" />
     internal sealed class TelerikUninstaller : UnInstaller, ITelerikUninstaller
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>Initializes a new instance of the <see cref="TelerikUninstaller"/> class.</summary>
         /// <param name="serviceProvider">An instance of <see cref="IServiceProvider"/>.</param>
         /// <param name="localizer">An instance of <see cref="ILocalizer"/>.</param>
         public TelerikUninstaller(IServiceProvider serviceProvider, ILocalizer localizer)
         : base(serviceProvider, localizer)
         {
+		_logger.LogDebug(">>> Entering TelerikUninstaller(serviceProvider={ServiceProvider},localizer={Localizer})", serviceProvider, localizer);
+		_logger.LogDebug("<<< Exiting TelerikUninstaller(serviceProvider={ServiceProvider},localizer={Localizer})", serviceProvider, localizer);
         }
 
         /// <inheritdoc />
         public void Execute()
         {
+			_logger.LogDebug(">>> Entering Execute()");
             var steps = new[]
             {
                 this.RemoveExtension("DotNetNuke.Telerik.Web"),
@@ -46,6 +51,7 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
             };
 
             var skip = false;
+			_logger.LogDebug("Execute(): skip → {Skip}", skip);
 
             foreach (var step in steps)
             {
@@ -62,6 +68,7 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
 
                 this.ProgressInternal.AddRange(UninstallSummaryItem.FromStep(step));
             }
+			_logger.LogDebug("<<< Exiting Execute()");
         }
     }
 }

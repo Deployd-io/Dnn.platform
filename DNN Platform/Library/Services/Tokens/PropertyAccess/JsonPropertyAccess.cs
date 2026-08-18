@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.Tokens
 
     public abstract class JsonPropertyAccess<TModel> : IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(JsonPropertyAccess));
         /// <inheritdoc />
         public virtual CacheLevel Cacheability
         {
@@ -22,14 +23,19 @@ namespace DotNetNuke.Services.Tokens
         /// <inheritdoc />
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			Logger.LogDebug(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             var json = propertyName.Trim();
             if (!(json.StartsWith("{", StringComparison.Ordinal) && json.EndsWith("}", StringComparison.Ordinal)))
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): json → {Json}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, json);
             {
+				Logger.LogWarning("Throwing ArgumentException from GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
                 throw new ArgumentException("The token argument is not property formatted JSON");
             }
 
             var deserializedObject = JsonConvert.DeserializeObject<TModel>(json);
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): deserializedObject → {DeserializedObject}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, deserializedObject);
 
+			Logger.LogDebug("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             return this.ProcessToken(deserializedObject, accessingUser, accessLevel);
         }
 

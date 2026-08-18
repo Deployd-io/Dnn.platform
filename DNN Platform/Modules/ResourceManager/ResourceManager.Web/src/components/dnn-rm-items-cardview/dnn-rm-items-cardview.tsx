@@ -1,3 +1,4 @@
+const logger = console;
 import { Component, Event, EventEmitter, Host, h, Prop, Element } from '@stencil/core';
 import { GetFolderContentResponse, Item } from '../../services/ItemsClient';
 import { selectionUtilities } from '../../utilities/selection-utilities';
@@ -24,13 +25,17 @@ export class DnnRmItemsCardview {
 
   private handleDoubleClick(item: Item): void {
     if (item.isFolder) {
+	logger.debug(`>>> Entering handleDoubleClick(item=${item})`);
       this.dnnRmFolderDoubleClicked.emit(item.itemId);
     } else {
       this.dnnRmFileDoubleClicked.emit(item.path);
+	logger.debug(`<<< Exiting handleDoubleClick(item=${item})`);
     }
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         {this.currentItems &&

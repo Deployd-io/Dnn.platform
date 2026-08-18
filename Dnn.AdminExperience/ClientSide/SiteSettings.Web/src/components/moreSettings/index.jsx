@@ -14,14 +14,17 @@ import {
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 function getError(errors) {
+	logger.debug(`>>> Entering getError(errors=${errors})`);
     let hasError = false;
     Object.keys(errors).forEach((key) => {
         if (errors[key] === true) {
             hasError = true;
         }
     });
+	logger.debug(`<<< Exiting getError(errors=${errors})`);
     return hasError;
 }
 
@@ -30,6 +33,7 @@ let isHost = false;
 class MoreSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             otherSettings: undefined,
             siteBehaviorExtrasRendered: true,
@@ -37,9 +41,11 @@ class MoreSettingsPanelBody extends Component {
             whitelistOption: 0,
         };
         isHost = util.settings.isHost;
+		logger.debug('<<< Exiting constructor()');
     }
 
     loadData() {
+		logger.debug('>>> Entering loadData()');
         const { props } = this;
         props.dispatch(
             SiteBehaviorActions.getOtherSettings(props.portalId, (data) => {
@@ -48,6 +54,7 @@ class MoreSettingsPanelBody extends Component {
                     whitelistOption = 0;
                 } else if (data.Settings.AllowedExtensionsWhitelist === data.Settings.ImageExtensionsList) {
                     whitelistOption = 2;
+					logger.debug('<<< Exiting loadData()');
                 }
                 this.setState({
                     otherSettings: Object.assign({}, data.Settings),
@@ -59,6 +66,7 @@ class MoreSettingsPanelBody extends Component {
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const { props } = this;
         if (props.otherSettings) {
             this.setState({
@@ -71,9 +79,11 @@ class MoreSettingsPanelBody extends Component {
             whitelistOption: 0,
         });
         this.loadData();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         const { props } = this;
         if (props.otherSettings) {
             let portalIdChanged = props.portalId !== undefined && prevProps.portalId !== props.portalId;
@@ -81,6 +91,7 @@ class MoreSettingsPanelBody extends Component {
 
             if (portalIdChanged || cultureCodeChanged) {
                 this.loadData();
+				logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
             }
         }
     }
@@ -98,11 +109,14 @@ class MoreSettingsPanelBody extends Component {
         props.dispatch(
             SiteBehaviorActions.otherSettingsClientModified(otherSettings)
         );
+		logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
     }
 
     onUpdate(event) {
+		logger.debug(`>>> Entering onUpdate(event=${event})`);
         if (event) {
             event.preventDefault();
+			logger.debug(`<<< Exiting onUpdate(event=${event})`);
         }
         const { props, state } = this;
 
@@ -120,6 +134,7 @@ class MoreSettingsPanelBody extends Component {
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const { props } = this;
         util.utilities.confirm(
             resx.get("SettingsRestoreWarning"),
@@ -145,24 +160,29 @@ class MoreSettingsPanelBody extends Component {
                 );
             }
         );
+		logger.debug('<<< Exiting onCancel()');
     }
 
     renderSiteBehaviorExtensions() {
+		logger.debug('>>> Entering renderSiteBehaviorExtensions()');
         const SiteBehaviorExtras =
             window.dnn.SiteSettings && window.dnn.SiteSettings.SiteBehaviorExtras;
         if (!SiteBehaviorExtras || SiteBehaviorExtras.length === 0) {
             return;
         }
         return SiteBehaviorExtras.sort(function (a, b) {
+		logger.debug('>>> Entering sort()');
             if (a.RenderOrder < b.RenderOrder) return -1;
             if (a.RenderOrder > b.RenderOrder) return 1;
             return 0;
         }).map((data) => {
+		logger.debug('<<< Exiting renderSiteBehaviorExtensions()');
             return data.Component;
         });
     }
 
     onSaveMoreSettings() {
+		logger.debug('>>> Entering onSaveMoreSettings()');
         const SiteBehaviorExtras =
             window.dnn.SiteSettings && window.dnn.SiteSettings.SiteBehaviorExtras;
         let _errorInSave = false;
@@ -221,9 +241,11 @@ class MoreSettingsPanelBody extends Component {
         } else {
             util.utilities.notify(resx.get("SettingsUpdateSuccess"));
         }
+		logger.debug('<<< Exiting onSaveMoreSettings()');
     }
 
     getOverallFormDirty() {
+		logger.debug('>>> Entering getOverallFormDirty()');
         let formDirty = false;
         const SiteBehaviorExtras =
             window.dnn.SiteSettings && window.dnn.SiteSettings.SiteBehaviorExtras;
@@ -240,10 +262,13 @@ class MoreSettingsPanelBody extends Component {
         if (this.props.otherSettingsClientModified) {
             formDirty = true;
         }
+		logger.debug('<<< Exiting getOverallFormDirty()');
         return formDirty;
     }
 
     getWhiteListOptions() {
+		logger.debug('>>> Entering getWhiteListOptions()');
+		logger.debug('<<< Exiting getWhiteListOptions()');
         return [
             { label: resx.get("Default"), value: 0 },
             { label: resx.get("Custom"), value: 1 },
@@ -252,6 +277,7 @@ class MoreSettingsPanelBody extends Component {
     }
 
     onWhitelistOptionChange(e) {
+		logger.debug(`>>> Entering onWhitelistOptionChange(e=${e})`);
         let newState = this.state;
         switch (e.value) {
             case 0:
@@ -262,25 +288,31 @@ class MoreSettingsPanelBody extends Component {
                 break;
         }
         newState.whitelistOption = e.value;
+		logger.debug(`onWhitelistOptionChange(e=${e}): newState.whitelistOption → ${newState.whitelistOption}`);
         this.setState(newState);
+		logger.debug(`<<< Exiting onWhitelistOptionChange(e=${e})`);
         this.props.dispatch(
             SiteBehaviorActions.otherSettingsClientModified(newState.otherSettings)
         );
     }
 
     getMaxNumberOfVersionsOptions(maxValue) {
+		logger.debug(`>>> Entering getMaxNumberOfVersionsOptions(maxValue=${maxValue})`);
         const maxNumberOfVersionsOptions = [];
         for (let i = 0; i <= maxValue; i++) {
             maxNumberOfVersionsOptions.push({ "value": i, "label": i.toString() });
         }
+		logger.debug(`<<< Exiting getMaxNumberOfVersionsOptions(maxValue=${maxValue})`);
         return maxNumberOfVersionsOptions;
     }
 
     getWorkflowsOptions() {
+		logger.debug('>>> Entering getWorkflowsOptions()');
         let options = [];
         const { props } = this;
         if (props.workflows !== undefined) {
             options = this.props.workflows.map((item) => {
+		logger.debug('<<< Exiting getWorkflowsOptions()');
                 return { label: item.label, value: item.value };
             });
         }
@@ -300,10 +332,12 @@ class MoreSettingsPanelBody extends Component {
         props.dispatch(
             SiteBehaviorActions.otherSettingsClientModified(otherSettings)
         );
+		logger.debug(`<<< Exiting onDropDownChange(key=${key},option=${option})`);
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const { props, state } = this;
         let htmlEditor = isHost ? (
             <div>
@@ -326,6 +360,7 @@ class MoreSettingsPanelBody extends Component {
             </div>
         ) : null;
         if (state.otherSettings) {
+			logger.debug('<<< Exiting render()');
             return (
                 <div className={styles.moreSettings}>
                     {state.siteBehaviorExtrasRendered &&
@@ -552,6 +587,8 @@ MoreSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         ...state,
         otherSettings: state.siteBehavior.otherSettings,

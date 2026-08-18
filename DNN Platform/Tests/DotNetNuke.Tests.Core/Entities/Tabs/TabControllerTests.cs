@@ -14,14 +14,18 @@ namespace DotNetNuke.Tests.Core.Entities.Tabs
         [SetUp]
         public void SetUp()
         {
+			mockEventLogger.LogDebug(">>> Entering SetUp()");
             MockComponentProvider.CreateDataProvider();
+			mockEventLogger.LogDebug("<<< Exiting SetUp()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			mockEventLogger.LogDebug(">>> Entering TearDown()");
             MockComponentProvider.ResetContainer();
             TabController.ClearInstance();
+			mockEventLogger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
@@ -55,11 +59,13 @@ namespace DotNetNuke.Tests.Core.Entities.Tabs
         [TestCase("Register")]
         public void IsValidadTab_Returns_False_For_Forbidden_PageNames(string tabName)
         {
+			mockEventLogger.LogDebug(">>> Entering IsValidadTab_Returns_False_For_Forbidden_PageNames(tabName={TabName})", tabName);
             // Arrange
             string invalidType;
 
             // Act
             var isValid = TabController.IsValidTabName(tabName, out invalidType);
+			mockEventLogger.LogDebug("IsValidadTab_Returns_False_For_Forbidden_PageNames(tabName={TabName}): isValid → {IsValid}", tabName, isValid);
 
             using (Assert.EnterMultipleScope())
             {
@@ -67,16 +73,19 @@ namespace DotNetNuke.Tests.Core.Entities.Tabs
                 Assert.That(isValid, Is.False, "A forbidden tab name is allowed");
                 Assert.That(invalidType, Is.EqualTo("InvalidTabName"), "The invalidType is not the expected one");
             }
+			mockEventLogger.LogDebug("<<< Exiting IsValidadTab_Returns_False_For_Forbidden_PageNames(tabName={TabName})", tabName);
         }
 
         [Test]
         public void IsValidadTab_Returns_False_For_Empty_PageNames()
         {
+			mockEventLogger.LogDebug(">>> Entering IsValidadTab_Returns_False_For_Empty_PageNames()");
             // Arrange
             string invalidType;
 
             // Act
             var isValid = TabController.IsValidTabName(string.Empty, out invalidType);
+			mockEventLogger.LogDebug("IsValidadTab_Returns_False_For_Empty_PageNames(): isValid → {IsValid}", isValid);
 
             using (Assert.EnterMultipleScope())
             {
@@ -84,6 +93,7 @@ namespace DotNetNuke.Tests.Core.Entities.Tabs
                 Assert.That(isValid, Is.False, "An empty tab name is allowed");
                 Assert.That(invalidType, Is.EqualTo("EmptyTabName"), "The invalidType is not the expected one");
             }
+			mockEventLogger.LogDebug("<<< Exiting IsValidadTab_Returns_False_For_Empty_PageNames()");
         }
 
         [Test]
@@ -92,11 +102,13 @@ namespace DotNetNuke.Tests.Core.Entities.Tabs
         [TestCase("products")]
         public void IsValidadTab_Returns_True_For_Regular_PageNames(string tabName)
         {
+			mockEventLogger.LogDebug(">>> Entering IsValidadTab_Returns_True_For_Regular_PageNames(tabName={TabName})", tabName);
             // Arrange
             string invalidType;
 
             // Act
             var isValid = TabController.IsValidTabName(tabName, out invalidType);
+			mockEventLogger.LogDebug("IsValidadTab_Returns_True_For_Regular_PageNames(tabName={TabName}): isValid → {IsValid}", tabName, isValid);
 
             using (Assert.EnterMultipleScope())
             {
@@ -104,6 +116,7 @@ namespace DotNetNuke.Tests.Core.Entities.Tabs
                 Assert.That(isValid, Is.True, "A regular tab name is not allowed");
                 Assert.That(invalidType, Is.Empty, "The invalidType is not the expected one");
             }
+			mockEventLogger.LogDebug("<<< Exiting IsValidadTab_Returns_True_For_Regular_PageNames(tabName={TabName})", tabName);
         }
     }
 }

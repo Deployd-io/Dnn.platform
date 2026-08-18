@@ -42,9 +42,12 @@ namespace DotNetNuke.Services.Installer
 
         public static string CreateSkinManifest(string skinFolder, string skinType, string tempInstallFolder)
         {
+			Logger.LogDebug(">>> Entering CreateSkinManifest(skinFolder={SkinFolder},skinType={SkinType},tempInstallFolder=<redacted>)", skinFolder, skinType);
             // Test if there are Skins and Containers folders in TempInstallFolder (ie it is a legacy combi package)
             bool isCombi = false;
+			Logger.LogDebug("CreateSkinManifest(skinFolder={SkinFolder},skinType={SkinType},tempInstallFolder=<redacted>): isCombi → {IsCombi}", skinFolder, skinType, isCombi);
             var installFolder = new DirectoryInfo(tempInstallFolder);
+			Logger.LogDebug("CreateSkinManifest(skinFolder={SkinFolder},skinType={SkinType},tempInstallFolder=<redacted>): installFolder → {InstallFolder}", skinFolder, skinType, installFolder);
             DirectoryInfo[] subFolders = installFolder.GetDirectories();
             if (subFolders.Length > 0)
             {
@@ -56,6 +59,7 @@ namespace DotNetNuke.Services.Installer
 
             // Create a writer to create the processed manifest
             var sb = new StringBuilder();
+			Logger.LogDebug("CreateSkinManifest(skinFolder={SkinFolder},skinType={SkinType},tempInstallFolder=<redacted>): sb → {Sb}", skinFolder, skinType, sb);
             using (XmlWriter writer = XmlWriter.Create(sb, XmlUtils.GetXmlWriterSettings(ConformanceLevel.Fragment)))
             {
                 PackageWriterBase.WriteManifestStartElement(writer);
@@ -85,6 +89,7 @@ namespace DotNetNuke.Services.Installer
                 writer.Close();
 
                 // Return new manifest
+				Logger.LogDebug("<<< Exiting CreateSkinManifest(skinFolder={SkinFolder},skinType={SkinType},tempInstallFolder=<redacted>)", skinFolder, skinType);
                 return sb.ToString();
             }
         }
@@ -138,6 +143,7 @@ namespace DotNetNuke.Services.Installer
             {
                 package.License = Util.PACKAGE_NoLicense;
             }
+			Logger.LogDebug("<<< Exiting ParsePackageName(package={Package})", package);
         }
 
         private static PackageInfo CreateSkinPackage(SkinPackageInfo skin)

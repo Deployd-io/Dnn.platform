@@ -23,7 +23,9 @@ namespace Dnn.EditBar.UI.Items
         public CompleteStateMenu()
             : this(null, null)
         {
+		eventLogger.LogDebug(">>> Entering CompleteStateMenu()");
         }
+		eventLogger.LogDebug("<<< Exiting CompleteStateMenu()");
 
         /// <inheritdoc />
         public override string Name { get; } = "CompleteState";
@@ -51,5 +53,6 @@ namespace Dnn.EditBar.UI.Items
             && this.IsLastState == false // not the last 'Published' state
             && this.IsPriorState == false // not the state that is before last 'Published' state
             && (this.IsDraftWithPermissions == true || this.IsReviewOrOtherIntermediateStateWithPermissions == true);
+			eventLogger.LogDebug("<<< Exiting Visible()");
     }
 }

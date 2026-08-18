@@ -51,7 +51,10 @@ namespace log4net.Util
         /// </remarks>
         public PatternParser(string pattern) 
         {
+			value.LogDebug(">>> Entering PatternParser(pattern={Pattern})", pattern);
             this.m_pattern = pattern;
+			value.LogDebug("PatternParser(pattern={Pattern}): this.m_pattern → {Arg1}", pattern, this.m_pattern);
+			value.LogDebug("<<< Exiting PatternParser(pattern={Pattern})", pattern);
         }
 
         /// <summary>Parses the pattern into a chain of pattern converters.</summary>
@@ -63,10 +66,12 @@ namespace log4net.Util
         /// </remarks>
         public PatternConverter Parse()
         {
+			value.LogDebug(">>> Entering Parse()");
             string[] converterNamesCache = this.BuildCache();
 
             this.ParseInternal(this.m_pattern, converterNamesCache);
 
+			value.LogDebug("<<< Exiting Parse()");
             return this.m_head;
         }
 
@@ -93,12 +98,14 @@ namespace log4net.Util
         /// </remarks>
         private string[] BuildCache()
         {
+			value.LogDebug(">>> Entering BuildCache()");
             string[] converterNamesCache = new string[this.m_patternConverters.Keys.Count];
             this.m_patternConverters.Keys.CopyTo(converterNamesCache, 0);
 
             // sort array so that longer strings come first
             Array.Sort(converterNamesCache, 0, converterNamesCache.Length, StringLengthComparer.Instance);
 
+			value.LogDebug("<<< Exiting BuildCache()");
             return converterNamesCache;
         }
 
@@ -115,10 +122,13 @@ namespace log4net.Util
 
             private StringLengthComparer()
             {
+			value.LogDebug(">>> Entering StringLengthComparer()");
+			value.LogDebug("<<< Exiting StringLengthComparer()");
             }
 
             public int Compare(object x, object y)
             {
+				value.LogDebug(">>> Entering Compare(x={X},y={Y})", x, y);
                 string s1 = x as string;
                 string s2 = y as string;
 
@@ -132,6 +142,7 @@ namespace log4net.Util
                 }
                 if (s2 == null)
                 {
+				value.LogDebug("<<< Exiting Compare(x={X},y={Y})", x, y);
                     return -1;
                 }
 
@@ -149,8 +160,10 @@ namespace log4net.Util
         /// </remarks>
         private void ParseInternal(string pattern, string[] matches)
         {
+			value.LogDebug(">>> Entering ParseInternal(pattern={Pattern},matches={Matches})", pattern, matches);
             int offset = 0;
             while(offset < pattern.Length)
+			value.LogDebug("ParseInternal(pattern={Pattern},matches={Matches}): offset → {Offset}", pattern, matches, offset);
             {
                 int i = pattern.IndexOf('%', offset);
                 if (i < 0 || i == pattern.Length - 1)
@@ -172,6 +185,7 @@ namespace log4net.Util
                         offset = i + 1;
 
                         FormattingInfo formattingInfo = new FormattingInfo();
+						value.LogDebug("ParseInternal(pattern={Pattern},matches={Matches}): formattingInfo → {FormattingInfo}", pattern, matches, formattingInfo);
 
                         // Process formatting options
 
@@ -182,6 +196,7 @@ namespace log4net.Util
                             {
                                 // Seen align flag
                                 formattingInfo.LeftAlign = true;
+								value.LogDebug("ParseInternal(pattern={Pattern},matches={Matches}): formattingInfo.LeftAlign → {Arg2}", pattern, matches, formattingInfo.LeftAlign);
                                 offset++;
                             }
                         }
@@ -192,6 +207,7 @@ namespace log4net.Util
                             if (formattingInfo.Min < 0)
                             {
                                 formattingInfo.Min = 0;
+								value.LogDebug("ParseInternal(pattern={Pattern},matches={Matches}): formattingInfo.Min → {Arg2}", pattern, matches, formattingInfo.Min);
                             }
 
                             formattingInfo.Min = (formattingInfo.Min * 10) + int.Parse(pattern[offset].ToString(), NumberFormatInfo.InvariantInfo);
@@ -214,6 +230,7 @@ namespace log4net.Util
                             if (formattingInfo.Max == int.MaxValue)
                             {
                                 formattingInfo.Max = 0;
+								value.LogDebug("ParseInternal(pattern={Pattern},matches={Matches}): formattingInfo.Max → {Arg2}", pattern, matches, formattingInfo.Max);
                             }
 
                             formattingInfo.Max = (formattingInfo.Max * 10) + int.Parse(pattern[offset].ToString(), NumberFormatInfo.InvariantInfo);
@@ -236,6 +253,7 @@ namespace log4net.Util
                                     offset = offset + matches[m].Length;
 
                                     string option = null;
+									value.LogDebug("ParseInternal(pattern={Pattern},matches={Matches}): option → {Option}", pattern, matches, option);
 
                                     // Look for option
                                     if (offset < pattern.Length)
@@ -246,6 +264,7 @@ namespace log4net.Util
                                             offset++;
                                             
                                             int optEnd = pattern.IndexOf('}', offset);
+											value.LogDebug("ParseInternal(pattern={Pattern},matches={Matches}): optEnd → {OptEnd}", pattern, matches, optEnd);
                                             if (optEnd < 0)
                                             {
                                                 // error
@@ -266,17 +285,20 @@ namespace log4net.Util
                     }
                 }
             }
+			value.LogDebug("<<< Exiting ParseInternal(pattern={Pattern},matches={Matches})", pattern, matches);
         }
 
         /// <summary>Process a parsed literal</summary>
         /// <param name="text">the literal text</param>
         private void ProcessLiteral(string text)
         {
+			value.LogDebug(">>> Entering ProcessLiteral(text={Text})", text);
             if (text.Length > 0)
             {
                 // Convert into a pattern
                 this.ProcessConverter("literal", text, new FormattingInfo());
             }
+			value.LogDebug("<<< Exiting ProcessLiteral(text={Text})", text);
         }
 
         /// <summary>Process a parsed converter pattern</summary>
@@ -320,6 +342,7 @@ namespace log4net.Util
 
                 this.AddConverter(pc);
             }
+			value.LogDebug("<<< Exiting ProcessConverter(converterName={ConverterName},option={Option},formattingInfo={FormattingInfo})", converterName, option, formattingInfo);
         }
 
         /// <summary>
@@ -343,6 +366,7 @@ namespace log4net.Util
                 // and therefore the tail would not change!
                 this.m_tail = this.m_tail.SetNext(pc);
             }
+			value.LogDebug("<<< Exiting AddConverter(pc={Pc})", pc);
         }
 
         private const char ESCAPE_CHAR = '%';

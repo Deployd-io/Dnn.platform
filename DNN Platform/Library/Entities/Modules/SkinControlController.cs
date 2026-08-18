@@ -19,6 +19,7 @@ namespace DotNetNuke.Entities.Modules
     /// <summary>ModuleControlController provides the Business Layer for Module Controls.</summary>
     public partial class SkinControlController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SkinControlController));
         private static readonly DataProvider DataProvider = DataProvider.Instance();
 
         /// <summary>DeleteSkinControl deletes a Skin Control in the database.</summary>
@@ -32,8 +33,10 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="skinControl">The Skin Control to delete.</param>
         public static void DeleteSkinControl(IEventLogger eventLogger, SkinControlInfo skinControl)
         {
+			Logger.LogDebug(">>> Entering DeleteSkinControl(eventLogger={EventLogger},skinControl={SkinControl})", eventLogger, skinControl);
             DataProvider.DeleteSkinControl(skinControl.SkinControlID);
             eventLogger.AddLog(skinControl, PortalController.Instance.GetCurrentSettings(), UserController.Instance.GetCurrentUserInfo().UserID, string.Empty, EventLogType.SKINCONTROL_DELETED);
+			Logger.LogDebug("<<< Exiting DeleteSkinControl(skinControl={SkinControl})", skinControl);
         }
 
         /// <summary>GetSkinControl gets a single Skin Control from the database.</summary>
@@ -49,6 +52,8 @@ namespace DotNetNuke.Entities.Modules
         /// <returns>The <see cref="SkinControlInfo"/> or <see langword="null"/>.</returns>
         public static SkinControlInfo GetSkinControlByPackageID(int packageID)
         {
+			Logger.LogDebug(">>> Entering GetSkinControlByPackageID(packageID={PackageID})", packageID);
+			Logger.LogDebug("<<< Exiting GetSkinControlByPackageID(packageID={PackageID})", packageID);
             return CBO.FillObject<SkinControlInfo>(DataProvider.GetSkinControlByPackageID(packageID));
         }
 
@@ -57,6 +62,8 @@ namespace DotNetNuke.Entities.Modules
         /// <returns>The <see cref="SkinControlInfo"/> or <see langword="null"/>.</returns>
         public static SkinControlInfo GetSkinControlByKey(string key)
         {
+			Logger.LogDebug(">>> Entering GetSkinControlByKey(key={Key})", key);
+			Logger.LogDebug("<<< Exiting GetSkinControlByKey(key={Key})", key);
             return CBO.FillObject<SkinControlInfo>(DataProvider.GetSkinControlByKey(key));
         }
 
@@ -80,6 +87,7 @@ namespace DotNetNuke.Entities.Modules
         /// <returns>The skin control ID.</returns>
         public static int SaveSkinControl(IEventLogger eventLogger, SkinControlInfo skinControl)
         {
+			Logger.LogDebug(">>> Entering SaveSkinControl(eventLogger={EventLogger},skinControl={SkinControl})", eventLogger, skinControl);
             int skinControlID = skinControl.SkinControlID;
             if (skinControlID == Null.NullInteger)
             {
@@ -105,6 +113,7 @@ namespace DotNetNuke.Entities.Modules
                 eventLogger.AddLog(skinControl, PortalController.Instance.GetCurrentSettings(), UserController.Instance.GetCurrentUserInfo().UserID, string.Empty, EventLogType.SKINCONTROL_UPDATED);
             }
 
+			Logger.LogDebug("<<< Exiting SaveSkinControl(skinControl={SkinControl})", skinControl);
             return skinControlID;
         }
     }

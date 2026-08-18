@@ -1,16 +1,20 @@
+const logger = console;
 if (typeof contactList === 'undefined' || contactList === null) {
     contactList = {};
 };
 
 ko.extenders.required = function (target, options) {
+	logger.debug(`>>> Entering function(target=${target},options=${options})`);
     //add some sub-observables to our observable
     target.hasError = ko.observable();
     target.validationMessage = ko.observable();
     target.validationClass = ko.observable();
 
     var regEx = new RegExp(options.regEx);
+	logger.debug(`function(target=${target},options=${options}): regEx → ${regEx}`);
     //define a function to do validation
     var errorMessage = options.overrideMessage || "This field is required";
+	logger.debug(`function(target=${target},options=${options}): errorMessage → ${errorMessage}`);
     var allowEmpty = options.allowEmpty || false;
     function validate(newValue) {
         var validated;
@@ -34,19 +38,27 @@ ko.extenders.required = function (target, options) {
 };
 
 function clearErrors(obsArr) {
+	logger.debug(`>>> Entering clearErrors(obsArr=${obsArr})`);
     for (var i = 0; i < obsArr.length; i++) {
         obsArr[i].hasError(false);
         obsArr[i].validationClass("form-control");
+		logger.debug(`<<< Exiting clearErrors(obsArr=${obsArr})`);
     }
 }
 
 contactList.contactsViewModel = function(config) {
+	logger.debug(`>>> Entering function(config=${config})`);
+	logger.debug('>>> Entering function()');
     var self = this;
     var resx = config.resx;
     var util = config.util;
+	logger.debug('>>> Entering function()'); const __log_start = Date.now();
     var preloadedData = config.preloadedData;
+	logger.debug(`>>> Entering function(data=${data},e=${e})`);
     var $rootElement = config.$rootElement;
+	logger.debug(`>>> Entering function(contactId=${contactId},cb=${cb})`);
 
+	logger.debug(`>>> Entering function(data=${data})`);
     var quickSettingsDispatcher = config.settings.quickSettingsDispatcher;
     var moduleId = config.settings.moduleId;
 
@@ -64,7 +76,9 @@ contactList.contactsViewModel = function(config) {
     self.selectedContact = new contactList.contactViewModel(self, config);
 
     var toggleView = function() {
+		logger.debug('>>> Entering toggleView()');
         self.isEditMode(!self.isEditMode());
+		logger.debug('<<< Exiting toggleView()');
     };
 
     self.addContact = function(){
@@ -77,6 +91,8 @@ contactList.contactsViewModel = function(config) {
         toggleView();
         self.refresh();
     }
+	logger.info(`function(config)=${config}: database operation took ${Date.now() - __log_start} ms`);
+	logger.info(`function()=: database operation took ${Date.now() - __log_start} ms`);
 
     self.editContact = function(data, e) {
         self.getContact(data.contactId());
@@ -96,6 +112,7 @@ contactList.contactsViewModel = function(config) {
                 } else {
                     //Error
                 }
+				logger.debug('<<< Exiting function()');
             },
 
             function(){
@@ -130,11 +147,14 @@ contactList.contactsViewModel = function(config) {
     };
 
     var updateView = function updateViewHandler(settings) {
+		logger.debug(`>>> Entering updateViewHandler(settings=${settings})`);
         self.isFormEnabled(settings.isFormEnabled);
+		logger.debug(`<<< Exiting updateViewHandler(settings=${settings})`);
     };
 
     self.init = function () {
         if (preloadedData) {
+			logger.debug(`>>> Entering function(parentViewModel=${parentViewModel},config=${config})`);
             self.load(preloadedData);
         } else {
             self.getContacts();
@@ -149,6 +169,7 @@ contactList.contactsViewModel = function(config) {
             var result = data.results[i];
             var contact = new contactList.contactViewModel(self, config);
             contact.load(result);
+			logger.debug(`function(data=${data}): result → ${result}`);
             self.contacts.push(contact);
         }
     };
@@ -165,6 +186,7 @@ contactList.contactViewModel = function(parentViewModel, config) {
     var $rootElement = config.$rootElement;
 
     self.parentViewModel = parentViewModel;
+	logger.debug(`function(parentViewModel=${parentViewModel},config=${config}): self.parentViewModel → ${self.parentViewModel}`);
     self.contactId = ko.observable(-1);
     self.firstName = ko.observable('').extend({ required: { overrideMessage: "Please enter a first name" } });
     self.lastName = ko.observable('').extend({ required: { overrideMessage: "Please enter a last name" } });
@@ -180,6 +202,7 @@ contactList.contactViewModel = function(parentViewModel, config) {
     self.deleteContact = function (data, e) {
         var opts = {
             callbackTrue: function () {
+				logger.debug('>>> Entering callbackTrue()');
                 var params = {
                     contactId: data.contactId(),
                     firstName: data.firstName(),

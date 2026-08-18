@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,12 +13,15 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("xquery", function() {
+logger.debug('>>> Entering defineMode()');
 
   // The keywords object is set to the result of this self executing
   // function. Each keyword is a property of the keywords object whose
   // value is {type: atype, style: astyle}
   var keywords = function(){
+	logger.debug('<<< Exiting defineMode()');
     // conveinence functions used to build keywords object
     function kw(type) {return {type: type, style: "keyword"};}
     var A = kw("keyword a")
@@ -48,6 +53,7 @@ CodeMirror.defineMode("xquery", function() {
     'self','some','sortby','stable','text','then','to','treat','typeswitch','union','variable','version','where',
     'xquery', 'empty-sequence'];
     for(var i=0, l=basic.length; i < l; i++) { kwObj[basic[i]] = kw(basic[i]);};
+	logger.debug(`function(): basic → ${basic}`);
 
     // a list of types. For each add a property to kwObj with the value of
     // {type: "atom", style: "atom"}
@@ -55,29 +61,36 @@ CodeMirror.defineMode("xquery", function() {
     'xs:time', 'xs:duration', 'xs:dayTimeDuration', 'xs:time', 'xs:yearMonthDuration', 'numeric', 'xs:hexBinary',
     'xs:base64Binary', 'xs:anyURI', 'xs:QName', 'xs:byte','xs:boolean','xs:anyURI','xf:yearMonthDuration'];
     for(var i=0, l=types.length; i < l; i++) { kwObj[types[i]] = atom;};
+	logger.debug(`function(): types → ${types}`);
 
     // each operator will add a property to kwObj with value of {type: "operator", style: "keyword"}
     var operators = ['eq', 'ne', 'lt', 'le', 'gt', 'ge', ':=', '=', '>', '>=', '<', '<=', '.', '|', '?', 'and', 'or', 'div', 'idiv', 'mod', '*', '/', '+', '-'];
+	logger.debug(`function(): operators → ${operators}`);
     for(var i=0, l=operators.length; i < l; i++) { kwObj[operators[i]] = operator;};
 
     // each axis_specifiers will add a property to kwObj with value of {type: "axis_specifier", style: "qualifier"}
     var axis_specifiers = ["self::", "attribute::", "child::", "descendant::", "descendant-or-self::", "parent::",
     "ancestor::", "ancestor-or-self::", "following::", "preceding::", "following-sibling::", "preceding-sibling::"];
     for(var i=0, l=axis_specifiers.length; i < l; i++) { kwObj[axis_specifiers[i]] = qualifier; };
+	logger.debug(`function(): axis_specifiers → ${axis_specifiers}`);
 
     return kwObj;
   }();
 
   function chain(stream, state, f) {
+	logger.debug(`>>> Entering chain(stream=${stream},state=${state},f=${f})`);
     state.tokenize = f;
+	logger.debug(`<<< Exiting chain(stream=${stream},state=${state},f=${f})`);
     return f(stream, state);
   }
 
   // the primary mode tokenizer
   function tokenBase(stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
     var ch = stream.next(),
         mightBeFunction = false,
         isEQName = isEQNameAhead(stream);
+		logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
 
     // an XML tag (if not in some sub, chained tokenizer)
     if (ch == "<") {
@@ -86,6 +99,7 @@ CodeMirror.defineMode("xquery", function() {
 
       if(stream.match("![CDATA", false)) {
         state.tokenize = tokenCDATA;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
         return "tag";
       }
 
@@ -94,8 +108,10 @@ CodeMirror.defineMode("xquery", function() {
       }
 
       var isclose = stream.eat("/");
+	logger.debug(`tokenBase(stream=${stream},state=${state}): isclose → ${isclose}`);
       stream.eatSpace();
       var tagName = "", c;
+	logger.debug(`tokenBase(stream=${stream},state=${state}): tagName → ${tagName}`);
       while ((c = stream.eat(/[^\s\u00a0=<>\"\'\/?]/))) tagName += c;
 
       return chain(stream, state, tokenTag(tagName, isclose));
@@ -208,6 +224,7 @@ CodeMirror.defineMode("xquery", function() {
 
   // handle comments, including nested
   function tokenComment(stream, state) {
+	logger.debug(`>>> Entering tokenComment(stream=${stream},state=${state})`);
     var maybeEnd = false, maybeNested = false, nestedCount = 0, ch;
     while (ch = stream.next()) {
       if (ch == ")" && maybeEnd) {
@@ -225,14 +242,17 @@ CodeMirror.defineMode("xquery", function() {
       maybeNested = (ch == "(");
     }
 
+	logger.debug(`<<< Exiting tokenComment(stream=${stream},state=${state})`);
     return "comment";
   }
 
   // tokenizer for string literals
   // optionally pass a tokenizer function to set state.tokenize back to when finished
   function tokenString(quote, f) {
+	logger.debug(`>>> Entering tokenString(quote=${quote},f=${f})`);
     return function(stream, state) {
       var ch;
+	logger.debug(`<<< Exiting tokenString(quote=${quote},f=${f})`);
 
       if(isInString(state) && stream.current() == quote) {
         popStateStack(state);
@@ -245,6 +265,8 @@ CodeMirror.defineMode("xquery", function() {
       // if we're in a string and in an XML block, allow an embedded code block
       if(stream.match("{", false) && isInXmlAttributeBlock(state)) {
         state.tokenize = tokenBase;
+		logger.debug(`tokenString(quote=${quote},f=${f}): state.tokenize → ${state.tokenize}`);
+		logger.debug(`function(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
         return "string";
       }
 
@@ -271,6 +293,7 @@ CodeMirror.defineMode("xquery", function() {
 
   // tokenizer for variables
   function tokenVariable(stream, state) {
+	logger.debug(`>>> Entering tokenVariable(stream=${stream},state=${state})`);
     var isVariableChar = /[\w\$_-]/;
 
     // a variable may start with a quoted EQName so if the next character is quote, consume to the next quote
@@ -283,6 +306,8 @@ CodeMirror.defineMode("xquery", function() {
     }
     stream.eatWhile(isVariableChar);
     state.tokenize = tokenBase;
+	logger.debug(`tokenVariable(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
+	logger.debug(`<<< Exiting tokenVariable(stream=${stream},state=${state})`);
     return "variable";
   }
 
@@ -311,8 +336,10 @@ CodeMirror.defineMode("xquery", function() {
 
   // tokenizer for XML attributes
   function tokenAttribute(stream, state) {
+	logger.debug(`>>> Entering tokenAttribute(stream=${stream},state=${state})`);
     var ch = stream.next();
 
+	logger.debug(`tokenAttribute(stream=${stream},state=${state}): ch → ${ch}`);
     if(ch == "/" && stream.eat(">")) {
       if(isInXmlAttributeBlock(state)) popStateStack(state);
       if(isInXmlBlock(state)) popStateStack(state);
@@ -339,17 +366,22 @@ CodeMirror.defineMode("xquery", function() {
     if(stream.match(">", false) || stream.match("/", false)) {
       popStateStack(state);
       state.tokenize = tokenBase;
+	logger.debug(`tokenAttribute(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
     }
 
+	logger.debug(`<<< Exiting tokenAttribute(stream=${stream},state=${state})`);
     return "attribute";
   }
 
   // handle comments, including nested
   function tokenXMLComment(stream, state) {
+	logger.debug(`>>> Entering tokenXMLComment(stream=${stream},state=${state})`);
     var ch;
     while (ch = stream.next()) {
       if (ch == "-" && stream.match("->", true)) {
         state.tokenize = tokenBase;
+		logger.debug(`tokenXMLComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
+		logger.debug(`<<< Exiting tokenXMLComment(stream=${stream},state=${state})`);
         return "comment";
       }
     }
@@ -358,10 +390,13 @@ CodeMirror.defineMode("xquery", function() {
 
   // handle CDATA
   function tokenCDATA(stream, state) {
+	logger.debug(`>>> Entering tokenCDATA(stream=${stream},state=${state})`);
     var ch;
     while (ch = stream.next()) {
       if (ch == "]" && stream.match("]", true)) {
         state.tokenize = tokenBase;
+		logger.debug(`tokenCDATA(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
+		logger.debug(`<<< Exiting tokenCDATA(stream=${stream},state=${state})`);
         return "comment";
       }
     }
@@ -369,10 +404,13 @@ CodeMirror.defineMode("xquery", function() {
 
   // handle preprocessing instructions
   function tokenPreProcessing(stream, state) {
+	logger.debug(`>>> Entering tokenPreProcessing(stream=${stream},state=${state})`);
     var ch;
     while (ch = stream.next()) {
       if (ch == "?" && stream.match(">", true)) {
         state.tokenize = tokenBase;
+		logger.debug(`tokenPreProcessing(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
+		logger.debug(`<<< Exiting tokenPreProcessing(stream=${stream},state=${state})`);
         return "comment meta";
       }
     }
@@ -386,12 +424,15 @@ CodeMirror.defineMode("xquery", function() {
   function isInString(state) { return isIn(state, "string"); }
 
   function isEQNameAhead(stream) {
+	logger.debug(`>>> Entering isEQNameAhead(stream=${stream})`);
     // assume we've already eaten a quote (")
     if(stream.current() === '"')
       return stream.match(/^[^\"]+\"\:/, false);
     else if(stream.current() === '\'')
       return stream.match(/^[^\"]+\'\:/, false);
     else
+	logger.debug(`>>> Entering isIn(state=${state},type=${type})`);
+	logger.debug(`<<< Exiting isIn(state=${state},type=${type})`);
       return false;
   }
 
@@ -400,28 +441,38 @@ CodeMirror.defineMode("xquery", function() {
   }
 
   function pushStateStack(state, newState) {
+	logger.debug(`>>> Entering pushStateStack(state=${state},newState=${newState})`);
     state.stack.push(newState);
+	logger.debug(`<<< Exiting pushStateStack(state=${state},newState=${newState})`);
   }
 
   function popStateStack(state) {
+	logger.debug(`>>> Entering popStateStack(state=${state})`);
     state.stack.pop();
     var reinstateTokenize = state.stack.length && state.stack[state.stack.length-1].tokenize;
     state.tokenize = reinstateTokenize || tokenBase;
+	logger.debug(`popStateStack(state=${state}): state.tokenize → ${state.tokenize}`);
+	logger.debug(`<<< Exiting popStateStack(state=${state})`);
   }
 
   // the interface for the mode API
   return {
     startState: function() {
+	logger.debug('>>> Entering startState()');
       return {
         tokenize: tokenBase,
         cc: [],
         stack: []
       };
+	logger.debug('<<< Exiting startState()');
     },
 
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       if (stream.eatSpace()) return null;
       var style = state.tokenize(stream, state);
+	logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
+	logger.debug(`token(stream=${stream},state=${state}): style → ${style}`);
       return style;
     },
 

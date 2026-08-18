@@ -13,6 +13,7 @@ import {
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 const re = /^[1-9][0-9]?[0-9]?[0-9]?$/;
 const re2 = /^[1-9][0-9]?[0-9]?[0-9]?$|^0$/;
@@ -20,6 +21,7 @@ const re2 = /^[1-9][0-9]?[0-9]?[0-9]?$|^0$/;
 class MemberManagementPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             memberSettings: undefined,
             error: {
@@ -32,9 +34,11 @@ class MemberManagementPanelBody extends Component {
             },
             triedToSubmit: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {props} = this;
         if (props.memberSettings) {
             this.updateMemberSettings(props.memberSettings);
@@ -43,6 +47,7 @@ class MemberManagementPanelBody extends Component {
         props.dispatch(SecurityActions.getMemberSettings((data) => {
             this.updateMemberSettings(data.Results.Settings);
         }));
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     updateMemberSettings(memberSettings) {
@@ -103,22 +108,29 @@ class MemberManagementPanelBody extends Component {
             triedToSubmit: false,
             error: state.error
         });
+		logger.debug(`<<< Exiting updateMemberSettings(memberSettings=${memberSettings})`);
     }
 
     UNSAFE_componentWillReceiveProps(props) {
+		logger.debug(`>>> Entering UNSAFE_componentWillReceiveProps(props=${props})`);
         this.updateMemberSettings(props.memberSettings);
+		logger.debug(`<<< Exiting UNSAFE_componentWillReceiveProps(props=${props})`);
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let {state, props} = this;
         let memberSettings = Object.assign({}, state.memberSettings);
+		logger.debug(`onSettingChange(key=${key},event=${event}): memberSettings → ${memberSettings}`);
         memberSettings[key] = typeof (event) === "object" ? event.target.value : event;
 
         this.updateMemberSettings(memberSettings);
         props.dispatch(SecurityActions.memberSettingsClientModified(memberSettings));
+		logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
     }
 
     onUpdate(event) {
+		logger.debug(`>>> Entering onUpdate(event=${event})`);
         event.preventDefault();
         const {props, state} = this;
         this.setState({
@@ -140,21 +152,26 @@ class MemberManagementPanelBody extends Component {
         }, () => {
             util.utilities.notifyError(resx.get("MemberSettingsError"));
         }));
+		logger.debug(`<<< Exiting onUpdate(event=${event})`);
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const {props} = this;
         util.utilities.confirm(resx.get("MemberSettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SecurityActions.getMemberSettings((data) => {
                 this.updateMemberSettings(data.Results.Settings);
+				logger.debug('<<< Exiting onCancel()');
             }));
         });
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {state} = this;
         if (state.memberSettings) {
+			logger.debug('<<< Exiting render()');
             return (
                 <div className={styles.memberSettings}>
                     <InputGroup>
@@ -383,6 +400,8 @@ MemberManagementPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         memberSettings: state.security.memberSettings,

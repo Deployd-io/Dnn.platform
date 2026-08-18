@@ -23,19 +23,26 @@ namespace DotNetNuke.Entities.Modules
     [Serializable]
     public class DesktopModuleInfo : ContentItem, IXmlSerializable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DesktopModuleInfo));
         private Dictionary<string, ModuleDefinitionInfo> moduleDefinitions;
         private PageInfo pageInfo;
 
         /// <summary>Initializes a new instance of the <see cref="DesktopModuleInfo"/> class.</summary>
         public DesktopModuleInfo()
         {
+			Logger.LogDebug(">>> Entering DesktopModuleInfo()");
             this.IsPremium = Null.NullBoolean;
             this.IsAdmin = Null.NullBoolean;
+			Logger.LogDebug("DesktopModuleInfo(): this.IsPremium → {Arg0}", this.IsPremium);
+			Logger.LogDebug("DesktopModuleInfo(): this.IsAdmin → {Arg0}", this.IsAdmin);
             this.CodeSubDirectory = Null.NullString;
             this.PackageID = Null.NullInteger;
             this.DesktopModuleID = Null.NullInteger;
+			Logger.LogDebug("DesktopModuleInfo(): this.CodeSubDirectory → {Arg0}", this.CodeSubDirectory);
+			Logger.LogDebug("DesktopModuleInfo(): this.PackageID → {Arg0}", this.PackageID);
             this.SupportedFeatures = Null.NullInteger;
             this.Shareable = ModuleSharing.Unknown;
+			Logger.LogDebug("<<< Exiting DesktopModuleInfo()");
         }
 
         /// <summary>Gets the Module Definitions for this Desktop Module.</summary>
@@ -221,6 +228,7 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="dr">The Data Reader to use.</param>
         public override void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.DesktopModuleID = Null.SetNullInteger(dr["DesktopModuleID"]);
             this.PackageID = Null.SetNullInteger(dr["PackageID"]);
             this.ModuleName = Null.SetNullString(dr["ModuleName"]);
@@ -242,11 +250,13 @@ namespace DotNetNuke.Entities.Modules
 
             // Call the base classes fill method to populate base class properties
             this.FillInternal(dr);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
 
         /// <inheritdoc />
         public XmlSchema GetSchema()
         {
+			Logger.LogDebug("<<< Exiting GetSchema()");
             return null;
         }
 
@@ -254,6 +264,7 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="reader">The XmlReader to use.</param>
         public void ReadXml(XmlReader reader)
         {
+			Logger.LogDebug(">>> Entering ReadXml(reader={Reader})", reader);
             while (reader.Read())
             {
                 if (reader.NodeType == XmlNodeType.EndElement)
@@ -312,11 +323,13 @@ namespace DotNetNuke.Entities.Modules
                             if (this.Page.HasAdminPage())
                             {
                                 this.AdminPage = this.Page.Name;
+								Logger.LogDebug("ReadXml(reader={Reader}): this.AdminPage → {Arg1}", reader, this.AdminPage);
                             }
 
                             if (this.Page.HasHostPage())
                             {
                                 this.HostPage = this.Page.Name;
+								Logger.LogDebug("ReadXml(reader={Reader}): this.HostPage → {Arg1}", reader, this.HostPage);
                             }
 
                             break;
@@ -324,6 +337,7 @@ namespace DotNetNuke.Entities.Modules
                             if (bool.TryParse(reader.ReadElementContentAsString(), out var isAdmin))
                             {
                                 this.IsAdmin = isAdmin;
+								Logger.LogDebug("ReadXml(reader={Reader}): this.IsAdmin → {Arg1}", reader, this.IsAdmin);
                             }
 
                             break;
@@ -331,6 +345,7 @@ namespace DotNetNuke.Entities.Modules
                             if (bool.TryParse(reader.ReadElementContentAsString(), out var isPremium))
                             {
                                 this.IsPremium = isPremium;
+								Logger.LogDebug("ReadXml(reader={Reader}): this.IsPremium → {Arg1}", reader, this.IsPremium);
                             }
 
                             break;
@@ -344,12 +359,14 @@ namespace DotNetNuke.Entities.Modules
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting ReadXml(reader={Reader})", reader);
         }
 
         /// <summary>Writes a DesktopModuleInfo to an XmlWriter.</summary>
         /// <param name="writer">The XmlWriter to use.</param>
         public void WriteXml(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteXml(writer={Writer})", writer);
             // Write start of main elemenst
             writer.WriteStartElement("desktopModule");
 
@@ -425,20 +442,25 @@ namespace DotNetNuke.Entities.Modules
 
             // Write end of main element
             writer.WriteEndElement();
+			Logger.LogDebug("<<< Exiting WriteXml(writer={Writer})", writer);
         }
 
         /// <summary>Clears a Feature from the Features.</summary>
         /// <param name="feature">The feature to Clear.</param>
         private void ClearFeature(DesktopModuleSupportedFeature feature)
         {
+			Logger.LogDebug(">>> Entering ClearFeature(feature={Feature})", feature);
             // And with the 1's complement of Feature to Clear the Feature flag
             this.SupportedFeatures = this.SupportedFeatures & ~((int)feature);
+			Logger.LogDebug("<<< Exiting ClearFeature(feature={Feature})", feature);
         }
 
         /// <summary>Gets a Feature from the Features.</summary>
         /// <param name="feature">The feature to Get.</param>
         private bool GetFeature(DesktopModuleSupportedFeature feature)
         {
+			Logger.LogDebug(">>> Entering GetFeature(feature={Feature})", feature);
+			Logger.LogDebug("<<< Exiting GetFeature(feature={Feature})", feature);
             return this.SupportedFeatures > Null.NullInteger && (this.SupportedFeatures & (int)feature) == (int)feature;
         }
 
@@ -446,7 +468,9 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="feature">The feature to Set.</param>
         private void SetFeature(DesktopModuleSupportedFeature feature)
         {
+			Logger.LogDebug(">>> Entering SetFeature(feature={Feature})", feature);
             this.SupportedFeatures |= (int)feature;
+			Logger.LogDebug("<<< Exiting SetFeature(feature={Feature})", feature);
         }
 
         /// <summary>Updates a Feature in the Features.</summary>
@@ -454,6 +478,7 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="isSet">A Boolean indicating whether to set or clear the feature.</param>
         private void UpdateFeature(DesktopModuleSupportedFeature feature, bool isSet)
         {
+			Logger.LogDebug(">>> Entering UpdateFeature(feature={Feature},isSet={IsSet})", feature, isSet);
             if (isSet)
             {
                 this.SetFeature(feature);
@@ -462,14 +487,17 @@ namespace DotNetNuke.Entities.Modules
             {
                 this.ClearFeature(feature);
             }
+			Logger.LogDebug("<<< Exiting UpdateFeature(feature={Feature},isSet={IsSet})", feature, isSet);
         }
 
         /// <summary>Reads a Supported Features from an XmlReader.</summary>
         /// <param name="reader">The XmlReader to use.</param>
         private void ReadSupportedFeatures(XmlReader reader)
         {
+			Logger.LogDebug(">>> Entering ReadSupportedFeatures(reader={Reader})", reader);
             this.SupportedFeatures = 0;
             reader.ReadStartElement("supportedFeatures");
+			Logger.LogDebug("ReadSupportedFeatures(reader={Reader}): this.SupportedFeatures → {Arg1}", reader, this.SupportedFeatures);
             do
             {
                 if (reader.HasAttributes)
@@ -479,26 +507,33 @@ namespace DotNetNuke.Entities.Modules
                     {
                         case "Portable":
                             this.IsPortable = true;
+							Logger.LogDebug("ReadSupportedFeatures(reader={Reader}): this.IsPortable → {Arg1}", reader, this.IsPortable);
                             break;
                         case "Searchable":
                             this.IsSearchable = true;
+							Logger.LogDebug("ReadSupportedFeatures(reader={Reader}): this.IsSearchable → {Arg1}", reader, this.IsSearchable);
                             break;
                         case "Upgradeable":
                             this.IsUpgradeable = true;
+							Logger.LogDebug("ReadSupportedFeatures(reader={Reader}): this.IsUpgradeable → {Arg1}", reader, this.IsUpgradeable);
                             break;
                     }
                 }
             }
             while (reader.ReadToNextSibling("supportedFeature"));
+			Logger.LogDebug("<<< Exiting ReadSupportedFeatures(reader={Reader})", reader);
         }
 
         private void ReadModuleSharing(XmlReader reader)
         {
+			Logger.LogDebug(">>> Entering ReadModuleSharing(reader={Reader})", reader);
             var sharing = reader.ReadElementString("shareable");
 
+			Logger.LogDebug("ReadModuleSharing(reader={Reader}): sharing → {Sharing}", reader, sharing);
             if (string.IsNullOrEmpty(sharing))
             {
                 this.Shareable = ModuleSharing.Unknown;
+				Logger.LogDebug("ReadModuleSharing(reader={Reader}): this.Shareable → {Arg1}", reader, this.Shareable);
             }
             else
             {
@@ -516,12 +551,14 @@ namespace DotNetNuke.Entities.Modules
                         break;
                 }
             }
+			Logger.LogDebug("<<< Exiting ReadModuleSharing(reader={Reader})", reader);
         }
 
         /// <summary>Reads a Module Definitions from an XmlReader.</summary>
         /// <param name="reader">The XmlReader to use.</param>
         private void ReadModuleDefinitions(XmlReader reader)
         {
+			Logger.LogDebug(">>> Entering ReadModuleDefinitions(reader={Reader})", reader);
             reader.ReadStartElement("moduleDefinitions");
             do
             {
@@ -529,6 +566,7 @@ namespace DotNetNuke.Entities.Modules
 
                 // Create new ModuleDefinition object
                 var moduleDefinition = new ModuleDefinitionInfo();
+				Logger.LogDebug("ReadModuleDefinitions(reader={Reader}): moduleDefinition → {ModuleDefinition}", reader, moduleDefinition);
 
                 // Load it from the Xml
                 moduleDefinition.ReadXml(reader);
@@ -537,10 +575,12 @@ namespace DotNetNuke.Entities.Modules
                 this.ModuleDefinitions.Add(moduleDefinition.FriendlyName, moduleDefinition);
             }
             while (reader.ReadToNextSibling("moduleDefinition"));
+			Logger.LogDebug("<<< Exiting ReadModuleDefinitions(reader={Reader})", reader);
         }
 
         private void ReadPageInfo(XmlReader reader)
         {
+			Logger.LogDebug(">>> Entering ReadPageInfo(reader={Reader})", reader);
             this.Page = new PageInfo();
 
             // Load it from the Xml
@@ -549,12 +589,15 @@ namespace DotNetNuke.Entities.Modules
             if (this.Page.HasAdminPage())
             {
                 this.AdminPage = this.Page.Name;
+				Logger.LogDebug("ReadPageInfo(reader={Reader}): this.AdminPage → {Arg1}", reader, this.AdminPage);
             }
 
             if (this.Page.HasHostPage())
             {
                 this.HostPage = this.Page.Name;
+				Logger.LogDebug("ReadPageInfo(reader={Reader}): this.HostPage → {Arg1}", reader, this.HostPage);
             }
+			Logger.LogDebug("<<< Exiting ReadPageInfo(reader={Reader})", reader);
         }
 
         [Serializable]
@@ -580,11 +623,15 @@ namespace DotNetNuke.Entities.Modules
 
             public bool HasAdminPage()
             {
+				Logger.LogDebug(">>> Entering HasAdminPage()");
+				Logger.LogDebug("<<< Exiting HasAdminPage()");
                 return this.Type.IndexOf("admin", StringComparison.InvariantCultureIgnoreCase) > Null.NullInteger;
             }
 
             public bool HasHostPage()
             {
+				Logger.LogDebug(">>> Entering HasHostPage()");
+				Logger.LogDebug("<<< Exiting HasHostPage()");
                 return this.Type.IndexOf("host", StringComparison.InvariantCultureIgnoreCase) > Null.NullInteger;
             }
 

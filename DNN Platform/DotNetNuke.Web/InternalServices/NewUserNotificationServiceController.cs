@@ -48,7 +48,9 @@ namespace DotNetNuke.Web.InternalServices
         public NewUserNotificationServiceController()
             : this(null, null, null, null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering NewUserNotificationServiceController()");
         }
+		eventLogger.LogDebug("<<< Exiting NewUserNotificationServiceController()");
 
         /// <summary>Initializes a new instance of the <see cref="NewUserNotificationServiceController"/> class.</summary>
         /// <param name="roleProvider">The role provider.</param>
@@ -70,8 +72,10 @@ namespace DotNetNuke.Web.InternalServices
         [ValidateAntiForgeryToken]
         public HttpResponseMessage Authorize(NotificationDTO postData)
         {
+			eventLogger.LogDebug(">>> Entering Authorize(postData={PostData})", postData);
             var user = this.GetUser(postData);
             if (user == null)
+			eventLogger.LogDebug("Authorize(postData={PostData}): user → {User}", postData, user);
             {
                 NotificationsController.Instance.DeleteNotification(postData.NotificationId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "User not found");
@@ -88,6 +92,7 @@ namespace DotNetNuke.Web.InternalServices
 
             Mail.SendMail(user, MessageType.UserAuthorized, this.PortalSettings);
 
+			eventLogger.LogDebug("<<< Exiting Authorize(postData={PostData})", postData);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
         }
 
@@ -98,8 +103,10 @@ namespace DotNetNuke.Web.InternalServices
         [ValidateAntiForgeryToken]
         public HttpResponseMessage Reject(NotificationDTO postData)
         {
+			eventLogger.LogDebug(">>> Entering Reject(postData={PostData})", postData);
             var user = this.GetUser(postData);
             if (user == null)
+			eventLogger.LogDebug("Reject(postData={PostData}): user → {User}", postData, user);
             {
                 NotificationsController.Instance.DeleteNotification(postData.NotificationId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "User not found");
@@ -107,6 +114,7 @@ namespace DotNetNuke.Web.InternalServices
 
             UserController.RemoveUser(user);
 
+			eventLogger.LogDebug("<<< Exiting Reject(postData={PostData})", postData);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
         }
 
@@ -120,33 +128,41 @@ namespace DotNetNuke.Web.InternalServices
         [ValidateAntiForgeryToken]
         public HttpResponseMessage SendVerificationMail(NotificationDTO postData)
         {
+			eventLogger.LogDebug(">>> Entering SendVerificationMail(postData={PostData})", postData);
             if (this.UserInfo.Membership.Approved)
             {
+				eventLogger.LogWarning("Throwing UserAlreadyVerifiedException from SendVerificationMail(postData={PostData})", postData);
                 throw new UserAlreadyVerifiedException();
             }
 
             if (!this.UserInfo.IsInRole("Unverified Users"))
             {
+				eventLogger.LogWarning("Throwing InvalidVerificationCodeException from SendVerificationMail(postData={PostData})", postData);
                 throw new InvalidVerificationCodeException();
             }
 
             var message = Mail.SendMail(this.UserInfo, MessageType.UserRegistrationVerified, this.PortalSettings);
+			eventLogger.LogDebug("SendVerificationMail(postData={PostData}): message → {Message}", postData, message);
             if (string.IsNullOrEmpty(message))
             {
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = Localization.GetSafeJSString("VerificationMailSendSuccessful", Localization.SharedResourceFile), });
             }
             else
             {
+				eventLogger.LogDebug("<<< Exiting SendVerificationMail(postData={PostData})", postData);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, message);
             }
         }
 
         private UserInfo GetUser(NotificationDTO notificationDto)
         {
+			eventLogger.LogDebug(">>> Entering GetUser(notificationDto={NotificationDto})", notificationDto);
             var notification = NotificationsController.Instance.GetNotification(notificationDto.NotificationId);
 
+			eventLogger.LogDebug("GetUser(notificationDto={NotificationDto}): notification → {Notification}", notificationDto, notification);
             if (!int.TryParse(notification.Context, out var userId))
             {
+			eventLogger.LogDebug("<<< Exiting GetUser(notificationDto={NotificationDto})", notificationDto);
                 return null;
             }
 

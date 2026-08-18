@@ -44,12 +44,17 @@ namespace DotNetNuke.HttpModules.UrlRewrite
         public BasicUrlRewriter(IServiceProvider serviceProvider, IHostSettings hostSettings, IPortalAliasService portalAliasService, IHostSettingsService hostSettingsService, IPortalController portalController)
             : base(hostSettings, portalAliasService, hostSettingsService, portalController)
         {
+			Logger.LogDebug(">>> Entering BasicUrlRewriter(serviceProvider={ServiceProvider},hostSettings={HostSettings},portalAliasService={PortalAliasService},hostSettingsService={HostSettingsService},portalController={PortalController})", serviceProvider, hostSettings, portalAliasService, hostSettingsService, portalController);
             this.serviceProvider = serviceProvider;
+			Logger.LogDebug("BasicUrlRewriter(serviceProvider={ServiceProvider},hostSettings={HostSettings},portalAliasService={PortalAliasService},hostSettingsService={HostSettingsService},portalController={PortalController}): serviceProvider → {ServiceProvider1}", serviceProvider, hostSettings, portalAliasService, hostSettingsService, portalController, serviceProvider);
+			Logger.LogDebug("<<< Exiting BasicUrlRewriter(serviceProvider={ServiceProvider},hostSettings={HostSettings},portalAliasService={PortalAliasService},hostSettingsService={HostSettingsService},portalController={PortalController})", serviceProvider, hostSettings, portalAliasService, hostSettingsService, portalController);
+			Logger.LogDebug("BasicUrlRewriter(serviceProvider={ServiceProvider},hostSettings={HostSettings},portalAliasService={PortalAliasService},hostSettingsService={HostSettingsService},portalController={PortalController}): this.serviceProvider → {Arg5}", serviceProvider, hostSettings, portalAliasService, hostSettingsService, portalController, this.serviceProvider);
         }
 
         /// <inheritdoc />
         internal override void RewriteUrl(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering RewriteUrl(sender={Sender},e={E})", sender, e);
             var app = (HttpApplication)sender;
             HttpServerUtility server = app.Server;
             HttpRequest request = app.Request;
@@ -103,6 +108,7 @@ namespace DotNetNuke.HttpModules.UrlRewrite
             if (domainName == string.Empty && CanAutoAddPortalAlias())
             {
                 domainName = Globals.GetDomainName(app.Request, true);
+				Logger.LogDebug("RewriteUrl(sender={Sender},e={E}): domainName → {DomainName}", sender, e, domainName);
             }
 
             // from this point on we are dealing with a "standard" querystring ( ie. http://www.domain.com/default.aspx?tabid=## )
@@ -206,6 +212,7 @@ namespace DotNetNuke.HttpModules.UrlRewrite
 
                                 response.Redirect(strURL, true);
                             }
+							Logger.LogDebug("<<< Exiting RewriteUrl(sender={Sender},e={E})", sender, e);
                         }
                     }
                 }
@@ -400,14 +407,17 @@ namespace DotNetNuke.HttpModules.UrlRewrite
         // Note these formerly lived in the 'UrlRewriteModule.cs' class
         private static string FormatDomain(string url, string replaceDomain, string withDomain)
         {
+			Logger.LogDebug(">>> Entering FormatDomain(url={Url},replaceDomain={ReplaceDomain},withDomain={WithDomain})", url, replaceDomain, withDomain);
             if (!string.IsNullOrEmpty(replaceDomain) && !string.IsNullOrEmpty(withDomain))
             {
                 if (url.IndexOf(replaceDomain, StringComparison.Ordinal) != -1)
                 {
                     url = url.Replace(replaceDomain, withDomain);
+					Logger.LogDebug("FormatDomain(url={Url},replaceDomain={ReplaceDomain},withDomain={WithDomain}): url → {Url1}", url, replaceDomain, withDomain, url);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting FormatDomain(url={Url},replaceDomain={ReplaceDomain},withDomain={WithDomain})", url, replaceDomain, withDomain);
             return url;
         }
 

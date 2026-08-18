@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
     /// <summary>Resize ImageTransform class.</summary>
     public class ImageResizeTransform : ImageTransform
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ImageResizeTransform));
         private int width;
         private int height;
         private int border;
@@ -22,11 +23,16 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
         /// <summary>Initializes a new instance of the <see cref="ImageResizeTransform"/> class.</summary>
         public ImageResizeTransform()
         {
+			Logger.LogDebug(">>> Entering ImageResizeTransform()");
             this.InterpolationMode = InterpolationMode.HighQualityBicubic;
             this.SmoothingMode = SmoothingMode.HighQuality;
+			Logger.LogDebug("ImageResizeTransform(): this.InterpolationMode → {Arg0}", this.InterpolationMode);
+			Logger.LogDebug("ImageResizeTransform(): this.SmoothingMode → {Arg0}", this.SmoothingMode);
             this.PixelOffsetMode = PixelOffsetMode.HighQuality;
             this.CompositingQuality = CompositingQuality.HighQuality;
             this.Mode = ImageResizeMode.Fit;
+			Logger.LogDebug("ImageResizeTransform(): this.PixelOffsetMode → {Arg0}", this.PixelOffsetMode);
+			Logger.LogDebug("<<< Exiting ImageResizeTransform()");
         }
 
         /// <summary>Gets provides an Unique String for this transformation.</summary>
@@ -119,6 +125,7 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
         /// <returns>Image result after image transformation.</returns>
         public override Image ProcessImage(Image image)
         {
+			Logger.LogDebug(">>> Entering ProcessImage(image={Image})", image);
             if (image == null)
             {
                 return null;
@@ -127,21 +134,26 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
             if (this.MaxWidth > 0)
             {
                 this.Width = image.Width > this.MaxWidth ? this.MaxWidth : image.Width;
+				Logger.LogDebug("ProcessImage(image={Image}): this.Width → {Arg1}", image, this.Width);
             }
 
             if (this.MaxHeight > 0)
             {
                 this.Height = image.Height > this.MaxHeight ? this.MaxHeight : image.Height;
+				Logger.LogDebug("ProcessImage(image={Image}): this.Height → {Arg1}", image, this.Height);
             }
 
             int scaledHeight = (int)(image.Height * ((float)this.Width / (float)image.Width));
+			Logger.LogDebug("ProcessImage(image={Image}): scaledHeight → {ScaledHeight}", image, scaledHeight);
             int scaledWidth = (int)(image.Width * ((float)this.Height / (float)image.Height));
+			Logger.LogDebug("ProcessImage(image={Image}): scaledWidth → {ScaledWidth}", image, scaledWidth);
 
             Image procImage;
             switch (this.Mode)
             {
                 case ImageResizeMode.Fit:
                     procImage = this.FitImage(image, scaledHeight, scaledWidth);
+					Logger.LogDebug("ProcessImage(image={Image}): procImage → {ProcImage}", image, procImage);
                     break;
                 case ImageResizeMode.Crop:
                     procImage = this.CropImage(image, scaledHeight, scaledWidth);
@@ -154,6 +166,7 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
                     break;
                 default:
                     Debug.Fail("Should not reach this");
+			Logger.LogDebug("<<< Exiting ProcessImage(image={Image})", image);
                     return null;
             }
 
@@ -163,13 +176,18 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
         /// <inheritdoc />
         public override string ToString()
         {
+			Logger.LogDebug(">>> Entering ToString()");
+			Logger.LogDebug("<<< Exiting ToString()");
             return "ImageResizeTransform";
         }
 
         private static void CheckValue(int value)
         {
+			Logger.LogDebug(">>> Entering CheckValue(value={Value})", value);
             if (value < 0)
             {
+				Logger.LogWarning("Throwing ArgumentOutOfRangeException from CheckValue(value={Value})", value);
+			Logger.LogDebug("<<< Exiting CheckValue(value={Value})", value);
                 throw new ArgumentOutOfRangeException(nameof(value));
             }
         }
@@ -218,6 +236,7 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
 
         private Bitmap FitSquareImage(Image img)
         {
+			Logger.LogDebug(">>> Entering FitSquareImage(img={Img})", img);
             int resizeWidth;
             int resizeHeight;
 
@@ -235,15 +254,22 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
             }
 
             var newImage = new Bitmap(newDim + (2 * this.border), newDim + (2 * this.border));
+			Logger.LogDebug("FitSquareImage(img={Img}): newImage → {NewImage}", img, newImage);
             var graphics = Graphics.FromImage(newImage);
+			Logger.LogDebug("FitSquareImage(img={Img}): graphics → {Graphics}", img, graphics);
 
             graphics.CompositingMode = CompositingMode.SourceCopy;
+			Logger.LogDebug("FitSquareImage(img={Img}): graphics.CompositingMode → {Arg1}", img, graphics.CompositingMode);
+			Logger.LogDebug("FitSquareImage(img={Img}): graphics.CompositingQuality → {Arg1}", img, graphics.CompositingQuality);
+			Logger.LogDebug("FitSquareImage(img={Img}): graphics.InterpolationMode → {Arg1}", img, graphics.InterpolationMode);
+			Logger.LogDebug("FitSquareImage(img={Img}): graphics.SmoothingMode → {Arg1}", img, graphics.SmoothingMode);
             graphics.CompositingQuality = this.CompositingQuality;
             graphics.InterpolationMode = this.InterpolationMode;
             graphics.SmoothingMode = this.SmoothingMode;
 
             graphics.FillRectangle(new SolidBrush(this.BackColor), new Rectangle(0, 0, newDim + (2 * this.border), newDim + (2 * this.border)));
             graphics.DrawImage(img, ((newDim - resizeWidth) / 2) + this.border, ((newDim - resizeHeight) / 2) + this.border, resizeWidth, resizeHeight);
+			Logger.LogDebug("<<< Exiting FitSquareImage(img={Img})", img);
             return newImage;
         }
 
@@ -277,19 +303,28 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
 
         private Bitmap FillImage(Image img)
         {
+			Logger.LogDebug(">>> Entering FillImage(img={Img})", img);
             int resizeHeight = this.Height;
             int resizeWidth = this.Width;
 
             var newImage = new Bitmap(this.Width, this.Height);
+			Logger.LogDebug("FillImage(img={Img}): newImage → {NewImage}", img, newImage);
             var graphics = Graphics.FromImage(newImage);
+			Logger.LogDebug("FillImage(img={Img}): graphics → {Graphics}", img, graphics);
 
             graphics.CompositingMode = CompositingMode.SourceCopy;
+			Logger.LogDebug("FillImage(img={Img}): graphics.CompositingMode → {Arg1}", img, graphics.CompositingMode);
+			Logger.LogDebug("FillImage(img={Img}): graphics.CompositingQuality → {Arg1}", img, graphics.CompositingQuality);
+			Logger.LogDebug("FillImage(img={Img}): graphics.InterpolationMode → {Arg1}", img, graphics.InterpolationMode);
+			Logger.LogDebug("FillImage(img={Img}): graphics.SmoothingMode → {Arg1}", img, graphics.SmoothingMode);
+			Logger.LogDebug("FillImage(img={Img}): graphics.PixelOffsetMode → {Arg1}", img, graphics.PixelOffsetMode);
             graphics.CompositingQuality = this.CompositingQuality;
             graphics.InterpolationMode = this.InterpolationMode;
             graphics.SmoothingMode = this.SmoothingMode;
             graphics.PixelOffsetMode = this.PixelOffsetMode;
 
             graphics.DrawImage(img, (this.Width - resizeWidth) / 2, (this.Height - resizeHeight) / 2, resizeWidth, resizeHeight);
+			Logger.LogDebug("<<< Exiting FillImage(img={Img})", img);
             return newImage;
         }
     }

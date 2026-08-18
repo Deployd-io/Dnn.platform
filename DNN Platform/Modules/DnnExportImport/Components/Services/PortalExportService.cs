@@ -34,6 +34,7 @@ namespace Dnn.ExportImport.Components.Services
         public PortalExportService()
             : this(null)
         {
+		eventLogger.LogDebug(">>> Entering PortalExportService()");
         }
 
         /// <inheritdoc />
@@ -48,8 +49,11 @@ namespace Dnn.ExportImport.Components.Services
         /// <inheritdoc />
         public override void ExportData(ExportImportJob exportJob, ExportDto exportDto)
         {
+			eventLogger.LogDebug(">>> Entering ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
             var fromDate = (exportDto.FromDateUtc ?? Constants.MinDbTime).ToLocalTime();
             var toDate = exportDto.ToDateUtc.ToLocalTime();
+			eventLogger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): toDate → {ToDate}", exportJob, exportDto, toDate);
+			eventLogger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): fromDate → {FromDate}", exportJob, exportDto, fromDate);
             if (this.CheckPoint.Stage > 1)
             {
                 return;
@@ -64,6 +68,7 @@ namespace Dnn.ExportImport.Components.Services
             if (this.CheckPoint.Stage == 0)
             {
                 var portalSettings = new List<ExportPortalSetting>();
+				eventLogger.LogDebug("ExportData(exportJob={ExportJob},exportDto={ExportDto}): portalSettings → {PortalSettings}", exportJob, exportDto, portalSettings);
                 var settingToMigrate =
                     SettingsController.Instance.GetSetting(Constants.PortalSettingExportKey)?.SettingValue?.Split(SettingExportSeparator, StringSplitOptions.RemoveEmptyEntries);
 
@@ -87,6 +92,8 @@ namespace Dnn.ExportImport.Components.Services
 
                     this.CheckPointStageCallback(this);
 
+					var __logStart = System.Diagnostics.Stopwatch.StartNew();
+					eventLogger.LogInformation("ExportData(exportJob,exportDto)={ExportJob},{ExportDto}: database query executed in {Arg2} ms", exportJob, exportDto, __logStart.ElapsedMilliseconds);
                     this.Repository.CreateItems(portalSettings);
                 }
 
@@ -122,11 +129,13 @@ namespace Dnn.ExportImport.Components.Services
                 this.CheckPoint.ProcessedItems += portalLanguages.Count;
                 this.CheckPointStageCallback(this);
             }
+			eventLogger.LogDebug("<<< Exiting ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
         }
 
         /// <inheritdoc />
         public override void ImportData(ExportImportJob importJob, ImportDto importDto)
         {
+			eventLogger.LogDebug(">>> Entering ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
             // Update the total items count in the check points. This should be updated only once.
             this.CheckPoint.TotalItems = this.CheckPoint.TotalItems = this.CheckPoint.TotalItems <= 0 ? this.GetImportTotal() : this.CheckPoint.TotalItems;
             if (this.CheckPointStageCallback(this))
@@ -142,6 +151,7 @@ namespace Dnn.ExportImport.Components.Services
             if (this.CheckPoint.Stage == 0)
             {
                 var portalSettings = this.Repository.GetAllItems<ExportPortalSetting>().ToList();
+				eventLogger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): portalSettings → {PortalSettings}", importJob, importDto, portalSettings);
                 this.ProcessPortalSettings(importJob, importDto, portalSettings);
                 this.CheckPoint.TotalItems = this.GetImportTotal();
                 this.Result.AddSummary("Imported Portal Settings", portalSettings.Count.ToString(CultureInfo.InvariantCulture));
@@ -157,6 +167,7 @@ namespace Dnn.ExportImport.Components.Services
             if (this.CheckPoint.Stage == 1)
             {
                 var portalLanguages = this.Repository.GetAllItems<ExportPortalLanguage>().ToList();
+				eventLogger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): portalLanguages → {PortalLanguages}", importJob, importDto, portalLanguages);
                 this.ProcessPortalLanguages(importJob, importDto, portalLanguages);
                 this.Result.AddSummary("Imported Portal Languages", portalLanguages.Count.ToString(CultureInfo.InvariantCulture));
                 this.CheckPoint.Progress += 50;
@@ -168,16 +179,21 @@ namespace Dnn.ExportImport.Components.Services
 
             /*
             ProgressPercentage = 0;
+			eventLogger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): ProgressPercentage → {ProgressPercentage}", importJob, importDto, ProgressPercentage);
             var portalLocalizations = Repository.GetAllItems<ExportPortalLocalization>().ToList();
+			eventLogger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): portalLocalizations → {PortalLocalizations}", importJob, importDto, portalLocalizations);
             ProcessPortalLocalizations(importJob, importDto, portalLocalizations);
             Result.AddSummary("Imported Portal Localizations", portalLocalizations.Count.ToString());
             ProgressPercentage += 40;
             */
+			eventLogger.LogDebug("<<< Exiting ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
         }
 
         /// <inheritdoc />
         public override int GetImportTotal()
         {
+			eventLogger.LogDebug(">>> Entering GetImportTotal()");
+			eventLogger.LogDebug("<<< Exiting GetImportTotal()");
             return this.Repository.GetCount<ExportPortalSetting>() + this.Repository.GetCount<ExportPortalLanguage>();
         }
 
@@ -250,6 +266,7 @@ namespace Dnn.ExportImport.Components.Services
                     this.Result.AddLogEntry("Added portal settings", exportPortalSetting.SettingName);
                 }
             }
+			eventLogger.LogDebug("<<< Exiting ProcessPortalSettings(importJob={ImportJob},importDto={ImportDto},portalSettings={PortalSettings})", importJob, importDto, portalSettings);
         }
 
         private void ProcessPortalLanguages(ExportImportJob importJob, ImportDto importDto, IEnumerable<ExportPortalLanguage> portalLanguages)
@@ -324,6 +341,8 @@ namespace Dnn.ExportImport.Components.Services
                     this.Result.AddLogEntry("Added portal language", exportPortalLanguage.CultureCode);
                 }
             }
+			eventLogger.LogDebug("<<< Exiting ProcessPortalLanguages(importJob={ImportJob},importDto={ImportDto},portalLanguages={PortalLanguages})", importJob, importDto, portalLanguages);
         }
+		eventLogger.LogDebug("<<< Exiting PortalExportService()");
     }
 }

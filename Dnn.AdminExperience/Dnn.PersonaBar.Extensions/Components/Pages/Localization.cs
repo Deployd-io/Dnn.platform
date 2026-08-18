@@ -12,6 +12,8 @@ namespace Dnn.PersonaBar.Pages.Components
 
         public static string GetString(string key)
         {
+			eventLogger.LogDebug(">>> Entering GetString(key={Key})", key);
+			eventLogger.LogDebug("<<< Exiting GetString(key={Key})", key);
             return DotNetNuke.Services.Localization.Localization.GetString(key, LocalResourcesFile);
         }
     }

@@ -13,6 +13,7 @@ namespace DotNetNuke.Web.Client.ResourceManager
     /// </summary>
     public static class LinkResourceExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LinkResourceExtensions));
         /// <summary>
         /// Marks the resource for preload.
         /// </summary>
@@ -22,12 +23,16 @@ namespace DotNetNuke.Web.Client.ResourceManager
         public static T SetPreload<T>(this T input)
             where T : ILinkResource
         {
+			Logger.LogDebug(">>> Entering SetPreload(input={Input})", input);
             if (input == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from SetPreload(input={Input})", input);
                 throw new ArgumentNullException(nameof(input));
             }
 
             input.Preload = true;
+			Logger.LogDebug("SetPreload(input={Input}): input.Preload → {Arg1}", input, input.Preload);
+			Logger.LogDebug("<<< Exiting SetPreload(input={Input})", input);
             return input;
         }
 
@@ -41,12 +46,16 @@ namespace DotNetNuke.Web.Client.ResourceManager
         public static T SetMedia<T>(this T input, string media)
             where T : ILinkResource
         {
+			Logger.LogDebug(">>> Entering SetMedia(input={Input},media={Media})", input, media);
             if (input == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from SetMedia(input={Input},media={Media})", input, media);
                 throw new ArgumentNullException(nameof(input));
             }
 
             input.Media = media;
+			Logger.LogDebug("SetMedia(input={Input},media={Media}): input.Media → {Arg2}", input, media, input.Media);
+			Logger.LogDebug("<<< Exiting SetMedia(input={Input},media={Media})", input, media);
             return input;
         }
     }

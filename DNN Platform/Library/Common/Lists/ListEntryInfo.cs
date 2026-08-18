@@ -12,17 +12,23 @@ namespace DotNetNuke.Common.Lists
     [Serializable]
     public class ListEntryInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ListEntryInfo));
         private string text = Null.NullString;
 
         /// <summary>Initializes a new instance of the <see cref="ListEntryInfo"/> class.</summary>
         public ListEntryInfo()
         {
+			Logger.LogDebug(">>> Entering ListEntryInfo()");
             this.ParentKey = Null.NullString;
             this.Parent = Null.NullString;
+			Logger.LogDebug("ListEntryInfo(): this.ParentKey → {Arg0}", this.ParentKey);
+			Logger.LogDebug("ListEntryInfo(): this.Parent → {Arg0}", this.Parent);
             this.Description = Null.NullString;
             this.Text = Null.NullString;
             this.Value = Null.NullString;
+			Logger.LogDebug("ListEntryInfo(): this.Description → {Arg0}", this.Description);
             this.ListName = Null.NullString;
+			Logger.LogDebug("<<< Exiting ListEntryInfo()");
         }
 
         /// <summary>Gets a unique key for the entry.</summary>

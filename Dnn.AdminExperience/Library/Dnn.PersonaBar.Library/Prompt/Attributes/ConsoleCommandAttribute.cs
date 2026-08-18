@@ -15,15 +15,20 @@ namespace Dnn.PersonaBar.Library.Prompt.Attributes
     public partial class ConsoleCommandAttribute : Attribute
 #pragma warning restore CS3015 // Type has no accessible constructors which use only CLS-compliant types
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ConsoleCommandAttribute));
         /// <summary>Initializes a new instance of the <see cref="ConsoleCommandAttribute"/> class.</summary>
         /// <param name="name">The command name.</param>
         /// <param name="category">The command category.</param>
         /// <param name="description">The command description.</param>
         public ConsoleCommandAttribute(string name, string category, string description)
         {
+			Logger.LogDebug(">>> Entering ConsoleCommandAttribute(name={Name},category={Category},description={Description})", name, category, description);
             this.Name = name;
             this.Category = category;
+			Logger.LogDebug("ConsoleCommandAttribute(name={Name},category={Category},description={Description}): this.Name → {Arg3}", name, category, description, this.Name);
+			Logger.LogDebug("ConsoleCommandAttribute(name={Name},category={Category},description={Description}): this.Category → {Arg3}", name, category, description, this.Category);
             this.Description = description;
+			Logger.LogDebug("<<< Exiting ConsoleCommandAttribute(name={Name},category={Category},description={Description})", name, category, description);
         }
 
         public string Name { get; set; }

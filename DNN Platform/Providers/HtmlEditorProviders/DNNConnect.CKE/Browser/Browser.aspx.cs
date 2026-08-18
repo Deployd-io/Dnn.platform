@@ -107,8 +107,10 @@ public partial class Browser : PageBase
     public Browser()
         : this(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
     {
+	eventLogger.LogDebug(">>> Entering Browser()");
     }
 
+	eventLogger.LogDebug("<<< Exiting Browser()");
     /// <summary>Initializes a new instance of the <see cref="Browser"/> class.</summary>
     /// <param name="hostSettings">The host settings.</param>
     /// <param name="hostSettingsService">The host settings service.</param>
@@ -161,7 +163,18 @@ public partial class Browser : PageBase
     {
         this.hostSettingsService = hostSettingsService ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IHostSettingsService>();
         this.eventLogger = eventLogger ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IEventLogger>();
+		eventLogger.LogDebug("Browser(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},userController={UserController},dataProvider={DataProvider},packageController={PackageController},tabController={TabController},clientResourceController={ClientResourceController}): eventLogger → {EventLogger1}", hostSettings, hostSettingsService, appStatus, eventLogger, portalController, permissionDefinitionService, portalAliasService, fileManager, folderManager, fileContentTypeManager, userController, dataProvider, packageController, tabController, clientResourceController, eventLogger);
+		eventLogger.LogDebug("Browser(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},userController={UserController},dataProvider={DataProvider},packageController={PackageController},tabController={TabController},clientResourceController={ClientResourceController}): permissionDefinitionService → {PermissionDefinitionService1}", hostSettings, hostSettingsService, appStatus, eventLogger, portalController, permissionDefinitionService, portalAliasService, fileManager, folderManager, fileContentTypeManager, userController, dataProvider, packageController, tabController, clientResourceController, permissionDefinitionService);
+		eventLogger.LogDebug("Browser(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},userController={UserController},dataProvider={DataProvider},packageController={PackageController},tabController={TabController},clientResourceController={ClientResourceController}): portalAliasService → {PortalAliasService1}", hostSettings, hostSettingsService, appStatus, eventLogger, portalController, permissionDefinitionService, portalAliasService, fileManager, folderManager, fileContentTypeManager, userController, dataProvider, packageController, tabController, clientResourceController, portalAliasService);
+		eventLogger.LogDebug("Browser(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},userController={UserController},dataProvider={DataProvider},packageController={PackageController},tabController={TabController},clientResourceController={ClientResourceController}): fileManager → {FileManager1}", hostSettings, hostSettingsService, appStatus, eventLogger, portalController, permissionDefinitionService, portalAliasService, fileManager, folderManager, fileContentTypeManager, userController, dataProvider, packageController, tabController, clientResourceController, fileManager);
+		eventLogger.LogDebug("Browser(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},userController={UserController},dataProvider={DataProvider},packageController={PackageController},tabController={TabController},clientResourceController={ClientResourceController}): folderManager → {FolderManager1}", hostSettings, hostSettingsService, appStatus, eventLogger, portalController, permissionDefinitionService, portalAliasService, fileManager, folderManager, fileContentTypeManager, userController, dataProvider, packageController, tabController, clientResourceController, folderManager);
+		eventLogger.LogDebug("Browser(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},userController={UserController},dataProvider={DataProvider},packageController={PackageController},tabController={TabController},clientResourceController={ClientResourceController}): fileContentTypeManager → {FileContentTypeManager1}", hostSettings, hostSettingsService, appStatus, eventLogger, portalController, permissionDefinitionService, portalAliasService, fileManager, folderManager, fileContentTypeManager, userController, dataProvider, packageController, tabController, clientResourceController, fileContentTypeManager);
+		eventLogger.LogDebug("Browser(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},userController={UserController},dataProvider={DataProvider},packageController={PackageController},tabController={TabController},clientResourceController={ClientResourceController}): dataProvider → {DataProvider1}", hostSettings, hostSettingsService, appStatus, eventLogger, portalController, permissionDefinitionService, portalAliasService, fileManager, folderManager, fileContentTypeManager, userController, dataProvider, packageController, tabController, clientResourceController, dataProvider);
+		eventLogger.LogDebug("Browser(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},userController={UserController},dataProvider={DataProvider},packageController={PackageController},tabController={TabController},clientResourceController={ClientResourceController}): packageController → {PackageController1}", hostSettings, hostSettingsService, appStatus, eventLogger, portalController, permissionDefinitionService, portalAliasService, fileManager, folderManager, fileContentTypeManager, userController, dataProvider, packageController, tabController, clientResourceController, packageController);
+		eventLogger.LogDebug("Browser(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},userController={UserController},dataProvider={DataProvider},packageController={PackageController},tabController={TabController},clientResourceController={ClientResourceController}): tabController → {TabController1}", hostSettings, hostSettingsService, appStatus, eventLogger, portalController, permissionDefinitionService, portalAliasService, fileManager, folderManager, fileContentTypeManager, userController, dataProvider, packageController, tabController, clientResourceController, tabController);
+		eventLogger.LogDebug("Browser(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},userController={UserController},dataProvider={DataProvider},packageController={PackageController},tabController={TabController},clientResourceController={ClientResourceController}): clientResourceController → {ClientResourceController1}", hostSettings, hostSettingsService, appStatus, eventLogger, portalController, permissionDefinitionService, portalAliasService, fileManager, folderManager, fileContentTypeManager, userController, dataProvider, packageController, tabController, clientResourceController, clientResourceController);
         this.portalController = portalController ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IPortalController>();
+		eventLogger.LogDebug("Browser(hostSettings={HostSettings},hostSettingsService={HostSettingsService},appStatus={AppStatus},eventLogger={EventLogger},portalController={PortalController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},userController={UserController},dataProvider={DataProvider},packageController={PackageController},tabController={TabController},clientResourceController={ClientResourceController}): portalController → {PortalController1}", hostSettings, hostSettingsService, appStatus, eventLogger, portalController, permissionDefinitionService, portalAliasService, fileManager, folderManager, fileContentTypeManager, userController, dataProvider, packageController, tabController, clientResourceController, portalController);
         this.permissionDefinitionService = permissionDefinitionService ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IPermissionDefinitionService>();
         this.portalAliasService = portalAliasService ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IPortalAliasService>();
         this.fileManager = fileManager ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IFileManager>();
@@ -315,6 +328,7 @@ public partial class Browser : PageBase
     public static void SetFile(string fileUrl)
     {
         ckFileUrl = fileUrl;
+		eventLogger.LogDebug("<<< Exiting SetFile(fileUrl={FileUrl})", fileUrl);
     }
 
     /// <summary>Get all Files and Put them in a DataTable for the GridView.</summary>
@@ -438,12 +452,14 @@ public partial class Browser : PageBase
             }
         }).Where(file => file is not null)
         .ToList();
+		eventLogger.LogDebug("<<< Exiting GetFiles(currentFolderInfo={CurrentFolderInfo})", currentFolderInfo);
     }
 
     /// <summary>Register JavaScripts and CSS.</summary>
     /// <param name="e">The Event Args.</param>
     protected override void OnPreRender(EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering OnPreRender(e={E})", e);
         this.LoadFavIcon();
 
         JavaScript.RequestRegistration(this.AppStatus, this.eventLogger, this.portalSettings, CommonJs.jQuery);
@@ -460,6 +476,7 @@ public partial class Browser : PageBase
         this.GetSelectedImageOrLink();
 
         base.OnPreRender(e);
+		eventLogger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
     }
 
     /// <summary>Close Browser Window.</summary>
@@ -467,6 +484,7 @@ public partial class Browser : PageBase
     /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
     protected void CmdCloseClick(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering CmdCloseClick(sender={Sender},e={E})", sender, e);
         if (!this.panLinkMode.Visible && this.panPageMode.Visible)
         {
             if (this.dnntreeTabs.SelectedNode == null)
@@ -478,7 +496,9 @@ public partial class Browser : PageBase
                 int.Parse(this.dnntreeTabs.SelectedValue), this.portalSettings.PortalId, true);
 
             string fileName = null;
+			eventLogger.LogDebug("CmdCloseClick(sender={Sender},e={E}): fileName → {FileName}", sender, e, fileName);
             var domainName = $"http://{Globals.GetDomainName(this.Request, true)}";
+			eventLogger.LogDebug("CmdCloseClick(sender={Sender},e={E}): domainName → {DomainName}", sender, e, domainName);
 
             // Add Language Parameter ?!
             var localeSelected = this.LanguageRow.Visible && this.LanguageList.SelectedIndex > 0;
@@ -488,6 +508,7 @@ public partial class Browser : PageBase
                 : Globals.ApplicationURL(selectTab.TabID);
 
             var friendlyUrl = Globals.FriendlyUrl(selectTab, friendlyUrlPath, this.portalSettings);
+			eventLogger.LogDebug("CmdCloseClick(sender={Sender},e={E}): friendlyUrl → {FriendlyUrl}", sender, e, friendlyUrl);
 
             var locale = localeSelected
                 ? $"language/{this.LanguageList.SelectedValue}/"
@@ -532,6 +553,7 @@ public partial class Browser : PageBase
             }
 
             this.Response.Write("<script type=\"text/javascript\">");
+			eventLogger.LogDebug("CmdCloseClick(sender={Sender},e={E}): type → {Type}", sender, e, type);
             this.Response.Write(this.GetJavaScriptCode(fileName, null, true));
             this.Response.Write("</script>");
 
@@ -542,8 +564,10 @@ public partial class Browser : PageBase
             if (!string.IsNullOrEmpty(this.lblFileName.Text) && !string.IsNullOrEmpty(this.FileId.Text))
             {
                 var fileInfo = this.fileManager.GetFile(int.Parse(this.FileId.Text));
+				eventLogger.LogDebug("CmdCloseClick(sender={Sender},e={E}): fileInfo → {FileInfo}", sender, e, fileInfo);
 
                 var filePath = this.fileManager.GetUrl(fileInfo);
+				eventLogger.LogDebug("CmdCloseClick(sender={Sender},e={E}): filePath → {FilePath}", sender, e, filePath);
 
                 if (this.rblLinkType.SelectedValue.Equals("absLnk", StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -566,6 +590,7 @@ public partial class Browser : PageBase
                 this.Response.End();
             }
         }
+		eventLogger.LogDebug("<<< Exiting CmdCloseClick(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Gets the JavaScript code.</summary>
@@ -648,6 +673,7 @@ public partial class Browser : PageBase
     /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
     protected void PagerFileLinks_PageChanged(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering PagerFileLinks_PageChanged(sender={Sender},e={E})", sender, e);
         this.ShowFilesIn(this.GetCurrentFolder(), true);
 
         // Reset selected file
@@ -655,6 +681,7 @@ public partial class Browser : PageBase
 
         this.FileId.Text = null;
         this.lblFileName.Text = null;
+		eventLogger.LogDebug("<<< Exiting PagerFileLinks_PageChanged(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Sorts the Files in ascending order.</summary>
@@ -662,11 +689,16 @@ public partial class Browser : PageBase
     /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
     protected void SortAscendingClick(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering SortAscendingClick(sender={Sender},e={E})", sender, e);
         this.SortFilesAscending = true;
         this.SortFilesDescending = false;
+		eventLogger.LogDebug("SortAscendingClick(sender={Sender},e={E}): this.SortFilesAscending → {Arg2}", sender, e, this.SortFilesAscending);
+		eventLogger.LogDebug("SortAscendingClick(sender={Sender},e={E}): this.SortFilesDescending → {Arg2}", sender, e, this.SortFilesDescending);
         this.SortFilesDateAscending = false;
         this.SortFilesDateDescending = false;
 
+		eventLogger.LogDebug("SortAscendingClick(sender={Sender},e={E}): this.SortFilesDateAscending → {Arg2}", sender, e, this.SortFilesDateAscending);
+		eventLogger.LogDebug("SortAscendingClick(sender={Sender},e={E}): this.SortFilesDateDescending → {Arg2}", sender, e, this.SortFilesDateDescending);
         this.SetSortButtonClasses();
 
         this.ShowFilesIn(this.GetCurrentFolder(), true);
@@ -676,6 +708,7 @@ public partial class Browser : PageBase
 
         this.FileId.Text = null;
         this.lblFileName.Text = null;
+		eventLogger.LogDebug("<<< Exiting SortAscendingClick(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Sorts the Files in descending order.</summary>
@@ -683,11 +716,16 @@ public partial class Browser : PageBase
     /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
     protected void SortDescendingClick(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering SortDescendingClick(sender={Sender},e={E})", sender, e);
         this.SortFilesAscending = false;
         this.SortFilesDescending = true;
+		eventLogger.LogDebug("SortDescendingClick(sender={Sender},e={E}): this.SortFilesAscending → {Arg2}", sender, e, this.SortFilesAscending);
+		eventLogger.LogDebug("SortDescendingClick(sender={Sender},e={E}): this.SortFilesDescending → {Arg2}", sender, e, this.SortFilesDescending);
+		eventLogger.LogDebug("SortDescendingClick(sender={Sender},e={E}): this.SortFilesDateDescending → {Arg2}", sender, e, this.SortFilesDateDescending);
         this.SortFilesDateAscending = false;
         this.SortFilesDateDescending = false;
 
+		eventLogger.LogDebug("SortDescendingClick(sender={Sender},e={E}): this.SortFilesDateAscending → {Arg2}", sender, e, this.SortFilesDateAscending);
         this.SetSortButtonClasses();
 
         this.ShowFilesIn(this.GetCurrentFolder(), true);
@@ -697,6 +735,7 @@ public partial class Browser : PageBase
 
         this.FileId.Text = null;
         this.lblFileName.Text = null;
+		eventLogger.LogDebug("<<< Exiting SortDescendingClick(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Sorts the Files by Date in ascending order.</summary>
@@ -704,11 +743,16 @@ public partial class Browser : PageBase
     /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
     protected void SortByDateAscendingClick(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering SortByDateAscendingClick(sender={Sender},e={E})", sender, e);
         this.SortFilesAscending = false;
         this.SortFilesDescending = false;
+		eventLogger.LogDebug("SortByDateAscendingClick(sender={Sender},e={E}): this.SortFilesAscending → {Arg2}", sender, e, this.SortFilesAscending);
+		eventLogger.LogDebug("SortByDateAscendingClick(sender={Sender},e={E}): this.SortFilesDescending → {Arg2}", sender, e, this.SortFilesDescending);
+		eventLogger.LogDebug("SortByDateAscendingClick(sender={Sender},e={E}): this.SortFilesDateDescending → {Arg2}", sender, e, this.SortFilesDateDescending);
         this.SortFilesDateAscending = true;
         this.SortFilesDateDescending = false;
 
+		eventLogger.LogDebug("SortByDateAscendingClick(sender={Sender},e={E}): this.SortFilesDateAscending → {Arg2}", sender, e, this.SortFilesDateAscending);
         this.SetSortButtonClasses();
 
         this.ShowFilesIn(this.GetCurrentFolder(), true);
@@ -718,6 +762,7 @@ public partial class Browser : PageBase
 
         this.FileId.Text = null;
         this.lblFileName.Text = null;
+		eventLogger.LogDebug("<<< Exiting SortByDateAscendingClick(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Sorts the Files by Date in descending order.</summary>
@@ -725,11 +770,16 @@ public partial class Browser : PageBase
     /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
     protected void SortByDateDescendingClick(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering SortByDateDescendingClick(sender={Sender},e={E})", sender, e);
         this.SortFilesAscending = false;
         this.SortFilesDescending = false;
+		eventLogger.LogDebug("SortByDateDescendingClick(sender={Sender},e={E}): this.SortFilesAscending → {Arg2}", sender, e, this.SortFilesAscending);
+		eventLogger.LogDebug("SortByDateDescendingClick(sender={Sender},e={E}): this.SortFilesDescending → {Arg2}", sender, e, this.SortFilesDescending);
+		eventLogger.LogDebug("SortByDateDescendingClick(sender={Sender},e={E}): this.SortFilesDateDescending → {Arg2}", sender, e, this.SortFilesDateDescending);
         this.SortFilesDateAscending = false;
         this.SortFilesDateDescending = true;
 
+		eventLogger.LogDebug("SortByDateDescendingClick(sender={Sender},e={E}): this.SortFilesDateAscending → {Arg2}", sender, e, this.SortFilesDateAscending);
         this.SetSortButtonClasses();
 
         this.ShowFilesIn(this.GetCurrentFolder(), true);
@@ -739,15 +789,18 @@ public partial class Browser : PageBase
 
         this.FileId.Text = null;
         this.lblFileName.Text = null;
+		eventLogger.LogDebug("<<< Exiting SortByDateDescendingClick(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Raises the <see cref="E:System.Web.UI.Control.Init"/> event to initialize the page.</summary>
     /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
     protected override void OnInit(EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering OnInit(e={E})", e);
         // CODEGEN: This call is required by the ASP.NET Web Form Designer.
         this.InitializeComponent();
         base.OnInit(e);
+		eventLogger.LogDebug("<<< Exiting OnInit(e={E})", e);
     }
 
     /// <summary>Handles the Load event of the Page control.</summary>
@@ -755,11 +808,15 @@ public partial class Browser : PageBase
     /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
     protected void Page_Load(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering Page_Load(sender={Sender},e={E})", sender, e);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         JavaScript.RequestRegistration(this.AppStatus, this.eventLogger, this.portalSettings, CommonJs.jQuery);
 
         this.SetSortButtonClasses();
 
         this.extensionWhiteList = this.HostSettings.AllowedExtensionAllowList;
+		eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): extensionWhiteList → {ExtensionWhiteList}", sender, e, extensionWhiteList);
+		eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): this.extensionWhiteList → {Arg2}", sender, e, this.extensionWhiteList);
 
         if (!string.IsNullOrEmpty(this.request.QueryString["mode"]))
         {
@@ -768,10 +825,14 @@ public partial class Browser : PageBase
         }
 
         ProviderConfiguration providerConfiguration = ProviderConfiguration.GetProviderConfiguration("htmlEditor");
+		eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): providerConfiguration → {ProviderConfiguration}", sender, e, providerConfiguration);
         Provider objProvider = (Provider)providerConfiguration.Providers[providerConfiguration.DefaultProvider];
+		eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): objProvider → {ObjProvider}", sender, e, objProvider);
 
         var settingsDictionary = EditorController.GetEditorHostSettings(this.HostSettings);
+		eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): settingsDictionary → {SettingsDictionary}", sender, e, settingsDictionary);
         var portalRoles = RoleController.Instance.GetRoles(this.portalSettings.PortalId);
+		eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): portalRoles → {PortalRoles}", sender, e, portalRoles);
 
         this.allPortalsSettings = SettingsUtil.LoadEditorSettingsByKey(
             this.portalSettings,
@@ -779,8 +840,11 @@ public partial class Browser : PageBase
             settingsDictionary,
             SettingConstants.HostKey,
             null);
+			eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): allPortalsSettings → {AllPortalsSettings}", sender, e, allPortalsSettings);
 
         this.currentSettings = this.currentSettings.SettingMode switch
+		eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): currentSettings → {CurrentSettings}", sender, e, currentSettings);
+		eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): this.currentSettings → {Arg2}", sender, e, this.currentSettings);
         {
             SettingsMode.Default => SettingsUtil.GetDefaultSettings(
                 this.portalSettings,
@@ -825,6 +889,7 @@ public partial class Browser : PageBase
             && HttpContext.Current.Request.IsAuthenticated)
         {
             string command = null;
+			eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): command → {Command}", sender, e, command);
 
             try
             {
@@ -835,6 +900,7 @@ public partial class Browser : PageBase
             }
             catch (Exception)
             {
+				eventLogger.LogError("Exception in Page_Load(sender={Sender},e={E}): {Arg2}", sender, e, Exception.Message);
                 command = null;
             }
 
@@ -843,9 +909,13 @@ public partial class Browser : PageBase
                 if (this.request.QueryString["Type"] != null)
                 {
                     this.browserModus = this.request.QueryString["Type"];
+					eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): this.browserModus → {Arg2}", sender, e, this.browserModus);
                     var browserModusText = this.LocalizeString("lblBrowserModus.Text");
+					eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): browserModusText → {BrowserModusText}", sender, e, browserModusText);
                     var browserModusTypeKey = $"BrowserModus.{this.browserModus}.Text";
+					eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): browserModusTypeKey → {BrowserModusTypeKey}", sender, e, browserModusTypeKey);
                     var browserModusTypeText = this.LocalizeString(browserModusTypeKey);
+					eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): browserModusTypeText → {BrowserModusTypeText}", sender, e, browserModusTypeText);
                     this.lblModus.Text = string.Format(browserModusText, browserModusTypeText);
 
                     if (!this.IsPostBack)
@@ -866,6 +936,8 @@ public partial class Browser : PageBase
                             LinkMode.AbsoluteURL => "absLnk",
                             _ => this.rblLinkType.SelectedValue,
                         };
+						eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): LinkMode.AbsoluteURL → {Arg2}", sender, e, LinkMode.AbsoluteURL);
+						eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): LinkMode.RelativeURL → {Arg2}", sender, e, LinkMode.RelativeURL);
 
                         switch (this.browserModus)
                         {
@@ -934,10 +1006,12 @@ public partial class Browser : PageBase
                     this.GetLanguageList();
 
                     var startFolder = this.StartingDir();
+					eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): startFolder → {StartFolder}", sender, e, startFolder);
 
                     this.FillFolderTree(startFolder);
 
                     bool folderSelected = false;
+					eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): folderSelected → {FolderSelected}", sender, e, folderSelected);
 
                     if (!string.IsNullOrEmpty(ckFileUrl))
                     {
@@ -969,11 +1043,14 @@ public partial class Browser : PageBase
         else
         {
             this.Response.Write("<script type=\"text/javascript\">");
+			eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): type → {Type}", sender, e, type);
             this.Response.Write($"javascript:alert({HttpUtility.JavaScriptStringEncode(this.LocalizeString("Error1.Text"), addDoubleQuotes: true)});self.close();");
             this.Response.Write("</script>");
 
             this.Response.End();
         }
+		eventLogger.LogInformation("Page_Load(sender,e)={Sender},{E}: external service call took {Arg2} ms", sender, e, __logStart.ElapsedMilliseconds);
+		eventLogger.LogDebug("<<< Exiting Page_Load(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Show Create New Folder Panel.</summary>
@@ -981,6 +1058,7 @@ public partial class Browser : PageBase
     /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
     protected void Create_Click(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering Create_Click(sender={Sender},e={E})", sender, e);
         this.panCreate.Visible = true;
 
         if (this.panUploadDiv.Visible)
@@ -992,6 +1070,7 @@ public partial class Browser : PageBase
         {
             this.panThumb.Visible = false;
         }
+		eventLogger.LogDebug("<<< Exiting Create_Click(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Synchronize Current Folder With the Database.</summary>
@@ -999,12 +1078,15 @@ public partial class Browser : PageBase
     /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
     protected void Syncronize_Click(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering Syncronize_Click(sender={Sender},e={E})", sender, e);
         var currentFolderInfo = this.GetCurrentFolder();
 
+		eventLogger.LogDebug("Syncronize_Click(sender={Sender},e={E}): currentFolderInfo → {CurrentFolderInfo}", sender, e, currentFolderInfo);
         this.folderManager.Synchronize(this.portalSettings.PortalId, currentFolderInfo.FolderPath, false, true);
 
         // Reload Folder
         this.ShowFilesIn(this.GetCurrentFolder());
+		eventLogger.LogDebug("<<< Exiting Syncronize_Click(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Delete Selected File.</summary>
@@ -1012,14 +1094,17 @@ public partial class Browser : PageBase
     /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
     protected void Delete_Click(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering Delete_Click(sender={Sender},e={E})", sender, e);
         if (string.IsNullOrEmpty(this.FileId.Text))
         {
             return;
         }
 
         var deleteFile = this.fileManager.GetFile(int.Parse(this.FileId.Text));
+		eventLogger.LogDebug("Delete_Click(sender={Sender},e={E}): deleteFile → {DeleteFile}", sender, e, deleteFile);
 
         var thumbFolder = Path.Combine(this.GetCurrentFolder().PhysicalPath, "_thumbs");
+		eventLogger.LogDebug("Delete_Click(sender={Sender},e={E}): thumbFolder → {ThumbFolder}", sender, e, thumbFolder);
 
         var thumbPath =
             Path.Combine(thumbFolder, this.lblFileName.Text).Replace(
@@ -1037,7 +1122,9 @@ public partial class Browser : PageBase
         }
         catch (Exception exception)
         {
+			eventLogger.LogError("Exception in Delete_Click(sender={Sender},e={E}): {Arg2}", sender, e, exception.Message);
             this.Response.Write("<script type=\"text/javascript\">");
+			eventLogger.LogDebug("Delete_Click(sender={Sender},e={E}): type → {Type}", sender, e, type);
             this.Response.Write($"javascript:alert({HttpUtility.JavaScriptStringEncode(exception.Message, addDoubleQuotes: true)});");
             this.Response.Write("</script>");
         }
@@ -1050,6 +1137,7 @@ public partial class Browser : PageBase
             this.FileId.Text = null;
             this.lblFileName.Text = null;
         }
+		eventLogger.LogDebug("<<< Exiting Delete_Click(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Download selected File.</summary>
@@ -1057,14 +1145,17 @@ public partial class Browser : PageBase
     /// <param name="e">The EventArgs e.</param>
     protected void Download_Click(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering Download_Click(sender={Sender},e={E})", sender, e);
         if (string.IsNullOrEmpty(this.FileId.Text))
         {
             return;
         }
 
         var downloadFile = this.fileManager.GetFile(int.Parse(this.FileId.Text));
+		eventLogger.LogDebug("Download_Click(sender={Sender},e={E}): downloadFile → {DownloadFile}", sender, e, downloadFile);
 
         this.fileManager.WriteFileToResponse(downloadFile, ContentDisposition.Attachment);
+		eventLogger.LogDebug("<<< Exiting Download_Click(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Opens the Re-sizing Panel.</summary>
@@ -1072,6 +1163,7 @@ public partial class Browser : PageBase
     /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
     protected void Resizer_Click(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering Resizer_Click(sender={Sender},e={E})", sender, e);
         if (string.IsNullOrEmpty(this.lblFileName.Text))
         {
             return;
@@ -1103,6 +1195,7 @@ public partial class Browser : PageBase
         this.lblCropInfo.Visible = false;
 
         var fileInfo = this.fileManager.GetFile(this.GetCurrentFolder(), this.lblFileName.Text);
+		eventLogger.LogDebug("Resizer_Click(sender={Sender},e={E}): fileInfo → {FileInfo}", sender, e, fileInfo);
         string sFilePath = this.fileManager.GetUrl(fileInfo);
 
         string sFileNameNoExt = Path.GetFileNameWithoutExtension(fileInfo.FileName);
@@ -1115,8 +1208,10 @@ public partial class Browser : PageBase
         }
 
         var fs = this.fileManager.GetFileContent(fileInfo);
+		eventLogger.LogDebug("Resizer_Click(sender={Sender},e={E}): fs → {Fs}", sender, e, fs);
 
         Image image = Image.FromStream(fs);
+		eventLogger.LogDebug("Resizer_Click(sender={Sender},e={E}): image → {Image}", sender, e, image);
 
         // Show Preview Images
         this.imgOriginal.ImageUrl = sFilePath;
@@ -1126,12 +1221,17 @@ public partial class Browser : PageBase
         int h = image.Height;
 
         int longestDimension = (w > h) ? w : h;
+		eventLogger.LogDebug("Resizer_Click(sender={Sender},e={E}): longestDimension → {LongestDimension}", sender, e, longestDimension);
         int shortestDimension = (w < h) ? w : h;
+		eventLogger.LogDebug("Resizer_Click(sender={Sender},e={E}): shortestDimension → {ShortestDimension}", sender, e, shortestDimension);
 
         float factor = ((float)longestDimension) / shortestDimension;
+		eventLogger.LogDebug("Resizer_Click(sender={Sender},e={E}): factor → {Factor}", sender, e, factor);
 
         double newWidth = 400;
+		eventLogger.LogDebug("Resizer_Click(sender={Sender},e={E}): newWidth → {NewWidth}", sender, e, newWidth);
         double newHeight = 300 / factor;
+		eventLogger.LogDebug("Resizer_Click(sender={Sender},e={E}): newHeight → {NewHeight}", sender, e, newHeight);
 
         if (w < h)
         {
@@ -1155,6 +1255,7 @@ public partial class Browser : PageBase
         {
             iDefaultWidth = this.currentSettings.ResizeWidth;
 
+			eventLogger.LogDebug("Resizer_Click(sender={Sender},e={E}): iDefaultWidth → {IDefaultWidth}", sender, e, iDefaultWidth);
             // Check if Default Value is greater the Image Value
             if (iDefaultWidth > image.Width)
             {
@@ -1170,6 +1271,7 @@ public partial class Browser : PageBase
         {
             iDefaultHeight = this.currentSettings.ResizeHeight;
 
+			eventLogger.LogDebug("Resizer_Click(sender={Sender},e={E}): iDefaultHeight → {IDefaultHeight}", sender, e, iDefaultHeight);
             // Check if Default Value is greater the Image Value
             if (iDefaultHeight > image.Height)
             {
@@ -1204,6 +1306,7 @@ public partial class Browser : PageBase
         this.Page.ClientScript.RegisterStartupScript(this.GetType(), "SliderScript", sliderScript, true);
 
         image.Dispose();
+		eventLogger.LogDebug("<<< Exiting Resizer_Click(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Show Upload Controls.</summary>
@@ -1211,6 +1314,7 @@ public partial class Browser : PageBase
     /// <param name="e">The e.</param>
     protected void Upload_Click(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering Upload_Click(sender={Sender},e={E})", sender, e);
         this.panUploadDiv.Visible = true;
 
         if (this.panCreate.Visible)
@@ -1222,6 +1326,7 @@ public partial class Browser : PageBase
         {
             this.panThumb.Visible = false;
         }
+		eventLogger.LogDebug("<<< Exiting Upload_Click(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Shows the files in directory.</summary>
@@ -1229,9 +1334,12 @@ public partial class Browser : PageBase
     /// <param name="pagerChanged">if set to <see langword="true"/> [pager changed].</param>
     protected void ShowFilesIn(string directory, bool pagerChanged = false)
     {
+		eventLogger.LogDebug(">>> Entering ShowFilesIn(directory={Directory},pagerChanged={PagerChanged})", directory, pagerChanged);
         var currentFolderInfo = Utility.ConvertFilePathToFolderInfo(directory, this.portalSettings);
 
+		eventLogger.LogDebug("ShowFilesIn(directory={Directory},pagerChanged={PagerChanged}): currentFolderInfo → {CurrentFolderInfo}", directory, pagerChanged, currentFolderInfo);
         this.ShowFilesIn(currentFolderInfo, pagerChanged);
+		eventLogger.LogDebug("<<< Exiting ShowFilesIn(directory={Directory},pagerChanged={PagerChanged})", directory, pagerChanged);
     }
 
     /// <summary>Gets the localized string corresponding to the <paramref name="key"/>.</summary>
@@ -1239,6 +1347,8 @@ public partial class Browser : PageBase
     /// <returns>The localized Text.</returns>
     protected string LocalizeString(string key)
     {
+		eventLogger.LogDebug(">>> Entering LocalizeString(key={Key})", key);
+		eventLogger.LogDebug("<<< Exiting LocalizeString(key={Key})", key);
         return Localization.GetString(key, this.ResXFile, this.LanguageCode);
     }
 
@@ -1287,12 +1397,15 @@ public partial class Browser : PageBase
 
     private static (int NewWidth, int NewHeight) DetermineNewDimensions(Image uplImage, int maxWidth, int maxHeight)
     {
+		eventLogger.LogDebug(">>> Entering DetermineNewDimensions(NewWidth={NewWidth},NewHeight={NewHeight})", NewWidth, NewHeight);
         // it's too big: we need to resize
         int newWidth, newHeight;
 
         // which determines the max: height or width?
         double ratioWidth = (double)maxWidth / (double)uplImage.Width;
+		eventLogger.LogDebug("DetermineNewDimensions(NewWidth={NewWidth},NewHeight={NewHeight}): ratioWidth → {RatioWidth}", NewWidth, NewHeight, ratioWidth);
         double ratioHeight = (double)maxHeight / (double)uplImage.Height;
+		eventLogger.LogDebug("DetermineNewDimensions(NewWidth={NewWidth},NewHeight={NewHeight}): ratioHeight → {RatioHeight}", NewWidth, NewHeight, ratioHeight);
         if (ratioWidth < ratioHeight)
         {
             // max width needs to be used
@@ -1306,6 +1419,7 @@ public partial class Browser : PageBase
             newWidth = (int)Math.Round(uplImage.Width * ratioHeight);
         }
 
+		eventLogger.LogDebug("<<< Exiting DetermineNewDimensions(NewWidth={NewWidth},NewHeight={NewHeight})", NewWidth, NewHeight);
         return (newWidth, newHeight);
     }
 
@@ -1314,8 +1428,10 @@ public partial class Browser : PageBase
     /// <returns>The output URL string.</returns>
     private static string MapUrl(string sPath)
     {
+		eventLogger.LogDebug(">>> Entering MapUrl(sPath={SPath})", sPath);
         string sAppPath = HttpContext.Current.Server.MapPath("~");
 
+		eventLogger.LogDebug("<<< Exiting MapUrl(sPath={SPath})", sPath);
         return HttpContext.Current.Request.ApplicationPath +
                sPath.Replace(sAppPath, string.Empty).Replace(@"\", "/");
     }
@@ -1333,8 +1449,10 @@ public partial class Browser : PageBase
     /// <returns>The Encoder.</returns>
     private static ImageCodecInfo GetEncoder(ImageFormat format)
     {
+		eventLogger.LogDebug(">>> Entering GetEncoder(format={Format})", format);
         ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
 
+		eventLogger.LogDebug("<<< Exiting GetEncoder(format={Format})", format);
         return codecs.FirstOrDefault(codec => codec.FormatID == format.Guid);
     }
 
@@ -1353,6 +1471,7 @@ public partial class Browser : PageBase
     /// <param name="folderInfo">The folder info.</param>
     private static string GetFolderIcon(IFolderInfo folderInfo)
     {
+		eventLogger.LogDebug(">>> Entering GetFolderIcon(folderInfo={FolderInfo})", folderInfo);
         if (folderInfo == null || string.IsNullOrEmpty(folderInfo.FolderPath))
         {
             return "Images/folder.gif";
@@ -1368,8 +1487,10 @@ public partial class Browser : PageBase
                 return "Images/folderdb.gif";
             default:
                 var folderMapping = FolderMappingController.Instance.GetFolderMapping(folderInfo.PortalID, folderInfo.FolderMappingID);
+				eventLogger.LogDebug("GetFolderIcon(folderInfo={FolderInfo}): folderMapping → {FolderMapping}", folderInfo, folderMapping);
                 if (folderMapping != null)
                 {
+				eventLogger.LogDebug("<<< Exiting GetFolderIcon(folderInfo={FolderInfo})", folderInfo);
                     return folderMapping.ImageUrl;
                 }
 
@@ -1381,7 +1502,9 @@ public partial class Browser : PageBase
     /// <param name="folderInfo">The folder info.</param>
     private void SetFolderPermission(IFolderInfo folderInfo)
     {
+		eventLogger.LogDebug(">>> Entering SetFolderPermission(folderInfo={FolderInfo})", folderInfo);
         this.folderManager.CopyParentFolderPermissions(folderInfo);
+		eventLogger.LogDebug("<<< Exiting SetFolderPermission(folderInfo={FolderInfo})", folderInfo);
     }
 
     /// <summary>Set Folder Permission.</summary>
@@ -1398,6 +1521,7 @@ public partial class Browser : PageBase
     /// <param name="currentUserInfo">The current user info.</param>
     private void SetUserFolderPermission(IFolderInfo folderInfo, UserInfo currentUserInfo)
     {
+		eventLogger.LogDebug(">>> Entering SetUserFolderPermission(folderInfo={FolderInfo},currentUserInfo={CurrentUserInfo})", folderInfo, currentUserInfo);
         if (FolderPermissionController.CanManageFolder((FolderInfo)folderInfo))
         {
             return;
@@ -1416,14 +1540,20 @@ public partial class Browser : PageBase
         }
 
         FolderPermissionController.SaveFolderPermissions((FolderInfo)folderInfo);
+		eventLogger.LogDebug("<<< Exiting SetUserFolderPermission(folderInfo={FolderInfo},currentUserInfo={CurrentUserInfo})", folderInfo, currentUserInfo);
         return;
 
         static FolderPermissionInfo InitializeFolderPermission(IPermissionDefinitionInfo permission, IFolderInfo folderInfo, IUserInfo currentUserInfo)
         {
+			eventLogger.LogDebug(">>> Entering InitializeFolderPermission(permission={Permission},folderInfo={FolderInfo},currentUserInfo={CurrentUserInfo})", permission, folderInfo, currentUserInfo);
             IFolderPermissionInfo folderPermission = new FolderPermissionInfo(permission) { AllowAccess = true, };
             folderPermission.FolderId = folderInfo.FolderID;
+			eventLogger.LogDebug("InitializeFolderPermission(permission={Permission},folderInfo={FolderInfo},currentUserInfo={CurrentUserInfo}): folderPermission.FolderId → {Arg3}", permission, folderInfo, currentUserInfo, folderPermission.FolderId);
+			eventLogger.LogDebug("InitializeFolderPermission(permission={Permission},folderInfo={FolderInfo},currentUserInfo={CurrentUserInfo}): folderPermission.UserId → {Arg3}", permission, folderInfo, currentUserInfo, folderPermission.UserId);
+			eventLogger.LogDebug("InitializeFolderPermission(permission={Permission},folderInfo={FolderInfo},currentUserInfo={CurrentUserInfo}): folderPermission → {FolderPermission}", permission, folderInfo, currentUserInfo, folderPermission);
             folderPermission.UserId = currentUserInfo.UserID;
             folderPermission.RoleId = Convert.ToInt32(Globals.glbRoleNothing, CultureInfo.InvariantCulture);
+			eventLogger.LogDebug("<<< Exiting InitializeFolderPermission(permission={Permission},folderInfo={FolderInfo},currentUserInfo={CurrentUserInfo})", permission, folderInfo, currentUserInfo);
             return (FolderPermissionInfo)folderPermission;
         }
     }
@@ -1431,10 +1561,12 @@ public partial class Browser : PageBase
     /// <summary>Sets the sort button classes.</summary>
     private void SetSortButtonClasses()
     {
+		eventLogger.LogDebug(">>> Entering SetSortButtonClasses()");
         this.SortAscending.CssClass = !this.SortFilesAscending ? "ButtonNormal" : "ButtonSelected";
         this.SortDescending.CssClass = !this.SortFilesDescending ? "ButtonNormal" : "ButtonSelected";
         this.SortByDateAscending.CssClass = !this.SortFilesDateAscending ? "ButtonNormal" : "ButtonSelected";
         this.SortByDateDescending.CssClass = !this.SortFilesDateDescending ? "ButtonNormal" : "ButtonSelected";
+		eventLogger.LogDebug("<<< Exiting SetSortButtonClasses()");
     }
 
     /// <summary>Hide Create Items if User has no write access to the Current Folder.</summary>
@@ -1457,13 +1589,16 @@ public partial class Browser : PageBase
         this.cmdDelete.CssClass = hasWriteAccess && isFileSelected ? "LinkNormal" : "LinkDisabled";
         this.cmdResizer.CssClass = hasWriteAccess && isFileSelected ? "LinkNormal" : "LinkDisabled";
         this.cmdDownload.CssClass = isFileSelected ? "LinkNormal" : "LinkDisabled";
+		eventLogger.LogDebug("<<< Exiting CheckFolderAccess(folderId={FolderId},isFileSelected={IsFileSelected})", folderId, isFileSelected);
     }
 
     /// <summary>Sets the default link type text.</summary>
     private void SetDefaultLinkTypeText()
     {
+		eventLogger.LogDebug(">>> Entering SetDefaultLinkTypeText()");
         this.rblLinkType.Items[0].Text = this.LocalizeString("relLnk.Text");
         this.rblLinkType.Items[1].Text = this.LocalizeString("absLnk.Text");
+		eventLogger.LogDebug("<<< Exiting SetDefaultLinkTypeText()");
     }
 
     /// <summary>Fill the Folder TreeView with all (Sub)Directories.</summary>
@@ -1505,26 +1640,31 @@ public partial class Browser : PageBase
         {
             folderNode.ChildNodes.Add(node);
         }
+		eventLogger.LogDebug("<<< Exiting FillFolderTree(currentFolderInfo={CurrentFolderInfo})", currentFolderInfo);
     }
 
     /// <summary>Fill Quality Values 1-100 %.</summary>
     private void FillQualityPercentages()
     {
+		eventLogger.LogDebug(">>> Entering FillQualityPercentages()");
         for (var i = 00; i < 101; i++)
         {
             this.dDlQuality.Items.Add(new ListItem { Text = i.ToString(), Value = i.ToString() });
         }
 
         this.dDlQuality.Items[100].Selected = true;
+		eventLogger.LogDebug("<<< Exiting FillQualityPercentages()");
     }
 
     /// <summary>The get portal settings.</summary>
     /// <returns>Current Portal Settings.</returns>
     private IPortalSettings GetPortalSettings()
     {
+		eventLogger.LogDebug(">>> Entering GetPortalSettings()");
         int iTabId = 0, iPortalId = 0;
 
         try
+		eventLogger.LogDebug("GetPortalSettings(): iTabId → {ITabId}", iTabId);
         {
             if (this.request.QueryString["tabid"] != null)
             {
@@ -1535,16 +1675,20 @@ public partial class Browser : PageBase
             {
                 iPortalId = int.Parse(this.request.QueryString["PortalID"]);
             }
+			eventLogger.LogDebug("GetPortalSettings(): iPortalId → {IPortalId}", iPortalId);
 
             string sDomainName = Globals.GetDomainName(this.Request, true);
 
             string sPortalAlias = this.portalAliasService.GetPortalAliasByPortal(iPortalId, sDomainName);
 
             var objPortalAliasInfo = this.portalAliasService.GetPortalAlias(sPortalAlias) as PortalAliasInfo;
+			eventLogger.LogDebug("GetPortalSettings(): objPortalAliasInfo → {ObjPortalAliasInfo}", objPortalAliasInfo);
             return new PortalSettings(iTabId, objPortalAliasInfo);
         }
         catch (Exception)
         {
+			eventLogger.LogError("Exception in GetPortalSettings(): {Arg0}", Exception.Message);
+			eventLogger.LogDebug("<<< Exiting GetPortalSettings()");
             return (IPortalSettings)HttpContext.Current.Items["PortalSettings"];
         }
     }
@@ -1553,8 +1697,10 @@ public partial class Browser : PageBase
     /// <returns>Returns the Starting Directory.</returns>
     private IFolderInfo StartingDir()
     {
+		eventLogger.LogDebug(">>> Entering StartingDir()");
         IFolderInfo startingFolderInfo = null;
 
+		eventLogger.LogDebug("StartingDir(): startingFolderInfo → {StartingFolderInfo}", startingFolderInfo);
         if (this.browserModus == "Image" && !string.IsNullOrEmpty(this.allPortalsSettings.HostBrowserRootDirForImg))
         {
             startingFolderInfo = Utility.EnsureGetFolder(
@@ -1564,6 +1710,7 @@ public partial class Browser : PageBase
         else if (this.browserModus == "Image" && !this.currentSettings.BrowserRootDirForImgId.Equals(-1))
         {
             var rootFolder = this.folderManager.GetFolder(this.currentSettings.BrowserRootDirForImgId);
+			eventLogger.LogDebug("StartingDir(): rootFolder → {RootFolder}", rootFolder);
 
             if (rootFolder != null)
             {
@@ -1610,6 +1757,7 @@ public partial class Browser : PageBase
         }
 
         var folderStart = startingFolderInfo.PhysicalPath;
+		eventLogger.LogDebug("StartingDir(): folderStart → {FolderStart}", folderStart);
 
         folderStart = folderStart.Substring(this.portalSettings.HomeDirectoryMapPath.Length).Replace(@"\", "/");
 
@@ -1619,6 +1767,7 @@ public partial class Browser : PageBase
 
         this.SetFolderPermission(startingFolderInfo);
 
+		eventLogger.LogDebug("<<< Exiting StartingDir()");
         return startingFolderInfo;
     }
 
@@ -1627,14 +1776,17 @@ public partial class Browser : PageBase
     /// <returns>Returns the user folder path.</returns>
     private IFolderInfo GetUserFolderInfo(string startingDir)
     {
+		eventLogger.LogDebug(">>> Entering GetUserFolderInfo(startingDir={StartingDir})", startingDir);
         IFolderInfo userFolderInfo;
 
         var userFolderPath = Path.Combine(startingDir, "userfiles");
+		eventLogger.LogDebug("GetUserFolderInfo(startingDir={StartingDir}): userFolderPath → {UserFolderPath}", startingDir, userFolderPath);
 
         // Create "userfiles" folder if not exists
         if (!Directory.Exists(userFolderPath))
         {
             var folderStart = userFolderPath;
+			eventLogger.LogDebug("GetUserFolderInfo(startingDir={StartingDir}): folderStart → {FolderStart}", startingDir, folderStart);
 
             folderStart = folderStart.Substring(this.portalSettings.HomeDirectoryMapPath.Length).Replace(@"\", "/");
 
@@ -1644,6 +1796,7 @@ public partial class Browser : PageBase
 
             this.SetFolderPermission(userFolderInfo);
         }
+		eventLogger.LogDebug("GetUserFolderInfo(startingDir={StartingDir}): userFolderInfo → {UserFolderInfo}", startingDir, userFolderInfo);
 
         // Create user folder based on the user id
         userFolderPath = Path.Combine(userFolderPath, $"{this.UserController.GetCurrentUserInfo().UserID}\\");
@@ -1670,6 +1823,7 @@ public partial class Browser : PageBase
             this.SetUserFolderPermission(userFolderInfo, this.UserController.GetCurrentUserInfo());
         }
 
+		eventLogger.LogDebug("<<< Exiting GetUserFolderInfo(startingDir={StartingDir})", startingDir);
         return userFolderInfo;
     }
 
@@ -1679,8 +1833,10 @@ public partial class Browser : PageBase
     /// </summary>
     private void InitializeComponent()
     {
+		eventLogger.LogDebug(">>> Entering InitializeComponent()");
         this.portalSettings = this.GetPortalSettings();
 
+		eventLogger.LogDebug("InitializeComponent(): portalSettings → {PortalSettings}", portalSettings);
         this.cmdCancel.Click += this.Cancel_Click;
         this.cmdUploadNow.Click += this.UploadNow_Click;
         this.cmdUploadCancel.Click += this.UploadCancel_Click;
@@ -1702,12 +1858,15 @@ public partial class Browser : PageBase
         this.FoldersTree.SelectedNodeChanged += this.FoldersTree_NodeClick;
 
         this.FilesList.ItemCommand += this.FilesList_ItemCommand;
+		eventLogger.LogDebug("<<< Exiting InitializeComponent()");
     }
 
     /// <summary>Load Favicon from Current Portal Home Directory.</summary>
     private void LoadFavIcon()
     {
+		eventLogger.LogDebug(">>> Entering LoadFavIcon()");
         this.favicon.Controls.Add(new LiteralControl(DotNetNuke.UI.Internals.FavIcon.GetHeaderLink(this.HostSettings, this.portalSettings.PortalId)));
+		eventLogger.LogDebug("<<< Exiting LoadFavIcon()");
     }
 
     /// <summary>Render all Directories and subdirectories recursive.</summary>
@@ -1733,12 +1892,14 @@ public partial class Browser : PageBase
             tnFolder.ChildNodes.Add(node);
         }
 
+		eventLogger.LogDebug("<<< Exiting RenderFolder(folderInfo={FolderInfo},readableFolders={ReadableFolders})", folderInfo, readableFolders);
         return tnFolder;
     }
 
     /// <summary>Gets the language list, and sets the default locale if Content Localization is Enabled.</summary>
     private void GetLanguageList()
     {
+		eventLogger.LogDebug(">>> Entering GetLanguageList()");
         var languageListItems =
             new LocaleController(this.HostSettings, this.AppStatus, this.dataProvider, this.PortalController, this.tabController, this.UserController, this.packageController).GetLocales(this.portalSettings.PortalId)
                 .Values.Select(language => new ListItem { Text = language.Text, Value = language.Code });
@@ -1770,28 +1931,36 @@ public partial class Browser : PageBase
             this.LanguageList.Items.RemoveAt(0);
 
             var currentTabCultureItem = this.LanguageList.Items.FindByValue(currentTab.CultureCode);
+			eventLogger.LogDebug("GetLanguageList(): currentTabCultureItem → {CurrentTabCultureItem}", currentTabCultureItem);
 
             if (currentTabCultureItem != null)
             {
                 currentTabCultureItem.Selected = true;
+				eventLogger.LogDebug("GetLanguageList(): currentTabCultureItem.Selected → {Arg0}", currentTabCultureItem.Selected);
             }
         }
+		eventLogger.LogDebug("<<< Exiting GetLanguageList()");
     }
 
     /// <summary>Load the Portal Tabs for the Page Links TreeView Selector.</summary>
     private void RenderTabs()
     {
+		eventLogger.LogDebug(">>> Entering RenderTabs()");
         if (this.dnntreeTabs.Nodes.Count > 0)
         {
             return;
         }
 
         var allPortalTabsList = TabController.GetPortalTabs(this.HostSettings, this.AppStatus, this.portalSettings.PortalId, -1, false, null, true, false, true, true, false);
+		eventLogger.LogDebug("RenderTabs(): allPortalTabsList → {AllPortalTabsList}", allPortalTabsList);
         var allPortalTabs = new HashSet<TabInfo>(allPortalTabsList);
+		eventLogger.LogDebug("RenderTabs(): allPortalTabs → {AllPortalTabs}", allPortalTabs);
 
         var helper = new TreeViewHelper<int>();
+		eventLogger.LogDebug("RenderTabs(): helper → {Helper}", helper);
         helper.LoadNodes(allPortalTabs, this.dnntreeTabs.Nodes, GetNodeId, GetParentId, GetNodeText, GetNodeValue, GetNodeImageUrl, GetParentIdCheck);
 
+		eventLogger.LogDebug("<<< Exiting RenderTabs()");
         return;
 
         static int GetNodeId(TabInfo x) => x.TabID;
@@ -1809,11 +1978,13 @@ public partial class Browser : PageBase
     /// <param name="elementId">The element ID.</param>
     private void ScrollToSelectedFile(string elementId)
     {
+		eventLogger.LogDebug(">>> Entering ScrollToSelectedFile(elementId={ElementId})", elementId);
         this.Page.ClientScript.RegisterStartupScript(
             this.GetType(),
             $"ScrollToSelected{Guid.NewGuid()}",
             $"document.getElementById({HttpUtility.JavaScriptStringEncode(elementId, addDoubleQuotes: true)}).scrollIntoView();",
             true);
+			eventLogger.LogDebug("<<< Exiting ScrollToSelectedFile(elementId={ElementId})", elementId);
     }
 
     /// <summary>Select a folder and the file inside the Browser.</summary>
@@ -1862,6 +2033,7 @@ public partial class Browser : PageBase
     /// <summary>JS Code that gets the selected File Url.</summary>
     private void GetSelectedImageOrLink()
     {
+		eventLogger.LogDebug(">>> Entering GetSelectedImageOrLink()");
         var scriptSelected = $$"""
             var editor = window.top.opener;
             if (typeof(CKEDITOR) !== 'undefined') {
@@ -1904,6 +2076,7 @@ public partial class Browser : PageBase
     /// <summary>Set Language for all Controls on this Page.</summary>
     private void SetLanguage()
     {
+		eventLogger.LogDebug(">>> Entering SetLanguage()");
         // Buttons
         this.cmdResizeCancel.Text = this.LocalizeString("cmdResizeCancel.Text");
         this.cmdResizeNow.Text = this.LocalizeString("cmdResizeNow.Text");
@@ -2035,6 +2208,7 @@ public partial class Browser : PageBase
         ClientAPI.AddButtonConfirm(this.cmdDelete, this.LocalizeString("AreYouSure.Text"));
 
         this.SetDefaultLinkTypeText();
+		eventLogger.LogDebug("<<< Exiting SetLanguage()");
     }
 
     /// <summary>Goes to selected file.</summary>
@@ -2073,6 +2247,7 @@ public partial class Browser : PageBase
 
             this.ScrollToSelectedFile(fileListItem.ClientID);
         }
+		eventLogger.LogDebug("<<< Exiting GoToSelectedFile(fileName={FileName})", fileName);
     }
 
     /// <summary>Show Preview for the URLs.</summary>
@@ -2108,6 +2283,7 @@ public partial class Browser : PageBase
         {
             this.SetDefaultLinkTypeText();
         }
+		eventLogger.LogDebug("<<< Exiting ShowFileHelpUrl(fileName={FileName},fileInfo={FileInfo})", fileName, fileInfo);
     }
 
     /// <summary>Shows the files in directory.</summary>
@@ -2354,6 +2530,7 @@ public partial class Browser : PageBase
 
             this.Response.End();
         }
+		eventLogger.LogDebug("<<< Exiting UploadFile(file={File},command={Command})", file, command);
     }
 
     /// <summary>Exit Dialog.</summary>
@@ -2361,8 +2538,10 @@ public partial class Browser : PageBase
     /// <param name="e">The e.</param>
     private void Cancel_Click(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering Cancel_Click(sender={Sender},e={E})", sender, e);
         this.Page.ClientScript.RegisterStartupScript(
             this.GetType(), "closeScript", "javascript:self.close();", true);
+			eventLogger.LogDebug("<<< Exiting Cancel_Click(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Hide Create New Folder Panel.</summary>
@@ -2370,7 +2549,9 @@ public partial class Browser : PageBase
     /// <param name="e">The e.</param>
     private void CreateCancel_Click(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering CreateCancel_Click(sender={Sender},e={E})", sender, e);
         this.panCreate.Visible = false;
+		eventLogger.LogDebug("<<< Exiting CreateCancel_Click(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Create a New Sub Folder.</summary>
@@ -2378,6 +2559,7 @@ public partial class Browser : PageBase
     /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
     private void CreateFolder_Click(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering CreateFolder_Click(sender={Sender},e={E})", sender, e);
         if (!string.IsNullOrEmpty(this.tbFolderName.Text))
         {
             if (Utility.ValidatePath(this.tbFolderName.Text))
@@ -2387,18 +2569,23 @@ public partial class Browser : PageBase
 
             this.tbFolderName.Text = Utility.CleanPath(this.tbFolderName.Text);
             var newFolderId = Null.NullInteger;
+			eventLogger.LogDebug("CreateFolder_Click(sender={Sender},e={E}): newFolderId → {NewFolderId}", sender, e, newFolderId);
 
             try
             {
                 var portalId = this.portalSettings.PortalId;
                 var currentFolder = this.GetCurrentFolder();
+				eventLogger.LogDebug("CreateFolder_Click(sender={Sender},e={E}): currentFolder → {CurrentFolder}", sender, e, currentFolder);
                 var newFolderPath = $"{currentFolder.FolderPath}{this.tbFolderName.Text}/";
+				eventLogger.LogDebug("CreateFolder_Click(sender={Sender},e={E}): newFolderPath → {NewFolderPath}", sender, e, newFolderPath);
 
                 var folderMapping = FolderMappingController.Instance.GetFolderMapping(currentFolder.FolderMappingID);
+				eventLogger.LogDebug("CreateFolder_Click(sender={Sender},e={E}): folderMapping → {FolderMapping}", sender, e, folderMapping);
 
                 if (!this.folderManager.FolderExists(portalId, newFolderPath))
                 {
                     var newFolder = this.folderManager.AddFolder(folderMapping, newFolderPath);
+					eventLogger.LogDebug("CreateFolder_Click(sender={Sender},e={E}): newFolder → {NewFolder}", sender, e, newFolder);
                     newFolderId = newFolder.FolderID;
                     this.SetFolderPermission(newFolder.FolderID);
                     this.lblCurrentDir.Text = newFolder.FolderPath;
@@ -2406,7 +2593,9 @@ public partial class Browser : PageBase
             }
             catch (Exception exception)
             {
+				eventLogger.LogError("Exception in CreateFolder_Click(sender={Sender},e={E}): {Arg2}", sender, e, exception.Message);
                 this.Response.Write("<script type=\"text/javascript\">");
+				eventLogger.LogDebug("CreateFolder_Click(sender={Sender},e={E}): type → {Type}", sender, e, type);
                 this.Response.Write($"javascript:alert({HttpUtility.JavaScriptStringEncode(exception.Message, addDoubleQuotes: true)});");
                 this.Response.Write("</script>");
             }
@@ -2417,12 +2606,16 @@ public partial class Browser : PageBase
                 if (newFolderId > Null.NullInteger)
                 {
                     var tnNewFolder = this.FindNodeByValue(this.FoldersTree, newFolderId.ToString());
+					eventLogger.LogDebug("CreateFolder_Click(sender={Sender},e={E}): tnNewFolder → {TnNewFolder}", sender, e, tnNewFolder);
                     if (tnNewFolder != null)
                     {
                         tnNewFolder.Selected = true;
+						eventLogger.LogDebug("CreateFolder_Click(sender={Sender},e={E}): tnNewFolder.Selected → {Arg2}", sender, e, tnNewFolder.Selected);
                         this.CurrentFolderId = newFolderId;
+						eventLogger.LogDebug("CreateFolder_Click(sender={Sender},e={E}): this.CurrentFolderId → {Arg2}", sender, e, this.CurrentFolderId);
 
                         var expandNode = tnNewFolder.Parent;
+						eventLogger.LogDebug("CreateFolder_Click(sender={Sender},e={E}): expandNode → {ExpandNode}", sender, e, expandNode);
                         while (expandNode != null)
                         {
                             expandNode.Expand();
@@ -2436,6 +2629,7 @@ public partial class Browser : PageBase
         }
 
         this.panCreate.Visible = false;
+		eventLogger.LogDebug("<<< Exiting CreateFolder_Click(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Save the New Cropped Image.</summary>
@@ -2443,6 +2637,7 @@ public partial class Browser : PageBase
     /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
     private void CropNow_Click(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering CropNow_Click(sender={Sender},e={E})", sender, e);
         // Hide Image Editor Panels
         this.panImagePreview.Visible = false;
         this.panImageEdHead.Visible = false;
@@ -2463,14 +2658,17 @@ public partial class Browser : PageBase
 
         // Add new file to database
         var currentFolderInfo = this.GetCurrentFolder();
+		eventLogger.LogDebug("CropNow_Click(sender={Sender},e={E}): currentFolderInfo → {CurrentFolderInfo}", sender, e, currentFolderInfo);
 
         this.folderManager.Synchronize(this.portalSettings.PortalId, currentFolderInfo.FolderPath, false, true);
 
         this.ShowFilesIn(this.GetCurrentFolder());
 
         string sExtension = Path.GetExtension(this.lblFileName.Text);
+		eventLogger.LogDebug("CropNow_Click(sender={Sender},e={E}): sExtension → {SExtension}", sender, e, sExtension);
 
         this.GoToSelectedFile($"{this.txtCropImageName.Text}{sExtension}");
+		eventLogger.LogDebug("<<< Exiting CropNow_Click(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Hide Image Re-sizing Panel.</summary>
@@ -2478,6 +2676,7 @@ public partial class Browser : PageBase
     /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
     private void ResizeCancel_Click(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering ResizeCancel_Click(sender={Sender},e={E})", sender, e);
         // Hide Image Editor Panels
         this.panImagePreview.Visible = false;
         this.panImageEdHead.Visible = false;
@@ -2494,6 +2693,7 @@ public partial class Browser : PageBase
         {
             this.BrowserMode.Visible = true;
         }
+		eventLogger.LogDebug("<<< Exiting ResizeCancel_Click(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Resize Image based on User Input.</summary>
@@ -2501,12 +2701,15 @@ public partial class Browser : PageBase
     /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
     private void ResizeNow_Click(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering ResizeNow_Click(sender={Sender},e={E})", sender, e);
         var file = this.fileManager.GetFile(this.GetCurrentFolder(), this.lblFileName.Text);
         string resizedFileName;
+		eventLogger.LogDebug("ResizeNow_Click(sender={Sender},e={E}): file → {File}", sender, e, file);
 
         using (var fileStream = this.fileManager.GetFileContent(file))
         {
             var oldImage = Image.FromStream(fileStream);
+			eventLogger.LogDebug("ResizeNow_Click(sender={Sender},e={E}): oldImage → {OldImage}", sender, e, oldImage);
 
             if (!int.TryParse(this.txtWidth.Text, out var newWidth))
             {
@@ -2531,6 +2734,7 @@ public partial class Browser : PageBase
             if (this.chkAspect.Checked)
             {
                 var finalHeight = Math.Abs(oldImage.Height * newWidth / oldImage.Width);
+				eventLogger.LogDebug("ResizeNow_Click(sender={Sender},e={E}): finalHeight → {FinalHeight}", sender, e, finalHeight);
 
                 if (finalHeight > newHeight)
                 {
@@ -2547,25 +2751,33 @@ public partial class Browser : PageBase
             {
                 counter++;
                 var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(resizedFileName);
+				eventLogger.LogDebug("ResizeNow_Click(sender={Sender},e={E}): fileNameWithoutExtension → {FileNameWithoutExtension}", sender, e, fileNameWithoutExtension);
                 resizedFileName = $"{fileNameWithoutExtension}_{counter}.{file.Extension}";
             }
 
             using var stream = new MemoryStream();
+			eventLogger.LogDebug("ResizeNow_Click(sender={Sender},e={E}): stream → {Stream}", sender, e, stream);
 
             // Add Compression to Jpeg Images
             if (oldImage.RawFormat.Equals(ImageFormat.Jpeg))
             {
                 ImageCodecInfo jpgEncoder = GetEncoder(oldImage.RawFormat);
+				eventLogger.LogDebug("ResizeNow_Click(sender={Sender},e={E}): jpgEncoder → {JpgEncoder}", sender, e, jpgEncoder);
 
                 Encoder myEncoder = Encoder.Quality;
                 EncoderParameters encodeParams = new EncoderParameters(1);
+				eventLogger.LogDebug("ResizeNow_Click(sender={Sender},e={E}): encodeParams → {EncodeParams}", sender, e, encodeParams);
                 EncoderParameter encodeParam = new EncoderParameter(myEncoder, long.Parse(this.dDlQuality.SelectedValue));
+				eventLogger.LogDebug("ResizeNow_Click(sender={Sender},e={E}): encodeParam → {EncodeParam}", sender, e, encodeParam);
                 encodeParams.Param[0] = encodeParam;
 
                 using Bitmap dst = new Bitmap(newWidth, newHeight);
+				eventLogger.LogDebug("ResizeNow_Click(sender={Sender},e={E}): dst → {Dst}", sender, e, dst);
                 using (Graphics g = Graphics.FromImage(dst))
                 {
                     g.SmoothingMode = SmoothingMode.AntiAlias;
+					eventLogger.LogDebug("ResizeNow_Click(sender={Sender},e={E}): g.SmoothingMode → {Arg2}", sender, e, g.SmoothingMode);
+					eventLogger.LogDebug("ResizeNow_Click(sender={Sender},e={E}): g.InterpolationMode → {Arg2}", sender, e, g.InterpolationMode);
                     g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                     g.DrawImage(oldImage, 0, 0, dst.Width, dst.Height);
                 }
@@ -2576,6 +2788,7 @@ public partial class Browser : PageBase
             {
                 // Finally Create a new Resized Image
                 using Image newImage = oldImage.GetThumbnailImage(newWidth, newHeight, null, IntPtr.Zero);
+				eventLogger.LogDebug("ResizeNow_Click(sender={Sender},e={E}): newImage → {NewImage}", sender, e, newImage);
                 var imageFormat = oldImage.RawFormat;
                 oldImage.Dispose();
                 newImage.Save(stream, imageFormat);
@@ -2586,6 +2799,7 @@ public partial class Browser : PageBase
 
         // Add new file to database
         var currentFolderInfo = this.GetCurrentFolder();
+		eventLogger.LogDebug("ResizeNow_Click(sender={Sender},e={E}): currentFolderInfo → {CurrentFolderInfo}", sender, e, currentFolderInfo);
 
         this.folderManager.Synchronize(this.portalSettings.PortalId, currentFolderInfo.FolderPath, false, true);
 
@@ -2609,6 +2823,7 @@ public partial class Browser : PageBase
         this.ShowFilesIn(this.GetCurrentFolder());
 
         this.GoToSelectedFile(resizedFileName);
+		eventLogger.LogDebug("<<< Exiting ResizeNow_Click(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Hide Resize Panel and Show CropZoom Panel.</summary>
@@ -2616,6 +2831,7 @@ public partial class Browser : PageBase
     /// <param name="e">The Event Args e.</param>
     private void Rotate_Click(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering Rotate_Click(sender={Sender},e={E})", sender, e);
         this.panThumb.Visible = false;
         this.panImageEditor.Visible = true;
 
@@ -2632,6 +2848,7 @@ public partial class Browser : PageBase
         this.title.Text = $"{this.lblResizeHeader.Text} - DNNConnect.CKEditorProvider.FileBrowser";
 
         var file = this.fileManager.GetFile(this.GetCurrentFolder(), this.lblFileName.Text);
+		eventLogger.LogDebug("Rotate_Click(sender={Sender},e={E}): file → {File}", sender, e, file);
         string sFilePath = this.fileManager.GetUrl(file);
 
         string sFileNameNoExt = Path.GetFileNameWithoutExtension(file.FileName);
@@ -2707,7 +2924,9 @@ public partial class Browser : PageBase
     /// <param name="e">The Event Args e.</param>
     private void UploadCancel_Click(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering UploadCancel_Click(sender={Sender},e={E})", sender, e);
         this.panUploadDiv.Visible = false;
+		eventLogger.LogDebug("<<< Exiting UploadCancel_Click(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Upload Selected File.</summary>
@@ -2715,10 +2934,13 @@ public partial class Browser : PageBase
     /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
     private void UploadNow_Click(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering UploadNow_Click(sender={Sender},e={E})", sender, e);
         this.FilesTable = null;
         this.ShowFilesIn(this.GetCurrentFolder());
+		eventLogger.LogDebug("UploadNow_Click(sender={Sender},e={E}): this.FilesTable → {Arg2}", sender, e, this.FilesTable);
 
         this.panUploadDiv.Visible = false;
+		eventLogger.LogDebug("<<< Exiting UploadNow_Click(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Show Preview of the Page links.</summary>
@@ -2726,6 +2948,7 @@ public partial class Browser : PageBase
     /// <param name="eventArgs">The <see cref="EventArgs"/> instance containing the event data.</param>
     private void TreeTabs_NodeClick(object sender, EventArgs eventArgs)
     {
+		eventLogger.LogDebug(">>> Entering TreeTabs_NodeClick(sender={Sender},eventArgs={EventArgs})", sender, eventArgs);
         if (this.dnntreeTabs.SelectedNode == null)
         {
             return;
@@ -2747,6 +2970,7 @@ public partial class Browser : PageBase
                 ? $"{Globals.ApplicationURL(selectTab.TabID)}&language={this.LanguageList.SelectedValue}"
                 : Globals.ApplicationURL(selectTab.TabID);
             var fileName = Globals.FriendlyUrl(selectTab, fileNamePath, this.portalSettings);
+			eventLogger.LogDebug("TreeTabs_NodeClick(sender={Sender},eventArgs={EventArgs}): fileName → {FileName}", sender, eventArgs, fileName);
 
             // Relative Url
             fileName = Globals.ResolveUrl(Regex.Replace(fileName, sDomainName, "~", RegexOptions.IgnoreCase));
@@ -2767,6 +2991,7 @@ public partial class Browser : PageBase
         else
         {
             string locale = localeSelected ? $"language/{this.LanguageList.SelectedValue}/" : string.Empty;
+			eventLogger.LogDebug("TreeTabs_NodeClick(sender={Sender},eventArgs={EventArgs}): locale → {Locale}", sender, eventArgs, locale);
 
             // Relative Url
             this.rblLinkType.Items[0].Text = Regex.Replace(
@@ -2793,22 +3018,28 @@ public partial class Browser : PageBase
             $"hideLoadingScript{Guid.NewGuid()}",
             "jQuery('#panelLoading').hide();",
             true);
+			eventLogger.LogDebug("<<< Exiting TreeTabs_NodeClick(sender={Sender},eventArgs={EventArgs})", sender, eventArgs);
     }
 
     /// <summary>Find and List all Anchors from the Selected Page.</summary>
     /// <param name="selectedTab">The selected tab.</param>
     private void FindAnchorsOnTab(TabInfo selectedTab)
     {
+		eventLogger.LogDebug(">>> Entering FindAnchorsOnTab(selectedTab={SelectedTab})", selectedTab);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         // Clear Item list first...
         this.AnchorList.Items.Clear();
 
         var noneText = this.LocalizeString("None.Text");
+		eventLogger.LogDebug("FindAnchorsOnTab(selectedTab={SelectedTab}): noneText → {NoneText}", selectedTab, noneText);
 
         try
         {
             var wc = new WebClient();
+			eventLogger.LogDebug("FindAnchorsOnTab(selectedTab={SelectedTab}): wc → {Wc}", selectedTab, wc);
 
             var tabUrl = selectedTab.FullUrl;
+			eventLogger.LogDebug("FindAnchorsOnTab(selectedTab={SelectedTab}): tabUrl → {TabUrl}", selectedTab, tabUrl);
 
             if (tabUrl.StartsWith("/", StringComparison.Ordinal))
             {
@@ -2817,6 +3048,7 @@ public partial class Browser : PageBase
             }
 
             var page = wc.DownloadString(tabUrl);
+			eventLogger.LogDebug("FindAnchorsOnTab(selectedTab={SelectedTab}): page → {Page}", selectedTab, page);
 
             foreach (LinkItem i in AnchorFinder.ListAll(page).Where(i => !string.IsNullOrEmpty(i.Anchor)))
             {
@@ -2828,9 +3060,12 @@ public partial class Browser : PageBase
         }
         catch (Exception)
         {
+			eventLogger.LogError("Exception in FindAnchorsOnTab(selectedTab={SelectedTab}): {Arg1}", selectedTab, Exception.Message);
             // Add No Anchor item
             this.AnchorList.Items.Add(noneText);
         }
+		eventLogger.LogInformation("FindAnchorsOnTab(selectedTab)={SelectedTab}: external service call {TabUrl} took {Arg2} ms", selectedTab, tabUrl, __logStart.ElapsedMilliseconds);
+		eventLogger.LogDebug("<<< Exiting FindAnchorsOnTab(selectedTab={SelectedTab})", selectedTab);
     }
 
     /// <summary>Show Info for Selected File.</summary>
@@ -2838,9 +3073,11 @@ public partial class Browser : PageBase
     /// <param name="e">The <see cref="System.Web.UI.WebControls.RepeaterCommandEventArgs"/> instance containing the event data.</param>
     private void FilesList_ItemCommand(object source, RepeaterCommandEventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering FilesList_ItemCommand(source={Source},e={E})", source, e);
         foreach (RepeaterItem item in this.FilesList.Items)
         {
             var listRowItem = (HtmlGenericControl)item.FindControl("ListRow");
+			eventLogger.LogDebug("FilesList_ItemCommand(source={Source},e={E}): listRowItem → {ListRowItem}", source, e, listRowItem);
 
             listRowItem.Attributes["class"] = item.ItemType switch
             {
@@ -2848,12 +3085,16 @@ public partial class Browser : PageBase
                 ListItemType.AlternatingItem => "FilesListRowAlt",
                 _ => listRowItem.Attributes["class"],
             };
+			eventLogger.LogDebug("FilesList_ItemCommand(source={Source},e={E}): ListItemType.Item → {Arg2}", source, e, ListItemType.Item);
+			eventLogger.LogDebug("FilesList_ItemCommand(source={Source},e={E}): ListItemType.AlternatingItem → {Arg2}", source, e, ListItemType.AlternatingItem);
         }
 
         var listRow = (HtmlGenericControl)e.Item.FindControl("ListRow");
+		eventLogger.LogDebug("FilesList_ItemCommand(source={Source},e={E}): listRow → {ListRow}", source, e, listRow);
         listRow.Attributes["class"] += " Selected";
 
         var fileListItem = (LinkButton)e.Item.FindControl("FileListItem");
+		eventLogger.LogDebug("FilesList_ItemCommand(source={Source},e={E}): fileListItem → {FileListItem}", source, e, fileListItem);
 
         if (fileListItem == null)
         {
@@ -2861,12 +3102,15 @@ public partial class Browser : PageBase
         }
 
         var fileId = Convert.ToInt32(fileListItem.CommandArgument);
+		eventLogger.LogDebug("FilesList_ItemCommand(source={Source},e={E}): fileId → {FileId}", source, e, fileId);
 
         var currentFile = this.fileManager.GetFile(fileId);
+		eventLogger.LogDebug("FilesList_ItemCommand(source={Source},e={E}): currentFile → {CurrentFile}", source, e, currentFile);
 
         this.ShowFileHelpUrl(currentFile.FileName, currentFile);
 
         this.ScrollToSelectedFile(fileListItem.ClientID);
+		eventLogger.LogDebug("<<< Exiting FilesList_ItemCommand(source={Source},e={E})", source, e);
     }
 
     /// <summary>Switch Browser in Link Modus between Link and Page Mode.</summary>
@@ -2874,6 +3118,7 @@ public partial class Browser : PageBase
     /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
     private void BrowserMode_SelectedIndexChanged(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering BrowserMode_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
         switch (this.BrowserMode.SelectedValue)
         {
             case "file":
@@ -2893,6 +3138,7 @@ public partial class Browser : PageBase
         this.title.Text = $"{this.lblModus.Text} - DNNConnect.CKEditorProvider.FileBrowser";
 
         this.SetDefaultLinkTypeText();
+		eventLogger.LogDebug("<<< Exiting BrowserMode_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
     }
 
     /// <summary>Load Files of Selected Folder.</summary>
@@ -2900,14 +3146,18 @@ public partial class Browser : PageBase
     /// <param name="eventArgs">The <see cref="EventArgs" /> instance containing the event data.</param>
     private void FoldersTree_NodeClick(object sender, EventArgs eventArgs)
     {
+		eventLogger.LogDebug(">>> Entering FoldersTree_NodeClick(sender={Sender},eventArgs={EventArgs})", sender, eventArgs);
         var folderId = Convert.ToInt32(this.FoldersTree.SelectedNode.Value);
         var folder = this.folderManager.GetFolder(folderId);
+		eventLogger.LogDebug("FoldersTree_NodeClick(sender={Sender},eventArgs={EventArgs}): folder → {Folder}", sender, eventArgs, folder);
+		eventLogger.LogDebug("FoldersTree_NodeClick(sender={Sender},eventArgs={EventArgs}): folderId → {FolderId}", sender, eventArgs, folderId);
 
         var folderName = !string.IsNullOrEmpty(folder.FolderPath) ?
             folder.FolderPath : this.LocalizeString("RootFolder.Text");
         this.lblCurrentDir.Text = folderName;
 
         this.CurrentFolderId = folderId;
+		eventLogger.LogDebug("FoldersTree_NodeClick(sender={Sender},eventArgs={EventArgs}): this.CurrentFolderId → {Arg2}", sender, eventArgs, this.CurrentFolderId);
 
         this.ShowFilesIn(folder);
 
@@ -2919,22 +3169,26 @@ public partial class Browser : PageBase
 
         // Expand Sub folders (if) exists
         this.FoldersTree.SelectedNode.Expanded = true;
+		eventLogger.LogDebug("<<< Exiting FoldersTree_NodeClick(sender={Sender},eventArgs={EventArgs})", sender, eventArgs);
     }
 
     /// <summary>Gets the disk space used.</summary>
     private void GetDiskSpaceUsed()
     {
+		eventLogger.LogDebug(">>> Entering GetDiskSpaceUsed()");
         var spaceAvailable = this.portalSettings.HostSpace.Equals(0)
                                  ? this.LocalizeString("UnlimitedSpace.Text")
                                  : $"{this.portalSettings.HostSpace}MB";
 
         var spaceUsed = this.portalController.GetPortalSpaceUsedBytes(this.portalSettings.PortalId);
+		eventLogger.LogDebug("GetDiskSpaceUsed(): spaceUsed → {SpaceUsed}", spaceUsed);
 
         string[] suffix = ["B", "KB", "MB", "GB", "TB"];
 
         var index = 0;
 
         double spaceUsedDouble = spaceUsed;
+		eventLogger.LogDebug("GetDiskSpaceUsed(): spaceUsedDouble → {SpaceUsedDouble}", spaceUsedDouble);
 
         if (spaceUsed > 1024)
         {
@@ -2945,17 +3199,21 @@ public partial class Browser : PageBase
         }
 
         var usedSpace = $"{spaceUsedDouble:0.##}{suffix[index]}";
+		eventLogger.LogDebug("GetDiskSpaceUsed(): usedSpace → {UsedSpace}", usedSpace);
 
         this.FileSpaceUsedLabel.Text =
             string.Format(
                 this.LocalizeString("SpaceUsed.Text"),
                 usedSpace,
                 spaceAvailable);
+				eventLogger.LogDebug("<<< Exiting GetDiskSpaceUsed()");
     }
 
     /// <summary>Gets the accepted file types.</summary>
     private string GetAcceptedFileTypes()
     {
+		eventLogger.LogDebug(">>> Entering GetAcceptedFileTypes()");
+		eventLogger.LogDebug("<<< Exiting GetAcceptedFileTypes()");
         return this.browserModus switch
         {
             "Flash" => string.Join("|", AllowedFlashExtensions),
@@ -2966,11 +3224,16 @@ public partial class Browser : PageBase
 
     private IFolderInfo GetCurrentFolder()
     {
+		eventLogger.LogDebug(">>> Entering GetCurrentFolder()");
+		eventLogger.LogDebug("<<< Exiting GetCurrentFolder()");
         return this.folderManager.GetFolder(this.CurrentFolderId);
     }
 
     private TreeNode FindNodeByValue(TreeView tree, string value)
     {
+		eventLogger.LogDebug(">>> Entering FindNodeByValue(tree={Tree},value={Value})", tree, value);
+		eventLogger.LogDebug("<<< Exiting FindNodeByValue(tree={Tree},value={Value})", tree, value);
+		eventLogger.LogDebug("<<< Exiting FindNodeByValue(nodes={Nodes},value={Value})", nodes, value);
         return this.FindNodeByValue(tree.Nodes, value);
     }
 

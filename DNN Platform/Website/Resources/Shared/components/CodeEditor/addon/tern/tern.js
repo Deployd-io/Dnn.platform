@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -69,6 +70,7 @@
         defs: this.options.defs || [],
         plugins: plugins
       });
+	logger.debug(`<<< Exiting getFile(ts=${ts},name=${name},c=${c})`);
     }
     this.trackChange = function(doc, change) { trackChange(self, doc, change); };
 
@@ -132,6 +134,8 @@
           data = self.options.responseFilter(doc, query, request, error, data);
         c(error, data);
       });
+	logger.debug(`>>> Entering selectName(ts=${ts},cm=${cm})`);
+	logger.debug(`<<< Exiting selectName(ts=${ts},cm=${cm})`);
     },
 
     destroy: function () {
@@ -169,9 +173,11 @@
   }
 
   function resolveDoc(ts, id) {
+	logger.debug(`>>> Entering resolveDoc(ts=${ts},id=${id})`);
     if (typeof id == "string") return ts.docs[id];
     if (id instanceof CodeMirror) id = id.getDoc();
     if (id instanceof CodeMirror.Doc) return findDoc(ts, id);
+	logger.debug(`<<< Exiting resolveDoc(ts=${ts},id=${id})`);
   }
 
   function trackChange(ts, doc, change) {
@@ -191,19 +197,26 @@
 
     if (doc.lineCount() > bigDoc && change.to - changed.from > 100) setTimeout(function() {
       if (data.changed && data.changed.to - data.changed.from > 100) sendDoc(ts, data);
+	logger.debug('>>> Entering setTimeout()');
     }, 200);
+	logger.debug('<<< Exiting setTimeout()');
+	logger.debug(`<<< Exiting trackChange(ts=${ts},doc=${doc},change=${change})`);
   }
 
   function sendDoc(ts, doc) {
     ts.server.request({files: [{type: "full", name: doc.name, text: docValue(ts, doc)}]}, function(error) {
+	logger.debug('>>> Entering function()');
       if (error) window.console.error(error);
       else doc.changed = null;
     });
+	logger.debug('<<< Exiting function()');
+	logger.debug(`<<< Exiting sendDoc(ts=${ts},doc=${doc})`);
   }
 
   // Completion
 
   function hint(ts, cm, c) {
+	logger.debug(`>>> Entering hint(ts=${ts},cm=${cm},c=${c})`);
     ts.request(cm, {type: "completions", types: true, docs: true, urls: true}, function(error, data) {
       if (error) return showError(ts, cm, error);
       var completions = [], after = "";
@@ -232,13 +245,16 @@
           tooltip = makeTooltip(node.parentNode.getBoundingClientRect().right + window.pageXOffset,
                                 node.getBoundingClientRect().top + window.pageYOffset, content);
           tooltip.className += " " + cls + "hint-doc";
+		logger.debug(`<<< Exiting on(obj=${obj},content=${content})`);
         }
       });
       c(obj);
     });
+	logger.debug(`<<< Exiting hint(ts=${ts},cm=${cm},c=${c})`);
   }
 
   function typeToIcon(type) {
+	logger.debug(`>>> Entering typeToIcon(type=${type})`);
     var suffix;
     if (type == "?") suffix = "unknown";
     else if (type == "number" || type == "string" || type == "bool") suffix = type;
@@ -269,11 +285,13 @@
       tempTooltip(cm, tip, ts);
       if (c) c();
     }, pos);
+	logger.debug(`<<< Exiting showContextInfo(ts=${ts},cm=${cm},pos=${pos},queryName=${queryName},c=${c})`);
   }
 
   // Maintaining argument hints
 
   function updateArgHints(ts, cm) {
+	logger.debug(`>>> Entering updateArgHints(ts=${ts},cm=${cm})`);
     closeArgHints(ts);
 
     if (cm.somethingSelected()) return;
@@ -294,6 +312,8 @@
       }
       ch = lex.column - extra;
       if (str.charAt(ch) == "(") {found = true; break;}
+	logger.debug(`>>> Entering inner(varName=${varName})`);
+	logger.debug(`<<< Exiting inner(varName=${varName})`);
     }
     if (!found) return;
 
@@ -313,6 +333,7 @@
       };
       showArgHints(ts, cm, argPos);
     });
+	logger.debug(`<<< Exiting updateArgHints(ts=${ts},cm=${cm})`);
   }
 
   function showArgHints(ts, cm, pos) {
@@ -334,16 +355,19 @@
     if (tp.rettype) tip.appendChild(elt("span", cls + "type", tp.rettype));
     var place = cm.cursorCoords(null, "page");
     ts.activeArgHints = makeTooltip(place.right + 1, place.bottom, tip);
+	logger.debug(`<<< Exiting showArgHints(ts=${ts},cm=${cm},pos=${pos})`);
   }
 
   function parseFnType(text) {
     var args = [], pos = 3;
 
     function skipMatching(upto) {
+	logger.debug(`>>> Entering skipMatching(upto=${upto})`);
       var depth = 0, start = pos;
       for (;;) {
         var next = text.charAt(pos);
         if (upto.test(next) && !depth) return text.slice(start, pos);
+		logger.debug(`<<< Exiting skipMatching(upto=${upto})`);
         if (/[{\[\(]/.test(next)) ++depth;
         else if (/[}\]\)]/.test(next)) --depth;
         ++pos;
@@ -364,6 +388,7 @@
 
     var rettype = text.slice(pos).match(/^\) -> (.*)$/);
 
+	logger.debug(`<<< Exiting parseFnType(text=${text})`);
     return {args: args, rettype: rettype && rettype[1]};
   }
 
@@ -398,9 +423,11 @@
   }
 
   function jumpBack(ts, cm) {
+	logger.debug(`>>> Entering jumpBack(ts=${ts},cm=${cm})`);
     var pos = ts.jumpStack.pop(), doc = pos && ts.docs[pos.file];
     if (!doc) return;
     moveTo(ts, findDoc(ts, cm.getDoc()), doc, pos.start, pos.end);
+	logger.debug(`<<< Exiting jumpBack(ts=${ts},cm=${cm})`);
   }
 
   function moveTo(ts, curDoc, doc, start, end) {
@@ -409,6 +436,7 @@
       closeArgHints(ts);
       ts.options.switchToDoc(doc.name, doc.doc);
     }
+	logger.debug(`<<< Exiting moveTo(ts=${ts},curDoc=${curDoc},doc=${doc},start=${start},end=${end})`);
   }
 
   // The {line,ch} representation of positions makes this rather awkward.
@@ -443,8 +471,10 @@
   }
 
   function atInterestingExpression(cm) {
+	logger.debug(`>>> Entering atInterestingExpression(cm=${cm})`);
     var pos = cm.getCursor("end"), tok = cm.getTokenAt(pos);
     if (tok.start < pos.ch && tok.type == "comment") return false;
+	logger.debug(`<<< Exiting atInterestingExpression(cm=${cm})`);
     return /[\w)\]]/.test(cm.getLine(pos.line).slice(Math.max(pos.ch - 1, 0), pos.ch + 1));
   }
 
@@ -455,7 +485,9 @@
     if (!/\w/.test(token.string)) return showError(ts, cm, "Not at a variable");
     dialog(cm, "New name for " + token.string, function(newName) {
       ts.request(cm, {type: "rename", newName: newName, fullDocs: true}, function(error, data) {
+		logger.debug(`>>> Entering request(cm=${cm})`);
         if (error) return showError(ts, cm, error);
+		logger.debug(`<<< Exiting request(cm=${cm},completions=${completions})`);
         applyChanges(ts, data.changes);
       });
     });
@@ -481,6 +513,7 @@
 
   var nextChangeOrig = 0;
   function applyChanges(ts, changes) {
+	logger.debug(`>>> Entering applyChanges(ts=${ts},changes=${changes})`);
     var perFile = Object.create(null);
     for (var i = 0; i < changes.length; ++i) {
       var ch = changes[i];
@@ -494,6 +527,7 @@
       for (var i = 0; i < chs.length; ++i) {
         var ch = chs[i];
         known.doc.replaceRange(ch.text, ch.start, ch.end, origin);
+		logger.debug(`<<< Exiting applyChanges(ts=${ts},changes=${changes})`);
       }
     }
   }
@@ -539,6 +573,7 @@
       }
     }
 
+	logger.debug(`<<< Exiting buildRequest(ts=${ts},doc=${doc},query=${query},pos=${pos})`);
     return {query: query, files: files};
   }
 
@@ -574,6 +609,7 @@
   var cmpPos = CodeMirror.cmpPos;
 
   function elt(tagname, cls /*, ... elts*/) {
+	logger.debug(`>>> Entering elt(tagname=${tagname})`);
     var e = document.createElement(tagname);
     if (cls) e.className = cls;
     for (var i = 2; i < arguments.length; ++i) {
@@ -581,6 +617,7 @@
       if (typeof elt == "string") elt = document.createTextNode(elt);
       e.appendChild(elt);
     }
+	logger.debug(`<<< Exiting elt(tagname=${tagname})`);
     return e;
   }
 
@@ -589,6 +626,7 @@
       cm.openDialog(text + ": <input type=text>", f);
     else
       f(prompt(text, ""));
+	logger.debug(`<<< Exiting dialog(cm=${cm},text=${text},f=${f})`);
   }
 
   // Tooltips

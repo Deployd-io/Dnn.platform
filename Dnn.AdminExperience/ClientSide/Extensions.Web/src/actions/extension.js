@@ -3,8 +3,10 @@ import { ExtensionService } from "services";
 import { validationMapExtensionBeingEdited } from "utils/helperFunctions";
 import Localization from "localization";
 import utilities from "utils";
+const logger = console;
 
 function errorCallback(error) {
+	logger.debug(`>>> Entering errorCallback(error=${error})`);
     let message = utilities.utilities.getResx("SharedResources", "GenericErrorMessage.Error");
     if (error.Error) {
         message = error.Error;
@@ -14,16 +16,22 @@ function errorCallback(error) {
         message = error;
     }
     utilities.utilities.notifyError(message);
+	logger.debug(`<<< Exiting errorCallback(error=${error})`);
 }
 function valueMapExtensionBeingEdited(extensionBeingEdited) {
+	logger.debug(`>>> Entering valueMapExtensionBeingEdited(extensionBeingEdited=${extensionBeingEdited})`);
     let _extensionBeingEdited = Object.assign({}, extensionBeingEdited);
     Object.keys(_extensionBeingEdited).forEach((key) => {
         _extensionBeingEdited[key] = _extensionBeingEdited[key].value;
     });
+	logger.debug(`valueMapExtensionBeingEdited(extensionBeingEdited=${extensionBeingEdited}): _extensionBeingEdited → ${_extensionBeingEdited}`);
+	logger.debug(`<<< Exiting valueMapExtensionBeingEdited(extensionBeingEdited=${extensionBeingEdited})`);
     return _extensionBeingEdited;
 }
 const extensionActions = {
     getInstalledPackages(type, callback) {
+		logger.debug(`>>> Entering getInstalledPackages(type=${type},callback=${callback})`);
+		logger.debug(`<<< Exiting getInstalledPackages(type=${type},callback=${callback})`);
         return (dispatch) => {
             ExtensionService.getInstalledPackages(type, payload => {
                 dispatch({
@@ -40,6 +48,8 @@ const extensionActions = {
         };
     },
     getAvailablePackages(type, callback) {
+		logger.debug(`>>> Entering getAvailablePackages(type=${type},callback=${callback})`);
+		logger.debug(`<<< Exiting getAvailablePackages(type=${type},callback=${callback})`);
         return (dispatch) => {
             ExtensionService.getAvailablePackages(type, payload => {
                 dispatch({
@@ -56,6 +66,8 @@ const extensionActions = {
         };
     },
     getPackageTypes(callback) {
+		logger.debug(`>>> Entering getPackageTypes(callback=${callback})`);
+		logger.debug(`<<< Exiting getPackageTypes(callback=${callback})`);
         return (dispatch) => {
             ExtensionService.getPackageTypes(payload => {
                 dispatch({
@@ -69,6 +81,8 @@ const extensionActions = {
         };
     },
     getAvailablePackageTypes(callback) {
+		logger.debug(`>>> Entering getAvailablePackageTypes(callback=${callback})`);
+		logger.debug(`<<< Exiting getAvailablePackageTypes(callback=${callback})`);
         return (dispatch) => {
             ExtensionService.getAvailablePackageTypes(payload => {
                 dispatch({
@@ -82,6 +96,8 @@ const extensionActions = {
         };
     },
     updateExtension(updatedExtension, editorActions, index, callback) {
+		logger.debug(`>>> Entering updateExtension(updatedExtension=${updatedExtension},editorActions=${editorActions},index=${index},callback=${callback})`);
+		logger.debug(`<<< Exiting updateExtension(updatedExtension=${updatedExtension},editorActions=${editorActions},index=${index},callback=${callback})`);
         return (dispatch) => {
             ExtensionService.updateExtension(updatedExtension, editorActions, (data) => {
                 dispatch({
@@ -105,6 +121,8 @@ const extensionActions = {
         };
     },
     downloadPackage(packageType, packageName, callback) {
+		logger.debug(`>>> Entering downloadPackage(packageType=${packageType},packageName=${packageName},callback=${callback})`);
+		logger.debug(`<<< Exiting downloadPackage(packageType=${packageType},packageName=${packageName},callback=${callback})`);
         return () => {
             ExtensionService.downloadPackage(packageType, packageName, (data) => {
                 if (callback) {
@@ -114,6 +132,8 @@ const extensionActions = {
         };
     },
     installAvailablePackage(packageType, packageName, newExtension, callback) {
+		logger.debug(`>>> Entering installAvailablePackage(packageType=${packageType},packageName=${packageName},newExtension=${newExtension},callback=${callback})`);
+		logger.debug(`<<< Exiting installAvailablePackage(packageType=${packageType},packageName=${packageName},newExtension=${newExtension},callback=${callback})`);
         return (dispatch) => {
             ExtensionService.installAvailablePackage(packageType, packageName, (data) => {
                 if (data.success) {
@@ -139,6 +159,8 @@ const extensionActions = {
         };
     },
     parseAvailablePackage(packageType, fileName, callback) {
+		logger.debug(`>>> Entering parseAvailablePackage(packageType=${packageType},fileName=${fileName},callback=${callback})`);
+		logger.debug(`<<< Exiting parseAvailablePackage(packageType=${packageType},fileName=${fileName},callback=${callback})`);
         return (dispatch) => {
             ExtensionService.parseAvailablePackage(packageType, fileName, (data) => {
                 dispatch({
@@ -152,6 +174,8 @@ const extensionActions = {
         };
     },
     deletePackage(payload, index, callback) {
+		logger.debug(`>>> Entering deletePackage(payload=${payload},index=${index},callback=${callback})`);
+		logger.debug(`<<< Exiting deletePackage(payload=${payload},index=${index},callback=${callback})`);
         return (dispatch) => {
             ExtensionService.deletePackage(payload, (data) => {
                 dispatch({
@@ -167,6 +191,8 @@ const extensionActions = {
         };
     },
     setPackageBeingDeleted(extensionBeingDeleted, extensionBeingDeletedIndex, callback) {
+		logger.debug(`>>> Entering setPackageBeingDeleted(extensionBeingDeleted=${extensionBeingDeleted},extensionBeingDeletedIndex=${extensionBeingDeletedIndex},callback=${callback})`);
+		logger.debug(`<<< Exiting setPackageBeingDeleted(extensionBeingDeleted=${extensionBeingDeleted},extensionBeingDeletedIndex=${extensionBeingDeletedIndex},callback=${callback})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SET_EXTENSION_BEING_DELETED,
@@ -181,6 +207,8 @@ const extensionActions = {
         };
     },
     toggleDeleteFiles(callback) {
+		logger.debug(`>>> Entering toggleDeleteFiles(callback=${callback})`);
+		logger.debug(`<<< Exiting toggleDeleteFiles(callback=${callback})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.TOGGLE_DELETE_EXTENSION_FILES
@@ -191,6 +219,8 @@ const extensionActions = {
         };
     },
     createNewModule(payload, shouldAppend, callback) {
+		logger.debug(`>>> Entering createNewModule(payload=${payload},shouldAppend=${shouldAppend},callback=${callback})`);
+		logger.debug(`<<< Exiting createNewModule(payload=${payload},shouldAppend=${shouldAppend},callback=${callback})`);
         return (dispatch) => {
             ExtensionService.createNewModule(payload, (data) => {
                 if (shouldAppend) {
@@ -206,6 +236,8 @@ const extensionActions = {
         };
     },
     addExtension(parameters, callback) {
+		logger.debug(`>>> Entering addExtension(parameters=${parameters},callback=${callback})`);
+		logger.debug(`<<< Exiting addExtension(parameters=${parameters},callback=${callback})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.EDIT_EXTENSION,
@@ -222,10 +254,13 @@ const extensionActions = {
         };
     },
     createNewExtension(extensionBeingAdded, editorActions, index, callback) {
+		logger.debug(`>>> Entering createNewExtension(extensionBeingAdded=${extensionBeingAdded},editorActions=${editorActions},index=${index},callback=${callback})`);
+		logger.debug(`<<< Exiting createNewExtension(extensionBeingAdded=${extensionBeingAdded},editorActions=${editorActions},index=${index},callback=${callback})`);
         return (dispatch) => {
             ExtensionService.createNewExtension(extensionBeingAdded, editorActions, (data) => {
                 let _extensionBeingAdded = JSON.parse(JSON.stringify(extensionBeingAdded));
                 _extensionBeingAdded.packageId = {};
+				logger.debug(`createNewExtension(extensionBeingAdded=${extensionBeingAdded},editorActions=${editorActions},index=${index},callback=${callback}): _extensionBeingAdded.packageId → ${_extensionBeingAdded.packageId}`);
                 _extensionBeingAdded.packageId.value = data.PackageId;
                 dispatch({
                     type: ActionTypes.ADDED_NEW_EXTENSION,
@@ -240,6 +275,8 @@ const extensionActions = {
         };
     },
     editExtension(parameters, extensionBeingEditedIndex, callback) {
+		logger.debug(`>>> Entering editExtension(parameters=${parameters},extensionBeingEditedIndex=${extensionBeingEditedIndex},callback=${callback})`);
+		logger.debug(`<<< Exiting editExtension(parameters=${parameters},extensionBeingEditedIndex=${extensionBeingEditedIndex},callback=${callback})`);
         return (dispatch) => {
             ExtensionService.getPackageSettings(parameters, (data) => {
                 dispatch({
@@ -256,6 +293,8 @@ const extensionActions = {
         };
     },
     toggleTriedToSave() {
+		logger.debug('>>> Entering toggleTriedToSave()');
+		logger.debug('<<< Exiting toggleTriedToSave()');
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.TOGGLE_TRIED_TO_SAVE
@@ -263,6 +302,8 @@ const extensionActions = {
         };
     },
     updateExtensionBeingEdited(extensionBeingEdited, callback) {
+		logger.debug(`>>> Entering updateExtensionBeingEdited(extensionBeingEdited=${extensionBeingEdited},callback=${callback})`);
+		logger.debug(`<<< Exiting updateExtensionBeingEdited(extensionBeingEdited=${extensionBeingEdited},callback=${callback})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.UPDATED_EXTENSION_BEING_EDITED,
@@ -278,6 +319,8 @@ const extensionActions = {
         };
     },
     toggleTabError(tabIndex, action, callback) {
+		logger.debug(`>>> Entering toggleTabError(tabIndex=${tabIndex},action=${action},callback=${callback})`);
+		logger.debug(`<<< Exiting toggleTabError(tabIndex=${tabIndex},action=${action},callback=${callback})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.TOGGLE_TAB_ERROR,
@@ -294,6 +337,8 @@ const extensionActions = {
         };
     },
     getModuleCategories(callback) {
+		logger.debug(`>>> Entering getModuleCategories(callback=${callback})`);
+		logger.debug(`<<< Exiting getModuleCategories(callback=${callback})`);
         return (dispatch) => {
             ExtensionService.getModuleCategories((data) => {
                 dispatch({
@@ -307,6 +352,8 @@ const extensionActions = {
         };
     },
     selectEditingTab(index, callback) {
+		logger.debug(`>>> Entering selectEditingTab(index=${index},callback=${callback})`);
+		logger.debug(`<<< Exiting selectEditingTab(index=${index},callback=${callback})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SELECT_EDITING_TAB,
@@ -320,6 +367,8 @@ const extensionActions = {
         };
     },
     getLocaleList(callback) {
+		logger.debug(`>>> Entering getLocaleList(callback=${callback})`);
+		logger.debug(`<<< Exiting getLocaleList(callback=${callback})`);
         return (dispatch) => {
             ExtensionService.getLocaleList((data) => {
                 dispatch({
@@ -333,6 +382,8 @@ const extensionActions = {
         };
     },
     getLocalePackageList(callback) {
+		logger.debug(`>>> Entering getLocalePackageList(callback=${callback})`);
+		logger.debug(`<<< Exiting getLocalePackageList(callback=${callback})`);
         return (dispatch) => {
             ExtensionService.getLocalePackagesList((data) => {
                 dispatch({
@@ -346,6 +397,8 @@ const extensionActions = {
         };
     },
     deployAvailablePackage(_package, updatedPackageIndex, callback) {
+		logger.debug(`>>> Entering deployAvailablePackage(_package=${_package},updatedPackageIndex=${updatedPackageIndex},callback=${callback})`);
+		logger.debug(`<<< Exiting deployAvailablePackage(_package=${_package},updatedPackageIndex=${updatedPackageIndex},callback=${callback})`);
         return () => {
             ExtensionService.deployAvailablePackage(_package.description, (data) => {
                 if (callback) {
@@ -355,6 +408,8 @@ const extensionActions = {
         };
     },
     GetPackageUsageFilter(callback) {
+		logger.debug(`>>> Entering GetPackageUsageFilter(callback=${callback})`);
+		logger.debug(`<<< Exiting GetPackageUsageFilter(callback=${callback})`);
         return (dispatch) => {
             ExtensionService.getPackageUsageFilter(payload => {
                 dispatch({
@@ -368,6 +423,8 @@ const extensionActions = {
         };
     },
     getPackageUsage(portalId, packageId, callback) {
+		logger.debug(`>>> Entering getPackageUsage(portalId=${portalId},packageId=${packageId},callback=${callback})`);
+		logger.debug(`<<< Exiting getPackageUsage(portalId=${portalId},packageId=${packageId},callback=${callback})`);
         return (dispatch) => {
             ExtensionService.getPackageUsage(portalId, packageId, (data) => {
                 dispatch({

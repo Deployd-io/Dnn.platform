@@ -19,6 +19,7 @@ namespace DotNetNuke.Entities.Modules
     /// <summary>ModuleControlController provides the Business Layer for Module Controls.</summary>
     public partial class ModuleControlController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleControlController));
         private const string Key = "ModuleControlID";
         private static readonly DataProvider DataProvider = DataProvider.Instance();
 
@@ -26,7 +27,9 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="objModuleControl">The Module Control to save.</param>
         public static void AddModuleControl(ModuleControlInfo objModuleControl)
         {
+			Logger.LogDebug(">>> Entering AddModuleControl(objModuleControl={ObjModuleControl})", objModuleControl);
             SaveModuleControl(objModuleControl, true);
+			Logger.LogDebug("<<< Exiting AddModuleControl(objModuleControl={ObjModuleControl})", objModuleControl);
         }
 
         /// <summary>DeleteModuleControl deletes a Module Control in the database.</summary>
@@ -35,6 +38,7 @@ namespace DotNetNuke.Entities.Modules
         {
             DataProvider.DeleteModuleControl(moduleControlID);
             DataCache.ClearHostCache(true);
+			Logger.LogDebug("<<< Exiting DeleteModuleControl(moduleControlID={ModuleControlID})", moduleControlID);
         }
 
         /// <summary>GetModuleControl gets a single Module Control from the database.</summary>
@@ -50,6 +54,8 @@ namespace DotNetNuke.Entities.Modules
         /// <returns>The <see cref="ModuleControlInfo"/> or <see langword="null"/>.</returns>
         public static ModuleControlInfo GetModuleControl(IHostSettings hostSettings, int moduleControlId)
         {
+			Logger.LogDebug(">>> Entering GetModuleControl(hostSettings={HostSettings},moduleControlId={ModuleControlId})", hostSettings, moduleControlId);
+			Logger.LogDebug("<<< Exiting GetModuleControl(hostSettings={HostSettings},moduleControlId={ModuleControlId})", hostSettings, moduleControlId);
             return (from kvp in GetModuleControls(hostSettings)
                     where kvp.Key == moduleControlId
                     select kvp.Value)
@@ -88,6 +94,8 @@ namespace DotNetNuke.Entities.Modules
         /// <returns>The <see cref="ModuleControlInfo"/> or <see langword="null"/>.</returns>
         public static ModuleControlInfo GetModuleControlByControlKey(IHostSettings hostSettings, string controlKey, int moduleDefId)
         {
+			Logger.LogDebug(">>> Entering GetModuleControlByControlKey(hostSettings={HostSettings},controlKey={ControlKey},moduleDefId={ModuleDefId})", hostSettings, controlKey, moduleDefId);
+			Logger.LogDebug("<<< Exiting GetModuleControlByControlKey(hostSettings={HostSettings},controlKey={ControlKey},moduleDefId={ModuleDefId})", hostSettings, controlKey, moduleDefId);
             return (from kvp in GetModuleControls(hostSettings)
                     where kvp.Value.ControlKey.Equals(controlKey, StringComparison.OrdinalIgnoreCase)
                                 && kvp.Value.ModuleDefID == moduleDefId
@@ -101,6 +109,7 @@ namespace DotNetNuke.Entities.Modules
         /// <returns>The module control ID.</returns>
         public static int SaveModuleControl(ModuleControlInfo moduleControl, bool clearCache)
         {
+			Logger.LogDebug(">>> Entering SaveModuleControl(moduleControl={ModuleControl},clearCache={ClearCache})", moduleControl, clearCache);
             int moduleControlID = moduleControl.ModuleControlID;
             if (moduleControlID == Null.NullInteger)
             {
@@ -141,6 +150,7 @@ namespace DotNetNuke.Entities.Modules
                 DataCache.ClearHostCache(true);
             }
 
+			Logger.LogDebug("<<< Exiting SaveModuleControl(moduleControl={ModuleControl},clearCache={ClearCache})", moduleControl, clearCache);
             return moduleControlID;
         }
 
@@ -148,7 +158,9 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="objModuleControl">The Module Control to save.</param>
         public static void UpdateModuleControl(ModuleControlInfo objModuleControl)
         {
+			Logger.LogDebug(">>> Entering UpdateModuleControl(objModuleControl={ObjModuleControl})", objModuleControl);
             SaveModuleControl(objModuleControl, true);
+			Logger.LogDebug("<<< Exiting UpdateModuleControl(objModuleControl={ObjModuleControl})", objModuleControl);
         }
 
         /// <summary>GetModuleControls gets a Dictionary of Module Controls from the Cache.</summary>
@@ -164,6 +176,8 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="cacheItemArgs">The CacheItemArgs object that contains the parameters needed for the database call.</param>
         private static object GetModuleControlsCallBack(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogDebug(">>> Entering GetModuleControlsCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
+			Logger.LogDebug("<<< Exiting GetModuleControlsCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return CBO.FillDictionary(Key, DataProvider.GetModuleControls(), new Dictionary<int, ModuleControlInfo>());
         }
     }

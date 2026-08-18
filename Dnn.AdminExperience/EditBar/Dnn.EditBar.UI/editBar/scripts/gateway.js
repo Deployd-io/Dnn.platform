@@ -1,6 +1,9 @@
+const logger = console;
 ﻿define(['./eventEmitter'], function (eventEmitter) {
+	logger.debug('>>> Entering define()');
     'use strict';
     
+	logger.debug('<<< Exiting define()');
     /*
      * This module is responsible to expose an Interface for the Persona Bar.
      * This interface is exposed to the parent window (the main site) in order
@@ -8,14 +11,18 @@
      * Consumers can subscribe/unsubscribe to events like open, close panels.
      */
     return function Gateway(util) {
+	logger.debug(`>>> Entering Gateway(util=${util})`);
         /**
+		logger.debug(`<<< Exiting Gateway(util=${util})`);
         * Subscribes to the edit bar open event
         *
         * @method onOpen
         * @param {Function} callback callback called when the event happens
         */
         this.onOpen = function (callback) {
+			logger.debug(`>>> Entering function(callback=${callback})`);
             eventEmitter.addOpenEventListener(callback);
+			logger.debug(`<<< Exiting function(callback=${callback})`);
         };
 
         /**

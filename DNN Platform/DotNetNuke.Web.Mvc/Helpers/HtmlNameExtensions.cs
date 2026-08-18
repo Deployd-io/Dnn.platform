@@ -12,12 +12,15 @@ namespace DotNetNuke.Web.Mvc.Helpers
     /// <summary>Gets the HTML ID and name attributes of the <see cref="DnnHtmlHelper"/> string.</summary>
     public static class HtmlNameExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HtmlNameExtensions));
         /// <summary>Gets the ID of the <see cref="DnnHtmlHelper"/> string.</summary>
         /// <returns>The HTML ID attribute value for the object that is represented by the expression.</returns>
         /// <param name="html">The HTML helper instance that this method extends.</param>
         /// <param name="name">An expression that identifies the object that contains the ID.</param>
         public static MvcHtmlString Id(this DnnHtmlHelper html, string name)
         {
+			Logger.LogDebug(">>> Entering Id(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting Id(html={Html},name={Name})", html, name);
             return html.HtmlHelper.Id(name);
         }
 
@@ -28,6 +31,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <typeparam name="TModel">The type of the model.</typeparam><typeparam name="TProperty">The type of the property.</typeparam>
         public static MvcHtmlString IdFor<TModel, TProperty>(this DnnHtmlHelper<TModel> html, Expression<Func<TModel, TProperty>> expression)
         {
+			Logger.LogDebug(">>> Entering IdFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting IdFor(html={Html},expression={Expression})", html, expression);
             return html.HtmlHelper.IdFor(expression);
         }
 
@@ -36,6 +41,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param>
         public static MvcHtmlString IdForModel(this DnnHtmlHelper html)
         {
+			Logger.LogDebug(">>> Entering IdForModel(html={Html})", html);
+			Logger.LogDebug("<<< Exiting IdForModel(html={Html})", html);
             return html.HtmlHelper.IdForModel();
         }
 
@@ -45,6 +52,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="name">An expression that identifies the object that contains the name.</param>
         public static MvcHtmlString Name(this DnnHtmlHelper html, string name)
         {
+			Logger.LogDebug(">>> Entering Name(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting Name(html={Html},name={Name})", html, name);
             return html.HtmlHelper.Name(name);
         }
 
@@ -56,6 +65,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <typeparam name="TProperty">The type of the property.</typeparam>
         public static MvcHtmlString NameFor<TModel, TProperty>(this DnnHtmlHelper<TModel> html, Expression<Func<TModel, TProperty>> expression)
         {
+			Logger.LogDebug(">>> Entering NameFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting NameFor(html={Html},expression={Expression})", html, expression);
             return html.HtmlHelper.NameFor(expression);
         }
 
@@ -64,6 +75,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param>
         public static MvcHtmlString NameForModel(this DnnHtmlHelper html)
         {
+			Logger.LogDebug(">>> Entering NameForModel(html={Html})", html);
+			Logger.LogDebug("<<< Exiting NameForModel(html={Html})", html);
             return html.HtmlHelper.NameForModel();
         }
     }

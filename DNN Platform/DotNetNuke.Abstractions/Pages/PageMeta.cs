@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information
@@ -36,6 +37,7 @@ namespace DotNetNuke.Abstractions.Pages
     /// </example>
     public class PageMeta
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>
         /// Initializes a new instance of the <see cref="PageMeta"/> class.
         /// </summary>
@@ -46,9 +48,13 @@ namespace DotNetNuke.Abstractions.Pages
         /// <exception cref="System.ArgumentException">Thrown when name is empty.</exception>
         public PageMeta(string name, string content, int priority)
         {
+			_logger.LogDebug(">>> Entering PageMeta(name={Name},content={Content},priority={Priority})", name, content, priority);
             this.Name = name;
             this.Content = content;
+			_logger.LogDebug("PageMeta(name={Name},content={Content},priority={Priority}): this.Name → {Arg3}", name, content, priority, this.Name);
+			_logger.LogDebug("PageMeta(name={Name},content={Content},priority={Priority}): this.Content → {Arg3}", name, content, priority, this.Content);
             this.Priority = priority;
+			_logger.LogDebug("<<< Exiting PageMeta(name={Name},content={Content},priority={Priority})", name, content, priority);
         }
 
         /// <summary>

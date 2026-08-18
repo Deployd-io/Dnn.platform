@@ -43,37 +43,46 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
         public ModulePackageEditor()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering ModulePackageEditor()");
         }
 
         /// <inheritdoc />
         public PackageInfoDto GetPackageDetail(int portalId, PackageInfo package)
         {
+			Logger.LogDebug(">>> Entering GetPackageDetail(portalId={PortalId},package={Package})", portalId, package);
             var desktopModule = DesktopModuleController.GetDesktopModuleByPackageID(package.PackageID);
 
+			Logger.LogDebug("GetPackageDetail(portalId={PortalId},package={Package}): desktopModule → {DesktopModule}", portalId, package, desktopModule);
             if (desktopModule == null)
             {
                 return new PackageInfoDto(portalId, package);
             }
 
             var isHostUser = UserController.Instance.GetCurrentUserInfo().IsSuperUser;
+			Logger.LogDebug("GetPackageDetail(portalId={PortalId},package={Package}): isHostUser → {IsHostUser}", portalId, package, isHostUser);
 
             var detail = isHostUser ? new ModulePackageDetailDto(portalId, package, desktopModule)
                                         : new ModulePackagePermissionsDto(portalId, package);
 
             detail.DesktopModuleId = desktopModule.DesktopModuleID;
+			Logger.LogDebug("GetPackageDetail(portalId={PortalId},package={Package}): detail.DesktopModuleId → {Arg2}", portalId, package, detail.DesktopModuleId);
             detail.Permissions = GetPermissionsData(this.permissionDefinitionService, portalId, desktopModule.DesktopModuleID);
 
+			Logger.LogDebug("<<< Exiting GetPackageDetail(portalId={PortalId},package={Package})", portalId, package);
             return detail;
         }
 
         /// <inheritdoc />
         public bool SavePackageSettings(PackageSettingsDto packageSettings, out string errorMessage)
         {
+			Logger.LogDebug(">>> Entering SavePackageSettings(packageSettings={PackageSettings})", packageSettings);
             errorMessage = string.Empty;
 
+			Logger.LogDebug("SavePackageSettings(packageSettings={PackageSettings}): errorMessage → {ErrorMessage}", packageSettings, errorMessage);
             try
             {
                 var desktopModule = DesktopModuleController.GetDesktopModuleByPackageID(packageSettings.PackageId);
+				Logger.LogDebug("SavePackageSettings(packageSettings={PackageSettings}): desktopModule → {DesktopModule}", packageSettings, desktopModule);
 
                 if (desktopModule == null)
                 {
@@ -81,6 +90,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
                 }
 
                 var isHostUser = UserController.Instance.GetCurrentUserInfo().IsSuperUser;
+				Logger.LogDebug("SavePackageSettings(packageSettings={PackageSettings}): isHostUser → {IsHostUser}", packageSettings, isHostUser);
 
                 UpdatePermissions(this.permissionDefinitionService, this.eventLogger, desktopModule, packageSettings);
 
@@ -98,6 +108,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
             {
                 Logger.Error(ex);
                 errorMessage = ex.Message;
+				Logger.LogDebug("<<< Exiting SavePackageSettings(packageSettings={PackageSettings})", packageSettings);
                 return false;
             }
         }
@@ -108,6 +119,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
             {
                 DesktopModuleController.RemoveDesktopModuleFromPortal(eventLogger, portal.Id, desktopModule.DesktopModuleID, true);
             }
+			Logger.LogDebug("<<< Exiting UnassignPortals(eventLogger={EventLogger},desktopModule={DesktopModule},portals={Portals})", eventLogger, desktopModule, portals);
         }
 
         private static void AssignPortals(IPermissionDefinitionService permissionDefinitionService, IEventLogger eventLogger, DesktopModuleInfo desktopModule, IList<ListItemDto> portals)
@@ -116,28 +128,37 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
             {
                 DesktopModuleController.AddDesktopModuleToPortal(eventLogger, permissionDefinitionService, portal.Id, desktopModule.DesktopModuleID, true, true);
             }
+			Logger.LogDebug("<<< Exiting AssignPortals(permissionDefinitionService={PermissionDefinitionService},eventLogger={EventLogger},desktopModule={DesktopModule},portals={Portals})", permissionDefinitionService, eventLogger, desktopModule, portals);
         }
 
         private static void SaveModuleDefinition(IPermissionDefinitionService permissionDefinitionService, ModuleDefinitionDto definitionDto)
         {
+			Logger.LogDebug(">>> Entering SaveModuleDefinition(permissionDefinitionService={PermissionDefinitionService},definitionDto={DefinitionDto})", permissionDefinitionService, definitionDto);
             var moduleDefinition = definitionDto.ToModuleDefinitionInfo();
             ModuleDefinitionController.SaveModuleDefinition(permissionDefinitionService, moduleDefinition, false, true);
+			Logger.LogDebug("<<< Exiting SaveModuleDefinition(permissionDefinitionService={PermissionDefinitionService},definitionDto={DefinitionDto})", permissionDefinitionService, definitionDto);
         }
 
         private static void DeleteModuleDefinition(IPermissionDefinitionService permissionDefinitionService, int defId)
         {
+			Logger.LogDebug(">>> Entering DeleteModuleDefinition(permissionDefinitionService={PermissionDefinitionService},defId={DefId})", permissionDefinitionService, defId);
             new ModuleDefinitionController(permissionDefinitionService).DeleteModuleDefinition(defId);
+			Logger.LogDebug("<<< Exiting DeleteModuleDefinition(permissionDefinitionService={PermissionDefinitionService},defId={DefId})", permissionDefinitionService, defId);
         }
 
         private static void SaveModuleControl(ModuleControlDto moduleControlDto)
         {
+			Logger.LogDebug(">>> Entering SaveModuleControl(moduleControlDto={ModuleControlDto})", moduleControlDto);
             var moduleControl = moduleControlDto.ToModuleControlInfo();
             ModuleControlController.SaveModuleControl(moduleControl, true);
+			Logger.LogDebug("<<< Exiting SaveModuleControl(moduleControlDto={ModuleControlDto})", moduleControlDto);
         }
 
         private static void DeleteModuleControl(int controlId)
         {
+			Logger.LogDebug(">>> Entering DeleteModuleControl(controlId={ControlId})", controlId);
             ModuleControlController.DeleteModuleControl(controlId);
+			Logger.LogDebug("<<< Exiting DeleteModuleControl(controlId={ControlId})", controlId);
         }
 
         private static void UpdateModuleProperties(IPermissionDefinitionService permissionDefinitionService, IEventLogger eventLogger, DesktopModuleInfo desktopModule, IDictionary<string, string> settings)
@@ -195,19 +216,25 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
                         break;
                 }
             }
+			Logger.LogDebug("<<< Exiting UpdateModuleProperties(permissionDefinitionService={PermissionDefinitionService},eventLogger={EventLogger},desktopModule={DesktopModule},settings={Settings})", permissionDefinitionService, eventLogger, desktopModule, settings);
         }
 
         private static PermissionsDto GetPermissionsData(IPermissionDefinitionService permissionDefinitionService, int portalId, int desktopModuleId)
         {
+			Logger.LogDebug(">>> Entering GetPermissionsData(permissionDefinitionService={PermissionDefinitionService},portalId={PortalId},desktopModuleId={DesktopModuleId})", permissionDefinitionService, portalId, desktopModuleId);
             var permissions = new PermissionsDto(permissionDefinitionService, true);
             if (desktopModuleId > 0)
+			Logger.LogDebug("GetPermissionsData(permissionDefinitionService={PermissionDefinitionService},portalId={PortalId},desktopModuleId={DesktopModuleId}): permissions → {Permissions}", permissionDefinitionService, portalId, desktopModuleId, permissions);
             {
                 var portalModule = DesktopModuleController.GetPortalDesktopModule(portalId, desktopModuleId);
+				Logger.LogDebug("GetPermissionsData(permissionDefinitionService={PermissionDefinitionService},portalId={PortalId},desktopModuleId={DesktopModuleId}): portalModule → {PortalModule}", permissionDefinitionService, portalId, desktopModuleId, portalModule);
                 if (portalModule != null)
                 {
                     permissions.DesktopModuleId = desktopModuleId;
+					Logger.LogDebug("GetPermissionsData(permissionDefinitionService={PermissionDefinitionService},portalId={PortalId},desktopModuleId={DesktopModuleId}): permissions.DesktopModuleId → {Arg3}", permissionDefinitionService, portalId, desktopModuleId, permissions.DesktopModuleId);
 
                     var modulePermissions = DesktopModulePermissionController.GetDesktopModulePermissions(portalModule.PortalDesktopModuleID);
+					Logger.LogDebug("GetPermissionsData(permissionDefinitionService={PermissionDefinitionService},portalId={PortalId},desktopModuleId={DesktopModuleId}): modulePermissions → {ModulePermissions}", permissionDefinitionService, portalId, desktopModuleId, modulePermissions);
                     foreach (IPermissionInfo permission in modulePermissions)
                     {
                         if (permission.UserId != Null.NullInteger)
@@ -229,6 +256,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetPermissionsData(permissionDefinitionService={PermissionDefinitionService},portalId={PortalId},desktopModuleId={DesktopModuleId})", permissionDefinitionService, portalId, desktopModuleId);
             return permissions;
         }
 
@@ -327,6 +355,8 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
             }
 
             DataCache.RemoveCache(string.Format(CultureInfo.InvariantCulture, DataCache.PortalDesktopModuleCacheKey, portalSettings.PortalId));
+			Logger.LogDebug("<<< Exiting UpdatePermissions(permissionDefinitionService={PermissionDefinitionService},eventLogger={EventLogger},desktopModule={DesktopModule},packageSettings={PackageSettings})", permissionDefinitionService, eventLogger, desktopModule, packageSettings);
         }
+		Logger.LogDebug("<<< Exiting ModulePackageEditor()");
     }
 }

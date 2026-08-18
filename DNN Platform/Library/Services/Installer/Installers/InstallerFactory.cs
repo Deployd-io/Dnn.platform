@@ -18,6 +18,7 @@ namespace DotNetNuke.Services.Installer.Installers
     /// <summary>The InstallerFactory is a factory class that is used to instantiate the appropriate Component Installer.</summary>
     public partial class InstallerFactory
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(InstallerFactory));
         /// <summary>The GetInstaller method instantiates the relevant Component Installer.</summary>
         /// <param name="installerType">The type of Installer.</param>
         /// <returns>A <see cref="ComponentInstallerBase"/> instance or <see langword="null"/>.</returns>
@@ -31,8 +32,10 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <returns>A <see cref="ComponentInstallerBase"/> instance or <see langword="null"/>.</returns>
         public static ComponentInstallerBase GetInstaller(IServiceProvider serviceProvider, string installerType)
         {
+			Logger.LogDebug(">>> Entering GetInstaller(serviceProvider={ServiceProvider},installerType={InstallerType})", serviceProvider, installerType);
             ComponentInstallerBase installer = null;
             switch (installerType)
+			Logger.LogDebug("GetInstaller(serviceProvider={ServiceProvider},installerType={InstallerType}): installer → {Installer}", serviceProvider, installerType, installer);
             {
                 case "File":
                     installer = new FileInstaller();
@@ -92,7 +95,9 @@ namespace DotNetNuke.Services.Installer.Installers
                 default:
                     // Installer type is defined in the List
                     var listController = ActivatorUtilities.GetServiceOrCreateInstance<ListController>(serviceProvider);
+					Logger.LogDebug("GetInstaller(serviceProvider={ServiceProvider},installerType={InstallerType}): listController → {ListController}", serviceProvider, installerType, listController);
                     ListEntryInfo entry = listController.GetListEntryInfo("Installer", installerType);
+					Logger.LogDebug("GetInstaller(serviceProvider={ServiceProvider},installerType={InstallerType}): entry → {Entry}", serviceProvider, installerType, entry);
 
                     if (entry != null && !string.IsNullOrEmpty(entry.Text))
                     {
@@ -103,6 +108,8 @@ namespace DotNetNuke.Services.Installer.Installers
                     break;
             }
 
+			Logger.LogDebug("<<< Exiting GetInstaller(installerType={InstallerType})", installerType);
+			Logger.LogDebug("<<< Exiting GetInstaller(serviceProvider={ServiceProvider},installerType={InstallerType})", serviceProvider, installerType);
             return installer;
         }
 

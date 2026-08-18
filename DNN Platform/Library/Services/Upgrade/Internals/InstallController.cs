@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.Upgrade.Internals
     /// <summary>Business Layer to manage Messaging. Also contains CRUD methods.</summary>
     public class InstallController : ServiceLocator<IInstallController, InstallController>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(InstallController));
         /// <inheritdoc />
         protected override Func<IInstallController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new InstallControllerImpl();
         }
     }

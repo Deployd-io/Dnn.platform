@@ -26,6 +26,7 @@ namespace DotNetNuke.Common.Lists
         public ListInfoCollection()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering ListInfoCollection()");
         }
 
         /// <summary>Gets the children from a parent name.</summary>
@@ -33,6 +34,8 @@ namespace DotNetNuke.Common.Lists
         /// <returns>A <see cref="ListInfo"/>.</returns>
         public ListInfo GetChildren(string parentName)
         {
+			Logger.LogDebug(">>> Entering GetChildren(parentName={ParentName})", parentName);
+			Logger.LogDebug("<<< Exiting GetChildren(parentName={ParentName})", parentName);
             return (ListInfo)this.Item(parentName);
         }
 
@@ -41,6 +44,7 @@ namespace DotNetNuke.Common.Lists
         /// <param name="value">The value of the object.</param>
         public void Add(string key, object value)
         {
+			Logger.LogDebug(">>> Entering Add(key={Key},value={Value})", key, value);
             try
             {
                 var index = this.List.Add(value);
@@ -50,6 +54,7 @@ namespace DotNetNuke.Common.Lists
             {
                 Logger.Error(exc);
             }
+			Logger.LogDebug("<<< Exiting Add(key={Key},value={Value})", key, value);
         }
 
         /// <summary>Gets the item at the specified index.</summary>
@@ -86,6 +91,7 @@ namespace DotNetNuke.Common.Lists
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting Item(key={Key})", key);
                 return null;
             }
         }
@@ -132,6 +138,7 @@ namespace DotNetNuke.Common.Lists
                 obj = this.List[index];
             }
 
+			Logger.LogDebug("<<< Exiting Item(key={Key},cache={Cache})", key, cache);
             return obj;
         }
 
@@ -155,8 +162,11 @@ namespace DotNetNuke.Common.Lists
         /// <summary>Clears the collection.</summary>
         internal new void Clear()
         {
+			Logger.LogDebug(">>> Entering Clear()");
             this.mKeyIndexLookup.Clear();
             base.Clear();
+			Logger.LogDebug("<<< Exiting Clear()");
         }
+		Logger.LogDebug("<<< Exiting ListInfoCollection()");
     }
 }

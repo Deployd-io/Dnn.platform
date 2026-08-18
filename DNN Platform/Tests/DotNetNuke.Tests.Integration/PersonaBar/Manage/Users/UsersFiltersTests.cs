@@ -11,10 +11,12 @@ namespace DotNetNuke.Tests.Integration.PersonaBar.Manage.Users
     using DNN.Integration.Test.Framework.Helpers;
     using Newtonsoft.Json;
     using NUnit.Framework;
+	using Microsoft.Extensions.Logging;
 
     [TestFixture]
     public class UsersFiltersTests : IntegrationTestBase
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private const string UnauthorizeApi = "/API/PersonaBar/Users/UpdateAuthorizeStatus?userId={0}&authorized=false";
         private const string DeleteApi = "/API/PersonaBar/Users/SoftDeleteUser?userId={0}";
         private const string MakeAdminApi = "/API/PersonaBar/Users/SaveUserRole?notifyUser=true&isOwner=false";
@@ -26,8 +28,11 @@ namespace DotNetNuke.Tests.Integration.PersonaBar.Manage.Users
         [OneTimeSetUp]
         public override async Task TestFixtureSetUp()
         {
+			_logger.LogDebug(">>> Entering TestFixtureSetUp()");
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             // clear all existing users except the HOST superuser
             DatabaseHelper.ExecuteNonQuery("DELETE FROM {objectQualifier}UserRelationships");
+			_logger.LogInformation("TestFixtureSetUp(): delete query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
             DatabaseHelper.ExecuteNonQuery("DELETE FROM {objectQualifier}UserPortals");
             DatabaseHelper.ExecuteNonQuery("DELETE FROM {objectQualifier}Users WHERE UserID > 1");
 
@@ -43,18 +48,22 @@ namespace DotNetNuke.Tests.Integration.PersonaBar.Manage.Users
             }
 
             var hostConnector = WebApiTestHelper.LoginHost();
+			_logger.LogDebug("TestFixtureSetUp(): hostConnector → {HostConnector}", hostConnector);
             var userIdx = 0;
 
             // make first user as admin
             var makeAdminItem = new { RoleId = 0, UserId = this._userIds[userIdx] };
             var response = hostConnector.PostJson(MakeAdminApi, makeAdminItem).Content.ReadAsStringAsync().Result;
+			_logger.LogDebug("TestFixtureSetUp(): response → {Response}", response);
             var result = JsonConvert.DeserializeObject<dynamic>(response);
+			_logger.LogDebug("TestFixtureSetUp(): result → {Result}", result);
             Assert.That(result.displayName.ToString(), Is.EqualTo(this._userNames[userIdx]));
 
             // Unauthorize the next 2 new users
             for (userIdx = 1; userIdx <= 2; userIdx++)
             {
                 var unauthorizeLink = string.Format(UnauthorizeApi, this._userIds[userIdx]);
+				_logger.LogDebug("TestFixtureSetUp(): unauthorizeLink → {UnauthorizeLink}", unauthorizeLink);
                 response = hostConnector.PostJson(unauthorizeLink, string.Empty).Content.ReadAsStringAsync().Result;
                 result = JsonConvert.DeserializeObject<dynamic>(response);
                 Assert.That(bool.Parse(result.Success.ToString()), Is.True);
@@ -62,9 +71,11 @@ namespace DotNetNuke.Tests.Integration.PersonaBar.Manage.Users
 
             // soft delete the next new user
             var deleteLink = string.Format(DeleteApi, this._userIds[userIdx]);
+			_logger.LogDebug("TestFixtureSetUp(): deleteLink → {DeleteLink}", deleteLink);
             response = hostConnector.PostJson(deleteLink, string.Empty).Content.ReadAsStringAsync().Result;
             result = JsonConvert.DeserializeObject<dynamic>(response);
             Assert.That(bool.Parse(result.Success.ToString()), Is.True);
+			_logger.LogDebug("<<< Exiting TestFixtureSetUp()");
         }
 
         [TestCase("All", MaxUsers, "/API/PersonaBar/Users/GetUsers?searchText=&filter=5&pageIndex=0&pageSize=10&sortColumn=&sortAscending=false&resetIndex=true")]
@@ -74,16 +85,22 @@ namespace DotNetNuke.Tests.Integration.PersonaBar.Manage.Users
         [TestCase("Superusers", 1, "/API/PersonaBar/Users/GetUsers?searchText=&filter=3&pageIndex=0&pageSize=10&sortColumn=&sortAscending=false&resetIndex=true")]
         public void GetUsersAsHostWithVariousFiltersShoudlReturnExpectedResult(string actionName, int expectedTotal, string apiMethod)
         {
+			_logger.LogDebug(">>> Entering GetUsersAsHostWithVariousFiltersShoudlReturnExpectedResult(actionName={ActionName},expectedTotal={ExpectedTotal},apiMethod={ApiMethod})", actionName, expectedTotal, apiMethod);
             // Arrange: all is done in TestFixtureSetUp()
 
             // Act
             var hostConnector = WebApiTestHelper.LoginHost();
+			_logger.LogDebug("GetUsersAsHostWithVariousFiltersShoudlReturnExpectedResult(actionName={ActionName},expectedTotal={ExpectedTotal},apiMethod={ApiMethod}): hostConnector → {HostConnector}", actionName, expectedTotal, apiMethod, hostConnector);
             var response = hostConnector.GetContent(apiMethod, null).Content.ReadAsStringAsync().Result;
+			_logger.LogDebug("GetUsersAsHostWithVariousFiltersShoudlReturnExpectedResult(actionName={ActionName},expectedTotal={ExpectedTotal},apiMethod={ApiMethod}): response → {Response}", actionName, expectedTotal, apiMethod, response);
             var result = JsonConvert.DeserializeObject<dynamic>(response);
+			_logger.LogDebug("GetUsersAsHostWithVariousFiltersShoudlReturnExpectedResult(actionName={ActionName},expectedTotal={ExpectedTotal},apiMethod={ApiMethod}): result → {Result}", actionName, expectedTotal, apiMethod, result);
 
             // Assert
             var totalResults = int.Parse(result.TotalResults.ToString());
+			_logger.LogDebug("GetUsersAsHostWithVariousFiltersShoudlReturnExpectedResult(actionName={ActionName},expectedTotal={ExpectedTotal},apiMethod={ApiMethod}): totalResults → {TotalResults}", actionName, expectedTotal, apiMethod, totalResults);
             Assert.That(totalResults, Is.EqualTo(expectedTotal), $"Total results {totalResults} is incorrect for action [{actionName}]");
+			_logger.LogDebug("<<< Exiting GetUsersAsHostWithVariousFiltersShoudlReturnExpectedResult(actionName={ActionName},expectedTotal={ExpectedTotal},apiMethod={ApiMethod})", actionName, expectedTotal, apiMethod);
         }
 
         [TestCase("All", MaxUsers, "/API/PersonaBar/Users/GetUsers?searchText=&filter=5&pageIndex=0&pageSize=10&sortColumn=&sortAscending=false&resetIndex=true")]
@@ -93,16 +110,22 @@ namespace DotNetNuke.Tests.Integration.PersonaBar.Manage.Users
         [TestCase("Superusers", 0, "/API/PersonaBar/Users/GetUsers?searchText=&filter=3&pageIndex=0&pageSize=10&sortColumn=&sortAscending=false&resetIndex=true")]
         public void GetUsersAsAdminWithVariousFiltersShoudlReturnExpectedResult(string actionName, int expectedTotal, string apiMethod)
         {
+			_logger.LogDebug(">>> Entering GetUsersAsAdminWithVariousFiltersShoudlReturnExpectedResult(actionName={ActionName},expectedTotal={ExpectedTotal},apiMethod={ApiMethod})", actionName, expectedTotal, apiMethod);
             // Arrange: all is done in TestFixtureSetUp()
 
             // Act
             var adminConnector = WebApiTestHelper.LoginUser(this._userNames[0]);
+			_logger.LogDebug("GetUsersAsAdminWithVariousFiltersShoudlReturnExpectedResult(actionName={ActionName},expectedTotal={ExpectedTotal},apiMethod={ApiMethod}): adminConnector → {AdminConnector}", actionName, expectedTotal, apiMethod, adminConnector);
             var response = adminConnector.GetContent(apiMethod, null).Content.ReadAsStringAsync().Result;
+			_logger.LogDebug("GetUsersAsAdminWithVariousFiltersShoudlReturnExpectedResult(actionName={ActionName},expectedTotal={ExpectedTotal},apiMethod={ApiMethod}): response → {Response}", actionName, expectedTotal, apiMethod, response);
             var result = JsonConvert.DeserializeObject<dynamic>(response);
+			_logger.LogDebug("GetUsersAsAdminWithVariousFiltersShoudlReturnExpectedResult(actionName={ActionName},expectedTotal={ExpectedTotal},apiMethod={ApiMethod}): result → {Result}", actionName, expectedTotal, apiMethod, result);
 
             // Assert
             var totalResults = int.Parse(result.TotalResults.ToString());
+			_logger.LogDebug("GetUsersAsAdminWithVariousFiltersShoudlReturnExpectedResult(actionName={ActionName},expectedTotal={ExpectedTotal},apiMethod={ApiMethod}): totalResults → {TotalResults}", actionName, expectedTotal, apiMethod, totalResults);
             Assert.That(totalResults, Is.EqualTo(expectedTotal), $"Total results {totalResults} is incorrect for action [{actionName}]");
+			_logger.LogDebug("<<< Exiting GetUsersAsAdminWithVariousFiltersShoudlReturnExpectedResult(actionName={ActionName},expectedTotal={ExpectedTotal},apiMethod={ApiMethod})", actionName, expectedTotal, apiMethod);
         }
     }
 }

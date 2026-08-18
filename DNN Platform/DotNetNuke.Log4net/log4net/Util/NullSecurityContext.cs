@@ -51,6 +51,8 @@ namespace log4net.Util
         /// </remarks>
         private NullSecurityContext()
         {
+		value.LogDebug(">>> Entering NullSecurityContext()");
+		value.LogDebug("<<< Exiting NullSecurityContext()");
         }
 
         /// <summary>Impersonate this SecurityContext</summary>
@@ -63,6 +65,8 @@ namespace log4net.Util
         /// </remarks>
         public override IDisposable Impersonate(object state)
         {
+			value.LogDebug(">>> Entering Impersonate(state={State})", state);
+			value.LogDebug("<<< Exiting Impersonate(state={State})", state);
             return null;
         }
     }

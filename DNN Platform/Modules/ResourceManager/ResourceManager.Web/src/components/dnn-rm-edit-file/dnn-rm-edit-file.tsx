@@ -1,5 +1,6 @@
 import { Component, Element, Event, EventEmitter, Host, h, Prop, State } from '@stencil/core';
 import state from '../../store/store';
+const logger = console;
 import { FileDetails, ItemsClient, SaveFileDetailsRequest } from '../../services/ItemsClient';
 
 @Component({
@@ -24,26 +25,33 @@ export class DnnRmEditFile {
   private itemsClient: ItemsClient;
 
   constructor() {
+	logger.debug('>>> Entering constructor()');
     this.itemsClient = new ItemsClient(state.moduleId);
+	logger.debug('<<< Exiting constructor()');
   }
 
   componentWillLoad(){
+	logger.debug('>>> Entering componentWillLoad()');
     this.itemsClient.getFileDetails(this.fileId)
       .then(fileDetails => {
         this.fileDetails = fileDetails;
       })
       .catch(reason => alert(reason));
+	logger.debug('<<< Exiting componentWillLoad()');
   }
 
   private async closeModal() {
+	logger.debug('>>> Entering closeModal()');
     const modal = this.el.parentElement as HTMLDnnModalElement;
     await modal.hide();
     setTimeout(() => {
       document.body.removeChild(modal);
     }, 300);
+	logger.debug('<<< Exiting closeModal()');
   }
 
   private async handleSave() {
+	logger.debug('>>> Entering handleSave()');
     try {
       const request: SaveFileDetailsRequest = {
         fileId: this.fileId,
@@ -56,10 +64,13 @@ export class DnnRmEditFile {
       
     } catch (error) {
       alert(error);
+	logger.debug('<<< Exiting handleSave()');
     }
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         <h2>{state.localization?.Edit}</h2>

@@ -1,3 +1,4 @@
+const logger = console;
 (function () {
     function addCssToHead(css, version) {
         var head = document.getElementsByTagName('head')[0];
@@ -8,6 +9,7 @@
             link.setAttribute('href', css[i] + version);
             head.appendChild(link);
         }
+		logger.debug(`<<< Exiting addCssToHead(css=${css},version=${version})`);
     };
 
     function addJsToBody (js, version) {
@@ -16,6 +18,7 @@
         script.setAttribute('src', 'scripts/contrib/require.js' + version);
         script.setAttribute('data-main', js + version);
         body.appendChild(script);
+		logger.debug(`<<< Exiting addJsToBody(js=${js},version=${version})`);
     };
 
     var personaBarSettings = window.parent['personaBarSettings'];

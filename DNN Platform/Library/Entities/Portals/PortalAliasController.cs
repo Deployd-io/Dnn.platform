@@ -37,6 +37,10 @@ namespace DotNetNuke.Entities.Portals
         public PortalAliasController()
             : this(null, null)
         {
+		eventLogger.LogDebug(">>> Entering PortalAliasController()");
+		eventLogger.LogDebug("<<< Exiting PortalAliasController()");
+		eventLogger.LogDebug(">>> Entering PortalAliasController(eventLogger={EventLogger},hostSettings={HostSettings})", eventLogger, hostSettings);
+		eventLogger.LogDebug("PortalAliasController(eventLogger={EventLogger},hostSettings={HostSettings}): hostSettings → {HostSettings1}", eventLogger, hostSettings, hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PortalAliasController"/> class.</summary>
@@ -46,6 +50,7 @@ namespace DotNetNuke.Entities.Portals
         {
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			eventLogger.LogDebug("<<< Exiting PortalAliasController(eventLogger={EventLogger},hostSettings={HostSettings})", eventLogger, hostSettings);
         }
 
         private IPortalAliasService ThisAsInterface => this;
@@ -260,12 +265,15 @@ namespace DotNetNuke.Entities.Portals
 #pragma warning disable CS0618 // Type or member is obsolete
         protected override Func<IPortalAliasController> GetFactory()
         {
+			eventLogger.LogDebug(">>> Entering GetFactory()");
+			eventLogger.LogDebug("<<< Exiting GetFactory()");
             return () => new PortalAliasController();
         }
 #pragma warning restore CS0618 // Type or member is obsolete
 
         private static void ClearCache(bool refreshServiceRoutes, int portalId = -1)
         {
+			eventLogger.LogDebug(">>> Entering ClearCache(refreshServiceRoutes={RefreshServiceRoutes},portalId={PortalId})", refreshServiceRoutes, portalId);
             DataCache.RemoveCache(DataCache.PortalAliasCacheKey);
             CacheController.FlushPageIndexFromCache();
 
@@ -278,6 +286,7 @@ namespace DotNetNuke.Entities.Portals
             {
                 ServicesRoutingManager.ReRegisterServiceRoutesWhileSiteIsRunning();
             }
+			eventLogger.LogDebug("<<< Exiting ClearCache(refreshServiceRoutes={RefreshServiceRoutes},portalId={PortalId})", refreshServiceRoutes, portalId);
         }
 
         private static bool ValidateAlias(string portalAlias, bool ischild, bool isDomain)
@@ -304,10 +313,13 @@ namespace DotNetNuke.Entities.Portals
                 UserController.Instance.GetCurrentUserInfo().UserID,
                 string.Empty,
                 logType);
+				eventLogger.LogDebug("<<< Exiting LogEvent(portalAlias={PortalAlias},logType={LogType})", portalAlias, logType);
         }
 
         private PortalAliasInfo GetPortalAliasLookupInternal(string alias)
         {
+			eventLogger.LogDebug(">>> Entering GetPortalAliasLookupInternal(alias={Alias})", alias);
+			eventLogger.LogDebug("<<< Exiting GetPortalAliasLookupInternal(alias={Alias})", alias);
             return this.GetPortalAliasesInternal().SingleOrDefault(pa => pa.Key == alias).Value;
         }
 

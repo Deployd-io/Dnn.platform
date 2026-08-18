@@ -39,6 +39,7 @@ namespace DotNetNuke.Admin.Containers
     public partial class ModuleActions(IEventLogger eventLogger, IModuleControlPipeline moduleControlPipeline, IJavaScriptLibraryHelper javaScript, IClientResourceController clientResourceController, IServicesFramework servicesFramework, IHostSettings hostSettings)
         : ActionBase(eventLogger)
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleActions.ascx));
         private readonly List<int> validIDs = [];
         private readonly IModuleControlPipeline moduleControlPipeline = moduleControlPipeline ?? Globals.GetCurrentServiceProvider().GetRequiredService<IModuleControlPipeline>();
         private readonly IJavaScriptLibraryHelper javaScript = javaScript ?? Globals.GetCurrentServiceProvider().GetRequiredService<IJavaScriptLibraryHelper>();
@@ -51,6 +52,7 @@ namespace DotNetNuke.Admin.Containers
         public ModuleActions()
             : this(null, null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering ModuleActions()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleActions"/> class.</summary>
@@ -61,6 +63,7 @@ namespace DotNetNuke.Admin.Containers
         public ModuleActions(IModuleControlPipeline moduleControlPipeline, IJavaScriptLibraryHelper javaScript, IClientResourceController clientResourceController)
             : this(null, moduleControlPipeline, javaScript, clientResourceController, null)
         {
+		Logger.LogDebug("<<< Exiting ModuleActions()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleActions"/> class.</summary>
@@ -99,15 +102,19 @@ namespace DotNetNuke.Admin.Containers
 
         protected string LocalizeString(string key)
         {
+			Logger.LogDebug(">>> Entering LocalizeString(key={Key})", key);
+			Logger.LogDebug("<<< Exiting LocalizeString(key={Key})", key);
             return Localization.GetString(key, Localization.GlobalResourceFile);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.ID = "ModuleActions";
+			Logger.LogDebug("OnInit(e={E}): this.ID → {Arg1}", e, this.ID);
 
             this.actionButton.Click += this.ActionButton_Click;
 
@@ -118,28 +125,38 @@ namespace DotNetNuke.Admin.Containers
             this.clientResourceController.RegisterScript("~/admin/menus/ModuleActions/ModuleActions.js");
 
             this.servicesFramework.RequestAjaxAntiForgerySupport();
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.AdminActionsJSON = "[]";
+			Logger.LogDebug("OnLoad(e={E}): this.AdminActionsJSON → {Arg1}", e, this.AdminActionsJSON);
             this.CustomActionsJSON = "[]";
             this.Panes = "[]";
+			Logger.LogDebug("OnLoad(e={E}): this.CustomActionsJSON → {Arg1}", e, this.CustomActionsJSON);
+			Logger.LogDebug("OnLoad(e={E}): this.Panes → {Arg1}", e, this.Panes);
             try
             {
                 this.SupportsQuickSettings = false;
                 this.DisplayQuickSettings = false;
+				Logger.LogDebug("OnLoad(e={E}): this.SupportsQuickSettings → {Arg1}", e, this.SupportsQuickSettings);
+				Logger.LogDebug("OnLoad(e={E}): this.DisplayQuickSettings → {Arg1}", e, this.DisplayQuickSettings);
                 this.ModuleTitle = this.ModuleContext.Configuration.ModuleTitle;
                 var moduleDefinitionId = this.ModuleContext.Configuration.ModuleDefID;
                 var quickSettingsControl = ModuleControlController.GetModuleControlByControlKey(this.hostSettings, "QuickSettings", moduleDefinitionId);
+				Logger.LogDebug("OnLoad(e={E}): quickSettingsControl → {QuickSettingsControl}", e, quickSettingsControl);
 
                 if (quickSettingsControl != null)
+				Logger.LogDebug("OnLoad(e={E}): this.ModuleTitle → {Arg1}", e, this.ModuleTitle);
                 {
                     this.SupportsQuickSettings = true;
                     var control = this.moduleControlPipeline.LoadModuleControl(this.Page, this.ModuleContext.Configuration, "QuickSettings", quickSettingsControl.ControlSrc);
+					Logger.LogDebug("OnLoad(e={E}): control → {Control}", e, control);
                     control.ID += this.ModuleContext.ModuleId;
                     this.quickSettings.Controls.Add(control);
 
@@ -161,6 +178,7 @@ namespace DotNetNuke.Admin.Containers
                     {
                         // Process Children
                         var actions = new List<ModuleAction>();
+						Logger.LogDebug("OnLoad(e={E}): actions → {Actions}", e, actions);
                         foreach (ModuleAction action in rootAction.Actions)
                         {
                             if (action.Visible)
@@ -173,6 +191,7 @@ namespace DotNetNuke.Admin.Containers
                                             && !action.Icon.StartsWith("~/", StringComparison.Ordinal))
                                     {
                                         action.Icon = "~/images/" + action.Icon;
+										Logger.LogDebug("OnLoad(e={E}): action.Icon → {Arg1}", e, action.Icon);
                                     }
 
                                     if (action.Icon.StartsWith("~/", StringComparison.Ordinal))
@@ -191,6 +210,7 @@ namespace DotNetNuke.Admin.Containers
                         }
 
                         var oSerializer = new JavaScriptSerializer();
+						Logger.LogDebug("OnLoad(e={E}): oSerializer → {OSerializer}", e, oSerializer);
                         if (rootAction.Title == Localization.GetString("ModuleGenericActions.Action", Localization.GlobalResourceFile))
                         {
                             this.AdminActionsJSON = oSerializer.Serialize(actions);
@@ -204,6 +224,7 @@ namespace DotNetNuke.Admin.Containers
                             else
                             {
                                 this.SupportsMove = actions.Count > 0;
+								Logger.LogDebug("OnLoad(e={E}): this.SupportsMove → {Arg1}", e, this.SupportsMove);
                                 this.Panes = oSerializer.Serialize(this.PortalSettings.ActiveTab.Panes);
                             }
                         }
@@ -212,28 +233,35 @@ namespace DotNetNuke.Admin.Containers
                     this.IsShared = this.ModuleContext.Configuration.AllTabs
                         || PortalGroupController.Instance.IsModuleShared(this.ModuleContext.ModuleId, PortalController.Instance.GetPortal(this.PortalSettings.PortalId))
                         || TabController.Instance.GetTabsByModuleID(this.ModuleContext.ModuleId).Count > 1;
+						Logger.LogDebug("OnLoad(e={E}): this.IsShared → {Arg1}", e, this.IsShared);
                 }
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer);
             base.Render(writer);
 
             foreach (int id in this.validIDs)
             {
                 this.Page.ClientScript.RegisterForEventValidation(this.actionButton.UniqueID, id.ToString());
             }
+			Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer);
         }
 
         private void ActionButton_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering ActionButton_Click(sender={Sender},e={E})", sender, e);
             this.ProcessAction(this.Request.Params["__EVENTARGUMENT"]);
+			Logger.LogDebug("<<< Exiting ActionButton_Click(sender={Sender},e={E})", sender, e);
         }
     }
 }

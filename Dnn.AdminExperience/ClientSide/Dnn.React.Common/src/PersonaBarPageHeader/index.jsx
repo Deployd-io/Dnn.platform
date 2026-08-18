@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import TextOverflowWrapperNew from "../TextOverflowWrapperNew";
 
 import "./style.less";
+const logger = console;
 
 const hotspotStyles = {
     position: "absolute",
@@ -18,10 +19,12 @@ const hotspotStyles = {
 
 
 const PersonaBarPageHeader = ({ title, children, tooltip, titleMaxWidth, titleCharLimit }) => {
+logger.debug(`>>> Entering PersonaBarPageHeader(title=${title},children=${children},tooltip=${tooltip},titleMaxWidth=${titleMaxWidth},titleCharLimit=${titleCharLimit})`);
 
     titleCharLimit = titleCharLimit ? titleCharLimit : 50;
 
     const renderTitle = () => {
+		logger.debug('>>> Entering renderTitle()');
         switch (true) {
             case title.length > titleCharLimit:
                 return (
@@ -40,6 +43,7 @@ const PersonaBarPageHeader = ({ title, children, tooltip, titleMaxWidth, titleCh
         }
     };
 
+	logger.debug(`<<< Exiting PersonaBarPageHeader(title=${title},children=${children},tooltip=${tooltip},titleMaxWidth=${titleMaxWidth},titleCharLimit=${titleCharLimit})`);
     return (
         <div className="dnn-persona-bar-page-header">
             {renderTitle()}

@@ -12,9 +12,11 @@ namespace Dnn.Modules.ResourceManager.Services.Attributes
     /// <summary>A custom <see cref="ExceptionFilterAttribute"/> for the resource manager.</summary>
     public class ResourceManagerExceptionFilter : ExceptionFilterAttribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ResourceManagerExceptionFilter));
         /// <inheritdoc />
         public override void OnException(HttpActionExecutedContext actionExecutedContext)
         {
+			Logger.LogDebug(">>> Entering OnException(actionExecutedContext={ActionExecutedContext})", actionExecutedContext);
             if (actionExecutedContext.Exception == null)
             {
                 return;
@@ -35,9 +37,11 @@ namespace Dnn.Modules.ResourceManager.Services.Attributes
                 actionExecutedContext.Response = actionExecutedContext.Request.CreateResponse(
                     HttpStatusCode.NotFound,
                     new { message = exception.Message });
+			Logger.LogWarning("Throwing exception from OnException(actionExecutedContext={ActionExecutedContext})", actionExecutedContext);
                 return;
             }
 
+			Logger.LogDebug("<<< Exiting OnException(actionExecutedContext={ActionExecutedContext})", actionExecutedContext);
             throw exception;
         }
     }

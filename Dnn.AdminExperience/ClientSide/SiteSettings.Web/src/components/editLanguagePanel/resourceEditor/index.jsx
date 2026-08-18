@@ -3,21 +3,26 @@ import PropTypes from "prop-types";
 import debounce from "lodash/debounce";
 import FullEditor from "./fullEditor";
 import "./style.less";
+const logger = console;
 import { SingleLineInput, MultiLineInput, Modal, SvgIcons } from "@dnnsoftware/dnn-react-common";
 
 class ResourceEditor extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             inFullMode: false,
             content: props.value ? props.value : ""
         };
         this.debouncedOnChange = debounce(this.changeContent, 500);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         if (this.props.value !== prevProps.value) {
             this.setState({content: this.props.value});
+			logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
         }
     }
 
@@ -27,10 +32,12 @@ class ResourceEditor extends Component {
     }
 
     changeContent() {
+		logger.debug('>>> Entering changeContent()');
         const { props } = this;
 
         if (props.enabled) {
             props.onChange(this.state.content);
+			logger.debug('<<< Exiting changeContent()');
         }
     }
 
@@ -56,8 +63,10 @@ class ResourceEditor extends Component {
     }
 
     renderSingle() {
+		logger.debug('>>> Entering renderSingle()');
         const { props, state } = this;
 
+		logger.debug('<<< Exiting renderSingle()');
         return (<SingleLineInput 
             className={props.className} 
             value={state.content} 
@@ -66,39 +75,49 @@ class ResourceEditor extends Component {
     }
 
     onEnterFullMode() {
+		logger.debug('>>> Entering onEnterFullMode()');
         this.setState({
             inFullMode: true
         });
 
         window.dnn.stopEscapeFromClosingPB = true;
+		logger.debug('<<< Exiting onEnterFullMode()');
     }
 
     onExitFullMode() {
+		logger.debug('>>> Entering onExitFullMode()');
         this.setState({
             inFullMode: false
         });
 
         window.dnn.stopEscapeFromClosingPB = false;
+		logger.debug('<<< Exiting onExitFullMode()');
     }
 
     onFullEditorChange(value) {
+		logger.debug(`>>> Entering onFullEditorChange(value=${value})`);
         const { props } = this;
 
         props.onChange(value);
 
         this.onExitFullMode();
+		logger.debug(`<<< Exiting onFullEditorChange(value=${value})`);
     }
 
     onFullEditorCancel() {
+		logger.debug('>>> Entering onFullEditorCancel()');
         this.onExitFullMode();
+		logger.debug('<<< Exiting onFullEditorCancel()');
     }
     
      
     render() {
+		logger.debug('>>> Entering render()');
         const { props, state } = this;
 
         const renderMulti = props.value && props.value.length > 30;
 
+		logger.debug('<<< Exiting render()');
         return (<div className="dnn-language-resource-editor">
             {renderMulti ? this.renderMulti() : this.renderSingle()}
             {props.enabled && 

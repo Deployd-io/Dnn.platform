@@ -7,6 +7,7 @@ import Html from "../Html";
 import "./style.less";
 import Service from "./Service";
 import PagePickerScrollbar from "./PagePickerScrollbar";
+const logger = console;
 
 
 function format() {
@@ -14,6 +15,7 @@ function format() {
     let methodsArguments = arguments;
     return format.replace(/{(\d+)}/gi, function (value, index) {
         let argumentsIndex = parseInt(index) + 1;
+	logger.debug('<<< Exiting format()');
         return methodsArguments[argumentsIndex];
     });
 }
@@ -21,6 +23,7 @@ function format() {
 class PagePicker extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             dropDownOpen: false,
             portalTabs: [],
@@ -29,19 +32,25 @@ class PagePicker extends Component {
             selectedPage: props.defaultLabel
         };
         this.loaded = false;
+		logger.debug(`constructor(props=${props}): this.state → ${this.state}`);
+		logger.debug(`constructor(props=${props}): this.loaded → ${this.loaded}`);
         this.handleClick = this.handleClick.bind(this);
 
         this.dnnPagePickerRef = React.createRef();
         this.pagePickerContent = React.createRef();
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         this._isMounted = false;
         if (!this.props.IsMultiSelect) {
             this.setDefaultPage(this.props);
         }
         if (!this.props.IsInDropDown) {
+			logger.debug(`UNSAFE_componentWillMount(): this._isMounted → ${this._isMounted}`);
             this.initialize(this.props);
+			logger.debug('<<< Exiting UNSAFE_componentWillMount()');
         }
         this.setState({
             selectedPage: this.props.defaultLabel
@@ -49,6 +58,7 @@ class PagePicker extends Component {
     }
 
     UNSAFE_componentWillReceiveProps(newProps) {
+		logger.debug(`>>> Entering UNSAFE_componentWillReceiveProps(newProps=${newProps})`);
         //reload if any query param changed
         const {props} = this;
         if (props.PortalTabsParameters.portalId !== newProps.PortalTabsParameters.portalId ||
@@ -58,6 +68,7 @@ class PagePicker extends Component {
             props.PortalTabsParameters.roles !== newProps.PortalTabsParameters.roles) {
             this.setState({portalTabs: []});
             this.loaded = false;
+		logger.debug(`UNSAFE_componentWillReceiveProps(newProps=${newProps}): this.loaded → ${this.loaded}`);
             return;
         }
 
@@ -76,34 +87,45 @@ class PagePicker extends Component {
                 this.setDefaultPage(newProps);
             }
         }
+		logger.debug(`<<< Exiting UNSAFE_componentWillReceiveProps(newProps=${newProps})`);
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this._isMounted = true;
         const {props} = this;
         if (props.closeOnBlur) {
+			logger.debug(`componentDidMount(): this._isMounted → ${this._isMounted}`);
             document.addEventListener("click", this.handleClick);
         }
         this._isMounted = true;
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentWillUnmount() {
+		logger.debug('>>> Entering componentWillUnmount()');
         document.removeEventListener("click", this.handleClick);
         this._isMounted = false;
+		logger.debug(`componentWillUnmount(): this._isMounted → ${this._isMounted}`);
+		logger.debug('<<< Exiting componentWillUnmount()');
     }
 
     initialize(props, callback) {
+		logger.debug(`>>> Entering initialize(props=${props},callback=${callback})`);
         this.getPortalTabs(props.cultureCode, () => {
             this.setPages(() => {
                 if (callback)
+					logger.debug(`<<< Exiting initialize(props=${props},callback=${callback})`);
                     callback();
             });
         });
     }
 
     getPortalTabs(cultureCode, callback) {
+		logger.debug(`>>> Entering getPortalTabs(cultureCode=${cultureCode},callback=${callback})`);
         const { props } = this;
         let service = new Service(this.props.serviceFramework, this.props.moduleRoot, this.props.controller);
+		logger.debug(`getPortalTabs(cultureCode=${cultureCode},callback=${callback}): service → ${service}`);
         const portalTabsParameters = !props.IsMultiSelect ? Object.assign(props.PortalTabsParameters, { selectedTabId: props.selectedTabId }) : Object.assign(props.PortalTabsParameters);
         service.getPortalTabs(portalTabsParameters, (data) => {
             this.setState({
@@ -111,15 +133,18 @@ class PagePicker extends Component {
             }, () => {
                 if (callback) {
                     callback();
+					logger.debug(`<<< Exiting getPortalTabs(cultureCode=${cultureCode},callback=${callback})`);
                 }
             });
         });
     }
 
     setPages(callback) {
+		logger.debug(`>>> Entering setPages(callback=${callback})`);
         const {props} = this;
         this.loaded = true;
         let {portalTabs} = this.state;
+		logger.debug(`setPages(callback=${callback}): this.loaded → ${this.loaded}`);
         if (!props.IsMultiSelect) {
             portalTabs[0].Name = props.noneSpecifiedText;
         }
@@ -141,11 +166,13 @@ class PagePicker extends Component {
                 this.onPageSelect(portalTabs[0]);
             }
             if (typeof callback === "function")
+				logger.debug(`<<< Exiting setPages(callback=${callback})`);
                 callback();
         });
     }
 
     getClassName() {
+		logger.debug('>>> Entering getClassName()');
         const {props} = this;
         let className = "dnn-page-picker";
         if (props.IsInDropDown) {
@@ -157,22 +184,27 @@ class PagePicker extends Component {
         if (!props.enabled) {
             className += " disabled";
         }
+		logger.debug('<<< Exiting getClassName()');
         return className;
     }
 
     getDropdownLabel() {
+		logger.debug('>>> Entering getDropdownLabel()');
         const { state } = this;
         let label = state.selectedPage;
+		logger.debug('<<< Exiting getDropdownLabel()');
         return label;
     }
 
     SetOpenNodesCount(root, lastId, count) {
+		logger.debug(`>>> Entering SetOpenNodesCount(root=${root},lastId=${lastId},count=${count})`);
         if (root.IsOpen && root.ChildTabs !== null && root.ChildTabs.length > 0) {
             root.ChildTabs.map((child) => {
                 count++;
                 if (child.IsOpen && child.ChildTabs !== null && child.ChildTabs.length > 0) {
                     count = this.SetOpenNodesCount(child, lastId, count);
                 }
+			logger.debug(`SetOpenNodesCount(root=${root},lastId=${lastId},count=${count}): count → ${count}`);
                 return count;
             });
         }
@@ -181,6 +213,7 @@ class PagePicker extends Component {
                 totalCount: count
             });
         }
+		logger.debug(`<<< Exiting SetOpenNodesCount(root=${root},lastId=${lastId},count=${count})`);
         return count;
     }
 
@@ -220,6 +253,7 @@ class PagePicker extends Component {
                 });
             });
         }
+		logger.debug(`<<< Exiting onPageSelect(page=${page},keepOpen=${keepOpen})`);
     }
     //page is passed by reference.
     getDescendants(page, callback, event) {
@@ -276,6 +310,7 @@ class PagePicker extends Component {
                     callback();
                 }
             });
+			logger.debug(`<<< Exiting getDescendants(page=${page},callback=${callback},event=${event})`);
     }
 
     getSelected(page, isCurrentOrDescendant) {
@@ -317,9 +352,11 @@ class PagePicker extends Component {
                 }
             </li>;
         });
+		logger.debug(`<<< Exiting getChildItems(children=${children},isCurrentOrDescendant=${isCurrentOrDescendant})`);
     }
 
     toggleDropdown() {
+		logger.debug('>>> Entering toggleDropdown()');
         const {props} = this;
         if (!this.loaded) {
             this.initialize(props, () => {
@@ -334,6 +371,7 @@ class PagePicker extends Component {
             });
         }
         else {
+			logger.debug('<<< Exiting toggleDropdown()');
             this.setState({
                 dropDownOpen: false
             });
@@ -341,10 +379,13 @@ class PagePicker extends Component {
     }
 
     getCountText() {
+		logger.debug('>>> Entering getCountText()');
+		logger.debug('<<< Exiting getCountText()');
         return format(this.props.CountText, this.state.totalCount);
     }
 
     findTabById(tabId, tabs, tab) {
+		logger.debug(`>>> Entering findTabById(tabId=${tabId},tabs=${tabs},tab=${tab})`);
         if (tab === null) {
             for (let i = 0; i < tabs.length; i++) {
                 let child = tabs[i];
@@ -360,15 +401,18 @@ class PagePicker extends Component {
                 }
             }
         }
+		logger.debug(`<<< Exiting findTabById(tabId=${tabId},tabs=${tabs},tab=${tab})`);
         return tab;
     }
     //Single Selection Methods
     //Set the dropdown label to the default selected page name.
     setDefaultPage(props, keepOpen) {
+		logger.debug(`>>> Entering setDefaultPage(props=${props},keepOpen=${keepOpen})`);
         if (props.IsInDropDown && !props.IsMultiSelect) {
             let {portalTabs} = this.state;
             if (portalTabs !== undefined && portalTabs.length > 0) {
                 let page = null;
+				logger.debug(`setDefaultPage(props=${props},keepOpen=${keepOpen}): page → ${page}`);
                 if (props.selectedTabId === -1) {
                     page = portalTabs[0];
                 } else {
@@ -376,6 +420,7 @@ class PagePicker extends Component {
                 }
                 if (page !== undefined && page !== null) {
                     this.onPageSelect(page, keepOpen);
+					logger.debug(`<<< Exiting setDefaultPage(props=${props},keepOpen=${keepOpen})`);
                 }
             }
             else if (props.selectedTabId >= 0) {
@@ -399,12 +444,14 @@ class PagePicker extends Component {
     }
 
     handleClick(event) {
+		logger.debug(`>>> Entering handleClick(event=${event})`);
         const {props} = this;
         // Note: this workaround is needed in IE. The remove event listener in the componentWillUnmount is called
         // before the handleClick handler is called, but in spite of that, the handleClick is executed. To avoid
         // the "findDOMNode was called on an unmounted component." error we need to check if the component is mounted before execute this code
         if (!this._isMounted || !props.closeOnBlur || !props.IsInDropDown) { return; }
         if (!this.dnnPagePickerRef.current.contains(event.target) && (typeof event.target.className === "string" && event.target.className.indexOf("do-not-close") === -1)) {
+			logger.debug(`<<< Exiting handleClick(event=${event})`);
             this.setState({
                 dropDownOpen: false
             });
@@ -431,15 +478,19 @@ class PagePicker extends Component {
         if (callback !== undefined) {
             callback(root);
         }
+		logger.debug(`<<< Exiting UnCheckAllExcept(root=${root},page=${page},callback=${callback})`);
         return root;
     }
 
     onSearch(value) {
+		logger.debug(`>>> Entering onSearch(value=${value})`);
         const {props} = this;
 
         if (value !== "") {
             const apiParameters = Object.assign(props.PortalTabsParameters, { searchText: value });
+			logger.debug(`onSearch(value=${value}): apiParameters → ${apiParameters}`);
             let service = new Service(this.props.serviceFramework, this.props.moduleRoot, this.props.controller);
+			logger.debug(`onSearch(value=${value}): service → ${service}`);
 
             service.searchPortalTabs(apiParameters, (data) => {
                 this.setState({
@@ -450,6 +501,7 @@ class PagePicker extends Component {
             });
         } else {
             this.initialize(props);
+			logger.debug(`<<< Exiting onSearch(value=${value})`);
         }
     }
     //Single Selection Methods Ends
@@ -524,6 +576,7 @@ class PagePicker extends Component {
         });
         if (callback)
             callback();
+			logger.debug(`<<< Exiting DoRecursiveSelect(page=${page},mainKey=${mainKey},originalChecked=${originalChecked},callback=${callback})`);
     }
 
     RecursiveFindParent(parentId, currentTree) {
@@ -544,6 +597,7 @@ class PagePicker extends Component {
     }
 
     getCheckboxIcon(selected) {
+		logger.debug(`>>> Entering getCheckboxIcon(selected=${selected})`);
         switch (selected) {
             case 0:
                 return CheckboxCheckedIcon;
@@ -552,6 +606,7 @@ class PagePicker extends Component {
             case 1:
                 return CheckboxUncheckedIcon;
             default:
+				logger.debug(`<<< Exiting getCheckboxIcon(selected=${selected})`);
                 return CheckboxUncheckedIcon;
         }
     }
@@ -559,12 +614,14 @@ class PagePicker extends Component {
     //Multi Selection Methods Ends
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
         
         if (this.loaded || props.IsInDropDown) {
             let picker = <div/>;
             if (state.portalTabs.length > 0 && state.portalTabs[0].Processed) {
                 let children = state.portalTabs.length > 0 && state.portalTabs[0].Processed && this.getChildItems(state.portalTabs);
+				logger.debug(`render(): children → ${children}`);
                 picker =
                     <PagePickerScrollbar style={props.scrollAreaStyle} ref={node => this.node = node}>
                         <div className="pages-container">
@@ -617,6 +674,7 @@ class PagePicker extends Component {
             );
         }
         else {
+			logger.debug('<<< Exiting render()');
             return (<div/>);
         }
     }

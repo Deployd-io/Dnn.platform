@@ -12,21 +12,30 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
     {
         public ModuleControlDto()
         {
+		eventLogger.LogDebug(">>> Entering ModuleControlDto()");
+		eventLogger.LogDebug("<<< Exiting ModuleControlDto()");
         }
 
         public ModuleControlDto(ModuleControlInfo moduleControl)
         {
+			eventLogger.LogDebug(">>> Entering ModuleControlDto(moduleControl={ModuleControl})", moduleControl);
             this.Id = moduleControl.ModuleControlID;
             this.DefinitionId = moduleControl.ModuleDefID;
+			eventLogger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.Id → {Arg1}", moduleControl, this.Id);
+			eventLogger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.DefinitionId → {Arg1}", moduleControl, this.DefinitionId);
             this.Key = moduleControl.ControlKey;
             this.Title = moduleControl.ControlTitle;
             this.Source = moduleControl.ControlSrc;
+			eventLogger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.Key → {Arg1}", moduleControl, this.Key);
+			eventLogger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.Title → {Arg1}", moduleControl, this.Title);
+			eventLogger.LogDebug("ModuleControlDto(moduleControl={ModuleControl}): this.Source → {Arg1}", moduleControl, this.Source);
             this.Type = moduleControl.ControlType;
             this.Order = moduleControl.ViewOrder;
             this.Icon = moduleControl.IconFile;
             this.HelpUrl = moduleControl.HelpURL;
             this.SupportPopups = moduleControl.SupportsPopUps;
             this.SupportPartialRendering = moduleControl.SupportsPartialRendering;
+			eventLogger.LogDebug("<<< Exiting ModuleControlDto(moduleControl={ModuleControl})", moduleControl);
         }
 
         [JsonProperty("id")]
@@ -64,6 +73,8 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
 
         public ModuleControlInfo ToModuleControlInfo()
         {
+			eventLogger.LogDebug(">>> Entering ToModuleControlInfo()");
+			eventLogger.LogDebug("<<< Exiting ToModuleControlInfo()");
             return new ModuleControlInfo
             {
                 ModuleControlID = this.Id,

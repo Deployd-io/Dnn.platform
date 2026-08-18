@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object")
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd)
@@ -11,8 +13,12 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("cmake", function () {
+logger.debug('>>> Entering defineMode()');
   var variable_regex = /({)?[a-zA-Z0-9_]+(})?/;
+logger.debug('<<< Exiting defineMode()');
+logger.debug(`defineMode(): variable_regex → ${variable_regex}`);
 
   function tokenString(stream, state) {
     var current, prev, found_var = false;
@@ -78,15 +84,23 @@ CodeMirror.defineMode("cmake", function () {
   }
   return {
     startState: function () {
+	logger.debug('>>> Entering startState()');
       var state = {};
       state.inDefinition = false;
       state.inInclude = false;
+	logger.debug(`startState(): state.inDefinition → ${state.inDefinition}`);
+	logger.debug(`startState(): state.inInclude → ${state.inInclude}`);
+	logger.debug(`startState(): state.pending → ${state.pending}`);
       state.continueString = false;
+	logger.debug(`startState(): state.continueString → ${state.continueString}`);
       state.pending = false;
+	logger.debug('<<< Exiting startState()');
       return state;
     },
     token: function (stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       if (stream.eatSpace()) return null;
+	logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
       return tokenize(stream, state);
     }
   };

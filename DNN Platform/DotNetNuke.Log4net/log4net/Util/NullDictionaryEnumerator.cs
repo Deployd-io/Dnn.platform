@@ -42,6 +42,8 @@ namespace log4net.Util
         /// </remarks>
         private NullDictionaryEnumerator()
         {
+		value.LogDebug(">>> Entering NullDictionaryEnumerator()");
+		value.LogDebug("<<< Exiting NullDictionaryEnumerator()");
         }
 
         /// <summary>Gets the singleton instance of the <see cref="NullDictionaryEnumerator" />.</summary>
@@ -86,6 +88,8 @@ namespace log4net.Util
         /// </remarks>
         public bool MoveNext()
         {
+			value.LogDebug(">>> Entering MoveNext()");
+			value.LogDebug("<<< Exiting MoveNext()");
             return false;
         }
   
@@ -97,6 +101,8 @@ namespace log4net.Util
         /// </remarks>
         public void Reset() 
         {
+		value.LogDebug(">>> Entering Reset()");
+		value.LogDebug("<<< Exiting Reset()");
         }
 
         /// <summary>Gets the current key from the enumerator.</summary>

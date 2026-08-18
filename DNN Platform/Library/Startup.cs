@@ -75,9 +75,11 @@ namespace DotNetNuke
     /// <inheritdoc />
     public class Startup : IDnnStartup
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Startup));
         /// <inheritdoc />
         public void ConfigureServices(IServiceCollection services)
         {
+			Logger.LogDebug(">>> Entering ConfigureServices(services={Services})", services);
             services.AddTransient(typeof(Lazy<>), typeof(LazyWrapper<>));
 
             services.TryAddEnumerable(ServiceDescriptor.Singleton<IModuleControlFactory, WebFormsModuleControlFactory>());
@@ -85,6 +87,7 @@ namespace DotNetNuke
             services.TryAddEnumerable(ServiceDescriptor.Singleton<IModuleControlFactory, ReflectedModuleControlFactory>());
             services.AddSingleton<IDnnContext, DotNetNukeContext>();
             services.AddSingleton<IHostSettings, HostSettings>();
+			Logger.LogDebug("<<< Exiting ConfigureServices(services={Services})", services);
             services.AddTransient<IMailSettings, MailSettings>();
 
 #pragma warning disable CS0618
@@ -189,8 +192,11 @@ namespace DotNetNuke
             services.AddTransient<IDataContext>(serviceProvider =>
             {
                 var hostSettings = serviceProvider.GetRequiredService<IHostSettings>();
+				Logger.LogDebug("ConfigureServices(services={Services}): hostSettings → {HostSettings}", services, hostSettings);
                 var dataProvider = serviceProvider.GetRequiredService<DataProvider>();
+				Logger.LogDebug("ConfigureServices(services={Services}): dataProvider → {DataProvider}", services, dataProvider);
                 var defaultConnectionStringName = dataProvider.Settings["connectionStringName"];
+				Logger.LogDebug("ConfigureServices(services={Services}): defaultConnectionStringName → {DefaultConnectionStringName}", services, defaultConnectionStringName);
 
                 return new PetaPocoDataContext(hostSettings, defaultConnectionStringName, dataProvider.ObjectQualifier);
             });
@@ -204,12 +210,17 @@ namespace DotNetNuke
 
         private static void RegisterModuleInjectionFilters(IServiceCollection services)
         {
+			Logger.LogDebug(">>> Entering RegisterModuleInjectionFilters(services={Services})", services);
             var filterTypes = new TypeLocator().GetAllMatchingTypes(IsValidModuleInjectionFilter);
             services.TryAddEnumerable(filterTypes.Select(t => new ServiceDescriptor(typeof(IModuleInjectionFilter), t, ServiceLifetime.Scoped)));
+			Logger.LogDebug("RegisterModuleInjectionFilters(services={Services}): filterTypes → {FilterTypes}", services, filterTypes);
+			Logger.LogDebug("<<< Exiting RegisterModuleInjectionFilters(services={Services})", services);
         }
 
         private static bool IsValidModuleInjectionFilter(Type t)
         {
+			Logger.LogDebug(">>> Entering IsValidModuleInjectionFilter(t={T})", t);
+			Logger.LogDebug("<<< Exiting IsValidModuleInjectionFilter(t={T})", t);
             return t is { IsClass: true, IsAbstract: false, IsVisible: true } && typeof(IModuleInjectionFilter).IsAssignableFrom(t);
         }
     }

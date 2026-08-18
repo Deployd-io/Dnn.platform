@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -51,6 +52,7 @@
                     "h5", "h6", "head", "html", "iframe", "layer", "legend", "object", "ol", "p", "select", "table", "ul"];
 
   function autoCloseGT(cm) {
+	logger.debug(`>>> Entering autoCloseGT(cm=${cm})`);
     if (cm.getOption("disableInput")) return CodeMirror.Pass;
     var ranges = cm.listSelections(), replacements = [];
     for (var i = 0; i < ranges.length; i++) {
@@ -92,6 +94,7 @@
         cm.indentLine(info.newPos.line + 1, null, true);
       }
     }
+	logger.debug(`<<< Exiting autoCloseGT(cm=${cm})`);
   }
 
   function autoCloseCurrent(cm, typingSlash) {
@@ -133,16 +136,20 @@
   }
 
   function autoCloseSlash(cm) {
+	logger.debug(`>>> Entering autoCloseSlash(cm=${cm})`);
     if (cm.getOption("disableInput")) return CodeMirror.Pass;
+	logger.debug(`<<< Exiting autoCloseSlash(cm=${cm})`);
     return autoCloseCurrent(cm, true);
   }
 
   CodeMirror.commands.closeTag = function(cm) { return autoCloseCurrent(cm); };
 
   function indexOf(collection, elt) {
+	logger.debug(`>>> Entering indexOf(collection=${collection},elt=${elt})`);
     if (collection.indexOf) return collection.indexOf(elt);
     for (var i = 0, e = collection.length; i < e; ++i)
       if (collection[i] == elt) return i;
+	logger.debug(`<<< Exiting indexOf(collection=${collection},elt=${elt})`);
     return -1;
   }
 
@@ -164,6 +171,7 @@
       if (!next || next.tag != tagName) return false;
       pos = next.to;
     }
+	logger.debug(`<<< Exiting closingTagExists(cm=${cm},tagName=${tagName},pos=${pos},state=${state},newTag=${newTag})`);
     return true;
   }
 });

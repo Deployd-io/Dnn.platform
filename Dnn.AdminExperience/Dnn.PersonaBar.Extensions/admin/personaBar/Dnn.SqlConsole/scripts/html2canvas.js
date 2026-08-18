@@ -1,3 +1,4 @@
+const logger = console;
 ﻿/*
   html2canvas 0.4.1 <http://html2canvas.hertzen.com>
   Copyright (c) 2013 Niklas von Hertzen
@@ -248,6 +249,7 @@ function parseBackgroundSizePosition(value, element, attribute, index) {
                 // IE 9 doesn't return double digit always
                 value[1] = value[0];
             }
+			logger.debug(`<<< Exiting toPX(element=${element},attribute=${attribute},value=${value})`);
         }
         value[1] = (value[1].indexOf("%") === -1) ? toPX(element, attribute + "Y", value[1]) : value[1];
     }
@@ -418,6 +420,7 @@ _html2canvas.Util.isTransparent = function(backgroundColor) {
   return (backgroundColor === "transparent" || backgroundColor === "rgba(0, 0, 0, 0)");
 };
 _html2canvas.Util.Font = (function () {
+logger.debug(`>>> Entering function(colorStop=${colorStop})`);
 
   var fontData = {};
 
@@ -803,10 +806,13 @@ _html2canvas.Util.Font = (function () {
       }
     }
 
+	logger.debug(`<<< Exiting function(colorStop=${colorStop})`);
     return gradient;
   };
 
   function addScrollStops(grad) {
+	logger.debug(`>>> Entering addScrollStops(grad=${grad})`);
+	logger.debug(`<<< Exiting addScrollStops(grad=${grad})`);
     return function(colorStop) {
       try {
         grad.addColorStop(colorStop.stop, colorStop.color);
@@ -907,6 +913,7 @@ _html2canvas.Util.Font = (function () {
   };
 })();
 function h2cRenderContext(width, height) {
+logger.debug(`>>> Entering h2cRenderContext(width=${width},height=${height})`);
   var storage = [];
   return {
     storage: storage,
@@ -1011,6 +1018,7 @@ function h2cRenderContext(width, height) {
         name: "drawImage",
         'arguments': arguments
       });
+	logger.debug(`<<< Exiting drawImage(ctx=${ctx})`);
     },
     fillText: function () {
       storage.push({
@@ -1025,6 +1033,7 @@ function h2cRenderContext(width, height) {
         name: variable,
         'arguments': value
       });
+	logger.debug(`<<< Exiting h2cRenderContext(width=${width},height=${height})`);
       return value;
     }
   };
@@ -1051,6 +1060,8 @@ _html2canvas.Parse = function (images, options) {
   images = images || {};
 
   function documentWidth () {
+	logger.debug('>>> Entering documentWidth()');
+	logger.debug('<<< Exiting documentWidth()');
     return Math.max(
       Math.max(doc.body.scrollWidth, doc.documentElement.scrollWidth),
       Math.max(doc.body.offsetWidth, doc.documentElement.offsetWidth),
@@ -1059,6 +1070,8 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function documentHeight () {
+	logger.debug('>>> Entering documentHeight()');
+	logger.debug('<<< Exiting documentHeight()');
     return Math.max(
       Math.max(doc.body.scrollHeight, doc.documentElement.scrollHeight),
       Math.max(doc.body.offsetHeight, doc.documentElement.offsetHeight),
@@ -1077,10 +1090,13 @@ _html2canvas.Parse = function (images, options) {
       ctx.fillRect(x, y, w, h);
       numDraws+=1;
     }
+	logger.debug(`<<< Exiting renderRect(ctx=${ctx},x=${x},y=${y},w=${w},h=${h},bgcolor=${bgcolor})`);
   }
 
   function capitalize(m, p1, p2) {
+	logger.debug(`>>> Entering capitalize(m=${m},p1=${p1},p2=${p2})`);
     if (m.length > 0) {
+	logger.debug(`<<< Exiting capitalize(m=${m},p1=${p1},p2=${p2})`);
       return p1 + p2.toUpperCase();
     }
   }
@@ -1094,11 +1110,14 @@ _html2canvas.Parse = function (images, options) {
       case "uppercase":
         return text.toUpperCase();
       default:
+	logger.debug(`<<< Exiting textTransform(text=${text},transform=${transform})`);
         return text;
     }
   }
 
   function noLetterSpacing(letter_spacing) {
+	logger.debug(`>>> Entering noLetterSpacing(letter_spacing=${letter_spacing})`);
+	logger.debug(`<<< Exiting noLetterSpacing(letter_spacing=${letter_spacing})`);
     return (/^(normal|none|0px)$/.test(letter_spacing));
   }
 
@@ -1107,6 +1126,7 @@ _html2canvas.Parse = function (images, options) {
       ctx.fillText(currentText, x, y);
       numDraws+=1;
     }
+	logger.debug(`<<< Exiting drawText(currentText=${currentText},x=${x},y=${y},ctx=${ctx})`);
   }
 
   function setTextVariables(ctx, el, text_decoration, color) {
@@ -1158,6 +1178,7 @@ _html2canvas.Parse = function (images, options) {
         renderRect(ctx, bounds.left, Math.ceil(bounds.top + metrics.middle + metrics.lineWidth), bounds.width, 1, color);
         break;
     }
+	logger.debug(`<<< Exiting renderTextDecoration(ctx=${ctx},text_decoration=${text_decoration},bounds=${bounds},metrics=${metrics},color=${color})`);
   }
 
   function getTextBounds(state, text, textDecoration, isLast, transform) {
@@ -1176,9 +1197,12 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function textRangeBounds(text, textNode, textOffset) {
+	logger.debug(`>>> Entering textRangeBounds(text=${text},textNode=${textNode},textOffset=${textOffset})`);
     var range = doc.createRange();
     range.setStart(textNode, textOffset);
+	logger.debug(`textRangeBounds(text=${text},textNode=${textNode},textOffset=${textOffset}): range → ${range}`);
     range.setEnd(textNode, textOffset + text.length);
+	logger.debug(`<<< Exiting textRangeBounds(text=${text},textNode=${textNode},textOffset=${textOffset})`);
     return range.getBoundingClientRect();
   }
 
@@ -1196,6 +1220,7 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function renderText(el, textNode, stack) {
+	logger.debug(`>>> Entering renderText(el=${el},textNode=${textNode},stack=${stack})`);
     var ctx = stack.ctx,
     color = getCSS(el, "color"),
     textDecoration = getCSS(el, "textDecoration"),
@@ -1219,17 +1244,21 @@ _html2canvas.Parse = function (images, options) {
 
       if (options.chinese) {
         textList.forEach(function(word, index) {
+		logger.debug(`>>> Entering forEach(word=${word})`);
           if (/.*[\u4E00-\u9FA5].*$/.test(word)) {
             word = word.split("");
             word.unshift(index, 1);
             textList.splice.apply(textList, word);
+			logger.debug(`<<< Exiting forEach(word=${word})`);
           }
         });
       }
 
       textList.forEach(function(text, index) {
         var bounds = getTextBounds(state, text, textDecoration, (index < textList.length - 1), stack.transform.matrix);
+		logger.debug(`<<< Exiting renderText(el=${el},textNode=${textNode},stack=${stack})`);
         if (bounds) {
+		logger.debug(`forEach(bounds=${bounds}): bounds → ${bounds}`);
           drawText(text, bounds.left, bounds.bottom, ctx);
           renderTextDecoration(ctx, textDecoration, bounds, metrics, color);
         }
@@ -1238,9 +1267,11 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function listPosition (element, val) {
+	logger.debug(`>>> Entering listPosition(element=${element},val=${val})`);
     var boundElement = doc.createElement( "boundelement" ),
     originalType,
     bounds;
+	logger.debug(`listPosition(element=${element},val=${val}): boundElement → ${boundElement}`);
 
     boundElement.style.display = "inline";
 
@@ -1254,10 +1285,12 @@ _html2canvas.Parse = function (images, options) {
     bounds = Util.Bounds(boundElement);
     element.removeChild(boundElement);
     element.style.listStyleType = originalType;
+	logger.debug(`<<< Exiting listPosition(element=${element},val=${val})`);
     return bounds;
   }
 
   function elementIndex(el) {
+	logger.debug(`>>> Entering elementIndex(el=${el})`);
     var i = -1,
     count = 1,
     childs = el.parentNode.childNodes;
@@ -1270,6 +1303,7 @@ _html2canvas.Parse = function (images, options) {
       }
       return count;
     } else {
+	logger.debug(`<<< Exiting elementIndex(el=${el})`);
       return -1;
     }
   }
@@ -1321,10 +1355,12 @@ _html2canvas.Parse = function (images, options) {
 
       drawText(text, x, listBounds.bottom, ctx);
     }
+	logger.debug(`<<< Exiting renderListItem(element=${element},stack=${stack},elBounds=${elBounds})`);
   }
 
   function loadImage (src){
     var img = images[src];
+	logger.debug(`<<< Exiting loadImage(src=${src})`);
     return (img && img.succeeded === true) ? img.img : false;
   }
 
@@ -1365,6 +1401,7 @@ _html2canvas.Parse = function (images, options) {
     if (parentStack) {
       parentStack.zIndex.children.push(stack);
     }
+	logger.debug(`<<< Exiting setZ(element=${element},stack=${stack},parentStack=${parentStack})`);
   }
 
   function renderImage(ctx, element, image, bounds, borders) {
@@ -1386,19 +1423,23 @@ _html2canvas.Parse = function (images, options) {
       bounds.width - (borders[1].width + borders[3].width + paddingLeft + paddingRight), //dw
       bounds.height - (borders[0].width + borders[2].width + paddingTop + paddingBottom) //dh
       );
+	logger.debug(`<<< Exiting renderImage(ctx=${ctx},element=${element},image=${image},bounds=${bounds},borders=${borders})`);
   }
 
   function getBorderData(element) {
     return ["Top", "Right", "Bottom", "Left"].map(function(side) {
+	logger.debug('>>> Entering map()');
       return {
         width: getCSSInt(element, 'border' + side + 'Width'),
         color: getCSS(element, 'border' + side + 'Color')
       };
     });
+	logger.debug(`<<< Exiting getBorderData(element=${element})`);
   }
 
   function getBorderRadiusData(element) {
     return ["TopLeft", "TopRight", "BottomRight", "BottomLeft"].map(function(side) {
+	logger.debug(`<<< Exiting getBorderRadiusData(element=${element})`);
       return getCSS(element, 'border' + side + 'Radius');
     });
   }
@@ -1468,14 +1509,18 @@ _html2canvas.Parse = function (images, options) {
   })(4 * ((Math.sqrt(2) - 1) / 3));
 
   function bezierCurve(start, startControl, endControl, end) {
+logger.debug(`>>> Entering bezierCurve(start=${start},startControl=${startControl},endControl=${endControl},end=${end})`);
 
     var lerp = function (a, b, t) {
+	logger.debug(`>>> Entering lerp(a=${a},b=${b},t=${t})`);
+	logger.debug(`<<< Exiting lerp(a=${a},b=${b},t=${t})`);
       return {
         x:a.x + (b.x - a.x) * t,
         y:a.y + (b.y - a.y) * t
       };
     };
 
+	logger.debug(`<<< Exiting bezierCurve(start=${start},startControl=${startControl},endControl=${endControl},end=${end})`);
     return {
       start: start,
       startControl: startControl,
@@ -1488,6 +1533,7 @@ _html2canvas.Parse = function (images, options) {
         abbc = lerp(ab, bc, t),
         bccd = lerp(bc, cd, t),
         dest = lerp(abbc, bccd, t);
+		logger.debug(`subdivide(t=${t}): ab → ${ab}`);
         return [bezierCurve(start, ab, abbc, dest), bezierCurve(dest, bccd, cd, end)];
       },
       curveTo: function(borderArgs) {
@@ -1511,9 +1557,11 @@ _html2canvas.Parse = function (images, options) {
     if (radius2[0] > 0 || radius2[1] > 0) {
       borderArgs.push(["line", corner2[0].start.x, corner2[0].start.y]);
     }
+	logger.debug(`<<< Exiting parseCorner(borderArgs=${borderArgs},radius1=${radius1},radius2=${radius2},corner1=${corner1},corner2=${corner2},x=${x},y=${y})`);
   }
 
   function drawSide(borderData, radius1, radius2, outer1, inner1, outer2, inner2) {
+	logger.debug(`>>> Entering drawSide(borderData=${borderData},radius1=${radius1},radius2=${radius2},outer1=${outer1},inner1=${inner1},outer2=${outer2},inner2=${inner2})`);
     var borderArgs = [];
 
     if (radius1[0] > 0 || radius1[1] > 0) {
@@ -1540,6 +1588,7 @@ _html2canvas.Parse = function (images, options) {
       borderArgs.push([ "line", borderData.c4[0], borderData.c4[1]]);
     }
 
+	logger.debug(`<<< Exiting drawSide(borderData=${borderData},radius1=${radius1},radius2=${radius2},outer1=${outer1},inner1=${inner1},outer2=${outer2},inner2=${inner2})`);
     return borderArgs;
   }
 
@@ -1753,14 +1802,17 @@ _html2canvas.Parse = function (images, options) {
       ctx.fill();
       numDraws+=1;
     }
+	logger.debug(`<<< Exiting renderBorders(ctx=${ctx},borderArgs=${borderArgs},color=${color})`);
   }
 
   function renderFormValue (el, bounds, stack){
+logger.debug(`>>> Entering renderFormValue(el=${el},bounds=${bounds},stack=${stack})`);
 
     var valueWrap = doc.createElement('valuewrap'),
     cssPropertyArray = ['lineHeight','textAlign','fontFamily','color','fontSize','paddingLeft','paddingTop','width','height','border','borderLeftWidth','borderTopWidth'],
     textValue,
     textNode;
+	logger.debug(`renderFormValue(el=${el},bounds=${bounds},stack=${stack}): valueWrap → ${valueWrap}`);
 
     cssPropertyArray.forEach(function(property) {
       try {
@@ -1795,6 +1847,7 @@ _html2canvas.Parse = function (images, options) {
 
     renderText(el, textNode, stack);
     body.removeChild(valueWrap);
+	logger.debug(`<<< Exiting renderFormValue(el=${el},bounds=${bounds},stack=${stack})`);
   }
 
   function drawImage (ctx) {
@@ -1803,12 +1856,15 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function getPseudoElement(el, which) {
+	logger.debug(`>>> Entering getPseudoElement(el=${el},which=${which})`);
     var elStyle = window.getComputedStyle(el, which);
     if(!elStyle || !elStyle.content || elStyle.content === "none" || elStyle.content === "-moz-alt-content" || elStyle.display === "none") {
+	logger.debug(`getPseudoElement(el=${el},which=${which}): elStyle → ${elStyle}`);
       return;
     }
     var content = elStyle.content + '',
     first = content.substr( 0, 1 );
+	logger.debug(`getPseudoElement(el=${el},which=${which}): content → ${content}`);
     //strips quotes
     if(first === content.substr( content.length - 1 ) && first.match(/'|"/)) {
       content = content.substr( 1, content.length - 2 );
@@ -1837,12 +1893,16 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function indexedProperty(property) {
+	logger.debug(`>>> Entering indexedProperty(property=${property})`);
+	logger.debug(`<<< Exiting indexedProperty(property=${property})`);
     return (isNaN(window.parseInt(property, 10)));
   }
 
   function injectPseudoElements(el, stack) {
+	logger.debug(`>>> Entering injectPseudoElements(el=${el},stack=${stack})`);
     var before = getPseudoElement(el, ':before'),
     after = getPseudoElement(el, ':after');
+	logger.debug(`injectPseudoElements(el=${el},stack=${stack}): before → ${before}`);
     if(!before && !after) {
       return;
     }
@@ -1861,6 +1921,7 @@ _html2canvas.Parse = function (images, options) {
       parseElement(after, stack, true);
       el.removeChild(after);
       el.className = el.className.replace(pseudoHide + "-after", "").trim();
+	logger.debug(`<<< Exiting injectPseudoElements(el=${el},stack=${stack})`);
     }
 
   }
@@ -1873,6 +1934,7 @@ _html2canvas.Parse = function (images, options) {
     ctx.translate(offsetX, offsetY);
     ctx.fill();
     ctx.translate(-offsetX, -offsetY);
+	logger.debug(`<<< Exiting renderBackgroundRepeat(ctx=${ctx},image=${image},backgroundPosition=${backgroundPosition},bounds=${bounds})`);
   }
 
   function backgroundRepeatShape(ctx, image, backgroundPosition, bounds, left, top, width, height) {
@@ -1886,6 +1948,7 @@ _html2canvas.Parse = function (images, options) {
     ctx.clip();
     renderBackgroundRepeat(ctx, image, backgroundPosition, bounds);
     ctx.restore();
+	logger.debug(`<<< Exiting backgroundRepeatShape(ctx=${ctx},image=${image},backgroundPosition=${backgroundPosition},bounds=${bounds},left=${left},top=${top},width=${width},height=${height})`);
   }
 
   function renderBackgroundColor(ctx, backgroundBounds, bgcolor) {
@@ -1897,6 +1960,7 @@ _html2canvas.Parse = function (images, options) {
       backgroundBounds.height,
       bgcolor
       );
+	logger.debug(`<<< Exiting renderBackgroundColor(ctx=${ctx},backgroundBounds=${backgroundBounds},bgcolor=${bgcolor})`);
   }
 
   function renderBackgroundRepeating(el, bounds, ctx, image, imageIndex) {
@@ -1933,6 +1997,7 @@ _html2canvas.Parse = function (images, options) {
         });
         break;
     }
+	logger.debug(`<<< Exiting renderBackgroundRepeating(el=${el},bounds=${bounds},ctx=${ctx},image=${image},imageIndex=${imageIndex})`);
   }
 
   function renderBackgroundImage(element, bounds, ctx) {
@@ -1961,6 +2026,7 @@ _html2canvas.Parse = function (images, options) {
         Util.log("html2canvas: Error loading background:", backgroundImage);
       }
     }
+	logger.debug(`<<< Exiting renderBackgroundImage(element=${element},bounds=${bounds},ctx=${ctx})`);
   }
 
   function resizeImage(image, bounds) {
@@ -1981,6 +2047,8 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function removePx(str) {
+	logger.debug(`>>> Entering removePx(str=${str})`);
+	logger.debug(`<<< Exiting removePx(str=${str})`);
     return str.replace("px", "");
   }
 
@@ -2753,6 +2821,7 @@ _html2canvas.Renderer.Canvas = function(options) {
       ctx[arg.name].apply(ctx, arg['arguments']);
     });
     ctx.closePath();
+	logger.debug(`<<< Exiting createShape(ctx=${ctx},args=${args})`);
   }
 
   function safeImage(item) {
@@ -2865,4 +2934,5 @@ _html2canvas.Renderer.Canvas = function(options) {
     return canvas;
   };
 };
+logger.debug(`<<< Exiting function(elem=${elem})`);
 })(window,document);

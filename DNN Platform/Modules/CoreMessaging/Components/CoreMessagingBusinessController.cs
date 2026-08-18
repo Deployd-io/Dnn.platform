@@ -26,21 +26,25 @@ namespace DotNetNuke.Modules.CoreMessaging.Components
         /// <returns>"Success" or "Failed".</returns>
         public string UpgradeModule(string version)
         {
+			Logger.LogDebug(">>> Entering UpgradeModule(version={Version})", version);
             try
             {
                 switch (version)
                 {
                     case "06.02.00":
                         var moduleDefinition = ModuleDefinitionController.GetModuleDefinitionByFriendlyName("Message Center");
+						Logger.LogDebug("UpgradeModule(version={Version}): moduleDefinition → {ModuleDefinition}", version, moduleDefinition);
                         if (moduleDefinition != null)
                         {
                             var portals = PortalController.Instance.GetPortals();
+							Logger.LogDebug("UpgradeModule(version={Version}): portals → {Portals}", version, portals);
                             foreach (IPortalInfo portal in portals)
                             {
                                 if (portal.UserTabId > Null.NullInteger)
                                 {
                                     // Find TabInfo
                                     var tab = TabController.Instance.GetTab(portal.UserTabId, portal.PortalId, true);
+									Logger.LogDebug("UpgradeModule(version={Version}): tab → {Tab}", version, tab);
                                     if (tab != null)
                                     {
                                         foreach (var module in ModuleController.Instance.GetTabModules(portal.UserTabId).Values)
@@ -70,6 +74,7 @@ namespace DotNetNuke.Modules.CoreMessaging.Components
             {
                 Logger.Error(exc);
 
+				Logger.LogDebug("<<< Exiting UpgradeModule(version={Version})", version);
                 return "Failed";
             }
         }

@@ -37,6 +37,7 @@ namespace DotNetNuke.Security.Permissions
         public PermissionController()
             : this(null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering PermissionController()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="PermissionController"/> class.</summary>
@@ -50,9 +51,11 @@ namespace DotNetNuke.Security.Permissions
 
         public static string BuildPermissions(IList permissions, string permissionKey)
         {
+			eventLogger.LogDebug(">>> Entering BuildPermissions(permissions={Permissions},permissionKey={PermissionKey})", permissions, permissionKey);
             var permissionsBuilder = new StringBuilder();
             foreach (IPermissionInfo permission in permissions)
             {
+			eventLogger.LogDebug("BuildPermissions(permissions={Permissions},permissionKey={PermissionKey}): permissionsBuilder → {PermissionsBuilder}", permissions, permissionKey, permissionsBuilder);
                 if (permissionKey.Equals(permission.PermissionKey, StringComparison.OrdinalIgnoreCase))
                 {
                     // Deny permissions are prefixed with a "!"
@@ -63,6 +66,7 @@ namespace DotNetNuke.Security.Permissions
                     if (Null.IsNull(permission.UserId))
                     {
                         permissionString = prefix + permission.RoleName + ";";
+						eventLogger.LogDebug("BuildPermissions(permissions={Permissions},permissionKey={PermissionKey}): permissionString → {PermissionString}", permissions, permissionKey, permissionString);
                     }
                     else
                     {
@@ -83,6 +87,7 @@ namespace DotNetNuke.Security.Permissions
 
             // get string
             string permissionsString = permissionsBuilder.ToString();
+			eventLogger.LogDebug("BuildPermissions(permissions={Permissions},permissionKey={PermissionKey}): permissionsString → {PermissionsString}", permissions, permissionKey, permissionsString);
 
             // ensure leading delimiter
             if (!permissionsString.StartsWith(";", StringComparison.Ordinal))
@@ -90,6 +95,7 @@ namespace DotNetNuke.Security.Permissions
                 permissionsString = permissionsString.Insert(0, ";");
             }
 
+			eventLogger.LogDebug("<<< Exiting BuildPermissions(permissions={Permissions},permissionKey={PermissionKey})", permissions, permissionKey);
             return permissionsString;
         }
 
@@ -97,6 +103,8 @@ namespace DotNetNuke.Security.Permissions
         [DnnDeprecated(9, 13, 1, $"Use {nameof(IPermissionDefinitionService)}.{nameof(IPermissionDefinitionService.GetDefinitionsByFolder)} instead.")]
         public static partial ArrayList GetPermissionsByFolder()
         {
+			eventLogger.LogDebug(">>> Entering GetPermissionsByFolder()");
+			eventLogger.LogDebug("<<< Exiting GetPermissionsByFolder()");
             return new ArrayList(GetPermissionsByFolderEnumerable(Globals.GetCurrentServiceProvider().GetRequiredService<DataProvider>(), Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>()).ToArray());
         }
 
@@ -104,6 +112,8 @@ namespace DotNetNuke.Security.Permissions
         [DnnDeprecated(9, 13, 1, $"Use {nameof(IPermissionDefinitionService)}.{nameof(IPermissionDefinitionService.GetDefinitionsByPortalDesktopModule)} instead.")]
         public static partial ArrayList GetPermissionsByPortalDesktopModule()
         {
+			eventLogger.LogDebug(">>> Entering GetPermissionsByPortalDesktopModule()");
+			eventLogger.LogDebug("<<< Exiting GetPermissionsByPortalDesktopModule()");
             return new ArrayList(GetPermissionsByPortalDesktopModuleEnumerable(Globals.GetCurrentServiceProvider().GetRequiredService<DataProvider>(), Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>()).ToArray());
         }
 
@@ -111,12 +121,15 @@ namespace DotNetNuke.Security.Permissions
         [DnnDeprecated(9, 13, 1, $"Use {nameof(IPermissionDefinitionService)}.{nameof(IPermissionDefinitionService.GetDefinitionsByTab)} instead.")]
         public static partial ArrayList GetPermissionsByTab()
         {
+			eventLogger.LogDebug(">>> Entering GetPermissionsByTab()");
+			eventLogger.LogDebug("<<< Exiting GetPermissionsByTab()");
             return new ArrayList(GetPermissionsByTabEnumerable(Globals.GetCurrentServiceProvider().GetRequiredService<DataProvider>(), Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>()).ToArray());
         }
 
         /// <inheritdoc cref="IPermissionDefinitionService.AddDefinition" />
         public int AddPermission(PermissionInfo permission)
         {
+			eventLogger.LogDebug("<<< Exiting AddPermission(permission={Permission})", permission);
             return this.AddPermission((IPermissionDefinitionInfo)permission);
         }
 
@@ -140,6 +153,7 @@ namespace DotNetNuke.Security.Permissions
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public void DeletePermission(int permissionID)
         {
+			eventLogger.LogDebug(">>> Entering DeletePermission(permissionID={PermissionID})", permissionID);
             this.eventLogger.AddLog(
                 "PermissionID",
                 permissionID.ToString(CultureInfo.InvariantCulture),
@@ -148,12 +162,15 @@ namespace DotNetNuke.Security.Permissions
                 EventLogType.PERMISSION_DELETED);
             this.dataProvider.DeletePermission(permissionID);
             ClearCache();
+			eventLogger.LogDebug("<<< Exiting DeletePermission(permissionID={PermissionID})", permissionID);
         }
 
         /// <inheritdoc cref="IPermissionDefinitionService.GetDefinition" />
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public PermissionInfo GetPermission(int permissionID)
         {
+			eventLogger.LogDebug(">>> Entering GetPermission(permissionID={PermissionID})", permissionID);
+			eventLogger.LogDebug("<<< Exiting GetPermission(permissionID={PermissionID})", permissionID);
             return GetPermissions(this.dataProvider, this.hostSettings).SingleOrDefault(p => ((IPermissionDefinitionInfo)p).PermissionId == permissionID);
         }
 
@@ -161,6 +178,8 @@ namespace DotNetNuke.Security.Permissions
         [DnnDeprecated(9, 13, 1, $"Use {nameof(IPermissionDefinitionService)}.{nameof(IPermissionDefinitionService.GetDefinitionsByCodeAndKey)} instead.")]
         public partial ArrayList GetPermissionByCodeAndKey(string permissionCode, string permissionKey)
         {
+			eventLogger.LogDebug(">>> Entering GetPermissionByCodeAndKey(permissionCode={PermissionCode},permissionKey={PermissionKey})", permissionCode, permissionKey);
+			eventLogger.LogDebug("<<< Exiting GetPermissionByCodeAndKey(permissionCode={PermissionCode},permissionKey={PermissionKey})", permissionCode, permissionKey);
             return new ArrayList(GetPermissionByCodeAndKeyEnumerable(this.dataProvider, this.hostSettings, permissionCode, permissionKey).ToArray());
         }
 
@@ -168,6 +187,8 @@ namespace DotNetNuke.Security.Permissions
         [DnnDeprecated(9, 13, 1, $"Use {nameof(IPermissionDefinitionService)}.{nameof(IPermissionDefinitionService.GetDefinitionsByModuleDefId)} instead.")]
         public partial ArrayList GetPermissionsByModuleDefID(int moduleDefID)
         {
+			eventLogger.LogDebug(">>> Entering GetPermissionsByModuleDefID(moduleDefID={ModuleDefID})", moduleDefID);
+			eventLogger.LogDebug("<<< Exiting GetPermissionsByModuleDefID(moduleDefID={ModuleDefID})", moduleDefID);
             return new ArrayList(GetPermissionsByModuleDefIdEnumerable(this.dataProvider, this.hostSettings, moduleDefID).ToArray());
         }
 
@@ -175,6 +196,8 @@ namespace DotNetNuke.Security.Permissions
         [DnnDeprecated(9, 13, 1, $"Use {nameof(IPermissionDefinitionService)}.{nameof(IPermissionDefinitionService.GetDefinitionsByModule)} instead.")]
         public partial ArrayList GetPermissionsByModule(int moduleId, int tabId)
         {
+			eventLogger.LogDebug(">>> Entering GetPermissionsByModule(moduleId={ModuleId},tabId={TabId})", moduleId, tabId);
+			eventLogger.LogDebug("<<< Exiting GetPermissionsByModule(moduleId={ModuleId},tabId={TabId})", moduleId, tabId);
             return new ArrayList(GetPermissionsByModuleEnumerable(this.dataProvider, this.hostSettings, moduleId, tabId).ToArray());
         }
 
@@ -182,6 +205,8 @@ namespace DotNetNuke.Security.Permissions
         public void UpdatePermission(PermissionInfo permission)
         {
             this.UpdatePermission((IPermissionDefinitionInfo)permission);
+			eventLogger.LogDebug(">>> Entering UpdatePermission(permission={Permission})", permission);
+			eventLogger.LogDebug("<<< Exiting UpdatePermission(permission={Permission})", permission);
         }
 
         /// <inheritdoc cref="IPermissionDefinitionService.UpdateDefinition" />
@@ -202,17 +227,23 @@ namespace DotNetNuke.Security.Permissions
         public T RemapPermission<T>(T permission, int portalId)
             where T : PermissionInfoBase
         {
+			eventLogger.LogDebug(">>> Entering RemapPermission(permission={Permission},portalId={PortalId})", permission, portalId);
             var permissionInfo = this.GetPermissionByCodeAndKey(permission.PermissionCode, permission.PermissionKey).Cast<IPermissionDefinitionInfo>().FirstOrDefault();
             T result = null;
+			eventLogger.LogDebug("RemapPermission(permission={Permission},portalId={PortalId}): result → {Result}", permission, portalId, result);
+			eventLogger.LogDebug("RemapPermission(permission={Permission},portalId={PortalId}): permissionInfo → {PermissionInfo}", permission, portalId, permissionInfo);
 
             if (permissionInfo != null)
             {
                 int roleID = int.MinValue;
+				eventLogger.LogDebug("RemapPermission(permission={Permission},portalId={PortalId}): roleID → {RoleID}", permission, portalId, roleID);
                 int userID = int.MinValue;
+				eventLogger.LogDebug("RemapPermission(permission={Permission},portalId={PortalId}): userID → {UserID}", permission, portalId, userID);
 
                 if (string.IsNullOrEmpty(permission.RoleName))
                 {
                     UserInfo user = UserController.GetUserByName(portalId, permission.Username);
+					eventLogger.LogDebug("RemapPermission(permission={Permission},portalId={PortalId}): user → {User}", permission, portalId, user);
                     if (user != null)
                     {
                         userID = user.UserID;
@@ -230,6 +261,7 @@ namespace DotNetNuke.Security.Permissions
                             break;
                         default:
                             RoleInfo role = RoleController.Instance.GetRole(portalId, r => r.RoleName == permission.RoleName);
+							eventLogger.LogDebug("RemapPermission(permission={Permission},portalId={PortalId}): role → {Role}", permission, portalId, role);
                             if (role != null)
                             {
                                 roleID = role.RoleID;
@@ -257,6 +289,7 @@ namespace DotNetNuke.Security.Permissions
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting RemapPermission(permission={Permission},portalId={PortalId})", permission, portalId);
             return result;
         }
 
@@ -298,6 +331,8 @@ namespace DotNetNuke.Security.Permissions
 
         private static IEnumerable<PermissionInfo> GetPermissions(DataProvider dataProvider, IHostSettings hostSettings)
         {
+			eventLogger.LogDebug(">>> Entering GetPermissions(dataProvider={DataProvider},hostSettings={HostSettings})", dataProvider, hostSettings);
+			eventLogger.LogDebug("<<< Exiting GetPermissions(dataProvider={DataProvider},hostSettings={HostSettings})", dataProvider, hostSettings);
             return CBO.GetCachedObject<IEnumerable<PermissionInfo>>(
                 hostSettings,
                 new CacheItemArgs(
@@ -309,21 +344,29 @@ namespace DotNetNuke.Security.Permissions
 
         private static IEnumerable<PermissionInfo> GetPermissionsByFolderEnumerable(DataProvider dataProvider, IHostSettings hostSettings)
         {
+			eventLogger.LogDebug(">>> Entering GetPermissionsByFolderEnumerable(dataProvider={DataProvider},hostSettings={HostSettings})", dataProvider, hostSettings);
+			eventLogger.LogDebug("<<< Exiting GetPermissionsByFolderEnumerable(dataProvider={DataProvider},hostSettings={HostSettings})", dataProvider, hostSettings);
             return GetPermissions(dataProvider, hostSettings).Where(p => p.PermissionCode == "SYSTEM_FOLDER");
         }
 
         private static IEnumerable<PermissionInfo> GetPermissionsByPortalDesktopModuleEnumerable(DataProvider dataProvider, IHostSettings hostSettings)
         {
+			eventLogger.LogDebug(">>> Entering GetPermissionsByPortalDesktopModuleEnumerable(dataProvider={DataProvider},hostSettings={HostSettings})", dataProvider, hostSettings);
+			eventLogger.LogDebug("<<< Exiting GetPermissionsByPortalDesktopModuleEnumerable(dataProvider={DataProvider},hostSettings={HostSettings})", dataProvider, hostSettings);
             return GetPermissions(dataProvider, hostSettings).Where(p => p.PermissionCode == "SYSTEM_DESKTOPMODULE");
         }
 
         private static IEnumerable<PermissionInfo> GetPermissionsByTabEnumerable(DataProvider dataProvider, IHostSettings hostSettings)
         {
+			eventLogger.LogDebug(">>> Entering GetPermissionsByTabEnumerable(dataProvider={DataProvider},hostSettings={HostSettings})", dataProvider, hostSettings);
+			eventLogger.LogDebug("<<< Exiting GetPermissionsByTabEnumerable(dataProvider={DataProvider},hostSettings={HostSettings})", dataProvider, hostSettings);
             return GetPermissions(dataProvider, hostSettings).Where(p => p.PermissionCode == "SYSTEM_TAB");
         }
 
         private static IEnumerable<PermissionInfo> GetPermissionByCodeAndKeyEnumerable(DataProvider dataProvider, IHostSettings hostSettings, string permissionCode, string permissionKey)
         {
+			eventLogger.LogDebug(">>> Entering GetPermissionByCodeAndKeyEnumerable(dataProvider={DataProvider},hostSettings={HostSettings},permissionCode={PermissionCode},permissionKey={PermissionKey})", dataProvider, hostSettings, permissionCode, permissionKey);
+			eventLogger.LogDebug("<<< Exiting GetPermissionByCodeAndKeyEnumerable(dataProvider={DataProvider},hostSettings={HostSettings},permissionCode={PermissionCode},permissionKey={PermissionKey})", dataProvider, hostSettings, permissionCode, permissionKey);
             return GetPermissions(dataProvider, hostSettings).Where(p => p.PermissionCode.Equals(permissionCode, StringComparison.OrdinalIgnoreCase)
                                                                        && p.PermissionKey.Equals(permissionKey, StringComparison.OrdinalIgnoreCase));
         }
@@ -335,15 +378,21 @@ namespace DotNetNuke.Security.Permissions
 
         private static IEnumerable<PermissionInfo> GetPermissionsByModuleEnumerable(DataProvider dataProvider, IHostSettings hostSettings, int moduleId, int tabId)
         {
+			eventLogger.LogDebug(">>> Entering GetPermissionsByModuleEnumerable(dataProvider={DataProvider},hostSettings={HostSettings},moduleId={ModuleId},tabId={TabId})", dataProvider, hostSettings, moduleId, tabId);
             var module = ModuleController.Instance.GetModule(moduleId, tabId, false);
             var moduleDefId = module.ModuleDefID;
+			eventLogger.LogDebug("GetPermissionsByModuleEnumerable(dataProvider={DataProvider},hostSettings={HostSettings},moduleId={ModuleId},tabId={TabId}): module → {Module}", dataProvider, hostSettings, moduleId, tabId, module);
 
+			eventLogger.LogDebug("<<< Exiting GetPermissionsByModuleEnumerable(dataProvider={DataProvider},hostSettings={HostSettings},moduleId={ModuleId},tabId={TabId})", dataProvider, hostSettings, moduleId, tabId);
             return GetPermissions(dataProvider, hostSettings).Where(p => ((IPermissionDefinitionInfo)p).ModuleDefId == moduleDefId || p.PermissionCode == "SYSTEM_MODULE_DEFINITION");
         }
 
         private static void ClearCache()
         {
+			eventLogger.LogDebug(">>> Entering ClearCache()");
             DataCache.RemoveCache(DataCache.PermissionsCacheKey);
+			eventLogger.LogDebug("<<< Exiting ClearCache()");
         }
+		eventLogger.LogDebug("<<< Exiting PermissionController()");
     }
 }

@@ -7,11 +7,13 @@ import "./style.less";
 import { CommonUsersActions } from "../../../actions";
 import utilities from "utils";
 import Combobox from "react-widgets/Combobox";
+const logger = console;
 import { GridCell, Checkbox, Pager, SvgIcons } from "@dnnsoftware/dnn-react-common";
 
 class UserRoles extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             roleSelectState: { userId: -1, keyword: "" },
             currentPage: 0,
@@ -21,14 +23,18 @@ class UserRoles extends Component {
             isOwner: false,
             allowOwner: false
         };
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.getRoles();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
 
     getRoles() {
+		logger.debug('>>> Entering getRoles()');
         const {props, state} = this;
 
         let parameter = {
@@ -38,37 +44,48 @@ class UserRoles extends Component {
             pageSize: state.pageSize
         };
         props.dispatch(CommonUsersActions.getUserRoles(parameter));
+		logger.debug('<<< Exiting getRoles()');
     }
 
     getSuggestRoles() {
+		logger.debug('>>> Entering getSuggestRoles()');
         const {props, state} = this;
         let keyword = state.roleSelectState.roleId >= 0 ? "" : state.roleSelectState.keyword;
         props.dispatch(CommonUsersActions.getSuggestRoles({ keyword: keyword, count: 10 }));
+		logger.debug('<<< Exiting getSuggestRoles()');
     }
     debounceGetSuggestRoles() {
+		logger.debug('>>> Entering debounceGetSuggestRoles()');
         this.getSuggestRoles();
+		logger.debug('<<< Exiting debounceGetSuggestRoles()');
     }
 
     onRoleSelectorChanged(item) {
+		logger.debug(`>>> Entering onRoleSelectorChanged(item=${item})`);
         if (item.roleId || item.roleName) {
             return;
         }
         this.setState({ roleSelectState: { roleId: -1, keyword: item } });
         this.debounceGetSuggestRoles();
+		logger.debug(`<<< Exiting onRoleSelectorChanged(item=${item})`);
     }
 
     onRoleSelectorSelected(item) {
+		logger.debug(`>>> Entering onRoleSelectorSelected(item=${item})`);
         this.onRoleSelected(item.roleId, () => {
             this.setState({ roleSelectState: { roleId: item.roleId, keyword: item.roleName } }, () => {
                 this.getSuggestRoles();
             });
         });
+		logger.debug(`<<< Exiting onRoleSelectorSelected(item=${item})`);
     }
 
     onRoleSelectorToggle() {
+	logger.debug('>>> Entering onRoleSelectorToggle()');
     }
 
     onAddRole() {
+		logger.debug('>>> Entering onAddRole()');
         const {state} = this;
         let roleId = state.roleSelectState.roleId;
         if (roleId === -1 || roleId=== undefined) {
@@ -76,6 +93,7 @@ class UserRoles extends Component {
         }
         this.saveRole(roleId);
         this.setState({ roleSelectState: { roleId: -1, keyword: "" } });
+		logger.debug('<<< Exiting onAddRole()');
     }
     saveRole(roleId, startTime, expiresTime) {
         const {props} = this;
@@ -83,9 +101,11 @@ class UserRoles extends Component {
         let parameter = { roleId: roleId, userId: props.userDetails.userId, startTime: startTime, expiresTime: expiresTime };
         props.dispatch(CommonUsersActions.saveUserRole(parameter, this.state.sendEmail, this.state.isOwner));
         this.setState({ sendEmail: true, isOwner: false, allowOwner: false });
+		logger.debug(`<<< Exiting saveRole(roleId=${roleId},startTime=${startTime},expiresTime=${expiresTime})`);
     }
 
     onPageChanged(currentPage, pageSize) {
+		logger.debug(`>>> Entering onPageChanged(currentPage=${currentPage},pageSize=${pageSize})`);
         let {state} = this;
         if (pageSize !== undefined && state.pageSize !== pageSize) {
             state.pageSize = pageSize;
@@ -95,8 +115,10 @@ class UserRoles extends Component {
             state
         });
         this.getRoles();
+		logger.debug(`<<< Exiting onPageChanged(currentPage=${currentPage},pageSize=${pageSize})`);
     }
     getRoleRows() {
+		logger.debug('>>> Entering getRoleRows()');
         let userRoles = this.props.userRoles;
         let roleRows = userRoles.map((role, index) => {
             return <RoleRow
@@ -106,6 +128,7 @@ class UserRoles extends Component {
                 saveRole={this.saveRole.bind(this) }>
             </RoleRow>;
         });
+		logger.debug('<<< Exiting getRoleRows()');
         return <div className="user-role-body">{(userRoles.length > 0) ?
             roleRows :
             <div className="no-roles-row">{Localization.get("NoRoles") }</div> }
@@ -161,8 +184,10 @@ class UserRoles extends Component {
             />;
     }
     render() {
+		logger.debug('>>> Entering render()');
         const {state} = this;
         /* eslint-disable react/no-danger */
+		logger.debug('<<< Exiting render()');
         return <div className="userroles-form-form">
             <div className="header">
                 <div className="header-title">{Localization.get("Roles.Title") }</div>
@@ -217,6 +242,8 @@ UserRoles.defaultProps = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         matchedRoles: state.users.matchedRoles,
         userRoles: state.users.userRoles,

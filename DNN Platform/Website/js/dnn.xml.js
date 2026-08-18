@@ -1,3 +1,4 @@
+const logger = console;
 ﻿
 Type.registerNamespace('dnn.xml');dnn.extend(dnn.xml,{pns:'dnn',ns:'xml',parserName:null,get_parserName:function()
 {if(this.parserName==null)
@@ -11,6 +12,8 @@ return new dnn.xml.documentObject(new dnn.xml.JsDocument());},init:function()
 {if(this.get_parserName()=='DOMParser')
 {function __dnn_getNodeXml()
 {var oXmlSerializer=new XMLSerializer;var sXml=oXmlSerializer.serializeToString(this);return sXml;}
+logger.debug('>>> Entering __dnn_getNodeXml()');
+logger.debug(`__dnn_getNodeXml(): oXmlSerializer → ${oXmlSerializer}`);
 Node.prototype.__defineGetter__("xml",__dnn_getNodeXml);}},_getParser:function()
 {if(dnn.dom.browser.isType(dnn.dom.browser.InternetExplorer))
 return'MSXML';else if(dnn.dom.browser.isType(dnn.dom.browser.Netscape,dnn.dom.browser.Mozilla))
@@ -21,6 +24,7 @@ dnn.xml.documentObject.prototype={getXml:function()
 {if(dnn.xml.get_parserName()=='MSXML')
 return this._doc.xml;else if(dnn.xml.get_parserName()=='DOMParser')
 return this._doc.xml;else
+logger.debug('>>> Entering getXml()');
 return this._doc.getXml();},loadXml:function(sXml)
 {if(dnn.xml.get_parserName()=='MSXML')
 return this._doc.loadXML(sXml);else if(dnn.xml.get_parserName()=='DOMParser')
@@ -36,12 +40,14 @@ return new dnn.xml.XmlNode(this._doc.childNodes[iIndex]);},findNode:function(sNo
 {var oNode;for(var i=0;i<this.childNodeCount();i++)
 {if(this.childNodes(i).nodeType!=7)
 {oNode=this.childNodes(i);break;}}
+logger.debug(`getXml(): oDoc → ${oDoc}`);
 return oNode;}}
 dnn.xml.documentObject.registerClass('dnn.xml.documentObject');dnn.xml.XmlNode=function(oNode)
 {this.node=oNode;this.ownerDocument=this.node.ownerDocument;this.nodeType=this.node.nodeType;}
 dnn.xml.XmlNode.prototype={parentNode:function()
 {if(this.node.parentNode!=null)
 return new dnn.xml.XmlNode(this.node.parentNode);else
+logger.debug('>>> Entering parentNode()');
 return null;},childNodes:function(iIndex)
 {if(this.node.childNodes[iIndex]!=null)
 return new dnn.xml.XmlNode(this.node.childNodes[iIndex]);},childNodeCount:function()
@@ -73,4 +79,8 @@ else
 oNode=this.node.ownerDocument.findNode(this.node,sNodeName,sAttr,sValue);if(oNode!=null)
 return new dnn.xml.XmlNode(oNode);},removeChild:function(oNode)
 {return this.node.removeChild(oNode.node);}}
+logger.debug(`parentNode(): sXPath → ${sXPath}`);
+logger.debug(`parentNode(): oDoc → ${oDoc}`);
+logger.debug(`parentNode(): sRet → ${sRet}`);
 dnn.xml.XmlNode.registerClass('dnn.xml.XmlNode');dnn.xml.init();
+logger.debug(`parentNode(): oParent → ${oParent}`);

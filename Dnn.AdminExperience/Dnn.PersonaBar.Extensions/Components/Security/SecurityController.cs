@@ -34,35 +34,45 @@ namespace Dnn.PersonaBar.Security.Components
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public IEnumerable<string> GetAuthenticationProviders()
         {
+			eventLogger.LogDebug(">>> Entering GetAuthenticationProviders()");
             var authSystems = AuthenticationController.GetEnabledAuthenticationServices();
             UserControl uc = new UserControl();
+			eventLogger.LogDebug("GetAuthenticationProviders(): uc → {Uc}", uc);
+			eventLogger.LogDebug("GetAuthenticationProviders(): authSystems → {AuthSystems}", authSystems);
             var authProviders = from authProvider in authSystems
                                  let authLoginControl = (AuthenticationLoginBase)uc.LoadControl("~/" + authProvider.LoginControlSrc)
                                  let oAuthLoginControl = authLoginControl as OAuthLoginBase
                                  where oAuthLoginControl == null && authLoginControl.Enabled
                                  select authProvider.AuthenticationType;
 
+			eventLogger.LogDebug("<<< Exiting GetAuthenticationProviders()");
             return authProviders;
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public IList<UserRoleInfo> GetAdminUsers(int portalId, string cultureCode = "")
         {
+			eventLogger.LogDebug(">>> Entering GetAdminUsers(portalId={PortalId},cultureCode={CultureCode})", portalId, cultureCode);
             var activeLanguage = string.IsNullOrEmpty(cultureCode)
                 ? LocaleController.Instance.GetDefaultLocale(portalId).Code
                 : cultureCode;
             var portal = PortalController.Instance.GetPortal(portalId, activeLanguage);
+			eventLogger.LogDebug("GetAdminUsers(portalId={PortalId},cultureCode={CultureCode}): portal → {Portal}", portalId, cultureCode, portal);
             var adminUsers = RoleController.Instance.GetUserRoles(portalId, null, portal.AdministratorRoleName);
+			eventLogger.LogDebug("GetAdminUsers(portalId={PortalId},cultureCode={CultureCode}): adminUsers → {AdminUsers}", portalId, cultureCode, adminUsers);
 
+			eventLogger.LogDebug("<<< Exiting GetAdminUsers(portalId={PortalId},cultureCode={CultureCode})", portalId, cultureCode);
             return adminUsers;
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public TabDto GetPortalTabs(int portalId, string cultureCode, bool isMultiLanguage)
         {
+			eventLogger.LogDebug(">>> Entering GetPortalTabs(portalId={PortalId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage})", portalId, cultureCode, isMultiLanguage);
             if (string.IsNullOrEmpty(cultureCode))
             {
                 cultureCode = LocaleController.Instance.GetDefaultLocale(portalId).Code;
+				eventLogger.LogDebug("GetPortalTabs(portalId={PortalId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage}): cultureCode → {CultureCode1}", portalId, cultureCode, isMultiLanguage, cultureCode);
             }
 
             var rootNode = new TabDto
@@ -74,7 +84,9 @@ namespace Dnn.PersonaBar.Security.Components
             };
 
             var portalInfo = PortalController.Instance.GetPortal(portalId);
+			eventLogger.LogDebug("GetPortalTabs(portalId={PortalId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage}): portalInfo → {PortalInfo}", portalId, cultureCode, isMultiLanguage, portalInfo);
             var tabs = TabController.GetPortalTabs(isMultiLanguage ? TabController.GetTabsBySortOrder(portalId, portalInfo.DefaultLanguage, true) : TabController.GetTabsBySortOrder(portalId, cultureCode, true), Null.NullInteger, false, "<" + Localization.GetString("None_Specified") + ">", true, false, true, false, false).Where(t => !t.IsSystem).ToList();
+			eventLogger.LogDebug("GetPortalTabs(portalId={PortalId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage}): tabs → {Tabs}", portalId, cultureCode, isMultiLanguage, tabs);
             foreach (var tab in tabs)
             {
                 if (tab.Level == 0 && tab.TabID != portalInfo.AdminTabId)
@@ -92,15 +104,21 @@ namespace Dnn.PersonaBar.Security.Components
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting GetPortalTabs(portalId={PortalId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage})", portalId, cultureCode, isMultiLanguage);
             return rootNode;
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public List<DataTable> GetModifiedSettings()
         {
+			eventLogger.LogDebug(">>> Entering GetModifiedSettings()");
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var tables = new List<DataTable>();
             var reader = DataProvider.Instance().ExecuteReader("SecurityAnalyzer_GetModifiedSettings");
             if (reader != null)
+			eventLogger.LogDebug("GetModifiedSettings(): tables → {Tables}", tables);
+			eventLogger.LogDebug("GetModifiedSettings(): reader → {Reader}", reader);
+			eventLogger.LogInformation("GetModifiedSettings(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
             {
                 do
                 {
@@ -111,6 +129,7 @@ namespace Dnn.PersonaBar.Security.Components
                 while (!reader.IsClosed);
             }
 
+			eventLogger.LogDebug("<<< Exiting GetModifiedSettings()");
             return tables;
         }
 
@@ -141,6 +160,7 @@ namespace Dnn.PersonaBar.Security.Components
                     }
                 }
             }
+			eventLogger.LogDebug("<<< Exiting AddChildNodes(parentNode={ParentNode},portal={Portal},cultureCode={CultureCode})", parentNode, portal, cultureCode);
         }
 
         private static TabCollection GetFilteredTabs(TabCollection tabs)

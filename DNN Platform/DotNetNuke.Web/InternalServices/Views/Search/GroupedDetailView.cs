@@ -8,10 +8,13 @@ namespace DotNetNuke.Web.InternalServices.Views.Search
     /// <summary>DetailedView grouped by Url (TabId).</summary>
     public class GroupedDetailView
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(GroupedDetailView));
         /// <summary>Initializes a new instance of the <see cref="GroupedDetailView"/> class.</summary>
         public GroupedDetailView()
         {
+			Logger.LogDebug(">>> Entering GroupedDetailView()");
             this.Results = new List<DetailedView>();
+			Logger.LogDebug("<<< Exiting GroupedDetailView()");
         }
 
         /// <summary>Gets or sets document's Url.</summary>

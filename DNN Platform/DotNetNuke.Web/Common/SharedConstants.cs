@@ -9,6 +9,7 @@ namespace DotNetNuke.Web.Common
     /// <summary>Common localized text.</summary>
     public static class SharedConstants
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SharedConstants));
         /// <summary>The localized text to display for the root folder of a portal's files.</summary>
         public static readonly string RootFolder;
 
@@ -20,9 +21,14 @@ namespace DotNetNuke.Web.Common
 
         static SharedConstants()
         {
+			Logger.LogDebug(">>> Entering SharedConstants()");
             RootFolder = Localization.GetString("RootFolder.Name", Localization.SharedResourceFile);
             HostRootFolder = Localization.GetString("HostRootFolder.Name", Localization.SharedResourceFile);
+			Logger.LogDebug("SharedConstants(): HostRootFolder → {HostRootFolder}", HostRootFolder);
+			Logger.LogDebug("SharedConstants(): RootFolder → {RootFolder}", RootFolder);
             Unspecified = "<" + Localization.GetString("None_Specified", Localization.SharedResourceFile) + ">";
+			Logger.LogDebug("SharedConstants(): Unspecified → {Unspecified}", Unspecified);
+			Logger.LogDebug("<<< Exiting SharedConstants()");
         }
     }
 }

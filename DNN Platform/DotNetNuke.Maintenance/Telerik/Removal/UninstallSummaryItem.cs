@@ -8,17 +8,23 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
     using System.Linq;
 
     using DotNetNuke.Maintenance.Telerik.Steps;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>A data transfer object with an uninstallation summary item.</summary>
     public class UninstallSummaryItem
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>Initializes a new instance of the <see cref="UninstallSummaryItem"/> class.</summary>
         /// <param name="step">The step to summarize.</param>
         internal UninstallSummaryItem(IStep step)
         {
+			_logger.LogDebug(">>> Entering UninstallSummaryItem(step={Step})", step);
             this.Notes = step.Notes;
             this.StepName = step.Name;
+			_logger.LogDebug("UninstallSummaryItem(step={Step}): this.Notes → {Arg1}", step, this.Notes);
+			_logger.LogDebug("UninstallSummaryItem(step={Step}): this.StepName → {Arg1}", step, this.StepName);
             this.Success = step.Success;
+			_logger.LogDebug("<<< Exiting UninstallSummaryItem(step={Step})", step);
         }
 
         /// <summary>Gets any remarks collected during step execution.</summary>
@@ -40,8 +46,10 @@ namespace DotNetNuke.Maintenance.Telerik.Removal
         /// </returns>
         internal static IEnumerable<UninstallSummaryItem> FromStep(IStep step)
         {
+			_logger.LogDebug(">>> Entering FromStep(step={Step})", step);
             if (step.Quiet && step.Success.HasValue && step.Success.Value)
             {
+			_logger.LogDebug("<<< Exiting FromStep(step={Step})", step);
                 return [];
             }
 

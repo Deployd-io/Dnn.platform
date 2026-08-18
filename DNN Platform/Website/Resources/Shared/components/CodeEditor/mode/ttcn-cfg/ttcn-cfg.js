@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -12,6 +14,7 @@
   "use strict";
 
   CodeMirror.defineMode("ttcn-cfg", function(config, parserConfig) {
+	logger.debug('>>> Entering defineMode()');
     var indentUnit = config.indentUnit,
         keywords = parserConfig.keywords || {},
         fileNCtrlMaskOptions = parserConfig.fileNCtrlMaskOptions || {},
@@ -20,10 +23,13 @@
         indentStatements = parserConfig.indentStatements !== false;
     var isOperatorChar = /[\|]/;
     var curPunc;
+	logger.debug('<<< Exiting defineMode()');
 
     function tokenBase(stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
       var ch = stream.next();
       if (ch == '"' || ch == "'") {
+		logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
         state.tokenize = tokenString(ch);
         return state.tokenize(stream, state);
       }
@@ -55,10 +61,12 @@
         return "negative fileNCtrlMaskOptions";
       if (externalCommands.propertyIsEnumerable(cur)) return "negative externalCommands";
 
+	logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
       return "variable";
     }
 
     function tokenString(quote) {
+	logger.debug(`>>> Entering tokenString(quote=${quote})`);
       return function(stream, state) {
         var escaped = false, next, end = false;
         while ((next = stream.next()) != null) {
@@ -76,57 +84,77 @@
         }
         if (end || !(escaped || multiLineStrings))
           state.tokenize = null;
+		logger.debug(`tokenString(quote=${quote}): state.tokenize → ${state.tokenize}`);
+		logger.debug(`<<< Exiting tokenString(quote=${quote})`);
         return "string";
       };
     }
 
     function Context(indented, column, type, align, prev) {
+	logger.debug(`>>> Entering Context(indented=${indented},column=${column},type=${type},align=${align},prev=${prev})`);
       this.indented = indented;
       this.column = column;
+	logger.debug(`Context(indented=${indented},column=${column},type=${type},align=${align},prev=${prev}): indented → ${indented}`);
+	logger.debug(`Context(indented=${indented},column=${column},type=${type},align=${align},prev=${prev}): this.indented → ${this.indented}`);
+	logger.debug(`Context(indented=${indented},column=${column},type=${type},align=${align},prev=${prev}): column → ${column}`);
+	logger.debug(`Context(indented=${indented},column=${column},type=${type},align=${align},prev=${prev}): this.prev → ${this.prev}`);
+	logger.debug(`Context(indented=${indented},column=${column},type=${type},align=${align},prev=${prev}): align → ${align}`);
       this.type = type;
       this.align = align;
       this.prev = prev;
+	logger.debug(`Context(indented=${indented},column=${column},type=${type},align=${align},prev=${prev}): type → ${type}`);
+	logger.debug(`<<< Exiting Context(indented=${indented},column=${column},type=${type},align=${align},prev=${prev})`);
     }
     function pushContext(state, col, type) {
       var indent = state.indented;
       if (state.context && state.context.type == "statement")
+		logger.debug(`>>> Entering pushContext(state=${state},col=${col},type=${type})`);
+		logger.debug(`<<< Exiting pushContext(state=${state},col=${col},type=${type})`);
         indent = state.context.indented;
       return state.context = new Context(indent, col, type, null, state.context);
     }
     function popContext(state) {
+	logger.debug(`>>> Entering popContext(state=${state})`);
       var t = state.context.type;
       if (t == ")" || t == "]" || t == "}")
         state.indented = state.context.indented;
+	logger.debug(`<<< Exiting popContext(state=${state})`);
       return state.context = state.context.prev;
     }
 
     //Interface
     return {
       startState: function(basecolumn) {
+		logger.debug(`>>> Entering startState(basecolumn=${basecolumn})`);
         return {
           tokenize: null,
           context: new Context((basecolumn || 0) - indentUnit, 0, "top", false),
           indented: 0,
           startOfLine: true
         };
+		logger.debug(`<<< Exiting startState(basecolumn=${basecolumn})`);
       },
 
       token: function(stream, state) {
+		logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
         var ctx = state.context;
         if (stream.sol()) {
           if (ctx.align == null) ctx.align = false;
           state.indented = stream.indentation();
           state.startOfLine = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.startOfLine → ${state.startOfLine}`);
         }
         if (stream.eatSpace()) return null;
         curPunc = null;
         var style = (state.tokenize || tokenBase)(stream, state);
+		logger.debug(`token(stream=${stream},state=${state}): style → ${style}`);
         if (style == "comment") return style;
         if (ctx.align == null) ctx.align = true;
 
         if ((curPunc == ";" || curPunc == ":" || curPunc == ",")
             && ctx.type == "statement"){
           popContext(state);
+		logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
         }
         else if (curPunc == "{") pushContext(state, stream.column(), "}");
         else if (curPunc == "[") pushContext(state, stream.column(), "]");
@@ -142,6 +170,7 @@
             && curPunc == "newstatement")))
           pushContext(state, stream.column(), "statement");
         state.startOfLine = false;
+		logger.debug(`<<< Exiting function(exports=${exports})`);
         return style;
       },
 
@@ -152,9 +181,12 @@
   });
 
   function words(str) {
+	logger.debug(`>>> Entering words(str=${str})`);
     var obj = {}, words = str.split(" ");
     for (var i = 0; i < words.length; ++i)
+	logger.debug(`words(str=${str}): obj → ${obj}`);
       obj[words[i]] = true;
+	logger.debug(`<<< Exiting words(str=${str})`);
     return obj;
   }
 

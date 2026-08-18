@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,6 +13,7 @@
 })(function(CodeMirror) {
   "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
   var Pos = CodeMirror.Pos;
   function cmp(a, b) { return a.line - b.line || a.ch - b.ch; }
 
@@ -19,10 +22,14 @@
   var xmlTagStart = new RegExp("<(/?)([" + nameStartChar + "][" + nameChar + "]*)", "g");
 
   function Iter(cm, line, ch, range) {
+	logger.debug(`>>> Entering Iter(cm=${cm},line=${line},ch=${ch},range=${range})`);
     this.line = line; this.ch = ch;
     this.cm = cm; this.text = cm.getLine(line);
+	logger.debug(`Iter(cm=${cm},line=${line},ch=${ch},range=${range}): line → ${line}`);
     this.min = range ? range.from : cm.firstLine();
     this.max = range ? range.to - 1 : cm.lastLine();
+	logger.debug(`Iter(cm=${cm},line=${line},ch=${ch},range=${range}): cm → ${cm}`);
+	logger.debug(`<<< Exiting Iter(cm=${cm},line=${line},ch=${ch},range=${range})`);
   }
 
   function tagAt(iter, ch) {
@@ -64,6 +71,7 @@
       var match = xmlTagStart.exec(iter.text);
       if (match && match.index == lt) return match;
     }
+	logger.debug(`<<< Exiting toTagStart(iter=${iter})`);
   }
 
   function toNextTag(iter) {
@@ -108,6 +116,7 @@
         stack.push(next[2]);
       }
     }
+	logger.debug(`<<< Exiting findMatchingClose(iter=${iter},tag=${tag})`);
   }
   function findMatchingOpen(iter, tag) {
     var stack = [];
@@ -132,27 +141,34 @@
         };
       }
     }
+	logger.debug(`<<< Exiting findMatchingOpen(iter=${iter},tag=${tag})`);
   }
 
   CodeMirror.registerHelper("fold", "xml", function(cm, start) {
     var iter = new Iter(cm, start.line, 0);
     for (;;) {
       var openTag = toNextTag(iter), end;
+	logger.debug(`registerHelper(iter=${iter}): openTag → ${openTag}`);
       if (!openTag || iter.line != start.line || !(end = toTagEnd(iter))) return;
       if (!openTag[1] && end != "selfClose") {
         var start = Pos(iter.line, iter.ch);
         var close = findMatchingClose(iter, openTag[2]);
+		logger.debug(`<<< Exiting registerHelper(iter=${iter})`);
+		logger.debug(`registerHelper(iter=${iter}): close → ${close}`);
         return close && {from: start, to: close.from};
       }
     }
   });
+logger.debug(`registerHelper(iter=${iter}): iter → ${iter}`);
   CodeMirror.findMatchingTag = function(cm, pos, range) {
     var iter = new Iter(cm, pos.line, pos.ch, range);
     if (iter.text.indexOf(">") == -1 && iter.text.indexOf("<") == -1) return;
     var end = toTagEnd(iter), to = end && Pos(iter.line, iter.ch);
     var start = end && toTagStart(iter);
+	logger.debug(`function(cm=${cm},pos=${pos},range=${range}): end → ${end}`);
     if (!end || !start || cmp(iter, pos) > 0) return;
     var here = {from: Pos(iter.line, iter.ch), to: to, tag: start[2]};
+	logger.debug(`function(cm=${cm},pos=${pos},range=${range}): here → ${here}`);
     if (end == "selfClose") return {open: here, close: null, at: "open"};
 
     if (start[1]) { // closing tag
@@ -167,16 +183,20 @@
     var iter = new Iter(cm, pos.line, pos.ch, range);
     for (;;) {
       var open = findMatchingOpen(iter);
+	logger.debug(`function(cm=${cm},pos=${pos},range=${range}): open → ${open}`);
       if (!open) break;
       var forward = new Iter(cm, pos.line, pos.ch, range);
+	logger.debug(`function(cm=${cm},pos=${pos},range=${range}): forward → ${forward}`);
       var close = findMatchingClose(forward, open.tag);
       if (close) return {open: open, close: close};
+	logger.debug(`function(cm=${cm},pos=${pos},range=${range}): close → ${close}`);
     }
   };
 
   // Used by addon/edit/closetag.js
   CodeMirror.scanForClosingTag = function(cm, pos, name, end) {
     var iter = new Iter(cm, pos.line, pos.ch, end ? {from: 0, to: end} : null);
+	logger.debug(`function(cm=${cm},pos=${pos},range=${range}): iter → ${iter}`);
     return findMatchingClose(iter, name);
   };
 });

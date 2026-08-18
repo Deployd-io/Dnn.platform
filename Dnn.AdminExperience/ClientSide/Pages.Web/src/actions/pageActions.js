@@ -7,6 +7,7 @@ import utils from "../utils";
 import Localization from "../localization";
 import cloneDeep from "lodash/cloneDeep";
 import Promise from "promise";
+const logger = console;
 
 const loadPage = function (dispatch, pageId, callback) {
     return new Promise((resolve) => {
@@ -48,6 +49,7 @@ const loadPage = function (dispatch, pageId, callback) {
                 }
                 resolve(response);
             }).catch((error) => {
+				logger.error(`Exception in loadPage(dispatch=${dispatch},pageId=${pageId},callback=${callback}): (no error binding)`);
                 dispatch({
                     type: ActionTypes.ERROR_LOADING_PAGE,
                     data: { error }
@@ -56,14 +58,19 @@ const loadPage = function (dispatch, pageId, callback) {
             });
         }
     });
+	logger.debug(`<<< Exiting loadPage(dispatch=${dispatch},pageId=${pageId},callback=${callback})`);
 };
 
 const redirectFromNonExistingPage = function (redirectUrl) {
+	logger.debug(`>>> Entering redirectFromNonExistingPage(redirectUrl=${redirectUrl})`);
     window.top.location.href = redirectUrl ? redirectUrl : utils.getDefaultPageUrl();
+	logger.debug(`<<< Exiting redirectFromNonExistingPage(redirectUrl=${redirectUrl})`);
 };
 
 const pageActions = {
     getPageList(id) {
+		logger.debug(`>>> Entering getPageList(id=${id})`);
+		logger.debug(`<<< Exiting getPageList(id=${id})`);
         return (dispatch) => PagesService.getPageList(id).then(pageList => {
 
             dispatch({
@@ -74,6 +81,8 @@ const pageActions = {
     },
 
     searchPageList(searchKey) {
+		logger.debug(`>>> Entering searchPageList(searchKey=${searchKey})`);
+		logger.debug(`<<< Exiting searchPageList(searchKey=${searchKey})`);
         return (dispatch) => PagesService.searchPageList(searchKey).then((searchList) => {
             dispatch({
                 type: SearchListActionTypes.SAVE_SEARCH_LIST,
@@ -84,10 +93,14 @@ const pageActions = {
 
 
     getPageHierarchy(id) {
+		logger.debug(`>>> Entering getPageHierarchy(id=${id})`);
+		logger.debug(`<<< Exiting getPageHierarchy(id=${id})`);
         return () => PagesService.getPageHierarchy(id);
     },
 
     searchAndFilterPageList(params) {
+		logger.debug(`>>> Entering searchAndFilterPageList(params=${params})`);
+		logger.debug(`<<< Exiting searchAndFilterPageList(params=${params})`);
         return (dispatch) => PagesService.searchAndFilterPageList(params).then((searchList) => {
             searchList = searchList.Results;
             dispatch({
@@ -98,6 +111,8 @@ const pageActions = {
     },
 
     searchAndFilterPagedPageList(params,filtersUpdated) {
+		logger.debug(`>>> Entering searchAndFilterPagedPageList(params=${params},filtersUpdated=${filtersUpdated})`);
+		logger.debug(`<<< Exiting searchAndFilterPagedPageList(params=${params},filtersUpdated=${filtersUpdated})`);
         return (dispatch) => PagesService.searchAndFilterPageList(params).then(searchResult => {
             dispatch({
                 type: SearchListActionTypes.SAVE_SEARCH_RESULT,
@@ -110,6 +125,8 @@ const pageActions = {
     },
 
     getWorkflowsList() {
+		logger.debug('>>> Entering getWorkflowsList()');
+		logger.debug('<<< Exiting getWorkflowsList()');
         return (dispatch) => PagesService.getWorkflowsList().then(workflowList => {
             dispatch({
                 type: ActionTypes.GET_WORKFLOW_LIST,
@@ -119,14 +136,20 @@ const pageActions = {
     },
 
     getPage(id) {
+		logger.debug(`>>> Entering getPage(id=${id})`);
+		logger.debug(`<<< Exiting getPage(id=${id})`);
         return () => PagesService.getPage(id);
     },
 
     getChildPageList(id) {
+		logger.debug(`>>> Entering getChildPageList(id=${id})`);
+		logger.debug(`<<< Exiting getChildPageList(id=${id})`);
         return () => PagesService.getChildPageList(id);
     },
 
     updatePageListStore(pageList) {
+		logger.debug(`>>> Entering updatePageListStore(pageList=${pageList})`);
+		logger.debug(`<<< Exiting updatePageListStore(pageList=${pageList})`);
         return (dispatch) => {
             dispatch({
                 type: PageListActionTypes.SAVE,
@@ -136,6 +159,8 @@ const pageActions = {
     },
 
     selectPageSettingTab(selectedPageSettingTab) {
+		logger.debug(`>>> Entering selectPageSettingTab(selectedPageSettingTab=${selectedPageSettingTab})`);
+		logger.debug(`<<< Exiting selectPageSettingTab(selectedPageSettingTab=${selectedPageSettingTab})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SELECT_PAGE_SETTING_TAB,
@@ -151,20 +176,27 @@ const pageActions = {
     },
 
     viewPage(id, url, callback) {
+		logger.debug(`>>> Entering viewPage(id=${id},url=${url},callback=${callback})`);
         PagesService.openPageInEditMode(id, url, callback);
+		logger.debug(`<<< Exiting viewPage(id=${id},url=${url},callback=${callback})`);
         return () => {
 
         };
     },
 
     duplicatePage() {
+		logger.debug('>>> Entering duplicatePage()');
+		logger.debug('<<< Exiting duplicatePage()');
         return (dispatch, getState) => {
             const { pages } = getState();
             const duplicate = (page) => {
                 const duplicatedPage = cloneDeep(page);
 
                 duplicatedPage.templateTabId = duplicatedPage.tabId;
+				logger.debug(`duplicatePage(): duplicatedPage.templateTabId → ${duplicatedPage.templateTabId}`);
+				logger.debug(`duplicatePage(): duplicatedPage.name → ${duplicatedPage.name}`);
                 duplicatedPage.tabId = 0;
+				logger.debug(`duplicatePage(): duplicatedPage.tabId → ${duplicatedPage.tabId}`);
                 duplicatedPage.name = "";
                 duplicatedPage.url = "";
                 duplicatedPage.isCopy = true;
@@ -186,6 +218,8 @@ const pageActions = {
 
 
     getNewPage(parentPage) {
+		logger.debug(`>>> Entering getNewPage(parentPage=${parentPage})`);
+		logger.debug(`<<< Exiting getNewPage(parentPage=${parentPage})`);
         return (dispatch) => PagesService.getNewPage(parentPage).then((page) => {
             page.referralTabId = parentPage.id;
             dispatch({
@@ -197,11 +231,13 @@ const pageActions = {
     },
 
     cancelPage(reloadPageId) {
+		logger.debug(`>>> Entering cancelPage(reloadPageId=${reloadPageId})`);
         if (reloadPageId) {
             return (dispatch) => {
                 return loadPage(dispatch, reloadPageId);
             };
         }
+		logger.debug(`<<< Exiting cancelPage(reloadPageId=${reloadPageId})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.CANCEL_PAGE,
@@ -245,6 +281,7 @@ const pageActions = {
                 });
             });
         };
+		logger.debug(`<<< Exiting deletePage(page=${page},redirectUrl=${redirectUrl})`);
     },
     deleteLocalizePage(page) {
         return (dispatch) => {
@@ -260,9 +297,12 @@ const pageActions = {
                 });
             });
         };
+		logger.debug(`<<< Exiting deleteLocalizePage(page=${page})`);
     },
     createPage(callback) {
+	logger.debug(`>>> Entering createPage(callback=${callback})`);
 
+		logger.debug(`<<< Exiting createPage(callback=${callback})`);
         return (dispatch, getState) => {
             dispatch({
                 type: ActionTypes.SAVE_PAGE
@@ -328,6 +368,8 @@ const pageActions = {
 
 
     changePageField(key, value) {
+		logger.debug(`>>> Entering changePageField(key=${key},value=${value})`);
+		logger.debug(`<<< Exiting changePageField(key=${key},value=${value})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.CHANGE_FIELD_VALUE,
@@ -338,6 +380,8 @@ const pageActions = {
     },
 
     changePageType(value) {
+		logger.debug(`>>> Entering changePageType(value=${value})`);
+		logger.debug(`<<< Exiting changePageType(value=${value})`);
         return {
             type: ActionTypes.CHANGE_FIELD_VALUE,
             field: "pageType",
@@ -352,9 +396,12 @@ const pageActions = {
                 permissions
             });
         };
+		logger.debug(`<<< Exiting changePermissions(permissions=${permissions})`);
     },
 
     fetchCacheProviderList() {
+		logger.debug('>>> Entering fetchCacheProviderList()');
+		logger.debug('<<< Exiting fetchCacheProviderList()');
         return (dispatch, getState) => {
             if (!getState().pages.cacheProviderList) {
                 dispatch({
@@ -367,6 +414,7 @@ const pageActions = {
                         data: { cacheProviderList }
                     });
                 }).catch((error) => {
+					logger.error('Exception in fetchCacheProviderList()');
                     dispatch({
                         type: ActionTypes.ERROR_FETCHING_CACHE_PROVIDER_LIST,
                         data: { error }
@@ -377,6 +425,8 @@ const pageActions = {
     },
 
     deletePageModule(module) {
+		logger.debug(`>>> Entering deletePageModule(module=${module})`);
+		logger.debug(`<<< Exiting deletePageModule(module=${module})`);
         return (dispatch, getState) => {
             dispatch({
                 type: ActionTypes.DELETING_PAGE_MODULE
@@ -394,6 +444,7 @@ const pageActions = {
                     data: { module }
                 });
             }).catch((error) => {
+				logger.error(`Exception in deletePageModule(module=${module}): (no error binding)`);
                 dispatch({
                     type: ActionTypes.ERROR_DELETING_PAGE_MODULE,
                     data: { error }
@@ -403,6 +454,8 @@ const pageActions = {
     },
 
     updatePageModuleCopy(id, key, event) {
+		logger.debug(`>>> Entering updatePageModuleCopy(id=${id},key=${key},event=${event})`);
+		logger.debug(`<<< Exiting updatePageModuleCopy(id=${id},key=${key},event=${event})`);
         return {
             type: ActionTypes.UPDATED_PAGE_MODULE_COPY,
             data: { id, key, event }
@@ -410,6 +463,8 @@ const pageActions = {
     },
 
     editingPageModule(module) {
+		logger.debug(`>>> Entering editingPageModule(module=${module})`);
+		logger.debug(`<<< Exiting editingPageModule(module=${module})`);
         return {
             type: ActionTypes.EDITING_PAGE_MODULE,
             data: { module }
@@ -417,6 +472,8 @@ const pageActions = {
     },
 
     cancelEditingPageModule() {
+		logger.debug('>>> Entering cancelEditingPageModule()');
+		logger.debug('<<< Exiting cancelEditingPageModule()');
         return {
             type: ActionTypes.CANCEL_EDITING_PAGE_MODULE,
             data: {}
@@ -424,6 +481,8 @@ const pageActions = {
     },
 
     copyAppearanceToDescendantPages() {
+		logger.debug('>>> Entering copyAppearanceToDescendantPages()');
+		logger.debug('<<< Exiting copyAppearanceToDescendantPages()');
         return (dispatch, getState) => {
             dispatch({
                 type: ActionTypes.COPYING_APPEARANCE_TO_DESCENDANT_PAGES
@@ -449,6 +508,7 @@ const pageActions = {
                     data: {}
                 });
             }).catch((error) => {
+				logger.error('Exception in copyAppearanceToDescendantPages()');
                 dispatch({
                     type: ActionTypes.ERROR_COPYING_APPEARANCE_TO_DESCENDANT_PAGES,
                     data: { error }
@@ -458,6 +518,8 @@ const pageActions = {
     },
 
     copyPermissionsToDescendantPages() {
+		logger.debug('>>> Entering copyPermissionsToDescendantPages()');
+		logger.debug('<<< Exiting copyPermissionsToDescendantPages()');
         return (dispatch, getState) => {
             dispatch({
                 type: ActionTypes.COPYING_PERMISSIONS_TO_DESCENDANT_PAGES
@@ -471,6 +533,7 @@ const pageActions = {
                     data: {}
                 });
             }).catch((error) => {
+				logger.error('Exception in copyPermissionsToDescendantPages()');
                 dispatch({
                     type: ActionTypes.ERROR_COPYING_PERMISSIONS_TO_DESCENDANT_PAGES,
                     data: { error }
@@ -480,6 +543,8 @@ const pageActions = {
     },
 
     getCachedPageCount(cacheProvider) {
+		logger.debug(`>>> Entering getCachedPageCount(cacheProvider=${cacheProvider})`);
+		logger.debug(`<<< Exiting getCachedPageCount(cacheProvider=${cacheProvider})`);
         return (dispatch, getState) => {
             const page = getState().pages.selectedPage;
             PagesService.getCachedPageCount(cacheProvider, page.tabId).then(data => {
@@ -494,6 +559,8 @@ const pageActions = {
     },
 
     clearCache(cacheProvider) {
+		logger.debug(`>>> Entering clearCache(cacheProvider=${cacheProvider})`);
+		logger.debug(`<<< Exiting clearCache(cacheProvider=${cacheProvider})`);
         return (dispatch, getState) => {
             const page = getState().pages.selectedPage;
             PagesService.clearCache(cacheProvider, page.tabId).then(() => {
@@ -508,6 +575,8 @@ const pageActions = {
     },
 
     clearSelectedPage() {
+		logger.debug('>>> Entering clearSelectedPage()');
+		logger.debug('<<< Exiting clearSelectedPage()');
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.CLEAR_SELECTED_PAGE,
@@ -517,12 +586,17 @@ const pageActions = {
     },
 
     movePage({ Action, PageId, ParentId, RelatedPageId }) {
+		logger.debug(`>>> Entering movePage(Action=${Action},PageId=${PageId},ParentId=${ParentId},RelatedPageId=${RelatedPageId})`);
+		logger.debug(`<<< Exiting movePage(Action=${Action},PageId=${PageId},ParentId=${ParentId},RelatedPageId=${RelatedPageId})`);
         return PagesService.movePage({ Action, PageId, ParentId, RelatedPageId }).catch(() => {
             utils.notifyError(Localization.get("AnErrorOccurred"));
         });
+		logger.error(`Exception in movePage(Action=${Action},PageId=${PageId},ParentId=${ParentId},RelatedPageId=${RelatedPageId}): (no error binding)`);
     },
 
     dirtyCustomDetails() {
+		logger.debug('>>> Entering dirtyCustomDetails()');
+		logger.debug('<<< Exiting dirtyCustomDetails()');
         return {
             type: ActionTypes.CUSTOM_PAGE_DETAILS_UPDATED,
             data: {}

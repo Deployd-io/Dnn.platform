@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.FileSystem
     [Serializable]
     public class FolderMappingInfo : IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FolderMappingInfo));
         private Hashtable folderMappingSettings;
 
         private string imageUrl;
@@ -23,18 +24,25 @@ namespace DotNetNuke.Services.FileSystem
         /// <summary>Initializes a new instance of the <see cref="FolderMappingInfo"/> class.</summary>
         public FolderMappingInfo()
         {
+			Logger.LogDebug(">>> Entering FolderMappingInfo()");
             this.FolderMappingID = Null.NullInteger;
             this.PortalID = Null.NullInteger;
+			Logger.LogDebug("FolderMappingInfo(): this.FolderMappingID → {Arg0}", this.FolderMappingID);
+			Logger.LogDebug("<<< Exiting FolderMappingInfo()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="FolderMappingInfo"/> class.</summary>
+		Logger.LogDebug("<<< Exiting FolderMappingInfo()");
         /// <param name="portalID">The portal ID.</param>
         /// <param name="mappingName">The mapping name.</param>
         /// <param name="folderProviderType">The name of the <see cref="Type"/> of the <see cref="FolderProvider"/>.</param>
         public FolderMappingInfo(int portalID, string mappingName, string folderProviderType)
         {
+			Logger.LogDebug(">>> Entering FolderMappingInfo(portalID={PortalID},mappingName=<redacted>,folderProviderType={FolderProviderType})", portalID, folderProviderType);
             this.FolderMappingID = Null.NullInteger;
             this.PortalID = portalID;
+			Logger.LogDebug("FolderMappingInfo(portalID={PortalID},mappingName=<redacted>,folderProviderType={FolderProviderType}): this.FolderMappingID → {Arg3}", portalID, folderProviderType, this.FolderMappingID);
+			Logger.LogDebug("FolderMappingInfo(portalID={PortalID},mappingName=<redacted>,folderProviderType={FolderProviderType}): this.PortalID → {Arg3}", portalID, folderProviderType, this.PortalID);
             this.MappingName = mappingName;
             this.FolderProviderType = folderProviderType;
         }
@@ -126,11 +134,13 @@ namespace DotNetNuke.Services.FileSystem
         /// <param name="dr">The Data Reader to use.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.FolderMappingID = Null.SetNullInteger(dr["FolderMappingID"]);
             this.PortalID = Null.SetNullInteger(dr["PortalID"]);
             this.MappingName = Null.SetNullString(dr["MappingName"]);
             this.FolderProviderType = Null.SetNullString(dr["FolderProviderType"]);
             this.Priority = Null.SetNullInteger(dr["Priority"]);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

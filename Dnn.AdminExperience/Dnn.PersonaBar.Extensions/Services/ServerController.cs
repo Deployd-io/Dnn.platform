@@ -29,7 +29,10 @@ namespace Dnn.PersonaBar.Servers.Services
 
         public ServerController(INavigationManager navigationManager)
         {
+			Logger.LogDebug(">>> Entering ServerController(navigationManager={NavigationManager})", navigationManager);
             this.NavigationManager = navigationManager;
+			Logger.LogDebug("ServerController(navigationManager={NavigationManager}): this.NavigationManager → {Arg1}", navigationManager, this.NavigationManager);
+			Logger.LogDebug("<<< Exiting ServerController(navigationManager={NavigationManager})", navigationManager);
         }
 
         internal static string LocalResourceFile => Path.Combine("~/DesktopModules/admin/Dnn.PersonaBar/Modules/Dnn.Servers/App_LocalResources/Servers.resx");
@@ -40,9 +43,11 @@ namespace Dnn.PersonaBar.Servers.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage RestartApplication()
         {
+			Logger.LogDebug(">>> Entering RestartApplication()");
             try
             {
                 var log = new LogInfo { BypassBuffering = true, LogTypeKey = nameof(EventLogType.HOST_ALERT) };
+				Logger.LogDebug("RestartApplication(): log → {Log}", log);
                 log.AddProperty("Message", Localization.GetString("UserRestart", LocalResourceFile));
                 LogController.Instance.AddLog(log);
                 Config.Touch();
@@ -51,6 +56,7 @@ namespace Dnn.PersonaBar.Servers.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting RestartApplication()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -59,6 +65,7 @@ namespace Dnn.PersonaBar.Servers.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage ClearCache()
         {
+			Logger.LogDebug(">>> Entering ClearCache()");
             try
             {
                 DataCache.ClearCache();
@@ -68,6 +75,7 @@ namespace Dnn.PersonaBar.Servers.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting ClearCache()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }

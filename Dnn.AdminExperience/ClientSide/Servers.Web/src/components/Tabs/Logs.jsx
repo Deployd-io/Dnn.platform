@@ -8,24 +8,31 @@ import LogsTabActions from "../../actions/logsTab";
 import utils from "../../utils";
 
 import "./tabs.less";
+const logger = console;
 
 class Logs extends Component {
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         if (this.props.logs.length > 0) {
             return;
         }
         this.props.onRetrieveLogsServerInfo();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     UNSAFE_componentWillReceiveProps(newProps) {
+		logger.debug(`>>> Entering UNSAFE_componentWillReceiveProps(newProps=${newProps})`);
         if (this.props.errorMessage !== newProps.errorMessage && newProps.errorMessage) {
             utils.notifyError(newProps.errorMessage);
+			logger.debug(`<<< Exiting UNSAFE_componentWillReceiveProps(newProps=${newProps})`);
         }
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { props } = this;
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className="dnn-servers-info-panel-big logsTab">
                 <div className="logContainer">
@@ -82,6 +89,8 @@ Logs.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         logs: state.logsTab.logs,
         errorMessage: state.logsTab.errorMessage,
@@ -91,6 +100,8 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+	logger.debug(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`);
+	logger.debug(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`);
     return {
         ...bindActionCreators({
             onRetrieveLogsServerInfo: LogsTabActions.loadLogsServerInfo,

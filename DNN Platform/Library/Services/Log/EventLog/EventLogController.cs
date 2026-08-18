@@ -20,6 +20,7 @@ namespace DotNetNuke.Services.Log.EventLog
     /// <inheritdoc />
     public partial class EventLogController : IEventLogger, IEventLogConfigService, IEventLogService
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(EventLogController));
         private IEventLogger EventLogger => this;
 
         private IEventLogConfigService EventLogConfigService => this;
@@ -263,6 +264,8 @@ namespace DotNetNuke.Services.Log.EventLog
         /// <inheritdoc />
         public ILogInfo GetLog(string logGuid)
         {
+			Logger.LogDebug(">>> Entering GetLog(logGuid={LogGuid})", logGuid);
+			Logger.LogDebug("<<< Exiting GetLog(logGuid={LogGuid})", logGuid);
             return LogController.Instance.GetLog(logGuid);
         }
 

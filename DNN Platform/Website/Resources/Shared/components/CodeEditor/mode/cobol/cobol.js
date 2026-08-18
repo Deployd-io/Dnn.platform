@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -6,6 +7,7 @@
  * Branched from CodeMirror's Scheme mode
  */
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -15,13 +17,19 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("cobol", function () {
+logger.debug('>>> Entering defineMode()');
   var BUILTIN = "builtin", COMMENT = "comment", STRING = "string",
       ATOM = "atom", NUMBER = "number", KEYWORD = "keyword", MODTAG = "header",
       COBOLLINENUM = "def", PERIOD = "link";
+	logger.debug(`defineMode(): BUILTIN → ${BUILTIN}`);
   function makeKeywords(str) {
+	logger.debug('<<< Exiting defineMode()');
     var obj = {}, words = str.split(" ");
+	logger.debug(`>>> Entering makeKeywords(str=${str})`);
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+	logger.debug(`<<< Exiting makeKeywords(str=${str})`);
     return obj;
   }
   var atoms = makeKeywords("TRUE FALSE ZEROES ZEROS ZERO SPACES SPACE LOW-VALUE LOW-VALUES ");
@@ -169,19 +177,24 @@ CodeMirror.defineMode("cobol", function () {
         stream.eat(tests.sign);
         stream.eatWhile(tests.digit);
       }
+	logger.debug(`isNumber(ch=${ch},stream=${stream}): ch → ${ch}`);
+	logger.debug(`<<< Exiting isNumber(ch=${ch},stream=${stream})`);
       return true;
     }
     return false;
   }
   return {
     startState: function () {
+	logger.debug('>>> Entering startState()');
       return {
         indentStack: null,
         indentation: 0,
         mode: false
       };
+	logger.debug('<<< Exiting startState()');
     },
     token: function (stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       if (state.indentStack == null && stream.sol()) {
         // update indentation, but only if indentStack is empty
         state.indentation = 6 ; //stream.indentation();
@@ -197,6 +210,7 @@ CodeMirror.defineMode("cobol", function () {
         while ((next = stream.next()) != null) {
           if (next == "\"" || next == "\'") {
             state.mode = false;
+			logger.debug(`token(stream=${stream},state=${state}): state.mode → ${state.mode}`);
             break;
           }
         }
@@ -204,7 +218,9 @@ CodeMirror.defineMode("cobol", function () {
         break;
       default: // default parsing mode
         var ch = stream.next();
+		logger.debug(`token(stream=${stream},state=${state}): ch → ${ch}`);
         var col = stream.column();
+		logger.debug(`token(stream=${stream},state=${state}): col → ${col}`);
         if (col >= 0 && col <= 5) {
           returnType = COBOLLINENUM;
         } else if (col >= 72 && col <= 79) {
@@ -239,12 +255,15 @@ CodeMirror.defineMode("cobol", function () {
           } else if (atoms && atoms.propertyIsEnumerable(stream.current().toUpperCase())) {
             returnType = ATOM;
           } else returnType = null;
+		logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
         }
       }
       return returnType;
     },
     indent: function (state) {
+	logger.debug(`>>> Entering indent(state=${state})`);
       if (state.indentStack == null) return state.indentation;
+	logger.debug(`<<< Exiting indent(state=${state})`);
       return state.indentStack.indent;
     }
   };

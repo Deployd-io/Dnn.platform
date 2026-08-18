@@ -6,6 +6,7 @@ namespace DotNetNuke.Services.Analytics
 {
     public class GenericAnalyticsEngine : AnalyticsEngineBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(GenericAnalyticsEngine));
         /// <inheritdoc />
         public override string EngineName
         {
@@ -18,6 +19,8 @@ namespace DotNetNuke.Services.Analytics
         /// <inheritdoc />
         public override string RenderScript(string scriptTemplate)
         {
+			Logger.LogDebug(">>> Entering RenderScript(scriptTemplate={ScriptTemplate})", scriptTemplate);
+			Logger.LogDebug("<<< Exiting RenderScript(scriptTemplate={ScriptTemplate})", scriptTemplate);
             return this.ReplaceTokens(scriptTemplate);
         }
     }

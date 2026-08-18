@@ -17,10 +17,12 @@ import {
 import LocalizedResources from "../../resources";
 import util from "../../utils";
 import styles from "./style.module.less";
+const logger = console;
 
 class CreateVocabulary extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             term: {
                 Name: "",
@@ -33,9 +35,11 @@ class CreateVocabulary extends Component {
             },
             triedToSubmit: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.setState({
             term: {
                 Name: "",
@@ -44,25 +48,32 @@ class CreateVocabulary extends Component {
                 ScopeTypeId: 2
             }
         });
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     onCloseVocabulary() {
+		logger.debug('>>> Entering onCloseVocabulary()');
         const {props} = this;
         props.onCloseVocabulary();
+		logger.debug('<<< Exiting onCloseVocabulary()');
     }
 
 
     onTermValueChange(key, event) {
+		logger.debug(`>>> Entering onTermValueChange(key=${key},event=${event})`);
         const value = typeof event === "object" ? event.target.value : parseInt(event); //event is value
 
+		logger.debug(`onTermValueChange(key=${key},event=${event}): value → ${value}`);
         let {state} = this;
         let {term} = this.state;
         term[key] = value;
         state.triedToSubmit = false;
+		logger.debug(`onTermValueChange(key=${key},event=${event}): state.triedToSubmit → ${state.triedToSubmit}`);
         if (value === "" && key === "Name") {
             state.error["name"] = true;
         } else if (value !== "" && key === "Name") {
             state.error["name"] = false;
+			logger.debug(`<<< Exiting onTermValueChange(key=${key},event=${event})`);
         }
         this.setState({
             state,
@@ -71,6 +82,8 @@ class CreateVocabulary extends Component {
     }
 
     getNextPage(pageIndex, pageSize, scopeTypeId) {
+		logger.debug(`>>> Entering getNextPage(pageIndex=${pageIndex},pageSize=${pageSize},scopeTypeId=${scopeTypeId})`);
+		logger.debug(`<<< Exiting getNextPage(pageIndex=${pageIndex},pageSize=${pageSize},scopeTypeId=${scopeTypeId})`);
         return {
             pageIndex: pageIndex || 0,
             pageSize: pageSize,
@@ -79,6 +92,7 @@ class CreateVocabulary extends Component {
     }
 
     onAddNewVocabulary(event) {
+		logger.debug(`>>> Entering onAddNewVocabulary(event=${event})`);
         event.preventDefault();
         const {props, state} = this;
         this.setState({
@@ -93,9 +107,11 @@ class CreateVocabulary extends Component {
             this.onCloseVocabulary();
             props.dispatch(PaginationActions.loadTab(this.getNextPage(0, 10000, state.term.ScopeTypeId)));   //index acts as scopeTypeId 
         }));
+		logger.debug(`<<< Exiting onAddNewVocabulary(event=${event})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
         const typeOptions = [
             {
@@ -118,6 +134,7 @@ class CreateVocabulary extends Component {
                 value: 1
             }
         ];
+		logger.debug('<<< Exiting render()');
         return (
             //inline style for height to allow proper calculating
             <PersonaBarPageBody backToLinkProps={{
@@ -180,6 +197,8 @@ CreateVocabulary.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         totalCount: state.vocabulary.totalCount,
         vocabularyAddedIsValid: state.vocabulary.vocabularyAddedIsValid,

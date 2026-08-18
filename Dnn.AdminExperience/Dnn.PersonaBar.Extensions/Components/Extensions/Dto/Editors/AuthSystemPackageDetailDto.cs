@@ -12,6 +12,8 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
         /// <summary>Initializes a new instance of the <see cref="AuthSystemPackageDetailDto"/> class.</summary>
         public AuthSystemPackageDetailDto()
         {
+		eventLogger.LogDebug(">>> Entering AuthSystemPackageDetailDto()");
+		eventLogger.LogDebug("<<< Exiting AuthSystemPackageDetailDto()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="AuthSystemPackageDetailDto"/> class.</summary>

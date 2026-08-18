@@ -17,6 +17,7 @@ namespace DotNetNuke.Services.Installer
     [Serializable]
     public partial class InstallFile
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(InstallFile));
         private static readonly Regex FileTypeMatchRegex = new Regex(Util.REGEX_Version + ".txt", RegexOptions.Compiled);
 
         /// <summary>
@@ -29,9 +30,14 @@ namespace DotNetNuke.Services.Installer
         /// <param name="info">An <see cref="InstallerInfo"/> instance.</param>
         public InstallFile(ZipArchiveEntry entry, InstallerInfo info)
         {
+			Logger.LogDebug(">>> Entering InstallFile(entry={Entry},info={Info})", entry, info);
             this.Encoding = TextEncoding.UTF8;
             this.InstallerInfo = info;
+			Logger.LogDebug("InstallFile(entry={Entry},info={Info}): this.Encoding → {Arg2}", entry, info, this.Encoding);
+			Logger.LogDebug("InstallFile(entry={Entry},info={Info}): this.InstallerInfo → {Arg2}", entry, info, this.InstallerInfo);
+			Logger.LogDebug("InstallFile(zip={Zip},entry={Entry},info={Info}): this.InstallerInfo → {Arg3}", zip, entry, info, this.InstallerInfo);
             this.ReadZip(entry);
+			Logger.LogDebug("<<< Exiting InstallFile(entry={Entry},info={Info})", entry, info);
         }
 
         /// <summary>
@@ -39,6 +45,7 @@ namespace DotNetNuke.Services.Installer
         /// This Constructor creates a new InstallFile instance.
         /// </summary>
         /// <param name="fileName">The fileName of the File.</param>
+		Logger.LogDebug("<<< Exiting InstallFile(entry={Entry},info={Info})", entry, info);
         public InstallFile(string fileName)
         {
             this.Encoding = TextEncoding.UTF8;
@@ -91,10 +98,13 @@ namespace DotNetNuke.Services.Installer
         public InstallFile(ZipInputStream zip, ZipEntry entry, InstallerInfo info)
 #pragma warning restore CS3001
         {
+			Logger.LogDebug(">>> Entering InstallFile(zip={Zip},entry={Entry},info={Info})", zip, entry, info);
             this.Encoding = TextEncoding.UTF8;
+			Logger.LogDebug("InstallFile(zip={Zip},entry={Entry},info={Info}): this.Encoding → {Arg3}", zip, entry, info, this.Encoding);
             this.InstallerInfo = info;
             this.ReadZip(zip, entry);
         }
+		Logger.LogDebug("<<< Exiting InstallFile(zip={Zip},entry={Entry},info={Info})", zip, entry, info);
 
         /// <summary>Gets the location of the backup file.</summary>
         /// <value>A string.</value>
@@ -175,7 +185,10 @@ namespace DotNetNuke.Services.Installer
         /// <param name="version">The version of the file.</param>
         public void SetVersion(Version version)
         {
+			Logger.LogDebug(">>> Entering SetVersion(version={Version})", version);
             this.Version = version;
+			Logger.LogDebug("SetVersion(version={Version}): this.Version → {Arg1}", version, this.Version);
+			Logger.LogDebug("<<< Exiting SetVersion(version={Version})", version);
         }
 
         /// <summary>The ParseFileName parses the ZipEntry metadata.</summary>
@@ -259,17 +272,21 @@ namespace DotNetNuke.Services.Installer
         /// <param name="entry">A ZipEntry containing the file metadata.</param>
         private void ReadZip(ZipArchiveEntry entry)
         {
+			Logger.LogDebug(">>> Entering ReadZip(entry={Entry})", entry);
             this.ParseFileName(entry.FullName);
             Util.WriteStream(entry.Open(), this.TempFileName);
             File.SetLastWriteTime(this.TempFileName, entry.LastWriteTime.LocalDateTime);
+			Logger.LogDebug("<<< Exiting ReadZip(entry={Entry})", entry);
         }
 
         [DnnDeprecated(9, 11, 0, "No replacement")]
         private partial void ReadZip(ZipInputStream unzip, ZipEntry entry)
         {
+			Logger.LogDebug(">>> Entering ReadZip(unzip={Unzip},entry={Entry})", unzip, entry);
             this.ParseFileName(entry.Name);
             Util.WriteStream(unzip, this.TempFileName);
             File.SetLastWriteTime(this.TempFileName, entry.DateTime);
+			Logger.LogDebug("<<< Exiting ReadZip(unzip={Unzip},entry={Entry})", unzip, entry);
         }
     }
 }

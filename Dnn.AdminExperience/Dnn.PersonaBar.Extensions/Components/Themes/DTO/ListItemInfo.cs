@@ -15,12 +15,17 @@ namespace Dnn.PersonaBar.Themes.Components.DTO
     {
         public ListItemInfo()
         {
+		eventLogger.LogDebug(">>> Entering ListItemInfo()");
+		eventLogger.LogDebug("<<< Exiting ListItemInfo()");
         }
 
         public ListItemInfo(string text, string value)
         {
+			eventLogger.LogDebug(">>> Entering ListItemInfo(text={Text},value={Value})", text, value);
             this.Text = text;
             this.Value = value;
+			eventLogger.LogDebug("ListItemInfo(text={Text},value={Value}): this.Text → {Arg2}", text, value, this.Text);
+			eventLogger.LogDebug("<<< Exiting ListItemInfo(text={Text},value={Value})", text, value);
         }
 
         [DataMember(Name = "text")]

@@ -23,6 +23,7 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
     public class TabVersionDetailController(IHostSettings hostSettings)
         : ServiceLocator<ITabVersionDetailController, TabVersionDetailController>, ITabVersionDetailController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabVersionDetailController));
         private static readonly DataProvider Provider = DataProvider.Instance();
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
 
@@ -31,20 +32,26 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
         public TabVersionDetailController()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering TabVersionDetailController()");
+		Logger.LogDebug("<<< Exiting TabVersionDetailController()");
         }
 
         /// <inheritdoc />
         public TabVersionDetail GetTabVersionDetail(int tabVersionDetailId, int tabVersionId, bool ignoreCache = false)
         {
+			Logger.LogDebug(">>> Entering GetTabVersionDetail(tabVersionDetailId={TabVersionDetailId},tabVersionId={TabVersionId},ignoreCache={IgnoreCache})", tabVersionDetailId, tabVersionId, ignoreCache);
+			Logger.LogDebug("<<< Exiting GetTabVersionDetail(tabVersionDetailId={TabVersionDetailId},tabVersionId={TabVersionId},ignoreCache={IgnoreCache})", tabVersionDetailId, tabVersionId, ignoreCache);
             return this.GetTabVersionDetails(tabVersionId, ignoreCache).SingleOrDefault(tvd => tvd.TabVersionDetailId == tabVersionDetailId);
         }
 
         /// <inheritdoc />
         public IEnumerable<TabVersionDetail> GetTabVersionDetails(int tabVersionId, bool ignoreCache = false)
         {
+			Logger.LogDebug(">>> Entering GetTabVersionDetails(tabVersionId={TabVersionId},ignoreCache={IgnoreCache})", tabVersionId, ignoreCache);
             // if we are not using the cache
             if (ignoreCache || this.hostSettings.PerformanceSetting == PerformanceSettings.NoCaching)
             {
+			Logger.LogDebug("<<< Exiting GetTabVersionDetails(tabVersionId={TabVersionId},ignoreCache={IgnoreCache})", tabVersionId, ignoreCache);
                 return CBO.FillCollection<TabVersionDetail>(Provider.GetTabVersionDetails(tabVersionId));
             }
 
@@ -57,26 +64,33 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
         /// <inheritdoc />
         public IEnumerable<TabVersionDetail> GetVersionHistory(int tabId, int version)
         {
+			Logger.LogDebug(">>> Entering GetVersionHistory(tabId={TabId},version={Version})", tabId, version);
+			Logger.LogDebug("<<< Exiting GetVersionHistory(tabId={TabId},version={Version})", tabId, version);
             return CBO.FillCollection<TabVersionDetail>(Provider.GetTabVersionDetailsHistory(tabId, version));
         }
 
         /// <inheritdoc />
         public void SaveTabVersionDetail(TabVersionDetail tabVersionDetail)
         {
+			Logger.LogDebug(">>> Entering SaveTabVersionDetail(tabVersionDetail={TabVersionDetail})", tabVersionDetail);
             this.SaveTabVersionDetail(tabVersionDetail, tabVersionDetail.CreatedByUserID, tabVersionDetail.LastModifiedByUserID);
+			Logger.LogDebug("<<< Exiting SaveTabVersionDetail(tabVersionDetail={TabVersionDetail})", tabVersionDetail);
         }
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void SaveTabVersionDetail(TabVersionDetail tabVersionDetail, int createdByUserID)
         {
+			Logger.LogDebug(">>> Entering SaveTabVersionDetail(tabVersionDetail={TabVersionDetail},createdByUserID={CreatedByUserID})", tabVersionDetail, createdByUserID);
             this.SaveTabVersionDetail(tabVersionDetail, createdByUserID, createdByUserID);
+			Logger.LogDebug("<<< Exiting SaveTabVersionDetail(tabVersionDetail={TabVersionDetail},createdByUserID={CreatedByUserID})", tabVersionDetail, createdByUserID);
         }
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void SaveTabVersionDetail(TabVersionDetail tabVersionDetail, int createdByUserID, int modifiedByUserID)
         {
+			Logger.LogDebug(">>> Entering SaveTabVersionDetail(tabVersionDetail={TabVersionDetail},createdByUserID={CreatedByUserID},modifiedByUserID={ModifiedByUserID})", tabVersionDetail, createdByUserID, modifiedByUserID);
             tabVersionDetail.TabVersionDetailId = Provider.SaveTabVersionDetail(
                 tabVersionDetail.TabVersionDetailId,
                 tabVersionDetail.TabVersionId,
@@ -88,29 +102,38 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
                 createdByUserID,
                 modifiedByUserID);
             this.ClearCache(tabVersionDetail.TabVersionId);
+			Logger.LogDebug("<<< Exiting SaveTabVersionDetail(tabVersionDetail={TabVersionDetail},createdByUserID={CreatedByUserID},modifiedByUserID={ModifiedByUserID})", tabVersionDetail, createdByUserID, modifiedByUserID);
         }
 
         /// <inheritdoc />
         public void DeleteTabVersionDetail(int tabVersionId, int tabVersionDetailId)
         {
+			Logger.LogDebug(">>> Entering DeleteTabVersionDetail(tabVersionId={TabVersionId},tabVersionDetailId={TabVersionDetailId})", tabVersionId, tabVersionDetailId);
             Provider.DeleteTabVersionDetail(tabVersionDetailId);
             this.ClearCache(tabVersionId);
+			Logger.LogDebug("<<< Exiting DeleteTabVersionDetail(tabVersionId={TabVersionId},tabVersionDetailId={TabVersionDetailId})", tabVersionId, tabVersionDetailId);
         }
 
         /// <inheritdoc />
         public void ClearCache(int tabVersionId)
         {
+			Logger.LogDebug(">>> Entering ClearCache(tabVersionId={TabVersionId})", tabVersionId);
             DataCache.RemoveCache(GetTabVersionDetailCacheKey(tabVersionId));
+			Logger.LogDebug("<<< Exiting ClearCache(tabVersionId={TabVersionId})", tabVersionId);
         }
 
         /// <inheritdoc />
         protected override System.Func<ITabVersionDetailController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new TabVersionDetailController();
         }
 
         private static string GetTabVersionDetailCacheKey(int tabVersionId)
         {
+			Logger.LogDebug(">>> Entering GetTabVersionDetailCacheKey(tabVersionId={TabVersionId})", tabVersionId);
+			Logger.LogDebug("<<< Exiting GetTabVersionDetailCacheKey(tabVersionId={TabVersionId})", tabVersionId);
             return string.Format(CultureInfo.InvariantCulture, DataCache.TabVersionDetailsCacheKey, tabVersionId);
         }
     }

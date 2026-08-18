@@ -10,6 +10,7 @@ using DotNetNuke.Common;
 using DotNetNuke.Entities.Modules.Actions;
 using DotNetNuke.Web.Mvc.Framework.ActionFilters;
 using DotNetNuke.Web.Mvc.Framework.Controllers;
+using Microsoft.Extensions.Logging;
 
 namespace Dnn.ContactList.Mvc.Controllers
 {
@@ -19,6 +20,7 @@ namespace Dnn.ContactList.Mvc.Controllers
     [DnnHandleError]
     public class ContactController : DnnController
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private readonly IContactRepository _repository;
 
         /// <summary>
@@ -31,9 +33,12 @@ namespace Dnn.ContactList.Mvc.Controllers
         /// </summary>
         public ContactController(IContactRepository repository)
         {
+			_logger.LogDebug(">>> Entering ContactController(repository={Repository})", repository);
             Requires.NotNull(repository);
 
             _repository = repository;
+			_logger.LogDebug("<<< Exiting ContactController(repository={Repository})", repository);
+			_logger.LogDebug("ContactController(repository={Repository}): _repository → {_repository}", repository, _repository);
         }
 
         /// <summary>
@@ -44,10 +49,15 @@ namespace Dnn.ContactList.Mvc.Controllers
         [HttpGet]
         public ActionResult Delete(int contactId)
         {
+			_logger.LogDebug(">>> Entering Delete(contactId={ContactId})", contactId);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var contact = _repository.GetContact(contactId, PortalSettings.PortalId);
 
+			_logger.LogInformation("Delete(contactId)={ContactId}: find query executed in {Arg1} ms", contactId, __logStart.ElapsedMilliseconds);
             _repository.DeleteContact(contact);
 
+			_logger.LogDebug("Delete(contactId={ContactId}): contact → {Contact}", contactId, contact);
+			_logger.LogDebug("<<< Exiting Delete(contactId={ContactId})", contactId);
             return RedirectToDefaultRoute();
         }
 
@@ -58,9 +68,12 @@ namespace Dnn.ContactList.Mvc.Controllers
         [HttpGet]
         public ActionResult Edit(int contactId = -1)
         {
+			_logger.LogDebug(">>> Entering Edit(contactId={ContactId})", contactId);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var contact = (contactId == -1)
                         ? new Contact { PortalId = PortalSettings.PortalId }
                         : _repository.GetContact(contactId, PortalSettings.PortalId);
+						_logger.LogInformation("Edit(contactId)={ContactId}: find query executed in {Arg1} ms", contactId, __logStart.ElapsedMilliseconds);
 
             return View(contact);
         }
@@ -111,13 +124,18 @@ namespace Dnn.ContactList.Mvc.Controllers
         [ModuleAction(ControlKey = "Edit", TitleKey = "AddContact")]
         public ActionResult Index(string searchTerm = "", int pageIndex = 0)
         {
+			_logger.LogDebug(">>> Entering Index(searchTerm={SearchTerm},pageIndex={PageIndex})", searchTerm, pageIndex);
             var contacts = _repository.GetContacts(searchTerm, PortalSettings.PortalId, pageIndex, ModuleContext.Configuration.ModuleSettings.GetValueOrDefault("PageSize", 6));
 
+			_logger.LogDebug("Index(searchTerm={SearchTerm},pageIndex={PageIndex}): contacts → {Contacts}", searchTerm, pageIndex, contacts);
+			_logger.LogDebug("<<< Exiting Index(searchTerm={SearchTerm},pageIndex={PageIndex})", searchTerm, pageIndex);
             return View(contacts);
         }
 
         public JsonResult GetJsonResult()
         {
+			_logger.LogDebug(">>> Entering GetJsonResult()");
+			_logger.LogDebug("<<< Exiting GetJsonResult()");
             return new JsonResult()
             {
                 Data = new
@@ -133,10 +151,13 @@ namespace Dnn.ContactList.Mvc.Controllers
 
         public ActionResult GetDemoPartial()
         {
+			_logger.LogDebug(">>> Entering GetDemoPartial()");
             TempData["UserID"] = User.UserID;
             ViewData["PortalId"] = PortalSettings.PortalId;
             ViewBag.Alias = PortalSettings.PortalAlias.HTTPAlias;
+			_logger.LogDebug("GetDemoPartial(): ViewBag.Alias → {Arg0}", ViewBag.Alias);
 
+			_logger.LogDebug("<<< Exiting GetDemoPartial()");
             return PartialView("_DemoPartial", DateTime.Now);
         }
     }

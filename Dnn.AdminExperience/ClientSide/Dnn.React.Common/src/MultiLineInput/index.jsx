@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import "./style.less";
+const logger = console;
 
 const getOpts = function (enabled) {
     let opts = {};
@@ -17,10 +18,14 @@ const getHandler = function (handler, enabled) {
 class MultiLineInput extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <textarea className={"dnn-ui-common-multi-line-input" + (" " + props.className)}
                 id={props.id}

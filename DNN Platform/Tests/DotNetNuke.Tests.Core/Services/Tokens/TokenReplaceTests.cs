@@ -34,13 +34,19 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
         [SetUp]
         public void SetUp()
         {
+			mockEventLogger.LogDebug(">>> Entering SetUp()");
             ComponentFactory.RegisterComponentInstance<TokenProvider>(new CoreTokenProvider());
             this.mockCache = MockComponentProvider.CreateDataCacheProvider();
+			mockEventLogger.LogDebug("SetUp(): mockCache → {MockCache}", mockCache);
             this.mockHostController = new Mock<IHostController>();
+			mockEventLogger.LogDebug("SetUp(): mockHostController → {MockHostController}", mockHostController);
             this.mockHostController.As<IHostSettingsService>();
             this.portalController = new Mock<IPortalController>();
+			mockEventLogger.LogDebug("SetUp(): portalController → {PortalController}", portalController);
             this.moduleController = new Mock<IModuleController>();
+			mockEventLogger.LogDebug("SetUp(): moduleController → {ModuleController}", moduleController);
             this.userController = new Mock<IUserController>();
+			mockEventLogger.LogDebug("SetUp(): userController → {UserController}", userController);
             PortalController.SetTestableInstance(this.portalController.Object);
             ModuleController.SetTestableInstance(this.moduleController.Object);
             UserController.SetTestableInstance(this.userController.Object);
@@ -52,6 +58,7 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
             this.serviceProvider = FakeServiceProvider.Setup(
                 services =>
                 {
+					mockEventLogger.LogDebug("SetUp(): serviceProvider → {ServiceProvider}", serviceProvider);
                     services.AddSingleton(this.mockCache.Object);
                     services.AddSingleton((IHostSettingsService)this.mockHostController.Object);
                     services.AddSingleton(this.mockHostController.Object);
@@ -59,15 +66,18 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
                     services.AddSingleton(this.moduleController.Object);
                     services.AddSingleton(this.userController.Object);
                 });
+				mockEventLogger.LogDebug("<<< Exiting SetUp()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			mockEventLogger.LogDebug(">>> Entering TearDown()");
             this.serviceProvider.Dispose();
             PortalController.ClearInstance();
             ModuleController.ClearInstance();
             UserController.ClearInstance();
+			mockEventLogger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
@@ -75,15 +85,18 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
         [TestCase("This is just plain text")]
         public void TextInputIsReturnedUnModified(string sourceText)
         {
+			mockEventLogger.LogDebug(">>> Entering TextInputIsReturnedUnModified(sourceText={SourceText})", sourceText);
             // Arrange
             var tokenReplace = new TokenReplace(Scope.DefaultSettings, PortalSettings.Current.DefaultLanguage,
                 PortalSettings.Current, UserController.Instance.GetUser(1, 1), 1);
 
             // Act
             var outputText = tokenReplace.ReplaceEnvironmentTokens(sourceText);
+			mockEventLogger.LogDebug("TextInputIsReturnedUnModified(sourceText={SourceText}): outputText → {OutputText}", sourceText, outputText);
 
             // Assert
             Assert.That(sourceText, Is.EqualTo(outputText));
+			mockEventLogger.LogDebug("<<< Exiting TextInputIsReturnedUnModified(sourceText={SourceText})", sourceText);
         }
 
         [Test]
@@ -92,19 +105,23 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
         [TestCase("[JavaScript:{ jsname: \"Knockout\" }] [JavaScript:{ path: \"~/DesktopModules/Dnn/ContactList/ClientScripts/contacts.js\"}]")]
         public void ObjectInputIsReturnedBlank(string sourceText)
         {
+			mockEventLogger.LogDebug(">>> Entering ObjectInputIsReturnedBlank(sourceText={SourceText})", sourceText);
             // Arrange
             var tokenReplace = new TokenReplace(Scope.DefaultSettings, PortalSettings.Current.DefaultLanguage,
                 PortalSettings.Current, UserController.Instance.GetUser(1, 1), 1);
 
             // Act
             var outputText = tokenReplace.ReplaceEnvironmentTokens(sourceText);
+			mockEventLogger.LogDebug("ObjectInputIsReturnedBlank(sourceText={SourceText}): outputText → {OutputText}", sourceText, outputText);
 
             // Assert
             Assert.That(outputText.Trim(), Is.EqualTo(string.Empty));
+			mockEventLogger.LogDebug("<<< Exiting ObjectInputIsReturnedBlank(sourceText={SourceText})", sourceText);
         }
 
         private void SetupPortalSettings()
         {
+			mockEventLogger.LogDebug(">>> Entering SetupPortalSettings()");
             var portalSettings = new PortalSettings
             {
                 AdministratorRoleName = Utilities.Constants.RoleName_Administrators,
@@ -112,10 +129,12 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
             };
 
             this.portalController.Setup(pc => pc.GetCurrentPortalSettings()).Returns(portalSettings);
+			mockEventLogger.LogDebug("<<< Exiting SetupPortalSettings()");
         }
 
         private void SetupModuleInfo()
         {
+			mockEventLogger.LogDebug(">>> Entering SetupModuleInfo()");
             var moduleInfo = new ModuleInfo
             {
                 ModuleID = 1,
@@ -124,10 +143,12 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
 
             this.moduleController.Setup(mc => mc.GetModule(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>()))
                 .Returns(moduleInfo);
+				mockEventLogger.LogDebug("<<< Exiting SetupModuleInfo()");
         }
 
         private void SetupUserInfo()
         {
+			mockEventLogger.LogDebug(">>> Entering SetupUserInfo()");
             var userInfo = new UserInfo
             {
                 UserID = 1,
@@ -135,6 +156,7 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
                 PortalID = this.portalController.Object.GetCurrentPortalSettings().PortalId,
             };
             this.userController.Setup(uc => uc.GetUser(It.IsAny<int>(), It.IsAny<int>())).Returns(userInfo);
+			mockEventLogger.LogDebug("<<< Exiting SetupUserInfo()");
         }
     }
 }

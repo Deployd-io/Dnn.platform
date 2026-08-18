@@ -17,6 +17,7 @@ namespace DotNetNuke.Services.Connections
 
     public sealed class DynamicJsonConverter : JavaScriptConverter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DynamicJsonConverter));
         /// <inheritdoc />
         public override IEnumerable<Type> SupportedTypes
         {
@@ -47,40 +48,50 @@ namespace DotNetNuke.Services.Connections
             public DynamicJsonObject(IDictionary<string, object> dictionary)
             {
                 this.dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
+				Logger.LogDebug("DynamicJsonObject(dictionary={Dictionary}): dictionary → {Dictionary1}", dictionary, dictionary);
+				Logger.LogDebug("<<< Exiting DynamicJsonObject(dictionary={Dictionary})", dictionary);
             }
 
             public override string ToString()
             {
+				Logger.LogDebug(">>> Entering ToString()");
                 var sb = new StringBuilder("{");
                 this.ToString(sb);
+				Logger.LogDebug("<<< Exiting ToString()");
                 return sb.ToString();
             }
 
             public override bool TryGetMember(GetMemberBinder binder, out object result)
             {
+				Logger.LogDebug(">>> Entering TryGetMember(binder={Binder})", binder);
                 if (!this.dictionary.TryGetValue(binder.Name, out result))
                 {
                     // return null to avoid exception.  caller can check for null this way...
                     result = null;
+					Logger.LogDebug("TryGetMember(binder={Binder}): result → {Result}", binder, result);
                     return true;
                 }
 
                 result = WrapResultObject(result);
+				Logger.LogDebug("<<< Exiting TryGetMember(binder={Binder})", binder);
                 return true;
             }
 
             public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
             {
+				Logger.LogDebug(">>> Entering TryGetIndex(binder={Binder},indexes={Indexes})", binder, indexes);
                 if (indexes.Length == 1 && indexes[0] != null)
                 {
                     if (!this.dictionary.TryGetValue(indexes[0].ToString(), out result))
                     {
                         // return null to avoid exception.  caller can check for null this way...
                         result = null;
+						Logger.LogDebug("TryGetIndex(binder={Binder},indexes={Indexes}): result → {Result}", binder, indexes, result);
                         return true;
                     }
 
                     result = WrapResultObject(result);
+				Logger.LogDebug("<<< Exiting TryGetIndex(binder={Binder},indexes={Indexes})", binder, indexes);
                     return true;
                 }
 
@@ -89,6 +100,7 @@ namespace DotNetNuke.Services.Connections
 
             private static object WrapResultObject(object result)
             {
+				Logger.LogDebug(">>> Entering WrapResultObject(result={Result})", result);
                 var dictionary = result as IDictionary<string, object>;
                 if (dictionary != null)
                 {
@@ -103,6 +115,7 @@ namespace DotNetNuke.Services.Connections
                         : new List<object>(arrayList.Cast<object>());
                 }
 
+				Logger.LogDebug("<<< Exiting WrapResultObject(result={Result})", result);
                 return result;
             }
 

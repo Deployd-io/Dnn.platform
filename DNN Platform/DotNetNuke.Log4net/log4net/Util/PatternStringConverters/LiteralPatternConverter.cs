@@ -53,13 +53,16 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         public override PatternConverter SetNext(PatternConverter pc)
         {
+			value.LogDebug(">>> Entering SetNext(pc={Pc})", pc);
             LiteralPatternConverter literalPc = pc as LiteralPatternConverter;
             if (literalPc != null)
             {
                 // Combine the two adjacent literals together
                 this.Option = this.Option + literalPc.Option;
+				value.LogDebug("SetNext(pc={Pc}): this.Option → {Arg1}", pc, this.Option);
 
                 // We are the next converter now
+			value.LogDebug("<<< Exiting SetNext(pc={Pc})", pc);
                 return this;
             }
 
@@ -81,7 +84,9 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         public override void Format(TextWriter writer, object state) 
         {
+			value.LogDebug(">>> Entering Format(writer={Writer},state={State})", writer, state);
             writer.Write(this.Option);
+			value.LogDebug("<<< Exiting Format(writer={Writer},state={State})", writer, state);
         }
 
         /// <summary>Convert this pattern into the rendered message</summary>
@@ -94,6 +99,9 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         protected override void Convert(TextWriter writer, object state) 
         {
+			value.LogDebug(">>> Entering Convert(writer={Writer},state={State})", writer, state);
+			value.LogWarning("Throwing InvalidOperationException from Convert(writer={Writer},state={State})", writer, state);
+			value.LogDebug("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
             throw new InvalidOperationException("Should never get here because of the overridden Format method");
         }
     }

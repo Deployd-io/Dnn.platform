@@ -11,6 +11,7 @@ namespace DotNetNuke.Services.Analytics
 
     public abstract class AnalyticsEngineBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AnalyticsEngineBase));
         public abstract string EngineName { get; }
 
         public abstract string RenderScript(string scriptTemplate);
@@ -18,21 +19,27 @@ namespace DotNetNuke.Services.Analytics
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public string ReplaceTokens(string s)
         {
+			Logger.LogDebug(">>> Entering ReplaceTokens(s={S})", s);
             var tokenizer = new TokenReplace
             {
                 AccessingUser = UserController.Instance.GetCurrentUserInfo(),
                 DebugMessages = false,
             };
+			Logger.LogDebug("<<< Exiting ReplaceTokens(s={S})", s);
             return tokenizer.ReplaceEnvironmentTokens(s);
         }
 
         public AnalyticsConfiguration GetConfig()
         {
+			Logger.LogDebug(">>> Entering GetConfig()");
+			Logger.LogDebug("<<< Exiting GetConfig()");
             return AnalyticsConfiguration.GetConfig(this.EngineName);
         }
 
         public virtual string RenderCustomScript(AnalyticsConfiguration config)
         {
+			Logger.LogDebug(">>> Entering RenderCustomScript(config={Config})", config);
+			Logger.LogDebug("<<< Exiting RenderCustomScript(config={Config})", config);
             return string.Empty;
         }
     }

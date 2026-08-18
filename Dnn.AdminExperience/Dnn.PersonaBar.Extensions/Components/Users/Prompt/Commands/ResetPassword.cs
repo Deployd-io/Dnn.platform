@@ -26,13 +26,16 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         public ResetPassword()
             : this(new UserValidator())
         {
+		eventLogger.LogDebug(">>> Entering ResetPassword()");
         }
 
+		eventLogger.LogDebug("<<< Exiting ResetPassword()");
         /// <summary>Initializes a new instance of the <see cref="ResetPassword"/> class.</summary>
         /// <param name="userValidator">The user validator.</param>
         public ResetPassword(IUserValidator userValidator)
         {
             this.userValidator = userValidator;
+			eventLogger.LogDebug("ResetPassword(userValidator={UserValidator}): userValidator → {UserValidator1}", userValidator, userValidator);
         }
 
         /// <inheritdoc />
@@ -45,13 +48,16 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.UserId = this.GetFlagValue(FlagId, "User Id", -1, true, true, true);
             this.Notify = this.GetFlagValue(FlagNotify, "Notify", false);
+			eventLogger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogDebug(">>> Entering Run()");
             ConsoleErrorResultModel errorResultModel;
             UserInfo userInfo;
 
@@ -72,6 +78,8 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             }
 
             var success = UsersController.Instance.ForceChangePassword(userInfo, this.PortalId, this.Notify);
+			eventLogger.LogDebug("Run(): success → {Success}", success);
+			eventLogger.LogDebug("<<< Exiting Run()");
             return success
                 ? new ConsoleResultModel(this.LocalizeString("Prompt_PasswordReset") + (this.Notify ? this.LocalizeString("Prompt_EmailSent") : string.Empty)) { Records = 1 }
                 : new ConsoleErrorResultModel(this.LocalizeString("OptionUnavailable"));

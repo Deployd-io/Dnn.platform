@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -18,6 +19,7 @@
  */
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -27,6 +29,7 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("asterisk", function() {
   var atoms    = ["exten", "same", "include","ignorepat","switch"],
       dpcmd    = ["#include","#exec"],
@@ -64,10 +67,13 @@ CodeMirror.defineMode("asterisk", function() {
                  ];
 
   function basicToken(stream,state){
+	logger.debug(`>>> Entering basicToken(stream=${stream},state=${state})`);
     var cur = '';
     var ch = stream.next();
+	logger.debug(`basicToken(stream=${stream},state=${state}): cur → ${cur}`);
     // comment
     if(ch == ";") {
+	logger.debug(`basicToken(stream=${stream},state=${state}): ch → ${ch}`);
       stream.skipToEnd();
       return "comment";
     }
@@ -98,9 +104,12 @@ CodeMirror.defineMode("asterisk", function() {
     // application args
     if(ch == '$'){
       var ch1 = stream.peek();
+	logger.debug(`basicToken(stream=${stream},state=${state}): ch1 → ${ch1}`);
       if(ch1 == '{'){
         stream.skipTo('}');
         stream.eat('}');
+		logger.debug(`basicToken(stream=${stream},state=${state}): state.extenStart → ${state.extenStart}`);
+		logger.debug(`<<< Exiting basicToken(stream=${stream},state=${state})`);
         return "variable-3";
       }
     }
@@ -123,6 +132,7 @@ CodeMirror.defineMode("asterisk", function() {
 
   return {
     startState: function() {
+	logger.debug('>>> Entering startState()');
       return {
         extenStart: false,
         extenSame:  false,
@@ -131,18 +141,23 @@ CodeMirror.defineMode("asterisk", function() {
         extenPriority: false,
         extenApplication: false
       };
+	logger.debug('<<< Exiting startState()');
     },
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
 
       var cur = '';
       if(stream.eatSpace()) return null;
+	logger.debug(`token(stream=${stream},state=${state}): cur → ${cur}`);
       // extension started
       if(state.extenStart){
         stream.eatWhile(/[^\s]/);
         cur = stream.current();
         if(/^=>?$/.test(cur)){
           state.extenExten = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.extenExten → ${state.extenExten}`);
           state.extenStart = false;
+		logger.debug(`token(stream=${stream},state=${state}): state.extenStart → ${state.extenStart}`);
           return "strong";
         } else {
           state.extenStart = false;
@@ -153,16 +168,20 @@ CodeMirror.defineMode("asterisk", function() {
         // set exten and priority
         state.extenExten = false;
         state.extenPriority = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.extenPriority → ${state.extenPriority}`);
         stream.eatWhile(/[^,]/);
         if(state.extenInclude) {
           stream.skipToEnd();
           state.extenPriority = false;
           state.extenInclude = false;
+		logger.debug(`token(stream=${stream},state=${state}): state.extenInclude → ${state.extenInclude}`);
         }
         if(state.extenSame) {
           state.extenPriority = false;
           state.extenSame = false;
+		logger.debug(`token(stream=${stream},state=${state}): state.extenSame → ${state.extenSame}`);
           state.extenApplication = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.extenApplication → ${state.extenApplication}`);
         }
         return "tag";
       } else if(state.extenPriority) {
@@ -183,6 +202,7 @@ CodeMirror.defineMode("asterisk", function() {
           return "def strong";
         }
       } else{
+	logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
         return basicToken(stream,state);
       }
 

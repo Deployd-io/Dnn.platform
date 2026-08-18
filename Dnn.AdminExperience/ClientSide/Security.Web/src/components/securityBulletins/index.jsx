@@ -6,16 +6,20 @@ import BulletinItemRow from "./bulletinItemRow";
 import resx from "../../resources";
 import styles from "./style.module.less";
 import WarningIcon from "./../svg/error.svg?react";
+const logger = console;
 
 class SecurityBulletinsPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             error: undefined
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {props} = this;
         if (props.securityBulletins) {
             return;
@@ -27,9 +31,11 @@ class SecurityBulletinsPanelBody extends Component {
                 error: errorMessage.Message
             });
         }));
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     renderHeader() {
+		logger.debug('>>> Entering renderHeader()');
         const tableFields = [
             { "name": resx.get("Bulletins"), "id": "Bulletins" }
         ];
@@ -40,12 +46,16 @@ class SecurityBulletinsPanelBody extends Component {
             </div>;
         });
 
+		logger.debug(`renderHeader(): tableHeaders → ${tableHeaders}`);
+		logger.debug('<<< Exiting renderHeader()');
         return <div className="bulletinsHeader-wrapper">{tableHeaders}</div>;
     }
 
     renderedList() {
+		logger.debug('>>> Entering renderedList()');
         const {props} = this;
         if (props.securityBulletins) {
+			logger.debug('<<< Exiting renderedList()');
             return props.securityBulletins.map((term, index) => {
                 return (
                     <BulletinItemRow
@@ -77,6 +87,7 @@ class SecurityBulletinsPanelBody extends Component {
 
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
         if (state.error) {
             return (
@@ -98,6 +109,7 @@ class SecurityBulletinsPanelBody extends Component {
                 );
             }
             else {
+				logger.debug('<<< Exiting render()');
                 return <div style={{ margin: "25px" }}>{resx.get("BulletinsDoNotExist").replace("{0}", props.platformVersion)}</div>;
             }
         }

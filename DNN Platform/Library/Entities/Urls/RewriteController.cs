@@ -27,6 +27,7 @@ namespace DotNetNuke.Entities.Urls
 
     public class RewriteController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RewriteController));
         internal const int SiteRootRewrite = -3;
         internal const int AllTabsRewrite = -1;
         private const string TabKeySeparator = "::";
@@ -202,6 +203,9 @@ namespace DotNetNuke.Entities.Urls
 
         internal static string CleanExtension(string value, string extension, out bool replaced)
         {
+			Logger.LogDebug(">>> Entering CleanExtension(value={Value},extension={Extension})", value, extension);
+			Logger.LogDebug("<<< Exiting CleanExtension(value={Value},extension={Extension})", value, extension);
+			Logger.LogDebug("<<< Exiting CleanExtension(value={Value},settings={Settings})", value, settings);
             return CleanExtension(value, extension, string.Empty, out replaced);
         }
 
@@ -655,6 +659,7 @@ namespace DotNetNuke.Entities.Urls
                                         reWritten = true;
                                         finished = true;
                                     }
+									Logger.LogDebug("<<< Exiting SetRewriteParameters(result={Result},rewritePath={RewritePath})", result, rewritePath);
                                 }
 
                                 if (finished)
@@ -702,8 +707,10 @@ namespace DotNetNuke.Entities.Urls
 
         internal static void GetUrlWithQuerystring(HttpRequest request, Uri requestUri, out string fullUrl, out string querystring)
         {
+			Logger.LogDebug(">>> Entering GetUrlWithQuerystring(request={Request},requestUri={RequestUri})", request, requestUri);
             // 699: incorrect encoding in absoluteUri.ToString()
             string urlWoutQuery = requestUri.AbsoluteUri;
+			Logger.LogDebug("GetUrlWithQuerystring(request={Request},requestUri={RequestUri}): urlWoutQuery → {UrlWoutQuery}", request, requestUri, urlWoutQuery);
             if (requestUri.Query != string.Empty)
             {
                 urlWoutQuery = urlWoutQuery.Replace(requestUri.Query, string.Empty);
@@ -715,9 +722,11 @@ namespace DotNetNuke.Entities.Urls
             // the encoding type is changed from utf-8 to latin-1
             querystring = requestUri.Query;
 
+			Logger.LogDebug("GetUrlWithQuerystring(request={Request},requestUri={RequestUri}): querystring → {Querystring}", request, requestUri, querystring);
             // get results
             fullUrl = urlWoutQuery;
             if (fullUrl.EndsWith("/_noext.aspx", StringComparison.InvariantCultureIgnoreCase))
+			Logger.LogDebug("GetUrlWithQuerystring(request={Request},requestUri={RequestUri}): fullUrl → {FullUrl}", request, requestUri, fullUrl);
             {
                 fullUrl = fullUrl.Replace("_noext.aspx", string.Empty);
 
@@ -734,6 +743,7 @@ namespace DotNetNuke.Entities.Urls
 
                 fullUrl += querystring;
             }
+			Logger.LogDebug("<<< Exiting GetUrlWithQuerystring(request={Request},requestUri={RequestUri})", request, requestUri);
         }
 
         /// <summary>Identifies a request for a physical file on the system.</summary>
@@ -822,6 +832,7 @@ namespace DotNetNuke.Entities.Urls
 
             // mark as physical request
             result.IsPhysicalResource = isPhysicalResource;
+			Logger.LogDebug("<<< Exiting IdentifyByPhysicalResource(physicalPath={PhysicalPath},fullUrl={FullUrl},queryStringCol={QueryStringCol},result={Result},useFriendlyUrls={UseFriendlyUrls},settings={Settings},parentTraceId={ParentTraceId})", physicalPath, fullUrl, queryStringCol, result, useFriendlyUrls, settings, parentTraceId);
         }
 
         internal static bool IdentifyByRegEx(
@@ -1040,6 +1051,7 @@ namespace DotNetNuke.Entities.Urls
             if (settings.FriendlyAdminHostUrls == false && IsAdminTab(tab.PortalID, tab.TabPath, settings))
             {
                 exclude = true;
+				Logger.LogDebug("<<< Exiting IsAdminTab(portalId={PortalId},tabPath={TabPath},settings={Settings})", portalId, tabPath, settings);
             }
 
             if (!exclude && settings.UseBaseFriendlyUrls != null)
@@ -1065,6 +1077,7 @@ namespace DotNetNuke.Entities.Urls
                 result.Action = ActionType.CheckFor301;
                 result.DebugMessages.Add("Built-in Url found: " + rewritePath);
             }
+			Logger.LogDebug("<<< Exiting RequestRedirectOnBuiltInUrl(urlParm={UrlParm},rewritePath={RewritePath},result={Result})", urlParm, rewritePath, result);
         }
 
         /// <summary>converts an array of URL path sections into the rewritten string of parameters for the requested URL.</summary>
@@ -1265,6 +1278,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting RewriteParameters(newUrl={NewUrl},tabKeyVal={TabKeyVal},urlParms={UrlParms},result={Result},langParms={LangParms},settings={Settings})", newUrl, tabKeyVal, urlParms, result, langParms, settings);
             return newUrl;
         }
 
@@ -1476,6 +1490,7 @@ namespace DotNetNuke.Entities.Urls
                         if (rewritePathHasQuery)
                         {
                             rewritePath = rewritePath + "&" + queryStringPiece;
+							Logger.LogDebug("AddQueryStringToRewritePath(rewritePath={RewritePath},queryString={QueryString}): rewritePath → {RewritePath1}", rewritePath, queryString, rewritePath);
                         }
                         else
                         {
@@ -1727,6 +1742,7 @@ namespace DotNetNuke.Entities.Urls
 
         private static UserInfo GetUser(IHostSettings hostSettings, int portalId, string vanityUrl)
         {
+			Logger.LogDebug(">>> Entering GetUser(hostSettings={HostSettings},portalId={PortalId},vanityUrl={VanityUrl})", hostSettings, portalId, vanityUrl);
             string cacheKey = string.Format(CultureInfo.InvariantCulture, CacheController.VanityUrlLookupKey, portalId);
             var vanityUrlLookupDictionary = CBO.GetCachedObject<Dictionary<string, UserInfo>>(
                 hostSettings,
@@ -1737,8 +1753,10 @@ namespace DotNetNuke.Entities.Urls
             {
                 user = UserController.GetUserByVanityUrl(portalId, vanityUrl);
                 vanityUrlLookupDictionary[vanityUrl] = user;
+				Logger.LogDebug("GetUser(hostSettings={HostSettings},portalId={PortalId},vanityUrl={VanityUrl}): user → {User}", hostSettings, portalId, vanityUrl, user);
             }
 
+			Logger.LogDebug("<<< Exiting GetUser(hostSettings={HostSettings},portalId={PortalId},vanityUrl={VanityUrl})", hostSettings, portalId, vanityUrl);
             return user;
         }
 

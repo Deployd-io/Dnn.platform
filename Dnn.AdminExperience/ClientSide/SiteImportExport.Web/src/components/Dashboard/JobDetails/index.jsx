@@ -7,26 +7,33 @@ import {
 } from "../../../actions";
 import Localization from "localization";
 import itemsToExportService from "../../../services/itemsToExportService";
+const logger = console;
 import { Label, Button, GridCell, SvgIcons } from "@dnnsoftware/dnn-react-common";
 
 class JobDetails extends Component {
     constructor(props) {
         super();
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             cancelled: props.cancelled
         };
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const { props } = this;
         if (props.jobId) {
             props.dispatch(ImportExportActions.getJobDetails(props.jobId));
+			logger.debug('<<< Exiting componentDidMount()');
         }
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         let {props} = this;
         if (props.cancelled !== prevProps.cancelled) {
+			logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
             this.setState({
                 cancelled: props.cancelled
             });
@@ -35,9 +42,11 @@ class JobDetails extends Component {
 
      
     getSummaryItem(category) {
+		logger.debug(`>>> Entering getSummaryItem(category=${category})`);
         const { props, state } = this;
         if (props.jobDetail.Summary) {
             let detail = props.jobDetail.Summary.SummaryItems.find(c => c.Category.toUpperCase() === category.toUpperCase());
+			logger.debug(`getSummaryItem(category=${category}): detail → ${detail}`);
             if (detail) {
                 if (detail.Completed || state.cancelled || props.jobDetail.Status !== 1 || detail.TotalItems === 0) {
                     return detail.ProcessedItems > detail.TotalItems ? detail.TotalItemsString : detail.ProcessedItemsString + " / " + detail.TotalItemsString;
@@ -54,16 +63,20 @@ class JobDetails extends Component {
             else return "-";
         }
         else {
+			logger.debug(`<<< Exiting getSummaryItem(category=${category})`);
             return "-";
         }
     }
 
     getUsersSummary() {
+		logger.debug('>>> Entering getUsersSummary()');
         const { props, state } = this;
         if (props.jobDetail.Summary) {
             let users = props.jobDetail.Summary.SummaryItems.find(c => c.Category === "USERS");
+			logger.debug(`getUsersSummary(): users → ${users}`);
             if (users && props.jobDetail.JobType === "Site Import") {
                 let usersData = props.jobDetail.Summary.SummaryItems.find(c => c.Category === "USERS_DATA");
+				logger.debug(`getUsersSummary(): usersData → ${usersData}`);
                 if (users.TotalItems > 0 && !users.Completed && !state.cancelled) {
                     return <GridCell>
                         <Label
@@ -150,6 +163,7 @@ class JobDetails extends Component {
                 }
             }
             else {
+				logger.debug('<<< Exiting getUsersSummary()');
                 return <GridCell>
                     <Label
                         labelType="inline"
@@ -162,16 +176,22 @@ class JobDetails extends Component {
     }
 
     cancel(jobId) {
+		logger.debug(`>>> Entering cancel(jobId=${jobId})`);
         this.props.cancelJob(jobId);
+		logger.debug(`<<< Exiting cancel(jobId=${jobId})`);
     }
 
     delete(jobId) {
+		logger.debug(`>>> Entering delete(jobId=${jobId})`);
         this.props.deleteJob(jobId);
+		logger.debug(`<<< Exiting delete(jobId=${jobId})`);
     }
 
     renderExportSummary() {
+		logger.debug('>>> Entering renderExportSummary()');
         const { props, state } = this;
         const registeredItemsToExport = itemsToExportService.getRegisteredItemsToExport();
+		logger.debug('<<< Exiting renderExportSummary()');
         return <div style={{ float: "left", width: "100%" }}>
             {props.jobDetail &&
                 <div className="export-summary">
@@ -322,8 +342,10 @@ class JobDetails extends Component {
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const { props } = this;
         if (props.jobDetail !== undefined) {
+			logger.debug('<<< Exiting render()');
             return (
                 <div className="job-details">
                     <div className="summary-title">{props.jobDetail.JobType.indexOf("Export") >= 0 ? Localization.get("ExportSummary") : Localization.get("ImportSummary")}</div>

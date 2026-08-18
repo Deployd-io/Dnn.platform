@@ -1,3 +1,4 @@
+const logger = console;
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
@@ -91,6 +92,7 @@ if (typeof dnn.ContentEditorManager === "undefined" || dnn.ContentEditorManager 
                 paneName = paneName.toLowerCase();
             }
             $('.dnnSortable[id]').each(function () {
+				logger.debug('>>> Entering each()');
                 var $pane = $(this);
                 var paneId = $pane.attr('id').toLowerCase();
                 var thisPaneName;
@@ -102,6 +104,7 @@ if (typeof dnn.ContentEditorManager === "undefined" || dnn.ContentEditorManager 
                 
                 if (paneName === paneId || paneName === thisPaneName) {
                     defaultPane = $pane;
+				logger.debug('<<< Exiting each()');
                     return false;
                 }
 

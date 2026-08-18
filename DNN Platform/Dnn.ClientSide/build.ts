@@ -9,6 +9,7 @@ import cssnano from "cssnano";
 import settings from "../../settings.local.json";
 import postcssImport from "postcss-import";
 import postcssBanner from "postcss-banner";
+const logger = console;
 
 // Define input and output file types
 interface FileConfig {
@@ -40,12 +41,17 @@ const files: FileConfig[] = [
 // Helper function to ensure directories exist
 function ensureDirectoryExists(filePath: string): void {
   const dir = path.dirname(filePath);
+logger.debug(`ensureDirectoryExists(filePath=${filePath}): dir → ${dir}`);
   if (!fs.existsSync(dir)) {
+	logger.debug(`>>> Entering ensureDirectoryExists(filePath=${filePath})`);
     fs.mkdirSync(dir, { recursive: true });
+	logger.debug(`<<< Exiting ensureDirectoryExists(filePath=${filePath})`);
   }
 }
 
 function normalizePath(filePath: string): string {
+logger.debug(`>>> Entering normalizePath(filePath=${filePath})`);
+logger.debug(`<<< Exiting normalizePath(filePath=${filePath})`);
   return path.resolve(filePath).replace(/\\/g, "/");
 }
 
@@ -87,8 +93,10 @@ async function buildScss(input: string, output: string): Promise<void> {
     console.log(`CSS written to: ${output}`);
 
     if (postcssResult.map) {
+		logger.debug(`>>> Entering buildScss(input=${input},output=${output})`);
         const sourcemapPath = `${output}.map`;
         fs.writeFileSync(sourcemapPath, JSON.stringify(postcssResult.map));
+		logger.debug(`<<< Exiting buildScss(input=${input},output=${output})`);
         console.log(`Sourcemap written to: ${sourcemapPath}`);
     }
   } catch (error) {
@@ -111,17 +119,21 @@ async function buildJs(input: string, output: string): Promise<void> {
     });
     console.log(`JS written to: ${output}`);
   } catch (error) {
+	logger.debug(`>>> Entering buildJs(input=${input},output=${output})`);
     console.error(`Error bundling JS for ${input}:`, error);
+	logger.debug(`<<< Exiting buildJs(input=${input},output=${output})`);
   }
 }
 
 // Process all files
 async function buildAll(): Promise<void> {
   for (const { input, output } of files) {
+	logger.debug('>>> Entering buildAll()');
     if (input.endsWith(".scss")) {
       await buildScss(input, output);
     } else if (input.endsWith(".ts") || input.endsWith(".js")) {
       await buildJs(input, output);
+	logger.debug('<<< Exiting buildAll()');
     }
   }
 }
@@ -137,6 +149,8 @@ function watchFiles(): void {
   });
   buildAll();
   watcher.on("all", async (event, filePath) => {
+	logger.debug('>>> Entering watchFiles()');
+	logger.debug('<<< Exiting watchFiles()');
       await buildAll();
   });
 }

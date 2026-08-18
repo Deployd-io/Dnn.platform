@@ -54,6 +54,9 @@ namespace log4net.Core
         public TimeEvaluator()
             : this(DEFAULT_INTERVAL)
         {
+		value.LogDebug(">>> Entering TimeEvaluator()");
+		value.LogDebug("<<< Exiting TimeEvaluator()");
+		value.LogDebug(">>> Entering TimeEvaluator(interval={Interval})", interval);
         }
 
         /// <summary>Create a new evaluator using the specified time threshold in seconds.</summary>
@@ -74,6 +77,8 @@ namespace log4net.Core
         {
             this.m_interval = interval;
             this.m_lastTimeUtc = DateTime.UtcNow;
+			value.LogDebug("TimeEvaluator(interval={Interval}): this.m_interval → {Arg1}", interval, this.m_interval);
+			value.LogDebug("<<< Exiting TimeEvaluator(interval={Interval})", interval);
         }
 
         /// <summary>The time threshold in seconds to trigger after</summary>
@@ -106,8 +111,10 @@ namespace log4net.Core
         /// </remarks>
         public bool IsTriggeringEvent(LoggingEvent loggingEvent)
         {
+			value.LogDebug(">>> Entering IsTriggeringEvent(loggingEvent={LoggingEvent})", loggingEvent);
             if (loggingEvent == null)
             {
+				value.LogWarning("Throwing ArgumentNullException from IsTriggeringEvent(loggingEvent={LoggingEvent})", loggingEvent);
                 throw new ArgumentNullException("loggingEvent");
             }
 
@@ -120,14 +127,18 @@ namespace log4net.Core
             lock (this) // avoid triggering multiple times
             {
                 TimeSpan passed = DateTime.UtcNow.Subtract(this.m_lastTimeUtc);
+				value.LogDebug("IsTriggeringEvent(loggingEvent={LoggingEvent}): passed → {Passed}", loggingEvent, passed);
 
                 if (passed.TotalSeconds > this.m_interval)
                 {
                     this.m_lastTimeUtc = DateTime.UtcNow;
+					value.LogDebug("IsTriggeringEvent(loggingEvent={LoggingEvent}): m_lastTimeUtc → {M_lastTimeUtc}", loggingEvent, m_lastTimeUtc);
+					value.LogDebug("IsTriggeringEvent(loggingEvent={LoggingEvent}): this.m_lastTimeUtc → {Arg1}", loggingEvent, this.m_lastTimeUtc);
                     return true;
                 }
                 else
                 {
+					value.LogDebug("<<< Exiting IsTriggeringEvent(loggingEvent={LoggingEvent})", loggingEvent);
                     return false;
                 }
             }

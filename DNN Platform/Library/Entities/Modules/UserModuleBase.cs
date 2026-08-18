@@ -34,6 +34,7 @@ namespace DotNetNuke.Entities.Modules
 
     public enum DisplayMode
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UserModuleBase));
         /// <summary>Display all.</summary>
         All = 0,
 
@@ -63,6 +64,9 @@ namespace DotNetNuke.Entities.Modules
         public UserModuleBase()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering UserModuleBase()");
+		Logger.LogDebug("<<< Exiting UserModuleBase()");
+		Logger.LogDebug(">>> Entering UserModuleBase(listController={ListController},hostSettings={HostSettings})", listController, hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="UserModuleBase"/> class.</summary>
@@ -72,6 +76,7 @@ namespace DotNetNuke.Entities.Modules
         {
             this.ListController = listController ?? this.DependencyProvider.GetRequiredService<ListController>();
             this.HostSettings = hostSettings ?? this.DependencyProvider.GetRequiredService<IHostSettings>();
+			Logger.LogDebug("<<< Exiting UserModuleBase(listController={ListController},hostSettings={HostSettings})", listController, hostSettings);
         }
 
         /// <summary>Gets or sets the User associated with this control.</summary>
@@ -208,12 +213,15 @@ namespace DotNetNuke.Entities.Modules
         /// <returns>The setting value or <see langword="null"/>.</returns>
         public static object GetSetting(int portalId, string settingKey)
         {
+			Logger.LogDebug(">>> Entering GetSetting(portalId={PortalId},settingKey={SettingKey})", portalId, settingKey);
             Hashtable settings = UserController.GetUserSettings(portalId);
             if (settings[settingKey] == null)
+			Logger.LogDebug("GetSetting(portalId={PortalId},settingKey={SettingKey}): settings → {Settings}", portalId, settingKey, settings);
             {
                 settings = UserController.GetUserSettings(portalId, settings);
             }
 
+			Logger.LogDebug("<<< Exiting GetSetting(portalId={PortalId},settingKey={SettingKey})", portalId, settingKey);
             return settings[settingKey];
         }
 
@@ -241,6 +249,7 @@ namespace DotNetNuke.Entities.Modules
             {
                 PortalController.UpdatePortalSetting(portalController, portalId, key, setting);
             }
+			Logger.LogDebug("<<< Exiting UpdateSetting(hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},key={Key},setting={Setting})", hostSettingsService, portalController, portalId, key, setting);
         }
 
         /// <summary>Updates the Settings for the Module.</summary>
@@ -265,6 +274,7 @@ namespace DotNetNuke.Entities.Modules
                 var setting = Convert.ToString(settingsEnumerator.Value, CultureInfo.InvariantCulture);
                 UpdateSetting(hostSettingsService, portalController, portalId, key, setting);
             }
+			Logger.LogDebug("<<< Exiting UpdateSettings(hostSettingsService={HostSettingsService},portalController={PortalController},portalId={PortalId},settings={Settings})", hostSettingsService, portalController, portalId, settings);
         }
 
         /// <summary>AddLocalizedModuleMessage adds a localized module message.</summary>
@@ -277,6 +287,7 @@ namespace DotNetNuke.Entities.Modules
             {
                 UI.Skins.Skin.AddModuleMessage(this, message, type);
             }
+			Logger.LogDebug("<<< Exiting AddLocalizedModuleMessage(message={Message},type={Type},display={Display})", message, type, display);
         }
 
         /// <summary>AddModuleMessage adds a module message.</summary>
@@ -286,6 +297,7 @@ namespace DotNetNuke.Entities.Modules
         protected void AddModuleMessage(string message, ModuleMessage.ModuleMessageType type, bool display)
         {
             this.AddLocalizedModuleMessage(Localization.GetString(message, this.LocalResourceFile), type, display);
+			Logger.LogDebug("<<< Exiting AddModuleMessage(message={Message},type={Type},display={Display})", message, type, display);
         }
 
         protected string CompleteUserCreation(UserCreateStatus createStatus, UserInfo newUser, bool notify, bool register)
@@ -375,6 +387,7 @@ namespace DotNetNuke.Entities.Modules
             var adminrole = RoleController.Instance.GetRoleById(portalSettings.PortalId, portalSettings.AdministratorRoleId);
             var roles = new List<RoleInfo> { adminrole };
             NotificationsController.Instance.SendNotification(notification, portalSettings.PortalId, roles, new List<UserInfo>());
+			Logger.LogDebug("<<< Exiting SendAdminNotification(newUser={NewUser},portalSettings={PortalSettings})", newUser, portalSettings);
         }
 
         private static string GetNotificationBody(string locale, UserInfo newUser, PortalSettings portalSettings)
@@ -398,14 +411,18 @@ namespace DotNetNuke.Entities.Modules
         /// <summary>InitialiseUser initialises a "new" user.</summary>
         private UserInfo InitialiseUser()
         {
+			Logger.LogDebug(">>> Entering InitialiseUser()");
             var newUser = new UserInfo();
             if (this.IsHostMenu && !this.IsRegister)
+			Logger.LogDebug("InitialiseUser(): newUser → {NewUser}", newUser);
             {
                 newUser.IsSuperUser = true;
+				Logger.LogDebug("InitialiseUser(): newUser.IsSuperUser → {Arg0}", newUser.IsSuperUser);
             }
             else
             {
                 newUser.PortalID = this.PortalId;
+				Logger.LogDebug("InitialiseUser(): newUser.PortalID → {Arg0}", newUser.PortalID);
             }
 
             // Initialize the ProfileProperties Collection
@@ -418,9 +435,11 @@ namespace DotNetNuke.Entities.Modules
 
             // Set default country
             var country = this.LookupCountry();
+			Logger.LogDebug("InitialiseUser(): country → {Country}", country);
             if (!string.IsNullOrEmpty(country))
             {
                 var listItem = this.ListController.GetListEntryInfo("Country", country);
+				Logger.LogDebug("InitialiseUser(): listItem → {ListItem}", listItem);
                 if (listItem != null)
                 {
                     country = listItem.EntryID.ToString(CultureInfo.InvariantCulture);
@@ -431,24 +450,31 @@ namespace DotNetNuke.Entities.Modules
 
             // Set AffiliateId
             int affiliateId = Null.NullInteger;
+			Logger.LogDebug("InitialiseUser(): affiliateId → {AffiliateId}", affiliateId);
             if (this.Request.Cookies["AffiliateId"] != null)
             {
                 affiliateId = int.Parse(this.Request.Cookies["AffiliateId"].Value, CultureInfo.InvariantCulture);
             }
 
             newUser.AffiliateID = affiliateId;
+			Logger.LogDebug("InitialiseUser(): newUser.AffiliateID → {Arg0}", newUser.AffiliateID);
+			Logger.LogDebug("<<< Exiting InitialiseUser()");
             return newUser;
         }
 
         private string LookupCountry()
         {
+			Logger.LogDebug(">>> Entering LookupCountry()");
             string ip;
             bool isLocal = false;
+			Logger.LogDebug("LookupCountry(): isLocal → {IsLocal}", isLocal);
             bool cacheGeoIPData = true;
             string geoIPFile;
             geoIPFile = "controls/CountryListBox/Data/GeoIP.dat";
             var userRequestIpAddressController = UserRequestIPAddressController.Instance;
+			Logger.LogDebug("LookupCountry(): geoIPFile → {GeoIPFile}", geoIPFile);
             var ipAddress = userRequestIpAddressController.GetUserRequestIPAddress(new HttpRequestWrapper(this.Request));
+			Logger.LogDebug("LookupCountry(): ipAddress → {IpAddress}", ipAddress);
             if (ipAddress == "127.0.0.1")
             {
                 // 'The country cannot be detected because the user is local.
@@ -456,6 +482,7 @@ namespace DotNetNuke.Entities.Modules
 
                 // Set the IP address in case they didn't specify LocalhostCountryCode
                 ip = this.Page.Request.UserHostAddress;
+				Logger.LogDebug("LookupCountry(): ip → {Ip}", ip);
             }
             else
             {
@@ -496,15 +523,18 @@ namespace DotNetNuke.Entities.Modules
 
             // Get the country code based on the IP address
             string country = Null.NullString;
+			Logger.LogDebug("LookupCountry(): country → {Country}", country);
             try
             {
                 country = countryLookup.LookupCountryName(ip);
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in LookupCountry(): {Arg0}", ex.getMessage());
                 Exceptions.LogException(ex);
             }
 
+			Logger.LogDebug("<<< Exiting LookupCountry()");
             return country;
         }
     }

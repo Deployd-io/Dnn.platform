@@ -57,7 +57,11 @@ namespace log4net.Core
         /// </remarks>
         public LoggerRepositoryCreationEventArgs(ILoggerRepository repository)
         {
+			value.LogDebug(">>> Entering LoggerRepositoryCreationEventArgs(repository={Repository})", repository);
             this.m_repository = repository;
+			value.LogDebug("LoggerRepositoryCreationEventArgs(repository={Repository}): m_repository → {M_repository}", repository, m_repository);
+			value.LogDebug("LoggerRepositoryCreationEventArgs(repository={Repository}): this.m_repository → {Arg1}", repository, this.m_repository);
+			value.LogDebug("<<< Exiting LoggerRepositoryCreationEventArgs(repository={Repository})", repository);
         }
 
         /// <summary>The <see cref="ILoggerRepository"/> that has been created</summary>

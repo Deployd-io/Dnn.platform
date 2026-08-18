@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -13,19 +15,26 @@
   // declare global: JSHINT
 
   var bogus = [ "Dangerous comment" ];
+logger.debug(`function(exports=${exports}): bogus → ${bogus}`);
 
   var warnings = [ [ "Expected '{'",
                      "Statement body should be inside '{ }' braces." ] ];
+					logger.debug(`function(exports=${exports}): warnings → ${warnings}`);
 
   var errors = [ "Missing semicolon", "Extra comma", "Missing property name",
                  "Unmatched ", " and instead saw", " is not defined",
                  "Unclosed string", "Stopping, unable to continue" ];
+				logger.debug(`<<< Exiting function(exports=${exports})`);
+				logger.debug(`function(exports=${exports}): errors → ${errors}`);
 
   function validator(text, options) {
+	logger.debug(`>>> Entering validator(text=${text},options=${options})`);
     if (!window.JSHINT) return [];
     JSHINT(text, options, options.globals);
     var errors = JSHINT.data().errors, result = [];
+	logger.debug(`validator(text=${text},options=${options}): errors → ${errors}`);
     if (errors) parseErrors(errors, result);
+	logger.debug(`<<< Exiting validator(text=${text},options=${options})`);
     return result;
   }
 
@@ -57,6 +66,7 @@
         error.description = replace;
       }
     }
+	logger.debug(`<<< Exiting fixWith(error=${error},fixes=${fixes},severity=${severity},force=${force})`);
   }
 
   function isBogus(error) {
@@ -94,10 +104,12 @@
             // forEachChar(evidence, function(item, index) {
             Array.prototype.forEach.call(evidence, function(item,
                                                             index) {
+															logger.debug('>>> Entering forEachChar()');
               if (item === '\t') {
                 // First col is 1 (not 0) to match error
                 // positions
                 tabpositions.push(index + 1);
+				logger.debug('<<< Exiting forEachChar()');
               }
             });
             linetabpositions[error.line] = tabpositions;
@@ -105,8 +117,10 @@
           if (tabpositions.length > 0) {
             var pos = error.character;
             tabpositions.forEach(function(tabposition) {
+			logger.debug('>>> Entering forEach()');
               if (pos > tabposition) pos -= 1;
             });
+			logger.debug('<<< Exiting forEach()');
             error.character = pos;
           }
         }
@@ -132,5 +146,6 @@
                        to: CodeMirror.Pos(error.line - 1, end)});
       }
     }
+	logger.debug(`<<< Exiting parseErrors(errors=${errors},output=${output})`);
   }
 });

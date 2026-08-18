@@ -8,11 +8,13 @@ import {
 } from "../../../actions";
 import util from "../../../utils";
 import Localization from "localization";
+const logger = console;
 
 /*eslint-disable eqeqeq*/
 class LogSettingEditor extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             logSettingDetail: {
                 KeepMostRecent: "*",
@@ -32,9 +34,11 @@ class LogSettingEditor extends Component {
                 mailToAddress: false
             }
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {props} = this;
         if (props.logTypeSettingId !== "") {
             props.dispatch(LogSettingActions.getLogSettingById({
@@ -45,10 +49,13 @@ class LogSettingEditor extends Component {
                     logSettingDetail
                 });
                 this.SetErrorState();
+				logger.debug(`UNSAFE_componentWillMount(): logSettingDetail → ${logSettingDetail}`);
             }));
+			logger.debug('<<< Exiting UNSAFE_componentWillMount()');
         }
     }
     getValue(selectKey) {
+		logger.debug(`>>> Entering getValue(selectKey=${selectKey})`);
         const {state} = this;
         switch (selectKey) {
             case "LogType":
@@ -70,6 +77,7 @@ class LogSettingEditor extends Component {
             default:
                 break;
         }
+		logger.debug(`<<< Exiting getValue(selectKey=${selectKey})`);
     }
     getEnabledStatus(key) {
         const {state} = this;
@@ -82,12 +90,15 @@ class LogSettingEditor extends Component {
             default:
                 break;
         }
+		logger.debug(`<<< Exiting getEnabledStatus(key=${key})`);
     }
     onDropDownChange(key, option) {
         this.ProcessChange(key, option.value);
+		logger.debug(`<<< Exiting onDropDownChange(key=${key},option=${option})`);
     }
     onTextChange(key, event) {
         this.ProcessChange(key, event.target.value);
+		logger.debug(`<<< Exiting onTextChange(key=${key},event=${event})`);
     }
     ProcessChange(key, value) {
         let {logSettingDetail} = this.state;
@@ -101,8 +112,10 @@ class LogSettingEditor extends Component {
         this.setState({
             state
         });
+		logger.debug(`<<< Exiting ProcessChange(key=${key},value=${value})`);
     }
     SetErrorState() {
+		logger.debug('>>> Entering SetErrorState()');
         let {logSettingDetail} = this.state;
         let {state} = this;
         if (logSettingDetail.EmailNotificationIsActive) {
@@ -114,6 +127,7 @@ class LogSettingEditor extends Component {
             }
         } else {
             state.error["mailToAddress"] = false;
+			logger.debug('<<< Exiting SetErrorState()');
         }
         state.triedToSubmit = false;
         this.setState({
@@ -136,8 +150,10 @@ class LogSettingEditor extends Component {
         this.setState({
             state
         });
+		logger.debug(`<<< Exiting OnCheckboxChanged(key=${key},status=${status})`);
     }
     addUpdateLogSetting(event) {
+		logger.debug(`>>> Entering addUpdateLogSetting(event=${event})`);
         event.preventDefault();
         const {props, state} = this;
         this.setState({
@@ -166,9 +182,11 @@ class LogSettingEditor extends Component {
         } else {
             props.Collapse(event);
         }
+		logger.debug(`<<< Exiting addUpdateLogSetting(event=${event})`);
     }
 
     deleteLogSetting(event) {
+		logger.debug(`>>> Entering deleteLogSetting(event=${event})`);
         const {props} = this;
         if (props.logTypeSettingId !== "") {
             util.utilities.confirm(Localization.get("ConfigDeletedWarning"), Localization.get("yes"), Localization.get("no"), () => {
@@ -185,11 +203,13 @@ class LogSettingEditor extends Component {
         }
         else {
             util.utilities.notifyError(Localization.get("ConfigDeleteInconsistency"));
+			logger.debug(`<<< Exiting deleteLogSetting(event=${event})`);
         }
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const portalList = this.props.portalList !== undefined && this.props.portalList.map(log => {
             return {
                 label: log.label,
@@ -268,6 +288,7 @@ class LogSettingEditor extends Component {
                     onChange={this.onTextChange.bind(this, "MailToAddress") }/>
             </div>
         </div>;
+		logger.debug('<<< Exiting render()');
         return (
             <div className="log-setting-editor">
                 <Grid numberOfColumns={2}>
@@ -298,6 +319,8 @@ LogSettingEditor.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         logSettingDetail: state.logSettings.logSettingDetail
     };

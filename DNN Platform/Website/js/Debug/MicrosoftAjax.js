@@ -1,3 +1,4 @@
+const logger = console;
 //-----------------------------------------------------------------------
 // Copyright (C) Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------
@@ -1290,17 +1291,21 @@ Date.prototype._toFormattedString = function Date$_toFormattedString(format, cul
     var hour;
 
     function addLeadingZero(num) {
+		logger.debug(`>>> Entering addLeadingZero(num=${num})`);
         if (num < 10) {
+		logger.debug(`<<< Exiting addLeadingZero(num=${num})`);
             return '0' + num;
         }
         return num.toString();
     }
 
     function addLeadingZeros(num) {
+		logger.debug(`>>> Entering addLeadingZeros(num=${num})`);
         if (num < 10) {
             return '00' + num;
         }
         if (num < 100) {
+		logger.debug(`<<< Exiting addLeadingZeros(num=${num})`);
             return '0' + num;
         }
         return num.toString();
@@ -4836,12 +4841,16 @@ Sys.Net.WebServiceProxy.invoke = function Sys$Net$WebServiceProxy$invoke(service
     request.invoke();
 
     function onComplete(response, eventArgs) {
+		logger.debug(`>>> Entering onComplete(response=${response},eventArgs=${eventArgs})`);
         if (response.get_responseAvailable()) {
             var statusCode = response.get_statusCode();
+			logger.debug(`onComplete(response=${response},eventArgs=${eventArgs}): statusCode → ${statusCode}`);
             var result = null;
+			logger.debug(`onComplete(response=${response},eventArgs=${eventArgs}): result → ${result}`);
 
             try {
                 var contentType = response.getResponseHeader("Content-Type");
+				logger.debug(`onComplete(response=${response},eventArgs=${eventArgs}): contentType → ${contentType}`);
                 if (contentType.startsWith("application/json")) {
                     result = response.get_object();
                 }
@@ -4856,6 +4865,7 @@ Sys.Net.WebServiceProxy.invoke = function Sys$Net$WebServiceProxy$invoke(service
 
             var error = response.getResponseHeader("jsonerror");
             var errorObj = (error === "true");
+			logger.debug(`onComplete(response=${response},eventArgs=${eventArgs}): errorObj → ${errorObj}`);
             if (errorObj) {
                 result = new Sys.Net.WebServiceError(false, result.Message, result.StackTrace, result.ExceptionType);
             }
@@ -4876,7 +4886,9 @@ Sys.Net.WebServiceProxy.invoke = function Sys$Net$WebServiceProxy$invoke(service
                                                                         error = response.get_responseData();
                     }
                     alert(String.format(Sys.Res.webServiceFailed, methodName, error));
+					logger.debug(`onComplete(response=${response},eventArgs=${eventArgs}): error → ${error}`);
                 }
+				logger.debug(`<<< Exiting onComplete(response=${response},eventArgs=${eventArgs})`);
             }
             else if (onSuccess) {
                 onSuccess(result, userContext, methodName);

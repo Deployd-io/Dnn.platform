@@ -10,6 +10,8 @@ namespace Dnn.PersonaBar.Users.Components.Dto
     {
         public UserBasicDto2()
         {
+		eventLogger.LogDebug(">>> Entering UserBasicDto2()");
+		eventLogger.LogDebug("<<< Exiting UserBasicDto2()");
         }
 
         public UserBasicDto2(UserInfo user)

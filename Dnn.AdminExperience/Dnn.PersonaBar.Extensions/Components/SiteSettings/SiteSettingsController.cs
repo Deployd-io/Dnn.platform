@@ -35,6 +35,7 @@ namespace Dnn.PersonaBar.SiteSettings.Components
 
         public void SaveLocalizedKeys(int portalId, string propertyName, string propertyCategory, string cultureCode, string propertyNameString, string propertyHelpString, string propertyRequiredString, string propertyValidationString, string categoryNameString)
         {
+			eventLogger.LogDebug(">>> Entering SaveLocalizedKeys(portalId={PortalId},propertyName={PropertyName},propertyCategory={PropertyCategory},cultureCode={CultureCode},propertyNameString={PropertyNameString},propertyHelpString={PropertyHelpString},propertyRequiredString={PropertyRequiredString},propertyValidationString={PropertyValidationString},categoryNameString={CategoryNameString})", portalId, propertyName, propertyCategory, cultureCode, propertyNameString, propertyHelpString, propertyRequiredString, propertyValidationString, categoryNameString);
             var portalResources = new XmlDocument { XmlResolver = null };
             var defaultResources = new XmlDocument { XmlResolver = null };
             XmlNode parent;
@@ -49,6 +50,7 @@ namespace Dnn.PersonaBar.SiteSettings.Components
             if (File.Exists(filename))
             {
                 using var portalResourcesReader = XmlReader.Create(filename, new XmlReaderSettings { XmlResolver = null, });
+				eventLogger.LogDebug("SaveLocalizedKeys(portalId={PortalId},propertyName={PropertyName},propertyCategory={PropertyCategory},cultureCode={CultureCode},propertyNameString={PropertyNameString},propertyHelpString={PropertyHelpString},propertyRequiredString={PropertyRequiredString},propertyValidationString={PropertyValidationString},categoryNameString={CategoryNameString}): portalResourcesReader → {PortalResourcesReader}", portalId, propertyName, propertyCategory, cultureCode, propertyNameString, propertyHelpString, propertyRequiredString, propertyValidationString, categoryNameString, portalResourcesReader);
                 portalResources.Load(portalResourcesReader);
             }
             else
@@ -67,10 +69,12 @@ namespace Dnn.PersonaBar.SiteSettings.Components
             foreach (XmlNode node in portalResources.SelectNodes("//root/data"))
             {
                 XmlNode defaultNode = defaultResources.SelectSingleNode("//root/data[@name='" + node.Attributes["name"].Value + "']");
+				eventLogger.LogDebug("SaveLocalizedKeys(portalId={PortalId},propertyName={PropertyName},propertyCategory={PropertyCategory},cultureCode={CultureCode},propertyNameString={PropertyNameString},propertyHelpString={PropertyHelpString},propertyRequiredString={PropertyRequiredString},propertyValidationString={PropertyValidationString},categoryNameString={CategoryNameString}): defaultNode → {DefaultNode}", portalId, propertyName, propertyCategory, cultureCode, propertyNameString, propertyHelpString, propertyRequiredString, propertyValidationString, categoryNameString, defaultNode);
                 if (defaultNode != null && defaultNode.InnerXml == node.InnerXml)
                 {
                     parent = node.ParentNode;
                     parent.RemoveChild(node);
+					eventLogger.LogDebug("SaveLocalizedKeys(portalId={PortalId},propertyName={PropertyName},propertyCategory={PropertyCategory},cultureCode={CultureCode},propertyNameString={PropertyNameString},propertyHelpString={PropertyHelpString},propertyRequiredString={PropertyRequiredString},propertyValidationString={PropertyValidationString},categoryNameString={CategoryNameString}): parent → {Parent}", portalId, propertyName, propertyCategory, cultureCode, propertyNameString, propertyHelpString, propertyRequiredString, propertyValidationString, categoryNameString, parent);
                 }
             }
 
@@ -97,29 +101,37 @@ namespace Dnn.PersonaBar.SiteSettings.Components
                     File.Delete(filename);
                 }
             }
+			eventLogger.LogDebug("<<< Exiting SaveLocalizedKeys(portalId={PortalId},propertyName={PropertyName},propertyCategory={PropertyCategory},cultureCode={CultureCode},propertyNameString={PropertyNameString},propertyHelpString={PropertyHelpString},propertyRequiredString={PropertyRequiredString},propertyValidationString={PropertyValidationString},categoryNameString={CategoryNameString})", portalId, propertyName, propertyCategory, cultureCode, propertyNameString, propertyHelpString, propertyRequiredString, propertyValidationString, categoryNameString);
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public IList<string> GetAvailableAnalyzers()
         {
+			eventLogger.LogDebug(">>> Entering GetAvailableAnalyzers()");
             var analyzers = new List<string>();
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
+			eventLogger.LogDebug("GetAvailableAnalyzers(): analyzers → {Analyzers}", analyzers);
                 try
                 {
                     analyzers.AddRange(from t in assembly.GetTypes() where IsAnalyzerType(t) && IsAllowType(t) select $"{t.FullName}, {assembly.GetName().Name}");
                 }
                 catch (Exception)
                 {
+					eventLogger.LogError("Exception in GetAvailableAnalyzers(): {Arg0}", Exception.Message);
                     // do nothing but just ignore the error.
+					eventLogger.LogDebug(">>> Entering IsAllowType(type={Type})", type);
+					eventLogger.LogDebug("<<< Exiting IsAllowType(type={Type})", type);
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting GetAvailableAnalyzers()");
             return analyzers;
         }
 
         public bool CreateAuthSystemPackage(string cultureCode, PackageInfo authPackage, bool createZip)
         {
+			eventLogger.LogDebug(">>> Entering CreateAuthSystemPackage(cultureCode={CultureCode},authPackage={AuthPackage},createZip={CreateZip})", cultureCode, authPackage, createZip);
             var package = new PackageInfo
             {
                 Name = authPackage.Name,
@@ -128,8 +140,11 @@ namespace Dnn.PersonaBar.SiteSettings.Components
                 License = Util.PACKAGE_NoLicense,
             };
             var fileName = Path.Combine(this.BasePath, "ResourcePack." + package.Name);
+			eventLogger.LogDebug("CreateAuthSystemPackage(cultureCode={CultureCode},authPackage={AuthPackage},createZip={CreateZip}): fileName → {FileName}", cultureCode, authPackage, createZip, fileName);
             var authSystem = AuthenticationController.GetAuthenticationServiceByPackageID(authPackage.PackageID);
+			eventLogger.LogDebug("CreateAuthSystemPackage(cultureCode={CultureCode},authPackage={AuthPackage},createZip={CreateZip}): authSystem → {AuthSystem}", cultureCode, authPackage, createZip, authSystem);
             var authPath = authSystem.LoginControlSrc.Substring(0, authSystem.LoginControlSrc.LastIndexOf("/", StringComparison.Ordinal));
+			eventLogger.LogDebug("CreateAuthSystemPackage(cultureCode={CultureCode},authPackage={AuthPackage},createZip={CreateZip}): authPath → {AuthPath}", cultureCode, authPackage, createZip, authPath);
             return this.CreatePackage(cultureCode, package, authPackage.PackageID, authPath.Replace("/", @"\"), fileName, createZip);
         }
 
@@ -141,7 +156,9 @@ namespace Dnn.PersonaBar.SiteSettings.Components
             package.License = Util.PACKAGE_NoLicense;
 
             fileName = Path.Combine(this.BasePath, "ResourcePack." + package.Name);
+			eventLogger.LogDebug("CreateCorePackage(cultureCode={CultureCode},fileName={FileName},createZip={CreateZip}): fileName → {FileName1}", cultureCode, fileName, createZip, fileName);
 
+			eventLogger.LogDebug("<<< Exiting CreateCorePackage(cultureCode={CultureCode},fileName={FileName},createZip={CreateZip})", cultureCode, fileName, createZip);
             return this.CreatePackage(cultureCode, package, -2, string.Empty, fileName, createZip);
         }
 
@@ -183,9 +200,13 @@ namespace Dnn.PersonaBar.SiteSettings.Components
             }
 
             fileName = Path.Combine(this.BasePath, "ResourcePack." + package.Name);
+			eventLogger.LogDebug("CreateFullPackage(cultureCode={CultureCode},fileName={FileName}): fileName → {FileName1}", cultureCode, fileName, fileName);
             fileName = fileName + "." + package.Version.ToString(3) + "." + language.Code + ".zip";
 
             var packageWriter = PackageWriterFactory.GetWriter(package) as LanguagePackWriter;
+			eventLogger.LogDebug("CreateFullPackage(cultureCode={CultureCode},fileName={FileName}): packageWriter → {PackageWriter}", cultureCode, fileName, packageWriter);
+			eventLogger.LogDebug("CreateFullPackage(cultureCode={CultureCode},fileName={FileName}): packageWriter.Language → {Arg2}", cultureCode, fileName, packageWriter.Language);
+			eventLogger.LogDebug("CreateFullPackage(cultureCode={CultureCode},fileName={FileName}): packageWriter.BasePath → {Arg2}", cultureCode, fileName, packageWriter.BasePath);
             packageWriter.Language = language;
             packageWriter.BasePath = string.Empty;
             foreach (KeyValuePair<string, InstallFile> kvp in this.files)
@@ -194,10 +215,12 @@ namespace Dnn.PersonaBar.SiteSettings.Components
             }
 
             packageWriter.CreatePackage(fileName, package.Name + " " + language.Text + ".dnn", this.manifest, true);
+			eventLogger.LogDebug("<<< Exiting CreateFullPackage(cultureCode={CultureCode},fileName={FileName})", cultureCode, fileName);
         }
 
         public bool CreateLibraryPackage(string cultureCode, PackageInfo library, bool createZip)
         {
+			eventLogger.LogDebug(">>> Entering CreateLibraryPackage(cultureCode={CultureCode},library={Library},createZip={CreateZip})", cultureCode, library, createZip);
             var package = new PackageInfo
             {
                 Name = library.Name,
@@ -207,13 +230,17 @@ namespace Dnn.PersonaBar.SiteSettings.Components
             };
 
             var fileName = Path.Combine(this.BasePath, "ResourcePack" + package.Name);
+			eventLogger.LogDebug("CreateLibraryPackage(cultureCode={CultureCode},library={Library},createZip={CreateZip}): fileName → {FileName}", cultureCode, library, createZip, fileName);
+			eventLogger.LogDebug("<<< Exiting CreateLibraryPackage(cultureCode={CultureCode},library={Library},createZip={CreateZip})", cultureCode, library, createZip);
             return this.CreatePackage(cultureCode, package, library.PackageID, library.FolderName, fileName, createZip);
         }
 
         public bool CreateModulePackage(string cultureCode, DesktopModuleInfo desktopModule, bool createZip)
         {
+			eventLogger.LogDebug(">>> Entering CreateModulePackage(cultureCode={CultureCode},desktopModule={DesktopModule},createZip={CreateZip})", cultureCode, desktopModule, createZip);
             var modulePackage = PackageController.Instance.GetExtensionPackage(Null.NullInteger, p => p.PackageID == desktopModule.PackageID);
 
+			eventLogger.LogDebug("CreateModulePackage(cultureCode={CultureCode},desktopModule={DesktopModule},createZip={CreateZip}): modulePackage → {ModulePackage}", cultureCode, desktopModule, createZip, modulePackage);
             var package = new PackageInfo
             {
                 Name = modulePackage.Name,
@@ -223,11 +250,14 @@ namespace Dnn.PersonaBar.SiteSettings.Components
             };
 
             var fileName = Path.Combine(this.BasePath, "ResourcePack." + package.Name);
+			eventLogger.LogDebug("CreateModulePackage(cultureCode={CultureCode},desktopModule={DesktopModule},createZip={CreateZip}): fileName → {FileName}", cultureCode, desktopModule, createZip, fileName);
+			eventLogger.LogDebug("<<< Exiting CreateModulePackage(cultureCode={CultureCode},desktopModule={DesktopModule},createZip={CreateZip})", cultureCode, desktopModule, createZip);
             return this.CreatePackage(cultureCode, package, modulePackage.PackageID, Path.Combine("DesktopModules\\", desktopModule.FolderName), fileName, createZip);
         }
 
         public bool CreateProviderPackage(string cultureCode, PackageInfo providerPackage, bool createZip)
         {
+			eventLogger.LogDebug(">>> Entering CreateProviderPackage(cultureCode={CultureCode},providerPackage={ProviderPackage},createZip={CreateZip})", cultureCode, providerPackage, createZip);
             var package = new PackageInfo
             {
                 Name = providerPackage.Name,
@@ -237,10 +267,13 @@ namespace Dnn.PersonaBar.SiteSettings.Components
             };
 
             var fileName = Path.Combine(this.BasePath, "ResourcePack." + package.Name);
+			eventLogger.LogDebug("CreateProviderPackage(cultureCode={CultureCode},providerPackage={ProviderPackage},createZip={CreateZip}): fileName → {FileName}", cultureCode, providerPackage, createZip, fileName);
 
             // Get the provider "path"
             XmlDocument configDoc = Config.Load();
+			eventLogger.LogDebug("CreateProviderPackage(cultureCode={CultureCode},providerPackage={ProviderPackage},createZip={CreateZip}): configDoc → {ConfigDoc}", cultureCode, providerPackage, createZip, configDoc);
             string providerName = package.Name;
+			eventLogger.LogDebug("CreateProviderPackage(cultureCode={CultureCode},providerPackage={ProviderPackage},createZip={CreateZip}): providerName → {ProviderName}", cultureCode, providerPackage, createZip, providerName);
             if (providerName.IndexOf(".", StringComparison.Ordinal) > Null.NullInteger)
             {
                 providerName = providerName.Substring(providerName.IndexOf(".", StringComparison.Ordinal) + 1);
@@ -275,6 +308,7 @@ namespace Dnn.PersonaBar.SiteSettings.Components
             }
             else
             {
+				eventLogger.LogDebug("<<< Exiting CreateProviderPackage(cultureCode={CultureCode},providerPackage={ProviderPackage},createZip={CreateZip})", cultureCode, providerPackage, createZip);
                 return false;
             }
         }
@@ -297,27 +331,37 @@ namespace Dnn.PersonaBar.SiteSettings.Components
                 resourceFilename = resourceFilename + "." + "Host";
             }
 
+			eventLogger.LogDebug("<<< Exiting GetResourceFile(type={Type},language={Language},portalId={PortalId})", type, language, portalId);
             return HttpContext.Current.Server.MapPath(resourceFilename + ".resx");
         }
 
         private static bool IsAnalyzerType(Type type)
         {
+			eventLogger.LogDebug(">>> Entering IsAnalyzerType(type={Type})", type);
+			eventLogger.LogDebug("<<< Exiting IsAnalyzerType(type={Type})", type);
             return type is { FullName: not null } && (type.FullName.Contains("Lucene.Net.Analysis.Analyzer") || IsAnalyzerType(type.BaseType));
         }
 
         private static bool IsAllowType(Type type)
         {
+			eventLogger.LogDebug(">>> Entering IsAllowType(type={Type})", type);
+			eventLogger.LogDebug("<<< Exiting IsAllowType(type={Type})", type);
             return !type.FullName.Contains("Lucene.Net.Analysis.Analyzer") && !type.FullName.Contains("DotNetNuke");
         }
 
         private static void UpdateResourceFileNode(XmlDocument xmlDoc, string key, string text)
         {
+			eventLogger.LogDebug(">>> Entering UpdateResourceFileNode(xmlDoc={XmlDoc},key={Key},text={Text})", xmlDoc, key, text);
             var node = xmlDoc.CreateNavigator()?.SelectSingleNode(XmlUtils.CreateXPathExpression("//root/data[@name='$key']/value", new KeyValuePair<string, object>("key", key)));
             if (node == null)
+			eventLogger.LogDebug("UpdateResourceFileNode(xmlDoc={XmlDoc},key={Key},text={Text}): node → {Node}", xmlDoc, key, text, node);
             {
                 // missing entry
                 var nodeData = xmlDoc.CreateElement("data");
+				eventLogger.LogDebug("UpdateResourceFileNode(xmlDoc={XmlDoc},key={Key},text={Text}): nodeData → {NodeData}", xmlDoc, key, text, nodeData);
                 var attr = xmlDoc.CreateAttribute("name");
+				eventLogger.LogDebug("UpdateResourceFileNode(xmlDoc={XmlDoc},key={Key},text={Text}): attr → {Attr}", xmlDoc, key, text, attr);
+				eventLogger.LogDebug("UpdateResourceFileNode(xmlDoc={XmlDoc},key={Key},text={Text}): attr.Value → {Arg3}", xmlDoc, key, text, attr.Value);
                 attr.Value = key;
                 nodeData.Attributes.Append(attr);
                 xmlDoc.SelectSingleNode("//root").AppendChild(nodeData);
@@ -325,6 +369,7 @@ namespace Dnn.PersonaBar.SiteSettings.Components
             }
 
             node.InnerXml = HttpUtility.HtmlEncode(text);
+			eventLogger.LogDebug("<<< Exiting UpdateResourceFileNode(xmlDoc={XmlDoc},key={Key},text={Text})", xmlDoc, key, text);
         }
 
         private bool CreatePackage(string cultureCode, PackageInfo package, int dependentPackageId, string basePath, string fileName, bool createZip)
