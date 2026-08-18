@@ -33,6 +33,8 @@ namespace Dnn.EditBar.UI.Items
         protected WorkflowBaseMenuItem()
             : this(null, null)
         {
+		eventLogger.LogDebug(">>> Entering WorkflowBaseMenuItem()");
+		eventLogger.LogDebug("<<< Exiting WorkflowBaseMenuItem()");
         }
 
         internal Workflow Workflow => this.WorkflowState != null ? WorkflowManager.Instance.GetWorkflow(this.WorkflowState.WorkflowID) : null;

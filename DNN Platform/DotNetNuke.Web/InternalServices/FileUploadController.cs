@@ -61,14 +61,18 @@ namespace DotNetNuke.Web.InternalServices
         public FileUploadController()
             : this(null, null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering FileUploadController()");
         }
 
+		Logger.LogDebug("<<< Exiting FileUploadController()");
         /// <summary>Initializes a new instance of the <see cref="FileUploadController"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Use overload with ICryptographyProvider. Scheduled for removal in v12.0.0.")]
         public FileUploadController(IHostSettings hostSettings)
             : this(hostSettings, null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering FileUploadController(hostSettings={HostSettings})", hostSettings);
+		Logger.LogDebug("<<< Exiting FileUploadController(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="FileUploadController"/> class.</summary>
@@ -81,7 +85,11 @@ namespace DotNetNuke.Web.InternalServices
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.cryptographyProvider = cryptographyProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<ICryptographyProvider>();
+			Logger.LogDebug("FileUploadController(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): cryptographyProvider → {CryptographyProvider1}", hostSettings, cryptographyProvider, portalController, appStatus, portalGroupController, cryptographyProvider);
+			Logger.LogDebug("FileUploadController(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): appStatus → {AppStatus1}", hostSettings, cryptographyProvider, portalController, appStatus, portalGroupController, appStatus);
+			Logger.LogDebug("FileUploadController(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalGroupController → {PortalGroupController1}", hostSettings, cryptographyProvider, portalController, appStatus, portalGroupController, portalGroupController);
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+			Logger.LogDebug("FileUploadController(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalController → {PortalController1}", hostSettings, cryptographyProvider, portalController, appStatus, portalGroupController, portalController);
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
             this.portalGroupController = portalGroupController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalGroupController>();
         }
@@ -91,7 +99,10 @@ namespace DotNetNuke.Web.InternalServices
         /// <returns>The URL.</returns>
         public static string GetUrl(int fileId)
         {
+			Logger.LogDebug(">>> Entering GetUrl(fileId={FileId})", fileId);
             var file = FileManager.Instance.GetFile(fileId, true);
+			Logger.LogDebug("GetUrl(fileId={FileId}): file → {File}", fileId, file);
+			Logger.LogDebug("<<< Exiting GetUrl(fileId={FileId})", fileId);
             return FileManager.Instance.GetUrl(file);
         }
 
@@ -101,14 +112,17 @@ namespace DotNetNuke.Web.InternalServices
         [HttpPost]
         public HttpResponseMessage LoadFiles(FolderItemDTO folderItem)
         {
+			Logger.LogDebug(">>> Entering LoadFiles(folderItem={FolderItem})", folderItem);
             int effectivePortalId = this.PortalSettings.PortalId;
 
+			Logger.LogDebug("LoadFiles(folderItem={FolderItem}): effectivePortalId → {EffectivePortalId}", folderItem, effectivePortalId);
             if (folderItem.FolderId <= 0)
             {
                 return this.Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
             var folder = FolderManager.Instance.GetFolder(folderItem.FolderId);
+			Logger.LogDebug("LoadFiles(folderItem={FolderItem}): folder → {Folder}", folderItem, folder);
 
             if (folder == null)
             {
@@ -118,6 +132,7 @@ namespace DotNetNuke.Web.InternalServices
             if (IsUserFolder(folder.FolderPath, out var userId))
             {
                 var user = UserController.GetUserById(this.hostSettings, effectivePortalId, userId);
+				Logger.LogDebug("LoadFiles(folderItem={FolderItem}): user → {User}", folderItem, user);
                 if (user is { IsSuperUser: true, })
                 {
                     effectivePortalId = Null.NullInteger;
@@ -129,8 +144,11 @@ namespace DotNetNuke.Web.InternalServices
             }
 
             var list = Globals.GetFileList(effectivePortalId, folderItem.FileFilter, !folderItem.Required, folder.FolderPath);
+			Logger.LogDebug("LoadFiles(folderItem={FolderItem}): list → {List}", folderItem, list);
             var fileItems = list.OfType<FileItem>().ToList();
+			Logger.LogDebug("LoadFiles(folderItem={FolderItem}): fileItems → {FileItems}", folderItem, fileItems);
 
+			Logger.LogDebug("<<< Exiting LoadFiles(folderItem={FolderItem})", folderItem);
             return this.Request.CreateResponse(HttpStatusCode.OK, fileItems);
         }
 
@@ -140,16 +158,19 @@ namespace DotNetNuke.Web.InternalServices
         [HttpGet]
         public HttpResponseMessage LoadImage(string fileId)
         {
+			Logger.LogDebug(">>> Entering LoadImage(fileId={FileId})", fileId);
             if (!string.IsNullOrEmpty(fileId))
             {
                 int file;
                 if (int.TryParse(fileId, out file))
                 {
                     var imageUrl = ShowImage(file);
+					Logger.LogDebug("LoadImage(fileId={FileId}): imageUrl → {ImageUrl}", fileId, imageUrl);
                     return this.Request.CreateResponse(HttpStatusCode.OK, imageUrl);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting LoadImage(fileId={FileId})", fileId);
             return this.Request.CreateResponse(HttpStatusCode.InternalServerError);
         }
 
@@ -160,14 +181,17 @@ namespace DotNetNuke.Web.InternalServices
         [IFrameSupportedValidateAntiForgeryToken]
         public Task<HttpResponseMessage> PostFile()
         {
+			Logger.LogDebug(">>> Entering PostFile()");
             HttpRequestMessage request = this.Request;
 
             if (!request.Content.IsMimeMultipartContent())
             {
+				Logger.LogWarning("Throwing HttpResponseException from PostFile()");
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
             var provider = new MultipartMemoryStreamProvider();
+			Logger.LogDebug("PostFile(): provider → {Provider}", provider);
 
             // local references for use in closure
             IPortalSettings portalSettings = this.PortalSettings;
@@ -177,17 +201,26 @@ namespace DotNetNuke.Web.InternalServices
                 .ContinueWith(_ =>
                     {
                         string folder = string.Empty;
+						Logger.LogDebug("PostFile(): folder → {Folder}", folder);
                         string filter = string.Empty;
+						Logger.LogDebug("PostFile(): filter → {Filter}", filter);
                         string fileName = string.Empty;
+						Logger.LogDebug("PostFile(): fileName → {FileName}", fileName);
                         bool overwrite = false;
+						Logger.LogDebug("PostFile(): overwrite → {Overwrite}", overwrite);
                         bool isHostMenu = false;
+						Logger.LogDebug("PostFile(): isHostMenu → {IsHostMenu}", isHostMenu);
                         bool extract = false;
+						Logger.LogDebug("PostFile(): extract → {Extract}", extract);
                         Stream stream = null;
+						Logger.LogDebug("PostFile(): stream → {Stream}", stream);
                         var returnFileDto = new SavedFileDTO();
+						Logger.LogDebug("PostFile(): returnFileDto → {ReturnFileDto}", returnFileDto);
 
                         foreach (var item in provider.Contents)
                         {
                             var name = item.Headers.ContentDisposition.Name;
+							Logger.LogDebug("PostFile(): name → {Name}", name);
                             switch (name.ToUpperInvariant())
                             {
                                 case "\"FOLDER\"":
@@ -254,6 +287,7 @@ namespace DotNetNuke.Web.InternalServices
                          * as a file download
                          */
                         var mediaTypeFormatter = new JsonMediaTypeFormatter();
+						Logger.LogDebug("PostFile(): mediaTypeFormatter → {MediaTypeFormatter}", mediaTypeFormatter);
                         mediaTypeFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/plain"));
 
                         if (!string.IsNullOrEmpty(errorMessage))
@@ -271,8 +305,11 @@ namespace DotNetNuke.Web.InternalServices
                                 },
                                 mediaTypeFormatter,
                                 "text/plain");
+								Logger.LogDebug("PostFile(): AlreadyExists → {AlreadyExists}", AlreadyExists);
+								Logger.LogDebug("PostFile(): Message → {Message}", Message);
                         }
 
+			Logger.LogDebug("<<< Exiting PostFile()");
                         return this.Request.CreateResponse(HttpStatusCode.OK, returnFileDto, mediaTypeFormatter, "text/plain");
                     });
 
@@ -286,6 +323,9 @@ namespace DotNetNuke.Web.InternalServices
         [AllowAnonymous]
         public Task<HttpResponseMessage> UploadFromLocal()
         {
+			Logger.LogDebug(">>> Entering UploadFromLocal()");
+			Logger.LogDebug("<<< Exiting UploadFromLocal()");
+			Logger.LogDebug("<<< Exiting UploadFromLocal(portalId={PortalId})", portalId);
             return this.UploadFromLocal(this.PortalSettings.PortalId);
         }
 
@@ -446,14 +486,19 @@ namespace DotNetNuke.Web.InternalServices
             out bool alreadyExists,
             out string errorMessage)
         {
+			Logger.LogDebug(">>> Entering SaveFile(stream={Stream},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},hostSettings={HostSettings},portalSettings={PortalSettings},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostMenu={IsHostMenu},extract={Extract})", stream, portalController, appStatus, portalGroupController, hostSettings, portalSettings, userInfo, folder, filter, fileName, overwrite, isHostMenu, extract);
             alreadyExists = false;
             var savedFileDto = new SavedFileDTO();
+			Logger.LogDebug("SaveFile(stream={Stream},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},hostSettings={HostSettings},portalSettings={PortalSettings},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostMenu={IsHostMenu},extract={Extract}): savedFileDto → {SavedFileDto}", stream, portalController, appStatus, portalGroupController, hostSettings, portalSettings, userInfo, folder, filter, fileName, overwrite, isHostMenu, extract, savedFileDto);
+			Logger.LogDebug("SaveFile(stream={Stream},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},hostSettings={HostSettings},portalSettings={PortalSettings},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostMenu={IsHostMenu},extract={Extract}): alreadyExists → {AlreadyExists}", stream, portalController, appStatus, portalGroupController, hostSettings, portalSettings, userInfo, folder, filter, fileName, overwrite, isHostMenu, extract, alreadyExists);
             try
             {
                 var extension = Path.GetExtension(fileName).ValueOrEmpty().Replace(".", string.Empty);
+				Logger.LogDebug("SaveFile(stream={Stream},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},hostSettings={HostSettings},portalSettings={PortalSettings},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostMenu={IsHostMenu},extract={Extract}): extension → {Extension}", stream, portalController, appStatus, portalGroupController, hostSettings, portalSettings, userInfo, folder, filter, fileName, overwrite, isHostMenu, extract, extension);
                 if (!string.IsNullOrEmpty(filter) && !filter.ToLowerInvariant().Contains(extension.ToLowerInvariant()))
                 {
                     errorMessage = GetLocalizedString("ExtensionNotAllowed");
+					Logger.LogDebug("SaveFile(stream={Stream},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},hostSettings={HostSettings},portalSettings={PortalSettings},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostMenu={IsHostMenu},extract={Extract}): errorMessage → {ErrorMessage}", stream, portalController, appStatus, portalGroupController, hostSettings, portalSettings, userInfo, folder, filter, fileName, overwrite, isHostMenu, extract, errorMessage);
                     return savedFileDto;
                 }
 
@@ -461,10 +506,13 @@ namespace DotNetNuke.Web.InternalServices
 
                 // Check if this is a User Folder
                 var effectivePortalId = isHostMenu ? Null.NullInteger : PortalController.GetEffectivePortalId(portalController, appStatus, portalGroupController, portalSettings.PortalId);
+				Logger.LogDebug("SaveFile(stream={Stream},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},hostSettings={HostSettings},portalSettings={PortalSettings},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostMenu={IsHostMenu},extract={Extract}): effectivePortalId → {EffectivePortalId}", stream, portalController, appStatus, portalGroupController, hostSettings, portalSettings, userInfo, folder, filter, fileName, overwrite, isHostMenu, extract, effectivePortalId);
                 var folderInfo = folderManager.GetFolder(effectivePortalId, folder);
+				Logger.LogDebug("SaveFile(stream={Stream},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},hostSettings={HostSettings},portalSettings={PortalSettings},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostMenu={IsHostMenu},extract={Extract}): folderInfo → {FolderInfo}", stream, portalController, appStatus, portalGroupController, hostSettings, portalSettings, userInfo, folder, filter, fileName, overwrite, isHostMenu, extract, folderInfo);
                 if (IsUserFolder(folder, out var userId))
                 {
                     var user = UserController.GetUserById(hostSettings, effectivePortalId, userId);
+					Logger.LogDebug("SaveFile(stream={Stream},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},hostSettings={HostSettings},portalSettings={PortalSettings},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostMenu={IsHostMenu},extract={Extract}): user → {User}", stream, portalController, appStatus, portalGroupController, hostSettings, portalSettings, userInfo, folder, filter, fileName, overwrite, isHostMenu, extract, user);
                     if (user != null)
                     {
                         folderInfo = folderManager.GetUserFolder(user);
@@ -488,7 +536,9 @@ namespace DotNetNuke.Web.InternalServices
                 }
 
                 var contentType = FileContentTypeManager.Instance.GetContentType(Path.GetExtension(fileName));
+				Logger.LogDebug("SaveFile(stream={Stream},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},hostSettings={HostSettings},portalSettings={PortalSettings},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostMenu={IsHostMenu},extract={Extract}): contentType → {ContentType}", stream, portalController, appStatus, portalGroupController, hostSettings, portalSettings, userInfo, folder, filter, fileName, overwrite, isHostMenu, extract, contentType);
                 var file = FileManager.Instance.AddFile(folderInfo, fileName, stream, true, !AlreadyCheckedPermissions, contentType, userInfo.UserID);
+				Logger.LogDebug("SaveFile(stream={Stream},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},hostSettings={HostSettings},portalSettings={PortalSettings},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostMenu={IsHostMenu},extract={Extract}): file → {File}", stream, portalController, appStatus, portalGroupController, hostSettings, portalSettings, userInfo, folder, filter, fileName, overwrite, isHostMenu, extract, file);
 
                 if (extract && extension.Equals("zip", StringComparison.OrdinalIgnoreCase))
                 {
@@ -510,31 +560,44 @@ namespace DotNetNuke.Web.InternalServices
             {
                 Logger.Error(ex);
                 errorMessage = ex.Message;
+			Logger.LogDebug("<<< Exiting SaveFile(stream={Stream},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},hostSettings={HostSettings},portalSettings={PortalSettings},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostMenu={IsHostMenu},extract={Extract})", stream, portalController, appStatus, portalGroupController, hostSettings, portalSettings, userInfo, folder, filter, fileName, overwrite, isHostMenu, extract);
                 return savedFileDto;
             }
         }
 
         private static string GetLocalizedString(string key)
         {
+			Logger.LogDebug(">>> Entering GetLocalizedString(key={Key})", key);
             const string resourceFile = "/App_GlobalResources/FileUpload.resx";
+			Logger.LogDebug("<<< Exiting GetLocalizedString(key={Key})", key);
             return Localization.GetString(key, resourceFile);
         }
 
         private static bool IsUserFolder(string folderPath, out int userId)
         {
+			Logger.LogDebug(">>> Entering IsUserFolder(folderPath={FolderPath})", folderPath);
             var match = UserFolderEx.Match(folderPath);
             userId = match.Success ? int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture) : Null.NullInteger;
 
+			Logger.LogDebug("IsUserFolder(folderPath={FolderPath}): userId → {UserId}", folderPath, userId);
+			Logger.LogDebug("IsUserFolder(folderPath={FolderPath}): match → {Match}", folderPath, match);
+			Logger.LogDebug("<<< Exiting IsUserFolder(folderPath={FolderPath})", folderPath);
             return match.Success;
         }
 
         private static string ShowImage(int fileId)
         {
+			Logger.LogDebug(">>> Entering ShowImage(fileId={FileId})", fileId);
             var image = (FileInfo)FileManager.Instance.GetFile(fileId);
 
+			Logger.LogDebug("ShowImage(fileId={FileId}): image → {Image}", fileId, image);
             if (image != null && IsImageExtension(image.Extension))
             {
                 var imageUrl = FileManager.Instance.GetUrl(image);
+				Logger.LogDebug("ShowImage(fileId={FileId}): imageUrl → {ImageUrl}", fileId, imageUrl);
+				Logger.LogDebug(">>> Entering IsImageExtension(extension={Extension})", extension);
+				Logger.LogDebug("<<< Exiting IsImageExtension(extension={Extension})", extension);
+			Logger.LogDebug("<<< Exiting ShowImage(fileId={FileId})", fileId);
                 return imageUrl;
             }
 
@@ -543,11 +606,15 @@ namespace DotNetNuke.Web.InternalServices
 
         private static bool IsImageExtension(string extension)
         {
+			Logger.LogDebug(">>> Entering IsImageExtension(extension={Extension})", extension);
+			Logger.LogDebug("<<< Exiting IsImageExtension(extension={Extension})", extension);
             return ImageExtensions.Any(e => e.Equals(extension, StringComparison.OrdinalIgnoreCase));
         }
 
         private static bool IsImage(string fileName)
         {
+			Logger.LogDebug(">>> Entering IsImage(fileName={FileName})", fileName);
+			Logger.LogDebug("<<< Exiting IsImage(fileName={FileName})", fileName);
             return ImageExtensions.Any(extension => fileName.EndsWith("." + extension, StringComparison.OrdinalIgnoreCase));
         }
 
@@ -565,12 +632,16 @@ namespace DotNetNuke.Web.InternalServices
             bool extract,
             string validationCode)
         {
+			Logger.LogDebug(">>> Entering UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode})", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode);
             var result = new FileUploadDto();
+			Logger.LogDebug("UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode}): result → {Result}", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode, result);
             BinaryReader reader = null;
             Stream fileContent = null;
+			Logger.LogDebug("UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode}): fileContent → {FileContent}", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode, fileContent);
             try
             {
                 var extensionList = new List<string>();
+				Logger.LogDebug("UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode}): extensionList → {ExtensionList}", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode, extensionList);
                 if (!string.IsNullOrWhiteSpace(filter))
                 {
                     extensionList = filter.Split(',').Select(i => i.Trim()).ToList();
@@ -584,10 +655,12 @@ namespace DotNetNuke.Web.InternalServices
 
                 if (!ValidationUtils.ValidationCodeMatched(cryptographyProvider, hostSettings, validateParams, validationCode))
                 {
+					Logger.LogWarning("Throwing InvalidOperationException from UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode})", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode);
                     throw new InvalidOperationException("Bad Request");
                 }
 
                 var extension = Path.GetExtension(fileName).ValueOrEmpty().Replace(".", string.Empty);
+				Logger.LogDebug("UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode}): extension → {Extension}", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode, extension);
                 result.FileIconUrl = IconController.GetFileIconUrl(extension);
 
                 if (!string.IsNullOrEmpty(filter) && !filter.ToLowerInvariant().Contains(extension.ToLowerInvariant()))
@@ -599,10 +672,12 @@ namespace DotNetNuke.Web.InternalServices
                 var folderManager = FolderManager.Instance;
                 var effectivePortalId = isHostPortal ? Null.NullInteger : portalId;
                 var folderInfo = folderManager.GetFolder(effectivePortalId, folder);
+				Logger.LogDebug("UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode}): folderInfo → {FolderInfo}", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode, folderInfo);
 
                 if (folderInfo == null && IsUserFolder(folder, out var userId))
                 {
                     var user = UserController.GetUserById(hostSettings, effectivePortalId, userId);
+					Logger.LogDebug("UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode}): user → {User}", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode, user);
                     if (user != null)
                     {
                         folderInfo = folderManager.GetUserFolder(user);
@@ -622,8 +697,11 @@ namespace DotNetNuke.Web.InternalServices
                 {
                     result.Message = GetLocalizedString("AlreadyExists");
                     result.AlreadyExists = true;
+					Logger.LogDebug("UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode}): result.AlreadyExists → {Arg12}", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode, result.AlreadyExists);
                     file = FileManager.Instance.GetFile(folderInfo, fileName, true);
                     result.FileId = file.FileId;
+					Logger.LogDebug("UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode}): file → {File}", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode, file);
+					Logger.LogDebug("UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode}): result.FileId → {Arg12}", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode, result.FileId);
                 }
                 else
                 {
@@ -631,13 +709,17 @@ namespace DotNetNuke.Web.InternalServices
                     if (extract && extension.Equals("zip", StringComparison.OrdinalIgnoreCase))
                     {
                         var destinationFolder = FolderManager.Instance.GetFolder(file.FolderId);
+						Logger.LogDebug("UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode}): destinationFolder → {DestinationFolder}", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode, destinationFolder);
                         var invalidFiles = new List<string>();
+						Logger.LogDebug("UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode}): invalidFiles → {InvalidFiles}", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode, invalidFiles);
                         var filesCount = FileManager.Instance.UnzipFile(file, destinationFolder, invalidFiles);
+						Logger.LogDebug("UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode}): filesCount → {FilesCount}", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode, filesCount);
 
                         var invalidFilesJson = invalidFiles.Count > 0
                             ? string.Join(",", invalidFiles.Select(invalidFile => HttpUtility.JavaScriptStringEncode(invalidFile, addDoubleQuotes: true)))
                             : string.Empty;
                         result.Prompt = $"{{\"invalidFiles\":[{invalidFilesJson}], \"totalCount\": {filesCount}}}";
+						Logger.LogDebug("UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode}): result.Prompt → {Arg12}", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode, result.Prompt);
                     }
 
                     result.FileId = file.FileId;
@@ -646,6 +728,7 @@ namespace DotNetNuke.Web.InternalServices
                 fileContent = FileManager.Instance.GetFileContent(file);
 
                 var path = GetUrl(result.FileId);
+				Logger.LogDebug("UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode}): path → {Path}", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode, path);
                 using (reader = new BinaryReader(fileContent))
                 {
                     Size size;
@@ -670,6 +753,8 @@ namespace DotNetNuke.Web.InternalServices
                 }
 
                 result.Path = result.FileId > 0 ? path : string.Empty;
+				Logger.LogDebug("UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode}): result.Path → {Arg12}", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode, result.Path);
+				Logger.LogDebug("UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode}): result.FileName → {Arg12}", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode, result.FileName);
                 result.FileName = fileName;
 
                 if (extract && extension.Equals("zip", StringComparison.OrdinalIgnoreCase))
@@ -688,6 +773,7 @@ namespace DotNetNuke.Web.InternalServices
             {
                 Logger.Error(exe);
                 result.Message = exe.Message;
+				Logger.LogDebug("UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode}): result.Message → {Arg12}", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode, result.Message);
                 return result;
             }
             finally
@@ -704,10 +790,13 @@ namespace DotNetNuke.Web.InternalServices
                     fileContent.Dispose();
                 }
             }
+			Logger.LogDebug("<<< Exiting UploadFile(cryptographyProvider={CryptographyProvider},hostSettings={HostSettings},stream={Stream},portalId={PortalId},userInfo={UserInfo},folder={Folder},filter={Filter},fileName={FileName},overwrite={Overwrite},isHostPortal={IsHostPortal},extract={Extract},validationCode={ValidationCode})", cryptographyProvider, hostSettings, stream, portalId, userInfo, folder, filter, fileName, overwrite, isHostPortal, extract, validationCode);
         }
 
         private static IPortalInfo[] GetMyPortalGroup()
         {
+			Logger.LogDebug(">>> Entering GetMyPortalGroup()");
+			Logger.LogDebug("<<< Exiting GetMyPortalGroup()");
             return (
                 from @group in PortalGroupController.Instance.GetPortalGroups().ToArray()
                 select PortalGroupController.Instance.GetPortalsByGroup(@group.PortalGroupId) into portals
@@ -718,6 +807,7 @@ namespace DotNetNuke.Web.InternalServices
 
         private bool IsPortalIdValid(int portalId)
         {
+			Logger.LogDebug(">>> Entering IsPortalIdValid(portalId={PortalId})", portalId);
             if (this.UserInfo.IsSuperUser)
             {
                 return true;
@@ -729,12 +819,15 @@ namespace DotNetNuke.Web.InternalServices
             }
 
             var isAdminUser = PortalSecurity.IsInRole(this.PortalSettings.AdministratorRoleName);
+			Logger.LogDebug("IsPortalIdValid(portalId={PortalId}): isAdminUser → {IsAdminUser}", portalId, isAdminUser);
             if (!isAdminUser)
             {
                 return false;
             }
 
             var myGroup = GetMyPortalGroup();
+			Logger.LogDebug("IsPortalIdValid(portalId={PortalId}): myGroup → {MyGroup}", portalId, myGroup);
+			Logger.LogDebug("<<< Exiting IsPortalIdValid(portalId={PortalId})", portalId);
             return myGroup != null && myGroup.Any(p => p.PortalId == portalId);
         }
 

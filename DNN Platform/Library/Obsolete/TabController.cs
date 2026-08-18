@@ -35,8 +35,11 @@ namespace DotNetNuke.Entities.Tabs
             PortalTemplateModuleAction mergeTabs,
             Hashtable hModules)
         {
+			Logger.LogDebug(">>> Entering DeserializePanes(nodePanes={NodePanes},portalId={PortalId},tabId={TabId},mergeTabs={MergeTabs},hModules={HModules})", nodePanes, portalId, tabId, mergeTabs, hModules);
             using var scope = Globals.GetOrCreateServiceScope();
+			Logger.LogDebug("DeserializePanes(nodePanes={NodePanes},portalId={PortalId},tabId={TabId},mergeTabs={MergeTabs},hModules={HModules}): scope → {Scope}", nodePanes, portalId, tabId, mergeTabs, hModules, scope);
             DeserializePanes(scope.ServiceProvider.GetRequiredService<IBusinessControllerProvider>(), nodePanes, portalId, tabId, mergeTabs, hModules);
+			Logger.LogDebug("<<< Exiting DeserializePanes(nodePanes={NodePanes},portalId={PortalId},tabId={TabId},mergeTabs={MergeTabs},hModules={HModules})", nodePanes, portalId, tabId, mergeTabs, hModules);
         }
 
         /// <summary>Deserializes the tab.</summary>
@@ -52,7 +55,10 @@ namespace DotNetNuke.Entities.Tabs
             int portalId,
             PortalTemplateModuleAction mergeTabs)
         {
+			Logger.LogDebug(">>> Entering DeserializeTab(tabNode={TabNode},tab={Tab},portalId={PortalId},mergeTabs={MergeTabs})", tabNode, tab, portalId, mergeTabs);
             using var scope = Globals.GetOrCreateServiceScope();
+			Logger.LogDebug("DeserializeTab(tabNode={TabNode},tab={Tab},portalId={PortalId},mergeTabs={MergeTabs}): scope → {Scope}", tabNode, tab, portalId, mergeTabs, scope);
+			Logger.LogDebug("<<< Exiting DeserializeTab(tabNode={TabNode},tab={Tab},portalId={PortalId},mergeTabs={MergeTabs})", tabNode, tab, portalId, mergeTabs);
             return DeserializeTab(scope.ServiceProvider.GetRequiredService<IBusinessControllerProvider>(), tabNode, tab, portalId, mergeTabs);
         }
 
@@ -75,7 +81,10 @@ namespace DotNetNuke.Entities.Tabs
             PortalTemplateModuleAction mergeTabs,
             Hashtable modules)
         {
+			Logger.LogDebug(">>> Entering DeserializeTab(tabNode={TabNode},tab={Tab},tabs={Tabs},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},modules={Modules})", tabNode, tab, tabs, portalId, isAdminTemplate, mergeTabs, modules);
             using var scope = Globals.GetOrCreateServiceScope();
+			Logger.LogDebug("DeserializeTab(tabNode={TabNode},tab={Tab},tabs={Tabs},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},modules={Modules}): scope → {Scope}", tabNode, tab, tabs, portalId, isAdminTemplate, mergeTabs, modules, scope);
+			Logger.LogDebug("<<< Exiting DeserializeTab(tabNode={TabNode},tab={Tab},tabs={Tabs},portalId={PortalId},isAdminTemplate={IsAdminTemplate},mergeTabs={MergeTabs},modules={Modules})", tabNode, tab, tabs, portalId, isAdminTemplate, mergeTabs, modules);
             return DeserializeTab(scope.ServiceProvider.GetRequiredService<IBusinessControllerProvider>(), tabNode, tab, tabs, portalId, isAdminTemplate, mergeTabs, modules);
         }
 
@@ -87,7 +96,10 @@ namespace DotNetNuke.Entities.Tabs
         [DnnDeprecated(10, 0, 0, "Please use overload with IBusinessControllerProvider")]
         public static partial XmlNode SerializeTab(XmlDocument tabXml, TabInfo objTab, bool includeContent)
         {
+			Logger.LogDebug(">>> Entering SerializeTab(tabXml={TabXml},objTab={ObjTab},includeContent={IncludeContent})", tabXml, objTab, includeContent);
             using var scope = Globals.GetOrCreateServiceScope();
+			Logger.LogDebug("SerializeTab(tabXml={TabXml},objTab={ObjTab},includeContent={IncludeContent}): scope → {Scope}", tabXml, objTab, includeContent, scope);
+			Logger.LogDebug("<<< Exiting SerializeTab(tabXml={TabXml},objTab={ObjTab},includeContent={IncludeContent})", tabXml, objTab, includeContent);
             return SerializeTab(
                 scope.ServiceProvider.GetRequiredService<IBusinessControllerProvider>(),
                 tabXml,
@@ -126,7 +138,10 @@ namespace DotNetNuke.Entities.Tabs
         [DnnDeprecated(9, 11, 1, "Use AddMissingLanguagesWithWarnings")]
         public partial void AddMissingLanguages(int portalId, int tabId)
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabController));
             this.AddMissingLanguagesWithWarnings(portalId, tabId);
+			Logger.LogDebug(">>> Entering AddMissingLanguages(portalId={PortalId},tabId={TabId})", portalId, tabId);
+			Logger.LogDebug("<<< Exiting AddMissingLanguages(portalId={PortalId},tabId={TabId})", portalId, tabId);
         }
     }
 }

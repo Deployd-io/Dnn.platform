@@ -8,12 +8,17 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
     {
         public ClientString()
         {
+		eventLogger.LogDebug(">>> Entering ClientString()");
+		eventLogger.LogDebug("<<< Exiting ClientString()");
         }
 
         public ClientString(string name, string value)
         {
+			eventLogger.LogDebug(">>> Entering ClientString(name={Name},value={Value})", name, value);
             this.Name = name;
             this.Value = value;
+			eventLogger.LogDebug("ClientString(name={Name},value={Value}): this.Name → {Arg2}", name, value, this.Name);
+			eventLogger.LogDebug("<<< Exiting ClientString(name={Name},value={Value})", name, value);
         }
     }
 }

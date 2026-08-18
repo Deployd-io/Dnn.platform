@@ -22,6 +22,7 @@ namespace DotNetNuke.Tests.Core.Services.ClientCapability
         [SetUp]
         public void SetUp()
         {
+			mockEventLogger.LogDebug(">>> Entering SetUp()");
             this._requestDics = new Dictionary<string, string>();
             this._requestDics.Add("Empty", string.Empty);
             this._requestDics.Add("Valid", "vlXgu64BQGFSQrY0ZcJBZASMvYvTHu9GQ0YM9rjPSso.eyJhbGdvcml0aG0iOiJITUFDLVNIQTI1NiIsIjAiOiJwYXlsb2FkIiwidXNlcl9pZCI6ICIxIiwiZXhwaXJlcyI6IjEzMjUzNzU5OTkifQ==");
@@ -30,35 +31,47 @@ namespace DotNetNuke.Tests.Core.Services.ClientCapability
 
             // json data "{\"algorithm\":\"HMAC-SHA256\",\"issued_at\":1319488107,\"page\":{\"id\":\"130634540372728\",\"liked\":false,\"admin\":true},\"user\":{\"country\":\"ca\",\"locale\":\"en_US\",\"age\":{\"min\":21}}}"
             this._requestDics.Add("Invalid", "Invalid Content");
+			mockEventLogger.LogDebug("<<< Exiting SetUp()");
         }
 
         [Test]
         public void FacebookRequestController_GetFacebookDetailsFromRequest_With_Empty_Request_String()
         {
+			mockEventLogger.LogDebug(">>> Entering FacebookRequestController_GetFacebookDetailsFromRequest_With_Empty_Request_String()");
             var request = FacebookRequestController.GetFacebookDetailsFromRequest(this._requestDics["Empty"]);
             Assert.That(request, Is.Null);
+			mockEventLogger.LogDebug("FacebookRequestController_GetFacebookDetailsFromRequest_With_Empty_Request_String(): request → {Request}", request);
+			mockEventLogger.LogDebug("<<< Exiting FacebookRequestController_GetFacebookDetailsFromRequest_With_Empty_Request_String()");
         }
 
         [Test]
         public void FacebookRequestController_GetFacebookDetailsFromRequest_With_Invalid_Request_String()
         {
+			mockEventLogger.LogDebug(">>> Entering FacebookRequestController_GetFacebookDetailsFromRequest_With_Invalid_Request_String()");
             var request = FacebookRequestController.GetFacebookDetailsFromRequest(this._requestDics["Invalid"]);
             Assert.That(request, Is.Null);
+			mockEventLogger.LogDebug("FacebookRequestController_GetFacebookDetailsFromRequest_With_Invalid_Request_String(): request → {Request}", request);
+			mockEventLogger.LogDebug("<<< Exiting FacebookRequestController_GetFacebookDetailsFromRequest_With_Invalid_Request_String()");
         }
 
         [Test]
         public void FacebookRequestController_GetFacebookDetailsFromRequest_With_Valid_Request_String()
         {
+			mockEventLogger.LogDebug(">>> Entering FacebookRequestController_GetFacebookDetailsFromRequest_With_Valid_Request_String()");
             var request = FacebookRequestController.GetFacebookDetailsFromRequest(this._requestDics["Valid"]);
             Assert.That(request.IsValid, Is.EqualTo(true));
+			mockEventLogger.LogDebug("FacebookRequestController_GetFacebookDetailsFromRequest_With_Valid_Request_String(): request → {Request}", request);
+			mockEventLogger.LogDebug("<<< Exiting FacebookRequestController_GetFacebookDetailsFromRequest_With_Valid_Request_String()");
         }
 
         [Test]
         public void FacebookRequestController_GetFacebookDetailsFromRequest_With_Valid_Request_String_ForAPage()
         {
+			mockEventLogger.LogDebug(">>> Entering FacebookRequestController_GetFacebookDetailsFromRequest_With_Valid_Request_String_ForAPage()");
             var request = FacebookRequestController.GetFacebookDetailsFromRequest(this._requestDics["ValidForAPage"]);
             using (Assert.EnterMultipleScope())
             {
+			mockEventLogger.LogDebug("FacebookRequestController_GetFacebookDetailsFromRequest_With_Valid_Request_String_ForAPage(): request → {Request}", request);
                 Assert.That(request.IsValid, Is.EqualTo(true));
                 Assert.That(request.Algorithm, Is.EqualTo("HMAC-SHA256"));
                 Assert.That(request.IssuedAt, Is.EqualTo(ConvertToTimestamp(1319488107)));
@@ -74,47 +87,66 @@ namespace DotNetNuke.Tests.Core.Services.ClientCapability
                 Assert.That(request.PageLiked, Is.EqualTo(false));
                 Assert.That(request.PageUserAdmin, Is.EqualTo(true));
             }
+			mockEventLogger.LogDebug("<<< Exiting FacebookRequestController_GetFacebookDetailsFromRequest_With_Valid_Request_String_ForAPage()");
         }
 
         [Test]
         public void FacebookRequestController_GetFacebookDetailsFromRequest_With_Empty_Request()
         {
+			mockEventLogger.LogDebug(">>> Entering FacebookRequestController_GetFacebookDetailsFromRequest_With_Empty_Request()");
             var request = FacebookRequestController.GetFacebookDetailsFromRequest(null as HttpRequest);
             Assert.That(request, Is.Null);
+			mockEventLogger.LogDebug("FacebookRequestController_GetFacebookDetailsFromRequest_With_Empty_Request(): request → {Request}", request);
+			mockEventLogger.LogDebug("<<< Exiting FacebookRequestController_GetFacebookDetailsFromRequest_With_Empty_Request()");
         }
 
         [Test]
         public void FacebookRequestController_GetFacebookDetailsFromRequest_With_Get_Request()
         {
+			mockEventLogger.LogDebug(">>> Entering FacebookRequestController_GetFacebookDetailsFromRequest_With_Get_Request()");
             HttpRequest httpRequest = new HttpRequest("unittest.aspx", "http://localhost/unittest.aspx", string.Empty);
             httpRequest.RequestType = "GET";
+			mockEventLogger.LogDebug("FacebookRequestController_GetFacebookDetailsFromRequest_With_Get_Request(): httpRequest.RequestType → {Arg0}", httpRequest.RequestType);
+			mockEventLogger.LogDebug("FacebookRequestController_GetFacebookDetailsFromRequest_With_Get_Request(): httpRequest → {HttpRequest}", httpRequest);
 
             var request = FacebookRequestController.GetFacebookDetailsFromRequest(httpRequest);
+			mockEventLogger.LogDebug("FacebookRequestController_GetFacebookDetailsFromRequest_With_Get_Request(): request → {Request}", request);
             Assert.That(request, Is.Null);
+			mockEventLogger.LogDebug("<<< Exiting FacebookRequestController_GetFacebookDetailsFromRequest_With_Get_Request()");
         }
 
         [Test]
         public void FacebookRequestController_GetFacebookDetailsFromRequest_With_Post_Invalid_Request()
         {
+			mockEventLogger.LogDebug(">>> Entering FacebookRequestController_GetFacebookDetailsFromRequest_With_Post_Invalid_Request()");
             HttpRequest httpRequest = new HttpRequest("unittest.aspx", "http://localhost/unittest.aspx", string.Empty);
             httpRequest.RequestType = "POST";
+			mockEventLogger.LogDebug("FacebookRequestController_GetFacebookDetailsFromRequest_With_Post_Invalid_Request(): httpRequest.RequestType → {Arg0}", httpRequest.RequestType);
+			mockEventLogger.LogDebug("FacebookRequestController_GetFacebookDetailsFromRequest_With_Post_Invalid_Request(): httpRequest → {HttpRequest}", httpRequest);
             this.SetReadonly(httpRequest.Form, false);
             httpRequest.Form.Add("signed_request", this._requestDics["Invalid"]);
 
             var request = FacebookRequestController.GetFacebookDetailsFromRequest(httpRequest);
+			mockEventLogger.LogDebug("FacebookRequestController_GetFacebookDetailsFromRequest_With_Post_Invalid_Request(): request → {Request}", request);
             Assert.That(request, Is.Null);
+			mockEventLogger.LogDebug("<<< Exiting FacebookRequestController_GetFacebookDetailsFromRequest_With_Post_Invalid_Request()");
         }
 
         [Test]
         public void FacebookRequestController_GetFacebookDetailsFromRequest_With_Post_Valid_Request()
         {
+			mockEventLogger.LogDebug(">>> Entering FacebookRequestController_GetFacebookDetailsFromRequest_With_Post_Valid_Request()");
             HttpRequest httpRequest = new HttpRequest("unittest.aspx", "http://localhost/unittest.aspx", string.Empty);
             httpRequest.RequestType = "POST";
+			mockEventLogger.LogDebug("FacebookRequestController_GetFacebookDetailsFromRequest_With_Post_Valid_Request(): httpRequest.RequestType → {Arg0}", httpRequest.RequestType);
+			mockEventLogger.LogDebug("FacebookRequestController_GetFacebookDetailsFromRequest_With_Post_Valid_Request(): httpRequest → {HttpRequest}", httpRequest);
             this.SetReadonly(httpRequest.Form, false);
             httpRequest.Form.Add("signed_request", this._requestDics["Valid"]);
 
             var request = FacebookRequestController.GetFacebookDetailsFromRequest(httpRequest);
+			mockEventLogger.LogDebug("FacebookRequestController_GetFacebookDetailsFromRequest_With_Post_Valid_Request(): request → {Request}", request);
             Assert.That(request.IsValid, Is.EqualTo(true));
+			mockEventLogger.LogDebug("<<< Exiting FacebookRequestController_GetFacebookDetailsFromRequest_With_Post_Valid_Request()");
         }
 
         /// <summary>method for converting a System.DateTime value to a UNIX Timestamp.</summary>
@@ -122,19 +154,25 @@ namespace DotNetNuke.Tests.Core.Services.ClientCapability
         /// <returns></returns>
         private static DateTime ConvertToTimestamp(long value)
         {
+			mockEventLogger.LogDebug(">>> Entering ConvertToTimestamp(value={Value})", value);
             // create Timespan by subtracting the value provided from
             // the Unix Epoch
             DateTime epoc = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+			mockEventLogger.LogDebug("ConvertToTimestamp(value={Value}): epoc → {Epoc}", value, epoc);
+			mockEventLogger.LogDebug("<<< Exiting ConvertToTimestamp(value={Value})", value);
             return epoc.AddSeconds((double)value);
         }
 
         private void SetReadonly(NameValueCollection collection, bool readOnly)
         {
+			mockEventLogger.LogDebug(">>> Entering SetReadonly(collection={Collection},readOnly={ReadOnly})", collection, readOnly);
             var readOnlyProperty = collection.GetType().GetProperty("IsReadOnly", BindingFlags.NonPublic | BindingFlags.Instance);
             if (readOnlyProperty != null)
+			mockEventLogger.LogDebug("SetReadonly(collection={Collection},readOnly={ReadOnly}): readOnlyProperty → {ReadOnlyProperty}", collection, readOnly, readOnlyProperty);
             {
                 readOnlyProperty.SetValue(collection, readOnly, null);
             }
+			mockEventLogger.LogDebug("<<< Exiting SetReadonly(collection={Collection},readOnly={ReadOnly})", collection, readOnly);
         }
     }
 }

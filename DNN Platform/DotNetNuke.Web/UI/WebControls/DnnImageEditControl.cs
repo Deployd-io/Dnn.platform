@@ -9,10 +9,14 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>An image edit control.</summary>
     public class DnnImageEditControl : DnnFileEditControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnImageEditControl));
         /// <summary>Initializes a new instance of the <see cref="DnnImageEditControl"/> class.</summary>
         public DnnImageEditControl()
         {
+			Logger.LogDebug(">>> Entering DnnImageEditControl()");
             this.FileFilter = Globals.ImageFileTypes;
+			Logger.LogDebug("DnnImageEditControl(): this.FileFilter → {Arg0}", this.FileFilter);
+			Logger.LogDebug("<<< Exiting DnnImageEditControl()");
         }
     }
 }

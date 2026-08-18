@@ -3,6 +3,7 @@ import { FolderTreeItem, InternalServicesClient } from "../../services/InternalS
 import { Item, ItemsClient } from "../../services/ItemsClient";
 import { GetFolderContentResponse } from "../../services/ItemsClient";
 import state from "../../store/store";
+const logger = console;
 
 @Component({
   tag: 'dnn-rm-folder-list',
@@ -27,16 +28,21 @@ export class DnnRmFolderList {
   private rootItemContextMenu: HTMLDnnContextMenuElement;
 
   constructor(){
+	logger.debug('>>> Entering constructor()');
     this.internalServicesClient = new InternalServicesClient(state.moduleId);
     this.itemsClient = new ItemsClient(state.moduleId);
+	logger.debug('<<< Exiting constructor()');
   }
 
   @Listen("dnnRmFoldersChanged", {target: "document"})
   handleFoldersChanged(){
+	logger.debug('>>> Entering handleFoldersChanged()');
     void this.getFolders();
+	logger.debug('<<< Exiting handleFoldersChanged()');
   }
 
   async componentWillLoad() {
+	logger.debug('>>> Entering componentWillLoad()');
     try {
       await this.getFolders();
       state.currentItems = await this.itemsClient.getFolderContent(
@@ -48,24 +54,31 @@ export class DnnRmFolderList {
         this.rootItem = await this.itemsClient.getFolderItem(state.settings.HomeFolderId)
     } catch (error) {
       alert(error);
+	logger.debug('<<< Exiting componentWillLoad()');
     }
   }
 
   private async getFolders() {
+	logger.debug('>>> Entering getFolders()');
     try {
       const data = await this.internalServicesClient.getFolders(state.settings.HomeFolderId)
       state.rootFolders = data;
+	logger.debug(`getFolders(): data → ${data}`);
     } catch (error) {
       alert(error);
+	logger.debug('<<< Exiting getFolders()');
     }
   }
 
   private handleFolderPicked(e: CustomEvent<FolderTreeItem>): void {
+	logger.debug(`>>> Entering handleFolderPicked(e=${e})`);
     this.selectedFolder = e.detail;
     this.dnnRmFolderListFolderPicked.emit(e.detail)
+	logger.debug(`<<< Exiting handleFolderPicked(e=${e})`);
   }
 
   private handleRootClicked(){
+	logger.debug('>>> Entering handleRootClicked()');
     const item: FolderTreeItem = {
       data: {
         hasChildren: false,
@@ -76,9 +89,13 @@ export class DnnRmFolderList {
     };
     this.selectedFolder = item;
     this.dnnRmFolderListFolderPicked.emit(item);
+	logger.debug(`handleRootClicked(): selectedFolder → ${selectedFolder}`);
+	logger.debug('<<< Exiting handleRootClicked()');
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         <button

@@ -9,15 +9,20 @@ namespace DotNetNuke.Prompt
     [AttributeUsage(AttributeTargets.Class)]
     public class ConsoleCommandAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ConsoleCommandAttribute));
         /// <summary>Initializes a new instance of the <see cref="ConsoleCommandAttribute"/> class.</summary>
         /// <param name="name">The command name.</param>
         /// <param name="categoryKey">The resource key for the command category.</param>
         /// <param name="descriptionKey">The resource key for the command description.</param>
         public ConsoleCommandAttribute(string name, string categoryKey, string descriptionKey)
         {
+			Logger.LogDebug(">>> Entering ConsoleCommandAttribute(name={Name},categoryKey={CategoryKey},descriptionKey={DescriptionKey})", name, categoryKey, descriptionKey);
             this.Name = name;
             this.CategoryKey = categoryKey;
+			Logger.LogDebug("ConsoleCommandAttribute(name={Name},categoryKey={CategoryKey},descriptionKey={DescriptionKey}): this.Name → {Arg3}", name, categoryKey, descriptionKey, this.Name);
+			Logger.LogDebug("ConsoleCommandAttribute(name={Name},categoryKey={CategoryKey},descriptionKey={DescriptionKey}): this.CategoryKey → {Arg3}", name, categoryKey, descriptionKey, this.CategoryKey);
             this.DescriptionKey = descriptionKey;
+			Logger.LogDebug("<<< Exiting ConsoleCommandAttribute(name={Name},categoryKey={CategoryKey},descriptionKey={DescriptionKey})", name, categoryKey, descriptionKey);
         }
 
         /// <summary>Gets or sets name used in the UI for the command. By convention we encourage you to use "verb-noun" as with Powershell (e.g. "add-module").</summary>

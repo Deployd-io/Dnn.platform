@@ -11,17 +11,21 @@ import MiddleActions from "./MiddleActions";
 import ThemeList from "./ThemeList";
 import "./style.less";
 import utils from "utils";
+const logger = console;
 
 class Body extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             searchText: "",
             level: 7
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     getThemesData(reload) {
+		logger.debug(`>>> Entering getThemesData(reload=${reload})`);
         const { props, state } = this;
 
         if (reload || props.themes.layouts.length === 0) {
@@ -30,6 +34,7 @@ class Body extends Component {
 
         let searchText = state.searchText;
         let level = state.level;
+		logger.debug(`<<< Exiting getThemesData(reload=${reload})`);
         return props.themes.layouts.filter(l => {
             return !searchText || l.packageName.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
         }).filter(l => {
@@ -38,21 +43,29 @@ class Body extends Component {
     }
 
     onSearch(value) {
+		logger.debug(`>>> Entering onSearch(value=${value})`);
         this.setState({ searchText: value });
+		logger.debug(`<<< Exiting onSearch(value=${value})`);
     }
 
     onFilterChanged(value) {
+		logger.debug(`>>> Entering onFilterChanged(value=${value})`);
         this.setState({ level: value });
+		logger.debug(`<<< Exiting onFilterChanged(value=${value})`);
     }
 
     backToThemes() {
+		logger.debug('>>> Entering backToThemes()');
         utils.utilities.loadPanel("Dnn.Themes", {});
         this.getThemesData(true);
+		logger.debug('<<< Exiting backToThemes()');
     }
 
     installTheme() {
+		logger.debug('>>> Entering installTheme()');
         let event = document.createEvent("Event");
 
+		logger.debug(`installTheme(): event → ${event}`);
         event.initEvent("installPortalTheme", true, true);
 
         let settings = {
@@ -70,9 +83,12 @@ class Body extends Component {
         });
 
         document.dispatchEvent(event);
+		logger.debug('<<< Exiting installTheme()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className="themes-body">
                 <PersonaBarPageHeader title={Localization.get("Themes")}>
@@ -98,6 +114,8 @@ Body.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         themes: state.theme.themes
     };

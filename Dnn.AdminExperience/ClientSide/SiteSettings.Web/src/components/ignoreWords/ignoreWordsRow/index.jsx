@@ -1,29 +1,36 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import "./style.less";
+const logger = console;
 import { Collapsible, SvgIcons } from "@dnnsoftware/dnn-react-common";
 
 class IgnoreWordsRow extends Component {
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
         this.setState({
             opened
         });
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     toggle() {
+		logger.debug('>>> Entering toggle()');
         if ((this.props.openId !== "" && this.props.id === this.props.openId)) {
             //this.props.Collapse();
         }
         else {
             this.props.OpenCollapse(this.props.id);
+			logger.debug('<<< Exiting toggle()');
         }
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
+		logger.debug('<<< Exiting render()');
         return (
             <div className={"collapsible-component-ignore-words" + (opened ? " row-opened" : "")}>
                 {props.visible &&

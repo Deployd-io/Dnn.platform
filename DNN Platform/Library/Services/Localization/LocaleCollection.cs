@@ -14,6 +14,7 @@ namespace DotNetNuke.Services.Localization
     /// <summary><para>The LocaleCollection class is a collection of Locale objects.  It stores the supported locales.</para></summary>
     public class LocaleCollection : NameObjectCollectionBase, IDictionary<string, Locale>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LocaleCollection));
         private DictionaryEntry de;
 
         /// <summary>Gets a String array that contains all the keys in the collection.</summary>
@@ -56,13 +57,16 @@ namespace DotNetNuke.Services.Localization
         /// <inheritdoc />
         public bool TryGetValue(string key, out Locale value)
         {
+			Logger.LogDebug(">>> Entering TryGetValue(key={Key})", key);
             if (!this.ContainsKey(key))
             {
                 value = null;
+				Logger.LogDebug("TryGetValue(key={Key}): value → {Value}", key, value);
                 return false;
             }
 
             value = this[key];
+			Logger.LogDebug("<<< Exiting TryGetValue(key={Key})", key);
             return true;
         }
 
@@ -71,14 +75,18 @@ namespace DotNetNuke.Services.Localization
         /// <param name="value">The value.</param>
         public void Add(string key, object value)
         {
+			Logger.LogDebug(">>> Entering Add(key={Key},value={Value})", key, value);
             this.BaseAdd(key, value);
+			Logger.LogDebug("<<< Exiting Add(key={Key},value={Value})", key, value);
         }
 
         /// <summary>Removes an entry with the specified key from the collection.</summary>
         /// <param name="key">The key.</param>
         public void Remove(string key)
         {
+			Logger.LogDebug(">>> Entering Remove(key={Key})", key);
             this.BaseRemove(key);
+			Logger.LogDebug("<<< Exiting Remove(key={Key})", key);
         }
 
         /// <inheritdoc />
@@ -108,8 +116,10 @@ namespace DotNetNuke.Services.Localization
         /// <inheritdoc />
         public bool Contains(KeyValuePair<string, Locale> item)
         {
+			Logger.LogDebug(">>> Entering Contains(item={Item})", item);
             if (!this.TryGetValue(item.Key, out var value))
             {
+			Logger.LogDebug("<<< Exiting Contains(item={Item})", item);
                 return false;
             }
 
@@ -119,9 +129,11 @@ namespace DotNetNuke.Services.Localization
         /// <inheritdoc />
         public void CopyTo(KeyValuePair<string, Locale>[] array, int arrayIndex)
         {
+			Logger.LogDebug(">>> Entering CopyTo(array={Array},arrayIndex={ArrayIndex})", array, arrayIndex);
             Requires.NotNull(nameof(array), array);
             if (arrayIndex > array.Length)
             {
+				Logger.LogWarning("Throwing ArgumentOutOfRangeException from CopyTo(array={Array},arrayIndex={ArrayIndex})", array, arrayIndex);
                 throw new ArgumentOutOfRangeException(nameof(arrayIndex), arrayIndex, "arrayIndex must be less than the length of array");
             }
 
@@ -134,17 +146,20 @@ namespace DotNetNuke.Services.Localization
             {
                 array[arrayIndex++] = new KeyValuePair<string, Locale>(key, this[key]);
             }
+			Logger.LogDebug("<<< Exiting CopyTo(array={Array},arrayIndex={ArrayIndex})", array, arrayIndex);
         }
 
         /// <inheritdoc />
         public bool Remove(KeyValuePair<string, Locale> item)
         {
+			Logger.LogDebug(">>> Entering Remove(item={Item})", item);
             if (!this.Contains(item))
             {
                 return false;
             }
 
             this.BaseRemove(item.Key);
+			Logger.LogDebug("<<< Exiting Remove(item={Item})", item);
             return true;
         }
 

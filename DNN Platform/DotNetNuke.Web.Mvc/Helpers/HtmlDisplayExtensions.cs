@@ -13,6 +13,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
     /// <summary>Represents support for rendering object values as HTML.</summary>
     public static class HtmlDisplayExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HtmlDisplayExtensions));
         /// <summary>Returns HTML markup for each property in the object that is represented by a string expression.</summary>
         ///
         /// <returns>
@@ -21,6 +22,13 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="expression">An expression that identifies the object that contains the properties to display.</param>
         public static MvcHtmlString Display(this DnnHtmlHelper html, string expression)
         {
+			Logger.LogDebug(">>> Entering Display(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting Display(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting Display(html={Html},expression={Expression},additionalViewData={AdditionalViewData})", html, expression, additionalViewData);
+			Logger.LogDebug("<<< Exiting Display(html={Html},expression={Expression},templateName={TemplateName})", html, expression, templateName);
+			Logger.LogDebug("<<< Exiting Display(html={Html},expression={Expression},templateName={TemplateName},additionalViewData={AdditionalViewData})", html, expression, templateName, additionalViewData);
+			Logger.LogDebug("<<< Exiting Display(html={Html},expression={Expression},templateName={TemplateName},htmlFieldName={HtmlFieldName})", html, expression, templateName, htmlFieldName);
+			Logger.LogDebug("<<< Exiting Display(html={Html},expression={Expression},templateName={TemplateName},htmlFieldName={HtmlFieldName},additionalViewData={AdditionalViewData})", html, expression, templateName, htmlFieldName, additionalViewData);
             return html.HtmlHelper.Display(expression);
         }
 
@@ -87,6 +95,13 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="expression">An expression that identifies the object that contains the properties to display.</param><typeparam name="TModel">The type of the model.</typeparam><typeparam name="TValue">The type of the value.</typeparam>
         public static MvcHtmlString DisplayFor<TModel, TValue>(this DnnHtmlHelper<TModel> html, Expression<Func<TModel, TValue>> expression)
         {
+			Logger.LogDebug(">>> Entering DisplayFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting DisplayFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting DisplayFor(html={Html},expression={Expression},additionalViewData={AdditionalViewData})", html, expression, additionalViewData);
+			Logger.LogDebug("<<< Exiting DisplayFor(html={Html},expression={Expression},templateName={TemplateName})", html, expression, templateName);
+			Logger.LogDebug("<<< Exiting DisplayFor(html={Html},expression={Expression},templateName={TemplateName},additionalViewData={AdditionalViewData})", html, expression, templateName, additionalViewData);
+			Logger.LogDebug("<<< Exiting DisplayFor(html={Html},expression={Expression},templateName={TemplateName},htmlFieldName={HtmlFieldName})", html, expression, templateName, htmlFieldName);
+			Logger.LogDebug("<<< Exiting DisplayFor(html={Html},expression={Expression},templateName={TemplateName},htmlFieldName={HtmlFieldName},additionalViewData={AdditionalViewData})", html, expression, templateName, htmlFieldName, additionalViewData);
             return html.HtmlHelper.DisplayFor(expression);
         }
 
@@ -153,6 +168,13 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param>
         public static MvcHtmlString DisplayForModel(this DnnHtmlHelper html)
         {
+			Logger.LogDebug(">>> Entering DisplayForModel(html={Html})", html);
+			Logger.LogDebug("<<< Exiting DisplayForModel(html={Html})", html);
+			Logger.LogDebug("<<< Exiting DisplayForModel(html={Html},additionalViewData={AdditionalViewData})", html, additionalViewData);
+			Logger.LogDebug("<<< Exiting DisplayForModel(html={Html},templateName={TemplateName})", html, templateName);
+			Logger.LogDebug("<<< Exiting DisplayForModel(html={Html},templateName={TemplateName},additionalViewData={AdditionalViewData})", html, templateName, additionalViewData);
+			Logger.LogDebug("<<< Exiting DisplayForModel(html={Html},templateName={TemplateName},htmlFieldName={HtmlFieldName})", html, templateName, htmlFieldName);
+			Logger.LogDebug("<<< Exiting DisplayForModel(html={Html},templateName={TemplateName},htmlFieldName={HtmlFieldName},additionalViewData={AdditionalViewData})", html, templateName, htmlFieldName, additionalViewData);
             return html.HtmlHelper.DisplayForModel(html.ViewData.ModelMetadata);
         }
 

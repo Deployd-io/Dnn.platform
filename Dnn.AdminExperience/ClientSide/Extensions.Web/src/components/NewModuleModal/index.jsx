@@ -8,6 +8,7 @@ import FromManifest from "./FromManifest";
 import FromNew from "./FromNew";
 import Localization from "localization";
 import styles from "./style.module.less";
+const logger = console;
 
 const inputStyle = { width: "100%" };
 
@@ -29,43 +30,58 @@ const newModuleTypes = [
 class NewModuleModal extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             selectedType: ""
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     onSelectOwnerFolder(ownerFolder) {
+		logger.debug(`>>> Entering onSelectOwnerFolder(ownerFolder=${ownerFolder})`);
         const { props } = this;
         props.dispatch(FolderActions.getModuleFolders(ownerFolder));
+		logger.debug(`<<< Exiting onSelectOwnerFolder(ownerFolder=${ownerFolder})`);
     }
 
     onSelectModuleFolder(parameters) {
+		logger.debug(`>>> Entering onSelectModuleFolder(parameters=${parameters})`);
         const { props } = this;
         props.dispatch(FolderActions.getModuleFiles(parameters));
+		logger.debug(`<<< Exiting onSelectModuleFolder(parameters=${parameters})`);
     }
 
     retrieveOwnerAndModuleFolders() {
+		logger.debug('>>> Entering retrieveOwnerAndModuleFolders()');
         this.props.dispatch(FolderActions.getOwnerFolders());
         this.props.dispatch(FolderActions.getModuleFolders(""));
+		logger.debug('<<< Exiting retrieveOwnerAndModuleFolders()');
     }
 
     onSelectNewModuleType(option) {
+		logger.debug(`>>> Entering onSelectNewModuleType(option=${option})`);
         this.setState({
             selectedType: option.value
         });
+		logger.debug(`<<< Exiting onSelectNewModuleType(option=${option})`);
     }
 
     getCreateButtonActive() {
+		logger.debug('>>> Entering getCreateButtonActive()');
+		logger.debug('<<< Exiting getCreateButtonActive()');
         return this.state.selectedType !== 0 && this.state.selectedType !== 1 && this.state.selectedType !== 2;
     }
 
     onAddNewFolder(payload, type, callback) {
+		logger.debug(`>>> Entering onAddNewFolder(payload=${payload},type=${type},callback=${callback})`);
         const { props } = this;
 
         props.dispatch(FolderActions.createFolder(payload, type, callback));
+		logger.debug(`<<< Exiting onAddNewFolder(payload=${payload},type=${type},callback=${callback})`);
     }
 
     onCreateNewModule(payload) {
+		logger.debug(`>>> Entering onCreateNewModule(payload=${payload})`);
         const { props } = this;
         const shouldAppend = props.selectedInstalledPackageType === "Module";
         props.dispatch(ExtensionActions.createNewModule(payload, shouldAppend, (data) => {
@@ -76,10 +92,12 @@ class NewModuleModal extends Component {
                 props.dispatch(ExtensionActions.getInstalledPackages("Module"));
             }
             this.onCancel();
+			logger.debug(`<<< Exiting onCreateNewModule(payload=${payload})`);
         }));
     }
 
     getCreateUI(selectedType) {
+		logger.debug(`>>> Entering getCreateUI(selectedType=${selectedType})`);
         const { props } = this;
         const ownerFolders = props.ownerFolders.map(folder => {
             return {
@@ -132,6 +150,7 @@ class NewModuleModal extends Component {
                     onCreateNewModule={this.onCreateNewModule.bind(this)}
                     retrieveOwnerAndModuleFolders={this.retrieveOwnerAndModuleFolders.bind(this)}/>;
             default:
+				logger.debug(`<<< Exiting getCreateUI(selectedType=${selectedType})`);
                 return <div></div>;
         }
     }
@@ -142,6 +161,8 @@ class NewModuleModal extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.newModuleModal}>
                 <PersonaBarPageHeader title={Localization.get("CreateModule.Action")} />
@@ -185,6 +206,8 @@ NewModuleModal.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         selectedInstalledPackageType: state.extension.selectedInstalledPackageType,
         ownerFolders: state.folder.ownerFolders,

@@ -8,11 +8,14 @@ namespace DotNetNuke.Services.Exceptions
 
     public class SchedulerException : BasePortalException
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SchedulerException));
         // default constructor
 
         /// <summary>Initializes a new instance of the <see cref="SchedulerException"/> class.</summary>
         public SchedulerException()
         {
+		Logger.LogDebug(">>> Entering SchedulerException()");
+		Logger.LogDebug("<<< Exiting SchedulerException()");
         }
 
         // constructor with exception message
@@ -22,7 +25,9 @@ namespace DotNetNuke.Services.Exceptions
         public SchedulerException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering SchedulerException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting SchedulerException(message={Message})", message);
 
         // constructor with message and inner exception
 

@@ -13,17 +13,23 @@ namespace DotNetNuke.Tests.Core.Collections
         [Test]
         public override void DoubleReadLockThrows()
         {
+			mockEventLogger.LogDebug(">>> Entering DoubleReadLockThrows()");
             Assert.DoesNotThrow(base.DoubleReadLock);
+			mockEventLogger.LogDebug("<<< Exiting DoubleReadLockThrows()");
         }
 
         [Test]
         public override void DoubleWriteLockThrows()
         {
+			mockEventLogger.LogDebug(">>> Entering DoubleWriteLockThrows()");
             Assert.DoesNotThrow(base.DoubleWriteLock);
+			mockEventLogger.LogDebug("<<< Exiting DoubleWriteLockThrows()");
         }
 
         internal override ILockStrategy GetLockStrategy()
         {
+			mockEventLogger.LogDebug(">>> Entering GetLockStrategy()");
+			mockEventLogger.LogDebug("<<< Exiting GetLockStrategy()");
             return new ReaderWriterLockStrategy();
         }
     }

@@ -11,26 +11,34 @@ import "./style.less";
 import { SvgIcons } from "@dnnsoftware/dnn-react-common";
 import util from "../../../utils";
 import resx from "../../../resources";
+const logger = console;
 
 class SiteAliasesPanel extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             openId: "",
             tableFields: []
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     loadData() {
+		logger.debug('>>> Entering loadData()');
         const {props} = this;
         props.dispatch(SiteBehaviorActions.getSiteAliases(props.portalId));
+		logger.debug('<<< Exiting loadData()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.loadData();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         const {props} = this;
         if (props !== prevProps) {
             let tableFields = [];
@@ -48,17 +56,20 @@ class SiteAliasesPanel extends Component {
             if (!props.siteAliases ||
                 props.portalId !== undefined && props.siteAliases.PortalId !== props.portalId) {
                 this.loadData();
+				logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
             }
         }
     }
 
     renderHeader() {
+		logger.debug('>>> Entering renderHeader()');
         let tableHeaders = this.state.tableFields.map((field) => {
             let className = "alias-items header-" + field.id;
             return <div className={className} key={"header-" + field.id}>
                 <span>{field.name}&nbsp; </span>
             </div>;
         });
+		logger.debug('<<< Exiting renderHeader()');
         return <div className="header-row">{tableHeaders}</div>;
     }
 
@@ -124,8 +135,10 @@ class SiteAliasesPanel extends Component {
 
      
     renderedSiteAliases() {
+		logger.debug('>>> Entering renderedSiteAliases()');
         let i = 0;
         if (this.props.siteAliases) {
+			logger.debug('<<< Exiting renderedSiteAliases()');
             return this.props.siteAliases.PortalAliases.map((item, index) => {
                 let id = "row-" + i++;
                 return (
@@ -160,7 +173,9 @@ class SiteAliasesPanel extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         let opened = (this.state.openId === "add");
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 <div className="alias-items">
@@ -215,6 +230,8 @@ SiteAliasesPanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         siteAliases: state.siteBehavior.siteAliases,
         tabIndex: state.pagination.tabIndex

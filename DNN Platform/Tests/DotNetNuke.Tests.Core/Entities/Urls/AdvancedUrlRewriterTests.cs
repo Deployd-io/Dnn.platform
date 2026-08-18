@@ -39,8 +39,10 @@
         [Test]
         public void CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely()
         {
+			portalController.LogDebug(">>> Entering CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely()");
             // Arrange
             const string CheckForRedirectsMethodName = "CheckForRedirects";
+			portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): ComponentFactory.Container → {Arg0}", ComponentFactory.Container);
             const string HostSettingsTableName = "HostSettings";
             const string PortalSettingsTableName = "PortalSettings";
             const string LanguagesTableName = "Languages";
@@ -55,6 +57,7 @@
             const string UriUrl = HttpScheme + "://" + GenericHost + "/über-uns/ctl/module/moduleid/466?returnurl=/über-uns";
             const string FullUrl = HttpScheme + "://" + GenericHost + "/%C3%BCber-uns/ctl/module/moduleid/466?returnurl=/%C3%BCber-uns";
             const string RewritePath = "Default.aspx?TabId=1&ctl=module&moduleid=466&returnurl=/%C3%BCber-uns&language=en-US";
+			portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): RewritePath → {RewritePath}", RewritePath);
             const string SampleHttpsUrl = HttpsScheme + "://google.com";
             const string PortalSettingsControllerRegistrationName = "PortalSettingsController";
             const string DNNPlatformText = "DNN Platform";
@@ -69,30 +72,37 @@
             {
                 portalController = new PortalController(Mock.Of<IBusinessControllerProvider>(), Mock.Of<IHostSettings>(), Mock.Of<IApplicationStatusInfo>(), Mock.Of<IEventLogger>());
             }
+			portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): portalController → {PortalController}", portalController);
 
             using var serviceProvider = FakeServiceProvider.Setup(services =>
             {
                 var hostController = new FakeHostController(new Dictionary<string, IConfigurationSetting>());
+				portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): hostController → {HostController}", hostController);
                 services.AddSingleton<IHostSettingsService>(hostController);
                 services.AddSingleton<IHostController>(hostController);
 
                 var dataProvider = MockComponentProvider.CreateDataProvider();
+				portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): dataProvider → {DataProvider}", dataProvider);
                 services.AddSingleton(dataProvider);
                 var hostSettingsTable = new DataTable(HostSettingsTableName);
+				portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): hostSettingsTable → {HostSettingsTable}", hostSettingsTable);
                 dataProvider
                     .Setup(s => s.GetHostSettings())
                     .Returns(() => hostSettingsTable.CreateDataReader());
                 var portalSettingsTable = new DataTable(PortalSettingsTableName);
+				portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): portalSettingsTable → {PortalSettingsTable}", portalSettingsTable);
                 dataProvider
                     .Setup(s => s.GetPortalSettings(
                         It.IsAny<int>(),
                         It.IsAny<string>()))
                     .Returns(() => portalSettingsTable.CreateDataReader());
                 var languagesTable = new DataTable(LanguagesTableName);
+				portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): languagesTable → {LanguagesTable}", languagesTable);
                 dataProvider
                     .Setup(s => s.GetLanguagesByPortal(It.IsAny<int>()))
                     .Returns(() => languagesTable.CreateDataReader());
                 var tabsTable = new DataTable(TabsTableName);
+				portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): tabsTable → {TabsTable}", tabsTable);
                 FillTabsTable(tabsTable);
                 dataProvider
                     .Setup(s => s.GetTabs(It.IsAny<int>()))
@@ -101,6 +111,7 @@
                     .Setup(s => s.GetTabCustomAliases(It.IsAny<int>()))
                     .Returns(() => tabsTable.CreateDataReader());
                 var tabUrlsTable = new DataTable(TabUrlsTableName);
+				portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): tabUrlsTable → {TabUrlsTable}", tabUrlsTable);
                 dataProvider
                     .Setup(s => s.GetTabPaths(
                         It.IsAny<int>(),
@@ -110,19 +121,23 @@
                     .Setup(s => s.GetTabUrls(It.IsAny<int>()))
                     .Returns(() => tabUrlsTable.CreateDataReader());
                 var tabSettingsTable = new DataTable(TabSettingsTableName);
+				portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): tabSettingsTable → {TabSettingsTable}", tabSettingsTable);
                 dataProvider
                     .Setup(s => s.GetTabSettings(It.IsAny<int>()))
                     .Returns(() => tabSettingsTable.CreateDataReader());
                 var portalsTable = new DataTable(PortalsTableName);
+				portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): portalsTable → {PortalsTable}", portalsTable);
                 FillPortalsTable(portalsTable);
                 dataProvider
                     .Setup(s => s.GetPortals(It.IsAny<string>()))
                     .Returns(() => portalsTable.CreateDataReader());
                 var extensionUrlProviderTable = new DataTable(ExtensionUrlProviderTableName);
+				portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): extensionUrlProviderTable → {ExtensionUrlProviderTable}", extensionUrlProviderTable);
                 dataProvider
                     .Setup(s => s.GetExtensionUrlProviders(It.IsAny<int>()))
                     .Returns(() => extensionUrlProviderTable.CreateDataReader());
                 var portalAliasTable = new DataTable(PortalAliasTableName);
+				portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): portalAliasTable → {PortalAliasTable}", portalAliasTable);
                 FillPortalAliasTable(portalAliasTable);
                 dataProvider
                     .Setup(s => s.GetPortalAliases())
@@ -134,15 +149,22 @@
                 services.AddSingleton<IPortalController>(portalController);
             });
             Host.PerformanceSetting = Globals.PerformanceSettings.ModerateCaching;
+			portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): Host.PerformanceSetting → {Arg0}", Host.PerformanceSetting);
             var uri = new Uri(Assembly.GetExecutingAssembly().CodeBase);
+			portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): uri → {Uri}", uri);
             var path = HttpUtility.UrlDecode(Path.GetFullPath(uri.AbsolutePath));
+			portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): path → {Path}", path);
             var websiteRootPath = path.Substring(0, path.IndexOf(DNNPlatformText, StringComparison.Ordinal));
+			portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): websiteRootPath → {WebsiteRootPath}", websiteRootPath);
             var physicalAppPath = Path.Combine(websiteRootPath, WebsiteText);
+			portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): physicalAppPath → {PhysicalAppPath}", physicalAppPath);
             var simulator = new HttpSimulator(ApplicationPath, physicalAppPath);
+			portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): simulator → {Simulator}", simulator);
             simulator.SimulateRequest(new Uri(SampleHttpsUrl));
             HttpContext.Current.Items.Add(UrlRewriteItemName, FullUrl);
 
             var urlRewriter = new AdvancedUrlRewriter();
+			portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): urlRewriter → {UrlRewriter}", urlRewriter);
             var checkForRedirectsMethod = typeof(AdvancedUrlRewriter)
                 .GetMethod(
                     CheckForRedirectsMethodName,
@@ -151,8 +173,11 @@
                     [typeof(Uri), typeof(string), typeof(NameValueCollection), typeof(UrlAction), typeof(string), typeof(FriendlyUrlSettings), typeof(int)],
                     null);
             var requestUri = new Uri(UriUrl);
+			portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): requestUri → {RequestUri}", requestUri);
             var queryStringCollection = new NameValueCollection();
+			portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): queryStringCollection → {QueryStringCollection}", queryStringCollection);
             var friendlyUrlSettings = new FriendlyUrlSettings(portalController, GenericPortalId);
+			portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): friendlyUrlSettings → {FriendlyUrlSettings}", friendlyUrlSettings);
             var urlAction = new UrlAction(
                 HttpScheme,
                 string.Empty,
@@ -163,12 +188,18 @@
                 PortalId = GenericPortalId,
                 IsSSLOffloaded = true,
                 PortalAlias = new PortalAliasInfo
+				portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): IsSSLOffloaded → {IsSSLOffloaded}", IsSSLOffloaded);
+				portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): PortalId → {PortalId}", PortalId);
+				portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): PortalAlias → {PortalAlias}", PortalAlias);
+				portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): TabId → {TabId}", TabId);
+				portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): Action → {Action}", Action);
                 {
                     HTTPAlias = GenericHost,
                 },
                 DoRewrite = true,
                 RewritePath = RewritePath,
             };
+			portalController.LogDebug("CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely(): DoRewrite → {DoRewrite}", DoRewrite);
             urlAction.SetRedirectAllowed(string.Empty, friendlyUrlSettings);
             var requestType = string.Empty;
             var portalHomeTabId = GenericTabId;
@@ -188,10 +219,12 @@
 
             // Assert
             Assert.That(isRedirected, Is.EqualTo(false));
+			portalController.LogDebug("<<< Exiting CheckForRedirects_WithUmlautUrls_DontRedirectInfinitely()");
         }
 
         private static void FillTabsTable(DataTable tabsTable)
         {
+			portalController.LogDebug(">>> Entering FillTabsTable(tabsTable={TabsTable})", tabsTable);
             var tabColumns = new[]
             {
                 "TabID",
@@ -288,12 +321,14 @@
                 DateTime.Now,
                 "0",
                 true,
+			portalController.LogDebug("<<< Exiting FillTabsTable(tabsTable={TabsTable})", tabsTable);
                 false);
 
         }
 
         private static void FillPortalsTable(DataTable portalsTable)
         {
+			portalController.LogDebug(">>> Entering FillPortalsTable(portalsTable={PortalsTable})", portalsTable);
             var portalColumns = new[]
             {
                 "PortalID",
@@ -393,10 +428,12 @@
                 "-1",
                 "2011-08-25 07:34:29",
                 "en-US");
+				portalController.LogDebug("<<< Exiting FillPortalsTable(portalsTable={PortalsTable})", portalsTable);
         }
 
         private static void FillPortalAliasTable(DataTable portalAliasTable)
         {
+			portalController.LogDebug(">>> Entering FillPortalAliasTable(portalAliasTable={PortalAliasTable})", portalAliasTable);
             var portalAliasColumns = new[]
             {
                 "PortalAliasId",
@@ -428,6 +465,7 @@
                 null,
                 "en-US",
                 true);
+				portalController.LogDebug("<<< Exiting FillPortalAliasTable(portalAliasTable={PortalAliasTable})", portalAliasTable);
         }
     }
 }

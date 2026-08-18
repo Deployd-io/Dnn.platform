@@ -3,6 +3,7 @@ import { SecurityContext } from './types/Security';
 import { ModuleContext } from './types/Module';
 import ContactList from './pages/ContactList';
 import ContactForm from './pages/ContactForm';
+const logger = console;
 
 interface AppProps {
   security: SecurityContext;
@@ -10,6 +11,8 @@ interface AppProps {
 }
 
 export default function App({ security, moduleContext }: AppProps) {
+logger.debug(`>>> Entering App(security=${security},moduleContext=${moduleContext})`);
+logger.debug(`<<< Exiting App(security=${security},moduleContext=${moduleContext})`);
   return (
     <Router>
       <Routes>

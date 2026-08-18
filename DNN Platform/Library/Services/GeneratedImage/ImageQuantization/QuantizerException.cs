@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class QuantizerException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(QuantizerException));
     /// <inheritdoc />
     public QuantizerException()
     {
+	Logger.LogDebug(">>> Entering QuantizerException()");
+	Logger.LogDebug("<<< Exiting QuantizerException()");
     }
 
     /// <inheritdoc />
     public QuantizerException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering QuantizerException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting QuantizerException(message={Message})", message);
 
     /// <inheritdoc />
     public QuantizerException(string message, Exception innerException)

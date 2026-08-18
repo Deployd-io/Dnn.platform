@@ -16,12 +16,16 @@ namespace DotNetNuke.Web.Api
     [DnnExceptionFilter]
     public abstract class DnnApiController : ApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnApiController));
         private readonly Lazy<ModuleInfo> activeModule;
 
         /// <summary>Initializes a new instance of the <see cref="DnnApiController"/> class.</summary>
         protected DnnApiController()
         {
+			Logger.LogDebug(">>> Entering DnnApiController()");
             this.activeModule = new Lazy<ModuleInfo>(this.InitModuleInfo);
+			Logger.LogDebug("DnnApiController(): activeModule → {ActiveModule}", activeModule);
+			Logger.LogDebug("<<< Exiting DnnApiController()");
         }
 
         /// <summary>Gets portalSettings for the current portal.</summary>
@@ -37,6 +41,8 @@ namespace DotNetNuke.Web.Api
 
         private ModuleInfo InitModuleInfo()
         {
+			Logger.LogDebug(">>> Entering InitModuleInfo()");
+			Logger.LogDebug("<<< Exiting InitModuleInfo()");
             return this.Request.FindModuleInfo();
         }
     }

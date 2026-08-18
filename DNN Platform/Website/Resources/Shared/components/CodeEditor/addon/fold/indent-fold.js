@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -12,18 +14,25 @@
 "use strict";
 
 CodeMirror.registerHelper("fold", "indent", function(cm, start) {
+logger.debug('>>> Entering registerHelper()');
   var tabSize = cm.getOption("tabSize"), firstLine = cm.getLine(start.line);
   if (!/\S/.test(firstLine)) return;
+logger.debug(`registerHelper(): tabSize → ${tabSize}`);
   var getIndent = function(line) {
+	logger.debug(`>>> Entering getIndent(line=${line})`);
+	logger.debug(`<<< Exiting getIndent(line=${line})`);
     return CodeMirror.countColumn(line, null, tabSize);
   };
   var myIndent = getIndent(firstLine);
   var lastLineInFold = null;
+logger.debug(`registerHelper(): myIndent → ${myIndent}`);
   // Go through lines until we find a line that definitely doesn't belong in
   // the block we're folding, or to the end.
   for (var i = start.line + 1, end = cm.lastLine(); i <= end; ++i) {
     var curLine = cm.getLine(i);
+	logger.debug(`registerHelper(): curLine → ${curLine}`);
     var curIndent = getIndent(curLine);
+	logger.debug(`registerHelper(): curIndent → ${curIndent}`);
     if (curIndent > myIndent) {
       // Lines with a greater indent are considered part of the block.
       lastLineInFold = i;
@@ -33,6 +42,7 @@ CodeMirror.registerHelper("fold", "indent", function(cm, start) {
       // A non-empty line at an indent equal to or less than ours marks the
       // start of another block.
       break;
+	logger.debug('<<< Exiting registerHelper()');
     }
   }
   if (lastLineInFold) return {
@@ -42,3 +52,4 @@ CodeMirror.registerHelper("fold", "indent", function(cm, start) {
 });
 
 });
+logger.debug(`<<< Exiting function(exports=${exports})`);

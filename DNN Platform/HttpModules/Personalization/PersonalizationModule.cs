@@ -17,19 +17,23 @@ namespace DotNetNuke.HttpModules.Personalization
     /// <summary>An <see cref="IHttpModule"/> which handles user personalization.</summary>
     public class PersonalizationModule : IHttpModule
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PersonalizationModule));
         private readonly PersonalizationController personalizationController;
 
         /// <summary>Initializes a new instance of the <see cref="PersonalizationModule"/> class.</summary>
         public PersonalizationModule()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering PersonalizationModule()");
         }
+		Logger.LogDebug("<<< Exiting PersonalizationModule()");
 
         /// <summary>Initializes a new instance of the <see cref="PersonalizationModule"/> class.</summary>
         /// <param name="personalizationController">The personalization controller.</param>
         public PersonalizationModule(PersonalizationController personalizationController)
         {
             this.personalizationController = personalizationController ?? Globals.GetCurrentServiceProvider().GetRequiredService<PersonalizationController>();
+			Logger.LogDebug("PersonalizationModule(personalizationController={PersonalizationController}): personalizationController → {PersonalizationController1}", personalizationController, personalizationController);
         }
 
         /// <summary>Gets the HttpModule module name.</summary>
@@ -40,12 +44,16 @@ namespace DotNetNuke.HttpModules.Personalization
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void Init(HttpApplication application)
         {
+			Logger.LogDebug(">>> Entering Init(application={Application})", application);
             application.EndRequest += this.OnEndRequest;
+			Logger.LogDebug("<<< Exiting Init(application={Application})", application);
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+		Logger.LogDebug(">>> Entering Dispose()");
+		Logger.LogDebug("<<< Exiting Dispose()");
         }
 
         /// <summary>Handles the <see cref="HttpApplication.EndRequest"/> event.</summary>
@@ -53,8 +61,10 @@ namespace DotNetNuke.HttpModules.Personalization
         /// <param name="e">The event args.</param>
         public void OnEndRequest(object s, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnEndRequest(s={S},e={E})", s, e);
             HttpContext context = ((HttpApplication)s).Context;
             HttpRequest request = context.Request;
+			Logger.LogDebug("OnEndRequest(s={S},e={E}): context → {Context}", s, e, context);
 
             if (!Initialize.ProcessHttpModule(request, false, false))
             {
@@ -63,12 +73,15 @@ namespace DotNetNuke.HttpModules.Personalization
 
             // Obtain PortalSettings from Current Context
             var portalSettings = (PortalSettings)context.Items["PortalSettings"];
+			Logger.LogDebug("OnEndRequest(s={S},e={E}): portalSettings → {PortalSettings}", s, e, portalSettings);
             if (portalSettings != null)
             {
                 // load the user info object
                 UserInfo userInfo = UserController.Instance.GetCurrentUserInfo();
+				Logger.LogDebug("OnEndRequest(s={S},e={E}): userInfo → {UserInfo}", s, e, userInfo);
                 this.personalizationController.SaveProfile(context, userInfo.UserID, portalSettings.PortalId);
             }
+			Logger.LogDebug("<<< Exiting OnEndRequest(s={S},e={E})", s, e);
         }
     }
 }

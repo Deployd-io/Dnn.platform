@@ -3,10 +3,12 @@
 
 Imports System
 Imports System.Collections
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.Utilities
 
     Public Class FunctionalityCollection
+	Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
 
         Inherits CollectionBase
         Implements IList(Of FunctionalityInfo)
@@ -26,7 +28,9 @@ Namespace DotNetNuke.UI.Utilities
         End Property
 
         Public Sub Add(ByVal f As FunctionalityInfo) Implements ICollection(Of FunctionalityInfo).Add
+			_logger.LogDebug(">>> Entering Add(f={F})", f)
             Me.InnerList.Add(f)
+			_logger.LogDebug("<<< Exiting Add(f={F})", f)
         End Sub
 
         Default Public Overridable Property Item(ByVal index As Integer) As FunctionalityInfo
@@ -76,11 +80,13 @@ Namespace DotNetNuke.UI.Utilities
 
         ''' <inheritdoc />
         Public Function Remove(item As FunctionalityInfo) As Boolean Implements ICollection(Of FunctionalityInfo).Remove
+			_logger.LogDebug(">>> Entering Remove(item={Item})", item)
             If Not Me.Contains(item) Then
                 Return False
             End If
 
             Me.InnerList.Remove(item)
+			_logger.LogDebug("<<< Exiting Remove(item={Item})", item)
             Return True
         End Function
 
@@ -91,7 +97,9 @@ Namespace DotNetNuke.UI.Utilities
 
         ''' <inheritdoc />
         Public Sub CopyTo(array As FunctionalityInfo(), arrayIndex As Integer) Implements ICollection(Of FunctionalityInfo).CopyTo
+			_logger.LogDebug(">>> Entering CopyTo(array={Array})", array)
             Me.InnerList.CopyTo(array, arrayIndex)
+			_logger.LogDebug("<<< Exiting CopyTo(array={Array})", array)
         End Sub
 
         ''' <inheritdoc />
@@ -101,7 +109,9 @@ Namespace DotNetNuke.UI.Utilities
 
         ''' <inheritdoc />
         Public Sub Insert(index As Integer, item As FunctionalityInfo) Implements IList(Of FunctionalityInfo).Insert
+			_logger.LogDebug(">>> Entering Insert(index={Index},item={Item})", index, item)
             Me.InnerList.Insert(index, item)
+			_logger.LogDebug("<<< Exiting Insert(index={Index},item={Item})", index, item)
         End Sub
 
         ''' <inheritdoc />
@@ -111,7 +121,9 @@ Namespace DotNetNuke.UI.Utilities
 
         ''' <inheritdoc />
         Private Sub Generic_RemoveAt(index As Integer) Implements IList(Of FunctionalityInfo).RemoveAt
+			_logger.LogDebug(">>> Entering Generic_RemoveAt(index={Index})", index)
             MyBase.RemoveAt(index)
+			_logger.LogDebug("<<< Exiting Generic_RemoveAt(index={Index})", index)
         End Sub
 
         ''' <inheritdoc />
@@ -130,10 +142,13 @@ Namespace DotNetNuke.UI.Utilities
 
             ''' <inheritdoc />
             Public Sub Dispose() Implements IDisposable.Dispose
+				_logger.LogDebug(">>> Entering Dispose()")
                 Dim disposable = TryCast(Me.enumerator, IDisposable)
+				_logger.LogDebug("Dispose(): disposable → {Disposable}", disposable)
                 If disposable IsNot nothing then
                     disposable.Dispose()
                 End If
+				_logger.LogDebug("<<< Exiting Dispose()")
             End Sub
 
             ''' <inheritdoc />
@@ -143,7 +158,9 @@ Namespace DotNetNuke.UI.Utilities
 
             ''' <inheritdoc />
             Public Sub Reset() Implements IEnumerator.Reset
+				_logger.LogDebug(">>> Entering Reset()")
                 Me.enumerator.Reset()
+				_logger.LogDebug("<<< Exiting Reset()")
             End Sub
 
             ''' <inheritdoc />

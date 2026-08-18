@@ -42,14 +42,18 @@ namespace Dnn.PersonaBar.Pages.Components
         public BulkPagesController()
             : this(null, null)
         {
+		eventLogger.LogDebug(">>> Entering BulkPagesController()");
         }
 
+		eventLogger.LogDebug("<<< Exiting BulkPagesController()");
         /// <summary>Initializes a new instance of the <see cref="BulkPagesController"/> class.</summary>
         /// <param name="businessControllerProvider">The business controller provider.</param>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IPermissionDefinitionService. Scheduled removal in v12.0.0.")]
         public BulkPagesController(IBusinessControllerProvider businessControllerProvider)
             : this(businessControllerProvider, null)
         {
+		eventLogger.LogDebug(">>> Entering BulkPagesController(businessControllerProvider={BusinessControllerProvider})", businessControllerProvider);
+		eventLogger.LogDebug("<<< Exiting BulkPagesController(businessControllerProvider={BusinessControllerProvider})", businessControllerProvider);
         }
 
         /// <summary>Initializes a new instance of the <see cref="BulkPagesController"/> class.</summary>
@@ -59,22 +63,29 @@ namespace Dnn.PersonaBar.Pages.Components
         {
             this.businessControllerProvider = businessControllerProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<IBusinessControllerProvider>();
             this.permissionDefinitionService = permissionDefinitionService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPermissionDefinitionService>();
+			eventLogger.LogDebug("BulkPagesController(businessControllerProvider={BusinessControllerProvider},permissionDefinitionService={PermissionDefinitionService}): permissionDefinitionService → {PermissionDefinitionService1}", businessControllerProvider, permissionDefinitionService, permissionDefinitionService);
         }
 
         /// <inheritdoc />
         public BulkPageResponse AddBulkPages(BulkPage page, bool validateOnly)
         {
+			eventLogger.LogDebug(">>> Entering AddBulkPages(page={Page},validateOnly={ValidateOnly})", page, validateOnly);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
             var portalId = portalSettings.PortalId;
+			eventLogger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): portalSettings → {PortalSettings}", page, validateOnly, portalSettings);
             var response = new BulkPageResponse();
+			eventLogger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): response → {Response}", page, validateOnly, response);
             var parentId = page.ParentId;
             var rootTab = TabController.Instance.GetTab(parentId, portalId, true);
+			eventLogger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): rootTab → {RootTab}", page, validateOnly, rootTab);
 
             var strValue = page.BulkPages;
+			eventLogger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): strValue → {StrValue}", page, validateOnly, strValue);
             strValue = strValue.Replace("\r", "\n").Replace("\n\n", "\n").Trim();
 
             if (!TabController.IsValidTabName(strValue, out var invalidType))
             {
+				eventLogger.LogWarning("Throwing BulkPagesException from AddBulkPages(page={Page},validateOnly={ValidateOnly})", page, validateOnly);
                 throw new BulkPagesException("bulkPages", string.Format(CultureInfo.CurrentCulture, Localization.GetString(invalidType), strValue));
             }
 
@@ -84,7 +95,9 @@ namespace Dnn.PersonaBar.Pages.Components
             }
 
             var pages = strValue.Split('\n');
+			eventLogger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): pages → {Pages}", page, validateOnly, pages);
             var tabs = new List<TabInfo>();
+			eventLogger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): tabs → {Tabs}", page, validateOnly, tabs);
 
             foreach (var strLine in pages)
             {
@@ -103,6 +116,7 @@ namespace Dnn.PersonaBar.Pages.Components
 
             var currentIndex = -1;
             var bulkPageItems = new List<BulkPageResponseItem>();
+			eventLogger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): bulkPageItems → {BulkPageItems}", page, validateOnly, bulkPageItems);
             foreach (var oTab in tabs)
             {
                 currentIndex += 1;
@@ -110,6 +124,7 @@ namespace Dnn.PersonaBar.Pages.Components
                 try
                 {
                     string errorMessage = null;
+					eventLogger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): errorMessage → {ErrorMessage}", page, validateOnly, errorMessage);
 
                     if (currentIndex == 0 && oTab.Level > 0)
                     {
@@ -137,6 +152,7 @@ namespace Dnn.PersonaBar.Pages.Components
                     else
                     {
                         var parentTabId = GetParentTabId(tabs, currentIndex, oTab.Level - 1);
+						eventLogger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): parentTabId → {ParentTabId}", page, validateOnly, parentTabId);
                         if (parentTabId != Null.NullInteger)
                         {
                             oTab.TabID = this.CreateTabFromParent(portalSettings, rootTab, oTab, parentTabId, validateOnly, out errorMessage);
@@ -147,18 +163,23 @@ namespace Dnn.PersonaBar.Pages.Components
                 }
                 catch (Exception ex)
                 {
+					eventLogger.LogError("Exception in AddBulkPages(page={Page},validateOnly={ValidateOnly}): {Arg2}", page, validateOnly, ex.getMessage());
                     throw new DotNetNukeException("Unable to process page.", ex, DotNetNukeErrorCode.DeserializePanesFailed);
                 }
             }
 
             response.Pages = bulkPageItems;
+			eventLogger.LogDebug("AddBulkPages(page={Page},validateOnly={ValidateOnly}): response.Pages → {Arg2}", page, validateOnly, response.Pages);
 
+			eventLogger.LogDebug("<<< Exiting AddBulkPages(page={Page},validateOnly={ValidateOnly})", page, validateOnly);
             return response;
         }
 
         /// <inheritdoc />
         protected override Func<IBulkPagesController> GetFactory()
         {
+			eventLogger.LogDebug(">>> Entering GetFactory()");
+			eventLogger.LogDebug("<<< Exiting GetFactory()");
             return Globals.DependencyProvider.GetRequiredService<IBulkPagesController>;
         }
 
@@ -168,12 +189,15 @@ namespace Dnn.PersonaBar.Pages.Components
         /// <returns>True in case there is a tab with the same name and path and with the index of greater than the first occurrence; false otherwise.</returns>
         private static bool DuplicateExists(int pageIndex, string[] pages)
         {
+			eventLogger.LogDebug(">>> Entering DuplicateExists(pageIndex={PageIndex},pages={Pages})", pageIndex, pages);
             var pageName = pages[pageIndex];
             var pageDirectory = GetPageDirectory(pageIndex, pages);
+			eventLogger.LogDebug("DuplicateExists(pageIndex={PageIndex},pages={Pages}): pageDirectory → {PageDirectory}", pageIndex, pages, pageDirectory);
 
             for (var index = 0; index < pageIndex; index++)
             {
                 var loopedDirectory = GetPageDirectory(index, pages);
+				eventLogger.LogDebug("DuplicateExists(pageIndex={PageIndex},pages={Pages}): loopedDirectory → {LoopedDirectory}", pageIndex, pages, loopedDirectory);
                 if (loopedDirectory != pageDirectory)
                 {
                     continue;
@@ -184,18 +208,24 @@ namespace Dnn.PersonaBar.Pages.Components
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting DuplicateExists(pageIndex={PageIndex},pages={Pages})", pageIndex, pages);
             return false;
         }
 
         private static string GetPageDirectory(int pageIndex, string[] pages)
         {
+			eventLogger.LogDebug(">>> Entering GetPageDirectory(pageIndex={PageIndex},pages={Pages})", pageIndex, pages);
             var fullPath = string.Empty;
             var pageLevel = GetPageLevel(pages[pageIndex]);
+			eventLogger.LogDebug("GetPageDirectory(pageIndex={PageIndex},pages={Pages}): pageLevel → {PageLevel}", pageIndex, pages, pageLevel);
             var currentLevel = pageLevel;
+			eventLogger.LogDebug("GetPageDirectory(pageIndex={PageIndex},pages={Pages}): currentLevel → {CurrentLevel}", pageIndex, pages, currentLevel);
+			eventLogger.LogDebug("GetPageDirectory(pageIndex={PageIndex},pages={Pages}): fullPath → {FullPath}", pageIndex, pages, fullPath);
             for (var index = pageIndex; index > -1; index--)
             {
                 var currentPage = pages[index];
                 var level = GetPageLevel(currentPage);
+				eventLogger.LogDebug("GetPageDirectory(pageIndex={PageIndex},pages={Pages}): level → {Level}", pageIndex, pages, level);
                 if (level < currentLevel)
                 {
                     currentLevel = level;
@@ -203,11 +233,14 @@ namespace Dnn.PersonaBar.Pages.Components
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting GetPageDirectory(pageIndex={PageIndex},pages={Pages})", pageIndex, pages);
             return fullPath;
         }
 
         private static int GetPageLevel(string pageName)
         {
+			eventLogger.LogDebug(">>> Entering GetPageLevel(pageName={PageName})", pageName);
+			eventLogger.LogDebug("<<< Exiting GetPageLevel(pageName={PageName})", pageName);
             return pageName
                 .Replace(" ", string.Empty)
                 .TakeWhile(t => t == '>')
@@ -216,6 +249,8 @@ namespace Dnn.PersonaBar.Pages.Components
 
         private static BulkPageResponseItem ToBulkPageResponseItem(TabInfo tab, string error)
         {
+			eventLogger.LogDebug(">>> Entering ToBulkPageResponseItem(tab={Tab},error={Error})", tab, error);
+			eventLogger.LogDebug("<<< Exiting ToBulkPageResponseItem(tab={Tab},error={Error})", tab, error);
             return new BulkPageResponseItem
             {
                 TabId = tab.TabID,
@@ -227,8 +262,10 @@ namespace Dnn.PersonaBar.Pages.Components
 
         private static int GetParentTabId(List<TabInfo> lstTabs, int currentIndex, int parentLevel)
         {
+			eventLogger.LogDebug(">>> Entering GetParentTabId(lstTabs={LstTabs},currentIndex={CurrentIndex},parentLevel={ParentLevel})", lstTabs, currentIndex, parentLevel);
             var oParent = lstTabs[0];
 
+			eventLogger.LogDebug("GetParentTabId(lstTabs={LstTabs},currentIndex={CurrentIndex},parentLevel={ParentLevel}): oParent → {OParent}", lstTabs, currentIndex, parentLevel, oParent);
             for (var i = 0; i < lstTabs.Count; i++)
             {
                 if (i == currentIndex)
@@ -242,27 +279,35 @@ namespace Dnn.PersonaBar.Pages.Components
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting GetParentTabId(lstTabs={LstTabs},currentIndex={CurrentIndex},parentLevel={ParentLevel})", lstTabs, currentIndex, parentLevel);
             return Null.NullInteger;
         }
 
         private static bool IsValidTabPath(TabInfo tab, string newTabPath, out string errorMessage)
         {
+			eventLogger.LogDebug(">>> Entering IsValidTabPath(tab={Tab},newTabPath={NewTabPath})", tab, newTabPath);
             var valid = true;
             errorMessage = null;
 
+			eventLogger.LogDebug("IsValidTabPath(tab={Tab},newTabPath={NewTabPath}): errorMessage → {ErrorMessage}", tab, newTabPath, errorMessage);
+			eventLogger.LogDebug("IsValidTabPath(tab={Tab},newTabPath={NewTabPath}): valid → {Valid}", tab, newTabPath, valid);
             // get default culture if the tab's culture is null
             var cultureCode = tab.CultureCode;
+			eventLogger.LogDebug("IsValidTabPath(tab={Tab},newTabPath={NewTabPath}): cultureCode → {CultureCode}", tab, newTabPath, cultureCode);
             if (string.IsNullOrEmpty(cultureCode))
             {
                 var portalSettings = PortalController.Instance.GetCurrentSettings();
+				eventLogger.LogDebug("IsValidTabPath(tab={Tab},newTabPath={NewTabPath}): portalSettings → {PortalSettings}", tab, newTabPath, portalSettings);
                 cultureCode = portalSettings.DefaultLanguage;
             }
 
             // Validate Tab Path
             var tabId = TabController.GetTabByTabPath(tab.PortalID, newTabPath, cultureCode);
+			eventLogger.LogDebug("IsValidTabPath(tab={Tab},newTabPath={NewTabPath}): tabId → {TabId}", tab, newTabPath, tabId);
             if (tabId != Null.NullInteger && tabId != tab.TabID)
             {
                 var existingTab = TabController.Instance.GetTab(tabId, tab.PortalID, false);
+				eventLogger.LogDebug("IsValidTabPath(tab={Tab},newTabPath={NewTabPath}): existingTab → {ExistingTab}", tab, newTabPath, existingTab);
                 if (existingTab is { IsDeleted: true, })
                 {
                     errorMessage = Localization.GetString("TabRecycled");
@@ -282,11 +327,13 @@ namespace Dnn.PersonaBar.Pages.Components
                 valid = false;
             }
 
+			eventLogger.LogDebug("<<< Exiting IsValidTabPath(tab={Tab},newTabPath={NewTabPath})", tab, newTabPath);
             return valid;
         }
 
         private int CreateTabFromParent(IPortalSettings portalSettings, TabInfo objRoot, TabInfo oTab, int parentId, bool validateOnly, out string errorMessage)
         {
+			eventLogger.LogDebug(">>> Entering CreateTabFromParent(portalSettings={PortalSettings},objRoot={ObjRoot},oTab={OTab},parentId={ParentId},validateOnly={ValidateOnly})", portalSettings, objRoot, oTab, parentId, validateOnly);
             var tab = new TabInfo
             {
                 PortalID = portalSettings.PortalId,
@@ -315,6 +362,9 @@ namespace Dnn.PersonaBar.Pages.Components
                 // TODO: To be retrieved once the parent tab  is selected?
                 ////tab.IsVisible = objRoot.IsVisible;
                 tab.DisableLink = objRoot.DisableLink;
+				eventLogger.LogDebug("CreateTabFromParent(portalSettings={PortalSettings},objRoot={ObjRoot},oTab={OTab},parentId={ParentId},validateOnly={ValidateOnly}): tab.DisableLink → {Arg5}", portalSettings, objRoot, oTab, parentId, validateOnly, tab.DisableLink);
+				eventLogger.LogDebug("CreateTabFromParent(portalSettings={PortalSettings},objRoot={ObjRoot},oTab={OTab},parentId={ParentId},validateOnly={ValidateOnly}): tab.SkinSrc → {Arg5}", portalSettings, objRoot, oTab, parentId, validateOnly, tab.SkinSrc);
+				eventLogger.LogDebug("CreateTabFromParent(portalSettings={PortalSettings},objRoot={ObjRoot},oTab={OTab},parentId={ParentId},validateOnly={ValidateOnly}): tab.ContainerSrc → {Arg5}", portalSettings, objRoot, oTab, parentId, validateOnly, tab.ContainerSrc);
                 tab.SkinSrc = objRoot.SkinSrc;
                 tab.ContainerSrc = objRoot.ContainerSrc;
             }
@@ -325,10 +375,13 @@ namespace Dnn.PersonaBar.Pages.Components
             }
 
             var parentTab = TabController.Instance.GetTab(parentId, -1, false);
+			eventLogger.LogDebug("CreateTabFromParent(portalSettings={PortalSettings},objRoot={ObjRoot},oTab={OTab},parentId={ParentId},validateOnly={ValidateOnly}): parentTab → {ParentTab}", portalSettings, objRoot, oTab, parentId, validateOnly, parentTab);
 
             if (parentTab != null)
             {
                 tab.PortalID = parentTab.PortalID;
+				eventLogger.LogDebug("CreateTabFromParent(portalSettings={PortalSettings},objRoot={ObjRoot},oTab={OTab},parentId={ParentId},validateOnly={ValidateOnly}): tab.PortalID → {Arg5}", portalSettings, objRoot, oTab, parentId, validateOnly, tab.PortalID);
+				eventLogger.LogDebug("CreateTabFromParent(portalSettings={PortalSettings},objRoot={ObjRoot},oTab={OTab},parentId={ParentId},validateOnly={ValidateOnly}): tab.ParentId → {Arg5}", portalSettings, objRoot, oTab, parentId, validateOnly, tab.ParentId);
                 tab.ParentId = parentTab.TabID;
             }
             else
@@ -344,6 +397,7 @@ namespace Dnn.PersonaBar.Pages.Components
             if (!TabController.IsValidTabName(tab.TabName, out var invalidType))
             {
                 errorMessage = string.Format(CultureInfo.CurrentCulture, Localization.GetString(invalidType), tab.TabName);
+				eventLogger.LogDebug("CreateTabFromParent(portalSettings={PortalSettings},objRoot={ObjRoot},oTab={OTab},parentId={ParentId},validateOnly={ValidateOnly}): errorMessage → {ErrorMessage}", portalSettings, objRoot, oTab, parentId, validateOnly, errorMessage);
                 return Null.NullInteger;
             }
 
@@ -384,6 +438,11 @@ namespace Dnn.PersonaBar.Pages.Components
                 ////tab.StartDate = objRoot.StartDate;
                 ////tab.EndDate = objRoot.EndDate;
                 tab.RefreshInterval = objRoot.RefreshInterval;
+				eventLogger.LogDebug("CreateTabFromParent(portalSettings={PortalSettings},objRoot={ObjRoot},oTab={OTab},parentId={ParentId},validateOnly={ValidateOnly}): tab.RefreshInterval → {Arg5}", portalSettings, objRoot, oTab, parentId, validateOnly, tab.RefreshInterval);
+				eventLogger.LogDebug("CreateTabFromParent(portalSettings={PortalSettings},objRoot={ObjRoot},oTab={OTab},parentId={ParentId},validateOnly={ValidateOnly}): tab.SiteMapPriority → {Arg5}", portalSettings, objRoot, oTab, parentId, validateOnly, tab.SiteMapPriority);
+				eventLogger.LogDebug("CreateTabFromParent(portalSettings={PortalSettings},objRoot={ObjRoot},oTab={OTab},parentId={ParentId},validateOnly={ValidateOnly}): tab.PageHeadText → {Arg5}", portalSettings, objRoot, oTab, parentId, validateOnly, tab.PageHeadText);
+				eventLogger.LogDebug("CreateTabFromParent(portalSettings={PortalSettings},objRoot={ObjRoot},oTab={OTab},parentId={ParentId},validateOnly={ValidateOnly}): tab.IsSecure → {Arg5}", portalSettings, objRoot, oTab, parentId, validateOnly, tab.IsSecure);
+				eventLogger.LogDebug("CreateTabFromParent(portalSettings={PortalSettings},objRoot={ObjRoot},oTab={OTab},parentId={ParentId},validateOnly={ValidateOnly}): tab.PermanentRedirect → {Arg5}", portalSettings, objRoot, oTab, parentId, validateOnly, tab.PermanentRedirect);
                 tab.SiteMapPriority = objRoot.SiteMapPriority;
                 tab.PageHeadText = objRoot.PageHeadText;
                 tab.IsSecure = objRoot.IsSecure;
@@ -404,13 +463,17 @@ namespace Dnn.PersonaBar.Pages.Components
                 TabController.Instance.CreateLocalizedCopies(tab);
             }
 
+			eventLogger.LogDebug("<<< Exiting CreateTabFromParent(portalSettings={PortalSettings},objRoot={ObjRoot},oTab={OTab},parentId={ParentId},validateOnly={ValidateOnly})", portalSettings, objRoot, oTab, parentId, validateOnly);
             return tab.TabID;
         }
 
         private void ApplyDefaultTabTemplate(TabInfo tab)
         {
+			eventLogger.LogDebug(">>> Entering ApplyDefaultTabTemplate(tab={Tab})", tab);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
             var templateFile = Path.Combine(portalSettings.HomeDirectoryMapPath, $@"Templates\{DefaultPageTemplate}");
+			eventLogger.LogDebug("ApplyDefaultTabTemplate(tab={Tab}): templateFile → {TemplateFile}", tab, templateFile);
+			eventLogger.LogDebug("ApplyDefaultTabTemplate(tab={Tab}): portalSettings → {PortalSettings}", tab, portalSettings);
 
             if (!File.Exists(templateFile))
             {
@@ -429,6 +492,8 @@ namespace Dnn.PersonaBar.Pages.Components
             }
             catch (Exception ex)
             {
+				eventLogger.LogError("Exception in ApplyDefaultTabTemplate(tab={Tab}): {Arg1}", tab, ex.getMessage());
+			eventLogger.LogDebug("<<< Exiting ApplyDefaultTabTemplate(tab={Tab})", tab);
                 throw new DotNetNukeException("Unable to process page template.", ex, DotNetNukeErrorCode.DeserializePanesFailed);
             }
         }

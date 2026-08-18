@@ -10,12 +10,14 @@ import SchedulerEditor from "./schedulerEditor";
 import "./style.less";
 import util from "../../utils";
 import resx from "../../resources";
+const logger = console;
 
 let tableFields = [];
 
 class SchedulerPanel extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             currentServerId: "*",
             schedulerItemList: [],
@@ -23,9 +25,11 @@ class SchedulerPanel extends Component {
             serverList: [],
             historyPanelOpen: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const { props } = this;
         props.dispatch(TaskActions.getSchedulerItemList());
         if (props.serverList === null || props.serverList === undefined || props.serverList.length === 0) {
@@ -38,12 +42,15 @@ class SchedulerPanel extends Component {
         tableFields.push({ "name": resx.get("RetryTimeLapse.Header"), "id": "RetryTimeLapse" });
         tableFields.push({ "name": resx.get("NextStart.Header"), "id": "NextStart" });
         tableFields.push({ "name": resx.get("Enabled.Header"), "id": "Enabled" });
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     createServerOptions(serverList) {
+		logger.debug(`>>> Entering createServerOptions(serverList=${serverList})`);
         let serverOptions = [];
         if (serverList !== undefined) {
             serverOptions = serverList.map((item) => {
+		logger.debug(`<<< Exiting createServerOptions(serverList=${serverList})`);
                 return { label: item.ServerName, value: item.ServerID };
             });
         }
@@ -51,12 +58,14 @@ class SchedulerPanel extends Component {
     }
 
     renderHeader() {
+		logger.debug('>>> Entering renderHeader()');
         let tableHeaders = tableFields.map((field) => {
             let className = "header-" + field.id;
             return <div className={className} key={"header-" + field.id}>
                 <span>{field.name}&nbsp; </span>
             </div>;
         });
+		logger.debug('<<< Exiting renderHeader()');
         return <div className="header-row">{tableHeaders}</div>;
     }
     uncollapse(id, index) {
@@ -135,8 +144,10 @@ class SchedulerPanel extends Component {
 
      
     renderedScedulerItemList() {
+		logger.debug('>>> Entering renderedScedulerItemList()');
         let i = 0;
         if (this.props.schedulerItemList) {
+			logger.debug('<<< Exiting renderedScedulerItemList()');
             return this.props.schedulerItemList.map((item, index) => {
                 let id = "row-" + i++;
                 return (
@@ -172,8 +183,11 @@ class SchedulerPanel extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         let opened = (this.state.openId === "add");
         let serverOptions = this.createServerOptions(this.props.serverList);
+		logger.debug(`render(): opened → ${opened}`);
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 <div className="schedule-items">
@@ -235,6 +249,8 @@ SchedulerPanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         schedulerItemList: state.task.schedulerItemList,
         serverList: state.task.serverList,

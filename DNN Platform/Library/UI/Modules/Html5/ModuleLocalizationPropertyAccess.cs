@@ -12,6 +12,7 @@ namespace DotNetNuke.UI.Modules.Html5
 
     public class ModuleLocalizationPropertyAccess : JsonPropertyAccess<ModuleLocalizationDto>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleLocalizationPropertyAccess));
         private readonly ModuleInstanceContext moduleContext;
         private readonly string html5File;
 
@@ -20,20 +21,29 @@ namespace DotNetNuke.UI.Modules.Html5
         /// <param name="html5File">The HTML file.</param>
         public ModuleLocalizationPropertyAccess(ModuleInstanceContext moduleContext, string html5File)
         {
+			Logger.LogDebug(">>> Entering ModuleLocalizationPropertyAccess(moduleContext={ModuleContext},html5File={Html5File})", moduleContext, html5File);
             this.html5File = html5File;
             this.moduleContext = moduleContext;
+			Logger.LogDebug("ModuleLocalizationPropertyAccess(moduleContext={ModuleContext},html5File={Html5File}): moduleContext → {ModuleContext1}", moduleContext, html5File, moduleContext);
+			Logger.LogDebug("ModuleLocalizationPropertyAccess(moduleContext={ModuleContext},html5File={Html5File}): this.html5File → {Arg2}", moduleContext, html5File, this.html5File);
+			Logger.LogDebug("<<< Exiting ModuleLocalizationPropertyAccess(moduleContext={ModuleContext},html5File={Html5File})", moduleContext, html5File);
         }
 
         /// <inheritdoc />
         protected override string ProcessToken(ModuleLocalizationDto model, UserInfo accessingUser, Scope accessLevel)
         {
+			Logger.LogDebug(">>> Entering ProcessToken(model={Model},accessingUser={AccessingUser},accessLevel={AccessLevel})", model, accessingUser, accessLevel);
             string returnValue = string.Empty;
 
+			Logger.LogDebug("ProcessToken(model={Model},accessingUser={AccessingUser},accessLevel={AccessLevel}): returnValue → {ReturnValue}", model, accessingUser, accessLevel, returnValue);
             string resourceFile = model.LocalResourceFile;
+			Logger.LogDebug("ProcessToken(model={Model},accessingUser={AccessingUser},accessLevel={AccessLevel}): resourceFile → {ResourceFile}", model, accessingUser, accessLevel, resourceFile);
             if (string.IsNullOrEmpty(resourceFile))
             {
                 var fileName = Path.GetFileName(this.html5File);
+				Logger.LogDebug("ProcessToken(model={Model},accessingUser={AccessingUser},accessLevel={AccessLevel}): fileName → {FileName}", model, accessingUser, accessLevel, fileName);
                 var path = this.html5File.Replace(fileName, string.Empty);
+				Logger.LogDebug("ProcessToken(model={Model},accessingUser={AccessingUser},accessLevel={AccessLevel}): path → {Path}", model, accessingUser, accessLevel, path);
                 resourceFile = Path.Combine(path, Localization.LocalResourceDirectory + "/", Path.ChangeExtension(fileName, "resx"));
             }
 
@@ -42,6 +52,7 @@ namespace DotNetNuke.UI.Modules.Html5
                 returnValue = Localization.GetString(model.Key, resourceFile);
             }
 
+			Logger.LogDebug("<<< Exiting ProcessToken(model={Model},accessingUser={AccessingUser},accessLevel={AccessLevel})", model, accessingUser, accessLevel);
             return returnValue;
         }
     }

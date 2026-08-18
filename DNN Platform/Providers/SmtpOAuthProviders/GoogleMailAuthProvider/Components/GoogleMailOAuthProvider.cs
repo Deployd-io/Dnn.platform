@@ -28,10 +28,12 @@ using Google.Apis.Auth.OAuth2.Flows;
 using Google.Apis.Auth.OAuth2.Responses;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 /// <inheritdoc />
 public class GoogleMailOAuthProvider : ISmtpOAuthProvider
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     private readonly IHostSettingsService hostSettingsService;
     private readonly IPortalAliasService portalAliasService;
     private readonly IHostSettings hostSettings;
@@ -45,8 +47,10 @@ public class GoogleMailOAuthProvider : ISmtpOAuthProvider
     public GoogleMailOAuthProvider(IHostSettingsService hostSettingsService, IPortalAliasService portalAliasService)
         : this(hostSettingsService, portalAliasService, null, null, null)
     {
+	_logger.LogDebug(">>> Entering GoogleMailOAuthProvider(hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService})", hostSettingsService, portalAliasService);
     }
 
+	_logger.LogDebug("<<< Exiting GoogleMailOAuthProvider(hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService})", hostSettingsService, portalAliasService);
     /// <summary>Initializes a new instance of the <see cref="GoogleMailOAuthProvider"/> class.</summary>
     /// <param name="hostSettingsService">The host settings service.</param>
     /// <param name="portalAliasService">The portal alias service.</param>
@@ -55,6 +59,10 @@ public class GoogleMailOAuthProvider : ISmtpOAuthProvider
     public GoogleMailOAuthProvider(IHostSettingsService hostSettingsService, IPortalAliasService portalAliasService, IHostSettings hostSettings, IPortalController portalController)
         : this(hostSettingsService, portalAliasService, hostSettings, portalController, null)
     {
+	_logger.LogDebug(">>> Entering GoogleMailOAuthProvider(hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService},hostSettings={HostSettings},portalController={PortalController})", hostSettingsService, portalAliasService, hostSettings, portalController);
+	_logger.LogDebug("<<< Exiting GoogleMailOAuthProvider(hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService},hostSettings={HostSettings},portalController={PortalController})", hostSettingsService, portalAliasService, hostSettings, portalController);
+	_logger.LogDebug("GoogleMailOAuthProvider(hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService},hostSettings={HostSettings},portalController={PortalController},cryptographyProvider={CryptographyProvider}): portalAliasService → {PortalAliasService1}", hostSettingsService, portalAliasService, hostSettings, portalController, cryptographyProvider, portalAliasService);
+	_logger.LogDebug("GoogleMailOAuthProvider(hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService},hostSettings={HostSettings},portalController={PortalController},cryptographyProvider={CryptographyProvider}): hostSettings → {HostSettings1}", hostSettingsService, portalAliasService, hostSettings, portalController, cryptographyProvider, hostSettings);
     }
 
     /// <summary>Initializes a new instance of the <see cref="GoogleMailOAuthProvider"/> class.</summary>
@@ -67,6 +75,8 @@ public class GoogleMailOAuthProvider : ISmtpOAuthProvider
     {
         this.hostSettingsService = hostSettingsService;
         this.portalAliasService = portalAliasService;
+		_logger.LogDebug("GoogleMailOAuthProvider(hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService},hostSettings={HostSettings},portalController={PortalController},cryptographyProvider={CryptographyProvider}): this.hostSettingsService → {Arg5}", hostSettingsService, portalAliasService, hostSettings, portalController, cryptographyProvider, this.hostSettingsService);
+		_logger.LogDebug("GoogleMailOAuthProvider(hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService},hostSettings={HostSettings},portalController={PortalController},cryptographyProvider={CryptographyProvider}): this.portalAliasService → {Arg5}", hostSettingsService, portalAliasService, hostSettings, portalController, cryptographyProvider, this.portalAliasService);
         this.hostSettings = hostSettings ?? HttpContextSource.Current?.GetScope().ServiceProvider.GetRequiredService<IHostSettings>() ?? new HostSettings(hostSettingsService);
         this.portalController = portalController ?? HttpContextSource.Current?.GetScope().ServiceProvider.GetRequiredService<IPortalController>();
         this.cryptographyProvider = cryptographyProvider ?? HttpContextSource.Current?.GetScope().ServiceProvider.GetRequiredService<ICryptographyProvider>();
@@ -81,29 +91,39 @@ public class GoogleMailOAuthProvider : ISmtpOAuthProvider
     /// <inheritdoc />
     public bool IsAuthorized(int portalId)
     {
+		_logger.LogDebug(">>> Entering IsAuthorized(portalId={PortalId})", portalId);
+		_logger.LogDebug("<<< Exiting IsAuthorized(portalId={PortalId})", portalId);
         return Task.Run(() => this.IsAuthorizedAsync(portalId)).GetAwaiter().GetResult();
     }
 
     /// <inheritdoc />
     public async Task<bool> IsAuthorizedAsync(int portalId, CancellationToken cancellationToken = default)
     {
+		_logger.LogDebug(">>> Entering IsAuthorizedAsync(portalId={PortalId},cancellationToken=<redacted>)", portalId);
         var accountEmail = this.GetSetting(portalId, Constants.AccountEmailSettingName);
         if (string.IsNullOrWhiteSpace(accountEmail))
+		_logger.LogDebug("IsAuthorizedAsync(portalId={PortalId},cancellationToken=<redacted>): accountEmail → {AccountEmail}", portalId, accountEmail);
         {
             return false;
         }
 
         var credential = await new GoogleCredentialDataStore(portalId, this.hostSettingsService, this.hostSettings, this.portalController).GetAsync<TokenResponse>(accountEmail);
+		_logger.LogDebug("IsAuthorizedAsync(portalId={PortalId},cancellationToken=<redacted>): credential → {Credential}", portalId, credential);
 
+		_logger.LogDebug("<<< Exiting IsAuthorizedAsync(portalId={PortalId},cancellationToken=<redacted>)", portalId);
         return !string.IsNullOrWhiteSpace(credential?.AccessToken);
     }
 
     /// <inheritdoc />
     public string GetAuthorizeUrl(int portalId)
     {
+		_logger.LogDebug(">>> Entering GetAuthorizeUrl(portalId={PortalId})", portalId);
         var accountEmail = this.GetSetting(portalId, Constants.AccountEmailSettingName);
         var clientId = this.GetSetting(portalId, Constants.ClientIdSettingName);
+		_logger.LogDebug("GetAuthorizeUrl(portalId={PortalId}): clientId → {ClientId}", portalId, clientId);
         var clientSecret = this.GetSetting(portalId, Constants.ClientSecretSettingName);
+		_logger.LogDebug("GetAuthorizeUrl(portalId={PortalId}): clientSecret → {ClientSecret}", portalId, clientSecret);
+		_logger.LogDebug("GetAuthorizeUrl(portalId={PortalId}): accountEmail → {AccountEmail}", portalId, accountEmail);
 
         if (string.IsNullOrWhiteSpace(accountEmail)
             || string.IsNullOrWhiteSpace(clientId)
@@ -113,27 +133,34 @@ public class GoogleMailOAuthProvider : ISmtpOAuthProvider
         }
 
         var portalSettings = new PortalSettings(portalId == Null.NullInteger ? this.hostSettings.HostPortalId : portalId);
+		_logger.LogDebug("GetAuthorizeUrl(portalId={PortalId}): portalSettings → {PortalSettings}", portalId, portalSettings);
         var portalAlias = this.portalAliasService.GetPortalAliasesByPortalId(portalId == Null.NullInteger ? this.hostSettings.HostPortalId : portalId)
             .OrderByDescending(a => a.IsPrimary)
             .First();
         var sslEnabled = portalSettings.SSLEnabled && portalSettings.SSLSetup == SiteSslSetup.On;
 
         var siteUrl = $"{(sslEnabled ? "https" : "http")}://{portalAlias.HttpAlias}";
+		_logger.LogDebug("GetAuthorizeUrl(portalId={PortalId}): siteUrl → {SiteUrl}", portalId, siteUrl);
 
+		_logger.LogDebug("<<< Exiting GetAuthorizeUrl(portalId={PortalId})", portalId);
         return string.Format(Constants.CallbackUrl, siteUrl, portalId);
     }
 
     /// <inheritdoc />
     public IList<SmtpOAuthSetting> GetSettings(int portalId)
     {
+		_logger.LogDebug(">>> Entering GetSettings(portalId={PortalId})", portalId);
+		_logger.LogDebug("<<< Exiting GetSettings(portalId={PortalId})", portalId);
         return portalId > Null.NullInteger ? this.GetSettingsFromPortal(portalId) : this.GetSettingsFromHost();
     }
 
     /// <inheritdoc />
     public bool UpdateSettings(int portalId, IDictionary<string, string> settings, out IList<string> errorMessages)
     {
+		_logger.LogDebug(">>> Entering UpdateSettings(portalId={PortalId},settings={Settings})", portalId, settings);
         errorMessages = new List<string>();
         bool changed;
+		_logger.LogDebug("UpdateSettings(portalId={PortalId},settings={Settings}): errorMessages → {ErrorMessages}", portalId, settings, errorMessages);
 
         if (portalId == Null.NullInteger)
         {
@@ -147,52 +174,72 @@ public class GoogleMailOAuthProvider : ISmtpOAuthProvider
         if (changed)
         {
             var settingName = string.Format(Constants.DataStoreSettingName, portalId);
+			_logger.LogDebug("UpdateSettings(portalId={PortalId},settings={Settings}): settingName → {SettingName}", portalId, settings, settingName);
             this.DeleteSetting(portalId, settingName);
         }
 
+		_logger.LogDebug("<<< Exiting UpdateSettings(portalId={PortalId},settings={Settings})", portalId, settings);
         return changed;
     }
 
     /// <inheritdoc />
     public void Authorize(int portalId, IOAuth2SmtpClient smtpClient)
     {
+		_logger.LogDebug(">>> Entering Authorize(portalId={PortalId},smtpClient={SmtpClient})", portalId, smtpClient);
         var settings = this.GetSettings(portalId);
         var accountEmail = settings.FirstOrDefault(i => i.Name == Constants.AccountEmailSettingName)?.Value ?? string.Empty;
+		_logger.LogDebug("Authorize(portalId={PortalId},smtpClient={SmtpClient}): accountEmail → {AccountEmail}", portalId, smtpClient, accountEmail);
         var codeFlow = this.CreateAuthorizationCodeFlow(portalId);
+		_logger.LogDebug("Authorize(portalId={PortalId},smtpClient={SmtpClient}): codeFlow → {CodeFlow}", portalId, smtpClient, codeFlow);
+		_logger.LogDebug("Authorize(portalId={PortalId},smtpClient={SmtpClient}): settings → {Settings}", portalId, smtpClient, settings);
         if (codeFlow == null)
         {
             return;
         }
 
         var response = new GoogleCredentialDataStore(portalId, this.hostSettingsService, this.hostSettings, this.portalController).GetAsync<TokenResponse>(accountEmail).Result;
+		_logger.LogDebug("Authorize(portalId={PortalId},smtpClient={SmtpClient}): response → {Response}", portalId, smtpClient, response);
         var credential = new UserCredential(codeFlow, accountEmail, response);
+		_logger.LogDebug("Authorize(portalId={PortalId},smtpClient={SmtpClient}): credential → {Credential}", portalId, smtpClient, credential);
         if (credential.Token.IsStale)
         {
             _ = credential.RefreshTokenAsync(CancellationToken.None).Result;
+			_logger.LogDebug("Authorize(portalId={PortalId},smtpClient={SmtpClient}): _ → {_}", portalId, smtpClient, _);
         }
 
         smtpClient.Authenticate(credential.UserId, credential.Token.AccessToken);
+		_logger.LogDebug("<<< Exiting Authorize(portalId={PortalId},smtpClient={SmtpClient})", portalId, smtpClient);
     }
 
     /// <inheritdoc />
     public async Task AuthorizeAsync(int portalId, IOAuth2SmtpClient smtpClient, CancellationToken cancellationToken)
     {
+		_logger.LogDebug(">>> Entering AuthorizeAsync(portalId={PortalId},smtpClient={SmtpClient},cancellationToken=<redacted>)", portalId, smtpClient);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var settings = this.GetSettings(portalId);
         var accountEmail = settings.FirstOrDefault(i => i.Name == Constants.AccountEmailSettingName)?.Value ?? string.Empty;
+		_logger.LogDebug("AuthorizeAsync(portalId={PortalId},smtpClient={SmtpClient},cancellationToken=<redacted>): settings → {Settings}", portalId, smtpClient, settings);
+		_logger.LogDebug("AuthorizeAsync(portalId={PortalId},smtpClient={SmtpClient},cancellationToken=<redacted>): accountEmail → {AccountEmail}", portalId, smtpClient, accountEmail);
         var codeFlow = this.CreateAuthorizationCodeFlow(portalId);
         if (codeFlow == null)
+		_logger.LogDebug("AuthorizeAsync(portalId={PortalId},smtpClient={SmtpClient},cancellationToken=<redacted>): codeFlow → {CodeFlow}", portalId, smtpClient, codeFlow);
         {
             return;
         }
 
         var response = await new GoogleCredentialDataStore(portalId, this.hostSettingsService, this.hostSettings, this.portalController).GetAsync<TokenResponse>(accountEmail);
+		_logger.LogDebug("AuthorizeAsync(portalId={PortalId},smtpClient={SmtpClient},cancellationToken=<redacted>): response → {Response}", portalId, smtpClient, response);
         var credential = new UserCredential(codeFlow, accountEmail, response);
+		_logger.LogDebug("AuthorizeAsync(portalId={PortalId},smtpClient={SmtpClient},cancellationToken=<redacted>): credential → {Credential}", portalId, smtpClient, credential);
         if (credential.Token.IsStale)
         {
             _ = await credential.RefreshTokenAsync(cancellationToken);
+			_logger.LogDebug("AuthorizeAsync(portalId={PortalId},smtpClient={SmtpClient},cancellationToken=<redacted>): _ → {_}", portalId, smtpClient, _);
         }
 
         await smtpClient.AuthenticateAsync(credential.UserId, credential.Token.AccessToken, cancellationToken);
+		_logger.LogInformation("AuthorizeAsync(portalId,smtpClient,cancellationToken)={PortalId},{SmtpClient},{CancellationToken}: external service call took {Arg3} ms", portalId, smtpClient, cancellationToken, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting AuthorizeAsync(portalId={PortalId},smtpClient={SmtpClient},cancellationToken=<redacted>)", portalId, smtpClient);
     }
 
     /// <summary>Create authorization code flow.</summary>
@@ -204,6 +251,10 @@ public class GoogleMailOAuthProvider : ISmtpOAuthProvider
     /// <returns>The authorization code flow.</returns>
     internal static IAuthorizationCodeFlow CreateAuthorizationCodeFlow(ISmtpOAuthController smtpOAuthController, IHostSettingsService hostSettingsService, IHostSettings hostSettings, IPortalController portalController, int portalId)
     {
+		_logger.LogDebug(">>> Entering CreateAuthorizationCodeFlow(smtpOAuthController={SmtpOAuthController},hostSettingsService={HostSettingsService},hostSettings={HostSettings},portalController={PortalController},portalId={PortalId})", smtpOAuthController, hostSettingsService, hostSettings, portalController, portalId);
+		_logger.LogDebug("<<< Exiting CreateAuthorizationCodeFlow(smtpOAuthController={SmtpOAuthController},hostSettingsService={HostSettingsService},hostSettings={HostSettings},portalController={PortalController},portalId={PortalId})", smtpOAuthController, hostSettingsService, hostSettings, portalController, portalId);
+		_logger.LogDebug("<<< Exiting CreateAuthorizationCodeFlow(portalId={PortalId})", portalId);
+		_logger.LogDebug("<<< Exiting CreateAuthorizationCodeFlow(authProvider={AuthProvider},hostSettingsService={HostSettingsService},hostSettings={HostSettings},portalController={PortalController},portalId={PortalId})", authProvider, hostSettingsService, hostSettings, portalController, portalId);
         return CreateAuthorizationCodeFlow(smtpOAuthController.GetOAuthProvider(Constants.Name), hostSettingsService, hostSettings, portalController, portalId);
     }
 
@@ -239,24 +290,33 @@ public class GoogleMailOAuthProvider : ISmtpOAuthProvider
 
     private IList<SmtpOAuthSetting> GetSettingsFromPortal(int portalId)
     {
+		_logger.LogDebug(">>> Entering GetSettingsFromPortal(portalId={PortalId})", portalId);
         var portalSettings = PortalController.Instance.GetPortalSettings(portalId);
         if (portalSettings == null)
+		_logger.LogDebug("GetSettingsFromPortal(portalId={PortalId}): portalSettings → {PortalSettings}", portalId, portalSettings);
         {
+			_logger.LogWarning("Throwing ArgumentException from GetSettingsFromPortal(portalId={PortalId})", portalId);
             throw new ArgumentException("Invalid portal Id.");
         }
 
         var accountEmail = portalSettings.GetValueOrDefault(Constants.AccountEmailSettingName, string.Empty);
+		_logger.LogDebug("GetSettingsFromPortal(portalId={PortalId}): accountEmail → {AccountEmail}", portalId, accountEmail);
         var clientId = portalSettings.GetValueOrDefault(Constants.ClientIdSettingName, string.Empty);
+		_logger.LogDebug("GetSettingsFromPortal(portalId={PortalId}): clientId → {ClientId}", portalId, clientId);
         var clientSecret = portalSettings.GetValueOrDefault(Constants.ClientSecretSettingName, string.Empty);
+		_logger.LogDebug("GetSettingsFromPortal(portalId={PortalId}): clientSecret → {ClientSecret}", portalId, clientSecret);
         if (!string.IsNullOrWhiteSpace(clientSecret))
         {
             var algorithmName = portalSettings.GetValueOrDefault(Constants.ClientSecretEncryptionAlgorithm, string.Empty);
+			_logger.LogDebug("GetSettingsFromPortal(portalId={PortalId}): algorithmName → {AlgorithmName}", portalId, algorithmName);
             if (!string.IsNullOrWhiteSpace(algorithmName))
             {
                 var initializationVector = portalSettings.GetValueOrDefault(Constants.ClientSecretInitializationVector, string.Empty);
+				_logger.LogDebug("GetSettingsFromPortal(portalId={PortalId}): initializationVector → {InitializationVector}", portalId, initializationVector);
                 clientSecret = this.cryptographyProvider.DecryptString(clientSecret, Config.GetDecryptionkey(), algorithmName, initializationVector);
             }
             else
+		_logger.LogDebug("<<< Exiting GetSettingsFromPortal(portalId={PortalId})", portalId);
             {
 #pragma warning disable CS0618 // Type or member is obsolete
                 clientSecret = PortalSecurity.Instance.Decrypt(Config.GetDecryptionkey(), clientSecret);
@@ -304,20 +364,28 @@ public class GoogleMailOAuthProvider : ISmtpOAuthProvider
 
     private IList<SmtpOAuthSetting> GetSettingsFromHost()
     {
+		_logger.LogDebug(">>> Entering GetSettingsFromHost()");
         var settingsDictionary = this.hostSettingsService.GetSettingsDictionary().ToDictionary(i => i.Key, i => i.Value);
 
+		_logger.LogDebug("GetSettingsFromHost(): settingsDictionary → {SettingsDictionary}", settingsDictionary);
         var accountEmail = settingsDictionary.GetValueOrDefault(Constants.AccountEmailSettingName, string.Empty);
+		_logger.LogDebug("GetSettingsFromHost(): accountEmail → {AccountEmail}", accountEmail);
         var clientId = settingsDictionary.GetValueOrDefault(Constants.ClientIdSettingName, string.Empty);
+		_logger.LogDebug("GetSettingsFromHost(): clientId → {ClientId}", clientId);
         var clientSecret = settingsDictionary.GetValueOrDefault(Constants.ClientSecretSettingName, string.Empty);
+		_logger.LogDebug("GetSettingsFromHost(): clientSecret → {ClientSecret}", clientSecret);
         if (!string.IsNullOrWhiteSpace(clientSecret))
         {
             var algorithmName = settingsDictionary.GetValueOrDefault(Constants.ClientSecretEncryptionAlgorithm, string.Empty);
+			_logger.LogDebug("GetSettingsFromHost(): algorithmName → {AlgorithmName}", algorithmName);
             if (!string.IsNullOrWhiteSpace(algorithmName))
             {
                 var initializationVector = settingsDictionary.GetValueOrDefault(Constants.ClientSecretInitializationVector, (string)null);
+				_logger.LogDebug("GetSettingsFromHost(): initializationVector → {InitializationVector}", initializationVector);
                 clientSecret = this.cryptographyProvider.DecryptString(clientSecret, Config.GetDecryptionkey(), algorithmName, initializationVector);
             }
             else
+		_logger.LogDebug("<<< Exiting GetSettingsFromHost()");
             {
 #pragma warning disable CS0618 // Type or member is obsolete
                 clientSecret = PortalSecurity.Instance.Decrypt(Config.GetDecryptionkey(), clientSecret);
@@ -357,12 +425,18 @@ public class GoogleMailOAuthProvider : ISmtpOAuthProvider
 
     private bool UpdateHostSettings(IDictionary<string, string> settings)
     {
+		_logger.LogDebug(">>> Entering UpdateHostSettings(settings={Settings})", settings);
         var accountEmail = this.GetSetting(Null.NullInteger, Constants.AccountEmailSettingName);
         var clientId = this.GetSetting(Null.NullInteger, Constants.ClientIdSettingName);
+		_logger.LogDebug("UpdateHostSettings(settings={Settings}): clientId → {ClientId}", settings, clientId);
         var clientSecret = this.GetSetting(Null.NullInteger, Constants.ClientSecretSettingName);
+		_logger.LogDebug("UpdateHostSettings(settings={Settings}): clientSecret → {ClientSecret}", settings, clientSecret);
         var clientSecretEncryptionAlgorithm = this.GetSetting(Null.NullInteger, Constants.ClientSecretEncryptionAlgorithm);
+		_logger.LogDebug("UpdateHostSettings(settings={Settings}): clientSecretEncryptionAlgorithm → {ClientSecretEncryptionAlgorithm}", settings, clientSecretEncryptionAlgorithm);
+		_logger.LogDebug("UpdateHostSettings(settings={Settings}): accountEmail → {AccountEmail}", settings, accountEmail);
 
         var changed = false;
+		_logger.LogDebug("UpdateHostSettings(settings={Settings}): changed → {Changed}", settings, changed);
         if (settings.ContainsKey(Constants.AccountEmailSettingName) && settings[Constants.AccountEmailSettingName] != accountEmail)
         {
             this.hostSettingsService.Update(Constants.AccountEmailSettingName, settings[Constants.AccountEmailSettingName], false);
@@ -392,17 +466,24 @@ public class GoogleMailOAuthProvider : ISmtpOAuthProvider
             DataCache.ClearCache();
         }
 
+		_logger.LogDebug("<<< Exiting UpdateHostSettings(settings={Settings})", settings);
         return changed;
     }
 
     private bool UpdatePortalSettings(int portalId, IDictionary<string, string> settings)
     {
+		_logger.LogDebug(">>> Entering UpdatePortalSettings(portalId={PortalId},settings={Settings})", portalId, settings);
         var accountEmail = this.GetSetting(portalId, Constants.AccountEmailSettingName);
         var clientId = this.GetSetting(portalId, Constants.ClientIdSettingName);
+		_logger.LogDebug("UpdatePortalSettings(portalId={PortalId},settings={Settings}): clientId → {ClientId}", portalId, settings, clientId);
         var clientSecret = this.GetSetting(portalId, Constants.ClientSecretSettingName);
+		_logger.LogDebug("UpdatePortalSettings(portalId={PortalId},settings={Settings}): clientSecret → {ClientSecret}", portalId, settings, clientSecret);
         var clientSecretEncryptionAlgorithm = this.GetSetting(portalId, Constants.ClientSecretEncryptionAlgorithm);
+		_logger.LogDebug("UpdatePortalSettings(portalId={PortalId},settings={Settings}): clientSecretEncryptionAlgorithm → {ClientSecretEncryptionAlgorithm}", portalId, settings, clientSecretEncryptionAlgorithm);
+		_logger.LogDebug("UpdatePortalSettings(portalId={PortalId},settings={Settings}): accountEmail → {AccountEmail}", portalId, settings, accountEmail);
 
         var changed = false;
+		_logger.LogDebug("UpdatePortalSettings(portalId={PortalId},settings={Settings}): changed → {Changed}", portalId, settings, changed);
         if (settings.ContainsKey(Constants.AccountEmailSettingName) && settings[Constants.AccountEmailSettingName] != accountEmail)
         {
             PortalController.UpdatePortalSetting(this.portalController, portalId, Constants.AccountEmailSettingName, settings[Constants.AccountEmailSettingName], false);
@@ -432,19 +513,25 @@ public class GoogleMailOAuthProvider : ISmtpOAuthProvider
             DataCache.ClearPortalCache(portalId, false);
         }
 
+		_logger.LogDebug("<<< Exiting UpdatePortalSettings(portalId={PortalId},settings={Settings})", portalId, settings);
         return changed;
     }
 
     private string GetSetting(int portalId, string settingName)
     {
+		_logger.LogDebug(">>> Entering GetSetting(portalId={PortalId},settingName={SettingName})", portalId, settingName);
         var settings = this.GetSettings(portalId);
         var setting = settings.FirstOrDefault(i => i.Name == settingName);
+		_logger.LogDebug("GetSetting(portalId={PortalId},settingName={SettingName}): setting → {Setting}", portalId, settingName, setting);
+		_logger.LogDebug("GetSetting(portalId={PortalId},settingName={SettingName}): settings → {Settings}", portalId, settingName, settings);
 
+		_logger.LogDebug("<<< Exiting GetSetting(portalId={PortalId},settingName={SettingName})", portalId, settingName);
         return setting?.Value ?? string.Empty;
     }
 
     private void DeleteSetting(int portalId, string settingName)
     {
+		_logger.LogDebug(">>> Entering DeleteSetting(portalId={PortalId},settingName={SettingName})", portalId, settingName);
         if (portalId == Null.NullInteger)
         {
             this.hostSettingsService.Update(settingName, string.Empty, false);
@@ -453,5 +540,6 @@ public class GoogleMailOAuthProvider : ISmtpOAuthProvider
         {
             PortalController.UpdatePortalSetting(this.portalController, portalId, settingName, string.Empty, false);
         }
+		_logger.LogDebug("<<< Exiting DeleteSetting(portalId={PortalId},settingName={SettingName})", portalId, settingName);
     }
 }

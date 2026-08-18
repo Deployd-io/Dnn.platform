@@ -26,6 +26,7 @@ namespace Dnn.AuthServices.Jwt.Data
     /// <summary>This class provides the Data Access Layer for the JWT Authentication library.</summary>
     public class DataService : ComponentBase<IDataService, DataService>, IDataService
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DataService));
         private readonly DataProvider dataProvider = DataProvider.Instance();
         private readonly IHostSettings hostSettings;
 
@@ -33,6 +34,10 @@ namespace Dnn.AuthServices.Jwt.Data
         public DataService()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering DataService()");
+		Logger.LogDebug(">>> Entering DataService(hostSettings={HostSettings})", hostSettings);
+		Logger.LogDebug("DataService(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
+		Logger.LogDebug("<<< Exiting DataService()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DataService"/> class.</summary>
@@ -41,27 +46,34 @@ namespace Dnn.AuthServices.Jwt.Data
         {
             this.hostSettings = hostSettings ??
                                 HttpContextSource.Current?.GetScope().ServiceProvider.GetRequiredService<IHostSettings>() ??
+								Logger.LogDebug("DataService(hostSettings={HostSettings}): this.hostSettings → {Arg1}", hostSettings, this.hostSettings);
                                 new HostSettings(
                                     new HostController(
 #pragma warning disable CS0618 // Type or member is obsolete
                                         new EventLogController(),
 #pragma warning restore CS0618 // Type or member is obsolete
                                         new Lazy<IPortalController>(() => PortalController.Instance)));
+										Logger.LogDebug("<<< Exiting DataService()");
         }
 
         /// <inheritdoc />
         public virtual PersistedToken GetTokenById(string tokenId)
         {
+			Logger.LogDebug(">>> Entering GetTokenById(tokenId=<redacted>)");
             try
             {
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
                 return CBO.GetCachedObject<PersistedToken>(
                     this.hostSettings,
                     new CacheItemArgs(GetCacheKey(tokenId), 60, CacheItemPriority.Default),
                     _ => CBO.FillObject<PersistedToken>(this.dataProvider.ExecuteReader("JsonWebTokens_GetById", tokenId)));
+					Logger.LogInformation("GetTokenById(tokenId)={TokenId}: database query executed in {Arg1} ms", tokenId, __logStart.ElapsedMilliseconds);
             }
             catch (InvalidCastException)
             {
+				Logger.LogError("Exception in GetTokenById(tokenId=<redacted>): {Arg1}", InvalidCastException.getMessage());
                 // occurs when no record found in th DB
+				Logger.LogDebug("<<< Exiting GetTokenById(tokenId=<redacted>)");
                 return null;
             }
         }
@@ -69,12 +81,16 @@ namespace Dnn.AuthServices.Jwt.Data
         /// <inheritdoc />
         public virtual IList<PersistedToken> GetUserTokens(int userId)
         {
+			Logger.LogDebug(">>> Entering GetUserTokens(userId={UserId})", userId);
+			Logger.LogDebug("<<< Exiting GetUserTokens(userId={UserId})", userId);
             return CBO.FillCollection<PersistedToken>(this.dataProvider.ExecuteReader("JsonWebTokens_GetByUserId", userId));
         }
 
         /// <inheritdoc />
         public virtual void AddToken(PersistedToken token)
         {
+			Logger.LogDebug(">>> Entering AddToken(token=<redacted>)");
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             this.dataProvider.ExecuteNonQuery(
                 "JsonWebTokens_Add",
                 token.TokenId,
@@ -84,42 +100,60 @@ namespace Dnn.AuthServices.Jwt.Data
                 token.TokenHash,
                 token.RenewalHash);
             DataCache.SetCache(GetCacheKey(token.TokenId), token, token.TokenExpiry.ToLocalTime());
+			Logger.LogInformation("AddToken(token)={Token}: database query executed in {Arg1} ms", token, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting AddToken(token=<redacted>)");
         }
 
         /// <inheritdoc />
         public virtual void UpdateToken(PersistedToken token)
         {
+			Logger.LogDebug(">>> Entering UpdateToken(token=<redacted>)");
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             this.dataProvider.ExecuteNonQuery("JsonWebTokens_Update", token.TokenId, token.TokenExpiry, token.TokenHash);
             token.RenewCount += 1;
             DataCache.SetCache(GetCacheKey(token.TokenId), token, token.TokenExpiry.ToLocalTime());
+			Logger.LogInformation("UpdateToken(token)={Token}: database query executed in {Arg1} ms", token, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting UpdateToken(token=<redacted>)");
         }
 
         /// <inheritdoc />
         public virtual void DeleteToken(string tokenId)
         {
+			Logger.LogDebug(">>> Entering DeleteToken(tokenId=<redacted>)");
             this.dataProvider.ExecuteNonQuery("JsonWebTokens_DeleteById", tokenId);
             DataCache.RemoveCache(GetCacheKey(tokenId));
+			Logger.LogInformation("DeleteToken(tokenId)={TokenId}: database query executed in {Arg1} ms", tokenId, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting DeleteToken(tokenId=<redacted>)");
         }
 
         /// <inheritdoc />
         public virtual void DeleteUserTokens(int userId)
         {
+			Logger.LogDebug(">>> Entering DeleteUserTokens(userId={UserId})", userId);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             this.dataProvider.ExecuteNonQuery("JsonWebTokens_DeleteByUser", userId);
             foreach (var token in this.GetUserTokens(userId))
             {
+			Logger.LogInformation("DeleteUserTokens(userId)={UserId}: database query executed in {Arg1} ms", userId, __logStart.ElapsedMilliseconds);
                 DataCache.RemoveCache(GetCacheKey(token.TokenId));
             }
+			Logger.LogDebug("<<< Exiting DeleteUserTokens(userId={UserId})", userId);
         }
 
         /// <inheritdoc />
         public virtual void DeleteExpiredTokens()
         {
+			Logger.LogDebug(">>> Entering DeleteExpiredTokens()");
             // don't worry about caching; these will already be invalidated by cache manager
             this.dataProvider.ExecuteNonQuery("JsonWebTokens_DeleteExpired");
+			Logger.LogInformation("DeleteExpiredTokens(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting DeleteExpiredTokens()");
         }
 
         private static string GetCacheKey(string tokenId)
         {
+			Logger.LogDebug(">>> Entering GetCacheKey(tokenId=<redacted>)");
+			Logger.LogDebug("<<< Exiting GetCacheKey(tokenId=<redacted>)");
             return string.Join(":", "JsonWebTokens", tokenId);
         }
     }

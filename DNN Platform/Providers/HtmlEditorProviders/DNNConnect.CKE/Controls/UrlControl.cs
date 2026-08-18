@@ -29,7 +29,9 @@ namespace DNNConnect.CKEditorProvider.Controls
         /// <summary>Initializes a new instance of the <see cref="UrlControl"/> class.</summary>
         protected UrlControl()
         {
+			eventLogger.LogDebug(">>> Entering UrlControl()");
             this.PreRender += this.Page_PreRender;
+			eventLogger.LogDebug("<<< Exiting UrlControl()");
         }
 
         /// <summary>Gets or sets a value indicating whether [reload files].</summary>
@@ -188,6 +190,7 @@ namespace DNNConnect.CKEditorProvider.Controls
         /// <summary>Binds the data.</summary>
         public void BindData()
         {
+			eventLogger.LogDebug(">>> Entering BindData()");
             this.LoadFolders();
 
             this.Files.Items.Clear();
@@ -195,8 +198,10 @@ namespace DNNConnect.CKEditorProvider.Controls
             this.Files.DataBind();
 
             this.ReloadFiles = false;
+			eventLogger.LogDebug("BindData(): this.ReloadFiles → {Arg0}", this.ReloadFiles);
 
             var url = Convert.ToString(this.ViewState["Url"], CultureInfo.InvariantCulture);
+			eventLogger.LogDebug("BindData(): url → {Url}", url);
 
             if (string.IsNullOrEmpty(url))
             {
@@ -204,18 +209,22 @@ namespace DNNConnect.CKEditorProvider.Controls
             }
 
             var urlType = Globals.GetURLType(url).ToString("g").Substring(0, 1);
+			eventLogger.LogDebug("BindData(): urlType → {UrlType}", urlType);
             if (urlType == "F")
             {
                 if (url.StartsWith("fileid=", StringComparison.OrdinalIgnoreCase))
                 {
                     var objFile = FileManager.Instance.GetFile(int.Parse(url.Substring(7), CultureInfo.InvariantCulture));
+					eventLogger.LogDebug("BindData(): objFile → {ObjFile}", objFile);
 
                     if (objFile != null)
                     {
                         url = objFile.Folder + objFile.FileName;
 
                         var fileName = url.Substring(url.LastIndexOf("/", StringComparison.Ordinal) + 1);
+						eventLogger.LogDebug("BindData(): fileName → {FileName}", fileName);
                         var folderPath = url.Replace(fileName, string.Empty);
+						eventLogger.LogDebug("BindData(): folderPath → {FolderPath}", folderPath);
 
                         if (this.Folders.Items.FindByValue(folderPath) != null)
                         {
@@ -243,6 +252,7 @@ namespace DNNConnect.CKEditorProvider.Controls
             }
 
             this.ViewState["Url"] = url;
+			eventLogger.LogDebug("<<< Exiting BindData()");
         }
 
         /// <summary>The get file list.</summary>
@@ -254,6 +264,8 @@ namespace DNNConnect.CKEditorProvider.Controls
         /// </returns>
         private ArrayList GetFileList(bool noneSpecified)
         {
+			eventLogger.LogDebug(">>> Entering GetFileList(noneSpecified={NoneSpecified})", noneSpecified);
+			eventLogger.LogDebug("<<< Exiting GetFileList(noneSpecified={NoneSpecified})", noneSpecified);
             return Globals.GetFileList(
                 this.PortalId, this.FileFilter, noneSpecified, this.Folders.SelectedItem.Value, false);
         }
@@ -261,9 +273,11 @@ namespace DNNConnect.CKEditorProvider.Controls
         /// <summary>The load folders.</summary>
         private void LoadFolders()
         {
+			eventLogger.LogDebug(">>> Entering LoadFolders()");
             this.Folders.Items.Clear();
 
             var foldersList = FolderManager.Instance.GetFolders(this.PortalId);
+			eventLogger.LogDebug("LoadFolders(): foldersList → {FoldersList}", foldersList);
 
             foreach (ListItem folderItem in from FolderInfo folder in foldersList
                                             select
@@ -279,6 +293,7 @@ namespace DNNConnect.CKEditorProvider.Controls
             {
                 this.Folders.Items.Add(folderItem);
             }
+			eventLogger.LogDebug("<<< Exiting LoadFolders()");
         }
 
         /// <summary>Handles the PreRender event of the Page control.</summary>
@@ -286,6 +301,7 @@ namespace DNNConnect.CKEditorProvider.Controls
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void Page_PreRender(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering Page_PreRender(sender={Sender},e={E})", sender, e);
             try
             {
                 if (this.ReloadFiles)
@@ -295,9 +311,11 @@ namespace DNNConnect.CKEditorProvider.Controls
             }
             catch (Exception exc)
             {
+				eventLogger.LogError("Exception in Page_PreRender(sender={Sender},e={E}): {Arg2}", sender, e, exc.getMessage());
                 // Let's detect possible problems
                 Exceptions.LogException(new Exception("Error rendering URLControl subcontrols.", exc));
             }
+			eventLogger.LogDebug("<<< Exiting Page_PreRender(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Handles the SelectedIndexChanged event of the Folders control.</summary>
@@ -305,6 +323,7 @@ namespace DNNConnect.CKEditorProvider.Controls
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void Folders_SelectedIndexChanged(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering Folders_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
             this.Files.Items.Clear();
             this.Files.DataSource = this.GetFileList(true);
             this.Files.DataBind();
@@ -326,6 +345,7 @@ namespace DNNConnect.CKEditorProvider.Controls
             {
                 this.ViewState["LastFileName"] = string.Empty;
             }
+			eventLogger.LogDebug("<<< Exiting Folders_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
         }
     }
 }

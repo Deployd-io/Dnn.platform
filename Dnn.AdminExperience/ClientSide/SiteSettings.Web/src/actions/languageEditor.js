@@ -1,7 +1,10 @@
 import { languageEditor as ActionTypes } from "constants/actionTypes";
 import LanguageEditorService from "services/languageEditorService";
+const logger = console;
 const languageEditorActions = {
     setLanguageBeingEdited(language) {
+		logger.debug(`>>> Entering setLanguageBeingEdited(language=${language})`);
+		logger.debug(`<<< Exiting setLanguageBeingEdited(language=${language})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SET_LANGUAGE_BEING_EDITED,
@@ -10,6 +13,8 @@ const languageEditorActions = {
         };
     },
     getRootResourcesFolder(portalId, mode, callback) {
+		logger.debug(`>>> Entering getRootResourcesFolder(portalId=${portalId},mode=${mode},callback=${callback})`);
+		logger.debug(`<<< Exiting getRootResourcesFolder(portalId=${portalId},mode=${mode},callback=${callback})`);
         return (dispatch) => {
             LanguageEditorService.getRootResourcesFolder(portalId, mode, (data) => {
                 dispatch({
@@ -23,6 +28,8 @@ const languageEditorActions = {
         };
     },
     getSubRootResources(folder, callback) {
+		logger.debug(`>>> Entering getSubRootResources(folder=${folder},callback=${callback})`);
+		logger.debug(`<<< Exiting getSubRootResources(folder=${folder},callback=${callback})`);
         return (dispatch) => {
             LanguageEditorService.getSubRootResources(folder, (data) => {
                 dispatch({
@@ -36,8 +43,11 @@ const languageEditorActions = {
         };
     },
     getResxEntries(parameters, callback) {
+		logger.debug(`>>> Entering getResxEntries(parameters=${parameters},callback=${callback})`);
+		logger.debug(`<<< Exiting getResxEntries(parameters=${parameters},callback=${callback})`);
         return (dispatch) => {
             let _parameters = Object.assign({}, parameters);
+			logger.debug(`getResxEntries(parameters=${parameters},callback=${callback}): _parameters → ${_parameters}`);
             delete _parameters.resourceFileActual;
             LanguageEditorService.getResxEntries(_parameters, (data) => {
                 dispatch({
@@ -51,6 +61,8 @@ const languageEditorActions = {
         };
     },
     updateResxEntry(updatedList, callback) {
+		logger.debug(`>>> Entering updateResxEntry(updatedList=${updatedList},callback=${callback})`);
+		logger.debug(`<<< Exiting updateResxEntry(updatedList=${updatedList},callback=${callback})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.UPDATED_RESX_ENTRIES,
@@ -62,6 +74,8 @@ const languageEditorActions = {
         };
     },
     saveTranslations(payload, callback) {
+		logger.debug(`>>> Entering saveTranslations(payload=${payload},callback=${callback})`);
+		logger.debug(`<<< Exiting saveTranslations(payload=${payload},callback=${callback})`);
         return () => {
             LanguageEditorService.saveTranslations(payload, (data) => {
                 if (callback) {

@@ -7,6 +7,7 @@ import GlobalIcon from "./GlobalIcon";
 import CustomIcon from "./CustomIcon";
 import Html from "../Html";
 import "./style.less";
+const logger = console;
 
 const getTooltipText = function (messages) {
     if (!messages || !messages.length) {
@@ -21,10 +22,12 @@ const getTooltipText = function (messages) {
 
  
 function getIconComponent(type) {
+	logger.debug(`>>> Entering getIconComponent(type=${type})`);
     switch (type) {
         case "info": return InfoIcon;
         case "error": case "warning": return ErrorIcon;
         case "global": return GlobalIcon;
+		logger.debug(`<<< Exiting getIconComponent(type=${type})`);
     }
 }
 
@@ -32,15 +35,21 @@ class Tooltip extends Component {
 
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }    
 
     render() {
+		logger.debug('>>> Entering render()');
         const {messages, rendered, type, className, style} = this.props;
         const containerClass = "dnn-ui-common-tooltip " + type + " " + (className ? className : "");
+		logger.debug(`render(): containerClass → ${containerClass}`);
         const message = getTooltipText(messages);
+		logger.debug(`render(): message → ${message}`);
         
 
         if (!message || rendered === false) {
+		logger.debug('<<< Exiting render()');
             return <noscript />;
         }
         return (

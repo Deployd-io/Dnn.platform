@@ -17,7 +17,11 @@ namespace Dnn.PersonaBar.Roles.Services.DTO
     {
         public RoleGroupDto()
         {
+			eventLogger.LogDebug(">>> Entering RoleGroupDto()");
             this.Id = -2;
+			eventLogger.LogDebug("RoleGroupDto(): this.Id → {Arg0}", this.Id);
+			eventLogger.LogDebug("RoleGroupDto(): Id → {Id}", Id);
+			eventLogger.LogDebug("<<< Exiting RoleGroupDto()");
         }
 
         [DataMember(Name = "id")]
@@ -34,6 +38,8 @@ namespace Dnn.PersonaBar.Roles.Services.DTO
 
         public static RoleGroupDto FromRoleGroupInfo(RoleGroupInfo roleGroup)
         {
+			eventLogger.LogDebug(">>> Entering FromRoleGroupInfo(roleGroup={RoleGroup})", roleGroup);
+			eventLogger.LogDebug("<<< Exiting FromRoleGroupInfo(roleGroup={RoleGroup})", roleGroup);
             return new RoleGroupDto()
             {
                 Id = roleGroup.RoleGroupID,
@@ -45,6 +51,8 @@ namespace Dnn.PersonaBar.Roles.Services.DTO
 
         public RoleGroupInfo ToRoleGroupInfo()
         {
+			eventLogger.LogDebug(">>> Entering ToRoleGroupInfo()");
+			eventLogger.LogDebug("<<< Exiting ToRoleGroupInfo()");
             return new RoleGroupInfo()
             {
                 RoleGroupID = this.Id,

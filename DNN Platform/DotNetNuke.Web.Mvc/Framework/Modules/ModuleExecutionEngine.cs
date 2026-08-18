@@ -12,14 +12,17 @@ namespace DotNetNuke.Web.Mvc.Framework.Modules
 
     public class ModuleExecutionEngine : IModuleExecutionEngine
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleExecutionEngine));
         /// <inheritdoc />
         public ModuleRequestResult ExecuteModule(ModuleRequestContext moduleRequestContext)
         {
+			Logger.LogDebug(">>> Entering ExecuteModule(moduleRequestContext={ModuleRequestContext})", moduleRequestContext);
             Requires.NotNull("moduleRequestContext", moduleRequestContext);
 
             if (moduleRequestContext.ModuleApplication != null)
             {
                 // Run the module
+			Logger.LogDebug("<<< Exiting ExecuteModule(moduleRequestContext={ModuleRequestContext})", moduleRequestContext);
                 return moduleRequestContext.ModuleApplication.ExecuteRequest(moduleRequestContext);
             }
 
@@ -29,8 +32,10 @@ namespace DotNetNuke.Web.Mvc.Framework.Modules
         /// <inheritdoc />
         public virtual void ExecuteModuleResult(ModuleRequestResult moduleResult, TextWriter writer)
         {
+			Logger.LogDebug(">>> Entering ExecuteModuleResult(moduleResult={ModuleResult},writer={Writer})", moduleResult, writer);
             var result = moduleResult.ActionResult as IDnnViewResult;
             if (result != null)
+			Logger.LogDebug("ExecuteModuleResult(moduleResult={ModuleResult},writer={Writer}): result → {Result}", moduleResult, writer, result);
             {
                 result.ExecuteResult(moduleResult.ControllerContext, writer);
             }
@@ -38,6 +43,7 @@ namespace DotNetNuke.Web.Mvc.Framework.Modules
             {
                 moduleResult.ActionResult.ExecuteResult(moduleResult.ControllerContext);
             }
+			Logger.LogDebug("<<< Exiting ExecuteModuleResult(moduleResult={ModuleResult},writer={Writer})", moduleResult, writer);
         }
     }
 }

@@ -25,6 +25,7 @@ namespace DotNetNuke.Services.Pages
     /// </remarks>
     public class PageService : IPageService
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PageService));
         /// <summary>
         /// Collection of head tags to be included in the HTML head section, ordered by priority.
         /// </summary>
@@ -71,12 +72,15 @@ namespace DotNetNuke.Services.Pages
         /// </remarks>
         public void AddMessage(PageMessage messageItem)
         {
+			Logger.LogDebug(">>> Entering AddMessage(messageItem={MessageItem})", messageItem);
             if (messageItem == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from AddMessage(messageItem={MessageItem})", messageItem);
                 throw new ArgumentNullException(nameof(messageItem));
             }
 
             this.messages.Add(messageItem);
+			Logger.LogDebug("<<< Exiting AddMessage(messageItem={MessageItem})", messageItem);
         }
 
         /// <summary>
@@ -91,12 +95,15 @@ namespace DotNetNuke.Services.Pages
         /// </remarks>
         public void AddMeta(PageMeta metaItem)
         {
+			Logger.LogDebug(">>> Entering AddMeta(metaItem={MetaItem})", metaItem);
             if (metaItem == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from AddMeta(metaItem={MetaItem})", metaItem);
                 throw new ArgumentNullException(nameof(metaItem));
             }
 
             this.metaTags.Add(metaItem);
+			Logger.LogDebug("<<< Exiting AddMeta(metaItem={MetaItem})", metaItem);
         }
 
         /// <summary>
@@ -111,12 +118,15 @@ namespace DotNetNuke.Services.Pages
         /// </remarks>
         public void AddToHead(PageTag tagItem)
         {
+			Logger.LogDebug(">>> Entering AddToHead(tagItem={TagItem})", tagItem);
             if (tagItem == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from AddToHead(tagItem={TagItem})", tagItem);
                 throw new ArgumentNullException(nameof(tagItem));
             }
 
             this.headTags.Add(tagItem);
+			Logger.LogDebug("<<< Exiting AddToHead(tagItem={TagItem})", tagItem);
         }
 
         /// <summary>
@@ -131,7 +141,9 @@ namespace DotNetNuke.Services.Pages
         /// </remarks>
         public void SetDescription(string value, int priority = 100)
         {
+			Logger.LogDebug(">>> Entering SetDescription(value={Value},priority={Priority})", value, priority);
             SetHighestPriorityValue(ref this.description, value, priority);
+			Logger.LogDebug("<<< Exiting SetDescription(value={Value},priority={Priority})", value, priority);
         }
 
         /// <summary>
@@ -146,7 +158,9 @@ namespace DotNetNuke.Services.Pages
         /// </remarks>
         public void SetKeyWords(string value, int priority = 100)
         {
+			Logger.LogDebug(">>> Entering SetKeyWords(value={Value},priority={Priority})", value, priority);
             SetHighestPriorityValue(ref this.keywords, value, priority);
+			Logger.LogDebug("<<< Exiting SetKeyWords(value={Value},priority={Priority})", value, priority);
         }
 
         /// <summary>
@@ -161,7 +175,9 @@ namespace DotNetNuke.Services.Pages
         /// </remarks>
         public void SetTitle(string value, int priority = 100)
         {
+			Logger.LogDebug(">>> Entering SetTitle(value={Value},priority={Priority})", value, priority);
             SetHighestPriorityValue(ref this.title, value, priority);
+			Logger.LogDebug("<<< Exiting SetTitle(value={Value},priority={Priority})", value, priority);
         }
 
         /// <summary>
@@ -171,7 +187,9 @@ namespace DotNetNuke.Services.Pages
         /// <param name="priority">The priority level for this canonical link URL. Higher values take precedence. Default is 100.</param>
         public void SetCanonicalLinkUrl(string value, int priority = 100)
         {
+			Logger.LogDebug(">>> Entering SetCanonicalLinkUrl(value={Value},priority={Priority})", value, priority);
             SetHighestPriorityValue(ref this.canonicalLinkUrl, value, priority);
+			Logger.LogDebug("<<< Exiting SetCanonicalLinkUrl(value={Value},priority={Priority})", value, priority);
         }
 
         /// <summary>
@@ -180,6 +198,8 @@ namespace DotNetNuke.Services.Pages
         /// <returns>The canonical link URL value or null if not set.</returns>
         public string GetCanonicalLinkUrl()
         {
+			Logger.LogDebug(">>> Entering GetCanonicalLinkUrl()");
+			Logger.LogDebug("<<< Exiting GetCanonicalLinkUrl()");
             return this.canonicalLinkUrl?.Value;
         }
 
@@ -189,6 +209,8 @@ namespace DotNetNuke.Services.Pages
         /// <returns>The title value or null if not set.</returns>
         public string GetTitle()
         {
+			Logger.LogDebug(">>> Entering GetTitle()");
+			Logger.LogDebug("<<< Exiting GetTitle()");
             return this.title?.Value;
         }
 
@@ -198,6 +220,8 @@ namespace DotNetNuke.Services.Pages
         /// <returns>The description value or null if not set.</returns>
         public string GetDescription()
         {
+			Logger.LogDebug(">>> Entering GetDescription()");
+			Logger.LogDebug("<<< Exiting GetDescription()");
             return this.description?.Value;
         }
 
@@ -207,6 +231,8 @@ namespace DotNetNuke.Services.Pages
         /// <returns>The keywords value or null if not set.</returns>
         public string GetKeyWords()
         {
+			Logger.LogDebug(">>> Entering GetKeyWords()");
+			Logger.LogDebug("<<< Exiting GetKeyWords()");
             return this.keywords?.Value;
         }
 
@@ -216,6 +242,8 @@ namespace DotNetNuke.Services.Pages
         /// <returns>List of head tags ordered by priority.</returns>
         public IEnumerable<PageTag> GetHeadTags()
         {
+			Logger.LogDebug(">>> Entering GetHeadTags()");
+			Logger.LogDebug("<<< Exiting GetHeadTags()");
             return this.headTags.OrderBy(x => x.Priority).ToList();
         }
 
@@ -225,6 +253,8 @@ namespace DotNetNuke.Services.Pages
         /// <returns>List of meta tags ordered by priority.</returns>
         public IEnumerable<PageMeta> GetMetaTags()
         {
+			Logger.LogDebug(">>> Entering GetMetaTags()");
+			Logger.LogDebug("<<< Exiting GetMetaTags()");
             return this.metaTags.OrderBy(x => x.Priority).ToList();
         }
 
@@ -234,6 +264,8 @@ namespace DotNetNuke.Services.Pages
         /// <returns>List of messages ordered by priority.</returns>
         public IEnumerable<PageMessage> GetMessages()
         {
+			Logger.LogDebug(">>> Entering GetMessages()");
+			Logger.LogDebug("<<< Exiting GetMessages()");
             return this.messages.OrderBy(x => x.Priority).ToList();
         }
 
@@ -242,12 +274,20 @@ namespace DotNetNuke.Services.Pages
         /// </summary>
         public void Clear()
         {
+			Logger.LogDebug(">>> Entering Clear()");
             this.title = null;
             this.description = null;
+			Logger.LogDebug("Clear(): this.title → {Arg0}", this.title);
+			Logger.LogDebug("Clear(): description → {Description}", description);
+			Logger.LogDebug("Clear(): this.description → {Arg0}", this.description);
+			Logger.LogDebug("Clear(): title → {Title}", title);
             this.keywords = null;
             this.headTags.Clear();
             this.metaTags.Clear();
+			Logger.LogDebug("Clear(): keywords → {Keywords}", keywords);
             this.messages.Clear();
+			Logger.LogDebug("Clear(): this.keywords → {Arg0}", this.keywords);
+			Logger.LogDebug("<<< Exiting Clear()");
         }
 
         /// <summary>
@@ -263,10 +303,13 @@ namespace DotNetNuke.Services.Pages
         /// </remarks>
         private static void SetHighestPriorityValue(ref PageTag currentItem, string value, int priority)
         {
+			Logger.LogDebug(">>> Entering SetHighestPriorityValue(currentItem={CurrentItem},value={Value},priority={Priority})", currentItem, value, priority);
             if (currentItem == null || priority > currentItem.Priority)
             {
                 currentItem = new PageTag(value, priority);
+				Logger.LogDebug("SetHighestPriorityValue(currentItem={CurrentItem},value={Value},priority={Priority}): currentItem → {CurrentItem1}", currentItem, value, priority, currentItem);
             }
+			Logger.LogDebug("<<< Exiting SetHighestPriorityValue(currentItem={CurrentItem},value={Value},priority={Priority})", currentItem, value, priority);
         }
     }
 }

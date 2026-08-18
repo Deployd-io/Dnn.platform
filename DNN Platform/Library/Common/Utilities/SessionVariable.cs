@@ -12,6 +12,7 @@ namespace DotNetNuke.Common.Utilities
     /// <typeparam name="T">The type of the value to be stored.</typeparam>
     public class SessionVariable<T> : StateVariable<T>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SessionVariable));
         /// <summary>
         /// Initializes a new instance of the <see cref="SessionVariable{T}"/> class.
         /// Initializes a new HttpContext.Session item variable.
@@ -22,6 +23,8 @@ namespace DotNetNuke.Common.Utilities
         public SessionVariable(string key)
             : base(key)
         {
+		Logger.LogDebug(">>> Entering SessionVariable(key={Key})", key);
+		Logger.LogDebug("<<< Exiting SessionVariable(key={Key})", key);
         }
 
         /// <summary>
@@ -72,7 +75,9 @@ namespace DotNetNuke.Common.Utilities
         /// <inheritdoc />
         protected override void Remove(string key)
         {
+			Logger.LogDebug(">>> Entering Remove(key={Key})", key);
             CurrentItems.Remove(key);
+			Logger.LogDebug("<<< Exiting Remove(key={Key})", key);
         }
     }
 }

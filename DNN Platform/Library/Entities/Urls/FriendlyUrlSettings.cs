@@ -17,6 +17,7 @@ namespace DotNetNuke.Entities.Urls
     [Serializable]
     public class FriendlyUrlSettings
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FriendlyUrlSettings));
         public const string ReplaceSpaceWithNothing = "None";
         public const string SpaceEncodingPlus = "+";
         public const string SpaceEncodingHex = "%20";
@@ -118,7 +119,9 @@ namespace DotNetNuke.Entities.Urls
         public FriendlyUrlSettings(int portalId)
             : this(null, null, null, portalId)
         {
+		Logger.LogDebug(">>> Entering FriendlyUrlSettings(portalId={PortalId})", portalId);
         }
+		Logger.LogDebug("<<< Exiting FriendlyUrlSettings(portalId={PortalId})", portalId);
 
         /// <summary>Initializes a new instance of the <see cref="FriendlyUrlSettings"/> class.</summary>
         /// <param name="portalController">The portal controller.</param>
@@ -127,6 +130,9 @@ namespace DotNetNuke.Entities.Urls
         public FriendlyUrlSettings(IPortalController portalController, int portalId)
             : this(null, null, null, portalId)
         {
+		Logger.LogDebug(">>> Entering FriendlyUrlSettings(portalController={PortalController},portalId={PortalId})", portalController, portalId);
+		Logger.LogDebug("<<< Exiting FriendlyUrlSettings(portalController={PortalController},portalId={PortalId})", portalController, portalId);
+		Logger.LogDebug("FriendlyUrlSettings(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalId={PortalId}): portalController → {PortalController1}", portalController, hostSettings, hostSettingsService, portalId, portalController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="FriendlyUrlSettings"/> class.</summary>
@@ -138,19 +144,26 @@ namespace DotNetNuke.Entities.Urls
         {
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("FriendlyUrlSettings(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalId={PortalId}): hostSettings → {HostSettings1}", portalController, hostSettings, hostSettingsService, portalId, hostSettings);
             this.hostSettingsService = hostSettingsService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
+			Logger.LogDebug("FriendlyUrlSettings(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalId={PortalId}): hostSettingsService → {HostSettingsService1}", portalController, hostSettings, hostSettingsService, portalId, hostSettingsService);
 
             this.PortalId = portalId < -1 ? -1 : portalId;
+			Logger.LogDebug("FriendlyUrlSettings(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalId={PortalId}): this.PortalId → {Arg4}", portalController, hostSettings, hostSettingsService, portalId, this.PortalId);
             this.IsDirty = false;
             this.IsLoading = false;
+			Logger.LogDebug("FriendlyUrlSettings(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalId={PortalId}): this.IsDirty → {Arg4}", portalController, hostSettings, hostSettingsService, portalId, this.IsDirty);
+			Logger.LogDebug("FriendlyUrlSettings(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalId={PortalId}): this.IsLoading → {Arg4}", portalController, hostSettings, hostSettingsService, portalId, this.IsLoading);
 
             this.PortalValues = new List<string>();
 
             this.TabId500 = this.TabId404 = -1;
+			Logger.LogDebug("FriendlyUrlSettings(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalId={PortalId}): this.TabId500 → {Arg4}", portalController, hostSettings, hostSettingsService, portalId, this.TabId500);
 
             if (portalId > -1)
             {
                 var portal = this.portalController.GetPortal(portalId);
+				Logger.LogDebug("FriendlyUrlSettings(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalId={PortalId}): portal → {Portal}", portalController, hostSettings, hostSettingsService, portalId, portal);
                 this.TabId500 = this.TabId404 = portal.Custom404TabId;
 
                 if (this.TabId500 == -1)

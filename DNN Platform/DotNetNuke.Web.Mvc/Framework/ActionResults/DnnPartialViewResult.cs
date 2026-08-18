@@ -17,8 +17,10 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionResults
 
     public class DnnPartialViewResult : PartialViewResult, IDnnViewResult
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnPartialViewResult));
         public void ExecuteResult(ControllerContext context, TextWriter writer)
         {
+			Logger.LogDebug(">>> Entering ExecuteResult(context={Context},writer={Writer})", context, writer);
             Requires.NotNull("context", context);
             Requires.NotNull("writer", writer);
 
@@ -28,20 +30,24 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionResults
             }
 
             ViewEngineResult result = null;
+			Logger.LogDebug("ExecuteResult(context={Context},writer={Writer}): result → {Result}", context, writer, result);
 
             if (this.View == null)
             {
                 result = this.ViewEngineCollection.FindPartialView(context, this.ViewName);
                 this.View = result.View;
+				Logger.LogDebug("ExecuteResult(context={Context},writer={Writer}): this.View → {Arg2}", context, writer, this.View);
             }
 
             var viewContext = new ViewContext(context, this.View, this.ViewData, this.TempData, writer);
+			Logger.LogDebug("ExecuteResult(context={Context},writer={Writer}): viewContext → {ViewContext}", context, writer, viewContext);
             this.View.Render(viewContext, writer);
 
             if (result != null)
             {
                 result.ViewEngine.ReleaseView(context, this.View);
             }
+			Logger.LogDebug("<<< Exiting ExecuteResult(context={Context},writer={Writer})", context, writer);
         }
     }
 }

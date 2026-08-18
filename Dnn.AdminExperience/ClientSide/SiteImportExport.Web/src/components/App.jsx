@@ -10,19 +10,23 @@ import Dashboard from "./Dashboard";
 import ExportModal from "./ExportModal";
 import ImportModal from "./ImportModal";
 import util from "../utils";
+const logger = console;
 import { PersonaBarPageHeader, PersonaBarPageBody, PersonaBarPage } from "@dnnsoftware/dnn-react-common";
 
 class App extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             referrer: util.settings.referrer,
             referrerText: util.settings.referrerText,
             backToReferrerFunc: null
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     backToReferrer(callback) {
+		logger.debug(`>>> Entering backToReferrer(callback=${callback})`);
         if (typeof callback === "function") {
             callback();
         }
@@ -33,17 +37,21 @@ class App extends Component {
                 backToReferrerFunc: null
             });
         }, 750);
+		logger.debug(`<<< Exiting backToReferrer(callback=${callback})`);
     }
 
     updateReferrerInfo(event) {
+		logger.debug(`>>> Entering updateReferrerInfo(event=${event})`);
         this.setState({
             referrer: event.referrer,
             referrerText: event.referrerText,
             backToReferrerFunc: this.backToReferrer.bind(this, event.backToReferrerFunc)
         });
+		logger.debug(`<<< Exiting updateReferrerInfo(event=${event})`);
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const { props } = this;
 
         document.addEventListener("siteImportExport", (e) => {
@@ -60,19 +68,23 @@ class App extends Component {
                 this.selectPanel(util.settings.importExportJob.jobType === "Export" ? 1 : 2);
             }));
             this.updateReferrerInfo(util.settings);
+			logger.debug('<<< Exiting componentDidMount()');
         }
     }
 
     selectPanel(panel, event) {
+		logger.debug(`>>> Entering selectPanel(panel=${panel},event=${event})`);
         if (event) {
             event.preventDefault();
         }
         const { props } = this;
         props.dispatch(VisiblePanelActions.selectPanel(panel));
         props.dispatch(ImportExportActions.jobSelected());
+		logger.debug(`<<< Exiting selectPanel(panel=${panel},event=${event})`);
     }
 
     selectPanelInternal(panel, event) {
+		logger.debug(`>>> Entering selectPanelInternal(panel=${panel},event=${event})`);
         if (event) {
             event.preventDefault();
         }
@@ -91,9 +103,11 @@ class App extends Component {
             props.dispatch(VisiblePanelActions.selectPanel(panel));
         }
         props.dispatch(ImportExportActions.jobSelected());
+		logger.debug(`<<< Exiting selectPanelInternal(panel=${panel},event=${event})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { props, state } = this;
         const PageHeaderSubtitleStyles = {
             clear:"both",
@@ -103,6 +117,7 @@ class App extends Component {
         };
 
 
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 <PersonaBarPage isOpen={props.selectedPage === 0} className={(props.selectedPage !== 0 ? "hidden" : "")}>
@@ -159,6 +174,8 @@ App.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         selectedPage: state.visiblePanel.selectedPage,
         selectedPageVisibleIndex: state.visiblePanel.selectedPageVisibleIndex,

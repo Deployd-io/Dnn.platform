@@ -4,6 +4,7 @@ import resx from "resources";
 import { SearchBox, GridCell } from "@dnnsoftware/dnn-react-common";
 import ResourceEditor from "./resourceEditor";
 import utilities from "utils";
+const logger = console;
 
 const rowSizes = [30, 35, 35];
 
@@ -22,15 +23,19 @@ const searchIconStyle = {
 class ResourceList extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             resources: [],
             searchText: ""
         };
+		logger.debug('<<< Exiting constructor()');
     }
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.setState({
             resources: this.props.list
         });
+		logger.debug('<<< Exiting componentDidMount()');
     }
     onChange(key, keyToChange, event) {
         let value = typeof (event) === "object" ? event.target.value : event;
@@ -40,23 +45,30 @@ class ResourceList extends Component {
         this.props.onResxChange(resources);
     }
     filterListFromSearchText(list) {
+		logger.debug(`>>> Entering filterListFromSearchText(list=${list})`);
+		logger.debug(`<<< Exiting filterListFromSearchText(list=${list})`);
         return list.filter((key) => {
             return key.toLowerCase().indexOf(this.state.searchText.toLowerCase()) > -1;
         });
     }
     onSearch(searchText) {
+		logger.debug(`>>> Entering onSearch(searchText=${searchText})`);
         this.setState({
             searchText
         });
+		logger.debug(`<<< Exiting onSearch(searchText=${searchText})`);
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const { props } = this;
         const pendingTranslations = Object.keys(this.props.list).filter((key) => {
             return this.props.list[key].First === this.props.list[key].Second;
         });
         const searchedList = this.filterListFromSearchText(Object.keys(this.props.list));
+		logger.debug(`render(): pendingTranslations → ${pendingTranslations}`);
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className="resource-list">
                 <GridCell className="resource-controls">

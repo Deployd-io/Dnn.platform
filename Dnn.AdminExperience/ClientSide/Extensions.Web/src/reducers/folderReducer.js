@@ -1,6 +1,9 @@
+const logger = console;
 import { folder as ActionTypes } from "constants/actionTypes";
 
 function addToFolders(value, folders) {
+	logger.debug(`>>> Entering addToFolders(value=${value},folders=${folders})`);
+	logger.debug(`<<< Exiting addToFolders(value=${value},folders=${folders})`);
     return folders.concat(value).sort();
 }
 

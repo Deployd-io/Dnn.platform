@@ -13,13 +13,18 @@ namespace DotNetNuke.Services.Scheduling
     /// <summary>This class is inherited by any class that wants to run tasks in the scheduler.</summary>
     public abstract class SchedulerClient
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SchedulerClient));
         /// <summary>Initializes a new instance of the <see cref="SchedulerClient"/> class.</summary>
         public SchedulerClient()
         {
+			Logger.LogDebug(">>> Entering SchedulerClient()");
             this.SchedulerEventGUID = Null.NullString;
             this.aProcessMethod = Null.NullString;
+			Logger.LogDebug("SchedulerClient(): this.SchedulerEventGUID → {Arg0}", this.SchedulerEventGUID);
+			Logger.LogDebug("SchedulerClient(): this.aProcessMethod → {Arg0}", this.aProcessMethod);
             this.Status = Null.NullString;
             this.ScheduleHistoryItem = new ScheduleHistoryItem();
+			Logger.LogDebug("<<< Exiting SchedulerClient()");
         }
 
         public event WorkStarted ProcessStarted;
@@ -46,34 +51,42 @@ namespace DotNetNuke.Services.Scheduling
 
         public void Started()
         {
+			Logger.LogDebug(">>> Entering Started()");
             if (this.ProcessStarted != null)
             {
                 this.ProcessStarted(this);
             }
+			Logger.LogDebug("<<< Exiting Started()");
         }
 
         public void Progressing()
         {
+			Logger.LogDebug(">>> Entering Progressing()");
             if (this.ProcessProgressing != null)
             {
                 this.ProcessProgressing(this);
             }
+			Logger.LogDebug("<<< Exiting Progressing()");
         }
 
         public void Completed()
         {
+			Logger.LogDebug(">>> Entering Completed()");
             if (this.ProcessCompleted != null)
             {
                 this.ProcessCompleted(this);
             }
+			Logger.LogDebug("<<< Exiting Completed()");
         }
 
         public void Errored(ref Exception objException)
         {
+			Logger.LogDebug(">>> Entering Errored(objException={ObjException})", objException);
             if (this.ProcessErrored != null)
             {
                 this.ProcessErrored(this, objException);
             }
+			Logger.LogDebug("<<< Exiting Errored(objException={ObjException})", objException);
         }
 
         /// '''''''''''''''''''''''''''''''''''''''''''''''''''

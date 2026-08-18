@@ -23,10 +23,16 @@ namespace DotNetNuke.Services.Tokens
     /// </summary>
     public class TokenReplace : BaseCustomTokenReplace
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TokenReplace));
         /// <summary>Initializes a new instance of the <see cref="TokenReplace"/> class for default context.</summary>
         public TokenReplace()
             : this(Scope.DefaultSettings, null, null, null, Null.NullInteger)
         {
+		Logger.LogDebug(">>> Entering TokenReplace()");
+		Logger.LogDebug("<<< Exiting TokenReplace()");
+		Logger.LogDebug(">>> Entering TokenReplace(moduleID={ModuleID})", moduleID);
+		Logger.LogDebug("<<< Exiting TokenReplace(moduleID={ModuleID})", moduleID);
+		Logger.LogDebug(">>> Entering TokenReplace(accessLevel={AccessLevel})", accessLevel);
         }
 
         /// <summary>Initializes a new instance of the <see cref="TokenReplace"/> class for default context and the current module. </summary>
@@ -41,6 +47,9 @@ namespace DotNetNuke.Services.Tokens
         public TokenReplace(Scope accessLevel)
             : this(accessLevel, null, null, null, Null.NullInteger)
         {
+		Logger.LogDebug("<<< Exiting TokenReplace(accessLevel={AccessLevel})", accessLevel);
+		Logger.LogDebug(">>> Entering TokenReplace(accessLevel={AccessLevel},moduleID={ModuleID})", accessLevel, moduleID);
+		Logger.LogDebug("<<< Exiting TokenReplace(accessLevel={AccessLevel},moduleID={ModuleID})", accessLevel, moduleID);
         }
 
         /// <summary>Initializes a new instance of the <see cref="TokenReplace"/> class for custom context.</summary>
@@ -71,6 +80,7 @@ namespace DotNetNuke.Services.Tokens
         {
             this.CurrentAccessLevel = accessLevel;
 
+			Logger.LogDebug("TokenReplace(accessLevel={AccessLevel},language={Language},portalSettings={PortalSettings},user={User},moduleID={ModuleID}): this.CurrentAccessLevel → {Arg5}", accessLevel, language, portalSettings, user, moduleID, this.CurrentAccessLevel);
             if (accessLevel != Scope.NoSettings)
             {
                 this.DeterminePortal(portalSettings);
@@ -121,6 +131,12 @@ namespace DotNetNuke.Services.Tokens
         /// <returns>string containing replaced values.</returns>
         public string ReplaceEnvironmentTokens(string sourceText)
         {
+			Logger.LogDebug(">>> Entering ReplaceEnvironmentTokens(sourceText={SourceText})", sourceText);
+			Logger.LogDebug("<<< Exiting ReplaceEnvironmentTokens(sourceText={SourceText})", sourceText);
+			Logger.LogDebug("<<< Exiting ReplaceEnvironmentTokens(sourceText={SourceText},row={Row})", sourceText, row);
+			Logger.LogDebug("<<< Exiting ReplaceEnvironmentTokens(sourceText={SourceText},custom={Custom},customCaption={CustomCaption})", sourceText, custom, customCaption);
+			Logger.LogDebug("<<< Exiting ReplaceEnvironmentTokens(sourceText={SourceText},custom={Custom},customCaptions={CustomCaptions})", sourceText, custom, customCaptions);
+			Logger.LogDebug("<<< Exiting ReplaceEnvironmentTokens(sourceText={SourceText},custom={Custom},customCaption={CustomCaption},row={Row})", sourceText, custom, customCaption, row);
             return this.ReplaceTokens(sourceText);
         }
 
@@ -193,7 +209,9 @@ namespace DotNetNuke.Services.Tokens
         /// <returns>string containing replaced values.</returns>
         protected override string ReplaceTokens(string sourceText)
         {
+			Logger.LogDebug(">>> Entering ReplaceTokens(sourceText={SourceText})", sourceText);
             this.InitializePropertySources();
+			Logger.LogDebug("<<< Exiting ReplaceTokens(sourceText={SourceText})", sourceText);
             return base.ReplaceTokens(sourceText);
         }
 
@@ -201,8 +219,10 @@ namespace DotNetNuke.Services.Tokens
         /// <remarks>security is not the purpose of the initialization, this is in the responsibility of each property access class.</remarks>
         private void InitializePropertySources()
         {
+			Logger.LogDebug(">>> Entering InitializePropertySources()");
             // Cleanup, by default "" is returned for these objects and any property
             IPropertyAccess defaultPropertyAccess = new EmptyPropertyAccess();
+			Logger.LogDebug("InitializePropertySources(): defaultPropertyAccess → {DefaultPropertyAccess}", defaultPropertyAccess);
             this.AddPropertySource("portal", defaultPropertyAccess);
             this.AddPropertySource("tab", defaultPropertyAccess);
             this.AddPropertySource("host", defaultPropertyAccess);
@@ -233,6 +253,7 @@ namespace DotNetNuke.Services.Tokens
                 this.AddPropertySource("membership", new MembershipPropertyAccess(this.User));
                 this.AddPropertySource("profile", new ProfilePropertyAccess(this.User));
             }
+			Logger.LogDebug("<<< Exiting InitializePropertySources()");
         }
 
         /// <summary>Load the module for the Module Token Provider.</summary>
@@ -244,6 +265,7 @@ namespace DotNetNuke.Services.Tokens
         /// </remarks>
         private ModuleInfo GetModule(int moduleId)
         {
+			Logger.LogDebug(">>> Entering GetModule(moduleId={ModuleId})", moduleId);
             if (moduleId == this.TokenContext.Module?.ModuleID)
             {
                 return this.TokenContext.Module;
@@ -257,6 +279,7 @@ namespace DotNetNuke.Services.Tokens
             var tab = this.TokenContext.Tab ?? this.PortalSettings?.ActiveTab;
             if (tab != null && tab.TabID > 0)
             {
+			Logger.LogDebug("<<< Exiting GetModule(moduleId={ModuleId})", moduleId);
                 return ModuleController.Instance.GetModule(moduleId, tab.TabID, false);
             }
 
@@ -265,26 +288,37 @@ namespace DotNetNuke.Services.Tokens
 
         private void DeterminePortal(PortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering DeterminePortal(portalSettings={PortalSettings})", portalSettings);
             this.PortalSettings = portalSettings ?? PortalSettings.Current;
+			Logger.LogDebug("DeterminePortal(portalSettings={PortalSettings}): this.PortalSettings → {Arg1}", portalSettings, this.PortalSettings);
+			Logger.LogDebug("<<< Exiting DeterminePortal(portalSettings={PortalSettings})", portalSettings);
         }
 
         private void DetermineUser(UserInfo user)
         {
+			Logger.LogDebug(">>> Entering DetermineUser(user={User})", user);
             this.AccessingUser = HttpContext.Current != null ? (UserInfo)HttpContext.Current.Items["UserInfo"] : new UserInfo();
             this.User = user ?? this.AccessingUser;
+			Logger.LogDebug("DetermineUser(user={User}): this.User → {Arg1}", user, this.User);
+			Logger.LogDebug("<<< Exiting DetermineUser(user={User})", user);
         }
 
         private void DetermineLanguage(string language)
         {
+			Logger.LogDebug(">>> Entering DetermineLanguage(language={Language})", language);
             this.Language = string.IsNullOrEmpty(language) ? new Localization.Localization().CurrentUICulture : language;
+			Logger.LogDebug("<<< Exiting DetermineLanguage(language={Language})", language);
         }
 
         private void DetermineModule(int moduleID)
         {
+			Logger.LogDebug(">>> Entering DetermineModule(moduleID={ModuleID})", moduleID);
             if (moduleID != Null.NullInteger)
             {
                 this.ModuleId = moduleID;
+				Logger.LogDebug("DetermineModule(moduleID={ModuleID}): this.ModuleId → {Arg1}", moduleID, this.ModuleId);
             }
+			Logger.LogDebug("<<< Exiting DetermineModule(moduleID={ModuleID})", moduleID);
         }
     }
 }

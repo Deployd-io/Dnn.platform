@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function() {
+logger.debug('>>> Entering function()');
   var mode = CodeMirror.getMode({indentUnit: 2}, "javascript");
   function MT(name) { test.mode(name, mode, Array.prototype.slice.call(arguments, 1)); }
 
@@ -163,7 +165,9 @@
     {name: "javascript", jsonld: true}
   );
   function LD(name) {
+	logger.debug(`>>> Entering LD(name=${name})`);
     test.mode(name, jsonld_mode, Array.prototype.slice.call(arguments, 1));
+	logger.debug(`<<< Exiting LD(name=${name})`);
   }
 
   LD("json_ld_keywords",

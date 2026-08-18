@@ -17,12 +17,17 @@ namespace Dnn.PersonaBar.SiteImportExport.MenuControllers
         /// <inheritdoc />
         public void UpdateParameters(MenuItem menuItem)
         {
+		eventLogger.LogDebug(">>> Entering UpdateParameters(menuItem={MenuItem})", menuItem);
+		eventLogger.LogDebug("<<< Exiting UpdateParameters(menuItem={MenuItem})", menuItem);
         }
 
         /// <inheritdoc />
         public bool Visible(MenuItem menuItem)
         {
+			eventLogger.LogDebug(">>> Entering Visible(menuItem={MenuItem})", menuItem);
             var user = UserController.Instance.GetCurrentUserInfo();
+			eventLogger.LogDebug("Visible(menuItem={MenuItem}): user → {User}", menuItem, user);
+			eventLogger.LogDebug("<<< Exiting Visible(menuItem={MenuItem})", menuItem);
             return user.IsSuperUser;
         }
 

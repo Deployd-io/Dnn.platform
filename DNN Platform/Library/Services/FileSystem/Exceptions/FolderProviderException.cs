@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.FileSystem
     [Serializable]
     public class FolderProviderException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FolderProviderException));
         /// <summary>Initializes a new instance of the <see cref="FolderProviderException"/> class.</summary>
         public FolderProviderException()
         {
+		Logger.LogDebug(">>> Entering FolderProviderException()");
+		Logger.LogDebug("<<< Exiting FolderProviderException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="FolderProviderException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Services.FileSystem
         public FolderProviderException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering FolderProviderException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting FolderProviderException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="FolderProviderException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

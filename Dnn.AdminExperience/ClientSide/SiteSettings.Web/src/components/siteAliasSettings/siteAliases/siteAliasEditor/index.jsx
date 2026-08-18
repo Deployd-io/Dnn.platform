@@ -8,10 +8,12 @@ import {
 } from "../../../../actions";
 import util from "../../../../utils";
 import resx from "../../../../resources";
+const logger = console;
 
 class SiteAliasEditor extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
 
         this.state = {
             aliasDetail: {
@@ -29,17 +31,21 @@ class SiteAliasEditor extends Component {
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const {props} = this;
         if (props.aliasId) {
             props.dispatch(SiteBehaviorActions.getSiteAlias(props.aliasId));
+			logger.debug('<<< Exiting componentDidMount()');
         }
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         const {props, state} = this;
         if ((props !== prevProps) && props.aliasDetail ) {
             if (props.aliasDetail["HTTPAlias"] === undefined || props.aliasDetail["HTTPAlias"] === "") {
                 state.error["alias"] = true;
+				logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
             }
             else if (props.aliasDetail["HTTPAlias"] !== "" && props.aliasDetail["HTTPAlias"] !== undefined) {
                 state.error["alias"] = false;
@@ -54,11 +60,14 @@ class SiteAliasEditor extends Component {
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let {state, props} = this;
         let aliasDetail = Object.assign({}, state.aliasDetail);
+		logger.debug(`onSettingChange(key=${key},event=${event}): aliasDetail → ${aliasDetail}`);
 
         if (aliasDetail[key] === "" && key === "HTTPAlias") {
             state.error["alias"] = true;
+			logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
         }
         else if (aliasDetail[key] !== "" && key === "HTTPAlias") {
             state.error["alias"] = false;
@@ -81,9 +90,11 @@ class SiteAliasEditor extends Component {
     }
 
     getBrowserOptions() {
+		logger.debug('>>> Entering getBrowserOptions()');
         let options = [];
         if (this.props.siteAliases.BrowserTypes !== undefined) {
             options = this.props.siteAliases.BrowserTypes.map((item) => {
+		logger.debug('<<< Exiting getBrowserOptions()');
                 return { label: item, value: item };
             });
         }
@@ -91,6 +102,7 @@ class SiteAliasEditor extends Component {
     }
 
     getLanguageOptions() {
+		logger.debug('>>> Entering getLanguageOptions()');
         let options = [];
         const noneSpecifiedText = "<" + resx.get("NoneSpecified") + ">";
         if (this.props.siteAliases.Languages !== undefined) {
@@ -99,10 +111,13 @@ class SiteAliasEditor extends Component {
             });
             options.unshift({ label: noneSpecifiedText, value: "" });
         }
+		logger.debug(`getLanguageOptions(): noneSpecifiedText → ${noneSpecifiedText}`);
+		logger.debug('<<< Exiting getLanguageOptions()');
         return options;
     }
 
     getSkinOptions() {
+		logger.debug('>>> Entering getSkinOptions()');
         let options = [];
         const noneSpecifiedText = "<" + resx.get("NoneSpecified") + ">";
         if (this.props.siteAliases.Skins !== undefined) {
@@ -111,10 +126,13 @@ class SiteAliasEditor extends Component {
             });
             options.unshift({ label: noneSpecifiedText, value: "" });
         }
+		logger.debug(`getSkinOptions(): noneSpecifiedText → ${noneSpecifiedText}`);
+		logger.debug('<<< Exiting getSkinOptions()');
         return options;
     }
 
     onSave() {
+		logger.debug('>>> Entering onSave()');
         const {props, state} = this;
         this.setState({
             triedToSubmit: true
@@ -124,9 +142,11 @@ class SiteAliasEditor extends Component {
         }
 
         props.onUpdate(state.aliasDetail);
+		logger.debug('<<< Exiting onSave()');
     }
 
     onChangePrimary(isPrimary) {
+		logger.debug(`>>> Entering onChangePrimary(isPrimary=${isPrimary})`);
         const {props, state} = this;
         this.setState({
             triedToSubmit: true
@@ -135,15 +155,18 @@ class SiteAliasEditor extends Component {
             return;
         }
         let aliasDetail = Object.assign({}, state.aliasDetail);
+		logger.debug(`onChangePrimary(isPrimary=${isPrimary}): aliasDetail → ${aliasDetail}`);
         aliasDetail["IsPrimary"] = isPrimary;
         this.setState({
             aliasDetail: aliasDetail
         }, () => {
             props.onUpdate(aliasDetail);
         });
+		logger.debug(`<<< Exiting onChangePrimary(isPrimary=${isPrimary})`);
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const {props} = this;
         if (props.siteAliasClientModified) {
             util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
@@ -153,11 +176,13 @@ class SiteAliasEditor extends Component {
         }
         else {
             props.Collapse();
+			logger.debug('<<< Exiting onCancel()');
         }
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
          
         if (this.state.aliasDetail !== undefined || this.props.id === "add") {
             const columnOne = <div key="column-one" className="left-column">
@@ -210,6 +235,7 @@ class SiteAliasEditor extends Component {
                 </InputGroup>
             </div>;
 
+			logger.debug('<<< Exiting render()');
             return (
                 <div className="alias-editor">
                     <GridSystem numberOfColumns={2}>{[columnOne, columnTwo]}</GridSystem>
@@ -249,6 +275,8 @@ SiteAliasEditor.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         aliasDetail: state.siteBehavior.aliasDetail,
         siteAliases: state.siteBehavior.siteAliases,

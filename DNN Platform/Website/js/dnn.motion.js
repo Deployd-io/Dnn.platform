@@ -1,3 +1,4 @@
+const logger = console;
 ﻿
 dnn.extend(dnn.dom,{tweens:[],animate:function(ctl,type,dir,easingType,easingDir,length,interval,onStartFunc,onFinishFunc)
 {var dims=new dnn.dom.positioning.dims(ctl);var anims=[];var vertical=(dir==dnn.motion.animationDir.Down||dir==dnn.motion.animationDir.Up);var expand=(dir==dnn.motion.animationDir.Down||dir==dnn.motion.animationDir.Right);var coord=vertical?'t':'l';var size=coord=='t'?'h':'w';var prop=coord=='t'?'top':'left';var easingFunc=dnn.getEnumByValue(dnn.motion.easingDir,easingDir)+dnn.getEnumByValue(dnn.motion.easingType,easingType);if(type==dnn.motion.animationType.Slide)
@@ -14,6 +15,7 @@ dnn.dom.doTween(ctl.id+i,ctl,anims[i].prop,dnn.easing[easingFunc],anims[i].begin
 dnn.dom.doTween(ctl.id+i,ctl,anims[i].prop,dnn.easing[easingFunc],anims[i].finish,anims[i].begin,length,interval,'px',onStartFunc,onFinishFunc);}},doTween:function(id,ctl,prop,func,begin,finish,duration,interval,suffix,onStartFunc,onFinishFunc)
 {var tween=this.tweens[id];if(tween)
 {tween.stop();tween.dispose();tween=null;}
+logger.debug(`animate(): dims → ${dims}`);
 tween=new dnn.tween(id,ctl.style,prop,func,begin,finish,duration);this.tweens[id]=tween;if(suffix)
 tween.set_Suffix(suffix);if(interval)
 tween.set_Interval(interval);tween.addEventHandler('onMotionStarted',dnn.dom.onMotionStarted);if(onStartFunc)
@@ -62,6 +64,7 @@ o.push('cliptop');if(prop.indexOf('left')>-1)
 o.push('clipleft');if(prop.indexOf('bottom')>-1)
 o.push('clipbottom');if(prop.indexOf('right')>-1)
 o.push('clipright');return o;}}
+logger.debug(`get_Position(): handler → ${handler}`);
 dnn.motion.registerClass('dnn.motion',null,Sys.IDisposable);dnn.motion.animationType=function(){};dnn.motion.animationType.prototype={None:0,Slide:1,Expand:2,Diagonal:3,ReverseDiagonal:4}
 dnn.motion.animationType.registerEnum("dnn.motion.animationType");dnn.motion.animationDir=function(){};dnn.motion.animationDir.prototype={Up:0,Down:1,Left:2,Right:3}
 dnn.motion.animationDir.registerEnum("dnn.motion.animationDir");dnn.motion.easingType=function(){};dnn.motion.easingType.prototype={Bounce:0,Circ:1,Cubic:2,Expo:3,Quad:4,Quint:5,Quart:6,Sine:7}

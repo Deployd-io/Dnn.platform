@@ -6,6 +6,7 @@ import util from "../../../utils";
 import resx from "../../../resources";
 import { Dropdown as Select, GridSystem as Grid, Switch, Button, SingleLineInputWithError, MultiLineInput, Label }  from "@dnnsoftware/dnn-react-common";
 import RoleGroupEditor from "./RoleGroupEditor";
+const logger = console;
 import {
     roles as RolesActions
 } from "../../../actions";
@@ -13,6 +14,7 @@ import {
 class RolesEditor extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         let roleDetails = Object.assign({}, props.roleDetails);
         this.state = {
             roleDetails: props.roleId !== -1 ? roleDetails : {
@@ -35,10 +37,15 @@ class RolesEditor extends Component {
             createGroupVisible: false
         };
         this.submitted = false;
+		logger.debug(`constructor(props=${props}): roleDetails → ${roleDetails}`);
+		logger.debug(`constructor(props=${props}): this.submitted → ${this.submitted}`);
+		logger.debug(`constructor(props=${props}): this.state → ${this.state}`);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     getValue(selectKey) {
         const { state } = this;
+		logger.debug(`>>> Entering getValue(selectKey=${selectKey})`);
         switch (selectKey) {
             case "RoleGroup":
                 return state.roleDetails.groupId !== undefined ? state.roleDetails.groupId : -1;
@@ -53,9 +60,11 @@ class RolesEditor extends Component {
             default:
                 break;
         }
+		logger.debug(`<<< Exiting getValue(selectKey=${selectKey})`);
     }
 
     onDropDownChange(key, option) {
+		logger.debug(`>>> Entering onDropDownChange(key=${key},option=${option})`);
         if (key === "groupId" && option.value === -3) {
             let createGroupVisible = true;
             this.setState({
@@ -63,11 +72,15 @@ class RolesEditor extends Component {
             });
         }
         this.performChange(key, option.value);
+		logger.debug(`<<< Exiting onDropDownChange(key=${key},option=${option})`);
     }
     onTextChange(key, event) {
+		logger.debug(`>>> Entering onTextChange(key=${key},event=${event})`);
         this.performChange(key, event.target.value);
+		logger.debug(`<<< Exiting onTextChange(key=${key},event=${event})`);
     }
     performChange(key, value) {
+		logger.debug(`>>> Entering performChange(key=${key},value=${value})`);
         if (key !== "assignToUsers") {
             let { roleDetails } = this.state;
             roleDetails[key] = value;
@@ -87,16 +100,22 @@ class RolesEditor extends Component {
         }, () => {
             this.validateForm();
         });
+		logger.debug(`performChange(key=${key},value=${value}): state.formModified → ${state.formModified}`);
+		logger.debug(`<<< Exiting performChange(key=${key},value=${value})`);
     }
 
     onSwitchToggle(key, status) {
+		logger.debug(`>>> Entering onSwitchToggle(key=${key},status=${status})`);
         this.performChange(key, status);
+		logger.debug(`<<< Exiting onSwitchToggle(key=${key},status=${status})`);
     }
     addUpdateRoleDetails(event) {
+		logger.debug(`>>> Entering addUpdateRoleDetails(event=${event})`);
         event.preventDefault();
         const { props, state } = this;
         this.submitted = true;
         if (!this.validateForm()) {
+			logger.debug(`addUpdateRoleDetails(event=${event}): this.submitted → ${this.submitted}`);
             return;
         }
 
@@ -107,6 +126,7 @@ class RolesEditor extends Component {
             }
 
             let successMsg = resx.get("RoleAdded.Message");
+			logger.debug(`addUpdateRoleDetails(event=${event}): successMsg → ${successMsg}`);
             let errorMsg = resx.get("RoleAdded.Error");
             if (props.roleId > 0) {
                 successMsg = resx.get("RoleUpdated.Message");
@@ -122,6 +142,7 @@ class RolesEditor extends Component {
         else {
             props.Collapse(event);
         }
+		logger.debug(`<<< Exiting addUpdateRoleDetails(event=${event})`);
     }
 
     validateForm() {
@@ -139,13 +160,16 @@ class RolesEditor extends Component {
         return valid;
     }
     refreshRolesListIfRequired() {
+		logger.debug('>>> Entering refreshRolesListIfRequired()');
         const { props, state } = this;
         let group = props.roleGroups.find(group => group.id === state.groupId);
         if (group !== undefined && group.rolesCount <= 1) {
             props.refreshRolesList();
+			logger.debug('<<< Exiting refreshRolesListIfRequired()');
         }
     }
     deleteRole(event) {
+		logger.debug(`>>> Entering deleteRole(event=${event})`);
         let { roleDetails } = this.state;
         const { props } = this;
         if (props.roleId > 0) {
@@ -158,9 +182,11 @@ class RolesEditor extends Component {
         }
         else {
             util.utilities.notify(resx.get("DeleteInconsistency.Error"));
+			logger.debug(`<<< Exiting deleteRole(event=${event})`);
         }
     }
     getRoleGroupOptions() {
+		logger.debug('>>> Entering getRoleGroupOptions()');
         let groupOptions = this.props.roleGroupOptions;
         groupOptions = groupOptions.filter(group => {
             return group.value !== -2;
@@ -168,6 +194,7 @@ class RolesEditor extends Component {
         groupOptions = [{
             label: <span className="do-not-close">{resx.get("lblNewGroup")}</span>, value: -3
         }].concat(groupOptions);
+		logger.debug('<<< Exiting getRoleGroupOptions()');
         return groupOptions;
     }
     CloseCreateGroup() {
@@ -189,6 +216,7 @@ class RolesEditor extends Component {
     }
      
     render() {
+		logger.debug('>>> Entering render()');
         let { state, props } = this;
         const columnOne = <div key="editor-container-columnOne" className="editor-container">
             <div className="editor-row divider" style={{marginTop:"-3rem"}}>
@@ -352,6 +380,7 @@ class RolesEditor extends Component {
         children.push(columnOne);
         children.push(columnTwo);
          
+		logger.debug('<<< Exiting render()');
         return (
             <div className="role-details-editor">
                 <Grid numberOfColumns={2}>{children}</Grid>
@@ -396,6 +425,8 @@ RolesEditor.propTypes = {
     rsvpLink: PropTypes.string
 };
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         roleGroups: state.roles.roleGroups,
         rsvpLink: state.roles.rsvpLink

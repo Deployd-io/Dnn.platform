@@ -3,18 +3,23 @@ import PropTypes from "prop-types";
 import { GridCell, Collapsible, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import ControlFields from "./ControlFields";
 import "./style.less";
+const logger = console;
 
 
 class ControlRow extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             isOpened: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={"module-control-row" + (props.isEditMode ? " row-opened" : "")}>
                 <GridCell columnSize={15} className="module-control-title">

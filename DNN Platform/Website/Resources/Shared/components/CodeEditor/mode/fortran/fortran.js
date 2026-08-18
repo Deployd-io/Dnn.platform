@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,12 +13,15 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("fortran", function() {
   function words(array) {
+	logger.debug(`>>> Entering words(array=${array})`);
     var keys = {};
     for (var i = 0; i < array.length; ++i) {
       keys[array[i]] = true;
     }
+	logger.debug(`<<< Exiting words(array=${array})`);
     return keys;
   }
 
@@ -115,12 +120,14 @@ CodeMirror.defineMode("fortran", function() {
   var litOperator = new RegExp("(\.and\.|\.or\.|\.eq\.|\.lt\.|\.le\.|\.gt\.|\.ge\.|\.ne\.|\.not\.|\.eqv\.|\.neqv\.)", "i");
 
   function tokenBase(stream, state) {
+logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
 
     if (stream.match(litOperator)){
         return 'operator';
     }
 
     var ch = stream.next();
+	logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
     if (ch == "!") {
       stream.skipToEnd();
       return "comment";
@@ -142,17 +149,20 @@ CodeMirror.defineMode("fortran", function() {
     }
     stream.eatWhile(/[\w\$_]/);
     var word = stream.current().toLowerCase();
+	logger.debug(`tokenBase(stream=${stream},state=${state}): word → ${word}`);
 
     if (keywords.hasOwnProperty(word)){
             return 'keyword';
     }
     if (builtins.hasOwnProperty(word) || dataTypes.hasOwnProperty(word)) {
+	logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
             return 'builtin';
     }
     return "variable";
   }
 
   function tokenString(quote) {
+	logger.debug(`>>> Entering tokenString(quote=${quote})`);
     return function(stream, state) {
       var escaped = false, next, end = false;
       while ((next = stream.next()) != null) {
@@ -163,6 +173,7 @@ CodeMirror.defineMode("fortran", function() {
         escaped = !escaped && next == "\\";
       }
       if (end || !escaped) state.tokenize = null;
+	logger.debug(`<<< Exiting tokenString(quote=${quote})`);
       return "string";
     };
   }
@@ -171,13 +182,18 @@ CodeMirror.defineMode("fortran", function() {
 
   return {
     startState: function() {
+	logger.debug('>>> Entering startState()');
+	logger.debug('<<< Exiting startState()');
       return {tokenize: null};
     },
 
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       if (stream.eatSpace()) return null;
       var style = (state.tokenize || tokenBase)(stream, state);
+	logger.debug(`token(stream=${stream},state=${state}): style → ${style}`);
       if (style == "comment" || style == "meta") return style;
+	logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
       return style;
     }
   };

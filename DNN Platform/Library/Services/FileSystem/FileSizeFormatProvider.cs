@@ -10,6 +10,7 @@ namespace DotNetNuke.Services.FileSystem
 
     public class FileSizeFormatProvider : IFormatProvider, ICustomFormatter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FileSizeFormatProvider));
         private const string FileSizeFormat = "fs";
         private const decimal OneKiloByte = 1024;
         private const decimal OneMegaByte = OneKiloByte * 1024;
@@ -18,6 +19,10 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         public object GetFormat(Type formatType)
         {
+			Logger.LogDebug(">>> Entering GetFormat(formatType={FormatType})", formatType);
+			Logger.LogDebug(">>> Entering Format(format={Format},arg={Arg},formatProvider={FormatProvider})", format, arg, formatProvider);
+			Logger.LogDebug("<<< Exiting Format(format={Format},arg={Arg},formatProvider={FormatProvider})", format, arg, formatProvider);
+			Logger.LogDebug("<<< Exiting GetFormat(formatType={FormatType})", formatType);
             return formatType == typeof(ICustomFormatter) ? this : null;
         }
 
@@ -71,8 +76,10 @@ namespace DotNetNuke.Services.FileSystem
 
         private static string DefaultFormat(string format, object arg, IFormatProvider formatProvider)
         {
+			Logger.LogDebug(">>> Entering DefaultFormat(format={Format},arg={Arg},formatProvider={FormatProvider})", format, arg, formatProvider);
             if (arg is IFormattable formattableArg)
             {
+			Logger.LogDebug("<<< Exiting DefaultFormat(format={Format},arg={Arg},formatProvider={FormatProvider})", format, arg, formatProvider);
                 return formattableArg.ToString(format, formatProvider);
             }
 

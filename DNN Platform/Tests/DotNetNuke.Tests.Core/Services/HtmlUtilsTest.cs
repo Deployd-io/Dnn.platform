@@ -21,36 +21,46 @@ namespace DotNetNuke.Tests.Core.Services
         [SetUp]
         public void SetUp()
         {
+		mockEventLogger.LogDebug(">>> Entering SetUp()");
+		mockEventLogger.LogDebug("<<< Exiting SetUp()");
         }
 
         [Test]
         [Timeout(2000)]
         public void DNN_12430_IsHtml_RegExTimeout()
         {
+			mockEventLogger.LogDebug(">>> Entering DNN_12430_IsHtml_RegExTimeout()");
             var result =
                 HtmlUtils.IsHtml(
                     @"'New Event: <a href=\""http://localhost/dnn540/Home/tabid/40/ModuleID/389/ItemID/8/mctl/EventDetails/Default.aspx"">Test</a> on Saturday, May 08, 2010 2:00 AM to Saturday, May 08, 2010 2:30 AM  - One time event - has been added");
 
             Assert.That(result, Is.True);
+			mockEventLogger.LogDebug("<<< Exiting DNN_12430_IsHtml_RegExTimeout()");
         }
 
         [Test]
         [Timeout(2000)]
         public void DNN_12926_IsHtml_Detection()
         {
+			mockEventLogger.LogDebug(">>> Entering DNN_12926_IsHtml_Detection()");
             var result = HtmlUtils.IsHtml("this is a test of dnnmail: <a href='https://www.dnnsoftware.com'>DotNetNuke</a>");
 
+			mockEventLogger.LogDebug("DNN_12926_IsHtml_Detection(): result → {Result}", result);
             Assert.That(result, Is.True);
+			mockEventLogger.LogDebug("<<< Exiting DNN_12926_IsHtml_Detection()");
         }
 
         [TearDown]
         public void TearDown()
         {
+		mockEventLogger.LogDebug(">>> Entering TearDown()");
+		mockEventLogger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void HtmlUtils_CleanWithTagInfo_Should_Return_Clean_Content_With_Attribute_Values()
         {
+			mockEventLogger.LogDebug(">>> Entering HtmlUtils_CleanWithTagInfo_Should_Return_Clean_Content_With_Attribute_Values()");
             // Arrange
             this.SetUp();
             this._expected =
@@ -58,34 +68,41 @@ namespace DotNetNuke.Tests.Core.Services
 
             // Act
             object retValue = HtmlUtils.CleanWithTagInfo(HtmlStr, Filters, true);
+			mockEventLogger.LogDebug("HtmlUtils_CleanWithTagInfo_Should_Return_Clean_Content_With_Attribute_Values(): retValue → {RetValue}", retValue);
 
             // Assert
             Assert.That(retValue, Is.EqualTo(this._expected));
 
             // TearDown
             this.TearDown();
+			mockEventLogger.LogDebug("<<< Exiting HtmlUtils_CleanWithTagInfo_Should_Return_Clean_Content_With_Attribute_Values()");
         }
 
         [Test]
         public void HtmlUtils_CleanWithTagInfo_Should_Return_Clean_Content_Without_Attribute_Values()
         {
+			mockEventLogger.LogDebug(">>> Entering HtmlUtils_CleanWithTagInfo_Should_Return_Clean_Content_Without_Attribute_Values()");
             // Arrange
             this.SetUp();
             this._expected = "Hello World This is a sample HTML text for testing DotNetNuke Corp ";
+			mockEventLogger.LogDebug("HtmlUtils_CleanWithTagInfo_Should_Return_Clean_Content_Without_Attribute_Values(): this._expected → {Arg0}", this._expected);
 
             // Act
             object retValue = HtmlUtils.CleanWithTagInfo(HtmlStr, " ", true);
+			mockEventLogger.LogDebug("HtmlUtils_CleanWithTagInfo_Should_Return_Clean_Content_Without_Attribute_Values(): retValue → {RetValue}", retValue);
 
             // Assert
             Assert.That(retValue, Is.EqualTo(this._expected));
 
             // TearDown
             this.TearDown();
+			mockEventLogger.LogDebug("<<< Exiting HtmlUtils_CleanWithTagInfo_Should_Return_Clean_Content_Without_Attribute_Values()");
         }
 
         [Test]
         public void HtmlUtils_StripUnspecifiedTags_Should_Return_Attribute_Values()
         {
+			mockEventLogger.LogDebug(">>> Entering HtmlUtils_StripUnspecifiedTags_Should_Return_Attribute_Values()");
             // Arrange
             this.SetUp();
             this._expected =
@@ -93,29 +110,35 @@ namespace DotNetNuke.Tests.Core.Services
 
             // Act
             object retValue = HtmlUtils.StripUnspecifiedTags(HtmlStr, Filters, false);
+			mockEventLogger.LogDebug("HtmlUtils_StripUnspecifiedTags_Should_Return_Attribute_Values(): retValue → {RetValue}", retValue);
 
             // Assert
             Assert.That(retValue, Is.EqualTo(this._expected));
 
             // TearDown
             this.TearDown();
+			mockEventLogger.LogDebug("<<< Exiting HtmlUtils_StripUnspecifiedTags_Should_Return_Attribute_Values()");
         }
 
         [Test]
         public void HtmlUtils_StripUnspecifiedTags_Should_Not_Return_Attribute_Values()
         {
+			mockEventLogger.LogDebug(">>> Entering HtmlUtils_StripUnspecifiedTags_Should_Not_Return_Attribute_Values()");
             // Arrange
             this.SetUp();
             this._expected = "Hello World!This is a sample HTML text for testing!DotNetNuke Corp.";
+			mockEventLogger.LogDebug("HtmlUtils_StripUnspecifiedTags_Should_Not_Return_Attribute_Values(): this._expected → {Arg0}", this._expected);
 
             // Act
             object retValue = HtmlUtils.StripUnspecifiedTags(HtmlStr, " ", false);
+			mockEventLogger.LogDebug("HtmlUtils_StripUnspecifiedTags_Should_Not_Return_Attribute_Values(): retValue → {RetValue}", retValue);
 
             // Assert
             Assert.That(retValue, Is.EqualTo(this._expected));
 
             // TearDown
             this.TearDown();
+			mockEventLogger.LogDebug("<<< Exiting HtmlUtils_StripUnspecifiedTags_Should_Not_Return_Attribute_Values()");
         }
     }
 }

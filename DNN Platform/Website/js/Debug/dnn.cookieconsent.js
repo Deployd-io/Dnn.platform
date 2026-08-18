@@ -1,4 +1,6 @@
+const logger = console;
 ﻿document.addEventListener('DOMContentLoaded', function () {
+	logger.debug('>>> Entering addEventListener()');
     window.cookieconsentoptions = window.cookieconsentoptions || {};
     window.cookieconsentoptions.content = {
         message: window.dnn.getVar('cc_message'),
@@ -6,6 +8,7 @@
         link: window.dnn.getVar('cc_link')
     }
     if (window.dnn.getVar('cc_morelink') != '') {
+		logger.debug(`addEventListener(): window.cookieconsentoptions → ${window.cookieconsentoptions}`);
         window.cookieconsentoptions.content.href = window.dnn.getVar('cc_morelink')
     }
     if (!window.cookieconsentoptions.palette) {
@@ -18,5 +21,6 @@
             }
         }
     }
+	logger.debug('<<< Exiting addEventListener()');
     window.cookieconsent.initialise(window.cookieconsentoptions);
 });

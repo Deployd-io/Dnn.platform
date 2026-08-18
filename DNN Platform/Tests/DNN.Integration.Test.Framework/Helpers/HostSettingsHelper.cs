@@ -5,12 +5,17 @@
 namespace DNN.Integration.Test.Framework.Helpers
 {
     using System;
+	using Microsoft.Extensions.Logging;
 
     public static class HostSettingsHelper
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public static string GetHostSettingValue(string hostSettingName)
         {
+			_logger.LogDebug(">>> Entering GetHostSettingValue(hostSettingName={HostSettingName})", hostSettingName);
             var query = string.Format("SELECT TOP(1) SettingValue FROM {{objectQualifier}}HostSettings WHERE SettingName='" + hostSettingName + "';");
+			_logger.LogDebug("GetHostSettingValue(hostSettingName={HostSettingName}): query → {Query}", hostSettingName, query);
+			_logger.LogDebug("<<< Exiting GetHostSettingValue(hostSettingName={HostSettingName})", hostSettingName);
             return DatabaseHelper.ExecuteScalar<string>(query);
         }
 
@@ -24,8 +29,10 @@ namespace DNN.Integration.Test.Framework.Helpers
         public static bool AddSettingIfMissing(string settingName, string settingValue, bool clearCache = true,
             bool recycleAppIfAdded = false)
         {
+			_logger.LogDebug(">>> Entering AddSettingIfMissing(settingName={SettingName},settingValue={SettingValue},clearCache={ClearCache},recycleAppIfAdded={RecycleAppIfAdded})", settingName, settingValue, clearCache, recycleAppIfAdded);
             var currentValue = GetHostSettingValue(settingName);
             if (!string.IsNullOrEmpty(currentValue))
+			_logger.LogDebug("AddSettingIfMissing(settingName={SettingName},settingValue={SettingValue},clearCache={ClearCache},recycleAppIfAdded={RecycleAppIfAdded}): currentValue → {CurrentValue}", settingName, settingValue, clearCache, recycleAppIfAdded, currentValue);
             {
                 return false;
             }
@@ -35,6 +42,8 @@ namespace DNN.Integration.Test.Framework.Helpers
                 @"VALUES(N'{0}', N'{1}', '0', {{ts: '{2:yyyy-MM-dd HH:mm.ss.fff}'}})",
                 settingName.Replace("'", "''"), settingValue.Replace("'", "''"), DateTime.UtcNow);
 
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			_logger.LogInformation("AddSettingIfMissing(settingName,settingValue,clearCache,recycleAppIfAdded)={SettingName},{SettingValue},{ClearCache},{RecycleAppIfAdded}: save query executed in {Arg4} ms", settingName, settingValue, clearCache, recycleAppIfAdded, __logStart.ElapsedMilliseconds);
             DatabaseHelper.ExecuteNonQuery(query);
 
             if (recycleAppIfAdded)
@@ -46,6 +55,7 @@ namespace DNN.Integration.Test.Framework.Helpers
                 WebApiTestHelper.ClearHostCache();
             }
 
+			_logger.LogDebug("<<< Exiting AddSettingIfMissing(settingName={SettingName},settingValue={SettingValue},clearCache={ClearCache},recycleAppIfAdded={RecycleAppIfAdded})", settingName, settingValue, clearCache, recycleAppIfAdded);
             return true;
         }
     }

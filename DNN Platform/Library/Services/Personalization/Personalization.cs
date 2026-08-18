@@ -21,12 +21,17 @@ namespace DotNetNuke.Services.Personalization
     /// <summary>Provides access to user personalization.</summary>
     public partial class Personalization
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Personalization));
         /// <summary>load users profile and extract value base on naming container and key.</summary>
         /// <param name="namingContainer">Container for related set of values.</param>
         /// <param name="key">Individual profile key.</param>
         /// <returns>The profile as an object.</returns>
         public static object GetProfile(string namingContainer, string key)
         {
+			Logger.LogDebug(">>> Entering GetProfile(namingContainer={NamingContainer},key={Key})", namingContainer, key);
+			Logger.LogDebug("<<< Exiting GetProfile(namingContainer={NamingContainer},key={Key})", namingContainer, key);
+			Logger.LogDebug("<<< Exiting GetProfile(personalizationController={PersonalizationController},namingContainer={NamingContainer},key={Key})", personalizationController, namingContainer, key);
+			Logger.LogDebug("<<< Exiting GetProfile(personalization={Personalization},namingContainer={NamingContainer},key={Key})", personalization, namingContainer, key);
             return GetProfile(personalizationController: null, namingContainer, key);
         }
 
@@ -56,6 +61,10 @@ namespace DotNetNuke.Services.Personalization
         /// <returns>The profile as an object.</returns>
         public static object GetSecureProfile(string namingContainer, string key)
         {
+			Logger.LogDebug(">>> Entering GetSecureProfile(namingContainer={NamingContainer},key={Key})", namingContainer, key);
+			Logger.LogDebug("<<< Exiting GetSecureProfile(namingContainer={NamingContainer},key={Key})", namingContainer, key);
+			Logger.LogDebug("<<< Exiting GetSecureProfile(personalizationController={PersonalizationController},namingContainer={NamingContainer},key={Key})", personalizationController, namingContainer, key);
+			Logger.LogDebug("<<< Exiting GetSecureProfile(personalization={Personalization},namingContainer={NamingContainer},key={Key})", personalization, namingContainer, key);
             return GetSecureProfile(personalizationController: null, namingContainer, key);
         }
 
@@ -112,7 +121,9 @@ namespace DotNetNuke.Services.Personalization
         /// <param name="key">Individual profile key.</param>
         public static void RemoveProfile(string namingContainer, string key)
         {
+			Logger.LogDebug(">>> Entering RemoveProfile(namingContainer={NamingContainer},key={Key})", namingContainer, key);
             RemoveProfile(personalizationController: null, namingContainer, key);
+			Logger.LogDebug("<<< Exiting RemoveProfile(namingContainer={NamingContainer},key={Key})", namingContainer, key);
         }
 
         /// <summary>
@@ -124,7 +135,9 @@ namespace DotNetNuke.Services.Personalization
         /// <param name="key">Individual profile key.</param>
         public static void RemoveProfile(PersonalizationController personalizationController, string namingContainer, string key)
         {
+			Logger.LogDebug(">>> Entering RemoveProfile(personalizationController={PersonalizationController},namingContainer={NamingContainer},key={Key})", personalizationController, namingContainer, key);
             RemoveProfile(LoadProfile(personalizationController), namingContainer, key);
+			Logger.LogDebug("<<< Exiting RemoveProfile(personalizationController={PersonalizationController},namingContainer={NamingContainer},key={Key})", personalizationController, namingContainer, key);
         }
 
         /// <summary>
@@ -136,11 +149,14 @@ namespace DotNetNuke.Services.Personalization
         /// <param name="key">Individual profile key.</param>
         public static void RemoveProfile(PersonalizationInfo personalization, string namingContainer, string key)
         {
+			Logger.LogDebug(">>> Entering RemoveProfile(personalization={Personalization},namingContainer={NamingContainer},key={Key})", personalization, namingContainer, key);
             if (personalization != null)
             {
                 personalization.Profile.Remove(namingContainer + ":" + key);
                 personalization.IsModified = true;
+				Logger.LogDebug("RemoveProfile(personalization={Personalization},namingContainer={NamingContainer},key={Key}): personalization.IsModified → {Arg3}", personalization, namingContainer, key, personalization.IsModified);
             }
+			Logger.LogDebug("<<< Exiting RemoveProfile(personalization={Personalization},namingContainer={NamingContainer},key={Key})", personalization, namingContainer, key);
         }
 
         /// <summary>persist profile value -use naming container and key to organize.</summary>
@@ -149,7 +165,9 @@ namespace DotNetNuke.Services.Personalization
         /// <param name="value">Individual profile value.</param>
         public static void SetProfile(string namingContainer, string key, object value)
         {
+			Logger.LogDebug(">>> Entering SetProfile(namingContainer={NamingContainer},key={Key},value={Value})", namingContainer, key, value);
             SetProfile(personalizationController: null, namingContainer, key, value);
+			Logger.LogDebug("<<< Exiting SetProfile(namingContainer={NamingContainer},key={Key},value={Value})", namingContainer, key, value);
         }
 
         /// <summary>persist profile value -use naming container and key to organize.</summary>
@@ -159,7 +177,9 @@ namespace DotNetNuke.Services.Personalization
         /// <param name="value">Individual profile value.</param>
         public static void SetProfile(PersonalizationController personalizationController, string namingContainer, string key, object value)
         {
+			Logger.LogDebug(">>> Entering SetProfile(personalizationController={PersonalizationController},namingContainer={NamingContainer},key={Key},value={Value})", personalizationController, namingContainer, key, value);
             SetProfile(LoadProfile(personalizationController), namingContainer, key, value);
+			Logger.LogDebug("<<< Exiting SetProfile(personalizationController={PersonalizationController},namingContainer={NamingContainer},key={Key},value={Value})", personalizationController, namingContainer, key, value);
         }
 
         /// <summary>persist value stored in PersonalizationInfo obhect - use naming container and key to organize.</summary>
@@ -169,11 +189,14 @@ namespace DotNetNuke.Services.Personalization
         /// <param name="value">Individual profile value.</param>
         public static void SetProfile(PersonalizationInfo personalization, string namingContainer, string key, object value)
         {
+			Logger.LogDebug(">>> Entering SetProfile(personalization={Personalization},namingContainer={NamingContainer},key={Key},value={Value})", personalization, namingContainer, key, value);
             if (personalization != null)
             {
                 personalization.Profile[namingContainer + ":" + key] = value;
                 personalization.IsModified = true;
+				Logger.LogDebug("SetProfile(personalization={Personalization},namingContainer={NamingContainer},key={Key},value={Value}): personalization.IsModified → {Arg4}", personalization, namingContainer, key, value, personalization.IsModified);
             }
+			Logger.LogDebug("<<< Exiting SetProfile(personalization={Personalization},namingContainer={NamingContainer},key={Key},value={Value})", personalization, namingContainer, key, value);
         }
 
         /// <summary>
@@ -185,7 +208,9 @@ namespace DotNetNuke.Services.Personalization
         /// <param name="value">Individual profile value.</param>
         public static void SetSecureProfile(string namingContainer, string key, object value)
         {
+			Logger.LogDebug(">>> Entering SetSecureProfile(namingContainer={NamingContainer},key={Key},value={Value})", namingContainer, key, value);
             SetSecureProfile(personalizationController: null, namingContainer, key, value);
+			Logger.LogDebug("<<< Exiting SetSecureProfile(namingContainer={NamingContainer},key={Key},value={Value})", namingContainer, key, value);
         }
 
         /// <summary>
@@ -198,7 +223,9 @@ namespace DotNetNuke.Services.Personalization
         /// <param name="value">Individual profile value.</param>
         public static void SetSecureProfile(PersonalizationController personalizationController, string namingContainer, string key, object value)
         {
+			Logger.LogDebug(">>> Entering SetSecureProfile(personalizationController={PersonalizationController},namingContainer={NamingContainer},key={Key},value={Value})", personalizationController, namingContainer, key, value);
             SetSecureProfile(LoadProfile(personalizationController), namingContainer, key, value);
+			Logger.LogDebug("<<< Exiting SetSecureProfile(personalizationController={PersonalizationController},namingContainer={NamingContainer},key={Key},value={Value})", personalizationController, namingContainer, key, value);
         }
 
         /// <summary>
@@ -224,6 +251,7 @@ namespace DotNetNuke.Services.Personalization
         /// <param name="value">Individual profile value.</param>
         public static void SetSecureProfile(ICryptographyProvider cryptographyProvider, PersonalizationInfo personalization, string namingContainer, string key, object value)
         {
+			Logger.LogDebug(">>> Entering SetSecureProfile(cryptographyProvider={CryptographyProvider},personalization={Personalization},namingContainer={NamingContainer},key={Key},value={Value})", cryptographyProvider, personalization, namingContainer, key, value);
             if (personalization != null)
             {
                 var (encryptedValue, algorithmName, initializationVector) = cryptographyProvider.EncryptString(value.ToString(), Config.GetDecryptionkey());
@@ -231,18 +259,22 @@ namespace DotNetNuke.Services.Personalization
                 personalization.Profile[$"{namingContainer}:{key}:algorithmName"] = algorithmName;
                 personalization.Profile[$"{namingContainer}:{key}:initializationVector"] = initializationVector;
                 personalization.IsModified = true;
+				Logger.LogDebug("SetSecureProfile(cryptographyProvider={CryptographyProvider},personalization={Personalization},namingContainer={NamingContainer},key={Key},value={Value}): personalization.IsModified → {Arg5}", cryptographyProvider, personalization, namingContainer, key, value, personalization.IsModified);
             }
+			Logger.LogDebug("<<< Exiting SetSecureProfile(cryptographyProvider={CryptographyProvider},personalization={Personalization},namingContainer={NamingContainer},key={Key},value={Value})", cryptographyProvider, personalization, namingContainer, key, value);
         }
 
         /// <summary>Gets the mode the user is viewing the page in.</summary>
         /// <returns><see cref="Mode"/>.</returns>
         public static Mode GetUserMode()
         {
+			Logger.LogDebug(">>> Entering GetUserMode()");
             Mode mode;
             if (HttpContextSource.Current?.Request.IsAuthenticated == true)
             {
                 mode = PortalSettings.Current.DefaultControlPanelMode;
                 string setting = Convert.ToString(Personalization.GetProfile("Usability", "UserMode" + PortalController.Instance.GetCurrentSettings().PortalId), CultureInfo.InvariantCulture);
+				Logger.LogDebug("GetUserMode(): mode → {Mode}", mode);
                 switch (setting.ToUpperInvariant())
                 {
                     case "VIEW":
@@ -261,23 +293,28 @@ namespace DotNetNuke.Services.Personalization
                 mode = Mode.View;
             }
 
+			Logger.LogDebug("<<< Exiting GetUserMode()");
             return mode;
         }
 
         private static PersonalizationInfo LoadProfile(PersonalizationController personalizationController)
         {
+			Logger.LogDebug(">>> Entering LoadProfile(personalizationController={PersonalizationController})", personalizationController);
             HttpContext context = HttpContext.Current;
 
             // First try and load Personalization object from the Context
             var personalization = (PersonalizationInfo)context.Items["Personalization"];
+			Logger.LogDebug("LoadProfile(personalizationController={PersonalizationController}): personalization → {Personalization}", personalizationController, personalization);
 
             // If the Personalization object is nothing load it and store it in the context for future calls
             if (personalization == null)
             {
                 var portalSettings = (PortalSettings)context.Items["PortalSettings"];
+				Logger.LogDebug("LoadProfile(personalizationController={PersonalizationController}): portalSettings → {PortalSettings}", personalizationController, portalSettings);
 
                 // load the user info object
                 UserInfo userInfo = UserController.Instance.GetCurrentUserInfo();
+				Logger.LogDebug("LoadProfile(personalizationController={PersonalizationController}): userInfo → {UserInfo}", personalizationController, userInfo);
 
                 // get the personalization object
                 personalizationController ??= Globals.GetCurrentServiceProvider().GetRequiredService<PersonalizationController>();
@@ -287,6 +324,7 @@ namespace DotNetNuke.Services.Personalization
                 context.Items.Add("Personalization", personalization);
             }
 
+			Logger.LogDebug("<<< Exiting LoadProfile(personalizationController={PersonalizationController})", personalizationController);
             return personalization;
         }
     }

@@ -1,9 +1,11 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 // Swift mode created by Michael Kaminsky https://github.com/mkaminsky11
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object")
     mod(require("../../lib/codemirror"))
   else if (typeof define == "function" && define.amd)
@@ -12,6 +14,7 @@
     mod(CodeMirror)
 })(function(CodeMirror) {
   "use strict"
+logger.debug(`<<< Exiting function(exports=${exports})`);
 
   function trim(str) { return /^\s*(.*?)\s*$/.exec(str)[1] }
 
@@ -19,9 +22,11 @@
   var tokens = new RegExp(separators.join("|"),"g")
 
   function getWord(string, pos) {
+	logger.debug(`>>> Entering getWord(string=${string},pos=${pos})`);
     var index = -1, count = 1
     var words = string.split(tokens)
     for (var i = 0; i < words.length; i++) {
+	logger.debug(`getWord(string=${string},pos=${pos}): words → ${words}`);
       for(var j = 1; j <= words[i].length; j++) {
         if (count==pos) index = i
         count++
@@ -36,16 +41,23 @@
       ret[1] = words[index]
       ret[0] = words[index-1]
     }
+	logger.debug(`getWord(string=${string},pos=${pos}): ret → ${ret}`);
+	logger.debug(`<<< Exiting getWord(string=${string},pos=${pos})`);
     return ret
   }
 
   CodeMirror.defineMode("swift", function() {
+	logger.debug('>>> Entering defineMode()');
     var keywords=["var","let","class","deinit","enum","extension","func","import","init","let","protocol","static","struct","subscript","typealias","var","as","dynamicType","is","new","super","self","Self","Type","__COLUMN__","__FILE__","__FUNCTION__","__LINE__","break","case","continue","default","do","else","fallthrough","if","in","for","return","switch","where","while","associativity","didSet","get","infix","inout","left","mutating","none","nonmutating","operator","override","postfix","precedence","prefix","right","set","unowned","unowned(safe)","unowned(unsafe)","weak","willSet"]
     var commonConstants=["Infinity","NaN","undefined","null","true","false","on","off","yes","no","nil","null","this","super"]
+	logger.debug(`defineMode(): commonConstants → ${commonConstants}`);
     var types=["String","bool","int","string","double","Double","Int","Float","float","public","private","extension"]
     var numbers=["0","1","2","3","4","5","6","7","8","9"]
+	logger.debug(`defineMode(): types → ${types}`);
+	logger.debug(`defineMode(): numbers → ${numbers}`);
     var operators=["+","-","/","*","%","=","|","&","<",">"]
     var punc=[";",",",".","(",")","{","}","[","]"]
+	logger.debug(`defineMode(): operators → ${operators}`);
     var delimiters=/^(?:[()\[\]{},:`=;]|\.\.?\.?)/
     var identifiers=/^[_A-Za-z$][_A-Za-z$0-9]*/
     var properties=/^(@|this\.)[_A-Za-z$][_A-Za-z$0-9]*/

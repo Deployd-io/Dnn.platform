@@ -2,17 +2,21 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import FolderIcon from "./img/folder.svg";
 import "./style.less";
+const logger = console;
 
 export default class Folders extends Component {
 
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             openFolders: []
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         const { props } = this;
         if (props.folders !== prevProps.folders) {
             if (!props.folders || !props.folders.children || !props.folders.children[0] || 
@@ -24,10 +28,12 @@ export default class Folders extends Component {
             openFolders.push(rootKey);
             this.setState({ openFolders });
         }
+		logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
     }
 
 
     toggleFolder(key) {
+		logger.debug(`>>> Entering toggleFolder(key=${key})`);
         let {openFolders} = this.state;
         if (openFolders.some(id => id === key)) {
             openFolders = openFolders.filter(id => id !== key);
@@ -35,9 +41,11 @@ export default class Folders extends Component {
             openFolders.push(key);
         }
         this.setState({ openFolders });
+		logger.debug(`<<< Exiting toggleFolder(key=${key})`);
     }
 
     onParentClick(item) {
+		logger.debug(`>>> Entering onParentClick(item=${item})`);
         if (!item.data.hasChildren) {
             return;
         }
@@ -46,10 +54,13 @@ export default class Folders extends Component {
             return;
         }
         this.props.onParentExpands(item.data.key);
+		logger.debug(`<<< Exiting onParentClick(item=${item})`);
     }
 
     onFolderNameClick(folder) {
+		logger.debug(`>>> Entering onFolderNameClick(folder=${folder})`);
         this.props.onFolderChange(folder.data);
+		logger.debug(`<<< Exiting onFolderNameClick(folder=${folder})`);
     }
 
     getFolderIcon() {
@@ -57,13 +68,16 @@ export default class Folders extends Component {
     }
 
     getFolders(folder) {
+		logger.debug(`>>> Entering getFolders(folder=${folder})`);
         if (!folder) {
             return false;
         }
 
         const folderIcon = this.getFolderIcon();
+		logger.debug(`getFolders(folder=${folder}): folderIcon → ${folderIcon}`);
         const children = folder.children.map((child) => {
             const isOpen = this.state.openFolders.some(id => id === child.data.key);
+			logger.debug(`getFolders(folder=${folder}): isOpen → ${isOpen}`);
             const className = isOpen ? "open" : "";
             return <li className={className} key={child.data.key}>
                 {child.data.hasChildren && 
@@ -82,12 +96,15 @@ export default class Folders extends Component {
             </li>;
         });
 
+		logger.debug(`<<< Exiting getFolders(folder=${folder})`);
         return <ul>{children}</ul>;
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const folders = this.getFolders(this.props.folders);
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className="dnn-folders-component">
                 {folders}

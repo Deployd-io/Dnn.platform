@@ -12,8 +12,11 @@ import StepSix from "./StepSix";
 import Localization from "localization";
 import utilities from "utils";
 import styles from "./style.module.less";
+const logger = console;
 
 function mapToManifestPayload(payload, manifest) {
+	logger.debug(`>>> Entering mapToManifestPayload(payload=${payload},manifest=${manifest})`);
+	logger.debug(`<<< Exiting mapToManifestPayload(payload=${payload},manifest=${manifest})`);
     return Object.assign(manifest, {
         archiveName: payload.archiveName,
         files: manifest.files || [],
@@ -23,6 +26,8 @@ function mapToManifestPayload(payload, manifest) {
 }
 
 function mapToPackagePayload(payload, manifest) {
+	logger.debug(`>>> Entering mapToPackagePayload(payload=${payload},manifest=${manifest})`);
+	logger.debug(`<<< Exiting mapToPackagePayload(payload=${payload},manifest=${manifest})`);
     return Object.assign(manifest, {
         archiveName: payload.archiveName,
         manifestName: payload.manifestName,
@@ -33,6 +38,8 @@ function mapToPackagePayload(payload, manifest) {
 }
 
 function mapToFileRequestPayload(manifest) {
+	logger.debug(`>>> Entering mapToFileRequestPayload(manifest=${manifest})`);
+	logger.debug(`<<< Exiting mapToFileRequestPayload(manifest=${manifest})`);
     return Object.assign(manifest, {
         packageFolder: manifest.basePath,
         includeSource: true,
@@ -41,12 +48,15 @@ function mapToFileRequestPayload(manifest) {
 }
 
 function deepCopy(object) {
+	logger.debug(`>>> Entering deepCopy(object=${object})`);
+	logger.debug(`<<< Exiting deepCopy(object=${object})`);
     return JSON.parse(JSON.stringify(object));
 }
 
 class CreatePackage extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
 
         this.state = {
             useExistingManifest: false,
@@ -61,20 +71,27 @@ class CreatePackage extends Component {
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         this.goToStep(0);
         let { props } = this;
         let _packagePayload = deepCopy(props.packagePayload);
+		logger.debug(`UNSAFE_componentWillMount(): _packagePayload → ${_packagePayload}`);
 
         _packagePayload.archiveName = props.packageManifest.name + "_" + props.packageManifest.version + "_Install.zip";
+		logger.debug(`UNSAFE_componentWillMount(): _packagePayload.archiveName → ${_packagePayload.archiveName}`);
 
         _packagePayload.manifestName = props.packageManifest.name + ".dnn";
+		logger.debug(`UNSAFE_componentWillMount(): _packagePayload.manifestName → ${_packagePayload.manifestName}`);
 
         props.dispatch(CreatePackageActions.updatePackagePayload(_packagePayload));
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     goToStep(step) {
+		logger.debug(`>>> Entering goToStep(step=${step})`);
         const { props } = this;
         props.dispatch(CreatePackageActions.goToWizardStep(step));
+		logger.debug(`<<< Exiting goToStep(step=${step})`);
     }
 
     onChange(key, event) {
@@ -111,6 +128,8 @@ class CreatePackage extends Component {
     }
 
     getManifestDropdown(manifests) {
+		logger.debug(`>>> Entering getManifestDropdown(manifests=${manifests})`);
+		logger.debug(`<<< Exiting getManifestDropdown(manifests=${manifests})`);
         return Object.keys(manifests).map((key) => {
             return {
                 label: key,
@@ -120,15 +139,18 @@ class CreatePackage extends Component {
     }
 
     goToStepTwo() {
+		logger.debug('>>> Entering goToStepTwo()');
         const { packagePayload } = this.props;
         if (packagePayload.useExistingManifest) {
             this.goToStepFour();
         } else {
             this.goToStep(1);
+			logger.debug('<<< Exiting goToStepTwo()');
         }
     }
 
     goToStepFour() {
+		logger.debug('>>> Entering goToStepFour()');
         const { props } = this;
         if (props.packagePayload.reviewManifest) {
             props.dispatch(CreatePackageActions.generateManifestPreview(mapToManifestPayload(deepCopy(props.packagePayload), deepCopy(props.packageManifest)), () => {
@@ -136,10 +158,12 @@ class CreatePackage extends Component {
             }));
         } else {
             this.goToStep(4);
+			logger.debug('<<< Exiting goToStepFour()');
         }
     }
 
     createPackage() {
+		logger.debug('>>> Entering createPackage()');
         const { props } = this;
 
         if (props.packagePayload.createManifest) {
@@ -158,11 +182,13 @@ class CreatePackage extends Component {
                 this.goToStep(5);
             }, (data) => {
                 utilities.utilities.notifyError(JSON.parse(data.responseText).Message, 5000);
+				logger.debug('<<< Exiting createPackage()');
             }));
         }
     }
 
     onStepBack() {
+		logger.debug('>>> Entering onStepBack()');
         const { props } = this;
         switch (props.createPackageStep) {
             case 1:
@@ -188,46 +214,60 @@ class CreatePackage extends Component {
                 }
                 break;
             default:
+				logger.debug('<<< Exiting onStepBack()');
                 break;
         }
     }
 
     onFileOrAssemblyChange(key, event) {
+		logger.debug(`>>> Entering onFileOrAssemblyChange(key=${key},event=${event})`);
         const { props } = this;
         let value = typeof event === "object" ? event.target.value : event;
+		logger.debug(`onFileOrAssemblyChange(key=${key},event=${event}): value → ${value}`);
 
         const _fileValue = value.split("\n");
+		logger.debug(`onFileOrAssemblyChange(key=${key},event=${event}): _fileValue → ${_fileValue}`);
 
         let packageManifest = deepCopy(props.packageManifest);
+		logger.debug(`onFileOrAssemblyChange(key=${key},event=${event}): packageManifest → ${packageManifest}`);
 
         packageManifest[key] = _fileValue;
 
         props.dispatch(CreatePackageActions.updatePackageManifest(packageManifest));
+		logger.debug(`<<< Exiting onFileOrAssemblyChange(key=${key},event=${event})`);
     }
 
     onBasePathChange(event) {
+		logger.debug(`>>> Entering onBasePathChange(event=${event})`);
         let value = typeof event === "object" ? event.target.value : event;
 
+		logger.debug(`onBasePathChange(event=${event}): value → ${value}`);
         const { props } = this;
 
         let packageManifest = deepCopy(props.packageManifest);
+		logger.debug(`onBasePathChange(event=${event}): packageManifest → ${packageManifest}`);
 
         packageManifest.basePath = value;
+		logger.debug(`onBasePathChange(event=${event}): packageManifest.basePath → ${packageManifest.basePath}`);
 
         props.dispatch(CreatePackageActions.updatePackageManifest(packageManifest));
+		logger.debug(`<<< Exiting onBasePathChange(event=${event})`);
     }
 
     onRefresh() {
+		logger.debug('>>> Entering onRefresh()');
         const { props } = this;
 
         props.dispatch(CreatePackageActions.refreshPackageFiles(mapToFileRequestPayload(deepCopy(props.packageManifest)),
             () => { },
             (data) => {
                 utilities.utilities.notifyError(JSON.parse(data.responseText).Message);
+				logger.debug('<<< Exiting onRefresh()');
             }));
     }
 
     getCurrentWizardUI(step) {
+		logger.debug(`>>> Entering getCurrentWizardUI(step=${step})`);
         const { props } = this;
         const {packageManifest, installedPackageTypes, packagePayload} = props;
         const version = packageManifest.version ? packageManifest.version.split(".") : [0, 0, 0];
@@ -247,6 +287,7 @@ class CreatePackage extends Component {
                     onSelect={this.onSelect.bind(this)}
                     reviewManifest={packagePayload.reviewManifest}
                     hasManifests={Object.keys(packageManifest.manifests).length > 0} />;
+					logger.debug(`getCurrentWizardUI(step=${step}): version → ${version}`);
             case 1:
                 return <StepTwo
                     packageManifest={packageManifest}
@@ -283,17 +324,21 @@ class CreatePackage extends Component {
                     archiveName={packagePayload.archiveName}
                     useExistingManifest={packagePayload.useExistingManifest}
                     onPrevious={this.onStepBack.bind(this)} />;
+					logger.debug(`getCurrentWizardUI(step=${step}): onCancel → ${onCancel}`);
             case 5: return <StepSix
                 onClose={props.onCancel.bind(this)}
                 logs={props.createdPackage} />;
             default:
+				logger.debug(`<<< Exiting getCurrentWizardUI(step=${step})`);
                 return <p>Oops, something went wrong. Click <a href="javascript:void(0)" onClick={props.onCancel.bind(this)}> here </a> to go back</p>;
         }
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         const {createPackageStep, packageManifest} = props;
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={styles.createPackage}>
                 <PersonaBarPageHeader title={Localization.get("CreatePackage_Header.Header")} />
@@ -321,6 +366,8 @@ CreatePackage.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         installedPackageTypes: state.extension.installedPackageTypes,
         createdPackage: state.createPackage.createdPackage,

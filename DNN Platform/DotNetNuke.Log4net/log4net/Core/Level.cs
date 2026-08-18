@@ -96,8 +96,10 @@ namespace log4net.Core
         /// </remarks>
         public Level(int level, string levelName, string displayName) 
         {
+			value.LogDebug(">>> Entering Level(level={Level},levelName={LevelName},displayName={DisplayName})", level, levelName, displayName);
             if (levelName == null)
             {
+				value.LogWarning("Throwing ArgumentNullException from Level(level={Level},levelName={LevelName},displayName={DisplayName})", level, levelName, displayName);
                 throw new ArgumentNullException("levelName");
             }
             if (displayName == null)
@@ -106,14 +108,21 @@ namespace log4net.Core
             }
 
             this.m_levelValue = level;
+			value.LogDebug("Level(level={Level},levelName={LevelName},displayName={DisplayName}): m_levelValue → {M_levelValue}", level, levelName, displayName, m_levelValue);
+			value.LogDebug("Level(level={Level},levelName={LevelName},displayName={DisplayName}): this.m_levelValue → {Arg3}", level, levelName, displayName, this.m_levelValue);
 #if NETSTANDARD1_3
             m_levelName = levelName;
+			value.LogDebug("Level(level={Level},levelName={LevelName},displayName={DisplayName}): m_levelName → {M_levelName}", level, levelName, displayName, m_levelName);
 #else
             this.m_levelName = string.Intern(levelName);
 #endif
             this.m_levelDisplayName = displayName;
+			value.LogDebug("Level(level={Level},levelName={LevelName},displayName={DisplayName}): this.m_levelDisplayName → {Arg3}", level, levelName, displayName, this.m_levelDisplayName);
+			value.LogDebug("<<< Exiting Level(level={Level},levelName={LevelName},displayName={DisplayName})", level, levelName, displayName);
+			value.LogDebug(">>> Entering Level(level={Level},levelName={LevelName})", level, levelName);
         }
 
+		value.LogDebug("<<< Exiting Level(level={Level},levelName={LevelName},displayName={DisplayName})", level, levelName, displayName);
         /// <summary>Constructor</summary>
         /// <param name="level">Integer value for this level, higher values represent more severe levels.</param>
         /// <param name="levelName">The string name of this level.</param>
@@ -183,6 +192,8 @@ namespace log4net.Core
         /// </remarks>
         public override string ToString() 
         {
+			value.LogDebug(">>> Entering ToString()");
+			value.LogDebug("<<< Exiting ToString()");
             return this.m_levelName;
         }
 
@@ -198,6 +209,7 @@ namespace log4net.Core
         /// </remarks>
         public override bool Equals(object o)
         {
+			value.LogDebug(">>> Entering Equals(o={O})", o);
             Level otherLevel = o as Level;
             if (otherLevel != null)
             {
@@ -205,6 +217,7 @@ namespace log4net.Core
             }
             else
             {
+				value.LogDebug("<<< Exiting Equals(o={O})", o);
                 return base.Equals(o);
             }
         }
@@ -222,6 +235,8 @@ namespace log4net.Core
         /// </remarks>
         public override int GetHashCode()
         {
+			value.LogDebug(">>> Entering GetHashCode()");
+			value.LogDebug("<<< Exiting GetHashCode()");
             return this.m_levelValue;
         }
 
@@ -265,11 +280,14 @@ namespace log4net.Core
         /// <exception cref="ArgumentException"><paramref name="r" /> is not a <see cref="Level" />.</exception>
         public int CompareTo(object r)
         {
+			value.LogDebug(">>> Entering CompareTo(r={R})", r);
             Level target = r as Level;
             if (target != null)
             {
+			value.LogWarning("Throwing ArgumentException from CompareTo(r={R})", r);
                 return Compare(this, target);
             }
+			value.LogDebug("<<< Exiting CompareTo(r={R})", r);
             throw new ArgumentException("Parameter: r, Value: [" + r + "] is not an instance of Level");
         }
 
@@ -432,6 +450,7 @@ namespace log4net.Core
         /// </remarks>
         public static int Compare(Level l, Level r)
         {
+			value.LogDebug(">>> Entering Compare(l={L},r={R})", l, r);
             // Reference equals
             if ((object)l == (object)r)
             {
@@ -448,6 +467,7 @@ namespace log4net.Core
             }
             if (r == null)
             {
+			value.LogDebug("<<< Exiting Compare(l={L},r={R})", l, r);
                 return 1;
             }
 

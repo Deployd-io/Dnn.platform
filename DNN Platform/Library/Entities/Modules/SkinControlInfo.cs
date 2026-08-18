@@ -15,11 +15,15 @@ namespace DotNetNuke.Entities.Modules
     [Serializable]
     public class SkinControlInfo : ControlInfo, IXmlSerializable, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SkinControlInfo));
         /// <summary>Initializes a new instance of the <see cref="SkinControlInfo"/> class.</summary>
         public SkinControlInfo()
         {
+			Logger.LogDebug(">>> Entering SkinControlInfo()");
             this.PackageID = Null.NullInteger;
             this.SkinControlID = Null.NullInteger;
+			Logger.LogDebug("SkinControlInfo(): this.PackageID → {Arg0}", this.PackageID);
+			Logger.LogDebug("<<< Exiting SkinControlInfo()");
         }
 
         /// <summary>Gets or sets the SkinControl ID.</summary>
@@ -46,14 +50,18 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="dr">The Data Reader to use.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.SkinControlID = Null.SetNullInteger(dr["SkinControlID"]);
             this.PackageID = Null.SetNullInteger(dr["PackageID"]);
             this.FillInternal(dr);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
 
         /// <inheritdoc />
         public XmlSchema GetSchema()
         {
+			Logger.LogDebug(">>> Entering GetSchema()");
+			Logger.LogDebug("<<< Exiting GetSchema()");
             return null;
         }
 
@@ -61,6 +69,7 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="reader">The XmlReader to use.</param>
         public void ReadXml(XmlReader reader)
         {
+			Logger.LogDebug(">>> Entering ReadXml(reader={Reader})", reader);
             while (reader.Read())
             {
                 if (reader.NodeType == XmlNodeType.EndElement)
@@ -75,12 +84,14 @@ namespace DotNetNuke.Entities.Modules
 
                 this.ReadXmlInternal(reader);
             }
+			Logger.LogDebug("<<< Exiting ReadXml(reader={Reader})", reader);
         }
 
         /// <summary>Writes a SkinControlInfo to an XmlWriter.</summary>
         /// <param name="writer">The XmlWriter to use.</param>
         public void WriteXml(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteXml(writer={Writer})", writer);
             // Write start of main elements
             writer.WriteStartElement("moduleControl");
 
@@ -89,6 +100,7 @@ namespace DotNetNuke.Entities.Modules
 
             // Write end of main element
             writer.WriteEndElement();
+			Logger.LogDebug("<<< Exiting WriteXml(writer={Writer})", writer);
         }
     }
 }

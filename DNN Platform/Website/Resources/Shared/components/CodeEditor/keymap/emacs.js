@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -18,11 +19,15 @@
 
   var killRing = [];
   function addToRing(str) {
+	logger.debug(`>>> Entering addToRing(str=${str})`);
     killRing.push(str);
     if (killRing.length > 50) killRing.shift();
+	logger.debug(`<<< Exiting addToRing(str=${str})`);
   }
   function growRingTop(str) {
+	logger.debug(`>>> Entering growRingTop(str=${str})`);
     if (!killRing.length) return addToRing(str);
+	logger.debug(`<<< Exiting growRingTop(str=${str})`);
     killRing[killRing.length - 1] += str;
   }
   function getFromRing(n) { return killRing[killRing.length - (n ? Math.min(n, 1) : 1)] || ""; }
@@ -31,6 +36,7 @@
   var lastKill = null;
 
   function kill(cm, from, to, mayGrow, text) {
+	logger.debug(`>>> Entering kill(cm=${cm},from=${from},to=${to},mayGrow=${mayGrow},text=${text})`);
     if (text == null) text = cm.getRange(from, to);
 
     if (mayGrow && lastKill && lastKill.cm == cm && posEq(from, lastKill.pos) && cm.isClean(lastKill.gen))
@@ -41,27 +47,37 @@
 
     if (mayGrow) lastKill = {cm: cm, pos: from, gen: cm.changeGeneration()};
     else lastKill = null;
+	logger.debug(`<<< Exiting kill(cm=${cm},from=${from},to=${to},mayGrow=${mayGrow},text=${text})`);
   }
 
   // Boundaries of various units
 
   function byChar(cm, pos, dir) {
+	logger.debug(`>>> Entering byChar(cm=${cm},pos=${pos},dir=${dir})`);
+	logger.debug(`<<< Exiting byChar(cm=${cm},pos=${pos},dir=${dir})`);
     return cm.findPosH(pos, dir, "char", true);
   }
 
   function byWord(cm, pos, dir) {
+	logger.debug(`>>> Entering byWord(cm=${cm},pos=${pos},dir=${dir})`);
+	logger.debug(`<<< Exiting byWord(cm=${cm},pos=${pos},dir=${dir})`);
     return cm.findPosH(pos, dir, "word", true);
   }
 
   function byLine(cm, pos, dir) {
+	logger.debug(`>>> Entering byLine(cm=${cm},pos=${pos},dir=${dir})`);
+	logger.debug(`<<< Exiting byLine(cm=${cm},pos=${pos},dir=${dir})`);
     return cm.findPosV(pos, dir, "line", cm.doc.sel.goalColumn);
   }
 
   function byPage(cm, pos, dir) {
+	logger.debug(`>>> Entering byPage(cm=${cm},pos=${pos},dir=${dir})`);
+	logger.debug(`<<< Exiting byPage(cm=${cm},pos=${pos},dir=${dir})`);
     return cm.findPosV(pos, dir, "page", cm.doc.sel.goalColumn);
   }
 
   function byParagraph(cm, pos, dir) {
+	logger.debug(`>>> Entering byParagraph(cm=${cm},pos=${pos},dir=${dir})`);
     var no = pos.line, line = cm.getLine(no);
     var sawText = /\S/.test(dir < 0 ? line.slice(0, pos.ch) : line.slice(pos.ch));
     var fst = cm.firstLine(), lst = cm.lastLine();
@@ -74,9 +90,11 @@
       if (hasText) sawText = true;
       else if (sawText) return Pos(no, 0);
     }
+	logger.debug(`<<< Exiting byParagraph(cm=${cm},pos=${pos},dir=${dir})`);
   }
 
   function bySentence(cm, pos, dir) {
+	logger.debug(`>>> Entering bySentence(cm=${cm},pos=${pos},dir=${dir})`);
     var line = pos.line, ch = pos.ch;
     var text = cm.getLine(pos.line), sawWord = false;
     for (;;) {
@@ -90,12 +108,14 @@
         continue;
       }
       if (sawWord && /[!?.]/.test(next)) return Pos(line, ch + (dir > 0 ? 1 : 0));
+	logger.debug(`<<< Exiting bySentence(cm=${cm},pos=${pos},dir=${dir})`);
       if (!sawWord) sawWord = /\w/.test(next);
       ch += dir;
     }
   }
 
   function byExpr(cm, pos, dir) {
+	logger.debug(`>>> Entering byExpr(cm=${cm},pos=${pos},dir=${dir})`);
     var wrap;
     if (cm.findMatchingBracket && (wrap = cm.findMatchingBracket(pos, true))
         && wrap.match && (wrap.forward ? 1 : -1) == dir)
@@ -109,6 +129,7 @@
         if (posEq(after, newPos)) return pos;
         else pos = newPos;
       } else {
+		logger.debug(`<<< Exiting byExpr(cm=${cm},pos=${pos},dir=${dir})`);
         return after;
       }
     }
@@ -117,22 +138,31 @@
   // Prefixes (only crudely supported)
 
   function getPrefix(cm, precise) {
+	logger.debug(`>>> Entering getPrefix(cm=${cm},precise=${precise})`);
     var digits = cm.state.emacsPrefix;
     if (!digits) return precise ? null : 1;
     clearPrefix(cm);
+	logger.debug(`<<< Exiting getPrefix(cm=${cm},precise=${precise})`);
     return digits == "-" ? -1 : Number(digits);
   }
 
   function repeated(cmd) {
+	logger.debug(`>>> Entering repeated(cmd=${cmd})`);
     var f = typeof cmd == "string" ? function(cm) { cm.execCommand(cmd); } : cmd;
     return function(cm) {
+	logger.debug(`>>> Entering function(cm=${cm})`);
       var prefix = getPrefix(cm);
+	logger.debug(`<<< Exiting function(cm=${cm})`);
       f(cm);
       for (var i = 1; i < prefix; ++i) f(cm);
+	logger.debug(`>>> Entering f(cm=${cm})`);
+	logger.debug(`<<< Exiting f(cm=${cm})`);
     };
+	logger.debug(`<<< Exiting repeated(cmd=${cmd})`);
   }
 
   function findEnd(cm, pos, by, dir) {
+	logger.debug(`>>> Entering findEnd(cm=${cm},pos=${pos},by=${by},dir=${dir})`);
     var prefix = getPrefix(cm);
     if (prefix < 0) { dir = -dir; prefix = -prefix; }
     for (var i = 0; i < prefix; ++i) {
@@ -140,27 +170,33 @@
       if (posEq(newPos, pos)) break;
       pos = newPos;
     }
+	logger.debug(`<<< Exiting findEnd(cm=${cm},pos=${pos},by=${by},dir=${dir})`);
     return pos;
   }
 
   function move(by, dir) {
+	logger.debug(`>>> Entering move(by=${by},dir=${dir})`);
     var f = function(cm) {
       cm.extendSelection(findEnd(cm, cm.getCursor(), by, dir));
     };
     f.motion = true;
+	logger.debug(`<<< Exiting move(by=${by},dir=${dir})`);
     return f;
   }
 
   function killTo(cm, by, dir) {
+	logger.debug(`>>> Entering killTo(cm=${cm},by=${by},dir=${dir})`);
     var selections = cm.listSelections(), cursor;
     var i = selections.length;
     while (i--) {
       cursor = selections[i].head;
       kill(cm, cursor, findEnd(cm, cursor, by, dir), true);
+	logger.debug(`<<< Exiting killTo(cm=${cm},by=${by},dir=${dir})`);
     }
   }
 
   function killRegion(cm) {
+	logger.debug(`>>> Entering killRegion(cm=${cm})`);
     if (cm.somethingSelected()) {
       var selections = cm.listSelections(), selection;
       var i = selections.length;
@@ -168,11 +204,13 @@
         selection = selections[i];
         kill(cm, selection.anchor, selection.head);
       }
+	logger.debug(`<<< Exiting killRegion(cm=${cm})`);
       return true;
     }
   }
 
   function addPrefix(cm, digit) {
+	logger.debug(`>>> Entering addPrefix(cm=${cm},digit=${digit})`);
     if (cm.state.emacsPrefix) {
       if (digit != "-") cm.state.emacsPrefix += digit;
       return;
@@ -181,72 +219,94 @@
     cm.state.emacsPrefix = digit;
     cm.on("keyHandled", maybeClearPrefix);
     cm.on("inputRead", maybeDuplicateInput);
+	logger.debug(`<<< Exiting addPrefix(cm=${cm},digit=${digit})`);
   }
 
   var prefixPreservingKeys = {"Alt-G": true, "Ctrl-X": true, "Ctrl-Q": true, "Ctrl-U": true};
 
   function maybeClearPrefix(cm, arg) {
+	logger.debug(`>>> Entering maybeClearPrefix(cm=${cm},arg=${arg})`);
     if (!cm.state.emacsPrefixMap && !prefixPreservingKeys.hasOwnProperty(arg))
       clearPrefix(cm);
+	logger.debug(`<<< Exiting maybeClearPrefix(cm=${cm},arg=${arg})`);
   }
 
   function clearPrefix(cm) {
+	logger.debug(`>>> Entering clearPrefix(cm=${cm})`);
     cm.state.emacsPrefix = null;
     cm.off("keyHandled", maybeClearPrefix);
     cm.off("inputRead", maybeDuplicateInput);
+	logger.debug(`<<< Exiting clearPrefix(cm=${cm})`);
   }
 
   function maybeDuplicateInput(cm, event) {
+	logger.debug(`>>> Entering maybeDuplicateInput(cm=${cm},event=${event})`);
     var dup = getPrefix(cm);
     if (dup > 1 && event.origin == "+input") {
       var one = event.text.join("\n"), txt = "";
       for (var i = 1; i < dup; ++i) txt += one;
       cm.replaceSelection(txt);
+	logger.debug(`<<< Exiting maybeDuplicateInput(cm=${cm},event=${event})`);
     }
   }
 
   function addPrefixMap(cm) {
+	logger.debug(`>>> Entering addPrefixMap(cm=${cm})`);
     cm.state.emacsPrefixMap = true;
     cm.addKeyMap(prefixMap);
     cm.on("keyHandled", maybeRemovePrefixMap);
     cm.on("inputRead", maybeRemovePrefixMap);
+	logger.debug(`<<< Exiting addPrefixMap(cm=${cm})`);
   }
 
   function maybeRemovePrefixMap(cm, arg) {
+	logger.debug(`>>> Entering maybeRemovePrefixMap(cm=${cm},arg=${arg})`);
     if (typeof arg == "string" && (/^\d$/.test(arg) || arg == "Ctrl-U")) return;
     cm.removeKeyMap(prefixMap);
     cm.state.emacsPrefixMap = false;
     cm.off("keyHandled", maybeRemovePrefixMap);
     cm.off("inputRead", maybeRemovePrefixMap);
+	logger.debug(`<<< Exiting maybeRemovePrefixMap(cm=${cm},arg=${arg})`);
   }
 
   // Utilities
 
   function setMark(cm) {
+	logger.debug(`>>> Entering setMark(cm=${cm})`);
     cm.setCursor(cm.getCursor());
     cm.setExtending(!cm.getExtending());
     cm.on("change", function() { cm.setExtending(false); });
+	logger.debug(`<<< Exiting setMark(cm=${cm})`);
   }
 
   function clearMark(cm) {
+	logger.debug(`>>> Entering clearMark(cm=${cm})`);
     cm.setExtending(false);
     cm.setCursor(cm.getCursor());
+	logger.debug(`<<< Exiting clearMark(cm=${cm})`);
   }
 
   function getInput(cm, msg, f) {
+	logger.debug(`>>> Entering getInput(cm=${cm},msg=${msg},f=${f})`);
     if (cm.openDialog)
       cm.openDialog(msg + ": <input type=\"text\" style=\"width: 10em\"/>", f, {bottom: true});
     else
       f(prompt(msg, ""));
+	logger.debug(`>>> Entering getInput(cm=${cm})`);
+	logger.debug(`<<< Exiting getInput(cm=${cm})`);
   }
 
   function operateOnWord(cm, op) {
+	logger.debug(`>>> Entering operateOnWord(cm=${cm},op=${op})`);
     var start = cm.getCursor(), end = cm.findPosH(start, 1, "word");
     cm.replaceRange(op(cm.getRange(start, end)), start, end);
     cm.setCursor(end);
+	logger.debug(`<<< Exiting operateOnWord(cm=${cm},letter=${letter})`);
+	logger.debug(`<<< Exiting operateOnWord(cm=${cm},op=${op})`);
   }
 
   function toEnclosingExpr(cm) {
+	logger.debug(`>>> Entering toEnclosingExpr(cm=${cm})`);
     var pos = cm.getCursor(), line = pos.line, ch = pos.ch;
     var stack = [];
     while (line >= cm.firstLine()) {
@@ -264,11 +324,14 @@
       }
       --line; ch = null;
     }
+	logger.debug(`<<< Exiting toEnclosingExpr(cm=${cm})`);
   }
 
   function quit(cm) {
+	logger.debug(`>>> Entering quit(cm=${cm})`);
     cm.execCommand("clearSearch");
     clearMark(cm);
+	logger.debug(`<<< Exiting quit(cm=${cm})`);
   }
 
   // Actual keymap
@@ -403,9 +466,11 @@
 
   var prefixMap = {"Ctrl-G": clearPrefix};
   function regPrefix(d) {
+	logger.debug(`>>> Entering regPrefix(d=${d})`);
     prefixMap[d] = function(cm) { addPrefix(cm, d); };
     keyMap["Ctrl-" + d] = function(cm) { addPrefix(cm, d); };
     prefixPreservingKeys["Ctrl-" + d] = true;
+	logger.debug(`<<< Exiting regPrefix(d=${d})`);
   }
   for (var i = 0; i < 10; ++i) regPrefix(String(i));
   regPrefix("-");

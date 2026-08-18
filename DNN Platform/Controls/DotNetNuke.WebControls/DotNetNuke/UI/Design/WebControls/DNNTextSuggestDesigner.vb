@@ -7,10 +7,12 @@ Imports System.IO
 Imports System.Web.UI
 Imports System.Web.UI.Design
 Imports System.Web.UI.WebControls
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.Design.WebControls
     Public Class DNNTextSuggestDesigner
         Inherits ControlDesigner
+		Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
         ' Methods
         Public Overrides Function GetDesignTimeHtml() As String
             Dim str As String
@@ -21,6 +23,10 @@ Namespace DotNetNuke.UI.Design.WebControls
                 Dim writer As New StringWriter
                 Dim textbox As New TextBox() With {
                     .Text = component.Text
+					_logger.LogDebug(">>> Entering GetDesignTimeHtml()")
+					_logger.LogDebug("GetDesignTimeHtml(): component → {Component}", component)
+					_logger.LogDebug("<<< Exiting GetDesignTimeHtml()")
+					_logger.LogDebug("GetDesignTimeHtml(): str → {Str}", str)
                 }
                 textbox.RenderControl(New HtmlTextWriter(writer))
                 str = writer.ToString

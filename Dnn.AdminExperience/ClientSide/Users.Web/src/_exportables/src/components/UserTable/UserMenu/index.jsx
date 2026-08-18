@@ -9,40 +9,54 @@ import utilities from "utils";
 import { GridCell } from "@dnnsoftware/dnn-react-common";
 import ChangePassword from "../ChangePassword";
 import "./style.less";
+const logger = console;
 import {canManagePassword, canDeleteUser, canAuthorizeUnAuthorizeUser, canPromoteDemote} from "../../permissionHelpers.js";
 
 class UserMenu extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             userDetails: props.userDetails,
             ChangePasswordVisible: false
         };
         this.showMenu = false;
+		logger.debug(`constructor(props=${props}): this.state → ${this.state}`);
+		logger.debug(`constructor(props=${props}): showMenu → ${showMenu}`);
         this.handleClick = this.handleClick.bind(this);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     handleClick(event) {
+		logger.debug(`>>> Entering handleClick(event=${event})`);
         if (!(this.rootElement && this.rootElement.contains(event.target)) && (typeof event.target.className !== "string" || (typeof event.target.className === "string" && event.target.className.indexOf("menu-item") === -1))) {
             this.props.onClose();
+			logger.debug(`<<< Exiting handleClick(event=${event})`);
         }
     }
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         document.addEventListener("click", this.handleClick, false);
         let {props} = this;
         this.showMenu = false;
         this.getUserDetails(props);
+		logger.debug(`componentDidMount(): showMenu → ${showMenu}`);
+		logger.debug('<<< Exiting componentDidMount()');
     }
     componentDidUpdate() {
+		logger.debug('>>> Entering componentDidUpdate()');
         if (this.props.userDetails === undefined && this.props.userDetails.userId !== this.props.userId) {
             this.showMenu = false;
             this.getUserDetails(this.props);
         }
         else {
             this.showMenu = true;
+			logger.debug(`componentDidUpdate(): this.showMenu → ${this.showMenu}`);
+			logger.debug('<<< Exiting componentDidUpdate()');
         }
     }
     getUserDetails(props) {
+		logger.debug(`>>> Entering getUserDetails(props=${props})`);
         props.dispatch(CommonUsersActions.getUserDetails({ userId: props.userId }, (data) => {
             let userDetails = Object.assign({}, data);
             this.setState({
@@ -50,26 +64,35 @@ class UserMenu extends Component {
             },()=>{
                 this.showMenu = true;
             });
+			logger.debug(`<<< Exiting getUserDetails(props=${props})`);
         }));
     }
     reload() {
+		logger.debug('>>> Entering reload()');
         this.getUserDetails(this.props);
+		logger.debug('<<< Exiting reload()');
     }
     componentWillUnmount() {
+		logger.debug('>>> Entering componentWillUnmount()');
         document.removeEventListener("click", this.handleClick, false);
+		logger.debug('<<< Exiting componentWillUnmount()');
     }
     sort(items, column, order) {
+		logger.debug(`>>> Entering sort(items=${items},column=${column},order=${order})`);
         order = order === undefined ? "asc" : order;
         items = items.sort(function (a, b) {
             if (a[column] > b[column]) //sort string descending
+				logger.debug(`sort(items=${items},column=${column},order=${order}): order → ${order}`);
                 return order === "asc" ? 1 : -1;
             if (a[column] < b[column])
                 return order === "asc" ? -1 : 1;
+		logger.debug(`<<< Exiting sort(order=${order})`);
             return 0;//default return value (no sorting)
         });
         return items;
     }
     onItemClick(key) {
+		logger.debug(`>>> Entering onItemClick(key=${key})`);
         switch (key) {
             case "ResetPassword":
                 this.onSendPasswordLink();
@@ -124,70 +147,93 @@ class UserMenu extends Component {
                 this.props.onClose();
                 break;
         }
+		logger.debug(`<<< Exiting onItemClick(key=${key})`);
     }
     
     onViewProfile() {
+		logger.debug('>>> Entering onViewProfile()');
         utilities.closePersonaBar(() => {
             window.top.location = this.state.userDetails.profileUrl;
         });
+		logger.debug('<<< Exiting onViewProfile()');
     }
     onSendPasswordLink() {
+		logger.debug('>>> Entering onSendPasswordLink()');
         this.props.dispatch(CommonUsersActions.sendPasswordResetLink({ userId: this.props.userId }, () => {
             utilities.notify(Localization.get("PasswordSent"), 10000);
+			logger.debug('<<< Exiting onSendPasswordLink()');
         }));
     }
     deleteUser() {
+		logger.debug('>>> Entering deleteUser()');
         utilities.confirm(Localization.get("DeleteUser.Confirm"), Localization.get("Delete"), Localization.get("Cancel"), () => {
             this.props.dispatch(CommonUsersActions.deleteUser({ userDetails: this.props.userDetails }, this.props.filter, () => {
                 utilities.notify(Localization.get("UserDeleted"), 3000);
                 this.reload();
+				logger.debug('<<< Exiting deleteUser()');
             }));
         });
     }
     hardDeleteUser() {
+		logger.debug('>>> Entering hardDeleteUser()');
         utilities.confirm(Localization.get("RemoveUser.Confirm"), Localization.get("Delete"), Localization.get("Cancel"), () => {
             this.props.dispatch(CommonUsersActions.eraseUser({ userId: this.props.userId }));
         });
+		logger.debug('<<< Exiting hardDeleteUser()');
     }
     restoreUser() {
+		logger.debug('>>> Entering restoreUser()');
         this.props.dispatch(CommonUsersActions.restoreUser({ userDetails: this.props.userDetails }, this.props.filter, () => {
             utilities.notify(Localization.get("UserRestored"), 3000);
             this.reload();
+			logger.debug('<<< Exiting restoreUser()');
         }));
     }
     forcePasswordChange() {
+		logger.debug('>>> Entering forcePasswordChange()');
         this.props.dispatch(CommonUsersActions.forceChangePassword({ userId: this.props.userId }, () => {
             utilities.notify(Localization.get("UserPasswordUpdateChanged"), 10000);
             this.reload();
+			logger.debug('<<< Exiting forcePasswordChange()');
         }));
     }
     updateAuthorizeStatus(authorized) {
+		logger.debug(`>>> Entering updateAuthorizeStatus(authorized=${authorized})`);
         this.props.dispatch(CommonUsersActions.updateAuthorizeStatus({ userDetails: this.props.userDetails }, authorized, this.props.filter, () => {
             utilities.notify(authorized ? Localization.get("UserAuthorized") :Localization.get("UserUnAuthorized"), 3000);
             this.reload();
+			logger.debug(`<<< Exiting updateAuthorizeStatus(authorized=${authorized})`);
         }));
     }
     unLockUser() {
+		logger.debug('>>> Entering unLockUser()');
         this.props.dispatch(CommonUsersActions.unLockUser({ userDetails: this.props.userDetails }, () => {
             utilities.notify(Localization.get("UserUnLocked"), 3000);
             this.reload();
+			logger.debug('<<< Exiting unLockUser()');
         }));
     }
     updateSuperUserStatus(setSuperUser) {
+		logger.debug(`>>> Entering updateSuperUserStatus(setSuperUser=${setSuperUser})`);
         this.props.dispatch(CommonUsersActions.updateSuperUserStatus({ userId: this.props.userId, setSuperUser: setSuperUser }, this.props.filter, () => {
             this.reload();
+			logger.debug(`<<< Exiting updateSuperUserStatus(setSuperUser=${setSuperUser})`);
         }));
     }
     toggleChangePassword(close) {
+		logger.debug(`>>> Entering toggleChangePassword(close=${close})`);
         const show = !this.state.ChangePasswordVisible;
         this.setState({ ChangePasswordVisible: show });
         if (close)
+			logger.debug(`<<< Exiting toggleChangePassword(close=${close})`);
             this.props.onClose();
     }
     
     render() {
+	logger.debug('>>> Entering render()');
 
         let visibleMenus = [{ key:"ViewProfile", title:  Localization.get("ViewProfile"), index: 10 }];
+		logger.debug(`render(): visibleMenus → ${visibleMenus}`);
         
         if (canPromoteDemote(this.props.appSettings.applicationSettings.settings, this.state.userDetails.userId))
         {
@@ -259,6 +305,7 @@ class UserMenu extends Component {
         }
         else
         {
+			logger.debug('<<< Exiting render()');
             return <div/>;
         }
     }
@@ -276,6 +323,8 @@ UserMenu.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         userDetails: state.users.userDetails
     };

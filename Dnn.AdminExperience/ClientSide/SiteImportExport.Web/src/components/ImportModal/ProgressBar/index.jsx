@@ -6,29 +6,38 @@ import {
 } from "actions";
 import { Line } from "rc-progress";
 import "./style.less";
+const logger = console;
 
 class ProgressBar extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
 
         this.timeout = "";
         this.started = false;
+		logger.debug(`constructor(): this.timeout → ${this.timeout}`);
         this.state = {
             percent: 0
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.started = true;
         this.increase();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentWillUnmount() {
+		logger.debug('>>> Entering componentWillUnmount()');
         clearTimeout(this.timeout);
         this.setState({ percent: 0 });
+		logger.debug('<<< Exiting componentWillUnmount()');
     }
 
     componentDidUpdate() {
+		logger.debug('>>> Entering componentDidUpdate()');
         let { props } = this;
         if (props.visible !== undefined) {
 
@@ -42,11 +51,13 @@ class ProgressBar extends Component {
                 this.started = true;
                 this.setState({ percent: 0 });
                 this.increase();
+				logger.debug('<<< Exiting componentDidUpdate()');
             }
         }
     }
 
     increase() {
+		logger.debug('>>> Entering increase()');
         if (this.state.percent > 95) {
             //clearTimeout(this.timeout);
             this.setState({ percent: 0 });
@@ -70,11 +81,15 @@ class ProgressBar extends Component {
         this.timeout = setTimeout(() => {
             this.increase();
         }, 200);
+		logger.debug('<<< Exiting increase()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         let visibility = this.props.visible ? "block" : "none";
 
+		logger.debug(`render(): visibility → ${visibility}`);
+		logger.debug('<<< Exiting render()');
         return (
             <div id="progressContainer" className={this.props.className} style={{ display: visibility }}>
                 <Line
@@ -97,6 +112,8 @@ ProgressBar.propTypes = {
 };
 
 function mapStateToProps() {
+	logger.debug('>>> Entering mapStateToProps()');
+	logger.debug('<<< Exiting mapStateToProps()');
     return {};
 }
 

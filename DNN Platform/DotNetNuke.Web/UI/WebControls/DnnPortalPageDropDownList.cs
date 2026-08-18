@@ -25,6 +25,7 @@ namespace DotNetNuke.Web.UI.WebControls
     [ToolboxData("<{0}:DnnPortalPageDropDownList runat='server'></{0}:DnnPortalPageDropDownList>")]
     public class DnnPortalPageDropDownList : DnnDropDownList
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnPortalPageDropDownList));
         private readonly Lazy<int> portalId = new Lazy<int>(() => PortalSettings.Current.ActiveTab.IsSuperTab ? -1 : PortalSettings.Current.PortalId);
 
         /// <summary>Initializes a new instance of the <see cref="DnnPortalPageDropDownList"/> class.</summary>
@@ -32,7 +33,9 @@ namespace DotNetNuke.Web.UI.WebControls
         public DnnPortalPageDropDownList()
             : this(Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>(), Globals.GetCurrentServiceProvider().GetRequiredService<IServicesFramework>())
         {
+		Logger.LogDebug(">>> Entering DnnPortalPageDropDownList()");
         }
+		Logger.LogDebug("<<< Exiting DnnPortalPageDropDownList()");
 
         /// <summary>Initializes a new instance of the <see cref="DnnPortalPageDropDownList"/> class.</summary>
         /// <param name="clientResourceController">The client resource controller.</param>
@@ -62,6 +65,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.SelectItemDefaultText = Localization.GetString("DropDownList.SelectWebPageDefaultText", Localization.SharedResourceFile);
@@ -71,13 +75,16 @@ namespace DotNetNuke.Web.UI.WebControls
             this.Services.GetTreeWithNodeMethod = "ItemListService/GetTreePathForPageInPortalGroup";
             this.Services.SortTreeMethod = "ItemListService/SortPagesInPortalGroup";
             this.Services.ServiceRoot = "InternalServices";
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             this.AddCssClass("page");
             base.OnPreRender(e);
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
     }
 }

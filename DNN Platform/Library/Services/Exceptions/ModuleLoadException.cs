@@ -11,6 +11,7 @@ namespace DotNetNuke.Services.Exceptions
 
     public class ModuleLoadException : BasePortalException
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleLoadException));
         private readonly ModuleInfo moduleConfiguration;
         private string friendlyName;
         private string moduleControlSource;
@@ -22,6 +23,8 @@ namespace DotNetNuke.Services.Exceptions
         /// <summary>Initializes a new instance of the <see cref="ModuleLoadException"/> class.</summary>
         public ModuleLoadException()
         {
+		Logger.LogDebug(">>> Entering ModuleLoadException()");
+		Logger.LogDebug("<<< Exiting ModuleLoadException()");
         }
 
         // constructor with exception message
@@ -31,7 +34,9 @@ namespace DotNetNuke.Services.Exceptions
         public ModuleLoadException(string message)
             : base(message)
         {
+			Logger.LogDebug(">>> Entering ModuleLoadException(message={Message})", message);
             this.InitilizePrivateVariables();
+			Logger.LogDebug("<<< Exiting ModuleLoadException(message={Message})", message);
         }
 
         // constructor with exception message
@@ -43,8 +48,10 @@ namespace DotNetNuke.Services.Exceptions
         public ModuleLoadException(string message, Exception inner, ModuleInfo moduleConfiguration)
             : base(message, inner)
         {
+			Logger.LogDebug(">>> Entering ModuleLoadException(message={Message},inner={Inner},moduleConfiguration={ModuleConfiguration})", message, inner, moduleConfiguration);
             this.moduleConfiguration = moduleConfiguration;
             this.InitilizePrivateVariables();
+			Logger.LogDebug("ModuleLoadException(message={Message},inner={Inner},moduleConfiguration={ModuleConfiguration}): this.moduleConfiguration → {Arg3}", message, inner, moduleConfiguration, this.moduleConfiguration);
         }
 
         // constructor with message and inner exception
@@ -56,6 +63,7 @@ namespace DotNetNuke.Services.Exceptions
             : base(message, inner)
         {
             this.InitilizePrivateVariables();
+			Logger.LogDebug("<<< Exiting ModuleLoadException(message={Message},inner={Inner})", message, inner);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleLoadException"/> class.</summary>
@@ -66,7 +74,9 @@ namespace DotNetNuke.Services.Exceptions
         {
             this.InitilizePrivateVariables();
             this.moduleId = info.GetInt32("m_ModuleId");
+			Logger.LogDebug("ModuleLoadException(info={Info},context={Context}): moduleId → {ModuleId}", info, context, moduleId);
             this.moduleDefId = info.GetInt32("m_ModuleDefId");
+			Logger.LogDebug("ModuleLoadException(info={Info},context={Context}): moduleDefId → {ModuleDefId}", info, context, moduleDefId);
             this.friendlyName = info.GetString("m_FriendlyName");
         }
 
@@ -108,20 +118,28 @@ namespace DotNetNuke.Services.Exceptions
 
         private void InitilizePrivateVariables()
         {
+			Logger.LogDebug(">>> Entering InitilizePrivateVariables()");
             // Try and get the Portal settings from context
             // If an error occurs getting the context then set the variables to -1
             if (this.moduleConfiguration != null)
             {
                 this.moduleId = this.moduleConfiguration.ModuleID;
+				Logger.LogDebug("InitilizePrivateVariables(): moduleId → {ModuleId}", moduleId);
+				Logger.LogDebug("InitilizePrivateVariables(): this.moduleId → {Arg0}", this.moduleId);
+				Logger.LogDebug("InitilizePrivateVariables(): this.friendlyName → {Arg0}", this.friendlyName);
                 this.moduleDefId = this.moduleConfiguration.ModuleDefID;
                 this.friendlyName = this.moduleConfiguration.ModuleTitle;
+				Logger.LogDebug("InitilizePrivateVariables(): moduleDefId → {ModuleDefId}", moduleDefId);
+				Logger.LogDebug("InitilizePrivateVariables(): this.moduleDefId → {Arg0}", this.moduleDefId);
                 this.moduleControlSource = this.moduleConfiguration.ModuleControl.ControlSrc;
             }
             else
             {
+				Logger.LogDebug("InitilizePrivateVariables(): this.moduleControlSource → {Arg0}", this.moduleControlSource);
                 this.moduleId = -1;
                 this.moduleDefId = -1;
             }
+			Logger.LogDebug("<<< Exiting InitilizePrivateVariables()");
         }
 
         ////public override void GetObjectData(SerializationInfo info, StreamingContext context)

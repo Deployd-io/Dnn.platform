@@ -24,7 +24,9 @@ namespace DNN.Integration.Test.Framework.Helpers
         /// <returns>IWebApiConnector object to perform more actions.</returns>
         public static IWebApiConnector GetAnnonymousConnector(string url = null)
         {
+			_logger.LogDebug(">>> Entering GetAnnonymousConnector(url={Url})", url);
             url = url ?? AppConfigHelper.SiteUrl;
+			_logger.LogDebug("<<< Exiting GetAnnonymousConnector(url={Url})", url);
             return _anonymousConnector ??
                 (_anonymousConnector = WebApiConnector.GetWebConnector(url, null));
         }
@@ -52,6 +54,7 @@ WHERE tm.TabID = {tabId} AND md.FriendlyName = '{moduleName}'");
             var email = $"{username}@dnn.com";
 
             using (WebApiTestHelper.Register(username, AppConfigHelper.HostPassword, username, email))
+			using Microsoft.Extensions.Logging;
             {
             }
 
@@ -75,7 +78,9 @@ WHERE tm.TabID = {tabId} AND md.FriendlyName = '{moduleName}'");
         public static HttpWebResponse Register(string userName, string password, string displayName, string email,
             string url = null, bool encriptFieldsNames = true)
         {
+			private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
             const string registerRelativeUrl = "/Register";
+			_logger.LogDebug(">>> Entering Register(userName={UserName},password=<redacted>,displayName={DisplayName},email={Email},url={Url},encriptFieldsNames={EncriptFieldsNames})", userName, displayName, email, url, encriptFieldsNames);
             const string registerFieldsPrefix = "dnn$ctr$Register$userForm";
 
             var postData = new Dictionary<string, object>
@@ -92,12 +97,17 @@ WHERE tm.TabID = {tabId} AND md.FriendlyName = '{moduleName}'");
 
             url = url ?? AppConfigHelper.SiteUrl;
             var excludedInputPrefixes = new List<string>();
+			_logger.LogDebug("Register(userName={UserName},password=<redacted>,displayName={DisplayName},email={Email},url={Url},encriptFieldsNames={EncriptFieldsNames}): excludedInputPrefixes → {ExcludedInputPrefixes}", userName, displayName, email, url, encriptFieldsNames, excludedInputPrefixes);
             var connector = WebApiConnector.GetWebConnector(url, string.Empty);
+			_logger.LogDebug("Register(userName={UserName},password=<redacted>,displayName={DisplayName},email={Email},url={Url},encriptFieldsNames={EncriptFieldsNames}): connector → {Connector}", userName, displayName, email, url, encriptFieldsNames, connector);
+			_logger.LogDebug("<<< Exiting Register(userName={UserName},password=<redacted>,displayName={DisplayName},email={Email},url={Url},encriptFieldsNames={EncriptFieldsNames})", userName, displayName, email, url, encriptFieldsNames);
             return connector.PostUserForm(registerRelativeUrl, postData, excludedInputPrefixes, false);
         }
 
         public static string GenerateSha256Hash(this string str)
         {
+			_logger.LogDebug(">>> Entering GenerateSha256Hash(str={Str})", str);
+			_logger.LogDebug("<<< Exiting GenerateSha256Hash(str={Str})", str);
             return str.GenerateHash("SHA256");
         }
 
@@ -106,6 +116,8 @@ WHERE tm.TabID = {tabId} AND md.FriendlyName = '{moduleName}'");
         /// <returns></returns>
         public static string GenerateMd5(this string str)
         {
+			_logger.LogDebug(">>> Entering GenerateMd5(str={Str})", str);
+			_logger.LogDebug("<<< Exiting GenerateMd5(str={Str})", str);
             return str.GenerateHash("MD5");
         }
 
@@ -116,25 +128,32 @@ WHERE tm.TabID = {tabId} AND md.FriendlyName = '{moduleName}'");
         /// <returns>IWebApiConnector object to perform more actions.</returns>
         public static IWebApiConnector LoginRegisteredUser(string firstName = IntegrationConstants.RuFirstName, string lastName = IntegrationConstants.RuLastName, string url = null)
         {
+			_logger.LogDebug(">>> Entering LoginRegisteredUser(firstName={FirstName},lastName={LastName},url={Url})", firstName, lastName, url);
             IWebApiConnector connector;
             url = url ?? AppConfigHelper.SiteUrl;
             var username = firstName + "." + lastName;
+			_logger.LogDebug("LoginRegisteredUser(firstName={FirstName},lastName={LastName},url={Url}): username → {Username}", firstName, lastName, url, username);
             var key = string.Join("_", url, username);
+			_logger.LogWarning("LoginRegisteredUser(firstName={FirstName},lastName={LastName},url={Url}): key → {Key}", firstName, lastName, url, key);
             if (!CachedConnections.TryGetValue(key, out connector) ||
                 connector.LoggedInAtTime < DateTime.Now.AddMinutes(-19.5))
             {
                 var portalId = GetPortalFromUrl(url);
+				_logger.LogDebug("LoginRegisteredUser(firstName={FirstName},lastName={LastName},url={Url}): portalId → {PortalId}", firstName, lastName, url, portalId);
                 UserController.CreateRegisteredUser(firstName, lastName, portalId);
                 connector = WebApiConnector.GetWebConnector(url, username);
                 CachedConnections[key] = connector;
+				_logger.LogDebug("LoginRegisteredUser(firstName={FirstName},lastName={LastName},url={Url}): connector → {Connector}", firstName, lastName, url, connector);
             }
 
             if (!connector.IsLoggedIn)
             {
                 var loggedIn = connector.Login(AppConfigHelper.HostPassword);
+				_logger.LogDebug("LoginRegisteredUser(firstName={FirstName},lastName={LastName},url={Url}): loggedIn → {LoggedIn}", firstName, lastName, url, loggedIn);
                 Assert.That(loggedIn, Is.True);
             }
 
+			_logger.LogDebug("<<< Exiting LoginRegisteredUser(firstName={FirstName},lastName={LastName},url={Url})", firstName, lastName, url);
             return connector;
         }
 
@@ -145,24 +164,31 @@ WHERE tm.TabID = {tabId} AND md.FriendlyName = '{moduleName}'");
         /// <returns>WebApiConnector object to perform more actions.</returns>
         public static IWebApiConnector LoginAdministrator(string firstName = IntegrationConstants.AdminFirstName, string lastName = IntegrationConstants.AdminLastName, string url = null)
         {
+			_logger.LogDebug(">>> Entering LoginAdministrator(firstName={FirstName},lastName={LastName},url={Url})", firstName, lastName, url);
             IWebApiConnector connector;
             url = url ?? AppConfigHelper.SiteUrl;
             var username = firstName + "." + lastName;
+			_logger.LogDebug("LoginAdministrator(firstName={FirstName},lastName={LastName},url={Url}): username → {Username}", firstName, lastName, url, username);
             var key = string.Join("_", url, username);
+			_logger.LogWarning("LoginAdministrator(firstName={FirstName},lastName={LastName},url={Url}): key → {Key}", firstName, lastName, url, key);
             if (!CachedConnections.TryGetValue(key, out connector))
             {
                 var portalId = GetPortalFromUrl(url);
+				_logger.LogDebug("LoginAdministrator(firstName={FirstName},lastName={LastName},url={Url}): portalId → {PortalId}", firstName, lastName, url, portalId);
                 UserController.CreateAdministratorUser(firstName, lastName, portalId);
                 connector = WebApiConnector.GetWebConnector(url, username);
                 CachedConnections.Add(key, connector);
+				_logger.LogDebug("LoginAdministrator(firstName={FirstName},lastName={LastName},url={Url}): connector → {Connector}", firstName, lastName, url, connector);
             }
 
             if (!connector.IsLoggedIn)
             {
                 var loggedIn = connector.Login(AppConfigHelper.HostPassword);
+				_logger.LogDebug("LoginAdministrator(firstName={FirstName},lastName={LastName},url={Url}): loggedIn → {LoggedIn}", firstName, lastName, url, loggedIn);
                 Assert.That(loggedIn, Is.True);
             }
 
+			_logger.LogDebug("<<< Exiting LoginAdministrator(firstName={FirstName},lastName={LastName},url={Url})", firstName, lastName, url);
             return connector;
         }
 
@@ -170,6 +196,8 @@ WHERE tm.TabID = {tabId} AND md.FriendlyName = '{moduleName}'");
         /// <returns>IWebApiConnector object to perform more actions.</returns>
         public static IWebApiConnector LoginHost()
         {
+			_logger.LogDebug(">>> Entering LoginHost()");
+			_logger.LogDebug("<<< Exiting LoginHost()");
             return LoginUser(AppConfigHelper.HostUserName);
         }
 
@@ -177,26 +205,33 @@ WHERE tm.TabID = {tabId} AND md.FriendlyName = '{moduleName}'");
         /// <returns>IWebApiConnector object to perform more actions.</returns>
         public static IWebApiConnector LoginUser(string username, string url = null)
         {
+			_logger.LogDebug(">>> Entering LoginUser(username={Username},url={Url})", username, url);
             IWebApiConnector connector;
             url = url ?? AppConfigHelper.SiteUrl;
             var key = string.Join("_", url, username);
+			_logger.LogWarning("LoginUser(username={Username},url={Url}): key → {Key}", username, url, key);
             if (!CachedConnections.TryGetValue(key, out connector))
             {
                 connector = WebApiConnector.GetWebConnector(url, username);
                 CachedConnections.Add(key, connector);
+				_logger.LogDebug("LoginUser(username={Username},url={Url}): connector → {Connector}", username, url, connector);
             }
 
             if (!connector.IsLoggedIn)
             {
                 var loggedIn = connector.Login(AppConfigHelper.HostPassword);
+				_logger.LogDebug("LoginUser(username={Username},url={Url}): loggedIn → {LoggedIn}", username, url, loggedIn);
                 Assert.That(loggedIn, Is.True);
             }
 
+			_logger.LogDebug("<<< Exiting LoginUser(username={Username},url={Url})", username, url);
             return connector;
         }
 
         public static int GetPortalFromUrl(string url)
         {
+			_logger.LogDebug(">>> Entering GetPortalFromUrl(url={Url})", url);
+			_logger.LogDebug("<<< Exiting GetPortalFromUrl(url={Url})", url);
             return 0;
         }
 
@@ -204,18 +239,24 @@ WHERE tm.TabID = {tabId} AND md.FriendlyName = '{moduleName}'");
         /// <returns>IWebApiConnector object to perform more actions.</returns>
         public static IWebApiConnector ClearHostCache()
         {
+			_logger.LogDebug(">>> Entering ClearHostCache()");
             var connector = LoginUser(AppConfigHelper.HostUserName);
 
+			_logger.LogDebug("ClearHostCache(): connector → {Connector}", connector);
             // connector.PostJson("API/internalservices/controlbar/ClearHostCache", null);
             connector.PostJson("API/PersonaBar/Server/ClearCache", null);
+			_logger.LogDebug("<<< Exiting ClearHostCache()");
             return connector;
         }
 
         /// <summary>Logs in as host and recycle the application.</summary>
         public static void RecycleApplication()
         {
+			_logger.LogDebug(">>> Entering RecycleApplication()");
             var connector = LoginUser(AppConfigHelper.HostUserName);
             connector.PostJson("API/internalservices/controlbar/RecycleApplicationPool ", null);
+			_logger.LogDebug("RecycleApplication(): connector → {Connector}", connector);
+			_logger.LogDebug("<<< Exiting RecycleApplication()");
         }
 
         /// <summary>Returns TabId and ModuleId headers for a Page to be passed in a Post WebApi call.</summary>
@@ -251,23 +292,32 @@ WHERE tm.TabID = {tabId} AND md.FriendlyName = '{moduleName}'");
 
         internal static void ClearCachedConnections()
         {
+			_logger.LogDebug(">>> Entering ClearCachedConnections()");
             _anonymousConnector = null;
             CachedConnections.Clear();
+			_logger.LogDebug("ClearCachedConnections(): _anonymousConnector → {_anonymousConnector}", _anonymousConnector);
+			_logger.LogDebug("<<< Exiting ClearCachedConnections()");
         }
 
         private static string CodifyInputName(string originalId, string sufix, bool encriptName)
         {
+			_logger.LogDebug(">>> Entering CodifyInputName(originalId={OriginalId},sufix={Sufix},encriptName={EncriptName})", originalId, sufix, encriptName);
             var transformedId = encriptName ? CodifyString(originalId) : originalId;
+			_logger.LogDebug("CodifyInputName(originalId={OriginalId},sufix={Sufix},encriptName={EncriptName}): transformedId → {TransformedId}", originalId, sufix, encriptName, transformedId);
+			_logger.LogDebug("<<< Exiting CodifyInputName(originalId={OriginalId},sufix={Sufix},encriptName={EncriptName})", originalId, sufix, encriptName);
             return "$" + transformedId + "$" + transformedId + "_" + sufix;
         }
 
         private static string CodifyString(string originalString)
         {
+			_logger.LogDebug(">>> Entering CodifyString(originalString={OriginalString})", originalString);
+			_logger.LogDebug("<<< Exiting CodifyString(originalString={OriginalString})", originalString);
             return GenerateHash(HostGuid.Substring(0, 7) + originalString + DateTime.Now.Day);
         }
 
         private static string GenerateHash(string str)
         {
+			_logger.LogDebug(">>> Entering GenerateHash(str={Str})", str);
             try
             {
                 return CryptoConfig.AllowOnlyFipsAlgorithms
@@ -276,7 +326,10 @@ WHERE tm.TabID = {tabId} AND md.FriendlyName = '{moduleName}'");
             }
             catch (Exception)
             {
+				_logger.LogError("Exception in GenerateHash(str={Str}): {Arg1}", str, Exception.Message);
+				_logger.LogDebug("<<< Exiting GenerateHash(str={Str})", str);
                 return str.GenerateMd5();
+			_logger.LogDebug("<<< Exiting GenerateHash(str={Str},hashType=<redacted>)", str);
             }
         }
 

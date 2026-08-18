@@ -10,9 +10,12 @@ namespace DotNetNuke.Entities.Users.Social
 
     public class FriendsController : ServiceLocator<IFriendsController, FriendsController>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FriendsController));
         /// <inheritdoc />
         protected override Func<IFriendsController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new FriendsControllerImpl();
         }
     }

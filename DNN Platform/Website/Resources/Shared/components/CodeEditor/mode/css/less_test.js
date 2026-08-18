@@ -1,10 +1,13 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function() {
+logger.debug('>>> Entering function()');
   "use strict";
 
   var mode = CodeMirror.getMode({indentUnit: 2}, "text/x-less");
+logger.debug(`function(): mode → ${mode}`);
   function MT(name) { test.mode(name, mode, Array.prototype.slice.call(arguments, 1), "less"); }
 
   MT("variable",
@@ -50,5 +53,6 @@
      "}");
 
 
+logger.debug('<<< Exiting function()');
   MT("interpolation", ".@{[variable foo]} { [property font-weight]: [atom bold]; }");
 })();

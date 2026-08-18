@@ -11,6 +11,7 @@ namespace DotNetNuke.UI.Skins.Controls
     /// <summary>A control which causes CSS to be included on the page.</summary>
     public partial class DnnCssInclude : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnCssInclude.ascx));
         public CssMediaType CssMedia { get; set; } = CssMediaType.None;
 
         public string FilePath { get; set; }
@@ -56,6 +57,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
             this.ctlInclude.AddTag = this.AddTag;
             this.ctlInclude.FilePath = this.FilePath;
@@ -76,6 +78,7 @@ namespace DotNetNuke.UI.Skins.Controls
             {
                 this.ctlInclude.CssMedia = this.CssMedia.ToString().ToLowerInvariant();
             }
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
     }
 }

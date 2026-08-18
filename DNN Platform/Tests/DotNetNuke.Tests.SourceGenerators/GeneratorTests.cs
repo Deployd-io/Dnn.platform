@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information
@@ -6,9 +7,12 @@ namespace DotNetNuke.Tests.SourceGenerators;
 [TestFixture]
 public class GeneratorTests
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     [Test]
     public async Task NoAttribute_GenerateNothing()
     {
+		_logger.LogDebug(">>> Entering NoAttribute_GenerateNothing()");
+		_logger.LogDebug("<<< Exiting NoAttribute_GenerateNothing()");
         await Verify("""
 namespace G;
 
@@ -24,6 +28,7 @@ public partial class D
     [Test]
     public async Task NotPartial_ReportsError()
     {
+		_logger.LogDebug(">>> Entering NotPartial_ReportsError()");
         await Verify("""
 namespace G;
 
@@ -35,11 +40,14 @@ public class D
 }
 
 """);
+	_logger.LogDebug("<<< Exiting Verify(source={Source})", source);
     }
 
     [Test]
     public async Task Class()
     {
+		_logger.LogDebug(">>> Entering Class()");
+		_logger.LogDebug("<<< Exiting Class()");
         await Verify("""
 namespace G;
 
@@ -56,6 +64,8 @@ public partial class D
     [Test]
     public async Task Class_Error()
     {
+		_logger.LogDebug(">>> Entering Class_Error()");
+		_logger.LogDebug("<<< Exiting Class_Error()");
         await Verify("""
 namespace G;
 
@@ -72,6 +82,8 @@ public partial class D
     [Test]
     public async Task GenericClass()
     {
+		_logger.LogDebug(">>> Entering GenericClass()");
+		_logger.LogDebug("<<< Exiting GenericClass()");
         await Verify("""
 namespace G;
 
@@ -88,6 +100,8 @@ public partial class D<T,U>
     [Test]
     public async Task NestedGeneric()
     {
+		_logger.LogDebug(">>> Entering NestedGeneric()");
+		_logger.LogDebug("<<< Exiting NestedGeneric()");
         await Verify("""
 namespace G;
 
@@ -107,6 +121,8 @@ public partial class D<T,U>
     [Test]
     public async Task Interface()
     {
+		_logger.LogDebug(">>> Entering Interface()");
+		_logger.LogDebug("<<< Exiting Interface()");
         await Verify("""
 namespace G;
 
@@ -123,6 +139,8 @@ public partial interface B
     [Test]
     public async Task GenericInterface()
     {
+		_logger.LogDebug(">>> Entering GenericInterface()");
+		_logger.LogDebug("<<< Exiting GenericInterface()");
         await Verify("""
 namespace G;
 
@@ -139,6 +157,8 @@ public partial interface B<T>
     [Test]
     public async Task Struct()
     {
+		_logger.LogDebug(">>> Entering Struct()");
+		_logger.LogDebug("<<< Exiting Struct()");
         await Verify("""
 namespace G;
 
@@ -155,6 +175,8 @@ public partial struct A
     [Test]
     public async Task Record()
     {
+		_logger.LogDebug(">>> Entering Record()");
+		_logger.LogDebug("<<< Exiting Record()");
         await Verify("""
 namespace G;
 
@@ -171,6 +193,8 @@ public partial record A
     [Test]
     public async Task NestedRecord()
     {
+		_logger.LogDebug(">>> Entering NestedRecord()");
+		_logger.LogDebug("<<< Exiting NestedRecord()");
         await Verify("""
 namespace G;
 
@@ -190,6 +214,7 @@ public partial class A
     [Test]
     public async Task SpecialCharacters()
     {
+		_logger.LogDebug(">>> Entering SpecialCharacters()");
         await Verify(""""
 namespace G;
 
@@ -215,6 +240,7 @@ public partial class A
     [Test]
     public async Task Methods()
     {
+		_logger.LogDebug(">>> Entering Methods()");
         await Verify("""
 namespace G;
 
@@ -264,6 +290,7 @@ internal partial class A
     [Test]
     public async Task ParamsParameter()
     {
+		_logger.LogDebug(">>> Entering ParamsParameter()");
         await Verify("""
 namespace G;
 
@@ -283,6 +310,7 @@ partial class A
     [Test]
     public async Task OptionalParameters()
     {
+		_logger.LogDebug(">>> Entering OptionalParameters()");
         await Verify("""
 namespace G;
 
@@ -312,6 +340,7 @@ partial class A
     [Test]
     public async Task ExtensionMethod()
     {
+		_logger.LogDebug(">>> Entering ExtensionMethod()");
         await Verify("""
 namespace G;
 
@@ -322,6 +351,7 @@ partial class A
     [DnnDeprecated(9, 9, 1, "Use overload taking IEnumerable.")]
     partial void R(this int[] numbers, string another)
     {
+	_logger.LogDebug(">>> Entering Verify(source={Source})", source);
     }
 }
 
@@ -330,6 +360,7 @@ partial class A
 
     private static async Task Verify(string source)
     {
+		_logger.LogDebug(">>> Entering Verify(source={Source})", source);
         var references =
             AppDomain.CurrentDomain.GetAssemblies()
                 .Where(a => !a.IsDynamic && !string.IsNullOrEmpty(a.Location))
@@ -344,5 +375,6 @@ partial class A
                 .Create(new DnnDeprecatedGenerator())
                 .RunGenerators(compilation);
         await Verifier.Verify(driver).UseDirectory("Snapshots");
+		_logger.LogDebug("<<< Exiting Verify(source={Source})", source);
     }
 }

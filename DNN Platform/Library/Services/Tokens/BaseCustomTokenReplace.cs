@@ -17,6 +17,7 @@ namespace DotNetNuke.Services.Tokens
     /// <summary>BaseCustomTokenReplace allows to add multiple sources implementing <see cref="IPropertyAccess">IPropertyAccess</see>.</summary>
     public abstract class BaseCustomTokenReplace : BaseTokenReplace
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(BaseCustomTokenReplace));
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Breaking Change")]
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
@@ -29,7 +30,11 @@ namespace DotNetNuke.Services.Tokens
         /// <summary>Initializes a new instance of the <see cref="BaseCustomTokenReplace"/> class.</summary>
         public BaseCustomTokenReplace()
         {
+			Logger.LogDebug(">>> Entering BaseCustomTokenReplace()");
             this.PropertySource = this.TokenContext.PropertySource;
+			Logger.LogDebug("BaseCustomTokenReplace(): PropertySource → {PropertySource}", PropertySource);
+			Logger.LogDebug("BaseCustomTokenReplace(): this.PropertySource → {Arg0}", this.PropertySource);
+			Logger.LogDebug("<<< Exiting BaseCustomTokenReplace()");
         }
 
         public TokenContext TokenContext
@@ -88,8 +93,10 @@ namespace DotNetNuke.Services.Tokens
         /// <remarks>always check cacheability before caching a module!.</remarks>
         public CacheLevel Cacheability(string sourceText)
         {
+			Logger.LogDebug(">>> Entering Cacheability(sourceText={SourceText})", sourceText);
             CacheLevel isSafe = CacheLevel.fullyCacheable;
             if (sourceText != null && !string.IsNullOrEmpty(sourceText))
+			Logger.LogDebug("Cacheability(sourceText={SourceText}): isSafe → {IsSafe}", sourceText, isSafe);
             {
                 // initialize PropertyAccess classes
                 string dummyResult = this.ReplaceTokens(sourceText);
@@ -109,6 +116,7 @@ namespace DotNetNuke.Services.Tokens
                         else
                         {
                             CacheLevel c = this.PropertySource[strObjectName.ToLowerInvariant()].Cacheability;
+							Logger.LogDebug("Cacheability(sourceText={SourceText}): c → {C}", sourceText, c);
                             if (c < isSafe)
                             {
                                 isSafe = c;
@@ -118,6 +126,7 @@ namespace DotNetNuke.Services.Tokens
                 }
             }
 
+			Logger.LogDebug("<<< Exiting Cacheability(sourceText={SourceText})", sourceText);
             return isSafe;
         }
 
@@ -126,6 +135,7 @@ namespace DotNetNuke.Services.Tokens
         /// <returns><see langword="true"/> if the source text contains tokens, otherwise <see langword="false"/>.</returns>
         public bool ContainsTokens(string strSourceText)
         {
+			Logger.LogDebug(">>> Entering ContainsTokens(strSourceText={StrSourceText})", strSourceText);
             if (string.IsNullOrEmpty(strSourceText))
             {
                 return false;
@@ -134,13 +144,16 @@ namespace DotNetNuke.Services.Tokens
             // also check providers, since they might support different syntax than square brackets
             return this.TokenizerRegex.Matches(strSourceText).Cast<Match>().Any(currentMatch => currentMatch.Result("${object}").Length > 0)
                 || this.Provider.ContainsTokens(strSourceText, this.TokenContext);
+				Logger.LogDebug("<<< Exiting ContainsTokens(strSourceText={StrSourceText})", strSourceText);
         }
 
         /// <inheritdoc />
         protected override string replacedTokenValue(string objectName, string propertyName, string format)
         {
+			Logger.LogDebug(">>> Entering replacedTokenValue(objectName={ObjectName},propertyName={PropertyName},format={Format})", objectName, propertyName, format);
             string result = string.Empty;
             bool propertyNotFound = false;
+			Logger.LogDebug("replacedTokenValue(objectName={ObjectName},propertyName={PropertyName},format={Format}): result → {Result}", objectName, propertyName, format, result);
             if (this.PropertySource.ContainsKey(objectName.ToLowerInvariant()))
             {
                 result = this.PropertySource[objectName.ToLowerInvariant()].GetProperty(propertyName, format, this.FormatProvider, this.AccessingUser, this.CurrentAccessLevel, ref propertyNotFound);
@@ -151,6 +164,7 @@ namespace DotNetNuke.Services.Tokens
                     "TokenReplaceUnknownObject",
                     Localization.SharedResourceFile,
                     this.FormatProvider.ToString());
+					Logger.LogDebug("replacedTokenValue(objectName={ObjectName},propertyName={PropertyName},format={Format}): message → {Message}", objectName, propertyName, format, message);
                 if (message == string.Empty)
                 {
                     message = "Error accessing [{0}:{1}], {0} is an unknown datasource";
@@ -179,12 +193,15 @@ namespace DotNetNuke.Services.Tokens
                 result = string.Format(CultureInfo.CurrentCulture, message, objectName, propertyName);
             }
 
+			Logger.LogDebug("<<< Exiting replacedTokenValue(objectName={ObjectName},propertyName={PropertyName},format={Format})", objectName, propertyName, format);
             return result;
         }
 
         /// <inheritdoc />
         protected override string ReplaceTokens(string sourceText)
         {
+			Logger.LogDebug(">>> Entering ReplaceTokens(sourceText={SourceText})", sourceText);
+			Logger.LogDebug("<<< Exiting ReplaceTokens(sourceText={SourceText})", sourceText);
             return this.Provider is CoreTokenProvider ? base.ReplaceTokens(sourceText) : this.Provider.Tokenize(sourceText, this.TokenContext);
         }
 
@@ -202,10 +219,12 @@ namespace DotNetNuke.Services.Tokens
         /// <param name="properties">The <see cref="IPropertyAccess"/> implementation.</param>
         protected void AddPropertySource(string name, IPropertyAccess properties)
         {
+			Logger.LogDebug(">>> Entering AddPropertySource(name={Name},properties={Properties})", name, properties);
             this.PropertySource[name + "_raw"] = properties;
             this.PropertySource[name] = new HtmlEncodingPropertyAccess(properties);
             this.PropertySource[name + "_url"] = new UrlEncodingPropertyAccess(properties);
             this.PropertySource[name + "_js"] = new JavaScriptEncodingPropertyAccess(properties);
+			Logger.LogDebug("<<< Exiting AddPropertySource(name={Name},properties={Properties})", name, properties);
         }
 
         /// <summary>Adds the <paramref name="properties"/> with the given <paramref name="name"/> as a source for the token replace.</summary>
@@ -213,7 +232,9 @@ namespace DotNetNuke.Services.Tokens
         /// <param name="properties">The <see cref="IPropertyAccess"/> implementation.</param>
         protected void AddRawPropertySource(string name, IPropertyAccess properties)
         {
+			Logger.LogDebug(">>> Entering AddRawPropertySource(name={Name},properties={Properties})", name, properties);
             this.PropertySource[name] = properties;
+			Logger.LogDebug("<<< Exiting AddRawPropertySource(name={Name},properties={Properties})", name, properties);
         }
     }
 }

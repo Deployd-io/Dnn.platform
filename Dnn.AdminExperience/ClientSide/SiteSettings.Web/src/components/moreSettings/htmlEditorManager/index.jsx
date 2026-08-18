@@ -5,23 +5,30 @@ import resx from "../../../resources";
 import { BackToLink } from "@dnnsoftware/dnn-react-common";
 import util from "utils";
 import styles from "./style.module.less";
+const logger = console;
 
 class HtmlEditorManagerPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             url: undefined
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.setState({
             url: util.siteRoot + "Host/HTMLEditorManager?portalid=" + this.props.portalId + "&portpopUp=true"
         });
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <div className="dnn-persona-bar-page-body">
                 <div className={styles.htmlEditorManager}>
@@ -41,6 +48,8 @@ HtmlEditorManagerPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex
     };

@@ -10,9 +10,11 @@ namespace DotNetNuke.Tests.Urls
 
     using DotNetNuke.Entities.Urls;
     using NUnit.Framework;
+	using Microsoft.Extensions.Logging;
 
     internal static class UrlTestFactoryClass
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         internal static IEnumerable FriendlyUrl_BaseTestCases
         {
             get
@@ -57,6 +59,7 @@ namespace DotNetNuke.Tests.Urls
 
                 GetTestsWithAliases("FriendlyUrl", "PageExtension", testData);
 
+			_logger.LogDebug("<<< Exiting GetTestsWithAliases(testType={TestType},testName={TestName},testData={TestData})", testType, testName, testData);
                 return testData;
             }
         }
@@ -252,6 +255,7 @@ namespace DotNetNuke.Tests.Urls
 
                 return testData;
             }
+			_logger.LogDebug(">>> Entering GetTestsWithAliases(testType={TestType},testName={TestName},testData={TestData})", testType, testName, testData);
         }
 
         internal static IEnumerable UrlRewrite_SecureRedirectTestCases
@@ -292,6 +296,9 @@ namespace DotNetNuke.Tests.Urls
 
         internal static FriendlyUrlSettings GetSettings(string testType, string testName, int portalId)
         {
+			_logger.LogDebug(">>> Entering GetSettings(testType={TestType},testName={TestName},portalId={PortalId})", testType, testName, portalId);
+			_logger.LogDebug("<<< Exiting GetSettings(testType={TestType},testName={TestName},portalId={PortalId})", testType, testName, portalId);
+			_logger.LogDebug("<<< Exiting GetSettings(testType={TestType},testName={TestName},settingsFile={SettingsFile},portalId={PortalId})", testType, testName, settingsFile, portalId);
             return GetSettings(testType, testName, "Settings", portalId);
         }
 
@@ -352,12 +359,14 @@ namespace DotNetNuke.Tests.Urls
             TestUtil.ReadStream("Aliases", (line, header) =>
             {
                 var fields = line.Split(',');
+				_logger.LogDebug("GetTestsWithAliases(testType={TestType},testName={TestName},testData={TestData}): fields → {Fields}", testType, testName, testData, fields);
                 GetTests(fields[1].Trim(), fields[0].Trim(), testType, testName, testData);
             });
         }
 
         private static void GetTests(string testPrefix, string alias, string testType, string testName, ArrayList testData)
         {
+			_logger.LogDebug(">>> Entering GetTests(testPrefix={TestPrefix},alias={Alias},testType={TestType},testName={TestName},testData={TestData})", testPrefix, alias, testType, testName, testData);
             try
             {
                 // Read Test File Data
@@ -390,9 +399,11 @@ namespace DotNetNuke.Tests.Urls
                             });
             }
 
+			_logger.LogDebug("<<< Exiting GetTests(testPrefix={TestPrefix},alias={Alias},testType={TestType},testName={TestName},testData={TestData})", testPrefix, alias, testType, testName, testData);
             // ReSharper disable RedundantCatchClause
 #pragma warning disable 168
             catch (Exception exc)
+			_logger.LogError("Exception in GetTests(testPrefix={TestPrefix},alias={Alias},testType={TestType},testName={TestName},testData={TestData}): {Arg5}", testPrefix, alias, testType, testName, testData, exc.getMessage());
 #pragma warning restore 168
             {
                 throw;

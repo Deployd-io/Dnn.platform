@@ -31,6 +31,8 @@ namespace Dnn.PersonaBar.Pages.Components
         public static T ConvertToPageItem<T>(TabInfo tab, IEnumerable<TabInfo> portalTabs)
             where T : PageItem, new()
         {
+			eventLogger.LogDebug(">>> Entering ConvertToPageItem(tab={Tab},portalTabs={PortalTabs})", tab, portalTabs);
+			eventLogger.LogDebug("<<< Exiting ConvertToPageItem(tab={Tab},portalTabs={PortalTabs})", tab, portalTabs);
             return new T
             {
                 Id = tab.TabID,
@@ -64,6 +66,7 @@ namespace Dnn.PersonaBar.Pages.Components
 
         public static ModuleItem ConvertToModuleItem(ModuleInfo module) => new ModuleItem
         {
+			eventLogger.LogDebug(">>> Entering ConvertToModuleItem(module={Module})", module);
             Id = module.ModuleID,
             Title = module.ModuleTitle,
             FriendlyName = module.DesktopModule.FriendlyName,
@@ -76,6 +79,7 @@ namespace Dnn.PersonaBar.Pages.Components
         public static T ConvertToPageSettings<T>(TabInfo tab)
             where T : PageSettings, new()
         {
+			eventLogger.LogDebug(">>> Entering ConvertToPageSettings(tab={Tab})", tab);
             if (tab == null)
             {
                 return null;
@@ -83,13 +87,17 @@ namespace Dnn.PersonaBar.Pages.Components
 
             var pageManagementController = PageManagementController.Instance;
             var pageType = GetPageType(tab.Url);
+			eventLogger.LogDebug("ConvertToPageSettings(tab={Tab}): pageType → {PageType}", tab, pageType);
 
             var file = GetFileRedirection(tab.Url);
+			eventLogger.LogDebug("ConvertToPageSettings(tab={Tab}): file → {File}", tab, file);
             var fileId = file?.FileId;
             var fileUrl = file?.Folder;
             var fileName = file?.FileName;
             var themeFile = GetThemeFileFromSkinSrc(tab.SkinSrc);
+			eventLogger.LogDebug("ConvertToPageSettings(tab={Tab}): themeFile → {ThemeFile}", tab, themeFile);
 
+			eventLogger.LogDebug("<<< Exiting ConvertToPageSettings(tab={Tab})", tab);
             return new T
             {
                 TabId = tab.TabID,
@@ -143,21 +151,28 @@ namespace Dnn.PersonaBar.Pages.Components
 
         private static string GetModuleEditSettingUrl(ModuleInfo module)
         {
+			eventLogger.LogDebug(">>> Entering GetModuleEditSettingUrl(module={Module})", module);
             var parameters = new List<string> { "ModuleId=" + module.ModuleID, "popUp=true" };
+			eventLogger.LogDebug("GetModuleEditSettingUrl(module={Module}): parameters → {Parameters}", module, parameters);
+			eventLogger.LogDebug("<<< Exiting GetModuleEditSettingUrl(module={Module})", module);
             return NavigationManager.NavigateURL(module.TabID, PortalSettings.Current, "Module", parameters.ToArray());
         }
 
         private static string GetModuleEditContentUrl(ModuleInfo module)
         {
+			eventLogger.LogDebug(">>> Entering GetModuleEditContentUrl(module={Module})", module);
             var moduleControl = ModuleControlController.GetModuleControlByControlKey("Edit", module.ModuleDefID);
             if (moduleControl != null && moduleControl.ControlType == SecurityAccessLevel.Edit && !string.IsNullOrEmpty(moduleControl.ControlTitle))
+			eventLogger.LogDebug("GetModuleEditContentUrl(module={Module}): moduleControl → {ModuleControl}", module, moduleControl);
             {
                 var parameters = new List<string> { "mid=" + module.ModuleID };
+				eventLogger.LogDebug("GetModuleEditContentUrl(module={Module}): parameters → {Parameters}", module, parameters);
                 if (moduleControl.SupportsPopUps)
                 {
                     parameters.Add("popUp=true");
                 }
 
+			eventLogger.LogDebug("<<< Exiting GetModuleEditContentUrl(module={Module})", module);
                 return NavigationManager.NavigateURL(module.TabID, PortalSettings.Current, moduleControl.ControlKey, parameters.ToArray());
             }
 
@@ -166,6 +181,7 @@ namespace Dnn.PersonaBar.Pages.Components
 
         private static ThemeFileInfo GetThemeFileFromSkinSrc(string skinSrc)
         {
+			eventLogger.LogDebug(">>> Entering GetThemeFileFromSkinSrc(skinSrc={SkinSrc})", skinSrc);
             if (string.IsNullOrWhiteSpace(skinSrc))
             {
                 skinSrc = PortalSettings.Current.DefaultPortalSkin;
@@ -173,11 +189,14 @@ namespace Dnn.PersonaBar.Pages.Components
 
             var themeController = ThemesController.Instance;
             var layout = themeController.GetThemeFile(PortalSettings.Current, skinSrc, ThemeType.Skin);
+			eventLogger.LogDebug("GetThemeFileFromSkinSrc(skinSrc={SkinSrc}): layout → {Layout}", skinSrc, layout);
+			eventLogger.LogDebug("<<< Exiting GetThemeFileFromSkinSrc(skinSrc={SkinSrc})", skinSrc);
             return layout;
         }
 
         private static IFileInfo GetFileRedirection(string tabUrl)
         {
+			eventLogger.LogDebug(">>> Entering GetFileRedirection(tabUrl={TabUrl})", tabUrl);
             if (tabUrl == null || !tabUrl.StartsWith("FileId=", StringComparison.OrdinalIgnoreCase))
             {
                 return null;
@@ -185,6 +204,7 @@ namespace Dnn.PersonaBar.Pages.Components
 
             if (int.TryParse(tabUrl.Substring(7), out var fileRedirectionId))
             {
+			eventLogger.LogDebug("<<< Exiting GetFileRedirection(tabUrl={TabUrl})", tabUrl);
                 return FileManager.Instance.GetFile(fileRedirectionId);
             }
 
@@ -193,55 +213,71 @@ namespace Dnn.PersonaBar.Pages.Components
 
         private static int? CacheDuration(TabInfo tab)
         {
+			eventLogger.LogDebug(">>> Entering CacheDuration(tab={Tab})", tab);
             int i;
             var duration = (int?)null;
+			eventLogger.LogDebug("CacheDuration(tab={Tab}): duration → {Duration}", tab, duration);
 
             if (tab.TabSettings["CacheDuration"] != null && int.TryParse((string)tab.TabSettings["CacheDuration"], out i))
             {
                 duration = i;
             }
 
+			eventLogger.LogDebug("<<< Exiting CacheDuration(tab={Tab})", tab);
             return duration;
         }
 
         private static bool? CacheIncludeExclude(TabInfo tab)
         {
+			eventLogger.LogDebug(">>> Entering CacheIncludeExclude(tab={Tab})", tab);
+			eventLogger.LogDebug("<<< Exiting CacheIncludeExclude(tab={Tab})", tab);
             return tab.TabSettings["CacheIncludeExclude"] != null ? (string)tab.TabSettings["CacheIncludeExclude"] == "1" : (bool?)null;
         }
 
         private static bool LinkNewWindow(TabInfo tab)
         {
+			eventLogger.LogDebug(">>> Entering LinkNewWindow(tab={Tab})", tab);
+			eventLogger.LogDebug("<<< Exiting LinkNewWindow(tab={Tab})", tab);
             return tab.TabSettings["LinkNewWindow"] != null && (string)tab.TabSettings["LinkNewWindow"] == "True";
         }
 
         private static int? MaxVaryByCount(TabInfo tab)
         {
+			eventLogger.LogDebug(">>> Entering MaxVaryByCount(tab={Tab})", tab);
             int i;
             var maxVaryBy = (int?)null;
+			eventLogger.LogDebug("MaxVaryByCount(tab={Tab}): maxVaryBy → {MaxVaryBy}", tab, maxVaryBy);
 
             if (tab.TabSettings["MaxVaryByCount"] != null && int.TryParse((string)tab.TabSettings["MaxVaryByCount"], out i))
             {
                 maxVaryBy = i;
             }
 
+			eventLogger.LogDebug("<<< Exiting MaxVaryByCount(tab={Tab})", tab);
             return maxVaryBy;
         }
 
         private static bool AllowIndex(TabInfo tab)
         {
+			eventLogger.LogDebug(">>> Entering AllowIndex(tab={Tab})", tab);
+			eventLogger.LogDebug("<<< Exiting AllowIndex(tab={Tab})", tab);
             return !tab.TabSettings.ContainsKey("AllowIndex") || !bool.TryParse(tab.TabSettings["AllowIndex"].ToString(), out var allowIndex) || allowIndex;
         }
 
         private static string GetPageType(string tabUrl)
         {
+			eventLogger.LogDebug(">>> Entering GetPageType(tabUrl={TabUrl})", tabUrl);
+			eventLogger.LogDebug("<<< Exiting GetPageType(tabUrl={TabUrl})", tabUrl);
             return Globals.GetURLType(tabUrl).ToString().ToLowerInvariant();
         }
 
         // TODO: Refactor to use enum
         private static string GetTabStatus(TabInfo tab)
         {
+			eventLogger.LogDebug(">>> Entering GetTabStatus(tab={Tab})", tab);
             if (tab.DisableLink)
             {
+			eventLogger.LogDebug("<<< Exiting GetTabStatus(tab={Tab})", tab);
                 return "Disabled";
             }
 
@@ -250,6 +286,8 @@ namespace Dnn.PersonaBar.Pages.Components
 
         private static string GetTabPublishStatus(TabInfo tab)
         {
+			eventLogger.LogDebug(">>> Entering GetTabPublishStatus(tab={Tab})", tab);
+			eventLogger.LogDebug("<<< Exiting GetTabPublishStatus(tab={Tab})", tab);
             return tab.HasBeenPublished && WorkflowHelper.IsWorkflowCompleted(tab)
                 ? Localization.GetString("lblPublished")
                 : Localization.GetString("lblDraft");

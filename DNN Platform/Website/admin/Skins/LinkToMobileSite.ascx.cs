@@ -15,6 +15,7 @@ namespace DotNetNuke.UI.Skins.Controls
     /// <summary>Skin object of portal links between desktop and mobile portals.</summary>
     public partial class LinkToMobileSite : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LinkToMobileSite.ascx));
         private const string MyFileName = "LinkToMobileSite.ascx";
         private readonly IRedirectionController redirectionController;
         private string localResourcesFile;
@@ -23,13 +24,16 @@ namespace DotNetNuke.UI.Skins.Controls
         public LinkToMobileSite()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering LinkToMobileSite()");
         }
+		Logger.LogDebug("<<< Exiting LinkToMobileSite()");
 
         /// <summary>Initializes a new instance of the <see cref="LinkToMobileSite"/> class.</summary>
         /// <param name="redirectionController">The mobile redirection controller.</param>
         public LinkToMobileSite(IRedirectionController redirectionController)
         {
             this.redirectionController = redirectionController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IRedirectionController>();
+			Logger.LogDebug("LinkToMobileSite(redirectionController={RedirectionController}): redirectionController → {RedirectionController1}", redirectionController, redirectionController);
         }
 
         private string LocalResourcesFile
@@ -48,9 +52,11 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             var redirectUrl = this.redirectionController.GetMobileSiteUrl();
+			Logger.LogDebug("OnLoad(e={E}): redirectUrl → {RedirectUrl}", e, redirectUrl);
             if (!string.IsNullOrEmpty(redirectUrl))
             {
                 this.lnkPortal.NavigateUrl = redirectUrl;
@@ -59,7 +65,9 @@ namespace DotNetNuke.UI.Skins.Controls
             else
             {
                 this.Visible = false;
+				Logger.LogDebug("OnLoad(e={E}): this.Visible → {Arg1}", e, this.Visible);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
     }
 }

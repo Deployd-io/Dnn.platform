@@ -24,9 +24,11 @@ namespace DotNetNuke.Services.FileSystem
         /// <summary>Initializes a new instance of the <see cref="FolderMappingsConfigController"/> class.</summary>
         public FolderMappingsConfigController()
         {
+			Logger.LogDebug(">>> Entering FolderMappingsConfigController()");
             this.FolderMappings = new Dictionary<string, string>();
             this.FolderTypes = new List<FolderTypeConfig>();
             this.LoadConfig();
+			Logger.LogDebug("<<< Exiting FolderMappingsConfigController()");
         }
 
         /// <inheritdoc />
@@ -43,6 +45,7 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         public void LoadConfig()
         {
+			Logger.LogDebug(">>> Entering LoadConfig()");
             try
             {
                 if (File.Exists(DefaultConfigFilePath))
@@ -61,14 +64,17 @@ namespace DotNetNuke.Services.FileSystem
             {
                 Logger.Error(ex);
             }
+			Logger.LogDebug("<<< Exiting LoadConfig()");
         }
 
         /// <inheritdoc />
         public void SaveConfig(string folderMappinsSettings)
         {
+			Logger.LogDebug(">>> Entering SaveConfig(folderMappinsSettings=<redacted>)");
             if (!File.Exists(DefaultConfigFilePath))
             {
                 var folderMappingsConfigContent = "<" + this.ConfigNode + ">" + folderMappinsSettings + "</" + this.ConfigNode + ">";
+				Logger.LogDebug("SaveConfig(folderMappinsSettings=<redacted>): folderMappingsConfigContent → {FolderMappingsConfigContent}", folderMappingsConfigContent);
                 File.AppendAllText(DefaultConfigFilePath, folderMappingsConfigContent);
                 var configDocument = new XmlDocument { XmlResolver = null };
                 using (var configReader = XmlReader.Create(new StringReader(folderMappingsConfigContent), new XmlReaderSettings { XmlResolver = null, }))
@@ -79,13 +85,16 @@ namespace DotNetNuke.Services.FileSystem
                 this.FillFolderMappings(configDocument);
                 this.FillFolderTypes(configDocument);
             }
+			Logger.LogDebug("<<< Exiting SaveConfig(folderMappinsSettings=<redacted>)");
         }
 
         /// <inheritdoc />
         public FolderMappingInfo GetFolderMapping(int portalId, string folderPath)
         {
+			Logger.LogDebug(">>> Entering GetFolderMapping(portalId={PortalId},folderPath={FolderPath})", portalId, folderPath);
             if (!this.FolderMappings.TryGetValue(folderPath, out var mapping))
             {
+			Logger.LogDebug("<<< Exiting GetFolderMapping(portalId={PortalId},folderPath={FolderPath})", portalId, folderPath);
                 return null;
             }
 
@@ -95,24 +104,31 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         protected override Func<IFolderMappingsConfigController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new FolderMappingsConfigController();
         }
 
         private static FolderTypeConfig GetFolderMappingFromConfigNode(XmlNode node)
         {
+			Logger.LogDebug(">>> Entering GetFolderMappingFromConfigNode(node={Node})", node);
             var nodeNavigator = node.CreateNavigator();
             var folderType = new FolderTypeConfig()
             {
+			Logger.LogDebug("GetFolderMappingFromConfigNode(node={Node}): nodeNavigator → {NodeNavigator}", node, nodeNavigator);
                 Name = XmlUtils.GetAttributeValue(nodeNavigator, "name"),
                 Provider = XmlUtils.GetNodeValue(nodeNavigator, "provider"),
             };
             XmlNodeList settingsNode = node.SelectNodes("settings/setting");
+			Logger.LogDebug("GetFolderMappingFromConfigNode(node={Node}): settingsNode → {SettingsNode}", node, settingsNode);
             if (settingsNode != null)
             {
                 var settings = new List<FolderTypeSettingConfig>();
+				Logger.LogDebug("GetFolderMappingFromConfigNode(node={Node}): settings → {Settings}", node, settings);
                 foreach (XmlNode settingNode in settingsNode)
                 {
                     var encryptValue = XmlUtils.GetAttributeValue(settingNode.CreateNavigator(), "encrypt");
+					Logger.LogDebug("GetFolderMappingFromConfigNode(node={Node}): encryptValue → {EncryptValue}", node, encryptValue);
                     settings.Add(new FolderTypeSettingConfig
                     {
                         Name = XmlUtils.GetAttributeValue(settingNode.CreateNavigator(), "name"),
@@ -122,15 +138,19 @@ namespace DotNetNuke.Services.FileSystem
                 }
 
                 folderType.Settings = settings;
+				Logger.LogDebug("GetFolderMappingFromConfigNode(node={Node}): folderType.Settings → {Arg1}", node, folderType.Settings);
             }
 
+			Logger.LogDebug("<<< Exiting GetFolderMappingFromConfigNode(node={Node})", node);
             return folderType;
         }
 
         private void FillFolderMappings(XmlDocument configDocument)
         {
+			Logger.LogDebug(">>> Entering FillFolderMappings(configDocument={ConfigDocument})", configDocument);
             var folderMappingsNode = configDocument.SelectSingleNode(this.ConfigNode + "/folderMappings");
             if (folderMappingsNode == null)
+			Logger.LogDebug("FillFolderMappings(configDocument={ConfigDocument}): folderMappingsNode → {FolderMappingsNode}", configDocument, folderMappingsNode);
             {
                 return;
             }
@@ -140,12 +160,15 @@ namespace DotNetNuke.Services.FileSystem
             {
                 this.FolderMappings.Add(XmlUtils.GetNodeValue(folderMappingNode, "folderPath"), XmlUtils.GetNodeValue(folderMappingNode, "folderTypeName"));
             }
+			Logger.LogDebug("<<< Exiting FillFolderMappings(configDocument={ConfigDocument})", configDocument);
         }
 
         private void FillFolderTypes(XmlDocument configDocument)
         {
+			Logger.LogDebug(">>> Entering FillFolderTypes(configDocument={ConfigDocument})", configDocument);
             var folderTypesNode = configDocument.SelectSingleNode(this.ConfigNode + "/folderTypes");
             if (folderTypesNode == null)
+			Logger.LogDebug("FillFolderTypes(configDocument={ConfigDocument}): folderTypesNode → {FolderTypesNode}", configDocument, folderTypesNode);
             {
                 return;
             }
@@ -155,6 +178,7 @@ namespace DotNetNuke.Services.FileSystem
             {
                 this.FolderTypes.Add(GetFolderMappingFromConfigNode(folderTypeNode));
             }
+			Logger.LogDebug("<<< Exiting FillFolderTypes(configDocument={ConfigDocument})", configDocument);
         }
     }
 }

@@ -10,16 +10,21 @@ using System.Runtime.Serialization;
 /// <summary>An exception throw when a container path is invalid.</summary>
 public class InvalidContainerPathException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(InvalidContainerPathException));
     /// <inheritdoc />
     public InvalidContainerPathException()
     {
+	Logger.LogDebug(">>> Entering InvalidContainerPathException()");
+	Logger.LogDebug("<<< Exiting InvalidContainerPathException()");
     }
 
     /// <inheritdoc />
     public InvalidContainerPathException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering InvalidContainerPathException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting InvalidContainerPathException(message={Message})", message);
 
     /// <inheritdoc />
     public InvalidContainerPathException(string message, Exception innerException)

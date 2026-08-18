@@ -13,6 +13,7 @@ namespace DotNetNuke.Entities.Portals
     [Serializable]
     public class PortalGroupInfo : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PortalGroupInfo));
         public string MasterPortalName
         {
             get
@@ -60,6 +61,7 @@ namespace DotNetNuke.Entities.Portals
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.FillInternal(dr);
 
             this.PortalGroupId = Null.SetNullInteger(dr["PortalGroupID"]);
@@ -67,6 +69,7 @@ namespace DotNetNuke.Entities.Portals
             this.PortalGroupDescription = Null.SetNullString(dr["PortalGroupDescription"]);
             this.MasterPortalId = Null.SetNullInteger(dr["MasterPortalID"]);
             this.AuthenticationDomain = Null.SetNullString(dr["AuthenticationDomain"]);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

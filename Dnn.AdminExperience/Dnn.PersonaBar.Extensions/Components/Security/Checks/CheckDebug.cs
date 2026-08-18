@@ -17,12 +17,14 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc />
         public CheckResult Execute()
         {
+			eventLogger.LogDebug(">>> Entering Execute()");
             var result = new CheckResult(SeverityEnum.Unverified, this.Id)
             {
                 Severity = HttpContext.Current.IsDebuggingEnabled
                     ? SeverityEnum.Warning
                     : SeverityEnum.Pass,
             };
+			eventLogger.LogDebug("<<< Exiting Execute()");
             return result;
         }
     }

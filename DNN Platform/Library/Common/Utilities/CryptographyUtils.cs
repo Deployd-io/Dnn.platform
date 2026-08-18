@@ -35,7 +35,9 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(10, 2, 2, "Use SHA2526 or higher")]
         public static partial SHA1 CreateSHA1()
         {
+		Logger.LogDebug(">>> Entering CreateSHA1()");
 #pragma warning disable CA5350
+			Logger.LogDebug("<<< Exiting CreateSHA1()");
             return SHA1.Create(CryptoConfig.AllowOnlyFipsAlgorithms ? SHA1CryptoServiceProvider : SHA1Cng);
 #pragma warning restore CA5350
         }
@@ -44,6 +46,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>A <see cref="SHA256"/> instance.</returns>
         public static SHA256 CreateSHA256()
         {
+			Logger.LogDebug(">>> Entering CreateSHA256()");
+			Logger.LogDebug("<<< Exiting CreateSHA256()");
             return SHA256.Create(CryptoConfig.AllowOnlyFipsAlgorithms ? SHA256CryptoServiceProvider : SHA256Cng);
         }
 
@@ -51,6 +55,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>A <see cref="SHA384"/> instance.</returns>
         public static SHA384 CreateSHA384()
         {
+			Logger.LogDebug(">>> Entering CreateSHA384()");
+			Logger.LogDebug("<<< Exiting CreateSHA384()");
             return SHA384.Create(CryptoConfig.AllowOnlyFipsAlgorithms ? SHA384CryptoServiceProvider : SHA384Cng);
         }
 
@@ -58,11 +64,14 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>A <see cref="SHA512"/> instance.</returns>
         public static SHA512 CreateSHA512()
         {
+			Logger.LogDebug(">>> Entering CreateSHA512()");
+			Logger.LogDebug("<<< Exiting CreateSHA512()");
             return SHA512.Create(CryptoConfig.AllowOnlyFipsAlgorithms ? SHA512CryptoServiceProvider : SHA512Cng);
         }
 
         public static string GenerateHash(this string str)
         {
+			Logger.LogDebug(">>> Entering GenerateHash(str={Str})", str);
             try
             {
                 return CryptoConfig.AllowOnlyFipsAlgorithms
@@ -71,17 +80,25 @@ namespace DotNetNuke.Common.Utilities
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in GenerateHash(str={Str}): {Arg1}", str, Exception.Message);
+				Logger.LogDebug("<<< Exiting GenerateHash(str={Str})", str);
                 return str.GenerateMd5();
+			Logger.LogDebug("<<< Exiting GenerateHash(str={Str},hashType=<redacted>)", str);
+			Logger.LogDebug("<<< Exiting GenerateHash(str={Str},hasher=<redacted>)", str);
             }
         }
 
         public static string GenerateSha256Hash(this string str)
         {
+			Logger.LogDebug(">>> Entering GenerateSha256Hash(str={Str})", str);
+			Logger.LogDebug("<<< Exiting GenerateSha256Hash(str={Str})", str);
             return str.GenerateHash(CreateSHA256());
         }
 
         public static string GenerateMd5(this string str)
         {
+			Logger.LogDebug(">>> Entering GenerateMd5(str={Str})", str);
+			Logger.LogDebug("<<< Exiting GenerateMd5(str={Str})", str);
             return str.GenerateHash("MD5");
         }
 
@@ -112,6 +129,7 @@ namespace DotNetNuke.Common.Utilities
                 // loop to each byte
                 foreach (var b in hashedByteArray)
                 {
+					private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CryptographyUtils));
                     // append it to our StringBuilder
                     stringBuilder.Append(b.ToString("x2", CultureInfo.InvariantCulture).ToLowerInvariant());
                 }
@@ -126,6 +144,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The setting key for the algorithm name.</returns>
         internal static string GetAlgorithmNameSettingKey(string settingKey)
         {
+			Logger.LogDebug(">>> Entering GetAlgorithmNameSettingKey(settingKey={SettingKey})", settingKey);
+			Logger.LogDebug("<<< Exiting GetAlgorithmNameSettingKey(settingKey={SettingKey})", settingKey);
             return $"{settingKey}_algorithmName";
         }
 
@@ -134,6 +154,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The setting key for the IV value.</returns>
         internal static string GetInitializationVectorSettingKey(string settingKey)
         {
+			Logger.LogDebug(">>> Entering GetInitializationVectorSettingKey(settingKey={SettingKey})", settingKey);
+			Logger.LogDebug("<<< Exiting GetInitializationVectorSettingKey(settingKey={SettingKey})", settingKey);
             return $"{settingKey}_initializationVector";
         }
     }

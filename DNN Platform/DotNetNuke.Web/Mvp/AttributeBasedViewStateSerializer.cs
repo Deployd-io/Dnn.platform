@@ -14,6 +14,7 @@ namespace DotNetNuke.Web.Mvp
     [DnnDeprecated(9, 2, 0, "Replace WebFormsMvp and DotNetNuke.Web.Mvp with MVC or SPA patterns instead")]
     public partial class AttributeBasedViewStateSerializer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AttributeBasedViewStateSerializer));
         private const BindingFlags MemberBindingFlags = BindingFlags.Instance | BindingFlags.Public;
 
         /// <summary>Deserializes the <paramref name="state"/> into the <paramref name="value"/>.</summary>
@@ -21,17 +22,21 @@ namespace DotNetNuke.Web.Mvp
         /// <param name="state">The state.</param>
         public static void DeSerialize(object value, StateBag state)
         {
+			Logger.LogDebug(">>> Entering DeSerialize(value={Value},state={State})", value, state);
             Type typ = value.GetType();
 
+			Logger.LogDebug("DeSerialize(value={Value},state={State}): typ → {Typ}", value, state, typ);
             // Parse all the Public instance properties
             foreach (PropertyInfo member in typ.GetProperties(MemberBindingFlags))
             {
                 // Determine if they are attributed with a ViewState Attribute
                 ViewStateAttribute attr = member.GetCustomAttributes(typeof(ViewStateAttribute), true).OfType<ViewStateAttribute>().FirstOrDefault();
+				Logger.LogDebug("DeSerialize(value={Value},state={State}): attr → {Attr}", value, state, attr);
                 if (attr != null)
                 {
                     // Get object from ViewState bag
                     string viewStateKey = attr.ViewStateKey;
+					Logger.LogDebug("DeSerialize(value={Value},state={State}): viewStateKey → {ViewStateKey}", value, state, viewStateKey);
                     if (string.IsNullOrEmpty(viewStateKey))
                     {
                         // Use class member's name for Key
@@ -41,6 +46,7 @@ namespace DotNetNuke.Web.Mvp
                     member.SetValue(value, state[viewStateKey], null);
                 }
             }
+			Logger.LogDebug("<<< Exiting DeSerialize(value={Value},state={State})", value, state);
         }
 
         /// <summary>Serializes the <paramref name="value"/> into the <paramref name="state"/>.</summary>
@@ -48,17 +54,21 @@ namespace DotNetNuke.Web.Mvp
         /// <param name="state">The state.</param>
         public static void Serialize(object value, StateBag state)
         {
+			Logger.LogDebug(">>> Entering Serialize(value={Value},state={State})", value, state);
             Type typ = value.GetType();
 
+			Logger.LogDebug("Serialize(value={Value},state={State}): typ → {Typ}", value, state, typ);
             // Parse all the Public instance properties
             foreach (PropertyInfo member in typ.GetProperties(MemberBindingFlags))
             {
                 // Determine if they are attributed with a ViewState Attribute
                 ViewStateAttribute attr = member.GetCustomAttributes(typeof(ViewStateAttribute), true).OfType<ViewStateAttribute>().FirstOrDefault();
+				Logger.LogDebug("Serialize(value={Value},state={State}): attr → {Attr}", value, state, attr);
                 if (attr != null)
                 {
                     // Add property to ViewState bag
                     string viewStateKey = attr.ViewStateKey;
+					Logger.LogDebug("Serialize(value={Value},state={State}): viewStateKey → {ViewStateKey}", value, state, viewStateKey);
                     if (string.IsNullOrEmpty(viewStateKey))
                     {
                         // Use class member's name for Key
@@ -68,6 +78,7 @@ namespace DotNetNuke.Web.Mvp
                     state[viewStateKey] = member.GetValue(value, null);
                 }
             }
+			Logger.LogDebug("<<< Exiting Serialize(value={Value},state={State})", value, state);
         }
     }
 }

@@ -18,6 +18,7 @@ namespace DotNetNuke.Services.GeneratedImage
     /// <summary>Manages counting the number of times an IP address has been seen.</summary>
     public partial class IPCount
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(IPCount));
         private const string TempFileExtension = ".tmp";
         private const string CacheAppRelativePath = @"~\App_Data\_ipcount\";
         private static readonly object PurgeQueuedLock = new object();
@@ -28,9 +29,14 @@ namespace DotNetNuke.Services.GeneratedImage
 
         static IPCount()
         {
+			Logger.LogDebug(">>> Entering IPCount()");
             PurgeInterval = new TimeSpan(0, 10, 0);
             MaxCount = 500;
+			Logger.LogDebug("IPCount(): PurgeInterval → {PurgeInterval}", PurgeInterval);
+			Logger.LogDebug("IPCount(): MaxCount → {MaxCount}", MaxCount);
             CachePath = HostingEnvironment.MapPath(CacheAppRelativePath);
+			Logger.LogDebug("IPCount(): CachePath → {CachePath}", CachePath);
+			Logger.LogDebug("<<< Exiting IPCount()");
         }
 
         public static string CachePath
@@ -107,6 +113,7 @@ namespace DotNetNuke.Services.GeneratedImage
 
         public static bool CheckIp(string ipAddress)
         {
+			Logger.LogDebug(">>> Entering CheckIp(ipAddress={IpAddress})", ipAddress);
             var now = DateTime.Now;
             if (!purgeQueued && now.Subtract(LastPurge) > PurgeInterval)
             {
@@ -116,9 +123,13 @@ namespace DotNetNuke.Services.GeneratedImage
                     {
                         purgeQueued = true;
 
+						Logger.LogDebug("CheckIp(ipAddress={IpAddress}): purgeQueued → {PurgeQueued}", ipAddress, purgeQueued);
                         var files = new DirectoryInfo(CachePath).GetFiles();
+						Logger.LogDebug("CheckIp(ipAddress={IpAddress}): files → {Files}", ipAddress, files);
                         var threshold = DateTime.Now.Subtract(PurgeInterval);
+						Logger.LogDebug("CheckIp(ipAddress={IpAddress}): threshold → {Threshold}", ipAddress, threshold);
                         var toTryDeleteAgain = new List<FileInfo>();
+						Logger.LogDebug("CheckIp(ipAddress={IpAddress}): toTryDeleteAgain → {ToTryDeleteAgain}", ipAddress, toTryDeleteAgain);
                         foreach (var file in files)
                         {
                             if (!file.Name.Equals("_lastpurge", StringComparison.OrdinalIgnoreCase) && file.LastWriteTime < threshold)
@@ -129,6 +140,7 @@ namespace DotNetNuke.Services.GeneratedImage
                                 }
                                 catch (Exception)
                                 {
+									Logger.LogError("Exception in CheckIp(ipAddress={IpAddress}): {Arg1}", ipAddress, Exception.Message);
                                     toTryDeleteAgain.Add(file);
                                 }
                             }
@@ -148,6 +160,7 @@ namespace DotNetNuke.Services.GeneratedImage
                         }
 
                         LastPurge = DateTime.Now;
+						Logger.LogDebug("CheckIp(ipAddress={IpAddress}): LastPurge → {LastPurge}", ipAddress, LastPurge);
 
                         purgeQueued = false;
                     }
@@ -155,12 +168,15 @@ namespace DotNetNuke.Services.GeneratedImage
             }
 
             var path = BuildFilePath(ipAddress);
+			Logger.LogDebug("CheckIp(ipAddress={IpAddress}): path → {Path}", ipAddress, path);
             var count = 1;
+			Logger.LogDebug("CheckIp(ipAddress={IpAddress}): count → {Count}", ipAddress, count);
             lock (FileLock)
             {
                 if (File.Exists(path))
                 {
                     var strCount = File.ReadAllText(path);
+					Logger.LogDebug("CheckIp(ipAddress={IpAddress}): strCount → {StrCount}", ipAddress, strCount);
                     if (int.TryParse(strCount, out count))
                     {
                         if (count > MaxCount)
@@ -173,6 +189,7 @@ namespace DotNetNuke.Services.GeneratedImage
                 }
 
                 File.WriteAllText(path, count.ToString(CultureInfo.InvariantCulture));
+				Logger.LogDebug("<<< Exiting CheckIp(ipAddress={IpAddress})", ipAddress);
                 return true;
             }
         }
@@ -183,13 +200,18 @@ namespace DotNetNuke.Services.GeneratedImage
         [DnnDeprecated(9, 2, 0, "Use UserRequestIPAddressController.Instance.GetUserRequestIPAddress")]
         public static partial string GetVisitorIPAddress(HttpContextBase context)
         {
+			Logger.LogDebug(">>> Entering GetVisitorIPAddress(context={Context})", context);
+			Logger.LogDebug("<<< Exiting GetVisitorIPAddress(context={Context})", context);
             return UserRequestIPAddressController.Instance.GetUserRequestIPAddress(context.Request);
         }
 
         private static string BuildFilePath(string ipAddress)
         {
+			Logger.LogDebug(">>> Entering BuildFilePath(ipAddress={IpAddress})", ipAddress);
             // it takes only the IP address without PORT for the file name
             var fileName = ipAddress.Split(':')[0];
+			Logger.LogDebug("BuildFilePath(ipAddress={IpAddress}): fileName → {FileName}", ipAddress, fileName);
+			Logger.LogDebug("<<< Exiting BuildFilePath(ipAddress={IpAddress})", ipAddress);
             return CachePath + fileName + TempFileExtension;
         }
     }

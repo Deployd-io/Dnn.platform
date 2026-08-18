@@ -15,10 +15,13 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
     /// </summary>
     internal class CompleteState : TabActionBase, IWorkflowAction
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CompleteState));
         /// <inheritdoc />
         public void DoActionOnStateChanging(StateTransaction stateTransaction)
         {
+			Logger.LogDebug(">>> Entering DoActionOnStateChanging(stateTransaction={StateTransaction})", stateTransaction);
             // nothing
+			Logger.LogDebug("<<< Exiting DoActionOnStateChanging(stateTransaction={StateTransaction})", stateTransaction);
         }
 
         /// <inheritdoc />
@@ -29,8 +32,10 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
         public ActionMessage GetActionMessage(StateTransaction stateTransaction, WorkflowState currentState)
             => new ActionMessage()
             {
+				Logger.LogDebug(">>> Entering GetActionMessage(stateTransaction={StateTransaction},currentState={CurrentState})", stateTransaction, currentState);
                 Subject = GetString($"{nameof(CompleteState)}{nameof(ActionMessage.Subject)}", "Page Approval"),
                 Body = GetString($"{nameof(CompleteState)}{nameof(ActionMessage.Body)}", "Page '{0}' is in the '{1}' state and awaits review and approval.", GetTab(stateTransaction.ContentItemId).LocalizedTabName, currentState.StateName),
             };
+				Logger.LogDebug(">>> Entering DoActionOnStateChanged(stateTransaction={StateTransaction})", stateTransaction);
     }
 }

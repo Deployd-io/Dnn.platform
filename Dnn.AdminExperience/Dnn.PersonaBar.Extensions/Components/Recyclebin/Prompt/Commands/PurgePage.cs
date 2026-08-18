@@ -37,8 +37,10 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
             RecyclebinController.Instance,
             new ContentVerifier())
         {
+		eventLogger.LogDebug(">>> Entering PurgePage()");
         }
 
+		eventLogger.LogDebug("<<< Exiting PurgePage()");
         /// <summary>Initializes a new instance of the <see cref="PurgePage"/> class.</summary>
         /// <param name="tabController">The tab controller.</param>
         /// <param name="recyclebinController">The recycle bin controller.</param>
@@ -47,6 +49,8 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
         {
             this.tabController = tabController;
             this.recyclebinController = recyclebinController;
+			eventLogger.LogDebug("PurgePage(tabController={TabController},recyclebinController={RecyclebinController},contentVerifier={ContentVerifier}): this.tabController → {Arg3}", tabController, recyclebinController, contentVerifier, this.tabController);
+			eventLogger.LogDebug("PurgePage(tabController={TabController},recyclebinController={RecyclebinController},contentVerifier={ContentVerifier}): recyclebinController → {RecyclebinController1}", tabController, recyclebinController, contentVerifier, recyclebinController);
             this.contentVerifier = contentVerifier;
         }
 
@@ -60,23 +64,29 @@ namespace Dnn.PersonaBar.Recyclebin.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.PageId = this.GetFlagValue(FlagId, "Page Id", -1, true, true, true);
             this.DeleteChildren = this.GetFlagValue(FlagDeleteChildren, "Delete Children", false);
+			eventLogger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogDebug(">>> Entering Run()");
             var tabInfo = this.tabController.GetTab(this.PageId, this.PortalSettings.PortalId);
             if (tabInfo == null ||
                 !this.contentVerifier.IsContentExistsForRequestedPortal(tabInfo.PortalID, this.PortalSettings))
             {
+				eventLogger.LogDebug("Run(): tabInfo → {TabInfo}", tabInfo);
                 return new ConsoleErrorResultModel(string.Format(CultureInfo.CurrentCulture, this.LocalizeString("PageNotFound"), this.PageId));
             }
 
             var errors = new StringBuilder();
+			eventLogger.LogDebug("Run(): errors → {Errors}", errors);
             this.recyclebinController.DeleteTabs(new List<TabInfo> { tabInfo }, errors, this.DeleteChildren);
 
+			eventLogger.LogDebug("<<< Exiting Run()");
             return errors.Length > 0
                 ? new ConsoleErrorResultModel(string.Format(CultureInfo.CurrentCulture, this.LocalizeString("Service_RemoveTabError"), errors))
                 : new ConsoleResultModel(string.Format(CultureInfo.CurrentCulture, this.LocalizeString("Prompt_PagePurgedSuccessfully"), this.PageId)) { Records = 1 };

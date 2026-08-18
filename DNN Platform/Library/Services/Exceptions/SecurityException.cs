@@ -22,6 +22,8 @@ namespace DotNetNuke.Services.Exceptions
         /// <summary>Initializes a new instance of the <see cref="SecurityException"/> class.</summary>
         public SecurityException()
         {
+		Logger.LogDebug(">>> Entering SecurityException()");
+		Logger.LogDebug("<<< Exiting SecurityException()");
         }
 
         // constructor with exception message
@@ -31,7 +33,9 @@ namespace DotNetNuke.Services.Exceptions
         public SecurityException(string message)
             : base(message)
         {
+			Logger.LogDebug(">>> Entering SecurityException(message={Message})", message);
             this.InitializePrivateVariables();
+			Logger.LogDebug("<<< Exiting SecurityException(message={Message})", message);
         }
 
         // constructor with message and inner exception
@@ -76,15 +80,18 @@ namespace DotNetNuke.Services.Exceptions
 
         private void InitializePrivateVariables()
         {
+			Logger.LogDebug(">>> Entering InitializePrivateVariables()");
             // Try and get the Portal settings from httpcontext
             try
             {
                 var userRequestIpAddressController = UserRequestIPAddressController.Instance;
                 var ipAddress = userRequestIpAddressController.GetUserRequestIPAddress(new HttpRequestWrapper(HttpContext.Current.Request));
+				Logger.LogDebug("InitializePrivateVariables(): ipAddress → {IpAddress}", ipAddress);
 
                 if (ipAddress != null)
                 {
                     this.ip = ipAddress;
+					Logger.LogDebug("InitializePrivateVariables(): this.ip → {Arg0}", this.ip);
                 }
 
                 this.querystring = HttpContext.Current.Request.MapPath(this.Querystring, HttpContext.Current.Request.ApplicationPath, false);
@@ -95,6 +102,8 @@ namespace DotNetNuke.Services.Exceptions
                 this.querystring = string.Empty;
                 Logger.Error(exc);
             }
+			Logger.LogDebug("InitializePrivateVariables(): this.querystring → {Arg0}", this.querystring);
+			Logger.LogDebug("<<< Exiting InitializePrivateVariables()");
         }
 
         ////public override void GetObjectData(SerializationInfo info, StreamingContext context)

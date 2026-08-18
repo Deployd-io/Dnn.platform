@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,10 +13,15 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("haskell", function(_config, modeConfig) {
+logger.debug('>>> Entering defineMode()');
 
+logger.debug('<<< Exiting defineMode()');
   function switchState(source, setState, f) {
+	logger.debug(`>>> Entering switchState(source=${source},setState=${setState},f=${f})`);
     setState(f);
+	logger.debug(`<<< Exiting switchState(source=${source},setState=${setState},f=${f})`);
     return f(source, setState);
   }
 
@@ -263,5 +270,6 @@ CodeMirror.defineMode("haskell", function(_config, modeConfig) {
 });
 
 CodeMirror.defineMIME("text/x-haskell", "haskell");
+logger.debug('>>> Entering function()');
 
 });

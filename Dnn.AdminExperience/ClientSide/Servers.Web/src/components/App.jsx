@@ -7,6 +7,7 @@ import localization from "../localization";
 import { bindActionCreators } from "redux";
 import ServerActions from "../actions/server";
 import utils from "../utils";
+const logger = console;
 
 const restartAppButtonStyle = {
     "marginRight": "10px"
@@ -15,6 +16,7 @@ const restartAppButtonStyle = {
 class App extends Component { 
 
     UNSAFE_componentWillReceiveProps(newProps) {       
+		logger.debug(`>>> Entering UNSAFE_componentWillReceiveProps(newProps=${newProps})`);
         if (this.props.infoMessage !== newProps.infoMessage && newProps.infoMessage) {
             utils.notify(newProps.infoMessage);
         }
@@ -26,13 +28,16 @@ class App extends Component {
         if (this.props.errorMessage !== newProps.errorMessage && newProps.errorMessage) {
             utils.notifyError(newProps.errorMessage);
         }
+		logger.debug(`<<< Exiting UNSAFE_componentWillReceiveProps(newProps=${newProps})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         const buttonVisible = utils.isHostUser();
         if (this.props.reloadPage) {
             window.top.location.reload();
+		logger.debug('<<< Exiting render()');
             return null;
         }
         return (
@@ -68,6 +73,8 @@ App.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         selectedPage: state.visiblePanel.selectedPage,
         selectedPageVisibleIndex: state.visiblePanel.selectedPageVisibleIndex,
@@ -78,6 +85,8 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+	logger.debug(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`);
+	logger.debug(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`);
     return {
         ...bindActionCreators ({
             onRestartApplicationClicked: ServerActions.restartApplication,

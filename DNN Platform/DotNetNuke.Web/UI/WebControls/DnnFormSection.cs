@@ -12,10 +12,13 @@ namespace DotNetNuke.Web.UI.WebControls
     [ParseChildren(true)]
     public class DnnFormSection : WebControl, INamingContainer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnFormSection));
         /// <summary>Initializes a new instance of the <see cref="DnnFormSection"/> class.</summary>
         public DnnFormSection()
         {
+			Logger.LogDebug(">>> Entering DnnFormSection()");
             this.Items = new List<DnnFormItemBase>();
+			Logger.LogDebug("<<< Exiting DnnFormSection()");
         }
 
         /// <summary>Gets or sets a value indicating whether the section is expanded.</summary>

@@ -43,6 +43,8 @@ namespace log4net.Util
         /// </remarks>
         public ReusableStringWriter(IFormatProvider formatProvider) : base(formatProvider) 
         {
+		value.LogDebug(">>> Entering ReusableStringWriter(formatProvider={FormatProvider})", formatProvider);
+		value.LogDebug("<<< Exiting ReusableStringWriter(formatProvider={FormatProvider})", formatProvider);
         }
 
         /// <summary>Override Dispose to prevent closing of writer</summary>
@@ -54,7 +56,9 @@ namespace log4net.Util
         /// </remarks>
         protected override void Dispose(bool disposing)
         {
+			value.LogDebug(">>> Entering Dispose(disposing={Disposing})", disposing);
             // Do not close the writer
+			value.LogDebug("<<< Exiting Dispose(disposing={Disposing})", disposing);
         }
 
         /// <summary>Reset this string writer so that it can be reused.</summary>
@@ -68,16 +72,21 @@ namespace log4net.Util
         /// </remarks>
         public void Reset(int maxCapacity, int defaultSize)
         {
+			value.LogDebug(">>> Entering Reset(maxCapacity={MaxCapacity},defaultSize={DefaultSize})", maxCapacity, defaultSize);
             // Reset working string buffer
             StringBuilder sb = this.GetStringBuilder();
+			value.LogDebug("Reset(maxCapacity={MaxCapacity},defaultSize={DefaultSize}): sb → {Sb}", maxCapacity, defaultSize, sb);
 
             sb.Length = 0;
+			value.LogDebug("Reset(maxCapacity={MaxCapacity},defaultSize={DefaultSize}): sb.Length → {Arg2}", maxCapacity, defaultSize, sb.Length);
             
             // Check if over max size
             if (sb.Capacity > maxCapacity) 
             {
                 sb.Capacity = defaultSize;
+				value.LogDebug("Reset(maxCapacity={MaxCapacity},defaultSize={DefaultSize}): sb.Capacity → {Arg2}", maxCapacity, defaultSize, sb.Capacity);
             } 
+			value.LogDebug("<<< Exiting Reset(maxCapacity={MaxCapacity},defaultSize={DefaultSize})", maxCapacity, defaultSize);
         }
     }
 }

@@ -14,29 +14,36 @@ namespace DotNetNuke.Services.Installer.Blocker
     /// <summary>This class ...</summary>
     public class InstallBlocker : ServiceLocator<IInstallBlocker, InstallBlocker>, IInstallBlocker
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(InstallBlocker));
         private const string InstallBlockerFile = "\\installBlocker.lock";
         private bool fileCreated;
 
         /// <inheritdoc />
         public void RegisterInstallBegining()
         {
+			Logger.LogDebug(">>> Entering RegisterInstallBegining()");
             if (!this.fileCreated)
             {
                 File.Create(Globals.ApplicationMapPath + InstallBlockerFile);
             }
 
             this.fileCreated = true;
+			Logger.LogDebug("RegisterInstallBegining(): this.fileCreated → {Arg0}", this.fileCreated);
+			Logger.LogDebug("<<< Exiting RegisterInstallBegining()");
         }
 
         /// <inheritdoc />
         public bool IsInstallInProgress()
         {
+			Logger.LogDebug(">>> Entering IsInstallInProgress()");
+			Logger.LogDebug("<<< Exiting IsInstallInProgress()");
             return this.fileCreated || File.Exists(Globals.ApplicationMapPath + InstallBlockerFile);
         }
 
         /// <inheritdoc />
         public void RegisterInstallEnd()
         {
+			Logger.LogDebug(">>> Entering RegisterInstallEnd()");
             var retryable = new RetryableAction(
                 () =>
                 {
@@ -51,11 +58,15 @@ namespace DotNetNuke.Services.Installer.Blocker
 
             retryable.TryIt();
             this.fileCreated = false;
+			Logger.LogDebug("RegisterInstallEnd(): this.fileCreated → {Arg0}", this.fileCreated);
+			Logger.LogDebug("<<< Exiting RegisterInstallEnd()");
         }
 
         /// <inheritdoc />
         protected override Func<IInstallBlocker> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new InstallBlocker();
         }
     }

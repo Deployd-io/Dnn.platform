@@ -18,19 +18,26 @@ namespace DotNetNuke.Entities.Groups
         /// <summary>Initializes a new instance of the <see cref="GroupInfo"/> class.</summary>
         public GroupInfo()
         {
+		eventLogger.LogDebug(">>> Entering GroupInfo()");
+		eventLogger.LogDebug("<<< Exiting GroupInfo()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="GroupInfo"/> class.</summary>
         /// <param name="roleInfo">The role info.</param>
         public GroupInfo(RoleInfo roleInfo)
         {
+			eventLogger.LogDebug(">>> Entering GroupInfo(roleInfo={RoleInfo})", roleInfo);
             this.RoleID = roleInfo.RoleID;
             this.RoleName = roleInfo.RoleName;
+			eventLogger.LogDebug("GroupInfo(roleInfo={RoleInfo}): this.RoleID → {Arg1}", roleInfo, this.RoleID);
+			eventLogger.LogDebug("GroupInfo(roleInfo={RoleInfo}): this.RoleName → {Arg1}", roleInfo, this.RoleName);
             this.Description = roleInfo.Description;
             this.PortalID = roleInfo.PortalID;
             this.SecurityMode = roleInfo.SecurityMode;
+			eventLogger.LogDebug("GroupInfo(roleInfo={RoleInfo}): this.Description → {Arg1}", roleInfo, this.Description);
             this.ServiceFee = roleInfo.ServiceFee;
             this.RSVPCode = roleInfo.RSVPCode;
+			eventLogger.LogDebug("<<< Exiting GroupInfo(roleInfo={RoleInfo})", roleInfo);
         }
 
         ////public RoleInfo Role {
@@ -141,6 +148,7 @@ namespace DotNetNuke.Entities.Groups
 
         private string GetString(string keyName, string defaultValue)
         {
+			eventLogger.LogDebug(">>> Entering GetString(keyName={KeyName},defaultValue={DefaultValue})", keyName, defaultValue);
             if (this.Settings == null)
             {
                 return defaultValue;
@@ -152,12 +160,14 @@ namespace DotNetNuke.Entities.Groups
             }
             else
             {
+				eventLogger.LogDebug("<<< Exiting GetString(keyName={KeyName},defaultValue={DefaultValue})", keyName, defaultValue);
                 return defaultValue;
             }
         }
 
         private void SetString(string keyName, string value)
         {
+			eventLogger.LogDebug(">>> Entering SetString(keyName={KeyName},value={Value})", keyName, value);
             if (this.Settings.ContainsKey(keyName))
             {
                 this.Settings[keyName] = value;
@@ -166,6 +176,7 @@ namespace DotNetNuke.Entities.Groups
             {
                 this.Settings.Add(keyName, value);
             }
+			eventLogger.LogDebug("<<< Exiting SetString(keyName={KeyName},value={Value})", keyName, value);
         }
     }
 }

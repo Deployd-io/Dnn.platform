@@ -1,9 +1,11 @@
+using Microsoft.Extensions.Logging;
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information
 
 namespace DotNetNuke.ContentSecurityPolicy
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Provides extension methods for <see cref="IContentSecurityPolicy"/>.
     /// </summary>
@@ -16,6 +18,7 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="csp">The content security policy to modify.</param>
         public static void AddWebformsSupport(this IContentSecurityPolicy csp)
         {
+			_logger.LogDebug(">>> Entering AddWebformsSupport(csp={Csp})", csp);
             csp.DefaultSource.AddSelf();
             csp.ScriptSource.AddSelf();
             csp.ScriptSource.AddInline();
@@ -27,6 +30,7 @@ namespace DotNetNuke.ContentSecurityPolicy
             csp.FormAction.AddSelf();
             csp.ConnectSource.AddSelf();
             csp.BaseUriSource.AddSelf();
+			_logger.LogDebug("<<< Exiting AddWebformsSupport(csp={Csp})", csp);
         }
     }
 }

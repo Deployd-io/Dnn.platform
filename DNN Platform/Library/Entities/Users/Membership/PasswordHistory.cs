@@ -13,6 +13,7 @@ namespace DotNetNuke.Entities.Users.Membership
     [Serializable]
     public class PasswordHistory : BaseEntityInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PasswordHistory));
         public int PasswordHistoryId { get; set; }
 
         public int UserId { get; set; }
@@ -25,6 +26,7 @@ namespace DotNetNuke.Entities.Users.Membership
         /// <param name="dr">the data reader.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.PasswordHistoryId = Convert.ToInt32(dr["PasswordHistoryID"], CultureInfo.InvariantCulture);
             this.UserId = Null.SetNullInteger(dr["UserID"]);
             this.Password = dr["Password"].ToString();
@@ -32,6 +34,7 @@ namespace DotNetNuke.Entities.Users.Membership
 
             // add audit column data
             this.FillInternal(dr);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

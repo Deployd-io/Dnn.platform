@@ -32,35 +32,47 @@ namespace DotNetNuke.Tests.Core.Controllers.Messaging
         [SetUp]
         public void SetUp()
         {
+			mockEventLogger.LogDebug(">>> Entering SetUp()");
             // Setup Mocks and Stub
             this.mockDataService = new Mock<IDataService>();
+			mockEventLogger.LogDebug("SetUp(): mockDataService → {MockDataService}", mockDataService);
             this.mockCacheProvider = MockComponentProvider.CreateDataCacheProvider();
+			mockEventLogger.LogDebug("SetUp(): mockCacheProvider → {MockCacheProvider}", mockCacheProvider);
 
             DataService.RegisterInstance(this.mockDataService.Object);
             SetupCachingProviderHelper.SetupCachingProvider(this.mockCacheProvider);
 
             // Setup SUT
             this.userPrefencesController = new UserPreferencesController();
+			mockEventLogger.LogDebug("SetUp(): userPrefencesController → {UserPrefencesController}", userPrefencesController);
+			mockEventLogger.LogDebug("<<< Exiting SetUp()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			mockEventLogger.LogDebug(">>> Entering TearDown()");
+			mockEventLogger.LogDebug("TearDown(): ComponentFactory.Container → {Arg0}", ComponentFactory.Container);
             ComponentFactory.Container = null;
+			mockEventLogger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void UserPreferencesController_ShouldThrowArgumentNullException_WhenNullDataServiceIsPassedInTheConstructor()
         {
+			mockEventLogger.LogDebug(">>> Entering UserPreferencesController_ShouldThrowArgumentNullException_WhenNullDataServiceIsPassedInTheConstructor()");
             // Act, Assert
             Assert.Throws<ArgumentNullException>(() => new UserPreferencesController(null));
+			mockEventLogger.LogDebug("<<< Exiting UserPreferencesController_ShouldThrowArgumentNullException_WhenNullDataServiceIsPassedInTheConstructor()");
         }
 
         [Test]
         public void SetUserPreference_ShouldCallDataService_WhenNoError()
         {
+			mockEventLogger.LogDebug(">>> Entering SetUserPreference_ShouldCallDataService_WhenNoError()");
             // Arrange
             var userPreference = new UserPreferenceBuilder().Build();
+			mockEventLogger.LogDebug("SetUserPreference_ShouldCallDataService_WhenNoError(): userPreference → {UserPreference}", userPreference);
 
             this.mockDataService.Setup(ds => ds.SetUserPreference(
                 userPreference.PortalId,
@@ -78,27 +90,33 @@ namespace DotNetNuke.Tests.Core.Controllers.Messaging
                 userPreference.UserId,
                 (int)userPreference.MessagesEmailFrequency,
                 (int)userPreference.NotificationsEmailFrequency), Times.Once);
+				mockEventLogger.LogDebug("<<< Exiting SetUserPreference_ShouldCallDataService_WhenNoError()");
         }
 
         [Test]
         public void GetUserPreference_ShouldReturnNullObject_WhenUserDoesNotHavePreference()
         {
+			mockEventLogger.LogDebug(">>> Entering GetUserPreference_ShouldReturnNullObject_WhenUserDoesNotHavePreference()");
             // Arrange
             var user = GetValidUser();
+			mockEventLogger.LogDebug("GetUserPreference_ShouldReturnNullObject_WhenUserDoesNotHavePreference(): user → {User}", user);
             this.mockDataService.Setup(ds => ds.GetUserPreference(
                 Constants.PORTAL_ValidPortalId,
                 Constants.UserID_User12)).Returns(UserPreferenceDataReaderMockHelper.CreateEmptyUserPreferenceReader);
 
             // Act
             var userPreference = this.userPrefencesController.GetUserPreference(user);
+			mockEventLogger.LogDebug("GetUserPreference_ShouldReturnNullObject_WhenUserDoesNotHavePreference(): userPreference → {UserPreference}", userPreference);
 
             // Assert
             Assert.That(userPreference, Is.Null);
+			mockEventLogger.LogDebug("<<< Exiting GetUserPreference_ShouldReturnNullObject_WhenUserDoesNotHavePreference()");
         }
 
         [Test]
         public void GetUserPreference_ShouldReturnUserPreference_WhenUserHasPreference()
         {
+			mockEventLogger.LogDebug(">>> Entering GetUserPreference_ShouldReturnUserPreference_WhenUserHasPreference()");
             // Arrange
             var expectedUserPreference = new UserPreferenceBuilder()
                 .WithUserId(Constants.UserID_User12)
@@ -106,11 +124,13 @@ namespace DotNetNuke.Tests.Core.Controllers.Messaging
                 .Build();
 
             var user = GetValidUser();
+			mockEventLogger.LogDebug("GetUserPreference_ShouldReturnUserPreference_WhenUserHasPreference(): user → {User}", user);
             this.mockDataService.Setup(ds => ds.GetUserPreference(Constants.PORTAL_ValidPortalId, Constants.UserID_User12))
                 .Returns(UserPreferenceDataReaderMockHelper.CreateUserPreferenceReader(expectedUserPreference));
 
             // Act
             var userPreference = this.userPrefencesController.GetUserPreference(user);
+			mockEventLogger.LogDebug("GetUserPreference_ShouldReturnUserPreference_WhenUserHasPreference(): userPreference → {UserPreference}", userPreference);
 
             // Assert
             Assert.That(userPreference, Is.Not.Null);
@@ -121,10 +141,13 @@ namespace DotNetNuke.Tests.Core.Controllers.Messaging
                 Assert.That(userPreference.PortalId, Is.EqualTo(user.PortalID));
                 Assert.That(userPreference.UserId, Is.EqualTo(user.UserID));
             }
+			mockEventLogger.LogDebug("<<< Exiting GetUserPreference_ShouldReturnUserPreference_WhenUserHasPreference()");
         }
 
         private static UserInfo GetValidUser()
         {
+			mockEventLogger.LogDebug(">>> Entering GetValidUser()");
+			mockEventLogger.LogDebug("<<< Exiting GetValidUser()");
             return new UserInfo
             {
                 DisplayName = Constants.UserDisplayName_User12,

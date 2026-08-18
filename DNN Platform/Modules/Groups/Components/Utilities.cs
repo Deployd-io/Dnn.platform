@@ -16,30 +16,41 @@ namespace DotNetNuke.Modules.Groups
     {
         public static string NavigateUrl(int tabId, string[] @params)
         {
+			eventLogger.LogDebug(">>> Entering NavigateUrl(tabId={TabId})", tabId);
             var navigationManager = Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
+			eventLogger.LogDebug("NavigateUrl(tabId={TabId}): navigationManager → {NavigationManager}", tabId, navigationManager);
+			eventLogger.LogDebug("<<< Exiting NavigateUrl(tabId={TabId})", tabId);
             return navigationManager.NavigateURL(tabId, string.Empty, @params);
         }
 
         public static string[] AddParams(string param, string[] currParams)
         {
+			eventLogger.LogDebug(">>> Entering AddParams(param={Param},currParams={CurrParams})", param, currParams);
             var tmpParams = new string[] { param };
             var intLength = tmpParams.Length;
             var currLength = currParams.Length;
             Array.Resize(ref tmpParams, intLength + currLength);
             currParams.CopyTo(tmpParams, intLength);
+			eventLogger.LogDebug("<<< Exiting AddParams(param={Param},currParams={CurrParams})", param, currParams);
             return tmpParams;
         }
 
         internal static string ParseTokenWrapper(string template, string token, bool condition)
         {
+			eventLogger.LogDebug(">>> Entering ParseTokenWrapper(template={Template},token=<redacted>,condition={Condition})", template, condition);
             var pattern = "(\\[" + token + "\\](.*?)\\[\\/" + token + "\\])";
             var regExp = RegexUtils.GetCachedRegex(pattern, RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
+			eventLogger.LogDebug("ParseTokenWrapper(template={Template},token=<redacted>,condition={Condition}): regExp → {RegExp}", template, condition, regExp);
             var matches = regExp.Matches(template);
+			eventLogger.LogDebug("ParseTokenWrapper(template={Template},token=<redacted>,condition={Condition}): matches → {Matches}", template, condition, matches);
+			eventLogger.LogDebug("ParseTokenWrapper(template={Template},token=<redacted>,condition={Condition}): pattern → {Pattern}", template, condition, pattern);
             foreach (Match match in matches)
             {
                 template = template.Replace(match.Value, condition ? match.Groups[2].Value : string.Empty);
+				eventLogger.LogDebug("ParseTokenWrapper(template={Template},token=<redacted>,condition={Condition}): template → {Template1}", template, condition, template);
             }
 
+			eventLogger.LogDebug("<<< Exiting ParseTokenWrapper(template={Template},token=<redacted>,condition={Condition})", template, condition);
             return template;
         }
     }

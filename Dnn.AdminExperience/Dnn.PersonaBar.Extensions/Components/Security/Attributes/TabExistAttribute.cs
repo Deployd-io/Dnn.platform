@@ -18,13 +18,17 @@ namespace Dnn.PersonaBar.Security.Attributes
         /// <inheritdoc />
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
+			eventLogger.LogDebug(">>> Entering IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             var propertyName = validationContext.DisplayName;
             int tabId = Convert.ToInt32(value.ToString(), CultureInfo.InvariantCulture);
+			eventLogger.LogDebug("IsValid(value={Value},validationContext={ValidationContext}): tabId → {TabId}", value, validationContext, tabId);
 
             if (tabId != -1)
             {
                 var portalSetting = PortalController.Instance.GetCurrentSettings();
+				eventLogger.LogDebug("IsValid(value={Value},validationContext={ValidationContext}): portalSetting → {PortalSetting}", value, validationContext, portalSetting);
                 var tab = TabController.Instance.GetTab(tabId, portalSetting.PortalId);
+				eventLogger.LogDebug("IsValid(value={Value},validationContext={ValidationContext}): tab → {Tab}", value, validationContext, tab);
 
                 if (tab == null)
                 {
@@ -42,6 +46,7 @@ namespace Dnn.PersonaBar.Security.Attributes
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             return ValidationResult.Success;
         }
     }

@@ -47,8 +47,11 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
         public ApiTokenController(IApiTokenRepository apiTokenRepository, IEventLogger eventLogger)
             : this(apiTokenRepository, eventLogger, null)
         {
+		Logger.LogDebug(">>> Entering ApiTokenController(apiTokenRepository=<redacted>,eventLogger={EventLogger})", eventLogger);
+		Logger.LogDebug("ApiTokenController(apiTokenRepository=<redacted>,eventLogger={EventLogger},hostSettings={HostSettings}): apiTokenRepository → {ApiTokenRepository1}", eventLogger, hostSettings, apiTokenRepository);
         }
 
+		Logger.LogDebug("<<< Exiting ApiTokenController(apiTokenRepository=<redacted>,eventLogger={EventLogger})", eventLogger);
         /// <summary>Initializes a new instance of the <see cref="ApiTokenController"/> class.</summary>
         /// <param name="apiTokenRepository">The API token repository.</param>
         /// <param name="eventLogger">The event logger.</param>
@@ -57,7 +60,9 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
         {
             this.apiTokenRepository = apiTokenRepository ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApiTokenRepository>();
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+			Logger.LogDebug("ApiTokenController(apiTokenRepository=<redacted>,eventLogger={EventLogger},hostSettings={HostSettings}): eventLogger → {EventLogger1}", eventLogger, hostSettings, eventLogger);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("ApiTokenController(apiTokenRepository=<redacted>,eventLogger={EventLogger},hostSettings={HostSettings}): hostSettings → {HostSettings1}", eventLogger, hostSettings, hostSettings);
         }
 
         /// <inheritdoc />
@@ -68,6 +73,7 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
         /// <inheritdoc />
         public (ApiToken Token, UserInfo User) ValidateToken(HttpRequestMessage request)
         {
+			Logger.LogDebug(">>> Entering ValidateToken(Token=<redacted>,User={User})", User);
             if (!ApiTokenAuthMessageHandler.IsEnabled)
             {
                 Logger.Trace(this.SchemeType + " is not registered/enabled in web.config file");
@@ -75,20 +81,26 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
             }
 
             var authorization = ValidateAuthHeader(request?.Headers.Authorization);
+			Logger.LogDebug("ValidateToken(Token=<redacted>,User={User}): authorization → {Authorization}", User, authorization);
+			Logger.LogDebug("<<< Exiting ValidateToken(Token=<redacted>,User={User})", User);
             return string.IsNullOrEmpty(authorization) ? (null, null) : this.ValidateAuthorizationValue(authorization);
         }
 
         /// <inheritdoc />
         public void SetApiTokenForRequest(ApiToken token)
         {
+			Logger.LogDebug(">>> Entering SetApiTokenForRequest(token=<redacted>)");
             HttpContext.Current.Items["ApiToken"] = token;
+			Logger.LogDebug("<<< Exiting SetApiTokenForRequest(token=<redacted>)");
         }
 
         /// <inheritdoc />
         public ApiToken GetCurrentThreadApiToken()
         {
+			Logger.LogDebug(">>> Entering GetCurrentThreadApiToken()");
             if (HttpContext.Current != null && HttpContext.Current.Items["ApiToken"] is ApiToken token)
             {
+			Logger.LogDebug("<<< Exiting GetCurrentThreadApiToken()");
                 return token;
             }
 
@@ -132,12 +144,15 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
         /// <inheritdoc />
         public IPagedList<ApiToken> GetApiTokens(ApiTokenScope scope, bool includeNarrowerScopes, int portalId, int userId, ApiTokenFilter filter, string apiKey, int pageIndex, int pageSize)
         {
+			Logger.LogDebug(">>> Entering GetApiTokens(scope={Scope},includeNarrowerScopes={IncludeNarrowerScopes},portalId={PortalId},userId={UserId},filter={Filter},apiKey=<redacted>,pageIndex={PageIndex},pageSize={PageSize})", scope, includeNarrowerScopes, portalId, userId, filter, pageIndex, pageSize);
+			Logger.LogDebug("<<< Exiting GetApiTokens(scope={Scope},includeNarrowerScopes={IncludeNarrowerScopes},portalId={PortalId},userId={UserId},filter={Filter},apiKey=<redacted>,pageIndex={PageIndex},pageSize={PageSize})", scope, includeNarrowerScopes, portalId, userId, filter, pageIndex, pageSize);
             return this.apiTokenRepository.GetApiTokens(scope, includeNarrowerScopes, portalId, userId, filter, apiKey, pageIndex, pageSize);
         }
 
         /// <inheritdoc />
         public string CreateApiToken(int portalId, string tokenName, ApiTokenScope scope, DateTime expiresOn, string apiKeys, int userId)
         {
+			Logger.LogDebug(">>> Entering CreateApiToken(portalId={PortalId},tokenName=<redacted>,scope={Scope},expiresOn={ExpiresOn},apiKeys=<redacted>,userId={UserId})", portalId, scope, expiresOn, userId);
             if (scope == ApiTokenScope.Host)
             {
                 portalId = Null.NullInteger;
@@ -150,9 +165,11 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
                 generator.GetBytes(tokenBytes);
                 newToken = EncodeBase64(tokenBytes);
             }
+			Logger.LogDebug("CreateApiToken(portalId={PortalId},tokenName=<redacted>,scope={Scope},expiresOn={ExpiresOn},apiKeys=<redacted>,userId={UserId}): newToken → {NewToken}", portalId, scope, expiresOn, userId, newToken);
 
             var tokenAndHostGuid = newToken + this.hostSettings.Guid;
             var hashedToken = GetHashedStr(tokenAndHostGuid);
+			Logger.LogDebug("CreateApiToken(portalId={PortalId},tokenName=<redacted>,scope={Scope},expiresOn={ExpiresOn},apiKeys=<redacted>,userId={UserId}): hashedToken → {HashedToken}", portalId, scope, expiresOn, userId, hashedToken);
 
             var token = new ApiTokenBase()
             {
@@ -162,40 +179,54 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
                 ExpiresOn = expiresOn,
                 TokenHash = hashedToken,
             };
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var ret = this.apiTokenRepository.AddApiToken(token, apiKeys, userId);
             this.eventLogger.AddLog(ret.ToLogProps(), PortalSettings, userId, nameof(EventLogType.APITOKEN_CREATED), false);
+			Logger.LogDebug("CreateApiToken(portalId={PortalId},tokenName=<redacted>,scope={Scope},expiresOn={ExpiresOn},apiKeys=<redacted>,userId={UserId}): ret → {Ret}", portalId, scope, expiresOn, userId, ret);
+			Logger.LogInformation("CreateApiToken(portalId,tokenName,scope,expiresOn,apiKeys,userId)={PortalId},{TokenName},{Scope},{ExpiresOn},{ApiKeys},{UserId}: database query executed in {Arg6} ms", portalId, tokenName, scope, expiresOn, apiKeys, userId, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting CreateApiToken(portalId={PortalId},tokenName=<redacted>,scope={Scope},expiresOn={ExpiresOn},apiKeys=<redacted>,userId={UserId})", portalId, scope, expiresOn, userId);
             return newToken;
         }
 
         /// <inheritdoc />
         public ApiToken GetApiToken(int apiTokenId)
         {
+			Logger.LogDebug(">>> Entering GetApiToken(apiTokenId=<redacted>)");
+			Logger.LogDebug("<<< Exiting GetApiToken(apiTokenId=<redacted>)");
             return this.apiTokenRepository.GetApiToken(apiTokenId);
         }
 
         /// <inheritdoc />
         public void RevokeOrDeleteApiToken(ApiToken token, bool delete, int userId)
         {
+			Logger.LogDebug(">>> Entering RevokeOrDeleteApiToken(token=<redacted>,delete={Delete},userId={UserId})", delete, userId);
             if (delete)
             {
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				Logger.LogInformation("RevokeOrDeleteApiToken(token,delete,userId)={Token},{Delete},{UserId}: delete query executed in {Arg3} ms", token, delete, userId, __logStart.ElapsedMilliseconds);
                 this.apiTokenRepository.DeleteApiToken(token.ToBase());
                 this.eventLogger.AddLog(token.ToLogProps(), PortalSettings, userId, nameof(EventLogType.APITOKEN_DELETED), false);
             }
             else
             {
+				Logger.LogInformation("RevokeOrDeleteApiToken(token,delete,userId)={Token},{Delete},{UserId}: database query executed in {Arg3} ms", token, delete, userId, __logStart.ElapsedMilliseconds);
                 this.apiTokenRepository.RevokeApiToken(token.ToBase(), userId);
                 this.eventLogger.AddLog(token.ToLogProps(), PortalSettings, userId, nameof(EventLogType.APITOKEN_REVOKED), false);
             }
+			Logger.LogDebug("<<< Exiting RevokeOrDeleteApiToken(token=<redacted>,delete={Delete},userId={UserId})", delete, userId);
         }
 
         /// <inheritdoc />
         public void DeleteExpiredAndRevokedApiTokens(int portalId, int userId)
         {
+			Logger.LogDebug(">>> Entering DeleteExpiredAndRevokedApiTokens(portalId={PortalId},userId={UserId})", portalId, userId);
             this.apiTokenRepository.DeleteExpiredAndRevokedApiTokens(portalId, userId);
+			Logger.LogDebug("<<< Exiting DeleteExpiredAndRevokedApiTokens(portalId={PortalId},userId={UserId})", portalId, userId);
         }
 
         private static string ValidateAuthHeader(AuthenticationHeaderValue authHdr)
         {
+			Logger.LogDebug(">>> Entering ValidateAuthHeader(authHdr={AuthHdr})", authHdr);
             if (authHdr == null)
             {
                 return null;
@@ -219,6 +250,7 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
                     Logger.Trace("Missing authorization header value in the request");
                 }
 
+			Logger.LogDebug("<<< Exiting ValidateAuthHeader(authHdr={AuthHdr})", authHdr);
                 return null;
             }
 
@@ -227,19 +259,27 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
 
         private static string EncodeBase64(byte[] data)
         {
+			Logger.LogDebug(">>> Entering EncodeBase64(data={Data})", data);
+			Logger.LogDebug("<<< Exiting EncodeBase64(data={Data})", data);
             return Convert.ToBase64String(data).TrimEnd('=');
         }
 
         private static string GetHashedStr(string data)
         {
+			Logger.LogDebug(">>> Entering GetHashedStr(data={Data})", data);
             using var hasher = SHA384.Create();
+			Logger.LogDebug("GetHashedStr(data={Data}): hasher → {Hasher}", data, hasher);
+			Logger.LogDebug("<<< Exiting GetHashedStr(data={Data})", data);
             return EncodeBase64(hasher.ComputeHash(TextEncoder.GetBytes(data)));
         }
 
         private (ApiToken Token, UserInfo User) ValidateAuthorizationValue(string authorization)
         {
+			Logger.LogDebug(">>> Entering ValidateAuthorizationValue(Token=<redacted>,User={User})", User);
             var tokenAndHostGuid = authorization + this.hostSettings.Guid;
             var hashedToken = GetHashedStr(tokenAndHostGuid);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			Logger.LogInformation("ValidateAuthorizationValue(Token,User)={Token},{User}: find query executed in {Arg2} ms", Token, User, __logStart.ElapsedMilliseconds);
             var apiToken = this.apiTokenRepository.GetApiToken(PortalSettings.PortalId, hashedToken);
             if (apiToken != null)
             {
@@ -293,6 +333,7 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
             }
 
             this.eventLogger.AddLog("Token Auth", authorization, EventLogType.APITOKEN_AUTHENTICATION_FAILED);
+			Logger.LogDebug("<<< Exiting ValidateAuthorizationValue(Token=<redacted>,User={User})", User);
             return (null, null);
         }
     }

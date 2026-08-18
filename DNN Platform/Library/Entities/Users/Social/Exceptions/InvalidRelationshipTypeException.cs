@@ -10,9 +10,12 @@ namespace DotNetNuke.Entities.Users
     [Serializable]
     public class InvalidRelationshipTypeException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(InvalidRelationshipTypeException));
         /// <summary>Initializes a new instance of the <see cref="InvalidRelationshipTypeException"/> class.</summary>
         public InvalidRelationshipTypeException()
         {
+		Logger.LogDebug(">>> Entering InvalidRelationshipTypeException()");
+		Logger.LogDebug("<<< Exiting InvalidRelationshipTypeException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="InvalidRelationshipTypeException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Entities.Users
         public InvalidRelationshipTypeException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering InvalidRelationshipTypeException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting InvalidRelationshipTypeException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="InvalidRelationshipTypeException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

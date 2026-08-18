@@ -1,8 +1,10 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 // Originall written by Alf Nielsen, re-written by Michael Zhou
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -13,19 +15,26 @@
 "use strict";
 
 function words(str) {
+logger.debug(`>>> Entering words(str=${str})`);
   var obj = {}, words = str.split(",");
   for (var i = 0; i < words.length; ++i) {
     var allCaps = words[i].toUpperCase();
+	logger.debug(`words(str=${str}): allCaps → ${allCaps}`);
     var firstCap = words[i].charAt(0).toUpperCase() + words[i].slice(1);
+	logger.debug(`words(str=${str}): firstCap → ${firstCap}`);
     obj[words[i]] = true;
     obj[allCaps] = true;
     obj[firstCap] = true;
   }
+logger.debug(`words(str=${str}): obj → ${obj}`);
+logger.debug(`<<< Exiting words(str=${str})`);
   return obj;
 }
 
 function metaHook(stream) {
+logger.debug(`>>> Entering metaHook(stream=${stream})`);
   stream.eatWhile(/[\w\$_]/);
+logger.debug(`<<< Exiting metaHook(stream=${stream})`);
   return "meta";
 }
 
@@ -169,6 +178,7 @@ CodeMirror.defineMode("vhdl", function(config, parserConfig) {
       else if (ctx.type == "}" || ctx.type == "top" || (ctx.type == "statement" && curPunc == "newstatement"))
         pushContext(state, stream.column(), "statement");
       state.startOfLine = false;
+	logger.debug(`<<< Exiting function(exports=${exports})`);
       return style;
     },
 
@@ -185,5 +195,6 @@ CodeMirror.defineMode("vhdl", function(config, parserConfig) {
 });
 
 CodeMirror.defineMIME("text/x-vhdl", "vhdl");
+logger.debug(`>>> Entering function(stream=${stream},state=${state})`);
 
 });

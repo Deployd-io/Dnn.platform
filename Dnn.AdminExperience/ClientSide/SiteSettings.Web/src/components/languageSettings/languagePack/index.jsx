@@ -9,10 +9,12 @@ import util from "../../../utils";
 import resx from "../../../resources";
 import styles from "./style.module.less";
 import MessageBox from "../../messageBox";
+const logger = console;
 
 class LanguagePackPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             languagePack: {
                 PackType: "Core",
@@ -28,9 +30,11 @@ class LanguagePackPanelBody extends Component {
             showMessageBox: false,
             message: ""
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     getLanguageOptions() {
+		logger.debug('>>> Entering getLanguageOptions()');
         const {props} = this;
         let options = [];
         if (props.languages !== undefined) {
@@ -57,21 +61,26 @@ class LanguagePackPanelBody extends Component {
                 }
             });
         }
+		logger.debug('<<< Exiting getLanguageOptions()');
         return options;
     }
 
     getTypeOptions() {
+		logger.debug('>>> Entering getTypeOptions()');
         let options = [{ label: resx.get("Core.LangPackType"), value: "Core" },
             { label: resx.get("Module.LangPackType"), value: "Module" },
             { label: resx.get("Provider.LangPackType"), value: "Provider" },
             { label: resx.get("AuthSystem.LangPackType"), value: "AuthSystem" },
             { label: resx.get("Full.LangPackType"), value: "Full" }];
+		logger.debug('<<< Exiting getTypeOptions()');
         return options;
     }
 
     renderModuleSelection() {
+		logger.debug('>>> Entering renderModuleSelection()');
         const {props} = this;
         if (props.modules) {
+			logger.debug('<<< Exiting renderModuleSelection()');
             return props.modules.map((item, i) => {
                 return (
                     <div className="languagePack-module" key={i}>
@@ -87,13 +96,17 @@ class LanguagePackPanelBody extends Component {
     }
 
     isModuleSelected(id) {
+		logger.debug(`>>> Entering isModuleSelected(id=${id})`);
         const { state} = this;
+		logger.debug(`<<< Exiting isModuleSelected(id=${id})`);
         return state.languagePack.ModuleIds.indexOf(id) > -1 ? true : false;
     }
 
     onModuleSelectionChange(id, event) {
+		logger.debug(`>>> Entering onModuleSelectionChange(id=${id},event=${event})`);
         let {state} = this;
         let languagePack = Object.assign({}, state.languagePack);
+		logger.debug(`onModuleSelectionChange(id=${id},event=${event}): languagePack → ${languagePack}`);
 
         let index = languagePack.ModuleIds.indexOf(id);
         if (event) {
@@ -112,6 +125,7 @@ class LanguagePackPanelBody extends Component {
         }
         else {
             state.error["module"] = false;
+			logger.debug(`<<< Exiting onModuleSelectionChange(id=${id},event=${event})`);
         }
 
         this.setState({
@@ -122,11 +136,14 @@ class LanguagePackPanelBody extends Component {
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let {state, props} = this;
         let languagePack = Object.assign({}, state.languagePack);
+		logger.debug(`onSettingChange(key=${key},event=${event}): languagePack → ${languagePack}`);
 
         if (key === "CultureCode") {
             languagePack[key] = event.value;
+			logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
         }
         else if (key === "PackType") {
             languagePack[key] = event;
@@ -157,6 +174,7 @@ class LanguagePackPanelBody extends Component {
     }
 
     onCreate(event) {
+		logger.debug(`>>> Entering onCreate(event=${event})`);
         event.preventDefault();
         const {props, state} = this;
         this.setState({
@@ -179,18 +197,24 @@ class LanguagePackPanelBody extends Component {
         }, (error) => {
             const errorMessage = JSON.parse(error.responseText);
             util.utilities.notifyError(errorMessage.Message);
+			logger.debug(`onCreate(event=${event}): errorMessage → ${errorMessage}`);
         }));
+		logger.debug(`<<< Exiting onCreate(event=${event})`);
     }
 
     closeMessageBox() {
+		logger.debug('>>> Entering closeMessageBox()');
         this.setState({
             showMessageBox: false
         });
+		logger.debug('<<< Exiting closeMessageBox()');
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.languagePack}>
                 <PersonaBarPageBody
@@ -289,6 +313,8 @@ LanguagePackPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         languages: state.languages.languageList,

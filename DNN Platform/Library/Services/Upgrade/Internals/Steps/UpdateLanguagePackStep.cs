@@ -20,10 +20,14 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
         /// <summary>Main method to execute the step.</summary>
         public override void Execute()
         {
+			Logger.LogDebug(">>> Entering Execute()");
             this.Percentage = 0;
             this.Status = StepStatus.Running;
+			Logger.LogDebug("Execute(): this.Percentage → {Arg0}", this.Percentage);
+			Logger.LogDebug("Execute(): this.Status → {Arg0}", this.Status);
 
             var installConfig = InstallController.Instance.GetInstallConfig();
+			Logger.LogDebug("Execute(): installConfig → {InstallConfig}", installConfig);
             string culture = installConfig.InstallCulture;
 
             if (!culture.Equals("en-us", StringComparison.OrdinalIgnoreCase))
@@ -32,11 +36,15 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
                 {
                     // need apply the Licensing module after packages installed, so that we can know what's the edition of install instance. CE/PE/EE
                     var document = Config.Load();
+					Logger.LogDebug("Execute(): document → {Document}", document);
                     var licensingNode = document.SelectSingleNode("/configuration/system.webServer/modules/add[@name='Licensing']");
+					Logger.LogDebug("Execute(): licensingNode → {LicensingNode}", licensingNode);
                     if (licensingNode != null)
                     {
                         var type = licensingNode.Attributes["type"].Value;
+						Logger.LogDebug("Execute(): type → {Type}", type);
                         var module = Reflection.CreateObject(type, null, false) as IHttpModule;
+						Logger.LogDebug("Execute(): module → {Module}", module);
                         module.Init(HttpContext.Current.ApplicationInstance);
                     }
 
@@ -51,6 +59,7 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
             }
 
             this.Status = StepStatus.Done;
+			Logger.LogDebug("<<< Exiting Execute()");
         }
     }
 }

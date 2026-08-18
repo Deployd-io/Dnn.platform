@@ -59,8 +59,10 @@ namespace DotNetNuke.Modules.Admin.Security
         public SecurityRoles()
             : this(null, null, null, null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering SecurityRoles()");
         }
 
+		Logger.LogDebug("<<< Exiting SecurityRoles()");
         /// <summary>Initializes a new instance of the <see cref="SecurityRoles"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
         /// <param name="roleProvider">The role provider.</param>
@@ -73,6 +75,15 @@ namespace DotNetNuke.Modules.Admin.Security
         public SecurityRoles(INavigationManager navigationManager, RoleProvider roleProvider, IRoleController roleController, IEventManager eventManager, IPortalController portalController, IUserController userController, IEventLogger eventLogger)
             : this(navigationManager, roleProvider, roleController, eventManager, portalController, userController, eventLogger, null)
         {
+		Logger.LogDebug(">>> Entering SecurityRoles(navigationManager={NavigationManager},roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger})", navigationManager, roleProvider, roleController, eventManager, portalController, userController, eventLogger);
+		Logger.LogDebug("<<< Exiting SecurityRoles(navigationManager={NavigationManager},roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger})", navigationManager, roleProvider, roleController, eventManager, portalController, userController, eventLogger);
+		Logger.LogDebug("SecurityRoles(navigationManager={NavigationManager},roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},hostSettings={HostSettings}): roleProvider → {RoleProvider1}", navigationManager, roleProvider, roleController, eventManager, portalController, userController, eventLogger, hostSettings, roleProvider);
+		Logger.LogDebug("SecurityRoles(navigationManager={NavigationManager},roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},hostSettings={HostSettings}): roleController → {RoleController1}", navigationManager, roleProvider, roleController, eventManager, portalController, userController, eventLogger, hostSettings, roleController);
+		Logger.LogDebug("SecurityRoles(navigationManager={NavigationManager},roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},hostSettings={HostSettings}): eventManager → {EventManager1}", navigationManager, roleProvider, roleController, eventManager, portalController, userController, eventLogger, hostSettings, eventManager);
+		Logger.LogDebug("SecurityRoles(navigationManager={NavigationManager},roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},hostSettings={HostSettings}): portalController → {PortalController1}", navigationManager, roleProvider, roleController, eventManager, portalController, userController, eventLogger, hostSettings, portalController);
+		Logger.LogDebug("SecurityRoles(navigationManager={NavigationManager},roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},hostSettings={HostSettings}): userController → {UserController1}", navigationManager, roleProvider, roleController, eventManager, portalController, userController, eventLogger, hostSettings, userController);
+		Logger.LogDebug("SecurityRoles(navigationManager={NavigationManager},roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},hostSettings={HostSettings}): eventLogger → {EventLogger1}", navigationManager, roleProvider, roleController, eventManager, portalController, userController, eventLogger, hostSettings, eventLogger);
+		Logger.LogDebug("SecurityRoles(navigationManager={NavigationManager},roleProvider={RoleProvider},roleController={RoleController},eventManager={EventManager},portalController={PortalController},userController={UserController},eventLogger={EventLogger},hostSettings={HostSettings}): hostSettings → {HostSettings1}", navigationManager, roleProvider, roleController, eventManager, portalController, userController, eventLogger, hostSettings, hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="SecurityRoles"/> class.</summary>
@@ -216,6 +227,7 @@ namespace DotNetNuke.Modules.Admin.Security
         /// <summary>DataBind binds the data to the controls.</summary>
         public override void DataBind()
         {
+			Logger.LogDebug(">>> Entering DataBind()");
             if (!ModulePermissionController.CanEditModuleContent(this.ModuleConfiguration))
             {
                 this.Response.Redirect(this.navigationManager.NavigateURL("Access Denied"), true);
@@ -230,6 +242,7 @@ namespace DotNetNuke.Modules.Admin.Security
             this.BindData();
 
             this.BindGrid();
+			Logger.LogDebug("<<< Exiting DataBind()");
         }
 
         /// <summary>
@@ -241,14 +254,17 @@ namespace DotNetNuke.Modules.Admin.Security
         /// <returns><see langword="true"/> if the delete button should be shown, <see langword="false"/> to hide the delete button.</returns>
         public bool DeleteButtonVisible(int userID, int roleID)
         {
+			Logger.LogDebug(">>> Entering DeleteButtonVisible(userID={UserID},roleID={RoleID})", userID, roleID);
             // [DNN-4285] Check if the role can be removed (only handles case of Administrator and Administrator Role
             bool canDelete = RoleController.CanRemoveUserFromRole(this.PortalSettings, userID, roleID);
+			Logger.LogDebug("DeleteButtonVisible(userID={UserID},roleID={RoleID}): canDelete → {CanDelete}", userID, roleID, canDelete);
             if (roleID == this.PortalSettings.AdministratorRoleId && canDelete)
             {
                 // User can only delete if in Admin role
                 canDelete = PortalSecurity.IsInRole(this.PortalSettings.AdministratorRoleName);
             }
 
+			Logger.LogDebug("<<< Exiting DeleteButtonVisible(userID={UserID},roleID={RoleID})", userID, roleID);
             return canDelete;
         }
 
@@ -257,12 +273,14 @@ namespace DotNetNuke.Modules.Admin.Security
         /// <returns>The short date string or <see cref="string.Empty"/>.</returns>
         public string FormatDate(DateTime dateTime)
         {
+			Logger.LogDebug(">>> Entering FormatDate(dateTime={DateTime})", dateTime);
             if (!Null.IsNull(dateTime))
             {
                 return dateTime.ToShortDateString();
             }
             else
             {
+				Logger.LogDebug("<<< Exiting FormatDate(dateTime={DateTime})", dateTime);
                 return string.Empty;
             }
         }
@@ -273,6 +291,8 @@ namespace DotNetNuke.Modules.Admin.Security
         /// <returns>A string with an HTML link to edit the user.</returns>
         public string FormatUser(int userID, string displayName)
         {
+			Logger.LogDebug(">>> Entering FormatUser(userID={UserID},displayName={DisplayName})", userID, displayName);
+			Logger.LogDebug("<<< Exiting FormatUser(userID={UserID},displayName={DisplayName})", userID, displayName);
             return "<a href=\"" + Globals.LinkClick("userid=" + userID, this.TabId, this.ModuleId) + "\" class=\"CommandButton\">" + displayName + "</a>";
         }
 
@@ -281,6 +301,7 @@ namespace DotNetNuke.Modules.Admin.Security
         // ReSharper disable once InconsistentNaming
         public void cmdDeleteUserRole_click(object sender, ImageClickEventArgs e)
         {
+			Logger.LogDebug(">>> Entering cmdDeleteUserRole_click(sender={Sender},e={E})", sender, e);
             if (PortalSecurity.IsInRole(this.PortalSettings.AdministratorRoleName) == false)
             {
                 return;
@@ -289,10 +310,14 @@ namespace DotNetNuke.Modules.Admin.Security
             try
             {
                 var cmdDeleteUserRole = (ImageButton)sender;
+				Logger.LogDebug("cmdDeleteUserRole_click(sender={Sender},e={E}): cmdDeleteUserRole → {CmdDeleteUserRole}", sender, e, cmdDeleteUserRole);
                 var roleId = Convert.ToInt32(cmdDeleteUserRole.Attributes["roleId"]);
+				Logger.LogDebug("cmdDeleteUserRole_click(sender={Sender},e={E}): roleId → {RoleId}", sender, e, roleId);
                 var userId = Convert.ToInt32(cmdDeleteUserRole.Attributes["userId"]);
+				Logger.LogDebug("cmdDeleteUserRole_click(sender={Sender},e={E}): userId → {UserId}", sender, e, userId);
 
                 var role = this.roleController.GetRole(this.PortalId, r => r.RoleID == roleId);
+				Logger.LogDebug("cmdDeleteUserRole_click(sender={Sender},e={E}): role → {Role}", sender, e, role);
                 if (!RoleController.DeleteUserRole(this.roleProvider, this.roleController, this.eventManager, this.portalController, this.userController, this.eventLogger, this.userController.GetUserById(this.PortalId, userId), role, this.PortalSettings, this.chkNotify.Checked))
                 {
                     UI.Skins.Skin.AddModuleMessage(this, Localization.GetString("RoleRemoveError", this.LocalResourceFile), ModuleMessage.ModuleMessageType.RedError);
@@ -302,19 +327,23 @@ namespace DotNetNuke.Modules.Admin.Security
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in cmdDeleteUserRole_click(sender={Sender},e={E}): {Arg2}", sender, e, exc.getMessage());
                 Exceptions.LogException(exc);
                 UI.Skins.Skin.AddModuleMessage(this, Localization.GetString("RoleRemoveError", this.LocalResourceFile), ModuleMessage.ModuleMessageType.RedError);
             }
+			Logger.LogDebug("<<< Exiting cmdDeleteUserRole_click(sender={Sender},e={E})", sender, e);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             if (this.Request.QueryString["RoleId"] != null)
             {
                 this.roleId = int.Parse(this.Request.QueryString["RoleId"]);
+				Logger.LogDebug("OnInit(e={E}): roleId → {RoleId}", e, roleId);
             }
 
             if (this.Request.QueryString["UserId"] != null)
@@ -323,9 +352,11 @@ namespace DotNetNuke.Modules.Admin.Security
 
                 // Use Int32.MaxValue as invalid UserId
                 this.userId = int.TryParse(this.Request.QueryString["UserId"], out userId) ? userId : int.MaxValue;
+				Logger.LogDebug("OnInit(e={E}): userId → {UserId}", e, userId);
             }
 
             this.CurrentPage = 1;
+			Logger.LogDebug("OnInit(e={E}): this.CurrentPage → {Arg1}", e, this.CurrentPage);
             if (this.Request.QueryString["CurrentPage"] != null)
             {
                 var currentPage = 0;
@@ -346,11 +377,13 @@ namespace DotNetNuke.Modules.Admin.Security
             this.cmdValidate.Click += this.CmdValidate_Click;
             this.grdUserRoles.ItemCreated += this.GrdUserRoles_ItemCreated;
             this.grdUserRoles.ItemDataBound += this.grdUserRoles_ItemDataBound;
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             try
@@ -376,8 +409,10 @@ namespace DotNetNuke.Modules.Admin.Security
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
@@ -385,10 +420,12 @@ namespace DotNetNuke.Modules.Admin.Security
         // ReSharper disable once InconsistentNaming
         protected void grdUserRoles_ItemDataBound(object sender, DataGridItemEventArgs e)
         {
+			Logger.LogDebug(">>> Entering grdUserRoles_ItemDataBound(sender={Sender},e={E})", sender, e);
             DataGridItem item = e.Item;
             if (item.ItemType == ListItemType.Item || item.ItemType == ListItemType.AlternatingItem || item.ItemType == ListItemType.SelectedItem)
             {
                 var userRole = (UserRoleInfo)item.DataItem;
+				Logger.LogDebug("grdUserRoles_ItemDataBound(sender={Sender},e={E}): userRole → {UserRole}", sender, e, userRole);
                 if (this.roleId == Null.NullInteger)
                 {
                     if (userRole.RoleID == Convert.ToInt32(this.cboRoles.SelectedValue))
@@ -405,20 +442,24 @@ namespace DotNetNuke.Modules.Admin.Security
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting grdUserRoles_ItemDataBound(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>BindData loads the controls from the Database.</summary>
         private void BindData()
         {
+			Logger.LogDebug(">>> Entering BindData()");
             // bind all portal roles to dropdownlist
             if (this.roleId == Null.NullInteger)
             {
                 if (this.cboRoles.Items.Count == 0)
                 {
                     var roles = this.roleController.GetRoles(this.PortalId, x => x.Status == RoleStatus.Approved);
+					Logger.LogDebug("BindData(): roles → {Roles}", roles);
 
                     // Remove access to Admin Role if use is not a member of the role
                     int roleIndex = Null.NullInteger;
+					Logger.LogDebug("BindData(): roleIndex → {RoleIndex}", roleIndex);
                     foreach (RoleInfo tmpRole in roles)
                     {
                         if (tmpRole.RoleName == this.PortalSettings.AdministratorRoleName)
@@ -506,11 +547,13 @@ namespace DotNetNuke.Modules.Admin.Security
                 this.cmdValidate.Visible = false;
                 this.plUsers.Visible = false;
             }
+			Logger.LogDebug("<<< Exiting BindData()");
         }
 
         /// <summary>BindGrid loads the data grid from the Database.</summary>
         private void BindGrid()
         {
+			Logger.LogDebug(">>> Entering BindGrid()");
             if (this.roleId != Null.NullInteger)
             {
                 this.cmdAdd.Text = Localization.GetString("AddUser.Text", this.LocalResourceFile);
@@ -540,16 +583,23 @@ namespace DotNetNuke.Modules.Admin.Security
                                                                             || s.StartsWith("UserId", StringComparison.OrdinalIgnoreCase)
                                                                             || s.StartsWith("filter", StringComparison.OrdinalIgnoreCase)
                                                                             || s.StartsWith("popUp", StringComparison.OrdinalIgnoreCase)).ToArray()));
+																			Logger.LogDebug("<<< Exiting BindGrid()");
         }
 
         private IList<UserRoleInfo> GetPagedDataSource()
         {
+			Logger.LogDebug(">>> Entering GetPagedDataSource()");
             var roleName = this.roleId != Null.NullInteger ? this.Role.RoleName : Null.NullString;
             var userName = this.userId != Null.NullInteger ? this.User.Username : Null.NullString;
+			Logger.LogDebug("GetPagedDataSource(): userName → {UserName}", userName);
 
             var userList = this.roleController.GetUserRoles(this.PortalId, userName, roleName);
+			Logger.LogDebug("GetPagedDataSource(): userList → {UserList}", userList);
             this.totalRecords = userList.Count;
+			Logger.LogDebug("GetPagedDataSource(): totalRecords → {TotalRecords}", totalRecords);
+			Logger.LogDebug("GetPagedDataSource(): this.totalRecords → {Arg0}", this.totalRecords);
 
+			Logger.LogDebug("<<< Exiting GetPagedDataSource()");
             return userList.Skip((this.CurrentPage - 1) * this.PageSize).Take(this.PageSize).ToList();
         }
 
@@ -558,26 +608,31 @@ namespace DotNetNuke.Modules.Admin.Security
         /// <param name="roleId">The ID of the Role.</param>
         private void GetDates(int userId, int roleId)
         {
+			Logger.LogDebug(">>> Entering GetDates(userId={UserId},roleId={RoleId})", userId, roleId);
             DateTime? expiryDate = null;
             DateTime? effectiveDate = null;
 
             var userRole = this.roleController.GetUserRole(this.PortalId, userId, roleId);
+			Logger.LogDebug("GetDates(userId={UserId},roleId={RoleId}): userRole → {UserRole}", userId, roleId, userRole);
             if (userRole != null)
             {
                 if (Null.IsNull(userRole.EffectiveDate) == false)
                 {
                     effectiveDate = userRole.EffectiveDate;
+					Logger.LogDebug("GetDates(userId={UserId},roleId={RoleId}): effectiveDate → {EffectiveDate}", userId, roleId, effectiveDate);
                 }
 
                 if (Null.IsNull(userRole.ExpiryDate) == false)
                 {
                     expiryDate = userRole.ExpiryDate;
                 }
+				Logger.LogDebug("GetDates(userId={UserId},roleId={RoleId}): expiryDate → {ExpiryDate}", userId, roleId, expiryDate);
             }
             else
             {
                 // new role assignment
                 var objRole = this.roleController.GetRole(this.PortalId, r => r.RoleID == roleId);
+				Logger.LogDebug("GetDates(userId={UserId},roleId={RoleId}): objRole → {ObjRole}", userId, roleId, objRole);
                 if (objRole.BillingPeriod > 0)
                 {
                     switch (objRole.BillingFrequency)
@@ -600,10 +655,12 @@ namespace DotNetNuke.Modules.Admin.Security
 
             this.effectiveDatePicker.Text = effectiveDate?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             this.expiryDatePicker.Text = expiryDate?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+			Logger.LogDebug("<<< Exiting GetDates(userId={UserId},roleId={RoleId})", userId, roleId);
         }
 
         private void CboUsers_SelectedIndexChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering CboUsers_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
             if ((this.cboUsers.SelectedItem != null) && (this.cboRoles.SelectedItem != null))
             {
                 this.SelectedUserID = int.Parse(this.cboUsers.SelectedItem.Value);
@@ -611,10 +668,12 @@ namespace DotNetNuke.Modules.Admin.Security
             }
 
             this.BindGrid();
+			Logger.LogDebug("<<< Exiting CboUsers_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
         }
 
         private void CmdValidate_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering CmdValidate_Click(sender={Sender},e={E})", sender, e);
             if (PortalSecurity.IsInRole(this.PortalSettings.AdministratorRoleName) == false)
             {
                 return;
@@ -624,10 +683,12 @@ namespace DotNetNuke.Modules.Admin.Security
             {
                 // validate username
                 UserInfo objUser = UserController.GetUserByName(this.PortalId, this.txtUsers.Text);
+				Logger.LogDebug("CmdValidate_Click(sender={Sender},e={E}): objUser → {ObjUser}", sender, e, objUser);
                 if (objUser != null)
                 {
                     this.GetDates(objUser.UserID, this.roleId);
                     this.SelectedUserID = objUser.UserID;
+					Logger.LogDebug("CmdValidate_Click(sender={Sender},e={E}): this.SelectedUserID → {Arg2}", sender, e, this.SelectedUserID);
                 }
                 else
                 {
@@ -636,16 +697,20 @@ namespace DotNetNuke.Modules.Admin.Security
             }
 
             this.BindGrid();
+			Logger.LogDebug("<<< Exiting CmdValidate_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void CboRoles_SelectedIndexChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering CboRoles_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
             this.GetDates(this.userId, int.Parse(this.cboRoles.SelectedItem.Value));
             this.BindGrid();
+			Logger.LogDebug("<<< Exiting CboRoles_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
         }
 
         private void CmdAdd_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering CmdAdd_Click(sender={Sender},e={E})", sender, e);
             if (PortalSecurity.IsInRole(this.PortalSettings.AdministratorRoleName) == false)
             {
                 return;
@@ -667,15 +732,18 @@ namespace DotNetNuke.Modules.Admin.Security
                         if (!DateTime.TryParseExact(this.effectiveDatePicker.Text, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var datEffectiveDate))
                         {
                             datEffectiveDate = Null.NullDate;
+							Logger.LogDebug("CmdAdd_Click(sender={Sender},e={E}): datEffectiveDate → {DatEffectiveDate}", sender, e, datEffectiveDate);
                         }
 
                         if (!DateTime.TryParseExact(this.expiryDatePicker.Text, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out var datExpiryDate))
                         {
                             datExpiryDate = Null.NullDate;
+							Logger.LogDebug("CmdAdd_Click(sender={Sender},e={E}): datExpiryDate → {DatExpiryDate}", sender, e, datExpiryDate);
                         }
 
                         // Add User to Role
                         var isOwner = false;
+						Logger.LogDebug("CmdAdd_Click(sender={Sender},e={E}): isOwner → {IsOwner}", sender, e, isOwner);
                         if (this.Role.SecurityMode is SecurityMode.SocialGroup or SecurityMode.Both)
                         {
                             isOwner = this.chkIsOwner.Checked;
@@ -690,17 +758,21 @@ namespace DotNetNuke.Modules.Admin.Security
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in CmdAdd_Click(sender={Sender},e={E}): {Arg2}", sender, e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting CmdAdd_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void GrdUserRoles_ItemCreated(object sender, DataGridItemEventArgs e)
         {
+			Logger.LogDebug(">>> Entering GrdUserRoles_ItemCreated(sender={Sender},e={E})", sender, e);
             try
             {
                 if (e.Item.FindControl("cmdDeleteUserRole") is ImageButton cmdDeleteUserRole)
                 {
                     var userRoleInfo = (UserRoleInfo)e.Item.DataItem;
+					Logger.LogDebug("GrdUserRoles_ItemCreated(sender={Sender},e={E}): userRoleInfo → {UserRoleInfo}", sender, e, userRoleInfo);
                     if (this.roleId == Null.NullInteger)
                     {
                         ClientAPI.AddButtonConfirm(cmdDeleteUserRole, string.Format(CultureInfo.CurrentCulture, Localization.GetString("DeleteRoleFromUser.Text", this.LocalResourceFile), userRoleInfo.FullName, userRoleInfo.RoleName));
@@ -718,8 +790,10 @@ namespace DotNetNuke.Modules.Admin.Security
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in GrdUserRoles_ItemCreated(sender={Sender},e={E}): {Arg2}", sender, e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting GrdUserRoles_ItemCreated(sender={Sender},e={E})", sender, e);
         }
     }
 }

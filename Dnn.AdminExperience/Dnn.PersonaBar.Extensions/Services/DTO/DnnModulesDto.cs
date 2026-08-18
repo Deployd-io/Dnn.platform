@@ -15,11 +15,13 @@ namespace Dnn.PersonaBar.Pages.Services.Dto
     {
         public DnnModulesDto(IEnumerable<string> locales)
         {
+			eventLogger.LogDebug(">>> Entering DnnModulesDto(locales={Locales})", locales);
             this.Modules = new List<DnnModuleDto>(); // one module for each language
             foreach (var locale in locales)
             {
                 this.Modules.Add(new DnnModuleDto { CultureCode = locale });
             }
+			eventLogger.LogDebug("<<< Exiting DnnModulesDto(locales={Locales})", locales);
         }
 
         public List<DnnModuleDto> Modules { get; }
@@ -28,6 +30,8 @@ namespace Dnn.PersonaBar.Pages.Services.Dto
 
         public DnnModuleDto Module(string locale)
         {
+			eventLogger.LogDebug(">>> Entering Module(locale={Locale})", locale);
+			eventLogger.LogDebug("<<< Exiting Module(locale={Locale})", locale);
             return this.Modules.Single(mo => mo.CultureCode == locale);
         }
     }

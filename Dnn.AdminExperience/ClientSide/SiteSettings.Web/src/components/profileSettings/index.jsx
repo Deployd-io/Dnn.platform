@@ -9,16 +9,20 @@ import { InputGroup, SingleLineInputWithError, GridSystem, Switch, Dropdown, Lab
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 class ProfileSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             profileSettings: undefined
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidUpdate() {
+		logger.debug('>>> Entering componentDidUpdate()');
         const {props} = this;
         if (props.profileSettings) {
             if (props.portalId === undefined || props.profileSettings.PortalId === props.portalId) {
@@ -28,15 +32,20 @@ class ProfileSettingsPanelBody extends Component {
                 this.loadData();
             }
         }
+		logger.debug('<<< Exiting componentDidUpdate()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.loadData();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     loadData() {
+		logger.debug('>>> Entering loadData()');
         const {props} = this;
         props.dispatch(SiteBehaviorActions.getProfileSettings(props.portalId, (data) => {
+			logger.debug('<<< Exiting loadData()');
             this.setState({
                 profileSettings: Object.assign({}, data.Settings)
             });
@@ -44,9 +53,11 @@ class ProfileSettingsPanelBody extends Component {
     }
 
     getProfileVisibilityOptions() {
+		logger.debug('>>> Entering getProfileVisibilityOptions()');
         let options = [];
         if (this.props.userVisibilityOptions !== undefined) {
             options = this.props.userVisibilityOptions.map((item) => {
+		logger.debug('<<< Exiting getProfileVisibilityOptions()');
                 return { label: resx.get(item.label), value: item.value };
             });
         }
@@ -54,9 +65,11 @@ class ProfileSettingsPanelBody extends Component {
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let {state, props} = this;
 
         let profileSettings = Object.assign({}, state.profileSettings);
+		logger.debug(`onSettingChange(key=${key},event=${event}): profileSettings → ${profileSettings}`);
         if (key === "ProfileDefaultVisibility") {
             profileSettings[key] = event.value;
         }
@@ -68,9 +81,11 @@ class ProfileSettingsPanelBody extends Component {
         });
 
         props.dispatch(SiteBehaviorActions.profileSettingsClientModified(profileSettings));
+		logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
     }
 
     onUpdate(event) {
+		logger.debug(`>>> Entering onUpdate(event=${event})`);
         event.preventDefault();
         const {props, state} = this;
 
@@ -78,13 +93,16 @@ class ProfileSettingsPanelBody extends Component {
             util.utilities.notify(resx.get("SettingsUpdateSuccess"));
         }, () => {
             util.utilities.notifyError(resx.get("SettingsError"));
+			logger.debug(`<<< Exiting onUpdate(event=${event})`);
         }));
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const {props} = this;
         util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SiteBehaviorActions.getProfileSettings(props.portalId, (data) => {
+				logger.debug('<<< Exiting onCancel()');
                 let profileSettings = Object.assign({}, data.Settings);
                 this.setState({
                     profileSettings
@@ -95,6 +113,7 @@ class ProfileSettingsPanelBody extends Component {
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
         if (state.profileSettings) {
             const columnOne = <div key="column-one" className="left-column">
@@ -157,6 +176,7 @@ class ProfileSettingsPanelBody extends Component {
                 </InputGroup>
             </div>;
 
+			logger.debug('<<< Exiting render()');
             return (
                 <div className={styles.profileSettings}>
                     <div className="sectionTitleNoBorder">{resx.get("UserProfileSettings")}</div>
@@ -194,6 +214,8 @@ ProfileSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         profileSettings: state.siteBehavior.profileSettings,

@@ -5,19 +5,24 @@ import { SvgIcons } from "@dnnsoftware/dnn-react-common";
 import util from "utils";
 import Html from "../../../Html";
 import styles from "./style.module.less";
+const logger = console;
 
 
 class Term extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             isOpened: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     toggleTerm(event) {
+		logger.debug(`>>> Entering toggleTerm(event=${event})`);
         if (event) {
             event.preventDefault();
+			logger.debug(`<<< Exiting toggleTerm(event=${event})`);
         }
         this.setState({
             isOpened: !this.state.isOpened
@@ -25,33 +30,41 @@ class Term extends Component {
     }
 
     onLiClick(event) {
+		logger.debug(`>>> Entering onLiClick(event=${event})`);
         event.preventDefault();
         const {props} = this;
         if (props.isEditable) {
             this.toggleTerm();
         } else {
             this.onClick();
+			logger.debug(`<<< Exiting onLiClick(event=${event})`);
         }
     }
 
     UNSAFE_componentWillReceiveProps(props) {
+		logger.debug(`>>> Entering UNSAFE_componentWillReceiveProps(props=${props})`);
         if (props.closeAll) {
             this.setState({
                 isOpened: false
             });
+			logger.debug(`<<< Exiting UNSAFE_componentWillReceiveProps(props=${props})`);
         }
     }
 
     onClick() {
+		logger.debug('>>> Entering onClick()');
         const {props} = this;
         props.onClick(props.term);
+		logger.debug('<<< Exiting onClick()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
         const className = styles.termLi + (props.children.length > 0 ? " has-children" : "") + (state.isOpened ? " opened" : "") + (props.term.selected ? " selected" : "");
 
          
+		logger.debug('<<< Exiting render()');
         return (
             <li className={className}>
                 <div>

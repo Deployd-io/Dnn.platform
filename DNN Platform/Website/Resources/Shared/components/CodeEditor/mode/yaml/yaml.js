@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -12,18 +14,27 @@
 "use strict";
 
 CodeMirror.defineMode("yaml", function() {
+logger.debug('>>> Entering defineMode()');
 
   var cons = ['true', 'false', 'on', 'off', 'yes', 'no'];
+logger.debug(`defineMode(): cons → ${cons}`);
   var keywordRegex = new RegExp("\\b(("+cons.join(")|(")+"))$", 'i');
 
   return {
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       var ch = stream.peek();
+	logger.debug(`<<< Exiting function(exports=${exports})`);
       var esc = state.escaped;
+	logger.debug(`defineMode(): keywordRegex → ${keywordRegex}`);
       state.escaped = false;
+	logger.debug(`token(stream=${stream},state=${state}): ch → ${ch}`);
       /* comments */
       if (ch == "#" && (stream.pos == 0 || /\s/.test(stream.string.charAt(stream.pos - 1)))) {
+		logger.debug(`function(exports=${exports}): state.escaped → ${state.escaped}`);
         stream.skipToEnd();
+		logger.debug(`defineMode(): state.escaped → ${state.escaped}`);
+		logger.debug(`token(stream=${stream},state=${state}): state.escaped → ${state.escaped}`);
         return "comment";
       }
 
@@ -35,17 +46,24 @@ CodeMirror.defineMode("yaml", function() {
       } else if (state.literal) { state.literal = false; }
       if (stream.sol()) {
         state.keyCol = 0;
+		logger.debug(`function(exports=${exports}): state.keyCol → ${state.keyCol}`);
+		logger.debug(`function(exports=${exports}): state.pairStart → ${state.pairStart}`);
         state.pair = false;
+		logger.debug(`function(exports=${exports}): state.pair → ${state.pair}`);
         state.pairStart = false;
         /* document start */
         if(stream.match(/---/)) { return "def"; }
+		logger.debug(`defineMode(): state.keyCol → ${state.keyCol}`);
         /* document end */
         if (stream.match(/\.\.\./)) { return "def"; }
+		logger.debug(`token(stream=${stream},state=${state}): state.keyCol → ${state.keyCol}`);
         /* array list item */
         if (stream.match(/\s*-\s+/)) { return 'meta'; }
+		logger.debug(`defineMode(): state.pair → ${state.pair}`);
       }
       /* inline pairs/lists */
       if (stream.match(/^(\{|\}|\[|\])/)) {
+		logger.debug(`token(stream=${stream},state=${state}): state.pair → ${state.pair}`);
         if (ch == '{')
           state.inlinePairs++;
         else if (ch == '}')
@@ -83,6 +101,7 @@ CodeMirror.defineMode("yaml", function() {
         /* keywords */
         if (stream.match(keywordRegex)) { return 'keyword'; }
       }
+	logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
 
       /* pairs (associative arrays) -> key */
       if (!state.pair && stream.match(/^\s*(?:[,\[\]{}&*!|>'"%@`][^\s'":]|[^,\[\]{}#&*!|>'"%@`])[^#]*?(?=\s*:($|\s))/)) {
@@ -99,6 +118,8 @@ CodeMirror.defineMode("yaml", function() {
       return null;
     },
     startState: function() {
+	logger.debug('>>> Entering startState()');
+	logger.debug('<<< Exiting defineMode()');
       return {
         pair: false,
         pairStart: false,
@@ -108,6 +129,7 @@ CodeMirror.defineMode("yaml", function() {
         literal: false,
         escaped: false
       };
+	logger.debug('<<< Exiting startState()');
     }
   };
 });

@@ -45,6 +45,7 @@ namespace log4net.Util.PatternStringConverters
 #endif
         protected override void Convert(TextWriter writer, object state) 
         {
+		value.LogDebug(">>> Entering Convert(writer={Writer},state={State})", writer, state);
 #if (NETCF || SSCLI)
             // On compact framework there is no System.Diagnostics.Process class
             writer.Write( SystemInfo.NotAvailableText );
@@ -62,6 +63,7 @@ namespace log4net.Util.PatternStringConverters
                 writer.Write(SystemInfo.NotAvailableText);
             }
 #endif
+		value.LogDebug("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
         }
 
         /// <summary>The fully qualified type of the ProcessIdPatternConverter class.</summary>

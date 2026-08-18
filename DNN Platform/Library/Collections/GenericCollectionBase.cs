@@ -17,6 +17,7 @@ using System.Collections.Generic;
 [Serializable]
 public abstract class GenericCollectionBase<TElement> : CollectionBase, IList<TElement>
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(GenericCollectionBase));
     /// <inheritdoc />
     public bool IsReadOnly => this.InnerList.IsReadOnly;
 
@@ -39,12 +40,14 @@ public abstract class GenericCollectionBase<TElement> : CollectionBase, IList<TE
     /// <inheritdoc />
     public bool Remove(TElement item)
     {
+		Logger.LogDebug(">>> Entering Remove(item={Item})", item);
         if (!this.Contains(item))
         {
             return false;
         }
 
         this.InnerList.Remove(item);
+		Logger.LogDebug("<<< Exiting Remove(item={Item})", item);
         return true;
     }
 

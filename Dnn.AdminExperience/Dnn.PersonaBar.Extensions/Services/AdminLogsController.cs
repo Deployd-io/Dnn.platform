@@ -34,6 +34,7 @@ namespace Dnn.PersonaBar.AdminLogs.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.AdminLogsView + "," + Components.Constants.LogSettingsEdit)]
         public HttpResponseMessage GetLogTypes()
         {
+			Logger.LogDebug(">>> Entering GetLogTypes()");
             try
             {
                 var logTypes =
@@ -59,12 +60,16 @@ namespace Dnn.PersonaBar.AdminLogs.Services
                     Results = types,
                     TotalResults = types.Count,
                 };
+				Logger.LogDebug("GetLogTypes(): Success → {Success}", Success);
+				Logger.LogDebug("GetLogTypes(): TotalResults → {TotalResults}", TotalResults);
+				Logger.LogDebug("GetLogTypes(): Results → {Results}", Results);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetLogTypes()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -79,9 +84,11 @@ namespace Dnn.PersonaBar.AdminLogs.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.AdminLogsView)]
         public HttpResponseMessage GetLogItems(string logType, int pageSize, int pageIndex)
         {
+			Logger.LogDebug(">>> Entering GetLogItems(logType={LogType},pageSize={PageSize},pageIndex={PageIndex})", logType, pageSize, pageIndex);
             try
             {
                 var portalId = this.UserInfo.IsSuperUser ? this.Request.GetQueryStringAsInteger("portalid") : this.PortalId;
+				Logger.LogDebug("GetLogItems(logType={LogType},pageSize={PageSize},pageIndex={PageIndex}): portalId → {PortalId}", logType, pageSize, pageIndex, portalId);
                 var totalRecords = 0;
                 var logItems = LogController.Instance.GetLogs(
                     portalId,
@@ -102,6 +109,8 @@ namespace Dnn.PersonaBar.AdminLogs.Services
                     v.LogProperties.Summary,
                     LogProperties = this.controller.GetPropertiesText(v),
                 });
+				Logger.LogDebug("GetLogItems(logType={LogType},pageSize={PageSize},pageIndex={PageIndex}): LogCreateDate → {LogCreateDate}", logType, pageSize, pageIndex, LogCreateDate);
+				Logger.LogDebug("GetLogItems(logType={LogType},pageSize={PageSize},pageIndex={PageIndex}): LogProperties → {LogProperties}", logType, pageSize, pageIndex, LogProperties);
 
                 var response = new
                 {
@@ -109,12 +118,16 @@ namespace Dnn.PersonaBar.AdminLogs.Services
                     Results = items,
                     TotalResults = totalRecords,
                 };
+				Logger.LogDebug("GetLogItems(logType={LogType},pageSize={PageSize},pageIndex={PageIndex}): Success → {Success}", logType, pageSize, pageIndex, Success);
+				Logger.LogDebug("GetLogItems(logType={LogType},pageSize={PageSize},pageIndex={PageIndex}): TotalResults → {TotalResults}", logType, pageSize, pageIndex, TotalResults);
+				Logger.LogDebug("GetLogItems(logType={LogType},pageSize={PageSize},pageIndex={PageIndex}): Results → {Results}", logType, pageSize, pageIndex, Results);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetLogItems(logType={LogType},pageSize={PageSize},pageIndex={PageIndex})", logType, pageSize, pageIndex);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -128,6 +141,7 @@ namespace Dnn.PersonaBar.AdminLogs.Services
         [RequireHost]
         public HttpResponseMessage DeleteLogItems(IEnumerable<string> logIds)
         {
+			Logger.LogDebug(">>> Entering DeleteLogItems(logIds={LogIds})", logIds);
             try
             {
                 foreach (var logId in logIds)
@@ -141,6 +155,7 @@ namespace Dnn.PersonaBar.AdminLogs.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting DeleteLogItems(logIds={LogIds})", logIds);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -154,6 +169,7 @@ namespace Dnn.PersonaBar.AdminLogs.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.AdminLogsView + "&" + Components.Constants.AdminLogsEdit)]
         public HttpResponseMessage EmailLogItems(EmailLogItemsRequest request)
         {
+			Logger.LogDebug(">>> Entering EmailLogItems(request={Request})", request);
             try
             {
                 if (!this.UserInfo.IsSuperUser && request.LogIds.Any(logGuid => (LogController.Instance.GetLog(logGuid)?.LogPortalId != this.PortalId)))
@@ -165,7 +181,9 @@ namespace Dnn.PersonaBar.AdminLogs.Services
 
                 string error;
                 var subject = request.Subject;
+				Logger.LogDebug("EmailLogItems(request={Request}): subject → {Subject}", request, subject);
                 var strFromEmailAddress = !string.IsNullOrEmpty(this.UserInfo.Email) ? this.UserInfo.Email : this.PortalSettings.Email;
+				Logger.LogDebug("EmailLogItems(request={Request}): strFromEmailAddress → {StrFromEmailAddress}", request, strFromEmailAddress);
 
                 if (string.IsNullOrEmpty(subject))
                 {
@@ -179,10 +197,14 @@ namespace Dnn.PersonaBar.AdminLogs.Services
                     ErrorMessage = error,
                     ReturnMessage = returnMsg,
                 });
+				Logger.LogDebug("EmailLogItems(request={Request}): Success → {Success}", request, Success);
+				Logger.LogDebug("EmailLogItems(request={Request}): ReturnMessage → {ReturnMessage}", request, ReturnMessage);
+				Logger.LogDebug("EmailLogItems(request={Request}): ErrorMessage → {ErrorMessage}", request, ErrorMessage);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting EmailLogItems(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -195,6 +217,7 @@ namespace Dnn.PersonaBar.AdminLogs.Services
         [RequireHost]
         public HttpResponseMessage ClearLog()
         {
+			Logger.LogDebug(">>> Entering ClearLog()");
             try
             {
                 this.controller.ClearLog();
@@ -203,6 +226,7 @@ namespace Dnn.PersonaBar.AdminLogs.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting ClearLog()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -214,9 +238,11 @@ namespace Dnn.PersonaBar.AdminLogs.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.LogSettingsView, CheckPermissionForAdmin = true)]
         public HttpResponseMessage GetKeepMostRecentOptions()
         {
+			Logger.LogDebug(">>> Entering GetKeepMostRecentOptions()");
             try
             {
                 var options = this.controller.GetKeepMostRecentOptions().ToList();
+				Logger.LogDebug("GetKeepMostRecentOptions(): options → {Options}", options);
 
                 var response = new
                 {
@@ -224,12 +250,16 @@ namespace Dnn.PersonaBar.AdminLogs.Services
                     Results = options,
                     TotalResults = options.Count,
                 };
+				Logger.LogDebug("GetKeepMostRecentOptions(): TotalResults → {TotalResults}", TotalResults);
+				Logger.LogDebug("GetKeepMostRecentOptions(): Success → {Success}", Success);
+				Logger.LogDebug("GetKeepMostRecentOptions(): Results → {Results}", Results);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetKeepMostRecentOptions()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -241,12 +271,15 @@ namespace Dnn.PersonaBar.AdminLogs.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.LogSettingsView, CheckPermissionForAdmin = true)]
         public HttpResponseMessage GetOccurrenceOptions()
         {
+			Logger.LogDebug(">>> Entering GetOccurrenceOptions()");
             try
             {
                 var response = new
                 {
                     Success = true,
                     Results = new
+					Logger.LogDebug("GetOccurrenceOptions(): Results → {Results}", Results);
+					Logger.LogDebug("GetOccurrenceOptions(): Success → {Success}", Success);
                     {
                         Thresholds = this.controller.GetOccurenceThresholds().ToList(),
                         NotificationTimes = this.controller.GetOccurenceThresholdNotificationTimes().ToList(),
@@ -254,12 +287,17 @@ namespace Dnn.PersonaBar.AdminLogs.Services
                     },
                     TotalResults = 1,
                 };
+				Logger.LogDebug("GetOccurrenceOptions(): NotificationTimeTypes → {NotificationTimeTypes}", NotificationTimeTypes);
+				Logger.LogDebug("GetOccurrenceOptions(): NotificationTimes → {NotificationTimes}", NotificationTimes);
+				Logger.LogDebug("GetOccurrenceOptions(): Thresholds → {Thresholds}", Thresholds);
+				Logger.LogDebug("GetOccurrenceOptions(): TotalResults → {TotalResults}", TotalResults);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetOccurrenceOptions()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -271,9 +309,11 @@ namespace Dnn.PersonaBar.AdminLogs.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.LogSettingsView, CheckPermissionForAdmin = true)]
         public HttpResponseMessage GetLogSettings()
         {
+			Logger.LogDebug(">>> Entering GetLogSettings()");
             try
             {
                 var logTypes = LogController.Instance.GetLogTypeConfigInfo().Cast<LogTypeConfigInfo>();
+				Logger.LogDebug("GetLogSettings(): logTypes → {LogTypes}", logTypes);
 
                 int portalId;
                 var types = logTypes
@@ -298,12 +338,16 @@ namespace Dnn.PersonaBar.AdminLogs.Services
                     Results = types,
                     TotalResults = types.Count,
                 };
+				Logger.LogDebug("GetLogSettings(): TotalResults → {TotalResults}", TotalResults);
+				Logger.LogDebug("GetLogSettings(): Results → {Results}", Results);
+				Logger.LogDebug("GetLogSettings(): Success → {Success}", Success);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetLogSettings()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -316,9 +360,11 @@ namespace Dnn.PersonaBar.AdminLogs.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.LogSettingsView, CheckPermissionForAdmin = true)]
         public HttpResponseMessage GetLogSetting(string logTypeConfigId)
         {
+			Logger.LogDebug(">>> Entering GetLogSetting(logTypeConfigId={LogTypeConfigId})", logTypeConfigId);
             try
             {
                 var configInfo = this.controller.GetLogTypeConfig(logTypeConfigId);
+				Logger.LogDebug("GetLogSetting(logTypeConfigId={LogTypeConfigId}): configInfo → {ConfigInfo}", logTypeConfigId, configInfo);
                 int portalId;
                 if (!this.UserInfo.IsSuperUser && (!int.TryParse(configInfo.LogTypePortalID, out portalId) || portalId != this.PortalId))
                 {
@@ -349,6 +395,7 @@ namespace Dnn.PersonaBar.AdminLogs.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetLogSetting(logTypeConfigId={LogTypeConfigId})", logTypeConfigId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -362,6 +409,7 @@ namespace Dnn.PersonaBar.AdminLogs.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.LogSettingsView + "&" + Components.Constants.LogSettingsEdit, CheckPermissionForAdmin = true)]
         public HttpResponseMessage AddLogSetting([FromBody] UpdateLogSettingsRequest request)
         {
+			Logger.LogDebug(">>> Entering AddLogSetting(request={Request})", request);
             try
             {
                 if (!this.UserInfo.IsSuperUser)
@@ -370,12 +418,14 @@ namespace Dnn.PersonaBar.AdminLogs.Services
                 }
 
                 var logTypeConfigInfo = JObject.FromObject(request).ToObject<LogTypeConfigInfo>();
+				Logger.LogDebug("AddLogSetting(request={Request}): logTypeConfigInfo → {LogTypeConfigInfo}", request, logTypeConfigInfo);
                 this.controller.AddLogTypeConfig(logTypeConfigInfo);
                 return this.GetLatestLogSetting();
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting AddLogSetting(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -389,6 +439,7 @@ namespace Dnn.PersonaBar.AdminLogs.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.LogSettingsView + "&" + Components.Constants.LogSettingsEdit, CheckPermissionForAdmin = true)]
         public HttpResponseMessage UpdateLogSetting([FromBody] UpdateLogSettingsRequest request)
         {
+			Logger.LogDebug(">>> Entering UpdateLogSetting(request={Request})", request);
             try
             {
                 request.LogTypePortalID = this.UserInfo.IsSuperUser ? request.LogTypePortalID : this.PortalId.ToString(CultureInfo.InvariantCulture);
@@ -396,6 +447,7 @@ namespace Dnn.PersonaBar.AdminLogs.Services
                 int requestPortalId;
                 int settingPortalId;
                 var configInfo = this.controller.GetLogTypeConfig(request.ID);
+				Logger.LogDebug("UpdateLogSetting(request={Request}): configInfo → {ConfigInfo}", request, configInfo);
                 if (!this.UserInfo.IsSuperUser &&
                     (!int.TryParse(configInfo.LogTypePortalID, out settingPortalId) ||
                      !int.TryParse(request.LogTypePortalID, out requestPortalId) || requestPortalId != settingPortalId))
@@ -404,12 +456,14 @@ namespace Dnn.PersonaBar.AdminLogs.Services
                 }
 
                 var logTypeConfigInfo = JObject.FromObject(request).ToObject<LogTypeConfigInfo>();
+				Logger.LogDebug("UpdateLogSetting(request={Request}): logTypeConfigInfo → {LogTypeConfigInfo}", request, logTypeConfigInfo);
                 this.controller.UpdateLogTypeConfig(logTypeConfigInfo);
                 return this.GetLogSetting(request.ID);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting UpdateLogSetting(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -423,9 +477,11 @@ namespace Dnn.PersonaBar.AdminLogs.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.LogSettingsView + "&" + Components.Constants.LogSettingsEdit, CheckPermissionForAdmin = true)]
         public HttpResponseMessage DeleteLogSetting(DeleteLogSettingsRequest request)
         {
+			Logger.LogDebug(">>> Entering DeleteLogSetting(request={Request})", request);
             try
             {
                 var configInfo = this.controller.GetLogTypeConfig(request.LogTypeConfigId);
+				Logger.LogDebug("DeleteLogSetting(request={Request}): configInfo → {ConfigInfo}", request, configInfo);
                 int portalId;
                 if (!this.UserInfo.IsSuperUser && (!int.TryParse(configInfo.LogTypePortalID, out portalId) || portalId != this.PortalId))
                 {
@@ -440,6 +496,7 @@ namespace Dnn.PersonaBar.AdminLogs.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting DeleteLogSetting(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -449,11 +506,13 @@ namespace Dnn.PersonaBar.AdminLogs.Services
         /// <returns>Log Setting.</returns>
         private HttpResponseMessage GetLatestLogSetting()
         {
+			Logger.LogDebug(">>> Entering GetLatestLogSetting()");
             try
             {
                 var logTypes = LogController.Instance.GetLogTypeConfigInfo().Cast<LogTypeConfigInfo>()
                     .OrderByDescending(l => Convert.ToInt32(l.ID, CultureInfo.InvariantCulture)).ToList();
                 var configInfo = logTypes.FirstOrDefault();
+				Logger.LogDebug("GetLatestLogSetting(): configInfo → {ConfigInfo}", configInfo);
 
                 if (configInfo != null)
                 {
@@ -485,6 +544,7 @@ namespace Dnn.PersonaBar.AdminLogs.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetLatestLogSetting()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }

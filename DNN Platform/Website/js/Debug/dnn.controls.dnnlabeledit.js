@@ -1,3 +1,4 @@
+const logger = console;
 /// <reference name="MicrosoftAjax.js" />
 /// <reference name="dnn.controls.js" assembly="DotNetNuke.WebControls" />
 /// <reference name="dnn.js" assembly="DotNetNuke.WebUtility" />
@@ -341,12 +342,16 @@ dnn.controls.DNNLabelEdit.prototype =
     },
     
     flashLabel: function () {
+		logger.debug('>>> Entering flashLabel()');
     	var handler = this;
 	    this.container.style.backgroundColor = "#fffacd";
+		logger.debug('<<< Exiting flashLabel()');
 	    setTimeout(function () {
+			logger.debug('>>> Entering setTimeout()');
 		    handler.container.style.backgroundColor = "#fffff0";
 		    setTimeout(function () {
 			    handler.container.style.backgroundColor = "transparent";
+				logger.debug('<<< Exiting setTimeout()');
             }, 300);
         }, 2500);
 	},

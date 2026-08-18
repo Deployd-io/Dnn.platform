@@ -2,10 +2,12 @@
 ' Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
 Imports System.Collections
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.Utilities
 
     Public Class BrowserCollection
+	Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
 
         Inherits CollectionBase
         Implements IList(Of Browser)
@@ -45,11 +47,13 @@ Namespace DotNetNuke.UI.Utilities
 
         ''' <inheritdoc />
         Public Function Remove(item As Browser) As Boolean Implements ICollection(Of Browser).Remove
+			_logger.LogDebug(">>> Entering Remove(item={Item})", item)
             If Not Me.Contains(item) Then
                 Return False
             End If
 
             Me.InnerList.Remove(item)
+			_logger.LogDebug("<<< Exiting Remove(item={Item})", item)
             Return True
         End Function
 
@@ -60,6 +64,8 @@ Namespace DotNetNuke.UI.Utilities
 
         ''' <inheritdoc />
         Public Function Contains(item As Browser) As Boolean Implements ICollection(Of Browser).Contains
+			_logger.LogDebug(">>> Entering Contains(item={Item})", item)
+			_logger.LogDebug("<<< Exiting Contains(item={Item})", item)
             Return Me.InnerList.Contains(item)
         End Function
 
@@ -70,6 +76,8 @@ Namespace DotNetNuke.UI.Utilities
 
         ''' <inheritdoc />
         Public Function IndexOf(item As Browser) As Integer Implements IList(Of Browser).IndexOf
+			_logger.LogDebug(">>> Entering IndexOf(item={Item})", item)
+			_logger.LogDebug("<<< Exiting IndexOf(item={Item})", item)
             Return Me.InnerList.IndexOf(item)
         End Function
 
@@ -80,7 +88,9 @@ Namespace DotNetNuke.UI.Utilities
 
         ''' <inheritdoc />
         Private Sub Generic_Clear() Implements ICollection(Of Browser).Clear
+			_logger.LogDebug(">>> Entering Generic_Clear()")
             MyBase.Clear()
+			_logger.LogDebug("<<< Exiting Generic_Clear()")
         End Sub
 
         ''' <inheritdoc />
@@ -90,6 +100,8 @@ Namespace DotNetNuke.UI.Utilities
 
         ''' <inheritdoc />
         Private Function Generic_GetEnumerator() As IEnumerator(Of Browser) Implements IEnumerable(Of Browser).GetEnumerator
+			_logger.LogDebug(">>> Entering Generic_GetEnumerator()")
+			_logger.LogDebug("<<< Exiting Generic_GetEnumerator()")
             Return New BrowserEnumerator(Me.GetEnumerator())
         End Function
 
@@ -99,7 +111,10 @@ Namespace DotNetNuke.UI.Utilities
             Private ReadOnly enumerator As IEnumerator
 
             Public Sub New(enumerator As IEnumerator)
+				_logger.LogDebug(">>> Entering New(enumerator={Enumerator})", enumerator)
+				_logger.LogDebug("New(enumerator={Enumerator}): Me.enumerator → {Arg1}", enumerator, Me.enumerator)
                 Me.enumerator = enumerator
+				_logger.LogDebug("<<< Exiting New(enumerator={Enumerator})", enumerator)
             End Sub
 
             ''' <inheritdoc />
@@ -112,6 +127,8 @@ Namespace DotNetNuke.UI.Utilities
 
             ''' <inheritdoc />
             Public Function MoveNext() As Boolean Implements IEnumerator.MoveNext
+				_logger.LogDebug(">>> Entering MoveNext()")
+				_logger.LogDebug("<<< Exiting MoveNext()")
                 Return Me.enumerator.MoveNext()
             End Function
 

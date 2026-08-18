@@ -9,6 +9,7 @@ import resx from "../../resources";
 import { SvgIcons } from "@dnnsoftware/dnn-react-common";
 import WarningIcon from "./../svg/error.svg?react";
 import styles from "./style.module.less";
+const logger = console;
 
 
 let tableFields = [];
@@ -16,12 +17,15 @@ let tableFields = [];
 class IpFiltersPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             openId: ""
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const {props} = this;
         props.dispatch(SecurityActions.getIpFilters());
 
@@ -29,15 +33,18 @@ class IpFiltersPanelBody extends Component {
         tableFields.push({ "name": resx.get("FilterType.Header"), "id": "RuleType" });
         tableFields.push({ "name": resx.get("IpAddress.Header"), "id": "IPAddress" });
         tableFields.push({ "name": resx.get("Notes.Header"), "id": "Notes" });
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     renderHeader() {
+		logger.debug('>>> Entering renderHeader()');
         let tableHeaders = tableFields.map((field) => {
             let className = "ip-filter-items header-" + field.id;
             return <div className={className} key={"header-" + field.id}>
                 <span>{field.name}</span>
             </div>;
         });
+		logger.debug('<<< Exiting renderHeader()');
         return <div className="header-row">{tableHeaders}</div>;
     }
 
@@ -86,7 +93,9 @@ class IpFiltersPanelBody extends Component {
 
 
     renderedIpFilters() {
+		logger.debug('>>> Entering renderedIpFilters()');
         let i = 0;
+		logger.debug('<<< Exiting renderedIpFilters()');
         return this.props.ipFilters.map((item, index) => {
             let id = "row-" + i++;
             return (
@@ -115,8 +124,10 @@ class IpFiltersPanelBody extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         let opened = (this.state.openId === "add");
         if (this.props.ipFilters) {
+			logger.debug('<<< Exiting render()');
             return (
                 <div className={styles.ipFilterItems}>
                     <div className="ip-filter-topbar">
@@ -171,6 +182,8 @@ IpFiltersPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         ipFilters: state.security.ipFilters,

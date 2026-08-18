@@ -11,7 +11,9 @@ namespace DNNConnect.CKEditorProvider.Services
         /// <inheritdoc />
         public void RegisterRoutes(IMapRoute mapRouteManager)
         {
+			eventLogger.LogDebug(">>> Entering RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
             mapRouteManager.MapHttpRoute("CKEditorProvider", "default", "{controller}/{action}", new[] { "DNNConnect.CKEditorProvider.Services" });
+			eventLogger.LogDebug("<<< Exiting RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
         }
     }
 }

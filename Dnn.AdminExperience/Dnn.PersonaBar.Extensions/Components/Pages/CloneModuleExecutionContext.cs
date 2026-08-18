@@ -16,13 +16,18 @@ namespace Dnn.PersonaBar.Pages.Components
         /// <inheritdoc />
         public void SetCloneModuleContext(bool cloneModule)
         {
+			eventLogger.LogDebug(">>> Entering SetCloneModuleContext(cloneModule={CloneModule})", cloneModule);
             var slot = Thread.GetNamedDataSlot(CloneModuleSlotName);
             Thread.SetData(slot, cloneModule ? bool.TrueString : bool.FalseString);
+			eventLogger.LogDebug("SetCloneModuleContext(cloneModule={CloneModule}): slot → {Slot}", cloneModule, slot);
+			eventLogger.LogDebug("<<< Exiting SetCloneModuleContext(cloneModule={CloneModule})", cloneModule);
         }
 
         /// <inheritdoc />
         protected override Func<ICloneModuleExecutionContext> GetFactory()
         {
+			eventLogger.LogDebug(">>> Entering GetFactory()");
+			eventLogger.LogDebug("<<< Exiting GetFactory()");
             return () => new CloneModuleExecutionContext();
         }
     }

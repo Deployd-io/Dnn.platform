@@ -95,17 +95,23 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
         [SetUp]
         public void SetUp()
         {
+			mockEventLogger.LogDebug(">>> Entering SetUp()");
             ComponentFactory.Container = new SimpleContainer();
             MockComponentProvider.ResetContainer();
 
             this.SetupHostController();
 
             this.mockDataProvider = MockComponentProvider.CreateDataProvider();
+			mockEventLogger.LogDebug("SetUp(): mockDataProvider → {MockDataProvider}", mockDataProvider);
             this.mockLocaleController = MockComponentProvider.CreateLocaleController();
+			mockEventLogger.LogDebug("SetUp(): mockLocaleController → {MockLocaleController}", mockLocaleController);
             this.mockCachingProvider = MockComponentProvider.CreateDataCacheProvider();
+			mockEventLogger.LogDebug("SetUp(): mockCachingProvider → {MockCachingProvider}", mockCachingProvider);
             this.mockUserController = new Mock<IUserController>();
+			mockEventLogger.LogDebug("SetUp(): mockUserController → {MockUserController}", mockUserController);
 
             this.mockSearchHelper = new Mock<ISearchHelper>();
+			mockEventLogger.LogDebug("SetUp(): mockSearchHelper → {MockSearchHelper}", mockSearchHelper);
             this.SetupDataProvider();
             this.SetupSearchHelper();
             this.SetupLocaleController();
@@ -117,6 +123,7 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             this.serviceProvider = FakeServiceProvider.Setup(
                 services =>
                 {
+					mockEventLogger.LogDebug("SetUp(): serviceProvider → {ServiceProvider}", serviceProvider);
                     services.AddSingleton<IHostController>(this.fakeHostController);
                     services.AddSingleton<IHostSettingsService>(this.fakeHostController);
                     services.AddSingleton(this.mockCachingProvider.Object);
@@ -129,13 +136,17 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
                 });
 
             this.CreateNewLuceneControllerInstance();
+			mockEventLogger.LogDebug("<<< Exiting SetUp()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			mockEventLogger.LogDebug(">>> Entering TearDown()");
             this.DeleteIndexFolder();
             this.fakeHostController = null;
+			mockEventLogger.LogDebug("TearDown(): fakeHostController → {FakeHostController}", fakeHostController);
+			mockEventLogger.LogDebug("TearDown(): this.fakeHostController → {Arg0}", this.fakeHostController);
             this.serviceProvider.Dispose();
             this.luceneController.Dispose();
             InternalSearchController.ClearInstance();
@@ -143,90 +154,112 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             SearchHelper.ClearInstance();
             LuceneController.ClearInstance();
             this.luceneController = null;
+			mockEventLogger.LogDebug("TearDown(): this.luceneController → {Arg0}", this.luceneController);
+			mockEventLogger.LogDebug("TearDown(): luceneController → {LuceneController}", luceneController);
+			mockEventLogger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void SearchController_Add_Throws_On_Null_SearchDocument()
         {
+			mockEventLogger.LogDebug(">>> Entering SearchController_Add_Throws_On_Null_SearchDocument()");
             // Arrange
 
             // Act, Assert
             Assert.Throws<ArgumentNullException>(() => this.internalSearchController.AddSearchDocument(null));
+			mockEventLogger.LogDebug("<<< Exiting SearchController_Add_Throws_On_Null_SearchDocument()");
         }
 
         [Test]
         public void SearchController_Add_Throws_On_Null_Or_Empty_UniqueuKey()
         {
+			mockEventLogger.LogDebug(">>> Entering SearchController_Add_Throws_On_Null_Or_Empty_UniqueuKey()");
             // Arrange
 
             // Act, Assert
             Assert.Throws<ArgumentException>(() => this.internalSearchController.AddSearchDocument(new SearchDocument()));
+			mockEventLogger.LogDebug("<<< Exiting SearchController_Add_Throws_On_Null_Or_Empty_UniqueuKey()");
         }
 
         [Test]
         public void SearchController_Add_Throws_On_Null_OrEmpty_Title()
         {
+			mockEventLogger.LogDebug(">>> Entering SearchController_Add_Throws_On_Null_OrEmpty_Title()");
             // Arrange
 
             // Act, Assert
             Assert.Throws<ArgumentOutOfRangeException>(
                 () => this.internalSearchController.AddSearchDocument(new SearchDocument { UniqueKey = Guid.NewGuid().ToString() }));
+				mockEventLogger.LogDebug("<<< Exiting SearchController_Add_Throws_On_Null_OrEmpty_Title()");
         }
 
         [Test]
         public void SearchController_AddSearchDocuments_Does_Not_Throw_On_Null_OrEmpty_Title()
         {
+			mockEventLogger.LogDebug(">>> Entering SearchController_AddSearchDocuments_Does_Not_Throw_On_Null_OrEmpty_Title()");
             // Arrange
             var documents = new List<SearchDocument> { new SearchDocument { UniqueKey = Guid.NewGuid().ToString() } };
+			mockEventLogger.LogDebug("SearchController_AddSearchDocuments_Does_Not_Throw_On_Null_OrEmpty_Title(): documents → {Documents}", documents);
 
             // Act, Assert
             this.internalSearchController.AddSearchDocuments(documents);
+			mockEventLogger.LogDebug("<<< Exiting SearchController_AddSearchDocuments_Does_Not_Throw_On_Null_OrEmpty_Title()");
         }
 
         [Test]
         public void SearchController_AddSearchDocuments_Does_Not_Throw_On_Empty_Search_Document()
         {
+			mockEventLogger.LogDebug(">>> Entering SearchController_AddSearchDocuments_Does_Not_Throw_On_Empty_Search_Document()");
             // Arrange
             var documents = new List<SearchDocument> { new SearchDocument() };
+			mockEventLogger.LogDebug("SearchController_AddSearchDocuments_Does_Not_Throw_On_Empty_Search_Document(): documents → {Documents}", documents);
 
             // Act, Assert
             this.internalSearchController.AddSearchDocuments(documents);
+			mockEventLogger.LogDebug("<<< Exiting SearchController_AddSearchDocuments_Does_Not_Throw_On_Empty_Search_Document()");
         }
 
         [Test]
         public void SearchController_Add_Throws_On_Zero_SearchTypeId()
         {
+			mockEventLogger.LogDebug(">>> Entering SearchController_Add_Throws_On_Zero_SearchTypeId()");
             // Arrange
 
             // Act, Assert
             Assert.Throws<ArgumentOutOfRangeException>(
                 () => this.internalSearchController.AddSearchDocument(new SearchDocument { UniqueKey = Guid.NewGuid().ToString() }));
+				mockEventLogger.LogDebug("<<< Exiting SearchController_Add_Throws_On_Zero_SearchTypeId()");
         }
 
         [Test]
         public void SearchController_Add_Throws_On_Negative_SearchTypeId()
         {
+			mockEventLogger.LogDebug(">>> Entering SearchController_Add_Throws_On_Negative_SearchTypeId()");
             // Arrange
 
             // Act, Assert
             Assert.Throws<ArgumentOutOfRangeException>(
                 () =>
                     this.internalSearchController.AddSearchDocument(new SearchDocument { UniqueKey = Guid.NewGuid().ToString(), Title = "title", SearchTypeId = -1 }));
+					mockEventLogger.LogDebug("<<< Exiting SearchController_Add_Throws_On_Negative_SearchTypeId()");
         }
 
         [Test]
         public void SearchController_Add_Throws_On_DateTimeMin_ModifiedTimeUtc()
         {
+			mockEventLogger.LogDebug(">>> Entering SearchController_Add_Throws_On_DateTimeMin_ModifiedTimeUtc()");
             // Arrange
 
             // Act, Assert
             Assert.Throws<ArgumentException>(
                 () => this.internalSearchController.AddSearchDocument(new SearchDocument { UniqueKey = Guid.NewGuid().ToString(), Title = "title", SearchTypeId = 1 }));
+				mockEventLogger.LogDebug("<<< Exiting SearchController_Add_Throws_On_DateTimeMin_ModifiedTimeUtc()");
         }
 
         [Test]
         public void SearchController_Add_Then_Delete_ModuleDefinition_WorksAsExpected()
         {
+			mockEventLogger.LogDebug(">>> Entering SearchController_Add_Then_Delete_ModuleDefinition_WorksAsExpected()");
             // Arrange
             const int totalDocs = 10;
             var now = DateTime.UtcNow;
@@ -249,10 +282,12 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
 
             // Assert
             var stats = this.GetSearchStatistics();
+			mockEventLogger.LogDebug("SearchController_Add_Then_Delete_ModuleDefinition_WorksAsExpected(): stats → {Stats}", stats);
             Assert.That(stats.TotalActiveDocuments, Is.EqualTo(totalDocs));
 
             // Act - delete last item
             var searchDoc = new SearchDocument { ModuleDefId = totalDocs };
+			mockEventLogger.LogDebug("SearchController_Add_Then_Delete_ModuleDefinition_WorksAsExpected(): searchDoc → {SearchDoc}", searchDoc);
             this.internalSearchController.DeleteSearchDocument(searchDoc);
 
             // Assert
@@ -274,11 +309,13 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
                 Assert.That(stats.TotalActiveDocuments, Is.EqualTo(totalDocs - 2));
                 Assert.That(stats.TotalDeletedDocuments, Is.EqualTo(2));
             }
+			mockEventLogger.LogDebug("<<< Exiting SearchController_Add_Then_Delete_ModuleDefinition_WorksAsExpected()");
         }
 
         [Test]
         public void SearchController_Add_Then_Delete_Module_WorksAsExpected()
         {
+			mockEventLogger.LogDebug(">>> Entering SearchController_Add_Then_Delete_Module_WorksAsExpected()");
             // Arrange
             const int totalDocs = 10;
             var now = DateTime.UtcNow;
@@ -301,10 +338,12 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
 
             // Assert
             var stats = this.GetSearchStatistics();
+			mockEventLogger.LogDebug("SearchController_Add_Then_Delete_Module_WorksAsExpected(): stats → {Stats}", stats);
             Assert.That(stats.TotalActiveDocuments, Is.EqualTo(totalDocs));
 
             // Act - delete last item
             var searchDoc = new SearchDocument { ModuleId = totalDocs };
+			mockEventLogger.LogDebug("SearchController_Add_Then_Delete_Module_WorksAsExpected(): searchDoc → {SearchDoc}", searchDoc);
             this.internalSearchController.DeleteSearchDocument(searchDoc);
 
             // Assert
@@ -326,11 +365,13 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
                 Assert.That(stats.TotalActiveDocuments, Is.EqualTo(totalDocs - 2));
                 Assert.That(stats.TotalDeletedDocuments, Is.EqualTo(2));
             }
+			mockEventLogger.LogDebug("<<< Exiting SearchController_Add_Then_Delete_Module_WorksAsExpected()");
         }
 
         [Test]
         public void SearchController_Add_Then_Delete_Portals_WorksAsExpected()
         {
+			mockEventLogger.LogDebug(">>> Entering SearchController_Add_Then_Delete_Portals_WorksAsExpected()");
             // Arrange
             const int totalDocs = 10; // must be even
             var now = DateTime.UtcNow;
@@ -353,6 +394,7 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
 
             // Assert
             var stats = this.GetSearchStatistics();
+			mockEventLogger.LogDebug("SearchController_Add_Then_Delete_Portals_WorksAsExpected(): stats → {Stats}", stats);
             Assert.That(stats.TotalActiveDocuments, Is.EqualTo(totalDocs));
 
             // Act - delete all portal 1 items
@@ -366,11 +408,13 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
                 Assert.That(stats.TotalActiveDocuments, Is.EqualTo(totalDocs / 2));
                 Assert.That(stats.TotalDeletedDocuments, Is.EqualTo(totalDocs / 2));
             }
+			mockEventLogger.LogDebug("<<< Exiting SearchController_Add_Then_Delete_Portals_WorksAsExpected()");
         }
 
         [Test]
         public void SearchController_Add_Then_Delete_Roles_WorksAsExpected()
         {
+			mockEventLogger.LogDebug(">>> Entering SearchController_Add_Then_Delete_Roles_WorksAsExpected()");
             // Arrange
             const int totalDocs = 10;
             var now = DateTime.UtcNow;
@@ -394,10 +438,12 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
 
             // Assert
             var stats = this.GetSearchStatistics();
+			mockEventLogger.LogDebug("SearchController_Add_Then_Delete_Roles_WorksAsExpected(): stats → {Stats}", stats);
             Assert.That(stats.TotalActiveDocuments, Is.EqualTo(totalDocs));
 
             // Act - delete last item
             var searchDoc = new SearchDocument { RoleId = totalDocs };
+			mockEventLogger.LogDebug("SearchController_Add_Then_Delete_Roles_WorksAsExpected(): searchDoc → {SearchDoc}", searchDoc);
             this.internalSearchController.DeleteSearchDocument(searchDoc);
 
             // Assert
@@ -419,11 +465,13 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
                 Assert.That(stats.TotalActiveDocuments, Is.EqualTo(totalDocs - 2));
                 Assert.That(stats.TotalDeletedDocuments, Is.EqualTo(2));
             }
+			mockEventLogger.LogDebug("<<< Exiting SearchController_Add_Then_Delete_Roles_WorksAsExpected()");
         }
 
         [Test]
         public void SearchController_Add_Then_Delete_Tabs_WorksAsExpected()
         {
+			mockEventLogger.LogDebug(">>> Entering SearchController_Add_Then_Delete_Tabs_WorksAsExpected()");
             // Arrange
             const int totalDocs = 10;
             var now = DateTime.UtcNow;
@@ -445,10 +493,12 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
 
             // Assert
             var stats = this.GetSearchStatistics();
+			mockEventLogger.LogDebug("SearchController_Add_Then_Delete_Tabs_WorksAsExpected(): stats → {Stats}", stats);
             Assert.That(stats.TotalActiveDocuments, Is.EqualTo(totalDocs));
 
             // Act - delete last item
             var searchDoc = new SearchDocument { TabId = totalDocs };
+			mockEventLogger.LogDebug("SearchController_Add_Then_Delete_Tabs_WorksAsExpected(): searchDoc → {SearchDoc}", searchDoc);
             this.internalSearchController.DeleteSearchDocument(searchDoc);
 
             // Assert
@@ -470,11 +520,13 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
                 Assert.That(stats.TotalActiveDocuments, Is.EqualTo(totalDocs - 2));
                 Assert.That(stats.TotalDeletedDocuments, Is.EqualTo(2));
             }
+			mockEventLogger.LogDebug("<<< Exiting SearchController_Add_Then_Delete_Tabs_WorksAsExpected()");
         }
 
         [Test]
         public void SearchController_Add_Then_Delete_Users_WorksAsExpected()
         {
+			mockEventLogger.LogDebug(">>> Entering SearchController_Add_Then_Delete_Users_WorksAsExpected()");
             // Arrange
             const int totalDocs = 10;
             var now = DateTime.UtcNow;
@@ -498,10 +550,12 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
 
             // Assert
             var stats = this.GetSearchStatistics();
+			mockEventLogger.LogDebug("SearchController_Add_Then_Delete_Users_WorksAsExpected(): stats → {Stats}", stats);
             Assert.That(stats.TotalActiveDocuments, Is.EqualTo(totalDocs));
 
             // Act - delete last item
             var searchDoc = new SearchDocument { AuthorUserId = totalDocs, };
+			mockEventLogger.LogDebug("SearchController_Add_Then_Delete_Users_WorksAsExpected(): searchDoc → {SearchDoc}", searchDoc);
             this.internalSearchController.DeleteSearchDocument(searchDoc);
 
             // Assert
@@ -523,13 +577,17 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
                 Assert.That(stats.TotalActiveDocuments, Is.EqualTo(totalDocs - 2));
                 Assert.That(stats.TotalDeletedDocuments, Is.EqualTo(2));
             }
+			mockEventLogger.LogDebug("<<< Exiting SearchController_Add_Then_Delete_Users_WorksAsExpected()");
         }
 
         private void CreateNewLuceneControllerInstance()
         {
+			mockEventLogger.LogDebug(">>> Entering CreateNewLuceneControllerInstance()");
             this.DeleteIndexFolder();
             InternalSearchController.SetTestableInstance(new InternalSearchControllerImpl());
             this.internalSearchController = InternalSearchController.Instance;
+			mockEventLogger.LogDebug("CreateNewLuceneControllerInstance(): internalSearchController → {InternalSearchController}", internalSearchController);
+			mockEventLogger.LogDebug("CreateNewLuceneControllerInstance(): this.internalSearchController → {Arg0}", this.internalSearchController);
 
             if (this.luceneController != null)
             {
@@ -538,13 +596,17 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             }
 
             this.luceneController = new LuceneControllerImpl(this.fakeHostController, new FakeApplicationStatusInfo());
+			mockEventLogger.LogDebug("CreateNewLuceneControllerInstance(): luceneController → {LuceneController}", luceneController);
             LuceneController.SetTestableInstance(this.luceneController);
+			mockEventLogger.LogDebug("<<< Exiting CreateNewLuceneControllerInstance()");
         }
 
         private void SetupHostController()
         {
+			mockEventLogger.LogDebug(">>> Entering SetupHostController()");
             this.fakeHostController = new FakeHostController(new Dictionary<string, string>
             {
+				mockEventLogger.LogDebug("SetupHostController(): fakeHostController → {FakeHostController}", fakeHostController);
                 { Constants.SearchIndexFolderKey, SearchIndexFolder + DateTime.UtcNow.Ticks },
                 { Constants.SearchReaderRefreshTimeKey, this.readerStaleTimeSpan.ToString(CultureInfo.InvariantCulture) },
                 { Constants.SearchTitleBoostSetting, Constants.DefaultSearchTitleBoost.ToString(CultureInfo.InvariantCulture) },
@@ -555,10 +617,12 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
                 { Constants.SearchMinLengthKey, Constants.DefaultMinLen.ToString(CultureInfo.InvariantCulture) },
                 { Constants.SearchMaxLengthKey, Constants.DefaultMaxLen.ToString(CultureInfo.InvariantCulture) },
             });
+			mockEventLogger.LogDebug("<<< Exiting SetupHostController()");
         }
 
         private void SetupLocaleController()
         {
+			mockEventLogger.LogDebug(">>> Entering SetupLocaleController()");
             this.mockLocaleController.Setup(l => l.GetLocale(It.IsAny<string>())).Returns(new Locale { LanguageId = -1, Code = string.Empty });
             this.mockLocaleController.Setup(l => l.GetLocale(CultureEnUs)).Returns(new Locale { LanguageId = LanguageIdEnUs, Code = CultureEnUs });
             this.mockLocaleController.Setup(l => l.GetLocale(CultureEnCa)).Returns(new Locale { LanguageId = LanguageIdEnFr, Code = CultureEnCa });
@@ -570,10 +634,12 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             this.mockLocaleController.Setup(l => l.GetLocale(LanguageIdEnFr)).Returns(new Locale { LanguageId = LanguageIdEnFr, Code = CultureEnCa });
             this.mockLocaleController.Setup(l => l.GetLocale(LanguageIdItIt)).Returns(new Locale { LanguageId = LanguageIdItIt, Code = CultureItIt });
             this.mockLocaleController.Setup(l => l.GetLocale(LanguageIdEsEs)).Returns(new Locale { LanguageId = LanguageIdEsEs, Code = CultureEsEs });
+			mockEventLogger.LogDebug("<<< Exiting SetupLocaleController()");
         }
 
         private void SetupDataProvider()
         {
+			mockEventLogger.LogDebug(">>> Entering SetupDataProvider()");
             // Standard DataProvider Path for Logging
             this.mockDataProvider.Setup(d => d.GetProviderPath()).Returns(string.Empty);
 
@@ -583,17 +649,22 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
                 .Returns(() => searchTypes);
 
             this.mockDataProvider.Setup(d => d.GetPortals(It.IsAny<string>())).Returns<string>(this.GetPortalsCallBack);
+			mockEventLogger.LogDebug("<<< Exiting SetupDataProvider()");
         }
 
         private IDataReader GetPortalsCallBack(string culture)
         {
+			mockEventLogger.LogDebug(">>> Entering GetPortalsCallBack(culture={Culture})", culture);
+			mockEventLogger.LogDebug("<<< Exiting GetPortalsCallBack(culture={Culture})", culture);
             return this.GetPortalCallBack(PortalId0, CultureEnUs);
         }
 
         private IDataReader GetPortalCallBack(int portalId, string culture)
         {
+			mockEventLogger.LogDebug(">>> Entering GetPortalCallBack(portalId={PortalId},culture={Culture})", portalId, culture);
             var table = new DataTable("Portal");
 
+			mockEventLogger.LogDebug("GetPortalCallBack(portalId={PortalId},culture={Culture}): table → {Table}", portalId, culture, table);
             var cols = new[]
             {
                 "PortalID", "PortalGroupID", "PortalName", "LogoFile", "FooterText", "ExpiryDate", "UserRegistration", "BannerAdvertising", "AdministratorId",
@@ -617,11 +688,13 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
                 "1057AC7A-3C08-4849-A3A6-3D2AB4662020", null, null, null, "0", "admin@changeme.invalid", "en-US", "-8", "58", "Portals/0",
                 null, homePage.ToString("D"), null, null, "57", "56", "-1", "-1", "7", null, null, "-1", "2011-08-25 07:34:11", "-1", "2011-08-25 07:34:29", culture);
 
+			mockEventLogger.LogDebug("<<< Exiting GetPortalCallBack(portalId={PortalId},culture={Culture})", portalId, culture);
             return table.CreateDataReader();
         }
 
         private void SetupSearchHelper()
         {
+			mockEventLogger.LogDebug(">>> Entering SetupSearchHelper()");
             this.mockSearchHelper.Setup(c => c.GetSearchMinMaxLength()).Returns(new Tuple<int, int>(Constants.DefaultMinLen, Constants.DefaultMaxLen));
             this.mockSearchHelper.Setup(c => c.GetSynonyms(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns<int, string, string>(this.GetSynonymsCallBack);
@@ -641,10 +714,12 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
                 .Returns<string, bool, bool>(new SearchHelperImpl(Mock.Of<IHostSettings>(), Mock.Of<IHostSettingsService>(), Mock.Of<IPortalController>(), new FakeApplicationStatusInfo()).RephraseSearchText);
             this.mockSearchHelper.Setup(x => x.StripTagsNoAttributes(It.IsAny<string>(), It.IsAny<bool>())).Returns((string html, bool _) => html);
             SearchHelper.SetTestableInstance(this.mockSearchHelper.Object);
+			mockEventLogger.LogDebug("<<< Exiting SetupSearchHelper()");
         }
 
         private IList<SynonymsGroup> GetSynonymsGroupsCallBack()
         {
+			mockEventLogger.LogDebug(">>> Entering GetSynonymsGroupsCallBack()");
             var groups = new List<SynonymsGroup>
             {
                 new SynonymsGroup { PortalId = 0, SynonymsGroupId = 1, SynonymsTags = string.Join(",", TermDNN, TermDotNetNuke) },
@@ -652,16 +727,19 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
                 new SynonymsGroup { PortalId = 0, SynonymsGroupId = 3, SynonymsTags = string.Join(",", TermJump, TermLeap, TermHop) },
             };
 
+			mockEventLogger.LogDebug("<<< Exiting GetSynonymsGroupsCallBack()");
             return groups;
         }
 
         private SearchType GetSearchTypeByNameCallback(string searchTypeName)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSearchTypeByNameCallback(searchTypeName={SearchTypeName})", searchTypeName);
             var searchType = new SearchType { SearchTypeName = searchTypeName, SearchTypeId = 0 };
             switch (searchTypeName)
             {
                 case ModuleSearchTypeName:
                     searchType.SearchTypeId = ModuleSearchTypeId;
+					mockEventLogger.LogDebug("GetSearchTypeByNameCallback(searchTypeName={SearchTypeName}): searchType.SearchTypeId → {Arg1}", searchTypeName, searchType.SearchTypeId);
                     break;
                 case TabSearchTypeName:
                     searchType.SearchTypeId = TabSearchTypeId;
@@ -677,32 +755,42 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
                     break;
             }
 
+			mockEventLogger.LogDebug("<<< Exiting GetSearchTypeByNameCallback(searchTypeName={SearchTypeName})", searchTypeName);
             return searchType;
         }
 
         private IList<string> GetSynonymsCallBack(int portalId, string cultureCode, string term)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSynonymsCallBack(portalId={PortalId},cultureCode={CultureCode},term={Term})", portalId, cultureCode, term);
             var synonyms = new List<string>();
             if (term == "fox")
+			mockEventLogger.LogDebug("GetSynonymsCallBack(portalId={PortalId},cultureCode={CultureCode},term={Term}): synonyms → {Synonyms}", portalId, cultureCode, term, synonyms);
             {
                 synonyms.Add("wolf");
             }
 
+			mockEventLogger.LogDebug("<<< Exiting GetSynonymsCallBack(portalId={PortalId},cultureCode={CultureCode},term={Term})", portalId, cultureCode, term);
             return synonyms;
         }
 
         private UserInfo GetUserByIdCallback(int portalId, int userId)
         {
+			mockEventLogger.LogDebug(">>> Entering GetUserByIdCallback(portalId={PortalId},userId={UserId})", portalId, userId);
+			mockEventLogger.LogDebug("<<< Exiting GetUserByIdCallback(portalId={PortalId},userId={UserId})", portalId, userId);
             return new UserInfo { UserID = userId, DisplayName = "User" + userId, PortalID = portalId };
         }
 
         private DataTable GetAllSearchTypes()
         {
+			mockEventLogger.LogDebug(">>> Entering GetAllSearchTypes()");
             var dtSearchTypes = new DataTable("SearchTypes");
             var pkId = dtSearchTypes.Columns.Add("SearchTypeId", typeof(int));
+			mockEventLogger.LogDebug("GetAllSearchTypes(): pkId → {PkId}", pkId);
+			mockEventLogger.LogDebug("GetAllSearchTypes(): dtSearchTypes → {DtSearchTypes}", dtSearchTypes);
             dtSearchTypes.Columns.Add("SearchTypeName", typeof(string));
             dtSearchTypes.Columns.Add("SearchResultClass", typeof(string));
             dtSearchTypes.PrimaryKey = new[] { pkId };
+			mockEventLogger.LogDebug("GetAllSearchTypes(): dtSearchTypes.PrimaryKey → {Arg0}", dtSearchTypes.PrimaryKey);
 
             // Create default Crawler
             dtSearchTypes.Rows.Add(ModuleSearchTypeId, ModuleSearchTypeName, FakeResultControllerClass);
@@ -711,11 +799,13 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             dtSearchTypes.Rows.Add(DocumentSearchTypeId, DocumentSearchTypeName, NoPermissionFakeResultControllerClass);
             dtSearchTypes.Rows.Add(UrlSearchTypeId, UrlSearchTypeName, FakeResultControllerClass);
 
+			mockEventLogger.LogDebug("<<< Exiting GetAllSearchTypes()");
             return dtSearchTypes;
         }
 
         private IEnumerable<SearchType> GetSearchTypes()
         {
+			mockEventLogger.LogDebug(">>> Entering GetSearchTypes()");
             var searchTypes = new List<SearchType>
             {
                 new SearchType { SearchTypeId = ModuleSearchTypeId, SearchTypeName = ModuleSearchTypeName, SearchResultClass = FakeResultControllerClass },
@@ -730,14 +820,17 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
                 new SearchType { SearchTypeId = UrlSearchTypeId, SearchTypeName = UrlSearchTypeName, SearchResultClass = FakeResultControllerClass },
             };
 
+			mockEventLogger.LogDebug("<<< Exiting GetSearchTypes()");
             return searchTypes;
         }
 
         private void DeleteIndexFolder()
         {
+			mockEventLogger.LogDebug(">>> Entering DeleteIndexFolder()");
             try
             {
                 var searchIndexFolder = this.fakeHostController.GetString(Constants.SearchIndexFolderKey, SearchIndexFolder);
+				mockEventLogger.LogDebug("DeleteIndexFolder(): searchIndexFolder → {SearchIndexFolder}", searchIndexFolder);
                 if (Directory.Exists(searchIndexFolder))
                 {
                     Directory.Delete(searchIndexFolder, true);
@@ -747,12 +840,15 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
             {
                 Console.WriteLine(ex);
             }
+			mockEventLogger.LogDebug("<<< Exiting DeleteIndexFolder()");
         }
 
         private SearchStatistics GetSearchStatistics()
         {
+			mockEventLogger.LogDebug(">>> Entering GetSearchStatistics()");
             this.internalSearchController.Commit();
             Thread.Sleep((int)(this.readerStaleTimeSpan * 1000)); // time to flush data to Lucene
+			mockEventLogger.LogDebug("<<< Exiting GetSearchStatistics()");
             return this.internalSearchController.GetSearchStatistics();
         }
 
@@ -760,31 +856,40 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
         [Test]
         public void SearchController_Delete_Throws_On_Null_Or_Empty_UniqueuKey()
         {
+			mockEventLogger.LogDebug(">>> Entering SearchController_Delete_Throws_On_Null_Or_Empty_UniqueuKey()");
             //Arrange            
 
             //Act, Assert
             var searchDoc = new SearchDocument() { UniqueKey = null, PortalId = 0, SearchTypeId = 1 };
+			mockEventLogger.LogDebug("SearchController_Delete_Throws_On_Null_Or_Empty_UniqueuKey(): searchDoc → {SearchDoc}", searchDoc);
             Assert.Throws<ArgumentException>(() => _internalSearchController.DeleteSearchDocument(searchDoc));
+			mockEventLogger.LogDebug("<<< Exiting SearchController_Delete_Throws_On_Null_Or_Empty_UniqueuKey()");
         }
 
         [Test]
         public void SearchController_Delete_Throws_On_Zero_SearchTypeId()
         {
+			mockEventLogger.LogDebug(">>> Entering SearchController_Delete_Throws_On_Zero_SearchTypeId()");
             //Arrange            
 
             //Act, Assert
             var searchDoc = new SearchDocument() { UniqueKey = "key", PortalId = 0, SearchTypeId = 0 };
+			mockEventLogger.LogDebug("SearchController_Delete_Throws_On_Zero_SearchTypeId(): searchDoc → {SearchDoc}", searchDoc);
             Assert.Throws<ArgumentException>(() => _internalSearchController.DeleteSearchDocument(searchDoc));
+			mockEventLogger.LogDebug("<<< Exiting SearchController_Delete_Throws_On_Zero_SearchTypeId()");
         }
 
         [Test]
         public void SearchController_Delete_Throws_On_Negative_SearchTypeId()
         {
+			mockEventLogger.LogDebug(">>> Entering SearchController_Delete_Throws_On_Negative_SearchTypeId()");
             //Arrange            
 
             //Act, Assert
             var searchDoc = new SearchDocument() { UniqueKey = "key", PortalId = 0, SearchTypeId = -1 };
+			mockEventLogger.LogDebug("SearchController_Delete_Throws_On_Negative_SearchTypeId(): searchDoc → {SearchDoc}", searchDoc);
             Assert.Throws<ArgumentOutOfRangeException>(() => _internalSearchController.DeleteSearchDocument(searchDoc));
+			mockEventLogger.LogDebug("<<< Exiting SearchController_Delete_Throws_On_Negative_SearchTypeId()");
         }
 #endif
 

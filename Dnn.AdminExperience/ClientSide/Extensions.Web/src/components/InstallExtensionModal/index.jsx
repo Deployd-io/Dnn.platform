@@ -11,10 +11,12 @@ import Localization from "localization";
 import utilities from "utils";
 import FileUpload from "./FileUpload";
 import styles from "./style.module.less";
+const logger = console;
 
 class InstallExtensionModal extends Component {
     constructor(props) {
         super();
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             package: null,
             wizardStep: 0,
@@ -22,12 +24,15 @@ class InstallExtensionModal extends Component {
             selectedLegacyType: null,
             isPortalPackage: props.isPortalPackage
         };
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     onPackageChange(event) {
+		logger.debug(`>>> Entering onPackageChange(event=${event})`);
         const files = event.target.files;
 
         if (files && files.length > 0) {
+			logger.debug(`<<< Exiting onPackageChange(event=${event})`);
             this.setState({
                 package: files[0]
             });
@@ -35,11 +40,14 @@ class InstallExtensionModal extends Component {
     }
 
     goToStep(wizardStep) {
+		logger.debug(`>>> Entering goToStep(wizardStep=${wizardStep})`);
         const { props } = this;
         props.dispatch(InstallationActions.navigateWizard(wizardStep));
+		logger.debug(`<<< Exiting goToStep(wizardStep=${wizardStep})`);
     }
 
     parsePackage(file, callback, errorCallback) {
+		logger.debug(`>>> Entering parsePackage(file=${file},callback=${callback},errorCallback=${errorCallback})`);
         if (!file) {
             utilities.utilities.notifyError(Localization.get("InstallExtension_EmptyPackage.Error"));
             return;
@@ -72,17 +80,23 @@ class InstallExtensionModal extends Component {
                 }
             }));
         });
+		logger.debug(`<<< Exiting parsePackage(file=${file},callback=${callback},errorCallback=${errorCallback})`);
     }
 
     goToReleaseNotes() {
+		logger.debug('>>> Entering goToReleaseNotes()');
         this.goToStep(2);
+		logger.debug('<<< Exiting goToReleaseNotes()');
     }
 
     goToLicense() {
+		logger.debug('>>> Entering goToLicense()');
         this.goToStep(3);
+		logger.debug('<<< Exiting goToLicense()');
     }
 
     installPackage() {
+		logger.debug('>>> Entering installPackage()');
         const { props } = this;
         this.setState({
             installingPackage: true
@@ -100,17 +114,21 @@ class InstallExtensionModal extends Component {
                     installingPackage: false
                 });
                 this.goToStep(4);
+				logger.debug('<<< Exiting installPackage()');
             }));
         }
     }
 
     onCheckRepairInstall(value) {
+		logger.debug(`>>> Entering onCheckRepairInstall(value=${value})`);
         this.setState({
             repairInstallChecked: value
         });
+		logger.debug(`<<< Exiting onCheckRepairInstall(value=${value})`);
     }
 
     cancelInstall() {
+		logger.debug('>>> Entering cancelInstall()');
         const { props } = this;
         props.dispatch(InstallationActions.clearParsedInstallationPackage());
         props.dispatch(InstallationActions.notInstallingAvailablePackage());
@@ -120,20 +138,25 @@ class InstallExtensionModal extends Component {
 
         if (props.backToReferrerFunc) {
             props.backToReferrerFunc();
+			logger.debug('<<< Exiting cancelInstall()');
         }
     }
 
     getResxFromLegacyType() {
+		logger.debug('>>> Entering getResxFromLegacyType()');
         if (this.state.selectedLegacyType === "Skin") {
             return Localization.get("CatalogSkin");
         } else {
+			logger.debug('<<< Exiting getResxFromLegacyType()');
             return Localization.get("Container");
         }
     }
 
     getPackageInformationStep() {
+		logger.debug('>>> Entering getPackageInformationStep()');
         const { props } = this;
         const parsedInstallationPackageCopy = utilities.utilities.getObjectCopy(props.parsedInstallationPackage);
+		logger.debug(`getPackageInformationStep(): parsedInstallationPackageCopy → ${parsedInstallationPackageCopy}`);
         let parsedInstallationPackage = this.state.selectedLegacyType ?
             Object.assign(parsedInstallationPackageCopy, {
                 packageType: this.getResxFromLegacyType(),
@@ -143,6 +166,7 @@ class InstallExtensionModal extends Component {
             })
             : parsedInstallationPackageCopy;
         if (parsedInstallationPackage) {
+			logger.debug('<<< Exiting getPackageInformationStep()');
             return <PackageInformation
                 extensionBeingEdited={parsedInstallationPackage}
                 validationMapped={false}
@@ -155,6 +179,7 @@ class InstallExtensionModal extends Component {
     }
 
     endInstallation() {
+		logger.debug('>>> Entering endInstallation()');
         const { props } = this;
         if (props.installingAvailablePackage) {
             props.dispatch(PaginationActions.loadTab(0, () => {
@@ -168,9 +193,11 @@ class InstallExtensionModal extends Component {
             }
             if (props.parsedInstallationPackage.packageType && props.parsedInstallationPackage.packageType !== props.selectedInstalledPackageType) {
                 const _packageType = (props.parsedInstallationPackage && props.parsedInstallationPackage.packageType) ? props.parsedInstallationPackage.packageType : "Module";
+				logger.debug(`endInstallation(): _packageType → ${_packageType}`);
                 props.dispatch(ExtensionActions.getInstalledPackages(_packageType));
             } else if (this.state.selectedLegacyType) {
                 props.dispatch(ExtensionActions.getInstalledPackages(this.state.selectedLegacyType));
+				logger.debug('<<< Exiting endInstallation()');
             }
             else if (props.selectedInstalledPackageType) {
                 props.dispatch(ExtensionActions.getInstalledPackages(props.selectedInstalledPackageType));
@@ -180,50 +207,66 @@ class InstallExtensionModal extends Component {
         this.cancelInstall();
     }
     onToggleLicenseAccept() {
+		logger.debug('>>> Entering onToggleLicenseAccept()');
         this.props.dispatch(InstallationActions.toggleAcceptLicense(!this.props.licenseAccepted));
+		logger.debug('<<< Exiting onToggleLicenseAccept()');
     }
     toggleViewLog(value) {
+		logger.debug(`>>> Entering toggleViewLog(value=${value})`);
         this.props.dispatch(InstallationActions.setViewingLog(value));
+		logger.debug(`<<< Exiting toggleViewLog(value=${value})`);
     }
     clearParsedInstallationPackage() {
+		logger.debug('>>> Entering clearParsedInstallationPackage()');
         this.setAlreadyInstalled(false);
         this.props.dispatch(InstallationActions.clearParsedInstallationPackage());
+		logger.debug('<<< Exiting clearParsedInstallationPackage()');
     }
     cancelInstallationOnUpload() {
+		logger.debug('>>> Entering cancelInstallationOnUpload()');
         this.clearParsedInstallationPackage();
         this.props.onCancel();
         this.props.dispatch(InstallationActions.toggleAcceptLicense(false));
 
         if (this.props.backToReferrerFunc) {
             this.props.backToReferrerFunc();
+			logger.debug('<<< Exiting cancelInstallationOnUpload()');
         }
     }
     onSelectLegacyType(value) {
+		logger.debug(`>>> Entering onSelectLegacyType(value=${value})`);
         this.setState({
             selectedLegacyType: value
         });
+		logger.debug(`<<< Exiting onSelectLegacyType(value=${value})`);
     }
     setAlreadyInstalled(value, nextStepIfFalse) {
+		logger.debug(`>>> Entering setAlreadyInstalled(value=${value},nextStepIfFalse=${nextStepIfFalse})`);
         this.setState({
             alreadyInstalled: value
         });
         if (nextStepIfFalse && !value) {
             this.goToStep(1);
+			logger.debug(`<<< Exiting setAlreadyInstalled(value=${value},nextStepIfFalse=${nextStepIfFalse})`);
         }
     }
     getSelectedLegacyTypeIsInstalled() {
+		logger.debug('>>> Entering getSelectedLegacyTypeIsInstalled()');
         if (this.state.selectedLegacyType === "Skin") {
             return this.props.parsedInstallationPackage && this.props.parsedInstallationPackage.legacySkinInstalled;
         }
         if (this.state.selectedLegacyType === "Container") {
+			logger.debug('<<< Exiting getSelectedLegacyTypeIsInstalled()');
             return this.props.parsedInstallationPackage && this.props.parsedInstallationPackage.legacyContainerInstalled;
         }
     }
     render() {
+		logger.debug('>>> Entering render()');
         const { props } = this;
         const { wizardStep } = props,
             legacyInstalled = (props.parsedInstallationPackage && (props.parsedInstallationPackage.legacySkinInstalled || props.parsedInstallationPackage.legacyContainerInstalled)),
             legacyTypeIsInstalled = this.getSelectedLegacyTypeIsInstalled();
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={styles.installExtensionModal}>
                 <PersonaBarPageHeader title={Localization.get("ExtensionInstall.Action")} />
@@ -314,6 +357,8 @@ InstallExtensionModal.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         parsedInstallationPackage: state.installation.parsedInstallationPackage,
         selectedInstalledPackageType: state.extension.selectedInstalledPackageType,

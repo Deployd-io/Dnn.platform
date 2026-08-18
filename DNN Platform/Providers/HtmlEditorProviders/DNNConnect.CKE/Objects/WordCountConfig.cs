@@ -13,8 +13,11 @@ namespace DNNConnect.CKEditorProvider.Objects
         /// <summary>Initializes a new instance of the <see cref="WordCountConfig" /> class.</summary>
         public WordCountConfig()
         {
+			eventLogger.LogDebug(">>> Entering WordCountConfig()");
             this.ShowWordCount = true;
             this.ShowCharCount = false;
+			eventLogger.LogDebug("WordCountConfig(): this.ShowWordCount → {Arg0}", this.ShowWordCount);
+			eventLogger.LogDebug("<<< Exiting WordCountConfig()");
         }
 
         /// <summary>Gets or sets a value indicating whether [show char count].</summary>

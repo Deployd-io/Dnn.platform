@@ -27,6 +27,7 @@ namespace DotNetNuke.Entities.Urls
 
     public class ExtensionUrlProviderController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ExtensionUrlProviderController));
         private static readonly object ProvidersBuildLock = new object();
 
         private static readonly Regex RewrittenUrlRegex = new Regex(
@@ -35,24 +36,32 @@ namespace DotNetNuke.Entities.Urls
 
         public static void DeleteProvider(ExtensionUrlProviderInfo urlProvider)
         {
+			Logger.LogDebug(">>> Entering DeleteProvider(urlProvider={UrlProvider})", urlProvider);
             DataProvider.Instance().DeleteExtensionUrlProvider(urlProvider.ExtensionUrlProviderId);
             ClearCache();
+			Logger.LogDebug("<<< Exiting DeleteProvider(urlProvider={UrlProvider})", urlProvider);
         }
 
         public static void DisableProvider(int providerId, int portalId)
         {
+			Logger.LogDebug(">>> Entering DisableProvider(providerId={ProviderId},portalId={PortalId})", providerId, portalId);
             DataProvider.Instance().UpdateExtensionUrlProvider(providerId, false);
             ClearCache(portalId);
+			Logger.LogDebug("<<< Exiting DisableProvider(providerId={ProviderId},portalId={PortalId})", providerId, portalId);
         }
 
         public static void EnableProvider(int providerId, int portalId)
         {
+			Logger.LogDebug(">>> Entering EnableProvider(providerId={ProviderId},portalId={PortalId})", providerId, portalId);
             DataProvider.Instance().UpdateExtensionUrlProvider(providerId, true);
             ClearCache(portalId);
+			Logger.LogDebug("<<< Exiting EnableProvider(providerId={ProviderId},portalId={PortalId})", providerId, portalId);
         }
 
         public static List<ExtensionUrlProviderInfo> GetProviders(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetProviders(portalId={PortalId})", portalId);
+			Logger.LogDebug("<<< Exiting GetProviders(portalId={PortalId})", portalId);
             return CBO.FillCollection<ExtensionUrlProviderInfo>(DataProvider.Instance().GetExtensionUrlProviders(portalId));
         }
 
@@ -71,22 +80,29 @@ namespace DotNetNuke.Entities.Urls
         /// <remarks>Note : similar copy for UI purposes in ConfigurationController.cs.</remarks>
         public static List<ExtensionUrlProvider> GetModuleProviders(IHostSettings hostSettings, IServiceProvider serviceProvider, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId})", hostSettings, serviceProvider, portalId);
             var cacheKey = FormattableString.Invariant($"ExtensionUrlProviders_{portalId}");
             var moduleProviders = CBO.GetCachedObject<List<ExtensionUrlProvider>>(
                 hostSettings,
                 new CacheItemArgs(cacheKey, 60, CacheItemPriority.High, portalId),
                 c =>
                 {
+					Logger.LogDebug("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): cacheKey → {CacheKey}", hostSettings, serviceProvider, portalId, cacheKey);
                     var id = (int)c.Params[0];
                     IDataReader dr = DataProvider.Instance().GetExtensionUrlProviders(id);
+					Logger.LogDebug("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): id → {Id}", hostSettings, serviceProvider, portalId, id);
+					Logger.LogDebug("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): dr → {Dr}", hostSettings, serviceProvider, portalId, dr);
                     try
                     {
                         var providers = new List<ExtensionUrlProvider>();
+						Logger.LogDebug("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): providers → {Providers}", hostSettings, serviceProvider, portalId, providers);
                         var providerConfigs = CBO.FillCollection(dr, new List<ExtensionUrlProviderInfo>(), false);
+						Logger.LogDebug("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): providerConfigs → {ProviderConfigs}", hostSettings, serviceProvider, portalId, providerConfigs);
 
                         foreach (var providerConfig in providerConfigs)
                         {
                             var providerType = Reflection.CreateType(providerConfig.ProviderType);
+							Logger.LogDebug("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): providerType → {ProviderType}", hostSettings, serviceProvider, portalId, providerType);
                             if (providerType == null)
                             {
                                 continue;
@@ -108,8 +124,11 @@ namespace DotNetNuke.Entities.Urls
                             while (dr.Read())
                             {
                                 var extensionUrlProviderId = Null.SetNullInteger(dr["ExtensionUrlProviderID"]);
+								Logger.LogDebug("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): extensionUrlProviderId → {ExtensionUrlProviderId}", hostSettings, serviceProvider, portalId, extensionUrlProviderId);
                                 var key = Null.SetNullString(dr["SettingName"]);
+								Logger.LogWarning("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): key → {Key}", hostSettings, serviceProvider, portalId, key);
                                 var value = Null.SetNullString(dr["SettingValue"]);
+								Logger.LogDebug("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): value → {Value}", hostSettings, serviceProvider, portalId, value);
 
                                 var provider = providers.SingleOrDefault(p =>
                                     p.ProviderConfig.ExtensionUrlProviderId == extensionUrlProviderId);
@@ -124,6 +143,7 @@ namespace DotNetNuke.Entities.Urls
                             {
                                 var extensionUrlProviderId = Null.SetNullInteger(dr["ExtensionUrlProviderID"]);
                                 var tabId = Null.SetNullInteger(dr["TabID"]);
+								Logger.LogDebug("GetModuleProviders(hostSettings={HostSettings},serviceProvider={ServiceProvider},portalId={PortalId}): tabId → {TabId}", hostSettings, serviceProvider, portalId, tabId);
 
                                 var provider = providers.SingleOrDefault(p =>
                                     p.ProviderConfig.ExtensionUrlProviderId == extensionUrlProviderId);
@@ -143,11 +163,14 @@ namespace DotNetNuke.Entities.Urls
                     }
                 });
 
+			Logger.LogDebug("<<< Exiting GetModuleProviders(portalId={PortalId})", portalId);
             return moduleProviders;
         }
 
         public static FriendlyUrlOptions GetOptionsFromSettings(FriendlyUrlSettings settings)
         {
+			Logger.LogDebug(">>> Entering GetOptionsFromSettings(settings={Settings})", settings);
+			Logger.LogDebug("<<< Exiting GetOptionsFromSettings(settings={Settings})", settings);
             return new FriendlyUrlOptions
             {
                 PunctuationReplacement = (settings.ReplaceSpaceWith != FriendlyUrlSettings.ReplaceSpaceWithNothing)
@@ -173,10 +196,13 @@ namespace DotNetNuke.Entities.Urls
         /// <param name="messages">The list of messages to log.</param>
         public static void LogModuleProviderExceptionInRequest(Exception ex, string status, ExtensionUrlProvider provider, UrlAction result, List<string> messages)
         {
+			Logger.LogDebug(">>> Entering LogModuleProviderExceptionInRequest(ex={Ex},status={Status},provider={Provider},result={Result},messages={Messages})", ex, status, provider, result, messages);
             if (ex != null)
             {
                 string moduleProviderName = "Unknown Provider";
+				Logger.LogDebug("LogModuleProviderExceptionInRequest(ex={Ex},status={Status},provider={Provider},result={Result},messages={Messages}): moduleProviderName → {ModuleProviderName}", ex, status, provider, result, messages, moduleProviderName);
                 string moduleProviderVersion = "Unknown Version";
+				Logger.LogDebug("LogModuleProviderExceptionInRequest(ex={Ex},status={Status},provider={Provider},result={Result},messages={Messages}): moduleProviderVersion → {ModuleProviderVersion}", ex, status, provider, result, messages, moduleProviderVersion);
                 if (provider != null)
                 {
                     moduleProviderName = provider.ProviderConfig.ProviderName;
@@ -187,19 +213,23 @@ namespace DotNetNuke.Entities.Urls
                 // the exception will be logged once for the life of the cache / application restart or 1 hour, whichever is shorter.
                 // create a cache key for this exception type
                 string cacheKey = ex.GetType().ToString();
+				Logger.LogDebug("LogModuleProviderExceptionInRequest(ex={Ex},status={Status},provider={Provider},result={Result},messages={Messages}): cacheKey → {CacheKey}", ex, status, provider, result, messages, cacheKey);
 
                 // see if there is an existing object logged for this exception type
                 object existingEx = DataCache.GetCache(cacheKey);
+				Logger.LogDebug("LogModuleProviderExceptionInRequest(ex={Ex},status={Status},provider={Provider},result={Result},messages={Messages}): existingEx → {ExistingEx}", ex, status, provider, result, messages, existingEx);
                 if (existingEx == null)
                 {
                     // if there was no existing object logged for this exception type, this is a new exception
                     DateTime expire = DateTime.Now.AddHours(1);
+					Logger.LogDebug("LogModuleProviderExceptionInRequest(ex={Ex},status={Status},provider={Provider},result={Result},messages={Messages}): expire → {Expire}", ex, status, provider, result, messages, expire);
                     DataCache.SetCache(cacheKey, cacheKey, expire);
 
                     // just store the cache key - it doesn't really matter
                     // create a log event
                     string productVer = DotNetNukeContext.Current.Application.Version.ToString();
                     var log = new LogInfo { LogTypeKey = "GENERAL_EXCEPTION" };
+					Logger.LogDebug("LogModuleProviderExceptionInRequest(ex={Ex},status={Status},provider={Provider},result={Result},messages={Messages}): log → {Log}", ex, status, provider, result, messages, log);
                     log.AddProperty(
                         "Url Rewriting Extension Url Provider Exception",
                         "Exception in Url Rewriting Process");
@@ -227,6 +257,7 @@ namespace DotNetNuke.Entities.Urls
                             foreach (string debugMessage in result.DebugMessages)
                             {
                                 string msg = debugMessage;
+								Logger.LogDebug("LogModuleProviderExceptionInRequest(ex={Ex},status={Status},provider={Provider},result={Result},messages={Messages}): msg → {Msg}", ex, status, provider, result, messages, msg);
                                 if (debugMessage == null)
                                 {
                                     msg = "[message was null]";
@@ -262,13 +293,16 @@ namespace DotNetNuke.Entities.Urls
                     }
 
                     log.BypassBuffering = true;
+					Logger.LogDebug("LogModuleProviderExceptionInRequest(ex={Ex},status={Status},provider={Provider},result={Result},messages={Messages}): log.BypassBuffering → {Arg5}", ex, status, provider, result, messages, log.BypassBuffering);
                     LogController.Instance.AddLog(log);
                 }
             }
+			Logger.LogDebug("<<< Exiting LogModuleProviderExceptionInRequest(ex={Ex},status={Status},provider={Provider},result={Result},messages={Messages})", ex, status, provider, result, messages);
         }
 
         public static void SaveProvider(ExtensionUrlProviderInfo provider)
         {
+			Logger.LogDebug(">>> Entering SaveProvider(provider={Provider})", provider);
             provider.ExtensionUrlProviderId = DataProvider.Instance().AddExtensionUrlProvider(
                                                     provider.ExtensionUrlProviderId,
                                                     provider.DesktopModuleId,
@@ -279,12 +313,15 @@ namespace DotNetNuke.Entities.Urls
                                                     provider.RewriteAllUrls,
                                                     provider.RedirectAllUrls,
                                                     provider.ReplaceAllUrls);
+													Logger.LogDebug("<<< Exiting SaveProvider(provider={Provider})", provider);
         }
 
         public static void SaveSetting(int providerId, int portalId, string settingName, string settingValue)
         {
+			Logger.LogDebug(">>> Entering SaveSetting(providerId={ProviderId},portalId={PortalId},settingName={SettingName},settingValue={SettingValue})", providerId, portalId, settingName, settingValue);
             DataProvider.Instance().SaveExtensionUrlProviderSetting(providerId, portalId, settingName, settingValue);
             ClearCache(portalId);
+			Logger.LogDebug("<<< Exiting SaveSetting(providerId={ProviderId},portalId={PortalId},settingName={SettingName},settingValue={SettingValue})", providerId, portalId, settingName, settingValue);
         }
 
         /// <summary>Checks to see if any providers are marked as 'always call for rewrites'.</summary>
@@ -295,14 +332,18 @@ namespace DotNetNuke.Entities.Urls
         /// <returns><see langword="true"/> if the there are providers that need to always be called, otherwise <see langword="false"/>.</returns>
         internal static bool CheckForAlwaysCallProviders(int portalId, int tabId, FriendlyUrlSettings settings, Guid parentTraceId)
         {
+			Logger.LogDebug(">>> Entering CheckForAlwaysCallProviders(portalId={PortalId},tabId={TabId},settings={Settings},parentTraceId={ParentTraceId})", portalId, tabId, settings, parentTraceId);
             List<int> alwaysCallTabids = CacheController.GetAlwaysCallProviderTabs(portalId);
             bool checkForAlwaysCallResult = false;
+			Logger.LogDebug("CheckForAlwaysCallProviders(portalId={PortalId},tabId={TabId},settings={Settings},parentTraceId={ParentTraceId}): checkForAlwaysCallResult → {CheckForAlwaysCallResult}", portalId, tabId, settings, parentTraceId, checkForAlwaysCallResult);
             if (alwaysCallTabids == null)
+			Logger.LogDebug("CheckForAlwaysCallProviders(portalId={PortalId},tabId={TabId},settings={Settings},parentTraceId={ParentTraceId}): alwaysCallTabids → {AlwaysCallTabids}", portalId, tabId, settings, parentTraceId, alwaysCallTabids);
             {
                 alwaysCallTabids = new List<int>(); // create new list
 
                 // nothing in cache, build list
                 List<ExtensionUrlProvider> providers = GetModuleProviders(portalId).Where(p => p.ProviderConfig.IsActive).ToList();
+				Logger.LogDebug("CheckForAlwaysCallProviders(portalId={PortalId},tabId={TabId},settings={Settings},parentTraceId={ParentTraceId}): providers → {Providers}", portalId, tabId, settings, parentTraceId, providers);
                 foreach (ExtensionUrlProvider provider in providers)
                 {
                     // check the always call property
@@ -337,6 +378,7 @@ namespace DotNetNuke.Entities.Urls
                 checkForAlwaysCallResult = true;
             }
 
+			Logger.LogDebug("<<< Exiting CheckForAlwaysCallProviders(portalId={PortalId},tabId={TabId},settings={Settings},parentTraceId={ParentTraceId})", portalId, tabId, settings, parentTraceId);
             return checkForAlwaysCallResult;
         }
 
@@ -349,15 +391,21 @@ namespace DotNetNuke.Entities.Urls
             ref List<string> messages,
             Guid parentTraceId)
         {
+			Logger.LogDebug(">>> Entering CheckForRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings},messages={Messages},parentTraceId={ParentTraceId})", requestUri, result, queryStringCol, settings, messages, parentTraceId);
             bool redirected = false;
+			Logger.LogDebug("CheckForRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): redirected → {Redirected}", requestUri, result, queryStringCol, settings, messages, parentTraceId, redirected);
             location = string.Empty;
             ExtensionUrlProvider activeProvider = null;
+			Logger.LogDebug("CheckForRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): activeProvider → {ActiveProvider}", requestUri, result, queryStringCol, settings, messages, parentTraceId, activeProvider);
+			Logger.LogDebug("CheckForRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): location → {Location}", requestUri, result, queryStringCol, settings, messages, parentTraceId, location);
             try
             {
                 List<ExtensionUrlProvider> providersToCall = GetProvidersToCall(result.TabId, result.PortalId, settings, parentTraceId);
+				Logger.LogDebug("CheckForRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): providersToCall → {ProvidersToCall}", requestUri, result, queryStringCol, settings, messages, parentTraceId, providersToCall);
                 if (providersToCall != null && providersToCall.Count > 0)
                 {
                     FriendlyUrlOptions options = UrlRewriterUtils.GetOptionsFromSettings(settings);
+					Logger.LogDebug("CheckForRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): options → {Options}", requestUri, result, queryStringCol, settings, messages, parentTraceId, options);
                     foreach (ExtensionUrlProvider provider in providersToCall)
                     {
                         activeProvider = provider; // for error handling
@@ -373,6 +421,8 @@ namespace DotNetNuke.Entities.Urls
                         if (redirected)
                         {
                             result.FinalUrl = location;
+							Logger.LogDebug("CheckForRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): result.FinalUrl → {Arg6}", requestUri, result, queryStringCol, settings, messages, parentTraceId, result.FinalUrl);
+							Logger.LogDebug("CheckForRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): result.Reason → {Arg6}", requestUri, result, queryStringCol, settings, messages, parentTraceId, result.Reason);
                             result.Reason = RedirectReason.Module_Provider_Redirect;
                             break;
                         }
@@ -381,6 +431,7 @@ namespace DotNetNuke.Entities.Urls
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in CheckForRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): {Arg6}", requestUri, result, queryStringCol, settings, messages, parentTraceId, ex.getMessage());
                 // log module provider exception
                 LogModuleProviderExceptionInRequest(ex, "500 Internal Server Error", activeProvider, result, messages);
 
@@ -388,6 +439,7 @@ namespace DotNetNuke.Entities.Urls
                 redirected = false;
                 location = string.Empty;
                 string providerName = "Unknown";
+				Logger.LogDebug("CheckForRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): providerName → {ProviderName}", requestUri, result, queryStringCol, settings, messages, parentTraceId, providerName);
                 if (activeProvider != null)
                 {
                     providerName = activeProvider.ProviderConfig.ProviderName;
@@ -399,6 +451,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting CheckForRedirect(requestUri={RequestUri},result={Result},queryStringCol={QueryStringCol},settings={Settings},messages={Messages},parentTraceId={ParentTraceId})", requestUri, result, queryStringCol, settings, messages, parentTraceId);
             return redirected;
         }
 
@@ -409,9 +462,12 @@ namespace DotNetNuke.Entities.Urls
         /// <returns><see langword="true"/> if there is a provider that requires checks for a site root rewrite/redirect, otherwise <see langword="false"/>.</returns>
         internal static bool CheckForSiteRootRewrite(int portalId, FriendlyUrlSettings settings, Guid parentTraceId)
         {
+			Logger.LogDebug(">>> Entering CheckForSiteRootRewrite(portalId={PortalId},settings={Settings},parentTraceId={ParentTraceId})", portalId, settings, parentTraceId);
             var providers = GetProvidersToCall(RewriteController.SiteRootRewrite, portalId, settings, parentTraceId);
 
+			Logger.LogDebug("CheckForSiteRootRewrite(portalId={PortalId},settings={Settings},parentTraceId={ParentTraceId}): providers → {Providers}", portalId, settings, parentTraceId, providers);
             // list should have returned all providers with site root rewrite, but double check here in case of faulty third-party logic
+			Logger.LogDebug("<<< Exiting CheckForSiteRootRewrite(portalId={PortalId},settings={Settings},parentTraceId={ParentTraceId})", portalId, settings, parentTraceId);
             return providers.Any(provider => provider.AlwaysUsesDnnPagePath(portalId) == false);
         }
 
@@ -427,19 +483,27 @@ namespace DotNetNuke.Entities.Urls
             ref List<string> messages,
             Guid parentTraceId)
         {
+			Logger.LogDebug(">>> Entering GetUrlFromExtensionUrlProviders(portalId={PortalId},tab={Tab},settings={Settings},friendlyUrlPath={FriendlyUrlPath},cultureCode={CultureCode},endingPageName={EndingPageName},messages={Messages},parentTraceId={ParentTraceId})", portalId, tab, settings, friendlyUrlPath, cultureCode, endingPageName, messages, parentTraceId);
             bool wasChanged = false;
+			Logger.LogDebug("GetUrlFromExtensionUrlProviders(portalId={PortalId},tab={Tab},settings={Settings},friendlyUrlPath={FriendlyUrlPath},cultureCode={CultureCode},endingPageName={EndingPageName},messages={Messages},parentTraceId={ParentTraceId}): wasChanged → {WasChanged}", portalId, tab, settings, friendlyUrlPath, cultureCode, endingPageName, messages, parentTraceId, wasChanged);
             changedPath = friendlyUrlPath;
             changeToSiteRoot = false;
             ExtensionUrlProvider activeProvider = null;
+			Logger.LogDebug("GetUrlFromExtensionUrlProviders(portalId={PortalId},tab={Tab},settings={Settings},friendlyUrlPath={FriendlyUrlPath},cultureCode={CultureCode},endingPageName={EndingPageName},messages={Messages},parentTraceId={ParentTraceId}): activeProvider → {ActiveProvider}", portalId, tab, settings, friendlyUrlPath, cultureCode, endingPageName, messages, parentTraceId, activeProvider);
+			Logger.LogDebug("GetUrlFromExtensionUrlProviders(portalId={PortalId},tab={Tab},settings={Settings},friendlyUrlPath={FriendlyUrlPath},cultureCode={CultureCode},endingPageName={EndingPageName},messages={Messages},parentTraceId={ParentTraceId}): changedPath → {ChangedPath}", portalId, tab, settings, friendlyUrlPath, cultureCode, endingPageName, messages, parentTraceId, changedPath);
+			Logger.LogDebug("GetUrlFromExtensionUrlProviders(portalId={PortalId},tab={Tab},settings={Settings},friendlyUrlPath={FriendlyUrlPath},cultureCode={CultureCode},endingPageName={EndingPageName},messages={Messages},parentTraceId={ParentTraceId}): changeToSiteRoot → {ChangeToSiteRoot}", portalId, tab, settings, friendlyUrlPath, cultureCode, endingPageName, messages, parentTraceId, changeToSiteRoot);
             if (messages == null)
             {
                 messages = new List<string>();
+				Logger.LogDebug("GetUrlFromExtensionUrlProviders(portalId={PortalId},tab={Tab},settings={Settings},friendlyUrlPath={FriendlyUrlPath},cultureCode={CultureCode},endingPageName={EndingPageName},messages={Messages},parentTraceId={ParentTraceId}): messages → {Messages1}", portalId, tab, settings, friendlyUrlPath, cultureCode, endingPageName, messages, parentTraceId, messages);
             }
 
             try
             {
                 List<ExtensionUrlProvider> providersToCall = GetProvidersToCall(tab.TabID, portalId, settings, parentTraceId);
+				Logger.LogDebug("GetUrlFromExtensionUrlProviders(portalId={PortalId},tab={Tab},settings={Settings},friendlyUrlPath={FriendlyUrlPath},cultureCode={CultureCode},endingPageName={EndingPageName},messages={Messages},parentTraceId={ParentTraceId}): providersToCall → {ProvidersToCall}", portalId, tab, settings, friendlyUrlPath, cultureCode, endingPageName, messages, parentTraceId, providersToCall);
                 FriendlyUrlOptions options = UrlRewriterUtils.GetOptionsFromSettings(settings);
+				Logger.LogDebug("GetUrlFromExtensionUrlProviders(portalId={PortalId},tab={Tab},settings={Settings},friendlyUrlPath={FriendlyUrlPath},cultureCode={CultureCode},endingPageName={EndingPageName},messages={Messages},parentTraceId={ParentTraceId}): options → {Options}", portalId, tab, settings, friendlyUrlPath, cultureCode, endingPageName, messages, parentTraceId, options);
                 foreach (ExtensionUrlProvider provider in providersToCall)
                 {
                     activeProvider = provider; // keep for exception purposes
@@ -477,6 +541,7 @@ namespace DotNetNuke.Entities.Urls
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in GetUrlFromExtensionUrlProviders(portalId={PortalId},tab={Tab},settings={Settings},friendlyUrlPath={FriendlyUrlPath},cultureCode={CultureCode},endingPageName={EndingPageName},messages={Messages},parentTraceId={ParentTraceId}): {Arg8}", portalId, tab, settings, friendlyUrlPath, cultureCode, endingPageName, messages, parentTraceId, ex.getMessage());
                 LogModuleProviderExceptionInRequest(ex, "500 Internal Server Error", activeProvider, null, messages);
 
                 // reset all values to defaults
@@ -485,6 +550,7 @@ namespace DotNetNuke.Entities.Urls
                 changeToSiteRoot = false;
             }
 
+			Logger.LogDebug("<<< Exiting GetUrlFromExtensionUrlProviders(portalId={PortalId},tab={Tab},settings={Settings},friendlyUrlPath={FriendlyUrlPath},cultureCode={CultureCode},endingPageName={EndingPageName},messages={Messages},parentTraceId={ParentTraceId})", portalId, tab, settings, friendlyUrlPath, cultureCode, endingPageName, messages, parentTraceId);
             return wasChanged;
         }
 
@@ -500,13 +566,19 @@ namespace DotNetNuke.Entities.Urls
             ref List<string> messages,
             Guid parentTraceId)
         {
+			Logger.LogDebug(">>> Entering TransformFriendlyUrlPath(newUrl={NewUrl},tabKeyVal={TabKeyVal},urlParms={UrlParms},isSiteRootMatch={IsSiteRootMatch},result={Result},settings={Settings},messages={Messages},parentTraceId={ParentTraceId})", newUrl, tabKeyVal, urlParms, isSiteRootMatch, result, settings, messages, parentTraceId);
             bool rewriteDone = false;
+			Logger.LogDebug("TransformFriendlyUrlPath(newUrl={NewUrl},tabKeyVal={TabKeyVal},urlParms={UrlParms},isSiteRootMatch={IsSiteRootMatch},result={Result},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): rewriteDone → {RewriteDone}", newUrl, tabKeyVal, urlParms, isSiteRootMatch, result, settings, messages, parentTraceId, rewriteDone);
             rewrittenUrl = newUrl;
             newAction = false;
             ExtensionUrlProvider activeProvider = null;
+			Logger.LogDebug("TransformFriendlyUrlPath(newUrl={NewUrl},tabKeyVal={TabKeyVal},urlParms={UrlParms},isSiteRootMatch={IsSiteRootMatch},result={Result},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): activeProvider → {ActiveProvider}", newUrl, tabKeyVal, urlParms, isSiteRootMatch, result, settings, messages, parentTraceId, activeProvider);
+			Logger.LogDebug("TransformFriendlyUrlPath(newUrl={NewUrl},tabKeyVal={TabKeyVal},urlParms={UrlParms},isSiteRootMatch={IsSiteRootMatch},result={Result},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): rewrittenUrl → {RewrittenUrl}", newUrl, tabKeyVal, urlParms, isSiteRootMatch, result, settings, messages, parentTraceId, rewrittenUrl);
+			Logger.LogDebug("TransformFriendlyUrlPath(newUrl={NewUrl},tabKeyVal={TabKeyVal},urlParms={UrlParms},isSiteRootMatch={IsSiteRootMatch},result={Result},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): newAction → {NewAction}", newUrl, tabKeyVal, urlParms, isSiteRootMatch, result, settings, messages, parentTraceId, newAction);
             try
             {
                 int tabId = result.TabId;
+				Logger.LogDebug("TransformFriendlyUrlPath(newUrl={NewUrl},tabKeyVal={TabKeyVal},urlParms={UrlParms},isSiteRootMatch={IsSiteRootMatch},result={Result},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): tabId → {TabId}", newUrl, tabKeyVal, urlParms, isSiteRootMatch, result, settings, messages, parentTraceId, tabId);
                 if (isSiteRootMatch)
                 {
                     tabId = RewriteController.SiteRootRewrite;
@@ -521,6 +593,7 @@ namespace DotNetNuke.Entities.Urls
                 {
                     // now check for providers by calling the providers
                     int upperBound = urlParms.GetUpperBound(0);
+					Logger.LogDebug("TransformFriendlyUrlPath(newUrl={NewUrl},tabKeyVal={TabKeyVal},urlParms={UrlParms},isSiteRootMatch={IsSiteRootMatch},result={Result},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): upperBound → {UpperBound}", newUrl, tabKeyVal, urlParms, isSiteRootMatch, result, settings, messages, parentTraceId, upperBound);
 
                     // clean extension off parameters array
                     var parms = new string[upperBound + 1];
@@ -533,6 +606,7 @@ namespace DotNetNuke.Entities.Urls
 
                     // get options from current settings
                     FriendlyUrlOptions options = UrlRewriterUtils.GetOptionsFromSettings(settings);
+					Logger.LogDebug("TransformFriendlyUrlPath(newUrl={NewUrl},tabKeyVal={TabKeyVal},urlParms={UrlParms},isSiteRootMatch={IsSiteRootMatch},result={Result},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): options → {Options}", newUrl, tabKeyVal, urlParms, isSiteRootMatch, result, settings, messages, parentTraceId, options);
                     foreach (ExtensionUrlProvider provider in providersToCall)
                     {
                         // set active provider for exception handling
@@ -551,6 +625,7 @@ namespace DotNetNuke.Entities.Urls
                             ref messages,
                             out status,
                             out location);
+							Logger.LogDebug("TransformFriendlyUrlPath(newUrl={NewUrl},tabKeyVal={TabKeyVal},urlParms={UrlParms},isSiteRootMatch={IsSiteRootMatch},result={Result},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): queryString → {QueryString}", newUrl, tabKeyVal, urlParms, isSiteRootMatch, result, settings, messages, parentTraceId, queryString);
                         if (status == 0 || status == 200)
                         {
                             // either not set, or set to '200 OK'.
@@ -566,6 +641,7 @@ namespace DotNetNuke.Entities.Urls
                                     // pattern to determine which tab matches
                                     // look for any other querystirng information in the already rewritten Url (ie language parameters)
                                     Match rewrittenUrlMatch = RewrittenUrlRegex.Match(rewrittenUrl);
+									Logger.LogDebug("TransformFriendlyUrlPath(newUrl={NewUrl},tabKeyVal={TabKeyVal},urlParms={UrlParms},isSiteRootMatch={IsSiteRootMatch},result={Result},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): rewrittenUrlMatch → {RewrittenUrlMatch}", newUrl, tabKeyVal, urlParms, isSiteRootMatch, result, settings, messages, parentTraceId, rewrittenUrlMatch);
                                     if (rewrittenUrlMatch.Groups["qs"].Success)
                                     {
                                         // keep any other querystring remainders
@@ -605,6 +681,9 @@ namespace DotNetNuke.Entities.Urls
                             {
                                 case 301:
                                     result.Action = ActionType.Redirect301;
+									Logger.LogDebug("TransformFriendlyUrlPath(newUrl={NewUrl},tabKeyVal={TabKeyVal},urlParms={UrlParms},isSiteRootMatch={IsSiteRootMatch},result={Result},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): result.Action → {Arg8}", newUrl, tabKeyVal, urlParms, isSiteRootMatch, result, settings, messages, parentTraceId, result.Action);
+									Logger.LogDebug("TransformFriendlyUrlPath(newUrl={NewUrl},tabKeyVal={TabKeyVal},urlParms={UrlParms},isSiteRootMatch={IsSiteRootMatch},result={Result},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): result.Reason → {Arg8}", newUrl, tabKeyVal, urlParms, isSiteRootMatch, result, settings, messages, parentTraceId, result.Reason);
+									Logger.LogDebug("TransformFriendlyUrlPath(newUrl={NewUrl},tabKeyVal={TabKeyVal},urlParms={UrlParms},isSiteRootMatch={IsSiteRootMatch},result={Result},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): result.FinalUrl → {Arg8}", newUrl, tabKeyVal, urlParms, isSiteRootMatch, result, settings, messages, parentTraceId, result.FinalUrl);
                                     result.Reason = RedirectReason.Module_Provider_Rewrite_Redirect;
                                     result.FinalUrl = location;
                                     break;
@@ -629,6 +708,7 @@ namespace DotNetNuke.Entities.Urls
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in TransformFriendlyUrlPath(newUrl={NewUrl},tabKeyVal={TabKeyVal},urlParms={UrlParms},isSiteRootMatch={IsSiteRootMatch},result={Result},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): {Arg8}", newUrl, tabKeyVal, urlParms, isSiteRootMatch, result, settings, messages, parentTraceId, ex.getMessage());
                 // log module provider exception
                 LogModuleProviderExceptionInRequest(ex, "500 Internal Server Error", activeProvider, result, messages);
 
@@ -637,6 +717,7 @@ namespace DotNetNuke.Entities.Urls
                 rewrittenUrl = newUrl;
                 newAction = false;
                 string providerName = "Unknown";
+				Logger.LogDebug("TransformFriendlyUrlPath(newUrl={NewUrl},tabKeyVal={TabKeyVal},urlParms={UrlParms},isSiteRootMatch={IsSiteRootMatch},result={Result},settings={Settings},messages={Messages},parentTraceId={ParentTraceId}): providerName → {ProviderName}", newUrl, tabKeyVal, urlParms, isSiteRootMatch, result, settings, messages, parentTraceId, providerName);
                 if (activeProvider != null)
                 {
                     providerName = activeProvider.ProviderConfig.ProviderName;
@@ -648,21 +729,27 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting TransformFriendlyUrlPath(newUrl={NewUrl},tabKeyVal={TabKeyVal},urlParms={UrlParms},isSiteRootMatch={IsSiteRootMatch},result={Result},settings={Settings},messages={Messages},parentTraceId={ParentTraceId})", newUrl, tabKeyVal, urlParms, isSiteRootMatch, result, settings, messages, parentTraceId);
             return rewriteDone;
         }
 
         private static void ClearCache()
         {
+			Logger.LogDebug(">>> Entering ClearCache()");
             foreach (IPortalInfo portal in PortalController.Instance.GetPortals())
             {
                 ClearCache(portal.PortalId);
             }
+			Logger.LogDebug("<<< Exiting ClearCache()");
         }
 
         private static void ClearCache(int portalId)
         {
+			Logger.LogDebug(">>> Entering ClearCache(portalId={PortalId})", portalId);
             var cacheKey = string.Format(CultureInfo.InvariantCulture, "ExtensionUrlProviders_{0}", portalId);
             DataCache.RemoveCache(cacheKey);
+			Logger.LogDebug("ClearCache(portalId={PortalId}): cacheKey → {CacheKey}", portalId, cacheKey);
+			Logger.LogDebug("<<< Exiting ClearCache(portalId={PortalId})", portalId);
         }
 
         /// <summary>Returns the providers to call. Returns tab ID matches first, and any portal ID matches after that.</summary>
@@ -718,6 +805,7 @@ namespace DotNetNuke.Entities.Urls
             }
 
             // return the collection of module providers
+			Logger.LogDebug("<<< Exiting GetProvidersToCall(tabId={TabId},portalId={PortalId},settings={Settings},parentTraceId={ParentTraceId})", tabId, portalId, settings, parentTraceId);
             return providers;
         }
     }

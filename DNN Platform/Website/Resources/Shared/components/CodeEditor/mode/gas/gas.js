@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,7 +13,9 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("gas", function(_config, parserConfig) {
+logger.debug('>>> Entering defineMode()');
   'use strict';
 
   // If an architecture is specified, its initialization function may
@@ -24,6 +28,7 @@ CodeMirror.defineMode("gas", function(_config, parserConfig) {
   // If no architecture is pased in "parserConfig" then only multiline
   // comments will have syntax support.
   var lineCommentStartSymbol = "";
+logger.debug(`defineMode(): lineCommentStartSymbol → ${lineCommentStartSymbol}`);
 
   // These directives are architecture independent.
   // Machine specific directives should go in their respective
@@ -140,8 +145,10 @@ CodeMirror.defineMode("gas", function(_config, parserConfig) {
   };
 
   var registers = {};
+logger.debug('<<< Exiting defineMode()');
 
   function x86(_parserConfig) {
+	logger.debug(`>>> Entering x86(_parserConfig=${_parserConfig})`);
     lineCommentStartSymbol = "#";
 
     registers.ax  = "variable";
@@ -186,9 +193,11 @@ CodeMirror.defineMode("gas", function(_config, parserConfig) {
     registers.es  = "keyword";
     registers.fs  = "keyword";
     registers.gs  = "keyword";
+	logger.debug(`<<< Exiting x86(_parserConfig=${_parserConfig})`);
   }
 
   function armv6(_parserConfig) {
+	logger.debug(`>>> Entering armv6(_parserConfig=${_parserConfig})`);
     // Reference:
     // http://infocenter.arm.com/help/topic/com.arm.doc.qrc0001l/QRC0001_UAL.pdf
     // http://infocenter.arm.com/help/topic/com.arm.doc.ddi0301h/DDI0301H_arm1176jzfs_r0p7_trm.pdf
@@ -217,11 +226,13 @@ CodeMirror.defineMode("gas", function(_config, parserConfig) {
     registers.r15 = registers.pc;
 
     custom.push(function(ch, stream) {
+	logger.debug('>>> Entering push()');
       if (ch === '#') {
         stream.eatWhile(/\w/);
         return "number";
       }
     });
+	logger.debug(`<<< Exiting armv6(_parserConfig=${_parserConfig})`);
   }
 
   var arch = (parserConfig.architecture || "x86").toLowerCase();
@@ -232,6 +243,7 @@ CodeMirror.defineMode("gas", function(_config, parserConfig) {
   }
 
   function nextUntilUnescaped(stream, end) {
+	logger.debug(`>>> Entering nextUntilUnescaped(stream=${stream},end=${end})`);
     var escaped = false, next;
     while ((next = stream.next()) != null) {
       if (next === end && !escaped) {
@@ -239,29 +251,38 @@ CodeMirror.defineMode("gas", function(_config, parserConfig) {
       }
       escaped = !escaped && next === "\\";
     }
+	logger.debug(`nextUntilUnescaped(stream=${stream},end=${end}): escaped → ${escaped}`);
+	logger.debug(`<<< Exiting nextUntilUnescaped(stream=${stream},end=${end})`);
     return escaped;
   }
 
   function clikeComment(stream, state) {
+	logger.debug(`>>> Entering clikeComment(stream=${stream},state=${state})`);
     var maybeEnd = false, ch;
     while ((ch = stream.next()) != null) {
       if (ch === "/" && maybeEnd) {
         state.tokenize = null;
+		logger.debug(`clikeComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
         break;
       }
       maybeEnd = (ch === "*");
     }
+	logger.debug(`clikeComment(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`);
+	logger.debug(`<<< Exiting clikeComment(stream=${stream},state=${state})`);
     return "comment";
   }
 
   return {
     startState: function() {
+	logger.debug('>>> Entering startState()');
       return {
         tokenize: null
       };
+	logger.debug('<<< Exiting startState()');
     },
 
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       if (state.tokenize) {
         return state.tokenize(stream, state);
       }
@@ -275,6 +296,7 @@ CodeMirror.defineMode("gas", function(_config, parserConfig) {
       if (ch === "/") {
         if (stream.eat("*")) {
           state.tokenize = clikeComment;
+		logger.debug(`token(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
           return clikeComment(stream, state);
         }
       }
@@ -331,6 +353,7 @@ CodeMirror.defineMode("gas", function(_config, parserConfig) {
       for (var i = 0; i < custom.length; i++) {
         style = custom[i](ch, stream, state);
         if (style) {
+		logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
           return style;
         }
       }

@@ -10,6 +10,7 @@ namespace DotNetNuke.Services.Installer.Dependencies
     /// <summary>The DependencyBase is a base class for Installer Dependencies.</summary>
     public abstract class DependencyBase : IDependency
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DependencyBase));
         /// <inheritdoc />
         public virtual string ErrorMessage
         {
@@ -31,6 +32,8 @@ namespace DotNetNuke.Services.Installer.Dependencies
         /// <inheritdoc />
         public virtual void ReadManifest(XPathNavigator dependencyNav)
         {
+		Logger.LogDebug(">>> Entering ReadManifest(dependencyNav={DependencyNav})", dependencyNav);
+		Logger.LogDebug("<<< Exiting ReadManifest(dependencyNav={DependencyNav})", dependencyNav);
         }
     }
 }

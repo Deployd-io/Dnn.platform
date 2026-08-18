@@ -11,6 +11,7 @@ namespace DotNetNuke.Services.Mail
     /// <summary>A provider with the ability to send emails.</summary>
     public abstract class MailProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MailProvider));
         /// <summary>Gets a value indicating whether this provider supports OAuth authentication to the SMTP server.</summary>
         public virtual bool SupportsOAuth => false;
 
@@ -18,6 +19,8 @@ namespace DotNetNuke.Services.Mail
         /// <returns>A <see cref="MailProvider"/> instance.</returns>
         public static MailProvider Instance()
         {
+			Logger.LogDebug(">>> Entering Instance()");
+			Logger.LogDebug("<<< Exiting Instance()");
             return ComponentFactory.GetComponent<MailProvider>();
         }
 
@@ -34,6 +37,8 @@ namespace DotNetNuke.Services.Mail
         /// <returns><see cref="string.Empty"/> if the message send successfully, otherwise an error message.</returns>
         public virtual Task<string> SendMailAsync(MailInfo mailInfo, SmtpInfo smtpInfo = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+			Logger.LogDebug(">>> Entering SendMailAsync(mailInfo={MailInfo},smtpInfo=<redacted>,cancellationToken=<redacted>)", mailInfo);
+			Logger.LogDebug("<<< Exiting SendMailAsync(mailInfo={MailInfo},smtpInfo=<redacted>,cancellationToken=<redacted>)", mailInfo);
             return Task.FromResult(this.SendMail(mailInfo, smtpInfo));
         }
     }

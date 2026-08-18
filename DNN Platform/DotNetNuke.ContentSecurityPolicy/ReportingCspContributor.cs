@@ -9,12 +9,14 @@ namespace DotNetNuke.ContentSecurityPolicy
     using System.Linq;
     using System.Net;
     using System.Text.RegularExpressions;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Contributor for reporting directives.
     /// </summary>
     public class ReportingCspContributor : BaseCspContributor
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private bool checkSyntax;
 
         /// <summary>
@@ -24,13 +26,17 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="checkSyntax">Check syntax of value.</param>
         public ReportingCspContributor(CspDirectiveType directiveType, bool checkSyntax)
         {
+			_logger.LogDebug(">>> Entering ReportingCspContributor(directiveType={DirectiveType},checkSyntax={CheckSyntax})", directiveType, checkSyntax);
             if (directiveType != CspDirectiveType.ReportUri && directiveType != CspDirectiveType.ReportTo)
             {
+				_logger.LogWarning("Throwing ArgumentException from ReportingCspContributor(directiveType={DirectiveType},checkSyntax={CheckSyntax})", directiveType, checkSyntax);
                 throw new ArgumentException("Invalid reporting directive type");
             }
 
             this.DirectiveType = directiveType;
+			_logger.LogDebug("ReportingCspContributor(directiveType={DirectiveType},checkSyntax={CheckSyntax}): this.DirectiveType → {Arg2}", directiveType, checkSyntax, this.DirectiveType);
             this.checkSyntax = checkSyntax;
+			_logger.LogDebug("<<< Exiting ReportingCspContributor(directiveType={DirectiveType},checkSyntax={CheckSyntax})", directiveType, checkSyntax);
         }
 
         /// <summary>
@@ -44,6 +50,7 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="endpoint">The URL of the endpoint where reports will be sent.</param>
         public void AddReportingEndpoint(string endpoint)
         {
+			_logger.LogDebug(">>> Entering AddReportingEndpoint(endpoint={Endpoint})", endpoint);
             if (this.checkSyntax)
             {
                 this.ValidateReportingEndpoint(endpoint);
@@ -53,6 +60,7 @@ namespace DotNetNuke.ContentSecurityPolicy
             {
                 this.ReportingEndpoints.Add(endpoint);
             }
+			_logger.LogDebug("<<< Exiting AddReportingEndpoint(endpoint={Endpoint})", endpoint);
         }
 
         /// <summary>
@@ -61,7 +69,9 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <param name="endpoint">The endpoint to remove.</param>
         public void RemoveReportingEndpoint(string endpoint)
         {
+			_logger.LogDebug(">>> Entering RemoveReportingEndpoint(endpoint={Endpoint})", endpoint);
             this.ReportingEndpoints.Remove(endpoint);
+			_logger.LogDebug("<<< Exiting RemoveReportingEndpoint(endpoint={Endpoint})", endpoint);
         }
 
         /// <summary>
@@ -70,8 +80,10 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>The directive string.</returns>
         public override string GenerateDirective()
         {
+			_logger.LogDebug(">>> Entering GenerateDirective()");
             if (this.ReportingEndpoints.Count == 0)
             {
+			_logger.LogDebug("<<< Exiting GenerateDirective()");
                 return string.Empty;
             }
 
@@ -80,22 +92,28 @@ namespace DotNetNuke.ContentSecurityPolicy
 
         private static void ValidateReportTo(string value)
         {
+			_logger.LogDebug(">>> Entering ValidateReportTo(value={Value})", value);
             if (string.IsNullOrWhiteSpace(value))
             {
+				_logger.LogWarning("Throwing ArgumentException from ValidateReportTo(value={Value})", value);
+			_logger.LogDebug("<<< Exiting ValidateReportTo(value={Value})", value);
                 throw new ArgumentException("Reporting to cannot be empty");
             }
         }
 
         private static void ValidateReportUri(string endpoint)
         {
+			_logger.LogDebug(">>> Entering ValidateReportUri(endpoint={Endpoint})", endpoint);
             if (string.IsNullOrWhiteSpace(endpoint))
             {
+				_logger.LogWarning("Throwing ArgumentException from ValidateReportUri(endpoint={Endpoint})", endpoint);
                 throw new ArgumentException("Reporting endpoint cannot be empty");
             }
 
             // URL validation regex
             if (!Uri.TryCreate(endpoint, UriKind.Absolute, out Uri uriResult))
             {
+			_logger.LogDebug("<<< Exiting ValidateReportUri(endpoint={Endpoint})", endpoint);
                 throw new ArgumentException($"Invalid reporting endpoint: {endpoint}");
             }
         }
@@ -105,6 +123,7 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// </summary>
         private void ValidateReportingEndpoint(string value)
         {
+			_logger.LogDebug(">>> Entering ValidateReportingEndpoint(value={Value})", value);
             switch (this.DirectiveType)
             {
                 case CspDirectiveType.ReportUri:
@@ -116,6 +135,7 @@ namespace DotNetNuke.ContentSecurityPolicy
 
                     // Add more specific validations as needed
             }
+			_logger.LogDebug("<<< Exiting ValidateReportingEndpoint(value={Value})", value);
         }
     }
 }

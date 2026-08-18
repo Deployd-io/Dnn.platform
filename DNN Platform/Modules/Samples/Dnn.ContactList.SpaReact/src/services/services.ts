@@ -1,3 +1,4 @@
+const logger = console;
 import { Contact } from '../types/Contact';
 import { ModuleContext } from '../types/Module';
 import { PagedList } from '../types/PagedList';
@@ -17,6 +18,8 @@ declare global {
 // Get DNN Services Framework
 function getServicesFramework(moduleId: number): ServicesFramework {
   if (window.$ && window.$.ServicesFramework) {
+	logger.debug(`>>> Entering getServicesFramework(moduleId=${moduleId})`);
+	logger.debug(`<<< Exiting getServicesFramework(moduleId=${moduleId})`);
     return window.$.ServicesFramework(moduleId);
   }
   throw new Error('DNN ServicesFramework not available');
@@ -24,7 +27,9 @@ function getServicesFramework(moduleId: number): ServicesFramework {
 
 // Build API headers with anti-forgery token
 function getHeaders(moduleContext: ModuleContext): HeadersInit {
+logger.debug(`>>> Entering getHeaders(moduleContext=${moduleContext})`);
   const sf = getServicesFramework(moduleContext.ModuleId);
+logger.debug(`<<< Exiting getHeaders(moduleContext=${moduleContext})`);
   return {
     'Content-Type': 'application/json',
     'ModuleId': moduleContext.ModuleId.toString(),
@@ -35,8 +40,11 @@ function getHeaders(moduleContext: ModuleContext): HeadersInit {
 
 // Get base API URL
 function getApiUrl(moduleContext: ModuleContext): string {
+logger.debug(`>>> Entering getApiUrl(moduleContext=${moduleContext})`);
   const sf = getServicesFramework(moduleContext.ModuleId);
+logger.debug(`getApiUrl(moduleContext=${moduleContext}): sf → ${sf}`);
   // The API is from ContactList.Spa module
+logger.debug(`<<< Exiting getApiUrl(moduleContext=${moduleContext})`);
   return sf.getServiceRoot('Dnn/ContactListSpaReact') + 'Contacts/';
 }
 

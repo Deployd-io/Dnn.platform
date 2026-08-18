@@ -5,9 +5,11 @@ import FolderDropdown from "../common/FolderDropdown";
 import { validationMapNewModule, valueMapNewModule } from "../common/helperFunctions";
 import Localization from "localization";
 import styles from "./style.module.less";
+const logger = console;
 
 const inputStyle = { width: "100%" };
 function getValidateRequired(key) {
+	logger.debug(`>>> Entering getValidateRequired(key=${key})`);
     switch (key) {
         case "moduleFolder":
         case "fileName":
@@ -15,6 +17,7 @@ function getValidateRequired(key) {
         case "language":
             return true;
         default:
+			logger.debug(`<<< Exiting getValidateRequired(key=${key})`);
             return false;
     }
 }
@@ -33,17 +36,22 @@ const emptyNewModule = {
 class FromNew extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             newModule: validationMapNewModule(emptyNewModule, getValidateRequired),
             triedToSave: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         this.props.retrieveOwnerAndModuleFolders();
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     onFolderSelect(key, option) {
+		logger.debug(`>>> Entering onFolderSelect(key=${key},option=${option})`);
         const { props } = this;
         let {newModule, triedToSave} = this.state;
         if (key === "ownerFolder") {
@@ -54,6 +62,7 @@ class FromNew extends Component {
         }
         if (newModule[key].required) {
             newModule[key].error = !option.value;
+			logger.debug(`<<< Exiting onFolderSelect(key=${key},option=${option})`);
         }
         newModule[key].value = option.value;
         this.setState({
@@ -75,6 +84,7 @@ class FromNew extends Component {
     }
 
     validateFields() {
+		logger.debug('>>> Entering validateFields()');
         let {newModule} = this.state;
         let errorCount = 0;
         Object.keys(newModule).forEach((key) => {
@@ -87,10 +97,12 @@ class FromNew extends Component {
             newModule,
             triedToSave
         });
+		logger.debug('<<< Exiting validateFields()');
         return errorCount === 0;
     }
 
     onCreateNewModule() {
+		logger.debug('>>> Entering onCreateNewModule()');
         let {state, props} = this;
         let triedToSave = true;
         if (!this.validateFields()) {
@@ -100,8 +112,10 @@ class FromNew extends Component {
             triedToSave
         });
         props.onCreateNewModule(valueMapNewModule(state.newModule));
+		logger.debug('<<< Exiting onCreateNewModule()');
     }
     onAddedNewFolder(data, type) {
+		logger.debug(`>>> Entering onAddedNewFolder(data=${data},type=${type})`);
         let {newModule} = this.state;
         if (type === "ownerFolder") {
             newModule.ownerFolder.value = data.ownerFolder;
@@ -117,6 +131,7 @@ class FromNew extends Component {
         if (type === "moduleFolder") {
             newModule.moduleFolder.value = data.moduleFolder;
             newModule.moduleFolder.error = false;
+			logger.debug(`<<< Exiting onAddedNewFolder(data=${data},type=${type})`);
         }
         this.setState({
             newModule
@@ -124,6 +139,7 @@ class FromNew extends Component {
     }
 
     onAddNewFolder(value, type, callback) {
+		logger.debug(`>>> Entering onAddNewFolder(value=${value},type=${type},callback=${callback})`);
         const { newModule } = this.state;
         let payload = {
             moduleFolder: type === "ownerFolder" ? "" : newModule.moduleFolder.value,
@@ -132,10 +148,13 @@ class FromNew extends Component {
         payload[type] = value;
 
         this.props.onAddNewFolder(payload, type, callback);
+		logger.debug(`<<< Exiting onAddNewFolder(value=${value},type=${type},callback=${callback})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={styles.fromNew + " extension-form"} style={{ padding: 0 }}>
                 <GridSystem className="with-right-border top-half">

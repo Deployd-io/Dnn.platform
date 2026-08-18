@@ -8,25 +8,33 @@ import { InputGroup, MultiLineInputWithError, PagePicker, GridSystem, Label, But
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 let isHost = false;
 
 class DefaultPagesSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this._mounted = false;
+		logger.debug(`constructor(): this._mounted → ${this._mounted}`);
         this.state = {
             defaultPagesSettings: undefined
         };
         isHost = util.settings.isHost;
+		logger.debug(`constructor(): this.state → ${this.state}`);
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this._mounted = true;
         this.loadData();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentDidUpdate() {
+		logger.debug('>>> Entering componentDidUpdate()');
         let { props} = this;
         if (props.defaultPagesSettings) {
             let portalIdChanged = props.portalId !== undefined && props.defaultPagesSettings.PortalId !== props.portalId;
@@ -34,18 +42,23 @@ class DefaultPagesSettingsPanelBody extends Component {
 
             if (portalIdChanged || cultureCodeChanged) {
                 this.loadData();
+				logger.debug('<<< Exiting componentDidUpdate()');
             }
         }
     }
 
     componentWillUnmount() {
+		logger.debug('>>> Entering componentWillUnmount()');
         this._mounted = false;
+		logger.debug('<<< Exiting componentWillUnmount()');
     }
 
     loadData() {
+		logger.debug('>>> Entering loadData()');
         const { props } = this;
         props.dispatch(SiteBehaviorActions.getDefaultPagesSettings(props.portalId, props.cultureCode, (data) => {
             if (this._mounted) {
+				logger.debug('<<< Exiting loadData()');
                 this.setState({
                     defaultPagesSettings: Object.assign({}, data.Settings)
                 });
@@ -54,9 +67,11 @@ class DefaultPagesSettingsPanelBody extends Component {
     }
 
     onSettingChange(key, event, value) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event},value=${value})`);
         let {state, props} = this;
 
         let defaultPagesSettings = Object.assign({}, state.defaultPagesSettings);
+		logger.debug(`onSettingChange(key=${key},event=${event},value=${value}): defaultPagesSettings → ${defaultPagesSettings}`);
 
         if (key === "SplashTabId" || key === "HomeTabId" || key === "LoginTabId" || key === "RegisterTabId" ||
             key === "UserTabId" || key === "SearchTabId" || key === "Custom404TabId" || key === "Custom500TabId" ||
@@ -78,9 +93,11 @@ class DefaultPagesSettingsPanelBody extends Component {
         });
 
         props.dispatch(SiteBehaviorActions.defaultPagesSettingsClientModified(defaultPagesSettings));
+		logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event},value=${value})`);
     }
 
     onUpdate(event) {
+		logger.debug(`>>> Entering onUpdate(event=${event})`);
         event.preventDefault();
         const {props, state} = this;
 
@@ -88,13 +105,16 @@ class DefaultPagesSettingsPanelBody extends Component {
             util.utilities.notify(resx.get("SettingsUpdateSuccess"));
         }, () => {
             util.utilities.notifyError(resx.get("SettingsError"));
+			logger.debug(`<<< Exiting onUpdate(event=${event})`);
         }));
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const {props} = this;
         util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SiteBehaviorActions.getDefaultPagesSettings(props.portalId, props.cultureCode, (data) => {
+				logger.debug('<<< Exiting onCancel()');
                 let defaultPagesSettings = Object.assign({}, data.Settings);
                 this.setState({
                     defaultPagesSettings
@@ -105,8 +125,10 @@ class DefaultPagesSettingsPanelBody extends Component {
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
         const noneSpecifiedText = "<" + resx.get("NoneSpecified") + ">";
+		logger.debug(`render(): noneSpecifiedText → ${noneSpecifiedText}`);
         const TabParameters = {
             portalId: props.portalId !== undefined ? props.portalId : -2,
             cultureCode: props.cultureCode || "",
@@ -116,9 +138,13 @@ class DefaultPagesSettingsPanelBody extends Component {
             sortOrder: 0
         };
         let TabParameters_1 = Object.assign(Object.assign({}, TabParameters), { disabledNotSelectable: false });
+		logger.debug(`render(): TabParameters_1 → ${TabParameters_1}`);
         let TabParameters_2 = Object.assign(Object.assign({}, TabParameters), { disabledNotSelectable: true });
+		logger.debug(`render(): TabParameters_2 → ${TabParameters_2}`);
         let TabParameters_Login = Object.assign(Object.assign({}, TabParameters), { disabledNotSelectable: false, validateTab: "Account Login" });
+		logger.debug(`render(): TabParameters_Login → ${TabParameters_Login}`);
         let TabParameters_Search = Object.assign(Object.assign({}, TabParameters), { disabledNotSelectable: false, validateTab: "Search Results" });
+		logger.debug(`render(): TabParameters_Search → ${TabParameters_Search}`);
         let TabParameters_Anonymous = Object.assign(Object.assign({}, TabParameters), { disabledNotSelectable: true, roles: "-1" });
         if (state.defaultPagesSettings) {
             const columnOne = <div key="column-one" className="left-column">
@@ -334,6 +360,7 @@ class DefaultPagesSettingsPanelBody extends Component {
                 </InputGroup>
             </div>;
 
+			logger.debug('<<< Exiting render()');
             return (
                 <div className={styles.defaultPagesSettings}>
                     <GridSystem numberOfColumns={2}>
@@ -385,6 +412,8 @@ DefaultPagesSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         defaultPagesSettings: state.siteBehavior.defaultPagesSettings,

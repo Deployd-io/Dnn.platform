@@ -11,13 +11,18 @@ namespace DotNetNuke.Services.Tokens
 
     public class DictionaryPropertyAccess : IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DictionaryPropertyAccess));
         private readonly IDictionary nameValueCollection;
 
         /// <summary>Initializes a new instance of the <see cref="DictionaryPropertyAccess"/> class.</summary>
         /// <param name="list">The dictionary of token values.</param>
         public DictionaryPropertyAccess(IDictionary list)
         {
+			Logger.LogDebug(">>> Entering DictionaryPropertyAccess(list={List})", list);
             this.nameValueCollection = list;
+			Logger.LogDebug("DictionaryPropertyAccess(list={List}): this.nameValueCollection → {Arg1}", list, this.nameValueCollection);
+			Logger.LogDebug("DictionaryPropertyAccess(list={List}): nameValueCollection → {NameValueCollection}", list, nameValueCollection);
+			Logger.LogDebug("<<< Exiting DictionaryPropertyAccess(list={List})", list);
         }
 
         /// <inheritdoc />
@@ -32,6 +37,7 @@ namespace DotNetNuke.Services.Tokens
         /// <inheritdoc />
         public virtual string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			Logger.LogDebug(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             if (this.nameValueCollection == null)
             {
                 return string.Empty;
@@ -39,6 +45,7 @@ namespace DotNetNuke.Services.Tokens
 
             object valueObject = this.nameValueCollection[propertyName];
             string outputFormat = format;
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): outputFormat → {OutputFormat}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, outputFormat);
             if (string.IsNullOrEmpty(format))
             {
                 outputFormat = "g";
@@ -65,6 +72,7 @@ namespace DotNetNuke.Services.Tokens
             else
             {
                 propertyNotFound = true;
+				Logger.LogDebug("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
                 return string.Empty;
             }
         }

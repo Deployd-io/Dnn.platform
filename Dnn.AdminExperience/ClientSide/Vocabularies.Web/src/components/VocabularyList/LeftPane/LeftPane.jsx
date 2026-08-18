@@ -4,24 +4,33 @@ import { EditableField as EditableWithLabel} from "@dnnsoftware/dnn-react-common
 import LocalizedResources from "../../../resources";
 import util from "utils";
 import styles from "./style.module.less";
+const logger = console;
 
 
 class LeftPane extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
     onEnter(key, value) {
+		logger.debug(`>>> Entering onEnter(key=${key},value=${value})`);
         const {props} = this;
         props.onEnter(key, value, props.index);
+		logger.debug(`<<< Exiting onEnter(key=${key},value=${value})`);
     }
 
     canEdit() {
+		logger.debug('>>> Entering canEdit()');
         const {props} = this;
+		logger.debug('<<< Exiting canEdit()');
         return util.isHost() || (props.scopeType === "Portal" && util.canEdit());
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.vocabulariesLeftPane}>
                 <EditableWithLabel

@@ -1,3 +1,4 @@
+const logger = console;
 ﻿; if (typeof dnn === "undefined" || dnn === null) { dnn = {}; }; //var dnn = dnn || {};
 
 // the semi-colon before function invocation is a safety net against concatenated 
@@ -42,7 +43,9 @@
             this._$meter = $("<div/>").addClass(this.options.meterCss).appendTo(this._$container).width(this.$element.outerWidth());
 	        var handler = this;
 	        setInterval(function () {
+				logger.debug('>>> Entering setInterval()');
 	            handler._$meter.width(handler.$element.outerWidth());
+				logger.debug('<<< Exiting setInterval()');
                 handler._$tooltipContent.width(handler.$element.outerWidth() - 20);
 	        }, 50);
             this._$meterValue = $('<div><span class=""></span><span class=""></span><span class=""></span><span class="last"></span></div>').appendTo(this._$meter);

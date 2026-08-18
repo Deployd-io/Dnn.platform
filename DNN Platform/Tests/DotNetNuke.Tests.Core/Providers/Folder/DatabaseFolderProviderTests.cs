@@ -35,29 +35,42 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
         [SetUp]
         public void Setup()
         {
+			mockEventLogger.LogDebug(">>> Entering Setup()");
             this._dfp = new DatabaseFolderProvider();
             this._mockData = MockComponentProvider.CreateDataProvider();
+			mockEventLogger.LogDebug("Setup(): _mockData → {_mockData}", _mockData);
+			mockEventLogger.LogDebug("Setup(): _dfp → {_dfp}", _dfp);
             this._folderInfo = new Mock<IFolderInfo>();
+			mockEventLogger.LogDebug("Setup(): _folderInfo → {_folderInfo}", _folderInfo);
             this._fileInfo = new Mock<IFileInfo>();
+			mockEventLogger.LogDebug("Setup(): _fileInfo → {_fileInfo}", _fileInfo);
             this._folderManager = new Mock<IFolderManager>();
+			mockEventLogger.LogDebug("Setup(): _folderManager → {_folderManager}", _folderManager);
             this._fileManager = new Mock<IFileManager>();
+			mockEventLogger.LogDebug("Setup(): _fileManager → {_fileManager}", _fileManager);
 
             FolderManager.RegisterInstance(this._folderManager.Object);
             FileManager.RegisterInstance(this._fileManager.Object);
+			mockEventLogger.LogDebug("<<< Exiting Setup()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			mockEventLogger.LogDebug(">>> Entering TearDown()");
             MockComponentProvider.ResetContainer();
+			mockEventLogger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void AddFile_Throws_On_Null_Folder()
         {
+			mockEventLogger.LogDebug(">>> Entering AddFile_Throws_On_Null_Folder()");
             var stream = new Mock<Stream>();
 
+			mockEventLogger.LogDebug("AddFile_Throws_On_Null_Folder(): stream → {Stream}", stream);
             Assert.Throws<ArgumentNullException>(() => this._dfp.AddFile(null, Constants.FOLDER_ValidFileName, stream.Object));
+			mockEventLogger.LogDebug("<<< Exiting AddFile_Throws_On_Null_Folder()");
         }
 
         [Test]
@@ -65,55 +78,70 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
         [TestCase("")]
         public void AddFile_Throws_On_NullOrEmpty_FileName(string fileName)
         {
+			mockEventLogger.LogDebug(">>> Entering AddFile_Throws_On_NullOrEmpty_FileName(fileName={FileName})", fileName);
             var stream = new Mock<Stream>();
 
+			mockEventLogger.LogDebug("AddFile_Throws_On_NullOrEmpty_FileName(fileName={FileName}): stream → {Stream}", fileName, stream);
             Assert.Throws<ArgumentException>(() => this._dfp.AddFile(this._folderInfo.Object, fileName, stream.Object));
+			mockEventLogger.LogDebug("<<< Exiting AddFile_Throws_On_NullOrEmpty_FileName(fileName={FileName})", fileName);
         }
 
         [Test]
         public void DeleteFile_Throws_On_Null_File()
         {
+			mockEventLogger.LogDebug(">>> Entering DeleteFile_Throws_On_Null_File()");
             Assert.Throws<ArgumentNullException>(() => this._dfp.DeleteFile(null));
+			mockEventLogger.LogDebug("<<< Exiting DeleteFile_Throws_On_Null_File()");
         }
 
         [Test]
         public void DeleteFile_Calls_DataProvider_ClearFileContent()
         {
+			mockEventLogger.LogDebug(">>> Entering DeleteFile_Calls_DataProvider_ClearFileContent()");
             this._fileInfo.Setup(fi => fi.FileId).Returns(Constants.FOLDER_ValidFileId);
 
             this._dfp.DeleteFile(this._fileInfo.Object);
 
             this._mockData.Verify(md => md.ClearFileContent(Constants.FOLDER_ValidFileId), Times.Once());
+			mockEventLogger.LogDebug("<<< Exiting DeleteFile_Calls_DataProvider_ClearFileContent()");
         }
 
         [Test]
         public void ExistsFile_Throws_On_Null_Folder()
         {
+			mockEventLogger.LogDebug(">>> Entering ExistsFile_Throws_On_Null_Folder()");
             Assert.Throws<ArgumentNullException>(() => this._dfp.FileExists(null, Constants.FOLDER_ValidFileName));
+			mockEventLogger.LogDebug("<<< Exiting ExistsFile_Throws_On_Null_Folder()");
         }
 
         [Test]
         public void ExistsFile_Throws_On_Null_FileName()
         {
+			mockEventLogger.LogDebug(">>> Entering ExistsFile_Throws_On_Null_FileName()");
             Assert.Throws<ArgumentNullException>(() => this._dfp.FileExists(this._folderInfo.Object, null));
+			mockEventLogger.LogDebug("<<< Exiting ExistsFile_Throws_On_Null_FileName()");
         }
 
         [Test]
         public void ExistsFile_Returns_True_When_File_Exists()
         {
+			mockEventLogger.LogDebug(">>> Entering ExistsFile_Returns_True_When_File_Exists()");
             this._folderInfo.Setup(fi => fi.PortalID).Returns(Constants.CONTENT_ValidPortalId);
             this._folderInfo.Setup(fi => fi.FolderID).Returns(Constants.FOLDER_ValidFolderId);
 
             this._fileManager.Setup(fm => fm.GetFile(this._folderInfo.Object, Constants.FOLDER_ValidFileName, true)).Returns(new FileInfo());
 
             var result = this._dfp.FileExists(this._folderInfo.Object, Constants.FOLDER_ValidFileName);
+			mockEventLogger.LogDebug("ExistsFile_Returns_True_When_File_Exists(): result → {Result}", result);
 
             Assert.That(result, Is.True);
+			mockEventLogger.LogDebug("<<< Exiting ExistsFile_Returns_True_When_File_Exists()");
         }
 
         [Test]
         public void ExistsFile_Returns_False_When_File_Does_Not_Exist()
         {
+			mockEventLogger.LogDebug(">>> Entering ExistsFile_Returns_False_When_File_Does_Not_Exist()");
             this._folderInfo.Setup(fi => fi.PortalID).Returns(Constants.CONTENT_ValidPortalId);
             this._folderInfo.Setup(fi => fi.FolderID).Returns(Constants.FOLDER_ValidFolderId);
 
@@ -121,68 +149,91 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             this._fileManager.Setup(fm => fm.GetFile(this._folderInfo.Object, Constants.FOLDER_ValidFileName)).Returns(file);
 
             var result = this._dfp.FileExists(this._folderInfo.Object, Constants.FOLDER_ValidFileName);
+			mockEventLogger.LogDebug("ExistsFile_Returns_False_When_File_Does_Not_Exist(): result → {Result}", result);
 
             Assert.That(result, Is.False);
+			mockEventLogger.LogDebug("<<< Exiting ExistsFile_Returns_False_When_File_Does_Not_Exist()");
         }
 
         [Test]
         public void ExistsFolder_Throws_On_Null_FolderMapping()
         {
+			mockEventLogger.LogDebug(">>> Entering ExistsFolder_Throws_On_Null_FolderMapping()");
             Assert.Throws<ArgumentNullException>(() => this._dfp.FolderExists(Constants.FOLDER_ValidFolderPath, null));
+			mockEventLogger.LogDebug("<<< Exiting ExistsFolder_Throws_On_Null_FolderMapping()");
         }
 
         [Test]
         public void ExistsFolder_Throws_On_Null_FolderPath()
         {
+			mockEventLogger.LogDebug(">>> Entering ExistsFolder_Throws_On_Null_FolderPath()");
             var folderMapping = new FolderMappingInfo();
 
+			mockEventLogger.LogDebug("ExistsFolder_Throws_On_Null_FolderPath(): folderMapping → {FolderMapping}", folderMapping);
             Assert.Throws<ArgumentNullException>(() => this._dfp.FolderExists(null, folderMapping));
+			mockEventLogger.LogDebug("<<< Exiting ExistsFolder_Throws_On_Null_FolderPath()");
         }
 
         [Test]
         public void ExistsFolder_Returns_True_When_Folder_Exists()
         {
+			mockEventLogger.LogDebug(">>> Entering ExistsFolder_Returns_True_When_Folder_Exists()");
             var folderMapping = new FolderMappingInfo();
             folderMapping.PortalID = Constants.CONTENT_ValidPortalId;
+			mockEventLogger.LogDebug("ExistsFolder_Returns_True_When_Folder_Exists(): folderMapping.PortalID → {Arg0}", folderMapping.PortalID);
+			mockEventLogger.LogDebug("ExistsFolder_Returns_True_When_Folder_Exists(): folderMapping → {FolderMapping}", folderMapping);
 
             this._folderManager.Setup(fm => fm.GetFolder(Constants.CONTENT_ValidPortalId, Constants.FOLDER_ValidFolderRelativePath)).Returns(new FolderInfo());
 
             var result = this._dfp.FolderExists(Constants.FOLDER_ValidFolderRelativePath, folderMapping);
+			mockEventLogger.LogDebug("ExistsFolder_Returns_True_When_Folder_Exists(): result → {Result}", result);
 
             Assert.That(result, Is.True);
+			mockEventLogger.LogDebug("<<< Exiting ExistsFolder_Returns_True_When_Folder_Exists()");
         }
 
         [Test]
         public void ExistsFolder_Returns_False_When_Folder_Does_Not_Exist()
         {
+			mockEventLogger.LogDebug(">>> Entering ExistsFolder_Returns_False_When_Folder_Does_Not_Exist()");
             var folderMapping = new FolderMappingInfo();
             folderMapping.PortalID = Constants.CONTENT_ValidPortalId;
+			mockEventLogger.LogDebug("ExistsFolder_Returns_False_When_Folder_Does_Not_Exist(): folderMapping.PortalID → {Arg0}", folderMapping.PortalID);
+			mockEventLogger.LogDebug("ExistsFolder_Returns_False_When_Folder_Does_Not_Exist(): folderMapping → {FolderMapping}", folderMapping);
 
             FolderInfo folder = null;
             this._folderManager.Setup(fm => fm.GetFolder(Constants.CONTENT_ValidPortalId, Constants.FOLDER_ValidFolderRelativePath)).Returns(folder);
 
             var result = this._dfp.FolderExists(Constants.FOLDER_ValidFolderRelativePath, folderMapping);
+			mockEventLogger.LogDebug("ExistsFolder_Returns_False_When_Folder_Does_Not_Exist(): result → {Result}", result);
 
             Assert.That(result, Is.False);
+			mockEventLogger.LogDebug("<<< Exiting ExistsFolder_Returns_False_When_Folder_Does_Not_Exist()");
         }
 
         [Test]
         public void GetFileAttributes_Returns_Null()
         {
+			mockEventLogger.LogDebug(">>> Entering GetFileAttributes_Returns_Null()");
             var result = this._dfp.GetFileAttributes(It.IsAny<IFileInfo>());
 
+			mockEventLogger.LogDebug("GetFileAttributes_Returns_Null(): result → {Result}", result);
             Assert.That(result, Is.Null);
+			mockEventLogger.LogDebug("<<< Exiting GetFileAttributes_Returns_Null()");
         }
 
         [Test]
         public void GetFiles_Throws_On_Null_Folder()
         {
+			mockEventLogger.LogDebug(">>> Entering GetFiles_Throws_On_Null_Folder()");
             Assert.Throws<ArgumentNullException>(() => this._dfp.GetFiles(null));
+			mockEventLogger.LogDebug("<<< Exiting GetFiles_Throws_On_Null_Folder()");
         }
 
         [Test]
         public void GetFiles_Calls_FolderManager_GetFilesByFolder()
         {
+			mockEventLogger.LogDebug(">>> Entering GetFiles_Calls_FolderManager_GetFilesByFolder()");
             var fileInfos = new List<IFileInfo>
             {
                 new FileInfo { FileName = string.Empty },
@@ -195,11 +246,13 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             this._dfp.GetFiles(this._folderInfo.Object);
 
             this._folderManager.Verify(fm => fm.GetFiles(this._folderInfo.Object), Times.Once());
+			mockEventLogger.LogDebug("<<< Exiting GetFiles_Calls_FolderManager_GetFilesByFolder()");
         }
 
         [Test]
         public void GetFiles_Count_Equals_DataProvider_GetFiles_Count()
         {
+			mockEventLogger.LogDebug(">>> Entering GetFiles_Count_Equals_DataProvider_GetFiles_Count()");
             var expectedFiles = new string[] { string.Empty, string.Empty, string.Empty };
 
             var fileInfos = new List<IFileInfo>
@@ -212,15 +265,19 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             this._folderManager.Setup(fm => fm.GetFiles(this._folderInfo.Object)).Returns((IList<IFileInfo>)fileInfos);
 
             var files = this._dfp.GetFiles(this._folderInfo.Object);
+			mockEventLogger.LogDebug("GetFiles_Count_Equals_DataProvider_GetFiles_Count(): files → {Files}", files);
 
             Assert.That(files, Has.Length.EqualTo(expectedFiles.Length));
+			mockEventLogger.LogDebug("<<< Exiting GetFiles_Count_Equals_DataProvider_GetFiles_Count()");
         }
 
         [Test]
         public void GetFiles_Returns_Valid_FileNames_When_Folder_Contains_Files()
         {
+			mockEventLogger.LogDebug(">>> Entering GetFiles_Returns_Valid_FileNames_When_Folder_Contains_Files()");
             var expectedFiles = new string[] { "file1.txt", "file2.txt", "file3.txt" };
 
+			mockEventLogger.LogDebug("GetFiles_Returns_Valid_FileNames_When_Folder_Contains_Files(): expectedFiles → {ExpectedFiles}", expectedFiles);
             var fileInfos = new List<IFileInfo>
             {
                 new FileInfo { FileName = "file1.txt" },
@@ -231,25 +288,32 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             this._folderManager.Setup(fm => fm.GetFiles(this._folderInfo.Object)).Returns((IList<IFileInfo>)fileInfos);
 
             var files = this._dfp.GetFiles(this._folderInfo.Object);
+			mockEventLogger.LogDebug("GetFiles_Returns_Valid_FileNames_When_Folder_Contains_Files(): files → {Files}", files);
 
             Assert.That(files, Is.EqualTo(expectedFiles).AsCollection);
+			mockEventLogger.LogDebug("<<< Exiting GetFiles_Returns_Valid_FileNames_When_Folder_Contains_Files()");
         }
 
         [Test]
         public void GetFileStream_Throws_On_Null_Folder()
         {
+			mockEventLogger.LogDebug(">>> Entering GetFileStream_Throws_On_Null_Folder()");
             Assert.Throws<ArgumentNullException>(() => this._dfp.GetFileStream(null, Constants.FOLDER_ValidFileName));
+			mockEventLogger.LogDebug("<<< Exiting GetFileStream_Throws_On_Null_Folder()");
         }
 
         [Test]
         public void GetFileStream_Throws_On_NullOrEmpty_FileName()
         {
+			mockEventLogger.LogDebug(">>> Entering GetFileStream_Throws_On_NullOrEmpty_FileName()");
             Assert.Throws<ArgumentException>(() => this._dfp.GetFileStream(this._folderInfo.Object, null));
+			mockEventLogger.LogDebug("<<< Exiting GetFileStream_Throws_On_NullOrEmpty_FileName()");
         }
 
         [Test]
         public void GetFileStream_Calls_FileManager_GetFile()
         {
+			mockEventLogger.LogDebug(">>> Entering GetFileStream_Calls_FileManager_GetFile()");
             this._folderInfo.Setup(fi => fi.PortalID).Returns(Constants.CONTENT_ValidPortalId);
             this._folderInfo.Setup(fi => fi.FolderID).Returns(Constants.FOLDER_ValidFolderId);
 
@@ -258,17 +322,20 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             this._dfp.GetFileStream(this._folderInfo.Object, Constants.FOLDER_ValidFileName);
 
             this._fileManager.Verify(fm => fm.GetFile(this._folderInfo.Object, Constants.FOLDER_ValidFileName, true), Times.Once());
+			mockEventLogger.LogDebug("<<< Exiting GetFileStream_Calls_FileManager_GetFile()");
         }
 
         [Test]
         public void GetFileStream_Returns_Valid_Stream_When_File_Exists()
         {
+			mockEventLogger.LogDebug(">>> Entering GetFileStream_Returns_Valid_Stream_When_File_Exists()");
             var validFileBytes = new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
             this._folderInfo.Setup(fi => fi.PortalID).Returns(Constants.CONTENT_ValidPortalId);
             this._folderInfo.Setup(fi => fi.FolderID).Returns(Constants.FOLDER_ValidFolderId);
 
             var _filesTable = new DataTable("Files");
+			mockEventLogger.LogDebug("GetFileStream_Returns_Valid_Stream_When_File_Exists(): _filesTable → {_filesTable}", _filesTable);
             _filesTable.Columns.Add("Content", typeof(byte[]));
 
             _filesTable.Rows.Add(validFileBytes);
@@ -279,6 +346,7 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
                 .Returns(new FileInfo { FileId = Constants.FOLDER_ValidFileId, PortalId = Constants.CONTENT_ValidPortalId });
 
             var result = this._dfp.GetFileStream(this._folderInfo.Object, Constants.FOLDER_ValidFileName);
+			mockEventLogger.LogDebug("GetFileStream_Returns_Valid_Stream_When_File_Exists(): result → {Result}", result);
 
             byte[] resultBytes;
             var buffer = new byte[16 * 1024];
@@ -294,11 +362,13 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             }
 
             Assert.That(resultBytes, Is.EqualTo(validFileBytes));
+			mockEventLogger.LogDebug("<<< Exiting GetFileStream_Returns_Valid_Stream_When_File_Exists()");
         }
 
         [Test]
         public void GetFileStream_Returns_Null_When_File_Does_Not_Exist()
         {
+			mockEventLogger.LogDebug(">>> Entering GetFileStream_Returns_Null_When_File_Does_Not_Exist()");
             this._folderInfo.Setup(fi => fi.PortalID).Returns(Constants.CONTENT_ValidPortalId);
             this._folderInfo.Setup(fi => fi.FolderID).Returns(Constants.FOLDER_ValidFolderId);
 
@@ -306,50 +376,66 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
                 .Returns((IFileInfo)null);
 
             var result = this._dfp.GetFileStream(this._folderInfo.Object, Constants.FOLDER_ValidFileName);
+			mockEventLogger.LogDebug("GetFileStream_Returns_Null_When_File_Does_Not_Exist(): result → {Result}", result);
 
             Assert.That(result, Is.Null);
+			mockEventLogger.LogDebug("<<< Exiting GetFileStream_Returns_Null_When_File_Does_Not_Exist()");
         }
 
         [Test]
         public void GetImageUrl_Calls_IconControllerWrapper_IconURL()
         {
+			mockEventLogger.LogDebug(">>> Entering GetImageUrl_Calls_IconControllerWrapper_IconURL()");
             var iconControllerWrapper = new Mock<IIconController>();
             IconControllerWrapper.RegisterInstance(iconControllerWrapper.Object);
+			mockEventLogger.LogDebug("GetImageUrl_Calls_IconControllerWrapper_IconURL(): iconControllerWrapper → {IconControllerWrapper}", iconControllerWrapper);
 
             this._dfp.GetFolderProviderIconPath();
 
             iconControllerWrapper.Verify(icw => icw.IconURL("FolderDatabase", "32x32"), Times.Once());
+			mockEventLogger.LogDebug("<<< Exiting GetImageUrl_Calls_IconControllerWrapper_IconURL()");
         }
 
         [Test]
         public void GetLastModificationTime_Returns_Null_Date()
         {
+			mockEventLogger.LogDebug(">>> Entering GetLastModificationTime_Returns_Null_Date()");
             var expectedResult = Null.NullDate;
 
             var result = this._dfp.GetLastModificationTime(this._fileInfo.Object);
+			mockEventLogger.LogDebug("GetLastModificationTime_Returns_Null_Date(): result → {Result}", result);
 
             Assert.That(result, Is.EqualTo(expectedResult));
+			mockEventLogger.LogDebug("<<< Exiting GetLastModificationTime_Returns_Null_Date()");
         }
 
         [Test]
         public void GetSubFolders_Throws_On_Null_FolderMapping()
         {
+			mockEventLogger.LogDebug(">>> Entering GetSubFolders_Throws_On_Null_FolderMapping()");
             Assert.Throws<ArgumentNullException>(() => this._dfp.GetSubFolders(Constants.FOLDER_ValidFolderPath, null).ToList());
+			mockEventLogger.LogDebug("<<< Exiting GetSubFolders_Throws_On_Null_FolderMapping()");
         }
 
         [Test]
         public void GetSubFolders_Throws_On_Null_FolderPath()
         {
+			mockEventLogger.LogDebug(">>> Entering GetSubFolders_Throws_On_Null_FolderPath()");
             var folderMappingInfo = new FolderMappingInfo();
 
+			mockEventLogger.LogDebug("GetSubFolders_Throws_On_Null_FolderPath(): folderMappingInfo → {FolderMappingInfo}", folderMappingInfo);
             Assert.Throws<ArgumentNullException>(() => this._dfp.GetSubFolders(null, folderMappingInfo).ToList());
+			mockEventLogger.LogDebug("<<< Exiting GetSubFolders_Throws_On_Null_FolderPath()");
         }
 
         [Test]
         public void GetSubFolders_Calls_FolderManager_GetFoldersByParentFolder()
         {
+			mockEventLogger.LogDebug(">>> Entering GetSubFolders_Calls_FolderManager_GetFoldersByParentFolder()");
             var folderMapping = new FolderMappingInfo();
             folderMapping.PortalID = Constants.CONTENT_ValidPortalId;
+			mockEventLogger.LogDebug("GetSubFolders_Calls_FolderManager_GetFoldersByParentFolder(): folderMapping.PortalID → {Arg0}", folderMapping.PortalID);
+			mockEventLogger.LogDebug("GetSubFolders_Calls_FolderManager_GetFoldersByParentFolder(): folderMapping → {FolderMapping}", folderMapping);
 
             this._folderManager.Setup(fm => fm.GetFolder(Constants.CONTENT_ValidPortalId, Constants.FOLDER_ValidFolderRelativePath)).Returns(this._folderInfo.Object);
             this._folderManager.Setup(fm => fm.GetFolders(this._folderInfo.Object)).Returns(new List<IFolderInfo>());
@@ -357,13 +443,17 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             this._dfp.GetSubFolders(Constants.FOLDER_ValidFolderRelativePath, folderMapping).ToList();
 
             this._folderManager.Verify(fm => fm.GetFolders(this._folderInfo.Object), Times.Once());
+			mockEventLogger.LogDebug("<<< Exiting GetSubFolders_Calls_FolderManager_GetFoldersByParentFolder()");
         }
 
         [Test]
         public void GetSubFolders_Count_Equals_DataProvider_GetFoldersByParentFolder_Count()
         {
+			mockEventLogger.LogDebug(">>> Entering GetSubFolders_Count_Equals_DataProvider_GetFoldersByParentFolder_Count()");
             var folderMapping = new FolderMappingInfo();
             folderMapping.PortalID = Constants.CONTENT_ValidPortalId;
+			mockEventLogger.LogDebug("GetSubFolders_Count_Equals_DataProvider_GetFoldersByParentFolder_Count(): folderMapping.PortalID → {Arg0}", folderMapping.PortalID);
+			mockEventLogger.LogDebug("GetSubFolders_Count_Equals_DataProvider_GetFoldersByParentFolder_Count(): folderMapping → {FolderMapping}", folderMapping);
 
             var subFolders = new List<IFolderInfo>()
             {
@@ -375,13 +465,16 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             this._folderManager.Setup(fm => fm.GetFolders(this._folderInfo.Object)).Returns(subFolders);
 
             var result = this._dfp.GetSubFolders(Constants.FOLDER_ValidFolderRelativePath, folderMapping).ToList();
+			mockEventLogger.LogDebug("GetSubFolders_Count_Equals_DataProvider_GetFoldersByParentFolder_Count(): result → {Result}", result);
 
             Assert.That(result, Has.Count.EqualTo(subFolders.Count));
+			mockEventLogger.LogDebug("<<< Exiting GetSubFolders_Count_Equals_DataProvider_GetFoldersByParentFolder_Count()");
         }
 
         [Test]
         public void GetSubFolders_Returns_Valid_SubFolders_When_Folder_Is_Not_Empty()
         {
+			mockEventLogger.LogDebug(">>> Entering GetSubFolders_Returns_Valid_SubFolders_When_Folder_Is_Not_Empty()");
             var expectedResult = new List<string>
             {
                 Constants.FOLDER_ValidSubFolderRelativePath,
@@ -389,6 +482,8 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             };
 
             var folderMapping = new FolderMappingInfo();
+			mockEventLogger.LogDebug("GetSubFolders_Returns_Valid_SubFolders_When_Folder_Is_Not_Empty(): folderMapping → {FolderMapping}", folderMapping);
+			mockEventLogger.LogDebug("GetSubFolders_Returns_Valid_SubFolders_When_Folder_Is_Not_Empty(): folderMapping.PortalID → {Arg0}", folderMapping.PortalID);
             folderMapping.PortalID = Constants.CONTENT_ValidPortalId;
 
             var subFolders = new List<IFolderInfo>
@@ -401,32 +496,43 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             this._folderManager.Setup(fm => fm.GetFolders(this._folderInfo.Object)).Returns(subFolders);
 
             var result = this._dfp.GetSubFolders(Constants.FOLDER_ValidFolderRelativePath, folderMapping).ToList();
+			mockEventLogger.LogDebug("GetSubFolders_Returns_Valid_SubFolders_When_Folder_Is_Not_Empty(): result → {Result}", result);
 
             Assert.That(result, Is.EqualTo(expectedResult).AsCollection);
+			mockEventLogger.LogDebug("<<< Exiting GetSubFolders_Returns_Valid_SubFolders_When_Folder_Is_Not_Empty()");
         }
 
         [Test]
         public void IsInSync_Returns_True()
         {
+			mockEventLogger.LogDebug(">>> Entering IsInSync_Returns_True()");
             var result = this._dfp.IsInSync(It.IsAny<IFileInfo>());
 
+			mockEventLogger.LogDebug("IsInSync_Returns_True(): result → {Result}", result);
             Assert.That(result, Is.True);
+			mockEventLogger.LogDebug("<<< Exiting IsInSync_Returns_True()");
         }
 
         [Test]
         public void SupportsFileAttributes_Returns_False()
         {
+			mockEventLogger.LogDebug(">>> Entering SupportsFileAttributes_Returns_False()");
             var result = this._dfp.SupportsFileAttributes();
 
+			mockEventLogger.LogDebug("SupportsFileAttributes_Returns_False(): result → {Result}", result);
             Assert.That(result, Is.False);
+			mockEventLogger.LogDebug("<<< Exiting SupportsFileAttributes_Returns_False()");
         }
 
         [Test]
         public void UpdateFile_Throws_On_Null_Folder()
         {
+			mockEventLogger.LogDebug(">>> Entering UpdateFile_Throws_On_Null_Folder()");
             var stream = new Mock<Stream>();
 
+			mockEventLogger.LogDebug("UpdateFile_Throws_On_Null_Folder(): stream → {Stream}", stream);
             Assert.Throws<ArgumentNullException>(() => this._dfp.UpdateFile(null, Constants.FOLDER_ValidFileName, stream.Object));
+			mockEventLogger.LogDebug("<<< Exiting UpdateFile_Throws_On_Null_Folder()");
         }
 
         [Test]
@@ -434,14 +540,18 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
         [TestCase("")]
         public void UpdateFile_Throws_On_NullOrEmpty_FileName(string fileName)
         {
+			mockEventLogger.LogDebug(">>> Entering UpdateFile_Throws_On_NullOrEmpty_FileName(fileName={FileName})", fileName);
             var stream = new Mock<Stream>();
 
+			mockEventLogger.LogDebug("UpdateFile_Throws_On_NullOrEmpty_FileName(fileName={FileName}): stream → {Stream}", fileName, stream);
             Assert.Throws<ArgumentException>(() => this._dfp.UpdateFile(this._folderInfo.Object, fileName, stream.Object));
+			mockEventLogger.LogDebug("<<< Exiting UpdateFile_Throws_On_NullOrEmpty_FileName(fileName={FileName})", fileName);
         }
 
         [Test]
         public void UpdateFile_Calls_DataProvider_UpdateFileContent_When_File_Exists()
         {
+			mockEventLogger.LogDebug(">>> Entering UpdateFile_Calls_DataProvider_UpdateFileContent_When_File_Exists()");
             this._folderInfo.Setup(fi => fi.PortalID).Returns(Constants.CONTENT_ValidPortalId);
             this._folderInfo.Setup(fi => fi.FolderID).Returns(Constants.FOLDER_ValidFolderId);
 
@@ -452,11 +562,13 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             this._dfp.UpdateFile(this._folderInfo.Object, Constants.FOLDER_ValidFileName, new MemoryStream(new byte[16 * 1024]));
 
             this._mockData.Verify(md => md.UpdateFileContent(Constants.FOLDER_ValidFileId, It.IsAny<byte[]>()), Times.Once());
+			mockEventLogger.LogDebug("<<< Exiting UpdateFile_Calls_DataProvider_UpdateFileContent_When_File_Exists()");
         }
 
         [Test]
         public void UpdateFile_Does_Not_Call_DataProvider_UpdateFileContent_When_File_Does_Not_Exist()
         {
+			mockEventLogger.LogDebug(">>> Entering UpdateFile_Does_Not_Call_DataProvider_UpdateFileContent_When_File_Does_Not_Exist()");
             this._folderInfo.Setup(fi => fi.PortalID).Returns(Constants.CONTENT_ValidPortalId);
             this._folderInfo.Setup(fi => fi.FolderID).Returns(Constants.FOLDER_ValidFolderId);
 
@@ -465,6 +577,7 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
             this._dfp.UpdateFile(this._folderInfo.Object, Constants.FOLDER_ValidFileName, null);
 
             this._mockData.Verify(md => md.UpdateFileContent(It.IsAny<int>(), It.IsAny<byte[]>()), Times.Never());
+			mockEventLogger.LogDebug("<<< Exiting UpdateFile_Does_Not_Call_DataProvider_UpdateFileContent_When_File_Does_Not_Exist()");
         }
     }
 }

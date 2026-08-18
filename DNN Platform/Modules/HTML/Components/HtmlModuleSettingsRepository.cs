@@ -13,6 +13,7 @@ namespace DotNetNuke.Modules.Html.Components
     using DotNetNuke.Entities.Portals;
 
     using Microsoft.Extensions.DependencyInjection;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>The <see cref="SettingsRepository{T}"/> used for storing and retrieving <see cref="HtmlModuleSettings"/>.</summary>
     /// <param name="moduleController">The module controller.</param>
@@ -26,11 +27,14 @@ namespace DotNetNuke.Modules.Html.Components
             hostSettingsService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>(),
             portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>())
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>Initializes a new instance of the <see cref="HtmlModuleSettingsRepository"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public HtmlModuleSettingsRepository()
             : this(null, null, null, null)
         {
+		_logger.LogDebug(">>> Entering HtmlModuleSettingsRepository()");
+		_logger.LogDebug("<<< Exiting HtmlModuleSettingsRepository()");
         }
     }
 }

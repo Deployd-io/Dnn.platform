@@ -48,6 +48,8 @@ namespace log4net.Util
         /// </remarks>
         public FormattingInfo() 
         {
+		value.LogDebug(">>> Entering FormattingInfo()");
+		value.LogDebug("<<< Exiting FormattingInfo()");
         }
 
         /// <summary>
@@ -61,9 +63,13 @@ namespace log4net.Util
         /// </remarks>
         public FormattingInfo(int min, int max, bool leftAlign) 
         {
+			value.LogDebug(">>> Entering FormattingInfo(min={Min},max={Max},leftAlign={LeftAlign})", min, max, leftAlign);
             this.m_min = min;
             this.m_max = max;
+			value.LogDebug("FormattingInfo(min={Min},max={Max},leftAlign={LeftAlign}): this.m_min → {Arg3}", min, max, leftAlign, this.m_min);
+			value.LogDebug("FormattingInfo(min={Min},max={Max},leftAlign={LeftAlign}): m_max → {M_max}", min, max, leftAlign, m_max);
             this.m_leftAlign = leftAlign;
+			value.LogDebug("<<< Exiting FormattingInfo(min={Min},max={Max},leftAlign={LeftAlign})", min, max, leftAlign);
         }
 
         /// <summary>

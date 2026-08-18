@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import styles from "./style.module.less";
 import Localization from "../../localization";
+const logger = console;
 import {
     templateActions as TemplateActions
 } from "../../actions";
@@ -12,13 +13,17 @@ import {
 class SaveAsTemplate extends Component {
 
     onChangeField(key, event) {
+		logger.debug(`>>> Entering onChangeField(key=${key},event=${event})`);
         const {onChangeField} = this.props;
         onChangeField(key, event.target.value);
+		logger.debug(`<<< Exiting onChangeField(key=${key},event=${event})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {template, onChangeField, onSave, onCancel, errors} = this.props;
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.saveAsTemplate}>
                 <div className="saveAsTemplateDetail">
@@ -81,6 +86,8 @@ SaveAsTemplate.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         template: state.template.template,
         errors: state.template.errors
@@ -88,6 +95,8 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+	logger.debug(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`);
+	logger.debug(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`);
     return bindActionCreators({
         onChangeField: TemplateActions.changeTemplateField,
         onSave: TemplateActions.savePageAsTemplate
