@@ -2,6 +2,7 @@ import { IRoleGroup } from '@dnncommunity/dnn-elements/dist/types/components/dnn
 import { IRole } from '@dnncommunity/dnn-elements/dist/types/components/dnn-permissions-grid/role-interface';
 import { Component, Element, Event, EventEmitter, Host, h, State, Prop } from '@stencil/core';
 import state from '../../store/store';
+const logger = console;
 import { FolderDetails, ItemsClient, SaveFolderDetailsRequest } from '../../services/ItemsClient';
 import { IPermissionDefinition, IPermissions,  IRolePermission, IUserPermission } from '@dnncommunity/dnn-elements/dist/types/components/dnn-permissions-grid/permissions-interface';
 import { ISearchedUser } from '@dnncommunity/dnn-elements/dist/types/components/dnn-permissions-grid/searched-user-interface';
@@ -34,12 +35,16 @@ export class DnnRmEditFolder {
   private itemsClient: ItemsClient;
 
   constructor() {
+	logger.debug('>>> Entering constructor()');
     this.itemsClient = new ItemsClient(state.moduleId);
+	logger.debug('<<< Exiting constructor()');
   }
 
   async componentWillLoad() {
+	logger.debug('>>> Entering componentWillLoad()');
     try {
       const data = await this.itemsClient.getFolderDetails(this.folderId);
+	logger.debug(`componentWillLoad(): data → ${data}`);
       this.folderDetails = {
           ...data,
           permissions: {
@@ -98,18 +103,22 @@ export class DnnRmEditFolder {
         this.roles = await this.itemsClient.getRoles();
     } catch (error) {
       alert (error);
+	logger.debug('<<< Exiting componentWillLoad()');
     }
   }
 
   private async closeModal() {
+	logger.debug('>>> Entering closeModal()');
     const modal = this.el.parentElement as HTMLDnnModalElement;
     await modal.hide();
     setTimeout(() => {
       document.body.removeChild(modal);
     }, 300);
+	logger.debug('<<< Exiting closeModal()');
   }
 
   private async handleSave() {
+	logger.debug('>>> Entering handleSave()');
     try {
       const folderDetails: SaveFolderDetailsRequest = {
         folderId: this.folderId,
@@ -121,12 +130,14 @@ export class DnnRmEditFolder {
       await this.closeModal();
     } catch (error) {
       alert(error);
+	logger.debug('<<< Exiting handleSave()');
     }
   }
 
   private handlePermissionsChanged(newPermissions: IPermissions): void {
     // Get previous role permissions and adjust related permissions
     newPermissions.rolePermissions.forEach(rolePermission => {
+	logger.debug(`>>> Entering handlePermissionsChanged(newPermissions=${newPermissions})`);
       const previousPermissions = this.lastPermissions?.rolePermissions?.find(p => p.roleId === rolePermission.roleId)?.permissions ?? [];
       this.adjustRelatedPermissions(rolePermission, previousPermissions);
     });
@@ -134,6 +145,7 @@ export class DnnRmEditFolder {
     // Get previous user permissions and adjust related permissions
     newPermissions.userPermissions.forEach(userPermission => {
       const previousPermissions = this.lastPermissions?.userPermissions?.find(p => p.userId === userPermission.userId)?.permissions ?? [];
+	logger.debug(`handlePermissionsChanged(newPermissions=${newPermissions}): previousPermissions → ${previousPermissions}`);
       this.adjustRelatedPermissions(userPermission, previousPermissions);
     });
   
@@ -143,8 +155,11 @@ export class DnnRmEditFolder {
       permissions: newPermissions,
     };
   
+	logger.debug(`handlePermissionsChanged(newPermissions=${newPermissions}): this.folderDetails → ${this.folderDetails}`);
     // Update the last known permissions state
     this.lastPermissions = newPermissions;
+	logger.debug(`handlePermissionsChanged(newPermissions=${newPermissions}): this.lastPermissions → ${this.lastPermissions}`);
+	logger.debug(`<<< Exiting handlePermissionsChanged(newPermissions=${newPermissions})`);
   }
   
   private adjustRelatedPermissions(permission: IRolePermission | IUserPermission, previousPermissions: IPermissionDefinition[]): void {
@@ -155,16 +170,23 @@ export class DnnRmEditFolder {
     };
   
     const viewPermission = permission.permissions.find(p => p.permissionId === permissionIds.view);
+	logger.debug(`adjustRelatedPermissions(permission=${permission},previousPermissions=${previousPermissions}): viewPermission → ${viewPermission}`);
     const browsePermission = permission.permissions.find(p => p.permissionId === permissionIds.browse);
+	logger.debug(`adjustRelatedPermissions(permission=${permission},previousPermissions=${previousPermissions}): browsePermission → ${browsePermission}`);
     const writePermission = permission.permissions.find(p => p.permissionId === permissionIds.write);
+	logger.debug(`adjustRelatedPermissions(permission=${permission},previousPermissions=${previousPermissions}): writePermission → ${writePermission}`);
 
     // Check if specific permissions have changed from the last known state
     const viewChanged = viewPermission && this.hasPermissionChanged(previousPermissions, viewPermission, permissionIds.view);
+	logger.debug(`adjustRelatedPermissions(permission=${permission},previousPermissions=${previousPermissions}): viewChanged → ${viewChanged}`);
     const browseChanged = browsePermission && this.hasPermissionChanged(previousPermissions, browsePermission, permissionIds.browse);
+	logger.debug(`adjustRelatedPermissions(permission=${permission},previousPermissions=${previousPermissions}): browseChanged → ${browseChanged}`);
     const writeChanged = writePermission && this.hasPermissionChanged(previousPermissions, writePermission, permissionIds.write);
+	logger.debug(`adjustRelatedPermissions(permission=${permission},previousPermissions=${previousPermissions}): writeChanged → ${writeChanged}`);
 
     // If view permission is denied, then deny all other permissions
     if (viewChanged && !viewPermission.allowAccess) {
+	logger.debug(`>>> Entering adjustRelatedPermissions(permission=${permission},previousPermissions=${previousPermissions})`);
       if (browsePermission != null) {
         browsePermission.allowAccess = false;
       }
@@ -196,8 +218,10 @@ export class DnnRmEditFolder {
       }
     }
   
+	logger.debug(`adjustRelatedPermissions(permission=${permission},previousPermissions=${previousPermissions}): permission.permissions → ${permission.permissions}`);
     // If write was allowed, then allow all other permissions
     if (writeChanged && writePermission.allowAccess) {
+	logger.debug(`<<< Exiting adjustRelatedPermissions(permission=${permission},previousPermissions=${previousPermissions})`);
       permission.permissions = [
         ...permission.permissions.filter(p => ![permissionIds.view, permissionIds.browse].includes(p.permissionId)), 
         {
@@ -222,19 +246,26 @@ export class DnnRmEditFolder {
   }
 
   private hasPermissionChanged(lastPermissions: IPermissionDefinition[], currentPermission: IPermissionDefinition, permissionId: number): boolean {
+	logger.debug(`>>> Entering hasPermissionChanged(lastPermissions=${lastPermissions},currentPermission=${currentPermission},permissionId=${permissionId})`);
     const lastPermission = lastPermissions.find(p => p.permissionId === permissionId)
+	logger.debug(`hasPermissionChanged(lastPermissions=${lastPermissions},currentPermission=${currentPermission},permissionId=${permissionId}): lastPermission → ${lastPermission}`);
+	logger.debug(`<<< Exiting hasPermissionChanged(lastPermissions=${lastPermissions},currentPermission=${currentPermission},permissionId=${permissionId})`);
     return lastPermission !=null || JSON.stringify(lastPermission) !== JSON.stringify(currentPermission);
   }
 
   private async handleUserSearchQueryChanged(detail: string) {
+	logger.debug(`>>> Entering handleUserSearchQueryChanged(detail=${detail})`);
     try {
       this.foundUsers = await this.itemsClient.searchUsers(detail);
     } catch (error) {
       alert(error);
+	logger.debug(`<<< Exiting handleUserSearchQueryChanged(detail=${detail})`);
     }
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         <h2>{state.localization?.Edit}</h2>

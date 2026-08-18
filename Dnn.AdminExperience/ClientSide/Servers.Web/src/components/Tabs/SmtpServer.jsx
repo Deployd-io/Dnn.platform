@@ -11,21 +11,28 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import SmtpServerTabActions from "../../actions/smtpServerTab";
 import utils from "../../utils";
+const logger = console;
 
 class SmtpServer extends Component {
     componentDidMount() {
+	logger.debug('>>> Entering componentDidMount()');
 
         const loadSettings = () => {
+			logger.debug('>>> Entering loadSettings()');
             const selectedSmtpSettings = this.getSelectedSmtpSettings();
       
             this.onChangeAuthProvider({value: selectedSmtpSettings.authProvider}, true);
+			logger.debug('<<< Exiting loadSettings()');
+			logger.debug(`loadSettings(): selectedSmtpSettings → ${selectedSmtpSettings}`);
         };
 
         this.props.onRetrieveSmtpServerInfo(loadSettings.bind(this));
         this.props.onRetrieveAuthProviders(loadSettings.bind(this));
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     UNSAFE_componentWillReceiveProps(newProps) {
+		logger.debug(`>>> Entering UNSAFE_componentWillReceiveProps(newProps=${newProps})`);
         if (
             this.props.infoMessage !== newProps.infoMessage &&
       newProps.infoMessage
@@ -47,28 +54,39 @@ class SmtpServer extends Component {
     }
 
     onChangeSmtpServerMode(mode) {
+		logger.debug(`>>> Entering onChangeSmtpServerMode(mode=${mode})`);
         const loadSettings = () => {
             const selectedSmtpSettings = this.getSelectedSmtpSettings();
             this.onChangeAuthProvider({value: selectedSmtpSettings.authProvider}, true);
         };
     
         this.props.onChangeSmtpServerMode(mode, loadSettings.bind(this));
+		logger.debug(`<<< Exiting onChangeSmtpServerMode(mode=${mode})`);
     }
 
     onChangeAuthenticationMode(authentication) {
+		logger.debug(`>>> Entering onChangeAuthenticationMode(authentication=${authentication})`);
         this.props.onChangeSmtpAuthentication(authentication);
+		logger.debug(`<<< Exiting onChangeAuthenticationMode(authentication=${authentication})`);
     }
 
     onChangeSmtpEnableSsl(enabled) {
+		logger.debug(`>>> Entering onChangeSmtpEnableSsl(enabled=${enabled})`);
         this.props.onChangeSmtpConfigurationValue("enableSmtpSsl", enabled);
+		logger.debug(`<<< Exiting onChangeSmtpEnableSsl(enabled=${enabled})`);
     }
 
     onChangeField(key, event) {
+		logger.debug(`>>> Entering onChangeField(key=${key},event=${event})`);
         this.props.onChangeSmtpConfigurationValue(key, event.target.value);
+		logger.debug(`<<< Exiting onChangeField(key=${key},event=${event})`);
     }
 
     onChangeAuthProvider(provider, passCheck) {
+		logger.debug(`>>> Entering onChangeAuthProvider(provider=${provider},passCheck=${passCheck})`);
         const authProvider = this.getSelectedAuthProviders().filter(function (item) {
+			logger.debug('>>> Entering filter()');
+			logger.debug('<<< Exiting filter()');
             return item.name === provider.value;
         }).pop();
 
@@ -90,12 +108,15 @@ class SmtpServer extends Component {
             }
         }
         this.props.onChangeSmtpConfigurationValue("authProviderSettings", settings, passCheck);
+		logger.debug(`<<< Exiting onChangeAuthProvider(provider=${provider},passCheck=${passCheck})`);
     }
 
     onChangeAuthSetting(name, event) {
+		logger.debug(`>>> Entering onChangeAuthSetting(name=${name},event=${event})`);
         const { props } = this;
 
         const selectedSmtpSettings = this.getSelectedSmtpSettings();
+		logger.debug(`onChangeAuthSetting(name=${name},event=${event}): selectedSmtpSettings → ${selectedSmtpSettings}`);
         const settings = selectedSmtpSettings.authProviderSettings;
 
         let newSettings = [];
@@ -111,15 +132,18 @@ class SmtpServer extends Component {
         }
 
         props.onChangeSmtpConfigurationValue("authProviderSettings", newSettings);
+		logger.debug(`<<< Exiting onChangeAuthSetting(name=${name},event=${event})`);
     }
 
     onSave() {
+		logger.debug('>>> Entering onSave()');
         const { props } = this;
 
         if (this.areThereValidationError()) {
             return;
         }
 
+		logger.debug('<<< Exiting onSave()');
         const smtpSettings =
       props.smtpServerInfo.smtpServerMode === "h" && utils.isHostUser()
           ? props.smtpServerInfo.host
@@ -144,27 +168,33 @@ class SmtpServer extends Component {
     }
 
     toDictionary(settings) {
+		logger.debug(`>>> Entering toDictionary(settings=${settings})`);
         let dict = {};
         settings = settings || [];
         for (let i = 0; i < settings.length; i++) {
             dict[settings[i].name] = settings[i].value;
         }
 
+		logger.debug(`<<< Exiting toDictionary(settings=${settings})`);
         return dict;
     }
 
     getSelectedSmtpSettings() {
+		logger.debug('>>> Entering getSelectedSmtpSettings()');
         const { props } = this;
 
         const areGlobalSettings = props.smtpServerInfo.smtpServerMode === "h";
+		logger.debug(`getSelectedSmtpSettings(): areGlobalSettings → ${areGlobalSettings}`);
         const selectedSmtpSettings =
         (areGlobalSettings
             ? props.smtpServerInfo.host
             : props.smtpServerInfo.site) || {};
+		logger.debug('<<< Exiting getSelectedSmtpSettings()');
         return selectedSmtpSettings;
     }
 
     getSelectedAuthProviders() {
+		logger.debug('>>> Entering getSelectedAuthProviders()');
         const { props } = this;
 
         if (typeof props.smtpServerInfo === "undefined" || typeof props.authProviders === "undefined") {
@@ -172,10 +202,12 @@ class SmtpServer extends Component {
         }
 
         const isGlobal = props.smtpServerInfo.smtpServerMode === "h";
+		logger.debug('<<< Exiting getSelectedAuthProviders()');
         return (isGlobal ? props.authProviders.host : props.authProviders.site) || [];
     }
 
     areThereValidationError() {
+		logger.debug('>>> Entering areThereValidationError()');
         let areErrors = false;
         const errors = this.props.errors;
         for (let prop in errors) {
@@ -184,10 +216,12 @@ class SmtpServer extends Component {
             }
         }
 
+		logger.debug('<<< Exiting areThereValidationError()');
         return areErrors;
     }
 
     onTestSmtpSettings() {
+		logger.debug('>>> Entering onTestSmtpSettings()');
         const { props } = this;
 
         if (this.areThereValidationError()) {
@@ -220,9 +254,11 @@ class SmtpServer extends Component {
             authProvider: smtpSettings.authProvider
         };
         props.onSendTestEmail(sendEmailRequest);
+		logger.debug('<<< Exiting onTestSmtpSettings()');
     }
 
     onCompleteAuthorize() {
+		logger.debug('>>> Entering onCompleteAuthorize()');
         const selectedSmtpSettings = this.getSelectedSmtpSettings();
         const authProvider = this.getSelectedAuthProviders().filter(function (item) {
             return item.name === selectedSmtpSettings.authProvider;
@@ -240,16 +276,23 @@ class SmtpServer extends Component {
             }).bind(this), 1000);
         }
     
+		logger.debug('<<< Exiting onCompleteAuthorize()');
         return false;
     }
 
     popupWindow(url, title, w, h) {
+		logger.debug(`>>> Entering popupWindow(url=${url},title=${title},w=${w},h=${h})`);
         const left = (screen.width / 2) - (w / 2);
         const top = (screen.height / 2) - (h / 2);
+		logger.debug(`popupWindow(url=${url},title=${title},w=${w},h=${h}): left → ${left}`);
+		logger.debug(`popupWindow(url=${url},title=${title},w=${w},h=${h}): top → ${top}`);
+		logger.debug(`<<< Exiting popupWindow(url=${url},title=${title},w=${w},h=${h})`);
         return window.open(url, title, "toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=" + w + ", height=" + h + ", top=" + top + ", left=" + left);
     }
 
     getSmtpServerOptions() {
+		logger.debug('>>> Entering getSmtpServerOptions()');
+		logger.debug('<<< Exiting getSmtpServerOptions()');
         return [
             {
                 label: localization.get("GlobalSmtpHostSetting"),
@@ -265,6 +308,7 @@ class SmtpServer extends Component {
     }
 
     getSmtpAuthenticationOptions() {
+		logger.debug('>>> Entering getSmtpAuthenticationOptions()');
         const hasAuthProviders = this.getSelectedAuthProviders().length > 0;
         let options = [
             {
@@ -281,6 +325,7 @@ class SmtpServer extends Component {
             }
         ];
 
+		logger.debug(`getSmtpAuthenticationOptions(): hasAuthProviders → ${hasAuthProviders}`);
         if (hasAuthProviders) {
             options.push({
                 label: localization.get("SMTPOAUTH"),
@@ -288,19 +333,25 @@ class SmtpServer extends Component {
             });
         }
 
+		logger.debug('<<< Exiting getSmtpAuthenticationOptions()');
         return options;
     }
 
     renderAuthSettings() {
+		logger.debug('>>> Entering renderAuthSettings()');
         const { props } = this;
 
         const authProvidersOptions = this.getSelectedAuthProviders().map(function (item) {
+			logger.debug('>>> Entering map()');
+			logger.debug('<<< Exiting map()');
             return {label: item.localizedName, value: item.name};
         });
 
         const areGlobalSettings = props.smtpServerInfo.smtpServerMode === "h";
+		logger.debug(`map(): areGlobalSettings → ${areGlobalSettings}`);
         const selectedSmtpSettings = this.getSelectedSmtpSettings();
         const authProvider = this.getSelectedAuthProviders().filter(function (item) {
+			logger.debug(`filter(): authProvider → ${authProvider}`);
             return item.name === selectedSmtpSettings.authProvider;
         }).pop();
 
@@ -355,18 +406,25 @@ class SmtpServer extends Component {
               </div>
             }
         </div>;
+		logger.debug('<<< Exiting renderAuthSettings()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { props } = this;
 
         const areGlobalSettings = props.smtpServerInfo.smtpServerMode === "h";
+		logger.debug(`render(): areGlobalSettings → ${areGlobalSettings}`);
         const selectedSmtpSettings = this.getSelectedSmtpSettings();
+		logger.debug(`render(): selectedSmtpSettings → ${selectedSmtpSettings}`);
         const credentialVisible = selectedSmtpSettings.smtpAuthentication === "1";
         const oauthEnabled = selectedSmtpSettings.smtpAuthentication === "3";
+		logger.debug(`render(): oauthEnabled → ${oauthEnabled}`);
         const smtpSettingsVisible = utils.isHostUser() || !areGlobalSettings;
+		logger.debug(`render(): smtpSettingsVisible → ${smtpSettingsVisible}`);
 
         if (props.smtpServerInfo.hideCoreSettings) {
+		logger.debug('<<< Exiting render()');
             return (
                 <div className="dnn-servers-info-panel-big smtpServerSettingsTab">
                     <div className="warningBox">
@@ -540,6 +598,8 @@ SmtpServer.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         smtpServerInfo: state.smtpServer.smtpServerInfo,
         authProviders: state.smtpServer.authProviders,
@@ -553,6 +613,8 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+	logger.debug(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`);
+	logger.debug(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`);
     return {
         ...bindActionCreators(
             {

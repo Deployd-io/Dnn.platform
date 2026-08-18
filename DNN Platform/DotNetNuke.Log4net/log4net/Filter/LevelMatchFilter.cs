@@ -52,6 +52,8 @@ namespace log4net.Filter
         /// <summary>Default constructor</summary>
         public LevelMatchFilter()
         {
+		log.DebugFormat(">>> Entering LevelMatchFilter()");
+		log.DebugFormat("<<< Exiting LevelMatchFilter()");
         }
 
         /// <summary><see cref="FilterDecision.Accept"/> when matching <see cref="LevelToMatch"/></summary>
@@ -101,14 +103,17 @@ namespace log4net.Filter
         /// </remarks>
         public override FilterDecision Decide(LoggingEvent loggingEvent) 
         {
+			log.DebugFormat(">>> Entering Decide(loggingEvent={0})", loggingEvent);
             if (loggingEvent == null)
             {
+				log.WarnFormat("Throwing ArgumentNullException from Decide(loggingEvent={0})", loggingEvent);
                 throw new ArgumentNullException("loggingEvent");
             }
 
             if (this.m_levelToMatch != null && this.m_levelToMatch == loggingEvent.Level) 
             {
                 // Found match
+			log.DebugFormat("<<< Exiting Decide(loggingEvent={0})", loggingEvent);
                 return this.m_acceptOnMatch ? FilterDecision.Accept : FilterDecision.Deny;
             }
             return FilterDecision.Neutral;

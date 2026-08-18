@@ -2,6 +2,7 @@ import { Component, Host, h } from '@stencil/core';
 import { FolderTreeItem } from '../../services/InternalServicesClient';
 import { ItemsClient } from '../../services/ItemsClient';
 import state from '../../store/store';
+const logger = console;
 
 @Component({
   tag: 'dnn-rm-left-pane',
@@ -13,10 +14,13 @@ export class DnnRmLeftPane {
   private itemsClient: ItemsClient;
 
   constructor() {
+	logger.debug('>>> Entering constructor()');
     this.itemsClient = new ItemsClient(state.moduleId);
+	logger.debug('<<< Exiting constructor()');
   }
 
   private async handleFolderClicked(e: CustomEvent<FolderTreeItem>) {
+	logger.debug(`>>> Entering handleFolderClicked(e=${e})`);
     try {
       state.selectedItems = [];
       state.currentItems = await this.itemsClient.getFolderContent(
@@ -28,10 +32,13 @@ export class DnnRmLeftPane {
       
     } catch (error) {
       alert(error);
+	logger.debug(`<<< Exiting handleFolderClicked(e=${e})`);
     }
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         <dnn-rm-folder-list

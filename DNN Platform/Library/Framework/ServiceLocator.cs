@@ -13,6 +13,7 @@ namespace DotNetNuke.Framework
     public abstract class ServiceLocator<TContract, TSelf>
         where TSelf : ServiceLocator<TContract, TSelf>, new()
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ServiceLocator));
         private static Lazy<TContract> instance = new Lazy<TContract>(InitInstance, true);
         private static TContract testableInstance;
         private static bool useTestable;
@@ -41,8 +42,12 @@ namespace DotNetNuke.Framework
         [SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes", Justification = "Breaking change")]
         public static void SetTestableInstance(TContract instance)
         {
+			Logger.LogDebug(">>> Entering SetTestableInstance(instance={Instance})", instance);
             testableInstance = instance;
             useTestable = true;
+			Logger.LogDebug("SetTestableInstance(instance={Instance}): useTestable → {UseTestable}", instance, useTestable);
+			Logger.LogDebug("SetTestableInstance(instance={Instance}): testableInstance → {TestableInstance}", instance, testableInstance);
+			Logger.LogDebug("<<< Exiting SetTestableInstance(instance={Instance})", instance);
         }
 
         /// <summary>Clears the current instance, a new instance will be initialized when next requested.</summary>
@@ -50,9 +55,13 @@ namespace DotNetNuke.Framework
         [SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes", Justification = "Breaking change")]
         public static void ClearInstance()
         {
+			Logger.LogDebug(">>> Entering ClearInstance()");
             useTestable = false;
             testableInstance = default(TContract);
             instance = new Lazy<TContract>(InitInstance, true);
+			Logger.LogDebug("ClearInstance(): instance → {Instance}", instance);
+			Logger.LogDebug("ClearInstance(): testableInstance → {TestableInstance}", testableInstance);
+			Logger.LogDebug("<<< Exiting ClearInstance()");
         }
 
         /// <summary>Gets the service locator factory.</summary>
@@ -61,12 +70,16 @@ namespace DotNetNuke.Framework
 
         private static TContract InitInstance()
         {
+			Logger.LogDebug(">>> Entering InitInstance()");
             if (Factory == null)
             {
                 var controllerInstance = new TSelf();
+				Logger.LogDebug("InitInstance(): controllerInstance → {ControllerInstance}", controllerInstance);
                 Factory = controllerInstance.GetFactory();
             }
+			Logger.LogDebug("InitInstance(): Factory → {Factory}", Factory);
 
+			Logger.LogDebug("<<< Exiting InitInstance()");
             return Factory();
         }
     }

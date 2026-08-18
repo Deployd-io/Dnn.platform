@@ -1,4 +1,5 @@
 (function () {
+	logger.debug(`>>> Entering function(ko=${ko},ut=${ut},sf=${sf},cf=${cf},eventEmitter=${eventEmitter},Gateway=${Gateway})`);
     'use strict';
 
     var debugMode = window.parent['editBarSettings']['debugMode'] === true;
@@ -20,6 +21,7 @@
         }
         else {
             console.error(err);
+			logger.debug(`<<< Exiting function(debugMode=${debugMode})`);
             throw err;
         }
     };
@@ -47,26 +49,32 @@ require(['jquery', 'knockout', '../util', '../sf', '../config', '../eventEmitter
         var util = {
             sf: sf.init(config.siteRoot, config.tabId, config.antiForgeryToken),
             switchMode: function(mode) {
+				logger.debug(`>>> Entering switchMode(mode=${mode})`);
                 window.top.$('#editBar-iframe').removeClass('small middle').addClass(mode);
+				logger.debug(`<<< Exiting switchMode(mode=${mode})`);
             }
         };
         util = $.extend(util, utility);
         // end define util
 
         var getMenuItem = function(name) {
+			logger.debug(`>>> Entering getMenuItem(name=${name})`);
             for (var i = 0; i < config.items.length; i++) {
                 if (config.items[i].name === name) {
                     return config.items[i];
                 }
             }
 
+			logger.debug(`<<< Exiting getMenuItem(name=${name})`);
             return null;
         }
 
         var getMenuLoader = function (item, callback) {
+			logger.debug(`>>> Entering getMenuLoader(item=${item},callback=${callback})`);
             if (!item.loader && !item.group) {
                 return;
             }
+			logger.debug(`>>> Entering getMenuLoader(menuItem=${menuItem})`);
 
             var loaderName = item.loader || item.group;
             if (typeof menuLoaders[loaderName] !== "undefined") {
@@ -85,11 +93,13 @@ require(['jquery', 'knockout', '../util', '../sf', '../config', '../eventEmitter
             }
 
             window.require(requiredArray, function (loader, html) {
+				logger.debug(`>>> Entering require(requiredArray=${requiredArray},loader=${loader})`);
                 if (typeof loader === "undefined") {
                     return;
                 }
 
                 if (html) {
+					logger.debug(`<<< Exiting require(requiredArray=${requiredArray},loader=${loader})`);
                     html = html.replace(/\[resx:(.+?)\]/gi, function (matches, key) {
                         return item.resx[key] || key;
                     });
@@ -99,11 +109,14 @@ require(['jquery', 'knockout', '../util', '../sf', '../config', '../eventEmitter
                 menuLoaders[loaderName] = loader;
 
                 loader[initMethod].call(loader, item, util, params, function() {
+					logger.debug(`>>> Entering call(loader=${loader},item=${item},util=${util},params=${params},callback=${callback})`);
                     if (typeof callback === "function") {
                         callback(loader);
+						logger.debug(`<<< Exiting call(loader=${loader},item=${item},util=${util},params=${params},callback=${callback})`);
                     }
                 });
             });
+			logger.debug(`<<< Exiting getMenuLoader(item=${item},callback=${callback})`);
         }
 
         util.callAction = function (menuName, actionName, params) {
@@ -118,6 +131,7 @@ require(['jquery', 'knockout', '../util', '../sf', '../config', '../eventEmitter
         }
 
         var loadMenu = function (item) {
+			logger.debug(`>>> Entering loadMenu(item=${item})`);
             if (!item.loader && !item.group) {
                 return;
             }
@@ -130,9 +144,11 @@ require(['jquery', 'knockout', '../util', '../sf', '../config', '../eventEmitter
             if (item.customLayout) {
                 getMenuLoader(item);
             }
+			logger.debug(`<<< Exiting loadMenu(item=${item})`);
         }
 
         var renderMenu = function (menuItem) {
+			logger.debug(`>>> Entering renderMenu(menuItem=${menuItem})`);
             if (menuItem.template) {
                 return menuItem.template;
             } else {
@@ -144,6 +160,7 @@ require(['jquery', 'knockout', '../util', '../sf', '../config', '../eventEmitter
                     menu += '<div class="submenuEditBar">' + tooltip + '</div>';
                 }
 
+				logger.debug(`<<< Exiting renderMenu(menuItem=${menuItem})`);
                 return menu;
             }
         }

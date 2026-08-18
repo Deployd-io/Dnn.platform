@@ -24,36 +24,46 @@ namespace DotNetNuke.Tests.Core.Framework
         [SetUp]
         public void Setup()
         {
+			mockEventLogger.LogDebug(">>> Entering Setup()");
             this.serviceProvider = FakeServiceProvider.Setup(services => services.AddSingleton(Mock.Of<IPortalController>()));
 
+			mockEventLogger.LogDebug("Setup(): serviceProvider → {ServiceProvider}", serviceProvider);
             var simulator = new Instance.Utilities.HttpSimulator.HttpSimulator("/", "c:\\");
+			mockEventLogger.LogDebug("Setup(): simulator → {Simulator}", simulator);
             simulator.SimulateRequest(new Uri("http://localhost/dnn/Default.aspx"));
+			mockEventLogger.LogDebug("<<< Exiting Setup()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			mockEventLogger.LogDebug(">>> Entering TearDown()");
             this.serviceProvider.Dispose();
+			mockEventLogger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void RequestingAjaxAntiForgeryIsNoted()
         {
+			mockEventLogger.LogDebug(">>> Entering RequestingAjaxAntiForgeryIsNoted()");
             var servicesFramework = new ServicesFrameworkImpl(
                 Mock.Of<IApplicationStatusInfo>(),
                 Mock.Of<IEventLogger>());
             servicesFramework.RequestAjaxAntiForgerySupport();
 
             Assert.That(servicesFramework.IsAjaxAntiForgerySupportRequired, Is.True);
+			mockEventLogger.LogDebug("<<< Exiting RequestingAjaxAntiForgeryIsNoted()");
         }
 
         [Test]
         public void NoAjaxAntiForgeryRequestMeansNotRequired()
         {
+			mockEventLogger.LogDebug(">>> Entering NoAjaxAntiForgeryRequestMeansNotRequired()");
             var servicesFramework = new ServicesFrameworkImpl(
                 Mock.Of<IApplicationStatusInfo>(),
                 Mock.Of<IEventLogger>());
             Assert.That(servicesFramework.IsAjaxAntiForgerySupportRequired, Is.False);
+			mockEventLogger.LogDebug("<<< Exiting NoAjaxAntiForgeryRequestMeansNotRequired()");
         }
     }
 }

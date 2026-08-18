@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,10 +13,14 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("velocity", function() {
     function parseWords(str) {
+		logger.debug(`>>> Entering parseWords(str=${str})`);
         var obj = {}, words = str.split(" ");
         for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+		logger.debug(`parseWords(str=${str}): obj → ${obj}`);
+		logger.debug(`<<< Exiting parseWords(str=${str})`);
         return obj;
     }
 
@@ -26,16 +32,23 @@ CodeMirror.defineMode("velocity", function() {
     var isOperatorChar = /[+\-*&%=<>!?:\/|]/;
 
     function chain(stream, state, f) {
+		logger.debug(`>>> Entering chain(stream=${stream},state=${state},f=${f})`);
         state.tokenize = f;
+		logger.debug(`chain(stream=${stream},state=${state},f=${f}): state.tokenize → ${state.tokenize}`);
+		logger.debug(`<<< Exiting chain(stream=${stream},state=${state},f=${f})`);
         return f(stream, state);
     }
     function tokenBase(stream, state) {
+		logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
         var beforeParams = state.beforeParams;
         state.beforeParams = false;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.beforeParams → ${state.beforeParams}`);
         var ch = stream.next();
+		logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
         // start of unparsed string?
         if ((ch == "'") && state.inParams) {
             state.lastTokenWasBuiltin = false;
+			logger.debug(`tokenBase(stream=${stream},state=${state}): state.lastTokenWasBuiltin → ${state.lastTokenWasBuiltin}`);
             return chain(stream, state, tokenString(ch));
         }
         // start of parsed string?
@@ -43,6 +56,7 @@ CodeMirror.defineMode("velocity", function() {
             state.lastTokenWasBuiltin = false;
             if (state.inString) {
                 state.inString = false;
+				logger.debug(`tokenBase(stream=${stream},state=${state}): state.inString → ${state.inString}`);
                 return "string";
             }
             else if (state.inParams)
@@ -54,6 +68,7 @@ CodeMirror.defineMode("velocity", function() {
                 state.inParams = true;
             else if (ch == ")") {
                 state.inParams = false;
+				logger.debug(`tokenBase(stream=${stream},state=${state}): state.inParams → ${state.inParams}`);
                 state.lastTokenWasBuiltin = true;
             }
             return null;
@@ -122,11 +137,13 @@ CodeMirror.defineMode("velocity", function() {
                 return "builtin";
             // default: just a "word"
             state.lastTokenWasBuiltin = false;
+			logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
             return null;
         }
     }
 
     function tokenString(quote) {
+		logger.debug(`>>> Entering tokenString(quote=${quote})`);
         return function(stream, state) {
             var escaped = false, next, end = false;
             while ((next = stream.next()) != null) {
@@ -136,33 +153,42 @@ CodeMirror.defineMode("velocity", function() {
                 }
                 if (quote=='"' && stream.peek() == '$' && !escaped) {
                     state.inString = true;
+					logger.debug(`tokenString(quote=${quote}): state.inString → ${state.inString}`);
                     end = true;
+					logger.debug(`function(stream=${stream},state=${state}): state.inString → ${state.inString}`);
                     break;
                 }
                 escaped = !escaped && next == "\\";
             }
             if (end) state.tokenize = tokenBase;
+			logger.debug(`<<< Exiting tokenString(quote=${quote})`);
             return "string";
         };
     }
 
     function tokenComment(stream, state) {
+		logger.debug(`>>> Entering tokenComment(stream=${stream},state=${state})`);
         var maybeEnd = false, ch;
         while (ch = stream.next()) {
             if (ch == "#" && maybeEnd) {
                 state.tokenize = tokenBase;
+				logger.debug(`tokenComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
                 break;
             }
             maybeEnd = (ch == "*");
         }
+		logger.debug(`tokenComment(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`);
+		logger.debug(`<<< Exiting tokenComment(stream=${stream},state=${state})`);
         return "comment";
     }
 
     function tokenUnparsed(stream, state) {
+		logger.debug(`>>> Entering tokenUnparsed(stream=${stream},state=${state})`);
         var maybeEnd = 0, ch;
         while (ch = stream.next()) {
             if (ch == "#" && maybeEnd == 2) {
                 state.tokenize = tokenBase;
+				logger.debug(`tokenUnparsed(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
                 break;
             }
             if (ch == "]")
@@ -170,12 +196,14 @@ CodeMirror.defineMode("velocity", function() {
             else if (ch != " ")
                 maybeEnd = 0;
         }
+		logger.debug(`<<< Exiting tokenUnparsed(stream=${stream},state=${state})`);
         return "meta";
     }
     // Interface
 
     return {
         startState: function() {
+			logger.debug('>>> Entering startState()');
             return {
                 tokenize: tokenBase,
                 beforeParams: false,
@@ -183,10 +211,13 @@ CodeMirror.defineMode("velocity", function() {
                 inString: false,
                 lastTokenWasBuiltin: false
             };
+			logger.debug('<<< Exiting startState()');
         },
 
         token: function(stream, state) {
+			logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
             if (stream.eatSpace()) return null;
+			logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
             return state.tokenize(stream, state);
         },
         blockCommentStart: "#*",

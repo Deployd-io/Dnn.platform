@@ -8,11 +8,14 @@ namespace DotNetNuke.Services.Assets
 
     public class AssetManagerException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AssetManagerException));
         /// <summary>Initializes a new instance of the <see cref="AssetManagerException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>
         public AssetManagerException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering AssetManagerException(message={Message})", message);
+		Logger.LogDebug("<<< Exiting AssetManagerException(message={Message})", message);
         }
     }
 }

@@ -1,4 +1,6 @@
+const logger = console;
 ﻿(function ($, window, document, undefined) {
+	logger.debug('>>> Entering function()');
     "use strict";
 
     var WebResourceUrl = this.WebResourceUrl = function (pathAndQuery) {
@@ -6,30 +8,46 @@
         this._pathAndQuery = pathAndQuery;
         this._parameters = new dnn.Dictionary();
         this._isInitialized = false;
+		logger.debug(`function(): this._isInitialized → ${this._isInitialized}`);
     };
 
     WebResourceUrl.prototype = {
         constructor: WebResourceUrl,
 
         path: function() {
+			logger.debug('>>> Entering path()');
             this._ensureInitialize();
+			logger.debug(`function(pathAndQuery=${pathAndQuery}): this._isInitialized → ${this._isInitialized}`);
+			logger.debug(`function(): this._path → ${this._path}`);
+			logger.debug(`function(pathAndQuery=${pathAndQuery}): this._path → ${this._path}`);
+			logger.debug(`function(pathAndQuery=${pathAndQuery}): this._pathAndQuery → ${this._pathAndQuery}`);
+			logger.debug(`function(): this._pathAndQuery → ${this._pathAndQuery}`);
+			logger.debug(`function(): WebResourceUrl.prototype → ${WebResourceUrl.prototype}`);
+			logger.debug('<<< Exiting path()');
             return this._path;
         },
 
         parameters: function() {
+			logger.debug('>>> Entering parameters()');
             this._ensureInitialize();
+			logger.debug('<<< Exiting parameters()');
             return this._parameters;
         },
 
         toPathAndQuery: function () {
+			logger.debug('>>> Entering toPathAndQuery()');
             var pathAndQuery = this.path().append(WebResourceUrl.toQueryString(this.parameters()), "?");
+			logger.debug(`toPathAndQuery(): pathAndQuery → ${pathAndQuery}`);
+			logger.debug('<<< Exiting toPathAndQuery()');
             return pathAndQuery;
         },
 
         _ensureInitialize: function () {
+			logger.debug('>>> Entering _ensureInitialize()');
             if (!this._isInitialized) {
                 this._initialize(this._pathAndQuery);
                 this._isInitialized = true;
+				logger.debug('<<< Exiting _ensureInitialize()');
             }
         },
 
@@ -51,6 +69,7 @@
                     }
                 }
             }
+			logger.debug(`<<< Exiting _initialize(pathAndQuery=${pathAndQuery})`);
         }
     };
 

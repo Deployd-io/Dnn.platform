@@ -13,10 +13,14 @@ namespace DotNetNuke.Entities.Modules
     [Serializable]
     public abstract class ControlInfo : BaseEntityInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ControlInfo));
         /// <summary>Initializes a new instance of the <see cref="ControlInfo"/> class.</summary>
         protected ControlInfo()
         {
+			Logger.LogDebug(">>> Entering ControlInfo()");
             this.SupportsPartialRendering = Null.NullBoolean;
+			Logger.LogDebug("ControlInfo(): this.SupportsPartialRendering → {Arg0}", this.SupportsPartialRendering);
+			Logger.LogDebug("<<< Exiting ControlInfo()");
         }
 
         /// <summary>Gets or sets the Control Key.</summary>
@@ -38,15 +42,18 @@ namespace DotNetNuke.Entities.Modules
         /// <param name="dr">The Data Reader to use.</param>
         protected override void FillInternal(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering FillInternal(dr={Dr})", dr);
             // Call EntityBaseInfo's implementation
             base.FillInternal(dr);
             this.ControlKey = Null.SetNullString(dr["ControlKey"]);
             this.ControlSrc = Null.SetNullString(dr["ControlSrc"]);
             this.SupportsPartialRendering = Null.SetNullBoolean(dr["SupportsPartialRendering"]);
+			Logger.LogDebug("<<< Exiting FillInternal(dr={Dr})", dr);
         }
 
         protected void ReadXmlInternal(XmlReader reader)
         {
+			Logger.LogDebug(">>> Entering ReadXmlInternal(reader={Reader})", reader);
             switch (reader.Name)
             {
                 case "controlKey":
@@ -64,14 +71,17 @@ namespace DotNetNuke.Entities.Modules
 
                     break;
             }
+			Logger.LogDebug("<<< Exiting ReadXmlInternal(reader={Reader})", reader);
         }
 
         protected void WriteXmlInternal(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteXmlInternal(writer={Writer})", writer);
             // write out properties
             writer.WriteElementString("controlKey", this.ControlKey);
             writer.WriteElementString("controlSrc", this.ControlSrc);
             writer.WriteElementString("supportsPartialRendering", this.SupportsPartialRendering.ToString());
+			Logger.LogDebug("<<< Exiting WriteXmlInternal(writer={Writer})", writer);
         }
     }
 }

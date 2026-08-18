@@ -1,5 +1,6 @@
 import { Component, Host, h, Event, EventEmitter, Prop } from '@stencil/core';
 import state from "../../../store/store";
+const logger = console;
 
 @Component({
   tag: 'dnn-action-upload-file',
@@ -18,15 +19,21 @@ export class DnnActionUploadFile {
    @Event() dnnRmFoldersChanged: EventEmitter<void>;
 
    private async handleClick() {
+	logger.debug('>>> Entering handleClick()');
     await this.showModal();
+	logger.debug('<<< Exiting handleClick()');
   }
 
   private async showModal(){
+	logger.debug('>>> Entering showModal()');
     const modal = document.createElement("dnn-modal");
     const container = document.createElement("div");
+	logger.debug(`showModal(): modal → ${modal}`);
+	logger.debug(`showModal(): container → ${container}`);
     container.style.overflowY = "auto";
     container.style.maxHeight = "70vh";
     const editor = document.createElement("dnn-rm-upload-file");
+	logger.debug(`showModal(): editor → ${editor}`);
     container.appendChild(editor);
     modal.appendChild(container);
     document.body.appendChild(modal);
@@ -34,9 +41,12 @@ export class DnnActionUploadFile {
     modal.addEventListener('dismissed', () => {
       this.dnnRmFoldersChanged.emit();
     });
+	logger.debug('<<< Exiting showModal()');
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         <button onClick={() => void this.handleClick()}>

@@ -35,6 +35,7 @@ namespace DotNetNuke.Modules.Admin.Users
     /// <summary>The ManageUsers UserModuleBase is used to manage Users.</summary>
     public partial class ManageUsers : UserModuleBase, IActionable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ManageUsers.ascx));
         private readonly INavigationManager navigationManager;
         private readonly IJavaScriptLibraryHelper javaScript;
 
@@ -43,6 +44,11 @@ namespace DotNetNuke.Modules.Admin.Users
         public ManageUsers()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering ManageUsers()");
+		Logger.LogDebug("<<< Exiting ManageUsers()");
+		Logger.LogDebug(">>> Entering ManageUsers(navigationManager={NavigationManager},javaScript={JavaScript})", navigationManager, javaScript);
+		Logger.LogDebug("<<< Exiting ManageUsers(navigationManager={NavigationManager},javaScript={JavaScript})", navigationManager, javaScript);
+		Logger.LogDebug("ManageUsers(navigationManager={NavigationManager},javaScript={JavaScript},listController={ListController},hostSettings={HostSettings}): javaScript → {JavaScript1}", navigationManager, javaScript, listController, hostSettings, javaScript);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ManageUsers"/> class.</summary>
@@ -246,6 +252,7 @@ namespace DotNetNuke.Modules.Admin.Users
         /// <param name="e">The event arguments.</param>
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.cmdCancel.Click += this.cmdCancel_Click;
@@ -311,12 +318,14 @@ namespace DotNetNuke.Modules.Admin.Users
 
                 this.userContainer.CssClass += " register";
             }
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <summary>Page_Load runs when the control is loaded.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             try
@@ -336,8 +345,10 @@ namespace DotNetNuke.Modules.Admin.Users
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
@@ -345,7 +356,9 @@ namespace DotNetNuke.Modules.Admin.Users
         // ReSharper disable once InconsistentNaming
         protected void cmdCancel_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering cmdCancel_Click(sender={Sender},e={E})", sender, e);
             this.Response.Redirect(this.navigationManager.NavigateURL(), true);
+			Logger.LogDebug("<<< Exiting cmdCancel_Click(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>cmdRegister_Click runs when the Register button is clicked.</summary>
@@ -356,6 +369,7 @@ namespace DotNetNuke.Modules.Admin.Users
         // ReSharper disable once InconsistentNaming
         protected void cmdAdd_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering cmdAdd_Click(sender={Sender},e={E})", sender, e);
             if (this.IsAdmin == false && this.HasManageUsersModulePermission() == false)
             {
                 return;
@@ -372,6 +386,7 @@ namespace DotNetNuke.Modules.Admin.Users
                     this.AddLocalizedModuleMessage(UserController.GetUserCreateStatus(this.ctlUser.CreateStatus), ModuleMessage.ModuleMessageType.RedError, true);
                 }
             }
+			Logger.LogDebug("<<< Exiting cmdAdd_Click(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>MembershipPasswordUpdateChanged runs when the Admin has forced the User to update their password.</summary>
@@ -379,6 +394,7 @@ namespace DotNetNuke.Modules.Admin.Users
         /// <param name="e">The event arguments.</param>
         protected void MembershipPasswordUpdateChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering MembershipPasswordUpdateChanged(sender={Sender},e={E})", sender, e);
             if (this.IsAdmin == false)
             {
                 return;
@@ -392,12 +408,15 @@ namespace DotNetNuke.Modules.Admin.Users
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in MembershipPasswordUpdateChanged(sender={Sender},e={E}): {Arg2}", sender, e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting MembershipPasswordUpdateChanged(sender={Sender},e={E})", sender, e);
         }
 
         private void BindData()
         {
+			Logger.LogDebug(">>> Entering BindData()");
             if (this.User != null)
             {
                 // If trying to add a SuperUser - check that user is a SuperUser
@@ -440,6 +459,7 @@ namespace DotNetNuke.Modules.Admin.Users
                     {
                         this.PageNo = 0;
                     }
+					Logger.LogDebug("BindData(): this.PageNo → {Arg0}", this.PageNo);
                 }
 
                 this.ShowPanel();
@@ -449,10 +469,12 @@ namespace DotNetNuke.Modules.Admin.Users
                 this.AddModuleMessage("NoUser", ModuleMessage.ModuleMessageType.YellowWarning, true);
                 this.DisableForm();
             }
+			Logger.LogDebug("<<< Exiting BindData()");
         }
 
         private bool VerifyUserPermissions()
         {
+			Logger.LogDebug(">>> Entering VerifyUserPermissions()");
             if (this.AddUser && this.IsHostMenu && !this.UserInfo.IsSuperUser)
             {
                 this.AddModuleMessage("NoUser", ModuleMessage.ModuleMessageType.YellowWarning, true);
@@ -510,19 +532,23 @@ namespace DotNetNuke.Modules.Admin.Users
                 }
             }
 
+			Logger.LogDebug("<<< Exiting VerifyUserPermissions()");
             return true;
         }
 
         private void BindMembership()
         {
+			Logger.LogDebug(">>> Entering BindMembership()");
             this.ctlMembership.User = this.User;
             this.ctlMembership.DataBind();
             this.AddModuleMessage("UserLockedOut", ModuleMessage.ModuleMessageType.YellowWarning, this.ctlMembership.UserMembership.LockedOut && (!this.Page.IsPostBack));
             this.imgLockedOut.Visible = this.ctlMembership.UserMembership.LockedOut;
+			Logger.LogDebug("<<< Exiting BindMembership()");
         }
 
         private void BindUser()
         {
+			Logger.LogDebug(">>> Entering BindUser()");
             if (this.AddUser)
             {
                 this.ctlUser.ShowUpdate = false;
@@ -541,10 +567,12 @@ namespace DotNetNuke.Modules.Admin.Users
             {
                 this.BindMembership();
             }
+			Logger.LogDebug("<<< Exiting BindUser()");
         }
 
         private void CheckQuota()
         {
+			Logger.LogDebug(">>> Entering CheckQuota()");
             if (this.PortalSettings.Users < this.PortalSettings.UserQuota || this.UserInfo.IsSuperUser || this.PortalSettings.UserQuota == 0)
             {
                 this.cmdAdd.Enabled = true;
@@ -554,10 +582,12 @@ namespace DotNetNuke.Modules.Admin.Users
                 this.cmdAdd.Enabled = false;
                 this.AddModuleMessage("ExceededUserQuota", ModuleMessage.ModuleMessageType.YellowWarning, true);
             }
+			Logger.LogDebug("<<< Exiting CheckQuota()");
         }
 
         private void DisableForm()
         {
+			Logger.LogDebug(">>> Entering DisableForm()");
             this.adminTabNav.Visible = false;
             this.dnnRoleDetails.Visible = false;
             this.dnnPasswordDetails.Visible = false;
@@ -565,10 +595,12 @@ namespace DotNetNuke.Modules.Admin.Users
             this.actionsRow.Visible = false;
             this.ctlMembership.Visible = false;
             this.ctlUser.Visible = false;
+			Logger.LogDebug("<<< Exiting DisableForm()");
         }
 
         private void ShowPanel()
         {
+			Logger.LogDebug(">>> Entering ShowPanel()");
             if (this.AddUser)
             {
                 this.adminTabNav.Visible = false;
@@ -625,10 +657,13 @@ namespace DotNetNuke.Modules.Admin.Users
                     this.dnnPasswordDetails.Visible =
                     this.actionsRow.Visible = false;
             }
+			Logger.LogDebug("<<< Exiting ShowPanel()");
         }
 
         private bool HasManageUsersModulePermission()
         {
+			Logger.LogDebug(">>> Entering HasManageUsersModulePermission()");
+			Logger.LogDebug("<<< Exiting HasManageUsersModulePermission()");
             return ModulePermissionController.HasModulePermission(this.ModuleConfiguration.ModulePermissions, "MANAGEUSER");
         }
 
@@ -637,6 +672,7 @@ namespace DotNetNuke.Modules.Admin.Users
         /// <param name="e">An ActionEventArgs object.</param>
         private void ModuleAction_Click(object sender, ActionEventArgs e)
         {
+			Logger.LogDebug(">>> Entering ModuleAction_Click(sender={Sender},e={E})", sender, e);
             switch (e.Action.CommandArgument)
             {
                 case "ManageRoles":
@@ -654,11 +690,13 @@ namespace DotNetNuke.Modules.Admin.Users
                 default:
                     break;
             }
+			Logger.LogDebug("<<< Exiting ModuleAction_Click(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>MembershipAuthorized runs when the User has been unlocked.</summary>
         private void MembershipAuthorized(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering MembershipAuthorized(sender={Sender},e={E})", sender, e);
             if (this.IsAdmin == false)
             {
                 return;
@@ -679,13 +717,16 @@ namespace DotNetNuke.Modules.Admin.Users
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in MembershipAuthorized(sender={Sender},e={E}): {Arg2}", sender, e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting MembershipAuthorized(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>MembershipPromoteToSuperuser runs when the User has been promoted to a superuser.</summary>
         private void MembershipPromoteToSuperuser(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering MembershipPromoteToSuperuser(sender={Sender},e={E})", sender, e);
             if (this.IsAdmin == false)
             {
                 return;
@@ -699,13 +740,16 @@ namespace DotNetNuke.Modules.Admin.Users
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in MembershipPromoteToSuperuser(sender={Sender},e={E}): {Arg2}", sender, e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting MembershipPromoteToSuperuser(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>MembershipDemoteFromSuperuser runs when the User has been demoted to a regular user.</summary>
         private void MembershipDemoteFromSuperuser(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering MembershipDemoteFromSuperuser(sender={Sender},e={E})", sender, e);
             if (this.IsAdmin == false)
             {
                 return;
@@ -719,13 +763,16 @@ namespace DotNetNuke.Modules.Admin.Users
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in MembershipDemoteFromSuperuser(sender={Sender},e={E}): {Arg2}", sender, e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting MembershipDemoteFromSuperuser(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>MembershipUnAuthorized runs when the User has been unlocked.</summary>
         private void MembershipUnAuthorized(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering MembershipUnAuthorized(sender={Sender},e={E})", sender, e);
             if (this.IsAdmin == false)
             {
                 return;
@@ -739,13 +786,16 @@ namespace DotNetNuke.Modules.Admin.Users
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in MembershipUnAuthorized(sender={Sender},e={E}): {Arg2}", sender, e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting MembershipUnAuthorized(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>MembershipUnLocked runs when the User has been unlocked.</summary>
         private void MembershipUnLocked(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering MembershipUnLocked(sender={Sender},e={E})", sender, e);
             if (this.IsAdmin == false)
             {
                 return;
@@ -758,19 +808,23 @@ namespace DotNetNuke.Modules.Admin.Users
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in MembershipUnLocked(sender={Sender},e={E}): {Arg2}", sender, e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting MembershipUnLocked(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>PasswordQuestionAnswerUpdated runs when the Password Q and A have been updated.</summary>
         private void PasswordQuestionAnswerUpdated(object sender, Password.PasswordUpdatedEventArgs e)
         {
+			Logger.LogDebug(">>> Entering PasswordQuestionAnswerUpdated(sender={Sender},e={E})", sender, e);
             if (this.IsAdmin == false)
             {
                 return;
             }
 
             PasswordUpdateStatus status = e.UpdateStatus;
+			Logger.LogDebug("PasswordQuestionAnswerUpdated(sender={Sender},e={E}): status → {Status}", sender, e, status);
             if (status == PasswordUpdateStatus.Success)
             {
                 this.AddModuleMessage("PasswordQAChanged", ModuleMessage.ModuleMessageType.GreenSuccess, true);
@@ -779,17 +833,20 @@ namespace DotNetNuke.Modules.Admin.Users
             {
                 this.AddModuleMessage(status.ToString(), ModuleMessage.ModuleMessageType.RedError, true);
             }
+			Logger.LogDebug("<<< Exiting PasswordQuestionAnswerUpdated(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>PasswordUpdated runs when the Password has been updated or reset.</summary>
         private void PasswordUpdated(object sender, Password.PasswordUpdatedEventArgs e)
         {
+			Logger.LogDebug(">>> Entering PasswordUpdated(sender={Sender},e={E})", sender, e);
             if (this.IsAdmin == false)
             {
                 return;
             }
 
             PasswordUpdateStatus status = e.UpdateStatus;
+			Logger.LogDebug("PasswordUpdated(sender={Sender},e={E}): status → {Status}", sender, e, status);
 
             if (status == PasswordUpdateStatus.Success)
             {
@@ -797,6 +854,7 @@ namespace DotNetNuke.Modules.Admin.Users
                 try
                 {
                     var accessingUser = (UserInfo)HttpContext.Current.Items["UserInfo"];
+					Logger.LogDebug("PasswordUpdated(sender={Sender},e={E}): accessingUser → {AccessingUser}", sender, e, accessingUser);
                     if (accessingUser.UserID != this.User.UserID)
                     {
                         // The password was changed by someone else
@@ -812,6 +870,7 @@ namespace DotNetNuke.Modules.Admin.Users
                 }
                 catch (Exception ex)
                 {
+					Logger.LogError("Exception in PasswordUpdated(sender={Sender},e={E}): {Arg2}", sender, e, ex.getMessage());
                     this.AddModuleMessage("PasswordMailError", ModuleMessage.ModuleMessageType.YellowWarning, true);
                     Exceptions.LogException(ex);
                 }
@@ -820,11 +879,13 @@ namespace DotNetNuke.Modules.Admin.Users
             {
                 this.AddModuleMessage(status.ToString(), ModuleMessage.ModuleMessageType.RedError, true);
             }
+			Logger.LogDebug("<<< Exiting PasswordUpdated(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>ProfileUpdateCompleted runs when the Profile has been updated.</summary>
         private void ProfileUpdateCompleted(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering ProfileUpdateCompleted(sender={Sender},e={E})", sender, e);
             if (this.IsAdmin == false)
             {
                 return;
@@ -833,12 +894,15 @@ namespace DotNetNuke.Modules.Admin.Users
             // Redirect to same page (this will update all controls for any changes to profile
             // and leave us at Page 0 (User Credentials)
             this.Response.Redirect(this.Request.RawUrl, true);
+			Logger.LogDebug("<<< Exiting ProfileUpdateCompleted(sender={Sender},e={E})", sender, e);
         }
 
         private void SubscriptionUpdated(object sender, MemberServices.SubscriptionUpdatedEventArgs e)
         {
+			Logger.LogDebug(">>> Entering SubscriptionUpdated(sender={Sender},e={E})", sender, e);
             string message = Null.NullString;
             if (e.Cancel)
+			Logger.LogDebug("SubscriptionUpdated(sender={Sender},e={E}): message → {Message}", sender, e, message);
             {
                 message = string.Format(CultureInfo.CurrentCulture, Localization.GetString("UserUnSubscribed", this.LocalResourceFile), e.RoleName);
             }
@@ -848,11 +912,13 @@ namespace DotNetNuke.Modules.Admin.Users
             }
 
             this.AddLocalizedModuleMessage(message, ModuleMessage.ModuleMessageType.GreenSuccess, true);
+			Logger.LogDebug("<<< Exiting SubscriptionUpdated(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>UserCreateCompleted runs when a new user has been Created.</summary>
         private void UserCreateCompleted(object sender, UserUserControlBase.UserCreatedEventArgs e)
         {
+			Logger.LogDebug(">>> Entering UserCreateCompleted(sender={Sender},e={E})", sender, e);
             try
             {
                 if (e.CreateStatus == UserCreateStatus.Success)
@@ -867,26 +933,32 @@ namespace DotNetNuke.Modules.Admin.Users
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in UserCreateCompleted(sender={Sender},e={E}): {Arg2}", sender, e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting UserCreateCompleted(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>UserDeleted runs when the User has been deleted.</summary>
         private void UserDeleted(object sender, UserUserControlBase.UserDeletedEventArgs e)
         {
+			Logger.LogDebug(">>> Entering UserDeleted(sender={Sender},e={E})", sender, e);
             try
             {
                 this.Response.Redirect(this.ReturnUrl, true);
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in UserDeleted(sender={Sender},e={E}): {Arg2}", sender, e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting UserDeleted(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>UserUpdateCompleted runs when a user has been updated.</summary>
         private void UserRestored(object sender, UserUserControlBase.UserRestoredEventArgs e)
         {
+			Logger.LogDebug(">>> Entering UserRestored(sender={Sender},e={E})", sender, e);
             try
             {
                 this.Response.Redirect(this.ReturnUrl, true);
@@ -895,12 +967,15 @@ namespace DotNetNuke.Modules.Admin.Users
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in UserRestored(sender={Sender},e={E}): {Arg2}", sender, e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting UserRestored(sender={Sender},e={E})", sender, e);
         }
 
         private void UserRemoved(object sender, UserUserControlBase.UserRemovedEventArgs e)
         {
+			Logger.LogDebug(">>> Entering UserRemoved(sender={Sender},e={E})", sender, e);
             try
             {
                 this.Response.Redirect(this.ReturnUrl, true);
@@ -909,20 +984,26 @@ namespace DotNetNuke.Modules.Admin.Users
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in UserRemoved(sender={Sender},e={E}): {Arg2}", sender, e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting UserRemoved(sender={Sender},e={E})", sender, e);
         }
 
         private void UserUpdateCompleted(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering UserUpdateCompleted(sender={Sender},e={E})", sender, e);
             this.Response.Redirect(this.Request.RawUrl, false);
             HttpContext.Current.ApplicationInstance.CompleteRequest();
+			Logger.LogDebug("<<< Exiting UserUpdateCompleted(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>UserUpdateError runs when there is an error updating the user.</summary>
         private void UserUpdateError(object sender, UserUserControlBase.UserUpdateErrorArgs e)
         {
+			Logger.LogDebug(">>> Entering UserUpdateError(sender={Sender},e={E})", sender, e);
             this.AddModuleMessage(e.Message, ModuleMessage.ModuleMessageType.RedError, true);
+			Logger.LogDebug("<<< Exiting UserUpdateError(sender={Sender},e={E})", sender, e);
         }
     }
 }

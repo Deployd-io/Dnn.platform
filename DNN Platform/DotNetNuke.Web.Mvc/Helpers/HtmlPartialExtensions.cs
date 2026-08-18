@@ -9,6 +9,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
     /// <summary>Represents the functionality to render a partial view as an HTML-encoded string.</summary>
     public static class HtmlPartialExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HtmlPartialExtensions));
         /// <summary>Renders the specified partial view as an HTML-encoded string.</summary>
         ///
         /// <returns>
@@ -17,6 +18,11 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="partialViewName">The name of the partial view to render.</param>
         public static MvcHtmlString Partial(this DnnHtmlHelper html, string partialViewName)
         {
+			Logger.LogDebug(">>> Entering Partial(html={Html},partialViewName={PartialViewName})", html, partialViewName);
+			Logger.LogDebug("<<< Exiting Partial(html={Html},partialViewName={PartialViewName})", html, partialViewName);
+			Logger.LogDebug("<<< Exiting Partial(html={Html},partialViewName={PartialViewName},viewData={ViewData})", html, partialViewName, viewData);
+			Logger.LogDebug("<<< Exiting Partial(html={Html},partialViewName={PartialViewName},model={Model})", html, partialViewName, model);
+			Logger.LogDebug("<<< Exiting Partial(html={Html},partialViewName={PartialViewName},model={Model},viewData={ViewData})", html, partialViewName, model, viewData);
             return html.HtmlHelper.Partial(partialViewName);
         }
 

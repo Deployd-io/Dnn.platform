@@ -9,21 +9,25 @@ import {
 } from "../../../../actions";
 import util from "../../../../utils";
 import resx from "../../../../resources";
+const logger = console;
 
 let isHost = false;
 
 class LanguageEditor extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
 
         this.state = {
             languageDetail: {
             }
         };
         isHost = util.settings.isHost;
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const {props} = this;
         if (!props.languageDetail || (props.code !== props.languageDetail.Code)) {
             props.dispatch(LanguagesActions.getLanguage(props.portalId, props.languageId));
@@ -33,6 +37,7 @@ class LanguageEditor extends Component {
             }
         }
         else {
+			logger.debug('<<< Exiting componentDidMount()');
             this.setState({
                 languageDetail: Object.assign({}, props.languageDetail)
             });
@@ -40,8 +45,10 @@ class LanguageEditor extends Component {
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         const { props } = this;
         if (props.languageDetail !== prevProps.languageDetail) {
+			logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
             this.setState({
                 languageDetail: Object.assign({}, props.languageDetail)
             });
@@ -49,6 +56,8 @@ class LanguageEditor extends Component {
     }
 
     getFlagItem(name, code) {
+		logger.debug(`>>> Entering getFlagItem(name=${name},code=${code})`);
+		logger.debug(`<<< Exiting getFlagItem(name=${name},code=${code})`);
         return (
             <div title={name}>
                 <Flag culture={code} title={name}/>
@@ -57,6 +66,7 @@ class LanguageEditor extends Component {
     }
 
     getLanguageOptions() {
+		logger.debug('>>> Entering getLanguageOptions()');
         let {props, state} = this;
         let options = [];
         if (props.id === "add") {
@@ -97,11 +107,13 @@ class LanguageEditor extends Component {
             if (nameA > nameB) {
                 return 1;
             }
+		logger.debug('<<< Exiting getLanguageOptions()');
             return 0;
         });
     }
 
     getFallbackOptions() {
+		logger.debug('>>> Entering getFallbackOptions()');
         const {props} = this;
         let options = [];
         if (props.fallbacks !== undefined) {
@@ -122,12 +134,15 @@ class LanguageEditor extends Component {
                 }
             });
         }
+		logger.debug('<<< Exiting getFallbackOptions()');
         return options;
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let {state, props} = this;
         let languageDetail = Object.assign({}, state.languageDetail);
+		logger.debug(`onSettingChange(key=${key},event=${event}): languageDetail → ${languageDetail}`);
 
         if (key === "Code" || key === "Fallback") {
             languageDetail[key] = event.value;
@@ -140,19 +155,25 @@ class LanguageEditor extends Component {
         });
 
         props.dispatch(LanguagesActions.languageClientModified(languageDetail));
+		logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
     }
 
     onSave() {
+		logger.debug('>>> Entering onSave()');
         const {props, state} = this;
         props.onUpdate(state.languageDetail);
+		logger.debug('<<< Exiting onSave()');
     }
 
     onSaveRoles() {
+		logger.debug('>>> Entering onSaveRoles()');
         const {props, state} = this;
         props.onUpdateRoles(state.languageDetail);
+		logger.debug('<<< Exiting onSaveRoles()');
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const {props} = this;
         if (props.languageClientModified) {
             util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
@@ -162,14 +183,17 @@ class LanguageEditor extends Component {
         }
         else {
             props.Collapse();
+			logger.debug('<<< Exiting onCancel()');
         }
     }
 
     getLanguageDisplayModes() {
+		logger.debug('>>> Entering getLanguageDisplayModes()');
         const {props} = this;
         let options = [];
         if (props.languageDisplayModes !== undefined) {
             options = props.languageDisplayModes.map((item) => {
+		logger.debug('<<< Exiting getLanguageDisplayModes()');
                 return { label: item.Key, value: item.Value };
             });
         }
@@ -177,37 +201,46 @@ class LanguageEditor extends Component {
     }
 
     getLanguageValue(code) {
+		logger.debug(`>>> Entering getLanguageValue(code=${code})`);
         let {state} = this;
         if (code) {
             return code;
         }
         else {
             let languages = this.getLanguageOptions();
+			logger.debug(`getLanguageValue(code=${code}): languages → ${languages}`);
 
             if (languages.length > 0) {
                 let languageDetail = Object.assign({}, state.languageDetail);
+				logger.debug(`getLanguageValue(code=${code}): languageDetail → ${languageDetail}`);
                 languageDetail["Code"] = languages[0].value;
             }
 
+			logger.debug(`<<< Exiting getLanguageValue(code=${code})`);
             return languages.length > 0 ? languages[0].value : "";
         }
     }
 
     onToggleEnable(enabled) {
+		logger.debug(`>>> Entering onToggleEnable(enabled=${enabled})`);
         if (!enabled) {
             const {languageDetail} = this.state;
             const languageName = this.props.languageDisplayMode.toLowerCase() === "native" ? languageDetail.NativeName : languageDetail.EnglishName;
+			logger.debug(`onToggleEnable(enabled=${enabled}): languageName → ${languageName}`);
             util.utilities.confirm(resx.get("DisableLanguageWarning").replace("{0}", languageName), resx.get("Yes"), resx.get("No"), () => {
                 this.onSettingChange("Enabled", enabled);
             });
         } else {
             this.onSettingChange("Enabled", enabled);
+			logger.debug(`<<< Exiting onToggleEnable(enabled=${enabled})`);
         }
     }
 
     onRoleSelectChange(roleName, selected) {
+		logger.debug(`>>> Entering onRoleSelectChange(roleName=${roleName},selected=${selected})`);
         let {state, props} = this;
         let languageDetail = Object.assign({}, state.languageDetail);
+		logger.debug(`onRoleSelectChange(roleName=${roleName},selected=${selected}): languageDetail → ${languageDetail}`);
 
         let roles = languageDetail.Roles.split(";");
         if (!roles) {
@@ -233,9 +266,11 @@ class LanguageEditor extends Component {
         });
 
         props.dispatch(LanguagesActions.languageClientModified(languageDetail));
+		logger.debug(`<<< Exiting onRoleSelectChange(roleName=${roleName},selected=${selected})`);
     }
 
     renderNewForm() {
+		logger.debug('>>> Entering renderNewForm()');
         let {state, props} = this;
         const columnOne = <div key="left-column" className="left-column">
             <InputGroup>
@@ -267,6 +302,7 @@ class LanguageEditor extends Component {
                 />
             </InputGroup>
         </div>;
+		logger.debug('<<< Exiting renderNewForm()');
         return (
             <div className="language-editor">
                 <GridSystem numberOfColumns={2}>{[columnOne, columnTwo]}</GridSystem>
@@ -287,6 +323,7 @@ class LanguageEditor extends Component {
     }
 
     renderEditForm() {
+		logger.debug('>>> Entering renderEditForm()');
         let {state} = this;
         const columnOne = <div className="left-column" key="editForm-columnOne">
             <InputGroup>
@@ -329,6 +366,7 @@ class LanguageEditor extends Component {
                 </InputGroup>
             }
         </div>;
+		logger.debug('<<< Exiting renderEditForm()');
         return (
             <div className="language-editor">
                 <GridSystem numberOfColumns={2}>{[columnOne, columnTwo]}</GridSystem>
@@ -350,7 +388,9 @@ class LanguageEditor extends Component {
     }
 
     renderRoleForm() {
+		logger.debug('>>> Entering renderRoleForm()');
         let {props} = this;
+		logger.debug('<<< Exiting renderRoleForm()');
         return (
             <div className="language-editor">
                 {props.code &&
@@ -376,6 +416,7 @@ class LanguageEditor extends Component {
 
      
     render() {
+		logger.debug('>>> Entering render()');
         let {state, props} = this;
          
         if (state.languageDetail !== undefined || props.id === "add") {
@@ -384,6 +425,7 @@ class LanguageEditor extends Component {
                     return this.renderNewForm();
                 }
                 else {
+					logger.debug('<<< Exiting render()');
                     return this.renderEditForm();
                 }
             }
@@ -415,6 +457,8 @@ LanguageEditor.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         languageDetail: state.languages.language,
         fallbacks: state.languages.fallbacks,

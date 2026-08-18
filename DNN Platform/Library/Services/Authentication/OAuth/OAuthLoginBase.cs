@@ -11,6 +11,7 @@ namespace DotNetNuke.Services.Authentication.OAuth
 
     public abstract class OAuthLoginBase : AuthenticationLoginBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(OAuthLoginBase));
         /// <inheritdoc />
         public override bool Enabled
         {
@@ -28,11 +29,14 @@ namespace DotNetNuke.Services.Authentication.OAuth
 
         protected virtual void AddCustomProperties(NameValueCollection properties)
         {
+		Logger.LogDebug(">>> Entering AddCustomProperties(properties={Properties})", properties);
+		Logger.LogDebug("<<< Exiting AddCustomProperties(properties={Properties})", properties);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             if (!this.IsPostBack)
@@ -46,6 +50,7 @@ namespace DotNetNuke.Services.Authentication.OAuth
             }
 
             bool shouldAuthorize = this.OAuthClient.IsCurrentService() && this.OAuthClient.HaveVerificationCode();
+			Logger.LogDebug("OnLoad(e={E}): shouldAuthorize → {ShouldAuthorize}", e, shouldAuthorize);
             if (this.Mode == AuthMode.Login)
             {
                 shouldAuthorize = shouldAuthorize || this.OAuthClient.IsCurrentUserAuthorized();
@@ -58,6 +63,7 @@ namespace DotNetNuke.Services.Authentication.OAuth
                     this.OAuthClient.AuthenticateUser(this.GetCurrentUser(), this.PortalSettings, this.IPAddress, this.AddCustomProperties, this.OnUserAuthenticated);
                 }
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
     }
 }

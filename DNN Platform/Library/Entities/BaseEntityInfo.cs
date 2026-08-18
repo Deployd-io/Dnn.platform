@@ -17,11 +17,15 @@ namespace DotNetNuke.Entities
     [Serializable]
     public abstract class BaseEntityInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(BaseEntityInfo));
         /// <summary>Initializes a new instance of the <see cref="BaseEntityInfo"/> class.</summary>
         protected BaseEntityInfo()
         {
+			Logger.LogDebug(">>> Entering BaseEntityInfo()");
             this.CreatedByUserID = Null.NullInteger;
             this.LastModifiedByUserID = Null.NullInteger;
+			Logger.LogDebug("BaseEntityInfo(): this.CreatedByUserID → {Arg0}", this.CreatedByUserID);
+			Logger.LogDebug("<<< Exiting BaseEntityInfo()");
         }
 
         /// <summary>Gets the CreatedByUserID.</summary>
@@ -57,9 +61,12 @@ namespace DotNetNuke.Entities
         /// <returns>A UserInfo object.</returns>
         public UserInfo CreatedByUser(int portalId)
         {
+			Logger.LogDebug(">>> Entering CreatedByUser(portalId={PortalId})", portalId);
             if (this.CreatedByUserID > Null.NullInteger)
             {
                 UserInfo user = UserController.GetUserById(portalId, this.CreatedByUserID);
+				Logger.LogDebug("CreatedByUser(portalId={PortalId}): user → {User}", portalId, user);
+			Logger.LogDebug("<<< Exiting CreatedByUser(portalId={PortalId})", portalId);
                 return user;
             }
 
@@ -71,9 +78,12 @@ namespace DotNetNuke.Entities
         /// <returns>A UserInfo object.</returns>
         public UserInfo LastModifiedByUser(int portalId)
         {
+			Logger.LogDebug(">>> Entering LastModifiedByUser(portalId={PortalId})", portalId);
             if (this.LastModifiedByUserID > Null.NullInteger)
             {
                 UserInfo user = UserController.GetUserById(portalId, this.LastModifiedByUserID);
+				Logger.LogDebug("LastModifiedByUser(portalId={PortalId}): user → {User}", portalId, user);
+			Logger.LogDebug("<<< Exiting LastModifiedByUser(portalId={PortalId})", portalId);
                 return user;
             }
 
@@ -84,17 +94,21 @@ namespace DotNetNuke.Entities
         /// <param name="dr">the data reader to use.</param>
         internal void FillBaseProperties(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering FillBaseProperties(dr={Dr})", dr);
             this.FillInternal(dr);
+			Logger.LogDebug("<<< Exiting FillBaseProperties(dr={Dr})", dr);
         }
 
         /// <summary>Fills a BaseEntityInfo from a Data Reader.</summary>
         /// <param name="dr">The Data Reader to use.</param>
         protected virtual void FillInternal(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering FillInternal(dr={Dr})", dr);
             this.CreatedByUserID = Null.SetNullInteger(dr["CreatedByUserID"]);
             this.CreatedOnDate = Null.SetNullDateTime(dr["CreatedOnDate"]);
             this.LastModifiedByUserID = Null.SetNullInteger(dr["LastModifiedByUserID"]);
             this.LastModifiedOnDate = Null.SetNullDateTime(dr["LastModifiedOnDate"]);
+			Logger.LogDebug("<<< Exiting FillInternal(dr={Dr})", dr);
         }
 
         /// <summary>Clones the base properties of the entity.</summary>
@@ -103,10 +117,16 @@ namespace DotNetNuke.Entities
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         protected void CloneBaseProperties(BaseEntityInfo clonedItem, BaseEntityInfo originalItem)
         {
+			Logger.LogDebug(">>> Entering CloneBaseProperties(clonedItem={ClonedItem},originalItem={OriginalItem})", clonedItem, originalItem);
             clonedItem.CreatedByUserID = originalItem.CreatedByUserID;
             clonedItem.CreatedOnDate = originalItem.CreatedOnDate;
+			Logger.LogDebug("CloneBaseProperties(clonedItem={ClonedItem},originalItem={OriginalItem}): clonedItem.CreatedOnDate → {Arg2}", clonedItem, originalItem, clonedItem.CreatedOnDate);
+			Logger.LogDebug("CloneBaseProperties(clonedItem={ClonedItem},originalItem={OriginalItem}): clonedItem.LastModifiedByUserID → {Arg2}", clonedItem, originalItem, clonedItem.LastModifiedByUserID);
+			Logger.LogDebug("CloneBaseProperties(clonedItem={ClonedItem},originalItem={OriginalItem}): clonedItem.CreatedByUserID → {Arg2}", clonedItem, originalItem, clonedItem.CreatedByUserID);
+			Logger.LogDebug("CloneBaseProperties(clonedItem={ClonedItem},originalItem={OriginalItem}): clonedItem.LastModifiedOnDate → {Arg2}", clonedItem, originalItem, clonedItem.LastModifiedOnDate);
             clonedItem.LastModifiedByUserID = originalItem.LastModifiedByUserID;
             clonedItem.LastModifiedOnDate = originalItem.LastModifiedOnDate;
+			Logger.LogDebug("<<< Exiting CloneBaseProperties(clonedItem={ClonedItem},originalItem={OriginalItem})", clonedItem, originalItem);
         }
     }
 }

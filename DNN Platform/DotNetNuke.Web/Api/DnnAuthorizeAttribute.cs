@@ -15,6 +15,7 @@ namespace DotNetNuke.Web.Api
     /// <summary>Provides Dnn specific details authorization filter.</summary>
     public sealed class DnnAuthorizeAttribute : AuthorizeAttributeBase, IOverrideDefaultAuthLevel
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnAuthorizeAttribute));
         private static readonly List<string> DefaultAuthTypes = [];
 
         private static readonly string[] EmptyArray = [];
@@ -77,6 +78,7 @@ namespace DotNetNuke.Web.Api
         /// <inheritdoc />
         public override bool IsAuthorized(AuthFilterContext context)
         {
+			Logger.LogDebug(">>> Entering IsAuthorized(context={Context})", context);
             Requires.NotNull("context", context);
 
             var identity = Thread.CurrentPrincipal.Identity;
@@ -88,6 +90,7 @@ namespace DotNetNuke.Web.Api
             if (this.denyRolesSplit.Length != 0)
             {
                 var currentUser = UserController.Instance.GetCurrentUserInfo();
+				Logger.LogDebug("IsAuthorized(context={Context}): currentUser → {CurrentUser}", context, currentUser);
                 if (!currentUser.IsSuperUser && this.denyRolesSplit.Any(currentUser.IsInRole))
                 {
                     return false;
@@ -106,6 +109,7 @@ namespace DotNetNuke.Web.Api
             // if the attribute opted in explicitly for specific authentication types, then
             // use it; otherwise use the defaults according to settings in the web.config.
             var currentAuthType = (identity.AuthenticationType ?? string.Empty).Trim();
+			Logger.LogDebug("IsAuthorized(context={Context}): currentAuthType → {CurrentAuthType}", context, currentAuthType);
             if (currentAuthType.Length > 0)
             {
                 if (this.authTypesSplit.Length != 0)
@@ -113,6 +117,7 @@ namespace DotNetNuke.Web.Api
                     return this.authTypesSplit.Contains(currentAuthType);
                 }
 
+			Logger.LogDebug("<<< Exiting IsAuthorized(context={Context})", context);
                 return DefaultAuthTypes.Contains(currentAuthType);
             }
 
@@ -123,14 +128,17 @@ namespace DotNetNuke.Web.Api
         /// <param name="authType">The name of the authentication type to add.</param>
         internal static void AppendToDefaultAuthTypes(string authType)
         {
+			Logger.LogDebug(">>> Entering AppendToDefaultAuthTypes(authType={AuthType})", authType);
             if (!string.IsNullOrEmpty(authType))
             {
                 DefaultAuthTypes.Add(authType.Trim());
             }
+			Logger.LogDebug("<<< Exiting AppendToDefaultAuthTypes(authType={AuthType})", authType);
         }
 
         private static string[] SplitString(string original)
         {
+			Logger.LogDebug(">>> Entering SplitString(original={Original})", original);
             if (string.IsNullOrEmpty(original))
             {
                 return EmptyArray;
@@ -138,6 +146,7 @@ namespace DotNetNuke.Web.Api
 
             var split = original.Split(Separator, StringSplitOptions.RemoveEmptyEntries)
                 .Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s));
+			Logger.LogDebug("<<< Exiting SplitString(original={Original})", original);
             return split.ToArray();
         }
     }

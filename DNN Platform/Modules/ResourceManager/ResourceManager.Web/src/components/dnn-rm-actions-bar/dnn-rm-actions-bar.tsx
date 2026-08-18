@@ -1,5 +1,6 @@
 import { Component, Host, h, State } from '@stencil/core';
 import state from '../../store/store';
+const logger = console;
 import { sortField, SortFieldInfo } from "../../enums/SortField";
 import { sortOrder } from "../../enums/SortOrder";
 import { InternalServicesClient } from '../../services/InternalServicesClient';
@@ -18,20 +19,27 @@ export class DnnRmActionsBar {
   private itemsClient: ItemsClient;
 
   constructor(){
+	logger.debug('>>> Entering constructor()');
     this.internalServicesClient = new InternalServicesClient(state.moduleId);
     this.itemsClient = new ItemsClient(state.moduleId);
+	logger.debug('<<< Exiting constructor()');
   }
 
   private changeLayout(): void {
     if (state.layout == "card"){
+	logger.debug('>>> Entering changeLayout()');
       state.layout = "list";
+	logger.debug(`changeLayout(): state.layout → ${state.layout}`);
       return;
     }
 
     state.layout = "card";
+	logger.debug('<<< Exiting changeLayout()');
   }
 
   private renderSortButton(sortOption: SortFieldInfo){
+	logger.debug(`>>> Entering renderSortButton(sortOption=${sortOption})`);
+	logger.debug(`<<< Exiting renderSortButton(sortOption=${sortOption})`);
     return(
       <button
         onClick={() =>
@@ -48,24 +56,29 @@ export class DnnRmActionsBar {
   }
 
   private renderRadioButton(checked = false){
+	logger.debug(`>>> Entering renderRadioButton(checked=${checked})`);
     if (checked){
       return <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/></svg>
     }
     else{
+	logger.debug(`<<< Exiting renderRadioButton(checked=${checked})`);
       return <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/></svg>
     }
   }
 
   private renderSortOrderButtonIcon(){
+	logger.debug('>>> Entering renderSortOrderButtonIcon()');
     if (state.sortOrder.sortOrderKey == sortOrder.ascending.sortOrderKey) {
       return <path d="M10 6h4v2h-4v-2zm-2 5h8v2h-8v-2zm-2 5h12v2h-12v-2z"/>
     }
     else {
+	logger.debug('<<< Exiting renderSortOrderButtonIcon()');
       return <path d="M6 6h12v2h-12v-2zm2 5h8v2h-8v-2zm2 5h4v2h-4v-2z"/>
     }
   }
 
   private async syncFolderContent(recursive: boolean = false) {
+	logger.debug(`>>> Entering syncFolderContent(recursive=${recursive})`);
     try {
       await this.itemsClient.syncFolderContent(
         state.currentItems.folder.folderId,
@@ -75,11 +88,13 @@ export class DnnRmActionsBar {
       await this.getFolderContent();
     } catch (error) {
       alert(error);
+	logger.debug(`<<< Exiting syncFolderContent(recursive=${recursive})`);
     }
   }
 
 
   private async getFolderContent() {
+	logger.debug('>>> Entering getFolderContent()');
     try {
       await this.getFolders();
       state.currentItems = await this.itemsClient.getFolderContent(
@@ -91,22 +106,29 @@ export class DnnRmActionsBar {
       
     } catch (error) {
       alert(error);
+	logger.debug('<<< Exiting getFolderContent()');
     }
   }
 
   private async getFolders() {
+	logger.debug('>>> Entering getFolders()');
     try {
       state.rootFolders = await this.internalServicesClient.getFolders(state.settings.HomeFolderId);
     } catch (error) {
       alert(error);
+	logger.debug('<<< Exiting getFolders()');
     }
   }
 
   private toggleSortOrder() {
+	logger.debug('>>> Entering toggleSortOrder()');
     state.sortOrder = (state.sortOrder.sortOrderKey == sortOrder.ascending.sortOrderKey) ? sortOrder.descending : sortOrder.ascending;
+	logger.debug('<<< Exiting toggleSortOrder()');
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         <dnn-vertical-overflow-menu>

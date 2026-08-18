@@ -14,18 +14,24 @@ namespace Dnn.PersonaBar.Servers.Components.DatabaseServer
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public DbInfo GetDbInfo()
         {
+			eventLogger.LogDebug(">>> Entering GetDbInfo()");
+			eventLogger.LogDebug("<<< Exiting GetDbInfo()");
             return CBO.FillObject<DbInfo>(DataService.GetDbInfo());
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public List<BackupInfo> GetDbBackups()
         {
+			eventLogger.LogDebug(">>> Entering GetDbBackups()");
+			eventLogger.LogDebug("<<< Exiting GetDbBackups()");
             return CBO.FillCollection<BackupInfo>(DataService.GetDbBackups());
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public List<DbFileInfo> GetDbFileInfo()
         {
+			eventLogger.LogDebug(">>> Entering GetDbFileInfo()");
+			eventLogger.LogDebug("<<< Exiting GetDbFileInfo()");
             return CBO.FillCollection<DbFileInfo>(DataService.GetDbFileInfo());
         }
     }

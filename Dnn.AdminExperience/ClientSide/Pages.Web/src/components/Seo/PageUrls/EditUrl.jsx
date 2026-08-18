@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
 import Localization from "../../../localization";
+const logger = console;
 import { Collapsible, GridCell, Button, RadioButtons, Label, Dropdown, SingleLineInputWithError } from "@dnnsoftware/dnn-react-common";
 
 const portalAliasUsageType = {
@@ -13,12 +14,15 @@ const portalAliasUsageType = {
 class EditUrl extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             hasChanges: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     onChangeField(key, event) {
+		logger.debug(`>>> Entering onChangeField(key=${key},event=${event})`);
         const {onChange} = this.props;
         let value = event;
         if (event.value) {
@@ -27,6 +31,7 @@ class EditUrl extends Component {
             value = event.target.value;
         }
         
+		logger.debug(`<<< Exiting onChangeField(key=${key},event=${event})`);
         onChange(key, value);
 
         this.setState({
@@ -35,6 +40,8 @@ class EditUrl extends Component {
     }
     
     getUrlTypeOptions() {
+		logger.debug('>>> Entering getUrlTypeOptions()');
+		logger.debug('<<< Exiting getUrlTypeOptions()');
         return [
             {
                 label: "Active (200)",
@@ -48,6 +55,8 @@ class EditUrl extends Component {
     }
     
     getOptions(siteAliases) {
+		logger.debug(`>>> Entering getOptions(siteAliases=${siteAliases})`);
+		logger.debug(`<<< Exiting getOptions(siteAliases=${siteAliases})`);
         return siteAliases.map(alias => {
             return {
                 label: alias.Value,
@@ -57,6 +66,7 @@ class EditUrl extends Component {
     }
     
     getSiteAliasUsageOptions(hasParent) {
+		logger.debug(`>>> Entering getSiteAliasUsageOptions(hasParent=${hasParent})`);
         let options = [
             {value: portalAliasUsageType.ChildPagesDoNotInherit, label: Localization.get("Pages_Seo_SelectedAliasUsageOptionThisPageOnly")}, 
             {value: portalAliasUsageType.ChildPagesInherit, label: Localization.get("Pages_Seo_SelectedAliasUsageOptionPageAndChildPages")}
@@ -68,12 +78,15 @@ class EditUrl extends Component {
             });
         }
         
+		logger.debug(`<<< Exiting getSiteAliasUsageOptions(hasParent=${hasParent})`);
         return options;
     }
     
     render() {
+		logger.debug('>>> Entering render()');
         const {url, saving, pageHasParent, siteAliases, primaryAliasId, isOpened, onSave, onCancel} = this.props;
         const aliases = this.getOptions(siteAliases);
+		logger.debug(`render(): aliases → ${aliases}`);
         const siteAliasUsageOptions = this.getSiteAliasUsageOptions(pageHasParent);
         if (
             !this.state.hasChanges &&
@@ -83,6 +96,7 @@ class EditUrl extends Component {
         {
             this.props.onChange("siteAlias", primaryAliasId); 
         }
+		logger.debug('<<< Exiting render()');
         return (
             <Collapsible accordion={true} isOpened={isOpened} className={"editUrl"}>
                 <div className="editUrl-body">

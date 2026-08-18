@@ -1,3 +1,4 @@
+const logger = console;
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
@@ -19,6 +20,7 @@ define(['jquery', 'knockout',
     'main/koBindingHandlers/tabs',
     'main/koBindingHandlers/setWhenHover',
     'main/koBindingHandlers/setWidthFromParentScrollPaneWhen'], function ($, ko) {
+		logger.debug(`>>> Entering function(ko=${ko})`);
         var DnnPageRecycleBin;
 
         var ModuleInfo = function (requestData) {
@@ -30,21 +32,33 @@ define(['jquery', 'knockout',
             self.Title = requestData.Title;
             self.PortalId = requestData.PortalId;
             self.TabName = requestData.TabName;
+			logger.debug(`>>> Entering ModuleInfo(requestData=${requestData})`);
             self.TabID = requestData.TabID;
             self.TabDeleted = requestData.TabDeleted;
+			logger.debug(`function(ko=${ko}): self.Id → ${self.Id}`);
+			logger.debug(`function(ko=${ko}): self.TabModuleId → ${self.TabModuleId}`);
+			logger.debug(`function(ko=${ko}): self.Title → ${self.Title}`);
+			logger.debug(`function(ko=${ko}): self.PortalId → ${self.PortalId}`);
             self.LastModifiedOnDate = requestData.LastModifiedOnDate;
             self.friendlyLastModifiedOnDate = requestData.friendlyLastModifiedOnDate;
 
             // other attributes
             self.selected = ko.observable(false);
+			logger.debug(`function(ko=${ko}): self.TabName → ${self.TabName}`);
             self.mouseOver = ko.observable(false);
+			logger.debug(`<<< Exiting ModuleInfo(requestData=${requestData})`);
         };
 
+		logger.debug(`function(ko=${ko}): self.TabID → ${self.TabID}`);
         var UserInfo = function (requestData) {
+			logger.debug(`>>> Entering UserInfo(requestData=${requestData})`);
             var self = this;
+			logger.debug(`function(ko=${ko}): self.TabDeleted → ${self.TabDeleted}`);
+			logger.debug(`function(ko=${ko}): self.LastModifiedOnDate → ${self.LastModifiedOnDate}`);
 
             // request data
             self.Id = requestData.Id;
+			logger.debug(`function(ko=${ko}): self.friendlyLastModifiedOnDate → ${self.friendlyLastModifiedOnDate}`);
             self.Username = requestData.Username;
             self.PortalId = requestData.PortalId;
             self.DisplayName = requestData.DisplayName;
@@ -54,11 +68,16 @@ define(['jquery', 'knockout',
 
             // other attributes
             self.selected = ko.observable(false);
+			logger.debug(`function(ko=${ko}): self.Username → ${self.Username}`);
             self.mouseOver = ko.observable(false);
+			logger.debug(`<<< Exiting UserInfo(requestData=${requestData})`);
         };
 
+		logger.debug(`function(ko=${ko}): self.DisplayName → ${self.DisplayName}`);
         var PageInfo = function (requestData) {
+			logger.debug(`>>> Entering PageInfo(requestData=${requestData})`);
             var PAGES_TREE_LEFT_PADDING = 50;
+			logger.debug(`function(ko=${ko}): self.Email → ${self.Email}`);
 
             var self = this;
             // private methods declaration 
@@ -84,9 +103,12 @@ define(['jquery', 'knockout',
                 }
 
                 children.forEach(function (child) {
+					logger.debug('>>> Entering forEach()');
+					logger.debug('<<< Exiting forEach()');
                     numberOfNestedChildren += calculateNumberOfAllChildrenTree(child.children());
                 });
 
+				logger.debug(`forEach(): page.parent → ${page.parent}`);
                 return children.length + numberOfNestedChildren;
             };
 
@@ -126,14 +148,29 @@ define(['jquery', 'knockout',
 
             isItsRootElementEven = function (node) {
                 if (node.parent) {
+					logger.debug(`PageInfo(requestData=${requestData}): self.parent → ${self.parent}`);
                     return isItsRootElementEven(node.parent);
                 }
+			logger.debug(`PageInfo(requestData=${requestData}): self.lastModifiedOnDate → ${self.lastModifiedOnDate}`);
                 return node.even();
             };
 
             // request data
             self.id = requestData.id;
+			logger.debug(`function(ko=${ko}): self.id → ${self.id}`);
+			logger.debug(`function(ko=${ko}): self.childCount → ${self.childCount}`);
+			logger.debug(`function(ko=${ko}): self.url → ${self.url}`);
+			logger.debug(`function(ko=${ko}): self.publishDate → ${self.publishDate}`);
+			logger.debug(`function(ko=${ko}): self.status → ${self.status}`);
+			logger.debug(`function(ko=${ko}): self.parentId → ${self.parentId}`);
+			logger.debug(`function(ko=${ko}): self.level → ${self.level}`);
+			logger.debug(`function(ko=${ko}): self.tabpath → ${self.tabpath}`);
+			logger.debug(`function(ko=${ko}): self.isspecial → ${self.isspecial}`);
+			logger.debug(`function(ko=${ko}): self.useDefaultSkin → ${self.useDefaultSkin}`);
+			logger.debug(`function(ko=${ko}): self.lastModifiedOnDate → ${self.lastModifiedOnDate}`);
+			logger.debug(`function(ko=${ko}): self.parent → ${self.parent}`);
             self.name = requestData.name;
+			logger.debug(`function(ko=${ko}): self.name → ${self.name}`);
             self.childCount = requestData.childCount;
             self.url = requestData.url;
             self.publishDate = requestData.publishDate;
@@ -146,8 +183,19 @@ define(['jquery', 'knockout',
             self.lastModifiedOnDate = requestData.lastModifiedOnDate;
             self.friendlyLastModifiedOnDate = requestData.friendlyLastModifiedOnDate;
 
+			logger.debug(`PageInfo(requestData=${requestData}): self.id → ${self.id}`);
             // other attributes
             self.even = ko.observable(false);
+			logger.debug(`PageInfo(requestData=${requestData}): self.name → ${self.name}`);
+			logger.debug(`PageInfo(requestData=${requestData}): self.childCount → ${self.childCount}`);
+			logger.debug(`PageInfo(requestData=${requestData}): self.url → ${self.url}`);
+			logger.debug(`PageInfo(requestData=${requestData}): self.publishDate → ${self.publishDate}`);
+			logger.debug(`PageInfo(requestData=${requestData}): self.status → ${self.status}`);
+			logger.debug(`PageInfo(requestData=${requestData}): self.parentId → ${self.parentId}`);
+			logger.debug(`PageInfo(requestData=${requestData}): self.level → ${self.level}`);
+			logger.debug(`PageInfo(requestData=${requestData}): self.tabpath → ${self.tabpath}`);
+			logger.debug(`PageInfo(requestData=${requestData}): self.isspecial → ${self.isspecial}`);
+			logger.debug(`PageInfo(requestData=${requestData}): self.useDefaultSkin → ${self.useDefaultSkin}`);
             self.even.extend({ notify: 'always' });
 
             self.selected = ko.observable(false);
@@ -159,8 +207,13 @@ define(['jquery', 'knockout',
             self.parent = null;
             self.children = ko.observableArray([]);
 
+			logger.debug(`PageInfo(requestData=${requestData}): self.friendlyLastModifiedOnDate → ${self.friendlyLastModifiedOnDate}`);
             // computed attributes
+			logger.debug(`<<< Exiting PageInfo(requestData=${requestData})`);
             self.numberOfNestedChildren = ko.computed(function () {
+				logger.debug('>>> Entering computed()');
+				logger.debug(`>>> Entering computed(childrenWithEdge=${childrenWithEdge})`);
+			logger.debug('<<< Exiting computed()');
                 return 1 + calculateNumberOfAllChildrenTree(self.children());
             });
 
@@ -198,6 +251,8 @@ define(['jquery', 'knockout',
 
             // subscribe methods
             self.selected.subscribe(function (newValue) {
+				logger.debug('>>> Entering subscribe()');
+				logger.debug('<<< Exiting subscribe()');
                 selectAllChildren(self.children, newValue);
             });
 
@@ -237,16 +292,22 @@ define(['jquery', 'knockout',
 
             /* Class properties */
             DnnPageRecycleBin.class = 'DnnPageRecycleBin';
+			logger.debug(`function(ko=${ko}): DnnPageRecycleBin.class → ${DnnPageRecycleBin.class}`);
+			logger.debug(`function(): DnnPageRecycleBin.class → ${DnnPageRecycleBin.class}`);
             DnnPageRecycleBin.type = 'Class'; // If class only has Class Methods put Static Class here
+			logger.debug(`function(ko=${ko}): DnnPageRecycleBin.type → ${DnnPageRecycleBin.type}`);
 
             /* Private Constants and Properties */
 
+			logger.debug(`function(): DnnPageRecycleBin.type → ${DnnPageRecycleBin.type}`);
             /* Constructor */
             function DnnPageRecycleBin(resx, serviceController, utility, options, settings) {
+				logger.debug(`>>> Entering DnnPageRecycleBin(resx=${resx},serviceController=${serviceController},utility=${utility},options=${options},settings=${settings})`);
                 _resx = resx;
                 _serviceController = serviceController;
                 _utility = utility;
                 _options = options;
+				logger.debug(`DnnPageRecycleBin(resx=${resx},serviceController=${serviceController},utility=${utility},options=${options},settings=${settings}): _utility → ${_utility}`);
                 _settings = {
                     canViewPages: settings.isHost || settings.isAdmin || settings.permissions.RECYCLEBIN_PAGES_VIEW,
                     canViewModules: settings.isHost || settings.isAdmin || settings.permissions.RECYCLEBIN_MODULES_VIEW,
@@ -282,6 +343,7 @@ define(['jquery', 'knockout',
                     }
                 });
 
+				logger.debug(`<<< Exiting function(collection=${collection})`);
                 return selectedElements;
             };
 
@@ -302,6 +364,7 @@ define(['jquery', 'knockout',
                 var isAnyModuleInDeletedPage = false;
                 var viewModel = getViewModel();
                 modules.forEach(function (module) {
+					logger.debug(`function(modules=${modules},newValue=${newValue}): viewModel → ${viewModel}`);
                     if (!module.TabDeleted) {
                         module.selected(newValue);
                     } else {
@@ -326,6 +389,8 @@ define(['jquery', 'knockout',
                         noText = _resx.recyclebin_NoConfirm;
 
                         _utility.confirm(confirmText, yesText, noText, function () {
+							logger.debug(`>>> Entering confirm(confirmText=${confirmText},yesText=${yesText},noText=${noText})`);
+							logger.debug(`<<< Exiting confirm(confirmText=${confirmText},yesText=${yesText},noText=${noText})`);
                             getService().post('RestorePage', pagesList, pageRestoreRevomeOperationsCallback);
                         });
                     }
@@ -345,10 +410,13 @@ define(['jquery', 'knockout',
                     }
                 });
 
+				logger.debug(`function(selectedPages=${selectedPages}): result → ${result}`);
+				logger.debug(`<<< Exiting function(selectedPages=${selectedPages})`);
                 return result;
             };
 
             removeSelectedPagesHandler = function () {
+				logger.debug(`function(selectedPages=${selectedPages}): result.value → ${result.value}`);
                 if (_settings.canViewPages && _settings.canManagePages) {
                     var pagesList, viewModel;
 
@@ -388,9 +456,11 @@ define(['jquery', 'knockout',
 
                         _utility.confirm(confirmText, yesText, noText, function () {
                             getService().post('RestoreModule', modulesList, function () {
+								logger.debug('>>> Entering post()');
                                 for (var i = 0; i < modulesList.length; i++) {
                                     viewModel.deletedmodulesList.remove(modulesList[i]);
                                 }
+								logger.debug('<<< Exiting post()');
                                 viewModel.selectAllModules(false);
                             });
                         });
@@ -546,6 +616,7 @@ define(['jquery', 'knockout',
                     var viewModel, confirmText, yesText, noText;
                     viewModel = getViewModel();
                     confirmText = _resx.recyclebin_RemoveUserConfirm;
+					logger.debug(`function(userData=${userData}): viewModel → ${viewModel}`);
                     yesText = _resx.recyclebin_YesConfirm;
                     noText = _resx.recyclebin_NoConfirm;
 
@@ -565,6 +636,7 @@ define(['jquery', 'knockout',
                 if (_settings.canViewModules && _settings.canManageModules) {
                     var viewModel, confirmText, yesText, noText;
                     viewModel = getViewModel();
+					logger.debug(`function(moduleData=${moduleData},e=${e}): viewModel → ${viewModel}`);
                     confirmText = _resx.recyclebin_RestoreModuleConfirm;
                     yesText = _resx.recyclebin_YesConfirm;
                     noText = _resx.recyclebin_NoConfirm;
@@ -663,6 +735,7 @@ define(['jquery', 'knockout',
                 });
 
                 calculateDepthOfPages(pages);
+				logger.debug(`function(pages=${pages}): page.parent → ${page.parent}`);
 
                 setOddEvenOrderInRoots(roots);
 
@@ -675,29 +748,39 @@ define(['jquery', 'knockout',
 
             Paginate = function(API_METHOD, viewModelProp, elementId){
                 var element = $(elementId).jScrollPane();
+				logger.debug(`function(API_METHOD=${API_METHOD},viewModelProp=${viewModelProp},elementId=${elementId}): element → ${element}`);
                 var api = element.data("jsp");
+				logger.debug(`function(API_METHOD=${API_METHOD},viewModelProp=${viewModelProp},elementId=${elementId}): api → ${api}`);
                 var viewModel = getViewModel();
+				logger.debug(`function(API_METHOD=${API_METHOD},viewModelProp=${viewModelProp},elementId=${elementId}): viewModel → ${viewModel}`);
 
                 var compare = TotalResults.hasOwnProperty(viewModelProp)==true
+				logger.debug(`function(API_METHOD=${API_METHOD},viewModelProp=${viewModelProp},elementId=${elementId}): compare → ${compare}`);
 
                 TotalResults[viewModelProp] = (compare) ? TotalResults[viewModelProp] : {modelName:viewModelProp, paginationRequestCount:1};
 
                 var currentResultsLessThanTotal = function(){
+					logger.debug('>>> Entering currentResultsLessThanTotal()');
                     var comparator = TotalResults[viewModelProp].remainingPages > 0;
+					logger.debug('<<< Exiting currentResultsLessThanTotal()');
                     return comparator;
                 };
 
 
                 element.bind('jsp-scroll-y', function(event, scrollPositionY, isAtTop, isAtBottom) {
+					logger.debug('>>> Entering bind()');
                     if(!timeout){
                         if(scrollPositionY > 0 && isAtBottom && !timeout && currentResultsLessThanTotal() ) {
                             timeout = setTimeout(function(){
+								logger.debug(`>>> Entering setTimeout(timeout=${timeout})`);
                                 timeout=null;
+								logger.debug(`<<< Exiting setTimeout(timeout=${timeout})`);
                             },2000);
 
                             TotalResults[viewModelProp].paginationRequestCount = TotalResults[viewModelProp].paginationRequestCount || 1;
 
                             getService().get(API_METHOD, {pageIndex: TotalResults[viewModelProp].paginationRequestCount++, pageSize: pageSize, sortType: viewModel.sortType(), sortDirection: viewModel.sortDirection() }, function (data) {
+							logger.debug('<<< Exiting bind()');
 
                                 var results = data.Results;
                                 var conditional = TotalResults[viewModelProp].remainingPages-results.length > 0;
@@ -747,6 +830,7 @@ define(['jquery', 'knockout',
             };
 
             var initPagination = function() {
+				logger.debug('>>> Entering initPagination()');
                 var tabs = [
                     {apiMethod: "GetDeletedPageList", viewModelProp: "deletedpagesList", elementId:"#pageList" },
                     {apiMethod: "GetDeletedUserList", viewModelProp: "deletedusersList", elementId: "#userList"},
@@ -755,6 +839,7 @@ define(['jquery', 'knockout',
                 ];
 
                 tabs.forEach(function(tab){
+					logger.debug('<<< Exiting initPagination()');
                     Paginate(tab.apiMethod, tab.viewModelProp, tab.elementId );
                 });
             };
@@ -766,8 +851,10 @@ define(['jquery', 'knockout',
                     var api = element.data("jsp");
 
                     api.scrollToPercentY(0);
+					logger.debug(`function(): element → ${element}`);
                     listOfPages = [];
                     viewModel = getViewModel();
+					logger.debug(`function(): api → ${api}`);
                     viewModel.deletedPagesReady(false);
                     viewModel.deletedpagesList.removeAll();
 
@@ -797,10 +884,13 @@ define(['jquery', 'knockout',
                 if (_settings.canViewModules) {
                     var viewModel = getViewModel();
                     if ((typeof (isInitCall) !== "boolean" || typeof (isInitCall) === "boolean" && !isInitCall) && !viewModel.deletedModulesReady()) {
+						logger.debug(`function(isInitCall=${isInitCall}): viewModel → ${viewModel}`);
                         return;
                     }
                     var element = $('#moduleList').jScrollPane();
+					logger.debug(`function(isInitCall=${isInitCall}): element → ${element}`);
                     var api = element.data("jsp");
+					logger.debug(`function(isInitCall=${isInitCall}): api → ${api}`);
 
                     api.scrollToPercentY(0);
                     viewModel.deletedModulesReady(false);
@@ -810,6 +900,7 @@ define(['jquery', 'knockout',
                     getService().get('GetDeletedModuleList', {pageIndex:0, pageSize:pageSize, sortType:viewModel.sortType(), sortDirection:viewModel.sortDirection()}, function (data) {
                         var results = data.Results;
                         var viewModelPropName = 'deletedmodulesList';
+						logger.debug(`function(): viewModelPropName → ${viewModelPropName}`);
 
                         TotalResults[viewModelPropName]={};
                         TotalResults[viewModelPropName].remainingPages = data.TotalResults-pageSize;
@@ -818,6 +909,7 @@ define(['jquery', 'knockout',
 
                         for (var i = 0; i < results.length; i++) {
                             var module = new ModuleInfo(results[i]);
+							logger.debug(`function(): module → ${module}`);
                             viewModel.deletedmodulesList.push(module);
                         }
                         viewModel.deletedModulesReady(true);
@@ -850,6 +942,7 @@ define(['jquery', 'knockout',
 
                         for (var i = 0; i < results.length; i++) {
                             var user = new UserInfo(results[i]);
+							logger.debug(`function(): user → ${user}`);
                             viewModel.deletedusersList.push(user);
                         }
                         viewModel.selectAllUsers(false);
@@ -865,6 +958,7 @@ define(['jquery', 'knockout',
                 switch (panelId) {
                     case 'pages':
                         activeTab = 0;
+						logger.debug(`function(event=${event},ui=${ui}): panelId → ${panelId}`);
                         break;
                     case 'modules':
                         activeTab = 1;
@@ -891,6 +985,7 @@ define(['jquery', 'knockout',
                         break;
                     case "users":
                         getDeletedUserList(false);
+						logger.debug(`<<< Exiting function(section=${section},type=${type},direction=${direction})`);
                         break;
                 }
             }
@@ -963,6 +1058,7 @@ define(['jquery', 'knockout',
                     }
                 }
 
+				logger.debug(`<<< Exiting function(wrapper=${wrapper})`);
                 return _viewModel;
             };
 
@@ -977,6 +1073,7 @@ define(['jquery', 'knockout',
                 _options = $.extend({}, RECYCLE_BIN_DEFAULT_OPTIONS, _options);
                 var viewModel = getViewModel();
                 ko.applyBindings(viewModel, wrapper[0]);
+				logger.debug(`function(wrapper=${wrapper}): viewModel → ${viewModel}`);
                 initPagination();
             };
 

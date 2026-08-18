@@ -35,6 +35,8 @@ namespace DotNetNuke.Web.InternalServices
         /// <exception cref="ArgumentException">The image was of an unrecognised format.</exception>
         public static Size GetDimensions(string path)
         {
+			Logger.LogDebug(">>> Entering GetDimensions(path={Path})", path);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             Size size;
             try
             {
@@ -46,12 +48,14 @@ namespace DotNetNuke.Web.InternalServices
                     }
                     catch (ArgumentException e)
                     {
+						Logger.LogError("Exception in GetDimensions(path={Path}): {Arg1}", path, e.Message);
                         throw new ArgumentException($"{ErrorMessage} file: '{path}' ", nameof(path), e);
                     }
                 }
             }
             catch (ArgumentException)
             {
+				Logger.LogError("Exception in GetDimensions(path={Path}): {Arg1}", path, ArgumentException.getMessage());
                 // do it the old fashioned way
                 using (var b = new Bitmap(path))
                 {
@@ -59,6 +63,8 @@ namespace DotNetNuke.Web.InternalServices
                 }
             }
 
+			Logger.LogInformation("GetDimensions(path)={Path}: external service call took {Arg1} ms", path, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting GetDimensions(path={Path})", path);
             return size;
         }
 
@@ -68,6 +74,7 @@ namespace DotNetNuke.Web.InternalServices
         /// <exception cref="ArgumentException">The image was of an unrecognised format.</exception>
         public static Size GetDimensions(BinaryReader binaryReader)
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ImageHeader));
             int maxMagicBytesLength = ImageFormatDecoders.Keys.OrderByDescending(x => x.Length).First().Length;
             var magicBytes = new byte[maxMagicBytesLength];
             for (var i = 0; i < maxMagicBytesLength; i += 1)
@@ -87,6 +94,7 @@ namespace DotNetNuke.Web.InternalServices
 
         private static bool StartsWith(byte[] thisBytes, byte[] thatBytes)
         {
+			Logger.LogDebug(">>> Entering StartsWith(thisBytes={ThisBytes},thatBytes={ThatBytes})", thisBytes, thatBytes);
             for (var i = 0; i < thatBytes.Length; i += 1)
             {
                 if (thisBytes[i] != thatBytes[i])
@@ -95,82 +103,110 @@ namespace DotNetNuke.Web.InternalServices
                 }
             }
 
+			Logger.LogDebug("<<< Exiting StartsWith(thisBytes={ThisBytes},thatBytes={ThatBytes})", thisBytes, thatBytes);
             return true;
         }
 
         private static short ReadLittleEndianInt16(BinaryReader binaryReader)
         {
+			Logger.LogDebug(">>> Entering ReadLittleEndianInt16(binaryReader={BinaryReader})", binaryReader);
             var bytes = new byte[sizeof(short)];
             for (var i = 0; i < sizeof(short); i += 1)
+			Logger.LogDebug("ReadLittleEndianInt16(binaryReader={BinaryReader}): bytes → {Bytes}", binaryReader, bytes);
             {
                 bytes[sizeof(short) - 1 - i] = binaryReader.ReadByte();
             }
 
+			Logger.LogDebug("<<< Exiting ReadLittleEndianInt16(binaryReader={BinaryReader})", binaryReader);
             return BitConverter.ToInt16(bytes, 0);
         }
 
         private static ushort ReadLittleEndianUInt16(BinaryReader binaryReader)
         {
+			Logger.LogDebug(">>> Entering ReadLittleEndianUInt16(binaryReader={BinaryReader})", binaryReader);
             var bytes = new byte[sizeof(ushort)];
             for (var i = 0; i < sizeof(ushort); i += 1)
+			Logger.LogDebug("ReadLittleEndianUInt16(binaryReader={BinaryReader}): bytes → {Bytes}", binaryReader, bytes);
             {
                 bytes[sizeof(ushort) - 1 - i] = binaryReader.ReadByte();
             }
 
+			Logger.LogDebug("<<< Exiting ReadLittleEndianUInt16(binaryReader={BinaryReader})", binaryReader);
             return BitConverter.ToUInt16(bytes, 0);
         }
 
         private static int ReadLittleEndianInt32(BinaryReader binaryReader)
         {
+			Logger.LogDebug(">>> Entering ReadLittleEndianInt32(binaryReader={BinaryReader})", binaryReader);
             var bytes = new byte[sizeof(int)];
             for (var i = 0; i < sizeof(int); i += 1)
+			Logger.LogDebug("ReadLittleEndianInt32(binaryReader={BinaryReader}): bytes → {Bytes}", binaryReader, bytes);
             {
                 bytes[sizeof(int) - 1 - i] = binaryReader.ReadByte();
             }
 
+			Logger.LogDebug("<<< Exiting ReadLittleEndianInt32(binaryReader={BinaryReader})", binaryReader);
             return BitConverter.ToInt32(bytes, 0);
         }
 
         private static Size DecodeBitmap(BinaryReader binaryReader)
         {
+			Logger.LogDebug(">>> Entering DecodeBitmap(binaryReader={BinaryReader})", binaryReader);
             binaryReader.ReadBytes(16);
             var width = binaryReader.ReadInt32();
+			Logger.LogDebug("DecodeBitmap(binaryReader={BinaryReader}): width → {Width}", binaryReader, width);
             var height = binaryReader.ReadInt32();
+			Logger.LogDebug("DecodeBitmap(binaryReader={BinaryReader}): height → {Height}", binaryReader, height);
+			Logger.LogDebug("<<< Exiting DecodeBitmap(binaryReader={BinaryReader})", binaryReader);
             return new Size(width, height);
         }
 
         private static Size DecodeGif(BinaryReader binaryReader)
         {
+			Logger.LogDebug(">>> Entering DecodeGif(binaryReader={BinaryReader})", binaryReader);
             int width = binaryReader.ReadInt16();
             int height = binaryReader.ReadInt16();
+			Logger.LogDebug("DecodeGif(binaryReader={BinaryReader}): height → {Height}", binaryReader, height);
+			Logger.LogDebug("DecodeGif(binaryReader={BinaryReader}): width → {Width}", binaryReader, width);
+			Logger.LogDebug("<<< Exiting DecodeGif(binaryReader={BinaryReader})", binaryReader);
             return new Size(width, height);
         }
 
         private static Size DecodePng(BinaryReader binaryReader)
         {
+			Logger.LogDebug(">>> Entering DecodePng(binaryReader={BinaryReader})", binaryReader);
             binaryReader.ReadBytes(8);
             var width = ReadLittleEndianInt32(binaryReader);
+			Logger.LogDebug("DecodePng(binaryReader={BinaryReader}): width → {Width}", binaryReader, width);
             var height = ReadLittleEndianInt32(binaryReader);
+			Logger.LogDebug("DecodePng(binaryReader={BinaryReader}): height → {Height}", binaryReader, height);
+			Logger.LogDebug("<<< Exiting DecodePng(binaryReader={BinaryReader})", binaryReader);
             return new Size(width, height);
         }
 
         private static Size DecodeJfif(BinaryReader binaryReader)
         {
+			Logger.LogDebug(">>> Entering DecodeJfif(binaryReader={BinaryReader})", binaryReader);
             while (binaryReader.ReadByte() == 0xff)
             {
                 byte marker = binaryReader.ReadByte();
+				Logger.LogDebug("DecodeJfif(binaryReader={BinaryReader}): marker → {Marker}", binaryReader, marker);
                 short chunkLength = ReadLittleEndianInt16(binaryReader);
+				Logger.LogDebug("DecodeJfif(binaryReader={BinaryReader}): chunkLength → {ChunkLength}", binaryReader, chunkLength);
                 if (marker == 0xc0 || marker == 0xc2)
                 {
                     binaryReader.ReadByte();
                     int height = ReadLittleEndianInt16(binaryReader);
+					Logger.LogDebug("DecodeJfif(binaryReader={BinaryReader}): height → {Height}", binaryReader, height);
                     int width = ReadLittleEndianInt16(binaryReader);
+					Logger.LogDebug("DecodeJfif(binaryReader={BinaryReader}): width → {Width}", binaryReader, width);
                     return new Size(width, height);
                 }
 
                 if (chunkLength < 0)
                 {
                     var uchunkLength = (ushort)chunkLength;
+					Logger.LogDebug("DecodeJfif(binaryReader={BinaryReader}): uchunkLength → {UchunkLength}", binaryReader, uchunkLength);
                     binaryReader.ReadBytes(uchunkLength - 2);
                 }
                 else
@@ -179,6 +215,8 @@ namespace DotNetNuke.Web.InternalServices
                 }
             }
 
+			Logger.LogWarning("Throwing ArgumentException from DecodeJfif(binaryReader={BinaryReader})", binaryReader);
+			Logger.LogDebug("<<< Exiting DecodeJfif(binaryReader={BinaryReader})", binaryReader);
             throw new ArgumentException(ErrorMessage);
         }
     }

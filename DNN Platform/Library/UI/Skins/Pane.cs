@@ -29,6 +29,7 @@ namespace DotNetNuke.UI.Skins
     /// <summary>The Pane class represents a Pane within the Skin.</summary>
     public class Pane : IDisposable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Pane));
         private const string CPaneOutline = "paneOutline";
         private HtmlGenericControl containerWrapperControl;
         private Dictionary<string, Containers.Container> containers;
@@ -40,14 +41,19 @@ namespace DotNetNuke.UI.Skins
         /// <param name="pane">The HtmlContainerControl in the Skin.</param>
         public Pane(HtmlContainerControl pane)
         {
+			Logger.LogDebug(">>> Entering Pane(pane={Pane})", pane);
             this.PaneControl = pane;
 
+			Logger.LogDebug("Pane(pane={Pane}): this.PaneControl → {Arg1}", pane, this.PaneControl);
             // Disable ViewState (we enable it later in the process)
             this.PaneControl.ViewStateMode = ViewStateMode.Disabled;
             this.Name = pane.ID;
+			Logger.LogDebug("Pane(pane={Pane}): this.Name → {Arg1}", pane, this.Name);
+			Logger.LogDebug("<<< Exiting Pane(pane={Pane})", pane);
         }
 
         /// <summary>
+		Logger.LogDebug("<<< Exiting Pane(pane={Pane})", pane);
         /// Initializes a new instance of the <see cref="Pane"/> class.
         /// Constructs a new Pane object from the Control in the Skin.
         /// </summary>
@@ -55,8 +61,10 @@ namespace DotNetNuke.UI.Skins
         /// <param name="pane">The HtmlContainerControl in the Skin.</param>
         public Pane(string name, HtmlContainerControl pane)
         {
+			Logger.LogDebug(">>> Entering Pane(name={Name},pane={Pane})", name, pane);
             this.PaneControl = pane;
             this.Name = name;
+			Logger.LogDebug("Pane(name={Name},pane={Pane}): this.PaneControl → {Arg2}", name, pane, this.PaneControl);
         }
 
         /// <summary>Gets a Dictionary of Containers.</summary>
@@ -76,12 +84,15 @@ namespace DotNetNuke.UI.Skins
         /// <param name="module">The Module.</param>
         public void InjectModule(ModuleInfo module)
         {
+			Logger.LogDebug(">>> Entering InjectModule(module={Module})", module);
             this.containerWrapperControl = new HtmlGenericControl("div");
             this.PaneControl.Controls.Add(this.containerWrapperControl);
+			Logger.LogDebug("InjectModule(module={Module}): containerWrapperControl → {ContainerWrapperControl}", module, containerWrapperControl);
 
             // inject module classes
             string classFormatString = "DnnModule DnnModule-{0} DnnModule-{1}";
             string sanitizedModuleName = Null.NullString;
+			Logger.LogDebug("InjectModule(module={Module}): sanitizedModuleName → {SanitizedModuleName}", module, sanitizedModuleName);
 
             if (!string.IsNullOrEmpty(module.DesktopModule.ModuleName))
             {
@@ -104,6 +115,7 @@ namespace DotNetNuke.UI.Skins
 
                 // Load container control
                 Containers.Container container = this.LoadModuleContainer(module);
+				Logger.LogDebug("InjectModule(module={Module}): container → {Container}", module, container);
 
                 // Add Container to Dictionary
                 this.Containers.Add(container.ID, container);
@@ -117,6 +129,8 @@ namespace DotNetNuke.UI.Skins
                         if (actionControl is ActionsMenu and Control control)
                         {
                             control.Visible = false;
+							Logger.LogDebug("InjectModule(module={Module}): control.Visible → {Arg1}", module, control.Visible);
+							Logger.LogDebug("InjectModule(module={Module}): container.InjectActionMenu → {Arg1}", module, container.InjectActionMenu);
                             container.InjectActionMenu = true;
                         }
                     }
@@ -126,10 +140,13 @@ namespace DotNetNuke.UI.Skins
                 {
                     // provide Drag-N-Drop capabilities
                     var dragDropContainer = new Panel();
+					Logger.LogDebug("InjectModule(module={Module}): dragDropContainer → {DragDropContainer}", module, dragDropContainer);
                     Control title = container.FindControl("dnnTitle");
+					Logger.LogDebug("InjectModule(module={Module}): title → {Title}", module, title);
 
                     // Assume that the title control is named dnnTitle.  If this becomes an issue we could loop through the controls looking for the title type of skin object
                     dragDropContainer.ID = container.ID + "_DD";
+					Logger.LogDebug("InjectModule(module={Module}): dragDropContainer.ID → {Arg1}", module, dragDropContainer.ID);
                     this.containerWrapperControl.Controls.Add(dragDropContainer);
 
                     // inject the container into the page pane - this triggers the Pre_Init() event for the user control
@@ -171,11 +188,14 @@ namespace DotNetNuke.UI.Skins
             }
             catch (ThreadAbortException)
             {
+				Logger.LogError("Exception in InjectModule(module={Module}): {Arg1}", module, ThreadAbortException.getMessage());
                 // Response.Redirect may be called in module control's OnInit method, so it will cause ThreadAbortException, no need any action here.
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in InjectModule(module={Module}): {Arg1}", module, exc.getMessage());
                 var lex = new ModuleLoadException(string.Format(CultureInfo.InvariantCulture, Skin.MODULEADD_ERROR, this.PaneControl.ID), exc);
+				Logger.LogDebug("InjectModule(module={Module}): lex → {Lex}", module, lex);
                 if (TabPermissionController.CanAdminPage())
                 {
                     // only display the error to administrators
@@ -183,6 +203,8 @@ namespace DotNetNuke.UI.Skins
                 }
 
                 Exceptions.LogException(exc);
+				Logger.LogWarning("Throwing lex from InjectModule(module={Module})", module);
+			Logger.LogDebug("<<< Exiting InjectModule(module={Module})", module);
                 throw lex;
             }
         }
@@ -190,6 +212,7 @@ namespace DotNetNuke.UI.Skins
         /// <summary>ProcessPane processes the Attributes for the PaneControl.</summary>
         public void ProcessPane()
         {
+			Logger.LogDebug(">>> Entering ProcessPane()");
             if (this.PaneControl != null)
             {
                 // remove excess skin non-validating attributes
@@ -214,6 +237,7 @@ namespace DotNetNuke.UI.Skins
 
                     // display pane name
                     var ctlLabel = new Label { Text = "<center>" + this.Name + "</center><br />", CssClass = "SubHead" };
+					Logger.LogDebug("ProcessPane(): ctlLabel → {CtlLabel}", ctlLabel);
                     this.PaneControl.Controls.AddAt(0, ctlLabel);
                 }
                 else
@@ -256,42 +280,52 @@ namespace DotNetNuke.UI.Skins
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting ProcessPane()");
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+			Logger.LogDebug(">>> Entering Dispose()");
             this.Dispose(true);
             GC.SuppressFinalize(this);
+			Logger.LogDebug("<<< Exiting Dispose()");
         }
 
         protected virtual void Dispose(bool disposing)
         {
+			Logger.LogDebug(">>> Entering Dispose(disposing={Disposing})", disposing);
             if (disposing)
             {
                 this.containerWrapperControl?.Dispose();
                 this.PaneControl?.Dispose();
             }
+			Logger.LogDebug("<<< Exiting Dispose(disposing={Disposing})", disposing);
         }
 
         private static bool IsVersionableModule(ModuleInfo moduleInfo)
         {
+			Logger.LogDebug(">>> Entering IsVersionableModule(moduleInfo={ModuleInfo})", moduleInfo);
             if (string.IsNullOrEmpty(moduleInfo.DesktopModule.BusinessControllerClass))
             {
                 return false;
             }
 
             var controllerType = Framework.Reflection.CreateType(moduleInfo.DesktopModule.BusinessControllerClass);
+			Logger.LogDebug("IsVersionableModule(moduleInfo={ModuleInfo}): controllerType → {ControllerType}", moduleInfo, controllerType);
+			Logger.LogDebug("<<< Exiting IsVersionableModule(moduleInfo={ModuleInfo})", moduleInfo);
             return typeof(IVersionable).IsAssignableFrom(controllerType);
         }
 
         private bool CanCollapsePane()
         {
+			Logger.LogDebug(">>> Entering CanCollapsePane()");
             // This section sets the width to "0" on panes that have no modules.
             // This preserves the integrity of the HTML syntax so we don't have to set
             // the visiblity of a pane to false. Setting the visibility of a pane to
             // false where there are colspans and rowspans can render the skin incorrectly.
             bool canCollapsePane = true;
+			Logger.LogDebug("CanCollapsePane(): canCollapsePane → {CanCollapsePane}", canCollapsePane);
             if (this.Containers.Count > 0)
             {
                 canCollapsePane = false;
@@ -316,6 +350,7 @@ namespace DotNetNuke.UI.Skins
                 canCollapsePane = false;
             }
 
+			Logger.LogDebug("<<< Exiting CanCollapsePane()");
             return canCollapsePane;
         }
 
@@ -324,11 +359,13 @@ namespace DotNetNuke.UI.Skins
         /// <returns>A Container.</returns>
         private Containers.Container LoadContainerByPath(string containerPath)
         {
+			Logger.LogDebug(">>> Entering LoadContainerByPath(containerPath={ContainerPath})", containerPath);
             if (containerPath.IndexOf("/skins/", StringComparison.InvariantCultureIgnoreCase) != -1
                 || containerPath.IndexOf(@"/skins\", StringComparison.InvariantCultureIgnoreCase) != -1
                 || containerPath.IndexOf(@"\skins\", StringComparison.InvariantCultureIgnoreCase) != -1
                 || containerPath.IndexOf(@"\skins/", StringComparison.InvariantCultureIgnoreCase) != -1)
             {
+				Logger.LogWarning("Throwing InvalidContainerPathException from LoadContainerByPath(containerPath={ContainerPath})", containerPath);
                 throw new InvalidContainerPathException($"Invalid container path: {containerPath}");
             }
 
@@ -336,22 +373,27 @@ namespace DotNetNuke.UI.Skins
 
             try
             {
+				Logger.LogDebug("LoadContainerByPath(containerPath={ContainerPath}): container → {Container}", containerPath, container);
                 string containerSrc = containerPath;
                 if (containerPath.IndexOf(Globals.ApplicationPath, StringComparison.InvariantCultureIgnoreCase) != -1)
                 {
                     containerPath = containerPath.Remove(0, Globals.ApplicationPath.Length);
+					Logger.LogDebug("LoadContainerByPath(containerPath={ContainerPath}): containerPath → {ContainerPath1}", containerPath, containerPath);
                 }
 
                 container = ControlUtilities.LoadControl<Containers.Container>(this.PaneControl.Page, containerPath);
                 container.ContainerSrc = containerSrc;
+				Logger.LogDebug("LoadContainerByPath(containerPath={ContainerPath}): container.ContainerSrc → {Arg1}", containerPath, container.ContainerSrc);
 
                 // call databind so that any server logic in the container is executed
                 container.DataBind();
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in LoadContainerByPath(containerPath={ContainerPath}): {Arg1}", containerPath, exc.getMessage());
                 // could not load user control
                 var lex = new ModuleLoadException(Skin.MODULELOAD_ERROR, exc);
+				Logger.LogDebug("LoadContainerByPath(containerPath={ContainerPath}): lex → {Lex}", containerPath, lex);
                 if (TabPermissionController.CanAdminPage())
                 {
                     // only display the error to administrators
@@ -369,8 +411,11 @@ namespace DotNetNuke.UI.Skins
         /// <returns>A Container.</returns>
         private Containers.Container LoadContainerFromCookie(HttpRequest request)
         {
+			Logger.LogDebug(">>> Entering LoadContainerFromCookie(request={Request})", request);
             Containers.Container container = null;
             HttpCookie cookie = request.Cookies["_ContainerSrc" + this.PortalSettings.PortalId];
+			Logger.LogDebug("LoadContainerFromCookie(request={Request}): cookie → {Cookie}", request, cookie);
+			Logger.LogDebug("LoadContainerFromCookie(request={Request}): container → {Container}", request, container);
             if (cookie != null)
             {
                 if (!string.IsNullOrEmpty(cookie.Value))
@@ -379,19 +424,24 @@ namespace DotNetNuke.UI.Skins
                 }
             }
 
+			Logger.LogDebug("<<< Exiting LoadContainerFromCookie(request={Request})", request);
             return container;
         }
 
         private Containers.Container LoadContainerFromPane()
         {
+			Logger.LogDebug(">>> Entering LoadContainerFromPane()");
             Containers.Container container = null;
             string containerSrc;
+			Logger.LogDebug("LoadContainerFromPane(): container → {Container}", container);
             var validSrc = false;
+			Logger.LogDebug("LoadContainerFromPane(): validSrc → {ValidSrc}", validSrc);
 
             if ((this.PaneControl.Attributes["ContainerType"] != null) && (this.PaneControl.Attributes["ContainerName"] != null))
             {
                 containerSrc = "[" + this.PaneControl.Attributes["ContainerType"] + "]" + SkinController.RootContainer + "/" + this.PaneControl.Attributes["ContainerName"] + "/" +
                                this.PaneControl.Attributes["ContainerSrc"];
+							Logger.LogDebug("LoadContainerFromPane(): containerSrc → {ContainerSrc}", containerSrc);
                 validSrc = true;
             }
             else
@@ -410,13 +460,17 @@ namespace DotNetNuke.UI.Skins
                 container = this.LoadContainerByPath(containerSrc);
             }
 
+			Logger.LogDebug("<<< Exiting LoadContainerFromPane()");
             return container;
         }
 
         private Containers.Container LoadContainerFromQueryString(ModuleInfo module, HttpRequest request)
         {
+			Logger.LogDebug(">>> Entering LoadContainerFromQueryString(module={Module},request={Request})", module, request);
             Containers.Container container = null;
             int previewModuleId = -1;
+			Logger.LogDebug("LoadContainerFromQueryString(module={Module},request={Request}): previewModuleId → {PreviewModuleId}", module, request, previewModuleId);
+			Logger.LogDebug("LoadContainerFromQueryString(module={Module},request={Request}): container → {Container}", module, request, container);
             if (request.QueryString["ModuleId"] != null)
             {
                 if (!int.TryParse(request.QueryString["ModuleId"], out previewModuleId))
@@ -429,16 +483,20 @@ namespace DotNetNuke.UI.Skins
             if (request.QueryString["ContainerSrc"] != null && (module.ModuleID == previewModuleId || previewModuleId == -1))
             {
                 string containerSrc = SkinController.FormatSkinSrc(Globals.QueryStringDecode(request.QueryString["ContainerSrc"]) + ".ascx", this.PortalSettings);
+				Logger.LogDebug("LoadContainerFromQueryString(module={Module},request={Request}): containerSrc → {ContainerSrc}", module, request, containerSrc);
                 container = this.LoadContainerByPath(containerSrc);
             }
 
+			Logger.LogDebug("<<< Exiting LoadContainerFromQueryString(module={Module},request={Request})", module, request);
             return container;
         }
 
         private Containers.Container LoadNoContainer(ModuleInfo module)
         {
+			Logger.LogDebug(">>> Entering LoadNoContainer(module={Module})", module);
             string noContainerSrc = "[G]" + SkinController.RootContainer + "/_default/No Container.ascx";
             Containers.Container container = null;
+			Logger.LogDebug("LoadNoContainer(module={Module}): container → {Container}", module, container);
 
             // if the module specifies that no container should be used
             if (module.DisplayTitle == false)
@@ -458,14 +516,18 @@ namespace DotNetNuke.UI.Skins
                 }
             }
 
+			Logger.LogDebug("<<< Exiting LoadNoContainer(module={Module})", module);
             return container;
         }
 
         private Containers.Container LoadModuleContainer(ModuleInfo module)
         {
+			Logger.LogDebug(">>> Entering LoadModuleContainer(module={Module})", module);
             var containerSrc = Null.NullString;
             var request = this.PaneControl.Page.Request;
+			Logger.LogDebug("LoadModuleContainer(module={Module}): containerSrc → {ContainerSrc}", module, containerSrc);
             Containers.Container container = null;
+			Logger.LogDebug("LoadModuleContainer(module={Module}): container → {Container}", module, container);
 
             if (this.PortalSettings.EnablePopUps && UrlUtils.InPopUp())
             {
@@ -539,6 +601,7 @@ namespace DotNetNuke.UI.Skins
 
             // set container id to an explicit short name to reduce page payload
             container.ID = "ctr";
+			Logger.LogDebug("LoadModuleContainer(module={Module}): container.ID → {Arg1}", module, container.ID);
 
             // make the container id unique for the page
             if (module.ModuleID > -1)
@@ -546,6 +609,7 @@ namespace DotNetNuke.UI.Skins
                 container.ID += module.ModuleID.ToString(CultureInfo.InvariantCulture);
             }
 
+			Logger.LogDebug("<<< Exiting LoadModuleContainer(module={Module})", module);
             return container;
         }
 
@@ -553,12 +617,17 @@ namespace DotNetNuke.UI.Skins
         /// <param name="args">A ClientAPIPostBackEventArgs object.</param>
         private void ModuleMoveToPanePostBack(ClientAPIPostBackEventArgs args)
         {
+			Logger.LogDebug(">>> Entering ModuleMoveToPanePostBack(args={Args})", args);
             var portalSettings = (PortalSettings)HttpContext.Current.Items["PortalSettings"];
             if (TabPermissionController.CanAdminPage())
+			Logger.LogDebug("ModuleMoveToPanePostBack(args={Args}): portalSettings → {PortalSettings}", args, portalSettings);
             {
                 var moduleId = Convert.ToInt32(args.EventArguments["moduleid"], CultureInfo.InvariantCulture);
+				Logger.LogDebug("ModuleMoveToPanePostBack(args={Args}): moduleId → {ModuleId}", args, moduleId);
                 var paneName = Convert.ToString(args.EventArguments["pane"], CultureInfo.InvariantCulture);
+				Logger.LogDebug("ModuleMoveToPanePostBack(args={Args}): paneName → {PaneName}", args, paneName);
                 var moduleOrder = Convert.ToInt32(args.EventArguments["order"], CultureInfo.InvariantCulture);
+				Logger.LogDebug("ModuleMoveToPanePostBack(args={Args}): moduleOrder → {ModuleOrder}", args, moduleOrder);
 
                 ModuleController.Instance.UpdateModuleOrder(portalSettings.ActiveTab.TabID, moduleId, moduleOrder, paneName);
                 ModuleController.Instance.UpdateTabModuleOrder(portalSettings.ActiveTab.TabID);
@@ -566,6 +635,7 @@ namespace DotNetNuke.UI.Skins
                 // Redirect to the same page to pick up changes
                 this.PaneControl.Page.Response.Redirect(this.PaneControl.Page.Request.RawUrl, true);
             }
+			Logger.LogDebug("<<< Exiting ModuleMoveToPanePostBack(args={Args})", args);
         }
     }
 }

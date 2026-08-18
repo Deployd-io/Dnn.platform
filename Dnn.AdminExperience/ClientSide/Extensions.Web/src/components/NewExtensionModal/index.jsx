@@ -7,14 +7,18 @@ import { ExtensionActions, VisiblePanelActions, PaginationActions } from "action
 import CustomSettings from "../EditExtension/CustomSettings";
 import BasicPackageInformation from "../common/BasicPackageInformation";
 import styles from "./style.module.less";
+const logger = console;
 
 const inputStyle = { width: "100%" };
 
 function formatVersionNumber(n) {
+	logger.debug(`>>> Entering formatVersionNumber(n=${n})`);
+	logger.debug(`<<< Exiting formatVersionNumber(n=${n})`);
     return n > 9 ? "" + n : "0" + n;
 }
 
 function getDropdownOptions() {
+	logger.debug('>>> Entering getDropdownOptions()');
     let options = [];
     for (let i = 0; i < 100; i++) {
         options.push({
@@ -22,10 +26,13 @@ function getDropdownOptions() {
             value: i
         });
     }
+	logger.debug('<<< Exiting getDropdownOptions()');
     return options;
 }
 
 function deepCopy(object) {
+	logger.debug(`>>> Entering deepCopy(object=${object})`);
+	logger.debug(`<<< Exiting deepCopy(object=${object})`);
     return JSON.parse(JSON.stringify(object));
 }
 
@@ -33,13 +40,17 @@ function deepCopy(object) {
 class NewExtensionModal extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.versionDropdownOptions = getDropdownOptions();
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const { props } = this;
         if ((!props.moduleCategories || props.moduleCategories.length === 0)) {
             props.dispatch(ExtensionActions.getModuleCategories());
+			logger.debug('<<< Exiting UNSAFE_componentWillMount()');
         }
     }
 
@@ -58,31 +69,41 @@ class NewExtensionModal extends Component {
         this.updateExtensionBeingEdited(_extensionBeingEdited);
     }
     onVersionChange(index, option) {
+		logger.debug(`>>> Entering onVersionChange(index=${index},option=${option})`);
         const { props } = this;
         let _extensionBeingEdited = JSON.parse(JSON.stringify(props.extensionBeingEdited));
         if (_extensionBeingEdited.version) {
             let versionArray = _extensionBeingEdited.version.value.split(".");
+			logger.debug(`onVersionChange(index=${index},option=${option}): versionArray → ${versionArray}`);
             versionArray[index] = option.value;
             _extensionBeingEdited.version.value = versionArray.join(".");
         }
         this.updateExtensionBeingEdited(_extensionBeingEdited);
+		logger.debug(`onVersionChange(index=${index},option=${option}): _extensionBeingEdited → ${_extensionBeingEdited}`);
+		logger.debug(`<<< Exiting onVersionChange(index=${index},option=${option})`);
     }
     onPackageTypeSelect(option) {
+		logger.debug(`>>> Entering onPackageTypeSelect(option=${option})`);
         let value = option.value;
 
         const { props } = this;
         let _extensionBeingEdited = deepCopy(props.extensionBeingEdited);
+		logger.debug(`onPackageTypeSelect(option=${option}): _extensionBeingEdited → ${_extensionBeingEdited}`);
 
         _extensionBeingEdited.packageType.value = value;
 
         this.updateExtensionBeingEdited(_extensionBeingEdited);
+		logger.debug(`<<< Exiting onPackageTypeSelect(option=${option})`);
     }
 
     updateExtensionBeingEdited(extensionBeingEdited, callback) {
+		logger.debug(`>>> Entering updateExtensionBeingEdited(extensionBeingEdited=${extensionBeingEdited},callback=${callback})`);
         const { props } = this;
         props.dispatch(ExtensionActions.updateExtensionBeingEdited(extensionBeingEdited, callback));
+		logger.debug(`<<< Exiting updateExtensionBeingEdited(extensionBeingEdited=${extensionBeingEdited},callback=${callback})`);
     }
     parseEditorActions(extension) {
+		logger.debug(`>>> Entering parseEditorActions(extension=${extension})`);
         switch (extension.packageType.value.toLowerCase()) {
             case "module":
                 return {
@@ -104,11 +125,13 @@ class NewExtensionModal extends Component {
                     dependentPackageId: extension.dependentPackageId.value
                 };
             default:
+				logger.debug(`<<< Exiting parseEditorActions(extension=${extension})`);
                 return {};
         }
     }
 
     onSaveExtension() {
+		logger.debug('>>> Entering onSaveExtension()');
         const {props} = this;
 
         let editorActions = this.parseEditorActions(props.extensionBeingEdited);
@@ -121,16 +144,21 @@ class NewExtensionModal extends Component {
                 props.dispatch(ExtensionActions.getInstalledPackages(props.extensionBeingEdited.packageType.value));
             }
             this.selectPanel(0);
+			logger.debug('<<< Exiting onSaveExtension()');
         }));
     }
     toggleTriedToSave() {
+		logger.debug('>>> Entering toggleTriedToSave()');
         const {props} = this;
         props.dispatch(ExtensionActions.toggleTriedToSave());
+		logger.debug('<<< Exiting toggleTriedToSave()');
     }
     validateFields() {
+		logger.debug('>>> Entering validateFields()');
         const { props } = this;
         let errorCount = 0;
         let _extensionBeingEdited = JSON.parse(JSON.stringify(props.extensionBeingEdited));
+		logger.debug(`validateFields(): _extensionBeingEdited → ${_extensionBeingEdited}`);
         Object.keys(_extensionBeingEdited).forEach((key) => {
             let field = _extensionBeingEdited[key];
             if (field.validateRequired && field.value === "") {
@@ -142,19 +170,23 @@ class NewExtensionModal extends Component {
             this.toggleTriedToSave();
         }
         this.updateExtensionBeingEdited(_extensionBeingEdited);
+		logger.debug('<<< Exiting validateFields()');
         return errorCount === 0;
     }
 
     selectPanel(panel, event) {
+		logger.debug(`>>> Entering selectPanel(panel=${panel},event=${event})`);
         if (event) {
             event.preventDefault();
         }
         const {props} = this;
         props.dispatch(VisiblePanelActions.selectPanel(panel));
+		logger.debug(`<<< Exiting selectPanel(panel=${panel},event=${event})`);
     }
 
 
     onSave() {
+		logger.debug('>>> Entering onSave()');
         if (!this.validateFields()) {
             return;
         }
@@ -162,9 +194,11 @@ class NewExtensionModal extends Component {
         this.onSaveExtension();
     }
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         const {extensionBeingEdited} = props;
         const version = extensionBeingEdited.version.value ? extensionBeingEdited.version.value.split(".") : [0, 0, 0];
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.newExtensionModal}>
                 <PersonaBarPageHeader title={Localization.get("CreateExtension.Action")} />
@@ -242,6 +276,8 @@ NewExtensionModal.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         extensionBeingEdited: state.extension.extensionBeingEdited,
         triedToSave: state.extension.triedToSave,

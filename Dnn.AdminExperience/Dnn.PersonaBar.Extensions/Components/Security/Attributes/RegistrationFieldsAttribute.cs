@@ -19,9 +19,13 @@ namespace Dnn.PersonaBar.Security.Attributes
     {
         public RegistrationFieldsAttribute(string registrationFormType, string requireUniqueDisplayName, string displayNameFormat)
         {
+			eventLogger.LogDebug(">>> Entering RegistrationFieldsAttribute(registrationFormType={RegistrationFormType},requireUniqueDisplayName={RequireUniqueDisplayName},displayNameFormat={DisplayNameFormat})", registrationFormType, requireUniqueDisplayName, displayNameFormat);
             this.RegistrationFormTypePropertyName = registrationFormType;
             this.RequireUniqueDisplayNamePropertyName = requireUniqueDisplayName;
+			eventLogger.LogDebug("RegistrationFieldsAttribute(registrationFormType={RegistrationFormType},requireUniqueDisplayName={RequireUniqueDisplayName},displayNameFormat={DisplayNameFormat}): this.RegistrationFormTypePropertyName → {Arg3}", registrationFormType, requireUniqueDisplayName, displayNameFormat, this.RegistrationFormTypePropertyName);
+			eventLogger.LogDebug("RegistrationFieldsAttribute(registrationFormType={RegistrationFormType},requireUniqueDisplayName={RequireUniqueDisplayName},displayNameFormat={DisplayNameFormat}): this.RequireUniqueDisplayNamePropertyName → {Arg3}", registrationFormType, requireUniqueDisplayName, displayNameFormat, this.RequireUniqueDisplayNamePropertyName);
             this.DisplayNameFormatPropertyName = displayNameFormat;
+			eventLogger.LogDebug("<<< Exiting RegistrationFieldsAttribute(registrationFormType={RegistrationFormType},requireUniqueDisplayName={RequireUniqueDisplayName},displayNameFormat={DisplayNameFormat})", registrationFormType, requireUniqueDisplayName, displayNameFormat);
         }
 
         public string RegistrationFormTypePropertyName { get; private set; }
@@ -33,14 +37,17 @@ namespace Dnn.PersonaBar.Security.Attributes
         /// <inheritdoc />
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
+			eventLogger.LogDebug(">>> Entering IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             var registrationFormTypeValue = string.Empty;
 
+			eventLogger.LogDebug("IsValid(value={Value},validationContext={ValidationContext}): registrationFormTypeValue → {RegistrationFormTypeValue}", value, validationContext, registrationFormTypeValue);
             try
             {
                 registrationFormTypeValue = validationContext.ObjectType.GetProperty(this.RegistrationFormTypePropertyName).GetValue(validationContext.ObjectInstance, null).ToString();
             }
             catch
             {
+				eventLogger.LogError("Exception in IsValid(value={Value},validationContext={ValidationContext}): {Arg2}", value, validationContext, ex.Message);
                 return new ValidationResult(string.Format(CultureInfo.CurrentCulture, Localization.GetString(Constants.NotValid, Constants.LocalResourcesFile), this.RegistrationFormTypePropertyName, registrationFormTypeValue));
             }
 
@@ -57,8 +64,11 @@ namespace Dnn.PersonaBar.Security.Attributes
             if (registrationFormType == 1)
             {
                 var registrationFields = value.ToString();
+				eventLogger.LogDebug("IsValid(value={Value},validationContext={ValidationContext}): registrationFields → {RegistrationFields}", value, validationContext, registrationFields);
                 var registrationTokens = registrationFields.Split(',');
+				eventLogger.LogDebug("IsValid(value={Value},validationContext={ValidationContext}): registrationTokens → {RegistrationTokens}", value, validationContext, registrationTokens);
                 var portalId = PortalController.Instance.GetCurrentSettings().PortalId;
+				eventLogger.LogDebug("IsValid(value={Value},validationContext={ValidationContext}): portalId → {PortalId}", value, validationContext, portalId);
 
                 foreach (var registrationField in registrationTokens)
                 {
@@ -74,6 +84,7 @@ namespace Dnn.PersonaBar.Security.Attributes
                 }
 
                 var requireUniqueDisplayNameValue = string.Empty;
+				eventLogger.LogDebug("IsValid(value={Value},validationContext={ValidationContext}): requireUniqueDisplayNameValue → {RequireUniqueDisplayNameValue}", value, validationContext, requireUniqueDisplayNameValue);
 
                 try
                 {
@@ -101,6 +112,7 @@ namespace Dnn.PersonaBar.Security.Attributes
                 }
 
                 var displayNameFormatValue = string.Empty;
+				eventLogger.LogDebug("IsValid(value={Value},validationContext={ValidationContext}): displayNameFormatValue → {DisplayNameFormatValue}", value, validationContext, displayNameFormatValue);
 
                 try
                 {
@@ -117,6 +129,7 @@ namespace Dnn.PersonaBar.Security.Attributes
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             return ValidationResult.Success;
         }
     }

@@ -14,11 +14,15 @@ internal class TestSetup
     [OneTimeSetUp]
     public void SetUp()
     {
+	mockEventLogger.LogDebug(">>> Entering SetUp()");
+	mockEventLogger.LogDebug("<<< Exiting SetUp()");
     }
 
     [OneTimeTearDown]
     public void TearDown()
     {
+		mockEventLogger.LogDebug(">>> Entering TearDown()");
         MockComponentProvider.ResetContainer();
+		mockEventLogger.LogDebug("<<< Exiting TearDown()");
     }
 }

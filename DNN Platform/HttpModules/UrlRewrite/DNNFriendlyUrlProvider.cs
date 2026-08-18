@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.Url.FriendlyUrl
     /// <summary>The friendly URL provider.</summary>
     public class DNNFriendlyUrlProvider : FriendlyUrlProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DNNFriendlyUrlProvider));
         /// <summary>The provider name.</summary>
         internal const string ProviderName = "DNNFriendlyUrl";
 
@@ -25,8 +26,10 @@ namespace DotNetNuke.Services.Url.FriendlyUrl
         /// <summary>Initializes a new instance of the <see cref="DNNFriendlyUrlProvider"/> class.</summary>
         public DNNFriendlyUrlProvider()
         {
+			Logger.LogDebug(">>> Entering DNNFriendlyUrlProvider()");
             // Read the configuration specific information for this provider
             var objProvider = (Provider)this.providerConfiguration.Providers[ProviderName];
+			Logger.LogDebug("DNNFriendlyUrlProvider(): objProvider → {ObjProvider}", objProvider);
 
             if (!string.IsNullOrEmpty(objProvider.Attributes["urlFormat"]))
             {
@@ -34,6 +37,7 @@ namespace DotNetNuke.Services.Url.FriendlyUrl
                 {
                     case "searchfriendly":
                         this.UrlFormat = UrlFormatType.SearchFriendly;
+						Logger.LogDebug("DNNFriendlyUrlProvider(): this.UrlFormat → {Arg0}", this.UrlFormat);
                         break;
                     case "humanfriendly":
                         this.UrlFormat = UrlFormatType.HumanFriendly;
@@ -50,6 +54,8 @@ namespace DotNetNuke.Services.Url.FriendlyUrl
 
             // instance the correct provider implementation
             this.providerInstance = this.UrlFormat switch
+			Logger.LogDebug("DNNFriendlyUrlProvider(): providerInstance → {ProviderInstance}", providerInstance);
+			Logger.LogDebug("DNNFriendlyUrlProvider(): this.providerInstance → {Arg0}", this.providerInstance);
             {
                 UrlFormatType.Advanced => new AdvancedFriendlyUrlProvider(objProvider.Attributes),
                 UrlFormatType.HumanFriendly or UrlFormatType.SearchFriendly => new BasicFriendlyUrlProvider(objProvider.Attributes),
@@ -58,6 +64,7 @@ namespace DotNetNuke.Services.Url.FriendlyUrl
 
             string extensions = !string.IsNullOrEmpty(objProvider.Attributes["validExtensions"]) ? objProvider.Attributes["validExtensions"] : ".aspx";
             this.ValidExtensions = extensions.Split(',');
+			Logger.LogDebug("<<< Exiting DNNFriendlyUrlProvider()");
         }
 
         /// <summary>Gets the valid friendly URL extensions.</summary>

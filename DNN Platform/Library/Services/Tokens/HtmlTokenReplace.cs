@@ -7,15 +7,18 @@ namespace DotNetNuke.Services.Tokens
 
     public class HtmlTokenReplace : TokenReplace
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HtmlTokenReplace));
         /// <summary>Initializes a new instance of the <see cref="HtmlTokenReplace"/> class.</summary>
         /// <param name="page">The page on which the module is rendering.</param>
         public HtmlTokenReplace(Page page)
             : base(Scope.DefaultSettings)
         {
+			Logger.LogDebug(">>> Entering HtmlTokenReplace(page={Page})", page);
             this.AddPropertySource("css", new CssPropertyAccess(page));
             this.AddPropertySource("js", new JavaScriptPropertyAccess(page));
             this.AddPropertySource("javascript", new JavaScriptPropertyAccess(page));
             this.AddPropertySource("antiforgerytoken", new AntiForgeryTokenPropertyAccess());
+			Logger.LogDebug("<<< Exiting HtmlTokenReplace(page={Page})", page);
         }
     }
 }

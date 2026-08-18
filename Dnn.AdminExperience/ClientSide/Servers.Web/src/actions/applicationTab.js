@@ -1,9 +1,12 @@
 import {applicationTab as ActionTypes}  from "../constants/actionTypes";
 import applicationTabService from "../services/applicationTabService";
 import localization from "../localization";
+const logger = console;
 
 const applicationTabActions = {
     loadApplicationInfo() {       
+		logger.debug('>>> Entering loadApplicationInfo()');
+		logger.debug('<<< Exiting loadApplicationInfo()');
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.LOAD_APPLICATION_TAB               
@@ -17,6 +20,7 @@ const applicationTabActions = {
                     }
                 });  
             }).catch(() => {
+				logger.error('Exception in loadApplicationInfo()');
                 dispatch({
                     type: ActionTypes.ERROR_LOADING_APPLICATION_TAB,
                     payload: {

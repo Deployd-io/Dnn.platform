@@ -19,10 +19,14 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc />
         public CheckResult Execute()
         {
+			eventLogger.LogDebug(">>> Entering Execute()");
             var result = new CheckResult(SeverityEnum.Unverified, this.Id);
             try
+			eventLogger.LogDebug("Execute(): result → {Result}", result);
             {
                 var portalController = new PortalController();
+				eventLogger.LogDebug("Execute(): portalController → {PortalController}", portalController);
+				eventLogger.LogDebug("Execute(): result.Severity → {Arg0}", result.Severity);
                 result.Severity = SeverityEnum.Pass;
                 foreach (PortalInfo portal in portalController.GetPortals())
                 {
@@ -36,6 +40,8 @@ namespace Dnn.PersonaBar.Security.Components.Checks
             }
             catch (Exception)
             {
+				eventLogger.LogError("Exception in Execute(): {Arg0}", Exception.Message);
+			eventLogger.LogDebug("<<< Exiting Execute()");
                 throw;
             }
 

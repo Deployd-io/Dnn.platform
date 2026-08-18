@@ -26,24 +26,32 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
 
         public void Failed(string message)
         {
+			eventLogger.LogDebug(">>> Entering Failed(message={Message})", message);
             this.Success = false;
             this.Message = message;
+			eventLogger.LogDebug("Failed(message={Message}): this.Success → {Arg1}", message, this.Success);
+			eventLogger.LogDebug("<<< Exiting Failed(message={Message})", message);
         }
 
         public void Succeed()
         {
+			eventLogger.LogDebug(">>> Entering Succeed()");
             this.Success = true;
             this.Message = string.Empty;
+			eventLogger.LogDebug("Succeed(): this.Success → {Arg0}", this.Success);
+			eventLogger.LogDebug("<<< Exiting Succeed()");
         }
 
         public void AddLogs(IEnumerable<LogEntry> logs)
         {
+			eventLogger.LogDebug(">>> Entering AddLogs(logs={Logs})", logs);
             this.Logs = logs?.Select(
                 l => new InstallerLogEntry
                 {
                     Type = l.Type.ToString(),
                     Description = l.Description,
                 }).ToList() ?? new List<InstallerLogEntry>();
+				eventLogger.LogDebug("<<< Exiting AddLogs(logs={Logs})", logs);
         }
     }
 }

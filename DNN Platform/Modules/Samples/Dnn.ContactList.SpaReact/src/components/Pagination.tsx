@@ -1,3 +1,4 @@
+const logger = console;
 interface PaginationProps {
   currentPage: number;
   totalItems: number;
@@ -6,23 +7,31 @@ interface PaginationProps {
 }
 
 export default function Pagination({ currentPage, totalItems, pageSize, onPageChange }: PaginationProps) {
+logger.debug(`>>> Entering Pagination(currentPage=${currentPage},totalItems=${totalItems},pageSize=${pageSize},onPageChange=${onPageChange})`);
   const totalPages = Math.ceil(totalItems / pageSize);
   const startItem = totalItems === 0 ? 0 : currentPage * pageSize + 1;
+logger.debug(`Pagination(currentPage=${currentPage},totalItems=${totalItems},pageSize=${pageSize},onPageChange=${onPageChange}): totalPages → ${totalPages}`);
   const endItem = Math.min((currentPage + 1) * pageSize, totalItems);
+logger.debug(`Pagination(currentPage=${currentPage},totalItems=${totalItems},pageSize=${pageSize},onPageChange=${onPageChange}): endItem → ${endItem}`);
 
   const handlePrev = () => {
+	logger.debug('>>> Entering handlePrev()');
     if (currentPage > 0) {
       onPageChange(currentPage - 1);
+	logger.debug('<<< Exiting handlePrev()');
     }
   };
 
   const handleNext = () => {
+	logger.debug('>>> Entering handleNext()');
     if (currentPage < totalPages - 1) {
       onPageChange(currentPage + 1);
+	logger.debug('<<< Exiting handleNext()');
     }
   };
 
   if (totalItems === 0) {
+logger.debug(`<<< Exiting Pagination(currentPage=${currentPage},totalItems=${totalItems},pageSize=${pageSize},onPageChange=${onPageChange})`);
     return null;
   }
 

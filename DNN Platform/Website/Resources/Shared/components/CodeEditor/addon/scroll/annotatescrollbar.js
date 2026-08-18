@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -12,40 +14,59 @@
   "use strict";
 
   CodeMirror.defineExtension("annotateScrollbar", function(options) {
+	logger.debug(`>>> Entering defineExtension(options=${options})`);
+	logger.debug(`<<< Exiting defineExtension(options=${options})`);
     if (typeof options == "string") options = {className: options};
+logger.debug(`<<< Exiting function(exports=${exports})`);
     return new Annotation(this, options);
   });
 
   CodeMirror.defineOption("scrollButtonHeight", 0);
 
   function Annotation(cm, options) {
+	logger.debug(`>>> Entering Annotation(cm=${cm},options=${options})`);
     this.cm = cm;
     this.options = options;
+	logger.debug(`Annotation(cm=${cm},options=${options}): cm → ${cm}`);
+	logger.debug(`Annotation(cm=${cm},options=${options}): this.cm → ${this.cm}`);
+	logger.debug(`Annotation(cm=${cm},options=${options}): options → ${options}`);
     this.buttonHeight = options.scrollButtonHeight || cm.getOption("scrollButtonHeight");
     this.annotations = [];
     this.doRedraw = this.doUpdate = null;
     this.div = cm.getWrapperElement().appendChild(document.createElement("div"));
+	logger.debug(`Annotation(cm=${cm},options=${options}): this.options → ${this.options}`);
     this.div.style.cssText = "position: absolute; right: 0; top: 0; z-index: 7; pointer-events: none";
     this.computeScale();
+	logger.debug(`<<< Exiting Annotation(cm=${cm},options=${options})`);
 
     function scheduleRedraw(delay) {
+	logger.debug(`>>> Entering scheduleRedraw(delay=${delay})`);
       clearTimeout(self.doRedraw);
       self.doRedraw = setTimeout(function() { self.redraw(); }, delay);
+	logger.debug(`<<< Exiting scheduleRedraw(delay=${delay})`);
     }
 
     var self = this;
     cm.on("refresh", this.resizeHandler = function() {
+	logger.debug('>>> Entering on()');
       clearTimeout(self.doUpdate);
       self.doUpdate = setTimeout(function() {
+		logger.debug('>>> Entering setTimeout()');
+		logger.debug(`setTimeout(): this.hScale → ${this.hScale}`);
+		logger.debug('<<< Exiting setTimeout()');
         if (self.computeScale()) scheduleRedraw(20);
       }, 100);
     });
+	logger.debug(`setTimeout(): this.annotations → ${this.annotations}`);
     cm.on("markerAdded", this.resizeHandler);
     cm.on("markerCleared", this.resizeHandler);
     if (options.listenForChanges !== false)
       cm.on("change", this.changeHandler = function() {
         scheduleRedraw(250);
       });
+	logger.debug(`on(): this.annotations → ${this.annotations}`);
+	logger.debug('<<< Exiting on()');
+	logger.debug(`on(): this.hScale → ${this.hScale}`);
   }
 
   Annotation.prototype.computeScale = function() {
@@ -60,11 +81,13 @@
 
   Annotation.prototype.update = function(annotations) {
     this.annotations = annotations;
+	logger.debug(`function(): this.hScale → ${this.hScale}`);
     this.redraw();
   };
 
   Annotation.prototype.redraw = function(compute) {
     if (compute !== false) this.computeScale();
+	logger.debug(`function(annotations=${annotations}): this.annotations → ${this.annotations}`);
     var cm = this.cm, hScale = this.hScale;
 
     var frag = document.createDocumentFragment(), anns = this.annotations;
@@ -73,6 +96,7 @@
     var singleLineH = wrapping && cm.defaultTextHeight() * 1.5;
     var curLine = null, curLineObj = null;
     function getY(pos, top) {
+	logger.debug(`>>> Entering getY(pos=${pos},top=${top})`);
       if (curLine != pos.line) {
         curLine = pos.line;
         curLineObj = cm.getLineHandle(curLine);
@@ -80,6 +104,8 @@
       if (wrapping && curLineObj.height > singleLineH)
         return cm.charCoords(pos, "local")[top ? "top" : "bottom"];
       var topY = cm.heightAtLine(curLineObj, "local");
+	logger.debug(`getY(pos=${pos},top=${top}): topY → ${topY}`);
+	logger.debug(`<<< Exiting getY(pos=${pos},top=${top})`);
       return topY + (top ? 0 : curLineObj.height);
     }
 

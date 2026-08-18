@@ -49,13 +49,16 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
         public NewPage()
             : this(PagesController.Instance)
         {
+		eventLogger.LogDebug(">>> Entering NewPage()");
         }
 
+		eventLogger.LogDebug("<<< Exiting NewPage()");
         /// <summary>Initializes a new instance of the <see cref="NewPage"/> class.</summary>
         /// <param name="pagesController">The pages controller.</param>
         public NewPage(IPagesController pagesController)
         {
             this.pagesController = pagesController;
+			eventLogger.LogDebug("NewPage(pagesController={PagesController}): pagesController → {PagesController1}", pagesController, pagesController);
         }
 
         /// <inheritdoc />
@@ -78,6 +81,7 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.ParentId = this.GetFlagValue<int?>(FlagParentId, "Parent Id", null, false, false, true);
             this.Title = this.GetFlagValue(FlagTitle, "Title", string.Empty);
             this.Name = this.GetFlagValue(FlagName, "Page Name", string.Empty, true, true);
@@ -93,33 +97,42 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
             }
 
             var testTab = TabController.Instance.GetTab((int)this.ParentId, this.PortalId);
+			eventLogger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): testTab → {TestTab}", args, portalSettings, userInfo, activeTabId, testTab);
             if (testTab == null)
             {
                 this.AddMessage(string.Format(CultureInfo.CurrentCulture, this.LocalizeString("Prompt_UnableToFindSpecified"), FlagParentId, this.ParentId));
             }
+			eventLogger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogDebug(">>> Entering Run()");
             try
             {
                 var pageSettings = this.pagesController.GetDefaultSettings();
+				eventLogger.LogDebug("Run(): pageSettings → {PageSettings}", pageSettings);
                 pageSettings.Name = !string.IsNullOrEmpty(this.Name) ? this.Name : pageSettings.Name;
                 pageSettings.Title = !string.IsNullOrEmpty(this.Title) ? this.Title : pageSettings.Title;
                 pageSettings.Url = !string.IsNullOrEmpty(this.Url) ? this.Url : pageSettings.Url;
                 pageSettings.Description = !string.IsNullOrEmpty(this.Description) ? this.Description : pageSettings.Description;
                 pageSettings.Keywords = !string.IsNullOrEmpty(this.Keywords) ? this.Keywords : pageSettings.Keywords;
                 pageSettings.ParentId = this.ParentId.HasValue ? this.ParentId : pageSettings.ParentId;
+				eventLogger.LogDebug("Run(): pageSettings.ParentId → {Arg0}", pageSettings.ParentId);
+				eventLogger.LogDebug("Run(): pageSettings.HasParent → {Arg0}", pageSettings.HasParent);
+				eventLogger.LogDebug("Run(): pageSettings.IncludeInMenu → {Arg0}", pageSettings.IncludeInMenu);
                 pageSettings.HasParent = this.ParentId.HasValue;
                 pageSettings.IncludeInMenu = this.Visible ?? pageSettings.IncludeInMenu;
                 pageSettings.IncludeInMenu = this.Visible ?? true;
                 if (pageSettings.ParentId != null)
                 {
                     var parentTab = this.pagesController.GetPageSettings(pageSettings.ParentId.Value);
+					eventLogger.LogDebug("Run(): parentTab → {ParentTab}", parentTab);
                     if (parentTab != null)
                     {
                         pageSettings.Permissions = parentTab.Permissions;
+						eventLogger.LogDebug("Run(): pageSettings.Permissions → {Arg0}", pageSettings.Permissions);
                     }
                 }
 
@@ -129,9 +142,11 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
                 }
 
                 var newTab = this.pagesController.SavePageDetails(this.PortalSettings, pageSettings);
+				eventLogger.LogDebug("Run(): newTab → {NewTab}", newTab);
 
                 // create the tab
                 var lstResults = new List<PageModel>();
+				eventLogger.LogDebug("Run(): lstResults → {LstResults}", lstResults);
                 if (newTab != null && newTab.TabID > 0)
                 {
                     lstResults.Add(new PageModel(newTab));
@@ -145,10 +160,13 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Commands
             }
             catch (PageNotFoundException)
             {
+				eventLogger.LogError("Exception in Run(): {Arg0}", PageNotFoundException.getMessage());
                 return new ConsoleErrorResultModel(this.LocalizeString("PageNotFound"));
             }
             catch (PageValidationException ex)
             {
+				eventLogger.LogError("Exception in Run(): {Arg0}", ex.getMessage());
+				eventLogger.LogDebug("<<< Exiting Run()");
                 return new ConsoleErrorResultModel(ex.Message);
             }
         }

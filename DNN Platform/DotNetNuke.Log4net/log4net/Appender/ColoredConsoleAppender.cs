@@ -159,6 +159,8 @@ namespace log4net.Appender
         /// </remarks>
         public ColoredConsoleAppender() 
         {
+		value.LogDebug(">>> Entering ColoredConsoleAppender()");
+		value.LogDebug("<<< Exiting ColoredConsoleAppender()");
         }
 
         /// <summary>
@@ -173,6 +175,7 @@ namespace log4net.Appender
         [Obsolete("Instead use the default constructor and set the Layout property")]
         public ColoredConsoleAppender(ILayout layout) : this(layout, false)
         {
+		value.LogDebug(">>> Entering ColoredConsoleAppender(layout={Layout})", layout);
         }
 
         /// <summary>
@@ -189,8 +192,11 @@ namespace log4net.Appender
         [Obsolete("Instead use the default constructor and set the Layout & Target properties")]
         public ColoredConsoleAppender(ILayout layout, bool writeToErrorStream) 
         {
+			value.LogDebug(">>> Entering ColoredConsoleAppender(layout={Layout},writeToErrorStream={WriteToErrorStream})", layout, writeToErrorStream);
             this.Layout = layout;
             this.m_writeToErrorStream = writeToErrorStream;
+			value.LogDebug("ColoredConsoleAppender(layout={Layout},writeToErrorStream={WriteToErrorStream}): this.Layout → {Arg2}", layout, writeToErrorStream, this.Layout);
+			value.LogDebug("<<< Exiting ColoredConsoleAppender(layout={Layout},writeToErrorStream={WriteToErrorStream})", layout, writeToErrorStream);
         }
 
         /// <summary>
@@ -238,7 +244,9 @@ namespace log4net.Appender
         /// </remarks>
         public void AddMapping(LevelColors mapping)
         {
+			value.LogDebug(">>> Entering AddMapping(mapping=<redacted>)");
             this.m_levelMapping.Add(mapping);
+			value.LogDebug("<<< Exiting AddMapping(mapping=<redacted>)");
         }
 
         /// <summary>
@@ -259,9 +267,11 @@ namespace log4net.Appender
         [System.Security.Permissions.SecurityPermission(System.Security.Permissions.SecurityAction.Demand, UnmanagedCode = true)]
         protected override void Append(Core.LoggingEvent loggingEvent) 
         {
+			value.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             if (this.m_consoleOutputWriter != null)
             {
                 IntPtr consoleHandle = IntPtr.Zero;
+				value.LogDebug("Append(loggingEvent={LoggingEvent}): consoleHandle → {ConsoleHandle}", loggingEvent, consoleHandle);
                 if (this.m_writeToErrorStream)
                 {
                     // Write to the error stream
@@ -275,9 +285,11 @@ namespace log4net.Appender
 
                 // Default to white on black
                 ushort colorInfo = (ushort)Colors.White;
+				value.LogDebug("Append(loggingEvent={LoggingEvent}): colorInfo → {ColorInfo}", loggingEvent, colorInfo);
 
                 // see if there is a specified lookup
                 LevelColors levelColors = this.m_levelMapping.Lookup(loggingEvent.Level) as LevelColors;
+				value.LogDebug("Append(loggingEvent={LoggingEvent}): levelColors → {LevelColors}", loggingEvent, levelColors);
                 if (levelColors != null)
                 {
                     colorInfo = levelColors.CombinedColor;
@@ -376,6 +388,7 @@ namespace log4net.Appender
                 char[] messageCharArray = strLoggingMessage.ToCharArray();
                 int arrayLength = messageCharArray.Length;
                 bool appendNewline = false;
+				value.LogDebug("Append(loggingEvent={LoggingEvent}): appendNewline → {AppendNewline}", loggingEvent, appendNewline);
 
                 // Trim off last newline, if it exists
                 if (arrayLength > 1 && messageCharArray[arrayLength-2] == '\r' && messageCharArray[arrayLength-1] == '\n')
@@ -396,6 +409,7 @@ namespace log4net.Appender
                     this.m_consoleOutputWriter.Write(s_windowsNewline, 0, 2);
                 }
             }
+			value.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
         }
 
         private static readonly char[] s_windowsNewline = {'\r', '\n'};
@@ -428,10 +442,12 @@ namespace log4net.Appender
         [System.Security.Permissions.SecurityPermission(System.Security.Permissions.SecurityAction.Demand, UnmanagedCode = true)]
         public override void ActivateOptions()
         {
+			value.LogDebug(">>> Entering ActivateOptions()");
             base.ActivateOptions();
             this.m_levelMapping.ActivateOptions();
 
             System.IO.Stream consoleOutputStream = null;
+			value.LogDebug("ActivateOptions(): consoleOutputStream → {ConsoleOutputStream}", consoleOutputStream);
 
             // Use the Console methods to open a Stream over the console std handle
             if (this.m_writeToErrorStream)
@@ -447,9 +463,11 @@ namespace log4net.Appender
 
             // Lookup the codepage encoding for the console
             System.Text.Encoding consoleEncoding = System.Text.Encoding.GetEncoding(GetConsoleOutputCP());
+			value.LogDebug("ActivateOptions(): consoleEncoding → {ConsoleEncoding}", consoleEncoding);
 
             // Create a writer around the console stream
             this.m_consoleOutputWriter = new System.IO.StreamWriter(consoleOutputStream, consoleEncoding, 0x100);
+			value.LogDebug("ActivateOptions(): m_consoleOutputWriter → {M_consoleOutputWriter}", m_consoleOutputWriter);
 
             this.m_consoleOutputWriter.AutoFlush = true;
 
@@ -458,6 +476,7 @@ namespace log4net.Appender
             // is not required. The console file handle should not be closed, so we don't call
             // Dispose, Close or the finalizer.
             GC.SuppressFinalize(this.m_consoleOutputWriter);
+			value.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>

@@ -13,6 +13,7 @@ namespace DotNetNuke.Web.Client.ResourceManager
     /// </summary>
     public static class ScriptResourceExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ScriptResourceExtensions));
         /// <summary>
         /// Sets the priority of the resource.
         /// </summary>
@@ -23,12 +24,15 @@ namespace DotNetNuke.Web.Client.ResourceManager
         public static T SetPriority<T>(this T input, FileOrder.Js priority)
             where T : IScriptResource
         {
+			Logger.LogDebug(">>> Entering SetPriority(input={Input},priority={Priority})", input, priority);
             if (input == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from SetPriority(input={Input},priority={Priority})", input, priority);
                 throw new ArgumentNullException(nameof(input));
             }
 
             input.Priority = (int)priority;
+			Logger.LogDebug("<<< Exiting SetPriority(input={Input},priority={Priority})", input, priority);
             return input;
         }
 
@@ -39,12 +43,16 @@ namespace DotNetNuke.Web.Client.ResourceManager
         /// <returns>The script resource with the async attribute set.</returns>
         public static IScriptResource SetAsync(this IScriptResource input)
         {
+			Logger.LogDebug(">>> Entering SetAsync(input={Input})", input);
             if (input == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from SetAsync(input={Input})", input);
                 throw new ArgumentNullException(nameof(input));
             }
 
             input.Async = true;
+			Logger.LogDebug("SetAsync(input={Input}): input.Async → {Arg1}", input, input.Async);
+			Logger.LogDebug("<<< Exiting SetAsync(input={Input})", input);
             return input;
         }
 
@@ -55,12 +63,16 @@ namespace DotNetNuke.Web.Client.ResourceManager
         /// <returns>The script resource with the defer attribute set.</returns>
         public static IScriptResource SetDefer(this IScriptResource input)
         {
+			Logger.LogDebug(">>> Entering SetDefer(input={Input})", input);
             if (input == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from SetDefer(input={Input})", input);
                 throw new ArgumentNullException(nameof(input));
             }
 
             input.Defer = true;
+			Logger.LogDebug("SetDefer(input={Input}): input.Defer → {Arg1}", input, input.Defer);
+			Logger.LogDebug("<<< Exiting SetDefer(input={Input})", input);
             return input;
         }
 
@@ -71,12 +83,16 @@ namespace DotNetNuke.Web.Client.ResourceManager
         /// <returns>The script resource with the no module attribute set.</returns>
         public static IScriptResource SetNoModule(this IScriptResource input)
         {
+			Logger.LogDebug(">>> Entering SetNoModule(input={Input})", input);
             if (input == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from SetNoModule(input={Input})", input);
                 throw new ArgumentNullException(nameof(input));
             }
 
             input.NoModule = true;
+			Logger.LogDebug("SetNoModule(input={Input}): input.NoModule → {Arg1}", input, input.NoModule);
+			Logger.LogDebug("<<< Exiting SetNoModule(input={Input})", input);
             return input;
         }
 
@@ -88,12 +104,16 @@ namespace DotNetNuke.Web.Client.ResourceManager
         /// <returns>The script resource with the type attribute set.</returns>
         public static IScriptResource SetType(this IScriptResource input, string type)
         {
+			Logger.LogDebug(">>> Entering SetType(input={Input},type={Type})", input, type);
             if (input == null)
             {
+				Logger.LogWarning("Throwing ArgumentNullException from SetType(input={Input},type={Type})", input, type);
                 throw new ArgumentNullException(nameof(input));
             }
 
             input.Type = type;
+			Logger.LogDebug("SetType(input={Input},type={Type}): input.Type → {Arg2}", input, type, input.Type);
+			Logger.LogDebug("<<< Exiting SetType(input={Input},type={Type})", input, type);
             return input;
         }
     }

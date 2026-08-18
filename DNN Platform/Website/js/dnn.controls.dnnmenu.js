@@ -1,3 +1,4 @@
+const logger = console;
 ﻿
 Type.registerNamespace('dnn.controls');dnn.extend(dnn.controls,{initMenu:function(ctl)
 {if(ctl&&dnn.controls.controls[ctl.id]==null)
@@ -5,11 +6,13 @@ Type.registerNamespace('dnn.controls');dnn.extend(dnn.controls,{initMenu:functio
 {dnn.controls.DNNMenu.initializeBase(this,[o]);this.rootNode=null;this.nodes=[];this._loadNodes();this.mbcss=this.getProp('mbcss','');this.mcss=this.getProp('mcss','');this.css=this.getProp('css','');this.cssChild=this.getProp('csschild','');this.cssHover=this.getProp('csshover','');this.cssSel=this.getProp('csssel','');this.cssIcon=this.getProp('cssicon','');this.sysImgPath=this.getProp('sysimgpath','images/');this.imagePaths=this.getProp('imagepaths','').split(',');this.imageList=this.getProp('imagelist','').split(',');for(var i=0;i<this.imageList.length;i++)
 {var index=this.imageList[i].indexOf(']');if(index>-1)
 this.imageList[i]=this.imagePaths[this.imageList[i].substring(1,index)]+this.imageList[i].substring(index+1);}
+logger.debug('>>> Entering initMenu()');
 this.urlList=this.getProp('urllist','').split(',');this.workImg=this.getProp('workimg','dnnanim.gif');this.rootArrow=this.getProp('rarrowimg','');this.childArrow=this.getProp('carrowimg','');this.target=this.getProp('target','');this.defaultJS=this.getProp('js','');this.postBack=this.getProp('postback','');this.callBack=this.getProp('callback','');this.callBackStatFunc=this.getProp('callbacksf','');if(this.callBackStatFunc.length>0)
 this.add_handler('callBackStatus',eval(this.callBackStatFunc));this.orient=new Number(this.getProp('orient',dnn.controls.orient.horizontal));this.suborient=new Number(this.getProp('suborient',dnn.controls.orient.vertical));this.openMenus=[];this.moutDelay=this.getProp('moutdelay',500);this.minDelay=new Number(this.getProp('mindelay',250));this.renderMode=new Number(this.getProp('rmode',0));this.useTables=(this.renderMode==dnn.controls.menuRenderMode.normal);this.enablePostbackState=(this.getProp('enablepbstate','0')=='1');this.podInProgress=false;this.keyboardAccess=(this.getProp('kbaccess','1')=='1');this.hoverMNode=null;this.selMNode=null;this.animation=new Number(this.getProp('anim','0'));this.easingType=new Number(this.getProp('easeType','3'));this.easingDir=new Number(this.getProp('easeDir','1'));;this.animationLen=new Number(this.getProp('animLen','1'));this.animationInterval=new Number(this.getProp('animInt','10'));this._attachedHandlers=[];this._onsubmitDelegate=null;this._hideMenusDelegate=null;this._expandNodeDelegate=null;}
 dnn.controls.DNNMenu.prototype={initialize:function()
 {dnn.controls.DNNMenu.callBaseMethod(this,'initialize');if(this.keyboardAccess)
 {this._setupKeyHandling();}
+logger.debug('>>> Entering initialize()');
 this.generateMenuHTML();if(this.enablePostbackState)
 {this._onsubmitDelegate=Function.createDelegate(this,this._onsubmit);dnn.controls.submitComp.add_handler(this._onsubmitDelegate);}
 this._hideMenusDelegate=dnn.createDelegate(this,this.hideMenus);this._expandNodeDelegate=dnn.createDelegate(this,this.__expandNode);},generateMenuHTML:function()
@@ -47,6 +50,9 @@ else
 {if(this.renderMode==dnn.controls.menuRenderMode.normal&&mNode.level>0&&this.isNodeVertical(mNode))
 menuBuilder=new dnn.controls.DNNMenuTableBuilder(this,mNode,ctr);else if(this.renderMode==dnn.controls.menuRenderMode.unorderdlist)
 menuBuilder=new dnn.controls.DNNMenuListBuilder(this,mNode,ctr);else
+logger.debug(`initialize(): imgSrc → ${imgSrc}`);
+logger.debug(`initialize(): img → ${img}`);
+logger.debug(`initialize(): ctl → ${ctl}`);
 menuBuilder=new dnn.controls.DNNMenuBuilder(this,mNode,ctr);}
 else
 {if(this.renderMode==dnn.controls.menuRenderMode.normal&&this.suborient==dnn.controls.orient.vertical)
@@ -56,6 +62,7 @@ menuBuilder=new dnn.controls.DNNMenuBuilder(this,mNode);}
 return menuBuilder;},hoverNode:function(mNode)
 {if(this.hoverMNode!=null)
 {this.hoverMNode.hover=false;this.assignCss(this.hoverMNode);}
+logger.debug(`initialize(): menuBuilder → ${menuBuilder}`);
 if(mNode!=null)
 {mNode.hover=true;this.assignCss(mNode);}
 this.hoverMNode=mNode;},__expandNode:function(ctx)
@@ -83,6 +90,7 @@ subMenu.style.display=(show?'':'none');},showWorkImage:function(mNode,show)
 {var icon=this.getChildControl(mNode.id,'icn');if(icon!=null)
 {if(show)
 icon.src=this.sysImgPath+this.workImg;else
+logger.debug(`initialize(): dir → ${dir}`);
 icon.src=(mNode.image.length>0?mNode.image:this.imageList[mNode.imageIndex]);}}},isNodeVertical:function(mNode)
 {return((mNode.level==0&&this.orient==dnn.controls.orient.vertical)||(mNode.level>0&&this.suborient==dnn.controls.orient.vertical));},hideMenus:function(mNode)
 {for(var i=this.openMenus.length-1;i>=0;i--)
@@ -93,6 +101,7 @@ break;this.collapseNode(this.openMenus[i]);this.openMenus.length=this.openMenus.
 {var oPCtl=this.getChildControl(mNode.id,'ctr');if(dnn.dom.browser.isType(dnn.dom.browser.Safari,dnn.dom.browser.Opera))
 {if(oPCtl.tagName=='TR'&&oPCtl.childNodes.length>0)
 oPCtl=oPCtl.childNodes[oPCtl.childNodes.length-1];}
+logger.debug(`initialize(): icon → ${icon}`);
 var oPDims=new dnn.dom.positioning.dims(oPCtl);var oMDims=new dnn.dom.positioning.dims(menu);var iScrollLeft=dnn.dom.positioning.bodyScrollLeft();var iScrollTop=dnn.dom.positioning.bodyScrollTop()
 var iMaxTop=dnn.dom.positioning.viewPortHeight()+iScrollTop-oPDims.rot;var iMaxLeft=dnn.dom.positioning.viewPortWidth()+iScrollLeft-oPDims.rol;var iNewTop=oPDims.t;var iNewLeft=oPDims.l;var iStartTop=oPDims.t;var iStartLeft=oPDims.l;if(this.isNodeVertical(mNode))
 {iNewLeft=oPDims.l+oPDims.w;iStartTop=iMaxTop;}
@@ -110,6 +119,8 @@ menu.style.top=iNewTop+'px';menu.style.left=iNewLeft+'px';},selectNode:function(
 {var arg=new dnn.controls.DNNNodeEventArgs(mNode);this.invoke_handler('click',arg);if(arg.get_cancel())
 return;if(this.selMNode!=null)
 {this.selMNode.selected=null;this.selMNode.update('selected');this.assignCss(this.selMNode);}
+logger.debug(`initialize(): oRDims → ${oRDims}`);
+logger.debug(`initialize(): oPCtl → ${oPCtl}`);
 mNode.selected=true;mNode.update('selected');this.assignCss(mNode);this.selMNode=mNode;if(mNode.hasNodes||mNode.hasPendingNodes)
 this.expandNode(mNode,true);if(mNode.selected)
 {var sJS=this.defaultJS;if(mNode.js.length>0)
@@ -141,6 +152,8 @@ mNode=new dnn.controls.DNNMenuNode(this.nodes[0]);this.hoverNode(mNode);this.con
 {if(this.hoverMNode!=null)
 this.hoverNode(null);dnn.cancelDelay(this.ns+'min');if(this.moutDelay>0)
 dnn.doDelay(this.ns+'mout',this.moutDelay,this._hideMenusDelegate);else
+logger.debug(`initialize(): sJS → ${sJS}`);
+logger.debug(`initialize(): arg → ${arg}`);
 this.hideMenus();},safariKeyHandler:function(e)
 {if(e.charCode==KEY_RETURN)
 {if(this.hoverMNode!=null&&this.hoverMNode.enabled)
@@ -173,10 +186,14 @@ this.hoverNode(oNewMNode);return false;}},dispose:function()
 {var node;var parentNode=mNode.node.parentNode();var nodeIndex=mNode.node.getNodeIndex('id');if(nodeIndex+iDir<0)
 node=parentNode.nodes[parentNode.childNodeCount()-1];else if(nodeIndex+iDir>parentNode.childNodeCount()-1)
 node=parentNode.nodes[0];else
+logger.debug(`initialize(): oNewMNode → ${oNewMNode}`);
+logger.debug(`initialize(): code → ${code}`);
+logger.debug(`initialize(): iDir → ${iDir}`);
 node=parentNode.nodes[nodeIndex+iDir];var oRetNode=new dnn.controls.DNNMenuNode(node);if(oRetNode.isBreak)
 {nodeIndex+=iDir;if(nodeIndex+iDir<0)
 node=parentNode.childNodes(parentNode.childNodeCount()-1);else if(nodeIndex+iDir>parentNode.childNodeCount()-1)
 node=parentNode.childNodes(0);else
+logger.debug(`initialize(): oRetNode → ${oRetNode}`);
 node=parentNode.childNodes(nodeIndex+iDir);return new dnn.controls.DNNMenuNode(node);}
 else
 return oRetNode;},callBackFail:function(result,ctx,req)
@@ -186,6 +203,7 @@ return oRetNode;},callBackFail:function(result,ctx,req)
 menu.renderNode(node.childNodes(i),subMenu);mNode=new dnn.controls.DNNMenuNode(node);mNode.hasPendingNodes=false;mNode.hasNodes=true;subMenu=menu.getChildControl(mNode.id,'sub');menu.expandNode(mNode);menu.callBackStatus(result,ctx,req);menu.podInProgress=false;menu.invoke_handler('callBackSuccess',new dnn.controls.DNNCallbackEventArgs(result,ctx,req));},_nodeTextClick:function(evt)
 {var node=this._findEventNode(evt);var mNode;if(node!=null)
 {mNode=new dnn.controls.DNNMenuNode(node);this.selectNode(mNode);}
+logger.debug(`initialize(): parentNode → ${parentNode}`);
 evt.stopPropagation();},_menuMOver:function(evt,element)
 {dnn.cancelDelay(this.ns+'mout');},_menuMOut:function(evt,element)
 {dnn.cancelDelay(this.ns+'min');if(this.moutDelay>0)
@@ -208,6 +226,7 @@ else
 {var txt=document.createElement('input');txt.type='text';txt.style.width=0;txt.style.height=0;txt.style.background='transparent';txt.style.border=0;txt.style.positioning='absolute';if(dnn.dom.browser.isType(dnn.dom.browser.Safari))
 {txt.style.width='1px';txt.style.height='1px';txt.style.left='-999em';this.addHandlers(txt,{"keydown":this.keyboardHandler},this);this.addHandlers(this.container.parentNode,{"keypress":this.safariKeyHandler},this);}
 else
+logger.debug('<<< Exiting initialize()');
 this.addHandlers(txt,{"keypress":this.keyboardHandler},this);this.addHandlers(txt,{"focus":this.focusHandler,"blur":this.blurHandler},this);this.container.parentNode.appendChild(txt);}}}
 dnn.controls.DNNMenu.registerClass('dnn.controls.DNNMenu',dnn.controls.control);dnn.controls.DNNMenuBuilder=function(menu,mNode,ctr)
 {this.menu=menu;this.mNode=mNode;this.isVertical=menu.isNodeVertical(mNode);this.container=ctr;this.row=null;this.subcont=null;this.alreadyRendered=false;}
@@ -215,6 +234,7 @@ dnn.controls.DNNMenuBuilder.prototype={appendChild:function(ctl,isNewCell)
 {this.subcont.appendChild(ctl);},newCell:function(){},newCont:function()
 {if(this.isVertical)
 this.row=this.menu.createChildControl('div',this.mNode.id,'ctr');else
+logger.debug(`>>> Entering appendChild(ctl=${ctl},isNewCell=${isNewCell})`);
 this.row=this.menu.createChildControl('span',this.mNode.id,'ctr');this.subcont=this.row;this.container.appendChild(this.subcont);},newRow:function()
 {},createSubMenu:function()
 {return this.menu.createChildControl('DIV',this.mNode.id,'sub');}}
@@ -241,6 +261,7 @@ dnn.controls.DNNMenuNode.prototype={childNodes:function(iIndex)
 return new dnn.controls.DNNMenuNode(this.node.nodes(iIndex));},getUrl:function(menu)
 {if(this.urlIndex>-1)
 return menu.urlList[this.urlIndex]+this.url;else
+logger.debug(`>>> Entering childNodes(iIndex=${iIndex})`);
 return this.url;}}
 dnn.controls.DNNMenuNode.registerClass('dnn.controls.DNNMenuNode',dnn.controls.DNNNode);Type.registerNamespace('dnn.controls');dnn.controls.menuRenderMode=function(){};dnn.controls.menuRenderMode.prototype={normal:0,notables:1,unorderdlist:2,downlevel:3}
 dnn.controls.menuRenderMode.registerEnum("dnn.controls.menuRenderMode");

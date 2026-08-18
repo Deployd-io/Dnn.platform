@@ -9,6 +9,7 @@ namespace DotNetNuke.Common
     /// <summary>Specifies that a certain condition is an error.</summary>
     public static class Guard
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Guard));
         /// <summary>
         ///     Indicates that the given <paramref name="condition" /> must not be <see langword="true"/>, throwing an
         ///     <see cref="InvalidOperationException" /> if it is.
@@ -22,7 +23,12 @@ namespace DotNetNuke.Common
         /// <exception cref="InvalidOperationException">When <paramref name="condition" /> is <see langword="true"/>.</exception>
         public static void Against(bool condition, string message, params object[] args)
         {
+			Logger.LogDebug(">>> Entering Against(condition={Condition},message={Message},args={Args})", condition, message, args);
             Against(condition, string.Format(CultureInfo.CurrentCulture, message, args));
+			Logger.LogDebug("<<< Exiting Against(condition={Condition},message={Message},args={Args})", condition, message, args);
+			Logger.LogDebug(">>> Entering Against(condition={Condition},message={Message})", condition, message);
+			Logger.LogWarning("Throwing InvalidOperationException from Against(condition={Condition},message={Message})", condition, message);
+			Logger.LogDebug("<<< Exiting Against(condition={Condition},message={Message})", condition, message);
         }
 
         /// <summary>
@@ -36,6 +42,7 @@ namespace DotNetNuke.Common
         {
             if (condition)
             {
+				Logger.LogWarning("Throwing InvalidOperationException from Against(condition={Condition},message={Message})", condition, message);
                 throw new InvalidOperationException(message);
             }
         }

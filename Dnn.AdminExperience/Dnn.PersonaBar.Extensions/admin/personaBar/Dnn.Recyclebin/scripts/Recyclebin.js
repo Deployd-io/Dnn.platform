@@ -1,3 +1,4 @@
+const logger = console;
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
@@ -15,6 +16,7 @@ define(['jquery',
 	'dnn.jScrollBar',
     'jquery-ui.min'],
     function ($, ko, koMapping, DnnPageRecycleBin) {
+		logger.debug('>>> Entering function()');
         'use strict';
 
         var dnnPageRecycleBin;
@@ -31,6 +33,7 @@ define(['jquery',
 
             dnnPageRecycleBin = new DnnPageRecycleBin(utility.resx.Recyclebin, utility.sf, utility, null, params.settings);
 
+			logger.debug(`function(wrapper=${wrapper},util=${util},params=${params},callback=${callback}): dnnPageRecycleBin → ${dnnPageRecycleBin}`);
             initRecycleBin(wrapper);
 
             if (typeof callback === 'function') {
@@ -56,6 +59,7 @@ define(['jquery',
                 return dnn.dnnPageHierarchy.handlePendingChanges();
             }
             dnnPageRecycleBin.show();
+			logger.debug(`<<< Exiting function(wrapper=${wrapper},util=${util},params=${params},callback=${callback})`);
         };
 
         return {

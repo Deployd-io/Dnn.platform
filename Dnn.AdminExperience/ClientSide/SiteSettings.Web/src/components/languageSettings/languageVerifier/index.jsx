@@ -8,13 +8,17 @@ import LanguageVerifierGrid from "./languageVerifierGrid";
 import { PersonaBarPageBody } from "@dnnsoftware/dnn-react-common";
 import resx from "../../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 class LanguageVerifierPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         const { props } = this;
         if (prevProps.selectedPage !== props.selectedPage && props.selectedPage === 2) {
             if (props.verificationResults) {
@@ -29,10 +33,13 @@ class LanguageVerifierPanelBody extends Component {
                 });
             }));
         }
+		logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
     }
 
     renderedResults() {
+		logger.debug('>>> Entering renderedResults()');
         if (this.props.verificationResults) {
+			logger.debug('<<< Exiting renderedResults()');
             return this.props.verificationResults.map((item, i) => {
                 return (
                     <LanguageVerifierGrid
@@ -54,6 +61,8 @@ class LanguageVerifierPanelBody extends Component {
 
      
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.languageVerifier}>                
                 <PersonaBarPageBody backToLinkProps={{
@@ -77,6 +86,8 @@ LanguageVerifierPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         selectedPage: state.visiblePanel.selectedPage,

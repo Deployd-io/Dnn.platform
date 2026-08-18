@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -6,6 +7,7 @@
 // by Dimage Sapelkin (https://github.com/kerabromsmu)
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("../../addon/mode/simple"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -80,4 +82,5 @@
   });
 
   CodeMirror.defineMIME("text/x-factor", "factor");
+  logger.debug(`<<< Exiting function(exports=${exports})`);
 });

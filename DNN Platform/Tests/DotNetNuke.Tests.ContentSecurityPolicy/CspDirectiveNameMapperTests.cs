@@ -8,6 +8,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
     using System.Linq;
 
     using NUnit.Framework;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Unit tests for the CspDirectiveNameMapper class.
@@ -15,12 +16,14 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
     [TestFixture]
     public class CspDirectiveNameMapperTests
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>
         /// Tests GetDirectiveName with all known directive types.
         /// </summary>
         [Test]
         public void GetDirectiveName_AllKnownTypes_ShouldReturnCorrectNames()
         {
+			_logger.LogDebug(">>> Entering GetDirectiveName_AllKnownTypes_ShouldReturnCorrectNames()");
             // Arrange & Act & Assert
             Assert.That(CspDirectiveNameMapper.GetDirectiveName(CspDirectiveType.DefaultSrc), Is.EqualTo("default-src"));
             Assert.That(CspDirectiveNameMapper.GetDirectiveName(CspDirectiveType.ScriptSrc), Is.EqualTo("script-src"));
@@ -39,6 +42,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             Assert.That(CspDirectiveNameMapper.GetDirectiveName(CspDirectiveType.ReportUri), Is.EqualTo("report-uri"));
             Assert.That(CspDirectiveNameMapper.GetDirectiveName(CspDirectiveType.ReportTo), Is.EqualTo("report-to"));
             Assert.That(CspDirectiveNameMapper.GetDirectiveName(CspDirectiveType.UpgradeInsecureRequests), Is.EqualTo("upgrade-insecure-requests"));
+			_logger.LogDebug("<<< Exiting GetDirectiveName_AllKnownTypes_ShouldReturnCorrectNames()");
         }
 
         /// <summary>
@@ -47,6 +51,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void GetDirectiveType_AllKnownNames_ShouldReturnCorrectTypes()
         {
+			_logger.LogDebug(">>> Entering GetDirectiveType_AllKnownNames_ShouldReturnCorrectTypes()");
             // Arrange & Act & Assert
             Assert.That(CspDirectiveNameMapper.GetDirectiveType("default-src"), Is.EqualTo(CspDirectiveType.DefaultSrc));
             Assert.That(CspDirectiveNameMapper.GetDirectiveType("script-src"), Is.EqualTo(CspDirectiveType.ScriptSrc));
@@ -65,6 +70,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             Assert.That(CspDirectiveNameMapper.GetDirectiveType("report-uri"), Is.EqualTo(CspDirectiveType.ReportUri));
             Assert.That(CspDirectiveNameMapper.GetDirectiveType("report-to"), Is.EqualTo(CspDirectiveType.ReportTo));
             Assert.That(CspDirectiveNameMapper.GetDirectiveType("upgrade-insecure-requests"), Is.EqualTo(CspDirectiveType.UpgradeInsecureRequests));
+			_logger.LogDebug("<<< Exiting GetDirectiveType_AllKnownNames_ShouldReturnCorrectTypes()");
         }
 
         /// <summary>
@@ -73,10 +79,12 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void GetDirectiveType_CaseInsensitiveInput_ShouldReturnCorrectType()
         {
+			_logger.LogDebug(">>> Entering GetDirectiveType_CaseInsensitiveInput_ShouldReturnCorrectType()");
             // Arrange & Act & Assert
             Assert.That(CspDirectiveNameMapper.GetDirectiveType("DEFAULT-SRC"), Is.EqualTo(CspDirectiveType.DefaultSrc));
             Assert.That(CspDirectiveNameMapper.GetDirectiveType("Script-Src"), Is.EqualTo(CspDirectiveType.ScriptSrc));
             Assert.That(CspDirectiveNameMapper.GetDirectiveType("STYLE-SRC"), Is.EqualTo(CspDirectiveType.StyleSrc));
+			_logger.LogDebug("<<< Exiting GetDirectiveType_CaseInsensitiveInput_ShouldReturnCorrectType()");
         }
 
         /// <summary>
@@ -85,12 +93,16 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void GetDirectiveType_UnknownDirectiveName_ShouldThrowArgumentException()
         {
+			_logger.LogDebug(">>> Entering GetDirectiveType_UnknownDirectiveName_ShouldThrowArgumentException()");
             // Arrange
             var unknownDirective = "unknown-directive";
+			_logger.LogDebug("GetDirectiveType_UnknownDirectiveName_ShouldThrowArgumentException(): unknownDirective → {UnknownDirective}", unknownDirective);
 
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => CspDirectiveNameMapper.GetDirectiveType(unknownDirective));
+			_logger.LogDebug("GetDirectiveType_UnknownDirectiveName_ShouldThrowArgumentException(): exception → {Exception}", exception);
             Assert.That(exception.Message, Does.Contain($"Unknown directive name: {unknownDirective}"));
+			_logger.LogDebug("<<< Exiting GetDirectiveType_UnknownDirectiveName_ShouldThrowArgumentException()");
         }
 
         /// <summary>
@@ -99,12 +111,15 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void GetDirectiveType_NullInput_ShouldThrowArgumentException()
         {
+			_logger.LogDebug(">>> Entering GetDirectiveType_NullInput_ShouldThrowArgumentException()");
             // Arrange
             string directiveName = null;
 
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => CspDirectiveNameMapper.GetDirectiveType(directiveName));
+			_logger.LogDebug("GetDirectiveType_NullInput_ShouldThrowArgumentException(): exception → {Exception}", exception);
             Assert.That(exception.Message, Does.Contain("Directive name cannot be null or empty"));
+			_logger.LogDebug("<<< Exiting GetDirectiveType_NullInput_ShouldThrowArgumentException()");
         }
 
         /// <summary>
@@ -113,12 +128,15 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void GetDirectiveType_EmptyInput_ShouldThrowArgumentException()
         {
+			_logger.LogDebug(">>> Entering GetDirectiveType_EmptyInput_ShouldThrowArgumentException()");
             // Arrange
             var directiveName = string.Empty;
 
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => CspDirectiveNameMapper.GetDirectiveType(directiveName));
+			_logger.LogDebug("GetDirectiveType_EmptyInput_ShouldThrowArgumentException(): exception → {Exception}", exception);
             Assert.That(exception.Message, Does.Contain("Directive name cannot be null or empty"));
+			_logger.LogDebug("<<< Exiting GetDirectiveType_EmptyInput_ShouldThrowArgumentException()");
         }
 
         /// <summary>
@@ -127,12 +145,16 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void GetDirectiveType_WhitespaceInput_ShouldThrowArgumentException()
         {
+			_logger.LogDebug(">>> Entering GetDirectiveType_WhitespaceInput_ShouldThrowArgumentException()");
             // Arrange
             var directiveName = "   ";
+			_logger.LogDebug("GetDirectiveType_WhitespaceInput_ShouldThrowArgumentException(): directiveName → {DirectiveName}", directiveName);
 
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => CspDirectiveNameMapper.GetDirectiveType(directiveName));
+			_logger.LogDebug("GetDirectiveType_WhitespaceInput_ShouldThrowArgumentException(): exception → {Exception}", exception);
             Assert.That(exception.Message, Does.Contain("Directive name cannot be null or empty"));
+			_logger.LogDebug("<<< Exiting GetDirectiveType_WhitespaceInput_ShouldThrowArgumentException()");
         }
 
         /// <summary>
@@ -141,6 +163,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void TryGetDirectiveType_ValidDirectiveNames_ShouldReturnTrueAndCorrectType()
         {
+			_logger.LogDebug(">>> Entering TryGetDirectiveType_ValidDirectiveNames_ShouldReturnTrueAndCorrectType()");
             // Arrange & Act & Assert
             Assert.That(CspDirectiveNameMapper.TryGetDirectiveType("default-src", out var defaultSrcType), Is.True);
             Assert.That(defaultSrcType, Is.EqualTo(CspDirectiveType.DefaultSrc));
@@ -150,6 +173,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
 
             Assert.That(CspDirectiveNameMapper.TryGetDirectiveType("upgrade-insecure-requests", out var upgradeType), Is.True);
             Assert.That(upgradeType, Is.EqualTo(CspDirectiveType.UpgradeInsecureRequests));
+			_logger.LogDebug("<<< Exiting TryGetDirectiveType_ValidDirectiveNames_ShouldReturnTrueAndCorrectType()");
         }
 
         /// <summary>
@@ -158,6 +182,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void TryGetDirectiveType_InvalidDirectiveNames_ShouldReturnFalseAndDefaultType()
         {
+			_logger.LogDebug(">>> Entering TryGetDirectiveType_InvalidDirectiveNames_ShouldReturnFalseAndDefaultType()");
             // Arrange & Act & Assert
             Assert.That(CspDirectiveNameMapper.TryGetDirectiveType("unknown-directive", out var type1), Is.False);
             Assert.That(type1, Is.EqualTo(default(CspDirectiveType)));
@@ -167,6 +192,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
 
             Assert.That(CspDirectiveNameMapper.TryGetDirectiveType(string.Empty, out var type3), Is.False);
             Assert.That(type3, Is.EqualTo(default(CspDirectiveType)));
+			_logger.LogDebug("<<< Exiting TryGetDirectiveType_InvalidDirectiveNames_ShouldReturnFalseAndDefaultType()");
         }
 
         /// <summary>
@@ -175,16 +201,21 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void RoundTripConversion_AllDirectiveTypes_ShouldReturnOriginalType()
         {
+			_logger.LogDebug(">>> Entering RoundTripConversion_AllDirectiveTypes_ShouldReturnOriginalType()");
             // Arrange
             var allDirectiveTypes = Enum.GetValues(typeof(CspDirectiveType)).Cast<CspDirectiveType>();
+			_logger.LogDebug("RoundTripConversion_AllDirectiveTypes_ShouldReturnOriginalType(): allDirectiveTypes → {AllDirectiveTypes}", allDirectiveTypes);
 
             // Act & Assert
             foreach (var originalType in allDirectiveTypes)
             {
                 var directiveName = CspDirectiveNameMapper.GetDirectiveName(originalType);
+				_logger.LogDebug("RoundTripConversion_AllDirectiveTypes_ShouldReturnOriginalType(): directiveName → {DirectiveName}", directiveName);
                 var convertedType = CspDirectiveNameMapper.GetDirectiveType(directiveName);
+				_logger.LogDebug("RoundTripConversion_AllDirectiveTypes_ShouldReturnOriginalType(): convertedType → {ConvertedType}", convertedType);
                 Assert.That(convertedType, Is.EqualTo(originalType), $"Round-trip conversion failed for {originalType}");
             }
+			_logger.LogDebug("<<< Exiting RoundTripConversion_AllDirectiveTypes_ShouldReturnOriginalType()");
         }
     }
 }

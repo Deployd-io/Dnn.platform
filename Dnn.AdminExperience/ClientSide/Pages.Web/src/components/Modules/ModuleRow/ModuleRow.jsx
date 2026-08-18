@@ -3,9 +3,11 @@ import PropTypes from "prop-types";
 import { GridCell, SvgIcons, Checkbox, RadioButtons } from "@dnnsoftware/dnn-react-common";
 import styles from "./style.module.less";
 import Localization from "../../../localization";
+const logger = console;
 
 class ModuleRow extends Component {
     getCopyOptions(isPortable) {
+		logger.debug(`>>> Entering getCopyOptions(isPortable=${isPortable})`);
         let options = [
             { label: Localization.get("ModuleCopyType.New"), value: "0" },
             { label: Localization.get("ModuleCopyType.Reference"), value: "2" }
@@ -13,12 +15,15 @@ class ModuleRow extends Component {
         if (isPortable) {
             options.splice(1, 0, { label: Localization.get("ModuleCopyType.Copy"), value: "1" });
         }
+		logger.debug(`<<< Exiting getCopyOptions(isPortable=${isPortable})`);
         return options;
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { module, onDelete, onEditing, onSetting, isEditingModule, showCopySettings, onCopyChange } = this.props;
         const editClassName = "extension-action" + (isEditingModule ? " selected" : "");
+		logger.debug('<<< Exiting render()');
         return (
              
             <div className={styles.moduleRow} >

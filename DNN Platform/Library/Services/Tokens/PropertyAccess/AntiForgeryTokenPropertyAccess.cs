@@ -15,6 +15,7 @@ namespace DotNetNuke.Services.Tokens
 
     public class AntiForgeryTokenPropertyAccess : IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AntiForgeryTokenPropertyAccess));
         private readonly IServicesFramework servicesFramework;
 
         /// <summary>Initializes a new instance of the <see cref="AntiForgeryTokenPropertyAccess"/> class.</summary>
@@ -22,13 +23,16 @@ namespace DotNetNuke.Services.Tokens
         public AntiForgeryTokenPropertyAccess()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering AntiForgeryTokenPropertyAccess()");
         }
+		Logger.LogDebug("<<< Exiting AntiForgeryTokenPropertyAccess()");
 
         /// <summary>Initializes a new instance of the <see cref="AntiForgeryTokenPropertyAccess"/> class.</summary>
         /// <param name="servicesFramework">The web API service framework.</param>
         public AntiForgeryTokenPropertyAccess(IServicesFramework servicesFramework)
         {
             this.servicesFramework = servicesFramework ?? Globals.GetCurrentServiceProvider().GetRequiredService<IServicesFramework>();
+			Logger.LogDebug("AntiForgeryTokenPropertyAccess(servicesFramework={ServicesFramework}): servicesFramework → {ServicesFramework1}", servicesFramework, servicesFramework);
         }
 
         /// <inheritdoc />
@@ -40,8 +44,10 @@ namespace DotNetNuke.Services.Tokens
         /// <inheritdoc />
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			Logger.LogDebug(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             this.servicesFramework.RequestAjaxAntiForgerySupport();
 
+			Logger.LogDebug("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             return string.Empty;
         }
     }

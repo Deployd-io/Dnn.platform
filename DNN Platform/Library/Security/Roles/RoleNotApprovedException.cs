@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class RoleNotApprovedException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RoleNotApprovedException));
     /// <inheritdoc />
     public RoleNotApprovedException()
     {
+	Logger.LogDebug(">>> Entering RoleNotApprovedException()");
+	Logger.LogDebug("<<< Exiting RoleNotApprovedException()");
     }
 
     /// <inheritdoc />
     public RoleNotApprovedException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering RoleNotApprovedException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting RoleNotApprovedException(message={Message})", message);
 
     /// <inheritdoc />
     public RoleNotApprovedException(string message, Exception innerException)

@@ -13,7 +13,9 @@ namespace DotNetNuke.Modules.Groups
         /// <inheritdoc />
         public void RegisterRoutes(IMapRoute mapRouteManager)
         {
+			eventLogger.LogDebug(">>> Entering RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
             mapRouteManager.MapHttpRoute("SocialGroups", "default", "{controller}/{action}", new[] { "DotNetNuke.Modules.Groups" });
+			eventLogger.LogDebug("<<< Exiting RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
         }
     }
 }

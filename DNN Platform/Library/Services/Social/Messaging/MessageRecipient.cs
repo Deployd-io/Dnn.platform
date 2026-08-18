@@ -17,6 +17,7 @@ namespace DotNetNuke.Services.Social.Messaging
     [Serializable]
     public class MessageRecipient : BaseEntityInfo, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MessageRecipient));
         private int recipientID = -1;
 
         /// <summary>Gets or sets recipientID - The primary key.</summary>
@@ -70,6 +71,7 @@ namespace DotNetNuke.Services.Social.Messaging
         /// <param name="dr">the data reader.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.RecipientID = Convert.ToInt32(dr["RecipientID"], CultureInfo.InvariantCulture);
             this.MessageID = Convert.ToInt32(dr["MessageID"], CultureInfo.InvariantCulture);
             this.UserID = Convert.ToInt32(dr["UserID"], CultureInfo.InvariantCulture);
@@ -78,6 +80,7 @@ namespace DotNetNuke.Services.Social.Messaging
 
             // add audit column data
             this.FillInternal(dr);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

@@ -51,10 +51,16 @@ namespace log4net.Layout
         /// </remarks>
         protected XmlLayoutBase() : this(false)
         {
+			value.LogDebug(">>> Entering XmlLayoutBase()");
             this.IgnoresException = false;
+			value.LogDebug("XmlLayoutBase(): this.IgnoresException → {Arg0}", this.IgnoresException);
+			value.LogDebug("<<< Exiting XmlLayoutBase()");
+			value.LogDebug(">>> Entering XmlLayoutBase(locationInfo={LocationInfo})", locationInfo);
+			value.LogDebug("XmlLayoutBase(locationInfo={LocationInfo}): this.IgnoresException → {Arg1}", locationInfo, this.IgnoresException);
         }
 
         /// <summary>Protected constructor to support subclasses</summary>
+		value.LogDebug("<<< Exiting XmlLayoutBase()");
         /// <remarks>
         /// <para>
         /// The <paramref name="locationInfo" /> parameter determines whether 
@@ -135,7 +141,9 @@ namespace log4net.Layout
         /// </remarks>
         public override void ActivateOptions() 
         {
+			value.LogDebug(">>> Entering ActivateOptions()");
             // nothing to do
+			value.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>Gets the content type output by this layout. </summary>
@@ -168,9 +176,12 @@ namespace log4net.Layout
         /// </remarks>
         public override void Format(TextWriter writer, LoggingEvent loggingEvent) 
         {
+			value.LogDebug(">>> Entering Format(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             if (loggingEvent == null)
             {
+				value.LogWarning("Throwing ArgumentNullException from Format(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
                 throw new ArgumentNullException("loggingEvent");
+			value.LogDebug("<<< Exiting Format(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             }
 #if NETSTANDARD
             var settings = new XmlWriterSettings

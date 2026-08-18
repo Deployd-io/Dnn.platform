@@ -10,6 +10,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// <summary>The WidgetComponentWriter class handles creating the manifest for Widget Component(s).</summary>
     public class WidgetComponentWriter : FileComponentWriter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(WidgetComponentWriter));
         /// <summary>Initializes a new instance of the <see cref="WidgetComponentWriter"/> class.</summary>
         /// <param name="basePath">The base path.</param>
         /// <param name="files">The files.</param>
@@ -17,6 +18,8 @@ namespace DotNetNuke.Services.Installer.Writers
         public WidgetComponentWriter(string basePath, Dictionary<string, InstallFile> files, PackageInfo package)
             : base(basePath, files, package)
         {
+		Logger.LogDebug(">>> Entering WidgetComponentWriter(basePath={BasePath},files={Files},package={Package})", basePath, files, package);
+		Logger.LogDebug("<<< Exiting WidgetComponentWriter(basePath={BasePath},files={Files},package={Package})", basePath, files, package);
         }
 
         /// <summary>Gets the name of the Collection Node ("widgetFiles").</summary>

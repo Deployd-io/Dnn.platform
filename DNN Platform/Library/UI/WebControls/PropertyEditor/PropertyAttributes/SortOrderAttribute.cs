@@ -8,11 +8,15 @@ namespace DotNetNuke.UI.WebControls
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class SortOrderAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SortOrderAttribute));
         /// <summary>Initializes a new instance of the <see cref="SortOrderAttribute"/> class.</summary>
         /// <param name="order">The sort order of the property.</param>
         public SortOrderAttribute(int order)
         {
+			Logger.LogDebug(">>> Entering SortOrderAttribute(order={Order})", order);
             this.Order = order;
+			Logger.LogDebug("SortOrderAttribute(order={Order}): this.Order → {Arg1}", order, this.Order);
+			Logger.LogDebug("<<< Exiting SortOrderAttribute(order={Order})", order);
         }
 
         public static int DefaultOrder

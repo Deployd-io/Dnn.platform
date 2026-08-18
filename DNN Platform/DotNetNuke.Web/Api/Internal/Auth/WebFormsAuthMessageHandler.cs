@@ -21,6 +21,7 @@ namespace DotNetNuke.Web.Api.Internal.Auth
     /// <summary>A web API message handler for web forms auth.</summary>
     public class WebFormsAuthMessageHandler : MessageProcessingHandler
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(WebFormsAuthMessageHandler));
         /// <summary>Gets the auth scheme.</summary>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public string AuthScheme => "Forms";
@@ -28,6 +29,7 @@ namespace DotNetNuke.Web.Api.Internal.Auth
         /// <inheritdoc />
         protected override HttpRequestMessage ProcessRequest(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+			Logger.LogDebug(">>> Entering ProcessRequest(request={Request},cancellationToken=<redacted>)", request);
             using var scope = Globals.GetOrCreateServiceScope();
             MembershipModule.AuthenticateRequest(
                 scope.ServiceProvider.GetRequiredService<IHostSettingsService>(),
@@ -38,7 +40,9 @@ namespace DotNetNuke.Web.Api.Internal.Auth
                 scope.ServiceProvider.GetRequiredService<IHostSettings>(),
                 request.GetHttpContext(),
                 allowUnknownExtensions: true);
+				Logger.LogDebug("ProcessRequest(request={Request},cancellationToken=<redacted>): scope → {Scope}", request, scope);
 
+			Logger.LogDebug("<<< Exiting ProcessRequest(request={Request},cancellationToken=<redacted>)", request);
             return request;
         }
 

@@ -35,8 +35,10 @@ namespace DotNetNuke.Framework
         public ServicesFrameworkImpl()
             : this(null, null)
         {
+		eventLogger.LogDebug(">>> Entering ServicesFrameworkImpl()");
         }
 
+		eventLogger.LogDebug("<<< Exiting ServicesFrameworkImpl()");
         /// <summary>Initializes a new instance of the <see cref="ServicesFrameworkImpl"/> class.</summary>
         /// <param name="appStatus">The application status.</param>
         /// <param name="eventLogger">The event logger.</param>
@@ -44,7 +46,9 @@ namespace DotNetNuke.Framework
         {
             var servicesProvider = Globals.GetCurrentServiceProvider();
             this.appStatus = appStatus ?? servicesProvider.GetRequiredService<IApplicationStatusInfo>();
+			eventLogger.LogDebug("ServicesFrameworkImpl(appStatus={AppStatus},eventLogger={EventLogger}): appStatus → {AppStatus1}", appStatus, eventLogger, appStatus);
             this.eventLogger = eventLogger ?? servicesProvider.GetRequiredService<IEventLogger>();
+			eventLogger.LogDebug("ServicesFrameworkImpl(appStatus={AppStatus},eventLogger={EventLogger}): eventLogger → {EventLogger1}", appStatus, eventLogger, eventLogger);
         }
 
         /// <inheritdoc />
@@ -62,29 +66,38 @@ namespace DotNetNuke.Framework
         /// <inheritdoc />
         public void RequestAjaxAntiForgerySupport()
         {
+			eventLogger.LogDebug(">>> Entering RequestAjaxAntiForgerySupport()");
             this.RequestAjaxScriptSupport();
             SetKey(AntiForgeryKey);
+			eventLogger.LogDebug("<<< Exiting RequestAjaxAntiForgerySupport()");
         }
 
         /// <inheritdoc />
         public void RegisterAjaxAntiForgery(Page page)
         {
+			eventLogger.LogDebug(">>> Entering RegisterAjaxAntiForgery(page={Page})", page);
             var ctl = page.FindControl("ClientResourcesFormBottom");
             ctl?.Controls.Add(new LiteralControl(AntiForgery.GetHtml().ToHtmlString()));
+			eventLogger.LogDebug("RegisterAjaxAntiForgery(page={Page}): ctl → {Ctl}", page, ctl);
+			eventLogger.LogDebug("<<< Exiting RegisterAjaxAntiForgery(page={Page})", page);
         }
 
         /// <inheritdoc />
         public void RequestAjaxScriptSupport()
         {
+			eventLogger.LogDebug(">>> Entering RequestAjaxScriptSupport()");
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, PortalSettings.Current, CommonJs.jQuery);
             SetKey(ScriptKey);
+			eventLogger.LogDebug("<<< Exiting RequestAjaxScriptSupport()");
         }
 
         /// <inheritdoc />
         public void RegisterAjaxScript(Page page)
         {
+			eventLogger.LogDebug(">>> Entering RegisterAjaxScript(page={Page})", page);
             var path = ServicesFramework.GetServiceFrameworkRoot();
             if (string.IsNullOrEmpty(path))
+			eventLogger.LogDebug("RegisterAjaxScript(page={Page}): path → {Path}", page, path);
             {
                 return;
             }
@@ -104,21 +117,29 @@ namespace DotNetNuke.Framework
             }
 
             GetClientResourcesController().RegisterScript(scriptPath);
+			eventLogger.LogDebug("<<< Exiting RegisterAjaxScript(page={Page})", page);
         }
 
         private static void SetKey(string key)
         {
+			eventLogger.LogDebug(">>> Entering SetKey(key={Key})", key);
             HttpContextSource.Current.Items[key] = true;
+			eventLogger.LogDebug("<<< Exiting SetKey(key={Key})", key);
         }
 
         private static bool CheckKey(string antiForgeryKey)
         {
+			eventLogger.LogDebug(">>> Entering CheckKey(antiForgeryKey={AntiForgeryKey})", antiForgeryKey);
+			eventLogger.LogDebug("<<< Exiting CheckKey(antiForgeryKey={AntiForgeryKey})", antiForgeryKey);
             return HttpContextSource.Current.Items.Contains(antiForgeryKey);
         }
 
         private static IClientResourceController GetClientResourcesController()
         {
+			eventLogger.LogDebug(">>> Entering GetClientResourcesController()");
             var serviceProvider = Globals.GetCurrentServiceProvider();
+			eventLogger.LogDebug("GetClientResourcesController(): serviceProvider → {ServiceProvider}", serviceProvider);
+			eventLogger.LogDebug("<<< Exiting GetClientResourcesController()");
             return serviceProvider.GetRequiredService<IClientResourceController>();
         }
     }

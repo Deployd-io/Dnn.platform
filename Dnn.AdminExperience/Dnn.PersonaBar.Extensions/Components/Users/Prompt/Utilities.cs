@@ -17,6 +17,8 @@ namespace Dnn.PersonaBar.Users.Components.Prompt
         [DnnDeprecated(9, 2, 1, "Use IUserValidator.ValidateUser.")]
         public static partial ConsoleErrorResultModel ValidateUser(int? userId, PortalSettings portalSettings, UserInfo currentUserInfo, out UserInfo userInfo)
         {
+			eventLogger.LogDebug(">>> Entering ValidateUser(userId={UserId},portalSettings={PortalSettings},currentUserInfo={CurrentUserInfo})", userId, portalSettings, currentUserInfo);
+			eventLogger.LogDebug("<<< Exiting ValidateUser(userId={UserId},portalSettings={PortalSettings},currentUserInfo={CurrentUserInfo})", userId, portalSettings, currentUserInfo);
             return UserValidator.ValidateUser(userId, portalSettings, currentUserInfo, out userInfo);
         }
     }

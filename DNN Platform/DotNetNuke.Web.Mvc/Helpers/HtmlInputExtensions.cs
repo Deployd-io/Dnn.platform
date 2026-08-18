@@ -13,6 +13,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
     /// <summary>Represents support for HTML input controls in an application.</summary>
     public static class HtmlInputExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HtmlInputExtensions));
         // CheckBox
 
         /// <summary>Returns a check box input element by using the specified HTML helper and the name of the form field.</summary>
@@ -23,6 +24,11 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field.</param>
         public static MvcHtmlString CheckBox(this DnnHtmlHelper html, string name)
         {
+			Logger.LogDebug(">>> Entering CheckBox(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting CheckBox(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting CheckBox(html={Html},name={Name},isChecked={IsChecked})", html, name, isChecked);
+			Logger.LogDebug("<<< Exiting CheckBox(html={Html},name={Name},htmlAttributes={HtmlAttributes})", html, name, htmlAttributes);
+			Logger.LogDebug("<<< Exiting CheckBox(html={Html},name={Name},isChecked={IsChecked},htmlAttributes={HtmlAttributes})", html, name, isChecked, htmlAttributes);
             return html.HtmlHelper.CheckBox(name);
         }
 
@@ -89,6 +95,9 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="expression">An expression that identifies the object that contains the properties to render.</param><typeparam name="TModel">The type of the model.</typeparam><exception cref="System.ArgumentNullException">The <paramref name="expression"/> parameter is null.</exception>
         public static MvcHtmlString CheckBoxFor<TModel>(this DnnHtmlHelper<TModel> html, Expression<Func<TModel, bool>> expression)
         {
+			Logger.LogDebug(">>> Entering CheckBoxFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting CheckBoxFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting CheckBoxFor(html={Html},expression={Expression},htmlAttributes={HtmlAttributes})", html, expression, htmlAttributes);
             return html.HtmlHelper.CheckBoxFor(expression);
         }
 
@@ -124,6 +133,10 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field and the <see cref="System.Web.Mvc.ViewDataDictionary"/> key that is used to look up the value.</param>
         public static MvcHtmlString Hidden(this DnnHtmlHelper html, string name)
         {
+			Logger.LogDebug(">>> Entering Hidden(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting Hidden(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting Hidden(html={Html},name={Name},value={Value})", html, name, value);
+			Logger.LogDebug("<<< Exiting Hidden(html={Html},name={Name},value={Value},htmlAttributes={HtmlAttributes})", html, name, value, htmlAttributes);
             return html.HtmlHelper.Hidden(name);
         }
 
@@ -168,6 +181,9 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="expression">An expression that identifies the object that contains the properties to render.</param><typeparam name="TModel">The type of the model.</typeparam><typeparam name="TProperty">The type of the property.</typeparam>
         public static MvcHtmlString HiddenFor<TModel, TProperty>(this DnnHtmlHelper<TModel> html, Expression<Func<TModel, TProperty>> expression)
         {
+			Logger.LogDebug(">>> Entering HiddenFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting HiddenFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting HiddenFor(html={Html},expression={Expression},htmlAttributes={HtmlAttributes})", html, expression, htmlAttributes);
             return html.HtmlHelper.HiddenFor(expression);
         }
 
@@ -203,6 +219,10 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field and the <see cref="System.Web.Mvc.ViewDataDictionary"/> key that is used to look up the value.</param>
         public static MvcHtmlString Password(this DnnHtmlHelper html, string name)
         {
+			Logger.LogDebug(">>> Entering Password(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting Password(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting Password(html={Html},name={Name},value={Value})", html, name, value);
+			Logger.LogDebug("<<< Exiting Password(html={Html},name={Name},value={Value},htmlAttributes={HtmlAttributes})", html, name, value, htmlAttributes);
             return html.HtmlHelper.Password(name);
         }
 
@@ -247,6 +267,9 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="expression">An expression that identifies the object that contains the properties to render.</param><typeparam name="TModel">The type of the model.</typeparam><typeparam name="TProperty">The type of the value.</typeparam><exception cref="System.ArgumentNullException">The <paramref name="expression"/> parameter is null.</exception>
         public static MvcHtmlString PasswordFor<TModel, TProperty>(this DnnHtmlHelper<TModel> html, Expression<Func<TModel, TProperty>> expression)
         {
+			Logger.LogDebug(">>> Entering PasswordFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting PasswordFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting PasswordFor(html={Html},expression={Expression},htmlAttributes={HtmlAttributes})", html, expression, htmlAttributes);
             return html.HtmlHelper.PasswordFor(expression);
         }
 
@@ -282,6 +305,11 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field and the <see cref="System.Web.Mvc.ViewDataDictionary"/> key that is used to look up the value.</param><param name="value">If this radio button is selected, the value of the radio button that is submitted when the form is posted. If the value of the selected radio button in the <see cref="System.Web.Mvc.ViewDataDictionary"/> or the <see cref="System.Web.Mvc.ModelStateDictionary"/> object matches this value, this radio button is selected.</param><exception cref="System.ArgumentException">The <paramref name="name"/> parameter is null or empty.</exception><exception cref="System.ArgumentNullException">The <paramref name="value"/> parameter is null.</exception>
         public static MvcHtmlString RadioButton(this DnnHtmlHelper html, string name, object value)
         {
+			Logger.LogDebug(">>> Entering RadioButton(html={Html},name={Name},value={Value})", html, name, value);
+			Logger.LogDebug("<<< Exiting RadioButton(html={Html},name={Name},value={Value})", html, name, value);
+			Logger.LogDebug("<<< Exiting RadioButton(html={Html},name={Name},value={Value},htmlAttributes={HtmlAttributes})", html, name, value, htmlAttributes);
+			Logger.LogDebug("<<< Exiting RadioButton(html={Html},name={Name},value={Value},isChecked={IsChecked})", html, name, value, isChecked);
+			Logger.LogDebug("<<< Exiting RadioButton(html={Html},name={Name},value={Value},isChecked={IsChecked},htmlAttributes={HtmlAttributes})", html, name, value, isChecked, htmlAttributes);
             return html.HtmlHelper.RadioButton(name, value);
         }
 
@@ -348,6 +376,9 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="expression">An expression that identifies the object that contains the properties to render.</param><param name="value">If this radio button is selected, the value of the radio button that is submitted when the form is posted. If the value of the selected radio button in the <see cref="System.Web.Mvc.ViewDataDictionary"/> or the <see cref="System.Web.Mvc.ModelStateDictionary"/> object matches this value, this radio button is selected.</param><typeparam name="TModel">The type of the model.</typeparam><typeparam name="TProperty">The type of the value.</typeparam><exception cref="System.ArgumentNullException">The <paramref name="value"/> parameter is null.</exception>
         public static MvcHtmlString RadioButtonFor<TModel, TProperty>(this DnnHtmlHelper<TModel> html, Expression<Func<TModel, TProperty>> expression, object value)
         {
+			Logger.LogDebug(">>> Entering RadioButtonFor(html={Html},expression={Expression},value={Value})", html, expression, value);
+			Logger.LogDebug("<<< Exiting RadioButtonFor(html={Html},expression={Expression},value={Value})", html, expression, value);
+			Logger.LogDebug("<<< Exiting RadioButtonFor(html={Html},expression={Expression},value={Value},htmlAttributes={HtmlAttributes})", html, expression, value, htmlAttributes);
             return html.HtmlHelper.RadioButtonFor(expression, value);
         }
 
@@ -383,6 +414,12 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the form field and the <see cref="System.Web.Mvc.ViewDataDictionary"/> key that is used to look up the value.</param>
         public static MvcHtmlString TextBox(this DnnHtmlHelper html, string name)
         {
+			Logger.LogDebug(">>> Entering TextBox(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting TextBox(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting TextBox(html={Html},name={Name},value={Value})", html, name, value);
+			Logger.LogDebug("<<< Exiting TextBox(html={Html},name={Name},value={Value},format={Format})", html, name, value, format);
+			Logger.LogDebug("<<< Exiting TextBox(html={Html},name={Name},value={Value},htmlAttributes={HtmlAttributes})", html, name, value, htmlAttributes);
+			Logger.LogDebug("<<< Exiting TextBox(html={Html},name={Name},value={Value},format={Format},htmlAttributes={HtmlAttributes})", html, name, value, format, htmlAttributes);
             return html.HtmlHelper.TextBox(name);
         }
 
@@ -460,6 +497,11 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="expression">An expression that identifies the object that contains the properties to render.</param><typeparam name="TModel">The type of the model.</typeparam><typeparam name="TProperty">The type of the value.</typeparam><exception cref="System.ArgumentException">The <paramref name="expression"/> parameter is null or empty.</exception>
         public static MvcHtmlString TextBoxFor<TModel, TProperty>(this DnnHtmlHelper<TModel> html, Expression<Func<TModel, TProperty>> expression)
         {
+			Logger.LogDebug(">>> Entering TextBoxFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting TextBoxFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting TextBoxFor(html={Html},expression={Expression},format={Format})", html, expression, format);
+			Logger.LogDebug("<<< Exiting TextBoxFor(html={Html},expression={Expression},htmlAttributes={HtmlAttributes})", html, expression, htmlAttributes);
+			Logger.LogDebug("<<< Exiting TextBoxFor(html={Html},expression={Expression},format={Format},htmlAttributes={HtmlAttributes})", html, expression, format, htmlAttributes);
             return html.HtmlHelper.TextBoxFor(expression);
         }
 

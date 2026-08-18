@@ -10,9 +10,13 @@ using DotNetNuke.Entities.Icons;
 /// <summary>The default <see cref="IIconController"/> implementation.</summary>
 internal class IconControllerWrapper : ComponentBase<IIconController, IconControllerWrapper>, IIconController
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(IconControllerWrapper));
     /// <inheritdoc />
     public string IconURL(string key)
     {
+		Logger.LogDebug(">>> Entering IconURL(key={Key})", key);
+		Logger.LogDebug("<<< Exiting IconURL(key={Key})", key);
+		Logger.LogDebug("<<< Exiting IconURL(key={Key},size={Size})", key, size);
         return IconController.IconURL(key);
     }
 

@@ -32,6 +32,11 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         public DnnCheckBoxList()
             : this(null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering DnnCheckBoxList()");
+		eventLogger.LogDebug("<<< Exiting DnnCheckBoxList()");
+		eventLogger.LogDebug(">>> Entering DnnCheckBoxList(appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController})", appStatus, eventLogger, clientResourceController);
+		eventLogger.LogDebug("DnnCheckBoxList(appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController}): eventLogger → {EventLogger1}", appStatus, eventLogger, clientResourceController, eventLogger);
+		eventLogger.LogDebug("DnnCheckBoxList(appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController}): clientResourceController → {ClientResourceController1}", appStatus, eventLogger, clientResourceController, clientResourceController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnCheckBoxList"/> class.</summary>
@@ -43,6 +48,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
             this.clientResourceController = clientResourceController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>();
+			eventLogger.LogDebug("<<< Exiting DnnCheckBoxList(appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController})", appStatus, eventLogger, clientResourceController);
         }
 
         /// <inheritdoc />
@@ -69,6 +75,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <inheritdoc />
         public override void DataBind()
         {
+			eventLogger.LogDebug(">>> Entering DataBind()");
             if (!string.IsNullOrEmpty(this.initValue))
             {
                 this.DataBind(this.initValue);
@@ -77,6 +84,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
             {
                 base.DataBind();
             }
+			eventLogger.LogDebug("<<< Exiting DataBind()");
         }
 
         /// <summary>Adds an item to the list.</summary>
@@ -84,7 +92,9 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <param name="value">The item value.</param>
         public void AddItem(string text, string value)
         {
+			eventLogger.LogDebug(">>> Entering AddItem(text={Text},value={Value})", text, value);
             this.Items.Add(new ListItem(text, value));
+			eventLogger.LogDebug("<<< Exiting AddItem(text={Text},value={Value})", text, value);
         }
 
         /// <summary>Inserts an item into the list.</summary>
@@ -93,14 +103,18 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <param name="value">The item value.</param>
         public void InsertItem(int index, string text, string value)
         {
+			eventLogger.LogDebug(">>> Entering InsertItem(index={Index},text={Text},value={Value})", index, text, value);
             this.Items.Insert(index, new ListItem(text, value));
+			eventLogger.LogDebug("<<< Exiting InsertItem(index={Index},text={Text},value={Value})", index, text, value);
         }
 
         /// <summary>Binds a data source to the invoked server control and all its child controls.</summary>
         /// <param name="initialValue">The initial value.</param>
         public void DataBind(string initialValue)
         {
+			eventLogger.LogDebug(">>> Entering DataBind(initialValue={InitialValue})", initialValue);
             this.DataBind(initialValue, false);
+			eventLogger.LogDebug("<<< Exiting DataBind(initialValue={InitialValue})", initialValue);
         }
 
         /// <summary>Binds a data source to the invoked server control and all its child controls.</summary>
@@ -108,9 +122,11 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <param name="findByText">Whether <paramref name="initial"/> is the text or value.</param>
         public void DataBind(string initial, bool findByText)
         {
+			eventLogger.LogDebug(">>> Entering DataBind(initial={Initial},findByText={FindByText})", initial, findByText);
             base.DataBind();
 
             this.Select(initial, findByText);
+			eventLogger.LogDebug("<<< Exiting DataBind(initial={Initial},findByText={FindByText})", initial, findByText);
         }
 
         /// <summary>Selects an item.</summary>
@@ -118,6 +134,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <param name="findByText">Whether <paramref name="initial"/> is the text or value.</param>
         public void Select(string initial, bool findByText)
         {
+			eventLogger.LogDebug(">>> Entering Select(initial={Initial},findByText={FindByText})", initial, findByText);
             if (findByText)
             {
                 if (this.FindItemByText(initial, true) != null)
@@ -132,6 +149,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
                     this.FindItemByValue(initial, true).Selected = true;
                 }
             }
+			eventLogger.LogDebug("<<< Exiting Select(initial={Initial},findByText={FindByText})", initial, findByText);
         }
 
         /// <summary>Finds an item by its text.</summary>
@@ -140,6 +158,8 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <returns>The list item or <see langword="null"/>.</returns>
         public ListItem FindItemByText(string text, bool ignoreCase = false)
         {
+			eventLogger.LogDebug(">>> Entering FindItemByText(text={Text},ignoreCase={IgnoreCase})", text, ignoreCase);
+			eventLogger.LogDebug("<<< Exiting FindItemByText(text={Text},ignoreCase={IgnoreCase})", text, ignoreCase);
             return ignoreCase ? this.Items.FindByText(text) : this.Items.FindByTextWithIgnoreCase(text);
         }
 
@@ -149,6 +169,8 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <returns>The list item or <see langword="null"/>.</returns>
         public ListItem FindItemByValue(string value, bool ignoreCase = false)
         {
+			eventLogger.LogDebug(">>> Entering FindItemByValue(value={Value},ignoreCase={IgnoreCase})", value, ignoreCase);
+			eventLogger.LogDebug("<<< Exiting FindItemByValue(value={Value},ignoreCase={IgnoreCase})", value, ignoreCase);
             return ignoreCase ? this.Items.FindByValue(value) : this.Items.FindByValueWithIgnoreCase(value);
         }
 
@@ -157,45 +179,57 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
         /// <returns>The index or <c>-1</c>.</returns>
         public int FindItemIndexByValue(string value)
         {
+			eventLogger.LogDebug(">>> Entering FindItemIndexByValue(value={Value})", value);
+			eventLogger.LogDebug("<<< Exiting FindItemIndexByValue(value={Value})", value);
             return this.Items.IndexOf(this.FindItemByValue(value));
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnInit(e={E})", e);
             this.RepeatColumns = 1;
             base.OnInit(e);
+			eventLogger.LogDebug("OnInit(e={E}): this.RepeatColumns → {Arg1}", e, this.RepeatColumns);
+			eventLogger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             Utilities.ApplyControlSkin(this.clientResourceController, this, string.Empty, string.Empty);
             this.RegisterRequestResources();
 
             base.OnPreRender(e);
+			eventLogger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private void RegisterRequestResources()
         {
+			eventLogger.LogDebug(">>> Entering RegisterRequestResources()");
             JavaScript.RequestRegistration(this.appStatus, this.eventLogger, PortalSettings.Current, CommonJs.DnnPlugins);
 
             if (this.appStatus.Status == UpgradeStatus.None)
             {
                 var package = JavaScriptLibraryController.Instance.GetLibrary(l => l.LibraryName == "Selectize");
+				eventLogger.LogDebug("RegisterRequestResources(): package → {Package}", package);
                 if (package != null)
                 {
                     JavaScript.RequestRegistration(this.appStatus, this.eventLogger, PortalSettings.Current, "Selectize");
 
                     var libraryPath = $"~/Resources/Libraries/{package.LibraryName}/{Globals.FormatVersion(package.Version, "00", 3, "_")}/";
+					eventLogger.LogDebug("RegisterRequestResources(): libraryPath → {LibraryPath}", libraryPath);
                     this.clientResourceController.RegisterStylesheet($"{libraryPath}selectize.css");
                     this.clientResourceController.RegisterStylesheet($"{libraryPath}selectize.default.css");
 
                     var initScripts = $"$('#{this.ClientID}').selectize({{}});";
+					eventLogger.LogDebug("RegisterRequestResources(): initScripts → {InitScripts}", initScripts);
 
                     this.Page.ClientScript.RegisterStartupScript(this.Page.GetType(), $"{this.ClientID}Sctipts", initScripts, true);
                 }
             }
+			eventLogger.LogDebug("<<< Exiting RegisterRequestResources()");
         }
     }
 }

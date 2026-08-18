@@ -2,34 +2,44 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Collapsible as Collapse, Checkbox, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import "./style.less";
+const logger = console;
 
 class ProviderRow extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         let opened = (this.props.openId !== "" && this.props.name === this.props.openId);
         this.setState({
             opened
         });
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     toggle() {
+		logger.debug('>>> Entering toggle()');
         if ((this.props.openId !== "" && this.props.name === this.props.openId)) {
             this.props.Collapse();
         } else {
             this.props.OpenCollapse(this.props.name);
+			logger.debug('<<< Exiting toggle()');
         }
     }
 
     updateStatus(event) {
+		logger.debug(`>>> Entering updateStatus(event=${event})`);
         const {props} = this;
         this.props.onUpdateStatus(props.providerId, event);
+		logger.debug(`<<< Exiting updateStatus(event=${event})`);
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         let opened = (this.props.openId !== "" && this.props.name === this.props.openId);
         if (props.visible) {
@@ -53,6 +63,7 @@ class ProviderRow extends Component {
             );
         }
         else {
+			logger.debug('<<< Exiting render()');
             return <div />;
         }
     }

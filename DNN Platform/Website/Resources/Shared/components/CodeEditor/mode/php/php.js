@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("../htmlmixed/htmlmixed"), require("../clike/clike"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -10,15 +12,20 @@
     mod(CodeMirror);
 })(function(CodeMirror) {
   "use strict";
+logger.debug(`<<< Exiting function(exports=${exports})`);
 
   function keywords(str) {
+	logger.debug(`>>> Entering keywords(str=${str})`);
     var obj = {}, words = str.split(" ");
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+	logger.debug(`keywords(str=${str}): obj → ${obj}`);
+	logger.debug(`<<< Exiting keywords(str=${str})`);
     return obj;
   }
 
   // Helper for phpString
   function matchSequence(list, end, escapes) {
+	logger.debug(`>>> Entering matchSequence(list=${list},end=${end},escapes=${escapes})`);
     if (list.length == 0) return phpString(end);
     return function (stream, state) {
       var patterns = list[0];
@@ -27,16 +34,20 @@
         return patterns[i][1];
       }
       state.tokenize = phpString(end, escapes);
+	logger.debug(`<<< Exiting matchSequence(list=${list},end=${end},escapes=${escapes})`);
       return "string";
     };
   }
   function phpString(closing, escapes) {
+	logger.debug(`>>> Entering phpString(closing=${closing},escapes=${escapes})`);
+	logger.debug(`<<< Exiting phpString(closing=${closing},escapes=${escapes})`);
     return function(stream, state) { return phpString_(stream, state, closing, escapes); };
   }
   function phpString_(stream, state, closing, escapes) {
     // "Complex" syntax
     if (escapes !== false && stream.match("${", false) || stream.match("{$", false)) {
       state.tokenize = null;
+	logger.debug(`phpString_(stream=${stream},state=${state},closing=${closing},escapes=${escapes}): state.tokenize → ${state.tokenize}`);
       return "string";
     }
 
@@ -112,8 +123,11 @@
           var delim = stream.current().slice(before[0].length + (quoted ? 2 : 1));
           if (quoted) stream.eat(quoted);
           if (delim) {
+			logger.debug(`function(stream=${stream},state=${state}): quoted → ${quoted}`);
+			logger.debug(`function(stream=${stream},state=${state}): delim → ${delim}`);
             (state.tokStack || (state.tokStack = [])).push(delim, 0);
             state.tokenize = phpString(delim, quoted != "'");
+			logger.debug(`<<< Exiting function(stream=${stream})`);
             return "string";
           }
         }
@@ -153,14 +167,20 @@
   CodeMirror.defineMode("php", function(config, parserConfig) {
     var htmlMode = CodeMirror.getMode(config, "text/html");
     var phpMode = CodeMirror.getMode(config, phpConfig);
+	logger.debug(`defineMode(htmlMode=${htmlMode}): htmlMode → ${htmlMode}`);
+	logger.debug(`defineMode(htmlMode=${htmlMode}): phpMode → ${phpMode}`);
 
+	logger.debug(`<<< Exiting defineMode(htmlMode=${htmlMode})`);
     function dispatch(stream, state) {
       var isPHP = state.curMode == phpMode;
+	logger.debug(`>>> Entering dispatch(stream=${stream},state=${state})`);
       if (stream.sol() && state.pending && state.pending != '"' && state.pending != "'") state.pending = null;
       if (!isPHP) {
         if (stream.match(/^<\?\w*/)) {
           state.curMode = phpMode;
+		logger.debug(`dispatch(stream=${stream},state=${state}): state.curMode → ${state.curMode}`);
           state.curState = state.php;
+		logger.debug(`dispatch(stream=${stream},state=${state}): state.curState → ${state.curState}`);
           return "meta";
         }
         if (state.pending == '"' || state.pending == "'") {
@@ -168,12 +188,15 @@
           var style = "string";
         } else if (state.pending && stream.pos < state.pending.end) {
           stream.pos = state.pending.end;
+		logger.debug(`dispatch(stream=${stream},state=${state}): stream.pos → ${stream.pos}`);
           var style = state.pending.style;
         } else {
           var style = htmlMode.token(stream, state.curState);
+		logger.debug(`dispatch(stream=${stream},state=${state}): style → ${style}`);
         }
         if (state.pending) state.pending = null;
         var cur = stream.current(), openPHP = cur.search(/<\?/), m;
+		logger.debug(`dispatch(stream=${stream},state=${state}): cur → ${cur}`);
         if (openPHP != -1) {
           if (style == "string" && (m = cur.match(/[\'\"]$/)) && !/\?>/.test(cur)) state.pending = m[0];
           else state.pending = {end: stream.pos, style: style};
@@ -185,35 +208,44 @@
         state.curState = state.html;
         return "meta";
       } else {
+		logger.debug(`<<< Exiting dispatch(stream=${stream},state=${state})`);
         return phpMode.token(stream, state.curState);
       }
     }
 
     return {
       startState: function() {
+		logger.debug('>>> Entering startState()');
         var html = CodeMirror.startState(htmlMode), php = CodeMirror.startState(phpMode);
         return {html: html,
                 php: php,
                 curMode: parserConfig.startOpen ? phpMode : htmlMode,
                 curState: parserConfig.startOpen ? php : html,
                 pending: null};
+				logger.debug(`startState(): html → ${html}`);
+				logger.debug('<<< Exiting startState()');
       },
 
       copyState: function(state) {
+		logger.debug(`>>> Entering copyState(state=${state})`);
         var html = state.html, htmlNew = CodeMirror.copyState(htmlMode, html),
             php = state.php, phpNew = CodeMirror.copyState(phpMode, php), cur;
+			logger.debug(`copyState(state=${state}): html → ${html}`);
         if (state.curMode == htmlMode) cur = htmlNew;
         else cur = phpNew;
         return {html: htmlNew, php: phpNew, curMode: state.curMode, curState: cur,
                 pending: state.pending};
+				logger.debug(`<<< Exiting copyState(state=${state})`);
       },
 
       token: dispatch,
 
       indent: function(state, textAfter) {
+		logger.debug(`>>> Entering indent(state=${state},textAfter=${textAfter})`);
         if ((state.curMode != phpMode && /^\s*<\//.test(textAfter)) ||
             (state.curMode == phpMode && /^\?>/.test(textAfter)))
           return htmlMode.indent(state.html, textAfter);
+		logger.debug(`<<< Exiting indent(state=${state},textAfter=${textAfter})`);
         return state.curMode.indent(state.curState, textAfter);
       },
 

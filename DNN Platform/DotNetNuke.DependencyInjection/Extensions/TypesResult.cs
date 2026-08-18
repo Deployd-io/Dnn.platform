@@ -6,19 +6,25 @@ namespace DotNetNuke.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 
 /// <summary>The result of a request to get types from assemblies.</summary>
 public class TypesResult
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>Initializes a new instance of the <see cref="TypesResult"/> class.</summary>
     /// <param name="types">The types.</param>
     /// <param name="loadExceptions">The <see cref="ReflectionTypeLoadException"/> instances that were occurred while loading the assemblies.</param>
     /// <param name="otherExceptions">The other exceptions that occurred while loading the assemblies.</param>
     public TypesResult(IReadOnlyCollection<Type> types, IReadOnlyDictionary<Assembly, ReflectionTypeLoadException> loadExceptions, IReadOnlyDictionary<Assembly, Exception> otherExceptions)
     {
+		_logger.LogDebug(">>> Entering TypesResult(types={Types},loadExceptions={LoadExceptions},otherExceptions={OtherExceptions})", types, loadExceptions, otherExceptions);
         this.Types = types;
         this.LoadExceptions = loadExceptions;
+		_logger.LogDebug("TypesResult(types={Types},loadExceptions={LoadExceptions},otherExceptions={OtherExceptions}): this.Types → {Arg3}", types, loadExceptions, otherExceptions, this.Types);
+		_logger.LogDebug("TypesResult(types={Types},loadExceptions={LoadExceptions},otherExceptions={OtherExceptions}): this.LoadExceptions → {Arg3}", types, loadExceptions, otherExceptions, this.LoadExceptions);
         this.OtherExceptions = otherExceptions;
+		_logger.LogDebug("<<< Exiting TypesResult(types={Types},loadExceptions={LoadExceptions},otherExceptions={OtherExceptions})", types, loadExceptions, otherExceptions);
     }
 
     /// <summary>Gets the types.</summary>

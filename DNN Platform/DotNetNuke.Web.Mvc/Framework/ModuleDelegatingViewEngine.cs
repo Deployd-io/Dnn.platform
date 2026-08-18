@@ -15,6 +15,7 @@ namespace DotNetNuke.Web.Mvc.Framework
     /// <summary>A View Engine that will delegate to whatever ViewEngine(s) the module application defines.</summary>
     public class ModuleDelegatingViewEngine : IViewEngine
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleDelegatingViewEngine));
         private readonly IHostSettings hostSettings;
         private readonly Dictionary<IView, IViewEngine> viewEngineMappings = new Dictionary<IView, IViewEngine>();
 
@@ -23,13 +24,16 @@ namespace DotNetNuke.Web.Mvc.Framework
         public ModuleDelegatingViewEngine()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering ModuleDelegatingViewEngine()");
         }
 
+		Logger.LogDebug("<<< Exiting ModuleDelegatingViewEngine()");
         /// <summary>Initializes a new instance of the <see cref="ModuleDelegatingViewEngine"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
         public ModuleDelegatingViewEngine(IHostSettings hostSettings)
         {
             this.hostSettings = hostSettings;
+			Logger.LogDebug("ModuleDelegatingViewEngine(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
         }
 
         /// <summary>Finds the specified partial view by using the specified controller context.</summary>
@@ -37,6 +41,8 @@ namespace DotNetNuke.Web.Mvc.Framework
         /// <param name="controllerContext">The controller context.</param><param name="partialViewName">The name of the partial view.</param><param name="useCache">true to specify that the view engine returns the cached view, if a cached view exists; otherwise, false.</param>
         public ViewEngineResult FindPartialView(ControllerContext controllerContext, string partialViewName, bool useCache)
         {
+			Logger.LogDebug(">>> Entering FindPartialView(controllerContext={ControllerContext},partialViewName={PartialViewName},useCache={UseCache})", controllerContext, partialViewName, useCache);
+			Logger.LogDebug("<<< Exiting FindPartialView(controllerContext={ControllerContext},partialViewName={PartialViewName},useCache={UseCache})", controllerContext, partialViewName, useCache);
             return this.RunAgainstModuleViewEngines(controllerContext, e => e.FindPartialView(this.hostSettings, controllerContext, partialViewName, useCache));
         }
 
@@ -45,6 +51,8 @@ namespace DotNetNuke.Web.Mvc.Framework
         /// <param name="controllerContext">The controller context.</param><param name="viewName">The name of the view.</param><param name="masterName">The name of the master.</param><param name="useCache">true to specify that the view engine returns the cached view, if a cached view exists; otherwise, false.</param>
         public ViewEngineResult FindView(ControllerContext controllerContext, string viewName, string masterName, bool useCache)
         {
+			Logger.LogDebug(">>> Entering FindView(controllerContext={ControllerContext},viewName={ViewName},masterName={MasterName},useCache={UseCache})", controllerContext, viewName, masterName, useCache);
+			Logger.LogDebug("<<< Exiting FindView(controllerContext={ControllerContext},viewName={ViewName},masterName={MasterName},useCache={UseCache})", controllerContext, viewName, masterName, useCache);
             return this.RunAgainstModuleViewEngines(controllerContext, e => e.FindView(this.hostSettings, controllerContext, viewName, masterName, useCache));
         }
 
@@ -52,16 +60,20 @@ namespace DotNetNuke.Web.Mvc.Framework
         /// <param name="controllerContext">The controller context.</param><param name="view">The view.</param>
         public void ReleaseView(ControllerContext controllerContext, IView view)
         {
+			Logger.LogDebug(">>> Entering ReleaseView(controllerContext={ControllerContext},view={View})", controllerContext, view);
             if (this.viewEngineMappings.TryGetValue(view, out var viewEngine))
             {
                 viewEngine.ReleaseView(controllerContext, view);
             }
+			Logger.LogDebug("<<< Exiting ReleaseView(controllerContext={ControllerContext},view={View})", controllerContext, view);
         }
 
         private static ModuleRequestResult GetCurrentModuleRequestResult(ControllerContext controllerContext)
         {
+			Logger.LogDebug(">>> Entering GetCurrentModuleRequestResult(controllerContext={ControllerContext})", controllerContext);
             if (controllerContext.HttpContext.HasModuleRequestResult())
             {
+			Logger.LogDebug("<<< Exiting GetCurrentModuleRequestResult(controllerContext={ControllerContext})", controllerContext);
                 return controllerContext.HttpContext.GetModuleRequestResult();
             }
 
@@ -70,6 +82,7 @@ namespace DotNetNuke.Web.Mvc.Framework
 
         private ViewEngineResult RunAgainstModuleViewEngines(ControllerContext controllerContext, Func<ViewEngineCollection, ViewEngineResult> engineRequest)
         {
+			Logger.LogDebug(">>> Entering RunAgainstModuleViewEngines(controllerContext={ControllerContext},engineRequest={EngineRequest})", controllerContext, engineRequest);
             var controller = controllerContext.Controller as IDnnController;
             if (controller?.ViewEngineCollectionEx == null)
             {
@@ -77,6 +90,7 @@ namespace DotNetNuke.Web.Mvc.Framework
             }
 
             var result = engineRequest(controller.ViewEngineCollectionEx);
+			Logger.LogDebug("RunAgainstModuleViewEngines(controllerContext={ControllerContext},engineRequest={EngineRequest}): result → {Result}", controllerContext, engineRequest, result);
 
             // If there is a view, store the view<->viewengine mapping so release works correctly
             if (result.View != null)
@@ -84,6 +98,7 @@ namespace DotNetNuke.Web.Mvc.Framework
                 this.viewEngineMappings[result.View] = result.ViewEngine;
             }
 
+			Logger.LogDebug("<<< Exiting RunAgainstModuleViewEngines(controllerContext={ControllerContext},engineRequest={EngineRequest})", controllerContext, engineRequest);
             return result;
         }
     }

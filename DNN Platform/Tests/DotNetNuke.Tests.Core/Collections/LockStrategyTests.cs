@@ -16,16 +16,20 @@ namespace DotNetNuke.Tests.Core.Collections
         [Test]
         public void DoubleDisposeAllowed()
         {
+			mockEventLogger.LogDebug(">>> Entering DoubleDisposeAllowed()");
             var strategy = this.GetLockStrategy();
 
+			mockEventLogger.LogDebug("DoubleDisposeAllowed(): strategy → {Strategy}", strategy);
             strategy.Dispose();
             strategy.Dispose();
 
             // no exception on 2nd dispose
+			mockEventLogger.LogDebug("<<< Exiting DoubleDisposeAllowed()");
         }
 
         protected void DoubleReadLock()
         {
+			mockEventLogger.LogDebug(">>> Entering DoubleReadLock()");
             using (var strategy = this.GetLockStrategy())
             {
                 using (var readLock1 = strategy.GetReadLock())
@@ -36,17 +40,21 @@ namespace DotNetNuke.Tests.Core.Collections
                     }
                 }
             }
+			mockEventLogger.LogDebug("<<< Exiting DoubleReadLock()");
         }
 
         [Test]
         public virtual void DoubleReadLockThrows()
         {
+			mockEventLogger.LogDebug(">>> Entering DoubleReadLockThrows()");
             Assert.Throws<LockRecursionException>(this.DoubleReadLock);
+			mockEventLogger.LogDebug("<<< Exiting DoubleReadLockThrows()");
         }
 
         [Test]
         public void ReadAndWriteLockOnSameThreadThrows()
         {
+			mockEventLogger.LogDebug(">>> Entering ReadAndWriteLockOnSameThreadThrows()");
             using (var strategy = this.GetLockStrategy())
             {
                 using (var readLock1 = strategy.GetReadLock())
@@ -61,11 +69,13 @@ namespace DotNetNuke.Tests.Core.Collections
                         });
                 }
             }
+			mockEventLogger.LogDebug("<<< Exiting ReadAndWriteLockOnSameThreadThrows()");
         }
 
         [Test]
         public void WriteAndReadLockOnSameThreadThrows()
         {
+			mockEventLogger.LogDebug(">>> Entering WriteAndReadLockOnSameThreadThrows()");
             using (var strategy = this.GetLockStrategy())
             {
                 using (var readLock1 = strategy.GetWriteLock())
@@ -80,11 +90,13 @@ namespace DotNetNuke.Tests.Core.Collections
                         });
                 }
             }
+			mockEventLogger.LogDebug("<<< Exiting WriteAndReadLockOnSameThreadThrows()");
         }
 
         [Test]
         public void DoubleReadLockOnDifferentThreads()
         {
+			mockEventLogger.LogDebug(">>> Entering DoubleReadLockOnDifferentThreads()");
             using (var strategy = this.GetLockStrategy())
             {
                 if (strategy.SupportsConcurrentReads)
@@ -92,6 +104,7 @@ namespace DotNetNuke.Tests.Core.Collections
                     using (var readLock1 = strategy.GetReadLock())
                     {
                         var t = new Thread(GetReadLock);
+						mockEventLogger.LogDebug("DoubleReadLockOnDifferentThreads(): t → {T}", t);
                         t.Start(strategy);
 
                         // sleep and let new thread run
@@ -103,17 +116,20 @@ namespace DotNetNuke.Tests.Core.Collections
                     }
                 }
             }
+			mockEventLogger.LogDebug("<<< Exiting DoubleReadLockOnDifferentThreads()");
         }
 
         [Test]
         public void DoubleWriteLockOnDifferentThreadsWaits()
         {
+			mockEventLogger.LogDebug(">>> Entering DoubleWriteLockOnDifferentThreadsWaits()");
             using (ILockStrategy strategy = this.GetLockStrategy())
             {
                 Thread t;
                 using (var writeLock1 = strategy.GetWriteLock())
                 {
                     t = new Thread(GetWriteLock);
+					mockEventLogger.LogDebug("DoubleWriteLockOnDifferentThreadsWaits(): t → {T}", t);
                     t.Start(strategy);
 
                     // sleep and let new thread run and block
@@ -128,16 +144,20 @@ namespace DotNetNuke.Tests.Core.Collections
                 // assert that getwritelock did complete once first writelock was released it's call
                 Assert.That(t.IsAlive, Is.False);
             }
+			mockEventLogger.LogDebug("<<< Exiting DoubleWriteLockOnDifferentThreadsWaits()");
         }
 
         [Test]
         public virtual void DoubleWriteLockThrows()
         {
+			mockEventLogger.LogDebug(">>> Entering DoubleWriteLockThrows()");
             Assert.Throws<LockRecursionException>(this.DoubleWriteLock);
+			mockEventLogger.LogDebug("<<< Exiting DoubleWriteLockThrows()");
         }
 
         protected void DoubleWriteLock()
         {
+			mockEventLogger.LogDebug(">>> Entering DoubleWriteLock()");
             using (ILockStrategy strategy = this.GetLockStrategy())
             {
                 using (var writeLock1 = strategy.GetWriteLock())
@@ -148,23 +168,29 @@ namespace DotNetNuke.Tests.Core.Collections
                     }
                 }
             }
+			mockEventLogger.LogDebug("<<< Exiting DoubleWriteLock()");
         }
 
         [Test]
         [TestCaseSource(nameof(GetObjectDisposedExceptionMethods))]
         public virtual void MethodsThrowAfterDisposed(Action<ILockStrategy> methodCall)
         {
+			mockEventLogger.LogDebug(">>> Entering MethodsThrowAfterDisposed(methodCall={MethodCall})", methodCall);
             var strategy = this.GetLockStrategy();
 
+			mockEventLogger.LogDebug("MethodsThrowAfterDisposed(methodCall={MethodCall}): strategy → {Strategy}", methodCall, strategy);
             strategy.Dispose();
             Assert.Throws<ObjectDisposedException>(() => methodCall.Invoke(strategy));
+			mockEventLogger.LogDebug("<<< Exiting MethodsThrowAfterDisposed(methodCall={MethodCall})", methodCall);
         }
 
         [Test]
         public void ReadLockPreventsWriteLock()
         {
+			mockEventLogger.LogDebug(">>> Entering ReadLockPreventsWriteLock()");
             Thread t = null;
 
+			mockEventLogger.LogDebug("ReadLockPreventsWriteLock(): t → {T}", t);
             using (var strategy = this.GetLockStrategy())
             {
                 using (var readLock = strategy.GetReadLock())
@@ -187,13 +213,16 @@ namespace DotNetNuke.Tests.Core.Collections
             }
 
             // release controller
+			mockEventLogger.LogDebug("<<< Exiting ReadLockPreventsWriteLock()");
         }
 
         [Test]
         public void OnlyOneWriteLockAllowed()
         {
+			mockEventLogger.LogDebug(">>> Entering OnlyOneWriteLockAllowed()");
             Thread t = null;
 
+			mockEventLogger.LogDebug("OnlyOneWriteLockAllowed(): t → {T}", t);
             using (var strategy = this.GetLockStrategy())
             {
                 using (var writeLock = strategy.GetWriteLock())
@@ -213,13 +242,16 @@ namespace DotNetNuke.Tests.Core.Collections
                 Thread.Sleep(100);
                 Assert.That(t.IsAlive, Is.False);
             }
+			mockEventLogger.LogDebug("<<< Exiting OnlyOneWriteLockAllowed()");
         }
 
         [Test]
         public void MultipleReadLocksAllowed()
         {
+			mockEventLogger.LogDebug(">>> Entering MultipleReadLocksAllowed()");
             Thread t = null;
 
+			mockEventLogger.LogDebug("MultipleReadLocksAllowed(): t → {T}", t);
             using (var strategy = this.GetLockStrategy())
             {
                 if (strategy.SupportsConcurrentReads)
@@ -241,38 +273,46 @@ namespace DotNetNuke.Tests.Core.Collections
                     Assert.Pass();
                 }
             }
+			mockEventLogger.LogDebug("<<< Exiting MultipleReadLocksAllowed()");
         }
 
         internal abstract ILockStrategy GetLockStrategy();
 
         protected static IEnumerable<Action<ILockStrategy>> GetObjectDisposedExceptionMethods()
         {
+			mockEventLogger.LogDebug(">>> Entering GetObjectDisposedExceptionMethods()");
             var l = new List<Action<ILockStrategy>>();
 
+			mockEventLogger.LogDebug("GetObjectDisposedExceptionMethods(): l → {L}", l);
             l.Add((ILockStrategy strategy) => strategy.GetReadLock());
             l.Add((ILockStrategy strategy) => strategy.GetWriteLock());
             l.Add((ILockStrategy strategy) => Console.WriteLine(strategy.ThreadCanRead));
             l.Add((ILockStrategy strategy) => Console.WriteLine(strategy.ThreadCanWrite));
 
+			mockEventLogger.LogDebug("<<< Exiting GetObjectDisposedExceptionMethods()");
             return l;
         }
 
         private static void GetReadLock(object obj)
         {
+			mockEventLogger.LogDebug(">>> Entering GetReadLock(obj={Obj})", obj);
             var strategy = (ILockStrategy)obj;
             using (var readLock = strategy.GetReadLock())
             {
                 // do nothing
             }
+			mockEventLogger.LogDebug("<<< Exiting GetReadLock(obj={Obj})", obj);
         }
 
         private static void GetWriteLock(object obj)
         {
+			mockEventLogger.LogDebug(">>> Entering GetWriteLock(obj={Obj})", obj);
             var strategy = (ILockStrategy)obj;
             using (var writeLock = strategy.GetWriteLock())
             {
                 // do nothing
             }
+			mockEventLogger.LogDebug("<<< Exiting GetWriteLock(obj={Obj})", obj);
         }
     }
 }

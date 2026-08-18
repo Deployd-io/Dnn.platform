@@ -132,8 +132,10 @@ namespace DotNetNuke.Web.UI.WebControls.Internal.PropertyEditorControls
         /// <inheritdoc />
         public override bool LoadPostData(string postDataKey, NameValueCollection postCollection)
         {
+			Logger.LogDebug(">>> Entering LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             this.EnsureChildControls();
             bool dataChanged = false;
+			Logger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): dataChanged → {DataChanged}", postDataKey, postCollection, dataChanged);
             string presentValue = this.StringValue;
             string postedValue = postCollection[postDataKey + "_control"];
             if (!presentValue.Equals(postedValue, StringComparison.Ordinal))
@@ -141,6 +143,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal.PropertyEditorControls
                 if (string.IsNullOrEmpty(postedValue))
                 {
                     this.Value = Null.NullDate;
+					Logger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): Value → {Value}", postDataKey, postCollection, Value);
                     dataChanged = true;
                 }
                 else
@@ -154,33 +157,39 @@ namespace DotNetNuke.Web.UI.WebControls.Internal.PropertyEditorControls
             }
 
             this.LoadDateControls();
+			Logger.LogDebug("<<< Exiting LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             return dataChanged;
         }
 
         /// <inheritdoc />
         protected override void CreateChildControls()
         {
+			Logger.LogDebug(">>> Entering CreateChildControls()");
             base.CreateChildControls();
 
             this.DateControl.ControlStyle.CopyFrom(this.ControlStyle);
             this.DateControl.ID = base.ID + "_control";
 
             this.Controls.Add(this.DateControl);
+			Logger.LogDebug("<<< Exiting CreateChildControls()");
         }
 
         /// <summary>Loads the date controls.</summary>
         protected virtual void LoadDateControls()
         {
+			Logger.LogDebug(">>> Entering LoadDateControls()");
             if (this.DateValue != Null.NullDate)
             {
                 this.DateControl.Text = this.DateValue.ToString("yyyy-MM-dd'T'HH:mm", CultureInfo.InvariantCulture);
             }
+			Logger.LogDebug("<<< Exiting LoadDateControls()");
         }
 
         /// <summary>OnDataChanged is called by the PostBack Handler when the Data has changed.</summary>
         /// <param name="e">An EventArgs object.</param>
         protected override void OnDataChanged(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnDataChanged(e={E})", e);
             var args = new PropertyEditorEventArgs(this.Name)
             {
                 Value = this.DateValue,
@@ -188,11 +197,13 @@ namespace DotNetNuke.Web.UI.WebControls.Internal.PropertyEditorControls
                 StringValue = this.DateValue.ToString(CultureInfo.InvariantCulture),
             };
             this.OnValueChanged(args);
+			Logger.LogDebug("<<< Exiting OnDataChanged(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             this.LoadDateControls();
@@ -201,23 +212,28 @@ namespace DotNetNuke.Web.UI.WebControls.Internal.PropertyEditorControls
             {
                 this.Page.RegisterRequiresPostBack(this);
             }
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <summary>RenderEditMode is called by the base control to render the control in Edit Mode.</summary>
         /// <param name="writer">The writer to which to render the HTML.</param>
         protected override void RenderEditMode(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering RenderEditMode(writer={Writer})", writer);
             this.RenderChildren(writer);
+			Logger.LogDebug("<<< Exiting RenderEditMode(writer={Writer})", writer);
         }
 
         /// <summary>RenderViewMode renders the View (readonly) mode of the control.</summary>
         /// <param name="writer">A HtmlTextWriter.</param>
         protected override void RenderViewMode(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering RenderViewMode(writer={Writer})", writer);
             this.ControlStyle.AddAttributesToRender(writer);
             writer.RenderBeginTag(HtmlTextWriterTag.Span);
             writer.Write(this.StringValue);
             writer.RenderEndTag();
+			Logger.LogDebug("<<< Exiting RenderViewMode(writer={Writer})", writer);
         }
     }
 }

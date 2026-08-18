@@ -4,6 +4,7 @@
 
 namespace DotNetNuke.ComponentModel
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(InstanceComponentBuilder));
     internal class InstanceComponentBuilder : IComponentBuilder
     {
         private readonly object instance;
@@ -14,8 +15,12 @@ namespace DotNetNuke.ComponentModel
         /// <param name="instance">The component instance.</param>
         public InstanceComponentBuilder(string name, object instance)
         {
+			Logger.LogDebug(">>> Entering InstanceComponentBuilder(name={Name},instance={Instance})", name, instance);
             this.name = name;
             this.instance = instance;
+			Logger.LogDebug("InstanceComponentBuilder(name={Name},instance={Instance}): instance → {Instance1}", name, instance, instance);
+			Logger.LogDebug("InstanceComponentBuilder(name={Name},instance={Instance}): this.name → {Arg2}", name, instance, this.name);
+			Logger.LogDebug("<<< Exiting InstanceComponentBuilder(name={Name},instance={Instance})", name, instance);
         }
 
         /// <inheritdoc />
@@ -30,6 +35,8 @@ namespace DotNetNuke.ComponentModel
         /// <inheritdoc />
         public object BuildComponent()
         {
+			Logger.LogDebug(">>> Entering BuildComponent()");
+			Logger.LogDebug("<<< Exiting BuildComponent()");
             return this.instance;
         }
     }

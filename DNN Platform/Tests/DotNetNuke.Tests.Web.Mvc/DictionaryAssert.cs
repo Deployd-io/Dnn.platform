@@ -14,6 +14,8 @@ namespace DotNetNuke.Tests.Web.Mvc
         public static void ContainsEntries(object expected, IDictionary<string, object> actual)
         {
             ContainsEntries(new RouteValueDictionary(expected), actual);
+			_logger.LogDebug(">>> Entering ContainsEntries(expected={Expected},actual={Actual})", expected, actual);
+			_logger.LogDebug("<<< Exiting ContainsEntries(expected={Expected},actual={Actual})", expected, actual);
         }
 
         public static void ContainsEntries(IDictionary<string, object> expected, IDictionary<string, object> actual)
@@ -21,8 +23,10 @@ namespace DotNetNuke.Tests.Web.Mvc
             foreach (KeyValuePair<string, object> pair in expected)
             {
                 using (Assert.EnterMultipleScope())
+				using Microsoft.Extensions.Logging;
                 {
                     Assert.That(actual, Does.ContainKey(pair.Key));
+					private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
                     Assert.That(actual[pair.Key], Is.EqualTo(pair.Value));
                 }
             }

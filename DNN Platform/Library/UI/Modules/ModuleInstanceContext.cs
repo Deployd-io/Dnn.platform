@@ -28,6 +28,7 @@ namespace DotNetNuke.UI.Modules
     /// <summary>Provides context data for a particular instance of a module.</summary>
     public class ModuleInstanceContext
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleInstanceContext));
         private readonly IModuleControl moduleControl;
         private ModuleActionCollection actions;
         private ModuleAction moduleSpecificActions;
@@ -41,13 +42,18 @@ namespace DotNetNuke.UI.Modules
         /// <summary>Initializes a new instance of the <see cref="ModuleInstanceContext"/> class.</summary>
         public ModuleInstanceContext()
         {
+		Logger.LogDebug(">>> Entering ModuleInstanceContext()");
+		Logger.LogDebug("<<< Exiting ModuleInstanceContext()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleInstanceContext"/> class.</summary>
         /// <param name="moduleControl">The module control.</param>
         public ModuleInstanceContext(IModuleControl moduleControl)
         {
+			Logger.LogDebug(">>> Entering ModuleInstanceContext(moduleControl={ModuleControl})", moduleControl);
             this.moduleControl = moduleControl;
+			Logger.LogDebug("ModuleInstanceContext(moduleControl={ModuleControl}): moduleControl → {ModuleControl1}", moduleControl, moduleControl);
+			Logger.LogDebug("<<< Exiting ModuleInstanceContext(moduleControl={ModuleControl})", moduleControl);
         }
 
         /// <summary>Gets a value indicating whether the user is in the Administrator role.</summary>
@@ -215,6 +221,12 @@ namespace DotNetNuke.UI.Modules
 
         public string EditUrl()
         {
+			Logger.LogDebug(">>> Entering EditUrl()");
+			Logger.LogDebug("<<< Exiting EditUrl()");
+			Logger.LogDebug("<<< Exiting EditUrl(controlKey={ControlKey})", controlKey);
+			Logger.LogDebug("<<< Exiting EditUrl(keyName={KeyName},keyValue={KeyValue})", keyName, keyValue);
+			Logger.LogDebug("<<< Exiting EditUrl(keyName={KeyName},keyValue={KeyValue},controlKey={ControlKey})", keyName, keyValue, controlKey);
+			Logger.LogDebug("<<< Exiting EditUrl(keyName={KeyName},keyValue={KeyValue},controlKey={ControlKey},additionalParameters={AdditionalParameters})", keyName, keyValue, controlKey, additionalParameters);
             return this.EditUrl(string.Empty, string.Empty, "Edit");
         }
 
@@ -231,6 +243,7 @@ namespace DotNetNuke.UI.Modules
         public string EditUrl(string keyName, string keyValue, string controlKey)
         {
             var parameters = Array.Empty<string>();
+			Logger.LogDebug("EditUrl(keyName={KeyName},keyValue={KeyValue},controlKey={ControlKey}): parameters → {Parameters}", keyName, keyValue, controlKey, parameters);
             return this.EditUrl(keyName, keyValue, controlKey, parameters);
         }
 
@@ -268,6 +281,9 @@ namespace DotNetNuke.UI.Modules
 
         public string NavigateUrl(int tabID, string controlKey, bool pageRedirect, params string[] additionalParameters)
         {
+			Logger.LogDebug(">>> Entering NavigateUrl(tabID={TabID},controlKey={ControlKey},pageRedirect={PageRedirect},additionalParameters={AdditionalParameters})", tabID, controlKey, pageRedirect, additionalParameters);
+			Logger.LogDebug("<<< Exiting NavigateUrl(tabID={TabID},controlKey={ControlKey},pageRedirect={PageRedirect},additionalParameters={AdditionalParameters})", tabID, controlKey, pageRedirect, additionalParameters);
+			Logger.LogDebug("<<< Exiting NavigateUrl(tabID={TabID},controlKey={ControlKey},pageName={PageName},pageRedirect={PageRedirect},additionalParameters={AdditionalParameters})", tabID, controlKey, pageName, pageRedirect, additionalParameters);
             return this.NavigateUrl(tabID, controlKey, Globals.glbDefaultPage, pageRedirect, additionalParameters);
         }
 
@@ -292,12 +308,16 @@ namespace DotNetNuke.UI.Modules
 
         public int GetNextActionID()
         {
+			Logger.LogDebug(">>> Entering GetNextActionID()");
             this.nextActionId += 1;
+			Logger.LogDebug("<<< Exiting GetNextActionID()");
             return this.nextActionId;
         }
 
         private static string FilterUrl(HttpRequest request)
         {
+			Logger.LogDebug(">>> Entering FilterUrl(request={Request})", request);
+			Logger.LogDebug("<<< Exiting FilterUrl(request={Request})", request);
             return request.RawUrl.Replace("\"", string.Empty);
         }
 
@@ -306,6 +326,7 @@ namespace DotNetNuke.UI.Modules
         /// <param name="actions">The actions collection to count.</param>
         private static int GetActionsCount(int count, ModuleActionCollection actions)
         {
+			Logger.LogDebug(">>> Entering GetActionsCount(count={Count},actions={Actions})", count, actions);
             foreach (ModuleAction action in actions)
             {
                 if (action.HasChildren())
@@ -314,20 +335,25 @@ namespace DotNetNuke.UI.Modules
 
                     // Recursively call to see if this collection has any child actions that would affect the count
                     count = GetActionsCount(count, action.Actions);
+					Logger.LogDebug("GetActionsCount(count={Count},actions={Actions}): count → {Count1}", count, actions, count);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetActionsCount(count={Count},actions={Actions})", count, actions);
             return count;
         }
 
         private static bool SupportShowInPopup(string url)
         {
+			Logger.LogDebug(">>> Entering SupportShowInPopup(url={Url})", url);
             if (HttpContext.Current == null || !url.Contains("://"))
             {
                 return true;
             }
 
             var isSecureConnection = UrlUtils.IsSecureConnectionOrSslOffload(HttpContext.Current.Request);
+			Logger.LogDebug("SupportShowInPopup(url={Url}): isSecureConnection → {IsSecureConnection}", url, isSecureConnection);
+			Logger.LogDebug("<<< Exiting SupportShowInPopup(url={Url})", url);
             return (isSecureConnection && url.StartsWith("https://", StringComparison.InvariantCultureIgnoreCase))
                    || (!isSecureConnection && url.StartsWith("http://", StringComparison.InvariantCultureIgnoreCase));
         }
@@ -335,11 +361,15 @@ namespace DotNetNuke.UI.Modules
         /// <summary>AddHelpActions Adds the Help actions to the Action Menu.</summary>
         private void AddHelpActions()
         {
+			Logger.LogDebug(">>> Entering AddHelpActions()");
             var url = string.Empty;
             var showInNewWindow = false;
+			Logger.LogDebug("AddHelpActions(): showInNewWindow → {ShowInNewWindow}", showInNewWindow);
+			Logger.LogDebug("AddHelpActions(): url → {Url}", url);
             if (!string.IsNullOrEmpty(this.Configuration.ModuleControl.HelpURL) && Host.EnableModuleOnLineHelp && this.PortalSettings.EnablePopUps)
             {
                 var supportInPopup = SupportShowInPopup(this.Configuration.ModuleControl.HelpURL);
+				Logger.LogDebug("AddHelpActions(): supportInPopup → {SupportInPopup}", supportInPopup);
                 if (supportInPopup)
                 {
                     url = UrlUtils.PopUpUrl(this.Configuration.ModuleControl.HelpURL, this.PortalSettings, false, false, 550, 950);
@@ -368,10 +398,12 @@ namespace DotNetNuke.UI.Modules
                 UseActionEvent = true,
             };
             this.moduleGenericActions.Actions.Add(helpAction);
+			Logger.LogDebug("<<< Exiting AddHelpActions()");
         }
 
         private void AddPrintAction()
         {
+			Logger.LogDebug(">>> Entering AddPrintAction()");
             var action = new ModuleAction(this.GetNextActionID())
             {
                 Title = Localization.GetString(ModuleActionType.PrintModule, Localization.GlobalResourceFile),
@@ -392,10 +424,12 @@ namespace DotNetNuke.UI.Modules
                 NewWindow = true,
             };
             this.moduleGenericActions.Actions.Add(action);
+			Logger.LogDebug("<<< Exiting AddPrintAction()");
         }
 
         private void AddSyndicateAction()
         {
+			Logger.LogDebug(">>> Entering AddSyndicateAction()");
             var action = new ModuleAction(this.GetNextActionID())
             {
                 Title = Localization.GetString(ModuleActionType.SyndicateModule, Localization.GlobalResourceFile),
@@ -409,13 +443,16 @@ namespace DotNetNuke.UI.Modules
                 NewWindow = true,
             };
             this.moduleGenericActions.Actions.Add(action);
+			Logger.LogDebug("<<< Exiting AddSyndicateAction()");
         }
 
         /// <summary>AddMenuMoveActions Adds the Move actions to the Action Menu.</summary>
         private void AddMenuMoveActions()
         {
+			Logger.LogDebug(">>> Entering AddMenuMoveActions()");
             // module movement
             this.moduleMoveActions = new ModuleAction(this.GetNextActionID(), Localization.GetString(ModuleActionType.MoveRoot, Localization.GlobalResourceFile), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, false);
+			Logger.LogDebug("AddMenuMoveActions(): moduleMoveActions → {ModuleMoveActions}", moduleMoveActions);
 
             // move module up/down
             if (this.Configuration != null)
@@ -492,25 +529,31 @@ namespace DotNetNuke.UI.Modules
                         false);
                 }
             }
+			Logger.LogDebug("<<< Exiting AddMenuMoveActions()");
         }
 
         /// <summary>LoadActions loads the Actions collections.</summary>
         private void LoadActions(HttpRequest request)
         {
+			Logger.LogDebug(">>> Entering LoadActions(request={Request})", request);
             this.actions = new ModuleActionCollection();
             if (this.PortalSettings.IsLocked)
+			Logger.LogDebug("LoadActions(request={Request}): actions → {Actions}", request, actions);
             {
                 return;
             }
 
             this.moduleGenericActions = new ModuleAction(this.GetNextActionID(), Localization.GetString("ModuleGenericActions.Action", Localization.GlobalResourceFile), string.Empty, string.Empty, string.Empty);
+			Logger.LogDebug("LoadActions(request={Request}): moduleGenericActions → {ModuleGenericActions}", request, moduleGenericActions);
             int maxActionId = Null.NullInteger;
+			Logger.LogDebug("LoadActions(request={Request}): maxActionId → {MaxActionId}", request, maxActionId);
 
             // check if module Implements Entities.Modules.IActionable interface
             var actionable = this.moduleControl as IActionable;
             if (actionable != null)
             {
                 this.moduleSpecificActions = new ModuleAction(this.GetNextActionID(), Localization.GetString("ModuleSpecificActions.Action", Localization.GlobalResourceFile), string.Empty, string.Empty, string.Empty);
+				Logger.LogDebug("LoadActions(request={Request}): moduleSpecificActions → {ModuleSpecificActions}", request, moduleSpecificActions);
 
                 ModuleActionCollection moduleActions = actionable.ModuleActions;
 
@@ -545,9 +588,12 @@ namespace DotNetNuke.UI.Modules
 
             // Make sure the Next Action Id counter is correct
             int actionCount = GetActionsCount(this.actions.Count, this.actions);
+			Logger.LogDebug("LoadActions(request={Request}): actionCount → {ActionCount}", request, actionCount);
             if (this.nextActionId < maxActionId)
             {
                 this.nextActionId = maxActionId;
+				Logger.LogDebug("LoadActions(request={Request}): nextActionId → {NextActionId}", request, nextActionId);
+				Logger.LogDebug("LoadActions(request={Request}): this.nextActionId → {Arg1}", request, this.nextActionId);
             }
 
             if (this.nextActionId < actionCount)
@@ -673,9 +719,11 @@ namespace DotNetNuke.UI.Modules
                 {
                     // Check if this is the owner instance of a shared module.
                     string confirmText = "confirm('" + ClientAPI.GetSafeJSString(Localization.GetString("DeleteModule.Confirm")) + "')";
+					Logger.LogDebug("LoadActions(request={Request}): confirmText → {ConfirmText}", request, confirmText);
                     if (!this.Configuration.IsShared)
                     {
                         var portal = PortalController.Instance.GetPortal(this.PortalSettings.PortalId);
+						Logger.LogDebug("LoadActions(request={Request}): portal → {Portal}", request, portal);
                         if (PortalGroupController.Instance.IsModuleShared(this.Configuration.ModuleID, portal))
                         {
                             confirmText = "confirm('" + ClientAPI.GetSafeJSString(Localization.GetString("DeleteSharedModule.Confirm")) + "')";
@@ -735,6 +783,7 @@ namespace DotNetNuke.UI.Modules
                     action.ClientScript = UrlUtils.PopUpUrl(action.Url, this.moduleControl as Control, this.PortalSettings, true, false);
                 }
             }
+			Logger.LogDebug("<<< Exiting LoadActions(request={Request})", request);
         }
     }
 }

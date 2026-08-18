@@ -76,6 +76,8 @@ namespace log4net
         /// </remarks>
         private ThreadContext()
         {
+		value.LogDebug(">>> Entering ThreadContext()");
+		value.LogDebug("<<< Exiting ThreadContext()");
         }
 
         /// <summary>The thread properties map</summary>

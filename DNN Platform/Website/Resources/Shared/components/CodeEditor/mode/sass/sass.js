@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,8 +13,11 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("sass", function(config) {
   function tokenRegexp(words) {
+	logger.debug(`>>> Entering tokenRegexp(words=${words})`);
+	logger.debug(`<<< Exiting tokenRegexp(words=${words})`);
     return new RegExp("^" + words.join("|"));
   }
 
@@ -26,11 +31,14 @@ CodeMirror.defineMode("sass", function(config) {
   var pseudoElementsRegexp = /^::?[a-zA-Z_][\w\-]*/;
 
   function urlTokens(stream, state) {
+	logger.debug(`>>> Entering urlTokens(stream=${stream},state=${state})`);
     var ch = stream.peek();
 
+	logger.debug(`urlTokens(stream=${stream},state=${state}): ch → ${ch}`);
     if (ch === ")") {
       stream.next();
       state.tokenizer = tokenBase;
+	logger.debug(`urlTokens(stream=${stream},state=${state}): state.tokenizer → ${state.tokenizer}`);
       return "operator";
     } else if (ch === "(") {
       stream.next();
@@ -42,10 +50,12 @@ CodeMirror.defineMode("sass", function(config) {
       return "string";
     } else {
       state.tokenizer = buildStringTokenizer(")", false);
+	logger.debug(`<<< Exiting urlTokens(stream=${stream},state=${state})`);
       return "string";
     }
   }
   function comment(indentation, multiLine) {
+	logger.debug(`>>> Entering comment(indentation=${indentation},multiLine=${multiLine})`);
     return function(stream, state) {
       if (stream.sol() && stream.indentation() <= indentation) {
         state.tokenizer = tokenBase;
@@ -53,40 +63,53 @@ CodeMirror.defineMode("sass", function(config) {
       }
 
       if (multiLine && stream.skipTo("*/")) {
+		logger.debug(`comment(indentation=${indentation},multiLine=${multiLine}): state.tokenizer → ${state.tokenizer}`);
         stream.next();
+		logger.debug(`function(stream=${stream},state=${state}): state.tokenizer → ${state.tokenizer}`);
         stream.next();
         state.tokenizer = tokenBase;
       } else {
         stream.skipToEnd();
       }
 
+	logger.debug(`<<< Exiting comment(indentation=${indentation},multiLine=${multiLine})`);
       return "comment";
     };
   }
 
   function buildStringTokenizer(quote, greedy) {
+	logger.debug(`>>> Entering buildStringTokenizer(quote=${quote},greedy=${greedy})`);
     if (greedy == null) { greedy = true; }
 
     function stringTokenizer(stream, state) {
+	logger.debug(`>>> Entering stringTokenizer(stream=${stream},state=${state})`);
       var nextChar = stream.next();
       var peekChar = stream.peek();
+	logger.debug(`stringTokenizer(stream=${stream},state=${state}): nextChar → ${nextChar}`);
+	logger.debug(`stringTokenizer(stream=${stream},state=${state}): peekChar → ${peekChar}`);
       var previousChar = stream.string.charAt(stream.pos-2);
 
+	logger.debug(`stringTokenizer(stream=${stream},state=${state}): previousChar → ${previousChar}`);
       var endingString = ((nextChar !== "\\" && peekChar === quote) || (nextChar === quote && previousChar !== "\\"));
+	logger.debug(`stringTokenizer(stream=${stream},state=${state}): endingString → ${endingString}`);
 
       if (endingString) {
         if (nextChar !== quote && greedy) { stream.next(); }
         state.tokenizer = tokenBase;
+		logger.debug(`buildStringTokenizer(quote=${quote},greedy=${greedy}): state.tokenizer → ${state.tokenizer}`);
+		logger.debug(`stringTokenizer(stream=${stream},state=${state}): state.tokenizer → ${state.tokenizer}`);
         return "string";
       } else if (nextChar === "#" && peekChar === "{") {
         state.tokenizer = buildInterpolationTokenizer(stringTokenizer);
         stream.next();
         return "operator";
       } else {
+	logger.debug(`<<< Exiting stringTokenizer(stream=${stream},state=${state})`);
         return "string";
       }
     }
 
+	logger.debug(`<<< Exiting buildStringTokenizer(quote=${quote},greedy=${greedy})`);
     return stringTokenizer;
   }
 
@@ -103,23 +126,29 @@ CodeMirror.defineMode("sass", function(config) {
   }
 
   function indent(state) {
+	logger.debug(`>>> Entering indent(state=${state})`);
     if (state.indentCount == 0) {
       state.indentCount++;
       var lastScopeOffset = state.scopes[0].offset;
       var currentOffset = lastScopeOffset + config.indentUnit;
       state.scopes.unshift({ offset:currentOffset });
+	logger.debug(`<<< Exiting indent(state=${state})`);
     }
   }
 
   function dedent(state) {
+	logger.debug(`>>> Entering dedent(state=${state})`);
     if (state.scopes.length == 1) return;
 
     state.scopes.shift();
+	logger.debug(`<<< Exiting dedent(state=${state})`);
   }
 
   function tokenBase(stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
     var ch = stream.peek();
 
+	logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
     // Comment
     if (stream.match("/*")) {
       state.tokenizer = comment(stream.indentation(), true);
@@ -191,6 +220,7 @@ CodeMirror.defineMode("sass", function(config) {
 
       if (stream.match(/^url/) && stream.peek() === "(") {
         state.tokenizer = urlTokens;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.tokenizer → ${state.tokenizer}`);
         return "atom";
       }
 
@@ -237,6 +267,7 @@ CodeMirror.defineMode("sass", function(config) {
         else if(stream.match(/ *:/,false)){
           indent(state);
           state.cursorHalf = 1;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.cursorHalf → ${state.cursorHalf}`);
           return "atom";
         }
         else if(stream.match(/ *,/,false)){
@@ -350,13 +381,17 @@ CodeMirror.defineMode("sass", function(config) {
     // If we haven't returned by now, we move 1 character
     // and return an error
     stream.next();
+	logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
     return null;
   }
 
   function tokenLexer(stream, state) {
+	logger.debug(`>>> Entering tokenLexer(stream=${stream},state=${state})`);
     if (stream.sol()) state.indentCount = 0;
     var style = state.tokenizer(stream, state);
+	logger.debug(`tokenLexer(stream=${stream},state=${state}): style → ${style}`);
     var current = stream.current();
+	logger.debug(`tokenLexer(stream=${stream},state=${state}): current → ${current}`);
 
     if (current === "@return" || current === "}"){
       dedent(state);
@@ -366,6 +401,7 @@ CodeMirror.defineMode("sass", function(config) {
       var startOfToken = stream.pos - current.length;
 
       var withCurrentIndent = startOfToken + (config.indentUnit * state.indentCount);
+	logger.debug(`tokenLexer(stream=${stream},state=${state}): withCurrentIndent → ${withCurrentIndent}`);
 
       var newScopes = [];
 
@@ -377,14 +413,17 @@ CodeMirror.defineMode("sass", function(config) {
       }
 
       state.scopes = newScopes;
+	logger.debug(`tokenLexer(stream=${stream},state=${state}): state.scopes → ${state.scopes}`);
     }
 
 
+	logger.debug(`<<< Exiting tokenLexer(stream=${stream},state=${state})`);
     return style;
   }
 
   return {
     startState: function() {
+	logger.debug('>>> Entering startState()');
       return {
         tokenizer: tokenBase,
         scopes: [{offset: 0, type: "sass"}],
@@ -394,12 +433,16 @@ CodeMirror.defineMode("sass", function(config) {
         definedVars: [],
         definedMixins: []
       };
+	logger.debug('<<< Exiting startState()');
     },
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       var style = tokenLexer(stream, state);
 
       state.lastToken = { style: style, content: stream.current() };
+	logger.debug(`token(stream=${stream},state=${state}): style → ${style}`);
 
+	logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
       return style;
     },
 

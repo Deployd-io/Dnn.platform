@@ -34,6 +34,9 @@ namespace DotNetNuke.Web.UI.WebControls
         protected DnnFormItemBase()
             : this(null, null)
         {
+		EventLogger.LogDebug(">>> Entering DnnFormItemBase()");
+		EventLogger.LogDebug("<<< Exiting DnnFormItemBase()");
+		EventLogger.LogDebug(">>> Entering DnnFormItemBase(appStatus={AppStatus},eventLogger={EventLogger})", appStatus, eventLogger);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnFormItemBase"/> class.</summary>
@@ -45,9 +48,12 @@ namespace DotNetNuke.Web.UI.WebControls
             this.EventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
 
             this.FormMode = DnnFormMode.Inherit;
+			EventLogger.LogDebug("DnnFormItemBase(appStatus={AppStatus},eventLogger={EventLogger}): this.FormMode → {Arg2}", appStatus, eventLogger, this.FormMode);
             this.IsValid = true;
 
+			EventLogger.LogDebug("DnnFormItemBase(appStatus={AppStatus},eventLogger={EventLogger}): this.IsValid → {Arg2}", appStatus, eventLogger, this.IsValid);
             this.Validators = [];
+			EventLogger.LogDebug("<<< Exiting DnnFormItemBase(appStatus={AppStatus},eventLogger={EventLogger})", appStatus, eventLogger);
         }
 
         /// <summary>Gets or sets the value.</summary>
@@ -139,9 +145,11 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <summary>Checks whether this item is valid, setting <see cref="IsValid"/>.</summary>
         public void CheckIsValid()
         {
+			EventLogger.LogDebug(">>> Entering CheckIsValid()");
             this.IsValid = true;
             foreach (BaseValidator validator in this.Validators)
             {
+			EventLogger.LogDebug("CheckIsValid(): this.IsValid → {Arg0}", this.IsValid);
                 validator.Validate();
                 if (!validator.IsValid)
                 {
@@ -149,12 +157,14 @@ namespace DotNetNuke.Web.UI.WebControls
                     break;
                 }
             }
+			EventLogger.LogDebug("<<< Exiting CheckIsValid()");
         }
 
         /// <summary>Data-binds the item.</summary>
         /// <param name="useDataSource">Whether to use the data source.</param>
         public void DataBindItem(bool useDataSource)
         {
+			EventLogger.LogDebug(">>> Entering DataBindItem(useDataSource={UseDataSource})", useDataSource);
             if (useDataSource)
             {
                 this.OnDataBinding(EventArgs.Empty);
@@ -166,6 +176,7 @@ namespace DotNetNuke.Web.UI.WebControls
 
                 this.CreateControlHierarchy();
                 this.ChildControlsCreated = true;
+				EventLogger.LogDebug("DataBindItem(useDataSource={UseDataSource}): this.ChildControlsCreated → {Arg1}", useDataSource, this.ChildControlsCreated);
             }
             else
             {
@@ -174,18 +185,23 @@ namespace DotNetNuke.Web.UI.WebControls
                     this.UpdateDataSourceInternal(null, this.value, this.DataField);
                 }
             }
+			EventLogger.LogDebug("<<< Exiting DataBindItem(useDataSource={UseDataSource})", useDataSource);
         }
 
         /// <summary>Creates the control hierarchy.</summary>
         protected virtual void CreateControlHierarchy()
         {
+			EventLogger.LogDebug(">>> Entering CreateControlHierarchy()");
             // Load Item Style
             this.CssClass = "dnnFormItem";
+			EventLogger.LogDebug("CreateControlHierarchy(): this.CssClass → {Arg0}", this.CssClass);
             this.CssClass += (this.FormMode == DnnFormMode.Long) ? string.Empty : " dnnFormShort";
 
             if (string.IsNullOrEmpty(this.ResourceKey))
             {
                 this.ResourceKey = this.DataField;
+				EventLogger.LogDebug("CreateControlHierarchy(): ResourceKey → {ResourceKey}", ResourceKey);
+				EventLogger.LogDebug("CreateControlHierarchy(): this.ResourceKey → {Arg0}", this.ResourceKey);
             }
 
             // Add Label
@@ -200,13 +216,17 @@ namespace DotNetNuke.Web.UI.WebControls
             if (this.Required)
             {
                 label.RequiredField = true;
+				EventLogger.LogDebug("CreateControlHierarchy(): label.RequiredField → {Arg0}", label.RequiredField);
             }
 
             this.Controls.Add(label);
 
             WebControl inputControl = this.CreateControlInternal(this);
+			EventLogger.LogDebug("CreateControlHierarchy(): inputControl → {InputControl}", inputControl);
+			EventLogger.LogDebug("CreateControlHierarchy(): label.AssociatedControlID → {Arg0}", label.AssociatedControlID);
             label.AssociatedControlID = inputControl.ID;
             this.AddValidators(inputControl.ID);
+			EventLogger.LogDebug("<<< Exiting CreateControlHierarchy()");
         }
 
         /// <summary>Use container to add custom control hierarchy to.</summary>
@@ -214,18 +234,22 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <returns>An "input" control that can be used for attaching validators.</returns>
         protected virtual WebControl CreateControlInternal(Control container)
         {
+			EventLogger.LogDebug(">>> Entering CreateControlInternal(container={Container})", container);
+			EventLogger.LogDebug("<<< Exiting CreateControlInternal(container={Container})", container);
             return null;
         }
 
         /// <inheritdoc />
         protected override void CreateChildControls()
         {
+			EventLogger.LogDebug(">>> Entering CreateChildControls()");
             // CreateChildControls re-creates the children (the items)
             // using the saved view state.
             // First clear any existing child controls.
             this.Controls.Clear();
 
             this.CreateControlHierarchy();
+			EventLogger.LogDebug("<<< Exiting CreateChildControls()");
         }
 
         /// <summary>Does the data binding.</summary>
@@ -233,12 +257,14 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <param name="value">The value.</param>
         protected void DataBindInternal(string dataField, ref object value)
         {
+			EventLogger.LogDebug(">>> Entering DataBindInternal(dataField={DataField},value={Value})", dataField, value);
             var dictionary = this.DataSource as IDictionary;
             if (dictionary != null)
             {
                 if (!string.IsNullOrEmpty(dataField) && dictionary.Contains(dataField))
                 {
                     value = dictionary[dataField];
+					EventLogger.LogDebug("DataBindInternal(dataField={DataField},value={Value}): value → {Value1}", dataField, value, value);
                 }
             }
             else
@@ -261,6 +287,7 @@ namespace DotNetNuke.Web.UI.WebControls
                         {
                             // ReSharper disable PossibleNullReferenceException
                             object parentValue = this.Property.GetValue(this.DataSource, null);
+							EventLogger.LogDebug("DataBindInternal(dataField={DataField},value={Value}): parentValue → {ParentValue}", dataField, value, parentValue);
                             if (this.ChildProperty != null && this.ChildProperty.GetValue(parentValue, null) != null)
                             {
                                 value = this.ChildProperty.GetValue(parentValue, null);
@@ -271,6 +298,9 @@ namespace DotNetNuke.Web.UI.WebControls
                     }
                 }
             }
+			EventLogger.LogDebug("<<< Exiting DataBindInternal(dataField={DataField},value={Value})", dataField, value);
+			EventLogger.LogDebug(">>> Entering DataBindInternal()");
+			EventLogger.LogDebug("<<< Exiting DataBindInternal()");
         }
 
         /// <summary>Does the data binding.</summary>
@@ -285,18 +315,26 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <param name="dataField">The data field.</param>
         protected void UpdateDataSource(object oldValue, object newValue, string dataField)
         {
+			EventLogger.LogDebug(">>> Entering UpdateDataSource(oldValue={OldValue},newValue={NewValue},dataField={DataField})", oldValue, newValue, dataField);
             this.CheckIsValid();
 
             this.value = newValue;
+			EventLogger.LogDebug("UpdateDataSource(oldValue={OldValue},newValue={NewValue},dataField={DataField}): value → {Value}", oldValue, newValue, dataField, value);
+			EventLogger.LogDebug("UpdateDataSource(oldValue={OldValue},newValue={NewValue},dataField={DataField}): this.value → {Arg3}", oldValue, newValue, dataField, this.value);
 
             this.UpdateDataSourceInternal(oldValue, newValue, dataField);
+			EventLogger.LogDebug("<<< Exiting UpdateDataSource(oldValue={OldValue},newValue={NewValue},dataField={DataField})", oldValue, newValue, dataField);
         }
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         protected override void LoadControlState(object state)
         {
+			EventLogger.LogDebug(">>> Entering LoadControlState(state={State})", state);
             this.value = state;
+			EventLogger.LogDebug("LoadControlState(state={State}): value → {Value}", state, value);
+			EventLogger.LogDebug("LoadControlState(state={State}): this.value → {Arg1}", state, this.value);
+			EventLogger.LogDebug("<<< Exiting LoadControlState(state={State})", state);
         }
 
         /// <summary>Gets the localized string corresponding to the <paramref name="key"/>.</summary>
@@ -304,24 +342,31 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <returns>The localized text.</returns>
         protected string LocalizeString(string key)
         {
+			EventLogger.LogDebug(">>> Entering LocalizeString(key={Key})", key);
+			EventLogger.LogDebug("<<< Exiting LocalizeString(key={Key})", key);
             return Localization.GetString(key, this.LocalResourceFile);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			EventLogger.LogDebug(">>> Entering OnInit(e={E})", e);
             this.Page.RegisterRequiresControlState(this);
             base.OnInit(e);
+			EventLogger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override object SaveControlState()
         {
+			EventLogger.LogDebug(">>> Entering SaveControlState()");
+			EventLogger.LogDebug("<<< Exiting SaveControlState()");
             return this.value;
         }
 
         private void AddValidators(string controlId)
         {
+			EventLogger.LogDebug(">>> Entering AddValidators(controlId={ControlId})", controlId);
             var value = this.Value as string;
             this.Validators.Clear();
 
@@ -348,6 +393,7 @@ namespace DotNetNuke.Web.UI.WebControls
                 {
                     regexValidator.IsValid = Regex.IsMatch(value, this.ValidationExpression);
                     this.IsValid = regexValidator.IsValid;
+					EventLogger.LogDebug("AddValidators(controlId={ControlId}): this.IsValid → {Arg1}", controlId, this.IsValid);
                 }
 
                 this.Validators.Add(regexValidator);
@@ -358,16 +404,21 @@ namespace DotNetNuke.Web.UI.WebControls
                 foreach (BaseValidator validator in this.Validators)
                 {
                     validator.ControlToValidate = controlId;
+					EventLogger.LogDebug("AddValidators(controlId={ControlId}): validator.ControlToValidate → {Arg1}", controlId, validator.ControlToValidate);
+					EventLogger.LogDebug("AddValidators(controlId={ControlId}): validator.Display → {Arg1}", controlId, validator.Display);
                     validator.Display = ValidatorDisplay.Dynamic;
                     validator.ErrorMessage = this.LocalizeString(validator.ErrorMessage);
                     validator.CssClass = "dnnFormMessage dnnFormError";
+					EventLogger.LogDebug("AddValidators(controlId={ControlId}): validator.CssClass → {Arg1}", controlId, validator.CssClass);
                     this.Controls.Add(validator);
                 }
             }
+			EventLogger.LogDebug("<<< Exiting AddValidators(controlId={ControlId})", controlId);
         }
 
         private void UpdateDataSourceInternal(object oldValue, object newValue, string dataField)
         {
+			EventLogger.LogDebug(">>> Entering UpdateDataSourceInternal(oldValue={OldValue},newValue={NewValue},dataField={DataField})", oldValue, newValue, dataField);
             if (this.DataSource != null)
             {
                 if (this.DataSource is IDictionary<string, string> dict)
@@ -405,6 +456,7 @@ namespace DotNetNuke.Web.UI.WebControls
                         if (this.Property != null)
                         {
                             object parentValue = this.Property.GetValue(this.DataSource, null);
+							EventLogger.LogDebug("UpdateDataSourceInternal(oldValue={OldValue},newValue={NewValue},dataField={DataField}): parentValue → {ParentValue}", oldValue, newValue, dataField, parentValue);
                             if (parentValue != null)
                             {
                                 if (parentValue is IDictionary<string, string> parentDict)
@@ -434,6 +486,7 @@ namespace DotNetNuke.Web.UI.WebControls
                     }
                 }
             }
+			EventLogger.LogDebug("<<< Exiting UpdateDataSourceInternal(oldValue={OldValue},newValue={NewValue},dataField={DataField})", oldValue, newValue, dataField);
         }
     }
 }

@@ -5,31 +5,38 @@ import styles from "./style.module.less";
 import Localization from "../../../localization";
 import EditUrl from "./EditUrl";
 import utils from "../../../utils";
+const logger = console;
 
 class UrlRow extends Component {
     onDelete(url) {
+		logger.debug(`>>> Entering onDelete(url=${url})`);
         const { onDelete } = this.props;
         utils.confirm(
             Localization.get("Pages_Seo_DeleteWarningMessage"),
             Localization.get("Delete"),
             Localization.get("Cancel"),
             function onConfirmDeletion() {
+				logger.debug('>>> Entering onConfirmDeletion()');
                 onDelete(url);
+				logger.debug('<<< Exiting onConfirmDeletion()');
             }
         );
     }
 
     onOpenEditForm(url) {
+		logger.debug(`>>> Entering onOpenEditForm(url=${url})`);
         const { editedUrl, onOpenEditForm, onCancel } = this.props;
         const opened = editedUrl && editedUrl.id === url.id;
         if (opened) {
             onCancel();
         } else {
             onOpenEditForm(url);
+			logger.debug(`<<< Exiting onOpenEditForm(url=${url})`);
         }
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { url, siteAliases, primaryAliasId, editedUrl, saving, onChange, pageHasParent,
             onSave, onCancel } = this.props;
         let generatedBy = Localization.get("Pages_Seo_GeneratedByAutomatic");
@@ -39,6 +46,7 @@ class UrlRow extends Component {
         }
         const opened = editedUrl && editedUrl.id === url.id;
 
+		logger.debug('<<< Exiting render()');
         return (
              
             <div className={styles.urlRow + (opened ? " row-opened" : "")} >

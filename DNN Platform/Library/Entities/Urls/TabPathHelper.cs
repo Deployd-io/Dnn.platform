@@ -18,12 +18,16 @@ namespace DotNetNuke.Entities.Urls
     /// <summary>The TabPathHelper class provides helper methods for working with tab urls.</summary>
     public class TabPathHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabPathHelper));
         public static string BuildTabPathWithReplacement(TabInfo tab, FriendlyUrlOptions options, Guid parentTraceId)
         {
+			Logger.LogDebug(">>> Entering BuildTabPathWithReplacement(tab={Tab},options={Options},parentTraceId={ParentTraceId})", tab, options, parentTraceId);
             string path = string.Empty;
             if (tab.ParentId > -1)
+			Logger.LogDebug("BuildTabPathWithReplacement(tab={Tab},options={Options},parentTraceId={ParentTraceId}): path → {Path}", tab, options, parentTraceId, path);
             {
                 TabInfo parentTab = TabController.Instance.GetTab(tab.ParentId, tab.PortalID, false);
+				Logger.LogDebug("BuildTabPathWithReplacement(tab={Tab},options={Options},parentTraceId={ParentTraceId}): parentTab → {ParentTab}", tab, options, parentTraceId, parentTab);
 
                 // 822 : don't assume parent tab is going to exist - database might be corrupted
                 // 896 : check to make sure tabid and parentid are different - or stack overflow occurs with terminal loop
@@ -36,6 +40,7 @@ namespace DotNetNuke.Entities.Urls
             bool modified;
             path = AppendToTabPath(path, tab, options, out modified);
 
+			Logger.LogDebug("<<< Exiting BuildTabPathWithReplacement(tab={Tab},options={Options},parentTraceId={ParentTraceId})", tab, options, parentTraceId);
             return path;
         }
 
@@ -45,8 +50,10 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>The <paramref name="tabPath"/> with diacritics replaced.</returns>
         public static string ReplaceDiacritics(string tabPath, out bool replacedDiacritic)
         {
+			Logger.LogDebug(">>> Entering ReplaceDiacritics(tabPath={TabPath})", tabPath);
             string nmTabPath = tabPath.Normalize(NormalizationForm.FormD);
             var sb = new StringBuilder();
+			Logger.LogDebug("ReplaceDiacritics(tabPath={TabPath}): sb → {Sb}", tabPath, sb);
             for (int i = 0; i < nmTabPath.Length; i++)
             {
                 char c = nmTabPath[i];
@@ -57,7 +64,10 @@ namespace DotNetNuke.Entities.Urls
             }
 
             string result = sb.ToString();
+			Logger.LogDebug("ReplaceDiacritics(tabPath={TabPath}): result → {Result}", tabPath, result);
             replacedDiacritic = !string.Equals(tabPath, result, StringComparison.Ordinal);
+			Logger.LogDebug("ReplaceDiacritics(tabPath={TabPath}): replacedDiacritic → {ReplacedDiacritic}", tabPath, replacedDiacritic);
+			Logger.LogDebug("<<< Exiting ReplaceDiacritics(tabPath={TabPath})", tabPath);
             return sb.ToString();
         }
 
@@ -68,8 +78,10 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>The friendly URL path.</returns>
         internal static string GetFriendlyUrlTabPath(TabInfo tab, FriendlyUrlOptions options, Guid parentTraceId)
         {
+			Logger.LogDebug(">>> Entering GetFriendlyUrlTabPath(tab={Tab},options={Options},parentTraceId={ParentTraceId})", tab, options, parentTraceId);
             string baseTabPath = tab.TabPath.Replace("//", "/").TrimStart('/');
             if (options.CanGenerateNonStandardPath)
+			Logger.LogDebug("GetFriendlyUrlTabPath(tab={Tab},options={Options},parentTraceId={ParentTraceId}): baseTabPath → {BaseTabPath}", tab, options, parentTraceId, baseTabPath);
             {
                 // build up a non-space version of the tab path
                 baseTabPath = BuildTabPathWithReplacement(tab, options, parentTraceId);
@@ -83,6 +95,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetFriendlyUrlTabPath(tab={Tab},options={Options},parentTraceId={ParentTraceId})", tab, options, parentTraceId);
             return baseTabPath;
         }
 
@@ -95,12 +108,15 @@ namespace DotNetNuke.Entities.Urls
         /// <remarks>Note if no specific home page found for the culture, will return defaultHomeTabId back.</remarks>
         internal static int GetHomePageTabIdForCulture(string defaultCulture, int portalId, string cultureCode, int defaultHomeTabId)
         {
+			Logger.LogDebug(">>> Entering GetHomePageTabIdForCulture(defaultCulture={DefaultCulture},portalId={PortalId},cultureCode={CultureCode},defaultHomeTabId={DefaultHomeTabId})", defaultCulture, portalId, cultureCode, defaultHomeTabId);
             int homeTabId = defaultHomeTabId;
             if (!string.Equals(defaultCulture, cultureCode, StringComparison.OrdinalIgnoreCase))
+			Logger.LogDebug("GetHomePageTabIdForCulture(defaultCulture={DefaultCulture},portalId={PortalId},cultureCode={CultureCode},defaultHomeTabId={DefaultHomeTabId}): homeTabId → {HomeTabId}", defaultCulture, portalId, cultureCode, defaultHomeTabId, homeTabId);
             {
                 // not the default culture, so there could be a different home page for the different culture in 5.5+ builds
                 var cultureLocale = new Locale { Code = cultureCode, Fallback = cultureCode, Text = cultureCode };
                 TabInfo tab = TabController.Instance.GetTabByCulture(defaultHomeTabId, portalId, cultureLocale);
+				Logger.LogDebug("GetHomePageTabIdForCulture(defaultCulture={DefaultCulture},portalId={PortalId},cultureCode={CultureCode},defaultHomeTabId={DefaultHomeTabId}): tab → {Tab}", defaultCulture, portalId, cultureCode, defaultHomeTabId, tab);
                 if (tab != null)
                 {
                     // this is the culture specific tab of the home page
@@ -108,13 +124,17 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetHomePageTabIdForCulture(defaultCulture={DefaultCulture},portalId={PortalId},cultureCode={CultureCode},defaultHomeTabId={DefaultHomeTabId})", defaultCulture, portalId, cultureCode, defaultHomeTabId);
             return homeTabId;
         }
 
         internal static string GetTabAliasSkinForTabAndAlias(int portalId, string httpAlias, string culture)
         {
+			Logger.LogDebug(">>> Entering GetTabAliasSkinForTabAndAlias(portalId={PortalId},httpAlias={HttpAlias},culture={Culture})", portalId, httpAlias, culture);
             string skin = null;
             Hashtable homePageSkins = CacheController.GetHomePageSkinsFromCache(portalId);
+			Logger.LogDebug("GetTabAliasSkinForTabAndAlias(portalId={PortalId},httpAlias={HttpAlias},culture={Culture}): homePageSkins → {HomePageSkins}", portalId, httpAlias, culture, homePageSkins);
+			Logger.LogDebug("GetTabAliasSkinForTabAndAlias(portalId={PortalId},httpAlias={HttpAlias},culture={Culture}): skin → {Skin}", portalId, httpAlias, culture, skin);
             if (homePageSkins != null)
             {
                 string key = httpAlias + "::" + culture;
@@ -129,6 +149,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetTabAliasSkinForTabAndAlias(portalId={PortalId},httpAlias={HttpAlias},culture={Culture})", portalId, httpAlias, culture);
             return skin;
         }
 
@@ -166,11 +187,15 @@ namespace DotNetNuke.Entities.Urls
             out bool isCustomPath,
             Guid parentTraceId)
         {
+			Logger.LogDebug(">>> Entering GetTabPath(tab={Tab},settings={Settings},options={Options},ignoreCustomRedirects={IgnoreCustomRedirects},homePageSiteRoot={HomePageSiteRoot},isHomeTab={IsHomeTab},cultureCode={CultureCode},isDefaultCultureCode={IsDefaultCultureCode},hasPath={HasPath},parentTraceId={ParentTraceId})", tab, settings, options, ignoreCustomRedirects, homePageSiteRoot, isHomeTab, cultureCode, isDefaultCultureCode, hasPath, parentTraceId);
             string newTabPath;
             dropLangParms = false;
             customHttpAlias = null;
             isCustomPath = false;
             if (homePageSiteRoot && isHomeTab && !hasPath)
+			Logger.LogDebug("GetTabPath(tab={Tab},settings={Settings},options={Options},ignoreCustomRedirects={IgnoreCustomRedirects},homePageSiteRoot={HomePageSiteRoot},isHomeTab={IsHomeTab},cultureCode={CultureCode},isDefaultCultureCode={IsDefaultCultureCode},hasPath={HasPath},parentTraceId={ParentTraceId}): dropLangParms → {DropLangParms}", tab, settings, options, ignoreCustomRedirects, homePageSiteRoot, isHomeTab, cultureCode, isDefaultCultureCode, hasPath, parentTraceId, dropLangParms);
+			Logger.LogDebug("GetTabPath(tab={Tab},settings={Settings},options={Options},ignoreCustomRedirects={IgnoreCustomRedirects},homePageSiteRoot={HomePageSiteRoot},isHomeTab={IsHomeTab},cultureCode={CultureCode},isDefaultCultureCode={IsDefaultCultureCode},hasPath={HasPath},parentTraceId={ParentTraceId}): customHttpAlias → {CustomHttpAlias}", tab, settings, options, ignoreCustomRedirects, homePageSiteRoot, isHomeTab, cultureCode, isDefaultCultureCode, hasPath, parentTraceId, customHttpAlias);
+			Logger.LogDebug("GetTabPath(tab={Tab},settings={Settings},options={Options},ignoreCustomRedirects={IgnoreCustomRedirects},homePageSiteRoot={HomePageSiteRoot},isHomeTab={IsHomeTab},cultureCode={CultureCode},isDefaultCultureCode={IsDefaultCultureCode},hasPath={HasPath},parentTraceId={ParentTraceId}): isCustomPath → {IsCustomPath}", tab, settings, options, ignoreCustomRedirects, homePageSiteRoot, isHomeTab, cultureCode, isDefaultCultureCode, hasPath, parentTraceId, isCustomPath);
             {
                 ////&& !isDefaultCultureCode - not working for non-language specific custom root urls
                 newTabPath = "/"; // site root for home page
@@ -179,18 +204,22 @@ namespace DotNetNuke.Entities.Urls
             {
                 // build the tab path and check for space replacement
                 string baseTabPath = TabIndexController.GetTabPath(tab, options, parentTraceId);
+				Logger.LogDebug("GetTabPath(tab={Tab},settings={Settings},options={Options},ignoreCustomRedirects={IgnoreCustomRedirects},homePageSiteRoot={HomePageSiteRoot},isHomeTab={IsHomeTab},cultureCode={CultureCode},isDefaultCultureCode={IsDefaultCultureCode},hasPath={HasPath},parentTraceId={ParentTraceId}): baseTabPath → {BaseTabPath}", tab, settings, options, ignoreCustomRedirects, homePageSiteRoot, isHomeTab, cultureCode, isDefaultCultureCode, hasPath, parentTraceId, baseTabPath);
 
                 // this is the new tab path
                 newTabPath = baseTabPath;
 
+				Logger.LogDebug("GetTabPath(tab={Tab},settings={Settings},options={Options},ignoreCustomRedirects={IgnoreCustomRedirects},homePageSiteRoot={HomePageSiteRoot},isHomeTab={IsHomeTab},cultureCode={CultureCode},isDefaultCultureCode={IsDefaultCultureCode},hasPath={HasPath},parentTraceId={ParentTraceId}): newTabPath → {NewTabPath}", tab, settings, options, ignoreCustomRedirects, homePageSiteRoot, isHomeTab, cultureCode, isDefaultCultureCode, hasPath, parentTraceId, newTabPath);
                 // 871 : case insensitive compare for culture code, all lookups done on lower case
                 string cultureCodeKey = string.Empty;
+				Logger.LogDebug("GetTabPath(tab={Tab},settings={Settings},options={Options},ignoreCustomRedirects={IgnoreCustomRedirects},homePageSiteRoot={HomePageSiteRoot},isHomeTab={IsHomeTab},cultureCode={CultureCode},isDefaultCultureCode={IsDefaultCultureCode},hasPath={HasPath},parentTraceId={ParentTraceId}): cultureCodeKey → {CultureCodeKey}", tab, settings, options, ignoreCustomRedirects, homePageSiteRoot, isHomeTab, cultureCode, isDefaultCultureCode, hasPath, parentTraceId, cultureCodeKey);
                 if (cultureCode != null)
                 {
                     cultureCodeKey = cultureCode.ToLowerInvariant();
                 }
 
                 bool checkForCustomHttpAlias = false;
+				Logger.LogDebug("GetTabPath(tab={Tab},settings={Settings},options={Options},ignoreCustomRedirects={IgnoreCustomRedirects},homePageSiteRoot={HomePageSiteRoot},isHomeTab={IsHomeTab},cultureCode={CultureCode},isDefaultCultureCode={IsDefaultCultureCode},hasPath={HasPath},parentTraceId={ParentTraceId}): checkForCustomHttpAlias → {CheckForCustomHttpAlias}", tab, settings, options, ignoreCustomRedirects, homePageSiteRoot, isHomeTab, cultureCode, isDefaultCultureCode, hasPath, parentTraceId, checkForCustomHttpAlias);
 
                 // get a custom tab name if redirects are being used
                 SharedDictionary<string, string> customAliasForTabs = null;
@@ -217,6 +246,7 @@ namespace DotNetNuke.Entities.Urls
                         {
                             // we want the custom value
                             string customTabPath = null;
+							Logger.LogDebug("GetTabPath(tab={Tab},settings={Settings},options={Options},ignoreCustomRedirects={IgnoreCustomRedirects},homePageSiteRoot={HomePageSiteRoot},isHomeTab={IsHomeTab},cultureCode={CultureCode},isDefaultCultureCode={IsDefaultCultureCode},hasPath={HasPath},parentTraceId={ParentTraceId}): customTabPath → {CustomTabPath}", tab, settings, options, ignoreCustomRedirects, homePageSiteRoot, isHomeTab, cultureCode, isDefaultCultureCode, hasPath, parentTraceId, customTabPath);
 
                             using (tabPaths.GetReadLock())
                             {
@@ -242,6 +272,7 @@ namespace DotNetNuke.Entities.Urls
                             {
                                 // 770 : pull out custom http alias if in string
                                 int aliasSeparator = customTabPath.IndexOf("::", StringComparison.Ordinal);
+								Logger.LogDebug("GetTabPath(tab={Tab},settings={Settings},options={Options},ignoreCustomRedirects={IgnoreCustomRedirects},homePageSiteRoot={HomePageSiteRoot},isHomeTab={IsHomeTab},cultureCode={CultureCode},isDefaultCultureCode={IsDefaultCultureCode},hasPath={HasPath},parentTraceId={ParentTraceId}): aliasSeparator → {AliasSeparator}", tab, settings, options, ignoreCustomRedirects, homePageSiteRoot, isHomeTab, cultureCode, isDefaultCultureCode, hasPath, parentTraceId, aliasSeparator);
                                 if (aliasSeparator > 0)
                                 {
                                     customHttpAlias = customTabPath.Substring(0, aliasSeparator);
@@ -306,13 +337,16 @@ namespace DotNetNuke.Entities.Urls
                 newTabPath = AdvancedFriendlyUrlProvider.ForceLowerCaseIfAllowed(tab, newTabPath, settings);
             }
 
+			Logger.LogDebug("<<< Exiting GetTabPath(tab={Tab},settings={Settings},options={Options},ignoreCustomRedirects={IgnoreCustomRedirects},homePageSiteRoot={HomePageSiteRoot},isHomeTab={IsHomeTab},cultureCode={CultureCode},isDefaultCultureCode={IsDefaultCultureCode},hasPath={HasPath},parentTraceId={ParentTraceId})", tab, settings, options, ignoreCustomRedirects, homePageSiteRoot, isHomeTab, cultureCode, isDefaultCultureCode, hasPath, parentTraceId);
             return newTabPath;
         }
 
         internal static bool IsTabHomePage(TabInfo tab, PortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering IsTabHomePage(tab={Tab},portalSettings={PortalSettings})", tab, portalSettings);
             bool isTabHomePage = tab.TabID == portalSettings.HomeTabId;
             if (!isTabHomePage)
+			Logger.LogDebug("IsTabHomePage(tab={Tab},portalSettings={PortalSettings}): isTabHomePage → {IsTabHomePage}", tab, portalSettings, isTabHomePage);
             {
                 // 756: check if content localization is switched on before checking for other languages
                 if (Host.Host.EnableBrowserLanguage)
@@ -354,13 +388,17 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting IsTabHomePage(tab={Tab},portalSettings={PortalSettings})", tab, portalSettings);
             return isTabHomePage;
         }
 
         private static string AppendToTabPath(string path, TabInfo tab, FriendlyUrlOptions options, out bool modified)
         {
+			Logger.LogDebug(">>> Entering AppendToTabPath(path={Path},tab={Tab},options={Options})", path, tab, options);
             string tabName = tab.TabName;
             var result = new StringBuilder(tabName.Length);
+			Logger.LogDebug("AppendToTabPath(path={Path},tab={Tab},options={Options}): result → {Result}", path, tab, options, result);
+			Logger.LogDebug("AppendToTabPath(path={Path},tab={Tab},options={Options}): tabName → {TabName}", path, tab, options, tabName);
 
             // 922 : change to harmonise cleaning of tab + other url name items
             tabName = FriendlyUrlController.CleanNameForUrl(tabName, options, out modified);
@@ -370,6 +408,7 @@ namespace DotNetNuke.Entities.Urls
                 && tabName.Contains(" ") == false)
             {
                 modified = true;
+				Logger.LogDebug("AppendToTabPath(path={Path},tab={Tab},options={Options}): modified → {Modified}", path, tab, options, modified);
 
                 // spaces replaced - the modified parameter is for all other replacements but space replacements
             }
@@ -377,6 +416,7 @@ namespace DotNetNuke.Entities.Urls
             result.Append(tabName);
             result.Insert(0, "//");
             result.Insert(0, path); // effectively adds result to the end of the path
+			Logger.LogDebug("<<< Exiting AppendToTabPath(path={Path},tab={Tab},options={Options})", path, tab, options);
             return result.ToString();
         }
     }

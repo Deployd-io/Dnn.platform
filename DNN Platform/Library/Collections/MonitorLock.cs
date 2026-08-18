@@ -8,6 +8,7 @@ namespace DotNetNuke.Collections.Internal
     /// <summary>An <see cref="ISharedCollectionLock"/> implementation which uses an <see cref="ExclusiveLockStrategy"/>.</summary>
     internal class MonitorLock : IDisposable, ISharedCollectionLock
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MonitorLock));
         private ExclusiveLockStrategy lockStrategy;
 
         // To detect redundant calls
@@ -17,31 +18,41 @@ namespace DotNetNuke.Collections.Internal
         /// <param name="lockStrategy">An <see cref="ExclusiveLockStrategy"/> instance to use.</param>
         public MonitorLock(ExclusiveLockStrategy lockStrategy)
         {
+			Logger.LogDebug(">>> Entering MonitorLock(lockStrategy={LockStrategy})", lockStrategy);
             this.lockStrategy = lockStrategy;
+			Logger.LogDebug("MonitorLock(lockStrategy={LockStrategy}): lockStrategy → {LockStrategy1}", lockStrategy, lockStrategy);
+			Logger.LogDebug("MonitorLock(lockStrategy={LockStrategy}): this.lockStrategy → {Arg1}", lockStrategy, this.lockStrategy);
+			Logger.LogDebug("<<< Exiting MonitorLock(lockStrategy={LockStrategy})", lockStrategy);
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+			Logger.LogDebug(">>> Entering Dispose()");
             // Do not change this code.  Put cleanup code in Dispose(bool disposing) below.
             this.Dispose(true);
             GC.SuppressFinalize(this);
+			Logger.LogDebug("<<< Exiting Dispose()");
         }
 
         /// <summary>Releases resources before final disposal.</summary>
         /// <param name="disposing">A value indicating if the instance is currently beeing disposed.</param>
         protected virtual void Dispose(bool disposing)
         {
+			Logger.LogDebug(">>> Entering Dispose(disposing={Disposing})", disposing);
             if (!this.isDisposed)
             {
                 if (disposing)
                 {
                     this.lockStrategy.Exit();
                     this.lockStrategy = null;
+					Logger.LogDebug("Dispose(disposing={Disposing}): lockStrategy → {LockStrategy}", disposing, lockStrategy);
+					Logger.LogDebug("Dispose(disposing={Disposing}): this.lockStrategy → {Arg1}", disposing, this.lockStrategy);
                 }
             }
 
             this.isDisposed = true;
+			Logger.LogDebug("<<< Exiting Dispose(disposing={Disposing})", disposing);
         }
     }
 }

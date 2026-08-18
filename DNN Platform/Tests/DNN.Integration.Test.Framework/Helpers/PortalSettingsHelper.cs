@@ -1,9 +1,11 @@
+using Microsoft.Extensions.Logging;
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information
 
 namespace DNN.Integration.Test.Framework.Helpers
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public static class PortalSettingsHelper
     {
         /// <summary>Gets a portal setting value.</summary>
@@ -12,12 +14,15 @@ namespace DNN.Integration.Test.Framework.Helpers
         /// <returns>The string value of the setting.</returns>
         public static string GetPortalSetting(string settingName, int portalId = 0)
         {
+			_logger.LogDebug(">>> Entering GetPortalSetting(settingName={SettingName},portalId={PortalId})", settingName, portalId);
             var query = string.Format(
                 @"SELECT SettingValue 
                                         FROM {{objectQualifier}}PortalSettings 
                                         WHERE SettingName = '{0}' 
                                             AND PortalId = {1}", settingName, portalId);
 
+			_logger.LogDebug("GetPortalSetting(settingName={SettingName},portalId={PortalId}): PortalId → {PortalId1}", settingName, portalId, PortalId);
+			_logger.LogDebug("<<< Exiting GetPortalSetting(settingName={SettingName},portalId={PortalId})", settingName, portalId);
             return DatabaseHelper.ExecuteScalar<string>(query);
         }
 
@@ -28,6 +33,7 @@ namespace DNN.Integration.Test.Framework.Helpers
         /// <param name="isSecure">This flag specifies whether the value is encrypted or not, defaults to false.</param>
         public static void SetPortalSetting(string settingName, string settingValue, int portalId = 0, bool isSecure = false)
         {
+			_logger.LogDebug(">>> Entering SetPortalSetting(settingName={SettingName},settingValue={SettingValue},portalId={PortalId},isSecure={IsSecure})", settingName, settingValue, portalId, isSecure);
             var query = string.Format(
                 @"MERGE INTO {{objectQualifier}}PortalSettings s
                     USING (SELECT {2} PortalId, '{0}' SettingName, '{1}' SettingValue, {3} Sec) AS v
@@ -37,8 +43,11 @@ namespace DNN.Integration.Test.Framework.Helpers
 				                          VALUES (v.PortalId, v.SettingName, v.SettingValue, v.Sec);",
                 settingName, settingValue, portalId, isSecure ? "1" : "0");
 
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             DatabaseHelper.ExecuteNonQuery(query);
             WebApiTestHelper.ClearHostCache();
+			_logger.LogInformation("SetPortalSetting(settingName,settingValue,portalId,isSecure)={SettingName},{SettingValue},{PortalId},{IsSecure}: database query executed in {Arg4} ms", settingName, settingValue, portalId, isSecure, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting SetPortalSetting(settingName={SettingName},settingValue={SettingValue},portalId={PortalId},isSecure={IsSecure})", settingName, settingValue, portalId, isSecure);
         }
     }
 }

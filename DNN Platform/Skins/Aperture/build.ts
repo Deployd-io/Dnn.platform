@@ -11,6 +11,7 @@ import postcssBanner from "postcss-banner";
 import chokidar from "chokidar";
 import bs from "browser-sync";
 import packageJson from "./package.json";
+const logger = console;
 import { glob, globSync } from "glob";
 import { Zip } from 'zip-lib';
 
@@ -66,11 +67,14 @@ const copyFiles: StaticFileConfig[] = [
 
 /** Normalizes a path (windows vs linux, etc.) */
 function normalizePath(filePath: string): string {
+logger.debug(`>>> Entering normalizePath(filePath=${filePath})`);
+logger.debug(`<<< Exiting normalizePath(filePath=${filePath})`);
   return path.resolve(filePath).replace(/\\/g, "/");
 }
 
 /** Copies files while preserving folder structure */
 function copyFilesPreservingStructure(copyConfig: StaticFileConfig[]): void {
+logger.debug(`>>> Entering copyFilesPreservingStructure(copyConfig=${copyConfig})`);
   copyConfig.forEach(entry => {
     console.log(`Copying files from ${entry.src} to ${entry.dest}...`);
     
@@ -82,6 +86,7 @@ function copyFilesPreservingStructure(copyConfig: StaticFileConfig[]): void {
         console.log(`Copied ${file} → ${destFile}`);
     });
   });
+logger.debug(`<<< Exiting copyFilesPreservingStructure(copyConfig=${copyConfig})`);
 }
 
 /** Helper function to ensure directories exist */
@@ -90,7 +95,9 @@ function ensureDirectoryExists(filePath: string): void {
   const dir = path.dirname(filePath);
   console.log("Directory: ", dir);
   if (!fs.existsSync(dir)) {
+	logger.debug(`>>> Entering ensureDirectoryExists(filePath=${filePath})`);
     fs.mkdirSync(dir, { recursive: true });
+	logger.debug(`<<< Exiting ensureDirectoryExists(filePath=${filePath})`);
   }
 }
 
@@ -132,8 +139,10 @@ async function buildScss(input: string, output: string): Promise<void> {
     console.log(`CSS written to: ${output}`);
 
     if (postcssResult.map) {
+		logger.debug(`>>> Entering buildScss(input=${input},output=${output})`);
         const sourcemapPath = `${output}.map`;
         fs.writeFileSync(sourcemapPath, JSON.stringify(postcssResult.map));
+		logger.debug(`<<< Exiting buildScss(input=${input},output=${output})`);
         console.log(`Sourcemap written to: ${sourcemapPath}`);
     }
   } catch (error) {
@@ -156,17 +165,21 @@ async function buildJs(input: string, output: string): Promise<void> {
     });
     console.log(`JS written to: ${output}`);
   } catch (error) {
+	logger.debug(`>>> Entering buildJs(input=${input},output=${output})`);
     console.error(`Error bundling JS for ${input}:`, error);
+	logger.debug(`<<< Exiting buildJs(input=${input},output=${output})`);
   }
 }
 
 /** Process all files */
 async function buildAll(firstRun = true): Promise<void> {
   for (const { input, output } of transpiledFiles) {
+	logger.debug(`>>> Entering buildAll(firstRun=${firstRun})`);
       if (input.endsWith(".scss")) {
           await buildScss(input, output);
       } else if (input.endsWith(".ts") || input.endsWith(".js")) {
           await buildJs(input, output);
+	logger.debug(`<<< Exiting buildAll(firstRun=${firstRun})`);
       }
   }
 
@@ -192,6 +205,7 @@ function watchFiles(): void {
   });
   buildAll();
   if (!browserSync.active) {
+	logger.debug('>>> Entering watchFiles()');
     browserSync.init({
       proxy: settings.WebsiteUrl,
       rewriteRules: [
@@ -208,10 +222,12 @@ function watchFiles(): void {
       ],
       injectChanges: true,
       middleware: function (_req, res, next) {
+		logger.debug(`>>> Entering middleware(_req=${_req},res=${res},next=${next})`);
         res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
         res.setHeader("Pragma", "no-cache");
         res.setHeader("Expires", "0");
         next();
+		logger.debug(`<<< Exiting middleware(_req=${_req},res=${res},next=${next})`);
       }
     });
   }
@@ -219,6 +235,7 @@ function watchFiles(): void {
       console.log(`File ${filePath} changed (${event}). Rebuilding...`);
       await buildAll(false);
       const isStaticFile = copyFiles.some(entry => globSync(entry.src).includes(filePath));
+	logger.debug(`watchFiles(): isStaticFile → ${isStaticFile}`);
       if (isStaticFile) {
         copyFilesPreservingStructure(copyFiles);
       }
@@ -227,12 +244,15 @@ function watchFiles(): void {
 }
 
 function deleteDirectoryWithRetry(path: string, retries = 5, delay = 1000) {
+logger.debug(`>>> Entering deleteDirectoryWithRetry(path=${path},retries=${retries},delay=${delay})`);
   try {
       fs.rmSync(path, { recursive: true, force: true });
   } catch (err: any) {
+	logger.error(`Exception in deleteDirectoryWithRetry(path=${path},retries=${retries},delay=${delay}): ${(err as Error).message}`, err);
       if (retries > 0 && err.code === 'EBUSY') {
           setTimeout(() => deleteDirectoryWithRetry(path, retries - 1, delay + 1000), delay);
       } else {
+		logger.debug(`<<< Exiting deleteDirectoryWithRetry(path=${path},retries=${retries},delay=${delay})`);
           throw err; // Rethrow the error if retries are exhausted or it's another error
       }
   }
@@ -241,16 +261,20 @@ function deleteDirectoryWithRetry(path: string, retries = 5, delay = 1000) {
 function ensureEmptyDirectory(dirPath: string): void {
   // Ensure that the directory exists
   if (!fs.existsSync(dirPath)) {
+	logger.debug(`>>> Entering ensureEmptyDirectory(dirPath=${dirPath})`);
       // Directory does not exist, create it
       fs.mkdirSync(dirPath, { recursive: true });
+	logger.debug(`<<< Exiting ensureEmptyDirectory(dirPath=${dirPath})`);
       return;
   }
 
   // Directory exists, empty it
   const files = fs.readdirSync(dirPath);
+logger.debug(`ensureEmptyDirectory(dirPath=${dirPath}): files → ${files}`);
 
   for (const file of files) {
       const currentPath = path.join(dirPath, file);
+	logger.debug(`ensureEmptyDirectory(dirPath=${dirPath}): currentPath → ${currentPath}`);
       if (fs.lstatSync(currentPath).isDirectory()) {
           // Recursive call for directories
           ensureEmptyDirectory(currentPath);
@@ -267,7 +291,10 @@ function ensureEmptyDirectory(dirPath: string): void {
 function copyFileToPath(src: string, dest: string): void {
   // Ensure that the destination directory exists
   const dir = path.dirname(dest);
+logger.debug(`copyFileToPath(src=${src},dest=${dest}): dir → ${dir}`);
   if (!fs.existsSync(dir)) {
+	logger.debug(`>>> Entering copyFileToPath(src=${src},dest=${dest})`);
+	logger.debug(`<<< Exiting copyFileToPath(src=${src},dest=${dest})`);
       fs.mkdirSync(dir, { recursive: true });
   }
 
@@ -278,6 +305,7 @@ function copyFileToPath(src: string, dest: string): void {
 /** Package files */
 async function packageFiles(): Promise<void> {
   const artifactsDir = "./artifacts";
+logger.debug(`packageFiles(): artifactsDir → ${artifactsDir}`);
   ensureEmptyDirectory(artifactsDir);
   const stagingDir = `${artifactsDir}/staging`;
   ensureEmptyDirectory(stagingDir);
@@ -298,11 +326,14 @@ async function packageFiles(): Promise<void> {
       { nodir: true }
   );
   skinResources.forEach((skinResource) => {
+	logger.debug('>>> Entering packageFiles()');
       const relativePath = path.relative(skinDist, skinResource).replace(/\\/g, '/');
       const targetPath = path.resolve(`${stagingDir}/skinResources/${relativePath}`);
+	logger.debug('<<< Exiting packageFiles()');
       copyFileToPath(skinResource, targetPath);
   });
   let zip = new Zip();
+logger.debug(`packageFiles(): zip → ${zip}`);
   zip.addFolder(`${stagingDir}/skinResources`);
   await zip.archive(`${stagingDir}/skin.zip`)
   deleteDirectoryWithRetry(`${stagingDir}/skinResources`);
@@ -339,7 +370,9 @@ async function packageFiles(): Promise<void> {
   );
   rootResources.forEach((rootResource) => {
       const relativePath = path.relative(skinDist, rootResource).replace(/\\/g, '/');
+	logger.debug(`packageFiles(): relativePath → ${relativePath}`);
       const targetPath = path.resolve(`${stagingDir}/${relativePath}`);
+	logger.debug(`packageFiles(): targetPath → ${targetPath}`);
       copyFileToPath(rootResource, targetPath);
   });
   console.log("Root files packaged.");
@@ -357,6 +390,7 @@ async function packageFiles(): Promise<void> {
   // Copy package to Install/Skin
   console.log("Copying package to Install/Skin...");
   var skinInstallPath = "../../../Website/Install/Skin/";
+logger.debug(`packageFiles(): skinInstallPath → ${skinInstallPath}`);
   console.log(`Copying ${packageName} to ${skinInstallPath}`);
   var destinationPath = `${skinInstallPath}/${packageName}`
   ensureDirectoryExists(destinationPath);

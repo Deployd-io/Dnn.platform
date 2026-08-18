@@ -13,10 +13,12 @@ using DotNetNuke.Abstractions.Settings;
 using DotNetNuke.Common.Utilities;
 using DotNetNuke.Entities;
 using DotNetNuke.Entities.Controllers;
+using Microsoft.Extensions.Logging;
 
 public class FakeHostController(Dictionary<string, IConfigurationSetting> settings)
     : IHostController, IHostSettingsService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public FakeHostController(IEnumerable<KeyValuePair<string, string>> settings)
         : this(settings.ToDictionary(kvp => kvp.Key, IConfigurationSetting (kvp) => new ConfigurationSetting { Key = kvp.Key, Value = kvp.Value, IsSecure = false, }))
     {
@@ -26,15 +28,19 @@ public class FakeHostController(Dictionary<string, IConfigurationSetting> settin
 
     public void AddSetting(string key, string value, bool isSecure = false)
     {
+		_logger.LogDebug(">>> Entering AddSetting(key={Key},value={Value},isSecure={IsSecure})", key, value, isSecure);
         this.Settings[key] = new ConfigurationSetting { Key = key, Value = value, IsSecure = isSecure, };
+		_logger.LogDebug("<<< Exiting AddSetting(key={Key},value={Value},isSecure={IsSecure})", key, value, isSecure);
     }
 
     public bool GetBoolean(string key) => this.GetBoolean(key, Null.NullBoolean);
 
     public bool GetBoolean(string key, bool defaultValue)
     {
+		_logger.LogDebug(">>> Entering GetBoolean(key={Key},defaultValue={DefaultValue})", key, defaultValue);
         if (this.Settings.TryGetValue(key, out var setting))
         {
+		_logger.LogDebug("<<< Exiting GetBoolean(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             return setting.Value.StartsWith("Y", StringComparison.InvariantCultureIgnoreCase) || setting.Value.Equals("TRUE", StringComparison.InvariantCultureIgnoreCase);
         }
 
@@ -58,6 +64,7 @@ public class FakeHostController(Dictionary<string, IConfigurationSetting> settin
 
     public string GetString(string key, string defaultValue)
         => this.Settings.TryGetValue(key, out var setting) ? setting.Value : defaultValue;
+		_logger.LogDebug("<<< Exiting GetString(key={Key})", key);
 
     public Dictionary<string, string> GetSettingsDictionary()
         => this.Settings.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Value);

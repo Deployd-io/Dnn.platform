@@ -21,6 +21,7 @@ namespace DotNetNuke.Web.UI.WebControls
     [DataContract]
     public class DnnFileUploadOptions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnFileUploadOptions));
         /// <summary>Gets or sets the client ID.</summary>
         [DataMember(Name = "clientId")]
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
@@ -106,7 +107,9 @@ namespace DotNetNuke.Web.UI.WebControls
         public DnnFileUploadOptions()
             : this(null, null, null)
         {
+		Logger.LogDebug(">>> Entering DnnFileUploadOptions()");
         }
+		Logger.LogDebug("<<< Exiting DnnFileUploadOptions()");
 
         /// <summary>Initializes a new instance of the <see cref="DnnFileUploadOptions"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -114,6 +117,10 @@ namespace DotNetNuke.Web.UI.WebControls
         public DnnFileUploadOptions(IHostSettings hostSettings)
             : this(hostSettings, null, null)
         {
+		Logger.LogDebug(">>> Entering DnnFileUploadOptions(hostSettings={HostSettings})", hostSettings);
+		Logger.LogDebug("<<< Exiting DnnFileUploadOptions(hostSettings={HostSettings})", hostSettings);
+		Logger.LogDebug("DnnFileUploadOptions(hostSettings={HostSettings},appStatus={AppStatus},cryptographyProvider={CryptographyProvider}): Width → {Width}", hostSettings, appStatus, cryptographyProvider, Width);
+		Logger.LogDebug("DnnFileUploadOptions(hostSettings={HostSettings},appStatus={AppStatus},cryptographyProvider={CryptographyProvider}): Height → {Height}", hostSettings, appStatus, cryptographyProvider, Height);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnFileUploadOptions"/> class.</summary>
@@ -124,12 +131,19 @@ namespace DotNetNuke.Web.UI.WebControls
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			Logger.LogDebug("DnnFileUploadOptions(hostSettings={HostSettings},appStatus={AppStatus},cryptographyProvider={CryptographyProvider}): appStatus → {AppStatus1}", hostSettings, appStatus, cryptographyProvider, appStatus);
             this.cryptographyProvider = cryptographyProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<ICryptographyProvider>();
+			Logger.LogDebug("DnnFileUploadOptions(hostSettings={HostSettings},appStatus={AppStatus},cryptographyProvider={CryptographyProvider}): cryptographyProvider → {CryptographyProvider1}", hostSettings, appStatus, cryptographyProvider, cryptographyProvider);
             this.FolderPicker = new DnnDropDownListOptions();
+			Logger.LogDebug("DnnFileUploadOptions(hostSettings={HostSettings},appStatus={AppStatus},cryptographyProvider={CryptographyProvider}): FolderPicker → {FolderPicker}", hostSettings, appStatus, cryptographyProvider, FolderPicker);
             this.MaxFileSize = (int)Config.GetMaxUploadSize(this.appStatus);
+			Logger.LogDebug("DnnFileUploadOptions(hostSettings={HostSettings},appStatus={AppStatus},cryptographyProvider={CryptographyProvider}): MaxFileSize → {MaxFileSize}", hostSettings, appStatus, cryptographyProvider, MaxFileSize);
             this.Extensions = [];
+			Logger.LogDebug("DnnFileUploadOptions(hostSettings={HostSettings},appStatus={AppStatus},cryptographyProvider={CryptographyProvider}): Extensions → {Extensions}", hostSettings, appStatus, cryptographyProvider, Extensions);
+			Logger.LogDebug("DnnFileUploadOptions(hostSettings={HostSettings},appStatus={AppStatus},cryptographyProvider={CryptographyProvider}): this.Extensions → {Arg3}", hostSettings, appStatus, cryptographyProvider, this.Extensions);
             this.Width = DefaultWidth;
             this.Height = DefaultHeight;
+			Logger.LogDebug("DnnFileUploadOptions(hostSettings={HostSettings},appStatus={AppStatus},cryptographyProvider={CryptographyProvider}): this.Width → {Arg3}", hostSettings, appStatus, cryptographyProvider, this.Width);
             this.Resources = new DnnFileUploadResources
             {
                 Title = Utilities.GetLocalizedString("FileUpload.Title.Text"),
@@ -158,6 +172,10 @@ namespace DotNetNuke.Web.UI.WebControls
                 UnzipFileFailedPromptBody = Utilities.GetLocalizedString("FileUpload.UnzipFileFailedPromptBody.Text"),
                 UnzipFileSuccessPromptBody = Utilities.GetLocalizedString("FileUpload.UnzipFileSuccessPromptBody.Text"),
             };
+			Logger.LogDebug("DnnFileUploadOptions(hostSettings={HostSettings},appStatus={AppStatus},cryptographyProvider={CryptographyProvider}): this.Height → {Arg3}", hostSettings, appStatus, cryptographyProvider, this.Height);
+			Logger.LogDebug("DnnFileUploadOptions(hostSettings={HostSettings},appStatus={AppStatus},cryptographyProvider={CryptographyProvider}): Resources → {Resources}", hostSettings, appStatus, cryptographyProvider, Resources);
+			Logger.LogDebug("DnnFileUploadOptions(hostSettings={HostSettings},appStatus={AppStatus},cryptographyProvider={CryptographyProvider}): hostSettings → {HostSettings1}", hostSettings, appStatus, cryptographyProvider, hostSettings);
+			Logger.LogDebug("DnnFileUploadOptions(hostSettings={HostSettings},appStatus={AppStatus},cryptographyProvider={CryptographyProvider}): this.Resources → {Arg3}", hostSettings, appStatus, cryptographyProvider, this.Resources);
         }
 
         /// <summary>Gets the parameters.</summary>

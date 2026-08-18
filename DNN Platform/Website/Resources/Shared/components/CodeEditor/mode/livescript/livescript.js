@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -7,6 +8,7 @@
  */
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -17,12 +19,18 @@
   "use strict";
 
   CodeMirror.defineMode('livescript', function(){
+	logger.debug('>>> Entering defineMode()');
     var tokenBase = function(stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
       var next_rule = state.next || "start";
       if (next_rule) {
+		logger.debug(`tokenBase(stream=${stream},state=${state}): next_rule → ${next_rule}`);
         state.next = state.next;
+		logger.debug(`function(exports=${exports}): state.next → ${state.next}`);
         var nr = Rules[next_rule];
+		logger.debug(`defineMode(): state.next → ${state.next}`);
         if (nr.splice) {
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.next → ${state.next}`);
           for (var i$ = 0; i$ < nr.length; ++i$) {
             var r = nr[i$];
             if (r.regex && stream.match(r.regex)) {
@@ -44,16 +52,20 @@
         }
       }
       stream.next();
+	logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
       return 'error';
     };
     var external = {
       startState: function(){
+		logger.debug('>>> Entering startState()');
         return {
           next: 'start',
           lastToken: null
         };
+		logger.debug('<<< Exiting startState()');
       },
       token: function(stream, state){
+		logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
         while (stream.pos == stream.start)
           var style = tokenBase(stream, state);
         state.lastToken = {
@@ -61,12 +73,16 @@
           indent: stream.indentation(),
           content: stream.current()
         };
+		logger.debug(`token(stream=${stream},state=${state}): style → ${style}`);
+		logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
         return style.replace(/\./g, ' ');
       },
       indent: function(state){
+		logger.debug(`>>> Entering indent(state=${state})`);
         var indentation = state.lastToken.indent;
         if (state.lastToken.content.match(indenter)) {
           indentation += 2;
+		logger.debug(`<<< Exiting indent(state=${state})`);
         }
         return indentation;
       }
@@ -75,8 +91,11 @@
   });
 
   var identifier = '(?![\\d\\s])[$\\w\\xAA-\\uFFDC](?:(?!\\s)[$\\w\\xAA-\\uFFDC]|-[A-Za-z])*';
+logger.debug(`function(exports=${exports}): identifier → ${identifier}`);
   var indenter = RegExp('(?:[({[=:]|[-~]>|\\b(?:e(?:lse|xport)|d(?:o|efault)|t(?:ry|hen)|finally|import(?:\\s*all)?|const|var|let|new|catch(?:\\s*' + identifier + ')?))\\s*$');
+logger.error(`Exception in function(exports=${exports}): (no error binding)`);
   var keywordend = '(?![$\\w]|-[A-Za-z]|\\s*:(?![:=]))';
+logger.debug(`function(exports=${exports}): keywordend → ${keywordend}`);
   var stringfill = {
     token: 'string',
     regex: '.+'

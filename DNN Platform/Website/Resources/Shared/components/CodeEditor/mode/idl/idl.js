@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -10,8 +12,11 @@
     mod(CodeMirror);
 })(function(CodeMirror) {
   "use strict";
+logger.debug(`<<< Exiting function(exports=${exports})`);
 
   function wordRegexp(words) {
+	logger.debug(`>>> Entering wordRegexp(words=${words})`);
+	logger.debug(`<<< Exiting wordRegexp(words=${words})`);
     return new RegExp('^((' + words.join(')|(') + '))\\b', 'i');
   };
 
@@ -242,6 +247,7 @@
   var boolOperators = new RegExp('(and|or|eq|lt|le|gt|ge|ne|not)', 'i');
 
   function tokenBase(stream) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream})`);
     // whitespaces
     if (stream.eatSpace()) return null;
 
@@ -275,12 +281,16 @@
 
     // Handle non-detected items
     stream.next();
+	logger.debug(`<<< Exiting tokenBase(stream=${stream})`);
     return null;
   };
 
   CodeMirror.defineMode('idl', function() {
+	logger.debug('>>> Entering defineMode()');
     return {
       token: function(stream) {
+		logger.debug(`>>> Entering token(stream=${stream})`);
+		logger.debug(`<<< Exiting token(stream=${stream})`);
         return tokenBase(stream);
       }
     };

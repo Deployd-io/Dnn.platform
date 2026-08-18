@@ -3,12 +3,15 @@ import PropTypes from "prop-types";
 import { GridCell, GridSystem, SingleLineInputWithError, DropdownWithError, Switch, Button } from "@dnnsoftware/dnn-react-common";
 import Localization from "localization";
 import "./style.less";
+const logger = console;
 
 const inputStyle = { width: "100%" };
 
 class ControlFields extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
     onSelect(key, option) {
         const { props } = this;
@@ -16,7 +19,9 @@ class ControlFields extends Component {
     }
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className="edit-module-control-box">
                 <GridSystem>

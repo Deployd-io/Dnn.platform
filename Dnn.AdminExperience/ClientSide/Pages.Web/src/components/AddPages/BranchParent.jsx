@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { PagePicker, Label } from "@dnnsoftware/dnn-react-common";
 import Localization from "../../localization";
 import utils from "../../utils";
+const logger = console;
 
 const PageToTestParameters = {
     portalId: -2,
@@ -17,8 +18,10 @@ const PageToTestParameters = {
 class BranchParent extends Component {
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         const noneSpecifiedText = utils.getPortalName() || Localization.get("Site");
+		logger.debug('<<< Exiting render()');
         return <div className="input-group">
             <Label
                 label={Localization.get("BranchParent")} />

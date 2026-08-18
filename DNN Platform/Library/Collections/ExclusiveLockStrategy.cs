@@ -9,6 +9,7 @@ namespace DotNetNuke.Collections.Internal
     /// <summary>Represents an exclusive locking strategy.</summary>
     public class ExclusiveLockStrategy : ILockStrategy
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ExclusiveLockStrategy));
         private readonly object @lock = new object();
 
         private bool isDisposed;
@@ -46,6 +47,9 @@ namespace DotNetNuke.Collections.Internal
         /// <inheritdoc />
         public ISharedCollectionLock GetReadLock()
         {
+			Logger.LogDebug(">>> Entering GetReadLock()");
+			Logger.LogDebug("<<< Exiting GetReadLock()");
+			Logger.LogDebug("<<< Exiting GetReadLock(timeout={Timeout})", timeout);
             return this.GetLock(TimeSpan.FromMilliseconds(-1));
         }
 
@@ -58,6 +62,9 @@ namespace DotNetNuke.Collections.Internal
         /// <inheritdoc />
         public ISharedCollectionLock GetWriteLock()
         {
+			Logger.LogDebug(">>> Entering GetWriteLock()");
+			Logger.LogDebug("<<< Exiting GetWriteLock()");
+			Logger.LogDebug("<<< Exiting GetWriteLock(timeout={Timeout})", timeout);
             return this.GetLock(TimeSpan.FromMilliseconds(-1));
         }
 
@@ -70,52 +77,71 @@ namespace DotNetNuke.Collections.Internal
         /// <inheritdoc />
         public void Dispose()
         {
+			Logger.LogDebug(">>> Entering Dispose()");
             this.Dispose(true);
             GC.SuppressFinalize(this);
+			Logger.LogDebug("<<< Exiting Dispose()");
         }
 
         /// <summary>Releases the exclusive lock.</summary>
         public void Exit()
         {
+			Logger.LogDebug(">>> Entering Exit()");
             this.EnsureNotDisposed();
             Monitor.Exit(this.@lock);
             this.lockedThread = null;
+			Logger.LogDebug("Exit(): lockedThread → {LockedThread}", lockedThread);
+			Logger.LogDebug("Exit(): this.lockedThread → {Arg0}", this.lockedThread);
+			Logger.LogDebug("<<< Exiting Exit()");
         }
 
         protected virtual void Dispose(bool disposing)
         {
+			Logger.LogDebug(">>> Entering Dispose(disposing={Disposing})", disposing);
             // todo remove disposable from interface?
             this.isDisposed = true;
+			Logger.LogDebug("<<< Exiting Dispose(disposing={Disposing})", disposing);
         }
 
         private MonitorLock GetLock(TimeSpan timeout)
         {
+			Logger.LogDebug(">>> Entering GetLock(timeout={Timeout})", timeout);
             this.EnsureNotDisposed();
             if (this.IsThreadLocked())
             {
+				Logger.LogWarning("Throwing LockRecursionException from GetLock(timeout={Timeout})", timeout);
                 throw new LockRecursionException();
             }
 
             if (Monitor.TryEnter(this.@lock, timeout))
             {
                 this.lockedThread = Thread.CurrentThread;
+				Logger.LogDebug("GetLock(timeout={Timeout}): lockedThread → {LockedThread}", timeout, lockedThread);
+				Logger.LogDebug("GetLock(timeout={Timeout}): this.lockedThread → {Arg1}", timeout, this.lockedThread);
                 return new MonitorLock(this);
             }
             else
             {
+				Logger.LogWarning("Throwing LockTimeoutException from GetLock(timeout={Timeout})", timeout);
+			Logger.LogDebug("<<< Exiting GetLock(timeout={Timeout})", timeout);
                 throw new LockTimeoutException("ExclusiveLockStrategy.GetLock timed out");
             }
         }
 
         private bool IsThreadLocked()
         {
+			Logger.LogDebug(">>> Entering IsThreadLocked()");
+			Logger.LogDebug("<<< Exiting IsThreadLocked()");
             return Thread.CurrentThread.Equals(this.lockedThread);
         }
 
         private void EnsureNotDisposed()
         {
+			Logger.LogDebug(">>> Entering EnsureNotDisposed()");
             if (this.isDisposed)
             {
+				Logger.LogWarning("Throwing ObjectDisposedException from EnsureNotDisposed()");
+			Logger.LogDebug("<<< Exiting EnsureNotDisposed()");
                 throw new ObjectDisposedException("ExclusiveLockStrategy");
             }
         }

@@ -2,6 +2,7 @@ import React from "react";
 import Upload from "./img/upload.svg";
 import Checkmark from "./img/checkmark.svg";
 import ErrorIcon from "./img/x.svg";
+const logger = console;
 
 interface UploadBarProps {
     errorText?: string;
@@ -24,9 +25,12 @@ const UploadBar: React.FC<UploadBarProps> = ({
     onTryAgain,
     tryAgainText
 }) => {
+	logger.debug(`>>> Entering UploadBar(errorText=${errorText},fileName=${fileName},percent=${percent},uploadCompleteText=${uploadCompleteText},uploadingText=${uploadingText},errorInPackage=${errorInPackage},onTryAgain=${onTryAgain},tryAgainText=${tryAgainText})`);
     const displayPercent = errorText ? 0 : percent;
     const text = errorText ? errorText : (percent === 100 ? uploadCompleteText : uploadingText);
+	logger.debug(`UploadBar(errorText=${errorText},fileName=${fileName},percent=${percent},uploadCompleteText=${uploadCompleteText},uploadingText=${uploadingText},errorInPackage=${errorInPackage},onTryAgain=${onTryAgain},tryAgainText=${tryAgainText}): text → ${text}`);
     const UploadIcon = errorText ? ErrorIcon : (percent === 100 ? Checkmark : Upload);
+	logger.debug(`UploadBar(errorText=${errorText},fileName=${fileName},percent=${percent},uploadCompleteText=${uploadCompleteText},uploadingText=${uploadingText},errorInPackage=${errorInPackage},onTryAgain=${onTryAgain},tryAgainText=${tryAgainText}): UploadIcon → ${UploadIcon}`);
     const className = "file-upload-container dnn-upload-bar" +
         (percent === 100 ? " complete" : "") +
         (errorText ? " upload-error" : "");
@@ -49,6 +53,7 @@ const UploadBar: React.FC<UploadBarProps> = ({
             </div>
         </div>
     );
+	logger.debug(`<<< Exiting UploadBar(errorText=${errorText},fileName=${fileName},percent=${percent},uploadCompleteText=${uploadCompleteText},uploadingText=${uploadingText},errorInPackage=${errorInPackage},onTryAgain=${onTryAgain},tryAgainText=${tryAgainText})`);
 };
 
 export default UploadBar;

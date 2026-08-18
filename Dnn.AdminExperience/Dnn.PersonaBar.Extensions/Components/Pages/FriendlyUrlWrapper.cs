@@ -14,6 +14,8 @@ namespace Dnn.PersonaBar.Pages.Components
         /// <inheritdoc />
         public string CleanNameForUrl(string urlPath, FriendlyUrlOptions options, out bool modified)
         {
+			eventLogger.LogDebug(">>> Entering CleanNameForUrl(urlPath={UrlPath},options={Options})", urlPath, options);
+			eventLogger.LogDebug("<<< Exiting CleanNameForUrl(urlPath={UrlPath},options={Options})", urlPath, options);
             return FriendlyUrlController.CleanNameForUrl(urlPath, options, out modified);
         }
 
@@ -21,7 +23,9 @@ namespace Dnn.PersonaBar.Pages.Components
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void ValidateUrl(string urlPath, int tabld, PortalSettings portalSettings, out bool modified)
         {
+			eventLogger.LogDebug(">>> Entering ValidateUrl(urlPath={UrlPath},tabld={Tabld},portalSettings={PortalSettings})", urlPath, tabld, portalSettings);
             FriendlyUrlController.ValidateUrl(urlPath, tabld, portalSettings, out modified);
+			eventLogger.LogDebug("<<< Exiting ValidateUrl(urlPath={UrlPath},tabld={Tabld},portalSettings={PortalSettings})", urlPath, tabld, portalSettings);
         }
     }
 }

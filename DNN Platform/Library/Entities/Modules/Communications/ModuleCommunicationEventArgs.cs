@@ -7,16 +7,21 @@ namespace DotNetNuke.Entities.Modules.Communications
 
     public class ModuleCommunicationEventArgs : EventArgs
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleCommunicationEventArgs));
         /// <summary>Initializes a new instance of the <see cref="ModuleCommunicationEventArgs"/> class.</summary>
         public ModuleCommunicationEventArgs()
         {
+		Logger.LogDebug(">>> Entering ModuleCommunicationEventArgs()");
+		Logger.LogDebug("<<< Exiting ModuleCommunicationEventArgs()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleCommunicationEventArgs"/> class.</summary>
         /// <param name="text">The text.</param>
         public ModuleCommunicationEventArgs(string text)
         {
+			Logger.LogDebug(">>> Entering ModuleCommunicationEventArgs(text={Text})", text);
             this.Text = text;
+			Logger.LogDebug("<<< Exiting ModuleCommunicationEventArgs(text={Text})", text);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleCommunicationEventArgs"/> class.</summary>
@@ -26,10 +31,14 @@ namespace DotNetNuke.Entities.Modules.Communications
         /// <param name="target">The target.</param>
         public ModuleCommunicationEventArgs(string type, object value, string sender, string target)
         {
+			Logger.LogDebug(">>> Entering ModuleCommunicationEventArgs(type={Type},value={Value},sender={Sender},target={Target})", type, value, sender, target);
             this.Type = type;
             this.Value = value;
+			Logger.LogDebug("ModuleCommunicationEventArgs(type={Type},value={Value},sender={Sender},target={Target}): this.Type → {Arg4}", type, value, sender, target, this.Type);
+			Logger.LogDebug("ModuleCommunicationEventArgs(type={Type},value={Value},sender={Sender},target={Target}): this.Value → {Arg4}", type, value, sender, target, this.Value);
             this.Sender = sender;
             this.Target = target;
+			Logger.LogDebug("<<< Exiting ModuleCommunicationEventArgs(type={Type},value={Value},sender={Sender},target={Target})", type, value, sender, target);
         }
 
         public string Sender { get; set; }

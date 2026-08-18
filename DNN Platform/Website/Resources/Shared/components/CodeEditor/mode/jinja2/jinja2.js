@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -12,6 +14,7 @@
   "use strict";
 
   CodeMirror.defineMode("jinja2", function() {
+	logger.debug('>>> Entering defineMode()');
     var keywords = ["and", "as", "block", "endblock", "by", "cycle", "debug", "else", "elif",
       "extends", "filter", "endfilter", "firstof", "for",
       "endfor", "if", "endif", "ifchanged", "endifchanged",
@@ -34,8 +37,10 @@
     atom = new RegExp("((" + atom.join(")|(") + "))\\b");
 
     function tokenBase (stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
       var ch = stream.peek();
 
+	logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
       //Comment
       if (state.incomment) {
         if(!stream.skipTo("#}")) {
@@ -44,12 +49,14 @@
           stream.eatWhile(/\#|}/);
           state.incomment = false;
         }
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.incomment → ${state.incomment}`);
         return "comment";
       //Tag
       } else if (state.intag) {
         //After operator
         if(state.operator) {
           state.operator = false;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.operator → ${state.operator}`);
           if(stream.match(atom)) {
             return "atom";
           }
@@ -60,6 +67,7 @@
         //After sign
         if(state.sign) {
           state.sign = false;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.sign → ${state.sign}`);
           if(stream.match(atom)) {
             return "atom";
           }
@@ -71,6 +79,7 @@
         if(state.instring) {
           if(ch == state.instring) {
             state.instring = false;
+			logger.debug(`tokenBase(stream=${stream},state=${state}): state.instring → ${state.instring}`);
           }
           stream.next();
           return "string";
@@ -80,6 +89,7 @@
           return "string";
         } else if(stream.match(state.intag + "}") || stream.eat("-") && stream.match(state.intag + "}")) {
           state.intag = false;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.intag → ${state.intag}`);
           return "tag";
         } else if(stream.match(operator)) {
           state.operator = true;
@@ -124,6 +134,8 @@
             state.intag = "}";
           }
           stream.eat("-");
+		logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
+		logger.debug(`<<< Exiting function(exports=${exports})`);
           return "tag";
         }
       }
@@ -132,9 +144,13 @@
 
     return {
       startState: function () {
+		logger.debug('>>> Entering startState()');
+		logger.debug('<<< Exiting startState()');
         return {tokenize: tokenBase};
       },
       token: function (stream, state) {
+		logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
+		logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
         return state.tokenize(stream, state);
       }
     };

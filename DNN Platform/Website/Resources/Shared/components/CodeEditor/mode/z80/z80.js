@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
   mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -12,6 +14,7 @@
 "use strict";
 
 CodeMirror.defineMode('z80', function(_config, parserConfig) {
+logger.debug('>>> Entering defineMode()');
   var ez80 = parserConfig.ez80;
   var keywords1, keywords2;
   if (ez80) {
@@ -23,24 +26,33 @@ CodeMirror.defineMode('z80', function(_config, parserConfig) {
   }
 
   var variables1 = /^(af?|bc?|c|de?|e|hl?|l|i[xy]?|r|sp)\b/i;
+logger.debug(`defineMode(): variables1 → ${variables1}`);
   var variables2 = /^(n?[zc]|p[oe]?|m)\b/i;
   var errors = /^([hl][xy]|i[xy][hl]|slia|sll)\b/i;
+logger.debug(`defineMode(): variables2 → ${variables2}`);
   var numbers = /^([\da-f]+h|[0-7]+o|[01]+b|\d+d?)\b/i;
+logger.debug('<<< Exiting defineMode()');
 
   return {
     startState: function() {
+	logger.debug('>>> Entering startState()');
       return {
         context: 0
       };
+	logger.debug('<<< Exiting startState()');
     },
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       if (!stream.column())
         state.context = 0;
 
       if (stream.eatSpace())
+		logger.debug(`function(exports=${exports}): state.context → ${state.context}`);
+	logger.debug(`defineMode(): state.context → ${state.context}`);
         return null;
 
       var w;
+	logger.debug(`token(stream=${stream},state=${state}): state.context → ${state.context}`);
 
       if (stream.eatWhile(/\w/)) {
         if (ez80 && stream.eat('.')) {
@@ -48,6 +60,7 @@ CodeMirror.defineMode('z80', function(_config, parserConfig) {
         }
         w = stream.current();
 
+		logger.debug(`token(stream=${stream},state=${state}): w → ${w}`);
         if (stream.indentation()) {
           if ((state.context == 1 || state.context == 4) && variables1.test(w)) {
             state.context = 4;
@@ -104,6 +117,7 @@ CodeMirror.defineMode('z80', function(_config, parserConfig) {
           return 'number';
       } else {
         stream.next();
+		logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
       }
       return null;
     }
@@ -114,3 +128,4 @@ CodeMirror.defineMIME("text/x-z80", "z80");
 CodeMirror.defineMIME("text/x-ez80", { name: "z80", ez80: true });
 
 });
+logger.debug(`<<< Exiting function(exports=${exports})`);

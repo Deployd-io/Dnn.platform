@@ -15,6 +15,7 @@ namespace DotNetNuke.Services.Social.Messaging.Internal.Views
     /// <summary>The MessageConversationView class contains details of the latest message in a Conversation.</summary>
     public class MessageConversationView : IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MessageConversationView));
         private int messageID = -1;
         private string displayDate;
         private DateTime createdOnDate;
@@ -110,6 +111,7 @@ namespace DotNetNuke.Services.Social.Messaging.Internal.Views
         /// <param name="dr">the data reader.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.MessageID = Convert.ToInt32(dr["MessageID"], CultureInfo.InvariantCulture);
             this.To = Null.SetNullString(dr["To"]);
             this.From = Null.SetNullString(dr["From"]);
@@ -123,6 +125,8 @@ namespace DotNetNuke.Services.Social.Messaging.Internal.Views
             this.NewThreadCount = Convert.ToInt32(dr["NewThreadCount"], CultureInfo.InvariantCulture);
             this.ThreadCount = Convert.ToInt32(dr["ThreadCount"], CultureInfo.InvariantCulture);
             this.createdOnDate = Null.SetNullDateTime(dr["CreatedOnDate"]);
+			Logger.LogDebug("Fill(dr={Dr}): createdOnDate → {CreatedOnDate}", dr, createdOnDate);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

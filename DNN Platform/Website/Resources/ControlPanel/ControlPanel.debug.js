@@ -1,3 +1,4 @@
+const logger = console;
 ﻿(function ($) {
 	$.fn.dnnControlPanel = function (options) {
 		var opts = $.extend({}, $.fn.dnnControlPanel.defaultOptions, options),
@@ -40,10 +41,13 @@
                 $controlPanel = $(this);
 
 			function EnableHide() {
+				logger.debug('>>> Entering EnableHide()');
 				if (!forceShow) canHide = true;
+				logger.debug('<<< Exiting EnableHide()');
 			}
 
 			function megaHoverOver() {
+				logger.debug('>>> Entering megaHoverOver()');
 				hideAll();
 				var menuSelector = $(this).parent().find(opts.menuBorderSelector);
 				if (!$.support.cssFloat && menuSelector.prev("iframe").length == 0) {
@@ -59,6 +63,7 @@
 					});
 				}
 				menuSelector.stop().fadeTo('fast', 1).show(); //Find sub and fade it in
+				logger.debug('<<< Exiting megaHoverOver()');
 			}
 
 			function hideAll() {

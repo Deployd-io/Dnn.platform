@@ -1,12 +1,16 @@
 import React from "react";
 import PropTypes from "prop-types";
 import "./style.less";
+const logger = console;
 
 function getHandler(handler, enabled) {
+	logger.debug(`>>> Entering getHandler(handler=${handler},enabled=${enabled})`);
+	logger.debug(`<<< Exiting getHandler(handler=${handler},enabled=${enabled})`);
     return handler && enabled ? handler : null; 
 }
 
 function getOpts(enabled, multipleSelect) {
+	logger.debug(`>>> Entering getOpts(enabled=${enabled},multipleSelect=${multipleSelect})`);
     const opts = {};
     if (!enabled) {
         opts["disabled"] = "disabled"; 
@@ -14,10 +18,13 @@ function getOpts(enabled, multipleSelect) {
     if (multipleSelect) {
         opts["multiple"] = "multiple"; 
     }
+	logger.debug(`<<< Exiting getOpts(enabled=${enabled},multipleSelect=${multipleSelect})`);
     return opts;
 }
 
 function getOptionsList(options) {
+	logger.debug(`>>> Entering getOptionsList(options=${options})`);
+	logger.debug(`<<< Exiting getOptionsList(options=${options})`);
     return options.map((option, index) => {
         return <option key={option.value + "_" + index} value={option.value}>{option.label}</option>;
     });  

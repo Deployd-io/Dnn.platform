@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(stream=${stream},state=${state})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,6 +13,7 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(stream=${stream},state=${state})`);
 CodeMirror.defineMode('tiki', function(config) {
   function inBlock(style, terminator, returnTokenizer) {
     return function(stream, state) {
@@ -29,18 +32,22 @@ CodeMirror.defineMode('tiki', function(config) {
   }
 
   function inLine(style) {
+	logger.debug(`>>> Entering inLine(style=${style})`);
     return function(stream, state) {
       while(!stream.eol()) {
         stream.next();
       }
       state.tokenize = inText;
+	logger.debug(`<<< Exiting inLine(style=${style})`);
       return style;
     };
   }
 
   function inText(stream, state) {
     function chain(parser) {
+	logger.debug(`>>> Entering chain(parser=${parser})`);
       state.tokenize = parser;
+	logger.debug(`<<< Exiting chain(parser=${parser})`);
       return parser(stream, state);
     }
 
@@ -131,6 +138,7 @@ CodeMirror.defineMode('tiki', function(config) {
   // Return variables for tokenizers
   var pluginName, type;
   function inPlugin(stream, state) {
+	logger.debug(`>>> Entering inPlugin(stream=${stream},state=${state})`);
     var ch = stream.next();
     var peek = stream.peek();
 
@@ -165,6 +173,7 @@ CodeMirror.defineMode('tiki', function(config) {
   }
 
   function inAttribute(quote) {
+	logger.debug(`>>> Entering inAttribute(quote=${quote})`);
     return function(stream, state) {
       while (!stream.eol()) {
         if (stream.next() == quote) {
@@ -172,11 +181,13 @@ CodeMirror.defineMode('tiki', function(config) {
           break;
         }
       }
+	logger.debug(`<<< Exiting inAttribute(quote=${quote})`);
       return "string";
     };
   }
 
   function inAttributeNoQuote() {
+	logger.debug('>>> Entering inAttributeNoQuote()');
     return function(stream, state) {
       while (!stream.eol()) {
         var ch = stream.next();
@@ -184,6 +195,7 @@ CodeMirror.defineMode('tiki', function(config) {
         if (ch == " " || ch == "," || /[ )}]/.test(peek)) {
       state.tokenize = inPlugin;
       break;
+	logger.debug('<<< Exiting inAttributeNoQuote()');
     }
   }
   return "string";
@@ -192,15 +204,20 @@ CodeMirror.defineMode('tiki', function(config) {
 
 var curState, setStyle;
 function pass() {
+logger.debug('>>> Entering pass()');
   for (var i = arguments.length - 1; i >= 0; i--) curState.cc.push(arguments[i]);
+logger.debug('<<< Exiting pass()');
 }
 
 function cont() {
+logger.debug('>>> Entering cont()');
   pass.apply(null, arguments);
+logger.debug('<<< Exiting cont()');
   return true;
 }
 
 function pushContext(pluginName, startOfLine) {
+logger.debug(`>>> Entering pushContext(pluginName=${pluginName},startOfLine=${startOfLine})`);
   var noIndent = curState.context && curState.context.noIndent;
   curState.context = {
     prev: curState.context,
@@ -209,13 +226,17 @@ function pushContext(pluginName, startOfLine) {
     startOfLine: startOfLine,
     noIndent: noIndent
   };
+logger.debug(`<<< Exiting pushContext(pluginName=${pluginName},startOfLine=${startOfLine})`);
 }
 
 function popContext() {
+logger.debug('>>> Entering popContext()');
   if (curState.context) curState.context = curState.context.prev;
+logger.debug('<<< Exiting popContext()');
 }
 
 function element(type) {
+logger.debug(`>>> Entering element(type=${type})`);
   if (type == "openPlugin") {curState.pluginName = pluginName; return cont(attributes, endplugin(curState.startOfLine));}
   else if (type == "closePlugin") {
     var err = false;
@@ -234,9 +255,11 @@ function element(type) {
     return cont();
   }
   else return cont();
+logger.debug(`<<< Exiting element(type=${type})`);
 }
 
 function endplugin(startOfLine) {
+logger.debug(`>>> Entering endplugin(startOfLine=${startOfLine})`);
   return function(type) {
     if (
       type == "selfclosePlugin" ||
@@ -244,31 +267,40 @@ function endplugin(startOfLine) {
     )
       return cont();
     if (type == "endPlugin") {pushContext(curState.pluginName, startOfLine); return cont();}
+	logger.debug(`<<< Exiting endplugin(startOfLine=${startOfLine})`);
     return cont();
   };
 }
 
 function endcloseplugin(err) {
+logger.debug(`>>> Entering endcloseplugin(err=${err})`);
   return function(type) {
     if (err) setStyle = "error";
     if (type == "endPlugin") return cont();
+	logger.debug(`<<< Exiting endcloseplugin(err=${err})`);
     return pass();
   };
 }
 
 function attributes(type) {
+logger.debug(`>>> Entering attributes(type=${type})`);
   if (type == "keyword") {setStyle = "attribute"; return cont(attributes);}
   if (type == "equals") return cont(attvalue, attributes);
+logger.debug(`<<< Exiting attributes(type=${type})`);
   return pass();
 }
 function attvalue(type) {
+logger.debug(`>>> Entering attvalue(type=${type})`);
   if (type == "keyword") {setStyle = "string"; return cont();}
   if (type == "string") return cont(attvaluemaybe);
+logger.debug(`<<< Exiting attvalue(type=${type})`);
   return pass();
 }
 function attvaluemaybe(type) {
+logger.debug(`>>> Entering attvaluemaybe(type=${type})`);
   if (type == "string") return cont(attvaluemaybe);
   else return pass();
+logger.debug(`<<< Exiting attvaluemaybe(type=${type})`);
 }
 return {
   startState: function() {

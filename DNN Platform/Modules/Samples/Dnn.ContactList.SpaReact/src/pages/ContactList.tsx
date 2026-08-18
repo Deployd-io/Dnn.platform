@@ -6,6 +6,7 @@ import { ModuleContext } from '../types/Module';
 import { getContacts, deleteContact } from '../services/services';
 import ContactCard from '../components/ContactCard';
 import Pagination from '../components/Pagination';
+const logger = console;
 
 interface ContactListProps {
   security: SecurityContext;
@@ -13,6 +14,7 @@ interface ContactListProps {
 }
 
 export default function ContactList({ security, moduleContext }: ContactListProps) {
+logger.debug(`>>> Entering ContactList(security=${security},moduleContext=${moduleContext})`);
   const navigate = useNavigate();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -40,10 +42,12 @@ export default function ContactList({ security, moduleContext }: ContactListProp
   }, [currentPage, debouncedSearchTerm]);
 
   const loadContacts = async () => {
+	logger.debug('>>> Entering loadContacts()');
     try {
       setLoading(true);
       setError(null);
       const response = await getContacts(moduleContext, currentPage, pageSize, debouncedSearchTerm);
+	logger.debug(`loadContacts(): response → ${response}`);
 
       setContacts(response.Data);
       setTotalCount(response.TotalCount);
@@ -52,14 +56,18 @@ export default function ContactList({ security, moduleContext }: ContactListProp
       setError('Failed to load contacts');
     } finally {
       setLoading(false);
+	logger.debug('<<< Exiting loadContacts()');
     }
   };
 
   const handleEdit = (contact: Contact) => {
+	logger.debug(`>>> Entering handleEdit(contact=${contact})`);
     navigate(`/edit/${contact.ContactId}`);
+	logger.debug(`<<< Exiting handleEdit(contact=${contact})`);
   };
 
   const handleDelete = async (contact: Contact) => {
+	logger.debug(`>>> Entering handleDelete(contact=${contact})`);
     try {
       const response = await deleteContact(moduleContext, contact);
 
@@ -72,15 +80,20 @@ export default function ContactList({ security, moduleContext }: ContactListProp
     } catch (err) {
       console.error('Error deleting contact:', err);
       alert('Failed to delete contact');
+	logger.debug(`<<< Exiting handleDelete(contact=${contact})`);
     }
   };
 
   const handleAddContact = () => {
+	logger.debug('>>> Entering handleAddContact()');
     navigate('/add');
+	logger.debug('<<< Exiting handleAddContact()');
   };
 
   const handlePageChange = (page: number) => {
+	logger.debug(`>>> Entering handlePageChange(page=${page})`);
     setCurrentPage(page);
+	logger.debug(`<<< Exiting handlePageChange(page=${page})`);
   };
 
   if (loading && contacts.length === 0) {
@@ -88,6 +101,7 @@ export default function ContactList({ security, moduleContext }: ContactListProp
   }
 
   if (error) {
+logger.debug(`<<< Exiting ContactList(security=${security},moduleContext=${moduleContext})`);
     return <div className="contactList-container">Error: {error}</div>;
   }
 

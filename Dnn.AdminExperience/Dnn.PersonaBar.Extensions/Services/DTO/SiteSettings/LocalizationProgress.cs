@@ -31,8 +31,12 @@ namespace Dnn.PersonaBar.SiteSettings.Services.Dto
 
         public LocalizationProgress Reset()
         {
+			eventLogger.LogDebug(">>> Entering Reset()");
             this.InProgress = false;
             this.CurrentOperationText = string.Empty;
+			eventLogger.LogDebug("Reset(): this.InProgress → {Arg0}", this.InProgress);
+			eventLogger.LogDebug("Reset(): this.CurrentOperationText → {Arg0}", this.CurrentOperationText);
+			eventLogger.LogDebug("<<< Exiting Reset()");
             return this;
         }
     }

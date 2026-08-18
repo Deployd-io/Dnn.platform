@@ -1,7 +1,9 @@
 import { languageEditor as ActionTypes } from "../constants/actionTypes";
 import utilities from "utils";
+const logger = console;
 
 function insertRecords(folders, newFolders, clearArray) {
+	logger.debug(`>>> Entering insertRecords(folders=${folders},newFolders=${newFolders},clearArray=${clearArray})`);
     let newFolderList = !clearArray ? utilities.utilities.getObjectCopy(folders) : [];
     newFolders.forEach((folder) => {
         let alreadyThere = folders.find((_folder) => {
@@ -11,6 +13,8 @@ function insertRecords(folders, newFolders, clearArray) {
             newFolderList.push(folder);
         }
     });
+	logger.debug(`insertRecords(folders=${folders},newFolders=${newFolders},clearArray=${clearArray}): newFolderList → ${newFolderList}`);
+	logger.debug(`<<< Exiting insertRecords(folders=${folders},newFolders=${newFolders},clearArray=${clearArray})`);
     return newFolderList;
 }
 

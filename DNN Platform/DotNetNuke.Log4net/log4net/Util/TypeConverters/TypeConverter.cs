@@ -48,6 +48,10 @@ namespace log4net.Util.TypeConverters
         /// </remarks>
         public bool CanConvertFrom(Type sourceType) 
         {
+			value.LogDebug(">>> Entering CanConvertFrom(sourceType={SourceType})", sourceType);
+			value.LogDebug(">>> Entering ConvertFrom(source={Source})", source);
+			value.LogDebug("<<< Exiting ConvertFrom(source={Source})", source);
+			value.LogDebug("<<< Exiting CanConvertFrom(sourceType={SourceType})", sourceType);
             return (sourceType == typeof(string));
         }
 

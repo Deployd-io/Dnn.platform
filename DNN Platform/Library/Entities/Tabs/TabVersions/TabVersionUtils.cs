@@ -16,15 +16,20 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
     /// <summary>This Class ofers a set of methods useful and reusable along the Tab Version API.</summary>
     internal static class TabVersionUtils
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabVersionUtils));
         /// <summary>Try to get the version number from the current URL.</summary>
         /// <param name="versionInt">Version number obtained. Null Integer if it is not available.</param>
         /// <returns>True if version number is available and valid from URL. Otherwise, False.</returns>
         internal static bool TryGetUrlVersion(out int versionInt)
         {
+			Logger.LogDebug(">>> Entering TryGetUrlVersion()");
             var version = GetTabVersionQueryStringValue();
             if (string.IsNullOrEmpty(version))
+			Logger.LogDebug("TryGetUrlVersion(): version → {Version}", version);
             {
                 versionInt = Null.NullInteger;
+				Logger.LogDebug("TryGetUrlVersion(): versionInt → {VersionInt}", versionInt);
+			Logger.LogDebug("<<< Exiting TryGetUrlVersion()");
                 return false;
             }
 
@@ -35,6 +40,9 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
         /// <returns>True if current user can see the current page. Otherwise, False.</returns>
         internal static bool CanSeeVersionedPages()
         {
+			Logger.LogDebug(">>> Entering CanSeeVersionedPages()");
+			Logger.LogDebug("<<< Exiting CanSeeVersionedPages()");
+			Logger.LogDebug("<<< Exiting CanSeeVersionedPages(tab={Tab})", tab);
             return CanSeeVersionedPages(TabController.CurrentPage);
         }
 
@@ -65,7 +73,10 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
 
         private static string GetTabVersionQueryStringValue()
         {
+			Logger.LogDebug(">>> Entering GetTabVersionQueryStringValue()");
             var currentPortal = PortalController.Instance.GetCurrentSettings();
+			Logger.LogDebug("GetTabVersionQueryStringValue(): currentPortal → {CurrentPortal}", currentPortal);
+			Logger.LogDebug("<<< Exiting GetTabVersionQueryStringValue()");
             return currentPortal == null ?
                 string.Empty :
                 HttpContext.Current.Request.QueryString[TabVersionSettings.Instance.GetTabVersionQueryStringParameter(currentPortal.PortalId)];

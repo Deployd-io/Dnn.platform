@@ -1,8 +1,11 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function() {
+logger.debug('>>> Entering function()');
   var mode = CodeMirror.getMode({indentUnit: 2}, "php");
+logger.debug('<<< Exiting function()');
   function MT(name) { test.mode(name, mode, Array.prototype.slice.call(arguments, 1)); }
 
   MT('simple_test',
@@ -76,9 +79,11 @@
 
 
   function build_recursive_monsters(nt, t, n){
+	logger.debug(`>>> Entering build_recursive_monsters(nt=${nt},t=${t},n=${n})`);
     var monsters = [t];
     for (var i = 1; i <= n; ++i)
       monsters[i] = nt.join(monsters[i - 1]);
+	logger.debug(`<<< Exiting build_recursive_monsters(nt=${nt},t=${t},n=${n})`);
     return monsters;
   }
 
@@ -122,9 +127,11 @@
      '[meta ?>]');
 
   function build_recursive_monsters_2(mf1, mf2, nt, t, n){
+	logger.debug(`>>> Entering build_recursive_monsters_2(mf1=${mf1},mf2=${mf2},nt=${nt},t=${t},n=${n})`);
     var monsters = [t];
     for (var i = 1; i <= n; ++i)
       monsters[i] = nt[0] + mf1[i - 1] + nt[1] + mf2[i - 1] + nt[2] + monsters[i - 1] + nt[3];
+	logger.debug(`<<< Exiting build_recursive_monsters_2(mf1=${mf1},mf2=${mf2},nt=${nt},t=${t},n=${n})`);
     return monsters;
   }
 

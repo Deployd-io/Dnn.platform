@@ -1,7 +1,9 @@
+const logger = console;
 ﻿
 Type.registerNamespace('dnn.diagnostics');dnn.extend(dnn.diagnostics,{pns:'dnn',ns:'diagnostics',parserName:null,debugCtl:null,debugWait:(document.all!=null),debugArray:[],clearDebug:function()
 {if(this.debugCtl!=null)
 {this.debugCtl.value='';return true;}
+logger.debug('>>> Entering clearDebug()');
 return false;},displayDebug:function(sText)
 {if(this.debugCtl==null)
 {if(dnn.dom.browser.type==dnn.dom.browser.InternetExplorer)
@@ -10,6 +12,7 @@ return false;},displayDebug:function(sText)
 oBody.onload=dnn.dom.appendFunction(oBody.onload,'__dnn_documentLoaded()');return;}}
 this.debugCtl=dnn.dom.getById('__dnnDebugOutput');if(this.debugCtl==null)
 {this.debugCtl=dnn.dom.createElement('TEXTAREA');this.debugCtl.id='__dnnDebugOutput';this.debugCtl.rows=10;this.debugCtl.cols=100;dnn.dom.appendChild(oBody,this.debugCtl);}
+logger.debug(`clearDebug(): oBody → ${oBody}`);
 this.debugCtl.style.display='block';}
 if(dnn.diagnostics.debugCtl==null)
 alert(sText);else

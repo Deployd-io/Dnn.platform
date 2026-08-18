@@ -7,21 +7,29 @@ import PackageInformation from "../common/BasicPackageInformation";
 import Localization from "localization";
 import utilities from "utils";
 import styles from "./style.module.less";
+const logger = console;
 class DeleteExtension extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
     onToggleDeleteFiles() {
+		logger.debug('>>> Entering onToggleDeleteFiles()');
         this.props.dispatch(ExtensionActions.toggleDeleteFiles());
+		logger.debug('<<< Exiting onToggleDeleteFiles()');
     }
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         this.props.dispatch(VisiblePanelActions.selectPanel(0));
         this.props.dispatch(ExtensionActions.setPackageBeingDeleted({}, -1)); //clear
         if (this.props.deleteExtensionFiles) {
             this.onToggleDeleteFiles();
+			logger.debug('<<< Exiting onCancel()');
         }
     }
     onDelete() {
+		logger.debug('>>> Entering onDelete()');
         const {props} = this;
         utilities.utilities.confirm(
             Localization.get("DeleteExtension.Warning").replace("{0}", props.extensionBeingDeleted.friendlyName),
@@ -32,11 +40,14 @@ class DeleteExtension extends Component {
                     deleteFiles: props.deleteExtensionFiles
                 }, props.extensionBeingDeletedIndex, this.onCancel.bind(this)));
             });
+			logger.debug('<<< Exiting onDelete()');
     }
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         const { extensionBeingDeleted } = props;
         const version = extensionBeingDeleted.version ? extensionBeingDeleted.version.split(".") : [0, 0, 0];
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={styles.DeleteExtension}>
                 <PersonaBarPageHeader title={Localization.get("DeleteExtension.Action").replace("{0}", extensionBeingDeleted.friendlyName)} />
@@ -86,6 +97,8 @@ DeleteExtension.defaultProps = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         selectedInstalledPackageType: state.extension.selectedInstalledPackageType,
         extensionBeingDeleted: state.extension.extensionBeingDeleted,

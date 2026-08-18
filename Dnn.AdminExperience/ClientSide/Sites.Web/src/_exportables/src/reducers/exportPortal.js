@@ -6,6 +6,7 @@ import {
     getFinalSwitchCase
 } from "./helpers";
 import utilities from "utils";
+const logger = console;
 
 const switchCase = [{
     condition: ActionTypes.SET_PORTAL_BEING_EXPORTED,
@@ -37,12 +38,14 @@ const switchCase = [{
 }];
 
 export default function getReducer(initialState, additionalCases) {
+	logger.debug(`>>> Entering getReducer(initialState=${initialState},additionalCases=${additionalCases})`);
     return function common(state = Object.assign({
         templates: [],
         totalTemplateCount: 0,
         portalBeingExported: {}
     }, initialState), action) {
         let _switchCase = getFinalSwitchCase(switchCase, additionalCases);
+		logger.debug(`getReducer(initialState=${initialState},additionalCases=${additionalCases}): _switchCase → ${_switchCase}`);
 
         let returnCase = { ...state };
 
@@ -53,6 +56,7 @@ export default function getReducer(initialState, additionalCases) {
             }
         });
 
+		logger.debug(`<<< Exiting getReducer(initialState=${initialState},additionalCases=${additionalCases})`);
         return returnCase;
     };
 }

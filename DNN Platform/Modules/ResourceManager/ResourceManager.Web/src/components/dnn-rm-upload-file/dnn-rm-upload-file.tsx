@@ -1,6 +1,7 @@
 import { Component, Host, h, Element, Event, EventEmitter, State } from '@stencil/core';
 import { ItemsClient } from '../../services/ItemsClient';
 import state from '../../store/store';
+const logger = console;
 
 @Component({
   tag: 'dnn-rm-upload-file',
@@ -30,27 +31,36 @@ export class DnnRmUploadFile {
   private extract = false;
 
   constructor() {
+	logger.debug('>>> Entering constructor()');
     this.itemsClient = new ItemsClient(state.moduleId);
+	logger.debug('<<< Exiting constructor()');
   }
 
   async componentWillLoad() {
+	logger.debug('>>> Entering componentWillLoad()');
     try {
       const data = await this.itemsClient.getAllowedFileExtensions();
+	logger.debug(`componentWillLoad(): data → ${data}`);
       this.allowedExtensions = data.allowedExtensions;
       this.validationCode = data.validationCode;
       this.maxUploadFileSize = data.maxUploadFileSize;
     } catch (error) {
       alert(error);
+	logger.debug('<<< Exiting componentWillLoad()');
     }
   }
 
   private handleFilesDropped(droppedFiles: File[]): void {
+	logger.debug(`>>> Entering handleFilesDropped(droppedFiles=${droppedFiles})`);
     droppedFiles.forEach(file =>{
       this.queuedFiles = [...this.queuedFiles, file];
     });
+	logger.debug(`<<< Exiting handleFilesDropped(droppedFiles=${droppedFiles})`);
   }
   
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         <h2>{state.localization.Upload}</h2>

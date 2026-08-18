@@ -44,23 +44,29 @@ namespace DotNetNuke.Entities.Modules.Prompt
         /// <inheritdoc />
         public override void Initialize(string[] args, IPortalSettings portalSettings, IUserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             base.Initialize(args, portalSettings, userInfo, activeTabId);
             this.ParseParameters(this);
+			Logger.LogDebug("<<< Exiting Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override IConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             try
             {
                 var desktopModule = DesktopModuleController.GetDesktopModuleByModuleName(this.ModuleName, this.PortalId);
+				Logger.LogDebug("Run(): desktopModule → {DesktopModule}", desktopModule);
                 if (desktopModule == null)
                 {
                     return new ConsoleErrorResultModel(string.Format(CultureInfo.CurrentCulture, this.LocalizeString("Prompt_DesktopModuleNotFound"), this.ModuleName));
                 }
 
                 var message = default(KeyValuePair<HttpStatusCode, string>);
+				Logger.LogDebug("Run(): message → {Message}", message);
                 var page = TabController.Instance.GetTab(this.PageId, this.PortalSettings.PortalId);
+				Logger.LogDebug("Run(): page → {Page}", page);
                 if (page == null)
                 {
                     message = new KeyValuePair<HttpStatusCode, string>(HttpStatusCode.NotFound, string.Format(CultureInfo.CurrentCulture, Localization.GetString("Prompt_PageNotFound", this.LocalResourceFile), this.PageId));
@@ -74,21 +80,29 @@ namespace DotNetNuke.Entities.Modules.Prompt
                 }
 
                 var moduleList = new List<ModuleInfo>();
+				Logger.LogDebug("Run(): moduleList → {ModuleList}", moduleList);
 
                 foreach (var objModuleDefinition in ModuleDefinitionController.GetModuleDefinitionsByDesktopModuleID(desktopModule.DesktopModuleID).Values)
                 {
                     var objModule = new ModuleInfo();
+					Logger.LogDebug("Run(): objModule → {ObjModule}", objModule);
                     objModule.Initialize(this.PortalSettings.PortalId);
 
                     objModule.PortalID = this.PortalSettings.PortalId;
+					Logger.LogDebug("Run(): objModule.PortalID → {Arg0}", objModule.PortalID);
+					Logger.LogDebug("Run(): objModule.TabID → {Arg0}", objModule.TabID);
+					Logger.LogDebug("Run(): objModule.ModuleOrder → {Arg0}", objModule.ModuleOrder);
                     objModule.TabID = this.PageId;
                     objModule.ModuleOrder = 0;
                     objModule.ModuleTitle = string.IsNullOrEmpty(this.ModuleTitle) ? objModuleDefinition.FriendlyName : this.ModuleTitle;
                     objModule.PaneName = this.Pane;
+					Logger.LogDebug("Run(): objModule.PaneName → {Arg0}", objModule.PaneName);
+					Logger.LogDebug("Run(): objModule.ModuleDefID → {Arg0}", objModule.ModuleDefID);
                     objModule.ModuleDefID = objModuleDefinition.ModuleDefID;
                     if (objModuleDefinition.DefaultCacheTime > 0)
                     {
                         objModule.CacheTime = objModuleDefinition.DefaultCacheTime;
+						Logger.LogDebug("Run(): objModule.CacheTime → {Arg0}", objModule.CacheTime);
                         if (this.PortalSettings.DefaultModuleId > Null.NullInteger &&
                             this.PortalSettings.DefaultTabId > Null.NullInteger)
                         {
@@ -108,6 +122,7 @@ namespace DotNetNuke.Entities.Modules.Prompt
                     if (this.PortalSettings.ContentLocalizationEnabled)
                     {
                         var defaultLocale = LocaleController.Instance.GetDefaultLocale(this.PortalSettings.PortalId);
+						Logger.LogDebug("Run(): defaultLocale → {DefaultLocale}", defaultLocale);
 
                         // check whether original tab is exists, if true then set culture code to default language,
                         // otherwise set culture code to current.
@@ -120,9 +135,12 @@ namespace DotNetNuke.Entities.Modules.Prompt
                     else
                     {
                         objModule.CultureCode = Null.NullString;
+						Logger.LogDebug("Run(): objModule.CultureCode → {Arg0}", objModule.CultureCode);
                     }
 
                     objModule.AllTabs = false;
+					Logger.LogDebug("Run(): objModule.AllTabs → {Arg0}", objModule.AllTabs);
+					Logger.LogDebug("Run(): objModule.Alignment → {Arg0}", objModule.Alignment);
                     objModule.Alignment = null;
 
                     ModuleController.Instance.AddModule(objModule);
@@ -130,6 +148,7 @@ namespace DotNetNuke.Entities.Modules.Prompt
 
                     // Set position so future additions to page can operate correctly
                     var position = ModuleController.Instance.GetTabModule(objModule.TabModuleID).ModuleOrder + 1;
+					Logger.LogDebug("Run(): position → {Position}", position);
                 }
 
                 if (moduleList == null)
@@ -143,12 +162,14 @@ namespace DotNetNuke.Entities.Modules.Prompt
                 }
 
                 var modules = moduleList.Select(newModule => ModuleController.Instance.GetTabModule(newModule.TabModuleID)).ToList();
+				Logger.LogDebug("Run(): modules → {Modules}", modules);
 
                 return new ConsoleResultModel(string.Format(CultureInfo.CurrentCulture, this.LocalizeString("Prompt_ModuleAdded"), modules.Count, moduleList.Count == 1 ? string.Empty : "s")) { Data = modules, Records = modules.Count };
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting Run()");
                 return new ConsoleErrorResultModel(this.LocalizeString("Prompt_AddModuleError"));
             }
         }

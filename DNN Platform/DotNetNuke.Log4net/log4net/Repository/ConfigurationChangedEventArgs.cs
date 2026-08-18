@@ -36,7 +36,11 @@ namespace log4net.Repository
         /// <param name="configurationMessages"></param>
         public ConfigurationChangedEventArgs(ICollection configurationMessages)
         {
+			value.LogDebug(">>> Entering ConfigurationChangedEventArgs(configurationMessages={ConfigurationMessages})", configurationMessages);
             this.configurationMessages = configurationMessages;
+			value.LogDebug("ConfigurationChangedEventArgs(configurationMessages={ConfigurationMessages}): this.configurationMessages → {Arg1}", configurationMessages, this.configurationMessages);
+			value.LogDebug("ConfigurationChangedEventArgs(configurationMessages={ConfigurationMessages}): configurationMessages → {ConfigurationMessages1}", configurationMessages, configurationMessages);
+			value.LogDebug("<<< Exiting ConfigurationChangedEventArgs(configurationMessages={ConfigurationMessages})", configurationMessages);
         }
 
         /// <summary>

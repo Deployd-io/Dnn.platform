@@ -19,12 +19,16 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc />
         public CheckResult Execute()
         {
+			eventLogger.LogDebug(">>> Entering Execute()");
             var result = new CheckResult(SeverityEnum.Unverified, this.Id);
             try
+			eventLogger.LogDebug("Execute(): result → {Result}", result);
             {
                 var totalRecords = 0;
 
                 var superUsers = UserController.GetUsers(-1, 1, int.MaxValue, ref totalRecords, false, true);
+				eventLogger.LogDebug("Execute(): superUsers → {SuperUsers}", superUsers);
+				eventLogger.LogDebug("Execute(): result.Severity → {Arg0}", result.Severity);
                 result.Severity = SeverityEnum.Pass;
                 foreach (UserInfo user in superUsers)
                 {
@@ -38,6 +42,8 @@ namespace Dnn.PersonaBar.Security.Components.Checks
             }
             catch (Exception)
             {
+				eventLogger.LogError("Exception in Execute(): {Arg0}", Exception.Message);
+			eventLogger.LogDebug("<<< Exiting Execute()");
                 throw;
             }
 

@@ -17,6 +17,7 @@ namespace DotNetNuke.UI.Skins.Controls
     /// </summary>
     public partial class TreeViewMenu : NavObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TreeViewMenu.ascx));
         private const string MyFileName = "TreeViewMenu.ascx";
         private string bodyCssClass = string.Empty;
         private string cssClass = string.Empty;
@@ -44,7 +45,9 @@ namespace DotNetNuke.UI.Skins.Controls
         public TreeViewMenu()
             : base()
         {
+		Logger.LogDebug(">>> Entering TreeViewMenu()");
         }
+		Logger.LogDebug("<<< Exiting TreeViewMenu()");
 
         /// <summary>Initializes a new instance of the <see cref="TreeViewMenu"/> class.</summary>
         /// <param name="serviceProvider">The service provider.</param>
@@ -330,6 +333,7 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             try
             {
@@ -402,32 +406,41 @@ namespace DotNetNuke.UI.Skins.Controls
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             this.InitializeTree();
             this.InitializeNavControl(this.cellBody, "DNNTreeNavigationProvider");
             this.Control.NodeClick += this.DNNTree_NodeClick;
             this.Control.PopulateOnDemand += this.DNNTree_PopulateOnDemand;
             base.OnInit(e);
             this.InitializeComponent();
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         private void InitializeComponent()
         {
+		Logger.LogDebug(">>> Entering InitializeComponent()");
+		Logger.LogDebug("<<< Exiting InitializeComponent()");
         }
 
         /// <summary>The BuildTree helper method is used to build the tree.</summary>
         private void BuildTree(DNNNode objNode, bool blnPODRequest)
         {
+			Logger.LogDebug(">>> Entering BuildTree(objNode={ObjNode},blnPODRequest={BlnPODRequest})", objNode, blnPODRequest);
             bool blnAddUpNode = false;
             DNNNodeCollection objNodes;
+			Logger.LogDebug("BuildTree(objNode={ObjNode},blnPODRequest={BlnPODRequest}): blnAddUpNode → {BlnAddUpNode}", objNode, blnPODRequest, blnAddUpNode);
             objNodes = this.GetNavigationNodes(objNode);
 
+			Logger.LogDebug("BuildTree(objNode={ObjNode},blnPODRequest={BlnPODRequest}): objNodes → {ObjNodes}", objNode, blnPODRequest, objNodes);
             if (blnPODRequest == false)
             {
                 if (!string.IsNullOrEmpty(this.Level))
@@ -454,13 +467,17 @@ namespace DotNetNuke.UI.Skins.Controls
             if (blnAddUpNode)
             {
                 var objParentNode = new DNNNode();
+				Logger.LogDebug("BuildTree(objNode={ObjNode},blnPODRequest={BlnPODRequest}): objParentNode → {ObjParentNode}", objNode, blnPODRequest, objParentNode);
                 objParentNode.ID = this.PortalSettings.ActiveTab.ParentId.ToString();
                 objParentNode.Key = objParentNode.ID;
+				Logger.LogDebug("BuildTree(objNode={ObjNode},blnPODRequest={BlnPODRequest}): objParentNode.Key → {Arg2}", objNode, blnPODRequest, objParentNode.Key);
                 objParentNode.Text = Localization.GetString("Parent", Localization.GetResourceFile(this, MyFileName));
                 objParentNode.ToolTip = Localization.GetString("GoUp", Localization.GetResourceFile(this, MyFileName));
                 objParentNode.CSSClass = this.NodeCssClass;
+				Logger.LogDebug("BuildTree(objNode={ObjNode},blnPODRequest={BlnPODRequest}): objParentNode.CSSClass → {Arg2}", objNode, blnPODRequest, objParentNode.CSSClass);
                 objParentNode.Image = this.ResolveUrl(this.TreeGoUpImage);
                 objParentNode.ClickAction = eClickAction.PostBack;
+				Logger.LogDebug("BuildTree(objNode={ObjNode},blnPODRequest={BlnPODRequest}): objParentNode.ClickAction → {Arg2}", objNode, blnPODRequest, objParentNode.ClickAction);
                 objNodes.InsertBefore(0, objParentNode);
             }
 
@@ -476,9 +493,11 @@ namespace DotNetNuke.UI.Skins.Controls
             if (this.Control.NavigationControl is DnnTree)
             {
                 var objTree = (DnnTree)this.Control.NavigationControl;
+				Logger.LogDebug("BuildTree(objNode={ObjNode},blnPODRequest={BlnPODRequest}): objTree → {ObjTree}", objNode, blnPODRequest, objTree);
                 if (objTree.SelectedTreeNodes.Count > 0)
                 {
                     var objTNode = (TreeNode)objTree.SelectedTreeNodes[1];
+					Logger.LogDebug("BuildTree(objNode={ObjNode},blnPODRequest={BlnPODRequest}): objTNode → {ObjTNode}", objNode, blnPODRequest, objTNode);
                     if (objTNode.DNNNodes.Count > 0)
                     {
                         // only expand it if nodes are not pending
@@ -486,10 +505,12 @@ namespace DotNetNuke.UI.Skins.Controls
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting BuildTree(objNode={ObjNode},blnPODRequest={BlnPODRequest})", objNode, blnPODRequest);
         }
 
         private void ProcessNodes(DNNNode objParent)
         {
+			Logger.LogDebug(">>> Entering ProcessNodes(objParent={ObjParent})", objParent);
             if (!string.IsNullOrEmpty(objParent.Image))
             {
             }
@@ -507,14 +528,17 @@ namespace DotNetNuke.UI.Skins.Controls
             {
                 this.ProcessNodes(objNode);
             }
+			Logger.LogDebug("<<< Exiting ProcessNodes(objParent={ObjParent})", objParent);
         }
 
         /// <summary>Sets common properties on DNNTree control.</summary>
         private void InitializeTree()
         {
+			Logger.LogDebug(">>> Entering InitializeTree()");
             if (string.IsNullOrEmpty(this.PathImage))
             {
                 this.PathImage = this.PortalSettings.HomeDirectory;
+				Logger.LogDebug("InitializeTree(): this.PathImage → {Arg0}", this.PathImage);
             }
 
             if (string.IsNullOrEmpty(this.PathSystemImage))
@@ -545,32 +569,39 @@ namespace DotNetNuke.UI.Skins.Controls
             if (string.IsNullOrEmpty(this.CSSNode))
             {
                 this.CSSNode = this.NodeChildCssClass;
+				Logger.LogDebug("InitializeTree(): this.CSSNode → {Arg0}", this.CSSNode);
             }
 
             if (string.IsNullOrEmpty(this.CSSNodeRoot))
             {
                 this.CSSNodeRoot = this.NodeCssClass;
+				Logger.LogDebug("InitializeTree(): this.CSSNodeRoot → {Arg0}", this.CSSNodeRoot);
             }
 
             if (string.IsNullOrEmpty(this.CSSNodeHover))
             {
                 this.CSSNodeHover = this.NodeOverCssClass;
+				Logger.LogDebug("InitializeTree(): this.CSSNodeHover → {Arg0}", this.CSSNodeHover);
             }
 
             if (string.IsNullOrEmpty(this.CSSNodeSelectedRoot))
             {
                 this.CSSNodeSelectedRoot = this.NodeSelectedCssClass;
+				Logger.LogDebug("InitializeTree(): this.CSSNodeSelectedRoot → {Arg0}", this.CSSNodeSelectedRoot);
             }
 
             if (string.IsNullOrEmpty(this.CSSNodeSelectedSub))
             {
                 this.CSSNodeSelectedSub = this.NodeSelectedCssClass;
+				Logger.LogDebug("InitializeTree(): this.CSSNodeSelectedSub → {Arg0}", this.CSSNodeSelectedSub);
             }
 
             if (string.IsNullOrEmpty(this.CSSControl))
             {
                 this.CSSControl = this.TreeCssClass;
+				Logger.LogDebug("InitializeTree(): this.CSSControl → {Arg0}", this.CSSControl);
             }
+			Logger.LogDebug("<<< Exiting InitializeTree()");
         }
 
         /// <summary>
@@ -582,22 +613,26 @@ namespace DotNetNuke.UI.Skins.Controls
         /// </remarks>
         private void DNNTree_NodeClick(NavigationEventArgs args)
         {
+			Logger.LogDebug(">>> Entering DNNTree_NodeClick(args={Args})", args);
             if (args.Node == null)
             {
                 args.Node = Navigation.GetNavigationNode(args.ID, this.Control.ID);
             }
 
             this.Response.Redirect(Globals.ApplicationURL(int.Parse(args.Node.Key)), true);
+			Logger.LogDebug("<<< Exiting DNNTree_NodeClick(args={Args})", args);
         }
 
         private void DNNTree_PopulateOnDemand(NavigationEventArgs args)
         {
+			Logger.LogDebug(">>> Entering DNNTree_PopulateOnDemand(args={Args})", args);
             if (args.Node == null)
             {
                 args.Node = Navigation.GetNavigationNode(args.ID, this.Control.ID);
             }
 
             this.BuildTree(args.Node, true);
+			Logger.LogDebug("<<< Exiting DNNTree_PopulateOnDemand(args={Args})", args);
         }
     }
 }

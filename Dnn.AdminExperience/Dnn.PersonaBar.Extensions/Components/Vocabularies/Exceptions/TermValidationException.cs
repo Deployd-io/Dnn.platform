@@ -12,6 +12,8 @@ namespace Dnn.PersonaBar.Vocabularies.Exceptions
         public TermValidationException()
             : base(Constants.TermValidationError)
         {
+		eventLogger.LogDebug(">>> Entering TermValidationException()");
+		eventLogger.LogDebug("<<< Exiting TermValidationException()");
         }
     }
 }

@@ -10,9 +10,11 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A tab strip control.</summary>
     public class DnnFormTabStrip : ListControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnFormTabStrip));
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer);
             writer.AddAttribute(HtmlTextWriterAttribute.Class, this.CssClass);
             writer.RenderBeginTag(HtmlTextWriterTag.Ul);
 
@@ -30,6 +32,7 @@ namespace DotNetNuke.Web.UI.WebControls
             }
 
             writer.RenderEndTag();
+			Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer);
         }
     }
 }

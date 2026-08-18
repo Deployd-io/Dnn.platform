@@ -7,10 +7,14 @@ namespace DotNetNuke.Entities.Content.Workflow.Dto
     /// <summary>This class represents the message that will be notified on workflow state transaction.</summary>
     public class StateTransactionMessage
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(StateTransactionMessage));
         /// <summary>Initializes a new instance of the <see cref="StateTransactionMessage"/> class.</summary>
         public StateTransactionMessage()
         {
+			Logger.LogDebug(">>> Entering StateTransactionMessage()");
             this.Params = [];
+			Logger.LogDebug("StateTransactionMessage(): this.Params → {Arg0}", this.Params);
+			Logger.LogDebug("<<< Exiting StateTransactionMessage()");
         }
 
         /// <summary>Gets or sets params of the message.</summary>

@@ -5,12 +5,14 @@ namespace DotNetNuke.Internal.SourceGenerators;
 
 using System;
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 /// <summary>Marks a type or member as deprecated.</summary>
 [Conditional("DNN_SOURCE_GENERATOR")]
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct | AttributeTargets.Method)]
 public class DnnDeprecatedAttribute : Attribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>Initializes a new instance of the <see cref="DnnDeprecatedAttribute"/> class.</summary>
     /// <param name="majorVersion">The major version in which the type or member was deprecated.</param>
     /// <param name="minorVersion">The minor version in which the type or member was deprecated.</param>
@@ -19,6 +21,9 @@ public class DnnDeprecatedAttribute : Attribute
     public DnnDeprecatedAttribute(int majorVersion, int minorVersion, int patchVersion, string replacement)
         : this(majorVersion, minorVersion, patchVersion, replacement, false)
     {
+	_logger.LogDebug(">>> Entering DnnDeprecatedAttribute(majorVersion={MajorVersion},minorVersion={MinorVersion},patchVersion={PatchVersion},replacement={Replacement})", majorVersion, minorVersion, patchVersion, replacement);
+	_logger.LogDebug("<<< Exiting DnnDeprecatedAttribute(majorVersion={MajorVersion},minorVersion={MinorVersion},patchVersion={PatchVersion},replacement={Replacement})", majorVersion, minorVersion, patchVersion, replacement);
+	_logger.LogDebug(">>> Entering DnnDeprecatedAttribute(majorVersion={MajorVersion},minorVersion={MinorVersion},patchVersion={PatchVersion},replacement={Replacement},error={Error})", majorVersion, minorVersion, patchVersion, replacement, error);
     }
 
     /// <summary>Initializes a new instance of the <see cref="DnnDeprecatedAttribute"/> class.</summary>
@@ -31,10 +36,14 @@ public class DnnDeprecatedAttribute : Attribute
     {
         this.MajorVersion = majorVersion;
         this.MinorVersion = minorVersion;
+		_logger.LogDebug("DnnDeprecatedAttribute(majorVersion={MajorVersion},minorVersion={MinorVersion},patchVersion={PatchVersion},replacement={Replacement},error={Error}): this.MajorVersion → {Arg5}", majorVersion, minorVersion, patchVersion, replacement, error, this.MajorVersion);
+		_logger.LogDebug("DnnDeprecatedAttribute(majorVersion={MajorVersion},minorVersion={MinorVersion},patchVersion={PatchVersion},replacement={Replacement},error={Error}): this.MinorVersion → {Arg5}", majorVersion, minorVersion, patchVersion, replacement, error, this.MinorVersion);
         this.PatchVersion = patchVersion;
         this.Replacement = replacement;
         this.IsError = error;
+		_logger.LogDebug("DnnDeprecatedAttribute(majorVersion={MajorVersion},minorVersion={MinorVersion},patchVersion={PatchVersion},replacement={Replacement},error={Error}): this.PatchVersion → {Arg5}", majorVersion, minorVersion, patchVersion, replacement, error, this.PatchVersion);
         this.RemovalVersion = majorVersion + 2;
+		_logger.LogDebug("<<< Exiting DnnDeprecatedAttribute(majorVersion={MajorVersion},minorVersion={MinorVersion},patchVersion={PatchVersion},replacement={Replacement},error={Error})", majorVersion, minorVersion, patchVersion, replacement, error);
     }
 
     /// <summary>Gets the major version in which the type or member was deprecated.</summary>

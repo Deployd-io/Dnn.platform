@@ -5,12 +5,17 @@ import
 { CommonPortalService as PortalService }
     from "../services";
 import utilities from "utils";
+const logger = console;
 
 function errorCallback(message) {
+	logger.debug(`>>> Entering errorCallback(message=${message})`);
     utilities.notifyError(JSON.parse(message.responseText).Message, 5000);
+	logger.debug(`<<< Exiting errorCallback(message=${message})`);
 }
 const portalActions = {
     deletePortal(portalId, index, callback) {
+		logger.debug(`>>> Entering deletePortal(portalId=${portalId},index=${index},callback=${callback})`);
+		logger.debug(`<<< Exiting deletePortal(portalId=${portalId},index=${index},callback=${callback})`);
         return (dispatch) => {
             PortalService.deletePortal(portalId, data => {
                 dispatch({
@@ -27,6 +32,8 @@ const portalActions = {
         };
     },
     getPortalTemplates(callback) {
+		logger.debug(`>>> Entering getPortalTemplates(callback=${callback})`);
+		logger.debug(`<<< Exiting getPortalTemplates(callback=${callback})`);
         return (dispatch) => {
             PortalService.getPortalTemplates(data => {
                 dispatch({
@@ -43,6 +50,8 @@ const portalActions = {
         };
     },
     createPortal(payload, success, fail) {
+		logger.debug(`>>> Entering createPortal(payload=${payload},success=${success},fail=${fail})`);
+		logger.debug(`<<< Exiting createPortal(payload=${payload},success=${success},fail=${fail})`);
         return (dispatch) => {
             PortalService.createPortal(payload, data => {
                 dispatch({
@@ -64,6 +73,8 @@ const portalActions = {
         };
     },
     loadPortals(searchParameters, append, callback) {
+		logger.debug(`>>> Entering loadPortals(searchParameters=${searchParameters},append=${append},callback=${callback})`);
+		logger.debug(`<<< Exiting loadPortals(searchParameters=${searchParameters},append=${append},callback=${callback})`);
         return (dispatch) => {
             PortalService.getPortals(searchParameters, data => {
                 if (append) {

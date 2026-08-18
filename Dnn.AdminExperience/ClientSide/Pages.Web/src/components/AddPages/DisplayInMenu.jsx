@@ -1,12 +1,15 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Localization from "../../localization";
+const logger = console;
 import { Label, Switch } from "@dnnsoftware/dnn-react-common";
 
 class DisplayInMenu extends Component {
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
+		logger.debug('<<< Exiting render()');
         return <div className="input-group">
             <Label
                 labelType="inline"

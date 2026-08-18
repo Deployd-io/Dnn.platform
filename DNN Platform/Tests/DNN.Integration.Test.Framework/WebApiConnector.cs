@@ -23,9 +23,11 @@ namespace DNN.Integration.Test.Framework
     using DNN.Integration.Test.Framework.Controllers;
     using DNN.Integration.Test.Framework.Helpers;
     using DotNetNuke.Common.Utilities;
+	using Microsoft.Extensions.Logging;
 
     internal class WebApiConnector : IWebApiConnector, IDisposable
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public const string FileFilters =
             "swf,jpg,jpeg,jpe,gif,bmp,png,doc,docx,xls,xlsx,ppt,pptx,pdf,txt,xml," +
             "xsl,xsd,css,zip,template,htmtemplate,ico,avi,mpg,mpeg,mp3,wmv,mov,wav";
@@ -63,13 +65,19 @@ namespace DNN.Integration.Test.Framework
 
         private WebApiConnector(string siteUrl)
         {
+			_logger.LogDebug(">>> Entering WebApiConnector(siteUrl={SiteUrl})", siteUrl);
             this.Timeout = TimeSpan.FromMinutes(1);
             this.Domain = new Uri(siteUrl);
             this.IsLoggedIn = false;
+			_logger.LogDebug("WebApiConnector(siteUrl={SiteUrl}): this.IsLoggedIn → {Arg1}", siteUrl, this.IsLoggedIn);
             this.ResetUserId();
             this._sessionCookiesContainer = new CookieContainer();
+			_logger.LogDebug("WebApiConnector(siteUrl={SiteUrl}): _sessionCookiesContainer → {_sessionCookiesContainer}", siteUrl, _sessionCookiesContainer);
             this._cookieVerificationToken = new Cookie(RqVerifTokenName, string.Empty, "/", this.Domain.Host);
+			_logger.LogDebug("WebApiConnector(siteUrl={SiteUrl}): _cookieVerificationToken → {_cookieVerificationToken}", siteUrl, _cookieVerificationToken);
             this.AvoidCaching = false;
+			_logger.LogDebug("WebApiConnector(siteUrl={SiteUrl}): this.AvoidCaching → {Arg1}", siteUrl, this.AvoidCaching);
+			_logger.LogDebug("<<< Exiting WebApiConnector(siteUrl={SiteUrl})", siteUrl);
         }
 
         /// <summary>
@@ -121,6 +129,8 @@ namespace DNN.Integration.Test.Framework
 
         public static WebApiConnector GetWebConnector(string siteUrl, string userName)
         {
+			_logger.LogDebug(">>> Entering GetWebConnector(siteUrl={SiteUrl},userName={UserName})", siteUrl, userName);
+			_logger.LogDebug("<<< Exiting GetWebConnector(siteUrl={SiteUrl},userName={UserName})", siteUrl, userName);
             return new WebApiConnector(siteUrl)
             {
                 UserName = (userName ?? string.Empty).Replace("'", string.Empty),
@@ -129,20 +139,33 @@ namespace DNN.Integration.Test.Framework
 
         public void Dispose()
         {
+			_logger.LogDebug(">>> Entering Dispose()");
             this.Logout();
+			_logger.LogDebug("<<< Exiting Dispose()");
         }
 
         public void Logout()
         {
+			_logger.LogDebug(">>> Entering Logout()");
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (this.IsLoggedIn)
             {
                 this.LoggedInAtTime = DateTime.MinValue;
+				_logger.LogDebug("Logout(): this.LoggedInAtTime → {Arg0}", this.LoggedInAtTime);
                 this.IsLoggedIn = false;
                 this.ResetUserId();
+				_logger.LogDebug("Logout(): this.IsLoggedIn → {Arg0}", this.IsLoggedIn);
                 try
                 {
                     var requestUriString = CombineUrlPath(this.Domain, LogoffPath);
+					_logger.LogDebug("Logout(): requestUriString → {RequestUriString}", requestUriString);
                     var httpWebRequest1 = (HttpWebRequest)WebRequest.Create(requestUriString);
+					_logger.LogDebug("Logout(): httpWebRequest1 → {HttpWebRequest1}", httpWebRequest1);
+					_logger.LogDebug("Logout(): httpWebRequest1.Method → {Arg0}", httpWebRequest1.Method);
+					_logger.LogDebug("Logout(): httpWebRequest1.KeepAlive → {Arg0}", httpWebRequest1.KeepAlive);
+					_logger.LogDebug("Logout(): httpWebRequest1.CookieContainer → {Arg0}", httpWebRequest1.CookieContainer);
+					_logger.LogDebug("Logout(): httpWebRequest1.ReadWriteTimeout → {Arg0}", httpWebRequest1.ReadWriteTimeout);
+					_logger.LogDebug("Logout(): httpWebRequest1.UserAgent → {Arg0}", httpWebRequest1.UserAgent);
                     httpWebRequest1.Method = "GET";
                     httpWebRequest1.KeepAlive = false;
                     httpWebRequest1.CookieContainer = this._sessionCookiesContainer;
@@ -156,14 +179,19 @@ namespace DNN.Integration.Test.Framework
                 finally
                 {
                     this._cookieVerificationToken = null;
+					_logger.LogDebug("Logout(): _cookieVerificationToken → {_cookieVerificationToken}", _cookieVerificationToken);
+					_logger.LogDebug("Logout(): this._cookieVerificationToken → {Arg0}", this._cookieVerificationToken);
                     this._sessionCookiesContainer = new CookieContainer();
 
+					_logger.LogDebug("Logout(): _sessionCookiesContainer → {_sessionCookiesContainer}", _sessionCookiesContainer);
                     var url = CombineUrlPath(this.Domain, "/");
+					_logger.LogDebug("Logout(): url → {Url}", url);
                     CachedWebPage cachedPage;
                     if (!this.AvoidCaching && CachedPages.TryGetValue(url, out cachedPage) &&
                         cachedPage.FetchDateTime < DateTime.Now.AddMinutes(-19.5))
                     {
                         this._inputFieldVerificationToken = cachedPage.VerificationToken;
+						_logger.LogDebug("Logout(): this._inputFieldVerificationToken → {Arg0}", this._inputFieldVerificationToken);
                     }
                     else
                     {
@@ -171,10 +199,13 @@ namespace DNN.Integration.Test.Framework
                     }
                 }
             }
+			_logger.LogInformation("Logout(): external service call {RequestUriString} took {Arg1} ms", requestUriString, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting Logout()");
         }
 
         public bool Login(string password)
         {
+			_logger.LogDebug(">>> Entering Login(password=<redacted>)");
             if (this.IsLoggedIn)
             {
                 return true;
@@ -194,6 +225,7 @@ namespace DNN.Integration.Test.Framework
                 };
 
             var excludedInputPrefixes = new List<string>();
+			_logger.LogDebug("Login(password=<redacted>): excludedInputPrefixes → {ExcludedInputPrefixes}", excludedInputPrefixes);
 
             // CombineUrlPath(_domain, LoginPath);
             using (var httpResponse2 = this.PostUserForm(LoginPath, postData, excludedInputPrefixes, false))
@@ -210,8 +242,10 @@ namespace DNN.Integration.Test.Framework
             if (this.IsLoggedIn)
             {
                 this.LoggedInAtTime = DateTime.Now;
+				_logger.LogDebug("Login(password=<redacted>): this.LoggedInAtTime → {Arg1}", this.LoggedInAtTime);
             }
 
+			_logger.LogDebug("<<< Exiting Login(password=<redacted>)");
             return this.IsLoggedIn;
         }
 
@@ -220,29 +254,43 @@ namespace DNN.Integration.Test.Framework
             bool waitHttpResponse = true,
             int userId = -1)
         {
+			_logger.LogDebug(">>> Entering UploadUserFile(fileName={FileName},waitHttpResponse={WaitHttpResponse},userId={UserId})", fileName, waitHttpResponse, userId);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             this.EnsureLoggedIn();
 
             var folder = "Users";
+			_logger.LogDebug("UploadUserFile(fileName={FileName},waitHttpResponse={WaitHttpResponse},userId={UserId}): folder → {Folder}", fileName, waitHttpResponse, userId, folder);
             if (userId > Null.NullInteger)
             {
                 var rootFolder = PathUtils.GetUserFolderPathElement(userId, PathUtils.UserFolderElement.Root);
+				_logger.LogDebug("UploadUserFile(fileName={FileName},waitHttpResponse={WaitHttpResponse},userId={UserId}): rootFolder → {RootFolder}", fileName, waitHttpResponse, userId, rootFolder);
                 var subFolder = PathUtils.GetUserFolderPathElement(userId, PathUtils.UserFolderElement.SubFolder);
+				_logger.LogDebug("UploadUserFile(fileName={FileName},waitHttpResponse={WaitHttpResponse},userId={UserId}): subFolder → {SubFolder}", fileName, waitHttpResponse, userId, subFolder);
                 folder = $"Users/{rootFolder}/{subFolder}/{userId}/";
             }
 
+			_logger.LogInformation("UploadUserFile(fileName,waitHttpResponse,userId)={FileName},{WaitHttpResponse},{UserId}: external service call took {Arg3} ms", fileName, waitHttpResponse, userId, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting UploadUserFile(fileName={FileName},waitHttpResponse={WaitHttpResponse},userId={UserId})", fileName, waitHttpResponse, userId);
             return await this.UploadFile(fileName, folder, waitHttpResponse);
         }
 
         public HttpResponseMessage ActivityStreamUploadUserFile(IDictionary<string, string> headers, string fileName)
         {
+			_logger.LogDebug(">>> Entering ActivityStreamUploadUserFile(headers={Headers},fileName={FileName})", headers, fileName);
             this.EnsureLoggedIn();
+			_logger.LogDebug("<<< Exiting ActivityStreamUploadUserFile(headers={Headers},fileName={FileName})", headers, fileName);
             return this.ActivityStreamUploadFile(headers, fileName);
         }
 
         public async Task<bool> UploadCmsFile(string fileName, string portalFolder)
         {
+			_logger.LogDebug(">>> Entering UploadCmsFile(fileName={FileName},portalFolder={PortalFolder})", fileName, portalFolder);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             this.EnsureLoggedIn();
             var result = await this.UploadFile(fileName, portalFolder);
+			_logger.LogDebug("UploadCmsFile(fileName={FileName},portalFolder={PortalFolder}): result → {Result}", fileName, portalFolder, result);
+			_logger.LogInformation("UploadCmsFile(fileName,portalFolder)={FileName},{PortalFolder}: external service call took {Arg2} ms", fileName, portalFolder, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting UploadCmsFile(fileName={FileName},portalFolder={PortalFolder})", fileName, portalFolder);
             return result.IsSuccessStatusCode;
         }
 
@@ -279,10 +327,13 @@ namespace DNN.Integration.Test.Framework
 
                 var requestUriString = CombineUrlPath(this.Domain, relativeUrl);
                 var result = client.PostAsJsonAsync(requestUriString, content).Result;
+				_logger.LogDebug(">>> Entering CreateHttpClient(path={Path},autoRedirect={AutoRedirect})", path, autoRedirect);
+				_logger.LogDebug("<<< Exiting CreateHttpClient(path={Path},autoRedirect={AutoRedirect})", path, autoRedirect);
                 return !waitHttpResponse
                     ? result
                     : EnsureSuccessResponse(result, "PostJson", requestUriString);
             }
+			_logger.LogDebug("<<< Exiting PostJson(relativeUrl={RelativeUrl},content={Content},contentHeaders={ContentHeaders},waitHttpResponse={WaitHttpResponse},ignoreLoggedIn={IgnoreLoggedIn})", relativeUrl, content, contentHeaders, waitHttpResponse, ignoreLoggedIn);
         }
 
         public HttpResponseMessage PutJson(
@@ -322,11 +373,14 @@ namespace DNN.Integration.Test.Framework
                     ? result
                     : EnsureSuccessResponse(result, "PutJson", requestUriString);
             }
+			_logger.LogDebug("<<< Exiting PutJson(relativeUrl={RelativeUrl},content={Content},contentHeaders={ContentHeaders},waitHttpResponse={WaitHttpResponse},ignoreLoggedIn={IgnoreLoggedIn})", relativeUrl, content, contentHeaders, waitHttpResponse, ignoreLoggedIn);
         }
 
         public HttpWebResponse PostUserForm(string relativeUrl, IDictionary<string, object> formFields,
             List<string> excludedInputPrefixes, bool checkUserLoggedIn = true, bool followRedirect = false)
         {
+			_logger.LogDebug(">>> Entering PostUserForm(relativeUrl={RelativeUrl},formFields={FormFields},excludedInputPrefixes={ExcludedInputPrefixes},checkUserLoggedIn={CheckUserLoggedIn},followRedirect={FollowRedirect})", relativeUrl, formFields, excludedInputPrefixes, checkUserLoggedIn, followRedirect);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (checkUserLoggedIn)
             {
                 this.EnsureLoggedIn();
@@ -338,6 +392,7 @@ namespace DNN.Integration.Test.Framework
             };
 
             var postParameters = new Dictionary<string, object>();
+			_logger.LogDebug("PostUserForm(relativeUrl={RelativeUrl},formFields={FormFields},excludedInputPrefixes={ExcludedInputPrefixes},checkUserLoggedIn={CheckUserLoggedIn},followRedirect={FollowRedirect}): postParameters → {PostParameters}", relativeUrl, formFields, excludedInputPrefixes, checkUserLoggedIn, followRedirect, postParameters);
             string[] inputFields;
             using (var client = new HttpClient(clientHandler)
             {
@@ -349,6 +404,7 @@ namespace DNN.Integration.Test.Framework
             }
 
             var firstField = formFields.First().Key;
+			_logger.LogDebug("PostUserForm(relativeUrl={RelativeUrl},formFields={FormFields},excludedInputPrefixes={ExcludedInputPrefixes},checkUserLoggedIn={CheckUserLoggedIn},followRedirect={FollowRedirect}): firstField → {FirstField}", relativeUrl, formFields, excludedInputPrefixes, checkUserLoggedIn, followRedirect, firstField);
             if (!inputFields.Any(f => f.Contains(firstField)))
             {
                 // the form doesn't have the proper input fields
@@ -362,6 +418,7 @@ namespace DNN.Integration.Test.Framework
             foreach (var field in inputFields)
             {
                 XElement xe = null;
+				_logger.LogDebug("PostUserForm(relativeUrl={RelativeUrl},formFields={FormFields},excludedInputPrefixes={ExcludedInputPrefixes},checkUserLoggedIn={CheckUserLoggedIn},followRedirect={FollowRedirect}): xe → {Xe}", relativeUrl, formFields, excludedInputPrefixes, checkUserLoggedIn, followRedirect, xe);
                 try
                 {
                     // fixes the error in HTML file input fields; e.g.:
@@ -384,8 +441,11 @@ namespace DNN.Integration.Test.Framework
                                 : xe.Attributes().ToArray();
 
                 var inputType = attrs.FirstOrDefault(a => a.Name == "type");
+				_logger.LogDebug("PostUserForm(relativeUrl={RelativeUrl},formFields={FormFields},excludedInputPrefixes={ExcludedInputPrefixes},checkUserLoggedIn={CheckUserLoggedIn},followRedirect={FollowRedirect}): inputType → {InputType}", relativeUrl, formFields, excludedInputPrefixes, checkUserLoggedIn, followRedirect, inputType);
                 var inputName = attrs.FirstOrDefault(a => a.Name == "name");
+				_logger.LogDebug("PostUserForm(relativeUrl={RelativeUrl},formFields={FormFields},excludedInputPrefixes={ExcludedInputPrefixes},checkUserLoggedIn={CheckUserLoggedIn},followRedirect={FollowRedirect}): inputName → {InputName}", relativeUrl, formFields, excludedInputPrefixes, checkUserLoggedIn, followRedirect, inputName);
                 var inputValue = attrs.FirstOrDefault(a => a.Name == "value");
+				_logger.LogDebug("PostUserForm(relativeUrl={RelativeUrl},formFields={FormFields},excludedInputPrefixes={ExcludedInputPrefixes},checkUserLoggedIn={CheckUserLoggedIn},followRedirect={FollowRedirect}): inputValue → {InputValue}", relativeUrl, formFields, excludedInputPrefixes, checkUserLoggedIn, followRedirect, inputValue);
 
                 if (inputType != null && inputName != null)
                 {
@@ -397,6 +457,7 @@ namespace DNN.Integration.Test.Framework
                                 {
                                     var value = inputValue == null ? string.Empty : inputValue.Value;
                                     if (formFields.ContainsKey(inputName.Value))
+									_logger.LogDebug("PostUserForm(relativeUrl={RelativeUrl},formFields={FormFields},excludedInputPrefixes={ExcludedInputPrefixes},checkUserLoggedIn={CheckUserLoggedIn},followRedirect={FollowRedirect}): value → {Value}", relativeUrl, formFields, excludedInputPrefixes, checkUserLoggedIn, followRedirect, value);
                                     {
                                         value = formFields[inputName.Value].ToString();
                                     }
@@ -433,6 +494,7 @@ namespace DNN.Integration.Test.Framework
             if (excludedInputPrefixes != null)
             {
                 var keys = postParameters.Keys.ToArray();
+				_logger.LogDebug("PostUserForm(relativeUrl={RelativeUrl},formFields={FormFields},excludedInputPrefixes={ExcludedInputPrefixes},checkUserLoggedIn={CheckUserLoggedIn},followRedirect={FollowRedirect}): keys → {Keys}", relativeUrl, formFields, excludedInputPrefixes, checkUserLoggedIn, followRedirect, keys);
 
                 var filteredKeys = from prefix in excludedInputPrefixes
                                    from key in keys
@@ -448,14 +510,18 @@ namespace DNN.Integration.Test.Framework
             if (postParameters.Count > 0)
             {
                 var url = CombineUrlPath(this.Domain, relativeUrl);
+				_logger.LogDebug("PostUserForm(relativeUrl={RelativeUrl},formFields={FormFields},excludedInputPrefixes={ExcludedInputPrefixes},checkUserLoggedIn={CheckUserLoggedIn},followRedirect={FollowRedirect}): url → {Url}", relativeUrl, formFields, excludedInputPrefixes, checkUserLoggedIn, followRedirect, url);
                 return this.MultipartFormDataPost(url, this.UserAgentValue, postParameters, null, followRedirect);
             }
 
+			_logger.LogInformation("PostUserForm(relativeUrl,formFields,excludedInputPrefixes,checkUserLoggedIn,followRedirect)={RelativeUrl},{FormFields},{ExcludedInputPrefixes},{CheckUserLoggedIn},{FollowRedirect}: external service call {RelativeUrl1} took {Arg6} ms", relativeUrl, formFields, excludedInputPrefixes, checkUserLoggedIn, followRedirect, relativeUrl, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting PostUserForm(relativeUrl={RelativeUrl},formFields={FormFields},excludedInputPrefixes={ExcludedInputPrefixes},checkUserLoggedIn={CheckUserLoggedIn},followRedirect={FollowRedirect})", relativeUrl, formFields, excludedInputPrefixes, checkUserLoggedIn, followRedirect);
             return null;
         }
 
         public HttpWebResponse MultipartFormDataPost(string relativeUrl, IDictionary<string, object> postParameters, IDictionary<string, string> headers = null, bool followRedirect = false)
         {
+			_logger.LogDebug(">>> Entering MultipartFormDataPost(relativeUrl={RelativeUrl},postParameters={PostParameters},headers={Headers},followRedirect={FollowRedirect})", relativeUrl, postParameters, headers, followRedirect);
             var url = CombineUrlPath(this.Domain, relativeUrl);
             return this.MultipartFormDataPost(url, this.UserAgentValue, postParameters, headers, followRedirect);
         }
@@ -464,13 +530,16 @@ namespace DNN.Integration.Test.Framework
             string relativeUrl, object parameters, Dictionary<string, string> contentHeaders = null,
             bool waitHttpResponse = true, bool autoRedirect = true)
         {
+			_logger.LogDebug(">>> Entering GetContent(relativeUrl={RelativeUrl},parameters={Parameters},contentHeaders={ContentHeaders},waitHttpResponse={WaitHttpResponse},autoRedirect={AutoRedirect})", relativeUrl, parameters, contentHeaders, waitHttpResponse, autoRedirect);
             var url = relativeUrl + "?" + QueryStringFromObject(parameters);
+			_logger.LogDebug("<<< Exiting GetContent(relativeUrl={RelativeUrl},parameters={Parameters},contentHeaders={ContentHeaders},waitHttpResponse={WaitHttpResponse},autoRedirect={AutoRedirect})", relativeUrl, parameters, contentHeaders, waitHttpResponse, autoRedirect);
             return this.GetContent(url, contentHeaders, waitHttpResponse, autoRedirect);
         }
 
         public HttpResponseMessage GetContent(
             string relativeUrl, Dictionary<string, string> contentHeaders = null, bool waitHttpResponse = true, bool autoRedirect = true)
         {
+			_logger.LogDebug(">>> Entering GetContent(relativeUrl={RelativeUrl},contentHeaders={ContentHeaders},waitHttpResponse={WaitHttpResponse},autoRedirect={AutoRedirect})", relativeUrl, contentHeaders, waitHttpResponse, autoRedirect);
             using (var client = this.CreateHttpClient("/", autoRedirect))
             {
                 var rqHeaders = client.DefaultRequestHeaders;
@@ -488,8 +557,11 @@ namespace DNN.Integration.Test.Framework
                 }
 
                 var requestUriString = CombineUrlPath(this.Domain, relativeUrl);
+				_logger.LogDebug("GetContent(relativeUrl={RelativeUrl},contentHeaders={ContentHeaders},waitHttpResponse={WaitHttpResponse},autoRedirect={AutoRedirect}): requestUriString → {RequestUriString}", relativeUrl, contentHeaders, waitHttpResponse, autoRedirect, requestUriString);
                 var uri = new Uri(requestUriString);
+				_logger.LogDebug("GetContent(relativeUrl={RelativeUrl},contentHeaders={ContentHeaders},waitHttpResponse={WaitHttpResponse},autoRedirect={AutoRedirect}): uri → {Uri}", relativeUrl, contentHeaders, waitHttpResponse, autoRedirect, uri);
                 var result = client.GetAsync(uri.AbsoluteUri).Result;
+				_logger.LogDebug("GetContent(relativeUrl={RelativeUrl},contentHeaders={ContentHeaders},waitHttpResponse={WaitHttpResponse},autoRedirect={AutoRedirect}): result → {Result}", relativeUrl, contentHeaders, waitHttpResponse, autoRedirect, result);
                 return !waitHttpResponse
                     ? result
                     : EnsureSuccessResponse(result, "GetContent", uri.AbsoluteUri);
@@ -498,38 +570,48 @@ namespace DNN.Integration.Test.Framework
 
         private static string GetVerificationToken(string pageData)
         {
+			_logger.LogDebug(">>> Entering GetVerificationToken(pageData={PageData})", pageData);
             if (!string.IsNullOrEmpty(pageData))
             {
                 const string str1 = "<input name=\"" + RqVerifTokenName + "\" type=\"hidden\" value=\"";
                 var startIndex1 = pageData.IndexOf(str1, StringComparison.Ordinal) + str1.Length;
+				_logger.LogDebug("GetVerificationToken(pageData={PageData}): startIndex1 → {StartIndex1}", pageData, startIndex1);
                 if (startIndex1 >= str1.Length)
                 {
                     var num1 = pageData.IndexOf("\"", startIndex1, StringComparison.Ordinal);
+					_logger.LogDebug("GetVerificationToken(pageData={PageData}): num1 → {Num1}", pageData, num1);
                     return pageData.Substring(startIndex1, num1 - startIndex1);
                 }
             }
 
+			_logger.LogDebug("<<< Exiting GetVerificationToken(pageData={PageData})", pageData);
             return string.Empty;
         }
 
         private static string GetCurrentTabId(string pageData)
         {
+			_logger.LogDebug(">>> Entering GetCurrentTabId(pageData={PageData})", pageData);
             if (!string.IsNullOrEmpty(pageData))
             {
                 var match = Regex.Match(pageData, "`sf_tabId`:`(\\d+)`");
+				_logger.LogDebug("GetCurrentTabId(pageData={PageData}): match → {Match}", pageData, match);
                 if (match.Success)
                 {
                     return match.Groups[1].Value;
                 }
             }
 
+			_logger.LogDebug("<<< Exiting GetCurrentTabId(pageData={PageData})", pageData);
             return string.Empty;
         }
 
         private static byte[] GetMultipartFormData(IEnumerable<KeyValuePair<string, object>> postParameters, string boundary)
         {
+			_logger.LogDebug(">>> Entering GetMultipartFormData(postParameters={PostParameters},boundary={Boundary})", postParameters, boundary);
             Stream formDataStream = new MemoryStream();
             var needsClrf = false;
+			_logger.LogDebug("GetMultipartFormData(postParameters={PostParameters},boundary={Boundary}): needsClrf → {NeedsClrf}", postParameters, boundary, needsClrf);
+			_logger.LogDebug("GetMultipartFormData(postParameters={PostParameters},boundary={Boundary}): formDataStream → {FormDataStream}", postParameters, boundary, formDataStream);
 
             foreach (var param in postParameters)
             {
@@ -573,12 +655,15 @@ namespace DNN.Integration.Test.Framework
 
             // Add the end of the request.  Start with a newline
             var footer = "\r\n--" + boundary + "--\r\n";
+			_logger.LogDebug("GetMultipartFormData(postParameters={PostParameters},boundary={Boundary}): footer → {Footer}", postParameters, boundary, footer);
             formDataStream.Write(Encoding.GetBytes(footer), 0, Encoding.GetByteCount(footer));
 
             // Dump the Stream into a byte[]
             formDataStream.Position = 0;
+			_logger.LogDebug("GetMultipartFormData(postParameters={PostParameters},boundary={Boundary}): formDataStream.Position → {Arg2}", postParameters, boundary, formDataStream.Position);
             var formData = new byte[formDataStream.Length];
             var len = formDataStream.Read(formData, 0, formData.Length);
+			_logger.LogDebug("GetMultipartFormData(postParameters={PostParameters},boundary={Boundary}): len → {Len}", postParameters, boundary, len);
             if (len != formDataStream.Length)
             {
                 Console.WriteLine(
@@ -587,11 +672,13 @@ namespace DNN.Integration.Test.Framework
             }
 
             formDataStream.Close();
+			_logger.LogDebug("<<< Exiting GetMultipartFormData(postParameters={PostParameters},boundary={Boundary})", postParameters, boundary);
             return formData;
         }
 
         private static string CombineUrlPath(Uri domain, string path)
         {
+			_logger.LogDebug(">>> Entering CombineUrlPath(domain={Domain},path={Path})", domain, path);
             if (path.StartsWith("http"))
             {
                 return path;
@@ -610,6 +697,7 @@ namespace DNN.Integration.Test.Framework
 
             if (path.StartsWith("/", StringComparison.Ordinal))
             {
+			_logger.LogDebug("<<< Exiting CombineUrlPath(domain={Domain},path={Path})", domain, path);
                 return url + path.Substring(1);
             }
 
@@ -618,20 +706,24 @@ namespace DNN.Integration.Test.Framework
 
         private static string QueryStringFromObject(object query)
         {
+			_logger.LogDebug(">>> Entering QueryStringFromObject(query={Query})");
             var properties = from p in query.GetType().GetProperties()
                              where p.GetValue(query, null) != null
                              select p.Name + "=" + HttpUtility.UrlEncode(p.GetValue(query, null).ToString());
 
+			_logger.LogDebug("<<< Exiting QueryStringFromObject(query={Query})");
             return string.Join("&", properties.ToArray());
         }
 
         private static HttpResponseMessage EnsureSuccessResponse(HttpResponseMessage result, string source, string url)
         {
+			_logger.LogDebug(">>> Entering EnsureSuccessResponse(result={Result},source={Source},url={Url})", result, source, url);
             var body = string.Empty;
 
             try
             {
                 body = result.Content.ReadAsStringAsync().Result;
+				_logger.LogDebug("<<< Exiting EnsureSuccessResponse(result={Result},source={Source},url={Url})", result, source, url);
                 return result.EnsureSuccessStatusCode();
             }
             catch (HttpRequestException ex)
@@ -648,14 +740,20 @@ namespace DNN.Integration.Test.Framework
 
         private void ResetUserId()
         {
+			_logger.LogDebug(">>> Entering ResetUserId()");
             this._userId = -1;
+			_logger.LogDebug("ResetUserId(): _userId → {_userId}", _userId);
+			_logger.LogDebug("ResetUserId(): this._userId → {Arg0}", this._userId);
+			_logger.LogDebug("<<< Exiting ResetUserId()");
         }
 
         private void EnsureLoggedIn()
         {
+			_logger.LogDebug(">>> Entering EnsureLoggedIn()");
             if (!this.IsLoggedIn)
             {
                 Console.WriteLine(@"User not logged in yet");
+			_logger.LogDebug("<<< Exiting EnsureLoggedIn()");
                 throw new WebApiException(
                     new HttpRequestException("User not logged in yet."),
                     new HttpResponseMessage(HttpStatusCode.Unauthorized));
@@ -664,11 +762,13 @@ namespace DNN.Integration.Test.Framework
 
         private void VerifyLogInCookie(HttpWebResponse httpResponse)
         {
+			_logger.LogDebug(">>> Entering VerifyLogInCookie(httpResponse={HttpResponse})", httpResponse);
             var cookie = AppConfigHelper.LoginCookie;
             var loginCookie = httpResponse.Cookies[cookie];
             if (loginCookie != null)
             {
                 this.IsLoggedIn = true;
+				_logger.LogDebug("VerifyLogInCookie(httpResponse={HttpResponse}): this.IsLoggedIn → {Arg1}", httpResponse, this.IsLoggedIn);
                 this.ExtractVerificationCookie(httpResponse.Headers["Set-Cookie"] ?? string.Empty);
                 using (var rs = httpResponse.GetResponseStream())
                 {
@@ -686,16 +786,20 @@ namespace DNN.Integration.Test.Framework
                     }
                 }
             }
+			_logger.LogDebug("<<< Exiting VerifyLogInCookie(httpResponse={HttpResponse})", httpResponse);
         }
 
         private void ExtractVerificationCookie(string cookiesString)
         {
+			_logger.LogDebug(">>> Entering ExtractVerificationCookie(cookiesString=<redacted>)");
             var parts1 = cookiesString.Split(',');
             foreach (var part1 in parts1)
             {
+			_logger.LogDebug("ExtractVerificationCookie(cookiesString=<redacted>): parts1 → {Parts1}", parts1);
                 if (part1.Contains(RqVerifTokenName))
                 {
                     var parts2 = part1.Split(';');
+					_logger.LogDebug("ExtractVerificationCookie(cookiesString=<redacted>): parts2 → {Parts2}", parts2);
                     foreach (var part2 in parts2)
                     {
                         if (part2.Contains(RqVerifTokenName))
@@ -715,10 +819,13 @@ namespace DNN.Integration.Test.Framework
                     break;
                 }
             }
+			_logger.LogDebug("<<< Exiting ExtractVerificationCookie(cookiesString=<redacted>)");
         }
 
         private async Task<HttpResponseMessage> UploadFile(string fileName, string portalFolder, bool waitHttpResponse = true)
         {
+			_logger.LogDebug(">>> Entering UploadFile(fileName={FileName},portalFolder={PortalFolder},waitHttpResponse={WaitHttpResponse})", fileName, portalFolder, waitHttpResponse);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             using (var client = this.CreateHttpClient("/", true))
             {
                 var headers = client.DefaultRequestHeaders;
@@ -729,7 +836,9 @@ namespace DNN.Integration.Test.Framework
                 if (string.IsNullOrEmpty(this._inputFieldVerificationToken))
                 {
                     var resultGet = await client.GetAsync("/");
+					_logger.LogDebug("UploadFile(fileName={FileName},portalFolder={PortalFolder},waitHttpResponse={WaitHttpResponse}): resultGet → {ResultGet}", fileName, portalFolder, waitHttpResponse, resultGet);
                     var data = await resultGet.Content.ReadAsStringAsync();
+					_logger.LogDebug("UploadFile(fileName={FileName},portalFolder={PortalFolder},waitHttpResponse={WaitHttpResponse}): data → {Data}", fileName, portalFolder, waitHttpResponse, data);
                     this._inputFieldVerificationToken = GetVerificationToken(data);
 
                     if (!string.IsNullOrEmpty(this._inputFieldVerificationToken))
@@ -743,6 +852,7 @@ namespace DNN.Integration.Test.Framework
                 }
 
                 var content = new MultipartFormDataContent();
+				_logger.LogDebug("UploadFile(fileName={FileName},portalFolder={PortalFolder},waitHttpResponse={WaitHttpResponse}): content → {Content}", fileName, portalFolder, waitHttpResponse, content);
                 var values = new[]
                 {
                     new KeyValuePair<string, string>("\"folder\"", portalFolder),
@@ -756,7 +866,9 @@ namespace DNN.Integration.Test.Framework
                 }
 
                 var fi = new FileInfo(fileName);
+				_logger.LogDebug("UploadFile(fileName={FileName},portalFolder={PortalFolder},waitHttpResponse={WaitHttpResponse}): fi → {Fi}", fileName, portalFolder, waitHttpResponse, fi);
                 var fileContent = new ByteArrayContent(File.ReadAllBytes(fileName));
+				_logger.LogDebug("UploadFile(fileName={FileName},portalFolder={PortalFolder},waitHttpResponse={WaitHttpResponse}): fileContent → {FileContent}", fileName, portalFolder, waitHttpResponse, fileContent);
                 fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
                 {
                     FileName = fi.Name,
@@ -767,6 +879,9 @@ namespace DNN.Integration.Test.Framework
 
                 client.DefaultRequestHeaders.UserAgent.ParseAdd(this.UserAgentValue);
                 var result = await client.PostAsync(UploadFileRequestPath, content);
+				_logger.LogDebug("UploadFile(fileName={FileName},portalFolder={PortalFolder},waitHttpResponse={WaitHttpResponse}): result → {Result}", fileName, portalFolder, waitHttpResponse, result);
+				_logger.LogInformation("UploadFile(fileName,portalFolder,waitHttpResponse)={FileName},{PortalFolder},{WaitHttpResponse}: external service call took {Arg3} ms", fileName, portalFolder, waitHttpResponse, __logStart.ElapsedMilliseconds);
+				_logger.LogDebug("<<< Exiting UploadFile(fileName={FileName},portalFolder={PortalFolder},waitHttpResponse={WaitHttpResponse})", fileName, portalFolder, waitHttpResponse);
                 return !waitHttpResponse
                     ? result
                     : EnsureSuccessResponse(result, "UploadFile", UploadFileRequestPath);
@@ -776,6 +891,7 @@ namespace DNN.Integration.Test.Framework
         private HttpResponseMessage ActivityStreamUploadFile(
             IDictionary<string, string> headers, string fileName, bool waitHttpResponse = false)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             using (var clientHandler = new HttpClientHandler
             {
                 AllowAutoRedirect = false,
@@ -861,6 +977,7 @@ namespace DNN.Integration.Test.Framework
 
         private string[] GetPageInputFields(HttpClient client, string path)
         {
+			_logger.LogDebug(">>> Entering GetPageInputFields(client={Client},path={Path})", client, path);
             CachedWebPage cachedPage = null;
             var url = CombineUrlPath(this.Domain, path);
             if (!this.IsLoggedIn || this.AvoidCaching ||
@@ -902,6 +1019,8 @@ namespace DNN.Integration.Test.Framework
                 client.DefaultRequestHeaders.Add(RqVerifTokenNameNoUndescrores, cachedPage.VerificationToken);
             }
 
+			_logger.LogInformation("GetPageInputFields(client,path)={Client},{Path}: external service call {Url} took {Arg3} ms", client, path, url, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting GetPageInputFields(client={Client},path={Path})", client, path);
             return cachedPage != null ? cachedPage.InputFields : [];
         }
 
@@ -916,15 +1035,24 @@ namespace DNN.Integration.Test.Framework
 
         private HttpWebResponse PostForm(string postUrl, string userAgent, string contentType, IDictionary<string, string> headers, byte[] formData, bool followRedirect)
         {
+			_logger.LogDebug(">>> Entering PostForm(postUrl={PostUrl},userAgent={UserAgent},contentType={ContentType},headers={Headers},formData={FormData},followRedirect={FollowRedirect})", postUrl, userAgent, contentType, headers, formData, followRedirect);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var request = WebRequest.Create(postUrl) as HttpWebRequest;
 
+			_logger.LogDebug("PostForm(postUrl={PostUrl},userAgent={UserAgent},contentType={ContentType},headers={Headers},formData={FormData},followRedirect={FollowRedirect}): request → {Request}", postUrl, userAgent, contentType, headers, formData, followRedirect, request);
             if (request == null)
             {
+				_logger.LogWarning("Throwing NullReferenceException from PostForm(postUrl={PostUrl},userAgent={UserAgent},contentType={ContentType},headers={Headers},formData={FormData},followRedirect={FollowRedirect})", postUrl, userAgent, contentType, headers, formData, followRedirect);
                 throw new NullReferenceException("request is not a http request");
             }
 
             // Set up the request properties.
             request.Method = "POST";
+			_logger.LogDebug("PostForm(postUrl={PostUrl},userAgent={UserAgent},contentType={ContentType},headers={Headers},formData={FormData},followRedirect={FollowRedirect}): request.Method → {Arg6}", postUrl, userAgent, contentType, headers, formData, followRedirect, request.Method);
+			_logger.LogDebug("PostForm(postUrl={PostUrl},userAgent={UserAgent},contentType={ContentType},headers={Headers},formData={FormData},followRedirect={FollowRedirect}): request.ContentType → {Arg6}", postUrl, userAgent, contentType, headers, formData, followRedirect, request.ContentType);
+			_logger.LogDebug("PostForm(postUrl={PostUrl},userAgent={UserAgent},contentType={ContentType},headers={Headers},formData={FormData},followRedirect={FollowRedirect}): request.UserAgent → {Arg6}", postUrl, userAgent, contentType, headers, formData, followRedirect, request.UserAgent);
+			_logger.LogDebug("PostForm(postUrl={PostUrl},userAgent={UserAgent},contentType={ContentType},headers={Headers},formData={FormData},followRedirect={FollowRedirect}): request.CookieContainer → {Arg6}", postUrl, userAgent, contentType, headers, formData, followRedirect, request.CookieContainer);
+			_logger.LogDebug("PostForm(postUrl={PostUrl},userAgent={UserAgent},contentType={ContentType},headers={Headers},formData={FormData},followRedirect={FollowRedirect}): request.ContentLength → {Arg6}", postUrl, userAgent, contentType, headers, formData, followRedirect, request.ContentLength);
             request.ContentType = contentType;
             request.UserAgent = userAgent;
             request.CookieContainer = this._sessionCookiesContainer;
@@ -939,6 +1067,10 @@ namespace DNN.Integration.Test.Framework
             }
 
             request.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
+			_logger.LogDebug("PostForm(postUrl={PostUrl},userAgent={UserAgent},contentType={ContentType},headers={Headers},formData={FormData},followRedirect={FollowRedirect}): request.Accept → {Arg6}", postUrl, userAgent, contentType, headers, formData, followRedirect, request.Accept);
+			_logger.LogDebug("PostForm(postUrl={PostUrl},userAgent={UserAgent},contentType={ContentType},headers={Headers},formData={FormData},followRedirect={FollowRedirect}): request.KeepAlive → {Arg6}", postUrl, userAgent, contentType, headers, formData, followRedirect, request.KeepAlive);
+			_logger.LogDebug("PostForm(postUrl={PostUrl},userAgent={UserAgent},contentType={ContentType},headers={Headers},formData={FormData},followRedirect={FollowRedirect}): request.ReadWriteTimeout → {Arg6}", postUrl, userAgent, contentType, headers, formData, followRedirect, request.ReadWriteTimeout);
+			_logger.LogDebug("PostForm(postUrl={PostUrl},userAgent={UserAgent},contentType={ContentType},headers={Headers},formData={FormData},followRedirect={FollowRedirect}): request.AllowAutoRedirect → {Arg6}", postUrl, userAgent, contentType, headers, formData, followRedirect, request.AllowAutoRedirect);
             request.KeepAlive = true;
             request.ReadWriteTimeout = 90;
             request.AllowAutoRedirect = followRedirect;
@@ -954,6 +1086,8 @@ namespace DNN.Integration.Test.Framework
             using (var requestStream = request.GetRequestStream())
             {
                 requestStream.Write(formData, 0, formData.Length);
+				_logger.LogInformation("PostForm(postUrl,userAgent,contentType,headers,formData,followRedirect)={PostUrl},{UserAgent},{ContentType},{Headers},{FormData},{FollowRedirect}: external service call {PostUrl1} took {Arg7} ms", postUrl, userAgent, contentType, headers, formData, followRedirect, postUrl, __logStart.ElapsedMilliseconds);
+				_logger.LogDebug("<<< Exiting PostForm(postUrl={PostUrl},userAgent={UserAgent},contentType={ContentType},headers={Headers},formData={FormData},followRedirect={FollowRedirect})", postUrl, userAgent, contentType, headers, formData, followRedirect);
                 return request.GetResponse() as HttpWebResponse;
             }
         }

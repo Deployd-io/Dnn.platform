@@ -8,8 +8,11 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
     {
         public ComplexType(int x, int y)
         {
+			mockEventLogger.LogDebug(">>> Entering ComplexType(x={X},y={Y})", x, y);
             this.X = x;
             this.Y = y;
+			mockEventLogger.LogDebug("ComplexType(x={X},y={Y}): this.X → {Arg2}", x, y, this.X);
+			mockEventLogger.LogDebug("<<< Exiting ComplexType(x={X},y={Y})", x, y);
         }
 
         public int X { get; private set; }

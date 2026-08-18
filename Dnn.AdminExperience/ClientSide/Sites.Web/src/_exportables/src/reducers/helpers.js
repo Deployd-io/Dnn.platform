@@ -1,4 +1,6 @@
+const logger = console;
 export function addPortalToList(portalsList, newPortal) {
+	logger.debug(`>>> Entering addPortalToList(portalsList=${portalsList},newPortal=${newPortal})`);
     if (portalsList.some(portal => portal.PortalID === newPortal.PortalID)) {
         portalsList = portalsList.filter(portal => {
             return portal.PortalID !== newPortal.PortalID;
@@ -15,10 +17,12 @@ export function addPortalToList(portalsList, newPortal) {
                 return 1;
             return 0;//default return value (no sorting)
         });
+	logger.debug(`<<< Exiting addPortalToList(portalsList=${portalsList},newPortal=${newPortal})`);
         return portalsList;
     }
 }
 export function addTemplateToList(templatesList, newTemplate) {
+	logger.debug(`>>> Entering addTemplateToList(templatesList=${templatesList},newTemplate=${newTemplate})`);
     if (templatesList.some(template => template.Value === newTemplate.Value)) {
         templatesList = templatesList.filter(template => {
             return template.Value !== newTemplate.Value;
@@ -35,11 +39,13 @@ export function addTemplateToList(templatesList, newTemplate) {
                 return 1;
             return 0;//default return value (no sorting)
         });
+	logger.debug(`<<< Exiting addTemplateToList(templatesList=${templatesList},newTemplate=${newTemplate})`);
         return templatesList;
     }
 }
 
 export function getFinalSwitchCase(switchCase, additionalCases) {
+	logger.debug(`>>> Entering getFinalSwitchCase(switchCase=${switchCase},additionalCases=${additionalCases})`);
     let _switchCase = switchCase;
     if (Object.prototype.toString.call(additionalCases) === "[object Array]") {
         additionalCases.forEach((extraCase) => {
@@ -58,5 +64,6 @@ export function getFinalSwitchCase(switchCase, additionalCases) {
             }
         });
     }
+	logger.debug(`<<< Exiting getFinalSwitchCase(switchCase=${switchCase},additionalCases=${additionalCases})`);
     return _switchCase;
 }

@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,10 +13,13 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("ruby", function(config) {
   function wordObj(words) {
+	logger.debug(`>>> Entering wordObj(words=${words})`);
     var o = {};
     for (var i = 0, e = words.length; i < e; ++i) o[words[i]] = true;
+	logger.debug(`<<< Exiting wordObj(words=${words})`);
     return o;
   }
   var keywords = wordObj([
@@ -32,27 +37,35 @@ CodeMirror.defineMode("ruby", function(config) {
   var curPunc;
 
   function chain(newtok, stream, state) {
+	logger.debug(`>>> Entering chain(newtok=${newtok},stream=${stream},state=${state})`);
     state.tokenize.push(newtok);
+	logger.debug(`<<< Exiting chain(newtok=${newtok},stream=${stream},state=${state})`);
     return newtok(stream, state);
   }
 
   function tokenBase(stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
     if (stream.sol() && stream.match("=begin") && stream.eol()) {
       state.tokenize.push(readBlockComment);
       return "comment";
     }
     if (stream.eatSpace()) return null;
     var ch = stream.next(), m;
+	logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
     if (ch == "`" || ch == "'" || ch == '"') {
       return chain(readQuoted(ch, "string", ch == '"' || ch == "`"), stream, state);
     } else if (ch == "/") {
       var currentIndex = stream.current().length;
+	logger.debug(`tokenBase(stream=${stream},state=${state}): currentIndex → ${currentIndex}`);
       if (stream.skipTo("/")) {
         var search_till = stream.current().length;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): search_till → ${search_till}`);
         stream.backUp(stream.current().length - currentIndex);
         var balance = 0;  // balance brackets
+		logger.warn(`tokenBase(stream=${stream},state=${state}): balance → ${balance}`);
         while (stream.current().length < search_till) {
           var chchr = stream.next();
+		logger.debug(`tokenBase(stream=${stream},state=${state}): chchr → ${chchr}`);
           if (chchr == "(") balance += 1;
           else if (chchr == ")") balance -= 1;
           if (balance < 0) break;
@@ -64,11 +77,13 @@ CodeMirror.defineMode("ruby", function(config) {
       return "operator";
     } else if (ch == "%") {
       var style = "string", embed = true;
+	logger.debug(`tokenBase(stream=${stream},state=${state}): style → ${style}`);
       if (stream.eat("s")) style = "atom";
       else if (stream.eat(/[WQ]/)) style = "string";
       else if (stream.eat(/[r]/)) style = "string-2";
       else if (stream.eat(/[wxq]/)) { style = "string"; embed = false; }
       var delim = stream.eat(/[^\w\s=]/);
+	logger.debug(`tokenBase(stream=${stream},state=${state}): delim → ${delim}`);
       if (!delim) return "operator";
       if (matching.propertyIsEnumerable(delim)) delim = matching[delim];
       return chain(readQuoted(delim, style, embed, true), stream, state);
@@ -136,8 +151,10 @@ CodeMirror.defineMode("ruby", function(config) {
       return null;
     } else if (/[\(\)\[\]{}\\;]/.test(ch)) {
       curPunc = ch;
+	logger.debug(`tokenBase(stream=${stream},state=${state}): curPunc → ${curPunc}`);
       return null;
     } else if (ch == "-" && stream.eat(">")) {
+	logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
       return "arrow";
     } else if (/[=+\-\/*:\.^%<>~|]/.test(ch)) {
       var more = stream.eatWhile(/[=+\-\/*:\.^%<>~|]/);
@@ -149,6 +166,7 @@ CodeMirror.defineMode("ruby", function(config) {
   }
 
   function tokenBaseUntilBrace(depth) {
+	logger.debug(`>>> Entering tokenBaseUntilBrace(depth=${depth})`);
     if (!depth) depth = 1;
     return function(stream, state) {
       if (stream.peek() == "}") {
@@ -161,10 +179,12 @@ CodeMirror.defineMode("ruby", function(config) {
       } else if (stream.peek() == "{") {
         state.tokenize[state.tokenize.length - 1] = tokenBaseUntilBrace(depth + 1);
       }
+	logger.debug(`<<< Exiting tokenBaseUntilBrace(depth=${depth})`);
       return tokenBase(stream, state);
     };
   }
   function tokenBaseOnce() {
+	logger.debug('>>> Entering tokenBaseOnce()');
     var alreadyCalled = false;
     return function(stream, state) {
       if (alreadyCalled) {
@@ -172,18 +192,22 @@ CodeMirror.defineMode("ruby", function(config) {
         return state.tokenize[state.tokenize.length-1](stream, state);
       }
       alreadyCalled = true;
+	logger.debug('<<< Exiting tokenBaseOnce()');
       return tokenBase(stream, state);
     };
   }
   function readQuoted(quote, style, embed, unescaped) {
+	logger.debug(`>>> Entering readQuoted(quote=${quote},style=${style},embed=${embed},unescaped=${unescaped})`);
     return function(stream, state) {
       var escaped = false, ch;
 
       if (state.context.type === 'read-quoted-paused') {
         state.context = state.context.prev;
+		logger.debug(`readQuoted(quote=${quote},style=${style},embed=${embed},unescaped=${unescaped}): state.context → ${state.context}`);
         stream.eat("}");
       }
 
+	logger.debug(`function(stream=${stream},state=${state}): state.context → ${state.context}`);
       while ((ch = stream.next()) != null) {
         if (ch == quote && (unescaped || !escaped)) {
           state.tokenize.pop();
@@ -203,40 +227,50 @@ CodeMirror.defineMode("ruby", function(config) {
         }
         escaped = !escaped && ch == "\\";
       }
+	logger.debug(`<<< Exiting readQuoted(quote=${quote},style=${style},embed=${embed},unescaped=${unescaped})`);
       return style;
     };
   }
   function readHereDoc(phrase) {
+	logger.debug(`>>> Entering readHereDoc(phrase=${phrase})`);
     return function(stream, state) {
       if (stream.match(phrase)) state.tokenize.pop();
       else stream.skipToEnd();
+	logger.debug(`<<< Exiting readHereDoc(phrase=${phrase})`);
       return "string";
     };
   }
   function readBlockComment(stream, state) {
+	logger.debug(`>>> Entering readBlockComment(stream=${stream},state=${state})`);
     if (stream.sol() && stream.match("=end") && stream.eol())
       state.tokenize.pop();
     stream.skipToEnd();
+	logger.debug(`<<< Exiting readBlockComment(stream=${stream},state=${state})`);
     return "comment";
   }
 
   return {
     startState: function() {
+	logger.debug('>>> Entering startState()');
       return {tokenize: [tokenBase],
               indented: 0,
               context: {type: "top", indented: -config.indentUnit},
               continuedLine: false,
               lastTok: null,
               varList: false};
+			logger.debug('<<< Exiting startState()');
     },
 
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       curPunc = null;
       if (stream.sol()) state.indented = stream.indentation();
       var style = state.tokenize[state.tokenize.length-1](stream, state), kwtype;
+	logger.debug(`token(stream=${stream},state=${state}): style → ${style}`);
       var thisTok = curPunc;
       if (style == "ident") {
         var word = stream.current();
+		logger.debug(`token(stream=${stream},state=${state}): word → ${word}`);
         style = state.lastTok == "." ? "property"
           : keywords.propertyIsEnumerable(stream.current()) ? "keyword"
           : /^[A-Z]/.test(word) ? "tag"
@@ -259,20 +293,25 @@ CodeMirror.defineMode("ruby", function(config) {
         state.context = {prev: state.context, type: curPunc || style, indented: state.indented};
       else if ((kwtype == "dedent" || /[\)\]\}]/.test(curPunc)) && state.context.prev)
         state.context = state.context.prev;
+		logger.debug(`token(stream=${stream},state=${state}): state.context → ${state.context}`);
 
       if (stream.eol())
+		logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
         state.continuedLine = (curPunc == "\\" || style == "operator");
       return style;
     },
 
     indent: function(state, textAfter) {
+	logger.debug(`>>> Entering indent(state=${state},textAfter=${textAfter})`);
       if (state.tokenize[state.tokenize.length-1] != tokenBase) return 0;
       var firstChar = textAfter && textAfter.charAt(0);
+	logger.debug(`indent(state=${state},textAfter=${textAfter}): firstChar → ${firstChar}`);
       var ct = state.context;
       var closing = ct.type == matching[firstChar] ||
         ct.type == "keyword" && /^(?:end|until|else|elsif|when|rescue)\b/.test(textAfter);
       return ct.indented + (closing ? 0 : config.indentUnit) +
         (state.continuedLine ? config.indentUnit : 0);
+		logger.debug(`<<< Exiting indent(state=${state},textAfter=${textAfter})`);
     },
 
     electricChars: "}de", // enD and rescuE

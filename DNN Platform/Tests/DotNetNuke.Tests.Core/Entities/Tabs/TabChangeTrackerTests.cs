@@ -16,9 +16,12 @@
         [Test]
         public void TrackModuleModification_WithSharedModule_ThrowsException()
         {
+			mockEventLogger.LogDebug(">>> Entering TrackModuleModification_WithSharedModule_ThrowsException()");
             // Arrange
             var tabChangeTracker = new TabChangeTracker();
+			mockEventLogger.LogDebug("TrackModuleModification_WithSharedModule_ThrowsException(): tabChangeTracker → {TabChangeTracker}", tabChangeTracker);
             var mockedModuleController = new Mock<IModuleController>();
+			mockEventLogger.LogDebug("TrackModuleModification_WithSharedModule_ThrowsException(): mockedModuleController → {MockedModuleController}", mockedModuleController);
             mockedModuleController
                 .Setup(s => s.IsSharedModule(It.IsAny<ModuleInfo>()))
                 .Returns(true);
@@ -26,7 +29,9 @@
 
             // Act & Assert
             var exception = Assert.Throws<InvalidOperationException>(() => tabChangeTracker.TrackModuleModification(null, 1, 0));
+			mockEventLogger.LogDebug("TrackModuleModification_WithSharedModule_ThrowsException(): exception → {Exception}", exception);
             Assert.That(exception.Data?[TabChangeTracker.IsModuleDoesNotBelongToPage], Is.EqualTo(true));
+			mockEventLogger.LogDebug("<<< Exiting TrackModuleModification_WithSharedModule_ThrowsException()");
         }
     }
 }

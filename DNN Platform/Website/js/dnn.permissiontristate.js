@@ -1,3 +1,4 @@
+const logger = console;
 ﻿/// <reference name="MicrosoftAjax.js" />
 
 Type.registerNamespace('dnn.controls');
@@ -44,6 +45,7 @@ dnn.controls.triStateManager = function (images, toolTips) {
 
         if ($hdn.hasClass('fullControl')) {
             $collection.each(function (index, elem) {
+				logger.debug(`>>> Entering each($elem=${$elem})`);
                 var $elem = jQuery(elem);
                 if (!$elem.hasClass('lockedPerm')) {
                     elem.value = hidden.value;
@@ -105,15 +107,21 @@ dnn.controls.triStateManager = function (images, toolTips) {
 
         if (dnn.controls.triStateManager.updateAdvancedState && typeof dnn.controls.triStateManager.updateAdvancedState == "function") {
             dnn.controls.triStateManager.updateAdvancedState.call($hdn, state, function(h, s) {
+				logger.debug(`>>> Entering call($hdn=${$hdn},state=${state})`);
+				logger.debug(`<<< Exiting call($hdn=${$hdn},state=${state})`);
                 updateImage(h, s);
             });
         }
     }
     
     function updateImage($hdn, state) {
+		logger.debug(`>>> Entering updateImage($hdn=${$hdn},state=${state})`);
         var img = $hdn.siblings('img')[0];
         img.src = images[state];
+		logger.debug(`updateImage($hdn=${$hdn},state=${state}): img → ${img}`);
         img.alt = toolTips[state];
+		logger.debug(`updateImage($hdn=${$hdn},state=${state}): img.alt → ${img.alt}`);
+		logger.debug(`<<< Exiting updateImage($hdn=${$hdn},state=${state})`);
     }
 
     return that;

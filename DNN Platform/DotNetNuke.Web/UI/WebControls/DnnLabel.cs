@@ -12,12 +12,16 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A label control.</summary>
     public class DnnLabel : Label, ILocalizable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnLabel));
         private bool localize = true;
 
         /// <summary>Initializes a new instance of the <see cref="DnnLabel"/> class.</summary>
         public DnnLabel()
         {
+			Logger.LogDebug(">>> Entering DnnLabel()");
             this.CssClass = "dnnFormLabel";
+			Logger.LogDebug("DnnLabel(): this.CssClass → {Arg0}", this.CssClass);
+			Logger.LogDebug("<<< Exiting DnnLabel()");
         }
 
         /// <inheritdoc />
@@ -40,6 +44,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         public virtual void LocalizeStrings()
         {
+			Logger.LogDebug(">>> Entering LocalizeStrings()");
             if (this.Localize)
             {
                 if (!string.IsNullOrEmpty(this.ToolTip))
@@ -59,20 +64,25 @@ namespace DotNetNuke.Web.UI.WebControls
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting LocalizeStrings()");
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
             this.LocalResourceFile = Utilities.GetLocalResourceFile(this);
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer);
             this.LocalizeStrings();
             base.Render(writer);
+			Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer);
         }
     }
 }

@@ -11,6 +11,8 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Exceptions
         public SetRoleException(string message)
             : base(message)
         {
+		eventLogger.LogDebug(">>> Entering SetRoleException(message={Message})", message);
+		eventLogger.LogDebug("<<< Exiting SetRoleException(message={Message})", message);
         }
     }
 }

@@ -13,12 +13,15 @@ namespace DotNetNuke.Tests.Core.Controllers.Search
     {
         public override bool HasViewPermission(SearchResult searchResult)
         {
+			mockEventLogger.LogDebug("<<< Exiting HasViewPermission(searchResult={SearchResult})", searchResult);
             return true;
         }
 
         // Returns the URL to the first instance of the module the user has access to view
         public override string GetDocUrl(SearchResult searchResult)
         {
+			mockEventLogger.LogDebug(">>> Entering GetDocUrl(searchResult={SearchResult})", searchResult);
+			mockEventLogger.LogDebug("<<< Exiting GetDocUrl(searchResult={SearchResult})", searchResult);
             return "http://www.google.com";
         }
     }

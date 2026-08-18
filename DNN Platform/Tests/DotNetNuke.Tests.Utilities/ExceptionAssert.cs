@@ -10,10 +10,12 @@ namespace DotNetNuke.Tests.Utilities
     using DotNetNuke.Internal.SourceGenerators;
 
     using NUnit.Framework;
+	using Microsoft.Extensions.Logging;
 
     [DnnDeprecated(7, 0, 0, "Use Assert.Exception or ExpectedExceptionAttribute", RemovalVersion = 11)]
     public static partial class ExceptionAssert
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         // public static void Throws<TException>(Action act) where TException : Exception
         // {
         //    Throws<TException>(act, ex => true);
@@ -26,6 +28,8 @@ namespace DotNetNuke.Tests.Utilities
         public static void Throws<TException>(string message, Action act, Predicate<TException> checker)
             where TException : Exception
         {
+			_logger.LogDebug(">>> Entering Throws(message={Message},act={Act},checker={Checker})", message, act, checker);
+			_logger.LogDebug("<<< Exiting Throws(message={Message},act={Act},checker={Checker})", message, act, checker);
             Throws<TException>(act, ex => ex.Message.Equals(message, StringComparison.Ordinal) && checker(ex));
         }
 
@@ -34,13 +38,17 @@ namespace DotNetNuke.Tests.Utilities
         {
             bool matched = false;
             bool thrown = false;
+			_logger.LogDebug("Throws(act={Act},checker={Checker}): thrown → {Thrown}", act, checker, thrown);
+			_logger.LogDebug("Throws(act={Act},checker={Checker}): matched → {Matched}", act, checker, matched);
             try
             {
                 act();
             }
             catch (Exception ex)
             {
+				_logger.LogError("Exception in Throws(act={Act},checker={Checker}): {Arg2}", act, checker, ex.getMessage());
                 TException tex = ex as TException;
+				_logger.LogDebug("Throws(act={Act},checker={Checker}): tex → {Tex}", act, checker, tex);
                 if (tex == null)
                 {
                     if (typeof(TException) == typeof(TargetInvocationException))
@@ -73,6 +81,7 @@ namespace DotNetNuke.Tests.Utilities
 
             if (!thrown)
             {
+				_logger.LogWarning("Throwing AssertionException from Throws(act={Act},checker={Checker})", act, checker);
                 throw new AssertionException(string.Format("Expected exception of type '{0}' was not thrown", typeof(TException).FullName));
             }
             else if (!matched)
@@ -83,15 +92,19 @@ namespace DotNetNuke.Tests.Utilities
 
         public static void ThrowsArgNull(string paramName, Action act)
         {
+			_logger.LogDebug(">>> Entering ThrowsArgNull(paramName={ParamName},act={Act})", paramName, act);
             Throws<ArgumentNullException>(act, ex => string.Equals(ex.ParamName, paramName, StringComparison.Ordinal));
+			_logger.LogDebug("<<< Exiting ThrowsArgNull(paramName={ParamName},act={Act})", paramName, act);
         }
 
         public static void ThrowsArgNullOrEmpty(string paramName, Action act)
         {
+			_logger.LogDebug(">>> Entering ThrowsArgNullOrEmpty(paramName={ParamName},act={Act})", paramName, act);
             Throws<ArgumentException>(
                 string.Format("Argument cannot be null or an empty string{1}Parameter name: {0}", paramName, Environment.NewLine),
                 act,
                 ex => string.Equals(ex.ParamName, paramName, StringComparison.Ordinal));
+				_logger.LogDebug("<<< Exiting ThrowsArgNullOrEmpty(paramName={ParamName},act={Act})", paramName, act);
         }
     }
 }
