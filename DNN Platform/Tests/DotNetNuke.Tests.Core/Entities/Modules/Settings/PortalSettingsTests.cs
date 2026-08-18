@@ -22,7 +22,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         /// <inheritdoc />
         protected override void SetupServiceProvider(IServiceCollection services)
         {
+			mockEventLogger.LogDebug(">>> Entering SetupServiceProvider(services={Services})", services);
             services.AddSingleton<ISerializationManager, SerializationManager>();
+			mockEventLogger.LogDebug("<<< Exiting SetupServiceProvider(services={Services})", services);
         }
 
         [Test]
@@ -30,7 +32,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("ar-JO")]
         public void SaveSettings_CallsUpdatePortalSetting_WithRightParameters_ar_JO(string stringValue, int integerValue, double doubleValue, bool booleanValue, DateTime datetimeValue, TimeSpan timeSpanValue, TestingEnum enumValue, ComplexType complexValue)
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_CallsUpdatePortalSetting_WithRightParameters_ar_JO(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
             this.SaveSettings_CallsUpdatePortalSetting_WithRightParameters(stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_CallsUpdatePortalSetting_WithRightParameters_ar_JO(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
         }
 
         [Test]
@@ -38,7 +42,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("ca-ES")]
         public void SaveSettings_CallsUpdatePortalSetting_WithRightParameters_ca_ES(string stringValue, int integerValue, double doubleValue, bool booleanValue, DateTime datetimeValue, TimeSpan timeSpanValue, TestingEnum enumValue, ComplexType complexValue)
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_CallsUpdatePortalSetting_WithRightParameters_ca_ES(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
             this.SaveSettings_CallsUpdatePortalSetting_WithRightParameters(stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_CallsUpdatePortalSetting_WithRightParameters_ca_ES(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
         }
 
         [Test]
@@ -46,7 +52,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("zh-CN")]
         public void SaveSettings_CallsUpdatePortalSetting_WithRightParameters_zh_CN(string stringValue, int integerValue, double doubleValue, bool booleanValue, DateTime datetimeValue, TimeSpan timeSpanValue, TestingEnum enumValue, ComplexType complexValue)
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_CallsUpdatePortalSetting_WithRightParameters_zh_CN(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
             this.SaveSettings_CallsUpdatePortalSetting_WithRightParameters(stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_CallsUpdatePortalSetting_WithRightParameters_zh_CN(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
         }
 
         [Test]
@@ -54,7 +62,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("en-US")]
         public void SaveSettings_CallsUpdatePortalSetting_WithRightParameters_en_US(string stringValue, int integerValue, double doubleValue, bool booleanValue, DateTime datetimeValue, TimeSpan timeSpanValue, TestingEnum enumValue, ComplexType complexValue)
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_CallsUpdatePortalSetting_WithRightParameters_en_US(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
             this.SaveSettings_CallsUpdatePortalSetting_WithRightParameters(stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_CallsUpdatePortalSetting_WithRightParameters_en_US(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
         }
 
         [Test]
@@ -62,7 +72,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("fr-FR")]
         public void SaveSettings_CallsUpdatePortalSetting_WithRightParameters_fr_FR(string stringValue, int integerValue, double doubleValue, bool booleanValue, DateTime datetimeValue, TimeSpan timeSpanValue, TestingEnum enumValue, ComplexType complexValue)
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_CallsUpdatePortalSetting_WithRightParameters_fr_FR(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
             this.SaveSettings_CallsUpdatePortalSetting_WithRightParameters(stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_CallsUpdatePortalSetting_WithRightParameters_fr_FR(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
         }
 
         [Test]
@@ -70,7 +82,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("he-IL")]
         public void SaveSettings_CallsUpdatePortalSetting_WithRightParameters_he_IL(string stringValue, int integerValue, double doubleValue, bool booleanValue, DateTime datetimeValue, TimeSpan timeSpanValue, TestingEnum enumValue, ComplexType complexValue)
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_CallsUpdatePortalSetting_WithRightParameters_he_IL(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
             this.SaveSettings_CallsUpdatePortalSetting_WithRightParameters(stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_CallsUpdatePortalSetting_WithRightParameters_he_IL(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
         }
 
         [Test]
@@ -78,7 +92,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("ru-RU")]
         public void SaveSettings_CallsUpdatePortalSetting_WithRightParameters_ru_RU(string stringValue, int integerValue, double doubleValue, bool booleanValue, DateTime datetimeValue, TimeSpan timeSpanValue, TestingEnum enumValue, ComplexType complexValue)
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_CallsUpdatePortalSetting_WithRightParameters_ru_RU(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
             this.SaveSettings_CallsUpdatePortalSetting_WithRightParameters(stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_CallsUpdatePortalSetting_WithRightParameters_ru_RU(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
         }
 
         [Test]
@@ -86,40 +102,54 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("tr-TR")]
         public void SaveSettings_CallsUpdatePortalSetting_WithRightParameters_tr_TR(string stringValue, int integerValue, double doubleValue, bool booleanValue, DateTime datetimeValue, TimeSpan timeSpanValue, TestingEnum enumValue, ComplexType complexValue)
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_CallsUpdatePortalSetting_WithRightParameters_tr_TR(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
             this.SaveSettings_CallsUpdatePortalSetting_WithRightParameters(stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_CallsUpdatePortalSetting_WithRightParameters_tr_TR(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
         }
 
         [Test]
         public void SaveSettings_UpdatesCache()
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_UpdatesCache()");
             // Arrange
             var moduleInfo = GetModuleInfo;
             var settings = new MyPortalSettings();
+			mockEventLogger.LogDebug("SaveSettings_UpdatesCache(): settings → {Settings}", settings);
 
             this.MockCache.Setup(c => c.Insert(CacheKey(moduleInfo), settings));
             var settingsRepository = new MyPortalSettingsRepository();
+			mockEventLogger.LogDebug("SaveSettings_UpdatesCache(): settingsRepository → {SettingsRepository}", settingsRepository);
 
             // Act
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			mockEventLogger.LogInformation("SaveSettings_UpdatesCache(): save query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
             settingsRepository.SaveSettings(moduleInfo, settings);
 
             // Assert
             this.MockRepository.VerifyAll();
+			mockEventLogger.LogInformation("SaveSettings_UpdatesCache(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_UpdatesCache()");
         }
 
         [Test]
         public void GetSettings_CallsGetCachedObject()
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_CallsGetCachedObject()");
             // Arrange
             var moduleInfo = GetModuleInfo;
 
             this.MockCache.Setup(c => c.GetItem("DNN_" + CacheKey(moduleInfo))).Returns(new MyPortalSettings());
             var settingsRepository = new MyPortalSettingsRepository();
+			mockEventLogger.LogDebug("GetSettings_CallsGetCachedObject(): settingsRepository → {SettingsRepository}", settingsRepository);
 
             // Act
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			mockEventLogger.LogInformation("GetSettings_CallsGetCachedObject(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
             settingsRepository.GetSettings(moduleInfo);
 
             // Assert
             this.MockRepository.VerifyAll();
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_CallsGetCachedObject()");
         }
 
         [Test]
@@ -127,7 +157,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("ar-JO")]
         public void GetSettings_GetsValuesFrom_PortalSettings_ar_JO(string stringValue, int integerValue, double doubleValue, bool booleanValue, DateTime datetimeValue, TimeSpan timeSpanValue, TestingEnum enumValue, ComplexType complexValue)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_GetsValuesFrom_PortalSettings_ar_JO(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
             this.GetSettings_GetsValuesFrom_PortalSettings(stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_GetsValuesFrom_PortalSettings_ar_JO(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
         }
 
         [Test]
@@ -135,7 +167,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("ca-ES")]
         public void GetSettings_GetsValuesFrom_PortalSettings_ca_ES(string stringValue, int integerValue, double doubleValue, bool booleanValue, DateTime datetimeValue, TimeSpan timeSpanValue, TestingEnum enumValue, ComplexType complexValue)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_GetsValuesFrom_PortalSettings_ca_ES(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
             this.GetSettings_GetsValuesFrom_PortalSettings(stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_GetsValuesFrom_PortalSettings_ca_ES(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
         }
 
         [Test]
@@ -143,7 +177,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("zh-CN")]
         public void GetSettings_GetsValuesFrom_PortalSettings_zh_CN(string stringValue, int integerValue, double doubleValue, bool booleanValue, DateTime datetimeValue, TimeSpan timeSpanValue, TestingEnum enumValue, ComplexType complexValue)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_GetsValuesFrom_PortalSettings_zh_CN(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
             this.GetSettings_GetsValuesFrom_PortalSettings(stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_GetsValuesFrom_PortalSettings_zh_CN(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
         }
 
         [Test]
@@ -151,7 +187,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("en-US")]
         public void GetSettings_GetsValuesFrom_PortalSettings_en_US(string stringValue, int integerValue, double doubleValue, bool booleanValue, DateTime datetimeValue, TimeSpan timeSpanValue, TestingEnum enumValue, ComplexType complexValue)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_GetsValuesFrom_PortalSettings_en_US(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
             this.GetSettings_GetsValuesFrom_PortalSettings(stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_GetsValuesFrom_PortalSettings_en_US(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
         }
 
         [Test]
@@ -159,7 +197,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("fr-FR")]
         public void GetSettings_GetsValuesFrom_PortalSettings_fr_FR(string stringValue, int integerValue, double doubleValue, bool booleanValue, DateTime datetimeValue, TimeSpan timeSpanValue, TestingEnum enumValue, ComplexType complexValue)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_GetsValuesFrom_PortalSettings_fr_FR(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
             this.GetSettings_GetsValuesFrom_PortalSettings(stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_GetsValuesFrom_PortalSettings_fr_FR(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
         }
 
         [Test]
@@ -167,7 +207,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("he-IL")]
         public void GetSettings_GetsValuesFrom_PortalSettings_he_IL(string stringValue, int integerValue, double doubleValue, bool booleanValue, DateTime datetimeValue, TimeSpan timeSpanValue, TestingEnum enumValue, ComplexType complexValue)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_GetsValuesFrom_PortalSettings_he_IL(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
             this.GetSettings_GetsValuesFrom_PortalSettings(stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_GetsValuesFrom_PortalSettings_he_IL(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
         }
 
         [Test]
@@ -175,7 +217,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("ru-RU")]
         public void GetSettings_GetsValuesFrom_PortalSettings_ru_RU(string stringValue, int integerValue, double doubleValue, bool booleanValue, DateTime datetimeValue, TimeSpan timeSpanValue, TestingEnum enumValue, ComplexType complexValue)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_GetsValuesFrom_PortalSettings_ru_RU(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
             this.GetSettings_GetsValuesFrom_PortalSettings(stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_GetsValuesFrom_PortalSettings_ru_RU(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
         }
 
         [Test]
@@ -183,12 +227,15 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("tr-TR")]
         public void GetSettings_GetsValuesFrom_PortalSettings_tr_TR(string stringValue, int integerValue, double doubleValue, bool booleanValue, DateTime datetimeValue, TimeSpan timeSpanValue, TestingEnum enumValue, ComplexType complexValue)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_GetsValuesFrom_PortalSettings_tr_TR(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
             this.GetSettings_GetsValuesFrom_PortalSettings(stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_GetsValuesFrom_PortalSettings_tr_TR(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
         }
 
         private void SaveSettings_CallsUpdatePortalSetting_WithRightParameters(string stringValue, int integerValue, double doubleValue,
             bool booleanValue, DateTime datetimeValue, TimeSpan timeSpanValue, TestingEnum enumValue, ComplexType complexValue)
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_CallsUpdatePortalSetting_WithRightParameters(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
             // Arrange
             var moduleInfo = GetModuleInfo;
             var settings = new MyPortalSettings
@@ -213,16 +260,22 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
             this.MockPortalController.Setup(pc => pc.UpdatePortalSetting(PortalId, SettingNamePrefix + "ComplexProperty", $"{complexValue.X} | {complexValue.Y}", true, Null.NullString, false));
 
             var settingsRepository = new MyPortalSettingsRepository();
+			mockEventLogger.LogDebug("SaveSettings_CallsUpdatePortalSetting_WithRightParameters(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue}): settingsRepository → {SettingsRepository}", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue, settingsRepository);
 
             // Act
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			mockEventLogger.LogInformation("SaveSettings_CallsUpdatePortalSetting_WithRightParameters(stringValue,integerValue,doubleValue,booleanValue,datetimeValue,timeSpanValue,enumValue,complexValue)={StringValue},{IntegerValue},{DoubleValue},{BooleanValue},{DatetimeValue},{TimeSpanValue},{EnumValue},{ComplexValue}: save query executed in {Arg8} ms", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue, __logStart.ElapsedMilliseconds);
             settingsRepository.SaveSettings(moduleInfo, settings);
 
             // Assert
             this.MockRepository.VerifyAll();
+			mockEventLogger.LogInformation("SaveSettings_CallsUpdatePortalSetting_WithRightParameters(stringValue,integerValue,doubleValue,booleanValue,datetimeValue,timeSpanValue,enumValue,complexValue)={StringValue},{IntegerValue},{DoubleValue},{BooleanValue},{DatetimeValue},{TimeSpanValue},{EnumValue},{ComplexValue}: database query executed in {Arg8} ms", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue, __logStart.ElapsedMilliseconds);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_CallsUpdatePortalSetting_WithRightParameters(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
         }
 
         private void GetSettings_GetsValuesFrom_PortalSettings(string stringValue, int integerValue, double doubleValue, bool booleanValue, DateTime datetimeValue, TimeSpan timeSpanValue, TestingEnum enumValue, ComplexType complexValue)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_GetsValuesFrom_PortalSettings(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
             // Arrange
             var moduleInfo = GetModuleInfo;
             var portalSettings = new Dictionary<string, string>
@@ -240,10 +293,14 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
             this.MockPortalSettings(moduleInfo, portalSettings);
 
             var settingsRepository = new MyPortalSettingsRepository();
+			mockEventLogger.LogDebug("GetSettings_GetsValuesFrom_PortalSettings(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue}): settingsRepository → {SettingsRepository}", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue, settingsRepository);
 
             // Act
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var settings = settingsRepository.GetSettings(moduleInfo);
 
+			mockEventLogger.LogDebug("GetSettings_GetsValuesFrom_PortalSettings(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue}): settings → {Settings}", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue, settings);
+			mockEventLogger.LogInformation("GetSettings_GetsValuesFrom_PortalSettings(stringValue,integerValue,doubleValue,booleanValue,datetimeValue,timeSpanValue,enumValue,complexValue)={StringValue},{IntegerValue},{DoubleValue},{BooleanValue},{DatetimeValue},{TimeSpanValue},{EnumValue},{ComplexValue}: find query executed in {Arg8} ms", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue, __logStart.ElapsedMilliseconds);
             using (Assert.EnterMultipleScope())
             {
                 // Assert
@@ -257,6 +314,7 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
                 Assert.That(settings.ComplexProperty, Is.EqualTo(complexValue), "The retrieved complex property value is not equal to the stored one");
             }
             this.MockRepository.VerifyAll();
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_GetsValuesFrom_PortalSettings(stringValue={StringValue},integerValue={IntegerValue},doubleValue={DoubleValue},booleanValue={BooleanValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue},enumValue={EnumValue},complexValue={ComplexValue})", stringValue, integerValue, doubleValue, booleanValue, datetimeValue, timeSpanValue, enumValue, complexValue);
         }
 
         public class MyPortalSettings

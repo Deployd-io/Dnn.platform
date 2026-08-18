@@ -10,10 +10,12 @@ namespace Dnn.PersonaBar.Library.Prompt.Common
 
     public class EmailValidator
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(EmailValidator));
         private bool invalid;
 
         public bool IsValid(string emailToTest)
         {
+			Logger.LogDebug(">>> Entering IsValid(emailToTest={EmailToTest})", emailToTest);
             if (string.IsNullOrEmpty(emailToTest))
             {
                 return false;
@@ -23,9 +25,11 @@ namespace Dnn.PersonaBar.Library.Prompt.Common
             try
             {
                 emailToTest = Regex.Replace(emailToTest, "(@)(.+)$", this.DomainMapper, RegexOptions.None, TimeSpan.FromMilliseconds(200));
+				Logger.LogDebug("IsValid(emailToTest={EmailToTest}): emailToTest → {EmailToTest1}", emailToTest, emailToTest);
             }
             catch (RegexMatchTimeoutException)
             {
+				Logger.LogError("Exception in IsValid(emailToTest={EmailToTest}): {Arg1}", emailToTest, RegexMatchTimeoutException.getMessage());
                 return false;
             }
 

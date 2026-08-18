@@ -9,16 +9,21 @@ namespace DotNetNuke.Prompt
     /// <summary>This is used to return the results of the execution of a command to the client.</summary>
     public class ConsoleResultModel : IConsoleResultModel
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ConsoleResultModel));
         /// <summary>Initializes a new instance of the <see cref="ConsoleResultModel"/> class.</summary>
         public ConsoleResultModel()
         {
+		Logger.LogDebug(">>> Entering ConsoleResultModel()");
+		Logger.LogDebug("<<< Exiting ConsoleResultModel()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ConsoleResultModel"/> class.</summary>
         /// <param name="output">The output text.</param>
         public ConsoleResultModel(string output)
         {
+			Logger.LogDebug(">>> Entering ConsoleResultModel(output={Output})", output);
             this.Output = output;
+			Logger.LogDebug("<<< Exiting ConsoleResultModel(output={Output})", output);
         }
 
         /// <inheritdoc />

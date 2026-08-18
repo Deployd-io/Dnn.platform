@@ -16,6 +16,8 @@ namespace Dnn.PersonaBar.Users.Data
         /// <inheritdoc />
         public IList<UserBasicDto> GetUsersByUserIds(int portalId, string userIds)
         {
+			eventLogger.LogDebug(">>> Entering GetUsersByUserIds(portalId={PortalId},userIds={UserIds})", portalId, userIds);
+			eventLogger.LogDebug("<<< Exiting GetUsersByUserIds(portalId={PortalId},userIds={UserIds})", portalId, userIds);
             return CBO.FillCollection<UserBasicDto>(
                 DotNetNuke.Data.DataProvider.Instance()
                     .ExecuteReader(
@@ -27,6 +29,8 @@ namespace Dnn.PersonaBar.Users.Data
         /// <inheritdoc />
         protected override Func<IUsersDataService> GetFactory()
         {
+			eventLogger.LogDebug(">>> Entering GetFactory()");
+			eventLogger.LogDebug("<<< Exiting GetFactory()");
             return () => new UsersDataService();
         }
     }

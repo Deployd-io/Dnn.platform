@@ -5,12 +5,14 @@
 namespace DotNetNuke.ContentSecurityPolicy
 {
     using System;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Utility class for converting directive types to their string representations.
     /// </summary>
     public static class CspDirectiveNameMapper
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>
         /// Gets the directive name string.
         /// </summary>
@@ -18,6 +20,12 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>The directive name string.</returns>
         public static string GetDirectiveName(CspDirectiveType directiveType)
         {
+			_logger.LogDebug(">>> Entering GetDirectiveName(directiveType={DirectiveType})", directiveType);
+			_logger.LogDebug("GetDirectiveName(directiveType={DirectiveType}): CspDirectiveType.BaseUri → {Arg1}", directiveType, CspDirectiveType.BaseUri);
+			_logger.LogDebug("GetDirectiveName(directiveType={DirectiveType}): CspDirectiveType.ReportUri → {Arg1}", directiveType, CspDirectiveType.ReportUri);
+			_logger.LogDebug("GetDirectiveName(directiveType={DirectiveType}): CspDirectiveType.ConnectSrc → {Arg1}", directiveType, CspDirectiveType.ConnectSrc);
+			_logger.LogDebug("GetDirectiveName(directiveType={DirectiveType}): CspDirectiveType.ScriptSrc → {Arg1}", directiveType, CspDirectiveType.ScriptSrc);
+			_logger.LogDebug("<<< Exiting GetDirectiveName(directiveType={DirectiveType})", directiveType);
             return directiveType switch
             {
                 CspDirectiveType.DefaultSrc => "default-src",
@@ -54,6 +62,8 @@ namespace DotNetNuke.ContentSecurityPolicy
                 throw new ArgumentException("Directive name cannot be null or empty", nameof(directiveName));
             }
 
+			_logger.LogDebug(">>> Entering GetDirectiveType(directiveName={DirectiveName})", directiveName);
+			_logger.LogDebug("<<< Exiting GetDirectiveType(directiveName={DirectiveName})", directiveName);
             return directiveName.ToLowerInvariant() switch
             {
                 "default-src" => CspDirectiveType.DefaultSrc,
@@ -85,8 +95,10 @@ namespace DotNetNuke.ContentSecurityPolicy
         /// <returns>True if parsing was successful, false otherwise.</returns>
         public static bool TryGetDirectiveType(string directiveName, out CspDirectiveType directiveType)
         {
+			_logger.LogDebug(">>> Entering TryGetDirectiveType(directiveName={DirectiveName})", directiveName);
             directiveType = default;
 
+			_logger.LogDebug("TryGetDirectiveType(directiveName={DirectiveName}): directiveType → {DirectiveType}", directiveName, directiveType);
             try
             {
                 directiveType = GetDirectiveType(directiveName);
@@ -94,6 +106,8 @@ namespace DotNetNuke.ContentSecurityPolicy
             }
             catch
             {
+				_logger.LogError("Exception in TryGetDirectiveType(directiveName={DirectiveName}): {Arg1}", directiveName, ex.Message);
+				_logger.LogDebug("<<< Exiting TryGetDirectiveType(directiveName={DirectiveName})", directiveName);
                 return false;
             }
         }

@@ -4,12 +4,16 @@ import { Label } from "@dnnsoftware/dnn-react-common";
 import localization from "../../../localization";
 import Card from "../Card/Card";
 import Gallery from "../Gallery/Gallery";
+const logger = console;
 
 class LayoutSelector extends Component {
 
     onClickLayout(layoutName) {
+		logger.debug(`>>> Entering onClickLayout(layoutName=${layoutName})`);
         const layout = this.props.layouts.find(l => l.name === layoutName);
         this.props.onSelectLayout(layout);
+		logger.debug(`onClickLayout(layoutName=${layoutName}): layout → ${layout}`);
+		logger.debug(`<<< Exiting onClickLayout(layoutName=${layoutName})`);
     }
 
     isSelected(layout) {
@@ -21,14 +25,17 @@ class LayoutSelector extends Component {
     }
 
     getSelectedIndex() {
+		logger.debug('>>> Entering getSelectedIndex()');
         const { selectedLayout, layouts } = this.props;
         if (!selectedLayout) {
+		logger.debug('<<< Exiting getSelectedIndex()');
             return -1;
         }
         return layouts.findIndex(c => c.name === selectedLayout.name);
     }
 
     getLayoutCards() {
+		logger.debug('>>> Entering getLayoutCards()');
         const { layouts, noThemeSelected } = this.props;
         let {defaultPortalLayout} = this.props;
         defaultPortalLayout = defaultPortalLayout === null ? "" : defaultPortalLayout;
@@ -51,10 +58,13 @@ class LayoutSelector extends Component {
                 selected={this.isSelected(layout) }
                 size="small" />;
         });
+		logger.debug('<<< Exiting getLayoutCards()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const selectedIndex = this.getSelectedIndex();
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 <Label

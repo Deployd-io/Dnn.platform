@@ -49,6 +49,8 @@ namespace log4net.Appender
         /// </remarks>
         public ForwardingAppender()
         {
+		value.LogDebug(">>> Entering ForwardingAppender()");
+		value.LogDebug("<<< Exiting ForwardingAppender()");
         }
 
         /// <summary>
@@ -65,6 +67,7 @@ namespace log4net.Appender
         /// </remarks>
         protected override void OnClose()
         {
+			value.LogDebug(">>> Entering OnClose()");
             // Remove all the attached appenders
             lock(this)
             {
@@ -73,6 +76,7 @@ namespace log4net.Appender
                     this.m_appenderAttachedImpl.RemoveAllAppenders();
                 }
             }
+			value.LogDebug("<<< Exiting OnClose()");
         }
 
         /// <summary>
@@ -86,11 +90,13 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent loggingEvent) 
         {
+			value.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             // Pass the logging event on the the attached appenders
             if (this.m_appenderAttachedImpl != null)
             {
                 this.m_appenderAttachedImpl.AppendLoopOnAppenders(loggingEvent);
             }
+			value.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
         } 
 
         /// <summary>
@@ -104,11 +110,13 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent[] loggingEvents) 
         {
+			value.LogDebug(">>> Entering Append(loggingEvents={LoggingEvents})", loggingEvents);
             // Pass the logging event on the the attached appenders
             if (this.m_appenderAttachedImpl != null)
             {
                 this.m_appenderAttachedImpl.AppendLoopOnAppenders(loggingEvents);
             }
+			value.LogDebug("<<< Exiting Append(loggingEvents={LoggingEvents})", loggingEvents);
         }
 
         /// <summary>
@@ -124,8 +132,10 @@ namespace log4net.Appender
         /// </remarks>
         public virtual void AddAppender(IAppender newAppender) 
         {
+			value.LogDebug(">>> Entering AddAppender(newAppender={NewAppender})", newAppender);
             if (newAppender == null)
             {
+				value.LogWarning("Throwing ArgumentNullException from AddAppender(newAppender={NewAppender})", newAppender);
                 throw new ArgumentNullException("newAppender");
             }
             lock(this)
@@ -133,10 +143,12 @@ namespace log4net.Appender
                 if (this.m_appenderAttachedImpl == null) 
                 {
                     this.m_appenderAttachedImpl = new AppenderAttachedImpl();
+					value.LogDebug("AddAppender(newAppender={NewAppender}): m_appenderAttachedImpl → {M_appenderAttachedImpl}", newAppender, m_appenderAttachedImpl);
                 }
 
                 this.m_appenderAttachedImpl.AddAppender(newAppender);
             }
+			value.LogDebug("<<< Exiting AddAppender(newAppender={NewAppender})", newAppender);
         }
 
         /// <summary>
@@ -182,10 +194,12 @@ namespace log4net.Appender
         /// </remarks>
         public virtual IAppender GetAppender(string name) 
         {
+			value.LogDebug(">>> Entering GetAppender(name={Name})", name);
             lock(this)
             {
                 if (this.m_appenderAttachedImpl == null || name == null)
                 {
+				value.LogDebug("<<< Exiting GetAppender(name={Name})", name);
                     return null;
                 }
 
@@ -203,14 +217,18 @@ namespace log4net.Appender
         /// </remarks>
         public virtual void RemoveAllAppenders() 
         {
+			value.LogDebug(">>> Entering RemoveAllAppenders()");
             lock(this)
             {
                 if (this.m_appenderAttachedImpl != null) 
                 {
                     this.m_appenderAttachedImpl.RemoveAllAppenders();
                     this.m_appenderAttachedImpl = null;
+					value.LogDebug("RemoveAllAppenders(): m_appenderAttachedImpl → {M_appenderAttachedImpl}", m_appenderAttachedImpl);
+					value.LogDebug("RemoveAllAppenders(): this.m_appenderAttachedImpl → {Arg0}", this.m_appenderAttachedImpl);
                 }
             }
+			value.LogDebug("<<< Exiting RemoveAllAppenders()");
         }
 
         /// <summary>
@@ -225,6 +243,7 @@ namespace log4net.Appender
         /// </remarks>
         public virtual IAppender RemoveAppender(IAppender appender) 
         {
+			value.LogDebug(">>> Entering RemoveAppender(appender={Appender})", appender);
             lock(this)
             {
                 if (appender != null && this.m_appenderAttachedImpl != null) 
@@ -232,6 +251,8 @@ namespace log4net.Appender
                     return this.m_appenderAttachedImpl.RemoveAppender(appender);
                 }
             }
+			value.LogDebug("<<< Exiting RemoveAppender(appender={Appender})", appender);
+			value.LogDebug("<<< Exiting RemoveAppender(name={Name})", name);
             return null;
         }
 

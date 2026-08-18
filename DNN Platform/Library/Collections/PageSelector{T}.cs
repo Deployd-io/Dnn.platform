@@ -10,6 +10,7 @@ namespace DotNetNuke.Collections
     /// <typeparam name = "T">The type of object in the data store.</typeparam>
     public class PageSelector<T>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PageSelector{T}));
         private readonly int pageSize;
         private readonly IEnumerable<T> source;
 
@@ -21,8 +22,12 @@ namespace DotNetNuke.Collections
         /// <param name="pageSize">The size of each page.</param>
         public PageSelector(IEnumerable<T> source, int pageSize)
         {
+			Logger.LogDebug(">>> Entering PageSelector(source={Source},pageSize={PageSize})", source, pageSize);
             this.source = source;
             this.pageSize = pageSize;
+			Logger.LogDebug("PageSelector(source={Source},pageSize={PageSize}): this.source → {Arg2}", source, pageSize, this.source);
+			Logger.LogDebug("PageSelector(source={Source},pageSize={PageSize}): pageSize → {PageSize1}", source, pageSize, pageSize);
+			Logger.LogDebug("<<< Exiting PageSelector(source={Source},pageSize={PageSize})", source, pageSize);
         }
 
         /// <summary>  Retrieves the specified page as a <see cref = "IPagedList{T}" />.</summary>
@@ -33,6 +38,8 @@ namespace DotNetNuke.Collections
         /// </returns>
         public IPagedList<T> GetPage(int pageIndex)
         {
+			Logger.LogDebug(">>> Entering GetPage(pageIndex={PageIndex})", pageIndex);
+			Logger.LogDebug("<<< Exiting GetPage(pageIndex={PageIndex})", pageIndex);
             return new PagedList<T>(this.source, pageIndex, this.pageSize);
         }
     }

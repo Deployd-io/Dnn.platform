@@ -13,27 +13,35 @@ import PageTypeSelector from "../PageTypeSelector/PageTypeSelector";
 import PageLocalization from "../PageLocalization/PageLocalization";
 import securityService from "../../services/securityService";
 import permissionTypes from "../../services/permissionTypes";
+const logger = console;
 
 class PageSettings extends Component {
 
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = { selectedPageName: "" };
+		logger.debug(`constructor(): this.state → ${this.state}`);
+		logger.debug('<<< Exiting constructor()');
     }
 
     hasPageErrors() {
+		logger.debug('>>> Entering hasPageErrors()');
         const { selectedPageErrors } = this.props;
+		logger.debug('<<< Exiting hasPageErrors()');
         return Object.keys(selectedPageErrors)
             .map(key => selectedPageErrors[key])
             .some(value => value);
     }
 
     getButtons() {
+		logger.debug('>>> Entering getButtons()');
         const { selectedPage, onCancel, onSave, onDelete, selectedPageDirty } = this.props;
 
         const saveButtonText = selectedPage.tabId === 0 ?
             Localization.get("AddPage") : Localization.get("Save");
         const pageErrors = this.hasPageErrors();
+		logger.debug(`getButtons(): pageErrors → ${pageErrors}`);
 
         let buttons = [<Button
             key="cancelButton"
@@ -59,6 +67,7 @@ class PageSettings extends Component {
                 {Localization.get("Delete")}
             </Button>);
         }
+		logger.debug('<<< Exiting getButtons()');
         return buttons;
     }
 
@@ -77,6 +86,8 @@ class PageSettings extends Component {
     }
 
     getCopyAppearanceToDescendantPagesButton() {
+		logger.debug('>>> Entering getCopyAppearanceToDescendantPagesButton()');
+		logger.debug('<<< Exiting getCopyAppearanceToDescendantPagesButton()');
         return <Button
             key="secondaryAppearanceButton"
             type="secondary"
@@ -86,6 +97,8 @@ class PageSettings extends Component {
     }
 
     getCopyPermissionsToDescendantPagesButton() {
+		logger.debug('>>> Entering getCopyPermissionsToDescendantPagesButton()');
+		logger.debug('<<< Exiting getCopyPermissionsToDescendantPagesButton()');
         return <Button
             key="secondaryPermissionsButton"
             type="secondary"
@@ -95,14 +108,17 @@ class PageSettings extends Component {
     }
 
     onSelectParentPageId(parentPageId, parentPageName) {
+		logger.debug(`>>> Entering onSelectParentPageId(parentPageId=${parentPageId},parentPageName=${parentPageName})`);
         if (this.state.parentPageId !== parentPageId) {
             this.setState({ parentPageId, parentPageName });
             this.props.onChangeParentId(parentPageId);
             this.props.onChangeField("hierarchy", parentPageName);
+			logger.debug(`<<< Exiting onSelectParentPageId(parentPageId=${parentPageId},parentPageName=${parentPageName})`);
         }
     }
     
     render() {
+		logger.debug('>>> Entering render()');
         const {
             selectedPage,
             selectedPageErrors,
@@ -121,6 +137,7 @@ class PageSettings extends Component {
         } = this.props;
 
         const buttons = this.getButtons();
+		logger.debug(`render(): buttons → ${buttons}`);
         const isEditingExistingPage = selectedPage.tabId !== 0;
         const appearanceButtons = [...buttons];
         const permissionsButtons = [...buttons];
@@ -133,8 +150,11 @@ class PageSettings extends Component {
         }
 
         const footer = this.getPageFooter(buttons);
+		logger.debug(`render(): footer → ${footer}`);
         const appearanceFooter = this.getPageFooter(appearanceButtons);
+		logger.debug(`render(): appearanceFooter → ${appearanceFooter}`);
         const permissionFooter = this.getPageFooter(permissionsButtons);
+		logger.debug(`render(): permissionFooter → ${permissionFooter}`);
 
         const advancedTabs = [
             {
@@ -234,6 +254,7 @@ class PageSettings extends Component {
                 </DnnTabs>
             </div>);
         }
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 <DnnTabs

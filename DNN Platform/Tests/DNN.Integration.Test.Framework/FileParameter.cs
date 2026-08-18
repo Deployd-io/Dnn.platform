@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information
@@ -6,9 +7,14 @@ namespace DNN.Integration.Test.Framework
 {
     public class FileParameter
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public FileParameter(byte[] file)
             : this(file, null)
         {
+		_logger.LogDebug(">>> Entering FileParameter(file={File})", file);
+		_logger.LogDebug("<<< Exiting FileParameter(file={File},filename={Filename})", file, filename);
+		_logger.LogDebug("<<< Exiting FileParameter(file={File})", file);
+		_logger.LogDebug(">>> Entering FileParameter(file={File},filename={Filename})", file, filename);
         }
 
         public FileParameter(byte[] file, string filename)
@@ -20,6 +26,7 @@ namespace DNN.Integration.Test.Framework
         {
             this.File = file;
             this.FileName = filename;
+			_logger.LogDebug("FileParameter(file={File},filename={Filename},contenttype={Contenttype}): this.File → {Arg3}", file, filename, contenttype, this.File);
             this.ContentType = contenttype;
         }
 

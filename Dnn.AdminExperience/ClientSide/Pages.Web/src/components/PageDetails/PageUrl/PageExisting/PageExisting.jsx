@@ -6,6 +6,7 @@ import { InputGroup, PagePicker, Label } from "@dnnsoftware/dnn-react-common";
 import utils from "../../../../utils";
 import Localization from "../../../../localization";
 import PageUrlCommons from "../PageUrlCommons/PageUrlCommons";
+const logger = console;
 
 const PageToTestParameters = {
     portalId: -2,
@@ -20,15 +21,21 @@ const PageToTestParameters = {
 class PageExisting extends Component {
 
     onChangePage(value) {
+		logger.debug(`>>> Entering onChangePage(value=${value})`);
         const {onChangeField} = this.props;
         onChangeField("existingTabRedirection", parseInt(value) === -1 ? "" : value);
+		logger.debug(`<<< Exiting onChangePage(value=${value})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {page} = this.props;
         const serviceFramework = utils.getServiceFramework();
+		logger.debug(`render(): serviceFramework → ${serviceFramework}`);
         const noneSpecifiedText = "<" + Localization.get("NoneSpecified") + ">";
+		logger.debug(`render(): noneSpecifiedText → ${noneSpecifiedText}`);
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.pageExisting}>
                 <InputGroup>
@@ -58,6 +65,8 @@ PageExisting.propTypes = {
 };
 
 const mapStateToProps = (state) => {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return ({page : state.pages.selectedPage});
 };
 

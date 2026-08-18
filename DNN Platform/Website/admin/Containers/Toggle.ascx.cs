@@ -17,6 +17,7 @@ namespace DotNetNuke.UI.Containers.Controls
     [PersistChildren(true)]
     public partial class Toggle : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Toggle.ascx));
         private readonly IJavaScriptLibraryHelper javaScript;
         private string target;
 
@@ -24,6 +25,10 @@ namespace DotNetNuke.UI.Containers.Controls
         public Toggle()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering Toggle()");
+		Logger.LogDebug("<<< Exiting Toggle()");
+		Logger.LogDebug(">>> Entering Toggle(javaScript={JavaScript})", javaScript);
+		Logger.LogDebug("Toggle(javaScript={JavaScript}): javaScript → {JavaScript1}", javaScript, javaScript);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Toggle"/> class.</summary>
@@ -31,6 +36,7 @@ namespace DotNetNuke.UI.Containers.Controls
         public Toggle(IJavaScriptLibraryHelper javaScript)
         {
             this.javaScript = javaScript ?? Globals.GetCurrentServiceProvider().GetRequiredService<IJavaScriptLibraryHelper>();
+			Logger.LogDebug("<<< Exiting Toggle(javaScript={JavaScript})", javaScript);
         }
 
         public string Class { get; set; }
@@ -64,6 +70,7 @@ namespace DotNetNuke.UI.Containers.Controls
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             this.javaScript.RequestRegistration(CommonJs.jQuery);
             this.javaScript.RequestRegistration(CommonJs.jQueryMigrate);
 
@@ -72,11 +79,13 @@ namespace DotNetNuke.UI.Containers.Controls
                 this.ClientID,
                 this.Target);
             this.Page.ClientScript.RegisterStartupScript(this.GetType(), this.ClientID, toggleScript);
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer);
             writer.AddAttribute("id", this.ClientID);
             writer.AddAttribute("class", this.Class);
             writer.RenderBeginTag("h2");
@@ -89,6 +98,7 @@ namespace DotNetNuke.UI.Containers.Controls
 
             writer.RenderEndTag();
             writer.RenderEndTag();
+			Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer);
         }
     }
 }

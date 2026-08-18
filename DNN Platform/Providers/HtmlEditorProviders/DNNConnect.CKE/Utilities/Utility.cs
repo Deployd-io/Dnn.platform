@@ -69,6 +69,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static bool IsUnit(object valueToCheck)
         {
+			eventLogger.LogDebug(">>> Entering IsUnit(valueToCheck={ValueToCheck})", valueToCheck);
             string sInputValue = Convert.ToString(valueToCheck);
 
             string sNewValue;
@@ -77,6 +78,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
             {
                 sNewValue = sInputValue.Replace("px", string.Empty);
 
+				eventLogger.LogDebug("IsUnit(valueToCheck={ValueToCheck}): sNewValue → {SNewValue}", valueToCheck, sNewValue);
                 if (IsNumeric(sNewValue))
                 {
                     return true;
@@ -99,6 +101,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting IsUnit(valueToCheck={ValueToCheck})", valueToCheck);
             return false;
         }
 
@@ -111,11 +114,13 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static bool IsNumeric(object valueToCheck)
         {
+			eventLogger.LogDebug(">>> Entering IsNumeric(valueToCheck={ValueToCheck})", valueToCheck);
             double resultValue;
             string inputValue = Convert.ToString(valueToCheck);
 
             bool numeric = double.TryParse(inputValue, NumberStyles.Any, null, out resultValue);
 
+			eventLogger.LogDebug("<<< Exiting IsNumeric(valueToCheck={ValueToCheck})", valueToCheck);
             return numeric;
         }
 
@@ -128,6 +133,8 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static bool ValidatePath(string path)
         {
+			eventLogger.LogDebug(">>> Entering ValidatePath(path={Path})", path);
+			eventLogger.LogDebug("<<< Exiting ValidatePath(path={Path})", path);
             return PathValidator.IsMatch(path);
         }
 
@@ -152,6 +159,8 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static string CleanPath(string path)
         {
+			eventLogger.LogDebug(">>> Entering CleanPath(path={Path})", path);
+			eventLogger.LogDebug("<<< Exiting CleanPath(path={Path})", path);
             return PathCleaner.Replace(path, string.Empty);
         }
 
@@ -172,32 +181,58 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// <returns>The ASCII equivalent output.</returns>
         public static string ConvertUnicodeChars(string input)
         {
+			eventLogger.LogDebug(">>> Entering ConvertUnicodeChars(input={Input})", input);
             Regex regA = new Regex("[ã|à|â|ä|á|å]");
             Regex regAA = new Regex("[Ã|À|Â|Ä|Á|Å]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regAA → {RegAA}", input, regAA);
             Regex regE = new Regex("[é|è|ê|ë]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regE → {RegE}", input, regE);
             Regex regEE = new Regex("[É|È|Ê|Ë]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regEE → {RegEE}", input, regEE);
             Regex regI = new Regex("[í|ì|î|ï]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regI → {RegI}", input, regI);
             Regex regII = new Regex("[Í|Ì|Î|Ï]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regII → {RegII}", input, regII);
             Regex regO = new Regex("[õ|ò|ó|ô|ö]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regO → {RegO}", input, regO);
             Regex regOO = new Regex("[Õ|Ó|Ò|Ô|Ö]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regOO → {RegOO}", input, regOO);
             Regex regU = new Regex("[ù|ú|û|ü|µ]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regU → {RegU}", input, regU);
             Regex regUU = new Regex("[Ü|Ú|Ù|Û]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regUU → {RegUU}", input, regUU);
             Regex regY = new Regex("[ý|ÿ]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regY → {RegY}", input, regY);
             Regex regYY = new Regex("[Ý]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regYY → {RegYY}", input, regYY);
             Regex regAE = new Regex("[æ]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regAE → {RegAE}", input, regAE);
             Regex regAEAE = new Regex("[Æ]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regAEAE → {RegAEAE}", input, regAEAE);
             Regex regOE = new Regex("[œ]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regOE → {RegOE}", input, regOE);
             Regex regOEOE = new Regex("[Œ]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regOEOE → {RegOEOE}", input, regOEOE);
             Regex regC = new Regex("[ç]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regC → {RegC}", input, regC);
             Regex regCC = new Regex("[Ç]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regCC → {RegCC}", input, regCC);
             Regex regDD = new Regex("[Ð]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regDD → {RegDD}", input, regDD);
             Regex regN = new Regex("[ñ]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regN → {RegN}", input, regN);
             Regex regNN = new Regex("[Ñ]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regNN → {RegNN}", input, regNN);
             Regex regS = new Regex("[š]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regS → {RegS}", input, regS);
             Regex regSS = new Regex("[Š]");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regSS → {RegSS}", input, regSS);
             Regex regDot = new Regex("[\uFF0E]");                      // 'U+FF0E' = full-width dot
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regDot → {RegDot}", input, regDot);
             Regex regBackslash = new Regex("[\uFF3C|\u29F5|\uFE68]");  // backslash-like characters
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regBackslash → {RegBackslash}", input, regBackslash);
             input = regA.Replace(input, "a");
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): input → {Input1}", input, input);
             input = regAA.Replace(input, "A");
             input = regE.Replace(input, "e");
             input = regEE.Replace(input, "E");
@@ -236,6 +271,8 @@ namespace DNNConnect.CKEditorProvider.Utilities
             input = input.Replace("\n", string.Empty);
             input = input.Replace("+", "_");
 
+			eventLogger.LogDebug("ConvertUnicodeChars(input={Input}): regA → {RegA}", input, regA);
+			eventLogger.LogDebug("<<< Exiting ConvertUnicodeChars(input={Input})", input);
             return input;
         }
 
@@ -247,6 +284,8 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static bool CheckIfUserHasFolderWriteAccess(int folderId, IPortalSettings portalSettings)
         {
+			eventLogger.LogDebug(">>> Entering CheckIfUserHasFolderWriteAccess(folderId={FolderId},portalSettings={PortalSettings})", folderId, portalSettings);
+			eventLogger.LogDebug("<<< Exiting CheckIfUserHasFolderWriteAccess(folderId={FolderId},portalSettings={PortalSettings})", folderId, portalSettings);
             return CheckIfUserHasFolderAccess(folderId, portalSettings, "WRITE");
         }
 
@@ -258,6 +297,8 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static bool CheckIfUserHasFolderReadAccess(int folderId, IPortalSettings portalSettings)
         {
+			eventLogger.LogDebug(">>> Entering CheckIfUserHasFolderReadAccess(folderId={FolderId},portalSettings={PortalSettings})", folderId, portalSettings);
+			eventLogger.LogDebug("<<< Exiting CheckIfUserHasFolderReadAccess(folderId={FolderId},portalSettings={PortalSettings})", folderId, portalSettings);
             return CheckIfUserHasFolderAccess(folderId, portalSettings, "READ");
         }
 
@@ -289,18 +330,24 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static int ConvertFilePathToFileId(string filePath, int portalID)
         {
+			eventLogger.LogDebug(">>> Entering ConvertFilePathToFileId(filePath={FilePath},portalID={PortalID})", filePath, portalID);
             var fileName = Path.GetFileName(filePath);
 
+			eventLogger.LogDebug("ConvertFilePathToFileId(filePath={FilePath},portalID={PortalID}): fileName → {FileName}", filePath, portalID, fileName);
             if (fileName == null)
             {
                 return Null.NullInteger;
             }
 
             var folderPath = filePath.Substring(0, filePath.LastIndexOf(fileName, StringComparison.Ordinal));
+			eventLogger.LogDebug("ConvertFilePathToFileId(filePath={FilePath},portalID={PortalID}): folderPath → {FolderPath}", filePath, portalID, folderPath);
             var folder = FolderManager.Instance.GetFolder(portalID, folderPath);
+			eventLogger.LogDebug("ConvertFilePathToFileId(filePath={FilePath},portalID={PortalID}): folder → {Folder}", filePath, portalID, folder);
 
             var file = FileManager.Instance.GetFile(folder, fileName);
+			eventLogger.LogDebug("ConvertFilePathToFileId(filePath={FilePath},portalID={PortalID}): file → {File}", filePath, portalID, file);
 
+			eventLogger.LogDebug("<<< Exiting ConvertFilePathToFileId(filePath={FilePath},portalID={PortalID})", filePath, portalID);
             return file.FileId;
         }
 
@@ -319,8 +366,10 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </typeparam>
         public static void SortAscending<TSource, TValue>(List<TSource> source, Func<TSource, TValue> selector)
         {
+			eventLogger.LogDebug(">>> Entering SortAscending(source={Source},selector={Selector})", source, selector);
             var comparer = Comparer<TValue>.Default;
             source.Sort((x, y) => comparer.Compare(selector(x), selector(y)));
+			eventLogger.LogDebug("<<< Exiting SortAscending(source={Source},selector={Selector})", source, selector);
         }
 
         /// <summary>Sort a List Descending.</summary>
@@ -338,8 +387,10 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </typeparam>
         public static void SortDescending<TSource, TValue>(List<TSource> source, Func<TSource, TValue> selector)
         {
+			eventLogger.LogDebug(">>> Entering SortDescending(source={Source},selector={Selector})", source, selector);
             var comparer = Comparer<TValue>.Default;
             source.Sort((x, y) => comparer.Compare(selector(y), selector(x)));
+			eventLogger.LogDebug("<<< Exiting SortDescending(source={Source},selector={Selector})", source, selector);
         }
 
         /// <summary>Determines whether user is in the specified role.</summary>
@@ -350,9 +401,12 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static bool IsInRoles(string roles, IPortalSettings settings)
         {
+			eventLogger.LogDebug(">>> Entering IsInRoles(roles={Roles},settings={Settings})", roles, settings);
             var objUserInfo = UserController.Instance.GetCurrentUserInfo();
 
+			eventLogger.LogDebug("IsInRoles(roles={Roles},settings={Settings}): objUserInfo → {ObjUserInfo}", roles, settings, objUserInfo);
             var isInRoles = objUserInfo.IsSuperUser;
+			eventLogger.LogDebug("IsInRoles(roles={Roles},settings={Settings}): isInRoles → {IsInRoles}", roles, settings, isInRoles);
 
             if (isInRoles)
             {
@@ -367,6 +421,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 if (role.StartsWith("!"))
                 {
                     var denyRole = role.Replace("!", string.Empty);
+					eventLogger.LogDebug("IsInRoles(roles={Roles},settings={Settings}): denyRole → {DenyRole}", roles, settings, denyRole);
 
                     if ((!context.Request.IsAuthenticated && denyRole.Equals(Globals.glbRoleUnauthUserName)) || denyRole.Equals(Globals.glbRoleAllUsersName) ||
                         objUserInfo.IsInRole(denyRole))
@@ -394,6 +449,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting IsInRoles(roles={Roles},settings={Settings})", roles, settings);
             return isInRoles;
         }
 
@@ -405,8 +461,10 @@ namespace DNNConnect.CKEditorProvider.Utilities
         public static T FindControl<T>(Control startingControl, string id)
             where T : Control
         {
+			eventLogger.LogDebug(">>> Entering FindControl(startingControl={StartingControl},id={Id})", startingControl, id);
             // this is null by default
             T found = null;
+			eventLogger.LogDebug("FindControl(startingControl={StartingControl},id={Id}): found → {Found}", startingControl, id, found);
 
             int controlCount = startingControl.Controls.Count;
 
@@ -439,6 +497,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting FindControl(startingControl={StartingControl},id={Id})", startingControl, id);
             return found;
         }
 
@@ -449,6 +508,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         public static long GetMaxUploadSize(bool inkilobytes = false)
         {
+			eventLogger.LogDebug(">>> Entering GetMaxUploadSize(inkilobytes={Inkilobytes})", inkilobytes);
             long result;
 
             try
@@ -457,12 +517,15 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     HttpContext.Current.GetSection("system.web/httpRuntime") as
                     HttpRuntimeSection;
                 result = section.MaxRequestLength;
+				eventLogger.LogDebug("GetMaxUploadSize(inkilobytes={Inkilobytes}): result → {Result}", inkilobytes, result);
             }
             catch (Exception)
             {
+				eventLogger.LogError("Exception in GetMaxUploadSize(inkilobytes={Inkilobytes}): {Arg1}", inkilobytes, Exception.Message);
                 result = 0;
             }
 
+			eventLogger.LogDebug("<<< Exiting GetMaxUploadSize(inkilobytes={Inkilobytes})", inkilobytes);
             return inkilobytes ? result : (result * 1024);
         }
 
@@ -471,6 +534,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// <returns>The protocol string value.</returns>
         public static string ToSettingValue(this LinkProtocol protocol)
         {
+			eventLogger.LogDebug(">>> Entering ToSettingValue(protocol={Protocol})", protocol);
             switch (protocol)
             {
                 case LinkProtocol.Http:
@@ -483,6 +547,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     return string.Empty;
                 case LinkProtocol.Https:
                 default:
+					eventLogger.LogDebug("<<< Exiting ToSettingValue(protocol={Protocol})", protocol);
                     return "https://";
             }
         }
@@ -512,6 +577,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
 
         private static bool CheckIfUserHasFolderAccess(int folderId, IPortalSettings portalSettings, string permissionKey)
         {
+			eventLogger.LogDebug(">>> Entering CheckIfUserHasFolderAccess(folderId={FolderId},portalSettings={PortalSettings},permissionKey={PermissionKey})", folderId, portalSettings, permissionKey);
             try
             {
                 var checkFolder = folderId.Equals(-1)
@@ -522,12 +588,16 @@ namespace DNNConnect.CKEditorProvider.Utilities
             }
             catch (Exception)
             {
+				eventLogger.LogError("Exception in CheckIfUserHasFolderAccess(folderId={FolderId},portalSettings={PortalSettings},permissionKey={PermissionKey}): {Arg3}", folderId, portalSettings, permissionKey, Exception.Message);
+				eventLogger.LogDebug("<<< Exiting CheckIfUserHasFolderAccess(folderId={FolderId},portalSettings={PortalSettings},permissionKey={PermissionKey})", folderId, portalSettings, permissionKey);
                 return false;
             }
         }
 
         private static bool Contains(this string @this, string value, StringComparison comparisonType)
         {
+			eventLogger.LogDebug(">>> Entering Contains(value={Value},comparisonType={ComparisonType})", value, comparisonType);
+			eventLogger.LogDebug("<<< Exiting Contains(value={Value},comparisonType={ComparisonType})", value, comparisonType);
             return @this.IndexOf(value, comparisonType) > -1;
         }
     }

@@ -1,40 +1,51 @@
+const logger = console;
 import { extension as ActionTypes } from "../constants/actionTypes";
 
 function getAvailablePackageTypes(installedTypes) {
+	logger.debug(`>>> Entering getAvailablePackageTypes(installedTypes=${installedTypes})`);
+	logger.debug(`<<< Exiting getAvailablePackageTypes(installedTypes=${installedTypes})`);
     return installedTypes.filter((type) => {
         return type.HasAvailablePackages === true;
     });
 }
 
 function addToModuleList(value, list) {
+	logger.debug(`>>> Entering addToModuleList(value=${value},list=${list})`);
     return list.concat(value).sort(function (a, b) {
+	logger.debug(`>>> Entering sort(value=${value})`);
         if (a.friendlyName.toLowerCase() < b.friendlyName.toLowerCase()) return -1;
         if (a.friendlyName.toLowerCase() > b.friendlyName.toLowerCase()) return 1;
+	logger.debug(`<<< Exiting addToModuleList(value=${value},list=${list})`);
         return 0;
     });
 }
 
 function getValidateRequired(key) {
+	logger.debug(`>>> Entering getValidateRequired(key=${key})`);
     switch (key) {
         case "friendlyName":
             return true;
         default:
+			logger.debug(`<<< Exiting getValidateRequired(key=${key})`);
             return false;
     }
 }
 
 function getTabMapping(key) {
+	logger.debug(`>>> Entering getTabMapping(key=${key})`);
     switch (key) {
         case "license":
             return 3;
         case "releaseNotes":
             return 4;
         default:
+			logger.debug(`<<< Exiting getTabMapping(key=${key})`);
             return 0;
     }
 }
 
 function validationMapExtensionBeingEdited(extensionBeingEdited) {
+	logger.debug(`>>> Entering validationMapExtensionBeingEdited(extensionBeingEdited=${extensionBeingEdited})`);
     let _extensionBeingEdited = Object.assign({}, extensionBeingEdited);
     Object.keys(_extensionBeingEdited).forEach((key) => {
         let validateRequired = getValidateRequired(key);
@@ -46,10 +57,14 @@ function validationMapExtensionBeingEdited(extensionBeingEdited) {
             error: false
         };
     });
+	logger.debug(`validationMapExtensionBeingEdited(extensionBeingEdited=${extensionBeingEdited}): _extensionBeingEdited → ${_extensionBeingEdited}`);
+	logger.debug(`<<< Exiting validationMapExtensionBeingEdited(extensionBeingEdited=${extensionBeingEdited})`);
     return _extensionBeingEdited;
 }
 
 function removeRecordFromArray(arr, index) {
+	logger.debug(`>>> Entering removeRecordFromArray(arr=${arr},index=${index})`);
+	logger.debug(`<<< Exiting removeRecordFromArray(arr=${arr},index=${index})`);
     return [...arr.slice(0, index), ...arr.slice(index + 1)];
 }
 export default function extension(state = {

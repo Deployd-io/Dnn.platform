@@ -5,15 +5,18 @@ import Module from "./Module";
 import { Checkbox, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import "./PageLanguage.less";
 import utils from "../../utils";
+const logger = console;
 
 class PageLanguage extends Component {
 
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             allModulesLinked: false,
             allModulesSelected: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     updateAllModules(key, value) {
@@ -25,44 +28,58 @@ class PageLanguage extends Component {
             }
             this.props.onUpdateModules(CultureCode, index, value, key);
         });
+		logger.debug(`<<< Exiting updateAllModules(key=${key},value=${value})`);
     }
 
     selectAllModules(e) {
+		logger.debug(`>>> Entering selectAllModules(e=${e})`);
         const allModulesSelected = e;
         this.setState({ allModulesSelected }, ()=> {
             this.updateAllModules("IsTranslated", e);
         });
+		logger.debug(`<<< Exiting selectAllModules(e=${e})`);
     }
 
     linkAllModules() {
+		logger.debug('>>> Entering linkAllModules()');
         const allModulesLinked = !this.state.allModulesLinked;
         this.setState({ allModulesLinked }, () => {
             this.updateAllModules("IsLocalized", allModulesLinked);
         });
+		logger.debug('<<< Exiting linkAllModules()');
     } 
 
     onUpdatePages(key, e) {
+		logger.debug(`>>> Entering onUpdatePages(key=${key},e=${e})`);
         const value = e.target ? e.target.value: e;
         const CultureCode = this.props.local.CultureCode;
         this.props.onUpdatePages(CultureCode, key, value);
+		logger.debug(`<<< Exiting onUpdatePages(key=${key},e=${e})`);
     }
 
     onViewPage(url, e) {
+		logger.debug(`>>> Entering onViewPage(url=${url},e=${e})`);
         utils.getUtilities().closePersonaBar(function () {
+			logger.debug('>>> Entering closePersonaBar()');
+			logger.debug('<<< Exiting closePersonaBar()');
             window.parent.location = url;
         });
 
         e.preventDefault();
         e.stopPropagation();
+		logger.debug(`<<< Exiting onViewPage(url=${url},e=${e})`);
     }
 
     onSettingPage(url, e) {
+		logger.debug(`>>> Entering onSettingPage(url=${url},e=${e})`);
         let panelId = window.$(".socialpanel:visible").attr("id");
         utils.getUtilities().panelViewData(panelId, {tab: [0]});
+		logger.debug(`onSettingPage(url=${url},e=${e}): panelId → ${panelId}`);
         window.parent.location = url;
         
         e.preventDefault();
         e.stopPropagation();
+		logger.debug(`<<< Exiting onSettingPage(url=${url},e=${e})`);
     }
 
     onDeletePage(page, e) {
@@ -78,15 +95,20 @@ class PageLanguage extends Component {
         );
         e.preventDefault();
         e.stopPropagation();
+		logger.debug(`<<< Exiting onDeletePage(page=${page},e=${e})`);
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const iconSrc = this.props.local && this.props.local.Icon ? this.props.local.Icon : "";
         const cultureCode = this.props.local && this.props.local.CultureCode ? this.props.local.CultureCode : "";
+		logger.debug(`render(): iconSrc → ${iconSrc}`);
+		logger.debug(`render(): cultureCode → ${cultureCode}`);
         const page = this.props.page || {};
         const modules = this.props.modules || [];
         const isCurrentPage = page.TabId === utils.getCurrentPageId();
+		logger.debug(`render(): isCurrentPage → ${isCurrentPage}`);
         const isSpecialPage = page && page.IsSpecial ? true : false;
         const moduleComponents = modules.map((module, index) => {
             return <Module
@@ -100,6 +122,7 @@ class PageLanguage extends Component {
                 cultureCode={cultureCode}
             />;
         });
+		logger.debug('<<< Exiting render()');
         return (
             <div className="page-language">
                 <div className="page-language-row">

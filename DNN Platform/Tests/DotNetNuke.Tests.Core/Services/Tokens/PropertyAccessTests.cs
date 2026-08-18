@@ -28,13 +28,18 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
         [SetUp]
         public void SetUp()
         {
+			mockEventLogger.LogDebug(">>> Entering SetUp()");
             this.serviceProvider = FakeServiceProvider.Setup(services => services.AddSingleton(Mock.Of<IPortalController>()));
+			mockEventLogger.LogDebug("SetUp(): serviceProvider → {ServiceProvider}", serviceProvider);
+			mockEventLogger.LogDebug("<<< Exiting SetUp()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			mockEventLogger.LogDebug(">>> Entering TearDown()");
             this.serviceProvider.Dispose();
+			mockEventLogger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
@@ -55,6 +60,7 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
 
             // Assert
             Assert.That(propertyNotFound, Is.EqualTo(expected));
+			mockEventLogger.LogDebug("<<< Exiting TicksPropertyAccess_GetProperty_Sets_PropertyNotFound(propertyName={PropertyName},expected={Expected})", propertyName, expected);
         }
 
         [Test]
@@ -62,11 +68,15 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
         [TestCase("ticksperday")]
         public void TicksPropertyAccess_GetProperty_Returns_Correct_String(string propertyName)
         {
+			mockEventLogger.LogDebug(">>> Entering TicksPropertyAccess_GetProperty_Returns_Correct_String(propertyName={PropertyName})", propertyName);
             // Arrange
             var ticksPropertyAccess = new TicksPropertyAccess();
+			mockEventLogger.LogDebug("TicksPropertyAccess_GetProperty_Returns_Correct_String(propertyName={PropertyName}): ticksPropertyAccess → {TicksPropertyAccess}", propertyName, ticksPropertyAccess);
             var accessingUser = new UserInfo();
+			mockEventLogger.LogDebug("TicksPropertyAccess_GetProperty_Returns_Correct_String(propertyName={PropertyName}): accessingUser → {AccessingUser}", propertyName, accessingUser);
 
             long expected = DateTime.MinValue.Ticks;
+			mockEventLogger.LogDebug("TicksPropertyAccess_GetProperty_Returns_Correct_String(propertyName={PropertyName}): expected → {Expected}", propertyName, expected);
             switch (propertyName)
             {
                 case "now":
@@ -86,6 +96,7 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
 
             // Assert
             Assert.That(propertyValue, Is.EqualTo(expected.ToString(CultureInfo.InvariantCulture)));
+			mockEventLogger.LogDebug("<<< Exiting TicksPropertyAccess_GetProperty_Returns_Correct_String(propertyName={PropertyName})", propertyName);
         }
 
         [Test]
@@ -107,6 +118,7 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
 
             // Assert
             Assert.That(propertyNotFound, Is.EqualTo(expected));
+			mockEventLogger.LogDebug("<<< Exiting DateTimePropertyAccess_GetProperty_Sets_PropertyNotFound(propertyName={PropertyName},expected={Expected})", propertyName, expected);
         }
 
         [Test]
@@ -120,12 +132,16 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
         [TestCase("utc", "it")]
         public void DateTimePropertyAccess_GetProperty_Returns_Correct_String_For_Culture(string propertyName, string cultureName)
         {
+			mockEventLogger.LogDebug(">>> Entering DateTimePropertyAccess_GetProperty_Returns_Correct_String_For_Culture(propertyName={PropertyName},cultureName={CultureName})", propertyName, cultureName);
             // Arrange
             var dtPropertyAccess = new DateTimePropertyAccess();
+			mockEventLogger.LogDebug("DateTimePropertyAccess_GetProperty_Returns_Correct_String_For_Culture(propertyName={PropertyName},cultureName={CultureName}): dtPropertyAccess → {DtPropertyAccess}", propertyName, cultureName, dtPropertyAccess);
             var accessingUser = new UserInfo { Profile = new UserProfile { PreferredTimeZone = TimeZoneInfo.Local } };
             var culture = new CultureInfo(cultureName);
+			mockEventLogger.LogDebug("DateTimePropertyAccess_GetProperty_Returns_Correct_String_For_Culture(propertyName={PropertyName},cultureName={CultureName}): culture → {Culture}", propertyName, cultureName, culture);
 
             string expected = string.Empty;
+			mockEventLogger.LogDebug("DateTimePropertyAccess_GetProperty_Returns_Correct_String_For_Culture(propertyName={PropertyName},cultureName={CultureName}): expected → {Expected}", propertyName, cultureName, expected);
 
             switch (propertyName)
             {
@@ -149,6 +165,7 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
 
             // Assert
             Assert.That(propertyValue, Is.EqualTo(expected));
+			mockEventLogger.LogDebug("<<< Exiting DateTimePropertyAccess_GetProperty_Returns_Correct_String_For_Culture(propertyName={PropertyName},cultureName={CultureName})", propertyName, cultureName);
         }
 
         [Test]
@@ -162,12 +179,16 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
         [TestCase("utc", "it", "mmm dd, yyyy")]
         public void DateTimePropertyAccess_GetProperty_Returns_Correct_String_Given_Format_And_Culture(string propertyName, string cultureName, string format)
         {
+			mockEventLogger.LogDebug(">>> Entering DateTimePropertyAccess_GetProperty_Returns_Correct_String_Given_Format_And_Culture(propertyName={PropertyName},cultureName={CultureName},format={Format})", propertyName, cultureName, format);
             // Arrange
             var dtPropertyAccess = new DateTimePropertyAccess();
+			mockEventLogger.LogDebug("DateTimePropertyAccess_GetProperty_Returns_Correct_String_Given_Format_And_Culture(propertyName={PropertyName},cultureName={CultureName},format={Format}): dtPropertyAccess → {DtPropertyAccess}", propertyName, cultureName, format, dtPropertyAccess);
             var accessingUser = new UserInfo { Profile = new UserProfile { PreferredTimeZone = TimeZoneInfo.Local } };
             var culture = new CultureInfo(cultureName);
+			mockEventLogger.LogDebug("DateTimePropertyAccess_GetProperty_Returns_Correct_String_Given_Format_And_Culture(propertyName={PropertyName},cultureName={CultureName},format={Format}): culture → {Culture}", propertyName, cultureName, format, culture);
 
             string expected = string.Empty;
+			mockEventLogger.LogDebug("DateTimePropertyAccess_GetProperty_Returns_Correct_String_Given_Format_And_Culture(propertyName={PropertyName},cultureName={CultureName},format={Format}): expected → {Expected}", propertyName, cultureName, format, expected);
 
             switch (propertyName)
             {
@@ -191,6 +212,7 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
 
             // Assert
             Assert.That(propertyValue, Is.EqualTo(expected));
+			mockEventLogger.LogDebug("<<< Exiting DateTimePropertyAccess_GetProperty_Returns_Correct_String_Given_Format_And_Culture(propertyName={PropertyName},cultureName={CultureName},format={Format})", propertyName, cultureName, format);
         }
 
         [Test]
@@ -198,21 +220,26 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
         [TestCase("now", "Azores Standard Time")]
         public void DateTimePropertyAccess_GetProperty_Adjusts_For_TimeZone(string propertyName, string timeZoneId)
         {
+			mockEventLogger.LogDebug(">>> Entering DateTimePropertyAccess_GetProperty_Adjusts_For_TimeZone(propertyName={PropertyName},timeZoneId={TimeZoneId})", propertyName, timeZoneId);
             // Arrange
             var dtPropertyAccess = new DateTimePropertyAccess();
+			mockEventLogger.LogDebug("DateTimePropertyAccess_GetProperty_Adjusts_For_TimeZone(propertyName={PropertyName},timeZoneId={TimeZoneId}): dtPropertyAccess → {DtPropertyAccess}", propertyName, timeZoneId, dtPropertyAccess);
             var userTimeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+			mockEventLogger.LogDebug("DateTimePropertyAccess_GetProperty_Adjusts_For_TimeZone(propertyName={PropertyName},timeZoneId={TimeZoneId}): userTimeZone → {UserTimeZone}", propertyName, timeZoneId, userTimeZone);
             var timeZoneProfileProperty = new ProfilePropertyDefinition(Constants.PORTAL_Zero)
             {
                 PropertyName = "PreferredTimeZone",
                 PropertyValue = timeZoneId,
             };
             var userProfile = new UserProfile();
+			mockEventLogger.LogDebug("DateTimePropertyAccess_GetProperty_Adjusts_For_TimeZone(propertyName={PropertyName},timeZoneId={TimeZoneId}): userProfile → {UserProfile}", propertyName, timeZoneId, userProfile);
             userProfile.ProfileProperties.Add(timeZoneProfileProperty);
 
             var accessingUser = new UserInfo { Profile = userProfile };
             var culture = CultureInfo.InvariantCulture;
 
             string expected = string.Empty;
+			mockEventLogger.LogDebug("DateTimePropertyAccess_GetProperty_Adjusts_For_TimeZone(propertyName={PropertyName},timeZoneId={TimeZoneId}): expected → {Expected}", propertyName, timeZoneId, expected);
 
             switch (propertyName)
             {
@@ -236,6 +263,7 @@ namespace DotNetNuke.Tests.Core.Services.Tokens
 
             // Assert
             Assert.That(propertyValue, Is.EqualTo(expected));
+			mockEventLogger.LogDebug("<<< Exiting DateTimePropertyAccess_GetProperty_Adjusts_For_TimeZone(propertyName={PropertyName},timeZoneId={TimeZoneId})", propertyName, timeZoneId);
         }
     }
 }

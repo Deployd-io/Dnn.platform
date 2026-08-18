@@ -12,6 +12,8 @@ namespace Dnn.PersonaBar.Vocabularies.Exceptions
         public VocabularyValidationException()
             : base(Constants.VocabularyValidationError)
         {
+		eventLogger.LogDebug(">>> Entering VocabularyValidationException()");
+		eventLogger.LogDebug("<<< Exiting VocabularyValidationException()");
         }
     }
 }

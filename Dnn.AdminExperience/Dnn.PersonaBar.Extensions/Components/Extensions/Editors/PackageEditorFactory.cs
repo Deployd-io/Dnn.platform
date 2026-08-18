@@ -10,6 +10,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
     {
         public static IPackageEditor GetPackageEditor(string packageType)
         {
+			eventLogger.LogDebug(">>> Entering GetPackageEditor(packageType={PackageType})", packageType);
             PackageTypes pkgType;
             Enum.TryParse(packageType, true, out pkgType);
 
@@ -29,6 +30,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Editors
                 case PackageTypes.Skin:
                     return new SkinPackageEditor();
                 case PackageTypes.SkinObject:
+			eventLogger.LogDebug("<<< Exiting GetPackageEditor(packageType={PackageType})", packageType);
                     return new SkinObjectPackageEditor();
             }
 

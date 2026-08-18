@@ -20,10 +20,12 @@ using Google.Apis.Json;
 using Google.Apis.Util.Store;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 /// <summary>Google credentials data store class.</summary>
 public class GoogleCredentialDataStore : IDataStore
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     private readonly IHostSettingsService hostSettingsService;
     private readonly IHostSettings hostSettings;
     private readonly IPortalController portalController;
@@ -36,6 +38,10 @@ public class GoogleCredentialDataStore : IDataStore
     public GoogleCredentialDataStore(int portalId, IHostSettingsService hostSettingsService)
         : this(portalId, hostSettingsService, null, null)
     {
+	_logger.LogDebug(">>> Entering GoogleCredentialDataStore(portalId={PortalId},hostSettingsService={HostSettingsService})", portalId, hostSettingsService);
+	_logger.LogDebug("<<< Exiting GoogleCredentialDataStore(portalId={PortalId},hostSettingsService={HostSettingsService})", portalId, hostSettingsService);
+	_logger.LogDebug(">>> Entering GoogleCredentialDataStore(portalId={PortalId},hostSettingsService={HostSettingsService},hostSettings={HostSettings},portalController={PortalController})", portalId, hostSettingsService, hostSettings, portalController);
+	_logger.LogDebug("GoogleCredentialDataStore(portalId={PortalId},hostSettingsService={HostSettingsService},hostSettings={HostSettings},portalController={PortalController}): hostSettingsService → {HostSettingsService1}", portalId, hostSettingsService, hostSettings, portalController, hostSettingsService);
     }
 
     /// <summary>Initializes a new instance of the <see cref="GoogleCredentialDataStore"/> class.</summary>
@@ -47,15 +53,20 @@ public class GoogleCredentialDataStore : IDataStore
     {
         this.portalId = portalId;
         this.hostSettingsService = hostSettingsService;
+		_logger.LogDebug("GoogleCredentialDataStore(portalId={PortalId},hostSettingsService={HostSettingsService},hostSettings={HostSettings},portalController={PortalController}): this.portalId → {Arg4}", portalId, hostSettingsService, hostSettings, portalController, this.portalId);
+		_logger.LogDebug("GoogleCredentialDataStore(portalId={PortalId},hostSettingsService={HostSettingsService},hostSettings={HostSettings},portalController={PortalController}): this.hostSettingsService → {Arg4}", portalId, hostSettingsService, hostSettings, portalController, this.hostSettingsService);
         this.hostSettings = hostSettings ?? HttpContextSource.Current?.GetScope().ServiceProvider.GetRequiredService<IHostSettings>() ?? new HostSettings(hostSettingsService);
         this.portalController = portalController ?? HttpContextSource.Current?.GetScope().ServiceProvider.GetRequiredService<IPortalController>();
+		_logger.LogDebug("<<< Exiting GoogleCredentialDataStore(portalId={PortalId},hostSettingsService={HostSettingsService},hostSettings={HostSettings},portalController={PortalController})", portalId, hostSettingsService, hostSettings, portalController);
     }
 
     /// <inheritdoc />
     public Task ClearAsync()
     {
+		_logger.LogDebug(">>> Entering ClearAsync()");
         var settingName = string.Format(Constants.DataStoreSettingName, this.portalId);
         if (this.portalId == Null.NullInteger)
+		_logger.LogDebug("ClearAsync(): settingName → {SettingName}", settingName);
         {
             this.hostSettingsService.Update(settingName, null, true);
         }
@@ -64,19 +75,24 @@ public class GoogleCredentialDataStore : IDataStore
             PortalController.UpdatePortalSetting(this.portalController, this.portalId, settingName, null, true);
         }
 
+		_logger.LogDebug("<<< Exiting ClearAsync()");
         return Task.CompletedTask;
     }
 
     /// <inheritdoc />
     public Task DeleteAsync<T>(string key)
     {
+		_logger.LogDebug(">>> Entering DeleteAsync(key={Key})", key);
         if (string.IsNullOrEmpty(key))
         {
+			_logger.LogWarning("Throwing ArgumentException from DeleteAsync(key={Key})", key);
             throw new ArgumentException("Key MUST have a value");
         }
 
         var dataStore = this.LoadDataStore();
+		_logger.LogDebug("DeleteAsync(key={Key}): dataStore → {DataStore}", key, dataStore);
         var settingName = GenerateStoredKey(key, typeof(T));
+		_logger.LogDebug("DeleteAsync(key={Key}): settingName → {SettingName}", key, settingName);
         if (dataStore.ContainsKey(settingName))
         {
             dataStore.Remove(settingName);
@@ -84,22 +100,28 @@ public class GoogleCredentialDataStore : IDataStore
 
         this.SaveDataStore(dataStore);
 
+		_logger.LogDebug("<<< Exiting DeleteAsync(key={Key})", key);
         return Task.CompletedTask;
     }
 
     /// <inheritdoc />
     public Task<T> GetAsync<T>(string key)
     {
+		_logger.LogDebug(">>> Entering GetAsync(key={Key})", key);
         if (string.IsNullOrEmpty(key))
         {
+			_logger.LogWarning("Throwing ArgumentException from GetAsync(key={Key})", key);
             throw new ArgumentException("Key MUST have a value");
         }
 
         var dataStore = this.LoadDataStore();
+		_logger.LogDebug("GetAsync(key={Key}): dataStore → {DataStore}", key, dataStore);
         var settingName = GenerateStoredKey(key, typeof(T));
+		_logger.LogDebug("GetAsync(key={Key}): settingName → {SettingName}", key, settingName);
         if (!dataStore.TryGetValue(settingName, out var settingValue))
         {
             settingValue = string.Empty;
+			_logger.LogDebug("GetAsync(key={Key}): settingValue → {SettingValue}", key, settingValue);
         }
 
         if (string.IsNullOrWhiteSpace(settingValue))
@@ -113,6 +135,8 @@ public class GoogleCredentialDataStore : IDataStore
         }
         catch (Exception ex)
         {
+			_logger.LogError("Exception in GetAsync(key={Key}): {Arg1}", key, ex.getMessage());
+		_logger.LogDebug("<<< Exiting GetAsync(key={Key})", key);
             return Task.FromException<T>(ex);
         }
     }
@@ -120,22 +144,30 @@ public class GoogleCredentialDataStore : IDataStore
     /// <inheritdoc />
     public Task StoreAsync<T>(string key, T value)
     {
+		_logger.LogDebug(">>> Entering StoreAsync(key={Key},value={Value})", key, value);
         if (string.IsNullOrEmpty(key))
         {
+			_logger.LogWarning("Throwing ArgumentException from StoreAsync(key={Key},value={Value})", key, value);
             throw new ArgumentException("Key MUST have a value");
         }
 
         var dataStore = this.LoadDataStore();
+		_logger.LogDebug("StoreAsync(key={Key},value={Value}): dataStore → {DataStore}", key, value, dataStore);
         var settingName = GenerateStoredKey(key, typeof(T));
+		_logger.LogDebug("StoreAsync(key={Key},value={Value}): settingName → {SettingName}", key, value, settingName);
         var settingValue = NewtonsoftJsonSerializer.Instance.Serialize(value);
+		_logger.LogDebug("StoreAsync(key={Key},value={Value}): settingValue → {SettingValue}", key, value, settingValue);
         dataStore[settingName] = settingValue;
         this.SaveDataStore(dataStore);
 
+		_logger.LogDebug("<<< Exiting StoreAsync(key={Key},value={Value})", key, value);
         return Task.CompletedTask;
     }
 
     private static string GenerateStoredKey(string key, Type t)
     {
+		_logger.LogDebug(">>> Entering GenerateStoredKey(key={Key},t={T})", key, t);
+		_logger.LogDebug("<<< Exiting GenerateStoredKey(key={Key},t={T})", key, t);
         return $"{t.FullName}-{key}";
     }
 
@@ -174,5 +206,6 @@ public class GoogleCredentialDataStore : IDataStore
         {
             PortalController.UpdateEncryptedString(this.hostSettings, this.portalController, HashAlgorithmName.SHA512, this.portalId, settingName, settingValue, Config.GetDecryptionkey());
         }
+		_logger.LogDebug("<<< Exiting SaveDataStore(dataStore={DataStore})", dataStore);
     }
 }

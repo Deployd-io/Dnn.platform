@@ -5,15 +5,18 @@ import FolderDropdown from "../common/FolderDropdown";
 import Localization from "localization";
 import { validationMapNewModule, valueMapNewModule } from "../common/helperFunctions";
 import styles from "./style.module.less";
+const logger = console;
 
 const inputStyle = { width: "100%" };
 function getValidateRequired(key) {
+	logger.debug(`>>> Entering getValidateRequired(key=${key})`);
     switch (key) {
         case "moduleFolder":
         case "fileName":
         case "moduleName":
             return true;
         default:
+			logger.debug(`<<< Exiting getValidateRequired(key=${key})`);
             return false;
     }
 }
@@ -32,18 +35,24 @@ const emptyNewModule = {
 class FromControl extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             newModule: validationMapNewModule(emptyNewModule, getValidateRequired),
             triedToSave: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         this.props.retrieveOwnerAndModuleFolders();
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
     UNSAFE_componentWillReceiveProps(props) {
+		logger.debug(`>>> Entering UNSAFE_componentWillReceiveProps(props=${props})`);
         if (props.moduleFiles.length > 0) {
             let { newModule } = this.state;
             newModule.fileName.value = props.moduleFiles[0].value;
+			logger.debug(`<<< Exiting UNSAFE_componentWillReceiveProps(props=${props})`);
             newModule.fileName.error = false;
 
             this.setState({
@@ -53,6 +62,7 @@ class FromControl extends Component {
     }
 
     onFolderSelect(key, option) {
+		logger.debug(`>>> Entering onFolderSelect(key=${key},option=${option})`);
         const { props, state } = this;
         let {newModule, triedToSave} = this.state;
         if (key === "ownerFolder") {
@@ -75,6 +85,7 @@ class FromControl extends Component {
         }
         if (newModule[key].required) {
             newModule[key].error = !option.value;
+			logger.debug(`<<< Exiting onFolderSelect(key=${key},option=${option})`);
         }
         newModule[key].value = option.value;
         this.setState({
@@ -96,6 +107,7 @@ class FromControl extends Component {
     }
 
     validateFields() {
+		logger.debug('>>> Entering validateFields()');
         let {newModule} = this.state;
         let errorCount = 0;
         Object.keys(newModule).forEach((key) => {
@@ -108,10 +120,12 @@ class FromControl extends Component {
             newModule,
             triedToSave
         });
+		logger.debug('<<< Exiting validateFields()');
         return errorCount === 0;
     }
 
     onCreateNewModule() {
+		logger.debug('>>> Entering onCreateNewModule()');
         let {state, props} = this;
         let triedToSave = true;
         if (!this.validateFields()) {
@@ -121,6 +135,7 @@ class FromControl extends Component {
             triedToSave
         });
         props.onCreateNewModule(valueMapNewModule(state.newModule));
+		logger.debug('<<< Exiting onCreateNewModule()');
     }
 
     onAddedNewFolder(data, type) {
@@ -140,6 +155,7 @@ class FromControl extends Component {
             newModule.moduleFolder.value = data.moduleFolder;
             newModule.moduleFolder.error = false;
             newModule.fileName.value = "";
+			logger.debug(`<<< Exiting onAddedNewFolder(data=${data},type=${type})`);
             newModule.fileName.error = true;
             this.setState({
                 triedToSave: false
@@ -164,10 +180,13 @@ class FromControl extends Component {
         payload[type] = value;
 
         this.props.onAddNewFolder(payload, type, callback);
+		logger.debug(`<<< Exiting onAddNewFolder(value=${value},type=${type},callback=${callback})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={styles.fromControl + " extension-form"} style={{ padding: 0 }}>
                 <GridSystem className="with-right-border top-half">

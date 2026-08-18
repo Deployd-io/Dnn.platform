@@ -73,6 +73,8 @@ namespace log4net.Layout
         public DynamicPatternLayout()
             : base()
         {
+		value.LogDebug(">>> Entering DynamicPatternLayout()");
+		value.LogDebug("<<< Exiting DynamicPatternLayout()");
         }
 
         /// <summary>

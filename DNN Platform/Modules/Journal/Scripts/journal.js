@@ -1,3 +1,4 @@
+const logger = console;
 ﻿;
 var journalItem = {};
 journalItem.JournalType = 'status';
@@ -10,6 +11,7 @@ var cancelRequest = false;
 var photoTool = null;
 
 function attachPhoto(fileId, path, isImage) {
+	logger.debug(`>>> Entering attachPhoto(fileId=${fileId},path=${path},isImage=${isImage})`);
     $('#tbar-attach-Area').hide();
     $(".filePreviewArea").append("<div id='attachClose' class='miniclose'></div>");
     $("#attachClose").show().click(function () {
@@ -35,13 +37,16 @@ function attachPhoto(fileId, path, isImage) {
         journalItem.ItemData.Url = 'fileid=' + fileId;
     }
     $("#btnShare").removeClass('disabled');
+	logger.debug(`<<< Exiting attachPhoto(fileId=${fileId},path=${path},isImage=${isImage})`);
     $("#btnShare").off('keypress', 'isDirtyHandler');
 
 }
 
 function bindConfirm() {
+	logger.debug('>>> Entering bindConfirm()');
     var options = journalOptions;
     $(".journalrow .minidel, .journalrow .miniclose").each(function () {
+		logger.debug('>>> Entering each()');
         if ($(this).data("confirmBinded")) {
             return;
         }
@@ -76,17 +81,22 @@ function bindConfirm() {
             title: options.title,
             isButton: true,
             callbackTrue: function () {
+				logger.debug('>>> Entering callbackTrue()');
                 for (var i = 0; i < clickFuncs.length; i++)
                     clickFuncs[i].call(oThis, oThis);
+					logger.debug('<<< Exiting callbackTrue()');
             }
         });
     });
+	logger.debug('<<< Exiting bindConfirm()');
 }
 
 function buildLikes(data, journalId) {
     var currLike = $('#like-' + journalId).text();
     if (currLike == resxLike) {
         $('#like-' + journalId).fadeOut(function () {
+			logger.debug(`>>> Entering fadeOut(journalId=${journalId})`);
+			logger.debug(`<<< Exiting fadeOut(journalId=${journalId})`);
             $(this).text(resxUnLike).fadeIn();
         });
     } else {
@@ -97,6 +107,7 @@ function buildLikes(data, journalId) {
     $('#jid-' + journalId + ' .likes').fadeOut(function () {
         $(this).empty().append(data.LikeList).fadeIn();
     });
+	logger.debug(`<<< Exiting buildLikes(data=${data},journalId=${journalId})`);
 };
 
 function getItems(sf) {
@@ -114,6 +125,7 @@ function getItems(sf) {
         beforeSend: sf.setModuleHeaders,
         data: data,
         success: function (data) {
+			logger.debug(`>>> Entering success(data=${data})`);
             if (data.length > 0) {
                 $("#journalItems").append(data);
                 pluginInit();
@@ -125,29 +137,37 @@ function getItems(sf) {
             }
             if (typeof (callback) != "undefined") {
                 callback(data);
+				logger.debug(`<<< Exiting success(data=${data})`);
             }
         },
         error: function (xhr, status, error) {
+			logger.debug(`>>> Entering error(xhr=${xhr},status=${status},error=${error})`);
             alert(error);
+			logger.debug(`<<< Exiting error(xhr=${xhr},status=${status},error=${error})`);
         }
     });
+	logger.debug(`<<< Exiting getItems(sf=${sf})`);
 }
 
 function IsImage(value) {
+	logger.debug(`>>> Entering IsImage(value=${value})`);
     if (value != null) {
         var imageTypesArray = journalOptions.imageTypes.toLowerCase().split(",");
         return $.inArray(value.toLowerCase(), imageTypesArray) >= 0;
     } else {
+		logger.debug(`<<< Exiting IsImage(value=${value})`);
         return false;
     }
 }
 
 function journalDelete(obj) {
+	logger.debug(`>>> Entering journalDelete(obj=${obj})`);
     var p = obj.parentNode;
     var jid = p.id.replace('jid-', '');
     var data = {};
     data.JournalId = jid;
     journalPost('SoftDelete', data, journalRemove, jid);
+	logger.debug(`<<< Exiting journalDelete(obj=${obj})`);
 };
 
 function journalPost(method, data, callback, journalId) {
@@ -166,15 +186,18 @@ function journalPost(method, data, callback, journalId) {
             alert(error);
         }
     });
+	logger.debug(`<<< Exiting journalPost(method=${method},data=${data},callback=${callback},journalId=${journalId})`);
 };
 
 function journalRemove(data, jid) {
     $('#jid-' + jid).slideUp(function () {
         $(this).remove();
     });
+	logger.debug(`<<< Exiting journalRemove(data=${data},jid=${jid})`);
 };
 
 function pluginInit() {
+	logger.debug('>>> Entering pluginInit()');
     var sf = journalOptions.servicesFramework;
     
     $('.jcmt').each(function () {
@@ -198,6 +221,7 @@ function pluginInit() {
         $(this).data("clickBinded", true);
 
         $(this).click(function(e) {
+		logger.debug(`>>> Entering click(this=${this})`);
 
             e.preventDefault();
             var jid = $(this).attr('id').replace('cmtbtn-', '');
@@ -224,6 +248,7 @@ function pluginInit() {
                     plh.show();
                 });
             }
+		logger.debug(`<<< Exiting click(this=${this})`);
         });
     });
 
@@ -252,11 +277,13 @@ function pluginInit() {
         $("#getMore").data("clickBinded", true);
     }
     $('#journalContent, .cmteditor').mentionsInput({servicesFramework: sf});
+	logger.debug('<<< Exiting pluginInit()');
 }
 
 (function ($, window) {
     "use strict";
     function resetJournalItem() {
+		logger.debug('>>> Entering resetJournalItem()');
         journalItem = {};
         journalItem.JournalType = 'status';
         journalItem.Title = '';
@@ -266,6 +293,7 @@ function pluginInit() {
         journalItem.Security = 'E';
         journalItem.Tags = [];
         journalItem.Users = [];
+		logger.debug('<<< Exiting resetJournalItem()');
     }
 
 
@@ -345,15 +373,18 @@ function pluginInit() {
         });
         $content.on('paste', function (e) {
             setTimeout(function () {
+				logger.debug('>>> Entering setTimeout()');
                 $content.val($content.val());
                 if ($content.val().length>=$maxLength && $maxLength > 0) {
                     var txt = $content.val().substring(0,$maxLength);
                     $content.val(txt);
+					logger.debug('<<< Exiting setTimeout()');
                 }
             }, 100);
 
         });
         function closeEditor() {
+			logger.debug('>>> Entering closeEditor()');
             $closeButton.hide();
             $contentShow = false;
             $securityMenu.hide();
@@ -388,6 +419,7 @@ function pluginInit() {
                 $placeHolder.show();
                 resetJournalItem();
             });
+			logger.debug('<<< Exiting closeEditor()');
         }
         var showContent = function () {
             $placeHolder.hide();
@@ -539,10 +571,13 @@ function pluginInit() {
                     alert(error);
                 }
             });
+			logger.debug(`<<< Exiting getNewItem(data=${data},callback=${callback})`);
         }
         function insertNewItem(html) {
+			logger.debug(`>>> Entering insertNewItem(html=${html})`);
             $(html).hide().prependTo("#journalItems").fadeIn();
             pluginInit();
+			logger.debug(`<<< Exiting insertNewItem(html=${html})`);
             //.slideDown();
 
         }
@@ -558,6 +593,7 @@ function pluginInit() {
             $previewArea = $wrap.find(opts.previewSelector);
         // updates the preview area
         function updatePageValues(url) {
+		logger.debug(`>>> Entering updatePageValues(url=${url})`);
 
             if ($previewArea.data('url') === url) {
                 return;
@@ -580,8 +616,10 @@ function pluginInit() {
                     alert(error);
                 }
             });
+			logger.debug(`<<< Exiting updatePageValues(url=${url})`);
         }
         function prevImg() {
+			logger.debug('>>> Entering prevImg()');
             currImage = currImage - 1;
             if (currImage < 0) {
                 currImage = images.length - 1;
@@ -594,8 +632,10 @@ function pluginInit() {
                 $(this).hide().attr('src', '').attr('src', images[currImage].URL).fadeIn();
             });
             journalItem.ItemData.ImageUrl = images[currImage].URL;
+			logger.debug('<<< Exiting prevImg()');
         };
         function nextImg() {
+			logger.debug('>>> Entering nextImg()');
             currImage = currImage + 1;
             if (currImage < 0) {
                 currImage = images.length - 1;
@@ -608,8 +648,10 @@ function pluginInit() {
                 $(this).hide().attr('src', '').attr('src', images[currImage].URL).fadeIn();
             });
             journalItem.ItemData.ImageUrl = images[currImage].URL;
+			logger.debug('<<< Exiting nextImg()');
         };
         function buildLinkPreview(link) {
+			logger.debug(`>>> Entering buildLinkPreview(link=${link})`);
             //$previewArea.empty();
             if (link.URL == null) {
                 return;
@@ -645,11 +687,13 @@ function pluginInit() {
 
             journalItem.ItemData.Title = link.Title;
             journalItem.ItemData.Description = escape(link.Description);
+			logger.debug(`<<< Exiting buildLinkPreview(link=${link})`);
             journalItem.ItemData.URL = link.URL;
 
         }
         // resets the preview area (but keeps the associated url in a data field for future use)
         function removePageValues() {
+			logger.debug('>>> Entering removePageValues()');
             $(opts.previewSelector + ' #imagePreviewer').hide();
             images = [];
             currImage = 0;
@@ -661,15 +705,19 @@ function pluginInit() {
             journalItem.JournalType = 'status';
             journalItem.ItemData = null;
             $previewArea.data('url','');
+			logger.debug('<<< Exiting removePageValues()');
         }
 
         // returns true if link already found, false if not
         function isLinkedUp() {
+			logger.debug('>>> Entering isLinkedUp()');
+			logger.debug('<<< Exiting isLinkedUp()');
             return $textArea.data('linkedUp');
         }
 
         // parses the first url out of a block of text
         function findUrl(enteredText) {
+			logger.debug(`>>> Entering findUrl(enteredText=${enteredText})`);
             if (typeof (enteredText) == 'undefined') {
                 enteredText = $textArea.val();
             }
@@ -685,6 +733,7 @@ function pluginInit() {
             if (url) {
                 url = (url.toString().split(',')[0]);
                 updatePageValues(url);
+				logger.debug(`<<< Exiting findUrl(enteredText=${enteredText})`);
             }
         }
 

@@ -23,7 +23,9 @@ namespace Dnn.EditBar.UI.Items
         public CompleteWorkflowMenu()
             : this(null, null)
         {
+		eventLogger.LogDebug(">>> Entering CompleteWorkflowMenu()");
         }
+		eventLogger.LogDebug("<<< Exiting CompleteWorkflowMenu()");
 
         /// <inheritdoc />
         public override string Name { get; } = "CompleteWorkflow";
@@ -52,5 +54,6 @@ namespace Dnn.EditBar.UI.Items
             && (this.IsReviewOrOtherIntermediateStateWithPermissions == true
                 || (this.IsPriorState == true && this.IsDraftWithPermissions == true) // for Save Draft workflow
                 || (this.IsLastState == true && this.HasUnpublishVersion && this.HasDraftPermission == true)); // handles other workflow scenarios (not Direct Publish)
+				eventLogger.LogDebug("<<< Exiting Visible()");
     }
 }

@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -6,6 +7,7 @@
  */
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -15,11 +17,16 @@
 })(function(CodeMirror) {
   "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
   CodeMirror.defineMode("smarty", function(config, parserConf) {
+	logger.debug('>>> Entering defineMode()');
     var rightDelimiter = parserConf.rightDelimiter || "}";
     var leftDelimiter = parserConf.leftDelimiter || "{";
+	logger.debug(`defineMode(): rightDelimiter → ${rightDelimiter}`);
+	logger.debug(`defineMode(): leftDelimiter → ${leftDelimiter}`);
     var version = parserConf.version || 2;
     var baseMode = CodeMirror.getMode(config, parserConf.baseMode || "null");
+	logger.debug(`defineMode(): baseMode → ${baseMode}`);
 
     var keyFunctions = ["debug", "extends", "function", "include", "literal"];
     var regs = {
@@ -35,21 +42,28 @@
     }
 
     function chain(stream, state, parser) {
+	logger.debug(`>>> Entering chain(stream=${stream},state=${state},parser=${parser})`);
       state.tokenize = parser;
+	logger.debug(`chain(stream=${stream},state=${state},parser=${parser}): state.tokenize → ${state.tokenize}`);
+	logger.debug(`<<< Exiting chain(stream=${stream},state=${state},parser=${parser})`);
       return parser(stream, state);
     }
 
     // Smarty 3 allows { and } surrounded by whitespace to NOT slip into Smarty mode
     function doesNotCount(stream, pos) {
+	logger.debug(`>>> Entering doesNotCount(stream=${stream},pos=${pos})`);
       if (pos == null) pos = stream.pos;
       return version === 3 && leftDelimiter == "{" &&
         (pos == stream.string.length || /\s/.test(stream.string.charAt(pos)));
+		logger.debug(`<<< Exiting doesNotCount(stream=${stream},pos=${pos})`);
     }
 
     function tokenTop(stream, state) {
+	logger.debug(`>>> Entering tokenTop(stream=${stream},state=${state})`);
       var string = stream.string;
       for (var scan = stream.pos;;) {
         var nextMatch = string.indexOf(leftDelimiter, scan);
+		logger.debug(`tokenTop(stream=${stream},state=${state}): nextMatch → ${nextMatch}`);
         scan = nextMatch + leftDelimiter.length;
         if (nextMatch == -1 || !doesNotCount(stream, nextMatch + leftDelimiter.length)) break;
       }
@@ -60,6 +74,7 @@
         } else {
           state.depth++;
           state.tokenize = tokenSmarty;
+		logger.debug(`tokenTop(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
           last = "startTag";
           return "tag";
         }
@@ -68,16 +83,19 @@
       if (nextMatch > -1) stream.string = string.slice(0, nextMatch);
       var token = baseMode.token(stream, state.base);
       if (nextMatch > -1) stream.string = string;
+	logger.debug(`<<< Exiting tokenTop(stream=${stream},state=${state})`);
       return token;
     }
 
     // parsing Smarty content
     function tokenSmarty(stream, state) {
+	logger.debug(`>>> Entering tokenSmarty(stream=${stream},state=${state})`);
       if (stream.match(rightDelimiter, true)) {
         if (version === 3) {
           state.depth--;
           if (state.depth <= 0) {
             state.tokenize = tokenTop;
+			logger.debug(`tokenSmarty(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
           }
         } else {
           state.tokenize = tokenTop;
@@ -91,6 +109,7 @@
       }
 
       var ch = stream.next();
+	logger.debug(`tokenSmarty(stream=${stream},state=${state}): ch → ${ch}`);
       if (ch == "$") {
         stream.eatWhile(regs.validIdentifier);
         return cont("variable-2", "variable");
@@ -136,6 +155,7 @@
         }
 
         var str = "";
+		logger.debug(`tokenSmarty(stream=${stream},state=${state}): str → ${str}`);
         if (ch != "/") {
           str += ch;
         }
@@ -149,6 +169,7 @@
           }
         }
         if (/\s/.test(ch)) {
+		logger.debug(`<<< Exiting tokenSmarty(stream=${stream},state=${state})`);
           return null;
         }
         return cont("tag", "tag");
@@ -156,6 +177,7 @@
     }
 
     function tokenAttribute(quote) {
+	logger.debug(`>>> Entering tokenAttribute(quote=${quote})`);
       return function(stream, state) {
         var prevChar = null;
         var currChar = null;
@@ -163,10 +185,13 @@
           currChar = stream.peek();
           if (stream.next() == quote && prevChar !== '\\') {
             state.tokenize = tokenSmarty;
+			logger.debug(`tokenAttribute(quote=${quote}): state.tokenize → ${state.tokenize}`);
+			logger.debug(`function(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
             break;
           }
           prevChar = currChar;
         }
+		logger.debug(`<<< Exiting tokenAttribute(quote=${quote})`);
         return "string";
       };
     }
@@ -186,34 +211,45 @@
 
     return {
       startState: function() {
+		logger.debug('>>> Entering startState()');
         return {
           base: CodeMirror.startState(baseMode),
           tokenize: tokenTop,
           last: null,
           depth: 0
         };
+		logger.debug('<<< Exiting startState()');
       },
       copyState: function(state) {
+		logger.debug(`>>> Entering copyState(state=${state})`);
         return {
           base: CodeMirror.copyState(baseMode, state.base),
           tokenize: state.tokenize,
           last: state.last,
           depth: state.depth
         };
+		logger.debug(`<<< Exiting copyState(state=${state})`);
       },
       innerMode: function(state) {
+		logger.debug(`>>> Entering innerMode(state=${state})`);
         if (state.tokenize == tokenTop)
+		logger.debug(`<<< Exiting innerMode(state=${state})`);
           return {mode: baseMode, state: state.base};
       },
       token: function(stream, state) {
+		logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
         var style = state.tokenize(stream, state);
         state.last = last;
+		logger.debug(`token(stream=${stream},state=${state}): style → ${style}`);
+		logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
         return style;
       },
       indent: function(state, text) {
+		logger.debug(`>>> Entering indent(state=${state},text=${text})`);
         if (state.tokenize == tokenTop && baseMode.indent)
           return baseMode.indent(state.base, text);
         else
+		logger.debug(`<<< Exiting indent(state=${state},text=${text})`);
           return CodeMirror.Pass;
       },
       blockCommentStart: leftDelimiter + "*",

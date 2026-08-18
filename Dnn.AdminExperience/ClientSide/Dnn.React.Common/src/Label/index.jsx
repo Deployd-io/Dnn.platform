@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Tooltip from "../Tooltip";
 import "./style.less";
+const logger = console;
 
 const tooltipStyle = {
     float: "left",
@@ -11,11 +12,15 @@ const tooltipStyle = {
 class Label extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         const tooltipMessages = props.tooltipMessage instanceof Array ? props.tooltipMessage : [props.tooltipMessage];
+		logger.debug('<<< Exiting render()');
         return (
             <div className={"dnn-label" + (props.className ? (" " + props.className) : "") + (" " + props.labelType) } style={props.style}>
                 <label htmlFor={props.labelFor} onClick={props.onClick && props.onClick.bind(this)}>{props.label}</label>

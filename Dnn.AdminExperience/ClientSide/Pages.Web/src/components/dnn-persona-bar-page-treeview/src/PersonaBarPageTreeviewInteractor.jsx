@@ -11,12 +11,14 @@ import { PropTypes } from "prop-types";
 import Promise from "promise";
 import "./styles.less";
 import Localization from "localization";
+const logger = console;
 
 
 class PersonaBarPageTreeviewInteractor extends Component {
 
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             rootLoaded: false,
             isTreeviewExpanded: false,
@@ -32,15 +34,22 @@ class PersonaBarPageTreeviewInteractor extends Component {
             treeViewActivePage: {}
         };
         this.origin = window.origin;
+		logger.debug(`constructor(props=${props}): this.state → ${this.state}`);
+		logger.debug(`constructor(props=${props}): this.origin → ${this.origin}`);
         this.treeContentWidth = 200;
 
         this.countTreeDepthOpen = 0;
+		logger.debug(`constructor(props=${props}): this.countTreeDepthOpen → ${this.countTreeDepthOpen}`);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.init();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     static getDerivedStateFromProps(props, state) {
+		logger.debug(`>>> Entering getDerivedStateFromProps(props=${props},state=${state})`);
         let setTreeViewExpanded = null;
         let pageList = null;   
         const {
@@ -48,8 +57,10 @@ class PersonaBarPageTreeviewInteractor extends Component {
             NoPermissionSelectionPageId
         } = props;
         const pageListCopy = cloneDeep(props.pageList);
+		logger.debug(`getDerivedStateFromProps(props=${props},state=${state}): pageListCopy → ${pageListCopy}`);
         if (activePage || NoPermissionSelectionPageId) {
             const tabId = (activePage && activePage.tabId) || NoPermissionSelectionPageId;
+			logger.debug(`getDerivedStateFromProps(props=${props},state=${state}): tabId → ${tabId}`);
             props._traverse((item, list) => {
                 item.selected = false;
                 if (item.id === tabId) {
@@ -80,9 +91,12 @@ class PersonaBarPageTreeviewInteractor extends Component {
         };
 
         const prevPageListCount = (state.pageList || []).length;
+		logger.debug(`getDerivedStateFromProps(props=${props},state=${state}): prevPageListCount → ${prevPageListCount}`);
         const newPageListCount = (newState.pageList || []).length;
+		logger.debug(`getDerivedStateFromProps(props=${props},state=${state}): newPageListCount → ${newPageListCount}`);
 
         if (prevPageListCount !== newPageListCount) {
+		logger.debug(`<<< Exiting getDerivedStateFromProps(props=${props},state=${state})`);
             return { ...newState, isChildLoaded: false };
         }
 
@@ -90,22 +104,28 @@ class PersonaBarPageTreeviewInteractor extends Component {
     }
 
     componentDidUpdate() {
+		logger.debug('>>> Entering componentDidUpdate()');
         const { pageList } = this.state;
         if (pageList) {
             this._countTreeOpenDeepParent(pageList);
+			logger.debug('<<< Exiting componentDidUpdate()');
         }
     }
 
     init() {
+		logger.debug('>>> Entering init()');
         this.setState({
             treeViewActivePage: this.props.activePage
         });
         if (!this.state.isChildLoaded) {
             this.loadAllChildList();
+			logger.debug('<<< Exiting init()');
         }
     }
 
     getPageInfo(id) {
+		logger.debug(`>>> Entering getPageInfo(id=${id})`);
+		logger.debug(`<<< Exiting getPageInfo(id=${id})`);
         return new Promise((resolve) => {
             const {
                 setActivePage,
@@ -123,6 +143,7 @@ class PersonaBarPageTreeviewInteractor extends Component {
     }
 
     toggleParentCollapsedState(id) {
+		logger.debug(`>>> Entering toggleParentCollapsedState(id=${id})`);
         this.setState({
             initialCollapse: false
         });
@@ -136,9 +157,11 @@ class PersonaBarPageTreeviewInteractor extends Component {
 
         updateReduxStore ? updateReduxStore(listPageItems) : null;
         this._countTreeOpenDeepParent(listPageItems);
+		logger.debug(`<<< Exiting toggleParentCollapsedState(id=${id})`);
     }
 
     onSelection({ id }) {
+		logger.debug(`>>> Entering onSelection(id=${id})`);
         let listPageItems = undefined;
         let updateReduxStore = null;
         this.props._traverse((item, listItem, updateStore) => {
@@ -149,18 +172,22 @@ class PersonaBarPageTreeviewInteractor extends Component {
             listPageItems = listItem;
         });
         updateReduxStore ? updateReduxStore(listPageItems) : null;
+		logger.debug(`<<< Exiting onSelection(id=${id})`);
     }
 
     onNoPermissionSelection({ id }) {
+		logger.debug(`>>> Entering onNoPermissionSelection(id=${id})`);
         this.props._traverse((item, list, updateStore) => {
             (item.id === id) ? item.selected = true : item.selected = false;
             item.selected ? this.props.onNoPermissionSelection(id) : null;
             delete item.showInContextMenu;
             updateStore(list);
         });
+		logger.debug(`<<< Exiting onNoPermissionSelection(id=${id})`);
     }
 
     onDuplicatePage(listItem) {
+		logger.debug(`>>> Entering onDuplicatePage(listItem=${listItem})`);
         let updateReduxStore = null;
         let pageList = null;
         this.props._traverse((item, list, updateStore) => {
@@ -171,6 +198,7 @@ class PersonaBarPageTreeviewInteractor extends Component {
 
         updateReduxStore(pageList);
         this.props.onDuplicatePage(listItem);
+		logger.debug(`<<< Exiting onDuplicatePage(listItem=${listItem})`);
     }
 
     getListItemLI(item) {
@@ -184,13 +212,17 @@ class PersonaBarPageTreeviewInteractor extends Component {
     }
 
     setMouseCoordinates(e) {
+		logger.debug(`>>> Entering setMouseCoordinates(e=${e})`);
         const capture = () => {
+			logger.debug('>>> Entering capture()');
             this.setState({ setMouseCoordDebounce: true, pageX: e.pageX, pageY: e.pageY });
             setTimeout(() => this.setState({ setMouseCoordDebounce: false }), this.state.debounceAmount);
+			logger.debug('<<< Exiting capture()');
         };
         const nothing = () => { };
 
         !this.state.dragOverDebounce ? capture() : nothing();
+		logger.debug(`<<< Exiting setMouseCoordinates(e=${e})`);
     }
 
 
@@ -203,9 +235,12 @@ class PersonaBarPageTreeviewInteractor extends Component {
         this.clonedElement.style.left = `${this.state.pageX}px`;
         this.clonedElement.classList.add("dnn-persona-bar-treeview-dragged");
         document.body.appendChild(this.clonedElement);
+		logger.debug(`<<< Exiting createClonedElement(e=${e},item=${item})`);
     }
 
     onDragEnter(e) {
+		logger.debug(`>>> Entering onDragEnter(e=${e})`);
+		logger.debug(`<<< Exiting onDragEnter(e=${e})`);
         e.preventDefault();
 
     }
@@ -223,8 +258,10 @@ class PersonaBarPageTreeviewInteractor extends Component {
         e.dataTransfer.setData ? e.dataTransfer.setData(type, "node") : null;
 
         const left = () => {
+			logger.debug('>>> Entering left()');
             const img = new Image();
             if (e.dataTransfer.setDragImage && !userAgent.indexOf("AppleWebkit")) {
+				logger.debug(`left(): img → ${img}`);
                 e.dataTransfer.setDragImage(img, 0, 0);
             }
 
@@ -243,17 +280,24 @@ class PersonaBarPageTreeviewInteractor extends Component {
                     }, () => updateStore(list));
                 }
             });
+			logger.debug(`left(): pageListItem.onDragOverState → ${pageListItem.onDragOverState}`);
+			logger.debug('<<< Exiting left()');
         };
 
         const right = () => {
+			logger.debug('>>> Entering right()');
             this.props.showCancelDialog(item.id);
+			logger.debug('<<< Exiting right()');
         };
 
         (!this.props.selectedPageDirty) ? left() : right();
+		logger.debug(`<<< Exiting onDragStart(e=${e},item=${item})`);
     }
 
     onDrag(e) {
+		logger.debug(`>>> Entering onDrag(e=${e})`);
         const move = () => {
+			logger.debug('>>> Entering move()');
             this.setState({ dragDebounce: true });
             const { pageX, pageY } = this.state;
             const elm = this.clonedElement;
@@ -262,13 +306,16 @@ class PersonaBarPageTreeviewInteractor extends Component {
             elm.style.top = `${e.pageY - 10}px`;
             elm.style.left = `${e.pageX - 10}px`;
             setTimeout(() => this.setState({ dragDebounce: false }), this.state.debounceAmount);
+			logger.debug('<<< Exiting move()');
         };
 
         const nothing = () => { };
         !this.state.dragDebounce ? move() : nothing();
+		logger.debug(`<<< Exiting onDrag(e=${e})`);
     }
 
     onDragEnd(e) {
+		logger.debug(`>>> Entering onDragEnd(e=${e})`);
         e.preventDefault();
 
         let pageList = null;
@@ -279,6 +326,7 @@ class PersonaBarPageTreeviewInteractor extends Component {
             pageList = list;
             runUpdateStore = updateStore;
         });
+		logger.debug(`<<< Exiting onDragEnd(e=${e})`);
         this.setState({
             pageList
         }, () => runUpdateStore(pageList));
@@ -295,6 +343,7 @@ class PersonaBarPageTreeviewInteractor extends Component {
                 }, () => updateStore(pageList));
             }
         });
+		logger.debug(`<<< Exiting onDragLeave(e=${e},item=${item})`);
     }
 
     onDragOver(e, item) {
@@ -303,6 +352,7 @@ class PersonaBarPageTreeviewInteractor extends Component {
         let pageList = null;
 
         const action = () => {
+			logger.debug('>>> Entering action()');
             this.setState({ dragOverDebounce: true });
             this.props._traverse((pageListItem, list, updateStore) => {
                 pageListItem.onDragOverState = false;
@@ -316,10 +366,13 @@ class PersonaBarPageTreeviewInteractor extends Component {
                 }
             });
             setTimeout(() => this.setState({ dragOverDebounce: false }), this.state.debounceAmount);
+			logger.debug(`action(): pageListItem.onDragOverState → ${pageListItem.onDragOverState}`);
+			logger.debug('<<< Exiting action()');
         };
 
         const noaction = () => { };
         !this.state.dragOverDebounce ? action() : noaction();
+		logger.debug(`<<< Exiting onDragOver(e=${e},item=${item})`);
     }
 
     onDrop(e, item) {
@@ -355,6 +408,7 @@ class PersonaBarPageTreeviewInteractor extends Component {
 
         const right = () => null;
         (item.id !== this.state.draggedItem.id && item.id !== this.state.draggedItem.parentId) ? left() : right();
+		logger.debug(`<<< Exiting onDrop(e=${e},item=${item})`);
     }
 
 
@@ -366,6 +420,7 @@ class PersonaBarPageTreeviewInteractor extends Component {
         RelatedPageId,
         RelatedPageParentId
     }) {
+	logger.debug('>>> Entering onMovePage()');
 
         e.preventDefault();
         const { onMovePage } = this.props;
@@ -398,11 +453,16 @@ class PersonaBarPageTreeviewInteractor extends Component {
     }
 
     removeClone() {
+		logger.debug('>>> Entering removeClone()');
         this.clonedElement ? document.body.removeChild(this.clonedElement) : null;
         this.clonedElement = null;
+		logger.debug(`removeClone(): this.clonedElement → ${this.clonedElement}`);
+		logger.debug('<<< Exiting removeClone()');
     }
 
     removeDropZones() {
+		logger.debug('>>> Entering removeDropZones()');
+		logger.debug('<<< Exiting removeDropZones()');
         return new Promise((resolve) => {
             let pageList = null;
             let runUpdateStore = null;
@@ -593,12 +653,14 @@ class PersonaBarPageTreeviewInteractor extends Component {
     }
 
     _countTreeOpenDeepParent(listItems) {
+		logger.debug(`>>> Entering _countTreeOpenDeepParent(listItems=${listItems})`);
         let maxCount = 0;
         for (let i = 0; i < listItems.length; i++) {
             let item = listItems[i];
             if (item.isOpen) {
                 if (item.childListItems) {
                     let count = this._countTreeDeep(item.childListItems);
+					logger.debug(`_countTreeOpenDeepParent(listItems=${listItems}): count → ${count}`);
                     if (count > maxCount) {
                         maxCount = count;
                     }
@@ -606,12 +668,15 @@ class PersonaBarPageTreeviewInteractor extends Component {
             }
         }
         this.countTreeDepthOpen = maxCount + 1;
+		logger.debug(`<<< Exiting _countTreeOpenDeepParent(listItems=${listItems})`);
         return this.countTreeDepthOpen;
     }
 
     _countTreeDeep(listItems) {
+		logger.debug(`>>> Entering _countTreeDeep(listItems=${listItems})`);
         let count = 0;
 
+		logger.debug(`_countTreeDeep(listItems=${listItems}): count → ${count}`);
         for (let i = 0; i < listItems.length; i++) {
             let item = listItems[i];
             if (item.isOpen) {
@@ -622,15 +687,20 @@ class PersonaBarPageTreeviewInteractor extends Component {
                 return count;
             }
         }
+		logger.debug(`<<< Exiting _countTreeDeep(listItems=${listItems})`);
         return count;
     }
 
     getChildListItems(id) {
+		logger.debug(`>>> Entering getChildListItems(id=${id})`);
         let promise = this.loadAllChildListItems(id);
         promise.then(this.toggleParentCollapsedState(id));
+		logger.debug(`<<< Exiting getChildListItems(id=${id})`);
     }
 
     loadAllChildListItems(id) {
+		logger.debug(`>>> Entering loadAllChildListItems(id=${id})`);
+		logger.debug(`<<< Exiting loadAllChildListItems(id=${id})`);
         return new Promise((resolve) => {
             const getChildListItems = () => {
                 this.props.getChildPageList(id)
@@ -656,6 +726,7 @@ class PersonaBarPageTreeviewInteractor extends Component {
     }
 
     loadAllChildList() {
+		logger.debug('>>> Entering loadAllChildList()');
         let promises = [];
         this.props._traverse((item) => {
             if (item.childCount > 0 && !Object.prototype.hasOwnProperty.call(item, "childListItems")) {
@@ -665,10 +736,12 @@ class PersonaBarPageTreeviewInteractor extends Component {
 
         if (promises.length > 0) {
             Promise.all(promises).then(this.setState({ isChildLoaded: true }));
+			logger.debug('<<< Exiting loadAllChildList()');
         }
     }
 
     toggleExpandAll() {
+		logger.debug('>>> Entering toggleExpandAll()');
         const {
             isTreeviewExpanded
         } = this.state;
@@ -685,11 +758,14 @@ class PersonaBarPageTreeviewInteractor extends Component {
                 item.isOpen = false;
                 item.hasChildren = false;
                 updateStore(list);
+				logger.debug('<<< Exiting toggleExpandAll()');
             }
         });
     }
 
     render_treeview() {
+		logger.debug('>>> Entering render_treeview()');
+		logger.debug('<<< Exiting render_treeview()');
         return (
             <span className="dnn-persona-bar-treeview-ul tree" onMouseOver={(e) => this.props.enabled ? this.setState({ pageX: e.pageX, pageY: e.pageY }) : () => {}} style={{ paddingBottom: "10px" }}>
                 {this.state.rootLoaded ?
@@ -720,6 +796,8 @@ class PersonaBarPageTreeviewInteractor extends Component {
     }
 
     render_treemenu() {
+		logger.debug('>>> Entering render_treemenu()');
+		logger.debug('<<< Exiting render_treemenu()');
         return (
             <span className="dnn-persona-bar-treeview-ul" >
                 {this.state.rootLoaded ?
@@ -739,6 +817,8 @@ class PersonaBarPageTreeviewInteractor extends Component {
     }
 
     render_tree_parent_expand() {
+		logger.debug('>>> Entering render_tree_parent_expand()');
+		logger.debug('<<< Exiting render_tree_parent_expand()');
         return (
             <span
                 className="dnn-persona-bar-treeview-ul" >
@@ -748,6 +828,8 @@ class PersonaBarPageTreeviewInteractor extends Component {
     }
 
     render_collapseExpand() {
+		logger.debug('>>> Entering render_collapseExpand()');
+		logger.debug('<<< Exiting render_collapseExpand()');
         return (
             <div
                 onClick={this.props.enabled ? this.toggleExpandAll.bind(this) : () => {}}
@@ -758,18 +840,24 @@ class PersonaBarPageTreeviewInteractor extends Component {
     }
 
     setMouseOver(isMouseOver) {
+		logger.debug(`>>> Entering setMouseOver(isMouseOver=${isMouseOver})`);
         let hasChildren = this.state.pageList && this.state.pageList.some((page) => page.childCount > 0);
 
         this.setState({
             isMouseInTree: (isMouseOver && hasChildren)
         });
+		logger.debug(`<<< Exiting setMouseOver(isMouseOver=${isMouseOver})`);
     }
 
     calculateTreeContentArea() {
+		logger.debug('>>> Entering calculateTreeContentArea()');
+		logger.debug('<<< Exiting calculateTreeContentArea()');
         return this.treeContentWidth + (this.countTreeDepthOpen * 25);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <div onMouseEnter={() => this.setMouseOver(true)} onMouseLeave={() => this.setMouseOver(false)}>
                 <GridCell
@@ -844,6 +932,8 @@ PersonaBarPageTreeviewInteractor.contextTypes = {
 
 
 const mapStateToProps = (state) => {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return ({
         activePage: state.pages.selectedPage
     });

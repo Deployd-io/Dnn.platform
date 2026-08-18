@@ -28,10 +28,12 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Portal
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             // default usage: return current portal if nothing else specified
             if (args.Length == 1)
             {
                 this.PortalIdFlagValue = this.PortalId;
+				eventLogger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): this.PortalIdFlagValue → {Arg4}", args, portalSettings, userInfo, activeTabId, this.PortalIdFlagValue);
             }
             else
             {
@@ -46,15 +48,20 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Portal
                     this.AddMessage(this.LocalizeString("Prompt_GetPortal_NoArgs"));
                 }
             }
+			eventLogger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogDebug(">>> Entering Run()");
             var pc = new PortalController();
             var lst = new List<PortalModel>();
+			eventLogger.LogDebug("Run(): lst → {Lst}", lst);
+			eventLogger.LogDebug("Run(): pc → {Pc}", pc);
 
             var portal = pc.GetPortal((int)this.PortalIdFlagValue);
+			eventLogger.LogDebug("Run(): portal → {Portal}", portal);
             if (portal == null)
             {
                 return new ConsoleErrorResultModel(
@@ -65,6 +72,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Portal
             }
 
             lst.Add(new PortalModel(portal));
+			eventLogger.LogDebug("<<< Exiting Run()");
             return new ConsoleResultModel(string.Empty)
             {
                 Data = lst,

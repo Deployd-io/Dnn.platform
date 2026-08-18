@@ -58,6 +58,8 @@ namespace log4net.Core
         /// </remarks>
         private LoggerManager() 
         {
+		log.DebugFormat(">>> Entering LoggerManager()");
+		log.DebugFormat("<<< Exiting LoggerManager()");
         }
 
         /// <summary>Hook the shutdown event</summary>
@@ -70,6 +72,7 @@ namespace log4net.Core
         /// </remarks>
         static LoggerManager()
         {
+			log.DebugFormat(">>> Entering LoggerManager()");
             try
             {
                 // Register the AppDomain events, note we have to do this with a
@@ -91,6 +94,7 @@ namespace log4net.Core
             // Set the default repository selector
 #if NETCF
             s_repositorySelector = new CompactRepositorySelector(typeof(log4net.Repository.Hierarchy.Hierarchy));
+			log.DebugFormat("LoggerManager(): s_repositorySelector → {0}", s_repositorySelector);
             return;
 #elif !NETSTANDARD1_3
             // Look for the RepositorySelector type specified in the AppSettings 'log4net.RepositorySelector'
@@ -151,6 +155,7 @@ namespace log4net.Core
         /// </remarks>
         private static void RegisterAppDomainEvents()
         {
+		log.DebugFormat(">>> Entering RegisterAppDomainEvents()");
 #if !NETCF && !NETSTANDARD1_3
             // ProcessExit seems to be fired if we are part of the default domain
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
@@ -158,6 +163,7 @@ namespace log4net.Core
             // Otherwise DomainUnload is fired
             AppDomain.CurrentDomain.DomainUnload += new EventHandler(OnDomainUnload);
 #endif
+		log.DebugFormat("<<< Exiting RegisterAppDomainEvents()");
         }
 
         /// <summary>Return the default <see cref="ILoggerRepository"/> instance.</summary>
@@ -172,6 +178,9 @@ namespace log4net.Core
         [Obsolete("Use GetRepository instead of GetLoggerRepository")]
         public static ILoggerRepository GetLoggerRepository(string repository)
         {
+			log.DebugFormat(">>> Entering GetLoggerRepository(repository={0})", repository);
+			log.DebugFormat("<<< Exiting GetLoggerRepository(repository={0})", repository);
+			log.DebugFormat("<<< Exiting GetLoggerRepository(repositoryAssembly={0})", repositoryAssembly);
             return GetRepository(repository);
         }
 
@@ -195,10 +204,14 @@ namespace log4net.Core
         /// </remarks>
         public static ILoggerRepository GetRepository(string repository)
         {
+			log.DebugFormat(">>> Entering GetRepository(repository={0})", repository);
             if (repository == null)
             {
+				log.WarnFormat("Throwing ArgumentNullException from GetRepository(repository={0})", repository);
+			log.DebugFormat("<<< Exiting GetRepository(repository={0})", repository);
                 throw new ArgumentNullException("repository");
             }
+			log.DebugFormat("<<< Exiting GetRepository(repositoryAssembly={0})", repositoryAssembly);
             return RepositorySelector.GetRepository(repository);
         }
 
@@ -235,14 +248,18 @@ namespace log4net.Core
         /// </remarks>
         public static ILogger Exists(string repository, string name) 
         {
+			log.DebugFormat(">>> Entering Exists(repository={0},name={1})", repository, name);
             if (repository == null)
             {
+				log.WarnFormat("Throwing ArgumentNullException from Exists(repository={0},name={1})", repository, name);
                 throw new ArgumentNullException("repository");
             }
             if (name == null)
             {
+			log.DebugFormat("<<< Exiting Exists(repository={0},name={1})", repository, name);
                 throw new ArgumentNullException("name");
             }
+			log.DebugFormat("<<< Exiting Exists(repositoryAssembly={0},name={1})", repositoryAssembly, name);
             return RepositorySelector.GetRepository(repository).Exists(name);
         }
 
@@ -283,10 +300,14 @@ namespace log4net.Core
         /// </remarks>
         public static ILogger[] GetCurrentLoggers(string repository)
         {
+			log.DebugFormat(">>> Entering GetCurrentLoggers(repository={0})", repository);
             if (repository == null)
             {
+				log.WarnFormat("Throwing ArgumentNullException from GetCurrentLoggers(repository={0})", repository);
+			log.DebugFormat("<<< Exiting GetCurrentLoggers(repository={0})", repository);
                 throw new ArgumentNullException("repository");
             }
+			log.DebugFormat("<<< Exiting GetCurrentLoggers(repositoryAssembly={0})", repositoryAssembly);
             return RepositorySelector.GetRepository(repository).GetCurrentLoggers();
         }
 
@@ -326,14 +347,20 @@ namespace log4net.Core
         /// </remarks>
         public static ILogger GetLogger(string repository, string name)
         {
+			log.DebugFormat(">>> Entering GetLogger(repository={0},name={1})", repository, name);
             if (repository == null)
             {
+				log.WarnFormat("Throwing ArgumentNullException from GetLogger(repository={0},name={1})", repository, name);
                 throw new ArgumentNullException("repository");
             }
             if (name == null)
             {
+			log.DebugFormat("<<< Exiting GetLogger(repository={0},name={1})", repository, name);
                 throw new ArgumentNullException("name");
             }
+			log.DebugFormat("<<< Exiting GetLogger(repositoryAssembly={0},name={1})", repositoryAssembly, name);
+			log.DebugFormat("<<< Exiting GetLogger(repository={0},type={1})", repository, type);
+			log.DebugFormat("<<< Exiting GetLogger(repositoryAssembly={0},type={1})", repositoryAssembly, type);
             return RepositorySelector.GetRepository(repository).GetLogger(name);
         }
 
@@ -431,10 +458,14 @@ namespace log4net.Core
         /// </remarks>
         public static void Shutdown() 
         {
+			log.DebugFormat(">>> Entering Shutdown()");
             foreach(ILoggerRepository repository in GetAllRepositories())
             {
                 repository.Shutdown();
+				log.DebugFormat(">>> Entering GetAllRepositories()");
+				log.DebugFormat("<<< Exiting GetAllRepositories()");
             }
+			log.DebugFormat("<<< Exiting Shutdown()");
         }
 
         /// <summary>Shuts down the repository for the repository specified.</summary>
@@ -458,11 +489,14 @@ namespace log4net.Core
         /// </remarks>
         public static void ShutdownRepository(string repository) 
         {
+			log.DebugFormat(">>> Entering ShutdownRepository(repository={0})", repository);
             if (repository == null)
             {
+				log.WarnFormat("Throwing ArgumentNullException from ShutdownRepository(repository={0})", repository);
                 throw new ArgumentNullException("repository");
             }
             RepositorySelector.GetRepository(repository).Shutdown();
+			log.DebugFormat("<<< Exiting ShutdownRepository(repository={0})", repository);
         }
 
         /// <summary>Shuts down the repository for the repository specified.</summary>
@@ -487,11 +521,14 @@ namespace log4net.Core
         /// </remarks>
         public static void ShutdownRepository(Assembly repositoryAssembly) 
         {
+			log.DebugFormat(">>> Entering ShutdownRepository(repositoryAssembly={0})", repositoryAssembly);
             if (repositoryAssembly == null)
             {
+				log.WarnFormat("Throwing ArgumentNullException from ShutdownRepository(repositoryAssembly={0})", repositoryAssembly);
                 throw new ArgumentNullException("repositoryAssembly");
             }
             RepositorySelector.GetRepository(repositoryAssembly).Shutdown();
+			log.DebugFormat("<<< Exiting ShutdownRepository(repositoryAssembly={0})", repositoryAssembly);
         }
 
         /// <summary>Resets all values contained in this repository instance to their defaults.</summary>
@@ -508,11 +545,14 @@ namespace log4net.Core
         /// </remarks>
         public static void ResetConfiguration(string repository) 
         {
+			log.DebugFormat(">>> Entering ResetConfiguration(repository={0})", repository);
             if (repository == null)
             {
+				log.WarnFormat("Throwing ArgumentNullException from ResetConfiguration(repository={0})", repository);
                 throw new ArgumentNullException("repository");
             }
             RepositorySelector.GetRepository(repository).ResetConfiguration();
+			log.DebugFormat("<<< Exiting ResetConfiguration(repository={0})", repository);
         }
 
         /// <summary>Resets all values contained in this repository instance to their defaults.</summary>
@@ -529,11 +569,14 @@ namespace log4net.Core
         /// </remarks>
         public static void ResetConfiguration(Assembly repositoryAssembly) 
         {
+			log.DebugFormat(">>> Entering ResetConfiguration(repositoryAssembly={0})", repositoryAssembly);
             if (repositoryAssembly == null)
             {
+				log.WarnFormat("Throwing ArgumentNullException from ResetConfiguration(repositoryAssembly={0})", repositoryAssembly);
                 throw new ArgumentNullException("repositoryAssembly");
             }
             RepositorySelector.GetRepository(repositoryAssembly).ResetConfiguration();
+			log.DebugFormat("<<< Exiting ResetConfiguration(repositoryAssembly={0})", repositoryAssembly);
         }
 
         /// <summary>Creates a repository with the specified name.</summary>
@@ -556,6 +599,10 @@ namespace log4net.Core
         [Obsolete("Use CreateRepository instead of CreateDomain")]
         public static ILoggerRepository CreateDomain(string repository)
         {
+			log.DebugFormat(">>> Entering CreateDomain(repository={0})", repository);
+			log.DebugFormat("<<< Exiting CreateDomain(repository={0})", repository);
+			log.DebugFormat("<<< Exiting CreateDomain(repository={0},repositoryType={1})", repository, repositoryType);
+			log.DebugFormat("<<< Exiting CreateDomain(repositoryAssembly={0},repositoryType={1})", repositoryAssembly, repositoryType);
             return CreateRepository(repository);
         }
 
@@ -575,10 +622,15 @@ namespace log4net.Core
         /// <exception cref="LogException">The specified repository already exists.</exception>
         public static ILoggerRepository CreateRepository(string repository)
         {
+			log.DebugFormat(">>> Entering CreateRepository(repository={0})", repository);
             if (repository == null)
             {
+				log.WarnFormat("Throwing ArgumentNullException from CreateRepository(repository={0})", repository);
+			log.DebugFormat("<<< Exiting CreateRepository(repository={0})", repository);
                 throw new ArgumentNullException("repository");
             }
+			log.DebugFormat("<<< Exiting CreateRepository(repository={0},repositoryType={1})", repository, repositoryType);
+			log.DebugFormat("<<< Exiting CreateRepository(repositoryAssembly={0},repositoryType={1})", repositoryAssembly, repositoryType);
             return RepositorySelector.CreateRepository(repository, null);
         }
 
@@ -687,6 +739,7 @@ namespace log4net.Core
         /// </remarks>
         public static ILoggerRepository[] GetAllRepositories()
         {
+			log.DebugFormat(">>> Entering GetAllRepositories()");
             return RepositorySelector.GetAllRepositories();
         }
 
@@ -724,10 +777,14 @@ namespace log4net.Core
         /// <returns>A string of version info.</returns>
         private static string GetVersionInfo()
         {
+			log.DebugFormat(">>> Entering GetVersionInfo()");
+			log.DebugFormat("<<< Exiting GetVersionInfo()");
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
+log.DebugFormat("GetVersionInfo(): sb → {0}", sb);
 #if NETSTANDARD1_3
             Assembly myAssembly = typeof(LoggerManager).GetTypeInfo().Assembly;
+			log.DebugFormat("GetVersionInfo(): myAssembly → {0}", myAssembly);
             sb.Append($"log4net assembly [{myAssembly.FullName}]. ");
             //sb.Append($"Loaded from [{myAssembly.Location}]. "); // TODO Assembly.Location available in netstandard1.5
             sb.Append($"(.NET Framework [{RuntimeInformation.FrameworkDescription}] on {RuntimeInformation.OSDescription}");
@@ -758,7 +815,9 @@ namespace log4net.Core
         /// </remarks>
         private static void OnDomainUnload(object sender, EventArgs e)
         {
+			log.DebugFormat(">>> Entering OnDomainUnload(sender={0},e={1})", sender, e);
             Shutdown();
+			log.DebugFormat("<<< Exiting OnDomainUnload(sender={0},e={1})", sender, e);
         }
 
         /// <summary>Called when the <see cref="AppDomain.ProcessExit"/> event fires</summary>
@@ -774,7 +833,9 @@ namespace log4net.Core
         /// </remarks>
         private static void OnProcessExit(object sender, EventArgs e)
         {
+			log.DebugFormat(">>> Entering OnProcessExit(sender={0},e={1})", sender, e);
             Shutdown();
+			log.DebugFormat("<<< Exiting OnProcessExit(sender={0},e={1})", sender, e);
         }
 #endif
 

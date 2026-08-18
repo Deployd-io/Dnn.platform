@@ -14,6 +14,7 @@ import {
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 const re = /^[1-9][0-9]?[0-9]?$|^0$/;
 const re2 = /^([9]\d|\d{3,4})$/;
@@ -22,6 +23,7 @@ const re3 = /^([1][2-9]|[2-9][0-9]|\d{3,})$/;
 class OtherSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             otherSettings: undefined,
             error: {
@@ -31,9 +33,11 @@ class OtherSettingsPanelBody extends Component {
             },
             triedToSubmit: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {props} = this;
         if (props.otherSettings) {
             this.setState({
@@ -47,12 +51,15 @@ class OtherSettingsPanelBody extends Component {
                 otherSettings
             });
         }));
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     UNSAFE_componentWillReceiveProps(props) {
+		logger.debug(`>>> Entering UNSAFE_componentWillReceiveProps(props=${props})`);
         let {state} = this;
 
         let autoAccountUnlockDuration = props.otherSettings["AutoAccountUnlockDuration"];
+		logger.debug(`UNSAFE_componentWillReceiveProps(props=${props}): autoAccountUnlockDuration → ${autoAccountUnlockDuration}`);
         if (autoAccountUnlockDuration === "" || !re.test(autoAccountUnlockDuration)) {
             state.error["autoAccountUnlockDuration"] = true;
         }
@@ -60,6 +67,7 @@ class OtherSettingsPanelBody extends Component {
             state.error["autoAccountUnlockDuration"] = false;
         }
         let asyncTimeout = props.otherSettings["AsyncTimeout"];
+		logger.debug(`UNSAFE_componentWillReceiveProps(props=${props}): asyncTimeout → ${asyncTimeout}`);
         if (asyncTimeout === "" || !re2.test(asyncTimeout)) {
             state.error["asyncTimeout"] = true;
         }
@@ -67,11 +75,13 @@ class OtherSettingsPanelBody extends Component {
             state.error["asyncTimeout"] = false;
         }
         let maxUploadSize = props.otherSettings["MaxUploadSize"];
+		logger.debug(`UNSAFE_componentWillReceiveProps(props=${props}): maxUploadSize → ${maxUploadSize}`);
         if (!this.isMaxUploadSizeValid(maxUploadSize)) {
             state.error["maxUploadSize"] = true;
         }
         else if (this.isMaxUploadSizeValid(maxUploadSize)) {
             state.error["maxUploadSize"] = false;
+			logger.debug(`<<< Exiting UNSAFE_componentWillReceiveProps(props=${props})`);
         }
 
         this.setState({
@@ -82,6 +92,7 @@ class OtherSettingsPanelBody extends Component {
     }
 
     isMaxUploadSizeValid(size) {
+		logger.debug(`>>> Entering isMaxUploadSizeValid(size=${size})`);
         let {props} = this;
         if (props.otherSettings === undefined) {
             return true;
@@ -96,14 +107,17 @@ class OtherSettingsPanelBody extends Component {
                 return false;
             }
             else {
+				logger.debug(`<<< Exiting isMaxUploadSizeValid(size=${size})`);
                 return true;
             }
         }
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let {state, props} = this;
         let otherSettings = Object.assign({}, state.otherSettings);
+		logger.debug(`onSettingChange(key=${key},event=${event}): otherSettings → ${otherSettings}`);
         otherSettings[key] = typeof (event) === "object" ? event.target.value : event;
 
         if (!re.test(otherSettings[key]) && key === "AutoAccountUnlockDuration") {
@@ -131,9 +145,11 @@ class OtherSettingsPanelBody extends Component {
             triedToSubmit: false
         });
         props.dispatch(SecurityActions.otherSettingsClientModified(otherSettings));
+		logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
     }
 
     onUpdate(event) {
+		logger.debug(`>>> Entering onUpdate(event=${event})`);
         event.preventDefault();
         const {props, state} = this;
         this.setState({
@@ -150,12 +166,15 @@ class OtherSettingsPanelBody extends Component {
         }, () => {
             util.utilities.notifyError(resx.get("OtherSettingsError"));
         }));
+		logger.debug(`<<< Exiting onUpdate(event=${event})`);
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const {props} = this;
         util.utilities.confirm(resx.get("OtherSettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SecurityActions.getOtherSettings((data) => {
+				logger.debug('<<< Exiting onCancel()');
                 let otherSettings = Object.assign({}, data.Results.Settings);
                 this.setState({
                     otherSettings
@@ -166,8 +185,10 @@ class OtherSettingsPanelBody extends Component {
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const { state } = this;
         if (state.otherSettings) {
+			logger.debug('<<< Exiting render()');
             return (
                 <div className={styles.otherSettings}>
                     <InputGroup>
@@ -379,6 +400,8 @@ OtherSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         otherSettings: state.security.otherSettings,

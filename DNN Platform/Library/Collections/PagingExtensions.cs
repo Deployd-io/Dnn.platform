@@ -8,6 +8,7 @@ namespace DotNetNuke.Collections
     /// <summary>Contains filters that can be applied to <see cref="IEnumerable{T}" /> stores.</summary>
     public static class PagingExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PagingExtensions));
         /// <summary>Filters the incoming store to retrieve pages of a specified size.</summary>
         /// <typeparam name="T">The type of the object being filtered.</typeparam>
         /// <param name="source">The source object being filtered.</param>
@@ -18,6 +19,8 @@ namespace DotNetNuke.Collections
         /// </returns>
         public static PageSelector<T> InPagesOf<T>(this IEnumerable<T> source, int pageSize)
         {
+			Logger.LogDebug(">>> Entering InPagesOf(source={Source},pageSize={PageSize})", source, pageSize);
+			Logger.LogDebug("<<< Exiting InPagesOf(source={Source},pageSize={PageSize})", source, pageSize);
             return new PageSelector<T>(source, pageSize);
         }
 
@@ -30,6 +33,8 @@ namespace DotNetNuke.Collections
         /// page of data from the data source.</returns>
         public static IPagedList<T> ToPagedList<T>(this IEnumerable<T> source, int pageIndex, int pageSize)
         {
+			Logger.LogDebug(">>> Entering ToPagedList(source={Source},pageIndex={PageIndex},pageSize={PageSize})", source, pageIndex, pageSize);
+			Logger.LogDebug("<<< Exiting ToPagedList(source={Source},pageIndex={PageIndex},pageSize={PageSize})", source, pageIndex, pageSize);
             return new PagedList<T>(source, pageIndex, pageSize);
         }
     }

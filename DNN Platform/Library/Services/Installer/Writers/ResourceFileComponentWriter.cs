@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// </summary>
     public class ResourceFileComponentWriter : FileComponentWriter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ResourceFileComponentWriter));
         /// <summary>
         /// Initializes a new instance of the <see cref="ResourceFileComponentWriter"/> class.
         /// Constructs the ResourceFileComponentWriter.
@@ -23,6 +24,8 @@ namespace DotNetNuke.Services.Installer.Writers
         public ResourceFileComponentWriter(string basePath, Dictionary<string, InstallFile> files, PackageInfo package)
             : base(basePath, files, package)
         {
+		Logger.LogDebug(">>> Entering ResourceFileComponentWriter(basePath={BasePath},files={Files},package={Package})", basePath, files, package);
+		Logger.LogDebug("<<< Exiting ResourceFileComponentWriter(basePath={BasePath},files={Files},package={Package})", basePath, files, package);
         }
 
         /// <summary>Gets the name of the Collection Node ("resourceFiles").</summary>

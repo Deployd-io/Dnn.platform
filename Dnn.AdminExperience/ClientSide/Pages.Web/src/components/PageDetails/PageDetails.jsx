@@ -5,10 +5,12 @@ import PageStandard from "./PageStandard/PageStandard";
 import PageUrl from "./PageUrl/PageUrl";
 import PageDetailsFooter from "./PageDetailsFooter/PageDetailsFooter";
 import PageIcons from "./PageIcons/PageIcons";
+const logger = console;
 
 class PageDetail extends Component {
 
     getDetail(pageType) {        
+		logger.debug(`>>> Entering getDetail(pageType=${pageType})`);
         switch (pageType) {
             case "normal": 
                 return PageStandard;
@@ -17,12 +19,15 @@ class PageDetail extends Component {
             case "file":
                 return PageUrl;
             default: 
+		logger.debug(`<<< Exiting getDetail(pageType=${pageType})`);
                 throw "invalid page type";
         }        
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const DetailComponent = this.getDetail(this.props.page.pageType);
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 <DetailComponent onChangeField={this.props.onChangeField} errors={this.props.errors} onSelectParentPageId={this.props.onSelectParentPageId}/>
@@ -42,6 +47,8 @@ PageDetail.propTypes = {
 };
 
 const mapStateToProps = (state) => {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         page: state.pages.selectedPage        
     };

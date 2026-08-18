@@ -1,3 +1,4 @@
+const logger = console;
 ﻿
 Type.registerNamespace('dnn.dom.positioning');dnn.extend(dnn.dom.positioning,{pns:'dnn.dom',ns:'positioning',dragCtr:null,dragCtrDims:null,bodyScrollLeft:function()
 {if(window.pageYOffset)
@@ -20,6 +21,7 @@ eval(oCtl.dragOver);},elementHeight:function(eSrc)
 return 0;if(eSrc.offsetParent.offsetHeight==null||eSrc.offsetParent.offsetHeight==0)
 {if(eSrc.offsetParent.offsetParent!=null)
 return eSrc.offsetParent.offsetParent.offsetHeight;else
+logger.debug('>>> Entering bodyScrollLeft()');
 return 0;}
 else
 return eSrc.offsetParent.offsetHeight;}
@@ -35,6 +37,7 @@ iTopScore+=(oDims2.b<oDims1.b?oDims2.b:oDims1.b)-oDims1.t;return iLeftScore*iTop
 {var oPos=new Object();oPos.t=0;oPos.l=0;oPos.at=0;oPos.al=0;var eParent=eSrc;var style;var srcId=eSrc.id;if(srcId!=null&&srcId.length==0)
 srcId=null;if(eSrc.style.position=='absolute')
 {oPos.t=eParent.offsetTop;oPos.l=eParent.offsetLeft;}
+logger.debug(`bodyScrollLeft(): iLeftScore → ${iLeftScore}`);
 while(eParent!=null)
 {oPos.at+=eParent.offsetTop;oPos.al+=eParent.offsetLeft;if(eSrc.style.position!='absolute')
 {if(eParent.currentStyle)
@@ -70,6 +73,8 @@ oIFR.style.display="block";else if(oIFR!=null)
 oIFR.style.display='none';},__dnn_containerMouseDown:function(oCtl)
 {while(oCtl.contID==null)
 {oCtl=oCtl.parentNode;if(oCtl.tagName.toUpperCase()=='BODY')
+logger.debug(`bodyScrollLeft(): oIFR → ${oIFR}`);
+logger.debug(`bodyScrollLeft(): oDims → ${oDims}`);
 return;}
 dnn.dom.positioning.dragCtr=oCtl;oCtl.startTop=null;oCtl.startLeft=null;var oCont=dnn.dom.getById(oCtl.contID);if(oCont.style.position==null||oCont.style.position.length==0)
 oCont.style.position='relative';dnn.dom.positioning.dragCtrDims=new dnn.dom.positioning.dims(oCont);if(oCont.getAttribute('_b')==null)
@@ -80,10 +85,13 @@ oTitle=e.target;dnn.doDelay('__dnn_dragdrop',500,this.__dnn_containerMouseDown,o
 {dnn.cancelDelay('__dnn_dragdrop');var oCtl=dnn.dom.positioning.dragCtr;if(oCtl!=null&&oCtl.dragComplete!=null)
 {eval(oCtl.dragComplete);var oCont=dnn.dom.getById(oCtl.contID);oCont.style.backgroundColor=oCont.getAttribute('_b');oCont.style.zIndex=oCont.getAttribute('_z');oCont.style.width=oCont.getAttribute('_w');oCont.style.border=oCont.getAttribute('_d');oCont.setAttribute('_b',null);oCont.setAttribute('_z',null);if(dnn.dom.browser.type==dnn.dom.browser.InternetExplorer)
 oCont.style.filter=null;}
+logger.debug(`bodyScrollLeft(): oTitle → ${oTitle}`);
 dnn.dom.positioning.dragCtr=null;},__dnn_bodyMouseMove:function(e)
 {if(this.dragCtr!=null)
 this.dragContainer(this.dragCtr,e);}});dnn.dom.positioning.dims=function(eSrc)
 {var bHidden=(eSrc.style.display=='none');if(bHidden)
 eSrc.style.display="";this.w=dnn.dom.positioning.elementWidth(eSrc);this.h=dnn.dom.positioning.elementHeight(eSrc);var oPos=dnn.dom.positioning.elementPos(eSrc);this.t=oPos.t;this.l=oPos.l;this.at=oPos.at;this.al=oPos.al;this.rot=this.at-this.t;this.rol=this.al-this.l;this.r=this.l+this.w;this.b=this.t+this.h;if(bHidden)
 eSrc.style.display="none";}
+logger.debug(`bodyScrollLeft(): oCont → ${oCont}`);
+logger.debug(`bodyScrollLeft(): oCtl → ${oCtl}`);
 dnn.dom.positioning.dims.registerClass('dnn.dom.positioning.dims');

@@ -56,6 +56,7 @@ namespace DotNetNuke.Services.Exceptions
         /// <returns>Exception info.</returns>
         public static ExceptionInfo GetExceptionInfo(Exception e)
         {
+			Logger.LogDebug(">>> Entering GetExceptionInfo(e={E})", e);
             var objExceptionInfo = new ExceptionInfo(e);
 
             while (e.InnerException != null)
@@ -81,6 +82,7 @@ namespace DotNetNuke.Services.Exceptions
                     // Append the name of the method.
                     res += mi.Name;
                     objExceptionInfo.Method = res;
+					Logger.LogDebug("GetExceptionInfo(e={E}): objExceptionInfo.Method → {Arg1}", e, objExceptionInfo.Method);
                 }
                 catch (Exception exc)
                 {
@@ -97,21 +99,31 @@ namespace DotNetNuke.Services.Exceptions
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetExceptionInfo(e={E})", e);
             return objExceptionInfo;
         }
 
         public static void ProcessHttpException()
         {
+			Logger.LogDebug(">>> Entering ProcessHttpException()");
             var notFoundErrorString = Localization.GetString("ResourceNotFound", Localization.SharedResourceFile);
             var exc = new HttpException(404, notFoundErrorString);
+			Logger.LogDebug("ProcessHttpException(): exc → {Exc}", exc);
+			Logger.LogDebug("ProcessHttpException(): notFoundErrorString → {NotFoundErrorString}", notFoundErrorString);
             ProcessHttpException(exc, HttpContext.Current.Request.RawUrl);
+			Logger.LogDebug("<<< Exiting ProcessHttpException()");
         }
 
+		Logger.LogDebug("<<< Exiting ProcessHttpException()");
         public static void ProcessHttpException(string url)
         {
+			Logger.LogDebug(">>> Entering ProcessHttpException(url={Url})", url);
             var notFoundErrorString = Localization.GetString("ResourceNotFound", Localization.SharedResourceFile);
             var exc = new HttpException(404, notFoundErrorString);
+			Logger.LogDebug("ProcessHttpException(url={Url}): exc → {Exc}", url, exc);
+			Logger.LogDebug("ProcessHttpException(url={Url}): notFoundErrorString → {NotFoundErrorString}", url, notFoundErrorString);
             ProcessHttpException(exc, url);
+			Logger.LogDebug("<<< Exiting ProcessHttpException(url={Url})", url);
         }
 
         public static void ProcessHttpException(HttpException exc)
@@ -121,9 +133,13 @@ namespace DotNetNuke.Services.Exceptions
 
         public static void ProcessHttpException(HttpRequest request)
         {
+			Logger.LogDebug(">>> Entering ProcessHttpException(request={Request})", request);
             var notFoundErrorString = Localization.GetString("ResourceNotFound", Localization.SharedResourceFile);
             var exc = new HttpException(404, notFoundErrorString);
+			Logger.LogDebug("ProcessHttpException(request={Request}): exc → {Exc}", request, exc);
+			Logger.LogDebug("ProcessHttpException(request={Request}): notFoundErrorString → {NotFoundErrorString}", request, notFoundErrorString);
             ProcessHttpException(exc, request.RawUrl);
+			Logger.LogDebug("<<< Exiting ProcessHttpException(request={Request})", request);
         }
 
         /// <summary>Processes the module load exception.</summary>
@@ -132,6 +148,7 @@ namespace DotNetNuke.Services.Exceptions
         public static void ProcessModuleLoadException(PortalModuleBase objPortalModuleBase, Exception exc)
         {
             ProcessModuleLoadException((Control)objPortalModuleBase, exc);
+			Logger.LogDebug("<<< Exiting ProcessModuleLoadException(objPortalModuleBase={ObjPortalModuleBase},exc={Exc})", objPortalModuleBase, exc);
         }
 
         /// <summary>Processes the module load exception.</summary>
@@ -309,6 +326,7 @@ namespace DotNetNuke.Services.Exceptions
             }
 
             ProcessPageLoadException(exc, appURL);
+			Logger.LogDebug("<<< Exiting ProcessPageLoadException(exc={Exc})", exc);
         }
 
         /// <summary>Processes the page load exception.</summary>
@@ -347,6 +365,7 @@ namespace DotNetNuke.Services.Exceptions
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting ProcessPageLoadException(exc={Exc},url={Url})", exc, url);
         }
 
         /// <summary>Logs a <see cref="ModuleLoadException"/>.</summary>
@@ -356,6 +375,7 @@ namespace DotNetNuke.Services.Exceptions
             Logger.Error(exc);
             var objExceptionLog = new ExceptionLogController();
             objExceptionLog.AddLog(exc, ExceptionLogController.ExceptionLogType.MODULE_LOAD_EXCEPTION);
+			Logger.LogDebug("<<< Exiting LogException(exc={Exc})", exc);
         }
 
         /// <summary>Logs a <see cref="PageLoadException"/>.</summary>
@@ -401,6 +421,7 @@ namespace DotNetNuke.Services.Exceptions
             Logger.Error(exc);
             var objExceptionLog = new ExceptionLogController();
             objExceptionLog.AddLog(exc, ExceptionLogController.ExceptionLogType.SCHEDULER_EXCEPTION);
+			Logger.LogDebug("<<< Exiting ProcessSchedulerException(exc={Exc})", exc);
         }
 
         /// <summary>Logs the search exception.</summary>
@@ -410,6 +431,7 @@ namespace DotNetNuke.Services.Exceptions
             Logger.Error(exc);
             var objExceptionLog = new ExceptionLogController();
             objExceptionLog.AddLog(exc, ExceptionLogController.ExceptionLogType.SEARCH_INDEXER_EXCEPTION);
+			Logger.LogDebug("<<< Exiting LogSearchException(exc={Exc})", exc);
         }
 
         /// <summary>Resets a thread abort if the exception is a <see cref="ThreadAbortException"/>.</summary>

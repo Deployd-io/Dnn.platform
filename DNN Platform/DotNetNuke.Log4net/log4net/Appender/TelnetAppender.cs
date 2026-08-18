@@ -61,6 +61,8 @@ namespace log4net.Appender
         /// </remarks>
         public TelnetAppender()
         {
+		value.LogDebug(">>> Entering TelnetAppender()");
+		value.LogDebug("<<< Exiting TelnetAppender()");
         }
 
         /// <summary>The fully qualified type of the TelnetAppender class.</summary>
@@ -113,13 +115,17 @@ namespace log4net.Appender
         /// </remarks>
         protected override void OnClose()  
         {
+			value.LogDebug(">>> Entering OnClose()");
             base.OnClose();
 
             if (this.m_handler != null)
             {
                 this.m_handler.Dispose();
                 this.m_handler = null;
+				value.LogDebug("OnClose(): m_handler → {M_handler}", m_handler);
+				value.LogDebug("OnClose(): this.m_handler → {Arg0}", this.m_handler);
             }
+			value.LogDebug("<<< Exiting OnClose()");
         }
 
         /// <summary>This appender requires a <see cref="Layout"/> to be set.</summary>
@@ -153,15 +159,18 @@ namespace log4net.Appender
         /// </remarks>
         public override void ActivateOptions() 
         {
+			value.LogDebug(">>> Entering ActivateOptions()");
             base.ActivateOptions();
             try 
             {
                 LogLog.Debug(declaringType, "Creating SocketHandler to listen on port ["+ this.m_listeningPort+"]");
                 this.m_handler = new SocketHandler(this.m_listeningPort);
+				value.LogDebug("ActivateOptions(): m_handler → {M_handler}", m_handler);
             }
             catch(Exception ex) 
             {
                 LogLog.Error(declaringType, "Failed to create SocketHandler", ex);
+			value.LogDebug("<<< Exiting ActivateOptions()");
                 throw;
             }
         }
@@ -175,10 +184,12 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent loggingEvent) 
         {
+			value.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
             if (this.m_handler != null && this.m_handler.HasConnections)
             {
                 this.m_handler.Send(this.RenderLoggingEvent(loggingEvent));
             }
+			value.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
         }
 
         /// <summary>Helper class to manage connected clients</summary>
@@ -218,13 +229,18 @@ namespace log4net.Appender
                 {
                     this.m_socket = socket;
 
+					value.LogDebug("SocketClient(socket={Socket}): this.m_socket → {Arg1}", socket, this.m_socket);
+					value.LogDebug("SocketClient(socket={Socket}): m_socket → {M_socket}", socket, m_socket);
                     try
                     {
                         this.m_writer = new StreamWriter(new NetworkStream(socket));
+						value.LogDebug("SocketClient(socket={Socket}): m_writer → {M_writer}", socket, m_writer);
                     }
                     catch
                     {
+						value.LogError("Exception in SocketClient(socket={Socket}): {Arg1}", socket, ex.Message);
                         this.Dispose();
+					value.LogDebug("<<< Exiting SocketClient(socket={Socket})", socket);
                         throw;
                     }
                 }
@@ -240,6 +256,9 @@ namespace log4net.Appender
                 {
                     this.m_writer.Write(message);
                     this.m_writer.Flush();
+					value.LogDebug(">>> Entering Send(message={Message})", message);
+					value.LogError("Exception in Send(message={Message}): {Arg1}", message, Exception.Message);
+					value.LogDebug("<<< Exiting Send(message={Message})", message);
                 }
 
                 /// <summary>Cleanup the clients connection</summary>
@@ -250,15 +269,19 @@ namespace log4net.Appender
                 /// </remarks>
                 public void Dispose()
                 {
+					value.LogDebug(">>> Entering Dispose()");
                     try
                     {
                         if (this.m_writer != null)
                         {
                             this.m_writer.Dispose();
                             this.m_writer = null;
+							value.LogDebug("Dispose(): m_writer → {M_writer}", m_writer);
+							value.LogDebug("Dispose(): this.m_writer → {Arg0}", this.m_writer);
                         }
                     }
                     catch { }
+					value.LogError("Exception in Dispose(): {Arg0}", ex.Message);
 
                     if (this.m_socket != null)
                     {
@@ -269,6 +292,7 @@ namespace log4net.Appender
                         catch { }
 
                         try
+					value.LogDebug("<<< Exiting Dispose()");
                         {
 #if NET_4_0 || NETSTANDARD
                             this.m_socket.Dispose();
@@ -279,6 +303,8 @@ namespace log4net.Appender
                         catch { }
 
                         this.m_socket = null;
+						value.LogDebug("Dispose(): m_socket → {M_socket}", m_socket);
+						value.LogDebug("Dispose(): this.m_socket → {Arg0}", this.m_socket);
                     }
                 }
             }
@@ -292,20 +318,25 @@ namespace log4net.Appender
             /// </remarks>
             public SocketHandler(int port)
             {
+				value.LogDebug(">>> Entering SocketHandler(port={Port})", port);
                 this.m_serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
+				value.LogDebug("SocketHandler(port={Port}): m_serverSocket → {M_serverSocket}", port, m_serverSocket);
                 this.m_serverSocket.Bind(new IPEndPoint(IPAddress.Any, port));
                 this.m_serverSocket.Listen(5);
                 this.AcceptConnection();
+				value.LogDebug("<<< Exiting SocketHandler(port={Port})", port);
             }
 
             private void AcceptConnection()
             {
+			value.LogDebug(">>> Entering AcceptConnection()");
 #if NETSTANDARD
                 m_serverSocket.AcceptAsync().ContinueWith(OnConnect, TaskScheduler.Default);
 #else
                 this.m_serverSocket.BeginAccept(new AsyncCallback(this.OnConnect), null);
 #endif
+			value.LogDebug("<<< Exiting AcceptConnection()");
             }
 
             /// <summary>Sends a string message to each of the connected clients</summary>
@@ -317,6 +348,7 @@ namespace log4net.Appender
             /// </remarks>
             public void Send(String message)
             {
+				value.LogDebug(">>> Entering Send(message={Message})", message);
                 ArrayList localClients = this.m_clients;
 
                 foreach (SocketClient client in localClients)
@@ -327,11 +359,13 @@ namespace log4net.Appender
                     }
                     catch (Exception)
                     {
+						value.LogError("Exception in Send(message={Message}): {Arg1}", message, Exception.Message);
                         // The client has closed the connection, remove it from our list
                         client.Dispose();
                         this.RemoveClient(client);
                     }
                 }
+				value.LogDebug("<<< Exiting Send(message={Message})", message);
             }
 
             /// <summary>Add a client to the internal clients list</summary>
@@ -344,6 +378,7 @@ namespace log4net.Appender
                     clientsCopy.Add(client);
                     this.m_clients = clientsCopy;
                 }
+				value.LogDebug("<<< Exiting AddClient(client={Client})", client);
             }
 
             /// <summary>Remove a client from the internal clients list</summary>
@@ -356,6 +391,7 @@ namespace log4net.Appender
                     clientsCopy.Remove(client);
                     this.m_clients = clientsCopy;
                 }
+				value.LogDebug("<<< Exiting RemoveClient(client={Client})", client);
             }
 
             /// <summary>Test if this handler has active connections</summary>
@@ -383,6 +419,7 @@ namespace log4net.Appender
 #if NETSTANDARD
             private void OnConnect(Task<Socket> acceptTask)
 #else
+			value.LogDebug(">>> Entering OnConnect(acceptTask={AcceptTask})", acceptTask);
             /// <summary>Callback used to accept a connection on the server socket</summary>
             /// <param name="asyncResult">The result of the asynchronous operation</param>
             /// <remarks>
@@ -391,6 +428,7 @@ namespace log4net.Appender
             /// if there are two many open connections you will be disconnected
             /// </para>
             /// </remarks>
+			value.LogDebug("<<< Exiting OnConnect(acceptTask={AcceptTask})", acceptTask);
             private void OnConnect(IAsyncResult asyncResult)
 #endif
             {
@@ -398,12 +436,14 @@ namespace log4net.Appender
                 {
 #if NETSTANDARD
                     Socket socket = acceptTask.GetAwaiter().GetResult();
+					value.LogDebug("OnConnect(asyncResult={AsyncResult}): socket → {Socket}", asyncResult, socket);
 #else
                     // Block until a client connects
                     Socket socket = this.m_serverSocket.EndAccept(asyncResult);
 #endif
                     LogLog.Debug(declaringType, "Accepting connection from ["+socket.RemoteEndPoint.ToString()+"]");
                     SocketClient client = new SocketClient(socket);
+					value.LogDebug("OnConnect(asyncResult={AsyncResult}): client → {Client}", asyncResult, client);
 
                     int currentActiveConnectionsCount = this.m_clients.Count;
                     if (currentActiveConnectionsCount < MAX_CONNECTIONS) 
@@ -415,7 +455,9 @@ namespace log4net.Appender
                         }
                         catch
                         {
+							value.LogError("Exception in OnConnect(acceptTask={AcceptTask}): {Arg1}", acceptTask, Exception.Message);
                             client.Dispose();
+							value.LogError("Exception in OnConnect(asyncResult={AsyncResult}): {Arg1}", asyncResult, Exception.Message);
                         }
                     }
                     else 

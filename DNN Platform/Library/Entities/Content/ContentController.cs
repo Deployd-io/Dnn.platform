@@ -28,6 +28,7 @@ namespace DotNetNuke.Entities.Content
     public class ContentController(IDataService dataService, IHostSettings hostSettings)
         : ServiceLocator<IContentController, ContentController>, IContentController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ContentController));
         private readonly IDataService dataService = dataService ?? Util.GetDataService();
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
 
@@ -36,6 +37,8 @@ namespace DotNetNuke.Entities.Content
         public ContentController()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering ContentController()");
+		Logger.LogDebug("<<< Exiting ContentController()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ContentController"/> class.</summary>
@@ -93,16 +96,21 @@ namespace DotNetNuke.Entities.Content
         /// <inheritdoc />
         public void DeleteContentItem(int contentItemId)
         {
+			Logger.LogDebug(">>> Entering DeleteContentItem(contentItemId={ContentItemId})", contentItemId);
             var contentItem = this.GetContentItem(contentItemId);
             this.DeleteContentItem(contentItem);
+			Logger.LogDebug("<<< Exiting DeleteContentItem(contentItem={ContentItem})", contentItem);
+			Logger.LogDebug("<<< Exiting DeleteContentItem(contentItemId={ContentItemId})", contentItemId);
         }
 
         /// <inheritdoc />
         public ContentItem GetContentItem(int contentItemId)
         {
+			Logger.LogDebug(">>> Entering GetContentItem(contentItemId={ContentItemId})", contentItemId);
             // Argument Contract
             Requires.NotNegative("contentItemId", contentItemId);
 
+			Logger.LogDebug("<<< Exiting GetContentItem(contentItemId={ContentItemId})", contentItemId);
             return CBO.GetCachedObject<ContentItem>(
                 this.hostSettings,
                 new CacheItemArgs(GetContentItemCacheKey(contentItemId), DataCache.ContentItemsCacheTimeOut, DataCache.ContentItemsCachePriority),
@@ -111,15 +119,19 @@ namespace DotNetNuke.Entities.Content
 
         public IQueryable<ContentItem> GetContentItems(int contentTypeId, int tabId, int moduleId)
         {
+			Logger.LogDebug(">>> Entering GetContentItems(contentTypeId={ContentTypeId},tabId={TabId},moduleId={ModuleId})", contentTypeId, tabId, moduleId);
+			Logger.LogDebug("<<< Exiting GetContentItems(contentTypeId={ContentTypeId},tabId={TabId},moduleId={ModuleId})", contentTypeId, tabId, moduleId);
             return CBO.FillQueryable<ContentItem>(this.dataService.GetContentItems(contentTypeId, tabId, moduleId));
         }
 
         /// <inheritdoc />
         public IQueryable<ContentItem> GetContentItemsByTerm(string term)
         {
+			Logger.LogDebug(">>> Entering GetContentItemsByTerm(term={Term})", term);
             // Argument Contract
             Requires.NotNullOrEmpty("term", term);
 
+			Logger.LogDebug("<<< Exiting GetContentItemsByTerm(term={Term})", term);
             return CBO.FillQueryable<ContentItem>(this.dataService.GetContentItemsByTerm(term));
         }
 
@@ -132,6 +144,9 @@ namespace DotNetNuke.Entities.Content
         /// <inheritdoc />
         public IQueryable<ContentItem> GetContentItemsByContentType(int contentTypeId)
         {
+			Logger.LogDebug(">>> Entering GetContentItemsByContentType(contentTypeId={ContentTypeId})", contentTypeId);
+			Logger.LogDebug("<<< Exiting GetContentItemsByContentType(contentTypeId={ContentTypeId})", contentTypeId);
+			Logger.LogDebug("<<< Exiting GetContentItemsByContentType(contentType={ContentType})", contentType);
             return CBO.FillQueryable<ContentItem>(this.dataService.GetContentItemsByContentType(contentTypeId));
         }
 
@@ -144,6 +159,7 @@ namespace DotNetNuke.Entities.Content
         /// <inheritdoc />
         public IQueryable<ContentItem> GetContentItemsByTerms(IList<Term> terms)
         {
+			Logger.LogDebug("<<< Exiting GetContentItemsByTerms(terms={Terms})", terms);
             return this.GetContentItemsByTerms(terms.Select(t => t.Name).ToArray());
         }
 
@@ -165,24 +181,32 @@ namespace DotNetNuke.Entities.Content
         /// <inheritdoc />
         public IQueryable<ContentItem> GetContentItemsByTabId(int tabId)
         {
+			Logger.LogDebug(">>> Entering GetContentItemsByTabId(tabId={TabId})", tabId);
+			Logger.LogDebug("<<< Exiting GetContentItemsByTabId(tabId={TabId})", tabId);
             return CBO.FillQueryable<ContentItem>(this.dataService.GetContentItemsByTabId(tabId));
         }
 
         /// <inheritdoc />
         public IQueryable<ContentItem> GetContentItemsByVocabularyId(int vocabularyId)
         {
+			Logger.LogDebug(">>> Entering GetContentItemsByVocabularyId(vocabularyId={VocabularyId})", vocabularyId);
+			Logger.LogDebug("<<< Exiting GetContentItemsByVocabularyId(vocabularyId={VocabularyId})", vocabularyId);
             return CBO.FillQueryable<ContentItem>(this.dataService.GetContentItemsByVocabularyId(vocabularyId));
         }
 
         /// <inheritdoc />
         public IQueryable<ContentItem> GetUnIndexedContentItems()
         {
+			Logger.LogDebug(">>> Entering GetUnIndexedContentItems()");
+			Logger.LogDebug("<<< Exiting GetUnIndexedContentItems()");
             return CBO.FillQueryable<ContentItem>(this.dataService.GetUnIndexedContentItems());
         }
 
         /// <inheritdoc />
         public IQueryable<ContentItem> GetContentItemsByModuleId(int moduleId)
         {
+			Logger.LogDebug(">>> Entering GetContentItemsByModuleId(moduleId={ModuleId})", moduleId);
+			Logger.LogDebug("<<< Exiting GetContentItemsByModuleId(moduleId={ModuleId})", moduleId);
             return CBO.FillQueryable<ContentItem>(this.dataService.GetContentItemsByModuleId(moduleId));
         }
 
@@ -202,6 +226,7 @@ namespace DotNetNuke.Entities.Content
             contentItem.LastModifiedByUserID = userId;
 
             UpdateContentItemsCache(contentItem);
+			Logger.LogDebug("<<< Exiting UpdateContentItem(contentItem={ContentItem})", contentItem);
         }
 
         /// <inheritdoc />
@@ -215,6 +240,7 @@ namespace DotNetNuke.Entities.Content
             this.dataService.AddMetaData(contentItem, name, value);
 
             UpdateContentItemsCache(contentItem, false);
+			Logger.LogDebug("<<< Exiting AddMetaData(contentItem={ContentItem},name={Name},value={Value})", contentItem, name, value);
         }
 
         /// <inheritdoc />
@@ -228,6 +254,7 @@ namespace DotNetNuke.Entities.Content
             this.dataService.DeleteMetaData(contentItem, name, value);
 
             UpdateContentItemsCache(contentItem, false);
+			Logger.LogDebug("<<< Exiting DeleteMetaData(contentItem={ContentItem},name={Name},value={Value})", contentItem, name, value);
         }
 
         /// <inheritdoc />
@@ -242,10 +269,12 @@ namespace DotNetNuke.Entities.Content
         /// <inheritdoc />
         public NameValueCollection GetMetaData(int contentItemId)
         {
+			Logger.LogDebug(">>> Entering GetMetaData(contentItemId={ContentItemId})", contentItemId);
             // Argument Contract
             Requires.NotNegative("contentItemId", contentItemId);
 
             var metadata = new NameValueCollection();
+			Logger.LogDebug("GetMetaData(contentItemId={ContentItemId}): metadata → {Metadata}", contentItemId, metadata);
 
             using (var dr = this.dataService.GetMetaData(contentItemId))
             {
@@ -258,12 +287,15 @@ namespace DotNetNuke.Entities.Content
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetMetaData(contentItemId={ContentItemId})", contentItemId);
             return metadata;
         }
 
         /// <inheritdoc />
         protected override Func<IContentController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => Globals.GetCurrentServiceProvider().GetRequiredService<IContentController>();
         }
 
@@ -271,6 +303,7 @@ namespace DotNetNuke.Entities.Content
             IEnumerable<KeyValuePair<string, string>> lh,
             IEnumerable<KeyValuePair<string, string>> rh)
         {
+			Logger.LogDebug("<<< Exiting MetaDataChanged(lh={Lh},rh={Rh})", lh, rh);
             return lh.SequenceEqual(rh, new NameValueEqualityComparer()) == false;
         }
 
@@ -287,10 +320,13 @@ namespace DotNetNuke.Entities.Content
                     c => contentItem,
                     false);
             }
+			Logger.LogDebug("<<< Exiting UpdateContentItemsCache(contentItem={ContentItem},readdItem={ReaddItem})", contentItem, readdItem);
         }
 
         private static string GetContentItemCacheKey(int contetnItemId)
         {
+			Logger.LogDebug(">>> Entering GetContentItemCacheKey(contetnItemId={ContetnItemId})", contetnItemId);
+			Logger.LogDebug("<<< Exiting GetContentItemCacheKey(contetnItemId={ContetnItemId})", contetnItemId);
             return string.Format(CultureInfo.InvariantCulture, DataCache.ContentItemsCacheKey, contetnItemId);
         }
 
@@ -316,6 +352,7 @@ namespace DotNetNuke.Entities.Content
             this.dataService.SynchronizeMetaData(contentItem, added, deleted);
 
             UpdateContentItemsCache(contentItem, false);
+			Logger.LogDebug("<<< Exiting SaveMetadataDelta(contentItem={ContentItem})", contentItem);
         }
     }
 }

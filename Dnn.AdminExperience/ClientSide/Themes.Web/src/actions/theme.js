@@ -1,19 +1,26 @@
 import { theme as ActionTypes } from "constants/actionTypes";
 import ThemeService from "services/themeService";
 import Localization from "localization";
+const logger = console;
 
 function errorCallback(xhr) {
+	logger.debug(`>>> Entering errorCallback(xhr=${xhr})`);
     let response = JSON.parse(xhr.responseText);
     let message = xhr.responseText;
+	logger.debug(`errorCallback(xhr=${xhr}): response → ${response}`);
     if (response && response.Message) {
         message = response.Message;
     }
 
     let utils = window.dnn.initThemes().utility;
     utils.notifyError(Localization.get(message), 5000);
+	logger.debug(`errorCallback(xhr=${xhr}): utils → ${utils}`);
+	logger.debug(`<<< Exiting errorCallback(xhr=${xhr})`);
 }
 const themeActions = {
     getCurrentTheme(callback) {
+		logger.debug(`>>> Entering getCurrentTheme(callback=${callback})`);
+		logger.debug(`<<< Exiting getCurrentTheme(callback=${callback})`);
         return (dispatch) => {
             ThemeService.getCurrentTheme(data => {
                 dispatch({
@@ -29,6 +36,8 @@ const themeActions = {
         };
     },
     getThemes(level, callback) {
+		logger.debug(`>>> Entering getThemes(level=${level},callback=${callback})`);
+		logger.debug(`<<< Exiting getThemes(level=${level},callback=${callback})`);
         return (dispatch) => {
             ThemeService.getThemes(level, data => {
                 dispatch({
@@ -45,6 +54,8 @@ const themeActions = {
         };
     },
     getCurrentThemeFiles(themeName, themeType, themeLevel, callback) {
+		logger.debug(`>>> Entering getCurrentThemeFiles(themeName=${themeName},themeType=${themeType},themeLevel=${themeLevel},callback=${callback})`);
+		logger.debug(`<<< Exiting getCurrentThemeFiles(themeName=${themeName},themeType=${themeType},themeLevel=${themeLevel},callback=${callback})`);
         return (dispatch) => {
             ThemeService.getThemeFiles(themeName, themeType, themeLevel, data => {
                 dispatch({
@@ -61,6 +72,8 @@ const themeActions = {
         };
     },
     getEditableThemeFiles(themeName, themeType, themeLevel, callback) {
+		logger.debug(`>>> Entering getEditableThemeFiles(themeName=${themeName},themeType=${themeType},themeLevel=${themeLevel},callback=${callback})`);
+		logger.debug(`<<< Exiting getEditableThemeFiles(themeName=${themeName},themeType=${themeType},themeLevel=${themeLevel},callback=${callback})`);
         return (dispatch) => {
             ThemeService.getThemeFiles(themeName, themeType, themeLevel, data => {
                 dispatch({
@@ -76,6 +89,8 @@ const themeActions = {
         };
     },
     getEditableTokens(callback) {
+		logger.debug(`>>> Entering getEditableTokens(callback=${callback})`);
+		logger.debug(`<<< Exiting getEditableTokens(callback=${callback})`);
         return (dispatch) => {
             ThemeService.getEditableTokens(data => {
                 dispatch({
@@ -121,6 +136,8 @@ const themeActions = {
         };
     },
     applyTheme(themeFile, scope, callback) {
+		logger.debug(`>>> Entering applyTheme(themeFile=${themeFile},scope=${scope},callback=${callback})`);
+		logger.debug(`<<< Exiting applyTheme(themeFile=${themeFile},scope=${scope},callback=${callback})`);
         return (dispatch) => {
             ThemeService.applyTheme(themeFile, scope, data => {
                 dispatch({
@@ -150,6 +167,8 @@ const themeActions = {
         };
     },
     parseTheme(themeName, parseType, callback) {
+		logger.debug(`>>> Entering parseTheme(themeName=${themeName},parseType=${parseType},callback=${callback})`);
+		logger.debug(`<<< Exiting parseTheme(themeName=${themeName},parseType=${parseType},callback=${callback})`);
         return (dispatch) => {
             ThemeService.parseTheme(themeName, parseType, () => {
                 dispatch({
@@ -164,6 +183,8 @@ const themeActions = {
         };
     },
     restoreTheme(callback) {
+		logger.debug(`>>> Entering restoreTheme(callback=${callback})`);
+		logger.debug(`<<< Exiting restoreTheme(callback=${callback})`);
         return (dispatch) => {
             ThemeService.restoreTheme(data => {
                 dispatch({
@@ -179,6 +200,8 @@ const themeActions = {
         };
     },
     applyDefaultTheme(themeName, level, callback) {
+		logger.debug(`>>> Entering applyDefaultTheme(themeName=${themeName},level=${level},callback=${callback})`);
+		logger.debug(`<<< Exiting applyDefaultTheme(themeName=${themeName},level=${level},callback=${callback})`);
         return (dispatch) => {
             ThemeService.applyDefaultTheme(themeName, level, data => {
                 dispatch({
@@ -194,6 +217,8 @@ const themeActions = {
         };
     },
     deleteTheme(theme, callback) {
+		logger.debug(`>>> Entering deleteTheme(theme=${theme},callback=${callback})`);
+		logger.debug(`<<< Exiting deleteTheme(theme=${theme},callback=${callback})`);
         return (dispatch) => {
             ThemeService.deleteTheme(theme, () => {
                 dispatch({

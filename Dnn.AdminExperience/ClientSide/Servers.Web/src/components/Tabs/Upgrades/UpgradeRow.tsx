@@ -8,6 +8,7 @@ import {
 import Localization from "../../../localization";
 import "./style.less";
 import util from "../../../utils";
+const logger = console;
 
 interface IUpgradeRowProps {
   upgrade: LocalUpgradeInfo;
@@ -16,6 +17,7 @@ interface IUpgradeRowProps {
 }
 
 const UpgradeRow: React.FC<IUpgradeRowProps> = (props) => {
+logger.debug(`>>> Entering UpgradeRow(props=${props})`);
   const version = `${props.upgrade.Version._Major}.${props.upgrade.Version._Minor}.${props.upgrade.Version._Build}`;
   const minDnnVersion = `${props.upgrade.MinDnnVersion._Major}.${props.upgrade.MinDnnVersion._Minor}.${props.upgrade.MinDnnVersion._Build}`;
 
@@ -50,6 +52,7 @@ const UpgradeRow: React.FC<IUpgradeRowProps> = (props) => {
           type="trash"
           className={"edit-icon"}
           onClick={() => {
+			logger.debug(`<<< Exiting UpgradeRow(props=${props})`);
             util.confirm(
               Localization.get("DeleteUpgradePackage.Confirm"),
               Localization.get("Confirm"),

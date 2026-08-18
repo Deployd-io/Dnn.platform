@@ -1,9 +1,12 @@
 import {server as ActionTypes}  from "../constants/actionTypes";
 import serverService from "../services/serverService";
 import localization from "../localization";
+const logger = console;
 
 const serverActions = {
     restartApplication() {       
+		logger.debug('>>> Entering restartApplication()');
+		logger.debug('<<< Exiting restartApplication()');
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.REQUEST_RESTART_APPLICATION               
@@ -17,6 +20,7 @@ const serverActions = {
                     }
                 });  
             }).catch(() => {
+				logger.error('Exception in restartApplication()');
                 dispatch({
                     type: ActionTypes.ERROR_REQUEST_RESTART_APPLICATION,
                     payload: {
@@ -27,6 +31,8 @@ const serverActions = {
         };
     },
     clearCache() {       
+		logger.debug('>>> Entering clearCache()');
+		logger.debug('<<< Exiting clearCache()');
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.REQUEST_CLEAR_CACHE               
@@ -40,6 +46,7 @@ const serverActions = {
                     }
                 });  
             }).catch(() => {
+				logger.error('Exception in clearCache()');
                 dispatch({
                     type: ActionTypes.ERROR_REQUEST_CLEAR_CACHE,
                     payload: {

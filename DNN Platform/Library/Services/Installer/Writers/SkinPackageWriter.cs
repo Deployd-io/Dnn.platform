@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// <summary>The SkinPackageWriter class.</summary>
     public class SkinPackageWriter : PackageWriterBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SkinPackageWriter));
         private readonly SkinPackageInfo skinPackage;
         private readonly string subFolder;
 
@@ -21,8 +22,16 @@ namespace DotNetNuke.Services.Installer.Writers
         public SkinPackageWriter(PackageInfo package)
             : base(package)
         {
+			Logger.LogDebug(">>> Entering SkinPackageWriter(package={Package})", package);
             this.skinPackage = SkinController.GetSkinByPackageID(package.PackageID);
             this.SetBasePath();
+			Logger.LogDebug("SkinPackageWriter(package={Package}): skinPackage → {SkinPackage}", package, skinPackage);
+			Logger.LogDebug("SkinPackageWriter(skinPackage={SkinPackage},package={Package}): skinPackage → {SkinPackage1}", skinPackage, package, skinPackage);
+			Logger.LogDebug("<<< Exiting SkinPackageWriter(package={Package})", package);
+			Logger.LogDebug(">>> Entering SkinPackageWriter(skinPackage={SkinPackage},package={Package})", skinPackage, package);
+			Logger.LogDebug("SkinPackageWriter(skinPackage={SkinPackage},package={Package}): this.skinPackage → {Arg2}", skinPackage, package, this.skinPackage);
+			Logger.LogDebug("<<< Exiting SkinPackageWriter(skinPackage={SkinPackage},package={Package})", skinPackage, package);
+			Logger.LogDebug("SkinPackageWriter(skinPackage={SkinPackage},package={Package},basePath={BasePath}): this.skinPackage → {Arg3}", skinPackage, package, basePath, this.skinPackage);
         }
 
         /// <summary>Initializes a new instance of the <see cref="SkinPackageWriter"/> class.</summary>
@@ -44,6 +53,7 @@ namespace DotNetNuke.Services.Installer.Writers
         {
             this.skinPackage = skinPackage;
             this.BasePath = basePath;
+			Logger.LogDebug("SkinPackageWriter(skinPackage={SkinPackage},package={Package},basePath={BasePath},subFolder={SubFolder}): this.skinPackage → {Arg4}", skinPackage, package, basePath, subFolder, this.skinPackage);
         }
 
         /// <summary>Initializes a new instance of the <see cref="SkinPackageWriter"/> class.</summary>
@@ -78,6 +88,7 @@ namespace DotNetNuke.Services.Installer.Writers
 
         public void SetBasePath()
         {
+			Logger.LogDebug(">>> Entering SetBasePath()");
             if (this.skinPackage.SkinType == "Skin")
             {
                 this.BasePath = Path.Combine("Portals\\_default\\Skins", this.SkinPackage.SkinName);
@@ -86,23 +97,28 @@ namespace DotNetNuke.Services.Installer.Writers
             {
                 this.BasePath = Path.Combine("Portals\\_default\\Containers", this.SkinPackage.SkinName);
             }
+			Logger.LogDebug("<<< Exiting SetBasePath()");
         }
 
         /// <inheritdoc />
         protected override void GetFiles(bool includeSource, bool includeAppCode)
         {
+			Logger.LogDebug(">>> Entering GetFiles(includeSource={IncludeSource},includeAppCode={IncludeAppCode})", includeSource, includeAppCode);
             // Call base class method with includeAppCode = false
             base.GetFiles(includeSource, false);
+			Logger.LogDebug("<<< Exiting GetFiles(includeSource={IncludeSource},includeAppCode={IncludeAppCode})", includeSource, includeAppCode);
         }
 
         /// <inheritdoc />
         protected override void ParseFiles(DirectoryInfo folder, string rootPath)
         {
+			Logger.LogDebug(">>> Entering ParseFiles(folder={Folder},rootPath=<redacted>)", folder);
             // Add the Files in the Folder
             FileInfo[] files = folder.GetFiles();
             foreach (FileInfo file in files)
             {
                 string filePath = folder.FullName.Replace(rootPath, string.Empty);
+				Logger.LogDebug("ParseFiles(folder={Folder},rootPath=<redacted>): filePath → {FilePath}", folder, filePath);
                 if (filePath.StartsWith(@"\", StringComparison.Ordinal))
                 {
                     filePath = filePath.Substring(1);
@@ -120,14 +136,17 @@ namespace DotNetNuke.Services.Installer.Writers
                         this.AddFile(filePath, Path.Combine(this.subFolder, filePath));
                     }
                 }
+			Logger.LogDebug("<<< Exiting ParseFiles(folder={Folder},rootPath=<redacted>)", folder);
             }
         }
 
         /// <inheritdoc />
         protected override void WriteFilesToManifest(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteFilesToManifest(writer={Writer})", writer);
             var skinFileWriter = new SkinComponentWriter(this.SkinPackage.SkinName, this.BasePath, this.Files, this.Package);
             if (this.SkinPackage.SkinType == "Skin")
+			Logger.LogDebug("WriteFilesToManifest(writer={Writer}): skinFileWriter → {SkinFileWriter}", writer, skinFileWriter);
             {
                 skinFileWriter = new SkinComponentWriter(this.SkinPackage.SkinName, this.BasePath, this.Files, this.Package);
             }
@@ -137,6 +156,7 @@ namespace DotNetNuke.Services.Installer.Writers
             }
 
             skinFileWriter.WriteManifest(writer);
+			Logger.LogDebug("<<< Exiting WriteFilesToManifest(writer={Writer})", writer);
         }
     }
 }

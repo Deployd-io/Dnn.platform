@@ -14,41 +14,57 @@ namespace DotNetNuke.Tests.Integration.Modules.DigitalAssets
     using DNN.Integration.Test.Framework.Helpers;
     using DotNetNuke.Common.Utilities;
     using NUnit.Framework;
+	using Microsoft.Extensions.Logging;
 
     [TestFixture]
     public class DigitalAssetsTests : IntegrationTestBase
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private readonly int PortalId = 0;
 
         [Test]
         [Ignore("Digital Assets module has been replaced by Resource Manager")]
         public async Task File_Url_Should_Update_After_Rename_Folder()
         {
+			_logger.LogDebug(">>> Entering File_Url_Should_Update_After_Rename_Folder()");
             var connector = WebApiTestHelper.LoginAdministrator();
 
+			_logger.LogDebug("File_Url_Should_Update_After_Rename_Folder(): connector → {Connector}", connector);
             var folder = this.CreateNewFolder(connector);
+			_logger.LogDebug("File_Url_Should_Update_After_Rename_Folder(): folder → {Folder}", folder);
             var folderId = Convert.ToInt32(folder.FolderID);
+			_logger.LogDebug("File_Url_Should_Update_After_Rename_Folder(): folderId → {FolderId}", folderId);
             var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Files\\Test.png");
+			_logger.LogDebug("File_Url_Should_Update_After_Rename_Folder(): filePath → {FilePath}", filePath);
             await connector.UploadCmsFile(filePath, folder.FolderPath.ToString());
             var fileId = this.GetFileId(folderId, "Test.png");
+			_logger.LogDebug("File_Url_Should_Update_After_Rename_Folder(): fileId → {FileId}", fileId);
 
             var newFolderName = Guid.NewGuid().ToString();
+			_logger.LogDebug("File_Url_Should_Update_After_Rename_Folder(): newFolderName → {NewFolderName}", newFolderName);
             this.RenameFolder(connector, folderId, newFolderName);
 
             var getUrlApi = "API/DigitalAssets/ContentService/GetUrl";
+			_logger.LogDebug("File_Url_Should_Update_After_Rename_Folder(): getUrlApi → {GetUrlApi}", getUrlApi);
             var fileUrl = connector.PostJson(getUrlApi, new { fileId = fileId }, this.GetRequestHeaders()).Content.ReadAsStringAsync().Result;
 
+			_logger.LogDebug("File_Url_Should_Update_After_Rename_Folder(): fileUrl → {FileUrl}", fileUrl);
             Assert.That(fileUrl, Does.Contain(newFolderName));
+			_logger.LogDebug("<<< Exiting File_Url_Should_Update_After_Rename_Folder()");
         }
 
         private int GetRootFolderId()
         {
+			_logger.LogDebug(">>> Entering GetRootFolderId()");
+			_logger.LogDebug("<<< Exiting GetRootFolderId()");
             return DatabaseHelper.ExecuteScalar<int>(
                 $"SELECT FolderID FROM {{objectQualifier}}[Folders] WHERE PortalId = {this.PortalId} AND FolderPath = ''");
         }
 
         private int GetStandardFolderMappingId()
         {
+			_logger.LogDebug(">>> Entering GetStandardFolderMappingId()");
+			_logger.LogDebug("<<< Exiting GetStandardFolderMappingId()");
             return DatabaseHelper.ExecuteScalar<int>(
                 $"SELECT FolderMappingId from {{objectQualifier}}[FolderMappings] where PortalID = {this.PortalId} and MappingName = 'Standard'");
         }
@@ -85,6 +101,7 @@ namespace DotNetNuke.Tests.Integration.Modules.DigitalAssets
             };
 
             connector.PostJson(apiUrl, postData, this.GetRequestHeaders());
+			_logger.LogDebug("<<< Exiting RenameFolder(connector={Connector},folderId={FolderId},newFolderName={NewFolderName})", connector, folderId, newFolderName);
         }
 
         private IDictionary<string, string> GetRequestHeaders()

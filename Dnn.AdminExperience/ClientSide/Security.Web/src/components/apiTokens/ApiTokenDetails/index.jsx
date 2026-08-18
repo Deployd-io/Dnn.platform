@@ -5,17 +5,22 @@ import "./style.less";
 import { GridSystem as Grid, Label } from "@dnnsoftware/dnn-react-common";
 import resx from "../../../resources";
 import utils from "../../../utils";
+const logger = console;
 
 class ApiTokenDetails extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         let scope = "";
         switch (this.props.apiToken.Scope) {
             case 0:
                 scope = resx.get("User");
+				logger.debug(`render(): scope → ${scope}`);
                 break;
             case 1:
                 scope = resx.get("Portal");
@@ -26,6 +31,7 @@ class ApiTokenDetails extends Component {
         }
         let status;
         let statusClass = "inactive";
+		logger.debug(`render(): statusClass → ${statusClass}`);
         if (utils.dateInPast(new Date(this.props.apiToken.ExpiresOn), new Date())) {
             status = resx.get("Expired");
         } else {
@@ -37,6 +43,7 @@ class ApiTokenDetails extends Component {
             }
         }
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className="apitokens-details">
                 <Grid numberOfColumns={2}>
@@ -138,6 +145,8 @@ ApiTokenDetails.propTypes = {
 };
 
 function mapStateToProps() {
+	logger.debug('>>> Entering mapStateToProps()');
+	logger.debug('<<< Exiting mapStateToProps()');
     return {};
 }
 

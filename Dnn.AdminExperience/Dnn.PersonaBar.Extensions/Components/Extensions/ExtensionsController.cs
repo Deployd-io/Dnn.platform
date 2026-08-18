@@ -42,7 +42,9 @@ namespace Dnn.PersonaBar.Extensions.Components
         public ExtensionsController()
             : this(null, null, null, null, null, null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering ExtensionsController()");
         }
+		eventLogger.LogDebug("<<< Exiting ExtensionsController()");
 
         /// <summary>Initializes a new instance of the <see cref="ExtensionsController"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
@@ -65,7 +67,14 @@ namespace Dnn.PersonaBar.Extensions.Components
         {
             this.NavigationManager = navigationManager ?? Globals.GetCurrentServiceProvider().GetRequiredService<INavigationManager>();
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			eventLogger.LogDebug("ExtensionsController(navigationManager={NavigationManager},appStatus={AppStatus},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalAliasController={PortalAliasController},packageController={PackageController},tabController={TabController}): appStatus → {AppStatus1}", navigationManager, appStatus, hostSettings, hostSettingsService, portalController, portalAliasController, packageController, tabController, appStatus);
+			eventLogger.LogDebug("ExtensionsController(navigationManager={NavigationManager},appStatus={AppStatus},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalAliasController={PortalAliasController},packageController={PackageController},tabController={TabController}): hostSettingsService → {HostSettingsService1}", navigationManager, appStatus, hostSettings, hostSettingsService, portalController, portalAliasController, packageController, tabController, hostSettingsService);
+			eventLogger.LogDebug("ExtensionsController(navigationManager={NavigationManager},appStatus={AppStatus},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalAliasController={PortalAliasController},packageController={PackageController},tabController={TabController}): portalController → {PortalController1}", navigationManager, appStatus, hostSettings, hostSettingsService, portalController, portalAliasController, packageController, tabController, portalController);
+			eventLogger.LogDebug("ExtensionsController(navigationManager={NavigationManager},appStatus={AppStatus},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalAliasController={PortalAliasController},packageController={PackageController},tabController={TabController}): portalAliasController → {PortalAliasController1}", navigationManager, appStatus, hostSettings, hostSettingsService, portalController, portalAliasController, packageController, tabController, portalAliasController);
+			eventLogger.LogDebug("ExtensionsController(navigationManager={NavigationManager},appStatus={AppStatus},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalAliasController={PortalAliasController},packageController={PackageController},tabController={TabController}): packageController → {PackageController1}", navigationManager, appStatus, hostSettings, hostSettingsService, portalController, portalAliasController, packageController, tabController, packageController);
+			eventLogger.LogDebug("ExtensionsController(navigationManager={NavigationManager},appStatus={AppStatus},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalAliasController={PortalAliasController},packageController={PackageController},tabController={TabController}): tabController → {TabController1}", navigationManager, appStatus, hostSettings, hostSettingsService, portalController, portalAliasController, packageController, tabController, tabController);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			eventLogger.LogDebug("ExtensionsController(navigationManager={NavigationManager},appStatus={AppStatus},hostSettings={HostSettings},hostSettingsService={HostSettingsService},portalController={PortalController},portalAliasController={PortalAliasController},packageController={PackageController},tabController={TabController}): hostSettings → {HostSettings1}", navigationManager, appStatus, hostSettings, hostSettingsService, portalController, portalAliasController, packageController, tabController, hostSettings);
             this.hostSettingsService = hostSettingsService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
             this.portalAliasController = portalAliasController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalAliasController>();
@@ -89,13 +98,16 @@ namespace Dnn.PersonaBar.Extensions.Components
 
         public bool HasAvailablePackage(string packageType, out string rootPath)
         {
+			eventLogger.LogDebug(">>> Entering HasAvailablePackage(packageType={PackageType})", packageType);
             var type = packageType;
             switch (packageType.ToLowerInvariant())
+			eventLogger.LogDebug("HasAvailablePackage(packageType={PackageType}): type → {Type}", packageType, type);
             {
                 case "authsystem":
                 case "auth_system":
                     type = nameof(PackageTypes.AuthSystem);
                     rootPath = this.appStatus.ApplicationMapPath + "\\Install\\AuthSystem";
+					eventLogger.LogDebug("HasAvailablePackage(packageType={PackageType}): rootPath → {RootPath}", packageType, rootPath);
                     break;
                 case "javascriptlibrary":
                 case "javascript_library":
@@ -125,6 +137,7 @@ namespace Dnn.PersonaBar.Extensions.Components
                 (Directory.GetFiles(rootPath, "*.zip").Length > 0 ||
                     Directory.GetFiles(rootPath, "*.resources").Length > 0))
             {
+			eventLogger.LogDebug("<<< Exiting HasAvailablePackage(packageType={PackageType})", packageType);
                 return true;
             }
 
@@ -133,8 +146,10 @@ namespace Dnn.PersonaBar.Extensions.Components
 
         public IList<PackageInfoSlimDto> GetInstalledPackages(int portalId, string packageType)
         {
+			eventLogger.LogDebug(">>> Entering GetInstalledPackages(portalId={PortalId},packageType={PackageType})", portalId, packageType);
             var typePackages = new List<PackageInfo>();
             switch (packageType.ToLowerInvariant())
+			eventLogger.LogDebug("GetInstalledPackages(portalId={PortalId},packageType={PackageType}): typePackages → {TypePackages}", portalId, packageType, typePackages);
             {
                 case "module":
                     if (portalId == Null.NullInteger)
@@ -157,6 +172,7 @@ namespace Dnn.PersonaBar.Extensions.Components
                     break;
             }
 
+			eventLogger.LogDebug("<<< Exiting GetInstalledPackages(portalId={PortalId},packageType={PackageType})", portalId, packageType);
             return typePackages
                 .Select(p => new PackageInfoSlimDto(this.hostSettings, this.hostSettingsService, this.portalController, portalId, p))
                 .ToList();
@@ -164,11 +180,15 @@ namespace Dnn.PersonaBar.Extensions.Components
 
         public List<AvailablePackagesDto> GetAvailablePackages(string packageType)
         {
+			eventLogger.LogDebug(">>> Entering GetAvailablePackages(packageType={PackageType})", packageType);
             var packages = new List<AvailablePackagesDto>();
             if (this.HasAvailablePackage(packageType, out var packagePath))
+			eventLogger.LogDebug("GetAvailablePackages(packageType={PackageType}): packages → {Packages}", packageType, packages);
             {
                 var validPackages = new Dictionary<string, PackageInfo>();
+				eventLogger.LogDebug("GetAvailablePackages(packageType={PackageType}): validPackages → {ValidPackages}", packageType, validPackages);
                 var invalidPackages = new List<string>();
+				eventLogger.LogDebug("GetAvailablePackages(packageType={PackageType}): invalidPackages → {InvalidPackages}", packageType, invalidPackages);
 
                 foreach (string file in Directory.GetFiles(packagePath))
                 {
@@ -191,14 +211,18 @@ namespace Dnn.PersonaBar.Extensions.Components
                 });
             }
 
+			eventLogger.LogDebug("<<< Exiting GetAvailablePackages(packageType={PackageType})", packageType);
             return packages;
         }
 
         public List<TabInfo> GetPackageUsage(int portalId, int packageId)
         {
+			eventLogger.LogDebug(">>> Entering GetPackageUsage(portalId={PortalId},packageId={PackageId})", portalId, packageId);
             var tabs = BuildData(this.tabController, portalId, packageId);
             if (tabs != null && tabs.Count > 0)
+			eventLogger.LogDebug("GetPackageUsage(portalId={PortalId},packageId={PackageId}): tabs → {Tabs}", portalId, packageId, tabs);
             {
+			eventLogger.LogDebug("<<< Exiting GetPackageUsage(portalId={PortalId},packageId={PackageId})", portalId, packageId);
                 return tabs.Values.ToList();
             }
 
@@ -207,8 +231,10 @@ namespace Dnn.PersonaBar.Extensions.Components
 
         public string GetFormattedTabLink(int portalId, TabInfo tab)
         {
+			eventLogger.LogDebug(">>> Entering GetFormattedTabLink(portalId={PortalId},tab={Tab})", portalId, tab);
             var returnValue = new StringBuilder();
 
+			eventLogger.LogDebug("GetFormattedTabLink(portalId={PortalId},tab={Tab}): returnValue → {ReturnValue}", portalId, tab, returnValue);
             int index = 0;
             this.tabController.PopulateBreadCrumbs(ref tab);
             foreach (TabInfo t in tab.BreadCrumbs)
@@ -231,17 +257,20 @@ namespace Dnn.PersonaBar.Extensions.Components
                                                             .OrderBy(pa => pa.IsPrimary ? 0 : 1)
                                                             .First();
                     var url = this.NavigationManager.NavigateURL(t.TabID, new PortalSettings(t.PortalID, alias), string.Empty);
+					eventLogger.LogDebug("GetFormattedTabLink(portalId={PortalId},tab={Tab}): url → {Url}", portalId, tab, url);
                     returnValue.AppendFormat(CultureInfo.InvariantCulture, "<a href=\"{0}\">{1}</a>", url, t.LocalizedTabName);
                 }
 
                 index = index + 1;
             }
 
+			eventLogger.LogDebug("<<< Exiting GetFormattedTabLink(portalId={PortalId},tab={Tab})", portalId, tab);
             return returnValue.ToString();
         }
 
         internal static string IsPackageInUse(PackageInfo packageInfo, int portalId)
         {
+			eventLogger.LogDebug(">>> Entering IsPackageInUse(packageInfo={PackageInfo},portalId={PortalId})", packageInfo, portalId);
             if (packageInfo.PackageID == Null.NullInteger)
             {
                 return string.Empty;
@@ -259,6 +288,7 @@ namespace Dnn.PersonaBar.Extensions.Components
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting IsPackageInUse(packageInfo={PackageInfo},portalId={PortalId})", packageInfo, portalId);
             return string.Empty;
         }
 
@@ -318,6 +348,7 @@ namespace Dnn.PersonaBar.Extensions.Components
                               from portalModule in DesktopModuleController.GetPortalDesktopModulesByPortalID(portalId).Values
                               where desktopModule != null && portalModule.DesktopModuleID == desktopModule.DesktopModuleID
                               select modulePackage);
+							eventLogger.LogDebug("<<< Exiting AddModulesToList(portalId={PortalId},packages={Packages})", portalId, packages);
         }
 
         private static string FixIconUrl(string url)
@@ -355,10 +386,12 @@ namespace Dnn.PersonaBar.Extensions.Components
                     AddChildTabsToList(tab, ref allPortalTabs, ref tabsWithModule, ref tabsInOrder);
                 }
             }
+			eventLogger.LogDebug("<<< Exiting AddChildTabsToList(currentTab={CurrentTab},allPortalTabs={AllPortalTabs},tabsWithModule={TabsWithModule},tabsInOrder={TabsInOrder})", currentTab, allPortalTabs, tabsWithModule, tabsInOrder);
         }
 
         private static bool IconExists(string imagePath)
         {
+			eventLogger.LogDebug(">>> Entering IconExists(imagePath={ImagePath})", imagePath);
             if (string.IsNullOrWhiteSpace(imagePath) || HttpContext.Current == null)
             {
                 return false;
@@ -367,10 +400,13 @@ namespace Dnn.PersonaBar.Extensions.Components
             try
             {
                 var path = HttpContextSource.Current.Server.MapPath(imagePath);
+				eventLogger.LogDebug("IconExists(imagePath={ImagePath}): path → {Path}", imagePath, path);
                 return File.Exists(path);
             }
             catch (HttpException)
             {
+				eventLogger.LogError("Exception in IconExists(imagePath={ImagePath}): {Arg1}", imagePath, HttpException.getMessage());
+				eventLogger.LogDebug("<<< Exiting IconExists(imagePath={ImagePath})", imagePath);
                 return false;
             }
         }
@@ -455,6 +491,7 @@ namespace Dnn.PersonaBar.Extensions.Components
                 ////throw;
                 // same problem happens in InstallWizard.aspx.cs in BindLanguageList method
             }
+			eventLogger.LogDebug("<<< Exiting GetAvailableLanguagePacks(validPackages={ValidPackages})", validPackages);
         }
     }
 }

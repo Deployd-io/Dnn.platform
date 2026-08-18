@@ -1,3 +1,4 @@
+const logger = console;
 ﻿/*globals jQuery, knockout */
 (function ($, ko) {
     "use strict";
@@ -7,6 +8,7 @@
             templateUrl = opts.templatePath + opts.templateName + opts.templateExtension;
 
         function fileManagerModel(items) {
+			logger.debug(`>>> Entering fileManagerModel(items=${items})`);
             var self = this,
                 data = items;
 
@@ -21,6 +23,7 @@
 
             // generic method for navigating the folder hierarchy
             self.find = function (array, id) {
+				logger.debug(`>>> Entering function(array=${array},id=${id})`);
                 if (array) {
                     for (var i = 0; i < array.length; i++) {
                         if (array[i].id === id) {
@@ -32,6 +35,7 @@
                         }
                     }
                 }
+				logger.debug(`<<< Exiting function(folder=${folder})`);
                 return null;
             };
 
@@ -65,9 +69,13 @@
             // custom binding handler used to run some arbitrary JS when the model changes
             ko.bindingHandlers.updateRowNumbers = {
                 update: function () {
+					logger.debug('>>> Entering update()');
                     $('#' + $wrap.attr("id") + ' tbody tr').each(function (i) {
                         $(this).find('td.fm-number').text(i + 1);
+						logger.debug('>>> Entering each()');
                     });
+					logger.debug('<<< Exiting each()');
+					logger.debug('<<< Exiting update()');
                 }
             };
 
@@ -88,12 +96,17 @@
 
             // go to the root folder by default
             self.goToFolder(data[0]);
+			logger.debug(`<<< Exiting fileManagerModel(items=${items})`);
         }
 
         function getItems(callback) {
+			logger.debug(`>>> Entering getItems(callback=${callback})`);
             $.get(opts.getItemsServiceUrl, {
                 fileExtensions: $wrap.data('fileExtensions')
             }, callback);
+			logger.debug(`<<< Exiting getItems(callback=${callback})`);
+			logger.debug('>>> Entering getItems()');
+			logger.debug('<<< Exiting getItems()');
         }
 
         // fetch template, populate placeholder (i.e. $wrap)
@@ -106,8 +119,10 @@
         // Parent scope is defined (e.g. body).
         // This allows us to bind event to DOM elements that are destroyed and recreated. (i.e. the "attach file" button)
         $(opts.openTriggerScope).delegate(opts.openTriggerSelector, 'click', function (e) {
+			logger.debug('>>> Entering delegate()');
             e.preventDefault();
 
+			logger.debug('<<< Exiting delegate()');
             // refresh the data
             getItems(function (result) {
                 if ($wrap.data('userFileManager.bound') === true) {
@@ -130,6 +145,7 @@
                 modal: true,
                 resizable: true,
                 open: function (event, ui) {
+				logger.debug(`>>> Entering open(event=${event},ui=${ui})`);
 
                     // wrapper div
                     var $div = $('<div />', { 'class': 'fm-actions' });
@@ -141,7 +157,9 @@
                     $('<a />', { 'class': 'dnnSecondaryAction', text: opts.cancelText, href: '#' })
                     .appendTo($actionList)
                     .click(function (ev) {
+						logger.debug('>>> Entering click()');
                         ev.preventDefault();
+						logger.debug('<<< Exiting click()');
                         $(event.target).dialog('close');
                     });
 
@@ -165,9 +183,12 @@
                     if (typeof $.ui.dialog.prototype.options.open == 'function') {
                         $.ui.dialog.prototype.options.open.apply(this, arguments);
                     }
+					logger.debug(`<<< Exiting open(event=${event},ui=${ui})`);
                 },
                 buttons: [{}],
                 close: function () {
+				logger.debug('>>> Entering close()');
+				logger.debug('<<< Exiting close()');
                 }
             });
         });

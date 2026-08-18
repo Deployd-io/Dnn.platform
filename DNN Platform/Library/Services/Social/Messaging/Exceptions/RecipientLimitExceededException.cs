@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.Social.Messaging.Exceptions
     [Serializable]
     public class RecipientLimitExceededException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RecipientLimitExceededException));
         /// <summary>Initializes a new instance of the <see cref="RecipientLimitExceededException"/> class.</summary>
         public RecipientLimitExceededException()
         {
+		Logger.LogDebug(">>> Entering RecipientLimitExceededException()");
+		Logger.LogDebug("<<< Exiting RecipientLimitExceededException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="RecipientLimitExceededException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Services.Social.Messaging.Exceptions
         public RecipientLimitExceededException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering RecipientLimitExceededException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting RecipientLimitExceededException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="RecipientLimitExceededException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

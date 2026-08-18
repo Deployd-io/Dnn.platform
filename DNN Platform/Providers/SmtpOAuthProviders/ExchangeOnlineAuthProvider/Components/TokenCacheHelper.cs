@@ -17,10 +17,12 @@ using DotNetNuke.Entities.Portals;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client;
+using Microsoft.Extensions.Logging;
 
 /// <summary>The token cache helper.</summary>
 public class TokenCacheHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     private readonly IHostSettingsService hostSettingsService;
     private readonly IPortalController portalController;
     private readonly IHostSettings hostSettings;
@@ -33,6 +35,10 @@ public class TokenCacheHelper
     public TokenCacheHelper(int portalId, IHostSettingsService hostSettingsService)
         : this(portalId, hostSettingsService, null, null)
     {
+	_logger.LogDebug(">>> Entering TokenCacheHelper(portalId={PortalId},hostSettingsService={HostSettingsService})", portalId, hostSettingsService);
+	_logger.LogDebug("<<< Exiting TokenCacheHelper(portalId={PortalId},hostSettingsService={HostSettingsService})", portalId, hostSettingsService);
+	_logger.LogDebug(">>> Entering TokenCacheHelper(portalId={PortalId},hostSettingsService={HostSettingsService},hostSettings={HostSettings},portalController={PortalController})", portalId, hostSettingsService, hostSettings, portalController);
+	_logger.LogDebug("TokenCacheHelper(portalId={PortalId},hostSettingsService={HostSettingsService},hostSettings={HostSettings},portalController={PortalController}): hostSettingsService → {HostSettingsService1}", portalId, hostSettingsService, hostSettings, portalController, hostSettingsService);
     }
 
     /// <summary>Initializes a new instance of the <see cref="TokenCacheHelper"/> class.</summary>
@@ -44,40 +50,52 @@ public class TokenCacheHelper
     {
         this.portalId = portalId;
         this.hostSettingsService = hostSettingsService;
+		_logger.LogDebug("TokenCacheHelper(portalId={PortalId},hostSettingsService={HostSettingsService},hostSettings={HostSettings},portalController={PortalController}): this.portalId → {Arg4}", portalId, hostSettingsService, hostSettings, portalController, this.portalId);
+		_logger.LogDebug("TokenCacheHelper(portalId={PortalId},hostSettingsService={HostSettingsService},hostSettings={HostSettings},portalController={PortalController}): this.hostSettingsService → {Arg4}", portalId, hostSettingsService, hostSettings, portalController, this.hostSettingsService);
         this.hostSettings = hostSettings ?? HttpContextSource.Current?.GetScope().ServiceProvider.GetRequiredService<IHostSettings>() ?? new HostSettings(hostSettingsService);
         this.portalController = portalController ?? HttpContextSource.Current?.GetScope().ServiceProvider.GetRequiredService<IPortalController>();
+		_logger.LogDebug("<<< Exiting TokenCacheHelper(portalId={PortalId},hostSettingsService={HostSettingsService},hostSettings={HostSettings},portalController={PortalController})", portalId, hostSettingsService, hostSettings, portalController);
     }
 
     /// <summary>Enable the token cache.</summary>
     /// <param name="tokenCache">The token cache instance.</param>
     public void EnableSerialization(ITokenCache tokenCache)
     {
+		_logger.LogDebug(">>> Entering EnableSerialization(tokenCache=<redacted>)");
         tokenCache.SetBeforeAccess(this.BeforeAccessNotification);
         tokenCache.SetAfterAccess(this.AfterAccessNotification);
+		_logger.LogDebug("<<< Exiting EnableSerialization(tokenCache=<redacted>)");
     }
 
     private void BeforeAccessNotification(TokenCacheNotificationArgs args)
     {
+		_logger.LogDebug(">>> Entering BeforeAccessNotification(args={Args})", args);
         var authentication = this.GetAuthenticationData();
         if (!string.IsNullOrEmpty(authentication))
+		_logger.LogDebug("BeforeAccessNotification(args={Args}): authentication → {Authentication}", args, authentication);
         {
             args.TokenCache.DeserializeMsalV3(Encoding.UTF8.GetBytes(authentication));
         }
+		_logger.LogDebug("<<< Exiting BeforeAccessNotification(args={Args})", args);
     }
 
     private void AfterAccessNotification(TokenCacheNotificationArgs args)
     {
+		_logger.LogDebug(">>> Entering AfterAccessNotification(args={Args})", args);
         if (args.HasStateChanged)
         {
             byte[] data = args.TokenCache.SerializeMsalV3();
             this.UpdateAuthenticationData(data);
         }
+		_logger.LogDebug("<<< Exiting AfterAccessNotification(args={Args})", args);
     }
 
     private string GetAuthenticationData()
     {
+		_logger.LogDebug(">>> Entering GetAuthenticationData()");
         if (this.portalId == Null.NullInteger)
         {
+		_logger.LogDebug("<<< Exiting GetAuthenticationData()");
             return this.hostSettingsService.GetEncryptedString(Constants.AuthenticationSettingName, Config.GetDecryptionkey());
         }
 
@@ -86,8 +104,10 @@ public class TokenCacheHelper
 
     private void UpdateAuthenticationData(byte[] data)
     {
+		_logger.LogDebug(">>> Entering UpdateAuthenticationData(data={Data})", data);
         var settingValue = Encoding.UTF8.GetString(data);
         if (this.portalId == Null.NullInteger)
+		_logger.LogDebug("UpdateAuthenticationData(data={Data}): settingValue → {SettingValue}", data, settingValue);
         {
             this.hostSettingsService.UpdateEncryptedString(Constants.AuthenticationSettingName, settingValue, Config.GetDecryptionkey());
         }
@@ -95,5 +115,6 @@ public class TokenCacheHelper
         {
             PortalController.UpdateEncryptedString(this.hostSettings, this.portalController, HashAlgorithmName.SHA512, this.portalId, Constants.AuthenticationSettingName, settingValue, Config.GetDecryptionkey());
         }
+		_logger.LogDebug("<<< Exiting UpdateAuthenticationData(data={Data})", data);
     }
 }

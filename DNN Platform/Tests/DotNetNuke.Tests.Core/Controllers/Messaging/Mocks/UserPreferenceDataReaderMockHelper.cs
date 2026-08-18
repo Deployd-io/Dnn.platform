@@ -12,28 +12,38 @@ namespace DotNetNuke.Tests.Core.Controllers.Messaging.Mocks
     {
         internal static IDataReader CreateEmptyUserPreferenceReader()
         {
+			mockEventLogger.LogDebug(">>> Entering CreateEmptyUserPreferenceReader()");
+			mockEventLogger.LogDebug("<<< Exiting CreateEmptyUserPreferenceReader()");
             return CreateUserPreferenceTable().CreateDataReader();
         }
 
         internal static IDataReader CreateUserPreferenceReader(UserPreference userPreference)
         {
+			mockEventLogger.LogDebug(">>> Entering CreateUserPreferenceReader(userPreference={UserPreference})", userPreference);
             var table = CreateUserPreferenceTable();
             AddUserPreferenceToTable(table, userPreference);
+			mockEventLogger.LogDebug("CreateUserPreferenceReader(userPreference={UserPreference}): table → {Table}", userPreference, table);
+			mockEventLogger.LogDebug("<<< Exiting CreateUserPreferenceReader(userPreference={UserPreference})", userPreference);
             return table.CreateDataReader();
         }
 
         private static DataTable CreateUserPreferenceTable()
         {
+			mockEventLogger.LogDebug(">>> Entering CreateUserPreferenceTable()");
             var table = new DataTable();
 
+			mockEventLogger.LogDebug("CreateUserPreferenceTable(): table → {Table}", table);
             var idColumn = table.Columns.Add("UserPreferenceId", typeof(int));
+			mockEventLogger.LogDebug("CreateUserPreferenceTable(): idColumn → {IdColumn}", idColumn);
             table.Columns.Add("PortalId", typeof(int));
             table.Columns.Add("UserId", typeof(string));
             table.Columns.Add("MessagesEmailFrequency", typeof(int));
             table.Columns.Add("NotificationsEmailFrequency", typeof(int));
 
             table.PrimaryKey = new[] { idColumn };
+			mockEventLogger.LogDebug("CreateUserPreferenceTable(): table.PrimaryKey → {Arg0}", table.PrimaryKey);
 
+			mockEventLogger.LogDebug("<<< Exiting CreateUserPreferenceTable()");
             return table;
         }
 
@@ -47,6 +57,7 @@ namespace DotNetNuke.Tests.Core.Controllers.Messaging.Mocks
                 userPreference.MessagesEmailFrequency,
                 userPreference.NotificationsEmailFrequency,
             });
+			mockEventLogger.LogDebug("<<< Exiting AddUserPreferenceToTable(table={Table},userPreference={UserPreference})", table, userPreference);
         }
     }
 }

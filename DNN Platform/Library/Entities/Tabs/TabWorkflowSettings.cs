@@ -15,6 +15,7 @@ namespace DotNetNuke.Entities.Tabs
 
     public class TabWorkflowSettings : ServiceLocator<ITabWorkflowSettings, TabWorkflowSettings>, ITabWorkflowSettings
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabWorkflowSettings));
         private const string DefaultTabWorkflowKey = "DefaultTabWorkflowKey";
         private const string TabWorkflowEnableKey = "TabWorkflowEnabledKey";
         private readonly ITabController tabController;
@@ -23,17 +24,24 @@ namespace DotNetNuke.Entities.Tabs
         /// <summary>Initializes a new instance of the <see cref="TabWorkflowSettings"/> class.</summary>
         public TabWorkflowSettings()
         {
+			Logger.LogDebug(">>> Entering TabWorkflowSettings()");
             this.tabController = TabController.Instance;
             this.systemWorkflowManager = SystemWorkflowManager.Instance;
+			Logger.LogDebug("TabWorkflowSettings(): systemWorkflowManager → {SystemWorkflowManager}", systemWorkflowManager);
+			Logger.LogDebug("TabWorkflowSettings(): this.tabController → {Arg0}", this.tabController);
+			Logger.LogDebug("<<< Exiting TabWorkflowSettings()");
         }
 
         /// <inheritdoc />
         public int GetDefaultTabWorkflowId(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetDefaultTabWorkflowId(portalId={PortalId})", portalId);
             var workflowId = PortalController.GetPortalSettingAsInteger(DefaultTabWorkflowKey, portalId, Null.NullInteger);
             if (workflowId == Null.NullInteger)
+			Logger.LogDebug("GetDefaultTabWorkflowId(portalId={PortalId}): workflowId → {WorkflowId}", portalId, workflowId);
             {
                 var workflow = this.systemWorkflowManager.GetDirectPublishWorkflow(portalId);
+				Logger.LogDebug("GetDefaultTabWorkflowId(portalId={PortalId}): workflow → {Workflow}", portalId, workflow);
                 workflowId = (workflow != null) ? workflow.WorkflowID : Null.NullInteger;
                 if (workflowId != Null.NullInteger)
                 {
@@ -41,6 +49,7 @@ namespace DotNetNuke.Entities.Tabs
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetDefaultTabWorkflowId(portalId={PortalId})", portalId);
             return workflowId;
         }
 
@@ -48,35 +57,45 @@ namespace DotNetNuke.Entities.Tabs
         public void SetDefaultTabWorkflowId(int portalId, int workflowId)
         {
             PortalController.UpdatePortalSetting(portalId, DefaultTabWorkflowKey, workflowId.ToString(CultureInfo.InvariantCulture), true);
+			Logger.LogDebug("<<< Exiting SetDefaultTabWorkflowId(portalId={PortalId},workflowId={WorkflowId})", portalId, workflowId);
         }
 
         /// <inheritdoc />
         public void SetWorkflowEnabled(int portalId, bool enabled)
         {
+			Logger.LogDebug(">>> Entering SetWorkflowEnabled(portalId={PortalId},enabled={Enabled})", portalId, enabled);
             Requires.NotNegative("portalId", portalId);
 
             PortalController.UpdatePortalSetting(portalId, TabWorkflowEnableKey, enabled.ToString(CultureInfo.InvariantCulture), true);
+			Logger.LogDebug("<<< Exiting SetWorkflowEnabled(portalId={PortalId},enabled={Enabled})", portalId, enabled);
         }
 
         /// <inheritdoc />
         public void SetWorkflowEnabled(int portalId, int tabId, bool enabled)
         {
+			Logger.LogDebug(">>> Entering SetWorkflowEnabled(portalId={PortalId},tabId={TabId},enabled={Enabled})", portalId, tabId, enabled);
             Requires.NotNegative("tabId", tabId);
 
             this.tabController.UpdateTabSetting(tabId, TabWorkflowEnableKey, enabled.ToString(CultureInfo.InvariantCulture));
+			Logger.LogDebug("<<< Exiting SetWorkflowEnabled(portalId={PortalId},tabId={TabId},enabled={Enabled})", portalId, tabId, enabled);
         }
 
         /// <inheritdoc />
         public bool IsWorkflowEnabled(int portalId, int tabId)
         {
+			Logger.LogDebug(">>> Entering IsWorkflowEnabled(portalId={PortalId},tabId={TabId})", portalId, tabId);
             if (!this.IsWorkflowEnabled(portalId))
             {
                 return false;
             }
 
             var tabInfo = this.tabController.GetTab(tabId, portalId);
+			Logger.LogDebug("IsWorkflowEnabled(portalId={PortalId},tabId={TabId}): tabInfo → {TabInfo}", portalId, tabId, tabInfo);
             var settings = this.tabController.GetTabSettings(tabId);
+			Logger.LogDebug("IsWorkflowEnabled(portalId={PortalId},tabId={TabId}): settings → {Settings}", portalId, tabId, settings);
 
+			Logger.LogDebug("<<< Exiting IsWorkflowEnabled(portalId={PortalId},tabId={TabId})", portalId, tabId);
+			Logger.LogDebug("<<< Exiting IsWorkflowEnabled(portalId={PortalId})", portalId);
             return !this.tabController.IsHostOrAdminPage(tabInfo) && (settings[TabWorkflowEnableKey] == null || Convert.ToBoolean(settings[TabWorkflowEnableKey], CultureInfo.InvariantCulture));
         }
 
@@ -94,6 +113,8 @@ namespace DotNetNuke.Entities.Tabs
         /// <inheritdoc />
         protected override Func<ITabWorkflowSettings> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new TabWorkflowSettings();
         }
     }

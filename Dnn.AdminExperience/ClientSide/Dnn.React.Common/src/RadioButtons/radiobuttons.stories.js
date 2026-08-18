@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import RadioButtons from "./index";
+const logger = console;
 
 export default {
     component: RadioButtons,
@@ -8,10 +9,15 @@ export default {
 class MyRadioButtons extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = { value: 1 };
+		logger.debug(`constructor(): this.state → ${this.state}`);
+		logger.debug('<<< Exiting constructor()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <RadioButtons
                 options={[

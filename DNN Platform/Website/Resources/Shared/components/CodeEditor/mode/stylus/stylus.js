@@ -1,9 +1,11 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 // Stylus mode created by Dmitry Kiselyov http://git.io/AaRB
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -13,7 +15,9 @@
 })(function(CodeMirror) {
   "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
   CodeMirror.defineMode("stylus", function(config) {
+	logger.debug('>>> Entering defineMode()');
     var indentUnit = config.indentUnit,
         tagKeywords = keySet(tagKeywords_),
         tagVariablesRegexp = /^(a|b|i|s|col|em)$/i,
@@ -38,10 +42,12 @@
         type,
         override;
 
+	logger.debug('<<< Exiting defineMode()');
     /**
      * Tokenizers
      */
     function tokenBase(stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
       firstWordMatch = stream.string.match(/(^[\w-]+\s*=\s*$)|(^\s*[\w-]+\s*=\s*[\w-])|(^\s*(\.|#|@|\$|\&|\[|\d|\+|::?|\{|\>|~|\/)?\s*[\w-]*([a-z0-9-]|\*|\/\*)(\(|,)?)/);
       state.context.line.firstWord = firstWordMatch ? firstWordMatch[0].replace(/^\s*/, "") : "";
       state.context.line.indent = stream.indentation();
@@ -55,6 +61,7 @@
       // Block comment
       if (stream.match("/*")) {
         state.tokenize = tokenCComment;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
         return tokenCComment(stream, state);
       }
       // String
@@ -159,14 +166,18 @@
      * Token comment
      */
     function tokenCComment(stream, state) {
+	logger.debug(`>>> Entering tokenCComment(stream=${stream},state=${state})`);
       var maybeEnd = false, ch;
       while ((ch = stream.next()) != null) {
         if (maybeEnd && ch == "/") {
           state.tokenize = null;
+		logger.debug(`tokenCComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
           break;
         }
         maybeEnd = (ch == "*");
       }
+	logger.debug(`tokenCComment(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`);
+	logger.debug(`<<< Exiting tokenCComment(stream=${stream},state=${state})`);
       return ["comment", "comment"];
     }
 
@@ -174,6 +185,7 @@
      * Token string
      */
     function tokenString(quote) {
+	logger.debug(`>>> Entering tokenString(quote=${quote})`);
       return function(stream, state) {
         var escaped = false, ch;
         while ((ch = stream.next()) != null) {
@@ -184,6 +196,7 @@
           escaped = !escaped && ch == "\\";
         }
         if (ch == quote || !escaped && quote != ")") state.tokenize = null;
+		logger.debug(`<<< Exiting tokenString(quote=${quote})`);
         return ["string", "string"];
       };
     }
@@ -192,6 +205,8 @@
      * Token parenthesized
      */
     function tokenParenthesized(stream, state) {
+	logger.debug(`>>> Entering tokenParenthesized(stream=${stream},state=${state})`);
+	logger.debug(`tokenParenthesized(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
       stream.next(); // Must be "("
       if (!stream.match(/\s*[\"\')]/, false))
         state.tokenize = tokenString(")");
@@ -206,8 +221,14 @@
     function Context(type, indent, prev, line) {
       this.type = type;
       this.indent = indent;
+	logger.debug(`Context(type=${type},indent=${indent},prev=${prev},line=${line}): type → ${type}`);
+	logger.debug(`Context(type=${type},indent=${indent},prev=${prev},line=${line}): this.type → ${this.type}`);
+	logger.debug(`Context(type=${type},indent=${indent},prev=${prev},line=${line}): line → ${line}`);
+	logger.debug(`Context(type=${type},indent=${indent},prev=${prev},line=${line}): this.line → ${this.line}`);
       this.prev = prev;
       this.line = line || {firstWord: "", indent: 0};
+	logger.debug(`Context(type=${type},indent=${indent},prev=${prev},line=${line}): prev → ${prev}`);
+	logger.debug(`<<< Exiting Context(type=${type},indent=${indent},prev=${prev},line=${line})`);
     }
 
     function pushContext(state, stream, type, indent) {
@@ -217,10 +238,13 @@
     }
 
     function popContext(state, currentIndent) {
+	logger.debug(`>>> Entering popContext(state=${state},currentIndent=${currentIndent})`);
       var contextIndent = state.context.indent - indentUnit;
       currentIndent = currentIndent || false;
       state.context = state.context.prev;
+	logger.debug(`popContext(state=${state},currentIndent=${currentIndent}): state.context → ${state.context}`);
       if (currentIndent) state.context.indent = contextIndent;
+	logger.debug(`<<< Exiting popContext(state=${state},currentIndent=${currentIndent})`);
       return state.context.type;
     }
 
@@ -244,6 +268,8 @@
 
     function wordIsProperty(word) {
       word = word.toLowerCase();
+	logger.debug(`wordIsProperty(word=${word}): word → ${word}`);
+	logger.debug(`<<< Exiting wordIsProperty(word=${word})`);
       return word in propertyKeywords || word in fontProperties;
     }
 
@@ -270,10 +296,12 @@
     }
 
     function typeIsBlock(type, stream) {
+	logger.debug(`<<< Exiting typeIsBlock(type=${type},stream=${stream})`);
       return ((endOfLine(stream) && (type == "{" || type == "]" || type == "hash" || type == "qualifier")) || type == "block-mixin");
     }
 
     function typeIsInterpolation(type, stream) {
+	logger.debug(`<<< Exiting typeIsInterpolation(type=${type},stream=${stream})`);
       return type == "{" && stream.match(/^\s*\$?[\w-]+/i, false);
     }
 
@@ -282,16 +310,23 @@
     }
 
     function startOfLine(stream) {
+	logger.debug(`>>> Entering startOfLine(stream=${stream})`);
+	logger.debug(`<<< Exiting startOfLine(stream=${stream})`);
       return stream.sol() || stream.string.match(new RegExp("^\\s*" + escapeRegExp(stream.current())));
     }
 
     function endOfLine(stream) {
+	logger.debug(`>>> Entering endOfLine(stream=${stream})`);
+	logger.debug(`<<< Exiting endOfLine(stream=${stream})`);
       return stream.eol() || stream.match(/^\s*$/, false);
     }
 
     function firstWordOfLine(line) {
+	logger.debug(`>>> Entering firstWordOfLine(line=${line})`);
       var re = /^\s*[-_]*[a-z0-9]+[\w-]*/i;
       var result = typeof line == "string" ? line.match(re) : line.string.match(re);
+	logger.debug(`firstWordOfLine(line=${line}): result → ${result}`);
+	logger.debug(`<<< Exiting firstWordOfLine(line=${line})`);
       return result ? result[0].replace(/^\s*/, "") : "";
     }
 
@@ -317,6 +352,7 @@
         return pushContext(state, stream, "block");
       }
       if (type == "}" && endOfLine(stream)) {
+		logger.debug(`<<< Exiting function(type=${type},stream=${stream},state=${state})`);
         return pushContext(state, stream, "block", 0);
       }
       if (type == "variable-name") {
@@ -466,6 +502,7 @@
       }
       if (type == "word") {
         var word = stream.current();
+		logger.debug(`function(type=${type},stream=${stream},state=${state}): word → ${word}`);
         override = wordAsValue(word);
         if (override == "tag" && tagVariablesRegexp.test(word)) {
           override = "variable-2";
@@ -567,6 +604,7 @@
     states.keyframes = function(type, stream, state) {
       if (stream.indentation() == "0" && ((type == "}" && startOfLine(stream)) || type == "]" || type == "hash"
                                           || type == "qualifier" || wordIsTag(stream.current()))) {
+		logger.debug(`<<< Exiting wordIsTag(word=${word})`);
         return popAndPass(type, stream, state);
       }
       if (type == "{") return pushContext(state, stream, "keyframes");
@@ -649,13 +687,16 @@
 
     return {
       startState: function(base) {
+		logger.debug(`>>> Entering startState(base=${base})`);
         return {
           tokenize: null,
           state: "block",
           context: new Context("block", base || 0, null)
         };
+		logger.debug(`<<< Exiting startState(base=${base})`);
       },
       token: function(stream, state) {
+		logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
         if (!state.tokenize && stream.eatSpace()) return null;
         style = (state.tokenize || tokenBase)(stream, state);
         if (style && typeof style == "object") {
@@ -664,9 +705,12 @@
         }
         override = style;
         state.state = states[state.state](type, stream, state);
+		logger.debug(`token(stream=${stream},state=${state}): override → ${override}`);
+		logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
         return override;
       },
       indent: function(state, textAfter, line) {
+	logger.debug(`>>> Entering indent(state=${state},textAfter=${textAfter},line=${line})`);
 
         var cx = state.context,
             ch = textAfter && textAfter.charAt(0),
@@ -750,17 +794,23 @@
                                       commonAtoms_,commonDef_);
 
   function wordRegexp(words) {
+	logger.debug(`>>> Entering wordRegexp(words=${words})`);
     words = words.sort(function(a,b){return b > a;});
+	logger.debug(`wordRegexp(words=${words}): words → ${words}`);
+	logger.debug(`<<< Exiting wordRegexp(words=${words})`);
     return new RegExp("^((" + words.join(")|(") + "))\\b");
   }
 
   function keySet(array) {
+	logger.debug(`>>> Entering keySet(array=${array})`);
     var keys = {};
     for (var i = 0; i < array.length; ++i) keys[array[i]] = true;
+	logger.debug(`<<< Exiting keySet(array=${array})`);
     return keys;
   }
 
   function escapeRegExp(text) {
+	logger.debug(`>>> Entering escapeRegExp(text=${text})`);
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
   }
 

@@ -2,9 +2,12 @@ import {smtpServerTab as ActionTypes}  from "../constants/actionTypes";
 import smtpServerService from "../services/smtpServerService";
 import localization from "../localization";
 import Promise from "es6-promise";
+const logger = console;
 
 const smtpServeTabActions = {
     loadSmtpServerInfo(callback) {       
+		logger.debug(`>>> Entering loadSmtpServerInfo(callback=${callback})`);
+		logger.debug(`<<< Exiting loadSmtpServerInfo(callback=${callback})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.LOAD_SMTP_SERVER_TAB               
@@ -22,6 +25,7 @@ const smtpServeTabActions = {
                     }
                 }); 
             }).catch(() => {
+				logger.error(`Exception in loadSmtpServerInfo(callback=${callback}): (no error binding)`);
                 dispatch({
                     type: ActionTypes.ERROR_LOADING_SMTP_SERVER_TAB,
                     payload: {
@@ -32,6 +36,8 @@ const smtpServeTabActions = {
         };
     },
     changeSmtpServerMode(smtpServeMode, callback) {
+		logger.debug(`>>> Entering changeSmtpServerMode(smtpServeMode=${smtpServeMode},callback=${callback})`);
+		logger.debug(`<<< Exiting changeSmtpServerMode(smtpServeMode=${smtpServeMode},callback=${callback})`);
         return (dispatch) => {
             Promise.all([dispatch({
                 type: ActionTypes.CHANGE_SMTP_SERVER_MODE,
@@ -46,6 +52,8 @@ const smtpServeTabActions = {
         };
     },
     changeSmtpAuthentication(smtpAuthentication) {
+		logger.debug(`>>> Entering changeSmtpAuthentication(smtpAuthentication=${smtpAuthentication})`);
+		logger.debug(`<<< Exiting changeSmtpAuthentication(smtpAuthentication=${smtpAuthentication})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.CHANGE_SMTP_AUTHENTICATION,
@@ -56,6 +64,8 @@ const smtpServeTabActions = {
         };
     },
     changeSmtpConfigurationValue(key, value, passCheck) {
+		logger.debug(`>>> Entering changeSmtpConfigurationValue(key=${key},value=${value},passCheck=${passCheck})`);
+		logger.debug(`<<< Exiting changeSmtpConfigurationValue(key=${key},value=${value},passCheck=${passCheck})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.CHANGE_SMTP_CONFIGURATION_VALUE,
@@ -68,6 +78,8 @@ const smtpServeTabActions = {
         };
     },
     updateSmtpServerSettings(parameters, callback) {       
+		logger.debug(`>>> Entering updateSmtpServerSettings(parameters=${parameters},callback=${callback})`);
+		logger.debug(`<<< Exiting updateSmtpServerSettings(parameters=${parameters},callback=${callback})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.UPDATE_SMTP_SERVER_SETTINGS               
@@ -88,6 +100,7 @@ const smtpServeTabActions = {
                     }
                 });
             }).catch(() => {
+				logger.error(`Exception in updateSmtpServerSettings(parameters=${parameters},callback=${callback}): (no error binding)`);
                 dispatch({
                     type: ActionTypes.ERROR_UPDATING_SMTP_SERVER_SETTINGS,
                     payload: {
@@ -98,6 +111,8 @@ const smtpServeTabActions = {
         };
     },
     sendTestEmail(parameters) {       
+		logger.debug(`>>> Entering sendTestEmail(parameters=${parameters})`);
+		logger.debug(`<<< Exiting sendTestEmail(parameters=${parameters})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SEND_TEST_EMAIL               
@@ -113,6 +128,7 @@ const smtpServeTabActions = {
                     }
                 });  
             }).catch((data) => {
+				logger.error(`Exception in sendTestEmail(parameters=${parameters}): (no error binding)`);
                 let response = JSON.parse(data.responseText);
                 dispatch({
                     type: ActionTypes.ERROR_SENDING_TEST_EMAIL,
@@ -124,6 +140,8 @@ const smtpServeTabActions = {
         };
     },
     loadAuthProviders(callback) {       
+		logger.debug(`>>> Entering loadAuthProviders(callback=${callback})`);
+		logger.debug(`<<< Exiting loadAuthProviders(callback=${callback})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.LOAD_OAUTH_PROVIDERS               
@@ -142,6 +160,7 @@ const smtpServeTabActions = {
                     }
                 }); 
             }).catch(() => {
+				logger.error(`Exception in loadAuthProviders(callback=${callback}): (no error binding)`);
                 dispatch({
                     type: ActionTypes.ERROR_LOADING_SMTP_SERVER_TAB,
                     payload: {

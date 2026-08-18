@@ -9,10 +9,12 @@ namespace DNN.Integration.Test.Framework
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>Represents a non successful response while executing a WebApi call.</summary>
     public class WebApiException : Exception
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>
         /// Initializes a new instance of the <see cref="WebApiException"/> class, with the specified inner exception and response.
         /// message that caused the exception.
@@ -22,7 +24,10 @@ namespace DNN.Integration.Test.Framework
         public WebApiException(Exception innerException, HttpResponseMessage result)
             : base(innerException.Message, innerException)
         {
+			_logger.LogDebug(">>> Entering WebApiException(innerException={InnerException},result={Result})", innerException, result);
             this.Result = result;
+			_logger.LogDebug("<<< Exiting WebApiException(innerException={InnerException},result={Result})", innerException, result);
+			_logger.LogDebug("WebApiException(innerException={InnerException},result={Result}): this.Result → {Arg2}", innerException, result, this.Result);
         }
 
         public WebApiException(Exception innerException, HttpResponseMessage result, string body)
@@ -39,6 +44,8 @@ namespace DNN.Integration.Test.Framework
 
         public dynamic BodyAsJson()
         {
+			_logger.LogDebug(">>> Entering BodyAsJson()");
+			_logger.LogDebug("<<< Exiting BodyAsJson()");
             return JsonConvert.DeserializeObject<JContainer>(this.Body);
         }
     }

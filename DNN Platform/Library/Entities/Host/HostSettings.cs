@@ -20,6 +20,7 @@ using SchedulerMode = DotNetNuke.Abstractions.Application.SchedulerMode;
 /// <param name="hostSettingsService">The host settings service.</param>
 public class HostSettings(IHostSettingsService hostSettingsService) : IHostSettings
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HostSettings));
     private PerformanceSettings? performanceSettings;
 
     /// <inheritdoc />
@@ -392,6 +393,8 @@ public class HostSettings(IHostSettingsService hostSettingsService) : IHostSetti
     /// <returns>The version number.</returns>
     public static int GetCrmVersion(IHostSettingsService hostSettingsService)
     {
+		Logger.LogDebug(">>> Entering GetCrmVersion(hostSettingsService={HostSettingsService})", hostSettingsService);
+		Logger.LogDebug("<<< Exiting GetCrmVersion(hostSettingsService={HostSettingsService})", hostSettingsService);
         return hostSettingsService.GetInteger(ClientResourceSettings.VersionKey, 1);
     }
 
@@ -400,6 +403,8 @@ public class HostSettings(IHostSettingsService hostSettingsService) : IHostSetti
     /// <returns>The GUID string.</returns>
     public static string GetHostGuid(IHostSettingsService hostSettingsService)
     {
+		Logger.LogDebug(">>> Entering GetHostGuid(hostSettingsService={HostSettingsService})", hostSettingsService);
+		Logger.LogDebug("<<< Exiting GetHostGuid(hostSettingsService={HostSettingsService})", hostSettingsService);
         return hostSettingsService.GetString("GUID");
     }
 

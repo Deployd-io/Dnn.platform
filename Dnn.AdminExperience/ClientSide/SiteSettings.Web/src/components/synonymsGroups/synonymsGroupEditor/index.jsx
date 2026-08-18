@@ -8,10 +8,12 @@ import {
 } from "../../../actions";
 import util from "../../../utils";
 import resx from "../../../resources";
+const logger = console;
 
 class SynonymsGroupEditor extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
 
         this.state = {
             group: {
@@ -26,8 +28,10 @@ class SynonymsGroupEditor extends Component {
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const {props} = this;
         let group = Object.assign({}, props.group);
+		logger.debug('<<< Exiting componentDidMount()');
         group.CultureCode = props.culture;
         this.setState({
             group: group
@@ -35,13 +39,16 @@ class SynonymsGroupEditor extends Component {
     }    
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let {state, props} = this;
         let group = Object.assign({}, state.group);
+		logger.debug(`onSettingChange(key=${key},event=${event}): group → ${group}`);
         
         group[key] = event.join();
 
         if (group[key] === "" && key === "SynonymsTags") {
             state.error["tags"] = true;
+			logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
         }
         else if (group[key] !== "" && key === "SynonymsTags") {
             state.error["tags"] = false;
@@ -59,6 +66,7 @@ class SynonymsGroupEditor extends Component {
     }
 
     onSave() {
+		logger.debug('>>> Entering onSave()');
         const {props, state} = this;
         this.setState({
             triedToSubmit: true
@@ -68,9 +76,11 @@ class SynonymsGroupEditor extends Component {
         }
 
         props.onUpdate(state.group);
+		logger.debug('<<< Exiting onSave()');
     }
     
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const {props} = this;
         if (props.synonymsGroupClientModified) {
             util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
@@ -80,13 +90,16 @@ class SynonymsGroupEditor extends Component {
         }
         else {
             props.Collapse();
+			logger.debug('<<< Exiting onCancel()');
         }
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
          
         if (this.state.group !== undefined || this.props.id === "add") {  
+			logger.debug('<<< Exiting render()');
             return (
                 <div className="synonyms-editor">
                     <InputGroup>
@@ -128,6 +141,8 @@ SynonymsGroupEditor.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {              
         synonymsGroupClientModified: state.search.synonymsGroupClientModified
     };

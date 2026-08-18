@@ -9,6 +9,8 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Models
         /// <summary>Initializes a new instance of the <see cref="PageModel"/> class.</summary>
         public PageModel()
         {
+		eventLogger.LogDebug(">>> Entering PageModel()");
+		eventLogger.LogDebug("<<< Exiting PageModel()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="PageModel"/> class.</summary>
@@ -18,6 +20,8 @@ namespace Dnn.PersonaBar.Pages.Components.Prompt.Models
         {
             this.Container = tab.ContainerSrc;
             this.Url = tab.Url;
+			eventLogger.LogDebug("PageModel(tab={Tab}): this.Container → {Arg1}", tab, this.Container);
+			eventLogger.LogDebug("PageModel(tab={Tab}): this.Url → {Arg1}", tab, this.Url);
             this.Keywords = tab.KeyWords;
             this.Description = tab.Description;
         }

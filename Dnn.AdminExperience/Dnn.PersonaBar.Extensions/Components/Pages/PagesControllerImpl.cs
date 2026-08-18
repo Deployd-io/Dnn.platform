@@ -83,6 +83,7 @@ namespace Dnn.PersonaBar.Pages.Components
                   new ContentVerifier(),
                   PortalController.Instance)
         {
+		eventLogger.LogDebug(">>> Entering PagesControllerImpl(businessControllerProvider={BusinessControllerProvider},templateController={TemplateController})", businessControllerProvider, templateController);
         }
 
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IPermissionDefinitionService. Scheduled removal in v12.0.0.")]
@@ -113,6 +114,7 @@ namespace Dnn.PersonaBar.Pages.Components
                 null)
         {
         }
+		eventLogger.LogDebug("<<< Exiting PagesControllerImpl(businessControllerProvider={BusinessControllerProvider},templateController={TemplateController})", businessControllerProvider, templateController);
 
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IPermissionDefinitionService. Scheduled removal in v12.0.0.")]
         public PagesControllerImpl(
@@ -150,23 +152,39 @@ namespace Dnn.PersonaBar.Pages.Components
             IHostSettings hostSettings,
             IHostSettingsService hostSettingsService)
         {
+			eventLogger.LogDebug("PagesControllerImpl(businessControllerProvider={BusinessControllerProvider},tabController={TabController},moduleController={ModuleController},pageUrlsController={PageUrlsController},templateController={TemplateController},defaultPortalThemeController={DefaultPortalThemeController},cloneModuleExecutionContext={CloneModuleExecutionContext},urlRewriterUtilsWrapper={UrlRewriterUtilsWrapper},friendlyUrlWrapper={FriendlyUrlWrapper},contentVerifier={ContentVerifier},portalController={PortalController},personalizationController={PersonalizationController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): templateController → {TemplateController1}", businessControllerProvider, tabController, moduleController, pageUrlsController, templateController, defaultPortalThemeController, cloneModuleExecutionContext, urlRewriterUtilsWrapper, friendlyUrlWrapper, contentVerifier, portalController, personalizationController, permissionDefinitionService, portalAliasService, hostSettings, hostSettingsService, templateController);
+			eventLogger.LogDebug("PagesControllerImpl(businessControllerProvider={BusinessControllerProvider},tabController={TabController},moduleController={ModuleController},pageUrlsController={PageUrlsController},templateController={TemplateController},defaultPortalThemeController={DefaultPortalThemeController},cloneModuleExecutionContext={CloneModuleExecutionContext},urlRewriterUtilsWrapper={UrlRewriterUtilsWrapper},friendlyUrlWrapper={FriendlyUrlWrapper},contentVerifier={ContentVerifier},portalController={PortalController},personalizationController={PersonalizationController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): defaultPortalThemeController → {DefaultPortalThemeController1}", businessControllerProvider, tabController, moduleController, pageUrlsController, templateController, defaultPortalThemeController, cloneModuleExecutionContext, urlRewriterUtilsWrapper, friendlyUrlWrapper, contentVerifier, portalController, personalizationController, permissionDefinitionService, portalAliasService, hostSettings, hostSettingsService, defaultPortalThemeController);
+			eventLogger.LogDebug("PagesControllerImpl(businessControllerProvider={BusinessControllerProvider},tabController={TabController},moduleController={ModuleController},pageUrlsController={PageUrlsController},templateController={TemplateController},defaultPortalThemeController={DefaultPortalThemeController},cloneModuleExecutionContext={CloneModuleExecutionContext},urlRewriterUtilsWrapper={UrlRewriterUtilsWrapper},friendlyUrlWrapper={FriendlyUrlWrapper},contentVerifier={ContentVerifier},portalController={PortalController},personalizationController={PersonalizationController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): cloneModuleExecutionContext → {CloneModuleExecutionContext1}", businessControllerProvider, tabController, moduleController, pageUrlsController, templateController, defaultPortalThemeController, cloneModuleExecutionContext, urlRewriterUtilsWrapper, friendlyUrlWrapper, contentVerifier, portalController, personalizationController, permissionDefinitionService, portalAliasService, hostSettings, hostSettingsService, cloneModuleExecutionContext);
+			eventLogger.LogDebug("PagesControllerImpl(businessControllerProvider={BusinessControllerProvider},tabController={TabController},moduleController={ModuleController},pageUrlsController={PageUrlsController},templateController={TemplateController},defaultPortalThemeController={DefaultPortalThemeController},cloneModuleExecutionContext={CloneModuleExecutionContext},urlRewriterUtilsWrapper={UrlRewriterUtilsWrapper},friendlyUrlWrapper={FriendlyUrlWrapper},contentVerifier={ContentVerifier},portalController={PortalController},personalizationController={PersonalizationController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): urlRewriterUtilsWrapper → {UrlRewriterUtilsWrapper1}", businessControllerProvider, tabController, moduleController, pageUrlsController, templateController, defaultPortalThemeController, cloneModuleExecutionContext, urlRewriterUtilsWrapper, friendlyUrlWrapper, contentVerifier, portalController, personalizationController, permissionDefinitionService, portalAliasService, hostSettings, hostSettingsService, urlRewriterUtilsWrapper);
             this.businessControllerProvider = businessControllerProvider;
+			eventLogger.LogDebug("PagesControllerImpl(businessControllerProvider={BusinessControllerProvider},tabController={TabController},moduleController={ModuleController},pageUrlsController={PageUrlsController},templateController={TemplateController},defaultPortalThemeController={DefaultPortalThemeController},cloneModuleExecutionContext={CloneModuleExecutionContext},urlRewriterUtilsWrapper={UrlRewriterUtilsWrapper},friendlyUrlWrapper={FriendlyUrlWrapper},contentVerifier={ContentVerifier},portalController={PortalController},personalizationController={PersonalizationController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): businessControllerProvider → {BusinessControllerProvider1}", businessControllerProvider, tabController, moduleController, pageUrlsController, templateController, defaultPortalThemeController, cloneModuleExecutionContext, urlRewriterUtilsWrapper, friendlyUrlWrapper, contentVerifier, portalController, personalizationController, permissionDefinitionService, portalAliasService, hostSettings, hostSettingsService, businessControllerProvider);
+			eventLogger.LogDebug("PagesControllerImpl(businessControllerProvider={BusinessControllerProvider},tabController={TabController},moduleController={ModuleController},pageUrlsController={PageUrlsController},templateController={TemplateController},defaultPortalThemeController={DefaultPortalThemeController},cloneModuleExecutionContext={CloneModuleExecutionContext},urlRewriterUtilsWrapper={UrlRewriterUtilsWrapper},friendlyUrlWrapper={FriendlyUrlWrapper},contentVerifier={ContentVerifier},portalController={PortalController},personalizationController={PersonalizationController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): this.businessControllerProvider → {Arg16}", businessControllerProvider, tabController, moduleController, pageUrlsController, templateController, defaultPortalThemeController, cloneModuleExecutionContext, urlRewriterUtilsWrapper, friendlyUrlWrapper, contentVerifier, portalController, personalizationController, permissionDefinitionService, portalAliasService, hostSettings, hostSettingsService, this.businessControllerProvider);
+			eventLogger.LogDebug("PagesControllerImpl(businessControllerProvider={BusinessControllerProvider},tabController={TabController},moduleController={ModuleController},pageUrlsController={PageUrlsController},templateController={TemplateController},defaultPortalThemeController={DefaultPortalThemeController},cloneModuleExecutionContext={CloneModuleExecutionContext},urlRewriterUtilsWrapper={UrlRewriterUtilsWrapper},friendlyUrlWrapper={FriendlyUrlWrapper},contentVerifier={ContentVerifier},portalController={PortalController},personalizationController={PersonalizationController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): moduleController → {ModuleController1}", businessControllerProvider, tabController, moduleController, pageUrlsController, templateController, defaultPortalThemeController, cloneModuleExecutionContext, urlRewriterUtilsWrapper, friendlyUrlWrapper, contentVerifier, portalController, personalizationController, permissionDefinitionService, portalAliasService, hostSettings, hostSettingsService, moduleController);
+			eventLogger.LogDebug("PagesControllerImpl(businessControllerProvider={BusinessControllerProvider},tabController={TabController},moduleController={ModuleController},pageUrlsController={PageUrlsController},templateController={TemplateController},defaultPortalThemeController={DefaultPortalThemeController},cloneModuleExecutionContext={CloneModuleExecutionContext},urlRewriterUtilsWrapper={UrlRewriterUtilsWrapper},friendlyUrlWrapper={FriendlyUrlWrapper},contentVerifier={ContentVerifier},portalController={PortalController},personalizationController={PersonalizationController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): pageUrlsController → {PageUrlsController1}", businessControllerProvider, tabController, moduleController, pageUrlsController, templateController, defaultPortalThemeController, cloneModuleExecutionContext, urlRewriterUtilsWrapper, friendlyUrlWrapper, contentVerifier, portalController, personalizationController, permissionDefinitionService, portalAliasService, hostSettings, hostSettingsService, pageUrlsController);
             this.tabController = tabController;
             this.moduleController = moduleController;
             this.pageUrlsController = pageUrlsController;
+			eventLogger.LogDebug("PagesControllerImpl(businessControllerProvider={BusinessControllerProvider},tabController={TabController},moduleController={ModuleController},pageUrlsController={PageUrlsController},templateController={TemplateController},defaultPortalThemeController={DefaultPortalThemeController},cloneModuleExecutionContext={CloneModuleExecutionContext},urlRewriterUtilsWrapper={UrlRewriterUtilsWrapper},friendlyUrlWrapper={FriendlyUrlWrapper},contentVerifier={ContentVerifier},portalController={PortalController},personalizationController={PersonalizationController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): tabController → {TabController1}", businessControllerProvider, tabController, moduleController, pageUrlsController, templateController, defaultPortalThemeController, cloneModuleExecutionContext, urlRewriterUtilsWrapper, friendlyUrlWrapper, contentVerifier, portalController, personalizationController, permissionDefinitionService, portalAliasService, hostSettings, hostSettingsService, tabController);
+			eventLogger.LogDebug("PagesControllerImpl(businessControllerProvider={BusinessControllerProvider},tabController={TabController},moduleController={ModuleController},pageUrlsController={PageUrlsController},templateController={TemplateController},defaultPortalThemeController={DefaultPortalThemeController},cloneModuleExecutionContext={CloneModuleExecutionContext},urlRewriterUtilsWrapper={UrlRewriterUtilsWrapper},friendlyUrlWrapper={FriendlyUrlWrapper},contentVerifier={ContentVerifier},portalController={PortalController},personalizationController={PersonalizationController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): this.tabController → {Arg16}", businessControllerProvider, tabController, moduleController, pageUrlsController, templateController, defaultPortalThemeController, cloneModuleExecutionContext, urlRewriterUtilsWrapper, friendlyUrlWrapper, contentVerifier, portalController, personalizationController, permissionDefinitionService, portalAliasService, hostSettings, hostSettingsService, this.tabController);
             this.templateController = templateController;
             this.defaultPortalThemeController = defaultPortalThemeController;
             this.cloneModuleExecutionContext = cloneModuleExecutionContext;
+			eventLogger.LogDebug("PagesControllerImpl(businessControllerProvider={BusinessControllerProvider},tabController={TabController},moduleController={ModuleController},pageUrlsController={PageUrlsController},templateController={TemplateController},defaultPortalThemeController={DefaultPortalThemeController},cloneModuleExecutionContext={CloneModuleExecutionContext},urlRewriterUtilsWrapper={UrlRewriterUtilsWrapper},friendlyUrlWrapper={FriendlyUrlWrapper},contentVerifier={ContentVerifier},portalController={PortalController},personalizationController={PersonalizationController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): this.moduleController → {Arg16}", businessControllerProvider, tabController, moduleController, pageUrlsController, templateController, defaultPortalThemeController, cloneModuleExecutionContext, urlRewriterUtilsWrapper, friendlyUrlWrapper, contentVerifier, portalController, personalizationController, permissionDefinitionService, portalAliasService, hostSettings, hostSettingsService, this.moduleController);
             this.urlRewriterUtilsWrapper = urlRewriterUtilsWrapper;
             this.friendlyUrlWrapper = friendlyUrlWrapper;
+			eventLogger.LogDebug("PagesControllerImpl(businessControllerProvider={BusinessControllerProvider},tabController={TabController},moduleController={ModuleController},pageUrlsController={PageUrlsController},templateController={TemplateController},defaultPortalThemeController={DefaultPortalThemeController},cloneModuleExecutionContext={CloneModuleExecutionContext},urlRewriterUtilsWrapper={UrlRewriterUtilsWrapper},friendlyUrlWrapper={FriendlyUrlWrapper},contentVerifier={ContentVerifier},portalController={PortalController},personalizationController={PersonalizationController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): this.pageUrlsController → {Arg16}", businessControllerProvider, tabController, moduleController, pageUrlsController, templateController, defaultPortalThemeController, cloneModuleExecutionContext, urlRewriterUtilsWrapper, friendlyUrlWrapper, contentVerifier, portalController, personalizationController, permissionDefinitionService, portalAliasService, hostSettings, hostSettingsService, this.pageUrlsController);
             this.contentVerifier = contentVerifier;
             this.portalController = portalController;
+			eventLogger.LogDebug("PagesControllerImpl(businessControllerProvider={BusinessControllerProvider},tabController={TabController},moduleController={ModuleController},pageUrlsController={PageUrlsController},templateController={TemplateController},defaultPortalThemeController={DefaultPortalThemeController},cloneModuleExecutionContext={CloneModuleExecutionContext},urlRewriterUtilsWrapper={UrlRewriterUtilsWrapper},friendlyUrlWrapper={FriendlyUrlWrapper},contentVerifier={ContentVerifier},portalController={PortalController},personalizationController={PersonalizationController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): this.templateController → {Arg16}", businessControllerProvider, tabController, moduleController, pageUrlsController, templateController, defaultPortalThemeController, cloneModuleExecutionContext, urlRewriterUtilsWrapper, friendlyUrlWrapper, contentVerifier, portalController, personalizationController, permissionDefinitionService, portalAliasService, hostSettings, hostSettingsService, this.templateController);
             this.personalizationController = personalizationController ?? Globals.GetCurrentServiceProvider().GetRequiredService<PersonalizationController>();
             this.permissionDefinitionService = permissionDefinitionService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPermissionDefinitionService>();
+			eventLogger.LogDebug("PagesControllerImpl(businessControllerProvider={BusinessControllerProvider},tabController={TabController},moduleController={ModuleController},pageUrlsController={PageUrlsController},templateController={TemplateController},defaultPortalThemeController={DefaultPortalThemeController},cloneModuleExecutionContext={CloneModuleExecutionContext},urlRewriterUtilsWrapper={UrlRewriterUtilsWrapper},friendlyUrlWrapper={FriendlyUrlWrapper},contentVerifier={ContentVerifier},portalController={PortalController},personalizationController={PersonalizationController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): this.defaultPortalThemeController → {Arg16}", businessControllerProvider, tabController, moduleController, pageUrlsController, templateController, defaultPortalThemeController, cloneModuleExecutionContext, urlRewriterUtilsWrapper, friendlyUrlWrapper, contentVerifier, portalController, personalizationController, permissionDefinitionService, portalAliasService, hostSettings, hostSettingsService, this.defaultPortalThemeController);
             this.portalAliasService = portalAliasService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalAliasService>();
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			eventLogger.LogDebug("PagesControllerImpl(businessControllerProvider={BusinessControllerProvider},tabController={TabController},moduleController={ModuleController},pageUrlsController={PageUrlsController},templateController={TemplateController},defaultPortalThemeController={DefaultPortalThemeController},cloneModuleExecutionContext={CloneModuleExecutionContext},urlRewriterUtilsWrapper={UrlRewriterUtilsWrapper},friendlyUrlWrapper={FriendlyUrlWrapper},contentVerifier={ContentVerifier},portalController={PortalController},personalizationController={PersonalizationController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): this.cloneModuleExecutionContext → {Arg16}", businessControllerProvider, tabController, moduleController, pageUrlsController, templateController, defaultPortalThemeController, cloneModuleExecutionContext, urlRewriterUtilsWrapper, friendlyUrlWrapper, contentVerifier, portalController, personalizationController, permissionDefinitionService, portalAliasService, hostSettings, hostSettingsService, this.cloneModuleExecutionContext);
             this.hostSettingsService = hostSettingsService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
         }
+		eventLogger.LogDebug("PagesControllerImpl(businessControllerProvider={BusinessControllerProvider},tabController={TabController},moduleController={ModuleController},pageUrlsController={PageUrlsController},templateController={TemplateController},defaultPortalThemeController={DefaultPortalThemeController},cloneModuleExecutionContext={CloneModuleExecutionContext},urlRewriterUtilsWrapper={UrlRewriterUtilsWrapper},friendlyUrlWrapper={FriendlyUrlWrapper},contentVerifier={ContentVerifier},portalController={PortalController},personalizationController={PersonalizationController},permissionDefinitionService={PermissionDefinitionService},portalAliasService={PortalAliasService},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): this.urlRewriterUtilsWrapper → {Arg16}", businessControllerProvider, tabController, moduleController, pageUrlsController, templateController, defaultPortalThemeController, cloneModuleExecutionContext, urlRewriterUtilsWrapper, friendlyUrlWrapper, contentVerifier, portalController, personalizationController, permissionDefinitionService, portalAliasService, hostSettings, hostSettingsService, this.urlRewriterUtilsWrapper);
 
         private PortalSettings PortalSettings { get; set; }
 
@@ -189,6 +207,7 @@ namespace Dnn.PersonaBar.Pages.Components
             if (tabId != Null.NullInteger && (tab == null || tabId != tab.TabID))
             {
                 var existingTab = this.tabController.GetTab(tabId, portalSettings.PortalId, false);
+				eventLogger.LogDebug("IsValidTabPath(tab={Tab},newTabPath={NewTabPath},newTabName={NewTabName}): existingTab → {ExistingTab}", tab, newTabPath, newTabName, existingTab);
                 if (existingTab is { IsDeleted: true })
                 {
                     errorMessage = Localization.GetString("TabRecycled");
@@ -218,16 +237,21 @@ namespace Dnn.PersonaBar.Pages.Components
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting IsValidTabPath(tab={Tab},newTabPath={NewTabPath},newTabName={NewTabName})", tab, newTabPath, newTabName);
             return valid;
         }
 
         /// <inheritdoc />
         public List<int> GetPageHierarchy(int pageId)
         {
+			eventLogger.LogDebug(">>> Entering GetPageHierarchy(pageId={PageId})", pageId);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
             var tab = TabController.Instance.GetTab(pageId, portalSettings.PortalId);
+			eventLogger.LogDebug("GetPageHierarchy(pageId={PageId}): tab → {Tab}", pageId, tab);
+			eventLogger.LogDebug("GetPageHierarchy(pageId={PageId}): portalSettings → {PortalSettings}", pageId, portalSettings);
             if (tab == null)
             {
+				eventLogger.LogWarning("Throwing PageNotFoundException from GetPageHierarchy(pageId={PageId})", pageId);
                 throw new PageNotFoundException();
             }
 
@@ -241,6 +265,7 @@ namespace Dnn.PersonaBar.Pages.Components
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting GetPageHierarchy(pageId={PageId})", pageId);
             return paths;
         }
 
@@ -302,6 +327,7 @@ namespace Dnn.PersonaBar.Pages.Components
         public void DeletePage(PageItem page, PortalSettings portalSettings = null)
         {
             this.DeletePage(page, false, portalSettings);
+			eventLogger.LogDebug("<<< Exiting DeletePage(page={Page},portalSettings={PortalSettings})", page, portalSettings);
         }
 
         /// <inheritdoc />
@@ -348,9 +374,11 @@ namespace Dnn.PersonaBar.Pages.Components
         /// <inheritdoc />
         public void EditModeForPage(int pageId, int userId)
         {
+			eventLogger.LogDebug(">>> Entering EditModeForPage(pageId={PageId},userId={UserId})", pageId, userId);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
             var newCookie = new HttpCookie("LastPageId", $"{portalSettings.PortalId}:{pageId}")
             {
+			eventLogger.LogDebug("EditModeForPage(pageId={PageId},userId={UserId}): portalSettings → {PortalSettings}", pageId, userId, portalSettings);
                 Path = !string.IsNullOrEmpty(Globals.ApplicationPath) ? Globals.ApplicationPath : "/",
             };
             HttpContext.Current.Response.Cookies.Add(newCookie);
@@ -358,10 +386,13 @@ namespace Dnn.PersonaBar.Pages.Components
             if (Personalization.GetUserMode() != PortalSettings.Mode.Edit)
             {
                 var personalization = this.personalizationController.LoadProfile(userId, portalSettings.PortalId);
+				eventLogger.LogDebug("EditModeForPage(pageId={PageId},userId={UserId}): personalization → {Personalization}", pageId, userId, personalization);
                 personalization.Profile["Usability:UserMode" + portalSettings.PortalId] = "EDIT";
                 personalization.IsModified = true;
+				eventLogger.LogDebug("EditModeForPage(pageId={PageId},userId={UserId}): personalization.IsModified → {Arg2}", pageId, userId, personalization.IsModified);
                 this.personalizationController.SaveProfile(personalization);
             }
+			eventLogger.LogDebug("<<< Exiting EditModeForPage(pageId={PageId},userId={UserId})", pageId, userId);
         }
 
         /// <inheritdoc />
@@ -397,10 +428,13 @@ namespace Dnn.PersonaBar.Pages.Components
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public IEnumerable<TabInfo> GetPageList(PortalSettings settings, int parentId = -1, string searchKey = "", bool includeHidden = true, bool includeDeleted = false, bool includeSubpages = false)
         {
+			eventLogger.LogDebug(">>> Entering GetPageList(settings={Settings},parentId={ParentId},searchKey={SearchKey},includeHidden={IncludeHidden},includeDeleted={IncludeDeleted},includeSubpages={IncludeSubpages})", settings, parentId, searchKey, includeHidden, includeDeleted, includeSubpages);
             var portalSettings = settings ?? PortalController.Instance.GetCurrentSettings();
             var adminTabId = portalSettings.AdminTabId;
+			eventLogger.LogDebug("GetPageList(settings={Settings},parentId={ParentId},searchKey={SearchKey},includeHidden={IncludeHidden},includeDeleted={IncludeDeleted},includeSubpages={IncludeSubpages}): portalSettings → {PortalSettings}", settings, parentId, searchKey, includeHidden, includeDeleted, includeSubpages, portalSettings);
 
             var tabs = TabController.GetPortalTabs(portalSettings.PortalId, adminTabId, false, includeHidden, includeDeleted, true);
+			eventLogger.LogDebug("GetPageList(settings={Settings},parentId={ParentId},searchKey={SearchKey},includeHidden={IncludeHidden},includeDeleted={IncludeDeleted},includeSubpages={IncludeSubpages}): tabs → {Tabs}", settings, parentId, searchKey, includeHidden, includeDeleted, includeSubpages, tabs);
             var pages = from t in tabs
                         where (t.ParentId != adminTabId || t.ParentId == Null.NullInteger) &&
                                 !t.IsSystem &&
@@ -480,11 +514,15 @@ namespace Dnn.PersonaBar.Pages.Components
         /// <inheritdoc />
         public IEnumerable<TabInfo> SearchPages(out int totalRecords, string searchKey = "", string pageType = "", string tags = "", string publishStatus = "", string publishDateStart = "", string publishDateEnd = "", int workflowId = -1, int pageIndex = -1, int pageSize = -1)
         {
+			eventLogger.LogDebug(">>> Entering SearchPages(searchKey={SearchKey},pageType={PageType},tags={Tags},publishStatus={PublishStatus},publishDateStart={PublishDateStart},publishDateEnd={PublishDateEnd},workflowId={WorkflowId},pageIndex={PageIndex},pageSize={PageSize})", searchKey, pageType, tags, publishStatus, publishDateStart, publishDateEnd, workflowId, pageIndex, pageSize);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
             var adminTabId = portalSettings.AdminTabId;
+			eventLogger.LogDebug("SearchPages(searchKey={SearchKey},pageType={PageType},tags={Tags},publishStatus={PublishStatus},publishDateStart={PublishDateStart},publishDateEnd={PublishDateEnd},workflowId={WorkflowId},pageIndex={PageIndex},pageSize={PageSize}): portalSettings → {PortalSettings}", searchKey, pageType, tags, publishStatus, publishDateStart, publishDateEnd, workflowId, pageIndex, pageSize, portalSettings);
 
             var tabs = TabController.GetPortalTabs(portalSettings.PortalId, adminTabId, false, true, false, true);
+			eventLogger.LogDebug("SearchPages(searchKey={SearchKey},pageType={PageType},tags={Tags},publishStatus={PublishStatus},publishDateStart={PublishDateStart},publishDateEnd={PublishDateEnd},workflowId={WorkflowId},pageIndex={PageIndex},pageSize={PageSize}): tabs → {Tabs}", searchKey, pageType, tags, publishStatus, publishDateStart, publishDateEnd, workflowId, pageIndex, pageSize, tabs);
             var pages = from t in tabs
+						eventLogger.LogDebug("SearchPages(searchKey={SearchKey},pageType={PageType},tags={Tags},publishStatus={PublishStatus},publishDateStart={PublishDateStart},publishDateEnd={PublishDateEnd},workflowId={WorkflowId},pageIndex={PageIndex},pageSize={PageSize}): pages → {Pages}", searchKey, pageType, tags, publishStatus, publishDateStart, publishDateEnd, workflowId, pageIndex, pageSize, pages);
                         where (t.ParentId != adminTabId || t.ParentId == Null.NullInteger) &&
                                 !t.IsSystem &&
                                     (string.IsNullOrEmpty(searchKey)
@@ -519,6 +557,8 @@ namespace Dnn.PersonaBar.Pages.Components
                     default:
                         break;
                 }
+				eventLogger.LogDebug(">>> Entering HasTags(tags={Tags},terms={Terms})", tags, terms);
+				eventLogger.LogDebug("<<< Exiting HasTags(tags={Tags},terms={Terms})", tags, terms);
             }
 
             DateTime startDate;
@@ -527,6 +567,7 @@ namespace Dnn.PersonaBar.Pages.Components
                 startDate = DateTime.ParseExact(publishDateStart, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
                 pages = pages.Where(p => WorkflowHelper.GetTabLastPublishedOn(p) >= startDate);
             }
+			eventLogger.LogDebug("SearchPages(searchKey={SearchKey},pageType={PageType},tags={Tags},publishStatus={PublishStatus},publishDateStart={PublishDateStart},publishDateEnd={PublishDateEnd},workflowId={WorkflowId},pageIndex={PageIndex},pageSize={PageSize}): startDate → {StartDate}", searchKey, pageType, tags, publishStatus, publishDateStart, publishDateEnd, workflowId, pageIndex, pageSize, startDate);
 
             DateTime endDate;
             if (!string.IsNullOrEmpty(publishDateEnd))
@@ -534,6 +575,7 @@ namespace Dnn.PersonaBar.Pages.Components
                 endDate = DateTime.ParseExact(publishDateEnd, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
                 pages = pages.Where(p => WorkflowHelper.GetTabLastPublishedOn(p) <= endDate);
             }
+			eventLogger.LogDebug("SearchPages(searchKey={SearchKey},pageType={PageType},tags={Tags},publishStatus={PublishStatus},publishDateStart={PublishDateStart},publishDateEnd={PublishDateEnd},workflowId={WorkflowId},pageIndex={PageIndex},pageSize={PageSize}): endDate → {EndDate}", searchKey, pageType, tags, publishStatus, publishDateStart, publishDateEnd, workflowId, pageIndex, pageSize, endDate);
 
             if (workflowId != -1)
             {
@@ -541,13 +583,19 @@ namespace Dnn.PersonaBar.Pages.Components
             }
 
             totalRecords = pages.Count();
+			eventLogger.LogDebug("SearchPages(searchKey={SearchKey},pageType={PageType},tags={Tags},publishStatus={PublishStatus},publishDateStart={PublishDateStart},publishDateEnd={PublishDateEnd},workflowId={WorkflowId},pageIndex={PageIndex},pageSize={PageSize}): pageIndex → {PageIndex1}", searchKey, pageType, tags, publishStatus, publishDateStart, publishDateEnd, workflowId, pageIndex, pageSize, pageIndex);
+			eventLogger.LogDebug("SearchPages(searchKey={SearchKey},pageType={PageType},tags={Tags},publishStatus={PublishStatus},publishDateStart={PublishDateStart},publishDateEnd={PublishDateEnd},workflowId={WorkflowId},pageIndex={PageIndex},pageSize={PageSize}): totalRecords → {TotalRecords}", searchKey, pageType, tags, publishStatus, publishDateStart, publishDateEnd, workflowId, pageIndex, pageSize, totalRecords);
+			eventLogger.LogDebug("<<< Exiting SearchPages(searchKey={SearchKey},pageType={PageType},tags={Tags},publishStatus={PublishStatus},publishDateStart={PublishDateStart},publishDateEnd={PublishDateEnd},workflowId={WorkflowId},pageIndex={PageIndex},pageSize={PageSize})", searchKey, pageType, tags, publishStatus, publishDateStart, publishDateEnd, workflowId, pageIndex, pageSize);
             return pageIndex == -1 || pageSize == -1 ? pages : pages.Skip(pageIndex * pageSize).Take(pageSize);
         }
 
         /// <inheritdoc />
         public IEnumerable<ModuleInfo> GetModules(int pageId)
         {
+			eventLogger.LogDebug(">>> Entering GetModules(pageId={PageId})", pageId);
             var tabModules = this.moduleController.GetTabModules(pageId);
+			eventLogger.LogDebug("GetModules(pageId={PageId}): tabModules → {TabModules}", pageId, tabModules);
+			eventLogger.LogDebug("<<< Exiting GetModules(pageId={PageId})", pageId);
             return tabModules.Values.Where(m => !m.IsDeleted);
         }
 
@@ -729,6 +777,7 @@ namespace Dnn.PersonaBar.Pages.Components
                     this.tabController.DeleteTabUrl(tabUrl, portalSettings.PortalId, true);
                 }
             }
+			eventLogger.LogDebug("<<< Exiting SaveTabUrl(tab={Tab},pageSettings={PageSettings})", tab, pageSettings);
         }
 
         /// <inheritdoc />
@@ -755,34 +804,45 @@ namespace Dnn.PersonaBar.Pages.Components
         /// <inheritdoc />
         public void CopyThemeToDescendantPages(int pageId, Theme theme)
         {
+			eventLogger.LogDebug(">>> Entering CopyThemeToDescendantPages(pageId={PageId},theme={Theme})", pageId, theme);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
             var portalId = portalSettings.PortalId;
+			eventLogger.LogDebug("CopyThemeToDescendantPages(pageId={PageId},theme={Theme}): portalSettings → {PortalSettings}", pageId, theme, portalSettings);
             var tab = this.tabController.GetTab(pageId, portalId, false);
+			eventLogger.LogDebug("CopyThemeToDescendantPages(pageId={PageId},theme={Theme}): tab → {Tab}", pageId, theme, tab);
             if (tab == null)
             {
+				eventLogger.LogWarning("Throwing PageNotFoundException from CopyThemeToDescendantPages(pageId={PageId},theme={Theme})", pageId, theme);
                 throw new PageNotFoundException();
             }
 
             TabController.CopyDesignToChildren(tab, theme.SkinSrc, theme.ContainerSrc);
+			eventLogger.LogDebug("<<< Exiting CopyThemeToDescendantPages(pageId={PageId},theme={Theme})", pageId, theme);
         }
 
         /// <inheritdoc />
         public void CopyPermissionsToDescendantPages(int pageId)
         {
+			eventLogger.LogDebug(">>> Entering CopyPermissionsToDescendantPages(pageId={PageId})", pageId);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
             var portalId = portalSettings.PortalId;
+			eventLogger.LogDebug("CopyPermissionsToDescendantPages(pageId={PageId}): portalSettings → {PortalSettings}", pageId, portalSettings);
             var tab = this.tabController.GetTab(pageId, portalId, false);
+			eventLogger.LogDebug("CopyPermissionsToDescendantPages(pageId={PageId}): tab → {Tab}", pageId, tab);
             if (tab == null)
             {
+				eventLogger.LogWarning("Throwing PageNotFoundException from CopyPermissionsToDescendantPages(pageId={PageId})", pageId);
                 throw new PageNotFoundException();
             }
 
             if (!TabPermissionController.CanManagePage(tab) || tab.IsSuperTab)
             {
+				eventLogger.LogWarning("Throwing PermissionsNotMetException from CopyPermissionsToDescendantPages(pageId={PageId})", pageId);
                 throw new PermissionsNotMetException(tab.TabID, Localization.GetString("CannotCopyPermissionsToDescendantPages"));
             }
 
             TabController.CopyPermissionsToChildren(tab, tab.TabPermissions);
+			eventLogger.LogDebug("<<< Exiting CopyPermissionsToDescendantPages(pageId={PageId})", pageId);
         }
 
         /// <inheritdoc />
@@ -798,16 +858,21 @@ namespace Dnn.PersonaBar.Pages.Components
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public PageSettings GetPageSettings(int pageId, PortalSettings requestPortalSettings = null)
         {
+			eventLogger.LogDebug(">>> Entering GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings})", pageId, requestPortalSettings);
             var tab = this.GetPageDetails(pageId);
 
+			eventLogger.LogDebug("GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings}): tab → {Tab}", pageId, requestPortalSettings, tab);
             var portalSettings = requestPortalSettings ?? this.portalController.GetCurrentPortalSettings();
+			eventLogger.LogDebug("GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings}): portalSettings → {PortalSettings}", pageId, requestPortalSettings, portalSettings);
 
             if (!this.contentVerifier.IsContentExistsForRequestedPortal(tab.PortalID, portalSettings))
             {
+				eventLogger.LogWarning("Throwing PageNotFoundException from GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings})", pageId, requestPortalSettings);
                 throw new PageNotFoundException();
             }
 
             var page = Converters.ConvertToPageSettings<PageSettings>(tab);
+			eventLogger.LogDebug("GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings}): page → {Page}", pageId, requestPortalSettings, page);
             page.Modules = this.GetModules(page.TabId).Select(Converters.ConvertToModuleItem);
             page.PageUrls = this.GetPageUrls(page.TabId);
             page.Permissions = this.GetPermissionsData(pageId);
@@ -815,12 +880,15 @@ namespace Dnn.PersonaBar.Pages.Components
             page.PrimaryAliasId = this.GetPrimaryAliasId(portalSettings.PortalId, portalSettings.CultureCode);
             page.Locales = this.GetLocales(portalSettings.PortalId);
             page.HasParent = tab.ParentId > -1;
+			eventLogger.LogDebug("GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings}): page.HasParent → {Arg2}", pageId, requestPortalSettings, page.HasParent);
 
             // icons
             var iconFile = string.IsNullOrEmpty(tab.IconFile) ? null : FileManager.Instance.GetFile(tab.PortalID, tab.IconFileRaw);
+			eventLogger.LogDebug("GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings}): iconFile → {IconFile}", pageId, requestPortalSettings, iconFile);
             if (iconFile != null)
             {
                 page.IconFile = new FileDto
+				eventLogger.LogDebug("GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings}): page.IconFile → {Arg2}", pageId, requestPortalSettings, page.IconFile);
                 {
                     fileId = iconFile.FileId,
                     fileName = iconFile.FileName,
@@ -830,9 +898,11 @@ namespace Dnn.PersonaBar.Pages.Components
             }
 
             var iconFileLarge = string.IsNullOrEmpty(tab.IconFileLarge) ? null : FileManager.Instance.GetFile(tab.PortalID, tab.IconFileLargeRaw);
+			eventLogger.LogDebug("GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings}): iconFileLarge → {IconFileLarge}", pageId, requestPortalSettings, iconFileLarge);
             if (iconFileLarge != null)
             {
                 page.IconFileLarge = new FileDto
+				eventLogger.LogDebug("GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings}): page.IconFileLarge → {Arg2}", pageId, requestPortalSettings, page.IconFileLarge);
                 {
                     fileId = iconFileLarge.FileId,
                     fileName = iconFileLarge.FileName,
@@ -846,12 +916,16 @@ namespace Dnn.PersonaBar.Pages.Components
             page.WorkflowId = WorkflowHelper.GetTabWorkflowId(tab);
 
             var workflow = WorkflowManager.Instance.GetWorkflow(page.WorkflowId);
+			eventLogger.LogDebug("GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings}): workflow → {Workflow}", pageId, requestPortalSettings, workflow);
             page.WorkflowName = workflow?.WorkflowName ?? WorkflowHelper.GetTabWorkflowName(tab);
 
             var isWorkflowCompleted = WorkflowHelper.IsWorkflowCompleted(tab);
+			eventLogger.LogDebug("GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings}): isWorkflowCompleted → {IsWorkflowCompleted}", pageId, requestPortalSettings, isWorkflowCompleted);
             var isWorkflowOnDraft = WorkflowEngine.Instance.IsWorkflowOnDraft(tab);
+			eventLogger.LogDebug("GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings}): isWorkflowOnDraft → {IsWorkflowOnDraft}", pageId, requestPortalSettings, isWorkflowOnDraft);
 
             page.StateId = tab.StateID;
+			eventLogger.LogDebug("GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings}): page.StateId → {Arg2}", pageId, requestPortalSettings, page.StateId);
             page.StateName = tab.StateID != Null.NullInteger
                 ? WorkflowStateManager.Instance.GetWorkflowState(tab.StateID)?.StateName
                 : workflow == null
@@ -861,32 +935,47 @@ namespace Dnn.PersonaBar.Pages.Components
                         : workflow.FirstState?.StateName;
 
             page.HasAVisibleVersion = tab.HasAVisibleVersion;
+			eventLogger.LogDebug("GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings}): page.HasAVisibleVersion → {Arg2}", pageId, requestPortalSettings, page.HasAVisibleVersion);
+			eventLogger.LogDebug("GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings}): page.HasBeenPublished → {Arg2}", pageId, requestPortalSettings, page.HasBeenPublished);
+			eventLogger.LogDebug("GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings}): page.IsWorkflowCompleted → {Arg2}", pageId, requestPortalSettings, page.IsWorkflowCompleted);
+			eventLogger.LogDebug("GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings}): page.IsWorkflowOnDraft → {Arg2}", pageId, requestPortalSettings, page.IsWorkflowOnDraft);
+			eventLogger.LogDebug("GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings}): page.PublishStatus → {Arg2}", pageId, requestPortalSettings, page.PublishStatus);
             page.HasBeenPublished = tab.HasBeenPublished;
             page.IsWorkflowCompleted = isWorkflowCompleted;
             page.IsWorkflowOnDraft = isWorkflowOnDraft;
             page.PublishStatus = tab.HasBeenPublished && isWorkflowCompleted ? "Published" : "Draft";
 
+			eventLogger.LogDebug("<<< Exiting GetPageSettings(pageId={PageId},requestPortalSettings={RequestPortalSettings})", pageId, requestPortalSettings);
             return page;
         }
 
         /// <inheritdoc />
         public PageUrlResult CreateCustomUrl(SeoUrl dto)
         {
+			eventLogger.LogDebug(">>> Entering CreateCustomUrl(dto={Dto})", dto);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
+			eventLogger.LogDebug("CreateCustomUrl(dto={Dto}): portalSettings → {PortalSettings}", dto, portalSettings);
+			eventLogger.LogDebug("<<< Exiting CreateCustomUrl(dto={Dto})", dto);
             return this.pageUrlsController.CreateCustomUrl(dto.SaveUrl, this.tabController.GetTab(dto.TabId, portalSettings.PortalId, false));
         }
 
         /// <inheritdoc />
         public PageUrlResult UpdateCustomUrl(SeoUrl dto)
         {
+			eventLogger.LogDebug(">>> Entering UpdateCustomUrl(dto={Dto})", dto);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
+			eventLogger.LogDebug("UpdateCustomUrl(dto={Dto}): portalSettings → {PortalSettings}", dto, portalSettings);
+			eventLogger.LogDebug("<<< Exiting UpdateCustomUrl(dto={Dto})", dto);
             return this.pageUrlsController.UpdateCustomUrl(dto.SaveUrl, this.tabController.GetTab(dto.TabId, portalSettings.PortalId, false));
         }
 
         /// <inheritdoc />
         public PageUrlResult DeleteCustomUrl(UrlIdDto dto)
         {
+			eventLogger.LogDebug(">>> Entering DeleteCustomUrl(dto={Dto})", dto);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
+			eventLogger.LogDebug("DeleteCustomUrl(dto={Dto}): portalSettings → {PortalSettings}", dto, portalSettings);
+			eventLogger.LogDebug("<<< Exiting DeleteCustomUrl(dto={Dto})", dto);
             return this.pageUrlsController.DeleteCustomUrl(dto.Id, this.tabController.GetTab(dto.TabId, portalSettings.PortalId, false));
         }
 
@@ -915,6 +1004,7 @@ namespace Dnn.PersonaBar.Pages.Components
             }
 
             contentController.AddContentItem(tab);
+			eventLogger.LogDebug("<<< Exiting CreateOrUpdateContentItem(tab={Tab})", tab);
         }
 
         public int UpdateTab(TabInfo tab, PageSettings pageSettings)
@@ -1010,13 +1100,16 @@ namespace Dnn.PersonaBar.Pages.Components
                     }
                 }
             }
+			eventLogger.LogDebug("<<< Exiting SavePagePermissions(tab={Tab},permissions={Permissions})", tab, permissions);
         }
 
         /// <inheritdoc />
         public virtual PageSettings GetDefaultSettings(int pageId = 0)
         {
+			eventLogger.LogDebug(">>> Entering GetDefaultSettings(pageId={PageId})", pageId);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
             var pageSettings = new PageSettings
+			eventLogger.LogDebug("GetDefaultSettings(pageId={PageId}): portalSettings → {PortalSettings}", pageId, portalSettings);
             {
                 Templates = this.templateController.GetTemplates(),
                 Permissions = pageId == 0 ? this.GetPermissionsData(portalSettings.HomeTabId) : this.GetPermissionsData(pageId),
@@ -1027,6 +1120,7 @@ namespace Dnn.PersonaBar.Pages.Components
             if (portalSettings.SSLSetup == DotNetNuke.Abstractions.Security.SiteSslSetup.On || (portalSettings.SSLEnabled && portalSettings.SSLEnforced))
             {
                 pageSettings.IsSecure = true;
+				eventLogger.LogDebug("GetDefaultSettings(pageId={PageId}): pageSettings.IsSecure → {Arg1}", pageId, pageSettings.IsSecure);
             }
 
             var tabVersionSettings = TabVersionSettings.Instance;
@@ -1035,17 +1129,22 @@ namespace Dnn.PersonaBar.Pages.Components
             pageSettings.WorkflowEnabled = tabWorkflowSettings.IsWorkflowEnabled(portalSettings.PortalId);
             pageSettings.WorkflowId = tabWorkflowSettings.GetDefaultTabWorkflowId(portalSettings.PortalId);
 
+			eventLogger.LogDebug("<<< Exiting GetDefaultSettings(pageId={PageId})", pageId);
             return pageSettings;
         }
 
         /// <inheritdoc />
         public PagePermissions GetPermissionsData(int pageId)
         {
+			eventLogger.LogDebug(">>> Entering GetPermissionsData(pageId={PageId})", pageId);
             var permissions = new PagePermissions(this.permissionDefinitionService, true);
             if (pageId > 0)
+			eventLogger.LogDebug("GetPermissionsData(pageId={PageId}): permissions → {Permissions}", pageId, permissions);
             {
                 var portalSettings = PortalController.Instance.GetCurrentSettings();
+				eventLogger.LogDebug("GetPermissionsData(pageId={PageId}): portalSettings → {PortalSettings}", pageId, portalSettings);
                 var tab = TabController.Instance.GetTab(pageId, portalSettings.PortalId);
+				eventLogger.LogDebug("GetPermissionsData(pageId={PageId}): tab → {Tab}", pageId, tab);
                 if (tab != null)
                 {
                     foreach (IPermissionInfo permission in tab.TabPermissions)
@@ -1076,20 +1175,26 @@ namespace Dnn.PersonaBar.Pages.Components
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting GetPermissionsData(pageId={PageId})", pageId);
             return permissions;
         }
 
         /// <inheritdoc />
         public void DeleteTabModule(int pageId, int moduleId)
         {
+			eventLogger.LogDebug(">>> Entering DeleteTabModule(pageId={PageId},moduleId={ModuleId})", pageId, moduleId);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
             var tab = this.tabController.GetTab(pageId, portalSettings.PortalId);
+			eventLogger.LogDebug("DeleteTabModule(pageId={PageId},moduleId={ModuleId}): tab → {Tab}", pageId, moduleId, tab);
+			eventLogger.LogDebug("DeleteTabModule(pageId={PageId},moduleId={ModuleId}): portalSettings → {PortalSettings}", pageId, moduleId, portalSettings);
             if (tab == null)
             {
+				eventLogger.LogWarning("Throwing PageModuleNotFoundException from DeleteTabModule(pageId={PageId},moduleId={ModuleId})", pageId, moduleId);
                 throw new PageModuleNotFoundException();
             }
 
             var tabModule = this.moduleController.GetModule(moduleId, pageId, false);
+			eventLogger.LogDebug("DeleteTabModule(pageId={PageId},moduleId={ModuleId}): tabModule → {TabModule}", pageId, moduleId, tabModule);
             if (tabModule == null)
             {
                 throw new PageModuleNotFoundException();
@@ -1097,11 +1202,13 @@ namespace Dnn.PersonaBar.Pages.Components
 
             if (!TabPermissionController.CanAddContentToPage(tab))
             {
+				eventLogger.LogWarning("Throwing SecurityException from DeleteTabModule(pageId={PageId},moduleId={ModuleId})", pageId, moduleId);
                 throw new SecurityException("You do not have permission to delete module on this page");
             }
 
             this.moduleController.DeleteTabModule(pageId, moduleId, true);
             this.moduleController.ClearCache(pageId);
+			eventLogger.LogDebug("<<< Exiting DeleteTabModule(pageId={PageId},moduleId={ModuleId})", pageId, moduleId);
         }
 
         public void CopyContentFromSourceTab(TabInfo tab, int sourceTabId, IEnumerable<ModuleItem> includedModules)
@@ -1117,6 +1224,7 @@ namespace Dnn.PersonaBar.Pages.Components
 
             // Copy Modules
             this.CopyModulesFromSourceTab(tab, sourceTab, includedModules);
+			eventLogger.LogDebug("<<< Exiting CopyContentFromSourceTab(tab={Tab},sourceTabId={SourceTabId},includedModules={IncludedModules})", tab, sourceTabId, includedModules);
         }
 
         protected virtual bool ValidatePageSettingsData(PortalSettings portalSettings, PageSettings pageSettings, TabInfo tab, out string invalidField, out string errorMessage)
@@ -1359,6 +1467,7 @@ namespace Dnn.PersonaBar.Pages.Components
             {
                 tab.IconFileLarge = null;
             }
+			eventLogger.LogDebug("<<< Exiting UpdateTabInfoFromPageSettings(tab={Tab},pageSettings={PageSettings})", tab, pageSettings);
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
@@ -1378,6 +1487,7 @@ namespace Dnn.PersonaBar.Pages.Components
             }
 
             ChangeContentWorkflow(tab, pageSettings);
+			eventLogger.LogDebug("<<< Exiting UpdateTabWorkflowFromPageSettings(tab={Tab},pageSettings={PageSettings})", tab, pageSettings);
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
@@ -1422,6 +1532,7 @@ namespace Dnn.PersonaBar.Pages.Components
 
             if (url.IndexOf("://", StringComparison.Ordinal) != -1)
             {
+			eventLogger.LogDebug("<<< Exiting GetExternalUrlRedirection(url={Url})", url);
                 return Globals.AddHTTP(url);
             }
 
@@ -1444,6 +1555,8 @@ namespace Dnn.PersonaBar.Pages.Components
 
         private static bool HasTags(string tags, IEnumerable<Term> terms)
         {
+			eventLogger.LogDebug(">>> Entering HasTags(tags={Tags},terms={Terms})", tags, terms);
+			eventLogger.LogDebug("<<< Exiting HasTags(tags={Tags},terms={Terms})", tags, terms);
             return tags.Split(',').All(tag => terms.Any(t => string.Equals(t.Name, tag, StringComparison.OrdinalIgnoreCase)));
         }
 
@@ -1467,6 +1580,7 @@ namespace Dnn.PersonaBar.Pages.Components
             tab.StateID = WorkflowEngine.Instance.IsWorkflowCompleted(tab.ContentItemId)
                 ? newWorkflow.LastState.StateID // Workflow is completed, just change to last state ("Published") of new workflow
                 : newWorkflow.FirstState.StateID; // Workflow bot completed, just change to first state ("Draft") of new workflow
+				eventLogger.LogDebug("<<< Exiting ChangeContentWorkflow(tab={Tab},pageSettings={PageSettings})", tab, pageSettings);
         }
 
         private static bool IsChild(int portalId, int tabId, int parentId)
@@ -1540,19 +1654,26 @@ namespace Dnn.PersonaBar.Pages.Components
         {
             url = url.TrimEnd('/');
             if (url.Length > 1 && url.IndexOf('/') > -1)
+			eventLogger.LogDebug("GetLocalPath(url={Url}): url → {Url1}", url, url);
             {
                 url = url.Remove(0, url.LastIndexOf('/'));
             }
 
+			eventLogger.LogDebug("<<< Exiting GetLocalPath(url={Url})", url);
             return url;
         }
 
         private TabInfo GetPageDetails(int pageId)
         {
+			eventLogger.LogDebug(">>> Entering GetPageDetails(pageId={PageId})", pageId);
             var portalSettings = this.portalController.GetCurrentSettings();
             var tab = this.tabController.GetTab(pageId, portalSettings.PortalId);
+			eventLogger.LogDebug("GetPageDetails(pageId={PageId}): tab → {Tab}", pageId, tab);
+			eventLogger.LogDebug("GetPageDetails(pageId={PageId}): portalSettings → {PortalSettings}", pageId, portalSettings);
             if (tab == null)
             {
+				eventLogger.LogWarning("Throwing PageNotFoundException from GetPageDetails(pageId={PageId})", pageId);
+			eventLogger.LogDebug("<<< Exiting GetPageDetails(pageId={PageId})", pageId);
                 throw new PageNotFoundException();
             }
 
@@ -1572,6 +1693,7 @@ namespace Dnn.PersonaBar.Pages.Components
 
                 this.MovePage(request);
             }
+			eventLogger.LogDebug("<<< Exiting MovePageIfNeeded(pageSettings={PageSettings},tab={Tab})", pageSettings, tab);
         }
 
         private string GetContainerSrc(PageSettings pageSettings)
@@ -1618,6 +1740,7 @@ namespace Dnn.PersonaBar.Pages.Components
                     this.tabController.UpdateTabSetting(tab.TabID, key, Convert.ToString(sourceTab.TabSettings[key], CultureInfo.InvariantCulture));
                 }
             }
+			eventLogger.LogDebug("<<< Exiting CopySourceTabProperties(tab={Tab},sourceTab={SourceTab})", tab, sourceTab);
         }
 
         private void CopyModulesFromSourceTab(TabInfo tab, TabInfo sourceTab, IEnumerable<ModuleItem> includedModules)
@@ -1712,6 +1835,7 @@ namespace Dnn.PersonaBar.Pages.Components
                     }
                 }
             }
+			eventLogger.LogDebug("<<< Exiting CopyModulesFromSourceTab(tab={Tab},sourceTab={SourceTab},includedModules={IncludedModules})", tab, sourceTab, includedModules);
         }
     }
 }

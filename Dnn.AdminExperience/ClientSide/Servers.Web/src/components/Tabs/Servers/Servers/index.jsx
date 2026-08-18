@@ -16,13 +16,17 @@ import utils from "../../../../utils";
 import "../../tabs.less";
 import "./style.less";
 import ServerList from "../ServerList";
+const logger = console;
 
 class Servers extends Component {
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.props.onRetrieveServers();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     UNSAFE_componentWillReceiveProps(newProps) {
+		logger.debug(`>>> Entering UNSAFE_componentWillReceiveProps(newProps=${newProps})`);
         if (
             this.props.errorMessage !== newProps.errorMessage &&
       newProps.errorMessage
@@ -32,29 +36,37 @@ class Servers extends Component {
     }
 
     deleteServer(serverId) {
+		logger.debug(`>>> Entering deleteServer(serverId=${serverId})`);
         this.props.deleteServer(serverId);
+		logger.debug(`<<< Exiting deleteServer(serverId=${serverId})`);
     }
 
     deleteNonActiveServers() {
+		logger.debug('>>> Entering deleteNonActiveServers()');
         utils.confirm(
             Localization.get("DeleteNonActiveServers.Confirm"),
             Localization.get("Confirm"),
             Localization.get("Cancel"),
             function () {
+				logger.debug('>>> Entering function()');
+				logger.debug('<<< Exiting function()');
                 this.props.deleteNonActiveServers();
             }.bind(this)
         );
     }
 
     hasInactiveServers() {
+		logger.debug('>>> Entering hasInactiveServers()');
         let res = false;
         this.props.servers.forEach((s) => {
             res = res || !s.isActive;
         });
+		logger.debug('<<< Exiting hasInactiveServers()');
         return res;
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { props } = this;
         let serverName = "";
         props.servers.forEach((element) => {
@@ -63,6 +75,7 @@ class Servers extends Component {
             }
         });
 
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell>
                 <GridCell className="dnn-servers-info-panel">
@@ -117,6 +130,8 @@ Servers.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         servers: state.serversTab.servers,
         errorMessage: state.serversTab.errorMessage,
@@ -124,6 +139,8 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+	logger.debug(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`);
+	logger.debug(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`);
     return {
         ...bindActionCreators(
             {

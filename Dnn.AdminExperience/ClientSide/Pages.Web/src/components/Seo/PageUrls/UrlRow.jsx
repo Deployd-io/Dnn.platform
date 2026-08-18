@@ -5,6 +5,7 @@ import styles from "./style.module.less";
 import Localization from "../../../localization";
 import EditUrl from "./EditUrl";
 import utils from "../../../utils";
+const logger = console;
 
 class UrlRow extends Component {
     onDelete(url) {
@@ -14,7 +15,9 @@ class UrlRow extends Component {
             Localization.get("Delete"),
             Localization.get("Cancel"),
             function onConfirmDeletion() {
+				logger.debug('>>> Entering onConfirmDeletion()');
                 onDelete(url);
+				logger.debug('<<< Exiting onConfirmDeletion()');
             }
         );
     }
@@ -27,9 +30,11 @@ class UrlRow extends Component {
         } else {
             onOpenEditForm(url);
         }
+		logger.debug(`<<< Exiting onOpenEditForm(url=${url})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { url, siteAliases, primaryAliasId, editedUrl, saving, onChange, pageHasParent,
             onSave, onCancel } = this.props;
         let generatedBy = Localization.get("Pages_Seo_GeneratedByAutomatic");
@@ -39,6 +44,7 @@ class UrlRow extends Component {
         }
         const opened = editedUrl && editedUrl.id === url.id;
 
+		logger.debug('<<< Exiting render()');
         return (
              
             <div className={styles.urlRow + (opened ? " row-opened" : "")} >

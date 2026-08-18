@@ -57,7 +57,11 @@ namespace log4net.Config
         /// </remarks>
         protected ConfiguratorAttribute(int priority)
         {
+			value.LogDebug(">>> Entering ConfiguratorAttribute(priority={Priority})", priority);
             this.m_priority = priority;
+			value.LogDebug("ConfiguratorAttribute(priority={Priority}): m_priority → {M_priority}", priority, m_priority);
+			value.LogDebug("ConfiguratorAttribute(priority={Priority}): this.m_priority → {Arg1}", priority, this.m_priority);
+			value.LogDebug("<<< Exiting ConfiguratorAttribute(priority={Priority})", priority);
         }
 
         /// <summary>
@@ -87,6 +91,7 @@ namespace log4net.Config
         /// </remarks>
         public int CompareTo(object obj)
         {
+			value.LogDebug(">>> Entering CompareTo(obj={Obj})", obj);
             // Reference equals
             if ((object)this == obj)
             {
@@ -94,6 +99,7 @@ namespace log4net.Config
             }
 
             int result = -1;
+			value.LogDebug("CompareTo(obj={Obj}): result → {Result}", obj, result);
 
             ConfiguratorAttribute target = obj as ConfiguratorAttribute;
             if (target != null)
@@ -106,6 +112,7 @@ namespace log4net.Config
                     result = -1;
                 }
             }
+			value.LogDebug("<<< Exiting CompareTo(obj={Obj})", obj);
             return result;
         }
     }

@@ -24,9 +24,14 @@ namespace DotNetNuke.Common.Utilities
         [DnnDeprecated(10, 0, 2, "Use overload taking IHostSettings")]
         public static partial string ComputeValidationCode(IList<object> parameters)
         {
+			Logger.LogDebug(">>> Entering ComputeValidationCode(parameters={Parameters})", parameters);
             using var scope = Globals.GetOrCreateServiceScope();
             var cryptographyProvider = scope.ServiceProvider.GetRequiredService<ICryptographyProvider>();
+			Logger.LogDebug("ComputeValidationCode(parameters={Parameters}): cryptographyProvider → {CryptographyProvider}", parameters, cryptographyProvider);
             var hostSettings = scope.ServiceProvider.GetRequiredService<IHostSettings>();
+			Logger.LogDebug("ComputeValidationCode(parameters={Parameters}): hostSettings → {HostSettings}", parameters, hostSettings);
+			Logger.LogDebug("ComputeValidationCode(parameters={Parameters}): scope → {Scope}", parameters, scope);
+			Logger.LogDebug("<<< Exiting ComputeValidationCode(parameters={Parameters})", parameters);
             return ComputeValidationCode(cryptographyProvider, hostSettings, parameters);
         }
 
@@ -49,6 +54,7 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The validation code.</returns>
         public static string ComputeValidationCode(ICryptographyProvider cryptographyProvider, IHostSettings hostSettings, IList<object> parameters)
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ValidationUtils));
             if (parameters != null && parameters.Any())
             {
                 var checkString = string.Join("_", parameters.Select(p =>

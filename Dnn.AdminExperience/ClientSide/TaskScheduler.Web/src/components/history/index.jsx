@@ -9,6 +9,7 @@ import "./style.less";
 import { Pager } from "@dnnsoftware/dnn-react-common";
 import resx from "../../resources";
 import HistoryIcon from "./../svg/history.svg";
+const logger = console;
 
 let pageSizeOptions = [];
 let tableFields = [];
@@ -16,6 +17,7 @@ let tableFields = [];
 class HistoryPanelBody extends Component {
     constructor(props) {
         super();
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             taskHistoryList: [],
             scheduleId: -1,
@@ -23,9 +25,11 @@ class HistoryPanelBody extends Component {
             pageSize: props.pageSize ? props.pageSize : 10,
             totalCount: 0
         };
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {props, state} = this;
         props.dispatch(TaskActions.getScheduleItemHistory({ scheduleId: props.scheduleId, pageIndex: state.pageIndex, pageSize: state.pageSize }));
 
@@ -42,14 +46,18 @@ class HistoryPanelBody extends Component {
         pageSizeOptions.push({ "value": "50", "label": "50 entries per page" });
         pageSizeOptions.push({ "value": "100", "label": "100 entries per page" });
         pageSizeOptions.push({ "value": "250", "label": "250 entries per page" });
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     onEnter(key) {
+		logger.debug(`>>> Entering onEnter(key=${key})`);
         const { state } = this;
         alert("You pressed enter! My value is: " + state[key]);
+		logger.debug(`<<< Exiting onEnter(key=${key})`);
     }
 
     onPageChange(currentPage, pageSize) {
+		logger.debug(`>>> Entering onPageChange(currentPage=${currentPage},pageSize=${pageSize})`);
         let {state, props} = this;
         if (pageSize !== undefined && state.pageSize !== pageSize) {
             state.pageSize = pageSize;
@@ -60,9 +68,12 @@ class HistoryPanelBody extends Component {
         }, () => {
             props.dispatch(TaskActions.getScheduleItemHistory({ scheduleId: props.scheduleId, pageIndex: state.pageIndex, pageSize: state.pageSize }));
         });
+		logger.debug(`onPageChange(currentPage=${currentPage},pageSize=${pageSize}): state.pageSize → ${state.pageSize}`);
+		logger.debug(`<<< Exiting onPageChange(currentPage=${currentPage},pageSize=${pageSize})`);
     }
 
     renderedHistoryListHeader() {
+		logger.debug('>>> Entering renderedHistoryListHeader()');
         let tableHeaders = tableFields.map((field, index) => {
             let className = "historyHeader historyHeader-" + field.id;
             return <div className={className} key={"historyHeader-" + index}>
@@ -70,11 +81,15 @@ class HistoryPanelBody extends Component {
             </div>;
         });
 
+		logger.debug(`renderedHistoryListHeader(): tableHeaders → ${tableHeaders}`);
+		logger.debug('<<< Exiting renderedHistoryListHeader()');
         return <div className="historyHeader-wrapper">{tableHeaders}</div>;
     }
 
     renderPager() {
+		logger.debug('>>> Entering renderPager()');
         const {props, state} = this;
+		logger.debug('<<< Exiting renderPager()');
         return (
             <div className="taskHistoryList-pager">
                 <Pager
@@ -95,8 +110,10 @@ class HistoryPanelBody extends Component {
 
 
     renderedHistoryList() {
+		logger.debug('>>> Entering renderedHistoryList()');
         const {props} = this;
         if (props.taskHistoryList) {
+			logger.debug('<<< Exiting renderedHistoryList()');
             return props.taskHistoryList.map((term, index) => {
                 return (
                     <TaskHistoryItemRow
@@ -118,7 +135,9 @@ class HistoryPanelBody extends Component {
 
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 <div className="historyIcon"><HistoryIcon /></div>
@@ -144,6 +163,8 @@ HistoryPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         taskHistoryList: state.task.taskHistoryList,
         tabIndex: state.pagination.tabIndex,

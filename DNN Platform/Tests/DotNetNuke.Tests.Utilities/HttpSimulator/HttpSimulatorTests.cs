@@ -12,13 +12,16 @@ namespace UnitTests.Subtext
 
     using DotNetNuke.Tests.Instance.Utilities.HttpSimulator;
     using NUnit.Framework;
+	using Microsoft.Extensions.Logging;
 
     ////[TestFixture]
     public class HttpSimulatorTests
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         ////[Test]
         public void CanGetSetSession()
         {
+			_logger.LogDebug(">>> Entering CanGetSetSession()");
             using (new HttpSimulator("/", @"c:\inetpub\").SimulateRequest())
             {
                 HttpContext.Current.Session["Test"] = "Success";
@@ -29,6 +32,7 @@ namespace UnitTests.Subtext
         ////[Test]
         public void CanGetSetApplicationVariables()
         {
+			_logger.LogDebug(">>> Entering CanGetSetApplicationVariables()");
             using (new HttpSimulator("/", @"c:\inetpub\").SimulateRequest())
             {
                 HttpContext.Current.Application["Test"] = "Success";
@@ -39,6 +43,7 @@ namespace UnitTests.Subtext
         ////[Test]
         public void TestHttpHandlerWritesCorrectResponse()
         {
+			_logger.LogDebug(">>> Entering TestHttpHandlerWritesCorrectResponse()");
             using (var simulator = new HttpSimulator("/", @"c:\inetpub\"))
             {
                 simulator.SetFormVariable("username", "phil")
@@ -57,6 +62,7 @@ namespace UnitTests.Subtext
         ////[Test]
         public void CanDispose()
         {
+			_logger.LogDebug(">>> Entering CanDispose()");
             using (var simulator = new HttpSimulator())
             {
                 simulator.SimulateRequest();
@@ -64,6 +70,7 @@ namespace UnitTests.Subtext
             }
 
             Assert.That(HttpContext.Current, Is.Null);
+			_logger.LogDebug("<<< Exiting CanDispose()");
         }
 
         /*//[RowTest]
@@ -87,6 +94,7 @@ namespace UnitTests.Subtext
                 Assert.That(HttpRuntime.AppDomainAppVirtualPath, Is.EqualTo(expectedAppPath));
                 Assert.That(HostingEnvironment.ApplicationVirtualPath, Is.EqualTo(expectedAppPath));
             }
+			_logger.LogDebug("<<< Exiting CanSetApplicationPathCorrectly(url={Url},appPath={AppPath},expectedAppPath={ExpectedAppPath})", url, appPath, expectedAppPath);
         }
 
         /*//[RowTest]
@@ -107,13 +115,16 @@ namespace UnitTests.Subtext
                 Assert.That(HostingEnvironment.ApplicationPhysicalPath, Is.EqualTo(expectedPhysicalAppPath));
                 Assert.That(HttpContext.Current.Request.PhysicalPath, Is.EqualTo(expectedPhysicalPath));
             }
+			_logger.LogDebug("<<< Exiting CanSetAppPhysicalPathCorrectly(url={Url},appPath={AppPath},appPhysicalPath={AppPhysicalPath},expectedPhysicalAppPath={ExpectedPhysicalAppPath},expectedPhysicalPath={ExpectedPhysicalPath})", url, appPath, appPhysicalPath, expectedPhysicalAppPath, expectedPhysicalPath);
         }
 
         ////[Test]
         public void CanGetQueryString()
         {
+			_logger.LogDebug(">>> Entering CanGetQueryString()");
             var simulator = new HttpSimulator();
             simulator.SimulateRequest(new Uri("http://localhost/Test.aspx?param1=value1&param2=value2&param3=value3"));
+			_logger.LogDebug("CanGetQueryString(): simulator → {Simulator}", simulator);
             for (var i = 1; i <= 3; i++)
             {
                 Assert.That(HttpContext.Current.Request.QueryString["param" + i], Is.EqualTo("value" + i), $"Could not find query string field 'param{i}'");
@@ -146,11 +157,13 @@ namespace UnitTests.Subtext
                 Assert.That(HttpContext.Current.Request.QueryString, Has.Count.EqualTo(1));
             }
             Assert.That(HttpContext.Current.Request.QueryString["param-name"], Is.Null);
+			_logger.LogDebug("<<< Exiting CanGetQueryString()");
         }
 
         // //[Test]
         public void CanSimulateFormPost()
         {
+			_logger.LogDebug(">>> Entering CanSimulateFormPost()");
             using (var simulator = new HttpSimulator())
             {
                 var form = new NameValueCollection { { "Test1", "Value1" }, { "Test2", "Value2" } };
@@ -175,28 +188,35 @@ namespace UnitTests.Subtext
                     Assert.That(HttpContext.Current.Request.Form["Test2"], Is.EqualTo("Value2"));
                 }
             }
+			_logger.LogDebug("<<< Exiting CanSimulateFormPost()");
         }
 
         // //[Test]
         public void CanGetResponse()
         {
+			_logger.LogDebug(">>> Entering CanGetResponse()");
             var simulator = new HttpSimulator();
             simulator.SimulateRequest();
+			_logger.LogDebug("CanGetResponse(): simulator → {Simulator}", simulator);
             HttpContext.Current.Response.Write("Hello World!");
             HttpContext.Current.Response.Flush();
             Assert.That(simulator.ResponseText, Is.EqualTo("Hello World!"));
+			_logger.LogDebug("<<< Exiting CanGetResponse()");
         }
 
         // //[Test]
         public void CanGetReferer()
         {
+			_logger.LogDebug(">>> Entering CanGetReferer()");
             var simulator = new HttpSimulator();
             simulator.SetReferer(new Uri("http://example.com/Blah.aspx")).SimulateRequest();
+			_logger.LogDebug("CanGetReferer(): simulator → {Simulator}", simulator);
             Assert.That(HttpContext.Current.Request.UrlReferrer, Is.EqualTo(new Uri("http://example.com/Blah.aspx")));
 
             simulator = new HttpSimulator();
             simulator.SimulateRequest().SetReferer(new Uri("http://x.example.com/Blah.aspx"));
             Assert.That(HttpContext.Current.Request.UrlReferrer, Is.EqualTo(new Uri("http://x.example.com/Blah.aspx")));
+			_logger.LogDebug("<<< Exiting CanGetReferer()");
         }
 
         /*//[RowTest]
@@ -214,6 +234,7 @@ namespace UnitTests.Subtext
                 Assert.That(simulator.ApplicationPath, Is.EqualTo(expectedAppPath));
                 Assert.That(simulator.PhysicalApplicationPath, Is.EqualTo(expectedAppDomainAppPath));
             }
+			_logger.LogDebug("<<< Exiting CanParseRequestUrl(url={Url},appPath={AppPath},physicalPath={PhysicalPath},expectedHost={ExpectedHost},expectedPort={ExpectedPort},expectedAppPath={ExpectedAppPath},expectedPage={ExpectedPage},expectedAppDomainAppPath={ExpectedAppDomainAppPath})", url, appPath, physicalPath, expectedHost, expectedPort, expectedAppPath, expectedPage, expectedAppDomainAppPath);
         }
 
         // [RowTest]
@@ -249,6 +270,7 @@ namespace UnitTests.Subtext
                 Assert.That(HttpContext.Current.Request.PhysicalApplicationPath, Is.EqualTo(expectedPhysicalPath));
                 Assert.That(HttpContext.Current.Request.Url.LocalPath, Is.EqualTo(expectedLocalPath));
             }
+			_logger.LogDebug("<<< Exiting CanSimulateRequest(url={Url},appPath={AppPath},physicalPath={PhysicalPath},expectedHost={ExpectedHost},expectedPort={ExpectedPort},expectedAppPath={ExpectedAppPath},expectedLocalPath={ExpectedLocalPath},expectedPhysicalPath={ExpectedPhysicalPath})", url, appPath, physicalPath, expectedHost, expectedPort, expectedAppPath, expectedLocalPath, expectedPhysicalPath);
         }
 
         // [RowTest]
@@ -259,6 +281,7 @@ namespace UnitTests.Subtext
         ////[Row("/Test/", "/Test", @"c:\inetpub\wwwroot\")]
         public void CanMapPath(string virtualPath, string appPath, string expectedMapPath)
         {
+			_logger.LogDebug(">>> Entering CanMapPath(virtualPath={VirtualPath},appPath={AppPath},expectedMapPath={ExpectedMapPath})", virtualPath, appPath, expectedMapPath);
             var url = new Uri("http://localhost/Test/Test.aspx");
             var simulator = new HttpSimulator(appPath, @"c:\inetpub\wwwroot\");
             simulator.SimulateRequest(url);
@@ -285,8 +308,18 @@ namespace UnitTests.Subtext
 
             var mappedPath = ReflectionHelper.InvokeNonPublicMethod<string>(environment, "MapPathActual", vpath, false);
             Console.WriteLine("MAPPED: " + mappedPath);
+			_logger.LogDebug("<<< Exiting CanMapPath(virtualPath={VirtualPath},appPath={AppPath},expectedMapPath={ExpectedMapPath})", virtualPath, appPath, expectedMapPath);
             Assert.That(HttpContext.Current.Request.MapPath(virtualPath), Is.EqualTo(expectedMapPath));
         }
+		_logger.LogDebug("CanMapPath(virtualPath={VirtualPath},appPath={AppPath},expectedMapPath={ExpectedMapPath}): appVirtPath → {AppVirtPath}", virtualPath, appPath, expectedMapPath, appVirtPath);
+		_logger.LogDebug("CanMapPath(virtualPath={VirtualPath},appPath={AppPath},expectedMapPath={ExpectedMapPath}): mapping → {Mapping}", virtualPath, appPath, expectedMapPath, mapping);
+		_logger.LogDebug("CanMapPath(virtualPath={VirtualPath},appPath={AppPath},expectedMapPath={ExpectedMapPath}): vpathString → {VpathString}", virtualPath, appPath, expectedMapPath, vpathString);
+		_logger.LogDebug("CanMapPath(virtualPath={VirtualPath},appPath={AppPath},expectedMapPath={ExpectedMapPath}): simulator → {Simulator}", virtualPath, appPath, expectedMapPath, simulator);
+		_logger.LogDebug("CanMapPath(virtualPath={VirtualPath},appPath={AppPath},expectedMapPath={ExpectedMapPath}): url → {Url}", virtualPath, appPath, expectedMapPath, url);
+		_logger.LogDebug("CanMapPath(virtualPath={VirtualPath},appPath={AppPath},expectedMapPath={ExpectedMapPath}): o → {O}", virtualPath, appPath, expectedMapPath, o);
+		_logger.LogDebug("CanMapPath(virtualPath={VirtualPath},appPath={AppPath},expectedMapPath={ExpectedMapPath}): mappedPath → {MappedPath}", virtualPath, appPath, expectedMapPath, mappedPath);
+		_logger.LogDebug("CanMapPath(virtualPath={VirtualPath},appPath={AppPath},expectedMapPath={ExpectedMapPath}): environment → {Environment}", virtualPath, appPath, expectedMapPath, environment);
+		_logger.LogDebug("CanMapPath(virtualPath={VirtualPath},appPath={AppPath},expectedMapPath={ExpectedMapPath}): vpath → {Vpath}", virtualPath, appPath, expectedMapPath, vpath);
 
         // [Test]
         public void CanInstantiateVirtualPath()
@@ -294,6 +327,8 @@ namespace UnitTests.Subtext
             var virtualPathType = Type.GetType("System.Web.VirtualPath, System.Web, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", true);
             var constructor = virtualPathType.GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(string) }, null);
             Assert.That(constructor, Is.Not.Null);
+			_logger.LogDebug(">>> Entering CanInstantiateVirtualPath()");
+			_logger.LogDebug("<<< Exiting CanInstantiateVirtualPath()");
         }
 
         // [Test]
@@ -301,8 +336,11 @@ namespace UnitTests.Subtext
         {
             var environment = HttpSimulatorTester.CallGetEnvironment();
             Assert.That(environment, Is.Not.Null);
+			_logger.LogDebug(">>> Entering CanGetHostingEnvironment()");
             environment = HttpSimulatorTester.CallGetEnvironment();
+			_logger.LogDebug("CanGetHostingEnvironment(): environment → {Environment}", environment);
             Assert.That(environment, Is.Not.Null);
+			_logger.LogDebug("<<< Exiting CanGetHostingEnvironment()");
         }
 
         // [RowTest]
@@ -318,12 +356,15 @@ namespace UnitTests.Subtext
         ////[Row("/////test///test////", "/test/test")]
         public void CanNormalizeSlashes(string s, string expected)
         {
+			_logger.LogDebug(">>> Entering CanNormalizeSlashes(s={S},expected={Expected})", s, expected);
             Assert.That(HttpSimulatorTester.CallNormalizeSlashes(s), Is.EqualTo(expected));
+			_logger.LogDebug("<<< Exiting CanNormalizeSlashes(s={S},expected={Expected})", s, expected);
         }
 
         // [Test]
         public void CanStripTrailing()
         {
+			_logger.LogDebug(">>> Entering CanStripTrailing()");
             Assert.That(HttpSimulatorTester.CallStripTrailingBackSlashes(@"c:\blah\blah2\"), Is.EqualTo(@"c:\blah\blah2"));
         }
 
@@ -336,19 +377,25 @@ namespace UnitTests.Subtext
 
             public void ProcessRequest(HttpContext context)
             {
+				_logger.LogDebug(">>> Entering ProcessRequest(context={Context})", context);
                 var physicalPath = context.Request.MapPath("/MyHandler.ashx");
                 var username = context.Request.Form["username"];
+				_logger.LogDebug("ProcessRequest(context={Context}): username → {Username}", context, username);
                 var id = context.Request.QueryString["id"];
+				_logger.LogDebug("ProcessRequest(context={Context}): id → {Id}", context, id);
+				_logger.LogDebug("ProcessRequest(context={Context}): physicalPath → {PhysicalPath}", context, physicalPath);
                 if (context.Request.UrlReferrer == null)
                 {
                     return;
                 }
 
                 var referer = context.Request.UrlReferrer.ToString();
+				_logger.LogDebug("ProcessRequest(context={Context}): referer → {Referer}", context, referer);
 
                 // Imagine, if you will, a bunch of complex interesting
                 // and fascinating logic here.
                 context.Response.Write(physicalPath + ":" + username + ":" + id + ":" + referer);
+				_logger.LogDebug("<<< Exiting ProcessRequest(context={Context})", context);
             }
         }
     }
@@ -357,16 +404,22 @@ namespace UnitTests.Subtext
     {
         public static string CallNormalizeSlashes(string s)
         {
+			_logger.LogDebug(">>> Entering CallNormalizeSlashes(s={S})", s);
+			_logger.LogDebug("<<< Exiting CallNormalizeSlashes(s={S})", s);
             return NormalizeSlashes(s);
         }
 
         public static string CallStripTrailingBackSlashes(string s)
         {
+			_logger.LogDebug(">>> Entering CallStripTrailingBackSlashes(s={S})", s);
+			_logger.LogDebug("<<< Exiting CallStripTrailingBackSlashes(s={S})", s);
             return StripTrailingBackSlashes(s);
         }
 
         public static HostingEnvironment CallGetEnvironment()
         {
+			_logger.LogDebug(">>> Entering CallGetEnvironment()");
+			_logger.LogDebug("<<< Exiting CallGetEnvironment()");
             return GetHostingEnvironment();
         }
     }

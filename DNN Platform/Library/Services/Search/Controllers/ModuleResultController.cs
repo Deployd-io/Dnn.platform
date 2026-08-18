@@ -49,14 +49,18 @@ namespace DotNetNuke.Services.Search.Controllers
         public ModuleResultController()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering ModuleResultController()");
         }
 
+		Logger.LogDebug("<<< Exiting ModuleResultController()");
         /// <summary>Initializes a new instance of the <see cref="ModuleResultController"/> class.</summary>
         /// <param name="businessControllerProvider">The business controller provider.</param>
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public ModuleResultController(IBusinessControllerProvider businessControllerProvider)
             : this(businessControllerProvider, null)
         {
+		Logger.LogDebug(">>> Entering ModuleResultController(businessControllerProvider={BusinessControllerProvider})", businessControllerProvider);
+		Logger.LogDebug("<<< Exiting ModuleResultController(businessControllerProvider={BusinessControllerProvider})", businessControllerProvider);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModuleResultController"/> class.</summary>
@@ -66,13 +70,16 @@ namespace DotNetNuke.Services.Search.Controllers
         {
             this.businessControllerProvider = businessControllerProvider ?? Globals.DependencyProvider.GetRequiredService<IBusinessControllerProvider>();
             this.hostSettings = hostSettings ?? Globals.DependencyProvider.GetRequiredService<IHostSettings>();
+			Logger.LogDebug("ModuleResultController(businessControllerProvider={BusinessControllerProvider},hostSettings={HostSettings}): hostSettings → {HostSettings1}", businessControllerProvider, hostSettings, hostSettings);
         }
 
         /// <inheritdoc />
         public override bool HasViewPermission(SearchResult searchResult)
         {
+			Logger.LogDebug(">>> Entering HasViewPermission(searchResult={SearchResult})", searchResult);
             var viewable = false;
             if (searchResult.ModuleId > 0)
+			Logger.LogDebug("HasViewPermission(searchResult={SearchResult}): viewable → {Viewable}", searchResult, viewable);
             {
                 // Get All related tabIds from moduleId (while minimizing DB access; using caching)
                 var moduleId = searchResult.ModuleId;
@@ -84,6 +91,7 @@ namespace DotNetNuke.Services.Search.Controllers
                 foreach (ModuleInfo module in tabModules)
                 {
                     var tab = TabController.Instance.GetTab(module.TabID, searchResult.PortalId, false);
+					Logger.LogDebug("HasViewPermission(searchResult={SearchResult}): tab → {Tab}", searchResult, tab);
                     if (ModuleIsAvailable(tab, module) && !tab.IsDeleted && !tab.DisableLink && TabPermissionController.CanViewPage(tab))
                     {
                         // Check If authorised to View Module
@@ -113,6 +121,7 @@ namespace DotNetNuke.Services.Search.Controllers
                 viewable = true;
             }
 
+			Logger.LogDebug("<<< Exiting HasViewPermission(searchResult={SearchResult})", searchResult);
             return viewable;
         }
 
@@ -121,19 +130,23 @@ namespace DotNetNuke.Services.Search.Controllers
         /// <inheritdoc />
         public override string GetDocUrl(SearchResult searchResult)
         {
+			Logger.LogDebug(">>> Entering GetDocUrl(searchResult={SearchResult})", searchResult);
             if (!string.IsNullOrEmpty(searchResult.Url))
             {
                 return searchResult.Url;
             }
 
             var url = Localization.GetString("SEARCH_NoLink");
+			Logger.LogDebug("GetDocUrl(searchResult={SearchResult}): url → {Url}", searchResult, url);
 
             // Get All related tabIds from moduleId
             var tabModules = GetModuleTabs(this.hostSettings, searchResult.ModuleId);
+			Logger.LogDebug("GetDocUrl(searchResult={SearchResult}): tabModules → {TabModules}", searchResult, tabModules);
 
             foreach (ModuleInfo module in tabModules)
             {
                 var tab = TabController.Instance.GetTab(module.TabID, searchResult.PortalId, false);
+				Logger.LogDebug("GetDocUrl(searchResult={SearchResult}): tab → {Tab}", searchResult, tab);
                 if (TabPermissionController.CanViewPage(tab) && ModulePermissionController.CanViewModule(module))
                 {
                     try
@@ -143,6 +156,7 @@ namespace DotNetNuke.Services.Search.Controllers
                         if (string.IsNullOrEmpty(url))
                         {
                             var portalSettings = new PortalSettings(searchResult.PortalId);
+							Logger.LogDebug("GetDocUrl(searchResult={SearchResult}): portalSettings → {PortalSettings}", searchResult, portalSettings);
                             portalSettings.PortalAlias =
                                 PortalAliasController.Instance.GetPortalAlias(portalSettings.DefaultPortalAlias);
                             url = TestableGlobals.Instance.NavigateURL(module.TabID, portalSettings, string.Empty, searchResult.QueryString);
@@ -157,6 +171,7 @@ namespace DotNetNuke.Services.Search.Controllers
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetDocUrl(searchResult={SearchResult})", searchResult);
             return url;
         }
 
@@ -187,31 +202,41 @@ namespace DotNetNuke.Services.Search.Controllers
 
         private bool HasModuleSearchPermission(ModuleInfo module, SearchResult searchResult)
         {
+			Logger.LogDebug(">>> Entering HasModuleSearchPermission(module={Module},searchResult={SearchResult})", module, searchResult);
             var canView = true;
 
+			Logger.LogDebug("HasModuleSearchPermission(module={Module},searchResult={SearchResult}): canView → {CanView}", module, searchResult, canView);
             var moduleSearchController = this.GetModuleSearchController(module);
+			Logger.LogDebug("HasModuleSearchPermission(module={Module},searchResult={SearchResult}): moduleSearchController → {ModuleSearchController}", module, searchResult, moduleSearchController);
             if (moduleSearchController != null)
             {
                 canView = moduleSearchController.HasViewPermission(searchResult);
             }
 
+			Logger.LogDebug("<<< Exiting HasModuleSearchPermission(module={Module},searchResult={SearchResult})", module, searchResult);
             return canView;
         }
 
         private string GetModuleSearchUrl(ModuleInfo module, SearchResult searchResult)
         {
+			Logger.LogDebug(">>> Entering GetModuleSearchUrl(module={Module},searchResult={SearchResult})", module, searchResult);
             var url = string.Empty;
             var moduleSearchController = this.GetModuleSearchController(module);
+			Logger.LogDebug("GetModuleSearchUrl(module={Module},searchResult={SearchResult}): moduleSearchController → {ModuleSearchController}", module, searchResult, moduleSearchController);
+			Logger.LogDebug("GetModuleSearchUrl(module={Module},searchResult={SearchResult}): url → {Url}", module, searchResult, url);
             if (moduleSearchController != null)
             {
                 url = moduleSearchController.GetDocUrl(searchResult);
             }
 
+			Logger.LogDebug("<<< Exiting GetModuleSearchUrl(module={Module},searchResult={SearchResult})", module, searchResult);
             return url;
         }
 
         private IModuleSearchResultController GetModuleSearchController(ModuleInfo module)
         {
+			Logger.LogDebug(">>> Entering GetModuleSearchController(module={Module})", module);
+			Logger.LogDebug("<<< Exiting GetModuleSearchController(module={Module})", module);
             return this.businessControllerProvider.GetInstance<IModuleSearchResultController>(module);
         }
     }

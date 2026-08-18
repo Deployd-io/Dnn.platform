@@ -15,11 +15,15 @@ namespace Dnn.PersonaBar.Seo.Components
         /// <inheritdoc />
         public void UpdateParameters(MenuItem menuItem)
         {
+		eventLogger.LogDebug(">>> Entering UpdateParameters(menuItem={MenuItem})", menuItem);
+		eventLogger.LogDebug("<<< Exiting UpdateParameters(menuItem={MenuItem})", menuItem);
         }
 
         /// <inheritdoc />
         public bool Visible(MenuItem menuItem)
         {
+			eventLogger.LogDebug(">>> Entering Visible(menuItem={MenuItem})", menuItem);
+			eventLogger.LogDebug("<<< Exiting Visible(menuItem={MenuItem})", menuItem);
             return true;
         }
 

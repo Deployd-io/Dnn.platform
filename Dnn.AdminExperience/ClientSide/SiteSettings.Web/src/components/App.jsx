@@ -16,6 +16,7 @@ import EditLanguagePanel from "./editLanguagePanel";
 import SiteLanguageSelector from "./siteLanguageSelector";
 import utilities from "utils";
 import resx from "../resources";
+const logger = console;
 
 const Pages = {
     Default: 0,
@@ -30,6 +31,7 @@ const Pages = {
 class App extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             portalId: utilities.settings.portalId,
             cultureCode: utilities.settings.cultureCode,
@@ -39,13 +41,17 @@ class App extends Component {
             bodyShowing: true
         };
         this.changePortalId = this.changePortalId.bind(this);
+		logger.debug(`constructor(): this.state → ${this.state}`);
         this.changeCultureCode = this.changeCultureCode.bind(this);
         this.changePortalIdCultureCode = this.changePortalIdCultureCode.bind(this);
+		logger.debug('<<< Exiting constructor()');
     }
 
     backToReferrer(callback) {
+		logger.debug(`>>> Entering backToReferrer(callback=${callback})`);
         if (typeof callback === "function") {
             callback();
+			logger.debug(`<<< Exiting backToReferrer(callback=${callback})`);
         }
         this.setState({
             referrer: "",
@@ -63,6 +69,7 @@ class App extends Component {
         }, () => {
             props.dispatch(siteInfo.updatePortalId(portalId));
         });
+		logger.debug(`<<< Exiting changePortalId(portalId=${portalId})`);
     }
 
     changeCultureCode(cultureCode) {
@@ -76,6 +83,7 @@ class App extends Component {
                 cultureCode
             });
         });
+		logger.debug(`<<< Exiting changeCultureCode(cultureCode=${cultureCode})`);
     }
 
     changePortalIdCultureCode(portalId, cultureCode) {
@@ -88,6 +96,7 @@ class App extends Component {
             this.changePortalId(portalId);
         }
         else {
+			logger.debug(`<<< Exiting changePortalIdCultureCode(portalId=${portalId},cultureCode=${cultureCode})`);
             this.setState({
                 bodyShowing: false
             }, () => {
@@ -102,14 +111,17 @@ class App extends Component {
     }
 
     updateReferrerInfo(event) {
+		logger.debug(`>>> Entering updateReferrerInfo(event=${event})`);
         this.setState({
             referrer: event.referrer,
             referrerText: event.referrerText,
             backToReferrerFunc: this.backToReferrer.bind(this, event.backToReferrerFunc)
         });
+		logger.debug(`<<< Exiting updateReferrerInfo(event=${event})`);
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         // Listen for the event.
         document.addEventListener("portalIdChanged", (e) => {
             this.changePortalId(e.portalId);
@@ -125,20 +137,27 @@ class App extends Component {
             this.changePortalIdCultureCode(e.portalId, e.cultureCode);
             this.updateReferrerInfo(e);
         }, false);
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     openPersonaBarPage(pageNumber) {
+		logger.debug(`>>> Entering openPersonaBarPage(pageNumber=${pageNumber})`);
         const {props} = this;
         props.dispatch(VisiblePanelActions.selectPanel(pageNumber));
+		logger.debug(`<<< Exiting openPersonaBarPage(pageNumber=${pageNumber})`);
     }
 
     closePersonaBarPage() {
+		logger.debug('>>> Entering closePersonaBarPage()');
         const {props} = this;
         props.dispatch(VisiblePanelActions.selectPanel(Pages.Default));
+		logger.debug('<<< Exiting closePersonaBarPage()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <div className="siteSettings-app">
                 <SiteLanguageSelector
@@ -216,6 +235,8 @@ App.propTypes = {
 
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         selectedPage: state.visiblePanel.selectedPage,
         selectedPageVisibleIndex: state.visiblePanel.selectedPageVisibleIndex,

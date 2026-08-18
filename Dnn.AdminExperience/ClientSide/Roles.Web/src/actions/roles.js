@@ -1,12 +1,17 @@
 import {roles as ActionTypes}  from "../constants/actionTypes";
 import ApplicationService from "../services/applicationService";
 import util from "../utils";
+const logger = console;
 
 function errorCallback(message) {
+	logger.debug(`>>> Entering errorCallback(message=${message})`);
     util.utilities.notifyError(JSON.parse(message.responseText).Message, 5000);
+	logger.debug(`<<< Exiting errorCallback(message=${message})`);
 }
 const rolesActions = {
     getRoleGroupsList(reload, callback) {
+		logger.debug(`>>> Entering getRoleGroupsList(reload=${reload},callback=${callback})`);
+		logger.debug(`<<< Exiting getRoleGroupsList(reload=${reload},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getRoleGroups(reload, data => {
                 dispatch({
@@ -20,6 +25,8 @@ const rolesActions = {
         };
     },
     saveRoleGroup(group, callback) {
+		logger.debug(`>>> Entering saveRoleGroup(group=${group},callback=${callback})`);
+		logger.debug(`<<< Exiting saveRoleGroup(group=${group},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.saveRoleGroup(group, data => {
                 dispatch({
@@ -34,6 +41,8 @@ const rolesActions = {
         };
     },
     deleteRoleGroup(group, callback) {
+		logger.debug(`>>> Entering deleteRoleGroup(group=${group},callback=${callback})`);
+		logger.debug(`<<< Exiting deleteRoleGroup(group=${group},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.deleteRoleGroup(group, data => {
                 dispatch({
@@ -48,6 +57,8 @@ const rolesActions = {
         };
     },
     getRolesList(parameters, callback) {
+		logger.debug(`>>> Entering getRolesList(parameters=${parameters},callback=${callback})`);
+		logger.debug(`<<< Exiting getRolesList(parameters=${parameters},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getRoles(parameters, data => {
                 dispatch({
@@ -64,6 +75,8 @@ const rolesActions = {
         };
     },
     saveRole(currentGroupId, assignExistUsers, role, callback) {
+		logger.debug(`>>> Entering saveRole(currentGroupId=${currentGroupId},assignExistUsers=${assignExistUsers},role=${role},callback=${callback})`);
+		logger.debug(`<<< Exiting saveRole(currentGroupId=${currentGroupId},assignExistUsers=${assignExistUsers},role=${role},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.saveRole(assignExistUsers, role, data => {
                 dispatch({
@@ -78,6 +91,8 @@ const rolesActions = {
         };
     },
     deleteRole(role, callback) {
+		logger.debug(`>>> Entering deleteRole(role=${role},callback=${callback})`);
+		logger.debug(`<<< Exiting deleteRole(role=${role},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.deleteRole(role, data => {
                 dispatch({

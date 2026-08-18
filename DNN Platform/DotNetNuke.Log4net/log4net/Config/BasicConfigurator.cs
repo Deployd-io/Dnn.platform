@@ -73,6 +73,8 @@ namespace log4net.Config
         /// </remarks>
         private BasicConfigurator()
         {
+		value.LogDebug(">>> Entering BasicConfigurator()");
+		value.LogDebug("<<< Exiting BasicConfigurator()");
         }
 
 #if !NETSTANDARD1_3
@@ -90,6 +92,9 @@ namespace log4net.Config
         /// </remarks>
         public static ICollection Configure()
         {
+			value.LogDebug(">>> Entering Configure()");
+			value.LogDebug("<<< Exiting Configure()");
+			value.LogDebug("<<< Exiting Configure(appenders={Appenders})", appenders);
             return Configure(LogManager.GetRepository(Assembly.GetCallingAssembly()));
         }
 
@@ -220,6 +225,7 @@ namespace log4net.Config
             {
                 LogLog.Warn(declaringType, "BasicConfigurator: Repository [" + repository + "] does not support the BasicConfigurator");
             }
+			value.LogDebug("<<< Exiting InternalConfigure(repository={Repository},appenders={Appenders})", repository, appenders);
         }
     }
 }

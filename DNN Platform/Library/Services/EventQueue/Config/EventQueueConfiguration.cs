@@ -19,8 +19,10 @@ namespace DotNetNuke.Services.EventQueue.Config
         /// <summary>Initializes a new instance of the <see cref="EventQueueConfiguration"/> class.</summary>
         internal EventQueueConfiguration()
         {
+			Logger.LogDebug(">>> Entering EventQueueConfiguration()");
             this.PublishedEvents = new Dictionary<string, PublishedEvent>();
             this.EventQueueSubscribers = new Dictionary<string, SubscriberInfo>();
+			Logger.LogDebug("<<< Exiting EventQueueConfiguration()");
         }
 
         internal Dictionary<string, SubscriberInfo> EventQueueSubscribers { get; set; }
@@ -37,12 +39,15 @@ namespace DotNetNuke.Services.EventQueue.Config
             {
                 config.EventQueueSubscribers.Add(subscriber.ID, subscriber);
             }
+			Logger.LogDebug("<<< Exiting RegisterEventSubscription(config={Config},eventname={Eventname},subscriber={Subscriber})", config, eventname, subscriber);
         }
 
         internal static EventQueueConfiguration GetConfig()
         {
+			Logger.LogDebug(">>> Entering GetConfig()");
             var config = (EventQueueConfiguration)DataCache.GetCache("EventQueueConfig");
             if (config == null)
+			Logger.LogDebug("GetConfig(): config → {Config}", config);
             {
                 string filePath = Globals.HostMapPath + "EventQueue\\EventQueue.config";
                 if (File.Exists(filePath))
@@ -62,12 +67,14 @@ namespace DotNetNuke.Services.EventQueue.Config
                     config.PublishedEvents = new Dictionary<string, PublishedEvent>();
                     config.EventQueueSubscribers = new Dictionary<string, SubscriberInfo>();
                     var subscriber = new SubscriberInfo("DNN Core");
+					Logger.LogDebug("GetConfig(): subscriber → {Subscriber}", subscriber);
                     RegisterEventSubscription(config, "Application_Start", subscriber);
                     RegisterEventSubscription(config, "Application_Start_FirstRequest", subscriber);
                     SaveConfig(config, filePath);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetConfig()");
             return config;
         }
 
@@ -79,10 +86,12 @@ namespace DotNetNuke.Services.EventQueue.Config
 
             // Set back into Cache
             DataCache.SetCache("EventQueueConfig", config, new DNNCacheDependency(filePath));
+			Logger.LogDebug("<<< Exiting SaveConfig(config={Config},filePath={FilePath})", config, filePath);
         }
 
         private void Deserialize(string configXml)
         {
+			Logger.LogDebug(">>> Entering Deserialize(configXml={ConfigXml})", configXml);
             if (!string.IsNullOrEmpty(configXml))
             {
                 var xmlDoc = new XmlDocument { XmlResolver = null };
@@ -94,6 +103,7 @@ namespace DotNetNuke.Services.EventQueue.Config
                 foreach (XmlElement xmlItem in xmlDoc.SelectNodes("/EventQueueConfig/PublishedEvents/Event"))
                 {
                     var oPublishedEvent = new PublishedEvent();
+					Logger.LogDebug("Deserialize(configXml={ConfigXml}): oPublishedEvent → {OPublishedEvent}", configXml, oPublishedEvent);
                     oPublishedEvent.EventName = xmlItem.SelectSingleNode("EventName").InnerText;
                     oPublishedEvent.Subscribers = xmlItem.SelectSingleNode("Subscribers").InnerText;
                     this.PublishedEvents.Add(oPublishedEvent.EventName, oPublishedEvent);
@@ -102,6 +112,7 @@ namespace DotNetNuke.Services.EventQueue.Config
                 foreach (XmlElement xmlItem in xmlDoc.SelectNodes("/EventQueueConfig/EventQueueSubscribers/Subscriber"))
                 {
                     var oSubscriberInfo = new SubscriberInfo();
+					Logger.LogDebug("Deserialize(configXml={ConfigXml}): oSubscriberInfo → {OSubscriberInfo}", configXml, oSubscriberInfo);
                     oSubscriberInfo.ID = xmlItem.SelectSingleNode("ID").InnerText;
                     oSubscriberInfo.Name = xmlItem.SelectSingleNode("Name").InnerText;
                     oSubscriberInfo.Address = xmlItem.SelectSingleNode("Address").InnerText;
@@ -110,17 +121,25 @@ namespace DotNetNuke.Services.EventQueue.Config
                     this.EventQueueSubscribers.Add(oSubscriberInfo.ID, oSubscriberInfo);
                 }
             }
+			Logger.LogDebug("<<< Exiting Deserialize(configXml={ConfigXml})", configXml);
         }
 
         private string Serialize()
         {
+			Logger.LogDebug(">>> Entering Serialize()");
             var settings = new XmlWriterSettings();
             settings.ConformanceLevel = ConformanceLevel.Document;
+			Logger.LogDebug("Serialize(): settings.ConformanceLevel → {Arg0}", settings.ConformanceLevel);
+			Logger.LogDebug("Serialize(): settings.Indent → {Arg0}", settings.Indent);
+			Logger.LogDebug("Serialize(): settings.CloseOutput → {Arg0}", settings.CloseOutput);
+			Logger.LogDebug("Serialize(): settings.OmitXmlDeclaration → {Arg0}", settings.OmitXmlDeclaration);
+			Logger.LogDebug("Serialize(): settings → {Settings}", settings);
             settings.Indent = true;
             settings.CloseOutput = true;
             settings.OmitXmlDeclaration = false;
 
             var sb = new StringBuilder();
+			Logger.LogDebug("Serialize(): sb → {Sb}", sb);
 
             using (XmlWriter writer = XmlWriter.Create(sb, settings))
             {
@@ -129,6 +148,7 @@ namespace DotNetNuke.Services.EventQueue.Config
                 writer.WriteStartElement("PublishedEvents");
                 foreach (string key in this.PublishedEvents.Keys)
                 {
+					private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(EventQueueConfiguration));
                     writer.WriteStartElement("Event");
 
                     writer.WriteElementString("EventName", this.PublishedEvents[key].EventName);
@@ -158,6 +178,7 @@ namespace DotNetNuke.Services.EventQueue.Config
                 writer.WriteEndElement();
 
                 writer.Close();
+				Logger.LogDebug("<<< Exiting Serialize()");
                 return sb.ToString();
             }
         }

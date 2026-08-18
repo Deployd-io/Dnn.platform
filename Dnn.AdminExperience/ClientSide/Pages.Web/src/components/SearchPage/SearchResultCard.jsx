@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import Localization from "../../localization";
 import cloneDeep from "lodash/cloneDeep";
 import securityService from "../../services/securityService";
+const logger = console;
 import { TextOverflowWrapper, GridCell, SvgIcons } from "@dnnsoftware/dnn-react-common";
 
 
@@ -10,6 +11,8 @@ class SearchResultCard extends Component {
 
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     onNameClick(item) {
@@ -23,65 +26,84 @@ class SearchResultCard extends Component {
                 this.props.setEmptyStateMessage(Localization.get("NoPermissionEditPage"));
             }
         });
+		logger.debug(`<<< Exiting onNameClick(item=${item})`);
     }
 
     distinct(list) {
+		logger.debug(`>>> Entering distinct(list=${list})`);
         let distinctList = [];
         list.map((item) => {
             if (item.trim() !== "" && distinctList.indexOf(item.trim().toLowerCase()) === -1)
                 distinctList.push(item.trim().toLowerCase());
         });
+		logger.debug(`<<< Exiting distinct(list=${list})`);
         return distinctList;
     }
 
     addToTags(newTag) {
+		logger.debug(`>>> Entering addToTags(newTag=${newTag})`);
         if (this.props.tags.indexOf(newTag) === -1) {
             let tags = this.props.tags;
             tags = tags.length > 0 ? `${tags},${newTag}` : `${newTag}`;
             tags = this.distinct(tags.split(",")).join(",");
+			logger.debug(`addToTags(newTag=${newTag}): tags → ${tags}`);
             this.props.updateSearchAdvancedTags(tags);
             this.props.onSearch();
+			logger.debug(`<<< Exiting addToTags(newTag=${newTag})`);
         }
     }
 
     getTabPath(path) {
+		logger.debug(`>>> Entering getTabPath(path=${path})`);
         path = path.startsWith("/") ? path.substring(1) : path;
+		logger.debug(`getTabPath(path=${path}): path → ${path}`);
+		logger.debug(`<<< Exiting getTabPath(path=${path})`);
         return path.split("/").join(" / ");
     }
 
     handlePageType() {
+		logger.debug('>>> Entering handlePageType()');
         if (this.props.filterByPageType !== this.props.item.pageType) {
             this.props.updateFilterByPageTypeOptions({ value: this.props.item.pageType });
             this.props.onSearch();
+			logger.debug('<<< Exiting handlePageType()');
         }
     }
     
     handlePagePublishStatus() {
+		logger.debug('>>> Entering handlePagePublishStatus()');
         if (this.props.filterByPublishStatus !== this.props.item.publishStatus) {
             this.props.updateFilterByPageStatusOptions({value:this.props.item.publishStatus});
             this.props.onSearch();
+			logger.debug('<<< Exiting handlePagePublishStatus()');
         } 
     }
 
     handlePublishDate() {
+		logger.debug('>>> Entering handlePublishDate()');
         const publishedDate = new Date(this.props.item.publishDate.split(" ")[0]);
 
+		logger.debug(`handlePublishDate(): publishedDate → ${publishedDate}`);
         if (this.props.startDate.toString() !== new Date(this.props.item.publishDate.split(" ")[0]).toString()
             || this.props.startDate.toString() !== this.props.endDate.toString()) {
 
             this.props.updateFilterStartEndDate(publishedDate, publishedDate);
             this.props.onSearch();
+			logger.debug('<<< Exiting handlePublishDate()');
         }
     }
 
     handleWorkflow() {
+		logger.debug('>>> Entering handleWorkflow()');
         if (this.props.filterByWorkflow !== this.props.item.workflowId) {
             this.props.updateFilterByWorkflowOptions({ value: this.props.item.workflowId, name: this.props.item.workflowName});
             this.props.onSearch();  
+			logger.debug('<<< Exiting handleWorkflow()');
         } 
     }
 
     renderCustomComponent() {
+		logger.debug('>>> Entering renderCustomComponent()');
         const item = this.props.item;
         if (!this.thumbRendered && this.props.pageTypeSelectorComponents && this.props.pageTypeSelectorComponents.length > 0) { 
             return this.props.pageTypeSelectorComponents.map(function (component, index) {
@@ -90,15 +112,19 @@ class SearchResultCard extends Component {
             });
         }
         this.thumbRendered = true;                             
+		logger.debug(`renderCustomComponent(): this.thumbRendered → ${this.thumbRendered}`);
+		logger.debug('<<< Exiting renderCustomComponent()');
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         let visibleMenus = [];
         this.props.item.canViewPage && visibleMenus.push(<li key={"visible-menu-item-can-view-page"} onClick={() => this.props.onViewPage(this.props.item)}><div title={Localization.get("View")}><SvgIcons.EyeIcon /></div></li>);
         this.props.item.canAddContentToPage && visibleMenus.push(<li key={"visible-menu-item-can-add-content"} onClick={() => this.props.onViewEditPage(this.props.item)}><div title={Localization.get("Edit")}><SvgIcons.TreeEdit /></div></li>);
         if (this.props.pageInContextComponents && securityService.isSuperUser()) {
             let additionalMenus = cloneDeep(this.props.pageInContextComponents || []);
+			logger.debug(`render(): additionalMenus → ${additionalMenus}`);
             additionalMenus && additionalMenus.map((additionalMenu, index) => {
                 visibleMenus.push(<li key={"visible-menu-item-additinal-" + index} onClick={() => (additionalMenu.OnClickAction && typeof additionalMenu.OnClickAction === "function")
                     && this.props.CallCustomAction(additionalMenu.OnClickAction)}><div title={additionalMenu.title}><additionalMenu.icon /></div></li>);
@@ -106,7 +132,9 @@ class SearchResultCard extends Component {
         }
 
         const tabPath = this.getTabPath(this.props.item.tabpath);
+		logger.debug(`render(): tabPath → ${tabPath}`);
 
+		logger.debug('<<< Exiting render()');
         return (
             
             <GridCell columnSize={100}>

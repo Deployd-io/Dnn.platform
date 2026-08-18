@@ -21,11 +21,15 @@ namespace DotNetNuke.Modules.Groups.Components
         /// <param name="groupInfo">The group info.</param>
         public GroupItemTokenReplace(RoleInfo groupInfo)
         {
+			eventLogger.LogDebug(">>> Entering GroupItemTokenReplace(groupInfo=<redacted>)");
             this.AddPropertySource("groupitem", groupInfo);
+			eventLogger.LogDebug("<<< Exiting GroupItemTokenReplace(groupInfo=<redacted>)");
         }
 
         public string ReplaceGroupItemTokens(string source)
         {
+			eventLogger.LogDebug(">>> Entering ReplaceGroupItemTokens(source={Source})", source);
+			eventLogger.LogDebug("<<< Exiting ReplaceGroupItemTokens(source={Source})", source);
             return this.ReplaceTokens(source);
         }
     }

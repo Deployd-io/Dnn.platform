@@ -34,8 +34,10 @@ namespace DotNetNuke.Tests.Core.Services.GeneratedImage
         [TestCase("http://mysite.com.badactor.com/siteB/page", false)]
         public void UriBelongsToSite_MultipleScenarios(string uriString, bool expected)
         {
+			mockEventLogger.LogDebug(">>> Entering UriBelongsToSite_MultipleScenarios(uriString={UriString},expected={Expected})", uriString, expected);
             // Arrange
             var mockPortalAliasController = new Mock<IPortalAliasService>();
+			mockEventLogger.LogDebug("UriBelongsToSite_MultipleScenarios(uriString={UriString},expected={Expected}): mockPortalAliasController → {MockPortalAliasController}", uriString, expected, mockPortalAliasController);
             mockPortalAliasController
                 .Setup(controller => controller.GetPortalAliases())
                 .Returns(new Dictionary<string, IPortalAliasInfo>
@@ -45,13 +47,17 @@ namespace DotNetNuke.Tests.Core.Services.GeneratedImage
                 });
 
             var validator = new UriValidator(mockPortalAliasController.Object);
+			mockEventLogger.LogDebug("UriBelongsToSite_MultipleScenarios(uriString={UriString},expected={Expected}): validator → {Validator}", uriString, expected, validator);
 
             var testUri = new Uri(uriString);
+			mockEventLogger.LogDebug("UriBelongsToSite_MultipleScenarios(uriString={UriString},expected={Expected}): testUri → {TestUri}", uriString, expected, testUri);
 
             // Act
             var result = validator.UriBelongsToSite(testUri);
+			mockEventLogger.LogDebug("UriBelongsToSite_MultipleScenarios(uriString={UriString},expected={Expected}): result → {Result}", uriString, expected, result);
 
             Assert.That(result, Is.EqualTo(expected));
+			mockEventLogger.LogDebug("<<< Exiting UriBelongsToSite_MultipleScenarios(uriString={UriString},expected={Expected})", uriString, expected);
         }
     }
 }

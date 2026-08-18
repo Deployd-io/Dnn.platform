@@ -1,17 +1,21 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import "./style.less";
+const logger = console;
 import { Collapsible, Flag, SvgIcons } from "@dnnsoftware/dnn-react-common";
 
 class LanguageRow extends Component {
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
         this.setState({
             opened
         });
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     toggle(mode) {
+		logger.debug(`>>> Entering toggle(mode=${mode})`);
         if ((this.props.openId !== "" && this.props.id === this.props.openId)) {
             if (mode !== this.state.openedMode) {
                 this.props.OpenCollapse(this.props.id, mode);
@@ -21,6 +25,7 @@ class LanguageRow extends Component {
             }
         }
         else {
+			logger.debug(`<<< Exiting toggle(mode=${mode})`);
             this.props.OpenCollapse(this.props.id, mode);
             this.setState({
                 openedMode: mode
@@ -146,6 +151,7 @@ class LanguageRow extends Component {
     }
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         const isAddMode = props.openId === "add";
 
@@ -187,6 +193,7 @@ class LanguageRow extends Component {
             );
         }
         else {
+			logger.debug('<<< Exiting render()');
             return (
                 <div className={"collapsible-component-language" + (opened ? " row-opened" : "")}>
                     <div className={"collapsible-header-language " + !opened} >

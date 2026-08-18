@@ -9,6 +9,7 @@ namespace DotNetNuke.Entities.Tabs.TabVersions.Exceptions
     /// <summary>Exception to notify error about managing tab versions.</summary>
     public class DnnTabVersionException : ApplicationException
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnTabVersionException));
         /// <summary>
         /// Initializes a new instance of the <see cref="DnnTabVersionException"/> class.
         ///   Constructs an instance of <see cref = "ApplicationException" /> class with the specified message.
@@ -17,6 +18,8 @@ namespace DotNetNuke.Entities.Tabs.TabVersions.Exceptions
         public DnnTabVersionException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering DnnTabVersionException(message={Message})", message);
+		Logger.LogDebug("<<< Exiting DnnTabVersionException(message={Message})", message);
         }
 
         /// <summary>

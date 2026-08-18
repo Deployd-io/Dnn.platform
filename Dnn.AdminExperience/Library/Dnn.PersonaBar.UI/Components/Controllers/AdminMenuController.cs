@@ -29,6 +29,7 @@ namespace Dnn.PersonaBar.UI.Components.Controllers
     public class AdminMenuController(IApplicationStatusInfo appStatus, IHostSettings hostSettings)
         : ServiceLocator<IAdminMenuController, AdminMenuController>, IAdminMenuController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AdminMenuController));
         private readonly IApplicationStatusInfo appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
         private Dictionary<string, IList<string>> knownPages;
@@ -38,7 +39,9 @@ namespace Dnn.PersonaBar.UI.Components.Controllers
         public AdminMenuController()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering AdminMenuController()");
         }
+		Logger.LogDebug("<<< Exiting AdminMenuController()");
 
         /// <summary>Initializes a new instance of the <see cref="AdminMenuController"/> class.</summary>
         /// <param name="appStatus">The application status.</param>
@@ -51,6 +54,7 @@ namespace Dnn.PersonaBar.UI.Components.Controllers
         /// <inheritdoc />
         public void CreateLinkMenu(TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering CreateLinkMenu(tab={Tab})", tab);
             if (!this.ValidateTab(tab))
             {
                 return;
@@ -60,6 +64,7 @@ namespace Dnn.PersonaBar.UI.Components.Controllers
             var tabId = tab.TabID;
 
             var identifier = $"Link_{portalId}_{tabId}";
+			Logger.LogDebug("CreateLinkMenu(tab={Tab}): identifier → {Identifier}", tab, identifier);
             if (PersonaBarRepository.Instance.GetMenuItem(identifier) != null)
             {
                 return;
@@ -83,39 +88,49 @@ namespace Dnn.PersonaBar.UI.Components.Controllers
             if (!tab.IsSuperTab)
             {
                 var portal = PortalController.Instance.GetPortal(portalId);
+				Logger.LogDebug("CreateLinkMenu(tab={Tab}): portal → {Portal}", tab, portal);
                 PersonaBarRepository.Instance.SaveMenuDefaultPermissions(menuItem, portal.AdministratorRoleName);
             }
+			Logger.LogDebug("<<< Exiting CreateLinkMenu(tab={Tab})", tab);
         }
 
         /// <inheritdoc />
         public void DeleteLinkMenu(TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering DeleteLinkMenu(tab={Tab})", tab);
             var portalId = tab.PortalID;
             var tabId = tab.TabID;
 
             var identifier = $"Link_{portalId}_{tabId}";
+			Logger.LogDebug("DeleteLinkMenu(tab={Tab}): identifier → {Identifier}", tab, identifier);
 
             PersonaBarRepository.Instance.DeleteMenuItem(identifier);
+			Logger.LogDebug("<<< Exiting DeleteLinkMenu(tab={Tab})", tab);
         }
 
         /// <inheritdoc />
         protected override Func<IAdminMenuController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => Globals.DependencyProvider.GetRequiredService<IAdminMenuController>();
         }
 
         private bool ValidateTab(TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering ValidateTab(tab={Tab})", tab);
             if (tab.IsDeleted || tab.DisableLink || !tab.IsVisible)
             {
                 return false;
             }
 
             var type = tab.IsSuperTab ? "host" : "admin";
+			Logger.LogDebug("ValidateTab(tab={Tab}): type → {Type}", tab, type);
             var portalId = tab.PortalID;
             var tabName = tab.TabName;
 
             var knownPages = this.GetKnownPages(type);
+			Logger.LogDebug("ValidateTab(tab={Tab}): knownPages → {KnownPages}", tab, knownPages);
             if (knownPages.Contains(tabName, StringComparer.InvariantCultureIgnoreCase))
             {
                 return false;
@@ -124,11 +139,13 @@ namespace Dnn.PersonaBar.UI.Components.Controllers
             if (!tab.IsSuperTab)
             {
                 var adminPage = TabController.GetTabByTabPath(this.hostSettings, portalId, "//Admin", string.Empty);
+				Logger.LogDebug("ValidateTab(tab={Tab}): adminPage → {AdminPage}", tab, adminPage);
                 if (adminPage == Null.NullInteger)
                 {
                     return false;
                 }
 
+			Logger.LogDebug("<<< Exiting ValidateTab(tab={Tab})", tab);
                 return tab.ParentId == adminPage;
             }
 

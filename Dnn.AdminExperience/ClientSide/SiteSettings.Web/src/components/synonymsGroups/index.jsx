@@ -10,22 +10,27 @@ import { Dropdown, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import "./style.less";
 import util from "../../utils";
 import resx from "../../resources";
+const logger = console;
 
 let tableFields = [];
 
 class SynonymsGroupsPanel extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             synonymsGroups: undefined,
             openId: "",
             culture: ""
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     loadData() {
+		logger.debug('>>> Entering loadData()');
         const { props } = this;
         props.dispatch(SearchActions.getSynonymsGroups(props.portalId, props.cultureCode, (data) => {
+			logger.debug('<<< Exiting loadData()');
             this.setState({
                 synonymsGroups: Object.assign({}, data)
             });
@@ -33,6 +38,7 @@ class SynonymsGroupsPanel extends Component {
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const { props } = this;
 
         if (tableFields.length === 0) {
@@ -42,9 +48,11 @@ class SynonymsGroupsPanel extends Component {
         props.dispatch(SearchActions.getCultureList(props.portalId));
 
         this.loadData();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         const { props } = this;
 
         if (props.synonymsGroups) {
@@ -53,11 +61,13 @@ class SynonymsGroupsPanel extends Component {
 
             if (portalIdChanged || cultureCodeChanged) {
                 this.loadData();
+				logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
             }
         }
     }
 
     renderHeader() {
+		logger.debug('>>> Entering renderHeader()');
         if (this.props.synonymsGroups) {
             let tableHeaders = tableFields.map((field) => {
                 let className = "synonyms-items header-" + field.id;
@@ -66,10 +76,12 @@ class SynonymsGroupsPanel extends Component {
                 </div>;
             });
 
+			logger.debug(`renderHeader(): tableHeaders → ${tableHeaders}`);
             if (this.props.synonymsGroups.SynonymsGroups.length > 0) {
                 return <div className="header-row">{tableHeaders}</div>;                
             }
             else {
+				logger.debug('<<< Exiting renderHeader()');
                 return <div className="header-row-no-border">{tableHeaders}</div>;
             }
         }
@@ -156,6 +168,7 @@ class SynonymsGroupsPanel extends Component {
     }
 
     getCultureOptions() {
+		logger.debug('>>> Entering getCultureOptions()');
         const {props} = this;
         let options = [];
         if (props.cultures !== undefined) {
@@ -170,13 +183,16 @@ class SynonymsGroupsPanel extends Component {
                 };
             });
         }
+		logger.debug('<<< Exiting getCultureOptions()');
         return options;
     }
 
      
     renderedSynonymsGroups() {
+		logger.debug('>>> Entering renderedSynonymsGroups()');
         let i = 0;
         if (this.props.synonymsGroups) {
+			logger.debug('<<< Exiting renderedSynonymsGroups()');
             return this.props.synonymsGroups.SynonymsGroups.map((item, index) => {
                 let id = "row-" + i++;
                 return (
@@ -206,7 +222,9 @@ class SynonymsGroupsPanel extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         let opened = (this.state.openId === "add");
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 <div className="synonyms-group-items">
@@ -267,6 +285,8 @@ SynonymsGroupsPanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         synonymsGroups: state.search.synonymsGroups,
         cultures: state.search.cultures,

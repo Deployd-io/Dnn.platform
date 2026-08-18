@@ -22,8 +22,10 @@ namespace DotNetNuke.Modules.Groups
         public List()
             : this(null, null)
         {
+		eventLogger.LogDebug(">>> Entering List()");
         }
 
+		eventLogger.LogDebug("<<< Exiting List()");
         /// <summary>Initializes a new instance of the <see cref="List"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
         /// <param name="servicesFramework">The web API service framework.</param>
@@ -31,6 +33,7 @@ namespace DotNetNuke.Modules.Groups
         {
             this._navigationManager = navigationManager ?? this.DependencyProvider.GetRequiredService<INavigationManager>();
             this.servicesFramework = servicesFramework ?? this.DependencyProvider.GetRequiredService<IServicesFramework>();
+			eventLogger.LogDebug("List(navigationManager={NavigationManager},servicesFramework={ServicesFramework}): servicesFramework → {ServicesFramework1}", navigationManager, servicesFramework, servicesFramework);
         }
 
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
@@ -40,6 +43,7 @@ namespace DotNetNuke.Modules.Groups
 
         protected void Page_Load(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering Page_Load(sender={Sender},e={E})", sender, e);
             this.servicesFramework.RequestAjaxAntiForgerySupport();
 
             this.panelSearch.Visible = this.GroupListSearchEnabled;
@@ -72,6 +76,7 @@ namespace DotNetNuke.Modules.Groups
             {
                 this.txtFilter.Text = this.GroupListFilter;
             }
+			eventLogger.LogDebug("<<< Exiting Page_Load(sender={Sender},e={E})", sender, e);
         }
 
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
@@ -79,12 +84,14 @@ namespace DotNetNuke.Modules.Groups
         // ReSharper disable once InconsistentNaming
         protected void btnSearch_Click(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering btnSearch_Click(sender={Sender},e={E})", sender, e);
             if (!this.Page.IsValid)
             {
                 return;
             }
 
             this.Response.Redirect(this._navigationManager.NavigateURL(this.TabId, string.Empty, "filter=" + this.txtFilter.Text.Trim()));
+			eventLogger.LogDebug("<<< Exiting btnSearch_Click(sender={Sender},e={E})", sender, e);
         }
     }
 }

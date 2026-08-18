@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,10 +13,13 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("eiffel", function() {
   function wordObj(words) {
+	logger.debug(`>>> Entering wordObj(words=${words})`);
     var o = {};
     for (var i = 0, e = words.length; i < e; ++i) o[words[i]] = true;
+	logger.debug(`<<< Exiting wordObj(words=${words})`);
     return o;
   }
   var keywords = wordObj([
@@ -86,13 +91,17 @@ CodeMirror.defineMode("eiffel", function() {
   var operators = wordObj([":=", "and then","and", "or","<<",">>"]);
 
   function chain(newtok, stream, state) {
+	logger.debug(`>>> Entering chain(newtok=${newtok},stream=${stream},state=${state})`);
     state.tokenize.push(newtok);
+	logger.debug(`<<< Exiting chain(newtok=${newtok},stream=${stream},state=${state})`);
     return newtok(stream, state);
   }
 
   function tokenBase(stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
     if (stream.eatSpace()) return null;
     var ch = stream.next();
+	logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
     if (ch == '"'||ch == "'") {
       return chain(readQuoted(ch, "string"), stream, state);
     } else if (ch == "-"&&stream.eat("-")) {
@@ -112,6 +121,7 @@ CodeMirror.defineMode("eiffel", function() {
       stream.eatWhile(/[=+\-\/*^%<>~]/);
       return "operator";
     } else {
+	logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
       return null;
     }
   }
@@ -132,13 +142,18 @@ CodeMirror.defineMode("eiffel", function() {
 
   return {
     startState: function() {
+	logger.debug('>>> Entering startState()');
+	logger.debug('<<< Exiting startState()');
       return {tokenize: [tokenBase]};
     },
 
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       var style = state.tokenize[state.tokenize.length-1](stream, state);
       if (style == "ident") {
+		logger.debug(`token(stream=${stream},state=${state}): style → ${style}`);
         var word = stream.current();
+		logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
         style = keywords.propertyIsEnumerable(stream.current()) ? "keyword"
           : operators.propertyIsEnumerable(stream.current()) ? "operator"
           : /^[A-Z][A-Z_0-9]*$/g.test(word) ? "tag"
@@ -149,6 +164,7 @@ CodeMirror.defineMode("eiffel", function() {
           : /^[0-9]+$/g.test(word) ? "number"
           : "variable";
       }
+	logger.debug(`token(stream=${stream},state=${state}): word → ${word}`);
       return style;
     },
     lineComment: "--"

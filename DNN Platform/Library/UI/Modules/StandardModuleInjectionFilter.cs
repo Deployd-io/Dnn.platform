@@ -12,9 +12,12 @@ namespace DotNetNuke.UI.Modules
 
     public class StandardModuleInjectionFilter : IModuleInjectionFilter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(StandardModuleInjectionFilter));
         /// <inheritdoc />
         public bool CanInjectModule(ModuleInfo module, PortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering CanInjectModule(module={Module},portalSettings={PortalSettings})", module, portalSettings);
+			Logger.LogDebug("<<< Exiting CanInjectModule(module={Module},portalSettings={PortalSettings})", module, portalSettings);
             return ModulePermissionController.CanViewModule(module)
                     && module.IsDeleted == false
                     && ((module.StartDate < DateTime.Now && module.EndDate > DateTime.Now)

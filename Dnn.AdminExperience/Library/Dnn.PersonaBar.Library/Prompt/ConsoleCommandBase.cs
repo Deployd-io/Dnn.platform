@@ -19,6 +19,7 @@ namespace Dnn.PersonaBar.Library.Prompt
     [DnnDeprecated(9, 7, 0, "Moved to DotNetNuke.Prompt in the core library project")]
     public abstract partial class ConsoleCommandBase : IConsoleCommand
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ConsoleCommandBase));
         /// <inheritdoc />
         public abstract string LocalResourceFile { get; }
 
@@ -51,8 +52,10 @@ namespace Dnn.PersonaBar.Library.Prompt
         /// <returns>The flag value or <paramref name="defaultVal"/>.</returns>
         public virtual T GetFlagValue<T>(string flag, string fieldName, T defaultVal, bool required = false, bool checkmain = false, bool checkpositive = false)
         {
+			Logger.LogDebug(">>> Entering GetFlagValue(flag={Flag},fieldName={FieldName},defaultVal={DefaultVal},required={Required},checkmain={Checkmain},checkpositive={Checkpositive})", flag, fieldName, defaultVal, required, checkmain, checkpositive);
             const string resourceFile = "~/DesktopModules/admin/Dnn.PersonaBar/App_LocalResources/SharedResources.resx";
             dynamic value = null;
+			Logger.LogDebug("GetFlagValue(flag={Flag},fieldName={FieldName},defaultVal={DefaultVal},required={Required},checkmain={Checkmain},checkpositive={Checkpositive}): value → {Value}", flag, fieldName, defaultVal, required, checkmain, checkpositive, value);
             try
             {
                 if (this.HasFlag(flag))
@@ -71,6 +74,7 @@ namespace Dnn.PersonaBar.Library.Prompt
                     if (checkmain && this.Args.Length >= 2 && !this.IsFlag(this.Args[1]))
                     {
                         var tc = TypeDescriptor.GetConverter(typeof(T));
+						Logger.LogDebug("GetFlagValue(flag={Flag},fieldName={FieldName},defaultVal={DefaultVal},required={Required},checkmain={Checkmain},checkpositive={Checkpositive}): tc → {Tc}", flag, fieldName, defaultVal, required, checkmain, checkpositive, tc);
                         value = tc.ConvertFrom(this.Args[1]);
                     }
                     else if (!required)
@@ -87,6 +91,7 @@ namespace Dnn.PersonaBar.Library.Prompt
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in GetFlagValue(flag={Flag},fieldName={FieldName},defaultVal={DefaultVal},required={Required},checkmain={Checkmain},checkpositive={Checkpositive}): {Arg6}", flag, fieldName, defaultVal, required, checkmain, checkpositive, Exception.Message);
                 this.ValidationMessage +=
                     Localization.GetString("Prompt_InvalidType", resourceFile)?
                         .Replace("[0]", fieldName)
@@ -100,24 +105,33 @@ namespace Dnn.PersonaBar.Library.Prompt
                 this.ValidationMessage += Localization.GetString("Promp_PositiveValueRequired", resourceFile)?.Replace("[0]", fieldName);
             }
 
+			Logger.LogDebug("<<< Exiting GetFlagValue(flag={Flag},fieldName={FieldName},defaultVal={DefaultVal},required={Required},checkmain={Checkmain},checkpositive={Checkpositive})", flag, fieldName, defaultVal, required, checkmain, checkpositive);
             return value ?? defaultVal;
         }
 
         public virtual void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+		Logger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
+		Logger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public void Initialize(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.Args = args;
             this.PortalSettings = portalSettings;
+			Logger.LogDebug("Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): this.Args → {Arg4}", args, portalSettings, userInfo, activeTabId, this.Args);
+			Logger.LogDebug("Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): this.PortalSettings → {Arg4}", args, portalSettings, userInfo, activeTabId, this.PortalSettings);
             this.User = userInfo;
             this.PortalId = portalSettings.PortalId;
             this.TabId = activeTabId;
+			Logger.LogDebug("Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): this.User → {Arg4}", args, portalSettings, userInfo, activeTabId, this.User);
+			Logger.LogDebug("Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): this.PortalId → {Arg4}", args, portalSettings, userInfo, activeTabId, this.PortalId);
             this.ValidationMessage = string.Empty;
             this.ParseFlags();
             this.Init(args, portalSettings, userInfo, activeTabId);
+			Logger.LogDebug("<<< Exiting Initialize(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
@@ -126,34 +140,48 @@ namespace Dnn.PersonaBar.Library.Prompt
         /// <inheritdoc />
         public virtual bool IsValid()
         {
+			Logger.LogDebug(">>> Entering IsValid()");
+			Logger.LogDebug("<<< Exiting IsValid()");
             return string.IsNullOrEmpty(this.ValidationMessage);
         }
 
         protected bool HasFlag(string flagName)
         {
             flagName = NormalizeFlagName(flagName);
+			Logger.LogDebug(">>> Entering Flag(flagName={FlagName},defValue={DefValue})", flagName, defValue);
+			Logger.LogDebug("Flag(flagName={FlagName},defValue={DefValue}): flagName → {FlagName1}", flagName, defValue, flagName);
+			Logger.LogDebug("<<< Exiting Flag(flagName={FlagName},defValue={DefValue})", flagName, defValue);
+			Logger.LogDebug("<<< Exiting HasFlag(flagName={FlagName})", flagName);
             return this.Flags.ContainsKey(flagName);
         }
 
         protected bool IsFlag(object input)
         {
+			Logger.LogDebug(">>> Entering IsFlag(input={Input})", input);
             var inputVal = Convert.ToString(input, CultureInfo.InvariantCulture);
+			Logger.LogDebug("<<< Exiting IsFlag(input={Input})", input);
             return !string.IsNullOrEmpty(inputVal) && inputVal.StartsWith("--", StringComparison.Ordinal);
         }
 
         protected string LocalizeString(string key)
         {
+			Logger.LogDebug(">>> Entering LocalizeString(key={Key})", key);
             var localizedText = Localization.GetString(key, this.LocalResourceFile);
+			Logger.LogDebug("LocalizeString(key={Key}): localizedText → {LocalizedText}", key, localizedText);
+			Logger.LogDebug("<<< Exiting LocalizeString(key={Key})", key);
             return string.IsNullOrEmpty(localizedText) ? key : localizedText;
         }
 
         protected void AddMessage(string message)
         {
+			Logger.LogDebug(">>> Entering AddMessage(message={Message})", message);
             this.ValidationMessage += message;
+			Logger.LogDebug("<<< Exiting AddMessage(message={Message})", message);
         }
 
         private static string GetTypeName(Type type)
         {
+			Logger.LogDebug(">>> Entering GetTypeName(type={Type})", type);
             if (type.FullName.ToLowerInvariant().Contains("int"))
             {
                 return "Integer";
@@ -171,6 +199,7 @@ namespace Dnn.PersonaBar.Library.Prompt
 
             if (type.FullName.ToLowerInvariant().Contains("datetime"))
             {
+			Logger.LogDebug("<<< Exiting GetTypeName(type={Type})", type);
                 return "DateTime";
             }
 
@@ -187,13 +216,16 @@ namespace Dnn.PersonaBar.Library.Prompt
             if (flagName.StartsWith("--", StringComparison.Ordinal))
             {
                 flagName = flagName.Substring(2);
+				Logger.LogDebug("NormalizeFlagName(flagName={FlagName}): flagName → {FlagName1}", flagName, flagName);
             }
 
+			Logger.LogDebug("<<< Exiting NormalizeFlagName(flagName={FlagName})", flagName);
             return flagName.ToLowerInvariant().Trim();
         }
 
         private void ParseFlags()
         {
+			Logger.LogDebug(">>> Entering ParseFlags()");
             this.Flags = new Hashtable();
 
             // loop through arguments, skipping the first one (the command)
@@ -206,7 +238,9 @@ namespace Dnn.PersonaBar.Library.Prompt
 
                 // found a flag
                 var flagName = NormalizeFlagName(this.Args[i]);
+				Logger.LogDebug("ParseFlags(): flagName → {FlagName}", flagName);
                 var flagValue = string.Empty;
+				Logger.LogDebug("ParseFlags(): flagValue → {FlagValue}", flagValue);
                 if (i < this.Args.Length - 1)
                 {
                     if (!string.IsNullOrEmpty(this.Args[i + 1]))
@@ -229,6 +263,7 @@ namespace Dnn.PersonaBar.Library.Prompt
 
                 this.Flags.Add(flagName.ToLowerInvariant(), flagValue);
             }
+			Logger.LogDebug("<<< Exiting ParseFlags()");
         }
 
         private object Flag<T>(string flagName, T defValue)
@@ -251,6 +286,8 @@ namespace Dnn.PersonaBar.Library.Prompt
 
         private bool IsBoolean<T>()
         {
+			Logger.LogDebug(">>> Entering IsBoolean()");
+			Logger.LogDebug("<<< Exiting IsBoolean()");
             return typeof(T) == typeof(bool?);
         }
     }

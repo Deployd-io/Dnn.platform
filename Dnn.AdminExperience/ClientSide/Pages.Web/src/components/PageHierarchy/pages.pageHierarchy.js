@@ -1,3 +1,4 @@
+const logger = console;
 /* eslint-disable no-var, id-match, quotes */ // errors
 /* eslint-disable no-unused-vars, space-before-function-paren, indent, eqeqeq */ // warnings
 /* global $, jQuery, ko */
@@ -32,6 +33,7 @@ window.dnn.pages = window.dnn.pages || {};
         _initialized: false,
 
         init: function(panel, initCallback) {
+			logger.debug(`>>> Entering init(panel=${panel},initCallback=${initCallback})`);
             var handler, viewModel;
 
             handler = this;
@@ -44,7 +46,9 @@ window.dnn.pages = window.dnn.pages || {};
             this._selectPageInHierarchyHandler = $.proxy(this._selectPageInHierarchy, this);
 
             this._lastWindowHeight = $(window).height();
+			logger.debug(`<<< Exiting init(panel=${panel},initCallback=${initCallback})`);
             $(window).resize(function onResizeWindow() {
+				logger.debug(`>>> Entering onResizeWindow(window=${window})`);
                 var newHeight = $(window).height();
                 if (handler._lastWindowHeight === newHeight) {
                     return;
@@ -53,6 +57,8 @@ window.dnn.pages = window.dnn.pages || {};
                 var RESIZE_CONTAINER_DELAY = 400;
                 setTimeout(function onResizeContainer() {
                     handler._resizeContentContainer(true);
+					logger.debug(`>>> Entering setTimeout(eventTriggeredByHover=${eventTriggeredByHover})`);
+					logger.debug(`<<< Exiting setTimeout(eventTriggeredByHover=${eventTriggeredByHover})`);
                     handler._lastWindowHeight = newHeight;
                 }, RESIZE_CONTAINER_DELAY);
             });
@@ -67,6 +73,7 @@ window.dnn.pages = window.dnn.pages || {};
             this._siteRoot = null;
             this._loadRootPageList();       
             this._initialized = true;     
+			logger.debug(`<<< Exiting onResizeContainer(RESIZE_CONTAINER_DELAY=${RESIZE_CONTAINER_DELAY})`);
         },
 
         getElement: function() {
@@ -212,10 +219,12 @@ window.dnn.pages = window.dnn.pages || {};
 
             // Hide other list sublevels if we are dragging for not block the ui
             $('.pages-list').each(function hideNextLevels() {
+				logger.debug('>>> Entering hideNextLevels()');
                 var self = $(this);
                 if (self.data('page-level') > level) {
                     self.hide();
                     self.addClass('removeMe');
+					logger.debug('<<< Exiting hideNextLevels()');
                 }
             });
             
@@ -227,9 +236,12 @@ window.dnn.pages = window.dnn.pages || {};
             });
 
             setTimeout(function() {
+				logger.debug(`>>> Entering setTimeout(eventTriggeredByHover=${eventTriggeredByHover})`);
                 $pagesList.next().addClass('expand');
 
+				logger.debug(`<<< Exiting setTimeout(eventTriggeredByHover=${eventTriggeredByHover})`);
                 handler._initScrollView(true, function () {
+					logger.debug(`>>> Entering _initScrollView(true=${true},eventTriggeredByHover=${eventTriggeredByHover})`);
                     var listScroller, containerScroller, $nextList, eventTriggeredByHover;
 
                     eventTriggeredByHover = false;
@@ -256,6 +268,7 @@ window.dnn.pages = window.dnn.pages || {};
                     handler.getElement().trigger('childpagesloaded');
                     if (typeof handler.options.onRefresh === "function") {			
                         handler.options.onRefresh(handler.panel);
+						logger.debug(`<<< Exiting _initScrollView(true=${true},eventTriggeredByHover=${eventTriggeredByHover})`);
                     }
                 });
             }, 0);
@@ -277,6 +290,8 @@ window.dnn.pages = window.dnn.pages || {};
 
         _viewPageClickHandler: function (pageData, e) {
             this.utility.closePersonaBar(function() {
+				logger.debug('>>> Entering closePersonaBar()');
+				logger.debug('<<< Exiting closePersonaBar()');
                 window.top.location.href = pageData.url;
             });
         },
@@ -362,15 +377,21 @@ window.dnn.pages = window.dnn.pages || {};
 
         _removeHiddenLists: function() {
             //Remove hidden levels
+			logger.debug('>>> Entering _removeHiddenLists()');
             $('.pages-list.removeMe').each(function removeHiddenLevels() {
+				logger.debug('>>> Entering removeHiddenLevels()');
                 ko.cleanNode(this);
+				logger.debug('<<< Exiting removeHiddenLevels()');
                 $(this).remove();
             });
             //Remove empty lists
             $('.pages-list ul:not(:has(*))').parents('.pages-list').each(function removeEmptyLists() {
+				logger.debug(`>>> Entering removeEmptyLists(ul=${ul})`);
                 ko.cleanNode(this);
+				logger.debug(`<<< Exiting removeEmptyLists(ul=${ul})`);
                 $(this).remove();
             });
+			logger.debug('<<< Exiting _removeHiddenLists()');
         },
 
         _searchKeywordsChangedHandler: function (e) {
@@ -407,6 +428,7 @@ window.dnn.pages = window.dnn.pages || {};
             this.container.find('.pages-list-container').width(20000);
 
             setTimeout(function () {
+				logger.debug(`>>> Entering setTimeout(OVER_TIME_TO_OPEN_PAGE_CHILDS=${OVER_TIME_TO_OPEN_PAGE_CHILDS})`);
                 handler._initScrollView(true);
             }, 300);
         },
@@ -440,7 +462,9 @@ window.dnn.pages = window.dnn.pages || {};
         },
 
         _selectedPagePathChanged(path) {
+			logger.debug(`>>> Entering _selectedPagePathChanged(path=${path})`);
             this.selectedPagePathChanged(path);
+			logger.debug(`<<< Exiting _selectedPagePathChanged(path=${path})`);
         },
 
         // Select page which under hierarchy and need expand level by level.
@@ -653,6 +677,7 @@ window.dnn.pages = window.dnn.pages || {};
             }
 
             setTimeout(function() {
+				logger.debug(`<<< Exiting setTimeout(OVER_TIME_TO_OPEN_PAGE_CHILDS=${OVER_TIME_TO_OPEN_PAGE_CHILDS})`);
                 $pagesList.addClass('animate');
             }, 100);
         },
@@ -684,7 +709,9 @@ window.dnn.pages = window.dnn.pages || {};
                 // Open childs on over (wating some time)
                 over: function () {
                     var self = $(this);
+					logger.debug('>>> Entering over()');
                     setTimeout(function() {
+						logger.debug('<<< Exiting over()');
                         if (self.hasClass('item-can-be-parent-list')) {
                             self.trigger('click'); // Triggers _addPagesList
                         }
@@ -712,6 +739,7 @@ window.dnn.pages = window.dnn.pages || {};
                     uiOnDragStart = null;
 
                     function updateHirerarchy() {
+						logger.debug('>>> Entering updateHirerarchy()');
                         var sourcePageId, sourceUl, sourceFind, source, sourceData, targetId, targetIndex, targetFind, target;
                         var params, movePage200Callback, movePageErrorCallback;
 
@@ -734,6 +762,7 @@ window.dnn.pages = window.dnn.pages || {};
                         target      = viewModel.pagesList()[targetFind.level].pages()[targetFind.index];
 
                         setTimeout(function removeItemAndCallToUpdate() {
+							logger.debug(`>>> Entering removeItemAndCallToUpdate(allowDrop=${allowDrop})`);
                             var newPagesArray, allowDrop;
 
                             allowDrop = handler._allowDrop(sourcePageId, targetFind.level);
@@ -764,6 +793,7 @@ window.dnn.pages = window.dnn.pages || {};
                             };
 
                             movePage200Callback = function(data) {
+								logger.debug(`>>> Entering function(data=${data})`);
                                 var targetDataPosition, targetData, index, sourceParentId, sourceParentFind, sourceParentData;
 
                                 if (data.Status > 0) {
@@ -815,9 +845,12 @@ window.dnn.pages = window.dnn.pages || {};
                                 draggingJqObj = null;
                                 uiOnDragStart = null;
 
+								logger.debug(`<<< Exiting function(data=${data})`);
                                 // Reactivate droppables/sortables
                                 setTimeout(function reinitDragAndDrop() {
+									logger.debug('>>> Entering reinitDragAndDrop()');
                                     handler._initDrag();
+									logger.debug('<<< Exiting reinitDragAndDrop()');
                                 }, 0);
                                 viewModel.dragPage(handler._getEmptyPageData());
                                 if (viewModel.isNew()) {
@@ -843,6 +876,7 @@ window.dnn.pages = window.dnn.pages || {};
                             };
 
                             // Tray to move by api call
+							logger.debug(`<<< Exiting removeItemAndCallToUpdate(allowDrop=${allowDrop})`);
                             handler._getService().post('MovePage', params, movePage200Callback, movePageErrorCallback);
                         }, 0);
                     }

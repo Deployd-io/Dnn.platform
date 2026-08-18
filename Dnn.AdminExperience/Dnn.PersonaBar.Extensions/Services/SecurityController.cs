@@ -89,8 +89,10 @@ namespace Dnn.PersonaBar.Security.Services
                 applicationStatusInfo,
                 null)
         {
+		Logger.LogDebug(">>> Entering SecurityController(pagesController={PagesController},portalAliasService={PortalAliasService},apiTokenController=<redacted>,hostSettingsService={HostSettingsService},applicationStatusInfo={ApplicationStatusInfo})", pagesController, portalAliasService, hostSettingsService, applicationStatusInfo);
         }
 
+		Logger.LogDebug("<<< Exiting SecurityController(pagesController={PagesController},portalAliasService={PortalAliasService},apiTokenController=<redacted>,hostSettingsService={HostSettingsService},applicationStatusInfo={ApplicationStatusInfo})", pagesController, portalAliasService, hostSettingsService, applicationStatusInfo);
         /// <summary>Initializes a new instance of the <see cref="SecurityController"/> class.</summary>
         /// <param name="controller">The security controller.</param>
         /// <param name="pagesController">The pages controller.</param>
@@ -116,6 +118,7 @@ namespace Dnn.PersonaBar.Security.Services
             this.applicationStatusInfo = applicationStatusInfo;
             this.applicationStatusInfo = applicationStatusInfo;
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("SecurityController(controller={Controller},pagesController={PagesController},portalAliasService={PortalAliasService},apiTokenController=<redacted>,hostSettingsService={HostSettingsService},applicationStatusInfo={ApplicationStatusInfo},hostSettings={HostSettings}): this.apiTokenController → {Arg7}", controller, pagesController, portalAliasService, hostSettingsService, applicationStatusInfo, hostSettings, this.apiTokenController);
         }
 
         /// GET: api/Security/GetBasicLoginSettings
@@ -133,16 +136,22 @@ namespace Dnn.PersonaBar.Security.Services
                     : cultureCode;
 
                 var portal = PortalController.Instance.GetPortal(this.PortalId, cultureCode);
+				Logger.LogDebug("GetBasicLoginSettings(cultureCode={CultureCode}): portal → {Portal}", cultureCode, portal);
                 var portalSettings = new PortalSettings(portal);
+				Logger.LogDebug("GetBasicLoginSettings(cultureCode={CultureCode}): portalSettings → {PortalSettings}", cultureCode, portalSettings);
 
                 dynamic settings = new ExpandoObject();
+				Logger.LogDebug("GetBasicLoginSettings(cultureCode={CultureCode}): settings → {Settings}", cultureCode, settings);
                 settings.DefaultAuthProvider = PortalController.GetPortalSetting("DefaultAuthProvider", this.PortalId, "DNN");
                 settings.PrimaryAdministratorId = PortalSettings.Current.AdministratorId;
+				Logger.LogDebug("GetBasicLoginSettings(cultureCode={CultureCode}): settings.PrimaryAdministratorId → {Arg1}", cultureCode, settings.PrimaryAdministratorId);
                 settings.RequireValidProfileAtLogin = PortalController.GetPortalSettingAsBoolean("Security_RequireValidProfileAtLogin", this.PortalId, true);
                 settings.CaptchaLogin = PortalController.GetPortalSettingAsBoolean("Security_CaptchaLogin", this.PortalId, false);
                 settings.CaptchaRetrievePassword = PortalController.GetPortalSettingAsBoolean("Security_CaptchaRetrivePassword", this.PortalId, false);
                 settings.CaptchaChangePassword = PortalController.GetPortalSettingAsBoolean("Security_CaptchaChangePassword", this.PortalId, false);
                 settings.HideLoginControl = this.PortalSettings.HideLoginControl;
+				Logger.LogDebug("GetBasicLoginSettings(cultureCode={CultureCode}): settings.HideLoginControl → {Arg1}", cultureCode, settings.HideLoginControl);
+				Logger.LogDebug("GetBasicLoginSettings(cultureCode={CultureCode}): settings.cultureCode → {Arg1}", cultureCode, settings.cultureCode);
                 settings.cultureCode = cultureCode;
                 settings.userRequestIPHeader = this.hostSettingsService.GetString(UserRequestIPHeaderSettingName, string.Empty);
 
@@ -151,6 +160,8 @@ namespace Dnn.PersonaBar.Security.Services
                     Name = v,
                     Value = v,
                 }).ToList();
+				Logger.LogDebug("GetBasicLoginSettings(cultureCode={CultureCode}): Name → {Name}", cultureCode, Name);
+				Logger.LogDebug("GetBasicLoginSettings(cultureCode={CultureCode}): Value → {Value}", cultureCode, Value);
 
                 var adminUsers = this.controller.GetAdminUsers(this.PortalId).Select(v => new
                 {
@@ -162,12 +173,17 @@ namespace Dnn.PersonaBar.Security.Services
                 {
                     Success = true,
                     Results = new
+					Logger.LogDebug("GetBasicLoginSettings(cultureCode={CultureCode}): Results → {Results}", cultureCode, Results);
+					Logger.LogDebug("GetBasicLoginSettings(cultureCode={CultureCode}): Success → {Success}", cultureCode, Success);
                     {
                         Settings = settings,
                         AuthProviders = authProviders,
                         Administrators = adminUsers,
                     },
                 };
+				Logger.LogDebug("GetBasicLoginSettings(cultureCode={CultureCode}): Settings → {Settings}", cultureCode, Settings);
+				Logger.LogDebug("GetBasicLoginSettings(cultureCode={CultureCode}): AuthProviders → {AuthProviders}", cultureCode, AuthProviders);
+				Logger.LogDebug("GetBasicLoginSettings(cultureCode={CultureCode}): Administrators → {Administrators}", cultureCode, Administrators);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
@@ -187,6 +203,7 @@ namespace Dnn.PersonaBar.Security.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.BasicLoginSettingsView + "&" + Components.Constants.BasicLoginSettingsEdit)]
         public HttpResponseMessage UpdateBasicLoginSettings(UpdateBasicLoginSettingsRequest request)
         {
+			Logger.LogDebug(">>> Entering UpdateBasicLoginSettings(request={Request})", request);
             if (!this.ModelState.IsValid)
             {
                 return this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, this.ModelState);
@@ -199,6 +216,7 @@ namespace Dnn.PersonaBar.Security.Services
                     : request.CultureCode;
 
                 var portalInfo = PortalController.Instance.GetPortal(this.PortalId);
+				Logger.LogDebug("UpdateBasicLoginSettings(request={Request}): portalInfo → {PortalInfo}", request, portalInfo);
                 portalInfo.AdministratorId = Convert.ToInt32(request.PrimaryAdministratorId);
                 PortalController.Instance.UpdatePortalInfo(portalInfo);
 
@@ -210,6 +228,7 @@ namespace Dnn.PersonaBar.Security.Services
                 PortalController.UpdatePortalSetting(this.PortalId, "HideLoginControl", request.HideLoginControl.ToString(), false);
 
                 var originalUserRequestIPHeader = this.hostSettingsService.GetString(UserRequestIPHeaderSettingName, string.Empty);
+				Logger.LogDebug("UpdateBasicLoginSettings(request={Request}): originalUserRequestIPHeader → {OriginalUserRequestIPHeader}", request, originalUserRequestIPHeader);
                 if (request.UserRequestIPHeader != originalUserRequestIPHeader)
                 {
                     this.hostSettingsService.Update(UserRequestIPHeaderSettingName, request.UserRequestIPHeader, true);
@@ -220,6 +239,7 @@ namespace Dnn.PersonaBar.Security.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting UpdateBasicLoginSettings(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -231,6 +251,7 @@ namespace Dnn.PersonaBar.Security.Services
         [RequireHost]
         public HttpResponseMessage GetIpFilters()
         {
+			Logger.LogDebug(">>> Entering GetIpFilters()");
             try
             {
                 var filters = IPFilterController.Instance.GetIPFilters().Select(v => new
@@ -240,21 +261,26 @@ namespace Dnn.PersonaBar.Security.Services
                     v.RuleType,
                     v.Notes,
                 }).ToList();
+				Logger.LogDebug("GetIpFilters(): IPFilter → {IPFilter}", IPFilter);
                 var response = new
                 {
                     Success = true,
                     Results = new
+					Logger.LogDebug("GetIpFilters(): Results → {Results}", Results);
+					Logger.LogDebug("GetIpFilters(): Success → {Success}", Success);
                     {
                         Filters = filters,
                         this.hostSettings.EnableIPChecking,
                     },
                 };
+				Logger.LogDebug("GetIpFilters(): Filters → {Filters}", Filters);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetIpFilters()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -267,13 +293,17 @@ namespace Dnn.PersonaBar.Security.Services
         [RequireHost]
         public HttpResponseMessage GetIpFilter(int filterId)
         {
+			Logger.LogDebug(">>> Entering GetIpFilter(filterId={FilterId})", filterId);
             try
             {
                 IPFilterInfo filter = IPFilterController.Instance.GetIPFilter(filterId);
+				Logger.LogDebug("GetIpFilter(filterId={FilterId}): filter → {Filter}", filterId, filter);
                 var response = new
                 {
                     Success = true,
                     Results = new
+					Logger.LogDebug("GetIpFilter(filterId={FilterId}): Success → {Success}", filterId, Success);
+					Logger.LogDebug("GetIpFilter(filterId={FilterId}): Results → {Results}", filterId, Results);
                     {
                         filter.IPAddress,
                         filter.IPFilterID,
@@ -288,6 +318,7 @@ namespace Dnn.PersonaBar.Security.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetIpFilter(filterId={FilterId})", filterId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -301,9 +332,15 @@ namespace Dnn.PersonaBar.Security.Services
         [RequireHost]
         public HttpResponseMessage UpdateIpFilter(UpdateIpFilterRequest request)
         {
+			Logger.LogDebug(">>> Entering UpdateIpFilter(request={Request})", request);
             try
             {
                 var ipf = new IPFilterInfo();
+				Logger.LogDebug("UpdateIpFilter(request={Request}): ipf → {Ipf}", request, ipf);
+				Logger.LogDebug("UpdateIpFilter(request={Request}): ipf.IPAddress → {Arg1}", request, ipf.IPAddress);
+				Logger.LogDebug("UpdateIpFilter(request={Request}): ipf.SubnetMask → {Arg1}", request, ipf.SubnetMask);
+				Logger.LogDebug("UpdateIpFilter(request={Request}): ipf.RuleType → {Arg1}", request, ipf.RuleType);
+				Logger.LogDebug("UpdateIpFilter(request={Request}): ipf.Notes → {Arg1}", request, ipf.Notes);
                 ipf.IPAddress = request.IPAddress;
                 ipf.SubnetMask = request.SubnetMask;
                 ipf.RuleType = request.RuleType;
@@ -322,6 +359,7 @@ namespace Dnn.PersonaBar.Security.Services
                 if (request.IPFilterID > 0)
                 {
                     ipf.IPFilterID = request.IPFilterID;
+					Logger.LogDebug("UpdateIpFilter(request={Request}): ipf.IPFilterID → {Arg1}", request, ipf.IPFilterID);
                     IPFilterController.Instance.UpdateIPFilter(ipf);
                 }
                 else
@@ -339,6 +377,7 @@ namespace Dnn.PersonaBar.Security.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting UpdateIpFilter(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -352,10 +391,13 @@ namespace Dnn.PersonaBar.Security.Services
         [RequireHost]
         public HttpResponseMessage DeleteIpFilter(int filterId)
         {
+			Logger.LogDebug(">>> Entering DeleteIpFilter(filterId={FilterId})", filterId);
             try
             {
                 IList<IPFilterInfo> currentRules = IPFilterController.Instance.GetIPFilters();
+				Logger.LogDebug("DeleteIpFilter(filterId={FilterId}): currentRules → {CurrentRules}", filterId, currentRules);
                 List<IPFilterInfo> currentWithDeleteRemoved = (from p in currentRules where p.IPFilterID != filterId select p).ToList();
+				Logger.LogDebug("DeleteIpFilter(filterId={FilterId}): currentWithDeleteRemoved → {CurrentWithDeleteRemoved}", filterId, currentWithDeleteRemoved);
 
                 if (IPFilterController.Instance.CanIPStillAccess(HttpContext.Current.Request.UserHostAddress, currentWithDeleteRemoved) == false)
                 {
@@ -364,6 +406,8 @@ namespace Dnn.PersonaBar.Security.Services
                 else
                 {
                     var ipf = new IPFilterInfo();
+					Logger.LogDebug("DeleteIpFilter(filterId={FilterId}): ipf → {Ipf}", filterId, ipf);
+					Logger.LogDebug("DeleteIpFilter(filterId={FilterId}): ipf.IPFilterID → {Arg1}", filterId, ipf.IPFilterID);
                     ipf.IPFilterID = filterId;
                     IPFilterController.Instance.DeleteIPFilter(ipf);
                     return this.Request.CreateResponse(HttpStatusCode.OK, new { Success = true, });
@@ -372,6 +416,7 @@ namespace Dnn.PersonaBar.Security.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting DeleteIpFilter(filterId={FilterId})", filterId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -383,12 +428,16 @@ namespace Dnn.PersonaBar.Security.Services
         [RequireHost]
         public HttpResponseMessage GetMemberSettings()
         {
+			Logger.LogDebug(">>> Entering GetMemberSettings()");
             try
             {
                 var response = new
                 {
                     Success = true,
                     Results = new
+					Logger.LogDebug("GetMemberSettings(): Success → {Success}", Success);
+					Logger.LogDebug("GetMemberSettings(): Results → {Results}", Results);
+					Logger.LogDebug("GetMemberSettings(): Settings → {Settings}", Settings);
                     {
                         Settings = new
                         {
@@ -406,12 +455,18 @@ namespace Dnn.PersonaBar.Security.Services
                         },
                     },
                 };
+				Logger.LogDebug("GetMemberSettings(): PasswordExpiry → {PasswordExpiry}", PasswordExpiry);
+				Logger.LogDebug("GetMemberSettings(): AdminMembershipResetLinkValidity → {AdminMembershipResetLinkValidity}", AdminMembershipResetLinkValidity);
+				Logger.LogDebug("GetMemberSettings(): MembershipResetLinkValidity → {MembershipResetLinkValidity}", MembershipResetLinkValidity);
+				Logger.LogDebug("GetMemberSettings(): PasswordExpiryReminder → {PasswordExpiryReminder}", PasswordExpiryReminder);
+				Logger.LogDebug("GetMemberSettings(): ForceLogoutAfterPasswordChanged → {ForceLogoutAfterPasswordChanged}", ForceLogoutAfterPasswordChanged);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetMemberSettings()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -425,6 +480,7 @@ namespace Dnn.PersonaBar.Security.Services
         [RequireHost]
         public HttpResponseMessage UpdateMemberSettings(UpdateMemberSettingsRequest request)
         {
+			Logger.LogDebug(">>> Entering UpdateMemberSettings(request={Request})", request);
             try
             {
                 this.hostSettingsService.Update("EnableBannedList", request.EnableBannedList ? "Y" : "N", false);
@@ -444,6 +500,7 @@ namespace Dnn.PersonaBar.Security.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting UpdateMemberSettings(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -455,18 +512,24 @@ namespace Dnn.PersonaBar.Security.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.RegistrationSettingsView)]
         public HttpResponseMessage GetRegistrationSettings()
         {
+			Logger.LogDebug(">>> Entering GetRegistrationSettings()");
             try
             {
                 List<KeyValuePair<string, int>> userRegistrationOptions = RegistrationSettingsHelper.GetUserRegistrationOptions();
                 List<KeyValuePair<string, int>> registrationFormTypeOptions = RegistrationSettingsHelper.GetRegistrationFormOptions();
 
                 var activeLanguage = LocaleController.Instance.GetDefaultLocale(this.PortalId).Code;
+				Logger.LogDebug("GetRegistrationSettings(): activeLanguage → {ActiveLanguage}", activeLanguage);
                 var portal = PortalController.Instance.GetPortal(this.PortalId, activeLanguage);
+				Logger.LogDebug("GetRegistrationSettings(): portal → {Portal}", portal);
 
                 var response = new
                 {
                     Success = true,
                     Results = new
+					Logger.LogDebug("GetRegistrationSettings(): Success → {Success}", Success);
+					Logger.LogDebug("GetRegistrationSettings(): Results → {Results}", Results);
+					Logger.LogDebug("GetRegistrationSettings(): Settings → {Settings}", Settings);
                     {
                         Settings = new
                         {
@@ -503,12 +566,39 @@ namespace Dnn.PersonaBar.Security.Services
                         RegistrationFormTypeOptions = registrationFormTypeOptions,
                     },
                 };
+				Logger.LogDebug("GetRegistrationSettings(): RequireUniqueDisplayName → {RequireUniqueDisplayName}", RequireUniqueDisplayName);
+				Logger.LogDebug("GetRegistrationSettings(): UseCaptchaRegister → {UseCaptchaRegister}", UseCaptchaRegister);
+				Logger.LogDebug("GetRegistrationSettings(): RequireValidProfile → {RequireValidProfile}", RequireValidProfile);
+				Logger.LogDebug("GetRegistrationSettings(): PasswordAttemptWindow → {PasswordAttemptWindow}", PasswordAttemptWindow);
+				Logger.LogDebug("GetRegistrationSettings(): UserNameValidation → {UserNameValidation}", UserNameValidation);
+				Logger.LogDebug("GetRegistrationSettings(): UseAuthenticationProviders → {UseAuthenticationProviders}", UseAuthenticationProviders);
+				Logger.LogDebug("GetRegistrationSettings(): PasswordResetEnabled → {PasswordResetEnabled}", PasswordResetEnabled);
+				Logger.LogDebug("GetRegistrationSettings(): MinPasswordLength → {MinPasswordLength}", MinPasswordLength);
+				Logger.LogDebug("GetRegistrationSettings(): PasswordFormat → {PasswordFormat}", PasswordFormat);
+				Logger.LogDebug("GetRegistrationSettings(): RequirePasswordConfirmation → {RequirePasswordConfirmation}", RequirePasswordConfirmation);
+				Logger.LogDebug("GetRegistrationSettings(): EmailAddressValidation → {EmailAddressValidation}", EmailAddressValidation);
+				Logger.LogDebug("GetRegistrationSettings(): RequiresUniqueEmail → {RequiresUniqueEmail}", RequiresUniqueEmail);
+				Logger.LogDebug("GetRegistrationSettings(): UseRandomPassword → {UseRandomPassword}", UseRandomPassword);
+				Logger.LogDebug("GetRegistrationSettings(): RegistrationFormTypeOptions → {RegistrationFormTypeOptions}", RegistrationFormTypeOptions);
+				Logger.LogDebug("GetRegistrationSettings(): UserNameMinLength → {UserNameMinLength}", UserNameMinLength);
+				Logger.LogDebug("GetRegistrationSettings(): ExcludedTerms → {ExcludedTerms}", ExcludedTerms);
+				Logger.LogDebug("GetRegistrationSettings(): DisplayNameFormat → {DisplayNameFormat}", DisplayNameFormat);
+				Logger.LogDebug("GetRegistrationSettings(): MaxInvalidPasswordAttempts → {MaxInvalidPasswordAttempts}", MaxInvalidPasswordAttempts);
+				Logger.LogDebug("GetRegistrationSettings(): UseEmailAsUsername → {UseEmailAsUsername}", UseEmailAsUsername);
+				Logger.LogDebug("GetRegistrationSettings(): EnableUnapprovedPasswordReminderNotification → {EnableUnapprovedPasswordReminderNotification}", EnableUnapprovedPasswordReminderNotification);
+				Logger.LogDebug("GetRegistrationSettings(): EnableRegisterNotification → {EnableRegisterNotification}", EnableRegisterNotification);
+				Logger.LogDebug("GetRegistrationSettings(): RequiresQuestionAndAnswer → {RequiresQuestionAndAnswer}", RequiresQuestionAndAnswer);
+				Logger.LogDebug("GetRegistrationSettings(): PasswordRetrievalEnabled → {PasswordRetrievalEnabled}", PasswordRetrievalEnabled);
+				Logger.LogDebug("GetRegistrationSettings(): MinNonAlphanumericCharacters → {MinNonAlphanumericCharacters}", MinNonAlphanumericCharacters);
+				Logger.LogDebug("GetRegistrationSettings(): UserRegistrationOptions → {UserRegistrationOptions}", UserRegistrationOptions);
+				Logger.LogDebug("GetRegistrationSettings(): UseProfanityFilter → {UseProfanityFilter}", UseProfanityFilter);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetRegistrationSettings()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -530,6 +620,7 @@ namespace Dnn.PersonaBar.Security.Services
 
                 var portalStats = SslController.Instance.GetPortalStats(this.PortalId);
                 settings.NumberOfSecureTabs = portalStats.NumberOfSecureTabs;
+				Logger.LogDebug(">>> Entering GetSslSettings()");
                 settings.NumberOfNonSecureTabs = portalStats.NumberOfNonSecureTabs;
 
                 if (this.UserInfo.IsSuperUser)
@@ -541,11 +632,15 @@ namespace Dnn.PersonaBar.Security.Services
                 {
                     Success = true,
                     Results = new
+					Logger.LogDebug("GetSslSettings(): Results → {Results}", Results);
+					Logger.LogDebug("GetSslSettings(): Success → {Success}", Success);
                     {
                         Settings = settings,
                     },
                 };
+				Logger.LogDebug("GetSslSettings(): Settings → {Settings}", Settings);
 
+				Logger.LogDebug("<<< Exiting GetSslSettings()");
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
@@ -564,6 +659,7 @@ namespace Dnn.PersonaBar.Security.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.RegistrationSettingsView + "&" + Components.Constants.RegistrationSettingsEdit)]
         public HttpResponseMessage UpdateRegistrationSettings(UpdateRegistrationSettingsRequest request)
         {
+			Logger.LogDebug(">>> Entering UpdateRegistrationSettings(request={Request})", request);
             if (!this.ModelState.IsValid)
             {
                 return this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, this.ModelState);
@@ -572,11 +668,13 @@ namespace Dnn.PersonaBar.Security.Services
             try
             {
                 var setting = request.RegistrationFields;
+				Logger.LogDebug("UpdateRegistrationSettings(request={Request}): setting → {Setting}", request, setting);
                 PortalController.UpdatePortalSetting(this.PortalId, "Registration_RegistrationFields", setting);
                 PortalController.UpdatePortalSetting(this.PortalId, "Registration_RegistrationFormType", request.RegistrationFormType.ToString(CultureInfo.InvariantCulture), false);
                 PortalController.UpdatePortalSetting(this.PortalId, "Registration_UseEmailAsUserName", request.UseEmailAsUsername.ToString(), false);
 
                 var portalInfo = PortalController.Instance.GetPortal(this.PortalId);
+				Logger.LogDebug("UpdateRegistrationSettings(request={Request}): portalInfo → {PortalInfo}", request, portalInfo);
                 portalInfo.UserRegistration = Convert.ToInt32(request.UserRegistration, CultureInfo.InvariantCulture);
                 PortalController.Instance.UpdatePortalInfo(portalInfo);
 
@@ -600,6 +698,7 @@ namespace Dnn.PersonaBar.Security.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting UpdateRegistrationSettings(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -613,12 +712,16 @@ namespace Dnn.PersonaBar.Security.Services
         [DnnAuthorize(StaticRoles = Constants.AdminsRoleName)]
         public HttpResponseMessage UpdateSslSettings(UpdateSslSettingsRequest request)
         {
+			Logger.LogDebug(">>> Entering UpdateSslSettings(request={Request})", request);
             try
             {
                 switch (request.SSLSetup)
                 {
                     case 0:
                         request.SSLEnforced = false;
+						Logger.LogDebug("UpdateSslSettings(request={Request}): request.SSLEnforced → {Arg1}", request, request.SSLEnforced);
+						Logger.LogDebug("UpdateSslSettings(request={Request}): request.SSLURL → {Arg1}", request, request.SSLURL);
+						Logger.LogDebug("UpdateSslSettings(request={Request}): request.STDURL → {Arg1}", request, request.STDURL);
                         request.SSLURL = string.Empty;
                         request.STDURL = string.Empty;
                         break;
@@ -627,6 +730,7 @@ namespace Dnn.PersonaBar.Security.Services
                         request.SSLURL = string.Empty;
                         request.STDURL = string.Empty;
                         request.SSLOffloadHeader = string.Empty;
+						Logger.LogDebug("UpdateSslSettings(request={Request}): request.SSLOffloadHeader → {Arg1}", request, request.SSLOffloadHeader);
                         break;
                 }
 
@@ -647,6 +751,7 @@ namespace Dnn.PersonaBar.Security.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting UpdateSslSettings(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -659,6 +764,7 @@ namespace Dnn.PersonaBar.Security.Services
         [DnnAuthorize(StaticRoles = Constants.AdminsRoleName)]
         public HttpResponseMessage SetAllPagesSecure()
         {
+			Logger.LogDebug(">>> Entering SetAllPagesSecure()");
             try
             {
                 DotNetNuke.Data.DataProvider.Instance().SetAllPortalTabsSecure(this.PortalId, true);
@@ -667,6 +773,7 @@ namespace Dnn.PersonaBar.Security.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting SetAllPagesSecure()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -678,9 +785,12 @@ namespace Dnn.PersonaBar.Security.Services
         [RequireHost]
         public HttpResponseMessage GetSecurityBulletins()
         {
+			Logger.LogDebug(">>> Entering GetSecurityBulletins()");
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             try
             {
                 var platformVersion = System.Reflection.Assembly.LoadFrom(this.applicationStatusInfo.ApplicationMapPath + @"\bin\DotNetNuke.dll").GetName().Version;
+				Logger.LogDebug("GetSecurityBulletins(): platformVersion → {PlatformVersion}", platformVersion);
                 string sRequest = $"https://dnnplatform.io/security.aspx?type={DotNetNukeContext.Current.Application.Type}&name=DNNCORP.CE&version={Globals.FormatVersion(platformVersion, "00", 3, string.Empty)}";
 
                 // format for display with "." delimiter
@@ -688,15 +798,20 @@ namespace Dnn.PersonaBar.Security.Services
 
                 // make remote request
                 Stream oStream = null;
+				Logger.LogDebug("GetSecurityBulletins(): oStream → {OStream}", oStream);
                 try
                 {
                     HttpWebRequest oRequest = Globals.GetExternalRequest(this.hostSettings, sRequest);
+					Logger.LogDebug("GetSecurityBulletins(): oRequest → {ORequest}", oRequest);
+					Logger.LogDebug("GetSecurityBulletins(): oRequest.Timeout → {Arg0}", oRequest.Timeout);
                     oRequest.Timeout = 10000; // 10 seconds
                     WebResponse oResponse = oRequest.GetResponse();
+					Logger.LogDebug("GetSecurityBulletins(): oResponse → {OResponse}", oResponse);
                     oStream = oResponse.GetResponseStream();
                 }
                 catch (Exception oExc)
                 {
+					Logger.LogError("Exception in GetSecurityBulletins(): {Arg0}", oExc.getMessage());
                     // connectivity issues
                     if (PortalSecurity.IsInRoles(this.PortalSettings.AdministratorRoleId.ToString(CultureInfo.InvariantCulture)))
                     {
@@ -710,6 +825,7 @@ namespace Dnn.PersonaBar.Security.Services
 
                 // load XML document
                 StreamReader oReader = new StreamReader(oStream);
+				Logger.LogDebug("GetSecurityBulletins(): oReader → {OReader}", oReader);
                 XmlDocument oDoc = new XmlDocument { XmlResolver = null, };
                 using (var xmlReader = XmlReader.Create(new StringReader(oReader.ReadToEnd()), new XmlReaderSettings { XmlResolver = null, }))
                 {
@@ -733,17 +849,23 @@ namespace Dnn.PersonaBar.Security.Services
                 {
                     Success = true,
                     Results = new
+					Logger.LogDebug("GetSecurityBulletins(): Success → {Success}", Success);
+					Logger.LogDebug("GetSecurityBulletins(): Results → {Results}", Results);
                     {
                         PlatformVersion = sVersion,
                         SecurityBulletins = items,
                     },
                 };
+				Logger.LogDebug("GetSecurityBulletins(): PlatformVersion → {PlatformVersion}", PlatformVersion);
+				Logger.LogDebug("GetSecurityBulletins(): SecurityBulletins → {SecurityBulletins}", SecurityBulletins);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogInformation("GetSecurityBulletins(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+				Logger.LogDebug("<<< Exiting GetSecurityBulletins()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -755,12 +877,16 @@ namespace Dnn.PersonaBar.Security.Services
         [RequireHost]
         public HttpResponseMessage GetOtherSettings()
         {
+			Logger.LogDebug(">>> Entering GetOtherSettings()");
             try
             {
                 var response = new
                 {
                     Success = true,
                     Results = new
+					Logger.LogDebug("GetOtherSettings(): Results → {Results}", Results);
+					Logger.LogDebug("GetOtherSettings(): Success → {Success}", Success);
+					Logger.LogDebug("GetOtherSettings(): Settings → {Settings}", Settings);
                     {
                         Settings = new
                         {
@@ -778,12 +904,19 @@ namespace Dnn.PersonaBar.Security.Services
                         },
                     },
                 };
+				Logger.LogDebug("GetOtherSettings(): AutoAccountUnlockDuration → {AutoAccountUnlockDuration}", AutoAccountUnlockDuration);
+				Logger.LogDebug("GetOtherSettings(): RangeUploadSize → {RangeUploadSize}", RangeUploadSize);
+				Logger.LogDebug("GetOtherSettings(): MaxUploadSize → {MaxUploadSize}", MaxUploadSize);
+				Logger.LogDebug("GetOtherSettings(): AsyncTimeout → {AsyncTimeout}", AsyncTimeout);
+				Logger.LogDebug("GetOtherSettings(): DefaultEndUserExtensionWhitelist → {DefaultEndUserExtensionWhitelist}", DefaultEndUserExtensionWhitelist);
+				Logger.LogDebug("GetOtherSettings(): AllowedExtensionWhitelist → {AllowedExtensionWhitelist}", AllowedExtensionWhitelist);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetOtherSettings()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -797,6 +930,7 @@ namespace Dnn.PersonaBar.Security.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage UpdateOtherSettings(UpdateOtherSettingsRequest request)
         {
+			Logger.LogDebug(">>> Entering UpdateOtherSettings(request={Request})", request);
             try
             {
                 this.hostSettingsService.Update("ShowCriticalErrors", request.ShowCriticalErrors ? "Y" : "N", false);
@@ -807,8 +941,11 @@ namespace Dnn.PersonaBar.Security.Services
                 this.hostSettingsService.Update("AutoAccountUnlockDuration", request.AutoAccountUnlockDuration.ToString(CultureInfo.InvariantCulture), false);
                 this.hostSettingsService.Update("AsyncTimeout", request.AsyncTimeout.ToString(CultureInfo.InvariantCulture), false);
                 var oldExtensionList = this.hostSettings.AllowedExtensionAllowList.ToStorageString();
+				Logger.LogDebug("UpdateOtherSettings(request={Request}): oldExtensionList → {OldExtensionList}", request, oldExtensionList);
                 var fileExtensions = new FileExtensionWhitelist(request.AllowedExtensionWhitelist);
+				Logger.LogDebug("UpdateOtherSettings(request={Request}): fileExtensions → {FileExtensions}", request, fileExtensions);
                 var newExtensionList = fileExtensions.ToStorageString();
+				Logger.LogDebug("UpdateOtherSettings(request={Request}): newExtensionList → {NewExtensionList}", request, newExtensionList);
                 this.hostSettingsService.Update("FileExtensions", newExtensionList, false);
                 if (oldExtensionList != newExtensionList)
                 {
@@ -816,10 +953,12 @@ namespace Dnn.PersonaBar.Security.Services
                 }
 
                 var defaultEndUserExtensionWhitelist = new FileExtensionWhitelist(request.DefaultEndUserExtensionWhitelist);
+				Logger.LogDebug("UpdateOtherSettings(request={Request}): defaultEndUserExtensionWhitelist → {DefaultEndUserExtensionWhitelist}", request, defaultEndUserExtensionWhitelist);
                 defaultEndUserExtensionWhitelist = defaultEndUserExtensionWhitelist.RestrictBy(fileExtensions);
                 this.hostSettingsService.Update("DefaultEndUserExtensionWhitelist", defaultEndUserExtensionWhitelist.ToStorageString(), false);
 
                 var maxCurrentRequest = Config.GetMaxUploadSize(this.applicationStatusInfo);
+				Logger.LogDebug("UpdateOtherSettings(request={Request}): maxCurrentRequest → {MaxCurrentRequest}", request, maxCurrentRequest);
                 var maxUploadByMb = request.MaxUploadSize * 1024 * 1024;
                 if (maxCurrentRequest != maxUploadByMb)
                 {
@@ -833,6 +972,7 @@ namespace Dnn.PersonaBar.Security.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting UpdateOtherSettings(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -845,21 +985,27 @@ namespace Dnn.PersonaBar.Security.Services
         [RequireHost]
         public HttpResponseMessage GetAuditCheckResults([FromUri] bool checkAll = false)
         {
+			Logger.LogDebug(">>> Entering GetAuditCheckResults(checkAll={CheckAll})", checkAll);
             try
             {
                 var audit = new Components.AuditChecks(this.pagesController);
+				Logger.LogDebug("GetAuditCheckResults(checkAll={CheckAll}): audit → {Audit}", checkAll, audit);
                 var results = audit.DoChecks(checkAll);
+				Logger.LogDebug("GetAuditCheckResults(checkAll={CheckAll}): results → {Results}", checkAll, results);
                 var response = new
                 {
                     Success = true,
                     Results = results,
                 };
+				Logger.LogDebug("GetAuditCheckResults(checkAll={CheckAll}): Success → {Success}", checkAll, Success);
+				Logger.LogDebug("GetAuditCheckResults(checkAll={CheckAll}): Results → {Results}", checkAll, Results);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetAuditCheckResults(checkAll={CheckAll})", checkAll);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -872,21 +1018,26 @@ namespace Dnn.PersonaBar.Security.Services
         [RequireHost]
         public HttpResponseMessage GetAuditCheckResult([FromUri] string id)
         {
+			Logger.LogDebug(">>> Entering GetAuditCheckResult(id={Id})", id);
             try
             {
                 var audit = new Components.AuditChecks(this.pagesController);
+				Logger.LogDebug("GetAuditCheckResult(id={Id}): audit → {Audit}", id, audit);
                 var result = audit.DoCheck(id);
+				Logger.LogDebug("GetAuditCheckResult(id={Id}): result → {Result}", id, result);
                 var response = new
                 {
                     Success = true,
                     Result = result,
                 };
+				Logger.LogDebug("GetAuditCheckResult(id={Id}): Success → {Success}", id, Success);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetAuditCheckResult(id={Id})", id);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -898,6 +1049,7 @@ namespace Dnn.PersonaBar.Security.Services
         [RequireHost]
         public HttpResponseMessage GetSuperuserActivities()
         {
+			Logger.LogDebug(">>> Entering GetSuperuserActivities()");
             try
             {
                 var users = UserController.GetUsers(true, true, -1).Cast<UserInfo>().Select(u => new
@@ -911,21 +1063,28 @@ namespace Dnn.PersonaBar.Security.Services
                     LastLoginDate = DisplayDate(u.Membership.LastLoginDate),
                     LastActivityDate = DisplayDate(u.Membership.LastActivityDate),
                 }).ToList();
+				Logger.LogDebug("GetSuperuserActivities(): CreatedDate → {CreatedDate}", CreatedDate);
+				Logger.LogDebug("GetSuperuserActivities(): LastLoginDate → {LastLoginDate}", LastLoginDate);
+				Logger.LogDebug("GetSuperuserActivities(): LastActivityDate → {LastActivityDate}", LastActivityDate);
 
                 var response = new
                 {
                     Success = true,
                     Results = new
+					Logger.LogDebug("GetSuperuserActivities(): Results → {Results}", Results);
+					Logger.LogDebug("GetSuperuserActivities(): Success → {Success}", Success);
                     {
                         Activities = users,
                     },
                 };
+				Logger.LogDebug("GetSuperuserActivities(): Activities → {Activities}", Activities);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetSuperuserActivities()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -938,11 +1097,14 @@ namespace Dnn.PersonaBar.Security.Services
         [RequireHost]
         public HttpResponseMessage SearchFileSystemAndDatabase(string term)
         {
+			Logger.LogDebug(">>> Entering SearchFileSystemAndDatabase(term={Term})", term);
             try
             {
                 // run these in parallel
                 var task1 = Task.Factory.StartNew(() => Components.Utility.SearchFiles(term));
+				Logger.LogDebug("SearchFileSystemAndDatabase(term={Term}): task1 → {Task1}", term, task1);
                 var task2 = Task.Factory.StartNew(() => Components.Utility.SearchDatabase(term));
+				Logger.LogDebug("SearchFileSystemAndDatabase(term={Term}): task2 → {Task2}", term, task2);
                 Task.WhenAll(task1, task2).Wait();
 
                 var foundinfiles = task1.Result;
@@ -951,17 +1113,22 @@ namespace Dnn.PersonaBar.Security.Services
                 {
                     Success = true,
                     Results = new
+					Logger.LogDebug("SearchFileSystemAndDatabase(term={Term}): Results → {Results}", term, Results);
+					Logger.LogDebug("SearchFileSystemAndDatabase(term={Term}): Success → {Success}", term, Success);
                     {
                         FoundInFiles = foundinfiles,
                         FoundInDatabase = foundindb,
                     },
                 };
+				Logger.LogDebug("SearchFileSystemAndDatabase(term={Term}): FoundInDatabase → {FoundInDatabase}", term, FoundInDatabase);
+				Logger.LogDebug("SearchFileSystemAndDatabase(term={Term}): FoundInFiles → {FoundInFiles}", term, FoundInFiles);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting SearchFileSystemAndDatabase(term={Term})", term);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -973,6 +1140,7 @@ namespace Dnn.PersonaBar.Security.Services
         [RequireHost]
         public HttpResponseMessage GetLastModifiedFiles()
         {
+			Logger.LogDebug(">>> Entering GetLastModifiedFiles()");
             try
             {
                 var highRiskFiles = Components.Utility.GetLastModifiedExecutableFiles().Select(f => new
@@ -980,6 +1148,8 @@ namespace Dnn.PersonaBar.Security.Services
                     FilePath = this.GetFilePath(f.FullName),
                     LastWriteTime = DisplayDate(f.LastWriteTime),
                 });
+				Logger.LogDebug("GetLastModifiedFiles(): LastWriteTime → {LastWriteTime}", LastWriteTime);
+				Logger.LogDebug("GetLastModifiedFiles(): FilePath → {FilePath}", FilePath);
                 var lowRiskFiles = Components.Utility.GetLastModifiedFiles().Select(f => new
                 {
                     FilePath = this.GetFilePath(f.FullName),
@@ -989,17 +1159,22 @@ namespace Dnn.PersonaBar.Security.Services
                 {
                     Success = true,
                     Results = new
+					Logger.LogDebug("GetLastModifiedFiles(): Results → {Results}", Results);
+					Logger.LogDebug("GetLastModifiedFiles(): Success → {Success}", Success);
                     {
                         HighRiskFiles = highRiskFiles,
                         LowRiskFiles = lowRiskFiles,
                     },
                 };
+				Logger.LogDebug("GetLastModifiedFiles(): HighRiskFiles → {HighRiskFiles}", HighRiskFiles);
+				Logger.LogDebug("GetLastModifiedFiles(): LowRiskFiles → {LowRiskFiles}", LowRiskFiles);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetLastModifiedFiles()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -1011,9 +1186,11 @@ namespace Dnn.PersonaBar.Security.Services
         [RequireHost]
         public HttpResponseMessage GetLastModifiedSettings()
         {
+			Logger.LogDebug(">>> Entering GetLastModifiedSettings()");
             try
             {
                 var settings = this.controller.GetModifiedSettings();
+				Logger.LogDebug("GetLastModifiedSettings(): settings → {Settings}", settings);
                 var portalSettings = (from DataRow dr in settings[0].Rows
                                       select new SettingsDto
                                       {
@@ -1060,6 +1237,8 @@ namespace Dnn.PersonaBar.Security.Services
                 {
                     Success = true,
                     Results = new
+					Logger.LogDebug("GetLastModifiedSettings(): Results → {Results}", Results);
+					Logger.LogDebug("GetLastModifiedSettings(): Success → {Success}", Success);
                     {
                         PortalSettings = portalSettings,
                         HostSettings = hostSettings,
@@ -1067,12 +1246,17 @@ namespace Dnn.PersonaBar.Security.Services
                         ModuleSettings = moduleSettings,
                     },
                 };
+				Logger.LogDebug("GetLastModifiedSettings(): TabSettings → {TabSettings}", TabSettings);
+				Logger.LogDebug("GetLastModifiedSettings(): ModuleSettings → {ModuleSettings}", ModuleSettings);
+				Logger.LogDebug("GetLastModifiedSettings(): HostSettings → {HostSettings}", HostSettings);
+				Logger.LogDebug("GetLastModifiedSettings(): PortalSettings → {PortalSettings}", PortalSettings);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetLastModifiedSettings()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -1084,22 +1268,27 @@ namespace Dnn.PersonaBar.Security.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.ManageApiTokens)]
         public HttpResponseMessage GetApiTokenSettings()
         {
+			Logger.LogDebug(">>> Entering GetApiTokenSettings()");
             try
             {
                 var response = new
                 {
                     Success = true,
                     Results = new
+					Logger.LogDebug("GetApiTokenSettings(): Results → {Results}", Results);
+					Logger.LogDebug("GetApiTokenSettings(): Success → {Success}", Success);
                     {
                         ApiTokenSettings = ApiTokenSettings.GetSettings(this.PortalId),
                     },
                 };
+				Logger.LogDebug("GetApiTokenSettings(): ApiTokenSettings → {ApiTokenSettings}", ApiTokenSettings);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetApiTokenSettings()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -1113,20 +1302,25 @@ namespace Dnn.PersonaBar.Security.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage UpdateApiTokenSettings(UpdateApiTokenSettingsRequest request)
         {
+			Logger.LogDebug(">>> Entering UpdateApiTokenSettings(request={Request})", request);
             try
             {
                 var settings = ApiTokenSettings.GetSettings(this.PortalId);
+				Logger.LogDebug("UpdateApiTokenSettings(request={Request}): settings → {Settings}", request, settings);
                 var oldMax = (int)settings.MaximumSiteTimespan;
+				Logger.LogDebug("UpdateApiTokenSettings(request={Request}): oldMax → {OldMax}", request, oldMax);
                 if (this.UserInfo.IsSuperUser)
                 {
                     settings.MaximumSiteTimespan = (ApiTokenTimespan)request.MaximumSiteTimespan;
                 }
 
                 var newMax = (int)settings.MaximumSiteTimespan;
+				Logger.LogDebug("UpdateApiTokenSettings(request={Request}): newMax → {NewMax}", request, newMax);
                 var maxHasBeenReduced = newMax < oldMax;
 
                 settings.UserTokenTimespan = (ApiTokenTimespan)request.UserTokenTimespan;
                 settings.AllowApiTokens = request.AllowApiTokens;
+				Logger.LogDebug("UpdateApiTokenSettings(request={Request}): settings.AllowApiTokens → {Arg1}", request, settings.AllowApiTokens);
                 settings.SaveSettings(this.PortalId);
 
                 if (maxHasBeenReduced)
@@ -1134,7 +1328,9 @@ namespace Dnn.PersonaBar.Security.Services
                     foreach (IPortalInfo p in PortalController.Instance.GetPortalList(Null.NullString))
                     {
                         var tokenSettings = ApiTokenSettings.GetSettings(p.PortalId);
+						Logger.LogDebug("UpdateApiTokenSettings(request={Request}): tokenSettings → {TokenSettings}", request, tokenSettings);
                         var oldValue = (int)tokenSettings.UserTokenTimespan;
+						Logger.LogDebug("UpdateApiTokenSettings(request={Request}): oldValue → {OldValue}", request, oldValue);
                         if (oldValue > newMax)
                         {
                             tokenSettings.UserTokenTimespan = (ApiTokenTimespan)newMax;
@@ -1148,6 +1344,7 @@ namespace Dnn.PersonaBar.Security.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting UpdateApiTokenSettings(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -1226,8 +1423,10 @@ namespace Dnn.PersonaBar.Security.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.ManageApiTokens)]
         public HttpResponseMessage GetApiTokenKeys()
         {
+			Logger.LogDebug(">>> Entering GetApiTokenKeys()");
             // The response.
             var response = new SortedDictionary<string, ApiTokenAttribute>();
+			Logger.LogDebug("GetApiTokenKeys(): response → {Response}", response);
 
             // Checks if the user is authorized.
             var user = this.UserInfo;
@@ -1249,6 +1448,7 @@ namespace Dnn.PersonaBar.Security.Services
             }
 
             // Returns the response.
+			Logger.LogDebug("<<< Exiting GetApiTokenKeys()");
             return this.Request.CreateResponse(HttpStatusCode.OK, response.Values);
         }
 
@@ -1261,14 +1461,18 @@ namespace Dnn.PersonaBar.Security.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.ManageApiTokens)]
         public HttpResponseMessage CreateApiToken(CreateApiTokenRequest data)
         {
+			Logger.LogDebug(">>> Entering CreateApiToken(data={Data})", data);
             var settings = ApiTokenSettings.GetSettings(this.PortalId);
             if (!settings.ApiTokensEnabled || (!settings.AllowApiTokens && data.Scope != (int)ApiTokenScope.Host))
+			Logger.LogDebug("CreateApiToken(data={Data}): settings → {Settings}", data, settings);
             {
                 return this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "API tokens are disabled");
             }
 
             var requestedScope = ApiTokenScope.User;
+			Logger.LogDebug("CreateApiToken(data={Data}): requestedScope → {RequestedScope}", data, requestedScope);
             var requestedTimespan = data.TokenTimespan;
+			Logger.LogDebug("CreateApiToken(data={Data}): requestedTimespan → {RequestedTimespan}", data, requestedTimespan);
 
             // Checks if the user is authorized.
             var user = this.UserInfo;
@@ -1301,7 +1505,9 @@ namespace Dnn.PersonaBar.Security.Services
 
             // Check the expiration time
             var expirationTime = DateTime.Now;
+			Logger.LogDebug("CreateApiToken(data={Data}): expirationTime → {ExpirationTime}", data, expirationTime);
             var setTimespan = (ApiTokenTimespan)requestedTimespan;
+			Logger.LogDebug("CreateApiToken(data={Data}): setTimespan → {SetTimespan}", data, setTimespan);
             switch (setTimespan)
             {
                 case ApiTokenTimespan.Days30:
@@ -1325,6 +1531,8 @@ namespace Dnn.PersonaBar.Security.Services
             }
 
             var token = this.apiTokenController.CreateApiToken(this.PortalId, data.TokenName.Trim(), requestedScope, expirationTime, data.ApiKeys, this.UserInfo.UserID);
+			Logger.LogWarning("CreateApiToken(data={Data}): token → {Token}", data, token);
+			Logger.LogDebug("<<< Exiting CreateApiToken(data={Data})", data);
             return this.Request.CreateResponse(HttpStatusCode.OK, token);
         }
 
@@ -1337,8 +1545,10 @@ namespace Dnn.PersonaBar.Security.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.ManageApiTokens)]
         public HttpResponseMessage RevokeOrDeleteApiToken(RevokeDeleteApiTokenRequest data)
         {
+			Logger.LogDebug(">>> Entering RevokeOrDeleteApiToken(data={Data})", data);
             var token = this.apiTokenController.GetApiToken(data.ApiTokenId);
             if (token == null)
+			Logger.LogWarning("RevokeOrDeleteApiToken(data={Data}): token → {Token}", data, token);
             {
                 return this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Invalid token");
             }
@@ -1346,6 +1556,7 @@ namespace Dnn.PersonaBar.Security.Services
             // Checks if the user is authorized.
             var user = this.UserInfo;
             var canManage = false;
+			Logger.LogDebug("RevokeOrDeleteApiToken(data={Data}): canManage → {CanManage}", data, canManage);
             if (user.IsSuperUser)
             {
                 canManage = true;
@@ -1378,6 +1589,7 @@ namespace Dnn.PersonaBar.Security.Services
                 this.apiTokenController.RevokeOrDeleteApiToken(token, data.Delete, user.UserID);
             }
 
+			Logger.LogDebug("<<< Exiting RevokeOrDeleteApiToken(data={Data})", data);
             return this.Request.CreateResponse(HttpStatusCode.OK, true);
         }
 
@@ -1394,9 +1606,12 @@ namespace Dnn.PersonaBar.Security.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.ManageApiTokens)]
         public HttpResponseMessage DeleteExpiredTokens()
         {
+			Logger.LogDebug(">>> Entering DeleteExpiredTokens()");
             var portalId = this.PortalId;
             var user = this.UserInfo;
+			Logger.LogDebug("DeleteExpiredTokens(): portalId → {PortalId}", portalId);
             var userId = user.UserID;
+			Logger.LogDebug("DeleteExpiredTokens(): userId → {UserId}", userId);
 
             if (user.IsSuperUser)
             {
@@ -1410,6 +1625,7 @@ namespace Dnn.PersonaBar.Security.Services
 
             this.apiTokenController.DeleteExpiredAndRevokedApiTokens(portalId, userId);
 
+			Logger.LogDebug("<<< Exiting DeleteExpiredTokens()");
             return this.Request.CreateResponse(HttpStatusCode.OK, true);
         }
 
@@ -1420,14 +1636,19 @@ namespace Dnn.PersonaBar.Security.Services
         [RequireAdmin]
         public HttpResponseMessage GetCspSettings()
         {
+			Logger.LogDebug(">>> Entering GetCspSettings()");
             try
             {
                 _ = bool.TryParse(Config.GetSetting("DisableCsp"), out bool disableCsp);
+				Logger.LogDebug("GetCspSettings(): _ → {_}", _);
 
                 var response = new
                 {
                     Success = true,
                     Results = new
+					Logger.LogDebug("GetCspSettings(): Results → {Results}", Results);
+					Logger.LogDebug("GetCspSettings(): Success → {Success}", Success);
+					Logger.LogDebug("GetCspSettings(): Settings → {Settings}", Settings);
                     {
                         Settings = new
                         {
@@ -1439,12 +1660,14 @@ namespace Dnn.PersonaBar.Security.Services
                         },
                     },
                 };
+				Logger.LogDebug("GetCspSettings(): CspDisabled → {CspDisabled}", CspDisabled);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetCspSettings()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -1458,21 +1681,28 @@ namespace Dnn.PersonaBar.Security.Services
         [RequireAdmin]
         public HttpResponseMessage UpdateCspSettings(UpdateCspSettingsRequest request)
         {
+			Logger.LogDebug(">>> Entering UpdateCspSettings(request={Request})", request);
             try
             {
                 var policy = new ContentSecurityPolicy(true);
+				Logger.LogDebug("UpdateCspSettings(request={Request}): policy → {Policy}", request, policy);
                 var parser = new ContentSecurityPolicyParser(policy);
+				Logger.LogDebug("UpdateCspSettings(request={Request}): parser → {Parser}", request, parser);
                 try
                 {
                     parser.Parse(request.CspHeader);
                 }
                 catch (Exception ex)
                 {
+					Logger.LogError("Exception in UpdateCspSettings(request={Request}): {Arg1}", request, ex.getMessage());
                     return this.Request.CreateResponse(HttpStatusCode.OK, new
                     {
                         Success = false,
                         Message = "Bad CspHeader - " + ex.Message,
                         Error = new
+						Logger.LogDebug("UpdateCspSettings(request={Request}): Message → {Message}", request, Message);
+						Logger.LogDebug("UpdateCspSettings(request={Request}): Error → {Error}", request, Error);
+						Logger.LogDebug("UpdateCspSettings(request={Request}): Success → {Success}", request, Success);
                         {
                             CspHeader = true,
                             CspHeaderErrors = new[] { ex.Message },
@@ -1480,6 +1710,10 @@ namespace Dnn.PersonaBar.Security.Services
                             CspReportingHeaderErrors = Array.Empty<string>(),
                         },
                     });
+					Logger.LogDebug("UpdateCspSettings(request={Request}): CspHeaderErrors → {CspHeaderErrors}", request, CspHeaderErrors);
+					Logger.LogDebug("UpdateCspSettings(request={Request}): CspReportingHeader → {CspReportingHeader}", request, CspReportingHeader);
+					Logger.LogDebug("UpdateCspSettings(request={Request}): CspReportingHeaderErrors → {CspReportingHeaderErrors}", request, CspReportingHeaderErrors);
+					Logger.LogDebug("UpdateCspSettings(request={Request}): CspHeader → {CspHeader}", request, CspHeader);
                 }
 
                 if (!string.IsNullOrEmpty(request.CspReportingHeader))
@@ -1515,6 +1749,7 @@ namespace Dnn.PersonaBar.Security.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting UpdateCspSettings(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -1550,19 +1785,26 @@ namespace Dnn.PersonaBar.Security.Services
 
         private static string DisplayDate(DateTime userDate)
         {
+			Logger.LogDebug(">>> Entering DisplayDate(userDate={UserDate})", userDate);
             var date = Null.NullString;
             date = !Null.IsNull(userDate) ? userDate.ToString(CultureInfo.InvariantCulture) : string.Empty;
+			Logger.LogDebug("DisplayDate(userDate={UserDate}): date → {Date}", userDate, date);
+			Logger.LogDebug("<<< Exiting DisplayDate(userDate={UserDate})", userDate);
             return date;
         }
 
         private int ValidateTabId(int tabId)
         {
+			Logger.LogDebug(">>> Entering ValidateTabId(tabId={TabId})", tabId);
             var tab = TabController.Instance.GetTab(tabId, this.PortalId);
+			Logger.LogDebug("ValidateTabId(tabId={TabId}): tab → {Tab}", tabId, tab);
+			Logger.LogDebug("<<< Exiting ValidateTabId(tabId={TabId})", tabId);
             return tab?.TabID ?? Null.NullInteger;
         }
 
         private string GetTabName(int tabId)
         {
+			Logger.LogDebug(">>> Entering GetTabName(tabId={TabId})", tabId);
             if (tabId == Null.NullInteger)
             {
                 return string.Empty;
@@ -1570,12 +1812,15 @@ namespace Dnn.PersonaBar.Security.Services
             else
             {
                 var tab = TabController.Instance.GetTab(tabId, this.PortalId);
+				Logger.LogDebug("GetTabName(tabId={TabId}): tab → {Tab}", tabId, tab);
+				Logger.LogDebug("<<< Exiting GetTabName(tabId={TabId})", tabId);
                 return tab != null ? tab.TabName : string.Empty;
             }
         }
 
         private string GetTabPath(int tabId)
         {
+			Logger.LogDebug(">>> Entering GetTabPath(tabId={TabId})", tabId);
             if (tabId == Null.NullInteger)
             {
                 return string.Empty;
@@ -1583,13 +1828,18 @@ namespace Dnn.PersonaBar.Security.Services
             else
             {
                 var tab = TabController.Instance.GetTab(tabId, this.PortalId);
+				Logger.LogDebug("GetTabPath(tabId={TabId}): tab → {Tab}", tabId, tab);
+				Logger.LogDebug("<<< Exiting GetTabPath(tabId={TabId})", tabId);
                 return tab != null ? tab.TabPath : string.Empty;
             }
         }
 
         private string GetFilePath(string filePath)
         {
+			Logger.LogDebug(">>> Entering GetFilePath(filePath={FilePath})", filePath);
             var path = Regex.Replace(filePath, Regex.Escape(this.applicationStatusInfo.ApplicationMapPath), string.Empty, RegexOptions.IgnoreCase);
+			Logger.LogDebug("GetFilePath(filePath={FilePath}): path → {Path}", filePath, path);
+			Logger.LogDebug("<<< Exiting GetFilePath(filePath={FilePath})", filePath);
             return path.TrimStart('\\');
         }
     }

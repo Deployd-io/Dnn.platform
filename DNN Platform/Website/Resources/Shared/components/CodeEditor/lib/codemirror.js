@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -8,6 +9,7 @@
 // at http://marijnhaverbeke.nl/blog/#cm-internals .
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     module.exports = mod();
   else if (typeof define == "function" && define.amd) // AMD
@@ -123,6 +125,7 @@
     if (webkit && options.lineWrapping &&
         getComputedStyle(display.lineDiv).textRendering == "optimizelegibility")
       display.lineDiv.style.textRendering = "auto";
+	logger.debug(`<<< Exiting copyObj(obj=${obj},target=${target},overwrite=${overwrite})`);
   }
 
   // DISPLAY CONSTRUCTOR
@@ -227,6 +230,7 @@
     d.activeTouch = null;
 
     input.init(d);
+	logger.debug(`<<< Exiting Display(place=${place},doc=${doc},input=${input})`);
   }
 
   // STATE UPDATES
@@ -236,17 +240,21 @@
   function loadMode(cm) {
     cm.doc.mode = CodeMirror.getMode(cm.options, cm.doc.modeOption);
     resetModeState(cm);
+	logger.debug(`<<< Exiting loadMode(cm=${cm})`);
   }
 
   function resetModeState(cm) {
     cm.doc.iter(function(line) {
+	logger.debug('>>> Entering iter()');
       if (line.stateAfter) line.stateAfter = null;
       if (line.styles) line.styles = null;
     });
     cm.doc.frontier = cm.doc.first;
+	logger.debug('<<< Exiting iter()');
     startWorker(cm, 100);
     cm.state.modeGen++;
     if (cm.curOp) regChange(cm);
+	logger.debug(`<<< Exiting resetModeState(cm=${cm})`);
   }
 
   function wrappingChanged(cm) {
@@ -262,6 +270,7 @@
     regChange(cm);
     clearCaches(cm);
     setTimeout(function(){updateScrollbars(cm);}, 100);
+	logger.debug(`<<< Exiting wrappingChanged(cm=${cm})`);
   }
 
   // Returns a function that estimates the height of a line, to use as
@@ -291,18 +300,21 @@
       var estHeight = est(line);
       if (estHeight != line.height) updateLineHeight(line, estHeight);
     });
+	logger.debug(`<<< Exiting estimateLineHeights(cm=${cm})`);
   }
 
   function themeChanged(cm) {
     cm.display.wrapper.className = cm.display.wrapper.className.replace(/\s*cm-s-\S+/g, "") +
       cm.options.theme.replace(/(^|\s)\s*/g, " cm-s-");
     clearCaches(cm);
+	logger.debug(`<<< Exiting themeChanged(cm=${cm})`);
   }
 
   function guttersChanged(cm) {
     updateGutters(cm);
     regChange(cm);
     setTimeout(function(){alignHorizontally(cm);}, 20);
+	logger.debug(`<<< Exiting guttersChanged(cm=${cm})`);
   }
 
   // Rebuild the gutter elements, ensure the margin to the left of the
@@ -320,11 +332,13 @@
     }
     gutters.style.display = i ? "" : "none";
     updateGutterSpace(cm);
+	logger.debug(`<<< Exiting updateGutters(cm=${cm})`);
   }
 
   function updateGutterSpace(cm) {
     var width = cm.display.gutters.offsetWidth;
     cm.display.sizer.style.marginLeft = width + "px";
+	logger.debug(`<<< Exiting updateGutterSpace(cm=${cm})`);
   }
 
   // Compute the character length of a line, taking into account
@@ -356,11 +370,13 @@
     d.maxLineChanged = true;
     doc.iter(function(line) {
       var len = lineLength(line);
+	logger.debug(`iter(len=${len}): len → ${len}`);
       if (len > d.maxLineLength) {
         d.maxLineLength = len;
         d.maxLine = line;
       }
     });
+	logger.debug(`<<< Exiting findMaxLine(cm=${cm})`);
   }
 
   // Make sure the gutters options contains the element
@@ -373,6 +389,7 @@
       options.gutters = options.gutters.slice(0);
       options.gutters.splice(found, 1);
     }
+	logger.debug(`<<< Exiting setGuttersForLineNumbers(options=${options})`);
   }
 
   // SCROLLBARS
@@ -403,6 +420,7 @@
 
     on(vert, "scroll", function() {
       if (vert.clientHeight) scroll(vert.scrollTop, "vertical");
+	logger.debug(`>>> Entering on(vert=${vert})`);
     });
     on(horiz, "scroll", function() {
       if (horiz.clientWidth) scroll(horiz.scrollLeft, "horizontal");
@@ -411,6 +429,7 @@
     this.checkedOverlay = false;
     // Need to set a minimum width to see the scrollbar on IE7 (but must not set it on IE8).
     if (ie && ie_version < 8) this.horiz.style.minHeight = this.vert.style.minWidth = "18px";
+	logger.debug(`<<< Exiting NativeScrollbars(place=${place},scroll=${scroll},cm=${cm})`);
   }
 
   NativeScrollbars.prototype = copyObj({
@@ -452,25 +471,34 @@
     },
     setScrollLeft: function(pos) {
       if (this.horiz.scrollLeft != pos) this.horiz.scrollLeft = pos;
+	logger.debug(`<<< Exiting setScrollLeft(pos=${pos})`);
     },
     setScrollTop: function(pos) {
       if (this.vert.scrollTop != pos) this.vert.scrollTop = pos;
+	logger.debug(`<<< Exiting setScrollTop(pos=${pos})`);
     },
     overlayHack: function() {
+	logger.debug('>>> Entering overlayHack()');
       var w = mac && !mac_geMountainLion ? "12px" : "18px";
       this.horiz.style.minHeight = this.vert.style.minWidth = w;
+	logger.debug(`overlayHack(): w → ${w}`);
       var self = this;
       var barMouseDown = function(e) {
+		logger.debug(`>>> Entering barMouseDown(e=${e})`);
         if (e_target(e) != self.vert && e_target(e) != self.horiz)
           operation(self.cm, onMouseDown)(e);
+		logger.debug(`<<< Exiting barMouseDown(e=${e})`);
       };
       on(this.vert, "mousedown", barMouseDown);
       on(this.horiz, "mousedown", barMouseDown);
+	logger.debug('<<< Exiting overlayHack()');
     },
     clear: function() {
+	logger.debug('>>> Entering clear()');
       var parent = this.horiz.parentNode;
       parent.removeChild(this.horiz);
       parent.removeChild(this.vert);
+	logger.debug('<<< Exiting clear()');
     }
   }, NativeScrollbars.prototype);
 
@@ -505,6 +533,7 @@
     }, cm);
     if (cm.display.scrollbars.addClass)
       addClass(cm.display.wrapper, cm.display.scrollbars.addClass);
+	logger.debug(`<<< Exiting initScrollbars(cm=${cm})`);
   }
 
   function updateScrollbars(cm, measure) {
@@ -517,6 +546,7 @@
       updateScrollbarsInner(cm, measureForScrollbars(cm));
       startWidth = cm.display.barWidth; startHeight = cm.display.barHeight;
     }
+	logger.debug(`<<< Exiting updateScrollbars(cm=${cm},measure=${measure})`);
   }
 
   // Re-synchronize the fake scrollbars with the actual size of the
@@ -538,6 +568,7 @@
       d.gutterFiller.style.height = sizes.bottom + "px";
       d.gutterFiller.style.width = measure.gutterWidth + "px";
     } else d.gutterFiller.style.display = "";
+	logger.debug(`<<< Exiting updateScrollbarsInner(cm=${cm},measure=${measure})`);
   }
 
   // Compute the lines that are visible in a given viewport (defaults
@@ -582,6 +613,7 @@
     }
     if (cm.options.fixedGutter)
       display.gutters.style.left = (comp + gutterW) + "px";
+	logger.debug(`<<< Exiting alignHorizontally(cm=${cm})`);
   }
 
   // Used to ensure that the line number gutter is still the right
@@ -631,6 +663,7 @@
     this.force = force;
     this.dims = getDimensions(cm);
     this.events = [];
+	logger.debug(`<<< Exiting DisplayUpdate(cm=${cm},viewport=${viewport},force=${force})`);
   }
 
   DisplayUpdate.prototype.signal = function(emitter, type) {
@@ -651,6 +684,7 @@
       display.sizer.style.borderRightWidth = scrollGap(cm) + "px";
       display.scrollbarsClipped = true;
     }
+	logger.debug(`<<< Exiting maybeClipScrollbars(cm=${cm})`);
   }
 
   // Does the actual updating of the line display. Bails out
@@ -674,6 +708,7 @@
     if (maybeUpdateLineNumberWidth(cm)) {
       resetView(cm);
       update.dims = getDimensions(cm);
+	logger.debug(`<<< Exiting countDirtyView(cm=${cm})`);
     }
 
     // Compute a suitable new viewport (from & to)
@@ -754,6 +789,7 @@
       update.signal(cm, "viewportChange", cm, cm.display.viewFrom, cm.display.viewTo);
       cm.display.reportedViewFrom = cm.display.viewFrom; cm.display.reportedViewTo = cm.display.viewTo;
     }
+	logger.debug(`<<< Exiting postUpdateDisplay(cm=${cm},update=${update})`);
   }
 
   function updateDisplaySimple(cm, viewport) {
@@ -767,6 +803,7 @@
       updateScrollbars(cm, barMeasure);
       update.finish();
     }
+	logger.debug(`<<< Exiting updateDisplaySimple(cm=${cm},viewport=${viewport})`);
   }
 
   function setDocumentHeight(cm, measure) {
@@ -774,6 +811,7 @@
     var total = measure.docHeight + cm.display.barHeight;
     cm.display.heightForcer.style.top = total + "px";
     cm.display.gutters.style.height = Math.max(total + scrollGap(cm), measure.clientHeight) + "px";
+	logger.debug(`<<< Exiting setDocumentHeight(cm=${cm},measure=${measure})`);
   }
 
   // Read the actual heights of the rendered lines, and update their
@@ -801,6 +839,7 @@
           updateWidgetHeight(cur.rest[j]);
       }
     }
+	logger.debug(`<<< Exiting updateHeightsInViewport(cm=${cm})`);
   }
 
   // Read and store the height of line widgets associated with the
@@ -808,6 +847,7 @@
   function updateWidgetHeight(line) {
     if (line.widgets) for (var i = 0; i < line.widgets.length; ++i)
       line.widgets[i].height = line.widgets[i].node.offsetHeight;
+	logger.debug(`<<< Exiting updateWidgetHeight(line=${line})`);
   }
 
   // Do a bulk-read of the DOM positions and sizes needed to draw the
@@ -870,6 +910,7 @@
       lineN += lineView.size;
     }
     while (cur) cur = rm(cur);
+	logger.debug(`<<< Exiting patchDisplay(cm=${cm},updateNumbersFrom=${updateNumbersFrom},dims=${dims})`);
   }
 
   // When an aspect of a line changes, a string is added to
@@ -884,6 +925,7 @@
       else if (type == "widget") updateLineWidgets(cm, lineView, dims);
     }
     lineView.changes = null;
+	logger.debug(`<<< Exiting updateLineForChanges(cm=${cm},lineView=${lineView},lineN=${lineN},dims=${dims})`);
   }
 
   // Lines with gutter elements, widgets or a background class need to
@@ -909,6 +951,7 @@
       var wrap = ensureLineWrapped(lineView);
       lineView.background = wrap.insertBefore(elt("div", null, cls), wrap.firstChild);
     }
+	logger.debug(`<<< Exiting updateLineBackground(lineView=${lineView})`);
   }
 
   // Wrapper around buildLineContent which will reuse the structure
@@ -939,6 +982,7 @@
     } else if (cls) {
       lineView.text.className = cls;
     }
+	logger.debug(`<<< Exiting updateLineText(cm=${cm},lineView=${lineView})`);
   }
 
   function updateLineClasses(lineView) {
@@ -949,6 +993,7 @@
       lineView.node.className = "";
     var textClass = lineView.textClass ? lineView.textClass + " " + (lineView.line.textClass || "") : lineView.line.textClass;
     lineView.text.className = textClass || "";
+	logger.debug(`<<< Exiting updateLineClasses(lineView=${lineView})`);
   }
 
   function updateLineGutter(cm, lineView, lineN, dims) {
@@ -989,6 +1034,7 @@
                                      dims.gutterLeft[id] + "px; width: " + dims.gutterWidth[id] + "px"));
       }
     }
+	logger.debug(`<<< Exiting updateLineGutter(cm=${cm},lineView=${lineView},lineN=${lineN},dims=${dims})`);
   }
 
   function updateLineWidgets(cm, lineView, dims) {
@@ -999,6 +1045,7 @@
         lineView.node.removeChild(node);
     }
     insertLineWidgets(cm, lineView, dims);
+	logger.debug(`<<< Exiting updateLineWidgets(cm=${cm},lineView=${lineView},dims=${dims})`);
   }
 
   // Build a line's DOM representation from scratch
@@ -1020,6 +1067,7 @@
     insertLineWidgetsFor(cm, lineView.line, lineView, dims, true);
     if (lineView.rest) for (var i = 0; i < lineView.rest.length; i++)
       insertLineWidgetsFor(cm, lineView.rest[i], lineView, dims, false);
+	logger.debug(`<<< Exiting insertLineWidgets(cm=${cm},lineView=${lineView},dims=${dims})`);
   }
 
   function insertLineWidgetsFor(cm, line, lineView, dims, allowAbove) {
@@ -1036,6 +1084,7 @@
         wrap.appendChild(node);
       signalLater(widget, "redraw");
     }
+	logger.debug(`<<< Exiting insertLineWidgetsFor(cm=${cm},line=${line},lineView=${lineView},dims=${dims},allowAbove=${allowAbove})`);
   }
 
   function positionLineWidget(widget, node, lineView, dims) {
@@ -1054,6 +1103,7 @@
       node.style.position = "relative";
       if (!widget.noHScroll) node.style.marginLeft = -dims.gutterTotalWidth + "px";
     }
+	logger.debug(`<<< Exiting positionLineWidget(widget=${widget},node=${node},lineView=${lineView},dims=${dims})`);
   }
 
   // POSITION OBJECT
@@ -1062,6 +1112,7 @@
   var Pos = CodeMirror.Pos = function(line, ch) {
     if (!(this instanceof Pos)) return new Pos(line, ch);
     this.line = line; this.ch = ch;
+	logger.debug(`function(line=${line},ch=${ch}): this.line → ${this.line}`);
   };
 
   // Compare two positions, return 0 if they are the same, a negative
@@ -1076,6 +1127,7 @@
 
   function ensureFocus(cm) {
     if (!cm.state.focused) { cm.display.input.focus(); onFocus(cm); }
+	logger.debug(`<<< Exiting ensureFocus(cm=${cm})`);
   }
 
   function isReadOnly(cm) {
@@ -1130,6 +1182,7 @@
     cm.curOp.updateInput = updateInput;
     cm.curOp.typing = true;
     cm.state.pasteIncoming = cm.state.cutIncoming = false;
+	logger.debug(`<<< Exiting applyTextInput(cm=${cm},inserted=${inserted},deleted=${deleted},sel=${sel},origin=${origin})`);
   }
 
   function handlePaste(e, cm) {
@@ -1164,6 +1217,7 @@
       }
       if (indented) signalLater(cm, "electricInput", cm, range.head.line);
     }
+	logger.debug(`<<< Exiting triggerElectric(cm=${cm},inserted=${inserted})`);
   }
 
   function copyableRanges(cm) {
@@ -1178,9 +1232,11 @@
   }
 
   function disableBrowserMagic(field) {
+	logger.debug(`>>> Entering disableBrowserMagic(field=${field})`);
     field.setAttribute("autocorrect", "off");
     field.setAttribute("autocapitalize", "off");
     field.setAttribute("spellcheck", "false");
+	logger.debug(`<<< Exiting disableBrowserMagic(field=${field})`);
   }
 
   // TEXTAREA INPUT STYLE
@@ -1189,23 +1245,32 @@
     this.cm = cm;
     // See input.poll and input.reset
     this.prevInput = "";
+	logger.debug(`TextareaInput(cm=${cm}): cm → ${cm}`);
+	logger.debug(`TextareaInput(cm=${cm}): this.cm → ${this.cm}`);
 
     // Flag that indicates whether we expect input to appear real soon
     // now (after some event like 'keypress' or 'input') and are
     // polling intensively.
     this.pollingFast = false;
+	logger.debug(`TextareaInput(cm=${cm}): this.prevInput → ${this.prevInput}`);
     // Self-resetting timeout for the poller
     this.polling = new Delayed();
+	logger.debug(`TextareaInput(cm=${cm}): this.pollingFast → ${this.pollingFast}`);
     // Tracks when input.reset has punted to just putting a short
     // string into the textarea instead of the full selection.
     this.inaccurateSelection = false;
     // Used to work around IE issue with selection being forgotten when focus moves away from textarea
     this.hasSelection = false;
+	logger.debug(`TextareaInput(cm=${cm}): this.inaccurateSelection → ${this.inaccurateSelection}`);
+	logger.debug(`TextareaInput(cm=${cm}): this.hasSelection → ${this.hasSelection}`);
     this.composing = null;
+	logger.debug(`TextareaInput(cm=${cm}): this.composing → ${this.composing}`);
+	logger.debug(`<<< Exiting TextareaInput(cm=${cm})`);
   };
 
   function hiddenTextarea() {
     var te = elt("textarea", null, null, "position: absolute; padding: 0; width: 1px; height: 1em; outline: none");
+	logger.debug('>>> Entering hiddenTextarea()');
     var div = elt("div", [te], null, "overflow: hidden; position: relative; width: 3px; height: 0px;");
     // The textarea is kept positioned near the cursor to prevent the
     // fact that it'll be scrolled into view on input from scrolling
@@ -1213,14 +1278,17 @@
     // very slow. So make the area wide instead.
     if (webkit) te.style.width = "1000px";
     else te.setAttribute("wrap", "off");
+	logger.debug(`hiddenTextarea(): div → ${div}`);
     // If border: 0; -- iOS fails to open keyboard (issue #1287)
     if (ios) te.style.border = "1px solid black";
     disableBrowserMagic(te);
+	logger.debug('<<< Exiting hiddenTextarea()');
     return div;
   }
 
   TextareaInput.prototype = copyObj({
     init: function(display) {
+	logger.debug(`>>> Entering init(display=${display})`);
       var input = this, cm = this.cm;
 
       // Wraps and hides input textarea
@@ -1232,8 +1300,10 @@
 
       // Needed to hide big blue blinking cursor on Mobile Safari (doesn't seem to work in iOS 8 anymore)
       if (ios) te.style.width = "0px";
+	logger.debug(`<<< Exiting init(display=${display})`);
 
       on(te, "input", function() {
+		logger.debug(`>>> Entering on(te=${te})`);
         if (ie && ie_version >= 9 && input.hasSelection) input.hasSelection = null;
         input.poll();
       });
@@ -1268,6 +1338,7 @@
           }
         }
         if (e.type == "cut") cm.state.cutIncoming = true;
+		logger.debug(`<<< Exiting prepareCopyCut(e=${e})`);
       }
       on(te, "cut", prepareCopyCut);
       on(te, "copy", prepareCopyCut);
@@ -1297,9 +1368,12 @@
           input.composing = null;
         }
       });
+	logger.debug(`init(display=${display}): div → ${div}`);
+	logger.debug(`init(display=${display}): div.contentEditable → ${div.contentEditable}`);
     },
 
     prepareSelection: function() {
+	logger.debug('>>> Entering prepareSelection()');
       // Redraw the selection and/or cursor
       var cm = this.cm, display = cm.display, doc = cm.doc;
       var result = prepareSelection(cm);
@@ -1308,22 +1382,28 @@
       if (cm.options.moveInputWithCursor) {
         var headPos = cursorCoords(cm, doc.sel.primary().head, "div");
         var wrapOff = display.wrapper.getBoundingClientRect(), lineOff = display.lineDiv.getBoundingClientRect();
+		logger.debug(`prepareSelection(): headPos → ${headPos}`);
         result.teTop = Math.max(0, Math.min(display.wrapper.clientHeight - 10,
                                             headPos.top + lineOff.top - wrapOff.top));
+											logger.debug(`prepareSelection(): wrapOff → ${wrapOff}`);
         result.teLeft = Math.max(0, Math.min(display.wrapper.clientWidth - 10,
                                              headPos.left + lineOff.left - wrapOff.left));
       }
 
+	logger.debug(`prepareSelection(): result.focus → ${result.focus}`);
+	logger.debug('<<< Exiting prepareSelection()');
       return result;
     },
 
     showSelection: function(drawn) {
+	logger.debug(`>>> Entering showSelection(drawn=${drawn})`);
       var cm = this.cm, display = cm.display;
       removeChildrenAndAdd(display.cursorDiv, drawn.cursors);
       removeChildrenAndAdd(display.selectionDiv, drawn.selection);
       if (drawn.teTop != null) {
         this.wrapper.style.top = drawn.teTop + "px";
         this.wrapper.style.left = drawn.teLeft + "px";
+		logger.debug(`<<< Exiting showSelection(drawn=${drawn})`);
       }
     },
 
@@ -1353,16 +1433,20 @@
     supportsTouch: function() { return false; },
 
     focus: function() {
+	logger.debug('>>> Entering focus()');
       if (this.cm.options.readOnly != "nocursor" && (!mobile || activeElt() != this.textarea)) {
         try { this.textarea.focus(); }
         catch (e) {} // IE8 will throw if the textarea is display: none or not in DOM
+		logger.debug('<<< Exiting focus()');
       }
     },
 
     blur: function() { this.textarea.blur(); },
 
     resetPosition: function() {
+	logger.debug('>>> Entering resetPosition()');
       this.wrapper.style.top = this.wrapper.style.left = 0;
+	logger.debug('<<< Exiting resetPosition()');
     },
 
     receivedFocus: function() { this.slowPoll(); },
@@ -1370,26 +1454,33 @@
     // Poll for input changes, using the normal rate of polling. This
     // runs as long as the editor is focused.
     slowPoll: function() {
+	logger.debug('>>> Entering slowPoll()');
       var input = this;
       if (input.pollingFast) return;
+	logger.debug('<<< Exiting slowPoll()');
       input.polling.set(this.cm.options.pollInterval, function() {
         input.poll();
         if (input.cm.state.focused) input.slowPoll();
       });
+	logger.debug('>>> Entering receivedFocus()');
+	logger.debug('<<< Exiting receivedFocus()');
     },
 
     // When an event has just come in that is likely to add or change
     // something in the input textarea, we poll faster, to ensure that
     // the change appears on the screen quickly.
     fastPoll: function() {
+	logger.debug('>>> Entering fastPoll()');
       var missed = false, input = this;
       input.pollingFast = true;
+	logger.debug(`fastPoll(): input.pollingFast → ${input.pollingFast}`);
       function p() {
         var changed = input.poll();
         if (!changed && !missed) {missed = true; input.polling.set(60, p);}
         else {input.pollingFast = false; input.slowPoll();}
       }
       input.polling.set(20, p);
+	logger.debug('<<< Exiting fastPoll()');
     },
 
     // Read input from the textarea, and update the document to match.
@@ -1399,6 +1490,7 @@
     // seen text (can be empty), which is stored in prevInput (we must
     // not reset the textarea when typing, because that breaks IME).
     poll: function() {
+	logger.debug('>>> Entering poll()');
       var cm = this.cm, input = this.textarea, prevInput = this.prevInput;
       // Since this is called a *lot*, try to bail out as cheaply as
       // possible when it is clear that nothing happened. hasSelection
@@ -1430,6 +1522,7 @@
       var same = 0, l = Math.min(prevInput.length, text.length);
       while (same < l && prevInput.charCodeAt(same) == text.charCodeAt(same)) ++same;
 
+	logger.debug('<<< Exiting poll()');
       var self = this;
       runInOp(cm, function() {
         applyTextInput(cm, text.slice(same), prevInput.length - same,
@@ -1445,11 +1538,14 @@
                                              {className: "CodeMirror-composing"});
         }
       });
+	logger.debug('<<< Exiting runInOp()');
       return true;
     },
 
     ensurePolled: function() {
+	logger.debug('>>> Entering ensurePolled()');
       if (this.pollingFast && this.poll()) this.pollingFast = false;
+	logger.debug('<<< Exiting ensurePolled()');
     },
 
     onKeyPress: function() {
@@ -1458,8 +1554,10 @@
     },
 
     onContextMenu: function(e) {
+	logger.debug(`>>> Entering onContextMenu(e=${e})`);
       var input = this, cm = input.cm, display = cm.display, te = input.textarea;
       var pos = posFromMouse(cm, e), scrollPos = display.scroller.scrollTop;
+	logger.debug(`onContextMenu(e=${e}): pos → ${pos}`);
       if (!pos || presto) return; // Opera is difficult.
 
       // Reset the current text selection only if the click is done outside of the selection
@@ -1475,22 +1573,29 @@
         (ie ? "rgba(255, 255, 255, .05)" : "transparent") +
         "; outline: none; border-width: 0; outline: none; overflow: hidden; opacity: .05; filter: alpha(opacity=5);";
       if (webkit) var oldScrollY = window.scrollY; // Work around Chrome issue (#2712)
+	logger.debug(`onContextMenu(e=${e}): oldScrollY → ${oldScrollY}`);
       display.input.focus();
       if (webkit) window.scrollTo(null, oldScrollY);
       display.input.reset();
       // Adds "Select all" to context menu in FF
       if (!cm.somethingSelected()) te.value = input.prevInput = " ";
       input.contextMenuPending = true;
+	logger.debug(`onContextMenu(e=${e}): input.contextMenuPending → ${input.contextMenuPending}`);
       display.selForContextMenu = cm.doc.sel;
+	logger.debug(`onContextMenu(e=${e}): display.selForContextMenu → ${display.selForContextMenu}`);
       clearTimeout(display.detectingSelectAll);
 
+	logger.debug(`<<< Exiting onContextMenu(e=${e})`);
       // Select-all will be greyed out if there's nothing to select, so
       // this adds a zero-width space so that we can later check whether
       // it got selected.
       function prepareSelectAllHack() {
+		logger.debug('>>> Entering prepareSelectAllHack()');
         if (te.selectionStart != null) {
           var selected = cm.somethingSelected();
+		logger.debug(`prepareSelectAllHack(): selected → ${selected}`);
           var extval = "\u200b" + (selected ? te.value : "");
+		logger.debug(`prepareSelectAllHack(): extval → ${extval}`);
           te.value = "\u21da"; // Used to catch context-menu undo
           te.value = extval;
           input.prevInput = selected ? "" : "\u200b";
@@ -1499,8 +1604,10 @@
           // selection in the meantime.
           display.selForContextMenu = cm.doc.sel;
         }
+		logger.debug('<<< Exiting prepareSelectAllHack()');
       }
       function rehide() {
+		logger.debug('>>> Entering rehide()');
         input.contextMenuPending = false;
         input.wrapper.style.position = "relative";
         te.style.cssText = oldCSS;
@@ -1517,6 +1624,7 @@
             else display.input.reset();
           };
           display.detectingSelectAll = setTimeout(poll, 200);
+		logger.debug('<<< Exiting rehide()');
         }
       }
 
@@ -1524,13 +1632,17 @@
       if (captureRightClick) {
         e_stop(e);
         var mouseup = function() {
+		logger.debug('>>> Entering mouseup()');
           off(window, "mouseup", mouseup);
           setTimeout(rehide, 20);
+		logger.debug('<<< Exiting mouseup()');
         };
         on(window, "mouseup", mouseup);
       } else {
         setTimeout(rehide, 50);
       }
+	logger.debug(`>>> Entering onContextMenu(cm=${cm},e=${e})`);
+	logger.debug(`<<< Exiting onContextMenu(cm=${cm},e=${e})`);
     },
 
     setUneditable: nothing,
@@ -1543,8 +1655,12 @@
   function ContentEditableInput(cm) {
     this.cm = cm;
     this.lastAnchorNode = this.lastAnchorOffset = this.lastFocusNode = this.lastFocusOffset = null;
+	logger.debug(`ContentEditableInput(cm=${cm}): cm → ${cm}`);
+	logger.debug(`ContentEditableInput(cm=${cm}): this.cm → ${this.cm}`);
+	logger.debug(`ContentEditableInput(cm=${cm}): this.gracePeriod → ${this.gracePeriod}`);
     this.polling = new Delayed();
     this.gracePeriod = false;
+	logger.debug(`<<< Exiting ContentEditableInput(cm=${cm})`);
   }
 
   ContentEditableInput.prototype = copyObj({
@@ -1559,6 +1675,7 @@
       on(div, "compositionstart", function(e) {
         var data = e.data;
         input.composing = {sel: cm.doc.sel, data: data, startData: data};
+		logger.debug(`>>> Entering on(div=${div})`);
         if (!data) return;
         var prim = cm.doc.sel.primary();
         var line = cm.getLine(prim.head.line);
@@ -1579,9 +1696,11 @@
         // selection polling) from doing damage when fired right after
         // compositionend.
         setTimeout(function() {
+		logger.debug('>>> Entering setTimeout()');
           if (!ours.handled)
             input.applyComposition(ours);
           if (input.composing == ours)
+			logger.debug('<<< Exiting setTimeout()');
             input.composing = null;
         }, 50);
       });
@@ -1604,12 +1723,15 @@
           return;
         } else {
           var ranges = copyableRanges(cm);
+		logger.debug(`onCopyCut(e=${e}): ranges → ${ranges}`);
           lastCopied = ranges.text;
           if (e.type == "cut") {
             cm.operation(function() {
+			logger.debug('>>> Entering operation()');
               cm.setSelections(ranges.ranges, 0, sel_dontScroll);
               cm.replaceSelection("", null, "cut");
             });
+			logger.debug('<<< Exiting operation()');
           }
         }
         // iOS exposes the clipboard API, but seems to discard content inserted into it
@@ -1620,6 +1742,7 @@
         } else {
           // Old-fashioned briefly-focus-a-textarea hack
           var kludge = hiddenTextarea(), te = kludge.firstChild;
+		logger.debug(`onCopyCut(e=${e}): kludge → ${kludge}`);
           cm.display.lineSpace.insertBefore(kludge, cm.display.lineSpace.firstChild);
           te.value = lastCopied.join("\n");
           var hadFocus = document.activeElement;
@@ -1629,6 +1752,7 @@
             hadFocus.focus();
           }, 50);
         }
+		logger.debug(`<<< Exiting onCopyCut(e=${e})`);
       }
       on(div, "copy", onCopyCut);
       on(div, "cut", onCopyCut);
@@ -1647,12 +1771,16 @@
     },
 
     showPrimarySelection: function() {
+	logger.debug('>>> Entering showPrimarySelection()');
       var sel = window.getSelection(), prim = this.cm.doc.sel.primary();
       var curAnchor = domToPos(this.cm, sel.anchorNode, sel.anchorOffset);
+	logger.debug(`showPrimarySelection(): sel → ${sel}`);
       var curFocus = domToPos(this.cm, sel.focusNode, sel.focusOffset);
       if (curAnchor && !curAnchor.bad && curFocus && !curFocus.bad &&
           cmp(minPos(curAnchor, curFocus), prim.from()) == 0 &&
           cmp(maxPos(curAnchor, curFocus), prim.to()) == 0)
+		logger.debug(`showPrimarySelection(): curAnchor → ${curAnchor}`);
+	logger.debug(`showPrimarySelection(): curFocus → ${curFocus}`);
         return;
 
       var start = posToDOM(this.cm, prim.from());
@@ -1671,40 +1799,55 @@
 
       try { var rng = range(start.node, start.offset, end.offset, end.node); }
       catch(e) {} // Our model of the DOM might be outdated, in which case the range we try to set can be impossible
+	logger.error('Exception in showPrimarySelection():', e.message, e);
       if (rng) {
         sel.removeAllRanges();
         sel.addRange(rng);
         if (old && sel.anchorNode == null) sel.addRange(old);
         else if (gecko) this.startGracePeriod();
+		logger.debug(`<<< Exiting map(array=${array},f=${f})`);
       }
       this.rememberSelection();
+	logger.debug('<<< Exiting showPrimarySelection()');
     },
 
     startGracePeriod: function() {
+	logger.debug('>>> Entering startGracePeriod()');
       var input = this;
       clearTimeout(this.gracePeriod);
+	logger.debug('<<< Exiting startGracePeriod()');
       this.gracePeriod = setTimeout(function() {
         input.gracePeriod = false;
         if (input.selectionChanged())
           input.cm.operation(function() { input.cm.curOp.selectionChanged = true; });
       }, 20);
+	logger.debug(`startGracePeriod(): input.gracePeriod → ${input.gracePeriod}`);
     },
 
     showMultipleSelections: function(info) {
       removeChildrenAndAdd(this.cm.display.cursorDiv, info.cursors);
       removeChildrenAndAdd(this.cm.display.selectionDiv, info.selection);
+	logger.debug(`<<< Exiting showMultipleSelections(info=${info})`);
     },
 
     rememberSelection: function() {
+	logger.debug('>>> Entering rememberSelection()');
       var sel = window.getSelection();
       this.lastAnchorNode = sel.anchorNode; this.lastAnchorOffset = sel.anchorOffset;
+	logger.debug(`rememberSelection(): sel → ${sel}`);
+	logger.debug(`rememberSelection(): this.lastAnchorNode → ${this.lastAnchorNode}`);
       this.lastFocusNode = sel.focusNode; this.lastFocusOffset = sel.focusOffset;
+	logger.debug(`rememberSelection(): this.lastFocusNode → ${this.lastFocusNode}`);
+	logger.debug('<<< Exiting rememberSelection()');
     },
 
     selectionInEditor: function() {
       var sel = window.getSelection();
+	logger.debug('>>> Entering selectionInEditor()');
       if (!sel.rangeCount) return false;
       var node = sel.getRangeAt(0).commonAncestorContainer;
+	logger.debug('<<< Exiting selectionInEditor()');
+	logger.debug(`selectionInEditor(): node → ${node}`);
       return contains(this.div, node);
     },
 
@@ -1733,18 +1876,24 @@
     },
 
     selectionChanged: function() {
+	logger.debug('>>> Entering selectionChanged()');
       var sel = window.getSelection();
       return sel.anchorNode != this.lastAnchorNode || sel.anchorOffset != this.lastAnchorOffset ||
         sel.focusNode != this.lastFocusNode || sel.focusOffset != this.lastFocusOffset;
+		logger.debug('<<< Exiting selectionChanged()');
     },
 
     pollSelection: function() {
+	logger.debug('>>> Entering pollSelection()');
       if (!this.composing && !this.gracePeriod && this.selectionChanged()) {
         var sel = window.getSelection(), cm = this.cm;
+		logger.debug(`pollSelection(): sel → ${sel}`);
         this.rememberSelection();
         var anchor = domToPos(cm, sel.anchorNode, sel.anchorOffset);
+		logger.debug(`pollSelection(): anchor → ${anchor}`);
         var head = domToPos(cm, sel.focusNode, sel.focusOffset);
         if (anchor && head) runInOp(cm, function() {
+		logger.debug('<<< Exiting pollSelection()');
           setSelection(cm.doc, simpleSelection(anchor, head), sel_dontScroll);
           if (anchor.bad || head.bad) cm.curOp.selectionChanged = true;
         });
@@ -1752,8 +1901,10 @@
     },
 
     pollContent: function() {
+	logger.debug('>>> Entering pollContent()');
       var cm = this.cm, display = cm.display, sel = cm.doc.sel.primary();
       var from = sel.from(), to = sel.to();
+	logger.debug(`pollContent(): cm → ${cm}`);
       if (from.line < display.viewFrom || to.line > display.viewTo - 1) return false;
 
       var fromIndex;
@@ -1762,20 +1913,25 @@
         var fromNode = display.view[0].node;
       } else {
         var fromLine = lineNo(display.view[fromIndex].line);
+		logger.debug(`pollContent(): fromLine → ${fromLine}`);
         var fromNode = display.view[fromIndex - 1].node.nextSibling;
       }
       var toIndex = findViewIndex(cm, to.line);
+	logger.debug(`pollContent(): toIndex → ${toIndex}`);
       if (toIndex == display.view.length - 1) {
         var toLine = display.viewTo - 1;
         var toNode = display.lineDiv.lastChild;
       } else {
         var toLine = lineNo(display.view[toIndex + 1].line) - 1;
+		logger.debug(`pollContent(): toLine → ${toLine}`);
         var toNode = display.view[toIndex + 1].node.previousSibling;
       }
 
       var newText = cm.doc.splitLines(domTextBetween(cm, fromNode, toNode, fromLine, toLine));
+	logger.debug(`pollContent(): newText → ${newText}`);
       var oldText = getBetween(cm.doc, Pos(fromLine, 0), Pos(toLine, getLine(cm.doc, toLine).text.length));
       while (newText.length > 1 && oldText.length > 1) {
+		logger.debug(`pollContent(): oldText → ${oldText}`);
         if (lst(newText) == lst(oldText)) { newText.pop(); oldText.pop(); toLine--; }
         else if (newText[0] == oldText[0]) { newText.shift(); oldText.shift(); fromLine++; }
         else break;
@@ -1810,19 +1966,25 @@
       this.forceCompositionEnd();
     },
     forceCompositionEnd: function() {
+	logger.debug('>>> Entering forceCompositionEnd()');
       if (!this.composing || this.composing.handled) return;
       this.applyComposition(this.composing);
       this.composing.handled = true;
       this.div.blur();
       this.div.focus();
+	logger.debug('<<< Exiting forceCompositionEnd()');
     },
     applyComposition: function(composing) {
+	logger.debug(`>>> Entering applyComposition(composing=${composing})`);
       if (composing.data && composing.data != composing.startData)
         operation(this.cm, applyTextInput)(this.cm, composing.data, 0, composing.sel);
+		logger.debug(`<<< Exiting applyComposition(composing=${composing})`);
     },
 
     setUneditable: function(node) {
+	logger.debug(`>>> Entering setUneditable(node=${node})`);
       node.setAttribute("contenteditable", "false");
+	logger.debug(`<<< Exiting setUneditable(node=${node})`);
     },
 
     onKeyPress: function(e) {
@@ -1926,6 +2088,7 @@
       else
         dist += after.textContent.length;
     }
+	logger.debug(`<<< Exiting locateNodeInLineView(lineView=${lineView},node=${node},offset=${offset})`);
   }
 
   function domTextBetween(cm, from, to, fromLine, toLine) {
@@ -1960,6 +2123,7 @@
         }
         text += val;
       }
+	logger.debug(`<<< Exiting walk(node=${node})`);
     }
     for (;;) {
       walk(from);
@@ -1981,6 +2145,10 @@
   function Selection(ranges, primIndex) {
     this.ranges = ranges;
     this.primIndex = primIndex;
+	logger.debug(`Selection(ranges=${ranges},primIndex=${primIndex}): this.ranges → ${this.ranges}`);
+	logger.debug(`Selection(ranges=${ranges},primIndex=${primIndex}): this.primIndex → ${this.primIndex}`);
+	logger.debug(`<<< Exiting Selection(ranges=${ranges},primIndex=${primIndex})`);
+	logger.debug('>>> Entering Selection()');
   }
 
   Selection.prototype = {
@@ -1991,17 +2159,22 @@
       for (var i = 0; i < this.ranges.length; i++) {
         var here = this.ranges[i], there = other.ranges[i];
         if (cmp(here.anchor, there.anchor) != 0 || cmp(here.head, there.head) != 0) return false;
+		logger.debug(`<<< Exiting equals(other=${other})`);
       }
       return true;
     },
     deepCopy: function() {
+	logger.debug('>>> Entering deepCopy()');
       for (var out = [], i = 0; i < this.ranges.length; i++)
         out[i] = new Range(copyPos(this.ranges[i].anchor), copyPos(this.ranges[i].head));
+	logger.debug('<<< Exiting deepCopy()');
       return new Selection(out, this.primIndex);
     },
     somethingSelected: function() {
+	logger.debug('>>> Entering somethingSelected()');
       for (var i = 0; i < this.ranges.length; i++)
         if (!this.ranges[i].empty()) return true;
+	logger.debug('<<< Exiting somethingSelected()');
       return false;
     },
     contains: function(pos, end) {
@@ -2011,18 +2184,23 @@
         if (cmp(end, range.from()) >= 0 && cmp(pos, range.to()) <= 0)
           return i;
       }
+	logger.debug(`<<< Exiting contains(pos=${pos},end=${end})`);
       return -1;
     }
   };
 
   function Range(anchor, head) {
     this.anchor = anchor; this.head = head;
+	logger.debug(`Range(anchor=${anchor},head=${head}): anchor → ${anchor}`);
+	logger.debug(`<<< Exiting Range(anchor=${anchor},head=${head})`);
   }
 
   Range.prototype = {
     from: function() { return minPos(this.anchor, this.head); },
     to: function() { return maxPos(this.anchor, this.head); },
     empty: function() {
+	logger.debug('>>> Entering empty()');
+	logger.debug('<<< Exiting empty()');
       return this.head.line == this.anchor.line && this.head.ch == this.anchor.ch;
     }
   };
@@ -2064,6 +2242,7 @@
     if (ch == null || ch > linelen) return Pos(pos.line, linelen);
     else if (ch < 0) return Pos(pos.line, 0);
     else return pos;
+	logger.debug(`<<< Exiting clipToLen(pos=${pos},linelen=${linelen})`);
   }
   function isLine(doc, l) {return l >= doc.first && l < doc.first + doc.size;}
   function clipPosArray(doc, array) {
@@ -2102,6 +2281,7 @@
   // Extend the primary selection range, discard the rest.
   function extendSelection(doc, head, other, options) {
     setSelection(doc, new Selection([extendRange(doc, doc.sel.primary(), head, other)], 0), options);
+	logger.debug(`<<< Exiting extendSelection(doc=${doc},head=${head},other=${other},options=${options})`);
   }
 
   // Extend all selections (pos is an array of selections with length
@@ -2111,6 +2291,7 @@
       out[i] = extendRange(doc, doc.sel.ranges[i], heads[i], null);
     var newSel = normalizeSelection(out, doc.sel.primIndex);
     setSelection(doc, newSel, options);
+	logger.debug(`<<< Exiting extendSelections(doc=${doc},heads=${heads},options=${options})`);
   }
 
   // Updates a single range in the selection.
@@ -2118,11 +2299,13 @@
     var ranges = doc.sel.ranges.slice(0);
     ranges[i] = range;
     setSelection(doc, normalizeSelection(ranges, doc.sel.primIndex), options);
+	logger.debug(`<<< Exiting replaceOneSelection(doc=${doc},i=${i},range=${range},options=${options})`);
   }
 
   // Reset the selection to a single range.
   function setSimpleSelection(doc, anchor, head, options) {
     setSelection(doc, simpleSelection(anchor, head), options);
+	logger.debug(`<<< Exiting setSimpleSelection(doc=${doc},anchor=${anchor},head=${head},options=${options})`);
   }
 
   // Give beforeSelectionChange handlers a change to influence a
@@ -2131,16 +2314,19 @@
     var obj = {
       ranges: sel.ranges,
       update: function(ranges) {
+		logger.debug(`>>> Entering update(ranges=${ranges})`);
         this.ranges = [];
         for (var i = 0; i < ranges.length; i++)
           this.ranges[i] = new Range(clipPos(doc, ranges[i].anchor),
                                      clipPos(doc, ranges[i].head));
+									logger.debug(`<<< Exiting update(ranges=${ranges})`);
       }
     };
     signal(doc, "beforeSelectionChange", doc, obj);
     if (doc.cm) signal(doc.cm, "beforeSelectionChange", doc.cm, obj);
     if (obj.ranges != sel.ranges) return normalizeSelection(obj.ranges, obj.ranges.length - 1);
     else return sel;
+	logger.debug(`<<< Exiting filterSelectionChange(doc=${doc},sel=${sel})`);
   }
 
   function setSelectionReplaceHistory(doc, sel, options) {
@@ -2150,7 +2336,10 @@
       setSelectionNoUndo(doc, sel, options);
     } else {
       setSelection(doc, sel, options);
+	logger.debug(`>>> Entering done(e=${e})`);
+	logger.debug(`<<< Exiting done(e=${e})`);
     }
+	logger.debug(`<<< Exiting setSelectionReplaceHistory(doc=${doc},sel=${sel},options=${options})`);
   }
 
   // Set a new selection.
@@ -2169,6 +2358,7 @@
 
     if (!(options && options.scroll === false) && doc.cm)
       ensureCursorVisible(doc.cm);
+	logger.debug(`<<< Exiting setSelectionNoUndo(doc=${doc},sel=${sel},options=${options})`);
   }
 
   function setSelectionInner(doc, sel) {
@@ -2181,12 +2371,14 @@
       signalCursorActivity(doc.cm);
     }
     signalLater(doc, "cursorActivity", doc);
+	logger.debug(`<<< Exiting setSelectionInner(doc=${doc},sel=${sel})`);
   }
 
   // Verify that the selection does not partially select any atomic
   // marked ranges.
   function reCheckSelection(doc) {
     setSelectionInner(doc, skipAtomicInSelection(doc, doc.sel, null, false), sel_dontScroll);
+	logger.debug(`<<< Exiting reCheckSelection(doc=${doc})`);
   }
 
   // Return a selection that does not partially select any atomic
@@ -2260,6 +2452,7 @@
 
   function updateSelection(cm) {
     cm.display.input.showSelection(cm.display.input.prepareSelection());
+	logger.debug(`<<< Exiting updateSelection(cm=${cm})`);
   }
 
   function prepareSelection(cm, primary) {
@@ -2296,6 +2489,7 @@
       otherCursor.style.top = pos.other.top + "px";
       otherCursor.style.height = (pos.other.bottom - pos.other.top) * .85 + "px";
     }
+	logger.debug(`<<< Exiting drawSelectionCursor(cm=${cm},head=${head},output=${output})`);
   }
 
   // Draws the given range as a highlighted selection
@@ -2312,6 +2506,7 @@
       fragment.appendChild(elt("div", null, "CodeMirror-selected", "position: absolute; left: " + left +
                                "px; top: " + top + "px; width: " + (width == null ? rightSide - left : width) +
                                "px; height: " + (bottom - top) + "px"));
+							logger.debug(`<<< Exiting add(left=${left},top=${top},width=${width},bottom=${bottom})`);
     }
 
     function drawForLine(line, fromArg, toArg) {
@@ -2325,10 +2520,12 @@
       iterateBidiSections(getOrder(lineObj), fromArg || 0, toArg == null ? lineLen : toArg, function(from, to, dir) {
         var leftPos = coords(from, "left"), rightPos, left, right;
         if (from == to) {
+		logger.debug(`function(toArg=${toArg},leftPos=${leftPos}): leftPos → ${leftPos}`);
           rightPos = leftPos;
           left = right = leftPos.left;
         } else {
           rightPos = coords(to - 1, "right");
+		logger.debug(`function(toArg=${toArg},leftPos=${leftPos}): rightPos → ${rightPos}`);
           if (dir == "rtl") { var tmp = leftPos; leftPos = rightPos; rightPos = tmp; }
           left = leftPos.left;
           right = rightPos.right;
@@ -2347,6 +2544,7 @@
         if (left < leftSide + 1) left = leftSide;
         add(left, rightPos.top, right - left, rightPos.bottom);
       });
+	logger.debug(`<<< Exiting drawForLine(line=${line},fromArg=${fromArg},toArg=${toArg})`);
       return {start: start, end: end};
     }
 
@@ -2371,6 +2569,7 @@
     }
 
     output.appendChild(fragment);
+	logger.debug(`<<< Exiting drawSelectionRange(cm=${cm},range=${range},output=${output})`);
   }
 
   // Cursor-blinking
@@ -2382,10 +2581,13 @@
     display.cursorDiv.style.visibility = "";
     if (cm.options.cursorBlinkRate > 0)
       display.blinker = setInterval(function() {
+		logger.debug('>>> Entering setInterval()');
+		logger.debug('<<< Exiting setInterval()');
         display.cursorDiv.style.visibility = (on = !on) ? "" : "hidden";
       }, cm.options.cursorBlinkRate);
     else if (cm.options.cursorBlinkRate < 0)
       display.cursorDiv.style.visibility = "hidden";
+	logger.debug(`<<< Exiting restartBlink(cm=${cm})`);
   }
 
   // HIGHLIGHT WORKER
@@ -2393,6 +2595,7 @@
   function startWorker(cm, time) {
     if (cm.doc.mode.startState && cm.doc.frontier < cm.display.viewTo)
       cm.state.highlight.set(time, bind(highlightWorker, cm));
+	logger.debug(`<<< Exiting startWorker(cm=${cm},time=${time})`);
   }
 
   function highlightWorker(cm) {
@@ -2408,6 +2611,7 @@
         var oldStyles = line.styles, tooLong = line.text.length > cm.options.maxHighlightLength;
         var highlighted = highlightLine(cm, line, tooLong ? copyState(doc.mode, state) : state, true);
         line.styles = highlighted.styles;
+		logger.debug(`function(newCls=${newCls}): highlighted → ${highlighted}`);
         var oldCls = line.styleClasses, newCls = highlighted.classes;
         if (newCls) line.styleClasses = newCls;
         else if (oldCls) line.styleClasses = null;
@@ -2431,6 +2635,7 @@
       for (var i = 0; i < changedLines.length; i++)
         regLineChange(cm, changedLines[i], "text");
     });
+	logger.debug(`<<< Exiting highlightWorker(cm=${cm})`);
   }
 
   // Finds the line to start with when starting a parse. Tries to
@@ -2510,7 +2715,9 @@
         }
       }
       heights.push(rect.bottom - rect.top);
+	logger.debug(`<<< Exiting displayWidth(cm=${cm})`);
     }
+	logger.debug(`<<< Exiting ensureLineHeights(cm=${cm},lineView=${lineView},rect=${rect})`);
   }
 
   // Find a line map (mapping character offsets to text nodes) and a
@@ -2717,6 +2924,7 @@
       if (lineView.rest) for (var i = 0; i < lineView.rest.length; i++)
         lineView.measure.caches[i] = {};
     }
+	logger.debug(`<<< Exiting clearLineMeasurementCacheFor(lineView=${lineView})`);
   }
 
   function clearLineMeasurementCache(cm) {
@@ -2731,6 +2939,7 @@
     cm.display.cachedCharWidth = cm.display.cachedTextHeight = cm.display.cachedPaddingH = null;
     if (!cm.options.lineWrapping) cm.display.maxLineChanged = true;
     cm.display.lineNumChars = null;
+	logger.debug(`<<< Exiting clearCaches(cm=${cm})`);
   }
 
   function pageScrollX() { return window.pageXOffset || (document.documentElement || document.body).scrollLeft; }
@@ -2793,6 +3002,7 @@
     function get(ch, right) {
       var m = measureCharPrepared(cm, preparedMeasure, ch, right ? "right" : "left", varHeight);
       if (right) m.left = m.right; else m.right = m.left;
+	logger.debug(`<<< Exiting get(ch=${ch},right=${right})`);
       return intoCoordSystem(cm, lineObj, m, context);
     }
     function getBidi(ch, partPos) {
@@ -2901,6 +3111,7 @@
       if (middleX > x) {to = middle; toX = middleX; if (toOutside = wrongLine) toX += 1000; dist = step;}
       else {from = middle; fromX = middleX; fromOutside = wrongLine; dist -= step;}
     }
+	logger.debug(`<<< Exiting coordsCharInner(cm=${cm},lineObj=${lineObj},lineNo=${lineNo},x=${x},y=${y})`);
   }
 
   var measureText;
@@ -2973,9 +3184,11 @@
         delayedCallbacks: []
       };
     }
+	logger.debug(`<<< Exiting startOperation(cm=${cm})`);
   }
 
   function fireCallbacksForOps(group) {
+	logger.debug(`>>> Entering fireCallbacksForOps(group=${group})`);
     // Calls delayed callbacks and cursorActivity handlers until no
     // new ones appear
     var callbacks = group.delayedCallbacks, i = 0;
@@ -2989,6 +3202,7 @@
             op.cursorActivityHandlers[op.cursorActivityCalled++].call(null, op.cm);
       }
     } while (i < callbacks.length);
+	logger.debug(`<<< Exiting fireCallbacksForOps(group=${group})`);
   }
 
   // Finish an operation, updating the display and signalling delayed events
@@ -3003,11 +3217,13 @@
         group.ops[i].cm.curOp = null;
       endOperations(group);
     }
+	logger.debug(`<<< Exiting endOperation(cm=${cm})`);
   }
 
   // The DOM updates done when an operation finishes are batched so
   // that the minimum number of relayouts are required.
   function endOperations(group) {
+	logger.debug(`>>> Entering endOperations(group=${group})`);
     var ops = group.ops;
     for (var i = 0; i < ops.length; i++) // Read DOM
       endOperation_R1(ops[i]);
@@ -3019,6 +3235,7 @@
       endOperation_W2(ops[i]);
     for (var i = 0; i < ops.length; i++) // Read DOM
       endOperation_finish(ops[i]);
+	logger.debug(`<<< Exiting endOperations(group=${group})`);
   }
 
   function endOperation_R1(op) {
@@ -3032,10 +3249,12 @@
       display.maxLineChanged && cm.options.lineWrapping;
     op.update = op.mustUpdate &&
       new DisplayUpdate(cm, op.mustUpdate && {top: op.scrollTop, ensure: op.scrollToPos}, op.forceUpdate);
+	logger.debug(`<<< Exiting endOperation_R1(op=${op})`);
   }
 
   function endOperation_W1(op) {
     op.updatedDisplay = op.mustUpdate && updateDisplayIfNeeded(op.cm, op.update);
+	logger.debug(`<<< Exiting endOperation_W1(op=${op})`);
   }
 
   function endOperation_R2(op) {
@@ -3057,6 +3276,7 @@
 
     if (op.updatedDisplay || op.selectionChanged)
       op.preparedSelection = display.input.prepareSelection();
+	logger.debug(`<<< Exiting endOperation_R2(op=${op})`);
   }
 
   function endOperation_W2(op) {
@@ -3081,6 +3301,7 @@
     if (cm.state.focused && op.updateInput)
       cm.display.input.reset(op.typing);
     if (op.focus && op.focus == activeElt()) ensureFocus(op.cm);
+	logger.debug(`<<< Exiting endOperation_W2(op=${op})`);
   }
 
   function endOperation_finish(op) {
@@ -3122,10 +3343,12 @@
     if (display.wrapper.offsetHeight)
       doc.scrollTop = cm.display.scroller.scrollTop;
 
+	logger.debug(`endOperation_finish(op=${op}): doc.scrollTop → ${doc.scrollTop}`);
     // Fire change events, and delayed event handlers
     if (op.changeObjs)
       signal(cm, "changes", cm, op.changeObjs);
     if (op.update)
+	logger.debug(`<<< Exiting endOperation_finish(op=${op})`);
       op.update.finish();
   }
 
@@ -3148,14 +3371,17 @@
   // Used to add methods to editor and doc instances, wrapping them in
   // operations.
   function methodOp(f) {
+	logger.debug(`>>> Entering methodOp(f=${f})`);
     return function() {
       if (this.curOp) return f.apply(this, arguments);
       startOperation(this);
       try { return f.apply(this, arguments); }
       finally { endOperation(this); }
     };
+	logger.debug(`<<< Exiting methodOp(f=${f})`);
   }
   function docMethodOp(f) {
+	logger.debug(`>>> Entering docMethodOp(f=${f})`);
     return function() {
       var cm = this.cm;
       if (!cm || cm.curOp) return f.apply(this, arguments);
@@ -3163,6 +3389,7 @@
       try { return f.apply(this, arguments); }
       finally { endOperation(cm); }
     };
+	logger.debug(`<<< Exiting docMethodOp(f=${f})`);
   }
 
   // VIEW TRACKING
@@ -3179,6 +3406,7 @@
     this.size = this.rest ? lineNo(lst(this.rest)) - lineN + 1 : 1;
     this.node = this.text = null;
     this.hidden = lineIsHidden(doc, line);
+	logger.debug(`<<< Exiting LineView(doc=${doc},line=${line},lineN=${lineN})`);
   }
 
   // Create a range of LineView objects for the given lines.
@@ -3219,6 +3447,7 @@
       } else {
         display.viewFrom += lendiff;
         display.viewTo += lendiff;
+		logger.debug(`<<< Exiting visualLineEndNo(doc=${doc},lineN=${lineN})`);
       }
     } else if (from <= display.viewFrom && to >= display.viewTo) { // Full overlap
       resetView(cm);
@@ -3250,6 +3479,7 @@
       } else {
         resetView(cm);
       }
+	logger.debug(`<<< Exiting resetView(cm=${cm})`);
     }
 
     var ext = display.externalMeasured;
@@ -3259,6 +3489,7 @@
       else if (from < ext.lineN + ext.size)
         display.externalMeasured = null;
     }
+	logger.debug(`<<< Exiting regChange(cm=${cm},from=${from},to=${to},lendiff=${lendiff})`);
   }
 
   // Register a change to a single line. Type must be one of "text",
@@ -3274,6 +3505,7 @@
     if (lineView.node == null) return;
     var arr = lineView.changes || (lineView.changes = []);
     if (indexOf(arr, type) == -1) arr.push(type);
+	logger.debug(`<<< Exiting regLineChange(cm=${cm},line=${line},type=${type})`);
   }
 
   // Clear the view.
@@ -3294,6 +3526,7 @@
       n -= view[i].size;
       if (n < 0) return i;
     }
+	logger.debug(`<<< Exiting findViewIndex(cm=${cm},n=${n})`);
   }
 
   function viewCuttingPoint(cm, oldN, newN, dir) {
@@ -3339,6 +3572,7 @@
         display.view = display.view.slice(0, findViewIndex(cm, to));
     }
     display.viewTo = to;
+	logger.debug(`<<< Exiting adjustView(cm=${cm},from=${from},to=${to})`);
   }
 
   // Count the number of lines in the view whose DOM representation is
@@ -3363,9 +3597,11 @@
       on(d.scroller, "dblclick", operation(cm, function(e) {
         if (signalDOMEvent(cm, e)) return;
         var pos = posFromMouse(cm, e);
+		logger.debug(`on(pos=${pos}): pos → ${pos}`);
         if (!pos || clickInGutter(cm, e) || eventInWidget(cm.display, e)) return;
         e_preventDefault(e);
         var word = cm.findWordAt(pos);
+		logger.debug(`on(pos=${pos}): word → ${word}`);
         extendSelection(cm.doc, word.anchor, word.head);
       }));
     else
@@ -3378,11 +3614,15 @@
     // Used to suppress mouse event handling when a touch happens
     var touchFinished, prevTouch = {end: 0};
     function finishTouch() {
+	logger.debug('>>> Entering finishTouch()');
       if (d.activeTouch) {
         touchFinished = setTimeout(function() {d.activeTouch = null;}, 1000);
         prevTouch = d.activeTouch;
         prevTouch.end = +new Date;
+		logger.debug(`finishTouch(): prevTouch → ${prevTouch}`);
+		logger.debug(`finishTouch(): prevTouch.end → ${prevTouch.end}`);
       }
+	logger.debug('<<< Exiting finishTouch()');
     };
     function isMouseLikeTouchEvent(e) {
       if (e.touches.length != 1) return false;
@@ -3403,6 +3643,7 @@
         if (e.touches.length == 1) {
           d.activeTouch.left = e.touches[0].pageX;
           d.activeTouch.top = e.touches[0].pageY;
+		logger.debug(`<<< Exiting on(now=${now})`);
         }
       }
     });
@@ -3414,6 +3655,7 @@
       if (touch && !eventInWidget(d, e) && touch.left != null &&
           !touch.moved && new Date - touch.start < 300) {
         var pos = cm.coordsChar(d.activeTouch, "page"), range;
+		logger.debug(`on(): pos → ${pos}`);
         if (!touch.prev || farAway(touch, touch.prev)) // Single tap
           range = new Range(pos, pos);
         else if (!touch.prev.prev || farAway(touch, touch.prev.prev)) // Double tap
@@ -3459,6 +3701,7 @@
     on(inp, "keypress", operation(cm, onKeyPress));
     on(inp, "focus", bind(onFocus, cm));
     on(inp, "blur", bind(onBlur, cm));
+	logger.debug(`<<< Exiting registerEventHandlers(cm=${cm})`);
   }
 
   function dragDropChanged(cm, value, old) {
@@ -3472,6 +3715,7 @@
       toggle(cm.display.scroller, "dragleave", funcs.leave);
       toggle(cm.display.scroller, "drop", funcs.drop);
     }
+	logger.debug(`<<< Exiting dragDropChanged(cm=${cm},value=${value},old=${old})`);
   }
 
   // Called when the window resizes
@@ -3483,6 +3727,7 @@
     d.cachedCharWidth = d.cachedTextHeight = d.cachedPaddingH = null;
     d.scrollbarsClipped = false;
     cm.setSize();
+	logger.debug(`<<< Exiting onResize(cm=${cm})`);
   }
 
   // MOUSE EVENTS
@@ -3561,6 +3806,7 @@
       else delayBlurEvent(cm);
       break;
     }
+	logger.debug(`<<< Exiting onMouseDown(e=${e})`);
   }
 
   var lastClick, lastDoubleClick;
@@ -3587,6 +3833,7 @@
       leftButtonStartDrag(cm, e, start, modifier);
     else
       leftButtonSelect(cm, e, start, type, modifier);
+	logger.debug(`<<< Exiting delayBlurEvent(cm=${cm})`);
   }
 
   // Start a text drag. When it ends, see if any dragging actually
@@ -3616,6 +3863,7 @@
     if (display.scroller.dragDrop) display.scroller.dragDrop();
     on(document, "mouseup", dragEnd);
     on(display.scroller, "drop", dragEnd);
+	logger.debug(`<<< Exiting leftButtonStartDrag(cm=${cm},e=${e},start=${start},modifier=${modifier})`);
   }
 
   // Normal selection, as opposed to text dragging.
@@ -3714,6 +3962,7 @@
         ranges[ourIndex] = new Range(clipPos(doc, anchor), head);
         setSelection(doc, normalizeSelection(ranges, ourIndex), sel_mouse);
       }
+	logger.debug(`<<< Exiting extendTo(pos=${pos})`);
     }
 
     var editorSize = display.wrapper.getBoundingClientRect();
@@ -3726,11 +3975,14 @@
     function extend(e) {
       var curCount = ++counter;
       var cur = posFromMouse(cm, e, true, type == "rect");
+	logger.debug(`extend(e=${e}): cur → ${cur}`);
       if (!cur) return;
       if (cmp(cur, lastPos) != 0) {
         cm.curOp.focus = activeElt();
         extendTo(cur);
         var visible = visibleLines(display, doc);
+		logger.debug(`<<< Exiting extend(e=${e})`);
+		logger.debug(`extend(e=${e}): visible → ${visible}`);
         if (cur.line >= visible.to || cur.line < visible.from)
           setTimeout(operation(cm, function(){if (counter == curCount) extend(e);}), 150);
       } else {
@@ -3761,6 +4013,7 @@
     cm.state.selectingText = up;
     on(document, "mousemove", move);
     on(document, "mouseup", up);
+	logger.debug(`<<< Exiting leftButtonSelect(cm=${cm},e=${e},start=${start},type=${type},addNew=${addNew})`);
   }
 
   // Determines whether an event happened in the gutter, and fires the
@@ -3786,6 +4039,8 @@
         return e_defaultPrevented(e);
       }
     }
+	logger.debug(`>>> Entering up(e=${e})`);
+	logger.debug(`<<< Exiting up(e=${e})`);
   }
 
   function clickInGutter(cm, e) {
@@ -3810,6 +4065,7 @@
     if (files && files.length && window.FileReader && window.File) {
       var n = files.length, text = Array(n), read = 0;
       var loadFile = function(file, i) {
+		logger.debug(`>>> Entering loadFile(file=${file},i=${i})`);
         var reader = new FileReader;
         reader.onload = operation(cm, function() {
           text[i] = reader.result;
@@ -3823,6 +4079,7 @@
           }
         });
         reader.readAsText(file);
+		logger.debug(`<<< Exiting loadFile(file=${file},i=${i})`);
       };
       for (var i = 0; i < n; ++i) loadFile(files[i], i);
     } else { // Normal drop
@@ -3847,6 +4104,7 @@
       }
       catch(e){}
     }
+	logger.debug(`<<< Exiting onDrop(e=${e})`);
   }
 
   function onDragStart(cm, e) {
@@ -3869,6 +4127,7 @@
       e.dataTransfer.setDragImage(img, 0, 0);
       if (presto) img.parentNode.removeChild(img);
     }
+	logger.debug(`<<< Exiting onDragStart(cm=${cm},e=${e})`);
   }
 
   function onDragOver(cm, e) {
@@ -3881,6 +4140,7 @@
       cm.display.lineSpace.insertBefore(cm.display.dragCursor, cm.display.cursorDiv);
     }
     removeChildrenAndAdd(cm.display.dragCursor, frag);
+	logger.debug(`<<< Exiting onDragOver(cm=${cm},e=${e})`);
   }
 
   function clearDragCursor(cm) {
@@ -3888,6 +4148,7 @@
       cm.display.lineSpace.removeChild(cm.display.dragCursor);
       cm.display.dragCursor = null;
     }
+	logger.debug(`<<< Exiting clearDragCursor(cm=${cm})`);
   }
 
   // SCROLL EVENTS
@@ -3936,10 +4197,12 @@
   else if (safari) wheelPixelsPerUnit = -1/3;
 
   var wheelEventDelta = function(e) {
+	logger.debug(`>>> Entering wheelEventDelta(e=${e})`);
     var dx = e.wheelDeltaX, dy = e.wheelDeltaY;
     if (dx == null && e.detail && e.axis == e.HORIZONTAL_AXIS) dx = e.detail;
     if (dy == null && e.detail && e.axis == e.VERTICAL_AXIS) dy = e.detail;
     else if (dy == null) dy = e.wheelDelta;
+	logger.debug(`<<< Exiting wheelEventDelta(e=${e})`);
     return {x: dx, y: dy};
   };
   CodeMirror.wheelEventPixels = function(e) {
@@ -4008,6 +4271,7 @@
           var sample = (movedY && display.wheelDY && movedY / display.wheelDY) ||
             (movedX && display.wheelDX && movedX / display.wheelDX);
           display.wheelStartX = display.wheelStartY = null;
+		logger.debug(`setTimeout(): sample → ${sample}`);
           if (!sample) return;
           wheelPixelsPerUnit = (wheelPixelsPerUnit * wheelSamples + sample) / (wheelSamples + 1);
           ++wheelSamples;
@@ -4016,6 +4280,7 @@
         display.wheelDX += dx; display.wheelDY += dy;
       }
     }
+	logger.debug(`<<< Exiting onScrollWheel(cm=${cm},e=${e})`);
   }
 
   // KEY EVENTS
@@ -4142,6 +4407,7 @@
     }
     on(document, "keyup", up);
     on(document, "mouseover", up);
+	logger.debug(`<<< Exiting showCrossHair(cm=${cm})`);
   }
 
   function onKeyUp(e) {
@@ -4168,6 +4434,7 @@
       if (cm.state.delayingBlurEvent) {
         cm.state.delayingBlurEvent = false;
         onBlur(cm);
+		logger.debug(`>>> Entering setTimeout(resizeTimer=${resizeTimer})`);
       }
     }, 100);
   }
@@ -4321,7 +4588,9 @@
         makeChangeInner(doc, {from: split[i].from, to: split[i].to, text: i ? [""] : change.text});
     } else {
       makeChangeInner(doc, change);
+	logger.debug(`<<< Exiting removeReadOnlyRanges(doc=${doc},from=${from},to=${to})`);
     }
+	logger.debug(`<<< Exiting makeChange(doc=${doc},change=${change},ignoreReadOnly=${ignoreReadOnly})`);
   }
 
   function makeChangeInner(doc, change) {
@@ -4336,9 +4605,11 @@
       if (!sharedHist && indexOf(rebased, doc.history) == -1) {
         rebaseHist(doc.history, change);
         rebased.push(doc.history);
+		logger.debug(`<<< Exiting indexOf(array=${array},elt=${elt})`);
       }
       makeChangeSingleDoc(doc, change, null, stretchSpansOverChange(doc, change));
     });
+	logger.debug(`<<< Exiting makeChangeInner(doc=${doc},change=${change})`);
   }
 
   // Revert a change stored in a document's history.
@@ -4403,7 +4674,10 @@
         }
         makeChangeSingleDoc(doc, change, null, mergeOldSpans(doc, change));
       });
+	logger.debug(`>>> Entering hasHandler(emitter=${emitter},type=${type})`);
     }
+	logger.debug(`<<< Exiting hasHandler(emitter=${emitter},type=${type})`);
+	logger.debug(`<<< Exiting makeChangeFromHistory(doc=${doc},type=${type},allowSelectionOnly=${allowSelectionOnly})`);
   }
 
   // Sub-views need their line numbers shifted when text is added
@@ -4420,6 +4694,7 @@
       for (var d = doc.cm.display, l = d.viewFrom; l < d.viewTo; l++)
         regLineChange(doc.cm, l, "gutter");
     }
+	logger.debug(`<<< Exiting shiftDoc(doc=${doc},distance=${distance})`);
   }
 
   // More lower-level change function, handling only a single document
@@ -4453,6 +4728,7 @@
     if (doc.cm) makeChangeSingleDocInEditor(doc.cm, change, spans);
     else updateDoc(doc, change, spans);
     setSelectionNoUndo(doc, selAfter, sel_dontScroll);
+	logger.debug(`<<< Exiting makeChangeSingleDoc(doc=${doc},change=${change},selAfter=${selAfter},spans=${spans})`);
   }
 
   // Handle the interaction of a change to a document with the editor
@@ -4479,6 +4755,7 @@
     if (!cm.options.lineWrapping) {
       doc.iter(checkWidthStart, from.line + change.text.length, function(line) {
         var len = lineLength(line);
+		logger.debug(`iter(checkWidthStart=${checkWidthStart},len=${len}): len → ${len}`);
         if (len > display.maxLineLength) {
           display.maxLine = line;
           display.maxLineLength = len;
@@ -4514,6 +4791,7 @@
       if (changesHandler) (cm.curOp.changeObjs || (cm.curOp.changeObjs = [])).push(obj);
     }
     cm.display.selForContextMenu = null;
+	logger.debug(`<<< Exiting makeChangeSingleDocInEditor(cm=${cm},change=${change},spans=${spans})`);
   }
 
   function replaceRange(doc, code, from, to, origin) {
@@ -4521,6 +4799,8 @@
     if (cmp(to, from) < 0) { var tmp = to; to = from; from = tmp; }
     if (typeof code == "string") code = doc.splitLines(code);
     makeChange(doc, {from: from, to: to, text: code, origin: origin});
+	logger.debug(`>>> Entering replaceRange(code=${code},from=${from},to=${to},origin=${origin})`);
+	logger.debug(`<<< Exiting replaceRange(code=${code},from=${from},to=${to},origin=${origin})`);
   }
 
   // SCROLLING THINGS INTO VIEW
@@ -4542,6 +4822,7 @@
       scrollNode.scrollIntoView(doScroll);
       cm.display.lineSpace.removeChild(scrollNode);
     }
+	logger.debug(`<<< Exiting maybeScrollWindow(cm=${cm},coords=${coords})`);
   }
 
   // Scroll a given position into view (immediately), verifying that
@@ -4575,6 +4856,7 @@
     var scrollPos = calculateScrollPos(cm, x1, y1, x2, y2);
     if (scrollPos.scrollTop != null) setScrollTop(cm, scrollPos.scrollTop);
     if (scrollPos.scrollLeft != null) setScrollLeft(cm, scrollPos.scrollLeft);
+	logger.debug(`<<< Exiting scrollIntoView(cm=${cm},x1=${x1},y1=${y1},x2=${x2},y2=${y2})`);
   }
 
   // Calculate a new scroll position needed to scroll the given
@@ -4617,6 +4899,7 @@
       cm.curOp.scrollLeft = (cm.curOp.scrollLeft == null ? cm.doc.scrollLeft : cm.curOp.scrollLeft) + left;
     if (top != null)
       cm.curOp.scrollTop = (cm.curOp.scrollTop == null ? cm.doc.scrollTop : cm.curOp.scrollTop) + top;
+	logger.debug(`<<< Exiting addToScrollPos(cm=${cm},left=${left},top=${top})`);
   }
 
   // Make sure that at the end of the operation the current cursor is
@@ -4629,6 +4912,7 @@
       to = Pos(cur.line, cur.ch + 1);
     }
     cm.curOp.scrollToPos = {from: from, to: to, margin: cm.options.cursorScrollMargin, isCursor: true};
+	logger.debug(`<<< Exiting ensureCursorVisible(cm=${cm})`);
   }
 
   // When an operation has its scrollToPos property set, and another
@@ -4646,6 +4930,7 @@
                                     Math.max(from.bottom, to.bottom) + range.margin);
       cm.scrollTo(sPos.scrollLeft, sPos.scrollTop);
     }
+	logger.debug(`<<< Exiting resolveScrollToPos(cm=${cm})`);
   }
 
   // API UTILITIES
@@ -4712,6 +4997,7 @@
         }
       }
     }
+	logger.debug(`<<< Exiting indentLine(cm=${cm},n=${n},how=${how},aggressive=${aggressive})`);
   }
 
   // Utility for applying a change to a line by handle or number,
@@ -4749,6 +5035,7 @@
         replaceRange(cm.doc, "", kill[i].from, kill[i].to, "+delete");
       ensureCursorVisible(cm);
     });
+	logger.debug(`<<< Exiting deleteNearSelection(cm=${cm},compute=${compute})`);
   }
 
   // Used for horizontal relative motion. Dir is -1 or 1 (left or
@@ -4765,12 +5052,16 @@
     var lineObj = getLine(doc, line);
     var possible = true;
     function findNextLine() {
+	logger.debug('>>> Entering findNextLine()');
       var l = line + dir;
       if (l < doc.first || l >= doc.first + doc.size) return (possible = false);
       line = l;
+	logger.debug(`findNextLine(): line → ${line}`);
+	logger.debug('<<< Exiting findNextLine()');
       return lineObj = getLine(doc, l);
     }
     function moveOnce(boundToLine) {
+	logger.debug(`>>> Entering moveOnce(boundToLine=${boundToLine})`);
       var next = (visually ? moveVisually : moveLogically)(lineObj, ch, dir, true);
       if (next == null) {
         if (!boundToLine && findNextLine()) {
@@ -4778,6 +5069,8 @@
           else ch = dir < 0 ? lineObj.text.length : 0;
         } else return (possible = false);
       } else ch = next;
+	logger.debug(`<<< Exiting moveOnce(boundToLine=${boundToLine})`);
+	logger.debug('>>> Entering next()');
       return true;
     }
 
@@ -4805,6 +5098,7 @@
     }
     var result = skipAtomic(doc, Pos(line, ch), origDir, true);
     if (!possible) result.hitSide = true;
+	logger.debug('<<< Exiting next()');
     return result;
   }
 
@@ -4848,19 +5142,24 @@
       options[option] = value;
       if (optionHandlers.hasOwnProperty(option))
         operation(this, optionHandlers[option])(this, value, old);
+		logger.debug(`<<< Exiting setOption(option=${option},value=${value})`);
     },
 
     getOption: function(option) {return this.options[option];},
     getDoc: function() {return this.doc;},
 
     addKeyMap: function(map, bottom) {
+	logger.debug(`>>> Entering addKeyMap(map=${map},bottom=${bottom})`);
       this.state.keyMaps[bottom ? "push" : "unshift"](getKeyMap(map));
+	logger.debug(`<<< Exiting addKeyMap(map=${map},bottom=${bottom})`);
     },
     removeKeyMap: function(map) {
+	logger.debug(`>>> Entering removeKeyMap(map=${map})`);
       var maps = this.state.keyMaps;
       for (var i = 0; i < maps.length; ++i)
         if (maps[i] == map || maps[i].name == map) {
           maps.splice(i, 1);
+		logger.debug(`<<< Exiting removeKeyMap(map=${map})`);
           return true;
         }
     },
@@ -4916,18 +5215,26 @@
     // Fetch the parser token for a given character. Useful for hacks
     // that want to inspect the mode state (say, for completion).
     getTokenAt: function(pos, precise) {
+	logger.debug(`>>> Entering getTokenAt(pos=${pos},precise=${precise})`);
+	logger.debug(`<<< Exiting getTokenAt(pos=${pos},precise=${precise})`);
       return takeToken(this, pos, precise);
     },
 
     getLineTokens: function(line, precise) {
+	logger.debug(`>>> Entering getLineTokens(line=${line},precise=${precise})`);
+	logger.debug(`<<< Exiting getLineTokens(line=${line},precise=${precise})`);
       return takeToken(this, Pos(line), precise, true);
     },
 
     getTokenTypeAt: function(pos) {
+	logger.debug(`>>> Entering getTokenTypeAt(pos=${pos})`);
       pos = clipPos(this.doc, pos);
       var styles = getLineStyles(this, getLine(this.doc, pos.line));
+	logger.debug(`getTokenTypeAt(pos=${pos}): pos → ${pos}`);
+	logger.debug(`getTokenTypeAt(pos=${pos}): styles → ${styles}`);
       var before = 0, after = (styles.length - 1) / 2, ch = pos.ch;
       var type;
+	logger.debug(`getTokenTypeAt(pos=${pos}): before → ${before}`);
       if (ch == 0) type = styles[2];
       else for (;;) {
         var mid = (before + after) >> 1;
@@ -4940,12 +5247,16 @@
     },
 
     getModeAt: function(pos) {
+	logger.debug(`>>> Entering getModeAt(pos=${pos})`);
       var mode = this.doc.mode;
       if (!mode.innerMode) return mode;
+	logger.debug(`<<< Exiting getModeAt(pos=${pos})`);
       return CodeMirror.innerMode(mode, this.getTokenAt(pos).state).mode;
     },
 
     getHelper: function(pos, type) {
+	logger.debug(`>>> Entering getHelper(pos=${pos},type=${type})`);
+	logger.debug(`<<< Exiting getHelper(pos=${pos},type=${type})`);
       return this.getHelpers(pos, type)[0];
     },
 
@@ -4970,12 +5281,16 @@
         if (cur.pred(mode, this) && indexOf(found, cur.val) == -1)
           found.push(cur.val);
       }
+	logger.debug(`<<< Exiting getHelpers(pos=${pos},type=${type})`);
       return found;
     },
 
     getStateAfter: function(line, precise) {
+	logger.debug(`>>> Entering getStateAfter(line=${line},precise=${precise})`);
       var doc = this.doc;
       line = clipLine(doc, line == null ? doc.first + doc.size - 1: line);
+	logger.debug(`<<< Exiting getStateAfter(line=${line},precise=${precise})`);
+	logger.debug(`getStateAfter(line=${line},precise=${precise}): line → ${line}`);
       return getStateBefore(this, line + 1, precise);
     },
 
@@ -4984,10 +5299,12 @@
       if (start == null) pos = range.head;
       else if (typeof start == "object") pos = clipPos(this.doc, start);
       else pos = start ? range.from() : range.to();
+	logger.debug(`<<< Exiting cursorCoords(cm=${cm},pos=${pos},context=${context},lineObj=${lineObj},preparedMeasure=${preparedMeasure},varHeight=${varHeight})`);
       return cursorCoords(this, pos, mode || "page");
     },
 
     charCoords: function(pos, mode) {
+	logger.debug(`<<< Exiting charCoords(cm=${cm},pos=${pos},context=${context},lineObj=${lineObj},bias=${bias})`);
       return charCoords(this, clipPos(this.doc, pos), mode || "page");
     },
 
@@ -4998,9 +5315,11 @@
 
     lineAtHeight: function(height, mode) {
       height = fromCoordSystem(this, {top: height, left: 0}, mode || "page").top;
+	logger.debug(`<<< Exiting lineAtHeight(height=${height},mode=${mode})`);
       return lineAtHeight(this.doc, height + this.display.viewOffset);
     },
     heightAtLine: function(line, mode) {
+	logger.debug(`>>> Entering heightAtLine(line=${line},mode=${mode})`);
       var end = false, lineObj;
       if (typeof line == "number") {
         var last = this.doc.first + this.doc.size - 1;
@@ -5012,6 +5331,7 @@
       }
       return intoCoordSystem(this, lineObj, {top: 0, left: 0}, mode || "page").top +
         (end ? this.doc.height - heightAtLine(lineObj) : 0);
+		logger.debug(`<<< Exiting heightAtLine(line=${line},mode=${mode})`);
     },
 
     defaultTextHeight: function() { return textHeight(this.display); },
@@ -5039,26 +5359,32 @@
     }),
 
     lineInfo: function(line) {
+	logger.debug(`>>> Entering lineInfo(line=${line})`);
       if (typeof line == "number") {
         if (!isLine(this.doc, line)) return null;
         var n = line;
         line = getLine(this.doc, line);
         if (!line) return null;
+		logger.debug(`lineInfo(line=${line}): line → ${line}`);
       } else {
         var n = lineNo(line);
+		logger.debug(`lineInfo(line=${line}): n → ${n}`);
         if (n == null) return null;
       }
       return {line: n, handle: line, text: line.text, gutterMarkers: line.gutterMarkers,
               textClass: line.textClass, bgClass: line.bgClass, wrapClass: line.wrapClass,
               widgets: line.widgets};
+			logger.debug(`<<< Exiting lineInfo(line=${line})`);
     },
 
     getViewport: function() { return {from: this.display.viewFrom, to: this.display.viewTo};},
 
     addWidget: function(pos, node, scroll, vert, horiz) {
+	logger.debug(`>>> Entering addWidget(pos=${pos},node=${node},scroll=${scroll},vert=${vert},horiz=${horiz})`);
       var display = this.display;
       pos = cursorCoords(this, clipPos(this.doc, pos));
       var top = pos.bottom, left = pos.left;
+	logger.debug(`addWidget(pos=${pos},node=${node},scroll=${scroll},vert=${vert},horiz=${horiz}): pos → ${pos}`);
       node.style.position = "absolute";
       node.setAttribute("cm-ignore-events", "true");
       this.display.input.setUneditable(node);
@@ -5068,6 +5394,7 @@
       } else if (vert == "above" || vert == "near") {
         var vspace = Math.max(display.wrapper.clientHeight, this.doc.height),
         hspace = Math.max(display.sizer.clientWidth, display.lineSpace.clientWidth);
+		logger.debug(`addWidget(pos=${pos},node=${node},scroll=${scroll},vert=${vert},horiz=${horiz}): vspace → ${vspace}`);
         // Default to positioning above (if specified and possible); otherwise default to positioning below
         if ((vert == 'above' || pos.bottom + node.offsetHeight > vspace) && pos.top > node.offsetHeight)
           top = pos.top - node.offsetHeight;
@@ -5087,7 +5414,9 @@
         node.style.left = left + "px";
       }
       if (scroll)
+		logger.debug(`addWidget(pos=${pos},node=${node},scroll=${scroll},vert=${vert},horiz=${horiz}): left → ${left}`);
         scrollIntoView(this, left, top, left + node.offsetWidth, top + node.offsetHeight);
+		logger.debug(`<<< Exiting addWidget(pos=${pos},node=${node},scroll=${scroll},vert=${vert},horiz=${horiz})`);
     },
 
     triggerOnKeyDown: methodOp(onKeyDown),
@@ -5095,7 +5424,9 @@
     triggerOnKeyUp: onKeyUp,
 
     execCommand: function(cmd) {
+	logger.debug(`>>> Entering execCommand(cmd=${cmd})`);
       if (commands.hasOwnProperty(cmd))
+		logger.debug(`<<< Exiting execCommand(cmd=${cmd})`);
         return commands[cmd].call(null, this);
     },
 
@@ -5108,12 +5439,14 @@
         cur = findPosH(this.doc, cur, dir, unit, visually);
         if (cur.hitSide) break;
       }
+	logger.debug(`<<< Exiting findPosH(doc=${doc},pos=${pos},dir=${dir},unit=${unit},visually=${visually})`);
       return cur;
     },
 
     moveH: methodOp(function(dir, unit) {
       var cm = this;
       cm.extendSelectionsBy(function(range) {
+		logger.debug('>>> Entering extendSelectionsBy()');
         if (cm.display.shift || cm.doc.extend || range.empty())
           return findPosH(cm.doc, range.head, dir, unit, cm.options.rtlMoveVisually);
         else
@@ -5128,6 +5461,8 @@
       else
         deleteNearSelection(this, function(range) {
           var other = findPosH(doc, range.head, dir, unit, false);
+		logger.debug(`<<< Exiting deleteNearSelection(this=${this},other=${other})`);
+		logger.debug(`deleteNearSelection(this=${this},other=${other}): other → ${other}`);
           return dir < 0 ? {from: other, to: range.head} : {from: range.head, to: other};
         });
     }),
@@ -5142,6 +5477,7 @@
         cur = findPosV(this, coords, dir, unit);
         if (cur.hitSide) break;
       }
+	logger.debug(`<<< Exiting findPosV(cm=${cm},pos=${pos},dir=${dir},unit=${unit})`);
       return cur;
     },
 
@@ -5152,6 +5488,7 @@
         if (collapse)
           return dir < 0 ? range.from() : range.to();
         var headPos = cursorCoords(cm, range.head, "div");
+		logger.debug(`extendSelectionsBy(): headPos → ${headPos}`);
         if (range.goalColumn != null) headPos.left = range.goalColumn;
         goals.push(headPos.left);
         var pos = findPosV(cm, headPos, dir, unit);
@@ -5165,18 +5502,25 @@
 
     // Find the word at the given position (as returned by coordsChar).
     findWordAt: function(pos) {
+	logger.debug(`>>> Entering findWordAt(pos=${pos})`);
       var doc = this.doc, line = getLine(doc, pos.line).text;
       var start = pos.ch, end = pos.ch;
+	logger.debug(`findWordAt(pos=${pos}): doc → ${doc}`);
       if (line) {
         var helper = this.getHelper(pos, "wordChars");
+		logger.debug(`findWordAt(pos=${pos}): helper → ${helper}`);
         if ((pos.xRel < 0 || end == line.length) && start) --start; else ++end;
         var startChar = line.charAt(start);
+		logger.debug(`findWordAt(pos=${pos}): startChar → ${startChar}`);
         var check = isWordChar(startChar, helper)
           ? function(ch) { return isWordChar(ch, helper); }
           : /\s/.test(startChar) ? function(ch) {return /\s/.test(ch);}
           : function(ch) {return !/\s/.test(ch) && !isWordChar(ch);};
         while (start > 0 && check(line.charAt(start - 1))) --start;
+		logger.debug(`findWordAt(pos=${pos}): check → ${check}`);
         while (end < line.length && check(line.charAt(end))) ++end;
+		logger.debug(`<<< Exiting findWordAt(pos=${pos})`);
+		logger.debug(`function(): this.explicitlyCleared → ${this.explicitlyCleared}`);
       }
       return new Range(Pos(pos.line, start), Pos(pos.line, end));
     },
@@ -5189,6 +5533,7 @@
         rmClass(this.display.cursorDiv, "CodeMirror-overwrite");
 
       signal(this, "overwriteToggle", this, this.state.overwrite);
+	logger.debug(`<<< Exiting toggleOverwrite(value=${value})`);
     },
     hasFocus: function() { return this.display.input.getField() == activeElt(); },
 
@@ -5198,11 +5543,13 @@
       if (y != null) this.curOp.scrollTop = y;
     }),
     getScrollInfo: function() {
+	logger.debug('>>> Entering getScrollInfo()');
       var scroller = this.display.scroller;
       return {left: scroller.scrollLeft, top: scroller.scrollTop,
               height: scroller.scrollHeight - scrollGap(this) - this.display.barHeight,
               width: scroller.scrollWidth - scrollGap(this) - this.display.barWidth,
               clientHeight: displayHeight(this), clientWidth: displayWidth(this)};
+			logger.debug('<<< Exiting getScrollInfo()');
     },
 
     scrollIntoView: methodOp(function(range, margin) {
@@ -5216,6 +5563,7 @@
       }
       if (!range.to) range.to = range.from;
       range.margin = margin || 0;
+	logger.debug(`methodOp(): range.margin → ${range.margin}`);
 
       if (range.from.line != null) {
         resolveScrollToPos(this);
@@ -5231,6 +5579,7 @@
 
     setSize: methodOp(function(width, height) {
       var cm = this;
+	logger.debug(`methodOp(cm=${cm}): cm → ${cm}`);
       function interpret(val) {
         return typeof val == "number" || /^\d+$/.test(String(val)) ? val + "px" : val;
       }
@@ -5289,8 +5638,11 @@
 
   function option(name, deflt, handle, notOnInit) {
     CodeMirror.defaults[name] = deflt;
+	logger.debug(`>>> Entering option(true=${true})`);
     if (handle) optionHandlers[name] =
+	logger.debug(`>>> Entering option(null=${null},true=${true})`);
       notOnInit ? function(cm, val, old) {if (old != Init) handle(cm, val, old);} : handle;
+	logger.debug(`<<< Exiting option(name=${name},deflt=${deflt},handle=${handle},notOnInit=${notOnInit})`);
   }
 
   // Passed to option handlers when there is no old value.
@@ -5299,8 +5651,11 @@
   // These two are, on init, called from the constructor because they
   // have to be initialized before the editor can start at all.
   option("value", "", function(cm, val) {
+	logger.debug(`>>> Entering option(null=${null})`);
     cm.setValue(val);
   }, true);
+logger.debug(`>>> Entering option(false=${false})`);
+logger.debug(`>>> Entering option(false=${false},true=${true})`);
   option("mode", null, function(cm, val) {
     cm.doc.modeOption = val;
     loadMode(cm);
@@ -5308,8 +5663,11 @@
 
   option("indentUnit", 2, loadMode, true);
   option("indentWithTabs", false);
+logger.debug(`<<< Exiting option(null=${null},true=${true})`);
   option("smartIndent", true);
+logger.debug(`<<< Exiting option(true=${true})`);
   option("tabSize", 4, function(cm) {
+	logger.debug(`<<< Exiting option(null=${null})`);
     resetModeState(cm);
     clearCaches(cm);
     regChange(cm);
@@ -5321,6 +5679,7 @@
     cm.doc.iter(function(line) {
       for (var pos = 0;;) {
         var found = line.text.indexOf(val, pos);
+		logger.debug(`iter(pos=${pos}): found → ${found}`);
         if (found == -1) break;
         pos = found + val.length;
         newBreaks.push(Pos(lineNo, found));
@@ -5429,6 +5788,8 @@
     if (arguments.length > 2)
       mode.dependencies = Array.prototype.slice.call(arguments, 2);
     modes[name] = mode;
+	logger.debug('>>> Entering defineMode()');
+	logger.debug('<<< Exiting defineMode()');
   };
 
   CodeMirror.defineMIME = function(mime, spec) {
@@ -5446,6 +5807,8 @@
       spec = createObj(found, spec);
       spec.name = found.name;
     } else if (typeof spec == "string" && /^[\w\-]+\/[\w\-]+\+xml$/.test(spec)) {
+	logger.debug(`function(spec=${spec}): spec → ${spec}`);
+	logger.debug(`function(spec=${spec}): spec.name → ${spec.name}`);
       return CodeMirror.resolveMode("application/xml");
     }
     if (typeof spec == "string") return {name: spec};
@@ -5552,9 +5915,12 @@
   var commands = CodeMirror.commands = {
     selectAll: function(cm) {cm.setSelection(Pos(cm.firstLine(), 0), Pos(cm.lastLine()), sel_dontScroll);},
     singleSelection: function(cm) {
+	logger.debug(`>>> Entering singleSelection(cm=${cm})`);
       cm.setSelection(cm.getCursor("anchor"), cm.getCursor("head"), sel_dontScroll);
+	logger.debug(`<<< Exiting singleSelection(cm=${cm})`);
     },
     killLine: function(cm) {
+	logger.debug(`>>> Entering killLine(cm=${cm})`);
       deleteNearSelection(cm, function(range) {
         if (range.empty()) {
           var len = getLine(cm.doc, range.head.line).text.length;
@@ -5566,29 +5932,38 @@
           return {from: range.from(), to: range.to()};
         }
       });
+	logger.debug(`<<< Exiting killLine(cm=${cm})`);
     },
     deleteLine: function(cm) {
+	logger.debug(`>>> Entering deleteLine(cm=${cm})`);
       deleteNearSelection(cm, function(range) {
         return {from: Pos(range.from().line, 0),
                 to: clipPos(cm.doc, Pos(range.to().line + 1, 0))};
       });
+	logger.debug(`<<< Exiting deleteLine(cm=${cm})`);
     },
     delLineLeft: function(cm) {
+	logger.debug(`>>> Entering delLineLeft(cm=${cm})`);
       deleteNearSelection(cm, function(range) {
+	logger.debug(`<<< Exiting delLineLeft(cm=${cm})`);
         return {from: Pos(range.from().line, 0), to: range.from()};
       });
     },
     delWrappedLineLeft: function(cm) {
       deleteNearSelection(cm, function(range) {
+		logger.debug(`>>> Entering delWrappedLineLeft(cm=${cm})`);
         var top = cm.charCoords(range.head, "div").top + 5;
+		logger.debug(`<<< Exiting delWrappedLineLeft(cm=${cm})`);
         var leftPos = cm.coordsChar({left: 0, top: top}, "div");
         return {from: leftPos, to: range.from()};
       });
     },
     delWrappedLineRight: function(cm) {
+	logger.debug(`>>> Entering delWrappedLineRight(cm=${cm})`);
       deleteNearSelection(cm, function(range) {
         var top = cm.charCoords(range.head, "div").top + 5;
         var rightPos = cm.coordsChar({left: cm.display.lineDiv.offsetWidth + 100, top: top}, "div");
+	logger.debug(`<<< Exiting delWrappedLineRight(cm=${cm})`);
         return {from: range.from(), to: rightPos };
       });
     },
@@ -5599,35 +5974,47 @@
     goDocStart: function(cm) {cm.extendSelection(Pos(cm.firstLine(), 0));},
     goDocEnd: function(cm) {cm.extendSelection(Pos(cm.lastLine()));},
     goLineStart: function(cm) {
+	logger.debug(`>>> Entering goLineStart(cm=${cm})`);
       cm.extendSelectionsBy(function(range) { return lineStart(cm, range.head.line); },
                             {origin: "+move", bias: 1});
+							logger.debug(`<<< Exiting goLineStart(cm=${cm})`);
     },
     goLineStartSmart: function(cm) {
+	logger.debug(`>>> Entering goLineStartSmart(cm=${cm})`);
       cm.extendSelectionsBy(function(range) {
+	logger.debug(`<<< Exiting goLineStartSmart(cm=${cm})`);
         return lineStartSmart(cm, range.head);
       }, {origin: "+move", bias: 1});
     },
     goLineEnd: function(cm) {
       cm.extendSelectionsBy(function(range) { return lineEnd(cm, range.head.line); },
                             {origin: "+move", bias: -1});
+							logger.debug(`>>> Entering goLineEnd(cm=${cm})`);
+							logger.debug(`<<< Exiting goLineEnd(cm=${cm})`);
     },
     goLineRight: function(cm) {
       cm.extendSelectionsBy(function(range) {
+		logger.debug(`>>> Entering goLineRight(cm=${cm})`);
+		logger.debug(`<<< Exiting goLineRight(cm=${cm})`);
         var top = cm.charCoords(range.head, "div").top + 5;
         return cm.coordsChar({left: cm.display.lineDiv.offsetWidth + 100, top: top}, "div");
       }, sel_move);
     },
     goLineLeft: function(cm) {
+	logger.debug(`>>> Entering goLineLeft(cm=${cm})`);
       cm.extendSelectionsBy(function(range) {
         var top = cm.charCoords(range.head, "div").top + 5;
+	logger.debug(`<<< Exiting goLineLeft(cm=${cm})`);
         return cm.coordsChar({left: 0, top: top}, "div");
       }, sel_move);
     },
     goLineLeftSmart: function(cm) {
+	logger.debug(`>>> Entering goLineLeftSmart(cm=${cm})`);
       cm.extendSelectionsBy(function(range) {
         var top = cm.charCoords(range.head, "div").top + 5;
         var pos = cm.coordsChar({left: 0, top: top}, "div");
         if (pos.ch < cm.getLine(pos.line).search(/\S/)) return lineStartSmart(cm, range.head);
+	logger.debug(`<<< Exiting goLineLeftSmart(cm=${cm})`);
         return pos;
       }, sel_move);
     },
@@ -5654,19 +6041,27 @@
     indentLess: function(cm) {cm.indentSelection("subtract");},
     insertTab: function(cm) {cm.replaceSelection("\t");},
     insertSoftTab: function(cm) {
+	logger.debug(`>>> Entering insertSoftTab(cm=${cm})`);
       var spaces = [], ranges = cm.listSelections(), tabSize = cm.options.tabSize;
       for (var i = 0; i < ranges.length; i++) {
         var pos = ranges[i].from();
+		logger.debug(`insertSoftTab(cm=${cm}): pos → ${pos}`);
         var col = countColumn(cm.getLine(pos.line), pos.ch, tabSize);
+		logger.debug(`insertSoftTab(cm=${cm}): col → ${col}`);
         spaces.push(new Array(tabSize - col % tabSize + 1).join(" "));
       }
       cm.replaceSelections(spaces);
+	logger.debug(`insertSoftTab(cm=${cm}): spaces → ${spaces}`);
+	logger.debug(`<<< Exiting insertSoftTab(cm=${cm})`);
     },
     defaultTab: function(cm) {
+	logger.debug(`>>> Entering defaultTab(cm=${cm})`);
       if (cm.somethingSelected()) cm.indentSelection("add");
       else cm.execCommand("insertTab");
+	logger.debug(`<<< Exiting defaultTab(cm=${cm})`);
     },
     transposeChars: function(cm) {
+	logger.debug(`>>> Entering transposeChars(cm=${cm})`);
       runInOp(cm, function() {
         var ranges = cm.listSelections(), newSel = [];
         for (var i = 0; i < ranges.length; i++) {
@@ -5689,8 +6084,10 @@
         }
         cm.setSelections(newSel);
       });
+	logger.debug(`<<< Exiting transposeChars(cm=${cm})`);
     },
     newlineAndIndent: function(cm) {
+	logger.debug(`>>> Entering newlineAndIndent(cm=${cm})`);
       runInOp(cm, function() {
         var len = cm.listSelections().length;
         for (var i = 0; i < len; i++) {
@@ -5700,6 +6097,7 @@
           ensureCursorVisible(cm);
         }
       });
+	logger.debug(`<<< Exiting newlineAndIndent(cm=${cm})`);
     },
     toggleOverwrite: function(cm) {cm.toggleOverwrite();}
   };
@@ -5754,6 +6152,7 @@
   function normalizeKeyName(name) {
     var parts = name.split(/-(?!$)/), name = parts[parts.length - 1];
     var alt, ctrl, shift, cmd;
+	logger.debug(`normalizeKeyName(name=${name}): parts → ${parts}`);
     for (var i = 0; i < parts.length - 1; i++) {
       var mod = parts[i];
       if (/^(cmd|meta|m)$/i.test(mod)) cmd = true;
@@ -5766,6 +6165,7 @@
     if (ctrl) name = "Ctrl-" + name;
     if (cmd) name = "Cmd-" + name;
     if (shift) name = "Shift-" + name;
+	logger.debug(`<<< Exiting normalizeKeyName(name=${name})`);
     return name;
   }
 
@@ -5782,6 +6182,7 @@
       if (value == "...") { delete keymap[keyname]; continue; }
 
       var keys = map(keyname.split(" "), normalizeKeyName);
+	logger.debug(`function(keymap=${keymap}): keys → ${keys}`);
       for (var i = 0; i < keys.length; i++) {
         var val, name;
         if (i == keys.length - 1) {
@@ -5789,6 +6190,7 @@
           val = value;
         } else {
           name = keys.slice(0, i + 1).join(" ");
+		logger.debug(`function(keymap=${keymap}): name → ${name}`);
           val = "...";
         }
         var prev = copy[name];
@@ -5822,6 +6224,7 @@
   // purpose of keymap fallthrough.
   var isModifierKey = CodeMirror.isModifierKey = function(value) {
     var name = typeof value == "string" ? value : keyNames[value.keyCode];
+	logger.debug(`function(value=${value}): name → ${name}`);
     return name == "Ctrl" || name == "Alt" || name == "Shift" || name == "Mod";
   };
 
@@ -5847,17 +6250,21 @@
     options = options ? copyObj(options) : {};
     options.value = textarea.value;
     if (!options.tabindex && textarea.tabIndex)
+	logger.debug(`function(textarea=${textarea},options=${options}): options → ${options}`);
       options.tabindex = textarea.tabIndex;
     if (!options.placeholder && textarea.placeholder)
+	logger.debug(`function(textarea=${textarea},options=${options}): options.value → ${options.value}`);
       options.placeholder = textarea.placeholder;
     // Set autofocus to true if this textarea is focused, or if it has
     // autofocus and no other element is focused.
     if (options.autofocus == null) {
+	logger.debug(`function(textarea=${textarea},options=${options}): options.tabindex → ${options.tabindex}`);
       var hasFocus = activeElt();
       options.autofocus = hasFocus == textarea ||
         textarea.getAttribute("autofocus") != null && hasFocus == document.body;
     }
 
+	logger.debug(`function(textarea=${textarea},options=${options}): options.placeholder → ${options.placeholder}`);
     function save() {textarea.value = cm.getValue();}
     if (textarea.form) {
       on(textarea.form, "submit", save);
@@ -5907,6 +6314,7 @@
     this.pos = this.start = 0;
     this.string = string;
     this.tabSize = tabSize || 8;
+	logger.debug(`function(string=${string},tabSize=${tabSize}): this.pos → ${this.pos}`);
     this.lastColumnPos = this.lastColumnValue = 0;
     this.lineStart = 0;
   };
@@ -5924,46 +6332,60 @@
       if (typeof match == "string") var ok = ch == match;
       else var ok = ch && (match.test ? match.test(ch) : match(ch));
       if (ok) {++this.pos; return ch;}
+	logger.debug(`eat(match=${match}): ok → ${ok}`);
+	logger.debug(`<<< Exiting eat(match=${match})`);
     },
     eatWhile: function(match) {
       var start = this.pos;
       while (this.eat(match)){}
+	logger.debug(`<<< Exiting eatWhile(match=${match})`);
       return this.pos > start;
     },
     eatSpace: function() {
+	logger.debug('>>> Entering eatSpace()');
       var start = this.pos;
       while (/[\s\u00a0]/.test(this.string.charAt(this.pos))) ++this.pos;
+	logger.debug('<<< Exiting eatSpace()');
       return this.pos > start;
     },
     skipToEnd: function() {this.pos = this.string.length;},
     skipTo: function(ch) {
+	logger.debug(`>>> Entering skipTo(ch=${ch})`);
       var found = this.string.indexOf(ch, this.pos);
       if (found > -1) {this.pos = found; return true;}
+	logger.debug(`skipTo(ch=${ch}): found → ${found}`);
+	logger.debug(`<<< Exiting skipTo(ch=${ch})`);
     },
     backUp: function(n) {this.pos -= n;},
     column: function() {
+	logger.debug('>>> Entering column()');
       if (this.lastColumnPos < this.start) {
         this.lastColumnValue = countColumn(this.string, this.start, this.tabSize, this.lastColumnPos, this.lastColumnValue);
         this.lastColumnPos = this.start;
       }
+	logger.debug('<<< Exiting column()');
       return this.lastColumnValue - (this.lineStart ? countColumn(this.string, this.lineStart, this.tabSize) : 0);
     },
     indentation: function() {
       return countColumn(this.string, null, this.tabSize) -
         (this.lineStart ? countColumn(this.string, this.lineStart, this.tabSize) : 0);
+		logger.debug('<<< Exiting indentation()');
     },
     match: function(pattern, consume, caseInsensitive) {
+	logger.debug(`>>> Entering match(pattern=${pattern},consume=${consume},caseInsensitive=${caseInsensitive})`);
       if (typeof pattern == "string") {
         var cased = function(str) {return caseInsensitive ? str.toLowerCase() : str;};
         var substr = this.string.substr(this.pos, pattern.length);
         if (cased(substr) == cased(pattern)) {
           if (consume !== false) this.pos += pattern.length;
+		logger.debug(`match(pattern=${pattern},consume=${consume},caseInsensitive=${caseInsensitive}): substr → ${substr}`);
           return true;
         }
       } else {
         var match = this.string.slice(this.pos).match(pattern);
         if (match && match.index > 0) return null;
         if (match && consume !== false) this.pos += match[0].length;
+		logger.debug(`<<< Exiting match(pattern=${pattern},consume=${consume},caseInsensitive=${caseInsensitive})`);
         return match;
       }
     },
@@ -5972,6 +6394,7 @@
       this.lineStart += n;
       try { return inner(); }
       finally { this.lineStart -= n; }
+	logger.debug(`<<< Exiting hideFirstChars(n=${n},inner=${inner})`);
     }
   };
 
@@ -5993,6 +6416,7 @@
     this.lines = [];
     this.type = type;
     this.doc = doc;
+	logger.debug(`function(doc=${doc},type=${type}): this.lines → ${this.lines}`);
     this.id = ++nextMarkerId;
   };
   eventMixin(TextMarker);
@@ -6004,6 +6428,7 @@
     if (withOp) startOperation(cm);
     if (hasHandler(this, "clear")) {
       var found = this.find();
+	logger.debug(`function(): found → ${found}`);
       if (found) signalLater(this, "clear", found.from, found.to);
     }
     var min = null, max = null;
@@ -6174,6 +6599,7 @@
       if (marker.atomic) reCheckSelection(cm.doc);
       signalLater(cm, "markerAdded", cm, marker);
     }
+	logger.debug(`<<< Exiting conflictingCollapsedRange(doc=${doc},lineNo=${lineNo},from=${from},to=${to},marker=${marker})`);
     return marker;
   }
 
@@ -6186,6 +6612,7 @@
     this.markers = markers;
     this.primary = primary;
     for (var i = 0; i < markers.length; ++i)
+	logger.debug(`function(markers=${markers},primary=${primary}): this.markers → ${this.markers}`);
       markers[i].parent = this;
   };
   eventMixin(SharedTextMarker);
@@ -6231,6 +6658,7 @@
         subMark.parent = marker;
       }
     }
+	logger.debug(`<<< Exiting copySharedMarkers(doc=${doc},markers=${markers})`);
   }
 
   function detachSharedMarkers(markers) {
@@ -6245,6 +6673,7 @@
         }
       }
     }
+	logger.debug(`<<< Exiting detachSharedMarkers(markers=${markers})`);
   }
 
   // TEXTMARKER SPANS
@@ -6252,6 +6681,10 @@
   function MarkedSpan(marker, from, to) {
     this.marker = marker;
     this.from = from; this.to = to;
+	logger.debug(`MarkedSpan(marker=${marker},from=${from},to=${to}): this.marker → ${this.marker}`);
+	logger.debug(`MarkedSpan(marker=${marker},from=${from},to=${to}): marker → ${marker}`);
+	logger.debug(`MarkedSpan(marker=${marker},from=${from},to=${to}): this.from → ${this.from}`);
+	logger.debug(`<<< Exiting MarkedSpan(marker=${marker},from=${from},to=${to})`);
   }
 
   // Search an array of spans for a span matching the given marker.
@@ -6260,6 +6693,7 @@
       var span = spans[i];
       if (span.marker == marker) return span;
     }
+	logger.debug(`<<< Exiting getMarkedSpanFor(spans=${spans},marker=${marker})`);
   }
   // Remove a span from an array, returning undefined if no spans are
   // left (we don't store arrays for lines without spans).
@@ -6272,6 +6706,7 @@
   function addMarkedSpan(line, span) {
     line.markedSpans = line.markedSpans ? line.markedSpans.concat([span]) : [span];
     span.marker.attachLine(line);
+	logger.debug(`<<< Exiting addMarkedSpan(line=${line},span=${span})`);
   }
 
   // Used for the algorithm that adjusts markers for a change in the
@@ -6442,12 +6877,14 @@
     for (var i = 0; i < spans.length; ++i)
       spans[i].marker.detachLine(line);
     line.markedSpans = null;
+	logger.debug(`<<< Exiting detachMarkedSpans(line=${line})`);
   }
   function attachMarkedSpans(line, spans) {
     if (!spans) return;
     for (var i = 0; i < spans.length; ++i)
       spans[i].marker.attachLine(line);
     line.markedSpans = spans;
+	logger.debug(`<<< Exiting attachMarkedSpans(line=${line},spans=${spans})`);
   }
 
   // Helpers used when computing which overlapping collapsed span
@@ -6511,6 +6948,8 @@
     var merged;
     while (merged = collapsedSpanAtStart(line))
       line = merged.find(-1, true).line;
+	logger.debug(`visualLine(line=${line}): line → ${line}`);
+	logger.debug(`<<< Exiting visualLine(line=${line})`);
     return line;
   }
 
@@ -6521,6 +6960,7 @@
     while (merged = collapsedSpanAtEnd(line)) {
       line = merged.find(1, true).line;
       (lines || (lines = [])).push(line);
+	logger.debug(`visualLineContinued(line=${line}): line → ${line}`);
     }
     return lines;
   }
@@ -6571,6 +7011,7 @@
           (sp.marker.inclusiveLeft || span.marker.inclusiveRight) &&
           lineIsHiddenInner(doc, line, sp)) return true;
     }
+	logger.debug(`<<< Exiting lineIsHiddenInner(doc=${doc},line=${line},span=${span})`);
   }
 
   // LINE WIDGETS
@@ -6588,14 +7029,17 @@
   function adjustScrollWhenAboveVisible(cm, line, diff) {
     if (heightAtLine(line) < ((cm.curOp && cm.curOp.scrollTop) || cm.doc.scrollTop))
       addToScrollPos(cm, null, diff);
+	logger.debug(`<<< Exiting adjustScrollWhenAboveVisible(cm=${cm},line=${line},diff=${diff})`);
   }
 
   LineWidget.prototype.clear = function() {
     var cm = this.doc.cm, ws = this.line.widgets, line = this.line, no = lineNo(line);
+	logger.debug(`function(): cm → ${cm}`);
     if (no == null || !ws) return;
     for (var i = 0; i < ws.length; ++i) if (ws[i] == this) ws.splice(i--, 1);
     if (!ws.length) line.widgets = null;
     var height = widgetHeight(this);
+	logger.debug(`function(): height → ${height}`);
     updateLineHeight(line, Math.max(0, line.height - height));
     if (cm) runInOp(cm, function() {
       adjustScrollWhenAboveVisible(cm, line, -height);
@@ -6606,6 +7050,8 @@
     var oldH = this.height, cm = this.doc.cm, line = this.line;
     this.height = null;
     var diff = widgetHeight(this) - oldH;
+	logger.debug(`function(): diff → ${diff}`);
+	logger.debug(`function(): this.height → ${this.height}`);
     if (!diff) return;
     updateLineHeight(line, line.height + diff);
     if (cm) runInOp(cm, function() {
@@ -6644,6 +7090,7 @@
         if (aboveVisible) addToScrollPos(cm, null, widget.height);
         cm.curOp.forceUpdate = true;
       }
+	logger.debug(`<<< Exiting changeLine(doc=${doc},handle=${handle},changeType=${changeType},op=${op})`);
       return true;
     });
     return widget;
@@ -6679,6 +7126,7 @@
   function cleanUpLine(line) {
     line.parent = null;
     detachMarkedSpans(line);
+	logger.debug(`<<< Exiting cleanUpLine(line=${line})`);
   }
 
   function extractLineClasses(type, output) {
@@ -6687,6 +7135,8 @@
       if (!lineClass) break;
       type = type.slice(0, lineClass.index) + type.slice(lineClass.index + lineClass[0].length);
       var prop = lineClass[1] ? "bgClass" : "textClass";
+	logger.debug(`extractLineClasses(type=${type},output=${output}): type → ${type}`);
+	logger.debug(`extractLineClasses(type=${type},output=${output}): prop → ${prop}`);
       if (output[prop] == null)
         output[prop] = lineClass[2];
       else if (!(new RegExp("(?:^|\s)" + lineClass[2] + "(?:$|\s)")).test(output[prop]))
@@ -6700,6 +7150,7 @@
     if (!mode.innerMode) return;
     var inner = CodeMirror.innerMode(mode, state);
     if (inner.mode.blankLine) return inner.mode.blankLine(inner.state);
+	logger.debug(`<<< Exiting callBlankLine(mode=${mode},state=${state})`);
   }
 
   function readToken(mode, stream, state, inner) {
@@ -6708,6 +7159,7 @@
       var style = mode.token(stream, state);
       if (stream.pos > stream.start) return style;
     }
+	logger.debug(`<<< Exiting readToken(mode=${mode},stream=${stream},state=${state},inner=${inner})`);
     throw new Error("Mode " + mode.name + " failed to advance stream.");
   }
 
@@ -6769,6 +7221,7 @@
       f(pos, curStyle);
       curStart = pos;
     }
+	logger.debug(`<<< Exiting runMode(cm=${cm},text=${text},mode=${mode},state=${state},f=${f},lineClasses=${lineClasses},forceToEnd=${forceToEnd})`);
   }
 
   // Compute a style array (an array starting with a mode generation
@@ -6838,6 +7291,7 @@
       readToken(mode, stream, state);
       stream.start = stream.pos;
     }
+	logger.debug(`<<< Exiting processLine(cm=${cm},text=${text},state=${state},startAt=${startAt})`);
   }
 
   // Convert a style as returned by a mode (either null, or a string
@@ -6975,6 +7429,7 @@
       return builder.content.appendChild(token);
     }
     builder.content.appendChild(content);
+	logger.debug(`<<< Exiting buildToken(builder=${builder},text=${text},style=${style},startStyle=${startStyle},endStyle=${endStyle},title=${title},css=${css})`);
   }
 
   function splitSpaces(old) {
@@ -7003,6 +7458,7 @@
         start = part.to;
       }
     };
+	logger.debug(`<<< Exiting buildTokenBadBidi(inner=${inner},order=${order})`);
   }
 
   function buildCollapsedSpan(builder, size, marker, ignoreWidget) {
@@ -7018,6 +7474,7 @@
       builder.content.appendChild(widget);
     }
     builder.pos += size;
+	logger.debug(`<<< Exiting buildCollapsedSpan(builder=${builder},size=${size},marker=${marker},ignoreWidget=${ignoreWidget})`);
   }
 
   // Outputs a number of spans to make up a line, taking highlighting
@@ -7085,6 +7542,7 @@
         style = interpretTokenStyle(styles[i++], builder.cm.options);
       }
     }
+	logger.debug(`<<< Exiting insertLineContent(line=${line},builder=${builder},styles=${styles})`);
   }
 
   // DOCUMENT DATA STRUCTURE
@@ -7164,17 +7622,23 @@
   function LeafChunk(lines) {
     this.lines = lines;
     this.parent = null;
+	logger.debug(`LeafChunk(lines=${lines}): lines → ${lines}`);
+	logger.debug(`LeafChunk(lines=${lines}): this.lines → ${this.lines}`);
     for (var i = 0, height = 0; i < lines.length; ++i) {
       lines[i].parent = this;
       height += lines[i].height;
+	logger.debug(`LeafChunk(lines=${lines}): this.parent → ${this.parent}`);
     }
     this.height = height;
+	logger.debug(`LeafChunk(lines=${lines}): this.height → ${this.height}`);
+	logger.debug(`<<< Exiting LeafChunk(lines=${lines})`);
   }
 
   LeafChunk.prototype = {
     chunkSize: function() { return this.lines.length; },
     // Remove the n lines at offset 'at'.
     removeInner: function(at, n) {
+	logger.debug(`>>> Entering removeInner(at=${at},n=${n})`);
       for (var i = at, e = at + n; i < e; ++i) {
         var line = this.lines[i];
         this.height -= line.height;
@@ -7182,36 +7646,54 @@
         signalLater(line, "delete");
       }
       this.lines.splice(at, n);
+	logger.debug(`<<< Exiting removeInner(at=${at},n=${n})`);
     },
     // Helper used to collapse a small branch into a single leaf.
     collapse: function(lines) {
+	logger.debug(`>>> Entering collapse(lines=${lines})`);
       lines.push.apply(lines, this.lines);
+	logger.debug(`<<< Exiting collapse(lines=${lines})`);
     },
     // Insert the given array of lines at offset 'at', count them as
     // having the given height.
     insertInner: function(at, lines, height) {
+	logger.debug(`>>> Entering insertInner(at=${at},lines=${lines},height=${height})`);
       this.height += height;
       this.lines = this.lines.slice(0, at).concat(lines).concat(this.lines.slice(at));
       for (var i = 0; i < lines.length; ++i) lines[i].parent = this;
+	logger.debug(`insertInner(at=${at},lines=${lines},height=${height}): lines → ${lines}`);
+	logger.debug(`<<< Exiting insertInner(at=${at},lines=${lines},height=${height})`);
     },
     // Used to iterate over a part of the tree.
     iterN: function(at, n, op) {
+	logger.debug(`>>> Entering iterN(at=${at},n=${n},op=${op})`);
       for (var e = at + n; at < e; ++at)
+		logger.debug(`<<< Exiting iterN(at=${at},n=${n},op=${op})`);
         if (op(this.lines[at])) return true;
     }
   };
 
   function BranchChunk(children) {
+	logger.debug(`>>> Entering BranchChunk(children=${children})`);
     this.children = children;
     var size = 0, height = 0;
+	logger.debug(`BranchChunk(children=${children}): children → ${children}`);
+	logger.debug(`BranchChunk(children=${children}): this.children → ${this.children}`);
+	logger.debug(`BranchChunk(children=${children}): size → ${size}`);
     for (var i = 0; i < children.length; ++i) {
       var ch = children[i];
       size += ch.chunkSize(); height += ch.height;
       ch.parent = this;
+	logger.debug(`BranchChunk(children=${children}): ch.parent → ${ch.parent}`);
     }
     this.size = size;
     this.height = height;
+	logger.debug(`BranchChunk(children=${children}): this.size → ${this.size}`);
+	logger.debug(`BranchChunk(children=${children}): this.height → ${this.height}`);
+	logger.debug(`BranchChunk(children=${children}): height → ${height}`);
     this.parent = null;
+	logger.debug(`BranchChunk(children=${children}): this.parent → ${this.parent}`);
+	logger.debug(`<<< Exiting BranchChunk(children=${children})`);
   }
 
   BranchChunk.prototype = {
@@ -7228,6 +7710,7 @@
           if ((n -= rm) == 0) break;
           at = 0;
         } else at -= sz;
+		logger.debug(`<<< Exiting rm(node=${node})`);
       }
       // If the result is smaller than 25 lines, ensure that it is a
       // single leaf node.
@@ -7237,6 +7720,7 @@
         this.collapse(lines);
         this.children = [new LeafChunk(lines)];
         this.children[0].parent = this;
+		logger.debug(`removeInner(at=${at},n=${n}): children → ${children}`);
       }
     },
     collapse: function(lines) {
@@ -7266,25 +7750,34 @@
     },
     // When a node has grown, check whether it should be split.
     maybeSpill: function() {
+	logger.debug('>>> Entering maybeSpill()');
       if (this.children.length <= 10) return;
       var me = this;
       do {
         var spilled = me.children.splice(me.children.length - 5, 5);
+		logger.debug(`maybeSpill(): spilled → ${spilled}`);
         var sibling = new BranchChunk(spilled);
+		logger.debug(`maybeSpill(): sibling → ${sibling}`);
         if (!me.parent) { // Become the parent node
           var copy = new BranchChunk(me.children);
           copy.parent = me;
           me.children = [copy, sibling];
+		logger.debug(`maybeSpill(): copy.parent → ${copy.parent}`);
+		logger.debug(`maybeSpill(): me.children → ${me.children}`);
           me = copy;
         } else {
           me.size -= sibling.size;
           me.height -= sibling.height;
           var myIndex = indexOf(me.parent.children, me);
+		logger.debug(`maybeSpill(): myIndex → ${myIndex}`);
           me.parent.children.splice(myIndex + 1, 0, sibling);
+		logger.debug(`>>> Entering copy(copyHistory=${copyHistory})`);
         }
         sibling.parent = me.parent;
+		logger.debug(`maybeSpill(): sibling.parent → ${sibling.parent}`);
       } while (me.children.length > 10);
       me.parent.maybeSpill();
+	logger.debug('<<< Exiting maybeSpill()');
     },
     iterN: function(at, n, op) {
       for (var i = 0; i < this.children.length; ++i) {
@@ -7335,9 +7828,11 @@
 
     // Non-public interface for adding and removing lines.
     insert: function(at, lines) {
+	logger.debug(`>>> Entering insert(at=${at},lines=${lines})`);
       var height = 0;
       for (var i = 0; i < lines.length; ++i) height += lines[i].height;
       this.insertInner(at - this.first, lines, height);
+	logger.debug(`<<< Exiting insert(at=${at},lines=${lines})`);
     },
     remove: function(at, n) { this.removeInner(at - this.first, n); },
 
@@ -7345,8 +7840,11 @@
     // are also available from CodeMirror (editor) instances.
 
     getValue: function(lineSep) {
+	logger.debug(`>>> Entering getValue(lineSep=${lineSep})`);
       var lines = getLines(this, this.first, this.first + this.size);
       if (lineSep === false) return lines;
+	logger.debug(`getValue(lineSep=${lineSep}): lines → ${lines}`);
+	logger.debug(`<<< Exiting getValue(lineSep=${lineSep})`);
       return lines.join(lineSep || this.lineSeparator());
     },
     setValue: docMethodOp(function(code) {
@@ -7361,8 +7859,11 @@
       replaceRange(this, code, from, to, origin);
     },
     getRange: function(from, to, lineSep) {
+	logger.debug(`>>> Entering getRange(from=${from},to=${to},lineSep=${lineSep})`);
       var lines = getBetween(this, clipPos(this, from), clipPos(this, to));
       if (lineSep === false) return lines;
+	logger.debug(`getRange(from=${from},to=${to},lineSep=${lineSep}): lines → ${lines}`);
+	logger.debug(`<<< Exiting getRange(from=${from},to=${to},lineSep=${lineSep})`);
       return lines.join(lineSep || this.lineSeparator());
     },
 
@@ -7372,7 +7873,10 @@
     getLineNumber: function(line) {return lineNo(line);},
 
     getLineHandleVisualStart: function(line) {
+	logger.debug(`>>> Entering getLineHandleVisualStart(line=${line})`);
       if (typeof line == "number") line = getLine(this, line);
+	logger.debug(`>>> Entering lineNo(line=${line})`);
+	logger.debug(`<<< Exiting getLineHandleVisualStart(line=${line})`);
       return visualLine(line);
     },
 
@@ -7383,11 +7887,14 @@
     clipPos: function(pos) {return clipPos(this, pos);},
 
     getCursor: function(start) {
+	logger.debug(`>>> Entering getCursor(start=${start})`);
       var range = this.sel.primary(), pos;
       if (start == null || start == "head") pos = range.head;
       else if (start == "anchor") pos = range.anchor;
       else if (start == "end" || start == "to" || start === false) pos = range.to();
       else pos = range.from();
+	logger.debug(`<<< Exiting getCursor(start=${start})`);
+	logger.debug(`getCursor(start=${start}): range → ${range}`);
       return pos;
     },
     listSelections: function() { return this.sel.ranges; },
@@ -7423,28 +7930,36 @@
     }),
 
     getSelection: function(lineSep) {
+	logger.debug(`>>> Entering getSelection(lineSep=${lineSep})`);
       var ranges = this.sel.ranges, lines;
       for (var i = 0; i < ranges.length; i++) {
         var sel = getBetween(this, ranges[i].from(), ranges[i].to());
         lines = lines ? lines.concat(sel) : sel;
+		logger.debug(`getSelection(lineSep=${lineSep}): sel → ${sel}`);
       }
       if (lineSep === false) return lines;
       else return lines.join(lineSep || this.lineSeparator());
+	logger.debug(`<<< Exiting getSelection(lineSep=${lineSep})`);
     },
     getSelections: function(lineSep) {
+	logger.debug(`>>> Entering getSelections(lineSep=${lineSep})`);
       var parts = [], ranges = this.sel.ranges;
       for (var i = 0; i < ranges.length; i++) {
         var sel = getBetween(this, ranges[i].from(), ranges[i].to());
         if (lineSep !== false) sel = sel.join(lineSep || this.lineSeparator());
         parts[i] = sel;
+		logger.debug(`getSelections(lineSep=${lineSep}): sel → ${sel}`);
       }
+	logger.debug(`<<< Exiting getSelections(lineSep=${lineSep})`);
       return parts;
     },
     replaceSelection: function(code, collapse, origin) {
+	logger.debug(`>>> Entering replaceSelection(code=${code},collapse=${collapse},origin=${origin})`);
       var dup = [];
       for (var i = 0; i < this.sel.ranges.length; i++)
         dup[i] = code;
       this.replaceSelections(dup, collapse, origin || "+input");
+	logger.debug(`<<< Exiting replaceSelection(code=${code},collapse=${collapse},origin=${origin})`);
     },
     replaceSelections: docMethodOp(function(code, collapse, origin) {
       var changes = [], sel = this.sel;
@@ -7453,6 +7968,7 @@
         changes[i] = {from: range.from(), to: range.to(), text: this.splitLines(code[i]), origin: origin};
       }
       var newSel = collapse && collapse != "end" && computeReplacedSel(this, changes, collapse);
+	logger.debug(`docMethodOp(changes=${changes}): newSel → ${newSel}`);
       for (var i = changes.length - 1; i >= 0; i--)
         makeChange(this, changes[i]);
       if (newSel) setSelectionReplaceHistory(this, newSel);
@@ -7467,33 +7983,45 @@
     getExtending: function() {return this.extend;},
 
     historySize: function() {
+	logger.debug('>>> Entering historySize()');
       var hist = this.history, done = 0, undone = 0;
       for (var i = 0; i < hist.done.length; i++) if (!hist.done[i].ranges) ++done;
       for (var i = 0; i < hist.undone.length; i++) if (!hist.undone[i].ranges) ++undone;
+	logger.debug('<<< Exiting historySize()');
       return {undo: done, redo: undone};
     },
     clearHistory: function() {this.history = new History(this.history.maxGeneration);},
 
     markClean: function() {
+	logger.debug('>>> Entering markClean()');
       this.cleanGeneration = this.changeGeneration(true);
+	logger.debug('<<< Exiting markClean()');
     },
     changeGeneration: function(forceSplit) {
+	logger.debug(`>>> Entering changeGeneration(forceSplit=${forceSplit})`);
       if (forceSplit)
         this.history.lastOp = this.history.lastSelOp = this.history.lastOrigin = null;
+	logger.debug(`<<< Exiting changeGeneration(forceSplit=${forceSplit})`);
       return this.history.generation;
     },
     isClean: function (gen) {
+	logger.debug(`>>> Entering isClean(gen=${gen})`);
+	logger.debug(`<<< Exiting isClean(gen=${gen})`);
       return this.history.generation == (gen || this.cleanGeneration);
     },
 
     getHistory: function() {
+	logger.debug('>>> Entering getHistory()');
       return {done: copyHistoryArray(this.history.done),
               undone: copyHistoryArray(this.history.undone)};
+			logger.debug('<<< Exiting getHistory()');
     },
     setHistory: function(histData) {
+	logger.debug(`>>> Entering setHistory(histData=${histData})`);
       var hist = this.history = new History(this.history.maxGeneration);
       hist.done = copyHistoryArray(histData.done.slice(0), null, true);
       hist.undone = copyHistoryArray(histData.undone.slice(0), null, true);
+	logger.debug(`<<< Exiting setHistory(histData=${histData})`);
     },
 
     addLineClass: docMethodOp(function(handle, where, cls) {
@@ -7534,21 +8062,29 @@
       return markText(this, clipPos(this, from), clipPos(this, to), options, "range");
     },
     setBookmark: function(pos, options) {
+	logger.debug(`>>> Entering setBookmark(pos=${pos},options=${options})`);
       var realOpts = {replacedWith: options && (options.nodeType == null ? options.widget : options),
                       insertLeft: options && options.insertLeft,
                       clearWhenEmpty: false, shared: options && options.shared,
                       handleMouseEvents: options && options.handleMouseEvents};
       pos = clipPos(this, pos);
+	logger.debug(`setBookmark(pos=${pos},options=${options}): realOpts → ${realOpts}`);
+	logger.debug(`setBookmark(pos=${pos},options=${options}): pos → ${pos}`);
+	logger.debug(`<<< Exiting setBookmark(pos=${pos},options=${options})`);
       return markText(this, pos, pos, realOpts, "bookmark");
     },
     findMarksAt: function(pos) {
+	logger.debug(`>>> Entering findMarksAt(pos=${pos})`);
       pos = clipPos(this, pos);
       var markers = [], spans = getLine(this, pos.line).markedSpans;
+	logger.debug(`findMarksAt(pos=${pos}): pos → ${pos}`);
+	logger.debug(`findMarksAt(pos=${pos}): markers → ${markers}`);
       if (spans) for (var i = 0; i < spans.length; ++i) {
         var span = spans[i];
         if ((span.from == null || span.from <= pos.ch) &&
             (span.to == null || span.to >= pos.ch))
           markers.push(span.marker.parent || span.marker);
+		logger.debug(`<<< Exiting findMarksAt(pos=${pos})`);
       }
       return markers;
     },
@@ -7570,12 +8106,14 @@
       return found;
     },
     getAllMarks: function() {
+	logger.debug('>>> Entering getAllMarks()');
       var markers = [];
       this.iter(function(line) {
         var sps = line.markedSpans;
         if (sps) for (var i = 0; i < sps.length; ++i)
           if (sps[i].from != null) markers.push(sps[i].marker);
       });
+	logger.debug('<<< Exiting getAllMarks()');
       return markers;
     },
 
@@ -7587,32 +8125,40 @@
         off -= sz;
         ++lineNo;
       });
+	logger.debug(`<<< Exiting posFromIndex(off=${off})`);
       return clipPos(this, Pos(lineNo, ch));
     },
     indexFromPos: function (coords) {
+	logger.debug(`>>> Entering indexFromPos(coords=${coords})`);
       coords = clipPos(this, coords);
       var index = coords.ch;
       if (coords.line < this.first || coords.ch < 0) return 0;
       this.iter(this.first, coords.line, function (line) {
         index += line.text.length + 1;
       });
+	logger.debug(`<<< Exiting indexFromPos(coords=${coords})`);
       return index;
     },
 
     copy: function(copyHistory) {
+	logger.debug(`>>> Entering copy(copyHistory=${copyHistory})`);
       var doc = new Doc(getLines(this, this.first, this.first + this.size),
                         this.modeOption, this.first, this.lineSep);
       doc.scrollTop = this.scrollTop; doc.scrollLeft = this.scrollLeft;
+	logger.debug(`copy(copyHistory=${copyHistory}): doc → ${doc}`);
       doc.sel = this.sel;
       doc.extend = false;
       if (copyHistory) {
         doc.history.undoDepth = this.history.undoDepth;
         doc.setHistory(this.getHistory());
       }
+	logger.debug(`copy(copyHistory=${copyHistory}): doc.scrollTop → ${doc.scrollTop}`);
+	logger.debug(`<<< Exiting copy(copyHistory=${copyHistory})`);
       return doc;
     },
 
     linkedDoc: function(options) {
+	logger.debug(`>>> Entering linkedDoc(options=${options})`);
       if (!options) options = {};
       var from = this.first, to = this.first + this.size;
       if (options.from != null && options.from > from) from = options.from;
@@ -7622,9 +8168,12 @@
       (this.linked || (this.linked = [])).push({doc: copy, sharedHist: options.sharedHist});
       copy.linked = [{doc: this, isParent: true, sharedHist: options.sharedHist}];
       copySharedMarkers(copy, findSharedMarkers(this));
+	logger.debug(`linkedDoc(options=${options}): copy.linked → ${copy.linked}`);
+	logger.debug(`<<< Exiting linkedDoc(options=${options})`);
       return copy;
     },
     unlinkDoc: function(other) {
+	logger.debug(`>>> Entering unlinkDoc(other=${other})`);
       if (other instanceof CodeMirror) other = other.doc;
       if (this.linked) for (var i = 0; i < this.linked.length; ++i) {
         var link = this.linked[i];
@@ -7642,6 +8191,7 @@
         other.history.done = copyHistoryArray(this.history.done, splitIds);
         other.history.undone = copyHistoryArray(this.history.undone, splitIds);
       }
+	logger.debug(`<<< Exiting unlinkDoc(other=${other})`);
     },
     iterLinkedDocs: function(f) {linkedDocs(this, f);},
 
@@ -7649,7 +8199,9 @@
     getEditor: function() {return this.cm;},
 
     splitLines: function(str) {
+	logger.debug(`>>> Entering splitLines(str=${str})`);
       if (this.lineSep) return str.split(this.lineSep);
+	logger.debug(`<<< Exiting splitLines(str=${str})`);
       return splitLinesAuto(str);
     },
     lineSeparator: function() { return this.lineSep || "\n"; }
@@ -7678,8 +8230,10 @@
         f(rel.doc, shared);
         propagate(rel.doc, doc, shared);
       }
+	logger.debug(`<<< Exiting propagate(doc=${doc},skip=${skip},sharedHist=${sharedHist})`);
     }
     propagate(doc, null, true);
+	logger.debug(`<<< Exiting linkedDocs(doc=${doc})`);
   }
 
   // Attach a document to an editor.
@@ -7687,11 +8241,13 @@
     if (doc.cm) throw new Error("This document is already in use.");
     cm.doc = doc;
     doc.cm = cm;
+	logger.debug(`attachDoc(cm=${cm},doc=${doc}): doc.cm → ${doc.cm}`);
     estimateLineHeights(cm);
     loadMode(cm);
     if (!cm.options.lineWrapping) findMaxLine(cm);
     cm.options.mode = doc.modeOption;
     regChange(cm);
+	logger.debug(`<<< Exiting attachDoc(cm=${cm},doc=${doc})`);
   }
 
   // LINE UTILITIES
@@ -7735,6 +8291,7 @@
   function updateLineHeight(line, height) {
     var diff = height - line.height;
     if (diff) for (var n = line; n; n = n.parent) n.height += diff;
+	logger.debug(`<<< Exiting updateLineHeight(line=${line},height=${height})`);
   }
 
   // Given a line object, find its line number by walking up through
@@ -7769,6 +8326,7 @@
       if (h < lh) break;
       h -= lh;
     }
+	logger.debug(`<<< Exiting lineAtHeight(chunk=${chunk},h=${h})`);
     return n + i;
   }
 
@@ -7777,6 +8335,7 @@
   function heightAtLine(lineObj) {
     lineObj = visualLine(lineObj);
 
+	logger.debug(`heightAtLine(lineObj=${lineObj}): lineObj → ${lineObj}`);
     var h = 0, chunk = lineObj.parent;
     for (var i = 0; i < chunk.lines.length; ++i) {
       var line = chunk.lines[i];
@@ -7805,18 +8364,25 @@
   // HISTORY
 
   function History(startGen) {
+	logger.debug(`>>> Entering History(startGen=${startGen})`);
     // Arrays of change events and selections. Doing something adds an
     // event to done and clears undo. Undoing moves events from done
     // to undone, redoing moves them in the other direction.
     this.done = []; this.undone = [];
     this.undoDepth = Infinity;
+	logger.debug(`History(startGen=${startGen}): this.done → ${this.done}`);
     // Used to track when changes can be merged into a single undo
     // event
     this.lastModTime = this.lastSelTime = 0;
+	logger.debug(`History(startGen=${startGen}): this.undoDepth → ${this.undoDepth}`);
+	logger.debug(`History(startGen=${startGen}): this.lastModTime → ${this.lastModTime}`);
     this.lastOp = this.lastSelOp = null;
     this.lastOrigin = this.lastSelOrigin = null;
     // Used by the isClean() method
     this.generation = this.maxGeneration = startGen || 1;
+	logger.debug(`History(startGen=${startGen}): this.lastOp → ${this.lastOp}`);
+	logger.debug(`History(startGen=${startGen}): this.generation → ${this.generation}`);
+	logger.debug(`<<< Exiting History(startGen=${startGen})`);
   }
 
   // Create a history change event from an updateDoc-style change
@@ -7836,6 +8402,7 @@
       if (last.ranges) array.pop();
       else break;
     }
+	logger.debug(`<<< Exiting clearSelectionEvents(array=${array})`);
   }
 
   // Find the top change event in the history. Pop off selection
@@ -7895,6 +8462,7 @@
     hist.lastOrigin = hist.lastSelOrigin = change.origin;
 
     if (!last) signal(doc, "historyAdded");
+	logger.debug(`<<< Exiting addChangeToHistory(doc=${doc},change=${change},selAfter=${selAfter},opId=${opId})`);
   }
 
   function selectionEventCanBeMerged(doc, origin, prev, sel) {
@@ -7930,12 +8498,14 @@
     hist.lastSelOp = opId;
     if (options && options.clearRedo !== false)
       clearSelectionEvents(hist.undone);
+	logger.debug(`<<< Exiting addSelectionToHistory(doc=${doc},sel=${sel},opId=${opId},options=${options})`);
   }
 
   function pushSelectionToHistory(sel, dest) {
     var top = lst(dest);
     if (!(top && top.ranges && top.equals(sel)))
       dest.push(sel);
+	logger.debug(`<<< Exiting pushSelectionToHistory(sel=${sel},dest=${dest})`);
   }
 
   // Used to store marked span information in the history.
@@ -7946,6 +8516,7 @@
         (existing || (existing = change["spans_" + doc.id] = {}))[n] = line.markedSpans;
       ++n;
     });
+	logger.debug(`<<< Exiting attachLocalSpans(doc=${doc},change=${change},from=${from},to=${to})`);
   }
 
   // When un/re-doing restores text containing marked spans, those
@@ -7971,6 +8542,7 @@
   // Used both to provide a JSON-safe object in .getHistory, and, when
   // detaching a document, to split the history in two
   function copyHistoryArray(events, newGroup, instantiateSel) {
+	logger.debug(`>>> Entering copyHistoryArray(events=${events},newGroup=${newGroup},instantiateSel=${instantiateSel})`);
     for (var i = 0, copy = []; i < events.length; ++i) {
       var event = events[i];
       if (event.ranges) {
@@ -7990,6 +8562,7 @@
         }
       }
     }
+	logger.debug(`<<< Exiting copyHistoryArray(events=${events},newGroup=${newGroup},instantiateSel=${instantiateSel})`);
     return copy;
   }
 
@@ -8002,6 +8575,7 @@
       pos.line = from;
       pos.ch = 0;
     }
+	logger.debug(`<<< Exiting rebaseHistSelSingle(pos=${pos},from=${from},to=${to},diff=${diff})`);
   }
 
   // Tries to rebase an array of history events given a change in the
@@ -8037,6 +8611,7 @@
         i = 0;
       }
     }
+	logger.debug(`<<< Exiting rebaseHistArray(array=${array},from=${from},to=${to},diff=${diff})`);
   }
 
   function rebaseHist(hist, change) {
@@ -8109,6 +8684,7 @@
     var arr = emitter._handlers && emitter._handlers[type];
     if (!arr) return;
     var args = Array.prototype.slice.call(arguments, 2);
+	logger.debug(`function(emitter=${emitter}): args → ${args}`);
     for (var i = 0; i < arr.length; ++i) arr[i].apply(null, args);
   };
 
@@ -8122,9 +8698,11 @@
   // them to be executed when the last operation ends, or, if no
   // operation is active, when a timeout fires.
   function signalLater(emitter, type /*, values...*/) {
+	logger.debug(`>>> Entering signalLater(emitter=${emitter})`);
     var arr = emitter._handlers && emitter._handlers[type];
     if (!arr) return;
     var args = Array.prototype.slice.call(arguments, 2), list;
+	logger.debug(`signalLater(emitter=${emitter}): args → ${args}`);
     if (operationGroup) {
       list = operationGroup.delayedCallbacks;
     } else if (orphanDelayedCallbacks) {
@@ -8132,16 +8710,21 @@
     } else {
       list = orphanDelayedCallbacks = [];
       setTimeout(fireOrphanDelayed, 0);
+	logger.debug(`signalLater(emitter=${emitter}): list → ${list}`);
     }
+	logger.debug(`<<< Exiting signalLater(emitter=${emitter})`);
     function bnd(f) {return function(){f.apply(null, args);};};
     for (var i = 0; i < arr.length; ++i)
       list.push(bnd(arr[i]));
   }
 
   function fireOrphanDelayed() {
+	logger.debug('>>> Entering fireOrphanDelayed()');
     var delayed = orphanDelayedCallbacks;
     orphanDelayedCallbacks = null;
     for (var i = 0; i < delayed.length; ++i) delayed[i]();
+	logger.debug(`fireOrphanDelayed(): orphanDelayedCallbacks → ${orphanDelayedCallbacks}`);
+	logger.debug('<<< Exiting fireOrphanDelayed()');
   }
 
   // The DOM events that CodeMirror handles can be overridden by
@@ -8160,6 +8743,7 @@
     var set = cm.curOp.cursorActivityHandlers || (cm.curOp.cursorActivityHandlers = []);
     for (var i = 0; i < arr.length; ++i) if (indexOf(set, arr[i]) == -1)
       set.push(arr[i]);
+	logger.debug(`<<< Exiting signalCursorActivity(cm=${cm})`);
   }
 
   function hasHandler(emitter, type) {
@@ -8170,8 +8754,10 @@
   // Add on and off methods to a constructor's prototype, to make
   // registering events on such objects more convenient.
   function eventMixin(ctor) {
+	logger.debug(`>>> Entering eventMixin(ctor=${ctor})`);
     ctor.prototype.on = function(type, f) {on(this, type, f);};
     ctor.prototype.off = function(type, f) {off(this, type, f);};
+	logger.debug(`<<< Exiting eventMixin(ctor=${ctor})`);
   }
 
   // MISC UTILITIES
@@ -8223,6 +8809,7 @@
       pos = nextTab + 1;
       if (col >= goal) return pos;
     }
+	logger.debug(`<<< Exiting findColumn(string=${string},goal=${goal},tabSize=${tabSize})`);
   }
 
   var spaceStrs = [""];
@@ -8262,6 +8849,7 @@
       inst = new nothing();
     }
     if (props) copyObj(props, inst);
+	logger.debug(`<<< Exiting createObj(base=${base},props=${props})`);
     return inst;
   };
 
@@ -8274,7 +8862,10 @@
   }
 
   function bind(f) {
+	logger.debug(`>>> Entering bind(f=${f})`);
     var args = Array.prototype.slice.call(arguments, 1);
+	logger.debug(`bind(f=${f}): args → ${args}`);
+	logger.debug(`<<< Exiting bind(f=${f})`);
     return function(){return f.apply(null, args);};
   }
 
@@ -8352,9 +8943,11 @@
   };
 
   function activeElt() {
+	logger.debug('>>> Entering activeElt()');
     var activeElement = document.activeElement;
     while (activeElement && activeElement.root && activeElement.root.activeElement)
       activeElement = activeElement.root.activeElement;
+	logger.debug('<<< Exiting activeElt()');
     return activeElement;
   }
   // Older versions of IE throws unspecified error when touching
@@ -8391,23 +8984,30 @@
   // garbage collected.
 
   function forEachCodeMirror(f) {
+	logger.debug(`>>> Entering forEachCodeMirror(f=${f})`);
     if (!document.body.getElementsByClassName) return;
     var byClass = document.body.getElementsByClassName("CodeMirror");
+	logger.debug(`forEachCodeMirror(f=${f}): byClass → ${byClass}`);
     for (var i = 0; i < byClass.length; i++) {
       var cm = byClass[i].CodeMirror;
       if (cm) f(cm);
+	logger.debug(`<<< Exiting forEachCodeMirror(f=${f})`);
     }
   }
 
   var globalsRegistered = false;
   function ensureGlobalHandlers() {
+	logger.debug('>>> Entering ensureGlobalHandlers()');
     if (globalsRegistered) return;
     registerGlobalHandlers();
     globalsRegistered = true;
+	logger.debug('<<< Exiting ensureGlobalHandlers()');
   }
   function registerGlobalHandlers() {
+	logger.debug('>>> Entering registerGlobalHandlers()');
     // When the window resizes, we need to refresh active editors.
     var resizeTimer;
+	logger.debug(`registerGlobalHandlers(): resizeTimer → ${resizeTimer}`);
     on(window, "resize", function() {
       if (resizeTimer == null) resizeTimer = setTimeout(function() {
         resizeTimer = null;
@@ -8417,7 +9017,9 @@
     // When the window loses focus, we want to show the editor as blurred
     on(window, "blur", function() {
       forEachCodeMirror(onBlur);
+	logger.debug(`<<< Exiting on(window=${window})`);
     });
+	logger.debug('<<< Exiting registerGlobalHandlers()');
   }
 
   // FEATURE DETECTION
@@ -8428,6 +9030,7 @@
     // couldn't get it to work yet.
     if (ie && ie_version < 9) return false;
     var div = elt('div');
+	logger.debug(`function(): div → ${div}`);
     return "draggable" in div || "dragDrop" in div;
   }();
 
@@ -8463,8 +9066,11 @@
     while (pos <= l) {
       var nl = string.indexOf("\n", pos);
       if (nl == -1) nl = string.length;
+	logger.debug(`function(): nl → ${nl}`);
       var line = string.slice(pos, string.charAt(nl - 1) == "\r" ? nl - 1 : nl);
+	logger.debug(`function(): line → ${line}`);
       var rt = line.indexOf("\r");
+	logger.debug(`function(): rt → ${rt}`);
       if (rt != -1) {
         result.push(line.slice(0, rt));
         pos += rt + 1;
@@ -8488,6 +9094,7 @@
 
   var hasCopyEvent = (function() {
     var e = elt("div");
+	logger.debug(`function(e=${e}): e → ${e}`);
     if ("oncopy" in e) return true;
     e.setAttribute("oncopy", "return;");
     return typeof e.oncopy == "function";

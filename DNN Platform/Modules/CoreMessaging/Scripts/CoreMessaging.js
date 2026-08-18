@@ -1,13 +1,22 @@
+const logger = console;
 ﻿function CoreMessaging($, ko, settings, composeMessageOptions) {
+	logger.debug(`>>> Entering CoreMessaging(ko=${ko},settings=${settings},composeMessageOptions=${composeMessageOptions})`);
     var profilePicHandler = settings.profilePicHandler;
     var serviceFramework = composeMessageOptions.servicesFramework;
     var baseServicepath = serviceFramework.getServiceRoot('CoreMessaging') + 'MessagingService/';
+	logger.debug(`CoreMessaging(ko=${ko},settings=${settings},composeMessageOptions=${composeMessageOptions}): baseServicepath → ${baseServicepath}`);
     var inboxpath = baseServicepath + "Inbox";
+	logger.debug(`CoreMessaging(ko=${ko},settings=${settings},composeMessageOptions=${composeMessageOptions}): inboxpath → ${inboxpath}`);
     var sentboxpath = baseServicepath + "Sentbox";
+	logger.debug(`CoreMessaging(ko=${ko},settings=${settings},composeMessageOptions=${composeMessageOptions}): sentboxpath → ${sentboxpath}`);
     var archivedboxpath = baseServicepath + "Archived";
+	logger.debug(`CoreMessaging(ko=${ko},settings=${settings},composeMessageOptions=${composeMessageOptions}): archivedboxpath → ${archivedboxpath}`);
     var notificationspath = baseServicepath + "Notifications";
+	logger.debug(`CoreMessaging(ko=${ko},settings=${settings},composeMessageOptions=${composeMessageOptions}): notificationspath → ${notificationspath}`);
     var countnotificationspath = baseServicepath + "CountNotifications";
+	logger.debug(`CoreMessaging(ko=${ko},settings=${settings},composeMessageOptions=${composeMessageOptions}): countnotificationspath → ${countnotificationspath}`);
     var gettotalspath = baseServicepath + "GetTotals";
+	logger.debug(`CoreMessaging(ko=${ko},settings=${settings},composeMessageOptions=${composeMessageOptions}): gettotalspath → ${gettotalspath}`);
     var pageSize = 10;
     var repliesPageSize = 2;
     var notificationsPageSize = 10;
@@ -19,30 +28,42 @@
                 .addClass('dnnFormMessage ' + cssclass)
                 .text(message);
 
+		logger.debug(`>>> Entering displayMessage(placeholderSelector=${placeholderSelector},message=${message},cssclass=${cssclass})`);
         $(containerElement + " " + placeholderSelector).prepend(messageNode);
 
         messageNode.fadeOut(3000, 'easeInExpo', function () {
+			logger.debug('>>> Entering fadeOut()');
+			logger.debug('<<< Exiting fadeOut()');
             messageNode.remove();
         });
+		logger.debug(`<<< Exiting displayMessage(placeholderSelector=${placeholderSelector},message=${message},cssclass=${cssclass})`);
     };
 
     function setDocumentTitle(title) {
+		logger.debug(`>>> Entering setDocumentTitle(title=${title})`);
         document.title = title + ' - ' + settings.currentUserText + ' - ' + settings.portalText;
+		logger.debug(`<<< Exiting setDocumentTitle(title=${title})`);
     }
 
     function getQuerystring(key, default_) {
+		logger.debug(`>>> Entering getQuerystring(key=${key},default_=${default_})`);
         if (default_ == null) default_ = "";
         key = key.replace(/\[/g, "\\\[").replace(/]/g, "\\\]");
         var regex = new RegExp("[\\?&]" + key + "=([^&#]*)");
+		logger.warn(`getQuerystring(key=${key},default_=${default_}): key → ${key}`);
+		logger.debug(`getQuerystring(key=${key},default_=${default_}): regex → ${regex}`);
         var qs = regex.exec(window.location.href);
         if (qs == null)
             return default_;
         else
+			logger.debug(`<<< Exiting getQuerystring(key=${key},default_=${default_})`);
             return qs[1];
     }
 
     (function (window) {
+		logger.debug('>>> Entering function()');
         // Check Location
+		logger.debug('<<< Exiting function()');
         if (document.location.protocol === 'file:') {
             alert('The HTML5 History API (and thus History.js) do not work on files, please upload it to a server.');
         }
@@ -55,11 +76,14 @@
             var state = History.getState(); // Note: We are using History.getState() instead of event.state
 
             if (state.data != null) {
+				logger.debug('>>> Entering bind()');
                 var data = state.data;
 
+				logger.debug(`bind(): data → ${data}`);
                 var action = data.action;
                 var view = data.view;
                 var context = ko.contextFor(document.getElementById($(containerElement).attr("id")));
+				logger.debug(`bind(): context → ${context}`);
 
                 if (view == "notifications") {
                     context.$root.loadNotificationsTabHandler();
@@ -94,6 +118,7 @@
                     }
                 }
             }
+		logger.debug(`<<< Exiting function(notification=${notification},action=${action})`);
         });
     })(window);
 
@@ -121,18 +146,38 @@
         self.CreatedOnDate = data.DisplayDate;
 
         self.Read = ko.computed(function () {
+			logger.debug('>>> Entering computed()');
+			logger.debug(`>>> Entering computed(selectedElement=${selectedElement})`);
             return self.NewThreadCount() === 0;
         });
 
         self.HasAttachments = ko.computed(function () {
+		logger.debug(`<<< Exiting messageConversationView(data=${data})`);
             return self.AttachmentCount() > 0;
         });
     }
 
     function messageThreadView(data) {
         var self = this;
+		logger.debug(`computed(): self.To → ${self.To}`);
+		logger.debug(`computed(): self.AttachmentCount → ${self.AttachmentCount}`);
+		logger.debug(`computed(): self.SenderUserID → ${self.SenderUserID}`);
+		logger.debug(`computed(): self.Confirm → ${self.Confirm}`);
+		logger.debug(`computed(): self.SenderAvatar → ${self.SenderAvatar}`);
+		logger.debug(`computed(): self.SenderProfileUrl → ${self.SenderProfileUrl}`);
+		logger.debug(`computed(): self.From → ${self.From}`);
+		logger.debug(`computed(): self.Subject → ${self.Subject}`);
+		logger.debug(`computed(): self.ConversationId → ${self.ConversationId}`);
+		logger.debug(`computed(): self.Attachments → ${self.Attachments}`);
+		logger.debug(`computed(): self.CreatedOnDate → ${self.CreatedOnDate}`);
+		logger.debug(`computed(): self.DisplayDate → ${self.DisplayDate}`);
+		logger.debug(`computed(): self.RowNumber → ${self.RowNumber}`);
+		logger.debug(`computed(): self.MessageIDName → ${self.MessageIDName}`);
+		logger.debug(`computed(): self.APICall → ${self.APICall}`);
+		logger.debug(`computed(): self.Name → ${self.Name}`);
 
         self.MessageID = data.Conversation.MessageID;
+		logger.debug(`computed(): self.MessageID → ${self.MessageID}`);
         self.To = data.Conversation.To;
         self.From = data.Conversation.From;
         self.Subject = data.Conversation.Subject;
@@ -151,6 +196,7 @@
         self.CreatedOnDate = data.Conversation.DisplayDate;
 
         self.Read = ko.computed(function () {
+		logger.debug(`<<< Exiting messageThreadView(data=${data})`);
             return self.NewThreadCount() === 0;
         });
     }
@@ -163,6 +209,7 @@
         self.Description = data.Description;
         self.Confirm = data.Confirm;
         self.APICall = data.APICall;
+		logger.debug(`<<< Exiting notificationActionViewModel(data=${data},notificationId=${notificationId})`);
     }
 
     function notificationViewModel(data) {
@@ -177,10 +224,13 @@
         self.DisplayDate = data.DisplayDate;
         self.SenderDisplayName = data.SenderDisplayName;
         self.Actions = $.map(data.Actions, function (action) { return new notificationActionViewModel(action, data.NotificationId); });
+		logger.debug(`<<< Exiting notificationViewModel(data=${data})`);
     }
 
     function coreMessagingViewModel() {
+		logger.debug('>>> Entering coreMessagingViewModel()');
         var self = this;
+		logger.debug(`coreMessagingViewModel(): self → ${self}`);
 
 	    self.disablePrivateMessage = ko.observable(settings.disablePrivateMessage);
         self.messages = ko.observableArray([]);
@@ -222,6 +272,7 @@
         self.isReplySelected = ko.observable(false);
         self.highlightThreads = false;
         self.conversationRead = ko.observable();
+		logger.debug(`coreMessagingViewModel(): self.highlightThreads → ${self.highlightThreads}`);
 
         self.selectMenuOn = ko.observable(false);
         self.actionsMenuOn = ko.observable(false);
@@ -247,6 +298,7 @@
         };
 
         $('body').on('click.coremessaging', function (event) {
+			logger.debug('>>> Entering on()');
             if (!$(event.target).closest('#SelectMenu').length) {
                 self.selectMenuOn(false);
             };
@@ -333,6 +385,7 @@
                     messagethreadsView != null &&
                     typeof messagethreadsView.Conversations !== "undefined") {
                     var mappedMessages = $.map(messagethreadsView.Conversations, function (item) {
+						logger.debug('>>> Entering map()');
                         return new messageThreadView(item);
                     });
 
@@ -377,6 +430,7 @@
         };
 
         self.getRepliesAndReply = function (message) {
+			logger.debug(`function(message=${message}): self.highlightThreads → ${self.highlightThreads}`);
             self.getReplies(message);
             self.setReplySelected();
         };
@@ -540,6 +594,7 @@
         self.delete = function (message) {
             var opts = {
                 callbackTrue: function() {
+					logger.debug('>>> Entering callbackTrue()');
                     $.ajax({
                         type: "POST",
                         url: baseServicepath + 'DeleteUserFromConversation',
@@ -559,6 +614,7 @@
                     }).fail(function(xhr, status) {
                         displayMessage("#dnnCoreMessaging", settings.serverErrorWithDescriptionText + status, "dnnFormWarning");
                     });
+					logger.debug('<<< Exiting callbackTrue()');
                 },
                 text: settings.text,
                 yesText: settings.yesText,
@@ -1018,6 +1074,7 @@
                 }
             });
         };
+		logger.debug('<<< Exiting coreMessagingViewModel()');
     }
 
     this.init = function (element) {
@@ -1052,4 +1109,5 @@
 
         viewModel.getTotals();
     };
+	logger.debug(`<<< Exiting CoreMessaging(ko=${ko},settings=${settings},composeMessageOptions=${composeMessageOptions})`);
 };

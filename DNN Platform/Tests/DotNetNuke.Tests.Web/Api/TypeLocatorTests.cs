@@ -17,18 +17,23 @@ namespace DotNetNuke.Tests.Web.Api
         [Test]
         public void LocateAllMatchingTypes()
         {
+			eventLogger.LogDebug(">>> Entering LocateAllMatchingTypes()");
             var assembly = new Mock<IAssembly>();
             assembly.Setup(x => x.GetTypes()).Returns(new[] { typeof(TypeLocatorTests), typeof(ServiceRoutingManagerTests) });
+			eventLogger.LogDebug("LocateAllMatchingTypes(): assembly → {Assembly}", assembly);
             var assemblyLocator = new Mock<IAssemblyLocator>();
+			eventLogger.LogDebug("LocateAllMatchingTypes(): assemblyLocator → {AssemblyLocator}", assemblyLocator);
             assemblyLocator.Setup(x => x.Assemblies).Returns(new[] { assembly.Object });
 
             var typeLocator = new TypeLocator { AssemblyLocator = assemblyLocator.Object };
 
             var types = typeLocator.GetAllMatchingTypes(x => true).ToList();
+			eventLogger.LogDebug("LocateAllMatchingTypes(): types → {Types}", types);
 
             Assert.That(types, Is.EquivalentTo(new[] { typeof(TypeLocatorTests), typeof(ServiceRoutingManagerTests) }));
             assembly.Verify(x => x.GetTypes(), Times.Once());
             assemblyLocator.Verify(x => x.Assemblies, Times.Once());
+			eventLogger.LogDebug("<<< Exiting LocateAllMatchingTypes()");
         }
     }
 }

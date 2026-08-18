@@ -3,34 +3,46 @@ import PropTypes from "prop-types";
 import Collapse from "react-collapse";
 import Button from "../Button";
 import "./style.less";
+const logger = console;
 
 export default class CollapsibleRow extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = { collapsed: props.collapsed ? props.collapsed : true };
+		logger.debug(`constructor(props=${props}): this.state → ${this.state}`);
         this.handleClick = this.handleClick.bind(this);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const {props} = this;
         if (props.closeOnBlur) {
             document.addEventListener("click", this.handleClick);
             this._isMounted = true;
+			logger.debug('<<< Exiting componentDidMount()');
         }
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         if (this.props.collapsed !== prevProps.collapsed) {
             this.setState({ collapsed: this.props.collapsed });
+			logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
         }
     }
     
     componentWillUnmount() {
+		logger.debug('>>> Entering componentWillUnmount()');
         document.removeEventListener("click", this.handleClick);
         this._isMounted = false;
+		logger.debug(`componentWillUnmount(): this._isMounted → ${this._isMounted}`);
+		logger.debug('<<< Exiting componentWillUnmount()');
     }
 
     handleClick(event) {
+		logger.debug(`>>> Entering handleClick(event=${event})`);
         const {props} = this;
         // Note: this workaround is needed in IE. The remove event listener in the componentWillUnmount is called
         // before the handleClick handler is called, but in spite of that, the handleClick is executed. To avoid
@@ -39,25 +51,33 @@ export default class CollapsibleRow extends Component {
 
         if (!this.node.contains(event.target)) {
             this.collapse();
+			logger.debug(`<<< Exiting handleClick(event=${event})`);
         }
     }
     uncollapse() {
+		logger.debug('>>> Entering uncollapse()');
         this.setState({
             collapsed: false
         });
+		logger.debug('<<< Exiting uncollapse()');
     }
     collapse() {
+		logger.debug('>>> Entering collapse()');
         this.setState({
             collapsed: true
         });
+		logger.debug('<<< Exiting collapse()');
     }
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         this.collapse();
         if (this.props.onChange) {
             this.props.onChange(true);
+			logger.debug('<<< Exiting onCancel()');
         }
     }
     toggle() {
+		logger.debug('>>> Entering toggle()');
         if (this.props.onChange) {
             this.props.onChange(this.state.collapsed);
         }
@@ -65,10 +85,13 @@ export default class CollapsibleRow extends Component {
             this.uncollapse();
         } else {
             this.collapse();
+			logger.debug('<<< Exiting toggle()');
         }
     }
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <div className={"dnn-collapsible-component" + (props.className ? (" " + props.className) : "") }>
                 <div className="collapsible-header" onClick={this.toggle.bind(this) }>{props.label}

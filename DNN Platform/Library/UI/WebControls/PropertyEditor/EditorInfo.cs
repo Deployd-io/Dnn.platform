@@ -17,10 +17,14 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>The EditorInfo class provides a helper class for the Property Editor.</summary>
     public partial class EditorInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(EditorInfo));
         /// <summary>Initializes a new instance of the <see cref="EditorInfo"/> class.</summary>
         public EditorInfo()
         {
+			Logger.LogDebug(">>> Entering EditorInfo()");
             this.Visible = true;
+			Logger.LogDebug("EditorInfo(): this.Visible → {Arg0}", this.Visible);
+			Logger.LogDebug("<<< Exiting EditorInfo()");
         }
 
         public object[] Attributes { get; set; }
@@ -66,16 +70,21 @@ namespace DotNetNuke.UI.WebControls
         /// <returns>The non-localized name of the editor.</returns>
         public static string GetEditor(ListController listController, int editorType)
         {
+			Logger.LogDebug(">>> Entering GetEditor(listController={ListController},editorType={EditorType})", listController, editorType);
             string editor = "UseSystemType";
             if (editorType != Null.NullInteger)
+			Logger.LogDebug("GetEditor(listController={ListController},editorType={EditorType}): editor → {Editor}", listController, editorType, editor);
             {
                 ListEntryInfo definitionEntry = listController.GetListEntryInfo("DataType", editorType);
+				Logger.LogDebug("GetEditor(listController={ListController},editorType={EditorType}): definitionEntry → {DefinitionEntry}", listController, editorType, definitionEntry);
                 if (definitionEntry != null)
                 {
                     editor = definitionEntry.TextNonLocalized;
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetEditor(editorType={EditorType})", editorType);
+			Logger.LogDebug("<<< Exiting GetEditor(listController={ListController},editorType={EditorType})", listController, editorType);
             return editor;
         }
 

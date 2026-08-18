@@ -1,12 +1,19 @@
+const logger = console;
 'use strict';
 define(['knockout', 'main/util', 'main/config'], function (ko, util, config) {
+	logger.debug('>>> Entering define()');
 	return {		
 		init: function(viewModel, pageSize, load, resx, pagerItemFormatDesc, nopagerItemFormatDesc){
+			logger.debug(`>>> Entering init(viewModel=${viewModel},pageSize=${pageSize},load=${load},resx=${resx},pagerItemFormatDesc=${pagerItemFormatDesc},nopagerItemFormatDesc=${nopagerItemFormatDesc})`);
 			viewModel.pageSize = pageSize;
 			viewModel.pageIndex = ko.observable(0);
 		    var cf = config.init();
+			logger.debug(`init(viewModel=${viewModel},pageSize=${pageSize},load=${load},resx=${resx},pagerItemFormatDesc=${pagerItemFormatDesc},nopagerItemFormatDesc=${nopagerItemFormatDesc}): cf → ${cf}`);
 		    var utility = util.init(cf);
+			logger.debug(`init(viewModel=${viewModel},pageSize=${pageSize},load=${load},resx=${resx},pagerItemFormatDesc=${pagerItemFormatDesc},nopagerItemFormatDesc=${nopagerItemFormatDesc}): utility → ${utility}`);
 			viewModel.startIndex = ko.computed(function(){ 
+				logger.debug('>>> Entering computed()');
+			logger.debug(`init(viewModel=${viewModel},pageSize=${pageSize},load=${load},resx=${resx},pagerItemFormatDesc=${pagerItemFormatDesc},nopagerItemFormatDesc=${nopagerItemFormatDesc}): viewModel.pageSize → ${viewModel.pageSize}`);
 				return viewModel.pageIndex() * viewModel.pageSize + 1; 
 			});
 			
@@ -25,6 +32,7 @@ define(['knockout', 'main/util', 'main/config'], function (ko, util, config) {
 			});
 			
 			viewModel.pagerVisible = ko.computed(function(){
+			logger.debug(`define(): viewModel.pageSize → ${viewModel.pageSize}`);
 				return viewModel.totalPages() > 1;
 			});			
 			
@@ -52,6 +60,7 @@ define(['knockout', 'main/util', 'main/config'], function (ko, util, config) {
 			});
 			
 			viewModel.prev = function(){	
+				logger.debug('>>> Entering function()');
 				if(viewModel.pageIndex() <= 0) return;
 				viewModel.pageIndex(viewModel.pageIndex() - 1);
 				if(typeof load === 'function') load.apply(viewModel);
@@ -60,8 +69,10 @@ define(['knockout', 'main/util', 'main/config'], function (ko, util, config) {
 			viewModel.next = function(){
 				if(viewModel.pageIndex() >= viewModel.totalPages() -1) return;
 				viewModel.pageIndex(viewModel.pageIndex() + 1);
+				logger.debug(`<<< Exiting init(viewModel=${viewModel},pageSize=${pageSize},load=${load},resx=${resx},pagerItemFormatDesc=${pagerItemFormatDesc},nopagerItemFormatDesc=${nopagerItemFormatDesc})`);
 				if(typeof load === 'function') load.apply(viewModel);
 			};	
 		}
 	};	
+	logger.debug('<<< Exiting define()');
 });

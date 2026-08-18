@@ -12,6 +12,8 @@ namespace Dnn.PersonaBar.Vocabularies.Exceptions
         public VocabularyNameAlreadyExistsException()
             : base(Constants.VocabularyExistsError)
         {
+		eventLogger.LogDebug(">>> Entering VocabularyNameAlreadyExistsException()");
+		eventLogger.LogDebug("<<< Exiting VocabularyNameAlreadyExistsException()");
         }
     }
 }

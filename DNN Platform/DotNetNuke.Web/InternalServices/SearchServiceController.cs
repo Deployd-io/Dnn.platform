@@ -36,6 +36,7 @@ namespace DotNetNuke.Web.InternalServices
     [DnnAuthorize(StaticRoles = "Administrators")]
     public class SearchServiceController : DnnApiController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SearchServiceController));
         private const string ModuleInfosCacheKey = "ModuleInfos{0}";
         private const CacheItemPriority ModuleInfosCachePriority = CacheItemPriority.AboveNormal;
         private const int ModuleInfosCacheTimeOut = 20;
@@ -55,8 +56,10 @@ namespace DotNetNuke.Web.InternalServices
         public SearchServiceController(ISearchController searchController)
             : this(searchController, null, null)
         {
+		Logger.LogDebug(">>> Entering SearchServiceController(searchController={SearchController})", searchController);
         }
 
+		Logger.LogDebug("<<< Exiting SearchServiceController(searchController={SearchController})", searchController);
         /// <summary>Initializes a new instance of the <see cref="SearchServiceController"/> class.</summary>
         /// <param name="searchController">The search controller.</param>
         /// <param name="hostSettings">The host settings.</param>
@@ -64,6 +67,11 @@ namespace DotNetNuke.Web.InternalServices
         public SearchServiceController(ISearchController searchController, IHostSettings hostSettings, IHostSettingsService hostSettingsService)
             : this(searchController, hostSettings, hostSettingsService, ModuleDefinitionController.GetModuleDefinitionByFriendlyName("Text/HTML")?.ModuleDefID ?? -1)
         {
+		Logger.LogDebug(">>> Entering SearchServiceController(searchController={SearchController},hostSettings={HostSettings},hostSettingsService={HostSettingsService})", searchController, hostSettings, hostSettingsService);
+		Logger.LogDebug("<<< Exiting SearchServiceController(searchController={SearchController},hostSettings={HostSettings},hostSettingsService={HostSettingsService})", searchController, hostSettings, hostSettingsService);
+		Logger.LogDebug("SearchServiceController(searchController={SearchController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},htmlModuleDefinitionId={HtmlModuleDefinitionId}): hostSettings → {HostSettings1}", searchController, hostSettings, hostSettingsService, htmlModuleDefinitionId, hostSettings);
+		Logger.LogDebug("SearchServiceController(searchController={SearchController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},htmlModuleDefinitionId={HtmlModuleDefinitionId}): hostSettingsService → {HostSettingsService1}", searchController, hostSettings, hostSettingsService, htmlModuleDefinitionId, hostSettingsService);
+		Logger.LogDebug("SearchServiceController(searchController={SearchController},hostSettings={HostSettings},hostSettingsService={HostSettingsService},htmlModuleDefinitionId={HtmlModuleDefinitionId}): htmlModuleDefinitionId → {HtmlModuleDefinitionId1}", searchController, hostSettings, hostSettingsService, htmlModuleDefinitionId, htmlModuleDefinitionId);
         }
 
         /// <summary>Initializes a new instance of the <see cref="SearchServiceController"/> class.</summary>
@@ -90,21 +98,34 @@ namespace DotNetNuke.Web.InternalServices
         [AllowAnonymous]
         public HttpResponseMessage Preview(string keywords, string culture, int forceWild = 1, int portal = -1)
         {
+			Logger.LogDebug(">>> Entering Preview(keywords={Keywords},culture={Culture},forceWild={ForceWild},portal={Portal})", keywords, culture, forceWild, portal);
             keywords = (keywords ?? string.Empty).Trim();
             var tags = SearchQueryStringParser.Instance.GetTags(keywords, out var cleanedKeywords);
+			Logger.LogDebug("Preview(keywords={Keywords},culture={Culture},forceWild={ForceWild},portal={Portal}): tags → {Tags}", keywords, culture, forceWild, portal, tags);
             var beginModifiedTimeUtc = SearchQueryStringParser.Instance.GetLastModifiedDate(cleanedKeywords, out cleanedKeywords);
+			Logger.LogDebug("Preview(keywords={Keywords},culture={Culture},forceWild={ForceWild},portal={Portal}): beginModifiedTimeUtc → {BeginModifiedTimeUtc}", keywords, culture, forceWild, portal, beginModifiedTimeUtc);
             var searchTypes = SearchQueryStringParser.Instance.GetSearchTypeList(keywords, out cleanedKeywords);
+			Logger.LogDebug("Preview(keywords={Keywords},culture={Culture},forceWild={ForceWild},portal={Portal}): searchTypes → {SearchTypes}", keywords, culture, forceWild, portal, searchTypes);
+			Logger.LogDebug("Preview(keywords={Keywords},culture={Culture},forceWild={ForceWild},portal={Portal}): keywords → {Keywords1}", keywords, culture, forceWild, portal, keywords);
 
             var contentSources = this.GetSearchContentSources(searchTypes);
+			Logger.LogDebug("Preview(keywords={Keywords},culture={Culture},forceWild={ForceWild},portal={Portal}): contentSources → {ContentSources}", keywords, culture, forceWild, portal, contentSources);
             var settings = this.GetSearchModuleSettings();
+			Logger.LogDebug("Preview(keywords={Keywords},culture={Culture},forceWild={ForceWild},portal={Portal}): settings → {Settings}", keywords, culture, forceWild, portal, settings);
             var searchTypeIds = GetSearchTypeIds(settings, contentSources);
+			Logger.LogDebug("Preview(keywords={Keywords},culture={Culture},forceWild={ForceWild},portal={Portal}): searchTypeIds → {SearchTypeIds}", keywords, culture, forceWild, portal, searchTypeIds);
             var moduleDefIds = GetSearchModuleDefIds(settings, contentSources);
+			Logger.LogDebug("Preview(keywords={Keywords},culture={Culture},forceWild={ForceWild},portal={Portal}): moduleDefIds → {ModuleDefIds}", keywords, culture, forceWild, portal, moduleDefIds);
             var portalIds = this.GetSearchPortalIds(settings, portal);
+			Logger.LogDebug("Preview(keywords={Keywords},culture={Culture},forceWild={ForceWild},portal={Portal}): portalIds → {PortalIds}", keywords, culture, forceWild, portal, portalIds);
 
             var userSearchTypeId = SearchHelper.Instance.GetSearchTypeByName("user").SearchTypeId;
+			Logger.LogDebug("Preview(keywords={Keywords},culture={Culture},forceWild={ForceWild},portal={Portal}): userSearchTypeId → {UserSearchTypeId}", keywords, culture, forceWild, portal, userSearchTypeId);
             var userSearchSource = contentSources.FirstOrDefault(s => s.SearchTypeId == userSearchTypeId);
+			Logger.LogDebug("Preview(keywords={Keywords},culture={Culture},forceWild={ForceWild},portal={Portal}): userSearchSource → {UserSearchSource}", keywords, culture, forceWild, portal, userSearchSource);
 
             var results = new List<GroupedBasicView>();
+			Logger.LogDebug("Preview(keywords={Keywords},culture={Culture},forceWild={ForceWild},portal={Portal}): results → {Results}", keywords, culture, forceWild, portal, results);
             if (portalIds.Count != 0 && searchTypeIds.Count != 0 &&
                 (!string.IsNullOrEmpty(cleanedKeywords) || tags.Count > 0))
             {
@@ -130,10 +151,12 @@ namespace DotNetNuke.Web.InternalServices
                 }
                 catch (Exception ex)
                 {
+					Logger.LogError("Exception in Preview(keywords={Keywords},culture={Culture},forceWild={ForceWild},portal={Portal}): {Arg4}", keywords, culture, forceWild, portal, ex.getMessage());
                     DotNetNuke.Services.Exceptions.Exceptions.LogException(ex);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting Preview(keywords={Keywords},culture={Culture},forceWild={ForceWild},portal={Portal})", keywords, culture, forceWild, portal);
             return this.Request.CreateResponse(HttpStatusCode.OK, results);
         }
 
@@ -148,22 +171,35 @@ namespace DotNetNuke.Web.InternalServices
         [AllowAnonymous]
         public HttpResponseMessage Search(string search, string culture, int pageIndex, int pageSize, int sortOption)
         {
+			Logger.LogDebug(">>> Entering Search(search={Search},culture={Culture},pageIndex={PageIndex},pageSize={PageSize},sortOption={SortOption})", search, culture, pageIndex, pageSize, sortOption);
             search = (search ?? string.Empty).Trim();
             var tags = SearchQueryStringParser.Instance.GetTags(search, out var cleanedKeywords);
+			Logger.LogDebug("Search(search={Search},culture={Culture},pageIndex={PageIndex},pageSize={PageSize},sortOption={SortOption}): tags → {Tags}", search, culture, pageIndex, pageSize, sortOption, tags);
             var beginModifiedTimeUtc = SearchQueryStringParser.Instance.GetLastModifiedDate(cleanedKeywords, out cleanedKeywords);
+			Logger.LogDebug("Search(search={Search},culture={Culture},pageIndex={PageIndex},pageSize={PageSize},sortOption={SortOption}): beginModifiedTimeUtc → {BeginModifiedTimeUtc}", search, culture, pageIndex, pageSize, sortOption, beginModifiedTimeUtc);
             var searchTypes = SearchQueryStringParser.Instance.GetSearchTypeList(cleanedKeywords, out cleanedKeywords);
+			Logger.LogDebug("Search(search={Search},culture={Culture},pageIndex={PageIndex},pageSize={PageSize},sortOption={SortOption}): searchTypes → {SearchTypes}", search, culture, pageIndex, pageSize, sortOption, searchTypes);
+			Logger.LogDebug("Search(search={Search},culture={Culture},pageIndex={PageIndex},pageSize={PageSize},sortOption={SortOption}): search → {Search1}", search, culture, pageIndex, pageSize, sortOption, search);
 
             var contentSources = this.GetSearchContentSources(searchTypes);
+			Logger.LogDebug("Search(search={Search},culture={Culture},pageIndex={PageIndex},pageSize={PageSize},sortOption={SortOption}): contentSources → {ContentSources}", search, culture, pageIndex, pageSize, sortOption, contentSources);
             var settings = this.GetSearchModuleSettings();
+			Logger.LogDebug("Search(search={Search},culture={Culture},pageIndex={PageIndex},pageSize={PageSize},sortOption={SortOption}): settings → {Settings}", search, culture, pageIndex, pageSize, sortOption, settings);
             var searchTypeIds = GetSearchTypeIds(settings, contentSources);
+			Logger.LogDebug("Search(search={Search},culture={Culture},pageIndex={PageIndex},pageSize={PageSize},sortOption={SortOption}): searchTypeIds → {SearchTypeIds}", search, culture, pageIndex, pageSize, sortOption, searchTypeIds);
             var moduleDefIds = GetSearchModuleDefIds(settings, contentSources);
+			Logger.LogDebug("Search(search={Search},culture={Culture},pageIndex={PageIndex},pageSize={PageSize},sortOption={SortOption}): moduleDefIds → {ModuleDefIds}", search, culture, pageIndex, pageSize, sortOption, moduleDefIds);
             var portalIds = this.GetSearchPortalIds(settings, -1);
+			Logger.LogDebug("Search(search={Search},culture={Culture},pageIndex={PageIndex},pageSize={PageSize},sortOption={SortOption}): portalIds → {PortalIds}", search, culture, pageIndex, pageSize, sortOption, portalIds);
             var userSearchTypeId = SearchHelper.Instance.GetSearchTypeByName("user").SearchTypeId;
+			Logger.LogDebug("Search(search={Search},culture={Culture},pageIndex={PageIndex},pageSize={PageSize},sortOption={SortOption}): userSearchTypeId → {UserSearchTypeId}", search, culture, pageIndex, pageSize, sortOption, userSearchTypeId);
             var maximumPageSize = this.hostSettingsService.GetInteger("Search_MaxResultPerPage", 100);
+			Logger.LogDebug("Search(search={Search},culture={Culture},pageIndex={PageIndex},pageSize={PageSize},sortOption={SortOption}): maximumPageSize → {MaximumPageSize}", search, culture, pageIndex, pageSize, sortOption, maximumPageSize);
 
             var more = false;
             var totalHits = 0;
             var results = new List<GroupedDetailView>();
+			Logger.LogDebug("Search(search={Search},culture={Culture},pageIndex={PageIndex},pageSize={PageSize},sortOption={SortOption}): results → {Results}", search, culture, pageIndex, pageSize, sortOption, results);
             if (portalIds.Count != 0 && searchTypeIds.Count != 0 &&
                 (!string.IsNullOrEmpty(cleanedKeywords) || tags.Any()))
             {
@@ -196,10 +232,12 @@ namespace DotNetNuke.Web.InternalServices
                 }
                 catch (Exception ex)
                 {
+					Logger.LogError("Exception in Search(search={Search},culture={Culture},pageIndex={PageIndex},pageSize={PageSize},sortOption={SortOption}): {Arg5}", search, culture, pageIndex, pageSize, sortOption, ex.getMessage());
                     DotNetNuke.Services.Exceptions.Exceptions.LogException(ex);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting Search(search={Search},culture={Culture},pageIndex={PageIndex},pageSize={PageSize},sortOption={SortOption})", search, culture, pageIndex, pageSize, sortOption);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { results, totalHits, more });
         }
 
@@ -211,7 +249,10 @@ namespace DotNetNuke.Web.InternalServices
         [SupportedModules("SearchAdmin")]
         public HttpResponseMessage AddSynonymsGroup(SynonymsGroupDto synonymsGroup)
         {
+			Logger.LogDebug(">>> Entering AddSynonymsGroup(synonymsGroup={SynonymsGroup})", synonymsGroup);
             var synonymsGroupId = SearchHelper.Instance.AddSynonymsGroup(synonymsGroup.Tags, synonymsGroup.PortalId, synonymsGroup.Culture, out var duplicateWord);
+			Logger.LogDebug("AddSynonymsGroup(synonymsGroup={SynonymsGroup}): synonymsGroupId → {SynonymsGroupId}", synonymsGroup, synonymsGroupId);
+			Logger.LogDebug("<<< Exiting AddSynonymsGroup(synonymsGroup={SynonymsGroup})", synonymsGroup);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Id = synonymsGroupId, DuplicateWord = duplicateWord, });
         }
 
@@ -223,7 +264,10 @@ namespace DotNetNuke.Web.InternalServices
         [SupportedModules("SearchAdmin")]
         public HttpResponseMessage UpdateSynonymsGroup(SynonymsGroupDto synonymsGroup)
         {
+			Logger.LogDebug(">>> Entering UpdateSynonymsGroup(synonymsGroup={SynonymsGroup})", synonymsGroup);
             var synonymsGroupId = SearchHelper.Instance.UpdateSynonymsGroup(synonymsGroup.Id, synonymsGroup.Tags, synonymsGroup.PortalId, synonymsGroup.Culture, out var duplicateWord);
+			Logger.LogDebug("UpdateSynonymsGroup(synonymsGroup={SynonymsGroup}): synonymsGroupId → {SynonymsGroupId}", synonymsGroup, synonymsGroupId);
+			Logger.LogDebug("<<< Exiting UpdateSynonymsGroup(synonymsGroup={SynonymsGroup})", synonymsGroup);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Id = synonymsGroupId, DuplicateWord = duplicateWord, });
         }
 
@@ -235,7 +279,9 @@ namespace DotNetNuke.Web.InternalServices
         [SupportedModules("SearchAdmin")]
         public HttpResponseMessage DeleteSynonymsGroup(SynonymsGroupDto synonymsGroup)
         {
+			Logger.LogDebug(">>> Entering DeleteSynonymsGroup(synonymsGroup={SynonymsGroup})", synonymsGroup);
             SearchHelper.Instance.DeleteSynonymsGroup(synonymsGroup.Id, synonymsGroup.PortalId, synonymsGroup.Culture);
+			Logger.LogDebug("<<< Exiting DeleteSynonymsGroup(synonymsGroup={SynonymsGroup})", synonymsGroup);
             return this.Request.CreateResponse(HttpStatusCode.OK);
         }
 
@@ -247,7 +293,10 @@ namespace DotNetNuke.Web.InternalServices
         [SupportedModules("SearchAdmin")]
         public HttpResponseMessage AddStopWords(StopWordsDto stopWords)
         {
+			Logger.LogDebug(">>> Entering AddStopWords(stopWords={StopWords})", stopWords);
             var stopWordsId = SearchHelper.Instance.AddSearchStopWords(stopWords.Words, stopWords.PortalId, stopWords.Culture);
+			Logger.LogDebug("AddStopWords(stopWords={StopWords}): stopWordsId → {StopWordsId}", stopWords, stopWordsId);
+			Logger.LogDebug("<<< Exiting AddStopWords(stopWords={StopWords})", stopWords);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Id = stopWordsId, });
         }
 
@@ -259,7 +308,10 @@ namespace DotNetNuke.Web.InternalServices
         [SupportedModules("SearchAdmin")]
         public HttpResponseMessage UpdateStopWords(StopWordsDto stopWords)
         {
+			Logger.LogDebug(">>> Entering UpdateStopWords(stopWords={StopWords})", stopWords);
             var stopWordsId = SearchHelper.Instance.UpdateSearchStopWords(stopWords.Id, stopWords.Words, stopWords.PortalId, stopWords.Culture);
+			Logger.LogDebug("UpdateStopWords(stopWords={StopWords}): stopWordsId → {StopWordsId}", stopWords, stopWordsId);
+			Logger.LogDebug("<<< Exiting UpdateStopWords(stopWords={StopWords})", stopWords);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Id = stopWordsId, });
         }
 
@@ -271,7 +323,9 @@ namespace DotNetNuke.Web.InternalServices
         [SupportedModules("SearchAdmin")]
         public HttpResponseMessage DeleteStopWords(StopWordsDto stopWords)
         {
+			Logger.LogDebug(">>> Entering DeleteStopWords(stopWords={StopWords})", stopWords);
             SearchHelper.Instance.DeleteSearchStopWords(stopWords.Id, stopWords.PortalId, stopWords.Culture);
+			Logger.LogDebug("<<< Exiting DeleteStopWords(stopWords={StopWords})", stopWords);
             return this.Request.CreateResponse(HttpStatusCode.OK);
         }
 
@@ -346,6 +400,7 @@ namespace DotNetNuke.Web.InternalServices
                             @group.Title = tabTitle;
                         }
                     }
+					Logger.LogDebug("<<< Exiting GetFriendlyTitle(result={Result})", result);
                 }
                 else if (first.ModuleDefId > 0 && first.ModuleDefId == this.htmlModuleDefinitionId)
                 {
@@ -377,6 +432,8 @@ namespace DotNetNuke.Web.InternalServices
                         Tags = result.Tags.ToList(),
                         AuthorProfileUrl = result.AuthorUserId > 0 ? Globals.UserProfileURL(result.AuthorUserId) : string.Empty,
                         AuthorName = result.AuthorName,
+						Logger.LogDebug(">>> Entering GetFriendlyTitle(result={Result})", result);
+						Logger.LogDebug("<<< Exiting GetFriendlyTitle(result={Result})", result);
                     };
                     @group.Results.Add(detail);
                 }
@@ -444,12 +501,19 @@ namespace DotNetNuke.Web.InternalServices
         /// <returns>A sequence of <see cref="BasicView"/> instances.</returns>
         internal IEnumerable<BasicView> GetBasicViews(SearchQuery searchQuery, out int totalHits)
         {
+			Logger.LogDebug(">>> Entering GetBasicViews(searchQuery={SearchQuery})", searchQuery);
             var sResult = this.searchController.SiteSearch(searchQuery);
             totalHits = sResult.TotalHits;
+			Logger.LogDebug("GetBasicViews(searchQuery={SearchQuery}): totalHits → {TotalHits}", searchQuery, totalHits);
             var showFriendlyTitle = this.GetBooleanSetting("ShowFriendlyTitle", true);
+			Logger.LogDebug("GetBasicViews(searchQuery={SearchQuery}): showFriendlyTitle → {ShowFriendlyTitle}", searchQuery, showFriendlyTitle);
             var showDescription = this.GetBooleanSetting("ShowDescription", true);
+			Logger.LogDebug("GetBasicViews(searchQuery={SearchQuery}): showDescription → {ShowDescription}", searchQuery, showDescription);
             var showSnippet = this.GetBooleanSetting("ShowSnippet", true);
+			Logger.LogDebug("GetBasicViews(searchQuery={SearchQuery}): showSnippet → {ShowSnippet}", searchQuery, showSnippet);
             var maxDescriptionLength = this.GetIntegerSetting("MaxDescriptionLength", 100);
+			Logger.LogDebug("GetBasicViews(searchQuery={SearchQuery}): maxDescriptionLength → {MaxDescriptionLength}", searchQuery, maxDescriptionLength);
+			Logger.LogDebug("GetBasicViews(searchQuery={SearchQuery}): sResult → {SResult}", searchQuery, sResult);
 
             return sResult.Results.Select(result =>
             {
@@ -468,11 +532,15 @@ namespace DotNetNuke.Web.InternalServices
                     Description = showDescription ? description : string.Empty,
                 };
             });
+			Logger.LogDebug("<<< Exiting GetBasicViews(searchQuery={SearchQuery})", searchQuery);
         }
 
         private static ArrayList GetModulesByDefinition(IHostSettings hostSettings, int portalId, string friendlyName)
         {
+			Logger.LogDebug(">>> Entering GetModulesByDefinition(hostSettings={HostSettings},portalId={PortalId},friendlyName={FriendlyName})", hostSettings, portalId, friendlyName);
             var cacheKey = string.Format(CultureInfo.InvariantCulture, ModuleInfosCacheKey, portalId);
+			Logger.LogDebug("GetModulesByDefinition(hostSettings={HostSettings},portalId={PortalId},friendlyName={FriendlyName}): cacheKey → {CacheKey}", hostSettings, portalId, friendlyName, cacheKey);
+			Logger.LogDebug("<<< Exiting GetModulesByDefinition(hostSettings={HostSettings},portalId={PortalId},friendlyName={FriendlyName})", hostSettings, portalId, friendlyName);
             return CBO.GetCachedObject<ArrayList>(
                 hostSettings,
                 new CacheItemArgs(cacheKey, ModuleInfosCacheTimeOut, ModuleInfosCachePriority),
@@ -554,8 +622,10 @@ namespace DotNetNuke.Web.InternalServices
 
         private static string GetFriendlyTitle(SearchResult result)
         {
+			Logger.LogDebug(">>> Entering GetFriendlyTitle(result={Result})", result);
             if (result.Keywords.TryGetValue("title", out var title) && !string.IsNullOrEmpty(title))
             {
+			Logger.LogDebug("<<< Exiting GetFriendlyTitle(result={Result})", result);
                 return title;
             }
 
@@ -575,12 +645,16 @@ namespace DotNetNuke.Web.InternalServices
 
         private static object GetTabTitleCallBack(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogDebug(">>> Entering GetTabTitleCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             var moduleId = (int)cacheItemArgs.ParamList[0];
             var moduleInfo = ModuleController.Instance.GetModule(moduleId, Null.NullInteger, true);
+			Logger.LogDebug("GetTabTitleCallBack(cacheItemArgs={CacheItemArgs}): moduleInfo → {ModuleInfo}", cacheItemArgs, moduleInfo);
+			Logger.LogDebug("GetTabTitleCallBack(cacheItemArgs={CacheItemArgs}): moduleId → {ModuleId}", cacheItemArgs, moduleId);
             if (moduleInfo != null)
             {
                 var tab = moduleInfo.ParentTab;
 
+			Logger.LogDebug("<<< Exiting GetTabTitleCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
                 return !string.IsNullOrEmpty(tab.Title) ? tab.Title : tab.TabName;
             }
 
@@ -589,49 +663,63 @@ namespace DotNetNuke.Web.InternalServices
 
         private bool IsWildCardEnabledForModule()
         {
+			Logger.LogDebug(">>> Entering IsWildCardEnabledForModule()");
             var searchModuleSettings = this.GetSearchModuleSettings();
             var enableWildSearch = true;
+			Logger.LogDebug("IsWildCardEnabledForModule(): enableWildSearch → {EnableWildSearch}", enableWildSearch);
+			Logger.LogDebug("IsWildCardEnabledForModule(): searchModuleSettings → {SearchModuleSettings}", searchModuleSettings);
             if (!string.IsNullOrEmpty(Convert.ToString(searchModuleSettings["EnableWildSearch"], CultureInfo.InvariantCulture)))
             {
                 enableWildSearch = Convert.ToBoolean(searchModuleSettings["EnableWildSearch"], CultureInfo.InvariantCulture);
             }
 
+			Logger.LogDebug("<<< Exiting IsWildCardEnabledForModule()");
             return enableWildSearch;
         }
 
         private ModuleInfo GetSearchModule()
         {
+			Logger.LogDebug(">>> Entering GetSearchModule()");
             var arrModules = GetModulesByDefinition(this.hostSettings, this.PortalSettings.PortalId, "Search Results");
             ModuleInfo findModule = null;
+			Logger.LogDebug("GetSearchModule(): findModule → {FindModule}", findModule);
+			Logger.LogDebug("GetSearchModule(): arrModules → {ArrModules}", arrModules);
             if (arrModules.Count > 1)
             {
                 findModule = arrModules.Cast<ModuleInfo>().FirstOrDefault(searchModule => searchModule.CultureCode == this.PortalSettings.CultureCode);
             }
 
+			Logger.LogDebug("<<< Exiting GetSearchModule()");
             return findModule ?? (arrModules.Count > 0 ? (ModuleInfo)arrModules[0] : null);
         }
 
         private Hashtable GetSearchModuleSettings()
         {
+			Logger.LogDebug(">>> Entering GetSearchModuleSettings()");
             if (this.ActiveModule != null && this.ActiveModule.ModuleDefinition.FriendlyName == "Search Results")
             {
                 return this.ActiveModule.ModuleSettings;
             }
 
             var searchModule = this.GetSearchModule();
+			Logger.LogDebug("GetSearchModuleSettings(): searchModule → {SearchModule}", searchModule);
+			Logger.LogDebug("<<< Exiting GetSearchModuleSettings()");
             return searchModule?.ModuleSettings;
         }
 
         private bool GetBooleanSetting(string settingName, bool defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetBooleanSetting(settingName={SettingName},defaultValue={DefaultValue})", settingName, defaultValue);
             if (this.PortalSettings == null)
             {
                 return defaultValue;
             }
 
             var settings = this.GetSearchModuleSettings();
+			Logger.LogDebug("GetBooleanSetting(settingName={SettingName},defaultValue={DefaultValue}): settings → {Settings}", settingName, defaultValue, settings);
             if (settings == null || !settings.ContainsKey(settingName))
             {
+			Logger.LogDebug("<<< Exiting GetBooleanSetting(settingName={SettingName},defaultValue={DefaultValue})", settingName, defaultValue);
                 return defaultValue;
             }
 
@@ -640,20 +728,24 @@ namespace DotNetNuke.Web.InternalServices
 
         private int GetIntegerSetting(string settingName, int defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetIntegerSetting(settingName={SettingName},defaultValue={DefaultValue})", settingName, defaultValue);
             if (this.PortalSettings == null)
             {
                 return defaultValue;
             }
 
             var settings = this.GetSearchModuleSettings();
+			Logger.LogDebug("GetIntegerSetting(settingName={SettingName},defaultValue={DefaultValue}): settings → {Settings}", settingName, defaultValue, settings);
             if (settings == null || !settings.ContainsKey(settingName))
             {
                 return defaultValue;
             }
 
             var settingValue = Convert.ToString(settings[settingName], CultureInfo.InvariantCulture);
+			Logger.LogDebug("GetIntegerSetting(settingName={SettingName},defaultValue={DefaultValue}): settingValue → {SettingValue}", settingName, defaultValue, settingValue);
             if (!string.IsNullOrEmpty(settingValue) && Regex.IsMatch(settingValue, "^\\d+$"))
             {
+			Logger.LogDebug("<<< Exiting GetIntegerSetting(settingName={SettingName},defaultValue={DefaultValue})", settingName, defaultValue);
                 return Convert.ToInt32(settingValue, CultureInfo.InvariantCulture);
             }
 
@@ -691,8 +783,11 @@ namespace DotNetNuke.Web.InternalServices
 
         private List<SearchContentSource> GetSearchContentSources(IList<string> typesList)
         {
+			Logger.LogDebug(">>> Entering GetSearchContentSources(typesList={TypesList})", typesList);
             var sources = new List<SearchContentSource>();
             var list = InternalSearchController.Instance.GetSearchContentSourceList(this.PortalSettings.PortalId);
+			Logger.LogDebug("GetSearchContentSources(typesList={TypesList}): list → {List}", typesList, list);
+			Logger.LogDebug("GetSearchContentSources(typesList={TypesList}): sources → {Sources}", typesList, sources);
 
             if (typesList.Any())
             {
@@ -707,15 +802,18 @@ namespace DotNetNuke.Web.InternalServices
                 sources.AddRange(list);
             }
 
+			Logger.LogDebug("<<< Exiting GetSearchContentSources(typesList={TypesList})", typesList);
             return sources;
         }
 
         private string GetTitle(SearchResult result, bool showFriendlyTitle = false)
         {
+			Logger.LogDebug(">>> Entering GetTitle(result={Result},showFriendlyTitle={ShowFriendlyTitle})", result, showFriendlyTitle);
             if (result.ModuleDefId > 0 && result.ModuleDefId == this.htmlModuleDefinitionId)
             {
                 // special handling for Html module
                 var tabTitle = GetTabTitleFromModuleId(this.hostSettings, result.ModuleId);
+				Logger.LogDebug("GetTitle(result={Result},showFriendlyTitle={ShowFriendlyTitle}): tabTitle → {TabTitle}", result, showFriendlyTitle, tabTitle);
                 if (!string.IsNullOrEmpty(tabTitle))
                 {
                     if (result.Title != "Enter Title" && result.Title != "Text/HTML")
@@ -727,6 +825,7 @@ namespace DotNetNuke.Web.InternalServices
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetTitle(result={Result},showFriendlyTitle={ShowFriendlyTitle})", result, showFriendlyTitle);
             return showFriendlyTitle ? GetFriendlyTitle(result) : result.Title;
         }
 

@@ -8,16 +8,20 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
 
     using DotNetNuke.Instrumentation;
     using DotNetNuke.Maintenance.Telerik.Removal;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>A base class that implements <see cref="IStepArray"/>.</summary>
     internal abstract class StepArrayBase : StepBase, IStepArray
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>Initializes a new instance of the <see cref="StepArrayBase"/> class.</summary>
         /// <param name="loggerSource">An instance of <see cref="ILoggerSource"/>.</param>
         /// <param name="localizer">An instance of <see cref="ILocalizer"/>.</param>
         public StepArrayBase(ILoggerSource loggerSource, ILocalizer localizer)
             : base(loggerSource, localizer)
         {
+		_logger.LogDebug(">>> Entering StepArrayBase(loggerSource={LoggerSource},localizer={Localizer})", loggerSource, localizer);
+		_logger.LogDebug("<<< Exiting StepArrayBase(loggerSource={LoggerSource},localizer={Localizer})", loggerSource, localizer);
         }
 
         /// <inheritdoc />
@@ -26,8 +30,10 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         /// <inheritdoc />
         protected override void ExecuteInternal()
         {
+			_logger.LogDebug(">>> Entering ExecuteInternal()");
             this.Success = true;
 
+			_logger.LogDebug("ExecuteInternal(): this.Success → {Arg0}", this.Success);
             foreach (var step in this.Steps)
             {
                 step.Execute();
@@ -38,6 +44,7 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
                     break;
                 }
             }
+			_logger.LogDebug("<<< Exiting ExecuteInternal()");
         }
     }
 }

@@ -1,9 +1,12 @@
 import {databaseTab as ActionTypes}  from "../constants/actionTypes";
 import databaseTabService from "../services/databaseTabService";
 import localization from "../localization";
+const logger = console;
 
 const databaseTabActions = {
     loadDatabaseServerInfo() {       
+		logger.debug('>>> Entering loadDatabaseServerInfo()');
+		logger.debug('<<< Exiting loadDatabaseServerInfo()');
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.LOAD_DATABASE_TAB               
@@ -17,6 +20,7 @@ const databaseTabActions = {
                     }
                 });  
             }).catch(() => {
+				logger.error('Exception in loadDatabaseServerInfo()');
                 dispatch({
                     type: ActionTypes.ERROR_LOADING_DATABASE_TAB,
                     payload: {

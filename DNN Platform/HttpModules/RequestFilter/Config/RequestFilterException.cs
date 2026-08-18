@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class RequestFilterException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RequestFilterException));
     /// <inheritdoc />
     public RequestFilterException()
     {
+	Logger.LogDebug(">>> Entering RequestFilterException()");
+	Logger.LogDebug("<<< Exiting RequestFilterException()");
     }
 
     /// <inheritdoc />
     public RequestFilterException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering RequestFilterException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting RequestFilterException(message={Message})", message);
 
     /// <inheritdoc />
     public RequestFilterException(string message, Exception innerException)

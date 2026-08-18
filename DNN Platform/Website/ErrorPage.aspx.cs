@@ -29,12 +29,17 @@ namespace DotNetNuke.Services.Exceptions
     /// </remarks>
     public partial class ErrorPage : Page
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ErrorPage.aspx));
         private readonly IApplicationStatusInfo appStatus;
 
         /// <summary>Initializes a new instance of the <see cref="ErrorPage"/> class.</summary>
         public ErrorPage()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering ErrorPage()");
+		Logger.LogDebug("<<< Exiting ErrorPage()");
+		Logger.LogDebug(">>> Entering ErrorPage(appStatus={AppStatus})", appStatus);
+		Logger.LogDebug("ErrorPage(appStatus={AppStatus}): appStatus → {AppStatus1}", appStatus, appStatus);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ErrorPage"/> class.</summary>
@@ -42,25 +47,31 @@ namespace DotNetNuke.Services.Exceptions
         public ErrorPage(IApplicationStatusInfo appStatus)
         {
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+			Logger.LogDebug("<<< Exiting ErrorPage(appStatus={AppStatus})", appStatus);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
             this.DefaultStylesheet.Attributes["href"] = this.ResolveUrl("~/Portals/_default/default.css");
             this.InstallStylesheet.Attributes["href"] = this.ResolveUrl("~/Install/install.css");
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             var portalSettings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogDebug("OnLoad(e={E}): portalSettings → {PortalSettings}", e, portalSettings);
             if (portalSettings != null && !string.IsNullOrEmpty(portalSettings.LogoFile))
             {
                 IFileInfo fileInfo = FileManager.Instance.GetFile(portalSettings.PortalId, portalSettings.LogoFile);
+				Logger.LogDebug("OnLoad(e={E}): fileInfo → {FileInfo}", e, fileInfo);
                 if (fileInfo != null)
                 {
                     this.headerImage.ImageUrl = FileManager.Instance.GetUrl(fileInfo);
@@ -71,6 +82,7 @@ namespace DotNetNuke.Services.Exceptions
 
             string localizedMessage;
             var status = this.Request.QueryString["status"];
+			Logger.LogDebug("OnLoad(e={E}): status → {Status}", e, status);
             if (!string.IsNullOrEmpty(status))
             {
                 this.ManageError(status);
@@ -79,6 +91,7 @@ namespace DotNetNuke.Services.Exceptions
             {
                 // get the last server error
                 var exc = this.Server.GetLastError();
+				Logger.LogDebug("OnLoad(e={E}): exc → {Exc}", e, exc);
                 try
                 {
                     if (this.Request.Url.LocalPath.ToLowerInvariant().EndsWith("installwizard.aspx"))
@@ -88,13 +101,16 @@ namespace DotNetNuke.Services.Exceptions
                     else
                     {
                         var lex = new PageLoadException(exc.Message, exc);
+						Logger.LogDebug("OnLoad(e={E}): lex → {Lex}", e, lex);
                         Exceptions.LogException(lex);
                         localizedMessage = Localization.GetString("Error.Text", Localization.GlobalResourceFile);
                         this.ErrorPlaceHolder.Controls.Add(new ErrorContainer(localizedMessage, lex).Container);
+						Logger.LogDebug("OnLoad(e={E}): localizedMessage → {LocalizedMessage}", e, localizedMessage);
                     }
                 }
                 catch
                 {
+					Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, ex.Message);
                     // No exception was found...you shouldn't end up here
                     // unless you go to this aspx page URL directly
                     localizedMessage = Localization.GetString("UnhandledError.Text", Localization.GlobalResourceFile);
@@ -107,6 +123,7 @@ namespace DotNetNuke.Services.Exceptions
             localizedMessage = Localization.GetString("Return.Text", Localization.GlobalResourceFile);
 
             this.hypReturn.Text = localizedMessage;
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         private void ManageError(string status)
@@ -137,6 +154,7 @@ namespace DotNetNuke.Services.Exceptions
             {
                 this.Response.StatusCode = statusCode;
             }
+			Logger.LogDebug("<<< Exiting ManageError(status={Status})", status);
         }
     }
 }

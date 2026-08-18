@@ -31,14 +31,18 @@ namespace DotNetNuke.Tests.Core.Services.Mobile
         [SetUp]
         public void SetUp()
         {
+			mockEventLogger.LogDebug(">>> Entering SetUp()");
             ComponentFactory.Container = new SimpleContainer();
             this.dataProvider = MockComponentProvider.CreateDataProvider();
+			mockEventLogger.LogDebug("SetUp(): dataProvider → {DataProvider}", dataProvider);
             this.dataProvider.Setup(d => d.GetProviderPath()).Returns(string.Empty);
             MockComponentProvider.CreateDataCacheProvider();
             MockComponentProvider.CreateEventLogController();
 
             this.dtProfiles = new DataTable("PreviewProfiles");
+			mockEventLogger.LogDebug("SetUp(): dtProfiles → {DtProfiles}", dtProfiles);
             var pkCol = this.dtProfiles.Columns.Add("Id", typeof(int));
+			mockEventLogger.LogDebug("SetUp(): pkCol → {PkCol}", pkCol);
             this.dtProfiles.Columns.Add("PortalId", typeof(int));
             this.dtProfiles.Columns.Add("Name", typeof(string));
             this.dtProfiles.Columns.Add("Width", typeof(int));
@@ -65,6 +69,7 @@ namespace DotNetNuke.Tests.Core.Services.Mobile
                                                                     if (this.dtProfiles.Rows.Count == 0)
                                                                     {
                                                                         id = 1;
+																		mockEventLogger.LogDebug("SetUp(): id → {Id}", id);
                                                                     }
                                                                     else
                                                                     {
@@ -85,6 +90,7 @@ namespace DotNetNuke.Tests.Core.Services.Mobile
                                                                 else
                                                                 {
                                                                     var rows = this.dtProfiles.Select("Id = " + id);
+																	mockEventLogger.LogDebug("SetUp(): rows → {Rows}", rows);
                                                                     if (rows.Length == 1)
                                                                     {
                                                                         var row = rows[0];
@@ -113,25 +119,32 @@ namespace DotNetNuke.Tests.Core.Services.Mobile
             this.serviceProvider = FakeServiceProvider.Setup(
                 services =>
                 {
+					mockEventLogger.LogDebug("SetUp(): serviceProvider → {ServiceProvider}", serviceProvider);
                     services.AddSingleton(this.dataProvider.Object);
                     services.AddSingleton(Mock.Of<IPortalController>());
                 });
+				mockEventLogger.LogDebug("<<< Exiting SetUp()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			mockEventLogger.LogDebug(">>> Entering TearDown()");
             this.serviceProvider.Dispose();
             this.dtProfiles?.Dispose();
+			mockEventLogger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void PreviewProfileController_Save_Valid_Profile()
         {
+			mockEventLogger.LogDebug(">>> Entering PreviewProfileController_Save_Valid_Profile()");
             var profile = new PreviewProfile { Name = "Test R", PortalId = 0, Width = 800, Height = 480 };
             new PreviewProfileController().Save(profile);
+			mockEventLogger.LogDebug("PreviewProfileController_Save_Valid_Profile(): profile → {Profile}", profile);
 
             var dataReader = this.dataProvider.Object.GetPreviewProfiles(0);
+			mockEventLogger.LogDebug("PreviewProfileController_Save_Valid_Profile(): dataReader → {DataReader}", dataReader);
             var affectedCount = 0;
             while (dataReader.Read())
             {
@@ -139,48 +152,60 @@ namespace DotNetNuke.Tests.Core.Services.Mobile
             }
 
             Assert.That(affectedCount, Is.EqualTo(1));
+			mockEventLogger.LogDebug("<<< Exiting PreviewProfileController_Save_Valid_Profile()");
         }
 
         [Test]
         public void PreviewProfileController_GetProfilesByPortal_With_Valid_PortalID()
         {
+			mockEventLogger.LogDebug(">>> Entering PreviewProfileController_GetProfilesByPortal_With_Valid_PortalID()");
             this.PrepareData();
 
             IList<IPreviewProfile> list = new PreviewProfileController().GetProfilesByPortal(0);
+			mockEventLogger.LogDebug("PreviewProfileController_GetProfilesByPortal_With_Valid_PortalID(): list → {List}", list);
 
             Assert.That(list, Has.Count.EqualTo(3));
+			mockEventLogger.LogDebug("<<< Exiting PreviewProfileController_GetProfilesByPortal_With_Valid_PortalID()");
         }
 
         [Test]
         public void PreviewProfileController_Delete_With_ValidID()
         {
+			mockEventLogger.LogDebug(">>> Entering PreviewProfileController_Delete_With_ValidID()");
             this.PrepareData();
             new PreviewProfileController().Delete(0, 1);
 
             IList<IPreviewProfile> list = new PreviewProfileController().GetProfilesByPortal(0);
+			mockEventLogger.LogDebug("PreviewProfileController_Delete_With_ValidID(): list → {List}", list);
 
             Assert.That(list, Has.Count.EqualTo(2));
+			mockEventLogger.LogDebug("<<< Exiting PreviewProfileController_Delete_With_ValidID()");
         }
 
         private IDataReader GetProfilesCallBack(int portalId)
         {
+			mockEventLogger.LogDebug(">>> Entering GetProfilesCallBack(portalId={PortalId})", portalId);
             var dtCheck = this.dtProfiles.Clone();
             foreach (var row in this.dtProfiles.Select("PortalId = " + portalId))
             {
+			mockEventLogger.LogDebug("GetProfilesCallBack(portalId={PortalId}): dtCheck → {DtCheck}", portalId, dtCheck);
                 dtCheck.Rows.Add(row.ItemArray);
             }
 
+			mockEventLogger.LogDebug("<<< Exiting GetProfilesCallBack(portalId={PortalId})", portalId);
             return dtCheck.CreateDataReader();
         }
 
         private void PrepareData()
         {
+			mockEventLogger.LogDebug(">>> Entering PrepareData()");
             this.dtProfiles.Rows.Add(1, 0, "R1", 640, 480, string.Empty, 1);
             this.dtProfiles.Rows.Add(2, 0, "R2", 640, 480, string.Empty, 2);
             this.dtProfiles.Rows.Add(3, 0, "R3", 640, 480, string.Empty, 3);
             this.dtProfiles.Rows.Add(4, 1, "R4", 640, 480, string.Empty, 4);
             this.dtProfiles.Rows.Add(5, 1, "R5", 640, 480, string.Empty, 5);
             this.dtProfiles.Rows.Add(6, 1, "R6", 640, 480, string.Empty, 6);
+			mockEventLogger.LogDebug("<<< Exiting PrepareData()");
         }
     }
 }

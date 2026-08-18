@@ -6,6 +6,7 @@ import utils from "../../../../utils";
 import { FileUpload, GridSystem, GridCell } from "@dnnsoftware/dnn-react-common";
 import PageUrlCommons from "../PageUrlCommons/PageUrlCommons";
 import Localization from "../../../../localization";
+const logger = console;
 
 class PageFile extends Component {
 
@@ -13,9 +14,11 @@ class PageFile extends Component {
         this.props.onChangeField("fileIdRedirection", selectedFile.fileId);
         this.props.onChangeField("fileFolderPathRedirection", selectedFile.folderPath);
         this.props.onChangeField("fileNameRedirection", selectedFile.fileName);
+		logger.debug(`<<< Exiting onFileSelect(selectedFile=${selectedFile})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {page} = this.props;
         const utilities = {
             utilities: utils.getUtilities()
@@ -27,6 +30,7 @@ class PageFile extends Component {
             fileName: page.fileNameRedirection
         } : null;
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.pageFile}>
                 <GridSystem>
@@ -74,6 +78,8 @@ PageFile.propTypes = {
 };
 
 const mapStateToProps = (state) => {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return ({page: state.pages.selectedPage});
 };
 

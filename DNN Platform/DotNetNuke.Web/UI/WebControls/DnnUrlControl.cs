@@ -33,6 +33,7 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>A URL control.</summary>
     public abstract class DnnUrlControl : UserControlBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnUrlControl));
         // ReSharper disable InconsistentNaming
 
         /// <summary>Gets or sets the error row panel.</summary>
@@ -185,14 +186,18 @@ namespace DotNetNuke.Web.UI.WebControls
         protected DnnUrlControl()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering DnnUrlControl()");
         }
 
+		Logger.LogDebug("<<< Exiting DnnUrlControl()");
         /// <summary>Initializes a new instance of the <see cref="DnnUrlControl"/> class.</summary>
         /// <param name="appStatus">The application status.</param>
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         protected DnnUrlControl(IApplicationStatusInfo appStatus)
             : this(appStatus, null)
         {
+		Logger.LogDebug(">>> Entering DnnUrlControl(appStatus={AppStatus})", appStatus);
+		Logger.LogDebug("<<< Exiting DnnUrlControl(appStatus={AppStatus})", appStatus);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnUrlControl"/> class.</summary>
@@ -713,12 +718,15 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             // prevent unauthorized access
             if (!this.Request.IsAuthenticated)
             {
                 this.Visible = false;
+				Logger.LogDebug("OnInit(e={E}): this.Visible → {Arg1}", e, this.Visible);
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
             }
 
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -729,6 +737,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.optType.SelectedIndexChanged += this.optType_SelectedIndexChanged;
@@ -743,6 +752,7 @@ namespace DotNetNuke.Web.UI.WebControls
                 if ((this.Request.QueryString["pid"] != null) && (Globals.IsHostTab(this.PortalSettings.ActiveTab.TabID) || UserController.Instance.GetCurrentUserInfo().IsSuperUser))
                 {
                     this.objPortal = PortalController.Instance.GetPortal(int.Parse(this.Request.QueryString["pid"], CultureInfo.InvariantCulture));
+					Logger.LogDebug("OnLoad(e={E}): objPortal → {ObjPortal}", e, objPortal);
                 }
                 else
                 {
@@ -756,8 +766,10 @@ namespace DotNetNuke.Web.UI.WebControls
                     // The type radio button must be initialized
                     // The url must be initialized no matter its value
                     this.doRenderTypes = true;
+					Logger.LogDebug("OnLoad(e={E}): this.doRenderTypes → {Arg1}", e, this.doRenderTypes);
                     this.doChangeURL = true;
                     ClientAPI.AddButtonConfirm(this.cmdDelete, Localization.GetString("DeleteItem"));
+					Logger.LogDebug("OnLoad(e={E}): this.doChangeURL → {Arg1}", e, this.doChangeURL);
 
                     // The following line was mover to the pre-render event to ensure render for the first time
                     // ViewState("IsUrlControlLoaded") = "Loaded"
@@ -765,13 +777,16 @@ namespace DotNetNuke.Web.UI.WebControls
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             try
@@ -800,9 +815,11 @@ namespace DotNetNuke.Web.UI.WebControls
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnPreRender(e={E}): {Arg1}", e, exc.getMessage());
                 // Let's detect possible problems
                 Exceptions.LogException(new RenderException("Error rendering URLControl subcontrols.", exc));
             }
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <summary>Handles the <see cref="LinkButton.Click"/> event on <see cref="cmdAdd"/>.</summary>
@@ -814,14 +831,18 @@ namespace DotNetNuke.Web.UI.WebControls
         // ReSharper disable once InconsistentNaming
         protected void cmdAdd_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering cmdAdd_Click(sender={Sender},e={E})", sender, e);
             this.cboUrls.Visible = false;
             this.cmdSelect.Visible = true;
             this.txtUrl.Visible = true;
             this.cmdAdd.Visible = false;
             this.cmdDelete.Visible = false;
             this.doRenderTypeControls = false; // Must not render on this postback
+			Logger.LogDebug("cmdAdd_Click(sender={Sender},e={E}): this.doRenderTypeControls → {Arg2}", sender, e, this.doRenderTypeControls);
             this.doRenderTypes = false;
             this.doChangeURL = false;
+			Logger.LogDebug("cmdAdd_Click(sender={Sender},e={E}): this.doRenderTypes → {Arg2}", sender, e, this.doRenderTypes);
+			Logger.LogDebug("<<< Exiting cmdAdd_Click(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Handles the <see cref="LinkButton.Click"/> event on <see cref="cmdDelete"/>.</summary>
@@ -833,16 +854,21 @@ namespace DotNetNuke.Web.UI.WebControls
         // ReSharper disable once InconsistentNaming
         protected void cmdDelete_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering cmdDelete_Click(sender={Sender},e={E})", sender, e);
             if (this.cboUrls.SelectedItem != null)
             {
                 var objUrls = new UrlController();
+				Logger.LogDebug("cmdDelete_Click(sender={Sender},e={E}): objUrls → {ObjUrls}", sender, e, objUrls);
                 objUrls.DeleteUrl(((IPortalInfo)this.objPortal).PortalId, this.cboUrls.SelectedItem.Value);
                 this.LoadUrls(); // we must reload the url list
             }
 
             this.doRenderTypeControls = false; // Must not render on this postback
+			Logger.LogDebug("cmdDelete_Click(sender={Sender},e={E}): this.doRenderTypeControls → {Arg2}", sender, e, this.doRenderTypeControls);
             this.doRenderTypes = false;
             this.doChangeURL = false;
+			Logger.LogDebug("cmdDelete_Click(sender={Sender},e={E}): this.doRenderTypes → {Arg2}", sender, e, this.doRenderTypes);
+			Logger.LogDebug("<<< Exiting cmdDelete_Click(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Handles the <see cref="LinkButton.Click"/> event on <see cref="cmdSelect"/>.</summary>
@@ -854,6 +880,7 @@ namespace DotNetNuke.Web.UI.WebControls
         // ReSharper disable once InconsistentNaming
         protected void cmdSelect_Click(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering cmdSelect_Click(sender={Sender},e={E})", sender, e);
             this.cboUrls.Visible = true;
             this.cmdSelect.Visible = false;
             this.txtUrl.Visible = false;
@@ -867,8 +894,11 @@ namespace DotNetNuke.Web.UI.WebControls
             }
 
             this.doRenderTypeControls = false; // Must not render on this postback
+			Logger.LogDebug("cmdSelect_Click(sender={Sender},e={E}): this.doRenderTypeControls → {Arg2}", sender, e, this.doRenderTypeControls);
             this.doRenderTypes = false;
             this.doChangeURL = false;
+			Logger.LogDebug("cmdSelect_Click(sender={Sender},e={E}): this.doRenderTypes → {Arg2}", sender, e, this.doRenderTypes);
+			Logger.LogDebug("<<< Exiting cmdSelect_Click(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Handles the <see cref="ListControl.SelectedIndexChanged"/> event on <see cref="optType"/>.</summary>
@@ -880,27 +910,38 @@ namespace DotNetNuke.Web.UI.WebControls
         // ReSharper disable once InconsistentNaming
         protected void optType_SelectedIndexChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering optType_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
             // Type changed, render the correct control set
             this.ViewState["UrlType"] = this.optType.SelectedItem.Value;
             this.doRenderTypeControls = true;
+			Logger.LogDebug("optType_SelectedIndexChanged(sender={Sender},e={E}): this.doRenderTypeControls → {Arg2}", sender, e, this.doRenderTypeControls);
+			Logger.LogDebug("<<< Exiting optType_SelectedIndexChanged(sender={Sender},e={E})", sender, e);
         }
 
         private void LoadUrls()
         {
+			Logger.LogDebug(">>> Entering LoadUrls()");
             var objUrls = new UrlController();
             this.cboUrls.Items.Clear();
+			Logger.LogDebug("LoadUrls(): objUrls → {ObjUrls}", objUrls);
             this.cboUrls.DataSource = objUrls.GetUrls(((IPortalInfo)this.objPortal).PortalId);
             this.cboUrls.DataBind();
+			Logger.LogDebug("<<< Exiting LoadUrls()");
         }
 
         private void DoChangeURL()
         {
+			Logger.LogDebug(">>> Entering DoChangeURL()");
             string url = Convert.ToString(this.ViewState["Url"], CultureInfo.InvariantCulture);
             string urltype = Convert.ToString(this.ViewState["UrlType"], CultureInfo.InvariantCulture);
+			Logger.LogDebug("DoChangeURL(): urltype → {Urltype}", urltype);
+			Logger.LogDebug("DoChangeURL(): url → {Url}", url);
             if (!string.IsNullOrEmpty(url))
             {
                 var objUrls = new UrlController();
+				Logger.LogDebug("DoChangeURL(): objUrls → {ObjUrls}", objUrls);
                 string trackingUrl = url;
+				Logger.LogDebug("DoChangeURL(): trackingUrl → {TrackingUrl}", trackingUrl);
 
                 urltype = Globals.GetURLType(url).ToString("g").Substring(0, 1);
                 if (urltype == "U" && url.StartsWith("~/" + this.PortalSettings.DefaultIconLocation, StringComparison.InvariantCultureIgnoreCase))
@@ -915,6 +956,7 @@ namespace DotNetNuke.Web.UI.WebControls
                     {
                         trackingUrl = url;
                         var objFile = FileManager.Instance.GetFile(int.Parse(url.Substring(7), CultureInfo.InvariantCulture));
+						Logger.LogDebug("DoChangeURL(): objFile → {ObjFile}", objFile);
                         if (objFile != null)
                         {
                             url = objFile.Folder + objFile.FileName;
@@ -924,12 +966,17 @@ namespace DotNetNuke.Web.UI.WebControls
                     {
                         // to handle legacy scenarios before the introduction of the FileServerHandler
                         var fileName = Path.GetFileName(url);
+						Logger.LogDebug("DoChangeURL(): fileName → {FileName}", fileName);
                         var folderPath = url.Substring(0, url.LastIndexOf(fileName, StringComparison.OrdinalIgnoreCase));
+						Logger.LogDebug("DoChangeURL(): folderPath → {FolderPath}", folderPath);
                         var folder = FolderManager.Instance.GetFolder(((IPortalInfo)this.objPortal).PortalId, folderPath);
+						Logger.LogDebug("DoChangeURL(): folder → {Folder}", folder);
                         var fileId = -1;
+						Logger.LogDebug("DoChangeURL(): fileId → {FileId}", fileId);
                         if (folder != null)
                         {
                             var file = FileManager.Instance.GetFile(folder, fileName);
+							Logger.LogDebug("DoChangeURL(): file → {File}", file);
                             if (file != null)
                             {
                                 fileId = file.FileId;
@@ -945,6 +992,7 @@ namespace DotNetNuke.Web.UI.WebControls
                     if (url.StartsWith("userid=", StringComparison.InvariantCultureIgnoreCase))
                     {
                         UserInfo objUser = UserController.GetUserById(this.HostSettings, ((IPortalInfo)this.objPortal).PortalId, int.Parse(url.Substring(7), CultureInfo.InvariantCulture));
+						Logger.LogDebug("DoChangeURL(): objUser → {ObjUser}", objUser);
                         if (objUser != null)
                         {
                             url = objUser.Username;
@@ -953,6 +1001,7 @@ namespace DotNetNuke.Web.UI.WebControls
                 }
 
                 UrlTrackingInfo objUrlTracking = objUrls.GetUrlTracking(((IPortalInfo)this.objPortal).PortalId, trackingUrl, this.ModuleID);
+				Logger.LogDebug("DoChangeURL(): objUrlTracking → {ObjUrlTracking}", objUrlTracking);
                 if (objUrlTracking != null)
                 {
                     this.chkNewWindow.Checked = objUrlTracking.NewWindow;
@@ -998,12 +1047,16 @@ namespace DotNetNuke.Web.UI.WebControls
 
             // Url type changed, then we must draw the controlos for that type
             this.doRenderTypeControls = true;
+			Logger.LogDebug("DoChangeURL(): this.doRenderTypeControls → {Arg0}", this.doRenderTypeControls);
+			Logger.LogDebug("<<< Exiting DoChangeURL()");
         }
 
         private void DoRenderTypes()
         {
+			Logger.LogDebug(">>> Entering DoRenderTypes()");
             // We must clear the list to keep the same item order
             string strCurrent = string.Empty;
+			Logger.LogDebug("DoRenderTypes(): strCurrent → {StrCurrent}", strCurrent);
             if (this.optType.SelectedIndex >= 0)
             {
                 strCurrent = this.optType.SelectedItem.Value; // Save current selected value
@@ -1112,6 +1165,7 @@ namespace DotNetNuke.Web.UI.WebControls
                     {
                         this.optType.Items[0].Selected = true;
                         this.doRenderTypeControls = true; // Type changed, re-draw
+						Logger.LogDebug("DoRenderTypes(): this.doRenderTypeControls → {Arg0}", this.doRenderTypeControls);
                     }
                 }
                 else
@@ -1126,12 +1180,15 @@ namespace DotNetNuke.Web.UI.WebControls
             {
                 this.TypeRow.Visible = false;
             }
+			Logger.LogDebug("<<< Exiting DoRenderTypes()");
         }
 
         private void DoCorrectRadioButtonList()
         {
+			Logger.LogDebug(">>> Entering DoCorrectRadioButtonList()");
             string urltype = Convert.ToString(this.ViewState["UrlType"], CultureInfo.InvariantCulture);
 
+			Logger.LogDebug("DoCorrectRadioButtonList(): urltype → {Urltype}", urltype);
             if (this.optType.Items.Count > 0)
             {
                 this.optType.ClearSelection();
@@ -1155,13 +1212,18 @@ namespace DotNetNuke.Web.UI.WebControls
                     this.ViewState["UrlType"] = urltype;
                 }
             }
+			Logger.LogDebug("<<< Exiting DoCorrectRadioButtonList()");
         }
 
         private void DoRenderTypeControls()
         {
+			Logger.LogDebug(">>> Entering DoRenderTypeControls()");
             string url = Convert.ToString(this.ViewState["Url"], CultureInfo.InvariantCulture);
             string urltype = Convert.ToString(this.ViewState["UrlType"], CultureInfo.InvariantCulture);
+			Logger.LogDebug("DoRenderTypeControls(): urltype → {Urltype}", urltype);
             var objUrls = new UrlController();
+			Logger.LogDebug("DoRenderTypeControls(): objUrls → {ObjUrls}", objUrls);
+			Logger.LogDebug("DoRenderTypeControls(): url → {Url}", url);
             if (!string.IsNullOrEmpty(urltype))
             {
                 // load listitems
@@ -1191,6 +1253,7 @@ namespace DotNetNuke.Web.UI.WebControls
                         }
 
                         ListItem selecteItem = this.cboImages.Items.FindByValue(url.ToLowerInvariant());
+						Logger.LogDebug("DoRenderTypeControls(): selecteItem → {SelecteItem}", selecteItem);
                         selecteItem?.Selected = true;
 
                         break;
@@ -1235,8 +1298,11 @@ namespace DotNetNuke.Web.UI.WebControls
                         if (!string.IsNullOrEmpty(url))
                         {
                             var settings = PortalController.Instance.GetCurrentSettings();
+							Logger.LogDebug("DoRenderTypeControls(): settings → {Settings}", settings);
                             var tabId = int.Parse(url, CultureInfo.InvariantCulture);
+							Logger.LogDebug("DoRenderTypeControls(): tabId → {TabId}", tabId);
                             var page = TabController.Instance.GetTab(tabId, settings.PortalId);
+							Logger.LogDebug("DoRenderTypeControls(): page → {Page}", page);
                             this.cboTabs.SelectedPage = page;
                         }
 
@@ -1251,9 +1317,13 @@ namespace DotNetNuke.Web.UI.WebControls
                         // select folder
                         // We Must check if selected folder has changed because of a property change (Secure, Database)
                         string fileName = string.Empty;
+						Logger.LogDebug("DoRenderTypeControls(): fileName → {FileName}", fileName);
                         string folderPath = string.Empty;
+						Logger.LogDebug("DoRenderTypeControls(): folderPath → {FolderPath}", folderPath);
                         string lastFileName = string.Empty;
+						Logger.LogDebug("DoRenderTypeControls(): lastFileName → {LastFileName}", lastFileName);
                         string lastFolderPath = string.Empty;
+						Logger.LogDebug("DoRenderTypeControls(): lastFolderPath → {LastFolderPath}", lastFolderPath);
 
                         // Let's try to remember last selection
                         if (this.ViewState["LastFolderPath"] != null)
@@ -1305,6 +1375,7 @@ namespace DotNetNuke.Web.UI.WebControls
                 this.FileRow.Visible = false;
                 this.UserRow.Visible = false;
             }
+			Logger.LogDebug("<<< Exiting DoRenderTypeControls()");
         }
     }
 }

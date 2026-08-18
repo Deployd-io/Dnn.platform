@@ -23,7 +23,10 @@ namespace DotNetNuke.UI.WebControls
         /// </summary>
         public TrueFalseEditControl()
         {
+			Logger.LogDebug(">>> Entering TrueFalseEditControl()");
             this.SystemType = "System.Boolean";
+			Logger.LogDebug("TrueFalseEditControl(): this.SystemType → {Arg0}", this.SystemType);
+			Logger.LogDebug("<<< Exiting TrueFalseEditControl()");
         }
 
         /// <summary>Gets a value indicating whether booleanValue returns the Boolean representation of the Value.</summary>
@@ -88,17 +91,24 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">The event arguments.</param>
         protected override void OnDataChanged(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnDataChanged(e={E})", e);
             var args = new PropertyEditorEventArgs(this.Name);
             args.Value = this.BooleanValue;
+			Logger.LogDebug("OnDataChanged(e={E}): args.Value → {Arg1}", e, args.Value);
+			Logger.LogDebug("OnDataChanged(e={E}): args.OldValue → {Arg1}", e, args.OldValue);
+			Logger.LogDebug("OnDataChanged(e={E}): args.StringValue → {Arg1}", e, args.StringValue);
+			Logger.LogDebug("OnDataChanged(e={E}): args → {Args}", e, args);
             args.OldValue = this.OldBooleanValue;
             args.StringValue = this.StringValue;
             this.OnValueChanged(args);
+			Logger.LogDebug("<<< Exiting OnDataChanged(e={E})", e);
         }
 
         /// <summary>RenderEditMode renders the Edit mode of the control.</summary>
         /// <param name="writer">A HtmlTextWriter.</param>
         protected override void RenderEditMode(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering RenderEditMode(writer={Writer})", writer);
             writer.AddAttribute(HtmlTextWriterAttribute.Type, "radio");
             if (this.BooleanValue)
             {
@@ -127,6 +137,7 @@ namespace DotNetNuke.UI.WebControls
             writer.RenderBeginTag(HtmlTextWriterTag.Span);
             writer.Write(Localization.GetString("False", Localization.SharedResourceFile));
             writer.RenderEndTag();
+			Logger.LogDebug("<<< Exiting RenderEditMode(writer={Writer})", writer);
         }
     }
 }

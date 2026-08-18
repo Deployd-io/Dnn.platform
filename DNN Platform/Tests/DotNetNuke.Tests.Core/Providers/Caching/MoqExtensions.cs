@@ -12,6 +12,8 @@ namespace DotNetNuke.Tests.Providers.Caching
     {
         public static IReturnsResult<CachingProvider> ReturnsValidValue(this ISetup<CachingProvider, object> ret)
         {
+			mockEventLogger.LogDebug(">>> Entering ReturnsValidValue(ret={Ret})", ret);
+			mockEventLogger.LogDebug("<<< Exiting ReturnsValidValue(ret={Ret})", ret);
             return ret.Returns(() => Constants.CACHEING_ValidValue);
         }
     }

@@ -1,6 +1,7 @@
 import {Component, Element, Host, h, State} from '@stencil/core';
 import { FolderMappingInfo, ItemsClient } from '../../services/ItemsClient';
 import state from "../../store/store";
+const logger = console;
 
 @Component({
     tag: 'dnn-rm-folder-mappings',
@@ -16,23 +17,31 @@ export class DnnRmFolderMappings {
     @State() addFolderTypeUrl: string;
 
     constructor() {
+		logger.debug('>>> Entering constructor()');
         this.itemsClient = new ItemsClient(state.moduleId);
+		logger.debug('<<< Exiting constructor()');
     }
 
     async componentWillLoad() {
+		logger.debug('>>> Entering componentWillLoad()');
         try {
             this.folderMappings = await this.itemsClient.getFolderMappings();
             this.addFolderTypeUrl = await this.itemsClient.getAddFolderTypeUrl();
         } catch (error) {
             alert(error);
+			logger.debug('<<< Exiting componentWillLoad()');
         }
     }
 
     private async dismiss() {
+		logger.debug('>>> Entering dismiss()');
         await this.el.closest('dnn-modal').hide();
+		logger.debug('<<< Exiting dismiss()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <Host>
                 <h2>{state.localization.EditFolderMappings}</h2>

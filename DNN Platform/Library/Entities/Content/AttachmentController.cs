@@ -31,72 +31,91 @@ namespace DotNetNuke.Entities.Content
         public AttachmentController()
             : this(Util.GetContentController())
         {
+		Logger.LogDebug(">>> Entering AttachmentController()");
         }
 
+		Logger.LogDebug("<<< Exiting AttachmentController()");
         /// <summary>Initializes a new instance of the <see cref="AttachmentController"/> class.</summary>
         /// <param name="contentController">The content controller.</param>
         public AttachmentController(IContentController contentController)
         {
             this.contentController = contentController;
+			Logger.LogDebug("AttachmentController(contentController={ContentController}): contentController → {ContentController1}", contentController, contentController);
         }
 
         /// <inheritdoc />
         public void AddFileToContent(int contentItemId, IFileInfo fileInfo)
         {
             this.AddFilesToContent(contentItemId, new[] { fileInfo });
+			Logger.LogDebug("<<< Exiting AddFileToContent(contentItemId={ContentItemId},fileInfo={FileInfo})", contentItemId, fileInfo);
         }
 
         /// <inheritdoc />
         public void AddFilesToContent(int contentItemId, IEnumerable<IFileInfo> fileInfo)
         {
             this.AddToContent(contentItemId, contentItem => contentItem.Files.AddRange(fileInfo));
+			Logger.LogDebug("<<< Exiting AddFilesToContent(contentItemId={ContentItemId},fileInfo={FileInfo})", contentItemId, fileInfo);
         }
 
         /// <inheritdoc />
         public void AddVideoToContent(int contentItemId, IFileInfo fileInfo)
         {
             this.AddVideosToContent(contentItemId, new[] { fileInfo });
+			Logger.LogDebug("<<< Exiting AddVideoToContent(contentItemId={ContentItemId},fileInfo={FileInfo})", contentItemId, fileInfo);
         }
 
         /// <inheritdoc />
         public void AddVideosToContent(int contentItemId, IEnumerable<IFileInfo> fileInfo)
         {
             this.AddToContent(contentItemId, contentItem => contentItem.Videos.AddRange(fileInfo));
+			Logger.LogDebug("<<< Exiting AddVideosToContent(contentItemId={ContentItemId},fileInfo={FileInfo})", contentItemId, fileInfo);
         }
 
         /// <inheritdoc />
         public void AddImageToContent(int contentItemId, IFileInfo fileInfo)
         {
             this.AddImagesToContent(contentItemId, new[] { fileInfo });
+			Logger.LogDebug("<<< Exiting AddImageToContent(contentItemId={ContentItemId},fileInfo={FileInfo})", contentItemId, fileInfo);
         }
 
         /// <inheritdoc />
         public void AddImagesToContent(int contentItemId, IEnumerable<IFileInfo> fileInfo)
         {
             this.AddToContent(contentItemId, contentItem => contentItem.Images.AddRange(fileInfo));
+			Logger.LogDebug("<<< Exiting AddImagesToContent(contentItemId={ContentItemId},fileInfo={FileInfo})", contentItemId, fileInfo);
         }
 
         /// <inheritdoc />
         public IList<IFileInfo> GetVideosByContent(int contentItemId)
         {
+			Logger.LogDebug(">>> Entering GetVideosByContent(contentItemId={ContentItemId})", contentItemId);
             var files = this.GetFilesByContent(contentItemId, VideoKey);
 
+			Logger.LogDebug("GetVideosByContent(contentItemId={ContentItemId}): files → {Files}", contentItemId, files);
+			Logger.LogDebug("<<< Exiting GetVideosByContent(contentItemId={ContentItemId})", contentItemId);
             return files.Select(fileId => FileManager.Instance.GetFile(fileId)).ToList();
         }
 
         /// <inheritdoc />
         public IList<IFileInfo> GetImagesByContent(int contentItemId)
         {
+			Logger.LogDebug(">>> Entering GetImagesByContent(contentItemId={ContentItemId})", contentItemId);
             var files = this.GetFilesByContent(contentItemId, ImageKey);
 
+			Logger.LogDebug("GetImagesByContent(contentItemId={ContentItemId}): files → {Files}", contentItemId, files);
+			Logger.LogDebug("<<< Exiting GetImagesByContent(contentItemId={ContentItemId})", contentItemId);
             return files.Select(fileId => FileManager.Instance.GetFile(fileId)).ToList();
         }
 
         /// <inheritdoc />
         public IList<IFileInfo> GetFilesByContent(int contentItemId)
         {
+			Logger.LogDebug(">>> Entering GetFilesByContent(contentItemId={ContentItemId})", contentItemId);
             var files = this.GetFilesByContent(contentItemId, FilesKey);
 
+			Logger.LogDebug("GetFilesByContent(contentItemId={ContentItemId}): files → {Files}", contentItemId, files);
+			Logger.LogDebug("<<< Exiting GetFilesByContent(contentItemId={ContentItemId})", contentItemId);
+			Logger.LogDebug("<<< Exiting GetFilesByContent(contentItemId={ContentItemId},type={Type})", contentItemId, type);
             return files.Select(fileId => FileManager.Instance.GetFile(fileId)).ToList();
         }
 
@@ -105,10 +124,12 @@ namespace DotNetNuke.Entities.Content
             SerializeToMetadata(contentItem.Files, contentItem.Metadata, FilesKey);
             SerializeToMetadata(contentItem.Videos, contentItem.Metadata, VideoKey);
             SerializeToMetadata(contentItem.Images, contentItem.Metadata, ImageKey);
+			Logger.LogDebug("<<< Exiting SerializeAttachmentMetadata(contentItem={ContentItem})", contentItem);
         }
 
         internal static IEnumerable<IFileInfo> DeserializeFileInfo(string content)
         {
+			Logger.LogDebug(">>> Entering DeserializeFileInfo(content={Content})", content);
             if (string.IsNullOrEmpty(content))
             {
                 yield break;
@@ -117,6 +138,7 @@ namespace DotNetNuke.Entities.Content
             foreach (var fileId in content.FromJson<int[]>().ToArray())
             {
                 IFileInfo fileInfo = null;
+				Logger.LogDebug("DeserializeFileInfo(content={Content}): fileInfo → {FileInfo}", content, fileInfo);
                 try
                 {
                     fileInfo = FileManager.Instance.GetFile(fileId);
@@ -136,6 +158,7 @@ namespace DotNetNuke.Entities.Content
                     yield return fileInfo;
                 }
             }
+			Logger.LogDebug("<<< Exiting DeserializeFileInfo(content={Content})", content);
         }
 
         internal static string SerializeFileInfo(IEnumerable<IFileInfo> files)
@@ -170,15 +193,19 @@ namespace DotNetNuke.Entities.Content
             {
                 nvc.Remove(key);
             }
+			Logger.LogDebug("<<< Exiting SerializeToMetadata(files={Files},nvc={Nvc},key={Key})", files, nvc, key);
         }
 
         private void AddToContent(int contentItemId, Action<ContentItem> action)
         {
+			Logger.LogDebug(">>> Entering AddToContent(contentItemId={ContentItemId},action={Action})", contentItemId, action);
             var contentItem = this.contentController.GetContentItem(contentItemId);
 
+			Logger.LogDebug("AddToContent(contentItemId={ContentItemId},action={Action}): contentItem → {ContentItem}", contentItemId, action, contentItem);
             action(contentItem);
 
             this.contentController.UpdateContentItem(contentItem);
+			Logger.LogDebug("<<< Exiting AddToContent(contentItemId={ContentItemId},action={Action})", contentItemId, action);
         }
 
         private int[] GetFilesByContent(int contentItemId, string type)

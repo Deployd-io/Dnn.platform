@@ -21,8 +21,10 @@ namespace DotNetNuke.Web.Extensions
         /// <param name="services">Service Collection used to registering services in the container.</param>
         public static void AddWebApi(this IServiceCollection services)
         {
+			Logger.LogDebug(">>> Entering AddWebApi(services={Services})", services);
             var allTypes = TypeExtensions.SafeGetTypes();
             allTypes.LogOtherExceptions(Logger);
+			Logger.LogDebug("AddWebApi(services={Services}): allTypes → {AllTypes}", services, allTypes);
 
             var controllerTypes = allTypes.Types
                 .Where(
@@ -32,6 +34,7 @@ namespace DotNetNuke.Web.Extensions
             {
                 services.TryAddScoped(controller);
             }
+			Logger.LogDebug("<<< Exiting AddWebApi(services={Services})", services);
         }
     }
 }

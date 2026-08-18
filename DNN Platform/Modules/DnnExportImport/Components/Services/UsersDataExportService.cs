@@ -27,6 +27,7 @@ namespace Dnn.ExportImport.Components.Services
     /// <summary>Supplementary service to import users additional data.</summary>
     public class UsersDataExportService(IHostSettings hostSettings, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController) : BasePortableService
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UsersDataExportService));
         private static readonly Tuple<string, Type>[] UserRolesDatasetColumns =
         {
             Tuple.Create("PortalId", typeof(int)),
@@ -64,7 +65,9 @@ namespace Dnn.ExportImport.Components.Services
         public UsersDataExportService()
             : this(null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering UsersDataExportService()");
         }
+		Logger.LogDebug("<<< Exiting UsersDataExportService()");
 
         /// <summary>Initializes a new instance of the <see cref="UsersDataExportService"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -86,6 +89,7 @@ namespace Dnn.ExportImport.Components.Services
         /// <inheritdoc />
         public override void ExportData(ExportImportJob exportJob, ExportDto exportDto)
         {
+			Logger.LogDebug(">>> Entering ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
             this.CheckPoint.Progress += 100;
             this.CheckPoint.Completed = true;
             this.CheckPoint.TotalItems = 0;
@@ -93,22 +97,26 @@ namespace Dnn.ExportImport.Components.Services
             this.CheckPointStageCallback(this);
 
             // No implementation required in export users child as everything is exported in parent service.
+			Logger.LogDebug("<<< Exiting ExportData(exportJob={ExportJob},exportDto={ExportDto})", exportJob, exportDto);
         }
 
         /// <inheritdoc />
         public override void ImportData(ExportImportJob importJob, ImportDto importDto)
         {
+			Logger.LogDebug(">>> Entering ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
             if (this.CheckCancelled(importJob))
             {
                 return;
             }
 
             var pageIndex = 0;
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): pageIndex → {PageIndex}", importJob, importDto, pageIndex);
             const int pageSize = Constants.DefaultPageSize;
             var totalUserRolesImported = 0;
             var totalProfilesImported = 0;
             var totalProcessed = 0;
             var totalUsers = this.Repository.GetCount<ExportUser>();
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): totalUsers → {TotalUsers}", importJob, importDto, totalUsers);
             if (totalUsers == 0)
             {
                 this.CheckPoint.Completed = true;
@@ -117,6 +125,7 @@ namespace Dnn.ExportImport.Components.Services
             }
 
             var totalPages = Util.CalculateTotalPages(totalUsers, pageSize);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): totalPages → {TotalPages}", importJob, importDto, totalPages);
 
             // Skip the import if all the users has been processed already.
             if (this.CheckPoint.Stage >= totalPages)
@@ -127,6 +136,7 @@ namespace Dnn.ExportImport.Components.Services
             pageIndex = this.CheckPoint.Stage;
 
             var totalUsersToBeProcessed = totalUsers - (pageIndex * pageSize);
+			Logger.LogDebug("ImportData(importJob={ImportJob},importDto={ImportDto}): totalUsersToBeProcessed → {TotalUsersToBeProcessed}", importJob, importDto, totalUsersToBeProcessed);
 
             // Update the total items count in the check points. This should be updated only once.
             this.CheckPoint.TotalItems = this.CheckPoint.TotalItems <= 0 ? totalUsers : this.CheckPoint.TotalItems;
@@ -271,6 +281,7 @@ namespace Dnn.ExportImport.Components.Services
                         }
                         catch (Exception ex)
                         {
+							Logger.LogError("Exception in ImportData(importJob={ImportJob},importDto={ImportDto}): {Arg2}", importJob, importDto, ex.getMessage());
                             this.Result.AddLogEntry($"Importing Users Data from {pageIndex * pageSize} to {(pageIndex * pageSize) + pageSize} exception", ex.Message, ReportLevel.Error);
                         }
 
@@ -299,11 +310,14 @@ namespace Dnn.ExportImport.Components.Services
                     this.Result.AddSummary("Imported User Profiles", totalProfilesImported.ToString(CultureInfo.InvariantCulture));
                 }
             }
+			Logger.LogDebug("<<< Exiting ImportData(importJob={ImportJob},importDto={ImportDto})", importJob, importDto);
         }
 
         /// <inheritdoc />
         public override int GetImportTotal()
         {
+			Logger.LogDebug(">>> Entering GetImportTotal()");
+			Logger.LogDebug("<<< Exiting GetImportTotal()");
             return this.Repository.GetCount<ExportUser>();
         }
 

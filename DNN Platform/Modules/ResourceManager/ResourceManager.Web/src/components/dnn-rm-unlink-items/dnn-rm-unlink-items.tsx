@@ -1,6 +1,7 @@
 import { Component, Element, Event, EventEmitter, Host, h, Prop, State } from '@stencil/core';
 import { Item, ItemsClient } from '../../services/ItemsClient';
 import state from '../../store/store';
+const logger = console;
 
 @Component({
   tag: 'dnn-rm-unlink-items',
@@ -27,18 +28,23 @@ export class DnnRmUnlinkItems {
   private itemsClient: ItemsClient;
 
   constructor() {
+	logger.debug('>>> Entering constructor()');
     this.itemsClient = new ItemsClient(state.moduleId);
+	logger.debug('<<< Exiting constructor()');
   }
 
   private async closeModal() {
+	logger.debug('>>> Entering closeModal()');
     const modal = this.el.parentElement as HTMLDnnModalElement;
     await modal.hide();
     setTimeout(() => {
       document.body.removeChild(modal);
     }, 300);
+	logger.debug('<<< Exiting closeModal()');
   }
 
   private async handleUnlink() {
+	logger.debug('>>> Entering handleUnlink()');
     this.unlinking = true;
     for (const item of this.items) {
       try {
@@ -49,21 +55,27 @@ export class DnnRmUnlinkItems {
         await this.handleItemUnlinked(item);
       } catch (error) {
         alert(error);
+		logger.debug('<<< Exiting handleUnlink()');
       }
     }
   }
   
   private async handleItemUnlinked(item: Item) {
+	logger.debug(`>>> Entering handleItemUnlinked(item=${item})`);
     this.unlinkedCount++;
     this.currentItemName = item.itemName;
     if (this.unlinkedCount == this.items.length) {
+	logger.debug(`handleItemUnlinked(item=${item}): this.currentItemName → ${this.currentItemName}`);
       this.unlinking = false;
       this.dnnRmFoldersChanged.emit();
       await this.closeModal();
+	logger.debug(`<<< Exiting handleItemUnlinked(item=${item})`);
     }
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         <h2>{state.localization?.UnlinkFolders}</h2>

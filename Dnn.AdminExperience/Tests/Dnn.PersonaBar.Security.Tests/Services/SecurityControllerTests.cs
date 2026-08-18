@@ -24,6 +24,7 @@ namespace Dnn.PersonaBar.Security.Tests.Services
         [Test]
         public void Services_Controller_AddPortalAlias_TrimsProtocolAndSlash()
         {
+			permissionProviderMock.LogDebug(">>> Entering Services_Controller_AddPortalAlias_TrimsProtocolAndSlash()");
             // arrange
             var sut = new SecurityController(
                 Mock.Of<Components.SecurityController>(),
@@ -36,16 +37,20 @@ namespace Dnn.PersonaBar.Security.Tests.Services
 
             // act
             var alias = sut.AddPortalAlias(SslUrl, PortalId);
+			permissionProviderMock.LogDebug("Services_Controller_AddPortalAlias_TrimsProtocolAndSlash(): alias → {Alias}", alias);
 
             // assert
             Assert.That(alias, Is.EqualTo(SomeAlias));
+			permissionProviderMock.LogDebug("<<< Exiting Services_Controller_AddPortalAlias_TrimsProtocolAndSlash()");
         }
 
         [Test]
         public void Services_Controller_AddPortalAlias_WhenAliasExists_AddIsNotInvoked()
         {
+			permissionProviderMock.LogDebug(">>> Entering Services_Controller_AddPortalAlias_WhenAliasExists_AddIsNotInvoked()");
             // arrange
             var portalAliasControllerMock = new Mock<IPortalAliasService>();
+			permissionProviderMock.LogDebug("Services_Controller_AddPortalAlias_WhenAliasExists_AddIsNotInvoked(): portalAliasControllerMock → {PortalAliasControllerMock}", portalAliasControllerMock);
             var portalAliasInfo = new PortalAliasInfo
             {
                 HTTPAlias = SomeAlias,
@@ -71,13 +76,16 @@ namespace Dnn.PersonaBar.Security.Tests.Services
                 c =>
                 c.AddPortalAlias(It.Is<IPortalAliasInfo>(match =>
                     match.HttpAlias == SomeAlias && match.PortalId == PortalId)), Times.Never);
+					permissionProviderMock.LogDebug("<<< Exiting Services_Controller_AddPortalAlias_WhenAliasExists_AddIsNotInvoked()");
         }
 
         [Test]
         public void Services_Controller_AddPortalAlias_WhenAliasDoesNotExist_AddIsInvoked()
         {
+			permissionProviderMock.LogDebug(">>> Entering Services_Controller_AddPortalAlias_WhenAliasDoesNotExist_AddIsInvoked()");
             // arrange
             var portalAliasControllerMock = new Mock<IPortalAliasService>();
+			permissionProviderMock.LogDebug("Services_Controller_AddPortalAlias_WhenAliasDoesNotExist_AddIsInvoked(): portalAliasControllerMock → {PortalAliasControllerMock}", portalAliasControllerMock);
             portalAliasControllerMock
                 .Setup(c => c.GetPortalAlias(SomeAlias, PortalId))
                 .Returns(() => null);
@@ -98,6 +106,7 @@ namespace Dnn.PersonaBar.Security.Tests.Services
                 c =>
                 c.AddPortalAlias(It.Is<IPortalAliasInfo>(match =>
                     match.HttpAlias == SomeAlias && match.PortalId == PortalId)), Times.Once);
+					permissionProviderMock.LogDebug("<<< Exiting Services_Controller_AddPortalAlias_WhenAliasDoesNotExist_AddIsInvoked()");
         }
     }
 }

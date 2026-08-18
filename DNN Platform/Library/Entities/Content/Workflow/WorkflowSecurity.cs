@@ -23,6 +23,7 @@ namespace DotNetNuke.Entities.Content.Workflow
     public class WorkflowSecurity(IPermissionDefinitionService permissionDefinitionService, IUserController userController, IWorkflowManager workflowManager)
         : ServiceLocator<IWorkflowSecurity, WorkflowSecurity>, IWorkflowSecurity
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(WorkflowSecurity));
         private const string ReviewPermissionKey = "REVIEW";
         private const string ReviewPermissionCode = "SYSTEM_CONTENTWORKFLOWSTATE";
         private const string ContentManagers = "Content Managers";
@@ -36,7 +37,9 @@ namespace DotNetNuke.Entities.Content.Workflow
         public WorkflowSecurity()
             : this(null, UserController.Instance, WorkflowManager.Instance)
         {
+		Logger.LogDebug(">>> Entering WorkflowSecurity()");
         }
+		Logger.LogDebug("<<< Exiting WorkflowSecurity()");
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
@@ -48,6 +51,7 @@ namespace DotNetNuke.Entities.Content.Workflow
         {
             var permissions = this.statePermissionsRepository.GetWorkflowStatePermissionByState(stateId);
 
+			Logger.LogDebug("<<< Exiting HasStateReviewerPermission(stateId={StateId})", stateId);
             return user.IsSuperUser ||
                 PortalSecurity.IsInRoles(user, settings, settings.AdministratorRoleName) ||
                 PortalSecurity.IsInRoles(user, settings, ContentManagers) ||
@@ -59,6 +63,8 @@ namespace DotNetNuke.Entities.Content.Workflow
         {
             var user = this.userController.GetUserById(portalId, userId);
             var portalSettings = new PortalSettings(portalId);
+			Logger.LogDebug("HasStateReviewerPermission(portalId={PortalId},userId={UserId},stateId={StateId}): user → {User}", portalId, userId, stateId, user);
+			Logger.LogDebug("<<< Exiting HasStateReviewerPermission(portalId={PortalId},userId={UserId},stateId={StateId})", portalId, userId, stateId);
             return this.HasStateReviewerPermission(portalSettings, user, stateId);
         }
 
@@ -66,25 +72,33 @@ namespace DotNetNuke.Entities.Content.Workflow
         public bool HasStateReviewerPermission(int stateId)
         {
             var user = this.userController.GetCurrentUserInfo();
+			Logger.LogDebug("HasStateReviewerPermission(stateId={StateId}): user → {User}", stateId, user);
             return this.HasStateReviewerPermission(PortalSettings.Current, user, stateId);
         }
 
         /// <inheritdoc />
         public bool IsWorkflowReviewer(int workflowId, int userId)
         {
+			Logger.LogDebug(">>> Entering IsWorkflowReviewer(workflowId={WorkflowId},userId={UserId})", workflowId, userId);
             var workflow = this.workflowManager.GetWorkflow(workflowId);
+			Logger.LogDebug("IsWorkflowReviewer(workflowId={WorkflowId},userId={UserId}): workflow → {Workflow}", workflowId, userId, workflow);
+			Logger.LogDebug("<<< Exiting IsWorkflowReviewer(workflowId={WorkflowId},userId={UserId})", workflowId, userId);
             return workflow.States.Any(contentWorkflowState => this.HasStateReviewerPermission(workflow.PortalID, userId, contentWorkflowState.StateID));
         }
 
         /// <inheritdoc />
         public PermissionInfo GetStateReviewPermission()
         {
+			Logger.LogDebug(">>> Entering GetStateReviewPermission()");
+			Logger.LogDebug("<<< Exiting GetStateReviewPermission()");
             return this.permissionDefinitionService.GetDefinitionsByCodeAndKey(ReviewPermissionCode, ReviewPermissionKey).OfType<PermissionInfo>().FirstOrDefault();
         }
 
         /// <inheritdoc />
         protected override Func<IWorkflowSecurity> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return Globals.DependencyProvider.GetRequiredService<IWorkflowSecurity>;
         }
     }

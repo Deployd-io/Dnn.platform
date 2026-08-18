@@ -6,10 +6,12 @@ import Localization from "../../localization";
 import SearchAdvanced from "./SearchAdvanced";
 import SearchResultCard from "./SearchResultCard";
 import LazyLoad from "./LazyLoad/LazyLoad";
+const logger = console;
 
 class SearchResult extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             pageList:[],
             page:0
@@ -18,12 +20,14 @@ class SearchResult extends Component {
     }
 
     loadMore(page) {
+		logger.debug(`>>> Entering loadMore(page=${page})`);
         if (this.props.filtersUpdated) {
             this.props.onSearchScroll(0);
             this.setState({
                 page:0
             });
         } else {
+			logger.debug(`<<< Exiting loadMore(page=${page})`);
             this.props.onSearchScroll(page);
             this.setState({
                 page:page
@@ -32,19 +36,23 @@ class SearchResult extends Component {
     }
 
     hasMoreItems() {
+		logger.debug('>>> Entering hasMoreItems()');
         if (this.props.searchResult.TotalResults === this.props.searchList.length) {
             return false;
         }
         else {
+			logger.debug('<<< Exiting hasMoreItems()');
             return true;
         }
     }
     
      
     render() {
+		logger.debug('>>> Entering render()');
         const { searchResult, searchList } = this.props;
         const loader = <div key={-1} className={"lazy-loading"} ></div>;
 
+		logger.debug('<<< Exiting render()');
         return ((this.props.searchResult !== null)?
             <GridCell columnSize={100} className="fade-in">
                 <GridCell columnSize={100} style={{ padding: "20px" }}>
@@ -135,6 +143,8 @@ SearchResult.propTypes = {
 };
 
 const mapStateToProps = (state) => {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         pageInContextComponents : state.extensions.pageInContextComponents,
         searchResult : state.searchList.searchResult,

@@ -9,6 +9,7 @@ namespace DotNetNuke.Web.Components
     /// <summary>Localization helper for the control bar.</summary>
     public class LocalizationHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LocalizationHelper));
         private const string ResourceFile = "admin/ControlPanel/App_LocalResources/ControlBar";
 
         /// <summary>Gets the localized string corresponding to the <paramref name="key"/>, for the control bar.</summary>
@@ -16,6 +17,8 @@ namespace DotNetNuke.Web.Components
         /// <returns>The localized Text.</returns>
         public static string GetControlBarString(string key)
         {
+			Logger.LogDebug(">>> Entering GetControlBarString(key={Key})", key);
+			Logger.LogDebug("<<< Exiting GetControlBarString(key={Key})", key);
             return Localization.GetString(key, ResourceFile);
         }
     }

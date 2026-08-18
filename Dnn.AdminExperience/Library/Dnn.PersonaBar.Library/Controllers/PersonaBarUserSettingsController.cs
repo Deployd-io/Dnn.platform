@@ -16,6 +16,7 @@ namespace Dnn.PersonaBar.Library.Controllers
 
     public class PersonaBarUserSettingsController : ServiceLocator<IPersonaBarUserSettingsController, PersonaBarUserSettingsController>, IPersonaBarUserSettingsController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PersonaBarUserSettingsController));
         private const string ContainerName = "AdminPersonaBar";
         private const string UserSettingsKey = "UserSettings";
         private readonly PersonalizationController personalizationController;
@@ -24,13 +25,16 @@ namespace Dnn.PersonaBar.Library.Controllers
         public PersonaBarUserSettingsController()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering PersonaBarUserSettingsController()");
         }
+		Logger.LogDebug("<<< Exiting PersonaBarUserSettingsController()");
 
         /// <summary>Initializes a new instance of the <see cref="PersonaBarUserSettingsController"/> class.</summary>
         /// <param name="personalizationController">The personalization controller.</param>
         public PersonaBarUserSettingsController(PersonalizationController personalizationController)
         {
             this.personalizationController = personalizationController ?? Globals.GetCurrentServiceProvider().GetRequiredService<PersonalizationController>();
+			Logger.LogDebug("PersonaBarUserSettingsController(personalizationController={PersonalizationController}): personalizationController → {PersonalizationController1}", personalizationController, personalizationController);
         }
 
         /// <inheritdoc />
@@ -39,18 +43,26 @@ namespace Dnn.PersonaBar.Library.Controllers
             var personalizationInfo = this.personalizationController.LoadProfile(userId, portalId);
             Personalization.SetProfile(personalizationInfo, ContainerName, UserSettingsKey, settings);
             this.personalizationController.SaveProfile(personalizationInfo);
+			Logger.LogDebug("<<< Exiting UpdatePersonaBarUserSettings(settings={Settings},userId={UserId},portalId={PortalId})", settings, userId, portalId);
         }
 
         /// <inheritdoc />
         public UserSettings GetPersonaBarUserSettings()
         {
+			Logger.LogDebug(">>> Entering GetPersonaBarUserSettings()");
             var settings = (UserSettings)Personalization.GetProfile(ContainerName, UserSettingsKey);
+			Logger.LogDebug("GetPersonaBarUserSettings(): settings → {Settings}", settings);
+			Logger.LogDebug("<<< Exiting GetPersonaBarUserSettings()");
             return settings ?? GetDefaultSettings();
         }
 
         /// <inheritdoc />
         protected override Func<IPersonaBarUserSettingsController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
+			Logger.LogDebug(">>> Entering GetDefaultSettings()");
+			Logger.LogDebug("<<< Exiting GetDefaultSettings()");
             return () => Globals.GetCurrentServiceProvider().GetRequiredService<IPersonaBarUserSettingsController>();
         }
 

@@ -29,25 +29,33 @@ namespace DotNetNuke.Tests.Web.Api
         [SetUp]
         public void SetUp()
         {
+			eventLogger.LogDebug(">>> Entering SetUp()");
             this.mockPortalAliasService = new Mock<IPortalAliasService>();
             this.mockPortalAliasService.As<IPortalAliasController>();
+			eventLogger.LogDebug("SetUp(): mockPortalAliasService → {MockPortalAliasService}", mockPortalAliasService);
 
             this.serviceProvider = FakeServiceProvider.Setup(
                 services =>
                 {
+					eventLogger.LogDebug("SetUp(): serviceProvider → {ServiceProvider}", serviceProvider);
                     services.AddSingleton(this.mockPortalAliasService.Object);
                 });
+				eventLogger.LogDebug("<<< Exiting SetUp()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			eventLogger.LogDebug(">>> Entering TearDown()");
             this.serviceProvider.Dispose();
 
             this.mockPortalAliasService = null;
+			eventLogger.LogDebug("TearDown(): mockPortalAliasService → {MockPortalAliasService}", mockPortalAliasService);
+			eventLogger.LogDebug("TearDown(): this.mockPortalAliasService → {Arg0}", this.mockPortalAliasService);
 
             PortalController.ClearInstance();
             TestableGlobals.ClearInstance();
+			eventLogger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
@@ -64,6 +72,7 @@ namespace DotNetNuke.Tests.Web.Api
 
             // Assert
             Assert.That(result, Is.EqualTo(expected));
+			eventLogger.LogDebug("<<< Exiting GetRouteUrl(moduleFolderName={ModuleFolderName},url={Url},count={Count},expected={Expected})", moduleFolderName, url, count, expected);
         }
 
         [Test]
@@ -71,6 +80,7 @@ namespace DotNetNuke.Tests.Web.Api
         [TestCase("name", -1, typeof(ArgumentOutOfRangeException), "count should be >= 0")]
         public void GetRouteUrlThrowsOnBadArguments(string moduleFolderName, int count, Type expectedException, string message)
         {
+			eventLogger.LogDebug(">>> Entering GetRouteUrlThrowsOnBadArguments(moduleFolderName={ModuleFolderName},count={Count},expectedException={ExpectedException},message={Message})", moduleFolderName, count, expectedException, message);
             // Arrange
 
             // Act
@@ -80,6 +90,7 @@ namespace DotNetNuke.Tests.Web.Api
             }
             catch (Exception e)
             {
+				eventLogger.LogError("Exception in GetRouteUrlThrowsOnBadArguments(moduleFolderName={ModuleFolderName},count={Count},expectedException={ExpectedException},message={Message}): {Arg4}", moduleFolderName, count, expectedException, message, e.Message);
                 if (e.GetType() == expectedException)
                 {
                     Assert.Pass();
@@ -89,13 +100,16 @@ namespace DotNetNuke.Tests.Web.Api
 
             // Assert
             Assert.Fail(message);
+			eventLogger.LogDebug("<<< Exiting GetRouteUrlThrowsOnBadArguments(moduleFolderName={ModuleFolderName},count={Count},expectedException={ExpectedException},message={Message})", moduleFolderName, count, expectedException, message);
         }
 
         [Test]
         public void ParentPortalOnVirtualDirReturnsAnEmptyPrefix()
         {
+			eventLogger.LogDebug(">>> Entering ParentPortalOnVirtualDirReturnsAnEmptyPrefix()");
             // Arrange
             var mockPortalController = new Mock<IPortalController>();
+			eventLogger.LogDebug("ParentPortalOnVirtualDirReturnsAnEmptyPrefix(): mockPortalController → {MockPortalController}", mockPortalController);
             var portals = new ArrayList { new PortalInfo { PortalID = 1 } };
             mockPortalController.Setup(x => x.GetPortals()).Returns(portals);
             PortalController.SetTestableInstance(mockPortalController.Object);
@@ -110,21 +124,26 @@ namespace DotNetNuke.Tests.Web.Api
                 });
 
             var mockGlobals = new Mock<IGlobals>();
+			eventLogger.LogDebug("ParentPortalOnVirtualDirReturnsAnEmptyPrefix(): mockGlobals → {MockGlobals}", mockGlobals);
             mockGlobals.Setup(x => x.ApplicationPath).Returns("/vdir");
             TestableGlobals.SetTestableInstance(mockGlobals.Object);
 
             // Act
             List<int> prefixes = new PortalAliasRouteManager().GetRoutePrefixCounts().ToList();
+			eventLogger.LogDebug("ParentPortalOnVirtualDirReturnsAnEmptyPrefix(): prefixes → {Prefixes}", prefixes);
 
             // Assert
             Assert.That(prefixes, Is.EquivalentTo(new[] { 0 }));
+			eventLogger.LogDebug("<<< Exiting ParentPortalOnVirtualDirReturnsAnEmptyPrefix()");
         }
 
         [Test]
         public void SingleParentPortalReturnsAnEmptyPrefix()
         {
+			eventLogger.LogDebug(">>> Entering SingleParentPortalReturnsAnEmptyPrefix()");
             // Arrange
             var mockPortalController = new Mock<IPortalController>();
+			eventLogger.LogDebug("SingleParentPortalReturnsAnEmptyPrefix(): mockPortalController → {MockPortalController}", mockPortalController);
             var portals = new ArrayList { new PortalInfo { PortalID = 1 } };
             mockPortalController.Setup(x => x.GetPortals()).Returns(portals);
             PortalController.SetTestableInstance(mockPortalController.Object);
@@ -139,21 +158,26 @@ namespace DotNetNuke.Tests.Web.Api
                 });
 
             var mockGlobals = new Mock<IGlobals>();
+			eventLogger.LogDebug("SingleParentPortalReturnsAnEmptyPrefix(): mockGlobals → {MockGlobals}", mockGlobals);
             mockGlobals.Setup(x => x.ApplicationPath).Returns(string.Empty);
             TestableGlobals.SetTestableInstance(mockGlobals.Object);
 
             // Act
             List<int> prefixes = new PortalAliasRouteManager().GetRoutePrefixCounts().ToList();
+			eventLogger.LogDebug("SingleParentPortalReturnsAnEmptyPrefix(): prefixes → {Prefixes}", prefixes);
 
             // Assert
             Assert.That(prefixes, Is.EquivalentTo(new[] { 0 }));
+			eventLogger.LogDebug("<<< Exiting SingleParentPortalReturnsAnEmptyPrefix()");
         }
 
         [Test]
         public void PrefixCountsAreCached()
         {
+			eventLogger.LogDebug(">>> Entering PrefixCountsAreCached()");
             // Arrange
             var mockPortalController = new Mock<IPortalController>();
+			eventLogger.LogDebug("PrefixCountsAreCached(): mockPortalController → {MockPortalController}", mockPortalController);
             var portals = new ArrayList { new PortalInfo { PortalID = 1 } };
             mockPortalController.Setup(x => x.GetPortals()).Returns(portals);
             PortalController.SetTestableInstance(mockPortalController.Object);
@@ -162,23 +186,28 @@ namespace DotNetNuke.Tests.Web.Api
             this.mockPortalAliasService.As<IPortalAliasController>().Setup(x => x.GetPortalAliasesByPortalId(It.IsAny<int>())).Returns(new[] { new PortalAliasInfo { HTTPAlias = "valid.lvh.me" } });
 
             var mockGlobals = new Mock<IGlobals>();
+			eventLogger.LogDebug("PrefixCountsAreCached(): mockGlobals → {MockGlobals}", mockGlobals);
             mockGlobals.Setup(x => x.ApplicationPath).Returns(string.Empty);
             TestableGlobals.SetTestableInstance(mockGlobals.Object);
 
             // Act
             var parm = new PortalAliasRouteManager();
+			eventLogger.LogDebug("PrefixCountsAreCached(): parm → {Parm}", parm);
             parm.GetRoutePrefixCounts();
             parm.GetRoutePrefixCounts();
 
             // Assert
             mockPortalController.Verify(x => x.GetPortals(), Times.Once());
+			eventLogger.LogDebug("<<< Exiting PrefixCountsAreCached()");
         }
 
         [Test]
         public void PrefixCountsCacheCanBeCleared()
         {
+			eventLogger.LogDebug(">>> Entering PrefixCountsCacheCanBeCleared()");
             // Arrange
             var mockPortalController = new Mock<IPortalController>();
+			eventLogger.LogDebug("PrefixCountsCacheCanBeCleared(): mockPortalController → {MockPortalController}", mockPortalController);
             var portals = new ArrayList { new PortalInfo { PortalID = 1 } };
             mockPortalController.Setup(x => x.GetPortals()).Returns(portals);
             PortalController.SetTestableInstance(mockPortalController.Object);
@@ -187,24 +216,29 @@ namespace DotNetNuke.Tests.Web.Api
             this.mockPortalAliasService.As<IPortalAliasController>().Setup(x => x.GetPortalAliasesByPortalId(It.IsAny<int>())).Returns(new[] { new PortalAliasInfo { HTTPAlias = "valid.lvh.me" } });
 
             var mockGlobals = new Mock<IGlobals>();
+			eventLogger.LogDebug("PrefixCountsCacheCanBeCleared(): mockGlobals → {MockGlobals}", mockGlobals);
             mockGlobals.Setup(x => x.ApplicationPath).Returns(string.Empty);
             TestableGlobals.SetTestableInstance(mockGlobals.Object);
 
             // Act
             var parm = new PortalAliasRouteManager();
+			eventLogger.LogDebug("PrefixCountsCacheCanBeCleared(): parm → {Parm}", parm);
             parm.GetRoutePrefixCounts();
             parm.ClearCachedData();
             parm.GetRoutePrefixCounts();
 
             // Assert
             mockPortalController.Verify(x => x.GetPortals(), Times.Exactly(2));
+			eventLogger.LogDebug("<<< Exiting PrefixCountsCacheCanBeCleared()");
         }
 
         [Test]
         public void VirtralDirWithChildPortalHasABlankAndASinglePrefix()
         {
+			eventLogger.LogDebug(">>> Entering VirtralDirWithChildPortalHasABlankAndASinglePrefix()");
             // Arrange
             var mockPortalController = new Mock<IPortalController>();
+			eventLogger.LogDebug("VirtralDirWithChildPortalHasABlankAndASinglePrefix(): mockPortalController → {MockPortalController}", mockPortalController);
             var portals = new ArrayList { new PortalInfo { PortalID = 1 } };
             mockPortalController.Setup(x => x.GetPortals()).Returns(portals);
             PortalController.SetTestableInstance(mockPortalController.Object);
@@ -222,14 +256,17 @@ namespace DotNetNuke.Tests.Web.Api
                 });
 
             var mockGlobals = new Mock<IGlobals>();
+			eventLogger.LogDebug("VirtralDirWithChildPortalHasABlankAndASinglePrefix(): mockGlobals → {MockGlobals}", mockGlobals);
             mockGlobals.Setup(x => x.ApplicationPath).Returns("/vdir");
             TestableGlobals.SetTestableInstance(mockGlobals.Object);
 
             // Act
             List<int> prefixes = new PortalAliasRouteManager().GetRoutePrefixCounts().ToList();
+			eventLogger.LogDebug("VirtralDirWithChildPortalHasABlankAndASinglePrefix(): prefixes → {Prefixes}", prefixes);
 
             // Assert
             Assert.That(prefixes, Is.EqualTo(new[] { 1, 0 }).AsCollection);
+			eventLogger.LogDebug("<<< Exiting VirtralDirWithChildPortalHasABlankAndASinglePrefix()");
         }
 
         [Test]
@@ -245,6 +282,7 @@ namespace DotNetNuke.Tests.Web.Api
 
             // Assert
             Assert.That(result, Is.EqualTo(expected));
+			eventLogger.LogDebug("<<< Exiting GetRouteNameHashesNameInCorrectFormat(moduleFolderName={ModuleFolderName},routeName={RouteName},count={Count},expected={Expected})", moduleFolderName, routeName, count, expected);
         }
 
         [Test]
@@ -260,6 +298,7 @@ namespace DotNetNuke.Tests.Web.Api
 
             // Assert
             Assert.That(result, Is.EqualTo(expected));
+			eventLogger.LogDebug("<<< Exiting GetRouteNameWithPortalAliasInfoHashesNameInCorrectFormat(moduleFolderName={ModuleFolderName},routeName={RouteName},httpAlias={HttpAlias},expected={Expected})", moduleFolderName, routeName, httpAlias, expected);
         }
 
         [Test]
@@ -267,28 +306,33 @@ namespace DotNetNuke.Tests.Web.Api
         [TestCase(null)]
         public void GetRouteNameThrowsOnEmptyModuleFolderName(string moduleFolderName)
         {
+			eventLogger.LogDebug(">>> Entering GetRouteNameThrowsOnEmptyModuleFolderName(moduleFolderName={ModuleFolderName})", moduleFolderName);
             // Arrange
 
             // Act
             Assert.Throws<ArgumentException>(() => new PortalAliasRouteManager().GetRouteName(moduleFolderName, string.Empty, 0));
 
             // Assert
+			eventLogger.LogDebug("<<< Exiting GetRouteNameThrowsOnEmptyModuleFolderName(moduleFolderName={ModuleFolderName})", moduleFolderName);
         }
 
         [Test]
         public void GetRouteNameThrowsOnCountLessThan0()
         {
+			eventLogger.LogDebug(">>> Entering GetRouteNameThrowsOnCountLessThan0()");
             // Arrange
 
             // Act
             Assert.Throws<ArgumentOutOfRangeException>(() => new PortalAliasRouteManager().GetRouteName("foo", string.Empty, -1));
 
             // Assert
+			eventLogger.LogDebug("<<< Exiting GetRouteNameThrowsOnCountLessThan0()");
         }
 
         [Test]
         public void GetAllRouteValuesWorksWithNullRouteValues()
         {
+			eventLogger.LogDebug(">>> Entering GetAllRouteValuesWorksWithNullRouteValues()");
             // Arrange
 
             // Act
@@ -296,11 +340,13 @@ namespace DotNetNuke.Tests.Web.Api
 
             // Assert
             Assert.Pass();
+			eventLogger.LogDebug("<<< Exiting GetAllRouteValuesWorksWithNullRouteValues()");
         }
 
         [Test]
         public void GetAllRouteValuesPreservesPassedInRouteValues()
         {
+			eventLogger.LogDebug(">>> Entering GetAllRouteValuesPreservesPassedInRouteValues()");
             // Arrange
 
             // Act
@@ -310,12 +356,15 @@ namespace DotNetNuke.Tests.Web.Api
 
             // Assert
             var expected = new Dictionary<string, object> { { "value1", 1 }, { "value2", 2 } };
+			eventLogger.LogDebug("GetAllRouteValuesPreservesPassedInRouteValues(): expected → {Expected}", expected);
             Assert.That(result, Is.EquivalentTo(expected));
+			eventLogger.LogDebug("<<< Exiting GetAllRouteValuesPreservesPassedInRouteValues()");
         }
 
         [Test]
         public void GetAllRouteValuesExtractsChildPortalParams()
         {
+			eventLogger.LogDebug(">>> Entering GetAllRouteValuesExtractsChildPortalParams()");
             // Arrange
 
             // Act
@@ -326,12 +375,15 @@ namespace DotNetNuke.Tests.Web.Api
 
             // Assert
             var expected = new Dictionary<string, object> { { "prefix0", "child" } };
+			eventLogger.LogDebug("GetAllRouteValuesExtractsChildPortalParams(): expected → {Expected}", expected);
             Assert.That(result, Is.EquivalentTo(expected));
+			eventLogger.LogDebug("<<< Exiting GetAllRouteValuesExtractsChildPortalParams()");
         }
 
         [Test]
         public void GetAllRouteValuesExtractsManyChildPortalParamsAndPreservesRouteValues()
         {
+			eventLogger.LogDebug(">>> Entering GetAllRouteValuesExtractsManyChildPortalParamsAndPreservesRouteValues()");
             // Arrange
 
             // Act
@@ -342,7 +394,9 @@ namespace DotNetNuke.Tests.Web.Api
 
             // Assert
             var expected = new Dictionary<string, object> { { "prefix0", "child0" }, { "prefix1", "child1" }, { "prefix2", "child2" }, { "prefix3", "child3" }, { "value1", 1 }, { "value2", 2 } };
+			eventLogger.LogDebug("GetAllRouteValuesExtractsManyChildPortalParamsAndPreservesRouteValues(): expected → {Expected}", expected);
             Assert.That(result, Is.EquivalentTo(expected));
+			eventLogger.LogDebug("<<< Exiting GetAllRouteValuesExtractsManyChildPortalParamsAndPreservesRouteValues()");
         }
     }
 }

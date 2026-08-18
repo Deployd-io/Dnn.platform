@@ -516,17 +516,20 @@ namespace DotNetNuke.Services.Log.EventLog
         public static partial void AddSettingLog(EventLogType logTypeKey, string idFieldName, int idValue, string settingName, string settingValue, int userId) =>
             Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>()
                 .AddSettingLog((Abstractions.Logging.EventLogType)logTypeKey, idFieldName, idValue, settingName, settingValue, userId);
+			cref.LogDebug(">>> Entering AddSettingLog(logTypeKey={LogTypeKey},idFieldName={IdFieldName},idValue={IdValue},settingName={SettingName},settingValue={SettingValue},userId={UserId})", logTypeKey, idFieldName, idValue, settingName, settingValue, userId);
 
         /// <inheritdoc cref="IEventLogger.AddLog(string,string,DotNetNuke.Abstractions.Logging.EventLogType)"/>
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.Logging.IEventLogger' instead")]
         public partial void AddLog(string propertyName, string propertyValue, EventLogType logType) =>
             this.EventLogger.AddLog(propertyName, propertyValue, (Abstractions.Logging.EventLogType)logType);
+			cref.LogDebug(">>> Entering AddLog(propertyName={PropertyName},propertyValue={PropertyValue},logType={LogType})", propertyName, propertyValue, logType);
 
         /// <inheritdoc cref="IEventLogger.AddLog(string,string,DotNetNuke.Abstractions.Logging.EventLogType)"/>
         [DnnDeprecated(9, 7, 0, "It has been replaced by the overload taking IPortalSettings")]
         public partial void AddLog(string propertyName, string propertyValue, PortalSettings portalSettings, int userID, EventLogType logType) =>
             this.AddLog(propertyName, propertyValue, (IPortalSettings)portalSettings, userID, logType);
 
+		cref.LogDebug("<<< Exiting AddLog(propertyName={PropertyName},propertyValue={PropertyValue},logType={LogType})", propertyName, propertyValue, logType);
         /// <inheritdoc cref="IEventLogger.AddLog(string,string,DotNetNuke.Abstractions.Logging.EventLogType)"/>
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.Logging.IEventLogger' instead")]
         public partial void AddLog(string propertyName, string propertyValue, IPortalSettings portalSettings, int userID, EventLogType logType) =>
@@ -591,6 +594,7 @@ namespace DotNetNuke.Services.Log.EventLog
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.Logging.IEventLogConfigService' instead")]
         public partial void AddLogType(string configFile, string fallbackConfigFile) =>
             this.EventLogConfigService.AddLogType(configFile, fallbackConfigFile);
+			cref.LogDebug(">>> Entering AddLogType(configFile={ConfigFile},fallbackConfigFile={FallbackConfigFile})", configFile, fallbackConfigFile);
 
         /// <inheritdoc cref="IEventLogConfigService.AddLogType(string,string)"/>
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.Logging.IEventLogConfigService' instead")]
@@ -601,41 +605,49 @@ namespace DotNetNuke.Services.Log.EventLog
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.Logging.IEventLogConfigService' instead")]
         public partial void AddLogTypeConfigInfo(LogTypeConfigInfo logTypeConfig) =>
             this.EventLogConfigService.AddLogTypeConfigInfo(logTypeConfig);
+			cref.LogDebug(">>> Entering AddLogTypeConfigInfo(logTypeConfig={LogTypeConfig})", logTypeConfig);
 
         /// <inheritdoc cref="IEventLogService.ClearLog"/>
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.Logging.IEventLogService' instead")]
         public partial void ClearLog() =>
             this.EventLogService.ClearLog();
+			cref.LogDebug(">>> Entering ClearLog()");
 
         /// <inheritdoc cref="IEventLogService.DeleteLog"/>
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.Logging.IEventLogService' instead")]
         public partial void DeleteLog(LogInfo logInfo) =>
             this.EventLogService.DeleteLog(logInfo);
+			cref.LogDebug(">>> Entering DeleteLog(logInfo={LogInfo})", logInfo);
 
         /// <inheritdoc cref="IEventLogConfigService.DeleteLogType"/>
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.Logging.IEventLogConfigService' instead")]
         public partial void DeleteLogType(LogTypeInfo logType) =>
             this.EventLogConfigService.DeleteLogType(logType);
+			cref.LogDebug(">>> Entering DeleteLogType(logType={LogType})", logType);
 
         /// <inheritdoc cref="IEventLogConfigService.DeleteLogTypeConfigInfo"/>
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.Logging.IEventLogConfigService' instead")]
         public partial void DeleteLogTypeConfigInfo(LogTypeConfigInfo logTypeConfig) =>
             this.EventLogConfigService.DeleteLogTypeConfigInfo(logTypeConfig);
+			cref.LogDebug(">>> Entering DeleteLogTypeConfigInfo(logTypeConfig={LogTypeConfig})", logTypeConfig);
 
         /// <inheritdoc cref="IEventLogService.GetLogs"/>
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.Logging.IEventLogService' instead")]
         public partial List<LogInfo> GetLogs(int portalID, string logType, int pageSize, int pageIndex, ref int totalRecords) =>
             this.EventLogService.GetLogs(portalID, logType, pageSize, pageIndex, ref totalRecords).Cast<LogInfo>().ToList();
+			cref.LogDebug(">>> Entering GetLogs(portalID={PortalID},logType={LogType},pageSize={PageSize},pageIndex={PageIndex},totalRecords={TotalRecords})", portalID, logType, pageSize, pageIndex, totalRecords);
 
         /// <inheritdoc cref="ILogController.GetLogTypeConfigInfo"/>
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.Logging.IEventLogConfigService' instead")]
         public partial ArrayList GetLogTypeConfigInfo() =>
             LogController.Instance.GetLogTypeConfigInfo();
+			cref.LogDebug(">>> Entering GetLogTypeConfigInfo()");
 
         /// <inheritdoc cref="IEventLogConfigService.GetLogTypeConfigInfoByID"/>
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.Logging.IEventLogConfigService' instead")]
         public partial LogTypeConfigInfo GetLogTypeConfigInfoByID(string id) =>
             (LogTypeConfigInfo)this.EventLogConfigService.GetLogTypeConfigInfoByID(id);
+			cref.LogDebug(">>> Entering GetLogTypeConfigInfoByID(id={Id})", id);
 
         /// <inheritdoc cref="IEventLogConfigService.GetLogTypeInfoDictionary"/>
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.Logging.IEventLogConfigService' instead")]
@@ -648,21 +660,25 @@ namespace DotNetNuke.Services.Log.EventLog
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.Logging.IEventLogService.GetLog()' instead")]
         public partial object GetSingleLog(LogInfo log, LoggingProvider.ReturnType returnType) =>
             LogController.Instance.GetSingleLog(log, returnType);
+			cref.LogDebug(">>> Entering GetSingleLog(log={Log},returnType={ReturnType})", log, returnType);
 
         /// <inheritdoc cref="IEventLogService.PurgeLogBuffer"/>
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.Logging.IEventLogService' instead")]
         public partial void PurgeLogBuffer() =>
             this.EventLogService.PurgeLogBuffer();
+			cref.LogDebug(">>> Entering PurgeLogBuffer()");
 
         /// <inheritdoc cref="IEventLogConfigService.UpdateLogTypeConfigInfo"/>
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.Logging.IEventLogConfigService' instead")]
         public virtual partial void UpdateLogTypeConfigInfo(LogTypeConfigInfo logTypeConfig) =>
             this.EventLogConfigService.UpdateLogTypeConfigInfo(logTypeConfig);
+			cref.LogDebug(">>> Entering UpdateLogTypeConfigInfo(logTypeConfig={LogTypeConfig})", logTypeConfig);
 
         /// <inheritdoc cref="IEventLogConfigService.UpdateLogType"/>
         [DnnDeprecated(9, 8, 0, "Use Dependency Injection to resolve 'DotNetNuke.Abstractions.Logging.IEventLogConfigService' instead")]
         public virtual partial void UpdateLogType(LogTypeInfo logType) =>
             this.EventLogConfigService.UpdateLogType(logType);
+			cref.LogDebug(">>> Entering UpdateLogType(logType={LogType})", logType);
 
         /// <inheritdoc />
         protected override Func<IEventLogController> GetFactory() => () => new EventLogController();

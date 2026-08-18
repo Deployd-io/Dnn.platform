@@ -15,11 +15,15 @@ namespace DotNetNuke.Tests.Core.Providers.Folder
         [Test]
         public void GetDefaultProviders_Should_Return_3_Valid_Providers()
         {
+			mockEventLogger.LogDebug(">>> Entering GetDefaultProviders_Should_Return_3_Valid_Providers()");
             var expectedValues = new List<string> { "StandardFolderProvider", "SecureFolderProvider", "DatabaseFolderProvider" };
 
+			mockEventLogger.LogDebug("GetDefaultProviders_Should_Return_3_Valid_Providers(): expectedValues → {ExpectedValues}", expectedValues);
             var defaultProviders = DefaultFolderProviders.GetDefaultProviders();
+			mockEventLogger.LogDebug("GetDefaultProviders_Should_Return_3_Valid_Providers(): defaultProviders → {DefaultProviders}", defaultProviders);
 
             Assert.That(defaultProviders, Is.EqualTo(expectedValues).AsCollection);
+			mockEventLogger.LogDebug("<<< Exiting GetDefaultProviders_Should_Return_3_Valid_Providers()");
         }
     }
 }

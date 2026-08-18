@@ -5,12 +5,17 @@
 namespace DotNetNuke.Tests.Web.Mvc.Fakes.Filters
 {
     using System.Web.Mvc;
+	using Microsoft.Extensions.Logging;
 
     public class FakeOnExecutingRedirectAttribute : FakeRedirectAttribute
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
+			_logger.LogDebug(">>> Entering OnActionExecuting(filterContext={FilterContext})", filterContext);
+			_logger.LogDebug("OnActionExecuting(filterContext={FilterContext}): filterContext.Result → {Arg1}", filterContext, filterContext.Result);
             filterContext.Result = Result;
+			_logger.LogDebug("<<< Exiting OnActionExecuting(filterContext={FilterContext})", filterContext);
         }
     }
 }

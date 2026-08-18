@@ -14,25 +14,33 @@ namespace DotNetNuke.Tests.Core.Controllers.Messaging.Mocks
     {
         internal static IDataReader CreateEmptySubscriptionReader()
         {
+			mockEventLogger.LogDebug(">>> Entering CreateEmptySubscriptionReader()");
+			mockEventLogger.LogDebug("<<< Exiting CreateEmptySubscriptionReader()");
             return CreateSubscriptionTable().CreateDataReader();
         }
 
         internal static IDataReader CreateSubscriptionReader(IEnumerable<Subscription> subscriptions)
         {
+			mockEventLogger.LogDebug(">>> Entering CreateSubscriptionReader(subscriptions={Subscriptions})", subscriptions);
             var datatable = CreateSubscriptionTable();
             foreach (var subscription in subscriptions)
             {
+			mockEventLogger.LogDebug("CreateSubscriptionReader(subscriptions={Subscriptions}): datatable → {Datatable}", subscriptions, datatable);
                 AddSubscriptionToTable(datatable, subscription);
             }
 
+			mockEventLogger.LogDebug("<<< Exiting CreateSubscriptionReader(subscriptions={Subscriptions})", subscriptions);
             return datatable.CreateDataReader();
         }
 
         private static DataTable CreateSubscriptionTable()
         {
+			mockEventLogger.LogDebug(">>> Entering CreateSubscriptionTable()");
             var table = new DataTable();
 
+			mockEventLogger.LogDebug("CreateSubscriptionTable(): table → {Table}", table);
             var idColumn = table.Columns.Add("SubscriptionId", typeof(int));
+			mockEventLogger.LogDebug("CreateSubscriptionTable(): idColumn → {IdColumn}", idColumn);
             table.Columns.Add("UserId", typeof(int));
             table.Columns.Add("PortalId", typeof(int));
             table.Columns.Add("SubscriptionTypeId", typeof(int));
@@ -43,7 +51,9 @@ namespace DotNetNuke.Tests.Core.Controllers.Messaging.Mocks
             table.Columns.Add("TabId", typeof(int));
 
             table.PrimaryKey = new[] { idColumn };
+			mockEventLogger.LogDebug("CreateSubscriptionTable(): table.PrimaryKey → {Arg0}", table.PrimaryKey);
 
+			mockEventLogger.LogDebug("<<< Exiting CreateSubscriptionTable()");
             return table;
         }
 
@@ -61,6 +71,7 @@ namespace DotNetNuke.Tests.Core.Controllers.Messaging.Mocks
                 subscription.ModuleId,
                 subscription.TabId,
             });
+			mockEventLogger.LogDebug("<<< Exiting AddSubscriptionToTable(table={Table},subscription={Subscription})", table, subscription);
         }
     }
 }

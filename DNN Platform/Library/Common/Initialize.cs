@@ -41,8 +41,10 @@ namespace DotNetNuke.Common
         /// <param name="app">The app.</param>
         public static void Init(HttpApplication app)
         {
+			Logger.LogDebug(">>> Entering Init(app={App})", app);
             string redirect;
             var status = Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>().Status;
+			Logger.LogDebug("Init(app={App}): status → {Status}", app, status);
 
             // Check if app is initialised
             if (alreadyInitialized && status == UpgradeStatus.None)
@@ -66,22 +68,26 @@ namespace DotNetNuke.Common
             {
                 app.Response.Redirect(redirect, true);
             }
+			Logger.LogDebug("<<< Exiting Init(app={App})", app);
         }
 
         /// <summary>LogStart logs the Application Start Event.</summary>
         public static void LogStart()
         {
+			Logger.LogDebug(">>> Entering LogStart()");
             var log = new LogInfo
             {
                 BypassBuffering = true,
                 LogTypeKey = nameof(EventLogType.APPLICATION_START),
             };
             LogController.Instance.AddLog(log);
+			Logger.LogDebug("<<< Exiting LogStart()");
         }
 
         /// <summary>LogEnd logs the Application Start Event.</summary>
         public static void LogEnd()
         {
+			Logger.LogDebug(">>> Entering LogEnd()");
             try
             {
                 ApplicationShutdownReason shutdownReason = HostingEnvironment.ShutdownReason;
@@ -90,6 +96,7 @@ namespace DotNetNuke.Common
                 {
                     case ApplicationShutdownReason.BinDirChangeOrDirectoryRename:
                         shutdownDetail = "The AppDomain shut down because of a change to the Bin folder or files contained in it.";
+						Logger.LogDebug("LogEnd(): shutdownDetail → {ShutdownDetail}", shutdownDetail);
                         break;
                     case ApplicationShutdownReason.BrowsersDirChangeOrDirectoryRename:
                         shutdownDetail = "The AppDomain shut down because of a change to the App_Browsers folder or files contained in it.";
@@ -179,15 +186,18 @@ namespace DotNetNuke.Common
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in LogEnd(): {Arg0}", exc.getMessage());
                 Exceptions.LogException(exc);
             }
 
             var status = Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>().Status;
+			Logger.LogDebug("LogEnd(): status → {Status}", status);
             if (status != UpgradeStatus.Install)
             {
                 // purge log buffer
                 LoggingProvider.Instance().PurgeLogBuffer();
             }
+			Logger.LogDebug("<<< Exiting LogEnd()");
         }
 
         /// <summary>Tests whether this request should be processed in an HttpModule.</summary>
@@ -245,22 +255,27 @@ namespace DotNetNuke.Common
                     Exceptions.LogException(exc);
                 }
             }
+			Logger.LogDebug("<<< Exiting RunSchedule(request={Request})", request);
         }
 
         /// <summary>StartScheduler starts the Scheduler.</summary>
         /// <param name="resetAppStartElapseTime">Whether reset app start elapse time before running schedule tasks.</param>
         public static void StartScheduler(bool resetAppStartElapseTime = false)
         {
+			Logger.LogDebug(">>> Entering StartScheduler(resetAppStartElapseTime={ResetAppStartElapseTime})", resetAppStartElapseTime);
             if (resetAppStartElapseTime)
             {
                 Globals.ResetAppStartElapseTime();
             }
 
             var scheduler = SchedulingProvider.Instance();
+			Logger.LogDebug("StartScheduler(resetAppStartElapseTime={ResetAppStartElapseTime}): scheduler → {Scheduler}", resetAppStartElapseTime, scheduler);
             scheduler.RunEventSchedule(EventName.APPLICATION_START);
 
             using var scope = Globals.GetOrCreateServiceScope();
+			Logger.LogDebug("StartScheduler(resetAppStartElapseTime={ResetAppStartElapseTime}): scope → {Scope}", resetAppStartElapseTime, scope);
             var hostSettings = scope.ServiceProvider.GetRequiredService<IHostSettings>();
+			Logger.LogDebug("StartScheduler(resetAppStartElapseTime={ResetAppStartElapseTime}): hostSettings → {HostSettings}", resetAppStartElapseTime, hostSettings);
 
             // instantiate APPLICATION_START scheduled jobs
             if (hostSettings.SchedulerMode == SchedulerMode.TimerMethod)
@@ -273,17 +288,21 @@ namespace DotNetNuke.Common
                 };
                 newThread.Start();
             }
+			Logger.LogDebug("<<< Exiting StartScheduler(resetAppStartElapseTime={ResetAppStartElapseTime})", resetAppStartElapseTime);
         }
 
         /// <summary>StopScheduler stops the Scheduler.</summary>
         public static void StopScheduler()
         {
+			Logger.LogDebug(">>> Entering StopScheduler()");
             // stop scheduled jobs
             SchedulingProvider.Instance().Halt("Stopped by Application_End");
+			Logger.LogDebug("<<< Exiting StopScheduler()");
         }
 
         private static string CheckVersion(HttpApplication app)
         {
+			Logger.LogDebug(">>> Entering CheckVersion(app={App})", app);
             HttpServerUtility server = app.Server;
 
             bool autoUpgrade = Config.GetSetting("AutoUpgrade") == null || bool.Parse(Config.GetSetting("AutoUpgrade"));
@@ -356,6 +375,7 @@ namespace DotNetNuke.Common
                     break;
             }
 
+			Logger.LogDebug("<<< Exiting CheckVersion(app={App})", app);
             return retValue;
         }
 
@@ -369,17 +389,22 @@ namespace DotNetNuke.Common
                     File.Copy(server.MapPath("~/Install/UnderConstruction.template.htm"), server.MapPath("~/Install/UnderConstruction.htm"));
                 }
             }
+			Logger.LogDebug("<<< Exiting CreateUnderConstructionPage(server={Server})", server);
         }
 
         private static Version GetDatabaseEngineVersion()
         {
+			Logger.LogDebug(">>> Entering GetDatabaseEngineVersion()");
+			Logger.LogDebug("<<< Exiting GetDatabaseEngineVersion()");
             return DataProvider.Instance().GetDatabaseEngineVersion();
         }
 
         private static Version GetNETFrameworkVersion()
         {
+			Logger.LogDebug(">>> Entering GetNETFrameworkVersion()");
             // Obtain the .NET Framework version, 9.4.0 and later requires .NET 4.7.2 or later
             var version = Environment.Version.ToString(2);
+			Logger.LogDebug("GetNETFrameworkVersion(): version → {Version}", version);
 
             // If unknown version return as is.
             if (version != "4.0")
@@ -390,6 +415,7 @@ namespace DotNetNuke.Common
             // Otherwise utilize release DWORD from registry to determine version
             // Reference List: https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/versions-and-dependencies
             var release = GetDotNet4ReleaseNumberFromRegistry();
+			Logger.LogDebug("GetNETFrameworkVersion(): release → {Release}", release);
             if (release >= 533320)
             {
                 return new Version("4.8.1");
@@ -402,6 +428,7 @@ namespace DotNetNuke.Common
 
             if (release >= 461808)
             {
+			Logger.LogDebug("<<< Exiting GetNETFrameworkVersion()");
                 return new Version("4.7.2");
             }
 
@@ -410,6 +437,7 @@ namespace DotNetNuke.Common
 
         private static int GetDotNet4ReleaseNumberFromRegistry()
         {
+			Logger.LogDebug(">>> Entering GetDotNet4ReleaseNumberFromRegistry()");
             try
             {
                 using (var ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
@@ -423,14 +451,17 @@ namespace DotNetNuke.Common
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in GetDotNet4ReleaseNumberFromRegistry(): {Arg0}", Exception.Message);
                 // ignore
             }
 
+			Logger.LogDebug("<<< Exiting GetDotNet4ReleaseNumberFromRegistry()");
             return -1;
         }
 
         private static string InitializeApp(HttpApplication app, ref bool initialized)
         {
+			Logger.LogDebug(">>> Entering InitializeApp(app={App},initialized={Initialized})", app, initialized);
             var request = app.Request;
 
             Logger.Trace("Request " + request.Url.LocalPath);
@@ -441,6 +472,8 @@ namespace DotNetNuke.Common
                 // NET Framework version is needed by Upgrade
                 Globals.NETFrameworkVersion = GetNETFrameworkVersion();
                 Globals.IISAppName = request.ServerVariables["APPL_MD_PATH"];
+				Logger.LogDebug("InitializeApp(app={App},initialized={Initialized}): Globals.IISAppName → {Arg2}", app, initialized, Globals.IISAppName);
+				Logger.LogDebug("InitializeApp(app={App},initialized={Initialized}): Globals.OperatingSystemVersion → {Arg2}", app, initialized, Globals.OperatingSystemVersion);
                 Globals.OperatingSystemVersion = Environment.OSVersion.Version;
 
                 return Null.NullString;
@@ -448,6 +481,7 @@ namespace DotNetNuke.Common
 
                 // Check whether the current App Version is the same as the DB Version
             var redirect = CheckVersion(app);
+			Logger.LogDebug("InitializeApp(app={App},initialized={Initialized}): redirect → {Redirect}", app, initialized, redirect);
             if (!string.IsNullOrEmpty(redirect) || InstallBlocker.Instance.IsInstallInProgress())
             {
                 return redirect;
@@ -487,6 +521,7 @@ namespace DotNetNuke.Common
 
             initialized = true;
 
+			Logger.LogDebug("<<< Exiting InitializeApp(app={App},initialized={Initialized})", app, initialized);
             return redirect;
         }
 

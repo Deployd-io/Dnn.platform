@@ -11,9 +11,12 @@ namespace DotNetNuke.Services.Scheduling
     /// </summary>
     public class ScheduleStatusSortRemainingTimeDescending : IComparer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ScheduleStatusSortRemainingTimeDescending));
         /// <inheritdoc />
         public int Compare(object x, object y)
         {
+			Logger.LogDebug(">>> Entering Compare(x={X},y={Y})", x, y);
+			Logger.LogDebug("<<< Exiting Compare(x={X},y={Y})", x, y);
             return ((ScheduleHistoryItem)x).RemainingTime.CompareTo(((ScheduleHistoryItem)y).RemainingTime);
         }
     }

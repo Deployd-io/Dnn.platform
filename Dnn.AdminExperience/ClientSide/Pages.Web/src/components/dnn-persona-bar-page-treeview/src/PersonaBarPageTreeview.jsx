@@ -4,15 +4,20 @@ import utils from "utils";
 import "./styles.less";
 import { SingleLineInput } from "@dnnsoftware/dnn-react-common";
 import PersonaBarPageIcon from "./_PersonaBarPageIcon";
+const logger = console;
 
 export class PersonaBarPageTreeview extends Component {
 
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {};
+		logger.debug(`constructor(): this.state → ${this.state}`);
+		logger.debug('<<< Exiting constructor()');
     }
 
     render_tree(item, childListItems) {
+		logger.debug(`>>> Entering render_tree(item=${item},childListItems=${childListItems})`);
         const {
             draggedItem,
             droppedItem,
@@ -32,6 +37,7 @@ export class PersonaBarPageTreeview extends Component {
             Localization
         } = this.props;
 
+		logger.debug(`<<< Exiting render_tree(item=${item},childListItems=${childListItems})`);
         return (
             <PersonaBarPageTreeview
                 draggedItem={draggedItem}
@@ -57,28 +63,39 @@ export class PersonaBarPageTreeview extends Component {
     }
 
     renderDropZone(direction, item) {
+		logger.debug(`>>> Entering renderDropZone(direction=${direction},item=${item})`);
         const { onMovePage, onDragEnd, draggedItem, dragOverItem, parentItem } = this.props;
         const onDragOver = (e, item, direction) => {
+			logger.debug(`>>> Entering onDragOver(e=${e},item=${item},direction=${direction})`);
             e.preventDefault();
             const elm = document.getElementById(`dropzone-${item.name}-${item.id}-${direction}`);
+			logger.debug(`onDragOver(e=${e},item=${item},direction=${direction}): elm → ${elm}`);
             (direction === "before") ? elm.classList.add("list-item-border-bottom") : elm.classList.add("list-item-border-top");
             const containerElm = document.getElementById(`list-item-container-${item.name}-${item.id}`);
+			logger.debug(`onDragOver(e=${e},item=${item},direction=${direction}): containerElm → ${containerElm}`);
             item.onDragOverState = false;
             containerElm.className = this.getClassName(item);
+			logger.debug(`<<< Exiting onDragOver(e=${e},item=${item},direction=${direction})`);
         };
 
+		logger.debug(`renderDropZone(direction=${direction},item=${item}): item.onDragOverState → ${item.onDragOverState}`);
         const onDragLeave = (item, direction) => {
+			logger.debug(`>>> Entering onDragLeave(item=${item},direction=${direction})`);
             const elm = document.getElementById(`dropzone-${item.name}-${item.id}-${direction}`);
             (direction === "before") ? elm.classList.remove("list-item-border-bottom") : elm.classList.remove("list-item-border-top");
+			logger.debug(`onDragLeave(item=${item},direction=${direction}): elm → ${elm}`);
             const containerElm = document.getElementById(`list-item-container-${item.name}-${item.id}`);
+			logger.debug(`onDragLeave(item=${item},direction=${direction}): containerElm → ${containerElm}`);
             item.onDragOverState = true;
             containerElm.className = this.getClassName(item);
+			logger.debug(`<<< Exiting onDragLeave(item=${item},direction=${direction})`);
         };
         if (!utils.getIsSuperUser() && (parentItem === undefined || parentItem && !parentItem.canManagePage)) {
             return;
         }
 
         if (item.onDragOverState) {
+			logger.debug(`<<< Exiting renderDropZone(direction=${direction},item=${item})`);
             return (
                 <div
                     id={`dropzone-${item.name}-${item.id}-${direction}`}
@@ -95,23 +112,28 @@ export class PersonaBarPageTreeview extends Component {
     }
 
     _checkItemDisabled(item) {
+		logger.debug(`>>> Entering _checkItemDisabled(item=${item})`);
         if (item.includeInMenu) {
             return false;
         }
         if (item.status !== "Visible") {
+		logger.debug(`<<< Exiting _checkItemDisabled(item=${item})`);
             return true;
         }  
         return false;
     }
 
     getClassName(item) {
+		logger.debug(`>>> Entering getClassName(item=${item})`);
         const DRAG_HOVER = item.onDragOverState === true;
         const SELECTED = item.selected === true;
         const DISABLED = this._checkItemDisabled(item);
+		logger.debug(`getClassName(item=${item}): DISABLED → ${DISABLED}`);
         
         if (DRAG_HOVER || SELECTED) {
             return "list-item-highlight list-item-dragover";
         } else if (DISABLED) {
+		logger.debug(`<<< Exiting getClassName(item=${item})`);
             return "list-item-disabled";
         }
 
@@ -119,6 +141,7 @@ export class PersonaBarPageTreeview extends Component {
     }
 
     renderLi() {
+		logger.debug('>>> Entering renderLi()');
         const {
             listItems,
             onSelection,
@@ -135,6 +158,7 @@ export class PersonaBarPageTreeview extends Component {
 
         let index = 0;
         let total = listItems.length;
+		logger.debug('<<< Exiting renderLi()');
         return listItems.map((item) => {
             const canManagePage = (e, item, fn) => {
                 const whenCanManage = () => e ? fn(e, item) : fn(item);
@@ -146,6 +170,7 @@ export class PersonaBarPageTreeview extends Component {
             index++;
 
             const style = item.canManagePage ? { "whiteSpace": "nowrap", height: "28px", lineHeight: "35px" } : { height: "28px" };
+			logger.debug(`renderLi(): style → ${style}`);
             const itemNameHidden = item.status === "Hidden" ? "item-name-hidden" : "";
             return (
                 <li key={"list-item-key-" + index} id={`list-item-${item.name}-${item.id}`} title={item.name}>
@@ -193,7 +218,9 @@ export class PersonaBarPageTreeview extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { listItems } = this.props;
+		logger.debug('<<< Exiting render()');
         return (
             <ul style={!listItems.length ? { padding: "0px", height: "0px" } : null}>
                 {this.renderLi()}

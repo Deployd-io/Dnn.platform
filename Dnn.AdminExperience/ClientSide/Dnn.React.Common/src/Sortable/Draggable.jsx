@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
 import interact from "interact.js";
+const logger = console;
 
 //TODO: reconsider location of this general component
 export default (Component) => { 
@@ -10,13 +11,17 @@ export default (Component) => {
 
         constructor() {
             super();
+			logger.debug('>>> Entering constructor()');
             this.initialScrollY = 0;
+			logger.debug(`constructor(): this.initialScrollY → ${this.initialScrollY}`);
+			logger.debug('<<< Exiting constructor()');
         }
 
         showGhostTargetOnClone(currentTarget) {            
             this.originalTarget = currentTarget;
             this.originalTargetClassName = this.originalTarget.className;
             this.originalTarget.className += " ghost";            
+			logger.debug(`<<< Exiting showGhostTargetOnClone(currentTarget=${currentTarget})`);
         }
         
         setCloneInitialPositionAndWidth(clone, currentTarget) {            
@@ -26,9 +31,11 @@ export default (Component) => {
                 top: rect.top + "px",
                 width: rect.width + "px"
             });  
+			logger.debug(`<<< Exiting setCloneInitialPositionAndWidth(clone=${clone},currentTarget=${currentTarget})`);
         }
         
         setPreviewInitialPosition(preview, event) {
+			logger.debug(`>>> Entering setPreviewInitialPosition(preview=${preview},event=${event})`);
             Object.assign(preview.style, {
                 display: "",
                 visibility: ""
@@ -38,6 +45,7 @@ export default (Component) => {
                 left: (event.clientX - rect.width / 2 ) + "px",
                 top: (event.clientY - rect.height / 2)  + "px"
             }); 
+			logger.debug(`<<< Exiting setPreviewInitialPosition(preview=${preview},event=${event})`);
         }
         
         cloneTarget(currentTarget) {
@@ -49,10 +57,13 @@ export default (Component) => {
         }
         
         clonePreviewElement(previewElement, event) {            
+			logger.debug(`>>> Entering clonePreviewElement(previewElement=${previewElement},event=${event})`);
             let clone = previewElement.cloneNode(true);                 
             this.setDraggingStyle(clone);
+			logger.debug(`clonePreviewElement(previewElement=${previewElement},event=${event}): clone → ${clone}`);
             document.body.appendChild(clone);
             this.setPreviewInitialPosition(clone, event);
+			logger.debug(`<<< Exiting clonePreviewElement(previewElement=${previewElement},event=${event})`);
             return clone;
         }
 
@@ -60,6 +71,7 @@ export default (Component) => {
             if (clone.parentNode) {
                 clone.parentNode.removeChild(clone);
             }
+			logger.debug(`<<< Exiting destroyClone(clone=${clone})`);
         }
         
         setDraggingStyle(target) {
@@ -69,6 +81,7 @@ export default (Component) => {
                 zIndex: 100000,
                 boxShadow: "20px 20px 20px 2px rgba(0,0,0,0.2)"
             });
+			logger.debug(`<<< Exiting setDraggingStyle(target=${target})`);
         }
         
         resetTarget(target) {   
@@ -83,14 +96,20 @@ export default (Component) => {
             });
             target.setAttribute("data-x", "");
             target.setAttribute("data-y", "");
+			logger.debug(`<<< Exiting resetTarget(target=${target})`);
         }
         
         moveTarget(event) {
+			logger.debug(`>>> Entering moveTarget(event=${event})`);
             const target = event.target;
             const x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
+			logger.debug(`moveTarget(event=${event}): target → ${target}`);
+			logger.debug(`moveTarget(event=${event}): x → ${x}`);
             const afterScroll = this.initialScrollY - window.scrollY;
             this.initialScrollY = window.scrollY;
             const y = ((parseFloat(target.getAttribute("data-y")) || 0) + event.dy) + afterScroll;
+			logger.debug(`moveTarget(event=${event}): this.initialScrollY → ${this.initialScrollY}`);
+			logger.debug(`moveTarget(event=${event}): y → ${y}`);
             
             // translate the element
             target.style.webkitTransform = 
@@ -101,11 +120,14 @@ export default (Component) => {
             // update the position attributes
             target.setAttribute("data-x", x);
             target.setAttribute("data-y", y);
+			logger.debug(`<<< Exiting moveTarget(event=${event})`);
         }
 
         componentDidMount() {
+			logger.debug('>>> Entering componentDidMount()');
             const self = this;
             const dragElement = ReactDOM.findDOMNode(this);   
+			logger.debug(`componentDidMount(): dragElement → ${dragElement}`);
             if (!dragElement) {
                 return;
             }     
@@ -156,9 +178,12 @@ export default (Component) => {
                     }
                     
                     let clone = null;
+					logger.debug(`componentDidMount(): clone → ${clone}`);
                     if (typeof(getDragPreview) === "function") {
                         const dragPreviewComponent = getDragPreview(self);
+						logger.debug(`componentDidMount(): dragPreviewComponent → ${dragPreviewComponent}`);
                         const dragPreviewDOMElement = ReactDOM.findDOMNode(dragPreviewComponent);
+						logger.debug(`componentDidMount(): dragPreviewDOMElement → ${dragPreviewDOMElement}`);
                         clone = this.clonePreviewElement(dragPreviewDOMElement, event);
                     } else {                                    
                         clone = this.cloneTarget(currentTarget);  
@@ -175,6 +200,7 @@ export default (Component) => {
                     onDragStart(self, event);
                 }
             });
+			logger.debug('<<< Exiting componentDidMount()');
         }
 
         render() {

@@ -13,10 +13,12 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
     using DotNetNuke.Entities.Portals;
     using DotNetNuke.Instrumentation;
     using DotNetNuke.Maintenance.Telerik.Removal;
+	using Microsoft.Extensions.Logging;
 
     /// <inheritdoc cref="IReplaceTabModuleStep" />
     internal sealed class ReplaceTabModuleStep : StepBase, IReplaceTabModuleStep, IStepArray
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private readonly IServiceProvider serviceProvider;
         private readonly List<IReplacePortalTabModuleStep> steps;
 
@@ -27,7 +29,12 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         public ReplaceTabModuleStep(ILoggerSource loggerSource, ILocalizer localizer, IServiceProvider serviceProvider)
             : base(loggerSource, localizer)
         {
+			_logger.LogDebug(">>> Entering ReplaceTabModuleStep(loggerSource={LoggerSource},localizer={Localizer},serviceProvider={ServiceProvider})", loggerSource, localizer, serviceProvider);
             this.serviceProvider = serviceProvider ??
+				_logger.LogDebug("<<< Exiting ReplaceTabModuleStep(loggerSource={LoggerSource},localizer={Localizer},serviceProvider={ServiceProvider})", loggerSource, localizer, serviceProvider);
+				_logger.LogDebug("ReplaceTabModuleStep(loggerSource={LoggerSource},localizer={Localizer},serviceProvider={ServiceProvider}): serviceProvider → {ServiceProvider1}", loggerSource, localizer, serviceProvider, serviceProvider);
+				_logger.LogDebug("ReplaceTabModuleStep(loggerSource={LoggerSource},localizer={Localizer},serviceProvider={ServiceProvider}): this.serviceProvider → {Arg3}", loggerSource, localizer, serviceProvider, this.serviceProvider);
+				_logger.LogWarning("Throwing ArgumentNullException from ReplaceTabModuleStep(loggerSource={LoggerSource},localizer={Localizer},serviceProvider={ServiceProvider})", loggerSource, localizer, serviceProvider);
                 throw new ArgumentNullException(nameof(serviceProvider));
 
             this.steps = [];
@@ -56,13 +63,18 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         /// <inheritdoc />
         protected override void ExecuteInternal()
         {
+			_logger.LogDebug(">>> Entering ExecuteInternal()");
             var portalController = this.GetService<IPortalController>();
 
+			_logger.LogDebug("ExecuteInternal(): portalController → {PortalController}", portalController);
             var steps = portalController.GetPortals()
                 .Cast<IPortalInfo>()
                 .Select(info =>
                 {
                     var step = this.GetService<IReplacePortalTabModuleStep>();
+					_logger.LogDebug("ExecuteInternal(): step → {Step}", step);
+					_logger.LogDebug("ExecuteInternal(): step.ParentStep → {Arg0}", step.ParentStep);
+					_logger.LogDebug("ExecuteInternal(): step.PortalId → {Arg0}", step.PortalId);
                     step.ParentStep = this;
                     step.PortalId = info.PortalId;
                     return step;
@@ -73,11 +85,14 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
                 this.steps.Add(step);
                 step.Execute();
             }
+			_logger.LogDebug("<<< Exiting ExecuteInternal()");
         }
 
         private T GetService<T>()
             where T : class
         {
+			_logger.LogDebug(">>> Entering GetService()");
+			_logger.LogDebug("<<< Exiting GetService()");
             return (T)this.serviceProvider.GetService(typeof(T));
         }
     }

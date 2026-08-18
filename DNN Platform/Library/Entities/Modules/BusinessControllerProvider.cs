@@ -12,19 +12,25 @@ using DotNetNuke.Framework;
 /// <summary>The <see cref="IBusinessControllerProvider"/> implementation.</summary>
 public class BusinessControllerProvider : IBusinessControllerProvider
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(BusinessControllerProvider));
     private readonly IServiceProvider serviceProvider;
 
     /// <summary>Initializes a new instance of the <see cref="BusinessControllerProvider"/> class.</summary>
     /// <param name="serviceProvider">The service provider.</param>
     public BusinessControllerProvider(IServiceProvider serviceProvider)
     {
+		Logger.LogDebug(">>> Entering BusinessControllerProvider(serviceProvider={ServiceProvider})", serviceProvider);
         this.serviceProvider = serviceProvider;
+		Logger.LogDebug("BusinessControllerProvider(serviceProvider={ServiceProvider}): serviceProvider → {ServiceProvider1}", serviceProvider, serviceProvider);
+		Logger.LogDebug("BusinessControllerProvider(serviceProvider={ServiceProvider}): this.serviceProvider → {Arg1}", serviceProvider, this.serviceProvider);
+		Logger.LogDebug("<<< Exiting BusinessControllerProvider(serviceProvider={ServiceProvider})", serviceProvider);
     }
 
     /// <inheritdoc />
     public T GetInstance<T>(string businessControllerTypeName)
         where T : class
     {
+		Logger.LogDebug(">>> Entering GetInstance(businessControllerTypeName={BusinessControllerTypeName})", businessControllerTypeName);
         if (string.IsNullOrEmpty(businessControllerTypeName))
         {
             return null;
@@ -37,6 +43,7 @@ public class BusinessControllerProvider : IBusinessControllerProvider
     public T GetInstance<T>(Type businessControllerType)
         where T : class
     {
+		Logger.LogDebug(">>> Entering GetInstance(businessControllerType={BusinessControllerType})", businessControllerType);
         Requires.NotNull(nameof(businessControllerType), businessControllerType);
         if (typeof(T).IsAssignableFrom(businessControllerType))
         {
@@ -51,6 +58,7 @@ public class BusinessControllerProvider : IBusinessControllerProvider
     {
         if (string.IsNullOrEmpty(businessControllerTypeName))
         {
+		Logger.LogDebug("<<< Exiting GetInstance(businessControllerTypeName={BusinessControllerTypeName})", businessControllerTypeName);
             return null;
         }
 
@@ -60,6 +68,7 @@ public class BusinessControllerProvider : IBusinessControllerProvider
     /// <inheritdoc />
     public object GetInstance(Type businessControllerType)
     {
+		Logger.LogDebug("<<< Exiting GetInstance(businessControllerType={BusinessControllerType})", businessControllerType);
         return Reflection.CreateObject(this.serviceProvider, businessControllerType);
     }
 }

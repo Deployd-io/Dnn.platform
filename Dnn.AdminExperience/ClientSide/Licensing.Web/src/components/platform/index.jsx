@@ -9,10 +9,13 @@ import DnnTechnologyEditorialIcon from "./../svg/dnn_technology_editorial.svg";
 import GithubIcon from "./../svg/github.svg";
 import DnnIcon from "./../svg/dnn_logo_primary.svg";
 import DocsIcon from "./../svg/dnn_docs_logo.svg";
+const logger = console;
 
 class Platform extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
 
     renderVersion() {
@@ -33,6 +36,8 @@ class Platform extends Component {
 
 
     renderLinks() {
+		logger.debug('>>> Entering renderLinks()');
+		logger.debug('<<< Exiting renderLinks()');
         return (
             <div className="links-wrapper">
                 <div className="link-docs-wrapper" title={resx.get("Docs.Header")} onClick={this.onDocsClick.bind(this) }>
@@ -61,12 +66,16 @@ class Platform extends Component {
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const {props} = this;
         props.dispatch(LicensingActions.getServerInfo());
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     /*eslint no-mixed-spaces-and-tabs: "error"*/
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.licensingPlatform}>
                 <div>
@@ -89,6 +98,8 @@ Platform.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         productVersion: state.licensing.productVersion
     };

@@ -23,6 +23,7 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
     using DotNetNuke.Services.Localization;
     using DotNetNuke.Services.Log.EventLog;
     using DotNetNuke.Services.Upgrade;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>Class that contains upgrade procedures.</summary>
     /// <param name="applicationStatusInfo">The application status info.</param>
@@ -30,6 +31,7 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
     public class UpgradeController(IApplicationStatusInfo applicationStatusInfo, IHostSettings hostSettings)
         : IUpgradeable
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>The module folder location.</summary>
         private const string ModuleFolder = "~/DesktopModules/Admin/HtmlEditorManager";
 
@@ -47,7 +49,9 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
         public UpgradeController()
             : this(null, null)
         {
+		_logger.LogDebug(">>> Entering UpgradeController()");
         }
+		_logger.LogDebug("<<< Exiting UpgradeController()");
 
         /// <summary> Initializes a new instance of the <see cref="UpgradeController"/> class.</summary>
         /// <param name="applicationStatusInfo">The application status info.</param>
@@ -62,6 +66,7 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
         /// <returns>Success if all goes well, otherwise, Failed.</returns>
         public string UpgradeModule(string version)
         {
+			_logger.LogDebug(">>> Entering UpgradeModule(version={Version})", version);
             try
             {
                 switch (version)
@@ -69,16 +74,20 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
                     case "07.04.00":
                         const string ResourceFile = ModuleFolder + "/App_LocalResources/ProviderConfiguration.ascx.resx";
                         var pageName = Localization.GetString("HTMLEditorPageName", ResourceFile);
+						_logger.LogDebug("UpgradeModule(version={Version}): pageName → {PageName}", version, pageName);
                         var pageDescription = Localization.GetString("HTMLEditorPageDescription", ResourceFile);
+						_logger.LogDebug("UpgradeModule(version={Version}): pageDescription → {PageDescription}", version, pageDescription);
 
                         // Create HTML Editor Config Page (or get existing one)
                         var editorPage = Upgrade.AddHostPage(pageName, pageDescription, ModuleFolder + "/images/HtmlEditorManager_Standard_16x16.png", ModuleFolder + "/images/HtmlEditorManager_Standard_32x32.png", false);
+						_logger.LogDebug("UpgradeModule(version={Version}): editorPage → {EditorPage}", version, editorPage);
 
                         // Find the RadEditor control and remove it
                         Upgrade.RemoveModule("RadEditor Manager", editorPage.TabName, editorPage.ParentId, false);
 
                         // Add Module To Page
                         var moduleDefId = this.GetModuleDefinitionId("DotNetNuke.HtmlEditorManager", "Html Editor Management");
+						_logger.LogDebug("UpgradeModule(version={Version}): moduleDefId → {ModuleDefId}", version, moduleDefId);
                         Upgrade.AddModuleToPage(editorPage, moduleDefId, pageName, ModuleFolder + "/images/HtmlEditorManager_Standard_32x32.png", true);
 
                         foreach (var item in DesktopModuleController.GetDesktopModules(this.hostSettings, Null.NullInteger))
@@ -88,6 +97,7 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
                             if (moduleInfo.ModuleName == "DotNetNuke.HtmlEditorManager")
                             {
                                 moduleInfo.Category = "Host";
+								_logger.LogDebug("UpgradeModule(version={Version}): moduleInfo.Category → {Arg1}", version, moduleInfo.Category);
                                 DesktopModuleController.SaveDesktopModule(moduleInfo, false, false);
                             }
                         }
@@ -124,8 +134,10 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
             catch (Exception ex)
             {
                 var xlc = new ExceptionLogController();
+				_logger.LogDebug("UpgradeModule(version={Version}): xlc → {Xlc}", version, xlc);
                 xlc.AddLog(ex);
 
+			_logger.LogDebug("<<< Exiting UpgradeModule(version={Version})", version);
                 return "Failed";
             }
 
@@ -134,8 +146,11 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
 
         private static void UpdateRadCfgFiles()
         {
+			_logger.LogDebug(">>> Entering UpdateRadCfgFiles()");
             var folder = Path.Combine(HostingEnvironment.ApplicationPhysicalPath, @"DesktopModules\Admin\RadEditorProvider\ConfigFile");
             UpdateRadCfgFiles(folder, "*ConfigFile*.xml");
+			_logger.LogDebug("UpdateRadCfgFiles(): folder → {Folder}", folder);
+			_logger.LogDebug("<<< Exiting UpdateRadCfgFiles()");
         }
 
         private static void UpdateRadCfgFiles(string folder, string mask)
@@ -195,27 +210,33 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
 
         private string UpdateWebConfigFile()
         {
+			_logger.LogDebug(">>> Entering UpdateWebConfigFile()");
+			_logger.LogDebug("<<< Exiting UpdateWebConfigFile()");
             return this.UpdateTelerikEncryptionKey("Telerik.AsyncUpload.ConfigurationEncryptionKey");
         }
 
         private string UpdateTelerikEncryptionKey(string keyName)
         {
+			_logger.LogDebug(">>> Entering UpdateTelerikEncryptionKey(keyName={KeyName})", keyName);
             const string DefaultValue = "MDEyMzQ1Njc4OUFCQ0RFRjAxMjM0NTY3ODlBQkNERUYwMTIzNDU2Nzg5QUJDREVG";
 
             var strError = string.Empty;
             var currentKey = Config.GetSetting(keyName);
+			_logger.LogDebug("UpdateTelerikEncryptionKey(keyName={KeyName}): currentKey → {CurrentKey}", keyName, currentKey);
             if (string.IsNullOrEmpty(currentKey) || DefaultValue.Equals(currentKey) || currentKey.Length < 40)
             {
                 try
                 {
                     // open the web.config
                     var xmlConfig = Config.Load(this.applicationStatusInfo);
+					_logger.LogDebug("UpdateTelerikEncryptionKey(keyName={KeyName}): xmlConfig → {XmlConfig}", keyName, xmlConfig);
 
                     // save the current config file
                     Config.BackupConfig(this.applicationStatusInfo);
 
                     // create a random Telerik encryption key and add it under <appSettings>
                     var newKey = PortalSecurity.Instance.CreateKey(32);
+					_logger.LogDebug("UpdateTelerikEncryptionKey(keyName={KeyName}): newKey → {NewKey}", keyName, newKey);
                     newKey = Convert.ToBase64String(Encoding.ASCII.GetBytes(newKey));
                     Config.AddAppSetting(xmlConfig, keyName, newKey);
 
@@ -228,10 +249,12 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
                 }
                 catch (Exception ex)
                 {
+					_logger.LogError("Exception in UpdateTelerikEncryptionKey(keyName={KeyName}): {Arg1}", keyName, ex.getMessage());
                     strError += ex.Message;
                 }
             }
 
+			_logger.LogDebug("<<< Exiting UpdateTelerikEncryptionKey(keyName={KeyName})", keyName);
             return strError;
         }
 
@@ -241,8 +264,10 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
         /// <returns>The Module ID for the HTML Editor Management module.</returns>
         private int GetModuleDefinitionId(string moduleName, string moduleDefinitionName)
         {
+			_logger.LogDebug(">>> Entering GetModuleDefinitionId(moduleName={ModuleName},moduleDefinitionName={ModuleDefinitionName})", moduleName, moduleDefinitionName);
             // get desktop module
             var desktopModule = DesktopModuleController.GetDesktopModuleByModuleName(this.hostSettings, moduleName, Null.NullInteger);
+			_logger.LogDebug("GetModuleDefinitionId(moduleName={ModuleName},moduleDefinitionName={ModuleDefinitionName}): desktopModule → {DesktopModule}", moduleName, moduleDefinitionName, desktopModule);
             if (desktopModule == null)
             {
                 return -1;
@@ -254,6 +279,7 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
                 desktopModule.DesktopModuleID);
             if (moduleDefinition == null)
             {
+			_logger.LogDebug("<<< Exiting GetModuleDefinitionId(moduleName={ModuleName},moduleDefinitionName={ModuleDefinitionName})", moduleName, moduleDefinitionName);
                 return -1;
             }
 
@@ -262,11 +288,15 @@ namespace DotNetNuke.Modules.HtmlEditorManager.Components
 
         private bool RadEditorProviderInstalled()
         {
+			_logger.LogDebug(">>> Entering RadEditorProviderInstalled()");
+			_logger.LogDebug("<<< Exiting RadEditorProviderInstalled()");
             return PackageController.Instance.GetExtensionPackage(Null.NullInteger, p => p.Name.Equals("DotNetNuke.RadEditorProvider")) != null;
         }
 
         private bool TelerikAssemblyExists()
         {
+			_logger.LogDebug(">>> Entering TelerikAssemblyExists()");
+			_logger.LogDebug("<<< Exiting TelerikAssemblyExists()");
             return File.Exists(Path.Combine(HostingEnvironment.ApplicationPhysicalPath, "bin\\Telerik.Web.UI.dll"));
         }
     }

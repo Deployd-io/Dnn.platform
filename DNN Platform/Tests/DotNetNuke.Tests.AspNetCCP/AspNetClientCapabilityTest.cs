@@ -13,10 +13,12 @@ namespace DotNetNuke.Tests.AspNetClientCapabilityProviderTest
     using DotNetNuke.Providers.AspNetClientCapabilityProvider;
     using DotNetNuke.Tests.Utilities.Mocks;
     using NUnit.Framework;
+	using Microsoft.Extensions.Logging;
 
     [TestFixture]
     public class AspNetClientCapabilityTest
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public const string iphoneUserAgent = "Mozilla/5.0 (iPod; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7";
         public const string wp7UserAgent = "Mozilla/4.0 (compatible; MSIE 7.0; Windows Phone OS 7.0; Trident/3.1; IEMobile/7.0) Asus;Galaxy6";
 
@@ -39,75 +41,94 @@ namespace DotNetNuke.Tests.AspNetClientCapabilityProviderTest
         [SetUp]
         public void Setup()
         {
+			_logger.LogDebug(">>> Entering Setup()");
             this._clientCapabilityProvider = new Providers.AspNetClientCapabilityProvider.AspNetClientCapabilityProvider();
 
+			_logger.LogDebug("Setup(): _clientCapabilityProvider → {_clientCapabilityProvider}", _clientCapabilityProvider);
             ComponentFactory.Container = new SimpleContainer();
             var dataProvider = MockComponentProvider.CreateDataProvider();
+			_logger.LogDebug("Setup(): dataProvider → {DataProvider}", dataProvider);
             dataProvider.Setup(d => d.GetProviderPath()).Returns(string.Empty);
             MockComponentProvider.CreateDataCacheProvider();
             MockComponentProvider.CreateEventLogController();
+			_logger.LogDebug("<<< Exiting Setup()");
         }
 
         [TearDown]
         public void TearDown()
         {
+		_logger.LogDebug(">>> Entering TearDown()");
+		_logger.LogDebug("<<< Exiting TearDown()");
         }
 
         [Test]
         public void AspNetClientCapability_IsMobile_Returns_True_For_BlackBerry9105V1()
         {
+			_logger.LogDebug(">>> Entering AspNetClientCapability_IsMobile_Returns_True_For_BlackBerry9105V1()");
             // Arrange
             var clientCapability = this._clientCapabilityProvider.GetClientCapability(blackBerry9105V1);
+			_logger.LogDebug("AspNetClientCapability_IsMobile_Returns_True_For_BlackBerry9105V1(): clientCapability → {ClientCapability}", clientCapability);
 
             // Act
             var bIsMobile = clientCapability.IsMobile;
 
             // Assert
             Assert.That(bIsMobile, Is.True);
+			_logger.LogDebug("<<< Exiting AspNetClientCapability_IsMobile_Returns_True_For_BlackBerry9105V1()");
         }
 
         [Test]
         public void AspNetClientCapability_IsMobile_Returns_True_For_IPhone()
         {
+			_logger.LogDebug(">>> Entering AspNetClientCapability_IsMobile_Returns_True_For_IPhone()");
             // Arrange
             var clientCapability = this._clientCapabilityProvider.GetClientCapability(iphoneUserAgent);
+			_logger.LogDebug("AspNetClientCapability_IsMobile_Returns_True_For_IPhone(): clientCapability → {ClientCapability}", clientCapability);
 
             // Act
             var bIsMobile = clientCapability.IsMobile;
 
             // Assert
             Assert.That(bIsMobile, Is.True);
+			_logger.LogDebug("<<< Exiting AspNetClientCapability_IsMobile_Returns_True_For_IPhone()");
         }
 
         [Test]
         public void AspNetClientCapability_IsMobile_Returns_True_For_WP7()
         {
+			_logger.LogDebug(">>> Entering AspNetClientCapability_IsMobile_Returns_True_For_WP7()");
             // Arrange
             var clientCapability = this._clientCapabilityProvider.GetClientCapability(wp7UserAgent);
+			_logger.LogDebug("AspNetClientCapability_IsMobile_Returns_True_For_WP7(): clientCapability → {ClientCapability}", clientCapability);
 
             // Act
             var bIsMobile = clientCapability.IsMobile;
 
             // Assert
             Assert.That(bIsMobile, Is.True);
+			_logger.LogDebug("<<< Exiting AspNetClientCapability_IsMobile_Returns_True_For_WP7()");
         }
 
         [Test]
         public void AspNetClientCapability_IsMobile_Returns_True_For_IPad()
         {
+			_logger.LogDebug(">>> Entering AspNetClientCapability_IsMobile_Returns_True_For_IPad()");
             // Arrange
             var clientCapability = this._clientCapabilityProvider.GetClientCapability(iPadTabletUserAgent);
+			_logger.LogDebug("AspNetClientCapability_IsMobile_Returns_True_For_IPad(): clientCapability → {ClientCapability}", clientCapability);
 
             // Act
             var bIsMobile = clientCapability.IsMobile;
 
             // Assert
             Assert.That(bIsMobile, Is.True);
+			_logger.LogDebug("<<< Exiting AspNetClientCapability_IsMobile_Returns_True_For_IPad()");
         }
 
         [Test]
         public void AspNetClientCapability_IsMobile_Returns_True_For_SamsungGalaxyGTP1000()
         {
+			_logger.LogDebug(">>> Entering AspNetClientCapability_IsMobile_Returns_True_For_SamsungGalaxyGTP1000()");
             // var simulator = new Instance.Utilities.HttpSimulator.HttpSimulator("/", string.Empty);
             // simulator.SetHeader("user-agent", samsungGalaxyTablet);
             // simulator.SimulateRequest();
@@ -115,156 +136,191 @@ namespace DotNetNuke.Tests.AspNetClientCapabilityProviderTest
 
             // Arrange
             var clientCapability = this._clientCapabilityProvider.GetClientCapability(samsungGalaxyTablet);
+			_logger.LogDebug("AspNetClientCapability_IsMobile_Returns_True_For_SamsungGalaxyGTP1000(): clientCapability → {ClientCapability}", clientCapability);
 
             // Act
             var isMobile = clientCapability.IsMobile;
 
             // Assert
             Assert.That(isMobile, Is.True);
+			_logger.LogDebug("<<< Exiting AspNetClientCapability_IsMobile_Returns_True_For_SamsungGalaxyGTP1000()");
         }
 
         [Test]
         public void AspNetClientCapability_IsMobile_Returns_False_For_EmptyUserAgent()
         {
+			_logger.LogDebug(">>> Entering AspNetClientCapability_IsMobile_Returns_False_For_EmptyUserAgent()");
             // Arrange
             var clientCapability = this._clientCapabilityProvider.GetClientCapability(string.Empty);
+			_logger.LogDebug("AspNetClientCapability_IsMobile_Returns_False_For_EmptyUserAgent(): clientCapability → {ClientCapability}", clientCapability);
 
             // Act
             var bIsMmobile = clientCapability.IsMobile;
 
             // Assert
             Assert.That(bIsMmobile, Is.False);
+			_logger.LogDebug("<<< Exiting AspNetClientCapability_IsMobile_Returns_False_For_EmptyUserAgent()");
         }
 
         [Test]
         public void AspNetClientCapability_IsMobile_Returns_False_For_NullUserAgent()
         {
+			_logger.LogDebug(">>> Entering AspNetClientCapability_IsMobile_Returns_False_For_NullUserAgent()");
             // Arrange
             string agent = null;
             var AspNetClientCapability = this._clientCapabilityProvider.GetClientCapability(agent);
+			_logger.LogDebug("AspNetClientCapability_IsMobile_Returns_False_For_NullUserAgent(): AspNetClientCapability → {AspNetClientCapability}", AspNetClientCapability);
 
             // Act
             var bIsMobile = AspNetClientCapability.IsMobile;
 
             // Assert
             Assert.That(bIsMobile, Is.False);
+			_logger.LogDebug("<<< Exiting AspNetClientCapability_IsMobile_Returns_False_For_NullUserAgent()");
         }
 
         [Test]
         public void AspNetClientCapability_IsMobile_Returns_True_For_HTCDesireVer1Sub22()
         {
+			_logger.LogDebug(">>> Entering AspNetClientCapability_IsMobile_Returns_True_For_HTCDesireVer1Sub22()");
             // Arrange
             var AspNetClientCapability = this._clientCapabilityProvider.GetClientCapability(htcDesireVer1Sub22UserAgent);
+			_logger.LogDebug("AspNetClientCapability_IsMobile_Returns_True_For_HTCDesireVer1Sub22(): AspNetClientCapability → {AspNetClientCapability}", AspNetClientCapability);
 
             // Act
             var bIsMobile = AspNetClientCapability.IsMobile;
 
             // Assert
             Assert.That(bIsMobile, Is.True);
+			_logger.LogDebug("<<< Exiting AspNetClientCapability_IsMobile_Returns_True_For_HTCDesireVer1Sub22()");
         }
 
         [Test]
         public void AspNetClientCapability_IsMobile_Returns_False_For_InternetExplorer8()
         {
+			_logger.LogDebug(">>> Entering AspNetClientCapability_IsMobile_Returns_False_For_InternetExplorer8()");
             // Arrange
             var AspNetClientCapability = this._clientCapabilityProvider.GetClientCapability(msIE8UserAgent);
+			_logger.LogDebug("AspNetClientCapability_IsMobile_Returns_False_For_InternetExplorer8(): AspNetClientCapability → {AspNetClientCapability}", AspNetClientCapability);
 
             // Act
             var bIsMobile = AspNetClientCapability.IsMobile;
 
             // Assert
             Assert.That(bIsMobile, Is.False);
+			_logger.LogDebug("<<< Exiting AspNetClientCapability_IsMobile_Returns_False_For_InternetExplorer8()");
         }
 
         [Test]
         public void AspNetClientCapability_IsMobile_Returns_False_For_InternetExplorer9()
         {
+			_logger.LogDebug(">>> Entering AspNetClientCapability_IsMobile_Returns_False_For_InternetExplorer9()");
             // Arrange
             var AspNetClientCapability = this._clientCapabilityProvider.GetClientCapability(msIE9UserAgent);
+			_logger.LogDebug("AspNetClientCapability_IsMobile_Returns_False_For_InternetExplorer9(): AspNetClientCapability → {AspNetClientCapability}", AspNetClientCapability);
 
             // Act
             var bIsMobile = AspNetClientCapability.IsMobile;
 
             // Assert
             Assert.That(bIsMobile, Is.False);
+			_logger.LogDebug("<<< Exiting AspNetClientCapability_IsMobile_Returns_False_For_InternetExplorer9()");
         }
 
         [Test]
         public void AspNetClientCapability_IsMobile_Returns_False_For_InternetExplorer10()
         {
+			_logger.LogDebug(">>> Entering AspNetClientCapability_IsMobile_Returns_False_For_InternetExplorer10()");
             // Arrange
             var AspNetClientCapability = this._clientCapabilityProvider.GetClientCapability(msIE10UserAgent);
+			_logger.LogDebug("AspNetClientCapability_IsMobile_Returns_False_For_InternetExplorer10(): AspNetClientCapability → {AspNetClientCapability}", AspNetClientCapability);
 
             // Act
             var bIsMobile = AspNetClientCapability.IsMobile;
 
             // Assert
             Assert.That(bIsMobile, Is.False);
+			_logger.LogDebug("<<< Exiting AspNetClientCapability_IsMobile_Returns_False_For_InternetExplorer10()");
         }
 
         [Test]
         public void AspNetClientCapability_IsMobile_Returns_False_For_FireFox()
         {
+			_logger.LogDebug(">>> Entering AspNetClientCapability_IsMobile_Returns_False_For_FireFox()");
             // Arrange
             var AspNetClientCapability = this._clientCapabilityProvider.GetClientCapability(fireFox5NT61UserAgent);
+			_logger.LogDebug("AspNetClientCapability_IsMobile_Returns_False_For_FireFox(): AspNetClientCapability → {AspNetClientCapability}", AspNetClientCapability);
 
             // Act
             var bIsMobile = AspNetClientCapability.IsMobile;
 
             // Assert
             Assert.That(bIsMobile, Is.False);
+			_logger.LogDebug("<<< Exiting AspNetClientCapability_IsMobile_Returns_False_For_FireFox()");
         }
 
         [Test]
         public void AspNetClientCapability_IsTablet_Returns_False_For_IPhone()
         {
+			_logger.LogDebug(">>> Entering AspNetClientCapability_IsTablet_Returns_False_For_IPhone()");
             // Arrange
             var clientCapability = this._clientCapabilityProvider.GetClientCapability(iphoneUserAgent);
+			_logger.LogDebug("AspNetClientCapability_IsTablet_Returns_False_For_IPhone(): clientCapability → {ClientCapability}", clientCapability);
 
             // Act
             var bIsTablet = clientCapability.IsTablet;
 
             // Assert
             Assert.That(bIsTablet, Is.False);
+			_logger.LogDebug("<<< Exiting AspNetClientCapability_IsTablet_Returns_False_For_IPhone()");
         }
 
         [Test]
         public void AspNetClientCapability_IsTablet_Returns_True_For_PCTablet()
         {
+			_logger.LogDebug(">>> Entering AspNetClientCapability_IsTablet_Returns_True_For_PCTablet()");
             // Arrange
             var clientCapability = this._clientCapabilityProvider.GetClientCapability(winTabletPC);
+			_logger.LogDebug("AspNetClientCapability_IsTablet_Returns_True_For_PCTablet(): clientCapability → {ClientCapability}", clientCapability);
 
             // Act
             var bIsTablet = clientCapability.IsTablet;
 
             // Assert
             Assert.That(bIsTablet, Is.True);
+			_logger.LogDebug("<<< Exiting AspNetClientCapability_IsTablet_Returns_True_For_PCTablet()");
         }
 
         [Test]
         public void AspNetClientCapability_SupportsFlash_Returns_True_For_HTCDesireVer1Sub22()
         {
+			_logger.LogDebug(">>> Entering AspNetClientCapability_SupportsFlash_Returns_True_For_HTCDesireVer1Sub22()");
             // Arrange
             var clientCapability = this._clientCapabilityProvider.GetClientCapability(htcDesireVer1Sub22UserAgent);
+			_logger.LogDebug("AspNetClientCapability_SupportsFlash_Returns_True_For_HTCDesireVer1Sub22(): clientCapability → {ClientCapability}", clientCapability);
 
             // Act
             var bSupportsFlash = clientCapability.SupportsFlash;
 
             // Assert
             Assert.That(bSupportsFlash, Is.False);
+			_logger.LogDebug("<<< Exiting AspNetClientCapability_SupportsFlash_Returns_True_For_HTCDesireVer1Sub22()");
         }
 
         [Test]
         public void AspNetClientCapability_SupportsFlash_Returns_False_For_WindowsPhone7()
         {
+			_logger.LogDebug(">>> Entering AspNetClientCapability_SupportsFlash_Returns_False_For_WindowsPhone7()");
             // Arrange
             var clientCapability = this._clientCapabilityProvider.GetClientCapability(wp7UserAgent);
+			_logger.LogDebug("AspNetClientCapability_SupportsFlash_Returns_False_For_WindowsPhone7(): clientCapability → {ClientCapability}", clientCapability);
 
             // Act
             var bIsTablet = clientCapability.IsTablet;
 
             // Assert
             Assert.That(bIsTablet, Is.False);
+			_logger.LogDebug("<<< Exiting AspNetClientCapability_SupportsFlash_Returns_False_For_WindowsPhone7()");
         }
     }
 }

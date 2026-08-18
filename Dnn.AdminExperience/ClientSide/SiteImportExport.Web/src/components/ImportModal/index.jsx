@@ -14,6 +14,7 @@ import ProgressBar from "./ProgressBar";
 import styles from "./style.module.less";
 import util from "utils";
 import NoDataIcon from "./img/nodata.svg";
+const logger = console;
 
 import { Button, GridCell, Pager } from "@dnnsoftware/dnn-react-common";
 
@@ -21,6 +22,7 @@ import { Button, GridCell, Pager } from "@dnnsoftware/dnn-react-common";
 class ImportModal extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             importRequest: {
                 PortalId: -1,
@@ -34,24 +36,30 @@ class ImportModal extends Component {
             keyword: "",
             requestSubmitting: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const { props, state } = this;
         props.dispatch(ImportExportActions.getImportPackages(this.getNextPage()));
 
         const { importRequest } = state;
         importRequest.PortalId = props.portalId;
+		logger.debug(`componentDidMount(): importRequest.PortalId → ${importRequest.PortalId}`);
         importRequest.PackageId = props.selectedPackage ? props.selectedPackage.PackageId : -1;
+		logger.debug('<<< Exiting componentDidMount()');
         this.setState({
             importRequest
         });
     }
 
     componentDidUpdate() {
+		logger.debug('>>> Entering componentDidUpdate()');
         const { props, state } = this;
         const { importRequest } = state;
         if (importRequest.PortalId === -1 || importRequest.PortalId !== props.portalId) {
+			logger.debug('<<< Exiting componentDidUpdate()');
             importRequest.PortalId = props.portalId;
             this.setState({
                 importRequest
@@ -60,14 +68,17 @@ class ImportModal extends Component {
     }
 
     goToStep(wizardStep) {
+		logger.debug(`>>> Entering goToStep(wizardStep=${wizardStep})`);
         const { props } = this;
         props.dispatch(ImportExportActions.navigateWizard(wizardStep));
         props.dispatch(ImportExportActions.importWizardGoToSetp(0, () => {
             props.dispatch(ImportExportActions.selectPackage());
+			logger.debug(`<<< Exiting goToStep(wizardStep=${wizardStep})`);
         }));
     }
 
     selectPackage(pkg) {
+		logger.debug(`>>> Entering selectPackage(pkg=${pkg})`);
         const { props } = this;
         if (props.selectedPackage && props.selectedPackage.PackageId === pkg.PackageId) {
             props.dispatch(ImportExportActions.selectPackage());
@@ -75,6 +86,7 @@ class ImportModal extends Component {
         else {
             props.dispatch(ImportExportActions.selectPackage(pkg, () => {
                 let { importRequest } = this.state;
+				logger.debug(`<<< Exiting selectPackage(pkg=${pkg})`);
                 importRequest.PackageId = pkg.PackageId;
                 this.setState({
                     importRequest
@@ -84,6 +96,7 @@ class ImportModal extends Component {
     }
 
     cancelImport() {
+		logger.debug('>>> Entering cancelImport()');
         const { props } = this;
         if (props.wizardStep === 0) {
             this.goToStep(0);
@@ -100,10 +113,12 @@ class ImportModal extends Component {
                     props.dispatch(ImportExportActions.selectPackage());
                     props.dispatch(ImportExportActions.importWizardGoToSetp(0));
                 });
+				logger.debug('<<< Exiting cancelImport()');
         }
     }
 
     onAnalyze() {
+		logger.debug('>>> Entering onAnalyze()');
         const { props } = this;
         if (props.selectedPackage) {
             props.dispatch(ImportExportActions.importWizardGoToSetp(1, () => {
@@ -114,10 +129,12 @@ class ImportModal extends Component {
         }
         else {
             util.utilities.notifyError(Localization.get("SelectException"));
+			logger.debug('<<< Exiting onAnalyze()');
         }
     }
 
     onImport() {
+		logger.debug('>>> Entering onImport()');
         const { props, state } = this;
         this.setState({
             requestSubmitting: true
@@ -142,20 +159,27 @@ class ImportModal extends Component {
                 requestSubmitting: false
             });
             util.utilities.notifyError(Localization.get("ImportRequestSubmit.ErrorMessage"));
+			logger.debug('<<< Exiting onImport()');
         }));
     }
 
     getSummaryItem(category) {
+		logger.debug(`>>> Entering getSummaryItem(category=${category})`);
         const { props } = this;
         let detail = props.importSummary.SummaryItems.find(c => c.Category === category.toUpperCase());
+		logger.debug(`getSummaryItem(category=${category}): detail → ${detail}`);
+		logger.debug(`<<< Exiting getSummaryItem(category=${category})`);
         return detail ? detail.TotalItemsString : "-";
     }
 
     onSwitchChange(key, event) {
+		logger.debug(`>>> Entering onSwitchChange(key=${key},event=${event})`);
         const value = typeof event === "object" ? event.target.value : event;
         let { importRequest } = this.state;
+		logger.debug(`onSwitchChange(key=${key},event=${event}): value → ${value}`);
         if (key === "CollisionResolution") {
             importRequest.CollisionResolution = value ? 1 : 0;
+			logger.debug(`<<< Exiting onSwitchChange(key=${key},event=${event})`);
         }
         else if (key === "RunNow") {
             importRequest.RunNow = value;
@@ -166,7 +190,9 @@ class ImportModal extends Component {
     }
 
     getNextPage() {
+		logger.debug('>>> Entering getNextPage()');
         const { state } = this;
+		logger.debug('<<< Exiting getNextPage()');
         return {
             pageIndex: state.pageIndex || 0,
             pageSize: state.pageSize,
@@ -176,6 +202,7 @@ class ImportModal extends Component {
     }
 
     onFilterChanged(filter) {
+		logger.debug(`>>> Entering onFilterChanged(filter=${filter})`);
         const { props } = this;
         this.setState({
             pageIndex: 0,
@@ -183,9 +210,11 @@ class ImportModal extends Component {
         }, () => {
             props.dispatch(ImportExportActions.getImportPackages(this.getNextPage()));
         });
+		logger.debug(`<<< Exiting onFilterChanged(filter=${filter})`);
     }
 
     onKeywordChanged(keyword) {
+		logger.debug(`>>> Entering onKeywordChanged(keyword=${keyword})`);
         const { props } = this;
         this.setState({
             pageIndex: 0,
@@ -193,9 +222,11 @@ class ImportModal extends Component {
         }, () => {
             props.dispatch(ImportExportActions.getImportPackages(this.getNextPage()));
         });
+		logger.debug(`<<< Exiting onKeywordChanged(keyword=${keyword})`);
     }
 
     onPageChange(currentPage, pageSize) {
+		logger.debug(`>>> Entering onPageChange(currentPage=${currentPage},pageSize=${pageSize})`);
         let { state, props } = this;
         if (pageSize !== undefined && state.pageSize !== pageSize) {
             state.pageSize = pageSize;
@@ -206,11 +237,15 @@ class ImportModal extends Component {
         }, () => {
             props.dispatch(ImportExportActions.getImportPackages(this.getNextPage()));
         });
+		logger.debug(`onPageChange(currentPage=${currentPage},pageSize=${pageSize}): state.pageSize → ${state.pageSize}`);
+		logger.debug(`<<< Exiting onPageChange(currentPage=${currentPage},pageSize=${pageSize})`);
     }
 
      
     renderPackageVerification() {
+		logger.debug('>>> Entering renderPackageVerification()');
         const { props } = this;
+		logger.debug('<<< Exiting renderPackageVerification()');
         return <div>
             {props.selectedPackage && !props.packageVerified &&
                 <div className="package-analyzing">
@@ -222,7 +257,9 @@ class ImportModal extends Component {
     }
 
     renderPager() {
+		logger.debug('>>> Entering renderPager()');
         const { props, state } = this;
+		logger.debug('<<< Exiting renderPager()');
         return (
             <div className="packagePager">
                 {props.importPackages && <Pager
@@ -243,7 +280,9 @@ class ImportModal extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { props, state } = this;
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.importModal}>
                 <div className="pageTitle">{Localization.get("SelectImportPackage")}</div>
@@ -316,6 +355,8 @@ ImportModal.defaultProps = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         wizardStep: state.importExport.importWizardStep,
         importPackages: state.importExport.importPackages,

@@ -4,10 +4,12 @@ import Tag from "./Tag";
 import Suggestions from "./Suggestions";
 import TagInput from "./TagInput";
 import "./style.less";
+const logger = console;
 
 class Tags extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             newTagText: "",
             tags: this.props.tags || [],
@@ -15,6 +17,7 @@ class Tags extends Component {
             isInputVisible: false,
             selectedIndex:-1
         };
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     hasClass(className, element) {
@@ -22,6 +25,7 @@ class Tags extends Component {
     }
 
     internalAddTag(newTagText) {
+		logger.debug(`>>> Entering internalAddTag(newTagText=${newTagText})`);
         if (newTagText && typeof(this.props.onNewTag) === "function") {
             this.props.onNewTag(newTagText);
         }
@@ -29,20 +33,28 @@ class Tags extends Component {
         this.setState({ newTagText: "" });
         if (!this.props.tags.find(t => t.toUpperCase().trim() === newTagText.toUpperCase().trim())) {
             const tags = this.props.tags.slice();
+			logger.debug(`internalAddTag(newTagText=${newTagText}): tags → ${tags}`);
             tags.push(newTagText.trim());
             this.updateTags(tags);
+			logger.debug(`<<< Exiting internalAddTag(newTagText=${newTagText})`);
         }
     }
 
     removeTagByName(tag) {
+		logger.debug(`>>> Entering removeTagByName(tag=${tag})`);
         const tags = this.props.tags.filter((_tag) => { return _tag !== tag; }).slice();
         this.updateTags(tags);
+		logger.debug(`removeTagByName(tag=${tag}): tags → ${tags}`);
+		logger.debug(`<<< Exiting removeTagByName(tag=${tag})`);
     }
 
     removeLastTag() {
+		logger.debug('>>> Entering removeLastTag()');
         const tags = this.props.tags.slice();
         tags.pop();
+		logger.debug(`removeLastTag(): tags → ${tags}`);
         this.updateTags(tags);
+		logger.debug('<<< Exiting removeLastTag()');
     }
 
     updateTags(tags) {
@@ -50,17 +62,21 @@ class Tags extends Component {
         this.setState({ tags }, () => {
             this.props.onUpdateTags(tags);
         });
+		logger.debug(`<<< Exiting updateTags(tags=${tags})`);
     }
 
     onClick() {
+		logger.debug('>>> Entering onClick()');
         if (this.state.isInputVisible) {
             return;
         }
 
         this.setState({ isInputVisible: true });
+		logger.debug('<<< Exiting onClick()');
     }
 
     onInputClose() {
+		logger.debug('>>> Entering onInputClose()');
         if (!this.state.isInputVisible) {
             return;
         }
@@ -70,42 +86,52 @@ class Tags extends Component {
         if (typeof(this.props.onAddingNewTagChange) === "function") {
             this.props.onAddingNewTagChange("");
         }
+		logger.debug('<<< Exiting onInputClose()');
     }
 
     addTag(tag) {
+		logger.debug(`>>> Entering addTag(tag=${tag})`);
         if (tag) {
             this.internalAddTag(tag);
         } else if (this.state.selectedIndex > -1) {
             let selectedTag = this.props.suggestions[this.state.selectedIndex];
             this.internalAddTag(selectedTag.value);
             this.setState({selectedIndex:-1});
+			logger.debug(`<<< Exiting addTag(tag=${tag})`);
         }
     }
 
     onAddingNewTagChange(value) {
+		logger.debug(`>>> Entering onAddingNewTagChange(value=${value})`);
         this.setState({newTagText:value});
 
         if (typeof(this.props.onAddingNewTagChange) === "function") {
             this.props.onAddingNewTagChange(value);
+			logger.debug(`<<< Exiting onAddingNewTagChange(value=${value})`);
         }
     }
 
     onArrowDown() {
+		logger.debug('>>> Entering onArrowDown()');
         const maxIndex = this.props.suggestions.length - 1;
         const current = this.state.selectedIndex;
         const selectedIndex = current < maxIndex ? current + 1 : current;
         this.setState({selectedIndex});
+		logger.debug('<<< Exiting onArrowDown()');
     }
 
     onArrowUp() {
+		logger.debug('>>> Entering onArrowUp()');
         const current = this.state.selectedIndex;
         if (current > 0) {
             const selectedIndex = current - 1;
             this.setState({selectedIndex});
+			logger.debug('<<< Exiting onArrowUp()');
         }
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         let Tags;
         if (typeof(this.props.renderItem) === "function") {
             Tags = this.props.tags.map((tag, index) => {
@@ -128,6 +154,7 @@ class Tags extends Component {
         }
 
         const typingText = this.props.autoSuggest ? this.props.searchTagsPlaceholder : this.props.addTagsPlaceholder;
+		logger.debug('<<< Exiting render()');
         return (
             <div className={className}
                 onClick={this.onClick.bind(this) }

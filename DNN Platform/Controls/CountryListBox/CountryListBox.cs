@@ -9,12 +9,14 @@ namespace DotNetNuke.UI.WebControls
     using System.Web.Caching;
     using System.Web.UI;
     using System.Web.UI.WebControls;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>A drop down list of countries.</summary>
     /// <seealso cref="DropDownList"/>
     [ToolboxData("<{0}:CountryListBox runat=server></{0}:CountryListBox>")]
     public class CountryListBox : DropDownList
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private bool cacheGeoIPData = true;
 
         /// <summary>Gets or sets a value indicating whether to cache the GeoIP data.</summary>
@@ -59,14 +61,17 @@ namespace DotNetNuke.UI.WebControls
         /// <inheritdoc />
         protected override void OnDataBinding(EventArgs e)
         {
+			_logger.LogDebug(">>> Entering OnDataBinding(e={E})", e);
             bool isLocal = false;
             string ip;
+			_logger.LogDebug("OnDataBinding(e={E}): isLocal → {IsLocal}", e, isLocal);
             if (!this.Page.IsPostBack)
             {
                 // If GeoIPFile is not provided, assume they put it in BIN.
                 if (string.IsNullOrEmpty(this.GeoIPFile))
                 {
                     this.GeoIPFile = "controls/CountryListBox/Data/GeoIP.dat";
+					_logger.LogDebug("OnDataBinding(e={E}): this.GeoIPFile → {Arg1}", e, this.GeoIPFile);
                 }
 
                 this.EnsureChildControls();
@@ -76,6 +81,7 @@ namespace DotNetNuke.UI.WebControls
                 {
                     // TestIP is specified, let's use it
                     ip = this.TestIP;
+					_logger.LogDebug("OnDataBinding(e={E}): ip → {Ip}", e, ip);
                 }
                 else if (this.Page.Request.UserHostAddress == "127.0.0.1")
                 {
@@ -152,6 +158,9 @@ namespace DotNetNuke.UI.WebControls
                         if (userCountry != "N/A")
                         {
                             var newItem = new ListItem();
+							_logger.LogDebug("OnDataBinding(e={E}): newItem → {NewItem}", e, newItem);
+							_logger.LogDebug("OnDataBinding(e={E}): newItem.Value → {Arg1}", e, newItem.Value);
+							_logger.LogDebug("OnDataBinding(e={E}): newItem.Text → {Arg1}", e, newItem.Text);
                             newItem.Value = userCountryCode;
                             newItem.Text = userCountry;
                             this.Items.Insert(0, newItem);
@@ -162,6 +171,7 @@ namespace DotNetNuke.UI.WebControls
                     }
                 }
             }
+			_logger.LogDebug("<<< Exiting OnDataBinding(e={E})", e);
         }
     }
 }

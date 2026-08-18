@@ -3,24 +3,32 @@ import PropTypes from "prop-types";
 import styles from "./style.module.less";
 import { Switch, Label } from "@dnnsoftware/dnn-react-common";
 import Localization from "../../../../localization";
+const logger = console;
 
 
 class PageUrlCommons extends Component {
 
     onChangeField(key) {
+		logger.debug(`>>> Entering onChangeField(key=${key})`);
         const {onChangeField} = this.props;
         onChangeField(key, event.target.value);
+		logger.debug(`<<< Exiting onChangeField(key=${key})`);
     }
 
     onChangeValue(key, value) {
+		logger.debug(`>>> Entering onChangeValue(key=${key},value=${value})`);
         const {onChangeField} = this.props;
         onChangeField(key, value);
+		logger.debug(`<<< Exiting onChangeValue(key=${key},value=${value})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {page, display} = this.props;
         const gridClass = "page-url-commons-grid " + display;
+		logger.debug(`render(): gridClass → ${gridClass}`);
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.pageUrlCommons}>
                 <div className={gridClass}>

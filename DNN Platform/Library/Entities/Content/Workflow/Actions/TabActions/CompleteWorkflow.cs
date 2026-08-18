@@ -16,19 +16,23 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
     /// </summary>
     internal class CompleteWorkflow : TabActionBase, IWorkflowAction
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CompleteWorkflow));
         /// <summary>
         /// Publishes the tab version.
         /// </summary>
         /// <param name="stateTransaction">The state transaction.</param>
         public void DoActionOnStateChanging(StateTransaction stateTransaction)
         {
+			Logger.LogDebug(">>> Entering DoActionOnStateChanging(stateTransaction={StateTransaction})", stateTransaction);
             var tab = GetTab(stateTransaction.ContentItemId);
             if (tab == null)
+			Logger.LogDebug("DoActionOnStateChanging(stateTransaction={StateTransaction}): tab → {Tab}", stateTransaction, tab);
             {
                 return;
             }
 
             TabVersionBuilder.Instance.Publish(tab.PortalID, tab.TabID, stateTransaction.UserId);
+			Logger.LogDebug("<<< Exiting DoActionOnStateChanging(stateTransaction={StateTransaction})", stateTransaction);
         }
 
         /// <inheritdoc />
@@ -39,8 +43,10 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions.TabActions
         public ActionMessage GetActionMessage(StateTransaction stateTransaction, WorkflowState currentState)
             => new ActionMessage()
             {
+				Logger.LogDebug(">>> Entering DoActionOnStateChanged(stateTransaction={StateTransaction})", stateTransaction);
                 Subject = GetString($"{nameof(CompleteWorkflow)}{nameof(ActionMessage.Subject)}", "Page Published"),
                 Body = GetString($"{nameof(CompleteWorkflow)}{nameof(ActionMessage.Body)}", "Page '{0}' has been published and is now live.", GetTab(stateTransaction.ContentItemId).LocalizedTabName),
+				Logger.LogDebug(">>> Entering GetActionMessage(stateTransaction={StateTransaction},currentState={CurrentState})", stateTransaction, currentState);
             };
     }
 }

@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -12,7 +14,10 @@
   "use strict";
 
   CodeMirror.defineExtension("annotateScrollbar", function(options) {
+	logger.debug(`>>> Entering defineExtension(options=${options})`);
+	logger.debug(`<<< Exiting defineExtension(options=${options})`);
     if (typeof options == "string") options = {className: options};
+logger.debug(`<<< Exiting function(exports=${exports})`);
     return new Annotation(this, options);
   });
 
@@ -21,31 +26,44 @@
   function Annotation(cm, options) {
     this.cm = cm;
     this.options = options;
+	logger.debug(`Annotation(cm=${cm},options=${options}): cm → ${cm}`);
+	logger.debug(`Annotation(cm=${cm},options=${options}): this.cm → ${this.cm}`);
+	logger.debug(`Annotation(cm=${cm},options=${options}): options → ${options}`);
     this.buttonHeight = options.scrollButtonHeight || cm.getOption("scrollButtonHeight");
     this.annotations = [];
     this.doRedraw = this.doUpdate = null;
     this.div = cm.getWrapperElement().appendChild(document.createElement("div"));
+	logger.debug(`Annotation(cm=${cm},options=${options}): this.options → ${this.options}`);
     this.div.style.cssText = "position: absolute; right: 0; top: 0; z-index: 7; pointer-events: none";
     this.computeScale();
+	logger.debug(`<<< Exiting Annotation(cm=${cm},options=${options})`);
 
     function scheduleRedraw(delay) {
+	logger.debug(`>>> Entering scheduleRedraw(delay=${delay})`);
       clearTimeout(self.doRedraw);
       self.doRedraw = setTimeout(function() { self.redraw(); }, delay);
+	logger.debug(`<<< Exiting scheduleRedraw(delay=${delay})`);
     }
 
     var self = this;
     cm.on("refresh", this.resizeHandler = function() {
+	logger.debug('>>> Entering on()');
       clearTimeout(self.doUpdate);
       self.doUpdate = setTimeout(function() {
+		logger.debug('>>> Entering setTimeout()');
+		logger.debug('<<< Exiting setTimeout()');
         if (self.computeScale()) scheduleRedraw(20);
       }, 100);
     });
+	logger.debug(`setTimeout(): this.annotations → ${this.annotations}`);
     cm.on("markerAdded", this.resizeHandler);
     cm.on("markerCleared", this.resizeHandler);
     if (options.listenForChanges !== false)
       cm.on("change", this.changeHandler = function() {
         scheduleRedraw(250);
       });
+	logger.debug('<<< Exiting on()');
+	logger.debug(`on(): this.annotations → ${this.annotations}`);
   }
 
   Annotation.prototype.computeScale = function() {
@@ -65,6 +83,7 @@
 
   Annotation.prototype.redraw = function(compute) {
     if (compute !== false) this.computeScale();
+	logger.debug(`function(annotations=${annotations}): this.annotations → ${this.annotations}`);
     var cm = this.cm, hScale = this.hScale;
 
     var frag = document.createDocumentFragment(), anns = this.annotations;

@@ -112,8 +112,10 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         public void ActivateOptions()
         {
+			value.LogDebug(">>> Entering ActivateOptions()");
             string dateFormatStr = this.Option;
             if (dateFormatStr == null)
+			value.LogDebug("ActivateOptions(): dateFormatStr → {DateFormatStr}", dateFormatStr);
             {
                 dateFormatStr = AbsoluteTimeDateFormatter.Iso8601TimeDateFormat;
             }
@@ -121,6 +123,7 @@ namespace log4net.Layout.Pattern
             if (SystemInfo.EqualsIgnoringCase(dateFormatStr, AbsoluteTimeDateFormatter.Iso8601TimeDateFormat))
             {
                 this.m_dateFormatter = new Iso8601DateFormatter();
+				value.LogDebug("ActivateOptions(): m_dateFormatter → {M_dateFormatter}", m_dateFormatter);
             }
             else if (SystemInfo.EqualsIgnoringCase(dateFormatStr, AbsoluteTimeDateFormatter.AbsoluteTimeDateFormat))
             {
@@ -142,6 +145,7 @@ namespace log4net.Layout.Pattern
                     this.m_dateFormatter = new Iso8601DateFormatter();
                 }	
             }
+			value.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>
@@ -160,6 +164,7 @@ namespace log4net.Layout.Pattern
         /// </remarks>
         protected override void Convert(TextWriter writer, LoggingEvent loggingEvent)
         {
+			value.LogDebug(">>> Entering Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
             try 
             {
                 this.m_dateFormatter.FormatDate(loggingEvent.TimeStamp, writer);
@@ -168,6 +173,7 @@ namespace log4net.Layout.Pattern
             {
                 LogLog.Error(declaringType, "Error occurred while converting date.", ex);
             }
+			value.LogDebug("<<< Exiting Convert(writer={Writer},loggingEvent={LoggingEvent})", writer, loggingEvent);
         }
 
         /// <summary>

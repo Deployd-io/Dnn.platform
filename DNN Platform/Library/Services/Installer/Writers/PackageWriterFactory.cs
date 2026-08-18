@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// <summary>The PackageWriterFactory is a factory class that is used to instantiate the appropriate Package Writer.</summary>
     public partial class PackageWriterFactory
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PackageWriterFactory));
         /// <summary>The GetWriter method instantiates the relevant PackageWriter Installer.</summary>
         /// <param name="package">The associated PackageInfo instance.</param>
         /// <returns>A <see cref="PackageWriterBase"/> instance or <see langword="null"/>.</returns>
@@ -29,8 +30,10 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <returns>A <see cref="PackageWriterBase"/> instance or <see langword="null"/>.</returns>
         public static PackageWriterBase GetWriter(IServiceProvider serviceProvider, PackageInfo package)
         {
+			Logger.LogDebug(">>> Entering GetWriter(serviceProvider={ServiceProvider},package={Package})", serviceProvider, package);
             PackageWriterBase writer = null;
             switch (package.PackageType)
+			Logger.LogDebug("GetWriter(serviceProvider={ServiceProvider},package={Package}): writer → {Writer}", serviceProvider, package, writer);
             {
                 case "Auth_System":
                     writer = new AuthenticationPackageWriter(package);
@@ -63,7 +66,9 @@ namespace DotNetNuke.Services.Installer.Writers
                 default:
                     // PackageType is defined in the List
                     var listController = ActivatorUtilities.GetServiceOrCreateInstance<ListController>(serviceProvider);
+					Logger.LogDebug("GetWriter(serviceProvider={ServiceProvider},package={Package}): listController → {ListController}", serviceProvider, package, listController);
                     ListEntryInfo entry = listController.GetListEntryInfo("PackageWriter", package.PackageType);
+					Logger.LogDebug("GetWriter(serviceProvider={ServiceProvider},package={Package}): entry → {Entry}", serviceProvider, package, entry);
 
                     if (entry != null && !string.IsNullOrEmpty(entry.Text))
                     {
@@ -74,6 +79,7 @@ namespace DotNetNuke.Services.Installer.Writers
                     break;
             }
 
+			Logger.LogDebug("<<< Exiting GetWriter(package={Package})", package);
             return writer;
         }
     }

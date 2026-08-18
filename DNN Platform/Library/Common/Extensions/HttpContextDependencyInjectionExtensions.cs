@@ -13,6 +13,7 @@ namespace DotNetNuke.Common.Extensions
     /// <summary>Dependency injection extensions for HttpContext.</summary>
     public static class HttpContextDependencyInjectionExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HttpContextDependencyInjectionExtensions));
         /// <summary>Sets the service scope for the http context.</summary>
         /// <param name="httpContext">The http context.</param>
         /// <param name="scope">The service scope.</param>
@@ -28,6 +29,7 @@ namespace DotNetNuke.Common.Extensions
             {
                 httpContext.Items[typeof(IServiceScope)] = scope;
             }
+			Logger.LogDebug("<<< Exiting SetScope(httpContext={HttpContext},scope={Scope})", httpContext, scope);
         }
 
         /// <summary>Clears the service scope for the http context.</summary>
@@ -39,7 +41,9 @@ namespace DotNetNuke.Common.Extensions
         /// <param name="httpContext">The http context on which to clear the service scope.</param>
         public static void ClearScope(this HttpContextBase httpContext)
         {
+			Logger.LogDebug(">>> Entering ClearScope(httpContext={HttpContext})", httpContext);
             httpContext.Items.Remove(typeof(IServiceScope));
+			Logger.LogDebug("<<< Exiting ClearScope(httpContext={HttpContext})", httpContext);
         }
 
         /// <summary>Gets the http context service scope.</summary>
@@ -53,7 +57,9 @@ namespace DotNetNuke.Common.Extensions
         /// <returns>A service scope.</returns>
         public static IServiceScope GetScope(this HttpContextBase httpContext)
         {
+			Logger.LogDebug(">>> Entering GetScope(httpContext={HttpContext})", httpContext);
             var scope = httpContext.Items.GetScope();
+			Logger.LogDebug("GetScope(httpContext={HttpContext}): scope → {Scope}", httpContext, scope);
             if (scope is not null || Globals.DependencyProvider is null)
             {
                 return scope;
@@ -67,6 +73,7 @@ namespace DotNetNuke.Common.Extensions
             }
 
             var scopeLock = new object();
+			Logger.LogDebug("GetScope(httpContext={HttpContext}): scopeLock → {ScopeLock}", httpContext, scopeLock);
             httpContext.Items.Add(ScopeLockName, scopeLock);
             lock (httpContext.Items[ScopeLockName])
             {
@@ -83,9 +90,11 @@ namespace DotNetNuke.Common.Extensions
             if (scope is not null)
             {
                 httpContext.AddOnRequestCompleted(DisposeScope);
+			Logger.LogDebug("<<< Exiting GetScope(httpContext={HttpContext})", httpContext);
                 return scope;
             }
 
+			Logger.LogDebug("<<< Exiting GetScope(httpContextItems={HttpContextItems})", httpContextItems);
             return GetScope(httpContext);
         }
 
@@ -96,8 +105,10 @@ namespace DotNetNuke.Common.Extensions
 
         private static void DisposeScope(HttpContextBase httpContext)
         {
+			Logger.LogDebug(">>> Entering DisposeScope(httpContext={HttpContext})", httpContext);
             httpContext.Items.GetScope()?.Dispose();
             httpContext.ClearScope();
+			Logger.LogDebug("<<< Exiting DisposeScope(httpContext={HttpContext})", httpContext);
         }
     }
 }

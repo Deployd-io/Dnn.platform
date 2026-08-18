@@ -9,28 +9,36 @@ import { Scrollbars } from "react-custom-scrollbars";
 import ThemeFile from "./ThemeFile";
 
 import "./style.less";
+const logger = console;
 
 class ThemeFileList extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             themeName: "",
             level: 0
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {props} = this;
 
         this.parseProps(props);
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     UNSAFE_componentWillReceiveProps(newProps) {
+		logger.debug(`>>> Entering UNSAFE_componentWillReceiveProps(newProps=${newProps})`);
         this.parseProps(newProps);
+		logger.debug(`<<< Exiting UNSAFE_componentWillReceiveProps(newProps=${newProps})`);
     }
 
     /*eslint-disable eqeqeq*/
     parseProps(props) {
+	logger.debug(`>>> Entering parseProps(props=${props})`);
 
         if (!props.theme || !props.theme.SiteLayout.themeName) {
             return;
@@ -39,35 +47,42 @@ class ThemeFileList extends Component {
         let themeName = props.type == 0 ? props.theme.SiteLayout.themeName : props.theme.SiteContainer.themeName;
         let path = props.type == 0 ? props.theme.SiteLayout.path : props.theme.SiteContainer.path;
         let level = path.indexOf("[G]") > -1 ? 4 : (path.indexOf("[S]") > -1 ? 2 : 1);
+		logger.debug(`parseProps(props=${props}): level → ${level}`);
 
         this.setState({ themeName: themeName, level: level }, function () {
             this.loadThemeFiles();
         });
+		logger.debug(`<<< Exiting parseProps(props=${props})`);
     }
 
     selectedAsSite(themeFile) {
+		logger.debug(`>>> Entering selectedAsSite(themeFile=${themeFile})`);
         const {props} = this;
         let currentTheme = props.theme;
 
         if (themeFile.type === 0) {
             return currentTheme.SiteLayout.path.toLowerCase() === themeFile.path.toLowerCase();
         } else {
+			logger.debug(`<<< Exiting selectedAsSite(themeFile=${themeFile})`);
             return currentTheme.SiteContainer.path.toLowerCase() === themeFile.path.toLowerCase();
         }
     }
 
     selectedAsEdit(themeFile) {
+		logger.debug(`>>> Entering selectedAsEdit(themeFile=${themeFile})`);
         const {props} = this;
         let currentTheme = props.theme;
 
         if (themeFile.type === 0) {
             return currentTheme.EditLayout.path.toLowerCase() === themeFile.path.toLowerCase();
         } else {
+			logger.debug(`<<< Exiting selectedAsEdit(themeFile=${themeFile})`);
             return currentTheme.EditContainer.path.toLowerCase() === themeFile.path.toLowerCase();
         }
     }
 
     getListWidth() {
+		logger.debug('>>> Entering getListWidth()');
         const {props} = this;
 
         let width = 0;
@@ -80,6 +95,7 @@ class ThemeFileList extends Component {
     }
 
     loadThemeFiles() {
+		logger.debug('>>> Entering loadThemeFiles()');
         const {props, state} = this;
 
         if (!state.themeName || props.themeFiles[props.type].length !== 0) {
@@ -87,11 +103,14 @@ class ThemeFileList extends Component {
         }
 
         props.dispatch(ThemeActions.getCurrentThemeFiles(state.themeName, props.type, state.level));
+		logger.debug('<<< Exiting loadThemeFiles()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className="theme-files-list">
                 <Scrollbars
@@ -118,6 +137,8 @@ ThemeFileList.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         themeFiles: state.theme.currentThemeFiles,
         theme: state.theme.currentTheme

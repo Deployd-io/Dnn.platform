@@ -14,7 +14,10 @@ namespace Dnn.PersonaBar.Pages.Components.Exceptions
         public BulkPagesException(string field, string message)
             : base(message)
         {
+			eventLogger.LogDebug(">>> Entering BulkPagesException(field={Field},message={Message})", field, message);
             this.Field = field;
+			eventLogger.LogDebug("BulkPagesException(field={Field},message={Message}): this.Field → {Arg2}", field, message, this.Field);
+			eventLogger.LogDebug("<<< Exiting BulkPagesException(field={Field},message={Message})", field, message);
         }
 
         public string Field { get; set; }

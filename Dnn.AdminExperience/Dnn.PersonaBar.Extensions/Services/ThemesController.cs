@@ -43,6 +43,12 @@ namespace Dnn.PersonaBar.Themes.Services
         public ThemesController()
             : this(null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering ThemesController()");
+		Logger.LogDebug("<<< Exiting ThemesController()");
+		Logger.LogDebug(">>> Entering ThemesController(controller={Controller},hostSettings={HostSettings},appStatus={AppStatus},localeController={LocaleController})", controller, hostSettings, appStatus, localeController);
+		Logger.LogDebug("ThemesController(controller={Controller},hostSettings={HostSettings},appStatus={AppStatus},localeController={LocaleController}): hostSettings → {HostSettings1}", controller, hostSettings, appStatus, localeController, hostSettings);
+		Logger.LogDebug("ThemesController(controller={Controller},hostSettings={HostSettings},appStatus={AppStatus},localeController={LocaleController}): appStatus → {AppStatus1}", controller, hostSettings, appStatus, localeController, appStatus);
+		Logger.LogDebug("ThemesController(controller={Controller},hostSettings={HostSettings},appStatus={AppStatus},localeController={LocaleController}): localeController → {LocaleController1}", controller, hostSettings, appStatus, localeController, localeController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ThemesController"/> class.</summary>
@@ -56,11 +62,13 @@ namespace Dnn.PersonaBar.Themes.Services
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
             this.localeController = localeController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ILocaleController>();
+			Logger.LogDebug("<<< Exiting ThemesController(controller={Controller},hostSettings={HostSettings},appStatus={AppStatus},localeController={LocaleController})", controller, hostSettings, appStatus, localeController);
         }
 
         [HttpGet]
         public HttpResponseMessage GetCurrentTheme(string language)
         {
+			Logger.LogDebug(">>> Entering GetCurrentTheme(language={Language})", language);
             try
             {
                 return this.Request.CreateResponse(HttpStatusCode.OK, this.GetCurrentThemeObject());
@@ -68,6 +76,7 @@ namespace Dnn.PersonaBar.Themes.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting GetCurrentTheme(language={Language})", language);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -75,6 +84,7 @@ namespace Dnn.PersonaBar.Themes.Services
         [HttpGet]
         public HttpResponseMessage GetThemes(ThemeLevel level)
         {
+			Logger.LogDebug(">>> Entering GetThemes(level={Level})", level);
             try
             {
                 return this.Request.CreateResponse(HttpStatusCode.OK, new
@@ -82,10 +92,13 @@ namespace Dnn.PersonaBar.Themes.Services
                     Layouts = this.controller.GetLayouts(this.PortalSettings, level),
                     Containers = this.controller.GetContainers(this.PortalSettings, level),
                 });
+				Logger.LogDebug("GetThemes(level={Level}): Layouts → {Layouts}", level, Layouts);
+				Logger.LogDebug("GetThemes(level={Level}): Containers → {Containers}", level, Containers);
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting GetThemes(level={Level})", level);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -118,6 +131,7 @@ namespace Dnn.PersonaBar.Themes.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.Edit)]
         public HttpResponseMessage ApplyTheme(ApplyThemeInfo applyTheme, string language)
         {
+			Logger.LogDebug(">>> Entering ApplyTheme(applyTheme={ApplyTheme},language={Language})", applyTheme, language);
             try
             {
                 this.controller.ApplyTheme(this.PortalId, applyTheme.ThemeFile, applyTheme.Scope);
@@ -126,6 +140,7 @@ namespace Dnn.PersonaBar.Themes.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting ApplyTheme(applyTheme={ApplyTheme},language={Language})", applyTheme, language);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -135,6 +150,7 @@ namespace Dnn.PersonaBar.Themes.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.Edit)]
         public HttpResponseMessage ApplyDefaultTheme(ApplyDefaultThemeInfo defaultTheme, string language)
         {
+			Logger.LogDebug(">>> Entering ApplyDefaultTheme(defaultTheme={DefaultTheme},language={Language})", defaultTheme, language);
             try
             {
                 var themeInfo = this.controller.GetLayouts(this.PortalSettings, ThemeLevel.All)
@@ -148,6 +164,7 @@ namespace Dnn.PersonaBar.Themes.Services
                 }
 
                 var themeFiles = this.controller.GetThemeFiles(this.PortalSettings, themeInfo);
+				Logger.LogDebug("ApplyDefaultTheme(defaultTheme={DefaultTheme},language={Language}): themeFiles → {ThemeFiles}", defaultTheme, language, themeFiles);
                 if (themeFiles.Count == 0)
                 {
                     return this.Request.CreateErrorResponse(HttpStatusCode.NotFound, "NoThemeFile");
@@ -159,6 +176,7 @@ namespace Dnn.PersonaBar.Themes.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting ApplyDefaultTheme(defaultTheme={DefaultTheme},language={Language})", defaultTheme, language);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -193,6 +211,7 @@ namespace Dnn.PersonaBar.Themes.Services
         [RequireHost]
         public HttpResponseMessage GetEditableTokens()
         {
+			Logger.LogDebug(">>> Entering GetEditableTokens()");
             try
             {
                 var tokens = SkinControlController.GetSkinControls().Values
@@ -204,6 +223,7 @@ namespace Dnn.PersonaBar.Themes.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting GetEditableTokens()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -211,6 +231,7 @@ namespace Dnn.PersonaBar.Themes.Services
         [HttpGet]
         public HttpResponseMessage GetEditableSettings(string token)
         {
+			Logger.LogDebug(">>> Entering GetEditableSettings(token=<redacted>)");
             try
             {
                 if (!SkinControlController.GetSkinControls().Values.Select(sc => sc.ControlSrc).ToHashSet(StringComparer.OrdinalIgnoreCase).Contains(token))
@@ -219,7 +240,9 @@ namespace Dnn.PersonaBar.Themes.Services
                 }
 
                 var strFile = this.appStatus.ApplicationMapPath + @"\" + token.ToLowerInvariant().Replace("/", @"\").Replace(".ascx", ".xml");
+				Logger.LogDebug("GetEditableSettings(token=<redacted>): strFile → {StrFile}", strFile);
                 var settings = new List<ListItemInfo>();
+				Logger.LogDebug("GetEditableSettings(token=<redacted>): settings → {Settings}", settings);
                 if (File.Exists(strFile))
                 {
                     var xmlDoc = new XmlDocument { XmlResolver = null };
@@ -234,6 +257,7 @@ namespace Dnn.PersonaBar.Themes.Services
                     }
                 }
 
+				Logger.LogDebug("<<< Exiting GetEditableSettings(token=<redacted>)");
                 return this.Request.CreateResponse(HttpStatusCode.OK, settings);
             }
             catch (Exception ex)
@@ -246,6 +270,7 @@ namespace Dnn.PersonaBar.Themes.Services
         [HttpGet]
         public HttpResponseMessage GetEditableValues(string token, string setting)
         {
+			Logger.LogDebug(">>> Entering GetEditableValues(token=<redacted>,setting={Setting})", setting);
             try
             {
                 if (!SkinControlController.GetSkinControls().Values.Select(sc => sc.ControlSrc).ToHashSet(StringComparer.OrdinalIgnoreCase).Contains(token))
@@ -254,7 +279,9 @@ namespace Dnn.PersonaBar.Themes.Services
                 }
 
                 var strFile = this.appStatus.ApplicationMapPath + @"\" + token.ToLowerInvariant().Replace("/", @"\").Replace(".ascx", ".xml");
+				Logger.LogDebug("GetEditableValues(token=<redacted>,setting={Setting}): strFile → {StrFile}", setting, strFile);
                 var value = string.Empty;
+				Logger.LogDebug("GetEditableValues(token=<redacted>,setting={Setting}): value → {Value}", setting, value);
                 if (File.Exists(strFile))
                 {
                     var xmlDoc = new XmlDocument { XmlResolver = null };
@@ -283,6 +310,7 @@ namespace Dnn.PersonaBar.Themes.Services
                     }
                 }
 
+				Logger.LogDebug("<<< Exiting GetEditableValues(token=<redacted>,setting={Setting})", setting);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Value = value });
             }
             catch (Exception ex)
@@ -297,9 +325,11 @@ namespace Dnn.PersonaBar.Themes.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.Edit)]
         public HttpResponseMessage UpdateTheme(UpdateThemeInfo updateTheme)
         {
+			Logger.LogDebug(">>> Entering UpdateTheme(updateTheme={UpdateTheme})", updateTheme);
             try
             {
                 var token = SkinControlController.GetSkinControls().Values.FirstOrDefault(t => t.ControlSrc == updateTheme.Token);
+				Logger.LogWarning("UpdateTheme(updateTheme={UpdateTheme}): token → {Token}", updateTheme, token);
                 if (token == null)
                 {
                     return this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "InvalidParameter");
@@ -313,12 +343,14 @@ namespace Dnn.PersonaBar.Themes.Services
                 }
 
                 updateTheme.Token = token.ControlKey;
+				Logger.LogDebug("UpdateTheme(updateTheme={UpdateTheme}): updateTheme.Token → {Arg1}", updateTheme, updateTheme.Token);
                 this.controller.UpdateTheme(this.PortalSettings, updateTheme);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { });
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting UpdateTheme(updateTheme={UpdateTheme})", updateTheme);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -328,6 +360,7 @@ namespace Dnn.PersonaBar.Themes.Services
         [RequireHost]
         public HttpResponseMessage ParseTheme(ParseThemeInfo parseTheme)
         {
+			Logger.LogDebug(">>> Entering ParseTheme(parseTheme={ParseTheme})", parseTheme);
             try
             {
                 var themeName = parseTheme.ThemeName;
@@ -353,6 +386,7 @@ namespace Dnn.PersonaBar.Themes.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting ParseTheme(parseTheme={ParseTheme})", parseTheme);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -362,6 +396,7 @@ namespace Dnn.PersonaBar.Themes.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.Edit)]
         public HttpResponseMessage RestoreTheme(string language)
         {
+			Logger.LogDebug(">>> Entering RestoreTheme(language={Language})", language);
             try
             {
                 SkinController.SetSkin(SkinController.RootSkin, this.PortalId, SkinType.Portal, string.Empty);
@@ -375,24 +410,33 @@ namespace Dnn.PersonaBar.Themes.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting RestoreTheme(language={Language})", language);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
 
         private object GetCurrentThemeObject()
         {
+			Logger.LogDebug(">>> Entering GetCurrentThemeObject()");
             var cultureCode = this.localeController.GetCurrentLocale(this.PortalId).Code;
             var siteLayout = PortalController.GetPortalSetting("DefaultPortalSkin", this.PortalId, this.hostSettings.DefaultPortalSkin, cultureCode);
+			Logger.LogDebug("GetCurrentThemeObject(): siteLayout → {SiteLayout}", siteLayout);
             var siteContainer = PortalController.GetPortalSetting("DefaultPortalContainer", this.PortalId, this.hostSettings.DefaultPortalContainer, cultureCode);
+			Logger.LogDebug("GetCurrentThemeObject(): siteContainer → {SiteContainer}", siteContainer);
             var editLayout = PortalController.GetPortalSetting("DefaultAdminSkin", this.PortalId, this.hostSettings.DefaultAdminSkin, cultureCode);
+			Logger.LogDebug("GetCurrentThemeObject(): editLayout → {EditLayout}", editLayout);
             var editContainer = PortalController.GetPortalSetting("DefaultAdminContainer", this.PortalId, this.hostSettings.DefaultAdminContainer, cultureCode);
+			Logger.LogDebug("GetCurrentThemeObject(): editContainer → {EditContainer}", editContainer);
+			Logger.LogDebug("GetCurrentThemeObject(): cultureCode → {CultureCode}", cultureCode);
 
+			Logger.LogDebug("<<< Exiting GetCurrentThemeObject()");
             return new
             {
                 SiteLayout = this.controller.GetThemeFile(this.PortalSettings, siteLayout, ThemeType.Skin),
                 SiteContainer = this.controller.GetThemeFile(this.PortalSettings, siteContainer, ThemeType.Container),
                 EditLayout = this.controller.GetThemeFile(this.PortalSettings, editLayout, ThemeType.Skin),
                 EditContainer = this.controller.GetThemeFile(this.PortalSettings, editContainer, ThemeType.Container),
+                Logger.LogDebug("GetCurrentThemeObject(): SiteLayout → {SiteLayout}", SiteLayout);
             };
         }
     }

@@ -29,6 +29,8 @@ namespace DotNetNuke.Services.Exceptions
         /// <summary>Initializes a new instance of the <see cref="BasePortalException"/> class.</summary>
         public BasePortalException()
         {
+		Logger.LogDebug(">>> Entering BasePortalException()");
+		Logger.LogDebug("<<< Exiting BasePortalException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="BasePortalException"/> class.</summary>
@@ -36,7 +38,9 @@ namespace DotNetNuke.Services.Exceptions
         public BasePortalException(string message)
             : base(message)
         {
+			Logger.LogDebug(">>> Entering BasePortalException(message={Message})", message);
             this.InitializePrivateVariables();
+			Logger.LogDebug("<<< Exiting BasePortalException(message={Message})", message);
         }
 
         /// <summary>Initializes a new instance of the <see cref="BasePortalException"/> class.</summary>
@@ -122,26 +126,34 @@ namespace DotNetNuke.Services.Exceptions
 
         private void InitializePrivateVariables()
         {
+			Logger.LogDebug(">>> Entering InitializePrivateVariables()");
             // Try and get the Portal settings from context
             // If an error occurs getting the context then set the variables to -1
             try
             {
                 var context = HttpContext.Current;
                 var portalSettings = PortalController.Instance.GetCurrentSettings();
+				Logger.LogDebug("InitializePrivateVariables(): portalSettings → {PortalSettings}", portalSettings);
                 Exception innerException = new WrappedException(this.message, this);
+				Logger.LogDebug("InitializePrivateVariables(): innerException → {InnerException}", innerException);
                 while (innerException.InnerException != null)
                 {
                     innerException = innerException.InnerException;
                 }
 
                 var exceptionInfo = Exceptions.GetExceptionInfo(innerException);
+				Logger.LogDebug("InitializePrivateVariables(): exceptionInfo → {ExceptionInfo}", exceptionInfo);
 
                 this.AssemblyVersion = DotNetNukeContext.Current.Application.Version.ToString(3);
                 if (portalSettings != null)
                 {
                     this.PortalID = portalSettings.PortalId;
+					Logger.LogDebug("InitializePrivateVariables(): this.PortalID → {Arg0}", this.PortalID);
+					Logger.LogDebug("InitializePrivateVariables(): this.ActiveTabID → {Arg0}", this.ActiveTabID);
+					Logger.LogDebug("InitializePrivateVariables(): this.ActiveTabName → {Arg0}", this.ActiveTabName);
                     this.PortalName = portalSettings.PortalName;
                     this.ActiveTabID = TabController.CurrentPage.TabID;
+					Logger.LogDebug("InitializePrivateVariables(): this.PortalName → {Arg0}", this.PortalName);
                     this.ActiveTabName = TabController.CurrentPage.TabName;
                 }
                 else
@@ -153,16 +165,19 @@ namespace DotNetNuke.Services.Exceptions
                 }
 
                 var currentUserInfo = UserController.Instance.GetCurrentUserInfo();
+				Logger.LogDebug("InitializePrivateVariables(): currentUserInfo → {CurrentUserInfo}", currentUserInfo);
                 this.UserID = currentUserInfo?.UserID ?? -1;
 
                 if (this.UserID != -1)
                 {
                     currentUserInfo = UserController.GetUserById(this.PortalID, this.UserID);
                     this.UserName = currentUserInfo != null ? currentUserInfo.Username : string.Empty;
+					Logger.LogDebug("InitializePrivateVariables(): this.UserID → {Arg0}", this.UserID);
                 }
                 else
                 {
                     this.UserName = string.Empty;
+					Logger.LogDebug("InitializePrivateVariables(): this.UserName → {Arg0}", this.UserName);
                 }
 
                 if (context != null)
@@ -180,13 +195,19 @@ namespace DotNetNuke.Services.Exceptions
                 {
                     this.RawURL = string.Empty;
                     this.AbsoluteURL = string.Empty;
+					Logger.LogDebug("InitializePrivateVariables(): this.RawURL → {Arg0}", this.RawURL);
                     this.AbsoluteURLReferrer = string.Empty;
                     this.UserAgent = string.Empty;
+					Logger.LogDebug("InitializePrivateVariables(): this.AbsoluteURL → {Arg0}", this.AbsoluteURL);
                 }
 
+				Logger.LogDebug("InitializePrivateVariables(): this.AbsoluteURLReferrer → {Arg0}", this.AbsoluteURLReferrer);
                 try
                 {
+					Logger.LogDebug("InitializePrivateVariables(): this.UserAgent → {Arg0}", this.UserAgent);
+					Logger.LogDebug("InitializePrivateVariables(): this.DefaultDataProvider → {Arg0}", this.DefaultDataProvider);
                     ProviderConfiguration objProviderConfiguration = ProviderConfiguration.GetProviderConfiguration("data");
+					Logger.LogDebug("InitializePrivateVariables(): objProviderConfiguration → {ObjProviderConfiguration}", objProviderConfiguration);
                     string strTypeName = ((Provider)objProviderConfiguration.Providers[objProviderConfiguration.DefaultProvider]).Type;
                     this.DefaultDataProvider = strTypeName;
                 }
@@ -202,8 +223,12 @@ namespace DotNetNuke.Services.Exceptions
                 if (exceptionInfo != null)
                 {
                     this.FileName = exceptionInfo.FileName;
+					Logger.LogDebug("InitializePrivateVariables(): this.FileName → {Arg0}", this.FileName);
+					Logger.LogDebug("InitializePrivateVariables(): this.FileColumnNumber → {Arg0}", this.FileColumnNumber);
+					Logger.LogDebug("InitializePrivateVariables(): this.Method → {Arg0}", this.Method);
                     this.FileLineNumber = exceptionInfo.FileLineNumber;
                     this.FileColumnNumber = exceptionInfo.FileColumnNumber;
+					Logger.LogDebug("InitializePrivateVariables(): this.FileLineNumber → {Arg0}", this.FileLineNumber);
                     this.Method = exceptionInfo.Method;
                 }
                 else
@@ -219,6 +244,7 @@ namespace DotNetNuke.Services.Exceptions
                     this.stackTrace = this.StackTrace;
                 }
                 catch (Exception exc)
+				Logger.LogDebug("InitializePrivateVariables(): this.stackTrace → {Arg0}", this.stackTrace);
                 {
                     Logger.Error(exc);
 
@@ -228,6 +254,7 @@ namespace DotNetNuke.Services.Exceptions
                 try
                 {
                     this.message = this.Message;
+					Logger.LogDebug("InitializePrivateVariables(): this.message → {Arg0}", this.message);
                 }
                 catch (Exception exc)
                 {
@@ -239,6 +266,7 @@ namespace DotNetNuke.Services.Exceptions
                 try
                 {
                     this.source = this.Source;
+					Logger.LogDebug("InitializePrivateVariables(): this.source → {Arg0}", this.source);
                 }
                 catch (Exception exc)
                 {
@@ -249,12 +277,14 @@ namespace DotNetNuke.Services.Exceptions
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in InitializePrivateVariables(): {Arg0}", exc.getMessage());
                 this.PortalID = -1;
                 this.UserID = -1;
                 this.AssemblyVersion = "-1";
                 this.ActiveTabID = -1;
                 this.ActiveTabName = string.Empty;
                 this.RawURL = string.Empty;
+				Logger.LogDebug("InitializePrivateVariables(): this.AssemblyVersion → {Arg0}", this.AssemblyVersion);
                 this.AbsoluteURL = string.Empty;
                 this.AbsoluteURLReferrer = string.Empty;
                 this.UserAgent = string.Empty;
@@ -269,6 +299,7 @@ namespace DotNetNuke.Services.Exceptions
                 this.source = string.Empty;
                 Logger.Error(exc);
             }
+			Logger.LogDebug("<<< Exiting InitializePrivateVariables()");
         }
 
         private class WrappedException : Exception
@@ -277,6 +308,7 @@ namespace DotNetNuke.Services.Exceptions
             public WrappedException(string message, Exception innerException)
                 : base(message, innerException)
             {
+			Logger.LogDebug("<<< Exiting WrappedException(message={Message},innerException={InnerException})", message, innerException);
             }
         }
 

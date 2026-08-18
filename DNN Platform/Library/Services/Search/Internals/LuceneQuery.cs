@@ -8,14 +8,20 @@ namespace DotNetNuke.Services.Search.Internals
     /// <summary>Lucene Specific Query Object to be passed into Lucene for Search.</summary>
     internal class LuceneQuery
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LuceneQuery));
         /// <summary>Initializes a new instance of the <see cref="LuceneQuery"/> class.</summary>
         public LuceneQuery()
         {
+			Logger.LogDebug(">>> Entering LuceneQuery()");
             this.PageIndex = 1;
             this.TitleSnippetLength = 60;
+			Logger.LogDebug("LuceneQuery(): this.PageIndex → {Arg0}", this.PageIndex);
+			Logger.LogDebug("LuceneQuery(): this.TitleSnippetLength → {Arg0}", this.TitleSnippetLength);
             this.BodySnippetLength = 100;
             this.PageSize = 10;
             this.Sort = Sort.RELEVANCE;
+			Logger.LogDebug("LuceneQuery(): this.BodySnippetLength → {Arg0}", this.BodySnippetLength);
+			Logger.LogDebug("<<< Exiting LuceneQuery()");
         }
 
         /// <summary>Gets or sets lucene's original Query Object.</summary>

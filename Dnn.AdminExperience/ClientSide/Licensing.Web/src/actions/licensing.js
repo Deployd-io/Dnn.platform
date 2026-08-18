@@ -1,8 +1,11 @@
 import { licensing as ActionTypes } from "../constants/actionTypes";
 import ApplicationService from "../services/applicationService";
+const logger = console;
 
 const licensingActions = {
     getProduct(callback) {
+		logger.debug(`>>> Entering getProduct(callback=${callback})`);
+		logger.debug(`<<< Exiting getProduct(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getProduct(data => {
                 dispatch({
@@ -19,6 +22,8 @@ const licensingActions = {
     },
 
     getServerInfo(callback) {
+		logger.debug(`>>> Entering getServerInfo(callback=${callback})`);
+		logger.debug(`<<< Exiting getServerInfo(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getServerInfo(data => {
                 dispatch({

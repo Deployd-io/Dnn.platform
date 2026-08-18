@@ -12,9 +12,12 @@ namespace DotNetNuke.Services.Social.Messaging.Exceptions
     [SuppressMessage("Microsoft.Design", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "Breaking change")]
     public class AttachmentsNotAllowed : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AttachmentsNotAllowed));
         /// <summary>Initializes a new instance of the <see cref="AttachmentsNotAllowed"/> class.</summary>
         public AttachmentsNotAllowed()
         {
+		Logger.LogDebug(">>> Entering AttachmentsNotAllowed()");
+		Logger.LogDebug("<<< Exiting AttachmentsNotAllowed()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="AttachmentsNotAllowed"/> class.</summary>
@@ -22,7 +25,9 @@ namespace DotNetNuke.Services.Social.Messaging.Exceptions
         public AttachmentsNotAllowed(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering AttachmentsNotAllowed(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting AttachmentsNotAllowed(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="AttachmentsNotAllowed"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

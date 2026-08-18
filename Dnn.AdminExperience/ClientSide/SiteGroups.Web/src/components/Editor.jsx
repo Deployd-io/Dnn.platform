@@ -10,13 +10,18 @@ import {
 } from "@dnnsoftware/dnn-react-common";
 import AssignedSelector from "./AssignedSelector";
 import "./Editor.less";
+const logger = console;
 
 export default class SiteGroupEditor extends React.Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <div className="sitegroup-details-editor">
                 <GridCell>

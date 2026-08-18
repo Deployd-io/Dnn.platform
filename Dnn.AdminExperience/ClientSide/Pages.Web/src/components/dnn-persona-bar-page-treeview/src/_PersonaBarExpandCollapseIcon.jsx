@@ -1,13 +1,16 @@
 import React, {Component} from "react";
 import { PropTypes } from "prop-types";
 import "./styles.less";
+const logger = console;
 import { SvgIcons } from "@dnnsoftware/dnn-react-common";
 
 export default class PersonaBarExpandCollapseIcon extends Component {
 
     render() {
+		logger.debug('>>> Entering render()');
         const {isOpen, item} = this.props;
          
+		logger.debug('<<< Exiting render()');
         return (
             <div className="parent-expand-icon">
                 {isOpen ? <div id={`collapse-${item.name}`} className="treeview-parent-collapse-button"><SvgIcons.CollapseTree /></div> : <div id={`expand-${item.name}`} className="treeview-parent-expand-button"><SvgIcons.ExpandTree /></div> }

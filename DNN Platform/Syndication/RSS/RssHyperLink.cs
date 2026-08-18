@@ -10,10 +10,14 @@ namespace DotNetNuke.Services.Syndication
     /// <summary>RssHyperLink control - works with <see cref="RssHttpHandlerBase{TRssChannelType,TRssItemType,TRssImageType}"/>.</summary>
     public class RssHyperLink : HyperLink
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RssHyperLink));
         /// <summary>Initializes a new instance of the <see cref="RssHyperLink"/> class.</summary>
         public RssHyperLink()
         {
+			Logger.LogDebug(">>> Entering RssHyperLink()");
             this.Text = "RSS";
+			Logger.LogDebug("RssHyperLink(): this.Text → {Arg0}", this.Text);
+			Logger.LogDebug("<<< Exiting RssHyperLink()");
         }
 
         /// <summary>Gets or sets the channel name.</summary>
@@ -25,6 +29,7 @@ namespace DotNetNuke.Services.Syndication
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             // modify the NavigateUrl to include optional user name and channel name
             string channel = this.ChannelName ?? string.Empty;
             string user = this.IncludeUserName ? this.Context.User.Identity.Name : string.Empty;
@@ -40,6 +45,7 @@ namespace DotNetNuke.Services.Syndication
             }
 
             base.OnPreRender(e);
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
     }
 }

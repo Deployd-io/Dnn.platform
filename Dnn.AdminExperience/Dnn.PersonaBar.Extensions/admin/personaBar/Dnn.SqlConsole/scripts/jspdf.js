@@ -1,5 +1,7 @@
+const logger = console;
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	logger.debug('<<< Exiting define()');
     typeof define === 'function' && define.amd ? define(factory) :
     (global.jspdf = factory());
 }(this, function () { 'use strict';
@@ -7,6 +9,8 @@
     var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
       return typeof obj;
     } : function (obj) {
+	logger.debug('>>> Entering function()');
+	logger.debug('<<< Exiting function()');
       return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
     };
 
@@ -81,6 +85,7 @@
             'credit-card': [153, 243]
         };
 
+		logger.debug(`<<< Exiting function(global=${global})`);
         /**
          * jsPDF's Internal PubSub Implementation.
          * See mrrio.github.io/jsPDF/doc/symbols/PubSub.html
@@ -90,6 +95,7 @@
          * @class
          * @name PubSub
          */
+		logger.debug('>>> Entering function()');
         function PubSub(context) {
             var topics = {};
 
@@ -105,6 +111,7 @@
                 var id = Math.random().toString(35);
                 topics[topic][id] = [callback, !!once];
 
+				logger.debug(`<<< Exiting function(token=<redacted>)`);
                 return id;
             };
 
@@ -137,6 +144,7 @@
                     if (idr.length) idr.forEach(this.unsubscribe);
                 }
             };
+			logger.debug(`<<< Exiting PubSub(context=${context})`);
         }
 
         /**
@@ -158,6 +166,7 @@
             // Default options
             unit = unit || 'mm';
             format = format || 'a4';
+			logger.debug(`jsPDF(orientation=${orientation},unit=${unit},format=${format},compressPdf=${compressPdf}): unit → ${unit}`);
             orientation = ('' + (orientation || 'P')).toLowerCase();
 
             var format_as_string = ('' + format).toLowerCase(),
@@ -214,16 +223,24 @@
             // Private functions
             /////////////////////
             f2 = function f2(number) {
+				logger.debug(`>>> Entering f2(number=${number})`);
+				logger.debug(`<<< Exiting f2(number=${number})`);
                 return number.toFixed(2); // Ie, %.2f
             },
                 f3 = function f3(number) {
+				logger.debug(`>>> Entering f3(number=${number})`);
+				logger.debug(`<<< Exiting f3(number=${number})`);
                 return number.toFixed(3); // Ie, %.3f
             },
                 padd2 = function padd2(number) {
+				logger.debug(`>>> Entering padd2(number=${number})`);
+				logger.debug(`<<< Exiting padd2(number=${number})`);
                 return ('0' + parseInt(number)).slice(-2);
             },
                 out = function out(string) {
+				logger.debug(`>>> Entering out(string=${string})`);
                 if (outToPages) {
+					logger.debug(`<<< Exiting out(string=${string})`);
                     /* set by beginPage */
                     pages[currentPage].push(string);
                 } else {
@@ -233,10 +250,12 @@
                 }
             },
                 newObject = function newObject() {
+				logger.debug('>>> Entering newObject()');
                 // Begin a new object
                 objectNumber++;
                 offsets[objectNumber] = content_length;
                 out(objectNumber + ' 0 obj');
+				logger.debug('<<< Exiting newObject()');
                 return objectNumber;
             },
 
@@ -245,30 +264,39 @@
             // All pages have been added so the object ID can be estimated to start right after.
             // This does not modify the current objectNumber;  It must be updated after the newObjects are output.
             newAdditionalObject = function newAdditionalObject() {
+				logger.debug('>>> Entering newAdditionalObject()');
                 var objId = pages.length * 2 + 1;
                 objId += additionalObjects.length;
                 var obj = { objId: objId, content: '' };
+				logger.debug(`newAdditionalObject(): obj → ${obj}`);
                 additionalObjects.push(obj);
+				logger.debug('<<< Exiting newAdditionalObject()');
                 return obj;
             },
 
             // Does not output the object.  The caller must call newObjectDeferredBegin(oid) before outputing any data
             newObjectDeferred = function newObjectDeferred() {
+				logger.debug('>>> Entering newObjectDeferred()');
                 objectNumber++;
                 offsets[objectNumber] = function () {
+				logger.debug('<<< Exiting newObjectDeferred()');
                     return content_length;
                 };
                 return objectNumber;
             },
                 newObjectDeferredBegin = function newObjectDeferredBegin(oid) {
                 offsets[oid] = content_length;
+				logger.debug(`<<< Exiting newObjectDeferredBegin(oid=${oid})`);
             },
                 putStream = function putStream(str) {
+				logger.debug(`>>> Entering putStream(str=${str})`);
                 out('stream');
                 out(str);
                 out('endstream');
+				logger.debug(`<<< Exiting putStream(str=${str})`);
             },
                 putPages = function putPages() {
+				logger.debug('>>> Entering putPages()');
                 var n,
                     p,
                     arr,
@@ -334,9 +362,11 @@
                 }
                 out(kids + ']');
                 out('/Count ' + page);
+				logger.debug(`putPages(): kids → ${kids}`);
                 out('>>');
                 out('endobj');
                 events.publish('postPutPages');
+				logger.debug('<<< Exiting putPages()');
             },
                 putFont = function putFont(font) {
                 font.objectNumber = newObject();
@@ -346,19 +376,25 @@
                 }
                 out('/Subtype/Type1>>');
                 out('endobj');
+				logger.debug(`<<< Exiting putFont(font=${font})`);
             },
                 putFonts = function putFonts() {
+				logger.debug('>>> Entering putFonts()');
                 for (var fontKey in fonts) {
                     if (fonts.hasOwnProperty(fontKey)) {
                         putFont(fonts[fontKey]);
+						logger.debug('<<< Exiting putFonts()');
                     }
                 }
             },
                 putXobjectDict = function putXobjectDict() {
+				logger.debug('>>> Entering putXobjectDict()');
                 // Loop through images, or other data objects
                 events.publish('putXobjectDict');
+				logger.debug('<<< Exiting putXobjectDict()');
             },
                 putResourceDictionary = function putResourceDictionary() {
+				logger.debug('>>> Entering putResourceDictionary()');
                 out('/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]');
                 out('/Font <<');
 
@@ -372,8 +408,10 @@
                 out('/XObject <<');
                 putXobjectDict();
                 out('>>');
+				logger.debug('<<< Exiting putResourceDictionary()');
             },
                 putResources = function putResources() {
+				logger.debug('>>> Entering putResources()');
                 putFonts();
                 events.publish('putResources');
                 // Resource dictionary
@@ -384,8 +422,10 @@
                 out('>>');
                 out('endobj');
                 events.publish('postPutResources');
+				logger.debug('<<< Exiting putResources()');
             },
                 putAdditionalObjects = function putAdditionalObjects() {
+				logger.debug('>>> Entering putAdditionalObjects()');
                 events.publish('putAdditionalObjects');
                 for (var i = 0; i < additionalObjects.length; i++) {
                     var obj = additionalObjects[i];
@@ -397,6 +437,7 @@
                 }
                 objectNumber += additionalObjects.length;
                 events.publish('postPutAdditionalObjects');
+				logger.debug('<<< Exiting putAdditionalObjects()');
             },
                 addToFontDictionary = function addToFontDictionary(fontKey, fontName, fontStyle) {
                 // this is mapping structure for quick font key lookup.
@@ -406,6 +447,7 @@
                     fontmap[fontName] = {};
                 }
                 fontmap[fontName][fontStyle] = fontKey;
+				logger.debug(`<<< Exiting addToFontDictionary(fontKey=${fontKey},fontName=${fontName},fontStyle=${fontStyle})`);
             },
 
             /**
@@ -439,6 +481,7 @@
                 return fontKey;
             },
                 addFonts = function addFonts() {
+				logger.debug('>>> Entering addFonts()');
 
                 var HELVETICA = "helvetica",
                     TIMES = "times",
@@ -450,19 +493,26 @@
                     encoding = 'StandardEncoding',
                     ZAPF = "zapfdingbats",
                     standardFonts = [['Helvetica', HELVETICA, NORMAL], ['Helvetica-Bold', HELVETICA, BOLD], ['Helvetica-Oblique', HELVETICA, ITALIC], ['Helvetica-BoldOblique', HELVETICA, BOLD_ITALIC], ['Courier', COURIER, NORMAL], ['Courier-Bold', COURIER, BOLD], ['Courier-Oblique', COURIER, ITALIC], ['Courier-BoldOblique', COURIER, BOLD_ITALIC], ['Times-Roman', TIMES, NORMAL], ['Times-Bold', TIMES, BOLD], ['Times-Italic', TIMES, ITALIC], ['Times-BoldItalic', TIMES, BOLD_ITALIC], ['ZapfDingbats', ZAPF]];
+					logger.debug(`addFonts(): HELVETICA → ${HELVETICA}`);
 
                 for (var i = 0, l = standardFonts.length; i < l; i++) {
                     var fontKey = addFont(standardFonts[i][0], standardFonts[i][1], standardFonts[i][2], encoding);
+					logger.debug(`addFonts(): fontKey → ${fontKey}`);
 
                     // adding aliases for standard fonts, this time matching the capitalization
                     var parts = standardFonts[i][0].split('-');
+					logger.debug(`addFonts(): parts → ${parts}`);
                     addToFontDictionary(fontKey, parts[0], parts[1] || '');
                 }
                 events.publish('addFonts', { fonts: fonts, dictionary: fontmap });
+				logger.debug('<<< Exiting addFonts()');
             },
                 SAFE = function __safeCall(fn) {
+				logger.debug(`>>> Entering __safeCall(fn=${fn})`);
                 fn.foo = function __safeCallWrapper() {
+					logger.debug('>>> Entering __safeCallWrapper()');
                     try {
+						logger.debug('<<< Exiting __safeCallWrapper()');
                         return fn.apply(this, arguments);
                     } catch (e) {
                         var stack = e.stack || '';
@@ -608,6 +658,8 @@
                     newtext.push(bch);
                     newtext.push(ch - (bch << 8));
                 }
+				logger.debug(`to8bitStream(text=${text},flags=${flags}): newtext → ${newtext}`);
+				logger.debug(`<<< Exiting to8bitStream(text=${text},flags=${flags})`);
                 return String.fromCharCode.apply(undefined, newtext);
             },
                 pdfEscape = function pdfEscape(text, flags) {
@@ -627,6 +679,7 @@
                 return to8bitStream(text, flags).replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
             },
                 putInfo = function putInfo() {
+				logger.debug('>>> Entering putInfo()');
                 out('/Producer (jsPDF ' + jsPDF.version + ')');
                 for (var key in documentProperties) {
                     if (documentProperties.hasOwnProperty(key) && documentProperties[key]) {
@@ -639,9 +692,13 @@
                     tzhour = Math.floor(Math.abs(tzoffset / 60)),
                     tzmin = Math.abs(tzoffset % 60),
                     tzstr = [tzsign, padd2(tzhour), "'", padd2(tzmin), "'"].join('');
+					logger.debug(`putInfo(): created → ${created}`);
+					logger.debug(`putInfo(): tzstr → ${tzstr}`);
                 out(['/CreationDate (D:', created.getFullYear(), padd2(created.getMonth() + 1), padd2(created.getDate()), padd2(created.getHours()), padd2(created.getMinutes()), padd2(created.getSeconds()), tzstr, ')'].join(''));
+				logger.debug('<<< Exiting putInfo()');
             },
                 putCatalog = function putCatalog() {
+				logger.debug('>>> Entering putCatalog()');
                 out('/Type /Catalog');
                 out('/Pages 1 0 R');
                 // PDF13ref Section 7.2.1
@@ -661,6 +718,7 @@
                         break;
                     default:
                         var pcn = '' + zoomMode;
+						logger.debug(`putCatalog(): pcn → ${pcn}`);
                         if (pcn.substr(pcn.length - 1) === '%') zoomMode = parseInt(zoomMode) / 100;
                         if (typeof zoomMode === 'number') {
                             out('/OpenAction [3 0 R /XYZ null null ' + f2(zoomMode) + ']');
@@ -693,17 +751,21 @@
                     out('/PageMode /' + pageMode);
                 }
                 events.publish('putCatalog');
+				logger.debug('<<< Exiting putCatalog()');
             },
                 putTrailer = function putTrailer() {
+				logger.debug('>>> Entering putTrailer()');
                 out('/Size ' + (objectNumber + 1));
                 out('/Root ' + objectNumber + ' 0 R');
                 out('/Info ' + (objectNumber - 1) + ' 0 R');
+				logger.debug('<<< Exiting putTrailer()');
             },
                 beginPage = function beginPage(width, height) {
                 // Dimensions are stored as user units and converted to points on output
                 var orientation = typeof height === 'string' && height.toLowerCase();
                 if (typeof width === 'string') {
                     var format = width.toLowerCase();
+					logger.debug(`beginPage(width=${width},height=${height}): format → ${format}`);
                     if (pageFormats.hasOwnProperty(format)) {
                         width = pageFormats[format][0] / k;
                         height = pageFormats[format][1] / k;
@@ -736,8 +798,10 @@
                 };
                 pagesContext[page] = {};
                 _setPage(page);
+				logger.debug(`<<< Exiting beginPage(width=${width},height=${height})`);
             },
                 _addPage = function _addPage() {
+				logger.debug('>>> Entering _addPage()');
                 beginPage.apply(this, arguments);
                 // Set line width
                 out(f2(lineWidth * k) + ' w');
@@ -751,6 +815,7 @@
                     out(lineJoinID + ' j');
                 }
                 events.publish('addPage', { pageNumber: page });
+				logger.debug('<<< Exiting _addPage()');
             },
                 _deletePage = function _deletePage(n) {
                 if (n > 0 && n <= page) {
@@ -762,6 +827,7 @@
                     }
                     this.setPage(currentPage);
                 }
+				logger.debug(`<<< Exiting _deletePage(n=${n})`);
             },
                 _setPage = function _setPage(n) {
                 if (n > 0 && n <= page) {
@@ -769,6 +835,7 @@
                     pageWidth = pagedim[n].width;
                     pageHeight = pagedim[n].height;
                 }
+				logger.debug(`<<< Exiting _setPage(n=${n})`);
             },
 
             /**
@@ -811,6 +878,7 @@
                     case 'fantasy':
                     default:
                         fontName = 'times';
+						logger.debug(`_getFont(fontName=${fontName},fontStyle=${fontStyle}): fontName → ${fontName}`);
                         break;
                 }
 
@@ -827,9 +895,11 @@
                         key = fontmap['times']['normal'];
                     }
                 }
+				logger.debug(`<<< Exiting _getFont(fontName=${fontName},fontStyle=${fontStyle})`);
                 return key;
             },
                 buildDocument = function buildDocument() {
+				logger.debug('>>> Entering buildDocument()');
                 outToPages = false; // switches out() to content
 
                 objectNumber = 2;
@@ -890,6 +960,7 @@
 
                 outToPages = true;
 
+				logger.debug('<<< Exiting buildDocument()');
                 return content.join('\n');
             },
                 getStyle = function getStyle(style) {
@@ -909,19 +980,25 @@
                              */
                             op = style;
                         }
+				logger.debug(`<<< Exiting getStyle(style=${style})`);
                 return op;
             },
                 getArrayBuffer = function getArrayBuffer() {
+				logger.debug('>>> Entering getArrayBuffer()');
                 var data = buildDocument(),
                     len = data.length,
                     ab = new ArrayBuffer(len),
                     u8 = new Uint8Array(ab);
+					logger.debug(`getArrayBuffer(): data → ${data}`);
 
                 while (len--) {
                     u8[len] = data.charCodeAt(len);
                 }return ab;
+				logger.debug('<<< Exiting getArrayBuffer()');
             },
                 getBlob = function getBlob() {
+				logger.debug('>>> Entering getBlob()');
+				logger.debug('<<< Exiting getBlob()');
                 return new Blob([getArrayBuffer()], { type: "application/pdf" });
             },
 
@@ -1068,23 +1145,34 @@
                     }
                 },
                 'output': function output(type, options) {
+					logger.debug(`<<< Exiting output(type=${type},options=${options})`);
                     return _output(type, options);
                 },
                 'getNumberOfPages': function getNumberOfPages() {
+					logger.debug('>>> Entering getNumberOfPages()');
+					logger.debug('<<< Exiting getNumberOfPages()');
                     return pages.length - 1;
                 },
                 'pages': pages,
                 'out': out,
                 'f2': f2,
                 'getPageInfo': function getPageInfo(pageNumberOneBased) {
+					logger.debug(`>>> Entering getPageInfo(pageNumberOneBased=${pageNumberOneBased})`);
                     var objId = (pageNumberOneBased - 1) * 2 + 3;
+					logger.debug(`getPageInfo(pageNumberOneBased=${pageNumberOneBased}): objId → ${objId}`);
+					logger.debug(`<<< Exiting getPageInfo(pageNumberOneBased=${pageNumberOneBased})`);
                     return { objId: objId, pageNumber: pageNumberOneBased, pageContext: pagesContext[pageNumberOneBased] };
                 },
                 'getCurrentPageInfo': function getCurrentPageInfo() {
+					logger.debug('>>> Entering getCurrentPageInfo()');
                     var objId = (currentPage - 1) * 2 + 3;
+					logger.debug(`getCurrentPageInfo(): objId → ${objId}`);
+					logger.debug('<<< Exiting getCurrentPageInfo()');
                     return { objId: objId, pageNumber: currentPage, pageContext: pagesContext[currentPage] };
                 },
                 'getPDFVersion': function getPDFVersion() {
+					logger.debug('>>> Entering getPDFVersion()');
+					logger.debug('<<< Exiting getPDFVersion()');
                     return pdfVersion;
                 }
             };
@@ -1138,6 +1226,7 @@
                     pagesContext[beforePage] = tmpPagesContext;
                     this.setPage(beforePage);
                 }
+				logger.debug(`<<< Exiting function(targetPage=${targetPage},beforePage=${beforePage})`);
                 return this;
             };
 
@@ -1179,6 +1268,8 @@
                  */
                 function ESC(s) {
                     s = s.split("\t").join(Array(options.TabLen || 9).join(" "));
+					logger.debug(`ESC(s=${s}): s → ${s}`);
+					logger.debug(`<<< Exiting ESC(s=${s})`);
                     return pdfEscape(s, flags);
                 }
 
@@ -1274,6 +1365,7 @@
                             maxLineLength,
                             leading = activeFontSize * lineHeightProportion,
                             lineWidths = text.map(function (v) {
+							logger.debug(`>>> Entering map(this=${this})`);
                             return this.getStringUnitWidth(v) * activeFontSize / k;
                         }, this);
                         maxLineLength = Math.max.apply(Math, lineWidths);
@@ -1751,6 +1843,7 @@
                 }
 
                 out(color);
+				logger.debug(`<<< Exiting function(ch1=${ch1},ch2=${ch2},ch3=${ch3},ch4=${ch4})`);
                 return this;
             };
 
@@ -1852,6 +1945,7 @@
                 } else {
                     textColor = [f3(r / 255), f3(g / 255), f3(b / 255), 'rg'].join(' ');
                 }
+				logger.debug(`<<< Exiting function(r=${r},g=${g},b=${b})`);
                 return this;
             };
 
@@ -1979,6 +2073,7 @@
             _addPage(format, orientation);
 
             events.publish('initialized');
+			logger.debug('<<< Exiting width()');
             return API;
         }
 
@@ -2113,8 +2208,10 @@
             if (this.acroformPlugin.printedOut) {
                 this.acroformPlugin.printedOut = false;
                 this.acroformPlugin.acroFormDictionaryRoot = null;
+				logger.debug(`function(s=${s}): s.heap_len → ${s.heap_len}`);
             }
             if (!this.acroformPlugin.acroFormDictionaryRoot) {
+				logger.debug(`function(s=${s}): s.heap_max → ${s.heap_max}`);
                 createAcroForm.call(this);
             }
             this.acroformPlugin.acroFormDictionaryRoot.Fields.push(formObject);
@@ -2163,6 +2260,8 @@
 
             var fieldArray = fieldArray || this.acroformPlugin.acroFormDictionaryRoot.Kids;
 
+			logger.debug(`function(strm=${strm},_level=${_level},bits=${bits},_method=${_method},memLevel=${memLevel},_strategy=${_strategy}): strm.msg → ${strm.msg}`);
+			logger.debug(`function(strm=${strm},_level=${_level},bits=${bits},_method=${_method},memLevel=${memLevel},_strategy=${_strategy}): strm.dstate → ${strm.dstate}`);
             for (var i in fieldArray) {
                 var key = i;
                 var form = fieldArray[i];
@@ -2696,6 +2795,7 @@ Q\n";
             // Set Helvetica to Standard Font (12px)
             // Color: Black
             stream += "/Helv 12 Tf 0 g";
+		logger.debug('<<< Exiting height()');
             return stream;
         }
     };
@@ -2863,6 +2963,8 @@ Q\n";
                     }
                 }
             }
+			logger.debug('>>> Entering filter()');
+			logger.info(`filter(): API call took ${Date.now() - _start} ms`);
             return content;
         };
 
@@ -3751,6 +3853,7 @@ Q\n";
     				this.addImage.apply(this, args);
 
     				callback(w, h, alias, args);
+					logger.debug(`<<< Exiting crop(canvas=${canvas},bounds=${bounds})`);
     			}
     		}.bind(this);
 
@@ -5280,6 +5383,8 @@ Q\n";
     			ctx.copy(this.ctx);
     			this.ctxStack.push(this.ctx);
     			this.ctx = ctx;
+				logger.debug('>>> Entering save()');
+				logger.debug('<<< Exiting save()');
     		},
 
     		restore: function restore() {
@@ -5730,6 +5835,7 @@ Q\n";
 
     		clip: function clip() {
     			//TODO not implemented
+				logger.debug(`<<< Exiting clip(this=${this})`);
     		},
 
     		translate: function translate(x, y) {
@@ -5958,6 +6064,7 @@ Q\n";
     				y: ctx._translate.y
     			};
     		};
+			logger.debug('<<< Exiting context()');
     	}
 
     	return this;
@@ -6414,8 +6521,10 @@ Q\n";
     		    found_images,
     		    x = 0;
     		function done() {
+				logger.debug('>>> Entering done()');
     			renderer.pdf.internal.events.publish('imagesLoaded');
     			cb(found_images);
+				logger.debug('<<< Exiting done()');
     		}
     		function loadImage(url, width, height) {
     			if (!url) return;
@@ -6441,6 +6550,7 @@ Q\n";
     				}
     			};
     			img.src = url;
+				logger.debug(`<<< Exiting loadImage(url=${url},width=${width},height=${height})`);
     		}
     		while (l--) {
     			loadImage(imgs[l].getAttribute("src"), imgs[l].width, imgs[l].height);
@@ -8432,6 +8542,7 @@ Q\n";
     				styletag.appendChild(document.createTextNode(cssbody));
     			}
     			document.getElementsByTagName("head")[0].appendChild(styletag);
+				logger.debug(`<<< Exiting InjectCSS(cssbody=${cssbody},document=${document})`);
     		}
 
     		function createWorkerNode(document) {
@@ -8456,13 +8567,17 @@ Q\n";
     		}
 
     		function attachSVGToWorkerNode(svgtext, frame) {
+				logger.debug(`>>> Entering attachSVGToWorkerNode(svgtext=${svgtext},frame=${frame})`);
     			var framedoc = (frame.contentWindow || frame.contentDocument).document;
     			framedoc.write(svgtext);
+				logger.debug(`attachSVGToWorkerNode(svgtext=${svgtext},frame=${frame}): framedoc → ${framedoc}`);
     			framedoc.close();
+				logger.debug(`<<< Exiting attachSVGToWorkerNode(svgtext=${svgtext},frame=${frame})`);
     			return framedoc.getElementsByTagName('svg')[0];
     		}
 
     		function convertPathToPDFLinesArgs(path) {
+				logger.debug(`>>> Entering convertPathToPDFLinesArgs(path=${path})`);
     			'use strict';
     			// we will use 'lines' method call. it needs:
     			// - starting coordinate pair
@@ -8475,6 +8590,7 @@ Q\n";
     			    vectors = [],
     			    position = 3,
     			    len = path.length;
+					logger.debug(`convertPathToPDFLinesArgs(path=${path}): x → ${x}`);
 
     			while (position < len) {
     				if (path[position] === 'c') {
@@ -8487,6 +8603,7 @@ Q\n";
     					position += 1;
     				}
     			}
+				logger.debug(`<<< Exiting convertPathToPDFLinesArgs(path=${path})`);
     			return [x, y, vectors];
     		}
 
@@ -8857,6 +8974,7 @@ Q\n";
     			return blob;
     		}
     		, FileSaver = function(blob, name, no_auto_bom) {
+				logger.debug(`>>> Entering FileSaver(blob=${blob},name=${name},no_auto_bom=${no_auto_bom})`);
     			if (!no_auto_bom) {
     				blob = auto_bom(blob);
     			}
@@ -8919,12 +9037,14 @@ Q\n";
     			if (can_use_save_link) {
     				object_url = get_URL().createObjectURL(blob);
     				setTimeout(function() {
+						logger.debug('>>> Entering setTimeout()');
     					save_link.href = object_url;
     					save_link.download = name;
     					click(save_link);
     					dispatch_all();
     					revoke(object_url);
     					filesaver.readyState = filesaver.DONE;
+						logger.debug('<<< Exiting setTimeout()');
     				});
     				return;
     			}
@@ -8953,14 +9073,19 @@ Q\n";
     			}
     			fs_min_size += blob.size;
     			req_fs(view.TEMPORARY, fs_min_size, abortable(function(fs) {
+					logger.debug(`>>> Entering req_fs(fs_min_size=${fs_min_size},save=${save})`);
     				fs.root.getDirectory("saved", create_if_not_found, abortable(function(dir) {
+						logger.debug(`>>> Entering getDirectory(create_if_not_found=${create_if_not_found},save=${save})`);
     					var save = function() {
+							logger.debug('>>> Entering save()');
     						dir.getFile(name, create_if_not_found, abortable(function(file) {
     							file.createWriter(abortable(function(writer) {
     								writer.onwriteend = function(event) {
+										logger.debug('>>> Entering createWriter()');
     									target_view.location.href = file.toURL();
     									filesaver.readyState = filesaver.DONE;
     									dispatch(filesaver, "writeend", event);
+										logger.debug('<<< Exiting createWriter()');
     									revoke(file);
     								};
     								writer.onerror = function() {
@@ -8970,6 +9095,8 @@ Q\n";
     									}
     								};
     								"writestart progress write abort".split(" ").forEach(function(event) {
+										logger.debug('>>> Entering forEach()');
+										logger.debug('<<< Exiting forEach()');
     									writer["on" + event] = filesaver["on" + event];
     								});
     								writer.write(blob);
@@ -8980,6 +9107,7 @@ Q\n";
     								filesaver.readyState = filesaver.WRITING;
     							}), fs_error);
     						}), fs_error);
+							logger.debug('<<< Exiting save()');
     					};
     					dir.getFile(name, {create: false}, abortable(function(file) {
     						// delete file if it already exists
@@ -8991,9 +9119,12 @@ Q\n";
     						} else {
     							fs_error();
     						}
+							logger.debug(`<<< Exiting getDirectory(create_if_not_found=${create_if_not_found},save=${save})`);
     					}));
+						logger.debug(`<<< Exiting req_fs(fs_min_size=${fs_min_size},save=${save})`);
     				}), fs_error);
     			}), fs_error);
+				logger.debug(`<<< Exiting FileSaver(blob=${blob},name=${name},no_auto_bom=${no_auto_bom})`);
     		}
     		, FS_proto = FileSaver.prototype
     		, saveAs = function(blob, name, no_auto_bom) {
@@ -9502,6 +9633,7 @@ Q\n";
     			29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29 ];
 
     	function Tree() {
+			logger.debug('>>> Entering Tree()');
     		var that = this;
 
     		// dyn_tree; // the dynamic tree
@@ -9589,6 +9721,7 @@ Q\n";
     					n--;
     				}
     			}
+				logger.debug(`<<< Exiting gen_bitlen(s=${s})`);
     		}
 
     		// Reverse the first len bits of a code, using straightforward code (a
@@ -9728,6 +9861,7 @@ Q\n";
 
     			// The field len is now set, we can generate the bit codes
     			gen_codes(tree, that.max_code, s.bl_count);
+			logger.debug('<<< Exiting Tree()');
     		};
 
     	}
@@ -9772,6 +9906,7 @@ Q\n";
     		that.extra_base = extra_base;
     		that.elems = elems;
     		that.max_length = max_length;
+			logger.debug(`<<< Exiting StaticTree(static_tree=${static_tree},extra_bits=${extra_bits},extra_base=${extra_base},elems=${elems},max_length=${max_length})`);
     	}
 
     	StaticTree.static_ltree = [ 12, 8, 140, 8, 76, 8, 204, 8, 44, 8, 172, 8, 108, 8, 236, 8, 28, 8, 156, 8, 92, 8, 220, 8, 60, 8, 188, 8, 124, 8, 252, 8, 2, 8,
@@ -9806,12 +9941,14 @@ Q\n";
     	var DEF_MEM_LEVEL = 8;
 
     	function Config(good_length, max_lazy, nice_length, max_chain, func) {
+			logger.debug(`>>> Entering Config(good_length=${good_length},max_lazy=${max_lazy},nice_length=${nice_length},max_chain=${max_chain},func=${func})`);
     		var that = this;
     		that.good_length = good_length;
     		that.max_lazy = max_lazy;
     		that.nice_length = nice_length;
     		that.max_chain = max_chain;
     		that.func = func;
+			logger.debug(`<<< Exiting Config(good_length=${good_length},max_lazy=${max_lazy},nice_length=${nice_length},max_chain=${max_chain},func=${func})`);
     	}
 
     	var STORED = 0;
@@ -9870,6 +10007,7 @@ Q\n";
     	}
 
     	function Deflate() {
+		logger.debug('>>> Entering Deflate()');
 
     		var that = this;
     		var strm; // pointer back to this zlib stream
@@ -9959,8 +10097,11 @@ Q\n";
     		var bl_tree; // Huffman tree for bit lengths
 
     		var l_desc = new Tree(); // desc for literal tree
+			logger.debug(`Deflate(): l_desc → ${l_desc}`);
     		var d_desc = new Tree(); // desc for distance tree
+			logger.debug(`Deflate(): d_desc → ${d_desc}`);
     		var bl_desc = new Tree(); // desc for bit length tree
+			logger.debug(`Deflate(): bl_desc → ${bl_desc}`);
 
     		// that.heap_len; // number of elements in the heap
     		// that.heap_max; // element of largest frequency
@@ -10021,8 +10162,10 @@ Q\n";
     		dyn_ltree = [];
     		dyn_dtree = [];
     		bl_tree = [];
+			logger.debug(`Deflate(): dyn_dtree → ${dyn_dtree}`);
 
     		function lm_init() {
+				logger.debug('>>> Entering lm_init()');
     			var i;
     			window_size = 2 * w_size;
 
@@ -10043,9 +10186,12 @@ Q\n";
     			match_length = prev_length = MIN_MATCH - 1;
     			match_available = 0;
     			ins_h = 0;
+				logger.debug(`lm_init(): match_available → ${match_available}`);
+				logger.debug('<<< Exiting lm_init()');
     		}
 
     		function init_block() {
+				logger.debug('>>> Entering init_block()');
     			var i;
     			// Initialize the trees.
     			for (i = 0; i < L_CODES; i++)
@@ -10058,10 +10204,12 @@ Q\n";
     			dyn_ltree[END_BLOCK * 2] = 1;
     			that.opt_len = that.static_len = 0;
     			last_lit = matches = 0;
+				logger.debug('<<< Exiting init_block()');
     		}
 
     		// Initialize the tree data structures for a new zlib stream.
     		function tr_init() {
+			logger.debug('>>> Entering tr_init()');
 
     			l_desc.dyn_tree = dyn_ltree;
     			l_desc.stat_desc = StaticTree.static_l_desc;
@@ -10078,6 +10226,7 @@ Q\n";
 
     			// Initialize the first block of the first file:
     			init_block();
+				logger.debug('<<< Exiting tr_init()');
     		}
 
     		// Restore the heap property by moving down the tree starting at node k,
@@ -10095,6 +10244,7 @@ Q\n";
     				// Set j to the smallest of the two sons:
     				if (j < that.heap_len && smaller(tree, heap[j + 1], heap[j], that.depth)) {
     					j++;
+						logger.debug(`<<< Exiting smaller(tree=${tree},n=${n},m=${m},depth=${depth})`);
     				}
     				// Exit if v is smaller than both sons
     				if (smaller(tree, v, heap[j], that.depth))
@@ -10162,6 +10312,7 @@ Q\n";
     		// Construct the Huffman tree for the bit lengths and return the index in
     		// bl_order of the last bit length code to send.
     		function build_bl_tree() {
+				logger.debug('>>> Entering build_bl_tree()');
     			var max_blindex; // index of last bit length code of non zero freq
 
     			// Determine the bit length frequencies for literal and distance trees
@@ -10184,6 +10335,7 @@ Q\n";
     			// Update opt_len to include the bit length tree and counts
     			that.opt_len += 3 * (max_blindex + 1) + 5 + 5 + 4;
 
+				logger.debug('<<< Exiting build_bl_tree()');
     			return max_blindex;
     		}
 
@@ -10191,16 +10343,19 @@ Q\n";
     		// IN assertion: there is enough room in pending_buf.
     		function put_byte(p) {
     			that.pending_buf[that.pending++] = p;
+				logger.debug(`<<< Exiting put_byte(p=${p})`);
     		}
 
     		function put_short(w) {
     			put_byte(w & 0xff);
     			put_byte((w >>> 8) & 0xff);
+				logger.debug(`<<< Exiting put_short(w=${w})`);
     		}
 
     		function putShortMSB(b) {
     			put_byte((b >> 8) & 0xff);
     			put_byte((b & 0xff) & 0xff);
+				logger.debug(`<<< Exiting putShortMSB(b=${b})`);
     		}
 
     		function send_bits(value, length) {
@@ -10217,11 +10372,13 @@ Q\n";
     				bi_buf |= (((value) << bi_valid) & 0xffff);
     				bi_valid += len;
     			}
+				logger.debug(`<<< Exiting send_bits(value=${value},length=${length})`);
     		}
 
     		function send_code(c, tree) {
     			var c2 = c * 2;
     			send_bits(tree[c2] & 0xffff, tree[c2 + 1] & 0xffff);
+				logger.debug(`<<< Exiting send_code(c=${c},tree=${tree})`);
     		}
 
     		// Send a literal or distance tree in compressed form, using the codes in
@@ -10284,6 +10441,7 @@ Q\n";
     		// lengths of the bit length codes, the literal tree and the distance tree.
     		// IN assertion: lcodes >= 257, dcodes >= 1, blcodes >= 4.
     		function send_all_trees(lcodes, dcodes, blcodes) {
+				logger.debug(`>>> Entering send_all_trees(lcodes=${lcodes},dcodes=${dcodes},blcodes=${blcodes})`);
     			var rank; // index in bl_order
 
     			send_bits(lcodes - 257, 5); // not +255 as stated in appnote.txt
@@ -10294,10 +10452,12 @@ Q\n";
     			}
     			send_tree(dyn_ltree, lcodes - 1); // literal tree
     			send_tree(dyn_dtree, dcodes - 1); // distance tree
+				logger.debug(`<<< Exiting send_all_trees(lcodes=${lcodes},dcodes=${dcodes},blcodes=${blcodes})`);
     		}
 
     		// Flush the bit buffer, keeping at most 7 bits in it.
     		function bi_flush() {
+				logger.debug('>>> Entering bi_flush()');
     			if (bi_valid == 16) {
     				put_short(bi_buf);
     				bi_buf = 0;
@@ -10306,6 +10466,7 @@ Q\n";
     				put_byte(bi_buf & 0xff);
     				bi_buf >>>= 8;
     				bi_valid -= 8;
+					logger.debug('<<< Exiting bi_flush()');
     			}
     		}
 
@@ -10319,6 +10480,7 @@ Q\n";
     		// To simplify the code, we assume the worst case of last real code encoded
     		// on one bit only.
     		function _tr_align() {
+				logger.debug('>>> Entering _tr_align()');
     			send_bits(STATIC_TREES << 1, 3);
     			send_code(END_BLOCK, StaticTree.static_ltree);
 
@@ -10334,6 +10496,7 @@ Q\n";
     				bi_flush();
     			}
     			last_eob_len = 7;
+				logger.debug('<<< Exiting _tr_align()');
     		}
 
     		// Save the match info and tally the frequency counts. Return true if
@@ -10379,9 +10542,11 @@ Q\n";
 
     		// Send the block data compressed using the given Huffman trees
     		function compress_block(ltree, dtree) {
+				logger.debug(`>>> Entering compress_block(ltree=${ltree},dtree=${dtree})`);
     			var dist; // distance of matched string
     			var lc; // match length or unmatched char (if dist === 0)
     			var lx = 0; // running index in l_buf
+				logger.debug(`compress_block(ltree=${ltree},dtree=${dtree}): dist → ${dist}`);
     			var code; // the code to send
     			var extra; // number of extra bits to send
 
@@ -10422,10 +10587,12 @@ Q\n";
 
     			send_code(END_BLOCK, ltree);
     			last_eob_len = ltree[END_BLOCK * 2 + 1];
+				logger.debug(`<<< Exiting compress_block(ltree=${ltree},dtree=${dtree})`);
     		}
 
     		// Flush the bit buffer and align the output on a byte boundary
     		function bi_windup() {
+				logger.debug('>>> Entering bi_windup()');
     			if (bi_valid > 8) {
     				put_short(bi_buf);
     			} else if (bi_valid > 0) {
@@ -10433,6 +10600,8 @@ Q\n";
     			}
     			bi_buf = 0;
     			bi_valid = 0;
+				logger.debug(`bi_windup(): bi_buf → ${bi_buf}`);
+				logger.debug('<<< Exiting bi_windup()');
     		}
 
     		// Copy a stored block, storing first the length and its
@@ -10527,9 +10696,12 @@ Q\n";
     		}
 
     		function flush_block_only(eof) {
+				logger.debug(`>>> Entering flush_block_only(eof=${eof})`);
     			_tr_flush_block(block_start >= 0 ? block_start : -1, strstart - block_start, eof);
     			block_start = strstart;
     			strm.flush_pending();
+				logger.debug(`flush_block_only(eof=${eof}): block_start → ${block_start}`);
+				logger.debug(`<<< Exiting flush_block_only(eof=${eof})`);
     		}
 
     		// Fill the window when the lookahead becomes insufficient.
@@ -10541,6 +10713,7 @@ Q\n";
     		// performed for at least two bytes (required for the zip translate_eol
     		// option -- not supported here).
     		function fill_window() {
+				logger.debug('>>> Entering fill_window()');
     			var n, m;
     			var p;
     			var more; // Amount of free space at the end of the window.
@@ -10621,6 +10794,7 @@ Q\n";
     				// but this is not important since only literal bytes will be
     				// emitted.
     			} while (lookahead < MIN_LOOKAHEAD && strm.avail_in !== 0);
+				logger.debug('<<< Exiting fill_window()');
     		}
 
     		// Copy without compression as much as possible from the input stream,
@@ -10680,18 +10854,22 @@ Q\n";
 
     			flush_block_only(flush == Z_FINISH);
     			if (strm.avail_out === 0)
+				logger.debug(`<<< Exiting deflate_stored(flush=${flush})`);
     				return (flush == Z_FINISH) ? FinishStarted : NeedMore;
 
     			return flush == Z_FINISH ? FinishDone : BlockDone;
     		}
 
     		function longest_match(cur_match) {
+				logger.debug(`>>> Entering longest_match(cur_match=${cur_match})`);
     			var chain_length = max_chain_length; // max hash chain length
     			var scan = strstart; // current string
     			var match; // matched string
+				logger.debug(`longest_match(cur_match=${cur_match}): match → ${match}`);
     			var len; // length of current match
     			var best_len = prev_length; // best match length so far
     			var limit = strstart > (w_size - MIN_LOOKAHEAD) ? strstart - (w_size - MIN_LOOKAHEAD) : 0;
+				logger.debug(`longest_match(cur_match=${cur_match}): limit → ${limit}`);
     			var _nice_match = nice_match;
 
     			// Stop when cur_match becomes <= limit. To simplify the code,
@@ -10757,6 +10935,7 @@ Q\n";
     			} while ((cur_match = (prev[cur_match & wmask] & 0xffff)) > limit && --chain_length !== 0);
 
     			if (best_len <= lookahead)
+				logger.debug(`<<< Exiting longest_match(cur_match=${cur_match})`);
     				return best_len;
     			return lookahead;
     		}
@@ -10862,6 +11041,7 @@ Q\n";
     				if (flush == Z_FINISH)
     					return FinishStarted;
     				else
+				logger.debug(`<<< Exiting deflate_fast(flush=${flush})`);
     					return NeedMore;
     			}
     			return flush == Z_FINISH ? FinishDone : BlockDone;
@@ -10995,6 +11175,7 @@ Q\n";
     				if (flush == Z_FINISH)
     					return FinishStarted;
     				else
+				logger.debug(`<<< Exiting deflate_slow(flush=${flush})`);
     					return NeedMore;
     			}
 
@@ -11002,6 +11183,7 @@ Q\n";
     		}
 
     		function deflateReset(strm) {
+				logger.debug(`>>> Entering deflateReset(strm=${strm})`);
     			strm.total_in = strm.total_out = 0;
     			strm.msg = null; //
     			
@@ -11014,6 +11196,7 @@ Q\n";
 
     			tr_init();
     			lm_init();
+				logger.debug(`<<< Exiting deflateReset(strm=${strm})`);
     			return Z_OK;
     		}
 
@@ -11073,6 +11256,7 @@ Q\n";
     			strategy = _strategy;
     			method = _method & 0xff;
 
+				logger.debug(`<<< Exiting function(strm=${strm},_level=${_level},bits=${bits},_method=${_method},memLevel=${memLevel},_strategy=${_strategy})`);
     			return deflateReset(strm);
     		};
 
@@ -11113,6 +11297,7 @@ Q\n";
     				max_chain_length = config_table[level].max_chain;
     			}
     			strategy = _strategy;
+				logger.debug(`<<< Exiting function(strm=${strm},_level=${_level},_strategy=${_strategy})`);
     			return err;
     		};
 
@@ -11146,6 +11331,7 @@ Q\n";
     				prev[n & w_mask] = head[ins_h];
     				head[ins_h] = n;
     			}
+				logger.debug(`<<< Exiting function(strm=${strm},dictionary=${dictionary},dictLength=${dictLength})`);
     			return Z_OK;
     		};
 
@@ -11269,6 +11455,7 @@ Q\n";
     			}
 
     			if (flush != Z_FINISH)
+				logger.debug('<<< Exiting Deflate()');
     				return Z_OK;
     			return Z_STREAM_END;
     		};
@@ -11277,6 +11464,7 @@ Q\n";
     	// ZStream
 
     	function ZStream() {
+			logger.debug('>>> Entering ZStream()');
     		var that = this;
     		that.next_in_index = 0;
     		that.next_out_index = 0;
@@ -11286,6 +11474,7 @@ Q\n";
     		// that.next_out; // next output byte should be put there
     		that.avail_out = 0; // remaining free space at next_out
     		that.total_out = 0; // total nb of bytes output so far
+			logger.debug('<<< Exiting ZStream()');
     		// that.msg;
     		// that.dstate;
     	}
@@ -11472,6 +11661,9 @@ Q\n";
         window.html2canvas = function() {
             return Promise.reject("No canvas support");
         };
+		logger.debug('>>> Entering then()');
+		logger.debug('<<< Exiting then()');
+		const _startApi = Date.now();
         return;
     }
 
@@ -11558,6 +11750,8 @@ Q\n";
     		while (length--) {
     			result[length] = fn(array[length]);
     		}
+			logger.debug('>>> Entering map()');
+			logger.debug('<<< Exiting map()');
     		return result;
     	}
 
@@ -11572,16 +11766,21 @@ Q\n";
     	 * function.
     	 */
     	function mapDomain(string, fn) {
+			logger.debug(`>>> Entering mapDomain(string=${string},fn=${fn})`);
     		var parts = string.split('@');
     		var result = '';
+			logger.debug(`mapDomain(string=${string},fn=${fn}): parts → ${parts}`);
     		if (parts.length > 1) {
     			// In email addresses, only the domain name should be punycoded. Leave
     			// the local part (i.e. everything up to `@`) intact.
     			result = parts[0] + '@';
+				logger.debug(`mapDomain(string=${string},fn=${fn}): result → ${result}`);
     			string = parts[1];
     		}
     		var labels = string.split(regexSeparators);
+			logger.debug(`mapDomain(string=${string},fn=${fn}): labels → ${labels}`);
     		var encoded = map(labels, fn).join('.');
+			logger.debug(`mapDomain(string=${string},fn=${fn}): encoded → ${encoded}`);
     		return result + encoded;
     	}
 
@@ -11599,6 +11798,7 @@ Q\n";
     	 * @returns {Array} The new array of code points.
     	 */
     	function ucs2decode(string) {
+			logger.debug(`>>> Entering ucs2decode(string=${string})`);
     		var output = [],
     		    counter = 0,
     		    length = string.length,
@@ -11621,6 +11821,7 @@ Q\n";
     				output.push(value);
     			}
     		}
+			logger.debug(`<<< Exiting ucs2decode(string=${string})`);
     		return output;
     	}
 
@@ -11641,6 +11842,7 @@ Q\n";
     				value = 0xDC00 | value & 0x3FF;
     			}
     			output += stringFromCharCode(value);
+			logger.debug(`<<< Exiting ucs2encode(array=${array})`);
     			return output;
     		}).join('');
     	}
@@ -11655,6 +11857,7 @@ Q\n";
     	 * the code point does not represent a value.
     	 */
     	function basicToDigit(codePoint) {
+			logger.debug(`>>> Entering basicToDigit(codePoint=${codePoint})`);
     		if (codePoint - 48 < 10) {
     			return codePoint - 22;
     		}
@@ -11662,6 +11865,7 @@ Q\n";
     			return codePoint - 65;
     		}
     		if (codePoint - 97 < 26) {
+			logger.debug(`<<< Exiting basicToDigit(codePoint=${codePoint})`);
     			return codePoint - 97;
     		}
     		return base;
@@ -11679,8 +11883,10 @@ Q\n";
     	 * if `flag` is non-zero and `digit` has no uppercase form.
     	 */
     	function digitToBasic(digit, flag) {
+			logger.debug(`>>> Entering digitToBasic(digit=${digit},flag=${flag})`);
     		//  0..25 map to ASCII a..z or A..Z
     		// 26..35 map to ASCII 0..9
+			logger.debug(`<<< Exiting digitToBasic(digit=${digit},flag=${flag})`);
     		return digit + 22 + 75 * (digit < 26) - ((flag != 0) << 5);
     	}
 
@@ -11696,6 +11902,8 @@ Q\n";
     		for (/* no initialization */; delta > baseMinusTMin * tMax >> 1; k += base) {
     			delta = floor(delta / baseMinusTMin);
     		}
+			logger.debug(`adapt(delta=${delta},numPoints=${numPoints},firstTime=${firstTime}): delta → ${delta}`);
+			logger.debug(`<<< Exiting adapt(delta=${delta},numPoints=${numPoints},firstTime=${firstTime})`);
     		return floor(k + (baseMinusTMin + 1) * delta / (delta + skew));
     	}
 
@@ -11707,6 +11915,7 @@ Q\n";
     	 * @returns {String} The resulting string of Unicode symbols.
     	 */
     	function decode(input) {
+			logger.debug(`>>> Entering decode(input=${input})`);
     		// Don't use UCS-2
     		var output = [],
     		    inputLength = input.length,
@@ -11797,6 +12006,7 @@ Q\n";
 
     		}
 
+			logger.debug(`<<< Exiting decode(input=${input})`);
     		return ucs2encode(output);
     	}
 
@@ -11808,6 +12018,7 @@ Q\n";
     	 * @returns {String} The resulting Punycode string of ASCII-only symbols.
     	 */
     	function encode(input) {
+			logger.debug(`>>> Entering encode(input=${input})`);
     		var n,
     		    delta,
     		    handledCPCount,
@@ -11830,6 +12041,7 @@ Q\n";
     		// Convert the input in UCS-2 to Unicode
     		input = ucs2decode(input);
 
+			logger.debug(`encode(input=${input}): input → ${input}`);
     		// Cache the length
     		inputLength = input.length;
 
@@ -11911,6 +12123,7 @@ Q\n";
     			++n;
 
     		}
+			logger.debug(`<<< Exiting encode(input=${input})`);
     		return output.join('');
     	}
 
@@ -11926,11 +12139,13 @@ Q\n";
     	 * string.
     	 */
     	function toUnicode(input) {
+			logger.debug(`>>> Entering toUnicode(input=${input})`);
     		return mapDomain(input, function(string) {
     			return regexPunycode.test(string)
     				? decode(string.slice(4).toLowerCase())
     				: string;
     		});
+			logger.debug(`<<< Exiting toUnicode(input=${input})`);
     	}
 
     	/**
@@ -11945,11 +12160,13 @@ Q\n";
     	 * email address.
     	 */
     	function toASCII(input) {
+			logger.debug(`>>> Entering toASCII(input=${input})`);
     		return mapDomain(input, function(string) {
     			return regexNonASCII.test(string)
     				? 'xn--' + encode(string)
     				: string;
     		});
+			logger.debug(`<<< Exiting toASCII(input=${input})`);
     	}
 
     	/*--------------------------------------------------------------------------*/
@@ -12056,6 +12273,7 @@ Q\n";
                 return renderWindow(node, container, options, windowWidth, windowHeight);
             });
         });
+		logger.debug(`<<< Exiting renderDocument(document=${document},options=${options},windowWidth=${windowWidth},windowHeight=${windowHeight})`);
     }
 
     function renderWindow(node, container, options, windowWidth, windowHeight) {
@@ -12080,6 +12298,7 @@ Q\n";
             }
 
             cleanupContainer(container, options);
+		logger.debug(`<<< Exiting renderWindow(node=${node},container=${container},options=${options},windowWidth=${windowWidth},windowHeight=${windowHeight})`);
             return canvas;
         });
     }
@@ -12089,6 +12308,7 @@ Q\n";
             container.parentNode.removeChild(container);
             log("Cleaned up container");
         }
+		logger.debug(`<<< Exiting cleanupContainer(container=${container},options=${options})`);
     }
 
     function crop(canvas, bounds) {
@@ -12106,6 +12326,8 @@ Q\n";
     }
 
     function documentWidth (doc) {
+		logger.debug(`>>> Entering documentWidth(doc=${doc})`);
+		logger.debug(`<<< Exiting documentWidth(doc=${doc})`);
         return Math.max(
             Math.max(doc.body.scrollWidth, doc.documentElement.scrollWidth),
             Math.max(doc.body.offsetWidth, doc.documentElement.offsetWidth),
@@ -12114,6 +12336,8 @@ Q\n";
     }
 
     function documentHeight (doc) {
+		logger.debug(`>>> Entering documentHeight(doc=${doc})`);
+		logger.debug(`<<< Exiting documentHeight(doc=${doc})`);
         return Math.max(
             Math.max(doc.body.scrollHeight, doc.documentElement.scrollHeight),
             Math.max(doc.body.offsetHeight, doc.documentElement.offsetHeight),
@@ -12122,6 +12346,8 @@ Q\n";
     }
 
     function smallImage() {
+		logger.debug('>>> Entering smallImage()');
+		logger.debug('<<< Exiting smallImage()');
         return "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
     }
 
@@ -12169,16 +12395,19 @@ Q\n";
             documentClone.replaceChild(options.javascriptEnabled === true ? documentClone.adoptNode(documentElement) : removeScriptNodes(documentClone.adoptNode(documentElement)), documentClone.documentElement);
             documentClone.close();
         });
+		logger.debug(`<<< Exiting createWindowClone(ownerDocument=${ownerDocument},containerDocument=${containerDocument},width=${width},height=${height},options=${options})`);
     }
 
     function restoreOwnerScroll(ownerDocument, x, y) {
         if (x !== ownerDocument.defaultView.pageXOffset || y !== ownerDocument.defaultView.pageYOffset) {
             ownerDocument.defaultView.scrollTo(x, y);
         }
+		logger.debug(`<<< Exiting restoreOwnerScroll(ownerDocument=${ownerDocument},x=${x},y=${y})`);
     }
 
     function loadUrlDocument(src, proxy, document, width, height, options) {
         return new Proxy(src, proxy, window.document).then(documentFromHTML(src)).then(function(doc) {
+		logger.debug(`<<< Exiting loadUrlDocument(src=${src},proxy=${proxy},document=${document},width=${width},height=${height},options=${options})`);
             return createWindowClone(doc, document, width, height, options);
         });
     }
@@ -12208,15 +12437,18 @@ Q\n";
                 doc.head.insertBefore(base, doc.head.firstChild);
             }
 
+		logger.debug(`<<< Exiting documentFromHTML(src=${src})`);
             return doc;
         };
     }
 
 
     function labelCanvasElements(ownerDocument) {
+		logger.debug(`>>> Entering labelCanvasElements(ownerDocument=${ownerDocument})`);
         [].slice.call(ownerDocument.querySelectorAll("canvas"), 0).forEach(function(canvas) {
             canvas.setAttribute(html2canvasCanvasCloneAttribute, "canvas-" + html2canvasCanvasCloneIndex++);
         });
+		logger.debug(`<<< Exiting labelCanvasElements(ownerDocument=${ownerDocument})`);
     }
 
     function cloneCanvasContents(ownerDocument, documentClone) {
@@ -12233,6 +12465,7 @@ Q\n";
             }
             canvas.removeAttribute(html2canvasCanvasCloneAttribute);
         });
+		logger.debug(`<<< Exiting cloneCanvasContents(ownerDocument=${ownerDocument},documentClone=${documentClone})`);
     }
 
     function removeScriptNodes(parent) {
@@ -12254,6 +12487,7 @@ Q\n";
         var link = document.createElement("a");
         link.href = url;
         link.href = link.href;
+		logger.debug(`<<< Exiting absoluteUrl(url=${url})`);
         return link;
     }
 
@@ -12265,11 +12499,14 @@ Q\n";
             DummyImageContainer.prototype.image = new Image();
             var image = this.image;
             DummyImageContainer.prototype.promise = new Promise(function(resolve, reject) {
+				logger.debug('>>> Entering Promise()');
                 image.onload = resolve;
                 image.onerror = reject;
                 image.src = smallImage();
+				logger.debug(`<<< Exiting DummyImageContainer(src=${src})`);
                 if (image.complete === true) {
                     resolve(image);
+				logger.debug(`<<< Exiting Promise(documentClone=${documentClone})`);
                 }
             });
         }
@@ -12322,10 +12559,13 @@ Q\n";
         this.baseline = baseline;
         this.lineWidth = 1;
         this.middle = middle;
+		logger.debug(`<<< Exiting Font(family=${family},size=${size})`);
     }
 
     function FontMetrics() {
+		logger.debug('>>> Entering FontMetrics()');
         this.data = {};
+		logger.debug('<<< Exiting FontMetrics()');
     }
 
     FontMetrics.prototype.getMetrics = function(family, size) {
@@ -12351,6 +12591,7 @@ Q\n";
         })).then(function(container) {
             return html2canvas(container.contentWindow.document.documentElement, {type: 'view', width: container.width, height: container.height, proxy: options.proxy, javascriptEnabled: options.javascriptEnabled, removeContainer: options.removeContainer, allowTaint: options.allowTaint, imageTimeout: options.imageTimeout / 2});
         }).then(function(canvas) {
+		logger.debug(`<<< Exiting FrameContainer(container=${container},sameOrigin=${sameOrigin},options=${options})`);
             return self.image = canvas;
         });
     }
@@ -12361,6 +12602,7 @@ Q\n";
     };
 
     function GradientContainer(imageData) {
+		logger.debug(`>>> Entering GradientContainer(imageData=${imageData})`);
         this.src = imageData.value;
         this.colorStops = [];
         this.type = null;
@@ -12369,6 +12611,8 @@ Q\n";
         this.x1 = 0.5;
         this.y1 = 0.5;
         this.promise = Promise.resolve(true);
+		logger.debug(`GradientContainer(imageData=${imageData}): y1 → ${y1}`);
+		logger.debug(`<<< Exiting GradientContainer(imageData=${imageData})`);
     }
 
     GradientContainer.prototype.TYPES = {
@@ -12381,6 +12625,7 @@ Q\n";
         this.image = new Image();
         var self = this;
         this.tainted = null;
+		logger.debug(`<<< Exiting ImageContainer(src=${src},cors=${cors})`);
         this.promise = new Promise(function(resolve, reject) {
             self.image.onload = resolve;
             self.image.onerror = reject;
@@ -12398,7 +12643,10 @@ Q\n";
         this.link = null;
         this.options = options;
         this.support = support;
+		logger.debug(`ImageLoader(options=${options},support=${support}): options → ${options}`);
+		logger.debug(`ImageLoader(options=${options},support=${support}): support → ${support}`);
         this.origin = this.getOrigin(window.location.href);
+		logger.debug(`<<< Exiting ImageLoader(options=${options},support=${support})`);
     }
 
     ImageLoader.prototype.findImages = function(nodes) {
@@ -12536,10 +12784,12 @@ Q\n";
     };
 
     function LinearGradientContainer(imageData) {
+		logger.debug(`>>> Entering LinearGradientContainer(imageData=${imageData})`);
         GradientContainer.apply(this, arguments);
         this.type = this.TYPES.LINEAR;
 
         var hasDirection = imageData.args[0].match(this.stepRegExp) === null;
+		logger.debug(`LinearGradientContainer(imageData=${imageData}): hasDirection → ${hasDirection}`);
 
         if (hasDirection) {
             imageData.args[0].split(" ").reverse().forEach(function(position) {
@@ -12603,6 +12853,7 @@ Q\n";
                 }, this);
             }
         }, this);
+		logger.debug(`<<< Exiting LinearGradientContainer(imageData=${imageData})`);
     }
 
     LinearGradientContainer.prototype = Object.create(GradientContainer.prototype);
@@ -12610,14 +12861,18 @@ Q\n";
     LinearGradientContainer.prototype.stepRegExp = /((?:rgb|rgba)\(\d{1,3},\s\d{1,3},\s\d{1,3}(?:,\s[0-9\.]+)?\))\s*(\d{1,3})?(%|px)?/;
 
     function log() {
+		logger.debug('>>> Entering log()');
         if (window.html2canvas.logging && window.console && window.console.log) {
             Function.prototype.bind.call(window.console.log, (window.console)).apply(window.console, [(Date.now() - window.html2canvas.start) + "ms", "html2canvas:"].concat([].slice.call(arguments, 0)));
+			logger.debug('<<< Exiting log()');
         }
     }
 
     function NodeContainer(node, parent) {
         this.node = node;
         this.parent = parent;
+		logger.debug(`NodeContainer(node=${node},parent=${parent}): node → ${node}`);
+		logger.debug(`NodeContainer(node=${node},parent=${parent}): parent → ${parent}`);
         this.stack = null;
         this.bounds = null;
         this.borders = null;
@@ -12632,6 +12887,7 @@ Q\n";
         this.transformMatrix = null;
         this.isPseudoElement = false;
         this.opacity = null;
+		logger.debug(`<<< Exiting NodeContainer(node=${node},parent=${parent})`);
     }
 
     NodeContainer.prototype.cloneTo = function(stack) {
@@ -12851,6 +13107,7 @@ Q\n";
     };
 
     NodeContainer.prototype.hasTransform = function() {
+		logger.debug(`<<< Exiting offsetBounds(node=${node})`);
         return this.parseTransformMatrix().join(",") !== "1,0,0,1,0,0" || (this.parent && this.parent.hasTransform());
     };
 
@@ -12871,8 +13128,10 @@ Q\n";
     }
 
     function parseMatrix(match) {
+		logger.debug(`>>> Entering parseMatrix(match=${match})`);
         if (match && match[1] === "matrix") {
             return match[2].split(",").map(function(s) {
+		logger.debug(`<<< Exiting parseMatrix(match=${match})`);
                 return parseFloat(s.trim());
             });
         }
@@ -12883,10 +13142,13 @@ Q\n";
     }
 
     function parseBackgrounds(backgroundImage) {
+		logger.debug(`>>> Entering parseBackgrounds(backgroundImage=${backgroundImage})`);
         var whitespace = ' \r\n\t',
             method, definition, prefix, prefix_i, block, results = [],
             mode = 0, numParen = 0, quote, args;
+			logger.debug(`parseBackgrounds(backgroundImage=${backgroundImage}): whitespace → ${whitespace}`);
         var appendResult = function() {
+			logger.debug('>>> Entering appendResult()');
             if(method) {
                 if (definition.substr(0, 1) === '"') {
                     definition = definition.substr(1, definition.length - 2);
@@ -12908,6 +13170,8 @@ Q\n";
             }
             args = [];
             method = prefix = definition = block = '';
+			logger.debug(`appendResult(): args → ${args}`);
+			logger.debug('<<< Exiting appendResult()');
         };
         args = [];
         method = prefix = definition = block = '';
@@ -12975,14 +13239,19 @@ Q\n";
         });
 
         appendResult();
+		logger.debug(`<<< Exiting parseBackgrounds(backgroundImage=${backgroundImage})`);
         return results;
     }
 
     function removePx(str) {
+		logger.debug(`>>> Entering removePx(str=${str})`);
+		logger.debug(`<<< Exiting removePx(str=${str})`);
         return str.replace("px", "");
     }
 
     function asFloat(str) {
+		logger.debug(`>>> Entering asFloat(str=${str})`);
+		logger.debug(`<<< Exiting asFloat(str=${str})`);
         return parseFloat(str);
     }
 
@@ -13063,6 +13332,7 @@ Q\n";
                 }
             }, this));
         }, this));
+		logger.debug(`<<< Exiting NodeParser(element=${element},renderer=${renderer},support=${support},imageLoader=${imageLoader},options=${options})`);
     }
 
     NodeParser.prototype.calculateOverflowClips = function() {
@@ -13148,7 +13418,9 @@ Q\n";
     };
 
     function toCamelCase(str) {
+		logger.debug(`>>> Entering toCamelCase(str=${str})`);
         return str.replace(/(\-[a-z])/g, function(match){
+		logger.debug(`<<< Exiting toCamelCase(str=${str})`);
             return match.toUpperCase().replace('-','');
         });
     }
@@ -13342,6 +13614,7 @@ Q\n";
         var bounds = container.parseBounds();
         this.renderer.clip(container.backgroundClip, function() {
             this.renderer.renderBackground(container, bounds, container.borders.borders.map(getWidth));
+			logger.debug(`<<< Exiting clip(this=${this})`);
         }, this);
 
         this.renderer.clip(container.clip, function() {
@@ -14013,6 +14286,8 @@ Q\n";
     }
 
     function hasUnicode(string) {
+		logger.debug(`>>> Entering hasUnicode(string=${string})`);
+		logger.debug(`<<< Exiting hasUnicode(string=${string})`);
         return (/[^\u0000-\u00ff]/).test(string);
     }
 
@@ -14021,6 +14296,7 @@ Q\n";
         var url = createProxyUrl(proxyUrl, src, callback);
 
         return supportsCORS ? XHR(url) : (jsonp(document, url, callback).then(function(response) {
+		logger.debug(`<<< Exiting Proxy(src=${src},proxyUrl=${proxyUrl},document=${document})`);
             return decode64(response.content);
         }));
     }
@@ -14072,6 +14348,8 @@ Q\n";
         src = link.href;
         this.src = src;
         this.image = new Image();
+		logger.debug(`ProxyImageContainer(src=${src},proxy=${proxy}): src → ${src}`);
+		logger.debug(`ProxyImageContainer(src=${src},proxy=${proxy}): image → ${image}`);
         var self = this;
         this.promise = new Promise(function(resolve, reject) {
             self.image.crossOrigin = "Anonymous";
@@ -14125,6 +14403,7 @@ Q\n";
         this.images = images;
         this.options = options;
         this.document = document;
+		logger.debug(`<<< Exiting Renderer(width=${width},height=${height},images=${images},options=${options},document=${document})`);
     }
 
     Renderer.prototype.renderImage = function(container, bounds, borderData, imageContainer) {
@@ -14220,6 +14499,8 @@ Q\n";
             break;
         default:
             this.renderBackgroundRepeat(imageContainer, position, size, {top: bounds.top, left: bounds.left}, borderData[3], borderData[0]);
+			logger.debug(`>>> Entering repeat(stream=${stream},array=${array},len=${len},offset=${offset},what=${what})`);
+			logger.debug(`<<< Exiting repeat(stream=${stream},array=${array},len=${len},offset=${offset},what=${what})`);
             break;
         }
     };
@@ -14234,6 +14515,7 @@ Q\n";
         this.contexts = [];
         this.children = [];
         this.opacity = (this.parent ? this.parent.stack.opacity : 1) * opacity;
+		logger.debug(`<<< Exiting StackingContext(hasOwnStacking=${hasOwnStacking},opacity=${opacity},element=${element},parent=${parent})`);
     }
 
     StackingContext.prototype = Object.create(NodeContainer.prototype);
@@ -14247,6 +14529,7 @@ Q\n";
         this.rangeBounds = this.testRangeBounds(document);
         this.cors = this.testCORS();
         this.svg = this.testSVG();
+		logger.debug(`<<< Exiting Support(document=${document})`);
     }
 
     Support.prototype.testRangeBounds = function(document) {
@@ -15112,10 +15395,13 @@ Q\n";
 
     var DecodeStream = (function() {
       function constructor() {
+		logger.debug('>>> Entering constructor()');
         this.pos = 0;
         this.bufferLength = 0;
         this.eof = false;
         this.buffer = null;
+		logger.debug(`<<< Exiting constructor(bytes=${bytes})`);
+		logger.debug('<<< Exiting constructor()');
       }
 
       constructor.prototype = {
@@ -15298,12 +15584,17 @@ Q\n";
       ]), 5];
       
       function error(e) {
+		logger.debug(`>>> Entering error(e=${e})`);
+		logger.debug(`<<< Exiting error(e=${e})`);
+		logger.debug(`<<< Exiting error(type=${type})`);
           throw new Error(e)
       }
 
       function constructor(bytes) {
         //var bytes = stream.getBytes();
         var bytesPos = 0;
+		logger.debug(`constructor(bytes=${bytes}): bytes → ${bytes}`);
+		logger.debug(`constructor(bytes=${bytes}): bytesPos → ${bytesPos}`);
 
         var cmf = bytes[bytesPos++];
         var flg = bytes[bytesPos++];

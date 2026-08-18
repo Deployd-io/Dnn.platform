@@ -23,6 +23,7 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
     /// </summary>
     public class SimpleWebFarmSynchronizationHandler : IHttpHandler
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SimpleWebFarmSynchronizationHandler));
         private readonly IHostSettings hostSettings;
         private readonly ICryptographyProvider cryptographyProvider;
 
@@ -30,6 +31,11 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
         public SimpleWebFarmSynchronizationHandler()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering SimpleWebFarmSynchronizationHandler()");
+		Logger.LogDebug(">>> Entering SimpleWebFarmSynchronizationHandler(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider})", hostSettings, cryptographyProvider);
+		Logger.LogDebug("SimpleWebFarmSynchronizationHandler(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider}): hostSettings → {HostSettings1}", hostSettings, cryptographyProvider, hostSettings);
+		Logger.LogDebug("<<< Exiting SimpleWebFarmSynchronizationHandler()");
+		Logger.LogDebug("SimpleWebFarmSynchronizationHandler(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider}): cryptographyProvider → {CryptographyProvider1}", hostSettings, cryptographyProvider, cryptographyProvider);
         }
 
         /// <summary>Initializes a new instance of the <see cref="SimpleWebFarmSynchronizationHandler"/> class.</summary>
@@ -44,8 +50,10 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
                                         new EventLogController(),
 #pragma warning restore CS0618 // Type or member is obsolete
                                         new Lazy<IPortalController>(() => PortalController.Instance)));
+										Logger.LogDebug("SimpleWebFarmSynchronizationHandler(hostSettings={HostSettings},cryptographyProvider={CryptographyProvider}): this.hostSettings → {Arg2}", hostSettings, cryptographyProvider, this.hostSettings);
 #pragma warning disable CS0618 // Type or member is obsolete
             this.cryptographyProvider = cryptographyProvider ?? CryptographyProvider.Instance() as ICryptographyProvider;
+			Logger.LogDebug("<<< Exiting SimpleWebFarmSynchronizationHandler()");
 #pragma warning restore CS0618 // Type or member is obsolete
         }
 
@@ -55,6 +63,7 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
         /// <inheritdoc />
         public void ProcessRequest(HttpContext context)
         {
+			Logger.LogDebug(">>> Entering ProcessRequest(context={Context})", context);
             // Validate the request for required inputs, return if no action possible
             if (string.IsNullOrWhiteSpace(context.Request.QueryString["command"]))
             {
@@ -83,6 +92,7 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
 
             // Pass the action on, if the current caching provider is ours
             provider.ProcessSynchronizationRequest(command, detail);
+			Logger.LogDebug("<<< Exiting ProcessRequest(context={Context})", context);
         }
     }
 }

@@ -20,8 +20,10 @@ namespace DNNConnect.CKEditorProvider.Extensions
         public static T GetCustomAttribute<T>(this PropertyInfo propertyInfo, bool inherit)
             where T : Attribute
         {
+			eventLogger.LogDebug(">>> Entering GetCustomAttribute(propertyInfo={PropertyInfo},inherit={Inherit})", propertyInfo, inherit);
             object[] attributes = propertyInfo.GetCustomAttributes(typeof(T), inherit);
 
+			eventLogger.LogDebug("<<< Exiting GetCustomAttribute(propertyInfo={PropertyInfo},inherit={Inherit})", propertyInfo, inherit);
             return attributes.Length == 0 ? null : attributes[0] as T;
         }
     }

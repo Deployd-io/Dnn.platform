@@ -17,6 +17,7 @@ namespace DotNetNuke.Web.Api
     /// <summary>A web API action filter which validates the anti-forgery token.</summary>
     public class ValidateAntiForgeryTokenAttribute : ActionFilterAttribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ValidateAntiForgeryTokenAttribute));
         /// <summary>The success result.</summary>
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1306:FieldNamesMustBeginWithLowerCaseLetter", Justification = "Breaking Change")]
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
@@ -32,14 +33,18 @@ namespace DotNetNuke.Web.Api
         /// <inheritdoc />
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
+			Logger.LogDebug(">>> Entering OnActionExecuting(actionContext={ActionContext})", actionContext);
             if (!BypassTokenCheck())
             {
                 var result = this.IsAuthorized(actionContext);
+				Logger.LogDebug("OnActionExecuting(actionContext={ActionContext}): result → {Result}", actionContext, result);
                 if (!result.Item1)
                 {
+					Logger.LogWarning("Throwing UnauthorizedAccessException from OnActionExecuting(actionContext={ActionContext})", actionContext);
                     throw new UnauthorizedAccessException(result.Item2);
                 }
             }
+			Logger.LogDebug("<<< Exiting OnActionExecuting(actionContext={ActionContext})", actionContext);
         }
 
         /// <summary>Appends the given <paramref name="authType"/> to the bypassed auth types.</summary>
@@ -51,6 +56,7 @@ namespace DotNetNuke.Web.Api
             {
                 BypassedAuthTypes.Add(text);
             }
+			Logger.LogDebug("<<< Exiting AppendToBypassAuthTypes(authType={AuthType})", authType);
         }
 
         /// <summary>Gets the value of the anti-forgery cookie.</summary>
@@ -58,20 +64,24 @@ namespace DotNetNuke.Web.Api
         /// <returns>The cookie value or <see cref="string.Empty"/>.</returns>
         protected static string GetAntiForgeryCookieValue(HttpActionContext actionContext)
         {
+			Logger.LogDebug(">>> Entering GetAntiForgeryCookieValue(actionContext={ActionContext})", actionContext);
             if (actionContext?.Request != null && actionContext.Request.Headers.TryGetValues("Cookie", out var cookies))
             {
                 foreach (var cookieValue in cookies)
                 {
                     var nameIndex = cookieValue.IndexOf(AntiForgery.Instance.CookieName, StringComparison.OrdinalIgnoreCase);
+					Logger.LogDebug("GetAntiForgeryCookieValue(actionContext={ActionContext}): nameIndex → {NameIndex}", actionContext, nameIndex);
                     if (nameIndex > -1)
                     {
                         var valueIndex = nameIndex + AntiForgery.Instance.CookieName.Length + 1;
                         var valueEndIndex = cookieValue.Substring(valueIndex).IndexOf(';');
+						Logger.LogDebug("GetAntiForgeryCookieValue(actionContext={ActionContext}): valueEndIndex → {ValueEndIndex}", actionContext, valueEndIndex);
                         return valueEndIndex > -1 ? cookieValue.Substring(valueIndex, valueEndIndex) : cookieValue.Substring(valueIndex);
                     }
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetAntiForgeryCookieValue(actionContext={ActionContext})", actionContext);
             return string.Empty;
         }
 
@@ -111,8 +121,10 @@ namespace DotNetNuke.Web.Api
 
         private static bool BypassTokenCheck()
         {
+			Logger.LogDebug(">>> Entering BypassTokenCheck()");
             // bypass anti-forgery for those handlers that request so.
             var authType = Thread.CurrentPrincipal?.Identity?.AuthenticationType;
+			Logger.LogDebug("<<< Exiting BypassTokenCheck()");
             return !string.IsNullOrEmpty(authType) && BypassedAuthTypes.Contains(authType);
         }
     }

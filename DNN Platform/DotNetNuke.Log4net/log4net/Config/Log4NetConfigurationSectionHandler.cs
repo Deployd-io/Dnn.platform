@@ -58,6 +58,8 @@ namespace log4net.Config
         /// </remarks>
         public Log4NetConfigurationSectionHandler()
         {
+		value.LogDebug(">>> Entering Log4NetConfigurationSectionHandler()");
+		value.LogDebug("<<< Exiting Log4NetConfigurationSectionHandler()");
         }
 
         /// <summary>Parses the configuration section.</summary>
@@ -72,6 +74,8 @@ namespace log4net.Config
         /// </remarks>
         public object Create(object parent, object configContext, XmlNode section)
         {
+			value.LogDebug(">>> Entering Create(parent={Parent},configContext={ConfigContext},section={Section})", parent, configContext, section);
+			value.LogDebug("<<< Exiting Create(parent={Parent},configContext={ConfigContext},section={Section})", parent, configContext, section);
             return section;
         }
     }

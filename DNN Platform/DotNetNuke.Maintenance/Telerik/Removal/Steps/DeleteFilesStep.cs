@@ -11,10 +11,12 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
     using DotNetNuke.Instrumentation;
     using DotNetNuke.Maintenance.Shims;
     using DotNetNuke.Maintenance.Telerik.Removal;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>Deletes files.</summary>
     internal sealed class DeleteFilesStep : StepBase, IDeleteFilesStep
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private readonly IFileSystemProvider fileSystemProvider;
         private readonly IApplicationStatusInfo applicationStatusInfo;
 
@@ -30,10 +32,17 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
             IApplicationStatusInfo applicationStatusInfo)
             : base(loggerSource, localizer)
         {
+			_logger.LogDebug(">>> Entering DeleteFilesStep(loggerSource={LoggerSource},localizer={Localizer},fileSystemProvider={FileSystemProvider},applicationStatusInfo={ApplicationStatusInfo})", loggerSource, localizer, fileSystemProvider, applicationStatusInfo);
+			_logger.LogDebug("DeleteFilesStep(loggerSource={LoggerSource},localizer={Localizer},fileSystemProvider={FileSystemProvider},applicationStatusInfo={ApplicationStatusInfo}): applicationStatusInfo → {ApplicationStatusInfo1}", loggerSource, localizer, fileSystemProvider, applicationStatusInfo, applicationStatusInfo);
             this.fileSystemProvider = fileSystemProvider ??
+				_logger.LogWarning("Throwing ArgumentNullException from DeleteFilesStep(loggerSource={LoggerSource},localizer={Localizer},fileSystemProvider={FileSystemProvider},applicationStatusInfo={ApplicationStatusInfo})", loggerSource, localizer, fileSystemProvider, applicationStatusInfo);
+				_logger.LogDebug("DeleteFilesStep(loggerSource={LoggerSource},localizer={Localizer},fileSystemProvider={FileSystemProvider},applicationStatusInfo={ApplicationStatusInfo}): fileSystemProvider → {FileSystemProvider1}", loggerSource, localizer, fileSystemProvider, applicationStatusInfo, fileSystemProvider);
+				_logger.LogDebug("DeleteFilesStep(loggerSource={LoggerSource},localizer={Localizer},fileSystemProvider={FileSystemProvider},applicationStatusInfo={ApplicationStatusInfo}): this.fileSystemProvider → {Arg4}", loggerSource, localizer, fileSystemProvider, applicationStatusInfo, this.fileSystemProvider);
                 throw new ArgumentNullException(nameof(fileSystemProvider));
 
             this.applicationStatusInfo = applicationStatusInfo ??
+				_logger.LogDebug("<<< Exiting DeleteFilesStep(loggerSource={LoggerSource},localizer={Localizer},fileSystemProvider={FileSystemProvider},applicationStatusInfo={ApplicationStatusInfo})", loggerSource, localizer, fileSystemProvider, applicationStatusInfo);
+				_logger.LogDebug("DeleteFilesStep(loggerSource={LoggerSource},localizer={Localizer},fileSystemProvider={FileSystemProvider},applicationStatusInfo={ApplicationStatusInfo}): this.applicationStatusInfo → {Arg4}", loggerSource, localizer, fileSystemProvider, applicationStatusInfo, this.applicationStatusInfo);
                 throw new ArgumentNullException(nameof(applicationStatusInfo));
         }
 
@@ -52,10 +61,15 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
         /// <inheritdoc />
         protected override void ExecuteInternal()
         {
+			_logger.LogDebug(">>> Entering ExecuteInternal()");
             var count = 0;
             var appPath = this.applicationStatusInfo.ApplicationMapPath + @"\";
+			_logger.LogDebug("ExecuteInternal(): appPath → {AppPath}", appPath);
             var fullPath = Path.GetFullPath(Path.Combine(appPath, this.RelativePath));
+			_logger.LogDebug("ExecuteInternal(): fullPath → {FullPath}", fullPath);
             var files = this.fileSystemProvider.EnumerateFiles(fullPath, this.SearchPattern, this.SearchOption);
+			_logger.LogDebug("ExecuteInternal(): files → {Files}", files);
+			_logger.LogDebug("ExecuteInternal(): count → {Count}", count);
 
             foreach (var file in files)
             {
@@ -64,6 +78,8 @@ namespace DotNetNuke.Maintenance.Telerik.Steps
             }
 
             this.Success = true;
+			_logger.LogDebug("ExecuteInternal(): this.Success → {Arg0}", this.Success);
+			_logger.LogDebug("<<< Exiting ExecuteInternal()");
             this.Notes = this.LocalizeFormat("UninstallStepCountOfFilesDeleted", count);
         }
     }

@@ -1,4 +1,5 @@
 import ActionTypes from "../constants/actionTypes/pageSeoTypes";
+const logger = console;
 
 const statusCodes = [
     {
@@ -18,6 +19,7 @@ export default function  pageSeoReducer(state = {
     editedUrl: null
 }, action) {
     const changeField = function changeField(key, value) {
+		logger.debug(`>>> Entering changeField(key=${key},value=${value})`);
         const newEditedUrl = {
             ...state.editedUrl
         };  
@@ -27,12 +29,14 @@ export default function  pageSeoReducer(state = {
                 ...state.editedUrl.statusCode
             };
             newEditedUrl[key].Key = value;
+			logger.debug(`changeField(key=${key},value=${value}): newEditedUrl.statusCode → ${newEditedUrl.statusCode}`);
             newEditedUrl[key].Value = statusCodes.filter(statusCode => statusCode.value === value)[0].label;
         } else if (key === "siteAlias") { 
             newEditedUrl.siteAlias = {
                 ...state.editedUrl.siteAlias
             };
             newEditedUrl[key].Key = value;
+			logger.debug(`changeField(key=${key},value=${value}): newEditedUrl.siteAlias → ${newEditedUrl.siteAlias}`);
         } else {
             if (key === "path" && 
                     (!value || !value.startsWith("/"))) {
@@ -42,9 +46,11 @@ export default function  pageSeoReducer(state = {
                 value = "?" + value;
             }
             
+			logger.debug(`changeField(key=${key},value=${value}): value → ${value}`);
             newEditedUrl[key] = value;
         }
         
+		logger.debug(`<<< Exiting changeField(key=${key},value=${value})`);
         return newEditedUrl;
     };
     switch (action.type) {

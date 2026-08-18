@@ -19,12 +19,17 @@ namespace DotNetNuke.UI
 
     public class UIUtilities
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UIUtilities));
         public static ModuleInfo GetSlaveModule(int tabId)
         {
+			Logger.LogDebug(">>> Entering GetSlaveModule(tabId={TabId})", tabId);
             var key = GetControlKey();
             var moduleId = GetModuleId(key);
+			Logger.LogDebug("GetSlaveModule(tabId={TabId}): moduleId → {ModuleId}", tabId, moduleId);
+			Logger.LogWarning("GetSlaveModule(tabId={TabId}): key → {Key}", tabId, key);
 
             ModuleInfo slaveModule = GetSlaveModule(moduleId, key, tabId);
+			Logger.LogDebug("GetSlaveModule(tabId={TabId}): slaveModule → {SlaveModule}", tabId, slaveModule);
             if (slaveModule != null)
             {
                 var moduleControl = ModuleControlController.GetModuleControlByControlKey(key, slaveModule.ModuleDefID) ??
@@ -32,9 +37,11 @@ namespace DotNetNuke.UI
                 if (moduleControl != null)
                 {
                     slaveModule.ModuleControlId = moduleControl.ModuleControlID;
+					Logger.LogDebug("GetSlaveModule(tabId={TabId}): slaveModule.ModuleControlId → {Arg1}", tabId, slaveModule.ModuleControlId);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetSlaveModule(tabId={TabId})", tabId);
             return slaveModule;
         }
 
@@ -63,6 +70,7 @@ namespace DotNetNuke.UI
                 }
             }
 
+			Logger.LogDebug("<<< Exiting IsLegacyUI(portalId={PortalId})", portalId);
             return isLegacyUi;
         }
 
@@ -76,14 +84,17 @@ namespace DotNetNuke.UI
 
         internal static string GetControlKey()
         {
+			Logger.LogDebug(">>> Entering GetControlKey()");
             HttpRequest request = HttpContext.Current.Request;
 
             string key = string.Empty;
+			Logger.LogWarning("GetControlKey(): key → {Key}", key);
             if (request.QueryString["ctl"] != null)
             {
                 key = request.QueryString["ctl"];
             }
 
+			Logger.LogDebug("<<< Exiting GetControlKey()");
             return key;
         }
 
@@ -113,14 +124,17 @@ namespace DotNetNuke.UI
 
         internal static string GetRenderMode()
         {
+			Logger.LogDebug(">>> Entering GetRenderMode()");
             HttpRequest request = HttpContext.Current.Request;
 
             var renderMode = string.Empty;
+			Logger.LogDebug("GetRenderMode(): renderMode → {RenderMode}", renderMode);
             if (request.QueryString["render"] != null)
             {
                 renderMode = request.QueryString["render"];
             }
 
+			Logger.LogDebug("<<< Exiting GetRenderMode()");
             return renderMode;
         }
 
@@ -172,8 +186,10 @@ namespace DotNetNuke.UI
         /// <returns>The path to the resource file.</returns>
         internal static string GetLocalResourceFile(Control ctrl)
         {
+			Logger.LogDebug(">>> Entering GetLocalResourceFile(ctrl={Ctrl})", ctrl);
             string resourceFileName = Null.NullString;
 
+			Logger.LogDebug("GetLocalResourceFile(ctrl={Ctrl}): resourceFileName → {ResourceFileName}", ctrl, resourceFileName);
             while (ctrl != null)
             {
                 if (ctrl is UserControl)
@@ -205,6 +221,7 @@ namespace DotNetNuke.UI
                 ctrl = ctrl.Parent;
             }
 
+			Logger.LogDebug("<<< Exiting GetLocalResourceFile(ctrl={Ctrl})", ctrl);
             return resourceFileName;
         }
     }

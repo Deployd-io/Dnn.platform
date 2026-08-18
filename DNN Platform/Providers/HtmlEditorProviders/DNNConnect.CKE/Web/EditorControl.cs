@@ -70,7 +70,9 @@ namespace DNNConnect.CKEditorProvider.Web
         public EditorControl()
             : this(null, null, null, null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering EditorControl()");
         }
+		eventLogger.LogDebug("<<< Exiting EditorControl()");
 
         /// <summary>Initializes a new instance of the <see cref="EditorControl"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
@@ -83,7 +85,13 @@ namespace DNNConnect.CKEditorProvider.Web
         {
             this.navigationManager = navigationManager ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<INavigationManager>();
             this.hostSettings = hostSettings ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IHostSettings>();
+			eventLogger.LogDebug("EditorControl(navigationManager={NavigationManager},hostSettings={HostSettings},appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController},moduleController={ModuleController}): hostSettings → {HostSettings1}", navigationManager, hostSettings, appStatus, eventLogger, clientResourceController, moduleController, hostSettings);
+			eventLogger.LogDebug("EditorControl(navigationManager={NavigationManager},hostSettings={HostSettings},appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController},moduleController={ModuleController}): eventLogger → {EventLogger1}", navigationManager, hostSettings, appStatus, eventLogger, clientResourceController, moduleController, eventLogger);
+			eventLogger.LogDebug("EditorControl(navigationManager={NavigationManager},hostSettings={HostSettings},appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController},moduleController={ModuleController}): clientResourceController → {ClientResourceController1}", navigationManager, hostSettings, appStatus, eventLogger, clientResourceController, moduleController, clientResourceController);
+			eventLogger.LogDebug("EditorControl(navigationManager={NavigationManager},hostSettings={HostSettings},appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController},moduleController={ModuleController}): moduleController → {ModuleController1}", navigationManager, hostSettings, appStatus, eventLogger, clientResourceController, moduleController, moduleController);
+			eventLogger.LogDebug("EditorControl(navigationManager={NavigationManager},hostSettings={HostSettings},appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController},moduleController={ModuleController}): navigationManager → {NavigationManager1}", navigationManager, hostSettings, appStatus, eventLogger, clientResourceController, moduleController, navigationManager);
             this.appStatus = appStatus ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IApplicationStatusInfo>();
+			eventLogger.LogDebug("EditorControl(navigationManager={NavigationManager},hostSettings={HostSettings},appStatus={AppStatus},eventLogger={EventLogger},clientResourceController={ClientResourceController},moduleController={ModuleController}): appStatus → {AppStatus1}", navigationManager, hostSettings, appStatus, eventLogger, clientResourceController, moduleController, appStatus);
             this.eventLogger = eventLogger ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IEventLogger>();
             this.clientResourceController = clientResourceController ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IClientResourceController>();
             this.moduleController = moduleController ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IModuleController>();
@@ -673,9 +681,13 @@ namespace DNNConnect.CKEditorProvider.Web
         /// <returns>The Instances found.</returns>
         public static Control FindModuleInstance(Control editorControl)
         {
+			eventLogger.LogDebug(">>> Entering FindModuleInstance(editorControl={EditorControl})", editorControl);
             Control ctl = editorControl.Parent;
             Control selectedCtl = null;
+			eventLogger.LogDebug("FindModuleInstance(editorControl={EditorControl}): selectedCtl → {SelectedCtl}", editorControl, selectedCtl);
             Control possibleCtl = null;
+			eventLogger.LogDebug("FindModuleInstance(editorControl={EditorControl}): possibleCtl → {PossibleCtl}", editorControl, possibleCtl);
+			eventLogger.LogDebug("FindModuleInstance(editorControl={EditorControl}): ctl → {Ctl}", editorControl, ctl);
 
             while (ctl != null)
             {
@@ -702,6 +714,7 @@ namespace DNNConnect.CKEditorProvider.Web
                 selectedCtl = possibleCtl;
             }
 
+			eventLogger.LogDebug("<<< Exiting FindModuleInstance(editorControl={EditorControl})", editorControl);
             return selectedCtl;
         }
 
@@ -710,8 +723,10 @@ namespace DNNConnect.CKEditorProvider.Web
         /// <returns>Returns a value indicating whether the text area has rendered.</returns>
         public bool HasRenderedTextArea(Control control)
         {
+			eventLogger.LogDebug(">>> Entering HasRenderedTextArea(control={Control})", control);
             if (control is EditorControl && ((EditorControl)control).IsRendered)
             {
+			eventLogger.LogDebug("<<< Exiting HasRenderedTextArea(control={Control})", control);
                 return true;
             }
 
@@ -724,6 +739,7 @@ namespace DNNConnect.CKEditorProvider.Web
         /// <returns>A value indicating whether the PostData has loaded.</returns>
         public bool LoadPostData(string postDataKey, NameValueCollection postCollection)
         {
+			eventLogger.LogDebug(">>> Entering LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             try
             {
                 string currentValue = this.Value;
@@ -741,6 +757,7 @@ namespace DNNConnect.CKEditorProvider.Web
                                     "<!-- Injected Syntax Highlight Code --><script type=\"text/javascript\" src=\"{0}plugins/syntaxhighlight/scripts/shCore.js\"></script><link type=\"text/css\" rel=\"stylesheet\" href=\"{0}plugins/syntaxhighlight/styles/shCore.css\"/><script type=\"text/javascript\">SyntaxHighlighter.all();</script>{1}",
                                     Globals.ResolveUrl("~/Providers/HtmlEditorProviders/DNNConnect.CKE/CKEditor/"),
                                     postedValue);
+									eventLogger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): type → {Type}", postDataKey, postCollection, type);
                         }
 
                         if (postedValue.Contains("<span class=\"math-tex\">") && !postedValue.Contains("MathJax.js"))
@@ -754,12 +771,15 @@ namespace DNNConnect.CKEditorProvider.Web
                     }
 
                     this.Value = postedValue;
+					eventLogger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): this.Value → {Arg2}", postDataKey, postCollection, this.Value);
 
                     return true;
                 }
             }
             catch (Exception)
             {
+				eventLogger.LogError("Exception in LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): {Arg2}", postDataKey, postCollection, Exception.Message);
+			eventLogger.LogDebug("<<< Exiting LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
                 return false;
             }
 
@@ -769,7 +789,9 @@ namespace DNNConnect.CKEditorProvider.Web
         /// <summary>Taises post data changed event.</summary>
         public void RaisePostDataChangedEvent()
         {
+			eventLogger.LogDebug(">>> Entering RaisePostDataChangedEvent()");
             // Do nothing
+			eventLogger.LogDebug("<<< Exiting RaisePostDataChangedEvent()");
         }
 
         /// <summary>
@@ -779,13 +801,16 @@ namespace DNNConnect.CKEditorProvider.Web
         /// <param name="e">An <see cref="T:System.EventArgs" /> object that contains the event data.</param>
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
+			eventLogger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <summary>Renders the control.</summary>
         /// <param name="outWriter">The Writer to render to.</param>
         protected override void Render(HtmlTextWriter outWriter)
         {
+			eventLogger.LogDebug(">>> Entering Render(outWriter={OutWriter})", outWriter);
             outWriter.Write("<div>");
             outWriter.Write("<noscript>");
             outWriter.Write("<p>");
@@ -833,6 +858,7 @@ namespace DNNConnect.CKEditorProvider.Web
             outWriter.Write("</div>");
 
             this.IsRendered = true;
+			eventLogger.LogDebug("Render(outWriter={OutWriter}): this.IsRendered → {Arg1}", outWriter, this.IsRendered);
 
             if (!this.HasRenderedTextArea(this.Page))
             {
@@ -859,38 +885,51 @@ namespace DNNConnect.CKEditorProvider.Web
             }
 
             outWriter.Write("</p>");
+			eventLogger.LogDebug("<<< Exiting Render(outWriter={OutWriter})", outWriter);
         }
 
         private string GetContainerSourcePath()
         {
+			eventLogger.LogDebug(">>> Entering GetContainerSourcePath()");
             var containerSource = this.portalSettings.ActiveTab.ContainerSrc ?? this.portalSettings.DefaultPortalContainer;
             containerSource = this.ResolveSourcePath(containerSource);
+			eventLogger.LogDebug("GetContainerSourcePath(): containerSource → {ContainerSource}", containerSource);
+			eventLogger.LogDebug("<<< Exiting GetContainerSourcePath()");
             return containerSource;
         }
 
         private string GetSkinSourcePath()
         {
+			eventLogger.LogDebug(">>> Entering GetSkinSourcePath()");
             var skinSource = this.portalSettings.ActiveTab.SkinSrc ?? this.portalSettings.DefaultPortalSkin;
             skinSource = this.ResolveSourcePath(skinSource);
+			eventLogger.LogDebug("GetSkinSourcePath(): skinSource → {SkinSource}", skinSource);
+			eventLogger.LogDebug("<<< Exiting GetSkinSourcePath()");
             return skinSource;
         }
 
         private string ResolveSourcePath(string source)
         {
+			eventLogger.LogDebug(">>> Entering ResolveSourcePath(source={Source})", source);
             source = "~" + source;
+			eventLogger.LogDebug("ResolveSourcePath(source={Source}): source → {Source1}", source, source);
+			eventLogger.LogDebug("<<< Exiting ResolveSourcePath(source={Source})", source);
             return source;
         }
 
         private void CKEditorInit(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering CKEditorInit(sender={Sender},e={E})", sender, e);
             this.Page?.RegisterRequiresPostBack(this); // Ensures that postback is handled
 
             this.portalModule = (PortalModuleBase)FindModuleInstance(this);
+			eventLogger.LogDebug("CKEditorInit(sender={Sender},e={E}): portalModule → {PortalModule}", sender, e, portalModule);
 
             if (this.portalModule == null || this.portalModule.ModuleId == -1)
             {
                 // Get Parent ModuleID From this ClientID
                 string sClientId = this.ClientID.Substring(this.ClientID.IndexOf("ctr") + 3);
+				eventLogger.LogDebug("CKEditorInit(sender={Sender},e={E}): sClientId → {SClientId}", sender, e, sClientId);
 
                 sClientId = sClientId.Remove(this.ClientID.IndexOf("_", StringComparison.Ordinal));
 
@@ -898,8 +937,11 @@ namespace DNNConnect.CKEditorProvider.Web
                 {
                     // The is no real module, then use the "User Accounts" module (Profile editor)
                     ModuleInfo objm = this.moduleController.GetModuleByDefinition(this.portalSettings.PortalId, "User Accounts");
+					eventLogger.LogDebug("CKEditorInit(sender={Sender},e={E}): objm → {Objm}", sender, e, objm);
 
                     this.parentModulId = objm.TabModuleID;
+					eventLogger.LogDebug("CKEditorInit(sender={Sender},e={E}): parentModulId → {ParentModulId}", sender, e, parentModulId);
+					eventLogger.LogDebug("CKEditorInit(sender={Sender},e={E}): this.parentModulId → {Arg2}", sender, e, this.parentModulId);
                 }
             }
             else
@@ -911,12 +953,16 @@ namespace DNNConnect.CKEditorProvider.Web
             this.LoadAllSettings();
             this.RegisterCKEditorLibrary();
             this.GenerateEditorLoadScript();
+			eventLogger.LogDebug("<<< Exiting CKEditorInit(sender={Sender},e={E})", sender, e);
         }
 
         private void SetFileBrowserMode()
         {
+			eventLogger.LogDebug(">>> Entering SetFileBrowserMode()");
             ProviderConfiguration providerConfiguration = ProviderConfiguration.GetProviderConfiguration(ProviderType);
             Provider objProvider = (Provider)providerConfiguration.Providers[providerConfiguration.DefaultProvider];
+			eventLogger.LogDebug("SetFileBrowserMode(): objProvider → {ObjProvider}", objProvider);
+			eventLogger.LogDebug("SetFileBrowserMode(): providerConfiguration → {ProviderConfiguration}", providerConfiguration);
 
             if (objProvider == null || string.IsNullOrEmpty(objProvider.Attributes["ck_browser"]))
             {
@@ -935,13 +981,17 @@ namespace DNNConnect.CKEditorProvider.Web
                     this.currentEditorSettings.BrowserMode = BrowserType.None;
                     break;
             }
+			eventLogger.LogDebug("<<< Exiting SetFileBrowserMode()");
         }
 
         /// <summary>Load Portal/Page/Module Settings.</summary>
         private void LoadAllSettings()
         {
+			eventLogger.LogDebug(">>> Entering LoadAllSettings()");
             var settingsDictionary = EditorController.GetEditorHostSettings(this.hostSettings);
             var portalRoles = RoleController.Instance.GetRoles(this.portalSettings.PortalId);
+			eventLogger.LogDebug("LoadAllSettings(): portalRoles → {PortalRoles}", portalRoles);
+			eventLogger.LogDebug("LoadAllSettings(): settingsDictionary → {SettingsDictionary}", settingsDictionary);
 
             // Load Default Settings
             this.currentEditorSettings = SettingsUtil.GetDefaultSettings(
@@ -950,19 +1000,24 @@ namespace DNNConnect.CKEditorProvider.Web
                 this.portalSettings.HomeDirectoryMapPath,
                 this.settings["configFolder"],
                 portalRoles);
+				eventLogger.LogDebug("LoadAllSettings(): currentEditorSettings → {CurrentEditorSettings}", currentEditorSettings);
 
             // Set Current Mode to Default
             this.currentEditorSettings.SettingMode = SettingsMode.Default;
 
             var hostKey = SettingConstants.HostKey;
             var portalKey = SettingConstants.PortalKey(this.portalSettings.PortalId);
+			eventLogger.LogDebug("LoadAllSettings(): portalKey → {PortalKey}", portalKey);
             var pageKey = $"DNNCKT#{this.portalSettings.ActiveTab.TabID}#";
+			eventLogger.LogDebug("LoadAllSettings(): pageKey → {PageKey}", pageKey);
             var moduleKey = $"DNNCKMI#{this.parentModulId}#INS#{this.ID}#";
+			eventLogger.LogDebug("LoadAllSettings(): moduleKey → {ModuleKey}", moduleKey);
 
             // Load Host Settings ?!
             if (SettingsUtil.CheckSettingsExistByKey(settingsDictionary, hostKey))
             {
                 var hostPortalRoles = RoleController.Instance.GetRoles(this.hostSettings.HostPortalId);
+				eventLogger.LogDebug("LoadAllSettings(): hostPortalRoles → {HostPortalRoles}", hostPortalRoles);
                 this.currentEditorSettings = SettingsUtil.LoadEditorSettingsByKey(
                     this.portalSettings,
                     this.currentEditorSettings,
@@ -979,7 +1034,10 @@ namespace DNNConnect.CKEditorProvider.Web
                     foreach (var toolbarRole in this.currentEditorSettings.ToolBarRoles)
                     {
                         var roleName = hostPortalRoles.FirstOrDefault(role => role.RoleID == toolbarRole.RoleId)?.RoleName ?? string.Empty;
+						eventLogger.LogDebug("LoadAllSettings(): roleName → {RoleName}", roleName);
+						eventLogger.LogDebug("LoadAllSettings(): toolbarRole.RoleId → {Arg0}", toolbarRole.RoleId);
                         var roleId = portalRoles.FirstOrDefault(role => role.RoleName.Equals(roleName))?.RoleID ?? Null.NullInteger;
+						eventLogger.LogDebug("LoadAllSettings(): roleId → {RoleId}", roleId);
                         toolbarRole.RoleId = roleId;
                     }
 
@@ -988,6 +1046,7 @@ namespace DNNConnect.CKEditorProvider.Web
                         var roleName = hostPortalRoles.FirstOrDefault(role => role.RoleID == uploadRoles.RoleId)?.RoleName ?? string.Empty;
                         var roleId = portalRoles.FirstOrDefault(role => role.RoleName.Equals(roleName))?.RoleID ?? Null.NullInteger;
                         uploadRoles.RoleId = roleId;
+						eventLogger.LogDebug("LoadAllSettings(): uploadRoles.RoleId → {Arg0}", uploadRoles.RoleId);
                     }
                 }
             }
@@ -1027,6 +1086,7 @@ namespace DNNConnect.CKEditorProvider.Web
 
             // Set Current Mode to Module Instance
             this.currentEditorSettings.SettingMode = SettingsMode.ModuleInstance;
+			eventLogger.LogDebug("<<< Exiting LoadAllSettings()");
         }
 
         /// <summary>Format the URL from FileID to File Path URL.</summary>
@@ -1034,8 +1094,10 @@ namespace DNNConnect.CKEditorProvider.Web
         /// <returns>The formatted URL.</returns>
         private string FormatUrl(string inputUrl)
         {
+			eventLogger.LogDebug(">>> Entering FormatUrl(inputUrl={InputUrl})", inputUrl);
             var formattedUrl = string.Empty;
 
+			eventLogger.LogDebug("FormatUrl(inputUrl={InputUrl}): formattedUrl → {FormattedUrl}", inputUrl, formattedUrl);
             if (string.IsNullOrEmpty(inputUrl))
             {
                 return formattedUrl;
@@ -1048,8 +1110,10 @@ namespace DNNConnect.CKEditorProvider.Web
             else if (inputUrl.StartsWith("FileID="))
             {
                 var fileId = int.Parse(inputUrl.Substring(7));
+				eventLogger.LogDebug("FormatUrl(inputUrl={InputUrl}): fileId → {FileId}", inputUrl, fileId);
 
                 var objFileInfo = FileManager.Instance.GetFile(fileId);
+				eventLogger.LogDebug("FormatUrl(inputUrl={InputUrl}): objFileInfo → {ObjFileInfo}", inputUrl, objFileInfo);
 
                 formattedUrl = this.portalSettings.HomeDirectory + objFileInfo.Folder + objFileInfo.FileName;
             }
@@ -1058,18 +1122,23 @@ namespace DNNConnect.CKEditorProvider.Web
                 formattedUrl = this.portalSettings.HomeDirectory + inputUrl;
             }
 
+			eventLogger.LogDebug("<<< Exiting FormatUrl(inputUrl={InputUrl})", inputUrl);
             return formattedUrl;
         }
 
         /// <summary>Load the Settings from the web.config file.</summary>
         private void LoadConfigSettings()
         {
+			eventLogger.LogDebug(">>> Entering LoadConfigSettings()");
             this.settings = new NameValueCollection();
 
+			eventLogger.LogDebug("LoadConfigSettings(): settings → {Settings}", settings);
             var providerConfiguration = ProviderConfiguration.GetProviderConfiguration(ProviderType);
+			eventLogger.LogDebug("LoadConfigSettings(): providerConfiguration → {ProviderConfiguration}", providerConfiguration);
             if (providerConfiguration.Providers.ContainsKey(providerConfiguration.DefaultProvider))
             {
                 var objProvider = (Provider)providerConfiguration.Providers[providerConfiguration.DefaultProvider];
+				eventLogger.LogDebug("LoadConfigSettings(): objProvider → {ObjProvider}", objProvider);
 
                 foreach (string key in objProvider.Attributes)
                 {
@@ -1089,6 +1158,8 @@ namespace DNNConnect.CKEditorProvider.Web
             }
             else
             {
+				eventLogger.LogWarning("Throwing ConfigurationErrorsException from LoadConfigSettings()");
+			eventLogger.LogDebug("<<< Exiting LoadConfigSettings()");
                 throw new ConfigurationErrorsException(string.Format(
                     "Configuration error: default provider {0} doesn't exist in {1} providers",
                     providerConfiguration.DefaultProvider,
@@ -1098,27 +1169,36 @@ namespace DNNConnect.CKEditorProvider.Web
 
         private void RegisterStartupScript(string key, string script, bool addScriptTags)
         {
+			eventLogger.LogDebug(">>> Entering RegisterStartupScript(key={Key},script={Script},addScriptTags={AddScriptTags})", key, script, addScriptTags);
             ScriptManager.RegisterStartupScript(this, this.GetType(), key, script, addScriptTags);
+			eventLogger.LogDebug("<<< Exiting RegisterStartupScript(key={Key},script={Script},addScriptTags={AddScriptTags})", key, script, addScriptTags);
         }
 
         private void RegisterScript(string key, string script, bool addScriptTags)
         {
+			eventLogger.LogDebug(">>> Entering RegisterScript(key={Key},script={Script},addScriptTags={AddScriptTags})", key, script, addScriptTags);
             ScriptManager.RegisterClientScriptBlock(this, this.GetType(), key, script, addScriptTags);
+			eventLogger.LogDebug("<<< Exiting RegisterScript(key={Key},script={Script},addScriptTags={AddScriptTags})", key, script, addScriptTags);
         }
 
         private void RegisterOnSubmitStatement(Type type, string key, string script)
         {
+			eventLogger.LogDebug(">>> Entering RegisterOnSubmitStatement(type={Type},key={Key},script={Script})", type, key, script);
             ScriptManager.RegisterOnSubmitStatement(this, type, key, script);
+			eventLogger.LogDebug("<<< Exiting RegisterOnSubmitStatement(type={Type},key={Key},script={Script})", type, key, script);
         }
 
         private string SetUserToolbar(string alternateConfigSubFolder)
         {
+			eventLogger.LogDebug(">>> Entering SetUserToolbar(alternateConfigSubFolder={AlternateConfigSubFolder})", alternateConfigSubFolder);
             string toolbarName = this.CanUseFullToolbarAsDefault() ? "Full" : "Basic";
 
+			eventLogger.LogDebug("SetUserToolbar(alternateConfigSubFolder={AlternateConfigSubFolder}): toolbarName → {ToolbarName}", alternateConfigSubFolder, toolbarName);
             var listToolbarSets = ToolbarUtil.GetToolbars(
                 this.portalSettings.HomeDirectoryMapPath, alternateConfigSubFolder);
 
             var listUserToolbarSets = new List<ToolbarSet>();
+			eventLogger.LogDebug("SetUserToolbar(alternateConfigSubFolder={AlternateConfigSubFolder}): listUserToolbarSets → {ListUserToolbarSets}", alternateConfigSubFolder, listUserToolbarSets);
 
             if (this.currentEditorSettings.ToolBarRoles.Count <= 0)
             {
@@ -1139,6 +1219,7 @@ namespace DNNConnect.CKEditorProvider.Web
 
                 // Role
                 var role = RoleController.Instance.GetRoleById(this.portalSettings.PortalId, roleToolbar.RoleId);
+				eventLogger.LogDebug("SetUserToolbar(alternateConfigSubFolder={AlternateConfigSubFolder}): role → {Role}", alternateConfigSubFolder, role);
 
                 if (role == null)
                 {
@@ -1157,6 +1238,7 @@ namespace DNNConnect.CKEditorProvider.Web
                 }
 
                 var toolbar = listToolbarSets.Find(toolbarSel => toolbarSel.Name.Equals(roleToolbar.Toolbar));
+				eventLogger.LogDebug("SetUserToolbar(alternateConfigSubFolder={AlternateConfigSubFolder}): toolbar → {Toolbar}", alternateConfigSubFolder, toolbar);
 
                 listUserToolbarSets.Add(toolbar);
             }
@@ -1168,29 +1250,36 @@ namespace DNNConnect.CKEditorProvider.Web
 
             // Compare The User Toolbars if the User is more then One Role, and apply the Toolbar with the Highest Priority
             int iHighestPrio = listUserToolbarSets.Max(toolb => toolb.Priority);
+			eventLogger.LogDebug("SetUserToolbar(alternateConfigSubFolder={AlternateConfigSubFolder}): iHighestPrio → {IHighestPrio}", alternateConfigSubFolder, iHighestPrio);
 
+			eventLogger.LogDebug("<<< Exiting SetUserToolbar(alternateConfigSubFolder={AlternateConfigSubFolder})", alternateConfigSubFolder);
             return ToolbarUtil.FindHighestToolbar(listUserToolbarSets, iHighestPrio).Name;
         }
 
         private bool CanUseFullToolbarAsDefault()
         {
+			eventLogger.LogDebug(">>> Entering CanUseFullToolbarAsDefault()");
             if (!HttpContext.Current.Request.IsAuthenticated)
             {
                 return false;
             }
 
             var currentUser = UserController.Instance.GetCurrentUserInfo();
+			eventLogger.LogDebug("CanUseFullToolbarAsDefault(): currentUser → {CurrentUser}", currentUser);
+			eventLogger.LogDebug("<<< Exiting CanUseFullToolbarAsDefault()");
             return currentUser.IsSuperUser || PortalSecurity.IsInRole(this.portalSettings.AdministratorRoleName);
         }
 
         private void RegisterCKEditorLibrary()
         {
+			eventLogger.LogDebug(">>> Entering RegisterCKEditorLibrary()");
             this.clientResourceController.RegisterStylesheet(Globals.ResolveUrl("~/Providers/HtmlEditorProviders/DNNConnect.CKE/css/CKEditorToolBars.css"));
             this.clientResourceController.RegisterStylesheet(Globals.ResolveUrl("~/Providers/HtmlEditorProviders/DNNConnect.CKE/css/CKEditorOverride.css"));
 
             ClientScriptManager cs = this.Page.ClientScript;
 
             Type csType = this.GetType();
+			eventLogger.LogDebug("RegisterCKEditorLibrary(): csType → {CsType}", csType);
 
             const string CsName = "CKEdScript";
             const string CsFindName = "CKFindScript";
@@ -1226,13 +1315,17 @@ namespace DNNConnect.CKEditorProvider.Web
                     "CKCustomJSFile",
                     this.FormatUrl(this.currentEditorSettings.CustomJsFile));
             }
+			eventLogger.LogDebug("<<< Exiting RegisterCKEditorLibrary()");
         }
 
         private void GenerateEditorLoadScript()
         {
+			eventLogger.LogDebug(">>> Entering GenerateEditorLoadScript()");
             var editorVar = $"editor{this.ClientID.Substring(this.ClientID.LastIndexOf("_", StringComparison.Ordinal) + 1).Replace("-", string.Empty)}";
 
+			eventLogger.LogDebug("GenerateEditorLoadScript(): editorVar → {EditorVar}", editorVar);
             var editorFixedId = this.ClientID.Replace("-", string.Empty).Replace(".", string.Empty);
+			eventLogger.LogDebug("GenerateEditorLoadScript(): editorFixedId → {EditorFixedId}", editorFixedId);
 
             var postBackScript = string.Format(
                 @" if (CKEDITOR && CKEDITOR.instances && CKEDITOR.instances.{0}) {{ CKEDITOR.instances.{0}.updateElement();  if (typeof Page_IsValid !== 'undefined' && !Page_IsValid) return false; CKEDITOR.instances.{0}.destroy(); }}",
@@ -1241,6 +1334,7 @@ namespace DNNConnect.CKEditorProvider.Web
             this.RegisterOnSubmitStatement(this.GetType(), $"CKEditor_OnAjaxSubmit_{editorFixedId}", postBackScript);
 
             var editorScript = new StringBuilder();
+			eventLogger.LogDebug("GenerateEditorLoadScript(): editorScript → {EditorScript}", editorScript);
 
             editorScript.AppendFormat(
                 "Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(LoadCKEditorInstance_{0});", editorFixedId);
@@ -1257,6 +1351,7 @@ namespace DNNConnect.CKEditorProvider.Web
 
             // Render EditorConfig
             var editorConfigScript = new StringBuilder();
+			eventLogger.LogDebug("GenerateEditorLoadScript(): editorConfigScript → {EditorConfigScript}", editorConfigScript);
             editorConfigScript.AppendFormat("var editorConfig{0} = {{", editorVar);
 
             var keysCount = this.Settings.Keys.Count;
@@ -1266,6 +1361,7 @@ namespace DNNConnect.CKEditorProvider.Web
             foreach (string key in this.Settings.Keys)
             {
                 var value = this.Settings[key];
+				eventLogger.LogDebug("GenerateEditorLoadScript(): value → {Value}", value);
 
                 currentCount++;
 
@@ -1324,6 +1420,7 @@ namespace DNNConnect.CKEditorProvider.Web
             editorScript.Append("ev.editor.on('maximize', function () {");
             editorScript.Append("if (ev.editor.commands.maximize.state == 1) {");
             editorScript.Append("var mainDocument = CKEDITOR.document;");
+			eventLogger.LogDebug("GenerateEditorLoadScript(): mainDocument → {MainDocument}", mainDocument);
             editorScript.Append("CKEDITOR.env.gecko && mainDocument.getDocumentElement().setStyle( 'position', 'fixed' );");
             editorScript.Append("}");
             editorScript.Append("});");
@@ -1338,6 +1435,7 @@ namespace DNNConnect.CKEditorProvider.Web
 
             this.RegisterScript($@"{editorFixedId}_CKE_Config", editorConfigScript.ToString(), true);
             this.RegisterStartupScript($@"{editorFixedId}_CKE_Startup", editorScript.ToString(), true);
+			eventLogger.LogDebug("<<< Exiting GenerateEditorLoadScript()");
         }
     }
 }

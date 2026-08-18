@@ -65,6 +65,8 @@ namespace log4net.Util
         /// <returns>string info about this object</returns>
         public override string ToString()
         {
+			value.LogDebug(">>> Entering ToString()");
+			value.LogDebug("<<< Exiting ToString()");
             return "PropertyEntry(Key=" + this.m_key + ", Value=" + this.m_value + ")";
         }
     }

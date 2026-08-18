@@ -41,6 +41,8 @@ namespace Dnn.EditBar.UI.Items
         /// <inheritdoc />
         public override bool Visible()
         {
+			eventLogger.LogDebug(">>> Entering Visible()");
+			eventLogger.LogDebug("<<< Exiting Visible()");
             return Personalization.GetUserMode() == PortalSettings.Mode.Edit;
         }
     }

@@ -12,18 +12,22 @@ namespace Dnn.PersonaBar.Users.Tests
     using Dnn.PersonaBar.Users.Components.Helpers;
     using Moq;
     using NUnit.Framework;
+	using Microsoft.Extensions.Logging;
 
     [TestFixture]
     public class SearchUsersBySearchTermTest
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private GetUsersContract usersContract;
         private UsersControllerTestable usersCtrl;
 
         [SetUp]
         public void Init()
         {
+			_logger.LogDebug(">>> Entering Init()");
             this.usersContract = new GetUsersContract
             {
+				_logger.LogDebug("Init(): this.usersContract → {Arg0}", this.usersContract);
                 SearchText = null,
                 PageIndex = 0,
                 PageSize = 10,
@@ -32,8 +36,11 @@ namespace Dnn.PersonaBar.Users.Tests
                 PortalId = 0,
                 Filter = UserFilters.All,
             };
+			_logger.LogDebug("Init(): usersContract → {UsersContract}", usersContract);
 
             this.usersCtrl = new UsersControllerTestable();
+			_logger.LogDebug("Init(): usersCtrl → {UsersCtrl}", usersCtrl);
+			_logger.LogDebug("<<< Exiting Init()");
         }
 
         [Test]
@@ -55,11 +62,13 @@ namespace Dnn.PersonaBar.Users.Tests
         [TestCase("search text", "search text%")]
         public void FilteredSearchTest(string searchText, string expectedFilteredText)
         {
+			_logger.LogDebug(">>> Entering FilteredSearchTest(searchText={SearchText},expectedFilteredText={ExpectedFilteredText})", searchText, expectedFilteredText);
             int totalRecords;
             this.usersContract.SearchText = searchText;
             this.usersCtrl.GetUsers(this.usersContract, true, out totalRecords);
 
             Assert.That(this.usersCtrl.LastSearch, Is.EqualTo(expectedFilteredText));
+			_logger.LogDebug("<<< Exiting FilteredSearchTest(searchText={SearchText},expectedFilteredText={ExpectedFilteredText})", searchText, expectedFilteredText);
         }
 
         private class UsersControllerTestable : UsersController
@@ -76,8 +85,11 @@ namespace Dnn.PersonaBar.Users.Tests
                 bool? hasAgreedToTerms,
                 bool? requestsRemoval)
             {
+				_logger.LogDebug(">>> Entering CallGetUsersBySearchTerm(usersContract={UsersContract},includeAuthorized={IncludeAuthorized},includeDeleted={IncludeDeleted},includeSuperUsers={IncludeSuperUsers},hasAgreedToTerms={HasAgreedToTerms},requestsRemoval={RequestsRemoval})", usersContract, includeAuthorized, includeDeleted, includeSuperUsers, hasAgreedToTerms, requestsRemoval);
                 this.LastSearch = SearchTextFilter.CleanWildcards(usersContract.SearchText);
                 this.dataReader = new Mock<IDataReader>();
+				_logger.LogDebug("CallGetUsersBySearchTerm(usersContract={UsersContract},includeAuthorized={IncludeAuthorized},includeDeleted={IncludeDeleted},includeSuperUsers={IncludeSuperUsers},hasAgreedToTerms={HasAgreedToTerms},requestsRemoval={RequestsRemoval}): dataReader → {DataReader}", usersContract, includeAuthorized, includeDeleted, includeSuperUsers, hasAgreedToTerms, requestsRemoval, dataReader);
+				_logger.LogDebug("<<< Exiting CallGetUsersBySearchTerm(usersContract={UsersContract},includeAuthorized={IncludeAuthorized},includeDeleted={IncludeDeleted},includeSuperUsers={IncludeSuperUsers},hasAgreedToTerms={HasAgreedToTerms},requestsRemoval={RequestsRemoval})", usersContract, includeAuthorized, includeDeleted, includeSuperUsers, hasAgreedToTerms, requestsRemoval);
                 return this.dataReader.Object;
             }
         }

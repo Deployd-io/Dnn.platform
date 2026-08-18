@@ -44,13 +44,16 @@ public class FileUploader : IHttpHandler
     public FileUploader()
         : this(null)
     {
+	eventLogger.LogDebug(">>> Entering FileUploader()");
     }
+	eventLogger.LogDebug("<<< Exiting FileUploader()");
 
     /// <summary>Initializes a new instance of the <see cref="FileUploader"/> class.</summary>
     /// <param name="hostSettings">The host settings.</param>
     public FileUploader(IHostSettings hostSettings)
     {
         this.hostSettings = hostSettings ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IHostSettings>();
+		eventLogger.LogDebug("FileUploader(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
     }
 
     /// <summary>Gets a value indicating whether another request can use the <see cref="IHttpHandler" /> instance.</summary>
@@ -70,18 +73,22 @@ public class FileUploader : IHttpHandler
     /// <param name="context">An <see cref="HttpContext" /> object that provides references to the intrinsic server objects (for example, Request, Response, Session, and Server) used to service HTTP requests.</param>
     public void ProcessRequest(HttpContext context)
     {
+		eventLogger.LogDebug(">>> Entering ProcessRequest(context={Context})", context);
         context.Response.AddHeader("Pragma", "no-cache");
         context.Response.AddHeader("Cache-Control", "private, no-cache");
 
         this.HandleMethod(context);
+		eventLogger.LogDebug("<<< Exiting ProcessRequest(context={Context})", context);
     }
 
     /// <summary>Returns the options.</summary>
     /// <param name="context">The context.</param>
     private static void ReturnOptions(HttpContext context)
     {
+		eventLogger.LogDebug(">>> Entering ReturnOptions(context={Context})", context);
         context.Response.AddHeader("Allow", "DELETE,GET,HEAD,POST,PUT,OPTIONS");
         context.Response.StatusCode = 200;
+		eventLogger.LogDebug("<<< Exiting ReturnOptions(context={Context})", context);
     }
 
     /// <summary>Gets the codec for the given <paramref name="format"/>.</summary>
@@ -89,19 +96,25 @@ public class FileUploader : IHttpHandler
     /// <returns>The codec, or <see langword="null"/>.</returns>
     private static ImageCodecInfo GetEncoder(ImageFormat format)
     {
+		eventLogger.LogDebug(">>> Entering GetEncoder(format={Format})", format);
         var codecs = ImageCodecInfo.GetImageDecoders();
 
+		eventLogger.LogDebug("GetEncoder(format={Format}): codecs → {Codecs}", format, codecs);
+		eventLogger.LogDebug("<<< Exiting GetEncoder(format={Format})", format);
         return codecs.FirstOrDefault(codec => codec.FormatID == format.Guid);
     }
 
     private static (int NewWidth, int NewHeight) DetermineNewDimensions(Image uplImage, int maxWidth, int maxHeight)
     {
+		eventLogger.LogDebug(">>> Entering DetermineNewDimensions(NewWidth={NewWidth},NewHeight={NewHeight})", NewWidth, NewHeight);
         // it's too big: we need to resize
         int newWidth, newHeight;
 
         // which determines the max: height or width?
         var ratioWidth = (double)maxWidth / (double)uplImage.Width;
+		eventLogger.LogDebug("DetermineNewDimensions(NewWidth={NewWidth},NewHeight={NewHeight}): ratioWidth → {RatioWidth}", NewWidth, NewHeight, ratioWidth);
         var ratioHeight = (double)maxHeight / (double)uplImage.Height;
+		eventLogger.LogDebug("DetermineNewDimensions(NewWidth={NewWidth},NewHeight={NewHeight}): ratioHeight → {RatioHeight}", NewWidth, NewHeight, ratioHeight);
         if (ratioWidth < ratioHeight)
         {
             // max width needs to be used
@@ -109,17 +122,20 @@ public class FileUploader : IHttpHandler
             newHeight = (int)Math.Round(uplImage.Height * ratioWidth);
         }
         else
+		eventLogger.LogDebug("DetermineNewDimensions(NewWidth={NewWidth},NewHeight={NewHeight}): newHeight → {NewHeight1}", NewWidth, NewHeight, newHeight);
         {
             // max height needs to be used
             newHeight = maxHeight;
             newWidth = (int)Math.Round(uplImage.Width * ratioHeight);
         }
 
+		eventLogger.LogDebug("<<< Exiting DetermineNewDimensions(NewWidth={NewWidth},NewHeight={NewHeight})", NewWidth, NewHeight);
         return (newWidth, newHeight);
     }
 
     private static Stream ResizeImage(Image uplImage, int newWidth, int newHeight)
     {
+		eventLogger.LogDebug(">>> Entering ResizeImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight})", uplImage, newWidth, newHeight);
         // Add Compression to Jpeg Images
         if (uplImage.RawFormat.Equals(ImageFormat.Jpeg))
         {
@@ -127,32 +143,44 @@ public class FileUploader : IHttpHandler
         }
 
         using Image newImage = uplImage.GetThumbnailImage(newWidth, newHeight, null, IntPtr.Zero);
+		eventLogger.LogDebug("ResizeImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight}): newImage → {NewImage}", uplImage, newWidth, newHeight, newImage);
         var imageFormat = uplImage.RawFormat;
 
         var fileContents = new MemoryStream();
+		eventLogger.LogDebug("ResizeImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight}): fileContents → {FileContents}", uplImage, newWidth, newHeight, fileContents);
         newImage.Save(fileContents, imageFormat);
+		eventLogger.LogDebug("<<< Exiting ResizeImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight})", uplImage, newWidth, newHeight);
         return fileContents;
     }
 
     private static Stream ResizeJpegImage(Image uplImage, int newWidth, int newHeight)
     {
+		eventLogger.LogDebug(">>> Entering ResizeJpegImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight})", uplImage, newWidth, newHeight);
         var jpgEncoder = GetEncoder(uplImage.RawFormat);
 
+		eventLogger.LogDebug("ResizeJpegImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight}): jpgEncoder → {JpgEncoder}", uplImage, newWidth, newHeight, jpgEncoder);
         var myEncoder = Encoder.Quality;
         var encodeParams = new EncoderParameters(1);
+		eventLogger.LogDebug("ResizeJpegImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight}): encodeParams → {EncodeParams}", uplImage, newWidth, newHeight, encodeParams);
         var encodeParam = new EncoderParameter(myEncoder, 80L);
+		eventLogger.LogDebug("ResizeJpegImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight}): encodeParam → {EncodeParam}", uplImage, newWidth, newHeight, encodeParam);
         encodeParams.Param[0] = encodeParam;
 
         using var destination = new Bitmap(newWidth, newHeight);
+		eventLogger.LogDebug("ResizeJpegImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight}): destination → {Destination}", uplImage, newWidth, newHeight, destination);
         using (var graphic = Graphics.FromImage(destination))
         {
             graphic.SmoothingMode = SmoothingMode.AntiAlias;
+			eventLogger.LogDebug("ResizeJpegImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight}): graphic.SmoothingMode → {Arg3}", uplImage, newWidth, newHeight, graphic.SmoothingMode);
+			eventLogger.LogDebug("ResizeJpegImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight}): graphic.InterpolationMode → {Arg3}", uplImage, newWidth, newHeight, graphic.InterpolationMode);
             graphic.InterpolationMode = InterpolationMode.HighQualityBicubic;
             graphic.DrawImage(uplImage, 0, 0, destination.Width, destination.Height);
         }
 
         var fileContents = new MemoryStream();
+		eventLogger.LogDebug("ResizeJpegImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight}): fileContents → {FileContents}", uplImage, newWidth, newHeight, fileContents);
         destination.Save(fileContents, jpgEncoder, encodeParams);
+		eventLogger.LogDebug("<<< Exiting ResizeJpegImage(uplImage={UplImage},newWidth={NewWidth},newHeight={NewHeight})", uplImage, newWidth, newHeight);
         return fileContents;
     }
 
@@ -160,6 +188,8 @@ public class FileUploader : IHttpHandler
     /// <param name="context">The context.</param>
     private void HandleMethod(HttpContext context)
     {
+		eventLogger.LogDebug(">>> Entering HandleMethod(context={Context})", context);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         switch (context.Request.HttpMethod)
         {
             case "HEAD":
@@ -189,35 +219,53 @@ public class FileUploader : IHttpHandler
                 context.Response.StatusCode = 405;
                 break;
         }
+		eventLogger.LogInformation("HandleMethod(context)={Context}: external service call took {Arg1} ms", context, __logStart.ElapsedMilliseconds);
+		eventLogger.LogDebug("<<< Exiting HandleMethod(context={Context})", context);
     }
 
     /// <summary>Uploads the file.</summary>
     /// <param name="context">The context.</param>
     private void UploadFile(HttpContext context)
     {
+		eventLogger.LogDebug(">>> Entering UploadFile(context={Context})", context);
         var statuses = new List<FilesUploadStatus>();
 
+		eventLogger.LogDebug("UploadFile(context={Context}): statuses → {Statuses}", context, statuses);
         this.UploadWholeFile(context, statuses);
 
         this.WriteJsonIframeSafe(context, statuses);
+		eventLogger.LogDebug("<<< Exiting UploadFile(context={Context})", context);
     }
 
     private EditorProviderSettings GetCurrentSettings(HttpContext context)
     {
+		eventLogger.LogDebug(">>> Entering GetCurrentSettings(context={Context})", context);
         var request = context.Request;
         int.TryParse(request.QueryString["PortalID"], out var portalId);
         this.portalSettings = new PortalSettings(portalId);
+		eventLogger.LogDebug("GetCurrentSettings(context={Context}): portalSettings → {PortalSettings}", context, portalSettings);
 
         if (!Enum.TryParse<SettingsMode>(request.QueryString["mode"], true, out var settingMode))
         {
             settingMode = SettingsMode.Default;
+			eventLogger.LogDebug("GetCurrentSettings(context={Context}): settingMode → {SettingMode}", context, settingMode);
         }
 
         var providerConfiguration = ProviderConfiguration.GetProviderConfiguration("htmlEditor");
+		eventLogger.LogDebug("GetCurrentSettings(context={Context}): providerConfiguration → {ProviderConfiguration}", context, providerConfiguration);
         var objProvider = (Provider)providerConfiguration.Providers[providerConfiguration.DefaultProvider];
+		eventLogger.LogDebug("GetCurrentSettings(context={Context}): objProvider → {ObjProvider}", context, objProvider);
         var settingsDictionary = EditorController.GetEditorHostSettings(this.hostSettings);
+		eventLogger.LogDebug("GetCurrentSettings(context={Context}): settingsDictionary → {SettingsDictionary}", context, settingsDictionary);
         var portalRoles = RoleController.Instance.GetRoles(this.portalSettings.PortalId);
+		eventLogger.LogDebug("GetCurrentSettings(context={Context}): portalRoles → {PortalRoles}", context, portalRoles);
 
+		eventLogger.LogDebug("GetCurrentSettings(context={Context}): SettingsMode.Default → {Arg1}", context, SettingsMode.Default);
+		eventLogger.LogDebug("GetCurrentSettings(context={Context}): SettingsMode.Host → {Arg1}", context, SettingsMode.Host);
+		eventLogger.LogDebug("GetCurrentSettings(context={Context}): SettingsMode.Portal → {Arg1}", context, SettingsMode.Portal);
+		eventLogger.LogDebug("GetCurrentSettings(context={Context}): SettingsMode.Page → {Arg1}", context, SettingsMode.Page);
+		eventLogger.LogDebug("GetCurrentSettings(context={Context}): SettingsMode.ModuleInstance → {Arg1}", context, SettingsMode.ModuleInstance);
+		eventLogger.LogDebug("<<< Exiting GetCurrentSettings(context={Context})", context);
         return settingMode switch
         {
             SettingsMode.Default =>
@@ -380,6 +428,7 @@ public class FileUploader : IHttpHandler
             var fullName = Path.GetFileName(fileName);
             statuses.Add(new FilesUploadStatus(fullName, file.ContentLength));
         }
+		eventLogger.LogDebug("<<< Exiting UploadWholeFile(context={Context},statuses={Statuses})", context, statuses);
     }
 
     /// <summary>Writes the JSON iFrame safe.</summary>
@@ -402,5 +451,6 @@ public class FileUploader : IHttpHandler
 
         var jsonObj = this.js.Serialize(statuses.ToArray());
         context.Response.Write(jsonObj);
+		eventLogger.LogDebug("<<< Exiting WriteJsonIframeSafe(context={Context},statuses={Statuses})", context, statuses);
     }
 }

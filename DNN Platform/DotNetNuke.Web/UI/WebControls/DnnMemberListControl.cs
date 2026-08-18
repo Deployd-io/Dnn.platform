@@ -20,6 +20,7 @@ namespace DotNetNuke.Web.UI.WebControls
     [ToolboxData("<{0}:DnnMemberListControl runat=\"server\"></{0}:DnnMemberListControl>")]
     public class DnnMemberListControl : WebControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnMemberListControl));
         private UserInfo currentUser;
         private RelationshipController relationshipController;
 
@@ -92,15 +93,20 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.currentUser = UserController.Instance.GetCurrentUserInfo();
+			Logger.LogDebug("OnInit(e={E}): currentUser → {CurrentUser}", e, currentUser);
             this.relationshipController = new RelationshipController();
+			Logger.LogDebug("OnInit(e={E}): relationshipController → {RelationshipController}", e, relationshipController);
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer);
             if (this.ItemTemplate == string.Empty)
             {
                 return;
@@ -115,6 +121,7 @@ namespace DotNetNuke.Web.UI.WebControls
             }
 
             var additionalFilters = new Dictionary<string, string>();
+			Logger.LogDebug("Render(writer={Writer}): additionalFilters → {AdditionalFilters}", writer, additionalFilters);
             additionalFilters.Add("Records", this.PageSize.ToString(CultureInfo.InvariantCulture));
             additionalFilters.Add("PageIndex", this.PageIndex.ToString(CultureInfo.InvariantCulture));
             additionalFilters.Add("Rowsize", this.RowSize.ToString(CultureInfo.InvariantCulture));
@@ -123,8 +130,11 @@ namespace DotNetNuke.Web.UI.WebControls
 
             // Currently Not Used by the SPROC
             var filterUser = this.Filters.TryGetValue("UserId", out var userId) && userId != null ? new UserInfo { UserID = int.Parse(userId, CultureInfo.InvariantCulture) } : new UserInfo() { PortalID = this.currentUser.PortalID };
+			Logger.LogDebug("Render(writer={Writer}): filterUser → {FilterUser}", writer, filterUser);
             var role = this.Filters.TryGetValue("RoleId", out var roleId) && roleId != null ? new UserRoleInfo { RoleID = int.Parse(roleId, CultureInfo.InvariantCulture) } : null;
+			Logger.LogDebug("Render(writer={Writer}): role → {Role}", writer, role);
             var relationship = this.Filters.TryGetValue("RelationshipTypeId", out var relationshipTypeId) && relationshipTypeId != null ? new RelationshipType { RelationshipTypeId = int.Parse(relationshipTypeId, CultureInfo.InvariantCulture), } : null;
+			Logger.LogDebug("Render(writer={Writer}): relationship → {Relationship}", writer, relationship);
 
             foreach (var filter in this.Filters.Where(filter => !additionalFilters.ContainsKey(filter.Key)))
             {
@@ -133,6 +143,7 @@ namespace DotNetNuke.Web.UI.WebControls
 
             var row = 0;
             var users = new DataTable();
+			Logger.LogDebug("Render(writer={Writer}): users → {Users}", writer, users);
 
             // users.Load(_relationshipController.GetUsersAdvancedSearch(_currentUser, filterUser, role, relationship, Filters, additionalFilters));
             if (users.Rows.Count > 0)
@@ -143,7 +154,9 @@ namespace DotNetNuke.Web.UI.WebControls
                     writer.Write(string.IsNullOrEmpty(this.AlternatingRowHeaderTemplate) || row % 2 == 0 ? this.RowHeaderTemplate : this.AlternatingRowHeaderTemplate);
 
                     var tokenReplace = new TokenReplace();
+					Logger.LogDebug("Render(writer={Writer}): tokenReplace → {TokenReplace}", writer, tokenReplace);
                     var tokenKeyValues = new Dictionary<string, string>();
+					Logger.LogDebug("Render(writer={Writer}): tokenKeyValues → {TokenKeyValues}", writer, tokenKeyValues);
 
                     foreach (var col in user.Table.Columns.Cast<DataColumn>().Where(col => !tokenKeyValues.ContainsKey(col.ColumnName)))
                     {
@@ -151,6 +164,7 @@ namespace DotNetNuke.Web.UI.WebControls
                     }
 
                     var listItem = string.IsNullOrEmpty(this.AlternatingItemTemplate) || row % 2 == 0 ? this.ItemTemplate : this.AlternatingItemTemplate;
+					Logger.LogDebug("Render(writer={Writer}): listItem → {ListItem}", writer, listItem);
                     listItem = tokenReplace.ReplaceEnvironmentTokens(listItem, tokenKeyValues, "Member");
                     writer.Write(listItem);
 
@@ -162,6 +176,7 @@ namespace DotNetNuke.Web.UI.WebControls
             }
 
             writer.Write(this.FooterTemplate);
+			Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer);
         }
     }
 }

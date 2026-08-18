@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,8 +13,11 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("octave", function() {
   function wordRegexp(words) {
+	logger.debug(`>>> Entering wordRegexp(words=${words})`);
+	logger.debug(`<<< Exiting wordRegexp(words=${words})`);
     return new RegExp("^((" + words.join(")|(") + "))\\b");
   }
 
@@ -44,19 +49,25 @@ CodeMirror.defineMode("octave", function() {
 
   // tokenizers
   function tokenTranspose(stream, state) {
+	logger.debug(`>>> Entering tokenTranspose(stream=${stream},state=${state})`);
     if (!stream.sol() && stream.peek() === '\'') {
       stream.next();
       state.tokenize = tokenBase;
+	logger.debug(`tokenTranspose(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
       return 'operator';
     }
     state.tokenize = tokenBase;
+	logger.debug(`<<< Exiting tokenTranspose(stream=${stream},state=${state})`);
     return tokenBase(stream, state);
   }
 
 
   function tokenComment(stream, state) {
+	logger.debug(`>>> Entering tokenComment(stream=${stream},state=${state})`);
     if (stream.match(/^.*%}/)) {
       state.tokenize = tokenBase;
+	logger.debug(`tokenComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
+	logger.debug(`<<< Exiting tokenComment(stream=${stream},state=${state})`);
       return 'comment';
     };
     stream.skipToEnd();
@@ -64,12 +75,14 @@ CodeMirror.defineMode("octave", function() {
   }
 
   function tokenBase(stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
     // whitespaces
     if (stream.eatSpace()) return null;
 
     // Handle one line Comments
     if (stream.match('%{')){
       state.tokenize = tokenComment;
+	logger.debug(`tokenBase(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
       stream.skipToEnd();
       return 'comment';
     }
@@ -83,6 +96,7 @@ CodeMirror.defineMode("octave", function() {
     if (stream.match(/^[0-9\.+-]/, false)) {
       if (stream.match(/^[+-]?0x[0-9a-fA-F]+[ij]?/)) {
         stream.tokenize = tokenBase;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): stream.tokenize → ${stream.tokenize}`);
         return 'number'; };
       if (stream.match(/^[+-]?\d*\.\d+([EeDd][+-]?\d+)?[ij]?/)) { return 'number'; };
       if (stream.match(/^[+-]?\d+([EeDd][+-]?\d+)?[ij]?/)) { return 'number'; };
@@ -115,16 +129,22 @@ CodeMirror.defineMode("octave", function() {
 
   return {
     startState: function() {
+	logger.debug('>>> Entering startState()');
       return {
         tokenize: tokenBase
       };
+	logger.debug('<<< Exiting startState()');
     },
 
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       var style = state.tokenize(stream, state);
       if (style === 'number' || style === 'variable'){
+		logger.debug(`token(stream=${stream},state=${state}): style → ${style}`);
         state.tokenize = tokenTranspose;
+		logger.debug(`token(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
       }
+	logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
       return style;
     }
   };

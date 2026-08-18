@@ -29,6 +29,7 @@ namespace DotNetNuke.UI.WebControls
     /// <summary>The PropertyEditorControl control provides a way to display and edit any properties of any Info class.</summary>
     public class PropertyEditorControl : WebControl, INamingContainer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PropertyEditorControl));
         private readonly IServiceProvider serviceProvider;
         private bool itemChanged;
         private Hashtable sections;
@@ -38,6 +39,9 @@ namespace DotNetNuke.UI.WebControls
         public PropertyEditorControl()
             : this(Globals.GetCurrentServiceProvider())
         {
+		Logger.LogDebug(">>> Entering PropertyEditorControl()");
+		Logger.LogDebug("<<< Exiting PropertyEditorControl()");
+		Logger.LogDebug(">>> Entering PropertyEditorControl(serviceProvider={ServiceProvider})", serviceProvider);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PropertyEditorControl"/> class.</summary>
@@ -46,6 +50,7 @@ namespace DotNetNuke.UI.WebControls
         {
             this.serviceProvider = serviceProvider;
             this.VisibilityStyle = new Style();
+			Logger.LogDebug("PropertyEditorControl(serviceProvider={ServiceProvider}): this.serviceProvider → {Arg1}", serviceProvider, this.serviceProvider);
             this.ItemStyle = new Style();
             this.LabelStyle = new Style();
             this.HelpStyle = new Style();
@@ -54,10 +59,14 @@ namespace DotNetNuke.UI.WebControls
             this.EditControlStyle = new Style();
             this.Fields = new ArrayList();
             this.ShowRequired = true;
+			Logger.LogDebug("PropertyEditorControl(serviceProvider={ServiceProvider}): this.ShowRequired → {Arg1}", serviceProvider, this.ShowRequired);
             this.LabelMode = LabelMode.Left;
             this.HelpDisplayMode = HelpDisplayMode.Always;
             this.Groups = Null.NullString;
+			Logger.LogDebug("PropertyEditorControl(serviceProvider={ServiceProvider}): LabelMode → {LabelMode}", serviceProvider, LabelMode);
+			Logger.LogDebug("PropertyEditorControl(serviceProvider={ServiceProvider}): this.LabelMode → {Arg1}", serviceProvider, this.LabelMode);
             this.AutoGenerate = true;
+			Logger.LogDebug("<<< Exiting PropertyEditorControl(serviceProvider={ServiceProvider})", serviceProvider);
         }
 
         public event PropertyChangedEventHandler ItemAdded;
@@ -254,6 +263,7 @@ namespace DotNetNuke.UI.WebControls
         /// <summary>Binds the controls to the DataSource.</summary>
         public override void DataBind()
         {
+			Logger.LogDebug(">>> Entering DataBind()");
             // Invoke OnDataBinding so DataBinding Event is raised
             this.OnDataBinding(EventArgs.Empty);
 
@@ -271,6 +281,8 @@ namespace DotNetNuke.UI.WebControls
 
             // Set flag so CreateChildControls should not be invoked later in control's lifecycle
             this.ChildControlsCreated = true;
+			Logger.LogDebug("DataBind(): this.ChildControlsCreated → {Arg0}", this.ChildControlsCreated);
+			Logger.LogDebug("<<< Exiting DataBind()");
         }
 
         /// <summary>
@@ -282,10 +294,13 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="adapter">An IEditorInfoAdapter.</param>
         protected void AddEditorRow(Table table, string name, IEditorInfoAdapter adapter)
         {
+			Logger.LogDebug(">>> Entering AddEditorRow(table={Table},name={Name},adapter={Adapter})", table, name, adapter);
             var row = new TableRow();
             table.Rows.Add(row);
+			Logger.LogDebug("AddEditorRow(table={Table},name={Name},adapter={Adapter}): row → {Row}", table, name, adapter, row);
 
             var cell = new TableCell();
+			Logger.LogDebug("AddEditorRow(table={Table},name={Name},adapter={Adapter}): cell → {Cell}", table, name, adapter, cell);
             row.Cells.Add(cell);
 
             // Create a FieldEditor for this Row
@@ -304,6 +319,7 @@ namespace DotNetNuke.UI.WebControls
             this.AddEditorRow(editor, cell);
 
             this.Fields.Add(editor);
+			Logger.LogDebug("<<< Exiting AddEditorRow(table={Table},name={Name},adapter={Adapter})", table, name, adapter);
         }
 
         protected void AddEditorRow(WebControl container, string name, IEditorInfoAdapter adapter)
@@ -332,24 +348,29 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="obj">Row Data Info.</param>
         protected virtual void AddEditorRow(Table table, object obj)
         {
+			Logger.LogDebug(">>> Entering AddEditorRow(table={Table},obj={Obj})", table, obj);
             var objProperty = (PropertyInfo)obj;
             this.AddEditorRow(table, objProperty.Name, new StandardEditorInfoAdapter(this.DataSource, objProperty.Name));
+			Logger.LogDebug("<<< Exiting AddEditorRow(table={Table},obj={Obj})", table, obj);
         }
 
         protected virtual void AddEditorRow(Panel container, object obj)
         {
             var objProperty = (PropertyInfo)obj;
             this.AddEditorRow(container, objProperty.Name, new StandardEditorInfoAdapter(this.DataSource, objProperty.Name));
+			Logger.LogDebug(">>> Entering AddEditorRow(obj={Obj})", obj);
         }
 
         protected virtual void AddEditorRow(object obj)
         {
             var objProperty = (PropertyInfo)obj;
             this.AddEditorRow(this, objProperty.Name, new StandardEditorInfoAdapter(this.DataSource, objProperty.Name));
+			Logger.LogDebug("<<< Exiting AddEditorRow(obj={Obj})", obj);
         }
 
         protected virtual void AddFields()
         {
+			Logger.LogDebug(">>> Entering AddFields()");
             foreach (FieldEditorControl editor in this.Fields)
             {
                 editor.DataSource = this.DataSource;
@@ -374,6 +395,7 @@ namespace DotNetNuke.UI.WebControls
 
                 this.AddEditorRow(editor, this);
             }
+			Logger.LogDebug("<<< Exiting AddFields()");
         }
 
         /// <summary>AddFields adds the fields that have beend defined in design mode (Autogenerate=false).</summary>
@@ -447,11 +469,13 @@ namespace DotNetNuke.UI.WebControls
             }
 
             this.sections[icon] = tbl;
+			Logger.LogDebug("<<< Exiting AddHeader(tbl={Tbl},header={Header})", tbl, header);
         }
 
         /// <summary>CreateEditor creates the control collection.</summary>
         protected virtual void CreateEditor()
         {
+			Logger.LogDebug(">>> Entering CreateEditor()");
             Table table;
             string[] arrGroups = null;
 
@@ -477,6 +501,7 @@ namespace DotNetNuke.UI.WebControls
                     // Add the Table to the Controls Collection
                     table = new Table { ID = "tbl" };
                     this.AddFields(table);
+					Logger.LogDebug("CreateEditor(): table → {Table}", table);
                     this.Controls.Add(table);
                 }
             }
@@ -492,26 +517,32 @@ namespace DotNetNuke.UI.WebControls
                             if (this.DisplayMode == EditorDisplayMode.Div)
                             {
                                 var groupData = this.UnderlyingDataSource.Cast<object>().Where(obj => this.GetCategory(obj) == strGroup.Trim() && this.GetRowVisibility(obj));
+								Logger.LogDebug("CreateEditor(): groupData → {GroupData}", groupData);
                                 if (groupData.Any())
                                 {
                                     // Add header
                                     var header = new HtmlGenericControl("h2");
+									Logger.LogDebug("CreateEditor(): header → {Header}", header);
                                     header.Attributes.Add("class", "dnnFormSectionHead");
                                     header.Attributes.Add("id", strGroup);
                                     this.Controls.Add(header);
 
                                     var localizedGroupName = Localization.GetString("ProfileProperties_" + strGroup + ".Header", this.LocalResourceFile);
+									Logger.LogDebug("CreateEditor(): localizedGroupName → {LocalizedGroupName}", localizedGroupName);
                                     if (string.IsNullOrEmpty(localizedGroupName))
                                     {
                                         localizedGroupName = strGroup;
                                     }
 
                                     var link = new HyperLink() { Text = localizedGroupName, NavigateUrl = "#" };
+									Logger.LogDebug("CreateEditor(): link → {Link}", link);
                                     header.Controls.Add(link);
 
                                     // fieldset to hold properties in group
                                     var fieldset = new HtmlGenericControl("fieldset");
+									Logger.LogDebug("CreateEditor(): fieldset → {Fieldset}", fieldset);
                                     var container = new Panel();
+									Logger.LogDebug("CreateEditor(): container → {Container}", container);
                                     fieldset.Controls.Add(container);
 
                                     foreach (object obj in groupData)
@@ -583,6 +614,7 @@ namespace DotNetNuke.UI.WebControls
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting CreateEditor()");
         }
 
         /// <summary>GetCategory gets the Category of an object.</summary>
@@ -590,17 +622,23 @@ namespace DotNetNuke.UI.WebControls
         /// <returns>The category name, or <see cref="Null.NullString"/>.</returns>
         protected virtual string GetCategory(object obj)
         {
+			Logger.LogDebug(">>> Entering GetCategory(obj={Obj})", obj);
             var objProperty = (PropertyInfo)obj;
             var categoryString = Null.NullString;
+			Logger.LogDebug("GetCategory(obj={Obj}): categoryString → {CategoryString}", obj, categoryString);
+			Logger.LogDebug("GetCategory(obj={Obj}): objProperty → {ObjProperty}", obj, objProperty);
 
             // Get Category Field
             var categoryAttributes = objProperty.GetCustomAttributes(typeof(CategoryAttribute), true);
+			Logger.LogDebug("GetCategory(obj={Obj}): categoryAttributes → {CategoryAttributes}", obj, categoryAttributes);
             if (categoryAttributes.Length > 0)
             {
                 var category = (CategoryAttribute)categoryAttributes[0];
+				Logger.LogDebug("GetCategory(obj={Obj}): category → {Category}", obj, category);
                 categoryString = category.Category;
             }
 
+			Logger.LogDebug("<<< Exiting GetCategory(obj={Obj})", obj);
             return categoryString;
         }
 
@@ -609,14 +647,18 @@ namespace DotNetNuke.UI.WebControls
         /// <returns>An array of group/category names.</returns>
         protected virtual string[] GetGroups(IEnumerable arrObjects)
         {
+			Logger.LogDebug(">>> Entering GetGroups(arrObjects={ArrObjects})", arrObjects);
             var arrGroups = new ArrayList();
 
+			Logger.LogDebug("GetGroups(arrObjects={ArrObjects}): arrGroups → {ArrGroups}", arrObjects, arrGroups);
             foreach (PropertyInfo objProperty in arrObjects)
             {
                 var categoryAttributes = objProperty.GetCustomAttributes(typeof(CategoryAttribute), true);
+				Logger.LogDebug("GetGroups(arrObjects={ArrObjects}): categoryAttributes → {CategoryAttributes}", arrObjects, categoryAttributes);
                 if (categoryAttributes.Length > 0)
                 {
                     var category = (CategoryAttribute)categoryAttributes[0];
+					Logger.LogDebug("GetGroups(arrObjects={ArrObjects}): category → {Category}", arrObjects, category);
 
                     if (!arrGroups.Contains(category.Category))
                     {
@@ -631,6 +673,7 @@ namespace DotNetNuke.UI.WebControls
                 strGroups[i] = Convert.ToString(arrGroups[i], CultureInfo.InvariantCulture);
             }
 
+			Logger.LogDebug("<<< Exiting GetGroups(arrObjects={ArrObjects})", arrObjects);
             return strGroups;
         }
 
@@ -639,13 +682,17 @@ namespace DotNetNuke.UI.WebControls
         /// <returns><see langword="true"/> if the row is visible, otherwise <see langword="false"/>.</returns>
         protected virtual bool GetRowVisibility(object obj)
         {
+			Logger.LogDebug(">>> Entering GetRowVisibility(obj={Obj})", obj);
             var objProperty = (PropertyInfo)obj;
 
+			Logger.LogDebug("GetRowVisibility(obj={Obj}): objProperty → {ObjProperty}", obj, objProperty);
             bool isVisible = true;
+			Logger.LogDebug("GetRowVisibility(obj={Obj}): isVisible → {IsVisible}", obj, isVisible);
             object[] browsableAttributes = objProperty.GetCustomAttributes(typeof(BrowsableAttribute), true);
             if (browsableAttributes.Length > 0)
             {
                 var browsable = (BrowsableAttribute)browsableAttributes[0];
+				Logger.LogDebug("GetRowVisibility(obj={Obj}): browsable → {Browsable}", obj, browsable);
                 if (!browsable.Browsable)
                 {
                     isVisible = false;
@@ -659,6 +706,7 @@ namespace DotNetNuke.UI.WebControls
                 if (requiredAttributes.Length > 0)
                 {
                     var required = (RequiredAttribute)requiredAttributes[0];
+					Logger.LogDebug("GetRowVisibility(obj={Obj}): required → {Required}", obj, required);
                     if (required.Required)
                     {
                         isVisible = true;
@@ -666,6 +714,7 @@ namespace DotNetNuke.UI.WebControls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetRowVisibility(obj={Obj})", obj);
             return isVisible;
         }
 
@@ -673,36 +722,43 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">The event arguments.</param>
         protected virtual void OnItemAdded(PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnItemAdded(e={E})", e);
             if (this.ItemAdded != null)
             {
                 this.ItemAdded(this, e);
             }
+			Logger.LogDebug("<<< Exiting OnItemAdded(e={E})", e);
         }
 
         /// <summary>Runs when an Editor is Created.</summary>
         /// <param name="e">The event arguments.</param>
         protected virtual void OnItemCreated(PropertyEditorItemEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnItemCreated(e={E})", e);
             if (this.ItemCreated != null)
             {
                 this.ItemCreated(this, e);
             }
+			Logger.LogDebug("<<< Exiting OnItemCreated(e={E})", e);
         }
 
         /// <summary>Runs when an item is removed from a collection type property.</summary>
         /// <param name="e">The event arguments.</param>
         protected virtual void OnItemDeleted(PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnItemDeleted(e={E})", e);
             if (this.ItemDeleted != null)
             {
                 this.ItemDeleted(this, e);
             }
+			Logger.LogDebug("<<< Exiting OnItemDeleted(e={E})", e);
         }
 
         /// <summary>Runs just before the control is rendered.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             if (this.itemChanged)
             {
                 // Rebind the control to the DataSource to make sure that the dependent
@@ -713,6 +769,7 @@ namespace DotNetNuke.UI.WebControls
             if (string.IsNullOrEmpty(this.CssClass))
             {
                 this.CssClass = "dnnForm";
+				Logger.LogDebug("OnPreRender(e={E}): this.CssClass → {Arg1}", e, this.CssClass);
             }
 
             // Find the Min/Max buttons
@@ -721,12 +778,15 @@ namespace DotNetNuke.UI.WebControls
                 foreach (DictionaryEntry key in this.sections)
                 {
                     var tbl = (Table)key.Value;
+					Logger.LogDebug("OnPreRender(e={E}): tbl → {Tbl}", e, tbl);
                     var icon = (Image)key.Key;
+					Logger.LogDebug("OnPreRender(e={E}): icon → {Icon}", e, icon);
                     DNNClientAPI.EnableMinMax(icon, tbl, false, IconController.IconURL("Minus", "12X15"), IconController.IconURL("Plus", "12X15"), DNNClientAPI.MinMaxPersistanceType.Page);
                 }
             }
 
             base.OnPreRender(e);
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <summary>Runs when an item is added to a collection type property.</summary>
@@ -734,7 +794,9 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">The event arguments.</param>
         protected virtual void CollectionItemAdded(object sender, PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering CollectionItemAdded(sender={Sender},e={E})", sender, e);
             this.OnItemAdded(e);
+			Logger.LogDebug("<<< Exiting CollectionItemAdded(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Runs when an item is removed from a collection type property.</summary>
@@ -742,7 +804,9 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">The event arguments.</param>
         protected virtual void CollectionItemDeleted(object sender, PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering CollectionItemDeleted(sender={Sender},e={E})", sender, e);
             this.OnItemDeleted(e);
+			Logger.LogDebug("<<< Exiting CollectionItemDeleted(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Runs when an Editor Is Created.</summary>
@@ -750,7 +814,9 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">The event arguments.</param>
         protected virtual void EditorItemCreated(object sender, PropertyEditorItemEventArgs e)
         {
+			Logger.LogDebug(">>> Entering EditorItemCreated(sender={Sender},e={E})", sender, e);
             this.OnItemCreated(e);
+			Logger.LogDebug("<<< Exiting EditorItemCreated(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Runs when an Item in the List Is Changed.</summary>
@@ -758,7 +824,10 @@ namespace DotNetNuke.UI.WebControls
         /// <param name="e">The event arguments.</param>
         protected virtual void ListItemChanged(object sender, PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering ListItemChanged(sender={Sender},e={E})", sender, e);
             this.itemChanged = true;
+			Logger.LogDebug("ListItemChanged(sender={Sender},e={E}): this.itemChanged → {Arg2}", sender, e, this.itemChanged);
+			Logger.LogDebug("<<< Exiting ListItemChanged(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>GetProperties returns an array of <see cref="System.Reflection.PropertyInfo">PropertyInfo</see>.</summary>
@@ -770,12 +839,14 @@ namespace DotNetNuke.UI.WebControls
         /// </remarks>
         private PropertyInfo[] GetProperties()
         {
+			Logger.LogDebug(">>> Entering GetProperties()");
             if (this.DataSource != null)
             {
                 // TODO:  We need to add code to support using the cache in the future
                 const BindingFlags bindings = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
 
                 var properties = this.DataSource.GetType().GetProperties(bindings);
+				Logger.LogDebug("GetProperties(): properties → {Properties}", properties);
 
                 // Apply sort method
                 switch (this.SortMode)
@@ -791,6 +862,7 @@ namespace DotNetNuke.UI.WebControls
                         break;
                 }
 
+			Logger.LogDebug("<<< Exiting GetProperties()");
                 return properties;
             }
 

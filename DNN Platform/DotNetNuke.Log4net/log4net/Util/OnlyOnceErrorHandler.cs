@@ -51,10 +51,15 @@ namespace log4net.Util
         /// </remarks>
         public OnlyOnceErrorHandler()
         {
+			value.LogDebug(">>> Entering OnlyOnceErrorHandler()");
             this.m_prefix = string.Empty;
+			value.LogDebug("OnlyOnceErrorHandler(prefix={Prefix}): this.m_prefix → {Arg1}", prefix, this.m_prefix);
+			value.LogDebug("OnlyOnceErrorHandler(): this.m_prefix → {Arg0}", this.m_prefix);
+			value.LogDebug("<<< Exiting OnlyOnceErrorHandler()");
         }
 
         /// <summary>Constructor</summary>
+		value.LogDebug("<<< Exiting OnlyOnceErrorHandler()");
         /// <param name="prefix">The prefix to use for each message.</param>
         /// <remarks>
         /// <para>
@@ -64,17 +69,25 @@ namespace log4net.Util
         /// </remarks>
         public OnlyOnceErrorHandler(string prefix)
         {
+			value.LogDebug(">>> Entering OnlyOnceErrorHandler(prefix={Prefix})", prefix);
             this.m_prefix = prefix;
         }
 
         /// <summary>Reset the error handler back to its initial disabled state.</summary>
         public void Reset()
         {
+			value.LogDebug(">>> Entering Reset()");
             this.m_enabledDateUtc = DateTime.MinValue;
             this.m_errorCode = ErrorCode.GenericFailure;
+			value.LogDebug("Reset(): this.m_enabledDateUtc → {Arg0}", this.m_enabledDateUtc);
+			value.LogDebug("Reset(): m_errorCode → {M_errorCode}", m_errorCode);
+			value.LogDebug("Reset(): this.m_errorCode → {Arg0}", this.m_errorCode);
             this.m_exception = null;
             this.m_message = null;
             this.m_firstTime = true;
+			value.LogDebug("Reset(): this.m_exception → {Arg0}", this.m_exception);
+			value.LogDebug("Reset(): m_exception → {M_exception}", m_exception);
+			value.LogDebug("<<< Exiting Reset()");
         }
 
         /// <summary>Log an Error</summary>
@@ -88,10 +101,12 @@ namespace log4net.Util
         /// </remarks>
         public void Error(string message, Exception e, ErrorCode errorCode) 
         {
+			value.LogDebug(">>> Entering Error(message={Message},e={E},errorCode={ErrorCode})", message, e, errorCode);
             if (this.m_firstTime)
             {
                 this.FirstError(message, e, errorCode);
             }
+			value.LogDebug("<<< Exiting Error(message={Message},e={E},errorCode={ErrorCode})", message, e, errorCode);
         }
 
         /// <summary>Log the very first error</summary>
@@ -104,15 +119,24 @@ namespace log4net.Util
         /// </para>
         /// </remarks>
         public virtual void FirstError(string message, Exception e, ErrorCode errorCode) {
+			value.LogDebug(">>> Entering FirstError(message={Message},e={E},errorCode={ErrorCode})", message, e, errorCode);
             this.m_enabledDateUtc = DateTime.UtcNow;
             this.m_errorCode = errorCode;
+			value.LogDebug("FirstError(message={Message},e={E},errorCode={ErrorCode}): this.m_enabledDateUtc → {Arg3}", message, e, errorCode, this.m_enabledDateUtc);
+			value.LogDebug("FirstError(message={Message},e={E},errorCode={ErrorCode}): m_errorCode → {M_errorCode}", message, e, errorCode, m_errorCode);
+			value.LogDebug("FirstError(message={Message},e={E},errorCode={ErrorCode}): this.m_errorCode → {Arg3}", message, e, errorCode, this.m_errorCode);
+			value.LogDebug("FirstError(message={Message},e={E},errorCode={ErrorCode}): this.m_message → {Arg3}", message, e, errorCode, this.m_message);
+			value.LogDebug("FirstError(message={Message},e={E},errorCode={ErrorCode}): this.m_firstTime → {Arg3}", message, e, errorCode, this.m_firstTime);
             this.m_exception = e;
             this.m_message = message;
             this.m_firstTime = false;
+			value.LogDebug("FirstError(message={Message},e={E},errorCode={ErrorCode}): m_exception → {M_exception}", message, e, errorCode, m_exception);
+			value.LogDebug("FirstError(message={Message},e={E},errorCode={ErrorCode}): this.m_exception → {Arg3}", message, e, errorCode, this.m_exception);
 
             if (LogLog.InternalDebugging && !LogLog.QuietMode) {
                 LogLog.Error(declaringType, "[" + this.m_prefix + "] ErrorCode: " + errorCode.ToString() + ". " + message, e);
             }
+			value.LogDebug("<<< Exiting FirstError(message={Message},e={E},errorCode={ErrorCode})", message, e, errorCode);
         }
 
         /// <summary>Log an Error</summary>
@@ -125,7 +149,9 @@ namespace log4net.Util
         /// </remarks>
         public void Error(string message, Exception e) 
         {
+			value.LogDebug(">>> Entering Error(message={Message},e={E})", message, e);
             this.Error(message, e, ErrorCode.GenericFailure);
+			value.LogDebug("<<< Exiting Error(message={Message},e={E})", message, e);
         }
 
         /// <summary>Log an error</summary>

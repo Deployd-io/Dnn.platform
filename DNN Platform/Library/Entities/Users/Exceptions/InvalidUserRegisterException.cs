@@ -9,9 +9,12 @@ namespace DotNetNuke.Entities.Users
     [Serializable]
     public class InvalidUserRegisterException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(InvalidUserRegisterException));
         /// <summary>Initializes a new instance of the <see cref="InvalidUserRegisterException"/> class.</summary>
         public InvalidUserRegisterException()
         {
+		Logger.LogDebug(">>> Entering InvalidUserRegisterException()");
+		Logger.LogDebug("<<< Exiting InvalidUserRegisterException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="InvalidUserRegisterException"/> class.</summary>

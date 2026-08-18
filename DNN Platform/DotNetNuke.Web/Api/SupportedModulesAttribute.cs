@@ -13,19 +13,25 @@ namespace DotNetNuke.Web.Api
     /// <summary>A web API authorization filter which requires the current module to be from particular desktop module.</summary>
     public class SupportedModulesAttribute(params string[] supportedModules) : AuthorizeAttributeBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SupportedModulesAttribute));
         /// <summary>Initializes a new instance of the <see cref="SupportedModulesAttribute"/> class.</summary>
         /// <param name="supportedModules">A comma-delimited list of desktop module names.</param>
         public SupportedModulesAttribute(string supportedModules)
             : this(supportedModules.Split(','))
         {
+		Logger.LogDebug(">>> Entering SupportedModulesAttribute(supportedModules={SupportedModules})", supportedModules);
         }
+		Logger.LogDebug("<<< Exiting SupportedModulesAttribute(supportedModules={SupportedModules})", supportedModules);
 
         /// <inheritdoc />
         public override bool IsAuthorized(AuthFilterContext context)
         {
+			Logger.LogDebug(">>> Entering IsAuthorized(context={Context})", context);
             var module = this.FindModuleInfo(context.ActionContext.Request);
             if (module != null)
+			Logger.LogDebug("IsAuthorized(context={Context}): module → {Module}", context, module);
             {
+			Logger.LogDebug("<<< Exiting IsAuthorized(context={Context})", context);
                 return this.ModuleIsSupported(module);
             }
 
@@ -37,12 +43,16 @@ namespace DotNetNuke.Web.Api
         /// <returns>The <see cref="ModuleInfo"/> instance or <see langword="null"/>.</returns>
         protected virtual ModuleInfo FindModuleInfo(HttpRequestMessage request)
         {
+			Logger.LogDebug(">>> Entering FindModuleInfo(request={Request})", request);
+			Logger.LogDebug("<<< Exiting FindModuleInfo(request={Request})", request);
             return request.FindModuleInfo();
         }
 
         /// <inheritdoc />
         protected override bool SkipAuthorization(HttpActionContext actionContext)
         {
+			Logger.LogDebug(">>> Entering SkipAuthorization(actionContext={ActionContext})", actionContext);
+			Logger.LogDebug("<<< Exiting SkipAuthorization(actionContext={ActionContext})", actionContext);
             return false;
         }
 

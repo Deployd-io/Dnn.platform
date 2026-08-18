@@ -16,12 +16,17 @@ namespace DotNetNuke.UI.Skins.Controls
     /// <summary>A skin/theme object which displays a link to email a site administrator for help.</summary>
     public partial class Help : SkinObjectBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Help.ascx));
         private readonly IHostSettings hostSettings;
 
         /// <summary>Initializes a new instance of the <see cref="Help"/> class.</summary>
         public Help()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering Help()");
+		Logger.LogDebug("<<< Exiting Help()");
+		Logger.LogDebug(">>> Entering Help(hostSettings={HostSettings})", hostSettings);
+		Logger.LogDebug("Help(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Help"/> class.</summary>
@@ -29,6 +34,7 @@ namespace DotNetNuke.UI.Skins.Controls
         public Help(IHostSettings hostSettings)
         {
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("<<< Exiting Help(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <summary>Gets or sets the CSS class to apply to the hyperlink.</summary>
@@ -37,14 +43,17 @@ namespace DotNetNuke.UI.Skins.Controls
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.InitializeComponent();
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             try
             {
@@ -71,12 +80,16 @@ namespace DotNetNuke.UI.Skins.Controls
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         private void InitializeComponent()
         {
+		Logger.LogDebug(">>> Entering InitializeComponent()");
+		Logger.LogDebug("<<< Exiting InitializeComponent()");
         }
     }
 }

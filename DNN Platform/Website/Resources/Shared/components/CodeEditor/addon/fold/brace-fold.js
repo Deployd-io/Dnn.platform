@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,14 +13,20 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.registerHelper("fold", "brace", function(cm, start) {
   var line = start.line, lineText = cm.getLine(line);
   var startCh, tokenType;
+logger.debug(`registerHelper(line=${line}): line → ${line}`);
 
+logger.debug(`<<< Exiting registerHelper(line=${line})`);
   function findOpening(openCh) {
+	logger.debug(`>>> Entering findOpening(openCh=${openCh})`);
     for (var at = start.ch, pass = 0;;) {
       var found = at <= 0 ? -1 : lineText.lastIndexOf(openCh, at - 1);
+	logger.debug(`findOpening(openCh=${openCh}): found → ${found}`);
       if (found == -1) {
+		logger.error(`Exception in findOpening(openCh=${openCh}): (no error binding)`);
         if (pass == 1) break;
         pass = 1;
         at = lineText.length;
@@ -28,6 +36,7 @@ CodeMirror.registerHelper("fold", "brace", function(cm, start) {
       tokenType = cm.getTokenTypeAt(CodeMirror.Pos(line, found + 1));
       if (!/^(comment|string)/.test(tokenType)) return found + 1;
       at = found - 1;
+	logger.debug(`<<< Exiting findOpening(openCh=${openCh})`);
     }
   }
 
@@ -70,6 +79,7 @@ CodeMirror.registerHelper("fold", "import", function(cm, start) {
       var text = cm.getLine(i), semi = text.indexOf(";");
       if (semi != -1) return {startCh: start.end, end: CodeMirror.Pos(i, semi)};
     }
+	logger.debug(`<<< Exiting hasImport(line=${line})`);
   }
 
   var start = start.line, has = hasImport(start), prev;
@@ -89,6 +99,7 @@ CodeMirror.registerHelper("fold", "include", function(cm, start) {
     var start = cm.getTokenAt(CodeMirror.Pos(line, 1));
     if (!/\S/.test(start.string)) start = cm.getTokenAt(CodeMirror.Pos(line, start.end + 1));
     if (start.type == "meta" && start.string.slice(0, 8) == "#include") return start.start + 8;
+	logger.debug(`<<< Exiting hasInclude(line=${line})`);
   }
 
   var start = start.line, has = hasInclude(start);

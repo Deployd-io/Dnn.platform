@@ -12,20 +12,30 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions
 
     public class WorkflowActionManager : ServiceLocator<IWorkflowActionManager, WorkflowActionManager>, IWorkflowActionManager
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(WorkflowActionManager));
         private readonly IWorkflowActionRepository workflowActionRepository;
 
         /// <summary>Initializes a new instance of the <see cref="WorkflowActionManager"/> class.</summary>
         public WorkflowActionManager()
         {
+			Logger.LogDebug(">>> Entering WorkflowActionManager()");
             this.workflowActionRepository = WorkflowActionRepository.Instance;
+			Logger.LogDebug("WorkflowActionManager(): workflowActionRepository → {WorkflowActionRepository}", workflowActionRepository);
+			Logger.LogDebug("WorkflowActionManager(): this.workflowActionRepository → {Arg0}", this.workflowActionRepository);
+			Logger.LogDebug("<<< Exiting WorkflowActionManager()");
         }
 
         /// <inheritdoc />
         public IWorkflowAction GetWorkflowActionInstance(int contentTypeId, WorkflowActionTypes actionType)
         {
+			Logger.LogDebug(">>> Entering GetWorkflowActionInstance(contentTypeId={ContentTypeId},actionType={ActionType})", contentTypeId, actionType);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var action = this.workflowActionRepository.GetWorkflowAction(contentTypeId, actionType.ToString());
             if (action == null)
             {
+				Logger.LogDebug("GetWorkflowActionInstance(contentTypeId={ContentTypeId},actionType={ActionType}): action → {Action}", contentTypeId, actionType, action);
+				Logger.LogInformation("GetWorkflowActionInstance(contentTypeId,actionType)={ContentTypeId},{ActionType}: find query executed in {Arg2} ms", contentTypeId, actionType, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting GetWorkflowActionInstance(contentTypeId={ContentTypeId},actionType={ActionType})", contentTypeId, actionType);
                 return null;
             }
 
@@ -35,20 +45,27 @@ namespace DotNetNuke.Entities.Content.Workflow.Actions
         /// <inheritdoc />
         public void RegisterWorkflowAction(WorkflowAction workflowAction)
         {
+			Logger.LogDebug(">>> Entering RegisterWorkflowAction(workflowAction={WorkflowAction})", workflowAction);
             Requires.NotNull("workflowAction", workflowAction);
 
             var action = Reflection.CreateInstance(Reflection.CreateType(workflowAction.ActionSource)) as IWorkflowAction;
+			Logger.LogDebug("RegisterWorkflowAction(workflowAction={WorkflowAction}): action → {Action}", workflowAction, action);
             if (action == null)
             {
+				Logger.LogWarning("Throwing ArgumentException from RegisterWorkflowAction(workflowAction={WorkflowAction})", workflowAction);
                 throw new ArgumentException("The specified ActionSource does not implement the IWorkflowAction interface");
             }
 
             this.workflowActionRepository.AddWorkflowAction(workflowAction);
+			Logger.LogInformation("RegisterWorkflowAction(workflowAction)={WorkflowAction}: database query executed in {Arg1} ms", workflowAction, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting RegisterWorkflowAction(workflowAction={WorkflowAction})", workflowAction);
         }
 
         /// <inheritdoc />
         protected override Func<IWorkflowActionManager> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new WorkflowActionManager();
         }
     }

@@ -42,6 +42,7 @@ namespace log4net.Util.PatternStringConverters
         /// </remarks>
         protected override void Convert(TextWriter writer, object state) 
         {
+		value.LogDebug(">>> Entering Convert(writer={Writer},state={State})", writer, state);
 #if (NETCF || SSCLI || NETSTANDARD1_3)
             // On compact framework there's no notion of current Windows user
             writer.Write( SystemInfo.NotAvailableText );
@@ -49,6 +50,7 @@ namespace log4net.Util.PatternStringConverters
             try
             {
                 System.Security.Principal.WindowsIdentity windowsIdentity = null;
+				value.LogDebug("Convert(writer={Writer},state={State}): windowsIdentity → {WindowsIdentity}", writer, state, windowsIdentity);
                 windowsIdentity = System.Security.Principal.WindowsIdentity.GetCurrent();
                 if (windowsIdentity != null && windowsIdentity.Name != null)
                 {
@@ -64,6 +66,7 @@ namespace log4net.Util.PatternStringConverters
                 writer.Write(SystemInfo.NotAvailableText);
             }
 #endif
+		value.LogDebug("<<< Exiting Convert(writer={Writer},state={State})", writer, state);
         }
 
         /// <summary>The fully qualified type of the UserNamePatternConverter class.</summary>

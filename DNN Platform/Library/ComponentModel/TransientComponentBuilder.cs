@@ -9,6 +9,7 @@ namespace DotNetNuke.ComponentModel
 
     internal class TransientComponentBuilder : IComponentBuilder
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TransientComponentBuilder));
         private readonly IServiceProvider serviceProvider;
         private readonly Type type;
 
@@ -18,9 +19,14 @@ namespace DotNetNuke.ComponentModel
         /// <param name="type">The type of the component.</param>
         public TransientComponentBuilder(IServiceProvider serviceProvider, string name, Type type)
         {
+			Logger.LogDebug(">>> Entering TransientComponentBuilder(serviceProvider={ServiceProvider},name={Name},type={Type})", serviceProvider, name, type);
             this.Name = name;
             this.serviceProvider = serviceProvider;
+			Logger.LogDebug("TransientComponentBuilder(serviceProvider={ServiceProvider},name={Name},type={Type}): this.Name → {Arg3}", serviceProvider, name, type, this.Name);
+			Logger.LogDebug("TransientComponentBuilder(serviceProvider={ServiceProvider},name={Name},type={Type}): this.serviceProvider → {Arg3}", serviceProvider, name, type, this.serviceProvider);
+			Logger.LogDebug("TransientComponentBuilder(serviceProvider={ServiceProvider},name={Name},type={Type}): serviceProvider → {ServiceProvider1}", serviceProvider, name, type, serviceProvider);
             this.type = type;
+			Logger.LogDebug("<<< Exiting TransientComponentBuilder(serviceProvider={ServiceProvider},name={Name},type={Type})", serviceProvider, name, type);
         }
 
         /// <inheritdoc />
@@ -29,6 +35,8 @@ namespace DotNetNuke.ComponentModel
         /// <inheritdoc />
         public object BuildComponent()
         {
+			Logger.LogDebug(">>> Entering BuildComponent()");
+			Logger.LogDebug("<<< Exiting BuildComponent()");
             return Reflection.CreateObject(this.serviceProvider, this.type);
         }
     }

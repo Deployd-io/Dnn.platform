@@ -46,6 +46,7 @@ namespace Dnn.PersonaBar.Users.Components
 
             notification.Body = Utilities.FixDoublEntityEncoding(notification.Body);
             NotificationsController.Instance.SendNotification(notification, portalSettings.PortalId, roles, new List<UserInfo>());
+			eventLogger.LogDebug("<<< Exiting SendNewUserNotifications(newUser={NewUser},portalSettings={PortalSettings},roles={Roles})", newUser, portalSettings, roles);
         }
 
         // NOTE - While making modifications in this method, developer must refer to call tree in Register.ascx.cs.
@@ -56,9 +57,12 @@ namespace Dnn.PersonaBar.Users.Components
         /// <inheritdoc />
         public UserBasicDto Register(RegisterationDetails registerationDetails)
         {
+			eventLogger.LogDebug(">>> Entering Register(registerationDetails={RegisterationDetails})", registerationDetails);
             var portalSettings = registerationDetails.PortalSettings;
             var username = registerationDetails.UserName;
+			eventLogger.LogDebug("Register(registerationDetails={RegisterationDetails}): username → {Username}", registerationDetails, username);
             var email = registerationDetails.Email;
+			eventLogger.LogDebug("Register(registerationDetails={RegisterationDetails}): email → {Email}", registerationDetails, email);
 
             Requires.NotNullOrEmpty("email", email);
 
@@ -68,6 +72,7 @@ namespace Dnn.PersonaBar.Users.Components
 
             if (disallowRegistration)
             {
+				eventLogger.LogWarning("Throwing RegistrationException from Register(registerationDetails={RegisterationDetails})", registerationDetails);
                 throw new RegistrationException(Localization.GetString("RegistrationNotAllowed", Library.Constants.SharedResources));
             }
 
@@ -79,6 +84,7 @@ namespace Dnn.PersonaBar.Users.Components
             };
 
             var cleanUsername = PortalSecurity.Instance.InputFilter(
+			eventLogger.LogDebug("<<< Exiting Register(registerationDetails={RegisterationDetails})", registerationDetails);
                 username,
 #pragma warning disable CS0618 // Type or member is obsolete
                 PortalSecurity.FilterFlag.NoScripting | PortalSecurity.FilterFlag.NoAngleBrackets | PortalSecurity.FilterFlag.NoMarkup);
@@ -86,10 +92,12 @@ namespace Dnn.PersonaBar.Users.Components
 
             if (!cleanUsername.Equals(username, StringComparison.Ordinal))
             {
+				eventLogger.LogWarning("Throwing ArgumentException from Register(registerationDetails={RegisterationDetails})", registerationDetails);
                 throw new ArgumentException(Localization.GetExceptionMessage("InvalidUserName", "The username specified is invalid."));
             }
 
             var valid = UserController.Instance.IsValidUserName(username);
+			eventLogger.LogDebug("Register(registerationDetails={RegisterationDetails}): valid → {Valid}", registerationDetails, valid);
 
             if (!valid)
             {
@@ -129,6 +137,9 @@ namespace Dnn.PersonaBar.Users.Components
                 !string.IsNullOrEmpty(registerationDetails.LastName))
             {
                 newUser.DisplayName = registerationDetails.FirstName + " " + registerationDetails.LastName;
+				eventLogger.LogDebug("Register(registerationDetails={RegisterationDetails}): newUser.DisplayName → {Arg1}", registerationDetails, newUser.DisplayName);
+				eventLogger.LogDebug("Register(registerationDetails={RegisterationDetails}): newUser.FirstName → {Arg1}", registerationDetails, newUser.FirstName);
+				eventLogger.LogDebug("Register(registerationDetails={RegisterationDetails}): newUser.LastName → {Arg1}", registerationDetails, newUser.LastName);
                 newUser.FirstName = registerationDetails.FirstName;
                 newUser.LastName = registerationDetails.LastName;
             }
@@ -139,6 +150,7 @@ namespace Dnn.PersonaBar.Users.Components
 
             // read all the user account settings
             var settings = UserController.GetUserSettings(portalSettings.PortalId);
+			eventLogger.LogDebug("Register(registerationDetails={RegisterationDetails}): settings → {Settings}", registerationDetails, settings);
 
             // Verify Profanity filter
             if (GetBoolSetting(settings, "Registration_UseProfanityFilter"))
@@ -154,10 +166,13 @@ namespace Dnn.PersonaBar.Users.Components
 
             // Email Address Validation
             var emailValidator = GetStringSetting(settings, "Security_EmailValidation");
+			eventLogger.LogDebug("Register(registerationDetails={RegisterationDetails}): emailValidator → {EmailValidator}", registerationDetails, emailValidator);
             if (!string.IsNullOrEmpty(emailValidator))
             {
                 var regExp = RegexUtils.GetCachedRegex(emailValidator, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+				eventLogger.LogDebug("Register(registerationDetails={RegisterationDetails}): regExp → {RegExp}", registerationDetails, regExp);
                 var matches = regExp.Matches(newUser.Email);
+				eventLogger.LogDebug("Register(registerationDetails={RegisterationDetails}): matches → {Matches}", registerationDetails, matches);
                 if (matches.Count == 0)
                 {
                     throw new RegistrationException(Localization.GetString(
@@ -168,6 +183,7 @@ namespace Dnn.PersonaBar.Users.Components
 
             // Excluded Terms Verification
             var excludeRegex = GetExcludeTermsRegex(settings);
+			eventLogger.LogDebug("Register(registerationDetails={RegisterationDetails}): excludeRegex → {ExcludeRegex}", registerationDetails, excludeRegex);
             if (!string.IsNullOrEmpty(excludeRegex))
             {
                 var regExp = RegexUtils.GetCachedRegex(excludeRegex, RegexOptions.IgnoreCase | RegexOptions.Multiline);
@@ -182,6 +198,7 @@ namespace Dnn.PersonaBar.Users.Components
 
             // User Name Validation
             var userNameValidator = GetStringSetting(settings, "Security_UserNameValidation");
+			eventLogger.LogDebug("Register(registerationDetails={RegisterationDetails}): userNameValidator → {UserNameValidator}", registerationDetails, userNameValidator);
             if (!string.IsNullOrEmpty(userNameValidator))
             {
                 var regExp = RegexUtils.GetCachedRegex(userNameValidator, RegexOptions.IgnoreCase | RegexOptions.Multiline);
@@ -196,6 +213,7 @@ namespace Dnn.PersonaBar.Users.Components
 
             // ensure unique username
             var user = UserController.GetUserByName(portalSettings.PortalId, newUser.Username);
+			eventLogger.LogDebug("Register(registerationDetails={RegisterationDetails}): user → {User}", registerationDetails, user);
             if (user != null)
             {
                 if (GetBoolSetting(settings, "Registration_UseEmailAsUserName"))
@@ -213,6 +231,7 @@ namespace Dnn.PersonaBar.Users.Components
                 }
 
                 newUser.Username = userName;
+				eventLogger.LogDebug("Register(registerationDetails={RegisterationDetails}): newUser.Username → {Arg1}", registerationDetails, newUser.Username);
             }
 
             // ensure unique display name
@@ -223,6 +242,7 @@ namespace Dnn.PersonaBar.Users.Components
                 {
                     var i = 1;
                     string displayName = null;
+					eventLogger.LogDebug("Register(registerationDetails={RegisterationDetails}): displayName → {DisplayName}", registerationDetails, displayName);
                     while (user != null)
                     {
                         displayName = newUser.DisplayName + " 0" + i.ToString(CultureInfo.InvariantCulture);
@@ -236,6 +256,7 @@ namespace Dnn.PersonaBar.Users.Components
 
             // Update display name format
             var displaynameFormat = GetStringSetting(settings, "Security_DisplayNameFormat");
+			eventLogger.LogDebug("Register(registerationDetails={RegisterationDetails}): displaynameFormat → {DisplaynameFormat}", registerationDetails, displaynameFormat);
             if (!string.IsNullOrEmpty(displaynameFormat))
             {
                 newUser.UpdateDisplayName(displaynameFormat);
@@ -250,6 +271,7 @@ namespace Dnn.PersonaBar.Users.Components
 
             // final creation of user
             var createStatus = UserController.CreateUser(ref newUser, registerationDetails.Notify);
+			eventLogger.LogDebug("Register(registerationDetails={RegisterationDetails}): createStatus → {CreateStatus}", registerationDetails, createStatus);
 
             // clear cache
             if (createStatus == UserCreateStatus.Success)
@@ -259,6 +281,7 @@ namespace Dnn.PersonaBar.Users.Components
 
             if (createStatus != UserCreateStatus.Success)
             {
+				eventLogger.LogWarning("Throwing InvalidUserRegisterException from Register(registerationDetails={RegisterationDetails})", registerationDetails);
                 throw new InvalidUserRegisterException(UserController.GetUserCreateStatus(createStatus));
             }
 
@@ -284,6 +307,8 @@ namespace Dnn.PersonaBar.Users.Components
         /// <inheritdoc />
         protected override Func<IRegisterController> GetFactory()
         {
+			eventLogger.LogDebug(">>> Entering GetFactory()");
+			eventLogger.LogDebug("<<< Exiting GetFactory()");
             return () => new RegisterController();
         }
 
@@ -293,6 +318,7 @@ namespace Dnn.PersonaBar.Users.Components
             var adminrole = roleController.GetRoleById(portalSettings.PortalId, portalSettings.AdministratorRoleId);
             var roles = new List<RoleInfo> { adminrole };
             SendNewUserNotifications(newUser, portalSettings, roles);
+			eventLogger.LogDebug("<<< Exiting SendAdminNotification(newUser={NewUser},portalSettings={PortalSettings})", newUser, portalSettings);
         }
 
         private static string GetNotificationBody(string locale, UserInfo newUser, PortalSettings portalSettings)

@@ -72,7 +72,9 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
         public TemplateDefinition()
             : this(null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering TemplateDefinition()");
         }
+		eventLogger.LogDebug("<<< Exiting TemplateDefinition()");
 
         /// <summary>Initializes a new instance of the <see cref="TemplateDefinition"/> class.</summary>
         /// <param name="clientResourceController">The client resource controller.</param>
@@ -86,17 +88,24 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 
         public TemplateDefinition Clone()
         {
+			eventLogger.LogDebug(">>> Entering Clone()");
+			eventLogger.LogDebug("<<< Exiting Clone()");
             return (TemplateDefinition)this.MemberwiseClone();
         }
 
         public void Reset()
         {
+			eventLogger.LogDebug(">>> Entering Reset()");
             this.ClientOptions = new List<ClientOption>(this.DefaultClientOptions);
             this.TemplateArguments = new List<TemplateArgument>(this.DefaultTemplateArguments);
+			eventLogger.LogDebug("Reset(): ClientOptions → {ClientOptions}", ClientOptions);
+			eventLogger.LogDebug("Reset(): TemplateArguments → {TemplateArguments}", TemplateArguments);
+			eventLogger.LogDebug("<<< Exiting Reset()");
         }
 
         public void AddClientOptions(List<ClientOption> options, bool replace)
         {
+			eventLogger.LogDebug(">>> Entering AddClientOptions(options={Options},replace={Replace})", options, replace);
             if (options != null)
             {
                 foreach (var option in options)
@@ -113,10 +122,12 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
                     }
                 }
             }
+			eventLogger.LogDebug("<<< Exiting AddClientOptions(options={Options},replace={Replace})", options, replace);
         }
 
         public void AddTemplateArguments(List<TemplateArgument> args, bool replace)
         {
+			eventLogger.LogDebug(">>> Entering AddTemplateArguments(args={Args},replace={Replace})", args, replace);
             if (args != null)
             {
                 foreach (var arg in args)
@@ -133,10 +144,12 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
                     }
                 }
             }
+			eventLogger.LogDebug("<<< Exiting AddTemplateArguments(args={Args},replace={Replace})", args, replace);
         }
 
         internal static TemplateDefinition FromName(IHostSettings hostSettings, string templateName, string manifestName)
         {
+			eventLogger.LogDebug(">>> Entering FromName(hostSettings={HostSettings},templateName={TemplateName},manifestName={ManifestName})", hostSettings, templateName, manifestName);
             var manifestUrl = new PathResolver(hostSettings, null).Resolve(
                 templateName + "/" + manifestName,
                 PathResolver.RelativeTo.Container,
@@ -144,6 +157,7 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
                 PathResolver.RelativeTo.Portal,
                 PathResolver.RelativeTo.Module,
                 PathResolver.RelativeTo.Dnn);
+			eventLogger.LogDebug("<<< Exiting FromName(hostSettings={HostSettings},templateName={TemplateName},manifestName={ManifestName})", hostSettings, templateName, manifestName);
             return FromManifest(hostSettings, manifestUrl);
         }
 
@@ -316,9 +330,11 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 
         internal void PreRender()
         {
+			eventLogger.LogDebug(">>> Entering PreRender()");
             var page = DNNContext.Current.Page;
 
             var clientResourcesController = GetClientResourcesController();
+			eventLogger.LogDebug("PreRender(): clientResourcesController → {ClientResourcesController}", clientResourcesController);
             foreach (var stylesheet in this.StyleSheets)
             {
                 clientResourcesController.RegisterStylesheet(stylesheet);
@@ -357,17 +373,24 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
             }
 
             var headContent = string.IsNullOrEmpty(this.TemplateHeadPath) ? string.Empty : Utilities.CachedFileContent(this.TemplateHeadPath);
+			eventLogger.LogDebug("PreRender(): headContent → {HeadContent}", headContent);
             var expandedHead = RegexLinks.Replace(headContent, "$1" + DNNContext.Current.ActiveTab.SkinPath + "$3");
+			eventLogger.LogDebug("PreRender(): expandedHead → {ExpandedHead}", expandedHead);
             page.Header.Controls.Add(new LiteralControl(expandedHead));
+			eventLogger.LogDebug("<<< Exiting PreRender()");
         }
 
         internal void Render(object source, HtmlTextWriter htmlWriter)
         {
+			eventLogger.LogDebug(">>> Entering Render(source={Source},htmlWriter={HtmlWriter})", source, htmlWriter);
             this.Processor.Render(source, htmlWriter, this);
+			eventLogger.LogDebug("<<< Exiting Render(source={Source},htmlWriter={HtmlWriter})", source, htmlWriter);
         }
 
         private static string GetResolvedPath(XmlNode scriptElt, PathResolver pathResolver)
         {
+			eventLogger.LogDebug(">>> Entering GetResolvedPath(scriptElt={ScriptElt},pathResolver={PathResolver})", scriptElt, pathResolver);
+			eventLogger.LogDebug("<<< Exiting GetResolvedPath(scriptElt={ScriptElt},pathResolver={PathResolver})", scriptElt, pathResolver);
             return pathResolver.Resolve(
                 scriptElt.InnerText.Trim(),
                 PathResolver.RelativeTo.Manifest,
@@ -391,6 +414,7 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
                         scriptPath = string.Empty;
                         break;
                     default:
+						eventLogger.LogWarning("Throwing ApplicationException from CreateScript(jsObject={JsObject},scriptPath={ScriptPath})", jsObject, scriptPath);
                         throw new ApplicationException(string.Format("Can't deduce script path for JavaScript object '{0}'", jsObject));
                 }
             }
@@ -432,7 +456,10 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
 
         private static IClientResourceController GetClientResourcesController()
         {
+			eventLogger.LogDebug(">>> Entering GetClientResourcesController()");
             var serviceProvider = Globals.GetCurrentServiceProvider();
+			eventLogger.LogDebug("GetClientResourcesController(): serviceProvider → {ServiceProvider}", serviceProvider);
+			eventLogger.LogDebug("<<< Exiting GetClientResourcesController()");
             return serviceProvider.GetRequiredService<IClientResourceController>();
         }
     }

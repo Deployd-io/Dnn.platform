@@ -51,6 +51,9 @@ namespace DotNetNuke.Common.Utilities
 
             // Create Zip Entry
             zipFile.CreateEntryFromFile(FixPath(filePath), Path.Combine(folder, fileName));
+			Logger.LogDebug(">>> Entering AddToZip(zipFile={ZipFile},filePath={FilePath},fileName={FileName},folder={Folder})", zipFile, filePath, fileName, folder);
+			Logger.LogInformation("AddToZip(zipFile,filePath,fileName,folder)={ZipFile},{FilePath},{FileName},{Folder}: external service call took {Arg4} ms", zipFile, filePath, fileName, folder, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting AddToZip(zipFile={ZipFile},filePath={FilePath},fileName={FileName},folder={Folder})", zipFile, filePath, fileName, folder);
         }
 
         /// <summary>Adds a File to a Zip File.</summary>
@@ -62,12 +65,16 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>A <see cref="Task"/> indicating completion.</returns>
         public static async Task AddToZipAsync(ZipArchive zipFile, string filePath, string fileName, string folder, CancellationToken cancellationToken = default)
         {
+			Logger.LogDebug(">>> Entering AddToZipAsync(zipFile={ZipFile},filePath={FilePath},fileName={FileName},folder={Folder},cancellationToken=<redacted>)", zipFile, filePath, fileName, folder);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             using var fs = File.OpenRead(FixPath(filePath));
 
+			Logger.LogDebug("AddToZipAsync(zipFile={ZipFile},filePath={FilePath},fileName={FileName},folder={Folder},cancellationToken=<redacted>): fs → {Fs}", zipFile, filePath, fileName, folder, fs);
             // Read file into byte array buffer
             var buffer = new byte[fs.Length];
 
             var len = await fs.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
+			Logger.LogDebug("AddToZipAsync(zipFile={ZipFile},filePath={FilePath},fileName={FileName},folder={Folder},cancellationToken=<redacted>): len → {Len}", zipFile, filePath, fileName, folder, len);
             if (len != fs.Length)
             {
                 Logger.ErrorFormat(
@@ -80,6 +87,8 @@ namespace DotNetNuke.Common.Utilities
 
             // Create Zip Entry
             zipFile.CreateEntryFromFile(FixPath(filePath), Path.Combine(folder, fileName));
+			Logger.LogInformation("AddToZipAsync(zipFile,filePath,fileName,folder,cancellationToken)={ZipFile},{FilePath},{FileName},{Folder},{CancellationToken}: external service call took {Arg5} ms", zipFile, filePath, fileName, folder, cancellationToken, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting AddToZipAsync(zipFile={ZipFile},filePath={FilePath},fileName={FileName},folder={Folder},cancellationToken=<redacted>)", zipFile, filePath, fileName, folder);
         }
 
         /// <summary>Tries to copy a file in the file system.</summary>
@@ -87,12 +96,14 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="destFileName">The name of the destination file.</param>
         public static void CopyFile(string sourceFileName, string destFileName)
         {
+			Logger.LogDebug(">>> Entering CopyFile(sourceFileName={SourceFileName},destFileName={DestFileName})", sourceFileName, destFileName);
             if (File.Exists(destFileName))
             {
                 File.SetAttributes(destFileName, FileAttributes.Normal);
             }
 
             File.Copy(sourceFileName, destFileName, true);
+			Logger.LogDebug("<<< Exiting CopyFile(sourceFileName={SourceFileName},destFileName={DestFileName})", sourceFileName, destFileName);
         }
 
         /// <summary>Tries to copy a file in the file system.</summary>
@@ -101,12 +112,14 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>A <see cref="Task"/> indicating completion.</returns>
         public static async Task CopyFileAsync(string sourceFileName, string destFileName)
         {
+			Logger.LogDebug(">>> Entering CopyFileAsync(sourceFileName={SourceFileName},destFileName={DestFileName})", sourceFileName, destFileName);
             if (await File.ExistsAsync(destFileName))
             {
                 await File.SetAttributesAsync(destFileName, FileAttributes.Normal);
             }
 
             await File.CopyAsync(sourceFileName, destFileName, true);
+			Logger.LogDebug("<<< Exiting CopyFileAsync(sourceFileName={SourceFileName},destFileName={DestFileName})", sourceFileName, destFileName);
         }
 
         /// <summary>
@@ -119,13 +132,16 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>Whether the file is deleted.</returns>
         public static bool DeleteFileWithWait(string fileName, short waitInMilliseconds, short maxAttempts)
         {
+			Logger.LogDebug(">>> Entering DeleteFileWithWait(fileName={FileName},waitInMilliseconds={WaitInMilliseconds},maxAttempts={MaxAttempts})", fileName, waitInMilliseconds, maxAttempts);
             fileName = FixPath(fileName);
             if (!File.Exists(fileName))
+			Logger.LogDebug("DeleteFileWithWait(fileName={FileName},waitInMilliseconds={WaitInMilliseconds},maxAttempts={MaxAttempts}): fileName → {FileName1}", fileName, waitInMilliseconds, maxAttempts, fileName);
             {
                 return true;
             }
 
             var fileDeleted = false;
+			Logger.LogDebug("DeleteFileWithWait(fileName={FileName},waitInMilliseconds={WaitInMilliseconds},maxAttempts={MaxAttempts}): fileDeleted → {FileDeleted}", fileName, waitInMilliseconds, maxAttempts, fileDeleted);
             var i = 0;
             while (fileDeleted != true)
             {
@@ -156,6 +172,7 @@ namespace DotNetNuke.Common.Utilities
                 }
             }
 
+			Logger.LogDebug("<<< Exiting DeleteFileWithWait(fileName={FileName},waitInMilliseconds={WaitInMilliseconds},maxAttempts={MaxAttempts})", fileName, waitInMilliseconds, maxAttempts);
             return fileDeleted;
         }
 
@@ -170,13 +187,17 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>Whether the file is deleted.</returns>
         public static async Task<bool> DeleteFileWithWaitAsync(string fileName, short waitInMilliseconds, short maxAttempts, CancellationToken cancellationToken = default)
         {
+			Logger.LogDebug(">>> Entering DeleteFileWithWaitAsync(fileName={FileName},waitInMilliseconds={WaitInMilliseconds},maxAttempts={MaxAttempts},cancellationToken=<redacted>)", fileName, waitInMilliseconds, maxAttempts);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             fileName = FixPath(fileName);
             if (!await File.ExistsAsync(fileName))
+			Logger.LogDebug("DeleteFileWithWaitAsync(fileName={FileName},waitInMilliseconds={WaitInMilliseconds},maxAttempts={MaxAttempts},cancellationToken=<redacted>): fileName → {FileName1}", fileName, waitInMilliseconds, maxAttempts, fileName);
             {
                 return true;
             }
 
             var fileDeleted = false;
+			Logger.LogDebug("DeleteFileWithWaitAsync(fileName={FileName},waitInMilliseconds={WaitInMilliseconds},maxAttempts={MaxAttempts},cancellationToken=<redacted>): fileDeleted → {FileDeleted}", fileName, waitInMilliseconds, maxAttempts, fileDeleted);
             var i = 0;
             while (fileDeleted != true)
             {
@@ -207,6 +228,8 @@ namespace DotNetNuke.Common.Utilities
                 }
             }
 
+			Logger.LogInformation("DeleteFileWithWaitAsync(fileName,waitInMilliseconds,maxAttempts,cancellationToken)={FileName},{WaitInMilliseconds},{MaxAttempts},{CancellationToken}: external service call took {Arg4} ms", fileName, waitInMilliseconds, maxAttempts, cancellationToken, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting DeleteFileWithWaitAsync(fileName={FileName},waitInMilliseconds={WaitInMilliseconds},maxAttempts={MaxAttempts},cancellationToken=<redacted>)", fileName, waitInMilliseconds, maxAttempts);
             return fileDeleted;
         }
 
@@ -214,12 +237,15 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="fileName">The name of the file.</param>
         public static void DeleteFile(string fileName)
         {
+			Logger.LogDebug(">>> Entering DeleteFile(fileName={FileName})", fileName);
             fileName = FixPath(fileName);
             if (File.Exists(fileName))
+			Logger.LogDebug("DeleteFile(fileName={FileName}): fileName → {FileName1}", fileName, fileName);
             {
                 File.SetAttributes(fileName, FileAttributes.Normal);
                 File.Delete(fileName);
             }
+			Logger.LogDebug("<<< Exiting DeleteFile(fileName={FileName})", fileName);
         }
 
         /// <summary>Tries to delete a file from the file system.</summary>
@@ -227,12 +253,17 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>A <see cref="Task"/> indicating completion.</returns>
         public static async Task DeleteFileAsync(string fileName)
         {
+			Logger.LogDebug(">>> Entering DeleteFileAsync(fileName={FileName})", fileName);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             fileName = FixPath(fileName);
             if (await File.ExistsAsync(fileName))
+			Logger.LogDebug("DeleteFileAsync(fileName={FileName}): fileName → {FileName1}", fileName, fileName);
             {
                 await File.SetAttributesAsync(fileName, FileAttributes.Normal);
                 await File.DeleteAsync(fileName);
             }
+			Logger.LogInformation("DeleteFileAsync(fileName)={FileName}: external service call took {Arg1} ms", fileName, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting DeleteFileAsync(fileName={FileName})", fileName);
         }
 
         /// <summary>Reads a file.</summary>
@@ -240,7 +271,10 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The string content of the file.</returns>
         public static string ReadFile(string filePath)
         {
+			Logger.LogDebug(">>> Entering ReadFile(filePath={FilePath})", filePath);
             using var reader = File.OpenText(filePath);
+			Logger.LogDebug("ReadFile(filePath={FilePath}): reader → {Reader}", filePath, reader);
+			Logger.LogDebug("<<< Exiting ReadFile(filePath={FilePath})", filePath);
             return reader.ReadToEnd();
         }
 
@@ -250,7 +284,10 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The string content of the file.</returns>
         public static async Task<string> ReadFileAsync(string filePath, CancellationToken cancellationToken = default)
         {
+			Logger.LogDebug(">>> Entering ReadFileAsync(filePath={FilePath},cancellationToken=<redacted>)", filePath);
             using var reader = File.OpenText(filePath);
+			Logger.LogDebug("ReadFileAsync(filePath={FilePath},cancellationToken=<redacted>): reader → {Reader}", filePath, reader);
+			Logger.LogDebug("<<< Exiting ReadFileAsync(filePath={FilePath},cancellationToken=<redacted>)", filePath);
             return await reader.ReadToEndAsync();
         }
 
@@ -267,6 +304,7 @@ namespace DotNetNuke.Common.Utilities
             {
                 zipStream?.Dispose();
             }
+			Logger.LogDebug("<<< Exiting UnzipResources(zipArchiveEntries={ZipArchiveEntries},destPath={DestPath})", zipArchiveEntries, destPath);
         }
 
         /// <summary>Unzips a resources zip file.</summary>
@@ -274,14 +312,17 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="destPath">The destination path to extract to.</param>
         public static void UnzipResources(IEnumerable<ZipArchiveEntry> zipArchiveEntries, string destPath)
         {
+			Logger.LogDebug(">>> Entering UnzipResources(zipArchiveEntries={ZipArchiveEntries},destPath={DestPath})", zipArchiveEntries, destPath);
             foreach (var zipEntry in zipArchiveEntries)
             {
                 HtmlUtils.WriteKeepAlive();
                 var localFileName = zipEntry.FullName;
                 var relativeDir = Path.GetDirectoryName(zipEntry.FullName);
+				Logger.LogDebug("UnzipResources(zipArchiveEntries={ZipArchiveEntries},destPath={DestPath}): relativeDir → {RelativeDir}", zipArchiveEntries, destPath, relativeDir);
                 if (!string.IsNullOrEmpty(relativeDir))
                 {
                     var destDir = Path.Combine(destPath, relativeDir);
+					Logger.LogDebug("UnzipResources(zipArchiveEntries={ZipArchiveEntries},destPath={DestPath}): destDir → {DestDir}", zipArchiveEntries, destPath, destDir);
                     if (!Directory.Exists(destDir))
                     {
                         Directory.Create(destDir, true);
@@ -294,6 +335,7 @@ namespace DotNetNuke.Common.Utilities
                 }
 
                 var fileNamePath = FixPath(Path.Combine(destPath, localFileName));
+				Logger.LogDebug("UnzipResources(zipArchiveEntries={ZipArchiveEntries},destPath={DestPath}): fileNamePath → {FileNamePath}", zipArchiveEntries, destPath, fileNamePath);
                 try
                 {
                     if (File.Exists(fileNamePath))
@@ -303,6 +345,7 @@ namespace DotNetNuke.Common.Utilities
                     }
 
                     using var fileStream = File.Open(fileNamePath, FileMode.CreateNew);
+					Logger.LogDebug("UnzipResources(zipArchiveEntries={ZipArchiveEntries},destPath={DestPath}): fileStream → {FileStream}", zipArchiveEntries, destPath, fileStream);
                     zipEntry.Open().CopyToStream(fileStream, 25000);
                 }
                 catch (Exception ex)
@@ -319,6 +362,7 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>A <see cref="Task"/> indicating completion.</returns>
         public static async Task UnzipResourcesAsync(ZipArchive zipStream, string destPath, CancellationToken cancellationToken = default)
         {
+			Logger.LogDebug(">>> Entering UnzipResourcesAsync(zipStream={ZipStream},destPath={DestPath},cancellationToken=<redacted>)", zipStream, destPath);
             try
             {
                 await UnzipResourcesAsync(zipStream.FileEntries(), destPath, cancellationToken);
@@ -327,6 +371,8 @@ namespace DotNetNuke.Common.Utilities
             {
                 zipStream?.Dispose();
             }
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			Logger.LogDebug("<<< Exiting UnzipResourcesAsync(zipStream={ZipStream},destPath={DestPath},cancellationToken=<redacted>)", zipStream, destPath);
         }
 
         /// <summary>Unzips a resources zip file.</summary>
@@ -336,16 +382,20 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>A <see cref="Task"/> indicating completion.</returns>
         public static async Task UnzipResourcesAsync(IEnumerable<ZipArchiveEntry> zipArchiveEntries, string destPath, CancellationToken cancellationToken)
         {
+			Logger.LogDebug(">>> Entering UnzipResourcesAsync(zipArchiveEntries={ZipArchiveEntries},destPath={DestPath},cancellationToken=<redacted>)", zipArchiveEntries, destPath);
             foreach (var zipEntry in zipArchiveEntries)
             {
+				Logger.LogDebug("<<< Exiting UnzipResourcesAsync(zipStream={ZipStream},destPath={DestPath},cancellationToken=<redacted>)", zipStream, destPath);
                 cancellationToken.ThrowIfCancellationRequested();
                 HtmlUtils.WriteKeepAlive();
 
                 var localFileName = zipEntry.FullName;
                 var relativeDir = Path.GetDirectoryName(zipEntry.FullName);
+				Logger.LogDebug("UnzipResourcesAsync(zipArchiveEntries={ZipArchiveEntries},destPath={DestPath},cancellationToken=<redacted>): relativeDir → {RelativeDir}", zipArchiveEntries, destPath, relativeDir);
                 if (!string.IsNullOrEmpty(relativeDir))
                 {
                     var destDir = Path.Combine(destPath, relativeDir);
+					Logger.LogDebug("UnzipResourcesAsync(zipArchiveEntries={ZipArchiveEntries},destPath={DestPath},cancellationToken=<redacted>): destDir → {DestDir}", zipArchiveEntries, destPath, destDir);
                     if (!await Directory.ExistsAsync(destDir))
                     {
                         await Directory.CreateAsync(destDir, true);
@@ -358,6 +408,7 @@ namespace DotNetNuke.Common.Utilities
                 }
 
                 var fileNamePath = FixPath(Path.Combine(destPath, localFileName));
+				Logger.LogDebug("UnzipResourcesAsync(zipArchiveEntries={ZipArchiveEntries},destPath={DestPath},cancellationToken=<redacted>): fileNamePath → {FileNamePath}", zipArchiveEntries, destPath, fileNamePath);
                 try
                 {
                     if (await File.ExistsAsync(fileNamePath))
@@ -367,6 +418,7 @@ namespace DotNetNuke.Common.Utilities
                     }
 
                     using var fileStream = File.Open(fileNamePath, FileMode.CreateNew);
+					Logger.LogDebug("UnzipResourcesAsync(zipArchiveEntries={ZipArchiveEntries},destPath={DestPath},cancellationToken=<redacted>): fileStream → {FileStream}", zipArchiveEntries, destPath, fileStream);
                     await zipEntry.Open().CopyToAsync(fileStream, 25000, cancellationToken);
                 }
                 catch (Exception ex)
@@ -374,6 +426,7 @@ namespace DotNetNuke.Common.Utilities
                     Logger.Error(ex);
                 }
             }
+			Logger.LogInformation("UnzipResourcesAsync(zipArchiveEntries,destPath,cancellationToken)={ZipArchiveEntries},{DestPath},{CancellationToken}: external service call took {Arg3} ms", zipArchiveEntries, destPath, cancellationToken, __logStart.ElapsedMilliseconds);
         }
 
         /// <summary>Deletes the files specified.</summary>
@@ -389,11 +442,14 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>An empty string if succeeded or a list of errors in case of failures.</returns>
         public static string DeleteFiles(IApplicationStatusInfo appStatus, Array arrPaths)
         {
+			Logger.LogDebug(">>> Entering DeleteFiles(appStatus={AppStatus},arrPaths={ArrPaths})", appStatus, arrPaths);
             var strExceptions = string.Empty;
             for (var i = 0; i < arrPaths.Length; i++)
             {
                 var strPath = (arrPaths.GetValue(i) ?? string.Empty).ToString();
+				Logger.LogDebug("DeleteFiles(appStatus={AppStatus},arrPaths={ArrPaths}): strPath → {StrPath}", appStatus, arrPaths, strPath);
                 var pos = strPath.IndexOf("'", StringComparison.Ordinal);
+				Logger.LogDebug("DeleteFiles(appStatus={AppStatus},arrPaths={ArrPaths}): pos → {Pos}", appStatus, arrPaths, pos);
                 if (pos != -1)
                 {
                     // the (') represents a comment to the end of the line
@@ -410,7 +466,9 @@ namespace DotNetNuke.Common.Utilities
                 if (strPath.EndsWith(@"\", StringComparison.Ordinal) && Directory.Exists(strPath))
                 {
                     var directoryInfo = new System.IO.DirectoryInfo(strPath);
+					Logger.LogDebug("DeleteFiles(appStatus={AppStatus},arrPaths={ArrPaths}): directoryInfo → {DirectoryInfo}", appStatus, arrPaths, directoryInfo);
                     var applicationPath = $@"{appStatus.ApplicationMapPath}\";
+					Logger.LogDebug("DeleteFiles(appStatus={AppStatus},arrPaths={ArrPaths}): applicationPath → {ApplicationPath}", appStatus, arrPaths, applicationPath);
                     if (!directoryInfo.FullName.StartsWith(applicationPath, StringComparison.OrdinalIgnoreCase) ||
                         directoryInfo.FullName.Equals(applicationPath, StringComparison.OrdinalIgnoreCase))
                     {
@@ -447,6 +505,7 @@ namespace DotNetNuke.Common.Utilities
                 }
             }
 
+			Logger.LogDebug("<<< Exiting DeleteFiles(arrPaths={ArrPaths})", arrPaths);
             return strExceptions;
         }
 
@@ -461,7 +520,9 @@ namespace DotNetNuke.Common.Utilities
             for (var i = 0; i < arrPaths.Length; i++)
             {
                 var strPath = (arrPaths.GetValue(i) ?? string.Empty).ToString();
+				Logger.LogDebug("DeleteFilesAsync(appStatus={AppStatus},arrPaths={ArrPaths},cancellationToken=<redacted>): strPath → {StrPath}", appStatus, arrPaths, strPath);
                 var pos = strPath.IndexOf("'", StringComparison.Ordinal);
+				Logger.LogDebug("DeleteFilesAsync(appStatus={AppStatus},arrPaths={ArrPaths},cancellationToken=<redacted>): pos → {Pos}", appStatus, arrPaths, pos);
                 if (pos != -1)
                 {
                     // the (') represents a comment to the end of the line
@@ -478,7 +539,9 @@ namespace DotNetNuke.Common.Utilities
                 if (strPath.EndsWith(@"\", StringComparison.Ordinal) && await Directory.ExistsAsync(strPath))
                 {
                     var directoryInfo = new System.IO.DirectoryInfo(strPath);
+					Logger.LogDebug("DeleteFilesAsync(appStatus={AppStatus},arrPaths={ArrPaths},cancellationToken=<redacted>): directoryInfo → {DirectoryInfo}", appStatus, arrPaths, directoryInfo);
                     var applicationPath = $@"{appStatus.ApplicationMapPath}\";
+					Logger.LogDebug("DeleteFilesAsync(appStatus={AppStatus},arrPaths={ArrPaths},cancellationToken=<redacted>): applicationPath → {ApplicationPath}", appStatus, arrPaths, applicationPath);
                     if (!directoryInfo.FullName.StartsWith(applicationPath, StringComparison.OrdinalIgnoreCase) ||
                         directoryInfo.FullName.Equals(applicationPath, StringComparison.OrdinalIgnoreCase))
                     {
@@ -493,6 +556,9 @@ namespace DotNetNuke.Common.Utilities
                     {
                         Logger.Error(ex);
                         strExceptions += $"Processing folder ({strPath}) Error: {ex.Message}{Environment.NewLine}";
+						Logger.LogDebug(">>> Entering DeleteFolderRecursiveAsync(strRoot={StrRoot},cancellationToken=<redacted>)", strRoot);
+						Logger.LogInformation("DeleteFolderRecursiveAsync(strRoot,cancellationToken)={StrRoot},{CancellationToken}: external service call took {Arg2} ms", strRoot, cancellationToken, __logStart.ElapsedMilliseconds);
+						Logger.LogDebug("<<< Exiting DeleteFolderRecursiveAsync(strRoot={StrRoot},cancellationToken=<redacted>)", strRoot);
                     }
                 }
                 else
@@ -515,6 +581,8 @@ namespace DotNetNuke.Common.Utilities
                 }
             }
 
+			Logger.LogInformation("DeleteFilesAsync(appStatus,arrPaths,cancellationToken)={AppStatus},{ArrPaths},{CancellationToken}: external service call took {Arg3} ms", appStatus, arrPaths, cancellationToken, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting DeleteFilesAsync(appStatus={AppStatus},arrPaths={ArrPaths},cancellationToken=<redacted>)", appStatus, arrPaths);
             return strExceptions;
         }
 
@@ -523,12 +591,14 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="filter">The filter to select the files to delete.</param>
         public static void DeleteFilesRecursive(string strRoot, string filter)
         {
+			Logger.LogDebug(">>> Entering DeleteFilesRecursive(strRoot={StrRoot},filter={Filter})", strRoot, filter);
             if (string.IsNullOrEmpty(strRoot))
             {
                 return;
             }
 
             strRoot = FixPath(strRoot);
+			Logger.LogDebug("DeleteFilesRecursive(strRoot={StrRoot},filter={Filter}): strRoot → {StrRoot1}", strRoot, filter, strRoot);
             if (!Directory.Exists(strRoot))
             {
                 return;
@@ -537,6 +607,7 @@ namespace DotNetNuke.Common.Utilities
             foreach (var strFolder in Directory.EnumerateDirectoryPaths(strRoot))
             {
                 var directory = new DirectoryInfo(strFolder);
+				Logger.LogDebug("DeleteFilesRecursive(strRoot={StrRoot},filter={Filter}): directory → {Directory}", strRoot, filter, directory);
                 if ((directory.Attributes & FileAttributes.Hidden) == 0 && (directory.Attributes & FileAttributes.System) == 0)
                 {
                     DeleteFilesRecursive(strFolder, filter);
@@ -554,6 +625,7 @@ namespace DotNetNuke.Common.Utilities
                     Logger.Error(ex);
                 }
             }
+			Logger.LogDebug("<<< Exiting DeleteFilesRecursive(strRoot={StrRoot},filter={Filter})", strRoot, filter);
         }
 
         /// <summary>Deletes files that match a filter recursively within folders.</summary>
@@ -563,12 +635,14 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>A <see cref="Task"/> indicating completion.</returns>
         public static async Task DeleteFilesRecursiveAsync(string strRoot, string filter, CancellationToken cancellationToken = default)
         {
+			Logger.LogDebug(">>> Entering DeleteFilesRecursiveAsync(strRoot={StrRoot},filter={Filter},cancellationToken=<redacted>)", strRoot, filter);
             if (string.IsNullOrEmpty(strRoot))
             {
                 return;
             }
 
             strRoot = FixPath(strRoot);
+			Logger.LogDebug("DeleteFilesRecursiveAsync(strRoot={StrRoot},filter={Filter},cancellationToken=<redacted>): strRoot → {StrRoot1}", strRoot, filter, strRoot);
             if (!await Directory.ExistsAsync(strRoot))
             {
                 return;
@@ -578,6 +652,7 @@ namespace DotNetNuke.Common.Utilities
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var directory = new DirectoryInfo(strFolder);
+				Logger.LogDebug("DeleteFilesRecursiveAsync(strRoot={StrRoot},filter={Filter},cancellationToken=<redacted>): directory → {Directory}", strRoot, filter, directory);
                 if ((directory.Attributes & FileAttributes.Hidden) == 0 && (directory.Attributes & FileAttributes.System) == 0)
                 {
                     await DeleteFilesRecursiveAsync(strFolder, filter, cancellationToken);
@@ -597,12 +672,14 @@ namespace DotNetNuke.Common.Utilities
                     Logger.Error(ex);
                 }
             }
+			Logger.LogDebug("<<< Exiting DeleteFilesRecursiveAsync(strRoot={StrRoot},filter={Filter},cancellationToken=<redacted>)", strRoot, filter);
         }
 
         /// <summary>Deletes a folder and all its child files and folders.</summary>
         /// <param name="strRoot">The root path to delete from.</param>
         public static void DeleteFolderRecursive(string strRoot)
         {
+			Logger.LogDebug(">>> Entering DeleteFolderRecursive(strRoot={StrRoot})", strRoot);
             strRoot = FixPath(strRoot);
             if (string.IsNullOrEmpty(strRoot) || !Directory.Exists(strRoot))
             {
@@ -646,6 +723,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>A <see cref="Task"/> indicating completion.</returns>
         public static async Task DeleteFolderRecursiveAsync(string strRoot, CancellationToken cancellationToken = default)
         {
+			Logger.LogDebug(">>> Entering DeleteFolderRecursiveAsync(strRoot={StrRoot},cancellationToken=<redacted>)", strRoot);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             strRoot = FixPath(strRoot);
             if (string.IsNullOrEmpty(strRoot) || !await Directory.ExistsAsync(strRoot))
             {
@@ -683,12 +762,14 @@ namespace DotNetNuke.Common.Utilities
                 Logger.Info($"{strRoot} does not exist.");
                 Logger.Error(ex);
             }
+			Logger.LogInformation("DeleteFolderRecursiveAsync(strRoot,cancellationToken)={StrRoot},{CancellationToken}: external service call took {Arg2} ms", strRoot, cancellationToken, __logStart.ElapsedMilliseconds);
         }
 
         /// <summary>Deletes all empty folders beneath a given root folder and the root folder itself as well if empty.</summary>
         /// <param name="path">The root folder path.</param>
         public static void DeleteEmptyFoldersRecursive(string path)
         {
+			Logger.LogDebug(">>> Entering DeleteEmptyFoldersRecursive(path={Path})", path);
             if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
             {
                 Logger.Info($"{path} does not exist.");
@@ -717,6 +798,7 @@ namespace DotNetNuke.Common.Utilities
             {
                 Logger.Error(ex);
             }
+			Logger.LogDebug("<<< Exiting DeleteEmptyFoldersRecursive(path={Path})", path);
         }
 
         /// <summary>Deletes all empty folders beneath a given root folder and the root folder itself as well if empty.</summary>
@@ -725,6 +807,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>A <see cref="Task"/> indicating completion.</returns>
         public static async Task DeleteEmptyFoldersRecursiveAsync(string path, CancellationToken cancellationToken = default)
         {
+			Logger.LogDebug(">>> Entering DeleteEmptyFoldersRecursiveAsync(path={Path},cancellationToken=<redacted>)", path);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (string.IsNullOrWhiteSpace(path) || !await Directory.ExistsAsync(path))
             {
                 Logger.Info($"{path} does not exist.");
@@ -754,6 +838,8 @@ namespace DotNetNuke.Common.Utilities
             {
                 Logger.Error(ex);
             }
+			Logger.LogInformation("DeleteEmptyFoldersRecursiveAsync(path,cancellationToken)={Path},{CancellationToken}: external service call took {Arg2} ms", path, cancellationToken, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting DeleteEmptyFoldersRecursiveAsync(path={Path},cancellationToken=<redacted>)", path);
         }
 
         /// <summary>Fixes the path in case the path separator is not windows style.</summary>
@@ -761,6 +847,8 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>A valid Windows path.</returns>
         public static string FixPath(string input)
         {
+			Logger.LogDebug(">>> Entering FixPath(input={Input})", input);
+			Logger.LogDebug("<<< Exiting FixPath(input={Input})", input);
             return string.IsNullOrEmpty(input) ? input : input.Trim().Replace("/", @"\");
         }
 
@@ -776,6 +864,7 @@ namespace DotNetNuke.Common.Utilities
         {
             FileStream fs = null;
             try
+			Logger.LogDebug("AddToZip(zipFile={ZipFile},filePath={FilePath},fileName={FileName},folder={Folder}): fs → {Fs}", zipFile, filePath, fileName, folder, fs);
             {
                 // Open File Stream
                 fs = File.OpenRead(FixPath(filePath));
@@ -784,6 +873,7 @@ namespace DotNetNuke.Common.Utilities
                 var buffer = new byte[fs.Length];
 
                 var len = fs.Read(buffer, 0, buffer.Length);
+				Logger.LogDebug("AddToZip(zipFile={ZipFile},filePath={FilePath},fileName={FileName},folder={Folder}): len → {Len}", zipFile, filePath, fileName, folder, len);
                 if (len != fs.Length)
                 {
                     Logger.ErrorFormat(
@@ -796,6 +886,9 @@ namespace DotNetNuke.Common.Utilities
 
                 // Create Zip Entry
                 var entry = new ZipEntry(Path.Combine(folder, fileName));
+				Logger.LogDebug("AddToZip(zipFile={ZipFile},filePath={FilePath},fileName={FileName},folder={Folder}): entry → {Entry}", zipFile, filePath, fileName, folder, entry);
+				Logger.LogDebug("AddToZip(zipFile={ZipFile},filePath={FilePath},fileName={FileName},folder={Folder}): entry.DateTime → {Arg4}", zipFile, filePath, fileName, folder, entry.DateTime);
+				Logger.LogDebug("AddToZip(zipFile={ZipFile},filePath={FilePath},fileName={FileName},folder={Folder}): entry.Size → {Arg4}", zipFile, filePath, fileName, folder, entry.Size);
                 entry.DateTime = DateTime.Now;
                 entry.Size = fs.Length;
                 fs.Close();
@@ -822,15 +915,18 @@ namespace DotNetNuke.Common.Utilities
         public static partial void UnzipResources(ZipInputStream zipStream, string destPath)
 #pragma warning restore CS3001
         {
+			Logger.LogDebug(">>> Entering UnzipResources(zipStream={ZipStream},destPath={DestPath})", zipStream, destPath);
             try
             {
                 var zipEntry = zipStream.GetNextEntry();
+				Logger.LogDebug("UnzipResources(zipStream={ZipStream},destPath={DestPath}): zipEntry → {ZipEntry}", zipStream, destPath, zipEntry);
                 while (zipEntry != null)
                 {
                     zipEntry.CheckZipEntry();
                     HtmlUtils.WriteKeepAlive();
                     var localFileName = zipEntry.Name;
                     var relativeDir = Path.GetDirectoryName(zipEntry.Name);
+					Logger.LogDebug("UnzipResources(zipStream={ZipStream},destPath={DestPath}): relativeDir → {RelativeDir}", zipStream, destPath, relativeDir);
                     if (!string.IsNullOrEmpty(relativeDir) && (!Directory.Exists(Path.Combine(destPath, relativeDir))))
                     {
                         Directory.Create(Path.Combine(destPath, relativeDir), true);
@@ -839,6 +935,7 @@ namespace DotNetNuke.Common.Utilities
                     if (!zipEntry.IsDirectory && (!string.IsNullOrEmpty(localFileName)))
                     {
                         var fileNamePath = FixPath(Path.Combine(destPath, localFileName));
+						Logger.LogDebug("UnzipResources(zipStream={ZipStream},destPath={DestPath}): fileNamePath → {FileNamePath}", zipStream, destPath, fileNamePath);
                         try
                         {
                             if (File.Exists(fileNamePath))
@@ -848,12 +945,14 @@ namespace DotNetNuke.Common.Utilities
                             }
 
                             FileStream objFileStream = null;
+							Logger.LogDebug("UnzipResources(zipStream={ZipStream},destPath={DestPath}): objFileStream → {ObjFileStream}", zipStream, destPath, objFileStream);
                             try
                             {
                                 File.Create(fileNamePath);
                                 objFileStream = File.Open(fileNamePath);
                                 var arrData = new byte[2048];
                                 var intSize = zipStream.Read(arrData, 0, arrData.Length);
+								Logger.LogDebug("UnzipResources(zipStream={ZipStream},destPath={DestPath}): intSize → {IntSize}", zipStream, destPath, intSize);
                                 while (intSize > 0)
                                 {
                                     objFileStream.Write(arrData, 0, intSize);
@@ -886,6 +985,7 @@ namespace DotNetNuke.Common.Utilities
                     zipStream.Dispose();
                 }
             }
+			Logger.LogDebug("<<< Exiting UnzipResources(zipStream={ZipStream},destPath={DestPath})", zipStream, destPath);
         }
     }
 }

@@ -16,6 +16,7 @@ namespace DotNetNuke.UI.Skins
 
     public enum SkinDefaultType
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SkinDefaults));
         /// <summary>Skin.</summary>
         SkinInfo = 0,
 
@@ -45,6 +46,7 @@ namespace DotNetNuke.UI.Skins
             this.folder = defaultElement.Attributes["folder"].Value;
             this.defaultName = defaultElement.Attributes["default"].Value;
             this.adminDefaultName = defaultElement.Attributes["admindefault"].Value;
+			Logger.LogDebug("<<< Exiting SkinDefaults(defaultType={DefaultType})", defaultType);
         }
 
         public string AdminDefaultName
@@ -87,7 +89,10 @@ namespace DotNetNuke.UI.Skins
 
         private static object GetSkinDefaultsCallback(CacheItemArgs cacheItemArgs)
         {
+			Logger.LogDebug(">>> Entering GetSkinDefaultsCallback(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             var defaultType = (SkinDefaultType)cacheItemArgs.ParamList[0];
+			Logger.LogDebug("GetSkinDefaultsCallback(cacheItemArgs={CacheItemArgs}): defaultType → {DefaultType}", cacheItemArgs, defaultType);
+			Logger.LogDebug("<<< Exiting GetSkinDefaultsCallback(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return new SkinDefaults(defaultType);
         }
     }

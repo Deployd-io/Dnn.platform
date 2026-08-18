@@ -2,9 +2,12 @@ import PropTypes from "prop-types";
 import React, { Component } from "react";
 import { GridCell } from "@dnnsoftware/dnn-react-common";
 import "./style.less";
+const logger = console;
 
 class ExtensionHeader extends Component {
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell columnSize={100} className="header-row">
                 {this.props.headers.map((header, index) => {

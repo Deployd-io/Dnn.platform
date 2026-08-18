@@ -21,11 +21,15 @@ namespace DotNetNuke.Data
     public abstract class RepositoryBase<T> : IRepository<T>
         where T : class
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RepositoryBase));
         /// <summary>Initializes a new instance of the <see cref="RepositoryBase{T}"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         protected RepositoryBase()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering RepositoryBase()");
+		Logger.LogDebug("<<< Exiting RepositoryBase()");
+		Logger.LogDebug(">>> Entering RepositoryBase(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="RepositoryBase{T}"/> class.</summary>
@@ -34,6 +38,7 @@ namespace DotNetNuke.Data
         {
             this.HostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
             this.InitializeInternal();
+			Logger.LogDebug("<<< Exiting RepositoryBase(hostSettings={HostSettings})", hostSettings);
         }
 
         protected IHostSettings HostSettings { get; }
@@ -49,8 +54,10 @@ namespace DotNetNuke.Data
         /// <inheritdoc />
         public void Delete(T item)
         {
+			Logger.LogDebug(">>> Entering Delete(item={Item})", item);
             this.DeleteInternal(item);
             this.ClearCache(item);
+			Logger.LogDebug("<<< Exiting Delete(item={Item})", item);
         }
 
         /// <inheritdoc />
@@ -65,6 +72,8 @@ namespace DotNetNuke.Data
         /// <inheritdoc />
         public IEnumerable<T> Get()
         {
+			Logger.LogDebug(">>> Entering Get()");
+			Logger.LogDebug("<<< Exiting Get()");
             return this.IsCacheable && !this.IsScoped
                 ? DataCache.GetCachedData<IEnumerable<T>>(this.HostSettings, this.CacheArgs, _ => this.GetInternal())
                 : this.GetInternal();
@@ -88,9 +97,12 @@ namespace DotNetNuke.Data
         /// <inheritdoc />
         public T GetById<TProperty>(TProperty id)
         {
+			Logger.LogDebug(">>> Entering GetById(id={Id})", id);
             return this.IsCacheable && !this.IsScoped
                         ? this.Get().SingleOrDefault(t => this.CompareTo(this.GetPrimaryKey<TProperty>(t), id) == 0)
                         : this.GetByIdInternal(id);
+			Logger.LogDebug("<<< Exiting GetById(id={Id},scopeValue={ScopeValue})", id, scopeValue);
+						Logger.LogDebug("<<< Exiting GetById(id={Id})", id);
         }
 
         /// <inheritdoc />
@@ -104,6 +116,8 @@ namespace DotNetNuke.Data
         /// <inheritdoc />
         public IPagedList<T> GetPage(int pageIndex, int pageSize)
         {
+			Logger.LogDebug(">>> Entering GetPage(pageIndex={PageIndex},pageSize={PageSize})", pageIndex, pageSize);
+			Logger.LogDebug("<<< Exiting GetPage(pageIndex={PageIndex},pageSize={PageSize})", pageIndex, pageSize);
             return this.IsCacheable && !this.IsScoped
                 ? this.Get().InPagesOf(pageSize).GetPage(pageIndex)
                 : this.GetPageInternal(pageIndex, pageSize);
@@ -122,15 +136,19 @@ namespace DotNetNuke.Data
         /// <inheritdoc />
         public void Insert(T item)
         {
+			Logger.LogDebug(">>> Entering Insert(item={Item})", item);
             this.InsertInternal(item);
             this.ClearCache(item);
+			Logger.LogDebug("<<< Exiting Insert(item={Item})", item);
         }
 
         /// <inheritdoc />
         public void Update(T item)
         {
+			Logger.LogDebug(">>> Entering Update(item={Item})", item);
             this.UpdateInternal(item);
             this.ClearCache(item);
+			Logger.LogDebug("<<< Exiting Update(item={Item})", item);
         }
 
         /// <inheritdoc />
@@ -154,10 +172,12 @@ namespace DotNetNuke.Data
             {
                 this.CacheArgs = null;
             }
+			Logger.LogDebug("<<< Exiting Initialize(cacheKey={CacheKey},cacheTimeOut={CacheTimeOut},cachePriority={CachePriority},scope={Scope})", cacheKey, cacheTimeOut, cachePriority, scope);
         }
 
         protected int CompareTo<TProperty>(TProperty first, TProperty second)
         {
+			Logger.LogDebug(">>> Entering CompareTo(first={First},second={Second})", first, second);
             Requires.IsTypeOf<IComparable>("first", first);
             Requires.IsTypeOf<IComparable>("second", second);
 
@@ -165,6 +185,7 @@ namespace DotNetNuke.Data
             var secondComparable = second as IComparable;
 
             // ReSharper disable PossibleNullReferenceException
+			Logger.LogDebug("<<< Exiting CompareTo(first={First},second={Second})", first, second);
             return firstComparable.CompareTo(secondComparable);
 
             // ReSharper restore PossibleNullReferenceException
@@ -172,16 +193,22 @@ namespace DotNetNuke.Data
 
         protected TProperty GetPropertyValue<TProperty>(T item, string propertyName)
         {
+			Logger.LogDebug(">>> Entering GetPropertyValue(item={Item},propertyName={PropertyName})", item, propertyName);
+			Logger.LogDebug("<<< Exiting GetPropertyValue(item={Item},propertyName={PropertyName})", item, propertyName);
             return DataUtil.GetPropertyValue<T, TProperty>(item, propertyName);
         }
 
         protected TProperty GetPrimaryKey<TProperty>(T item)
         {
+			Logger.LogDebug(">>> Entering GetPrimaryKey(item={Item})", item);
+			Logger.LogDebug("<<< Exiting GetPrimaryKey(item={Item})", item);
             return DataUtil.GetPrimaryKey<T, TProperty>(item);
         }
 
         protected TProperty GetScopeValue<TProperty>(T item)
         {
+			Logger.LogDebug(">>> Entering GetScopeValue(item={Item})", item);
+			Logger.LogDebug("<<< Exiting GetScopeValue(item={Item})", item);
             return DataUtil.GetPropertyValue<T, TProperty>(item, this.Scope);
         }
 
@@ -203,31 +230,42 @@ namespace DotNetNuke.Data
 
         private void CheckIfScoped()
         {
+			Logger.LogDebug(">>> Entering CheckIfScoped()");
             if (!this.IsScoped)
             {
+				Logger.LogWarning("Throwing NotSupportedException from CheckIfScoped()");
+			Logger.LogDebug("<<< Exiting CheckIfScoped()");
                 throw new NotSupportedException("This method requires the model to be cacheable and have a cache scope defined");
             }
         }
 
         private void ClearCache(T item)
         {
+			Logger.LogDebug(">>> Entering ClearCache(item={Item})", item);
             if (this.IsCacheable)
             {
                 DataCache.RemoveCache(this.IsScoped
                                           ? string.Format(CultureInfo.InvariantCulture, this.CacheArgs.CacheKey, this.GetScopeValue<object>(item))
                                           : this.CacheArgs.CacheKey);
             }
+			Logger.LogDebug("<<< Exiting ClearCache(item={Item})", item);
         }
 
         private void InitializeInternal()
         {
+			Logger.LogDebug(">>> Entering InitializeInternal()");
             var type = typeof(T);
             this.Scope = string.Empty;
+			Logger.LogDebug("InitializeInternal(): this.Scope → {Arg0}", this.Scope);
+			Logger.LogDebug("InitializeInternal(): this.IsScoped → {Arg0}", this.IsScoped);
+			Logger.LogDebug("InitializeInternal(): this.CacheArgs → {Arg0}", this.CacheArgs);
             this.IsCacheable = false;
             this.IsScoped = false;
+			Logger.LogDebug("InitializeInternal(): this.IsCacheable → {Arg0}", this.IsCacheable);
             this.CacheArgs = null;
 
             var scopeAttribute = DataUtil.GetAttribute<ScopeAttribute>(type);
+			Logger.LogDebug("InitializeInternal(): scopeAttribute → {ScopeAttribute}", scopeAttribute);
             if (scopeAttribute != null)
             {
                 this.Scope = scopeAttribute.Scope;
@@ -235,7 +273,9 @@ namespace DotNetNuke.Data
 
             this.IsScoped = !string.IsNullOrEmpty(this.Scope);
 
+			Logger.LogDebug("InitializeInternal(): type → {Type}", type);
             var cacheableAttribute = DataUtil.GetAttribute<CacheableAttribute>(type);
+			Logger.LogDebug("InitializeInternal(): cacheableAttribute → {CacheableAttribute}", cacheableAttribute);
             if (cacheableAttribute != null)
             {
                 this.IsCacheable = true;
@@ -252,6 +292,7 @@ namespace DotNetNuke.Data
 
                 this.CacheArgs = new CacheItemArgs(cacheKey, cacheTimeOut, cachePriority);
             }
+			Logger.LogDebug("<<< Exiting InitializeInternal()");
         }
     }
 }

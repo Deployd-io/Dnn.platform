@@ -62,12 +62,17 @@ namespace DotNetNuke.Services.Mail
         /// <summary>Initializes a new instance of the <see cref="SendTokenizedBulkEmail"/> class.</summary>
         public SendTokenizedBulkEmail()
         {
+			Logger.LogDebug(">>> Entering SendTokenizedBulkEmail()");
             this.ReportRecipients = true;
             this.AddressMethod = AddressMethods.Send_TO;
+			Logger.LogDebug("SendTokenizedBulkEmail(): this.ReportRecipients → {Arg0}", this.ReportRecipients);
+			Logger.LogDebug("SendTokenizedBulkEmail(): this.AddressMethod → {Arg0}", this.AddressMethod);
             this.BodyFormat = MailFormat.Text;
             this.Subject = string.Empty;
             this.Priority = MailPriority.Normal;
+			Logger.LogDebug("SendTokenizedBulkEmail(): this.BodyFormat → {Arg0}", this.BodyFormat);
             this.Initialize();
+			Logger.LogDebug("<<< Exiting SendTokenizedBulkEmail()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="SendTokenizedBulkEmail"/> class.</summary>
@@ -222,13 +227,18 @@ namespace DotNetNuke.Services.Mail
         /// <remarks>if not called, values will be taken from host settings.</remarks>
         public bool SetSMTPServer(string smtpServer, string smtpAuthentication, string smtpUsername, string smtpPassword, bool smtpEnableSSL)
         {
+			Logger.LogDebug(">>> Entering SetSMTPServer(smtpServer={SmtpServer},smtpAuthentication={SmtpAuthentication},smtpUsername={SmtpUsername},smtpPassword=<redacted>,smtpEnableSSL={SmtpEnableSSL})", smtpServer, smtpAuthentication, smtpUsername, smtpEnableSSL);
             this.EnsureNotDisposed();
 
             this.smtpServer = smtpServer;
+			Logger.LogDebug("SetSMTPServer(smtpServer={SmtpServer},smtpAuthentication={SmtpAuthentication},smtpUsername={SmtpUsername},smtpPassword=<redacted>,smtpEnableSSL={SmtpEnableSSL}): this.smtpServer → {Arg5}", smtpServer, smtpAuthentication, smtpUsername, smtpEnableSSL, this.smtpServer);
             this.smtpAuthenticationMethod = smtpAuthentication;
             this.smtpUsername = smtpUsername;
+			Logger.LogDebug("SetSMTPServer(smtpServer={SmtpServer},smtpAuthentication={SmtpAuthentication},smtpUsername={SmtpUsername},smtpPassword=<redacted>,smtpEnableSSL={SmtpEnableSSL}): this.smtpAuthenticationMethod → {Arg5}", smtpServer, smtpAuthentication, smtpUsername, smtpEnableSSL, this.smtpAuthenticationMethod);
+			Logger.LogDebug("SetSMTPServer(smtpServer={SmtpServer},smtpAuthentication={SmtpAuthentication},smtpUsername={SmtpUsername},smtpPassword=<redacted>,smtpEnableSSL={SmtpEnableSSL}): this.smtpUsername → {Arg5}", smtpServer, smtpAuthentication, smtpUsername, smtpEnableSSL, this.smtpUsername);
             this.smtpPassword = smtpPassword;
             this.smtpEnableSSL = smtpEnableSSL;
+			Logger.LogDebug("<<< Exiting SetSMTPServer(smtpServer={SmtpServer},smtpAuthentication={SmtpAuthentication},smtpUsername={SmtpUsername},smtpPassword=<redacted>,smtpEnableSSL={SmtpEnableSSL})", smtpServer, smtpAuthentication, smtpUsername, smtpEnableSSL);
             return true;
         }
 
@@ -237,14 +247,18 @@ namespace DotNetNuke.Services.Mail
         /// <remarks>only local stored files can be added with a path.</remarks>
         public void AddAttachment(string localPath)
         {
+			Logger.LogDebug(">>> Entering AddAttachment(localPath={LocalPath})", localPath);
             this.EnsureNotDisposed();
             this.attachments.Add(new Attachment(localPath));
+			Logger.LogDebug("<<< Exiting AddAttachment(localPath={LocalPath})", localPath);
         }
 
         public void AddAttachment(Stream contentStream, ContentType contentType)
         {
+			Logger.LogDebug(">>> Entering AddAttachment(contentStream={ContentStream},contentType={ContentType})", contentStream, contentType);
             this.EnsureNotDisposed();
             this.attachments.Add(new Attachment(contentStream, contentType));
+			Logger.LogDebug("<<< Exiting AddAttachment(contentStream={ContentStream},contentType={ContentType})", contentStream, contentType);
         }
 
         /// <summary>Add a single recipient.</summary>
@@ -254,6 +268,7 @@ namespace DotNetNuke.Services.Mail
         {
             this.EnsureNotDisposed();
             this.addressedUsers.Add(recipient);
+			Logger.LogDebug("<<< Exiting AddAddressedUser(recipient={Recipient})", recipient);
         }
 
         /// <summary>Add all members of a role to recipient list.</summary>
@@ -261,8 +276,10 @@ namespace DotNetNuke.Services.Mail
         /// <remarks>emaiol will be used for addressing, other properties might be used for TokenReplace.</remarks>
         public void AddAddressedRole(string roleName)
         {
+			Logger.LogDebug(">>> Entering AddAddressedRole(roleName={RoleName})", roleName);
             this.EnsureNotDisposed();
             this.addressedRoles.Add(roleName);
+			Logger.LogDebug("<<< Exiting AddAddressedRole(roleName={RoleName})", roleName);
         }
 
         /// <summary>All bulk mail recipients, derived from role names and individual adressees. </summary>
@@ -270,21 +287,26 @@ namespace DotNetNuke.Services.Mail
         /// <remarks>user.Email used for sending, other properties might be used for TokenReplace.</remarks>
         public List<UserInfo> Recipients()
         {
+			Logger.LogDebug(">>> Entering Recipients()");
             this.EnsureNotDisposed();
 
             var userList = new List<UserInfo>();
+			Logger.LogDebug("Recipients(): userList → {UserList}", userList);
             var keyList = new List<string>();
+			Logger.LogDebug("Recipients(): keyList → {KeyList}", keyList);
 
             foreach (string roleName in this.addressedRoles)
             {
                 string role = roleName;
                 var roleInfo = RoleController.Instance.GetRole(this.portalSettings.PortalId, r => r.RoleName == role);
+				Logger.LogDebug("Recipients(): roleInfo → {RoleInfo}", roleInfo);
 
                 foreach (UserInfo objUser in RoleController.Instance.GetUsersByRole(this.portalSettings.PortalId, roleName))
                 {
                     UserInfo user = objUser;
                     ProfileController.GetUserProfile(ref user);
                     var userRole = RoleController.Instance.GetUserRole(this.portalSettings.PortalId, objUser.UserID, roleInfo.RoleID);
+					Logger.LogDebug("Recipients(): userRole → {UserRole}", userRole);
 
                     // only add if user role has not expired and effectivedate has been passed
                     if ((userRole.EffectiveDate <= DateTime.Now || Null.IsNull(userRole.EffectiveDate)) && (userRole.ExpiryDate >= DateTime.Now || Null.IsNull(userRole.ExpiryDate)))
@@ -299,6 +321,7 @@ namespace DotNetNuke.Services.Mail
                 this.ConditionallyAddUser(objUser, ref keyList, ref userList);
             }
 
+			Logger.LogDebug("<<< Exiting Recipients()");
             return userList;
         }
 
@@ -307,24 +330,29 @@ namespace DotNetNuke.Services.Mail
         /// <remarks>Detailed status report is sent by email to sending user.</remarks>
         public int SendMails()
         {
+			Logger.LogDebug(">>> Entering SendMails()");
             this.EnsureNotDisposed();
 
             int recipients = 0;
             int messagesSent = 0;
+			Logger.LogDebug("SendMails(): messagesSent → {MessagesSent}", messagesSent);
             int errors = 0;
 
             try
             {
                 // send to recipients
                 string body = this.body;
+				Logger.LogDebug("SendMails(): body → {Body}", body);
                 if (this.BodyFormat == MailFormat.Html)
                 {
                     // Add Base Href for any images inserted in to the email.
                     var host = this.PortalAlias.Contains("/") ? this.PortalAlias.Substring(0, this.PortalAlias.IndexOf('/')) : this.PortalAlias;
+					Logger.LogDebug("SendMails(): host → {Host}", host);
                     body = "<html><head><base href='http://" + host + "'><title>" + this.Subject + "</title></head><body>" + body + "</body></html>";
                 }
 
                 string subject = this.Subject;
+				Logger.LogDebug("SendMails(): subject → {Subject}", subject);
                 string startedAt = DateTime.Now.ToString(CultureInfo.InvariantCulture);
 
                 bool replaceTokens = !this.SuppressTokenReplace && (this.tokenReplace.ContainsTokens(this.Subject) || this.tokenReplace.ContainsTokens(this.body));
@@ -332,7 +360,9 @@ namespace DotNetNuke.Services.Mail
                 bool individualBody = false;
 
                 var mailErrors = new StringBuilder();
+				Logger.LogDebug("SendMails(): mailErrors → {MailErrors}", mailErrors);
                 var mailRecipients = new StringBuilder();
+				Logger.LogDebug("SendMails(): mailRecipients → {MailRecipients}", mailRecipients);
 
                 switch (this.AddressMethod)
                 {
@@ -408,6 +438,7 @@ namespace DotNetNuke.Services.Mail
                         break;
                     case AddressMethods.Send_BCC:
                         var distributionList = new StringBuilder();
+						Logger.LogDebug("SendMails(): distributionList → {DistributionList}", distributionList);
                         messagesSent = Null.NullInteger;
                         foreach (UserInfo user in this.Recipients())
                         {
@@ -423,6 +454,7 @@ namespace DotNetNuke.Services.Mail
                             {
                                 // no access to User properties possible!
                                 var tr = new TokenReplace(Scope.Configuration);
+								Logger.LogDebug("SendMails(): tr → {Tr}", tr);
                                 body = tr.ReplaceEnvironmentTokens(this.body);
                                 subject = tr.ReplaceEnvironmentTokens(this.Subject);
                             }
@@ -485,25 +517,31 @@ namespace DotNetNuke.Services.Mail
                 }
             }
 
+			Logger.LogDebug("<<< Exiting SendMails()");
             return messagesSent;
         }
 
         /// <summary>Wrapper for Function SendMails.</summary>
         public void Send()
         {
+			Logger.LogDebug(">>> Entering Send()");
             this.EnsureNotDisposed();
             this.SendMails();
+			Logger.LogDebug("<<< Exiting Send()");
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+			Logger.LogDebug(">>> Entering Dispose()");
             this.Dispose(true);
             GC.SuppressFinalize(this);
+			Logger.LogDebug("<<< Exiting Dispose()");
         }
 
         protected virtual void Dispose(bool disposing)
         {
+			Logger.LogDebug(">>> Entering Dispose(disposing={Disposing})", disposing);
             if (!this.isDisposed)
             {
                 if (disposing)
@@ -513,25 +551,31 @@ namespace DotNetNuke.Services.Mail
                     {
                         attachment.Dispose();
                         this.isDisposed = true;
+						Logger.LogDebug("Dispose(disposing={Disposing}): this.isDisposed → {Arg1}", disposing, this.isDisposed);
                     }
                 }
 
                 // get rid of unmanaged resources
             }
+			Logger.LogDebug("<<< Exiting Dispose(disposing={Disposing})", disposing);
         }
 
         /// <summary>internal method to initialize used objects, depending on parameters of construct method.</summary>
         private void Initialize()
         {
+			Logger.LogDebug(">>> Entering Initialize()");
             this.portalSettings = PortalController.Instance.GetCurrentSettings();
             this.PortalAlias = ((IPortalAliasInfo)PortalSettings.Current.PortalAlias).HttpAlias;
+			Logger.LogDebug("Initialize(): this.smtpEnableSSL → {Arg0}", this.smtpEnableSSL);
             this.SendingUser = (UserInfo)HttpContext.Current.Items["UserInfo"];
             this.tokenReplace = new TokenReplace();
+			Logger.LogDebug("Initialize(): tokenReplace → {TokenReplace}", tokenReplace);
             this.confirmBodyHTML = Localization.GetString("EMAIL_BulkMailConf_Html_Body", Localization.GlobalResourceFile, this.strSenderLanguage);
             this.confirmBodyText = Localization.GetString("EMAIL_BulkMailConf_Text_Body", Localization.GlobalResourceFile, this.strSenderLanguage);
             this.confirmSubject = Localization.GetString("EMAIL_BulkMailConf_Subject", Localization.GlobalResourceFile, this.strSenderLanguage);
             this.noError = Localization.GetString("NoErrorsSending", Localization.GlobalResourceFile, this.strSenderLanguage);
             this.smtpEnableSSL = Host.EnableSMTPSSL;
+			Logger.LogDebug("<<< Exiting Initialize()");
         }
 
         /// <summary>Send bulkmail confirmation to admin.</summary>
@@ -576,6 +620,7 @@ namespace DotNetNuke.Services.Mail
             var message = new Message { FromUserID = this.sendingUser.UserID, ToUserID = this.sendingUser.UserID, Subject = strSubject, Body = body, Status = MessageStatusType.Unread };
 
             Mail.SendEmail(this.sendingUser.Email, this.sendingUser.Email, message.Subject, message.Body);
+			Logger.LogDebug("<<< Exiting SendConfirmationMail(numRecipients={NumRecipients},numMessages={NumMessages},numErrors={NumErrors},subject={Subject},startedAt={StartedAt},mailErrors={MailErrors},recipientList={RecipientList})", numRecipients, numMessages, numErrors, subject, startedAt, mailErrors, recipientList);
         }
 
         /// <summary>check, if the user's language matches the current language filter.</summary>
@@ -584,6 +629,7 @@ namespace DotNetNuke.Services.Mail
         /// <remarks>if filter not set, true is returned.</remarks>
         private bool MatchLanguageFilter(string userLanguage)
         {
+			Logger.LogDebug(">>> Entering MatchLanguageFilter(userLanguage={UserLanguage})", userLanguage);
             if (this.LanguageFilter == null || this.LanguageFilter.Length == 0)
             {
                 return true;
@@ -594,6 +640,7 @@ namespace DotNetNuke.Services.Mail
                 userLanguage = this.portalSettings.DefaultLanguage;
             }
 
+			Logger.LogDebug("<<< Exiting MatchLanguageFilter(userLanguage={UserLanguage})", userLanguage);
             return this.LanguageFilter.Any(s => userLanguage.StartsWith(s, StringComparison.InvariantCultureIgnoreCase));
         }
 
@@ -622,15 +669,19 @@ namespace DotNetNuke.Services.Mail
                     keyList.Add(key);
                 }
             }
+			Logger.LogDebug("<<< Exiting ConditionallyAddUser(user={User},keyList={KeyList},userList={UserList})", user, keyList, userList);
         }
 
         private List<Attachment> LoadAttachments()
         {
+			Logger.LogDebug(">>> Entering LoadAttachments()");
             var attachments = new List<Attachment>();
             foreach (var attachment in this.attachments)
             {
+			Logger.LogDebug("LoadAttachments(): attachments → {Attachments}", attachments);
                 Attachment newAttachment;
                 MemoryStream memoryStream = null;
+				Logger.LogDebug("LoadAttachments(): memoryStream → {MemoryStream}", memoryStream);
                 var buffer = new byte[4096];
                 try
                 {
@@ -638,6 +689,7 @@ namespace DotNetNuke.Services.Mail
                     while (true)
                     {
                         var read = attachment.ContentStream.Read(buffer, 0, 4096);
+						Logger.LogDebug("LoadAttachments(): read → {Read}", read);
                         if (read <= 0)
                         {
                             break;
@@ -648,6 +700,7 @@ namespace DotNetNuke.Services.Mail
 
                     newAttachment = new Attachment(memoryStream, attachment.ContentType);
                     newAttachment.ContentStream.Position = 0;
+					Logger.LogDebug("LoadAttachments(): newAttachment → {NewAttachment}", newAttachment);
                     attachments.Add(newAttachment);
 
                     // reset original position
@@ -660,13 +713,17 @@ namespace DotNetNuke.Services.Mail
                 }
             }
 
+			Logger.LogDebug("<<< Exiting LoadAttachments()");
             return attachments;
         }
 
         private void EnsureNotDisposed()
         {
+			Logger.LogDebug(">>> Entering EnsureNotDisposed()");
             if (this.isDisposed)
             {
+				Logger.LogWarning("Throwing ObjectDisposedException from EnsureNotDisposed()");
+			Logger.LogDebug("<<< Exiting EnsureNotDisposed()");
                 throw new ObjectDisposedException("SharedDictionary");
             }
         }

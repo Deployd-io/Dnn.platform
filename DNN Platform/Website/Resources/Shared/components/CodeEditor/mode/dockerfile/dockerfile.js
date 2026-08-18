@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("../../addon/mode/simple"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -18,6 +20,7 @@
       instructionRegex = "(" + instructions.join('|') + ")",
       instructionOnlyLine = new RegExp(instructionRegex + "\\s*$", "i"),
       instructionWithArguments = new RegExp(instructionRegex + "(\\s+)", "i");
+	logger.debug(`function(exports=${exports}): instructions → ${instructions}`);
 
   CodeMirror.defineSimpleMode("dockerfile", {
     start: [
@@ -77,3 +80,4 @@
 
   CodeMirror.defineMIME("text/x-dockerfile", "dockerfile");
 });
+logger.debug(`<<< Exiting function(exports=${exports})`);
