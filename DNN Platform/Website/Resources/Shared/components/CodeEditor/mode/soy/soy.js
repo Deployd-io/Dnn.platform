@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("../htmlmixed/htmlmixed"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -14,8 +16,11 @@
   var indentingTags = ["template", "literal", "msg", "fallbackmsg", "let", "if", "elseif",
                        "else", "switch", "case", "default", "foreach", "ifempty", "for",
                        "call", "param", "deltemplate", "delcall", "log"];
+					logger.debug(`function(exports=${exports}): indentingTags → ${indentingTags}`);
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
   CodeMirror.defineMode("soy", function(config) {
+	logger.debug('>>> Entering defineMode()');
     var textMode = CodeMirror.getMode(config, "text/plain");
     var modes = {
       html: CodeMirror.getMode(config, {name: "text/html", multilineTagIndentFactor: 2, multilineTagIndentPastTag: false}),
@@ -26,27 +31,36 @@
       js: CodeMirror.getMode(config, {name: "text/javascript", statementIndent: 2 * config.indentUnit})
     };
 
+	logger.debug(`defineMode(): textMode → ${textMode}`);
     function last(array) {
+	logger.debug(`>>> Entering last(array=${array})`);
+	logger.debug(`<<< Exiting last(array=${array})`);
       return array[array.length - 1];
     }
 
     function tokenUntil(stream, state, untilRegExp) {
+	logger.debug(`>>> Entering tokenUntil(stream=${stream},state=${state},untilRegExp=${untilRegExp})`);
       var oldString = stream.string;
       var match = untilRegExp.exec(oldString.substr(stream.pos));
+	logger.debug(`tokenUntil(stream=${stream},state=${state},untilRegExp=${untilRegExp}): match → ${match}`);
       if (match) {
         // We don't use backUp because it backs up just the position, not the state.
         // This uses an undocumented API.
         stream.string = oldString.substr(0, stream.pos + match.index);
       }
       var result = stream.hideFirstChars(state.indent, function() {
+		logger.debug('>>> Entering hideFirstChars()');
+		logger.debug('<<< Exiting hideFirstChars()');
         return state.localMode.token(stream, state.localState);
       });
       stream.string = oldString;
+	logger.debug(`<<< Exiting tokenUntil(stream=${stream},state=${state},untilRegExp=${untilRegExp})`);
       return result;
     }
 
     return {
       startState: function() {
+		logger.debug('>>> Entering startState()');
         return {
           kind: [],
           kindTag: [],
@@ -55,9 +69,11 @@
           localMode: modes.html,
           localState: CodeMirror.startState(modes.html)
         };
+		logger.debug('<<< Exiting startState()');
       },
 
       copyState: function(state) {
+		logger.debug(`>>> Entering copyState(state=${state})`);
         return {
           tag: state.tag, // Last seen Soy tag.
           kind: state.kind.concat([]), // Values of kind="" attributes.
@@ -67,9 +83,11 @@
           localMode: state.localMode,
           localState: CodeMirror.copyState(state.localMode, state.localState)
         };
+		logger.debug(`<<< Exiting copyState(state=${state})`);
       },
 
       token: function(stream, state) {
+		logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
         var match;
 
         switch (last(state.soyState)) {
@@ -85,6 +103,7 @@
             if (stream.match(/^}/)) {
               state.indent -= 2 * config.indentUnit;
               state.soyState.pop();
+			logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
               return "variable-2";
             }
             stream.next();
@@ -126,6 +145,7 @@
             } else {
               stream.skipToEnd();
             }
+			logger.debug('<<< Exiting defineMode()');
             return "string";
         }
 
@@ -161,6 +181,7 @@
       },
 
       indent: function(state, textAfter) {
+		logger.debug(`>>> Entering indent(state=${state},textAfter=${textAfter})`);
         var indent = state.indent, top = last(state.soyState);
         if (top == "comment") return CodeMirror.Pass;
 
@@ -174,12 +195,15 @@
         }
         if (indent && state.localMode.indent)
           indent += state.localMode.indent(state.localState, textAfter);
+		logger.debug(`<<< Exiting indent(state=${state},textAfter=${textAfter})`);
         return indent;
       },
 
       innerMode: function(state) {
+		logger.debug(`>>> Entering innerMode(state=${state})`);
         if (state.soyState.length && last(state.soyState) != "literal") return null;
         else return {state: state.localState, mode: state.localMode};
+		logger.debug(`<<< Exiting innerMode(state=${state})`);
       },
 
       electricInput: /^\s*\{(\/|\/template|\/deltemplate|\/switch|fallbackmsg|elseif|else|case|default|ifempty|\/literal\})$/,

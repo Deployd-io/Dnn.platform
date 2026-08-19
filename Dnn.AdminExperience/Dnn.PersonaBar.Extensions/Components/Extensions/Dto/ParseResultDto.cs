@@ -18,6 +18,8 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
     {
         public ParseResultDto()
         {
+		eventLogger.LogDebug(">>> Entering ParseResultDto()");
+		eventLogger.LogDebug("<<< Exiting ParseResultDto()");
         }
 
         public ParseResultDto(PackageInfo package)
@@ -57,18 +59,27 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
 
         public void Failed(string message, IList<LogEntry> logs = null)
         {
+			eventLogger.LogDebug(">>> Entering Failed(message={Message},logs={Logs})", message, logs);
             this.Success = false;
             this.Message = Localization.GetString(message, Constants.SharedResources) ?? message;
+			eventLogger.LogDebug("Failed(message={Message},logs={Logs}): this.Success → {Arg2}", message, logs, this.Success);
             this.AddLogs(logs);
 
             // UI devs asked for these to be non-null empty for moving to next step
             this.Description = this.Description ?? string.Empty;
+			eventLogger.LogDebug("Failed(message={Message},logs={Logs}): this.Description → {Arg2}", message, logs, this.Description);
             this.Email = this.Email ?? string.Empty;
             this.FriendlyName = this.FriendlyName ?? string.Empty;
+			eventLogger.LogDebug("Failed(message={Message},logs={Logs}): this.Email → {Arg2}", message, logs, this.Email);
+			eventLogger.LogDebug("Failed(message={Message},logs={Logs}): this.FriendlyName → {Arg2}", message, logs, this.FriendlyName);
             this.IsInUse = this.IsInUse ?? string.Empty;
             this.License = this.License ?? string.Empty;
             this.Name = this.Name ?? string.Empty;
             this.Organization = this.Organization ?? string.Empty;
+			eventLogger.LogDebug("Failed(message={Message},logs={Logs}): this.IsInUse → {Arg2}", message, logs, this.IsInUse);
+			eventLogger.LogDebug("Failed(message={Message},logs={Logs}): this.License → {Arg2}", message, logs, this.License);
+			eventLogger.LogDebug("Failed(message={Message},logs={Logs}): this.Name → {Arg2}", message, logs, this.Name);
+			eventLogger.LogDebug("Failed(message={Message},logs={Logs}): this.Organization → {Arg2}", message, logs, this.Organization);
             this.Owner = this.Owner ?? string.Empty;
             this.PackageIcon = this.PackageIcon ?? string.Empty;
             this.PackageType = this.PackageType ?? string.Empty;
@@ -77,21 +88,28 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
             this.UpgradeIndicator = this.UpgradeIndicator ?? string.Empty;
             this.UpgradeUrl = this.UpgradeUrl ?? string.Empty;
             this.Url = this.Url ?? string.Empty;
+			eventLogger.LogDebug("Failed(message={Message},logs={Logs}): this.Owner → {Arg2}", message, logs, this.Owner);
+			eventLogger.LogDebug("Failed(message={Message},logs={Logs}): this.PackageIcon → {Arg2}", message, logs, this.PackageIcon);
+			eventLogger.LogDebug("Failed(message={Message},logs={Logs}): this.PackageType → {Arg2}", message, logs, this.PackageType);
             this.Version = this.Version ?? string.Empty;
 
             this.LegacyError = this.LegacyError ?? string.Empty;
             this.Message = this.Message ?? string.Empty;
+			eventLogger.LogDebug("<<< Exiting Failed(message={Message},logs={Logs})", message, logs);
         }
 
         public void Succeed(IList<LogEntry> logs)
         {
+			eventLogger.LogDebug(">>> Entering Succeed(logs={Logs})", logs);
             this.Success = true;
             this.Message = string.Empty;
             this.AddLogs(logs);
+			eventLogger.LogDebug("<<< Exiting Succeed(logs={Logs})", logs);
         }
 
         public void AddLogs(IEnumerable<LogEntry> logs)
         {
+			eventLogger.LogDebug(">>> Entering AddLogs(logs={Logs})", logs);
             if (logs == null)
             {
                 this.Logs = new List<InstallerLogEntry>();
@@ -100,6 +118,7 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto
             {
                 this.Logs = logs.Select(l => new InstallerLogEntry { Type = l.Type.ToString(), Description = l.Description }).ToList();
             }
+			eventLogger.LogDebug("<<< Exiting AddLogs(logs={Logs})", logs);
         }
     }
 }

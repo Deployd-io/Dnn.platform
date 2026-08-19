@@ -2,11 +2,14 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import { SingleLineInputWithError } from "@dnnsoftware/dnn-react-common";
 import Localization from "../../../localization";
+const logger = console;
 
 class PageNameInput extends Component {
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
+		logger.debug('<<< Exiting render()');
         return <div> 
             <SingleLineInputWithError
                 label={Localization.get("Name") + "*"}

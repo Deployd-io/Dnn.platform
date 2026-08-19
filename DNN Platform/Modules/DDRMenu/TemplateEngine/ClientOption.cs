@@ -13,12 +13,17 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
     {
         public ClientOption()
         {
+		eventLogger.LogDebug(">>> Entering ClientOption()");
+		eventLogger.LogDebug("<<< Exiting ClientOption()");
         }
 
         public ClientOption(string name, string value)
         {
+			eventLogger.LogDebug(">>> Entering ClientOption(name={Name},value={Value})", name, value);
             this.Name = name;
             this.Value = value;
+			eventLogger.LogDebug("ClientOption(name={Name},value={Value}): this.Name → {Arg2}", name, value, this.Name);
+			eventLogger.LogDebug("<<< Exiting ClientOption(name={Name},value={Value})", name, value);
         }
 
         public string Name { get; set; }

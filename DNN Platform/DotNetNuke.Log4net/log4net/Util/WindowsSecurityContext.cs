@@ -80,6 +80,8 @@ namespace log4net.Util
         /// </remarks>
         public WindowsSecurityContext()
         {
+		value.LogDebug(">>> Entering WindowsSecurityContext()");
+		value.LogDebug("<<< Exiting WindowsSecurityContext()");
         }
 
         /// <summary>Gets or sets the impersonation mode for this security context</summary>
@@ -187,10 +189,12 @@ namespace log4net.Util
         /// <see cref="DomainName" /> or <see cref="Password" /> properties were not specified.</exception>
         public void ActivateOptions()
         {
+			value.LogDebug(">>> Entering ActivateOptions()");
             if (this.m_impersonationMode == ImpersonationMode.User)
             {
                 if (this.m_userName == null)
                 {
+					value.LogWarning("Throwing ArgumentNullException from ActivateOptions()");
                     throw new ArgumentNullException("m_userName");
                 }
 
@@ -205,7 +209,9 @@ namespace log4net.Util
                 }
 
                 this.m_identity = LogonUser(this.m_userName, this.m_domainName, this.m_password);
+				value.LogDebug("ActivateOptions(): m_identity → {M_identity}", m_identity);
             }
+			value.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>Impersonate the Windows account specified by the <see cref="UserName"/> and <see cref="DomainName"/> properties.</summary>
@@ -222,6 +228,7 @@ namespace log4net.Util
         /// </remarks>
         public override IDisposable Impersonate(object state)
         {
+			value.LogDebug(">>> Entering Impersonate(state={State})", state);
             if (this.m_impersonationMode == ImpersonationMode.User)
             {
                 if (this.m_identity != null)
@@ -232,6 +239,7 @@ namespace log4net.Util
             else if (this.m_impersonationMode == ImpersonationMode.Process)
             {
                 // Impersonate(0) will revert to the process credentials
+			value.LogDebug("<<< Exiting Impersonate(state={State})", state);
                 return new DisposableImpersonationContext(WindowsIdentity.Impersonate(IntPtr.Zero));
             }
             return null;
@@ -254,6 +262,7 @@ namespace log4net.Util
         [SecurityPermission(SecurityAction.Demand, UnmanagedCode = true)]
         private static WindowsIdentity LogonUser(string userName, string domainName, string password)
         {
+			value.LogDebug(">>> Entering LogonUser(userName={UserName},domainName={DomainName},password=<redacted>)", userName, domainName);
             const int LOGON32_PROVIDER_DEFAULT = 0;
             //This parameter causes LogonUser to create a primary token.
             const int LOGON32_LOGON_INTERACTIVE = 2;
@@ -263,6 +272,8 @@ namespace log4net.Util
             if(!LogonUser(userName, domainName, password, LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, ref tokenHandle))
             {
                 NativeError error = NativeError.GetLastError();
+				value.LogWarning("Throwing Exception from LogonUser(userName={UserName},domainName={DomainName},password=<redacted>)", userName, domainName);
+				value.LogDebug("LogonUser(userName={UserName},domainName={DomainName},password=<redacted>): error → {Error}", userName, domainName, error);
                 throw new Exception("Failed to LogonUser ["+userName+"] in Domain ["+domainName+"]. Error: "+ error.ToString());
             }
 
@@ -279,6 +290,7 @@ namespace log4net.Util
             }
 
             WindowsIdentity identity = new WindowsIdentity(dupeTokenHandle);
+			value.LogDebug("LogonUser(userName={UserName},domainName={DomainName},password=<redacted>): identity → {Identity}", userName, domainName, identity);
 
             // Free the tokens.
             if (dupeTokenHandle != IntPtr.Zero) 
@@ -290,6 +302,7 @@ namespace log4net.Util
                 CloseHandle(tokenHandle);
             }
 
+			value.LogDebug("<<< Exiting LogonUser(userName={UserName},domainName={DomainName},password=<redacted>)", userName, domainName);
             return identity;
         }
 
@@ -322,7 +335,11 @@ namespace log4net.Util
             /// </remarks>
             public DisposableImpersonationContext(WindowsImpersonationContext impersonationContext)
             {
+				value.LogDebug(">>> Entering DisposableImpersonationContext(impersonationContext={ImpersonationContext})", impersonationContext);
                 this.m_impersonationContext = impersonationContext;
+				value.LogDebug("DisposableImpersonationContext(impersonationContext={ImpersonationContext}): m_impersonationContext → {M_impersonationContext}", impersonationContext, m_impersonationContext);
+				value.LogDebug("DisposableImpersonationContext(impersonationContext={ImpersonationContext}): this.m_impersonationContext → {Arg1}", impersonationContext, this.m_impersonationContext);
+				value.LogDebug("<<< Exiting DisposableImpersonationContext(impersonationContext={ImpersonationContext})", impersonationContext);
             }
 
             /// <summary>Revert the impersonation</summary>
@@ -333,7 +350,9 @@ namespace log4net.Util
             /// </remarks>
             public void Dispose()
             {
+				value.LogDebug(">>> Entering Dispose()");
                 this.m_impersonationContext.Undo();
+				value.LogDebug("<<< Exiting Dispose()");
             }
         }
     }

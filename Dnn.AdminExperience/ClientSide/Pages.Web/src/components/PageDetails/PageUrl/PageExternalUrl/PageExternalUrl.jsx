@@ -5,17 +5,22 @@ import styles from "./style.module.less";
 import { SingleLineInputWithError, InputGroup } from "@dnnsoftware/dnn-react-common";
 import Localization from "../../../../localization";
 import PageUrlCommons from "../PageUrlCommons/PageUrlCommons";
+const logger = console;
 
 class PageExternalUrl extends Component {
 
     onChangeField(key, event) {
+		logger.debug(`>>> Entering onChangeField(key=${key},event=${event})`);
         const {onChangeField} = this.props;
         onChangeField(key, event.target.value);
+		logger.debug(`<<< Exiting onChangeField(key=${key},event=${event})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {page} = this.props;
         
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.pageExternalUrl}>
                 <InputGroup>
@@ -40,6 +45,8 @@ PageExternalUrl.propTypes = {
 };
 
 const mapStateToProps = (state) => {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return ({page : state.pages.selectedPage});
 };
 

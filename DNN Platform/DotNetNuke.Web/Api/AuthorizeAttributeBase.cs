@@ -14,11 +14,14 @@ namespace DotNetNuke.Web.Api
     /// <summary>Provides Dnn specific details for authorization filter.</summary>
     public abstract class AuthorizeAttributeBase : AuthorizationFilterAttribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AuthorizeAttributeBase));
         /// <summary>Checks if the <see cref="AllowAnonymousAttribute"/> is present.</summary>
         /// <param name="actionContext">The HTTP action context.</param>
         /// <returns>A value indicating whether the <see cref="AllowAnonymousAttribute"/> is present.</returns>
         public static bool IsAnonymousAttributePresent(HttpActionContext actionContext)
         {
+			Logger.LogDebug(">>> Entering IsAnonymousAttributePresent(actionContext={ActionContext})", actionContext);
+			Logger.LogDebug("<<< Exiting IsAnonymousAttributePresent(actionContext={ActionContext})", actionContext);
             return actionContext.ActionDescriptor.GetCustomAttributes<AllowAnonymousAttribute>().Count != 0
                    || (actionContext.ControllerContext.ControllerDescriptor.GetCustomAttributes<AllowAnonymousAttribute>().Count != 0
                          && actionContext.ActionDescriptor.GetCustomAttributes<AuthorizeAttributeBase>().All(t => t is SupportedModulesAttribute));
@@ -33,6 +36,7 @@ namespace DotNetNuke.Web.Api
         /// <param name="actionContext">The HTTP action context.</param>
         public override void OnAuthorization(HttpActionContext actionContext)
         {
+			Logger.LogDebug(">>> Entering OnAuthorization(actionContext={ActionContext})", actionContext);
             Requires.NotNull("actionContext", actionContext);
 
             if (this.SkipAuthorization(actionContext))
@@ -42,10 +46,12 @@ namespace DotNetNuke.Web.Api
 
             const string failureMessage = "Authorization has been denied for this request.";
             var authFilterContext = new AuthFilterContext(actionContext, failureMessage);
+			Logger.LogDebug("OnAuthorization(actionContext={ActionContext}): authFilterContext → {AuthFilterContext}", actionContext, authFilterContext);
             if (!this.IsAuthorized(authFilterContext))
             {
                 authFilterContext.HandleUnauthorizedRequest();
             }
+			Logger.LogDebug("<<< Exiting OnAuthorization(actionContext={ActionContext})", actionContext);
         }
 
         /// <summary>Skips this authorization step if anonymous attribute is applied, override if auth should never be skipped, or other conditions are required.</summary>
@@ -53,6 +59,8 @@ namespace DotNetNuke.Web.Api
         /// <returns>A value indicating whether to skip the authorization.</returns>
         protected virtual bool SkipAuthorization(HttpActionContext actionContext)
         {
+			Logger.LogDebug(">>> Entering SkipAuthorization(actionContext={ActionContext})", actionContext);
+			Logger.LogDebug("<<< Exiting SkipAuthorization(actionContext={ActionContext})", actionContext);
             return IsAnonymousAttributePresent(actionContext);
         }
     }

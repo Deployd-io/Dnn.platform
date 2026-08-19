@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+const logger = console;
 
 const getStyle = (url) => ({
     position: "relative",
@@ -37,6 +38,7 @@ const overlayStyle = {
 };
 
 function Flag({ culture = "", onClick, title }) {
+	logger.debug(`>>> Entering Flag(culture=${culture},onClick=${onClick},title=${title})`);
     const [flagUrl, setFlagUrl] = useState(undefined);
     const [isFallback, setIsFallback] = useState(false);
 
@@ -55,6 +57,8 @@ function Flag({ culture = "", onClick, title }) {
         }
     }, [culture]);
 
+	logger.error(`Exception in Flag(culture=${culture},onClick=${onClick},title=${title}): (no error binding)`);
+	logger.debug(`<<< Exiting Flag(culture=${culture},onClick=${onClick},title=${title})`);
     return (
         <div onClick={onClick} title={title} style={getStyle(flagUrl)}>
             {isFallback && culture ? <div style={overlayStyle}>{culture}</div> : null}

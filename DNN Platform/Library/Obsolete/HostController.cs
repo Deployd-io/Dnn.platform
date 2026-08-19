@@ -24,6 +24,7 @@ namespace DotNetNuke.Entities.Controllers
     public partial class HostController : ComponentBase<IHostController, HostController>, IHostController
 #pragma warning restore CS0618 // Type or member is obsolete
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HostController));
         [Obsolete("Deprecated in DotNetNuke 9.7.1. Use DotNetNuke.Abstractions.IHostSettingsService instead. Scheduled removal in v11.0.0.")]
         public static new IHostController Instance
         {

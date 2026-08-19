@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -12,6 +14,7 @@
 "use strict";
 
 CodeMirror.defineMode("diff", function() {
+logger.debug('>>> Entering defineMode()');
 
   var TOKEN_NAMES = {
     '+': 'positive',
@@ -21,9 +24,11 @@ CodeMirror.defineMode("diff", function() {
 
   return {
     token: function(stream) {
+	logger.debug(`>>> Entering token(stream=${stream})`);
       var tw_pos = stream.string.search(/[\t ]+?$/);
 
       if (!stream.sol() || tw_pos === 0) {
+		logger.debug(`token(stream=${stream}): tw_pos → ${tw_pos}`);
         stream.skipToEnd();
         return ("error " + (
           TOKEN_NAMES[stream.string.charAt(0)] || '')).replace(/ $/, '');
@@ -35,13 +40,18 @@ CodeMirror.defineMode("diff", function() {
         stream.skipToEnd();
       } else {
         stream.pos = tw_pos;
+		logger.debug(`function(exports=${exports}): stream.pos → ${stream.pos}`);
       }
 
+	logger.debug(`token(stream=${stream}): stream.pos → ${stream.pos}`);
+	logger.debug(`<<< Exiting token(stream=${stream})`);
       return token_name;
     }
   };
 });
+logger.debug('<<< Exiting defineMode()');
 
 CodeMirror.defineMIME("text/x-diff", "diff");
 
 });
+logger.debug(`<<< Exiting function(exports=${exports})`);

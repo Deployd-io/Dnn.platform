@@ -18,6 +18,7 @@ namespace DotNetNuke.Web.Mvc.Common
     public class DesktopModuleControllerAdapter(IHostSettings hostSettings)
         : ServiceLocator<IDesktopModuleController, DesktopModuleControllerAdapter>, IDesktopModuleController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DesktopModuleControllerAdapter));
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
 
         /// <summary>Initializes a new instance of the <see cref="DesktopModuleControllerAdapter"/> class.</summary>
@@ -25,17 +26,23 @@ namespace DotNetNuke.Web.Mvc.Common
         public DesktopModuleControllerAdapter()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering DesktopModuleControllerAdapter()");
         }
+		Logger.LogDebug("<<< Exiting DesktopModuleControllerAdapter()");
 
         /// <inheritdoc />
         public DesktopModuleInfo GetDesktopModule(int desktopModuleId, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetDesktopModule(desktopModuleId={DesktopModuleId},portalId={PortalId})", desktopModuleId, portalId);
+			Logger.LogDebug("<<< Exiting GetDesktopModule(desktopModuleId={DesktopModuleId},portalId={PortalId})", desktopModuleId, portalId);
             return Entities.Modules.DesktopModuleController.GetDesktopModule(this.hostSettings, desktopModuleId, portalId);
         }
 
         /// <inheritdoc />
         protected override Func<IDesktopModuleController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => Globals.GetCurrentServiceProvider().GetRequiredService<IDesktopModuleController>();
         }
     }

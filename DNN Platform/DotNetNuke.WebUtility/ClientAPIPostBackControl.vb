@@ -3,6 +3,7 @@
 
 Imports System.Diagnostics.CodeAnalysis
 Imports System.Web.UI
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.Utilities
 
@@ -23,6 +24,7 @@ Namespace DotNetNuke.UI.Utilities
     ''' </history>
     ''' -----------------------------------------------------------------------------
     Public Class ClientAPIPostBackControl : Inherits Control : Implements IPostBackEventHandler
+		Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
         Delegate Sub PostBackEvent(ByVal Args As ClientAPIPostBackEventArgs)
         Private m_oEventHandlers As Hashtable = New Hashtable
 
@@ -61,11 +63,13 @@ Namespace DotNetNuke.UI.Utilities
         ''' </history>
         ''' -----------------------------------------------------------------------------
         Public Sub AddEventHandler(ByVal strEventName As String, ByVal objDelegate As PostBackEvent)
+			_logger.LogDebug(">>> Entering AddEventHandler(strEventName={StrEventName},objDelegate={ObjDelegate})", strEventName, objDelegate)
             If m_oEventHandlers.Contains(strEventName) = False Then
                 m_oEventHandlers.Add(strEventName, objDelegate)
             Else
                 m_oEventHandlers(strEventName) = CType(System.Delegate.Combine(CType(m_oEventHandlers(strEventName), ClientAPIPostBackControl.PostBackEvent), objDelegate), ClientAPIPostBackControl.PostBackEvent)
             End If
+			_logger.LogDebug("<<< Exiting AddEventHandler(strEventName={StrEventName},objDelegate={ObjDelegate})", strEventName, objDelegate)
         End Sub
 
         ''' -----------------------------------------------------------------------------

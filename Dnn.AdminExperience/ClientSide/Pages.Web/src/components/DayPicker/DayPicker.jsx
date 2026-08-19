@@ -2,9 +2,12 @@ import React from "react";
 import PropTypes from "prop-types";
 import Picker from "react-day-picker";
 import "./style.less";
+const logger = console;
 
 
 const DayPicker = (newProps) => {
+	logger.debug(`>>> Entering DayPicker(newProps=${newProps})`);
+	logger.debug(`<<< Exiting DayPicker(newProps=${newProps})`);
     return (
         <div className="dnn-day-picker">
             <Picker {...newProps} />

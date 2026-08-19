@@ -13,10 +13,14 @@ namespace DotNetNuke.Services.Log.EventLog
     [Serializable]
     public class LogDetailInfo : ILogDetailInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LogDetailInfo));
         /// <summary>Initializes a new instance of the <see cref="LogDetailInfo"/> class.</summary>
         public LogDetailInfo()
             : this(string.Empty, string.Empty)
         {
+		Logger.LogDebug(">>> Entering LogDetailInfo()");
+		Logger.LogDebug("<<< Exiting LogDetailInfo()");
+		Logger.LogDebug(">>> Entering LogDetailInfo(name={Name},value={Value})", name, value);
         }
 
         /// <summary>Initializes a new instance of the <see cref="LogDetailInfo"/> class.</summary>
@@ -26,6 +30,8 @@ namespace DotNetNuke.Services.Log.EventLog
         {
             this.PropertyName = name;
             this.PropertyValue = value;
+			Logger.LogDebug("LogDetailInfo(name={Name},value={Value}): this.PropertyName → {Arg2}", name, value, this.PropertyName);
+			Logger.LogDebug("<<< Exiting LogDetailInfo(name={Name},value={Value})", name, value);
         }
 
         /// <inheritdoc />
@@ -36,6 +42,7 @@ namespace DotNetNuke.Services.Log.EventLog
 
         public void ReadXml(XmlReader reader)
         {
+			Logger.LogDebug(">>> Entering ReadXml(reader={Reader})", reader);
             reader.ReadStartElement("PropertyName");
             this.PropertyName = reader.ReadString();
             reader.ReadEndElement();
@@ -49,26 +56,32 @@ namespace DotNetNuke.Services.Log.EventLog
             {
                 reader.Read();
             }
+			Logger.LogDebug("<<< Exiting ReadXml(reader={Reader})", reader);
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
+			Logger.LogDebug(">>> Entering ToString()");
             var sb = new StringBuilder();
             sb.Append("<p><strong>");
+			Logger.LogDebug("ToString(): sb → {Sb}", sb);
             sb.Append(this.PropertyName);
             sb.Append("</strong>: ");
             sb.Append(this.PropertyValue);
             sb.Append("</p>");
+			Logger.LogDebug("<<< Exiting ToString()");
             return sb.ToString();
         }
 
         public void WriteXml(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteXml(writer={Writer})", writer);
             writer.WriteStartElement("LogProperty");
             writer.WriteElementString("PropertyName", this.PropertyName);
             writer.WriteElementString("PropertyValue", this.PropertyValue);
             writer.WriteEndElement();
+			Logger.LogDebug("<<< Exiting WriteXml(writer={Writer})", writer);
         }
     }
 }

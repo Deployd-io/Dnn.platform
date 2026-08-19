@@ -3,11 +3,14 @@
 
 Imports System
 Imports System.Web.UI
+Imports Microsoft.Extensions.Logging
+Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
 
 Namespace DotNetNuke.UI.WebControls
     Friend Interface IMenuNodeWriter
         ' Methods
         Sub RenderNode(ByVal writer As HtmlTextWriter, ByVal Node As MenuNode)
+		_logger.LogDebug(">>> Entering RenderNode(writer={Writer},Node={Node})", writer, Node)
     End Interface
 End Namespace
 

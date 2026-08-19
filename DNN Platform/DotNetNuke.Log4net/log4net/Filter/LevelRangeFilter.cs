@@ -54,6 +54,8 @@ namespace log4net.Filter
         /// <summary>Default constructor</summary>
         public LevelRangeFilter()
         {
+		log.DebugFormat(">>> Entering LevelRangeFilter()");
+		log.DebugFormat("<<< Exiting LevelRangeFilter()");
         }
 
         /// <summary><see cref="FilterDecision.Accept"/> when matching <see cref="LevelMin"/> and <see cref="LevelMax"/></summary>
@@ -117,8 +119,10 @@ namespace log4net.Filter
         /// </remarks>
         public override FilterDecision Decide(LoggingEvent loggingEvent) 
         {
+			log.DebugFormat(">>> Entering Decide(loggingEvent={0})", loggingEvent);
             if (loggingEvent == null)
             {
+				log.WarnFormat("Throwing ArgumentNullException from Decide(loggingEvent={0})", loggingEvent);
                 throw new ArgumentNullException("loggingEvent");
             }
 
@@ -149,6 +153,7 @@ namespace log4net.Filter
             else 
             {
                 // event is ok for this filter; allow later filters to have a look..
+				log.DebugFormat("<<< Exiting Decide(loggingEvent={0})", loggingEvent);
                 return FilterDecision.Neutral;
             }
         }

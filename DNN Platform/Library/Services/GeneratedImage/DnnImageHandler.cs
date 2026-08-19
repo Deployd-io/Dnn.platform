@@ -33,6 +33,7 @@ namespace DotNetNuke.Services.GeneratedImage
     /// <summary>An <see cref="IHttpHandler"/> for serving images.</summary>
     public class DnnImageHandler : ImageHandler
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnImageHandler));
         /// <summary>
         /// Allow list of server folders where the system allow the dnn image handler to
         /// read to serve image files from it and its subfolders.
@@ -54,8 +55,10 @@ namespace DotNetNuke.Services.GeneratedImage
         public DnnImageHandler()
             : this(Globals.GetCurrentServiceProvider(), null, null)
         {
+		Logger.LogDebug(">>> Entering DnnImageHandler()");
         }
 
+		Logger.LogDebug("<<< Exiting DnnImageHandler()");
         /// <summary>Initializes a new instance of the <see cref="DnnImageHandler"/> class.</summary>
         /// <param name="serviceProvider">The DI container.</param>
         /// <param name="appStatus">The application status.</param>
@@ -63,6 +66,11 @@ namespace DotNetNuke.Services.GeneratedImage
         public DnnImageHandler(IServiceProvider serviceProvider, IApplicationStatusInfo appStatus)
             : this(serviceProvider, appStatus, null)
         {
+		Logger.LogDebug(">>> Entering DnnImageHandler(serviceProvider={ServiceProvider},appStatus={AppStatus})", serviceProvider, appStatus);
+		Logger.LogDebug("<<< Exiting DnnImageHandler(serviceProvider={ServiceProvider},appStatus={AppStatus})", serviceProvider, appStatus);
+		Logger.LogDebug("DnnImageHandler(serviceProvider={ServiceProvider},appStatus={AppStatus},portalAliasService={PortalAliasService}): appStatus → {AppStatus1}", serviceProvider, appStatus, portalAliasService, appStatus);
+		Logger.LogDebug("DnnImageHandler(serviceProvider={ServiceProvider},appStatus={AppStatus},portalAliasService={PortalAliasService}): portalAliasService → {PortalAliasService1}", serviceProvider, appStatus, portalAliasService, portalAliasService);
+		Logger.LogDebug("DnnImageHandler(serviceProvider={ServiceProvider},appStatus={AppStatus},portalAliasService={PortalAliasService}): serviceProvider → {ServiceProvider1}", serviceProvider, appStatus, portalAliasService, serviceProvider);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnImageHandler"/> class.</summary>
@@ -73,16 +81,23 @@ namespace DotNetNuke.Services.GeneratedImage
         {
             this.serviceProvider = serviceProvider;
             this.appStatus = appStatus ?? serviceProvider.GetRequiredService<IApplicationStatusInfo>();
+			Logger.LogDebug("DnnImageHandler(serviceProvider={ServiceProvider},appStatus={AppStatus},portalAliasService={PortalAliasService}): this.serviceProvider → {Arg3}", serviceProvider, appStatus, portalAliasService, this.serviceProvider);
             this.portalAliasService = portalAliasService ?? serviceProvider.GetRequiredService<IPortalAliasService>();
 
             // Set default settings here
             this.EnableClientCache = true;
+			Logger.LogDebug("DnnImageHandler(serviceProvider={ServiceProvider},appStatus={AppStatus},portalAliasService={PortalAliasService}): this.EnableClientCache → {Arg3}", serviceProvider, appStatus, portalAliasService, this.EnableClientCache);
             this.EnableServerCache = true;
             this.AllowStandalone = true;
+			Logger.LogDebug("DnnImageHandler(serviceProvider={ServiceProvider},appStatus={AppStatus},portalAliasService={PortalAliasService}): this.EnableServerCache → {Arg3}", serviceProvider, appStatus, portalAliasService, this.EnableServerCache);
+			Logger.LogDebug("DnnImageHandler(serviceProvider={ServiceProvider},appStatus={AppStatus},portalAliasService={PortalAliasService}): this.AllowStandalone → {Arg3}", serviceProvider, appStatus, portalAliasService, this.AllowStandalone);
             this.LogSecurity = false;
             this.EnableIPCount = false;
             this.ImageCompression = 95;
             DiskImageStore.PurgeInterval = new TimeSpan(0, 3, 0);
+			Logger.LogDebug("DnnImageHandler(serviceProvider={ServiceProvider},appStatus={AppStatus},portalAliasService={PortalAliasService}): this.LogSecurity → {Arg3}", serviceProvider, appStatus, portalAliasService, this.LogSecurity);
+			Logger.LogDebug("DnnImageHandler(serviceProvider={ServiceProvider},appStatus={AppStatus},portalAliasService={PortalAliasService}): this.EnableIPCount → {Arg3}", serviceProvider, appStatus, portalAliasService, this.EnableIPCount);
+			Logger.LogDebug("DnnImageHandler(serviceProvider={ServiceProvider},appStatus={AppStatus},portalAliasService={PortalAliasService}): this.ImageCompression → {Arg3}", serviceProvider, appStatus, portalAliasService, this.ImageCompression);
             this.IPCountPurgeInterval = new TimeSpan(0, 5, 0);
             this.IPCountMaxCount = 500;
             this.ClientCacheExpiration = new TimeSpan(0, 10, 0);
@@ -135,6 +150,7 @@ namespace DotNetNuke.Services.GeneratedImage
         /// <inheritdoc />
         public override ImageInfo GenerateImage(NameValueCollection parameters)
         {
+			Logger.LogDebug(">>> Entering GenerateImage(parameters={Parameters})", parameters);
             SetupCulture();
 
             // which type of image should be generated ?
@@ -145,17 +161,23 @@ namespace DotNetNuke.Services.GeneratedImage
 
             // Lets retrieve the color
             Color color = string.IsNullOrEmpty(parameters["color"]) ? Color.White : (parameters["color"].StartsWith("#", StringComparison.Ordinal) ? ColorTranslator.FromHtml(parameters["color"]) : Color.FromName(parameters["color"]));
+			Logger.LogDebug("GenerateImage(parameters={Parameters}): color → {Color}", parameters, color);
             Color backColor = string.IsNullOrEmpty(parameters["backcolor"]) ? Color.White : (parameters["backcolor"].StartsWith("#", StringComparison.Ordinal) ? ColorTranslator.FromHtml(parameters["backcolor"]) : Color.FromName(parameters["backcolor"]));
+			Logger.LogDebug("GenerateImage(parameters={Parameters}): backColor → {BackColor}", parameters, backColor);
 
             // Do we have a border ?
             int border = string.IsNullOrEmpty(parameters["border"]) ? 0 : Convert.ToInt32(parameters["border"], CultureInfo.InvariantCulture);
+			Logger.LogDebug("GenerateImage(parameters={Parameters}): border → {Border}", parameters, border);
 
             // Do we have a resizemode defined ?
             var resizeMode = string.IsNullOrEmpty(parameters["resizemode"]) ? ImageResizeMode.Fit : (ImageResizeMode)Enum.Parse(typeof(ImageResizeMode), parameters["ResizeMode"], true);
+			Logger.LogDebug("GenerateImage(parameters={Parameters}): resizeMode → {ResizeMode}", parameters, resizeMode);
 
             // Maximum sizes
             int maxWidth = ParseDimension(parameters["MaxWidth"]);
+			Logger.LogDebug("GenerateImage(parameters={Parameters}): maxWidth → {MaxWidth}", parameters, maxWidth);
             int maxHeight = ParseDimension(parameters["MaxHeight"]);
+			Logger.LogDebug("GenerateImage(parameters={Parameters}): maxHeight → {MaxHeight}", parameters, maxHeight);
 
             // Any text ?
             string text = string.IsNullOrEmpty(parameters["text"]) ? string.Empty : parameters["text"];
@@ -167,8 +189,10 @@ namespace DotNetNuke.Services.GeneratedImage
             if (!string.IsNullOrEmpty(parameters["NoCache"]))
             {
                 this.EnableClientCache = false;
+				Logger.LogDebug("GenerateImage(parameters={Parameters}): this.EnableClientCache → {Arg1}", parameters, this.EnableClientCache);
                 this.EnableServerCache = false;
             }
+			Logger.LogDebug("GenerateImage(parameters={Parameters}): this.EnableServerCache → {Arg1}", parameters, this.EnableServerCache);
 
             try
             {
@@ -181,6 +205,7 @@ namespace DotNetNuke.Services.GeneratedImage
                         if (!int.TryParse(parameters["userid"], out uid) || uid <= 0)
                         {
                             uid = -1;
+							Logger.LogDebug("GenerateImage(parameters={Parameters}): uid → {Uid}", parameters, uid);
                         }
 
                         var uppTrans = new UserProfilePicTransform
@@ -206,6 +231,7 @@ namespace DotNetNuke.Services.GeneratedImage
                         if (!string.IsNullOrEmpty(parameters["Color"]))
                         {
                             placeHolderTrans.Color = color;
+							Logger.LogDebug("GenerateImage(parameters={Parameters}): placeHolderTrans.Color → {Arg1}", parameters, placeHolderTrans.Color);
                         }
 
                         if (!string.IsNullOrEmpty(parameters["Text"]))
@@ -213,12 +239,14 @@ namespace DotNetNuke.Services.GeneratedImage
                             if (bool.TryParse(Config.GetSetting("AllowDnnImagePlaceholderText"), out var allowDnnImagePlaceholderText) && allowDnnImagePlaceholderText)
                             {
                                 placeHolderTrans.Text = text;
+								Logger.LogDebug("GenerateImage(parameters={Parameters}): placeHolderTrans.Text → {Arg1}", parameters, placeHolderTrans.Text);
                             }
                         }
 
                         if (!string.IsNullOrEmpty(parameters["BackColor"]))
                         {
                             placeHolderTrans.BackColor = backColor;
+							Logger.LogDebug("GenerateImage(parameters={Parameters}): placeHolderTrans.BackColor → {Arg1}", parameters, placeHolderTrans.BackColor);
                         }
 
                         this.ImageTransforms.Add(placeHolderTrans);
@@ -226,16 +254,20 @@ namespace DotNetNuke.Services.GeneratedImage
 
                     case "securefile":
                         var secureFileTrans = new SecureFileTransform();
+						Logger.LogDebug("GenerateImage(parameters={Parameters}): secureFileTrans → {SecureFileTrans}", parameters, secureFileTrans);
                         if (!string.IsNullOrEmpty(parameters["FileId"]))
                         {
                             var fileId = Convert.ToInt32(parameters["FileId"], CultureInfo.InvariantCulture);
+							Logger.LogDebug("GenerateImage(parameters={Parameters}): fileId → {FileId}", parameters, fileId);
                             var file = FileManager.Instance.GetFile(fileId);
+							Logger.LogDebug("GenerateImage(parameters={Parameters}): file → {File}", parameters, file);
                             if (file == null)
                             {
                                 return this.GetEmptyImageInfo();
                             }
 
                             var folder = FolderManager.Instance.GetFolder(file.FolderId);
+							Logger.LogDebug("GenerateImage(parameters={Parameters}): folder → {Folder}", parameters, folder);
                             if (!secureFileTrans.DoesHaveReadFolderPermission(folder))
                             {
                                 return this.GetEmptyImageInfo();
@@ -243,6 +275,8 @@ namespace DotNetNuke.Services.GeneratedImage
 
                             this.ContentType = GetImageFormat(file.Extension);
                             secureFileTrans.SecureFile = file;
+							Logger.LogDebug("GenerateImage(parameters={Parameters}): secureFileTrans.SecureFile → {Arg1}", parameters, secureFileTrans.SecureFile);
+							Logger.LogDebug("GenerateImage(parameters={Parameters}): secureFileTrans.EmptyImage → {Arg1}", parameters, secureFileTrans.EmptyImage);
                             secureFileTrans.EmptyImage = this.EmptyImage;
                             this.ImageTransforms.Add(secureFileTrans);
                         }
@@ -251,14 +285,18 @@ namespace DotNetNuke.Services.GeneratedImage
 
                     case "file":
                         var imgFile = string.Empty;
+						Logger.LogDebug("GenerateImage(parameters={Parameters}): imgFile → {ImgFile}", parameters, imgFile);
                         var imgUrl = string.Empty;
+						Logger.LogDebug("GenerateImage(parameters={Parameters}): imgUrl → {ImgUrl}", parameters, imgUrl);
 
                         // Lets determine the 2 types of Image Source: Single file, file url
                         var filePath = parameters["File"];
+						Logger.LogDebug("GenerateImage(parameters={Parameters}): filePath → {FilePath}", parameters, filePath);
                         if (!string.IsNullOrEmpty(filePath))
                         {
                             filePath = filePath.Trim();
                             var fullFilePath = HttpContext.Current.Server.MapPath(filePath);
+							Logger.LogDebug("GenerateImage(parameters={Parameters}): fullFilePath → {FullFilePath}", parameters, fullFilePath);
                             if (!File.Exists(fullFilePath) || !IsAllowedFilePathImage(filePath))
                             {
                                 return this.GetEmptyImageInfo();
@@ -269,9 +307,11 @@ namespace DotNetNuke.Services.GeneratedImage
                         else if (!string.IsNullOrEmpty(parameters["Url"]))
                         {
                             var url = parameters["Url"];
+							Logger.LogDebug("GenerateImage(parameters={Parameters}): url → {Url}", parameters, url);
 
                             // allow only site resources when using the url parameter
                             var uriValidator = new UriValidator(this.portalAliasService);
+							Logger.LogDebug("GenerateImage(parameters={Parameters}): uriValidator → {UriValidator}", parameters, uriValidator);
                             if (!url.StartsWith("http", StringComparison.OrdinalIgnoreCase) || !uriValidator.UriBelongsToSite(new Uri(url)))
                             {
                                 return this.GetEmptyImageInfo();
@@ -286,6 +326,7 @@ namespace DotNetNuke.Services.GeneratedImage
                             if (string.IsNullOrEmpty(parameters["Url"]))
                             {
                                 var fi = new System.IO.FileInfo(imgFile);
+								Logger.LogDebug("GenerateImage(parameters={Parameters}): fi → {Fi}", parameters, fi);
                                 extension = fi.Extension.ToLowerInvariant();
                             }
                             else
@@ -305,12 +346,16 @@ namespace DotNetNuke.Services.GeneratedImage
                         string imageTransformClass = ConfigurationManager.AppSettings["DnnImageHandler." + mode];
                         string[] imageTransformClassParts = imageTransformClass.Split(',');
                         var asm = Assembly.LoadFrom($@"{this.appStatus.ApplicationMapPath}\bin\{imageTransformClassParts[1].Trim()}.dll");
+						Logger.LogDebug("GenerateImage(parameters={Parameters}): asm → {Asm}", parameters, asm);
                         var t = asm.GetType(imageTransformClassParts[0].Trim());
+						Logger.LogDebug("GenerateImage(parameters={Parameters}): t → {T}", parameters, t);
                         var imageTransform = (ImageTransform)ActivatorUtilities.GetServiceOrCreateInstance(this.serviceProvider, t);
+						Logger.LogDebug("GenerateImage(parameters={Parameters}): imageTransform → {ImageTransform}", parameters, imageTransform);
 
                         foreach (var key in parameters.AllKeys)
                         {
                             var pi = t.GetProperty(key, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+							Logger.LogDebug("GenerateImage(parameters={Parameters}): pi → {Pi}", parameters, pi);
                             if (pi != null && key != "mode")
                             {
                                 switch (key.ToLowerInvariant())
@@ -346,6 +391,7 @@ namespace DotNetNuke.Services.GeneratedImage
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in GenerateImage(parameters={Parameters}): {Arg1}", parameters, ex.getMessage());
                 Exceptions.Exceptions.LogException(ex);
                 return this.GetEmptyImageInfo();
             }
@@ -358,7 +404,10 @@ namespace DotNetNuke.Services.GeneratedImage
                 width = ParseDimension(parameters["w"]);
                 height = ParseDimension(parameters["h"]);
 
+				Logger.LogDebug("GenerateImage(parameters={Parameters}): width → {Width}", parameters, width);
+				Logger.LogDebug("GenerateImage(parameters={Parameters}): height → {Height}", parameters, height);
                 var size = string.IsNullOrEmpty(parameters["size"]) ? string.Empty : parameters["size"];
+				Logger.LogDebug("GenerateImage(parameters={Parameters}): size → {Size}", parameters, size);
 
                 switch (size)
                 {
@@ -422,10 +471,12 @@ namespace DotNetNuke.Services.GeneratedImage
             if (!string.IsNullOrEmpty(parameters["Gamma"]))
             {
                 var gammaTrans = new ImageGammaTransform();
+				Logger.LogDebug("GenerateImage(parameters={Parameters}): gammaTrans → {GammaTrans}", parameters, gammaTrans);
                 double gamma;
                 if (double.TryParse(parameters["Gamma"], NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out gamma) && gamma >= 0.2 && gamma <= 5)
                 {
                     gammaTrans.Gamma = gamma;
+					Logger.LogDebug("GenerateImage(parameters={Parameters}): gammaTrans.Gamma → {Arg1}", parameters, gammaTrans.Gamma);
                     this.ImageTransforms.Add(gammaTrans);
                 }
             }
@@ -434,10 +485,12 @@ namespace DotNetNuke.Services.GeneratedImage
             if (!string.IsNullOrEmpty(parameters["Brightness"]))
             {
                 var brightnessTrans = new ImageBrightnessTransform();
+				Logger.LogDebug("GenerateImage(parameters={Parameters}): brightnessTrans → {BrightnessTrans}", parameters, brightnessTrans);
                 int brightness;
                 if (int.TryParse(parameters["Brightness"], out brightness))
                 {
                     brightnessTrans.Brightness = brightness;
+					Logger.LogDebug("GenerateImage(parameters={Parameters}): brightnessTrans.Brightness → {Arg1}", parameters, brightnessTrans.Brightness);
                     this.ImageTransforms.Add(brightnessTrans);
                 }
             }
@@ -446,10 +499,12 @@ namespace DotNetNuke.Services.GeneratedImage
             if (!string.IsNullOrEmpty(parameters["Contrast"]))
             {
                 var contrastTrans = new ImageContrastTransform();
+				Logger.LogDebug("GenerateImage(parameters={Parameters}): contrastTrans → {ContrastTrans}", parameters, contrastTrans);
                 double contrast;
                 if (double.TryParse(parameters["Contrast"], NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out contrast) && (contrast >= -100 && contrast <= 100))
                 {
                     contrastTrans.Contrast = contrast;
+					Logger.LogDebug("GenerateImage(parameters={Parameters}): contrastTrans.Contrast → {Arg1}", parameters, contrastTrans.Contrast);
                     this.ImageTransforms.Add(contrastTrans);
                 }
             }
@@ -458,6 +513,7 @@ namespace DotNetNuke.Services.GeneratedImage
             if (!string.IsNullOrEmpty(parameters["Greyscale"]))
             {
                 var greyscaleTrans = new ImageGreyScaleTransform();
+				Logger.LogDebug("GenerateImage(parameters={Parameters}): greyscaleTrans → {GreyscaleTrans}", parameters, greyscaleTrans);
                 this.ImageTransforms.Add(greyscaleTrans);
             }
 
@@ -465,6 +521,7 @@ namespace DotNetNuke.Services.GeneratedImage
             if (!string.IsNullOrEmpty(parameters["Invert"]))
             {
                 var invertTrans = new ImageInvertTransform();
+				Logger.LogDebug("GenerateImage(parameters={Parameters}): invertTrans → {InvertTrans}", parameters, invertTrans);
                 this.ImageTransforms.Add(invertTrans);
             }
 
@@ -472,27 +529,35 @@ namespace DotNetNuke.Services.GeneratedImage
             if (!string.IsNullOrEmpty(parameters["RotateFlip"]))
             {
                 var rotateFlipTrans = new ImageRotateFlipTransform();
+				Logger.LogDebug("GenerateImage(parameters={Parameters}): rotateFlipTrans → {RotateFlipTrans}", parameters, rotateFlipTrans);
+				Logger.LogDebug("GenerateImage(parameters={Parameters}): rotateFlipTrans.RotateFlip → {Arg1}", parameters, rotateFlipTrans.RotateFlip);
                 var rotateFlipType = (RotateFlipType)Enum.Parse(typeof(RotateFlipType), parameters["RotateFlip"]);
+				Logger.LogDebug("GenerateImage(parameters={Parameters}): rotateFlipType → {RotateFlipType}", parameters, rotateFlipType);
                 rotateFlipTrans.RotateFlip = rotateFlipType;
                 this.ImageTransforms.Add(rotateFlipTrans);
             }
 
             // We start the chain with an empty image
             var emptyImage = new Bitmap(1, 1);
+			Logger.LogDebug("GenerateImage(parameters={Parameters}): emptyImage → {EmptyImage}", parameters, emptyImage);
             using (var ms = new MemoryStream())
             {
                 emptyImage.Save(ms, this.ContentType);
+				Logger.LogDebug("<<< Exiting GenerateImage(parameters={Parameters})", parameters);
                 return new ImageInfo(ms.ToArray());
             }
         }
 
         private static bool IsAllowedFilePathImage(string filePath)
         {
+			Logger.LogDebug(">>> Entering IsAllowedFilePathImage(filePath={FilePath})", filePath);
             var normalizeFilePath = NormalizeFilePath(filePath.Trim());
 
+			Logger.LogDebug("IsAllowedFilePathImage(filePath={FilePath}): normalizeFilePath → {NormalizeFilePath}", filePath, normalizeFilePath);
             // Resources file cannot be served
             if (filePath.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
             {
+			Logger.LogDebug("<<< Exiting IsAllowedFilePathImage(filePath={FilePath})", filePath);
                 return false;
             }
 
@@ -502,17 +567,21 @@ namespace DotNetNuke.Services.GeneratedImage
 
         private static string NormalizeFilePath(string filePath)
         {
+			Logger.LogDebug(">>> Entering NormalizeFilePath(filePath={FilePath})", filePath);
             var normalizeFilePath = filePath.Replace(@"\", "/");
             if (!normalizeFilePath.StartsWith("/", StringComparison.Ordinal))
             {
+				Logger.LogDebug("NormalizeFilePath(filePath={FilePath}): normalizeFilePath → {NormalizeFilePath}", filePath, normalizeFilePath);
                 normalizeFilePath = "/" + normalizeFilePath;
             }
 
+			Logger.LogDebug("<<< Exiting NormalizeFilePath(filePath={FilePath})", filePath);
             return normalizeFilePath;
         }
 
         private static int ParseDimension(string value)
         {
+			Logger.LogDebug(">>> Entering ParseDimension(value={Value})", value);
             const int DefaultDimension = 0;
             if (string.IsNullOrEmpty(value))
             {
@@ -525,6 +594,7 @@ namespace DotNetNuke.Services.GeneratedImage
                 {
                     dimension = (int)Math.Round(doubleDimension, 0);
                 }
+				Logger.LogDebug("ParseDimension(value={Value}): dimension → {Dimension}", value, dimension);
             }
 
             // The system won't allow a resize for an image bigger than 4K pixels
@@ -534,11 +604,13 @@ namespace DotNetNuke.Services.GeneratedImage
                 dimension = DefaultDimension;
             }
 
+			Logger.LogDebug("<<< Exiting ParseDimension(value={Value})", value);
             return dimension;
         }
 
         private static ImageFormat GetImageFormat(string extension)
         {
+			Logger.LogDebug(">>> Entering GetImageFormat(extension={Extension})", extension);
             switch (extension.ToLowerInvariant())
             {
                 case "jpg":
@@ -553,12 +625,14 @@ namespace DotNetNuke.Services.GeneratedImage
                 case "ico":
                     return ImageFormat.Icon;
                 default:
+					Logger.LogDebug("<<< Exiting GetImageFormat(extension={Extension})", extension);
                     return ImageFormat.Png;
             }
         }
 
         private static void SetupCulture()
         {
+			Logger.LogDebug(">>> Entering SetupCulture()");
             var settings = PortalSettings.Current;
             if (settings == null)
             {
@@ -566,14 +640,18 @@ namespace DotNetNuke.Services.GeneratedImage
             }
 
             var pageLocale = TestableLocalization.Instance.GetPageLocale(settings);
+			Logger.LogDebug("SetupCulture(): pageLocale → {PageLocale}", pageLocale);
             if (pageLocale != null)
             {
                 TestableLocalization.Instance.SetThreadCultures(pageLocale, settings);
             }
+			Logger.LogDebug("<<< Exiting SetupCulture()");
         }
 
         private ImageInfo GetEmptyImageInfo()
         {
+			Logger.LogDebug(">>> Entering GetEmptyImageInfo()");
+			Logger.LogDebug("<<< Exiting GetEmptyImageInfo()");
             return new ImageInfo(this.EmptyImage)
             {
                 IsEmptyImage = true,
@@ -582,6 +660,7 @@ namespace DotNetNuke.Services.GeneratedImage
 
         private void ReadSettings()
         {
+			Logger.LogDebug(">>> Entering ReadSettings()");
             var settings = ConfigurationManager.AppSettings["DnnImageHandler"];
             if (string.IsNullOrEmpty(settings))
             {
@@ -630,6 +709,7 @@ namespace DotNetNuke.Services.GeneratedImage
                         break;
                 }
             }
+			Logger.LogDebug("<<< Exiting ReadSettings()");
         }
     }
 }

@@ -1,3 +1,4 @@
+const logger = console;
 ﻿(function ($) {
     $.fn.dnnComposeMessage = function (options) {
         var opts = $.extend({}, $.fn.dnnComposeMessage.defaultOptions, options),
@@ -53,14 +54,17 @@
             var messageNode = $("<div/>")
                 .addClass('dnnFormMessage dnnFormWarning')
                 .text(message);
+				logger.debug(`>>> Entering displayMessage(placeHolderElement=${placeHolderElement},message=${message})`);
 
             placeHolderElement.prepend(messageNode);
 
             messageNode.fadeOut(3000, 'easeInExpo', function () {
                 messageNode.remove();
             });
+			logger.debug(`<<< Exiting displayMessage(placeHolderElement=${placeHolderElement},message=${message})`);
         };
 	    function attachFile(file) {
+			logger.debug(`>>> Entering attachFile(file=${file})`);
             if ($.inArray(file.id, attachments) === -1) {
                 attachments.push(file.id);
                 composeMessageDialog.find('.messageAttachments ul').append('<li><a href="#" title="' + file.name + '">' + file.name + '</a><a href="#" class="removeAttachment" title="' + opts.removeText + '"></a></li>');
@@ -70,6 +74,7 @@
                         attachments.splice(index, 1);
                         $(this).parent().remove();
                     }
+			logger.debug(`<<< Exiting attachFile(file=${file})`);
                     return false;
                 });
             }

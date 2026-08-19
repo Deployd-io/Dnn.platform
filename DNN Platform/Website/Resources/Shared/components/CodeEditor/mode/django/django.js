@@ -2,6 +2,7 @@
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("../htmlmixed/htmlmixed"),
         require("../../addon/mode/overlay"));
@@ -13,7 +14,9 @@
 })(function(CodeMirror) {
   "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
   CodeMirror.defineMode("django:inner", function() {
+	logger.debug('>>> Entering defineMode()');
     var keywords = ["block", "endblock", "for", "endfor", "true", "false",
                     "loop", "none", "self", "super", "if", "endif", "as",
                     "else", "import", "with", "endwith", "without", "context", "ifequal", "endifequal",
@@ -38,16 +41,21 @@
         operators = ["==", "!=", "<", ">", "<=", ">=", "in", "not", "or", "and"];
 
     keywords = new RegExp("^\\b(" + keywords.join("|") + ")\\b");
+		logger.debug(`defineMode(): keywords → ${keywords}`);
     filters = new RegExp("^\\b(" + filters.join("|") + ")\\b");
     operators = new RegExp("^\\b(" + operators.join("|") + ")\\b");
+	logger.debug(`defineMode(): operators → ${operators}`);
 
+	logger.debug('<<< Exiting defineMode()');
     // We have to return "null" instead of null, in order to avoid string
     // styling as the default, when using Django templates inside HTML
     // element attributes
     function tokenBase (stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
       // Attempt to identify a variable, template or comment tag respectively
       if (stream.match("{{")) {
         state.tokenize = inVariable;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
         return "tag";
       } else if (stream.match("{%")) {
         state.tokenize = inTag;
@@ -60,6 +68,7 @@
       // Ignore completely any stream series that do not match the
       // Django template opening tags.
       while (stream.next() != null && !stream.match("{{", false) && !stream.match("{%", false)) {}
+	logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
       return null;
     }
 
@@ -75,6 +84,8 @@
             state.escapeNext = false;
           }
 
+		logger.debug(`function(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
+		logger.debug(`function(stream=${stream},state=${state}): state.escapeNext → ${state.escapeNext}`);
           var ch = stream.next();
 
           // Take into account the backslash for escaping characters, such as
@@ -90,9 +101,11 @@
 
     // Apply Django template variable syntax highlighting
     function inVariable (stream, state) {
+	logger.debug(`>>> Entering inVariable(stream=${stream},state=${state})`);
       // Attempt to match a dot that precedes a property
       if (state.waitDot) {
         state.waitDot = false;
+		logger.debug(`inVariable(stream=${stream},state=${state}): state.waitDot → ${state.waitDot}`);
 
         if (stream.peek() != ".") {
           return "null";
@@ -103,6 +116,7 @@
           return "error";
         } else if (stream.eat(".")) {
           state.waitProperty = true;
+		logger.debug(`inVariable(stream=${stream},state=${state}): state.waitProperty → ${state.waitProperty}`);
           return "null";
         } else {
           throw Error ("Unexpected error while waiting for property.");
@@ -112,6 +126,7 @@
       // Attempt to match a pipe that precedes a filter
       if (state.waitPipe) {
         state.waitPipe = false;
+		logger.debug(`inVariable(stream=${stream},state=${state}): state.waitPipe → ${state.waitPipe}`);
 
         if (stream.peek() != "|") {
           return "null";
@@ -122,6 +137,7 @@
           return "error";
         } else if (stream.eat("|")) {
           state.waitFilter = true;
+		logger.debug(`inVariable(stream=${stream},state=${state}): state.waitFilter → ${state.waitFilter}`);
           return "null";
         } else {
           throw Error ("Unexpected error while waiting for filter.");
@@ -180,18 +196,22 @@
         state.waitDot = null;
         state.waitPipe = null;
         state.tokenize = tokenBase;
+		logger.debug(`inVariable(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
         return "tag";
       }
 
       // If nothing was found, advance to the next character
       stream.next();
+	logger.debug(`<<< Exiting inVariable(stream=${stream},state=${state})`);
       return "null";
     }
 
     function inTag (stream, state) {
+	logger.debug(`>>> Entering inTag(stream=${stream},state=${state})`);
       // Attempt to match a dot that precedes a property
       if (state.waitDot) {
         state.waitDot = false;
+		logger.debug(`inTag(stream=${stream},state=${state}): state.waitDot → ${state.waitDot}`);
 
         if (stream.peek() != ".") {
           return "null";
@@ -202,6 +222,7 @@
           return "error";
         } else if (stream.eat(".")) {
           state.waitProperty = true;
+		logger.debug(`inTag(stream=${stream},state=${state}): state.waitProperty → ${state.waitProperty}`);
           return "null";
         } else {
           throw Error ("Unexpected error while waiting for property.");
@@ -211,6 +232,7 @@
       // Attempt to match a pipe that precedes a filter
       if (state.waitPipe) {
         state.waitPipe = false;
+		logger.debug(`inTag(stream=${stream},state=${state}): state.waitPipe → ${state.waitPipe}`);
 
         if (stream.peek() != "|") {
           return "null";
@@ -221,6 +243,7 @@
           return "error";
         } else if (stream.eat("|")) {
           state.waitFilter = true;
+		logger.debug(`inTag(stream=${stream},state=${state}): state.waitFilter → ${state.waitFilter}`);
           return "null";
         } else {
           throw Error ("Unexpected error while waiting for filter.");
@@ -272,9 +295,11 @@
 
       // Attempt to match a keyword
       var keywordMatch = stream.match(keywords);
+	logger.debug(`inTag(stream=${stream},state=${state}): keywordMatch → ${keywordMatch}`);
       if (keywordMatch) {
         if (keywordMatch[0] == "comment") {
           state.blockCommentTag = true;
+		logger.debug(`inTag(stream=${stream},state=${state}): state.blockCommentTag → ${state.blockCommentTag}`);
         }
         return "keyword";
       }
@@ -305,34 +330,45 @@
 
       // If nothing was found, advance to the next character
       stream.next();
+	logger.debug(`<<< Exiting inTag(stream=${stream},state=${state})`);
       return "null";
     }
 
     // Mark everything as comment inside the tag and the tag itself.
     function inComment (stream, state) {
+	logger.debug(`>>> Entering inComment(stream=${stream},state=${state})`);
       if (stream.match("#}")) {
         state.tokenize = tokenBase;
+		logger.debug(`inComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
       }
+	logger.debug(`<<< Exiting inComment(stream=${stream},state=${state})`);
       return "comment";
     }
 
     // Mark everything as a comment until the `blockcomment` tag closes.
     function inBlockComment (stream, state) {
+	logger.debug(`>>> Entering inBlockComment(stream=${stream},state=${state})`);
       if (stream.match(/\{%\s*endcomment\s*%\}/, false)) {
         state.tokenize = inTag;
+		logger.debug(`inBlockComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
         stream.match("{%");
         return "tag";
       } else {
         stream.next();
+		logger.debug(`<<< Exiting inBlockComment(stream=${stream},state=${state})`);
         return "comment";
       }
     }
 
     return {
       startState: function () {
+		logger.debug('>>> Entering startState()');
+		logger.debug('<<< Exiting startState()');
         return {tokenize: tokenBase};
       },
       token: function (stream, state) {
+		logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
+		logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
         return state.tokenize(stream, state);
       },
       blockCommentStart: "{% comment %}",
@@ -343,6 +379,8 @@
   CodeMirror.defineMode("django", function(config) {
     var htmlBase = CodeMirror.getMode(config, "text/html");
     var djangoInner = CodeMirror.getMode(config, "django:inner");
+	logger.debug(`defineMode(htmlBase=${htmlBase}): htmlBase → ${htmlBase}`);
+logger.debug(`defineMode(htmlBase=${htmlBase}): djangoInner → ${djangoInner}`);
     return CodeMirror.overlayMode(htmlBase, djangoInner);
   });
 

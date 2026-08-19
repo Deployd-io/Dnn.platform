@@ -13,11 +13,14 @@ import { DnnTabs as Tabs, PersonaBarPageBody } from "@dnnsoftware/dnn-react-comm
 import "./style.less";
 import resx from "../../resources";
 import util from "../../utils";
+const logger = console;
 
 export class Body extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.handleSelect = this.handleSelect.bind(this);
+		logger.debug('<<< Exiting constructor()');
     }
 
     handleSelect(index) {
@@ -35,6 +38,8 @@ export class Body extends Component {
 
     /*eslint no-mixed-spaces-and-tabs: "error"*/
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <PersonaBarPageBody>
                 <TopPane />
@@ -60,6 +65,8 @@ Body.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         status: state.task.status,

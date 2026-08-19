@@ -6,6 +6,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Caching;
 using DotNetNuke.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Logging;
 
 namespace Dnn.ContactList.Api
 {
@@ -16,9 +17,13 @@ namespace Dnn.ContactList.Api
     [Scope("PortalId")]
     public class Contact
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public Contact()
         {
+			_logger.LogDebug(">>> Entering Contact()");
             ContactId = -1;
+			_logger.LogDebug("Contact(): ContactId → {ContactId}", ContactId);
+			_logger.LogDebug("<<< Exiting Contact()");
         }
 
         public int ContactId { get; set; }

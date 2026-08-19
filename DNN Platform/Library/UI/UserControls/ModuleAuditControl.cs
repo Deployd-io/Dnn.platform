@@ -20,6 +20,7 @@ namespace DotNetNuke.UI.UserControls
 
     public abstract class ModuleAuditControl : UserControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleAuditControl));
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
         protected Label lblCreatedBy;
@@ -34,10 +35,14 @@ namespace DotNetNuke.UI.UserControls
         /// <summary>Initializes a new instance of the <see cref="ModuleAuditControl"/> class.</summary>
         public ModuleAuditControl()
         {
+			Logger.LogDebug(">>> Entering ModuleAuditControl()");
             this.LastModifiedDate = string.Empty;
             this.LastModifiedByUser = string.Empty;
+			Logger.LogDebug("ModuleAuditControl(): this.LastModifiedDate → {Arg0}", this.LastModifiedDate);
+			Logger.LogDebug("ModuleAuditControl(): this.LastModifiedByUser → {Arg0}", this.LastModifiedByUser);
             this.CreatedByUser = string.Empty;
             this.CreatedDate = string.Empty;
+			Logger.LogDebug("<<< Exiting ModuleAuditControl()");
         }
 
         public string CreatedDate { private get; set; }
@@ -79,6 +84,7 @@ namespace DotNetNuke.UI.UserControls
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             try
@@ -105,22 +111,27 @@ namespace DotNetNuke.UI.UserControls
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         private void ShowCreatedString()
         {
+			Logger.LogDebug(">>> Entering ShowCreatedString()");
             if (CheckDateColumnRegex.IsMatch(this.CreatedByUser))
             {
                 if (int.Parse(this.CreatedByUser, CultureInfo.CurrentCulture) == Null.NullInteger)
                 {
                     this.CreatedByUser = this.systemUser;
+					Logger.LogDebug("ShowCreatedString(): this.CreatedByUser → {Arg0}", this.CreatedByUser);
                 }
                 else
                 {
                     // contains a UserID
                     UserInfo userInfo = UserController.GetUserById(PortalController.Instance.GetCurrentSettings().PortalId, int.Parse(this.CreatedByUser, CultureInfo.CurrentCulture));
+					Logger.LogDebug("ShowCreatedString(): userInfo → {UserInfo}", userInfo);
                     if (userInfo != null)
                     {
                         this.CreatedByUser = userInfo.DisplayName;
@@ -130,10 +141,12 @@ namespace DotNetNuke.UI.UserControls
 
             string createdString = Localization.GetString("CreatedBy", Localization.GetResourceFile(this, MyFileName));
             this.lblCreatedBy.Text = string.Format(CultureInfo.CurrentCulture, createdString, this.CreatedByUser, this.CreatedDate);
+			Logger.LogDebug("<<< Exiting ShowCreatedString()");
         }
 
         private void ShowUpdatedString(bool isCreatorAndUpdater)
         {
+			Logger.LogDebug(">>> Entering ShowUpdatedString(isCreatorAndUpdater={IsCreatorAndUpdater})", isCreatorAndUpdater);
             // check to see if audit contains update information
             if (string.IsNullOrEmpty(this.LastModifiedDate))
             {
@@ -145,6 +158,7 @@ namespace DotNetNuke.UI.UserControls
                 if (isCreatorAndUpdater)
                 {
                     this.LastModifiedByUser = this.CreatedByUser;
+					Logger.LogDebug("ShowUpdatedString(isCreatorAndUpdater={IsCreatorAndUpdater}): this.LastModifiedByUser → {Arg1}", isCreatorAndUpdater, this.LastModifiedByUser);
                 }
                 else if (int.Parse(this.LastModifiedByUser, CultureInfo.CurrentCulture) == Null.NullInteger)
                 {
@@ -154,6 +168,7 @@ namespace DotNetNuke.UI.UserControls
                 {
                     // contains a UserID
                     UserInfo userInfo = UserController.GetUserById(PortalController.Instance.GetCurrentSettings().PortalId, int.Parse(this.LastModifiedByUser, CultureInfo.CurrentCulture));
+					Logger.LogDebug("ShowUpdatedString(isCreatorAndUpdater={IsCreatorAndUpdater}): userInfo → {UserInfo}", isCreatorAndUpdater, userInfo);
                     if (userInfo != null)
                     {
                         this.LastModifiedByUser = userInfo.DisplayName;
@@ -163,6 +178,7 @@ namespace DotNetNuke.UI.UserControls
 
             string updatedByString = Localization.GetString("UpdatedBy", Localization.GetResourceFile(this, MyFileName));
             this.lblUpdatedBy.Text = string.Format(CultureInfo.CurrentCulture, updatedByString, this.LastModifiedByUser, this.LastModifiedDate);
+			Logger.LogDebug("<<< Exiting ShowUpdatedString(isCreatorAndUpdater={IsCreatorAndUpdater})", isCreatorAndUpdater);
         }
 
         [Serializable]

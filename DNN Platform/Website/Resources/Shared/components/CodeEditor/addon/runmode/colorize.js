@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("./runmode"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -12,9 +14,13 @@
   "use strict";
 
   var isBlock = /^(p|li|div|h\\d|pre|blockquote|td)$/;
+logger.debug(`<<< Exiting function(exports=${exports})`);
+logger.debug(`function(exports=${exports}): isBlock → ${isBlock}`);
 
   function textContent(node, out) {
+	logger.debug(`>>> Entering textContent(node=${node},out=${out})`);
     if (node.nodeType == 3) return out.push(node.nodeValue);
+	logger.debug(`<<< Exiting textContent(node=${node},out=${out})`);
     for (var ch = node.firstChild; ch; ch = ch.nextSibling) {
       textContent(ch, out);
       if (isBlock.test(node.nodeType)) out.push("\n");
@@ -27,11 +33,13 @@
     for (var i = 0; i < collection.length; ++i) {
       var node = collection[i];
       var mode = node.getAttribute("data-lang") || defaultMode;
+	logger.debug(`function(collection=${collection},defaultMode=${defaultMode}): mode → ${mode}`);
       if (!mode) continue;
 
       var text = [];
       textContent(node, text);
       node.innerHTML = "";
+	logger.debug(`function(collection=${collection},defaultMode=${defaultMode}): node.innerHTML → ${node.innerHTML}`);
       CodeMirror.runMode(text.join(""), mode, node);
 
       node.className += " cm-s-default";

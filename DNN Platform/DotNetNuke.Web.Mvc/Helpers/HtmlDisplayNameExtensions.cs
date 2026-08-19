@@ -13,6 +13,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
     /// <summary>Provides a mechanism to get display names.</summary>
     public static class HtmlDisplayNameExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HtmlDisplayNameExtensions));
         /// <summary>Gets the display name.</summary>
         ///
         /// <returns>
@@ -21,6 +22,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="expression">An expression that identifies the object that contains the display name.</param>
         public static MvcHtmlString DisplayName(this DnnHtmlHelper html, string expression)
         {
+			Logger.LogDebug(">>> Entering DisplayName(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting DisplayName(html={Html},expression={Expression})", html, expression);
             return html.HtmlHelper.DisplayName(expression);
         }
 
@@ -32,6 +35,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="expression">An expression that identifies the object that contains the display name.</param><typeparam name="TModel">The type of the model.</typeparam><typeparam name="TValue">The type of the value.</typeparam>
         public static MvcHtmlString DisplayNameFor<TModel, TValue>(this DnnHtmlHelper<IEnumerable<TModel>> html, Expression<Func<TModel, TValue>> expression)
         {
+			Logger.LogDebug(">>> Entering DisplayNameFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting DisplayNameFor(html={Html},expression={Expression})", html, expression);
             return html.HtmlHelper.DisplayNameFor(expression);
         }
 
@@ -54,6 +59,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param>
         public static MvcHtmlString DisplayNameForModel(this DnnHtmlHelper html)
         {
+			Logger.LogDebug(">>> Entering DisplayNameForModel(html={Html})", html);
+			Logger.LogDebug("<<< Exiting DisplayNameForModel(html={Html})", html);
             return html.HtmlHelper.DisplayNameForModel();
         }
     }

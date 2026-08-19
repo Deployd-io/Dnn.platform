@@ -27,6 +27,7 @@ using Microsoft.Extensions.DependencyInjection;
 public class CountryRegionController(ListController listController)
     : DnnApiController
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CountryRegionController));
     private readonly ListController listController = listController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ListController>();
 
     /// <summary>Initializes a new instance of the <see cref="CountryRegionController"/> class.</summary>
@@ -34,6 +35,8 @@ public class CountryRegionController(ListController listController)
     public CountryRegionController()
         : this(null)
     {
+	Logger.LogDebug(">>> Entering CountryRegionController()");
+	Logger.LogDebug("<<< Exiting CountryRegionController()");
     }
 
     /// <summary>Gets the countries.</summary>
@@ -41,8 +44,12 @@ public class CountryRegionController(ListController listController)
     [HttpGet]
     public HttpResponseMessage Countries()
     {
+		Logger.LogDebug(">>> Entering Countries()");
         var searchString = (HttpContext.Current.Request.Params["SearchString"] ?? string.Empty).NormalizeString();
         var countries = CachedCountryList.GetCountryList(this.listController);
+		Logger.LogDebug("Countries(): countries → {Countries}", countries);
+		Logger.LogDebug("Countries(): searchString → {SearchString}", searchString);
+		Logger.LogDebug("<<< Exiting Countries()");
         return this.Request.CreateResponse(HttpStatusCode.OK, countries.Values.Where(
             x => x.NormalizedFullName.IndexOf(searchString, StringComparison.CurrentCulture) > -1).OrderBy(x => x.NormalizedFullName));
     }
@@ -53,6 +60,7 @@ public class CountryRegionController(ListController listController)
     [HttpGet]
     public HttpResponseMessage Regions(int country)
     {
+		Logger.LogDebug(">>> Entering Regions(country={Country})", country);
         List<Region> res = [];
         foreach (ListEntryInfo r in this.listController.GetListEntryInfoItems("Region").Where(l => l.ParentID == country))
         {
@@ -63,6 +71,7 @@ public class CountryRegionController(ListController listController)
             });
         }
 
+		Logger.LogDebug("<<< Exiting Regions(country={Country})", country);
         return this.Request.CreateResponse(HttpStatusCode.OK, res.OrderBy(r => r.Text));
     }
 

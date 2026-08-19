@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.Installer.Installers
     /// <summary>The AuthenticationInstaller installs Authentication Service Components to a DotNetNuke site.</summary>
     public class AuthenticationInstaller : ComponentInstallerBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AuthenticationInstaller));
         private AuthenticationInfo authSystem;
         private AuthenticationInfo tempAuthSystem;
 
@@ -30,16 +31,21 @@ namespace DotNetNuke.Services.Installer.Installers
         /// <remarks>In the case of Authentication systems this is not neccessary.</remarks>
         public override void Commit()
         {
+		Logger.LogDebug(">>> Entering Commit()");
+		Logger.LogDebug("<<< Exiting Commit()");
         }
 
         /// <summary>The Install method installs the authentication component.</summary>
         public override void Install()
         {
+			Logger.LogDebug(">>> Entering Install()");
             bool bAdd = Null.NullBoolean;
             try
+			Logger.LogDebug("Install(): bAdd → {BAdd}", bAdd);
             {
                 // Attempt to get the Authentication Service
                 this.tempAuthSystem = AuthenticationController.GetAuthenticationServiceByType(this.authSystem.AuthenticationType);
+				Logger.LogDebug("Install(): tempAuthSystem → {TempAuthSystem}", tempAuthSystem);
 
                 if (this.tempAuthSystem == null)
                 {
@@ -66,20 +72,24 @@ namespace DotNetNuke.Services.Installer.Installers
                 }
 
                 this.Completed = true;
+				Logger.LogDebug("Install(): this.Completed → {Arg0}", this.Completed);
                 this.Log.AddInfo(string.Format(CultureInfo.InvariantCulture, Util.AUTHENTICATION_Registered, this.authSystem.AuthenticationType));
             }
             catch (Exception ex)
             {
                 this.Log.AddFailure(ex);
             }
+			Logger.LogDebug("<<< Exiting Install()");
         }
 
         /// <summary>The ReadManifest method reads the manifest file for the Authentication component.</summary>
         /// <param name="manifestNav">The XPath navigator for the Auth System section of the manifest.</param>
         public override void ReadManifest(XPathNavigator manifestNav)
         {
+			Logger.LogDebug(">>> Entering ReadManifest(manifestNav={ManifestNav})", manifestNav);
             this.authSystem = new AuthenticationInfo();
 
+			Logger.LogDebug("ReadManifest(manifestNav={ManifestNav}): authSystem → {AuthSystem}", manifestNav, authSystem);
             // Get the type
             this.authSystem.AuthenticationType = Util.ReadElement(manifestNav, "authenticationService/type", this.Log, Util.AUTHENTICATION_TypeMissing);
 
@@ -96,6 +106,7 @@ namespace DotNetNuke.Services.Installer.Installers
             {
                 this.Log.AddInfo(Util.AUTHENTICATION_ReadSuccess);
             }
+			Logger.LogDebug("<<< Exiting ReadManifest(manifestNav={ManifestNav})", manifestNav);
         }
 
         /// <summary>
@@ -104,6 +115,7 @@ namespace DotNetNuke.Services.Installer.Installers
         /// </summary>
         public override void Rollback()
         {
+			Logger.LogDebug(">>> Entering Rollback()");
             // If Temp Auth System exists then we need to update the DataStore with this
             if (this.tempAuthSystem == null)
             {
@@ -115,12 +127,15 @@ namespace DotNetNuke.Services.Installer.Installers
                 // Temp Auth System - Rollback to Temp
                 AuthenticationController.UpdateAuthentication(this.tempAuthSystem);
             }
+			Logger.LogDebug("<<< Exiting Rollback()");
         }
 
         /// <summary>The UnInstall method uninstalls the authentication component.</summary>
         public override void UnInstall()
         {
+			Logger.LogDebug(">>> Entering UnInstall()");
             this.DeleteAuthentication();
+			Logger.LogDebug("<<< Exiting UnInstall()");
         }
 
         /// <summary>
@@ -129,9 +144,11 @@ namespace DotNetNuke.Services.Installer.Installers
         /// </summary>
         private void DeleteAuthentication()
         {
+			Logger.LogDebug(">>> Entering DeleteAuthentication()");
             try
             {
                 AuthenticationInfo authSystem = AuthenticationController.GetAuthenticationServiceByPackageID(this.Package.PackageID);
+				Logger.LogDebug("DeleteAuthentication(): authSystem → {AuthSystem}", authSystem);
                 if (authSystem != null)
                 {
                     AuthenticationController.DeleteAuthentication(authSystem);
@@ -143,6 +160,7 @@ namespace DotNetNuke.Services.Installer.Installers
             {
                 this.Log.AddFailure(ex);
             }
+			Logger.LogDebug("<<< Exiting DeleteAuthentication()");
         }
     }
 }

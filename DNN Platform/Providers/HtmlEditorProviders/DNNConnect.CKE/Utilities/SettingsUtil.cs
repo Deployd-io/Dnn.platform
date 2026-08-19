@@ -37,6 +37,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         internal static bool CheckSettingsExistByKey(List<EditorHostSetting> editorHostSettings, string key)
         {
+			eventLogger.LogDebug(">>> Entering CheckSettingsExistByKey(editorHostSettings={EditorHostSettings},key={Key})", editorHostSettings, key);
             if (
                 editorHostSettings.Any(
                     setting => setting.Name.Equals(string.Format("{0}{1}", key, SettingConstants.SKIN))))
@@ -48,6 +49,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
             }
 
             // No Settings Found
+			eventLogger.LogDebug("<<< Exiting CheckSettingsExistByKey(editorHostSettings={EditorHostSettings},key={Key})", editorHostSettings, key);
             return false;
         }
 
@@ -57,10 +59,12 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// <returns>Returns if The Module Settings Exists or not.</returns>
         internal static bool CheckExistsModuleSettings(string moduleKey, int moduleId)
         {
+			eventLogger.LogDebug(">>> Entering CheckExistsModuleSettings(moduleKey={ModuleKey},moduleId={ModuleId})", moduleKey, moduleId);
             var module = ModuleController.Instance.GetModule(moduleId, Null.NullInteger, false);
             if (module != null)
             {
                 var hshModSet = module.ModuleSettings;
+			eventLogger.LogDebug("<<< Exiting CheckExistsModuleSettings(moduleKey={ModuleKey},moduleId={ModuleId})", moduleKey, moduleId);
                 return hshModSet != null && hshModSet.Keys.Cast<string>().Any(key => key.StartsWith(moduleKey));
             }
 
@@ -73,11 +77,13 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// <returns>Returns if The Module Settings Exists or not.</returns>
         internal static bool CheckExistsModuleInstanceSettings(string moduleKey, int moduleId)
         {
+			eventLogger.LogDebug(">>> Entering CheckExistsModuleInstanceSettings(moduleKey={ModuleKey},moduleId={ModuleId})", moduleKey, moduleId);
             var module = ModuleController.Instance.GetModule(moduleId, Null.NullInteger, false);
             if (module != null)
             {
                 var hshModSet = module.ModuleSettings;
 
+			eventLogger.LogDebug("<<< Exiting CheckExistsModuleInstanceSettings(moduleKey={ModuleKey},moduleId={ModuleId})", moduleKey, moduleId);
                 return hshModSet != null && !string.IsNullOrEmpty((string)hshModSet[string.Format("{0}skin", moduleKey)]);
             }
 
@@ -100,11 +106,15 @@ namespace DNNConnect.CKEditorProvider.Utilities
             string key,
             IList<RoleInfo> portalRoles)
         {
+			eventLogger.LogDebug(">>> Entering LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles})", portalSettings, currentSettings, editorHostSettings, key, portalRoles);
             var roles = new ArrayList();
+			eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): roles → {Roles}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, roles);
 
             // Import all Editor config settings
             var props = GetEditorConfigProperties().ToList();
+			eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): props → {Props}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, props);
             var filteredSettings = editorHostSettings.Where(s => s.Name.StartsWith(key)).ToList();
+			eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): filteredSettings → {FilteredSettings}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, filteredSettings);
 
             foreach (PropertyInfo info in props)
             {
@@ -117,6 +127,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 }
 
                 var settingValue = string.Empty;
+				eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): settingValue → {SettingValue}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, settingValue);
                 if (!info.Name.Equals("CodeMirror") && !info.Name.Equals("WordCount"))
                 {
                     settingValue =
@@ -324,6 +335,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 }
 
                 currentSettings.ToolBarRoles = listToolbarRoles;
+				eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.ToolBarRoles → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.ToolBarRoles);
 
                 var listUploadSizeRoles = (from RoleInfo objRole in portalRoles
                         where
@@ -384,6 +396,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 }
 
                 currentSettings.UploadSizeRoles = listUploadSizeRoles;
+				eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.UploadSizeRoles → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.UploadSizeRoles);
 
                 if (
                     filteredSettings.Any(
@@ -399,6 +412,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                         string sRoles = settingValue;
 
                         currentSettings.BrowserRoles = sRoles;
+						eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.BrowserRoles → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.BrowserRoles);
 
                         string[] rolesA = sRoles.Split(';');
 
@@ -440,6 +454,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     if (bool.TryParse(settingValue, out bResult))
                     {
                         currentSettings.BrowserAllowFollowFolderPerms = bResult;
+						eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.BrowserAllowFollowFolderPerms → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.BrowserAllowFollowFolderPerms);
                     }
                 }
             }
@@ -455,6 +470,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 if (!string.IsNullOrEmpty(settingValue))
                 {
                     currentSettings.Browser = settingValue;
+					eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.Browser → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.Browser);
 
                     switch (currentSettings.Browser)
                     {
@@ -464,6 +480,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                                 if (PortalSecurity.IsInRoles(sRoleName))
                                 {
                                     currentSettings.BrowserMode = BrowserType.CKFinder;
+									eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.BrowserMode → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.BrowserMode);
 
                                     break;
                                 }
@@ -516,10 +533,12 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 if (!string.IsNullOrEmpty(settingValue))
                 {
                     currentSettings.ImageButton = settingValue;
+					eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.ImageButton → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.ImageButton);
 
                     if (currentSettings.ImageButton == "easyimage")
                     {
                         currentSettings.ImageButtonMode = ImageButtonType.StandardButton;
+						eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.ImageButtonMode → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.ImageButtonMode);
                         foreach (string sRoleName in roles)
                         {
                             if (PortalSecurity.IsInRoles(sRoleName))
@@ -549,6 +568,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     if (bool.TryParse(settingValue, out bResult))
                     {
                         currentSettings.InjectSyntaxJs = bResult;
+						eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.InjectSyntaxJs → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.InjectSyntaxJs);
                     }
                 }
             }
@@ -592,6 +612,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 if (!string.IsNullOrEmpty(settingValue))
                 {
                     currentSettings.BlankText = settingValue;
+					eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.BlankText → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.BlankText);
                 }
             }
 
@@ -634,6 +655,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 if (!string.IsNullOrEmpty(settingValue))
                 {
                     currentSettings.CustomJsFile = settingValue;
+					eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.CustomJsFile → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.CustomJsFile);
                 }
             }
 
@@ -707,6 +729,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     if (bool.TryParse(settingValue, out bResult))
                     {
                         currentSettings.UseAnchorSelector = bResult;
+						eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.UseAnchorSelector → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.UseAnchorSelector);
                     }
                 }
             }
@@ -725,6 +748,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     if (bool.TryParse(settingValue, out bResult))
                     {
                         currentSettings.ShowPageLinksTabFirst = bResult;
+						eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.ShowPageLinksTabFirst → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.ShowPageLinksTabFirst);
                     }
                 }
             }
@@ -743,6 +767,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     if (bool.TryParse(settingValue, out bResult))
                     {
                         currentSettings.OverrideFileOnUpload = bResult;
+						eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.OverrideFileOnUpload → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.OverrideFileOnUpload);
                     }
                 }
             }
@@ -761,6 +786,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     if (bool.TryParse(settingValue, out bResult))
                     {
                         currentSettings.SubDirs = bResult;
+						eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.SubDirs → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.SubDirs);
                     }
                 }
             }
@@ -776,6 +802,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 if (!string.IsNullOrEmpty(settingValue))
                 {
                     currentSettings.HostBrowserRootDir = settingValue;
+					eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.HostBrowserRootDir → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.HostBrowserRootDir);
                 }
             }
 
@@ -795,6 +822,8 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     }
                     catch (Exception)
                     {
+						eventLogger.LogError("Exception in LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, Exception.Message);
+						eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.BrowserRootDirId → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.BrowserRootDirId);
                         currentSettings.BrowserRootDirId = -1;
                     }
                 }
@@ -811,6 +840,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 if (!string.IsNullOrEmpty(settingValue))
                 {
                     currentSettings.HostBrowserRootDirForImg = settingValue;
+					eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.HostBrowserRootDirForImg → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.HostBrowserRootDirForImg);
                 }
             }
 
@@ -831,6 +861,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     catch (Exception)
                     {
                         currentSettings.BrowserRootDirForImgId = -1;
+						eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.BrowserRootDirForImgId → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.BrowserRootDirForImgId);
                     }
                 }
             }
@@ -846,6 +877,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 if (!string.IsNullOrEmpty(settingValue))
                 {
                     currentSettings.HostUploadDir = settingValue;
+					eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.HostUploadDir → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.HostUploadDir);
                 }
             }
 
@@ -866,6 +898,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     catch (Exception)
                     {
                         currentSettings.UploadDirId = -1;
+						eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.UploadDirId → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.UploadDirId);
                     }
                 }
             }
@@ -881,6 +914,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 if (!string.IsNullOrEmpty(settingValue))
                 {
                     currentSettings.HostUploadDirForImg = settingValue;
+					eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.HostUploadDirForImg → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.HostUploadDirForImg);
                 }
             }
 
@@ -901,6 +935,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     catch (Exception)
                     {
                         currentSettings.UploadDirForImgId = -1;
+						eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.UploadDirForImgId → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.UploadDirForImgId);
                     }
                 }
             }
@@ -922,6 +957,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     catch (Exception)
                     {
                         currentSettings.ResizeWidthUpload = -1;
+						eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.ResizeWidthUpload → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.ResizeWidthUpload);
                     }
                 }
             }
@@ -943,6 +979,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     catch (Exception)
                     {
                         currentSettings.ResizeHeightUpload = -1;
+						eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.ResizeHeightUpload → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.ResizeHeightUpload);
                     }
                 }
             }
@@ -964,6 +1001,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     catch (Exception)
                     {
                         currentSettings.ResizeWidth = -1;
+						eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.ResizeWidth → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.ResizeWidth);
                     }
                 }
             }
@@ -985,10 +1023,12 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     catch (Exception)
                     {
                         currentSettings.ResizeHeight = -1;
+						eventLogger.LogDebug("LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles}): currentSettings.ResizeHeight → {Arg5}", portalSettings, currentSettings, editorHostSettings, key, portalRoles, currentSettings.ResizeHeight);
                     }
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting LoadEditorSettingsByKey(portalSettings={PortalSettings},currentSettings={CurrentSettings},editorHostSettings={EditorHostSettings},key={Key},portalRoles={PortalRoles})", portalSettings, currentSettings, editorHostSettings, key, portalRoles);
             return currentSettings;
         }
 
@@ -1003,8 +1043,11 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// </returns>
         internal static EditorProviderSettings LoadModuleSettings(IPortalSettings portalSettings, EditorProviderSettings currentSettings, string key, int moduleId, IList<RoleInfo> portalRoles)
         {
+			eventLogger.LogDebug(">>> Entering LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles})", portalSettings, currentSettings, key, moduleId, portalRoles);
             Hashtable hshModSet = null;
             var module = ModuleController.Instance.GetModule(moduleId, Null.NullInteger, false);
+			eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): module → {Module}", portalSettings, currentSettings, key, moduleId, portalRoles, module);
+			eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): hshModSet → {HshModSet}", portalSettings, currentSettings, key, moduleId, portalRoles, hshModSet);
             if (module != null)
             {
                 hshModSet = module.ModuleSettings;
@@ -1013,6 +1056,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
             hshModSet = hshModSet ?? new Hashtable();
 
             var roles = new ArrayList();
+			eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): roles → {Roles}", portalSettings, currentSettings, key, moduleId, portalRoles, roles);
 
             // Import all Editor config settings
             foreach (
@@ -1143,6 +1187,8 @@ namespace DNNConnect.CKEditorProvider.Utilities
 
                         break;
                 }
+				eventLogger.LogDebug(">>> Entering GetEditorConfigProperties()");
+				eventLogger.LogDebug("<<< Exiting GetEditorConfigProperties()");
             }
 
             /////////////////
@@ -1166,6 +1212,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                                                    select
                                                        new ToolbarRoles { RoleId = objRole.RoleID, Toolbar = sToolbar })
                 .ToList();
+				eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): sToolbar → {SToolbar}", portalSettings, currentSettings, key, moduleId, portalRoles, sToolbar);
 
             if (!string.IsNullOrEmpty((string)hshModSet[string.Format("{0}{2}#{1}", key, "-1", SettingConstants.TOOLB)]))
             {
@@ -1175,6 +1222,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
             }
 
             currentSettings.ToolBarRoles = listToolbarRoles;
+			eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): currentSettings.ToolBarRoles → {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, currentSettings.ToolBarRoles);
 
             var listUploadSizeRoles = (from RoleInfo objRole in portalRoles
                                        where
@@ -1204,6 +1252,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
             }
 
             currentSettings.UploadSizeRoles = listUploadSizeRoles;
+			eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): currentSettings.UploadSizeRoles → {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, currentSettings.UploadSizeRoles);
 
             if (!string.IsNullOrEmpty((string)hshModSet[$"{key}{SettingConstants.BROWSERALLOWFOLLOWFOLDERPERMS}"]))
             {
@@ -1211,6 +1260,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 if (bool.TryParse((string)hshModSet[$"{key}{SettingConstants.BROWSERALLOWFOLLOWFOLDERPERMS}"], out bResult))
                 {
                     currentSettings.BrowserAllowFollowFolderPerms = bResult;
+					eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): currentSettings.BrowserAllowFollowFolderPerms → {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, currentSettings.BrowserAllowFollowFolderPerms);
                 }
             }
 
@@ -1219,6 +1269,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 string sRoles = (string)hshModSet[string.Format("{0}{1}", key, SettingConstants.ROLES)];
 
                 currentSettings.BrowserRoles = sRoles;
+				eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): currentSettings.BrowserRoles → {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, currentSettings.BrowserRoles);
 
                 string[] rolesA = sRoles.Split(';');
 
@@ -1227,6 +1278,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                     if (Utility.IsNumeric(sRoleName))
                     {
                         RoleInfo roleInfo = RoleController.Instance.GetRoleById(portalSettings.PortalId, int.Parse(sRoleName));
+						eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): roleInfo → {RoleInfo}", portalSettings, currentSettings, key, moduleId, portalRoles, roleInfo);
 
                         if (roleInfo != null)
                         {
@@ -1252,6 +1304,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                             if (PortalSecurity.IsInRoles(sRoleName))
                             {
                                 currentSettings.BrowserMode = BrowserType.CKFinder;
+								eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): currentSettings.BrowserMode → {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, currentSettings.BrowserMode);
 
                                 break;
                             }
@@ -1299,6 +1352,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 if (currentSettings.ImageButton == "easyimage")
                 {
                     currentSettings.ImageButtonMode = ImageButtonType.StandardButton;
+					eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): currentSettings.ImageButtonMode → {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, currentSettings.ImageButtonMode);
                     foreach (string sRoleName in roles)
                     {
                         if (PortalSecurity.IsInRoles(sRoleName))
@@ -1319,6 +1373,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 if (bool.TryParse((string)hshModSet[string.Format("{0}{1}", key, SettingConstants.INJECTJS)], out bResult))
                 {
                     currentSettings.InjectSyntaxJs = bResult;
+					eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): currentSettings.InjectSyntaxJs → {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, currentSettings.InjectSyntaxJs);
                 }
             }
 
@@ -1380,6 +1435,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 if (bool.TryParse((string)hshModSet[string.Format("{0}{1}", key, SettingConstants.USEANCHORSELECTOR)], out bResult))
                 {
                     currentSettings.UseAnchorSelector = bResult;
+					eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): currentSettings.UseAnchorSelector → {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, currentSettings.UseAnchorSelector);
                 }
             }
 
@@ -1389,6 +1445,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 if (bool.TryParse((string)hshModSet[string.Format("{0}{1}", key, SettingConstants.SHOWPAGELINKSTABFIRST)], out bResult))
                 {
                     currentSettings.ShowPageLinksTabFirst = bResult;
+					eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): currentSettings.ShowPageLinksTabFirst → {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, currentSettings.ShowPageLinksTabFirst);
                 }
             }
 
@@ -1398,6 +1455,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 if (bool.TryParse((string)hshModSet[string.Format("{0}{1}", key, SettingConstants.OVERRIDEFILEONUPLOAD)], out bResult))
                 {
                     currentSettings.OverrideFileOnUpload = bResult;
+					eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): currentSettings.OverrideFileOnUpload → {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, currentSettings.OverrideFileOnUpload);
                 }
             }
 
@@ -1407,6 +1465,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 if (bool.TryParse((string)hshModSet[string.Format("{0}{1}", key, SettingConstants.SUBDIRS)], out bResult))
                 {
                     currentSettings.SubDirs = bResult;
+					eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): currentSettings.SubDirs → {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, currentSettings.SubDirs);
                 }
             }
 
@@ -1418,6 +1477,8 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 }
                 catch (Exception)
                 {
+					eventLogger.LogError("Exception in LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, Exception.Message);
+					eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): currentSettings.BrowserRootDirId → {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, currentSettings.BrowserRootDirId);
                     currentSettings.BrowserRootDirId = -1;
                 }
             }
@@ -1431,6 +1492,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 catch (Exception)
                 {
                     currentSettings.BrowserRootDirForImgId = -1;
+					eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): currentSettings.BrowserRootDirForImgId → {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, currentSettings.BrowserRootDirForImgId);
                 }
             }
 
@@ -1443,6 +1505,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 catch (Exception)
                 {
                     currentSettings.UploadDirId = -1;
+					eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): currentSettings.UploadDirId → {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, currentSettings.UploadDirId);
                 }
             }
 
@@ -1455,6 +1518,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 catch (Exception)
                 {
                     currentSettings.UploadDirForImgId = -1;
+					eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): currentSettings.UploadDirForImgId → {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, currentSettings.UploadDirForImgId);
                 }
             }
 
@@ -1467,6 +1531,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 catch (Exception)
                 {
                     currentSettings.ResizeWidthUpload = -1;
+					eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): currentSettings.ResizeWidthUpload → {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, currentSettings.ResizeWidthUpload);
                 }
             }
 
@@ -1479,6 +1544,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 catch (Exception)
                 {
                     currentSettings.ResizeHeightUpload = -1;
+					eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): currentSettings.ResizeHeightUpload → {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, currentSettings.ResizeHeightUpload);
                 }
             }
 
@@ -1491,6 +1557,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 catch (Exception)
                 {
                     currentSettings.ResizeWidth = -1;
+					eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): currentSettings.ResizeWidth → {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, currentSettings.ResizeWidth);
                 }
             }
 
@@ -1503,9 +1570,11 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 catch (Exception)
                 {
                     currentSettings.ResizeHeight = -1;
+					eventLogger.LogDebug("LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles}): currentSettings.ResizeHeight → {Arg5}", portalSettings, currentSettings, key, moduleId, portalRoles, currentSettings.ResizeHeight);
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting LoadModuleSettings(portalSettings={PortalSettings},currentSettings={CurrentSettings},key={Key},moduleId={ModuleId},portalRoles={PortalRoles})", portalSettings, currentSettings, key, moduleId, portalRoles);
             return currentSettings;
         }
 
@@ -1518,11 +1587,14 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// <returns>Returns the Default Provider Settings.</returns>
         internal static EditorProviderSettings GetDefaultSettings(IPortalSettings portalSettings, IHostSettings hostSettings, string homeDirPath, string alternateSubFolder, IList<RoleInfo> portalRoles)
         {
+			eventLogger.LogDebug(">>> Entering GetDefaultSettings(portalSettings={PortalSettings},hostSettings={HostSettings},homeDirPath={HomeDirPath},alternateSubFolder={AlternateSubFolder},portalRoles={PortalRoles})", portalSettings, hostSettings, homeDirPath, alternateSubFolder, portalRoles);
             var roles = new ArrayList();
 
+			eventLogger.LogDebug("GetDefaultSettings(portalSettings={PortalSettings},hostSettings={HostSettings},homeDirPath={HomeDirPath},alternateSubFolder={AlternateSubFolder},portalRoles={PortalRoles}): roles → {Roles}", portalSettings, hostSettings, homeDirPath, alternateSubFolder, portalRoles, roles);
             if (!string.IsNullOrEmpty(alternateSubFolder))
             {
                 var alternatePath = Path.Combine(homeDirPath, alternateSubFolder);
+				eventLogger.LogDebug("GetDefaultSettings(portalSettings={PortalSettings},hostSettings={HostSettings},homeDirPath={HomeDirPath},alternateSubFolder={AlternateSubFolder},portalRoles={PortalRoles}): alternatePath → {AlternatePath}", portalSettings, hostSettings, homeDirPath, alternateSubFolder, portalRoles, alternatePath);
 
                 if (!Directory.Exists(alternatePath))
                 {
@@ -1535,6 +1607,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
             // Check if old Settings File Exists
             if (File.Exists(Path.Combine(homeDirPath, SettingConstants.XmlDefaultFileName)))
             {
+			eventLogger.LogDebug("<<< Exiting GetDefaultSettings(portalSettings={PortalSettings},hostSettings={HostSettings},homeDirPath={HomeDirPath},alternateSubFolder={AlternateSubFolder},portalRoles={PortalRoles})", portalSettings, hostSettings, homeDirPath, alternateSubFolder, portalRoles);
                 // Import Old SettingsBase XML File
 #pragma warning disable CS0618 // Type or member is obsolete
                 ImportSettingBaseXml(homeDirPath, false);
@@ -1559,12 +1632,14 @@ namespace DNNConnect.CKEditorProvider.Utilities
             }
 
             var serializer = new XmlSerializer(typeof(EditorProviderSettings));
+			eventLogger.LogDebug("GetDefaultSettings(portalSettings={PortalSettings},hostSettings={HostSettings},homeDirPath={HomeDirPath},alternateSubFolder={AlternateSubFolder},portalRoles={PortalRoles}): serializer → {Serializer}", portalSettings, hostSettings, homeDirPath, alternateSubFolder, portalRoles, serializer);
             var reader =
                 new StreamReader(
                     new FileStream(
                         Path.Combine(homeDirPath, SettingConstants.XmlSettingsFileName), FileMode.Open, FileAccess.Read, FileShare.Read));
 
             var settings = (EditorProviderSettings)serializer.Deserialize(reader);
+			eventLogger.LogDebug("GetDefaultSettings(portalSettings={PortalSettings},hostSettings={HostSettings},homeDirPath={HomeDirPath},alternateSubFolder={AlternateSubFolder},portalRoles={PortalRoles}): settings → {Settings}", portalSettings, hostSettings, homeDirPath, alternateSubFolder, portalRoles, settings);
 
             if (!string.IsNullOrEmpty(settings.EditorWidth))
             {
@@ -1590,6 +1665,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                         if (Utility.IsNumeric(sRoleName))
                         {
                             RoleInfo roleInfo = RoleController.Instance.GetRoleById(portalSettings?.PortalId ?? hostSettings.HostPortalId, int.Parse(sRoleName));
+							eventLogger.LogDebug("GetDefaultSettings(portalSettings={PortalSettings},hostSettings={HostSettings},homeDirPath={HomeDirPath},alternateSubFolder={AlternateSubFolder},portalRoles={PortalRoles}): roleInfo → {RoleInfo}", portalSettings, hostSettings, homeDirPath, alternateSubFolder, portalRoles, roleInfo);
 
                             if (roleInfo != null)
                             {
@@ -1614,6 +1690,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                             if (PortalSecurity.IsInRoles(sRoleName))
                             {
                                 settings.BrowserMode = BrowserType.CKFinder;
+								eventLogger.LogDebug("GetDefaultSettings(portalSettings={PortalSettings},hostSettings={HostSettings},homeDirPath={HomeDirPath},alternateSubFolder={AlternateSubFolder},portalRoles={PortalRoles}): settings.BrowserMode → {Arg5}", portalSettings, hostSettings, homeDirPath, alternateSubFolder, portalRoles, settings.BrowserMode);
 
                                 break;
                             }
@@ -1658,6 +1735,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 if (settings.ImageButton == "easyimage")
                 {
                     settings.ImageButtonMode = ImageButtonType.StandardButton;
+					eventLogger.LogDebug("GetDefaultSettings(portalSettings={PortalSettings},hostSettings={HostSettings},homeDirPath={HomeDirPath},alternateSubFolder={AlternateSubFolder},portalRoles={PortalRoles}): settings.ImageButtonMode → {Arg5}", portalSettings, hostSettings, homeDirPath, alternateSubFolder, portalRoles, settings.ImageButtonMode);
                     foreach (string sRoleName in roles)
                     {
                         if (PortalSecurity.IsInRoles(sRoleName))
@@ -1680,9 +1758,12 @@ namespace DNNConnect.CKEditorProvider.Utilities
         /// <summary>Creates the default settings file.</summary>
         internal static void CreateDefaultSettingsFile()
         {
+			eventLogger.LogDebug(">>> Entering CreateDefaultSettingsFile()");
             var newSettings = new EditorProviderSettings();
 
+			eventLogger.LogDebug("CreateDefaultSettingsFile(): newSettings → {NewSettings}", newSettings);
             var serializer = new XmlSerializer(typeof(EditorProviderSettings));
+			eventLogger.LogDebug("CreateDefaultSettingsFile(): serializer → {Serializer}", serializer);
 
             var textWriter =
                 new StreamWriter(
@@ -1695,12 +1776,14 @@ namespace DNNConnect.CKEditorProvider.Utilities
             serializer.Serialize(textWriter, newSettings);
 
             textWriter.Close();
+			eventLogger.LogDebug("<<< Exiting CreateDefaultSettingsFile()");
         }
 
         /// <summary>Gets the editor config properties.</summary>
         /// <returns>Returns the EditorConfig Properties.</returns>
         internal static IEnumerable<PropertyInfo> GetEditorConfigProperties()
         {
+			eventLogger.LogDebug(">>> Entering GetEditorConfigProperties()");
             return
                 typeof(EditorConfig).GetProperties()
                     .Where(
@@ -1728,9 +1811,13 @@ namespace DNNConnect.CKEditorProvider.Utilities
         [DnnDeprecated(7, 0, 0, "Please use EditorProviderSettings Class instead", RemovalVersion = 11)]
         internal static partial void ImportSettingBaseXml(string homeDirPath, bool isDefaultXmlFile)
         {
+			eventLogger.LogDebug(">>> Entering ImportSettingBaseXml(homeDirPath={HomeDirPath},isDefaultXmlFile={IsDefaultXmlFile})", homeDirPath, isDefaultXmlFile);
             var oldXmlPath = Path.Combine(homeDirPath, SettingConstants.XmlDefaultFileName);
             var oldSerializer = new XmlSerializer(typeof(SettingBase));
+			eventLogger.LogDebug("ImportSettingBaseXml(homeDirPath={HomeDirPath},isDefaultXmlFile={IsDefaultXmlFile}): oldSerializer → {OldSerializer}", homeDirPath, isDefaultXmlFile, oldSerializer);
             var reader = new XmlTextReader(new FileStream(oldXmlPath, FileMode.Open, FileAccess.Read, FileShare.Read));
+			eventLogger.LogDebug("ImportSettingBaseXml(homeDirPath={HomeDirPath},isDefaultXmlFile={IsDefaultXmlFile}): reader → {Reader}", homeDirPath, isDefaultXmlFile, reader);
+			eventLogger.LogDebug("ImportSettingBaseXml(homeDirPath={HomeDirPath},isDefaultXmlFile={IsDefaultXmlFile}): oldXmlPath → {OldXmlPath}", homeDirPath, isDefaultXmlFile, oldXmlPath);
 
             if (!oldSerializer.CanDeserialize(reader))
             {
@@ -1740,6 +1827,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
             }
 
             var oldDefaultSettings = (SettingBase)oldSerializer.Deserialize(reader);
+			eventLogger.LogDebug("ImportSettingBaseXml(homeDirPath={HomeDirPath},isDefaultXmlFile={IsDefaultXmlFile}): oldDefaultSettings → {OldDefaultSettings}", homeDirPath, isDefaultXmlFile, oldDefaultSettings);
 
             reader.Close();
 
@@ -1750,6 +1838,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                             || oldDefaultSettings.sSkin.Equals("v2"))
             {
                 oldDefaultSettings.sSkin = "moono";
+				eventLogger.LogDebug("ImportSettingBaseXml(homeDirPath={HomeDirPath},isDefaultXmlFile={IsDefaultXmlFile}): oldDefaultSettings.sSkin → {Arg2}", homeDirPath, isDefaultXmlFile, oldDefaultSettings.sSkin);
             }
 
             // Migrate Settings
@@ -1828,6 +1917,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
 
             // Save new xml file
             var newSerializer = new XmlSerializer(typeof(EditorProviderSettings));
+			eventLogger.LogDebug("ImportSettingBaseXml(homeDirPath={HomeDirPath},isDefaultXmlFile={IsDefaultXmlFile}): newSerializer → {NewSerializer}", homeDirPath, isDefaultXmlFile, newSerializer);
 
             using (
                 var textWriter =
@@ -1843,6 +1933,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
 
                 textWriter.Close();
             }
+			eventLogger.LogDebug("<<< Exiting ImportSettingBaseXml(homeDirPath={HomeDirPath},isDefaultXmlFile={IsDefaultXmlFile})", homeDirPath, isDefaultXmlFile);
         }
 
         /// <summary>Gets the size of the current user upload.</summary>
@@ -1853,6 +1944,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
         internal static int GetCurrentUserUploadSize(EditorProviderSettings settings, IPortalSettings portalSettings, HttpRequest httpRequest)
         {
             var uploadFileLimitForPortal = Convert.ToInt32(Utility.GetMaxUploadSize());
+			eventLogger.LogDebug(">>> Entering GetCurrentUserUploadSize(settings={Settings},portalSettings={PortalSettings},httpRequest={HttpRequest})", settings, portalSettings, httpRequest);
 
             if (settings.ToolBarRoles.Count <= 0)
             {
@@ -1860,6 +1952,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
             }
 
             var listUserUploadFileSizes = new List<ToolbarSet>();
+			eventLogger.LogDebug("GetCurrentUserUploadSize(settings={Settings},portalSettings={PortalSettings},httpRequest={HttpRequest}): listUserUploadFileSizes → {ListUserUploadFileSizes}", settings, portalSettings, httpRequest, listUserUploadFileSizes);
 
             foreach (var roleUploadSize in settings.UploadSizeRoles)
             {
@@ -1875,6 +1968,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
 
                 // Role
                 var role = RoleController.Instance.GetRoleById(portalSettings.PortalId, roleUploadSize.RoleId);
+				eventLogger.LogDebug("GetCurrentUserUploadSize(settings={Settings},portalSettings={PortalSettings},httpRequest={HttpRequest}): role → {Role}", settings, portalSettings, httpRequest, role);
 
                 if (role == null)
                 {
@@ -1887,6 +1981,7 @@ namespace DNNConnect.CKEditorProvider.Utilities
                 }
 
                 var toolbar = new ToolbarSet(role.RoleName, roleUploadSize.UploadFileLimit);
+				eventLogger.LogDebug("GetCurrentUserUploadSize(settings={Settings},portalSettings={PortalSettings},httpRequest={HttpRequest}): toolbar → {Toolbar}", settings, portalSettings, httpRequest, toolbar);
 
                 listUserUploadFileSizes.Add(toolbar);
             }
@@ -1898,7 +1993,9 @@ namespace DNNConnect.CKEditorProvider.Utilities
 
             // Compare The User Toolbars if the User is more then One Role, and apply the Toolbar with the Highest Priority
             int iHighestPrio = listUserUploadFileSizes.Max(toolb => toolb.Priority);
+			eventLogger.LogDebug("GetCurrentUserUploadSize(settings={Settings},portalSettings={PortalSettings},httpRequest={HttpRequest}): iHighestPrio → {IHighestPrio}", settings, portalSettings, httpRequest, iHighestPrio);
 
+			eventLogger.LogDebug("<<< Exiting GetCurrentUserUploadSize(settings={Settings},portalSettings={PortalSettings},httpRequest={HttpRequest})", settings, portalSettings, httpRequest);
             return listUserUploadFileSizes.Find(toolbarSel => toolbarSel.Priority.Equals(iHighestPrio)).Priority;
         }
     }

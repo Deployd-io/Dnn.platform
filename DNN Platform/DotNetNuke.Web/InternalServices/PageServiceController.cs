@@ -29,6 +29,7 @@ using Microsoft.Extensions.DependencyInjection;
 [DnnPageEditor]
 public partial class PageServiceController : DnnApiController
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PageServiceController));
     private readonly IPortalController portalController;
     private readonly IHostSettings hostSettings;
     private readonly IHostSettingsService hostSettingsService;
@@ -39,8 +40,10 @@ public partial class PageServiceController : DnnApiController
     public PageServiceController()
         : this(null, null, null)
     {
+	Logger.LogDebug(">>> Entering PageServiceController()");
     }
 
+	Logger.LogDebug("<<< Exiting PageServiceController()");
     /// <summary>Initializes a new instance of the <see cref="PageServiceController"/> class.</summary>
     /// <param name="portalController">The portal controller.</param>
     /// <param name="hostSettings">The host settings.</param>
@@ -49,7 +52,9 @@ public partial class PageServiceController : DnnApiController
     {
         this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
         this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+		Logger.LogDebug("PageServiceController(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): hostSettings → {HostSettings1}", portalController, hostSettings, hostSettingsService, hostSettings);
         this.hostSettingsService = hostSettingsService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
+		Logger.LogDebug("PageServiceController(portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): hostSettingsService → {HostSettingsService1}", portalController, hostSettings, hostSettingsService, hostSettingsService);
     }
 
     /// <summary>Gets the portal ID.</summary>
@@ -84,10 +89,13 @@ public partial class PageServiceController : DnnApiController
     [DnnPagePermission]
     public HttpResponseMessage PublishPage(PublishPageRequest requestBody)
     {
+		Logger.LogDebug(">>> Entering PublishPage(requestBody={RequestBody})", requestBody);
         var tabId = this.Request.FindTabId();
 
+		Logger.LogDebug("PublishPage(requestBody={RequestBody}): tabId → {TabId}", requestBody, tabId);
         TabPublishingController.Instance.SetTabPublishing(tabId, this.PortalId, requestBody.Publish);
 
+		Logger.LogDebug("<<< Exiting PublishPage(requestBody={RequestBody})", requestBody);
         return this.Request.CreateResponse(HttpStatusCode.OK);
     }
 
@@ -98,10 +106,13 @@ public partial class PageServiceController : DnnApiController
     [ValidateAntiForgeryToken]
     public HttpResponseMessage UpdateCustomUrl(SaveUrlDto dto)
     {
+		Logger.LogDebug(">>> Entering UpdateCustomUrl(dto={Dto})", dto);
         var urlPath = dto.Path.ValueOrEmpty().TrimStart('/');
 
+		Logger.LogDebug("UpdateCustomUrl(dto={Dto}): urlPath → {UrlPath}", dto, urlPath);
         // Clean Url
         var options = UrlRewriterUtils.ExtendOptionsForCustomURLs(UrlRewriterUtils.GetOptionsFromSettings(new FriendlyUrlSettings(this.portalController, this.hostSettings, this.hostSettingsService, this.PortalSettings.PortalId)));
+		Logger.LogDebug("UpdateCustomUrl(dto={Dto}): options → {Options}", dto, options);
 
         // now clean the path
         urlPath = FriendlyUrlController.CleanNameForUrl(urlPath, options, out var modified);
@@ -115,6 +126,9 @@ public partial class PageServiceController : DnnApiController
                     ErrorMessage = Localization.GetString("CustomUrlPathCleaned.Error", Localization.GlobalResourceFile),
                     SuggestedUrlPath = "/" + urlPath,
                 });
+				Logger.LogDebug("UpdateCustomUrl(dto={Dto}): Success → {Success}", dto, Success);
+				Logger.LogDebug("UpdateCustomUrl(dto={Dto}): ErrorMessage → {ErrorMessage}", dto, ErrorMessage);
+				Logger.LogDebug("UpdateCustomUrl(dto={Dto}): SuggestedUrlPath → {SuggestedUrlPath}", dto, SuggestedUrlPath);
         }
 
         // Validate for uniqueness
@@ -163,6 +177,8 @@ public partial class PageServiceController : DnnApiController
             {
                 // Change the original 200 url to a redirect
                 tabUrl.HttpStatus = "301";
+				Logger.LogDebug("UpdateCustomUrl(dto={Dto}): tabUrl.HttpStatus → {Arg1}", dto, tabUrl.HttpStatus);
+				Logger.LogDebug("UpdateCustomUrl(dto={Dto}): tabUrl.SeqNum → {Arg1}", dto, tabUrl.SeqNum);
                 tabUrl.SeqNum = dto.Id;
                 TabController.Instance.SaveTabUrl(tabUrl, this.PortalId, true);
 
@@ -196,6 +212,7 @@ public partial class PageServiceController : DnnApiController
             Success = true,
         };
 
+		Logger.LogDebug("<<< Exiting UpdateCustomUrl(dto={Dto})", dto);
         return this.Request.CreateResponse(HttpStatusCode.OK, response);
     }
 }

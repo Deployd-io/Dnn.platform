@@ -4,10 +4,13 @@ import PropTypes from "prop-types";
 import Notify from "./Notify";
 
 import "./NotifyModal.less";
+const logger = console;
 
 
 class NotifyModal extends Component {
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return <TransitionModal onCloseModal={this.props.onClose}>
             <Notify 
                 onSend={this.props.onSend}

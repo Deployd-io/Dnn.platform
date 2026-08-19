@@ -7,17 +7,24 @@ import { getPasswordStrength } from "utils/PasswordStrength";
 import {CommonUsersActions as UserActions } from "../../../actions";
 
 import "./style.less";
+const logger = console;
 
 class Password extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.props.loadPasswordStrengthOptions();
+		logger.debug('<<< Exiting componentDidMount()');
     }
    
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <div className="passwordContainer">
                 <SingleLineInputWithError label={Localization.get("Password") }
@@ -51,12 +58,16 @@ Password.propTypes = {
 };
 
 const mapStateToProps = (state) => {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         passwordStrengthOptions : state.users.passwordStrengthOptions
     };
 };
 
 const mapDispatchToProps = (dispatch) => {
+	logger.debug(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`);
+	logger.debug(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`);
     return {
         loadPasswordStrengthOptions : () =>{
             dispatch(UserActions.passwordStrength());

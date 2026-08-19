@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,10 +13,14 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("r", function(config) {
   function wordObj(str) {
+	logger.debug(`>>> Entering wordObj(str=${str})`);
     var words = str.split(" "), res = {};
     for (var i = 0; i < words.length; ++i) res[words[i]] = true;
+	logger.debug(`wordObj(str=${str}): words → ${words}`);
+	logger.debug(`<<< Exiting wordObj(str=${str})`);
     return res;
   }
   var atoms = wordObj("NULL NA Inf NaN NA_integer_ NA_real_ NA_complex_ NA_character_");
@@ -25,8 +31,10 @@ CodeMirror.defineMode("r", function(config) {
   var curPunc;
 
   function tokenBase(stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
     curPunc = null;
     var ch = stream.next();
+	logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
     if (ch == "#") {
       stream.skipToEnd();
       return "comment";
@@ -47,6 +55,7 @@ CodeMirror.defineMode("r", function(config) {
     } else if (/[\w\.]/.test(ch) && ch != "_") {
       stream.eatWhile(/[\w\.]/);
       var word = stream.current();
+	logger.debug(`tokenBase(stream=${stream},state=${state}): word → ${word}`);
       if (atoms.propertyIsEnumerable(word)) return "atom";
       if (keywords.propertyIsEnumerable(word)) {
         // Block keywords start new blocks, except 'else if', which only starts
@@ -74,11 +83,13 @@ CodeMirror.defineMode("r", function(config) {
       if (ch == ";") return "semi";
       return null;
     } else {
+	logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
       return null;
     }
   }
 
   function tokenString(quote) {
+	logger.debug(`>>> Entering tokenString(quote=${quote})`);
     return function(stream, state) {
       if (stream.eat("\\")) {
         var ch = stream.next();
@@ -94,44 +105,56 @@ CodeMirror.defineMode("r", function(config) {
           if (next == quote) { state.tokenize = tokenBase; break; }
           if (next == "\\") { stream.backUp(1); break; }
         }
+		logger.debug(`<<< Exiting tokenString(quote=${quote})`);
         return "string";
       }
     };
   }
 
   function push(state, type, stream) {
+	logger.debug(`>>> Entering push(state=${state},type=${type},stream=${stream})`);
     state.ctx = {type: type,
                  indent: state.indent,
                  align: null,
                  column: stream.column(),
                  prev: state.ctx};
+				logger.debug(`push(state=${state},type=${type},stream=${stream}): state.ctx → ${state.ctx}`);
+				logger.debug(`<<< Exiting push(state=${state},type=${type},stream=${stream})`);
   }
   function pop(state) {
+	logger.debug(`>>> Entering pop(state=${state})`);
     state.indent = state.ctx.indent;
     state.ctx = state.ctx.prev;
+	logger.debug(`pop(state=${state}): state.ctx → ${state.ctx}`);
+	logger.debug(`<<< Exiting pop(state=${state})`);
   }
 
   return {
     startState: function() {
+	logger.debug('>>> Entering startState()');
       return {tokenize: tokenBase,
               ctx: {type: "top",
                     indent: -config.indentUnit,
                     align: false},
               indent: 0,
               afterIdent: false};
+			logger.debug('<<< Exiting startState()');
     },
 
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       if (stream.sol()) {
         if (state.ctx.align == null) state.ctx.align = false;
         state.indent = stream.indentation();
       }
       if (stream.eatSpace()) return null;
       var style = state.tokenize(stream, state);
+	logger.debug(`token(stream=${stream},state=${state}): style → ${style}`);
       if (style != "comment" && state.ctx.align == null) state.ctx.align = true;
 
       var ctype = state.ctx.type;
       if ((curPunc == ";" || curPunc == "{" || curPunc == "}") && ctype == "block") pop(state);
+	logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
       if (curPunc == "{") push(state, "}", stream);
       else if (curPunc == "(") {
         push(state, ")", stream);
@@ -145,12 +168,15 @@ CodeMirror.defineMode("r", function(config) {
     },
 
     indent: function(state, textAfter) {
+	logger.debug(`>>> Entering indent(state=${state},textAfter=${textAfter})`);
       if (state.tokenize != tokenBase) return 0;
       var firstChar = textAfter && textAfter.charAt(0), ctx = state.ctx,
           closing = firstChar == ctx.type;
+		logger.debug(`indent(state=${state},textAfter=${textAfter}): firstChar → ${firstChar}`);
       if (ctx.type == "block") return ctx.indent + (firstChar == "{" ? 0 : config.indentUnit);
       else if (ctx.align) return ctx.column + (closing ? 0 : 1);
       else return ctx.indent + (closing ? 0 : config.indentUnit);
+	logger.debug(`<<< Exiting indent(state=${state},textAfter=${textAfter})`);
     },
 
     lineComment: "#"

@@ -1,33 +1,43 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
 import Localization from "localization";
+const logger = console;
 import { Tooltip, Checkbox, SvgIcons } from "@dnnsoftware/dnn-react-common";
 
 class Module extends Component {
 
     onUpdateModules(key, e) {
+		logger.debug(`>>> Entering onUpdateModules(key=${key},e=${e})`);
         const value = e.target ? e.target.value : e;
         const {index} = this.props;
         const {cultureCode} = this.props;
         this.props.onUpdateModules(cultureCode, index, value, key);
+		logger.debug(`<<< Exiting onUpdateModules(key=${key},e=${e})`);
     }
 
     onDeleteModule(TabModuleId) {
+		logger.debug(`>>> Entering onDeleteModule(TabModuleId=${TabModuleId})`);
         this.props.onDeleteModule(TabModuleId);
+		logger.debug(`<<< Exiting onDeleteModule(TabModuleId=${TabModuleId})`);
     }
 
     onRestoreModule(TabModuleId) {
+		logger.debug(`>>> Entering onRestoreModule(TabModuleId=${TabModuleId})`);
         this.props.onRestoreModule(TabModuleId);
+		logger.debug(`<<< Exiting onRestoreModule(TabModuleId=${TabModuleId})`);
     }
 
     toggleLink() {
+		logger.debug('>>> Entering toggleLink()');
         const {module} = this.props;
         const value = !module.IsLocalized;
         this.onUpdateModules("IsLocalized", value);
+		logger.debug('<<< Exiting toggleLink()');
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {module} = this.props;
         const {isDefault} = this.props;
 
@@ -60,6 +70,7 @@ class Module extends Component {
                 </div>}
             </div>;
         }
+		logger.debug('<<< Exiting render()');
         return <div className="module-row copy">
             <Checkbox
                 style={{ float: "left" }}

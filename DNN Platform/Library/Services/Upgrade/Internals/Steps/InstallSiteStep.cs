@@ -21,16 +21,21 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
     /// <summary>InstallSiteStep - Step that installs Website.</summary>
     public class InstallSiteStep : BaseInstallationStep
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(InstallSiteStep));
         /// <summary>Main method to execute the step.</summary>
         public override void Execute()
         {
+			Logger.LogDebug(">>> Entering Execute()");
             this.Percentage = 0;
             this.Status = StepStatus.Running;
+			Logger.LogDebug("Execute(): this.Percentage → {Arg0}", this.Percentage);
+			Logger.LogDebug("Execute(): this.Status → {Arg0}", this.Status);
 
             // Set Status to None
             Globals.SetStatus(Globals.UpgradeStatus.None);
 
             var installConfig = InstallController.Instance.GetInstallConfig();
+			Logger.LogDebug("Execute(): installConfig → {InstallConfig}", installConfig);
             var percentForEachStep = 100 / installConfig.Portals.Count;
             var counter = 0;
             foreach (var portal in installConfig.Portals)
@@ -46,10 +51,12 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
             Globals.ResetAppStartElapseTime();
 
             this.Status = StepStatus.Done;
+			Logger.LogDebug("<<< Exiting Execute()");
         }
 
         private void CreateSite(PortalConfig portal, InstallConfig installConfig)
         {
+			Logger.LogDebug(">>> Entering CreateSite(portal={Portal},installConfig={InstallConfig})", portal, installConfig);
             var domain = string.Empty;
             if (HttpContext.Current != null)
             {
@@ -57,9 +64,11 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
             }
 
             var serverPath = Globals.ApplicationMapPath + @"\";
+			Logger.LogDebug("CreateSite(portal={Portal},installConfig={InstallConfig}): serverPath → {ServerPath}", portal, installConfig, serverPath);
 
             // Get the Portal Alias
             var portalAlias = domain;
+			Logger.LogDebug("CreateSite(portal={Portal},installConfig={InstallConfig}): portalAlias → {PortalAlias}", portal, installConfig, portalAlias);
             if (portal.PortAliases.Count > 0)
             {
                 portalAlias = portal.PortAliases[0];
@@ -75,6 +84,7 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
 
             // Create default email
             var email = portal.AdminEmail;
+			Logger.LogDebug("CreateSite(portal={Portal},installConfig={InstallConfig}): email → {Email}", portal, installConfig, email);
             if (string.IsNullOrEmpty(email))
             {
                 email = "admin@" + domain.Replace("www.", string.Empty);
@@ -88,6 +98,7 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
 
             // install LP if installing in a different language
             string culture = installConfig.InstallCulture;
+			Logger.LogDebug("CreateSite(portal={Portal},installConfig={InstallConfig}): culture → {Culture}", portal, installConfig, culture);
             if (!culture.Equals("en-us", StringComparison.OrdinalIgnoreCase))
             {
                 string installFolder = HttpContext.Current.Server.MapPath("~/Install/language");
@@ -107,6 +118,7 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
             }
 
             var template = Upgrade.FindBestTemplate(portal.TemplateFileName, culture);
+			Logger.LogDebug("CreateSite(portal={Portal},installConfig={InstallConfig}): template → {Template}", portal, installConfig, template);
             UserInfo userInfo;
 
             if (!string.IsNullOrEmpty(portal.AdminUserName))
@@ -119,6 +131,7 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
             }
 
             var childPath = string.Empty;
+			Logger.LogDebug("CreateSite(portal={Portal},installConfig={InstallConfig}): childPath → {ChildPath}", portal, installConfig, childPath);
             if (portal.IsChild)
             {
                 childPath = portalAlias.Substring(portalAlias.LastIndexOf("/", StringComparison.Ordinal) + 1);
@@ -161,6 +174,7 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
             if (!culture.Equals("en-us", StringComparison.OrdinalIgnoreCase))
             {
                 var locale = LocaleController.Instance.GetLocale("en-US");
+				Logger.LogDebug("CreateSite(portal={Portal},installConfig={InstallConfig}): locale → {Locale}", portal, installConfig, locale);
                 Localization.RemoveLanguageFromPortal(portalId, locale.LanguageId, true);
             }
 
@@ -169,6 +183,7 @@ namespace DotNetNuke.Services.Upgrade.InternalController.Steps
             UserController.UserLogin(portalId, userInfo.Username, installConfig.SuperUser.Password, string.Empty, string.Empty, string.Empty, ref loginStatus, false);
 
             InstallController.Instance.RemoveFromInstallConfig("//dotnetnuke/superuser/password");
+			Logger.LogDebug("<<< Exiting CreateSite(portal={Portal},installConfig={InstallConfig})", portal, installConfig);
         }
 
         ////private void CreateFolderMappingConfig(string folderMappinsSettings)

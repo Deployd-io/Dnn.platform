@@ -8,10 +8,13 @@ namespace DotNetNuke.Entities.Content.Workflow.Exceptions
 
     public class WorkflowConcurrencyException : WorkflowException
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(WorkflowConcurrencyException));
         /// <summary>Initializes a new instance of the <see cref="WorkflowConcurrencyException"/> class.</summary>
         public WorkflowConcurrencyException()
             : base(Localization.GetString("WorkflowConcurrencyException", Localization.ExceptionsResourceFile))
         {
+		Logger.LogDebug(">>> Entering WorkflowConcurrencyException()");
+		Logger.LogDebug("<<< Exiting WorkflowConcurrencyException()");
         }
     }
 }

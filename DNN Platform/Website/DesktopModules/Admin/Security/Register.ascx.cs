@@ -62,8 +62,10 @@ namespace DotNetNuke.Modules.Admin.Users
         public Register()
             : this(null, null, null, null, null, null, null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering Register()");
         }
 
+		eventLogger.LogDebug("<<< Exiting Register()");
         /// <summary>Initializes a new instance of the <see cref="Register"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
         /// <param name="serviceProvider">The service provider.</param>
@@ -71,6 +73,10 @@ namespace DotNetNuke.Modules.Admin.Users
         public Register(INavigationManager navigationManager, IServiceProvider serviceProvider)
             : this(navigationManager, serviceProvider, null, null, null, null, null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering Register(navigationManager={NavigationManager},serviceProvider={ServiceProvider})", navigationManager, serviceProvider);
+		eventLogger.LogDebug("<<< Exiting Register(navigationManager={NavigationManager},serviceProvider={ServiceProvider})", navigationManager, serviceProvider);
+		eventLogger.LogDebug(">>> Entering Register(navigationManager={NavigationManager},serviceProvider={ServiceProvider},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController})", navigationManager, serviceProvider, hostSettings, javaScript, clientResourceController);
+		eventLogger.LogDebug("<<< Exiting Register(navigationManager={NavigationManager},serviceProvider={ServiceProvider},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController})", navigationManager, serviceProvider, hostSettings, javaScript, clientResourceController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Register"/> class.</summary>
@@ -97,6 +103,14 @@ namespace DotNetNuke.Modules.Admin.Users
         public Register(INavigationManager navigationManager, IServiceProvider serviceProvider, IHostSettings hostSettings, IJavaScriptLibraryHelper javaScript, IClientResourceController clientResourceController, IApplicationStatusInfo appStatus, IEventLogger eventLogger)
             : this(navigationManager, serviceProvider, hostSettings, javaScript, clientResourceController, appStatus, eventLogger, null, null)
         {
+		eventLogger.LogDebug("Register(navigationManager={NavigationManager},serviceProvider={ServiceProvider},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},listController={ListController},dataProvider={DataProvider}): navigationManager → {NavigationManager1}", navigationManager, serviceProvider, hostSettings, javaScript, clientResourceController, appStatus, eventLogger, listController, dataProvider, navigationManager);
+		eventLogger.LogDebug("Register(navigationManager={NavigationManager},serviceProvider={ServiceProvider},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},listController={ListController},dataProvider={DataProvider}): hostSettings → {HostSettings1}", navigationManager, serviceProvider, hostSettings, javaScript, clientResourceController, appStatus, eventLogger, listController, dataProvider, hostSettings);
+		eventLogger.LogDebug("Register(navigationManager={NavigationManager},serviceProvider={ServiceProvider},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},listController={ListController},dataProvider={DataProvider}): javaScript → {JavaScript1}", navigationManager, serviceProvider, hostSettings, javaScript, clientResourceController, appStatus, eventLogger, listController, dataProvider, javaScript);
+		eventLogger.LogDebug("Register(navigationManager={NavigationManager},serviceProvider={ServiceProvider},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},listController={ListController},dataProvider={DataProvider}): clientResourceController → {ClientResourceController1}", navigationManager, serviceProvider, hostSettings, javaScript, clientResourceController, appStatus, eventLogger, listController, dataProvider, clientResourceController);
+		eventLogger.LogDebug("Register(navigationManager={NavigationManager},serviceProvider={ServiceProvider},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},listController={ListController},dataProvider={DataProvider}): appStatus → {AppStatus1}", navigationManager, serviceProvider, hostSettings, javaScript, clientResourceController, appStatus, eventLogger, listController, dataProvider, appStatus);
+		eventLogger.LogDebug("Register(navigationManager={NavigationManager},serviceProvider={ServiceProvider},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},listController={ListController},dataProvider={DataProvider}): eventLogger → {EventLogger1}", navigationManager, serviceProvider, hostSettings, javaScript, clientResourceController, appStatus, eventLogger, listController, dataProvider, eventLogger);
+		eventLogger.LogDebug("Register(navigationManager={NavigationManager},serviceProvider={ServiceProvider},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},listController={ListController},dataProvider={DataProvider}): listController → {ListController1}", navigationManager, serviceProvider, hostSettings, javaScript, clientResourceController, appStatus, eventLogger, listController, dataProvider, listController);
+		eventLogger.LogDebug("Register(navigationManager={NavigationManager},serviceProvider={ServiceProvider},hostSettings={HostSettings},javaScript={JavaScript},clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},listController={ListController},dataProvider={DataProvider}): dataProvider → {DataProvider1}", navigationManager, serviceProvider, hostSettings, javaScript, clientResourceController, appStatus, eventLogger, listController, dataProvider, dataProvider);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Register"/> class.</summary>
@@ -158,6 +172,7 @@ namespace DotNetNuke.Modules.Admin.Users
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.javaScript.RequestRegistration(CommonJs.DnnPlugins);
@@ -229,6 +244,7 @@ namespace DotNetNuke.Modules.Admin.Users
             else
             {
                 var fields = this.PortalSettings.Registration.RegistrationFields.Split(',').ToList();
+				eventLogger.LogDebug("OnInit(e={E}): fields → {Fields}", e, fields);
 
                 // append question/answer field when RequiresQuestionAndAnswer is enabled in config.
                 if (MembershipProviderConfig.RequiresQuestionAndAnswer)
@@ -247,6 +263,7 @@ namespace DotNetNuke.Modules.Admin.Users
                 foreach (string field in fields)
                 {
                     var trimmedField = field.Trim();
+					eventLogger.LogDebug("OnInit(e={E}): trimmedField → {TrimmedField}", e, trimmedField);
                     switch (trimmedField)
                     {
                         case "Username":
@@ -279,6 +296,7 @@ namespace DotNetNuke.Modules.Admin.Users
                             break;
                         default:
                             ProfilePropertyDefinition property = this.User.Profile.GetProperty(trimmedField);
+							eventLogger.LogDebug("OnInit(e={E}): property → {Property}", e, property);
                             if (property != null)
                             {
                                 this.AddProperty(property);
@@ -298,6 +316,7 @@ namespace DotNetNuke.Modules.Admin.Users
                 }
                 catch (ThreadAbortException)
                 {
+					eventLogger.LogError("Exception in OnInit(e={E}): {Arg1}", e, ThreadAbortException.getMessage());
                     // do nothing here.
                 }
             }
@@ -308,11 +327,13 @@ namespace DotNetNuke.Modules.Admin.Users
             if (this.PortalSettings.Registration.UseAuthProviders)
             {
                 List<AuthenticationInfo> authSystems = AuthenticationController.GetEnabledAuthenticationServices(this.hostSettings);
+				eventLogger.LogDebug("OnInit(e={E}): authSystems → {AuthSystems}", e, authSystems);
                 foreach (AuthenticationInfo authSystem in authSystems)
                 {
                     try
                     {
                         var authLoginControl = (AuthenticationLoginBase)this.LoadControl("~/" + authSystem.LoginControlSrc);
+						eventLogger.LogDebug("OnInit(e={E}): authLoginControl → {AuthLoginControl}", e, authLoginControl);
                         if (authSystem.AuthenticationType != "DNN")
                         {
                             this.BindLoginControl(authLoginControl, authSystem);
@@ -321,6 +342,7 @@ namespace DotNetNuke.Modules.Admin.Users
                             if (authLoginControl.Enabled && authLoginControl.SupportsRegistration)
                             {
                                 authLoginControl.Mode = AuthMode.Register;
+								eventLogger.LogDebug("OnInit(e={E}): authLoginControl.Mode → {Arg1}", e, authLoginControl.Mode);
 
                                 // Add Login Control to List
                                 this.loginControls.Add(authLoginControl);
@@ -329,15 +351,18 @@ namespace DotNetNuke.Modules.Admin.Users
                     }
                     catch (Exception ex)
                     {
+						eventLogger.LogError("Exception in OnInit(e={E}): {Arg1}", e, ex.getMessage());
                         Exceptions.LogException(ex);
                     }
                 }
             }
+			eventLogger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             if (this.Request.IsAuthenticated)
@@ -396,11 +421,13 @@ namespace DotNetNuke.Modules.Admin.Users
             {
                 this.userForm.DataBind();
             }
+			eventLogger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             var confirmPasswordOptions = new DnnConfirmPasswordOptions()
@@ -413,7 +440,9 @@ namespace DotNetNuke.Modules.Admin.Users
             };
 
             var optionsAsJsonString = Json.Serialize(confirmPasswordOptions);
+			eventLogger.LogDebug("OnPreRender(e={E}): optionsAsJsonString → {OptionsAsJsonString}", e, optionsAsJsonString);
             var script = $"dnn.initializePasswordComparer({optionsAsJsonString});{Environment.NewLine}";
+			eventLogger.LogDebug("OnPreRender(e={E}): script → {Script}", e, script);
 
             if (ScriptManager.GetCurrent(this.Page) != null)
             {
@@ -424,10 +453,12 @@ namespace DotNetNuke.Modules.Admin.Users
             {
                 this.Page.ClientScript.RegisterStartupScript(this.GetType(), "ConfirmPassword", script, true);
             }
+			eventLogger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private void AddField(string dataField, string dataMember, bool required, string regexValidator, TextBoxMode textMode)
         {
+			eventLogger.LogDebug(">>> Entering AddField(dataField={DataField},dataMember={DataMember},required={Required},regexValidator={RegexValidator},textMode={TextMode})", dataField, dataMember, required, regexValidator, textMode);
             if (this.userForm.Items.Any(i => i.ID == dataField))
             {
                 return;
@@ -445,19 +476,23 @@ namespace DotNetNuke.Modules.Admin.Users
             if (!string.IsNullOrEmpty(regexValidator))
             {
                 formItem.ValidationExpression = regexValidator;
+				eventLogger.LogDebug("AddField(dataField={DataField},dataMember={DataMember},required={Required},regexValidator={RegexValidator},textMode={TextMode}): formItem.ValidationExpression → {Arg5}", dataField, dataMember, required, regexValidator, textMode, formItem.ValidationExpression);
             }
 
             this.userForm.Items.Add(formItem);
+			eventLogger.LogDebug("<<< Exiting AddField(dataField={DataField},dataMember={DataMember},required={Required},regexValidator={RegexValidator},textMode={TextMode})", dataField, dataMember, required, regexValidator, textMode);
         }
 
         private void AddPasswordStrengthField(string dataField, string dataMember, bool required)
         {
+			eventLogger.LogDebug(">>> Entering AddPasswordStrengthField(dataField={DataField},dataMember={DataMember},required={Required})", dataField, dataMember, required);
             DnnFormItemBase formItem;
 
             if (this.hostSettings.EnableStrengthMeter)
             {
                 formItem = new DnnFormPasswordItem(this.appStatus, this.eventLogger, this.clientResourceController)
                 {
+				eventLogger.LogDebug("AddPasswordStrengthField(dataField={DataField},dataMember={DataMember},required={Required}): formItem → {FormItem}", dataField, dataMember, required, formItem);
                     TextBoxCssClass = PasswordStrengthTextBoxCssClass,
                     ContainerCssClass = "password-strength-container",
                 };
@@ -478,10 +513,12 @@ namespace DotNetNuke.Modules.Admin.Users
             formItem.Required = required;
 
             this.userForm.Items.Add(formItem);
+			eventLogger.LogDebug("<<< Exiting AddPasswordStrengthField(dataField={DataField},dataMember={DataMember},required={Required})", dataField, dataMember, required);
         }
 
         private void AddPasswordConfirmField(string dataField, string dataMember, bool required)
         {
+			eventLogger.LogDebug(">>> Entering AddPasswordConfirmField(dataField={DataField},dataMember={DataMember},required={Required})", dataField, dataMember, required);
             var formItem = new DnnFormTextBoxItem(this.appStatus, this.eventLogger)
             {
                 ID = dataField,
@@ -495,16 +532,19 @@ namespace DotNetNuke.Modules.Admin.Users
                 MaxLength = 39,
             };
             this.userForm.Items.Add(formItem);
+			eventLogger.LogDebug("<<< Exiting AddPasswordConfirmField(dataField={DataField},dataMember={DataMember},required={Required})", dataField, dataMember, required);
         }
 
         private void AddProperty(ProfilePropertyDefinition property)
         {
+			eventLogger.LogDebug(">>> Entering AddProperty(property={Property})", property);
             if (this.userForm.Items.Any(i => i.ID == property.PropertyName))
             {
                 return;
             }
 
             ListEntryInfo imageType = this.listController.GetListEntryInfo("DataType", "Image");
+			eventLogger.LogDebug("AddProperty(property={Property}): imageType → {ImageType}", property, imageType);
             if (property.DataType != imageType.EntryID)
             {
                 var formItem = new DnnFormEditControlItem(this.appStatus, this.eventLogger, this.serviceProvider)
@@ -524,33 +564,42 @@ namespace DotNetNuke.Modules.Admin.Users
                 if (!string.IsNullOrEmpty(property.DefaultValue))
                 {
                     formItem.Value = property.DefaultValue;
+					eventLogger.LogDebug("AddProperty(property={Property}): formItem.Value → {Arg1}", property, formItem.Value);
                 }
 
                 if (!string.IsNullOrEmpty(property.ValidationExpression))
                 {
                     formItem.ValidationExpression = property.ValidationExpression;
+					eventLogger.LogDebug("AddProperty(property={Property}): formItem.ValidationExpression → {Arg1}", property, formItem.ValidationExpression);
                 }
 
                 this.userForm.Items.Add(formItem);
             }
+			eventLogger.LogDebug("<<< Exiting AddProperty(property={Property})", property);
         }
 
         private void BindLoginControl(AuthenticationLoginBase authLoginControl, AuthenticationInfo authSystem)
         {
+			eventLogger.LogDebug(">>> Entering BindLoginControl(authLoginControl={AuthLoginControl},authSystem={AuthSystem})", authLoginControl, authSystem);
             // set the control ID to the resource file name ( ie. controlname.ascx = controlname )
             // this is necessary for the Localization in PageBase
             authLoginControl.AuthenticationType = authSystem.AuthenticationType;
+			eventLogger.LogDebug("BindLoginControl(authLoginControl={AuthLoginControl},authSystem={AuthSystem}): authLoginControl.AuthenticationType → {Arg2}", authLoginControl, authSystem, authLoginControl.AuthenticationType);
             authLoginControl.ID = Path.GetFileNameWithoutExtension(authSystem.LoginControlSrc) + "_" + authSystem.AuthenticationType;
             authLoginControl.LocalResourceFile = authLoginControl.TemplateSourceDirectory + "/" + Localization.LocalResourceDirectory + "/" +
                                                  Path.GetFileNameWithoutExtension(authSystem.LoginControlSrc);
+												eventLogger.LogDebug("BindLoginControl(authLoginControl={AuthLoginControl},authSystem={AuthSystem}): authLoginControl.LocalResourceFile → {Arg2}", authLoginControl, authSystem, authLoginControl.LocalResourceFile);
             authLoginControl.RedirectURL = this.GetRedirectUrl();
             authLoginControl.ModuleConfiguration = this.ModuleConfiguration;
+			eventLogger.LogDebug("BindLoginControl(authLoginControl={AuthLoginControl},authSystem={AuthSystem}): authLoginControl.ModuleConfiguration → {Arg2}", authLoginControl, authSystem, authLoginControl.ModuleConfiguration);
 
             authLoginControl.UserAuthenticated += this.UserAuthenticated;
+			eventLogger.LogDebug("<<< Exiting BindLoginControl(authLoginControl={AuthLoginControl},authSystem={AuthSystem})", authLoginControl, authSystem);
         }
 
         private void CreateUser()
         {
+			eventLogger.LogDebug(">>> Entering CreateUser()");
             // Update DisplayName to conform to Format
             this.UpdateDisplayName();
 
@@ -593,31 +642,38 @@ namespace DotNetNuke.Modules.Admin.Users
             }
             catch (Exception exc)
             {
+				eventLogger.LogError("Exception in CreateUser(): {Arg0}", exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			eventLogger.LogDebug("<<< Exiting CreateUser()");
         }
 
         private void UpdateDisplayName()
         {
+			eventLogger.LogDebug(">>> Entering UpdateDisplayName()");
             // Update DisplayName to conform to Format
             if (!string.IsNullOrEmpty(this.PortalSettings.Registration.DisplayNameFormat))
             {
                 this.User.UpdateDisplayName(this.PortalSettings.Registration.DisplayNameFormat);
             }
+			eventLogger.LogDebug("<<< Exiting UpdateDisplayName()");
         }
 
         private bool Validate()
         {
+			eventLogger.LogDebug(">>> Entering Validate()");
             if (!string.IsNullOrEmpty(this.gotcha.Value))
             {
                 return false;
             }
 
             this.CreateStatus = UserCreateStatus.AddUser;
+			eventLogger.LogDebug("Validate(): this.CreateStatus → {Arg0}", this.CreateStatus);
             var portalSecurity = PortalSecurity.Instance;
 
             // Check User Editor
             bool isValid = this.userForm.IsValid;
+			eventLogger.LogDebug("Validate(): isValid → {IsValid}", isValid);
 
             if (isValid)
             {
@@ -625,13 +681,16 @@ namespace DotNetNuke.Modules.Admin.Users
                 var filterFlags = PortalSecurity.FilterFlag.NoScripting | PortalSecurity.FilterFlag.NoAngleBrackets | PortalSecurity.FilterFlag.NoMarkup;
 #pragma warning restore CS0618 // PortalSecurity.FilterFlag.NoScripting is deprecated
                 var name = this.User.Username ?? this.User.Email;
+				eventLogger.LogDebug("Validate(): name → {Name}", name);
                 var cleanUsername = PortalSecurity.Instance.InputFilter(name, filterFlags);
+				eventLogger.LogDebug("Validate(): cleanUsername → {CleanUsername}", cleanUsername);
                 if (!cleanUsername.Equals(name))
                 {
                     this.CreateStatus = UserCreateStatus.InvalidUserName;
                 }
 
                 var valid = UserController.Instance.IsValidUserName(name);
+				eventLogger.LogDebug("Validate(): valid → {Valid}", valid);
 
                 if (!valid)
                 {
@@ -639,18 +698,21 @@ namespace DotNetNuke.Modules.Admin.Users
                 }
 
                 var cleanEmail = PortalSecurity.Instance.InputFilter(this.User.Email, filterFlags);
+				eventLogger.LogDebug("Validate(): cleanEmail → {CleanEmail}", cleanEmail);
                 if (!cleanEmail.Equals(this.User.Email))
                 {
                     this.CreateStatus = UserCreateStatus.InvalidEmail;
                 }
 
                 var cleanFirstName = PortalSecurity.Instance.InputFilter(this.User.FirstName, filterFlags);
+				eventLogger.LogDebug("Validate(): cleanFirstName → {CleanFirstName}", cleanFirstName);
                 if (!cleanFirstName.Equals(this.User.FirstName))
                 {
                     this.CreateStatus = UserCreateStatus.InvalidFirstName;
                 }
 
                 var cleanLastName = PortalSecurity.Instance.InputFilter(this.User.LastName, filterFlags);
+				eventLogger.LogDebug("Validate(): cleanLastName → {CleanLastName}", cleanLastName);
                 if (!cleanLastName.Equals(this.User.LastName))
                 {
                     this.CreateStatus = UserCreateStatus.InvalidLastName;
@@ -659,6 +721,7 @@ namespace DotNetNuke.Modules.Admin.Users
                 if (string.IsNullOrEmpty(this.PortalSettings.Registration.DisplayNameFormat))
                 {
                     var cleanDisplayName = PortalSecurity.Instance.InputFilter(this.User.DisplayName, filterFlags);
+					eventLogger.LogDebug("Validate(): cleanDisplayName → {CleanDisplayName}", cleanDisplayName);
                     if (!cleanDisplayName.Equals(this.User.DisplayName))
                     {
                         this.CreateStatus = UserCreateStatus.InvalidDisplayName;
@@ -737,10 +800,12 @@ namespace DotNetNuke.Modules.Admin.Users
 
             // Validate banned password
             var settings = new MembershipPasswordSettings(this.User.PortalID);
+			eventLogger.LogDebug("Validate(): settings → {Settings}", settings);
 
             if (settings.EnableBannedList)
             {
                 var m = new MembershipPasswordController(this.listController, this.dataProvider);
+				eventLogger.LogDebug("Validate(): m → {M}", m);
                 if (m.FoundBannedPassword(this.User.Membership.Password) || this.User.Username == this.User.Membership.Password)
                 {
                     this.CreateStatus = UserCreateStatus.BannedPasswordUsed;
@@ -766,6 +831,7 @@ namespace DotNetNuke.Modules.Admin.Users
 
             // Validate Unique User Name
             UserInfo user = UserController.GetUserByName(this.PortalId, this.User.Username);
+			eventLogger.LogDebug("Validate(): user → {User}", user);
             if (user != null)
             {
                 if (this.PortalSettings.Registration.UseEmailAsUserName)
@@ -777,6 +843,7 @@ namespace DotNetNuke.Modules.Admin.Users
                     this.CreateStatus = UserCreateStatus.DuplicateUserName;
                     int i = 1;
                     string userName = null;
+					eventLogger.LogDebug("Validate(): userName → {UserName}", userName);
                     while (user != null)
                     {
                         userName = this.User.Username + "0" + i.ToString(CultureInfo.InvariantCulture);
@@ -797,6 +864,7 @@ namespace DotNetNuke.Modules.Admin.Users
                     this.CreateStatus = UserCreateStatus.DuplicateDisplayName;
                     int i = 1;
                     string displayName = null;
+					eventLogger.LogDebug("Validate(): displayName → {DisplayName}", displayName);
                     while (user != null)
                     {
                         displayName = this.User.DisplayName + " 0" + i.ToString(CultureInfo.InvariantCulture);
@@ -837,8 +905,10 @@ namespace DotNetNuke.Modules.Admin.Users
 
         private string GetRedirectUrl(bool checkSetting = true)
         {
+			eventLogger.LogDebug(">>> Entering GetRedirectUrl(checkSetting={CheckSetting})", checkSetting);
             var redirectUrl = string.Empty;
             var redirectAfterRegistration = this.PortalSettings.Registration.RedirectAfterRegistration;
+			eventLogger.LogDebug("GetRedirectUrl(checkSetting={CheckSetting}): redirectUrl → {RedirectUrl}", checkSetting, redirectUrl);
             if (checkSetting && redirectAfterRegistration > 0)
             {
                 // redirect to after registration page
@@ -873,11 +943,13 @@ namespace DotNetNuke.Modules.Admin.Users
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting GetRedirectUrl(checkSetting={CheckSetting})", checkSetting);
             return redirectUrl;
         }
 
         private void RegisterButton_Click(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering RegisterButton_Click(sender={Sender},e={E})", sender, e);
             if ((this.PortalSettings.Registration.UseCaptcha && this.ctlCaptcha.IsValid) || !this.PortalSettings.Registration.UseCaptcha)
             {
                 if (this.IsValid)
@@ -895,16 +967,20 @@ namespace DotNetNuke.Modules.Admin.Users
                     }
                 }
             }
+			eventLogger.LogDebug("<<< Exiting RegisterButton_Click(sender={Sender},e={E})", sender, e);
         }
 
         private void UserAuthenticated(object sender, UserAuthenticatedEventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering UserAuthenticated(sender={Sender},e={E})", sender, e);
             NameValueCollection profileProperties = e.Profile;
 
             this.User.Username = e.UserToken;
             this.AuthenticationType = e.AuthenticationType;
+			eventLogger.LogDebug("UserAuthenticated(sender={Sender},e={E}): this.AuthenticationType → {Arg2}", sender, e, this.AuthenticationType);
             this.UserToken = e.UserToken;
 
+			eventLogger.LogDebug("UserAuthenticated(sender={Sender},e={E}): this.UserToken → {Arg2}", sender, e, this.UserToken);
             foreach (string key in profileProperties)
             {
                 switch (key)
@@ -944,6 +1020,7 @@ namespace DotNetNuke.Modules.Admin.Users
 
                 this.userForm.DataBind();
             }
+			eventLogger.LogDebug("<<< Exiting UserAuthenticated(sender={Sender},e={E})", sender, e);
         }
     }
 }

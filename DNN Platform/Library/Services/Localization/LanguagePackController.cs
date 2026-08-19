@@ -17,6 +17,7 @@ namespace DotNetNuke.Services.Localization
     /// <summary>A controller for language packs.</summary>
     public partial class LanguagePackController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LanguagePackController));
         /// <summary>Delete the specified language pack.</summary>
         /// <param name="languagePack">The language pack.</param>
         [DnnDeprecated(10, 2, 2, "Use overload taking IEventLogger")]
@@ -28,7 +29,9 @@ namespace DotNetNuke.Services.Localization
         /// <param name="languagePack">The language pack.</param>
         public static void DeleteLanguagePack(IEventLogger eventLogger, LanguagePackInfo languagePack)
         {
+			Logger.LogDebug(">>> Entering DeleteLanguagePack(eventLogger={EventLogger},languagePack={LanguagePack})", eventLogger, languagePack);
             // fix DNN-26330     Removing a language pack extension removes the language
+			Logger.LogDebug("<<< Exiting DeleteLanguagePack(languagePack={LanguagePack})", languagePack);
             // we should not delete language when deleting language pack, as there is just a loose relationship
 
             ////if (languagePack.PackageType == LanguagePackType.Core)
@@ -45,6 +48,8 @@ namespace DotNetNuke.Services.Localization
 
         public static LanguagePackInfo GetLanguagePackByPackage(int packageID)
         {
+			Logger.LogDebug(">>> Entering GetLanguagePackByPackage(packageID={PackageID})", packageID);
+			Logger.LogDebug("<<< Exiting GetLanguagePackByPackage(packageID={PackageID})", packageID);
             return CBO.FillObject<LanguagePackInfo>(DataProvider.Instance().GetLanguagePackByPackage(packageID));
         }
 
@@ -59,8 +64,10 @@ namespace DotNetNuke.Services.Localization
         /// <param name="languagePack">The language pack.</param>
         public static void SaveLanguagePack(IEventLogger eventLogger, LanguagePackInfo languagePack)
         {
+			Logger.LogDebug(">>> Entering SaveLanguagePack(eventLogger={EventLogger},languagePack={LanguagePack})", eventLogger, languagePack);
             if (languagePack.LanguagePackID == Null.NullInteger)
             {
+				Logger.LogDebug("<<< Exiting SaveLanguagePack(languagePack={LanguagePack})", languagePack);
                 // Add Language Pack
                 languagePack.LanguagePackID = DataProvider.Instance().AddLanguagePack(
                     languagePack.PackageID,

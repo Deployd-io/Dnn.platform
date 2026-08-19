@@ -23,7 +23,9 @@ namespace Dnn.EditBar.UI.Items
         public CompleteWorkflowMenu()
             : this(null, null)
         {
+		eventLogger.LogDebug(">>> Entering CompleteWorkflowMenu()");
         }
+		eventLogger.LogDebug("<<< Exiting CompleteWorkflowMenu()");
 
         /// <inheritdoc />
         public override string Name { get; } = "CompleteWorkflow";

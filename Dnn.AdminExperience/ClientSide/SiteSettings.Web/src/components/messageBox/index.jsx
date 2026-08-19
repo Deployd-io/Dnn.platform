@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Modal from "react-modal";
+const logger = console;
 import { SvgIcons } from "@dnnsoftware/dnn-react-common";
 
 const modalStyles = {
@@ -29,16 +30,22 @@ const modalStyles = {
 class MessageBox extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
 
     onClose() {
+		logger.debug('>>> Entering onClose()');
         const {props} = this;
         props.onClose();
+		logger.debug('<<< Exiting onClose()');
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <Modal
                 isOpen={props.isOpened}

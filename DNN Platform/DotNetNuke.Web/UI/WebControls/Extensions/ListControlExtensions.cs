@@ -11,13 +11,16 @@ namespace DotNetNuke.Web.UI.WebControls.Extensions
     /// <summary>Extension methods for <see cref="ListControl"/> instances.</summary>
     public static class ListControlExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ListControlExtensions));
         /// <summary>Adds an item into the list.</summary>
         /// <param name="control">The list control.</param>
         /// <param name="text">The item text.</param>
         /// <param name="value">The item value.</param>
         public static void AddItem(this ListControl control, string text, string value)
         {
+			Logger.LogDebug(">>> Entering AddItem(control={Control},text={Text},value={Value})", control, text, value);
             control.Items.Add(new ListItem(text, value));
+			Logger.LogDebug("<<< Exiting AddItem(control={Control},text={Text},value={Value})", control, text, value);
         }
 
         /// <summary>Inserts an item into the list.</summary>
@@ -27,7 +30,9 @@ namespace DotNetNuke.Web.UI.WebControls.Extensions
         /// <param name="value">The item value.</param>
         public static void InsertItem(this ListControl control, int index, string text, string value)
         {
+			Logger.LogDebug(">>> Entering InsertItem(control={Control},index={Index},text={Text},value={Value})", control, index, text, value);
             control.Items.Insert(index, new ListItem(text, value));
+			Logger.LogDebug("<<< Exiting InsertItem(control={Control},index={Index},text={Text},value={Value})", control, index, text, value);
         }
 
         /// <summary>Binds a data source to the invoked server control and all its child controls.</summary>
@@ -35,7 +40,9 @@ namespace DotNetNuke.Web.UI.WebControls.Extensions
         /// <param name="initialValue">The initial value.</param>
         public static void DataBind(this ListControl control, string initialValue)
         {
+			Logger.LogDebug(">>> Entering DataBind(control={Control},initialValue={InitialValue})", control, initialValue);
             DataBind(control, initialValue, false);
+			Logger.LogDebug("<<< Exiting DataBind(control={Control},initialValue={InitialValue})", control, initialValue);
         }
 
         /// <summary>Binds a data source to the invoked server control and all its child controls.</summary>
@@ -44,9 +51,11 @@ namespace DotNetNuke.Web.UI.WebControls.Extensions
         /// <param name="findByText">Whether <paramref name="initial"/> is the text or value.</param>
         public static void DataBind(this ListControl control, string initial, bool findByText)
         {
+			Logger.LogDebug(">>> Entering DataBind(control={Control},initial={Initial},findByText={FindByText})", control, initial, findByText);
             control.DataBind();
 
             Select(control, initial, findByText);
+			Logger.LogDebug("<<< Exiting DataBind(control={Control},initial={Initial},findByText={FindByText})", control, initial, findByText);
         }
 
         /// <summary>Selects an item.</summary>
@@ -54,7 +63,9 @@ namespace DotNetNuke.Web.UI.WebControls.Extensions
         /// <param name="initial">The item's value.</param>
         public static void Select(this ListControl control, string initial)
         {
+			Logger.LogDebug(">>> Entering Select(control={Control},initial={Initial})", control, initial);
             Select(control, initial, false, -1);
+			Logger.LogDebug("<<< Exiting Select(control={Control},initial={Initial})", control, initial);
         }
 
         /// <summary>Selects an item.</summary>
@@ -63,7 +74,9 @@ namespace DotNetNuke.Web.UI.WebControls.Extensions
         /// <param name="findByText">Whether <paramref name="initial"/> is the text or value.</param>
         public static void Select(this ListControl control, string initial, bool findByText)
         {
+			Logger.LogDebug(">>> Entering Select(control={Control},initial={Initial},findByText={FindByText})", control, initial, findByText);
             Select(control, initial, findByText, -1);
+			Logger.LogDebug("<<< Exiting Select(control={Control},initial={Initial},findByText={FindByText})", control, initial, findByText);
         }
 
         /// <summary>Selects an item.</summary>
@@ -73,6 +86,7 @@ namespace DotNetNuke.Web.UI.WebControls.Extensions
         /// <param name="fallbackIndex">The index to select if the item isn't found.</param>
         public static void Select(this ListControl control, string initial, bool findByText, int fallbackIndex)
         {
+			Logger.LogDebug(">>> Entering Select(control={Control},initial={Initial},findByText={FindByText},fallbackIndex={FallbackIndex})", control, initial, findByText, fallbackIndex);
             control.ClearSelection();
             if (findByText)
             {
@@ -96,6 +110,7 @@ namespace DotNetNuke.Web.UI.WebControls.Extensions
                     control.Items[fallbackIndex].Selected = true;
                 }
             }
+			Logger.LogDebug("<<< Exiting Select(control={Control},initial={Initial},findByText={FindByText},fallbackIndex={FallbackIndex})", control, initial, findByText, fallbackIndex);
         }
 
         /// <summary>Use this method instead of ListItemCollection.FindByText to find the specific item with case-insensitive.</summary>
@@ -104,6 +119,8 @@ namespace DotNetNuke.Web.UI.WebControls.Extensions
         /// <returns>the specific item or null if didn't match the text with any item.</returns>
         public static ListItem FindByTextWithIgnoreCase(this ListItemCollection listItems, string text)
         {
+			Logger.LogDebug(">>> Entering FindByTextWithIgnoreCase(listItems={ListItems},text={Text})", listItems, text);
+			Logger.LogDebug("<<< Exiting FindByTextWithIgnoreCase(listItems={ListItems},text={Text})", listItems, text);
             return listItems.Cast<ListItem>().FirstOrDefault(item => item.Text.Equals(text, StringComparison.OrdinalIgnoreCase));
         }
 
@@ -113,6 +130,8 @@ namespace DotNetNuke.Web.UI.WebControls.Extensions
         /// <returns>the specific item or null if didn't match the value with any item.</returns>
         public static ListItem FindByValueWithIgnoreCase(this ListItemCollection listItems, string value)
         {
+			Logger.LogDebug(">>> Entering FindByValueWithIgnoreCase(listItems={ListItems},value={Value})", listItems, value);
+			Logger.LogDebug("<<< Exiting FindByValueWithIgnoreCase(listItems={ListItems},value={Value})", listItems, value);
             return listItems.Cast<ListItem>().FirstOrDefault(item => item.Value.Equals(value, StringComparison.OrdinalIgnoreCase));
         }
     }

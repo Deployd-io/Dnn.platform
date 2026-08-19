@@ -14,11 +14,14 @@ namespace DotNetNuke.Web.Mvp
     public abstract partial class WebServicePresenter<TView> : Presenter<TView>
         where TView : class, IWebServiceView
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(WebServicePresenter));
         /// <summary>Initializes a new instance of the <see cref="WebServicePresenter{TView}"/> class.</summary>
         /// <param name="view">The view.</param>
         protected WebServicePresenter(TView view)
             : base(view)
         {
+		Logger.LogDebug(">>> Entering WebServicePresenter(view={View})", view);
+		Logger.LogDebug("<<< Exiting WebServicePresenter(view={View})", view);
         }
     }
 }

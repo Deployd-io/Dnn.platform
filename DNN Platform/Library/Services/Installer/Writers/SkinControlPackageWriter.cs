@@ -15,11 +15,13 @@ namespace DotNetNuke.Services.Installer.Writers
     /// <summary>The SkinControlPackageWriter class.</summary>
     public class SkinControlPackageWriter : PackageWriterBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SkinControlPackageWriter));
         /// <summary>Initializes a new instance of the <see cref="SkinControlPackageWriter"/> class.</summary>
         /// <param name="package">The package info.</param>
         public SkinControlPackageWriter(PackageInfo package)
             : base(package)
         {
+			Logger.LogDebug(">>> Entering SkinControlPackageWriter(package={Package})", package);
             this.SkinControl = SkinControlController.GetSkinControlByPackageID(package.PackageID);
             this.BasePath = Path.Combine("DesktopModules", package.Name.ToLowerInvariant()).Replace("/", @"\");
             this.AppCodePath = Path.Combine("App_Code", package.Name.ToLowerInvariant()).Replace("/", @"\");
@@ -64,6 +66,7 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <inheritdoc />
         protected override void WriteManifestComponent(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteManifestComponent(writer={Writer})", writer);
             // Start component Element
             writer.WriteStartElement("component");
             writer.WriteAttributeString("type", "SkinObject");
@@ -73,12 +76,15 @@ namespace DotNetNuke.Services.Installer.Writers
 
             // End component Element
             writer.WriteEndElement();
+			Logger.LogDebug("<<< Exiting WriteManifestComponent(writer={Writer})", writer);
         }
 
         private void ReadLegacyManifest(XPathNavigator legacyManifest, bool processModule)
         {
+			Logger.LogDebug(">>> Entering ReadLegacyManifest(legacyManifest={LegacyManifest},processModule={ProcessModule})", legacyManifest, processModule);
             XPathNavigator folderNav = legacyManifest.SelectSingleNode("folders/folder");
 
+			Logger.LogDebug("ReadLegacyManifest(legacyManifest={LegacyManifest},processModule={ProcessModule}): folderNav → {FolderNav}", legacyManifest, processModule, folderNav);
             if (processModule)
             {
                 this.Package.Name = Util.ReadElement(folderNav, "name");
@@ -111,6 +117,7 @@ namespace DotNetNuke.Services.Installer.Writers
             {
                 this.AddFile(Util.ReadElement(folderNav, "resourcefile"));
             }
+			Logger.LogDebug("<<< Exiting ReadLegacyManifest(legacyManifest={LegacyManifest},processModule={ProcessModule})", legacyManifest, processModule);
         }
     }
 }

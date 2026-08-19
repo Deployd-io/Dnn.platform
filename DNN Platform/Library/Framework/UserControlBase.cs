@@ -18,6 +18,7 @@ namespace DotNetNuke.Framework
     /// </summary>
     public class UserControlBase : UserControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UserControlBase));
         public bool IsHostMenu
             => Globals.IsHostTab(this.PortalSettings.ActiveTab.TabID);
 
@@ -34,5 +35,6 @@ namespace DotNetNuke.Framework
         /// <inheritdoc cref="HtmlUtils.JavaScriptStringEncode(string,bool)"/>
         public static IHtmlString JavaScriptStringEncode(string value, bool addDoubleQuotes)
             => HtmlUtils.JavaScriptStringEncode(value, addDoubleQuotes);
+			Logger.LogDebug("<<< Exiting JavaScriptStringEncode(value={Value},addDoubleQuotes={AddDoubleQuotes})", value, addDoubleQuotes);
     }
 }

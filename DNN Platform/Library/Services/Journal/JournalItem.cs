@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.Journal
 
     public class JournalItem : IHydratable, IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(JournalItem));
         /// <inheritdoc />
         public CacheLevel Cacheability
         {
@@ -102,6 +103,7 @@ namespace DotNetNuke.Services.Journal
         /// <inheritdoc />
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.JournalId = Null.SetNullInteger(dr["JournalId"]);
             this.JournalTypeId = Null.SetNullInteger(dr["JournalTypeId"]);
             this.PortalId = Null.SetNullInteger(dr["PortalId"]);
@@ -111,6 +113,7 @@ namespace DotNetNuke.Services.Journal
             if (!string.IsNullOrEmpty(Null.SetNullString(dr["JournalXML"])))
             {
                 this.JournalXML = new XmlDocument { XmlResolver = null };
+				Logger.LogDebug("Fill(dr={Dr}): this.JournalXML → {Arg1}", dr, this.JournalXML);
                 using (var journalReader = XmlReader.Create(new StringReader(dr["JournalXML"].ToString()), new XmlReaderSettings { XmlResolver = null, }))
                 {
                     this.JournalXML.Load(journalReader);
@@ -118,9 +121,11 @@ namespace DotNetNuke.Services.Journal
 
                 XmlNode xRoot = this.JournalXML.DocumentElement;
                 XmlNode xNode = xRoot.SelectSingleNode("//items/item/body");
+				Logger.LogDebug("Fill(dr={Dr}): xNode → {XNode}", dr, xNode);
                 if (xNode != null)
                 {
                     this.Body = xNode.InnerText;
+					Logger.LogDebug("Fill(dr={Dr}): this.Body → {Arg1}", dr, this.Body);
                 }
             }
 
@@ -146,11 +151,13 @@ namespace DotNetNuke.Services.Journal
             this.CommentsDisabled = Null.SetNullBoolean(dr["CommentsDisabled"]);
             this.CommentsHidden = Null.SetNullBoolean(dr["CommentsHidden"]);
             this.SimilarCount = Null.SetNullInteger(dr["SimilarCount"]);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
 
         /// <inheritdoc />
         public string GetProperty(string propertyName, string format, System.Globalization.CultureInfo formatProvider, Entities.Users.UserInfo accessingUser, Scope accessLevel, ref bool propertyNotFound)
         {
+			Logger.LogDebug(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             string outputFormat = string.Empty;
             if (format == string.Empty)
             {
@@ -162,6 +169,7 @@ namespace DotNetNuke.Services.Journal
             }
 
             propertyName = propertyName.ToLowerInvariant();
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound}): propertyName → {PropertyName1}", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound, propertyName);
             switch (propertyName)
             {
                 case "journalid":
@@ -187,6 +195,7 @@ namespace DotNetNuke.Services.Journal
             }
 
             propertyNotFound = true;
+			Logger.LogDebug("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},accessLevel={AccessLevel},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, accessLevel, propertyNotFound);
             return string.Empty;
         }
     }

@@ -13,8 +13,11 @@ namespace Dnn.PersonaBar.Users.Components.Contracts
     {
         public GetUsersContract()
         {
+			eventLogger.LogDebug(">>> Entering GetUsersContract()");
             this.SortColumn = "Joined";
             this.SortAscending = false;
+			eventLogger.LogDebug("GetUsersContract(): this.SortColumn → {Arg0}", this.SortColumn);
+			eventLogger.LogDebug("<<< Exiting GetUsersContract()");
         }
 
         public int PortalId { get; set; }

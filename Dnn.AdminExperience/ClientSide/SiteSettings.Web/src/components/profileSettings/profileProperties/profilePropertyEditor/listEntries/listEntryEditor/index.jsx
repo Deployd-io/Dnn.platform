@@ -3,10 +3,12 @@ import PropTypes from "prop-types";
 import "./style.less";
 import { SingleLineInputWithError, GridSystem, Switch, Label, Button, InputGroup } from "@dnnsoftware/dnn-react-common";
 import resx from "resources";
+const logger = console;
 
 class ListEntryEditor extends Component {
     constructor(props) {
         super();
+		logger.debug(`>>> Entering constructor(props=${props})`);
 
         this.state = {
             entryDetail: {
@@ -26,10 +28,14 @@ class ListEntryEditor extends Component {
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let { state } = this;
         let entryDetail = Object.assign({}, state.entryDetail);
+		logger.debug(`onSettingChange(key=${key},event=${event}): entryDetail → ${entryDetail}`);
         let value = typeof (event) === "object" ? event.target.value : event;
+		logger.debug(`onSettingChange(key=${key},event=${event}): value → ${value}`);
         state.error[key] = value === "" ? true : false;
+		logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
         entryDetail[key] = value;
 
         this.setState({
@@ -40,6 +46,7 @@ class ListEntryEditor extends Component {
     }
 
     onSave() {
+		logger.debug('>>> Entering onSave()');
         const { props, state } = this;
         this.setState({
             triedToSubmit: true
@@ -49,15 +56,19 @@ class ListEntryEditor extends Component {
         }
 
         props.onUpdate(state.entryDetail);
+		logger.debug('<<< Exiting onSave()');
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const { props } = this;
         props.Collapse();
+		logger.debug('<<< Exiting onCancel()');
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         if (this.state.entryDetail !== undefined || this.props.id === "add") {
             const columnOne = <div className="left-column">
                 <InputGroup>
@@ -105,6 +116,7 @@ class ListEntryEditor extends Component {
                 </InputGroup>
             </div>;
 
+			logger.debug('<<< Exiting render()');
             return (
                 <div className="entry-editor">
                     <GridSystem numberOfColumns={2}>{[columnOne, columnTwo]}</GridSystem>

@@ -8,27 +8,36 @@ Imports System.Collections.Generic
 Imports System.Diagnostics
 Imports System.Web.UI
 Imports System.Web.UI.WebControls
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.WebControls
     Friend NotInheritable Class DNNMenuWriter
         Inherits WebControl
         Implements IDNNMenuWriter
+		Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
         ' Methods
         Public Sub New()
+			_logger.LogDebug(">>> Entering New()")
             DNNMenuWriter.__ENCAddToList(Me)
+			_logger.LogDebug("<<< Exiting New()")
+			_logger.LogDebug(">>> Entering New(blnForceFullMenu={BlnForceFullMenu})", blnForceFullMenu)
+			_logger.LogDebug("New(blnForceFullMenu={BlnForceFullMenu}): Me.ForceFullMenu → {Arg1}", blnForceFullMenu, Me.ForceFullMenu)
         End Sub
 
         Public Sub New(ByVal blnForceFullMenu As Boolean)
             DNNMenuWriter.__ENCAddToList(Me)
             Me.ForceFullMenu = blnForceFullMenu
+			_logger.LogDebug("<<< Exiting New(blnForceFullMenu={BlnForceFullMenu})", blnForceFullMenu)
         End Sub
 
         <DebuggerNonUserCode> _
         Private Shared Sub __ENCAddToList(ByVal value As Object)
+			_logger.LogDebug(">>> Entering __ENCAddToList(value={Value})", value)
             SyncLock DNNMenuWriter.__ENCList
                 If (DNNMenuWriter.__ENCList.Count = DNNMenuWriter.__ENCList.Capacity) Then
                     Dim index As Integer = 0
                     Dim num3 As Integer = (DNNMenuWriter.__ENCList.Count - 1)
+					_logger.LogDebug("__ENCAddToList(value={Value}): num3 → {Num3}", value, num3)
                     Dim num2 As Integer = 0
                     Do While True
                         Dim num4 As Integer = num3
@@ -38,6 +47,7 @@ Namespace DotNetNuke.UI.WebControls
                             Exit Do
                         End If
                         Dim reference As WeakReference = DNNMenuWriter.__ENCList(num2)
+						_logger.LogDebug("__ENCAddToList(value={Value}): reference → {Reference}", value, reference)
                         If reference.IsAlive Then
                             If (num2 <> index) Then
                                 DNNMenuWriter.__ENCList(index) = DNNMenuWriter.__ENCList(num2)
@@ -49,12 +59,15 @@ Namespace DotNetNuke.UI.WebControls
                 End If
                 DNNMenuWriter.__ENCList.Add(New WeakReference(value))
             End SyncLock
+			_logger.LogDebug("<<< Exiting __ENCAddToList(value={Value})", value)
         End Sub
 
         Protected Overrides Sub RenderChildren(ByVal writer As HtmlTextWriter)
+			_logger.LogDebug(">>> Entering RenderChildren(writer={Writer})", writer)
             Dim enumerator As IEnumerator = Nothing
             Try 
                 enumerator = Me.m_objMenu.MenuNodes.GetEnumerator
+				_logger.LogDebug("RenderChildren(writer={Writer}): enumerator → {Enumerator}", writer, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
@@ -66,9 +79,12 @@ Namespace DotNetNuke.UI.WebControls
                     TryCast(enumerator,IDisposable).Dispose
                 End If
             End Try
+			_logger.LogDebug("<<< Exiting RenderChildren(writer={Writer})", writer)
         End Sub
 
         Protected Overrides Sub RenderContents(ByVal writer As HtmlTextWriter)
+			_logger.LogDebug(">>> Entering RenderContents(writer={Writer})", writer)
+			_logger.LogDebug("RenderContents(writer={Writer}): str → {Str}", writer, str)
             Dim str As String = "DNNMenu "
             If (Me.m_objMenu.SelectedMenuNodes.Count = 0) Then
                 If (Strings.Len(Me.m_objMenu.MenuBarCssClass) > 0) Then
@@ -84,11 +100,15 @@ Namespace DotNetNuke.UI.WebControls
             writer.RenderBeginTag(HtmlTextWriterTag.Div)
             Me.RenderChildren(writer)
             writer.RenderEndTag
+			_logger.LogDebug("<<< Exiting RenderContents(writer={Writer})", writer)
         End Sub
 
         Public Sub RenderMenu(ByVal writer As HtmlTextWriter, ByVal Menu As DNNMenu) Implements IDNNMenuWriter.RenderMenu
+			_logger.LogDebug(">>> Entering RenderMenu(writer={Writer},Menu={Menu})", writer, Menu)
+			_logger.LogDebug("RenderMenu(writer={Writer},Menu={Menu}): Me.m_objMenu → {Arg2}", writer, Menu, Me.m_objMenu)
             Me.m_objMenu = Menu
             Me.RenderControl(writer)
+			_logger.LogDebug("<<< Exiting RenderMenu(writer={Writer},Menu={Menu})", writer, Menu)
         End Sub
 
 

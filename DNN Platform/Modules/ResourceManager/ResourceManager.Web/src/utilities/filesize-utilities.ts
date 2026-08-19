@@ -1,5 +1,8 @@
+const logger = console;
 export function getFileSize(fileSize: number): string {
     if (fileSize == undefined || fileSize == undefined){
+		logger.debug(`>>> Entering getFileSize(fileSize=${fileSize})`);
+		logger.debug(`<<< Exiting getFileSize(fileSize=${fileSize})`);
         return "";
     }
 

@@ -19,6 +19,7 @@ namespace DotNetNuke.Web.Api.Internal.Auth
     [DnnDeprecated(10, 2, 2, "Use JWT or API token authentication")]
     internal partial class DigestAuthentication
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DigestAuthentication));
         /// <summary>The scheme name for <see cref="AuthMessageHandlerBase.AuthScheme"/>.</summary>
         internal const string AuthenticationScheme = "Digest";
 #pragma warning disable CA5351 // Do not use broken cryptographic algorithms
@@ -34,10 +35,15 @@ namespace DotNetNuke.Web.Api.Internal.Auth
         /// <param name="ipAddress">The user's IPv4 address or <see cref="string.Empty"/>.</param>
         public DigestAuthentication(DigestAuthenticationRequest request, int portalId, string ipAddress)
         {
+			Logger.LogDebug(">>> Entering DigestAuthentication(request={Request},portalId={PortalId},ipAddress={IpAddress})", request, portalId, ipAddress);
             this.Request = request;
             this.portalId = portalId;
+			Logger.LogDebug("DigestAuthentication(request={Request},portalId={PortalId},ipAddress={IpAddress}): this.Request → {Arg3}", request, portalId, ipAddress, this.Request);
+			Logger.LogDebug("DigestAuthentication(request={Request},portalId={PortalId},ipAddress={IpAddress}): portalId → {PortalId1}", request, portalId, ipAddress, portalId);
+			Logger.LogDebug("DigestAuthentication(request={Request},portalId={PortalId},ipAddress={IpAddress}): this.portalId → {Arg3}", request, portalId, ipAddress, this.portalId);
             this.ipAddress = ipAddress ?? string.Empty;
             this.AuthenticateRequest();
+			Logger.LogDebug("<<< Exiting DigestAuthentication(request={Request},portalId={PortalId},ipAddress={IpAddress})", request, portalId, ipAddress);
         }
 
         /// <summary>Gets or sets the request.</summary>
@@ -56,44 +62,56 @@ namespace DotNetNuke.Web.Api.Internal.Auth
         /// <returns>A hex string of the MD5 hash of the digest.</returns>
         public string CalculateHashedDigest()
         {
+			Logger.LogDebug(">>> Entering CalculateHashedDigest()");
+			Logger.LogDebug("<<< Exiting CalculateHashedDigest()");
             return CreateMd5HashBinHex(this.GenerateUnhashedDigest());
         }
 
         private static string CreateMd5HashBinHex(string val)
         {
+			Logger.LogDebug(">>> Entering CreateMd5HashBinHex(val={Val})", val);
             ////Services.Logging.LoggingController.SimpleLog(String.Format("Creating Hash for {0}", val))
             ////Services.Logging.LoggingController.SimpleLog(String.Format("Back and forth: {0}", Encoding.Default.GetString(Encoding.Default.GetBytes(val))))
             var bha1 = Md5.ComputeHash(Encoding.Default.GetBytes(val));
+			Logger.LogDebug("CreateMd5HashBinHex(val={Val}): bha1 → {Bha1}", val, bha1);
             var ha1 = string.Empty;
             for (var i = 0; i <= 15; i++)
             {
                 ha1 += string.Format(CultureInfo.InvariantCulture, "{0:x02}", bha1[i]);
             }
 
+			Logger.LogDebug("<<< Exiting CreateMd5HashBinHex(val={Val})", val);
             return ha1;
         }
 
         /// <remarks>the nonce is created in <see cref="DigestAuthMessageHandler"/>.</remarks>
         private static bool IsNonceValid(string nonce)
         {
+			Logger.LogDebug(">>> Entering IsNonceValid(nonce=<redacted>)");
             DateTime expireTime;
 
             var numPadChars = nonce.Length % 4;
+			Logger.LogDebug("IsNonceValid(nonce=<redacted>): numPadChars → {NumPadChars}", numPadChars);
             if (numPadChars > 0)
             {
                 numPadChars = 4 - numPadChars;
             }
 
             var newNonce = nonce.PadRight(nonce.Length + numPadChars, '=');
+			Logger.LogDebug("IsNonceValid(nonce=<redacted>): newNonce → {NewNonce}", newNonce);
 
             try
             {
                 var decodedBytes = Convert.FromBase64String(newNonce);
+				Logger.LogDebug("IsNonceValid(nonce=<redacted>): decodedBytes → {DecodedBytes}", decodedBytes);
                 var expireStr = Encoding.Default.GetString(decodedBytes);
+				Logger.LogDebug("IsNonceValid(nonce=<redacted>): expireStr → {ExpireStr}", expireStr);
                 expireTime = DateTime.Parse(expireStr, CultureInfo.InvariantCulture);
             }
             catch (FormatException)
             {
+				Logger.LogError("Exception in IsNonceValid(nonce=<redacted>): {Arg1}", FormatException.getMessage());
+			Logger.LogDebug("<<< Exiting IsNonceValid(nonce=<redacted>)");
                 return false;
             }
 
@@ -102,6 +120,7 @@ namespace DotNetNuke.Web.Api.Internal.Auth
 
         private void AuthenticateRequest()
         {
+			Logger.LogDebug(">>> Entering AuthenticateRequest()");
             this.password = this.GetPassword(this.Request);
             if (this.password != null)
             {
@@ -111,13 +130,16 @@ namespace DotNetNuke.Web.Api.Internal.Auth
                 if ((!this.IsNonceStale) && this.Request.RequestParams["response"] == this.CalculateHashedDigest())
                 {
                     this.IsValid = true;
+					Logger.LogDebug("AuthenticateRequest(): this.IsValid → {Arg0}", this.IsValid);
                     this.User = new GenericPrincipal(new GenericIdentity(this.Request.RawUsername, AuthenticationScheme), null);
                 }
             }
+			Logger.LogDebug("<<< Exiting AuthenticateRequest()");
         }
 
         private string GetPassword(DigestAuthenticationRequest request)
         {
+			Logger.LogDebug(">>> Entering GetPassword(request={Request})", request);
             var user = UserController.GetUserByName(this.portalId, request.CleanUsername) ??
                        UserController.GetUserByName(this.portalId, request.RawUsername);
             if (user == null)
@@ -126,6 +148,7 @@ namespace DotNetNuke.Web.Api.Internal.Auth
             }
 
             var userPassword = UserController.GetPassword(ref user, string.Empty);
+			Logger.LogDebug("GetPassword(request={Request}): userPassword → {UserPassword}", request, userPassword);
 
             // Try to validate user
             var loginStatus = UserLoginStatus.LOGIN_FAILURE;
@@ -138,11 +161,13 @@ namespace DotNetNuke.Web.Api.Internal.Auth
                 this.ipAddress,
                 ref loginStatus);
 
+			Logger.LogDebug("<<< Exiting GetPassword(request={Request})", request);
             return user != null ? userPassword : null;
         }
 
         private string GenerateUnhashedDigest()
         {
+			Logger.LogDebug(">>> Entering GenerateUnhashedDigest()");
             var cleanUsername = this.Request.RequestParams["username"].Replace(@"\\", @"\");
             var realm = this.Request.RequestParams["realm"];
             var ha1 = CreateMd5HashBinHex($"{cleanUsername}:{realm}:{this.password}");
@@ -156,6 +181,9 @@ namespace DotNetNuke.Web.Api.Internal.Auth
             var qop = this.Request.RequestParams["qop"];
 
             ////Services.Logging.LoggingController.SimpleLog(A1, HA1, A2, HA2, unhashedDigest)
+			Logger.LogDebug("GenerateUnhashedDigest(): cnonce → {Cnonce}", cnonce);
+			Logger.LogDebug("GenerateUnhashedDigest(): ha1 → {Ha1}", ha1);
+			Logger.LogDebug("<<< Exiting GenerateUnhashedDigest()");
             return qop != null ? $"{ha1}:{nonce}:{nc}:{cnonce}:{qop}:{ha2}" : $"{ha1}:{nonce}:{ha2}";
         }
     }

@@ -14,33 +14,39 @@ namespace DotNetNuke.Common.Utilities
 
     public class Calendar
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Calendar));
         /// <summary>Opens a popup Calendar.</summary>
         /// <param name="field">TextBox to return the date value.</param>
         /// <returns>A JavaScript URL.</returns>
         public static string InvokePopupCal(TextBox field)
         {
+			Logger.LogDebug(">>> Entering InvokePopupCal(field={Field})", field);
             // Define character array to trim from language strings
             char[] trimChars = { ',', ' ' };
 
             // Get culture array of month names and convert to string for
             // passing to the popup calendar
             var monthBuilder = new StringBuilder();
+			Logger.LogDebug("InvokePopupCal(field={Field}): monthBuilder → {MonthBuilder}", field, monthBuilder);
             foreach (string month in DateTimeFormatInfo.CurrentInfo.MonthNames)
             {
                 monthBuilder.AppendFormat(CultureInfo.InvariantCulture, "{0},", month);
             }
 
             var monthNameString = monthBuilder.ToString().TrimEnd(trimChars);
+			Logger.LogDebug("InvokePopupCal(field={Field}): monthNameString → {MonthNameString}", field, monthNameString);
 
             // Get culture array of day names and convert to string for
             // passing to the popup calendar
             var dayBuilder = new StringBuilder();
+			Logger.LogDebug("InvokePopupCal(field={Field}): dayBuilder → {DayBuilder}", field, dayBuilder);
             foreach (string day in DateTimeFormatInfo.CurrentInfo.AbbreviatedDayNames)
             {
                 dayBuilder.AppendFormat(CultureInfo.InvariantCulture, "{0},", day);
             }
 
             var dayNameString = dayBuilder.ToString().TrimEnd(trimChars);
+			Logger.LogDebug("InvokePopupCal(field={Field}): dayNameString → {DayNameString}", field, dayNameString);
 
             // Get the short date pattern for the culture
             string formatString = DateTimeFormatInfo.CurrentInfo.ShortDatePattern;
@@ -52,6 +58,7 @@ namespace DotNetNuke.Common.Utilities
             string strToday = ClientAPI.GetSafeJSString(Localization.GetString("Today"));
             string strClose = ClientAPI.GetSafeJSString(Localization.GetString("Close"));
             string strCalendar = ClientAPI.GetSafeJSString(Localization.GetString("Calendar"));
+				Logger.LogDebug("<<< Exiting InvokePopupCal(field={Field})", field);
             return
                 string.Format(
                     CultureInfo.InvariantCulture,

@@ -5,6 +5,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 import Localization from "localization";
 import Html from "../../Html";
 import "./style.less";
+const logger = console;
 
 const licenseBoxStyle = {
     border: "1px solid #c8c8c8",
@@ -16,8 +17,10 @@ const licenseBoxStyle = {
 
 class LogDisplay extends Component {
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
          
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell style={{ padding: 0 }} className="install-failure-logs">
                 <Scrollbars style={licenseBoxStyle}>

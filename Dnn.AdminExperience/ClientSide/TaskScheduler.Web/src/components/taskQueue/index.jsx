@@ -5,14 +5,19 @@ import TaskStatusItemRow from "./taskStatusItemRow";
 import "./style.less";
 import resx from "../../resources";
 import NoDataIcon from "./../svg/nodata.svg";
+const logger = console;
 
 class TaskQueuePanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
 
     renderedTaskStatusList() {
+		logger.debug('>>> Entering renderedTaskStatusList()');
         const { props } = this;
+		logger.debug('<<< Exiting renderedTaskStatusList()');
         return props.taskStatusList.map((term, index) => {
             return (
                 <TaskStatusItemRow
@@ -33,8 +38,10 @@ class TaskQueuePanelBody extends Component {
     }
 
     renderedTaskProcessingList() {
+		logger.debug('>>> Entering renderedTaskProcessingList()');
         const { props } = this;
         if (props.taskProcessingList) {
+			logger.debug('<<< Exiting renderedTaskProcessingList()');
             return props.taskProcessingList.map((term, index) => {
                 return (
                     <TaskStatusItemRow
@@ -56,7 +63,9 @@ class TaskQueuePanelBody extends Component {
 
     /*eslint-disable eqeqeq*/
     render() {
+		logger.debug('>>> Entering render()');
         const { props } = this;
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 {props.taskStatusList && props.taskStatusList.length == 0 && props.taskProcessingList && props.taskProcessingList.length == 0 &&
@@ -82,6 +91,8 @@ TaskQueuePanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         schedulingEnabled: state.task.schedulingEnabled,
         taskStatusList: state.task.taskStatusList,

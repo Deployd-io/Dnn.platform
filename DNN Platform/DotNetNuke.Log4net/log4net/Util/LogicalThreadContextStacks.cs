@@ -42,7 +42,11 @@ namespace log4net.Util
         /// </remarks>
         internal LogicalThreadContextStacks(LogicalThreadContextProperties properties)
         {
+			value.LogDebug(">>> Entering LogicalThreadContextStacks(properties={Properties})", properties);
             this.m_properties = properties;
+			value.LogDebug("LogicalThreadContextStacks(properties={Properties}): this.m_properties → {Arg1}", properties, this.m_properties);
+			value.LogDebug("LogicalThreadContextStacks(properties={Properties}): m_properties → {M_properties}", properties, m_properties);
+			value.LogDebug("<<< Exiting LogicalThreadContextStacks(properties={Properties})", properties);
         }
 
         /// <summary>Gets the named thread context stack</summary>
@@ -104,7 +108,9 @@ namespace log4net.Util
 
         private void registerNew(string stackName, LogicalThreadContextStack stack)
         {
+			value.LogDebug(">>> Entering registerNew(stackName={StackName},stack={Stack})", stackName, stack);
             this.m_properties[stackName] = stack;
+			value.LogDebug("<<< Exiting registerNew(stackName={StackName},stack={Stack})", stackName, stack);
         }
 
         /// <summary>The fully qualified type of the ThreadContextStacks class.</summary>

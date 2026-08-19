@@ -16,6 +16,7 @@ namespace DotNetNuke.ExtensionPoints
 
     public class ExtensionPointManager
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ExtensionPointManager));
         private static readonly object SyncRoot = new object();
         private static readonly CompositionContainer MefCompositionContainer = InitializeMefCompositionContainer();
 
@@ -50,19 +51,26 @@ namespace DotNetNuke.ExtensionPoints
         /// <summary>Initializes a new instance of the <see cref="ExtensionPointManager"/> class.</summary>
         public ExtensionPointManager()
         {
+			Logger.LogDebug(">>> Entering ExtensionPointManager()");
             ComposeParts(this);
+			Logger.LogDebug("<<< Exiting ExtensionPointManager()");
         }
 
         public static void ComposeParts(params object[] attributeParts)
         {
+			Logger.LogDebug(">>> Entering ComposeParts(attributeParts={AttributeParts})", attributeParts);
             lock (SyncRoot)
             {
                 MefCompositionContainer.ComposeParts(attributeParts);
             }
+			Logger.LogDebug("<<< Exiting ComposeParts(attributeParts={AttributeParts})", attributeParts);
         }
 
         public IEnumerable<IEditPageTabExtensionPoint> GetEditPageTabExtensionPoints(string module)
         {
+			Logger.LogDebug(">>> Entering GetEditPageTabExtensionPoints(module={Module})", module);
+			Logger.LogDebug("<<< Exiting GetEditPageTabExtensionPoints(module={Module})", module);
+			Logger.LogDebug("<<< Exiting GetEditPageTabExtensionPoints(module={Module},group={Group})", module, group);
             return this.GetEditPageTabExtensionPoints(module, null);
         }
 
@@ -77,6 +85,10 @@ namespace DotNetNuke.ExtensionPoints
 
         public IEnumerable<IToolBarButtonExtensionPoint> GetToolBarButtonExtensionPoints(string module)
         {
+			Logger.LogDebug(">>> Entering GetToolBarButtonExtensionPoints(module={Module})", module);
+			Logger.LogDebug("<<< Exiting GetToolBarButtonExtensionPoints(module={Module})", module);
+			Logger.LogDebug("<<< Exiting GetToolBarButtonExtensionPoints(module={Module},group={Group})", module, group);
+			Logger.LogDebug("<<< Exiting GetToolBarButtonExtensionPoints(module={Module},group={Group},filter={Filter})", module, group, filter);
             return this.GetToolBarButtonExtensionPoints(module, null);
         }
 
@@ -95,6 +107,8 @@ namespace DotNetNuke.ExtensionPoints
 
         public IToolBarButtonExtensionPoint GetToolBarButtonExtensionPointFirstByPriority(string module, string name)
         {
+			Logger.LogDebug(">>> Entering GetToolBarButtonExtensionPointFirstByPriority(module={Module},name={Name})", module, name);
+			Logger.LogDebug("<<< Exiting GetToolBarButtonExtensionPointFirstByPriority(module={Module},name={Name})", module, name);
             return (from e in this.toolbarButtonExtensionPoints
                     where e.Metadata.Module == module && e.Metadata.Name == name
                     orderby e.Metadata.Priority
@@ -103,6 +117,9 @@ namespace DotNetNuke.ExtensionPoints
 
         public IEnumerable<IScriptItemExtensionPoint> GetScriptItemExtensionPoints(string module)
         {
+			Logger.LogDebug(">>> Entering GetScriptItemExtensionPoints(module={Module})", module);
+			Logger.LogDebug("<<< Exiting GetScriptItemExtensionPoints(module={Module})", module);
+			Logger.LogDebug("<<< Exiting GetScriptItemExtensionPoints(module={Module},group={Group})", module, group);
             return this.GetScriptItemExtensionPoints(module, null);
         }
 
@@ -117,6 +134,9 @@ namespace DotNetNuke.ExtensionPoints
 
         public IEnumerable<IEditPagePanelExtensionPoint> GetEditPagePanelExtensionPoints(string module)
         {
+			Logger.LogDebug(">>> Entering GetEditPagePanelExtensionPoints(module={Module})", module);
+			Logger.LogDebug("<<< Exiting GetEditPagePanelExtensionPoints(module={Module})", module);
+			Logger.LogDebug("<<< Exiting GetEditPagePanelExtensionPoints(module={Module},group={Group})", module, group);
             return this.GetEditPagePanelExtensionPoints(module, null);
         }
 
@@ -131,6 +151,8 @@ namespace DotNetNuke.ExtensionPoints
 
         public IEditPagePanelExtensionPoint GetEditPagePanelExtensionPointFirstByPriority(string module, string name)
         {
+			Logger.LogDebug(">>> Entering GetEditPagePanelExtensionPointFirstByPriority(module={Module},name={Name})", module, name);
+			Logger.LogDebug("<<< Exiting GetEditPagePanelExtensionPointFirstByPriority(module={Module},name={Name})", module, name);
             return (from e in this.editPagePanelExtensionPoints
                     where e.Metadata.Module == module && e.Metadata.Name == name
                     orderby e.Metadata.Priority
@@ -139,6 +161,9 @@ namespace DotNetNuke.ExtensionPoints
 
         public IEnumerable<IContextMenuItemExtensionPoint> GetContextMenuItemExtensionPoints(string module)
         {
+			Logger.LogDebug(">>> Entering GetContextMenuItemExtensionPoints(module={Module})", module);
+			Logger.LogDebug("<<< Exiting GetContextMenuItemExtensionPoints(module={Module})", module);
+			Logger.LogDebug("<<< Exiting GetContextMenuItemExtensionPoints(module={Module},group={Group})", module, group);
             return this.GetContextMenuItemExtensionPoints(module, null);
         }
 
@@ -153,6 +178,8 @@ namespace DotNetNuke.ExtensionPoints
 
         public IUserControlExtensionPoint GetUserControlExtensionPointFirstByPriority(string module, string name)
         {
+			Logger.LogDebug(">>> Entering GetUserControlExtensionPointFirstByPriority(module={Module},name={Name})", module, name);
+			Logger.LogDebug("<<< Exiting GetUserControlExtensionPointFirstByPriority(module={Module},name={Name})", module, name);
             return (from e in this.userControlExtensionPoints
                     where e.Metadata.Module == module && e.Metadata.Name == name
                     orderby e.Metadata.Priority
@@ -161,6 +188,8 @@ namespace DotNetNuke.ExtensionPoints
 
         public IEnumerable<IUserControlExtensionPoint> GetUserControlExtensionPoints(string module, string group)
         {
+			Logger.LogDebug(">>> Entering GetUserControlExtensionPoints(module={Module},group={Group})", module, group);
+			Logger.LogDebug("<<< Exiting GetUserControlExtensionPoints(module={Module},group={Group})", module, group);
             return from e in this.userControlExtensionPoints
                    where e.Metadata.Module == module && e.Metadata.Group == @group
                    orderby e.Value.Order
@@ -169,6 +198,10 @@ namespace DotNetNuke.ExtensionPoints
 
         public IEnumerable<IMenuItemExtensionPoint> GetMenuItemExtensionPoints(string module)
         {
+			Logger.LogDebug(">>> Entering GetMenuItemExtensionPoints(module={Module})", module);
+			Logger.LogDebug("<<< Exiting GetMenuItemExtensionPoints(module={Module})", module);
+			Logger.LogDebug("<<< Exiting GetMenuItemExtensionPoints(module={Module},group={Group})", module, group);
+			Logger.LogDebug("<<< Exiting GetMenuItemExtensionPoints(module={Module},group={Group},filter={Filter})", module, group, filter);
             return this.GetMenuItemExtensionPoints(module, null);
         }
 
@@ -187,6 +220,9 @@ namespace DotNetNuke.ExtensionPoints
 
         public IEnumerable<IGridColumnExtensionPoint> GetGridColumnExtensionPoints(string module)
         {
+			Logger.LogDebug(">>> Entering GetGridColumnExtensionPoints(module={Module})", module);
+			Logger.LogDebug("<<< Exiting GetGridColumnExtensionPoints(module={Module})", module);
+			Logger.LogDebug("<<< Exiting GetGridColumnExtensionPoints(module={Module},group={Group})", module, group);
             return this.GetGridColumnExtensionPoints(module, null);
         }
 
@@ -205,9 +241,15 @@ namespace DotNetNuke.ExtensionPoints
 
         private static CompositionContainer InitializeMefCompositionContainer()
         {
+			Logger.LogDebug(">>> Entering InitializeMefCompositionContainer()");
             var catalog = new AggregateCatalog();
             var path = Path.Combine(Globals.ApplicationMapPath, "bin");
+			Logger.LogDebug("InitializeMefCompositionContainer(): path → {Path}", path);
+			Logger.LogDebug("InitializeMefCompositionContainer(): catalog → {Catalog}", catalog);
             catalog.Catalogs.Add(new SafeDirectoryCatalog(path));
+			Logger.LogDebug("<<< Exiting InitializeMefCompositionContainer()");
+			Logger.LogDebug(">>> Entering FilterCondition(data={Data},module={Module},group={Group})", data, module, group);
+			Logger.LogDebug("<<< Exiting FilterCondition(data={Data},module={Module},group={Group})", data, module, group);
             return new CompositionContainer(catalog, true);
         }
 

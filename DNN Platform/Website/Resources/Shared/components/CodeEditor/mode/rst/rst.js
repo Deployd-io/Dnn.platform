@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("../python/python"), require("../stex/stex"), require("../../addon/mode/overlay"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,9 +13,12 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode('rst', function (config, options) {
+logger.debug('>>> Entering defineMode()');
 
   var rx_strong = /^\*\*[^\*\s](?:[^\*]*[^\*\s])?\*\*/;
+logger.debug(`defineMode(): rx_strong → ${rx_strong}`);
   var rx_emphasis = /^\*[^\*\s](?:[^\*]*[^\*\s])?\*/;
   var rx_literal = /^``[^`\s](?:[^`]*[^`\s])``/;
 
@@ -54,6 +59,8 @@ CodeMirror.defineMode('rst', function (config, options) {
         if (stream.match(rx_uri, false)) break;
       }
 
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
+	logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
       return null;
     }
   };
@@ -225,6 +232,8 @@ CodeMirror.defineMode('rst-base', function (config) {
       }
     } else if (phase(state) == rx_role_suf ||
                stream.match(rx_role_suf, false)) {
+			logger.debug(`to_normal(stream=${stream},state=${state}): state.tmp_stex → ${state.tmp_stex}`);
+			logger.debug(`to_normal(stream=${stream},state=${state}): state.tmp → ${state.tmp}`);
 
       switch (stage(state)) {
       case 0:
@@ -347,6 +356,9 @@ CodeMirror.defineMode('rst-base', function (config) {
       if (stream.next()) change(state, to_normal);
     }
 
+	logger.debug('>>> Entering startState()');
+	logger.debug('<<< Exiting startState()');
+	logger.debug(`<<< Exiting to_normal(stream=${stream},state=${state})`);
     return token;
   }
 
@@ -354,6 +366,7 @@ CodeMirror.defineMode('rst-base', function (config) {
   ///////////////////////////////////////////////////////////////////////////
 
   function to_explicit(stream, state) {
+	logger.debug(`>>> Entering to_explicit(stream=${stream},state=${state})`);
     var token = null;
 
     if (phase(state) == rx_substitution ||
@@ -454,6 +467,7 @@ CodeMirror.defineMode('rst-base', function (config) {
       }
     }
 
+	logger.debug(`<<< Exiting to_explicit(stream=${stream},state=${state})`);
     return token;
   }
 
@@ -461,10 +475,14 @@ CodeMirror.defineMode('rst-base', function (config) {
   ///////////////////////////////////////////////////////////////////////////
 
   function to_comment(stream, state) {
+	logger.debug(`>>> Entering to_comment(stream=${stream},state=${state})`);
+	logger.debug(`<<< Exiting to_comment(stream=${stream},state=${state})`);
     return as_block(stream, state, 'comment');
   }
 
   function to_verbatim(stream, state) {
+	logger.debug(`>>> Entering to_verbatim(stream=${stream},state=${state})`);
+	logger.debug(`<<< Exiting to_verbatim(stream=${stream},state=${state})`);
     return as_block(stream, state, 'meta');
   }
 
@@ -482,6 +500,7 @@ CodeMirror.defineMode('rst-base', function (config) {
   ///////////////////////////////////////////////////////////////////////////
 
   function to_mode(stream, state) {
+logger.debug(`>>> Entering to_mode(stream=${stream},state=${state})`);
 
     if (state.ctx.mode && state.ctx.local) {
 
@@ -494,6 +513,7 @@ CodeMirror.defineMode('rst-base', function (config) {
     }
 
     change(state, to_normal);
+	logger.debug(`<<< Exiting to_mode(stream=${stream},state=${state})`);
     return null;
   }
 
@@ -501,19 +521,27 @@ CodeMirror.defineMode('rst-base', function (config) {
   ///////////////////////////////////////////////////////////////////////////
 
   function context(phase, stage, mode, local) {
+	logger.debug(`>>> Entering context(phase=${phase},stage=${stage},mode=${mode},local=${local})`);
+	logger.debug(`<<< Exiting context(phase=${phase},stage=${stage},mode=${mode},local=${local})`);
     return {phase: phase, stage: stage, mode: mode, local: local};
   }
 
   function change(state, tok, ctx) {
+	logger.debug(`>>> Entering change(state=${state},tok=${tok},ctx=${ctx})`);
     state.tok = tok;
     state.ctx = ctx || {};
+	logger.debug(`<<< Exiting change(state=${state},tok=${tok},ctx=${ctx})`);
   }
 
   function stage(state) {
+	logger.debug(`>>> Entering stage(state=${state})`);
+	logger.debug(`<<< Exiting stage(state=${state})`);
     return state.ctx.stage || 0;
   }
 
   function phase(state) {
+	logger.debug(`>>> Entering phase(state=${state})`);
+	logger.debug(`<<< Exiting phase(state=${state})`);
     return state.ctx.phase;
   }
 
@@ -526,18 +554,22 @@ CodeMirror.defineMode('rst-base', function (config) {
     },
 
     copyState: function (state) {
+	logger.debug(`>>> Entering copyState(state=${state})`);
       var ctx = state.ctx, tmp = state.tmp;
       if (ctx.local)
         ctx = {mode: ctx.mode, local: CodeMirror.copyState(ctx.mode, ctx.local)};
       if (tmp)
         tmp = {mode: tmp.mode, local: CodeMirror.copyState(tmp.mode, tmp.local)};
+	logger.debug(`<<< Exiting copyState(state=${state})`);
       return {tok: state.tok, ctx: ctx, tmp: tmp};
     },
 
     innerMode: function (state) {
+	logger.debug(`>>> Entering innerMode(state=${state})`);
       return state.tmp      ? {state: state.tmp.local, mode: state.tmp.mode}
       : state.ctx.mode ? {state: state.ctx.local, mode: state.ctx.mode}
       : null;
+	logger.debug(`<<< Exiting innerMode(state=${state})`);
     },
 
     token: function (stream, state) {

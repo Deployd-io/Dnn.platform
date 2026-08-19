@@ -5,12 +5,15 @@ namespace DotNetNuke.Entities.Tabs
 {
     public class TabExistsException : TabException
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabExistsException));
         /// <summary>Initializes a new instance of the <see cref="TabExistsException"/> class.</summary>
         /// <param name="tabId">The ID of the existing tab.</param>
         /// <param name="message">The message that describes the error.</param>
         public TabExistsException(int tabId, string message)
             : base(tabId, message)
         {
+		Logger.LogDebug(">>> Entering TabExistsException(tabId={TabId},message={Message})", tabId, message);
+		Logger.LogDebug("<<< Exiting TabExistsException(tabId={TabId},message={Message})", tabId, message);
         }
     }
 }

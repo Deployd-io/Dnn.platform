@@ -26,10 +26,16 @@ namespace DotNetNuke.Entities.Tabs
         /// <summary>Initializes a new instance of the <see cref="TabWorkflowTracker"/> class.</summary>
         public TabWorkflowTracker()
         {
+			Logger.LogDebug(">>> Entering TabWorkflowTracker()");
             this.tabController = TabController.Instance;
             this.workflowEngine = WorkflowEngine.Instance;
+			Logger.LogDebug("TabWorkflowTracker(): this.tabController → {Arg0}", this.tabController);
+			Logger.LogDebug("TabWorkflowTracker(): workflowEngine → {WorkflowEngine}", workflowEngine);
+			Logger.LogDebug("TabWorkflowTracker(): this.workflowEngine → {Arg0}", this.workflowEngine);
             this.workflowManager = WorkflowManager.Instance;
             this.tabWorkflowSettings = TabWorkflowSettings.Instance;
+			Logger.LogDebug("TabWorkflowTracker(): workflowManager → {WorkflowManager}", workflowManager);
+			Logger.LogDebug("<<< Exiting TabWorkflowTracker()");
         }
 
         /// <summary>Tracks a workflow instance when a module is added to a page.</summary>
@@ -38,7 +44,9 @@ namespace DotNetNuke.Entities.Tabs
         /// <param name="userId">User Id related with the workflow instance.</param>
         public void TrackModuleAddition(ModuleInfo module, int moduleVersion, int userId)
         {
+			Logger.LogDebug(">>> Entering TrackModuleAddition(module={Module},moduleVersion={ModuleVersion},userId={UserId})", module, moduleVersion, userId);
             this.NotifyWorkflowAboutChanges(module.PortalID, module.TabID, userId);
+			Logger.LogDebug("<<< Exiting TrackModuleAddition(module={Module},moduleVersion={ModuleVersion},userId={UserId})", module, moduleVersion, userId);
         }
 
         /// <summary>Tracks a workflow instance when a module is modified on a page.</summary>
@@ -47,7 +55,9 @@ namespace DotNetNuke.Entities.Tabs
         /// <param name="userId">User Id related with the workflow instance.</param>
         public void TrackModuleModification(ModuleInfo module, int moduleVersion, int userId)
         {
+			Logger.LogDebug(">>> Entering TrackModuleModification(module={Module},moduleVersion={ModuleVersion},userId={UserId})", module, moduleVersion, userId);
             this.NotifyWorkflowAboutChanges(module.PortalID, module.TabID, userId);
+			Logger.LogDebug("<<< Exiting TrackModuleModification(module={Module},moduleVersion={ModuleVersion},userId={UserId})", module, moduleVersion, userId);
         }
 
         /// <summary>Tracks a workflow instance when a module is deleted from a page.</summary>
@@ -56,7 +66,9 @@ namespace DotNetNuke.Entities.Tabs
         /// <param name="userId">User Id related with the workflow instance.</param>
         public void TrackModuleDeletion(ModuleInfo module, int moduleVersion, int userId)
         {
+			Logger.LogDebug(">>> Entering TrackModuleDeletion(module={Module},moduleVersion={ModuleVersion},userId={UserId})", module, moduleVersion, userId);
             this.NotifyWorkflowAboutChanges(module.PortalID, module.TabID, userId);
+			Logger.LogDebug("<<< Exiting TrackModuleDeletion(module={Module},moduleVersion={ModuleVersion},userId={UserId})", module, moduleVersion, userId);
         }
 
         /// <summary>Tracks a workflow instance when a module is copied from an exisitng page.</summary>
@@ -66,7 +78,9 @@ namespace DotNetNuke.Entities.Tabs
         /// <param name="userId">User Id related with the workflow instance.</param>
         public void TrackModuleCopy(ModuleInfo module, int moduleVersion, int originalTabId, int userId)
         {
+			Logger.LogDebug(">>> Entering TrackModuleCopy(module={Module},moduleVersion={ModuleVersion},originalTabId={OriginalTabId},userId={UserId})", module, moduleVersion, originalTabId, userId);
             this.TrackModuleAddition(module, moduleVersion, userId);
+			Logger.LogDebug("<<< Exiting TrackModuleCopy(module={Module},moduleVersion={ModuleVersion},originalTabId={OriginalTabId},userId={UserId})", module, moduleVersion, originalTabId, userId);
         }
 
         /// <summary>Tracks a workflow instance when a copied module is deleted from an exisitng page.</summary>
@@ -76,23 +90,30 @@ namespace DotNetNuke.Entities.Tabs
         /// <param name="userId">User Id related with the workflow instance.</param>
         public void TrackModuleUncopy(ModuleInfo module, int moduleVersion, int originalTabId, int userId)
         {
+			Logger.LogDebug(">>> Entering TrackModuleUncopy(module={Module},moduleVersion={ModuleVersion},originalTabId={OriginalTabId},userId={UserId})", module, moduleVersion, originalTabId, userId);
             this.TrackModuleDeletion(module, moduleVersion, userId);
+			Logger.LogDebug("<<< Exiting TrackModuleUncopy(module={Module},moduleVersion={ModuleVersion},originalTabId={OriginalTabId},userId={UserId})", module, moduleVersion, originalTabId, userId);
         }
 
         /// <inheritdoc />
         protected override Func<ITabChangeTracker> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new TabWorkflowTracker();
         }
 
         private void NotifyWorkflowAboutChanges(int portalId, int tabId, int userId)
         {
+			Logger.LogDebug(">>> Entering NotifyWorkflowAboutChanges(portalId={PortalId},tabId={TabId},userId={UserId})", portalId, tabId, userId);
             try
             {
                 var tabInfo = this.tabController.GetTab(tabId, portalId);
+				Logger.LogDebug("NotifyWorkflowAboutChanges(portalId={PortalId},tabId={TabId},userId={UserId}): tabInfo → {TabInfo}", portalId, tabId, userId, tabInfo);
                 if (tabInfo != null && !tabInfo.IsDeleted && this.workflowEngine.IsWorkflowCompleted(tabInfo))
                 {
                     var workflow = this.GetCurrentOrDefaultWorkflow(tabInfo, portalId);
+					Logger.LogDebug("NotifyWorkflowAboutChanges(portalId={PortalId},tabId={TabId},userId={UserId}): workflow → {Workflow}", portalId, tabId, userId, workflow);
                     if (workflow == null)
                     {
                         Logger.Warn("Current Workflow and Default workflow are not found on NotifyWorkflowAboutChanges");
@@ -105,18 +126,23 @@ namespace DotNetNuke.Entities.Tabs
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in NotifyWorkflowAboutChanges(portalId={PortalId},tabId={TabId},userId={UserId}): {Arg3}", portalId, tabId, userId, ex.getMessage());
                 Exceptions.LogException(ex);
             }
+			Logger.LogDebug("<<< Exiting NotifyWorkflowAboutChanges(portalId={PortalId},tabId={TabId},userId={UserId})", portalId, tabId, userId);
         }
 
         private Workflow GetCurrentOrDefaultWorkflow(ContentItem item, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetCurrentOrDefaultWorkflow(item={Item},portalId={PortalId})", item, portalId);
             if (item.StateID != Null.NullInteger)
             {
                 return this.workflowManager.GetWorkflow(item);
             }
 
             var defaultWorkflow = this.tabWorkflowSettings.GetDefaultTabWorkflowId(portalId);
+			Logger.LogDebug("GetCurrentOrDefaultWorkflow(item={Item},portalId={PortalId}): defaultWorkflow → {DefaultWorkflow}", item, portalId, defaultWorkflow);
+			Logger.LogDebug("<<< Exiting GetCurrentOrDefaultWorkflow(item={Item},portalId={PortalId})", item, portalId);
             return this.workflowManager.GetWorkflow(defaultWorkflow);
         }
     }

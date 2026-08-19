@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -12,15 +14,19 @@
   "use strict";
 
   CodeMirror.defineMode("ebnf", function (config) {
+	logger.debug('>>> Entering defineMode()');
     var commentType = {slash: 0, parenthesis: 1};
     var stateType = {comment: 0, _string: 1, characterClass: 2};
     var bracesMode = null;
+	logger.debug(`defineMode(): bracesMode → ${bracesMode}`);
 
     if (config.bracesMode)
       bracesMode = CodeMirror.getMode(config, config.bracesMode);
 
     return {
       startState: function () {
+		logger.debug('>>> Entering startState()');
+		logger.debug(`<<< Exiting function(exports=${exports})`);
         return {
           stringType: null,
           commentType: null,
@@ -30,8 +36,10 @@
           stack: [],
           inDefinition: false
         };
+		logger.debug('<<< Exiting startState()');
       },
       token: function (stream, state) {
+		logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
         if (!stream) return;
 
         //check for state changes
@@ -47,6 +55,7 @@
           } else if (stream.match(/^\(\*/)) { //comments starting with (*
             state.stack.unshift(stateType.comment);
             state.commentType = commentType.parenthesis;
+			logger.debug(`defineMode(): state.commentType → ${state.commentType}`);
           }
         }
 
@@ -77,6 +86,7 @@
               state.commentType = null;
             } else {
               stream.match(/^.[^\*]*/);
+			logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
             }
           }
           return "comment";
@@ -91,6 +101,7 @@
         }
 
         var peek = stream.peek();
+		logger.debug(`defineMode(): peek → ${peek}`);
 
         if (bracesMode !== null && (state.braced || peek === "{")) {
           if (state.localState === null)

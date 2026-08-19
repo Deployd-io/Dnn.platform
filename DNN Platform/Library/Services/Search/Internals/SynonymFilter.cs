@@ -17,6 +17,7 @@ namespace DotNetNuke.Services.Search.Internals
     /// <remarks>Implementation is inspired by sample code in Manning Lucene In Action 2nd Edition, pg. 133.</remarks>
     internal sealed class SynonymFilter : TokenFilter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SynonymFilter));
         private readonly Stack<string> synonymStack = new Stack<string>();
         private readonly TermAttribute termAtt;
         private readonly PositionIncrementAttribute posIncrAtt;
@@ -27,17 +28,23 @@ namespace DotNetNuke.Services.Search.Internals
         public SynonymFilter(TokenStream input)
             : base(input)
         {
+			Logger.LogDebug(">>> Entering SynonymFilter(input={Input})", input);
             this.termAtt = (TermAttribute)this.AddAttribute<ITermAttribute>();
             this.posIncrAtt = (PositionIncrementAttribute)this.AddAttribute<IPositionIncrementAttribute>();
+			Logger.LogDebug("SynonymFilter(input={Input}): termAtt → {TermAtt}", input, termAtt);
+			Logger.LogDebug("<<< Exiting SynonymFilter(input={Input})", input);
+			Logger.LogDebug("SynonymFilter(input={Input}): posIncrAtt → {PosIncrAtt}", input, posIncrAtt);
         }
 
         /// <inheritdoc />
         public override bool IncrementToken()
         {
+			Logger.LogDebug(">>> Entering IncrementToken()");
             // Pop buffered synonyms
             if (this.synonymStack.Count > 0)
             {
                 var syn = this.synonymStack.Pop();
+				Logger.LogDebug("IncrementToken(): syn → {Syn}", syn);
                 this.RestoreState(this.current);
                 this.termAtt.SetTermBuffer(syn);
 
@@ -56,16 +63,21 @@ namespace DotNetNuke.Services.Search.Internals
             if (this.AddAliasesToStack())
             {
                 this.current = this.CaptureState(); // save current token
+				Logger.LogDebug("IncrementToken(): current → {Current}", current);
             }
 
+			Logger.LogDebug("<<< Exiting IncrementToken()");
             return true;
         }
 
         private bool AddAliasesToStack()
         {
+			Logger.LogDebug(">>> Entering AddAliasesToStack()");
             var portalId = 0; // default
             string cultureCode;
+			Logger.LogDebug("AddAliasesToStack(): portalId → {PortalId}", portalId);
             var searchDoc = Thread.GetData(Thread.GetNamedDataSlot(Constants.TlsSearchInfo)) as SearchDocument;
+			Logger.LogDebug("AddAliasesToStack(): searchDoc → {SearchDoc}", searchDoc);
             if (searchDoc != null)
             {
                 portalId = searchDoc.PortalId;
@@ -73,6 +85,7 @@ namespace DotNetNuke.Services.Search.Internals
                 if (string.IsNullOrEmpty(cultureCode))
                 {
                     var portalInfo = PortalController.Instance.GetPortal(portalId);
+					Logger.LogDebug("AddAliasesToStack(): portalInfo → {PortalInfo}", portalInfo);
                     if (portalInfo != null)
                     {
                         cultureCode = portalInfo.DefaultLanguage;
@@ -85,17 +98,20 @@ namespace DotNetNuke.Services.Search.Internals
             }
 
             var synonyms = SearchHelper.Instance.GetSynonyms(portalId, cultureCode, this.termAtt.Term).ToArray();
+			Logger.LogDebug("AddAliasesToStack(): synonyms → {Synonyms}", synonyms);
             if (synonyms.Length == 0)
             {
                 return false;
             }
 
             var cultureInfo = new CultureInfo(cultureCode);
+			Logger.LogDebug("AddAliasesToStack(): cultureInfo → {CultureInfo}", cultureInfo);
             foreach (var synonym in synonyms)
             {
                 this.synonymStack.Push(synonym.ToLower(cultureInfo));
             }
 
+			Logger.LogDebug("<<< Exiting AddAliasesToStack()");
             return true;
         }
     }

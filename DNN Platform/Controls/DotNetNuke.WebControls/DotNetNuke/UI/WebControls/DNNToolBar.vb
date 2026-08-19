@@ -17,25 +17,32 @@ Imports System.Web.UI
 Imports System.Web.UI.Design
 Imports System.Web.UI.HtmlControls
 Imports System.Web.UI.WebControls
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.WebControls
     <ProvideProperty("Toolbar", GetType(Control)), DefaultProperty("Buttons"), ParseChildren(True, "Buttons"), Designer(GetType(DNNToolBarDesigner)), PersistChildren(False)> _
     Public Class DNNToolBar
         Inherits Control
         Implements IExtenderProvider
+		Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
         ' Methods
         Public Sub New()
+			_logger.LogDebug(">>> Entering New()")
             AddHandler MyBase.PreRender, New EventHandler(AddressOf Me.DNNToolBar_PreRender)
             DNNToolBar.__ENCAddToList(Me)
             Me.m_bMarked = False
+			_logger.LogDebug("New(): Me.m_bMarked → {Arg0}", Me.m_bMarked)
+			_logger.LogDebug("<<< Exiting New()")
         End Sub
 
         <DebuggerNonUserCode> _
         Private Shared Sub __ENCAddToList(ByVal value As Object)
+			_logger.LogDebug(">>> Entering __ENCAddToList(value={Value})", value)
             SyncLock DNNToolBar.__ENCList
                 If (DNNToolBar.__ENCList.Count = DNNToolBar.__ENCList.Capacity) Then
                     Dim index As Integer = 0
                     Dim num3 As Integer = (DNNToolBar.__ENCList.Count - 1)
+					_logger.LogDebug("__ENCAddToList(value={Value}): num3 → {Num3}", value, num3)
                     Dim num2 As Integer = 0
                     Do While True
                         Dim num4 As Integer = num3
@@ -45,6 +52,7 @@ Namespace DotNetNuke.UI.WebControls
                             Exit Do
                         End If
                         Dim reference As WeakReference = DNNToolBar.__ENCList(num2)
+						_logger.LogDebug("__ENCAddToList(value={Value}): reference → {Reference}", value, reference)
                         If reference.IsAlive Then
                             If (num2 <> index) Then
                                 DNNToolBar.__ENCList(index) = DNNToolBar.__ENCList(num2)
@@ -56,30 +64,39 @@ Namespace DotNetNuke.UI.WebControls
                 End If
                 DNNToolBar.__ENCList.Add(New WeakReference(value))
             End SyncLock
+			_logger.LogDebug("<<< Exiting __ENCAddToList(value={Value})", value)
         End Sub
 
         Public Function CanExtend(ByVal extendee As Object) As Boolean Implements IExtenderProvider.CanExtend
+			_logger.LogDebug(">>> Entering CanExtend(extendee={Extendee})", extendee)
+			_logger.LogDebug("<<< Exiting CanExtend(extendee={Extendee})", extendee)
             Return ((True = TypeOf extendee Is IDNNToolBar) AndAlso (DirectCast(extendee, IDNNToolBar).ToolBarId = Me.ID))
         End Function
 
         Private Sub DNNToolBar_PreRender(ByVal sender As Object, ByVal e As EventArgs)
+			_logger.LogDebug(">>> Entering DNNToolBar_PreRender(sender={Sender},e={E})", sender, e)
             If Me.Visible Then
                 Me.RegisterToolbarScript
             End If
+			_logger.LogDebug("<<< Exiting DNNToolBar_PreRender(sender={Sender},e={E})", sender, e)
         End Sub
 
         Private Function FindAttachedControl(ByVal objControl As Control) As Control
+			_logger.LogDebug(">>> Entering FindAttachedControl(objControl={ObjControl})", objControl)
             Dim enumerator As IEnumerator = Nothing
             If (TypeOf objControl Is IDNNToolBar AndAlso (DirectCast(objControl, IDNNToolBar).ToolBarId = Me.ID)) Then
                 Return objControl
             End If
             Try 
                 enumerator = objControl.Controls.GetEnumerator
+				_logger.LogDebug("FindAttachedControl(objControl={ObjControl}): enumerator → {Enumerator}", objControl, enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
                     End If
                     Dim current As Control = DirectCast(enumerator.Current, Control)
+					_logger.LogDebug("FindAttachedControl(objControl={ObjControl}): current → {Current}", objControl, current)
+					_logger.LogDebug("FindAttachedControl(objControl={ObjControl}): objA → {ObjA}", objControl, objA)
                     Dim objA As Control = Me.FindAttachedControl(current)
                     If Not Object.ReferenceEquals(objA, Nothing) Then
                         Return objA
@@ -90,27 +107,39 @@ Namespace DotNetNuke.UI.WebControls
                     TryCast(enumerator,IDisposable).Dispose
                 End If
             End Try
+			_logger.LogDebug("<<< Exiting FindAttachedControl(objControl={ObjControl})", objControl)
             Return Nothing
         End Function
 
         Public Function GetToolbar(ByVal objControl As Control) As DNNToolBar
+			_logger.LogDebug(">>> Entering GetToolbar(objControl={ObjControl})", objControl)
+			_logger.LogDebug("GetToolbar(objControl={ObjControl}): bar2 → {Bar2}", objControl, bar2)
             Dim bar2 As IDNNToolBar = DirectCast(objControl, IDNNToolBar)
             Dim control As Control = Nothing
             If (Strings.Len(bar2.ToolBarId) > 0) Then
                 control = objControl.Page.FindControl(bar2.ToolBarId)
+				_logger.LogDebug("GetToolbar(objControl={ObjControl}): control → {Control}", objControl, control)
             End If
+			_logger.LogDebug("<<< Exiting GetToolbar(objControl={ObjControl})", objControl)
             Return DirectCast(control, DNNToolBar)
         End Function
 
         Friend Sub NotifyDesigner()
+			_logger.LogDebug(">>> Entering NotifyDesigner()")
             If (If((Not WebControls.IsDesignMode OrElse (MyBase.Site Is Nothing)), 0, 1) <> 0) Then
                 Dim member As PropertyDescriptor = TypeDescriptor.GetProperties(Me)("Toolbar")
+				_logger.LogDebug("NotifyDesigner(): member → {Member}", member)
                 Dim ce As New ComponentChangedEventArgs(Me, member, Nothing, Me)
                 DirectCast(DirectCast(MyBase.Site.Container, IDesignerHost).GetDesigner(Me), ControlDesigner).OnComponentChanged(Me, ce)
             End If
+			_logger.LogDebug("<<< Exiting NotifyDesigner()")
         End Sub
 
         Public Function RegisterToolBar(ByVal objAssociatedControl As Control, ByVal strShowEventName As String, ByVal strHideEventName As String, ByVal strToolBarActionHandler As String) As Boolean
+			_logger.LogDebug(">>> Entering RegisterToolBar(objAssociatedControl={ObjAssociatedControl},strShowEventName={StrShowEventName},strHideEventName={StrHideEventName},strToolBarActionHandler={StrToolBarActionHandler})", objAssociatedControl, strShowEventName, strHideEventName, strToolBarActionHandler)
+			_logger.LogDebug(">>> Entering RegisterToolBar(objAssociatedControl={ObjAssociatedControl},strShowEventName={StrShowEventName},strHideEventName={StrHideEventName},strToolBarActionHandler={StrToolBarActionHandler},ToolBarScriptPath={ToolBarScriptPath})", objAssociatedControl, strShowEventName, strHideEventName, strToolBarActionHandler, ToolBarScriptPath)
+			_logger.LogDebug("<<< Exiting RegisterToolBar(objAssociatedControl={ObjAssociatedControl},strShowEventName={StrShowEventName},strHideEventName={StrHideEventName},strToolBarActionHandler={StrToolBarActionHandler})", objAssociatedControl, strShowEventName, strHideEventName, strToolBarActionHandler)
+			_logger.LogDebug("<<< Exiting RegisterToolBar(objAssociatedControl={ObjAssociatedControl},strShowEventName={StrShowEventName},strHideEventName={StrHideEventName},strToolBarActionHandler={StrToolBarActionHandler},ToolBarScriptPath={ToolBarScriptPath})", objAssociatedControl, strShowEventName, strHideEventName, strToolBarActionHandler, ToolBarScriptPath)
             Return Me.RegisterToolBar(objAssociatedControl, strShowEventName, strHideEventName, strToolBarActionHandler, ClientAPI.ScriptPath)
         End Function
 
@@ -134,10 +163,12 @@ Namespace DotNetNuke.UI.WebControls
         End Function
 
         Private Function RegisterToolbarScript() As String
+			_logger.LogDebug(">>> Entering RegisterToolbarScript()")
             Dim str As String = Nothing
             Dim uniqueID As String = Me.UniqueID
             If Me.ReuseToolBar Then
                 uniqueID = If(Not String.IsNullOrEmpty(Me.BehaviorID), Me.BehaviorID, Me.ID)
+				_logger.LogDebug("RegisterToolbarScript(): uniqueID → {UniqueID}", uniqueID)
             End If
             If (Not ClientAPI.IsClientScriptBlockRegistered(Me.Page, (uniqueID & "_toolbar")) AndAlso ClientAPI.BrowserSupportsFunctionality(ClientAPI.ClientFunctionality.DHTML)) Then
                 ClientAPI.RegisterClientReference(Me.Page, ClientAPI.ClientNamespaceReferences.dnn)
@@ -147,16 +178,20 @@ Namespace DotNetNuke.UI.WebControls
                 ClientAPI.RegisterEmbeddedResource(Me.Page, "dnn.controls.dnntoolbar.js", Me.GetType)
                 ClientAPI.RegisterEmbeddedResource(Me.Page, "dnn.controls.dnntoolbarstub.js", Me.GetType)
             End If
+			_logger.LogDebug("<<< Exiting RegisterToolbarScript()")
             Return str
         End Function
 
         Protected Overrides Sub Render(ByVal writer As HtmlTextWriter)
+		_logger.LogDebug(">>> Entering Render(writer={Writer})", writer)
         End Sub
 
         Public Sub SetToolbar()
+		_logger.LogDebug(">>> Entering SetToolbar()")
         End Sub
 
         Friend Function ToJSON() As String
+			_logger.LogDebug(">>> Entering ToJSON()")
             Dim enumerator As IEnumerator = Nothing
             Dim enumerator2 As IEnumerator = Nothing
             Dim hashtable As New Hashtable
@@ -179,11 +214,13 @@ Namespace DotNetNuke.UI.WebControls
             builder.Append("["c)
             Try 
                 enumerator = Me.Buttons.GetEnumerator
+				_logger.LogDebug("ToJSON(): enumerator → {Enumerator}", enumerator)
                 Do While True
                     If Not enumerator.MoveNext Then
                         Exit Do
                     End If
                     Dim current As DNNToolBarButton = DirectCast(enumerator.Current, DNNToolBarButton)
+					_logger.LogDebug("ToJSON(): current → {Current}", current)
                     If (builder.Length > 1) Then
                         builder.Append(","c)
                     End If
@@ -197,14 +234,17 @@ Namespace DotNetNuke.UI.WebControls
             builder.Append("]"c)
             hashtable.Add("btns", builder.ToString)
             builder = New StringBuilder
+			_logger.LogDebug("ToJSON(): builder → {Builder}", builder)
             builder.Append("{"c)
             Try 
                 enumerator2 = hashtable.Keys.GetEnumerator
+				_logger.LogDebug("ToJSON(): enumerator2 → {Enumerator2}", enumerator2)
                 Do While True
                     If Not enumerator2.MoveNext Then
                         Exit Do
                     End If
                     Dim str2 As String = Conversions.ToString(enumerator2.Current)
+					_logger.LogDebug("ToJSON(): str2 → {Str2}", str2)
                     If (builder.Length > 1) Then
                         builder.Append(","c)
                     End If
@@ -216,6 +256,7 @@ Namespace DotNetNuke.UI.WebControls
                 End If
             End Try
             builder.Append("}"c)
+			_logger.LogDebug("<<< Exiting ToJSON()")
             Return builder.ToString
         End Function
 

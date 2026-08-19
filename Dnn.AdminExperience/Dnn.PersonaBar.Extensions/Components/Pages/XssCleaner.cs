@@ -15,6 +15,7 @@ public static class XssCleaner
     /// <param name="input">The input to clean.</param>
     public static void Clean(this PageSettings input)
     {
+		eventLogger.LogDebug(">>> Entering Clean(input={Input})", input);
         input.Title = Clean(input.Title);
         input.Description = Clean(input.Description);
         input.Name = Clean(input.Name);
@@ -25,6 +26,7 @@ public static class XssCleaner
         input.Alias = Clean(input.Alias);
         input.LocalizedName = Clean(input.LocalizedName);
         input.PageStyleSheet = Clean(input.PageStyleSheet);
+		eventLogger.LogDebug("<<< Exiting Clean(input={Input})", input);
     }
 
     /// <summary>Cleans <see cref="BulkPage"/> input.</summary>

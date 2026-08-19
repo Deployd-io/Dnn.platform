@@ -16,19 +16,23 @@ import {
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 let isHost = false;
 
 class PrivacySettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             privacySettings: undefined
         };
         isHost = util.settings.isHost;
+		logger.debug('<<< Exiting constructor()');
     }
 
     loadData() {
+		logger.debug('>>> Entering loadData()');
         const { props } = this;
         props.dispatch(
             SiteBehaviorActions.getPrivacySettings(props.portalId, data => {
@@ -37,13 +41,17 @@ class PrivacySettingsPanelBody extends Component {
                 });
             })
         );
+		logger.debug('<<< Exiting loadData()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.loadData();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         const { props } = this;
         if (props.privacySettings) {
             let portalIdChanged = props.portalId !== undefined && prevProps.portalId !== props.portalId;
@@ -51,11 +59,14 @@ class PrivacySettingsPanelBody extends Component {
 
             if (portalIdChanged || cultureCodeChanged) {
                 this.loadData();
+				logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
             }
         }
     }
 
     getUserDeleteOptions() {
+		logger.debug('>>> Entering getUserDeleteOptions()');
+		logger.debug('<<< Exiting getUserDeleteOptions()');
         return [
             { label: resx.get("Off"), value: 0 },
             { label: resx.get("DataConsentUserDeleteManual"), value: 1 },
@@ -65,6 +76,8 @@ class PrivacySettingsPanelBody extends Component {
     }
 
     getTimeLapseMeasurements() {
+		logger.debug('>>> Entering getTimeLapseMeasurements()');
+		logger.debug('<<< Exiting getTimeLapseMeasurements()');
         return [
             { value: "h", label: resx.get("Hours") },
             { value: "d", label: resx.get("Days") },
@@ -73,17 +86,20 @@ class PrivacySettingsPanelBody extends Component {
     }
 
     onDataConsentResetTerms() {
+		logger.debug('>>> Entering onDataConsentResetTerms()');
         util.utilities.confirm(
             resx.get("DataConsentResetTerms.Confirm"),
             resx.get("Yes"),
             resx.get("No"),
             function onDataConsentResetTermsConfirm() {
+				logger.debug('>>> Entering onDataConsentResetTermsConfirm()');
                 SiteBehaviorActions.resetTermsAgreement(
                     {
                         PortalId: this.state.privacySettings.PortalId
                     },
                     () => {
                         util.utilities.notify(resx.get("DataConsentResetTerms.Completed"));
+						logger.debug('<<< Exiting onDataConsentResetTermsConfirm()');
                     }
                 );
             }.bind(this)
@@ -91,6 +107,7 @@ class PrivacySettingsPanelBody extends Component {
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let { state, props } = this;
         let privacySettings = Object.assign({}, state.privacySettings);
 
@@ -98,6 +115,7 @@ class PrivacySettingsPanelBody extends Component {
             key === "DataConsentUserDeleteAction" ||
       key === "DataConsentDelayMeasurement"
         ) {
+			logger.debug(`onSettingChange(key=${key},event=${event}): privacySettings → ${privacySettings}`);
             privacySettings[key] = event.value;
         } else {
             privacySettings[key] =
@@ -114,6 +132,7 @@ class PrivacySettingsPanelBody extends Component {
     }
 
     onUpdate(event) {
+		logger.debug(`>>> Entering onUpdate(event=${event})`);
         event.preventDefault();
         const { props, state } = this;
 
@@ -130,12 +149,14 @@ class PrivacySettingsPanelBody extends Component {
                 },
                 () => {
                     util.utilities.notifyError(resx.get("SettingsError"));
+					logger.debug(`<<< Exiting onUpdate(event=${event})`);
                 }
             )
         );
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const { props } = this;
         util.utilities.confirm(
             resx.get("SettingsRestoreWarning"),
@@ -151,10 +172,12 @@ class PrivacySettingsPanelBody extends Component {
                 );
             }
         );
+		logger.debug('<<< Exiting onCancel()');
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const { props, state } = this;
         const TabParameters = {
             portalId: props.portalId !== undefined ? props.portalId : -2,
@@ -194,8 +217,10 @@ class PrivacySettingsPanelBody extends Component {
         ) : (
             <div key="column-one-left" className="left-column" />
         );
+		logger.debug(`render(): TabParameters_1 → ${TabParameters_1}`);
         const columnTwoLeft = state.privacySettings ? (
             <div key="column-two-left" className="left-column">
+				logger.debug(`render(): noneSpecifiedText → ${noneSpecifiedText}`);
                 <InputGroup>
                     <Label
                         labelType="inline"
@@ -233,6 +258,7 @@ class PrivacySettingsPanelBody extends Component {
         ) : (
             <div key="column-two-right" className="right-column" />
         );
+		logger.debug('<<< Exiting render()');
         const hardDeleteDelay =
       state.privacySettings &&
       state.privacySettings.DataConsentUserDeleteAction === 2 ? (
@@ -394,6 +420,8 @@ PrivacySettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         privacySettings: state.siteBehavior.privacySettings,

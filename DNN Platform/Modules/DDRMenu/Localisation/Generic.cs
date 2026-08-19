@@ -36,7 +36,9 @@ namespace DotNetNuke.Web.DDRMenu.Localisation
         public Generic()
             : this(null, null)
         {
+		eventLogger.LogDebug(">>> Entering Generic()");
         }
+		eventLogger.LogDebug("<<< Exiting Generic()");
 
         /// <summary>Initializes a new instance of the <see cref="Generic"/> class.</summary>
         /// <param name="businessControllerProvider">The business controller provider.</param>
@@ -49,26 +51,32 @@ namespace DotNetNuke.Web.DDRMenu.Localisation
         /// <inheritdoc />
         public bool HaveApi()
         {
+			eventLogger.LogDebug(">>> Entering HaveApi()");
             if (!this.haveChecked)
             {
                 var modules = DesktopModuleController.GetDesktopModules(this.hostSettings, PortalSettings.Current.PortalId);
+				eventLogger.LogDebug("HaveApi(): modules → {Modules}", modules);
                 foreach (var module in modules.Values.Where(m => !string.IsNullOrEmpty(m.BusinessControllerClass)))
                 {
                     try
                     {
                         var controllerType = Reflection.CreateType(module.BusinessControllerClass);
+						eventLogger.LogDebug("HaveApi(): controllerType → {ControllerType}", controllerType);
                         this.locTab = controllerType.GetMethod("LocaliseTab", [typeof(TabInfo), typeof(int),]);
+						eventLogger.LogDebug("HaveApi(): locTab → {LocTab}", locTab);
                         if (this.locTab != null)
                         {
                             if (!this.locTab.IsStatic)
                             {
                                 this.locApi = this.businessControllerProvider.GetInstance(controllerType);
+								eventLogger.LogDebug("HaveApi(): locApi → {LocApi}", locApi);
                             }
 
                             break;
                         }
 
                         this.locNodes = controllerType.GetMethod("LocaliseNodes", [typeof(DNNNodeCollection),]);
+						eventLogger.LogDebug("HaveApi(): locNodes → {LocNodes}", locNodes);
                         if (this.locNodes != null)
                         {
                             if (!this.locNodes.IsStatic)
@@ -83,24 +91,31 @@ namespace DotNetNuke.Web.DDRMenu.Localisation
                     // ReSharper disable once EmptyGeneralCatchClause
                     catch
                     {
+					eventLogger.LogError("Exception in HaveApi(): {Arg0}", ex.Message);
                     }
                 }
 
                 this.haveChecked = true;
+				eventLogger.LogDebug("HaveApi(): this.haveChecked → {Arg0}", this.haveChecked);
             }
 
+			eventLogger.LogDebug("<<< Exiting HaveApi()");
             return this.locTab != null || this.locNodes != null;
         }
 
         /// <inheritdoc />
         public TabInfo LocaliseTab(TabInfo tab, int portalId)
         {
+			eventLogger.LogDebug(">>> Entering LocaliseTab(tab={Tab},portalId={PortalId})", tab, portalId);
+			eventLogger.LogDebug("<<< Exiting LocaliseTab(tab={Tab},portalId={PortalId})", tab, portalId);
             return (TabInfo)this.locTab?.Invoke(this.locApi, [tab, portalId,]);
         }
 
         /// <inheritdoc />
         public DNNNodeCollection LocaliseNodes(DNNNodeCollection nodes)
         {
+			eventLogger.LogDebug(">>> Entering LocaliseNodes(nodes={Nodes})", nodes);
+			eventLogger.LogDebug("<<< Exiting LocaliseNodes(nodes={Nodes})", nodes);
             return (DNNNodeCollection)this.locNodes?.Invoke(this.locApi, [nodes,]);
         }
     }

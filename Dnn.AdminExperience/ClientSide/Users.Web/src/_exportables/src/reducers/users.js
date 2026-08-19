@@ -1,3 +1,4 @@
+const logger = console;
 import {users as ActionTypes}  from "../actionTypes";
 import {updateUsersList, updateUser, removeUser, updateUserRoleList, removeUserRoleFromList} from "../helpers";
 const switchCase = [
@@ -168,6 +169,7 @@ const switchCase = [
     }
 ];
 function getFinalSwitchCase(switchCase, additionalCases) {
+	logger.debug(`>>> Entering getFinalSwitchCase(switchCase=${switchCase},additionalCases=${additionalCases})`);
     let _switchCase = switchCase;
     if (Object.prototype.toString.call(additionalCases) === "[object Array]") {
         additionalCases.forEach((extraCase) => {
@@ -186,9 +188,11 @@ function getFinalSwitchCase(switchCase, additionalCases) {
             }
         });
     }
+	logger.debug(`<<< Exiting getFinalSwitchCase(switchCase=${switchCase},additionalCases=${additionalCases})`);
     return _switchCase;
 }
 export default function getReducer(initialState, additionalCases) {
+	logger.debug(`>>> Entering getReducer(initialState=${initialState},additionalCases=${additionalCases})`);
     return function common(state = Object.assign({
         users: [],
         totalUsers: 0,
@@ -200,6 +204,7 @@ export default function getReducer(initialState, additionalCases) {
         passwordStrengthOptions: {}
     }, initialState), action) {
         let _switchCase = getFinalSwitchCase(switchCase, additionalCases);
+		logger.debug(`getReducer(initialState=${initialState},additionalCases=${additionalCases}): _switchCase → ${_switchCase}`);
 
         let returnCase = { ...state };
 
@@ -210,6 +215,7 @@ export default function getReducer(initialState, additionalCases) {
             }
         });
 
+		logger.debug(`<<< Exiting getReducer(initialState=${initialState},additionalCases=${additionalCases})`);
         return returnCase;
     };
 }

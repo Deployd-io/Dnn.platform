@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -13,6 +14,7 @@ E.G.:
 */
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -22,10 +24,16 @@ E.G.:
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("vbscript", function(conf, parserConf) {
+	logger.debug('>>> Entering defineMode()');
     var ERRORCLASS = 'error';
+	logger.debug('<<< Exiting defineMode()');
+	logger.debug(`defineMode(): ERRORCLASS → ${ERRORCLASS}`);
 
     function wordRegexp(words) {
+		logger.debug(`>>> Entering wordRegexp(words=${words})`);
+		logger.debug(`<<< Exiting wordRegexp(words=${words})`);
         return new RegExp("^((" + words.join(")|(") + "))\\b", "i");
     }
 
@@ -106,20 +114,26 @@ CodeMirror.defineMode("vbscript", function(conf, parserConf) {
 
 
     function indent(_stream, state) {
+	logger.debug(`>>> Entering indent(_stream=${_stream},state=${state})`);
       state.currentIndent++;
+	logger.debug(`<<< Exiting indent(_stream=${_stream},state=${state})`);
     }
 
     function dedent(_stream, state) {
+	logger.debug(`>>> Entering dedent(_stream=${_stream},state=${state})`);
       state.currentIndent--;
+	logger.debug(`<<< Exiting dedent(_stream=${_stream},state=${state})`);
     }
     // tokenizers
     function tokenBase(stream, state) {
+		logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
         if (stream.eatSpace()) {
             return 'space';
             //return null;
         }
 
         var ch = stream.peek();
+		logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
 
         // Handle Comments
         if (ch === "'") {
@@ -189,6 +203,7 @@ CodeMirror.defineMode("vbscript", function(conf, parserConf) {
 
         if (stream.match(noIndentWords)) {
             state.doInCurrentLine = true;
+			logger.debug(`tokenBase(stream=${stream},state=${state}): state.doInCurrentLine → ${state.doInCurrentLine}`);
 
             return 'keyword';
         }
@@ -253,18 +268,23 @@ CodeMirror.defineMode("vbscript", function(conf, parserConf) {
 
         // Handle non-detected items
         stream.next();
+		logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
         return ERRORCLASS;
     }
 
     function tokenStringFactory(delimiter) {
+		logger.debug(`>>> Entering tokenStringFactory(delimiter=${delimiter})`);
         var singleline = delimiter.length == 1;
         var OUTCLASS = 'string';
+		logger.debug(`tokenStringFactory(delimiter=${delimiter}): OUTCLASS → ${OUTCLASS}`);
 
         return function(stream, state) {
             while (!stream.eol()) {
                 stream.eatWhile(/[^'"]/);
                 if (stream.match(delimiter)) {
                     state.tokenize = tokenBase;
+					logger.debug(`tokenStringFactory(delimiter=${delimiter}): state.tokenize → ${state.tokenize}`);
+					logger.debug(`function(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
                     return OUTCLASS;
                 } else {
                     stream.eat(/['"]/);
@@ -277,14 +297,18 @@ CodeMirror.defineMode("vbscript", function(conf, parserConf) {
                     state.tokenize = tokenBase;
                 }
             }
+			logger.debug(`<<< Exiting tokenStringFactory(delimiter=${delimiter})`);
             return OUTCLASS;
         };
     }
 
 
     function tokenLexer(stream, state) {
+		logger.debug(`>>> Entering tokenLexer(stream=${stream},state=${state})`);
         var style = state.tokenize(stream, state);
         var current = stream.current();
+		logger.debug(`tokenLexer(stream=${stream},state=${state}): style → ${style}`);
+		logger.debug(`tokenLexer(stream=${stream},state=${state}): current → ${current}`);
 
         // Handle '.' connected identifiers
         if (current === '.') {
@@ -301,12 +325,14 @@ CodeMirror.defineMode("vbscript", function(conf, parserConf) {
             }
         }
 
+		logger.debug(`<<< Exiting tokenLexer(stream=${stream},state=${state})`);
         return style;
     }
 
     var external = {
         electricChars:"dDpPtTfFeE ",
         startState: function() {
+			logger.debug('>>> Entering startState()');
             return {
               tokenize: tokenBase,
               lastToken: null,
@@ -320,10 +346,13 @@ CodeMirror.defineMode("vbscript", function(conf, parserConf) {
         },
 
         token: function(stream, state) {
+			logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
             if (stream.sol()) {
               state.currentIndent += state.nextLineIndent;
               state.nextLineIndent = 0;
+			logger.debug(`token(stream=${stream},state=${state}): state.nextLineIndent → ${state.nextLineIndent}`);
               state.doInCurrentLine = 0;
+			logger.debug(`token(stream=${stream},state=${state}): state.doInCurrentLine → ${state.doInCurrentLine}`);
             }
             var style = tokenLexer(stream, state);
 
@@ -331,13 +360,18 @@ CodeMirror.defineMode("vbscript", function(conf, parserConf) {
 
             if (style==='space') style=null;
 
+			logger.debug(`token(stream=${stream},state=${state}): style → ${style}`);
+			logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
             return style;
         },
 
         indent: function(state, textAfter) {
+			logger.debug(`>>> Entering indent(state=${state},textAfter=${textAfter})`);
             var trueText = textAfter.replace(/^\s+|\s+$/g, '') ;
             if (trueText.match(closing) || trueText.match(doubleClosing) || trueText.match(middle)) return conf.indentUnit*(state.currentIndent-1);
+			logger.debug(`indent(state=${state},textAfter=${textAfter}): trueText → ${trueText}`);
             if(state.currentIndent < 0) return 0;
+			logger.debug(`<<< Exiting indent(state=${state},textAfter=${textAfter})`);
             return state.currentIndent * conf.indentUnit;
         }
 

@@ -16,15 +16,20 @@ namespace DotNetNuke.Web.Razor
     using DotNetNuke.Services.Localization;
     using DotNetNuke.UI.Modules;
     using DotNetNuke.Web.Razor.Helpers;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>Renders a razor file.</summary>
     [DnnDeprecated(9, 3, 2, "Use Razor Pages instead")]
     public partial class RazorEngine
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public RazorEngine(string razorScriptFile, ModuleInstanceContext moduleContext, string localResourceFile)
         {
+			_logger.LogDebug(">>> Entering RazorEngine(razorScriptFile={RazorScriptFile},moduleContext={ModuleContext},localResourceFile={LocalResourceFile})", razorScriptFile, moduleContext, localResourceFile);
             this.RazorScriptFile = razorScriptFile;
             this.ModuleContext = moduleContext;
+			_logger.LogDebug("RazorEngine(razorScriptFile={RazorScriptFile},moduleContext={ModuleContext},localResourceFile={LocalResourceFile}): this.RazorScriptFile → {Arg3}", razorScriptFile, moduleContext, localResourceFile, this.RazorScriptFile);
+			_logger.LogDebug("RazorEngine(razorScriptFile={RazorScriptFile},moduleContext={ModuleContext},localResourceFile={LocalResourceFile}): this.ModuleContext → {Arg3}", razorScriptFile, moduleContext, localResourceFile, this.ModuleContext);
             this.LocalResourceFile = localResourceFile ?? Path.Combine(Path.GetDirectoryName(razorScriptFile), Localization.LocalResourceDirectory, Path.GetFileName(razorScriptFile) + ".resx");
 
             try
@@ -33,16 +38,20 @@ namespace DotNetNuke.Web.Razor
             }
             catch (HttpParseException)
             {
+				_logger.LogError("Exception in RazorEngine(razorScriptFile={RazorScriptFile},moduleContext={ModuleContext},localResourceFile={LocalResourceFile}): {Arg3}", razorScriptFile, moduleContext, localResourceFile, HttpParseException.getMessage());
                 throw;
             }
             catch (HttpCompileException)
             {
+				_logger.LogError("Exception in RazorEngine(razorScriptFile={RazorScriptFile},moduleContext={ModuleContext},localResourceFile={LocalResourceFile}): {Arg3}", razorScriptFile, moduleContext, localResourceFile, HttpCompileException.getMessage());
                 throw;
             }
             catch (Exception exc)
             {
+				_logger.LogError("Exception in RazorEngine(razorScriptFile={RazorScriptFile},moduleContext={ModuleContext},localResourceFile={LocalResourceFile}): {Arg3}", razorScriptFile, moduleContext, localResourceFile, exc.getMessage());
                 Exceptions.LogException(exc);
             }
+			_logger.LogDebug("<<< Exiting RazorEngine(razorScriptFile={RazorScriptFile},moduleContext={ModuleContext},localResourceFile={LocalResourceFile})", razorScriptFile, moduleContext, localResourceFile);
         }
 
         public DotNetNukeWebPage Webpage { get; set; }
@@ -63,15 +72,18 @@ namespace DotNetNuke.Web.Razor
         [DnnDeprecated(9, 3, 2, "Use Razor Pages instead")]
         public partial Type RequestedModelType()
         {
+			_logger.LogDebug(">>> Entering RequestedModelType()");
             if (this.Webpage != null)
             {
                 var webpageType = this.Webpage.GetType();
+				_logger.LogDebug("RequestedModelType(): webpageType → {WebpageType}", webpageType);
                 if (webpageType.BaseType.IsGenericType)
                 {
                     return webpageType.BaseType.GetGenericArguments()[0];
                 }
             }
 
+			_logger.LogDebug("<<< Exiting RequestedModelType()");
             return null;
         }
 
@@ -82,12 +94,14 @@ namespace DotNetNuke.Web.Razor
         [DnnDeprecated(9, 3, 2, "Use Razor Pages instead")]
         public partial void Render<T>(TextWriter writer, T model)
         {
+			_logger.LogDebug(">>> Entering Render(writer={Writer},model={Model})", writer, model);
             try
             {
                 this.Webpage.ExecutePageHierarchy(new WebPageContext(this.HttpContext, this.Webpage, model), writer, this.Webpage);
             }
             catch (Exception exc)
             {
+				_logger.LogError("Exception in Render(writer={Writer},model={Model}): {Arg2}", writer, model, exc.getMessage());
                 Exceptions.LogException(exc);
             }
         }
@@ -97,14 +111,18 @@ namespace DotNetNuke.Web.Razor
         [DnnDeprecated(9, 3, 2, "Use Razor Pages instead")]
         public partial void Render(TextWriter writer)
         {
+			_logger.LogDebug(">>> Entering Render(writer={Writer})", writer);
             try
+			_logger.LogDebug("<<< Exiting Render(writer={Writer},model={Model})", writer, model);
             {
                 this.Webpage.ExecutePageHierarchy(new WebPageContext(this.HttpContext, this.Webpage, null), writer, this.Webpage);
             }
             catch (Exception exc)
             {
+				_logger.LogError("Exception in Render(writer={Writer}): {Arg1}", writer, exc.getMessage());
                 Exceptions.LogException(exc);
             }
+			_logger.LogDebug("<<< Exiting Render(writer={Writer})", writer);
         }
 
         /// <summary>Renders a razor file into a <see cref="TextWriter"/>.</summary>
@@ -119,36 +137,46 @@ namespace DotNetNuke.Web.Razor
             }
             catch (Exception exc)
             {
+				_logger.LogError("Exception in Render(writer={Writer},context={Context}): {Arg2}", writer, context, exc.getMessage());
                 Exceptions.LogException(exc);
             }
         }
 
         private object CreateWebPageInstance()
         {
+			_logger.LogDebug(">>> Entering CreateWebPageInstance()");
             var compiledType = BuildManager.GetCompiledType(this.RazorScriptFile);
             object objectValue = null;
+			_logger.LogDebug("CreateWebPageInstance(): objectValue → {ObjectValue}", objectValue);
+			_logger.LogDebug("CreateWebPageInstance(): compiledType → {CompiledType}", compiledType);
             if (compiledType != null)
             {
                 objectValue = RuntimeHelpers.GetObjectValue(Activator.CreateInstance(compiledType));
             }
 
+			_logger.LogDebug("<<< Exiting CreateWebPageInstance()");
             return objectValue;
         }
 
         private void InitHelpers(DotNetNukeWebPage webPage)
         {
+			_logger.LogDebug(">>> Entering InitHelpers(webPage={WebPage})", webPage);
             webPage.Dnn = new DnnHelper(this.ModuleContext);
             webPage.Html = new HtmlHelper(this.ModuleContext, this.LocalResourceFile);
             webPage.Url = new UrlHelper(this.ModuleContext);
+			_logger.LogDebug("<<< Exiting InitHelpers(webPage={WebPage})", webPage);
         }
 
         private void InitWebpage()
         {
+			_logger.LogDebug(">>> Entering InitWebpage()");
             if (!string.IsNullOrEmpty(this.RazorScriptFile))
             {
                 var objectValue = RuntimeHelpers.GetObjectValue(this.CreateWebPageInstance());
+				_logger.LogDebug("InitWebpage(): objectValue → {ObjectValue}", objectValue);
                 if (objectValue == null)
                 {
+					_logger.LogWarning("Throwing InvalidOperationException from InitWebpage()");
                     throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "The webpage found at '{0}' was not created.", new object[] { this.RazorScriptFile }));
                 }
 
@@ -162,6 +190,7 @@ namespace DotNetNuke.Web.Razor
                 this.Webpage.VirtualPath = VirtualPathUtility.GetDirectory(this.RazorScriptFile);
                 this.InitHelpers(this.Webpage);
             }
+			_logger.LogDebug("<<< Exiting InitWebpage()");
         }
     }
 }

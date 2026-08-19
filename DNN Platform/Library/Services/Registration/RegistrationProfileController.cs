@@ -21,6 +21,7 @@ namespace DotNetNuke.Services.Registration
     public class RegistrationProfileController(ListController listController, IHostSettings hostSettings, IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController)
         : ServiceLocator<IRegistrationProfileController, RegistrationProfileController>, IRegistrationProfileController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RegistrationProfileController));
         private readonly ListController listController = listController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ListController>();
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
         private readonly IPortalController portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
@@ -32,16 +33,22 @@ namespace DotNetNuke.Services.Registration
         public RegistrationProfileController()
             : this(null, null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering RegistrationProfileController()");
         }
+		Logger.LogDebug("<<< Exiting RegistrationProfileController()");
 
         /// <inheritdoc />
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public IEnumerable<string> Search(int portalId, string searchTerm)
         {
+			Logger.LogDebug(">>> Entering Search(portalId={PortalId},searchTerm={SearchTerm})", portalId, searchTerm);
             ListEntryInfo imageType = this.listController.GetListEntryInfo("DataType", "Image");
 
+			Logger.LogDebug("Search(portalId={PortalId},searchTerm={SearchTerm}): imageType → {ImageType}", portalId, searchTerm, imageType);
             List<string> results = [];
+			Logger.LogDebug("Search(portalId={PortalId},searchTerm={SearchTerm}): results → {Results}", portalId, searchTerm, results);
             var properties = ProfileController.GetPropertyDefinitionsByPortal(this.hostSettings, this.portalController, this.appStatus, this.portalGroupController, portalId);
+			Logger.LogDebug("Search(portalId={PortalId},searchTerm={SearchTerm}): properties → {Properties}", portalId, searchTerm, properties);
             foreach (var definition in properties.Where(definition => definition.DataType != imageType.EntryID))
             {
                 AddProperty(results, definition.PropertyName, searchTerm);
@@ -55,21 +62,26 @@ namespace DotNetNuke.Services.Registration
             AddProperty(results, "PasswordQuestion", searchTerm);
             AddProperty(results, "PasswordAnswer", searchTerm);
 
+			Logger.LogDebug("<<< Exiting Search(portalId={PortalId},searchTerm={SearchTerm})", portalId, searchTerm);
             return results;
         }
 
         /// <inheritdoc />
         protected override Func<IRegistrationProfileController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => Globals.DependencyProvider.GetRequiredService<IRegistrationProfileController>();
         }
 
         private static void AddProperty(List<string> results, string field, string searchTerm)
         {
+			Logger.LogDebug(">>> Entering AddProperty(results={Results},field={Field},searchTerm={SearchTerm})", results, field, searchTerm);
             if (field.ToLowerInvariant().Contains(searchTerm.ToLowerInvariant().Trim()))
             {
                 results.Add(field);
             }
+			Logger.LogDebug("<<< Exiting AddProperty(results={Results},field={Field},searchTerm={SearchTerm})", results, field, searchTerm);
         }
     }
 }

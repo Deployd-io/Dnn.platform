@@ -1,3 +1,4 @@
+const logger = console;
 /** vim: et:ts=4:sw=4:sts=4
  * @license RequireJS 2.3.5 Copyright jQuery Foundation and other contributors.
  * Released under MIT license, https://github.com/requirejs/requirejs/blob/master/LICENSE
@@ -9,6 +10,8 @@
 
 var requirejs, require, define;
 (function (global, setTimeout) {
+	logger.debug(`>>> Entering function(version=${version})`);
+	logger.debug(`function(map=${map}): this.depMatched → ${this.depMatched}`);
     var req, s, head, baseElement, dataMain, src,
         interactiveScript, currentlyAddingScript, mainScript, subPath,
         version = '2.3.5',
@@ -37,14 +40,23 @@ var requirejs, require, define;
 
     //Could match something like ')//comment', do not lose the prefix to comment.
     function commentReplace(match, singlePrefix) {
+		logger.debug(`>>> Entering commentReplace(match=${match},singlePrefix=${singlePrefix})`);
+		logger.debug(`<<< Exiting commentReplace(match=${match},singlePrefix=${singlePrefix})`);
         return singlePrefix || '';
     }
 
     function isFunction(it) {
+		logger.debug(`>>> Entering isFunction(it=${it})`);
+		logger.debug(`>>> Entering on(depMap=${depMap},name=${name},fn=${fn})`);
+		logger.debug(`<<< Exiting on(depMap=${depMap},name=${name},fn=${fn})`);
+		logger.debug(`<<< Exiting on(pluginMap=${pluginMap},bundleId=${bundleId})`);
+		logger.debug(`<<< Exiting isFunction(it=${it})`);
         return ostring.call(it) === '[object Function]';
     }
 
     function isArray(it) {
+		logger.debug(`>>> Entering isArray(it=${it})`);
+		logger.debug(`<<< Exiting isArray(it=${it})`);
         return ostring.call(it) === '[object Array]';
     }
 
@@ -53,10 +65,12 @@ var requirejs, require, define;
      * a true value, it will break out of the loop.
      */
     function each(ary, func) {
+		logger.debug(`>>> Entering each(ary=${ary},func=${func})`);
         if (ary) {
             var i;
             for (i = 0; i < ary.length; i += 1) {
                 if (ary[i] && func(ary[i], i, ary)) {
+					logger.debug(`<<< Exiting each(ary=${ary},func=${func})`);
                     break;
                 }
             }
@@ -68,10 +82,12 @@ var requirejs, require, define;
      * returns a true value, it will break out of the loop.
      */
     function eachReverse(ary, func) {
+		logger.debug(`>>> Entering eachReverse(ary=${ary},func=${func})`);
         if (ary) {
             var i;
             for (i = ary.length - 1; i > -1; i -= 1) {
                 if (ary[i] && func(ary[i], i, ary)) {
+					logger.debug(`<<< Exiting eachReverse(ary=${ary},func=${func})`);
                     break;
                 }
             }
@@ -79,10 +95,14 @@ var requirejs, require, define;
     }
 
     function hasProp(obj, prop) {
+		logger.debug(`>>> Entering hasProp(obj=${obj},prop=${prop})`);
+		logger.debug(`<<< Exiting hasProp(obj=${obj},prop=${prop})`);
         return hasOwn.call(obj, prop);
     }
 
     function getOwn(obj, prop) {
+		logger.debug(`>>> Entering getOwn(obj=${obj},prop=${prop})`);
+		logger.debug(`<<< Exiting getOwn(obj=${obj},prop=${prop})`);
         return hasProp(obj, prop) && obj[prop];
     }
 
@@ -92,14 +112,18 @@ var requirejs, require, define;
      * iteration is stopped.
      */
     function eachProp(obj, func) {
+		logger.debug(`>>> Entering eachProp(obj=${obj},func=${func})`);
         var prop;
+		logger.debug(`>>> Entering eachProp(source=${source},value=${value})`);
         for (prop in obj) {
             if (hasProp(obj, prop)) {
                 if (func(obj[prop], prop)) {
+					logger.debug(`<<< Exiting eachProp(obj=${obj},func=${func})`);
                     break;
                 }
             }
         }
+		logger.debug('<<< Exiting eachProp()');
     }
 
     /**
@@ -107,6 +131,7 @@ var requirejs, require, define;
      * but only if target does not already have a property of the same name.
      */
     function mixin(target, source, force, deepStringMixin) {
+		logger.debug(`>>> Entering mixin(target=${target},source=${source},force=${force},deepStringMixin=${deepStringMixin})`);
         if (source) {
             eachProp(source, function (value, prop) {
                 if (force || !hasProp(target, prop)) {
@@ -120,32 +145,40 @@ var requirejs, require, define;
                         mixin(target[prop], value, force, deepStringMixin);
                     } else {
                         target[prop] = value;
+						logger.debug(`<<< Exiting eachProp(source=${source},value=${value})`);
                     }
                 }
             });
         }
+		logger.debug(`<<< Exiting mixin(target=${target},source=${source},force=${force},deepStringMixin=${deepStringMixin})`);
         return target;
     }
 
     //Similar to Function.prototype.bind, but the 'this' object is specified
     //first, since it is easier to read/figure out what 'this' will be.
     function bind(obj, fn) {
+		logger.debug(`>>> Entering bind(obj=${obj},fn=${fn})`);
         return function () {
+			logger.debug(`<<< Exiting bind(obj=${obj},fn=${fn})`);
             return fn.apply(obj, arguments);
         };
     }
 
     function scripts() {
+		logger.debug('>>> Entering scripts()');
         return document.getElementsByTagName('script');
     }
 
     function defaultOnError(err) {
+		logger.debug(`>>> Entering defaultOnError(err=${err})`);
+		logger.debug(`<<< Exiting defaultOnError(err=${err})`);
         throw err;
     }
 
     //Allow getting a global that is expressed in
     //dot notation, like 'a.b.c'.
     function getGlobal(value) {
+		logger.debug(`>>> Entering getGlobal(value=${value})`);
         if (!value) {
             return value;
         }
@@ -153,6 +186,7 @@ var requirejs, require, define;
         each(value.split('.'), function (part) {
             g = g[part];
         });
+		logger.debug(`<<< Exiting getGlobal(value=${value})`);
         return g;
     }
 
@@ -165,12 +199,17 @@ var requirejs, require, define;
      * @returns {Error}
      */
     function makeError(id, msg, err, requireModules) {
+		logger.debug(`>>> Entering makeError(id=${id},msg=${msg},err=${err},requireModules=${requireModules})`);
         var e = new Error(msg + '\nhttp://requirejs.org/docs/errors.html#' + id);
         e.requireType = id;
+		logger.debug(`makeError(id=${id},msg=${msg},err=${err},requireModules=${requireModules}): e → ${e}`);
+		logger.debug(`makeError(id=${id},msg=${msg},err=${err},requireModules=${requireModules}): e.requireType → ${e.requireType}`);
         e.requireModules = requireModules;
+		logger.debug(`makeError(id=${id},msg=${msg},err=${err},requireModules=${requireModules}): e.requireModules → ${e.requireModules}`);
         if (err) {
             e.originalError = err;
         }
+		logger.debug(`<<< Exiting makeError(id=${id},msg=${msg},err=${err},requireModules=${requireModules})`);
         return e;
     }
 
@@ -197,6 +236,7 @@ var requirejs, require, define;
     }
 
     function newContext(contextName) {
+		logger.debug(`>>> Entering newContext(contextName=${contextName})`);
         var inCheckLoaded, Module, context, handlers,
             checkLoadedTimeoutId,
             config = {
@@ -224,6 +264,7 @@ var requirejs, require, define;
             requireCounter = 1,
             unnormalizedCounter = 1;
 
+		logger.debug(`newContext(contextName=${contextName}): unnormalizedCounter → ${unnormalizedCounter}`);
         /**
          * Trims the . and .. from an array of path segments.
          * It will keep a leading path segment if a .. will become
@@ -234,6 +275,7 @@ var requirejs, require, define;
          * @param {Array} ary the array of path segments.
          */
         function trimDots(ary) {
+			logger.debug(`>>> Entering trimDots(ary=${ary})`);
             var i, part;
             for (i = 0; i < ary.length; i++) {
                 part = ary[i];
@@ -251,6 +293,7 @@ var requirejs, require, define;
                     } else if (i > 0) {
                         ary.splice(i - 1, 2);
                         i -= 2;
+						logger.debug(`<<< Exiting trimDots(ary=${ary})`);
                     }
                 }
             }
@@ -267,6 +310,7 @@ var requirejs, require, define;
          * @returns {String} normalized name
          */
         function normalize(name, baseName, applyMap) {
+			logger.debug(`>>> Entering normalize(name=${name},baseName=${baseName},applyMap=${applyMap})`);
             var pkgMain, mapValue, nameParts, i, j, nameSegment, lastIndex,
                 foundMap, foundI, foundStarMap, starI, normalizedBaseParts,
                 baseParts = (baseName && baseName.split('/')),
@@ -318,6 +362,7 @@ var requirejs, require, define;
                             //this name.
                             if (mapValue) {
                                 mapValue = getOwn(mapValue, nameSegment);
+								logger.debug(`normalize(name=${name},baseName=${baseName},applyMap=${applyMap}): mapValue → ${mapValue}`);
                                 if (mapValue) {
                                     //Match, update name to the new value.
                                     foundMap = mapValue;
@@ -345,6 +390,7 @@ var requirejs, require, define;
                 if (foundMap) {
                     nameParts.splice(0, foundI, foundMap);
                     name = nameParts.join('/');
+					logger.debug(`normalize(name=${name},baseName=${baseName},applyMap=${applyMap}): name → ${name}`);
                 }
             }
 
@@ -356,20 +402,25 @@ var requirejs, require, define;
         }
 
         function removeScript(name) {
+			logger.debug(`>>> Entering removeScript(name=${name})`);
             if (isBrowser) {
                 each(scripts(), function (scriptNode) {
                     if (scriptNode.getAttribute('data-requiremodule') === name &&
                             scriptNode.getAttribute('data-requirecontext') === context.contextName) {
                         scriptNode.parentNode.removeChild(scriptNode);
+						logger.debug('<<< Exiting function()');
                         return true;
                     }
                 });
             }
+			logger.debug(`<<< Exiting removeScript(name=${name})`);
         }
 
         function hasPathFallback(id) {
+			logger.debug(`>>> Entering hasPathFallback(id=${id})`);
             var pathConfig = getOwn(config.paths, id);
             if (pathConfig && isArray(pathConfig) && pathConfig.length > 1) {
+				logger.debug(`hasPathFallback(id=${id}): pathConfig → ${pathConfig}`);
                 //Pop off the first array value, since it failed, and
                 //retry
                 pathConfig.shift();
@@ -381,6 +432,11 @@ var requirejs, require, define;
                     skipMap: true
                 })([id]);
 
+				logger.debug(`>>> Entering makeRequire(relMap=${relMap},options=${options})`);
+				logger.debug(`makeRequire(relMap=${relMap},options=${options}): callback.__requireJsBuild → ${callback.__requireJsBuild}`);
+				logger.debug(`makeRequire(relMap=${relMap},options=${options}): requireMod.skipMap → ${requireMod.skipMap}`);
+				logger.debug(`<<< Exiting makeRequire(relMap=${relMap},options=${options})`);
+			logger.debug(`<<< Exiting hasPathFallback(id=${id})`);
                 return true;
             }
         }
@@ -389,12 +445,16 @@ var requirejs, require, define;
         //with the plugin being undefined if the name
         //did not have a plugin prefix.
         function splitPrefix(name) {
+			logger.debug(`>>> Entering splitPrefix(name=${name})`);
             var prefix,
                 index = name ? name.indexOf('!') : -1;
             if (index > -1) {
                 prefix = name.substring(0, index);
                 name = name.substring(index + 1, name.length);
             }
+			logger.debug(`splitPrefix(name=${name}): name → ${name}`);
+			logger.debug(`splitPrefix(name=${name}): index → ${index}`);
+			logger.debug(`<<< Exiting splitPrefix(name=${name})`);
             return [prefix, name];
         }
 
@@ -414,6 +474,7 @@ var requirejs, require, define;
          * @returns {Object}
          */
         function makeModuleMap(name, parentModuleMap, isNormalized, applyMap) {
+			logger.debug(`>>> Entering makeModuleMap(name=${name},parentModuleMap=${parentModuleMap},isNormalized=${isNormalized},applyMap=${applyMap})`);
             var url, pluginModule, suffix, nameParts,
                 prefix = null,
                 parentName = parentModuleMap ? parentModuleMap.name : null,
@@ -432,6 +493,7 @@ var requirejs, require, define;
             prefix = nameParts[0];
             name = nameParts[1];
 
+			logger.debug(`makeModuleMap(name=${name},parentModuleMap=${parentModuleMap},isNormalized=${isNormalized},applyMap=${applyMap}): name → ${name}`);
             if (prefix) {
                 prefix = normalize(prefix, parentName, applyMap);
                 pluginModule = getOwn(defined, prefix);
@@ -482,6 +544,7 @@ var requirejs, require, define;
                      '_unnormalized' + (unnormalizedCounter += 1) :
                      '';
 
+			logger.debug(`<<< Exiting makeModuleMap(name=${name},parentModuleMap=${parentModuleMap},isNormalized=${isNormalized},applyMap=${applyMap})`);
             return {
                 prefix: prefix,
                 name: normalizedName,
@@ -497,13 +560,16 @@ var requirejs, require, define;
         }
 
         function getModule(depMap) {
+			logger.debug(`>>> Entering getModule(depMap=${depMap})`);
             var id = depMap.id,
                 mod = getOwn(registry, id);
+				logger.debug(`getModule(depMap=${depMap}): id → ${id}`);
 
             if (!mod) {
                 mod = registry[id] = new context.Module(depMap);
             }
 
+			logger.debug(`<<< Exiting getModule(depMap=${depMap})`);
             return mod;
         }
 
@@ -527,6 +593,7 @@ var requirejs, require, define;
         }
 
         function onError(err, errback) {
+			logger.debug(`>>> Entering onError(err=${err},errback=${errback})`);
             var ids = err.requireModules,
                 notified = false;
 
@@ -534,12 +601,15 @@ var requirejs, require, define;
                 errback(err);
             } else {
                 each(ids, function (id) {
+					logger.debug(`>>> Entering each(ids=${ids},mod=${mod})`);
                     var mod = getOwn(registry, id);
                     if (mod) {
                         //Set error on module, so it skips timeout checks.
                         mod.error = err;
+						logger.debug(`each(ids=${ids},mod=${mod}): mod → ${mod}`);
                         if (mod.events.error) {
                             notified = true;
+							logger.debug(`each(ids=${ids},mod=${mod}): mod.error → ${mod.error}`);
                             mod.emit('error', err);
                         }
                     }
@@ -556,16 +626,20 @@ var requirejs, require, define;
          * defQueue.
          */
         function takeGlobalQueue() {
+			logger.debug('>>> Entering takeGlobalQueue()');
             //Push all the globalDefQueue items into the context's defQueue
             if (globalDefQueue.length) {
                 each(globalDefQueue, function(queueItem) {
+					logger.debug(`>>> Entering each(globalDefQueue=${globalDefQueue},id=${id})`);
                     var id = queueItem[0];
                     if (typeof id === 'string') {
+						logger.debug(`each(globalDefQueue=${globalDefQueue},id=${id}): id → ${id}`);
                         context.defQueueMap[id] = true;
                     }
                     defQueue.push(queueItem);
                 });
                 globalDefQueue = [];
+				logger.debug('<<< Exiting takeGlobalQueue()');
             }
         }
 
@@ -595,6 +669,8 @@ var requirejs, require, define;
                         id: mod.map.id,
                         uri: mod.map.url,
                         config: function () {
+							logger.debug('>>> Entering config()');
+							logger.debug('<<< Exiting config()');
                             return getOwn(config.config, mod.map.id) || {};
                         },
                         exports: mod.exports || (mod.exports = {})
@@ -604,17 +680,22 @@ var requirejs, require, define;
         };
 
         function cleanRegistry(id) {
+			logger.debug(`>>> Entering cleanRegistry(id=${id})`);
             //Clean up machinery used for waiting modules.
             delete registry[id];
             delete enabledRegistry[id];
+			logger.debug(`<<< Exiting cleanRegistry(id=${id})`);
         }
 
         function breakCycle(mod, traced, processed) {
+			logger.debug(`>>> Entering breakCycle(mod=${mod},traced=${traced},processed=${processed})`);
             var id = mod.map.id;
 
+			logger.debug(`breakCycle(mod=${mod},traced=${traced},processed=${processed}): id → ${id}`);
             if (mod.error) {
                 mod.emit('error', mod.error);
             } else {
+				logger.debug(`<<< Exiting breakCycle(mod=${mod},traced=${traced},processed=${processed})`);
                 traced[id] = true;
                 each(mod.depMaps, function (depMap, i) {
                     var depId = depMap.id,
@@ -630,6 +711,7 @@ var requirejs, require, define;
                             mod.check(); //pass false?
                         } else {
                             breakCycle(dep, traced, processed);
+							logger.debug(`<<< Exiting each(depId=${depId})`);
                         }
                     }
                 });
@@ -638,6 +720,7 @@ var requirejs, require, define;
         }
 
         function checkLoaded() {
+			logger.debug('>>> Entering checkLoaded()');
             var err, usingPathFallback,
                 waitInterval = config.waitSeconds * 1000,
                 //It is possible to disable the wait interval by using waitSeconds of 0.
@@ -654,6 +737,7 @@ var requirejs, require, define;
 
             inCheckLoaded = true;
 
+			logger.debug(`checkLoaded(): inCheckLoaded → ${inCheckLoaded}`);
             //Figure out the state of all the modules.
             eachProp(enabledRegistry, function (mod) {
                 var map = mod.map,
@@ -682,6 +766,7 @@ var requirejs, require, define;
                     } else if (!mod.inited && mod.fetched && map.isDefine) {
                         stillLoading = true;
                         if (!map.prefix) {
+							logger.debug(`<<< Exiting eachProp(enabledRegistry=${enabledRegistry},map=${map})`);
                             //No reason to keep looking for unfinished
                             //loading. If the only stillLoading is a
                             //plugin resource though, keep going,
@@ -703,7 +788,9 @@ var requirejs, require, define;
             //Not expired, check for a cycle.
             if (needCycleCheck) {
                 each(reqCalls, function (mod) {
+					logger.debug(`>>> Entering each(reqCalls=${reqCalls})`);
                     breakCycle(mod, {}, {});
+					logger.debug('>>> Entering each()');
                 });
             }
 
@@ -715,13 +802,16 @@ var requirejs, require, define;
                 //if a timeout is not already in effect.
                 if ((isBrowser || isWebWorker) && !checkLoadedTimeoutId) {
                     checkLoadedTimeoutId = setTimeout(function () {
+						logger.debug(`>>> Entering setTimeout(checkLoadedTimeoutId=${checkLoadedTimeoutId})`);
                         checkLoadedTimeoutId = 0;
                         checkLoaded();
+						logger.debug(`<<< Exiting setTimeout(checkLoadedTimeoutId=${checkLoadedTimeoutId})`);
                     }, 50);
                 }
             }
 
             inCheckLoaded = false;
+			logger.debug('<<< Exiting checkLoaded()');
         }
 
         Module = function (map) {
@@ -731,17 +821,21 @@ var requirejs, require, define;
             this.depExports = [];
             this.depMaps = [];
             this.depMatched = [];
+			logger.debug(`function(map=${map}): this.map → ${this.map}`);
             this.pluginMaps = {};
             this.depCount = 0;
 
+			logger.debug(`function(map=${map}): this.depExports → ${this.depExports}`);
             /* this.exports this.factory
                this.depMaps = [],
                this.enabled, this.fetched
+			logger.debug(`function(map=${map}): this.depMaps → ${this.depMaps}`);
             */
         };
 
         Module.prototype = {
             init: function (depMaps, factory, errback, options) {
+				logger.debug(`>>> Entering init(depMaps=${depMaps},factory=${factory},errback=${errback},options=${options})`);
                 options = options || {};
 
                 //Do not do more inits if already done. Can happen if there
@@ -753,6 +847,7 @@ var requirejs, require, define;
 
                 this.factory = factory;
 
+				logger.debug(`init(depMaps=${depMaps},factory=${factory},errback=${errback},options=${options}): this.factory → ${this.factory}`);
                 if (errback) {
                     //Register for errors on this module.
                     this.on('error', errback);
@@ -771,13 +866,17 @@ var requirejs, require, define;
                 //would affect that config.
                 this.depMaps = depMaps && depMaps.slice(0);
 
+				logger.debug(`init(depMaps=${depMaps},factory=${factory},errback=${errback},options=${options}): depMaps → ${depMaps}`);
                 this.errback = errback;
 
+				logger.debug(`init(depMaps=${depMaps},factory=${factory},errback=${errback},options=${options}): this.errback → ${this.errback}`);
                 //Indicate this module has be initialized
                 this.inited = true;
 
+				logger.debug(`init(depMaps=${depMaps},factory=${factory},errback=${errback},options=${options}): this.inited → ${this.inited}`);
                 this.ignore = options.ignore;
 
+				logger.debug(`init(depMaps=${depMaps},factory=${factory},errback=${errback},options=${options}): this.ignore → ${this.ignore}`);
                 //Could have option to init this module in enabled mode,
                 //or could have been previously marked as enabled. However,
                 //the dependencies are not known until init is called. So
@@ -789,19 +888,23 @@ var requirejs, require, define;
                 } else {
                     this.check();
                 }
+				logger.debug(`<<< Exiting init(depMaps=${depMaps},factory=${factory},errback=${errback},options=${options})`);
             },
 
             defineDep: function (i, depExports) {
+				logger.debug(`>>> Entering defineDep(i=${i},depExports=${depExports})`);
                 //Because of cycles, defined callback for a given
                 //export can be called more than once.
                 if (!this.depMatched[i]) {
                     this.depMatched[i] = true;
                     this.depCount -= 1;
                     this.depExports[i] = depExports;
+					logger.debug(`<<< Exiting defineDep(i=${i},depExports=${depExports})`);
                 }
             },
 
             fetch: function () {
+				logger.debug('>>> Entering fetch()');
                 if (this.fetched) {
                     return;
                 }
@@ -809,6 +912,7 @@ var requirejs, require, define;
 
                 context.startTime = (new Date()).getTime();
 
+				logger.debug(`fetch(): this.fetched → ${this.fetched}`);
                 var map = this.map;
 
                 //If the manager is for a plugin managed resource,
@@ -820,12 +924,14 @@ var requirejs, require, define;
                         return map.prefix ? this.callPlugin() : this.load();
                     }));
                 } else {
+					logger.debug('<<< Exiting fetch()');
                     //Regular dependency.
                     return map.prefix ? this.callPlugin() : this.load();
                 }
             },
 
             load: function () {
+				logger.debug('>>> Entering load()');
                 var url = this.map.url;
 
                 //Regular dependency.
@@ -833,6 +939,8 @@ var requirejs, require, define;
                     urlFetched[url] = true;
                     context.load(this.map.id, url);
                 }
+				logger.debug(`>>> Entering load(id=${id},url=${url})`);
+				logger.debug('<<< Exiting load()');
             },
 
             /**
@@ -916,7 +1024,25 @@ var requirejs, require, define;
                             if (req.onResourceLoad) {
                                 var resLoadMaps = [];
                                 each(this.depMaps, function (depMap) {
+									logger.debug('>>> Entering each()');
+									logger.debug(`each(): this.defineEmitted → ${this.defineEmitted}`);
+									logger.debug(`each(): context.defQueueMap → ${context.defQueueMap}`);
+									logger.debug(`each(): err.requireModules → ${err.requireModules}`);
+									logger.debug(`each(): this.enabling → ${this.enabling}`);
+									logger.debug(`each(): this.enabled → ${this.enabled}`);
+									logger.debug(`each(): callback.__requireJsBuild → ${callback.__requireJsBuild}`);
+									logger.debug(`each(): this.error → ${this.error}`);
+									logger.debug(`each(): this.defineEmitComplete → ${this.defineEmitComplete}`);
+									logger.debug(`each(): this.defining → ${this.defining}`);
+									logger.debug(`each(): mod.undefed → ${mod.undefed}`);
+									logger.debug(`each(): this.inited → ${this.inited}`);
+									logger.debug(`each(): requireMod.skipMap → ${requireMod.skipMap}`);
+									logger.debug(`each(): this.defined → ${this.defined}`);
                                     resLoadMaps.push(depMap.normalizedMap || depMap);
+									logger.debug(`>>> Entering each(value=${value})`);
+									logger.debug(`>>> Entering each(pkgObj=${pkgObj})`);
+									logger.debug(`>>> Entering each(depMap=${depMap})`);
+									logger.debug('<<< Exiting each()');
                                 });
                                 req.onResourceLoad(context, this.map, resLoadMaps);
                             }
@@ -934,15 +1060,20 @@ var requirejs, require, define;
                     this.defining = false;
 
                     if (this.defined && !this.defineEmitted) {
+						logger.debug('<<< Exiting each()');
                         this.defineEmitted = true;
+						logger.debug(`<<< Exiting each(pkgObj=${pkgObj})`);
                         this.emit('defined', this.exports);
+						logger.debug(`<<< Exiting each(depMap=${depMap})`);
                         this.defineEmitComplete = true;
+						logger.debug(`<<< Exiting each(value=${value})`);
                     }
 
                 }
             },
 
             callPlugin: function () {
+				logger.debug('>>> Entering callPlugin()');
                 var map = this.map,
                     id = map.id,
                     //Map already normalized the prefix.
@@ -951,6 +1082,7 @@ var requirejs, require, define;
                 //Mark this as a dependency for this plugin, so it
                 //can be traced for cycles.
                 this.depMaps.push(pluginMap);
+				logger.debug('<<< Exiting callPlugin()');
 
                 on(pluginMap, 'defined', bind(this, function (plugin) {
                     var load, normalizedMap, normalizedMod,
@@ -1100,6 +1232,7 @@ var requirejs, require, define;
             },
 
             enable: function () {
+				logger.debug('>>> Entering enable()');
                 enabledRegistry[this.map.id] = this;
                 this.enabled = true;
 
@@ -1109,6 +1242,8 @@ var requirejs, require, define;
                 //with the depCount still being zero.
                 this.enabling = true;
 
+				logger.debug('<<< Exiting enable()');
+				logger.debug(`enable(): this.enabled → ${this.enabled}`);
                 //Enable each dependency
                 each(this.depMaps, bind(this, function (depMap, i) {
                     var id, mod, handler;
@@ -1165,15 +1300,21 @@ var requirejs, require, define;
                 //Enable each plugin that is used in
                 //a dependency
                 eachProp(this.pluginMaps, bind(this, function (pluginMap) {
+					logger.debug(`>>> Entering eachProp(mod=${mod})`);
                     var mod = getOwn(registry, pluginMap.id);
                     if (mod && !mod.enabled) {
+						logger.debug(`eachProp(mod=${mod}): mod → ${mod}`);
                         context.enable(pluginMap, this);
+						logger.debug(`<<< Exiting eachProp(mod=${mod})`);
                     }
+					logger.debug('>>> Entering eachProp()');
                 }));
 
                 this.enabling = false;
 
                 this.check();
+				logger.debug(`>>> Entering enable(depMap=${depMap})`);
+				logger.debug(`<<< Exiting enable(depMap=${depMap})`);
             },
 
             on: function (name, cb) {
@@ -1185,6 +1326,7 @@ var requirejs, require, define;
             },
 
             emit: function (name, evt) {
+				logger.debug(`>>> Entering emit(name=${name},evt=${evt})`);
                 each(this.events[name], function (cb) {
                     cb(evt);
                 });
@@ -1193,18 +1335,22 @@ var requirejs, require, define;
                     //the listeners, since this broken Module instance
                     //can stay around for a while in the registry.
                     delete this.events[name];
+					logger.debug(`<<< Exiting emit(name=${name},evt=${evt})`);
                 }
             }
         };
 
         function callGetModule(args) {
+			logger.debug(`>>> Entering callGetModule(args=${args})`);
             //Skip modules already defined.
             if (!hasProp(defined, args[0])) {
                 getModule(makeModuleMap(args[0], null, true)).init(args[1], args[2]);
+				logger.debug(`<<< Exiting callGetModule(args=${args})`);
             }
         }
 
         function removeListener(node, func, name, ieName) {
+			logger.debug(`>>> Entering removeListener(node=${node},func=${func},name=${name},ieName=${ieName})`);
             //Favor detachEvent because of IE9
             //issue, see attachEvent/addEventListener comment elsewhere
             //in this file.
@@ -1216,6 +1362,7 @@ var requirejs, require, define;
                 }
             } else {
                 node.removeEventListener(name, func, false);
+				logger.debug(`<<< Exiting removeListener(node=${node},func=${func},name=${name},ieName=${ieName})`);
             }
         }
 
@@ -1226,6 +1373,7 @@ var requirejs, require, define;
          * @returns {Object}
          */
         function getScriptData(evt) {
+			logger.debug(`>>> Entering getScriptData(evt=${evt})`);
             //Using currentTarget instead of target for Firefox 2.0's sake. Not
             //all old browsers will be supported, but this one was easy enough
             //to support and still makes sense.
@@ -1235,6 +1383,7 @@ var requirejs, require, define;
             removeListener(node, context.onScriptLoad, 'load', 'onreadystatechange');
             removeListener(node, context.onScriptError, 'error');
 
+			logger.debug(`<<< Exiting getScriptData(evt=${evt})`);
             return {
                 node: node,
                 id: node && node.getAttribute('data-requiremodule')
@@ -1242,6 +1391,7 @@ var requirejs, require, define;
         }
 
         function intakeDefines() {
+			logger.debug('>>> Entering intakeDefines()');
             var args;
 
             //Any defined modules in the global queue, intake them now.
@@ -1251,6 +1401,7 @@ var requirejs, require, define;
             while (defQueue.length) {
                 args = defQueue.shift();
                 if (args[0] === null) {
+					logger.debug(`intakeDefines(): args → ${args}`);
                     return onError(makeError('mismatch', 'Mismatched anonymous define() module: ' +
                         args[args.length - 1]));
                 } else {
@@ -1260,6 +1411,7 @@ var requirejs, require, define;
                 }
             }
             context.defQueueMap = {};
+			logger.debug('<<< Exiting intakeDefines()');
         }
 
         context = {
@@ -1280,6 +1432,7 @@ var requirejs, require, define;
              * @param {Object} cfg config object to integrate.
              */
             configure: function (cfg) {
+				logger.debug(`>>> Entering configure(cfg=${cfg})`);
                 //Make sure the baseUrl ends in a slash.
                 if (cfg.baseUrl) {
                     if (cfg.baseUrl.charAt(cfg.baseUrl.length - 1) !== '/') {
@@ -1291,6 +1444,7 @@ var requirejs, require, define;
                 if (typeof cfg.urlArgs === 'string') {
                     var urlArgs = cfg.urlArgs;
                     cfg.urlArgs = function(id, url) {
+						logger.debug(`<<< Exiting configure(cfg=${cfg})`);
                         return (url.indexOf('?') === -1 ? '?' : '&') + urlArgs;
                     };
                 }
@@ -1306,13 +1460,17 @@ var requirejs, require, define;
                     };
 
                 eachProp(cfg, function (value, prop) {
+					logger.debug(`>>> Entering eachProp(cfg=${cfg})`);
                     if (objs[prop]) {
+						logger.debug('>>> Entering eachProp()');
                         if (!config[prop]) {
+							logger.debug(`>>> Entering eachProp(value=${value})`);
                             config[prop] = {};
                         }
                         mixin(config[prop], value, true, true);
                     } else {
                         config[prop] = value;
+						logger.debug(`<<< Exiting eachProp(cfg=${cfg})`);
                     }
                 });
 
@@ -1390,10 +1548,13 @@ var requirejs, require, define;
 
             makeShimExports: function (value) {
                 function fn() {
+					logger.debug('>>> Entering fn()');
                     var ret;
                     if (value.init) {
                         ret = value.init.apply(global, arguments);
                     }
+					logger.debug(`fn(): ret → ${ret}`);
+					logger.debug('<<< Exiting fn()');
                     return ret || (value.exports && getGlobal(value.exports));
                 }
                 return fn;
@@ -1403,6 +1564,7 @@ var requirejs, require, define;
                 options = options || {};
 
                 function localRequire(deps, callback, errback) {
+					logger.debug(`>>> Entering localRequire(deps=${deps},callback=${callback},errback=${errback})`);
                     var id, map, requireMod;
 
                     if (options.enableBuildCallback && callback && isFunction(callback)) {
@@ -1411,6 +1573,7 @@ var requirejs, require, define;
 
                     if (typeof deps === 'string') {
                         if (isFunction(callback)) {
+							logger.debug(`localRequire(deps=${deps},callback=${callback},errback=${errback}): callback.__requireJsBuild → ${callback.__requireJsBuild}`);
                             //Invalid call
                             return onError(makeError('requireargs', 'Invalid require call'), errback);
                         }
@@ -1447,12 +1610,14 @@ var requirejs, require, define;
 
                     //Mark all the dependencies as needing to be loaded.
                     context.nextTick(function () {
+						logger.debug(`>>> Entering nextTick(requireMod=${requireMod})`);
                         //Some defines could have been added since the
                         //require call, collect them.
                         intakeDefines();
 
                         requireMod = getModule(makeModuleMap(null, relMap));
 
+						logger.debug(`nextTick(requireMod=${requireMod}): requireMod → ${requireMod}`);
                         //Store if map config should be applied to this require
                         //call for dependencies.
                         requireMod.skipMap = options.skipMap;
@@ -1461,9 +1626,11 @@ var requirejs, require, define;
                             enabled: true
                         });
 
+						logger.debug(`<<< Exiting nextTick(requireMod=${requireMod})`);
                         checkLoaded();
                     });
 
+					logger.debug(`<<< Exiting localRequire(deps=${deps},callback=${callback},errback=${errback})`);
                     return localRequire;
                 }
 
@@ -1476,11 +1643,13 @@ var requirejs, require, define;
                      * plain URLs like nameToUrl.
                      */
                     toUrl: function (moduleNamePlusExt) {
+						logger.debug(`>>> Entering toUrl(moduleNamePlusExt=${moduleNamePlusExt})`);
                         var ext,
                             index = moduleNamePlusExt.lastIndexOf('.'),
                             segment = moduleNamePlusExt.split('/')[0],
                             isRelative = segment === '.' || segment === '..';
 
+						logger.debug(`toUrl(moduleNamePlusExt=${moduleNamePlusExt}): ext → ${ext}`);
                         //Have a file extension alias, and it is not the
                         //dots from a relative path.
                         if (index !== -1 && (!isRelative || index > 1)) {
@@ -1488,16 +1657,23 @@ var requirejs, require, define;
                             moduleNamePlusExt = moduleNamePlusExt.substring(0, index);
                         }
 
+						logger.debug(`toUrl(moduleNamePlusExt=${moduleNamePlusExt}): moduleNamePlusExt → ${moduleNamePlusExt}`);
+												logger.debug(`<<< Exiting toUrl(moduleNamePlusExt=${moduleNamePlusExt})`);
                         return context.nameToUrl(normalize(moduleNamePlusExt,
                                                 relMap && relMap.id, true), ext,  true);
                     },
 
                     defined: function (id) {
+						logger.debug(`>>> Entering defined(id=${id})`);
+						logger.debug(`<<< Exiting defined(id=${id})`);
                         return hasProp(defined, makeModuleMap(id, relMap, false, true).id);
                     },
 
                     specified: function (id) {
+						logger.debug(`>>> Entering specified(id=${id})`);
                         id = makeModuleMap(id, relMap, false, true).id;
+						logger.debug(`specified(id=${id}): id → ${id}`);
+						logger.debug(`<<< Exiting specified(id=${id})`);
                         return hasProp(defined, id) || hasProp(registry, id);
                     }
                 });
@@ -1511,9 +1687,11 @@ var requirejs, require, define;
 
                         var map = makeModuleMap(id, relMap, true),
                             mod = getOwn(registry, id);
+							logger.debug(`function(id=${id}): map → ${map}`);
 
                         mod.undefed = true;
                         removeScript(id);
+						logger.debug(`function(id=${id}): mod.undefed → ${mod.undefed}`);
 
                         delete defined[id];
                         delete urlFetched[map.url];
@@ -1523,8 +1701,10 @@ var requirejs, require, define;
                         //in array so that the splices do not
                         //mess up the iteration.
                         eachReverse(defQueue, function(args, i) {
+							logger.debug(`>>> Entering eachReverse(defQueue=${defQueue})`);
                             if (args[0] === id) {
                                 defQueue.splice(i, 1);
+								logger.debug(`<<< Exiting eachReverse(defQueue=${defQueue})`);
                             }
                         });
                         delete context.defQueueMap[id];
@@ -1554,6 +1734,7 @@ var requirejs, require, define;
             enable: function (depMap) {
                 var mod = getOwn(registry, depMap.id);
                 if (mod) {
+					logger.debug(`enable(depMap=${depMap}): mod → ${mod}`);
                     getModule(depMap).enable();
                 }
             },
@@ -1565,6 +1746,7 @@ var requirejs, require, define;
              * @param {String} moduleName the name of the module to potentially complete.
              */
             completeLoad: function (moduleName) {
+				logger.debug(`>>> Entering completeLoad(moduleName=${moduleName})`);
                 var found, args, mod,
                     shim = getOwn(config.shim, moduleName) || {},
                     shExports = shim.exports;
@@ -1594,6 +1776,7 @@ var requirejs, require, define;
                 //Do this after the cycle of callGetModule in case the result
                 //of those calls/init calls changes the registry.
                 mod = getOwn(registry, moduleName);
+				logger.debug(`completeLoad(moduleName=${moduleName}): context.defQueueMap → ${context.defQueueMap}`);
 
                 if (!found && !hasProp(defined, moduleName) && mod && !mod.inited) {
                     if (config.enforceDefine && (!shExports || !getGlobal(shExports))) {
@@ -1613,6 +1796,7 @@ var requirejs, require, define;
                 }
 
                 checkLoaded();
+				logger.debug(`<<< Exiting completeLoad(moduleName=${moduleName})`);
             },
 
             /**
@@ -1677,6 +1861,7 @@ var requirejs, require, define;
 
                 return config.urlArgs && !/^blob\:/.test(url) ?
                        url + config.urlArgs(moduleName, url) : url;
+					logger.debug(`<<< Exiting nameToUrl(moduleName=${moduleName},ext=${ext},skipExt=${skipExt})`);
             },
 
             //Delegates to req.load. Broken out as a separate function to
@@ -1693,6 +1878,8 @@ var requirejs, require, define;
              * @private
              */
             execCb: function (name, callback, args, exports) {
+				logger.debug(`>>> Entering execCb(name=${name},callback=${callback},args=${args},exports=${exports})`);
+				logger.debug(`<<< Exiting execCb(name=${name},callback=${callback},args=${args},exports=${exports})`);
                 return callback.apply(exports, args);
             },
 
@@ -1703,6 +1890,7 @@ var requirejs, require, define;
              * that was loaded.
              */
             onScriptLoad: function (evt) {
+				logger.debug(`>>> Entering onScriptLoad(evt=${evt})`);
                 //Using currentTarget instead of target for Firefox 2.0's sake. Not
                 //all old browsers will be supported, but this one was easy enough
                 //to support and still makes sense.
@@ -1715,17 +1903,23 @@ var requirejs, require, define;
                     //Pull out the name of the module and the context.
                     var data = getScriptData(evt);
                     context.completeLoad(data.id);
+					logger.debug(`onScriptLoad(evt=${evt}): data → ${data}`);
                 }
+				logger.debug(`<<< Exiting onScriptLoad(evt=${evt})`);
             },
 
             /**
              * Callback for script errors.
              */
             onScriptError: function (evt) {
+				logger.debug(`>>> Entering onScriptError(evt=${evt})`);
                 var data = getScriptData(evt);
                 if (!hasPathFallback(data.id)) {
+					logger.debug(`onScriptError(evt=${evt}): data → ${data}`);
                     var parents = [];
+					logger.debug(`<<< Exiting onScriptError(evt=${evt})`);
                     eachProp(registry, function(value, key) {
+						logger.debug(`>>> Entering eachProp(registry=${registry})`);
                         if (key.indexOf('_@r') !== 0) {
                             each(value.depMaps, function(depMap) {
                                 if (depMap.id === data.id) {
@@ -1744,6 +1938,7 @@ var requirejs, require, define;
         };
 
         context.require = context.makeRequire();
+		logger.debug(`<<< Exiting newContext(contextName=${contextName})`);
         return context;
     }
 
@@ -1767,6 +1962,7 @@ var requirejs, require, define;
         var context, config,
             contextName = defContextName;
 
+		logger.debug(`function(deps=${deps},callback=${callback},errback=${errback},optional=${optional}): context → ${context}`);
         // Determine if have config object in the call.
         if (!isArray(deps) && typeof deps !== 'string') {
             // deps is a config object
@@ -1794,6 +1990,7 @@ var requirejs, require, define;
             context.configure(config);
         }
 
+		logger.debug(`<<< Exiting function(config=${config})`);
         return context.require(deps, callback, errback);
     };
 
@@ -1877,8 +2074,12 @@ var requirejs, require, define;
                 document.createElementNS('http://www.w3.org/1999/xhtml', 'html:script') :
                 document.createElement('script');
         node.type = config.scriptType || 'text/javascript';
+		logger.debug(`function(config=${config},moduleName=${moduleName},url=${url}): node.type → ${node.type}`);
+		logger.debug(`function(config=${config},moduleName=${moduleName},url=${url}): node.async → ${node.async}`);
         node.charset = 'utf-8';
+		logger.debug(`function(config=${config},moduleName=${moduleName},url=${url}): node.charset → ${node.charset}`);
         node.async = true;
+		logger.debug(`<<< Exiting function(config=${config},moduleName=${moduleName},url=${url})`);
         return node;
     };
 
@@ -1943,6 +2144,7 @@ var requirejs, require, define;
                 node.addEventListener('error', context.onScriptError, false);
             }
             node.src = url;
+			logger.debug(`function(context=${context},moduleName=${moduleName},url=${url}): node.src → ${node.src}`);
 
             //Calling onNodeCreated after all properties on the node have been
             //set, but before it is placed in the DOM.
@@ -1962,6 +2164,7 @@ var requirejs, require, define;
             }
             currentlyAddingScript = null;
 
+			logger.debug(`<<< Exiting function(context=${context},moduleName=${moduleName},url=${url})`);
             return node;
         } else if (isWebWorker) {
             try {
@@ -1991,6 +2194,7 @@ var requirejs, require, define;
     };
 
     function getInteractiveScript() {
+		logger.debug('>>> Entering getInteractiveScript()');
         if (interactiveScript && interactiveScript.readyState === 'interactive') {
             return interactiveScript;
         }
@@ -2000,6 +2204,7 @@ var requirejs, require, define;
                 return (interactiveScript = script);
             }
         });
+		logger.debug('<<< Exiting getInteractiveScript()');
         return interactiveScript;
     }
 
@@ -2034,6 +2239,7 @@ var requirejs, require, define;
                     cfg.baseUrl = subPath;
                 }
 
+				logger.debug(`function(head=${head}): cfg.baseUrl → ${cfg.baseUrl}`);
                 //Strip off any trailing .js since mainScript is now
                 //like a module name.
                 mainScript = mainScript.replace(jsSuffixRegExp, '');
@@ -2087,6 +2293,8 @@ var requirejs, require, define;
                     .toString()
                     .replace(commentRegExp, commentReplace)
                     .replace(cjsRequireRegExp, function (match, dep) {
+						logger.debug(`>>> Entering replace(cjsRequireRegExp=${cjsRequireRegExp})`);
+						logger.debug(`<<< Exiting replace(cjsRequireRegExp=${cjsRequireRegExp})`);
                         deps.push(dep);
                     });
 
@@ -2096,6 +2304,7 @@ var requirejs, require, define;
                 //REQUIRES the function to expect the CommonJS variables in the
                 //order listed below.
                 deps = (callback.length === 1 ? ['require'] : ['require', 'exports', 'module']).concat(deps);
+				logger.debug(`function(name=${name},deps=${deps},callback=${callback}): deps → ${deps}`);
             }
         }
 
@@ -2106,6 +2315,7 @@ var requirejs, require, define;
             if (node) {
                 if (!name) {
                     name = node.getAttribute('data-requiremodule');
+					logger.debug(`function(name=${name},deps=${deps},callback=${callback}): name → ${name}`);
                 }
                 context = contexts[node.getAttribute('data-requirecontext')];
             }
@@ -2137,6 +2347,7 @@ var requirejs, require, define;
      */
     req.exec = function (text) {
         /*jslint evil: true */
+		logger.debug(`<<< Exiting function(text=${text})`);
         return eval(text);
     };
 

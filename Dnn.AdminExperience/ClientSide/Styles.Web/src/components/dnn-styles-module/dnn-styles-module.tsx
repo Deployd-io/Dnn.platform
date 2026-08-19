@@ -3,6 +3,7 @@ import { IStylesResx } from '../../window.dnn';
 import StylesClient, { IPortalStyles } from '../../clients/styles-client';
 import { DnnColorInfo } from '@dnncommunity/dnn-elements/dist/types/components';
 import ColorNames from './color-names';
+const logger = console;
 @Component({
   tag: 'dnn-styles-module',
   styleUrl: 'dnn-styles-module.scss',
@@ -21,10 +22,13 @@ export class DnnStylesModule {
   private componentWidth: number;
 
   constructor() {
+	logger.debug('>>> Entering constructor()');
     this.stylesClient = new StylesClient();
+	logger.debug('<<< Exiting constructor()');
   }
 
   connectedCallback() {
+	logger.debug('>>> Entering connectedCallback()');
     this.resizeObserver = new ResizeObserver(entries => {
       for (const entry of entries) {
         const newWidth = entry.contentRect.width;
@@ -43,17 +47,23 @@ export class DnnStylesModule {
       }
     });
     this.resizeObserver.observe(this.el);
+	logger.debug(`connectedCallback(): this.componentWidth → ${this.componentWidth}`);
+	logger.debug('<<< Exiting connectedCallback()');
   }
 
   disconnectedCallback() {
+	logger.debug('>>> Entering disconnectedCallback()');
     this.resizeObserver.unobserve(this.el);
+	logger.debug('<<< Exiting disconnectedCallback()');
   }
 
   componentWillLoad() {
+	logger.debug('>>> Entering componentWillLoad()');
     const dnnStyles = window.dnn as unknown as IDnnWrapper;
     this.resx = dnnStyles.initStyles().utility?.resx?.Styles;
     const header = document.querySelector("#dnnStylesHeader h3");
     if (header) {
+	logger.debug(`componentWillLoad(): header → ${header}`);
       header.textContent = this.resx.nav_Styles;
     }
     this.stylesClient.getStyles()
@@ -66,6 +76,11 @@ export class DnnStylesModule {
         console.error(error);
       });
     this.isHost = this.stylesClient.isHostUser;
+	logger.debug(`componentWillLoad(): this.isHost → ${this.isHost}`);
+	logger.debug(`componentWillLoad(): header.textContent → ${header.textContent}`);
+	logger.debug(`componentWillLoad(): this.originalStyles → ${this.originalStyles}`);
+	logger.debug(`componentWillLoad(): this.styles → ${this.styles}`);
+	logger.debug('<<< Exiting componentWillLoad()');
   }
 
   private handleColorChange(colorName: ColorNames, detail: DnnColorInfo): void {
@@ -76,12 +91,15 @@ export class DnnStylesModule {
       [`Color${colorName}Light`]: detail.lightColor,
       [`Color${colorName}Dark`]: detail.darkColor,
     }
+	logger.debug(`<<< Exiting handleColorChange(colorName=${colorName},detail=${detail})`);
   }
 
   private handleSave(): void {
     this.stylesClient.saveStyles(this.styles)
       .then(() => {
+		logger.debug('>>> Entering handleSave()');
         this.originalStyles = this.styles;
+		logger.debug('<<< Exiting handleSave()');
         this.stylesClient.notify(this.resx?.SaveSuccess);
       })
       .catch(error => {
@@ -93,6 +111,7 @@ export class DnnStylesModule {
   private handleRestoreDefault(): void {
     this.stylesClient.restoreStyles()
     .then(response => {
+	logger.debug('>>> Entering handleRestoreDefault()');
       this.originalStyles = response;
       this.styles = {...this.originalStyles};
     })
@@ -100,9 +119,12 @@ export class DnnStylesModule {
       this.stylesClient.notifyError(this.resx?.SaveError);
       console.error(error);
     });
+	logger.debug('<<< Exiting handleRestoreDefault()');
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         <form

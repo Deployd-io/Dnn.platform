@@ -2,16 +2,19 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import IconButton from "../IconButton";
+const logger = console;
 
 class StatusSwitch extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         
         this.state = {
         };
     }
 
     changeState() {
+		logger.debug('>>> Entering changeState()');
         const {props} = this;
 
         if (props.status === 3) {
@@ -19,6 +22,7 @@ class StatusSwitch extends Component {
         }
 
         let status = props.status + 1;
+		logger.debug(`changeState(): status → ${status}`);
         if (status > 2) {
             status = 0;
         }
@@ -26,9 +30,11 @@ class StatusSwitch extends Component {
         if (typeof props.onChange === "function") {
             props.onChange(status);
         }
+		logger.debug('<<< Exiting changeState()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props } = this;
 
         let type = "";
@@ -48,6 +54,7 @@ class StatusSwitch extends Component {
                 className = "locked";
                 break;
         }
+		logger.debug('<<< Exiting render()');
         return (
             
             <IconButton type={type} className={className} onClick={this.changeState.bind(this)} />

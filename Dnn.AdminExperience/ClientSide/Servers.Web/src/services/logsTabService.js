@@ -1,7 +1,10 @@
 import * as dayjs from "dayjs";
 import serviceFramework from "./serviceFramework";
+const logger = console;
 
 const getLogs = function () {
+	logger.debug('>>> Entering getLogs()');
+	logger.debug('<<< Exiting getLogs()');
     return serviceFramework
         .get("ServerSettingsLogs", "GetLogs")
         .then(response => {
@@ -32,7 +35,9 @@ const getLogs = function () {
 };
 
 const getLog = function (fileName, upgradeLog) {
+	logger.debug(`>>> Entering getLog(fileName=${fileName},upgradeLog=${upgradeLog})`);
     if (upgradeLog) {
+	logger.debug(`<<< Exiting getLog(fileName=${fileName},upgradeLog=${upgradeLog})`);
         return serviceFramework.get("ServerSettingsLogs", "GetUpgradeLogFile", {logName: fileName});    
     }
     

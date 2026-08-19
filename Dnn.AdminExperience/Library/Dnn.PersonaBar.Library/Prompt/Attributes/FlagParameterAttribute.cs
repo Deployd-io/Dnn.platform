@@ -13,6 +13,7 @@ namespace Dnn.PersonaBar.Library.Prompt.Attributes
     [DnnDeprecated(9, 7, 0, "Moved to DotNetNuke.Prompt in the core library project and is now a Property Attribute called CommandParameter")]
     public partial class FlagParameterAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FlagParameterAttribute));
         /// <summary>Initializes a new instance of the <see cref="FlagParameterAttribute"/> class.</summary>
         /// <param name="flag">The flag name.</param>
         /// <param name="description">The description.</param>
@@ -21,11 +22,18 @@ namespace Dnn.PersonaBar.Library.Prompt.Attributes
         /// <param name="required">Whether the flag is required.</param>
         public FlagParameterAttribute(string flag, string description, string type, string defaultValue, bool required)
         {
+			Logger.LogDebug(">>> Entering FlagParameterAttribute(flag={Flag},description={Description},type={Type},defaultValue={DefaultValue},required={Required})", flag, description, type, defaultValue, required);
             this.Flag = flag;
             this.Type = type;
+			Logger.LogDebug("FlagParameterAttribute(flag={Flag},description={Description},type={Type},defaultValue={DefaultValue},required={Required}): this.Flag → {Arg5}", flag, description, type, defaultValue, required, this.Flag);
+			Logger.LogDebug("FlagParameterAttribute(flag={Flag},description={Description},type={Type},defaultValue={DefaultValue},required={Required}): this.Type → {Arg5}", flag, description, type, defaultValue, required, this.Type);
             this.Required = required;
             this.DefaultValue = defaultValue;
             this.Description = description;
+			Logger.LogDebug("FlagParameterAttribute(flag={Flag},description={Description},type={Type},defaultValue={DefaultValue},required={Required}): this.Required → {Arg5}", flag, description, type, defaultValue, required, this.Required);
+			Logger.LogDebug("<<< Exiting FlagParameterAttribute(flag={Flag},description={Description},type={Type},defaultValue={DefaultValue},required={Required})", flag, description, type, defaultValue, required);
+			Logger.LogDebug(">>> Entering FlagParameterAttribute(flag={Flag},description={Description},type={Type},defaultValue={DefaultValue})", flag, description, type, defaultValue);
+			Logger.LogDebug("<<< Exiting FlagParameterAttribute(flag={Flag},description={Description},type={Type},defaultValue={DefaultValue})", flag, description, type, defaultValue);
         }
 
         /// <summary>Initializes a new instance of the <see cref="FlagParameterAttribute"/> class.</summary>

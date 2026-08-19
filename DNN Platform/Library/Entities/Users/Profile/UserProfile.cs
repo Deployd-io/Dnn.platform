@@ -26,6 +26,7 @@ namespace DotNetNuke.Entities.Users
     [Serializable]
     public class UserProfile : IIndexable
     {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UserProfile));
 #pragma warning disable SA1310 // Field names should not contain underscore
 #pragma warning disable CA1707 // Identifiers should not contain underscores
 #pragma warning disable SA1600 // Elements should be documented
@@ -114,13 +115,18 @@ namespace DotNetNuke.Entities.Users
         /// <summary>Initializes a new instance of the <see cref="UserProfile"/> class.</summary>
         public UserProfile()
         {
+		Logger.LogDebug(">>> Entering UserProfile()");
+		Logger.LogDebug("<<< Exiting UserProfile()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="UserProfile"/> class with a provided existing user.</summary>
         /// <param name="user">The user this profile belongs to.</param>
         public UserProfile(UserInfo user)
         {
+			Logger.LogDebug(">>> Entering UserProfile(user={User})", user);
             this.user = user;
+			Logger.LogDebug("UserProfile(user={User}): user → {User1}", user, user);
+			Logger.LogDebug("<<< Exiting UserProfile(user={User})", user);
         }
 
         /// <summary>Gets the full name by concatenating the first and last name with a space.</summary>
@@ -350,11 +356,14 @@ namespace DotNetNuke.Entities.Users
         /// <summary>Clears the IsDirty Flag.</summary>
         public void ClearIsDirty()
         {
+			Logger.LogDebug(">>> Entering ClearIsDirty()");
             this.IsDirty = false;
             foreach (ProfilePropertyDefinition profProperty in this.ProfileProperties)
             {
+			Logger.LogDebug("ClearIsDirty(): this.IsDirty → {Arg0}", this.IsDirty);
                 profProperty?.ClearIsDirty();
             }
+			Logger.LogDebug("<<< Exiting ClearIsDirty()");
         }
 
         /// <summary>Gets a Profile Property from the Profile.</summary>
@@ -365,6 +374,8 @@ namespace DotNetNuke.Entities.Users
         /// <returns>A profile property definition, <see cref="ProfilePropertyDefinition"/>.</returns>
         public ProfilePropertyDefinition GetProperty(string propName)
         {
+			Logger.LogDebug(">>> Entering GetProperty(propName={PropName})", propName);
+			Logger.LogDebug("<<< Exiting GetProperty(propName={PropName})", propName);
             return this.ProfileProperties[propName];
         }
 
@@ -376,8 +387,11 @@ namespace DotNetNuke.Entities.Users
         /// <returns>A string representing the property value.</returns>
         public string GetPropertyValue(string propName)
         {
+			Logger.LogDebug(">>> Entering GetPropertyValue(propName={PropName})", propName);
             string propValue = Null.NullString;
             ProfilePropertyDefinition profileProp = this.GetProperty(propName);
+			Logger.LogDebug("GetPropertyValue(propName={PropName}): profileProp → {ProfileProp}", propName, profileProp);
+			Logger.LogDebug("GetPropertyValue(propName={PropName}): propValue → {PropValue}", propName, propValue);
             if (profileProp != null)
             {
                 propValue = profileProp.PropertyValue;
@@ -385,7 +399,9 @@ namespace DotNetNuke.Entities.Users
                 if (profileProp.DataType > -1)
                 {
                     var listController = Globals.GetCurrentServiceProvider().GetRequiredService<ListController>();
+					Logger.LogDebug("GetPropertyValue(propName={PropName}): listController → {ListController}", propName, listController);
                     var dataType = listController.GetListEntryInfo("DataType", profileProp.DataType);
+					Logger.LogDebug("GetPropertyValue(propName={PropName}): dataType → {DataType}", propName, dataType);
                     if (dataType == null)
                     {
                         LoggerSource.Instance.GetLogger(typeof(UserProfile)).ErrorFormat(CultureInfo.InvariantCulture, "Invalid data type {0} for profile property {1}", profileProp.DataType, profileProp.PropertyName);
@@ -399,6 +415,7 @@ namespace DotNetNuke.Entities.Users
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetPropertyValue(propName={PropName})", propName);
             return propValue;
         }
 
@@ -406,7 +423,9 @@ namespace DotNetNuke.Entities.Users
         /// <param name="portalId">The id of the portal this profile belongs to.</param>
         public void InitialiseProfile(int portalId)
         {
+			Logger.LogDebug(">>> Entering InitialiseProfile(portalId={PortalId})", portalId);
             this.InitialiseProfile(portalId, true);
+			Logger.LogDebug("<<< Exiting InitialiseProfile(portalId={PortalId})", portalId);
         }
 
         /// <summary>Initializes the Profile with an empty collection of profile properties or default values.</summary>
@@ -415,12 +434,15 @@ namespace DotNetNuke.Entities.Users
         /// copied to the Profile.</param>
         public void InitialiseProfile(int portalId, bool useDefaults)
         {
+			Logger.LogDebug(">>> Entering InitialiseProfile(portalId={PortalId},useDefaults={UseDefaults})", portalId, useDefaults);
             this.profileProperties = ProfileController.GetPropertyDefinitionsByPortal(portalId, true, false);
             if (useDefaults)
             {
+				Logger.LogDebug("<<< Exiting InitialiseProfile(portalId={PortalId})", portalId);
                 foreach (ProfilePropertyDefinition profileProperty in this.profileProperties)
                 {
                     profileProperty.PropertyValue = profileProperty.DefaultValue;
+					Logger.LogDebug("InitialiseProfile(portalId={PortalId},useDefaults={UseDefaults}): profileProperty.PropertyValue → {Arg2}", portalId, useDefaults, profileProperty.PropertyValue);
                 }
             }
         }
@@ -430,30 +452,37 @@ namespace DotNetNuke.Entities.Users
         /// <param name="propValue">The value of the property to set.</param>
         public void SetProfileProperty(string propName, string propValue)
         {
+			Logger.LogDebug(">>> Entering SetProfileProperty(propName={PropName},propValue={PropValue})", propName, propValue);
             ProfilePropertyDefinition profileProp = this.GetProperty(propName);
             if (profileProp != null)
             {
                 profileProp.PropertyValue = propValue;
+				Logger.LogDebug("SetProfileProperty(propName={PropName},propValue={PropValue}): profileProp.PropertyValue → {Arg2}", propName, propValue, profileProp.PropertyValue);
 
                 // Set the IsDirty flag
                 if (profileProp.IsDirty)
                 {
                     this.IsDirty = true;
+					Logger.LogDebug("SetProfileProperty(propName={PropName},propValue={PropValue}): this.IsDirty → {Arg2}", propName, propValue, this.IsDirty);
                 }
             }
+			Logger.LogDebug("<<< Exiting SetProfileProperty(propName={PropName},propValue={PropValue})", propName, propValue);
         }
 
         private static string GetListValue(ListController listController, string listName, string value)
         {
+			Logger.LogDebug(">>> Entering GetListValue(listController={ListController},listName={ListName},value={Value})", listController, listName, value);
             if (int.TryParse(value, out var entryId))
             {
                 ListEntryInfo item = listController.GetListEntryInfo(listName, entryId);
+				Logger.LogDebug("GetListValue(listController={ListController},listName={ListName},value={Value}): item → {Item}", listController, listName, value, item);
                 if (item != null)
                 {
                     return item.Text;
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetListValue(listController={ListController},listName={ListName},value={Value})", listController, listName, value);
             return value;
         }
     }

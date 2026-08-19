@@ -11,6 +11,7 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
     [Serializable]
     public class AzureBlob
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AzureBlob));
         private readonly string relativePath = string.Empty;
         private readonly DateTime lastModifiedUtc = DateTime.MinValue;
         private readonly long length = -1;
@@ -18,15 +19,20 @@ namespace DotNetNuke.Providers.FolderProviders.AzureFolderProvider
 
         public AzureBlob(CloudBlob blob)
         {
+			Logger.LogDebug(">>> Entering AzureBlob(blob={Blob})", blob);
             if (blob == null)
             {
                 return;
             }
 
             this.relativePath = blob.RelativePath();
+			Logger.LogDebug("AzureBlob(blob={Blob}): length → {Length}", blob, length);
             this.lastModifiedUtc = blob.Properties.LastModified.GetValueOrDefault(DateTimeOffset.MinValue).UtcDateTime;
+			Logger.LogDebug("AzureBlob(blob={Blob}): lastModifiedUtc → {LastModifiedUtc}", blob, lastModifiedUtc);
             this.length = blob.Properties.Length;
             this.etag = blob.Properties.ETag;
+			Logger.LogDebug("AzureBlob(blob={Blob}): this.length → {Arg1}", blob, this.length);
+			Logger.LogDebug("<<< Exiting AzureBlob(blob={Blob})", blob);
         }
 
         public string RelativePath => this.relativePath;

@@ -17,6 +17,7 @@ namespace DotNetNuke.Services.Search
     /// <summary>A base class for search indexers.</summary>
     public abstract partial class IndexingProviderBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(IndexingProviderBase));
         private const string TimePostfix = "UtcTime";
         private const string DataPostfix = "Data";
 
@@ -35,8 +36,10 @@ namespace DotNetNuke.Services.Search
         /// <returns>Either <paramref name="localTime"/> or the stored index time, whichever is earlier.</returns>
         protected DateTime GetLocalTimeOfLastIndexedItem(int portalId, int scheduleId, DateTime localTime)
         {
+			Logger.LogDebug(">>> Entering GetLocalTimeOfLastIndexedItem(portalId={PortalId},scheduleId={ScheduleId},localTime={LocalTime})", portalId, scheduleId, localTime);
             var lastTime = SearchHelper.Instance.GetIndexerCheckpointUtcTime(
                 scheduleId, this.ScheduleItemSettingKey(portalId, TimePostfix)).ToLocalTime();
+			Logger.LogDebug("<<< Exiting GetLocalTimeOfLastIndexedItem(portalId={PortalId},scheduleId={ScheduleId},localTime={LocalTime})", portalId, scheduleId, localTime);
             return lastTime < localTime ? lastTime : localTime;
         }
 
@@ -46,8 +49,10 @@ namespace DotNetNuke.Services.Search
         /// <param name="localTime">The local time to store.</param>
         protected void SetLocalTimeOfLastIndexedItem(int portalId, int scheduleId, DateTime localTime)
         {
+			Logger.LogDebug(">>> Entering SetLocalTimeOfLastIndexedItem(portalId={PortalId},scheduleId={ScheduleId},localTime={LocalTime})", portalId, scheduleId, localTime);
             SearchHelper.Instance.SetIndexerCheckpointUtcTime(
                 scheduleId, this.ScheduleItemSettingKey(portalId, TimePostfix), localTime.ToUniversalTime());
+				Logger.LogDebug("<<< Exiting SetLocalTimeOfLastIndexedItem(portalId={PortalId},scheduleId={ScheduleId},localTime={LocalTime})", portalId, scheduleId, localTime);
         }
 
         /// <summary>Retrieves free format data to help the indexer to perform its job.</summary>
@@ -56,6 +61,8 @@ namespace DotNetNuke.Services.Search
         /// <returns>The checkpoint data.</returns>
         protected string GetLastCheckpointData(int portalId, int scheduleId)
         {
+			Logger.LogDebug(">>> Entering GetLastCheckpointData(portalId={PortalId},scheduleId={ScheduleId})", portalId, scheduleId);
+			Logger.LogDebug("<<< Exiting GetLastCheckpointData(portalId={PortalId},scheduleId={ScheduleId})", portalId, scheduleId);
             return SearchHelper.Instance.GetIndexerCheckpointData(scheduleId, this.ScheduleItemSettingKey(portalId, DataPostfix));
         }
 
@@ -65,7 +72,9 @@ namespace DotNetNuke.Services.Search
         /// <param name="data">The data to store.</param>
         protected void SetLastCheckpointData(int portalId, int scheduleId, string data)
         {
+			Logger.LogDebug(">>> Entering SetLastCheckpointData(portalId={PortalId},scheduleId={ScheduleId},data={Data})", portalId, scheduleId, data);
             SearchHelper.Instance.SetIndexerCheckpointData(scheduleId, this.ScheduleItemSettingKey(portalId, DataPostfix), data);
+			Logger.LogDebug("<<< Exiting SetLastCheckpointData(portalId={PortalId},scheduleId={ScheduleId},data={Data})", portalId, scheduleId, data);
         }
 
         /// <summary>
@@ -91,8 +100,11 @@ namespace DotNetNuke.Services.Search
         /// <returns>The setting key.</returns>
         private string ScheduleItemSettingKey(int portalId, string propertyId)
         {
+			Logger.LogDebug(">>> Entering ScheduleItemSettingKey(portalId={PortalId},propertyId={PropertyId})", portalId, propertyId);
             Requires.NotNullOrEmpty("propertyId", propertyId);
             var t = this.GetType();
+			Logger.LogDebug("ScheduleItemSettingKey(portalId={PortalId},propertyId={PropertyId}): t → {T}", portalId, propertyId, t);
+			Logger.LogDebug("<<< Exiting ScheduleItemSettingKey(portalId={PortalId},propertyId={PropertyId})", portalId, propertyId);
             return string.Join("_", "Search", t.Name, t.FullName.GetHashCode().ToString("x8", CultureInfo.InvariantCulture), portalId.ToString(CultureInfo.InvariantCulture), propertyId);
         }
     }

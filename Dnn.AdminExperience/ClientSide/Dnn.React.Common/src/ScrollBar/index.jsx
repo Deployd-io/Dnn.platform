@@ -3,14 +3,19 @@ import PropTypes from "prop-types";
 
 import ScrollArea from "react-scrollbar/dist/no-css";
 import "./styles.less";
+const logger = console;
 
 class ScrollBar extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
 
+	logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <ScrollArea
                 speed={0.8}

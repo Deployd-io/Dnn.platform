@@ -11,14 +11,20 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
     /// <summary>Gamma ImageTransform class.</summary>
     public class ImageGammaTransform : ImageTransform
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ImageGammaTransform));
         /// <summary>Initializes a new instance of the <see cref="ImageGammaTransform"/> class.</summary>
         public ImageGammaTransform()
         {
+			Logger.LogDebug(">>> Entering ImageGammaTransform()");
             this.InterpolationMode = InterpolationMode.HighQualityBicubic;
             this.SmoothingMode = SmoothingMode.HighQuality;
+			Logger.LogDebug("ImageGammaTransform(): this.InterpolationMode → {Arg0}", this.InterpolationMode);
+			Logger.LogDebug("ImageGammaTransform(): this.SmoothingMode → {Arg0}", this.SmoothingMode);
             this.PixelOffsetMode = PixelOffsetMode.HighQuality;
             this.CompositingQuality = CompositingQuality.HighQuality;
             this.Gamma = 1;
+			Logger.LogDebug("ImageGammaTransform(): this.PixelOffsetMode → {Arg0}", this.PixelOffsetMode);
+			Logger.LogDebug("<<< Exiting ImageGammaTransform()");
         }
 
         /// <summary>Gets provides an Unique String for this class.</summary>
@@ -32,8 +38,10 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
         /// <returns>Image result after image transformation.</returns>
         public override Image ProcessImage(Image image)
         {
+			Logger.LogDebug(">>> Entering ProcessImage(image={Image})", image);
             var temp = (Bitmap)image;
             var bmap = (Bitmap)temp.Clone();
+			Logger.LogDebug("ProcessImage(image={Image}): bmap → {Bmap}", image, bmap);
             Color c;
             byte[] gammaArray = new byte[256];
             for (var i = 0; i < 256; ++i)
@@ -46,6 +54,7 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
                 for (var j = 0; j < bmap.Height; j++)
                 {
                     c = bmap.GetPixel(i, j);
+					Logger.LogDebug("ProcessImage(image={Image}): c → {C}", image, c);
                     bmap.SetPixel(
                         i,
                         j,
@@ -56,6 +65,7 @@ namespace DotNetNuke.Services.GeneratedImage.FilterTransform
                 }
             }
 
+			Logger.LogDebug("<<< Exiting ProcessImage(image={Image})", image);
             return (Image)bmap.Clone();
         }
     }

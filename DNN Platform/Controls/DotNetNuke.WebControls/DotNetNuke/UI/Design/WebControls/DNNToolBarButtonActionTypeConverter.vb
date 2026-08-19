@@ -6,28 +6,38 @@ Imports Microsoft.VisualBasic
 Imports System
 Imports System.ComponentModel
 Imports System.Web.UI
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.Design.WebControls
     Public Class DNNToolBarButtonActionTypeConverter
         Inherits TypeConverter
+		Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
         ' Methods
         Private Function AttachedControl(ByVal context As ITypeDescriptorContext) As Control
+			_logger.LogDebug(">>> Entering AttachedControl(context={Context})", context)
             If Object.ReferenceEquals(Me.m_objAttached, Nothing) Then
                 Dim parent As DNNToolBar = DirectCast(DirectCast(context.Instance, DNNToolBarButton).Parent, DNNToolBar)
+				_logger.LogDebug("AttachedControl(context={Context}): parent → {Parent}", context, parent)
+				_logger.LogDebug("AttachedControl(context={Context}): Me.m_objAttached → {Arg1}", context, Me.m_objAttached)
                 Me.m_objAttached = parent.AttachedControl
             End If
+			_logger.LogDebug("<<< Exiting AttachedControl(context={Context})", context)
             Return Me.m_objAttached
         End Function
 
         Public Overrides Function GetStandardValues(ByVal context As ITypeDescriptorContext) As StandardValuesCollection
+			_logger.LogDebug(">>> Entering GetStandardValues(context={Context})", context)
             Dim values As New Collection
             Dim commonActions As String() = DirectCast(context.Instance, DNNToolBarButton).CommonActions
+			_logger.LogDebug("GetStandardValues(context={Context}): commonActions → {CommonActions}", context, commonActions)
             Dim index As Integer = 0
             Do While True
                 Dim flag As Boolean = (index < commonActions.Length)
+				_logger.LogDebug("GetStandardValues(context={Context}): flag → {Flag}", context, flag)
                 If Not flag Then
                     If Me.SupportsActions(context) Then
                         Dim actions As String() = DirectCast(Me.AttachedControl(context), IDNNToolBarSupportedActions).Actions
+						_logger.LogDebug("GetStandardValues(context={Context}): actions → {Actions}", context, actions)
                         Dim num2 As Integer = 0
                         Do While True
                             flag = (num2 < actions.Length)
@@ -35,6 +45,7 @@ Namespace DotNetNuke.UI.Design.WebControls
                                 Exit Do
                             End If
                             Dim str2 As String = actions(num2)
+							_logger.LogDebug("GetStandardValues(context={Context}): str2 → {Str2}", context, str2)
                             values.Add(str2, Nothing, Nothing, Nothing)
                             num2 += 1
                         Loop
@@ -42,22 +53,30 @@ Namespace DotNetNuke.UI.Design.WebControls
                     Return New StandardValuesCollection(values)
                 End If
                 Dim item As String = commonActions(index)
+				_logger.LogDebug("GetStandardValues(context={Context}): item → {Item}", context, item)
                 values.Add(item, Nothing, Nothing, Nothing)
                 index += 1
             Loop
 
+			_logger.LogDebug("<<< Exiting GetStandardValues(context={Context})", context)
             Return Nothing
         End Function
 
         Public Overrides Function GetStandardValuesExclusive(ByVal context As ITypeDescriptorContext) As Boolean
+			_logger.LogDebug(">>> Entering GetStandardValuesExclusive(context={Context})", context)
+			_logger.LogDebug("<<< Exiting GetStandardValuesExclusive(context={Context})", context)
             Return False
         End Function
 
         Public Overrides Function GetStandardValuesSupported(ByVal context As ITypeDescriptorContext) As Boolean
+			_logger.LogDebug(">>> Entering GetStandardValuesSupported(context={Context})", context)
+			_logger.LogDebug("<<< Exiting GetStandardValuesSupported(context={Context})", context)
             Return Me.SupportsActions(context)
         End Function
 
         Private Function SupportsActions(ByVal context As ITypeDescriptorContext) As Boolean
+			_logger.LogDebug(">>> Entering SupportsActions(context={Context})", context)
+			_logger.LogDebug("<<< Exiting SupportsActions(context={Context})", context)
             Return ((Not Me.AttachedControl(context) Is Nothing) AndAlso TypeOf Me.AttachedControl(context) Is IDNNToolBarSupportedActions)
         End Function
 

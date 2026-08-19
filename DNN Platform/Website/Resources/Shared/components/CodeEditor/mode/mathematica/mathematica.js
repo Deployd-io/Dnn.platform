@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -6,6 +7,7 @@
 // See: https://github.com/halirutan/Mathematica-Source-Highlighting/tree/master/src/lang-mma.js
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -15,14 +17,19 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode('mathematica', function(_config, _parserConfig) {
+logger.debug('>>> Entering defineMode()');
 
   // used pattern building blocks
   var Identifier = '[a-zA-Z\\$][a-zA-Z0-9\\$]*';
+logger.debug(`defineMode(): Identifier → ${Identifier}`);
   var pBase      = "(?:\\d+)";
   var pFloat     = "(?:\\.\\d+|\\d+\\.\\d*|\\d+)";
   var pFloatBase = "(?:\\.\\w+|\\w+\\.\\w*|\\w+)";
+logger.debug(`defineMode(): pFloatBase → ${pFloatBase}`);
   var pPrecision = "(?:`(?:`?"+pFloat+")?)";
+logger.debug(`defineMode(): pPrecision → ${pPrecision}`);
 
   // regular expressions
   var reBaseForm        = new RegExp('(?:'+pBase+'(?:\\^\\^'+pFloatBase+pPrecision+'?(?:\\*\\^[+-]?\\d+)?))');
@@ -122,6 +129,7 @@ CodeMirror.defineMode('mathematica', function(_config, _parserConfig) {
 
     // operators. Note that operators like @@ or /; are matched separately for each symbol.
     if (stream.match(/(?:\\|\+|\-|\*|\/|,|;|\.|:|@|~|=|>|<|&|\||_|`|'|\^|\?|!|%)/, true, false)) {
+	logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
       return 'operator';
     }
 
@@ -130,6 +138,7 @@ CodeMirror.defineMode('mathematica', function(_config, _parserConfig) {
   }
 
   function tokenString(stream, state) {
+	logger.debug(`>>> Entering tokenString(stream=${stream},state=${state})`);
     var next, end = false, escaped = false;
     while ((next = stream.next()) != null) {
       if (next === '"' && !escaped) {
@@ -140,11 +149,14 @@ CodeMirror.defineMode('mathematica', function(_config, _parserConfig) {
     }
     if (end && !escaped) {
       state.tokenize = tokenBase;
+	logger.debug(`tokenString(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
     }
+	logger.debug(`<<< Exiting tokenString(stream=${stream},state=${state})`);
     return 'string';
   };
 
   function tokenComment(stream, state) {
+	logger.debug(`>>> Entering tokenComment(stream=${stream},state=${state})`);
     var prev, next;
     while(state.commentLevel > 0 && (next = stream.next()) != null) {
       if (prev === '(' && next === '*') state.commentLevel++;
@@ -153,14 +165,19 @@ CodeMirror.defineMode('mathematica', function(_config, _parserConfig) {
     }
     if (state.commentLevel <= 0) {
       state.tokenize = tokenBase;
+	logger.debug(`tokenComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
     }
+	logger.debug(`tokenComment(stream=${stream},state=${state}): prev → ${prev}`);
+	logger.debug(`<<< Exiting tokenComment(stream=${stream},state=${state})`);
     return 'comment';
   }
 
   return {
     startState: function() {return {tokenize: tokenBase, commentLevel: 0};},
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       if (stream.eatSpace()) return null;
+	logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
       return state.tokenize(stream, state);
     },
     blockCommentStart: "(*",

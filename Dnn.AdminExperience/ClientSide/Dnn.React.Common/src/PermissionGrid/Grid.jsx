@@ -4,19 +4,23 @@ import GridCell from "../GridCell";
 import GridCaption from "./GridCaption";
 import GridHeader from "./GridHeader";
 import GridRow from "./GridRow";
+const logger = console;
 
 class Grid extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
 
         this.state = {
         };
     }
 
     onPermissionChange(permission) {
+		logger.debug(`>>> Entering onPermissionChange(permission=${permission})`);
         const {props, state} = this;
 
         let permissions = props.permissions.map(function (p) {
+			logger.debug('>>> Entering map()');
             switch (props.type) {
                 case "role":
                     if (p.roleId === permission.roleId) {
@@ -36,12 +40,15 @@ class Grid extends Component {
         if (typeof props.onChange === "function") {
             props.onChange(permissions);
         }
+		logger.debug(`<<< Exiting onPermissionChange(permission=${permission})`);
     }
 
     onPermissionDeleted(permission) {
+		logger.debug(`>>> Entering onPermissionDeleted(permission=${permission})`);
         const {props, state} = this;
 
         let permissions = props.permissions.filter(function (p) {
+			logger.debug('>>> Entering filter()');
             switch (props.type) {
                 case "role":
                     return p.roleId !== permission.roleId;
@@ -53,9 +60,11 @@ class Grid extends Component {
         if (typeof props.onChange === "function") {
             props.onChange(permissions);
         }
+		logger.debug(`<<< Exiting onPermissionDeleted(permission=${permission})`);
     }
 
     onSuggestion(value) {
+		logger.debug(`>>> Entering onSuggestion(value=${value})`);
         const {props, state} = this;
 
         let permission = props.permissions.filter(function (p) {
@@ -81,10 +90,13 @@ class Grid extends Component {
                 permissions: []
             };
             props.onAddPermission(newPermission);
+			logger.debug(`onSuggestion(value=${value}): newPermission → ${newPermission}`);
         }
+		logger.debug(`<<< Exiting onSuggestion(value=${value})`);
     }
 
     renderGrid() {
+		logger.debug('>>> Entering renderGrid()');
         const {props, state} = this;
 
         const totalWidth = 100;
@@ -93,6 +105,7 @@ class Grid extends Component {
         const minimumActionColumnWidth = 8;
 
         let columnWidth = defaultColumnWith;
+		logger.debug(`renderGrid(): columnWidth → ${columnWidth}`);
         let actionsWidth;
         const tooManyColumns = totalWidth < roleColumnWidth + props.definitions.length * columnWidth;
         if (tooManyColumns) {
@@ -104,6 +117,7 @@ class Grid extends Component {
         }
 
         let self = this;
+		logger.debug('<<< Exiting renderGrid()');
         return (
             <GridCell style={{"display":"table"}} className={props.type + "-permissions-grid"}>
                 <GridCaption service={props.service} localization={props.localization} type={props.type} onSuggestion={this.onSuggestion.bind(this) } />
@@ -132,8 +146,10 @@ class Grid extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
 
+		logger.debug('<<< Exiting render()');
         return (
             this.renderGrid()
         );

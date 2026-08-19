@@ -25,11 +25,14 @@ namespace DotNetNuke.Web.UI.WebControls
     [ToolboxData("<{0}:DnnFileDropDownList runat='server'></{0}:DnnFileDropDownList>")]
     public class DnnFileDropDownList : DnnDropDownList
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnFileDropDownList));
         /// <summary>Initializes a new instance of the <see cref="DnnFileDropDownList"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.2.2. Please use overload with IClientResourceController. Scheduled removal in v12.0.0.")]
         public DnnFileDropDownList()
             : this(Globals.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>(), Globals.GetCurrentServiceProvider().GetRequiredService<IServicesFramework>())
         {
+		Logger.LogDebug(">>> Entering DnnFileDropDownList()");
+		Logger.LogDebug("<<< Exiting DnnFileDropDownList()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnFileDropDownList"/> class.</summary>
@@ -84,6 +87,7 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             this.SelectItemDefaultText = Localization.GetString("DropDownList.SelectFileDefaultText", Localization.SharedResourceFile);
@@ -94,11 +98,14 @@ namespace DotNetNuke.Web.UI.WebControls
             this.Options.ItemList.DisableUnspecifiedOrder = true;
 
             this.FolderId = Null.NullInteger;
+			Logger.LogDebug("OnInit(e={E}): this.FolderId → {Arg1}", e, this.FolderId);
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             this.AddCssClass("file");
 
             if (this.IncludeNoneSpecificItem)
@@ -107,6 +114,7 @@ namespace DotNetNuke.Web.UI.WebControls
             }
 
             base.OnPreRender(e);
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
     }
 }

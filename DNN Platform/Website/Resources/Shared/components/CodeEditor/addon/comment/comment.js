@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -14,9 +16,13 @@
   var noOptions = {};
   var nonWS = /[^\s\u00a0]/;
   var Pos = CodeMirror.Pos;
+logger.debug(`<<< Exiting function(exports=${exports})`);
 
   function firstNonWS(str) {
+	logger.debug(`>>> Entering firstNonWS(str=${str})`);
     var found = str.search(nonWS);
+	logger.debug(`firstNonWS(str=${str}): found → ${found}`);
+	logger.debug(`<<< Exiting firstNonWS(str=${str})`);
     return found == -1 ? 0 : found;
   }
 
@@ -24,6 +30,7 @@
     var minLine = Infinity, ranges = cm.listSelections(), mode = null;
     for (var i = ranges.length - 1; i >= 0; i--) {
       var from = ranges[i].from(), to = ranges[i].to();
+	logger.debug(`function(cm=${cm}): from → ${from}`);
       if (from.line >= minLine) continue;
       if (to.line >= minLine) to = Pos(minLine, 0);
       minLine = from.line;
@@ -39,25 +46,30 @@
   };
 
   CodeMirror.defineExtension("lineComment", function(from, to, options) {
+	logger.debug('>>> Entering defineExtension()');
     if (!options) options = noOptions;
     var self = this, mode = self.getModeAt(from);
     var commentString = options.lineComment || mode.lineComment;
     if (!commentString) {
       if (options.blockCommentStart || mode.blockCommentStart) {
         options.fullLines = true;
+		logger.debug(`defineExtension(): options.fullLines → ${options.fullLines}`);
         self.blockComment(from, to, options);
       }
       return;
     }
     var firstLine = self.getLine(from.line);
+	logger.debug(`defineExtension(): firstLine → ${firstLine}`);
     if (firstLine == null) return;
     var end = Math.min(to.ch != 0 || to.line == from.line ? to.line + 1 : to.line, self.lastLine() + 1);
     var pad = options.padding == null ? " " : options.padding;
     var blankLines = options.commentBlankLines || from.line == to.line;
 
+	logger.debug('<<< Exiting defineExtension()');
     self.operation(function() {
       if (options.indent) {
         var baseString = firstLine.slice(0, firstNonWS(firstLine));
+		logger.debug(`operation(baseString=${baseString}): baseString → ${baseString}`);
         for (var i = from.line; i < end; ++i) {
           var line = self.getLine(i), cut = baseString.length;
           if (!blankLines && !nonWS.test(line)) continue;
@@ -91,8 +103,10 @@
     if (from.line > end) return;
 
     self.operation(function() {
+	logger.debug('>>> Entering operation()');
       if (options.fullLines != false) {
         var lastLineHasText = nonWS.test(self.getLine(end));
+		logger.debug(`operation(): lastLineHasText → ${lastLineHasText}`);
         self.replaceRange(pad + endString, Pos(end));
         self.replaceRange(startString + pad, Pos(from.line, 0));
         var lead = options.blockCommentLead || mode.blockCommentLead;
@@ -103,22 +117,27 @@
         self.replaceRange(endString, to);
         self.replaceRange(startString, from);
       }
+	logger.debug(`<<< Exiting operation(baseString=${baseString})`);
     });
   });
 
   CodeMirror.defineExtension("uncomment", function(from, to, options) {
     if (!options) options = noOptions;
     var self = this, mode = self.getModeAt(from);
+	logger.debug(`defineExtension(): self → ${self}`);
     var end = Math.min(to.ch != 0 || to.line == from.line ? to.line : to.line - 1, self.lastLine()), start = Math.min(from.line, end);
+	logger.debug(`defineExtension(): end → ${end}`);
 
     // Try finding line comments
     var lineString = options.lineComment || mode.lineComment, lines = [];
     var pad = options.padding == null ? " " : options.padding, didSomething;
+	logger.debug(`defineExtension(): pad → ${pad}`);
     lineComment: {
       if (!lineString) break lineComment;
       for (var i = start; i <= end; ++i) {
         var line = self.getLine(i);
         var found = line.indexOf(lineString);
+		logger.debug(`defineExtension(): found → ${found}`);
         if (found > -1 && !/comment/.test(self.getTokenTypeAt(Pos(i, found + 1)))) found = -1;
         if (found == -1 && (i != end || i == start) && nonWS.test(line)) break lineComment;
         if (found > -1 && nonWS.test(line.slice(0, found))) break lineComment;
@@ -128,6 +147,7 @@
         for (var i = start; i <= end; ++i) {
           var line = lines[i - start];
           var pos = line.indexOf(lineString), endPos = pos + lineString.length;
+		logger.debug(`operation(i=${i}): pos → ${pos}`);
           if (pos < 0) continue;
           if (line.slice(endPos, endPos + pad.length) == pad) endPos += pad.length;
           didSomething = true;
@@ -143,7 +163,9 @@
     if (!startString || !endString) return false;
     var lead = options.blockCommentLead || mode.blockCommentLead;
     var startLine = self.getLine(start), endLine = end == start ? startLine : self.getLine(end);
+	logger.debug(`defineExtension(): startLine → ${startLine}`);
     var open = startLine.indexOf(startString), close = endLine.lastIndexOf(endString);
+	logger.debug(`defineExtension(): open → ${open}`);
     if (close == -1 && start != end) {
       endLine = self.getLine(--end);
       close = endLine.lastIndexOf(endString);
@@ -172,6 +194,7 @@
       self.replaceRange("", Pos(start, open), Pos(start, openEnd));
       if (lead) for (var i = start + 1; i <= end; ++i) {
         var line = self.getLine(i), found = line.indexOf(lead);
+		logger.debug(`operation(): line → ${line}`);
         if (found == -1 || nonWS.test(line.slice(0, found))) continue;
         var foundEnd = found + lead.length;
         if (pad && line.slice(foundEnd, foundEnd + pad.length) == pad) foundEnd += pad.length;

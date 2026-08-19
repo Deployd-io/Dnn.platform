@@ -1,14 +1,18 @@
 import React, { Component, } from "react";
 import PropTypes from "prop-types";
+const logger = console;
 import { Collapsible, } from "@dnnsoftware/dnn-react-common";
 class Folder extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             isOpen: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
     toggleCollapse() {
+		logger.debug('>>> Entering toggleCollapse()');
         const { props } = this;
         this.setState({
             isOpen: !this.state.isOpen
@@ -17,12 +21,15 @@ class Folder extends Component {
             props.onClick(props.folder.NewValue, () => {
                 this.setState({ isOpen: true });
             });
+			logger.debug('<<< Exiting toggleCollapse()');
         }
     }
      
     render() {
+		logger.debug('>>> Entering render()');
         const { props } = this;
         const isFolder = props.folder.NewValue.indexOf(".resx") === -1;
+		logger.debug('<<< Exiting render()');
         return (
             <li>
                 {isFolder && <div onClick={this.toggleCollapse.bind(this)} className="edit-svg"><isOpenIcon /></div>}

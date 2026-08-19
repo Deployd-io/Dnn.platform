@@ -13,6 +13,8 @@ namespace Dnn.PersonaBar.Pages.Components.Exceptions
         public PageException(string message)
             : base(message)
         {
+		eventLogger.LogDebug(">>> Entering PageException(message={Message})", message);
+		eventLogger.LogDebug("<<< Exiting PageException(message={Message})", message);
         }
     }
 }

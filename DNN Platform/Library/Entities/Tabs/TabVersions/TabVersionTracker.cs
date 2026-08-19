@@ -20,18 +20,22 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
         /// <param name="userId">User Id who provokes the version detail.</param>
         public void TrackModuleAddition(ModuleInfo module, int moduleVersion, int userId)
         {
+			Logger.LogDebug(">>> Entering TrackModuleAddition(module={Module},moduleVersion={ModuleVersion},userId={UserId})", module, moduleVersion, userId);
             Requires.NotNull("module", module);
 
             try
             {
                 var unPublishedVersion = GetOrCreateUnPublishedTabVersion(module.PortalID, module.TabID, userId);
+				Logger.LogDebug("TrackModuleAddition(module={Module},moduleVersion={ModuleVersion},userId={UserId}): unPublishedVersion → {UnPublishedVersion}", module, moduleVersion, userId, unPublishedVersion);
 
                 ProcessAdditionDetail(module, moduleVersion, userId, unPublishedVersion);
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in TrackModuleAddition(module={Module},moduleVersion={ModuleVersion},userId={UserId}): {Arg3}", module, moduleVersion, userId, ex.getMessage());
                 Services.Exceptions.Exceptions.LogException(ex);
             }
+			Logger.LogDebug("<<< Exiting TrackModuleAddition(module={Module},moduleVersion={ModuleVersion},userId={UserId})", module, moduleVersion, userId);
         }
 
         /// <summary>Tracks a version detail when a module is modified on a page.</summary>
@@ -40,6 +44,7 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
         /// <param name="userId">User Id who provokes the version detail.</param>
         public void TrackModuleModification(ModuleInfo module, int moduleVersion, int userId)
         {
+			Logger.LogDebug(">>> Entering TrackModuleModification(module={Module},moduleVersion={ModuleVersion},userId={UserId})", module, moduleVersion, userId);
             Requires.NotNull("module", module);
 
             try
@@ -50,21 +55,27 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
                 }
 
                 var unPublishedVersion = GetOrCreateUnPublishedTabVersion(module.PortalID, module.TabID, userId);
+				Logger.LogDebug("TrackModuleModification(module={Module},moduleVersion={ModuleVersion},userId={UserId}): unPublishedVersion → {UnPublishedVersion}", module, moduleVersion, userId, unPublishedVersion);
                 var tabVersionDetail = CreateNewTabVersionDetailObjectFromModule(unPublishedVersion.TabVersionId, module.ModuleID, module.PaneName, module.ModuleOrder, moduleVersion, TabVersionDetailAction.Modified);
+				Logger.LogDebug("TrackModuleModification(module={Module},moduleVersion={ModuleVersion},userId={UserId}): tabVersionDetail → {TabVersionDetail}", module, moduleVersion, userId, tabVersionDetail);
 
                 var existingTabVersionDetail = TabVersionDetailController.Instance.GetTabVersionDetails(unPublishedVersion.TabVersionId).SingleOrDefault(tvd => tvd.ModuleId == module.ModuleID);
+				Logger.LogDebug("TrackModuleModification(module={Module},moduleVersion={ModuleVersion},userId={UserId}): existingTabVersionDetail → {ExistingTabVersionDetail}", module, moduleVersion, userId, existingTabVersionDetail);
                 if (existingTabVersionDetail != null)
                 {
                     tabVersionDetail.TabVersionDetailId = existingTabVersionDetail.TabVersionDetailId;
+					Logger.LogDebug("TrackModuleModification(module={Module},moduleVersion={ModuleVersion},userId={UserId}): tabVersionDetail.TabVersionDetailId → {Arg3}", module, moduleVersion, userId, tabVersionDetail.TabVersionDetailId);
                     if (moduleVersion == Null.NullInteger)
                     {
                         tabVersionDetail.ModuleVersion = existingTabVersionDetail.ModuleVersion;
+						Logger.LogDebug("TrackModuleModification(module={Module},moduleVersion={ModuleVersion},userId={UserId}): tabVersionDetail.ModuleVersion → {Arg3}", module, moduleVersion, userId, tabVersionDetail.ModuleVersion);
                     }
 
                     // If the operation is done over a just created module, the Added operation is kept.
                     if (existingTabVersionDetail.Action == TabVersionDetailAction.Added)
                     {
                         tabVersionDetail.Action = TabVersionDetailAction.Added;
+						Logger.LogDebug("TrackModuleModification(module={Module},moduleVersion={ModuleVersion},userId={UserId}): tabVersionDetail.Action → {Arg3}", module, moduleVersion, userId, tabVersionDetail.Action);
                     }
                 }
 
@@ -72,12 +83,15 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
             }
             catch (InvalidOperationException)
             {
+				Logger.LogError("Exception in TrackModuleModification(module={Module},moduleVersion={ModuleVersion},userId={UserId}): {Arg3}", module, moduleVersion, userId, InvalidOperationException.getMessage());
                 throw;
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in TrackModuleModification(module={Module},moduleVersion={ModuleVersion},userId={UserId}): {Arg3}", module, moduleVersion, userId, ex.getMessage());
                 Services.Exceptions.Exceptions.LogException(ex);
             }
+			Logger.LogDebug("<<< Exiting TrackModuleModification(module={Module},moduleVersion={ModuleVersion},userId={UserId})", module, moduleVersion, userId);
         }
 
         /// <summary>Tracks a version detail when a module is deleted from a page.</summary>
@@ -86,18 +100,22 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
         /// <param name="userId">User Id who provokes the version detail.</param>
         public void TrackModuleDeletion(ModuleInfo module, int moduleVersion, int userId)
         {
+			Logger.LogDebug(">>> Entering TrackModuleDeletion(module={Module},moduleVersion={ModuleVersion},userId={UserId})", module, moduleVersion, userId);
             Requires.NotNull("module", module);
 
             try
             {
                 var unPublishedVersion = GetOrCreateUnPublishedTabVersion(module.PortalID, module.TabID, userId);
+				Logger.LogDebug("TrackModuleDeletion(module={Module},moduleVersion={ModuleVersion},userId={UserId}): unPublishedVersion → {UnPublishedVersion}", module, moduleVersion, userId, unPublishedVersion);
 
                 ProcessDeletionDetail(module, moduleVersion, userId, unPublishedVersion);
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in TrackModuleDeletion(module={Module},moduleVersion={ModuleVersion},userId={UserId}): {Arg3}", module, moduleVersion, userId, ex.getMessage());
                 Services.Exceptions.Exceptions.LogException(ex);
             }
+			Logger.LogDebug("<<< Exiting TrackModuleDeletion(module={Module},moduleVersion={ModuleVersion},userId={UserId})", module, moduleVersion, userId);
         }
 
         /// <summary>Tracks a version detail when a module is copied from an exisitng page.</summary>
@@ -107,6 +125,7 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
         /// /// <param name="userId">User Id who provokes the version detail.</param>
         public void TrackModuleCopy(ModuleInfo module, int moduleVersion, int originalTabId, int userId)
         {
+			Logger.LogDebug(">>> Entering TrackModuleCopy(module={Module},moduleVersion={ModuleVersion},originalTabId={OriginalTabId},userId={UserId})", module, moduleVersion, originalTabId, userId);
             Requires.NotNull("module", module);
 
             try
@@ -122,8 +141,10 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in TrackModuleCopy(module={Module},moduleVersion={ModuleVersion},originalTabId={OriginalTabId},userId={UserId}): {Arg4}", module, moduleVersion, originalTabId, userId, ex.getMessage());
                 Services.Exceptions.Exceptions.LogException(ex);
             }
+			Logger.LogDebug("<<< Exiting TrackModuleCopy(module={Module},moduleVersion={ModuleVersion},originalTabId={OriginalTabId},userId={UserId})", module, moduleVersion, originalTabId, userId);
         }
 
         /// <summary>Tracks a version detail when a copied module is deleted from an exisitng page.</summary>
@@ -133,6 +154,7 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
         /// <param name="userId">User Id who provokes the version detail.</param>
         public void TrackModuleUncopy(ModuleInfo module, int moduleVersion, int originalTabId, int userId)
         {
+			Logger.LogDebug(">>> Entering TrackModuleUncopy(module={Module},moduleVersion={ModuleVersion},originalTabId={OriginalTabId},userId={UserId})", module, moduleVersion, originalTabId, userId);
             Requires.NotNull("module", module);
 
             try
@@ -149,18 +171,23 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in TrackModuleUncopy(module={Module},moduleVersion={ModuleVersion},originalTabId={OriginalTabId},userId={UserId}): {Arg4}", module, moduleVersion, originalTabId, userId, ex.getMessage());
                 Services.Exceptions.Exceptions.LogException(ex);
             }
+			Logger.LogDebug("<<< Exiting TrackModuleUncopy(module={Module},moduleVersion={ModuleVersion},originalTabId={OriginalTabId},userId={UserId})", module, moduleVersion, originalTabId, userId);
         }
 
         /// <inheritdoc />
         protected override Func<ITabChangeTracker> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new TabVersionTracker();
         }
 
         private static void ProcessAdditionDetail(ModuleInfo module, int moduleVersion, int userId, TabVersion targetVersion)
         {
+			Logger.LogDebug(">>> Entering ProcessAdditionDetail(module={Module},moduleVersion={ModuleVersion},userId={UserId},targetVersion={TargetVersion})", module, moduleVersion, userId, targetVersion);
             if (IsHostModule(module))
             {
                 return;
@@ -183,10 +210,12 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
                 moduleVersion,
                 TabVersionDetailAction.Added);
             TabVersionDetailController.Instance.SaveTabVersionDetail(tabVersionDetail, userId);
+			Logger.LogDebug("<<< Exiting ProcessAdditionDetail(module={Module},moduleVersion={ModuleVersion},userId={UserId},targetVersion={TargetVersion})", module, moduleVersion, userId, targetVersion);
         }
 
         private static void ProcessDeletionDetail(ModuleInfo module, int moduleVersion, int userId, TabVersion targetVersion)
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabVersionTracker));
             if (IsHostModule(module))
             {
                 return;
@@ -210,6 +239,7 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
 
             // Do not add module to Tab Version Details if it has been hard deleted
             ModuleInfo moduleInfo = ModuleController.Instance.GetModule(module.ModuleID, module.TabID, false);
+			Logger.LogDebug("ProcessDeletionDetail(module={Module},moduleVersion={ModuleVersion},userId={UserId},targetVersion={TargetVersion}): moduleInfo → {ModuleInfo}", module, moduleVersion, userId, targetVersion, moduleInfo);
             if (moduleInfo != null)
             {
                 var tabVersionDetail = CreateNewTabVersionDetailObjectFromModule(
@@ -219,16 +249,22 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
                     TabVersionDetailAction.Deleted);
                 TabVersionDetailController.Instance.SaveTabVersionDetail(tabVersionDetail, userId);
             }
+			Logger.LogDebug("<<< Exiting ProcessDeletionDetail(module={Module},moduleVersion={ModuleVersion},userId={UserId},targetVersion={TargetVersion})", module, moduleVersion, userId, targetVersion);
         }
 
         private static bool IsHostModule(ModuleInfo module)
         {
+			Logger.LogDebug(">>> Entering IsHostModule(module={Module})", module);
+			Logger.LogDebug("<<< Exiting IsHostModule(module={Module})", module);
             return module.PortalID == Null.NullInteger;
         }
 
         private static TabVersion GetOrCreateUnPublishedTabVersion(int portalId, int tabId, int createdByUserId)
         {
+			Logger.LogDebug(">>> Entering GetOrCreateUnPublishedTabVersion(portalId={PortalId},tabId={TabId},createdByUserId={CreatedByUserId})", portalId, tabId, createdByUserId);
             var unPublishedVersion = TabVersionBuilder.Instance.GetUnPublishedVersion(tabId);
+			Logger.LogDebug("GetOrCreateUnPublishedTabVersion(portalId={PortalId},tabId={TabId},createdByUserId={CreatedByUserId}): unPublishedVersion → {UnPublishedVersion}", portalId, tabId, createdByUserId, unPublishedVersion);
+			Logger.LogDebug("<<< Exiting GetOrCreateUnPublishedTabVersion(portalId={PortalId},tabId={TabId},createdByUserId={CreatedByUserId})", portalId, tabId, createdByUserId);
             return unPublishedVersion == null ?
                 TabVersionBuilder.Instance.CreateNewVersion(portalId, tabId, createdByUserId) :
                 TabVersionController.Instance.GetTabVersions(tabId).SingleOrDefault(tv => !tv.IsPublished);
@@ -236,6 +272,8 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
 
         private static TabVersionDetail CreateNewTabVersionDetailObjectFromModule(int tabVersionId, ModuleInfo module, int moduleVersion, TabVersionDetailAction action)
         {
+			Logger.LogDebug(">>> Entering CreateNewTabVersionDetailObjectFromModule(tabVersionId={TabVersionId},module={Module},moduleVersion={ModuleVersion},action={Action})", tabVersionId, module, moduleVersion, action);
+			Logger.LogDebug("<<< Exiting CreateNewTabVersionDetailObjectFromModule(tabVersionId={TabVersionId},module={Module},moduleVersion={ModuleVersion},action={Action})", tabVersionId, module, moduleVersion, action);
             return new TabVersionDetail
             {
                 TabVersionDetailId = 0,
@@ -245,6 +283,7 @@ namespace DotNetNuke.Entities.Tabs.TabVersions
                 ModuleOrder = module.ModuleOrder,
                 PaneName = module.PaneName,
                 Action = action,
+			Logger.LogDebug("<<< Exiting CreateNewTabVersionDetailObjectFromModule(tabVersionId={TabVersionId},moduleId={ModuleId},paneName={PaneName},moduleOrder={ModuleOrder},moduleVersion={ModuleVersion},action={Action})", tabVersionId, moduleId, paneName, moduleOrder, moduleVersion, action);
             };
         }
 

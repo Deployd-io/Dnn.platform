@@ -14,6 +14,7 @@ namespace DotNetNuke.Entities.Modules.Definitions
 
     public enum ModuleDefinitionVersion
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleDefinitionValidator));
         /// <summary>An unknown version.</summary>
         VUnknown = 0,
 
@@ -40,6 +41,7 @@ namespace DotNetNuke.Entities.Modules.Definitions
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public ModuleDefinitionVersion GetModuleDefinitionVersion(Stream xmlStream)
         {
+			Logger.LogDebug(">>> Entering GetModuleDefinitionVersion(xmlStream={XmlStream})", xmlStream);
             ModuleDefinitionVersion retValue;
             xmlStream.Seek(0, SeekOrigin.Begin);
             var xmlReader = new XmlTextReader(xmlStream)
@@ -54,6 +56,7 @@ namespace DotNetNuke.Entities.Modules.Definitions
             {
                 case "module":
                     retValue = ModuleDefinitionVersion.V1;
+					Logger.LogDebug("GetModuleDefinitionVersion(xmlStream={XmlStream}): retValue → {RetValue}", xmlStream, retValue);
                     break;
                 case "dotnetnuke":
                     switch (xmlReader.GetAttribute("type"))
@@ -89,21 +92,26 @@ namespace DotNetNuke.Entities.Modules.Definitions
                     break;
             }
 
+			Logger.LogDebug("<<< Exiting GetModuleDefinitionVersion(xmlStream={XmlStream})", xmlStream);
             return retValue;
         }
 
         /// <inheritdoc />
         public override bool Validate(Stream xmlStream)
         {
+			Logger.LogDebug(">>> Entering Validate(xmlStream={XmlStream})", xmlStream);
             this.SchemaSet.Add(string.Empty, this.GetDnnSchemaPath(xmlStream));
+			Logger.LogDebug("<<< Exiting Validate(xmlStream={XmlStream})", xmlStream);
             return base.Validate(xmlStream);
         }
 
         private static string GetLocalizedString(string key)
         {
+			Logger.LogDebug(">>> Entering GetLocalizedString(key={Key})", key);
             var objPortalSettings = (PortalSettings)HttpContext.Current.Items["PortalSettings"];
             if (objPortalSettings == null)
             {
+			Logger.LogDebug("<<< Exiting GetLocalizedString(key={Key})", key);
                 return key;
             }
 
@@ -112,8 +120,11 @@ namespace DotNetNuke.Entities.Modules.Definitions
 
         private string GetDnnSchemaPath(Stream xmlStream)
         {
+			Logger.LogDebug(">>> Entering GetDnnSchemaPath(xmlStream={XmlStream})", xmlStream);
             ModuleDefinitionVersion version = this.GetModuleDefinitionVersion(xmlStream);
             string schemaPath = string.Empty;
+			Logger.LogDebug("GetDnnSchemaPath(xmlStream={XmlStream}): schemaPath → {SchemaPath}", xmlStream, schemaPath);
+			Logger.LogDebug("GetDnnSchemaPath(xmlStream={XmlStream}): version → {Version}", xmlStream, version);
             switch (version)
             {
                 case ModuleDefinitionVersion.V2:
@@ -129,6 +140,8 @@ namespace DotNetNuke.Entities.Modules.Definitions
                     schemaPath = "components\\ResourceInstaller\\ModuleDef_V2Provider.xsd";
                     break;
                 case ModuleDefinitionVersion.VUnknown:
+					Logger.LogWarning("Throwing UnknownModuleDefinitionVersionException from GetDnnSchemaPath(xmlStream={XmlStream})", xmlStream);
+			Logger.LogDebug("<<< Exiting GetDnnSchemaPath(xmlStream={XmlStream})", xmlStream);
                     throw new UnknownModuleDefinitionVersionException(GetLocalizedString("EXCEPTION_LoadFailed"));
             }
 

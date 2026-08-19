@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Label, Dropdown } from "@dnnsoftware/dnn-react-common";
 import Localization from "../../../localization";
+const logger = console;
 
 
 const styles = {
@@ -16,17 +17,21 @@ const styles = {
 
 class Template extends Component {
     getTemplatesOptions() {
+		logger.debug('>>> Entering getTemplatesOptions()');
         const {props} = this;
         const {templates} = props;
+		logger.debug('<<< Exiting getTemplatesOptions()');
         return templates.map(template => {
             return {value: template.Value, label: template.Id};
         });
     }
     
     render() {
+		logger.debug('>>> Entering render()');
         const {selectedTemplateId, templates, onSelect} = this.props;
         
         if (!templates || templates.length === 0) {
+		logger.debug('<<< Exiting render()');
             return null;
         }
         

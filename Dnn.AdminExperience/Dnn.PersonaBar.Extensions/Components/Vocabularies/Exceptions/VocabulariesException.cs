@@ -11,6 +11,8 @@ namespace Dnn.PersonaBar.Vocabularies.Exceptions
         /// <summary>Initializes a new instance of the <see cref="VocabulariesException"/> class.</summary>
         public VocabulariesException()
         {
+		eventLogger.LogDebug(">>> Entering VocabulariesException()");
+		eventLogger.LogDebug("<<< Exiting VocabulariesException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="VocabulariesException"/> class.</summary>
@@ -18,7 +20,9 @@ namespace Dnn.PersonaBar.Vocabularies.Exceptions
         public VocabulariesException(string message)
             : base(message)
         {
+		eventLogger.LogDebug(">>> Entering VocabulariesException(message={Message})", message);
         }
+		eventLogger.LogDebug("<<< Exiting VocabulariesException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="VocabulariesException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

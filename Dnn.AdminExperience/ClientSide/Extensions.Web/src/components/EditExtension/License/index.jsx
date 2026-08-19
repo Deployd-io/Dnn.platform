@@ -5,6 +5,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 import Localization from "localization";
 import Html from "../../Html";
 import "./style.less";
+const logger = console;
 
 const inputStyle = { width: "100%" };
 const licenseBoxStyle = {
@@ -16,9 +17,11 @@ const licenseBoxStyle = {
 
 class License extends Component {
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         const {value} = props;
          
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className="extension-license extension-form">
                 {props.installationMode && <h6>{Localization.get("InstallExtension_License.Header")}</h6>}

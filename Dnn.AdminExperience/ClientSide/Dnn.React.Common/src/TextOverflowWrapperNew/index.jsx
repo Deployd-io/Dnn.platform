@@ -3,30 +3,38 @@ import PropTypes from "prop-types";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 
 import "./style.less";
+const logger = console;
 
 const generateID = () => "a" + Math.random().toString(36).substr(2, 10);
 class TextOverflowWrapperNew extends Component {
   constructor() {
     super();
+	logger.debug('>>> Entering constructor()');
     this.state = {
       isTooltipActive: false,
       id: generateID(),
     };
+	logger.debug('<<< Exiting constructor()');
   }
 
   showTooltip() {
+	logger.debug('>>> Entering showTooltip()');
     this.setState({
       isTooltipActive: true,
     });
+	logger.debug('<<< Exiting showTooltip()');
   }
 
   hideTooltip() {
+	logger.debug('>>> Entering hideTooltip()');
     this.setState({
       isTooltipActive: false,
     });
+	logger.debug('<<< Exiting hideTooltip()');
   }
 
   render() {
+	logger.debug('>>> Entering render()');
     const { props, state } = this;
 
     const hotspotStyles = {
@@ -40,6 +48,7 @@ class TextOverflowWrapperNew extends Component {
       zIndex: 10000,
     };
 
+	logger.debug('<<< Exiting render()');
     return (
       <div>
         <div

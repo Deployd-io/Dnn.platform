@@ -13,6 +13,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
     /// <summary>Represents support for making selections in a list.</summary>
     public static class HtmlSelectExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HtmlSelectExtensions));
         // DropDownList
 
         /// <summary>Returns a single-selection select element using the specified HTML helper and the name of the form field.</summary>
@@ -22,6 +23,13 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <exception cref="System.ArgumentException">The <paramref name="name"/> parameter is null or empty.</exception>
         public static MvcHtmlString DropDownList(this DnnHtmlHelper html, string name)
         {
+			Logger.LogDebug(">>> Entering DropDownList(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting DropDownList(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting DropDownList(html={Html},name={Name},optionLabel={OptionLabel})", html, name, optionLabel);
+			Logger.LogDebug("<<< Exiting DropDownList(html={Html},name={Name},selectList={SelectList})", html, name, selectList);
+			Logger.LogDebug("<<< Exiting DropDownList(html={Html},name={Name},selectList={SelectList},htmlAttributes={HtmlAttributes})", html, name, selectList, htmlAttributes);
+			Logger.LogDebug("<<< Exiting DropDownList(html={Html},name={Name},selectList={SelectList},optionLabel={OptionLabel})", html, name, selectList, optionLabel);
+			Logger.LogDebug("<<< Exiting DropDownList(html={Html},name={Name},selectList={SelectList},optionLabel={OptionLabel},htmlAttributes={HtmlAttributes})", html, name, selectList, optionLabel, htmlAttributes);
             return html.HtmlHelper.DropDownList(name);
         }
 
@@ -117,6 +125,11 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <exception cref="System.ArgumentNullException">The <paramref name="expression"/> parameter is null.</exception>
         public static MvcHtmlString DropDownListFor<TModel, TProperty>(this DnnHtmlHelper<TModel> html, Expression<Func<TModel, TProperty>> expression, IEnumerable<SelectListItem> selectList)
         {
+			Logger.LogDebug(">>> Entering DropDownListFor(html={Html},expression={Expression},selectList={SelectList})", html, expression, selectList);
+			Logger.LogDebug("<<< Exiting DropDownListFor(html={Html},expression={Expression},selectList={SelectList})", html, expression, selectList);
+			Logger.LogDebug("<<< Exiting DropDownListFor(html={Html},expression={Expression},selectList={SelectList},htmlAttributes={HtmlAttributes})", html, expression, selectList, htmlAttributes);
+			Logger.LogDebug("<<< Exiting DropDownListFor(html={Html},expression={Expression},selectList={SelectList},optionLabel={OptionLabel})", html, expression, selectList, optionLabel);
+			Logger.LogDebug("<<< Exiting DropDownListFor(html={Html},expression={Expression},selectList={SelectList},optionLabel={OptionLabel},htmlAttributes={HtmlAttributes})", html, expression, selectList, optionLabel, htmlAttributes);
             return html.HtmlHelper.DropDownListFor(expression, selectList);
         }
 
@@ -200,6 +213,11 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <typeparam name="TEnum">The type of the value.</typeparam>
         public static MvcHtmlString EnumDropDownListFor<TModel, TEnum>(this DnnHtmlHelper<TModel> html, Expression<Func<TModel, TEnum>> expression)
         {
+			Logger.LogDebug(">>> Entering EnumDropDownListFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting EnumDropDownListFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting EnumDropDownListFor(html={Html},expression={Expression},htmlAttributes={HtmlAttributes})", html, expression, htmlAttributes);
+			Logger.LogDebug("<<< Exiting EnumDropDownListFor(html={Html},expression={Expression},optionLabel={OptionLabel})", html, expression, optionLabel);
+			Logger.LogDebug("<<< Exiting EnumDropDownListFor(html={Html},expression={Expression},optionLabel={OptionLabel},htmlAttributes={HtmlAttributes})", html, expression, optionLabel, htmlAttributes);
             return html.HtmlHelper.EnumDropDownListFor<TModel, TEnum>(expression);
         }
 
@@ -274,6 +292,10 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <exception cref="System.ArgumentException">The <paramref name="name"/> parameter is null or empty.</exception>
         public static MvcHtmlString ListBox(this DnnHtmlHelper html, string name)
         {
+			Logger.LogDebug(">>> Entering ListBox(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting ListBox(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting ListBox(html={Html},name={Name},selectList={SelectList})", html, name, selectList);
+			Logger.LogDebug("<<< Exiting ListBox(html={Html},name={Name},selectList={SelectList},htmlAttributes={HtmlAttributes})", html, name, selectList, htmlAttributes);
             return html.HtmlHelper.ListBox(name);
         }
 
@@ -321,6 +343,9 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <exception cref="System.ArgumentNullException">The <paramref name="expression"/> parameter is null.</exception>
         public static MvcHtmlString ListBoxFor<TModel, TProperty>(this DnnHtmlHelper<TModel> html, Expression<Func<TModel, TProperty>> expression, IEnumerable<SelectListItem> selectList)
         {
+			Logger.LogDebug(">>> Entering ListBoxFor(html={Html},expression={Expression},selectList={SelectList})", html, expression, selectList);
+			Logger.LogDebug("<<< Exiting ListBoxFor(html={Html},expression={Expression},selectList={SelectList})", html, expression, selectList);
+			Logger.LogDebug("<<< Exiting ListBoxFor(html={Html},expression={Expression},selectList={SelectList},htmlAttributes={HtmlAttributes})", html, expression, selectList, htmlAttributes);
             return html.HtmlHelper.ListBoxFor(expression, selectList);
         }
 

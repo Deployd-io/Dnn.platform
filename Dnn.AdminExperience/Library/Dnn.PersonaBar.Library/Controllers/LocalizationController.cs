@@ -21,6 +21,7 @@ namespace Dnn.PersonaBar.Library.Controllers
 
     public class LocalizationController : ServiceLocator<ILocalizationController, LocalizationController>, ILocalizationController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LocalizationController));
         public static readonly TimeSpan FiveMinutes = TimeSpan.FromMinutes(5);
         public static readonly TimeSpan OneHour = TimeSpan.FromHours(1);
 
@@ -33,6 +34,8 @@ namespace Dnn.PersonaBar.Library.Controllers
         /// <inheritdoc />
         public long GetResxTimeStamp(string resourceFile, Dto.Localization localization)
         {
+			Logger.LogDebug(">>> Entering GetResxTimeStamp(resourceFile={ResourceFile},localization={Localization})", resourceFile, localization);
+			Logger.LogDebug("<<< Exiting GetResxTimeStamp(resourceFile={ResourceFile},localization={Localization})", resourceFile, localization);
             return GetLastModifiedTime(resourceFile, this.CultureName, localization).Ticks;
         }
 
@@ -85,20 +88,26 @@ namespace Dnn.PersonaBar.Library.Controllers
         /// <inheritdoc />
         protected override Func<ILocalizationController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new LocalizationController();
         }
 
         private static string GetNameAttribute(XmlNode node)
         {
+			Logger.LogDebug(">>> Entering GetNameAttribute(node={Node})", node);
             if (node.Attributes != null)
             {
                 var attribute = node.Attributes.GetNamedItem("name");
+				Logger.LogDebug("GetNameAttribute(node={Node}): attribute → {Attribute}", node, attribute);
                 if (attribute != null)
                 {
                     return attribute.Value;
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetNameAttribute(node={Node})", node);
+			Logger.LogDebug("<<< Exiting GetNameAttribute(navigator={Navigator})", navigator);
             return null;
         }
 
@@ -109,16 +118,19 @@ namespace Dnn.PersonaBar.Library.Controllers
 
         private static void AssertHeaderValue(IEnumerable<XmlNode> headers, string key, string value)
         {
+			Logger.LogDebug(">>> Entering AssertHeaderValue(headers={Headers},key={Key},value={Value})", headers, key, value);
             var header = headers.FirstOrDefault(x => GetNameAttribute(x).Equals(key, StringComparison.OrdinalIgnoreCase));
             if (header != null)
             {
                 if (!header.InnerText.Equals(value, StringComparison.OrdinalIgnoreCase))
                 {
+					Logger.LogWarning("Throwing LocalizationException from AssertHeaderValue(headers={Headers},key={Key},value={Value})", headers, key, value);
                     throw new LocalizationException($"Resource header '{key}' != '{value}'");
                 }
             }
             else
             {
+			Logger.LogDebug("<<< Exiting AssertHeaderValue(headers={Headers},key={Key},value={Value})", headers, key, value);
                 throw new LocalizationException($"Resource header '{key}' is missing");
             }
         }
@@ -168,16 +180,20 @@ namespace Dnn.PersonaBar.Library.Controllers
 
         private static DateTime GetLastModifiedTime(string resourceFile, string culture, Dto.Localization localization)
         {
+			Logger.LogDebug(">>> Entering GetLastModifiedTime(resourceFile={ResourceFile},culture={Culture},localization={Localization})", resourceFile, culture, localization);
             Requires.NotNullOrEmpty("culture", culture);
 
             var cacheKey = string.Format(CultureInfo.CurrentCulture, localization.ResxModifiedDateCacheKey, culture);
+			Logger.LogDebug("GetLastModifiedTime(resourceFile={ResourceFile},culture={Culture},localization={Localization}): cacheKey → {CacheKey}", resourceFile, culture, localization, cacheKey);
             var cachedData = DataCache.GetCache(cacheKey);
+			Logger.LogDebug("GetLastModifiedTime(resourceFile={ResourceFile},culture={Culture},localization={Localization}): cachedData → {CachedData}", resourceFile, culture, localization, cachedData);
             if (cachedData is DateTime)
             {
                 return (DateTime)DataCache.GetCache(cacheKey);
             }
 
             var lastModifiedDate = GetLastModifiedTimeInternal(resourceFile, culture);
+			Logger.LogDebug("GetLastModifiedTime(resourceFile={ResourceFile},culture={Culture},localization={Localization}): lastModifiedDate → {LastModifiedDate}", resourceFile, culture, localization, lastModifiedDate);
 
             DataCache.SetCache(
                 cacheKey,
@@ -188,13 +204,17 @@ namespace Dnn.PersonaBar.Library.Controllers
                 CacheItemPriority.Normal,
                 null);
 
+			Logger.LogDebug("<<< Exiting GetLastModifiedTime(resourceFile={ResourceFile},culture={Culture},localization={Localization})", resourceFile, culture, localization);
             return lastModifiedDate;
         }
 
         private static DateTime GetLastModifiedTimeInternal(string resourceFile, string culture)
         {
+			Logger.LogDebug(">>> Entering GetLastModifiedTimeInternal(resourceFile={ResourceFile},culture={Culture})", resourceFile, culture);
             var cultureSpecificFile = System.Web.HttpContext.Current.Server.MapPath($"{resourceFile.Replace(".resx", string.Empty)}.{culture}.resx");
             var lastModifiedDate = DateTime.MinValue;
+			Logger.LogDebug("GetLastModifiedTimeInternal(resourceFile={ResourceFile},culture={Culture}): lastModifiedDate → {LastModifiedDate}", resourceFile, culture, lastModifiedDate);
+			Logger.LogDebug("GetLastModifiedTimeInternal(resourceFile={ResourceFile},culture={Culture}): cultureSpecificFile → {CultureSpecificFile}", resourceFile, culture, cultureSpecificFile);
 
             if (File.Exists(cultureSpecificFile))
             {
@@ -203,12 +223,14 @@ namespace Dnn.PersonaBar.Library.Controllers
             else
             {
                 var cultureNeutralFile = System.Web.HttpContext.Current.Server.MapPath(resourceFile);
+				Logger.LogDebug("GetLastModifiedTimeInternal(resourceFile={ResourceFile},culture={Culture}): cultureNeutralFile → {CultureNeutralFile}", resourceFile, culture, cultureNeutralFile);
                 if (File.Exists(cultureNeutralFile))
                 {
                     lastModifiedDate = File.GetLastWriteTime(cultureNeutralFile);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetLastModifiedTimeInternal(resourceFile={ResourceFile},culture={Culture})", resourceFile, culture);
             return lastModifiedDate;
         }
     }

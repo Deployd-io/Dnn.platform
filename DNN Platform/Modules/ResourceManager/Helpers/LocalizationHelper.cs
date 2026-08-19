@@ -10,6 +10,7 @@ namespace Dnn.Modules.ResourceManager.Helpers
     /// <summary>Localization helper methods.</summary>
     internal class LocalizationHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LocalizationHelper));
         private const string ResourceFile = "~/" + Constants.ModulePath + "/App_LocalResources/ResourceManager.resx";
 
         /// <summary>Gets a localized resource string from the resource manager resource file.</summary>
@@ -17,6 +18,8 @@ namespace Dnn.Modules.ResourceManager.Helpers
         /// <returns>A string containing the localized text.</returns>
         public static string GetString(string key)
         {
+			Logger.LogDebug(">>> Entering GetString(key={Key})", key);
+			Logger.LogDebug("<<< Exiting GetString(key={Key})", key);
             return Localization.GetString(key, ResourceFile);
         }
     }

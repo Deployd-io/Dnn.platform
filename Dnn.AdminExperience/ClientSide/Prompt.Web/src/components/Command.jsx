@@ -4,14 +4,17 @@ import Html from "./Html";
 import Localization from "../localization/Localization";
 //import { sort } from "utils/helpers";
 import DomKey from "../services/DomKey";
+const logger = console;
 
 const Command = ({commandList, IsPaging}) => {
+logger.debug(`>>> Entering Command(commandList=${commandList},IsPaging=${IsPaging})`);
 
     IsPaging(false);
 
     const headingName = <h3 className="mono"><Html html={Localization.get("Prompt_Help_PromptCommands")}/></h3>;
     const paragraphDescription = <p className="lead"><Html html={Localization.get("Prompt_Help_ListOfAvailableMsg")}/></p>;
     const headingCommands = <h4><Html html={Localization.get("Prompt_Help_Commands")}/></h4>;
+	logger.debug(`Command(commandList=${commandList},IsPaging=${IsPaging}): headingCommands → ${headingCommands}`);
 
     const commandsList = commandList.sort((a,b) => {
         const catA = a.Category;
@@ -38,11 +41,13 @@ const Command = ({commandList, IsPaging}) => {
             return [{separator: true, Category: current.Category}, current];
         }
 
+	logger.debug(`Command(commandList=${commandList},IsPaging=${IsPaging}): commandsList → ${commandsList}`);
         return [...prev, current];
 
     }, []);
 
     const commandsOutput = commandsList.map((cmd) => {
+		logger.debug(`Command(commandList=${commandList},IsPaging=${IsPaging}): commandsOutput → ${commandsOutput}`);
         if (cmd.separator) {
             return <tr key={DomKey.get("command")} className="divider"><td colSpan="2">{cmd.Category}</td></tr>;
         }
@@ -84,6 +89,7 @@ const Command = ({commandList, IsPaging}) => {
         </section>
     );
 
+	logger.debug(`<<< Exiting Command(commandList=${commandList},IsPaging=${IsPaging})`);
     return out;
 };
 

@@ -1,17 +1,22 @@
 import { Component } from "react";
 import PropTypes from "prop-types";
 import securityService from "../../services/securityService";
+const logger = console;
 
 class Sec extends Component {
 
     componentDidMount() {
+	logger.debug('>>> Entering componentDidMount()');
 
+	logger.debug('<<< Exiting componentDidMount()');
     }
 
     isVisible() {
+		logger.debug('>>> Entering isVisible()');
         const { selectedPage, permission, onlySuperUsers, onlyForNotSuperUser } = this.props;
 
         const isSuperUser = securityService.isSuperUser();
+		logger.debug(`isVisible(): isSuperUser → ${isSuperUser}`);
         if (onlyForNotSuperUser && isSuperUser) {
             return false;
         }
@@ -21,6 +26,7 @@ class Sec extends Component {
         }
 
         if (onlySuperUsers) {
+		logger.debug('<<< Exiting isVisible()');
             return false;
         }
 
@@ -28,8 +34,10 @@ class Sec extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const isVisible = this.isVisible();
         if (!isVisible) {
+		logger.debug('<<< Exiting render()');
             return null;
         }
 

@@ -59,6 +59,8 @@ namespace log4net.Config
         /// </remarks>
         public RepositoryAttribute()
         {
+		value.LogDebug(">>> Entering RepositoryAttribute()");
+		value.LogDebug("<<< Exiting RepositoryAttribute()");
         }
 
         /// <summary>
@@ -73,7 +75,9 @@ namespace log4net.Config
         /// </remarks>
         public RepositoryAttribute(string name)
         {
+			value.LogDebug(">>> Entering RepositoryAttribute(name={Name})", name);
             this.m_name = name;
+			value.LogDebug("<<< Exiting RepositoryAttribute(name={Name})", name);
         }
 
         /// <summary>Gets or sets the name of the logging repository.</summary>

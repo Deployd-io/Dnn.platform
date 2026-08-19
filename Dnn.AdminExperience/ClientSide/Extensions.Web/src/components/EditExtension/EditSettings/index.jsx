@@ -8,8 +8,10 @@ import WrapWithContainer from "./WrapWithContainer";
 import CoreLanguagePack from "../CustomSettings/CoreLanguagePack";
 import ExtensionLanguagePack from "../CustomSettings/ExtensionLanguagePack";
 import IFrameHandler from "./IFrameHandler";
+const logger = console;
 
 function checkIfKnownAuthenticationProvider(name) {
+	logger.debug(`>>> Entering checkIfKnownAuthenticationProvider(name=${name})`);
     switch (name) {
         case "DNN_FacebookAuthentication":
         case "DNN_GoogleAuthentication":
@@ -17,12 +19,14 @@ function checkIfKnownAuthenticationProvider(name) {
         case "DNN_TwitterAuthentication":
             return true;
         default:
+			logger.debug(`<<< Exiting checkIfKnownAuthenticationProvider(name=${name})`);
             return false;
     }
 }
 
 class EditSettings extends Component {
     getSettingsEditor(props) {
+		logger.debug(`>>> Entering getSettingsEditor(props=${props})`);
         switch (props.type) {
             case "Module":
                 return <ModuleSettings {...props} />;
@@ -54,13 +58,16 @@ class EditSettings extends Component {
                     <ExtensionLanguagePack { ...props} disabled={true} />
                 </WrapWithContainer>;
             default:
+				logger.debug(`<<< Exiting getSettingsEditor(props=${props})`);
                 return <IFrameHandler {...props} />;
         }
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
 
+		logger.debug('<<< Exiting render()');
         return this.getSettingsEditor(props);
     }
 }

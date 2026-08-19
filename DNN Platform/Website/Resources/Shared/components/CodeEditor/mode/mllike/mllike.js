@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,7 +13,9 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode('mllike', function(_config, parserConfig) {
+logger.debug('>>> Entering defineMode()');
   var words = {
     'let': 'keyword',
     'rec': 'keyword',
@@ -44,14 +48,18 @@ CodeMirror.defineMode('mllike', function(_config, parserConfig) {
   for (var prop in extraWords) {
     if (extraWords.hasOwnProperty(prop)) {
       words[prop] = parserConfig.extraWords[prop];
+	logger.debug('<<< Exiting defineMode()');
     }
   }
 
   function tokenBase(stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
     var ch = stream.next();
 
+	logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
     if (ch === '"') {
       state.tokenize = tokenString;
+	logger.debug(`tokenBase(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
       return state.tokenize(stream, state);
     }
     if (ch === '(') {

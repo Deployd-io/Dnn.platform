@@ -4,32 +4,43 @@ import Dropdown from "../../Dropdown";
 
 import "./style.less";
 import Service from "./Service";
+const logger = console;
 function format() {
+	logger.debug('>>> Entering format()');
     let format = arguments[0];
     let methodsArgs = arguments;
     return format.replace(/{(\d+)}/gi, function (value, index) {
         let argsIndex = parseInt(index) + 1;
+		logger.debug(`<<< Exiting function(argsIndex=${argsIndex})`);
+	logger.debug('<<< Exiting format()');
         return methodsArgs[argsIndex];
     });
 }
 class RoleGroupFilter extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             roleGroups: [],
             selectedGroup: { id: -1, name: props.localization.globalGroupsText }
         };
 
+		logger.debug(`constructor(props=${props}): this.state → ${this.state}`);
         this.groupsDropdown = React.createRef();
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.getRoleGroups();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     closeDropdown() {
+		logger.debug('>>> Entering closeDropdown()');
         /*This is done in order to keep the dropdown closed on click on edit/delete*/
         let {state} = this.groupsDropdown;
+		logger.debug('<<< Exiting closeDropdown()');
         state.dropDownOpen = true;
         this.groupsDropdown.setState({
             state
@@ -37,6 +48,7 @@ class RoleGroupFilter extends Component {
     }
 
     getRoleGroups(callback) {
+		logger.debug(`>>> Entering getRoleGroups(callback=${callback})`);
         const { props, state } = this;
 
         if (state.roleGroups.length > 0) {
@@ -52,15 +64,19 @@ class RoleGroupFilter extends Component {
             }, () => {
                 if (typeof callback === "function") {
                     callback.call(this);
+					logger.debug(`<<< Exiting getRoleGroups(callback=${callback})`);
                 }
             });
         });
     }
 
     BuildRoleGroupsOptions() {
+		logger.debug('>>> Entering BuildRoleGroupsOptions()');
         const { props, state } = this;
 
         let roleGroupsOptions = state.roleGroups.map((group) => {
+		logger.debug(`BuildRoleGroupsOptions(): roleGroupsOptions → ${roleGroupsOptions}`);
+		logger.debug('<<< Exiting BuildRoleGroupsOptions()');
             return { label: group.name, value: group.id };
         });
 
@@ -72,16 +88,20 @@ class RoleGroupFilter extends Component {
 
         let selectedGroup = { id: group.value, name: group.label };
         this.setState({ selectedGroup: selectedGroup }, function () {
+			logger.debug(`>>> Entering setState(selectedGroup=${selectedGroup})`);
             if (typeof props.onChange === "function") {
                 props.onChange(this.state.selectedGroup);
+				logger.debug(`<<< Exiting setState(selectedGroup=${selectedGroup})`);
             }
         });
     }
 
     getRoleGroupsDropDown() {
+		logger.debug('>>> Entering getRoleGroupsDropDown()');
         const {props, state} = this;
 
         let roleGroupsOptions = this.BuildRoleGroupsOptions();
+		logger.debug(`getRoleGroupsDropDown(): roleGroupsOptions → ${roleGroupsOptions}`);
 
         let GroupsDropDown = <Dropdown
             withBorder={false}
@@ -93,13 +113,16 @@ class RoleGroupFilter extends Component {
             prependWith={props.localization.filterByGroup}
         />;
 
+		logger.debug('<<< Exiting getRoleGroupsDropDown()');
         return GroupsDropDown;
     }
 
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className={"groups-filter" + (state.roleGroups.length === 0 ? "no-group" : "") }>
                 {this.getRoleGroupsDropDown() }

@@ -1,6 +1,9 @@
 import serviceFramework from "./serviceFramework";
+const logger = console;
 
 const convertKeyValueToLabelValue = function (list) {
+	logger.debug(`>>> Entering convertKeyValueToLabelValue(list=${list})`);
+	logger.debug(`<<< Exiting convertKeyValueToLabelValue(list=${list})`);
     return list.map((item) => {
         return {
             value: item.Value,
@@ -10,6 +13,8 @@ const convertKeyValueToLabelValue = function (list) {
 };
 
 const getPerformanceSettings = function () {
+	logger.debug('>>> Entering getPerformanceSettings()');
+	logger.debug('<<< Exiting getPerformanceSettings()');
     return serviceFramework.get("ServerSettingsPerformance", "GetPerformanceSettings")
         .then(response => {
             return {
@@ -37,6 +42,7 @@ const getPerformanceSettings = function () {
 };
 
 const save = function (performanceSettings) {
+	logger.debug(`>>> Entering save(performanceSettings=${performanceSettings})`);
     const request = {
         CachingProvider: performanceSettings.cachingProvider,
         PageStatePersistence: performanceSettings.pageStatePersistence,
@@ -51,11 +57,14 @@ const save = function (performanceSettings) {
         CurrentPortalVersion: performanceSettings.currentPortalVersion,
     };
 
+	logger.debug(`<<< Exiting save(performanceSettings=${performanceSettings})`);
     return serviceFramework.post("ServerSettingsPerformance", "UpdatePerformanceSettings", request);
 };
 
 const incrementVersion = function (isGlobalSetting) {
+	logger.debug(`>>> Entering incrementVersion(isGlobalSetting=${isGlobalSetting})`);
     if (isGlobalSetting) {
+	logger.debug(`<<< Exiting incrementVersion(isGlobalSetting=${isGlobalSetting})`);
         return serviceFramework.post("ServerSettingsPerformance", "IncrementHostVersion");
     }
 

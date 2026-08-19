@@ -9,17 +9,23 @@ namespace DotNetNuke.Web.Client.Cdf
     /// <summary>A file.</summary>
     internal class BasicFile
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(BasicFile));
         /// <summary>Initializes a new instance of the <see cref="BasicFile"/> class.</summary>
         /// <param name="type">The dependency type.</param>
         public BasicFile(ClientDependencyType type)
         {
+			Logger.LogDebug(">>> Entering BasicFile(type={Type})", type);
             this.DependencyType = type;
             this.HtmlAttributes = new Dictionary<string, string>();
+			Logger.LogDebug("BasicFile(type={Type}): this.DependencyType → {Arg1}", type, this.DependencyType);
             this.Priority = 100;
+			Logger.LogDebug("BasicFile(type={Type}): this.Priority → {Arg1}", type, this.Priority);
             this.Group = 100;
             this.Name = string.Empty;
             this.Version = string.Empty;
+			Logger.LogDebug("BasicFile(type={Type}): this.Group → {Arg1}", type, this.Group);
             this.ForceVersion = false;
+			Logger.LogDebug("<<< Exiting BasicFile(type={Type})", type);
         }
 
         /// <summary>Gets or sets the file path.</summary>

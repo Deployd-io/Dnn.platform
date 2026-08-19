@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -69,6 +70,8 @@
         defs: this.options.defs || [],
         plugins: plugins
       });
+	logger.debug(`>>> Entering getFile(ts=${ts},name=${name},c=${c})`);
+	logger.debug(`<<< Exiting getFile(ts=${ts},name=${name},c=${c})`);
     }
     this.trackChange = function(doc, change) { trackChange(self, doc, change); };
 
@@ -132,6 +135,8 @@
           data = self.options.responseFilter(doc, query, request, error, data);
         c(error, data);
       });
+	logger.debug(`>>> Entering selectName(ts=${ts},cm=${cm})`);
+	logger.debug(`<<< Exiting selectName(ts=${ts},cm=${cm})`);
     },
 
     destroy: function () {
@@ -157,6 +162,7 @@
   }
 
   function findDoc(ts, doc, name) {
+	logger.debug(`>>> Entering findDoc(ts=${ts},doc=${doc},name=${name})`);
     for (var n in ts.docs) {
       var cur = ts.docs[n];
       if (cur.doc == doc) return cur;
@@ -165,16 +171,20 @@
       n = "[doc" + (i || "") + "]";
       if (!ts.docs[n]) { name = n; break; }
     }
+	logger.debug(`<<< Exiting findDoc(ts=${ts},doc=${doc},name=${name})`);
     return ts.addDoc(name, doc);
   }
 
   function resolveDoc(ts, id) {
+	logger.debug(`>>> Entering resolveDoc(ts=${ts},id=${id})`);
     if (typeof id == "string") return ts.docs[id];
     if (id instanceof CodeMirror) id = id.getDoc();
     if (id instanceof CodeMirror.Doc) return findDoc(ts, id);
+	logger.debug(`<<< Exiting resolveDoc(ts=${ts},id=${id})`);
   }
 
   function trackChange(ts, doc, change) {
+	logger.debug(`>>> Entering trackChange(ts=${ts},doc=${doc},change=${change})`);
     var data = findDoc(ts, doc);
 
     var argHints = ts.cachedArgHints;
@@ -191,20 +201,29 @@
 
     if (doc.lineCount() > bigDoc && change.to - changed.from > 100) setTimeout(function() {
       if (data.changed && data.changed.to - data.changed.from > 100) sendDoc(ts, data);
+	logger.debug('>>> Entering setTimeout()');
     }, 200);
+	logger.debug('<<< Exiting setTimeout()');
+	logger.debug(`<<< Exiting trackChange(ts=${ts},doc=${doc},change=${change})`);
   }
 
   function sendDoc(ts, doc) {
+	logger.debug(`>>> Entering sendDoc(ts=${ts},doc=${doc})`);
     ts.server.request({files: [{type: "full", name: doc.name, text: docValue(ts, doc)}]}, function(error) {
+	logger.debug('>>> Entering function()');
       if (error) window.console.error(error);
       else doc.changed = null;
     });
+	logger.debug('<<< Exiting function()');
+	logger.debug(`<<< Exiting sendDoc(ts=${ts},doc=${doc})`);
   }
 
   // Completion
 
   function hint(ts, cm, c) {
+	logger.debug(`>>> Entering hint(ts=${ts},cm=${cm},c=${c})`);
     ts.request(cm, {type: "completions", types: true, docs: true, urls: true}, function(error, data) {
+	logger.debug(`>>> Entering request(cm=${cm},completions=${completions})`);
       if (error) return showError(ts, cm, error);
       var completions = [], after = "";
       var from = data.start, to = data.end;
@@ -232,13 +251,17 @@
           tooltip = makeTooltip(node.parentNode.getBoundingClientRect().right + window.pageXOffset,
                                 node.getBoundingClientRect().top + window.pageYOffset, content);
           tooltip.className += " " + cls + "hint-doc";
+		logger.debug(`<<< Exiting on(obj=${obj},content=${content})`);
         }
       });
       c(obj);
     });
+	logger.debug(`<<< Exiting request(cm=${cm},completions=${completions})`);
+	logger.debug(`<<< Exiting hint(ts=${ts},cm=${cm},c=${c})`);
   }
 
   function typeToIcon(type) {
+	logger.debug(`>>> Entering typeToIcon(type=${type})`);
     var suffix;
     if (type == "?") suffix = "unknown";
     else if (type == "number" || type == "string" || type == "bool") suffix = type;
@@ -251,6 +274,7 @@
   // Type queries
 
   function showContextInfo(ts, cm, pos, queryName, c) {
+	logger.debug(`>>> Entering showContextInfo(ts=${ts},cm=${cm},pos=${pos},queryName=${queryName},c=${c})`);
     ts.request(cm, queryName, function(error, data) {
       if (error) return showError(ts, cm, error);
       if (ts.options.typeTip) {
@@ -269,11 +293,13 @@
       tempTooltip(cm, tip, ts);
       if (c) c();
     }, pos);
+	logger.debug(`<<< Exiting showContextInfo(ts=${ts},cm=${cm},pos=${pos},queryName=${queryName},c=${c})`);
   }
 
   // Maintaining argument hints
 
   function updateArgHints(ts, cm) {
+	logger.debug(`>>> Entering updateArgHints(ts=${ts},cm=${cm})`);
     closeArgHints(ts);
 
     if (cm.somethingSelected()) return;
@@ -294,6 +320,8 @@
       }
       ch = lex.column - extra;
       if (str.charAt(ch) == "(") {found = true; break;}
+	logger.debug(`>>> Entering inner(varName=${varName})`);
+	logger.debug(`<<< Exiting inner(varName=${varName})`);
     }
     if (!found) return;
 
@@ -313,9 +341,11 @@
       };
       showArgHints(ts, cm, argPos);
     });
+	logger.debug(`<<< Exiting updateArgHints(ts=${ts},cm=${cm})`);
   }
 
   function showArgHints(ts, cm, pos) {
+	logger.debug(`>>> Entering showArgHints(ts=${ts},cm=${cm},pos=${pos})`);
     closeArgHints(ts);
 
     var cache = ts.cachedArgHints, tp = cache.type;
@@ -334,16 +364,20 @@
     if (tp.rettype) tip.appendChild(elt("span", cls + "type", tp.rettype));
     var place = cm.cursorCoords(null, "page");
     ts.activeArgHints = makeTooltip(place.right + 1, place.bottom, tip);
+	logger.debug(`<<< Exiting showArgHints(ts=${ts},cm=${cm},pos=${pos})`);
   }
 
   function parseFnType(text) {
+	logger.debug(`>>> Entering parseFnType(text=${text})`);
     var args = [], pos = 3;
 
     function skipMatching(upto) {
+	logger.debug(`>>> Entering skipMatching(upto=${upto})`);
       var depth = 0, start = pos;
       for (;;) {
         var next = text.charAt(pos);
         if (upto.test(next) && !depth) return text.slice(start, pos);
+		logger.debug(`<<< Exiting skipMatching(upto=${upto})`);
         if (/[{\[\(]/.test(next)) ++depth;
         else if (/[}\]\)]/.test(next)) --depth;
         ++pos;
@@ -364,6 +398,7 @@
 
     var rettype = text.slice(pos).match(/^\) -> (.*)$/);
 
+	logger.debug(`<<< Exiting parseFnType(text=${text})`);
     return {args: args, rettype: rettype && rettype[1]};
   }
 
@@ -398,21 +433,26 @@
   }
 
   function jumpBack(ts, cm) {
+	logger.debug(`>>> Entering jumpBack(ts=${ts},cm=${cm})`);
     var pos = ts.jumpStack.pop(), doc = pos && ts.docs[pos.file];
     if (!doc) return;
     moveTo(ts, findDoc(ts, cm.getDoc()), doc, pos.start, pos.end);
+	logger.debug(`<<< Exiting jumpBack(ts=${ts},cm=${cm})`);
   }
 
   function moveTo(ts, curDoc, doc, start, end) {
+	logger.debug(`>>> Entering moveTo(ts=${ts},curDoc=${curDoc},doc=${doc},start=${start},end=${end})`);
     doc.doc.setSelection(start, end);
     if (curDoc != doc && ts.options.switchToDoc) {
       closeArgHints(ts);
       ts.options.switchToDoc(doc.name, doc.doc);
+	logger.debug(`<<< Exiting moveTo(ts=${ts},curDoc=${curDoc},doc=${doc},start=${start},end=${end})`);
     }
   }
 
   // The {line,ch} representation of positions makes this rather awkward.
   function findContext(doc, data) {
+	logger.debug(`>>> Entering findContext(doc=${doc},data=${data})`);
     var before = data.context.slice(0, data.contextOffset).split("\n");
     var startLine = data.start.line - (before.length - 1);
     var start = Pos(startLine, (before.length == 1 ? data.start.ch : doc.getLine(startLine).length) - before[0].length);
@@ -439,12 +479,15 @@
       var end = Pos(nearest.line, nearest.ch + (data.end.ch - data.start.ch));
     else
       var end = Pos(nearest.line + (data.end.line - data.start.line), data.end.ch);
+	logger.debug(`<<< Exiting findContext(doc=${doc},data=${data})`);
     return {start: nearest, end: end};
   }
 
   function atInterestingExpression(cm) {
+	logger.debug(`>>> Entering atInterestingExpression(cm=${cm})`);
     var pos = cm.getCursor("end"), tok = cm.getTokenAt(pos);
     if (tok.start < pos.ch && tok.type == "comment") return false;
+	logger.debug(`<<< Exiting atInterestingExpression(cm=${cm})`);
     return /[\w)\]]/.test(cm.getLine(pos.line).slice(Math.max(pos.ch - 1, 0), pos.ch + 1));
   }
 
@@ -481,6 +524,7 @@
 
   var nextChangeOrig = 0;
   function applyChanges(ts, changes) {
+	logger.debug(`>>> Entering applyChanges(ts=${ts},changes=${changes})`);
     var perFile = Object.create(null);
     for (var i = 0; i < changes.length; ++i) {
       var ch = changes[i];
@@ -494,6 +538,7 @@
       for (var i = 0; i < chs.length; ++i) {
         var ch = chs[i];
         known.doc.replaceRange(ch.text, ch.start, ch.end, origin);
+		logger.debug(`<<< Exiting applyChanges(ts=${ts},changes=${changes})`);
       }
     }
   }
@@ -501,6 +546,7 @@
   // Generic request-building helper
 
   function buildRequest(ts, doc, query, pos) {
+	logger.debug(`>>> Entering buildRequest(ts=${ts},doc=${doc},query=${query},pos=${pos})`);
     var files = [], offsetLines = 0, allowFragments = !query.fullDocs;
     if (!allowFragments) delete query.fullDocs;
     if (typeof query == "string") query = {type: query};
@@ -539,10 +585,12 @@
       }
     }
 
+	logger.debug(`<<< Exiting buildRequest(ts=${ts},doc=${doc},query=${query},pos=${pos})`);
     return {query: query, files: files};
   }
 
   function getFragmentAround(data, start, end) {
+	logger.debug(`>>> Entering getFragmentAround(data=${data},start=${start},end=${end})`);
     var doc = data.doc;
     var minIndent = null, minLine = null, endLine, tabSize = 4;
     for (var p = start.line - 1, min = Math.max(0, p - 50); p >= min; --p) {
@@ -563,6 +611,7 @@
     }
     var from = Pos(minLine, 0);
 
+	logger.debug(`<<< Exiting getFragmentAround(data=${data},start=${start},end=${end})`);
     return {type: "part",
             name: data.name,
             offsetLines: from.line,
@@ -574,6 +623,7 @@
   var cmpPos = CodeMirror.cmpPos;
 
   function elt(tagname, cls /*, ... elts*/) {
+	logger.debug(`>>> Entering elt(tagname=${tagname})`);
     var e = document.createElement(tagname);
     if (cls) e.className = cls;
     for (var i = 2; i < arguments.length; ++i) {
@@ -581,10 +631,12 @@
       if (typeof elt == "string") elt = document.createTextNode(elt);
       e.appendChild(elt);
     }
+	logger.debug(`<<< Exiting elt(tagname=${tagname})`);
     return e;
   }
 
   function dialog(cm, text, f) {
+	logger.debug(`>>> Entering dialog(cm=${cm},text=${text},f=${f})`);
     if (cm.openDialog)
       cm.openDialog(text + ": <input type=text>", f);
     else

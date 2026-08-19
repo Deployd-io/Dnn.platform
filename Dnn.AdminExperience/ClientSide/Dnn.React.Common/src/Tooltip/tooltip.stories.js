@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Tooltip from "./index";
+const logger = console;
 
 export default {
     component: Tooltip,
@@ -56,14 +57,21 @@ export const NotRendered = () => (
 class DynamicRenderedTooltip extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {rendered: false};
+		logger.debug(`constructor(): this.state → ${this.state}`);
+		logger.debug('<<< Exiting constructor()');
     }
 
     handleToggleRender() {
+		logger.debug('>>> Entering handleToggleRender()');
         this.setState({rendered: !this.state.rendered});
+		logger.debug('<<< Exiting handleToggleRender()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <div style={{marginTop:100, marginLeft:100,}}>
                 <p>This tooltip should not be rendered until you click the button</p>

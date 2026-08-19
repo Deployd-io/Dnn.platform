@@ -9,15 +9,18 @@ using DotNetNuke.Web.Api;
 /// <summary>A web API service route mapper for internal services.</summary>
 public class ServiceRouteMapper : IServiceRouteMapper
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ServiceRouteMapper));
     private static readonly string[] Namespaces = ["DotNetNuke.Web.InternalServices",];
 
     /// <inheritdoc />
     public void RegisterRoutes(IMapRoute mapRouteManager)
     {
+		Logger.LogDebug(">>> Entering RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
         mapRouteManager.MapHttpRoute(
             "InternalServices",
             "default",
             "{controller}/{action}",
             Namespaces);
+			Logger.LogDebug("<<< Exiting RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
     }
 }

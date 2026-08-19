@@ -12,6 +12,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
     /// <summary>Provides a mechanism to create custom HTML markup compatible with the ASP.NET MVC model binders and templates.</summary>
     public static class HtmlValueExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HtmlValueExtensions));
         /// <summary>Provides a mechanism to create custom HTML markup compatible with the ASP.NET MVC model binders and templates.</summary>
         ///
         /// <returns>
@@ -20,6 +21,9 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="name">The name of the model.</param>
         public static MvcHtmlString Value(this DnnHtmlHelper html, string name)
         {
+			Logger.LogDebug(">>> Entering Value(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting Value(html={Html},name={Name})", html, name);
+			Logger.LogDebug("<<< Exiting Value(html={Html},name={Name},format={Format})", html, name, format);
             return html.HtmlHelper.Value(name);
         }
 
@@ -42,6 +46,9 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="expression">An expression that identifies the object that contains the properties to expose.</param><typeparam name="TModel">The model.</typeparam><typeparam name="TProperty">The property.</typeparam>
         public static MvcHtmlString ValueFor<TModel, TProperty>(this DnnHtmlHelper<TModel> html, Expression<Func<TModel, TProperty>> expression)
         {
+			Logger.LogDebug(">>> Entering ValueFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting ValueFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting ValueFor(html={Html},expression={Expression},format={Format})", html, expression, format);
             return html.HtmlHelper.ValueFor(expression);
         }
 
@@ -64,6 +71,9 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param>
         public static MvcHtmlString ValueForModel(this DnnHtmlHelper html)
         {
+			Logger.LogDebug(">>> Entering ValueForModel(html={Html})", html);
+			Logger.LogDebug("<<< Exiting ValueForModel(html={Html})", html);
+			Logger.LogDebug("<<< Exiting ValueForModel(html={Html},format={Format})", html, format);
             return html.HtmlHelper.ValueForModel();
         }
 

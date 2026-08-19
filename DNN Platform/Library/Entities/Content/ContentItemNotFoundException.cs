@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class ContentItemNotFoundException : ApplicationException
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ContentItemNotFoundException));
     /// <inheritdoc />
     public ContentItemNotFoundException()
     {
+	Logger.LogDebug(">>> Entering ContentItemNotFoundException()");
+	Logger.LogDebug("<<< Exiting ContentItemNotFoundException()");
     }
 
     /// <inheritdoc />
     public ContentItemNotFoundException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering ContentItemNotFoundException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting ContentItemNotFoundException(message={Message})", message);
 
     /// <inheritdoc />
     public ContentItemNotFoundException(string message, Exception innerException)

@@ -22,14 +22,20 @@ namespace Dnn.PersonaBar.Vocabularies.Components
 
         public VocabulariesController()
         {
+			eventLogger.LogDebug(">>> Entering VocabulariesController()");
             this.termController = new TermController();
             this.vocabularyController = new VocabularyController();
+			eventLogger.LogDebug("VocabulariesController(): vocabularyController → {VocabularyController}", vocabularyController);
+			eventLogger.LogDebug("VocabulariesController(): termController → {TermController}", termController);
             this.validator = new Validator(new DataAnnotationsObjectValidator());
+			eventLogger.LogDebug("VocabulariesController(): validator → {Validator}", validator);
             this.validator.Validators.Add(new VocabularyNameValidator(this.vocabularyController, this.termController));
+			eventLogger.LogDebug("<<< Exiting VocabulariesController()");
         }
 
         public List<Vocabulary> GetVocabularies(int portalId, int pageIndex, int pageSize, int scopeTypeId, out int total)
         {
+			eventLogger.LogDebug(">>> Entering GetVocabularies(portalId={PortalId},pageIndex={PageIndex},pageSize={PageSize},scopeTypeId={ScopeTypeId})", portalId, pageIndex, pageSize, scopeTypeId);
             var vocabularies = this.vocabularyController.GetVocabularies().Where(v => v.ScopeType.ScopeType == "Application" || (v.ScopeType.ScopeType == "Portal" && v.ScopeId == portalId));
             if (scopeTypeId != Null.NullInteger)
             {
@@ -37,63 +43,83 @@ namespace Dnn.PersonaBar.Vocabularies.Components
             }
 
             total = vocabularies.Count();
+			eventLogger.LogDebug("GetVocabularies(portalId={PortalId},pageIndex={PageIndex},pageSize={PageSize},scopeTypeId={ScopeTypeId}): total → {Total}", portalId, pageIndex, pageSize, scopeTypeId, total);
+			eventLogger.LogDebug("<<< Exiting GetVocabularies(portalId={PortalId},pageIndex={PageIndex},pageSize={PageSize},scopeTypeId={ScopeTypeId})", portalId, pageIndex, pageSize, scopeTypeId);
             return vocabularies.Skip(pageIndex * pageSize).Take(pageSize).ToList();
         }
 
         public bool IsSystemVocabulary(int vocabularyId)
         {
+			eventLogger.LogDebug(">>> Entering IsSystemVocabulary(vocabularyId={VocabularyId})", vocabularyId);
+			eventLogger.LogDebug("<<< Exiting IsSystemVocabulary(vocabularyId={VocabularyId})", vocabularyId);
             return this.vocabularyController.GetVocabularies().Any(v => v.VocabularyId == vocabularyId && v.IsSystem);
         }
 
         public int AddVocabulary(Vocabulary vocabulary)
         {
+			eventLogger.LogDebug(">>> Entering AddVocabulary(vocabulary={Vocabulary})", vocabulary);
             if (vocabulary.ScopeType.ScopeType == Constants.VocabularyScopeTypeWebsite)
             {
                 vocabulary.ScopeId = PortalSettings.Current.PortalId;
+				eventLogger.LogDebug("AddVocabulary(vocabulary={Vocabulary}): vocabulary.ScopeId → {Arg1}", vocabulary, vocabulary.ScopeId);
             }
 
             var result = this.validator.ValidateObject(vocabulary);
+			eventLogger.LogDebug("AddVocabulary(vocabulary={Vocabulary}): result → {Result}", vocabulary, result);
             if (result.IsValid)
             {
                 return this.vocabularyController.AddVocabulary(vocabulary);
             }
             else
             {
+				eventLogger.LogWarning("Throwing VocabularyNameAlreadyExistsException from AddVocabulary(vocabulary={Vocabulary})", vocabulary);
+			eventLogger.LogDebug("<<< Exiting AddVocabulary(vocabulary={Vocabulary})", vocabulary);
                 throw new VocabularyNameAlreadyExistsException();
             }
         }
 
         public void UpdateVocabulary(Vocabulary vocabulary)
         {
+			eventLogger.LogDebug(">>> Entering UpdateVocabulary(vocabulary={Vocabulary})", vocabulary);
             if (vocabulary.ScopeType.ScopeType == Constants.VocabularyScopeTypeWebsite)
             {
                 vocabulary.ScopeId = PortalSettings.Current.PortalId;
+				eventLogger.LogDebug("UpdateVocabulary(vocabulary={Vocabulary}): vocabulary.ScopeId → {Arg1}", vocabulary, vocabulary.ScopeId);
             }
 
             var result = this.validator.ValidateObject(vocabulary);
+			eventLogger.LogDebug("UpdateVocabulary(vocabulary={Vocabulary}): result → {Result}", vocabulary, result);
             if (result.IsValid)
             {
                 this.vocabularyController.UpdateVocabulary(vocabulary);
             }
             else
             {
+				eventLogger.LogWarning("Throwing VocabularyValidationException from UpdateVocabulary(vocabulary={Vocabulary})", vocabulary);
+			eventLogger.LogDebug("<<< Exiting UpdateVocabulary(vocabulary={Vocabulary})", vocabulary);
                 throw new VocabularyValidationException();
             }
         }
 
         public void DeleteVocabulary(Vocabulary vocabulary)
         {
+			eventLogger.LogDebug(">>> Entering DeleteVocabulary(vocabulary={Vocabulary})", vocabulary);
             this.vocabularyController.DeleteVocabulary(vocabulary);
+			eventLogger.LogDebug("<<< Exiting DeleteVocabulary(vocabulary={Vocabulary})", vocabulary);
         }
 
         public List<Term> GetTermsByVocabulary(int vocabularyId)
         {
+			eventLogger.LogDebug(">>> Entering GetTermsByVocabulary(vocabularyId={VocabularyId})", vocabularyId);
             var vocabulary = this.vocabularyController.GetVocabularies().SingleOrDefault(v => v.VocabularyId == vocabularyId);
+			eventLogger.LogDebug("GetTermsByVocabulary(vocabularyId={VocabularyId}): vocabulary → {Vocabulary}", vocabularyId, vocabulary);
+			eventLogger.LogDebug("<<< Exiting GetTermsByVocabulary(vocabularyId={VocabularyId})", vocabularyId);
             return this.termController.GetTermsByVocabulary(vocabularyId).ToList();
         }
 
         public int AddTerm(Term term)
         {
+			eventLogger.LogDebug(">>> Entering AddTerm(term={Term})", term);
             var result = this.validator.ValidateObject(term);
             if (result.IsValid)
             {
@@ -101,12 +127,15 @@ namespace Dnn.PersonaBar.Vocabularies.Components
             }
             else
             {
+				eventLogger.LogWarning("Throwing TermValidationException from AddTerm(term={Term})", term);
+			eventLogger.LogDebug("<<< Exiting AddTerm(term={Term})", term);
                 throw new TermValidationException();
             }
         }
 
         public void UpdateTerm(Term term)
         {
+			eventLogger.LogDebug(">>> Entering UpdateTerm(term={Term})", term);
             var result = this.validator.ValidateObject(term);
             if (result.IsValid)
             {
@@ -114,27 +143,35 @@ namespace Dnn.PersonaBar.Vocabularies.Components
             }
             else
             {
+				eventLogger.LogWarning("Throwing TermValidationException from UpdateTerm(term={Term})", term);
+			eventLogger.LogDebug("<<< Exiting UpdateTerm(term={Term})", term);
                 throw new TermValidationException();
             }
         }
 
         public void DeleteTerm(Term term)
         {
+			eventLogger.LogDebug(">>> Entering DeleteTerm(term={Term})", term);
             this.termController.DeleteTerm(term);
+			eventLogger.LogDebug("<<< Exiting DeleteTerm(term={Term})", term);
         }
 
         public Term GetTerm(int termId)
         {
+			eventLogger.LogDebug(">>> Entering GetTerm(termId={TermId})", termId);
+			eventLogger.LogDebug("<<< Exiting GetTerm(termId={TermId})", termId);
             return this.termController.GetTerm(termId);
         }
 
         private static void AddChildNodes(List<Term> termList, TermDto parentNode)
         {
+			eventLogger.LogDebug(">>> Entering AddChildNodes(termList={TermList},parentNode={ParentNode})", termList, parentNode);
             if (parentNode.ChildTerms != null)
             {
                 parentNode.ChildTerms.Clear();
                 var parentId = parentNode.TermId;
                 var terms = termList.Where(v => v.ParentTermId == parentId);
+				eventLogger.LogDebug("AddChildNodes(termList={TermList},parentNode={ParentNode}): terms → {Terms}", termList, parentNode, terms);
 
                 foreach (var term in terms)
                 {
@@ -154,6 +191,7 @@ namespace Dnn.PersonaBar.Vocabularies.Components
                     }
                 }
             }
+			eventLogger.LogDebug("<<< Exiting AddChildNodes(termList={TermList},parentNode={ParentNode})", termList, parentNode);
         }
     }
 }

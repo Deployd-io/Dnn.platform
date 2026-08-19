@@ -6,6 +6,7 @@ import { CommonUsersActions } from "../../../actions";
 import utilities from "utils";
 import { Button, SingleLineInputWithError, GridSystem, GridCell } from "@dnnsoftware/dnn-react-common";
 import "./style.less";
+const logger = console;
 
 const inputStyle = { width: "100%" };
 const blankChangePassword = {
@@ -16,6 +17,7 @@ const blankChangePassword = {
 class ChangePassword extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             changePassword: Object.assign({}, blankChangePassword),
             errors: {
@@ -25,18 +27,24 @@ class ChangePassword extends Component {
             },
             confirmPassword: ""
         };
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
     componentWillMount() {
+		logger.debug('>>> Entering componentWillMount()');
         let {changePassword} = this.state;
         changePassword.userId = this.props.userId;
+		logger.debug(`componentWillMount(): changePassword.userId → ${changePassword.userId}`);
         changePassword.password = "";
+		logger.debug('<<< Exiting componentWillMount()');
         this.setState({
             changePassword
         });
     }
     componentWillReceiveProps(newProps) {
+		logger.debug(`>>> Entering componentWillReceiveProps(newProps=${newProps})`);
         this.clear(() => {
             let {changePassword} = this.state;
+			logger.debug(`<<< Exiting componentWillReceiveProps(newProps=${newProps})`);
             changePassword.userId = newProps.userId;
             this.setState({
                 changePassword
@@ -60,10 +68,12 @@ class ChangePassword extends Component {
         }
     }
     save() {
+		logger.debug('>>> Entering save()');
         if (this.validateForm()) {
             this.props.dispatch(CommonUsersActions.changePassword(this.state.changePassword, () => {
                 this.cancel();
                 utilities.notify(Localization.get("ChangeSuccessful"), 3000);
+				logger.debug('<<< Exiting save()');
             }));
         }
     }
@@ -92,6 +102,7 @@ class ChangePassword extends Component {
         return valid;
     }
     clear(callback) {
+		logger.debug(`>>> Entering clear(callback=${callback})`);
         this.setState({
             changePassword: Object.assign({}, blankChangePassword),
             confirmPassword: "",
@@ -103,16 +114,20 @@ class ChangePassword extends Component {
         }, () => {
             if (typeof callback === "function") {
                 callback();
+				logger.debug(`<<< Exiting clear(callback=${callback})`);
             }
         });
     }
     cancel() {
+		logger.debug('>>> Entering cancel()');
         this.clear();
         if (typeof this.props.onCancel === "function")
             this.props.onCancel();
     }
     render() {
+		logger.debug('>>> Entering render()');
         let {state} = this;
+		logger.debug('<<< Exiting render()');
         return this.props.visible && <div className="dnn-user-change-password">
             <GridCell className="do-not-close">
                 <GridCell>
@@ -158,6 +173,8 @@ ChangePassword.defaultProps = {
     visible: true
 };
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         userDetails: state.users.userDetails
     };

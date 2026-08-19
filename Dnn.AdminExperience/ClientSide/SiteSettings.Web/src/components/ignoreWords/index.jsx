@@ -10,22 +10,27 @@ import "./style.less";
 import { Dropdown, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import util from "../../utils";
 import resx from "../../resources";
+const logger = console;
 
 let tableFields = [];
 
 class IgnoreWordsPanel extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             ignoreWords: undefined,
             openId: "",
             culture: ""
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     loadData() {
+		logger.debug('>>> Entering loadData()');
         const { props } = this;
         props.dispatch(SearchActions.getIgnoreWords(props.portalId, props.cultureCode, (data) => {
+			logger.debug('<<< Exiting loadData()');
             this.setState({
                 ignoreWords: Object.assign({}, data),
                 culture: data.CultureCode
@@ -34,6 +39,7 @@ class IgnoreWordsPanel extends Component {
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const { props } = this;
 
         if (tableFields.length === 0) {
@@ -42,9 +48,11 @@ class IgnoreWordsPanel extends Component {
 
         props.dispatch(SearchActions.getCultureList(props.portalId));
         this.loadData();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         const { props } = this;
 
         if (props.ignoreWords) {
@@ -53,17 +61,20 @@ class IgnoreWordsPanel extends Component {
 
             if (portalIdChanged || cultureCodeChanged) {
                 this.loadData();
+				logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
             }
         }
     }
 
     renderHeader() {
+		logger.debug('>>> Entering renderHeader()');
         let tableHeaders = tableFields.map((field) => {
             let className = "words-items header-" + field.id;
             return <div className={className} key={"header-" + field.id}>
                 <span>{field.name}&nbsp; </span>
             </div>;
         });
+		logger.debug('<<< Exiting renderHeader()');
         return <div className="header-row">{tableHeaders}</div>;
     }
 
@@ -136,6 +147,7 @@ class IgnoreWordsPanel extends Component {
     }
 
     getCultureOptions() {
+		logger.debug('>>> Entering getCultureOptions()');
         const {props} = this;
         let options = [];
         if (props.cultures !== undefined) {
@@ -150,13 +162,16 @@ class IgnoreWordsPanel extends Component {
                 };
             });
         }
+		logger.debug('<<< Exiting getCultureOptions()');
         return options;
     }
 
      
     renderedIgnoreWords() {
+		logger.debug('>>> Entering renderedIgnoreWords()');
         const {props} = this;
         if (props.ignoreWords && props.ignoreWords.StopWords) {
+			logger.debug('<<< Exiting renderedIgnoreWords()');
             return (
                 <IgnoreWordsRow
                     wordsId={props.ignoreWords.StopWordsId}
@@ -183,8 +198,10 @@ class IgnoreWordsPanel extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
         let opened = (state.openId === "add");
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 <div className="words-group-items">
@@ -249,6 +266,8 @@ IgnoreWordsPanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         ignoreWords: state.search.ignoreWords,
         tabIndex: state.pagination.tabIndex,

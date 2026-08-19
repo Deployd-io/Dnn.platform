@@ -44,8 +44,10 @@ namespace DNNConnect.CKEditorProvider
         public Options()
             : this(null, null, null, null, null, null, null, null, null)
         {
+		eventLogger.LogDebug(">>> Entering Options()");
         }
 
+		eventLogger.LogDebug("<<< Exiting Options()");
         /// <summary>Initializes a new instance of the <see cref="Options"/> class.</summary>
         /// <param name="portalController">The portal controller.</param>
         /// <param name="appStatus">The application status.</param>
@@ -71,7 +73,11 @@ namespace DNNConnect.CKEditorProvider
         {
             this.eventLogger = eventLogger ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IEventLogger>();
             this.clientResourceController = clientResourceController ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IClientResourceController>();
+			eventLogger.LogDebug("Options(portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},userController={UserController},eventLogger={EventLogger},clientResourceController={ClientResourceController},hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService},moduleController={ModuleController}): clientResourceController → {ClientResourceController1}", portalController, appStatus, hostSettings, userController, eventLogger, clientResourceController, hostSettingsService, portalAliasService, moduleController, clientResourceController);
+			eventLogger.LogDebug("Options(portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},userController={UserController},eventLogger={EventLogger},clientResourceController={ClientResourceController},hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService},moduleController={ModuleController}): portalAliasService → {PortalAliasService1}", portalController, appStatus, hostSettings, userController, eventLogger, clientResourceController, hostSettingsService, portalAliasService, moduleController, portalAliasService);
+			eventLogger.LogDebug("Options(portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},userController={UserController},eventLogger={EventLogger},clientResourceController={ClientResourceController},hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService},moduleController={ModuleController}): moduleController → {ModuleController1}", portalController, appStatus, hostSettings, userController, eventLogger, clientResourceController, hostSettingsService, portalAliasService, moduleController, moduleController);
             this.hostSettingsService = hostSettingsService ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IHostSettingsService>();
+			eventLogger.LogDebug("Options(portalController={PortalController},appStatus={AppStatus},hostSettings={HostSettings},userController={UserController},eventLogger={EventLogger},clientResourceController={ClientResourceController},hostSettingsService={HostSettingsService},portalAliasService={PortalAliasService},moduleController={ModuleController}): hostSettingsService → {HostSettingsService1}", portalController, appStatus, hostSettings, userController, eventLogger, clientResourceController, hostSettingsService, portalAliasService, moduleController, hostSettingsService);
             this.portalAliasService = portalAliasService ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IPortalAliasService>();
             this.moduleController = moduleController ?? HttpContextSource.Current.GetScope().ServiceProvider.GetRequiredService<IModuleController>();
         }
@@ -94,6 +100,7 @@ namespace DNNConnect.CKEditorProvider
         /// <param name="e">The Event Args.</param>
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             JavaScript.RequestRegistration(this.AppStatus, this.eventLogger, this.PortalSettings, CommonJs.jQuery);
             JavaScript.RequestRegistration(this.AppStatus, this.eventLogger, this.PortalSettings, CommonJs.jQueryUI);
             this.clientResourceController.CreateScript(this.ResolveUrl("js/jquery.notification.js")).Register();
@@ -103,18 +110,21 @@ namespace DNNConnect.CKEditorProvider
             this.clientResourceController.CreateStylesheet(this.ResolveUrl("css/Options.css")).Register();
 
             base.OnPreRender(e);
+			eventLogger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <summary>Raises the <see cref="E:Init" /> event.</summary>
         /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
         protected override void OnInit(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnInit(e={E})", e);
             // CODEGEN: This call is required by the ASP.NET Web Form Designer.
             this.InitializeComponent();
             base.OnInit(e);
 
             // Favicon
             this.LoadFavIcon();
+			eventLogger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <summary>Handles the Load event of the Page control.</summary>
@@ -122,8 +132,10 @@ namespace DNNConnect.CKEditorProvider
         /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
         protected void Page_Load(object sender, EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering Page_Load(sender={Sender},e={E})", sender, e);
             ModuleInfo modInfo = null;
 
+			eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): modInfo → {ModInfo}", sender, e, modInfo);
             try
             {
                 // Get ModuleID from Url
@@ -131,6 +143,7 @@ namespace DNNConnect.CKEditorProvider
                 if (!int.TryParse(this.request.QueryString["mid"], NumberStyles.Integer, CultureInfo.InvariantCulture, out moduleId))
                 {
                     moduleId = -1;
+					eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): moduleId → {ModuleId}", sender, e, moduleId);
                 }
 
                 // Get TabId from Url
@@ -138,6 +151,7 @@ namespace DNNConnect.CKEditorProvider
                 if (!int.TryParse(this.request.QueryString["tid"], NumberStyles.Integer, CultureInfo.InvariantCulture, out tabId))
                 {
                     tabId = -1;
+					eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): tabId → {TabId}", sender, e, tabId);
                 }
 
                 if (moduleId != -1 && tabId != -1)
@@ -151,6 +165,7 @@ namespace DNNConnect.CKEditorProvider
             }
             catch (Exception exception)
             {
+				eventLogger.LogError("Exception in Page_Load(sender={Sender},e={E}): {Arg2}", sender, e, exception.Message);
                 Exceptions.ProcessPageLoadException(exception);
 
                 this.ClosePage();
@@ -160,8 +175,11 @@ namespace DNNConnect.CKEditorProvider
             {
                 // Get ModuleID from Url
                 var oEditorOptions = (CKEditorOptions)this.Page.LoadControl("CKEditorOptions.ascx");
+				eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): oEditorOptions → {OEditorOptions}", sender, e, oEditorOptions);
 
                 oEditorOptions.ID = "CKEditor_Options";
+				eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): oEditorOptions.ID → {Arg2}", sender, e, oEditorOptions.ID);
+				eventLogger.LogDebug("Page_Load(sender={Sender},e={E}): oEditorOptions.ModuleConfiguration → {Arg2}", sender, e, oEditorOptions.ModuleConfiguration);
                 oEditorOptions.ModuleConfiguration = modInfo;
 
                 this.phControls.Controls.Add(oEditorOptions);
@@ -172,22 +190,27 @@ namespace DNNConnect.CKEditorProvider
 
                 this.ClosePage();
             }
+			eventLogger.LogDebug("<<< Exiting Page_Load(sender={Sender},e={E})", sender, e);
         }
 
         /// <summary>Closes the page.</summary>
         private void ClosePage()
         {
+			eventLogger.LogDebug(">>> Entering ClosePage()");
             this.Page.ClientScript.RegisterStartupScript(
                 this.GetType(), "closeScript", "javascript:self.close();", true);
+				eventLogger.LogDebug("<<< Exiting ClosePage()");
         }
 
         /// <summary>Gets the portal settings.</summary>
         /// <returns>The Portal Settings.</returns>
         private IPortalSettings GetPortalSettings()
         {
+			eventLogger.LogDebug(">>> Entering GetPortalSettings()");
             int iTabId = 0, iPortalId = 0;
 
             IPortalSettings portalSettings;
+			eventLogger.LogDebug("GetPortalSettings(): iTabId → {ITabId}", iTabId);
 
             try
             {
@@ -200,19 +223,23 @@ namespace DNNConnect.CKEditorProvider
                 {
                     iPortalId = int.Parse(this.request.QueryString["PortalID"]);
                 }
+				eventLogger.LogDebug("GetPortalSettings(): iPortalId → {IPortalId}", iPortalId);
 
                 string sDomainName = Globals.GetDomainName(this.Request, true);
 
                 string sPortalAlias = this.portalAliasService.GetPortalAliasByPortal(iPortalId, sDomainName);
 
                 var objPortalAliasInfo = this.portalAliasService.GetPortalAlias(sPortalAlias);
+				eventLogger.LogDebug("GetPortalSettings(): objPortalAliasInfo → {ObjPortalAliasInfo}", objPortalAliasInfo);
                 portalSettings = PortalSettings.Create(iTabId, objPortalAliasInfo);
             }
             catch (Exception)
             {
+				eventLogger.LogError("Exception in GetPortalSettings(): {Arg0}", Exception.Message);
                 portalSettings = (IPortalSettings)HttpContext.Current.Items["PortalSettings"];
             }
 
+			eventLogger.LogDebug("<<< Exiting GetPortalSettings()");
             return portalSettings;
         }
 
@@ -222,13 +249,18 @@ namespace DNNConnect.CKEditorProvider
         /// </summary>
         private void InitializeComponent()
         {
+			eventLogger.LogDebug(">>> Entering InitializeComponent()");
             this.curPortalSettings = this.GetPortalSettings();
+			eventLogger.LogDebug("InitializeComponent(): curPortalSettings → {CurPortalSettings}", curPortalSettings);
+			eventLogger.LogDebug("<<< Exiting InitializeComponent()");
         }
 
         /// <summary>Load Favicon from Current Portal Home Directory.</summary>
         private void LoadFavIcon()
         {
+			eventLogger.LogDebug(">>> Entering LoadFavIcon()");
             this.favicon.Controls.Add(new LiteralControl(DotNetNuke.UI.Internals.FavIcon.GetHeaderLink(this.HostSettings, this.curPortalSettings.PortalId)));
+			eventLogger.LogDebug("<<< Exiting LoadFavIcon()");
         }
     }
 }

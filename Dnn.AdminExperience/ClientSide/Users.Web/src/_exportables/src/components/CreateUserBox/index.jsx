@@ -7,6 +7,7 @@ import {validateEmail} from "../../helpers";
 import utilities from "utils";
 import styles from "./style.module.less";
 import Password from "../common/Password";
+const logger = console;
 import { GridCell, GridSystem, SingleLineInputWithError, Button, Switch, Checkbox } from "@dnnsoftware/dnn-react-common";
 
 
@@ -27,6 +28,7 @@ const newUserRegistrationDetails = {
 class CreateUserBox extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             UserDetails: Object.assign({}, newUserRegistrationDetails),
             confirmPassword: "",
@@ -43,13 +45,17 @@ class CreateUserBox extends Component {
             }
         };
         this.submitted = false;
+		logger.debug(`constructor(props=${props}): this.submitted → ${this.submitted}`);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     onChangePassword(event) {
+		logger.debug(`>>> Entering onChangePassword(event=${event})`);
         this.setState({
             UserDetails: Object.assign(this.state.UserDetails, {password : event.target.value}),
             errors: Object.assign(this.state.errors, {password:false})
         });
+		logger.debug(`<<< Exiting onChangePassword(event=${event})`);
     }
 
     onChange(key, item) {
@@ -69,21 +75,34 @@ class CreateUserBox extends Component {
         });
     }
     save() {
+		logger.debug('>>> Entering save()');
         this.submitted = true;
         if (this.validateForm()) {
             this.props.save(CommonUsersActions.createUser(this.state.UserDetails, this.props.filter, () => {
                 this.cancel();
                 utilities.notify(Localization.get("UserCreated"), 3000);
+				logger.debug('<<< Exiting save()');
             }));
         }
     }
     
     clearForm(callback) {
+		logger.debug(`>>> Entering clearForm(callback=${callback})`);
         let {UserDetails} = this.state;
         UserDetails = Object.assign({}, newUserRegistrationDetails);
+		logger.debug(`clearForm(callback=${callback}): UserDetails → ${UserDetails}`);
         let {errors} = this.state;
         errors.firstName = false;
+		logger.debug(`clearForm(callback=${callback}): errors.firstName → ${errors.firstName}`);
+		logger.debug(`clearForm(callback=${callback}): errors.userName → ${errors.userName}`);
+		logger.debug(`clearForm(callback=${callback}): errors.email → ${errors.email}`);
+		logger.debug(`clearForm(callback=${callback}): errors.password → ${errors.password}`);
+		logger.debug(`clearForm(callback=${callback}): errors.confirmPassword → ${errors.confirmPassword}`);
+		logger.debug(`clearForm(callback=${callback}): errors.passwordsMatch → ${errors.passwordsMatch}`);
+		logger.debug(`clearForm(callback=${callback}): errors.question → ${errors.question}`);
+		logger.debug(`clearForm(callback=${callback}): errors.answer → ${errors.answer}`);
         errors.lastName = false;
+		logger.debug(`clearForm(callback=${callback}): errors.lastName → ${errors.lastName}`);
         errors.userName = false;
         errors.email = false;
         errors.password = false;
@@ -98,14 +117,18 @@ class CreateUserBox extends Component {
             confirmPassword: ""
         }, () => {
             if (typeof callback === "function") {
+				logger.debug(`clearForm(callback=${callback}): this.submitted → ${this.submitted}`);
                 callback();
+				logger.debug(`<<< Exiting clearForm(callback=${callback})`);
             }
         });
     }
     cancel() {
+		logger.debug('>>> Entering cancel()');
         this.clearForm(() => {
             this.props.onCancel();
         });
+		logger.debug('<<< Exiting cancel()');
     }
     validateForm() {
         const {props } = this;
@@ -170,8 +193,10 @@ class CreateUserBox extends Component {
         return valid;
     }
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state } = this;
         let requiresQuestionAndAnswer = props.appSettings.applicationSettings.settings.requiresQuestionAndAnswer;
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={styles.newExtensionModal} style={props.style}>
                 <GridCell className="new-user-box">
@@ -298,6 +323,8 @@ CreateUserBox.propTypes = {
 };
 
 const mapDispatchToProps = (dispatch) => {
+	logger.debug(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`);
+	logger.debug(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`);
     return {
         save : (callback) =>{
             dispatch(callback);

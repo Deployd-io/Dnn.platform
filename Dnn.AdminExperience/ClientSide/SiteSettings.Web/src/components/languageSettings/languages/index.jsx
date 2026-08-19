@@ -12,6 +12,7 @@ import { Collapsible, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import "./style.less";
 import util from "../../../utils";
 import resx from "../../../resources";
+const logger = console;
 
 let tableFields = [];
 let isHost = false;
@@ -19,6 +20,7 @@ let isHost = false;
 class LanguagesPanel extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             languageList: [],
             openId: "",
@@ -26,14 +28,17 @@ class LanguagesPanel extends Component {
             contentLocalizationEnabled: false
         };
         isHost = util.settings.isHost;
+		logger.debug('<<< Exiting constructor()');
     }
 
     loadData() {
+		logger.debug('>>> Entering loadData()');
         const {props} = this;
 
         this.getHeaderColumns(props.contentLocalizationEnabled);
 
         props.dispatch(LanguagesActions.getLanguages(props.portalId, (data) => {
+			logger.debug('<<< Exiting loadData()');
             this.setState({
                 languageList: data.Languages,
                 contentLocalizationEnabled: props.contentLocalizationEnabled
@@ -42,19 +47,24 @@ class LanguagesPanel extends Component {
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.loadData();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         let { props } = this;
 
         if (prevProps.portalId !== props.portalId || 
             prevProps.contentLocalizationEnabled !== props.contentLocalizationEnabled) {
             this.loadData();
+			logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
         }
     }
 
     getHeaderColumns(contentLocalizationEnabled) {
+		logger.debug(`>>> Entering getHeaderColumns(contentLocalizationEnabled=${contentLocalizationEnabled})`);
         tableFields = [];
         if (contentLocalizationEnabled) {
             tableFields.push({ "name": resx.get("Culture.Header"), "id": "adv-Culture" });
@@ -67,16 +77,19 @@ class LanguagesPanel extends Component {
         else {
             tableFields.push({ "name": resx.get("Culture.Header"), "id": "Culture" });
             tableFields.push({ "name": resx.get("Enabled.Header"), "id": "Enabled" });
+			logger.debug(`<<< Exiting getHeaderColumns(contentLocalizationEnabled=${contentLocalizationEnabled})`);
         }
     }
 
     renderHeader() {
+		logger.debug('>>> Entering renderHeader()');
         let tableHeaders = tableFields.map((field) => {
             let className = "languages-items header-" + field.id;
             return <div className={className} key={"header-" + field.id}>
                 <span>{field.name}&nbsp; </span>
             </div>;
         });
+		logger.debug('<<< Exiting renderHeader()');
         return <div className="header-row">{tableHeaders}</div>;
     }
 
@@ -175,8 +188,10 @@ class LanguagesPanel extends Component {
 
      
     renderedLanguages() {
+		logger.debug('>>> Entering renderedLanguages()');
         let i = 0;
         if (this.props.languageList) {
+			logger.debug('<<< Exiting renderedLanguages()');
             return this.props.languageList.map((item, index) => {
                 let id = "row-" + i++;
                 return (
@@ -223,7 +238,9 @@ class LanguagesPanel extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         let opened = (this.state.openId === "add");
+		logger.debug('<<< Exiting render()');
         return (
             <div>
                 <div className="language-items">
@@ -286,6 +303,8 @@ LanguagesPanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         languageList: state.languages.languageList,
         tabIndex: state.pagination.tabIndex,

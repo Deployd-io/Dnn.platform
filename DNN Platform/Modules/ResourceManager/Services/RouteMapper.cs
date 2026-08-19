@@ -8,10 +8,13 @@ namespace Dnn.Modules.ResourceManager.Services
     /// <inheritdoc />
     public class RouteMapper : IServiceRouteMapper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RouteMapper));
         /// <inheritdoc />
         public void RegisterRoutes(IMapRoute mapRouteManager)
         {
+			Logger.LogDebug(">>> Entering RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
             mapRouteManager.MapHttpRoute("ResourceManager", "default", "{controller}/{action}", new[] { "Dnn.Modules.ResourceManager.Services" });
+			Logger.LogDebug("<<< Exiting RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
         }
     }
 }

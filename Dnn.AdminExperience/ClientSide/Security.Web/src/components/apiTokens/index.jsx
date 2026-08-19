@@ -10,6 +10,7 @@ import ApiTokenRow from "./ApiTokenRow";
 import ApiTokenDetails from "./ApiTokenDetails";
 import CreateApiToken from "./CreateApiToken";
 import "./style.less";
+const logger = console;
 
 let scopeOptions = [];
 let filterOptions = [];
@@ -19,6 +20,7 @@ let isHost = false;
 class ApiTokensPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             portalList: [],
             currentPortal: "",
@@ -35,13 +37,16 @@ class ApiTokensPanelBody extends Component {
             showNewApiToken: false,
         };
         isHost = util.settings.isHost;
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const { props } = this;
         if (isHost) {
             props.dispatch(SecurityActions.getPortalList(util.settings.isHost, (dataPortal) => {
                 let portalList = Object.assign([], dataPortal.Results);
+				logger.debug(`UNSAFE_componentWillMount(): portalList → ${portalList}`);
                 let currentPortalId = portalList[0].PortalId;
                 let currentPortal = portalList[0].PortalName;
                 this.setState({
@@ -89,11 +94,14 @@ class ApiTokensPanelBody extends Component {
         filterOptions.push({ "value": 4, "label": resx.get("RevokedOrExpired") });
 
         this.getData();
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     getData() {
+		logger.debug('>>> Entering getData()');
         const crtPid = this.state.currentPortalId;
         this.props.dispatch(SecurityActions.getApiTokens(crtPid < 0 ? -2 : crtPid, this.state.currentFilter, this.state.filterByApiTokenKey, this.state.currentScope, this.state.pageIndex, this.state.pageSize, (data) => {
+			logger.debug('<<< Exiting getData()');
             this.setState({
                 apiTokens: data.Data,
                 totalCount: data.TotalCount
@@ -102,6 +110,7 @@ class ApiTokensPanelBody extends Component {
     }
 
     getTimespanOptions() {
+		logger.debug('>>> Entering getTimespanOptions()');
         if (timespanOptions.length === 0) {
             timespanOptions.push({ "value": 0, "label": resx.get("Days30") });
             timespanOptions.push({ "value": 1, "label": resx.get("Days60") });
@@ -116,10 +125,12 @@ class ApiTokensPanelBody extends Component {
                 });
             }
         }
+		logger.debug('<<< Exiting getTimespanOptions()');
         return timespanOptions;
     }
 
     resetApiFilterList() {
+		logger.debug('>>> Entering resetApiFilterList()');
         let newOptions = [];
         newOptions.push({ "value": "", "label": resx.get("All") });
         const f = this.state.currentScope === -2 ? this.state.apiTokenKeys : this.state.apiTokenKeys.filter((item) => {
@@ -135,18 +146,22 @@ class ApiTokensPanelBody extends Component {
         }, () => {
             this.getData();
         });
+		logger.debug('<<< Exiting resetApiFilterList()');
     }
 
     onPageChange(currentPage, pageSize) {
+		logger.debug(`>>> Entering onPageChange(currentPage=${currentPage},pageSize=${pageSize})`);
         this.setState({
             pageIndex: currentPage,
             pageSize: pageSize
         }, () => {
             this.getData();
         });
+		logger.debug(`<<< Exiting onPageChange(currentPage=${currentPage},pageSize=${pageSize})`);
     }
 
     renderHeader() {
+		logger.debug('>>> Entering renderHeader()');
         const tableFields = [
             { name: "TokenName", width: 17 },
             { name: "Portal", width: 18 },
@@ -164,11 +179,14 @@ class ApiTokensPanelBody extends Component {
             </div>;
         });
 
+		logger.debug(`renderHeader(): tableHeaders → ${tableHeaders}`);
+		logger.debug('<<< Exiting renderHeader()');
         return <div className="logHeader-wrapper">{tableHeaders}</div>;
     }
 
     renderList() {
         return this.state.apiTokens.map((item, index) => {
+		logger.debug('>>> Entering renderList()');
             return <ApiTokenRow
                 key={index}
                 apiToken={item}
@@ -179,11 +197,14 @@ class ApiTokensPanelBody extends Component {
                     apiTokenKeys={this.state.apiTokenKeys}
                 />
             </ApiTokenRow>;
+		logger.debug('<<< Exiting renderList()');
         });
     }
 
     renderPager() {
+		logger.debug('>>> Entering renderPager()');
         const { state } = this;
+		logger.debug('<<< Exiting renderPager()');
         return (
             <div className="logContainer">
                 <div className="logPager">
@@ -206,8 +227,10 @@ class ApiTokensPanelBody extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { state } = this;
         if (state.apiTokenSettings && !state.apiTokenSettings.ApiTokensEnabled) {
+		logger.debug('<<< Exiting render()');
             return (<div style={{ float: "left", width: "100%" }}>
                 <div className="logContainer">
                     <div className="warningBox">
@@ -354,6 +377,8 @@ ApiTokensPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         apiTokens: state.security.apiTokens,

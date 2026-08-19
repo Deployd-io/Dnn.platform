@@ -4,12 +4,15 @@ import { GridCell, SingleLineInputWithError, Button } from "@dnnsoftware/dnn-rea
 import Localization from "localization";
 import { connect } from "react-redux";
 import styles from "./style.module.less";
+const logger = console;
 
 const inputStyle = { width: "100%" };
 class Container extends Component {
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         let { extensionBeingEdited } = props;
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={styles.editContainer + (props.className ? " " + props.className : "")}>
                 <GridCell>
@@ -43,6 +46,8 @@ Container.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         extensionBeingEdited: state.extension.extensionBeingEdited,
         extensionBeingEditedIndex: state.extension.extensionBeingEditedIndex

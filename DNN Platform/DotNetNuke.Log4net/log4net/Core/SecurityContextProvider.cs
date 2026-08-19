@@ -93,6 +93,8 @@ namespace log4net.Core
         /// </remarks>
         protected SecurityContextProvider()
         {
+		value.LogDebug(">>> Entering SecurityContextProvider()");
+		value.LogDebug("<<< Exiting SecurityContextProvider()");
         }
 
         /// <summary>Create a SecurityContext for a consumer</summary>
@@ -109,6 +111,8 @@ namespace log4net.Core
         /// </remarks>
         public virtual SecurityContext CreateSecurityContext(object consumer)
         {
+			value.LogDebug(">>> Entering CreateSecurityContext(consumer={Consumer})", consumer);
+			value.LogDebug("<<< Exiting CreateSecurityContext(consumer={Consumer})", consumer);
             return NullSecurityContext.Instance;
         }
     }

@@ -36,6 +36,8 @@ public partial class RelationshipServiceController(IHostSettings hostSettings)
     public RelationshipServiceController()
         : this(null)
     {
+	Logger.LogDebug(">>> Entering RelationshipServiceController()");
+	Logger.LogDebug("<<< Exiting RelationshipServiceController()");
     }
 
     /// <summary>Accept a friend.</summary>
@@ -54,20 +56,26 @@ public partial class RelationshipServiceController(IHostSettings hostSettings)
     [ValidateAntiForgeryToken]
     public HttpResponseMessage AcceptFriend(NotificationRequest requestBody)
     {
+		Logger.LogDebug(">>> Entering AcceptFriend(requestBody={RequestBody})", requestBody);
         var success = false;
 
+		Logger.LogDebug("AcceptFriend(requestBody={RequestBody}): success → {Success}", requestBody, success);
         try
         {
             var recipient = InternalMessagingController.Instance.GetMessageRecipient(requestBody.NotificationId, this.UserInfo.UserID);
+			Logger.LogDebug("AcceptFriend(requestBody={RequestBody}): recipient → {Recipient}", requestBody, recipient);
             if (recipient != null)
             {
                 var notification = NotificationsController.Instance.GetNotification(requestBody.NotificationId);
+				Logger.LogDebug("AcceptFriend(requestBody={RequestBody}): notification → {Notification}", requestBody, notification);
                 if (int.TryParse(notification.Context, out var userRelationshipId))
                 {
                     var userRelationship = RelationshipController.Instance.GetUserRelationship(userRelationshipId);
+					Logger.LogDebug("AcceptFriend(requestBody={RequestBody}): userRelationship → {UserRelationship}", requestBody, userRelationship);
                     if (userRelationship != null)
                     {
                         var friend = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, userRelationship.UserId);
+						Logger.LogDebug("AcceptFriend(requestBody={RequestBody}): friend → {Friend}", requestBody, friend);
                         FriendsController.Instance.AcceptFriend(friend);
                         success = true;
                     }
@@ -81,6 +89,7 @@ public partial class RelationshipServiceController(IHostSettings hostSettings)
 
         if (success)
         {
+		Logger.LogDebug("<<< Exiting AcceptFriend(postData={PostData})", postData);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
         }
 
@@ -103,17 +112,22 @@ public partial class RelationshipServiceController(IHostSettings hostSettings)
     [ValidateAntiForgeryToken]
     public HttpResponseMessage FollowBack(NotificationRequest requestBody)
     {
+		Logger.LogDebug(">>> Entering FollowBack(requestBody={RequestBody})", requestBody);
         var success = false;
 
+		Logger.LogDebug("FollowBack(requestBody={RequestBody}): success → {Success}", requestBody, success);
         try
         {
             var recipient = InternalMessagingController.Instance.GetMessageRecipient(requestBody.NotificationId, this.UserInfo.UserID);
+			Logger.LogDebug("FollowBack(requestBody={RequestBody}): recipient → {Recipient}", requestBody, recipient);
             if (recipient != null)
             {
                 var notification = NotificationsController.Instance.GetNotification(requestBody.NotificationId);
+				Logger.LogDebug("FollowBack(requestBody={RequestBody}): notification → {Notification}", requestBody, notification);
                 if (int.TryParse(notification.Context, out var targetUserId))
                 {
                     var targetUser = UserController.GetUserById(this.hostSettings, this.PortalSettings.PortalId, targetUserId);
+					Logger.LogDebug("FollowBack(requestBody={RequestBody}): targetUser → {TargetUser}", requestBody, targetUser);
 
                     if (targetUser == null)
                     {
@@ -123,6 +137,7 @@ public partial class RelationshipServiceController(IHostSettings hostSettings)
                                 "UserDoesNotExist",
                                 "The user you are trying to follow no longer exists."),
                         };
+						Logger.LogDebug("FollowBack(requestBody={RequestBody}): Message → {Message}", requestBody, Message);
                         return this.Request.CreateResponse(HttpStatusCode.InternalServerError, response);
                     }
 
@@ -152,6 +167,7 @@ public partial class RelationshipServiceController(IHostSettings hostSettings)
 
         if (success)
         {
+		Logger.LogDebug("<<< Exiting FollowBack(postData={PostData})", postData);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", });
         }
 

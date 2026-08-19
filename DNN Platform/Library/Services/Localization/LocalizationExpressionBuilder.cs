@@ -15,6 +15,7 @@ namespace DotNetNuke.Services.Localization
     [ExpressionEditor("DotNetNuke.Services.Localization.LocalizationExpressionBuilderEditor")]
     public class LocalizationExpressionBuilder : ExpressionBuilder
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LocalizationExpressionBuilder));
         /// <inheritdoc />
         public override bool SupportsEvaluate
         {
@@ -26,12 +27,14 @@ namespace DotNetNuke.Services.Localization
 
         public static object GetLocalizedResource(string key, Type targetType, string propertyName, string virtualPath)
         {
+			Logger.LogDebug(">>> Entering GetLocalizedResource(key={Key},targetType={TargetType},propertyName={PropertyName},virtualPath={VirtualPath})", key, targetType, propertyName, virtualPath);
             if (HttpContext.Current == null)
             {
                 return null;
             }
 
             string localResourceFile = string.Empty;
+			Logger.LogDebug("GetLocalizedResource(key={Key},targetType={TargetType},propertyName={PropertyName},virtualPath={VirtualPath}): localResourceFile → {LocalResourceFile}", key, targetType, propertyName, virtualPath, localResourceFile);
             if (!string.IsNullOrEmpty(virtualPath))
             {
                 string filename = Path.GetFileName(virtualPath);
@@ -45,6 +48,7 @@ namespace DotNetNuke.Services.Localization
 
             if (value == null)
             {
+				Logger.LogWarning("Throwing InvalidOperationException from GetLocalizedResource(key={Key},targetType={TargetType},propertyName={PropertyName},virtualPath={VirtualPath})", key, targetType, propertyName, virtualPath);
                 throw new InvalidOperationException($"Localized Value '{key}' not found.");
             }
 
@@ -52,6 +56,7 @@ namespace DotNetNuke.Services.Localization
             if (targetType != null)
             {
                 PropertyDescriptor propDesc = TypeDescriptor.GetProperties(targetType)[propertyName];
+				Logger.LogDebug("GetLocalizedResource(key={Key},targetType={TargetType},propertyName={PropertyName},virtualPath={VirtualPath}): propDesc → {PropDesc}", key, targetType, propertyName, virtualPath, propDesc);
                 if (propDesc != null && propDesc.PropertyType != value.GetType())
                 {
                     // Type mismatch - make sure that the value can be converted to the Web control property type
@@ -69,12 +74,14 @@ namespace DotNetNuke.Services.Localization
             }
 
             // If we reach here, no type mismatch - return the value
+			Logger.LogDebug("<<< Exiting GetLocalizedResource(key={Key},targetType={TargetType},propertyName={PropertyName},virtualPath={VirtualPath})", key, targetType, propertyName, virtualPath);
             return value;
         }
 
         /// <inheritdoc />
         public override CodeExpression GetCodeExpression(BoundPropertyEntry entry, object parsedData, ExpressionBuilderContext context)
         {
+			Logger.LogDebug(">>> Entering GetCodeExpression(entry={Entry},parsedData={ParsedData},context={Context})", entry, parsedData, context);
             var inputParams = new CodeExpression[]
                                   {
                                       new CodePrimitiveExpression(entry.Expression.Trim()),
@@ -83,17 +90,20 @@ namespace DotNetNuke.Services.Localization
                                       new CodePrimitiveExpression(context.VirtualPath),
                                   };
 
+			Logger.LogDebug("<<< Exiting GetCodeExpression(entry={Entry},parsedData={ParsedData},context={Context})", entry, parsedData, context);
             return new CodeMethodInvokeExpression(new CodeTypeReferenceExpression(this.GetType()), "GetLocalizedResource", inputParams);
         }
 
         /// <inheritdoc />
         public override object EvaluateExpression(object target, BoundPropertyEntry entry, object parsedData, ExpressionBuilderContext context)
         {
+			Logger.LogDebug(">>> Entering EvaluateExpression(target={Target},entry={Entry},parsedData={ParsedData},context={Context})", target, entry, parsedData, context);
             string key = entry.Expression.Trim();
             Type targetType = entry.DeclaringType;
             string propertyName = entry.PropertyInfo.Name;
             string virtualPath = context.VirtualPath;
 
+			Logger.LogDebug("<<< Exiting EvaluateExpression(target={Target},entry={Entry},parsedData={ParsedData},context={Context})", target, entry, parsedData, context);
             return GetLocalizedResource(key, targetType, propertyName, virtualPath);
         }
     }

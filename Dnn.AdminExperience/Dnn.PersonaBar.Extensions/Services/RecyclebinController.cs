@@ -35,8 +35,10 @@ namespace Dnn.PersonaBar.Recyclebin.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.RecycleBinPagesView)]
         public HttpResponseMessage GetDeletedPageList(int pageIndex = -1, int pageSize = -1, string sortType = "", string sortDirection = "")
         {
+			eventLogger.LogDebug(">>> Entering GetDeletedPageList(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection})", pageIndex, pageSize, sortType, sortDirection);
             var totalRecords = 0;
             var tabs = Components.RecyclebinController.Instance.GetDeletedTabs(out totalRecords, pageIndex, pageSize, sortType, sortDirection);
+			eventLogger.LogDebug("GetDeletedPageList(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): tabs → {Tabs}", pageIndex, pageSize, sortType, sortDirection, tabs);
             var deletedtabs = from t in tabs
                               select this.ConvertToPageItem(t, tabs);
             var response = new
@@ -45,6 +47,10 @@ namespace Dnn.PersonaBar.Recyclebin.Services
                 Results = deletedtabs,
                 TotalResults = totalRecords,
             };
+			eventLogger.LogDebug("GetDeletedPageList(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): Success → {Success}", pageIndex, pageSize, sortType, sortDirection, Success);
+			eventLogger.LogDebug("GetDeletedPageList(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): Results → {Results}", pageIndex, pageSize, sortType, sortDirection, Results);
+			eventLogger.LogDebug("GetDeletedPageList(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): TotalResults → {TotalResults}", pageIndex, pageSize, sortType, sortDirection, TotalResults);
+			eventLogger.LogDebug("<<< Exiting GetDeletedPageList(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection})", pageIndex, pageSize, sortType, sortDirection);
             return this.Request.CreateResponse(HttpStatusCode.OK, response);
         }
 
@@ -52,15 +58,22 @@ namespace Dnn.PersonaBar.Recyclebin.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.RecycleBinModulesView)]
         public HttpResponseMessage GetDeletedModuleList(int pageIndex = -1, int pageSize = -1, string sortType = "", string sortDirection = "")
         {
+			eventLogger.LogDebug(">>> Entering GetDeletedModuleList(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection})", pageIndex, pageSize, sortType, sortDirection);
             var totalRecords = 0;
             var mods = Components.RecyclebinController.Instance.GetDeletedModules(out totalRecords, pageIndex, pageSize, sortType, sortDirection);
+			eventLogger.LogDebug("GetDeletedModuleList(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): mods → {Mods}", pageIndex, pageSize, sortType, sortDirection, mods);
             var deletedmodules = from t in mods select this.ConvertToModuleItem(t);
+			eventLogger.LogDebug("GetDeletedModuleList(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): deletedmodules → {Deletedmodules}", pageIndex, pageSize, sortType, sortDirection, deletedmodules);
             var response = new
             {
                 Success = true,
                 Results = deletedmodules,
                 TotalResults = totalRecords,
             };
+			eventLogger.LogDebug("GetDeletedModuleList(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): TotalResults → {TotalResults}", pageIndex, pageSize, sortType, sortDirection, TotalResults);
+			eventLogger.LogDebug("GetDeletedModuleList(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): Results → {Results}", pageIndex, pageSize, sortType, sortDirection, Results);
+			eventLogger.LogDebug("GetDeletedModuleList(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): Success → {Success}", pageIndex, pageSize, sortType, sortDirection, Success);
+			eventLogger.LogDebug("<<< Exiting GetDeletedModuleList(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection})", pageIndex, pageSize, sortType, sortDirection);
             return this.Request.CreateResponse(HttpStatusCode.OK, response);
         }
 
@@ -68,15 +81,23 @@ namespace Dnn.PersonaBar.Recyclebin.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.RecycleBinUsersView)]
         public HttpResponseMessage GetDeletedUserList(int pageIndex = -1, int pageSize = -1, string sortType = "", string sortDirection = "")
         {
+			eventLogger.LogDebug(">>> Entering GetDeletedUserList(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection})", pageIndex, pageSize, sortType, sortDirection);
             var totalRecords = 0;
             var users = Components.RecyclebinController.Instance.GetDeletedUsers(out totalRecords, pageIndex, pageSize, sortType, sortDirection);
+			eventLogger.LogDebug("GetDeletedUserList(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): users → {Users}", pageIndex, pageSize, sortType, sortDirection, users);
             var deletedusers = from t in users select ConvertToUserItem(t);
+			eventLogger.LogDebug("GetDeletedUserList(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): deletedusers → {Deletedusers}", pageIndex, pageSize, sortType, sortDirection, deletedusers);
             var response = new
             {
                 Success = true,
                 Results = deletedusers,
                 TotalResults = totalRecords,
+				eventLogger.LogDebug(">>> Entering ConvertToUserItem(user={User})", user);
+				eventLogger.LogDebug("<<< Exiting ConvertToUserItem(user={User})", user);
             };
+			eventLogger.LogDebug("GetDeletedUserList(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): TotalResults → {TotalResults}", pageIndex, pageSize, sortType, sortDirection, TotalResults);
+			eventLogger.LogDebug("GetDeletedUserList(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection}): Results → {Results}", pageIndex, pageSize, sortType, sortDirection, Results);
+			eventLogger.LogDebug("<<< Exiting GetDeletedUserList(pageIndex={PageIndex},pageSize={PageSize},sortType={SortType},sortDirection={SortDirection})", pageIndex, pageSize, sortType, sortDirection);
             return this.Request.CreateResponse(HttpStatusCode.OK, response);
         }
 
@@ -85,8 +106,10 @@ namespace Dnn.PersonaBar.Recyclebin.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.RecycleBinPagesView + "&" + Components.Constants.RecycleBinPagesEdit)]
         public HttpResponseMessage RemovePage(List<PageItem> pages)
         {
+			eventLogger.LogDebug(">>> Entering RemovePage(pages={Pages})", pages);
             var errors = new StringBuilder();
 
+			eventLogger.LogDebug("RemovePage(pages={Pages}): errors → {Errors}", pages, errors);
             Components.RecyclebinController.Instance.DeleteTabs(pages, errors);
 
             if (errors.Length > 0)
@@ -100,8 +123,10 @@ namespace Dnn.PersonaBar.Recyclebin.Services
                             Components.RecyclebinController.Instance.LocalizeString("Service_RemoveTabError"),
                             errors),
                 });
+						eventLogger.LogDebug("RemovePage(pages={Pages}): Status → {Status}", pages, Status);
             }
 
+			eventLogger.LogDebug("<<< Exiting RemovePage(pages={Pages})", pages);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Status = 0 });
         }
 
@@ -110,8 +135,10 @@ namespace Dnn.PersonaBar.Recyclebin.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.RecycleBinModulesView + "&" + Components.Constants.RecycleBinModulesEdit)]
         public HttpResponseMessage RemoveModule(List<ModuleItem> modules)
         {
+			eventLogger.LogDebug(">>> Entering RemoveModule(modules={Modules})", modules);
             var errors = new StringBuilder();
 
+			eventLogger.LogDebug("RemoveModule(modules={Modules}): errors → {Errors}", modules, errors);
             Components.RecyclebinController.Instance.DeleteModules(modules, errors);
 
             if (errors.Length > 0)
@@ -125,8 +152,10 @@ namespace Dnn.PersonaBar.Recyclebin.Services
                             Components.RecyclebinController.Instance.LocalizeString("Service_RemoveTabModuleError"),
                             errors),
                 });
+						eventLogger.LogDebug("RemoveModule(modules={Modules}): Status → {Status}", modules, Status);
             }
 
+			eventLogger.LogDebug("<<< Exiting RemoveModule(modules={Modules})", modules);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Status = 0 });
         }
 
@@ -135,8 +164,10 @@ namespace Dnn.PersonaBar.Recyclebin.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.RecycleBinUsersView + "&" + Components.Constants.RecycleBinUsersEdit)]
         public HttpResponseMessage RemoveUser(List<UserItem> users)
         {
+			eventLogger.LogDebug(">>> Entering RemoveUser(users={Users})", users);
             var errors = new StringBuilder();
 
+			eventLogger.LogDebug("RemoveUser(users={Users}): errors → {Errors}", users, errors);
             Components.RecyclebinController.Instance.DeleteUsers(users);
 
             if (errors.Length > 0)
@@ -146,8 +177,11 @@ namespace Dnn.PersonaBar.Recyclebin.Services
                     Status = 1,
                     Message = string.Format(CultureInfo.CurrentCulture, Components.RecyclebinController.Instance.LocalizeString("Service_RemoveUserError"), errors),
                 });
+				eventLogger.LogDebug("RemoveUser(users={Users}): Status → {Status}", users, Status);
+				eventLogger.LogDebug("RemoveUser(users={Users}): Message → {Message}", users, Message);
             }
 
+			eventLogger.LogDebug("<<< Exiting RemoveUser(users={Users})", users);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Status = 0 });
         }
 
@@ -156,6 +190,7 @@ namespace Dnn.PersonaBar.Recyclebin.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.RecycleBinPagesView + "&" + Components.Constants.RecycleBinPagesEdit)]
         public HttpResponseMessage RestorePage(List<PageItem> pages)
         {
+			eventLogger.LogDebug(">>> Entering RestorePage(pages={Pages})", pages);
             var errors = new StringBuilder();
             if (pages != null && pages.Count != 0)
             {
@@ -172,6 +207,8 @@ namespace Dnn.PersonaBar.Recyclebin.Services
                 }
             }
 
+			eventLogger.LogDebug("RestorePage(pages={Pages}): Status → {Status}", pages, Status);
+			eventLogger.LogDebug("<<< Exiting RestorePage(pages={Pages})", pages);
             return errors.Length > 0
                 ? this.Request.CreateResponse(
                     HttpStatusCode.OK,
@@ -192,14 +229,18 @@ namespace Dnn.PersonaBar.Recyclebin.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.RecycleBinModulesView + "&" + Components.Constants.RecycleBinModulesEdit)]
         public HttpResponseMessage RestoreModule(List<ModuleItem> modules)
         {
+			eventLogger.LogDebug(">>> Entering RestoreModule(modules={Modules})", modules);
             // modules dic stores module.Key=moduleId, module.Value=pageId;
             var result = true;
+			eventLogger.LogDebug("RestoreModule(modules={Modules}): result → {Result}", modules, result);
             var errors = new StringBuilder();
+			eventLogger.LogDebug("RestoreModule(modules={Modules}): errors → {Errors}", modules, errors);
             if (modules != null && modules.Count != 0)
             {
                 foreach (var module in modules)
                 {
                     var tab = TabController.Instance.GetTab(module.TabID, this.PortalSettings.PortalId);
+					eventLogger.LogDebug("RestoreModule(modules={Modules}): tab → {Tab}", modules, tab);
                     if (tab == null)
                     {
                         return this.Request.CreateResponse(HttpStatusCode.NotFound);
@@ -213,6 +254,7 @@ namespace Dnn.PersonaBar.Recyclebin.Services
 
             if (!result)
             {
+			eventLogger.LogDebug("<<< Exiting RestoreModule(modules={Modules})", modules);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Status = 1, Message = errors });
             }
 
@@ -224,6 +266,7 @@ namespace Dnn.PersonaBar.Recyclebin.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = Components.Constants.RecycleBinUsersView + "&" + Components.Constants.RecycleBinUsersEdit)]
         public HttpResponseMessage RestoreUser(List<UserItem> users)
         {
+			eventLogger.LogDebug(">>> Entering RestoreUser(users={Users})", users);
             var errors = new StringBuilder();
             if (users != null && users.Count != 0)
             {
@@ -240,6 +283,8 @@ namespace Dnn.PersonaBar.Recyclebin.Services
                 }
             }
 
+			eventLogger.LogDebug("RestoreUser(users={Users}): Status → {Status}", users, Status);
+			eventLogger.LogDebug("<<< Exiting RestoreUser(users={Users})", users);
             return errors.Length > 0
                 ? this.Request.CreateResponse(
                     HttpStatusCode.OK,
@@ -259,10 +304,15 @@ namespace Dnn.PersonaBar.Recyclebin.Services
         [AdvancedPermission(MenuName = Components.Constants.MenuName, Permission = EmptyRecycleBinPermission)]
         public HttpResponseMessage EmptyRecycleBin()
         {
+			eventLogger.LogDebug(">>> Entering EmptyRecycleBin()");
             var deletedTabs = Components.RecyclebinController.Instance.GetDeletedTabs(out _);
             var deletedModules = Components.RecyclebinController.Instance.GetDeletedModules(out _);
+			eventLogger.LogDebug("EmptyRecycleBin(): deletedModules → {DeletedModules}", deletedModules);
             var deletedUsers = Components.RecyclebinController.Instance.GetDeletedUsers(out _);
+			eventLogger.LogDebug("EmptyRecycleBin(): deletedUsers → {DeletedUsers}", deletedUsers);
             var errors = new StringBuilder();
+			eventLogger.LogDebug("EmptyRecycleBin(): errors → {Errors}", errors);
+			eventLogger.LogDebug("EmptyRecycleBin(): deletedTabs → {DeletedTabs}", deletedTabs);
 
             Components.RecyclebinController.Instance.DeleteModules(deletedModules, errors);
 
@@ -281,13 +331,17 @@ namespace Dnn.PersonaBar.Recyclebin.Services
                             Components.RecyclebinController.Instance.LocalizeString("Service_EmptyRecycleBinError"),
                             errors),
                 });
+						eventLogger.LogDebug("EmptyRecycleBin(): Status → {Status}", Status);
             }
 
+			eventLogger.LogDebug("<<< Exiting EmptyRecycleBin()");
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Status = 0 });
         }
 
         private static UserItem ConvertToUserItem(UserInfo user)
         {
+			eventLogger.LogDebug(">>> Entering ConvertToUserItem(user={User})", user);
+			eventLogger.LogDebug("<<< Exiting ConvertToUserItem(user={User})", user);
             return new UserItem
             {
                 Id = user.UserID,
@@ -308,6 +362,8 @@ namespace Dnn.PersonaBar.Recyclebin.Services
 
         private PageItem ConvertToPageItem(TabInfo tab, IEnumerable<TabInfo> portalTabs)
         {
+			eventLogger.LogDebug(">>> Entering ConvertToPageItem(tab={Tab},portalTabs={PortalTabs})", tab, portalTabs);
+			eventLogger.LogDebug("<<< Exiting ConvertToPageItem(tab={Tab},portalTabs={PortalTabs})", tab, portalTabs);
             return new PageItem
             {
                 Id = tab.TabID,
@@ -334,13 +390,18 @@ namespace Dnn.PersonaBar.Recyclebin.Services
 
         private bool UseDefaultSkin(TabInfo tab)
         {
+			eventLogger.LogDebug(">>> Entering UseDefaultSkin(tab={Tab})", tab);
+			eventLogger.LogDebug("<<< Exiting UseDefaultSkin(tab={Tab})", tab);
             return !string.IsNullOrEmpty(tab.SkinSrc) &&
                    tab.SkinSrc.Equals(this.PortalSettings.DefaultPortalSkin, StringComparison.OrdinalIgnoreCase);
         }
 
         private ModuleItem ConvertToModuleItem(ModuleInfo mod)
         {
+			eventLogger.LogDebug(">>> Entering ConvertToModuleItem(mod={Mod})", mod);
             var tab = TabController.Instance.GetTab(mod.TabID, this.PortalSettings.PortalId);
+			eventLogger.LogDebug("ConvertToModuleItem(mod={Mod}): tab → {Tab}", mod, tab);
+			eventLogger.LogDebug("<<< Exiting ConvertToModuleItem(mod={Mod})", mod);
             return new ModuleItem
             {
                 Id = mod.ModuleID,

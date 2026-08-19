@@ -10,16 +10,20 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>Creates a control that render one item in a list ($lt;li> control).</summary>
     public class DnnUnsortedListItem : WebControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnUnsortedListItem));
         /// <summary>Initializes a new instance of the <see cref="DnnUnsortedListItem"/> class.</summary>
         public DnnUnsortedListItem()
             : base(HtmlTextWriterTag.Li)
         {
+		Logger.LogDebug(">>> Entering DnnUnsortedListItem()");
+		Logger.LogDebug("<<< Exiting DnnUnsortedListItem()");
         }
 
         /// <summary>Adds the controls.</summary>
         /// <param name="childControls">The controls to add.</param>
         public void AddControls(params Control[] childControls)
         {
+			Logger.LogDebug(">>> Entering AddControls(childControls={ChildControls})", childControls);
             foreach (var childControl in childControls)
             {
                 if (childControl != null)
@@ -27,11 +31,13 @@ namespace DotNetNuke.Web.UI.WebControls
                     this.Controls.Add(childControl);
                 }
             }
+			Logger.LogDebug("<<< Exiting AddControls(childControls={ChildControls})", childControls);
         }
 
         /// <inheritdoc />
         protected override void AddAttributesToRender(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering AddAttributesToRender(writer={Writer})", writer);
             writer.AddAttribute(HtmlTextWriterAttribute.Id, this.ClientID);
             if (!string.IsNullOrEmpty(this.CssClass))
             {
@@ -42,6 +48,7 @@ namespace DotNetNuke.Web.UI.WebControls
             {
                 writer.AddAttribute(HtmlTextWriterAttribute.Title, this.ToolTip);
             }
+			Logger.LogDebug("<<< Exiting AddAttributesToRender(writer={Writer})", writer);
         }
     }
 }

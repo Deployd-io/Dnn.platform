@@ -38,6 +38,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Models
 
         public static ModuleInfoModel FromDnnModuleInfo(DotNetNuke.Entities.Modules.ModuleInfo dnnModule, bool? deleted = null)
         {
+			eventLogger.LogDebug(">>> Entering FromDnnModuleInfo(dnnModule={DnnModule},deleted={Deleted})", dnnModule, deleted);
             var mim = new ModuleInfoModel
             {
                 ModuleId = dnnModule.ModuleID,
@@ -50,16 +51,20 @@ namespace Dnn.PersonaBar.Prompt.Components.Models
 
             // assign command links
             mim.__ModuleId = $"get-module {mim.ModuleId}";
+			eventLogger.LogDebug("FromDnnModuleInfo(dnnModule={DnnModule},deleted={Deleted}): mim.__ModuleId → {Arg2}", dnnModule, deleted, mim.__ModuleId);
+			eventLogger.LogDebug("FromDnnModuleInfo(dnnModule={DnnModule},deleted={Deleted}): mim.__ModuleName → {Arg2}", dnnModule, deleted, mim.__ModuleName);
             mim.__ModuleName = $"list-modules --name '{mim.ModuleName}' --all";
 
             // get a list of all pages this module is added to
             var addedTo = DotNetNuke.Entities.Modules.ModuleController.Instance.GetTabModulesByModule(mim.ModuleId);
+			eventLogger.LogDebug("FromDnnModuleInfo(dnnModule={DnnModule},deleted={Deleted}): addedTo → {AddedTo}", dnnModule, deleted, addedTo);
             if (deleted.HasValue)
             {
                 addedTo = addedTo.Where(x => x.IsDeleted == deleted.Value).ToList();
             }
 
             var sbAddedTo = new StringBuilder();
+			eventLogger.LogDebug("FromDnnModuleInfo(dnnModule={DnnModule},deleted={Deleted}): sbAddedTo → {SbAddedTo}", dnnModule, deleted, sbAddedTo);
             foreach (var modInfo in addedTo)
             {
                 if (sbAddedTo.Length > 0)
@@ -71,6 +76,7 @@ namespace Dnn.PersonaBar.Prompt.Components.Models
             }
 
             mim.AddedToPages = sbAddedTo.ToString();
+			eventLogger.LogDebug("<<< Exiting FromDnnModuleInfo(dnnModule={DnnModule},deleted={Deleted})", dnnModule, deleted);
             return mim;
         }
     }
