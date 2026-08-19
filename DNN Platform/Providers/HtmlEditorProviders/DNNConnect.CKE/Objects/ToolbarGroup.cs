@@ -11,7 +11,9 @@ namespace DNNConnect.CKEditorProvider.Objects
         /// <summary>Initializes a new instance of the <see cref="ToolbarGroup" /> class.</summary>
         public ToolbarGroup()
         {
+			eventLogger.LogDebug(">>> Entering ToolbarGroup()");
             this.items = new List<string>();
+			eventLogger.LogDebug("<<< Exiting ToolbarGroup()");
         }
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter

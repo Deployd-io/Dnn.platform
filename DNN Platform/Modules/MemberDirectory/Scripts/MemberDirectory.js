@@ -1,10 +1,15 @@
+const logger = console;
 ﻿function MemberDirectory($, ko, settings, composeMessageSettings) {
+	logger.debug(`>>> Entering MemberDirectory(ko=${ko},settings=${settings},composeMessageSettings=${composeMessageSettings})`);
     var opts = $.extend({}, MemberDirectory.defaultSettings, settings);
     var serviceFramework = settings.servicesFramework;
+	logger.debug(`MemberDirectory(ko=${ko},settings=${settings},composeMessageSettings=${composeMessageSettings}): opts → ${opts}`);
     var baseServicepath = serviceFramework.getServiceRoot('MemberDirectory') + 'MemberDirectory/';
+	logger.debug(`MemberDirectory(ko=${ko},settings=${settings},composeMessageSettings=${composeMessageSettings}): baseServicepath → ${baseServicepath}`);
     var pageIndex = 0;
     var pageSize = opts.pageSize;
     var userId = opts.userId;
+	logger.debug(`MemberDirectory(ko=${ko},settings=${settings},composeMessageSettings=${composeMessageSettings}): userId → ${userId}`);
     var groupId = opts.groupId;
     var viewerId = opts.viewerId;
     var profileUrl = opts.profileUrl;
@@ -14,14 +19,27 @@
 
     function displayMessage(message, cssclass) {
         var messageNode = $("<div/>").addClass('dnnFormMessage ' + cssclass).text(message);
+		logger.debug(`>>> Entering displayMessage(message=${message},cssclass=${cssclass})`);
         $(containerElement).prepend(messageNode);
         messageNode.fadeOut(3000, 'easeInExpo', function () { messageNode.remove(); });
+		logger.debug(`<<< Exiting displayMessage(message=${message},cssclass=${cssclass})`);
     };
 
     function Member(item) {
+		logger.debug(`>>> Entering Member(item=${item})`);
         var self = this;
         self.AddFriendText = opts.addFriendText;
+		logger.debug(`Member(item=${item}): self.AddFriendText → ${self.AddFriendText}`);
+		logger.debug(`Member(item=${item}): self.FriendPendingText → ${self.FriendPendingText}`);
+		logger.debug(`Member(item=${item}): self.RemoveFriendText → ${self.RemoveFriendText}`);
+		logger.debug(`Member(item=${item}): self.FollowText → ${self.FollowText}`);
+		logger.debug(`Member(item=${item}): self.UnFollowText → ${self.UnFollowText}`);
+		logger.debug(`Member(item=${item}): self.SendMessageText → ${self.SendMessageText}`);
+		logger.debug(`Member(item=${item}): self.UserNameText → ${self.UserNameText}`);
+		logger.debug(`Member(item=${item}): self.EmailText → ${self.EmailText}`);
+		logger.debug(`Member(item=${item}): self.CityText → ${self.CityText}`);
         self.AcceptFriendText = opts.acceptFriendText;
+		logger.debug(`Member(item=${item}): self.AcceptFriendText → ${self.AcceptFriendText}`);
         self.FriendPendingText = opts.friendPendingText;
         self.RemoveFriendText = opts.removeFriendText;
         self.FollowText = opts.followText;
@@ -47,6 +65,8 @@
         self.FriendId = ko.observable(item.FriendId);
 
         self.IsFriend = ko.computed(function () {
+			logger.debug(`>>> Entering computed(this=${this})`);
+			logger.debug(`<<< Exiting computed(this=${this})`);
             return self.FriendStatus() == 2;
         }, this);
 
@@ -96,6 +116,8 @@
         });
         
         self.getProfilePicture = function (w, h) {
+			logger.debug(`>>> Entering function(w=${w},h=${h})`);
+			logger.debug(`<<< Exiting function(w=${w},h=${h})`);
             return profilePicHandler.replace("{0}", self.UserId()).replace("{1}", h).replace("{2}", w);
         };
 
@@ -190,9 +212,11 @@
                 displayMessage(settings.serverErrorWithDescriptionText + status, "dnnFormWarning");
             });
         };
+		logger.debug(`<<< Exiting Member(item=${item})`);
     };
 
     function MemberDirectoryViewModel(initialData) {
+		logger.debug(`>>> Entering MemberDirectoryViewModel(initialData=${initialData})`);
         // Data
         var self = this;
 
@@ -289,11 +313,15 @@
                 if (element.nodeType == 1) {
                     var config = {
                         over: function () {
+							logger.debug('>>> Entering over()');
                             $(this).find("div[id$='popUpPanel']").fadeIn("slow");
+							logger.debug('<<< Exiting over()');
                         },
                         timeout: 500,
                         out: function () {
+							logger.debug('>>> Entering out()');
                             $(this).find("div[id$='popUpPanel']").fadeOut("fast");
+							logger.debug('<<< Exiting out()');
                         }
                     };
                     $(element).hoverIntent(config);
@@ -302,6 +330,7 @@
         };
 
         self.isEven = function (item) {
+			logger.debug(`<<< Exiting MemberDirectoryViewModel(initialData=${initialData})`);
             return (self.Members.indexOf(item) % 2 == 0);
         };
 
@@ -421,17 +450,22 @@
                 //Basic Search
                 $('input#mdBasicSearch').autocomplete({
                     source: function (request, response) {
+						logger.debug(`>>> Entering source(request=${request},response=${response})`);
                         viewModel.getSuggestions(request.term, response);
+						logger.debug(`<<< Exiting source(request=${request},response=${response})`);
                         return;
                     },
                     minLength: 1,
                     select: function (event, ui) {
+						logger.debug(`>>> Entering select(event=${event},ui=${ui})`);
                         viewModel.getMember(ui.item);
+						logger.debug(`<<< Exiting select(event=${event},ui=${ui})`);
                     }
                 });
 
                 //Advanced Search
                 $('a#mdAdvancedSearch').click(function (event) {
+					logger.debug('>>> Entering click()');
                     event.preventDefault();
                     $('div#mdAdvancedSearchForm').slideDown();
                     $(this).addClass("active");
@@ -441,8 +475,10 @@
                 var timer;
                 var cursorIsOnAdvancedSearchForm;
                 $('a#mdAdvancedSearch').mouseleave(function () {
+					logger.debug('>>> Entering mouseleave()');
                     timer = setTimeout(function () {
                         if ($('div#mdAdvancedSearchForm').is(':visible') && !cursorIsOnAdvancedSearchForm) {
+							logger.debug('>>> Entering setTimeout()');
                             $('div#mdAdvancedSearchForm').hide();
                             $(this).removeClass("active");
                             $(".mdSearch").removeClass("active");
@@ -451,6 +487,7 @@
 
                 });
                 $('div#mdAdvancedSearchForm').mouseenter(function () {
+					logger.debug('>>> Entering mouseenter()');
                     cursorIsOnAdvancedSearchForm = true;
                 });
                 $('div#mdAdvancedSearchForm').mouseleave(function () {
@@ -466,8 +503,12 @@
 		            var options = $.extend({}, {
 			            openTriggerSelector: containerElement + " .ComposeMessage",
 			            onPrePopulate: function(target) {
+							logger.debug(`>>> Entering onPrePopulate(target=${target})`);
 				            var context = ko.contextFor(target);
 				            var prePopulatedRecipients = [{ id: "user-" + context.$data.UserId(), name: context.$data.DisplayName() }];
+							logger.debug(`onPrePopulate(target=${target}): context → ${context}`);
+							logger.debug(`onPrePopulate(target=${target}): prePopulatedRecipients → ${prePopulatedRecipients}`);
+							logger.debug(`<<< Exiting onPrePopulate(target=${target})`);
 				            return prePopulatedRecipients;
 			            },
 			            servicesFramework: serviceFramework

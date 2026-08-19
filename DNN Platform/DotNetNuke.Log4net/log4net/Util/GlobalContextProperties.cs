@@ -69,6 +69,8 @@ namespace log4net.Util
         /// </remarks>
         internal GlobalContextProperties()
         {
+		value.LogDebug(">>> Entering GlobalContextProperties()");
+		value.LogDebug("<<< Exiting GlobalContextProperties()");
         }
 
         /// <summary>
@@ -115,17 +117,21 @@ namespace log4net.Util
         /// </remarks>
         public void Remove(string key)
         {
+			value.LogDebug(">>> Entering Remove(key={Key})", key);
             lock(this.m_syncRoot)
             {
                 if (this.m_readOnlyProperties.Contains(key))
                 {
                     PropertiesDictionary mutableProps = new PropertiesDictionary(this.m_readOnlyProperties);
+					value.LogDebug("Remove(key={Key}): mutableProps → {MutableProps}", key, mutableProps);
 
                     mutableProps.Remove(key);
 
                     this.m_readOnlyProperties = new ReadOnlyPropertiesDictionary(mutableProps);
+					value.LogDebug("Remove(key={Key}): m_readOnlyProperties → {M_readOnlyProperties}", key, m_readOnlyProperties);
                 }
             }
+			value.LogDebug("<<< Exiting Remove(key={Key})", key);
         }
 
         /// <summary>
@@ -133,10 +139,13 @@ namespace log4net.Util
         /// </summary>
         public void Clear()
         {
+			value.LogDebug(">>> Entering Clear()");
             lock(this.m_syncRoot)
             {
                 this.m_readOnlyProperties = new ReadOnlyPropertiesDictionary();
+				value.LogDebug("Clear(): m_readOnlyProperties → {M_readOnlyProperties}", m_readOnlyProperties);
             }
+			value.LogDebug("<<< Exiting Clear()");
         }
 
         /// <summary>
@@ -151,6 +160,8 @@ namespace log4net.Util
         /// </remarks>
         internal ReadOnlyPropertiesDictionary GetReadOnlyProperties()
         {
+			value.LogDebug(">>> Entering GetReadOnlyProperties()");
+			value.LogDebug("<<< Exiting GetReadOnlyProperties()");
             return this.m_readOnlyProperties;
         }
     }

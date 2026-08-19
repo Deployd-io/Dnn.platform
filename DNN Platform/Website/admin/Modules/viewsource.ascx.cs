@@ -19,6 +19,7 @@ namespace DotNetNuke.Modules.Admin.Modules
     /// <summary>A control which displays the source code for a module.</summary>
     public partial class ViewSource : PortalModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(viewsource.ascx));
         private readonly INavigationManager navigationManager;
         private readonly IHostSettings hostSettings;
 
@@ -27,6 +28,10 @@ namespace DotNetNuke.Modules.Admin.Modules
         public ViewSource()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering ViewSource()");
+		Logger.LogDebug("<<< Exiting ViewSource()");
+		Logger.LogDebug(">>> Entering ViewSource(navigationManager={NavigationManager},hostSettings={HostSettings})", navigationManager, hostSettings);
+		Logger.LogDebug("ViewSource(navigationManager={NavigationManager},hostSettings={HostSettings}): hostSettings → {HostSettings1}", navigationManager, hostSettings, hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ViewSource"/> class.</summary>
@@ -36,6 +41,7 @@ namespace DotNetNuke.Modules.Admin.Modules
         {
             this.navigationManager = navigationManager ?? this.DependencyProvider.GetRequiredService<INavigationManager>();
             this.hostSettings = hostSettings ?? this.DependencyProvider.GetRequiredService<IHostSettings>();
+			Logger.LogDebug("<<< Exiting ViewSource(navigationManager={NavigationManager},hostSettings={HostSettings})", navigationManager, hostSettings);
         }
 
         protected bool CanEditSource => this.Request.IsLocal;
@@ -59,6 +65,7 @@ namespace DotNetNuke.Modules.Admin.Modules
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.cboFile.SelectedIndexChanged += this.OnFileIndexChanged;
@@ -69,6 +76,7 @@ namespace DotNetNuke.Modules.Admin.Modules
                 this.cmdCancel.NavigateUrl = this.ReturnUrl;
 
                 var objModuleControl = ModuleControlController.GetModuleControl(this.hostSettings, this.ModuleControlId);
+				Logger.LogDebug("OnLoad(e={E}): objModuleControl → {ObjModuleControl}", e, objModuleControl);
                 if (objModuleControl != null)
                 {
                     this.BindFiles(objModuleControl.ControlSrc);
@@ -86,15 +94,19 @@ namespace DotNetNuke.Modules.Admin.Modules
 
             this.cmdUpdate.Visible = this.CanEditSource;
             this.txtSource.Enabled = this.CanEditSource;
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         protected void OnFileIndexChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnFileIndexChanged(sender={Sender},e={E})", sender, e);
             this.DisplayFile();
+			Logger.LogDebug("<<< Exiting OnFileIndexChanged(sender={Sender},e={E})", sender, e);
         }
 
         private void BindFiles(string controlSrc)
         {
+			Logger.LogDebug(">>> Entering BindFiles(controlSrc={ControlSrc})", controlSrc);
             this.cboFile.Items.Clear();
 
             // cboFile.Items.Add(new ListItem(Localization.GetString("None_Specified"), "None"));
@@ -103,6 +115,7 @@ namespace DotNetNuke.Modules.Admin.Modules
             this.cboFile.AddItem("User Control", "UserControl");
 
             var srcPhysicalPath = this.Server.MapPath(controlSrc);
+			Logger.LogDebug("BindFiles(controlSrc={ControlSrc}): srcPhysicalPath → {SrcPhysicalPath}", controlSrc, srcPhysicalPath);
             if (File.Exists(srcPhysicalPath + ".vb") || File.Exists(srcPhysicalPath + ".cs"))
             {
                 // cboFile.Items.Add(new ListItem("Code File", "CodeFile"));
@@ -110,18 +123,24 @@ namespace DotNetNuke.Modules.Admin.Modules
             }
 
             var fileName = Path.GetFileName(srcPhysicalPath);
+			Logger.LogDebug("BindFiles(controlSrc={ControlSrc}): fileName → {FileName}", controlSrc, fileName);
             var folder = Path.GetDirectoryName(srcPhysicalPath);
+			Logger.LogDebug("BindFiles(controlSrc={ControlSrc}): folder → {Folder}", controlSrc, folder);
             if (File.Exists(folder + "\\App_LocalResources\\" + fileName + ".resx"))
             {
                 // cboFile.Items.Add(new ListItem("Resource File", "ResourceFile"));
                 this.cboFile.AddItem("Resource File", "ResourceFile");
             }
+			Logger.LogDebug("<<< Exiting BindFiles(controlSrc={ControlSrc})", controlSrc);
         }
 
         private string GetSourceFileName(string controlSrc)
         {
+			Logger.LogDebug(">>> Entering GetSourceFileName(controlSrc={ControlSrc})", controlSrc);
             var srcPhysicalPath = this.Server.MapPath(controlSrc);
             var srcFile = Null.NullString;
+			Logger.LogDebug("GetSourceFileName(controlSrc={ControlSrc}): srcFile → {SrcFile}", controlSrc, srcFile);
+			Logger.LogDebug("GetSourceFileName(controlSrc={ControlSrc}): srcPhysicalPath → {SrcPhysicalPath}", controlSrc, srcPhysicalPath);
             switch (this.cboFile.SelectedValue)
             {
                 case "UserControl":
@@ -140,22 +159,28 @@ namespace DotNetNuke.Modules.Admin.Modules
                     break;
                 case "ResourceFile":
                     var fileName = Path.GetFileName(srcPhysicalPath);
+					Logger.LogDebug("GetSourceFileName(controlSrc={ControlSrc}): fileName → {FileName}", controlSrc, fileName);
                     var folder = Path.GetDirectoryName(srcPhysicalPath);
+					Logger.LogDebug("GetSourceFileName(controlSrc={ControlSrc}): folder → {Folder}", controlSrc, folder);
                     srcFile = folder + "\\App_LocalResources\\" + fileName + ".resx";
                     break;
             }
 
+			Logger.LogDebug("<<< Exiting GetSourceFileName(controlSrc={ControlSrc})", controlSrc);
             return srcFile;
         }
 
         private void DisplayFile()
         {
+			Logger.LogDebug(">>> Entering DisplayFile()");
             var objModuleControl = ModuleControlController.GetModuleControl(this.hostSettings, this.ModuleControlId);
             if (objModuleControl != null)
             {
                 var srcVirtualPath = objModuleControl.ControlSrc;
                 var srcFile = Null.NullString;
+				Logger.LogDebug("DisplayFile(): srcFile → {SrcFile}", srcFile);
                 var displaySource = this.cboFile.SelectedValue != "None";
+				Logger.LogDebug("DisplayFile(): displaySource → {DisplaySource}", displaySource);
 
                 if (displaySource)
                 {
@@ -163,6 +188,7 @@ namespace DotNetNuke.Modules.Admin.Modules
                     this.lblSourceFile.Text = string.Format(CultureInfo.CurrentCulture, Localization.GetString("SourceFile", this.LocalResourceFile), srcFile);
 
                     var objStreamReader = File.OpenText(srcFile);
+					Logger.LogDebug("DisplayFile(): objStreamReader → {ObjStreamReader}", objStreamReader);
                     this.txtSource.Text = objStreamReader.ReadToEnd();
                     objStreamReader.Close();
                 }
@@ -170,10 +196,12 @@ namespace DotNetNuke.Modules.Admin.Modules
                 this.lblSourceFile.Visible = displaySource;
                 this.trSource.Visible = displaySource;
             }
+			Logger.LogDebug("<<< Exiting DisplayFile()");
         }
 
         private void OnUpdateClick(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnUpdateClick(sender={Sender},e={E})", sender, e);
             try
             {
                 if (this.cboFile.SelectedValue == "None")
@@ -184,14 +212,17 @@ namespace DotNetNuke.Modules.Admin.Modules
                 else
                 {
                     var objModuleControl = ModuleControlController.GetModuleControl(this.hostSettings, this.ModuleControlId);
+					Logger.LogDebug("OnUpdateClick(sender={Sender},e={E}): objModuleControl → {ObjModuleControl}", sender, e, objModuleControl);
                     if (objModuleControl != null)
                     {
                         var srcVirtualPath = objModuleControl.ControlSrc;
                         var srcPhysicalPath = this.GetSourceFileName(srcVirtualPath);
+						Logger.LogDebug("OnUpdateClick(sender={Sender},e={E}): srcPhysicalPath → {SrcPhysicalPath}", sender, e, srcPhysicalPath);
                         if (File.Exists(srcPhysicalPath))
                         {
                             File.SetAttributes(srcPhysicalPath, FileAttributes.Normal);
                             var objStream = File.CreateText(srcPhysicalPath);
+							Logger.LogDebug("OnUpdateClick(sender={Sender},e={E}): objStream → {ObjStream}", sender, e, objStream);
                             objStream.WriteLine(this.txtSource.Text);
                             objStream.Close();
                         }
@@ -202,8 +233,10 @@ namespace DotNetNuke.Modules.Admin.Modules
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnUpdateClick(sender={Sender},e={E}): {Arg2}", sender, e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnUpdateClick(sender={Sender},e={E})", sender, e);
         }
     }
 }

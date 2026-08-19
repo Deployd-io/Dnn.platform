@@ -43,8 +43,10 @@ public partial class Create : GroupsModuleBase
     public Create()
         : this(null, null, null, null, null, null, null, null, null)
     {
+	eventLogger.LogDebug(">>> Entering Create()");
     }
 
+	eventLogger.LogDebug("<<< Exiting Create()");
     /// <summary>Initializes a new instance of the <see cref="Create"/> class.</summary>
     /// <param name="navigationManager">The navigation manager.</param>
     /// <param name="fileManager">The file manager.</param>
@@ -58,6 +60,15 @@ public partial class Create : GroupsModuleBase
     public Create(INavigationManager navigationManager, IFileManager fileManager, IFolderManager folderManager, IFileContentTypeManager fileContentTypeManager, IRoleController roleController, IApplicationStatusInfo applicationStatusInfo, IEventLogger eventLogger, DataProvider dataProvider)
         : this(navigationManager, fileManager, folderManager, fileContentTypeManager, roleController, applicationStatusInfo, eventLogger, dataProvider, null)
     {
+	eventLogger.LogDebug(">>> Entering Create(navigationManager={NavigationManager},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},roleController={RoleController},applicationStatusInfo={ApplicationStatusInfo},eventLogger={EventLogger},dataProvider={DataProvider})", navigationManager, fileManager, folderManager, fileContentTypeManager, roleController, applicationStatusInfo, eventLogger, dataProvider);
+	eventLogger.LogDebug("<<< Exiting Create(navigationManager={NavigationManager},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},roleController={RoleController},applicationStatusInfo={ApplicationStatusInfo},eventLogger={EventLogger},dataProvider={DataProvider})", navigationManager, fileManager, folderManager, fileContentTypeManager, roleController, applicationStatusInfo, eventLogger, dataProvider);
+	eventLogger.LogDebug("Create(navigationManager={NavigationManager},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},roleController={RoleController},applicationStatusInfo={ApplicationStatusInfo},eventLogger={EventLogger},dataProvider={DataProvider},hostSettings={HostSettings}): fileManager → {FileManager1}", navigationManager, fileManager, folderManager, fileContentTypeManager, roleController, applicationStatusInfo, eventLogger, dataProvider, hostSettings, fileManager);
+	eventLogger.LogDebug("Create(navigationManager={NavigationManager},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},roleController={RoleController},applicationStatusInfo={ApplicationStatusInfo},eventLogger={EventLogger},dataProvider={DataProvider},hostSettings={HostSettings}): folderManager → {FolderManager1}", navigationManager, fileManager, folderManager, fileContentTypeManager, roleController, applicationStatusInfo, eventLogger, dataProvider, hostSettings, folderManager);
+	eventLogger.LogDebug("Create(navigationManager={NavigationManager},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},roleController={RoleController},applicationStatusInfo={ApplicationStatusInfo},eventLogger={EventLogger},dataProvider={DataProvider},hostSettings={HostSettings}): fileContentTypeManager → {FileContentTypeManager1}", navigationManager, fileManager, folderManager, fileContentTypeManager, roleController, applicationStatusInfo, eventLogger, dataProvider, hostSettings, fileContentTypeManager);
+	eventLogger.LogDebug("Create(navigationManager={NavigationManager},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},roleController={RoleController},applicationStatusInfo={ApplicationStatusInfo},eventLogger={EventLogger},dataProvider={DataProvider},hostSettings={HostSettings}): roleController → {RoleController1}", navigationManager, fileManager, folderManager, fileContentTypeManager, roleController, applicationStatusInfo, eventLogger, dataProvider, hostSettings, roleController);
+	eventLogger.LogDebug("Create(navigationManager={NavigationManager},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},roleController={RoleController},applicationStatusInfo={ApplicationStatusInfo},eventLogger={EventLogger},dataProvider={DataProvider},hostSettings={HostSettings}): eventLogger → {EventLogger1}", navigationManager, fileManager, folderManager, fileContentTypeManager, roleController, applicationStatusInfo, eventLogger, dataProvider, hostSettings, eventLogger);
+	eventLogger.LogDebug("Create(navigationManager={NavigationManager},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},roleController={RoleController},applicationStatusInfo={ApplicationStatusInfo},eventLogger={EventLogger},dataProvider={DataProvider},hostSettings={HostSettings}): dataProvider → {DataProvider1}", navigationManager, fileManager, folderManager, fileContentTypeManager, roleController, applicationStatusInfo, eventLogger, dataProvider, hostSettings, dataProvider);
+	eventLogger.LogDebug("Create(navigationManager={NavigationManager},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},roleController={RoleController},applicationStatusInfo={ApplicationStatusInfo},eventLogger={EventLogger},dataProvider={DataProvider},hostSettings={HostSettings}): hostSettings → {HostSettings1}", navigationManager, fileManager, folderManager, fileContentTypeManager, roleController, applicationStatusInfo, eventLogger, dataProvider, hostSettings, hostSettings);
     }
 
     /// <summary>Initializes a new instance of the <see cref="Create"/> class.</summary>
@@ -78,6 +89,7 @@ public partial class Create : GroupsModuleBase
         this.fileContentTypeManager = fileContentTypeManager ?? this.DependencyProvider.GetRequiredService<IFileContentTypeManager>();
         this.roleController = roleController ?? this.DependencyProvider.GetRequiredService<IRoleController>();
         this.appStatus = applicationStatusInfo ?? this.DependencyProvider.GetRequiredService<IApplicationStatusInfo>();
+		eventLogger.LogDebug("Create(navigationManager={NavigationManager},fileManager={FileManager},folderManager={FolderManager},fileContentTypeManager={FileContentTypeManager},roleController={RoleController},applicationStatusInfo={ApplicationStatusInfo},eventLogger={EventLogger},dataProvider={DataProvider},hostSettings={HostSettings}): appStatus → {AppStatus}", navigationManager, fileManager, folderManager, fileContentTypeManager, roleController, applicationStatusInfo, eventLogger, dataProvider, hostSettings, appStatus);
         this.eventLogger = eventLogger ?? this.DependencyProvider.GetRequiredService<IEventLogger>();
         this.dataProvider = dataProvider ?? this.DependencyProvider.GetRequiredService<DataProvider>();
         this.hostSettings = hostSettings ?? this.DependencyProvider.GetRequiredService<IHostSettings>();
@@ -86,10 +98,12 @@ public partial class Create : GroupsModuleBase
     /// <inheritdoc />
     protected override void OnInit(EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering OnInit(e={E})", e);
         this.Load += this.Page_Load;
         this.btnCreate.Click += this.Create_Click;
         this.btnCancel.Click += this.Cancel_Click;
         base.OnInit(e);
+		eventLogger.LogDebug("<<< Exiting OnInit(e={E})", e);
     }
 
     /// <summary>Handles the <see cref="Control.Load"/> event.</summary>
@@ -97,17 +111,24 @@ public partial class Create : GroupsModuleBase
     /// <param name="e">The event args.</param>
     protected void Page_Load(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering Page_Load(sender={Sender},e={E})", sender, e);
         JavaScript.RequestRegistration(this.appStatus, this.eventLogger, this.PortalSettings, CommonJs.DnnPlugins);
+		eventLogger.LogDebug("<<< Exiting Page_Load(sender={Sender},e={E})", sender, e);
     }
 
     private void Cancel_Click(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering Cancel_Click(sender={Sender},e={E})", sender, e);
         var groupListingUrl = this.navigationManager.NavigateURL(this.TabId);
         this.Response.Redirect(groupListingUrl);
+		eventLogger.LogDebug("Cancel_Click(sender={Sender},e={E}): groupListingUrl → {GroupListingUrl}", sender, e, groupListingUrl);
+		eventLogger.LogDebug("<<< Exiting Cancel_Click(sender={Sender},e={E})", sender, e);
     }
 
     private void Create_Click(object sender, EventArgs e)
     {
+		eventLogger.LogDebug(">>> Entering Create_Click(sender={Sender},e={E})", sender, e);
+		eventLogger.LogDebug("<<< Exiting Create_Click(sender={Sender},e={E})", sender, e);
         var ps = Security.PortalSecurity.Instance;
 #pragma warning disable CS0618 // Type or member is obsolete
         this.txtGroupName.Text = ps.InputFilter(this.txtGroupName.Text, Security.PortalSecurity.FilterFlag.NoScripting);
@@ -123,7 +144,9 @@ public partial class Create : GroupsModuleBase
         }
 
         var modRoles = new List<RoleInfo>();
+		eventLogger.LogDebug("Create_Click(sender={Sender},e={E}): modRoles → {ModRoles}", sender, e, modRoles);
         var modUsers = new List<UserInfo>();
+		eventLogger.LogDebug("Create_Click(sender={Sender},e={E}): modUsers → {ModUsers}", sender, e, modUsers);
         foreach (IPermissionInfo modulePermissionInfo in ModulePermissionController.GetModulePermissions(this.ModuleId, this.TabId))
         {
             if (modulePermissionInfo.PermissionKey == "MODGROUP" && modulePermissionInfo.AllowAccess)
@@ -140,6 +163,7 @@ public partial class Create : GroupsModuleBase
         }
 
         var roleInfo = new RoleInfo
+		eventLogger.LogDebug("Create_Click(sender={Sender},e={E}): roleInfo → {RoleInfo}", sender, e, roleInfo);
         {
             PortalID = this.PortalId,
             RoleName = this.txtGroupName.Text,
@@ -152,6 +176,7 @@ public partial class Create : GroupsModuleBase
         if (this.GroupModerationEnabled)
         {
             roleInfo.Status = RoleStatus.Pending;
+			eventLogger.LogDebug("Create_Click(sender={Sender},e={E}): roleInfo.Status → {Arg2}", sender, e, roleInfo.Status);
             userRoleStatus = RoleStatus.Pending;
         }
         else
@@ -160,6 +185,7 @@ public partial class Create : GroupsModuleBase
         }
 
         var objModulePermissions = new ModulePermissionCollection(CBO.FillCollection(this.dataProvider.GetModulePermissionsByModuleID(this.ModuleId, -1), typeof(ModulePermissionInfo)));
+		eventLogger.LogDebug("Create_Click(sender={Sender},e={E}): objModulePermissions → {ObjModulePermissions}", sender, e, objModulePermissions);
         if (ModulePermissionController.HasModulePermission(objModulePermissions, "MODGROUP"))
         {
             roleInfo.Status = RoleStatus.Approved;
@@ -167,17 +193,20 @@ public partial class Create : GroupsModuleBase
         }
 
         var roleGroupId = this.DefaultRoleGroupId;
+		eventLogger.LogDebug("Create_Click(sender={Sender},e={E}): roleGroupId → {RoleGroupId}", sender, e, roleGroupId);
         if (roleGroupId < Null.NullInteger)
         {
             roleGroupId = Null.NullInteger;
         }
 
         roleInfo.RoleGroupID = roleGroupId;
+		eventLogger.LogDebug("Create_Click(sender={Sender},e={E}): roleInfo.RoleGroupID → {Arg2}", sender, e, roleInfo.RoleGroupID);
 
         roleInfo.RoleID = this.roleController.AddRole(roleInfo);
         roleInfo = this.roleController.GetRoleById(this.PortalId, roleInfo.RoleID);
 
         var groupUrl = this.navigationManager.NavigateURL(this.GroupViewTabId, string.Empty, $"groupid={roleInfo.RoleID}");
+		eventLogger.LogDebug("Create_Click(sender={Sender},e={E}): groupUrl → {GroupUrl}", sender, e, groupUrl);
         if (groupUrl.StartsWith("http://") || groupUrl.StartsWith("https://"))
         {
             const int startIndex = 8; // length of https://
@@ -194,12 +223,16 @@ public partial class Create : GroupsModuleBase
             var groupFolder = this.folderManager.GetFolder(this.PortalSettings.PortalId, $"Groups/{roleInfo.RoleID}") ??
                               this.folderManager.AddFolder(this.PortalSettings.PortalId, $"Groups/{roleInfo.RoleID}");
             var fileName = Path.GetFileName(this.inpFile.PostedFile.FileName);
+			eventLogger.LogDebug("Create_Click(sender={Sender},e={E}): fileName → {FileName}", sender, e, fileName);
+			eventLogger.LogDebug("Create_Click(sender={Sender},e={E}): roleInfo.IconFile → {Arg2}", sender, e, roleInfo.IconFile);
             var fileInfo = this.fileManager.AddFile(groupFolder, fileName, this.inpFile.PostedFile.InputStream, true, false, this.fileContentTypeManager.GetContentType(Path.GetExtension(fileName)));
+			eventLogger.LogDebug("Create_Click(sender={Sender},e={E}): fileInfo → {FileInfo}", sender, e, fileInfo);
             roleInfo.IconFile = $"FileID={fileInfo.FileId}";
             this.roleController.UpdateRole(roleInfo);
         }
 
         var notifications = new Notifications(this.hostSettings);
+		eventLogger.LogDebug("Create_Click(sender={Sender},e={E}): notifications → {Notifications}", sender, e, notifications);
 
         this.roleController.AddUserRole(this.PortalId, this.UserId, roleInfo.RoleID, userRoleStatus, true, Null.NullDate, Null.NullDate);
         if (roleInfo.Status == RoleStatus.Pending)
@@ -217,6 +250,7 @@ public partial class Create : GroupsModuleBase
         }
 
         var groupListingUrl = this.navigationManager.NavigateURL(this.TabId);
+		eventLogger.LogDebug("Create_Click(sender={Sender},e={E}): groupListingUrl → {GroupListingUrl}", sender, e, groupListingUrl);
         this.Response.Redirect(groupListingUrl);
     }
 }

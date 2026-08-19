@@ -15,6 +15,7 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
     /// <summary>Settings class for storing and retrieving API token settings.</summary>
     public partial class ApiTokenSettings
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ApiTokenSettings));
         /// <summary>Gets or sets the timespan of a token for end users.</summary>
         [PortalSetting(Prefix = "ApiTokens_")]
         public ApiTokenTimespan UserTokenTimespan { get; set; } = ApiTokenTimespan.Days30;
@@ -44,6 +45,8 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
         /// <returns>The API token settings for the given portal ID.</returns>
         public static ApiTokenSettings GetSettings(ApiTokenSettingsRepository settingsRepository, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetSettings(settingsRepository={SettingsRepository},portalId={PortalId})", settingsRepository, portalId);
+			Logger.LogDebug("<<< Exiting GetSettings(settingsRepository={SettingsRepository},portalId={PortalId})", settingsRepository, portalId);
             return settingsRepository.GetSettings(portalId);
         }
 
@@ -58,7 +61,9 @@ namespace DotNetNuke.Web.Api.Auth.ApiTokens
         /// <param name="portalId">The ID of the portal for the settings.</param>
         public void SaveSettings(ApiTokenSettingsRepository settingsRepository, int portalId)
         {
+			Logger.LogDebug(">>> Entering SaveSettings(settingsRepository={SettingsRepository},portalId={PortalId})", settingsRepository, portalId);
             settingsRepository.SaveSettings(portalId, this);
+			Logger.LogDebug("<<< Exiting SaveSettings(portalId={PortalId})", portalId);
         }
     }
 }

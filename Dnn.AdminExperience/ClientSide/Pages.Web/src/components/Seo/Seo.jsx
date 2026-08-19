@@ -4,34 +4,44 @@ import styles from "./style.module.less";
 import { GridSystem, GridCell, Label, Dropdown, MultiLineInputWithError, Switch } from "@dnnsoftware/dnn-react-common";
 import Localization from "../../localization";
 import PageUrls from "./PageUrls/PageUrls";
+const logger = console;
 
 class Seo extends Component {
 
     onChangeField(key, event) {
+		logger.debug(`>>> Entering onChangeField(key=${key},event=${event})`);
         const {onChangeField} = this.props;
         onChangeField(key, event.target.value);
+		logger.debug(`<<< Exiting onChangeField(key=${key},event=${event})`);
     }
 
     onSitemapPrioritySelected(option) {
+		logger.debug(`>>> Entering onSitemapPrioritySelected(option=${option})`);
         const {onChangeField} = this.props;
         onChangeField("sitemapPriority", option.value);
+		logger.debug(`<<< Exiting onSitemapPrioritySelected(option=${option})`);
     }
 
     getSitemapPriorityOptions() {
+		logger.debug('>>> Entering getSitemapPriorityOptions()');
         const options = [];
         for (let i = 0; i <= 1; i += 0.1) {
             const v = i.toFixed(1) / 1;
+			logger.debug(`getSitemapPriorityOptions(): v → ${v}`);
             options.push({ value: v, label: v });
         }
 
+		logger.debug('<<< Exiting getSitemapPriorityOptions()');
         return options;
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {page, onChangeField} = this.props;
 
         const editing = page.tabId !== 0;
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.seoContainer}>
                 {editing &&

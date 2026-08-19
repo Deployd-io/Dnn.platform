@@ -11,11 +11,13 @@ import {
     roles as RolesActions
 } from "../../../actions";
 import util from "utils";
+const logger = console;
 
 let canEdit = false;
 class FiltersBar extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             selectedGroup: {
                 label: resx.get("GlobalRolesGroup"),
@@ -24,8 +26,10 @@ class FiltersBar extends Component {
             showPopup: false
         };
         canEdit = util.settings.isHost || util.settings.isAdmin || util.settings.permissions.EDIT;
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
     onDeleteGroup(e) {
+		logger.debug(`>>> Entering onDeleteGroup(e=${e})`);
         e.stopPropagation();
 
         const {props} = this;
@@ -43,20 +47,25 @@ class FiltersBar extends Component {
             }));
         }, () => {
         });
+		logger.debug(`<<< Exiting onDeleteGroup(e=${e})`);
     }
 
     onSave(group) {
+		logger.debug(`>>> Entering onSave(group=${group})`);
         this.updateSelectedGroup({ label: group.name, value: group.id });
         let {showPopup} = this.state;
+		logger.debug(`<<< Exiting onSave(group=${group})`);
         showPopup = !showPopup;
         this.setState({
             showPopup
         });
     }
     closeDropDown() {
+		logger.debug('>>> Entering closeDropDown()');
         /*This is done in order to keep the dropdown closed on click on edit/delete*/
         let {state} = this.groupsDropdownRef;
         if (state) {
+			logger.debug('<<< Exiting closeDropDown()');
             state.dropDownOpen = false;
             this.groupsDropdownRef.setState({
                 state
@@ -68,6 +77,7 @@ class FiltersBar extends Component {
         this.props.onRoleGroupChanged(option);
     }
     toggleEditGroup() {
+		logger.debug('>>> Entering toggleEditGroup()');
         let {showPopup} = this.state;
         showPopup = !showPopup;
         this.setState({
@@ -75,21 +85,26 @@ class FiltersBar extends Component {
         }, () => {
             this.closeDropDown();
         });
+		logger.debug('<<< Exiting toggleEditGroup()');
     }
     updateSelectedGroup(option) {
+		logger.debug(`>>> Entering updateSelectedGroup(option=${option})`);
         let { label} = option;
         let { value} = option;
         let {selectedGroup} = this.state;
         selectedGroup.label = label;
         selectedGroup.value = value;
+		logger.debug(`<<< Exiting updateSelectedGroup(option=${option})`);
         this.setState({
             selectedGroup
         });
     }
 
     getCurrentLabel() {
+		logger.debug('>>> Entering getCurrentLabel()');
         let {props} = this;
         let selectedGroup = Object.assign({}, this.state.selectedGroup);
+		logger.debug(`getCurrentLabel(): selectedGroup → ${selectedGroup}`);
         let value = selectedGroup.value;
         let label = selectedGroup.label;
         /*eslint-disable no-unused-vars*/
@@ -107,24 +122,32 @@ class FiltersBar extends Component {
                 </div>;
             }
         }
+		logger.debug(`getCurrentLabel(): group → ${group}`);
+		logger.debug('<<< Exiting getCurrentLabel()');
         return label;
     }
     getCurrentGroup() {
+		logger.debug('>>> Entering getCurrentGroup()');
         let {props} = this;
         let selectedGroup = Object.assign({}, this.state.selectedGroup);
+		logger.debug(`getCurrentGroup(): selectedGroup → ${selectedGroup}`);
         let value = selectedGroup.value;
         let label = selectedGroup.label;
         let group = { id: value, name: label };
         if (props.roleGroups.some(group => group.id === this.state.selectedGroup.value)) {
             group = Object.assign({}, props.roleGroups.filter(group => group.id === value)[0]);
         }
+		logger.debug(`getCurrentGroup(): group → ${group}`);
+		logger.debug('<<< Exiting getCurrentGroup()');
         return group;
     }
 
 
     getRoleGroupsDropDown() {
+		logger.debug('>>> Entering getRoleGroupsDropDown()');
         let label = this.getCurrentLabel();
         let roleGroupsOptions = this.BuildRoleGroupsOptions();
+		logger.debug(`getRoleGroupsDropDown(): label → ${label}`);
         let GroupsDropDown = <Dropdown  style={{ width: "100%" }}
             withBorder={false}
             options={roleGroupsOptions}
@@ -132,6 +155,7 @@ class FiltersBar extends Component {
             onSelect={this.onSelect.bind(this) }
             ref={node => this.groupsDropdownRef = node}
         />;
+		logger.debug('<<< Exiting getRoleGroupsDropDown()');
         return <div className="groups-filter">{GroupsDropDown}<div className="clear"></div></div>;
     }
 
@@ -143,6 +167,8 @@ class FiltersBar extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return <div className="filter-container">
             <GridCell columnSize={35} >
                 {this.props.roleGroups.length > 0 && this.getRoleGroupsDropDown() }
@@ -176,6 +202,8 @@ FiltersBar.propTypes = {
     DeleteAllowed: PropTypes.bool
 };
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         roleGroups: state.roles.roleGroups
     };

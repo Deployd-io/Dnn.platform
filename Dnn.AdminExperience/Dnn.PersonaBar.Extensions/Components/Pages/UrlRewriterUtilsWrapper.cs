@@ -11,6 +11,8 @@ namespace Dnn.PersonaBar.Pages.Components
         /// <inheritdoc />
         public FriendlyUrlOptions GetExtendOptionsForURLs(int portalId)
         {
+			eventLogger.LogDebug(">>> Entering GetExtendOptionsForURLs(portalId={PortalId})", portalId);
+			eventLogger.LogDebug("<<< Exiting GetExtendOptionsForURLs(portalId={PortalId})", portalId);
             return UrlRewriterUtils.ExtendOptionsForCustomURLs(UrlRewriterUtils.GetOptionsFromSettings(new FriendlyUrlSettings(portalId)));
         }
     }

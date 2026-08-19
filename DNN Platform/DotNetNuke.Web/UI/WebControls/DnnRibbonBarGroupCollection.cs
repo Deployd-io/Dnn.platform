@@ -9,16 +9,22 @@ using System.Web.UI;
 /// <summary>A collection of <see cref="DnnRibbonBarGroup"/> controls.</summary>
 public class DnnRibbonBarGroupCollection : TypedControlCollection<DnnRibbonBarGroup>
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnRibbonBarGroupCollection));
     /// <summary>Initializes a new instance of the <see cref="DnnRibbonBarGroupCollection"/> class.</summary>
     /// <param name="owner">The owner control.</param>
     public DnnRibbonBarGroupCollection(Control owner)
         : base(owner)
     {
+	Logger.LogDebug(">>> Entering DnnRibbonBarGroupCollection(owner={Owner})", owner);
+	Logger.LogDebug("<<< Exiting DnnRibbonBarGroupCollection(owner={Owner})", owner);
     }
 
     /// <inheritdoc />
     protected override void ThrowOnInvalidControlType()
     {
+		Logger.LogDebug(">>> Entering ThrowOnInvalidControlType()");
+		Logger.LogWarning("Throwing ArgumentException from ThrowOnInvalidControlType()");
+		Logger.LogDebug("<<< Exiting ThrowOnInvalidControlType()");
         throw new ArgumentException("DnnRibbonBarGroupCollection must contain controls of type DnnRibbonBarGroup");
     }
 }

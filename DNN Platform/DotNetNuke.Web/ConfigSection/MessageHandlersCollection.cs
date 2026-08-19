@@ -12,6 +12,7 @@ namespace DotNetNuke.Web.ConfigSection
     /// <summary>A collection of <see cref="MessageHandlerEntry"/> instances.</summary>
     public class MessageHandlersCollection : ConfigurationElementCollection, ICollection<ConfigurationElement>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MessageHandlersCollection));
         /// <inheritdoc />
         bool ICollection<ConfigurationElement>.IsReadOnly => this.IsReadOnly();
 
@@ -47,12 +48,14 @@ namespace DotNetNuke.Web.ConfigSection
         /// <inheritdoc />
         public bool Remove(ConfigurationElement item)
         {
+			Logger.LogDebug(">>> Entering Remove(item={Item})", item);
             if (!this.Contains(item))
             {
                 return false;
             }
 
             this.BaseRemove(this.GetElementKey(item));
+			Logger.LogDebug("<<< Exiting Remove(item={Item})", item);
             return true;
         }
 
@@ -65,12 +68,16 @@ namespace DotNetNuke.Web.ConfigSection
         /// <inheritdoc />
         protected override ConfigurationElement CreateNewElement()
         {
+			Logger.LogDebug(">>> Entering CreateNewElement()");
+			Logger.LogDebug("<<< Exiting CreateNewElement()");
             return new MessageHandlerEntry();
         }
 
         /// <inheritdoc />
         protected override object GetElementKey(ConfigurationElement element)
         {
+			Logger.LogDebug(">>> Entering GetElementKey(element={Element})", element);
+			Logger.LogDebug("<<< Exiting GetElementKey(element={Element})", element);
             return (element as MessageHandlerEntry ?? new MessageHandlerEntry()).Name;
         }
 

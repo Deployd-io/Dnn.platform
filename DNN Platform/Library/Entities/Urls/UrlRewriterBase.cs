@@ -18,13 +18,16 @@ namespace DotNetNuke.Entities.Urls
     /// <summary>Abstract class to allow derived classes of different implementations of Url Rewriter.</summary>
     public abstract class UrlRewriterBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UrlRewriterBase));
         /// <summary>Initializes a new instance of the <see cref="UrlRewriterBase"/> class.</summary>
         [Obsolete("Deprecated in DotNetNuke 10.0.2. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         protected UrlRewriterBase()
             : this(null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering UrlRewriterBase()");
         }
 
+		Logger.LogDebug("<<< Exiting UrlRewriterBase()");
         /// <summary>Initializes a new instance of the <see cref="UrlRewriterBase"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
         /// <param name="portalAliasService">The portal alias service.</param>
@@ -54,35 +57,46 @@ namespace DotNetNuke.Entities.Urls
 
         protected static void AutoAddAlias(IHostSettings hostSettings, IPortalAliasService portalAliasService, HttpContextBase context)
         {
+			Logger.LogDebug(">>> Entering AutoAddAlias(hostSettings={HostSettings},portalAliasService={PortalAliasService},context={Context})", hostSettings, portalAliasService, context);
             var portalId = hostSettings.HostPortalId;
 
             // the domain name was not found so try using the host portal's first alias
             if (portalId > Null.NullInteger)
             {
                 IPortalAliasInfo portalAliasInfo = new PortalAliasInfo();
+				Logger.LogDebug("AutoAddAlias(hostSettings={HostSettings},portalAliasService={PortalAliasService},context={Context}): portalAliasInfo → {PortalAliasInfo}", hostSettings, portalAliasService, context, portalAliasInfo);
                 portalAliasInfo.HttpAlias = Globals.GetDomainName(context.Request, true);
                 portalAliasInfo.PortalId = portalId;
+				Logger.LogDebug("AutoAddAlias(hostSettings={HostSettings},portalAliasService={PortalAliasService},context={Context}): portalAliasInfo.PortalId → {Arg3}", hostSettings, portalAliasService, context, portalAliasInfo.PortalId);
                 portalAliasService.AddPortalAlias(portalAliasInfo);
 
                 context.Response.Redirect(context.Request.Url.ToString(), true);
             }
+			Logger.LogDebug("<<< Exiting AutoAddAlias(hostSettings={HostSettings},portalAliasService={PortalAliasService},context={Context})", hostSettings, portalAliasService, context);
+			Logger.LogDebug(">>> Entering AutoAddAlias(context={Context})", context);
         }
 
         protected static void AutoAddAlias(HttpContext context)
         {
             var serviceProvider = context.GetScope().ServiceProvider;
             AutoAddAlias(serviceProvider.GetRequiredService<IHostSettings>(), serviceProvider.GetRequiredService<IPortalAliasService>(), new HttpContextWrapper(context));
+			Logger.LogDebug("AutoAddAlias(context={Context}): serviceProvider → {ServiceProvider}", context, serviceProvider);
+			Logger.LogDebug("<<< Exiting AutoAddAlias(context={Context})", context);
         }
 
         protected static bool CanAutoAddPortalAlias(IHostSettingsService hostSettingsService, IPortalController portalController)
         {
+			Logger.LogDebug(">>> Entering CanAutoAddPortalAlias(hostSettingsService={HostSettingsService},portalController={PortalController})", hostSettingsService, portalController);
             bool autoAddPortalAlias = hostSettingsService.GetBoolean("AutoAddPortalAlias");
+			Logger.LogDebug("<<< Exiting CanAutoAddPortalAlias(hostSettingsService={HostSettingsService},portalController={PortalController})", hostSettingsService, portalController);
+			Logger.LogDebug("<<< Exiting CanAutoAddPortalAlias()");
             return autoAddPortalAlias && (portalController.GetPortals().Count == 1);
         }
 
         protected static bool CanAutoAddPortalAlias()
         {
             var serviceProvider = Globals.GetCurrentServiceProvider();
+			Logger.LogDebug("CanAutoAddPortalAlias(): serviceProvider → {ServiceProvider}", serviceProvider);
             return CanAutoAddPortalAlias(
                 serviceProvider.GetRequiredService<IHostSettingsService>(),
                 serviceProvider.GetRequiredService<IPortalController>());

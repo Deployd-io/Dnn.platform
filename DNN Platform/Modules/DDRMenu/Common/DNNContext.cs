@@ -36,10 +36,16 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         /// <param name="hostControl">The control that hosts the menu.</param>
         public DNNContext(Control hostControl)
         {
+			eventLogger.LogDebug(">>> Entering DNNContext(hostControl={HostControl})", hostControl);
             this.HostControl = hostControl;
 
+			eventLogger.LogDebug("DNNContext(hostControl={HostControl}): this.HostControl → {Arg1}", hostControl, this.HostControl);
             this.savedContext = Current;
+			eventLogger.LogDebug("DNNContext(hostControl={HostControl}): savedContext → {SavedContext}", hostControl, savedContext);
+			eventLogger.LogDebug("DNNContext(hostControl={HostControl}): this.savedContext → {Arg1}", hostControl, this.savedContext);
             Current = this;
+			eventLogger.LogDebug("DNNContext(hostControl={HostControl}): Current → {Current}", hostControl, Current);
+			eventLogger.LogDebug("<<< Exiting DNNContext(hostControl={HostControl})", hostControl);
         }
 
         /// <summary>Gets the module name.</summary>
@@ -54,6 +60,8 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         {
             get { return (DNNContext)HttpContext.Current.Items[DataName]; }
             private set { HttpContext.Current.Items[DataName] = value; }
+			eventLogger.LogDebug(">>> Entering GetModuleFolder(hostSettings={HostSettings})", hostSettings);
+			eventLogger.LogDebug("<<< Exiting GetModuleFolder(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <summary>Gets a reference to the page.</summary>
@@ -79,6 +87,7 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         public static string GetModuleFolder(IHostSettings hostSettings)
         {
             var desktopModule = DesktopModuleController.GetDesktopModuleByModuleName(hostSettings, ModuleName, PortalSettings.Current.PortalId);
+			eventLogger.LogDebug("GetModuleFolder(hostSettings={HostSettings}): desktopModule → {DesktopModule}", hostSettings, desktopModule);
             return moduleFolder ??= $"~/DesktopModules/{desktopModule.FolderName}/";
         }
 
@@ -87,20 +96,25 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
         /// <returns>The converted url.</returns>
         public string ResolveUrl(string relativeUrl)
         {
+			eventLogger.LogDebug(">>> Entering ResolveUrl(relativeUrl={RelativeUrl})", relativeUrl);
+			eventLogger.LogDebug("<<< Exiting ResolveUrl(relativeUrl={RelativeUrl})", relativeUrl);
             return this.HostControl.ResolveUrl(relativeUrl);
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+			eventLogger.LogDebug(">>> Entering Dispose()");
             this.Dispose(true);
             GC.SuppressFinalize(this);
+			eventLogger.LogDebug("<<< Exiting Dispose()");
         }
 
         /// <summary>Disposes this instance resources.</summary>
         /// <param name="disposing">A value indicating if the current instance is disposing.</param>
         protected virtual void Dispose(bool disposing)
         {
+			eventLogger.LogDebug(">>> Entering Dispose(disposing={Disposing})", disposing);
             if (this.isDisposed)
             {
                 return;
@@ -112,13 +126,18 @@ namespace DotNetNuke.Web.DDRMenu.DNNCommon
             }
 
             Current = this.savedContext;
+			eventLogger.LogDebug("Dispose(disposing={Disposing}): Current → {Current}", disposing, Current);
             this.isDisposed = true;
+			eventLogger.LogDebug("<<< Exiting Dispose(disposing={Disposing})", disposing);
         }
 
         private static string GetModuleNameFromAssembly()
         {
+			eventLogger.LogDebug(">>> Entering GetModuleNameFromAssembly()");
             var moduleFullName = Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().CodeBase);
 
+			eventLogger.LogDebug("GetModuleNameFromAssembly(): moduleFullName → {ModuleFullName}", moduleFullName);
+			eventLogger.LogDebug("<<< Exiting GetModuleNameFromAssembly()");
             return moduleFullName.Substring(moduleFullName.LastIndexOf('.') + 1);
         }
     }

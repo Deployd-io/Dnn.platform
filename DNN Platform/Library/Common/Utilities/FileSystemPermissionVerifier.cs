@@ -22,7 +22,11 @@ namespace DotNetNuke.Common.Utilities
         /// <param name="basePath">The path at which to start verifying.</param>
         public FileSystemPermissionVerifier(string basePath)
         {
+			Logger.LogDebug(">>> Entering FileSystemPermissionVerifier(basePath={BasePath})", basePath);
             this.basePath = basePath;
+			Logger.LogDebug("FileSystemPermissionVerifier(basePath={BasePath}): this.basePath → {Arg1}", basePath, this.basePath);
+			Logger.LogDebug("<<< Exiting FileSystemPermissionVerifier(basePath={BasePath})", basePath);
+			Logger.LogDebug("FileSystemPermissionVerifier(basePath={BasePath},retryTimes={RetryTimes}): retryTimes → {RetryTimes1}", basePath, retryTimes, retryTimes);
         }
 
         /// <summary>Initializes a new instance of the <see cref="FileSystemPermissionVerifier"/> class.</summary>
@@ -45,9 +49,11 @@ namespace DotNetNuke.Common.Utilities
 
         public bool VerifyAll()
         {
+			Logger.LogDebug(">>> Entering VerifyAll()");
             lock (typeof(FileSystemPermissionVerifier))
             {
                 // All these steps must be executed in this sequence as one unit
+				Logger.LogDebug("<<< Exiting VerifyAll()");
                 return this.VerifyFolderCreate() &&
                        this.VerifyFileCreate() &&
                        this.VerifyFileDelete() &&
@@ -57,6 +63,7 @@ namespace DotNetNuke.Common.Utilities
 
         private static void FileCreateAction(string verifyPath)
         {
+			Logger.LogDebug(">>> Entering FileCreateAction(verifyPath={VerifyPath})", verifyPath);
             if (File.Exists(verifyPath))
             {
                 File.Delete(verifyPath);
@@ -66,23 +73,28 @@ namespace DotNetNuke.Common.Utilities
             {
                 // do nothing just let it close
             }
+			Logger.LogDebug("<<< Exiting FileCreateAction(verifyPath={VerifyPath})", verifyPath);
         }
 
         private static void FolderCreateAction(string verifyPath)
         {
+			Logger.LogDebug(">>> Entering FolderCreateAction(verifyPath={VerifyPath})", verifyPath);
             if (Directory.Exists(verifyPath))
             {
                 Directory.Delete(verifyPath, true);
             }
 
             Directory.CreateDirectory(verifyPath);
+			Logger.LogDebug("<<< Exiting FolderCreateAction(verifyPath={VerifyPath})", verifyPath);
         }
 
         /// <summary>  VerifyFileCreate checks whether a file can be created.</summary>
         private bool VerifyFileCreate()
         {
+			Logger.LogDebug(">>> Entering VerifyFileCreate()");
             string verifyPath = Path.Combine(this.basePath, "Verify\\Verify.txt");
             bool verified = true;
+			Logger.LogDebug("VerifyFileCreate(): verified → {Verified}", verified);
 
             // Attempt to create the File
             try
@@ -95,14 +107,17 @@ namespace DotNetNuke.Common.Utilities
                 verified = false;
             }
 
+			Logger.LogDebug("<<< Exiting VerifyFileCreate()");
             return verified;
         }
 
         /// <summary>  VerifyFileDelete checks whether a file can be deleted.</summary>
         private bool VerifyFileDelete()
         {
+			Logger.LogDebug(">>> Entering VerifyFileDelete()");
             string verifyPath = Path.Combine(this.basePath, "Verify\\Verify.txt");
             bool verified = true;
+			Logger.LogDebug("VerifyFileDelete(): verified → {Verified}", verified);
 
             // Attempt to delete the File
             try
@@ -115,14 +130,17 @@ namespace DotNetNuke.Common.Utilities
                 verified = false;
             }
 
+			Logger.LogDebug("<<< Exiting VerifyFileDelete()");
             return verified;
         }
 
         /// <summary>  VerifyFolderCreate checks whether a folder can be created.</summary>
         private bool VerifyFolderCreate()
         {
+			Logger.LogDebug(">>> Entering VerifyFolderCreate()");
             string verifyPath = Path.Combine(this.basePath, "Verify");
             bool verified = true;
+			Logger.LogDebug("VerifyFolderCreate(): verified → {Verified}", verified);
 
             // Attempt to create the Directory
             try
@@ -135,14 +153,17 @@ namespace DotNetNuke.Common.Utilities
                 verified = false;
             }
 
+			Logger.LogDebug("<<< Exiting VerifyFolderCreate()");
             return verified;
         }
 
         /// <summary>  VerifyFolderDelete checks whether a folder can be deleted.</summary>
         private bool VerifyFolderDelete()
         {
+			Logger.LogDebug(">>> Entering VerifyFolderDelete()");
             string verifyPath = Path.Combine(this.basePath, "Verify");
             bool verified = true;
+			Logger.LogDebug("VerifyFolderDelete(): verified → {Verified}", verified);
 
             // Attempt to delete the Directory
             try
@@ -155,12 +176,15 @@ namespace DotNetNuke.Common.Utilities
                 verified = false;
             }
 
+			Logger.LogDebug("<<< Exiting VerifyFolderDelete()");
             return verified;
         }
 
         private void Try(Action action, string description)
         {
+			Logger.LogDebug(">>> Entering Try(action={Action},description={Description})", action, description);
             new RetryableAction(action, description, this.retryTimes, TimeSpan.FromSeconds(1)).TryIt();
+			Logger.LogDebug("<<< Exiting Try(action={Action},description={Description})", action, description);
         }
     }
 }

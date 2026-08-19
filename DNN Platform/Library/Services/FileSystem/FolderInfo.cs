@@ -22,6 +22,7 @@ namespace DotNetNuke.Services.FileSystem
     [Serializable]
     public class FolderInfo : BaseEntityInfo, IHydratable, IFolderInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FolderInfo));
         // local property declarations
         private string displayName;
         private string displayPath;
@@ -32,6 +33,9 @@ namespace DotNetNuke.Services.FileSystem
         public FolderInfo()
             : this(false)
         {
+		Logger.LogDebug(">>> Entering FolderInfo()");
+		Logger.LogDebug("<<< Exiting FolderInfo()");
+		Logger.LogDebug(">>> Entering FolderInfo(initialiseEmptyPermissions={InitialiseEmptyPermissions})", initialiseEmptyPermissions);
         }
 
         /// <summary>Initializes a new instance of the <see cref="FolderInfo"/> class.</summary>
@@ -40,12 +44,16 @@ namespace DotNetNuke.Services.FileSystem
         {
             this.FolderID = Null.NullInteger;
             this.UniqueId = Guid.NewGuid();
+			Logger.LogDebug("FolderInfo(initialiseEmptyPermissions={InitialiseEmptyPermissions}): this.FolderID → {Arg1}", initialiseEmptyPermissions, this.FolderID);
             this.VersionGuid = Guid.NewGuid();
             this.WorkflowID = Null.NullInteger;
+			Logger.LogDebug("FolderInfo(initialiseEmptyPermissions={InitialiseEmptyPermissions}): this.WorkflowID → {Arg1}", initialiseEmptyPermissions, this.WorkflowID);
             if (initialiseEmptyPermissions)
             {
                 this.folderPermissions = new FolderPermissionCollection();
+				Logger.LogDebug("FolderInfo(initialiseEmptyPermissions={InitialiseEmptyPermissions}): folderPermissions → {FolderPermissions}", initialiseEmptyPermissions, folderPermissions);
             }
+			Logger.LogDebug("<<< Exiting FolderInfo(initialiseEmptyPermissions={InitialiseEmptyPermissions})", initialiseEmptyPermissions);
         }
 
         /// <inheritdoc />
@@ -277,6 +285,7 @@ namespace DotNetNuke.Services.FileSystem
         /// <param name="dr">The Data Reader to use.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.FolderID = Null.SetNullInteger(dr["FolderID"]);
             this.UniqueId = Null.SetNullGuid(dr["UniqueId"]);
             this.VersionGuid = Null.SetNullGuid(dr["VersionGuid"]);
@@ -292,6 +301,7 @@ namespace DotNetNuke.Services.FileSystem
             this.WorkflowID = Null.SetNullInteger(dr["WorkflowID"]);
             this.ParentID = Null.SetNullInteger(dr["ParentID"]);
             this.FillBaseProperties(dr);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

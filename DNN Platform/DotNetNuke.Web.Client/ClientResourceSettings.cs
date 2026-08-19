@@ -55,6 +55,7 @@ namespace DotNetNuke.Web.Client
 
         static ClientResourceSettings()
         {
+			Logger.LogDebug(">>> Entering ClientResourceSettings()");
             try
             {
                 PortalControllerType = Type.GetType("DotNetNuke.Entities.Portals.PortalController, DotNetNuke");
@@ -63,6 +64,7 @@ namespace DotNetNuke.Web.Client
             {
                 LoggerSource.Instance.GetLogger(typeof(ClientResourceSettings)).Warn("Failed to get get types for reflection", exception);
             }
+			Logger.LogDebug("<<< Exiting ClientResourceSettings()");
         }
 
         private UpgradeStatus Status
@@ -83,7 +85,10 @@ namespace DotNetNuke.Web.Client
         [DnnDeprecated(9, 10, 3, "Use overload taking portalId")]
         public partial bool IsOverridingDefaultSettingsEnabled()
         {
+			Logger.LogDebug(">>> Entering IsOverridingDefaultSettingsEnabled()");
             int? portalId = GetPortalIdThroughReflection();
+			Logger.LogDebug("<<< Exiting IsOverridingDefaultSettingsEnabled()");
+			Logger.LogDebug("<<< Exiting IsOverridingDefaultSettingsEnabled(portalId={PortalId})", portalId);
             return this.IsOverridingDefaultSettingsEnabled(portalId);
         }
 
@@ -105,7 +110,10 @@ namespace DotNetNuke.Web.Client
         [DnnDeprecated(9, 10, 3, "Use overload taking portalId")]
         public partial int? GetVersion()
         {
+			Logger.LogDebug(">>> Entering GetVersion()");
             int? portalId = GetPortalIdThroughReflection();
+			Logger.LogDebug("<<< Exiting GetVersion()");
+			Logger.LogDebug("<<< Exiting GetVersion(portalId={PortalId})", portalId);
             return this.GetVersion(portalId);
         }
 
@@ -141,6 +149,8 @@ namespace DotNetNuke.Web.Client
         [DnnDeprecated(10, 2, 0, "Composite files (bundling) have been deprecated.")]
         public partial bool? AreCompositeFilesEnabled()
         {
+			Logger.LogDebug(">>> Entering AreCompositeFilesEnabled()");
+			Logger.LogDebug("<<< Exiting AreCompositeFilesEnabled()");
             int? portalId = GetPortalIdThroughReflection();
 #pragma warning disable CS0618 // Type or member is obsolete
             return this.IsBooleanSettingEnabled(portalId, EnableCompositeFilesKey);
@@ -152,6 +162,8 @@ namespace DotNetNuke.Web.Client
         [DnnDeprecated(10, 2, 0, "Minification has been deprecated.")]
         public partial bool? EnableCssMinification()
         {
+			Logger.LogDebug(">>> Entering EnableCssMinification()");
+			Logger.LogDebug("<<< Exiting EnableCssMinification()");
             int? portalId = GetPortalIdThroughReflection();
 #pragma warning disable CS0618 // Type or member is obsolete
             return this.IsBooleanSettingEnabled(portalId, MinifyCssKey);
@@ -163,6 +175,8 @@ namespace DotNetNuke.Web.Client
         [DnnDeprecated(10, 2, 0, "Minification has been deprecated.")]
         public partial bool? EnableJsMinification()
         {
+			Logger.LogDebug(">>> Entering EnableJsMinification()");
+			Logger.LogDebug("<<< Exiting EnableJsMinification()");
             int? portalId = GetPortalIdThroughReflection();
 #pragma warning disable CS0618 // Type or member is obsolete
             return this.IsBooleanSettingEnabled(portalId, MinifyJsKey);
@@ -171,10 +185,13 @@ namespace DotNetNuke.Web.Client
 
         private static bool? GetBooleanSetting(int? portalId, string dictionaryKey, string settingKey)
         {
+			Logger.LogDebug(">>> Entering GetBooleanSetting(portalId={PortalId},dictionaryKey={DictionaryKey},settingKey={SettingKey})", portalId, dictionaryKey, settingKey);
             var setting = GetSetting(portalId, dictionaryKey, settingKey);
             bool result;
+			Logger.LogDebug("GetBooleanSetting(portalId={PortalId},dictionaryKey={DictionaryKey},settingKey={SettingKey}): setting → {Setting}", portalId, dictionaryKey, settingKey, setting);
             if (setting != null && bool.TryParse(setting, out result))
             {
+			Logger.LogDebug("<<< Exiting GetBooleanSetting(portalId={PortalId},dictionaryKey={DictionaryKey},settingKey={SettingKey})", portalId, dictionaryKey, settingKey);
                 return result;
             }
 
@@ -183,8 +200,10 @@ namespace DotNetNuke.Web.Client
 
         private static int? GetIntegerSetting(int? portalId, string dictionaryKey, string settingKey)
         {
+			Logger.LogDebug(">>> Entering GetIntegerSetting(portalId={PortalId},dictionaryKey={DictionaryKey},settingKey={SettingKey})", portalId, dictionaryKey, settingKey);
             var setting = GetSetting(portalId, dictionaryKey, settingKey);
             int version;
+			Logger.LogDebug("GetIntegerSetting(portalId={PortalId},dictionaryKey={DictionaryKey},settingKey={SettingKey}): setting → {Setting}", portalId, dictionaryKey, settingKey, setting);
             if (setting != null && int.TryParse(setting, out version))
             {
                 if (version > -1)
@@ -193,11 +212,13 @@ namespace DotNetNuke.Web.Client
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetIntegerSetting(portalId={PortalId},dictionaryKey={DictionaryKey},settingKey={SettingKey})", portalId, dictionaryKey, settingKey);
             return null;
         }
 
         private static string GetSetting(int? portalId, string dictionaryKey, string settingKey)
         {
+			Logger.LogDebug(">>> Entering GetSetting(portalId={PortalId},dictionaryKey={DictionaryKey},settingKey={SettingKey})", portalId, dictionaryKey, settingKey);
             bool isHttpContext = HttpContext.Current != null && HttpContext.Current.Items.Contains(dictionaryKey);
             var settings = isHttpContext ? HttpContext.Current.Items[dictionaryKey] : null;
             if (settings == null)
@@ -212,8 +233,10 @@ namespace DotNetNuke.Web.Client
 
             string value;
             var dictionary = (Dictionary<string, string>)settings;
+			Logger.LogDebug("GetSetting(portalId={PortalId},dictionaryKey={DictionaryKey},settingKey={SettingKey}): dictionary → {Dictionary}", portalId, dictionaryKey, settingKey, dictionary);
             if (dictionary.TryGetValue(settingKey, out value))
             {
+			Logger.LogDebug("<<< Exiting GetSetting(portalId={PortalId},dictionaryKey={DictionaryKey},settingKey={SettingKey})", portalId, dictionaryKey, settingKey);
                 return value;
             }
 
@@ -223,6 +246,7 @@ namespace DotNetNuke.Web.Client
 
         private static string GetPortalSettingThroughReflection(int? portalId, string settingKey)
         {
+			Logger.LogDebug(">>> Entering GetPortalSettingThroughReflection(portalId={PortalId},settingKey={SettingKey})", portalId, settingKey);
             if (portalId is null)
             {
                 return null;
@@ -231,9 +255,13 @@ namespace DotNetNuke.Web.Client
             try
             {
                 using var scope = DependencyInjection.GetOrCreateServiceScope();
+				Logger.LogDebug("GetPortalSettingThroughReflection(portalId={PortalId},settingKey={SettingKey}): scope → {Scope}", portalId, settingKey, scope);
                 var portalController = ActivatorUtilities.GetServiceOrCreateInstance(scope.ServiceProvider, PortalControllerType);
+				Logger.LogDebug("GetPortalSettingThroughReflection(portalId={PortalId},settingKey={SettingKey}): portalController → {PortalController}", portalId, settingKey, portalController);
                 var method = PortalControllerType.GetMethod("GetPortalSettings", BindingFlags.Public | BindingFlags.Instance, null, [typeof(int),], null);
+				Logger.LogDebug("GetPortalSettingThroughReflection(portalId={PortalId},settingKey={SettingKey}): method → {Method}", portalId, settingKey, method);
                 var dictionary = (Dictionary<string, string>)method.Invoke(portalController, [portalId.Value,]);
+				Logger.LogDebug("GetPortalSettingThroughReflection(portalId={PortalId},settingKey={SettingKey}): dictionary → {Dictionary}", portalId, settingKey, dictionary);
 
                 if (dictionary.TryGetValue(settingKey, out var value))
                 {
@@ -245,11 +273,13 @@ namespace DotNetNuke.Web.Client
                 LoggerSource.Instance.GetLogger(typeof(ClientResourceSettings)).Warn("Failed to Get Portal Setting Through Reflection", exception);
             }
 
+			Logger.LogDebug("<<< Exiting GetPortalSettingThroughReflection(portalId={PortalId},settingKey={SettingKey})", portalId, settingKey);
             return null;
         }
 
         private static int? GetPortalIdThroughReflection()
         {
+			Logger.LogDebug(">>> Entering GetPortalIdThroughReflection()");
             try
             {
                 if (HttpContext.Current == null)
@@ -258,8 +288,11 @@ namespace DotNetNuke.Web.Client
                 }
 
                 using var scope = DependencyInjection.GetOrCreateServiceScope();
+				Logger.LogDebug("GetPortalIdThroughReflection(): scope → {Scope}", scope);
                 var portalAliasService = scope.ServiceProvider.GetRequiredService<IPortalAliasService>();
+				Logger.LogDebug("GetPortalIdThroughReflection(): portalAliasService → {PortalAliasService}", portalAliasService);
                 var alias = portalAliasService.GetPortalAlias(HttpContext.Current.Request.Url.Host);
+				Logger.LogDebug("GetPortalIdThroughReflection(): alias → {Alias}", alias);
 
                 return alias.PortalId;
             }
@@ -268,17 +301,22 @@ namespace DotNetNuke.Web.Client
                 LoggerSource.Instance.GetLogger(typeof(ClientResourceSettings)).Warn("Failed to Get Portal ID Through Reflection", exception);
             }
 
+			Logger.LogDebug("<<< Exiting GetPortalIdThroughReflection()");
             return null;
         }
 
         private static string GetHostSettingThroughReflection(string settingKey)
         {
+			Logger.LogDebug(">>> Entering GetHostSettingThroughReflection(settingKey={SettingKey})", settingKey);
             try
             {
                 using var scope = DependencyInjection.GetOrCreateServiceScope();
+				Logger.LogDebug("GetHostSettingThroughReflection(settingKey={SettingKey}): scope → {Scope}", settingKey, scope);
                 var hostSettingsService = scope.ServiceProvider.GetRequiredService<IHostSettingsService>();
+				Logger.LogDebug("GetHostSettingThroughReflection(settingKey={SettingKey}): hostSettingsService → {HostSettingsService}", settingKey, hostSettingsService);
 
                 var dictionary = hostSettingsService.GetSettingsDictionary();
+				Logger.LogDebug("GetHostSettingThroughReflection(settingKey={SettingKey}): dictionary → {Dictionary}", settingKey, dictionary);
                 if (dictionary.TryGetValue(settingKey, out var value))
                 {
                     return value;
@@ -289,33 +327,42 @@ namespace DotNetNuke.Web.Client
                 LoggerSource.Instance.GetLogger(typeof(ClientResourceSettings)).Warn("Failed to Get Host Setting Through Reflection", exception);
             }
 
+			Logger.LogDebug("<<< Exiting GetHostSettingThroughReflection(settingKey={SettingKey})", settingKey);
             return null;
         }
 
         private static UpgradeStatus GetStatusByReflection()
         {
+			Logger.LogDebug(">>> Entering GetStatusByReflection()");
             try
             {
                 using var scope = DependencyInjection.GetOrCreateServiceScope();
+				Logger.LogDebug("GetStatusByReflection(): scope → {Scope}", scope);
                 var applicationStatusInfo = scope.ServiceProvider.GetRequiredService<IApplicationStatusInfo>();
+				Logger.LogDebug("GetStatusByReflection(): applicationStatusInfo → {ApplicationStatusInfo}", applicationStatusInfo);
                 return applicationStatusInfo.Status;
             }
             catch (Exception exception)
             {
+				private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ClientResourceSettings));
                 LoggerSource.Instance.GetLogger(typeof(ClientResourceSettings)).Warn("Failed to Get Status By Reflection", exception);
+				Logger.LogDebug("<<< Exiting GetStatusByReflection()");
                 return UpgradeStatus.Unknown;
             }
         }
 
         private bool? IsBooleanSettingEnabled(int? portalId, string settingKey)
         {
+			Logger.LogDebug(">>> Entering IsBooleanSettingEnabled(portalId={PortalId},settingKey={SettingKey})", portalId, settingKey);
             if (this.Status != UpgradeStatus.None)
             {
                 return false;
             }
 
             var portalEnabled = GetBooleanSetting(portalId, PortalSettingsDictionaryKey, settingKey);
+			Logger.LogDebug("IsBooleanSettingEnabled(portalId={PortalId},settingKey={SettingKey}): portalEnabled → {PortalEnabled}", portalId, settingKey, portalEnabled);
             var overrideDefaultSettings = GetBooleanSetting(portalId, PortalSettingsDictionaryKey, OverrideDefaultSettingsKey);
+			Logger.LogDebug("IsBooleanSettingEnabled(portalId={PortalId},settingKey={SettingKey}): overrideDefaultSettings → {OverrideDefaultSettings}", portalId, settingKey, overrideDefaultSettings);
 
             // if portal version is set
             // and the portal "override default settings" flag is set and set to true
@@ -326,8 +373,10 @@ namespace DotNetNuke.Web.Client
 
             // otherwise return the host setting
             var hostEnabled = GetBooleanSetting(portalId, HostSettingsDictionaryKey, settingKey);
+			Logger.LogDebug("IsBooleanSettingEnabled(portalId={PortalId},settingKey={SettingKey}): hostEnabled → {HostEnabled}", portalId, settingKey, hostEnabled);
             if (hostEnabled.HasValue)
             {
+			Logger.LogDebug("<<< Exiting IsBooleanSettingEnabled(portalId={PortalId},settingKey={SettingKey})", portalId, settingKey);
                 return hostEnabled.Value;
             }
 

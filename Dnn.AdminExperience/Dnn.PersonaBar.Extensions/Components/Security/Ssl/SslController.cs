@@ -15,14 +15,18 @@ namespace Dnn.PersonaBar.Extensions.Components.Security.Ssl
         /// <inheritdoc />
         public PortalStats GetPortalStats(int portalId)
         {
+			eventLogger.LogDebug(">>> Entering GetPortalStats(portalId={PortalId})", portalId);
             using (IDataContext context = DataContext.Instance())
             {
+				eventLogger.LogDebug("<<< Exiting GetPortalStats(portalId={PortalId})", portalId);
                 return context.ExecuteQuery<PortalStats>(System.Data.CommandType.StoredProcedure, "{databaseOwner}{objectQualifier}PersonaBar_GetPortalStats", portalId).FirstOrDefault();
             }
         }
 
         protected override Func<ISSlController> GetFactory()
         {
+			eventLogger.LogDebug(">>> Entering GetFactory()");
+			eventLogger.LogDebug("<<< Exiting GetFactory()");
             return () => new SslController();
         }
     }

@@ -10,6 +10,7 @@ namespace Dnn.PersonaBar.Library.Security
 
     public class SecurityService : ISecurityService
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SecurityService));
         public static ISecurityService Instance
         {
             get
@@ -26,7 +27,10 @@ namespace Dnn.PersonaBar.Library.Security
 
         public virtual bool IsPagesAdminUser()
         {
+			Logger.LogDebug(">>> Entering IsPagesAdminUser()");
             var user = UserController.Instance.GetCurrentUserInfo();
+			Logger.LogDebug("IsPagesAdminUser(): user → {User}", user);
+			Logger.LogDebug("<<< Exiting IsPagesAdminUser()");
             return user.IsSuperUser || user.IsInRole(PortalSettings.Current?.AdministratorRoleName);
         }
     }

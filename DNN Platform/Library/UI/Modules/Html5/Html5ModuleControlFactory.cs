@@ -20,6 +20,7 @@ namespace DotNetNuke.UI.Modules.Html5
     /// <param name="hostSettings">The host settings.</param>
     public class Html5ModuleControlFactory(IBusinessControllerProvider businessControllerProvider, IServicesFramework servicesFramework, IHostSettings hostSettings) : BaseModuleControlFactory
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Html5ModuleControlFactory));
         private readonly IBusinessControllerProvider businessControllerProvider = businessControllerProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<IBusinessControllerProvider>();
         private readonly IServicesFramework servicesFramework = servicesFramework ?? Globals.GetCurrentServiceProvider().GetRequiredService<IServicesFramework>();
         private readonly IHostSettings hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
@@ -29,7 +30,9 @@ namespace DotNetNuke.UI.Modules.Html5
         public Html5ModuleControlFactory()
             : this(null, null, null)
         {
+		Logger.LogDebug(">>> Entering Html5ModuleControlFactory()");
         }
+		Logger.LogDebug("<<< Exiting Html5ModuleControlFactory()");
 
         /// <summary>Initializes a new instance of the <see cref="Html5ModuleControlFactory"/> class.</summary>
         /// <param name="businessControllerProvider">The business controller provider.</param>
@@ -45,6 +48,8 @@ namespace DotNetNuke.UI.Modules.Html5
         /// <inheritdoc />
         public override bool SupportsControl(ModuleInfo moduleConfiguration, string controlSrc)
         {
+			Logger.LogDebug(">>> Entering SupportsControl(moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc})", moduleConfiguration, controlSrc);
+			Logger.LogDebug("<<< Exiting SupportsControl(moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc})", moduleConfiguration, controlSrc);
             return controlSrc.EndsWith(".html", StringComparison.OrdinalIgnoreCase) ||
                    controlSrc.EndsWith(".htm", StringComparison.OrdinalIgnoreCase);
         }
@@ -52,18 +57,24 @@ namespace DotNetNuke.UI.Modules.Html5
         /// <inheritdoc />
         public override Control CreateControl(TemplateControl containerControl, string controlKey, string controlSrc)
         {
+			Logger.LogDebug(">>> Entering CreateControl(containerControl={ContainerControl},controlKey={ControlKey},controlSrc={ControlSrc})", containerControl, controlKey, controlSrc);
+			Logger.LogDebug("<<< Exiting CreateControl(containerControl={ContainerControl},controlKey={ControlKey},controlSrc={ControlSrc})", containerControl, controlKey, controlSrc);
             return new Html5HostControl("~/" + controlSrc, this.businessControllerProvider, this.servicesFramework, this.hostSettings);
         }
 
         /// <inheritdoc />
         public override Control CreateModuleControl(TemplateControl containerControl, ModuleInfo moduleConfiguration)
         {
+			Logger.LogDebug(">>> Entering CreateModuleControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration})", containerControl, moduleConfiguration);
+			Logger.LogDebug("<<< Exiting CreateModuleControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration})", containerControl, moduleConfiguration);
             return this.CreateControl(containerControl, string.Empty, moduleConfiguration.ModuleControl.ControlSrc);
         }
 
         /// <inheritdoc />
         public override Control CreateSettingsControl(TemplateControl containerControl, ModuleInfo moduleConfiguration, string controlSrc)
         {
+			Logger.LogDebug(">>> Entering CreateSettingsControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc})", containerControl, moduleConfiguration, controlSrc);
+			Logger.LogDebug("<<< Exiting CreateSettingsControl(containerControl={ContainerControl},moduleConfiguration={ModuleConfiguration},controlSrc={ControlSrc})", containerControl, moduleConfiguration, controlSrc);
             return this.CreateControl(containerControl, string.Empty, controlSrc);
         }
     }

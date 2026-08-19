@@ -27,17 +27,24 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Models
 
         public UserModelBase()
         {
+		eventLogger.LogDebug(">>> Entering UserModelBase()");
+		eventLogger.LogDebug("<<< Exiting UserModelBase()");
         }
 
         public UserModelBase(UserInfo userInfo)
         {
+			eventLogger.LogDebug(">>> Entering UserModelBase(userInfo={UserInfo})", userInfo);
             this.Email = userInfo.Email;
             this.LastLogin = userInfo.Membership.LastLoginDate.ToPromptShortDateString();
+			eventLogger.LogDebug("UserModelBase(userInfo={UserInfo}): this.Email → {Arg1}", userInfo, this.Email);
             this.UserId = userInfo.UserID;
+			eventLogger.LogDebug("UserModelBase(userInfo={UserInfo}): this.UserId → {Arg1}", userInfo, this.UserId);
             this.Username = userInfo.Username;
             this.IsDeleted = userInfo.IsDeleted;
             this.IsAuthorized = userInfo.Membership.Approved;
+			eventLogger.LogDebug("UserModelBase(userInfo={UserInfo}): this.Username → {Arg1}", userInfo, this.Username);
             this.IsLockedOut = userInfo.Membership.LockedOut;
+			eventLogger.LogDebug("<<< Exiting UserModelBase(userInfo={UserInfo})", userInfo);
         }
 
         // ReSharper disable InconsistentNaming

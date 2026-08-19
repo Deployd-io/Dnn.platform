@@ -4,10 +4,13 @@ import { connect } from "react-redux";
 import { GridCell, SingleLineInputWithError, GridSystem, Button, Label } from "@dnnsoftware/dnn-react-common";
 import Localization from "localization";
 import styles from "./style.module.less";
+const logger = console;
 
 const inputStyle = { width: "100%" };
 class JavascriptLibrary extends Component {
     getNameVersionRows(list) {
+		logger.debug(`>>> Entering getNameVersionRows(list=${list})`);
+		logger.debug(`<<< Exiting getNameVersionRows(list=${list})`);
         return list.map((item, i) => {
             return <GridCell key={i} className="js-library-info-row">
                 <GridCell columnSize={70} className="js-library-info-name">
@@ -20,6 +23,8 @@ class JavascriptLibrary extends Component {
         });
     }
     getNameVersionTable(list, label, labelTooltip) {
+		logger.debug(`>>> Entering getNameVersionTable(list=${list},label=${label},labelTooltip=${labelTooltip})`);
+		logger.debug(`<<< Exiting getNameVersionTable(list=${list},label=${label},labelTooltip=${labelTooltip})`);
         return [
             <Label
                 label={label}
@@ -38,8 +43,10 @@ class JavascriptLibrary extends Component {
         ];
     }
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         const { extensionBeingEdited } = props;
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={styles.editJSLibrary + (props.className ? " " + props.className : "")}>
                 <GridSystem className="with-right-border top-half">
@@ -122,6 +129,8 @@ JavascriptLibrary.PropTypes = {
     primaryButtonText: PropTypes.string
 };
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         extensionBeingEdited: state.extension.extensionBeingEdited,
         extensionBeingEditedIndex: state.extension.extensionBeingEditedIndex

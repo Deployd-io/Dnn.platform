@@ -14,10 +14,13 @@ namespace DotNetNuke.Modules.Groups.Components
     {
         public static void CreateJournalEntry(RoleInfo roleInfo, UserInfo createdBy)
         {
+			eventLogger.LogDebug(">>> Entering CreateJournalEntry(roleInfo={RoleInfo},createdBy={CreatedBy})", roleInfo, createdBy);
             var journalController = JournalController.Instance;
             var journalItem = new JournalItem();
+			eventLogger.LogDebug("CreateJournalEntry(roleInfo={RoleInfo},createdBy={CreatedBy}): journalItem → {JournalItem}", roleInfo, createdBy, journalItem);
 
             string url = string.Empty;
+			eventLogger.LogDebug("CreateJournalEntry(roleInfo={RoleInfo},createdBy={CreatedBy}): url → {Url}", roleInfo, createdBy, url);
 
             if (roleInfo.Settings.ContainsKey("URL"))
             {
@@ -25,6 +28,14 @@ namespace DotNetNuke.Modules.Groups.Components
             }
 
             journalItem.PortalId = roleInfo.PortalID;
+			eventLogger.LogDebug("CreateJournalEntry(roleInfo={RoleInfo},createdBy={CreatedBy}): journalItem.PortalId → {Arg2}", roleInfo, createdBy, journalItem.PortalId);
+			eventLogger.LogDebug("CreateJournalEntry(roleInfo={RoleInfo},createdBy={CreatedBy}): journalItem.ProfileId → {Arg2}", roleInfo, createdBy, journalItem.ProfileId);
+			eventLogger.LogDebug("CreateJournalEntry(roleInfo={RoleInfo},createdBy={CreatedBy}): journalItem.UserId → {Arg2}", roleInfo, createdBy, journalItem.UserId);
+			eventLogger.LogDebug("CreateJournalEntry(roleInfo={RoleInfo},createdBy={CreatedBy}): journalItem.Title → {Arg2}", roleInfo, createdBy, journalItem.Title);
+			eventLogger.LogDebug("CreateJournalEntry(roleInfo={RoleInfo},createdBy={CreatedBy}): journalItem.ItemData → {Arg2}", roleInfo, createdBy, journalItem.ItemData);
+			eventLogger.LogDebug("CreateJournalEntry(roleInfo={RoleInfo},createdBy={CreatedBy}): journalItem.SocialGroupId → {Arg2}", roleInfo, createdBy, journalItem.SocialGroupId);
+			eventLogger.LogDebug("CreateJournalEntry(roleInfo={RoleInfo},createdBy={CreatedBy}): journalItem.Summary → {Arg2}", roleInfo, createdBy, journalItem.Summary);
+			eventLogger.LogDebug("CreateJournalEntry(roleInfo={RoleInfo},createdBy={CreatedBy}): journalItem.Body → {Arg2}", roleInfo, createdBy, journalItem.Body);
             journalItem.ProfileId = createdBy.UserID;
             journalItem.UserId = createdBy.UserID;
             journalItem.Title = roleInfo.RoleName;
@@ -41,6 +52,7 @@ namespace DotNetNuke.Modules.Groups.Components
             }
 
             journalItem.SecuritySet = string.Empty;
+			eventLogger.LogDebug("CreateJournalEntry(roleInfo={RoleInfo},createdBy={CreatedBy}): journalItem.SecuritySet → {Arg2}", roleInfo, createdBy, journalItem.SecuritySet);
 
             if (roleInfo.IsPublic)
             {
@@ -48,6 +60,7 @@ namespace DotNetNuke.Modules.Groups.Components
             }
 
             journalController.SaveJournalItem(journalItem, null);
+			eventLogger.LogDebug("<<< Exiting CreateJournalEntry(roleInfo={RoleInfo},createdBy={CreatedBy})", roleInfo, createdBy);
         }
     }
 }

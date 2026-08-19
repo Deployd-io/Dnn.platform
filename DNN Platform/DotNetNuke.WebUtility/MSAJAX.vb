@@ -4,11 +4,13 @@
 Imports System.Reflection
 Imports System.Web
 Imports System.Web.UI
+Imports Microsoft.Extensions.Logging
 
 
 Namespace DotNetNuke.UI.Utilities
 
     Public Class MSAJAX
+	Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
 
 #Region "Member Variables"
         Private Shared m_ScriptManagerType As Type
@@ -103,14 +105,17 @@ Namespace DotNetNuke.UI.Utilities
         End Function
 
         Public Shared Sub Register(ByVal objPage As Page)
+			_logger.LogDebug(">>> Entering Register(objPage={ObjPage})", objPage)
             If IsInstalled() Then
                 If ScriptManagerControl(objPage) Is Nothing Then
                     Dim sm As Control = ScriptManagerControl(objPage)
+					_logger.LogDebug("Register(objPage={ObjPage}): sm → {Sm}", objPage, sm)
                     If sm Is Nothing Then
                         sm = CType(Reflection.CreateInstance(ScriptManagerType), Control)
                     End If
                     If Not sm Is Nothing Then
                         sm.ID = "ScriptManager"
+						_logger.LogDebug("Register(objPage={ObjPage}): sm.ID → {Arg1}", objPage, sm.ID)
                         'objPage.Form.Controls.AddAt(0, sm)
                         objPage.Form.Controls.Add(sm)
                         HttpContext.Current.Items("System.Web.UI.ScriptManager") = True 'Let DNN know we added it
@@ -126,21 +131,26 @@ Namespace DotNetNuke.UI.Utilities
                 End If
                 objPage.ClientScript.RegisterStartupScript(objPage.GetType(), "MSAJAXInit", "Sys.Application.initialize();", True)
             End If
+			_logger.LogDebug("<<< Exiting Register(objPage={ObjPage})", objPage)
         End Sub
 
         Public Shared Sub SetScriptManagerProperty(ByVal objPage As Page, ByVal PropertyName As String, ByVal Args() As Object)
+			_logger.LogDebug(">>> Entering SetScriptManagerProperty(objPage={ObjPage},PropertyName={PropertyName})", objPage, PropertyName)
             If IsInstalled() Then
                 Register(objPage)
                 If Not ScriptManagerControl(objPage) Is Nothing Then
                     Reflection.SetProperty(ScriptManagerType, PropertyName, ScriptManagerControl(objPage), Args)
                 End If
             End If
+			_logger.LogDebug("<<< Exiting SetScriptManagerProperty(objPage={ObjPage},PropertyName={PropertyName})", objPage, PropertyName)
         End Sub
 
         Public Shared Sub RegisterClientScript(ByVal objPage As Page, ByVal Path As String)
+			_logger.LogDebug(">>> Entering RegisterClientScript(objPage={ObjPage},Path={Path})", objPage, Path)
             If IsInstalled() Then
                 Register(objPage)
                 Dim ref As Object = GetScriptReference()
+				_logger.LogDebug("RegisterClientScript(objPage={ObjPage},Path={Path}): ref → {Ref}", objPage, Path, ref)
                 MSAJAX.SetScriptReferenceProperty(ref, "Path", Path)
                 MSAJAX.SetScriptReferenceProperty(ref, "IgnoreScriptPath", False)
                 RegisterClientScript(objPage, ref)
@@ -149,6 +159,10 @@ Namespace DotNetNuke.UI.Utilities
                     objPage.ClientScript.RegisterClientScriptInclude(Path, Path)
                 End If
             End If
+			_logger.LogDebug("<<< Exiting RegisterClientScript(objPage={ObjPage},Path={Path})", objPage, Path)
+			_logger.LogDebug(">>> Entering RegisterClientScript(objPage={ObjPage},Name={Name},Assembly={Assembly})", objPage, Name, Assembly)
+			_logger.LogDebug("RegisterClientScript(objPage={ObjPage},Name={Name},Assembly={Assembly}): ref → {Ref}", objPage, Name, Assembly, ref)
+			_logger.LogDebug("<<< Exiting RegisterClientScript(objPage={ObjPage},Name={Name},Assembly={Assembly})", objPage, Name, Assembly)
         End Sub
 
         Public Shared Sub RegisterStartupScript(ByVal objPage As Page, ByVal Key As String, ByVal Script As String)

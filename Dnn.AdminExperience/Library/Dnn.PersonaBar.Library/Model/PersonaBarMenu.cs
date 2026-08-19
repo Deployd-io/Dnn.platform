@@ -12,6 +12,7 @@ namespace Dnn.PersonaBar.Library.Model
     [Serializable]
     public class PersonaBarMenu
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PersonaBarMenu));
         private IList<MenuItem> allItems;
 
         [IgnoreDataMember]
@@ -34,11 +35,13 @@ namespace Dnn.PersonaBar.Library.Model
 
         private static void FillAllItems(IList<MenuItem> allItems, IList<MenuItem> menuItems)
         {
+			Logger.LogDebug(">>> Entering FillAllItems(allItems={AllItems},menuItems={MenuItems})", allItems, menuItems);
             foreach (var menu in menuItems)
             {
                 allItems.Add(menu);
                 FillAllItems(allItems, menu.Children);
             }
+			Logger.LogDebug("<<< Exiting FillAllItems(allItems={AllItems},menuItems={MenuItems})", allItems, menuItems);
         }
     }
 }

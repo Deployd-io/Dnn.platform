@@ -60,10 +60,16 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			eventLogger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.Email = this.GetFlagValue(FlagEmail, "Email", string.Empty, true);
             this.Username = this.GetFlagValue(FlagUsername, "Username", string.Empty, true);
+			eventLogger.LogWarning("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): Password → {Password}", args, portalSettings, userInfo, activeTabId, Password);
+			eventLogger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): Notify → {Notify}", args, portalSettings, userInfo, activeTabId, Notify);
+			eventLogger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): Email → {Email}", args, portalSettings, userInfo, activeTabId, Email);
             this.FirstName = this.GetFlagValue(FlagFirstname, "FirstName", string.Empty, true);
+			eventLogger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): FirstName → {FirstName}", args, portalSettings, userInfo, activeTabId, FirstName);
             this.LastName = this.GetFlagValue(FlagLastname, "LastName", string.Empty, true);
+			eventLogger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): LastName → {LastName}", args, portalSettings, userInfo, activeTabId, LastName);
             this.Password = this.GetFlagValue(FlagPassword, "Password", string.Empty);
             this.Approved = this.GetFlagValue(FlagApproved, "Approved", true);
             this.Notify = this.GetFlagValue(FlagNotify, "Notify", false);
@@ -73,15 +79,18 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             }
 
             var emailVal = new EmailValidator();
+			eventLogger.LogDebug("Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId}): emailVal → {EmailVal}", args, portalSettings, userInfo, activeTabId, emailVal);
             if (!emailVal.IsValid(this.Email))
             {
                 this.AddMessage(this.LocalizeString("Email.RegExError"));
             }
+			eventLogger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogDebug(">>> Entering Run()");
             var settings = new RegisterationDetails
             {
                 PortalSettings = this.PortalSettings,
@@ -98,6 +107,7 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             try
             {
                 var userInfo = RegisterController.Instance.Register(settings);
+				eventLogger.LogDebug("Run(): userInfo → {UserInfo}", userInfo);
                 var lstResult = new List<UserModel>
                 {
                     new UserModel(UserController.Instance.GetUser(this.PortalId, userInfo.UserId)),
@@ -106,6 +116,8 @@ namespace Dnn.PersonaBar.Users.Components.Prompt.Commands
             }
             catch (Exception ex)
             {
+				eventLogger.LogError("Exception in Run(): {Arg0}", ex.getMessage());
+				eventLogger.LogDebug("<<< Exiting Run()");
                 return new ConsoleErrorResultModel(ex.Message);
             }
         }

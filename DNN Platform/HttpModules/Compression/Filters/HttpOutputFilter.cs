@@ -11,11 +11,15 @@ namespace DotNetNuke.HttpModules.Compression
     [SuppressMessage("Microsoft.Design", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "Breaking change")]
     public abstract class HttpOutputFilter : Stream
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HttpOutputFilter));
         /// <summary>Initializes a new instance of the <see cref="HttpOutputFilter"/> class.</summary>
         /// <param name="baseStream">The base stream.</param>
         protected HttpOutputFilter(Stream baseStream)
         {
+			Logger.LogDebug(">>> Entering HttpOutputFilter(baseStream={BaseStream})", baseStream);
             this.BaseStream = baseStream;
+			Logger.LogDebug("HttpOutputFilter(baseStream={BaseStream}): this.BaseStream → {Arg1}", baseStream, this.BaseStream);
+			Logger.LogDebug("<<< Exiting HttpOutputFilter(baseStream={BaseStream})", baseStream);
         }
 
         /// <inheritdoc />

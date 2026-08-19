@@ -10,6 +10,7 @@ namespace DotNetNuke.Web.Razor
     using DotNetNuke.Internal.SourceGenerators;
 
     using Microsoft.Extensions.DependencyInjection;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>A razor web page model.</summary>
     /// <typeparam name="TModel">The model type.</typeparam>
@@ -17,12 +18,16 @@ namespace DotNetNuke.Web.Razor
     public abstract partial class DotNetNukeWebPage<TModel> : DotNetNukeWebPage
         where TModel : class
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private TModel model;
 
         public DotNetNukeWebPage()
         {
+			_logger.LogDebug(">>> Entering DotNetNukeWebPage()");
             var model = Globals.GetCurrentServiceProvider().GetService<TModel>();
             this.Model = model ?? Activator.CreateInstance<TModel>();
+			_logger.LogDebug("DotNetNukeWebPage(): model → {Model}", model);
+			_logger.LogDebug("<<< Exiting DotNetNukeWebPage()");
         }
 
         public new TModel Model

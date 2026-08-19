@@ -50,6 +50,8 @@ namespace log4net.Filter
         /// <summary>Default constructor</summary>
         public LoggerMatchFilter()
         {
+		log.DebugFormat(">>> Entering LoggerMatchFilter()");
+		log.DebugFormat("<<< Exiting LoggerMatchFilter()");
         }
 
         /// <summary><see cref="FilterDecision.Accept"/> when matching <see cref="LoggerToMatch"/></summary>
@@ -104,8 +106,10 @@ namespace log4net.Filter
         /// </remarks>
         public override FilterDecision Decide(LoggingEvent loggingEvent) 
         {
+			log.DebugFormat(">>> Entering Decide(loggingEvent={0})", loggingEvent);
             if (loggingEvent == null)
             {
+				log.WarnFormat("Throwing ArgumentNullException from Decide(loggingEvent={0})", loggingEvent);
                 throw new ArgumentNullException("loggingEvent");
             }
 
@@ -124,6 +128,7 @@ namespace log4net.Filter
             {
                 // We cannot filter so allow the filter chain
                 // to continue processing
+				log.DebugFormat("<<< Exiting Decide(loggingEvent={0})", loggingEvent);
                 return FilterDecision.Neutral;
             }
         }

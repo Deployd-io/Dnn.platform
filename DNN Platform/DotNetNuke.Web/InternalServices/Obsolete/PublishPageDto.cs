@@ -10,6 +10,7 @@ using DotNetNuke.Internal.SourceGenerators;
 [DnnDeprecated(10, 3, 3, "Use PublishPageRequest")]
 public partial class PublishPageDto
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PublishPageDto));
     /// <summary>Gets or sets a value indicating whether to publish.</summary>
     public bool Publish { get; set; }
 
@@ -17,6 +18,8 @@ public partial class PublishPageDto
     /// <returns>A <see cref="PublishPageRequest"/> instance.</returns>
     public PublishPageRequest ToPublishPageRequest()
     {
+		Logger.LogDebug(">>> Entering ToPublishPageRequest()");
+		Logger.LogDebug("<<< Exiting ToPublishPageRequest()");
         return new PublishPageRequest
         {
             Publish = this.Publish,

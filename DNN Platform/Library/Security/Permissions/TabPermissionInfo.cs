@@ -17,17 +17,23 @@ namespace DotNetNuke.Security.Permissions
     [XmlRoot("permission")]
     public class TabPermissionInfo : PermissionInfoBase, IHydratable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabPermissionInfo));
         private int tabId;
         private int tabPermissionId;
 
         /// <summary>Initializes a new instance of the <see cref="TabPermissionInfo"/> class.</summary>
         public TabPermissionInfo()
         {
+			Logger.LogDebug(">>> Entering TabPermissionInfo()");
             this.tabPermissionId = Null.NullInteger;
             this.tabId = Null.NullInteger;
+			Logger.LogDebug("TabPermissionInfo(): this.tabPermissionId → {Arg0}", this.tabPermissionId);
+			Logger.LogDebug("TabPermissionInfo(): tabId → {TabId}", tabId);
+			Logger.LogDebug("<<< Exiting TabPermissionInfo()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="TabPermissionInfo"/> class.</summary>
+		Logger.LogDebug("<<< Exiting TabPermissionInfo()");
         /// <param name="permission">A PermissionInfo object.</param>
         public TabPermissionInfo(PermissionInfo permission)
             : this((IPermissionDefinitionInfo)permission)
@@ -39,10 +45,13 @@ namespace DotNetNuke.Security.Permissions
         public TabPermissionInfo(IPermissionDefinitionInfo permission)
             : this()
         {
+			Logger.LogDebug(">>> Entering TabPermissionInfo(permission={Permission})", permission);
             ((IPermissionDefinitionInfo)this).ModuleDefId = permission.ModuleDefId;
             this.PermissionCode = permission.PermissionCode;
+			Logger.LogDebug("TabPermissionInfo(permission={Permission}): this.PermissionCode → {Arg1}", permission, this.PermissionCode);
             ((IPermissionDefinitionInfo)this).PermissionId = permission.PermissionId;
             this.PermissionKey = permission.PermissionKey;
+			Logger.LogDebug("TabPermissionInfo(permission={Permission}): this.PermissionKey → {Arg1}", permission, this.PermissionKey);
             this.PermissionName = permission.PermissionName;
         }
 
@@ -78,10 +87,12 @@ namespace DotNetNuke.Security.Permissions
         /// <param name="dr">The Data Reader to use.</param>
         public void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             // Call the base classes fill method to populate base class properties
             this.FillInternal(dr);
             this.TabPermissionID = Null.SetNullInteger(dr["TabPermissionID"]);
             this.TabID = Null.SetNullInteger(dr["TabID"]);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

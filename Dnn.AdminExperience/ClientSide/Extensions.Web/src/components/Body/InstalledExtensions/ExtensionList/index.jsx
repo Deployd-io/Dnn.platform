@@ -4,14 +4,19 @@ import { GridCell } from "@dnnsoftware/dnn-react-common";
 import ExtensionHeader from "../common/ExtensionHeader";
 import ExtensionDetailRow from "../common/ExtensionDetailRow";
 import styles from "./style.module.less";
+const logger = console;
 
 class ExtensionList extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
 
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={styles.extensionList} style={{ padding: "5px 20px" }}>
                 <ExtensionHeader />

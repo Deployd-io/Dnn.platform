@@ -13,6 +13,7 @@ namespace DotNetNuke.UI.WebControls
     [ToolboxData("<{0}:DNNCountryEditControl runat=server></{0}:DNNCountryEditControl>")]
     public class DNNCountryEditControl : DNNListEditControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DNNCountryEditControl));
         private readonly ListController listController;
 
         /// <summary>Initializes a new instance of the <see cref="DNNCountryEditControl"/> class.</summary>
@@ -20,17 +21,23 @@ namespace DotNetNuke.UI.WebControls
         public DNNCountryEditControl()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering DNNCountryEditControl()");
         }
 
+		Logger.LogDebug("<<< Exiting DNNCountryEditControl()");
         /// <summary>Initializes a new instance of the <see cref="DNNCountryEditControl"/> class.</summary>
         /// <param name="listController">The list controller.</param>
         public DNNCountryEditControl(ListController listController)
         {
             this.listController = listController;
             this.AutoPostBack = true;
+			Logger.LogDebug("DNNCountryEditControl(listController={ListController}): this.listController → {Arg1}", listController, this.listController);
+			Logger.LogDebug("DNNCountryEditControl(listController={ListController}): this.AutoPostBack → {Arg1}", listController, this.AutoPostBack);
             this.ListName = "Country";
             this.ParentKey = string.Empty;
             this.TextField = ListBoundField.Text;
+			Logger.LogDebug("DNNCountryEditControl(listController={ListController}): this.ListName → {Arg1}", listController, this.ListName);
+			Logger.LogDebug("DNNCountryEditControl(listController={ListController}): this.ParentKey → {Arg1}", listController, this.ParentKey);
             this.ValueField = ListBoundField.Id;
             this.ItemChanged += this.OnItemChanged;
             this.SortAlphabetically = true;
@@ -38,13 +45,16 @@ namespace DotNetNuke.UI.WebControls
 
         private void OnItemChanged(object sender, PropertyEditorEventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnItemChanged(sender={Sender},e={E})", sender, e);
             var regionContainer = ControlUtilities.FindControl<Control>(this.Parent, "Region", true);
             if (regionContainer != null)
             {
                 var regionControl = ControlUtilities.FindFirstDescendent<DNNRegionEditControl>(regionContainer);
+				Logger.LogDebug("OnItemChanged(sender={Sender},e={E}): regionControl → {RegionControl}", sender, e, regionControl);
                 if (regionControl != null)
                 {
                     var countries = this.listController.GetListEntryInfoItems("Country");
+					Logger.LogDebug("OnItemChanged(sender={Sender},e={E}): countries → {Countries}", sender, e, countries);
                     foreach (var checkCountry in countries)
                     {
                         if (checkCountry.EntryID.ToString(CultureInfo.InvariantCulture) == e.StringValue)
@@ -52,11 +62,13 @@ namespace DotNetNuke.UI.WebControls
                             var attributes = new object[1];
                             attributes[0] = new ListAttribute("Region", "Country." + checkCountry.Value, ListBoundField.Id, ListBoundField.Text);
                             regionControl.CustomAttributes = attributes;
+							Logger.LogDebug("OnItemChanged(sender={Sender},e={E}): regionControl.CustomAttributes → {Arg2}", sender, e, regionControl.CustomAttributes);
                             break;
                         }
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting OnItemChanged(sender={Sender},e={E})", sender, e);
         }
     }
 }

@@ -33,6 +33,7 @@ namespace DotNetNuke.Entities.Urls
     /// <summary>The friendly URL controller.</summary>
     public partial class FriendlyUrlController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FriendlyUrlController));
         private const string DisableMobileRedirectCookieName = "disablemobileredirect"; // dnn cookies
         private const string DisableRedirectPresistCookieName = "disableredirectpresist"; // dnn cookies
 
@@ -106,9 +107,12 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>A <see cref="List{T}"/> of alias strings.</returns>
         public static List<string> GetCustomAliasesForTabs()
         {
+			Logger.LogDebug(">>> Entering GetCustomAliasesForTabs()");
             var aliases = new List<string>();
 
+			Logger.LogDebug("GetCustomAliasesForTabs(): aliases → {Aliases}", aliases);
             IDataReader dr = DataProvider.Instance().GetCustomAliasesForTabs();
+			Logger.LogDebug("GetCustomAliasesForTabs(): dr → {Dr}", dr);
             try
             {
                 while (dr.Read())
@@ -118,6 +122,7 @@ namespace DotNetNuke.Entities.Urls
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in GetCustomAliasesForTabs(): {Arg0}", exc.getMessage());
                 Exceptions.LogException(exc);
             }
             finally
@@ -125,12 +130,17 @@ namespace DotNetNuke.Entities.Urls
                 CBO.CloseDataReader(dr, true);
             }
 
+			Logger.LogDebug("<<< Exiting GetCustomAliasesForTabs()");
             return aliases;
         }
 
         public static TabInfo GetTab(int tabId, bool addStdUrls)
         {
+			Logger.LogDebug(">>> Entering GetTab(tabId={TabId},addStdUrls={AddStdUrls})", tabId, addStdUrls);
             var portalSettings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogDebug("GetTab(tabId={TabId},addStdUrls={AddStdUrls}): portalSettings → {PortalSettings}", tabId, addStdUrls, portalSettings);
+			Logger.LogDebug("<<< Exiting GetTab(tabId={TabId},addStdUrls={AddStdUrls})", tabId, addStdUrls);
+			Logger.LogDebug("<<< Exiting GetTab(tabId={TabId},addStdUrls={AddStdUrls},portalSettings={PortalSettings},settings={Settings})", tabId, addStdUrls, portalSettings, settings);
             return GetTab(tabId, addStdUrls, portalSettings, GetCurrentSettings(portalSettings.PortalId));
         }
 
@@ -152,12 +162,15 @@ namespace DotNetNuke.Entities.Urls
 
         public static string CleanNameForUrl(string urlName, FriendlyUrlOptions options, out bool replacedUnwantedChars)
         {
+			Logger.LogDebug(">>> Entering CleanNameForUrl(urlName={UrlName},options={Options})", urlName, options);
             replacedUnwantedChars = false;
 
+			Logger.LogDebug("CleanNameForUrl(urlName={UrlName},options={Options}): replacedUnwantedChars → {ReplacedUnwantedChars}", urlName, options, replacedUnwantedChars);
             // get options
             if (options == null)
             {
                 options = new FriendlyUrlOptions();
+				Logger.LogDebug("CleanNameForUrl(urlName={UrlName},options={Options}): options → {Options1}", urlName, options, options);
             }
 
             bool convertDiacritics = options.ConvertDiacriticChars;
@@ -172,8 +185,10 @@ namespace DotNetNuke.Entities.Urls
             }
 
             var result = new StringBuilder(urlName.Length);
+			Logger.LogDebug("CleanNameForUrl(urlName={UrlName},options={Options}): result → {Result}", urlName, options, result);
             int i = 0;
             string normalisedUrl = urlName;
+			Logger.LogDebug("CleanNameForUrl(urlName={UrlName},options={Options}): normalisedUrl → {NormalisedUrl}", urlName, options, normalisedUrl);
             if (convertDiacritics)
             {
                 normalisedUrl = urlName.Normalize(NormalizationForm.FormD);
@@ -185,6 +200,7 @@ namespace DotNetNuke.Entities.Urls
 
             int last = normalisedUrl.Length - 1;
             bool doublePeriod = false;
+			Logger.LogDebug("CleanNameForUrl(urlName={UrlName},options={Options}): doublePeriod → {DoublePeriod}", urlName, options, doublePeriod);
             foreach (char c in normalisedUrl)
             {
                 // look for a double period in the name
@@ -195,6 +211,7 @@ namespace DotNetNuke.Entities.Urls
 
                 // use string for manipulation
                 string ch = c.ToString(CultureInfo.InvariantCulture);
+				Logger.LogDebug("CleanNameForUrl(urlName={UrlName},options={Options}): ch → {Ch}", urlName, options, ch);
 
                 // do replacement in pre-defined list?
                 if (replacementChars != null && replacementChars.TryGetValue(ch, out var replacement))
@@ -259,6 +276,7 @@ namespace DotNetNuke.Entities.Urls
                 result = result.Replace(replaceWith + replaceWith, replaceWith);
             }
 
+			Logger.LogDebug("<<< Exiting CleanNameForUrl(urlName={UrlName},options={Options})", urlName, options);
             return result.ToString();
         }
 
@@ -268,6 +286,7 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>The <paramref name="path"/> with <paramref name="leading"/> at the start.</returns>
         public static string EnsureLeadingChar(string leading, string path)
         {
+			Logger.LogDebug(">>> Entering EnsureLeadingChar(leading={Leading},path={Path})", leading, path);
             if (leading != null && path != null
                                 && leading.Length <= path.Length && leading != string.Empty)
             {
@@ -279,11 +298,13 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting EnsureLeadingChar(leading={Leading},path={Path})", leading, path);
             return path;
         }
 
         public static string EnsureNotLeadingChar(string leading, string path)
         {
+			Logger.LogDebug(">>> Entering EnsureNotLeadingChar(leading={Leading},path={Path})", leading, path);
             if (leading != null && path != null
                                 && leading.Length <= path.Length && leading != string.Empty)
             {
@@ -292,9 +313,11 @@ namespace DotNetNuke.Entities.Urls
                 {
                     // matches start, take leading off
                     path = path.Substring(leading.Length);
+					Logger.LogDebug("EnsureNotLeadingChar(leading={Leading},path={Path}): path → {Path1}", leading, path, path);
                 }
             }
 
+			Logger.LogDebug("<<< Exiting EnsureNotLeadingChar(leading={Leading},path={Path})", leading, path);
             return path;
         }
 
@@ -361,9 +384,12 @@ namespace DotNetNuke.Entities.Urls
 
         public static string ValidateUrl(string cleanUrl, int validateUrlForTabId, PortalSettings settings, out bool modified)
         {
+			Logger.LogDebug(">>> Entering ValidateUrl(cleanUrl={CleanUrl},validateUrlForTabId={ValidateUrlForTabId},settings={Settings})", cleanUrl, validateUrlForTabId, settings);
             modified = false;
             bool isUnique;
+			Logger.LogDebug("ValidateUrl(cleanUrl={CleanUrl},validateUrlForTabId={ValidateUrlForTabId},settings={Settings}): modified → {Modified}", cleanUrl, validateUrlForTabId, settings, modified);
             var uniqueUrl = cleanUrl;
+			Logger.LogDebug("ValidateUrl(cleanUrl={CleanUrl},validateUrlForTabId={ValidateUrlForTabId},settings={Settings}): uniqueUrl → {UniqueUrl}", cleanUrl, validateUrlForTabId, settings, uniqueUrl);
             int counter = 0;
             do
             {
@@ -375,16 +401,21 @@ namespace DotNetNuke.Entities.Urls
 
                 isUnique = ValidateUrl(uniqueUrl, validateUrlForTabId, settings);
                 counter++;
+				Logger.LogDebug("ValidateUrl(cleanUrl={CleanUrl},validateUrlForTabId={ValidateUrlForTabId},settings={Settings}): isUnique → {IsUnique}", cleanUrl, validateUrlForTabId, settings, isUnique);
             }
             while (!isUnique);
 
+			Logger.LogDebug("<<< Exiting ValidateUrl(cleanUrl={CleanUrl},validateUrlForTabId={ValidateUrlForTabId},settings={Settings})", cleanUrl, validateUrlForTabId, settings);
+			Logger.LogDebug("<<< Exiting ValidateUrl(url={Url},validateUrlForTabId={ValidateUrlForTabId},settings={Settings})", url, validateUrlForTabId, settings);
             return uniqueUrl;
         }
 
         internal static bool CanUseMobileDevice(HttpRequestBase request, HttpResponseBase response)
         {
+			Logger.LogDebug(">>> Entering CanUseMobileDevice(request={Request},response={Response})", request, response);
             var canUseMobileDevice = true;
             int val;
+			Logger.LogDebug("CanUseMobileDevice(request={Request},response={Response}): canUseMobileDevice → {CanUseMobileDevice}", request, response, canUseMobileDevice);
             if (int.TryParse(request.QueryString[DisableMobileRedirectQueryStringName], out val))
             {
                 // the nomo value is in the querystring
@@ -435,6 +466,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting CanUseMobileDevice(request={Request},response={Response})", request, response);
             return canUseMobileDevice;
         }
 
@@ -445,19 +477,25 @@ namespace DotNetNuke.Entities.Urls
         /// <returns><see langword="true"/> if the page is an admin page, otherwise <see langword="false"/>.</returns>
         internal static bool IsAdminTab(int portalId, string tabPath, FriendlyUrlSettings settings)
         {
+			Logger.LogDebug(">>> Entering IsAdminTab(portalId={PortalId},tabPath={TabPath},settings={Settings})", portalId, tabPath, settings);
+			Logger.LogDebug("<<< Exiting IsAdminTab(portalId={PortalId},tabPath={TabPath},settings={Settings})", portalId, tabPath, settings);
             return RewriteController.IsAdminTab(portalId, tabPath, settings);
         }
 
         private static bool IsMobileClient()
         {
+			Logger.LogDebug(">>> Entering IsMobileClient()");
+			Logger.LogDebug("<<< Exiting IsMobileClient()");
             return (HttpContext.Current.Request.Browser != null) && (ClientCapabilityProvider.Instance() != null) && ClientCapabilityProvider.CurrentClientCapability.IsMobile;
         }
 
         private static void CheckIllegalChars(string illegalChars, ref string ch, ref bool replacedUnwantedChars)
         {
+			Logger.LogDebug(">>> Entering CheckIllegalChars(illegalChars={IllegalChars},ch={Ch},replacedUnwantedChars={ReplacedUnwantedChars})", illegalChars, ch, replacedUnwantedChars);
             var resultingCh = new StringBuilder(ch.Length);
             foreach (char c in ch)
             {
+			Logger.LogDebug("CheckIllegalChars(illegalChars={IllegalChars},ch={Ch},replacedUnwantedChars={ReplacedUnwantedChars}): resultingCh → {ResultingCh}", illegalChars, ch, replacedUnwantedChars, resultingCh);
                 // ch could contain several chars from the pre-defined replacement list
                 if (illegalChars.ToUpperInvariant().Contains(char.ToUpperInvariant(c)))
                 {
@@ -470,10 +508,13 @@ namespace DotNetNuke.Entities.Urls
             }
 
             ch = resultingCh.ToString();
+			Logger.LogDebug("CheckIllegalChars(illegalChars={IllegalChars},ch={Ch},replacedUnwantedChars={ReplacedUnwantedChars}): ch → {Ch1}", illegalChars, ch, replacedUnwantedChars, ch);
+			Logger.LogDebug("<<< Exiting CheckIllegalChars(illegalChars={IllegalChars},ch={Ch},replacedUnwantedChars={ReplacedUnwantedChars})", illegalChars, ch, replacedUnwantedChars);
         }
 
         private static void CheckCharsForReplace(FriendlyUrlOptions options, ref string ch, ref bool replacedUnwantedChars)
         {
+			Logger.LogDebug(">>> Entering CheckCharsForReplace(options={Options},ch={Ch},replacedUnwantedChars={ReplacedUnwantedChars})", options, ch, replacedUnwantedChars);
             if (!options.ReplaceChars.ToUpperInvariant().Contains(ch.ToUpperInvariant()))
             {
                 return;
@@ -486,12 +527,14 @@ namespace DotNetNuke.Entities.Urls
             }
 
             ch = options.PunctuationReplacement; // in list of replacment chars
+			Logger.LogDebug("CheckCharsForReplace(options={Options},ch={Ch},replacedUnwantedChars={ReplacedUnwantedChars}): ch → {Ch1}", options, ch, replacedUnwantedChars, ch);
 
             // If we still have a space ensure it's encoded
             if (ch == " ")
             {
                 ch = options.SpaceEncoding;
             }
+			Logger.LogDebug("<<< Exiting CheckCharsForReplace(options={Options},ch={Ch},replacedUnwantedChars={ReplacedUnwantedChars})", options, ch, replacedUnwantedChars);
         }
 
         private static bool ValidateUrl(string url, int validateUrlForTabId, PortalSettings settings)

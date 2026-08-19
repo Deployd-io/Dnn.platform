@@ -13,26 +13,33 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
 
     public class RequireHostAttribute : AuthorizeAttributeBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RequireHostAttribute));
         private UserInfo user;
 
         /// <inheritdoc />
         public override void OnAuthorization(AuthorizationContext filterContext)
         {
+			Logger.LogDebug(">>> Entering OnAuthorization(filterContext={FilterContext})", filterContext);
             var controller = filterContext.Controller as IDnnController;
 
             if (controller == null)
             {
+				Logger.LogWarning("Throwing InvalidOperationException from OnAuthorization(filterContext={FilterContext})", filterContext);
                 throw new InvalidOperationException("This attribute can only be applied to Controllers that implement IDnnController");
             }
 
             this.user = controller.ModuleContext.PortalSettings.UserInfo;
+			Logger.LogDebug("OnAuthorization(filterContext={FilterContext}): user → {User}", filterContext, user);
+			Logger.LogDebug("OnAuthorization(filterContext={FilterContext}): this.user → {Arg1}", filterContext, this.user);
 
             base.OnAuthorization(filterContext);
+			Logger.LogDebug("<<< Exiting OnAuthorization(filterContext={FilterContext})", filterContext);
         }
 
         /// <inheritdoc />
         protected override bool AuthorizeCore(HttpContextBase httpContext)
         {
+			Logger.LogDebug(">>> Entering AuthorizeCore(httpContext={HttpContext})", httpContext);
             var principal = Thread.CurrentPrincipal;
             if (!principal.Identity.IsAuthenticated)
             {
@@ -41,6 +48,7 @@ namespace DotNetNuke.Web.Mvc.Framework.ActionFilters
 
             if (this.user != null)
             {
+			Logger.LogDebug("<<< Exiting AuthorizeCore(httpContext={HttpContext})", httpContext);
                 return this.user.IsSuperUser;
             }
 

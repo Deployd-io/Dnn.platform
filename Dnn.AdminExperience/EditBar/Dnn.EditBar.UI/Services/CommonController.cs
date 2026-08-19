@@ -34,6 +34,10 @@ namespace Dnn.EditBar.UI.Services
         public CommonController()
             : this(null)
         {
+		eventLogger.LogDebug(">>> Entering CommonController()");
+		eventLogger.LogDebug("<<< Exiting CommonController()");
+		eventLogger.LogDebug(">>> Entering CommonController(personalizationController={PersonalizationController})", personalizationController);
+		eventLogger.LogDebug("CommonController(personalizationController={PersonalizationController}): personalizationController → {PersonalizationController1}", personalizationController, personalizationController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CommonController"/> class.</summary>
@@ -41,12 +45,15 @@ namespace Dnn.EditBar.UI.Services
         public CommonController(PersonalizationController personalizationController)
         {
             this.personalizationController = personalizationController;
+			eventLogger.LogDebug("<<< Exiting CommonController(personalizationController={PersonalizationController})", personalizationController);
         }
 
         [HttpGet]
         [AllowAnonymous]
         public HttpResponseMessage CheckAuthorized()
         {
+			eventLogger.LogDebug(">>> Entering CheckAuthorized()");
+			eventLogger.LogDebug("<<< Exiting CheckAuthorized()");
             return this.Request.CreateResponse(HttpStatusCode.OK, new { success = this.IsPageEditor() });
         }
 
@@ -54,8 +61,10 @@ namespace Dnn.EditBar.UI.Services
         [DnnPageEditor]
         public HttpResponseMessage GetUserSetting(string key)
         {
+			eventLogger.LogDebug(">>> Entering GetUserSetting(key={Key})", key);
             var personalization = this.personalizationController.LoadProfile(this.UserInfo.UserID, this.PortalSettings.PortalId);
             var value = personalization.Profile[key + this.PortalSettings.PortalId];
+			eventLogger.LogDebug("GetUserSetting(key={Key}): personalization → {Personalization}", key, personalization);
 
             if (value == null)
             {
@@ -68,6 +77,7 @@ namespace Dnn.EditBar.UI.Services
                 Value = value,
             };
 
+			eventLogger.LogDebug("<<< Exiting GetUserSetting(key={Key})", key);
             return this.Request.CreateResponse(HttpStatusCode.OK, userSetting);
         }
 
@@ -76,19 +86,25 @@ namespace Dnn.EditBar.UI.Services
         [DnnPageEditor]
         public HttpResponseMessage SetUserSetting(UserSetting setting)
         {
+			eventLogger.LogDebug(">>> Entering SetUserSetting(setting={Setting})", setting);
             var personalization = this.personalizationController.LoadProfile(this.UserInfo.UserID, this.PortalSettings.PortalId);
             personalization.Profile[setting.Key + this.PortalSettings.PortalId] = setting.Value;
+			eventLogger.LogDebug("SetUserSetting(setting={Setting}): personalization → {Personalization}", setting, personalization);
+			eventLogger.LogDebug("SetUserSetting(setting={Setting}): personalization.IsModified → {Arg1}", setting, personalization.IsModified);
             personalization.IsModified = true;
             this.personalizationController.SaveProfile(personalization);
 
+			eventLogger.LogDebug("<<< Exiting SetUserSetting(setting={Setting})", setting);
             return this.Request.CreateResponse(HttpStatusCode.OK);
         }
 
         private static bool IsModuleAdmin(PortalSettings portalSettings)
         {
+			eventLogger.LogDebug(">>> Entering IsModuleAdmin(portalSettings={PortalSettings})", portalSettings);
             bool isModuleAdmin = false;
             foreach (ModuleInfo objModule in TabController.CurrentPage.Modules)
             {
+			eventLogger.LogDebug("IsModuleAdmin(portalSettings={PortalSettings}): isModuleAdmin → {IsModuleAdmin}", portalSettings, isModuleAdmin);
                 if (!objModule.IsDeleted)
                 {
                     bool blnHasModuleEditPermissions = ModulePermissionController.HasModuleAccess(SecurityAccessLevel.Edit, Null.NullString, objModule);
@@ -100,11 +116,14 @@ namespace Dnn.EditBar.UI.Services
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting IsModuleAdmin(portalSettings={PortalSettings})", portalSettings);
             return portalSettings.ControlPanelSecurity == PortalSettings.ControlPanelPermission.ModuleEditor && isModuleAdmin;
         }
 
         private bool IsPageEditor()
         {
+			eventLogger.LogDebug(">>> Entering IsPageEditor()");
+			eventLogger.LogDebug("<<< Exiting IsPageEditor()");
             return PagePermissionsAttributesHelper.HasTabPermission("EDIT,CONTENT,MANAGE") || IsModuleAdmin(this.PortalSettings);
         }
     }

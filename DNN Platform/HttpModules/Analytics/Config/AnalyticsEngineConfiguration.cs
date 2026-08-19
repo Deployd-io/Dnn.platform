@@ -44,8 +44,11 @@ namespace DotNetNuke.HttpModules.Config
         /// <returns>An <see cref="AnalyticsEngineConfiguration"/> instance.</returns>
         public static AnalyticsEngineConfiguration GetConfig(IApplicationStatusInfo appStatus, IEventLogger eventLogger)
         {
+			Logger.LogDebug(">>> Entering GetConfig(appStatus={AppStatus},eventLogger={EventLogger})", appStatus, eventLogger);
             var config = new AnalyticsEngineConfiguration { AnalyticsEngines = new AnalyticsEngineCollection() };
             string filePath = null;
+			Logger.LogDebug("GetConfig(appStatus={AppStatus},eventLogger={EventLogger}): filePath → {FilePath}", appStatus, eventLogger, filePath);
+			Logger.LogDebug("GetConfig(appStatus={AppStatus},eventLogger={EventLogger}): config → {Config}", appStatus, eventLogger, config);
             try
             {
                 config = (AnalyticsEngineConfiguration)DataCache.GetCache("AnalyticsEngineConfig");
@@ -60,6 +63,7 @@ namespace DotNetNuke.HttpModules.Config
                     {
                         doc = new XPathDocument(xmlReader);
                     }
+					Logger.LogDebug("GetConfig(appStatus={AppStatus},eventLogger={EventLogger}): doc → {Doc}", appStatus, eventLogger, doc);
 
                     config = new AnalyticsEngineConfiguration { AnalyticsEngines = new AnalyticsEngineCollection() };
                     foreach (XPathNavigator nav in
@@ -86,6 +90,7 @@ namespace DotNetNuke.HttpModules.Config
             {
                 // log it
                 var log = new LogInfo { LogTypeKey = nameof(EventLogType.HOST_ALERT), };
+				Logger.LogDebug("GetConfig(appStatus={AppStatus},eventLogger={EventLogger}): log → {Log}", appStatus, eventLogger, log);
                 log.AddProperty("Analytics.AnalyticsEngineConfiguration", "GetConfig Failed");
                 if (!string.IsNullOrEmpty(filePath))
                 {
@@ -97,6 +102,7 @@ namespace DotNetNuke.HttpModules.Config
                 Logger.Error(log);
             }
 
+			Logger.LogDebug("<<< Exiting GetConfig()");
             return config;
         }
     }

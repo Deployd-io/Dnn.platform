@@ -6,15 +6,22 @@ Imports System.Globalization
 Imports System.Reflection
 'Imports System.Configuration
 Imports System.Web.Compilation
+Imports Microsoft.Extensions.Logging
 
 Namespace DotNetNuke.UI.Utilities
 
     Public Class Reflection
+	Private Shared ReadOnly _logger As Microsoft.Extensions.Logging.ILogger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance
 
 #Region "Public Shared Methods"
 
         Public Shared Function CreateObject(ByVal TypeName As String, ByVal CacheKey As String) As Object
+		_logger.LogDebug(">>> Entering CreateObject(TypeName={TypeName},CacheKey={CacheKey})", TypeName, CacheKey)
 
+			_logger.LogDebug(">>> Entering CreateObject(TypeName={TypeName},CacheKey={CacheKey},UseCache={UseCache})", TypeName, CacheKey, UseCache)
+			_logger.LogDebug("<<< Exiting CreateObject(TypeName={TypeName},CacheKey={CacheKey})", TypeName, CacheKey)
+			_logger.LogDebug("<<< Exiting CreateObject(TypeName={TypeName},CacheKey={CacheKey},UseCache={UseCache})", TypeName, CacheKey, UseCache)
+			_logger.LogDebug("<<< Exiting CreateObject(Of={Of})", Of)
             Return CreateObject(TypeName, CacheKey, True)
 
         End Function
@@ -22,6 +29,7 @@ Namespace DotNetNuke.UI.Utilities
         Public Shared Function CreateObject(ByVal TypeName As String, ByVal CacheKey As String, ByVal UseCache As Boolean) As Object
 
             ' dynamically create the object
+			_logger.LogDebug(">>> Entering CreateObject(Of={Of})", Of)
             Return Activator.CreateInstance(CreateType(TypeName, CacheKey, UseCache))
 
         End Function
@@ -34,14 +42,22 @@ Namespace DotNetNuke.UI.Utilities
         End Function
 
         Public Shared Function CreateType(ByVal TypeName As String) As Type
+			_logger.LogDebug(">>> Entering CreateType(TypeName={TypeName})", TypeName)
+			_logger.LogDebug(">>> Entering CreateType(TypeName={TypeName},IgnoreErrors={IgnoreErrors})", TypeName, IgnoreErrors)
+			_logger.LogDebug("<<< Exiting CreateType(TypeName={TypeName})", TypeName)
+			_logger.LogDebug("<<< Exiting CreateType(TypeName={TypeName},IgnoreErrors={IgnoreErrors})", TypeName, IgnoreErrors)
+			_logger.LogDebug("<<< Exiting CreateType(TypeName={TypeName},CacheKey={CacheKey},UseCache={UseCache})", TypeName, CacheKey, UseCache)
+			_logger.LogDebug("<<< Exiting CreateType(TypeName={TypeName},CacheKey={CacheKey},UseCache={UseCache},IgnoreErrors={IgnoreErrors})", TypeName, CacheKey, UseCache, IgnoreErrors)
             Return CreateType(TypeName, "", True, False)
         End Function
 
         Public Shared Function CreateType(ByVal TypeName As String, ByVal IgnoreErrors As Boolean) As Type
+			_logger.LogDebug(">>> Entering CreateType(TypeName={TypeName},CacheKey={CacheKey},UseCache={UseCache})", TypeName, CacheKey, UseCache)
             Return CreateType(TypeName, "", True, IgnoreErrors)
         End Function
 
         Public Shared Function CreateType(ByVal TypeName As String, ByVal CacheKey As String, ByVal UseCache As Boolean) As Type
+			_logger.LogDebug(">>> Entering CreateType(TypeName={TypeName},CacheKey={CacheKey},UseCache={UseCache},IgnoreErrors={IgnoreErrors})", TypeName, CacheKey, UseCache, IgnoreErrors)
             Return CreateType(TypeName, CacheKey, UseCache, False)
         End Function
 
@@ -81,28 +97,35 @@ Namespace DotNetNuke.UI.Utilities
         End Function
 
         Public Shared Function CreateInstance(ByVal Type As Type) As Object
+			_logger.LogDebug(">>> Entering CreateInstance(Type={Type})", Type)
             If Not Type Is Nothing Then
                 Return Type.InvokeMember("", System.Reflection.BindingFlags.CreateInstance, Nothing, Nothing, Nothing, Nothing)
             Else
                 Return Nothing
             End If
+			_logger.LogDebug("<<< Exiting CreateInstance(Type={Type})", Type)
         End Function
 
         Public Shared Function GetProperty(ByVal Type As Type, ByVal PropertyName As String, ByVal Target As Object) As Object
+			_logger.LogDebug(">>> Entering GetProperty(Type={Type},PropertyName={PropertyName},Target={Target})", Type, PropertyName, Target)
             If Not Type Is Nothing Then
                 Return Type.InvokeMember(PropertyName, System.Reflection.BindingFlags.GetProperty, Nothing, Target, Nothing, CultureInfo.InvariantCulture)
             Else
                 Return Nothing
             End If
+			_logger.LogDebug("<<< Exiting GetProperty(Type={Type},PropertyName={PropertyName},Target={Target})", Type, PropertyName, Target)
         End Function
 
         Public Shared Sub SetProperty(ByVal Type As Type, ByVal PropertyName As String, ByVal Target As Object, ByVal Args() As Object)
+			_logger.LogDebug(">>> Entering SetProperty(Type={Type},PropertyName={PropertyName},Target={Target})", Type, PropertyName, Target)
             If Not Type Is Nothing Then
                 Type.InvokeMember(PropertyName, System.Reflection.BindingFlags.SetProperty, Nothing, Target, Args, CultureInfo.InvariantCulture)
             End If
+			_logger.LogDebug("<<< Exiting SetProperty(Type={Type},PropertyName={PropertyName},Target={Target})", Type, PropertyName, Target)
         End Sub
 
         Public Shared Function InvokeMethod(ByVal Type As Type, ByVal MethodName As String, ByVal Target As Object, ByVal Args() As Object) As Object
+			_logger.LogDebug(">>> Entering InvokeMethod(Type={Type},MethodName={MethodName},Target={Target})", Type, MethodName, Target)
             If Not Type Is Nothing Then
                 'Can't use this. in case generic method defined, params match and ambiguous match found error
                 'Dim method As MethodInfo = Type.GetMethod(MethodName, Type.GetTypeArray(Args))
@@ -112,6 +135,7 @@ Namespace DotNetNuke.UI.Utilities
                     If method.Name = MethodName AndAlso method.IsGenericMethod = False AndAlso method.GetParameters().Length = Args.Length Then
                         If ParamsSameType(method.GetParameters(), Args) Then
                             match = True
+							_logger.LogDebug("InvokeMethod(Type={Type},MethodName={MethodName},Target={Target}): match → {Match}", Type, MethodName, Target, match)
                             Exit For
                         End If
                     End If
@@ -120,21 +144,26 @@ Namespace DotNetNuke.UI.Utilities
                     Return method.Invoke(Target, Args)
                 End If
             End If
+			_logger.LogDebug("<<< Exiting InvokeMethod(Type={Type},MethodName={MethodName},Target={Target})", Type, MethodName, Target)
             Return Nothing
         End Function
 
         Private Shared Function ParamsSameType(ByVal params() As ParameterInfo, ByVal Args() As Object) As Boolean
+			_logger.LogDebug(">>> Entering ParamsSameType()")
             Dim match As Boolean = True
             For i As Integer = 0 To Args.Length - 1
                 If params(i).ParameterType.IsAssignableFrom(Args(i).GetType()) = False Then
                     match = False
+					_logger.LogDebug("ParamsSameType(): match → {Match}", match)
                     Exit For
                 End If
             Next
+			_logger.LogDebug("<<< Exiting ParamsSameType()")
             Return match
         End Function
 
         Public Shared Function InvokeGenericMethod(Of T)(ByVal Type As Type, ByVal MethodName As String, ByVal Target As Object, ByVal Args() As Object) As T
+			_logger.LogDebug(">>> Entering InvokeGenericMethod(Of={Of})", Of)
             If Not Type Is Nothing Then
                 Dim method As MethodInfo = Nothing
                 For Each method In Type.GetMembers()
@@ -142,9 +171,11 @@ Namespace DotNetNuke.UI.Utilities
                 Next
                 If Not method Is Nothing Then
                     Dim genMethod As MethodInfo = method.MakeGenericMethod(GetType(T))
+					_logger.LogDebug("InvokeGenericMethod(Of={Of}): genMethod → {GenMethod}", Of, genMethod)
                     Return CType(genMethod.Invoke(Target, Args), T)
                 End If
             End If
+			_logger.LogDebug("<<< Exiting InvokeGenericMethod(Of={Of})", Of)
             Return Nothing
         End Function
 

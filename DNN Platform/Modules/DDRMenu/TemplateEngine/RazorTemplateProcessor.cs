@@ -31,16 +31,20 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
         public RazorTemplateProcessor()
             : this(null)
         {
+		eventLogger.LogDebug(">>> Entering RazorTemplateProcessor()");
         }
+		eventLogger.LogDebug("<<< Exiting RazorTemplateProcessor()");
 
         /// <inheritdoc />
         public bool LoadDefinition(TemplateDefinition baseDefinition)
         {
+			eventLogger.LogDebug(">>> Entering LoadDefinition(baseDefinition={BaseDefinition})", baseDefinition);
             var virtualPath = baseDefinition.TemplateVirtualPath;
 
             if (!virtualPath.EndsWith(".cshtml", StringComparison.InvariantCultureIgnoreCase) &&
                 !virtualPath.EndsWith(".vbhtml", StringComparison.InvariantCultureIgnoreCase))
             {
+			eventLogger.LogDebug("<<< Exiting LoadDefinition(baseDefinition={BaseDefinition})", baseDefinition);
                 return false;
             }
 
@@ -50,9 +54,13 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
         /// <inheritdoc />
         public void Render(object source, HtmlTextWriter htmlWriter, TemplateDefinition liveDefinition)
         {
+			eventLogger.LogDebug(">>> Entering Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition})", source, htmlWriter, liveDefinition);
             if (!string.IsNullOrEmpty(liveDefinition.TemplateVirtualPath))
             {
                 var resolver = new PathResolver(this.hostSettings, liveDefinition.Folder);
+				eventLogger.LogDebug("Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition}): resolver → {Resolver}", source, htmlWriter, liveDefinition, resolver);
+				eventLogger.LogDebug("Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition}): model.Source → {Arg3}", source, htmlWriter, liveDefinition, model.Source);
+				eventLogger.LogDebug("Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition}): model.ControlID → {Arg3}", source, htmlWriter, liveDefinition, model.ControlID);
                 dynamic model = new ExpandoObject();
                 model.Source = source;
                 model.ControlID = DNNContext.Current.HostControl.ClientID;
@@ -65,12 +73,15 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
                 liveDefinition.TemplateArguments.ForEach(a => modelDictionary.Add(a.Name, a.Value));
                 htmlWriter.Write(this.RenderTemplate(liveDefinition.TemplateVirtualPath, model));
             }
+			eventLogger.LogDebug("<<< Exiting Render(source={Source},htmlWriter={HtmlWriter},liveDefinition={LiveDefinition})", source, htmlWriter, liveDefinition);
         }
 
         protected static string ConvertToJson(List<ClientOption> options)
         {
+			eventLogger.LogDebug(">>> Entering ConvertToJson(options={Options})", options);
             var result = new StringBuilder();
             result.Append("{");
+			eventLogger.LogDebug("ConvertToJson(options={Options}): result → {Result}", options, result);
 
             if (options != null)
             {
@@ -102,16 +113,22 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
             }
 
             result.Append("}");
+			eventLogger.LogDebug("<<< Exiting ConvertToJson(options={Options})", options);
             return result.ToString();
         }
 
         private StringWriter RenderTemplate(string virtualPath, dynamic model)
         {
+			eventLogger.LogDebug(">>> Entering RenderTemplate(virtualPath={VirtualPath},model={Model})", virtualPath, model);
             var page = WebPageBase.CreateInstanceFromVirtualPath(virtualPath);
             var httpContext = new HttpContextWrapper(HttpContext.Current);
+			eventLogger.LogDebug("RenderTemplate(virtualPath={VirtualPath},model={Model}): httpContext → {HttpContext}", virtualPath, model, httpContext);
             var pageContext = new WebPageContext(httpContext, page, model);
+			eventLogger.LogDebug("RenderTemplate(virtualPath={VirtualPath},model={Model}): pageContext → {PageContext}", virtualPath, model, pageContext);
+			eventLogger.LogDebug("RenderTemplate(virtualPath={VirtualPath},model={Model}): page → {Page}", virtualPath, model, page);
 
             var writer = new StringWriter();
+			eventLogger.LogDebug("RenderTemplate(virtualPath={VirtualPath},model={Model}): writer → {Writer}", virtualPath, model, writer);
 
             if (page is WebPage)
             {
@@ -121,6 +138,7 @@ namespace DotNetNuke.Web.DDRMenu.TemplateEngine
             {
 #pragma warning disable CS0618 // Type or member is obsolete
                 var razorEngine = new RazorEngine(virtualPath, null, null);
+				eventLogger.LogDebug("RenderTemplate(virtualPath={VirtualPath},model={Model}): razorEngine → {RazorEngine}", virtualPath, model, razorEngine);
 #pragma warning restore CS0618 // Type or member is obsolete
                 razorEngine.Render<dynamic>(writer, model);
             }

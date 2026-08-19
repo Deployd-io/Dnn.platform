@@ -1,3 +1,4 @@
+const logger = console;
 (function ($, window) {
 	$.fn.dnnActionMenu = function (options) {
 		var opts = $.extend({},
@@ -10,6 +11,7 @@
 
 			//hover event
 			function hoverOver($m, opacity, effectMenu) {
+				logger.debug(`>>> Entering hoverOver($m=${$m},opacity=${opacity},effectMenu=${effectMenu})`);
 				var $border = $m.children('.' + opts.borderClassName);
 				if ($border.length === 0) {
 					$border = $('<div class="' + opts.borderClassName + '"></div>').prependTo($m).css({ opacity: 0 });
@@ -19,6 +21,7 @@
 					$m.find(opts.menuActionSelector).fadeTo(opts.fadeSpeed, opacity);
 				}
 				$m.children('.' + opts.borderClassName).fadeTo(opts.fadeSpeed, opacity);
+				logger.debug(`<<< Exiting hoverOver($m=${$m},opacity=${opacity},effectMenu=${effectMenu})`);
 			}
 
 			//hover out event

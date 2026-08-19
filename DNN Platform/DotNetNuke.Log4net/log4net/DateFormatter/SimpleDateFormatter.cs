@@ -47,7 +47,10 @@ namespace log4net.DateFormatter
         /// </remarks>
         public SimpleDateFormatter(string format)
         {
+			value.LogDebug(">>> Entering SimpleDateFormatter(format={Format})", format);
             this.m_formatString = format;
+			value.LogDebug("SimpleDateFormatter(format={Format}): this.m_formatString → {Arg1}", format, this.m_formatString);
+			value.LogDebug("<<< Exiting SimpleDateFormatter(format={Format})", format);
         }
 
         /// <summary>Formats the date using <see cref="M:DateTime.ToString(string, IFormatProvider)"/>.</summary>
@@ -61,7 +64,9 @@ namespace log4net.DateFormatter
         /// </remarks>
         public virtual void FormatDate(DateTime dateToFormat, TextWriter writer)
         {
+			value.LogDebug(">>> Entering FormatDate(dateToFormat={DateToFormat},writer={Writer})", dateToFormat, writer);
             writer.Write(dateToFormat.ToString(this.m_formatString, System.Globalization.DateTimeFormatInfo.InvariantInfo));
+			value.LogDebug("<<< Exiting FormatDate(dateToFormat={DateToFormat},writer={Writer})", dateToFormat, writer);
         }
 
         /// <summary>The format string used to format the <see cref="DateTime" />.</summary>

@@ -8,12 +8,14 @@ import {
 } from "../../../actions";
 import util from "../../../utils";
 import resx from "../../../resources";
+const logger = console;
 
 const re = /^([0-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-4][0-4][0])$/;
 
 class ModePanel extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             updateRequest: {
                 SchedulerMode: "",
@@ -25,12 +27,15 @@ class ModePanel extends Component {
             triedToSubmit: false,
             clientModified: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         let {props, state} = this;
         if (props.schedulerDelay === "" || !re.test(props.schedulerDelay)) {
             state.error["schedulerDelay"] = true;
+			logger.debug('<<< Exiting componentDidMount()');
         }
         this.setState({
             triedToSubmit: false,
@@ -43,6 +48,7 @@ class ModePanel extends Component {
     }    
 
     onSave(event) {
+		logger.debug(`>>> Entering onSave(event=${event})`);
         event.preventDefault();
         const {props, state} = this;
 
@@ -65,6 +71,7 @@ class ModePanel extends Component {
         });
 
         props.onClose();
+		logger.debug(`<<< Exiting onSave(event=${event})`);
     }
 
     onValueChange(key, event) {
@@ -89,6 +96,7 @@ class ModePanel extends Component {
     }
 
     onClose() {
+		logger.debug('>>> Entering onClose()');
         const {props, state} = this;
         state.error["schedulerDelay"] = false;
         this.setState({
@@ -96,11 +104,14 @@ class ModePanel extends Component {
             clientModified: false
         });
         props.onClose();
+		logger.debug('<<< Exiting onClose()');
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <div className={props.isOpened ? "collapsible-content-mode" : "collapsible-content-mode-hidden"}>
                 <Collapsible
@@ -161,6 +172,8 @@ ModePanel.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         schedulerDelay: state.task.schedulerDelay,
         schedulerMode: state.task.schedulerMode,

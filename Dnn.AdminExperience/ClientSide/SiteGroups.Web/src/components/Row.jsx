@@ -8,10 +8,12 @@ import {
 } from "@dnnsoftware/dnn-react-common";
 import SiteGroupEditor from "./Editor";
 import "./Row.less";
+const logger = console;
 
 export default class SiteGroupRow extends React.Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             PortalGroupName: props.group.PortalGroupName || "",
             AuthenticationDomain: props.group.AuthenticationDomain,
@@ -27,29 +29,38 @@ export default class SiteGroupRow extends React.Component {
             }
         };
         this.submitted = false;
+		logger.debug(`constructor(props=${props}): this.submitted → ${this.submitted}`);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     UNSAFE_componentWillReceiveProps(newProps) {
+		logger.debug(`>>> Entering UNSAFE_componentWillReceiveProps(newProps=${newProps})`);
         this.resetState(newProps);
+		logger.debug(`<<< Exiting UNSAFE_componentWillReceiveProps(newProps=${newProps})`);
     }
 
     clickOnPortal(index, type) {
+		logger.debug(`>>> Entering clickOnPortal(index=${index},type=${type})`);
         if (type === "assignedPortals") {
             let p = JSON.parse(JSON.stringify(this.state.Portals));
             p[index].selected = !p[index].selected;
             this.setState({ Portals: p });
         } else {
             let p = JSON.parse(JSON.stringify(this.state.UnassignedSites));
+			logger.debug(`clickOnPortal(index=${index},type=${type}): p → ${p}`);
             p[index].selected = !p[index].selected;
             this.setState({ UnassignedSites: p });
+			logger.debug(`<<< Exiting clickOnPortal(index=${index},type=${type})`);
         }
     }
 
     moveItemsLeft() {
+		logger.debug('>>> Entering moveItemsLeft()');
         let assignedPortals = JSON.parse(JSON.stringify(this.state.Portals));
         let unassignedPortals = JSON.parse(
             JSON.stringify(this.state.UnassignedSites)
         ).filter(site => site.PortalId !== this.props.group.MasterPortal.PortalId);
+		logger.debug(`moveItemsLeft(): assignedPortals → ${assignedPortals}`);
         let itemsToStay = [],
             itemsToMove = [];
         let selectedCount = 0;
@@ -64,6 +75,7 @@ export default class SiteGroupRow extends React.Component {
             }
         });
         if (selectedCount > 0) {
+			logger.debug('<<< Exiting moveItemsLeft()');
             this.setState({
                 UnassignedSites: unassignedPortals.concat(itemsToMove),
                 Portals: itemsToStay
@@ -72,12 +84,14 @@ export default class SiteGroupRow extends React.Component {
     }
 
     moveItemsRight() {
+		logger.debug('>>> Entering moveItemsRight()');
         let assignedPortals = JSON.parse(JSON.stringify(this.state.Portals));
         let unassignedPortals = JSON.parse(
             JSON.stringify(this.state.UnassignedSites)
         );
         let itemsToStay = [],
             itemsToMove = [];
+			logger.debug(`moveItemsRight(): assignedPortals → ${assignedPortals}`);
         let selectedCount = 0;
         unassignedPortals.forEach(portal => {
             let { selected } = portal;
@@ -90,6 +104,7 @@ export default class SiteGroupRow extends React.Component {
             }
         });
         if (selectedCount > 0) {
+			logger.debug('<<< Exiting moveItemsRight()');
             this.setState({
                 UnassignedSites: itemsToStay,
                 Portals: assignedPortals.concat(itemsToMove)
@@ -98,6 +113,7 @@ export default class SiteGroupRow extends React.Component {
     }
 
     moveAll(direction) {
+		logger.debug(`>>> Entering moveAll(direction=${direction})`);
         let assignedPortals = JSON.parse(JSON.stringify(this.state.Portals));
         let unassignedPortals = JSON.parse(
             JSON.stringify(this.state.UnassignedSites)
@@ -115,29 +131,39 @@ export default class SiteGroupRow extends React.Component {
                     UnassignedSites: unassignedPortals.concat(assignedPortals),
                     Portals: []
                 });
+				logger.debug(`<<< Exiting moveAll(direction=${direction})`);
                 break;
         }
     }
 
     sortPortals(a, b) {
+		logger.debug(`>>> Entering sortPortals(a=${a},b=${b})`);
+		logger.debug(`<<< Exiting sortPortals(a=${a},b=${b})`);
         return a.PortalName < b.PortalName ? -1 : 1;
     }
 
     isNew() {
+		logger.debug('>>> Entering isNew()');
+		logger.debug('<<< Exiting isNew()');
         return this.props.group.PortalGroupId === -1;
     }
 
     save() {
+		logger.debug('>>> Entering save()');
         this.submitted = true;
         if (this.isValid()) this.props.onSave(this.result());
+		logger.debug('<<< Exiting save()');
     }
 
     cancel() {
+		logger.debug('>>> Entering cancel()');
         this.resetState(this.props);
         this.props.onCancelEditing();
+		logger.debug('<<< Exiting cancel()');
     }
 
     resetState(props) {
+		logger.debug(`>>> Entering resetState(props=${props})`);
         this.setState({
             PortalGroupName: props.group.PortalGroupName || "",
             AuthenticationDomain: props.group.AuthenticationDomain,
@@ -149,6 +175,7 @@ export default class SiteGroupRow extends React.Component {
                 authenticationDomain: false
             }
         });
+		logger.debug(`<<< Exiting resetState(props=${props})`);
     }
 
     isValid() {
@@ -167,6 +194,8 @@ export default class SiteGroupRow extends React.Component {
     }
 
     result() {
+		logger.debug('>>> Entering result()');
+		logger.debug('<<< Exiting result()');
         return {
             PortalGroup: {
                 PortalGroupId: this.props.group.PortalGroupId,
@@ -181,6 +210,8 @@ export default class SiteGroupRow extends React.Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <div className={"row " + this.props.isOpened}>
                 <div className="rowHeader">

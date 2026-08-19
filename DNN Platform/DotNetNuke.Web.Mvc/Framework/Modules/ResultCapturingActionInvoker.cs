@@ -10,32 +10,44 @@ namespace DotNetNuke.Web.Mvc.Framework.Modules
 
     public class ResultCapturingActionInvoker : ControllerActionInvoker
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ResultCapturingActionInvoker));
         public ActionResult ResultOfLastInvoke { get; set; }
 
         /// <inheritdoc />
         protected override ActionExecutedContext InvokeActionMethodWithFilters(ControllerContext controllerContext, IList<IActionFilter> filters, ActionDescriptor actionDescriptor, IDictionary<string, object> parameters)
         {
+			Logger.LogDebug(">>> Entering InvokeActionMethodWithFilters(controllerContext={ControllerContext},filters={Filters},actionDescriptor={ActionDescriptor},parameters={Parameters})", controllerContext, filters, actionDescriptor, parameters);
             var context = base.InvokeActionMethodWithFilters(controllerContext, filters, actionDescriptor, parameters);
             this.ResultOfLastInvoke = context.Result;
+			Logger.LogDebug("InvokeActionMethodWithFilters(controllerContext={ControllerContext},filters={Filters},actionDescriptor={ActionDescriptor},parameters={Parameters}): context → {Context}", controllerContext, filters, actionDescriptor, parameters, context);
+			Logger.LogDebug("InvokeActionMethodWithFilters(controllerContext={ControllerContext},filters={Filters},actionDescriptor={ActionDescriptor},parameters={Parameters}): this.ResultOfLastInvoke → {Arg4}", controllerContext, filters, actionDescriptor, parameters, this.ResultOfLastInvoke);
+			Logger.LogDebug("<<< Exiting InvokeActionMethodWithFilters(controllerContext={ControllerContext},filters={Filters},actionDescriptor={ActionDescriptor},parameters={Parameters})", controllerContext, filters, actionDescriptor, parameters);
             return context;
         }
 
         /// <inheritdoc />
         protected override ExceptionContext InvokeExceptionFilters(ControllerContext controllerContext, IList<IExceptionFilter> filters, Exception exception)
         {
+			Logger.LogDebug(">>> Entering InvokeExceptionFilters(controllerContext={ControllerContext},filters={Filters},exception={Exception})", controllerContext, filters, exception);
             var context = base.InvokeExceptionFilters(controllerContext, filters, exception);
             this.ResultOfLastInvoke = context.Result;
+			Logger.LogDebug("InvokeExceptionFilters(controllerContext={ControllerContext},filters={Filters},exception={Exception}): context → {Context}", controllerContext, filters, exception, context);
+			Logger.LogDebug("InvokeExceptionFilters(controllerContext={ControllerContext},filters={Filters},exception={Exception}): this.ResultOfLastInvoke → {Arg3}", controllerContext, filters, exception, this.ResultOfLastInvoke);
+			Logger.LogDebug("<<< Exiting InvokeExceptionFilters(controllerContext={ControllerContext},filters={Filters},exception={Exception})", controllerContext, filters, exception);
             return context;
         }
 
         /// <inheritdoc />
         protected override void InvokeActionResult(ControllerContext controllerContext, ActionResult actionResult)
         {
+			Logger.LogDebug(">>> Entering InvokeActionResult(controllerContext={ControllerContext},actionResult={ActionResult})", controllerContext, actionResult);
             // Do not invoke the action.  Instead, store it for later retrieval
             if (this.ResultOfLastInvoke == null)
             {
                 this.ResultOfLastInvoke = actionResult;
+				Logger.LogDebug("InvokeActionResult(controllerContext={ControllerContext},actionResult={ActionResult}): this.ResultOfLastInvoke → {Arg2}", controllerContext, actionResult, this.ResultOfLastInvoke);
             }
+			Logger.LogDebug("<<< Exiting InvokeActionResult(controllerContext={ControllerContext},actionResult={ActionResult})", controllerContext, actionResult);
         }
     }
 }

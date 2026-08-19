@@ -7,6 +7,7 @@ namespace DotNetNuke.Services.Localization
 
     public static class LocalizationExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LocalizationExtensions));
         public const string ResxFileLocaleRegex = "(?i)(.*)\\.((\\w\\w-)?\\w{2,3}-\\w{2,3})(\\.resx)$(?-i)";
         private static readonly Regex FileNameMatchRegex = new Regex(ResxFileLocaleRegex, RegexOptions.Compiled);
 
@@ -18,7 +19,10 @@ namespace DotNetNuke.Services.Localization
         /// <returns>Microsoft compatible locale code.</returns>
         public static string GetLocaleCodeFromFileName(this string fileName)
         {
+			Logger.LogDebug(">>> Entering GetLocaleCodeFromFileName(fileName={FileName})", fileName);
             var m = FileNameMatchRegex.Match(fileName);
+			Logger.LogDebug("GetLocaleCodeFromFileName(fileName={FileName}): m → {M}", fileName, m);
+			Logger.LogDebug("<<< Exiting GetLocaleCodeFromFileName(fileName={FileName})", fileName);
             return m.Success ? m.Groups[2].Value : string.Empty;
         }
 
@@ -30,7 +34,10 @@ namespace DotNetNuke.Services.Localization
         /// <returns>File name stripped of culture code or extension.</returns>
         public static string GetFileNameFromLocalizedResxFile(this string fileName)
         {
+			Logger.LogDebug(">>> Entering GetFileNameFromLocalizedResxFile(fileName={FileName})", fileName);
             var m = FileNameMatchRegex.Match(fileName);
+			Logger.LogDebug("GetFileNameFromLocalizedResxFile(fileName={FileName}): m → {M}", fileName, m);
+			Logger.LogDebug("<<< Exiting GetFileNameFromLocalizedResxFile(fileName={FileName})", fileName);
             return m.Success ? m.Groups[1].Value : string.Empty;
         }
     }

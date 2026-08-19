@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -12,6 +14,7 @@
 "use strict";
 
 CodeMirror.defineMode("verilog", function(config, parserConfig) {
+logger.debug('>>> Entering defineMode()');
 
   var indentUnit = config.indentUnit,
       statementIndentUnit = parserConfig.statementIndentUnit || indentUnit,
@@ -21,8 +24,11 @@ CodeMirror.defineMode("verilog", function(config, parserConfig) {
       hooks = parserConfig.hooks || {};
 
   function words(str) {
+	logger.debug(`>>> Entering words(str=${str})`);
     var obj = {}, words = str.split(" ");
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+	logger.debug(`words(str=${str}): obj → ${obj}`);
+	logger.debug(`<<< Exiting words(str=${str})`);
     return obj;
   }
 
@@ -64,6 +70,7 @@ CodeMirror.defineMode("verilog", function(config, parserConfig) {
   */
   var isOperatorChar = /[\+\-\*\/!~&|^%=?:]/;
   var isBracketChar = /[\[\]{}()]/;
+logger.debug(`defineMode(): isBracketChar → ${isBracketChar}`);
 
   var unsignedNumber = /\d[0-9_]*/;
   var decimalLiteral = /\d*\s*'s?d\s*\d[0-9_]*/i;
@@ -71,11 +78,19 @@ CodeMirror.defineMode("verilog", function(config, parserConfig) {
   var octLiteral = /\d*\s*'s?o\s*[xz0-7][xz0-7_]*/i;
   var hexLiteral = /\d*\s*'s?h\s*[0-9a-fxz?][0-9a-fxz?_]*/i;
   var realLiteral = /(\d[\d_]*(\.\d[\d_]*)?E-?[\d_]+)|(\d[\d_]*\.\d[\d_]*)/i;
+logger.debug(`defineMode(): octLiteral → ${octLiteral}`);
+logger.debug(`defineMode(): realLiteral → ${realLiteral}`);
+logger.debug(`defineMode(): decimalLiteral → ${decimalLiteral}`);
+logger.debug(`defineMode(): hexLiteral → ${hexLiteral}`);
+logger.debug(`defineMode(): binaryLiteral → ${binaryLiteral}`);
+logger.debug(`defineMode(): this.indented → ${this.indented}`);
+logger.debug(`defineMode(): this.align → ${this.align}`);
 
   var closingBracketOrWord = /^((\w+)|[)}\]])/;
   var closingBracket = /[)}\]]/;
 
   var curPunc;
+logger.debug(`defineMode(): closingBracketOrWord → ${closingBracketOrWord}`);
   var curKeyword;
 
   // Block openings which are closed by a matching keyword in the form of ("end" + keyword)
@@ -84,6 +99,9 @@ CodeMirror.defineMode("verilog", function(config, parserConfig) {
     "case checker class clocking config function generate interface module package" +
     "primitive program property specify sequence table task"
   );
+logger.debug(`defineMode(): this.prev → ${this.prev}`);
+logger.debug(`defineMode(): this.type → ${this.type}`);
+logger.debug(`defineMode(): this.column → ${this.column}`);
 
   // Opening/closing pairs
   var openClose = {};
@@ -243,6 +261,7 @@ CodeMirror.defineMode("verilog", function(config, parserConfig) {
     if (t == ")" || t == "]" || t == "}") {
       state.indented = state.context.indented;
     }
+	logger.debug('<<< Exiting defineMode()');
     return state.context = state.context.prev;
   }
 
@@ -292,6 +311,7 @@ CodeMirror.defineMode("verilog", function(config, parserConfig) {
         startOfLine: true
       };
       if (hooks.startState) hooks.startState(state);
+	logger.debug(`<<< Exiting function(exports=${exports})`);
       return state;
     },
 

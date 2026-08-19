@@ -4,20 +4,28 @@ import Tooltip from "../Tooltip";
 import Input from "../SingleLineInput";
 import Label from "../Label";
 import "./style.less";
+const logger = console;
 
 class SingleLineInputWithError extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             isFocused: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     getClass() {
+		logger.debug('>>> Entering getClass()');
         const {props} = this;
         const errorClass = props.error ? " " + props.errorSeverity : "";
+		logger.debug(`getClass(): errorClass → ${errorClass}`);
         const enabledClass = props.enabled ? "" : " disabled";
+		logger.debug(`getClass(): enabledClass → ${enabledClass}`);
         const customClass = " " + props.className;
+		logger.debug(`getClass(): customClass → ${customClass}`);
+		logger.debug('<<< Exiting getClass()');
         return "dnn-single-line-input-with-error" + errorClass + customClass + enabledClass;
     }
 
@@ -41,7 +49,9 @@ class SingleLineInputWithError extends Component {
     }
 
     getCounter(counter) {
+		logger.debug(`>>> Entering getCounter(counter=${counter})`);
         if (!this.shouldRenderCounter(counter)) {
+		logger.debug(`<<< Exiting getCounter(counter=${counter})`);
             return null;
         }
 
@@ -53,11 +63,14 @@ class SingleLineInputWithError extends Component {
     }
 
     shouldRenderCounter(counter) {
+		logger.debug(`>>> Entering shouldRenderCounter(counter=${counter})`);
         const counterIsDefined = !!counter || counter === 0;
+		logger.debug(`<<< Exiting shouldRenderCounter(counter=${counter})`);
         return this.state.isFocused && counterIsDefined;
     }
 
     getInputRightPadding(counter, error) {
+		logger.debug(`>>> Entering getInputRightPadding(counter=${counter},error=${error})`);
         let padding = 0;
         if (counter || counter === 0) {
             padding += 10 + counter.toString().length * 8;
@@ -66,13 +79,16 @@ class SingleLineInputWithError extends Component {
             padding += 22;
         }
 
+		logger.debug(`<<< Exiting getInputRightPadding(counter=${counter},error=${error})`);
         return padding;
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         const errorMessages = props.errorMessage instanceof Array ? props.errorMessage : [props.errorMessage];
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className={this.getClass()} style={props.style}>
                 {props.label &&

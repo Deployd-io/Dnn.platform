@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.FileSystem
 
     public class FileContentTypeManager(ListController listController) : ComponentBase<IFileContentTypeManager, FileContentTypeManager>, IFileContentTypeManager
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FileContentTypeManager));
         private static readonly object ThreadLocker = new object();
         private readonly ListController listController = listController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ListController>();
         private Dictionary<string, string> contentTypes;
@@ -25,6 +26,7 @@ namespace DotNetNuke.Services.FileSystem
         public FileContentTypeManager()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering FileContentTypeManager()");
         }
 
         /// <inheritdoc />
@@ -65,17 +67,21 @@ namespace DotNetNuke.Services.FileSystem
         /// <inheritdoc />
         public virtual string GetContentType(string extension)
         {
+			Logger.LogDebug(">>> Entering GetContentType(extension={Extension})", extension);
             if (string.IsNullOrEmpty(extension))
             {
                 return "application/octet-stream";
             }
 
             var key = extension.TrimStart('.').ToLowerInvariant();
+			Logger.LogWarning("GetContentType(extension={Extension}): key → {Key}", extension, key);
+			Logger.LogDebug("<<< Exiting GetContentType(extension={Extension})", extension);
             return this.ContentTypes.TryGetValue(key, out var contentType) ? contentType : "application/octet-stream";
         }
 
         private static Dictionary<string, string> GetDefaultContentTypes()
         {
+			Logger.LogDebug("<<< Exiting FileContentTypeManager()");
             return new Dictionary<string, string>
             {
                 { "txt", "text/plain" },

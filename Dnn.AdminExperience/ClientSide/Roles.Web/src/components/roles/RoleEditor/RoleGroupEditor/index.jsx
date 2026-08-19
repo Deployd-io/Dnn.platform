@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import "./style.less";
 import util from "../../../../utils";
 import resx from "../../../../resources";
+const logger = console;
 import { SingleLineInputWithError, MultiLineInput, Button, Label }  from "@dnnsoftware/dnn-react-common";
 import {
     roles as RolesActions
@@ -12,7 +13,9 @@ import {
 class RoleGroupEditor extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         let group = Object.assign({}, props.group);
+		logger.debug(`constructor(props=${props}): group → ${group}`);
 
         this.state = {
             group,
@@ -22,19 +25,28 @@ class RoleGroupEditor extends Component {
         };
         this.submitted = false;
         this.handleClick = this.handleClick.bind(this);
+		logger.debug(`constructor(props=${props}): this.submitted → ${this.submitted}`);
         this.node = React.createRef();
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         document.addEventListener("click", this.handleClick);
         this._isMounted = true;
+		logger.debug(`componentDidMount(): this._isMounted → ${this._isMounted}`);
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentWillUnmount() {
+		logger.debug('>>> Entering componentWillUnmount()');
         document.removeEventListener("click", this.handleClick);
         this._isMounted = false;
+		logger.debug(`componentWillUnmount(): this._isMounted → ${this._isMounted}`);
+		logger.debug('<<< Exiting componentWillUnmount()');
     }
 
     handleClick(event) {
+		logger.debug(`>>> Entering handleClick(event=${event})`);
         // Note: this workaround is needed in IE. The remove event listener in the componentWillUnmount is called
         // before the handleClick handler is called, but in spite of that, the handleClick is executed. To avoid
         // the "findDOMNode was called on an unmounted component." error we need to check if the component is mounted before execute this code
@@ -46,9 +58,11 @@ class RoleGroupEditor extends Component {
                 this.props.onCancel();
             }
             this.props.onCancel();
+			logger.debug(`<<< Exiting handleClick(event=${event})`);
         }
     }
     onEditFieldChanged(name, event) {
+		logger.debug(`>>> Entering onEditFieldChanged(name=${name},event=${event})`);
         let {group} = this.state;
         group[name] = event.target.value || "";
         this.setState({
@@ -56,9 +70,11 @@ class RoleGroupEditor extends Component {
         }, () => {
             this.validateForm();
         });
+		logger.debug(`<<< Exiting onEditFieldChanged(name=${name},event=${event})`);
     }
 
     onCancel(e) {
+		logger.debug(`>>> Entering onCancel(e=${e})`);
         e.stopPropagation();
 
         this.setState({
@@ -66,20 +82,24 @@ class RoleGroupEditor extends Component {
         }, () => {
             if (typeof this.props.onCancel === "function") {
                 this.props.onCancel();
+				logger.debug(`<<< Exiting onCancel(e=${e})`);
             }
         });
     }
 
     onSave(e) {
+		logger.debug(`>>> Entering onSave(e=${e})`);
         e.stopPropagation();
 
         const {props, state} = this;
         this.submitted = true;
         if (this.validateForm()) {
+			logger.debug(`onSave(e=${e}): this.submitted → ${this.submitted}`);
             props.dispatch(RolesActions.saveRoleGroup(state.group, (group) => {
                 util.utilities.notify(resx.get("RoleGroupUpdated.Message"));
                 if (typeof this.props.onSave === "function") {
                     this.props.onSave(group);
+					logger.debug(`<<< Exiting onSave(e=${e})`);
                 }
             }));
         }
@@ -103,8 +123,10 @@ class RoleGroupEditor extends Component {
 
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
         let group = Object.assign({}, state.group);
+		logger.debug('<<< Exiting render()');
         return props.visible && <div ref={node => this.rootElement = node} className="role-group-editor" onClick={this.props.onClick.bind(this) }>
             <h2>{resx.get(props.title) }</h2>
             <div className="edit-form">
@@ -155,6 +177,8 @@ RoleGroupEditor.defaultProps = {
 };
 
 function mapStateToProps() {
+	logger.debug('>>> Entering mapStateToProps()');
+	logger.debug('<<< Exiting mapStateToProps()');
     return {};
 }
 

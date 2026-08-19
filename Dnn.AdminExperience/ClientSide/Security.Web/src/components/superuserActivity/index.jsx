@@ -4,21 +4,27 @@ import { connect } from "react-redux";
 import { security as SecurityActions } from "../../actions";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 class SuperuserActivityPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {props} = this;
         if (props.activities) {
             return;
         }
         props.dispatch(SecurityActions.getSuperuserActivities());
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     renderHeader() {
+		logger.debug('>>> Entering renderHeader()');
         const tableFields = [
             { "name": resx.get("Username"), "id": "Username" },
             { "name": resx.get("CreatedDate"), "id": "CreatedDate" },
@@ -32,11 +38,15 @@ class SuperuserActivityPanelBody extends Component {
             </div>;
         });
 
+		logger.debug(`renderHeader(): tableHeaders → ${tableHeaders}`);
+		logger.debug('<<< Exiting renderHeader()');
         return <div className="activityHeader-wrapper">{tableHeaders}</div>;
     }
 
     renderedList() {
+		logger.debug('>>> Entering renderedList()');
         const {props} = this;
+		logger.debug('<<< Exiting renderedList()');
         return props.activities.map((term, i) => {
             return (
                 <div className="activityItem" key={i}>
@@ -67,8 +77,10 @@ class SuperuserActivityPanelBody extends Component {
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         if (props.activities) {
+			logger.debug('<<< Exiting render()');
             return (
                 <div className={styles.activities}>
                     <div className="activities-topbar">
@@ -92,6 +104,8 @@ SuperuserActivityPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         activities: state.security.activities

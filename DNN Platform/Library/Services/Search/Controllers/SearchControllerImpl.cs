@@ -28,6 +28,7 @@ namespace DotNetNuke.Services.Search.Controllers
     /// <summary>  The Impl Controller class for Search.</summary>
     internal class SearchControllerImpl : ISearchController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SearchControllerImpl));
         private const string SeacrchContollersCacheKey = "SearchControllers";
 
         private readonly IServiceProvider serviceProvider;
@@ -38,32 +39,43 @@ namespace DotNetNuke.Services.Search.Controllers
         public SearchControllerImpl()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering SearchControllerImpl()");
         }
 
+		Logger.LogDebug("<<< Exiting SearchControllerImpl()");
         /// <summary>Initializes a new instance of the <see cref="SearchControllerImpl"/> class.</summary>
         /// <param name="serviceProvider">The DI container.</param>
         public SearchControllerImpl(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider ?? Globals.DependencyProvider;
+			Logger.LogDebug("SearchControllerImpl(serviceProvider={ServiceProvider}): serviceProvider → {ServiceProvider1}", serviceProvider, serviceProvider);
         }
 
         /// <inheritdoc />
         public SearchResults SiteSearch(SearchQuery searchQuery)
         {
+			Logger.LogDebug(">>> Entering SiteSearch(searchQuery={SearchQuery})", searchQuery);
             var results = this.GetResults(searchQuery);
+			Logger.LogDebug("SiteSearch(searchQuery={SearchQuery}): results → {Results}", searchQuery, results);
+			Logger.LogDebug("<<< Exiting SiteSearch(searchQuery={SearchQuery})", searchQuery);
             return new SearchResults { TotalHits = results.Item1, Results = results.Item2, };
         }
 
         /// <inheritdoc />
         public SearchResults ModuleSearch(SearchQuery searchQuery)
         {
+			Logger.LogDebug(">>> Entering ModuleSearch(searchQuery={SearchQuery})", searchQuery);
             searchQuery.SearchTypeIds = new List<int> { this.moduleSearchTypeId };
             var results = this.GetResults(searchQuery);
+			Logger.LogDebug("ModuleSearch(searchQuery={SearchQuery}): results → {Results}", searchQuery, results);
+			Logger.LogDebug("ModuleSearch(searchQuery={SearchQuery}): searchQuery.SearchTypeIds → {Arg1}", searchQuery, searchQuery.SearchTypeIds);
+			Logger.LogDebug("<<< Exiting ModuleSearch(searchQuery={SearchQuery})", searchQuery);
             return new SearchResults { TotalHits = results.Item1, Results = results.Item2 };
         }
 
         private static void FillTagsValues(Document doc, SearchResult result)
         {
+			Logger.LogDebug(">>> Entering FillTagsValues(doc={Doc},result={Result})", doc, result);
             foreach (var field in doc.GetFields())
             {
                 if (field.StringValue == null)
@@ -76,33 +88,41 @@ namespace DotNetNuke.Services.Search.Controllers
                 {
                     case Constants.UniqueKeyTag:
                         result.UniqueKey = field.StringValue;
+						Logger.LogDebug("FillTagsValues(doc={Doc},result={Result}): result.UniqueKey → {Arg2}", doc, result, result.UniqueKey);
                         break;
                     case Constants.TitleTag:
                         var title = field.StringValue;
                         result.Title = title;
+						Logger.LogDebug("FillTagsValues(doc={Doc},result={Result}): result.Title → {Arg2}", doc, result, result.Title);
                         break;
                     case Constants.BodyTag:
                         result.Body = field.StringValue;
+						Logger.LogDebug("FillTagsValues(doc={Doc},result={Result}): result.Body → {Arg2}", doc, result, result.Body);
                         break;
                     case Constants.DescriptionTag:
                         result.Description = field.StringValue;
+						Logger.LogDebug("FillTagsValues(doc={Doc},result={Result}): result.Description → {Arg2}", doc, result, result.Description);
                         break;
                     case Constants.Tag:
                         result.Tags = result.Tags.Concat(new[] { field.StringValue });
                         break;
                     case Constants.PermissionsTag:
                         result.Permissions = field.StringValue;
+						Logger.LogDebug("FillTagsValues(doc={Doc},result={Result}): result.Permissions → {Arg2}", doc, result, result.Permissions);
                         break;
                     case Constants.QueryStringTag:
                         result.QueryString = field.StringValue;
+						Logger.LogDebug("FillTagsValues(doc={Doc},result={Result}): result.QueryString → {Arg2}", doc, result, result.QueryString);
                         break;
                     case Constants.UrlTag:
                         result.Url = field.StringValue;
+						Logger.LogDebug("FillTagsValues(doc={Doc},result={Result}): result.Url → {Arg2}", doc, result, result.Url);
                         break;
                     case Constants.SearchTypeTag:
                         if (int.TryParse(field.StringValue, out intField))
                         {
                             result.SearchTypeId = intField;
+							Logger.LogDebug("FillTagsValues(doc={Doc},result={Result}): result.SearchTypeId → {Arg2}", doc, result, result.SearchTypeId);
                         }
 
                         break;
@@ -110,6 +130,7 @@ namespace DotNetNuke.Services.Search.Controllers
                         if (int.TryParse(field.StringValue, out intField))
                         {
                             result.ModuleId = intField;
+							Logger.LogDebug("FillTagsValues(doc={Doc},result={Result}): result.ModuleId → {Arg2}", doc, result, result.ModuleId);
                         }
 
                         break;
@@ -117,6 +138,7 @@ namespace DotNetNuke.Services.Search.Controllers
                         if (int.TryParse(field.StringValue, out intField))
                         {
                             result.ModuleDefId = intField;
+							Logger.LogDebug("FillTagsValues(doc={Doc},result={Result}): result.ModuleDefId → {Arg2}", doc, result, result.ModuleDefId);
                         }
 
                         break;
@@ -124,6 +146,7 @@ namespace DotNetNuke.Services.Search.Controllers
                         if (int.TryParse(field.StringValue, out intField))
                         {
                             result.PortalId = intField;
+							Logger.LogDebug("FillTagsValues(doc={Doc},result={Result}): result.PortalId → {Arg2}", doc, result, result.PortalId);
                         }
 
                         break;
@@ -131,6 +154,7 @@ namespace DotNetNuke.Services.Search.Controllers
                         if (int.TryParse(field.StringValue, out intField))
                         {
                             result.AuthorUserId = intField;
+							Logger.LogDebug("FillTagsValues(doc={Doc},result={Result}): result.AuthorUserId → {Arg2}", doc, result, result.AuthorUserId);
                         }
 
                         break;
@@ -138,27 +162,32 @@ namespace DotNetNuke.Services.Search.Controllers
                         if (int.TryParse(field.StringValue, out intField))
                         {
                             result.RoleId = intField;
+							Logger.LogDebug("FillTagsValues(doc={Doc},result={Result}): result.RoleId → {Arg2}", doc, result, result.RoleId);
                         }
 
                         break;
                     case Constants.AuthorNameTag:
                         result.AuthorName = field.StringValue;
+						Logger.LogDebug("FillTagsValues(doc={Doc},result={Result}): result.AuthorName → {Arg2}", doc, result, result.AuthorName);
                         break;
                     case Constants.TabIdTag:
                         if (int.TryParse(field.StringValue, out intField))
                         {
                             result.TabId = intField;
+							Logger.LogDebug("FillTagsValues(doc={Doc},result={Result}): result.TabId → {Arg2}", doc, result, result.TabId);
                         }
 
                         break;
                     case Constants.ModifiedTimeTag:
                         DateTime.TryParseExact(field.StringValue, Constants.DateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var modifiedTimeUtc);
                         result.ModifiedTimeUtc = modifiedTimeUtc;
+						Logger.LogDebug("FillTagsValues(doc={Doc},result={Result}): result.ModifiedTimeUtc → {Arg2}", doc, result, result.ModifiedTimeUtc);
                         break;
                     default:
                         if (field.Name.StartsWith(Constants.NumericKeyPrefixTag, StringComparison.Ordinal))
                         {
                             var key = field.Name.Substring(Constants.NumericKeyPrefixTag.Length);
+							Logger.LogWarning("FillTagsValues(doc={Doc},result={Result}): key → {Key}", doc, result, key);
                             if (int.TryParse(field.StringValue, out intField))
                             {
                                 if (!result.NumericKeys.ContainsKey(key))
@@ -179,12 +208,15 @@ namespace DotNetNuke.Services.Search.Controllers
                         break;
                 }
             }
+			Logger.LogDebug("<<< Exiting FillTagsValues(doc={Doc},result={Result})", doc, result);
         }
 
         private static string GetSnippet(SearchResult searchResult, LuceneResult luceneResult)
         {
+			Logger.LogDebug(">>> Entering GetSnippet(searchResult={SearchResult},luceneResult={LuceneResult})", searchResult, luceneResult);
             var sb = new StringBuilder();
 
+			Logger.LogDebug("GetSnippet(searchResult={SearchResult},luceneResult={LuceneResult}): sb → {Sb}", searchResult, luceneResult, sb);
             if (!string.IsNullOrEmpty(luceneResult.TitleSnippet))
             {
                 sb.Append(luceneResult.TitleSnippet + "...");
@@ -216,18 +248,23 @@ namespace DotNetNuke.Services.Search.Controllers
             }
 
             var snippet = sb.ToString();
+			Logger.LogDebug("GetSnippet(searchResult={SearchResult},luceneResult={LuceneResult}): snippet → {Snippet}", searchResult, luceneResult, snippet);
             if (string.IsNullOrEmpty(snippet))
             {
                 snippet = searchResult.Title;
             }
 
+			Logger.LogDebug("<<< Exiting GetSnippet(searchResult={SearchResult},luceneResult={LuceneResult})", searchResult, luceneResult);
             return snippet;
         }
 
         private static SearchResult GetPartialSearchResult(Document doc, SearchQuery searchQuery)
         {
+			Logger.LogDebug(">>> Entering GetPartialSearchResult(doc={Doc},searchQuery={SearchQuery})", doc, searchQuery);
             var result = new SearchResult { SearchContext = searchQuery.SearchContext };
             var localeField = doc.GetField(Constants.LocaleTag);
+			Logger.LogDebug("GetPartialSearchResult(doc={Doc},searchQuery={SearchQuery}): localeField → {LocaleField}", doc, searchQuery, localeField);
+			Logger.LogDebug("GetPartialSearchResult(doc={Doc},searchQuery={SearchQuery}): result → {Result}", doc, searchQuery, result);
 
             if (localeField != null)
             {
@@ -237,11 +274,13 @@ namespace DotNetNuke.Services.Search.Controllers
             }
 
             FillTagsValues(doc, result);
+			Logger.LogDebug("<<< Exiting GetPartialSearchResult(doc={Doc},searchQuery={SearchQuery})", doc, searchQuery);
             return result;
         }
 
         private static Sort GetSort(SearchQuery query)
         {
+			Logger.LogDebug(">>> Entering GetSort(query={Query})");
             var sort = Sort.RELEVANCE; // default sorting - relevance is always descending.
             if (query.SortField != SortFields.Relevance)
             {
@@ -276,6 +315,7 @@ namespace DotNetNuke.Services.Search.Controllers
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetSort(query={Query})");
             return sort;
         }
 
@@ -406,6 +446,7 @@ namespace DotNetNuke.Services.Search.Controllers
 
         private void ApplySearchTypeIdFilter(BooleanQuery query, SearchQuery searchQuery)
         {
+			Logger.LogDebug(">>> Entering ApplySearchTypeIdFilter(query={Query},searchQuery={SearchQuery})", query, searchQuery);
             // Special handling for Module Search
             if (searchQuery.SearchTypeIds.Count() == 1 && searchQuery.SearchTypeIds.Contains(this.moduleSearchTypeId))
             {
@@ -418,6 +459,7 @@ namespace DotNetNuke.Services.Search.Controllers
                 else
                 {
                     var modDefQuery = new BooleanQuery();
+					Logger.LogDebug("ApplySearchTypeIdFilter(query={Query},searchQuery={SearchQuery}): modDefQuery → {ModDefQuery}", query, searchQuery, modDefQuery);
                     foreach (var moduleDefId in searchQuery.ModuleDefIds)
                     {
                         modDefQuery.Add(NumericRangeQuery.NewIntRange(Constants.ModuleDefIdTag, moduleDefId, moduleDefId, true, true), Occur.SHOULD);
@@ -434,6 +476,7 @@ namespace DotNetNuke.Services.Search.Controllers
             else
             {
                 var searchTypeIdQuery = new BooleanQuery();
+				Logger.LogDebug("ApplySearchTypeIdFilter(query={Query},searchQuery={SearchQuery}): searchTypeIdQuery → {SearchTypeIdQuery}", query, searchQuery, searchTypeIdQuery);
                 foreach (var searchTypeId in searchQuery.SearchTypeIds)
                 {
                     if (searchTypeId == this.moduleSearchTypeId)
@@ -456,18 +499,25 @@ namespace DotNetNuke.Services.Search.Controllers
 
                 query.Add(searchTypeIdQuery, Occur.MUST);
             }
+			Logger.LogDebug("<<< Exiting ApplySearchTypeIdFilter(query={Query},searchQuery={SearchQuery})", query, searchQuery);
         }
 
         private SearchResult GetSearchResultFromLuceneResult(LuceneResult luceneResult)
         {
+			Logger.LogDebug(">>> Entering GetSearchResultFromLuceneResult(luceneResult={LuceneResult})", luceneResult);
             var result = new SearchResult();
             var doc = luceneResult.Document;
+			Logger.LogDebug("GetSearchResultFromLuceneResult(luceneResult={LuceneResult}): result → {Result}", luceneResult, result);
+			Logger.LogDebug("GetSearchResultFromLuceneResult(luceneResult={LuceneResult}): result.DisplayScore → {Arg1}", luceneResult, result.DisplayScore);
+			Logger.LogDebug("GetSearchResultFromLuceneResult(luceneResult={LuceneResult}): result.Score → {Arg1}", luceneResult, result.Score);
             result.DisplayScore = luceneResult.DisplayScore;
             result.Score = luceneResult.Score;
 
             // set culture code of result
             result.CultureCode = string.Empty;
+			Logger.LogDebug("GetSearchResultFromLuceneResult(luceneResult={LuceneResult}): result.CultureCode → {Arg1}", luceneResult, result.CultureCode);
             var localeField = luceneResult.Document.GetField(Constants.LocaleTag);
+			Logger.LogDebug("GetSearchResultFromLuceneResult(luceneResult={LuceneResult}): localeField → {LocaleField}", luceneResult, localeField);
             if (localeField != null)
             {
                 if (int.TryParse(localeField.StringValue, out var id) && id >= 0)
@@ -482,6 +532,7 @@ namespace DotNetNuke.Services.Search.Controllers
 
             FillTagsValues(doc, result);
             result.Snippet = GetSnippet(result, luceneResult);
+			Logger.LogDebug("<<< Exiting GetSearchResultFromLuceneResult(luceneResult={LuceneResult})", luceneResult);
             return result;
         }
 
@@ -545,9 +596,13 @@ namespace DotNetNuke.Services.Search.Controllers
 
         private bool HasPermissionToViewDoc(Document document, SearchQuery searchQuery)
         {
+			Logger.LogDebug(">>> Entering HasPermissionToViewDoc(document={Document},searchQuery={SearchQuery})", document, searchQuery);
             // others LuceneResult fields are not important at this moment
             var result = GetPartialSearchResult(document, searchQuery);
+			Logger.LogDebug("HasPermissionToViewDoc(document={Document},searchQuery={SearchQuery}): result → {Result}", document, searchQuery, result);
             var resultController = this.GetSearchResultControllers().SingleOrDefault(sc => sc.Key == result.SearchTypeId).Value;
+			Logger.LogDebug("HasPermissionToViewDoc(document={Document},searchQuery={SearchQuery}): resultController → {ResultController}", document, searchQuery, resultController);
+			Logger.LogDebug("<<< Exiting HasPermissionToViewDoc(document={Document},searchQuery={SearchQuery})", document, searchQuery);
             return resultController != null && resultController.HasViewPermission(result);
         }
     }

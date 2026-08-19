@@ -45,6 +45,8 @@ namespace log4net.Util
         /// </remarks>
         public ProtectCloseTextWriter(TextWriter writer) : base(writer)
         {
+		value.LogDebug(">>> Entering ProtectCloseTextWriter(writer={Writer})", writer);
+		value.LogDebug("<<< Exiting ProtectCloseTextWriter(writer={Writer})", writer);
         }
 
         /// <summary>Attach this instance to a different underlying <see cref="TextWriter"/></summary>
@@ -56,7 +58,10 @@ namespace log4net.Util
         /// </remarks>
         public void Attach(TextWriter writer)
         {
+			value.LogDebug(">>> Entering Attach(writer={Writer})", writer);
             this.Writer = writer;
+			value.LogDebug("Attach(writer={Writer}): this.Writer → {Arg1}", writer, this.Writer);
+			value.LogDebug("<<< Exiting Attach(writer={Writer})", writer);
         }
 
         /// <summary>Does not close the underlying output writer.</summary>
@@ -68,7 +73,9 @@ namespace log4net.Util
         /// </remarks>
         public override void Close()
         {
+			value.LogDebug(">>> Entering Close()");
             // do nothing
+			value.LogDebug("<<< Exiting Close()");
         }
     }
 }

@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -30,6 +31,7 @@
 */
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -39,7 +41,9 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("ntriples", function() {
+logger.debug('>>> Entering defineMode()');
 
   var Location = {
     PRE_SUBJECT         : 0,
@@ -56,7 +60,9 @@ CodeMirror.defineMode("ntriples", function() {
     POST_OBJ            : 11,
     ERROR               : 12
   };
+logger.debug('<<< Exiting defineMode()');
   function transitState(currState, c) {
+	logger.debug(`>>> Entering transitState(currState=${currState},c=${c})`);
     var currLocation = currState.location;
     var ret;
 
@@ -99,10 +105,13 @@ CodeMirror.defineMode("ntriples", function() {
     else ret = Location.ERROR;
 
     currState.location=ret;
+	logger.debug(`transitState(currState=${currState},c=${c}): currState.location → ${currState.location}`);
+	logger.debug(`<<< Exiting transitState(currState=${currState},c=${c})`);
   }
 
   return {
     startState: function() {
+	logger.debug('>>> Entering startState()');
        return {
            location : Location.PRE_SUBJECT,
            uris     : [],
@@ -111,12 +120,16 @@ CodeMirror.defineMode("ntriples", function() {
            langs    : [],
            types    : []
        };
+	logger.debug('<<< Exiting startState()');
     },
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       var ch = stream.next();
       if(ch == '<') {
          transitState(state, ch);
+		logger.debug(`token(stream=${stream},state=${state}): ch → ${ch}`);
          var parsedURI = '';
+		logger.debug(`token(stream=${stream},state=${state}): parsedURI → ${parsedURI}`);
          stream.eatWhile( function(c) { if( c != '#' && c != '>' ) { parsedURI += c; return true; } return false;} );
          state.uris.push(parsedURI);
          if( stream.match('#', false) ) return 'variable';
@@ -126,6 +139,7 @@ CodeMirror.defineMode("ntriples", function() {
       }
       if(ch == '#') {
         var parsedAnchor = '';
+		logger.debug(`token(stream=${stream},state=${state}): parsedAnchor → ${parsedAnchor}`);
         stream.eatWhile(function(c) { if(c != '>' && c != ' ') { parsedAnchor+= c; return true; } return false;});
         state.anchors.push(parsedAnchor);
         return 'variable-2';
@@ -137,6 +151,7 @@ CodeMirror.defineMode("ntriples", function() {
       if(ch == '_') {
           transitState(state, ch);
           var parsedBNode = '';
+		logger.debug(`token(stream=${stream},state=${state}): parsedBNode → ${parsedBNode}`);
           stream.eatWhile(function(c) { if( c != ' ' ) { parsedBNode += c; return true; } return false;});
           state.bnodes.push(parsedBNode);
           stream.next();
@@ -155,6 +170,7 @@ CodeMirror.defineMode("ntriples", function() {
       if( ch == '@' ) {
           transitState(state, '@');
           var parsedLang = '';
+		logger.debug(`token(stream=${stream},state=${state}): parsedLang → ${parsedLang}`);
           stream.eatWhile(function(c) { if( c != ' ' ) { parsedLang += c; return true; } return false;});
           state.langs.push(parsedLang);
           stream.next();
@@ -165,6 +181,7 @@ CodeMirror.defineMode("ntriples", function() {
           stream.next();
           transitState(state, '^');
           var parsedType = '';
+		logger.debug(`token(stream=${stream},state=${state}): parsedType → ${parsedType}`);
           stream.eatWhile(function(c) { if( c != '>' ) { parsedType += c; return true; } return false;} );
           state.types.push(parsedType);
           stream.next();
@@ -176,6 +193,7 @@ CodeMirror.defineMode("ntriples", function() {
       }
       if( ch == '.' ) {
           transitState(state, ch);
+		logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
       }
     }
   };

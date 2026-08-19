@@ -8,17 +8,23 @@ namespace DotNetNuke.Web.InternalServices.Views.Search
     /// <summary>BasicView grouped by DocumentTypeName.</summary>
     public class GroupedBasicView
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(GroupedBasicView));
         /// <summary>Initializes a new instance of the <see cref="GroupedBasicView"/> class.</summary>
         public GroupedBasicView()
         {
+		Logger.LogDebug(">>> Entering GroupedBasicView()");
+		Logger.LogDebug("<<< Exiting GroupedBasicView()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="GroupedBasicView"/> class.</summary>
         /// <param name="basic">The basic view.</param>
         public GroupedBasicView(BasicView basic)
         {
+			Logger.LogDebug(">>> Entering GroupedBasicView(basic={Basic})", basic);
             this.DocumentTypeName = basic.DocumentTypeName;
             this.Results = new List<BasicView>
+			Logger.LogDebug("GroupedBasicView(basic={Basic}): this.DocumentTypeName → {Arg1}", basic, this.DocumentTypeName);
+			Logger.LogDebug("GroupedBasicView(basic={Basic}): this.Results → {Arg1}", basic, this.Results);
             {
                 new BasicView
                 {
@@ -29,6 +35,7 @@ namespace DotNetNuke.Web.InternalServices.Views.Search
                     Attributes = basic.Attributes,
                 },
             };
+			Logger.LogDebug("<<< Exiting GroupedBasicView()");
         }
 
         /// <summary>Gets or sets type of Search Document.</summary>

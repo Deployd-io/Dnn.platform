@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -12,6 +14,7 @@
 "use strict";
 
 CodeMirror.defineMode("d", function(config, parserConfig) {
+logger.debug('>>> Entering defineMode()');
   var indentUnit = config.indentUnit,
       statementIndentUnit = parserConfig.statementIndentUnit || indentUnit,
       keywords = parserConfig.keywords || {},
@@ -25,9 +28,12 @@ CodeMirror.defineMode("d", function(config, parserConfig) {
   var curPunc;
 
   function tokenBase(stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
     var ch = stream.next();
     if (hooks[ch]) {
+	logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
       var result = hooks[ch](stream, state);
+	logger.debug(`tokenBase(stream=${stream},state=${state}): result → ${result}`);
       if (result !== false) return result;
     }
     if (ch == '"' || ch == "'" || ch == "`") {
@@ -169,6 +175,7 @@ CodeMirror.defineMode("d", function(config, parserConfig) {
       else if (((ctx.type == "}" || ctx.type == "top") && curPunc != ';') || (ctx.type == "statement" && curPunc == "newstatement"))
         pushContext(state, stream.column(), "statement");
       state.startOfLine = false;
+	logger.debug(`<<< Exiting function(exports=${exports})`);
       return style;
     },
 

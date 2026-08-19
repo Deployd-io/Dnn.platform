@@ -113,14 +113,18 @@ namespace DotNetNuke.Security
         public PortalSecurity()
             : this(null, null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering PortalSecurity()");
         }
 
+		Logger.LogDebug("<<< Exiting PortalSecurity()");
         /// <summary>Initializes a new instance of the <see cref="PortalSecurity"/> class.</summary>
         /// <param name="cryptographyProvider">The cryptography provider.</param>
         [Obsolete("Deprecated in DotNetNuke 10.2.4. Please use overload with ListController. Scheduled removal in v12.0.0.")]
         public PortalSecurity(ICryptographyProvider cryptographyProvider)
             : this(cryptographyProvider, null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering PortalSecurity(cryptographyProvider={CryptographyProvider})", cryptographyProvider);
+		Logger.LogDebug("<<< Exiting PortalSecurity(cryptographyProvider={CryptographyProvider})", cryptographyProvider);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PortalSecurity"/> class.</summary>
@@ -133,7 +137,11 @@ namespace DotNetNuke.Security
         {
             this.cryptographyProvider = cryptographyProvider ?? Globals.GetCurrentServiceProvider().GetRequiredService<ICryptographyProvider>();
             this.listController = listController ?? Globals.GetCurrentServiceProvider().GetRequiredService<ListController>();
+			Logger.LogDebug("PortalSecurity(cryptographyProvider={CryptographyProvider},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): listController → {ListController1}", cryptographyProvider, listController, portalController, appStatus, portalGroupController, listController);
+			Logger.LogDebug("PortalSecurity(cryptographyProvider={CryptographyProvider},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): appStatus → {AppStatus1}", cryptographyProvider, listController, portalController, appStatus, portalGroupController, appStatus);
+			Logger.LogDebug("PortalSecurity(cryptographyProvider={CryptographyProvider},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalGroupController → {PortalGroupController1}", cryptographyProvider, listController, portalController, appStatus, portalGroupController, portalGroupController);
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
+			Logger.LogDebug("PortalSecurity(cryptographyProvider={CryptographyProvider},listController={ListController},portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalController → {PortalController1}", cryptographyProvider, listController, portalController, appStatus, portalGroupController, portalController);
             this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
             this.portalGroupController = portalGroupController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalGroupController>();
         }
@@ -148,6 +156,7 @@ namespace DotNetNuke.Security
         [SuppressMessage("Microsoft.Design", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix", Justification = "Breaking change")]
         public enum FilterFlag
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PortalSecurity));
             /// <summary>Replaces line breaks with <c>&lt;br&gt;</c> tags.</summary>
             MultiLine = 1,
 
@@ -212,8 +221,10 @@ namespace DotNetNuke.Security
         /// <summary>Forces the secure connection.</summary>
         public static void ForceSecureConnection()
         {
+			Logger.LogDebug(">>> Entering ForceSecureConnection()");
             // get current url
             var url = HttpContext.Current.Request.Url.ToString();
+			Logger.LogDebug("ForceSecureConnection(): url → {Url}", url);
 
             // if unsecure connection
             if (url.StartsWith("http://", StringComparison.InvariantCultureIgnoreCase))
@@ -234,6 +245,7 @@ namespace DotNetNuke.Security
                 // redirect to secure connection
                 HttpContext.Current.Response.Redirect(url, true);
             }
+			Logger.LogDebug("<<< Exiting ForceSecureConnection()");
         }
 
         /// <summary>Gets the cookie domain for the portal group or from web.config.</summary>
@@ -255,11 +267,13 @@ namespace DotNetNuke.Security
         /// <returns>Cookie domain for the portal group or from web.config.</returns>
         public static string GetCookieDomain(IPortalController portalController, IApplicationStatusInfo appStatus, IPortalGroupController portalGroupController, int portalId)
         {
+			Logger.LogDebug(">>> Entering GetCookieDomain(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId})", portalController, appStatus, portalGroupController, portalId);
             string cookieDomain = string.Empty;
             if (PortalController.IsMemberOfPortalGroup(portalController, portalId))
             {
                 // set cookie domain for portal group
                 var group = portalGroupController.GetPortalGroups().SingleOrDefault(p => p.MasterPortalId == PortalController.GetEffectivePortalId(portalController, appStatus, portalGroupController, portalId));
+				Logger.LogDebug("GetCookieDomain(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController},portalId={PortalId}): group → {Group}", portalController, appStatus, portalGroupController, portalId, group);
 
                 if (@group != null
                         && !string.IsNullOrEmpty(@group.AuthenticationDomain)
@@ -279,6 +293,7 @@ namespace DotNetNuke.Security
                 cookieDomain = FormsAuthentication.CookieDomain;
             }
 
+			Logger.LogDebug("<<< Exiting GetCookieDomain(portalId={PortalId})", portalId);
             return cookieDomain;
         }
 
@@ -287,8 +302,12 @@ namespace DotNetNuke.Security
         /// <returns><see langword="true"/> if the current user is denied from the provided specified roles; otherwise, <see langword="false"/>.</returns>
         public static bool IsDenied(string roles)
         {
+			Logger.LogDebug(">>> Entering IsDenied(roles={Roles})", roles);
             UserInfo objUserInfo = UserController.Instance.GetCurrentUserInfo();
             var settings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogDebug("IsDenied(roles={Roles}): settings → {Settings}", roles, settings);
+			Logger.LogDebug("IsDenied(roles={Roles}): objUserInfo → {ObjUserInfo}", roles, objUserInfo);
+			Logger.LogDebug("<<< Exiting IsDenied(roles={Roles})", roles);
             return IsDenied(objUserInfo, settings, roles);
         }
 
@@ -348,8 +367,10 @@ namespace DotNetNuke.Security
         /// <returns><see langword="true"/> if user belongs to the specified role; otherwise, <see langword="false"/>.</returns>
         public static bool IsInRole(string role)
         {
+			Logger.LogDebug(">>> Entering IsInRole(role={Role})", role);
             if (!string.IsNullOrEmpty(role) && role == Globals.glbRoleUnauthUserName && !HttpContext.Current.Request.IsAuthenticated)
             {
+			Logger.LogDebug("<<< Exiting IsInRole(role={Role})", role);
                 return true;
             }
 
@@ -361,8 +382,12 @@ namespace DotNetNuke.Security
         /// <returns><see langword="true"/> if user belongs to the specified roles; otherwise, <see langword="false"/>.</returns>
         public static bool IsInRoles(string roles)
         {
+			Logger.LogDebug(">>> Entering IsInRoles(roles={Roles})", roles);
             var objUserInfo = UserController.Instance.GetCurrentUserInfo();
             var settings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogDebug("IsInRoles(roles={Roles}): settings → {Settings}", roles, settings);
+			Logger.LogDebug("IsInRoles(roles={Roles}): objUserInfo → {ObjUserInfo}", roles, objUserInfo);
+			Logger.LogDebug("<<< Exiting IsInRoles(roles={Roles})", roles);
             return IsInRoles(objUserInfo, settings, roles);
         }
 
@@ -409,8 +434,12 @@ namespace DotNetNuke.Security
         /// <returns><see langword="true"/> if the specified user is a friend of the current user; otherwise, <see langword="false"/>.</returns>
         public static bool IsFriend(int userId)
         {
+			Logger.LogDebug(">>> Entering IsFriend(userId={UserId})", userId);
             var objUserInfo = UserController.Instance.GetCurrentUserInfo();
             var settings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogDebug("IsFriend(userId={UserId}): settings → {Settings}", userId, settings);
+			Logger.LogDebug("IsFriend(userId={UserId}): objUserInfo → {ObjUserInfo}", userId, objUserInfo);
+			Logger.LogDebug("<<< Exiting IsFriend(userId={UserId})", userId);
             return IsInRoles(objUserInfo, settings, RoleFriendPrefix + userId);
         }
 
@@ -419,8 +448,12 @@ namespace DotNetNuke.Security
         /// <returns><see langword="true"/> if the specified user is a follower of the current user; otherwise, <see langword="false"/>.</returns>
         public static bool IsFollower(int userId)
         {
+			Logger.LogDebug(">>> Entering IsFollower(userId={UserId})", userId);
             var objUserInfo = UserController.Instance.GetCurrentUserInfo();
             var settings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogDebug("IsFollower(userId={UserId}): settings → {Settings}", userId, settings);
+			Logger.LogDebug("IsFollower(userId={UserId}): objUserInfo → {ObjUserInfo}", userId, objUserInfo);
+			Logger.LogDebug("<<< Exiting IsFollower(userId={UserId})", userId);
             return IsInRoles(objUserInfo, settings, RoleFollowerPrefix + userId);
         }
 
@@ -429,8 +462,12 @@ namespace DotNetNuke.Security
         /// <returns><see langword="true"/> if the specified user is an owner; otherwise, <see langword="false"/>.</returns>
         public static bool IsOwner(int userId)
         {
+			Logger.LogDebug(">>> Entering IsOwner(userId={UserId})", userId);
             var objUserInfo = UserController.Instance.GetCurrentUserInfo();
             var settings = PortalController.Instance.GetCurrentSettings();
+			Logger.LogDebug("IsOwner(userId={UserId}): settings → {Settings}", userId, settings);
+			Logger.LogDebug("IsOwner(userId={UserId}): objUserInfo → {ObjUserInfo}", userId, objUserInfo);
+			Logger.LogDebug("<<< Exiting IsOwner(userId={UserId})", userId);
             return IsInRoles(objUserInfo, settings, RoleOwnerPrefix + userId);
         }
 
@@ -441,9 +478,12 @@ namespace DotNetNuke.Security
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public string CreateKey(int numBytes)
         {
+			Logger.LogDebug(">>> Entering CreateKey(numBytes={NumBytes})", numBytes);
             using var rng = new RNGCryptoServiceProvider();
             var buff = new byte[numBytes];
+			Logger.LogDebug("CreateKey(numBytes={NumBytes}): rng → {Rng}", numBytes, rng);
             rng.GetBytes(buff);
+			Logger.LogDebug("<<< Exiting CreateKey(numBytes={NumBytes})", numBytes);
             return BytesToHexString(buff);
         }
 
@@ -455,6 +495,8 @@ namespace DotNetNuke.Security
         [DnnDeprecated(10, 2, 2, "Use DotNetNuke.Abstractions.Security.ICryptographyProvider")]
         public partial string Decrypt(string strKey, string strData)
         {
+			Logger.LogDebug(">>> Entering Decrypt(strKey={StrKey},strData={StrData})", strKey, strData);
+			Logger.LogDebug("<<< Exiting Decrypt(strKey={StrKey},strData={StrData})", strKey, strData);
             return this.cryptographyProvider.DecryptParameter(strData, strKey, CryptographyProvider.Instance().EncryptParameterAlgorithmName);
         }
 
@@ -466,6 +508,7 @@ namespace DotNetNuke.Security
         [DnnDeprecated(10, 2, 2, "Use DotNetNuke.Abstractions.Security.ICryptographyProvider")]
         public partial string DecryptString(string message, string passphrase)
         {
+			Logger.LogDebug(">>> Entering DecryptString(message={Message},passphrase=<redacted>)", message);
             if (!message.Contains(EncryptedStringAlgorithmSeparator, StringComparison.Ordinal))
             {
                 return this.cryptographyProvider.DecryptString(
@@ -476,12 +519,18 @@ namespace DotNetNuke.Security
             }
 
             var endOfMessage = message.IndexOf(EncryptedStringAlgorithmSeparator, StringComparison.Ordinal);
+			Logger.LogDebug("DecryptString(message={Message},passphrase=<redacted>): endOfMessage → {EndOfMessage}", message, endOfMessage);
             var encryptedMessage = message.Substring(0, endOfMessage);
+			Logger.LogDebug("DecryptString(message={Message},passphrase=<redacted>): encryptedMessage → {EncryptedMessage}", message, encryptedMessage);
             var startOfAlgorithm = endOfMessage + EncryptedStringAlgorithmSeparator.Length;
             var endOfAlgorithm = message.IndexOf(EncryptedStringInitializationVectorSeparator, startOfAlgorithm, StringComparison.Ordinal);
+			Logger.LogDebug("DecryptString(message={Message},passphrase=<redacted>): endOfAlgorithm → {EndOfAlgorithm}", message, endOfAlgorithm);
             var algorithmName = message.Substring(startOfAlgorithm, endOfAlgorithm - startOfAlgorithm);
+			Logger.LogDebug("DecryptString(message={Message},passphrase=<redacted>): algorithmName → {AlgorithmName}", message, algorithmName);
             var startOfInitializationVector = endOfAlgorithm + EncryptedStringInitializationVectorSeparator.Length;
             var initializationVector = message.Substring(startOfInitializationVector);
+			Logger.LogDebug("DecryptString(message={Message},passphrase=<redacted>): initializationVector → {InitializationVector}", message, initializationVector);
+			Logger.LogDebug("<<< Exiting DecryptString(message={Message},passphrase=<redacted>)", message);
             return this.cryptographyProvider.DecryptString(encryptedMessage, passphrase, algorithmName, initializationVector);
         }
 
@@ -493,6 +542,8 @@ namespace DotNetNuke.Security
         [DnnDeprecated(10, 2, 2, "Use DotNetNuke.Abstractions.Security.ICryptographyProvider")]
         public partial string Encrypt(string key, string data)
         {
+			Logger.LogDebug(">>> Entering Encrypt(key={Key},data={Data})", key, data);
+			Logger.LogDebug("<<< Exiting Encrypt(key={Key},data={Data})", key, data);
             return this.cryptographyProvider.EncryptParameter(data, key).EncryptedMessage;
         }
 
@@ -504,7 +555,9 @@ namespace DotNetNuke.Security
         [DnnDeprecated(10, 2, 2, "Use DotNetNuke.Abstractions.Security.ICryptographyProvider")]
         public partial string EncryptString(string message, string passphrase)
         {
+			Logger.LogDebug(">>> Entering EncryptString(message={Message},passphrase=<redacted>)", message);
             var (encryptedMessage, algorithm, initializationVector) = this.cryptographyProvider.EncryptString(message, passphrase);
+			Logger.LogDebug("<<< Exiting EncryptString(message={Message},passphrase=<redacted>)", message);
             return $"{encryptedMessage}{EncryptedStringAlgorithmSeparator}{algorithm}{EncryptedStringInitializationVectorSeparator}{initializationVector}";
         }
 
@@ -514,17 +567,21 @@ namespace DotNetNuke.Security
         /// <returns>Filtered UserInput.</returns>
         public string InputFilter(string userInput, FilterFlag filterType)
         {
+			Logger.LogDebug(">>> Entering InputFilter(userInput={UserInput},filterType={FilterType})", userInput, filterType);
             if (userInput == null)
             {
                 return string.Empty;
             }
 
             var tempInput = userInput;
+			Logger.LogDebug("<<< Exiting InputFilter(userInput={UserInput},filterType={FilterType})", userInput, filterType);
+			Logger.LogDebug("InputFilter(userInput={UserInput},filterType={FilterType}): tempInput → {TempInput}", userInput, filterType, tempInput);
 #pragma warning disable CS0618 // Type or member is obsolete
             if ((filterType & FilterFlag.NoAngleBrackets) == FilterFlag.NoAngleBrackets)
 #pragma warning restore CS0618 // Type or member is obsolete
             {
                 var removeAngleBrackets = Config.GetSetting("RemoveAngleBrackets") != null && bool.Parse(Config.GetSetting("RemoveAngleBrackets"));
+				Logger.LogDebug("InputFilter(userInput={UserInput},filterType={FilterType}): removeAngleBrackets → {RemoveAngleBrackets}", userInput, filterType, removeAngleBrackets);
                 if (removeAngleBrackets)
                 {
                     tempInput = FormatAngleBrackets(tempInput);
@@ -586,6 +643,7 @@ namespace DotNetNuke.Security
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public string Replace(string inputString, ConfigType configType, string configSource, FilterScope filterScope)
         {
+			Logger.LogDebug(">>> Entering Replace(inputString={InputString},configType={ConfigType},configSource={ConfigSource},filterScope={FilterScope})", inputString, configType, configSource, filterScope);
             switch (configType)
             {
                 case ConfigType.ListController:
@@ -602,6 +660,7 @@ namespace DotNetNuke.Security
                         case FilterScope.SystemList:
                             listEntryHostInfos = this.listController.GetListEntryInfoItems(listName, string.Empty, Null.NullInteger);
                             inputString = listEntryHostInfos.Aggregate(inputString, (current, removeItem) => Regex.Replace(current, @"\b" + Regex.Escape(removeItem.Text) + @"\b", removeItem.Value, options));
+							Logger.LogDebug("Replace(inputString={InputString},configType={ConfigType},configSource={ConfigSource},filterScope={FilterScope}): listEntryHostInfos → {ListEntryHostInfos}", inputString, configType, configSource, filterScope, listEntryHostInfos);
                             break;
                         case FilterScope.SystemAndPortalList:
                             settings = PortalController.Instance.GetCurrentSettings();
@@ -609,18 +668,23 @@ namespace DotNetNuke.Security
                             listEntryPortalInfos = this.listController.GetListEntryInfoItems(listName + "-" + settings.PortalId, string.Empty, settings.PortalId);
                             inputString = listEntryHostInfos.Aggregate(inputString, (current, removeItem) => Regex.Replace(current, @"\b" + Regex.Escape(removeItem.Text) + @"\b", removeItem.Value, options));
                             inputString = listEntryPortalInfos.Aggregate(inputString, (current, removeItem) => Regex.Replace(current, @"\b" + Regex.Escape(removeItem.Text) + @"\b", removeItem.Value, options));
+							Logger.LogDebug("Replace(inputString={InputString},configType={ConfigType},configSource={ConfigSource},filterScope={FilterScope}): settings → {Settings}", inputString, configType, configSource, filterScope, settings);
                             break;
                         case FilterScope.PortalList:
                             settings = PortalController.Instance.GetCurrentSettings();
                             listEntryPortalInfos = this.listController.GetListEntryInfoItems(listName + "-" + settings.PortalId, string.Empty, settings.PortalId);
                             inputString = listEntryPortalInfos.Aggregate(inputString, (current, removeItem) => Regex.Replace(current, @"\b" + Regex.Escape(removeItem.Text) + @"\b", removeItem.Value, options));
+							Logger.LogDebug("Replace(inputString={InputString},configType={ConfigType},configSource={ConfigSource},filterScope={FilterScope}): listEntryPortalInfos → {ListEntryPortalInfos}", inputString, configType, configSource, filterScope, listEntryPortalInfos);
                             break;
                     }
 
                     break;
                 case ConfigType.ExternalFile:
+					Logger.LogWarning("Throwing NotImplementedException from Replace(inputString={InputString},configType={ConfigType},configSource={ConfigSource},filterScope={FilterScope})", inputString, configType, configSource, filterScope);
                     throw new NotImplementedException();
                 default:
+					Logger.LogWarning("Throwing ArgumentOutOfRangeException from Replace(inputString={InputString},configType={ConfigType},configSource={ConfigSource},filterScope={FilterScope})", inputString, configType, configSource, filterScope);
+			Logger.LogDebug("<<< Exiting Replace(inputString={InputString},configType={ConfigType},configSource={ConfigSource},filterScope={FilterScope})", inputString, configType, configSource, filterScope);
                     throw new ArgumentOutOfRangeException(nameof(configType));
             }
 
@@ -643,6 +707,7 @@ namespace DotNetNuke.Security
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public string Remove(string inputString, ConfigType configType, string configSource, FilterScope filterScope)
         {
+			Logger.LogDebug(">>> Entering Remove(inputString={InputString},configType={ConfigType},configSource={ConfigSource},filterScope={FilterScope})", inputString, configType, configSource, filterScope);
             switch (configType)
             {
                 case ConfigType.ListController:
@@ -659,6 +724,7 @@ namespace DotNetNuke.Security
                         case FilterScope.SystemList:
                             listEntryHostInfos = this.listController.GetListEntryInfoItems(listName, string.Empty, Null.NullInteger);
                             inputString = listEntryHostInfos.Aggregate(inputString, (current, removeItem) => Regex.Replace(current, @"\b" + Regex.Escape(removeItem.Text) + @"\b", string.Empty, options));
+							Logger.LogDebug("Remove(inputString={InputString},configType={ConfigType},configSource={ConfigSource},filterScope={FilterScope}): listEntryHostInfos → {ListEntryHostInfos}", inputString, configType, configSource, filterScope, listEntryHostInfos);
                             break;
                         case FilterScope.SystemAndPortalList:
                             settings = PortalController.Instance.GetCurrentSettings();
@@ -666,18 +732,23 @@ namespace DotNetNuke.Security
                             listEntryPortalInfos = this.listController.GetListEntryInfoItems(listName + "-" + settings.PortalId, string.Empty, settings.PortalId);
                             inputString = listEntryHostInfos.Aggregate(inputString, (current, removeItem) => Regex.Replace(current, @"\b" + Regex.Escape(removeItem.Text) + @"\b", string.Empty, options));
                             inputString = listEntryPortalInfos.Aggregate(inputString, (current, removeItem) => Regex.Replace(current, @"\b" + Regex.Escape(removeItem.Text) + @"\b", string.Empty, options));
+							Logger.LogDebug("Remove(inputString={InputString},configType={ConfigType},configSource={ConfigSource},filterScope={FilterScope}): settings → {Settings}", inputString, configType, configSource, filterScope, settings);
                             break;
                         case FilterScope.PortalList:
                             settings = PortalController.Instance.GetCurrentSettings();
                             listEntryPortalInfos = this.listController.GetListEntryInfoItems(listName + "-" + settings.PortalId, string.Empty, settings.PortalId);
                             inputString = listEntryPortalInfos.Aggregate(inputString, (current, removeItem) => Regex.Replace(current, @"\b" + Regex.Escape(removeItem.Text) + @"\b", string.Empty, options));
+							Logger.LogDebug("Remove(inputString={InputString},configType={ConfigType},configSource={ConfigSource},filterScope={FilterScope}): listEntryPortalInfos → {ListEntryPortalInfos}", inputString, configType, configSource, filterScope, listEntryPortalInfos);
                             break;
                     }
 
                     break;
                 case ConfigType.ExternalFile:
+					Logger.LogWarning("Throwing NotImplementedException from Remove(inputString={InputString},configType={ConfigType},configSource={ConfigSource},filterScope={FilterScope})", inputString, configType, configSource, filterScope);
                     throw new NotImplementedException();
                 default:
+					Logger.LogWarning("Throwing ArgumentOutOfRangeException from Remove(inputString={InputString},configType={ConfigType},configSource={ConfigSource},filterScope={FilterScope})", inputString, configType, configSource, filterScope);
+			Logger.LogDebug("<<< Exiting Remove(inputString={InputString},configType={ConfigType},configSource={ConfigSource},filterScope={FilterScope})", inputString, configType, configSource, filterScope);
                     throw new ArgumentOutOfRangeException(nameof(configType));
             }
 
@@ -692,6 +763,7 @@ namespace DotNetNuke.Security
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public void SignIn(UserInfo user, bool createPersistentCookie)
         {
+			Logger.LogDebug(">>> Entering SignIn(user={User},createPersistentCookie=<redacted>)", user);
             if (PortalController.IsMemberOfPortalGroup(this.portalController, user.PortalID) || createPersistentCookie)
             {
                 // Create a custom auth cookie
@@ -703,6 +775,7 @@ namespace DotNetNuke.Security
 
                 // encrypt it
                 var encryptedAuthTicket = FormsAuthentication.Encrypt(authenticationTicket);
+				Logger.LogDebug("SignIn(user={User},createPersistentCookie=<redacted>): encryptedAuthTicket → {EncryptedAuthTicket}", user, encryptedAuthTicket);
 
                 // Create a new Cookie
                 var authCookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedAuthTicket)
@@ -724,6 +797,7 @@ namespace DotNetNuke.Security
                 if (PortalController.IsMemberOfPortalGroup(this.portalController, user.PortalID))
                 {
                     var domain = GetCookieDomain(this.portalController, this.appStatus, this.portalGroupController, user.PortalID);
+					Logger.LogDebug("SignIn(user={User},createPersistentCookie=<redacted>): domain → {Domain}", user, domain);
                     var siteGroupCookie = new HttpCookie("SiteGroup", domain)
                     {
                         Expires = authenticationTicket.Expiration,
@@ -747,6 +821,7 @@ namespace DotNetNuke.Security
                 if (!string.IsNullOrEmpty(authCookie?.Value))
                 {
                     var t = FormsAuthentication.Decrypt(authCookie.Value);
+					Logger.LogDebug("SignIn(user={User},createPersistentCookie=<redacted>): t → {T}", user, t);
                     if (t != null)
                     {
                         AuthCookieController.Instance.Update(authCookie.Value, t.Expiration.ToUniversalTime(), user.UserID);
@@ -762,6 +837,7 @@ namespace DotNetNuke.Security
 
             // Identity the Login is processed by system.
             HttpContext.Current.Items["DNN_UserSignIn"] = true;
+			Logger.LogDebug("<<< Exiting SignIn(user={User},createPersistentCookie=<redacted>)", user);
         }
 
         /// <summary>
@@ -770,6 +846,7 @@ namespace DotNetNuke.Security
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public void SignOut()
         {
+			Logger.LogDebug(">>> Entering SignOut()");
             InvalidateAspNetSession(HttpContext.Current);
 
             var currentAuthCookie = HttpContext.Current.Request.Cookies[FormsAuthentication.FormsCookieName];
@@ -781,6 +858,7 @@ namespace DotNetNuke.Security
 
             // Log User Off from Cookie Authentication System
             var domainCookie = HttpContext.Current.Request.Cookies["SiteGroup"];
+			Logger.LogDebug("SignOut(): domainCookie → {DomainCookie}", domainCookie);
             if (domainCookie == null)
             {
                 // Forms Authentication's Logout
@@ -793,6 +871,7 @@ namespace DotNetNuke.Security
 
                 // Create a new Cookie
                 var str = string.Empty;
+				Logger.LogDebug("SignOut(): str → {Str}", str);
                 if (HttpContext.Current.Request.Browser["supportsEmptyStringInCookieValue"] == "false")
                 {
                     str = "NoCookie";
@@ -824,16 +903,20 @@ namespace DotNetNuke.Security
 
             // remove language cookie
             var httpCookie = HttpContext.Current.Response.Cookies["language"];
+			Logger.LogDebug("SignOut(): httpCookie → {HttpCookie}", httpCookie);
             if (httpCookie != null)
             {
                 httpCookie.Value = string.Empty;
+				Logger.LogDebug("SignOut(): httpCookie.Value → {Arg0}", httpCookie.Value);
             }
 
             // remove authentication type cookie
             var cookie = HttpContext.Current.Response.Cookies["authentication"];
+			Logger.LogDebug("SignOut(): cookie → {Cookie}", cookie);
             if (cookie != null)
             {
                 cookie.Value = string.Empty;
+				Logger.LogDebug("SignOut(): cookie.Value → {Arg0}", cookie.Value);
             }
 
             // expire cookies
@@ -863,11 +946,13 @@ namespace DotNetNuke.Security
                     if (auth != null)
                     {
                         auth.Value = null;
+						Logger.LogDebug("SignOut(): auth.Value → {Arg0}", auth.Value);
                         auth.Path = !string.IsNullOrEmpty(Globals.ApplicationPath) ? Globals.ApplicationPath : "/";
                         auth.Expires = DateTime.Now.AddYears(-30);
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting SignOut()");
         }
 
         /// <summary>This function applies security filtering to the UserInput string, and reports whether the input string is valid.</summary>
@@ -876,8 +961,10 @@ namespace DotNetNuke.Security
         /// <returns><see langword="true"/> if the input is valid, otherwise <see langword="false"/>.</returns>
         public bool ValidateInput(string userInput, FilterFlag filterType)
         {
+			Logger.LogDebug(">>> Entering ValidateInput(userInput={UserInput},filterType={FilterType})", userInput, filterType);
             string filteredInput = this.InputFilter(userInput, filterType);
 
+			Logger.LogDebug("<<< Exiting ValidateInput(userInput={UserInput},filterType={FilterType})", userInput, filterType);
             return userInput == filteredInput;
         }
 
@@ -891,24 +978,31 @@ namespace DotNetNuke.Security
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public void CheckAllPortalFileExtensionWhitelists(string newMasterList)
         {
+			Logger.LogDebug(">>> Entering CheckAllPortalFileExtensionWhitelists(newMasterList={NewMasterList})", newMasterList);
             var masterList = new FileExtensionWhitelist(newMasterList);
             var portalSettings = Data.DataProvider.Instance().GetPortalSettingsBySetting("AllowedExtensionsWhitelist", null);
+			Logger.LogDebug("CheckAllPortalFileExtensionWhitelists(newMasterList={NewMasterList}): portalSettings → {PortalSettings}", newMasterList, portalSettings);
+			Logger.LogDebug("CheckAllPortalFileExtensionWhitelists(newMasterList={NewMasterList}): masterList → {MasterList}", newMasterList, masterList);
             foreach (var portalId in portalSettings.Keys)
             {
                 if (!string.IsNullOrEmpty(portalSettings[portalId]))
                 {
                     var portalExts = new FileExtensionWhitelist(portalSettings[portalId]);
+					Logger.LogDebug("CheckAllPortalFileExtensionWhitelists(newMasterList={NewMasterList}): portalExts → {PortalExts}", newMasterList, portalExts);
                     var newValue = portalExts.RestrictBy(masterList).ToStorageString();
+					Logger.LogDebug("CheckAllPortalFileExtensionWhitelists(newMasterList={NewMasterList}): newValue → {NewValue}", newMasterList, newValue);
                     if (newValue != portalSettings[portalId])
                     {
                         PortalController.UpdatePortalSetting(this.portalController, portalId, "AllowedExtensionsWhitelist", newValue, false);
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting CheckAllPortalFileExtensionWhitelists(newMasterList={NewMasterList})", newMasterList);
         }
 
         private static void ProcessRole(UserInfo user, IPortalSettings settings, string roleName, out bool? roleAllowed)
         {
+			Logger.LogDebug(">>> Entering ProcessRole(user={User},settings={Settings},roleName={RoleName})", user, settings, roleName);
             var roleType = GetRoleType(roleName);
             switch (roleType)
             {
@@ -925,46 +1019,64 @@ namespace DotNetNuke.Security
                     ProcessSecurityRole(user, settings, roleName, out roleAllowed);
                     break;
             }
+			Logger.LogDebug("<<< Exiting ProcessRole(user={User},settings={Settings},roleName={RoleName})", user, settings, roleName);
         }
 
         private static void ProcessFriendRole(UserInfo user, string roleName, out bool? roleAllowed)
         {
+			Logger.LogDebug(">>> Entering ProcessFriendRole(user={User},roleName={RoleName})", user, roleName);
             roleAllowed = null;
             var targetUser = UserController.Instance.GetUserById(user.PortalID, GetEntityFromRoleName(roleName));
+			Logger.LogDebug("ProcessFriendRole(user={User},roleName={RoleName}): targetUser → {TargetUser}", user, roleName, targetUser);
+			Logger.LogDebug("ProcessFriendRole(user={User},roleName={RoleName}): roleAllowed → {RoleAllowed}", user, roleName, roleAllowed);
             var relationShip = RelationshipController.Instance.GetFriendRelationship(user, targetUser);
+			Logger.LogDebug("ProcessFriendRole(user={User},roleName={RoleName}): relationShip → {RelationShip}", user, roleName, relationShip);
             if (relationShip != null && relationShip.Status == RelationshipStatus.Accepted)
             {
                 roleAllowed = true;
             }
+			Logger.LogDebug("<<< Exiting ProcessFriendRole(user={User},roleName={RoleName})", user, roleName);
         }
 
         private static void ProcessFollowerRole(UserInfo user, string roleName, out bool? roleAllowed)
         {
+			Logger.LogDebug(">>> Entering ProcessFollowerRole(user={User},roleName={RoleName})", user, roleName);
             roleAllowed = null;
             var targetUser = UserController.Instance.GetUserById(user.PortalID, GetEntityFromRoleName(roleName));
+			Logger.LogDebug("ProcessFollowerRole(user={User},roleName={RoleName}): targetUser → {TargetUser}", user, roleName, targetUser);
+			Logger.LogDebug("ProcessFollowerRole(user={User},roleName={RoleName}): roleAllowed → {RoleAllowed}", user, roleName, roleAllowed);
             var relationShip = RelationshipController.Instance.GetFollowerRelationship(user, targetUser);
+			Logger.LogDebug("ProcessFollowerRole(user={User},roleName={RoleName}): relationShip → {RelationShip}", user, roleName, relationShip);
             if (relationShip != null && relationShip.Status == RelationshipStatus.Accepted)
             {
                 roleAllowed = true;
             }
+			Logger.LogDebug("<<< Exiting ProcessFollowerRole(user={User},roleName={RoleName})", user, roleName);
         }
 
         private static void ProcessOwnerRole(UserInfo user, string roleName, out bool? roleAllowed)
         {
+			Logger.LogDebug(">>> Entering ProcessOwnerRole(user={User},roleName={RoleName})", user, roleName);
             roleAllowed = null;
             var entityId = GetEntityFromRoleName(roleName);
+			Logger.LogDebug("ProcessOwnerRole(user={User},roleName={RoleName}): entityId → {EntityId}", user, roleName, entityId);
+			Logger.LogDebug("ProcessOwnerRole(user={User},roleName={RoleName}): roleAllowed → {RoleAllowed}", user, roleName, roleAllowed);
             if (entityId == user.UserID)
             {
                 roleAllowed = true;
             }
+			Logger.LogDebug("<<< Exiting ProcessOwnerRole(user={User},roleName={RoleName})", user, roleName);
         }
 
         private static int GetEntityFromRoleName(string roleName)
         {
+			Logger.LogDebug(">>> Entering GetEntityFromRoleName(roleName={RoleName})", roleName);
             var roleParts = roleName.Split(':');
             int result;
+			Logger.LogDebug("GetEntityFromRoleName(roleName={RoleName}): roleParts → {RoleParts}", roleName, roleParts);
             if (roleParts.Length > 1 && int.TryParse(roleParts[1], out result))
             {
+			Logger.LogDebug("<<< Exiting GetEntityFromRoleName(roleName={RoleName})", roleName);
                 return result;
             }
 
@@ -973,8 +1085,10 @@ namespace DotNetNuke.Security
 
         private static void ProcessSecurityRole(UserInfo user, IPortalSettings settings, string roleName, out bool? roleAllowed)
         {
+			Logger.LogDebug(">>> Entering ProcessSecurityRole(user={User},settings={Settings},roleName={RoleName})", user, settings, roleName);
             roleAllowed = null;
 
+			Logger.LogDebug("ProcessSecurityRole(user={User},settings={Settings},roleName={RoleName}): roleAllowed → {RoleAllowed}", user, settings, roleName, roleAllowed);
             // permissions strings are encoded with Deny permissions at the beginning and Grant permissions at the end for optimal performance
             if (!string.IsNullOrEmpty(roleName))
             {
@@ -1001,10 +1115,12 @@ namespace DotNetNuke.Security
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting ProcessSecurityRole(user={User},settings={Settings},roleName={RoleName})", user, settings, roleName);
         }
 
         private static RoleType GetRoleType(string roleName)
         {
+			Logger.LogDebug(">>> Entering GetRoleType(roleName={RoleName})", roleName);
             if (roleName.StartsWith(RoleFriendPrefix, StringComparison.InvariantCultureIgnoreCase))
             {
                 return RoleType.Friend;
@@ -1017,6 +1133,7 @@ namespace DotNetNuke.Security
 
             if (roleName.StartsWith(RoleOwnerPrefix, StringComparison.InvariantCultureIgnoreCase))
             {
+			Logger.LogDebug("<<< Exiting GetRoleType(roleName={RoleName})", roleName);
                 return RoleType.Owner;
             }
 
@@ -1025,12 +1142,15 @@ namespace DotNetNuke.Security
 
         private static string BytesToHexString(IEnumerable<byte> bytes)
         {
+			Logger.LogDebug(">>> Entering BytesToHexString(bytes={Bytes})", bytes);
             var hexString = new StringBuilder();
             foreach (var b in bytes)
             {
+			Logger.LogDebug("BytesToHexString(bytes={Bytes}): hexString → {HexString}", bytes, hexString);
                 hexString.Append(string.Format(CultureInfo.InvariantCulture, "{0:X2}", b));
             }
 
+			Logger.LogDebug("<<< Exiting BytesToHexString(bytes={Bytes})", bytes);
             return hexString.ToString();
         }
 
@@ -1046,8 +1166,10 @@ namespace DotNetNuke.Security
         /// </remarks>
         private static string FilterStrings(string strInput)
         {
+			Logger.LogDebug(">>> Entering FilterStrings(strInput={StrInput})", strInput);
             // setup up list of search terms as items may be used twice
             var tempInput = strInput;
+			Logger.LogDebug("FilterStrings(strInput={StrInput}): tempInput → {TempInput}", strInput, tempInput);
             if (string.IsNullOrWhiteSpace(tempInput))
             {
                 return tempInput;
@@ -1057,10 +1179,12 @@ namespace DotNetNuke.Security
 
             // remove the js event from html tags
             var tagMatches = DangerElementsRegex.Matches(tempInput);
+			Logger.LogDebug("FilterStrings(strInput={StrInput}): tagMatches → {TagMatches}", strInput, tagMatches);
             foreach (Match match in tagMatches)
             {
                 var tagContent = match.Value;
                 var cleanTagContent = DangerElementContentRegex.Replace(tagContent, string.Empty);
+				Logger.LogDebug("FilterStrings(strInput={StrInput}): cleanTagContent → {CleanTagContent}", strInput, cleanTagContent);
                 tempInput = tempInput.Replace(tagContent, cleanTagContent);
             }
 
@@ -1079,6 +1203,7 @@ namespace DotNetNuke.Security
                 tempInput = RxListStrings.Aggregate(tempInput, (current, s) => s.Replace(current, replacement));
             }
 
+			Logger.LogDebug("<<< Exiting FilterStrings(strInput={StrInput})", strInput);
             return tempInput;
         }
 
@@ -1088,7 +1213,10 @@ namespace DotNetNuke.Security
         /// <remarks>This is a private function that is used internally by the <see cref="InputFilter"/> function.</remarks>
         private static string FormatAngleBrackets(string strInput)
         {
+			Logger.LogDebug(">>> Entering FormatAngleBrackets(strInput={StrInput})", strInput);
             var tempInput = new StringBuilder(strInput).Replace("<", string.Empty).Replace(">", string.Empty);
+			Logger.LogDebug("FormatAngleBrackets(strInput={StrInput}): tempInput → {TempInput}", strInput, tempInput);
+			Logger.LogDebug("<<< Exiting FormatAngleBrackets(strInput={StrInput})", strInput);
             return tempInput.ToString();
         }
 
@@ -1098,8 +1226,11 @@ namespace DotNetNuke.Security
         /// <remarks>This is a private function that is used internally by the <see cref="InputFilter"/> function.</remarks>
         private static string FormatMultiLine(string strInput)
         {
+			Logger.LogDebug(">>> Entering FormatMultiLine(strInput={StrInput})", strInput);
             const string lbreak = "<br />";
             var tempInput = new StringBuilder(strInput).Replace("\r\n", lbreak).Replace("\n", lbreak).Replace("\r", lbreak);
+			Logger.LogDebug("FormatMultiLine(strInput={StrInput}): tempInput → {TempInput}", strInput, tempInput);
+			Logger.LogDebug("<<< Exiting FormatMultiLine(strInput={StrInput})", strInput);
             return tempInput.ToString();
         }
 
@@ -1109,7 +1240,9 @@ namespace DotNetNuke.Security
         /// <remarks>This is a private function that is used internally by the <see cref="InputFilter"/> function.</remarks>
         private static string FormatRemoveSQL(string strSQL)
         {
+			Logger.LogDebug(">>> Entering FormatRemoveSQL(strSQL={StrSQL})", strSQL);
             // Check for forbidden T-SQL commands. Use word boundaries to filter only real statements.
+			Logger.LogDebug("<<< Exiting FormatRemoveSQL(strSQL={StrSQL})", strSQL);
             return BadStatementRegex.Replace(strSQL, " ").Replace("'", "''");
         }
 
@@ -1119,6 +1252,8 @@ namespace DotNetNuke.Security
         /// <remarks>This is a private function that is used internally by the <see cref="InputFilter"/> function.</remarks>
         private static string FormatRemoveControlCharacters(string str)
         {
+			Logger.LogDebug(">>> Entering FormatRemoveControlCharacters(str={Str})", str);
+			Logger.LogDebug("<<< Exiting FormatRemoveControlCharacters(str={Str})", str);
             return ControlCharactersRegex.Replace(ControlCharacterToWhitespaceRegex.Replace(str, " "), string.Empty);
         }
 
@@ -1128,17 +1263,21 @@ namespace DotNetNuke.Security
         /// <remarks>This is a private function that is used internally by the <see cref="InputFilter"/> function.</remarks>
         private static bool IncludesMarkup(string strInput)
         {
+			Logger.LogDebug(">>> Entering IncludesMarkup(strInput={StrInput})", strInput);
+			Logger.LogDebug("<<< Exiting IncludesMarkup(strInput={StrInput})", strInput);
             return StripTagsRegex.IsMatch(strInput);
         }
 
         private static void InvalidateAspNetSession(HttpContext context)
         {
+			Logger.LogDebug(">>> Entering InvalidateAspNetSession(context={Context})", context);
             if (context.Session != null && !context.Session.IsNewSession)
             {
                 // invalidate existing session so a new one is created
                 context.Session.Clear();
                 context.Session.Abandon();
             }
+			Logger.LogDebug("<<< Exiting InvalidateAspNetSession(context={Context})", context);
         }
     }
 }

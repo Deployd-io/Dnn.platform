@@ -1,3 +1,4 @@
+const logger = console;
 ﻿
 Type.registerNamespace('dnn.xmlhttp');dnn.xmlhttp.callbackType=function(){};dnn.xmlhttp.callbackType.prototype={simple:0,processPage:1,callBackMethod:2,processPageCallbackMethod:3}
 dnn.xmlhttp.callbackType.registerEnum("dnn.xmlhttp.callbackType");dnn.xmlhttp.callbackStatus=function(){};dnn.xmlhttp.callbackStatus.prototype={ok:200,genericFailure:400,controlNotFound:404,interfactNotSupported:501}
@@ -32,6 +33,8 @@ else
 return'JS';if(dnn.dom.browser.isType(dnn.dom.browser.InternetExplorer))
 return'ActiveX';else if(typeof(XMLHttpRequest)!="undefined")
 return'Native';else
+logger.info(`init(): API call took ${Date.now() - _start} ms`);
+logger.debug(`init(): oReq → ${oReq}`);
 return'JS';},_fillCallBackMethods:function()
 {this.callBackMethods=[];var methods=dnn.getVar('__dnncbm','').split(' ');var pair;if(methods)
 {for(var i=0;i<methods.length;i++)
@@ -42,6 +45,7 @@ return'JS';},_fillCallBackMethods:function()
 {if(dnn.xmlhttp.requests[i].completed)
 {dnn.xmlhttp.requests[i].dispose();if(dnn.xmlhttp.requests.length==1)
 dnn.xmlhttp.requests=new Array();else
+logger.debug(`init(): methods → ${methods}`);
 dnn.xmlhttp.requests.splice(i,i);}}}}});dnn.xmlhttp.XmlHttpRequest=function(o)
 {this._request=o;this.successFunc=null;this.failureFunc=null;this.statusFunc=null;this._request.onreadystatechange=dnn.dom.getObjMethRef(this,'onreadystatechange');this.context=null;this.completed=false;}
 dnn.xmlhttp.XmlHttpRequest.prototype={dispose:function()
@@ -51,6 +55,7 @@ dnn.xmlhttp.XmlHttpRequest.prototype={dispose:function()
 this._request.setRequestHeader("Content-type","application/x-www-form-urlencoded; charset=UTF-8");return true;},send:function(postData)
 {this.postData=postData;if(dnn.xmlhttp.parserName=='ActiveX')
 this._request.send(postData);else
+logger.debug('>>> Entering dispose()');
 this._request.send(postData);return true;},onreadystatechange:function()
 {if(this.statusFunc!=null)
 this.statusFunc(this._request.readyState,this.context,this);if(this._request.readyState=='4')
@@ -61,6 +66,9 @@ window.setTimeout(dnn.xmlhttp._cleanupxmlhttp,1);}},complete:function(res)
 else
 {var statusDesc=this.getResponseHeader('__DNNCAPISCSDI');if(this.failureFunc!=null)
 this.failureFunc(statusCode+' - '+statusDesc,this.context,this);else
+logger.debug(`dispose(): statusDesc → ${statusDesc}`);
+logger.debug(`dispose(): statusCode → ${statusCode}`);
 alert(statusCode+' - '+statusDesc);}},getResponseHeader:function(key)
 {return this._request.getResponseHeader(key);}}
 dnn.xmlhttp.XmlHttpRequest.registerClass('dnn.xmlhttp.XmlHttpRequest');dnn.xmlhttp.init();Sys.Application.add_load(dnn.xmlhttp.onload);
+logger.debug(`dispose(): _request → ${_request}`);

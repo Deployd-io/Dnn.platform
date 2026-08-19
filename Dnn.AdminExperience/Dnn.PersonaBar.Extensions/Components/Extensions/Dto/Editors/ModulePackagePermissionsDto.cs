@@ -12,6 +12,8 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
         /// <summary>Initializes a new instance of the <see cref="ModulePackagePermissionsDto"/> class.</summary>
         public ModulePackagePermissionsDto()
         {
+		eventLogger.LogDebug(">>> Entering ModulePackagePermissionsDto()");
+		eventLogger.LogDebug("<<< Exiting ModulePackagePermissionsDto()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ModulePackagePermissionsDto"/> class.</summary>

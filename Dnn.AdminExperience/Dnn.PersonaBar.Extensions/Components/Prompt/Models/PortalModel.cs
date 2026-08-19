@@ -12,6 +12,8 @@ namespace Dnn.PersonaBar.Prompt.Components.Models
     {
         public PortalModel()
         {
+		eventLogger.LogDebug(">>> Entering PortalModel()");
+		eventLogger.LogDebug("<<< Exiting PortalModel()");
         }
 
         public PortalModel(PortalInfo portal)
@@ -19,7 +21,9 @@ namespace Dnn.PersonaBar.Prompt.Components.Models
         {
             // get portal settings for specified portal
             var ps = new PortalSettings(portal);
+			eventLogger.LogDebug("PortalModel(portal={Portal}): ps → {Ps}", portal, ps);
             this.CdfVersion = ps.CdfVersion;
+			eventLogger.LogDebug("PortalModel(portal={Portal}): this.CdfVersion → {Arg1}", portal, this.CdfVersion);
             this.SiteTheme = Utilities.FormatSkinName(ps.DefaultPortalSkin);
             this.AdminTheme = Utilities.FormatSkinName(ps.DefaultAdminSkin);
             this.Container = Utilities.FormatContainerName(ps.DefaultPortalContainer);

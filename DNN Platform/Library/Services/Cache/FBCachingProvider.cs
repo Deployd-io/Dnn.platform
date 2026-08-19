@@ -29,7 +29,9 @@ namespace DotNetNuke.Services.Cache
         public FBCachingProvider()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering FBCachingProvider()");
         }
+		Logger.LogDebug("<<< Exiting FBCachingProvider()");
 
         /// <summary>Initializes a new instance of the <see cref="FBCachingProvider"/> class.</summary>
         /// <param name="hostSettings">The host settings.</param>
@@ -41,8 +43,10 @@ namespace DotNetNuke.Services.Cache
         /// <inheritdoc />
         public override void Insert(string cacheKey, object itemToCache, DNNCacheDependency dependency, DateTime absoluteExpiration, TimeSpan slidingExpiration, CacheItemPriority priority,                                    CacheItemRemovedCallback onRemoveCallback)
         {
+			Logger.LogDebug(">>> Entering Insert(cacheKey={CacheKey},itemToCache={ItemToCache},dependency={Dependency},absoluteExpiration={AbsoluteExpiration},slidingExpiration={SlidingExpiration},priority={Priority},onRemoveCallback={OnRemoveCallback})", cacheKey, itemToCache, dependency, absoluteExpiration, slidingExpiration, priority, onRemoveCallback);
             // initialize cache dependency
             DNNCacheDependency d = dependency;
+			Logger.LogDebug("Insert(cacheKey={CacheKey},itemToCache={ItemToCache},dependency={Dependency},absoluteExpiration={AbsoluteExpiration},slidingExpiration={SlidingExpiration},priority={Priority},onRemoveCallback={OnRemoveCallback}): d → {D}", cacheKey, itemToCache, dependency, absoluteExpiration, slidingExpiration, priority, onRemoveCallback, d);
 
             // if web farm is enabled
             if (this.IsWebFarm())
@@ -60,24 +64,29 @@ namespace DotNetNuke.Services.Cache
 
             // Call base class method to add obect to cache
             base.Insert(cacheKey, itemToCache, d, absoluteExpiration, slidingExpiration, priority, onRemoveCallback);
+			Logger.LogDebug("<<< Exiting Insert(cacheKey={CacheKey},itemToCache={ItemToCache},dependency={Dependency},absoluteExpiration={AbsoluteExpiration},slidingExpiration={SlidingExpiration},priority={Priority},onRemoveCallback={OnRemoveCallback})", cacheKey, itemToCache, dependency, absoluteExpiration, slidingExpiration, priority, onRemoveCallback);
         }
 
         /// <inheritdoc />
         public override bool IsWebFarm()
         {
+			Logger.LogDebug(">>> Entering IsWebFarm()");
             bool isWebFarm = Null.NullBoolean;
             if (!string.IsNullOrEmpty(Config.GetSetting("IsWebFarm")))
             {
                 isWebFarm = bool.Parse(Config.GetSetting("IsWebFarm"));
             }
 
+			Logger.LogDebug("<<< Exiting IsWebFarm()");
             return isWebFarm;
         }
 
         /// <inheritdoc />
         public override string PurgeCache()
         {
+			Logger.LogDebug(">>> Entering PurgeCache()");
             // called by scheduled job to remove cache files which are no longer active
+			Logger.LogDebug("<<< Exiting PurgeCache()");
             return PurgeCacheFiles(Globals.HostMapPath + CachingDirectory);
         }
 
@@ -85,6 +94,7 @@ namespace DotNetNuke.Services.Cache
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public override void Remove(string key)
         {
+			Logger.LogDebug(">>> Entering Remove(key={Key})", key);
             base.Remove(key);
 
             // if web farm is enabled in config file
@@ -92,28 +102,35 @@ namespace DotNetNuke.Services.Cache
             {
                 // get hashed filename
                 string f = GetFileName(key);
+				Logger.LogDebug("Remove(key={Key}): f → {F}", key, f);
 
                 // delete cache file - this synchronizes the cache across servers in the farm
                 DeleteCacheFile(f);
             }
+			Logger.LogDebug("<<< Exiting Remove(key={Key})", key);
         }
 
         private static string ByteArrayToString(byte[] arrInput)
         {
+			Logger.LogDebug(">>> Entering ByteArrayToString(arrInput={ArrInput})", arrInput);
             int i;
             var sOutput = new StringBuilder(arrInput.Length);
+			Logger.LogDebug("ByteArrayToString(arrInput={ArrInput}): sOutput → {SOutput}", arrInput, sOutput);
             for (i = 0; i <= arrInput.Length - 1; i++)
             {
                 sOutput.Append(arrInput[i].ToString("X2", CultureInfo.InvariantCulture));
             }
 
+			Logger.LogDebug("<<< Exiting ByteArrayToString(arrInput={ArrInput})", arrInput);
             return sOutput.ToString();
         }
 
         private static void CreateCacheFile(string fileName, string cacheKey)
         {
+			Logger.LogDebug(">>> Entering CreateCacheFile(fileName={FileName},cacheKey={CacheKey})", fileName, cacheKey);
             // declare stream
             StreamWriter s = null;
+			Logger.LogDebug("CreateCacheFile(fileName={FileName},cacheKey={CacheKey}): s → {S}", fileName, cacheKey, s);
             try
             {
                 // if the cache file does not already exist
@@ -130,6 +147,7 @@ namespace DotNetNuke.Services.Cache
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in CreateCacheFile(fileName={FileName},cacheKey={CacheKey}): {Arg2}", fileName, cacheKey, ex.getMessage());
                 // permissions issue creating cache file or more than one thread may have been trying to write the cache file simultaneously
                 Exceptions.Exceptions.LogException(ex);
             }
@@ -140,10 +158,12 @@ namespace DotNetNuke.Services.Cache
                     s.Close();
                 }
             }
+			Logger.LogDebug("<<< Exiting CreateCacheFile(fileName={FileName},cacheKey={CacheKey})", fileName, cacheKey);
         }
 
         private static void DeleteCacheFile(string fileName)
         {
+			Logger.LogDebug(">>> Entering DeleteCacheFile(fileName={FileName})", fileName);
             try
             {
                 if (File.Exists(fileName))
@@ -153,25 +173,30 @@ namespace DotNetNuke.Services.Cache
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in DeleteCacheFile(fileName={FileName}): {Arg1}", fileName, ex.getMessage());
                 // an error occurred when trying to delete the cache file - this is serious as it means that the cache will not be synchronized
                 Exceptions.Exceptions.LogException(ex);
             }
+			Logger.LogDebug("<<< Exiting DeleteCacheFile(fileName={FileName})", fileName);
         }
 
         private static string GetFileName(string cacheKey)
         {
+			Logger.LogDebug(">>> Entering GetFileName(cacheKey={CacheKey})", cacheKey);
             // cache key may contain characters invalid for a filename - this method creates a valid filename
             byte[] fileNameBytes = Encoding.ASCII.GetBytes(cacheKey);
             using (var sha256 = new SHA256CryptoServiceProvider())
             {
                 fileNameBytes = sha256.ComputeHash(fileNameBytes);
                 string finalFileName = ByteArrayToString(fileNameBytes);
+				Logger.LogDebug("<<< Exiting GetFileName(cacheKey={CacheKey})", cacheKey);
                 return Path.GetFullPath(Globals.HostMapPath + CachingDirectory + finalFileName + CacheFileExtension);
             }
         }
 
         private static string PurgeCacheFiles(string folder)
         {
+			Logger.LogDebug(">>> Entering PurgeCacheFiles(folder={Folder})", folder);
             // declare counters
             int purgedFiles = 0;
             int purgeErrors = 0;
@@ -180,6 +205,7 @@ namespace DotNetNuke.Services.Cache
             // get list of cache files
             string[] f;
             f = Directory.GetFiles(folder);
+			Logger.LogDebug("PurgeCacheFiles(folder={Folder}): f → {F}", folder, f);
 
             // loop through cache files
             for (i = 0; i <= f.Length - 1; i++)
@@ -188,6 +214,7 @@ namespace DotNetNuke.Services.Cache
                 DateTime dtLastWrite;
                 dtLastWrite = File.GetLastWriteTime(f[i]);
 
+				Logger.LogDebug("PurgeCacheFiles(folder={Folder}): dtLastWrite → {DtLastWrite}", folder, dtLastWrite);
                 // if the cache file is more than 2 hours old ( no point in checking most recent cache files )
                 if (dtLastWrite < DateTime.Now.Subtract(new TimeSpan(2, 0, 0)))
                 {
@@ -215,6 +242,7 @@ namespace DotNetNuke.Services.Cache
             }
 
             // return a summary message for the job
+			Logger.LogDebug("<<< Exiting PurgeCacheFiles(folder={Folder})", folder);
             return $"Cache Synchronization Files Processed: {f.Length}, Purged: {purgedFiles}, Errors: {purgeErrors}";
         }
     }

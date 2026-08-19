@@ -4,12 +4,17 @@ import { GridCell, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import { Scrollbars } from "react-custom-scrollbars";
 import Localization from "localization";
 import styles from "./style.module.less";
+const logger = console;
 class AssignedSelector extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
     getPortalList(list, type) {
+		logger.debug(`>>> Entering getPortalList(list=${list},type=${type})`);
         const { props } = this;
+		logger.debug(`<<< Exiting getPortalList(list=${list},type=${type})`);
         return list.map((portal, index) => {
             return <li className={portal.selected ? "selected" : ""}
                 onClick={props.onClickOnPortal.bind(this, index, type)}
@@ -20,9 +25,12 @@ class AssignedSelector extends Component {
     }
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         const assignedPortals = this.getPortalList(props.assignedPortals, "assignedPortals");
+		logger.debug(`render(): assignedPortals → ${assignedPortals}`);
         const unassignedPortals = this.getPortalList(props.unassignedPortals, "unassignedPortals");
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={styles.assignedSelector}>
                 <GridCell columnSize={45} className="selector-box">

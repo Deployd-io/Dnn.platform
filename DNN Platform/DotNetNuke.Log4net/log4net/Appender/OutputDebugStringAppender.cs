@@ -54,6 +54,8 @@ namespace log4net.Appender
         /// </remarks>
         public OutputDebugStringAppender()
         {
+		value.LogDebug(">>> Entering OutputDebugStringAppender()");
+		value.LogDebug("<<< Exiting OutputDebugStringAppender()");
         }
 
         /// <summary>Write the logging event to the output debug string API</summary>
@@ -71,14 +73,17 @@ namespace log4net.Appender
 #endif
         protected override void Append(LoggingEvent loggingEvent) 
         {
+		value.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
 #if NETSTANDARD
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
+				value.LogWarning("Throwing PlatformNotSupportedException from Append(loggingEvent={LoggingEvent})", loggingEvent);
                 throw new System.PlatformNotSupportedException("OutputDebugString is only available on Windows");
             }
 #endif
 
             OutputDebugString(this.RenderLoggingEvent(loggingEvent));
+			value.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
         } 
 
         /// <summary>This appender requires a <see cref="Layout"/> to be set.</summary>

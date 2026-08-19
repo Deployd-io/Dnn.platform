@@ -29,19 +29,26 @@ namespace DotNetNuke.Web.Mvc
     /// <summary>WebForms control for hosting an MVC module control.</summary>
     public class MvcHostControl : ModuleControlBase, IActionable
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MvcHostControl));
         private ModuleRequestResult result;
         private string controlKey;
 
         /// <summary>Initializes a new instance of the <see cref="MvcHostControl"/> class.</summary>
         public MvcHostControl()
         {
+			Logger.LogDebug(">>> Entering MvcHostControl()");
             this.controlKey = string.Empty;
+			Logger.LogDebug("MvcHostControl(): this.controlKey → {Arg0}", this.controlKey);
+			Logger.LogDebug("MvcHostControl(controlKey={ControlKey}): this.controlKey → {Arg1}", controlKey, this.controlKey);
+			Logger.LogDebug("<<< Exiting MvcHostControl()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="MvcHostControl"/> class.</summary>
+		Logger.LogDebug("<<< Exiting MvcHostControl()");
         /// <param name="controlKey">The module control key.</param>
         public MvcHostControl(string controlKey)
         {
+			Logger.LogDebug(">>> Entering MvcHostControl(controlKey={ControlKey})", controlKey);
             this.controlKey = controlKey;
         }
 
@@ -54,13 +61,17 @@ namespace DotNetNuke.Web.Mvc
         /// <summary>Runs and renders the MVC action.</summary>
         protected void ExecuteModule()
         {
+			Logger.LogDebug(">>> Entering ExecuteModule()");
             try
             {
                 HttpContextBase httpContext = new HttpContextWrapper(HttpContext.Current);
+				Logger.LogDebug("ExecuteModule(): httpContext → {HttpContext}", httpContext);
 
                 var moduleExecutionEngine = GetModuleExecutionEngine();
+				Logger.LogDebug("ExecuteModule(): moduleExecutionEngine → {ModuleExecutionEngine}", moduleExecutionEngine);
 
                 this.result = moduleExecutionEngine.ExecuteModule(this.GetModuleRequestContext(httpContext));
+				Logger.LogDebug("ExecuteModule(): result → {Result}", result);
 
                 this.ModuleActions = this.LoadActions(this.result);
 
@@ -68,24 +79,29 @@ namespace DotNetNuke.Web.Mvc
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in ExecuteModule(): {Arg0}", exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting ExecuteModule()");
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             if (this.ExecuteModuleImmediately)
             {
                 this.ExecuteModule();
             }
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
             try
             {
@@ -95,6 +111,7 @@ namespace DotNetNuke.Web.Mvc
                 }
 
                 var mvcString = RenderModule(this.result);
+				Logger.LogDebug("OnPreRender(e={E}): mvcString → {MvcString}", e, mvcString);
                 if (!string.IsNullOrEmpty(Convert.ToString(mvcString, CultureInfo.InvariantCulture)))
                 {
                     this.Controls.Add(new LiteralControl(Convert.ToString(mvcString, CultureInfo.InvariantCulture)));
@@ -102,8 +119,10 @@ namespace DotNetNuke.Web.Mvc
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnPreRender(e={E}): {Arg1}", e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         private static ModuleApplication GetModuleApplication(
@@ -133,40 +152,52 @@ namespace DotNetNuke.Web.Mvc
                 ModuleName = desktopModule.ModuleName,
                 FolderPath = desktopModule.FolderName,
             };
+			Logger.LogDebug("<<< Exiting GetModuleApplication(businessControllerProvider={BusinessControllerProvider},desktopModule={DesktopModule},defaultRouteData={DefaultRouteData})", businessControllerProvider, desktopModule, defaultRouteData);
         }
 
         private static IModuleExecutionEngine GetModuleExecutionEngine()
         {
+			Logger.LogDebug(">>> Entering GetModuleExecutionEngine()");
             var moduleExecutionEngine = ComponentFactory.GetComponent<IModuleExecutionEngine>();
 
+			Logger.LogDebug("GetModuleExecutionEngine(): moduleExecutionEngine → {ModuleExecutionEngine}", moduleExecutionEngine);
             if (moduleExecutionEngine == null)
             {
                 moduleExecutionEngine = new ModuleExecutionEngine();
                 ComponentFactory.RegisterComponentInstance<IModuleExecutionEngine>(moduleExecutionEngine);
             }
 
+			Logger.LogDebug("<<< Exiting GetModuleExecutionEngine()");
             return moduleExecutionEngine;
         }
 
         private static MvcHtmlString RenderModule(ModuleRequestResult moduleResult)
         {
+			Logger.LogDebug(">>> Entering RenderModule(moduleResult={ModuleResult})", moduleResult);
             using var writer = new StringWriter(CultureInfo.CurrentCulture);
             var moduleExecutionEngine = ComponentFactory.GetComponent<IModuleExecutionEngine>();
+			Logger.LogDebug("RenderModule(moduleResult={ModuleResult}): moduleExecutionEngine → {ModuleExecutionEngine}", moduleResult, moduleExecutionEngine);
+			Logger.LogDebug("RenderModule(moduleResult={ModuleResult}): writer → {Writer}", moduleResult, writer);
 
             moduleExecutionEngine.ExecuteModuleResult(moduleResult, writer);
 
+			Logger.LogDebug("<<< Exiting RenderModule(moduleResult={ModuleResult})", moduleResult);
             return MvcHtmlString.Create(writer.ToString());
         }
 
         private ModuleRequestContext GetModuleRequestContext(HttpContextBase httpContext)
         {
+			Logger.LogDebug(">>> Entering GetModuleRequestContext(httpContext={HttpContext})", httpContext);
             var module = this.ModuleContext.Configuration;
 
             // TODO DesktopModuleControllerAdapter usage is temporary in order to make method testable
             var desktopModule = DesktopModuleControllerAdapter.Instance.GetDesktopModule(module.DesktopModuleID, module.PortalID);
+			Logger.LogDebug("GetModuleRequestContext(httpContext={HttpContext}): desktopModule → {DesktopModule}", httpContext, desktopModule);
             var defaultControl = ModuleControlControllerAdapter.Instance.GetModuleControlByControlKey(string.Empty, module.ModuleDefID);
+			Logger.LogDebug("GetModuleRequestContext(httpContext={HttpContext}): defaultControl → {DefaultControl}", httpContext, defaultControl);
 
             var defaultRouteData = ModuleRoutingProvider.Instance().GetRouteData(null, defaultControl);
+			Logger.LogDebug("GetModuleRequestContext(httpContext={HttpContext}): defaultRouteData → {DefaultRouteData}", httpContext, defaultRouteData);
 
             var moduleApplication = GetModuleApplication(
                 httpContext.GetScope().ServiceProvider.GetRequiredService<IBusinessControllerProvider>(),
@@ -183,6 +214,7 @@ namespace DotNetNuke.Web.Mvc
             }
 
             var moduleId = Null.NullInteger;
+			Logger.LogDebug("GetModuleRequestContext(httpContext={HttpContext}): moduleId → {ModuleId}", httpContext, moduleId);
             if (queryString["moduleid"] != null)
             {
                 if (!int.TryParse(queryString["moduleid"], out moduleId))
@@ -199,6 +231,7 @@ namespace DotNetNuke.Web.Mvc
             else
             {
                 var control = ModuleControlControllerAdapter.Instance.GetModuleControlByControlKey(this.controlKey, module.ModuleDefID);
+				Logger.LogDebug("GetModuleRequestContext(httpContext={HttpContext}): control → {Control}", httpContext, control);
                 routeData = ModuleRoutingProvider.Instance().GetRouteData(httpContext, control);
             }
 
@@ -211,13 +244,16 @@ namespace DotNetNuke.Web.Mvc
                 RouteData = routeData,
             };
 
+			Logger.LogDebug("<<< Exiting GetModuleRequestContext(httpContext={HttpContext})", httpContext);
             return moduleRequestContext;
         }
 
         private ModuleActionCollection LoadActions(ModuleRequestResult requestResult)
         {
+			Logger.LogDebug(">>> Entering LoadActions(requestResult={RequestResult})", requestResult);
             var actions = new ModuleActionCollection();
 
+			Logger.LogDebug("LoadActions(requestResult={RequestResult}): actions → {Actions}", requestResult, actions);
             if (requestResult.ModuleActions != null)
             {
                 foreach (ModuleAction action in requestResult.ModuleActions)
@@ -227,6 +263,7 @@ namespace DotNetNuke.Web.Mvc
                 }
             }
 
+			Logger.LogDebug("<<< Exiting LoadActions(requestResult={RequestResult})", requestResult);
             return actions;
         }
     }

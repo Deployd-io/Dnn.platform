@@ -15,6 +15,7 @@ namespace DotNetNuke.HttpModules.Compression
     /// </remarks>
     public abstract class CompressingFilter : HttpOutputFilter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CompressingFilter));
         /// <summary>
         /// Initializes a new instance of the <see cref="CompressingFilter"/> class.
         /// Protected constructor that sets up the underlying stream we're compressing into.
@@ -23,6 +24,8 @@ namespace DotNetNuke.HttpModules.Compression
         protected CompressingFilter(Stream baseStream)
             : base(baseStream)
         {
+		Logger.LogDebug(">>> Entering CompressingFilter(baseStream={BaseStream})", baseStream);
+		Logger.LogDebug("<<< Exiting CompressingFilter(baseStream={BaseStream})", baseStream);
         }
 
         /// <summary>Gets the name of the content-encoding that's being implemented.</summary>
@@ -38,12 +41,15 @@ namespace DotNetNuke.HttpModules.Compression
         /// <summary>Writes out the compression-related headers.  Subclasses should call this once before writing to the output stream.</summary>
         internal void WriteHeaders()
         {
+			Logger.LogDebug(">>> Entering WriteHeaders()");
             // this is dangerous.  if Response.End is called before the filter is used, directly or indirectly,
             // the content will not pass through the filter.  However, this header will still be appended.
             // Look for handling cases in PreRequestSendHeaders and Pre
             HttpContext.Current.Response.AppendHeader("Content-Encoding", this.ContentEncoding);
             HttpContext.Current.Response.AppendHeader("X-Compressed-By", "DotNetNuke-Compression");
             this.HasWrittenHeaders = true;
+			Logger.LogDebug("WriteHeaders(): this.HasWrittenHeaders → {Arg0}", this.HasWrittenHeaders);
+			Logger.LogDebug("<<< Exiting WriteHeaders()");
         }
     }
 }

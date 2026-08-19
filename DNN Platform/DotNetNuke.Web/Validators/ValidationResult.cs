@@ -11,16 +11,23 @@ namespace DotNetNuke.Web.Validators
     /// <summary>A validation result.</summary>
     public class ValidationResult
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ValidationResult));
         /// <summary>Initializes a new instance of the <see cref="ValidationResult"/> class without any errors.</summary>
         public ValidationResult()
         {
+			Logger.LogDebug(">>> Entering ValidationResult()");
             this.Errors = [];
+			Logger.LogDebug("ValidationResult(): this.Errors → {Arg0}", this.Errors);
+			Logger.LogDebug("ValidationResult(errors={Errors}): this.Errors → {Arg1}", errors, this.Errors);
+			Logger.LogDebug("<<< Exiting ValidationResult()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ValidationResult"/> class with errors.</summary>
+		Logger.LogDebug("<<< Exiting ValidationResult()");
         /// <param name="errors">The errors.</param>
         public ValidationResult(IEnumerable<ValidationError> errors)
         {
+			Logger.LogDebug(">>> Entering ValidationResult(errors={Errors})", errors);
             Requires.NotNull("errors", errors);
             this.Errors = errors;
         }
@@ -39,9 +46,11 @@ namespace DotNetNuke.Web.Validators
         /// <returns>A new <see cref="ValidationResult"/> with the errors combined.</returns>
         public ValidationResult CombineWith(ValidationResult other)
         {
+			Logger.LogDebug(">>> Entering CombineWith(other={Other})", other);
             Requires.NotNull("other", other);
 
             // Just concatenate the errors collection
+			Logger.LogDebug("<<< Exiting CombineWith(other={Other})", other);
             return new ValidationResult(this.Errors.Concat(other.Errors));
         }
     }

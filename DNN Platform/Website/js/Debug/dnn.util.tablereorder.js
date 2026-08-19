@@ -1,3 +1,4 @@
+const logger = console;
 /// <reference name="MicrosoftAjax.js" />
 /// <reference name="dnn.js" assembly="DotNetNuke.WebUtility" />
 
@@ -102,7 +103,9 @@ dnn.extend(dnn.util, {
 
     //doesn't belong here...   Don't use outside core, it will be moved
     checkallChecked: function (oCtl, iCellIndex) {
+		logger.debug(`>>> Entering checkallChecked(oCtl=${oCtl},iCellIndex=${iCellIndex})`);
         setTimeout(function () {
+			logger.debug('>>> Entering setTimeout()');
             var bChecked = oCtl.checked;
             var oTD = dnn.dom.getParentByTagName(oCtl, 'td');
             var oTR = oTD.parentNode;
@@ -128,5 +131,6 @@ dnn.extend(dnn.util, {
             }
             //return true;
         }, 10);
+		logger.debug(`<<< Exiting checkallChecked(oCtl=${oCtl},iCellIndex=${iCellIndex})`);
     }
 });

@@ -76,7 +76,10 @@ namespace Dnn.PersonaBar.SiteSettings.Services
 
         public LanguagesController(INavigationManager navigationManager)
         {
+			Logger.LogDebug(">>> Entering LanguagesController(navigationManager={NavigationManager})", navigationManager);
             this.NavigationManager = navigationManager;
+			Logger.LogDebug("LanguagesController(navigationManager={NavigationManager}): this.NavigationManager → {Arg1}", navigationManager, this.NavigationManager);
+			Logger.LogDebug("<<< Exiting LanguagesController(navigationManager={NavigationManager})", navigationManager);
         }
 
         protected INavigationManager NavigationManager { get; }
@@ -88,6 +91,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
         [HttpGet]
         public HttpResponseMessage GetTabsForTranslation(int? portalId, string cultureCode)
         {
+			Logger.LogDebug(">>> Entering GetTabsForTranslation(portalId={PortalId},cultureCode={CultureCode})", portalId, cultureCode);
             try
             {
                 var pid = portalId ?? this.PortalId;
@@ -97,11 +101,13 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                 }
 
                 var nonTranslatedTabs = this.GetTabsForTranslationInternal(pid, cultureCode);
+				Logger.LogDebug("GetTabsForTranslation(portalId={PortalId},cultureCode={CultureCode}): nonTranslatedTabs → {NonTranslatedTabs}", portalId, cultureCode, nonTranslatedTabs);
                 return this.Request.CreateResponse(HttpStatusCode.OK, nonTranslatedTabs);
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting GetTabsForTranslation(portalId={PortalId},cultureCode={CultureCode})", portalId, cultureCode);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.ToString());
             }
         }
@@ -110,9 +116,11 @@ namespace Dnn.PersonaBar.SiteSettings.Services
         [HttpGet]
         public HttpResponseMessage GetRootResourcesFolders()
         {
+			Logger.LogDebug(">>> Entering GetRootResourcesFolders()");
             try
             {
                 var folders = new List<KeyValuePair<string, string>>();
+				Logger.LogDebug("GetRootResourcesFolders(): folders → {Folders}", folders);
                 var server = HttpContext.Current.Server;
 
                 folders.Add(new KeyValuePair<string, string>(LocalizeString("LocalResources"), "_"));
@@ -125,10 +133,12 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                     {
                         Folders = folders.MapEntries(),
                     });
+					Logger.LogDebug("GetRootResourcesFolders(): Folders → {Folders}", Folders);
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting GetRootResourcesFolders()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.ToString());
             }
         }
@@ -137,10 +147,13 @@ namespace Dnn.PersonaBar.SiteSettings.Services
         [HttpGet]
         public HttpResponseMessage GetSubRootResources(string currentFolder = null)
         {
+			Logger.LogDebug(">>> Entering GetSubRootResources(currentFolder={CurrentFolder})", currentFolder);
             try
             {
                 var folders = new List<KeyValuePair<string, string>>();
+				Logger.LogDebug("GetSubRootResources(currentFolder={CurrentFolder}): folders → {Folders}", currentFolder, folders);
                 var files = new List<KeyValuePair<string, string>>();
+				Logger.LogDebug("GetSubRootResources(currentFolder={CurrentFolder}): files → {Files}", currentFolder, files);
                 var server = HttpContext.Current.Server;
 
                 if (string.IsNullOrEmpty(currentFolder))
@@ -149,13 +162,17 @@ namespace Dnn.PersonaBar.SiteSettings.Services
 
                     const string skins = "Skins";
                     var skinsPath = Path.Combine(Globals.ApplicationMapPath, skins);
+					Logger.LogDebug("GetSubRootResources(currentFolder={CurrentFolder}): skinsPath → {SkinsPath}", currentFolder, skinsPath);
 
                     if (Directory.Exists(skinsPath) && HasLocalResources(skinsPath))
                     {
                         folders.Add(new KeyValuePair<string, string>(LocalizeString("HostSkins"), skinsPath));
+						Logger.LogDebug(">>> Entering HasLocalResources(path={Path})", path);
+						Logger.LogDebug("<<< Exiting HasLocalResources(path={Path})", path);
                     }
 
                     var portalSkinFolder = Path.Combine(this.PortalSettings.HomeSystemDirectoryMapPath, skins);
+					Logger.LogDebug("GetSubRootResources(currentFolder={CurrentFolder}): portalSkinFolder → {PortalSkinFolder}", currentFolder, portalSkinFolder);
                     if (Directory.Exists(portalSkinFolder) &&
                         this.PortalSettings.ActiveTab.ParentId == this.PortalSettings.AdminTabId)
                     {
@@ -167,13 +184,16 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                 else
                 {
                     string foldername = currentFolder;
+					Logger.LogDebug("GetSubRootResources(currentFolder={CurrentFolder}): foldername → {Foldername}", currentFolder, foldername);
                     if (currentFolder.StartsWith("_/", StringComparison.Ordinal))
                     {
                         foldername = foldername.Substring(2);
                     }
 
                     var directories = GetResxDirectories(server.MapPath("~/" + foldername));
+					Logger.LogDebug("GetSubRootResources(currentFolder={CurrentFolder}): directories → {Directories}", currentFolder, directories);
                     var directoryFiles = GetResxFiles(server.MapPath("~/" + foldername));
+					Logger.LogDebug("GetSubRootResources(currentFolder={CurrentFolder}): directoryFiles → {DirectoryFiles}", currentFolder, directoryFiles);
                     if (currentFolder.StartsWith("_/", StringComparison.Ordinal))
                     {
                         folders.AddRange(directories.Select(
@@ -198,6 +218,8 @@ namespace Dnn.PersonaBar.SiteSettings.Services
             }
             catch (Exception ex)
             {
+				Logger.LogDebug("GetSubRootResources(currentFolder={CurrentFolder}): Files → {Files}", currentFolder, Files);
+				Logger.LogDebug("GetSubRootResources(currentFolder={CurrentFolder}): Folders → {Folders}", currentFolder, Folders);
                 Logger.Error(ex);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.ToString());
             }
@@ -207,6 +229,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
         [HttpGet]
         public HttpResponseMessage GetResxEntries(int? portalId, string mode, string locale, string resourceFile, bool highlight = false)
         {
+			Logger.LogDebug(">>> Entering GetResxEntries(portalId={PortalId},mode={Mode},locale={Locale},resourceFile={ResourceFile},highlight={Highlight})", portalId, mode, locale, resourceFile, highlight);
             try
             {
                 var pid = portalId ?? this.PortalId;
@@ -224,6 +247,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                 }
 
                 var language = this.localeController.GetLocale(locale);
+				Logger.LogDebug("GetResxEntries(portalId={PortalId},mode={Mode},locale={Locale},resourceFile={ResourceFile},highlight={Highlight}): language → {Language}", portalId, mode, locale, resourceFile, highlight, language);
 
                 switch (resourceMode)
                 {
@@ -250,20 +274,25 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                     : HttpContext.Current.Server.MapPath(Localization.GlobalResourceFile);
 
                 var editTable = this.LoadFile(pid, resourceMode, "Edit", locale);
+				Logger.LogDebug("GetResxEntries(portalId={PortalId},mode={Mode},locale={Locale},resourceFile={ResourceFile},highlight={Highlight}): editTable → {EditTable}", portalId, mode, locale, resourceFile, highlight, editTable);
                 var defaultTable = this.LoadFile(pid, resourceMode, "Default", locale);
+				Logger.LogDebug("GetResxEntries(portalId={PortalId},mode={Mode},locale={Locale},resourceFile={ResourceFile},highlight={Highlight}): defaultTable → {DefaultTable}", portalId, mode, locale, resourceFile, highlight, defaultTable);
 
                 var fullPath = Path.GetFileName(this.ResourceFile(pid, locale, resourceMode).Replace(Globals.ApplicationMapPath, string.Empty));
+				Logger.LogDebug("GetResxEntries(portalId={PortalId},mode={Mode},locale={Locale},resourceFile={ResourceFile},highlight={Highlight}): fullPath → {FullPath}", portalId, mode, locale, resourceFile, highlight, fullPath);
                 var folder = this.ResourceFile(pid, locale, resourceMode).Replace(Globals.ApplicationMapPath, string.Empty).Replace(@"\" + resourceFile, string.Empty);
 
                 // check edit table and if empty, just use default
                 if (editTable.Count == 0)
                 {
+					Logger.LogDebug("GetResxEntries(portalId={PortalId},mode={Mode},locale={Locale},resourceFile={ResourceFile},highlight={Highlight}): folder → {Folder}", portalId, mode, locale, resourceFile, highlight, folder);
                     editTable = defaultTable;
                 }
                 else
                 {
                     // remove obsolete keys
                     var toBeDeleted = new ArrayList();
+					Logger.LogDebug("GetResxEntries(portalId={PortalId},mode={Mode},locale={Locale},resourceFile={ResourceFile},highlight={Highlight}): toBeDeleted → {ToBeDeleted}", portalId, mode, locale, resourceFile, highlight, toBeDeleted);
                     foreach (string key in editTable.Keys)
                     {
                         if (!defaultTable.Contains(key))
@@ -292,6 +321,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                         {
                             // Update default value
                             var p = (Pair)editTable[key];
+							Logger.LogDebug("GetResxEntries(portalId={PortalId},mode={Mode},locale={Locale},resourceFile={ResourceFile},highlight={Highlight}): p → {P}", portalId, mode, locale, resourceFile, highlight, p);
                             p.Second = ((Pair)defaultTable[key]).First;
                             editTable[key] = p;
                         }
@@ -307,8 +337,12 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                 });
             }
             catch (Exception ex)
+			Logger.LogDebug("GetResxEntries(portalId={PortalId},mode={Mode},locale={Locale},resourceFile={ResourceFile},highlight={Highlight}): File → {File}", portalId, mode, locale, resourceFile, highlight, File);
+			Logger.LogDebug("GetResxEntries(portalId={PortalId},mode={Mode},locale={Locale},resourceFile={ResourceFile},highlight={Highlight}): Folder → {Folder}", portalId, mode, locale, resourceFile, highlight, Folder);
+			Logger.LogDebug("GetResxEntries(portalId={PortalId},mode={Mode},locale={Locale},resourceFile={ResourceFile},highlight={Highlight}): LanguageCode → {LanguageCode}", portalId, mode, locale, resourceFile, highlight, LanguageCode);
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting GetResxEntries(portalId={PortalId},mode={Mode},locale={Locale},resourceFile={ResourceFile},highlight={Highlight})", portalId, mode, locale, resourceFile, highlight);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.ToString());
             }
         }
@@ -318,6 +352,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage SaveResxEntries(UpdateTransaltionsRequest request)
         {
+			Logger.LogDebug(">>> Entering SaveResxEntries(request={Request})", request);
             try
             {
                 var pid = request.PortalId ?? this.PortalId;
@@ -334,6 +369,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                 }
 
                 var language = this.localeController.GetLocale(request.Locale);
+				Logger.LogDebug("SaveResxEntries(request={Request}): language → {Language}", request, language);
 
                 switch (resourceMode)
                 {
@@ -361,11 +397,13 @@ namespace Dnn.PersonaBar.SiteSettings.Services
 
                 this.selectedResourceFile = HttpContext.Current.Server.MapPath("~/" + request.ResourceFile);
                 var message = this.SaveResourceFileFile(pid, resourceMode, request.Locale, request.Entries);
+				Logger.LogDebug("SaveResxEntries(request={Request}): message → {Message}", request, message);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new { Message = message, });
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting SaveResxEntries(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.ToString());
             }
         }
@@ -375,6 +413,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage EnableLocalizedContent([FromUri] int? portalId, [FromUri] bool translatePages)
         {
+			Logger.LogDebug(">>> Entering EnableLocalizedContent(portalId={PortalId},translatePages={TranslatePages})", portalId, translatePages);
             try
             {
                 var pid = portalId ?? this.PortalId;
@@ -385,7 +424,9 @@ namespace Dnn.PersonaBar.SiteSettings.Services
 
                 var progress = new LocalizationProgress { InProgress = true, };
                 var portal = PortalController.Instance.GetPortal(pid);
+				Logger.LogDebug("EnableLocalizedContent(portalId={PortalId},translatePages={TranslatePages}): portal → {Portal}", portalId, translatePages, portal);
                 var portalSettings = new PortalSettings(portal);
+				Logger.LogDebug("EnableLocalizedContent(portalId={PortalId},translatePages={TranslatePages}): portalSettings → {PortalSettings}", portalId, translatePages, portalSettings);
                 LanguagesControllerTasks.LocalizeSitePages(
                     progress, pid, translatePages, portalSettings.DefaultLanguage ?? Localization.SystemLocale);
                 return this.Request.CreateResponse(HttpStatusCode.OK, progress);
@@ -393,6 +434,9 @@ namespace Dnn.PersonaBar.SiteSettings.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug(">>> Entering LocalizedContent(portalId={PortalId},cultureCode={CultureCode})", portalId, cultureCode);
+				Logger.LogDebug("<<< Exiting LocalizedContent(portalId={PortalId},cultureCode={CultureCode})", portalId, cultureCode);
+			Logger.LogDebug("<<< Exiting EnableLocalizedContent(portalId={PortalId},translatePages={TranslatePages})", portalId, translatePages);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.ToString());
             }
         }
@@ -428,14 +472,17 @@ namespace Dnn.PersonaBar.SiteSettings.Services
         [HttpGet]
         public HttpResponseMessage GetLocalizationProgress()
         {
+			Logger.LogDebug(">>> Entering GetLocalizationProgress()");
             try
             {
                 var progress = LanguagesControllerTasks.ReadProgressFile();
+				Logger.LogDebug("GetLocalizationProgress(): progress → {Progress}", progress);
                 return this.Request.CreateResponse(HttpStatusCode.OK, progress);
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting GetLocalizationProgress()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.ToString());
             }
         }
@@ -445,6 +492,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage DisableLocalizedContent([FromUri] int? portalId)
         {
+			Logger.LogDebug(">>> Entering DisableLocalizedContent(portalId={PortalId})", portalId);
             try
             {
                 var pid = portalId ?? this.PortalId;
@@ -454,7 +502,9 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                 }
 
                 var portal = PortalController.Instance.GetPortal(pid);
+				Logger.LogDebug("DisableLocalizedContent(portalId={PortalId}): portal → {Portal}", portalId, portal);
                 var portalSettings = new PortalSettings(portal);
+				Logger.LogDebug("DisableLocalizedContent(portalId={PortalId}): portalSettings → {PortalSettings}", portalId, portalSettings);
                 var portalDefault = portalSettings.DefaultLanguage;
                 foreach (var locale in this.localeController.GetLocales(pid).Values.Where(l => l.Code != portalDefault))
                 {
@@ -473,6 +523,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting DisableLocalizedContent(portalId={PortalId})", portalId);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.ToString());
             }
         }
@@ -482,6 +533,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage MarkAllPagesTranslated([FromUri] int? portalId, [FromUri] string cultureCode)
         {
+			Logger.LogDebug(">>> Entering MarkAllPagesTranslated(portalId={PortalId},cultureCode={CultureCode})", portalId, cultureCode);
             try
             {
                 var pid = portalId ?? this.PortalId;
@@ -496,6 +548,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                 }
 
                 var locale = this.localeController.GetLocale(pid, cultureCode);
+				Logger.LogDebug("MarkAllPagesTranslated(portalId={PortalId},cultureCode={CultureCode}): locale → {Locale}", portalId, cultureCode, locale);
                 if (locale == null)
                 {
                     return this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "InvalidCulture");
@@ -509,6 +562,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                 foreach (var page in nonTranslatedTabs)
                 {
                     page.LocalizedVersionGuid = page.DefaultLanguageTab.LocalizedVersionGuid;
+					Logger.LogDebug("MarkAllPagesTranslated(portalId={PortalId},cultureCode={CultureCode}): page.LocalizedVersionGuid → {Arg2}", portalId, cultureCode, page.LocalizedVersionGuid);
                     this.tabController.UpdateTab(page);
                 }
 
@@ -517,6 +571,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting MarkAllPagesTranslated(portalId={PortalId},cultureCode={CultureCode})", portalId, cultureCode);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.ToString());
             }
         }
@@ -526,6 +581,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage ActivateLanguage([FromUri] int? portalId, [FromUri] string cultureCode, [FromUri] bool enable)
         {
+			Logger.LogDebug(">>> Entering ActivateLanguage(portalId={PortalId},cultureCode={CultureCode},enable={Enable})", portalId, cultureCode, enable);
             try
             {
                 var pid = portalId ?? this.PortalId;
@@ -540,6 +596,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                 }
 
                 var locale = this.localeController.GetLocale(pid, cultureCode);
+				Logger.LogDebug("ActivateLanguage(portalId={PortalId},cultureCode={CultureCode},enable={Enable}): locale → {Locale}", portalId, cultureCode, enable, locale);
                 if (locale == null)
                 {
                     return this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "InvalidCulture");
@@ -551,6 +608,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting ActivateLanguage(portalId={PortalId},cultureCode={CultureCode},enable={Enable})", portalId, cultureCode, enable);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.ToString());
             }
         }
@@ -560,6 +618,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage PublishAllPages([FromUri] int? portalId, [FromUri] string cultureCode, [FromUri] bool enable)
         {
+			Logger.LogDebug(">>> Entering PublishAllPages(portalId={PortalId},cultureCode={CultureCode},enable={Enable})", portalId, cultureCode, enable);
             try
             {
                 var pid = portalId ?? this.PortalId;
@@ -574,6 +633,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                 }
 
                 var locale = this.localeController.GetLocale(pid, cultureCode);
+				Logger.LogDebug("PublishAllPages(portalId={PortalId},cultureCode={CultureCode},enable={Enable}): locale → {Locale}", portalId, cultureCode, enable, locale);
                 if (locale == null)
                 {
                     return this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "InvalidCulture");
@@ -585,6 +645,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting PublishAllPages(portalId={PortalId},cultureCode={CultureCode},enable={Enable})", portalId, cultureCode, enable);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.ToString());
             }
         }
@@ -594,6 +655,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage DeleteLanguagePages(int? portalId, string cultureCode)
         {
+			Logger.LogDebug(">>> Entering DeleteLanguagePages(portalId={PortalId},cultureCode={CultureCode})", portalId, cultureCode);
             try
             {
                 var pid = portalId ?? this.PortalId;
@@ -608,6 +670,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                 }
 
                 var locale = this.localeController.GetLocale(pid, cultureCode);
+				Logger.LogDebug("DeleteLanguagePages(portalId={PortalId},cultureCode={CultureCode}): locale → {Locale}", portalId, cultureCode, locale);
                 if (locale == null)
                 {
                     return this.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "InvalidCulture");
@@ -623,6 +686,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting DeleteLanguagePages(portalId={PortalId},cultureCode={CultureCode})", portalId, cultureCode);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.ToString());
             }
         }
@@ -655,8 +719,10 @@ namespace Dnn.PersonaBar.SiteSettings.Services
 
         private static bool HasLocalResources(string path)
         {
+			Logger.LogDebug(">>> Entering HasLocalResources(path={Path})", path);
             var folderInfo = new DirectoryInfo(path);
 
+			Logger.LogDebug("HasLocalResources(path={Path}): folderInfo → {FolderInfo}", path, folderInfo);
             if (path.EndsWith(Localization.LocalResourceDirectory, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
@@ -668,6 +734,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
             }
 
             var hasResources = false;
+			Logger.LogDebug("HasLocalResources(path={Path}): hasResources → {HasResources}", path, hasResources);
             foreach (var folder in Directory.GetDirectories(path))
             {
                 if ((File.GetAttributes(folder) & FileAttributes.ReparsePoint) != FileAttributes.ReparsePoint)
@@ -677,11 +744,14 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                 }
             }
 
+			Logger.LogDebug("<<< Exiting HasLocalResources(path={Path})", path);
             return hasResources || folderInfo.GetFiles("*.resx").Length > 0;
         }
 
         private static string LocalizeString(string key)
         {
+			Logger.LogDebug(">>> Entering LocalizeString(key={Key})", key);
+			Logger.LogDebug("<<< Exiting LocalizeString(key={Key})", key);
             return Localization.GetString(key, LocalResourcesFile);
         }
 
@@ -696,11 +766,13 @@ namespace Dnn.PersonaBar.SiteSettings.Services
         /// </remarks>
         private static void LoadResource(Hashtable ht, string filepath)
         {
+			Logger.LogDebug(">>> Entering LoadResource(ht={Ht},filepath={Filepath})", ht, filepath);
             var d = new XmlDocument { XmlResolver = null };
             bool xmlLoaded;
             try
             {
                 using var xmlReader = XmlReader.Create(filepath, new XmlReaderSettings { XmlResolver = null, });
+				Logger.LogDebug("LoadResource(ht={Ht},filepath={Filepath}): xmlReader → {XmlReader}", ht, filepath, xmlReader);
                 d.Load(xmlReader);
                 xmlLoaded = true;
             }
@@ -713,6 +785,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
             if (xmlLoaded)
             {
                 var nLoopVariables = d.SelectNodes("root/data");
+				Logger.LogDebug("LoadResource(ht={Ht},filepath={Filepath}): nLoopVariables → {NLoopVariables}", ht, filepath, nLoopVariables);
                 if (nLoopVariables != null)
                 {
                     foreach (XmlNode nLoopVariable in nLoopVariables)
@@ -721,6 +794,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                         if (n.NodeType != XmlNodeType.Comment)
                         {
                             var selectSingleNode = n.SelectSingleNode("value");
+							Logger.LogDebug("LoadResource(ht={Ht},filepath={Filepath}): selectSingleNode → {SelectSingleNode}", ht, filepath, selectSingleNode);
                             if (selectSingleNode != null)
                             {
                                 var val = selectSingleNode.InnerText;
@@ -740,10 +814,13 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting LoadResource(ht={Ht},filepath={Filepath})", ht, filepath);
         }
 
         private static XPathExpression GetResourceKeyXPath(string resourceKeyName)
         {
+			Logger.LogDebug(">>> Entering GetResourceKeyXPath(resourceKeyName={ResourceKeyName})", resourceKeyName);
+			Logger.LogDebug("<<< Exiting GetResourceKeyXPath(resourceKeyName={ResourceKeyName})", resourceKeyName);
             return XmlUtils.CreateXPathExpression(
                 "//root/data[@name=$resourceKeyName]",
                 new KeyValuePair<string, object>("resourceKeyName", resourceKeyName));
@@ -751,6 +828,8 @@ namespace Dnn.PersonaBar.SiteSettings.Services
 
         private static XPathExpression GetResourceKeyValueXPath(string resourceKeyName)
         {
+			Logger.LogDebug(">>> Entering GetResourceKeyValueXPath(resourceKeyName={ResourceKeyName})", resourceKeyName);
+			Logger.LogDebug("<<< Exiting GetResourceKeyValueXPath(resourceKeyName={ResourceKeyName})", resourceKeyName);
             return XmlUtils.CreateXPathExpression(
                 "//root/data[@name=$resourceKeyName]/value",
                 new KeyValuePair<string, object>("resourceKeyName", resourceKeyName));
@@ -758,25 +837,37 @@ namespace Dnn.PersonaBar.SiteSettings.Services
 
         private static XPathNavigator AddResourceKey(XmlDocument resourceDoc, string resourceKey)
         {
+			Logger.LogDebug(">>> Entering AddResourceKey(resourceDoc={ResourceDoc},resourceKey={ResourceKey})", resourceDoc, resourceKey);
             // missing entry
             var nodeData = resourceDoc.CreateElement("data");
+			Logger.LogDebug("AddResourceKey(resourceDoc={ResourceDoc},resourceKey={ResourceKey}): nodeData → {NodeData}", resourceDoc, resourceKey, nodeData);
             var attr = resourceDoc.CreateAttribute("name");
+			Logger.LogDebug("AddResourceKey(resourceDoc={ResourceDoc},resourceKey={ResourceKey}): attr → {Attr}", resourceDoc, resourceKey, attr);
+			Logger.LogDebug("AddResourceKey(resourceDoc={ResourceDoc},resourceKey={ResourceKey}): attr.Value → {Arg2}", resourceDoc, resourceKey, attr.Value);
             attr.Value = resourceKey;
             nodeData.Attributes?.Append(attr);
             var selectSingleNode = resourceDoc.SelectSingleNode("//root");
+			Logger.LogDebug("AddResourceKey(resourceDoc={ResourceDoc},resourceKey={ResourceKey}): selectSingleNode → {SelectSingleNode}", resourceDoc, resourceKey, selectSingleNode);
             selectSingleNode?.AppendChild(nodeData);
+			Logger.LogDebug("<<< Exiting AddResourceKey(resourceDoc={ResourceDoc},resourceKey={ResourceKey})", resourceDoc, resourceKey);
             return nodeData.AppendChild(resourceDoc.CreateElement("value")).CreateNavigator();
         }
 
         private static bool IsDefaultLanguage(int portalId, string cultureCode)
         {
+			Logger.LogDebug(">>> Entering IsDefaultLanguage(portalId={PortalId},cultureCode={CultureCode})", portalId, cultureCode);
             var portal = PortalController.Instance.GetPortal(portalId);
             var portalSettings = new PortalSettings(portal);
+			Logger.LogDebug("IsDefaultLanguage(portalId={PortalId},cultureCode={CultureCode}): portalSettings → {PortalSettings}", portalId, cultureCode, portalSettings);
+			Logger.LogDebug("IsDefaultLanguage(portalId={PortalId},cultureCode={CultureCode}): portal → {Portal}", portalId, cultureCode, portal);
+			Logger.LogDebug("<<< Exiting IsDefaultLanguage(portalId={PortalId},cultureCode={CultureCode})", portalId, cultureCode);
             return string.Equals(cultureCode, portalSettings.DefaultLanguage, StringComparison.OrdinalIgnoreCase);
         }
 
         private bool IsLanguageEnabled(int portalId, string cultureCode)
         {
+			Logger.LogDebug(">>> Entering IsLanguageEnabled(portalId={PortalId},cultureCode={CultureCode})", portalId, cultureCode);
+			Logger.LogDebug("<<< Exiting IsLanguageEnabled(portalId={PortalId},cultureCode={CultureCode})", portalId, cultureCode);
             return this.localeController.GetLocales(portalId).ContainsKey(cultureCode);
         }
 
@@ -800,14 +891,17 @@ namespace Dnn.PersonaBar.SiteSettings.Services
         /// </remarks>
         private Hashtable LoadFile(int portalId, LanguageResourceMode mode, string type, string locale)
         {
+			Logger.LogDebug(">>> Entering LoadFile(portalId={PortalId},mode={Mode},type={Type},locale={Locale})", portalId, mode, type, locale);
             string file;
             var ht = new Hashtable();
+			Logger.LogDebug("LoadFile(portalId={PortalId},mode={Mode},type={Type},locale={Locale}): ht → {Ht}", portalId, mode, type, locale, ht);
 
             if (type == "Edit")
             {
                 // Only load resources from the file being edited
                 file = this.ResourceFile(portalId, locale, mode);
                 LoadResource(ht, file);
+				Logger.LogDebug("LoadFile(portalId={PortalId},mode={Mode},type={Type},locale={Locale}): file → {File}", portalId, mode, type, locale, file);
             }
             else if (type == "Default")
             {
@@ -840,6 +934,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                 }
             }
 
+			Logger.LogDebug("<<< Exiting LoadFile(portalId={PortalId},mode={Mode},type={Type},locale={Locale})", portalId, mode, type, locale);
             return ht;
         }
 
@@ -850,17 +945,22 @@ namespace Dnn.PersonaBar.SiteSettings.Services
         /// <returns>Localized File Name.</returns>
         private string ResourceFile(int portalId, string language, LanguageResourceMode mode)
         {
+			Logger.LogDebug(">>> Entering ResourceFile(portalId={PortalId},language={Language},mode={Mode})", portalId, language, mode);
+			Logger.LogDebug("<<< Exiting ResourceFile(portalId={PortalId},language={Language},mode={Mode})", portalId, language, mode);
             return Localization.GetResourceFileName(this.selectedResourceFile, language, mode.ToString(), portalId);
         }
 
         /// <summary>  Updates all values from the datagrid.</summary>
         private string SaveResourceFileFile(int portalId, LanguageResourceMode mode, string locale, IEnumerable<LocalizationEntry> entries)
         {
+			Logger.LogDebug(">>> Entering SaveResourceFileFile(portalId={PortalId},mode={Mode},locale={Locale},entries={Entries})", portalId, mode, locale, entries);
             var resDoc = new XmlDocument { XmlResolver = null };
             var defDoc = new XmlDocument { XmlResolver = null };
 
             var filename = this.ResourceFile(portalId, locale, mode);
+			Logger.LogDebug("SaveResourceFileFile(portalId={PortalId},mode={Mode},locale={Locale},entries={Entries}): filename → {Filename}", portalId, mode, locale, entries, filename);
             var resourceFile = File.Exists(filename) ? filename : this.ResourceFile(portalId, Localization.SystemLocale, LanguageResourceMode.System);
+			Logger.LogDebug("SaveResourceFileFile(portalId={PortalId},mode={Mode},locale={Locale},entries={Entries}): resourceFile → {ResourceFile}", portalId, mode, locale, entries, resourceFile);
             using (var resourceReader = XmlReader.Create(resourceFile, new XmlReaderSettings { XmlResolver = null, }))
             {
                 resDoc.Load(resourceReader);
@@ -873,6 +973,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
 
             // store all changed resources
             var changedResources = new Dictionary<string, string>();
+			Logger.LogDebug("SaveResourceFileFile(portalId={PortalId},mode={Mode},locale={Locale},entries={Entries}): changedResources → {ChangedResources}", portalId, mode, locale, entries, changedResources);
 
             // only items different from default will be saved
             foreach (var entry in entries)
@@ -881,6 +982,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                 var txtValue = entry.NewValue;
 
                 var node = resDoc.CreateNavigator()?.SelectSingleNode(GetResourceKeyValueXPath(resourceKey));
+				Logger.LogDebug("SaveResourceFileFile(portalId={PortalId},mode={Mode},locale={Locale},entries={Entries}): node → {Node}", portalId, mode, locale, entries, node);
                 switch (mode)
                 {
                     case LanguageResourceMode.System:
@@ -925,6 +1027,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
 
             // remove obsolete keys
             var nodeLoopVariables = resDoc.SelectNodes("//root/data");
+			Logger.LogDebug("SaveResourceFileFile(portalId={PortalId},mode={Mode},locale={Locale},entries={Entries}): nodeLoopVariables → {NodeLoopVariables}", portalId, mode, locale, entries, nodeLoopVariables);
             if (nodeLoopVariables != null)
             {
                 foreach (XmlNode node in nodeLoopVariables)
@@ -946,6 +1049,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                     if (node.Attributes != null)
                     {
                         var xmlNodeList = resDoc.CreateNavigator()?.Select(GetResourceKeyXPath(node.Attributes["name"].Value));
+						Logger.LogDebug("SaveResourceFileFile(portalId={PortalId},mode={Mode},locale={Locale},entries={Entries}): xmlNodeList → {XmlNodeList}", portalId, mode, locale, entries, xmlNodeList);
                         if (xmlNodeList is { Count: > 1, })
                         {
                             node.ParentNode?.RemoveChild(node);
@@ -979,24 +1083,33 @@ namespace Dnn.PersonaBar.SiteSettings.Services
             if (changedResources.Count > 0)
             {
                 var values = string.Join("; ", changedResources.Select(x => x.Key + "=" + x.Value));
+				Logger.LogDebug("SaveResourceFileFile(portalId={PortalId},mode={Mode},locale={Locale},entries={Entries}): values → {Values}", portalId, mode, locale, entries, values);
                 var log = new LogInfo { LogTypeKey = nameof(EventLogType.ADMIN_ALERT) };
+				Logger.LogDebug("SaveResourceFileFile(portalId={PortalId},mode={Mode},locale={Locale},entries={Entries}): log → {Log}", portalId, mode, locale, entries, log);
                 log.LogProperties.Add(new LogDetailInfo(LocalizeString("ResourceUpdated"), this.ResourceFile(portalId, locale, mode)));
                 log.LogProperties.Add(new LogDetailInfo("Updated Values", values));
                 LogController.Instance.AddLog(log);
             }
 
+			Logger.LogDebug("<<< Exiting SaveResourceFileFile(portalId={PortalId},mode={Mode},locale={Locale},entries={Entries})", portalId, mode, locale, entries);
             return string.Format(CultureInfo.InvariantCulture, LocalizeString("Updated"), this.ResourceFile(portalId, locale, mode));
         }
 
         private List<LanguageTabDto> GetTabsForTranslationInternal(int portalId, string cultureCode)
         {
+			Logger.LogDebug(">>> Entering GetTabsForTranslationInternal(portalId={PortalId},cultureCode={CultureCode})", portalId, cultureCode);
             var locale = new LocaleController().GetLocale(portalId, cultureCode);
             var portal = PortalController.Instance.GetPortal(portalId);
+			Logger.LogDebug("GetTabsForTranslationInternal(portalId={PortalId},cultureCode={CultureCode}): portal → {Portal}", portalId, cultureCode, portal);
             var portalSettings = new PortalSettings(portal);
+			Logger.LogDebug("GetTabsForTranslationInternal(portalId={PortalId},cultureCode={CultureCode}): portalSettings → {PortalSettings}", portalId, cultureCode, portalSettings);
             var pages = new List<LanguageTabDto>();
+			Logger.LogDebug("GetTabsForTranslationInternal(portalId={PortalId},cultureCode={CultureCode}): pages → {Pages}", portalId, cultureCode, pages);
+			Logger.LogDebug("GetTabsForTranslationInternal(portalId={PortalId},cultureCode={CultureCode}): locale → {Locale}", portalId, cultureCode, locale);
             if (locale != null && locale.Code != portalSettings.DefaultLanguage)
             {
                 var portalTabs = this.tabController.GetTabsByPortal(portalId).WithCulture(locale.Code, false).Values;
+				Logger.LogDebug("GetTabsForTranslationInternal(portalId={PortalId},cultureCode={CultureCode}): portalTabs → {PortalTabs}", portalId, cultureCode, portalTabs);
                 var nonTranslated = from t in portalTabs where !t.IsTranslated && !t.IsDeleted select t;
                 pages.AddRange(
                     nonTranslated.Select(page => new LanguageTabDto()
@@ -1007,6 +1120,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                     }));
             }
 
+			Logger.LogDebug("<<< Exiting GetTabsForTranslationInternal(portalId={PortalId},cultureCode={CultureCode})", portalId, cultureCode);
             return pages;
         }
     }

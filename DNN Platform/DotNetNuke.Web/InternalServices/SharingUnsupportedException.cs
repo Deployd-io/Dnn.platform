@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class SharingUnsupportedException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SharingUnsupportedException));
     /// <inheritdoc />
     public SharingUnsupportedException()
     {
+	Logger.LogDebug(">>> Entering SharingUnsupportedException()");
+	Logger.LogDebug("<<< Exiting SharingUnsupportedException()");
     }
 
     /// <inheritdoc />
     public SharingUnsupportedException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering SharingUnsupportedException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting SharingUnsupportedException(message={Message})", message);
 
     /// <inheritdoc />
     public SharingUnsupportedException(string message, Exception innerException)

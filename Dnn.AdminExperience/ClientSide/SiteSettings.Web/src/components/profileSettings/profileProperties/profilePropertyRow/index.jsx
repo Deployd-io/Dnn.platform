@@ -2,26 +2,32 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Collapsible, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import "./style.less";
+const logger = console;
 
 class ProfilePropertyRow extends Component {
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
         this.setState({
             opened
         });
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     toggle() {
+		logger.debug('>>> Entering toggle()');
         if ((this.props.openId !== "" && this.props.id === this.props.openId)) {
             this.props.Collapse();
         }
         else {
             this.props.OpenCollapse(this.props.id);
+			logger.debug('<<< Exiting toggle()');
         }
     }
 
      
     getBooleanDisplay(prop) {
+		logger.debug(`>>> Entering getBooleanDisplay(prop=${prop})`);
         if (this.props.id !== "add") {
             if (prop) {
                 return <div className="checkMarkIcon"><SvgIcons.CheckMarkIcon /></div>;
@@ -29,6 +35,7 @@ class ProfilePropertyRow extends Component {
             else return <span>&nbsp; </span>;
         }
         else return <span>-</span>;
+		logger.debug(`<<< Exiting getBooleanDisplay(prop=${prop})`);
     }
 
     isSystemProperty(name) {
@@ -44,8 +51,10 @@ class ProfilePropertyRow extends Component {
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
+		logger.debug('<<< Exiting render()');
         return (
             <div className={"collapsible-component-properties" + (opened ? " row-opened" : "")}>
                 <div className={"collapsible-header-properties " + !opened} >

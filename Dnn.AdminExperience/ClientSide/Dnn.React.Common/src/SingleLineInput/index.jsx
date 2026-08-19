@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import "./style.less";
+const logger = console;
 
 const getOptions = function (enabled) {
     let opts = {};
@@ -20,9 +21,13 @@ const getType = function (type) {
 class SingleLineInput extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <input type={getType(props.type)}
                 className={"dnn-ui-common-single-line-input" + (" " + props.className) + (" " + props.size)}

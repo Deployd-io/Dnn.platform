@@ -18,8 +18,10 @@ namespace Dnn.PersonaBar.Prompt.Components.Commands.Utilities
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			eventLogger.LogDebug(">>> Entering Run()");
             if (this.Args.Length > 1)
             {
+			eventLogger.LogDebug("<<< Exiting Run()");
                 return new ConsoleResultModel(this.Args[1]);
             }
 

@@ -12,11 +12,14 @@ namespace DotNetNuke.Data.PetaPoco
 
     public static class FluentMapperExtensions
     {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FluentMapperExtensions));
 #pragma warning disable CS3002 // Return type is not CLS-compliant
         public static FluentMapper<TModel> AddFluentMapper<TModel>(this IDataContext dataContext)
         {
+			Logger.LogDebug(">>> Entering AddFluentMapper(dataContext={DataContext})", dataContext);
             var petaPocoDataContext = dataContext as PetaPocoDataContext;
             FluentMapper<TModel> mapper = null;
+			Logger.LogDebug("AddFluentMapper(dataContext={DataContext}): mapper → {Mapper}", dataContext, mapper);
 
             // ReSharper disable once UseNullPropagation
             if (petaPocoDataContext != null)
@@ -25,6 +28,7 @@ namespace DotNetNuke.Data.PetaPoco
                 petaPocoDataContext.FluentMappers.Add(typeof(TModel), mapper);
             }
 
+			Logger.LogDebug("<<< Exiting AddFluentMapper(dataContext={DataContext})", dataContext);
             return mapper;
         }
 

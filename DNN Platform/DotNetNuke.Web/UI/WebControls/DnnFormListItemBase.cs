@@ -15,6 +15,7 @@ namespace DotNetNuke.Web.UI.WebControls
     /// <summary>An item in a form.</summary>
     public abstract class DnnFormListItemBase : DnnFormItemBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnFormListItemBase));
         private IEnumerable listSource;
 
         /// <summary>Initializes a new instance of the <see cref="DnnFormListItemBase"/> class.</summary>
@@ -22,7 +23,9 @@ namespace DotNetNuke.Web.UI.WebControls
         protected DnnFormListItemBase()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering DnnFormListItemBase()");
         }
+		Logger.LogDebug("<<< Exiting DnnFormListItemBase()");
 
         /// <summary>Initializes a new instance of the <see cref="DnnFormListItemBase"/> class.</summary>
         /// <param name="appStatus">The application status.</param>
@@ -63,6 +66,8 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <summary>Bind the list.</summary>
         protected virtual void BindList()
         {
+		Logger.LogDebug(">>> Entering BindList()");
+		Logger.LogDebug("<<< Exiting BindList()");
         }
     }
 }

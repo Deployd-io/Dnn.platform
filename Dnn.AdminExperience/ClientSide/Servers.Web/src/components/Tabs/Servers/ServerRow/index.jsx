@@ -13,32 +13,40 @@ import Localization from "../../../../localization";
 import util from "../../../../utils";
 import "./style.less";
 import serversTabService from "../../../../services/serversTabService";
+const logger = console;
 
 export default class ServerRow extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             server: props.server,
             newUrl: props.server.url,
         };
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     toggleEdit() {
+		logger.debug('>>> Entering toggleEdit()');
         if (this.props.inEdit) {
             this.props.collapse();
         } else {
             this.changeUrl(this.props.server.url);
             this.props.openCollapse();
+			logger.debug('<<< Exiting toggleEdit()');
         }
     }
 
     changeUrl(newUrl) {
+		logger.debug(`>>> Entering changeUrl(newUrl=${newUrl})`);
         this.setState({
             newUrl: newUrl,
         });
+		logger.debug(`<<< Exiting changeUrl(newUrl=${newUrl})`);
     }
 
     updateUrl() {
+		logger.debug('>>> Entering updateUrl()');
         serversTabService
             .editServerUrl(this.props.server.serverId, this.state.newUrl)
             .then((response) => {
@@ -54,21 +62,27 @@ export default class ServerRow extends Component {
                 util.notifyError(Localization.get("ServerUpdateUrlError"));
             });
         this.props.collapse();
+		logger.debug('<<< Exiting updateUrl()');
     }
 
     deleteServer() {
+		logger.debug('>>> Entering deleteServer()');
         util.confirm(
             Localization.get("DeleteServerConfirm"),
             Localization.get("Confirm"),
             Localization.get("Cancel"),
             function () {
+				logger.debug('>>> Entering function()');
+				logger.debug('<<< Exiting function()');
                 this.props.deleteServer(this.props.server.serverId);
             }.bind(this)
         );
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { server } = this.state;
+		logger.debug('<<< Exiting render()');
         return (
             <div className={"collapsible-component1 " + this.props.inEdit}>
                 <div className={"collapsible-header1 " + !this.props.inEdit}>

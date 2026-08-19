@@ -11,6 +11,7 @@ namespace DotNetNuke.Services.Installer.Packages
     /// <summary>The PackageEditorBase class provides a Base Classs for Package Editors.</summary>
     public class PackageEditorBase : ModuleUserControlBase, IPackageEditor
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PackageEditorBase));
         private bool isWizard = Null.NullBoolean;
         private PackageInfo package;
         private int packageID = Null.NullInteger;
@@ -79,24 +80,33 @@ namespace DotNetNuke.Services.Installer.Packages
         /// <summary>Used to Initialize the Control.</summary>
         public virtual void Initialize()
         {
+		Logger.LogDebug(">>> Entering Initialize()");
+		Logger.LogDebug("<<< Exiting Initialize()");
         }
 
         /// <summary>Used to Update the Package.</summary>
         public virtual void UpdatePackage()
         {
+		Logger.LogDebug(">>> Entering UpdatePackage()");
+		Logger.LogDebug("<<< Exiting UpdatePackage()");
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             this.ID = this.EditorID;
             base.OnInit(e);
+			Logger.LogDebug("OnInit(e={E}): this.ID → {Arg1}", e, this.ID);
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
     }
 }

@@ -5,6 +5,7 @@ import { Collapsible as Collapse, Switch, DropdownWithError, RadioButtons, Butto
 import { CommonPortalListActions } from "dnn-sites-common-actions";
 import Localization from "localization";
 import "./style.less";
+const logger = console;
 
 const emptyNewPortal = {
     SiteTemplate: "",
@@ -23,6 +24,7 @@ const emptyNewPortal = {
     PasswordConfirm: ""
 };
 function extractDomain(url) {
+	logger.debug(`>>> Entering extractDomain(url=${url})`);
     let domain, port;
     //find & remove protocol (http, ftp, etc.) and get domain
     if (url.indexOf("://") > -1) {
@@ -32,6 +34,7 @@ function extractDomain(url) {
         domain = url.split("/")[0];
     }
     [domain, port] = domain.split(":");
+	logger.debug(`<<< Exiting extractDomain(url=${url})`);
     return port !== undefined && port !== 80 && port !== 443 ? `${domain}:${port}` : domain;
 }
 
@@ -41,12 +44,15 @@ function validateEmail(email) {
 }
 
 function getUniqueId() {
+	logger.debug('>>> Entering getUniqueId()');
+	logger.debug('<<< Exiting getUniqueId()');
     return Math.random() * Date.now();
 }
 
 class CreatePortal extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             defaultTemplate: "",
             newPortal: Object.assign({}, emptyNewPortal),
@@ -62,18 +68,23 @@ class CreatePortal extends Component {
             },
             triedToSave: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     resetNewPortal() {
+		logger.debug('>>> Entering resetNewPortal()');
         this.setState({
             newPortal: Object.assign({}, emptyNewPortal)
         });
+		logger.debug('<<< Exiting resetNewPortal()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const { props, state } = this;
         props.dispatch(CommonPortalListActions.getPortalTemplates((data) => {
             let {newPortal} = state;
+			logger.debug('<<< Exiting UNSAFE_componentWillMount()');
             newPortal.SiteTemplate = data.Results.DefaultTemplate;
             this.setState({
                 defaultTemplate: data.Results.DefaultTemplate,
@@ -82,6 +93,7 @@ class CreatePortal extends Component {
         }));
     }
     resolveSiteUrl(isChildSite) {
+		logger.debug(`>>> Entering resolveSiteUrl(isChildSite=${isChildSite})`);
         let rootDomain = extractDomain(window.location.href);
         if (isChildSite) {
             let { newPortal, error } = this.state;
@@ -96,18 +108,22 @@ class CreatePortal extends Component {
             let { newPortal } = this.state;
             newPortal.SiteAlias = newPortal.SiteAlias.replace(rootDomain + "/", "");
             this.setState({ newPortal });
+			logger.debug(`<<< Exiting resolveSiteUrl(isChildSite=${isChildSite})`);
         }
     }
 
     resolveSiteAliasError(value, isChildSite) {
+		logger.debug(`>>> Entering resolveSiteAliasError(value=${value},isChildSite=${isChildSite})`);
         let rootDomain = extractDomain(window.location.href);
         let subUrl = value.replace(rootDomain + "/", "");
+		logger.debug(`resolveSiteAliasError(value=${value},isChildSite=${isChildSite}): rootDomain → ${rootDomain}`);
         if (!isChildSite) {
             let regex = /[^\/a-z0-9-.:]/i;
             return value === "" || regex.test(value) || value.indexOf(" ") > 0;
         } else {
             let regex = /[^\/a-z0-9_-]/i;
             if (((regex.test(subUrl) && subUrl !== "") || (value.indexOf(rootDomain + "/")) === -1) || subUrl === "" || value.indexOf(" ") > 0) {
+			logger.debug(`<<< Exiting resolveSiteAliasError(value=${value},isChildSite=${isChildSite})`);
                 return true;
             }
             return false;
@@ -115,12 +131,16 @@ class CreatePortal extends Component {
     }
 
     resolvePasswordError(value) {
+		logger.debug(`>>> Entering resolvePasswordError(value=${value})`);
         if (value !== this.state.newPortal.Password || value === "" || value.length < 7) {
+		logger.debug(`<<< Exiting resolvePasswordError(value=${value})`);
             return true;
         }
         return false;
     }
     resolveEmailError(value) {
+		logger.debug(`>>> Entering resolveEmailError(value=${value})`);
+		logger.debug(`<<< Exiting resolveEmailError(value=${value})`);
         return !validateEmail(value);
     }
     onChange(key, event) {
@@ -186,16 +206,21 @@ class CreatePortal extends Component {
         });
     }
     checkForError(newPortal, key) {
+		logger.debug(`>>> Entering checkForError(newPortal=${newPortal},key=${key})`);
         if (newPortal[key] === "") {
+			logger.debug(`<<< Exiting checkForError(newPortal=${newPortal},key=${key})`);
             return true;
         }
     }
     setCreatingPortal(creatingPortal) {
+		logger.debug(`>>> Entering setCreatingPortal(creatingPortal=${creatingPortal})`);
         this.setState({
             creatingPortal
         });
+		logger.debug(`<<< Exiting setCreatingPortal(creatingPortal=${creatingPortal})`);
     }
     createPortal() {
+		logger.debug('>>> Entering createPortal()');
         const { props, state } = this;
         let triedToSave = true;
         this.setState({
@@ -222,16 +247,20 @@ class CreatePortal extends Component {
                 }, 5200);
             }));
         });
+		logger.debug('<<< Exiting createPortal()');
     }
 
     onCancel(event) {
+		logger.debug(`>>> Entering onCancel(event=${event})`);
         if (event) {
             event.preventDefault();
         }
         this.props.onCancel();
         this.resetNewPortal();
+		logger.debug(`<<< Exiting onCancel(event=${event})`);
     }
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
 
         const templateOptions = props.portalTemplates.map(template => {
@@ -241,6 +270,7 @@ class CreatePortal extends Component {
             };
         });
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className="create-portal">
                 <PersonaBarPageHeader title={Localization.get("AddNewSite.Header")} />
@@ -413,6 +443,8 @@ CreatePortal.propTypes = {
 
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         portalTemplates: state.exportPortal.templates
     };

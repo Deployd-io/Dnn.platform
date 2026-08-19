@@ -23,6 +23,7 @@ namespace Dnn.ExportImport.Components.Providers
     /// <summary>A data provider.</summary>
     internal sealed class DataProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DataProvider));
         private static readonly DataProvider Provider;
 
         private readonly DotNetNuke.Data.DataProvider dataProvider = DotNetNuke.Data.DataProvider.Instance();
@@ -30,18 +31,26 @@ namespace Dnn.ExportImport.Components.Providers
 
         static DataProvider()
         {
+			Logger.LogDebug(">>> Entering DataProvider()");
             Provider = new DataProvider(Globals.DependencyProvider.GetRequiredService<IHostSettings>());
+			Logger.LogDebug("<<< Exiting DataProvider()");
+			Logger.LogDebug("DataProvider(): Provider → {Provider}", Provider);
         }
 
         private DataProvider(IHostSettings hostSettings)
         {
+			Logger.LogDebug(">>> Entering DataProvider(hostSettings={HostSettings})", hostSettings);
             this.hostSettings = hostSettings;
+			Logger.LogDebug("DataProvider(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
+			Logger.LogDebug("<<< Exiting DataProvider(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <summary>Gets the singleton instance of <see cref="DataProvider"/>.</summary>
         /// <returns>The instance.</returns>
         public static DataProvider Instance()
         {
+			Logger.LogDebug(">>> Entering Instance()");
+			Logger.LogDebug("<<< Exiting Instance()");
             return Provider;
         }
 
@@ -53,8 +62,11 @@ namespace Dnn.ExportImport.Components.Providers
         /// <param name="modifiedBy">The ID of the modifying user.</param>
         public void UpdateRecordChangers(string tableName, string primaryKeyName, int primaryKeyId, int? createdBy, int? modifiedBy)
         {
+			Logger.LogDebug(">>> Entering UpdateRecordChangers(tableName={TableName},primaryKeyName={PrimaryKeyName},primaryKeyId={PrimaryKeyId},createdBy={CreatedBy},modifiedBy={ModifiedBy})", tableName, primaryKeyName, primaryKeyId, createdBy, modifiedBy);
             this.dataProvider.ExecuteNonQuery(
                 "Export_GenericUpdateRecordChangers", tableName, primaryKeyName, primaryKeyId, createdBy, modifiedBy);
+				Logger.LogInformation("UpdateRecordChangers(tableName,primaryKeyName,primaryKeyId,createdBy,modifiedBy)={TableName},{PrimaryKeyName},{PrimaryKeyId},{CreatedBy},{ModifiedBy}: database query executed in {Arg5} ms", tableName, primaryKeyName, primaryKeyId, createdBy, modifiedBy, __logStart.ElapsedMilliseconds);
+				Logger.LogDebug("<<< Exiting UpdateRecordChangers(tableName={TableName},primaryKeyName={PrimaryKeyName},primaryKeyId={PrimaryKeyId},createdBy={CreatedBy},modifiedBy={ModifiedBy})", tableName, primaryKeyName, primaryKeyId, createdBy, modifiedBy);
         }
 
         /// <summary>Update the unique ID.</summary>
@@ -64,7 +76,9 @@ namespace Dnn.ExportImport.Components.Providers
         /// <param name="uniqueId">The unique ID.</param>
         public void UpdateUniqueId(string tableName, string primaryKeyName, int primaryKeyId, Guid uniqueId)
         {
+			Logger.LogDebug(">>> Entering UpdateUniqueId(tableName={TableName},primaryKeyName={PrimaryKeyName},primaryKeyId={PrimaryKeyId},uniqueId={UniqueId})", tableName, primaryKeyName, primaryKeyId, uniqueId);
             this.dataProvider.ExecuteNonQuery("Export_UpdateUniqueId", tableName, primaryKeyName, primaryKeyId, uniqueId);
+			Logger.LogDebug("<<< Exiting UpdateUniqueId(tableName={TableName},primaryKeyName={PrimaryKeyName},primaryKeyId={PrimaryKeyId},uniqueId={UniqueId})", tableName, primaryKeyName, primaryKeyId, uniqueId);
         }
 
         /// <summary>Update setting record changers.</summary>
@@ -76,8 +90,11 @@ namespace Dnn.ExportImport.Components.Providers
         /// <param name="modifiedBy">The ID of the modifying user.</param>
         public void UpdateSettingRecordChangers(string tableName, string primaryKeyName, int parentKeyId, string settingName, int? createdBy, int? modifiedBy)
         {
+			Logger.LogDebug(">>> Entering UpdateSettingRecordChangers(tableName={TableName},primaryKeyName={PrimaryKeyName},parentKeyId={ParentKeyId},settingName={SettingName},createdBy={CreatedBy},modifiedBy={ModifiedBy})", tableName, primaryKeyName, parentKeyId, settingName, createdBy, modifiedBy);
             this.dataProvider.ExecuteNonQuery(
                 "Export_GenedicUpdateSettingsRecordChangers", tableName, primaryKeyName, parentKeyId, settingName, createdBy, modifiedBy);
+				Logger.LogInformation("UpdateSettingRecordChangers(tableName,primaryKeyName,parentKeyId,settingName,createdBy,modifiedBy)={TableName},{PrimaryKeyName},{ParentKeyId},{SettingName},{CreatedBy},{ModifiedBy}: database query executed in {Arg6} ms", tableName, primaryKeyName, parentKeyId, settingName, createdBy, modifiedBy, __logStart.ElapsedMilliseconds);
+				Logger.LogDebug("<<< Exiting UpdateSettingRecordChangers(tableName={TableName},primaryKeyName={PrimaryKeyName},parentKeyId={ParentKeyId},settingName={SettingName},createdBy={CreatedBy},modifiedBy={ModifiedBy})", tableName, primaryKeyName, parentKeyId, settingName, createdBy, modifiedBy);
         }
 
         /// <summary>Add a new import/export job.</summary>
@@ -91,6 +108,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>The job ID.</returns>
         public int AddNewJob(int portalId, int userId, JobType jobType, string jobName, string jobDescription, string directory, string serializedObject)
         {
+			Logger.LogDebug(">>> Entering AddNewJob(portalId={PortalId},userId={UserId},jobType={JobType},jobName={JobName},jobDescription={JobDescription},directory={Directory},serializedObject={SerializedObject})", portalId, userId, jobType, jobName, jobDescription, directory, serializedObject);
+			Logger.LogDebug("<<< Exiting AddNewJob(portalId={PortalId},userId={UserId},jobType={JobType},jobName={JobName},jobDescription={JobDescription},directory={Directory},serializedObject={SerializedObject})", portalId, userId, jobType, jobName, jobDescription, directory, serializedObject);
             return this.dataProvider.ExecuteScalar<int>(
                 "ExportImportJobs_Add",
                 portalId,
@@ -108,7 +127,9 @@ namespace Dnn.ExportImport.Components.Providers
         /// <param name="description">The job description.</param>
         public void UpdateJobInfo(int jobId, string name, string description)
         {
+			Logger.LogDebug(">>> Entering UpdateJobInfo(jobId={JobId},name={Name},description={Description})", jobId, name, description);
             this.dataProvider.ExecuteNonQuery("ExportImportJobs_UpdateInfo", jobId, name, description);
+			Logger.LogDebug("<<< Exiting UpdateJobInfo(jobId={JobId},name={Name},description={Description})", jobId, name, description);
         }
 
         /// <summary>Update a job status.</summary>
@@ -116,35 +137,47 @@ namespace Dnn.ExportImport.Components.Providers
         /// <param name="jobStatus">The job status.</param>
         public void UpdateJobStatus(int jobId, JobStatus jobStatus)
         {
+			Logger.LogDebug(">>> Entering UpdateJobStatus(jobId={JobId},jobStatus={JobStatus})", jobId, jobStatus);
             DateTime? completeDate = null;
             if (jobStatus == JobStatus.Failed || jobStatus == JobStatus.Successful)
             {
                 completeDate = DateUtils.GetDatabaseUtcTime();
             }
+			Logger.LogDebug("UpdateJobStatus(jobId={JobId},jobStatus={JobStatus}): completeDate → {CompleteDate}", jobId, jobStatus, completeDate);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
             this.dataProvider.ExecuteNonQuery(
                 "ExportImportJobs_UpdateStatus", jobId, jobStatus, completeDate);
+				Logger.LogInformation("UpdateJobStatus(jobId,jobStatus)={JobId},{JobStatus}: database query executed in {Arg2} ms", jobId, jobStatus, __logStart.ElapsedMilliseconds);
+				Logger.LogDebug("<<< Exiting UpdateJobStatus(jobId={JobId},jobStatus={JobStatus})", jobId, jobStatus);
         }
 
         /// <summary>Set a job as canceled.</summary>
         /// <param name="jobId">The job ID.</param>
         public void SetJobCancelled(int jobId)
         {
+			Logger.LogDebug(">>> Entering SetJobCancelled(jobId={JobId})", jobId);
             this.dataProvider.ExecuteNonQuery("ExportImportJobs_SetCancelled", jobId);
+			Logger.LogDebug("<<< Exiting SetJobCancelled(jobId={JobId})", jobId);
         }
 
         /// <summary>Remove a job.</summary>
         /// <param name="jobId">The job ID.</param>
         public void RemoveJob(int jobId)
         {
+			Logger.LogDebug(">>> Entering RemoveJob(jobId={JobId})", jobId);
             // using 60 sec timeout because cascading deletes in logs might take a lot of time
             this.dataProvider.ExecuteNonQuery(60, "ExportImportJobs_Remove", jobId);
+			Logger.LogInformation("RemoveJob(jobId)={JobId}: database query executed in {Arg1} ms", jobId, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting RemoveJob(jobId={JobId})", jobId);
         }
 
         /// <summary>Get the import/export settings.</summary>
         /// <returns>A data reader.</returns>
         public IDataReader GetExportImportSettings()
         {
+			Logger.LogDebug(">>> Entering GetExportImportSettings()");
+			Logger.LogDebug("<<< Exiting GetExportImportSettings()");
             return this.dataProvider.ExecuteReader("ExportImport_Settings");
         }
 
@@ -152,18 +185,24 @@ namespace Dnn.ExportImport.Components.Providers
         /// <param name="exportImportSetting">The setting.</param>
         public void AddExportImportSetting(ExportImportSetting exportImportSetting)
         {
+			Logger.LogDebug(">>> Entering AddExportImportSetting(exportImportSetting={ExportImportSetting})", exportImportSetting);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             this.dataProvider.ExecuteNonQuery(
                 "ExportImport_AddSetting",
                 exportImportSetting.SettingName,
                 exportImportSetting.SettingValue,
                 exportImportSetting.SettingIsSecure,
                 exportImportSetting.CreatedByUserId);
+				Logger.LogInformation("AddExportImportSetting(exportImportSetting)={ExportImportSetting}: database query executed in {Arg1} ms", exportImportSetting, __logStart.ElapsedMilliseconds);
+				Logger.LogDebug("<<< Exiting AddExportImportSetting(exportImportSetting={ExportImportSetting})", exportImportSetting);
         }
 
         /// <summary>Get the first active job.</summary>
         /// <returns>A data reader.</returns>
         public IDataReader GetFirstActiveJob()
         {
+			Logger.LogDebug(">>> Entering GetFirstActiveJob()");
+			Logger.LogDebug("<<< Exiting GetFirstActiveJob()");
             return this.dataProvider.ExecuteReader("ExportImportJobs_FirstActive");
         }
 
@@ -172,6 +211,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetJobById(int jobId)
         {
+			Logger.LogDebug(">>> Entering GetJobById(jobId={JobId})", jobId);
+			Logger.LogDebug("<<< Exiting GetJobById(jobId={JobId})", jobId);
             return this.dataProvider.ExecuteReader("ExportImportJobs_GetById", jobId);
         }
 
@@ -180,6 +221,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetJobSummaryLog(int jobId)
         {
+			Logger.LogDebug(">>> Entering GetJobSummaryLog(jobId={JobId})", jobId);
+			Logger.LogDebug("<<< Exiting GetJobSummaryLog(jobId={JobId})", jobId);
             return this.dataProvider.ExecuteReader("ExportImportJobLogs_Summary", jobId);
         }
 
@@ -188,6 +231,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetJobFullLog(int jobId)
         {
+			Logger.LogDebug(">>> Entering GetJobFullLog(jobId={JobId})", jobId);
+			Logger.LogDebug("<<< Exiting GetJobFullLog(jobId={JobId})", jobId);
             return this.dataProvider.ExecuteReader("ExportImportJobLogs_Full", jobId);
         }
 
@@ -198,6 +243,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>The count.</returns>
         public int GetAllJobsCount(int? portalId, int? jobType, string keywords)
         {
+			Logger.LogDebug(">>> Entering GetAllJobsCount(portalId={PortalId},jobType={JobType},keywords={Keywords})", portalId, jobType, keywords);
+			Logger.LogDebug("<<< Exiting GetAllJobsCount(portalId={PortalId},jobType={JobType},keywords={Keywords})", portalId, jobType, keywords);
             return this.dataProvider.ExecuteScalar<int>("ExportImport_GetJobsCount", portalId, jobType, keywords);
         }
 
@@ -210,6 +257,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllJobs(int? portalId, int? pageSize, int? pageIndex, int? jobType, string keywords)
         {
+			Logger.LogDebug(">>> Entering GetAllJobs(portalId={PortalId},pageSize={PageSize},pageIndex={PageIndex},jobType={JobType},keywords={Keywords})", portalId, pageSize, pageIndex, jobType, keywords);
+			Logger.LogDebug("<<< Exiting GetAllJobs(portalId={PortalId},pageSize={PageSize},pageIndex={PageIndex},jobType={JobType},keywords={Keywords})", portalId, pageSize, pageIndex, jobType, keywords);
             return this.dataProvider.ExecuteReader(
                 "ExportImportJobs_GetAll", portalId, pageSize, pageIndex, jobType, keywords);
         }
@@ -219,6 +268,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetJobChekpoints(int jobId)
         {
+			Logger.LogDebug(">>> Entering GetJobChekpoints(jobId={JobId})", jobId);
+			Logger.LogDebug("<<< Exiting GetJobChekpoints(jobId={JobId})", jobId);
             return this.dataProvider.ExecuteReader("ExportImportCheckpoints_GetByJob", jobId);
         }
 
@@ -228,6 +279,7 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>The date/time or <see langword="null"/>.</returns>
         public DateTime? GetLastJobTime(int portalId, JobType jobType)
         {
+			Logger.LogDebug(">>> Entering GetLastJobTime(portalId={PortalId},jobType={JobType})", portalId, jobType);
             var datim = this.dataProvider.ExecuteScalar<DateTime?>("ExportImportJobLogs_LastJobTime", portalId, jobType);
             if (datim.HasValue)
             {
@@ -235,6 +287,7 @@ namespace Dnn.ExportImport.Components.Providers
                 datim = new DateTime(d.Year, d.Month, d.Day, d.Hour, d.Minute, d.Second, d.Millisecond, DateTimeKind.Utc);
             }
 
+			Logger.LogDebug("<<< Exiting GetLastJobTime(portalId={PortalId},jobType={JobType})", portalId, jobType);
             return datim;
         }
 
@@ -242,6 +295,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <param name="checkpoint">The checkpoint.</param>
         public void UpsertJobChekpoint(ExportImportChekpoint checkpoint)
         {
+			Logger.LogDebug(">>> Entering UpsertJobChekpoint(checkpoint={Checkpoint})", checkpoint);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             this.dataProvider.ExecuteNonQuery(
                 "ExportImportCheckpoints_Upsert",
                 checkpoint.JobId,
@@ -254,12 +309,16 @@ namespace Dnn.ExportImport.Components.Providers
                 checkpoint.ProcessedItems,
                 this.dataProvider.GetNull(checkpoint.StartDate),
                 checkpoint.Completed);
+				Logger.LogInformation("UpsertJobChekpoint(checkpoint)={Checkpoint}: database query executed in {Arg1} ms", checkpoint, __logStart.ElapsedMilliseconds);
+				Logger.LogDebug("<<< Exiting UpsertJobChekpoint(checkpoint={Checkpoint})", checkpoint);
         }
 
         /// <summary>Get all scope types.</summary>
         /// <returns>A data reader.</returns>
         public IDataReader GetAllScopeTypes()
         {
+			Logger.LogDebug(">>> Entering GetAllScopeTypes()");
+			Logger.LogDebug("<<< Exiting GetAllScopeTypes()");
             return this.dataProvider.ExecuteReader("ExportTaxonomy_ScopeTypes");
         }
 
@@ -267,6 +326,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllVocabularyTypes()
         {
+			Logger.LogDebug(">>> Entering GetAllVocabularyTypes()");
+			Logger.LogDebug("<<< Exiting GetAllVocabularyTypes()");
             return this.dataProvider.ExecuteReader("ExportTaxonomy_VocabularyTypes");
         }
 
@@ -277,6 +338,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllTerms(int portalId, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetAllTerms(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetAllTerms(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
             return this.dataProvider.ExecuteReader("ExportTaxonomy_Terms", portalId, toDate, this.dataProvider.GetNull(fromDate));
         }
 
@@ -287,6 +350,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllVocabularies(int portalId, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetAllVocabularies(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetAllVocabularies(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
             return this.dataProvider.ExecuteReader("ExportTaxonomy_Vocabularies", portalId, toDate, this.dataProvider.GetNull(fromDate));
         }
 
@@ -297,6 +362,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllRoleGroups(int portalId, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetAllRoleGroups(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetAllRoleGroups(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
             return this.dataProvider.ExecuteReader("Export_RoleGroups", portalId, toDate, this.dataProvider.GetNull(fromDate));
         }
 
@@ -307,6 +374,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllRoles(int portalId, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetAllRoles(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetAllRoles(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
             return this.dataProvider.ExecuteReader("Export_Roles", portalId, toDate, this.dataProvider.GetNull(fromDate));
         }
 
@@ -317,6 +386,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllRoleSettings(int portalId, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetAllRoleSettings(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetAllRoleSettings(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
             return this.dataProvider.ExecuteReader("Export_RoleSettings", portalId, toDate, this.dataProvider.GetNull(fromDate));
         }
 
@@ -326,6 +397,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>The ID or <see cref="Globals.glbRoleNothing"/>.</returns>
         public int GetRoleIdByName(int portalId, string roleName)
         {
+			Logger.LogDebug(">>> Entering GetRoleIdByName(portalId={PortalId},roleName={RoleName})", portalId, roleName);
+			Logger.LogDebug("<<< Exiting GetRoleIdByName(portalId={PortalId},roleName={RoleName})", portalId, roleName);
             return this.dataProvider.ExecuteScalar<int>("Export_RoleIdByName", this.dataProvider.GetNull(portalId), roleName);
         }
 
@@ -333,7 +406,9 @@ namespace Dnn.ExportImport.Components.Providers
         /// <param name="roleId">The role ID.</param>
         public void SetRoleAutoAssign(int roleId)
         {
+			Logger.LogDebug(">>> Entering SetRoleAutoAssign(roleId={RoleId})", roleId);
             this.dataProvider.ExecuteNonQuery("Export_RoleSetAutoAssign", roleId);
+			Logger.LogDebug("<<< Exiting SetRoleAutoAssign(roleId={RoleId})", roleId);
         }
 
         /// <summary>Get property definitions for the portal.</summary>
@@ -344,6 +419,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetPropertyDefinitionsByPortal(int portalId, bool includeDeleted, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetPropertyDefinitionsByPortal(portalId={PortalId},includeDeleted={IncludeDeleted},toDate={ToDate},fromDate={FromDate})", portalId, includeDeleted, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetPropertyDefinitionsByPortal(portalId={PortalId},includeDeleted={IncludeDeleted},toDate={ToDate},fromDate={FromDate})", portalId, includeDeleted, toDate, fromDate);
             return this.dataProvider.ExecuteReader(
                 "Export_GetPropertyDefinitionsByPortal",
                 portalId,
@@ -362,6 +439,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllUsers(int portalId, int pageIndex, int pageSize, bool includeDeleted, DateTime toDateUtc, DateTime? fromDateUtc)
         {
+			Logger.LogDebug(">>> Entering GetAllUsers(portalId={PortalId},pageIndex={PageIndex},pageSize={PageSize},includeDeleted={IncludeDeleted},toDateUtc={ToDateUtc},fromDateUtc={FromDateUtc})", portalId, pageIndex, pageSize, includeDeleted, toDateUtc, fromDateUtc);
+			Logger.LogDebug("<<< Exiting GetAllUsers(portalId={PortalId},pageIndex={PageIndex},pageSize={PageSize},includeDeleted={IncludeDeleted},toDateUtc={ToDateUtc},fromDateUtc={FromDateUtc})", portalId, pageIndex, pageSize, includeDeleted, toDateUtc, fromDateUtc);
             return this.dataProvider.ExecuteReader(
                 "Export_GetAllUsers",
                 portalId,
@@ -381,6 +460,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>The count.</returns>
         public int GetUsersCount(int portalId, bool includeDeleted, DateTime toDateUtc, DateTime? fromDateUtc)
         {
+			Logger.LogDebug(">>> Entering GetUsersCount(portalId={PortalId},includeDeleted={IncludeDeleted},toDateUtc={ToDateUtc},fromDateUtc={FromDateUtc})", portalId, includeDeleted, toDateUtc, fromDateUtc);
+			Logger.LogDebug("<<< Exiting GetUsersCount(portalId={PortalId},includeDeleted={IncludeDeleted},toDateUtc={ToDateUtc},fromDateUtc={FromDateUtc})", portalId, includeDeleted, toDateUtc, fromDateUtc);
             return this.dataProvider
                 .ExecuteScalar<int>("Export_GetAllUsers", portalId, 0, 0, includeDeleted, toDateUtc, this.dataProvider.GetNull(fromDateUtc), true);
         }
@@ -391,8 +472,12 @@ namespace Dnn.ExportImport.Components.Providers
         /// <param name="modifiedByUserName">The username of the modifying user.</param>
         public void UpdateUserChangers(int userId, string createdByUserName, string modifiedByUserName)
         {
+			Logger.LogDebug(">>> Entering UpdateUserChangers(userId={UserId},createdByUserName={CreatedByUserName},modifiedByUserName={ModifiedByUserName})", userId, createdByUserName, modifiedByUserName);
             this.dataProvider.ExecuteNonQuery(
                 "Export_UpdateUsersChangers", userId, createdByUserName, modifiedByUserName);
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				Logger.LogInformation("UpdateUserChangers(userId,createdByUserName,modifiedByUserName)={UserId},{CreatedByUserName},{ModifiedByUserName}: database query executed in {Arg3} ms", userId, createdByUserName, modifiedByUserName, __logStart.ElapsedMilliseconds);
+				Logger.LogDebug("<<< Exiting UpdateUserChangers(userId={UserId},createdByUserName={CreatedByUserName},modifiedByUserName={ModifiedByUserName})", userId, createdByUserName, modifiedByUserName);
         }
 
         /// <summary>Get portal settings.</summary>
@@ -402,6 +487,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetPortalSettings(int portalId, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetPortalSettings(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetPortalSettings(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
             return this.dataProvider.ExecuteReader("Export_GetPortalSettings", portalId, toDate, this.dataProvider.GetNull(fromDate));
         }
 
@@ -412,6 +499,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetPortalLanguages(int portalId, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetPortalLanguages(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetPortalLanguages(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
             return this.dataProvider.ExecuteReader("Export_GetPortalLanguages", portalId, toDate, this.dataProvider.GetNull(fromDate));
         }
 
@@ -422,6 +511,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetPortalLocalizations(int portalId, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetPortalLocalizations(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetPortalLocalizations(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
             return this.dataProvider.ExecuteReader("Export_GetPortalLocalizations", portalId, toDate, this.dataProvider.GetNull(fromDate));
         }
 
@@ -432,6 +523,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetFolders(int portalId, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetFolders(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetFolders(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
             return this.dataProvider.ExecuteReader("Export_GetFolders", portalId, toDate, this.dataProvider.GetNull(fromDate));
         }
 
@@ -443,6 +536,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetFolderPermissionsByPath(int portalId, string folderPath, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetFolderPermissionsByPath(portalId={PortalId},folderPath={FolderPath},toDate={ToDate},fromDate={FromDate})", portalId, folderPath, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetFolderPermissionsByPath(portalId={PortalId},folderPath={FolderPath},toDate={ToDate},fromDate={FromDate})", portalId, folderPath, toDate, fromDate);
             return this.dataProvider
                 .ExecuteReader("Export_GetFolderPermissionsByPath", portalId, folderPath, toDate, this.dataProvider.GetNull(fromDate));
         }
@@ -454,6 +549,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetFolderMappings(int portalId, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetFolderMappings(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetFolderMappings(portalId={PortalId},toDate={ToDate},fromDate={FromDate})", portalId, toDate, fromDate);
             return this.dataProvider.ExecuteReader("Export_GetFolderMappings", portalId, toDate, this.dataProvider.GetNull(fromDate));
         }
 
@@ -465,6 +562,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetFiles(int portalId, int? folderId, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetFiles(portalId={PortalId},folderId={FolderId},toDate={ToDate},fromDate={FromDate})", portalId, folderId, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetFiles(portalId={PortalId},folderId={FolderId},toDate={ToDate},fromDate={FromDate})", portalId, folderId, toDate, fromDate);
             return this.dataProvider.ExecuteReader("Export_GetFiles", portalId, folderId, toDate, this.dataProvider.GetNull(fromDate));
         }
 
@@ -475,10 +574,14 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>The permission ID or <see langword="null"/>.</returns>
         public int? GetPermissionId(string permissionCode, string permissionKey, string permissionName)
         {
+			Logger.LogDebug(">>> Entering GetPermissionId(permissionCode={PermissionCode},permissionKey={PermissionKey},permissionName={PermissionName})", permissionCode, permissionKey, permissionName);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var permissions = CBO.GetCachedObject<IEnumerable<PermissionInfo>>(
                 this.hostSettings,
                 new CacheItemArgs(DataCache.PermissionsCacheKey, DataCache.PermissionsCacheTimeout, DataCache.PermissionsCachePriority),
                 c => CBO.FillCollection<PermissionInfo>(this.dataProvider.ExecuteReader("GetPermissions")));
+				Logger.LogInformation("GetPermissionId(permissionCode,permissionKey,permissionName)={PermissionCode},{PermissionKey},{PermissionName}: database query executed in {Arg3} ms", permissionCode, permissionKey, permissionName, __logStart.ElapsedMilliseconds);
+				Logger.LogDebug("<<< Exiting GetPermissionId(permissionCode={PermissionCode},permissionKey={PermissionKey},permissionName={PermissionName})", permissionCode, permissionKey, permissionName);
             return
                 (from IPermissionDefinitionInfo x in permissions
                 where x.PermissionCode == permissionCode
@@ -497,6 +600,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllPortalTabs(int portalId, bool includeDeleted, bool includeSystem, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetAllPortalTabs(portalId={PortalId},includeDeleted={IncludeDeleted},includeSystem={IncludeSystem},toDate={ToDate},fromDate={FromDate})", portalId, includeDeleted, includeSystem, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetAllPortalTabs(portalId={PortalId},includeDeleted={IncludeDeleted},includeSystem={IncludeSystem},toDate={ToDate},fromDate={FromDate})", portalId, includeDeleted, includeSystem, toDate, fromDate);
             return this.dataProvider.ExecuteReader("Export_Tabs", portalId, includeDeleted, includeSystem, toDate, fromDate);
         }
 
@@ -507,6 +612,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllTabSettings(int tabId, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetAllTabSettings(tabId={TabId},toDate={ToDate},fromDate={FromDate})", tabId, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetAllTabSettings(tabId={TabId},toDate={ToDate},fromDate={FromDate})", tabId, toDate, fromDate);
             return this.dataProvider.ExecuteReader("Export_TabSettings", tabId, toDate, fromDate);
         }
 
@@ -517,6 +624,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllTabPermissions(int tabId, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetAllTabPermissions(tabId={TabId},toDate={ToDate},fromDate={FromDate})", tabId, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetAllTabPermissions(tabId={TabId},toDate={ToDate},fromDate={FromDate})", tabId, toDate, fromDate);
             return this.dataProvider.ExecuteReader("Export_TabPermissions", tabId, toDate, fromDate);
         }
 
@@ -527,6 +636,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllTabUrls(int tabId, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetAllTabUrls(tabId={TabId},toDate={ToDate},fromDate={FromDate})", tabId, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetAllTabUrls(tabId={TabId},toDate={ToDate},fromDate={FromDate})", tabId, toDate, fromDate);
             return this.dataProvider.ExecuteReader("Export_TabUrls", tabId, toDate, fromDate);
         }
 
@@ -538,6 +649,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllModules(int tabId, bool includeDeleted, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetAllModules(tabId={TabId},includeDeleted={IncludeDeleted},toDate={ToDate},fromDate={FromDate})", tabId, includeDeleted, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetAllModules(tabId={TabId},includeDeleted={IncludeDeleted},toDate={ToDate},fromDate={FromDate})", tabId, includeDeleted, toDate, fromDate);
             return this.dataProvider.ExecuteReader("Export_Modules", tabId, includeDeleted, toDate, fromDate);
         }
 
@@ -548,6 +661,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllModuleSettings(int moduleId, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetAllModuleSettings(moduleId={ModuleId},toDate={ToDate},fromDate={FromDate})", moduleId, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetAllModuleSettings(moduleId={ModuleId},toDate={ToDate},fromDate={FromDate})", moduleId, toDate, fromDate);
             return this.dataProvider.ExecuteReader("Export_ModuleSettings", moduleId, toDate, fromDate);
         }
 
@@ -558,6 +673,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllModulePermissions(int moduleId, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetAllModulePermissions(moduleId={ModuleId},toDate={ToDate},fromDate={FromDate})", moduleId, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetAllModulePermissions(moduleId={ModuleId},toDate={ToDate},fromDate={FromDate})", moduleId, toDate, fromDate);
             return this.dataProvider.ExecuteReader("Export_ModulePermissions", moduleId, toDate, fromDate);
         }
 
@@ -569,6 +686,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllTabModules(int tabId, bool includeDeleted, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetAllTabModules(tabId={TabId},includeDeleted={IncludeDeleted},toDate={ToDate},fromDate={FromDate})", tabId, includeDeleted, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetAllTabModules(tabId={TabId},includeDeleted={IncludeDeleted},toDate={ToDate},fromDate={FromDate})", tabId, includeDeleted, toDate, fromDate);
             return this.dataProvider.ExecuteReader("Export_TabModules", tabId, includeDeleted, toDate, fromDate);
         }
 
@@ -577,6 +696,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns><see langword="true"/> if it exists, otherwise <see langword="false"/>.</returns>
         public bool CheckTabModuleUniqueIdExists(Guid uniqueId)
         {
+			Logger.LogDebug(">>> Entering CheckTabModuleUniqueIdExists(uniqueId={UniqueId})", uniqueId);
+			Logger.LogDebug("<<< Exiting CheckTabModuleUniqueIdExists(uniqueId={UniqueId})", uniqueId);
             return this.dataProvider.ExecuteScalar<int?>("ExportImport_CheckTabModuleUniqueIdExists", uniqueId) > 0;
         }
 
@@ -585,6 +706,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns><see langword="true"/> if it exists, otherwise <see langword="false"/>.</returns>
         public bool CheckTabUniqueIdExists(Guid uniqueId)
         {
+			Logger.LogDebug(">>> Entering CheckTabUniqueIdExists(uniqueId={UniqueId})", uniqueId);
+			Logger.LogDebug("<<< Exiting CheckTabUniqueIdExists(uniqueId={UniqueId})", uniqueId);
             return this.dataProvider.ExecuteScalar<int?>("ExportImport_CheckTabUniqueIdExists", uniqueId) > 0;
         }
 
@@ -596,6 +719,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllTabModuleSettings(int tabId, bool includeDeleted, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetAllTabModuleSettings(tabId={TabId},includeDeleted={IncludeDeleted},toDate={ToDate},fromDate={FromDate})", tabId, includeDeleted, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetAllTabModuleSettings(tabId={TabId},includeDeleted={IncludeDeleted},toDate={ToDate},fromDate={FromDate})", tabId, includeDeleted, toDate, fromDate);
             return this.dataProvider.ExecuteReader("Export_TabModuleSettings", tabId, includeDeleted, toDate, fromDate);
         }
 
@@ -605,7 +730,9 @@ namespace Dnn.ExportImport.Components.Providers
         /// <param name="isVisible">Whether the tab is visible.</param>
         public void SetTabSpecificData(int tabId, bool isDeleted, bool isVisible)
         {
+			Logger.LogDebug(">>> Entering SetTabSpecificData(tabId={TabId},isDeleted={IsDeleted},isVisible={IsVisible})", tabId, isDeleted, isVisible);
             this.dataProvider.ExecuteNonQuery("Export_SetTabSpecificData", tabId, isDeleted, isVisible);
+			Logger.LogDebug("<<< Exiting SetTabSpecificData(tabId={TabId},isDeleted={IsDeleted},isVisible={IsVisible})", tabId, isDeleted, isVisible);
         }
 
         /// <summary>Sets whether a tab-module is deleted.</summary>
@@ -613,7 +740,9 @@ namespace Dnn.ExportImport.Components.Providers
         /// <param name="isDeleted">Whether it is deleted.</param>
         public void SetTabModuleDeleted(int tabModuleId, bool isDeleted)
         {
+			Logger.LogDebug(">>> Entering SetTabModuleDeleted(tabModuleId={TabModuleId},isDeleted={IsDeleted})", tabModuleId, isDeleted);
             this.dataProvider.ExecuteNonQuery("Export_SetTabModuleDeleted", tabModuleId, isDeleted);
+			Logger.LogDebug("<<< Exiting SetTabModuleDeleted(tabModuleId={TabModuleId},isDeleted={IsDeleted})", tabModuleId, isDeleted);
         }
 
         /// <summary>Sets whether a user is deleted.</summary>
@@ -622,7 +751,9 @@ namespace Dnn.ExportImport.Components.Providers
         /// <param name="isDeleted">Whether it is deleted.</param>
         public void SetUserDeleted(int portalId, int userId, bool isDeleted)
         {
+			Logger.LogDebug(">>> Entering SetUserDeleted(portalId={PortalId},userId={UserId},isDeleted={IsDeleted})", portalId, userId, isDeleted);
             this.dataProvider.ExecuteNonQuery("Export_SetUserDeleted", portalId, userId, isDeleted);
+			Logger.LogDebug("<<< Exiting SetUserDeleted(portalId={PortalId},userId={UserId},isDeleted={IsDeleted})", portalId, userId, isDeleted);
         }
 
         /// <summary>Gets the permission info.</summary>
@@ -632,6 +763,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetPermissionInfo(string permissionCode, string permissionKey, string permissionName)
         {
+			Logger.LogDebug(">>> Entering GetPermissionInfo(permissionCode={PermissionCode},permissionKey={PermissionKey},permissionName={PermissionName})", permissionCode, permissionKey, permissionName);
+			Logger.LogDebug("<<< Exiting GetPermissionInfo(permissionCode={PermissionCode},permissionKey={PermissionKey},permissionName={PermissionName})", permissionCode, permissionKey, permissionName);
             return this.dataProvider.ExecuteReader("Export_GetPermissionInfo", permissionCode, permissionKey, permissionName);
         }
 
@@ -642,7 +775,9 @@ namespace Dnn.ExportImport.Components.Providers
         /// <param name="modifiedBy">The ID of the modifying user.</param>
         public void UpdateTabUrlChangers(int tabId, int seqNum, int? createdBy, int? modifiedBy)
         {
+			Logger.LogDebug(">>> Entering UpdateTabUrlChangers(tabId={TabId},seqNum={SeqNum},createdBy={CreatedBy},modifiedBy={ModifiedBy})", tabId, seqNum, createdBy, modifiedBy);
             this.dataProvider.ExecuteNonQuery("Export_UpdateTabUrlChangers", tabId, seqNum, createdBy, modifiedBy);
+			Logger.LogDebug("<<< Exiting UpdateTabUrlChangers(tabId={TabId},seqNum={SeqNum},createdBy={CreatedBy},modifiedBy={ModifiedBy})", tabId, seqNum, createdBy, modifiedBy);
         }
 
         /// <summary>Gets all workflows.</summary>
@@ -651,6 +786,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllWorkflows(int portalId, bool includeDeleted)
         {
+			Logger.LogDebug(">>> Entering GetAllWorkflows(portalId={PortalId},includeDeleted={IncludeDeleted})", portalId, includeDeleted);
+			Logger.LogDebug("<<< Exiting GetAllWorkflows(portalId={PortalId},includeDeleted={IncludeDeleted})", portalId, includeDeleted);
             return this.dataProvider.ExecuteReader("Export_ContentWorkflows", portalId, includeDeleted);
         }
 
@@ -659,6 +796,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllWorkflowSources(int workflowId)
         {
+			Logger.LogDebug(">>> Entering GetAllWorkflowSources(workflowId={WorkflowId})", workflowId);
+			Logger.LogDebug("<<< Exiting GetAllWorkflowSources(workflowId={WorkflowId})", workflowId);
             return this.dataProvider.ExecuteReader("Export_ContentWorkflowSources", workflowId);
         }
 
@@ -667,6 +806,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllWorkflowStates(int workflowId)
         {
+			Logger.LogDebug(">>> Entering GetAllWorkflowStates(workflowId={WorkflowId})", workflowId);
+			Logger.LogDebug("<<< Exiting GetAllWorkflowStates(workflowId={WorkflowId})", workflowId);
             return this.dataProvider.ExecuteReader("Export_ContentWorkflowStates", workflowId);
         }
 
@@ -677,6 +818,8 @@ namespace Dnn.ExportImport.Components.Providers
         /// <returns>A data reader.</returns>
         public IDataReader GetAllWorkflowStatePermissions(int workflowStateId, DateTime toDate, DateTime? fromDate)
         {
+			Logger.LogDebug(">>> Entering GetAllWorkflowStatePermissions(workflowStateId={WorkflowStateId},toDate={ToDate},fromDate={FromDate})", workflowStateId, toDate, fromDate);
+			Logger.LogDebug("<<< Exiting GetAllWorkflowStatePermissions(workflowStateId={WorkflowStateId},toDate={ToDate},fromDate={FromDate})", workflowStateId, toDate, fromDate);
             return this.dataProvider.ExecuteReader("Export_ContentWorkflowStatePermissions", workflowStateId, toDate, fromDate);
         }
     }

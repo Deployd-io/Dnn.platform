@@ -1,6 +1,7 @@
 import React from "react";
 import { shallow } from "enzyme";
 import Breadcrumbs from "../Breadcrumbs";
+const logger = console;
 
 describe("Breadcrumbs",()=>{
     let onSelectedItemReturn = -1;
@@ -8,6 +9,7 @@ describe("Breadcrumbs",()=>{
     //Callback on click Breadcrumbs
     const onSelectedItem = (item) => {
         onSelectedItemReturn = item;
+		logger.debug(`<<< Exiting onSelectedItem(item=${item})`);
     };
 
     const item = {

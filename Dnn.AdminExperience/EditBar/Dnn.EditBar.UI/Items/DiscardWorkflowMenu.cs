@@ -23,7 +23,9 @@ namespace Dnn.EditBar.UI.Items
         public DiscardWorkflowMenu()
             : this(null, null)
         {
+		eventLogger.LogDebug(">>> Entering DiscardWorkflowMenu()");
         }
+		eventLogger.LogDebug("<<< Exiting DiscardWorkflowMenu()");
 
         /// <inheritdoc />
         public override string Name => "DiscardWorkflow";
@@ -51,5 +53,6 @@ namespace Dnn.EditBar.UI.Items
             && !this.IsDirectPublishWorkflow
             && ((this.IsLastState == false && (this.IsDraftWithPermissions == true || this.IsReviewOrOtherIntermediateStateWithPermissions == true))
             || (this.IsLastState == true && this.HasUnpublishVersion && this.HasDraftPermission)); // handles other workflow scenarios (not Direct Publish)
+			eventLogger.LogDebug("<<< Exiting Visible()");
     }
 }

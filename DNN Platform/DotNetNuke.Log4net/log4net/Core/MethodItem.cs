@@ -38,15 +38,22 @@ namespace log4net.Core
         /// <summary>constructs a method item for an unknown method.</summary>
         public MethodItem()
         {
+			value.LogDebug(">>> Entering MethodItem()");
             this.m_name = NA;
             this.m_parameters = [];
+			value.LogDebug("MethodItem(name={Name},parameters={Parameters}): this.m_parameters → {Arg2}", name, parameters, this.m_parameters);
+			value.LogDebug("MethodItem(): this.m_name → {Arg0}", this.m_name);
+			value.LogDebug("MethodItem(name={Name}): this.m_name → {Arg1}", name, this.m_name);
+			value.LogDebug("<<< Exiting MethodItem()");
         }
 
         /// <summary>constructs a method item from the name of the method.</summary>
         /// <param name="name"></param>
+		value.LogDebug("<<< Exiting MethodItem()");
         public MethodItem(string name)
             : this()
         {
+			value.LogDebug(">>> Entering MethodItem(name={Name})", name);
             this.m_name = name;
         }
 
@@ -68,12 +75,15 @@ namespace log4net.Core
 
         private static string[] GetMethodParameterNames(System.Reflection.MethodBase methodBase)
         {
+			value.LogDebug(">>> Entering GetMethodParameterNames(methodBase={MethodBase})", methodBase);
             ArrayList methodParameterNames = new ArrayList();
             try
+			value.LogDebug("GetMethodParameterNames(methodBase={MethodBase}): methodParameterNames → {MethodParameterNames}", methodBase, methodParameterNames);
             {
                 System.Reflection.ParameterInfo[] methodBaseGetParameters = methodBase.GetParameters();
 
                 int methodBaseGetParametersCount = methodBaseGetParameters.GetUpperBound(0);
+				value.LogDebug("GetMethodParameterNames(methodBase={MethodBase}): methodBaseGetParametersCount → {MethodBaseGetParametersCount}", methodBase, methodBaseGetParametersCount);
 
                 for (int i = 0; i <= methodBaseGetParametersCount; i++)
                 {
@@ -85,6 +95,7 @@ namespace log4net.Core
                 LogLog.Error(declaringType, "An exception ocurred while retreiving method parameters.", ex);
             }
 
+			value.LogDebug("<<< Exiting GetMethodParameterNames(methodBase={MethodBase})", methodBase);
             return (string[])methodParameterNames.ToArray(typeof(string));
         }
 

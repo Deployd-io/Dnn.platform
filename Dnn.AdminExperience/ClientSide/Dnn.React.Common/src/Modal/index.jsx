@@ -4,59 +4,78 @@ import ReactDOM from "react-dom";
 import {Scrollbars} from "react-custom-scrollbars";
 import { XThinIcon } from "../SvgIcons";
 import "./style.less";
+const logger = console;
 
 
 class Modal extends Component {
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         if (this.props.isOpen) {
             this.handleModalOpened();
+			logger.debug('<<< Exiting componentDidMount()');
         }
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         if (!prevProps.isOpen && this.props.isOpen) {
             this.handleModalOpened();
         } else if (prevProps.isOpen && !this.props.isOpen) {
             this.handleModalClosed();
+			logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
         }
     }
 
     componentWillUnmount() {
+		logger.debug('>>> Entering componentWillUnmount()');
         this.handleModalClosed();
+		logger.debug('<<< Exiting componentWillUnmount()');
     }
 
     handleModalOpened() {
+		logger.debug('>>> Entering handleModalOpened()');
         if (document && document.body) {
             document.body.classList.add("ReactModal__Body--open");
         }
         if (this.props.onAfterOpen) {
             this.props.onAfterOpen();
+			logger.debug('<<< Exiting handleModalOpened()');
         }
     }
 
     handleModalClosed() {
+		logger.debug('>>> Entering handleModalClosed()');
         if (document && document.body) {
             document.body.classList.remove("ReactModal__Body--open");
+			logger.debug('<<< Exiting handleModalClosed()');
         }
     }
 
     onOverlayMouseDown() {
+		logger.debug('>>> Entering onOverlayMouseDown()');
         if (this.props.shouldCloseOnOverlayClick && this.props.onRequestClose) {
             this.props.onRequestClose();
+			logger.debug('<<< Exiting onOverlayMouseDown()');
         }
     }
 
     onContentMouseDown(event) {
+		logger.debug(`>>> Entering onContentMouseDown(event=${event})`);
         event.stopPropagation();
+		logger.debug(`<<< Exiting onContentMouseDown(event=${event})`);
     }
 
     onPortalKeyDown(event) {
+		logger.debug(`>>> Entering onPortalKeyDown(event=${event})`);
         if (event.key === "Escape" && this.props.onRequestClose) {
             this.props.onRequestClose();
+			logger.debug(`<<< Exiting onPortalKeyDown(event=${event})`);
         }
     }
 
     getScrollbarStyle(props) {
+		logger.debug(`>>> Entering getScrollbarStyle(props=${props})`);
+		logger.debug(`<<< Exiting getScrollbarStyle(props=${props})`);
         return {
             width: "100%",
             height: props.header ? "calc(100% - 55px)" : "100%",
@@ -65,8 +84,11 @@ class Modal extends Component {
         };
     }
     getModalStyles(props) {
+		logger.debug(`>>> Entering getModalStyles(props=${props})`);
         let modalWidth = props.modalWidth;
         let modalTopMargin = props.modalTopMargin;
+		logger.debug(`getModalStyles(props=${props}): modalWidth → ${modalWidth}`);
+		logger.debug(`getModalStyles(props=${props}): modalTopMargin → ${modalTopMargin}`);
         if (document.getElementsByClassName("socialpanel") && document.getElementsByClassName("socialpanel").length > 0 && !props.modalWidth) {
             modalWidth = document.getElementsByClassName("socialpanel")[0].offsetWidth;
         }
@@ -109,6 +131,7 @@ class Modal extends Component {
         const customOverlay = props.style && props.style.overlay ? props.style.overlay : {};
         const customContent = props.style && props.style.content ? props.style.content : {};
 
+		logger.debug(`<<< Exiting getModalStyles(props=${props})`);
         return {
             overlay: {
                 ...defaultStyles.overlay,
@@ -122,13 +145,16 @@ class Modal extends Component {
     }
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         if (!props.isOpen || !document || !document.body) {
             return null;
         }
 
         const modalStyles = this.getModalStyles(props);
+		logger.debug(`render(): modalStyles → ${modalStyles}`);
         const scrollBarStyle = this.getScrollbarStyle(props);
+		logger.debug('<<< Exiting render()');
         return ReactDOM.createPortal(
             <div className="ReactModalPortal" onKeyDown={this.onPortalKeyDown.bind(this)}>
                 <div

@@ -28,8 +28,10 @@ namespace Dnn.PersonaBar.Servers.Services
 
         public static string FirstCharToUpper(string input, CultureInfo culture)
         {
+			Logger.LogDebug(">>> Entering FirstCharToUpper(input={Input},culture={Culture})", input, culture);
             if (string.IsNullOrEmpty(input))
             {
+			Logger.LogDebug("<<< Exiting FirstCharToUpper(input={Input})", input);
                 return input;
             }
 
@@ -39,9 +41,11 @@ namespace Dnn.PersonaBar.Servers.Services
         [HttpGet]
         public HttpResponseMessage GetApplicationInfo()
         {
+			Logger.LogDebug(">>> Entering GetApplicationInfo()");
             try
             {
                 var friendlyUrlProvider = GetProviderConfiguration("friendlyUrl");
+				Logger.LogDebug("GetApplicationInfo(): friendlyUrlProvider → {FriendlyUrlProvider}", friendlyUrlProvider);
                 return this.Request.CreateResponse(HttpStatusCode.OK, new
                 {
                     product = DotNetNukeContext.Current.Application.Description,
@@ -57,10 +61,22 @@ namespace Dnn.PersonaBar.Servers.Services
                     webFarmEnabled = DotNetNuke.Services.Cache.CachingProvider.Instance().IsWebFarm().ToString(),
                     casPermissions = SecurityPolicy.Permissions,
                 });
+				Logger.LogDebug("GetApplicationInfo(): version → {Version}", version);
+				Logger.LogDebug("GetApplicationInfo(): webFarmEnabled → {WebFarmEnabled}", webFarmEnabled);
+				Logger.LogDebug("GetApplicationInfo(): dataProvider → {DataProvider}", dataProvider);
+				Logger.LogDebug("GetApplicationInfo(): friendlyUrlsEnabled → {FriendlyUrlsEnabled}", friendlyUrlsEnabled);
+				Logger.LogDebug("GetApplicationInfo(): loggingProvider → {LoggingProvider}", loggingProvider);
+				Logger.LogDebug("GetApplicationInfo(): schedulerMode → {SchedulerMode}", schedulerMode);
+				Logger.LogDebug("GetApplicationInfo(): htmlEditorProvider → {HtmlEditorProvider}", htmlEditorProvider);
+				Logger.LogDebug("GetApplicationInfo(): product → {Product}", product);
+				Logger.LogDebug("GetApplicationInfo(): cachingProvider → {CachingProvider}", cachingProvider);
+				Logger.LogDebug("GetApplicationInfo(): casPermissions → {CasPermissions}", casPermissions);
+				Logger.LogDebug("GetApplicationInfo(): friendlyUrlType → {FriendlyUrlType}", friendlyUrlType);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetApplicationInfo()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -69,11 +85,15 @@ namespace Dnn.PersonaBar.Servers.Services
         {
             var urlProvider = (Provider)ProviderConfiguration.GetProviderConfiguration("friendlyUrl").Providers[friendlyUrlProvider];
             var urlFormat = urlProvider.Attributes["urlformat"];
+			Logger.LogDebug(">>> Entering GetFriendlyUrlType(friendlyUrlProvider={FriendlyUrlProvider})", friendlyUrlProvider);
+			Logger.LogDebug("<<< Exiting GetFriendlyUrlType(friendlyUrlProvider={FriendlyUrlProvider})", friendlyUrlProvider);
             return string.IsNullOrWhiteSpace(urlFormat) ? "SearchFriendly" : FirstCharToUpper(urlFormat, CultureInfo.InvariantCulture);
         }
 
         private static string GetProviderConfiguration(string providerName)
         {
+			Logger.LogDebug(">>> Entering GetProviderConfiguration(providerName={ProviderName})", providerName);
+			Logger.LogDebug("<<< Exiting GetProviderConfiguration(providerName={ProviderName})", providerName);
             return ProviderConfiguration.GetProviderConfiguration(providerName).DefaultProvider;
         }
     }

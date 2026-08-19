@@ -28,13 +28,16 @@ namespace DotNetNuke.UI.Containers
         public ActionCommandButton()
             : this(null)
         {
+		eventLogger.LogDebug(">>> Entering ActionCommandButton()");
         }
+		eventLogger.LogDebug("<<< Exiting ActionCommandButton()");
 
         /// <summary>Initializes a new instance of the <see cref="ActionCommandButton"/> class.</summary>
         /// <param name="eventLogger">The event logger.</param>
         public ActionCommandButton(IEventLogger eventLogger)
         {
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
+			eventLogger.LogDebug("ActionCommandButton(eventLogger={EventLogger}): eventLogger → {EventLogger1}", eventLogger, eventLogger);
         }
 
         /// <inheritdoc />
@@ -59,41 +62,50 @@ namespace DotNetNuke.UI.Containers
         /// <summary>CreateChildControls builds the control tree.</summary>
         protected override void CreateChildControls()
         {
+			eventLogger.LogDebug(">>> Entering CreateChildControls()");
             // Call base class method to ensure Control Tree is built
             base.CreateChildControls();
 
             // Set Causes Validation and Enables ViewState to false
             this.CausesValidation = false;
+			eventLogger.LogDebug("CreateChildControls(): this.CausesValidation → {Arg0}", this.CausesValidation);
             this.EnableViewState = false;
+			eventLogger.LogDebug("<<< Exiting CreateChildControls()");
         }
 
         /// <summary>OnAction raises the Action Event.</summary>
         /// <param name="e">The event arguments.</param>
         protected virtual void OnAction(ActionEventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnAction(e={E})", e);
             this.Action?.Invoke(this, e);
+			eventLogger.LogDebug("<<< Exiting OnAction(e={E})", e);
         }
 
         /// <summary>OnButtonClick runs when the underlying CommandButton is clicked.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnButtonClick(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnButtonClick(e={E})", e);
             base.OnButtonClick(e);
             if (!this.ActionManager.ProcessAction(this.ModuleAction))
             {
                 this.OnAction(new ActionEventArgs(this.ModuleAction, this.ModuleControl.ModuleContext.Configuration));
             }
+			eventLogger.LogDebug("<<< Exiting OnButtonClick(e={E})", e);
         }
 
         /// <summary>OnPreRender runs when just before the Render phase of the Page Lifecycle.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnPreRender(EventArgs e)
         {
+			eventLogger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
 
             if (this.ModuleAction != null && this.ActionManager.IsVisible(this.ModuleAction))
             {
                 this.Text = this.ModuleAction.Title;
+				eventLogger.LogDebug("OnPreRender(e={E}): this.Text → {Arg1}", e, this.Text);
                 this.CommandArgument = this.ModuleAction.ID.ToString(CultureInfo.InvariantCulture);
 
                 if (this.DisplayIcon && (!string.IsNullOrEmpty(this.ModuleAction.Icon) || !string.IsNullOrEmpty(this.ImageUrl)))
@@ -120,7 +132,9 @@ namespace DotNetNuke.UI.Containers
             else
             {
                 this.Visible = false;
+				eventLogger.LogDebug("OnPreRender(e={E}): this.Visible → {Arg1}", e, this.Visible);
             }
+			eventLogger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
     }
 }

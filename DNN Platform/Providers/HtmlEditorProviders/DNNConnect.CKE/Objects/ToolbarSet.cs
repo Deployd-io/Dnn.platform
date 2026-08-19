@@ -12,15 +12,21 @@ namespace DNNConnect.CKEditorProvider.Objects
         /// <summary>Initializes a new instance of the <see cref="ToolbarSet" /> class.</summary>
         public ToolbarSet()
         {
+			eventLogger.LogDebug(">>> Entering ToolbarSet()");
             this.ToolbarGroups = new List<ToolbarGroup>();
+			eventLogger.LogDebug("<<< Exiting ToolbarSet()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ToolbarSet" /> class.</summary>
+		eventLogger.LogDebug("<<< Exiting ToolbarSet()");
         /// <param name="name">The name.</param>
         public ToolbarSet(string name)
         {
+			eventLogger.LogDebug(">>> Entering ToolbarSet(name={Name})", name);
             this.Name = name;
             this.ToolbarGroups = new List<ToolbarGroup>();
+			eventLogger.LogDebug("ToolbarSet(name={Name}): this.Name → {Arg1}", name, this.Name);
+			eventLogger.LogDebug("<<< Exiting ToolbarSet(name={Name})", name);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ToolbarSet" /> class.</summary>
@@ -28,8 +34,10 @@ namespace DNNConnect.CKEditorProvider.Objects
         /// <param name="priority">The priority.</param>
         public ToolbarSet(string name, int priority)
         {
+			eventLogger.LogDebug(">>> Entering ToolbarSet(name={Name},priority={Priority})", name, priority);
             this.Name = name;
             this.Priority = priority;
+			eventLogger.LogDebug("ToolbarSet(name={Name},priority={Priority}): this.Name → {Arg2}", name, priority, this.Name);
             this.ToolbarGroups = new List<ToolbarGroup>();
         }
 

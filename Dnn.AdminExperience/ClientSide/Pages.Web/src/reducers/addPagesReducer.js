@@ -1,6 +1,9 @@
 import ActionTypes from "../constants/actionTypes/addPagesActionTypes";
+const logger = console;
 
 function getEmptyBulkPage() {
+	logger.debug('>>> Entering getEmptyBulkPage()');
+	logger.debug('<<< Exiting getEmptyBulkPage()');
     return {
         bulkPages: "",
         parentId: null,
@@ -13,11 +16,13 @@ function getEmptyBulkPage() {
 }
 
 function changeField(state, field, value) {
+	logger.debug(`>>> Entering changeField(state=${state},field=${field},value=${value})`);
     const newBulkPage = {
         ...state.bulkPage
     };  
     newBulkPage[field] = value;
     
+	logger.debug(`<<< Exiting changeField(state=${state},field=${field},value=${value})`);
     return newBulkPage;
 }
 

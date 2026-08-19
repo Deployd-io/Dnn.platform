@@ -31,9 +31,11 @@ namespace Dnn.PersonaBar.UI.Services
         [HttpGet]
         public HttpResponseMessage GetPortals(bool addAll = false)
         {
+			Logger.LogDebug(">>> Entering GetPortals(addAll={AddAll})", addAll);
             try
             {
                 var portals = PortalController.Instance.GetPortals().OfType<IPortalInfo>();
+				Logger.LogDebug("GetPortals(addAll={AddAll}): portals → {Portals}", addAll, portals);
                 if (!this.UserInfo.IsSuperUser)
                 {
                     portals = portals.Where(portal => portal.PortalId == this.PortalId);
@@ -52,6 +54,8 @@ namespace Dnn.PersonaBar.UI.Services
                         PortalId = -1,
                         PortalName = Localization.GetString("AllSites", Constants.SharedResources),
                     });
+					Logger.LogDebug("GetPortals(addAll={AddAll}): PortalId → {PortalId}", addAll, PortalId);
+					Logger.LogDebug("GetPortals(addAll={AddAll}): PortalName → {PortalName}", addAll, PortalName);
                 }
 
                 var response = new
@@ -60,12 +64,16 @@ namespace Dnn.PersonaBar.UI.Services
                     Results = availablePortals,
                     TotalResults = availablePortals.Count,
                 };
+				Logger.LogDebug("GetPortals(addAll={AddAll}): TotalResults → {TotalResults}", addAll, TotalResults);
+				Logger.LogDebug("GetPortals(addAll={AddAll}): Results → {Results}", addAll, Results);
+				Logger.LogDebug("GetPortals(addAll={AddAll}): Success → {Success}", addAll, Success);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetPortals(addAll={AddAll})", addAll);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }

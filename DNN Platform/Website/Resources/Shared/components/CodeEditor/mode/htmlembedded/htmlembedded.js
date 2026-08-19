@@ -2,6 +2,7 @@
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("../htmlmixed/htmlmixed"),
         require("../../addon/mode/multiplex"));
@@ -14,6 +15,8 @@
   "use strict";
 
   CodeMirror.defineMode("htmlembedded", function(config, parserConfig) {
+	logger.debug('>>> Entering defineMode()');
+	logger.debug('<<< Exiting defineMode()');
     return CodeMirror.multiplexingMode(CodeMirror.getMode(config, "htmlmixed"), {
       open: parserConfig.open || parserConfig.scriptStartRegex || "<%",
       close: parserConfig.close || parserConfig.scriptEndRegex || "%>",
@@ -26,3 +29,4 @@
   CodeMirror.defineMIME("application/x-jsp", {name: "htmlembedded", scriptingModeSpec:"text/x-java"});
   CodeMirror.defineMIME("application/x-erb", {name: "htmlembedded", scriptingModeSpec:"ruby"});
 });
+logger.debug(`<<< Exiting function(exports=${exports})`);

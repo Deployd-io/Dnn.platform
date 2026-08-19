@@ -24,6 +24,7 @@ namespace DotNetNuke.Modules.SearchResults
     /// <summary>A control which displays search results.</summary>
     public partial class SearchResults : PortalModuleBase
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SearchResults.ascx));
         private const int DefaultPageIndex = 1;
         private const int DefaultPageSize = 15;
         private const int DefaultSortOption = 0;
@@ -41,8 +42,10 @@ namespace DotNetNuke.Modules.SearchResults
         public SearchResults()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering SearchResults()");
         }
 
+		Logger.LogDebug("<<< Exiting SearchResults()");
         /// <summary>Initializes a new instance of the <see cref="SearchResults"/> class.</summary>
         /// <param name="javaScript">The JavaScript library helper.</param>
         /// <param name="clientResourceController">The client resources controller.</param>
@@ -50,6 +53,10 @@ namespace DotNetNuke.Modules.SearchResults
         public SearchResults(IJavaScriptLibraryHelper javaScript, IClientResourceController clientResourceController)
             : this(javaScript, clientResourceController, null)
         {
+		Logger.LogDebug(">>> Entering SearchResults(javaScript={JavaScript},clientResourceController={ClientResourceController})", javaScript, clientResourceController);
+		Logger.LogDebug("<<< Exiting SearchResults(javaScript={JavaScript},clientResourceController={ClientResourceController})", javaScript, clientResourceController);
+		Logger.LogDebug("SearchResults(javaScript={JavaScript},clientResourceController={ClientResourceController},servicesFramework={ServicesFramework}): clientResourceController → {ClientResourceController1}", javaScript, clientResourceController, servicesFramework, clientResourceController);
+		Logger.LogDebug("SearchResults(javaScript={JavaScript},clientResourceController={ClientResourceController},servicesFramework={ServicesFramework}): servicesFramework → {ServicesFramework1}", javaScript, clientResourceController, servicesFramework, servicesFramework);
         }
 
         /// <summary>Initializes a new instance of the <see cref="SearchResults"/> class.</summary>
@@ -371,6 +378,7 @@ namespace DotNetNuke.Modules.SearchResults
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.servicesFramework.RequestAjaxAntiForgerySupport();
@@ -384,6 +392,7 @@ namespace DotNetNuke.Modules.SearchResults
             foreach (string o in this.SearchContentSources)
             {
                 var item = new ListItem(o, o) { Selected = this.CheckedScopeItem(o) };
+				Logger.LogDebug("OnLoad(e={E}): item → {Item}", e, item);
                 this.SearchScopeList.Items.Add(item);
             }
 
@@ -392,38 +401,49 @@ namespace DotNetNuke.Modules.SearchResults
                 Localization.GetResourceFile(this, MyFileName));
 
             var pageSizeItem = this.ResultsPerPageList.FindItemByValue(this.PageSize.ToString());
+			Logger.LogDebug("OnLoad(e={E}): pageSizeItem → {PageSizeItem}", e, pageSizeItem);
             if (pageSizeItem != null)
             {
                 pageSizeItem.Selected = true;
+				Logger.LogDebug("OnLoad(e={E}): pageSizeItem.Selected → {Arg1}", e, pageSizeItem.Selected);
             }
 
             this.SetLastModifiedFilter();
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         private bool CheckedScopeItem(string scopeItemName)
         {
+			Logger.LogDebug(">>> Entering CheckedScopeItem(scopeItemName={ScopeItemName})", scopeItemName);
             var searchScope = this.SearchScope;
+			Logger.LogDebug("<<< Exiting CheckedScopeItem(scopeItemName={ScopeItemName})", scopeItemName);
             return searchScope.Length == 0 || searchScope.Any(x => x == scopeItemName);
         }
 
         private void SetLastModifiedFilter()
         {
+			Logger.LogDebug(">>> Entering SetLastModifiedFilter()");
             var lastModifiedParam = this.LastModifiedParam;
 
             if (!string.IsNullOrEmpty(lastModifiedParam))
             {
                 var item = this.AdvnacedDatesList.Items.Cast<ListItem>().FirstOrDefault(x => x.Value == lastModifiedParam);
+				Logger.LogDebug("SetLastModifiedFilter(): item → {Item}", item);
                 if (item != null)
                 {
                     item.Selected = true;
+					Logger.LogDebug("SetLastModifiedFilter(): item.Selected → {Arg0}", item.Selected);
                 }
             }
+			Logger.LogDebug("<<< Exiting SetLastModifiedFilter()");
         }
 
         private bool GetBooleanSetting(string settingName, bool defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetBooleanSetting(settingName={SettingName},defaultValue={DefaultValue})", settingName, defaultValue);
             if (this.Settings.ContainsKey(settingName) && !string.IsNullOrEmpty(Convert.ToString(this.Settings[settingName])))
             {
+			Logger.LogDebug("<<< Exiting GetBooleanSetting(settingName={SettingName},defaultValue={DefaultValue})", settingName, defaultValue);
                 return Convert.ToBoolean(this.Settings[settingName]);
             }
 
@@ -432,9 +452,11 @@ namespace DotNetNuke.Modules.SearchResults
 
         private int GetIntegerSetting(string settingName, int defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetIntegerSetting(settingName={SettingName},defaultValue={DefaultValue})", settingName, defaultValue);
             var settingValue = Convert.ToString(this.Settings[settingName]);
             if (!string.IsNullOrEmpty(settingValue) && Regex.IsMatch(settingValue, "^\\d+$"))
             {
+			Logger.LogDebug("<<< Exiting GetIntegerSetting(settingName={SettingName},defaultValue={DefaultValue})", settingName, defaultValue);
                 return Convert.ToInt32(settingValue);
             }
 

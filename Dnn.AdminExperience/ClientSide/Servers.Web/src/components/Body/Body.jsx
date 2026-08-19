@@ -18,11 +18,14 @@ import PerformanceTab from "../Tabs/Performance/Index";
 import LogsTab from "../Tabs/Logs";
 import application from "../../globals/application";
 import utils from "../../utils";
+const logger = console;
 
 class Body extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.handleSelect = this.handleSelect.bind(this);
+		logger.debug('<<< Exiting constructor()');
     }
 
     handleSelect(index) {
@@ -47,21 +50,27 @@ class Body extends Component {
     }
 
     getInteger(value) {
+		logger.debug(`>>> Entering getInteger(value=${value})`);
         if (value === 0) {
             return 0;
         }
         if (value) {
+		logger.debug(`<<< Exiting getInteger(value=${value})`);
             return parseInt(value.toString());
         }
         return value;
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { props } = this;
         const isHost = utils.isHostUser();
+		logger.debug(`render(): isHost → ${isHost}`);
         let registeredTabs = application.getRegisteredServerTabs();
+		logger.debug(`render(): registeredTabs → ${registeredTabs}`);
         if (!isHost) {
             registeredTabs = registeredTabs.filter(function (tab) {
+				logger.debug('>>> Entering filter()');
                 return !tab.isHostOnlyVisible;
             });
         }
@@ -156,6 +165,7 @@ class Body extends Component {
         this.insertElementsInArray(
             serverSettingsTabBody,
             registeredTabs.filter(function (tab) {
+		logger.debug('<<< Exiting render()');
                 return tab.parentIndex === 1;
             }),
             "order",
@@ -184,6 +194,8 @@ Body.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         applicationInfo: state.applicationTab.applicationInfo,
         tabIndex: state.pagination.tabIndex,

@@ -113,6 +113,8 @@ namespace log4net.Appender
         /// </remarks>
         public UdpAppender() 
         {
+		value.LogDebug(">>> Entering UdpAppender()");
+		value.LogDebug("<<< Exiting UdpAppender()");
         }
 
         /// <summary>
@@ -326,14 +328,17 @@ namespace log4net.Appender
         /// <exception cref="ArgumentOutOfRangeException">The TCP port number assigned to <see cref="LocalPort" /> or <see cref="RemotePort" /> is less than <see cref="IPEndPoint.MinPort" /> or greater than <see cref="IPEndPoint.MaxPort" />.</exception>
         public override void ActivateOptions()
         {
+			value.LogDebug(">>> Entering ActivateOptions()");
             base.ActivateOptions();
 
             if (this.RemoteAddress == null) 
             {
+				value.LogWarning("Throwing ArgumentNullException from ActivateOptions()");
                 throw new ArgumentNullException("The required property 'Address' was not specified.");
             } 
             else if (this.RemotePort < IPEndPoint.MinPort || this.RemotePort > IPEndPoint.MaxPort) 
             {
+				value.LogWarning("Throwing CreateArgumentOutOfRangeException from ActivateOptions()");
                 throw Util.SystemInfo.CreateArgumentOutOfRangeException("this.RemotePort", (object)this.RemotePort,
                     "The RemotePort is less than " + 
                     IPEndPoint.MinPort.ToString(NumberFormatInfo.InvariantInfo) + 
@@ -353,6 +358,7 @@ namespace log4net.Appender
                 this.RemoteEndPoint = new IPEndPoint(this.RemoteAddress, this.RemotePort);
                 this.InitializeClientConnection();
             }
+			value.LogDebug("<<< Exiting ActivateOptions()");
         }
 
         /// <summary>This method is called by the <see cref="M:AppenderSkeleton.DoAppend(LoggingEvent)"/> method.</summary>
@@ -367,8 +373,13 @@ namespace log4net.Appender
         /// </remarks>
         protected override void Append(LoggingEvent loggingEvent) 
         {
+			value.LogDebug(">>> Entering Append(loggingEvent={LoggingEvent})", loggingEvent);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             try 
             {
+			value.LogError("Exception in Append(loggingEvent={LoggingEvent}): {Arg1}", loggingEvent, ex.getMessage());
+			value.LogInformation("Append(loggingEvent)={LoggingEvent}: external service call took {Arg1} ms", loggingEvent, __logStart.ElapsedMilliseconds);
+			value.LogDebug("<<< Exiting Append(loggingEvent={LoggingEvent})", loggingEvent);
                 Byte [] buffer = this.m_encoding.GetBytes(this.RenderLoggingEvent(loggingEvent).ToCharArray());
 #if NETSTANDARD
                 Client.SendAsync(buffer, buffer.Length, RemoteEndPoint).Wait();
@@ -412,12 +423,14 @@ namespace log4net.Appender
         /// </remarks>
         protected override void OnClose() 
         {
+			value.LogDebug(">>> Entering OnClose()");
             base.OnClose();
 
             if (this.Client != null) 
             {
                 this.Client.Close();
             }
+			value.LogDebug("<<< Exiting OnClose()");
         }
 
         /// <summary>Initializes the underlying  <see cref="UdpClient" /> connection.</summary>
@@ -432,6 +445,7 @@ namespace log4net.Appender
         /// </remarks>
         protected virtual void InitializeClientConnection() 
         {
+			value.LogDebug(">>> Entering InitializeClientConnection()");
             try 
             {
                 if (this.LocalPort == 0)
@@ -461,6 +475,7 @@ namespace log4net.Appender
 
                 this.Client = null;
             }
+			value.LogDebug("InitializeClientConnection(): this.Client → {Arg0}", this.Client);
         }
 
         /// <summary>

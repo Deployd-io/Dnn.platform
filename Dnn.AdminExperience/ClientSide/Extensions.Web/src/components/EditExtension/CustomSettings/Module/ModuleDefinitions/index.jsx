@@ -10,10 +10,12 @@ import { ModuleDefinitionActions } from "actions";
 import DefinitionFields from "./DefinitionFields";
 import utils from "utils";
 import "./style.less";
+const logger = console;
 
 class ModuleDefinitions extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             moduleDefinitionBeingEdited: {},
             moduleDefinitionBeingEditedIndex: null,
@@ -24,9 +26,12 @@ class ModuleDefinitions extends Component {
             triedToSave: false,
             editMode: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
     getNewModuleDefinition() {
+		logger.debug('>>> Entering getNewModuleDefinition()');
         const { props } = this;
+		logger.debug('<<< Exiting getNewModuleDefinition()');
         return {
             id: -1,
             desktopModuleId: props.desktopModuleId,
@@ -36,11 +41,14 @@ class ModuleDefinitions extends Component {
         };
     }
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         this.setState({
             moduleDefinitionBeingEdited: this.getNewModuleDefinition()
         });
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
     confirmAction(callback) {
+		logger.debug(`>>> Entering confirmAction(callback=${callback})`);
         const { props } = this;
         if (props.formIsDirty) {
             utilities.utilities.confirm(Localization.get("UnsavedChanges.HelpText"), Localization.get("UnsavedChanges.Confirm"), Localization.get("UnsavedChanges.Cancel"), () => {
@@ -52,15 +60,19 @@ class ModuleDefinitions extends Component {
             });
         } else {
             callback();
+			logger.debug(`<<< Exiting confirmAction(callback=${callback})`);
         }
     }
     resetError() {
+		logger.debug('>>> Entering resetError()');
+		logger.debug('<<< Exiting resetError()');
         return {
             name: false,
             friendlyName: false
         };
     }
     exitEditMode() {
+		logger.debug('>>> Entering exitEditMode()');
         this.confirmAction(() => {
             this.setState({
                 moduleDefinitionBeingEdited: this.getNewModuleDefinition(),
@@ -70,8 +82,10 @@ class ModuleDefinitions extends Component {
                 triedToSave: false
             });
         });
+		logger.debug('<<< Exiting exitEditMode()');
     }
     _onEditModuleDefinition(moduleDefinitionBeingEdited, moduleDefinitionBeingEditedIndex) {
+		logger.debug(`>>> Entering _onEditModuleDefinition(moduleDefinitionBeingEdited=${moduleDefinitionBeingEdited},moduleDefinitionBeingEditedIndex=${moduleDefinitionBeingEditedIndex})`);
         this.setState({
             editMode: true,
             error: {
@@ -81,11 +95,14 @@ class ModuleDefinitions extends Component {
             moduleDefinitionBeingEdited,
             moduleDefinitionBeingEditedIndex
         });
+		logger.debug(`<<< Exiting _onEditModuleDefinition(moduleDefinitionBeingEdited=${moduleDefinitionBeingEdited},moduleDefinitionBeingEditedIndex=${moduleDefinitionBeingEditedIndex})`);
     }
     onEditModuleDefinition(moduleDefinitionBeingEdited, moduleDefinitionBeingEditedIndex) {
+		logger.debug(`>>> Entering onEditModuleDefinition(moduleDefinitionBeingEdited=${moduleDefinitionBeingEdited},moduleDefinitionBeingEditedIndex=${moduleDefinitionBeingEditedIndex})`);
         this.confirmAction(() => {
             this._onEditModuleDefinition(moduleDefinitionBeingEdited, moduleDefinitionBeingEditedIndex);
         });
+		logger.debug(`<<< Exiting onEditModuleDefinition(moduleDefinitionBeingEdited=${moduleDefinitionBeingEdited},moduleDefinitionBeingEditedIndex=${moduleDefinitionBeingEditedIndex})`);
     }
     onChange(key, event) {
         const { props, state } = this;
@@ -110,6 +127,7 @@ class ModuleDefinitions extends Component {
         }
     }
     onSave() {
+		logger.debug('>>> Entering onSave()');
         const { props, state } = this;
         let { error, } = state;
         let triedToSave = true;
@@ -128,6 +146,7 @@ class ModuleDefinitions extends Component {
         }
 
         let extensionBeingUpdated = JSON.parse(JSON.stringify(props.extensionBeingEdited));
+		logger.debug(`onSave(): extensionBeingUpdated → ${extensionBeingUpdated}`);
         let moduleDefinitions = extensionBeingUpdated.moduleDefinitions.value;
         if (state.moduleDefinitionBeingEditedIndex > -1) {
             moduleDefinitions[state.moduleDefinitionBeingEditedIndex] = state.moduleDefinitionBeingEdited;
@@ -137,40 +156,51 @@ class ModuleDefinitions extends Component {
 
         state.moduleDefinitionBeingEdited.desktopModuleId = props.extensionBeingEdited.desktopModuleId.value;
         let actions = { savedefinition: JSON.stringify(state.moduleDefinitionBeingEdited) };
+		logger.debug(`onSave(): actions → ${actions}`);
 
         props.dispatch(ExtensionActions.updateExtension(extensionBeingUpdated, actions, props.extensionBeingEditedIndex, () => {
             props.dispatch(ModuleDefinitionActions.setFormDirt(false, () => {
                 this.exitEditMode();
             }));
         }));
+		logger.debug('<<< Exiting onSave()');
     }
     onControlSave() {
+		logger.debug('>>> Entering onControlSave()');
         const { props, state } = this;
         let extensionBeingUpdated = JSON.parse(JSON.stringify(props.extensionBeingEdited));
+		logger.debug(`onControlSave(): extensionBeingUpdated → ${extensionBeingUpdated}`);
         state.moduleDefinitionBeingEdited.desktopModuleId = props.extensionBeingEdited.desktopModuleId.value;
         let actions = { savedefinition: JSON.stringify(state.moduleDefinitionBeingEdited) };
+		logger.debug(`onControlSave(): actions → ${actions}`);
 
         props.dispatch(ExtensionActions.updateExtension(extensionBeingUpdated, actions, props.extensionBeingEditedIndex, () => {
             props.dispatch(ModuleDefinitionActions.setFormDirt(false, () => {
                 this.exitEditMode();
+				logger.debug('<<< Exiting onControlSave()');
             }));
         }));
     }
     onDelete(definitionId) {
+		logger.debug(`>>> Entering onDelete(definitionId=${definitionId})`);
         utilities.utilities.confirm("Are you sure you want to delete this module definition?", "Yes", "No", () => {
             const { props } = this;
 
             let extensionBeingUpdated = JSON.parse(JSON.stringify(props.extensionBeingEdited));
+			logger.debug(`onDelete(definitionId=${definitionId}): extensionBeingUpdated → ${extensionBeingUpdated}`);
 
             let actions = { deletedefinition: definitionId.toString() };
+			logger.debug(`onDelete(definitionId=${definitionId}): actions → ${actions}`);
 
             props.dispatch(ExtensionActions.updateExtension(extensionBeingUpdated, actions, props.extensionBeingEditedIndex, () => {
                 utils.utilities.notify(Localization.get("UpdateComplete"));
+				logger.debug(`<<< Exiting onDelete(definitionId=${definitionId})`);
             }));
         });
     }
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
         const moduleDefinitions = props.extensionBeingEdited.moduleDefinitions.value.map((moduleDefinition, index) => {
 
@@ -192,7 +222,9 @@ class ModuleDefinitions extends Component {
         });
 
         const isAddMode = state.editMode && state.moduleDefinitionBeingEditedIndex === -1;
+		logger.debug(`render(): moduleDefinitions → ${moduleDefinitions}`);
 
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className="module-definitions">
                 <GridCell className="header-container">
@@ -232,6 +264,8 @@ ModuleDefinitions.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         extensionBeingEdited: state.extension.extensionBeingEdited,
         controlFormIsDirty: state.moduleDefinition.controlFormIsDirty

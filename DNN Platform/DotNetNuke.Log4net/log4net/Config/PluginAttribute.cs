@@ -64,10 +64,14 @@ namespace log4net.Config
         /// </remarks>
         public PluginAttribute(string typeName)
         {
+			value.LogDebug(">>> Entering PluginAttribute(typeName={TypeName})", typeName);
             this.m_typeName = typeName;
+			value.LogDebug("PluginAttribute(typeName={TypeName}): this.m_typeName → {Arg1}", typeName, this.m_typeName);
+			value.LogDebug("<<< Exiting PluginAttribute(typeName={TypeName})", typeName);
         }
 #endif
 
+		value.LogDebug("<<< Exiting PluginAttribute(typeName={TypeName})", typeName);
         /// <summary>
         /// Initializes a new instance of the <see cref="PluginAttribute" /> class
         /// with the specified type.
@@ -80,7 +84,9 @@ namespace log4net.Config
         /// </remarks>
         public PluginAttribute(Type type)
         {
+			value.LogDebug(">>> Entering PluginAttribute(type={Type})", type);
             this.m_type = type;
+			value.LogDebug("PluginAttribute(type={Type}): m_type → {M_type}", type, m_type);
         }
 
         /// <summary>Gets or sets the type for the plugin.</summary>
@@ -126,8 +132,11 @@ namespace log4net.Config
         /// <returns>The plugin object.</returns>
         public IPlugin CreatePlugin()
         {
+			value.LogDebug(">>> Entering CreatePlugin()");
+			value.LogDebug("<<< Exiting CreatePlugin()");
             Type pluginType = this.m_type;
 #if !NETSTANDARD1_3
+			value.LogDebug("CreatePlugin(): pluginType → {PluginType}", pluginType);
             if (this.m_type == null)
             {
                 // Get the plugin object type from the string type name
@@ -137,11 +146,13 @@ namespace log4net.Config
             // Check that the type is a plugin
             if (!(typeof(IPlugin).IsAssignableFrom(pluginType)))
             {
+				value.LogWarning("Throwing LogException from CreatePlugin()");
                 throw new LogException("Plugin type [" + pluginType.FullName + "] does not implement the log4net.IPlugin interface");
             }
 
             // Create an instance of the plugin using the default constructor
             IPlugin plugin = (IPlugin)Activator.CreateInstance(pluginType);
+			value.LogDebug("CreatePlugin(): plugin → {Plugin}", plugin);
 
             return plugin;
         }
@@ -156,8 +167,10 @@ namespace log4net.Config
         /// <returns>A representation of the properties of this object</returns>
         public override string ToString()
         {
+			value.LogDebug(">>> Entering ToString()");
             if (this.m_type != null)
             {
+			value.LogDebug("<<< Exiting ToString()");
                 return "PluginAttribute[Type=" + this.m_type.FullName + "]";
             }
             return "PluginAttribute[Type=" + this.m_typeName + "]";

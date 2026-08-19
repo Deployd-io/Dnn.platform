@@ -1,3 +1,4 @@
+const logger = console;
 ﻿; if (typeof window.dnn === "undefined" || window.dnn === null) { window.dnn = {}; }; //var dnn = dnn || {};
 
 // Copyright (c) .NET Foundation. All rights reserved.
@@ -69,6 +70,8 @@
         },
         
         id: function() {
+			logger.debug(`>>> Entering function(selector=${selector},options=${options},methods=${methods})`);
+			logger.debug(`<<< Exiting function(selector=${selector},options=${options},methods=${methods})`);
             return this.$element.attr('id');
         },
 
@@ -320,6 +323,7 @@
 
 dnn.createDropDownList = function (selector, options, methods) {
     $(document).ready(function () {
+		logger.debug(`>>> Entering ready(document=${document})`);
         var $element = $(selector);
         // in case when control is excluded from rendering by server tags logic,
         // a check on the html element existence is performed here:

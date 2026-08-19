@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,11 +13,17 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("nginx", function(config) {
+logger.debug('>>> Entering defineMode()');
 
+logger.debug('<<< Exiting defineMode()');
   function words(str) {
+	logger.debug(`>>> Entering words(str=${str})`);
     var obj = {}, words = str.split(" ");
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+	logger.debug(`words(str=${str}): obj → ${obj}`);
+	logger.debug(`<<< Exiting words(str=${str})`);
     return obj;
   }
 
@@ -36,11 +44,13 @@ CodeMirror.defineMode("nginx", function(config) {
   function ret(style, tp) {type = tp; return style;}
 
   function tokenBase(stream, state) {
+logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
 
 
     stream.eatWhile(/[\w\$_]/);
 
     var cur = stream.current();
+	logger.debug(`tokenBase(stream=${stream},state=${state}): cur → ${cur}`);
 
 
     if (keywords.propertyIsEnumerable(cur)) {
@@ -55,9 +65,11 @@ CodeMirror.defineMode("nginx", function(config) {
     /**/
 
     var ch = stream.next();
+	logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
     if (ch == "@") {stream.eatWhile(/[\w\\\-]/); return ret("meta", stream.current());}
     else if (ch == "/" && stream.eat("*")) {
       state.tokenize = tokenCComment;
+	logger.debug(`tokenBase(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
       return tokenCComment(stream, state);
     }
     else if (ch == "<" && stream.eat("!")) {
@@ -90,35 +102,45 @@ CodeMirror.defineMode("nginx", function(config) {
     }
     else {
       stream.eatWhile(/[\w\\\-]/);
+	logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
       return ret("variable", "variable");
     }
   }
 
   function tokenCComment(stream, state) {
+	logger.debug(`>>> Entering tokenCComment(stream=${stream},state=${state})`);
     var maybeEnd = false, ch;
     while ((ch = stream.next()) != null) {
       if (maybeEnd && ch == "/") {
         state.tokenize = tokenBase;
+		logger.debug(`tokenCComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
         break;
       }
       maybeEnd = (ch == "*");
     }
+	logger.debug(`tokenCComment(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`);
+	logger.debug(`<<< Exiting tokenCComment(stream=${stream},state=${state})`);
     return ret("comment", "comment");
   }
 
   function tokenSGMLComment(stream, state) {
+	logger.debug(`>>> Entering tokenSGMLComment(stream=${stream},state=${state})`);
     var dashes = 0, ch;
     while ((ch = stream.next()) != null) {
       if (dashes >= 2 && ch == ">") {
         state.tokenize = tokenBase;
+		logger.debug(`tokenSGMLComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
         break;
       }
       dashes = (ch == "-") ? dashes + 1 : 0;
     }
+	logger.debug(`tokenSGMLComment(stream=${stream},state=${state}): dashes → ${dashes}`);
+	logger.debug(`<<< Exiting tokenSGMLComment(stream=${stream},state=${state})`);
     return ret("comment", "comment");
   }
 
   function tokenString(quote) {
+	logger.debug(`>>> Entering tokenString(quote=${quote})`);
     return function(stream, state) {
       var escaped = false, ch;
       while ((ch = stream.next()) != null) {
@@ -127,23 +149,29 @@ CodeMirror.defineMode("nginx", function(config) {
         escaped = !escaped && ch == "\\";
       }
       if (!escaped) state.tokenize = tokenBase;
+	logger.debug(`<<< Exiting tokenString(quote=${quote})`);
       return ret("string", "string");
     };
   }
 
   return {
     startState: function(base) {
+	logger.debug(`>>> Entering startState(base=${base})`);
       return {tokenize: tokenBase,
               baseIndent: base || 0,
               stack: []};
+			logger.debug(`<<< Exiting startState(base=${base})`);
     },
 
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       if (stream.eatSpace()) return null;
       type = null;
       var style = state.tokenize(stream, state);
+	logger.debug(`token(stream=${stream},state=${state}): style → ${style}`);
 
       var context = state.stack[state.stack.length-1];
+	logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
       if (type == "hash" && context == "rule") style = "atom";
       else if (style == "variable") {
         if (context == "rule") style = "number";
@@ -163,7 +191,9 @@ CodeMirror.defineMode("nginx", function(config) {
     },
 
     indent: function(state, textAfter) {
+	logger.debug(`>>> Entering indent(state=${state},textAfter=${textAfter})`);
       var n = state.stack.length;
+	logger.debug(`<<< Exiting indent(state=${state},textAfter=${textAfter})`);
       if (/^\}/.test(textAfter))
         n -= state.stack[state.stack.length-1] == "rule" ? 2 : 1;
       return state.baseIndent + n * indentUnit;

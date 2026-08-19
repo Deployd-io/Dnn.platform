@@ -16,6 +16,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// </summary>
     public class LanguageComponentWriter : FileComponentWriter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(LanguageComponentWriter));
         private readonly int dependentPackageID;
         private readonly Locale language;
         private readonly LanguagePackType packageType;
@@ -31,8 +32,12 @@ namespace DotNetNuke.Services.Installer.Writers
         public LanguageComponentWriter(Locale language, string basePath, Dictionary<string, InstallFile> files, PackageInfo package)
             : base(basePath, files, package)
         {
+			Logger.LogDebug(">>> Entering LanguageComponentWriter(language={Language},basePath={BasePath},files={Files},package={Package})", language, basePath, files, package);
             this.language = language;
             this.packageType = LanguagePackType.Core;
+			Logger.LogDebug("LanguageComponentWriter(language={Language},basePath={BasePath},files={Files},package={Package}): this.language → {Arg4}", language, basePath, files, package, this.language);
+			Logger.LogDebug("<<< Exiting LanguageComponentWriter(language={Language},basePath={BasePath},files={Files},package={Package})", language, basePath, files, package);
+			Logger.LogDebug("LanguageComponentWriter(language={Language},basePath={BasePath},files={Files},package={Package}): packageType → {PackageType}", language, basePath, files, package, packageType);
         }
 
         /// <summary>
@@ -48,6 +53,8 @@ namespace DotNetNuke.Services.Installer.Writers
         {
             this.language = LocaleController.Instance.GetLocale(languagePack.LanguageID);
             this.packageType = languagePack.PackageType;
+			Logger.LogDebug("LanguageComponentWriter(languagePack={LanguagePack},basePath={BasePath},files={Files},package={Package}): packageType → {PackageType}", languagePack, basePath, files, package, packageType);
+			Logger.LogDebug("LanguageComponentWriter(languagePack={LanguagePack},basePath={BasePath},files={Files},package={Package}): this.packageType → {Arg4}", languagePack, basePath, files, package, this.packageType);
             this.dependentPackageID = languagePack.DependentPackageID;
         }
 
@@ -92,6 +99,7 @@ namespace DotNetNuke.Services.Installer.Writers
         /// <param name="writer">The Xmlwriter to use.</param>
         protected override void WriteCustomManifest(XmlWriter writer)
         {
+			Logger.LogDebug(">>> Entering WriteCustomManifest(writer={Writer})", writer);
             // Write language Elements
             writer.WriteElementString("code", this.language.Code);
             if (this.packageType == LanguagePackType.Core)
@@ -102,8 +110,10 @@ namespace DotNetNuke.Services.Installer.Writers
             else
             {
                 PackageInfo package = PackageController.Instance.GetExtensionPackage(Null.NullInteger, p => p.PackageID == this.dependentPackageID);
+				Logger.LogDebug("WriteCustomManifest(writer={Writer}): package → {Package}", writer, package);
                 writer.WriteElementString("package", package.Name);
             }
+			Logger.LogDebug("<<< Exiting WriteCustomManifest(writer={Writer})", writer);
         }
     }
 }

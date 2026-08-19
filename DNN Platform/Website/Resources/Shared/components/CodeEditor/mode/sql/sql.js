@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,6 +13,7 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("sql", function(config, parserConfig) {
   "use strict";
 
@@ -24,11 +27,14 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
       dateSQL        = parserConfig.dateSQL || {"date" : true, "time" : true, "timestamp" : true};
 
   function tokenBase(stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
     var ch = stream.next();
 
+	logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
     // call hooks from the mime type
     if (hooks[ch]) {
       var result = hooks[ch](stream, state);
+	logger.debug(`tokenBase(stream=${stream},state=${state}): result → ${result}`);
       if (result !== false) return result;
     }
 
@@ -81,6 +87,7 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
       // multi-line comments
       // ref: https://kb.askmonty.org/en/comment-syntax/
       state.tokenize = tokenComment;
+	logger.debug(`tokenBase(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
       return state.tokenize(stream, state);
     } else if (ch == ".") {
       // .1 for 0.1
@@ -118,24 +125,30 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
 
   // 'string', with char specified in quote escaped by '\'
   function tokenLiteral(quote) {
+	logger.debug(`>>> Entering tokenLiteral(quote=${quote})`);
     return function(stream, state) {
       var escaped = false, ch;
       while ((ch = stream.next()) != null) {
         if (ch == quote && !escaped) {
           state.tokenize = tokenBase;
+		logger.debug(`tokenLiteral(quote=${quote}): state.tokenize → ${state.tokenize}`);
           break;
         }
         escaped = !escaped && ch == "\\";
+		logger.debug(`function(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
       }
+	logger.debug(`<<< Exiting tokenLiteral(quote=${quote})`);
       return "string";
     };
   }
   function tokenComment(stream, state) {
+	logger.debug(`>>> Entering tokenComment(stream=${stream},state=${state})`);
     while (true) {
       if (stream.skipTo("*")) {
         stream.next();
         if (stream.eat("/")) {
           state.tokenize = tokenBase;
+		logger.debug(`tokenComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
           break;
         }
       } else {
@@ -143,29 +156,39 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
         break;
       }
     }
+	logger.debug(`<<< Exiting tokenComment(stream=${stream},state=${state})`);
     return "comment";
   }
 
   function pushContext(stream, state, type) {
+	logger.debug(`>>> Entering pushContext(stream=${stream},state=${state},type=${type})`);
     state.context = {
       prev: state.context,
       indent: stream.indentation(),
       col: stream.column(),
       type: type
     };
+	logger.debug(`pushContext(stream=${stream},state=${state},type=${type}): state.context → ${state.context}`);
+	logger.debug(`<<< Exiting pushContext(stream=${stream},state=${state},type=${type})`);
   }
 
   function popContext(state) {
+	logger.debug(`>>> Entering popContext(state=${state})`);
     state.indent = state.context.indent;
     state.context = state.context.prev;
+	logger.debug(`popContext(state=${state}): state.context → ${state.context}`);
+	logger.debug(`<<< Exiting popContext(state=${state})`);
   }
 
   return {
     startState: function() {
+	logger.debug('>>> Entering startState()');
+	logger.debug('<<< Exiting startState()');
       return {tokenize: tokenBase, context: null};
     },
 
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       if (stream.sol()) {
         if (state.context && state.context.align == null)
           state.context.align = false;
@@ -173,12 +196,14 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
       if (stream.eatSpace()) return null;
 
       var style = state.tokenize(stream, state);
+	logger.debug(`token(stream=${stream},state=${state}): style → ${style}`);
       if (style == "comment") return style;
 
       if (state.context && state.context.align == null)
         state.context.align = true;
 
       var tok = stream.current();
+	logger.debug(`token(stream=${stream},state=${state}): tok → ${tok}`);
       if (tok == "(")
         pushContext(stream, state, ")");
       else if (tok == "[")
@@ -189,11 +214,14 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
     },
 
     indent: function(state, textAfter) {
+	logger.debug(`>>> Entering indent(state=${state},textAfter=${textAfter})`);
       var cx = state.context;
       if (!cx) return CodeMirror.Pass;
       var closing = textAfter.charAt(0) == cx.type;
+	logger.debug(`indent(state=${state},textAfter=${textAfter}): closing → ${closing}`);
       if (cx.align) return cx.col + (closing ? 0 : 1);
       else return cx.indent + (closing ? 0 : config.indentUnit);
+	logger.debug(`<<< Exiting indent(state=${state},textAfter=${textAfter})`);
     },
 
     blockCommentStart: "/*",
@@ -207,6 +235,7 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
 
   // `identifier`
   function hookIdentifier(stream) {
+	logger.debug(`>>> Entering hookIdentifier(stream=${stream})`);
     // MySQL/MariaDB identifiers
     // ref: http://dev.mysql.com/doc/refman/5.6/en/identifier-qualifiers.html
     var ch;
@@ -214,11 +243,13 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
       if (ch == "`" && !stream.eat("`")) return "variable-2";
     }
     stream.backUp(stream.current().length - 1);
+	logger.debug(`<<< Exiting hookIdentifier(stream=${stream})`);
     return stream.eatWhile(/\w/) ? "variable-2" : null;
   }
 
   // variable token
   function hookVar(stream) {
+	logger.debug(`>>> Entering hookVar(stream=${stream})`);
     // variables
     // @@prefix.varName @varName
     // varName can be quoted with ` or ' or "

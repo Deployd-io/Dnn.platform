@@ -16,9 +16,13 @@ namespace Dnn.PersonaBar.Security.Components
         /// <param name="checkname">The check name.</param>
         public CheckResult(SeverityEnum severity, string checkname)
         {
+			eventLogger.LogDebug(">>> Entering CheckResult(severity={Severity},checkname={Checkname})", severity, checkname);
             this.Severity = severity;
             this.CheckName = checkname;
+			eventLogger.LogDebug("CheckResult(severity={Severity},checkname={Checkname}): this.Severity → {Arg2}", severity, checkname, this.Severity);
+			eventLogger.LogDebug("CheckResult(severity={Severity},checkname={Checkname}): this.CheckName → {Arg2}", severity, checkname, this.CheckName);
             this.Notes = new List<string>();
+			eventLogger.LogDebug("<<< Exiting CheckResult(severity={Severity},checkname={Checkname})", severity, checkname);
         }
 
         public string Reason

@@ -8,15 +8,20 @@ namespace DotNetNuke.Entities.Content.Common
 
     internal class NameValueEqualityComparer : IEqualityComparer<KeyValuePair<string, string>>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(NameValueEqualityComparer));
         /// <inheritdoc />
         public bool Equals(KeyValuePair<string, string> x, KeyValuePair<string, string> y)
         {
+			Logger.LogDebug(">>> Entering Equals(x={X},y={Y})", x, y);
+			Logger.LogDebug("<<< Exiting Equals(x={X},y={Y})", x, y);
             return x.Key == y.Key && x.Value == y.Value;
         }
 
         /// <inheritdoc />
         public int GetHashCode(KeyValuePair<string, string> obj)
         {
+			Logger.LogDebug(">>> Entering GetHashCode(obj={Obj})", obj);
+			Logger.LogDebug("<<< Exiting GetHashCode(obj={Obj})", obj);
             return obj.Key.GetHashCode() ^ obj.Value.GetHashCode();
         }
     }

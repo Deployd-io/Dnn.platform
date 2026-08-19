@@ -44,8 +44,10 @@ public class MessagingServiceController : DnnApiController
     public MessagingServiceController()
         : this(null, null, null)
     {
+	Logger.LogDebug(">>> Entering MessagingServiceController()");
     }
 
+	Logger.LogDebug("<<< Exiting MessagingServiceController()");
     /// <summary>Initializes a new instance of the <see cref="MessagingServiceController"/> class.</summary>
     /// <param name="portalController">The portal controller.</param>
     /// <param name="appStatus">The application status.</param>
@@ -54,7 +56,9 @@ public class MessagingServiceController : DnnApiController
     {
         this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
         this.appStatus = appStatus ?? Globals.GetCurrentServiceProvider().GetRequiredService<IApplicationStatusInfo>();
+		Logger.LogDebug("MessagingServiceController(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): appStatus → {AppStatus1}", portalController, appStatus, portalGroupController, appStatus);
         this.portalGroupController = portalGroupController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalGroupController>();
+		Logger.LogDebug("MessagingServiceController(portalController={PortalController},appStatus={AppStatus},portalGroupController={PortalGroupController}): portalGroupController → {PortalGroupController1}", portalController, appStatus, portalGroupController, portalGroupController);
     }
 
     /// <summary>Gets how long a user needs to wait before being allowed to send a message.</summary>
@@ -62,6 +66,7 @@ public class MessagingServiceController : DnnApiController
     [HttpGet]
     public HttpResponseMessage WaitTimeForNextMessage()
     {
+		Logger.LogDebug(">>> Entering WaitTimeForNextMessage()");
         try
         {
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", Value = InternalMessagingController.Instance.WaitTimeForNextMessage(this.UserInfo) });
@@ -69,6 +74,7 @@ public class MessagingServiceController : DnnApiController
         catch (Exception exc)
         {
             Logger.Error(exc);
+			Logger.LogDebug("<<< Exiting WaitTimeForNextMessage()");
             return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
         }
     }
@@ -80,19 +86,26 @@ public class MessagingServiceController : DnnApiController
     [HttpPost]
     public HttpResponseMessage Create(CreateDTO postData)
     {
+		Logger.LogDebug(">>> Entering Create(postData={PostData})", postData);
         try
         {
             var portalId = PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, this.PortalSettings.PortalId);
+			Logger.LogDebug("Create(postData={PostData}): portalId → {PortalId}", postData, portalId);
             var roleIdsList = string.IsNullOrEmpty(postData.RoleIds) ? null : postData.RoleIds.FromJson<IList<int>>();
+			Logger.LogDebug("Create(postData={PostData}): roleIdsList → {RoleIdsList}", postData, roleIdsList);
             var userIdsList = string.IsNullOrEmpty(postData.UserIds) ? null : postData.UserIds.FromJson<IList<int>>();
+			Logger.LogDebug("Create(postData={PostData}): userIdsList → {UserIdsList}", postData, userIdsList);
             var fileIdsList = string.IsNullOrEmpty(postData.FileIds) ? null : postData.FileIds.FromJson<IList<int>>();
+			Logger.LogDebug("Create(postData={PostData}): fileIdsList → {FileIdsList}", postData, fileIdsList);
 
             if (fileIdsList != null)
             {
                 foreach (var fileId in fileIdsList)
                 {
                     var file = FileManager.Instance.GetFile(fileId);
+					Logger.LogDebug("Create(postData={PostData}): file → {File}", postData, file);
                     var folder = file != null ? FolderManager.Instance.GetFolder(file.FolderId) : null;
+					Logger.LogDebug("Create(postData={PostData}): folder → {Folder}", postData, folder);
                     if (folder == null || !FolderPermissionController.CanViewFolder((FolderInfo)folder))
                     {
                         return this.Request.CreateResponse(HttpStatusCode.Forbidden, "Access to the specified file is not permitted.");
@@ -105,16 +118,20 @@ public class MessagingServiceController : DnnApiController
                 : null;
 
             List<UserInfo> users = null;
+			Logger.LogDebug("Create(postData={PostData}): users → {Users}", postData, users);
             if (userIdsList != null)
             {
                 users = userIdsList.Select(id => UserController.Instance.GetUser(portalId, id)).Where(user => user != null).ToList();
             }
 
             var body = HttpUtility.UrlDecode(postData.Body);
+		Logger.LogDebug("<<< Exiting Create(postData={PostData})", postData);
+			Logger.LogDebug("Create(postData={PostData}): body → {Body}", postData, body);
 #pragma warning disable CS0618 // Type or member is obsolete
             body = PortalSecurity.Instance.InputFilter(body, PortalSecurity.FilterFlag.NoMarkup);
 #pragma warning restore CS0618 // Type or member is obsolete
             var message = new Message { Subject = HttpUtility.UrlDecode(postData.Subject), Body = body, };
+			Logger.LogDebug("Create(postData={PostData}): message → {Message}", postData, message);
             MessagingController.Instance.SendMessage(message, roles, users, fileIdsList);
             return this.Request.CreateResponse(HttpStatusCode.OK, new { Result = "success", Value = message.MessageID });
         }
@@ -131,14 +148,18 @@ public class MessagingServiceController : DnnApiController
     [HttpGet]
     public HttpResponseMessage Search(string q)
     {
+		Logger.LogDebug(">>> Entering Search(q={Q})", q);
         try
         {
             var portalId = PortalController.GetEffectivePortalId(this.portalController, this.appStatus, this.portalGroupController, this.PortalSettings.PortalId);
+			Logger.LogDebug("Search(q={Q}): portalId → {PortalId}", q, portalId);
             var isAdmin = this.UserInfo.IsSuperUser || this.UserInfo.IsInRole("Administrators");
+			Logger.LogDebug("Search(q={Q}): isAdmin → {IsAdmin}", q, isAdmin);
             const int numResults = 10;
 
             // GetUsersAdvancedSearch doesn't accept a comma or a single quote in the query so we have to remove them for now. See issue 20224.
             q = q.Replace(",", string.Empty).Replace("'", string.Empty);
+			Logger.LogDebug("Search(q={Q}): q → {Q1}", q, q);
             if (q.Length == 0)
             {
                 return this.Request.CreateResponse<object>(HttpStatusCode.OK, null);
@@ -151,9 +172,12 @@ public class MessagingServiceController : DnnApiController
                     name = user.DisplayName,
                     iconfile = UserController.Instance.GetUserProfilePictureUrl(user.UserID, 32, 32),
                 }).ToList();
+				Logger.LogDebug("Search(q={Q}): name → {Name}", q, name);
+				Logger.LogDebug("Search(q={Q}): iconfile → {Iconfile}", q, iconfile);
 
             // Roles should be visible to Administrators or User in the Role.
             var roles = RoleController.Instance.GetRolesBasicSearch(portalId, numResults, q);
+			Logger.LogDebug("Search(q={Q}): roles → {Roles}", q, roles);
             results.AddRange(from roleInfo in roles
                              where
                                  isAdmin ||
@@ -172,6 +196,7 @@ public class MessagingServiceController : DnnApiController
         catch (Exception exc)
         {
             Logger.Error(exc);
+			Logger.LogDebug("<<< Exiting Search(q={Q})", q);
             return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
         }
     }

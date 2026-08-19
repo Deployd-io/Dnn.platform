@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Dropdown from "./Dropdown";
+const logger = console;
 
 let timeArray = [];
 for (let i = 0; i < 24; i++) {
@@ -13,6 +14,7 @@ for (let i = 0; i < 24; i++) {
 timeArray = timeArray.map(t => {return {label: t, value: t};});
 
 function getHour(number) {
+	logger.debug(`>>> Entering getHour(number=${number})`);
     let hour = number;
     if (number > 12) {
         hour = number - 12;
@@ -20,6 +22,8 @@ function getHour(number) {
     if (hour < 10) {
         hour = "0" + hour;
     }
+	logger.debug(`getHour(number=${number}): hour → ${hour}`);
+	logger.debug(`<<< Exiting getHour(number=${number})`);
     return hour;
 }
 

@@ -15,6 +15,7 @@ import {
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 let canEdit = false;
 const reUserNameMinLength = /^[1-9][0-9]?[0-9]?$|^0$/;
@@ -22,6 +23,7 @@ const reUserNameMinLength = /^[1-9][0-9]?[0-9]?$|^0$/;
 class RegistrationSettingsPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             registrationSettings: undefined,
             triedToSubmit: false,
@@ -32,9 +34,11 @@ class RegistrationSettingsPanelBody extends Component {
             }
         };
         canEdit = util.settings.isHost || util.settings.isAdmin || util.settings.permissions.REGISTRATION_SETTINGS_EDIT;
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const { props } = this;
         if (props.registrationSettings) {
             this.setState({
@@ -48,19 +52,24 @@ class RegistrationSettingsPanelBody extends Component {
                 registrationSettings
             });
         }));
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     UNSAFE_componentWillReceiveProps(props) {
+		logger.debug(`>>> Entering UNSAFE_componentWillReceiveProps(props=${props})`);
         this.setState({
             registrationSettings: Object.assign({}, props.registrationSettings),
             triedToSubmit: false
         });
+		logger.debug(`<<< Exiting UNSAFE_componentWillReceiveProps(props=${props})`);
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let { state, props } = this;
 
         let registrationSettings = Object.assign({}, state.registrationSettings);
+		logger.debug(`onSettingChange(key=${key},event=${event}): registrationSettings → ${registrationSettings}`);
 
         if (key === "UserRegistration" || key === "RegistrationFormType") {
             registrationSettings[key] = parseInt(event);
@@ -87,9 +96,11 @@ class RegistrationSettingsPanelBody extends Component {
         });
 
         props.dispatch(SecurityActions.registrationSettingsClientModified(registrationSettings));
+		logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
     }
 
     onUpdate(event) {
+		logger.debug(`>>> Entering onUpdate(event=${event})`);
         event.preventDefault();
         const { props, state } = this;
         state.error["validationFields"] = "";
@@ -109,17 +120,21 @@ class RegistrationSettingsPanelBody extends Component {
             util.utilities.notifyError(resx.get("RegistrationSettingsError"));
             const errorMessage = JSON.parse(error.responseText);
             state.error["registrationFields"] = errorMessage.Message;
+			logger.debug(`onUpdate(event=${event}): errorMessage → ${errorMessage}`);
             state.error["validationFields"] = errorMessage.ModelState;
             this.setState({
                 error: state.error
             });
         }));
+		logger.debug(`<<< Exiting onUpdate(event=${event})`);
     }
 
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const { props } = this;
         util.utilities.confirm(resx.get("RegistrationSettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
             props.dispatch(SecurityActions.getRegistrationSettings((data) => {
+				logger.debug('<<< Exiting onCancel()');
                 let registrationSettings = Object.assign({}, data.Results.Settings);
                 this.setState({
                     registrationSettings
@@ -129,9 +144,11 @@ class RegistrationSettingsPanelBody extends Component {
     }
 
     keyValuePairsToOptions(keyValuePairs) {
+		logger.debug(`>>> Entering keyValuePairsToOptions(keyValuePairs=${keyValuePairs})`);
         let options = [];
         if (keyValuePairs !== undefined) {
             options = keyValuePairs.map((item) => {
+		logger.debug(`<<< Exiting keyValuePairsToOptions(keyValuePairs=${keyValuePairs})`);
                 return { label: item.Key, value: item.Value };
             });
         }
@@ -139,17 +156,21 @@ class RegistrationSettingsPanelBody extends Component {
     }
 
     isCustomFormType() {
+		logger.debug('>>> Entering isCustomFormType()');
         const { state } = this;
         if (state.registrationSettings != undefined && state.registrationSettings.RegistrationFormType === 1) {
+		logger.debug('<<< Exiting isCustomFormType()');
             return true;
         }
         return false;
     }
 
     getRegistrationFields(fields) {
+		logger.debug(`>>> Entering getRegistrationFields(fields=${fields})`);
         let fieldList = [];
         if (fields) {
             fieldList = fields.split(",").map((item) => {
+		logger.debug(`<<< Exiting getRegistrationFields(fields=${fields})`);
                 return { id: item, name: item };
             });
         }
@@ -157,25 +178,31 @@ class RegistrationSettingsPanelBody extends Component {
     }
 
     onUpdateTags(event) {
+		logger.debug(`>>> Entering onUpdateTags(event=${event})`);
         let { state, props } = this;
         let registrationSettings = Object.assign({}, state.registrationSettings);
+		logger.debug(`onUpdateTags(event=${event}): registrationSettings → ${registrationSettings}`);
         let fields = event.map((field) => { return field.name; }).join(",");
+		logger.debug(`onUpdateTags(event=${event}): fields → ${fields}`);
         registrationSettings["RegistrationFields"] = fields;
         this.setState({
             registrationSettings: registrationSettings,
             triedToSubmit: false
         });
         props.dispatch(SecurityActions.registrationSettingsClientModified(registrationSettings));
+		logger.debug(`<<< Exiting onUpdateTags(event=${event})`);
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const { props, state } = this;
         const ToolTipStyle = {
             padding: "5px 0",
             float: "left"
         };
         if (state.registrationSettings) {
+			logger.debug('<<< Exiting render()');
             return (
                 <div className={styles.registrationSettings}>
                     <InputGroup>
@@ -583,6 +610,8 @@ RegistrationSettingsPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         registrationSettings: state.security.registrationSettings,

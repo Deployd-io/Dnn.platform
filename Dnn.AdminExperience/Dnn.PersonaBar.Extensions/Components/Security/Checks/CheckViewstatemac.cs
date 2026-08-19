@@ -19,14 +19,17 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc />
         public CheckResult Execute()
         {
+			eventLogger.LogDebug(">>> Entering Execute()");
             var result = new CheckResult(SeverityEnum.Unverified, this.Id);
             var page = HttpContext.Current.Handler as Page;
+			eventLogger.LogDebug("Execute(): result → {Result}", result);
 
             if (page != null)
             {
                 if (page.EnableViewStateMac == false)
                 {
                     result.Severity = SeverityEnum.Failure;
+					eventLogger.LogDebug("Execute(): result.Severity → {Arg0}", result.Severity);
                 }
                 else
                 {
@@ -34,6 +37,7 @@ namespace Dnn.PersonaBar.Security.Components.Checks
                 }
             }
 
+			eventLogger.LogDebug("<<< Exiting Execute()");
             return result;
         }
     }

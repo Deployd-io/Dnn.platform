@@ -1,9 +1,15 @@
+const logger = console;
 if (!DDR.Menu.Providers.DNNMenu) {
     DDRjQuery(function ($) {
+		logger.debug('>>> Entering DDRjQuery()');
         DDR.Menu.Providers.DNNMenu = function (jqContainer, dnnNavParams) {
+			logger.debug(`>>> Entering function(jqContainer=${jqContainer},dnnNavParams=${dnnNavParams})`);
             var me = this;
 
             me.baseConstructor(jqContainer, dnnNavParams);
+			logger.debug(`<<< Exiting function(menu=${menu})`);
+			logger.debug(`<<< Exiting function(item=${item})`);
+			logger.debug(`<<< Exiting function(jqContainer=${jqContainer},dnnNavParams=${dnnNavParams})`);
         }
         DDR.Menu.Providers.DNNMenu.prototype = new DDR.Menu.Providers.BaseRenderer();
 
@@ -16,6 +22,8 @@ if (!DDR.Menu.Providers.DNNMenu) {
             outerContainer.append(dnnNavContainer);
 
             me.subMenus.each(function (m) {
+				logger.debug('>>> Entering each()');
+				logger.debug('<<< Exiting each()');
                 dnnNavContainer.append(me.createRenderedMenu(m));
             });
 
@@ -23,9 +31,11 @@ if (!DDR.Menu.Providers.DNNMenu) {
 
             me.jqContainer.show(1);
             me.jqContainer.queue(function () {
+				logger.debug('>>> Entering queue()');
                 me.addCovering();
                 me.prepareHideAndShow();
 
+				logger.debug('<<< Exiting queue()');
                 $(this).dequeue();
             });
         }
@@ -48,6 +58,7 @@ if (!DDR.Menu.Providers.DNNMenu) {
                 menu.flyout = true;
                 menu.layout = "vertical";
                 var parentItem = menu.parentItem;
+				logger.debug('<<< Exiting DDRjQuery()');
                 var parentMenu = parentItem.parentMenu;
 
 //                var result = $("<table cellspacing='0' cellpadding='0' border='0' />").css({ "position": "absolute", "left": "-1000px" });

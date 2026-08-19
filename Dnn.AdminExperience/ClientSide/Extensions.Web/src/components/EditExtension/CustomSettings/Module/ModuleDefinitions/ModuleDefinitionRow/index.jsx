@@ -5,18 +5,23 @@ import Localization from "localization";
 import Controls from "./Controls";
 import DefinitionFields from "../DefinitionFields";
 import "./style.less";
+const logger = console;
 
 
 class ModuleDefinitionRow extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             isOpened: false
         };
+		logger.debug('<<< Exiting constructor()');
     }
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={"module-definition-row " + (props.isEditMode ? " row-opened": "")}>
                 <GridCell columnSize={85} className="module-definition-name">

@@ -10,10 +10,13 @@ namespace DotNetNuke.ModulePipeline
     /// <inheritdoc />
     public class Startup : IDnnStartup
     {
+		private static readonly ILog TraceLogger = LoggerSource.Instance.GetLogger("DNN.Trace");
         /// <inheritdoc />
         public void ConfigureServices(IServiceCollection services)
         {
+			TraceLogger.LogDebug(">>> Entering ConfigureServices(services={Services})", services);
             services.AddSingleton<IModuleControlPipeline, ModuleControlPipeline>();
+			TraceLogger.LogDebug("<<< Exiting ConfigureServices(services={Services})", services);
         }
     }
 }

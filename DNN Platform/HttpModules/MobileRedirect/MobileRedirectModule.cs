@@ -23,6 +23,7 @@ namespace DotNetNuke.HttpModules
     /// <summary>An <see cref="IHttpModule"/> for mobile redirection.</summary>
     public class MobileRedirectModule : IHttpModule
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MobileRedirectModule));
         private static readonly List<string> SpecialPages = ["/login.aspx", "/register.aspx", "/terms.aspx", "/privacy.aspx", "/login", "/register", "/terms", "/privacy",];
         private static readonly Regex MvcServicePath = new Regex(@"DesktopModules/MVC/", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private readonly IRedirectionController redirectionController;
@@ -35,8 +36,10 @@ namespace DotNetNuke.HttpModules
         public MobileRedirectModule()
             : this(null, null, null, null)
         {
+		Logger.LogDebug(">>> Entering MobileRedirectModule()");
         }
 
+		Logger.LogDebug("<<< Exiting MobileRedirectModule()");
         /// <summary>Initializes a new instance of the <see cref="MobileRedirectModule"/> class.</summary>
         /// <param name="redirectionController">The redirection controller.</param>
         /// <param name="portalController">The portal controller.</param>
@@ -47,7 +50,10 @@ namespace DotNetNuke.HttpModules
         {
             this.portalController = portalController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IPortalController>();
             this.redirectionController = redirectionController ?? Globals.GetCurrentServiceProvider().GetRequiredService<IRedirectionController>();
+			Logger.LogDebug("MobileRedirectModule(redirectionController={RedirectionController},portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): redirectionController → {RedirectionController1}", redirectionController, portalController, hostSettings, hostSettingsService, redirectionController);
+			Logger.LogDebug("MobileRedirectModule(redirectionController={RedirectionController},portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): hostSettingsService → {HostSettingsService1}", redirectionController, portalController, hostSettings, hostSettingsService, hostSettingsService);
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("MobileRedirectModule(redirectionController={RedirectionController},portalController={PortalController},hostSettings={HostSettings},hostSettingsService={HostSettingsService}): hostSettings → {HostSettings1}", redirectionController, portalController, hostSettings, hostSettingsService, hostSettings);
             this.hostSettingsService = hostSettingsService ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettingsService>();
         }
 
@@ -59,12 +65,16 @@ namespace DotNetNuke.HttpModules
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public void Init(HttpApplication application)
         {
+			Logger.LogDebug(">>> Entering Init(application={Application})", application);
             application.BeginRequest += this.OnBeginRequest;
+			Logger.LogDebug("<<< Exiting Init(application={Application})", application);
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+		Logger.LogDebug(">>> Entering Dispose()");
+		Logger.LogDebug("<<< Exiting Dispose()");
         }
 
         /// <summary>Handle the <see cref="HttpApplication.BeginRequest"/> event.</summary>
@@ -72,8 +82,11 @@ namespace DotNetNuke.HttpModules
         /// <param name="e">The event args.</param>
         public void OnBeginRequest(object s, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnBeginRequest(s={S},e={E})", s, e);
             var app = (HttpApplication)s;
             var portalSettings = this.portalController.GetCurrentSettings();
+			Logger.LogDebug("OnBeginRequest(s={S},e={E}): portalSettings → {PortalSettings}", s, e, portalSettings);
+			Logger.LogDebug("OnBeginRequest(s={S},e={E}): app → {App}", s, e, app);
 
             // First check if we are upgrading/installing
             var rawUrl = app.Request.RawUrl;
@@ -84,6 +97,8 @@ namespace DotNetNuke.HttpModules
                     || this.IsSpecialPage(rawUrl)
                     || (portalSettings != null && !this.IsRedirectAllowed(rawUrl, app, portalSettings)))
             {
+				Logger.LogDebug(">>> Entering IsSpecialPage(url={Url})", url);
+				Logger.LogDebug("<<< Exiting IsSpecialPage(url={Url})", url);
                 return;
             }
 
@@ -98,6 +113,7 @@ namespace DotNetNuke.HttpModules
             }
 
             var redirectUrl = this.redirectionController.GetRedirectUrl(app.Request.UserAgent);
+			Logger.LogDebug("OnBeginRequest(s={S},e={E}): redirectUrl → {RedirectUrl}", s, e, redirectUrl);
             if (string.IsNullOrEmpty(redirectUrl))
             {
                 return;
@@ -105,19 +121,25 @@ namespace DotNetNuke.HttpModules
 
             // append the query string from original url
             var idx = rawUrl.IndexOf("?", StringComparison.Ordinal);
+			Logger.LogDebug("OnBeginRequest(s={S},e={E}): idx → {Idx}", s, e, idx);
             var queryString = idx >= 0 ? rawUrl.Substring(idx + 1) : string.Empty;
+			Logger.LogDebug("OnBeginRequest(s={S},e={E}): queryString → {QueryString}", s, e, queryString);
             if (!string.IsNullOrEmpty(queryString))
             {
                 redirectUrl = string.Concat(redirectUrl, redirectUrl.Contains("?") ? "&" : "?", queryString);
             }
 
             app.Response.Redirect(redirectUrl);
+			Logger.LogDebug("<<< Exiting OnBeginRequest(s={S},e={E})", s, e);
         }
 
         private bool IsRedirectAllowed(string url, HttpApplication app, IPortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering IsRedirectAllowed(url={Url},app={App},portalSettings={PortalSettings})", url, app, portalSettings);
             var urlAction = new UrlAction(app.Request);
             urlAction.SetRedirectAllowed(url, new FriendlyUrlSettings(this.portalController, this.hostSettings, this.hostSettingsService, portalSettings.PortalId));
+			Logger.LogDebug("IsRedirectAllowed(url={Url},app={App},portalSettings={PortalSettings}): urlAction → {UrlAction}", url, app, portalSettings, urlAction);
+			Logger.LogDebug("<<< Exiting IsRedirectAllowed(url={Url},app={App},portalSettings={PortalSettings})", url, app, portalSettings);
             return urlAction.RedirectAllowed;
         }
 

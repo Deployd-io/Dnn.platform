@@ -13,6 +13,7 @@ namespace DotNetNuke.Services.Installer.Writers
     /// </summary>
     public class ContainerComponentWriter : SkinComponentWriter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ContainerComponentWriter));
         /// <summary>
         /// Initializes a new instance of the <see cref="ContainerComponentWriter"/> class.
         /// Constructs the ContainerComponentWriter.
@@ -24,6 +25,8 @@ namespace DotNetNuke.Services.Installer.Writers
         public ContainerComponentWriter(string containerName, string basePath, Dictionary<string, InstallFile> files, PackageInfo package)
             : base(containerName, basePath, files, package)
         {
+		Logger.LogDebug(">>> Entering ContainerComponentWriter(containerName={ContainerName},basePath={BasePath},files={Files},package={Package})", containerName, basePath, files, package);
+		Logger.LogDebug("<<< Exiting ContainerComponentWriter(containerName={ContainerName},basePath={BasePath},files={Files},package={Package})", containerName, basePath, files, package);
         }
 
         /// <summary>Gets the name of the Collection Node ("containerFiles").</summary>

@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import Table from "./Table";
+const logger = console;
 import {
     pageSeoActions as SeoActions
 } from "../../../actions";
@@ -10,14 +11,18 @@ import {
 class PageUrls extends Component {
         
     onSaveUrl() {
+		logger.debug('>>> Entering onSaveUrl()');
         this.props.onSaveUrl(this.props.editedUrl, this.props.primaryAliasId);
+		logger.debug('<<< Exiting onSaveUrl()');
     }
     
     render() {
+		logger.debug('>>> Entering render()');
         const {pageHasParent, addingNewUrl, editingUrl, onOpenEditForm, onDeleteUrl,
             editedUrl, onCloseEditUrl, onOpenNewForm, onCloseNewUrl, newFormOpened, siteAliases, primaryAliasId, 
             pageUrls, onChange, onAddNewUrl} = this.props;
         
+		logger.debug('<<< Exiting render()');
         return (
             <div>                
                 <Table pageUrls={pageUrls} 
@@ -61,6 +66,8 @@ PageUrls.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         newFormOpened: state.pageSeo.newFormOpened,
         editedUrl: state.pageSeo.editedUrl,
@@ -70,6 +77,8 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+	logger.debug(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`);
+	logger.debug(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`);
     return {
         ...bindActionCreators ({
             onOpenNewForm: SeoActions.openNewForm,

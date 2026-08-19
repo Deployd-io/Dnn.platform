@@ -224,6 +224,13 @@ namespace DotNetNuke.Entities.Modules
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string EditUrl()
         {
+			tracelLogger.LogDebug(">>> Entering EditUrl()");
+			tracelLogger.LogDebug("<<< Exiting EditUrl()");
+			tracelLogger.LogDebug("<<< Exiting EditUrl(controlKey={ControlKey})", controlKey);
+			tracelLogger.LogDebug("<<< Exiting EditUrl(keyName={KeyName},keyValue={KeyValue})", keyName, keyValue);
+			tracelLogger.LogDebug("<<< Exiting EditUrl(keyName={KeyName},keyValue={KeyValue},controlKey={ControlKey})", keyName, keyValue, controlKey);
+			tracelLogger.LogDebug("<<< Exiting EditUrl(keyName={KeyName},keyValue={KeyValue},controlKey={ControlKey},additionalParameters={AdditionalParameters})", keyName, keyValue, controlKey, additionalParameters);
+			tracelLogger.LogDebug("<<< Exiting EditUrl(tabID={TabID},controlKey={ControlKey},pageRedirect={PageRedirect},additionalParameters={AdditionalParameters})", tabID, controlKey, pageRedirect, additionalParameters);
             return this.ModuleContext.EditUrl();
         }
 
@@ -264,15 +271,19 @@ namespace DotNetNuke.Entities.Modules
 
         public int GetNextActionID()
         {
+			tracelLogger.LogDebug(">>> Entering GetNextActionID()");
+			tracelLogger.LogDebug("<<< Exiting GetNextActionID()");
             return this.ModuleContext.GetNextActionID();
         }
 
         /// <inheritdoc />
         public override void Dispose()
         {
+			tracelLogger.LogDebug(">>> Entering Dispose()");
             base.Dispose();
             this.Dispose(true);
             GC.SuppressFinalize(this);
+			tracelLogger.LogDebug("<<< Exiting Dispose()");
         }
 
         /// <summary>Gets the file name for the module cache.</summary>
@@ -282,9 +293,11 @@ namespace DotNetNuke.Entities.Modules
         [DnnDeprecated(7, 0, 0, "Please use ModuleController.CacheFileName(TabModuleID)", RemovalVersion = 11)]
         public partial string GetCacheFileName(int tabModuleId)
         {
+			tracelLogger.LogDebug(">>> Entering GetCacheFileName(tabModuleId={TabModuleId})", tabModuleId);
             string strCacheKey = "TabModule:";
             strCacheKey += tabModuleId + ":";
             strCacheKey += Thread.CurrentThread.CurrentUICulture.ToString();
+			tracelLogger.LogDebug("<<< Exiting GetCacheFileName(tabModuleId={TabModuleId})", tabModuleId);
             return PortalController.Instance.GetCurrentSettings().HomeDirectoryMapPath + "Cache" + @"\" + Globals.CleanFileName(strCacheKey) + ".resources";
         }
 
@@ -295,9 +308,11 @@ namespace DotNetNuke.Entities.Modules
         [DnnDeprecated(7, 0, 0, "Please use ModuleController.CacheKey(TabModuleID)", RemovalVersion = 11)]
         public partial string GetCacheKey(int tabModuleId)
         {
+			tracelLogger.LogDebug(">>> Entering GetCacheKey(tabModuleId={TabModuleId})", tabModuleId);
             string strCacheKey = "TabModule:";
             strCacheKey += tabModuleId + ":";
             strCacheKey += Thread.CurrentThread.CurrentUICulture.ToString();
+			tracelLogger.LogDebug("<<< Exiting GetCacheKey(tabModuleId={TabModuleId})", tabModuleId);
             return strCacheKey;
         }
 
@@ -305,11 +320,14 @@ namespace DotNetNuke.Entities.Modules
         [DnnDeprecated(7, 0, 0, "Please use ModuleController.SynchronizeModule(ModuleId)", RemovalVersion = 11)]
         public partial void SynchronizeModule()
         {
+			tracelLogger.LogDebug(">>> Entering SynchronizeModule()");
             ModuleController.SynchronizeModule(this.ModuleId);
+			tracelLogger.LogDebug("<<< Exiting SynchronizeModule()");
         }
 
         protected virtual void Dispose(bool disposing)
         {
+			tracelLogger.LogDebug(">>> Entering Dispose(disposing={Disposing})", disposing);
             if (disposing)
             {
                 if (this.serviceScopeContainer.IsValueCreated)
@@ -317,11 +335,13 @@ namespace DotNetNuke.Entities.Modules
                     this.serviceScopeContainer.Value.Dispose();
                 }
             }
+			tracelLogger.LogDebug("<<< Exiting Dispose(disposing={Disposing})", disposing);
         }
 
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			tracelLogger.LogDebug(">>> Entering OnInit(e={E})", e);
             if (this.tracelLogger.IsDebugEnabled)
             {
                 this.tracelLogger.Debug($"PortalModuleBase.OnInit Start (TabId:{this.PortalSettings.ActiveTab.TabID},ModuleId:{this.ModuleId}): {this.GetType()}");
@@ -332,11 +352,13 @@ namespace DotNetNuke.Entities.Modules
             {
                 this.tracelLogger.Debug($"PortalModuleBase.OnInit End (TabId:{this.PortalSettings.ActiveTab.TabID},ModuleId:{this.ModuleId}): {this.GetType()}");
             }
+			tracelLogger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			tracelLogger.LogDebug(">>> Entering OnLoad(e={E})", e);
             if (this.tracelLogger.IsDebugEnabled)
             {
                 this.tracelLogger.Debug($"PortalModuleBase.OnLoad Start (TabId:{this.PortalSettings.ActiveTab.TabID},ModuleId:{this.ModuleId}): {this.GetType()}");
@@ -347,23 +369,28 @@ namespace DotNetNuke.Entities.Modules
             {
                 this.tracelLogger.Debug($"PortalModuleBase.OnLoad End (TabId:{this.PortalSettings.ActiveTab.TabID},ModuleId:{this.ModuleId}): {this.GetType()}");
             }
+			tracelLogger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <summary>Helper method that can be used to add an ActionEventHandler to the Skin for this Module Control.</summary>
         /// <param name="e">The event arguments.</param>
         protected void AddActionHandler(ActionEventHandler e)
         {
+			tracelLogger.LogDebug(">>> Entering AddActionHandler(e={E})", e);
             UI.Skins.Skin parentSkin = UI.Skins.Skin.GetParentSkin(this);
             if (parentSkin != null)
             {
                 parentSkin.RegisterModuleActionEvent(this.ModuleId, e);
             }
+			tracelLogger.LogDebug("<<< Exiting AddActionHandler(e={E})", e);
         }
 
         /// <inheritdoc cref="Localization.GetString(string,string)"/>
         [DnnDeprecated(10, 0, 2, "Use LocalizeText or LocalizeHtml")]
         protected partial string LocalizeString(string key)
         {
+			tracelLogger.LogDebug(">>> Entering LocalizeString(key={Key})", key);
+			tracelLogger.LogDebug("<<< Exiting LocalizeString(key={Key})", key);
             return Localization.GetString(key, this.LocalResourceFile);
         }
 
@@ -371,6 +398,8 @@ namespace DotNetNuke.Entities.Modules
         [DnnDeprecated(10, 0, 2, "Use LocalizeJsString")]
         protected partial string LocalizeSafeJsString(string key)
         {
+			tracelLogger.LogDebug(">>> Entering LocalizeSafeJsString(key={Key})", key);
+			tracelLogger.LogDebug("<<< Exiting LocalizeSafeJsString(key={Key})", key);
             return Localization.GetSafeJSString(key, this.LocalResourceFile);
         }
 
@@ -392,5 +421,6 @@ namespace DotNetNuke.Entities.Modules
         /// <returns>The localized text encoded as a JavaScript string.</returns>
         protected IHtmlString LocalizeJsString(string key, bool addDoubleQuotes = false)
             => HtmlUtils.JavaScriptStringEncode(Localization.GetString(key, this.LocalResourceFile), addDoubleQuotes);
+			tracelLogger.LogDebug("<<< Exiting LocalizeJsString(key={Key},addDoubleQuotes={AddDoubleQuotes})", key, addDoubleQuotes);
     }
 }

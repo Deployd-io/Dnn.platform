@@ -29,6 +29,7 @@ namespace DotNetNuke.Services.Social.Messaging
                                 : ServiceLocator<IMessagingController, MessagingController>,
                                 IMessagingController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(MessagingController));
         private const int MaxRecipients = 2000;
         private const int MaxSubjectLength = 400;
         private const double DefaultMessagingThrottlingIntervalMinutes = 0.5;
@@ -39,27 +40,34 @@ namespace DotNetNuke.Services.Social.Messaging
         public MessagingController()
             : this(DataService.Instance)
         {
+		Logger.LogDebug(">>> Entering MessagingController()");
         }
 
+		Logger.LogDebug("<<< Exiting MessagingController()");
         /// <summary>Initializes a new instance of the <see cref="MessagingController"/> class.</summary>
         /// <param name="dataService">The data service to use.</param>
         public MessagingController(IDataService dataService)
         {
             Requires.NotNull("dataService", dataService);
             this.dataService = dataService;
+			Logger.LogDebug("MessagingController(dataService={DataService}): dataService → {DataService1}", dataService, dataService);
         }
 
         /// <inheritdoc />
         public virtual void SendMessage(Message message, IList<RoleInfo> roles, IList<UserInfo> users, IList<int> fileIDs)
         {
+			Logger.LogDebug(">>> Entering SendMessage(message={Message},roles={Roles},users={Users},fileIDs={FileIDs})", message, roles, users, fileIDs);
             this.SendMessage(message, roles, users, fileIDs, UserController.Instance.GetCurrentUserInfo());
+			Logger.LogDebug("<<< Exiting SendMessage(message={Message},roles={Roles},users={Users},fileIDs={FileIDs})", message, roles, users, fileIDs);
         }
 
         /// <inheritdoc />
         public virtual void SendMessage(Message message, IList<RoleInfo> roles, IList<UserInfo> users, IList<int> fileIDs, UserInfo sender)
         {
+			Logger.LogDebug(">>> Entering SendMessage(message={Message},roles={Roles},users={Users},fileIDs={FileIDs},sender={Sender})", message, roles, users, fileIDs, sender);
             if (sender == null || sender.UserID <= 0)
             {
+				Logger.LogWarning("Throwing ArgumentException from SendMessage(message={Message},roles={Roles},users={Users},fileIDs={FileIDs},sender={Sender})", message, roles, users, fileIDs, sender);
                 throw new ArgumentException(Localization.GetString("MsgSenderRequiredError", Localization.ExceptionsResourceFile));
             }
 
@@ -97,7 +105,9 @@ namespace DotNetNuke.Services.Social.Messaging
             }
 
             var sbTo = new StringBuilder();
+			Logger.LogDebug("SendMessage(message={Message},roles={Roles},users={Users},fileIDs={FileIDs},sender={Sender}): sbTo → {SbTo}", message, roles, users, fileIDs, sender, sbTo);
             var replyAllAllowed = true;
+			Logger.LogDebug("SendMessage(message={Message},roles={Roles},users={Users},fileIDs={FileIDs},sender={Sender}): replyAllAllowed → {ReplyAllAllowed}", message, roles, users, fileIDs, sender, replyAllAllowed);
             if (roles != null)
             {
                 foreach (var role in roles.Where(role => !string.IsNullOrEmpty(role.RoleName)))
@@ -127,15 +137,19 @@ namespace DotNetNuke.Services.Social.Messaging
 
             // Cannot send message if within ThrottlingInterval
             var waitTime = InternalMessagingController.Instance.WaitTimeForNextMessage(sender);
+			Logger.LogDebug("SendMessage(message={Message},roles={Roles},users={Users},fileIDs={FileIDs},sender={Sender}): waitTime → {WaitTime}", message, roles, users, fileIDs, sender, waitTime);
             if (waitTime > 0)
             {
                 var interval = this.GetPortalSettingAsDouble("MessagingThrottlingInterval", sender.PortalID, DefaultMessagingThrottlingIntervalMinutes);
+				Logger.LogWarning("Throwing ThrottlingIntervalNotMetException from SendMessage(message={Message},roles={Roles},users={Users},fileIDs={FileIDs},sender={Sender})", message, roles, users, fileIDs, sender);
+				Logger.LogDebug("SendMessage(message={Message},roles={Roles},users={Users},fileIDs={FileIDs},sender={Sender}): interval → {Interval}", message, roles, users, fileIDs, sender, interval);
                 throw new ThrottlingIntervalNotMetException(string.Format(CultureInfo.CurrentCulture, Localization.GetString("MsgThrottlingIntervalNotMet", Localization.ExceptionsResourceFile), interval));
             }
 
             // Cannot have attachments if it's not enabled
             if (fileIDs is { Count: > 0, } && !InternalMessagingController.Instance.AttachmentsAllowed(sender.PortalID))
             {
+				Logger.LogWarning("Throwing AttachmentsNotAllowed from SendMessage(message={Message},roles={Roles},users={Users},fileIDs={FileIDs},sender={Sender})", message, roles, users, fileIDs, sender);
                 throw new AttachmentsNotAllowed(Localization.GetString("MsgAttachmentsNotAllowed", Localization.ExceptionsResourceFile));
             }
 
@@ -153,11 +167,13 @@ namespace DotNetNuke.Services.Social.Messaging
 
             if (recipientCount > InternalMessagingController.Instance.RecipientLimit(sender.PortalID))
             {
+				Logger.LogWarning("Throwing RecipientLimitExceededException from SendMessage(message={Message},roles={Roles},users={Users},fileIDs={FileIDs},sender={Sender})", message, roles, users, fileIDs, sender);
                 throw new RecipientLimitExceededException(Localization.GetString("MsgRecipientLimitExceeded", Localization.ExceptionsResourceFile));
             }
 
             // Profanity Filter
             var profanityFilterSetting = this.GetPortalSetting("MessagingProfanityFilters", sender.PortalID, "NO");
+			Logger.LogDebug("SendMessage(message={Message},roles={Roles},users={Users},fileIDs={FileIDs},sender={Sender}): profanityFilterSetting → {ProfanityFilterSetting}", message, roles, users, fileIDs, sender, profanityFilterSetting);
             if (profanityFilterSetting.Equals("YES", StringComparison.OrdinalIgnoreCase))
             {
                 message.Subject = this.InputFilter(message.Subject);
@@ -166,6 +182,10 @@ namespace DotNetNuke.Services.Social.Messaging
 
             message.To = sbTo.ToString().Trim(',');
             message.MessageID = Null.NullInteger;
+			Logger.LogDebug("SendMessage(message={Message},roles={Roles},users={Users},fileIDs={FileIDs},sender={Sender}): message.MessageID → {Arg5}", message, roles, users, fileIDs, sender, message.MessageID);
+			Logger.LogDebug("SendMessage(message={Message},roles={Roles},users={Users},fileIDs={FileIDs},sender={Sender}): message.ReplyAllAllowed → {Arg5}", message, roles, users, fileIDs, sender, message.ReplyAllAllowed);
+			Logger.LogDebug("SendMessage(message={Message},roles={Roles},users={Users},fileIDs={FileIDs},sender={Sender}): message.SenderUserID → {Arg5}", message, roles, users, fileIDs, sender, message.SenderUserID);
+			Logger.LogDebug("SendMessage(message={Message},roles={Roles},users={Users},fileIDs={FileIDs},sender={Sender}): message.From → {Arg5}", message, roles, users, fileIDs, sender, message.From);
             message.ReplyAllAllowed = replyAllAllowed;
             message.SenderUserID = sender.UserID;
             message.From = sender.DisplayName;
@@ -180,6 +200,8 @@ namespace DotNetNuke.Services.Social.Messaging
                     if (CanViewFile(attachment.FileID) && IsFileInUserFolder(attachment.FileID, sender))
                     {
                         this.dataService.SaveMessageAttachment(attachment, UserController.Instance.GetCurrentUserInfo().UserID);
+						Logger.LogDebug(">>> Entering IsFileInUserFolder(fileId={FileId},sender={Sender})", fileId, sender);
+						Logger.LogDebug("<<< Exiting IsFileInUserFolder(fileId={FileId},sender={Sender})", fileId, sender);
                     }
                 }
             }
@@ -200,6 +222,7 @@ namespace DotNetNuke.Services.Social.Messaging
             if (users == null)
             {
                 users = new List<UserInfo>();
+				Logger.LogDebug("SendMessage(message={Message},roles={Roles},users={Users},fileIDs={FileIDs},sender={Sender}): users → {Users1}", message, roles, users, fileIDs, sender, users);
             }
 
             foreach (var recipient in from user in users where InternalMessagingController.Instance.GetMessageRecipient(message.MessageID, user.UserID) == null select new MessageRecipient { MessageID = message.MessageID, UserID = user.UserID, Read = false, RecipientID = Null.NullInteger })
@@ -210,6 +233,7 @@ namespace DotNetNuke.Services.Social.Messaging
             if (users.All(u => u.UserID != sender.UserID))
             {
                 var recipient = InternalMessagingController.Instance.GetMessageRecipient(message.MessageID, sender.UserID);
+				Logger.LogDebug("SendMessage(message={Message},roles={Roles},users={Users},fileIDs={FileIDs},sender={Sender}): recipient → {Recipient}", message, roles, users, fileIDs, sender, recipient);
 
                 if (recipient == null)
                 {
@@ -223,6 +247,7 @@ namespace DotNetNuke.Services.Social.Messaging
 
             // Mark the conversation as read by the sender of the message.
             InternalMessagingController.Instance.MarkRead(message.MessageID, sender.UserID);
+			Logger.LogDebug("<<< Exiting SendMessage(message={Message},roles={Roles},users={Users},fileIDs={FileIDs},sender={Sender})", message, roles, users, fileIDs, sender);
         }
 
         /// <summary>
@@ -231,6 +256,8 @@ namespace DotNetNuke.Services.Social.Messaging
         /// <returns><see cref="UserInfo"/>.</returns>
         internal virtual UserInfo GetCurrentUserInfo()
         {
+			Logger.LogDebug(">>> Entering GetCurrentUserInfo()");
+			Logger.LogDebug("<<< Exiting GetCurrentUserInfo()");
             return UserController.Instance.GetCurrentUserInfo();
         }
 
@@ -243,6 +270,8 @@ namespace DotNetNuke.Services.Social.Messaging
         /// <returns>The setting value as a string.</returns>
         internal virtual string GetPortalSetting(string settingName, int portalId, string defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetPortalSetting(settingName={SettingName},portalId={PortalId},defaultValue={DefaultValue})", settingName, portalId, defaultValue);
+			Logger.LogDebug("<<< Exiting GetPortalSetting(settingName={SettingName},portalId={PortalId},defaultValue={DefaultValue})", settingName, portalId, defaultValue);
             return PortalController.GetPortalSetting(settingName, portalId, defaultValue);
         }
 
@@ -255,6 +284,8 @@ namespace DotNetNuke.Services.Social.Messaging
         /// <returns>The setting value as a double.</returns>
         internal virtual double GetPortalSettingAsDouble(string key, int portalId, double defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetPortalSettingAsDouble(key={Key},portalId={PortalId},defaultValue={DefaultValue})", key, portalId, defaultValue);
+			Logger.LogDebug("<<< Exiting GetPortalSettingAsDouble(key={Key},portalId={PortalId},defaultValue={DefaultValue})", key, portalId, defaultValue);
             return PortalController.GetPortalSettingAsDouble(key, portalId, defaultValue);
         }
 
@@ -265,7 +296,9 @@ namespace DotNetNuke.Services.Social.Messaging
         /// <returns>A string representing the input filter to use.</returns>
         internal virtual string InputFilter(string input)
         {
+			Logger.LogDebug(">>> Entering InputFilter(input={Input})", input);
             var ps = PortalSecurity.Instance;
+			Logger.LogDebug("<<< Exiting InputFilter(input={Input})", input);
             return ps.InputFilter(input, PortalSecurity.FilterFlag.NoProfanity);
         }
 
@@ -276,17 +309,22 @@ namespace DotNetNuke.Services.Social.Messaging
         /// <returns>Whether the user is an admin or host user.</returns>
         internal virtual bool IsAdminOrHost(UserInfo userInfo)
         {
+			Logger.LogDebug(">>> Entering IsAdminOrHost(userInfo={UserInfo})", userInfo);
+			Logger.LogDebug("<<< Exiting IsAdminOrHost(userInfo={UserInfo})", userInfo);
             return userInfo.IsSuperUser || userInfo.IsInRole(PortalController.Instance.GetCurrentSettings().AdministratorRoleName);
         }
 
         /// <inheritdoc />
         protected override Func<IMessagingController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => new MessagingController();
         }
 
         private static bool CanViewFile(int fileId)
         {
+			Logger.LogDebug(">>> Entering CanViewFile(fileId={FileId})", fileId);
             var file = FileManager.Instance.GetFile(fileId);
             if (file == null)
             {
@@ -294,11 +332,14 @@ namespace DotNetNuke.Services.Social.Messaging
             }
 
             var folder = FolderManager.Instance.GetFolder(file.FolderId);
+			Logger.LogDebug("CanViewFile(fileId={FileId}): folder → {Folder}", fileId, folder);
+			Logger.LogDebug("<<< Exiting CanViewFile(fileId={FileId})", fileId);
             return folder != null && FolderPermissionController.Instance.CanViewFolder(folder);
         }
 
         private static bool IsFileInUserFolder(int fileId, UserInfo sender)
         {
+			Logger.LogDebug(">>> Entering IsFileInUserFolder(fileId={FileId},sender={Sender})", fileId, sender);
             var file = FileManager.Instance.GetFile(fileId);
             if (file == null)
             {
@@ -306,16 +347,19 @@ namespace DotNetNuke.Services.Social.Messaging
             }
 
             var userFolder = FolderManager.Instance.GetUserFolder(sender);
+			Logger.LogDebug("IsFileInUserFolder(fileId={FileId},sender={Sender}): userFolder → {UserFolder}", fileId, sender, userFolder);
             if (userFolder is null)
             {
                 return false;
             }
 
             var folderId = file.FolderId;
+			Logger.LogDebug("IsFileInUserFolder(fileId={FileId},sender={Sender}): folderId → {FolderId}", fileId, sender, folderId);
 
             while (folderId != Null.NullInteger)
             {
                 var folder = FolderManager.Instance.GetFolder(folderId);
+				Logger.LogDebug("IsFileInUserFolder(fileId={FileId},sender={Sender}): folder → {Folder}", fileId, sender, folder);
                 if (folder == null)
                 {
                     return false;
@@ -329,6 +373,7 @@ namespace DotNetNuke.Services.Social.Messaging
                 folderId = folder.ParentID;
             }
 
+			Logger.LogDebug("<<< Exiting IsFileInUserFolder(fileId={FileId},sender={Sender})", fileId, sender);
             return false;
         }
     }

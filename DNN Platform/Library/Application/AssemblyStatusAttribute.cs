@@ -21,6 +21,7 @@ namespace DotNetNuke.Application
     /// </value>
     public enum ReleaseMode
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AssemblyStatusAttribute));
         /// <summary>Not assigned.</summary>
         None = 0,
 
@@ -50,7 +51,11 @@ namespace DotNetNuke.Application
         /// <param name="releaseMode">The release mode.</param>
         public AssemblyStatusAttribute(ReleaseMode releaseMode)
         {
+			Logger.LogDebug(">>> Entering AssemblyStatusAttribute(releaseMode={ReleaseMode})", releaseMode);
             this.releaseMode = releaseMode;
+			Logger.LogDebug("AssemblyStatusAttribute(releaseMode={ReleaseMode}): this.releaseMode → {Arg1}", releaseMode, this.releaseMode);
+			Logger.LogDebug("AssemblyStatusAttribute(releaseMode={ReleaseMode}): releaseMode → {ReleaseMode1}", releaseMode, releaseMode);
+			Logger.LogDebug("<<< Exiting AssemblyStatusAttribute(releaseMode={ReleaseMode})", releaseMode);
         }
 
         /// <summary>Gets status of current assembly.</summary>

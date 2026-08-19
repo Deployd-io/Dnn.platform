@@ -11,6 +11,7 @@ namespace Dnn.ExportImport.Components.Dto
     [JsonObject]
     public class ExportFileInfo : IDateTimeConverter
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ExportFileInfo));
         /// <summary>Gets or sets path for exported files.</summary>
         public string ExportPath { get; set; }
 
@@ -20,7 +21,9 @@ namespace Dnn.ExportImport.Components.Dto
         /// <inheritdoc />
         public void ConvertToLocal(UserInfo userInfo)
         {
+			Logger.LogDebug(">>> Entering ConvertToLocal(userInfo={UserInfo})", userInfo);
             // Nothing to convert.
+			Logger.LogDebug("<<< Exiting ConvertToLocal(userInfo={UserInfo})", userInfo);
         }
     }
 }

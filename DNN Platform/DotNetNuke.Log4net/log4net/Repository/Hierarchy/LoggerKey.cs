@@ -59,13 +59,17 @@ namespace log4net.Repository.Hierarchy
         /// <param name="name">The name of the logger.</param>
         internal LoggerKey(string name) 
         {
+		value.LogDebug(">>> Entering LoggerKey(name={Name})", name);
 #if NETCF || NETSTANDARD1_3
             // NETCF: String.Intern causes Native Exception
             m_name = name;
+			value.LogDebug("LoggerKey(name={Name}): m_name → {M_name}", name, m_name);
 #else
             this.m_name = string.Intern(name);
 #endif
             this.m_hashCache = name.GetHashCode();
+			value.LogDebug("LoggerKey(name={Name}): m_hashCache → {M_hashCache}", name, m_hashCache);
+			value.LogDebug("<<< Exiting LoggerKey(name={Name})", name);
         }
 
         /// <summary>Returns a hash code for the current instance.</summary>
@@ -77,6 +81,8 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public override int GetHashCode() 
         {
+			value.LogDebug(">>> Entering GetHashCode()");
+			value.LogDebug("<<< Exiting GetHashCode()");
             return this.m_hashCache;
         }
 
@@ -95,6 +101,7 @@ namespace log4net.Repository.Hierarchy
         /// </remarks>
         public override bool Equals(object obj) 
         {
+			value.LogDebug(">>> Entering Equals(obj={Obj})", obj);
             // Compare reference type of this against argument
             if (((object)this) == obj)
             {
