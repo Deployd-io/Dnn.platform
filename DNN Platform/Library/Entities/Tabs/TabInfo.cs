@@ -44,6 +44,7 @@ namespace DotNetNuke.Entities.Tabs
     [Serializable]
     public class TabInfo : ContentItem, IPropertyAccess
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabInfo));
         private static readonly Regex SkinSrcRegex = new Regex(@"([^/]+$)", RegexOptions.CultureInvariant);
         private static Dictionary<string, string> docTypeCache = new Dictionary<string, string>();
         private static ReaderWriterLockSlim docTypeCacheLock = new ReaderWriterLockSlim();
@@ -69,19 +70,35 @@ namespace DotNetNuke.Entities.Tabs
         public TabInfo()
             : this(new SharedDictionary<string, string>(), new SharedDictionary<string, string>())
         {
+		Logger.LogDebug(">>> Entering TabInfo()");
         }
 
+		Logger.LogDebug("<<< Exiting TabInfo()");
         private TabInfo(SharedDictionary<string, string> localizedTabNameDictionary, SharedDictionary<string, string> fullUrlDictionary)
         {
             this.localizedTabNameDictionary = localizedTabNameDictionary;
             this.fullUrlDictionary = fullUrlDictionary;
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): this.localizedTabNameDictionary → {Arg2}", localizedTabNameDictionary, fullUrlDictionary, this.localizedTabNameDictionary);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): this.fullUrlDictionary → {Arg2}", localizedTabNameDictionary, fullUrlDictionary, this.fullUrlDictionary);
 
             this.PortalID = Null.NullInteger;
             this.ParentId = Null.NullInteger;
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): PortalID → {PortalID}", localizedTabNameDictionary, fullUrlDictionary, PortalID);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): this.PortalID → {Arg2}", localizedTabNameDictionary, fullUrlDictionary, this.PortalID);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): ParentId → {ParentId}", localizedTabNameDictionary, fullUrlDictionary, ParentId);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): this.ParentId → {Arg2}", localizedTabNameDictionary, fullUrlDictionary, this.ParentId);
             this.IconFile = Null.NullString;
             this.IconFileLarge = Null.NullString;
             this.Title = Null.NullString;
             this.Description = Null.NullString;
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): IconFile → {IconFile}", localizedTabNameDictionary, fullUrlDictionary, IconFile);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): this.IconFile → {Arg2}", localizedTabNameDictionary, fullUrlDictionary, this.IconFile);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): IconFileLarge → {IconFileLarge}", localizedTabNameDictionary, fullUrlDictionary, IconFileLarge);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): this.IconFileLarge → {Arg2}", localizedTabNameDictionary, fullUrlDictionary, this.IconFileLarge);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): Title → {Title}", localizedTabNameDictionary, fullUrlDictionary, Title);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): this.Title → {Arg2}", localizedTabNameDictionary, fullUrlDictionary, this.Title);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): Description → {Description}", localizedTabNameDictionary, fullUrlDictionary, Description);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): this.Description → {Arg2}", localizedTabNameDictionary, fullUrlDictionary, this.Description);
             this.KeyWords = Null.NullString;
             this.Url = Null.NullString;
             this.SkinSrc = Null.NullString;
@@ -90,6 +107,21 @@ namespace DotNetNuke.Entities.Tabs
             this.TabPath = Null.NullString;
             this.StartDate = Null.NullDate;
             this.EndDate = Null.NullDate;
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): KeyWords → {KeyWords}", localizedTabNameDictionary, fullUrlDictionary, KeyWords);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): this.KeyWords → {Arg2}", localizedTabNameDictionary, fullUrlDictionary, this.KeyWords);
+			Logger.LogInformation("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): Url → {Url}", localizedTabNameDictionary, fullUrlDictionary, Url);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): this.Url → {Arg2}", localizedTabNameDictionary, fullUrlDictionary, this.Url);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): SkinSrc → {SkinSrc}", localizedTabNameDictionary, fullUrlDictionary, SkinSrc);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): this.SkinSrc → {Arg2}", localizedTabNameDictionary, fullUrlDictionary, this.SkinSrc);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): this.skinDoctype → {Arg2}", localizedTabNameDictionary, fullUrlDictionary, this.skinDoctype);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): ContainerSrc → {ContainerSrc}", localizedTabNameDictionary, fullUrlDictionary, ContainerSrc);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): this.ContainerSrc → {Arg2}", localizedTabNameDictionary, fullUrlDictionary, this.ContainerSrc);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): TabPath → {TabPath}", localizedTabNameDictionary, fullUrlDictionary, TabPath);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): this.TabPath → {Arg2}", localizedTabNameDictionary, fullUrlDictionary, this.TabPath);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): StartDate → {StartDate}", localizedTabNameDictionary, fullUrlDictionary, StartDate);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): this.StartDate → {Arg2}", localizedTabNameDictionary, fullUrlDictionary, this.StartDate);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): EndDate → {EndDate}", localizedTabNameDictionary, fullUrlDictionary, EndDate);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): this.EndDate → {Arg2}", localizedTabNameDictionary, fullUrlDictionary, this.EndDate);
             this.RefreshInterval = Null.NullInteger;
             this.PageHeadText = Null.NullString;
             this.SiteMapPriority = 0.5F;
@@ -106,6 +138,10 @@ namespace DotNetNuke.Entities.Tabs
             this.HasBeenPublished = true;
             this.DisableLink = false;
 
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): RefreshInterval → {RefreshInterval}", localizedTabNameDictionary, fullUrlDictionary, RefreshInterval);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): this.RefreshInterval → {Arg2}", localizedTabNameDictionary, fullUrlDictionary, this.RefreshInterval);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): PageHeadText → {PageHeadText}", localizedTabNameDictionary, fullUrlDictionary, PageHeadText);
+			Logger.LogDebug("TabInfo(localizedTabNameDictionary={LocalizedTabNameDictionary},fullUrlDictionary={FullUrlDictionary}): this.PageHeadText → {Arg2}", localizedTabNameDictionary, fullUrlDictionary, this.PageHeadText);
             this.Panes = new ArrayList();
 
             this.IsSystem = false;
@@ -703,8 +739,10 @@ namespace DotNetNuke.Entities.Tabs
         [SuppressMessage("Microsoft.Naming", "CA1725:ParameterNamesShouldMatchBaseDeclaration", Justification = "Breaking change")]
         public string GetProperty(string propertyName, string format, CultureInfo formatProvider, UserInfo accessingUser, Scope currentScope, ref bool propertyNotFound)
         {
+			Logger.LogDebug(">>> Entering GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound);
             string outputFormat = string.Empty;
             if (format == string.Empty)
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): outputFormat → {OutputFormat}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, outputFormat);
             {
                 outputFormat = "g";
             }
@@ -713,13 +751,16 @@ namespace DotNetNuke.Entities.Tabs
             if (currentScope == Scope.NoSettings)
             {
                 propertyNotFound = true;
+				Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): propertyNotFound → {PropertyNotFound1}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, propertyNotFound);
                 return PropertyAccess.ContentLocked;
             }
 
             propertyNotFound = true;
 
             string result = string.Empty;
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): result → {Result}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, result);
             bool isPublic = true;
+			Logger.LogDebug("GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound}): isPublic → {IsPublic}", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound, isPublic);
             switch (lowerPropertyName)
             {
                 case "tabid":
@@ -863,6 +904,7 @@ namespace DotNetNuke.Entities.Tabs
                 result = PropertyAccess.ContentLocked;
             }
 
+			Logger.LogDebug("<<< Exiting GetProperty(propertyName={PropertyName},format={Format},formatProvider={FormatProvider},accessingUser={AccessingUser},currentScope={CurrentScope},propertyNotFound={PropertyNotFound})", propertyName, format, formatProvider, accessingUser, currentScope, propertyNotFound);
             return result;
         }
 
@@ -871,6 +913,7 @@ namespace DotNetNuke.Entities.Tabs
         /// <returns>The doctype statement (e.g. <c>&lt;!DOCTYPE html&gt;</c>).</returns>
         public string GetSkinDoctype(IHostSettings hostSettings)
         {
+			Logger.LogDebug(">>> Entering GetSkinDoctype(hostSettings={HostSettings})", hostSettings);
             if (string.IsNullOrEmpty(this.SkinSrc) == false && string.IsNullOrEmpty(this.skinDoctype))
             {
                 this.skinDoctype = this.CheckIfDoctypeConfigExists();
@@ -878,8 +921,10 @@ namespace DotNetNuke.Entities.Tabs
                 {
                     this.skinDoctype = hostSettings.DefaultDocType;
                 }
+				Logger.LogDebug("GetSkinDoctype(hostSettings={HostSettings}): this.skinDoctype → {Arg1}", hostSettings, this.skinDoctype);
             }
 
+			Logger.LogDebug("<<< Exiting GetSkinDoctype(hostSettings={HostSettings})", hostSettings);
             return this.skinDoctype;
         }
 
@@ -887,6 +932,7 @@ namespace DotNetNuke.Entities.Tabs
         /// <returns>A new <see cref="TabInfo"/> instance.</returns>
         public TabInfo Clone()
         {
+			Logger.LogDebug(">>> Entering Clone()");
             var clonedTab = new TabInfo(this.localizedTabNameDictionary, this.fullUrlDictionary)
             {
                 TabID = this.TabID,
@@ -934,6 +980,11 @@ namespace DotNetNuke.Entities.Tabs
 
             // localized properties
             clonedTab.UniqueId = this.UniqueId;
+			Logger.LogDebug("Clone(): clonedTab.UniqueId → {Arg0}", clonedTab.UniqueId);
+			Logger.LogDebug("Clone(): clonedTab.VersionGuid → {Arg0}", clonedTab.VersionGuid);
+			Logger.LogDebug("Clone(): clonedTab.DefaultLanguageGuid → {Arg0}", clonedTab.DefaultLanguageGuid);
+			Logger.LogDebug("Clone(): clonedTab.LocalizedVersionGuid → {Arg0}", clonedTab.LocalizedVersionGuid);
+			Logger.LogDebug("Clone(): clonedTab.CultureCode → {Arg0}", clonedTab.CultureCode);
             clonedTab.VersionGuid = this.VersionGuid;
             clonedTab.DefaultLanguageGuid = this.DefaultLanguageGuid;
             clonedTab.LocalizedVersionGuid = this.LocalizedVersionGuid;
@@ -941,13 +992,16 @@ namespace DotNetNuke.Entities.Tabs
 
             clonedTab.Panes = new ArrayList();
             clonedTab.Modules = this.modules;
+			Logger.LogDebug("Clone(): clonedTab.Modules → {Arg0}", clonedTab.Modules);
 
+			Logger.LogDebug("<<< Exiting Clone()");
             return clonedTab;
         }
 
         /// <inheritdoc />
         public override void Fill(IDataReader dr)
         {
+			Logger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             // Call the base classes fill method to populate base class properties
             this.FillInternal(dr);
             this.UniqueId = Null.SetNullGuid(dr["UniqueId"]);
@@ -957,7 +1011,32 @@ namespace DotNetNuke.Entities.Tabs
             this.CultureCode = Null.SetNullString(dr["CultureCode"]);
 
             this.TabOrder = Null.SetNullInteger(dr["TabOrder"]);
+			Logger.LogDebug("Fill(dr={Dr}): TabOrder → {TabOrder}", dr, TabOrder);
+			Logger.LogDebug("Fill(dr={Dr}): TabName → {TabName}", dr, TabName);
+			Logger.LogDebug("Fill(dr={Dr}): IsVisible → {IsVisible}", dr, IsVisible);
+			Logger.LogDebug("Fill(dr={Dr}): HasBeenPublished → {HasBeenPublished}", dr, HasBeenPublished);
+			Logger.LogDebug("Fill(dr={Dr}): ParentId → {ParentId}", dr, ParentId);
+			Logger.LogDebug("Fill(dr={Dr}): Level → {Level}", dr, Level);
+			Logger.LogDebug("Fill(dr={Dr}): IconFile → {IconFile}", dr, IconFile);
+			Logger.LogDebug("Fill(dr={Dr}): IconFileLarge → {IconFileLarge}", dr, IconFileLarge);
+			Logger.LogDebug("Fill(dr={Dr}): DisableLink → {DisableLink}", dr, DisableLink);
+			Logger.LogDebug("Fill(dr={Dr}): Title → {Title}", dr, Title);
+			Logger.LogDebug("Fill(dr={Dr}): Description → {Description}", dr, Description);
+			Logger.LogDebug("Fill(dr={Dr}): KeyWords → {KeyWords}", dr, KeyWords);
+			Logger.LogDebug("Fill(dr={Dr}): IsDeleted → {IsDeleted}", dr, IsDeleted);
+			Logger.LogInformation("Fill(dr={Dr}): Url → {Url}", dr, Url);
+			Logger.LogDebug("Fill(dr={Dr}): SkinSrc → {SkinSrc}", dr, SkinSrc);
+			Logger.LogDebug("Fill(dr={Dr}): ContainerSrc → {ContainerSrc}", dr, ContainerSrc);
+			Logger.LogDebug("Fill(dr={Dr}): TabPath → {TabPath}", dr, TabPath);
+			Logger.LogDebug("Fill(dr={Dr}): StartDate → {StartDate}", dr, StartDate);
+			Logger.LogDebug("Fill(dr={Dr}): EndDate → {EndDate}", dr, EndDate);
+			Logger.LogDebug("Fill(dr={Dr}): HasChildren → {HasChildren}", dr, HasChildren);
+			Logger.LogDebug("Fill(dr={Dr}): RefreshInterval → {RefreshInterval}", dr, RefreshInterval);
+			Logger.LogDebug("Fill(dr={Dr}): PageHeadText → {PageHeadText}", dr, PageHeadText);
+			Logger.LogDebug("Fill(dr={Dr}): IsSecure → {IsSecure}", dr, IsSecure);
+			Logger.LogDebug("Fill(dr={Dr}): PermanentRedirect → {PermanentRedirect}", dr, PermanentRedirect);
             this.PortalID = Null.SetNullInteger(dr["PortalID"]);
+			Logger.LogDebug("Fill(dr={Dr}): PortalID → {PortalID}", dr, PortalID);
             this.TabName = Null.SetNullString(dr["TabName"]);
             this.IsVisible = Null.SetNullBoolean(dr["IsVisible"]);
             this.HasBeenPublished = Null.SetNullBoolean(dr["HasBeenPublished"]);
@@ -983,8 +1062,11 @@ namespace DotNetNuke.Entities.Tabs
             this.PermanentRedirect = Null.SetNullBoolean(dr["PermanentRedirect"]);
             this.SiteMapPriority = Null.SetNullSingle(dr["SiteMapPriority"]);
             this.BreadCrumbs = null;
+			Logger.LogDebug("Fill(dr={Dr}): this.BreadCrumbs → {Arg1}", dr, this.BreadCrumbs);
             this.Modules = null;
             this.IsSystem = Null.SetNullBoolean(dr["IsSystem"]);
+			Logger.LogDebug("Fill(dr={Dr}): this.Modules → {Arg1}", dr, this.Modules);
+			Logger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
 
         /// <summary>Gets the URL for the given <paramref name="cultureCode"/>.</summary>
@@ -992,16 +1074,20 @@ namespace DotNetNuke.Entities.Tabs
         /// <returns>The URL or <see cref="string.Empty"/>.</returns>
         public string GetCurrentUrl(string cultureCode)
         {
+			Logger.LogDebug(">>> Entering GetCurrentUrl(cultureCode={CultureCode})", cultureCode);
             string url = null;
             if (this.tabUrls != null && this.tabUrls.Count > 0)
+			Logger.LogDebug("GetCurrentUrl(cultureCode={CultureCode}): url → {Url}", cultureCode, url);
             {
                 TabUrlInfo tabUrl = this.tabUrls.CurrentUrl(cultureCode);
+				Logger.LogDebug("GetCurrentUrl(cultureCode={CultureCode}): tabUrl → {TabUrl}", cultureCode, tabUrl);
                 if (tabUrl != null)
                 {
                     url = tabUrl.Url;
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetCurrentUrl(cultureCode={CultureCode})", cultureCode);
             return url ?? string.Empty;
         }
 
@@ -1009,19 +1095,29 @@ namespace DotNetNuke.Entities.Tabs
         /// <returns>A comma-delimited <see cref="string"/>.</returns>
         public string GetTags()
         {
+			Logger.LogDebug(">>> Entering GetTags()");
+			Logger.LogDebug("<<< Exiting GetTags()");
             return string.Join(",", this.Terms.Select(t => t.Name));
         }
 
         /// <summary>Clears the tab URLs collection.</summary>
         internal void ClearTabUrls()
         {
+			Logger.LogDebug(">>> Entering ClearTabUrls()");
             this.tabUrls = null;
+			Logger.LogDebug("ClearTabUrls(): this.tabUrls → {Arg0}", this.tabUrls);
+			Logger.LogDebug("ClearTabUrls(): tabUrls → {TabUrls}", tabUrls);
+			Logger.LogDebug("<<< Exiting ClearTabUrls()");
         }
 
         /// <summary>Clears the settings collection.</summary>
         internal void ClearSettingsCache()
         {
+			Logger.LogDebug(">>> Entering ClearSettingsCache()");
             this.settings = null;
+			Logger.LogDebug("ClearSettingsCache(): this.settings → {Arg0}", this.settings);
+			Logger.LogDebug("ClearSettingsCache(): settings → {Settings}", settings);
+			Logger.LogDebug("<<< Exiting ClearSettingsCache()");
         }
 
         /// <summary>
@@ -1031,6 +1127,7 @@ namespace DotNetNuke.Entities.Tabs
         /// </summary>
         private string CheckIfDoctypeConfigExists()
         {
+			Logger.LogDebug(">>> Entering CheckIfDoctypeConfigExists()");
             if (string.IsNullOrEmpty(this.SkinSrc))
             {
                 return string.Empty;
@@ -1045,10 +1142,12 @@ namespace DotNetNuke.Entities.Tabs
                 try
                 {
                     var docType = this.LoadDocType();
+					Logger.LogDebug("CheckIfDoctypeConfigExists(): docType → {DocType}", docType);
                     docTypeCache[this.SkinSrc] = docType == null ? string.Empty : docType.FirstChild.InnerText;
                 }
                 catch (Exception ex)
                 {
+					Logger.LogError("Exception in CheckIfDoctypeConfigExists(): {Arg0}", ex.getMessage());
                     Exceptions.LogException(ex);
                 }
                 finally
@@ -1061,6 +1160,7 @@ namespace DotNetNuke.Entities.Tabs
             docTypeCacheLock.EnterReadLock();
             try
             {
+				Logger.LogDebug("<<< Exiting CheckIfDoctypeConfigExists()");
                 return docTypeCache[this.SkinSrc];
             }
             finally
@@ -1071,23 +1171,28 @@ namespace DotNetNuke.Entities.Tabs
 
         private XmlDocument LoadDocType()
         {
+			Logger.LogDebug(">>> Entering LoadDocType()");
             var xmlSkinDocType = new XmlDocument { XmlResolver = null };
 
             // default to the skinname.doctype.xml to allow the individual skin to override the skin package
             var skinFileName = HttpContext.Current.Server.MapPath(this.SkinSrc.Replace(".ascx", ".doctype.xml"));
+			Logger.LogDebug("LoadDocType(): skinFileName → {SkinFileName}", skinFileName);
             if (File.Exists(skinFileName))
             {
                 using var doctypeReader = XmlReader.Create(skinFileName, new XmlReaderSettings { XmlResolver = null, });
+				Logger.LogDebug("LoadDocType(): doctypeReader → {DoctypeReader}", doctypeReader);
                 xmlSkinDocType.Load(doctypeReader);
                 return xmlSkinDocType;
             }
 
             // use the skin.doctype.xml file
             var packageFileName = HttpContext.Current.Server.MapPath(SkinSrcRegex.Replace(this.SkinSrc, "skin.doctype.xml"));
+			Logger.LogDebug("LoadDocType(): packageFileName → {PackageFileName}", packageFileName);
             if (File.Exists(packageFileName))
             {
                 using var doctypeReader = XmlReader.Create(packageFileName, new XmlReaderSettings { XmlResolver = null, });
                 xmlSkinDocType.Load(doctypeReader);
+			Logger.LogDebug("<<< Exiting LoadDocType()");
                 return xmlSkinDocType;
             }
 
@@ -1097,9 +1202,11 @@ namespace DotNetNuke.Entities.Tabs
 
         private void IconFileGetter(ref string iconFile, string iconRaw)
         {
+			Logger.LogDebug(">>> Entering IconFileGetter(iconFile={IconFile},iconRaw={IconRaw})", iconFile, iconRaw);
             if ((!string.IsNullOrEmpty(iconRaw) && iconRaw.StartsWith("~", StringComparison.Ordinal)) || this.PortalID == Null.NullInteger)
             {
                 iconFile = iconRaw;
+				Logger.LogDebug("IconFileGetter(iconFile={IconFile},iconRaw={IconRaw}): iconFile → {IconFile1}", iconFile, iconRaw, iconFile);
             }
             else if (iconFile == null && !string.IsNullOrEmpty(iconRaw) && this.PortalID != Null.NullInteger)
             {
@@ -1107,6 +1214,7 @@ namespace DotNetNuke.Entities.Tabs
                 if (iconRaw.StartsWith("FileID=", StringComparison.OrdinalIgnoreCase))
                 {
                     var fileId = Convert.ToInt32(iconRaw.Substring(7), CultureInfo.InvariantCulture);
+					Logger.LogDebug("IconFileGetter(iconFile={IconFile},iconRaw={IconRaw}): fileId → {FileId}", iconFile, iconRaw, fileId);
                     fileInfo = FileManager.Instance.GetFile(fileId);
                 }
                 else
@@ -1116,6 +1224,7 @@ namespace DotNetNuke.Entities.Tabs
 
                 iconFile = fileInfo != null ? FileManager.Instance.GetUrl(fileInfo) : iconRaw;
             }
+			Logger.LogDebug("<<< Exiting IconFileGetter(iconFile={IconFile},iconRaw={IconRaw})", iconFile, iconRaw);
         }
     }
 }

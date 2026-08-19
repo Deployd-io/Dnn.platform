@@ -1,5 +1,7 @@
+const logger = console;
 ﻿(function(window, $) {
 	function parseUri (str) {
+		logger.debug(`>>> Entering parseUri(str=${str})`);
 		var	o   = parseUri.options,
 			m   = o.parser[o.strictMode ? "strict" : "loose"].exec(str),
 			uri = {},
@@ -9,9 +11,12 @@
 
 		uri[o.q.name] = {};
 		uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+			logger.debug('>>> Entering replace()');
+			logger.debug('<<< Exiting replace()');
 			if ($1) uri[o.q.name][$1] = $2;
 		});
 
+		logger.debug(`<<< Exiting parseUri(str=${str})`);
 		return uri;
 	};
 	

@@ -8,11 +8,14 @@ namespace DotNetNuke.Services.Exceptions
 
     public class SearchIndexEmptyException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SearchIndexEmptyException));
         /// <summary>Initializes a new instance of the <see cref="SearchIndexEmptyException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>
         public SearchIndexEmptyException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering SearchIndexEmptyException(message={Message})", message);
+		Logger.LogDebug("<<< Exiting SearchIndexEmptyException(message={Message})", message);
         }
     }
 }

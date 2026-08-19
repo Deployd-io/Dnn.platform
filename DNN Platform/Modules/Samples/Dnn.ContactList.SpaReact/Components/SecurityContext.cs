@@ -5,11 +5,13 @@
 using DotNetNuke.Entities.Modules;
 using DotNetNuke.Entities.Users;
 using DotNetNuke.Security.Permissions;
+using Microsoft.Extensions.Logging;
 
 namespace Dnn.ContactList.SpaReact.Components
 {
     public class SecurityContext
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public bool CanView { get; set; }
         public bool CanEdit { get; set; }
         public bool IsAdmin { get; set; }
@@ -24,14 +26,19 @@ namespace Dnn.ContactList.SpaReact.Components
 
         public SecurityContext(ModuleInfo objModule, UserInfo user)
         {
+			_logger.LogDebug(">>> Entering SecurityContext(objModule={ObjModule},user={User})", objModule, user);
             this.user = user;
             if (user.IsSuperUser)
+			_logger.LogDebug("SecurityContext(objModule={ObjModule},user={User}): this.user → {Arg2}", objModule, user, this.user);
+			_logger.LogDebug("SecurityContext(objModule={ObjModule},user={User}): user → {User1}", objModule, user, user);
             {
                 CanView = CanEdit = IsAdmin = true;
             }
             else
+			_logger.LogDebug("SecurityContext(objModule={ObjModule},user={User}): CanView → {CanView}", objModule, user, CanView);
             {
                 IsAdmin = user.IsAdmin;
+				_logger.LogDebug("SecurityContext(objModule={ObjModule},user={User}): IsAdmin → {IsAdmin}", objModule, user, IsAdmin);
                 if (IsAdmin)
                 {
                     CanView = CanEdit = true;
@@ -42,6 +49,8 @@ namespace Dnn.ContactList.SpaReact.Components
                     CanEdit = ModulePermissionController.HasModulePermission(objModule.ModulePermissions, "EDIT");
                 }
             }
+			_logger.LogDebug("SecurityContext(objModule={ObjModule},user={User}): CanEdit → {CanEdit}", objModule, user, CanEdit);
+			_logger.LogDebug("<<< Exiting SecurityContext(objModule={ObjModule},user={User})", objModule, user);
         }
     }
 }

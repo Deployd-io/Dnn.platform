@@ -17,6 +17,7 @@ namespace DotNetNuke.Web.Common
     /// </summary>
     internal class WebFormsServiceProvider : IServiceProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(WebFormsServiceProvider));
         private const BindingFlags ActivatorFlags =
             BindingFlags.Instance |
             BindingFlags.NonPublic |
@@ -26,9 +27,12 @@ namespace DotNetNuke.Web.Common
         /// <inheritdoc />
         public object GetService(Type serviceType)
         {
+			Logger.LogDebug(">>> Entering GetService(serviceType={ServiceType})", serviceType);
             var provider = HttpContextSource.Current?.GetScope()?.ServiceProvider;
 
+			Logger.LogDebug("GetService(serviceType={ServiceType}): provider → {Provider}", serviceType, provider);
             var service = provider?.GetService(serviceType);
+			Logger.LogDebug("GetService(serviceType={ServiceType}): service → {Service}", serviceType, service);
 
             if (service != null)
             {
@@ -39,6 +43,7 @@ namespace DotNetNuke.Web.Common
             // which is the case for some of the types in ASP.NET WebForms. So we need to check if there are any public constructors.
             if (provider != null && serviceType.GetConstructors().Length > 0)
             {
+			Logger.LogDebug("<<< Exiting GetService(serviceType={ServiceType})", serviceType);
                 return ActivatorUtilities.CreateInstance(provider, serviceType);
             }
 

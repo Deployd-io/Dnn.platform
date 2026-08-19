@@ -2,22 +2,29 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import "./style.less";
 import Tooltip from "../Tooltip";
+const logger = console;
 
 class TextOverflowWrapper extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.uniqueId = "overflowTooltip-" + (Date.now() * Math.random());
         this.state = {
             itemWidth: 0
         };
         this.overflowTooltipRef = React.createRef();
+		logger.debug(`constructor(): this.state → ${this.state}`);
+		logger.debug('<<< Exiting constructor()');
     }
     getStyle() {
         const {props} = this;
+		logger.debug('>>> Entering getStyle()');
+		logger.debug('<<< Exiting getStyle()');
         return Object.assign({ maxWidth: props.maxWidth }, props.style);
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         //Set time out to ensure calculation happens after render
         this.timerId = setTimeout(() => {
             let input = this.overflowTooltipRef;
@@ -27,19 +34,25 @@ class TextOverflowWrapper extends Component {
                     itemWidth: inputRect.width
                 });
             } else {
+				logger.debug(`componentDidMount(): inputRect → ${inputRect}`);
                 this.setState({
                     itemWidth: this.props.maxWidth
                 });
             }
         }, 500);
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentWillUnmount() {
+		logger.debug('>>> Entering componentWillUnmount()');
         clearTimeout(this.timerId);
+		logger.debug('<<< Exiting componentWillUnmount()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
+		logger.debug('<<< Exiting render()');
         return (
             <div
                 className={"dnn-text-overflow-wrapper" + (props.className ? " " + props.className : "")}

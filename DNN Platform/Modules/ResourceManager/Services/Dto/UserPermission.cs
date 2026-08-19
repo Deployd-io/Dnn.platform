@@ -10,10 +10,13 @@ namespace Dnn.Modules.ResourceManager.Services.Dto
     [DataContract]
     public class UserPermission
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UserPermission));
         /// <summary>Initializes a new instance of the <see cref="UserPermission"/> class.</summary>
         public UserPermission()
         {
+			Logger.LogDebug(">>> Entering UserPermission()");
             this.Permissions = new List<Permission>();
+			Logger.LogDebug("<<< Exiting UserPermission()");
         }
 
         /// <summary>Gets or sets the id of the user.</summary>

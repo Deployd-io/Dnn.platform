@@ -10,6 +10,7 @@ namespace DotNetNuke.Services.Log.EventLog
     /// <summary>Extensions methods for types related to the Event Log.</summary>
     public static class EventLogExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(EventLogExtensions));
         /// <summary>Add setting log.</summary>
         /// <param name="logger">The <see cref="IEventLogger"/> instance.</param>
         /// <param name="logTypeKey">The log type.</param>
@@ -20,13 +21,17 @@ namespace DotNetNuke.Services.Log.EventLog
         /// <param name="userId">The ID of the user taking the action.</param>
         public static void AddSettingLog(this IEventLogger logger, EventLogType logTypeKey, string idFieldName, int idValue, string settingName, string settingValue, int userId)
         {
+			Logger.LogDebug(">>> Entering AddSettingLog(logger={Logger},logTypeKey={LogTypeKey},idFieldName={IdFieldName},idValue={IdValue},settingName={SettingName},settingValue={SettingValue},userId={UserId})", logger, logTypeKey, idFieldName, idValue, settingName, settingValue, userId);
             ILogInfo log = new LogInfo { LogTypeKey = logTypeKey.ToString(), };
             log.LogUserId = userId;
+			Logger.LogDebug("AddSettingLog(logger={Logger},logTypeKey={LogTypeKey},idFieldName={IdFieldName},idValue={IdValue},settingName={SettingName},settingValue={SettingValue},userId={UserId}): log.LogUserId → {Arg7}", logger, logTypeKey, idFieldName, idValue, settingName, settingValue, userId, log.LogUserId);
+			Logger.LogDebug("AddSettingLog(logger={Logger},logTypeKey={LogTypeKey},idFieldName={IdFieldName},idValue={IdValue},settingName={SettingName},settingValue={SettingValue},userId={UserId}): log → {Log}", logger, logTypeKey, idFieldName, idValue, settingName, settingValue, userId, log);
             log.LogProperties.Add(new LogDetailInfo(idFieldName, idValue.ToString(CultureInfo.InvariantCulture)));
             log.LogProperties.Add(new LogDetailInfo("SettingName", settingName));
             log.LogProperties.Add(new LogDetailInfo("SettingValue", settingValue));
 
             logger.AddLog(log);
+			Logger.LogDebug("<<< Exiting AddSettingLog(logger={Logger},logTypeKey={LogTypeKey},idFieldName={IdFieldName},idValue={IdValue},settingName={SettingName},settingValue={SettingValue},userId={UserId})", logger, logTypeKey, idFieldName, idValue, settingName, settingValue, userId);
         }
     }
 }

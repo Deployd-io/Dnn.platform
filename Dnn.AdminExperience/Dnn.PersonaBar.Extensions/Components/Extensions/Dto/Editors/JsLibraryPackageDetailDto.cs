@@ -13,6 +13,8 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
     {
         public JsLibraryPackageDetailDto()
         {
+		eventLogger.LogDebug(">>> Entering JsLibraryPackageDetailDto()");
+		eventLogger.LogDebug("<<< Exiting JsLibraryPackageDetailDto()");
         }
 
         public JsLibraryPackageDetailDto(int portalId, PackageInfo package)

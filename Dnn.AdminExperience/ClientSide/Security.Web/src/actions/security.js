@@ -1,9 +1,12 @@
 import { security as ActionTypes } from "../constants/actionTypes";
 import ApplicationService from "../services/applicationService";
 import util from "../utils";
+const logger = console;
 
 const securityActions = {
     getIpFilters(callback) {
+		logger.debug(`>>> Entering getIpFilters(callback=${callback})`);
+		logger.debug(`<<< Exiting getIpFilters(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getIpFilters(data => {
                 dispatch({
@@ -20,6 +23,8 @@ const securityActions = {
         };
     },
     getIpFilter(searchParameters, callback) {
+		logger.debug(`>>> Entering getIpFilter(searchParameters=${searchParameters},callback=${callback})`);
+		logger.debug(`<<< Exiting getIpFilter(searchParameters=${searchParameters},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getIpFilter(searchParameters, data => {
                 dispatch({
@@ -35,6 +40,8 @@ const securityActions = {
         };
     },
     deleteIpFilter(filterId, ipFilters, callback) {
+		logger.debug(`>>> Entering deleteIpFilter(filterId=${filterId},ipFilters=${ipFilters},callback=${callback})`);
+		logger.debug(`<<< Exiting deleteIpFilter(filterId=${filterId},ipFilters=${ipFilters},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.deleteIpFilter(filterId, data => {
                 dispatch({
@@ -53,6 +60,8 @@ const securityActions = {
         };
     },
     getBasicLoginSettings(cultureCode, callback) {
+		logger.debug(`>>> Entering getBasicLoginSettings(cultureCode=${cultureCode},callback=${callback})`);
+		logger.debug(`<<< Exiting getBasicLoginSettings(cultureCode=${cultureCode},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getBasicLoginSettings(cultureCode, data => {
                 dispatch({
@@ -71,6 +80,8 @@ const securityActions = {
         };
     },
     updateBasicLoginSettings(payload, callback) {
+		logger.debug(`>>> Entering updateBasicLoginSettings(payload=${payload},callback=${callback})`);
+		logger.debug(`<<< Exiting updateBasicLoginSettings(payload=${payload},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.updateBasicLoginSettings(payload, data => {
                 dispatch({
@@ -86,6 +97,8 @@ const securityActions = {
         };
     },
     basicLoginSettingsClientModified(parameter) {
+		logger.debug(`>>> Entering basicLoginSettingsClientModified(parameter=${parameter})`);
+		logger.debug(`<<< Exiting basicLoginSettingsClientModified(parameter=${parameter})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SECURITY_BASIC_LOGIN_SETTINS_CLIENT_MODIFIED,
@@ -97,6 +110,8 @@ const securityActions = {
         };
     },
     memberSettingsClientModified(parameter) {
+		logger.debug(`>>> Entering memberSettingsClientModified(parameter=${parameter})`);
+		logger.debug(`<<< Exiting memberSettingsClientModified(parameter=${parameter})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SECURITY_MEMBER_SETTINS_CLIENT_MODIFIED,
@@ -108,6 +123,8 @@ const securityActions = {
         };
     },
     registrationSettingsClientModified(parameter) {
+		logger.debug(`>>> Entering registrationSettingsClientModified(parameter=${parameter})`);
+		logger.debug(`<<< Exiting registrationSettingsClientModified(parameter=${parameter})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SECURITY_REGISTRATION_SETTINS_CLIENT_MODIFIED,
@@ -119,6 +136,8 @@ const securityActions = {
         };
     },
     sslSettingsClientModified(parameter) {
+		logger.debug(`>>> Entering sslSettingsClientModified(parameter=${parameter})`);
+		logger.debug(`<<< Exiting sslSettingsClientModified(parameter=${parameter})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SECURITY_SSL_SETTINS_CLIENT_MODIFIED,
@@ -130,6 +149,8 @@ const securityActions = {
         };
     },
     otherSettingsClientModified(parameter) {
+		logger.debug(`>>> Entering otherSettingsClientModified(parameter=${parameter})`);
+		logger.debug(`<<< Exiting otherSettingsClientModified(parameter=${parameter})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SECURITY_OTHER_SETTINS_CLIENT_MODIFIED,
@@ -141,6 +162,8 @@ const securityActions = {
         };
     },
     updateIpFilter(payload, callback) {
+		logger.debug(`>>> Entering updateIpFilter(payload=${payload},callback=${callback})`);
+		logger.debug(`<<< Exiting updateIpFilter(payload=${payload},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.updateIpFilter(payload, data => {
                 dispatch({
@@ -156,6 +179,8 @@ const securityActions = {
         };
     },
     getMemberSettings(callback) {
+		logger.debug(`>>> Entering getMemberSettings(callback=${callback})`);
+		logger.debug(`<<< Exiting getMemberSettings(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getMemberSettings(data => {
                 dispatch({
@@ -172,6 +197,8 @@ const securityActions = {
         };
     },
     updateMemberSettings(payload, callback) {
+		logger.debug(`>>> Entering updateMemberSettings(payload=${payload},callback=${callback})`);
+		logger.debug(`<<< Exiting updateMemberSettings(payload=${payload},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.updateMemberSettings(payload, data => {
                 dispatch({
@@ -187,6 +214,8 @@ const securityActions = {
         };
     },
     getRegistrationSettings(callback) {
+		logger.debug(`>>> Entering getRegistrationSettings(callback=${callback})`);
+		logger.debug(`<<< Exiting getRegistrationSettings(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getRegistrationSettings(data => {
                 dispatch({
@@ -205,6 +234,8 @@ const securityActions = {
         };
     },
     updateRegistrationSettings(payload, callback, failureCallback) {
+		logger.debug(`>>> Entering updateRegistrationSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting updateRegistrationSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.updateRegistrationSettings(payload, data => {
                 dispatch({
@@ -224,6 +255,8 @@ const securityActions = {
         };
     },
     getSslSettings(callback) {
+		logger.debug(`>>> Entering getSslSettings(callback=${callback})`);
+		logger.debug(`<<< Exiting getSslSettings(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getSslSettings(data => {
                 dispatch({
@@ -240,6 +273,8 @@ const securityActions = {
         };
     },
     updateSslSettings(payload, callback, failureCallback) {
+		logger.debug(`>>> Entering updateSslSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting updateSslSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.updateSslSettings(payload, data => {
                 dispatch({
@@ -259,6 +294,7 @@ const securityActions = {
         };
     },
     setAllPagesSecure(callback, failureCallback) {
+		logger.debug(`>>> Entering setAllPagesSecure(callback=${callback},failureCallback=${failureCallback})`);
         ApplicationService.setAllPagesSecure(data => {
             if (callback) {
                 callback(data);
@@ -266,10 +302,13 @@ const securityActions = {
         }, data => {
             if (failureCallback) {
                 failureCallback(data);
+				logger.debug(`<<< Exiting setAllPagesSecure(callback=${callback},failureCallback=${failureCallback})`);
             }
         });
     },
     getOtherSettings(callback) {
+		logger.debug(`>>> Entering getOtherSettings(callback=${callback})`);
+		logger.debug(`<<< Exiting getOtherSettings(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getOtherSettings(data => {
                 dispatch({
@@ -286,6 +325,8 @@ const securityActions = {
         };
     },
     updateOtherSettings(payload, callback) {
+		logger.debug(`>>> Entering updateOtherSettings(payload=${payload},callback=${callback})`);
+		logger.debug(`<<< Exiting updateOtherSettings(payload=${payload},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.updateOtherSettings(payload, data => {
                 dispatch({
@@ -301,6 +342,8 @@ const securityActions = {
         };
     },
     getSecurityBulletins(callback, failureCallback) {
+		logger.debug(`>>> Entering getSecurityBulletins(callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting getSecurityBulletins(callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.getSecurityBulletins(data => {
                 dispatch({
@@ -321,6 +364,8 @@ const securityActions = {
         };
     },
     getSuperuserActivities(callback) {
+		logger.debug(`>>> Entering getSuperuserActivities(callback=${callback})`);
+		logger.debug(`<<< Exiting getSuperuserActivities(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getSuperuserActivities(data => {
                 dispatch({
@@ -336,6 +381,8 @@ const securityActions = {
         };
     },
     getAuditCheckResults(callback) {
+		logger.debug(`>>> Entering getAuditCheckResults(callback=${callback})`);
+		logger.debug(`<<< Exiting getAuditCheckResults(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getAuditCheckResults(data => {
                 dispatch({
@@ -351,6 +398,8 @@ const securityActions = {
         };
     },
     getAuditCheckResult(id, callback) {
+		logger.debug(`>>> Entering getAuditCheckResult(id=${id},callback=${callback})`);
+		logger.debug(`<<< Exiting getAuditCheckResult(id=${id},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getAuditCheckResult(id, data => {
                 dispatch({
@@ -366,6 +415,8 @@ const securityActions = {
         };
     },
     searchFileSystemAndDatabase(searchParameters, callback) {
+		logger.debug(`>>> Entering searchFileSystemAndDatabase(searchParameters=${searchParameters},callback=${callback})`);
+		logger.debug(`<<< Exiting searchFileSystemAndDatabase(searchParameters=${searchParameters},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.searchFileSystemAndDatabase(searchParameters, data => {
                 dispatch({
@@ -383,6 +434,8 @@ const securityActions = {
         };
     },
     clearFileSystemAndDatabaseSearch() {
+		logger.debug('>>> Entering clearFileSystemAndDatabaseSearch()');
+		logger.debug('<<< Exiting clearFileSystemAndDatabaseSearch()');
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.RETRIEVED_SECURITY_SEARCH_FILE_SYSTEM_DATABASE,
@@ -395,6 +448,8 @@ const securityActions = {
         };
     },
     getLastModifiedSettings(callback) {
+		logger.debug(`>>> Entering getLastModifiedSettings(callback=${callback})`);
+		logger.debug(`<<< Exiting getLastModifiedSettings(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getLastModifiedSettings(data => {
                 dispatch({
@@ -411,6 +466,8 @@ const securityActions = {
         };
     },
     getLastModifiedFiles(callback) {
+		logger.debug(`>>> Entering getLastModifiedFiles(callback=${callback})`);
+		logger.debug(`<<< Exiting getLastModifiedFiles(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getLastModifiedFiles(data => {
                 dispatch({
@@ -427,6 +484,8 @@ const securityActions = {
         };
     },
     updatefileSystemAndDatabaseSearchKeyword(keyword) {
+		logger.debug(`>>> Entering updatefileSystemAndDatabaseSearchKeyword(keyword=${keyword})`);
+		logger.debug(`<<< Exiting updatefileSystemAndDatabaseSearchKeyword(keyword=${keyword})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.UPDATED_SECURITY_SEARCH_FILE_SYSTEM_DATABASE_KEYWORD,
@@ -438,6 +497,8 @@ const securityActions = {
         };
     },
     updatefileSystemAndDatabaseActiveTab(tab) {
+		logger.debug(`>>> Entering updatefileSystemAndDatabaseActiveTab(tab=${tab})`);
+		logger.debug(`<<< Exiting updatefileSystemAndDatabaseActiveTab(tab=${tab})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.UPDATED_SECURITY_SEARCH_FILE_SYSTEM_DATABASE_ACTIVE_TAB,
@@ -448,6 +509,8 @@ const securityActions = {
         };
     },
     getPortalList(addAll, callback) {
+		logger.debug(`>>> Entering getPortalList(addAll=${addAll},callback=${callback})`);
+		logger.debug(`<<< Exiting getPortalList(addAll=${addAll},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getPortalList(addAll, data => {
                 dispatch({
@@ -464,6 +527,8 @@ const securityActions = {
         };
     },
     getApiTokenSettings(callback) {
+		logger.debug(`>>> Entering getApiTokenSettings(callback=${callback})`);
+		logger.debug(`<<< Exiting getApiTokenSettings(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getApiTokenSettings(data => {
                 dispatch({
@@ -480,6 +545,8 @@ const securityActions = {
         };
     },
     updateApiTokenSettings(payload, callback) {
+		logger.debug(`>>> Entering updateApiTokenSettings(payload=${payload},callback=${callback})`);
+		logger.debug(`<<< Exiting updateApiTokenSettings(payload=${payload},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.updateApiTokenSettings(payload, data => {
                 dispatch({
@@ -495,6 +562,8 @@ const securityActions = {
         };
     },
     apiTokenSettingsClientModified(parameter) {
+		logger.debug(`>>> Entering apiTokenSettingsClientModified(parameter=${parameter})`);
+		logger.debug(`<<< Exiting apiTokenSettingsClientModified(parameter=${parameter})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SECURITY_APITOKEN_SETTINS_CLIENT_MODIFIED,
@@ -506,6 +575,8 @@ const securityActions = {
         };
     },
     getApiTokenKeys(callback) {
+		logger.debug(`>>> Entering getApiTokenKeys(callback=${callback})`);
+		logger.debug(`<<< Exiting getApiTokenKeys(callback=${callback})`);
         return () => {
             ApplicationService.getApiTokenKeys(data => {
                 if (callback) {
@@ -550,6 +621,8 @@ const securityActions = {
         };
     },
     deleteExpiredApiTokens(callback) {
+		logger.debug(`>>> Entering deleteExpiredApiTokens(callback=${callback})`);
+		logger.debug(`<<< Exiting deleteExpiredApiTokens(callback=${callback})`);
         return () => {
             ApplicationService.deleteExpiredApiTokens(data => {
                 if (callback) {
@@ -559,6 +632,8 @@ const securityActions = {
         };
     },
     deleteExpiredAndRevokedApiTokens(callback) {
+		logger.debug(`>>> Entering deleteExpiredAndRevokedApiTokens(callback=${callback})`);
+		logger.debug(`<<< Exiting deleteExpiredAndRevokedApiTokens(callback=${callback})`);
         return () => {
             ApplicationService.deleteExpiredAndRevokedApiTokens(data => {
                 if (callback) {
@@ -568,6 +643,8 @@ const securityActions = {
         };
     },
     getCspSettings(callback) {
+		logger.debug(`>>> Entering getCspSettings(callback=${callback})`);
+		logger.debug(`<<< Exiting getCspSettings(callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getCspSettings(data => {
                 dispatch({
@@ -584,6 +661,8 @@ const securityActions = {
         };
     },
     updateCspSettings(payload, callback) {
+		logger.debug(`>>> Entering updateCspSettings(payload=${payload},callback=${callback})`);
+		logger.debug(`<<< Exiting updateCspSettings(payload=${payload},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.updateCspSettings(payload, data => {
                 if (data.Success) {
@@ -602,6 +681,8 @@ const securityActions = {
         };
     },
     cspSettingsClientModified(parameter) {
+		logger.debug(`>>> Entering cspSettingsClientModified(parameter=${parameter})`);
+		logger.debug(`<<< Exiting cspSettingsClientModified(parameter=${parameter})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SECURITY_CSP_SETTINS_CLIENT_MODIFIED,

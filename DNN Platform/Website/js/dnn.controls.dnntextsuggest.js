@@ -1,3 +1,4 @@
+const logger = console;
 ﻿
 Type.registerNamespace('dnn.controls');dnn.extend(dnn.controls,{initTextSuggest:function(ctl)
 {if(ctl&&dnn.controls.controls[ctl.id]==null)
@@ -5,6 +6,7 @@ Type.registerNamespace('dnn.controls');dnn.extend(dnn.controls,{initTextSuggest:
 {dnn.controls.DNNTextSuggest.initializeBase(this,[o]);this.resultCtr=null;this.tscss=this.getProp('tscss','');this.css=this.getProp('css','');this.cssChild=this.getProp('csschild','');this.cssHover=this.getProp('csshover','');this.cssSel=this.getProp('csssel','');this.sysImgPath=this.getProp('sysimgpath','');this.workImg='dnnanim.gif';this.target=this.getProp('target','');this.defaultJS=this.getProp('js','');this.postBack=this.getProp('postback','');this.callBack=this.getProp('callback','');this.callBackStatFunc=this.getProp('callbackSF','');if(this.callBackStatFunc.length>0)
 this.add_handler('callBackStatus',eval(this.callBackStatFunc));this.rootNode=null;this.selNode=null;this.selIndex=-1;this.lookupDelay=this.getProp('ludelay','500');this.lostFocusDelay=this.getProp('lfdelay','500');this.inAnimObj=null;this.inAnimType=null;this.prevText='';this.addHandlers(o,{'keyup':this.keyUp,'keypress':this.keyPress,'blur':this.onblur,'focus':this.onfocus},this);o.setAttribute('autocomplete','off');this.delimiter=this.getProp('del','');this.idtoken=this.getProp('idtok','');this.maxRows=new Number(this.getProp('maxRows','10'));if(this.maxRows==0)
 this.maxRows=9999;this.minChar=new Number(this.getProp('minChar','1'));this.caseSensitive=this.getProp('casesens','0')=='1';this.prevLookupText='';this.prevLookupOffset=0;this._blurHideDelegate=dnn.createDelegate(this,this.blurHide);this._doLookupDelegate=dnn.createDelegate(this,this.doLookup);}
+logger.debug('>>> Entering initTextSuggest()');
 dnn.controls.DNNTextSuggest.prototype={keyPress:function(e)
 {if(e.charCode==KEY_RETURN)
 {e.stopPropagation();e.preventDefault();return false;}},onblur:function(e)
@@ -53,6 +55,7 @@ return new dnn.controls.DNNTextSuggestNode(node);}},setNodeIndex:function(index)
 {var arg=new dnn.controls.DNNNodeEventArgs(tsNode);this.invoke_handler('click',arg);if(arg.get_cancel())
 return;if(this.selNode!=null)
 {this.selNode.selected=null;this.assignCss(this.selNode);}
+logger.debug(`keyPress(e=${e}): element → ${element}`);
 if(tsNode.selected)
 {tsNode.selected=null;this.assignCss(tsNode);}
 else
@@ -97,6 +100,7 @@ return false;}}
 return true;},renderResults:function(result)
 {if(result!=null)
 {var json=dnn.evalJSON("{"+result+"}");this.nodes=json.nodes;this.rootNode={};this.rootNode.nodes=this.nodes;this.rootNode.id=this.ns;this.rootNode=new dnn.controls.JSONNode(this.rootNode,'root',0);}
+logger.debug(`keyPress(e=${e}): json → ${json}`);
 if(this.rootNode!=null)
 {if(this.resultCtr==null)
 this.renderContainer();this.clearResults();for(var i=0;i<this.rootNode.childNodeCount();i++)
@@ -118,9 +122,12 @@ nodeCss+=' '+(tsNode.cssSel.length>0?tsNode.cssSel:this.cssSel);oCtr.className=n
 {var ts=ctx;ts.invoke_handler('callBackFail',new dnn.controls.DNNCallbackEventArgs(result,ctx,req));},_findEventNode:function(evt)
 {return this.rootNode.findNode(this.getChildControlBaseId(evt.target));},dispose:function()
 {this._blurHideDelegate=null;this._doLookupDelegate=null;dnn.controls.DNNTextSuggest.callBaseMethod(this,'dispose');}}
+logger.debug(`keyPress(e=${e}): tsNode → ${tsNode}`);
+logger.debug(`keyPress(e=${e}): newCtr → ${newCtr}`);
 dnn.controls.DNNTextSuggest.registerClass('dnn.controls.DNNTextSuggest',dnn.controls.control);dnn.controls.DNNTextSuggestNode=function(node)
 {dnn.controls.DNNTextSuggestNode.initializeBase(this,[node]);this.hover=false;this.selected=node.getAttribute('selected','0')=='1'?true:null;this.clickAction=node.getAttribute('ca',dnn.controls.action.none);}
 dnn.controls.DNNTextSuggestNode.prototype={childNodes:function(index)
 {if(this.node.childNodes[index]!=null)
 return new dnn.controls.DNNTextSuggestNode(this.node.childNodes[index]);}}
+logger.debug(`>>> Entering childNodes(index=${index})`);
 dnn.controls.DNNTextSuggestNode.registerClass('dnn.controls.DNNTextSuggestNode',dnn.controls.DNNNode);

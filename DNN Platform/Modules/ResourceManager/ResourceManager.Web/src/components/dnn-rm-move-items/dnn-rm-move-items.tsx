@@ -2,6 +2,7 @@ import { Component, Element, Event, EventEmitter, Host, h, Prop, State } from '@
 import { FolderTreeItem } from '../../services/InternalServicesClient';
 import { Item, ItemsClient } from '../../services/ItemsClient';
 import state from '../../store/store';
+const logger = console;
 // import { ItemsClient } from '../../services/ItemsClient';
 
 @Component({
@@ -31,18 +32,23 @@ export class DnnRmMoveItems {
   private itemsClient: ItemsClient;
 
   constructor() {
+	logger.debug('>>> Entering constructor()');
     this.itemsClient = new ItemsClient(state.moduleId);
+	logger.debug('<<< Exiting constructor()');
   }
 
   private async closeModal() {
+	logger.debug('>>> Entering closeModal()');
     const modal = this.el.parentElement as HTMLDnnModalElement;
     await modal.hide();
     setTimeout(() => {
       document.body.removeChild(modal);
     }, 300);
+	logger.debug('<<< Exiting closeModal()');
   }
 
   private async handleMove() {
+	logger.debug('>>> Entering handleMove()');
     this.moving = true;
     for (const item of this.items){
       if (item.isFolder){
@@ -63,26 +69,34 @@ export class DnnRmMoveItems {
             await this.handleItemMoved(item);
         } catch (error) {
           alert(error);
+		logger.debug('<<< Exiting handleMove()');
         }
       }
     }
   }
   
   private async handleItemMoved(item: Item) {
+	logger.debug(`>>> Entering handleItemMoved(item=${item})`);
     this.movedCount++;
     this.currentItemName = item.itemName;
     if (this.movedCount == this.items.length) {
+	logger.debug(`handleItemMoved(item=${item}): this.currentItemName → ${this.currentItemName}`);
       this.moving = false;
       this.dnnRmFoldersChanged.emit();
       await this.closeModal();
+	logger.debug(`<<< Exiting handleItemMoved(item=${item})`);
     }
   }
 
   private getMoveButtonText() {
+	logger.debug('>>> Entering getMoveButtonText()');
+	logger.debug('<<< Exiting getMoveButtonText()');
       return this.selectedFolder == undefined ? state.localization?.NoFolderSelected : state.localization?.Move;
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         <h2>{state.localization?.MoveItems}</h2>

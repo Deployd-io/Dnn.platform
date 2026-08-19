@@ -1,3 +1,4 @@
+const logger = console;
 //-----------------------------------------------------------------------
 // Copyright (C) Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------
@@ -1290,17 +1291,21 @@ Date.prototype._toFormattedString = function Date$_toFormattedString(format, cul
     var hour;
 
     function addLeadingZero(num) {
+		logger.debug(`>>> Entering addLeadingZero(num=${num})`);
         if (num < 10) {
+		logger.debug(`<<< Exiting addLeadingZero(num=${num})`);
             return '0' + num;
         }
         return num.toString();
     }
 
     function addLeadingZeros(num) {
+		logger.debug(`>>> Entering addLeadingZeros(num=${num})`);
         if (num < 10) {
             return '00' + num;
         }
         if (num < 100) {
+		logger.debug(`<<< Exiting addLeadingZeros(num=${num})`);
             return '0' + num;
         }
         return num.toString();
@@ -1502,6 +1507,7 @@ Number.prototype._toFormattedString = function Number$_toFormattedString(format,
     var _currencyNegativePattern = ["($n)","-$n","$-n","$n-","(n$)","-n$","n-$","n$-","-n $","-$ n","n $-","$ n-","$ -n","n- $","($ n)","(n $)"];
 
         function expandNumber(number, precision, groupSizes, sep, decimalChar) {
+		logger.debug(`>>> Entering expandNumber(number=${number},precision=${precision},groupSizes=${groupSizes},sep=${sep},decimalChar=${decimalChar})`);
         
         var curSize = groupSizes[0];
         var curGroupIndex = 1;
@@ -1509,11 +1515,14 @@ Number.prototype._toFormattedString = function Number$_toFormattedString(format,
                 var numberString = number.toString();
         var right = "";
         var exponent = "";
+				logger.debug(`expandNumber(number=${number},precision=${precision},groupSizes=${groupSizes},sep=${sep},decimalChar=${decimalChar}): exponent → ${exponent}`);
                 var decimalSplit = numberString.split('.');
+				logger.debug(`expandNumber(number=${number},precision=${precision},groupSizes=${groupSizes},sep=${sep},decimalChar=${decimalChar}): decimalSplit → ${decimalSplit}`);
         if (decimalSplit.length > 1) {
             numberString = decimalSplit[0];
             right = decimalSplit[1];
                         var exponentSplit = right.split(/e/i);
+						logger.debug(`expandNumber(number=${number},precision=${precision},groupSizes=${groupSizes},sep=${sep},decimalChar=${decimalChar}): exponentSplit → ${exponentSplit}`);
             if (exponentSplit.length > 1) {
                 right = exponentSplit[0];
                 exponent = "e" + exponentSplit[1];
@@ -1538,6 +1547,7 @@ Number.prototype._toFormattedString = function Number$_toFormattedString(format,
 
         var stringIndex = numberString.length-1;
         var ret = "";
+		logger.debug(`expandNumber(number=${number},precision=${precision},groupSizes=${groupSizes},sep=${sep},decimalChar=${decimalChar}): ret → ${ret}`);
         while (stringIndex >= 0) {
 
                         if (curSize === 0 || curSize > stringIndex) {
@@ -1559,6 +1569,7 @@ Number.prototype._toFormattedString = function Number$_toFormattedString(format,
                 curGroupIndex++;
             }
         }
+		logger.debug(`<<< Exiting expandNumber(number=${number},precision=${precision},groupSizes=${groupSizes},sep=${sep},decimalChar=${decimalChar})`);
         return numberString.slice(0, stringIndex + 1) + sep + ret + right;
     }
     var nf = cultureInfo.numberFormat;
@@ -4836,12 +4847,16 @@ Sys.Net.WebServiceProxy.invoke = function Sys$Net$WebServiceProxy$invoke(service
     request.invoke();
 
     function onComplete(response, eventArgs) {
+		logger.debug(`>>> Entering onComplete(response=${response},eventArgs=${eventArgs})`);
         if (response.get_responseAvailable()) {
             var statusCode = response.get_statusCode();
+			logger.debug(`onComplete(response=${response},eventArgs=${eventArgs}): statusCode → ${statusCode}`);
             var result = null;
+			logger.debug(`onComplete(response=${response},eventArgs=${eventArgs}): result → ${result}`);
 
             try {
                 var contentType = response.getResponseHeader("Content-Type");
+				logger.debug(`onComplete(response=${response},eventArgs=${eventArgs}): contentType → ${contentType}`);
                 if (contentType.startsWith("application/json")) {
                     result = response.get_object();
                 }
@@ -4856,6 +4871,7 @@ Sys.Net.WebServiceProxy.invoke = function Sys$Net$WebServiceProxy$invoke(service
 
             var error = response.getResponseHeader("jsonerror");
             var errorObj = (error === "true");
+			logger.debug(`onComplete(response=${response},eventArgs=${eventArgs}): errorObj → ${errorObj}`);
             if (errorObj) {
                 result = new Sys.Net.WebServiceError(false, result.Message, result.StackTrace, result.ExceptionType);
             }
@@ -4876,7 +4892,9 @@ Sys.Net.WebServiceProxy.invoke = function Sys$Net$WebServiceProxy$invoke(service
                                                                         error = response.get_responseData();
                     }
                     alert(String.format(Sys.Res.webServiceFailed, methodName, error));
+					logger.debug(`onComplete(response=${response},eventArgs=${eventArgs}): error → ${error}`);
                 }
+				logger.debug(`<<< Exiting onComplete(response=${response},eventArgs=${eventArgs})`);
             }
             else if (onSuccess) {
                 onSuccess(result, userContext, methodName);

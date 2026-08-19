@@ -11,6 +11,7 @@ namespace DotNetNuke.Entities.Urls.Config
     [Serializable]
     public class RewriterRule
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RewriterRule));
         [NonSerialized]
         private Regex matchRx;
 
@@ -51,6 +52,8 @@ namespace DotNetNuke.Entities.Urls.Config
         // also don't worry about locking; the worst case this will be created more than once
         public Regex GetRuleRegex(string applicationPath)
         {
+			Logger.LogDebug(">>> Entering GetRuleRegex(applicationPath={ApplicationPath})", applicationPath);
+			Logger.LogDebug("<<< Exiting GetRuleRegex(applicationPath={ApplicationPath})", applicationPath);
             return this.matchRx ?? (this.matchRx =
                 RegexUtils.GetCachedRegex(
                     "^" + RewriterUtils.ResolveUrl(applicationPath, this.LookFor) + "$",

@@ -14,6 +14,7 @@ namespace DotNetNuke.Web.Mvp
     public abstract partial class SettingsView<TModel> : SettingsViewBase, ISettingsView<TModel>
         where TModel : SettingsModel, new()
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SettingsView));
         private TModel model;
 
         /// <inheritdoc />
@@ -42,13 +43,16 @@ namespace DotNetNuke.Web.Mvp
         /// <returns>The setting value or <paramref name="defaultValue"/>.</returns>
         protected string GetModuleSetting(string key, string defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetModuleSetting(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             var value = defaultValue;
 
+			Logger.LogDebug("GetModuleSetting(key={Key},defaultValue={DefaultValue}): value → {Value}", key, defaultValue, value);
             if (this.Model.ModuleSettings.TryGetValue(key, out var settingValue))
             {
                 value = settingValue;
             }
 
+			Logger.LogDebug("<<< Exiting GetModuleSetting(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             return value;
         }
 
@@ -58,13 +62,16 @@ namespace DotNetNuke.Web.Mvp
         /// <returns>The setting value or <paramref name="defaultValue"/>.</returns>
         protected string GetTabModuleSetting(string key, string defaultValue)
         {
+			Logger.LogDebug(">>> Entering GetTabModuleSetting(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             var value = defaultValue;
 
+			Logger.LogDebug("GetTabModuleSetting(key={Key},defaultValue={DefaultValue}): value → {Value}", key, defaultValue, value);
             if (this.Model.TabModuleSettings.TryGetValue(key, out var settingValue))
             {
                 value = settingValue;
             }
 
+			Logger.LogDebug("<<< Exiting GetTabModuleSetting(key={Key},defaultValue={DefaultValue})", key, defaultValue);
             return value;
         }
     }

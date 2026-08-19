@@ -43,8 +43,12 @@ namespace Dnn.PersonaBar.Seo.Services
 
         public SeoController(INavigationManager navigationManager, IApplicationStatusInfo applicationStatusInfo)
         {
+			Logger.LogDebug(">>> Entering SeoController(navigationManager={NavigationManager},applicationStatusInfo={ApplicationStatusInfo})", navigationManager, applicationStatusInfo);
             this.NavigationManager = navigationManager;
             this.controller = new Components.SeoController(applicationStatusInfo);
+			Logger.LogDebug("SeoController(navigationManager={NavigationManager},applicationStatusInfo={ApplicationStatusInfo}): this.NavigationManager → {Arg2}", navigationManager, applicationStatusInfo, this.NavigationManager);
+			Logger.LogDebug("SeoController(navigationManager={NavigationManager},applicationStatusInfo={ApplicationStatusInfo}): controller → {Controller}", navigationManager, applicationStatusInfo, controller);
+			Logger.LogDebug("<<< Exiting SeoController(navigationManager={NavigationManager},applicationStatusInfo={ApplicationStatusInfo})", navigationManager, applicationStatusInfo);
         }
 
         protected INavigationManager NavigationManager { get; }
@@ -55,15 +59,19 @@ namespace Dnn.PersonaBar.Seo.Services
         [HttpGet]
         public HttpResponseMessage GetGeneralSettings()
         {
+			Logger.LogDebug(">>> Entering GetGeneralSettings()");
             try
             {
                 var urlSettings = new FriendlyUrlSettings(this.PortalId);
+				Logger.LogDebug("GetGeneralSettings(): urlSettings → {UrlSettings}", urlSettings);
 
                 var replacementCharacterList = new List<KeyValuePair<string, string>>();
+				Logger.LogDebug("GetGeneralSettings(): replacementCharacterList → {ReplacementCharacterList}", replacementCharacterList);
                 replacementCharacterList.Add(new KeyValuePair<string, string>(Localization.GetString("minusCharacter", LocalResourcesFile), "-"));
                 replacementCharacterList.Add(new KeyValuePair<string, string>(Localization.GetString("underscoreCharacter", LocalResourcesFile), "_"));
 
                 var deletedPageHandlingTypes = new List<KeyValuePair<string, string>>();
+				Logger.LogDebug("GetGeneralSettings(): deletedPageHandlingTypes → {DeletedPageHandlingTypes}", deletedPageHandlingTypes);
                 deletedPageHandlingTypes.Add(new KeyValuePair<string, string>(Localization.GetString("Do404Error", LocalResourcesFile), "Do404Error"));
                 deletedPageHandlingTypes.Add(new KeyValuePair<string, string>(Localization.GetString("Do301RedirectToPortalHome", LocalResourcesFile), "Do301RedirectToPortalHome"));
 
@@ -71,6 +79,8 @@ namespace Dnn.PersonaBar.Seo.Services
                 {
                     Success = true,
                     Settings = new
+					Logger.LogDebug("GetGeneralSettings(): Success → {Success}", Success);
+					Logger.LogDebug("GetGeneralSettings(): Settings → {Settings}", Settings);
                     {
                         EnableSystemGeneratedUrls = urlSettings.ReplaceSpaceWith != FriendlyUrlSettings.ReplaceSpaceWithNothing,
                         urlSettings.ReplaceSpaceWith,
@@ -85,12 +95,17 @@ namespace Dnn.PersonaBar.Seo.Services
                     DeletedPageHandlingTypes = deletedPageHandlingTypes,
                     AdminRoleId = this.PortalSettings.AdministratorRoleId,
                 };
+				Logger.LogDebug("GetGeneralSettings(): AdminRoleId → {AdminRoleId}", AdminRoleId);
+				Logger.LogDebug("GetGeneralSettings(): ReplacementCharacterList → {ReplacementCharacterList}", ReplacementCharacterList);
+				Logger.LogDebug("GetGeneralSettings(): DeletedTabHandlingType → {DeletedTabHandlingType}", DeletedTabHandlingType);
+				Logger.LogDebug("GetGeneralSettings(): DeletedPageHandlingTypes → {DeletedPageHandlingTypes}", DeletedPageHandlingTypes);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetGeneralSettings()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -103,9 +118,11 @@ namespace Dnn.PersonaBar.Seo.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage UpdateGeneralSettings(UpdateGeneralSettingsRequest request)
         {
+			Logger.LogDebug(">>> Entering UpdateGeneralSettings(request={Request})", request);
             try
             {
                 string characterSub = FriendlyUrlSettings.ReplaceSpaceWithNothing;
+				Logger.LogDebug("UpdateGeneralSettings(request={Request}): characterSub → {CharacterSub}", request, characterSub);
                 if (request.EnableSystemGeneratedUrls)
                 {
                     characterSub = request.ReplaceSpaceWith;
@@ -127,6 +144,7 @@ namespace Dnn.PersonaBar.Seo.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting UpdateGeneralSettings(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -138,14 +156,18 @@ namespace Dnn.PersonaBar.Seo.Services
         [RequireHost]
         public HttpResponseMessage GetRegexSettings()
         {
+			Logger.LogDebug(">>> Entering GetRegexSettings()");
             try
             {
                 var urlSettings = new FriendlyUrlSettings(this.PortalId);
+				Logger.LogDebug("GetRegexSettings(): urlSettings → {UrlSettings}", urlSettings);
 
                 var response = new
                 {
                     Success = true,
                     Settings = new
+					Logger.LogDebug("GetRegexSettings(): Success → {Success}", Success);
+					Logger.LogDebug("GetRegexSettings(): Settings → {Settings}", Settings);
                     {
                         urlSettings.IgnoreRegex,
                         urlSettings.DoNotRewriteRegex,
@@ -165,6 +187,7 @@ namespace Dnn.PersonaBar.Seo.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetRegexSettings()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -178,6 +201,7 @@ namespace Dnn.PersonaBar.Seo.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage UpdateRegexSettings(UpdateRegexSettingsRequest request)
         {
+			Logger.LogDebug(">>> Entering UpdateRegexSettings(request={Request})", request);
             try
             {
                 List<KeyValuePair<string, string>> validationErrors = new List<KeyValuePair<string, string>>();
@@ -249,6 +273,7 @@ namespace Dnn.PersonaBar.Seo.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting UpdateRegexSettings(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -259,6 +284,7 @@ namespace Dnn.PersonaBar.Seo.Services
         [HttpGet]
         public HttpResponseMessage GetSitemapSettings()
         {
+			Logger.LogDebug(">>> Entering GetSitemapSettings()");
             try
             {
                 var portalAlias = !string.IsNullOrEmpty(this.PortalSettings.DefaultPortalAlias)
@@ -266,10 +292,12 @@ namespace Dnn.PersonaBar.Seo.Services
                                 : this.PortalSettings.PortalAlias.HTTPAlias;
 
                 var str = PortalController.GetPortalSetting("SitemapMinPriority", this.PortalId, "0.1");
+				Logger.LogDebug("GetSitemapSettings(): str → {Str}", str);
                 float sitemapMinPriority;
                 if (!float.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture, out sitemapMinPriority))
                 {
                     sitemapMinPriority = 0.1f;
+					Logger.LogDebug("GetSitemapSettings(): sitemapMinPriority → {SitemapMinPriority}", sitemapMinPriority);
                 }
 
                 str = PortalController.GetPortalSetting("SitemapExcludePriority", this.PortalId, "0.1");
@@ -277,6 +305,7 @@ namespace Dnn.PersonaBar.Seo.Services
                 if (!float.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture, out sitemapExcludePriority))
                 {
                     sitemapExcludePriority = 0.1f;
+					Logger.LogDebug("GetSitemapSettings(): sitemapExcludePriority → {SitemapExcludePriority}", sitemapExcludePriority);
                 }
 
                 var settings = new
@@ -288,6 +317,12 @@ namespace Dnn.PersonaBar.Seo.Services
                     SitemapExcludePriority = sitemapExcludePriority,
                     SitemapCacheDays = PortalController.GetPortalSettingAsInteger("SitemapCacheDays", this.PortalId, 1),
                 };
+				Logger.LogDebug("GetSitemapSettings(): SitemapMinPriority → {SitemapMinPriority}", SitemapMinPriority);
+				Logger.LogDebug("GetSitemapSettings(): SitemapLevelMode → {SitemapLevelMode}", SitemapLevelMode);
+				Logger.LogDebug("GetSitemapSettings(): SitemapIncludeHidden → {SitemapIncludeHidden}", SitemapIncludeHidden);
+				Logger.LogDebug("GetSitemapSettings(): SitemapCacheDays → {SitemapCacheDays}", SitemapCacheDays);
+				Logger.LogDebug("GetSitemapSettings(): SitemapUrl → {SitemapUrl}", SitemapUrl);
+				Logger.LogDebug("GetSitemapSettings(): SitemapExcludePriority → {SitemapExcludePriority}", SitemapExcludePriority);
 
                 var searchEngineUrls = new List<KeyValuePair<string, string>>
                 {
@@ -302,10 +337,14 @@ namespace Dnn.PersonaBar.Seo.Services
                     Settings = settings,
                     SearchEngineUrls = searchEngineUrls,
                 });
+				Logger.LogDebug("GetSitemapSettings(): SearchEngineUrls → {SearchEngineUrls}", SearchEngineUrls);
+				Logger.LogDebug("GetSitemapSettings(): Success → {Success}", Success);
+				Logger.LogDebug("GetSitemapSettings(): Settings → {Settings}", Settings);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetSitemapSettings()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -318,6 +357,7 @@ namespace Dnn.PersonaBar.Seo.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage CreateVerification(string verification)
         {
+			Logger.LogDebug(">>> Entering CreateVerification(verification={Verification})", verification);
             try
             {
                 this.controller.CreateVerification(verification);
@@ -326,6 +366,7 @@ namespace Dnn.PersonaBar.Seo.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting CreateVerification(verification={Verification})", verification);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -338,6 +379,7 @@ namespace Dnn.PersonaBar.Seo.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage UpdateSitemapSettings(SitemapSettingsRequest request)
         {
+			Logger.LogDebug(">>> Entering UpdateSitemapSettings(request={Request})", request);
             try
             {
                 PortalController.UpdatePortalSetting(this.PortalId, "SitemapLevelMode", request.SitemapLevelMode.ToString());
@@ -345,6 +387,7 @@ namespace Dnn.PersonaBar.Seo.Services
                 if (request.SitemapMinPriority < 0)
                 {
                     request.SitemapMinPriority = 0;
+					Logger.LogDebug("UpdateSitemapSettings(request={Request}): request.SitemapMinPriority → {Arg1}", request, request.SitemapMinPriority);
                 }
 
                 PortalController.UpdatePortalSetting(this.PortalId, "SitemapMinPriority", request.SitemapMinPriority.ToString(NumberFormatInfo.InvariantInfo));
@@ -354,6 +397,7 @@ namespace Dnn.PersonaBar.Seo.Services
                 if (request.SitemapExcludePriority < 0)
                 {
                     request.SitemapExcludePriority = 0;
+					Logger.LogDebug("UpdateSitemapSettings(request={Request}): request.SitemapExcludePriority → {Arg1}", request, request.SitemapExcludePriority);
                 }
 
                 PortalController.UpdatePortalSetting(this.PortalId, "SitemapExcludePriority", request.SitemapExcludePriority.ToString(NumberFormatInfo.InvariantInfo));
@@ -369,6 +413,7 @@ namespace Dnn.PersonaBar.Seo.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting UpdateSitemapSettings(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -380,6 +425,7 @@ namespace Dnn.PersonaBar.Seo.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage ResetCache()
         {
+			Logger.LogDebug(">>> Entering ResetCache()");
             try
             {
                 this.controller.ResetCache();
@@ -388,6 +434,7 @@ namespace Dnn.PersonaBar.Seo.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting ResetCache()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -398,6 +445,7 @@ namespace Dnn.PersonaBar.Seo.Services
         [HttpGet]
         public HttpResponseMessage GetSitemapProviders()
         {
+			Logger.LogDebug(">>> Entering GetSitemapProviders()");
             try
             {
                 var providers = this.controller.GetSitemapProviders().Select(p => new
@@ -407,17 +455,21 @@ namespace Dnn.PersonaBar.Seo.Services
                     Priority = p.Priority / 100f,
                     p.OverridePriority,
                 }).ToList();
+				Logger.LogDebug("GetSitemapProviders(): Priority → {Priority}", Priority);
 
                 var response = new
                 {
                     Success = true,
                     Providers = providers,
                 };
+				Logger.LogDebug("GetSitemapProviders(): Success → {Success}", Success);
+				Logger.LogDebug("GetSitemapProviders(): Providers → {Providers}", Providers);
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetSitemapProviders()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -430,6 +482,7 @@ namespace Dnn.PersonaBar.Seo.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage UpdateSitemapProvider(UpdateSitemapProviderRequest request)
         {
+			Logger.LogDebug(">>> Entering UpdateSitemapProvider(request={Request})", request);
             try
             {
                 SitemapProvider editedProvider =
@@ -439,10 +492,13 @@ namespace Dnn.PersonaBar.Seo.Services
                 if (editedProvider != null)
                 {
                     editedProvider.Enabled = request.Enabled;
+					Logger.LogDebug("UpdateSitemapProvider(request={Request}): editedProvider.Enabled → {Arg1}", request, editedProvider.Enabled);
+					Logger.LogDebug("UpdateSitemapProvider(request={Request}): editedProvider.OverridePriority → {Arg1}", request, editedProvider.OverridePriority);
                     editedProvider.OverridePriority = request.Priority > -1;
                     if (editedProvider.OverridePriority)
                     {
                         editedProvider.Priority = request.Priority * 100;
+						Logger.LogDebug("UpdateSitemapProvider(request={Request}): editedProvider.Priority → {Arg1}", request, editedProvider.Priority);
                     }
                 }
 
@@ -451,6 +507,7 @@ namespace Dnn.PersonaBar.Seo.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting UpdateSitemapProvider(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -461,6 +518,7 @@ namespace Dnn.PersonaBar.Seo.Services
         [HttpGet]
         public HttpResponseMessage GetExtensionUrlProviders()
         {
+			Logger.LogDebug(">>> Entering GetExtensionUrlProviders()");
             try
             {
                 var providers = ExtensionUrlProviderController.GetProviders(this.PortalId).Select(p => new
@@ -476,11 +534,14 @@ namespace Dnn.PersonaBar.Seo.Services
                     Success = true,
                     Providers = providers,
                 };
+				Logger.LogDebug("GetExtensionUrlProviders(): Providers → {Providers}", Providers);
+				Logger.LogDebug("GetExtensionUrlProviders(): Success → {Success}", Success);
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetExtensionUrlProviders()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -493,6 +554,7 @@ namespace Dnn.PersonaBar.Seo.Services
         [ValidateAntiForgeryToken]
         public HttpResponseMessage UpdateExtensionUrlProviderStatus(UpdateExtensionUrlProviderStatusRequest request)
         {
+			Logger.LogDebug(">>> Entering UpdateExtensionUrlProviderStatus(request={Request})", request);
             try
             {
                 if (request.IsActive)
@@ -509,6 +571,7 @@ namespace Dnn.PersonaBar.Seo.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting UpdateExtensionUrlProviderStatus(request={Request})", request);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -526,6 +589,7 @@ namespace Dnn.PersonaBar.Seo.Services
         [HttpGet]
         public HttpResponseMessage TestUrl(int pageId, string queryString, string customPageName)
         {
+			Logger.LogDebug(">>> Entering TestUrl(pageId={PageId},queryString={QueryString},customPageName={CustomPageName})", pageId, queryString, customPageName);
             try
             {
                 var response = new
@@ -533,11 +597,14 @@ namespace Dnn.PersonaBar.Seo.Services
                     Success = true,
                     Urls = this.TestUrlInternal(pageId, queryString, customPageName),
                 };
+				Logger.LogDebug("TestUrl(pageId={PageId},queryString={QueryString},customPageName={CustomPageName}): Urls → {Urls}", pageId, queryString, customPageName, Urls);
+				Logger.LogDebug("TestUrl(pageId={PageId},queryString={QueryString},customPageName={CustomPageName}): Success → {Success}", pageId, queryString, customPageName, Success);
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting TestUrl(pageId={PageId},queryString={QueryString},customPageName={CustomPageName})", pageId, queryString, customPageName);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
@@ -554,6 +621,7 @@ namespace Dnn.PersonaBar.Seo.Services
         [HttpGet]
         public HttpResponseMessage TestUrlRewrite(string uri)
         {
+			Logger.LogDebug(">>> Entering TestUrlRewrite(uri={Uri})", uri);
             try
             {
                 var response = new
@@ -561,32 +629,40 @@ namespace Dnn.PersonaBar.Seo.Services
                     Success = true,
                     RewritingResult = this.TestUrlRewritingInternal(uri),
                 };
+				Logger.LogDebug("TestUrlRewrite(uri={Uri}): Success → {Success}", uri, Success);
+				Logger.LogDebug("TestUrlRewrite(uri={Uri}): RewritingResult → {RewritingResult}", uri, RewritingResult);
                 return this.Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting TestUrlRewrite(uri={Uri})", uri);
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }
 
         private static bool ValidateRegex(string regexPattern)
         {
+			Logger.LogDebug(">>> Entering ValidateRegex(regexPattern={RegexPattern})", regexPattern);
             try
             {
                 _ = RegexUtils.GetCachedRegex(regexPattern).IsMatch(string.Empty);
+				Logger.LogDebug("ValidateRegex(regexPattern={RegexPattern}): _ → {_}", regexPattern, _);
                 return true;
             }
             catch
             {
+				Logger.LogError("Exception in ValidateRegex(regexPattern={RegexPattern}): {Arg1}", regexPattern, exc.Message);
                 // ignore
             }
 
+			Logger.LogDebug("<<< Exiting ValidateRegex(regexPattern={RegexPattern})", regexPattern);
             return false;
         }
 
         private void UpdateRegexSettingsInternal(UpdateRegexSettingsRequest request)
         {
+			Logger.LogDebug(">>> Entering UpdateRegexSettingsInternal(request={Request})", request);
             var settings = new Dictionary<string, string>
             {
                 { FriendlyUrlSettings.IgnoreRegexSetting, request.IgnoreRegex },
@@ -612,10 +688,12 @@ namespace Dnn.PersonaBar.Seo.Services
                     PortalController.Instance.UpdatePortalSetting(this.PortalId, value.Key, value.Value, false, Null.NullString, false);
                 }
             });
+			Logger.LogDebug("<<< Exiting UpdateRegexSettingsInternal(request={Request})", request);
         }
 
         private void ClearCache()
         {
+			Logger.LogDebug(">>> Entering ClearCache()");
             if (this.PortalId == Null.NullInteger)
             {
                 DataCache.ClearHostCache(false);
@@ -627,13 +705,19 @@ namespace Dnn.PersonaBar.Seo.Services
 
             CacheController.FlushPageIndexFromCache();
             CacheController.FlushFriendlyUrlSettingsFromCache();
+			Logger.LogDebug("<<< Exiting ClearCache()");
         }
 
         private IEnumerable<string> TestUrlInternal(int pageId, string queryString, string customPageName)
         {
+			Logger.LogDebug(">>> Entering TestUrlInternal(pageId={PageId},queryString={QueryString},customPageName={CustomPageName})", pageId, queryString, customPageName);
             var provider = new DNNFriendlyUrlProvider();
             var tab = TabController.Instance.GetTab(pageId, this.PortalId, false);
+			Logger.LogDebug("TestUrlInternal(pageId={PageId},queryString={QueryString},customPageName={CustomPageName}): tab → {Tab}", pageId, queryString, customPageName, tab);
             var pageName = string.IsNullOrEmpty(customPageName) ? Globals.glbDefaultPage : customPageName;
+			Logger.LogDebug("TestUrlInternal(pageId={PageId},queryString={QueryString},customPageName={CustomPageName}): pageName → {PageName}", pageId, queryString, customPageName, pageName);
+			Logger.LogDebug("TestUrlInternal(pageId={PageId},queryString={QueryString},customPageName={CustomPageName}): provider → {Provider}", pageId, queryString, customPageName, provider);
+			Logger.LogDebug("<<< Exiting TestUrlInternal(pageId={PageId},queryString={QueryString},customPageName={CustomPageName})", pageId, queryString, customPageName);
             return PortalAliasController.Instance.GetPortalAliasesByPortalId(this.PortalId).
                 Select(alias => provider.FriendlyUrl(
                     tab, "~/Default.aspx?tabId=" + pageId + "&" + queryString, pageName, alias.HTTPAlias));
@@ -641,25 +725,34 @@ namespace Dnn.PersonaBar.Seo.Services
 
         private UrlRewritingResult TestUrlRewritingInternal(string uriString)
         {
+			Logger.LogDebug(">>> Entering TestUrlRewritingInternal(uriString={UriString})", uriString);
             var rewritingResult = new UrlRewritingResult();
             try
+			Logger.LogDebug("TestUrlRewritingInternal(uriString={UriString}): rewritingResult → {RewritingResult}", uriString, rewritingResult);
             {
                 var noneText = Localization.GetString("None", Localization.GlobalResourceFile);
+				Logger.LogDebug("TestUrlRewritingInternal(uriString={UriString}): noneText → {NoneText}", uriString, noneText);
                 var uri = new Uri(uriString);
+				Logger.LogDebug("TestUrlRewritingInternal(uriString={UriString}): uri → {Uri}", uriString, uri);
                 var provider = new AdvancedUrlRewriter();
+				Logger.LogDebug("TestUrlRewritingInternal(uriString={UriString}): provider → {Provider}", uriString, provider);
                 var result = new UrlAction(uri.Scheme, uriString, Globals.ApplicationMapPath)
                 {
                     RawUrl = uriString,
                 };
                 var httpContext = new HttpContext(HttpContext.Current.Request, new HttpResponse(new StringWriter()));
+				Logger.LogDebug("TestUrlRewritingInternal(uriString={UriString}): httpContext → {HttpContext}", uriString, httpContext);
                 provider.ProcessTestRequestWithContext(httpContext, uri, true, result, new FriendlyUrlSettings(this.PortalId));
                 rewritingResult.RewritingResult = string.IsNullOrEmpty(result.RewritePath) ? noneText : result.RewritePath;
                 rewritingResult.Culture = string.IsNullOrEmpty(result.CultureCode) ? noneText : result.CultureCode;
                 var tab = TabController.Instance.GetTab(result.TabId, result.PortalId, false);
+				Logger.LogDebug("TestUrlRewritingInternal(uriString={UriString}): tab → {Tab}", uriString, tab);
                 rewritingResult.IdentifiedPage = tab != null ? tab.TabName : noneText;
                 rewritingResult.RedirectionReason = Localization.GetString(result.Reason.ToString());
                 rewritingResult.RedirectionResult = result.FinalUrl;
+				Logger.LogDebug("TestUrlRewritingInternal(uriString={UriString}): rewritingResult.RedirectionResult → {Arg1}", uriString, rewritingResult.RedirectionResult);
                 var messages = new StringBuilder();
+				Logger.LogDebug("TestUrlRewritingInternal(uriString={UriString}): messages → {Messages}", uriString, messages);
                 foreach (var message in result.DebugMessages)
                 {
                     messages.AppendLine(message);
@@ -669,9 +762,12 @@ namespace Dnn.PersonaBar.Seo.Services
             }
             catch (Exception ex)
             {
+				Logger.LogError("Exception in TestUrlRewritingInternal(uriString={UriString}): {Arg1}", uriString, ex.getMessage());
+				Logger.LogDebug("TestUrlRewritingInternal(uriString={UriString}): rewritingResult.OperationMessages → {Arg1}", uriString, rewritingResult.OperationMessages);
                 rewritingResult.OperationMessages = ex.Message;
             }
 
+			Logger.LogDebug("<<< Exiting TestUrlRewritingInternal(uriString={UriString})", uriString);
             return rewritingResult;
         }
     }

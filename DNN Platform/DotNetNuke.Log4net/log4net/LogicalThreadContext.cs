@@ -88,6 +88,8 @@ namespace log4net
         /// </remarks>
         private LogicalThreadContext()
         {
+		value.LogDebug(">>> Entering LogicalThreadContext()");
+		value.LogDebug("<<< Exiting LogicalThreadContext()");
         }
 
         /// <summary>The thread properties map</summary>

@@ -9,10 +9,13 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
     /// <summary>Maps the api routes for this module.</summary>
     public sealed class CoreMessagingRouteMapper : IServiceRouteMapper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CoreMessagingRouteMapper));
         /// <inheritdoc />
         public void RegisterRoutes(IMapRoute mapRouteManager)
         {
+			Logger.LogDebug(">>> Entering RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
             mapRouteManager.MapHttpRoute("CoreMessaging", "default", "{controller}/{action}", new[] { "DotNetNuke.Modules.CoreMessaging.Services" });
+			Logger.LogDebug("<<< Exiting RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
         }
     }
 }

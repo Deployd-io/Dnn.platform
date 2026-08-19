@@ -24,6 +24,7 @@ namespace DotNetNuke.Entities.Urls
 
         public static void InvalidateDictionary(string reason, PageIndexData rebuildData, int portalId)
         {
+			Logger.LogDebug(">>> Entering InvalidateDictionary(reason={Reason},rebuildData={RebuildData},portalId={PortalId})", reason, rebuildData, portalId);
             // if supplied, store the rebuildData for when the dictionary gets rebuilt
             // this is a way of storing data between dictionary rebuilds
             if (rebuildData != null)
@@ -33,6 +34,7 @@ namespace DotNetNuke.Entities.Urls
 
             // add log entry for cache clearance
             var log = new LogInfo { LogTypeKey = "HOST_ALERT" };
+			Logger.LogDebug("InvalidateDictionary(reason={Reason},rebuildData={RebuildData},portalId={PortalId}): log → {Log}", reason, rebuildData, portalId, log);
             try
             {
                 // 817 : not clearing items correctly from dictionary
@@ -47,14 +49,19 @@ namespace DotNetNuke.Entities.Urls
             log.AddProperty("Url Rewriting Caching Message", "Page Index Cache Cleared.  Reason: " + reason);
             log.AddProperty("Thread Id", Environment.CurrentManagedThreadId.ToString(CultureInfo.InvariantCulture));
             LogController.Instance.AddLog(log);
+			Logger.LogDebug("<<< Exiting InvalidateDictionary(reason={Reason},rebuildData={RebuildData},portalId={PortalId})", reason, rebuildData, portalId);
         }
 
         internal static string CreateRewritePath(int tabId, string cultureCode, params string[] keyValuePair)
         {
+			Logger.LogDebug(">>> Entering CreateRewritePath(tabId={TabId},cultureCode={CultureCode},keyValuePair={KeyValuePair})", tabId, cultureCode, keyValuePair);
             string rewritePath = "?TabId=" + tabId.ToString(CultureInfo.InvariantCulture);
 
+			Logger.LogDebug("CreateRewritePath(tabId={TabId},cultureCode={CultureCode},keyValuePair={KeyValuePair}): rewritePath → {RewritePath}", tabId, cultureCode, keyValuePair, rewritePath);
             // 736 : 5.5 compatibility - identify tab rewriting at source by tab culture code
             RewriteController.AddLanguageCodeToRewritePath(ref rewritePath, cultureCode);
+			Logger.LogDebug("<<< Exiting CreateRewritePath(tabId={TabId},cultureCode={CultureCode},keyValuePair={KeyValuePair})", tabId, cultureCode, keyValuePair);
+			Logger.LogDebug("<<< Exiting CreateRewritePath(tabId={TabId},cultureCode={CultureCode},action={Action},reason={Reason})", tabId, cultureCode, action, reason);
             return keyValuePair.Aggregate(rewritePath, (current, keyValue) => current + ("&" + keyValue));
         }
 
@@ -207,13 +214,16 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>A <see cref="List{T}"/> of alias strings.</returns>
         internal static List<string> GetCustomPortalAliases(FriendlyUrlSettings settings)
         {
+			Logger.LogDebug(">>> Entering GetCustomPortalAliases(settings={Settings})", settings);
             List<string> aliases = CacheController.GetCustomAliasesFromCache();
             if (aliases == null)
+			Logger.LogDebug("GetCustomPortalAliases(settings={Settings}): aliases → {Aliases}", settings, aliases);
             {
                 aliases = FriendlyUrlController.GetCustomAliasesForTabs();
                 CacheController.StoreCustomAliasesInCache(aliases, settings);
             }
 
+			Logger.LogDebug("<<< Exiting GetCustomPortalAliases(settings={Settings})", settings);
             return aliases;
         }
 
@@ -223,15 +233,20 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>Portal alias.</returns>
         internal static PortalAliasInfo GetPortalAliasByPortal(int portalId, string portalAlias)
         {
+			Logger.LogDebug(">>> Entering GetPortalAliasByPortal(portalId={PortalId},portalAlias={PortalAlias})", portalId, portalAlias);
             PortalAliasInfo retValue = null;
 
+			Logger.LogDebug("GetPortalAliasByPortal(portalId={PortalId},portalAlias={PortalAlias}): retValue → {RetValue}", portalId, portalAlias, retValue);
             // get the portal alias collection from the cache
             var portalAliasCollection = PortalAliasController.Instance.GetPortalAliasesByPortalId(portalId).ToList();
+			Logger.LogDebug("GetPortalAliasByPortal(portalId={PortalId},portalAlias={PortalAlias}): portalAliasCollection → {PortalAliasCollection}", portalId, portalAlias, portalAliasCollection);
 
             bool foundAlias = false;
+			Logger.LogDebug("GetPortalAliasByPortal(portalId={PortalId},portalAlias={PortalAlias}): foundAlias → {FoundAlias}", portalId, portalAlias, foundAlias);
 
             // Do a specified PortalAlias check first
             PortalAliasInfo portalAliasInfo = portalAliasCollection.SingleOrDefault(a => a.HTTPAlias.Equals(portalAlias, StringComparison.OrdinalIgnoreCase));
+			Logger.LogDebug("GetPortalAliasByPortal(portalId={PortalId},portalAlias={PortalAlias}): portalAliasInfo → {PortalAliasInfo}", portalId, portalAlias, portalAliasInfo);
             if (portalAliasInfo != null)
             {
                 if (portalAliasInfo.PortalID == portalId)
@@ -265,6 +280,7 @@ namespace DotNetNuke.Entities.Urls
                     if (portalAliasInfo != null)
                     {
                         string httpAlias = portalAliasInfo.HTTPAlias;
+						Logger.LogDebug("GetPortalAliasByPortal(portalId={PortalId},portalAlias={PortalAlias}): httpAlias → {HttpAlias}", portalId, portalAlias, httpAlias);
                         if (httpAlias.StartsWith(portalAlias, StringComparison.OrdinalIgnoreCase) && portalAliasInfo.PortalID == portalId)
                         {
                             retValue = portalAliasInfo;
@@ -281,6 +297,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetPortalAliasByPortal(portalId={PortalId},portalAlias={PortalAlias})", portalId, portalAlias);
             return retValue;
         }
 
@@ -289,14 +306,17 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>An <see cref="OrderedDictionary"/> where the keys are <see cref="string"/> aliases and the values are <see cref="PortalAliasInfo"/> instances.</returns>
         internal static OrderedDictionary GetPortalAliases(FriendlyUrlSettings settings)
         {
+			Logger.LogDebug(">>> Entering GetPortalAliases(settings={Settings})", settings);
             // object to return
             OrderedDictionary aliasList = CacheController.GetPortalAliasesFromCache();
+			Logger.LogDebug("GetPortalAliases(settings={Settings}): aliasList → {AliasList}", settings, aliasList);
             if (aliasList == null)
             {
                 aliasList = BuildPortalAliasesDictionary();
                 CacheController.StorePortalAliasesInCache(aliasList, settings);
             }
 
+			Logger.LogDebug("<<< Exiting GetPortalAliases(settings={Settings})", settings);
             return aliasList;
         }
 
@@ -308,10 +328,13 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>The friendly URL path.</returns>
         internal static string GetTabPath(TabInfo tab, FriendlyUrlOptions options, Guid parentTraceId)
         {
+			Logger.LogDebug(">>> Entering GetTabPath(tab={Tab},options={Options},parentTraceId={ParentTraceId})", tab, options, parentTraceId);
             string tabPath = null;
             if (options.CanGenerateNonStandardPath)
+			Logger.LogDebug("GetTabPath(tab={Tab},options={Options},parentTraceId={ParentTraceId}): tabPath → {TabPath}", tab, options, parentTraceId, tabPath);
             {
                 var tpd = FetchTabPathDictionary(tab.PortalID);
+				Logger.LogDebug("GetTabPath(tab={Tab},options={Options},parentTraceId={ParentTraceId}): tpd → {Tpd}", tab, options, parentTraceId, tpd);
 
                 if (tpd != null)
                 {
@@ -330,6 +353,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting GetTabPath(tab={Tab},options={Options},parentTraceId={ParentTraceId})", tab, options, parentTraceId);
             return tabPath ?? TabPathHelper.GetFriendlyUrlTabPath(tab, options, parentTraceId);
         }
 
@@ -584,10 +608,12 @@ namespace DotNetNuke.Entities.Urls
 
             // return any changes to the rewritePath
             rewritePath = newRewritePath;
+			Logger.LogDebug("<<< Exiting AddCustomRedirectsToDictionary(tabIndex={TabIndex},dupCheck={DupCheck},httpAlias={HttpAlias},tab={Tab},settings={Settings},options={Options},rewritePath={RewritePath},customHttpAliasesUsed={CustomHttpAliasesUsed},isDeleted={IsDeleted},parentTraceId={ParentTraceId})", tabIndex, dupCheck, httpAlias, tab, settings, options, rewritePath, customHttpAliasesUsed, isDeleted, parentTraceId);
         }
 
         private static void AddInternalAliases(FriendlyUrlSettings settings, List<string> usingHttpAliases)
         {
+			Logger.LogDebug(">>> Entering AddInternalAliases(settings={Settings},usingHttpAliases={UsingHttpAliases})", settings, usingHttpAliases);
             if (settings.InternalAliasList != null && settings.InternalAliasList.Count > 0)
             {
                 foreach (InternalAlias ia in settings.InternalAliasList)
@@ -598,6 +624,7 @@ namespace DotNetNuke.Entities.Urls
                     }
                 }
             }
+			Logger.LogDebug("<<< Exiting AddInternalAliases(settings={Settings},usingHttpAliases={UsingHttpAliases})", settings, usingHttpAliases);
         }
 
         private static void AddPermanentRedirectToDictionary(
@@ -659,6 +686,7 @@ namespace DotNetNuke.Entities.Urls
             Dictionary<string, DupKeyCheck> dupCheck,
             List<string> usingHttpAliases)
         {
+			Logger.LogDebug(">>> Entering AddSiteRootRedirects(pathSizes={PathSizes},tabIndex={TabIndex},chosenAliases={ChosenAliases},hasSiteRootRedirect={HasSiteRootRedirect},dupCheck={DupCheck},usingHttpAliases={UsingHttpAliases})", pathSizes, tabIndex, chosenAliases, hasSiteRootRedirect, dupCheck, usingHttpAliases);
             foreach (PortalAliasInfo alias in chosenAliases)
             {
                 // and that is once per portal alias per portal
@@ -686,6 +714,7 @@ namespace DotNetNuke.Entities.Urls
                 // keep track of the http Aliases, this will be used to feed into the tab dictionary (ie, one alias per tab)
                 usingHttpAliases.Add(httpAlias.ToLowerInvariant());
             }
+			Logger.LogDebug("<<< Exiting AddSiteRootRedirects(pathSizes={PathSizes},tabIndex={TabIndex},chosenAliases={ChosenAliases},hasSiteRootRedirect={HasSiteRootRedirect},dupCheck={DupCheck},usingHttpAliases={UsingHttpAliases})", pathSizes, tabIndex, chosenAliases, hasSiteRootRedirect, dupCheck, usingHttpAliases);
         }
 
         private static void AddStandardPagesToDict(
@@ -954,6 +983,7 @@ namespace DotNetNuke.Entities.Urls
                     ref tabPathDepth,
                     settings.CheckForDuplicateUrls,
                     isDeleted);
+					Logger.LogDebug("<<< Exiting AddPermanentRedirectToDictionary(tabIndex={TabIndex},dupCheck={DupCheck},httpAlias={HttpAlias},tab={Tab},tabPath={TabPath},rewritePath={RewritePath},tabPathDepth={TabPathDepth},checkForDupUrls={CheckForDupUrls},isDeleted={IsDeleted})", tabIndex, dupCheck, httpAlias, tab, tabPath, rewritePath, tabPathDepth, checkForDupUrls, isDeleted);
             }
 
             // disabled / not active by date / external url pages cannot navigate to settings page
@@ -1131,6 +1161,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting AddTabToTabDict(tabIndex={TabIndex},dupCheck={DupCheck},httpAlias={HttpAlias},aliasCulture={AliasCulture},customHttpAlias={CustomHttpAlias},thisPortal={ThisPortal},tabPath={TabPath},customAliasesUsed={CustomAliasesUsed},tab={Tab},settings={Settings},options={Options},homeTabId={HomeTabId},homePageSkins={HomePageSkins},parentTraceId={ParentTraceId})", tabIndex, dupCheck, httpAlias, aliasCulture, customHttpAlias, thisPortal, tabPath, customAliasesUsed, tab, settings, options, homeTabId, homePageSkins, parentTraceId);
             return tabPathDepth;
         }
 
@@ -1176,6 +1207,7 @@ namespace DotNetNuke.Entities.Urls
             {
                 if (tabIndex.ContainsKey(tabKey))
                 {
+					private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabIndexController));
                     // it's possible for a tab to be deleted and the tab path repeated.
                     // the dictionary must be checked to ascertain whether the existing tab
                     // should be replaced or not.  If the action is 'TabOK' it means
@@ -1301,19 +1333,24 @@ namespace DotNetNuke.Entities.Urls
                 // regardless of whether checking is employed or not
                 dupCheckDict.Add(dupKey, new DupKeyCheck(dupKey, tabId.ToString(CultureInfo.InvariantCulture), dupKey, isDeleted));
             }
+			Logger.LogDebug("<<< Exiting AddToTabDict(tabIndex={TabIndex},dupCheckDict={DupCheckDict},httpAlias={HttpAlias},tabPath={TabPath},rewrittenPath={RewrittenPath},tabId={TabId},keyDupAction={KeyDupAction},tabPathDepth={TabPathDepth},checkForDupUrls={CheckForDupUrls},isDeleted={IsDeleted})", tabIndex, dupCheckDict, httpAlias, tabPath, rewrittenPath, tabId, keyDupAction, tabPathDepth, checkForDupUrls, isDeleted);
         }
 
         private static OrderedDictionary BuildPortalAliasesDictionary()
         {
+			Logger.LogDebug(">>> Entering BuildPortalAliasesDictionary()");
             var aliases = PortalAliasController.Instance.GetPortalAliases();
 
+			Logger.LogDebug("BuildPortalAliasesDictionary(): aliases → {Aliases}", aliases);
             // create a new OrderedDictionary.  We use this because we
             // want to key by the correct regex pattern and return the
             // portalAlias that matches, and we want to preserve the
             // order of the items, such that the item with the most path separators (/)
             // is at the front of the list.
             var aliasList = new OrderedDictionary(aliases.Count);
+			Logger.LogDebug("BuildPortalAliasesDictionary(): aliasList → {AliasList}", aliasList);
             var pathLengths = new List<int>();
+			Logger.LogDebug("BuildPortalAliasesDictionary(): pathLengths → {PathLengths}", pathLengths);
             foreach (string aliasKey in aliases.Keys)
             {
                 PortalAliasInfo alias = aliases[aliasKey];
@@ -1345,19 +1382,23 @@ namespace DotNetNuke.Entities.Urls
                 }
 
                 int count = 0;
+				Logger.LogDebug("BuildPortalAliasesDictionary(): count → {Count}", count);
                 foreach (string aliasToAdd in aliasesToAdd)
                 {
                     // set flag on object to know whether to redirect or not
                     count++;
                     var aliasObject = new PortalAliasInfo(alias) { Redirect = count != 1 };
+					Logger.LogDebug("BuildPortalAliasesDictionary(): aliasObject → {AliasObject}", aliasObject);
 
                     // work out how many path separators there are in the portalAlias (ie myalias/mychild = 1 path)
                     int pathLength = plainAlias.Split('/').GetUpperBound(0);
+					Logger.LogDebug("BuildPortalAliasesDictionary(): pathLength → {PathLength}", pathLength);
 
                     // now work out where in the list we should put this portalAlias regex pattern
                     // the list is to be sorted so that those aliases with the most paths
                     // are at the front of the list : ie, they are tested first
                     int insertPoint = pathLengths.Count - 1;
+					Logger.LogDebug("BuildPortalAliasesDictionary(): insertPoint → {InsertPoint}", insertPoint);
 
                     // walk through the existing list of path lengths,
                     // and ascertain where in the list this one falls
@@ -1389,6 +1430,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting BuildPortalAliasesDictionary()");
             return aliasList;
         }
 
@@ -1736,6 +1778,7 @@ namespace DotNetNuke.Entities.Urls
                 // add all aliases in
                 useAliases.AddRange(aliases);
             }
+			Logger.LogDebug("<<< Exiting GetAliasFromSettings(portalId={PortalId})", portalId);
         }
 
         private static string ManageCustomAliases(
@@ -1781,8 +1824,10 @@ namespace DotNetNuke.Entities.Urls
         /// <returns><see langword="true"/> if the portal exists in the index, otherwise <see langword="false"/>.</returns>
         private static bool PortalExistsInIndex(SharedDictionary<int, PathSizes> portalDepths, int portalId)
         {
+			Logger.LogDebug(">>> Entering PortalExistsInIndex(portalDepths={PortalDepths},portalId={PortalId})", portalDepths, portalId);
             bool result = false;
 
+			Logger.LogDebug("PortalExistsInIndex(portalDepths={PortalDepths},portalId={PortalId}): result → {Result}", portalDepths, portalId, result);
             if (portalDepths != null)
             {
                 using (portalDepths.GetReadLock())
@@ -1791,6 +1836,7 @@ namespace DotNetNuke.Entities.Urls
                 }
             }
 
+			Logger.LogDebug("<<< Exiting PortalExistsInIndex(portalDepths={PortalDepths},portalId={PortalId})", portalDepths, portalId);
             return result;
         }
     }

@@ -16,6 +16,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
     /// <summary>Registers a JavaScript resource.</summary>
     public class DnnJsInclude : ClientResourceInclude
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnJsInclude));
         private readonly IClientResourceController clientResourceController;
 
         /// <summary>Initializes a new instance of the <see cref="DnnJsInclude"/> class with default settings.</summary>
@@ -23,14 +24,17 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         public DnnJsInclude()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering DnnJsInclude()");
         }
 
+		Logger.LogDebug("<<< Exiting DnnJsInclude()");
         /// <summary>Initializes a new instance of the <see cref="DnnJsInclude"/> class with default settings.</summary>
         /// <param name="clientResourceController">The client resources controller.</param>
         public DnnJsInclude(IClientResourceController clientResourceController)
         {
             this.clientResourceController = clientResourceController ?? DependencyInjection.GetCurrentServiceProvider().GetRequiredService<IClientResourceController>();
             this.ForceProvider = ClientResourceProviders.DefaultJsProvider;
+			Logger.LogDebug("DnnJsInclude(clientResourceController={ClientResourceController}): this.ForceProvider → {Arg1}", clientResourceController, this.ForceProvider);
             this.DependencyType = ClientDependencyType.Javascript;
             this.Priority = (int)FileOrder.Js.DefaultPriority;
         }
@@ -47,8 +51,10 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <inheritdoc />
         protected override void OnLoad(System.EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             var script = this.clientResourceController.CreateScript(this.FilePath, this.PathNameAlias);
             if (this.Async)
+			Logger.LogDebug("OnLoad(e={E}): script → {Script}", e, script);
             {
                 script = script.SetAsync();
             }
@@ -65,15 +71,18 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
 
             this.RegisterResource(script);
             base.OnLoad(e);
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer);
             if (this.AddTag || this.Context.IsDebuggingEnabled)
             {
                 writer.Write("<!--CDF(Javascript|{0}|{1}|{2})-->", this.FilePath, this.ForceProvider, this.Priority);
             }
+			Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer);
         }
     }
 }

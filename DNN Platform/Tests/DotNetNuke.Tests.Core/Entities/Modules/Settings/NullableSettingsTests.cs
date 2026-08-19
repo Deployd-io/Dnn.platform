@@ -30,7 +30,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
 
         protected override void SetupServiceProvider(IServiceCollection services)
         {
+			mockEventLogger.LogDebug(">>> Entering SetupServiceProvider(services={Services})", services);
             services.AddSingleton<ISerializationManager, SerializationManager>();
+			mockEventLogger.LogDebug("<<< Exiting SetupServiceProvider(services={Services})", services);
         }
 
         [Test]
@@ -38,7 +40,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("ar-JO")]
         public void SaveSettings_CallsUpdateSetting_WithRightParameters_ar_JO(string stringValue, int? integerValue, DateTime? datetimeValue, TimeSpan? timeSpanValue)
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_CallsUpdateSetting_WithRightParameters_ar_JO(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
             this.SaveSettings_CallsUpdateSetting_WithRightParameters(stringValue, integerValue, datetimeValue, timeSpanValue);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_CallsUpdateSetting_WithRightParameters_ar_JO(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
         }
 
         [Test]
@@ -46,7 +50,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("ca-ES")]
         public void SaveSettings_CallsUpdateSetting_WithRightParameters_ca_ES(string stringValue, int? integerValue, DateTime? datetimeValue, TimeSpan? timeSpanValue)
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_CallsUpdateSetting_WithRightParameters_ca_ES(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
             this.SaveSettings_CallsUpdateSetting_WithRightParameters(stringValue, integerValue, datetimeValue, timeSpanValue);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_CallsUpdateSetting_WithRightParameters_ca_ES(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
         }
 
         [Test]
@@ -54,7 +60,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("zh-CN")]
         public void SaveSettings_CallsUpdateSetting_WithRightParameters_zh_CN(string stringValue, int? integerValue, DateTime? datetimeValue, TimeSpan? timeSpanValue)
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_CallsUpdateSetting_WithRightParameters_zh_CN(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
             this.SaveSettings_CallsUpdateSetting_WithRightParameters(stringValue, integerValue, datetimeValue, timeSpanValue);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_CallsUpdateSetting_WithRightParameters_zh_CN(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
         }
 
         [Test]
@@ -62,7 +70,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("en-US")]
         public void SaveSettings_CallsUpdateSetting_WithRightParameters_en_US(string stringValue, int? integerValue, DateTime? datetimeValue, TimeSpan? timeSpanValue)
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_CallsUpdateSetting_WithRightParameters_en_US(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
             this.SaveSettings_CallsUpdateSetting_WithRightParameters(stringValue, integerValue, datetimeValue, timeSpanValue);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_CallsUpdateSetting_WithRightParameters_en_US(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
         }
 
         [Test]
@@ -70,7 +80,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("fr-FR")]
         public void SaveSettings_CallsUpdateSetting_WithRightParameters_fr_FR(string stringValue, int? integerValue, DateTime? datetimeValue, TimeSpan? timeSpanValue)
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_CallsUpdateSetting_WithRightParameters_fr_FR(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
             this.SaveSettings_CallsUpdateSetting_WithRightParameters(stringValue, integerValue, datetimeValue, timeSpanValue);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_CallsUpdateSetting_WithRightParameters_fr_FR(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
         }
 
         [Test]
@@ -78,7 +90,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("he-IL")]
         public void SaveSettings_CallsUpdateSetting_WithRightParameters_he_IL(string stringValue, int? integerValue, DateTime? datetimeValue, TimeSpan? timeSpanValue)
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_CallsUpdateSetting_WithRightParameters_he_IL(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
             this.SaveSettings_CallsUpdateSetting_WithRightParameters(stringValue, integerValue, datetimeValue, timeSpanValue);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_CallsUpdateSetting_WithRightParameters_he_IL(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
         }
 
         [Test]
@@ -86,7 +100,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("ru-RU")]
         public void SaveSettings_CallsUpdateSetting_WithRightParameters_ru_RU(string stringValue, int? integerValue, DateTime? datetimeValue, TimeSpan? timeSpanValue)
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_CallsUpdateSetting_WithRightParameters_ru_RU(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
             this.SaveSettings_CallsUpdateSetting_WithRightParameters(stringValue, integerValue, datetimeValue, timeSpanValue);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_CallsUpdateSetting_WithRightParameters_ru_RU(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
         }
 
         [Test]
@@ -94,42 +110,56 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("tr-TR")]
         public void SaveSettings_CallsUpdateSetting_WithRightParameters_tr_TR(string stringValue, int? integerValue, DateTime? datetimeValue, TimeSpan? timeSpanValue)
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_CallsUpdateSetting_WithRightParameters_tr_TR(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
             this.SaveSettings_CallsUpdateSetting_WithRightParameters(stringValue, integerValue, datetimeValue, timeSpanValue);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_CallsUpdateSetting_WithRightParameters_tr_TR(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
         }
 
         [Test]
         public void SaveSettings_UpdatesCache()
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_UpdatesCache()");
             // Arrange
             var moduleInfo = GetModuleInfo;
             var settings = new MyNullableSettings();
+			mockEventLogger.LogDebug("SaveSettings_UpdatesCache(): settings → {Settings}", settings);
 
             this.MockModuleSettings(moduleInfo, new Hashtable());
             this.MockTabModuleSettings(moduleInfo, new Hashtable());
             this.MockCache.Setup(c => c.Insert(CacheKey(moduleInfo), settings));
             var settingsRepository = new MyNullableSettingsRepository();
+			mockEventLogger.LogDebug("SaveSettings_UpdatesCache(): settingsRepository → {SettingsRepository}", settingsRepository);
 
             // Act
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			mockEventLogger.LogInformation("SaveSettings_UpdatesCache(): save query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
             settingsRepository.SaveSettings(moduleInfo, settings);
 
             // Assert
             this.MockRepository.VerifyAll();
+			mockEventLogger.LogInformation("SaveSettings_UpdatesCache(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_UpdatesCache()");
         }
 
         [Test]
         public void GetSettings_CallsGetCachedObject()
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_CallsGetCachedObject()");
             // Arrange
             var moduleInfo = GetModuleInfo;
 
             this.MockCache.Setup(c => c.GetItem("DNN_" + CacheKey(moduleInfo))).Returns(new MyNullableSettings());
             var settingsRepository = new MyNullableSettingsRepository();
+			mockEventLogger.LogDebug("GetSettings_CallsGetCachedObject(): settingsRepository → {SettingsRepository}", settingsRepository);
 
             // Act
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			mockEventLogger.LogInformation("GetSettings_CallsGetCachedObject(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
             settingsRepository.GetSettings(moduleInfo);
 
             // Assert
             this.MockRepository.VerifyAll();
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_CallsGetCachedObject()");
         }
 
         [Test]
@@ -137,7 +167,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("ar-JO")]
         public void GetSettings_GetsValues_FromCorrectSettings_ar_JO(string stringValue, int? integerValue, DateTime? datetimeValue, TimeSpan? timeSpanValue)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_GetsValues_FromCorrectSettings_ar_JO(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
             this.GetSettings_GetsValues_FromCorrectSettings(stringValue, integerValue, datetimeValue, timeSpanValue);
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_GetsValues_FromCorrectSettings_ar_JO(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
         }
 
         [Test]
@@ -145,7 +177,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("ca-ES")]
         public void GetSettings_GetsValues_FromCorrectSettings_ca_ES(string stringValue, int? integerValue, DateTime? datetimeValue, TimeSpan? timeSpanValue)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_GetsValues_FromCorrectSettings_ca_ES(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
             this.GetSettings_GetsValues_FromCorrectSettings(stringValue, integerValue, datetimeValue, timeSpanValue);
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_GetsValues_FromCorrectSettings_ca_ES(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
         }
 
         [Test]
@@ -153,7 +187,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("zh-CN")]
         public void GetSettings_GetsValues_FromCorrectSettings_zh_CN(string stringValue, int? integerValue, DateTime? datetimeValue, TimeSpan? timeSpanValue)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_GetsValues_FromCorrectSettings_zh_CN(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
             this.GetSettings_GetsValues_FromCorrectSettings(stringValue, integerValue, datetimeValue, timeSpanValue);
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_GetsValues_FromCorrectSettings_zh_CN(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
         }
 
         [Test]
@@ -161,7 +197,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("en-US")]
         public void GetSettings_GetsValues_FromCorrectSettings_en_US(string stringValue, int? integerValue, DateTime? datetimeValue, TimeSpan? timeSpanValue)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_GetsValues_FromCorrectSettings_en_US(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
             this.GetSettings_GetsValues_FromCorrectSettings(stringValue, integerValue, datetimeValue, timeSpanValue);
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_GetsValues_FromCorrectSettings_en_US(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
         }
 
         [Test]
@@ -169,7 +207,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("fr-FR")]
         public void GetSettings_GetsValues_FromCorrectSettings_fr_FR(string stringValue, int? integerValue, DateTime? datetimeValue, TimeSpan? timeSpanValue)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_GetsValues_FromCorrectSettings_fr_FR(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
             this.GetSettings_GetsValues_FromCorrectSettings(stringValue, integerValue, datetimeValue, timeSpanValue);
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_GetsValues_FromCorrectSettings_fr_FR(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
         }
 
         [Test]
@@ -177,7 +217,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("he-IL")]
         public void GetSettings_GetsValues_FromCorrectSettings_he_IL(string stringValue, int? integerValue, DateTime? datetimeValue, TimeSpan? timeSpanValue)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_GetsValues_FromCorrectSettings_he_IL(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
             this.GetSettings_GetsValues_FromCorrectSettings(stringValue, integerValue, datetimeValue, timeSpanValue);
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_GetsValues_FromCorrectSettings_he_IL(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
         }
 
         [Test]
@@ -185,7 +227,9 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("ru-RU")]
         public void GetSettings_GetsValues_FromCorrectSettings_ru_RU(string stringValue, int? integerValue, DateTime? datetimeValue, TimeSpan? timeSpanValue)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_GetsValues_FromCorrectSettings_ru_RU(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
             this.GetSettings_GetsValues_FromCorrectSettings(stringValue, integerValue, datetimeValue, timeSpanValue);
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_GetsValues_FromCorrectSettings_ru_RU(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
         }
 
         [Test]
@@ -193,11 +237,14 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
         [SetCulture("tr-TR")]
         public void GetSettings_GetsValues_FromCorrectSettings_tr_TR(string stringValue, int? integerValue, DateTime? datetimeValue, TimeSpan? timeSpanValue)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_GetsValues_FromCorrectSettings_tr_TR(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
             this.GetSettings_GetsValues_FromCorrectSettings(stringValue, integerValue, datetimeValue, timeSpanValue);
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_GetsValues_FromCorrectSettings_tr_TR(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
         }
 
         private void SaveSettings_CallsUpdateSetting_WithRightParameters(string stringValue, int? integerValue, DateTime? datetimeValue, TimeSpan? timeSpanValue)
         {
+			mockEventLogger.LogDebug(">>> Entering SaveSettings_CallsUpdateSetting_WithRightParameters(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
             // Arrange
             var moduleInfo = GetModuleInfo;
             var settings = new MyNullableSettings
@@ -213,39 +260,55 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
             var expectedStringValue = stringValue ?? string.Empty;
             this.MockModuleController.Setup(pc => pc.UpdateModuleSetting(ModuleId, "StringProperty", expectedStringValue));
             var integerString = integerValue?.ToString() ?? string.Empty;
+			mockEventLogger.LogDebug("SaveSettings_CallsUpdateSetting_WithRightParameters(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue}): integerString → {IntegerString}", stringValue, integerValue, datetimeValue, timeSpanValue, integerString);
             this.MockPortalController.Setup(pc => pc.UpdatePortalSetting(PortalId, "IntegerProperty", integerString, true, Null.NullString, false));
             var dateTimeString = datetimeValue?.ToString("o", CultureInfo.InvariantCulture) ?? string.Empty;
+			mockEventLogger.LogDebug("SaveSettings_CallsUpdateSetting_WithRightParameters(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue}): dateTimeString → {DateTimeString}", stringValue, integerValue, datetimeValue, timeSpanValue, dateTimeString);
             this.MockModuleController.Setup(mc => mc.UpdateModuleSetting(ModuleId, "DateTimeProperty", dateTimeString));
             var timeSpanString = timeSpanValue?.ToString("c", CultureInfo.InvariantCulture) ?? string.Empty;
+			mockEventLogger.LogDebug("SaveSettings_CallsUpdateSetting_WithRightParameters(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue}): timeSpanString → {TimeSpanString}", stringValue, integerValue, datetimeValue, timeSpanValue, timeSpanString);
             this.MockModuleController.Setup(mc => mc.UpdateTabModuleSetting(TabModuleId, "TimeSpanProperty", timeSpanString));
 
             var settingsRepository = new MyNullableSettingsRepository();
+			mockEventLogger.LogDebug("SaveSettings_CallsUpdateSetting_WithRightParameters(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue}): settingsRepository → {SettingsRepository}", stringValue, integerValue, datetimeValue, timeSpanValue, settingsRepository);
 
             // Act
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			mockEventLogger.LogInformation("SaveSettings_CallsUpdateSetting_WithRightParameters(stringValue,integerValue,datetimeValue,timeSpanValue)={StringValue},{IntegerValue},{DatetimeValue},{TimeSpanValue}: save query executed in {Arg4} ms", stringValue, integerValue, datetimeValue, timeSpanValue, __logStart.ElapsedMilliseconds);
             settingsRepository.SaveSettings(moduleInfo, settings);
 
             // Assert
             this.MockRepository.VerifyAll();
+			mockEventLogger.LogInformation("SaveSettings_CallsUpdateSetting_WithRightParameters(stringValue,integerValue,datetimeValue,timeSpanValue)={StringValue},{IntegerValue},{DatetimeValue},{TimeSpanValue}: database query executed in {Arg4} ms", stringValue, integerValue, datetimeValue, timeSpanValue, __logStart.ElapsedMilliseconds);
+			mockEventLogger.LogDebug("<<< Exiting SaveSettings_CallsUpdateSetting_WithRightParameters(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
         }
 
         private void GetSettings_GetsValues_FromCorrectSettings(string stringValue, int? integerValue, DateTime? datetimeValue, TimeSpan? timeSpanValue)
         {
+			mockEventLogger.LogDebug(">>> Entering GetSettings_GetsValues_FromCorrectSettings(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
             // Arrange
             var expectedStringValue = stringValue ?? string.Empty;
             var moduleInfo = GetModuleInfo;
             var portalSettings = new Dictionary<string, string> { ["IntegerProperty"] = integerValue?.ToString() ?? string.Empty, };
+			mockEventLogger.LogDebug("GetSettings_GetsValues_FromCorrectSettings(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue}): portalSettings → {PortalSettings}", stringValue, integerValue, datetimeValue, timeSpanValue, portalSettings);
             var moduleSettings = new Hashtable { ["DateTimeProperty"] = datetimeValue?.ToString("o", CultureInfo.InvariantCulture) ?? string.Empty, ["StringProperty"] = expectedStringValue, };
+			mockEventLogger.LogDebug("GetSettings_GetsValues_FromCorrectSettings(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue}): moduleSettings → {ModuleSettings}", stringValue, integerValue, datetimeValue, timeSpanValue, moduleSettings);
             var tabModuleSettings = new Hashtable { ["TimeSpanProperty"] = timeSpanValue?.ToString("c", CultureInfo.InvariantCulture) ?? string.Empty, };
+			mockEventLogger.LogDebug("GetSettings_GetsValues_FromCorrectSettings(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue}): tabModuleSettings → {TabModuleSettings}", stringValue, integerValue, datetimeValue, timeSpanValue, tabModuleSettings);
 
             this.MockPortalSettings(moduleInfo, portalSettings);
             this.MockModuleSettings(moduleInfo, moduleSettings);
             this.MockTabModuleSettings(moduleInfo, tabModuleSettings);
 
             var settingsRepository = new MyNullableSettingsRepository();
+			mockEventLogger.LogDebug("GetSettings_GetsValues_FromCorrectSettings(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue}): settingsRepository → {SettingsRepository}", stringValue, integerValue, datetimeValue, timeSpanValue, settingsRepository);
 
             // Act
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var settings = settingsRepository.GetSettings(moduleInfo);
 
+			mockEventLogger.LogDebug("GetSettings_GetsValues_FromCorrectSettings(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue}): settings → {Settings}", stringValue, integerValue, datetimeValue, timeSpanValue, settings);
+			mockEventLogger.LogInformation("GetSettings_GetsValues_FromCorrectSettings(stringValue,integerValue,datetimeValue,timeSpanValue)={StringValue},{IntegerValue},{DatetimeValue},{TimeSpanValue}: find query executed in {Arg4} ms", stringValue, integerValue, datetimeValue, timeSpanValue, __logStart.ElapsedMilliseconds);
             using (Assert.EnterMultipleScope())
             {
                 // Assert
@@ -255,6 +318,7 @@ namespace DotNetNuke.Tests.Core.Entities.Modules.Settings
                 Assert.That(settings.TimeSpanProperty, Is.EqualTo(timeSpanValue), "The retrieved timespan property value is not equal to the stored one");
             }
             this.MockRepository.VerifyAll();
+			mockEventLogger.LogDebug("<<< Exiting GetSettings_GetsValues_FromCorrectSettings(stringValue={StringValue},integerValue={IntegerValue},datetimeValue={DatetimeValue},timeSpanValue={TimeSpanValue})", stringValue, integerValue, datetimeValue, timeSpanValue);
         }
 
         public class MyNullableSettings

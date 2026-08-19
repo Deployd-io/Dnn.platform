@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import GridCell from "../GridCell";
 import Grid from "./Grid";
 import "./style.less";
+const logger = console;
 
 const defaultLocalization = {
     filterByGroup: "Filter By Group:",
@@ -23,6 +24,7 @@ const defaultLocalization = {
 class PermissionGrid extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
 
         this.state = {
             definitions: props.permissions.permissionDefinitions,
@@ -33,42 +35,52 @@ class PermissionGrid extends Component {
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         if (this.props.permissions !== prevProps.permissions) {
             this.setState({
                 definitions: this.props.permissions.permissionDefinitions,
                 rolePermissions: this.props.permissions.rolePermissions,
                 userPermissions: this.props.permissions.userPermissions
             });
+			logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
         }
     }
 
     localize(key) {
+		logger.debug(`>>> Entering localize(key=${key})`);
         const {props, state} = this;
 
+		logger.debug(`<<< Exiting localize(key=${key})`);
         return state.localization[key] || key;
     }
 
     onPermissionsChanged(type, permissions) {
+		logger.debug(`>>> Entering onPermissionsChanged(type=${type},permissions=${permissions})`);
         const {props, state} = this;
 
         let newState = {rolePermissions: state.rolePermissions, userPermissions: state.userPermissions};
         switch (type) {
             case "role":
                 newState = Object.assign(newState, {rolePermissions: permissions});
+				logger.debug(`onPermissionsChanged(type=${type},permissions=${permissions}): newState → ${newState}`);
                 break;
             case "user":
                 newState = Object.assign(newState, {userPermissions: permissions});
                 break;
         }
 
+		logger.debug(`<<< Exiting onPermissionsChanged(type=${type},permissions=${permissions})`);
         this.setState(newState, function () {
+			logger.debug(`>>> Entering setState(newState=${newState})`);
             if (typeof props.onPermissionsChanged === "function") {
                 props.onPermissionsChanged(newState);
+				logger.debug(`<<< Exiting setState(newState=${newState})`);
             }
         });
     }
 
     onAddPermission(type, permission) {
+		logger.debug(`>>> Entering onAddPermission(type=${type},permission=${permission})`);
         const {props, state} = this;
 
         let newState = {rolePermissions: state.rolePermissions, userPermissions: state.userPermissions};
@@ -81,6 +93,7 @@ class PermissionGrid extends Component {
                 break;
         }
 
+		logger.debug(`<<< Exiting onAddPermission(type=${type},permission=${permission})`);
         this.setState(newState, function () {
             if (typeof props.onPermissionsChanged === "function") {
                 props.onPermissionsChanged(newState);
@@ -89,8 +102,10 @@ class PermissionGrid extends Component {
     }
     
     renderRolesGrid() {
+		logger.debug('>>> Entering renderRolesGrid()');
         const {props, state} = this;
 
+		logger.debug('<<< Exiting renderRolesGrid()');
         return  <Grid 
             service={props.service} 
             localization={state.localization} 
@@ -102,8 +117,10 @@ class PermissionGrid extends Component {
     }
 
     renderUsersGrid() {
+		logger.debug('>>> Entering renderUsersGrid()');
         const {props, state} = this;
 
+		logger.debug('<<< Exiting renderUsersGrid()');
         return  <Grid 
             service={props.service} 
             localization={state.localization} 
@@ -115,9 +132,11 @@ class PermissionGrid extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
 
         if (!props.permissions || !props.permissions.permissionDefinitions) {
+		logger.debug('<<< Exiting render()');
             return null;
         }
 

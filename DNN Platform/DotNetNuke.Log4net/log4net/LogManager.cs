@@ -62,6 +62,8 @@ namespace log4net
         /// </remarks>
         private LogManager()
         {
+		log.DebugFormat(">>> Entering LogManager()");
+		log.DebugFormat("<<< Exiting LogManager()");
         }
 
 #if !NETSTANDARD1_3 // Excluded because GetCallingAssembly() is not available in CoreFX (https://github.com/dotnet/corefx/issues/2221).
@@ -77,6 +79,10 @@ namespace log4net
         /// <returns>The logger found, or <c>null</c> if no logger could be found.</returns>
         public static ILog Exists(string name) 
         {
+			log.DebugFormat(">>> Entering Exists(name={0})", name);
+			log.DebugFormat("<<< Exiting Exists(name={0})", name);
+			log.DebugFormat("<<< Exiting Exists(repository={0},name={1})", repository, name);
+			log.DebugFormat("<<< Exiting Exists(repositoryAssembly={0},name={1})", repositoryAssembly, name);
             return Exists(Assembly.GetCallingAssembly(), name);
         }
         
@@ -88,6 +94,10 @@ namespace log4net
         /// <returns>All the defined loggers.</returns>
         public static ILog[] GetCurrentLoggers()
         {
+			log.DebugFormat(">>> Entering GetCurrentLoggers()");
+			log.DebugFormat("<<< Exiting GetCurrentLoggers()");
+			log.DebugFormat("<<< Exiting GetCurrentLoggers(repository={0})", repository);
+			log.DebugFormat("<<< Exiting GetCurrentLoggers(repositoryAssembly={0})", repositoryAssembly);
             return GetCurrentLoggers(Assembly.GetCallingAssembly());
         }
         
@@ -109,6 +119,13 @@ namespace log4net
         /// <returns>The logger with the name specified.</returns>
         public static ILog GetLogger(string name)
         {
+			log.DebugFormat(">>> Entering GetLogger(name={0})", name);
+			log.DebugFormat("<<< Exiting GetLogger(name={0})", name);
+			log.DebugFormat("<<< Exiting GetLogger(repository={0},name={1})", repository, name);
+			log.DebugFormat("<<< Exiting GetLogger(repositoryAssembly={0},name={1})", repositoryAssembly, name);
+			log.DebugFormat("<<< Exiting GetLogger(type={0})", type);
+			log.DebugFormat("<<< Exiting GetLogger(repository={0},type={1})", repository, type);
+			log.DebugFormat("<<< Exiting GetLogger(repositoryAssembly={0},type={1})", repositoryAssembly, type);
             return GetLogger(Assembly.GetCallingAssembly(), name);
         }
 #endif // !NETSTANDARD1_3
@@ -275,7 +292,9 @@ namespace log4net
         /// </remarks>
         public static void Shutdown() 
         {
+			log.DebugFormat(">>> Entering Shutdown()");
             LoggerManager.Shutdown();
+			log.DebugFormat("<<< Exiting Shutdown()");
         }
 
 #if !NETSTANDARD1_3
@@ -298,7 +317,9 @@ namespace log4net
         /// </remarks>
         public static void ShutdownRepository() 
         {
+			log.DebugFormat(">>> Entering ShutdownRepository()");
             ShutdownRepository(Assembly.GetCallingAssembly());
+			log.DebugFormat("<<< Exiting ShutdownRepository()");
         }
 #endif
 
@@ -322,7 +343,9 @@ namespace log4net
         /// <param name="repository">The repository to shutdown.</param>
         public static void ShutdownRepository(string repository) 
         {
+			log.DebugFormat(">>> Entering ShutdownRepository(repository={0})", repository);
             LoggerManager.ShutdownRepository(repository);
+			log.DebugFormat("<<< Exiting ShutdownRepository(repository={0})", repository);
         }
 
         /// <summary>Shuts down the repository specified.</summary>
@@ -347,7 +370,9 @@ namespace log4net
         /// <param name="repositoryAssembly">The assembly to use to lookup the repository.</param>
         public static void ShutdownRepository(Assembly repositoryAssembly) 
         {
+			log.DebugFormat(">>> Entering ShutdownRepository(repositoryAssembly={0})", repositoryAssembly);
             LoggerManager.ShutdownRepository(repositoryAssembly);
+			log.DebugFormat("<<< Exiting ShutdownRepository(repositoryAssembly={0})", repositoryAssembly);
         }
 
 #if !NETSTANDARD1_3
@@ -365,7 +390,9 @@ namespace log4net
         /// </remarks>
         public static void ResetConfiguration() 
         {
+			log.DebugFormat(">>> Entering ResetConfiguration()");
             ResetConfiguration(Assembly.GetCallingAssembly());
+			log.DebugFormat("<<< Exiting ResetConfiguration()");
         }
 #endif
 
@@ -383,7 +410,9 @@ namespace log4net
         /// <param name="repository">The repository to reset.</param>
         public static void ResetConfiguration(string repository) 
         {
+			log.DebugFormat(">>> Entering ResetConfiguration(repository={0})", repository);
             LoggerManager.ResetConfiguration(repository);
+			log.DebugFormat("<<< Exiting ResetConfiguration(repository={0})", repository);
         }
 
         /// <summary>Resets all values contained in this repository instance to their defaults.</summary>
@@ -400,7 +429,9 @@ namespace log4net
         /// <param name="repositoryAssembly">The assembly to use to lookup the repository to reset.</param>
         public static void ResetConfiguration(Assembly repositoryAssembly) 
         {
+			log.DebugFormat(">>> Entering ResetConfiguration(repositoryAssembly={0})", repositoryAssembly);
             LoggerManager.ResetConfiguration(repositoryAssembly);
+			log.DebugFormat("<<< Exiting ResetConfiguration(repositoryAssembly={0})", repositoryAssembly);
         }
 
 #if !NETSTANDARD1_3
@@ -416,6 +447,10 @@ namespace log4net
         [Obsolete("Use GetRepository instead of GetLoggerRepository")]
         public static ILoggerRepository GetLoggerRepository()
         {
+			log.DebugFormat(">>> Entering GetLoggerRepository()");
+			log.DebugFormat("<<< Exiting GetLoggerRepository()");
+			log.DebugFormat("<<< Exiting GetLoggerRepository(repository={0})", repository);
+			log.DebugFormat("<<< Exiting GetLoggerRepository(repositoryAssembly={0})", repositoryAssembly);
             return GetRepository(Assembly.GetCallingAssembly());
         }
 #endif
@@ -462,6 +497,10 @@ namespace log4net
         /// <returns>The <see cref="ILoggerRepository"/> instance for the default repository.</returns>
         public static ILoggerRepository GetRepository()
         {
+			log.DebugFormat(">>> Entering GetRepository()");
+			log.DebugFormat("<<< Exiting GetRepository()");
+			log.DebugFormat("<<< Exiting GetRepository(repository={0})", repository);
+			log.DebugFormat("<<< Exiting GetRepository(repositoryAssembly={0})", repositoryAssembly);
             return GetRepository(Assembly.GetCallingAssembly());
         }
 #endif
@@ -514,6 +553,11 @@ namespace log4net
         [Obsolete("Use CreateRepository instead of CreateDomain")]
         public static ILoggerRepository CreateDomain(Type repositoryType)
         {
+			log.DebugFormat(">>> Entering CreateDomain(repositoryType={0})", repositoryType);
+			log.DebugFormat("<<< Exiting CreateDomain(repositoryType={0})", repositoryType);
+			log.DebugFormat("<<< Exiting CreateDomain(repository={0})", repository);
+			log.DebugFormat("<<< Exiting CreateDomain(repository={0},repositoryType={1})", repository, repositoryType);
+			log.DebugFormat("<<< Exiting CreateDomain(repositoryAssembly={0},repositoryType={1})", repositoryAssembly, repositoryType);
             return CreateRepository(Assembly.GetCallingAssembly(), repositoryType);
         }
 
@@ -532,6 +576,11 @@ namespace log4net
         /// </remarks>
         public static ILoggerRepository CreateRepository(Type repositoryType)
         {
+			log.DebugFormat(">>> Entering CreateRepository(repositoryType={0})", repositoryType);
+			log.DebugFormat("<<< Exiting CreateRepository(repositoryType={0})", repositoryType);
+			log.DebugFormat("<<< Exiting CreateRepository(repository={0})", repository);
+			log.DebugFormat("<<< Exiting CreateRepository(repository={0},repositoryType={1})", repository, repositoryType);
+			log.DebugFormat("<<< Exiting CreateRepository(repositoryAssembly={0},repositoryType={1})", repositoryAssembly, repositoryType);
             return CreateRepository(Assembly.GetCallingAssembly(), repositoryType);
         }
 #endif
@@ -667,6 +716,8 @@ namespace log4net
         /// <returns>An array of all the known <see cref="ILoggerRepository"/> objects.</returns>
         public static ILoggerRepository[] GetAllRepositories()
         {
+			log.DebugFormat(">>> Entering GetAllRepositories()");
+			log.DebugFormat("<<< Exiting GetAllRepositories()");
             return LoggerManager.GetAllRepositories();
         }
 
@@ -675,14 +726,17 @@ namespace log4net
             /// <returns><c>True</c> if all logging events were flushed successfully, else <c>false</c>.</returns>
             public static bool Flush(int millisecondsTimeout)
             {
+			log.DebugFormat(">>> Entering Flush(millisecondsTimeout={0})", millisecondsTimeout);
 #if !NETSTANDARD1_3 // Excluded because GetCallingAssembly() is not available in CoreFX (https://github.com/dotnet/corefx/issues/2221).
                 Appender.IFlushable flushableRepository = LoggerManager.GetRepository(Assembly.GetCallingAssembly()) as Appender.IFlushable;
+				log.DebugFormat("Flush(millisecondsTimeout={0}): flushableRepository → {1}", millisecondsTimeout, flushableRepository);
                 if (flushableRepository == null)
                 {
                     return false;
                 }
                 else
                 {
+				log.DebugFormat("<<< Exiting Flush(millisecondsTimeout={0})", millisecondsTimeout);
                     return flushableRepository.Flush(millisecondsTimeout);
                 }
 #else
@@ -695,6 +749,8 @@ namespace log4net
         /// <returns>The wrapper for the logger specified.</returns>
         private static ILog WrapLogger(ILogger logger)
         {
+			log.DebugFormat(">>> Entering WrapLogger(logger={0})", logger);
+			log.DebugFormat("<<< Exiting WrapLogger(logger={0})", logger);
             return (ILog)s_wrapperMap.GetWrapper(logger);
         }
 
@@ -703,11 +759,13 @@ namespace log4net
         /// <returns>The wrapper objects for the loggers specified.</returns>
         private static ILog[] WrapLoggers(ILogger[] loggers)
         {
+			log.DebugFormat(">>> Entering WrapLoggers(loggers={0})", loggers);
             ILog[] results = new ILog[loggers.Length];
             for(int i = 0; i < loggers.Length; i++)
             {
                 results[i] = WrapLogger(loggers[i]);
             }
+			log.DebugFormat("<<< Exiting WrapLoggers(loggers={0})", loggers);
             return results;
         }
 
@@ -719,6 +777,8 @@ namespace log4net
         /// <returns>The wrapper for the logger specified.</returns>
         private static ILoggerWrapper WrapperCreationHandler(ILogger logger)
         {
+			log.DebugFormat(">>> Entering WrapperCreationHandler(logger={0})", logger);
+			log.DebugFormat("<<< Exiting WrapperCreationHandler(logger={0})", logger);
             return new LogImpl(logger);
         }
 

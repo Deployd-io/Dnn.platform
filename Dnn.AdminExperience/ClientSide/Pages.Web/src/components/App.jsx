@@ -31,8 +31,10 @@ import "./style.less";
 
 import {PersonaBarPageTreeviewInteractor} from "./dnn-persona-bar-page-treeview";
 import SearchResult from "./SearchPage/SearchResult";
+const logger = console;
 
 function getSelectedTabBeingViewed(viewTab) {
+	logger.debug(`>>> Entering getSelectedTabBeingViewed(viewTab=${viewTab})`);
     switch (viewTab) {
         case "details":
             return 0;
@@ -41,6 +43,7 @@ function getSelectedTabBeingViewed(viewTab) {
         case "localization":
             return 2;
         case "advanced":
+			logger.debug(`<<< Exiting getSelectedTabBeingViewed(viewTab=${viewTab})`);
             return 3;
     }
 }
@@ -49,7 +52,9 @@ function getSelectedTabBeingViewed(viewTab) {
 class App extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         const date = new Date();
+		logger.debug(`constructor(): date → ${date}`);
         this.state = {
             referral: "",
             referralText: "",
@@ -78,22 +83,30 @@ class App extends Component {
             inDuplicateMode: false
         };
         this.lastActivePageId = null;
+		logger.debug(`constructor(): this.state → ${this.state}`);
+		logger.debug(`constructor(): this.lastActivePageId → ${this.lastActivePageId}`);
+		logger.debug(`constructor(): this.noPermissionSelectionPageId → ${this.noPermissionSelectionPageId}`);
         this.shouldRunRecursive = true;
         this.noPermissionSelectionPageId = null;
+		logger.debug('<<< Exiting constructor()');
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         let { selectedPage } = this.props;
         if (securityService.userHasPermission(permissionTypes.MANAGE_PAGE, selectedPage)) {
             this.props.getContentLocalizationEnabled();
         }
 
         const viewName = utils.getViewName();
+		logger.debug(`componentDidMount(): viewName → ${viewName}`);
         const viewParams = utils.getViewParams();
+		logger.debug(`componentDidMount(): viewParams → ${viewParams}`);
         window.dnn.utility.setConfirmationDialogPosition();
         window.dnn.utility.closeSocialTasks();
         this.props.getPageList().then(() => {
             const selectedPageId = utils.getSelectedPageId() || utils.getCurrentPageId();
+			logger.debug(`componentDidMount(): selectedPageId → ${selectedPageId}`);
             selectedPageId && !utils.getIsAdminHostSystemPage() && this.onLoadPage(selectedPageId);
         
             if (viewName === "edit") {
@@ -107,32 +120,40 @@ class App extends Component {
             //Listen to event fired to view page settings (from site settings)
             document.addEventListener("viewPageSettings", this.resolveTabBeingViewed.bind(this), false);
         });
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     //Update referral text if coming from a referral. (ex: "SiteSettings", resx.get("BackToLanguages"))
     updateReferral(referral, referralText) {
+		logger.debug(`>>> Entering updateReferral(referral=${referral},referralText=${referralText})`);
         this.setState({
             referral,
             referralText
         });
+		logger.debug(`<<< Exiting updateReferral(referral=${referral},referralText=${referralText})`);
     }
 
     //Method to go back to referral panel.
     goToReferralPanel(referral) {
+		logger.debug(`>>> Entering goToReferralPanel(referral=${referral})`);
         let personaBar = window.parent.dnn ? window.parent.dnn.PersonaBar : null;
         if (personaBar) {
             personaBar.openPanel(referral, {}); //Open, panel should already be rendered, so no need to pass params.
             this.updateReferral("", "");
+			logger.debug(`<<< Exiting goToReferralPanel(referral=${referral})`);
         }
     }
 
     //Call method to go back to referral panel
     backToReferral(referral) {
+		logger.debug(`>>> Entering backToReferral(referral=${referral})`);
         this.goToReferralPanel(referral);
+		logger.debug(`<<< Exiting backToReferral(referral=${referral})`);
     }
 
     //Resolves tab being viewed if view params are present.
     resolveTabBeingViewed(viewParams) {
+	logger.debug(`>>> Entering resolveTabBeingViewed(viewParams=${viewParams})`);
 
         if (!viewParams) {
             return;
@@ -147,15 +168,20 @@ class App extends Component {
         if (viewParams.referral) {
             this.updateReferral(viewParams.referral, viewParams.referralText);
         }
+		logger.debug(`<<< Exiting resolveTabBeingViewed(viewParams=${viewParams})`);
     }
     
     componentWillUnmount() {
+		logger.debug('>>> Entering componentWillUnmount()');
         document.removeEventListener("viewPageSettings", this.resolveTabBeingViewed);
+		logger.debug('<<< Exiting componentWillUnmount()');
     }
 
     componentDidUpdate(prevProps) {
+		logger.debug(`>>> Entering componentDidUpdate(prevProps=${prevProps})`);
         if (this.props.error && this.props.error && this.props.error !== prevProps.error) {
             const errorMessage = (this.props.error && this.props.error.message) || Localization.get("AnErrorOccurred");
+			logger.debug(`componentDidUpdate(prevProps=${prevProps}): errorMessage → ${errorMessage}`);
             utils.notifyError(errorMessage);
         }
         window.dnn.utility.closeSocialTasks();
@@ -168,15 +194,22 @@ class App extends Component {
             this.shouldRunRecursive = false;
             this.buildTree(selectedPage.tabId);
         }
+		logger.debug(`<<< Exiting componentDidUpdate(prevProps=${prevProps})`);
     }
 
     buildTree(selectedId) {
+		logger.debug(`>>> Entering buildTree(selectedId=${selectedId})`);
         const buildTreeInternal = (hierarchy) => {
+			logger.debug(`>>> Entering buildTreeInternal(hierarchy=${hierarchy})`);
             const callAPI = () => {
+				logger.debug('>>> Entering callAPI()');
                 const parentId = hierarchy.shift();
                 parentId && setTimeout(() => execute(), 100);
+				logger.debug(`callAPI(): parentId → ${parentId}`);
                 const execute = () => {
+					logger.debug('<<< Exiting callAPI()');
                     if (parentId !== selectedId) {
+						logger.debug('>>> Entering execute()');
                         let page = null;
                         this._traverse((item, list, update) => {
                             if (item.id === parentId) {
@@ -192,11 +225,13 @@ class App extends Component {
                                 .then(data => {
                                     this._traverse((item, list, update) => {
                                         const left = () => {
+											logger.debug('>>> Entering left()');
                                             item.childListItems = data;
                                             item.isOpen = true;
                                             item.hasChildren = true;
                                             update(list);
                                             callAPI();
+											logger.debug('<<< Exiting left()');
                                         };
                                         const right = () => { update(list); };
                                         (data.length > 0 && item.id === data[0].parentId) ? left() : right();
@@ -204,6 +239,8 @@ class App extends Component {
                                 });
                         } else {
                             callAPI();
+							logger.debug('<<< Exiting right()');
+						logger.debug('<<< Exiting execute()');
                         }
                     } else {
                         this.buildBreadCrumbPath(selectedId);
@@ -211,15 +248,20 @@ class App extends Component {
                 };
             };
             callAPI();
+			logger.debug(`<<< Exiting buildTreeInternal(hierarchy=${hierarchy})`);
         };
         this.props.getPageHierarchy(selectedId).then(buildTreeInternal);
+		logger.debug(`<<< Exiting buildTree(selectedId=${selectedId})`);
     }
 
     onPageSettings(pageId) {
+		logger.debug(`>>> Entering onPageSettings(pageId=${pageId})`);
         this.onLoadPage(pageId);
+		logger.debug(`<<< Exiting onPageSettings(pageId=${pageId})`);
     }
 
     onCreatePage() {
+		logger.debug('>>> Entering onCreatePage()');
         this.props.onCreatePage((page) => {
             if (page && page.canAddContentToPage || page && page.pageType !== "normal" || utils.getIsSuperUser()) {
                 page.selected = true;
@@ -295,14 +337,19 @@ class App extends Component {
             else {
                 let self = this;
                 self.setEmptyStateMessage();
+				logger.debug(`onCreatePage(): self → ${self}`);
             }
         });
+		logger.debug('<<< Exiting onCreatePage()');
     }
 
     onUpdatePage(input) {
+		logger.debug(`>>> Entering onUpdatePage(input=${input})`);
         this.shouldRunRecursive = false;
+		logger.debug(`<<< Exiting onUpdatePage(input=${input})`);
         return new Promise((resolve) => {
             const update = (input && input.tabId) ? input : this.props.selectedPage;
+			logger.debug(`onUpdatePage(input=${input}): update → ${update}`);
             let cachedItem = null;
 
             const removeFromOldParent = () => {
@@ -336,6 +383,8 @@ class App extends Component {
                             });
                         }
                     });
+					logger.debug('>>> Entering right()');
+					logger.debug('<<< Exiting right()');
                 };
 
                 (update.oldParentId === -1 || update.parentId === -1) ? left() : right();
@@ -411,15 +460,18 @@ class App extends Component {
 
     
     onLoadPage(pageId, callback) {
+		logger.debug(`>>> Entering onLoadPage(pageId=${pageId},callback=${callback})`);
         const self = this;
         this.props.onLoadPage(pageId).then((data) => {
             self.buildBreadCrumbPath(data.tabId);
             if (typeof callback === "function")
+				logger.debug(`<<< Exiting onLoadPage(pageId=${pageId},callback=${callback})`);
                 callback(data);
         });
     }
 
     _addPageToTree(parentId) {
+		logger.debug(`>>> Entering _addPageToTree(parentId=${parentId})`);
         let runUpdateStore = null;
         let pageList = null;
         
@@ -430,6 +482,7 @@ class App extends Component {
                     item.hasChildren = true;
                     item.childCount++;
                     const newPageChildItems = item.childListItems.concat(this.props.selectedPage);
+					logger.debug(`_addPageToTree(parentId=${parentId}): newPageChildItems → ${newPageChildItems}`);
                     item.childListItems = newPageChildItems;
                     updateStore(list);        
                 }
@@ -443,10 +496,13 @@ class App extends Component {
             });
             const newPageList = pageList.concat(this.props.selectedPage);    
             runUpdateStore(newPageList);
+			logger.debug(`_addPageToTree(parentId=${parentId}): newPageList → ${newPageList}`);
         }
+		logger.debug(`<<< Exiting _addPageToTree(parentId=${parentId})`);
     }
 
     _removePageFromTree(parentId) {
+		logger.debug(`>>> Entering _removePageFromTree(parentId=${parentId})`);
         this._traverse((item, list, updateStore) => {
             if (item.id === parentId && parentId !== undefined) {
                 let itemIndex = null;
@@ -459,31 +515,41 @@ class App extends Component {
                     }
                 });
                 const arr1 = item.childListItems.slice(0, itemIndex);
+				logger.debug(`_removePageFromTree(parentId=${parentId}): arr1 → ${arr1}`);
                 const arr2 = item.childListItems.slice(itemIndex + 1);
+				logger.debug(`_removePageFromTree(parentId=${parentId}): arr2 → ${arr2}`);
                 item.childListItems = [...arr1, ...arr2];
                 updateStore(list);
             }
             if ((parentId === undefined || parentId === -1) && item.tabId !== undefined) {
                 const newPageList = list.slice(0,list.length-1);
+				logger.debug(`_removePageFromTree(parentId=${parentId}): newPageList → ${newPageList}`);
                 updateStore(newPageList);
             }
+		logger.debug(`<<< Exiting _removePageFromTree(parentId=${parentId})`);
         });
 
+logger.debug(`_removePageFromTree(parentId=${parentId}): item.childListItems → ${item.childListItems}`);
 
     }
 
     onCancelPage(parentPageId) {
+		logger.debug(`>>> Entering onCancelPage(parentPageId=${parentPageId})`);
         this._removePageFromTree(parentPageId);
         this.props.changeSelectedPagePath([]);
         (parentPageId !== -1) ? this.props.onCancelPage(parentPageId) : this.props.onCancelPage();
         this.setState({inDuplicateMode: false});
+		logger.debug(`<<< Exiting onCancelPage(parentPageId=${parentPageId})`);
     }
 
     onChangeParentId() {
+		logger.debug('>>> Entering onChangeParentId()');
         this.onChangePageField("oldParentId", this.props.selectedPage.parentId);
+		logger.debug('<<< Exiting onChangeParentId()');
     }
 
     onAddMultiplePage() {
+		logger.debug('>>> Entering onAddMultiplePage()');
         this._testDirtyPage(()=>{
             this.clearEmptyStateMessage();
             this.selectPageSettingTab(0);
@@ -492,13 +558,16 @@ class App extends Component {
             this.props.onLoadAddMultiplePages();
         });  
         
+		logger.debug('<<< Exiting onAddMultiplePage()');
     }
     
     /**
      * When on edit mode
      */
     onEditMode() {
+		logger.debug('>>> Entering onEditMode()');
         const {selectedPage, selectedView, selectedPageDirty} = this.props;
+		logger.debug('<<< Exiting onEditMode()');
         return ((selectedPage && selectedPage.tabId === 0) || selectedPageDirty
             || selectedView === panels.SAVE_AS_TEMPLATE_PANEL
             || selectedView === panels.ADD_MULTIPLE_PAGES_PANEL 
@@ -506,10 +575,12 @@ class App extends Component {
     }
 
     onAddPage(parentPage) {
+		logger.debug(`>>> Entering onAddPage(parentPage=${parentPage})`);
         this.clearEmptyStateMessage();
         this.selectPageSettingTab(0);
         
         const addPage = () => {
+			logger.debug('>>> Entering addPage()');
             const { props } = this;
             const { selectedPage } = props;
             let runUpdateStore = null;
@@ -521,8 +592,11 @@ class App extends Component {
                 runUpdateStore = updateStore;
             });
             runUpdateStore(pageList);
+			logger.debug(`onAddPage(parentPage=${parentPage}): item.selected → ${item.selected}`);
 
+			logger.debug(`addPage(): item.selected → ${item.selected}`);
             const onConfirm = () => {
+				logger.debug('>>> Entering onConfirm()');
                 this.props.changeSelectedPagePath([]);
                 
                 this.props.getNewPage(parentPage).then(()=>{
@@ -531,11 +605,14 @@ class App extends Component {
                             .then(pageChildItems => {
                                 this._traverse((item, list, update) => {
                                     const updateChildItems = () => {
+										logger.debug('>>> Entering updateChildItems()');
                                         const newPageChildItems = pageChildItems.concat(this.props.selectedPage);
                                         item.childListItems = newPageChildItems;
+										logger.debug(`updateChildItems(): newPageChildItems → ${newPageChildItems}`);
                                         item.isOpen = true;
                                         item.hasChildren = true;
                                         update(list);
+										logger.debug('<<< Exiting updateChildItems()');
                                     };
                                     (item.id === parentPage.id) ? updateChildItems() : null;
                                 });
@@ -551,9 +628,14 @@ class App extends Component {
 
                     this.setState({inDuplicateMode: false});
                 }); 
+				logger.debug('<<< Exiting onConfirm()');
+			logger.debug('<<< Exiting addPage()');
+		logger.debug(`<<< Exiting onAddPage(parentPage=${parentPage})`);
             };
        
+	logger.debug(`onAddPage(parentPage=${parentPage}): item.childListItems → ${item.childListItems}`);
 
+			logger.debug(`addPage(): item.childListItems → ${item.childListItems}`);
             if (selectedPage && selectedPage.tabId !== 0 && props.selectedPageDirty) {
                 utils.confirm(
                     Localization.get("CancelWithoutSaving"),
@@ -562,12 +644,16 @@ class App extends Component {
                     onConfirm);
 
             } else {
+				logger.debug(`onAddPage(parentPage=${parentPage}): item.isOpen → ${item.isOpen}`);
                 onConfirm();
+				logger.debug(`addPage(): item.isOpen → ${item.isOpen}`);
             }
             
             setTimeout(()=>{
                 if (this.node.querySelector("#name")) {
+					logger.debug(`onAddPage(parentPage=${parentPage}): item.hasChildren → ${item.hasChildren}`);
                     this.node.querySelector("#name").focus();
+					logger.debug(`addPage(): item.hasChildren → ${item.hasChildren}`);
                 }    
             },100);
         };
@@ -577,6 +663,7 @@ class App extends Component {
     }
 
     onCancelSettings() {
+		logger.debug('>>> Entering onCancelSettings()');
         const { props } = this;
         if (props.selectedPageDirty) {
             
@@ -585,6 +672,7 @@ class App extends Component {
         else {
             if (props.selectedPage.tabId === 0 && props.selectedPage.isCopy && props.selectedPage.templateTabId) {
                 this.onCancelPage(props.selectedPage.parentId);
+				logger.debug('<<< Exiting onCancelSettings()');
             }
             else if (props.selectedPage.tabId === 0 && props.selectedPage.referralTabId) {
                 this.onCancelPage(props.selectedPage.referralTabId);
@@ -596,6 +684,7 @@ class App extends Component {
     }
 
     onDeleteSettings() {
+		logger.debug('>>> Entering onDeleteSettings()');
         const { props } = this;
         const { selectedPage } = props;
 
@@ -623,7 +712,10 @@ class App extends Component {
             };
         };
 
+		logger.debug(`onDeleteSettings(): item.childListItems → ${item.childListItems}`);
         const right = () => {
+			logger.debug('>>> Entering right()');
+			logger.debug('<<< Exiting right()');
             return () => {
                 let itemIndex;
                 const pageList = JSON.parse(JSON.stringify(this.props.pageList));
@@ -642,6 +734,7 @@ class App extends Component {
             };
         };
 
+		logger.debug('<<< Exiting onDeleteSettings()');
         const onDelete = (selectedPage.parentId !== -1) ? left() : right();
 
         utils.confirm(
@@ -652,15 +745,19 @@ class App extends Component {
     }
 
     onClearCache() {
+		logger.debug('>>> Entering onClearCache()');
         const { props } = this;
         props.onClearCache();
+		logger.debug('<<< Exiting onClearCache()');
     }
 
     showCancelWithoutSavingDialog() {
+		logger.debug('>>> Entering showCancelWithoutSavingDialog()');
         const { props } = this;
         const onConfirm = () => {
             if (props.selectedPage.tabId === 0 && props.selectedPage.isCopy && props.selectedPage.templateTabId) {
                 this.onCancelPage(props.selectedPage.parentId);
+				logger.debug('<<< Exiting showCancelWithoutSavingDialog()');
             }
             else if (props.selectedPage.tabId === 0 && props.selectedPage.referralTabId) {
                 this.onCancelPage(props.selectedPage.referralTabId);
@@ -679,6 +776,7 @@ class App extends Component {
 
 
     showCancelWithoutSavingDialogInEditMode(input) {
+		logger.debug(`>>> Entering showCancelWithoutSavingDialogInEditMode(input=${input})`);
         const id = (typeof input === "object") ? this.props.selectedPage.tabId : input;
         if (this.props.selectedPageDirty) {
             const onConfirm = () => {
@@ -701,26 +799,33 @@ class App extends Component {
                 Localization.get("Go Back"),
                 onConfirm);
 
+		logger.debug(`showCancelWithoutSavingDialogInEditMode(input=${input}): this.lastActivePageId → ${this.lastActivePageId}`);
         } else {
             this.onCancelPage();
             this.props.changeSelectedPagePath([]);
 
+		logger.debug(`<<< Exiting showCancelWithoutSavingDialogInEditMode(input=${input})`);
         }
     }
 
     isNewPage() {
+		logger.debug('>>> Entering isNewPage()');
         const { selectedPage } = this.props;
+		logger.debug('<<< Exiting isNewPage()');
         return selectedPage.tabId === 0;
     }
 
     getPageTitle() {
+		logger.debug('>>> Entering getPageTitle()');
         const { selectedPage } = this.props;
+		logger.debug('<<< Exiting getPageTitle()');
         return this.isNewPage() ?
             Localization.get("AddPage") :
             selectedPage.name;
     }
     
     _testDirtyPage(callback) {
+		logger.debug(`>>> Entering _testDirtyPage(callback=${callback})`);
         const {selectedPage, selectedPageDirty} = this.props;
         const onConfirm = () => {
             callback();
@@ -736,6 +841,7 @@ class App extends Component {
             });
         };
 
+		logger.debug(`_testDirtyPage(callback=${callback}): this.lastActivePageId → ${this.lastActivePageId}`);
         if (selectedPage && selectedPage.tabId !== 0 && selectedPageDirty) {
             utils.confirm(
                 Localization.get("CancelWithoutSaving"),
@@ -744,18 +850,23 @@ class App extends Component {
                 onConfirm);
 
         } else {
+			logger.debug(`<<< Exiting _testDirtyPage(callback=${callback})`);
             return onConfirm();
         }
     }
 
     onLoadSavePageAsTemplate() {
+		logger.debug('>>> Entering onLoadSavePageAsTemplate()');
         this._testDirtyPage(this.props.onLoadSavePageAsTemplate.bind(this));
+		logger.debug('<<< Exiting onLoadSavePageAsTemplate()');
     }
 
     getSettingsButtons() {
+		logger.debug('>>> Entering getSettingsButtons()');
         const { selectedPage, settingsButtonComponents, onLoadSavePageAsTemplate, onShowPageSettings, onHidePageSettings } = this.props;
         const SaveAsTemplateButton = settingsButtonComponents.SaveAsTemplateButton || Button;
         
+		logger.debug('<<< Exiting getSettingsButtons()');
         return (
             <div className="heading-buttons">
                 <Sec permission={permissionTypes.EXPORT_PAGE} selectedPage={selectedPage}>
@@ -776,22 +887,29 @@ class App extends Component {
     }
 
     selectPageSettingTab(index) {
+		logger.debug(`>>> Entering selectPageSettingTab(index=${index})`);
         this.props.selectPageSettingTab(index);
+		logger.debug(`<<< Exiting selectPageSettingTab(index=${index})`);
     }
 
     onSaveMultiplePages() {    
+		logger.debug('>>> Entering onSaveMultiplePages()');
+		logger.debug('<<< Exiting onSaveMultiplePages()');
         return this.props.onSaveMultiplePages(()=>{
             this.props.getPageList();
         });
     }
     
     onValidateMultiplePages() {    
+		logger.debug('>>> Entering onValidateMultiplePages()');
+		logger.debug('<<< Exiting onValidateMultiplePages()');
         return this.props.onValidateMultiplePages(()=>{
             // stay on same page
         });
     }
     
     onCancelAddMultiplePages() {
+		logger.debug('>>> Entering onCancelAddMultiplePages()');
         const { props } = this;
         
         if (props.dirtyBulkPage) {
@@ -806,11 +924,14 @@ class App extends Component {
                 onConfirm);
         } else {
             props.onCancelAddMultiplePages();
+			logger.debug('<<< Exiting onCancelAddMultiplePages()');
         }    
     }
 
     getAddPages() {
+		logger.debug('>>> Entering getAddPages()');
         const { props } = this;
+		logger.debug('<<< Exiting getAddPages()');
         return (
             <AddPages
                 bulkPage={props.bulkPage}
@@ -822,6 +943,8 @@ class App extends Component {
     }
 
     onCancelSaveCustomDetail(onCancelSave) {
+		logger.debug(`>>> Entering onCancelSaveCustomDetail(onCancelSave=${onCancelSave})`);
+		logger.debug(`<<< Exiting onCancelSaveCustomDetail(onCancelSave=${onCancelSave})`);
         return ((isDirty) =>{
             if (isDirty) {
                 const onConfirm = () => {
@@ -840,10 +963,13 @@ class App extends Component {
     }
 
     onChangeCustomDetail() {
+	logger.debug('>>> Entering onChangeCustomDetail()');
 
+	logger.debug('<<< Exiting onChangeCustomDetail()');
     }
     
     onCancelSavePageAsTemplate() {
+		logger.debug('>>> Entering onCancelSavePageAsTemplate()');
         const { props } = this;
         
         if (props.dirtyTemplate) {
@@ -858,11 +984,14 @@ class App extends Component {
                 onConfirm);
         } else {
             props.onCancelSavePageAsTemplate();
+			logger.debug('<<< Exiting onCancelSavePageAsTemplate()');
         }
     }
 
     getSaveAsTemplatePage() {
+		logger.debug('>>> Entering getSaveAsTemplatePage()');
         
+		logger.debug('<<< Exiting getSaveAsTemplatePage()');
         return (
             <SaveAsTemplate
                 onCancel={this.onCancelSavePageAsTemplate.bind(this)} />);
@@ -870,12 +999,15 @@ class App extends Component {
 
 
     _traverse(comparator, pageListCopy) {
+		logger.debug(`>>> Entering _traverse(comparator=${comparator},pageListCopy=${pageListCopy})`);
         let listItems = pageListCopy || JSON.parse(JSON.stringify(this.props.pageList));
         const cachedChildListItems = [];
+		logger.debug(`_traverse(comparator=${comparator},pageListCopy=${pageListCopy}): listItems → ${listItems}`);
         cachedChildListItems.push(listItems);
         const condition = cachedChildListItems.length > 0;
 
         const loop = () => {
+			logger.debug('>>> Entering loop()');
             const childItem = cachedChildListItems.length ? cachedChildListItems.shift() : null;
             const left = () => childItem.forEach(item => {
                 comparator(item, listItems, (pageList) => this.props.updatePageListStore(pageList));
@@ -884,15 +1016,19 @@ class App extends Component {
             });
             const right = () => null;
             childItem ? left() : right();
+			logger.debug('<<< Exiting loop()');
         };
 
         const exit = () => null;
 
         loop();
+		logger.debug(`<<< Exiting _traverse(comparator=${comparator},pageListCopy=${pageListCopy})`);
         return;
     }
 
     setActivePage(pageInfo) {
+		logger.debug(`>>> Entering setActivePage(pageInfo=${pageInfo})`);
+		logger.debug(`<<< Exiting setActivePage(pageInfo=${pageInfo})`);
         return new Promise((resolve) => {
             this.selectPageSettingTab(0);
             pageInfo.id = pageInfo.id || pageInfo.tabId;
@@ -903,10 +1039,12 @@ class App extends Component {
     }
 
     onSelection(pageId) {
+		logger.debug(`>>> Entering onSelection(pageId=${pageId})`);
         const { selectedPage, selectedPageDirty } = this.props;
         this.selectPageSettingTab(0);
         this.shouldRunRecursive = false;
         const left = () => {
+			logger.debug(`onSelection(pageId=${pageId}): this.shouldRunRecursive → ${this.shouldRunRecursive}`);
             if (!selectedPage || selectedPage.tabId !== pageId) {
                 this.onLoadPage(pageId);
                 this.selectPageSettingTab(0);
@@ -914,16 +1052,21 @@ class App extends Component {
         };
         const right = () => (!selectedPage || pageId !== selectedPage.tabId) ? this.showCancelWithoutSavingDialogInEditMode(pageId) : null;
         (!selectedPageDirty) ? left() : right();
+		logger.debug(`<<< Exiting onSelection(pageId=${pageId})`);
     }
 
     onNoPermissionSelection(pageId) {
+		logger.debug(`>>> Entering onNoPermissionSelection(pageId=${pageId})`);
         const setNoPermissionState = () => {
+			logger.debug('>>> Entering setNoPermissionState()');
             this.onCancelPage();
             this.buildBreadCrumbPath(pageId);
             this.noPermissionSelectionPageId = pageId;
             this.setEmptyStateMessage(Localization.get("NoPermissionEditPage"));
+			logger.debug('<<< Exiting setNoPermissionState()');
         };
         if (this.props.selectedPageDirty) {
+			logger.debug(`onNoPermissionSelection(pageId=${pageId}): this.noPermissionSelectionPageId → ${this.noPermissionSelectionPageId}`);
             utils.confirm(
                 Localization.get("CancelWithoutSaving"),
                 Localization.get("Continue"),
@@ -932,34 +1075,43 @@ class App extends Component {
         }
         else {
             setNoPermissionState();
+			logger.debug(`<<< Exiting onNoPermissionSelection(pageId=${pageId})`);
         }
     }
 
     onChangePageField(key, value) {
+		logger.debug(`>>> Entering onChangePageField(key=${key},value=${value})`);
         if (this.props.selectedPage[key] !== value) {
             this.props.onChangePageField(key, value);
         }
         this.updatePageNameOnList(key, value);
+		logger.debug(`<<< Exiting onChangePageField(key=${key},value=${value})`);
     }
 
     updatePageNameOnList(key, value) {
+		logger.debug(`>>> Entering updatePageNameOnList(key=${key},value=${value})`);
         this._traverse((item, list, updateStore) => {
             if ((item.tabId === 0 || item.id === this.props.selectedPage.tabId) && key === "name") {
                 item.name = value;
                 item.selected = true;
                 item.isOpen = true;
                 updateStore(list);
+				logger.debug(`<<< Exiting updatePageNameOnList(key=${key},value=${value})`);
             } 
         });
     }
 
     onMovePage({ Action, PageId, ParentId, RelatedPageId }) {
+		logger.debug(`>>> Entering onMovePage(Action=${Action},PageId=${PageId},ParentId=${ParentId},RelatedPageId=${RelatedPageId})`);
+		logger.debug(`<<< Exiting onMovePage(Action=${Action},PageId=${PageId},ParentId=${ParentId},RelatedPageId=${RelatedPageId})`);
         return PageActions.movePage({ Action, PageId, ParentId, RelatedPageId });
     }
 
     CallCustomAction(action) {
+		logger.debug(`>>> Entering CallCustomAction(action=${action})`);
         const { selectedPage, selectedPageDirty } = this.props;
         const callAction = () => {
+			logger.debug('>>> Entering callAction()');
             if (selectedPage && selectedPage.tabId !== 0 && selectedPageDirty) {
                 const onConfirm = () => {
                     action();
@@ -972,15 +1124,20 @@ class App extends Component {
 
             } else {
                 action();
+				logger.debug('<<< Exiting callAction()');
             }
         };
         callAction();
+		logger.debug(`<<< Exiting CallCustomAction(action=${action})`);
     }
 
     onDuplicatePage(item) {
+		logger.debug(`>>> Entering onDuplicatePage(item=${item})`);
         const { selectedPage, selectedPageDirty } = this.props;
         const message = Localization.get("NoPermissionCopyPage");
+		logger.debug(`onDuplicatePage(item=${item}): message → ${message}`);
         const duplicate = () => {
+			logger.debug('>>> Entering duplicate()');
             if (selectedPage && selectedPage.tabId !== 0 && selectedPageDirty) {
                 const onConfirm = () => {
                     this.props.onDuplicatePage(true);
@@ -998,41 +1155,54 @@ class App extends Component {
                 });
             }
             this.setState({inDuplicateMode: true});
+			logger.debug('<<< Exiting duplicate()');
         };
         const noPermission = () => this.setEmptyStateMessage(message);
         item.canCopyPage ? duplicate() : noPermission();
+		logger.debug(`<<< Exiting onDuplicatePage(item=${item})`);
     }
 
     onViewEditPage(item) {
+		logger.debug(`>>> Entering onViewEditPage(item=${item})`);
         const { selectedPageDirty } = this.props;
         const viewPage = () => PageActions.viewPage(item.id, item.url);
 
         const showConfirmationDialog = () => {
+			logger.debug('>>> Entering showConfirmationDialog()');
             utils.confirm(
                 Localization.get("CancelWithoutSaving"),
                 Localization.get("Close"),
                 Localization.get("Cancel"),
                 viewPage);
+				logger.debug('<<< Exiting showConfirmationDialog()');
         };
 
         const proceed = () => selectedPageDirty ? showConfirmationDialog() : viewPage();
 
         this.clearEmptyStateMessage();
         const message = Localization.get("NoPermissionEditPage");
+		logger.debug(`onViewEditPage(item=${item}): message → ${message}`);
         const noPermission = () => this.setEmptyStateMessage(message);
+		logger.debug(`<<< Exiting onViewEditPage(item=${item})`);
         item.canAddContentToPage ? proceed() : noPermission();
 
     }
 
     onViewPage(item) {
+		logger.debug(`>>> Entering onViewPage(item=${item})`);
         const { selectedPageDirty } = this.props;
         const view = () => {
+			logger.debug('>>> Entering view()');
             //this.onLoadPage(item.id);
             utils.getUtilities().closePersonaBar(function () {
+				logger.debug('>>> Entering closePersonaBar()');
+				logger.debug('<<< Exiting closePersonaBar()');
                 window.parent.location = item.url;
             });
+			logger.debug('<<< Exiting view()');
         };
 
+		logger.debug(`closePersonaBar(): this.noPermissionSelectionPageId → ${this.noPermissionSelectionPageId}`);
         const left = () => {
             utils.confirm(
                 Localization.get("CancelWithoutSaving"),
@@ -1046,22 +1216,29 @@ class App extends Component {
 
         this.clearEmptyStateMessage();
         const message = Localization.get("NoPermissionViewPage");
+		logger.debug(`onViewPage(item=${item}): message → ${message}`);
         const noPermission = () => this.setEmptyStateMessage(message);
+		logger.debug(`<<< Exiting onViewPage(item=${item})`);
         item.canViewPage ? proceed() : noPermission();
 
     }
 
     setEmptyStateMessage(emptyStateMessage) {
+		logger.debug(`>>> Entering setEmptyStateMessage(emptyStateMessage=${emptyStateMessage})`);
         this.setState({ emptyStateMessage });
         this.props.clearSelectedPage();
+		logger.debug(`<<< Exiting setEmptyStateMessage(emptyStateMessage=${emptyStateMessage})`);
     }
 
     clearEmptyStateMessage() {
+		logger.debug('>>> Entering clearEmptyStateMessage()');
         this.noPermissionSelectionPageId = null;
         this.setState({ emptyStateMessage: null });
+		logger.debug('<<< Exiting clearEmptyStateMessage()');
     }
     
     onDayClick(newDay, isEndDate) {
+		logger.debug(`>>> Entering onDayClick(newDay=${newDay},isEndDate=${isEndDate})`);
         this.setState({ startAndEndDateDirty: true });
         const right = () => {
             const condition = newDay.getTime() < this.state.endDate.getTime();
@@ -1073,13 +1250,16 @@ class App extends Component {
             condition ? this.setState({ endDate: newDay, filtersUpdated: true }) : null;
         };
         isEndDate ? left() : right();
+		logger.debug(`<<< Exiting onDayClick(newDay=${newDay},isEndDate=${isEndDate})`);
     }
 
     generateFilters() {
+		logger.debug('>>> Entering generateFilters()');
         const { filterByPageType, filterByPublishStatus, filterByWorkflow, filterByWorkflowName, startDate, endDate, startAndEndDateDirty } = this.state;
         const filters = this.state.tags.split(",")
             .filter(e => !!e)
             .map((tag) => {
+			logger.debug(`generateFilters(): filters → ${filters}`);
                 return { ref: `tag-${tag}`, tag: `${tag}` };
             });
 
@@ -1089,21 +1269,28 @@ class App extends Component {
         
         if (startAndEndDateDirty) {
             let dateRangeText = Localization.get("PublishedDateRange");
+			logger.debug(`generateFilters(): dateRangeText → ${dateRangeText}`);
             const fullStartDate = utils.formatDate(startDate);
+			logger.debug(`generateFilters(): fullStartDate → ${fullStartDate}`);
             const fullEndDate = utils.formatDate(endDate);
+			logger.debug(`generateFilters(): fullEndDate → ${fullEndDate}`);
             const dateInterval = () => filters.push({ ref: "startAndEndDateDirty", tag: `${dateRangeText}: ${fullStartDate} - ${fullEndDate} ` });
             const justOneDate = () => filters.push({ ref: "startAndEndDateDirty", tag: `${dateRangeText}: ${fullStartDate}` });
 
             fullStartDate !== fullEndDate ? dateInterval() : justOneDate();
+			logger.debug('<<< Exiting generateFilters()');
         }
     }
 
     saveSearchFilters(searchFields) {
+		logger.debug(`>>> Entering saveSearchFilters(searchFields=${searchFields})`);
+		logger.debug(`<<< Exiting saveSearchFilters(searchFields=${searchFields})`);
         return new Promise((resolve) => this.setState({ searchFields }, () => resolve()));
     }
 
     
     onSearch(term) {
+		logger.debug(`>>> Entering onSearch(term=${term})`);
         let newTerm = (term !== undefined) ? term : this.state.searchTerm;
         this.setState({
             searchTerm: newTerm,
@@ -1131,9 +1318,11 @@ class App extends Component {
             }
             this.setState({ DropdownCalendarIsActive: null});
         });
+		logger.debug(`<<< Exiting onSearch(term=${term})`);
     }
 
     doSearch() {
+		logger.debug('>>> Entering doSearch()');
         const { selectedPage } = this.props;
         if (selectedPage && this.props.selectedPageDirty) {
             this.onCancelPage(selectedPage.tabId);
@@ -1141,7 +1330,9 @@ class App extends Component {
 
         let { searchTerm, filterByPageType, filterByPublishStatus, filterByWorkflow, startDate, endDate, startAndEndDateDirty, tags } = this.state;
         const fullStartDate = `${startDate.getDate() < 10 ? "0" + startDate.getDate() : startDate.getDate()}/${((startDate.getMonth() + 1) < 10 ? "0" + (startDate.getMonth() + 1) : (startDate.getMonth() + 1))}/${startDate.getFullYear()} 00:00:00`;
+		logger.debug(`doSearch(): fullStartDate → ${fullStartDate}`);
         const fullEndDate = `${endDate.getDate() < 10 ? "0" + endDate.getDate() : endDate.getDate()}/${((endDate.getMonth() + 1) < 10 ? "0" + (endDate.getMonth() + 1) : (endDate.getMonth() + 1))}/${endDate.getFullYear()} 23:59:59`;
+		logger.debug(`doSearch(): fullEndDate → ${fullEndDate}`);
         const searchDateRange = startAndEndDateDirty ? { publishDateStart: fullStartDate, publishDateEnd: fullEndDate } : {};
 
         if (tags) {
@@ -1159,6 +1350,7 @@ class App extends Component {
         };
         
         search = Object.assign({}, search, searchDateRange);
+		logger.debug(`doSearch(): search → ${search}`);
         for (let prop in search) {
             if (!search[prop]) {
                 delete search[prop];
@@ -1174,6 +1366,7 @@ class App extends Component {
         this.saveSearchFilters(search).then(() => {
             this.props.searchAndFilterPagedPageList(search,filterUp,filterPage);
         });        
+		logger.debug('<<< Exiting doSearch()');
         this.setState({ 
             inSearch: true, 
             filtersUpdated: false 
@@ -1181,14 +1374,17 @@ class App extends Component {
     }
 
     onSearchScroll(page) {
+		logger.debug(`>>> Entering onSearchScroll(page=${page})`);
         this.setState({
             pageIndex: page
         },()=>{
             this.doSearch();
         });
+		logger.debug(`<<< Exiting onSearchScroll(page=${page})`);
     }
     
     clearAdvancedSearch() {
+		logger.debug('>>> Entering clearAdvancedSearch()');
         let date = new Date();
         this.setState({
             startDate: date,
@@ -1205,18 +1401,22 @@ class App extends Component {
             filtersUpdated: true,
             pageIndex:0
         },()=>this.onSearch(this.state.searchTerm));
+		logger.debug('<<< Exiting clearAdvancedSearch()');
     }
 
     clearAdvancedSearchDateInterval() {
+		logger.debug('>>> Entering clearAdvancedSearchDateInterval()');
         let date = new Date();
         this.setState({
             startDate:date,
             endDate: date,
             startAndEndDateDirty:false
         });
+		logger.debug('<<< Exiting clearAdvancedSearchDateInterval()');
     }
     
     clearSearch(callback) {
+		logger.debug(`>>> Entering clearSearch(callback=${callback})`);
         let date = new Date();
         this.setState({
             filtersUpdated: true,
@@ -1241,10 +1441,12 @@ class App extends Component {
             else {
                 const { selectedPage } = this.props;
                 !selectedPage && this.lastActivePageId && this.onLoadPage(this.lastActivePageId);
+				logger.debug(`<<< Exiting clearSearch(callback=${callback})`);
             }
         });
     }
     showCancelWithoutSavingDialogAndRun(callback, cancelCallback) {
+	logger.debug(`>>> Entering showCancelWithoutSavingDialogAndRun(callback=${callback},cancelCallback=${cancelCallback})`);
 
         const onConfirm = () => {
             if (typeof callback === "function") {
@@ -1252,8 +1454,10 @@ class App extends Component {
             }
         };
         const onCancel = () => {
+			logger.debug('>>> Entering onCancel()');
             if (typeof cancelCallback === "function") {
                 cancelCallback();
+				logger.debug('<<< Exiting onCancel()');
             }
         };
         utils.confirm(
@@ -1262,12 +1466,16 @@ class App extends Component {
             Localization.get("Cancel"),
             onConfirm,
             onCancel);
+			logger.debug(`<<< Exiting showCancelWithoutSavingDialogAndRun(callback=${callback},cancelCallback=${cancelCallback})`);
     }
     buildBreadCrumbPath(pageId) {
+		logger.debug(`>>> Entering buildBreadCrumbPath(pageId=${pageId})`);
         let page = {};
         let selectedPath = [];
         const buildBreadCrumbPathInternal = () => {
+			logger.debug('>>> Entering buildBreadCrumbPathInternal()');
             const addNode = (tabId) => {
+				logger.debug(`>>> Entering addNode(tabId=${tabId})`);
                 this._traverse((item) => {
                     if (item.id === tabId) {
                         page = item;
@@ -1284,16 +1492,22 @@ class App extends Component {
                     this.props.changeSelectedPagePath(selectedPath);
                 };
                 page.parentId > 0 ? left() : right();
+				logger.debug(`<<< Exiting addNode(tabId=${tabId})`);
             };
             addNode(pageId);
+			logger.debug('<<< Exiting buildBreadCrumbPathInternal()');
         };
         buildBreadCrumbPathInternal();
+		logger.debug(`<<< Exiting buildBreadCrumbPath(pageId=${pageId})`);
     }
 
     render_PagesDetailEditor() {
+	logger.debug('>>> Entering render_PagesDetailEditor()');
 
         const render_emptyState = () => {
+			logger.debug('>>> Entering render_emptyState()');
             const DefaultMessage = Localization.get("NoPageSelected");
+			logger.debug('<<< Exiting render_emptyState()');
             return (
                 <div className="empty-page-state">
                     <div className="empty-page-state-message">
@@ -1306,8 +1520,10 @@ class App extends Component {
 
 
         const render_pageDetails = () => {
+			logger.debug('>>> Entering render_pageDetails()');
             const { props } = this;
             const { isContentLocalizationEnabled } = props;
+			logger.debug('<<< Exiting render_pageDetails()');
             return (
                 <PageSettings key={"pageDetails" + this.props.selectedPage.tabId}
                     selectedPage={this.props.selectedPage}
@@ -1339,6 +1555,7 @@ class App extends Component {
             );
         };
         const { selectedPage } = this.props;
+		logger.debug('<<< Exiting render_PagesDetailEditor()');
         return (
             <GridCell columnSize={100} className="treeview-page-details" >
                 {(selectedPage && selectedPage.tabId) ? render_pageDetails() : render_emptyState()}
@@ -1347,10 +1564,14 @@ class App extends Component {
     }
 
     render_addPageEditor() {
+		logger.debug('>>> Entering render_addPageEditor()');
         const { props } = this;
         const cancelAction = this.onCancelSettings.bind(this);
+		logger.debug(`render_addPageEditor(): cancelAction → ${cancelAction}`);
         const deleteAction = this.onDeleteSettings.bind(this);
+		logger.debug(`render_addPageEditor(): deleteAction → ${deleteAction}`);
         const AllowContentLocalization = !!props.isContentLocalizationEnabled;
+		logger.debug('<<< Exiting render_addPageEditor()');
         return (
             <GridCell columnSize={100} className="treeview-page-details" >
                 <PageSettings key="newPageSettings" selectedPage={props.selectedPage}
@@ -1383,12 +1604,16 @@ class App extends Component {
 
 
     render_pageList() {
+		logger.debug('>>> Entering render_pageList()');
+		logger.debug('<<< Exiting render_pageList()');
         return (
             <PageList onPageSettings={this.onPageSettings.bind(this)} />
         );
     }
     
     getFilterByPageTypeOptions() {
+		logger.debug('>>> Entering getFilterByPageTypeOptions()');
+		logger.debug('<<< Exiting getFilterByPageTypeOptions()');
         return [
             { value: "", label: Localization.get("lblNone") },
             { value: "normal", label: Localization.get("lblNormal") },
@@ -1399,61 +1624,87 @@ class App extends Component {
     }
 
     getFilterByPageStatusOptions() {
+		logger.debug('>>> Entering getFilterByPageStatusOptions()');
         let filterByPageStatusOptions = [
             { value: "published", label: Localization.get("lblPublished") }
         ];
+		logger.debug('<<< Exiting getFilterByPageStatusOptions()');
         return ([{ value: "", label: Localization.get("lblNone") }]).concat(filterByPageStatusOptions.concat([{ value: "draft", label: Localization.get("lblDraft") }]));
     }
     getFilterByWorkflowOptions() {
+		logger.debug('>>> Entering getFilterByWorkflowOptions()');
         let workflowList = [];
         if (this.props.workflowList.length <= 0) {
             this.props.getWorkflowsList();
         }
         this.props.workflowList.length ? workflowList = this.props.workflowList.map((item => { return { value: item.workflowId, label: item.workflowName }; })) : null;
+		logger.debug('<<< Exiting getFilterByWorkflowOptions()');
         return [{ value: "", label: Localization.get("lblNone") }].concat(workflowList);
     }
     getPageTypeLabel(pageType) {
+		logger.debug(`>>> Entering getPageTypeLabel(pageType=${pageType})`);
         const filterByPageTypeOptions = this.getFilterByPageTypeOptions();
+		logger.debug(`getPageTypeLabel(pageType=${pageType}): filterByPageTypeOptions → ${filterByPageTypeOptions}`);
+		logger.debug(`<<< Exiting getPageTypeLabel(pageType=${pageType})`);
         return filterByPageTypeOptions.find(x => x.value === pageType.toLowerCase()) && filterByPageTypeOptions.find(x => x.value === pageType.toLowerCase()).label;
     }
     getPublishStatusLabel(publishStatus) {
+		logger.debug(`>>> Entering getPublishStatusLabel(publishStatus=${publishStatus})`);
         const filterByPublishStatusOptions = this.getFilterByPageStatusOptions();
+		logger.debug(`getPublishStatusLabel(publishStatus=${publishStatus}): filterByPublishStatusOptions → ${filterByPublishStatusOptions}`);
+		logger.debug(`<<< Exiting getPublishStatusLabel(publishStatus=${publishStatus})`);
         return filterByPublishStatusOptions.find(x => x.value === publishStatus.toLowerCase()) && filterByPublishStatusOptions.find(x => x.value === publishStatus.toLowerCase()).label || publishStatus;
     }
 
     updateSearchAdvancedTags(tags) {
+		logger.debug(`>>> Entering updateSearchAdvancedTags(tags=${tags})`);
         this.setState({tags:tags,filtersUpdated:true, pageIndex:0});
+		logger.debug(`<<< Exiting updateSearchAdvancedTags(tags=${tags})`);
     }
 
     onApplyChangesDropdownDayPicker() {
+		logger.debug('>>> Entering onApplyChangesDropdownDayPicker()');
         const { startAndEndDateDirty, startDate, endDate } = this.state;
         const fullStartDate = startDate.getDate() + startDate.getMonth() + startDate.getFullYear();
         const fullEndDate = endDate.getDate() + endDate.getMonth() + endDate.getFullYear();
+		logger.debug(`onApplyChangesDropdownDayPicker(): fullEndDate → ${fullEndDate}`);
         const condition = !startAndEndDateDirty && fullStartDate === fullEndDate;
         condition ? this.setState({ startAndEndDateDirty: true, DropdownCalendarIsActive: null }) : this.setState({ DropdownCalendarIsActive: null });
+		logger.debug(`onApplyChangesDropdownDayPicker(): fullStartDate → ${fullStartDate}`);
+		logger.debug('<<< Exiting onApplyChangesDropdownDayPicker()');
     }
     
     updateFilterByPageTypeOptions(data) { 
+		logger.debug(`>>> Entering updateFilterByPageTypeOptions(data=${data})`);
         this.setState({ filterByPageType: data.value, filtersUpdated: true,pageIndex:0 }); 
+		logger.debug(`<<< Exiting updateFilterByPageTypeOptions(data=${data})`);
     }
     
     updateFilterByPageStatusOptions(data) {
+		logger.debug(`>>> Entering updateFilterByPageStatusOptions(data=${data})`);
         this.setState({ filterByPublishStatus: data.value, filtersUpdated: true, pageIndex:0 });
+		logger.debug(`<<< Exiting updateFilterByPageStatusOptions(data=${data})`);
     } 
     updateFilterByWorkflowOptions(data) {
+		logger.debug(`>>> Entering updateFilterByWorkflowOptions(data=${data})`);
         this.setState({ filterByWorkflow: data.value, filterByWorkflowName: data.label, filtersUpdated: true, pageIndex:0});
+		logger.debug(`<<< Exiting updateFilterByWorkflowOptions(data=${data})`);
     }
 
     updateFilterStartEndDate(startDate, endDate) {
+		logger.debug(`>>> Entering updateFilterStartEndDate(startDate=${startDate},endDate=${endDate})`);
         this.setState({
             startDate,endDate,
             startAndEndDateDirty:true,
             filtersUpdated:true,
             pageIndex:0
         });
+		logger.debug(`<<< Exiting updateFilterStartEndDate(startDate=${startDate},endDate=${endDate})`);
     }
 
     render_searchResults() {
+		logger.debug('>>> Entering render_searchResults()');
+		logger.debug('<<< Exiting render_searchResults()');
         return (
             <SearchResult 
                 filters={this.state.filters} 
@@ -1496,6 +1747,7 @@ class App extends Component {
     }
     
     getAdditionalPageSettings() {
+		logger.debug('>>> Entering getAdditionalPageSettings()');
         const additionalPageSettings = [];
 
         const { props } = this;
@@ -1517,10 +1769,12 @@ class App extends Component {
             }
         }
 
+		logger.debug('<<< Exiting getAdditionalPageSettings()');
         return additionalPageSettings;
     }
     
     render_details() {
+		logger.debug('>>> Entering render_details()');
         const {selectedPage} = this.props;
         const {inSearch} = this.state;
         const {selectedView} = this.props;
@@ -1538,17 +1792,21 @@ class App extends Component {
                 return this.getAdditionalPageSettings();
             case !selectedPage:
             default:
+				logger.debug('<<< Exiting render_details()');
                 return this.render_PagesDetailEditor();
         }
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { props } = this;
         const { selectedPage } = props;
         const { inSearch } = this.state;
         const isListPagesAllowed = securityService.canSeePagesList();
+		logger.debug(`render(): isListPagesAllowed → ${isListPagesAllowed}`);
        
          
+		logger.debug('<<< Exiting render()');
         return (
 
             <div ref={node => this.node = node} className="pages-app personaBar-mainContainer">
@@ -1684,6 +1942,8 @@ App.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         pageList: state.pageList.pageList,
         selectedView: state.visiblePanel.selectedPage,
@@ -1714,6 +1974,8 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+	logger.debug(`>>> Entering mapDispatchToProps(dispatch=${dispatch})`);
+	logger.debug(`<<< Exiting mapDispatchToProps(dispatch=${dispatch})`);
     return bindActionCreators({
         getNewPage: PageActions.getNewPage,
         getPageList: PageActions.getPageList,

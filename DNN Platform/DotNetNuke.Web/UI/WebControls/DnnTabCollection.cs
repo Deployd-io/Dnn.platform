@@ -9,16 +9,22 @@ using System.Web.UI;
 /// <summary>A collection of <see cref="DnnTab"/> instances.</summary>
 public class DnnTabCollection : TypedControlCollection<DnnTab>
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnTabCollection));
     /// <summary>Initializes a new instance of the <see cref="DnnTabCollection"/> class.</summary>
     /// <param name="owner">The owner control.</param>
     public DnnTabCollection(Control owner)
         : base(owner)
     {
+	Logger.LogDebug(">>> Entering DnnTabCollection(owner={Owner})", owner);
+	Logger.LogDebug("<<< Exiting DnnTabCollection(owner={Owner})", owner);
     }
 
     /// <inheritdoc />
     protected override void ThrowOnInvalidControlType()
     {
+		Logger.LogDebug(">>> Entering ThrowOnInvalidControlType()");
+		Logger.LogWarning("Throwing ArgumentException from ThrowOnInvalidControlType()");
+		Logger.LogDebug("<<< Exiting ThrowOnInvalidControlType()");
         throw new ArgumentException("DnnTabCollection must contain controls of type DnnTab");
     }
 }

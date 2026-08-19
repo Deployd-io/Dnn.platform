@@ -15,19 +15,24 @@ namespace DotNetNuke.Web.Api.Internal
     /// <summary>Requires that the user is an editor on the page.</summary>
     public sealed class DnnPageEditorAttribute : AuthorizeAttributeBase, IOverrideDefaultAuthLevel
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnPageEditorAttribute));
         /// <inheritdoc />
         public override bool IsAuthorized(AuthFilterContext context)
         {
+			Logger.LogDebug(">>> Entering IsAuthorized(context={Context})", context);
             Requires.NotNull("context", context);
 
+			Logger.LogDebug("<<< Exiting IsAuthorized(context={Context})", context);
             return PagePermissionsAttributesHelper.HasTabPermission("EDIT,CONTENT,MANAGE") || IsModuleAdmin(((DnnApiController)context.ActionContext.ControllerContext.Controller).PortalSettings);
         }
 
         private static bool IsModuleAdmin(PortalSettings portalSettings)
         {
+			Logger.LogDebug(">>> Entering IsModuleAdmin(portalSettings={PortalSettings})", portalSettings);
             bool isModuleAdmin = false;
             foreach (ModuleInfo objModule in TabController.CurrentPage.Modules)
             {
+			Logger.LogDebug("IsModuleAdmin(portalSettings={PortalSettings}): isModuleAdmin → {IsModuleAdmin}", portalSettings, isModuleAdmin);
                 if (!objModule.IsDeleted)
                 {
                     bool blnHasModuleEditPermissions = ModulePermissionController.HasModuleAccess(SecurityAccessLevel.Edit, Null.NullString, objModule);
@@ -39,6 +44,7 @@ namespace DotNetNuke.Web.Api.Internal
                 }
             }
 
+			Logger.LogDebug("<<< Exiting IsModuleAdmin(portalSettings={PortalSettings})", portalSettings);
             return portalSettings.ControlPanelSecurity == PortalSettings.ControlPanelPermission.ModuleEditor && isModuleAdmin;
         }
     }

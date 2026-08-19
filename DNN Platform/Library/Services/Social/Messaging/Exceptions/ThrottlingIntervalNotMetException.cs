@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.Social.Messaging.Exceptions
     [Serializable]
     public class ThrottlingIntervalNotMetException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ThrottlingIntervalNotMetException));
         /// <summary>Initializes a new instance of the <see cref="ThrottlingIntervalNotMetException"/> class.</summary>
         public ThrottlingIntervalNotMetException()
         {
+		Logger.LogDebug(">>> Entering ThrottlingIntervalNotMetException()");
+		Logger.LogDebug("<<< Exiting ThrottlingIntervalNotMetException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="ThrottlingIntervalNotMetException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Services.Social.Messaging.Exceptions
         public ThrottlingIntervalNotMetException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering ThrottlingIntervalNotMetException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting ThrottlingIntervalNotMetException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="ThrottlingIntervalNotMetException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

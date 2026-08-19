@@ -17,6 +17,7 @@ namespace Dnn.PersonaBar.Security.Attributes
         /// <inheritdoc />
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
+			eventLogger.LogDebug(">>> Entering IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
             var propertyName = validationContext.DisplayName;
 
             if (!bool.TryParse(value.ToString(), out var userEmailAsUsername))
@@ -26,6 +27,7 @@ namespace Dnn.PersonaBar.Security.Attributes
 
             if (userEmailAsUsername && UserController.GetDuplicateEmailCount() > 0)
             {
+			eventLogger.LogDebug("<<< Exiting IsValid(value={Value},validationContext={ValidationContext})", value, validationContext);
                 return new ValidationResult(Localization.GetString(Components.Constants.ContainsDuplicateAddresses, Components.Constants.LocalResourcesFile));
             }
 

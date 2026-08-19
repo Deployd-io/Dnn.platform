@@ -6,11 +6,13 @@ import { GridCell, SvgIcons, Modal } from "@dnnsoftware/dnn-react-common";
 import Localization from "../../localization";
 import utils from "../../utils";
 import ModuleEdit from "./ModuleEdit/ModuleEdit";
+const logger = console;
 
 class Modules extends Component {
 
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
 
         this.state = {
             editType: ""
@@ -18,24 +20,30 @@ class Modules extends Component {
     }
 
     onDeleteModule(module) {
+		logger.debug(`>>> Entering onDeleteModule(module=${module})`);
         const {onDeleteModule} = this.props;
         utils.confirm(
             Localization.get("DeleteModuleConfirm").replace("[MODULETITLE]", module.title),
             Localization.get("Delete"),
             Localization.get("Cancel"),
             function onConfirmDeletion() {
+				logger.debug('>>> Entering onConfirmDeletion()');
+				logger.debug('<<< Exiting onConfirmDeletion()');
                 onDeleteModule(module);
             });
     }
 
     onEditingModule(editType, module) {
+		logger.debug(`>>> Entering onEditingModule(editType=${editType},module=${module})`);
         const { onEditingModule } = this.props;
         this.setState({editType: editType}, () => {
             onEditingModule(module);
         });
+		logger.debug(`<<< Exiting onEditingModule(editType=${editType},module=${module})`);
     }
 
     getModules() {
+		logger.debug('>>> Entering getModules()');
         const {modules, editingSettingModuleId, showCopySettings, onModuleCopyChange} = this.props;
 
         if (modules.length === 0) {
@@ -58,13 +66,17 @@ class Modules extends Component {
                     showCopySettings={showCopySettings} />
             );
         });
+		logger.debug('<<< Exiting getModules()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { state } = this;
         const {modules, onCancelEditingModule, editingSettingModuleId, showCopySettings, selectedPage} = this.props;
         const moduleRows = this.getModules();
+		logger.debug(`render(): moduleRows → ${moduleRows}`);
         const editingModule = modules.find(m => m.id === editingSettingModuleId);
+		logger.debug('<<< Exiting render()');
         return (
              
             <div className={styles.moduleContainer}>

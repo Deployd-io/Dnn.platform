@@ -1,4 +1,5 @@
 import ActionTypes from "../constants/actionTypes/extensionsActionTypes";
+const logger = console;
 
 export default function extensionsReducer(state = {
     toolbarComponents: [],
@@ -12,19 +13,27 @@ export default function extensionsReducer(state = {
 }, action) {
 
     function addComponent(component) {
+		logger.debug(`>>> Entering addComponent(component=${component})`);
         const newSettingsButtonComponents = { ...state.settingsButtonComponents };
         newSettingsButtonComponents[component.id] = component.component;
+		logger.debug(`<<< Exiting addComponent(component=${component})`);
         return newSettingsButtonComponents;
     }
     function addInContextComponent(component) {
+		logger.debug(`>>> Entering addInContextComponent(component=${component})`);
         let newPageInContextComponents = [...state.pageInContextComponents];
         newPageInContextComponents = newPageInContextComponents.concat(component.component);
+		logger.debug(`addInContextComponent(component=${component}): newPageInContextComponents → ${newPageInContextComponents}`);
+		logger.debug(`<<< Exiting addInContextComponent(component=${component})`);
         return newPageInContextComponents;
     }
 
     function addPageSettingsComponent(component) {
+		logger.debug(`>>> Entering addPageSettingsComponent(component=${component})`);
         let newPageSettingsComponents = [...state.pageSettingsComponents];
         newPageSettingsComponents = newPageSettingsComponents.concat(component);
+		logger.debug(`addPageSettingsComponent(component=${component}): newPageSettingsComponents → ${newPageSettingsComponents}`);
+		logger.debug(`<<< Exiting addPageSettingsComponent(component=${component})`);
         return newPageSettingsComponents;
     }
 

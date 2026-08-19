@@ -12,16 +12,20 @@ import CreatePackageModal from "./CreatePackageModal";
 import DeleteExtension from "./DeleteExtension";
 import { VisiblePanelActions } from "actions";
 import util from "../utils";
+const logger = console;
 
 class App extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             extensionBeingEdited: {}
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     selectPanel(panel, event) {
+		logger.debug(`>>> Entering selectPanel(panel=${panel},event=${event})`);
         if (event) {
             event.preventDefault();
         }
@@ -33,9 +37,11 @@ class App extends Component {
         }, () => {
             props.dispatch(VisiblePanelActions.selectPanel(panel));
         });        
+		logger.debug(`<<< Exiting selectPanel(panel=${panel},event=${event})`);
     }
 
     backToReferrer(callback) {
+		logger.debug(`>>> Entering backToReferrer(callback=${callback})`);
         if (typeof callback === "function") {
             callback();
         }
@@ -46,17 +52,21 @@ class App extends Component {
                 backToReferrerFunc: null
             });
         }, 750);
+		logger.debug(`<<< Exiting backToReferrer(callback=${callback})`);
     }
 
     updateReferrerInfo(event) {
+		logger.debug(`>>> Entering updateReferrerInfo(event=${event})`);
         this.setState({
             referrer: event.referrer,
             referrerText: event.referrerText,
             backToReferrerFunc: this.backToReferrer.bind(this, event.backToReferrerFunc)
         });
+		logger.debug(`<<< Exiting updateReferrerInfo(event=${event})`);
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const { props } = this;
 
         document.addEventListener("installPortalTheme", (e) => {
@@ -71,13 +81,16 @@ class App extends Component {
                 this.selectPanel(3);
             }));
             this.updateReferrerInfo(util.settings);
+			logger.debug('<<< Exiting UNSAFE_componentWillMount()');
         }
     }
 
     /* End Extension CRUD methods */
 
     render() {
+		logger.debug('>>> Entering render()');
         const { props, state } = this;
+		logger.debug('<<< Exiting render()');
         return (
             <div className="extensions-app personaBar-mainContainer">
                 <PersonaBarPage isOpen={props.selectedPage === 0} className={(props.selectedPage !== 0 ? "hidden" : "")}>
@@ -126,6 +139,8 @@ App.propTypes = {
 
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         packageTypes: state.extension.packageTypes,
         installedPackages: state.extension.installedPackages,

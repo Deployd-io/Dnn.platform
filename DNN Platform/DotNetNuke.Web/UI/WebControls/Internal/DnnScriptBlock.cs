@@ -13,15 +13,19 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
     /// <summary>This control is only for internal use, please don't reference it in any other place as it may be removed in the future.</summary>
     public class DnnScriptBlock : Control
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnScriptBlock));
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering Render(writer={Writer})", writer);
             if (!this.DesignMode)
             {
                 ScriptManager scriptManager = AJAX.GetScriptManager(this.Page);
+				Logger.LogDebug("Render(writer={Writer}): scriptManager → {ScriptManager}", writer, scriptManager);
                 if (scriptManager.IsInAsyncPostBack)
                 {
                     StringBuilder scriBuilder = new StringBuilder();
+					Logger.LogDebug("Render(writer={Writer}): scriBuilder → {ScriBuilder}", writer, scriBuilder);
                     base.Render(new HtmlTextWriter(new StringWriter(scriBuilder)));
                     ScriptManager.RegisterClientScriptBlock(this.Page, typeof(Page), this.UniqueID, scriBuilder.ToString(), false);
                 }
@@ -34,6 +38,7 @@ namespace DotNetNuke.Web.UI.WebControls.Internal
             {
                 base.Render(writer);
             }
+			Logger.LogDebug("<<< Exiting Render(writer={Writer})", writer);
         }
     }
 }

@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.FileSystem
     [Serializable]
     public class FolderAlreadyExistsException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FolderAlreadyExistsException));
         /// <summary>Initializes a new instance of the <see cref="FolderAlreadyExistsException"/> class.</summary>
         public FolderAlreadyExistsException()
         {
+		Logger.LogDebug(">>> Entering FolderAlreadyExistsException()");
+		Logger.LogDebug("<<< Exiting FolderAlreadyExistsException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="FolderAlreadyExistsException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Services.FileSystem
         public FolderAlreadyExistsException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering FolderAlreadyExistsException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting FolderAlreadyExistsException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="FolderAlreadyExistsException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

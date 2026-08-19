@@ -4,14 +4,17 @@ import { GridCell, SingleLineInputWithError, GridSystem, Switch, Button } from "
 import Localization from "localization";
 import { connect } from "react-redux";
 import styles from "./style.module.less";
+const logger = console;
 
 const inputStyle = { width: "100%" };
 
 class SkinObject extends Component {
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         let { extensionBeingEdited } = props;
 
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={(styles.editSkinObj + (props.className ? " " + props.className : ""))}>
                 <GridSystem className="with-right-border top-half">
@@ -64,6 +67,8 @@ SkinObject.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         extensionBeingEdited: state.extension.extensionBeingEdited,
         extensionBeingEditedIndex: state.extension.extensionBeingEditedIndex

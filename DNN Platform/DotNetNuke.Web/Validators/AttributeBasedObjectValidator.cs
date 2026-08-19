@@ -12,9 +12,12 @@ namespace DotNetNuke.Web.Validators
     public abstract class AttributeBasedObjectValidator<TAttribute> : PropertyBasedObjectValidator
         where TAttribute : Attribute
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(AttributeBasedObjectValidator));
         /// <inheritdoc />
         protected override ValidationResult ValidateProperty(object target, PropertyInfo targetProperty)
         {
+			Logger.LogDebug(">>> Entering ValidateProperty(target={Target},targetProperty={TargetProperty})", target, targetProperty);
+			Logger.LogDebug("<<< Exiting ValidateProperty(target={Target},targetProperty={TargetProperty})", target, targetProperty);
             return targetProperty.GetCustomAttributes(true)
                 .OfType<TAttribute>()
                 .Aggregate(

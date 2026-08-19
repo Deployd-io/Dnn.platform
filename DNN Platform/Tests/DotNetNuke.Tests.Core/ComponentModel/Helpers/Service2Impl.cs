@@ -10,7 +10,11 @@ namespace DotNetNuke.Tests.Core.ComponentModel.Helpers
 
         public Service2Impl(IService service)
         {
+			mockEventLogger.LogDebug(">>> Entering Service2Impl(service={Service})", service);
             this._service = service;
+			mockEventLogger.LogDebug("Service2Impl(service={Service}): this._service → {Arg1}", service, this._service);
+			mockEventLogger.LogDebug("Service2Impl(service={Service}): _service → {_service}", service, _service);
+			mockEventLogger.LogDebug("<<< Exiting Service2Impl(service={Service})", service);
         }
 
         public IService Service

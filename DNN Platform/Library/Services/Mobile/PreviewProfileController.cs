@@ -33,6 +33,10 @@ namespace DotNetNuke.Services.Mobile
         public PreviewProfileController()
             : this(null, null)
         {
+		eventLogger.LogDebug(">>> Entering PreviewProfileController()");
+		eventLogger.LogDebug("<<< Exiting PreviewProfileController()");
+		eventLogger.LogDebug(">>> Entering PreviewProfileController(eventLogger={EventLogger},hostSettings={HostSettings})", eventLogger, hostSettings);
+		eventLogger.LogDebug("PreviewProfileController(eventLogger={EventLogger},hostSettings={HostSettings}): hostSettings → {HostSettings1}", eventLogger, hostSettings, hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PreviewProfileController"/> class.</summary>
@@ -42,6 +46,7 @@ namespace DotNetNuke.Services.Mobile
         {
             this.eventLogger = eventLogger ?? Globals.GetCurrentServiceProvider().GetRequiredService<IEventLogger>();
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			eventLogger.LogDebug("<<< Exiting PreviewProfileController(eventLogger={EventLogger},hostSettings={HostSettings})", eventLogger, hostSettings);
         }
 
         /// <summary>
@@ -51,6 +56,7 @@ namespace DotNetNuke.Services.Mobile
         /// <param name="profile">profile object.</param>
         public void Save(IPreviewProfile profile)
         {
+			eventLogger.LogDebug(">>> Entering Save(profile={Profile})", profile);
             Requires.NotNull("The profile can't be null", profile);
 
             if (profile.Id == Null.NullInteger || profile.SortOrder == 0)
@@ -69,11 +75,14 @@ namespace DotNetNuke.Services.Mobile
                 UserController.Instance.GetCurrentUserInfo().UserID);
 
             profile.Id = id;
+			eventLogger.LogDebug("Save(profile={Profile}): profile.Id → {Arg1}", profile, profile.Id);
 
             var logContent = $"{(profile.Id == Null.NullInteger ? "Add" : "Update")} Mobile Preview Profile '{profile.Name}'";
+			eventLogger.LogDebug("Save(profile={Profile}): logContent → {LogContent}", profile, logContent);
             AddLog(this.eventLogger, logContent);
 
             ClearCache(profile.PortalId);
+			eventLogger.LogDebug("<<< Exiting Save(profile={Profile})", profile);
         }
 
         /// <summary>delete a preview profile.</summary>
@@ -81,8 +90,10 @@ namespace DotNetNuke.Services.Mobile
         /// <param name="id">the profile's id.</param>
         public void Delete(int portalId, int id)
         {
+			eventLogger.LogDebug(">>> Entering Delete(portalId={PortalId},id={Id})", portalId, id);
             var delProfile = this.GetProfileById(portalId, id);
             if (delProfile != null)
+			eventLogger.LogDebug("Delete(portalId={PortalId},id={Id}): delProfile → {DelProfile}", portalId, id, delProfile);
             {
                 // update the list order
                 this.GetProfilesByPortal(portalId)
@@ -99,6 +110,7 @@ namespace DotNetNuke.Services.Mobile
 
                 ClearCache(portalId);
             }
+			eventLogger.LogDebug("<<< Exiting Delete(portalId={PortalId},id={Id})", portalId, id);
         }
 
         /// <summary>get a preview profiles list for portal.</summary>
@@ -106,6 +118,9 @@ namespace DotNetNuke.Services.Mobile
         /// <returns>List of preview profile.</returns>
         public IList<IPreviewProfile> GetProfilesByPortal(int portalId)
         {
+			eventLogger.LogDebug(">>> Entering GetProfilesByPortal(portalId={PortalId})", portalId);
+			eventLogger.LogDebug("<<< Exiting GetProfilesByPortal(portalId={PortalId})", portalId);
+			eventLogger.LogDebug("<<< Exiting GetProfilesByPortal(portalId={PortalId},addDefault={AddDefault})", portalId, addDefault);
             return this.GetProfilesByPortal(portalId, true);
         }
 
@@ -115,17 +130,23 @@ namespace DotNetNuke.Services.Mobile
         /// <returns>profile object.</returns>
         public IPreviewProfile GetProfileById(int portalId, int id)
         {
+			eventLogger.LogDebug(">>> Entering GetProfileById(portalId={PortalId},id={Id})", portalId, id);
+			eventLogger.LogDebug("<<< Exiting GetProfileById(portalId={PortalId},id={Id})", portalId, id);
             return this.GetProfilesByPortal(portalId).Where(r => r.Id == id).FirstOrDefault();
         }
 
         private static void ClearCache(int portalId)
         {
+			eventLogger.LogDebug(">>> Entering ClearCache(portalId={PortalId})", portalId);
             DataCache.RemoveCache(string.Format(CultureInfo.InvariantCulture, DataCache.PreviewProfilesCacheKey, portalId));
+			eventLogger.LogDebug("<<< Exiting ClearCache(portalId={PortalId})", portalId);
         }
 
         private static void AddLog(IEventLogger eventLogger, string logContent)
         {
+			eventLogger.LogDebug(">>> Entering AddLog(eventLogger={EventLogger},logContent={LogContent})", eventLogger, logContent);
             eventLogger.AddLog("Message", logContent, PortalController.Instance.GetCurrentSettings(), UserController.Instance.GetCurrentUserInfo().UserID, EventLogType.ADMIN_ALERT);
+			eventLogger.LogDebug("<<< Exiting AddLog(eventLogger={EventLogger},logContent={LogContent})", eventLogger, logContent);
         }
 
         private IList<IPreviewProfile> GetProfilesByPortal(int portalId, bool addDefault)
@@ -137,35 +158,46 @@ namespace DotNetNuke.Services.Mobile
 
         private IList<IPreviewProfile> GetProfilesByPortalIdCallBack(CacheItemArgs cacheItemArgs)
         {
+			eventLogger.LogDebug(">>> Entering GetProfilesByPortalIdCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             int portalId = (int)cacheItemArgs.ParamList[0];
             bool addDefault = (bool)cacheItemArgs.ParamList[1];
+			eventLogger.LogDebug("GetProfilesByPortalIdCallBack(cacheItemArgs={CacheItemArgs}): portalId → {PortalId}", cacheItemArgs, portalId);
 
             var profiles = CBO.FillCollection<PreviewProfile>(DataProvider.Instance().GetPreviewProfiles(portalId));
+			eventLogger.LogDebug("GetProfilesByPortalIdCallBack(cacheItemArgs={CacheItemArgs}): profiles → {Profiles}", cacheItemArgs, profiles);
             if (profiles.Count == 0 && addDefault)
             {
                 profiles = this.CreateDefaultDevices(portalId);
             }
 
+			eventLogger.LogDebug("<<< Exiting GetProfilesByPortalIdCallBack(cacheItemArgs={CacheItemArgs})", cacheItemArgs);
             return profiles.Cast<IPreviewProfile>().ToList();
         }
 
         private List<PreviewProfile> CreateDefaultDevices(int portalId)
         {
+			eventLogger.LogDebug(">>> Entering CreateDefaultDevices(portalId={PortalId})", portalId);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var settings = PortalController.Instance.GetPortalSettings(portalId);
             List<PreviewProfile> profiles = [];
+			eventLogger.LogDebug("CreateDefaultDevices(portalId={PortalId}): settings → {Settings}", portalId, settings);
+			eventLogger.LogDebug("CreateDefaultDevices(portalId={PortalId}): profiles → {Profiles}", portalId, profiles);
 
             if (!settings.TryGetValue("DefPreviewProfiles_Created", out var defaultPreviewProfiles) || defaultPreviewProfiles != DotNetNukeContext.Current.Application.Name)
             {
                 try
                 {
                     var defaultDeviceDBPath = Config.GetSetting("DefaultDevicesDatabase");
+					eventLogger.LogDebug("CreateDefaultDevices(portalId={PortalId}): defaultDeviceDBPath → {DefaultDeviceDBPath}", portalId, defaultDeviceDBPath);
                     if (!string.IsNullOrEmpty(defaultDeviceDBPath))
                     {
                         var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, defaultDeviceDBPath);
+						eventLogger.LogDebug("CreateDefaultDevices(portalId={PortalId}): dataPath → {DataPath}", portalId, dataPath);
 
                         if (!string.IsNullOrEmpty(dataPath) && File.Exists(dataPath))
                         {
                             var serializer = new XmlSerializer(typeof(List<PreviewProfile>));
+							eventLogger.LogDebug("CreateDefaultDevices(portalId={PortalId}): serializer → {Serializer}", portalId, serializer);
                             using (var fileStream = File.OpenRead(dataPath))
                             using (var xmlReader = XmlReader.Create(fileStream))
                             {
@@ -175,6 +207,7 @@ namespace DotNetNuke.Services.Mobile
                             profiles?.ForEach(p =>
                             {
                                 p.PortalId = portalId;
+								eventLogger.LogDebug("CreateDefaultDevices(portalId={PortalId}): p.PortalId → {Arg1}", portalId, p.PortalId);
                                 this.Save(p);
                             });
                         }
@@ -184,10 +217,13 @@ namespace DotNetNuke.Services.Mobile
                 }
                 catch (Exception ex)
                 {
+					eventLogger.LogError("Exception in CreateDefaultDevices(portalId={PortalId}): {Arg1}", portalId, ex.getMessage());
                     Exceptions.Exceptions.LogException(ex);
                 }
             }
 
+			eventLogger.LogInformation("CreateDefaultDevices(portalId)={PortalId}: external service call took {Arg1} ms", portalId, __logStart.ElapsedMilliseconds);
+			eventLogger.LogDebug("<<< Exiting CreateDefaultDevices(portalId={PortalId})", portalId);
             return profiles;
         }
     }

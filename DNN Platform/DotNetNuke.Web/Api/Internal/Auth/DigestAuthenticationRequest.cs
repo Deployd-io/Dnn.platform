@@ -14,6 +14,7 @@ namespace DotNetNuke.Web.Api.Internal.Auth
     [DnnDeprecated(10, 2, 2, "Use JWT or API token authentication")]
     internal partial class DigestAuthenticationRequest
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DigestAuthenticationRequest));
         private static readonly Regex AuthHeaderRegex = new Regex("\\s?(?'name'\\w+)=(\"(?'value'[^\"]+)\"|(?'value'[^,]+))", RegexOptions.Compiled);
 
         /// <summary>Initializes a new instance of the <see cref="DigestAuthenticationRequest"/> class.</summary>
@@ -21,6 +22,7 @@ namespace DotNetNuke.Web.Api.Internal.Auth
         /// <param name="httpMethod">The HTTP method (e.g. <c>"GET"</c> or <c>"POST"</c>).</param>
         public DigestAuthenticationRequest(string authorizationHeader, string httpMethod)
         {
+			Logger.LogDebug(">>> Entering DigestAuthenticationRequest(authorizationHeader=<redacted>,httpMethod={HttpMethod})", httpMethod);
             // Authorization: Digest
             // username="Mufasa",
             // realm="testrealm@host.com",
@@ -44,13 +46,17 @@ namespace DotNetNuke.Web.Api.Internal.Auth
                 this.CleanUsername = this.RawUsername;
                 if (this.CleanUsername.LastIndexOf(@"\", StringComparison.Ordinal) > 0)
                 {
+					Logger.LogDebug("DigestAuthenticationRequest(authorizationHeader=<redacted>,httpMethod={HttpMethod}): this.CleanUsername → {Arg2}", httpMethod, this.CleanUsername);
+					Logger.LogDebug("DigestAuthenticationRequest(authorizationHeader=<redacted>,httpMethod={HttpMethod}): this.HttpMethod → {Arg2}", httpMethod, this.HttpMethod);
                     this.CleanUsername = this.CleanUsername.Substring(this.CleanUsername.LastIndexOf(@"\", StringComparison.Ordinal) + 2 - 1);
                 }
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in DigestAuthenticationRequest(authorizationHeader=<redacted>,httpMethod={HttpMethod}): {Arg2}", httpMethod, Exception.Message);
                 // suppress any issue e.g. another 401 from a different auth method
             }
+			Logger.LogDebug("<<< Exiting DigestAuthenticationRequest(authorizationHeader=<redacted>,httpMethod={HttpMethod})", httpMethod);
         }
 
         /// <summary>Gets or sets the request params from the Authorization header.</summary>

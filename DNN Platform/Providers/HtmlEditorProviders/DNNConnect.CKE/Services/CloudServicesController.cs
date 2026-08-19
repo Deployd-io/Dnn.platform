@@ -19,6 +19,8 @@ namespace DNNConnect.CKEditorProvider.Services
         [HttpGet]
         public HttpResponseMessage GetToken()
         {
+			eventLogger.LogDebug(">>> Entering GetToken()");
+			eventLogger.LogDebug("<<< Exiting GetToken()");
             return this.Request.CreateResponse(HttpStatusCode.OK, "faketoken");
         }
     }

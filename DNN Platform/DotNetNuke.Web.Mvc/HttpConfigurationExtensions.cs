@@ -12,14 +12,17 @@ namespace DotNetNuke.Web.Mvc
 
     public static class HttpConfigurationExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HttpConfigurationExtensions));
         private const string Key = "MvcTabAndModuleInfoProvider";
 
         public static void AddTabAndModuleInfoProvider(this HttpConfiguration configuration, ITabAndModuleInfoProvider tabAndModuleInfoProvider)
         {
+			Logger.LogDebug(">>> Entering AddTabAndModuleInfoProvider(configuration={Configuration},tabAndModuleInfoProvider={TabAndModuleInfoProvider})", configuration, tabAndModuleInfoProvider);
             Requires.NotNull("configuration", configuration);
             Requires.NotNull("tabAndModuleInfoProvider", tabAndModuleInfoProvider);
 
             var providers = configuration.Properties.GetOrAdd(Key, InitValue) as ConcurrentQueue<ITabAndModuleInfoProvider>;
+			Logger.LogDebug("AddTabAndModuleInfoProvider(configuration={Configuration},tabAndModuleInfoProvider={TabAndModuleInfoProvider}): providers → {Providers}", configuration, tabAndModuleInfoProvider, providers);
 
             if (providers == null)
             {
@@ -28,15 +31,18 @@ namespace DotNetNuke.Web.Mvc
             }
 
             providers.Enqueue(tabAndModuleInfoProvider);
+			Logger.LogDebug("<<< Exiting AddTabAndModuleInfoProvider(configuration={Configuration},tabAndModuleInfoProvider={TabAndModuleInfoProvider})", configuration, tabAndModuleInfoProvider);
         }
 
         public static IEnumerable<ITabAndModuleInfoProvider> GetTabAndModuleInfoProviders(this HttpConfiguration configuration)
         {
+			Logger.LogDebug(">>> Entering GetTabAndModuleInfoProviders(configuration={Configuration})", configuration);
             Requires.NotNull("configuration", configuration);
 
             if (configuration.Properties.GetOrAdd(Key, InitValue) is not ConcurrentQueue<ITabAndModuleInfoProvider> providers)
             {
                 // shouldn't ever happen outside of unit tests
+			Logger.LogDebug("<<< Exiting GetTabAndModuleInfoProviders(configuration={Configuration})", configuration);
                 return [];
             }
 
@@ -45,6 +51,8 @@ namespace DotNetNuke.Web.Mvc
 
         private static object InitValue(object o)
         {
+			Logger.LogDebug(">>> Entering InitValue(o={O})", o);
+			Logger.LogDebug("<<< Exiting InitValue(o={O})", o);
             return new ConcurrentQueue<ITabAndModuleInfoProvider>();
         }
     }

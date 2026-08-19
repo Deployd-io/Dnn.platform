@@ -5,31 +5,39 @@ import {formatDate, sort} from "../../../helpers";
 import UserMenu from "../UserMenu";
 import Localization from "localization";
 import ColumnSizes from "../columnSizes";
+const logger = console;
 import {canManageRoles, canManageProfile, canViewSettings} from "../../permissionHelpers.js";
 import { SvgIcons, GridCell, Collapsible, TextOverflowWrapper } from "@dnnsoftware/dnn-react-common";
 
 class DetailsRow extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.rootElement = React.createRef();
+		logger.debug('<<< Exiting constructor()');
         this.state = {
             opened: false,
             showMenu: false
         };
     }
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this._isMounted = true;
         let opened = (this.props.openId !== "" && this.props.id === this.props.openId);
         this.setState({
             opened
         });
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     componentWillUnmount() {
+		logger.debug('>>> Entering componentWillUnmount()');
         this._isMounted = false;
+		logger.debug('<<< Exiting componentWillUnmount()');
     }
 
     handleClick(event) {
+		logger.debug(`>>> Entering handleClick(event=${event})`);
         // Note: this workaround is needed in IE. The remove event listener in the componentWillUnmount is called
         // before the handleClick handler is called, but in spite of that, the handleClick is executed. To avoid
         // the "findDOMNode was called on an unmounted component." error we need to check if the component is mounted before execute this code
@@ -38,25 +46,32 @@ class DetailsRow extends Component {
             && !(event.target.id === "confirmbtn" || event.target.id === "cancelbtn") && this.props.openId !== "add") {
             if ((this.props.openId !== "" && this.props.id === this.props.openId)) {
                 this.props.Collapse();
+				logger.debug(`<<< Exiting handleClick(event=${event})`);
             }
         }
     }
     toggle(index) {
+		logger.debug(`>>> Entering toggle(index=${index})`);
         if ((this.props.openId !== "" && this.props.id === this.props.openId) && this.props.currentIndex === index) {
             this.props.Collapse();
         } else {
             this.props.OpenCollapse(this.props.id, index);
+			logger.debug(`<<< Exiting toggle(index=${index})`);
         }
     }
     toggleUserMenu() {
+		logger.debug('>>> Entering toggleUserMenu()');
         const show = !this.state.showMenu;
         this.setState({ showMenu: show });
+		logger.debug('<<< Exiting toggleUserMenu()');
     }
     
     /* eslint-disable react/no-danger */
     getUserActions(user, opened) {
+		logger.debug(`>>> Entering getUserActions(user=${user},opened=${opened})`);
         let actionIcons = [];
         actionIcons = actionIcons.concat((this.props.getUserTabsIcons && this.props.getUserTabsIcons(user)) || []);
+		logger.debug(`getUserActions(user=${user},opened=${opened}): actionIcons → ${actionIcons}`);
 
         if (canManageProfile(this.props.appSettings.applicationSettings.settings))
         {
@@ -87,7 +102,9 @@ class DetailsRow extends Component {
         let userActions = sort(actionIcons, "index", "desc").map((actionIcon) => {
             let Icon = actionIcon.icon;
             let element = <div key={`user_action_${i}`} title={actionIcon.title} className={ "extension-action " + !(opened && this.props.currentIndex === i) } onClick={ this.toggle.bind(this, i) } ><Icon /></div>;
+			logger.debug(`getUserActions(user=${user},opened=${opened}): element → ${element}`);
             i++;
+		logger.debug(`<<< Exiting getUserActions(user=${user},opened=${opened})`);
             return element;
         });
         return ([<div key={`user_action_wrapper_${user.userId}`} style={{ position: "relative" }}>
@@ -100,14 +117,18 @@ class DetailsRow extends Component {
         </div>]).concat(userActions);
     }
     getUserColumns(user, id, opened) {
+		logger.debug(`>>> Entering getUserColumns(user=${user},id=${id},opened=${opened})`);
         let userActions = this.getUserActions(user, opened);
         let extraColumns = this.props.getUserColumns && this.props.getUserColumns(user);
+		logger.debug(`getUserColumns(user=${user},id=${id},opened=${opened}): extraColumns → ${extraColumns}`);
         let columnSizes =this.props.columnSizes!==undefined? this.props.columnSizes: ColumnSizes;
         let userColumns = [];
         if (this.props.appSettings.applicationSettings.settings.dataConsentActive) {
             let statusClass = "black";
+			logger.debug(`getUserColumns(user=${user},id=${id},opened=${opened}): statusClass → ${statusClass}`);
             let StatusIcon = SvgIcons.Signature;
             let hoverText = Localization.get("HasAgreedToTerms.title");
+			logger.debug(`getUserColumns(user=${user},id=${id},opened=${opened}): hoverText → ${hoverText}`);
             if (user.requestsRemoval) {
                 statusClass = "red";
                 StatusIcon = SvgIcons.UserSlash;
@@ -169,16 +190,21 @@ class DetailsRow extends Component {
             }
         ]).concat((extraColumns) || []);
 
+		logger.debug(`<<< Exiting getUserColumns(user=${user},id=${id},opened=${opened})`);
         return sort(userColumns, "index").map((column) => {
             return column.content;
         });
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         let {user} = this.props;
+		logger.debug(`render(): user → ${user}`);
         let opened = (props.openId !== "" && props.id === props.openId);
+		logger.debug(`render(): opened → ${opened}`);
         let uniqueId = "userRow-" + Math.random() + Date.now();
+		logger.debug(`render(): uniqueId → ${uniqueId}`);
         if (user === undefined) {
             user = {
                 avatar: "-",
@@ -190,6 +216,7 @@ class DetailsRow extends Component {
             };
         }
         let userColumns = this.getUserColumns(user, props.id, opened);
+		logger.debug('<<< Exiting render()');
         return (
             /* eslint-disable react/no-danger */
             <GridCell className={"collapsible-component-users"} id={uniqueId} ref={(node) => this.rootElement = node}>

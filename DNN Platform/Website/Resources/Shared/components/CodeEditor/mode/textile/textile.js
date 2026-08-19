@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") { // CommonJS
     mod(require("../../lib/codemirror"));
   } else if (typeof define == "function" && define.amd) { // AMD
@@ -47,15 +49,21 @@
   };
 
   function startNewLine(stream, state) {
+	logger.debug(`>>> Entering startNewLine(stream=${stream},state=${state})`);
     state.mode = Modes.newLayout;
     state.tableHeading = false;
+	logger.debug(`startNewLine(stream=${stream},state=${state}): state.mode → ${state.mode}`);
 
     if (state.layoutType === "definitionList" && state.spanningLayout &&
         stream.match(RE("definitionListEnd"), false))
       state.spanningLayout = false;
+		logger.debug(`startNewLine(stream=${stream},state=${state}): state.tableHeading → ${state.tableHeading}`);
+		logger.debug(`startNewLine(stream=${stream},state=${state}): state.spanningLayout → ${state.spanningLayout}`);
+	logger.debug(`<<< Exiting startNewLine(stream=${stream},state=${state})`);
   }
 
   function handlePhraseModifier(stream, state, ch) {
+	logger.debug(`>>> Entering handlePhraseModifier(stream=${stream},state=${state},ch=${ch})`);
     if (ch === "_") {
       if (stream.eat("_"))
         return togglePhraseModifier(stream, state, "italic", /__/, 2);
@@ -111,17 +119,21 @@
     if (ch === "!") {
       var type = togglePhraseModifier(stream, state, "image", /(?:\([^\)]+\))?!/, 1);
       stream.match(/^:\S+/); // optional Url portion
+	logger.debug(`<<< Exiting handlePhraseModifier(stream=${stream},state=${state},ch=${ch})`);
       return type;
     }
     return tokenStyles(state);
   }
 
   function togglePhraseModifier(stream, state, phraseModifier, closeRE, openSize) {
+	logger.debug(`>>> Entering togglePhraseModifier(stream=${stream},state=${state},phraseModifier=${phraseModifier},closeRE=${closeRE},openSize=${openSize})`);
     var charBefore = stream.pos > openSize ? stream.string.charAt(stream.pos - openSize - 1) : null;
     var charAfter = stream.peek();
+	logger.debug(`togglePhraseModifier(stream=${stream},state=${state},phraseModifier=${phraseModifier},closeRE=${closeRE},openSize=${openSize}): charBefore → ${charBefore}`);
     if (state[phraseModifier]) {
       if ((!charAfter || /\W/.test(charAfter)) && charBefore && /\S/.test(charBefore)) {
         var type = tokenStyles(state);
+		logger.debug(`togglePhraseModifier(stream=${stream},state=${state},phraseModifier=${phraseModifier},closeRE=${closeRE},openSize=${openSize}): type → ${type}`);
         state[phraseModifier] = false;
         return type;
       }
@@ -130,12 +142,16 @@
       state[phraseModifier] = true;
       state.mode = Modes.attributes;
     }
+	logger.debug(`togglePhraseModifier(stream=${stream},state=${state},phraseModifier=${phraseModifier},closeRE=${closeRE},openSize=${openSize}): charAfter → ${charAfter}`);
+	logger.debug(`<<< Exiting togglePhraseModifier(stream=${stream},state=${state},phraseModifier=${phraseModifier},closeRE=${closeRE},openSize=${openSize})`);
     return tokenStyles(state);
   };
 
   function tokenStyles(state) {
+	logger.debug(`>>> Entering tokenStyles(state=${state})`);
     var disabled = textileDisabled(state);
     if (disabled) return disabled;
+	logger.debug(`tokenStyles(state=${state}): disabled → ${disabled}`);
 
     var styles = [];
     if (state.layoutType) styles.push(TOKEN_STYLES[state.layoutType]);
@@ -147,10 +163,12 @@
     if (state.layoutType === "header")
       styles.push(TOKEN_STYLES.header + "-" + state.header);
 
+	logger.debug(`<<< Exiting tokenStyles(state=${state})`);
     return styles.length ? styles.join(" ") : null;
   }
 
   function textileDisabled(state) {
+	logger.debug(`>>> Entering textileDisabled(state=${state})`);
     var type = state.layoutType;
 
     switch(type) {
@@ -160,42 +178,54 @@
       return TOKEN_STYLES[type];
     default:
       if (state.notextile)
+	logger.debug(`<<< Exiting textileDisabled(state=${state})`);
         return TOKEN_STYLES.notextile + (type ? (" " + TOKEN_STYLES[type]) : "");
       return null;
     }
   }
 
   function tokenStylesWith(state, extraStyles) {
+	logger.debug(`>>> Entering tokenStylesWith(state=${state},extraStyles=${extraStyles})`);
     var disabled = textileDisabled(state);
     if (disabled) return disabled;
+	logger.debug(`tokenStylesWith(state=${state},extraStyles=${extraStyles}): disabled → ${disabled}`);
 
     var type = tokenStyles(state);
+	logger.debug(`tokenStylesWith(state=${state},extraStyles=${extraStyles}): type → ${type}`);
     if (extraStyles)
       return type ? (type + " " + extraStyles) : extraStyles;
     else
+	logger.debug(`<<< Exiting tokenStylesWith(state=${state},extraStyles=${extraStyles})`);
       return type;
   }
 
   function activeStyles(state) {
+	logger.debug(`>>> Entering activeStyles(state=${state})`);
     var styles = [];
     for (var i = 1; i < arguments.length; ++i) {
       if (state[arguments[i]])
         styles.push(TOKEN_STYLES[arguments[i]]);
     }
+	logger.debug(`<<< Exiting activeStyles(state=${state})`);
     return styles;
   }
 
   function blankLine(state) {
+	logger.debug(`>>> Entering blankLine(state=${state})`);
     var spanningLayout = state.spanningLayout, type = state.layoutType;
 
     for (var key in state) if (state.hasOwnProperty(key))
       delete state[key];
 
     state.mode = Modes.newLayout;
+	logger.debug(`blankLine(state=${state}): state.mode → ${state.mode}`);
     if (spanningLayout) {
       state.layoutType = type;
+	logger.debug(`blankLine(state=${state}): state.layoutType → ${state.layoutType}`);
       state.spanningLayout = true;
+	logger.debug(`blankLine(state=${state}): state.spanningLayout → ${state.spanningLayout}`);
     }
+	logger.debug(`<<< Exiting blankLine(state=${state})`);
   }
 
   var REs = {
@@ -230,6 +260,7 @@
       css: /\{[^\}]+\}/
     },
     createRe: function(name) {
+	logger.debug(`>>> Entering createRe(name=${name})`);
       switch (name) {
       case "drawTable":
         return REs.makeRe("^", REs.single.drawTable, "$");
@@ -261,18 +292,23 @@
                             REs.attributes.lang, REs.attributes.align, REs.attributes.pad);
 
       default:
+	logger.debug(`<<< Exiting createRe(name=${name})`);
         return REs.makeRe("^", REs.single[name]);
       }
     },
     makeRe: function() {
+	logger.debug('>>> Entering makeRe()');
       var pattern = "";
       for (var i = 0; i < arguments.length; ++i) {
+		logger.debug(`makeRe(): pattern → ${pattern}`);
         var arg = arguments[i];
         pattern += (typeof arg === "string") ? arg : arg.source;
+		logger.debug('<<< Exiting makeRe()');
       }
       return new RegExp(pattern);
     },
     choiceRe: function() {
+	logger.debug('>>> Entering choiceRe()');
       var parts = [arguments[0]];
       for (var i = 1; i < arguments.length; ++i) {
         parts[i * 2 - 1] = "|";
@@ -281,18 +317,24 @@
 
       parts.unshift("(?:");
       parts.push(")");
+	logger.debug('<<< Exiting choiceRe()');
+	logger.debug(`<<< Exiting function(exports=${exports})`);
       return REs.makeRe.apply(null, parts);
     }
   };
 
   function RE(name) {
+	logger.debug(`>>> Entering RE(name=${name})`);
+	logger.debug(`<<< Exiting RE(name=${name})`);
     return (REs.cache[name] || (REs.cache[name] = REs.createRe(name)));
   }
 
   var Modes = {
     newLayout: function(stream, state) {
+	logger.debug(`>>> Entering newLayout(stream=${stream},state=${state})`);
       if (stream.match(RE("typeLayout"), false)) {
         state.spanningLayout = false;
+		logger.debug(`newLayout(stream=${stream},state=${state}): state.spanningLayout → ${state.spanningLayout}`);
         return (state.mode = Modes.blockType)(stream, state);
       }
       var newMode;
@@ -306,14 +348,17 @@
         else if (stream.match(RE("definitionList")))
           newMode = Modes.definitionList;
         else if (stream.match(RE("html"), false))
+		logger.debug(`<<< Exiting newLayout(stream=${stream},state=${state})`);
           newMode = Modes.html;
       }
       return (state.mode = (newMode || Modes.text))(stream, state);
     },
 
     blockType: function(stream, state) {
+	logger.debug(`>>> Entering blockType(stream=${stream},state=${state})`);
       var match, type;
       state.layoutType = null;
+	logger.debug(`blockType(stream=${stream},state=${state}): state.layoutType → ${state.layoutType}`);
 
       if (match = stream.match(RE("type")))
         type = match[0];
@@ -340,21 +385,28 @@
       }
 
       state.mode = Modes.attributes;
+	logger.debug(`blockType(stream=${stream},state=${state}): state.mode → ${state.mode}`);
+	logger.debug(`<<< Exiting blockType(stream=${stream},state=${state})`);
       return tokenStyles(state);
     },
 
     text: function(stream, state) {
+	logger.debug(`>>> Entering text(stream=${stream},state=${state})`);
       if (stream.match(RE("text"))) return tokenStyles(state);
 
       var ch = stream.next();
       if (ch === '"')
+		logger.debug(`text(stream=${stream},state=${state}): ch → ${ch}`);
+		logger.debug(`<<< Exiting text(stream=${stream},state=${state})`);
         return (state.mode = Modes.link)(stream, state);
       return handlePhraseModifier(stream, state, ch);
     },
 
     attributes: function(stream, state) {
+	logger.debug(`>>> Entering attributes(stream=${stream},state=${state})`);
       state.mode = Modes.layoutLength;
 
+	logger.debug(`attributes(stream=${stream},state=${state}): state.mode → ${state.mode}`);
       if (stream.match(RE("attributes")))
         return tokenStylesWith(state, TOKEN_STYLES.attributes);
       else
@@ -362,17 +414,25 @@
     },
 
     layoutLength: function(stream, state) {
+	logger.debug(`>>> Entering layoutLength(stream=${stream},state=${state})`);
       if (stream.eat(".") && stream.eat("."))
         state.spanningLayout = true;
 
+	logger.debug(`layoutLength(stream=${stream},state=${state}): state.spanningLayout → ${state.spanningLayout}`);
       state.mode = Modes.text;
+	logger.debug(`layoutLength(stream=${stream},state=${state}): state.mode → ${state.mode}`);
+	logger.debug(`<<< Exiting layoutLength(stream=${stream},state=${state})`);
       return tokenStyles(state);
     },
 
     list: function(stream, state) {
+	logger.debug(`>>> Entering list(stream=${stream},state=${state})`);
       var match = stream.match(RE("list"));
       state.listDepth = match[0].length;
+	logger.debug(`list(stream=${stream},state=${state}): match → ${match}`);
+	logger.debug(`list(stream=${stream},state=${state}): state.listDepth → ${state.listDepth}`);
       var listMod = (state.listDepth - 1) % 3;
+	logger.debug(`list(stream=${stream},state=${state}): listMod → ${listMod}`);
       if (!listMod)
         state.layoutType = "list1";
       else if (listMod === 1)
@@ -381,59 +441,80 @@
         state.layoutType = "list3";
 
       state.mode = Modes.attributes;
+	logger.debug(`list(stream=${stream},state=${state}): state.mode → ${state.mode}`);
+	logger.debug(`<<< Exiting list(stream=${stream},state=${state})`);
       return tokenStyles(state);
     },
 
     link: function(stream, state) {
+	logger.debug(`>>> Entering link(stream=${stream},state=${state})`);
       state.mode = Modes.text;
       if (stream.match(RE("link"))) {
+		logger.debug(`link(stream=${stream},state=${state}): state.mode → ${state.mode}`);
         stream.match(/\S+/);
+		logger.debug(`<<< Exiting link(stream=${stream},state=${state})`);
         return tokenStylesWith(state, TOKEN_STYLES.link);
       }
       return tokenStyles(state);
     },
 
     linkDefinition: function(stream, state) {
+	logger.debug(`>>> Entering linkDefinition(stream=${stream},state=${state})`);
       stream.skipToEnd();
+	logger.debug(`<<< Exiting linkDefinition(stream=${stream},state=${state})`);
       return tokenStylesWith(state, TOKEN_STYLES.linkDefinition);
     },
 
     definitionList: function(stream, state) {
+	logger.debug(`>>> Entering definitionList(stream=${stream},state=${state})`);
       stream.match(RE("definitionList"));
 
       state.layoutType = "definitionList";
+	logger.debug(`definitionList(stream=${stream},state=${state}): state.layoutType → ${state.layoutType}`);
 
       if (stream.match(/\s*$/))
         state.spanningLayout = true;
       else
         state.mode = Modes.attributes;
 
+	logger.debug(`<<< Exiting definitionList(stream=${stream},state=${state})`);
+	logger.debug(`definitionList(stream=${stream},state=${state}): state.spanningLayout → ${state.spanningLayout}`);
       return tokenStyles(state);
     },
 
     html: function(stream, state) {
+	logger.debug(`>>> Entering html(stream=${stream},state=${state})`);
       stream.skipToEnd();
+	logger.debug(`<<< Exiting html(stream=${stream},state=${state})`);
       return tokenStylesWith(state, TOKEN_STYLES.html);
     },
 
     table: function(stream, state) {
+	logger.debug(`>>> Entering table(stream=${stream},state=${state})`);
       state.layoutType = "table";
+	logger.debug(`<<< Exiting table(stream=${stream},state=${state})`);
       return (state.mode = Modes.tableCell)(stream, state);
     },
 
     tableCell: function(stream, state) {
+	logger.debug(`>>> Entering tableCell(stream=${stream},state=${state})`);
       if (stream.match(RE("tableHeading")))
         state.tableHeading = true;
       else
         stream.eat("|");
 
+	logger.debug(`tableCell(stream=${stream},state=${state}): state.tableHeading → ${state.tableHeading}`);
       state.mode = Modes.tableCellAttributes;
+	logger.debug(`tableCell(stream=${stream},state=${state}): state.mode → ${state.mode}`);
+	logger.debug(`<<< Exiting tableCell(stream=${stream},state=${state})`);
       return tokenStyles(state);
     },
 
     tableCellAttributes: function(stream, state) {
+	logger.debug(`>>> Entering tableCellAttributes(stream=${stream},state=${state})`);
       state.mode = Modes.tableText;
 
+	logger.debug(`tableCellAttributes(stream=${stream},state=${state}): state.mode → ${state.mode}`);
       if (stream.match(RE("tableCellAttributes")))
         return tokenStylesWith(state, TOKEN_STYLES.attributes);
       else
@@ -441,11 +522,14 @@
     },
 
     tableText: function(stream, state) {
+	logger.debug(`>>> Entering tableText(stream=${stream},state=${state})`);
       if (stream.match(RE("tableText")))
         return tokenStyles(state);
 
       if (stream.peek() === "|") { // end of cell
         state.mode = Modes.tableCell;
+		logger.debug(`tableText(stream=${stream},state=${state}): state.mode → ${state.mode}`);
+		logger.debug(`<<< Exiting tableText(stream=${stream},state=${state})`);
         return tokenStyles(state);
       }
       return handlePhraseModifier(stream, state, stream.next());
@@ -453,12 +537,17 @@
   };
 
   CodeMirror.defineMode("textile", function() {
+	logger.debug('>>> Entering defineMode()');
     return {
       startState: function() {
+		logger.debug('>>> Entering startState()');
+		logger.debug('<<< Exiting startState()');
         return { mode: Modes.newLayout };
       },
       token: function(stream, state) {
+		logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
         if (stream.sol()) startNewLine(stream, state);
+		logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
         return state.mode(stream, state);
       },
       blankLine: blankLine

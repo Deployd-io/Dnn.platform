@@ -9,13 +9,17 @@ namespace DotNetNuke.UI.WebControls
 
     public class PropertySortOrderComparer : IComparer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PropertySortOrderComparer));
         /// <inheritdoc />
         public int Compare(object x, object y)
         {
+			Logger.LogDebug(">>> Entering Compare(x={X},y={Y})", x, y);
             if (x is PropertyInfo && y is PropertyInfo)
             {
                 var xProp = (PropertyInfo)x;
+				Logger.LogDebug("Compare(x={X},y={Y}): xProp → {XProp}", x, y, xProp);
                 var yProp = (PropertyInfo)y;
+				Logger.LogDebug("Compare(x={X},y={Y}): yProp → {YProp}", x, y, yProp);
                 object[] xSortOrder = xProp.GetCustomAttributes(typeof(SortOrderAttribute), true);
                 int xSortOrderValue;
                 if (xSortOrder.Length > 0)
@@ -49,6 +53,8 @@ namespace DotNetNuke.UI.WebControls
             }
             else
             {
+				Logger.LogWarning("Throwing ArgumentException from Compare(x={X},y={Y})", x, y);
+			Logger.LogDebug("<<< Exiting Compare(x={X},y={Y})", x, y);
                 throw new ArgumentException("Object is not of type PropertyInfo");
             }
         }

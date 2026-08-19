@@ -12,6 +12,8 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
         /// <summary>Initializes a new instance of the <see cref="SkinPackageDetailDto"/> class.</summary>
         public SkinPackageDetailDto()
         {
+		eventLogger.LogDebug(">>> Entering SkinPackageDetailDto()");
+		eventLogger.LogDebug("<<< Exiting SkinPackageDetailDto()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="SkinPackageDetailDto"/> class.</summary>

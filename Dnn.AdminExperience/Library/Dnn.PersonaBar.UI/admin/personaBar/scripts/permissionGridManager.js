@@ -1,3 +1,4 @@
+const logger = console;
 ﻿/*
 * @depend jquery.tokeninput
 */
@@ -54,12 +55,16 @@
             updateHiddenField();
 
             function updateHiddenField() {
+				logger.debug('>>> Entering updateHiddenField()');
                 var Id = roleSelector.val();
                 roleId.val(Id);
+				logger.debug('<<< Exiting updateHiddenField()');
             }
         };
 
         $(document).ready(function() {
+			logger.debug(`>>> Entering ready(document=${document})`);
+			logger.debug(`<<< Exiting ready(document=${document})`);
             init();
         });
         return this;

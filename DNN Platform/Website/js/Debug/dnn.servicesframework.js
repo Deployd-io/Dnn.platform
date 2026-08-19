@@ -1,4 +1,6 @@
+const logger = console;
 ﻿(function ($) {
+	logger.debug('>>> Entering function()');
     $.dnnSF = function (moduleId) {
         // To avoid scope issues, use 'base' instead of 'this'
         // to reference this class from internal events and functions.
@@ -7,6 +9,7 @@
         base.getServiceRoot = function (moduleName) {
             var serviceRoot = dnn.getVar("sf_siteRoot", "/");
             serviceRoot += "API/" + moduleName + "/";
+			logger.debug(`function(moduleName=${moduleName}): serviceRoot → ${serviceRoot}`);
             return serviceRoot;
         };
 
@@ -20,12 +23,14 @@
 
         base.setModuleHeaders = function (xhr) {
             var tabId = base.getTabId();
+			logger.debug(`function(xhr=${xhr}): tabId → ${tabId}`);
             if (tabId > -1) {
                 xhr.setRequestHeader("ModuleId", base.getModuleId());
                 xhr.setRequestHeader("TabId", tabId);
             }
 
             var afValue = base.getAntiForgeryValue();
+			logger.debug(`function(xhr=${xhr}): afValue → ${afValue}`);
             if (afValue) {
                 xhr.setRequestHeader("RequestVerificationToken", afValue);
             }
@@ -43,6 +48,7 @@
     };
 
     $.ServicesFramework = function (moduleId) {
+		logger.debug(`<<< Exiting function(moduleId=${moduleId})`);
         return new $.dnnSF(moduleId);
     };
 

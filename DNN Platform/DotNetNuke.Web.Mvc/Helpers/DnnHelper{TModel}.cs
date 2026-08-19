@@ -15,6 +15,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
 
     public class DnnHelper<TModel> : DnnHelper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnHelper{TModel}));
         /// <summary>Initializes a new instance of the <see cref="DnnHelper{TModel}"/> class.</summary>
         /// <param name="viewContext">The view context.</param>
         /// <param name="viewDataContainer">The ViewData container.</param>
@@ -22,7 +23,9 @@ namespace DotNetNuke.Web.Mvc.Helpers
         public DnnHelper(ViewContext viewContext, IViewDataContainer viewDataContainer)
             : this(null, null, null, viewContext, viewDataContainer, RouteTable.Routes)
         {
+		Logger.LogDebug(">>> Entering DnnHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer})", viewContext, viewDataContainer);
         }
+		Logger.LogDebug("<<< Exiting DnnHelper(viewContext={ViewContext},viewDataContainer={ViewDataContainer})", viewContext, viewDataContainer);
 
         /// <summary>Initializes a new instance of the <see cref="DnnHelper{TModel}"/> class.</summary>
         /// <param name="clientResourceController">The client resource controller.</param>
@@ -33,6 +36,8 @@ namespace DotNetNuke.Web.Mvc.Helpers
         public DnnHelper(IClientResourceController clientResourceController, IApplicationStatusInfo appStatus, IEventLogger eventLogger, ViewContext viewContext, IViewDataContainer viewDataContainer)
             : this(clientResourceController, appStatus, eventLogger, viewContext, viewDataContainer, RouteTable.Routes)
         {
+		Logger.LogDebug(">>> Entering DnnHelper(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},viewContext={ViewContext},viewDataContainer={ViewDataContainer})", clientResourceController, appStatus, eventLogger, viewContext, viewDataContainer);
+		Logger.LogDebug("<<< Exiting DnnHelper(clientResourceController={ClientResourceController},appStatus={AppStatus},eventLogger={EventLogger},viewContext={ViewContext},viewDataContainer={ViewDataContainer})", clientResourceController, appStatus, eventLogger, viewContext, viewDataContainer);
         }
 
         /// <summary>Initializes a new instance of the <see cref="DnnHelper{TModel}"/> class.</summary>

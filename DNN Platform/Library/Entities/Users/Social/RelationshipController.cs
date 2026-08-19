@@ -13,9 +13,12 @@ namespace DotNetNuke.Entities.Users.Social
     /// <summary>Business Layer to manage Relationships. Also contains CRUD methods.</summary>
     public class RelationshipController : ServiceLocator<IRelationshipController, RelationshipController>
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RelationshipController));
         /// <inheritdoc />
         protected override Func<IRelationshipController> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => ActivatorUtilities.GetServiceOrCreateInstance<RelationshipControllerImpl>(Globals.DependencyProvider);
         }
     }

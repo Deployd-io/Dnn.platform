@@ -14,11 +14,14 @@ namespace DotNetNuke.Web.UI.WebControls
     public class TypedControlCollection<T> : ControlCollection, IList<T>
         where T : Control
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TypedControlCollection));
         /// <summary>Initializes a new instance of the <see cref="TypedControlCollection{T}"/> class.</summary>
         /// <param name="owner">The owner control.</param>
         public TypedControlCollection(Control owner)
             : base(owner)
         {
+		Logger.LogDebug(">>> Entering TypedControlCollection(owner={Owner})", owner);
+		Logger.LogDebug("<<< Exiting TypedControlCollection(owner={Owner})", owner);
         }
 
         /// <inheritdoc />
@@ -39,23 +42,29 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         public override void Add(Control child)
         {
+			Logger.LogDebug(">>> Entering Add(child={Child})", child);
             if (child is not T item)
+			Logger.LogDebug(">>> Entering Insert(index={Index},item={Item})", index, item);
             {
+				Logger.LogDebug("<<< Exiting Insert(index={Index},item={Item})", index, item);
                 this.ThrowOnInvalidControlType();
             }
 
             base.Add(child);
+			Logger.LogDebug("<<< Exiting Add(child={Child})", child);
         }
 
         /// <inheritdoc />
         public override void AddAt(int index, Control child)
         {
+			Logger.LogDebug(">>> Entering AddAt(index={Index},child={Child})", index, child);
             if (child is not T)
             {
                 this.ThrowOnInvalidControlType();
             }
 
             base.AddAt(index, child);
+			Logger.LogDebug("<<< Exiting AddAt(index={Index},child={Child})", index, child);
         }
 
         /// <inheritdoc />
@@ -73,12 +82,16 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <inheritdoc />
         public bool Remove(T item)
         {
+			Logger.LogDebug(">>> Entering CopyTo(array={Array},arrayIndex={ArrayIndex})", array, arrayIndex);
             if (!this.Contains(item))
+			Logger.LogDebug(">>> Entering Remove(item={Item})", item);
             {
+				Logger.LogDebug("<<< Exiting CopyTo(array={Array},arrayIndex={ArrayIndex})", array, arrayIndex);
                 return false;
             }
 
             base.Remove(item);
+			Logger.LogDebug("<<< Exiting Remove(item={Item})", item);
             return true;
         }
 
@@ -90,6 +103,9 @@ namespace DotNetNuke.Web.UI.WebControls
         /// <exception cref="InvalidOperationException">Always.</exception>
         protected virtual void ThrowOnInvalidControlType()
         {
+			Logger.LogDebug(">>> Entering ThrowOnInvalidControlType()");
+			Logger.LogWarning("Throwing InvalidOperationException from ThrowOnInvalidControlType()");
+			Logger.LogDebug("<<< Exiting ThrowOnInvalidControlType()");
             throw new InvalidOperationException("Not supported");
         }
 

@@ -22,6 +22,7 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>A new <see cref="FriendlyUrlOptions"/> instance.</returns>
         public static FriendlyUrlOptions GetOptionsFromSettings(FriendlyUrlSettings settings)
         {
+			Logger.LogDebug(">>> Entering GetOptionsFromSettings(settings={Settings})", settings);
             var options = new FriendlyUrlOptions
             {
                 PunctuationReplacement = (settings.ReplaceSpaceWith != FriendlyUrlSettings.ReplaceSpaceWithNothing)
@@ -39,6 +40,7 @@ namespace DotNetNuke.Entities.Urls
                                             ? string.Empty
                                             : settings.PageExtension,
             };
+			Logger.LogDebug("<<< Exiting GetOptionsFromSettings(settings={Settings})", settings);
             return options;
         }
 
@@ -47,6 +49,7 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>The extended options.</returns>
         public static FriendlyUrlOptions ExtendOptionsForCustomURLs(FriendlyUrlOptions options)
         {
+			Logger.LogDebug(">>> Entering ExtendOptionsForCustomURLs(options={Options})", options);
             var result = new FriendlyUrlOptions
             {
                 PunctuationReplacement = options.PunctuationReplacement,
@@ -60,6 +63,7 @@ namespace DotNetNuke.Entities.Urls
                 ReplaceCharWithChar = options.ReplaceCharWithChar,
                 PageExtension = options.PageExtension,
             };
+			Logger.LogDebug("<<< Exiting ExtendOptionsForCustomURLs(options={Options})", options);
             return result;
         }
 
@@ -69,6 +73,7 @@ namespace DotNetNuke.Entities.Urls
         /// <param name="result">The result.</param>
         public static void Log404(HttpRequest request, FriendlyUrlSettings settings, UrlAction result)
         {
+			Logger.LogDebug(">>> Entering Log404(request={Request},settings={Settings},result={Result})", request, settings, result);
             var log = new LogInfo
             {
                 LogTypeKey = nameof(EventLogType.PAGE_NOT_FOUND_404),
@@ -97,12 +102,14 @@ namespace DotNetNuke.Entities.Urls
 
                 var userRequestIpAddressController = UserRequestIPAddressController.Instance;
                 var ipAddress = userRequestIpAddressController.GetUserRequestIPAddress(new HttpRequestWrapper(request));
+				Logger.LogDebug("Log404(request={Request},settings={Settings},result={Result}): ipAddress → {IpAddress}", request, settings, result, ipAddress);
 
                 log.LogProperties.Add(new LogDetailInfo("HostAddress", ipAddress));
                 log.LogProperties.Add(new LogDetailInfo("HostName", request.UserHostName));
             }
 
             LogController.Instance.AddLog(log);
+			Logger.LogDebug("<<< Exiting Log404(request={Request},settings={Settings},result={Result})", request, settings, result);
         }
 
         /// <summary>logs an exception once per cache-lifetime.</summary>
@@ -111,6 +118,7 @@ namespace DotNetNuke.Entities.Urls
         /// <param name="result">The result.</param>
         public static void LogExceptionInRequest(Exception ex, string status, UrlAction result)
         {
+			Logger.LogDebug(">>> Entering LogExceptionInRequest(ex={Ex},status={Status},result={Result})", ex, status, result);
             if (ex != null)
             {
                 // 831 : improve exception logging by logging custom properties instead of just the raw exception
@@ -171,12 +179,14 @@ namespace DotNetNuke.Entities.Urls
                     }
 
                     log.BypassBuffering = true;
+					Logger.LogDebug("LogExceptionInRequest(ex={Ex},status={Status},result={Result}): log.BypassBuffering → {Arg3}", ex, status, result, log.BypassBuffering);
                     LogController.Instance.AddLog(log);
 
                     // Log this error in lig4net
                     Logger.Error(ex);
                 }
             }
+			Logger.LogDebug("<<< Exiting LogExceptionInRequest(ex={Ex},status={Status},result={Result})", ex, status, result);
         }
 
         /// <summary>Clean Page name to remove page extension.</summary>
@@ -186,7 +196,9 @@ namespace DotNetNuke.Entities.Urls
         /// <returns><paramref name="value"/> without the extension.</returns>
         public static string CleanExtension(string value, FriendlyUrlSettings settings, string langParms)
         {
+			Logger.LogDebug(">>> Entering CleanExtension(value={Value},settings={Settings},langParms={LangParms})", value, settings, langParms);
             bool replaced;
+			Logger.LogDebug("<<< Exiting CleanExtension(value={Value},settings={Settings},langParms={LangParms})", value, settings, langParms);
             return RewriteController.CleanExtension(value, settings, langParms, out replaced);
         }
     }

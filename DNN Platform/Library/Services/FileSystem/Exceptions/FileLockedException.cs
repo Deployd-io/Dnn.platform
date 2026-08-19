@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.FileSystem
     [Serializable]
     public class FileLockedException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FileLockedException));
         /// <summary>Initializes a new instance of the <see cref="FileLockedException"/> class.</summary>
         public FileLockedException()
         {
+		Logger.LogDebug(">>> Entering FileLockedException()");
+		Logger.LogDebug("<<< Exiting FileLockedException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="FileLockedException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Services.FileSystem
         public FileLockedException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering FileLockedException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting FileLockedException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="FileLockedException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

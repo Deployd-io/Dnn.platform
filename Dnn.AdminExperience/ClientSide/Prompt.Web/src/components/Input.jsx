@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import Localization from "localization/Localization";
 import { util, formatString } from "../utils/helpers";
 import "../components/Prompt.less";
+const logger = console;
 import {commands as Cmd, modes as Mode} from "../constants/promptLabel";
 
 class Input extends Component {
@@ -12,29 +13,39 @@ class Input extends Component {
     }
 
     getValue() {
+		logger.debug('>>> Entering getValue()');
+		logger.debug('<<< Exiting getValue()');
         return this.cmdPromptInput.value;
     }
 
     setFocus(focus) {
+		logger.debug(`>>> Entering setFocus(focus=${focus})`);
         focus ? this.cmdPromptInput.focus() : this.cmdPromptInput.blur();
+		logger.debug(`<<< Exiting setFocus(focus=${focus})`);
     }
 
     getTabId() {
+		logger.debug('>>> Entering getTabId()');
         const dnnVariable = JSON.parse(window.parent.document.getElementsByName("__dnnVariable")[0].value);
+		logger.debug(`getTabId(): dnnVariable → ${dnnVariable}`);
+		logger.debug('<<< Exiting getTabId()');
         return dnnVariable.sf_tabId;
     }
 
     readInput() {
+		logger.debug('>>> Entering readInput()');
         const { props } = this;
         let txt = this.getValue().trim();
         if (txt === "" && props.nextPageCommand !== null && props.nextPageCommand !== "") {
             txt = props.nextPageCommand;
         }
         props.updateHistory(txt);
+		logger.debug('<<< Exiting readInput()');
         return txt;
     }
 
     runLocalCmd(txt) {
+		logger.debug(`>>> Entering runLocalCmd(txt=${txt})`);
         const { props } = this;
         const { actions } = props;
 
@@ -47,6 +58,7 @@ class Input extends Component {
         // Client Command
         const tokens = txt.split(" ");
         const cmd = tokens[0].toUpperCase();
+		logger.debug(`runLocalCmd(txt=${txt}): cmd → ${cmd}`);
 
         let done = true;
         switch (cmd) {
@@ -68,10 +80,12 @@ class Input extends Component {
                 done = false;
                 break;
         }
+		logger.debug(`<<< Exiting runLocalCmd(txt=${txt})`);
         return done;
     }
 
     runServerCmd(txt) {
+		logger.debug(`>>> Entering runServerCmd(txt=${txt})`);
         const { props } = this;
         const { actions } = props;
 
@@ -84,10 +98,13 @@ class Input extends Component {
         // Client Command
         const tokens = txt.split(" ");
         const cmd = tokens[0].toUpperCase();
+		logger.debug(`runServerCmd(txt=${txt}): cmd → ${cmd}`);
 
         // Server Command
         const errorCallback = (error) => {
+			logger.debug(`>>> Entering errorCallback(error=${error})`);
             actions.runLocalCommand("ERROR", error.responseJSON.Message);
+			logger.debug(`<<< Exiting errorCallback(error=${error})`);
         };
 
         if (cmd === Cmd.HELP) {
@@ -100,6 +117,7 @@ class Input extends Component {
             }
         } else {
             if (!Cmd[cmd]) {
+				logger.debug(`<<< Exiting runServerCmd(txt=${txt})`);
                 actions.runCommand(
                     {cmdLine: txt, currentPage: self.tabId},
                     () => {
@@ -109,12 +127,15 @@ class Input extends Component {
     }
 
     displayCmdInfo(txt) {
+		logger.debug(`>>> Entering displayCmdInfo(txt=${txt})`);
         const { props } = this;
         const { actions } = props;
         actions.runLocalCommand("INFO", "\n" + txt + "\n", "cmd");
+		logger.debug(`<<< Exiting displayCmdInfo(txt=${txt})`);
     }
 
     runCmd() {
+		logger.debug('>>> Entering runCmd()');
         const txt = this.readInput();
         if (txt) {
             this.displayCmdInfo(txt);
@@ -122,6 +143,7 @@ class Input extends Component {
                 this.runServerCmd(txt);
             }
             this.setFocus(false);
+			logger.debug('<<< Exiting runCmd()');
         }
     }
 
@@ -159,22 +181,30 @@ class Input extends Component {
     }
 
     isPaging() {
+		logger.debug('>>> Entering isPaging()');
         const { props } = this;
         const IS_PAGING = props.paging !== null && props.paging.pageNo <= props.paging.totalPages;
+		logger.debug('<<< Exiting isPaging()');
         return IS_PAGING;
     }
 
     isLastPage() {
+		logger.debug('>>> Entering isLastPage()');
         const { props } = this;
         const IS_LAST_PAGE = props.paging !== null && props.paging.pageNo === props.paging.totalPages;
+		logger.debug('<<< Exiting isLastPage()');
         return IS_LAST_PAGE;
     }
 
     render() {
+	logger.debug('>>> Entering render()');
 
         const IS_PAGING = this.isPaging();
+		logger.debug(`render(): IS_PAGING → ${IS_PAGING}`);
         const IS_LAST_PAGE = this.isLastPage();
+		logger.debug(`render(): IS_LAST_PAGE → ${IS_LAST_PAGE}`);
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className={`dnn-prompt-input-wrapper ${IS_PAGING && !IS_LAST_PAGE ? "hidden-cursor" : ""}`}>
                 <input className={`dnn-prompt-input ${IS_PAGING && !IS_LAST_PAGE ? "hidden-text" : ""}`} ref={(el) => {

@@ -15,17 +15,29 @@ namespace DNNConnect.CKEditorProvider.Objects
         /// <summary>Initializes a new instance of the <see cref="EditorConfig" /> class.</summary>
         public EditorConfig()
         {
+			eventLogger.LogDebug(">>> Entering EditorConfig()");
             this.AllowedContent = "false";
             this.AutoGrow_BottomSpace = 0;
+			eventLogger.LogDebug("EditorConfig(): this.AllowedContent → {Arg0}", this.AllowedContent);
+			eventLogger.LogDebug("EditorConfig(): this.AutoGrow_BottomSpace → {Arg0}", this.AutoGrow_BottomSpace);
             this.AutoGrow_MaxHeight = 0;
             this.AutoGrow_MinHeight = 200;
             this.AutoGrow_OnStartup = false;
+			eventLogger.LogDebug("EditorConfig(): this.AutoGrow_MaxHeight → {Arg0}", this.AutoGrow_MaxHeight);
+			eventLogger.LogDebug("EditorConfig(): this.AutoGrow_MinHeight → {Arg0}", this.AutoGrow_MinHeight);
+			eventLogger.LogDebug("EditorConfig(): this.AutoGrow_OnStartup → {Arg0}", this.AutoGrow_OnStartup);
             this.AutoParagraph = true;
             this.AutoSave_Delay = 25;
             this.AutoUpdateElement = true;
             this.BaseFloatZIndex = 10000;
             this.BasicEntities = true;
             this.BlockedKeystrokes = "[ CKEDITOR.CTRL + 66, CKEDITOR.CTRL + 73, CKEDITOR.CTRL + 85 ]";
+			eventLogger.LogDebug("EditorConfig(): this.AutoParagraph → {Arg0}", this.AutoParagraph);
+			eventLogger.LogDebug("EditorConfig(): this.AutoSave_Delay → {Arg0}", this.AutoSave_Delay);
+			eventLogger.LogDebug("EditorConfig(): this.AutoUpdateElement → {Arg0}", this.AutoUpdateElement);
+			eventLogger.LogDebug("EditorConfig(): this.BaseFloatZIndex → {Arg0}", this.BaseFloatZIndex);
+			eventLogger.LogDebug("EditorConfig(): this.BasicEntities → {Arg0}", this.BasicEntities);
+			eventLogger.LogDebug("EditorConfig(): this.BlockedKeystrokes → {Arg0}", this.BlockedKeystrokes);
             this.BrowserContextMenuOnCtrl = true;
             this.Clipboard_DefaultContentType = "html";
             this.CodeMirror = new CodeMirror();
@@ -38,6 +50,17 @@ namespace DNNConnect.CKEditorProvider.Objects
             this.Dialog_BackgroundCoverOpacity = 0.5;
             this.Dialog_ButtonsOrder = "OS";
             this.Dialog_MagnetDistance = 20;
+			eventLogger.LogDebug("EditorConfig(): this.BrowserContextMenuOnCtrl → {Arg0}", this.BrowserContextMenuOnCtrl);
+			eventLogger.LogDebug("EditorConfig(): this.Clipboard_DefaultContentType → {Arg0}", this.Clipboard_DefaultContentType);
+			eventLogger.LogDebug("EditorConfig(): this.ColorButton_Colors → {Arg0}", this.ColorButton_Colors);
+			eventLogger.LogDebug("EditorConfig(): this.ColorButton_EnableMore → {Arg0}", this.ColorButton_EnableMore);
+			eventLogger.LogDebug("EditorConfig(): this.DataIndentationChars → {Arg0}", this.DataIndentationChars);
+			eventLogger.LogDebug("EditorConfig(): this.DefaultLanguage → {Arg0}", this.DefaultLanguage);
+			eventLogger.LogDebug("EditorConfig(): this.DefaultLinkType → {Arg0}", this.DefaultLinkType);
+			eventLogger.LogDebug("EditorConfig(): this.Dialog_BackgroundCoverColor → {Arg0}", this.Dialog_BackgroundCoverColor);
+			eventLogger.LogDebug("EditorConfig(): this.Dialog_BackgroundCoverOpacity → {Arg0}", this.Dialog_BackgroundCoverOpacity);
+			eventLogger.LogDebug("EditorConfig(): this.Dialog_ButtonsOrder → {Arg0}", this.Dialog_ButtonsOrder);
+			eventLogger.LogDebug("EditorConfig(): this.Dialog_MagnetDistance → {Arg0}", this.Dialog_MagnetDistance);
             this.Dialog_StartupFocusTab = false;
             this.DisableNativeSpellChecker = true;
             this.DisableNativeTableHandles = true;
@@ -61,6 +84,29 @@ namespace DNNConnect.CKEditorProvider.Objects
             this.FlashConvertOnEdit = false;
             this.FlashEmbedTagOnly = false;
             this.FloatSpaceDockedOffsetX = 0;
+			eventLogger.LogDebug("EditorConfig(): this.Dialog_StartupFocusTab → {Arg0}", this.Dialog_StartupFocusTab);
+			eventLogger.LogDebug("EditorConfig(): this.DisableNativeSpellChecker → {Arg0}", this.DisableNativeSpellChecker);
+			eventLogger.LogDebug("EditorConfig(): this.DisableNativeTableHandles → {Arg0}", this.DisableNativeTableHandles);
+			eventLogger.LogDebug("EditorConfig(): this.DisableObjectResizing → {Arg0}", this.DisableObjectResizing);
+			eventLogger.LogDebug("EditorConfig(): this.DisableReadonlyStyling → {Arg0}", this.DisableReadonlyStyling);
+			eventLogger.LogDebug("EditorConfig(): this.Div_WrapTable → {Arg0}", this.Div_WrapTable);
+			eventLogger.LogDebug("EditorConfig(): this.DocType → {Arg0}", this.DocType);
+			eventLogger.LogDebug("EditorConfig(): this.EnableTabKeyTools → {Arg0}", this.EnableTabKeyTools);
+			eventLogger.LogDebug("EditorConfig(): this.EnterMode → {Arg0}", this.EnterMode);
+			eventLogger.LogDebug("EditorConfig(): this.Entities → {Arg0}", this.Entities);
+			eventLogger.LogDebug("EditorConfig(): this.Entities_additional → {Arg0}", this.Entities_additional);
+			eventLogger.LogDebug("EditorConfig(): this.Entities_Greek → {Arg0}", this.Entities_Greek);
+			eventLogger.LogDebug("EditorConfig(): this.Entities_Latin → {Arg0}", this.Entities_Latin);
+			eventLogger.LogDebug("EditorConfig(): this.Entities_ProcessNumerical → {Arg0}", this.Entities_ProcessNumerical);
+			eventLogger.LogDebug("EditorConfig(): this.ExtraPlugins → {Arg0}", this.ExtraPlugins);
+			eventLogger.LogDebug("EditorConfig(): this.FileBrowserWindowFeatures → {Arg0}", this.FileBrowserWindowFeatures);
+			eventLogger.LogDebug("EditorConfig(): this.FileBrowserWindowHeight → {Arg0}", this.FileBrowserWindowHeight);
+			eventLogger.LogDebug("EditorConfig(): this.FileBrowserWindowWidth → {Arg0}", this.FileBrowserWindowWidth);
+			eventLogger.LogDebug("EditorConfig(): this.FillEmptyBlocks → {Arg0}", this.FillEmptyBlocks);
+			eventLogger.LogDebug("EditorConfig(): this.FlashAddEmbedTag → {Arg0}", this.FlashAddEmbedTag);
+			eventLogger.LogDebug("EditorConfig(): this.FlashConvertOnEdit → {Arg0}", this.FlashConvertOnEdit);
+			eventLogger.LogDebug("EditorConfig(): this.FlashEmbedTagOnly → {Arg0}", this.FlashEmbedTagOnly);
+			eventLogger.LogDebug("EditorConfig(): this.FloatSpaceDockedOffsetX → {Arg0}", this.FloatSpaceDockedOffsetX);
             this.FloatSpaceDockedOffsetY = 0;
             this.FloatSpacePinnedOffsetX = 0;
             this.FloatSpacePinnedOffsetY = 0;
@@ -107,6 +153,14 @@ namespace DNNConnect.CKEditorProvider.Objects
             this.SourceAreaTabSize = 20;
             this.StartupFocus = false;
             this.StartupMode = "wysiwyg";
+			eventLogger.LogDebug("EditorConfig(): this.FloatSpaceDockedOffsetY → {Arg0}", this.FloatSpaceDockedOffsetY);
+			eventLogger.LogDebug("EditorConfig(): this.FloatSpacePinnedOffsetX → {Arg0}", this.FloatSpacePinnedOffsetX);
+			eventLogger.LogDebug("EditorConfig(): this.FloatSpacePinnedOffsetY → {Arg0}", this.FloatSpacePinnedOffsetY);
+			eventLogger.LogDebug("EditorConfig(): this.FontSize_Sizes → {Arg0}", this.FontSize_Sizes);
+			eventLogger.LogDebug("EditorConfig(): this.Font_Names → {Arg0}", this.Font_Names);
+			eventLogger.LogDebug("EditorConfig(): this.ForceEnterMode → {Arg0}", this.ForceEnterMode);
+			eventLogger.LogDebug("EditorConfig(): this.ForcePasteAsPlainText → {Arg0}", this.ForcePasteAsPlainText);
+			eventLogger.LogDebug("EditorConfig(): this.ForceSimpleAmpersand → {Arg0}", this.ForceSimpleAmpersand);
             this.StartupOutlineBlocks = false;
             this.StartupShowBorders = true;
             this.TabIndex = 0;
@@ -121,6 +175,7 @@ namespace DNNConnect.CKEditorProvider.Objects
             this.UseComputedState = true;
             this.Width = "99%";
             this.WordCount = new WordCountConfig();
+			eventLogger.LogDebug("<<< Exiting EditorConfig()");
         }
 
         /// <summary>Gets or sets a value indicating whether [allowed content].</summary>

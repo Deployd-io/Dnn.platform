@@ -9,11 +9,14 @@ namespace DotNetNuke.Web.Services
     /// <summary>Registers web API routes for <see cref="MobileHelperController"/>.</summary>
     public class ServiceRouteMapper : IServiceRouteMapper
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ServiceRouteMapper));
         /// <inheritdoc />
         public void RegisterRoutes(IMapRoute mapRouteManager)
         {
+			Logger.LogDebug(">>> Entering RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
             mapRouteManager.MapHttpRoute(
                 "web", "default", "{controller}/{action}", new[] { this.GetType().Namespace });
+				Logger.LogDebug("<<< Exiting RegisterRoutes(mapRouteManager={MapRouteManager})", mapRouteManager);
         }
     }
 }

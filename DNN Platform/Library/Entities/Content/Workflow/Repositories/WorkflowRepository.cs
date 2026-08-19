@@ -30,43 +30,59 @@ namespace DotNetNuke.Entities.Content.Workflow.Repositories
         public WorkflowRepository()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering WorkflowRepository()");
         }
 
         /// <inheritdoc />
         public IEnumerable<Entities.Workflow> GetWorkflows(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetWorkflows(portalId={PortalId})", portalId);
             using var context = DataContext.Instance(this.hostSettings);
             var rep = context.GetRepository<Entities.Workflow>();
+			Logger.LogDebug("GetWorkflows(portalId={PortalId}): rep → {Rep}", portalId, rep);
             var workflows = rep.Find("WHERE (PortalId = @0 OR PortalId IS NULL)", portalId).ToArray();
+			Logger.LogDebug("GetWorkflows(portalId={PortalId}): workflows → {Workflows}", portalId, workflows);
+			Logger.LogDebug("GetWorkflows(portalId={PortalId}): context → {Context}", portalId, context);
 
             // Workflow States eager loading
             foreach (var workflow in workflows)
             {
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				Logger.LogInformation("GetWorkflows(portalId)={PortalId}: find query executed in {Arg1} ms", portalId, __logStart.ElapsedMilliseconds);
                 workflow.States = this.stateRepository.GetWorkflowStates(workflow.WorkflowID);
             }
 
+			Logger.LogDebug("<<< Exiting GetWorkflows(portalId={PortalId})", portalId);
             return workflows;
         }
 
         /// <inheritdoc />
         public IEnumerable<Entities.Workflow> GetSystemWorkflows(int portalId)
         {
+			Logger.LogDebug(">>> Entering GetSystemWorkflows(portalId={PortalId})", portalId);
             using var context = DataContext.Instance(this.hostSettings);
             var rep = context.GetRepository<Entities.Workflow>();
+			Logger.LogDebug("GetSystemWorkflows(portalId={PortalId}): rep → {Rep}", portalId, rep);
             var workflows = rep.Find("WHERE (PortalId = @0 OR PortalId IS NULL) AND IsSystem = 1", portalId).ToArray();
+			Logger.LogDebug("GetSystemWorkflows(portalId={PortalId}): workflows → {Workflows}", portalId, workflows);
+			Logger.LogDebug("GetSystemWorkflows(portalId={PortalId}): context → {Context}", portalId, context);
 
             // Workflow States eager loading
             foreach (var workflow in workflows)
             {
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				Logger.LogInformation("GetSystemWorkflows(portalId)={PortalId}: find query executed in {Arg1} ms", portalId, __logStart.ElapsedMilliseconds);
                 workflow.States = this.stateRepository.GetWorkflowStates(workflow.WorkflowID);
             }
 
+			Logger.LogDebug("<<< Exiting GetSystemWorkflows(portalId={PortalId})", portalId);
             return workflows;
         }
 
         /// <inheritdoc />
         public Entities.Workflow GetWorkflow(int workflowId)
         {
+			Logger.LogDebug(">>> Entering GetWorkflow(workflowId={WorkflowId})", workflowId);
             return CBO.GetCachedObject<Entities.Workflow>(
                 this.hostSettings,
                 new CacheItemArgs(GetWorkflowItemKey(workflowId), DataCache.WorkflowsCacheTimeout, DataCache.WorkflowsCachePriority),
@@ -77,6 +93,7 @@ namespace DotNetNuke.Entities.Content.Workflow.Repositories
                     {
                         var rep = context.GetRepository<Entities.Workflow>();
                         workflow = rep.Find("WHERE WorkflowID = @0", workflowId).SingleOrDefault();
+						Logger.LogDebug("GetWorkflow(workflowId={WorkflowId}): workflow → {Workflow}", workflowId, workflow);
                     }
 
                     if (workflow == null)
@@ -84,6 +101,8 @@ namespace DotNetNuke.Entities.Content.Workflow.Repositories
                         return null;
                     }
 
+					var __logStart = System.Diagnostics.Stopwatch.StartNew();
+					Logger.LogInformation("GetWorkflow(workflowId)={WorkflowId}: find query executed in {Arg1} ms", workflowId, __logStart.ElapsedMilliseconds);
                     workflow.States = this.stateRepository.GetWorkflowStates(workflowId);
                     return workflow;
                 });
@@ -92,6 +111,7 @@ namespace DotNetNuke.Entities.Content.Workflow.Repositories
         /// <inheritdoc />
         public Entities.Workflow GetWorkflow(ContentItem item)
         {
+			Logger.LogDebug(">>> Entering GetWorkflow(item={Item})", item);
             var state = this.stateRepository.GetWorkflowStateByID(item.StateID);
             return state == null ? null : this.GetWorkflow(state.WorkflowID);
         }
@@ -101,12 +121,15 @@ namespace DotNetNuke.Entities.Content.Workflow.Repositories
         /// <inheritdoc />
         public void AddWorkflow(Entities.Workflow workflow)
         {
+			Logger.LogDebug(">>> Entering AddWorkflow(workflow={Workflow})", workflow);
             using (var context = DataContext.Instance(this.hostSettings))
             {
                 var rep = context.GetRepository<Entities.Workflow>();
+				Logger.LogDebug("AddWorkflow(workflow={Workflow}): rep → {Rep}", workflow, rep);
 
                 if (DoesExistWorkflow(workflow, rep))
                 {
+					Logger.LogWarning("Throwing WorkflowNameAlreadyExistsException from AddWorkflow(workflow={Workflow})", workflow);
                     throw new WorkflowNameAlreadyExistsException();
                 }
 
@@ -114,6 +137,7 @@ namespace DotNetNuke.Entities.Content.Workflow.Repositories
             }
 
             CacheWorkflow(this.hostSettings, workflow);
+			Logger.LogDebug("<<< Exiting AddWorkflow(workflow={Workflow})", workflow);
         }
 
         // TODO: validation
@@ -121,12 +145,15 @@ namespace DotNetNuke.Entities.Content.Workflow.Repositories
         /// <inheritdoc />
         public void UpdateWorkflow(Entities.Workflow workflow)
         {
+			Logger.LogDebug(">>> Entering UpdateWorkflow(workflow={Workflow})", workflow);
             using (var context = DataContext.Instance(this.hostSettings))
             {
                 var rep = context.GetRepository<Entities.Workflow>();
+				Logger.LogDebug("UpdateWorkflow(workflow={Workflow}): rep → {Rep}", workflow, rep);
 
                 if (DoesExistWorkflow(workflow, rep))
                 {
+					Logger.LogWarning("Throwing WorkflowNameAlreadyExistsException from UpdateWorkflow(workflow={Workflow})", workflow);
                     throw new WorkflowNameAlreadyExistsException();
                 }
 
@@ -135,33 +162,44 @@ namespace DotNetNuke.Entities.Content.Workflow.Repositories
 
             DataCache.RemoveCache(GetWorkflowItemKey(workflow.WorkflowID));
             CacheWorkflow(this.hostSettings, workflow);
+			Logger.LogDebug("<<< Exiting UpdateWorkflow(workflow={Workflow})", workflow);
         }
 
         /// <inheritdoc />
         public void DeleteWorkflow(Entities.Workflow workflow)
         {
+			Logger.LogDebug(">>> Entering DeleteWorkflow(workflow={Workflow})", workflow);
             using (var context = DataContext.Instance(this.hostSettings))
             {
                 var rep = context.GetRepository<Entities.Workflow>();
+				Logger.LogDebug("DeleteWorkflow(workflow={Workflow}): rep → {Rep}", workflow, rep);
                 rep.Delete(workflow);
             }
 
             DataCache.RemoveCache(GetWorkflowItemKey(workflow.WorkflowID));
+			Logger.LogDebug("<<< Exiting DeleteWorkflow(workflow={Workflow})", workflow);
         }
 
         internal static string GetWorkflowItemKey(int workflowId)
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(WorkflowRepository));
+			Logger.LogDebug(">>> Entering GetWorkflowItemKey(workflowId={WorkflowId})", workflowId);
+			Logger.LogDebug("<<< Exiting GetWorkflowItemKey(workflowId={WorkflowId})", workflowId);
             return string.Format(CultureInfo.InvariantCulture, DataCache.ContentWorkflowCacheKey, workflowId);
         }
 
         /// <inheritdoc />
         protected override Func<IWorkflowRepository> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return () => ActivatorUtilities.GetServiceOrCreateInstance<WorkflowRepository>(Globals.DependencyProvider);
         }
 
         private static bool DoesExistWorkflow(Entities.Workflow workflow, IRepository<Entities.Workflow> rep)
         {
+			Logger.LogDebug(">>> Entering DoesExistWorkflow(workflow={Workflow},rep={Rep})", workflow, rep);
+			Logger.LogDebug("<<< Exiting DoesExistWorkflow(workflow={Workflow},rep={Rep})", workflow, rep);
             return rep.Find(
                            "WHERE IsDeleted = 0 AND (PortalId = @0 OR PortalId IS NULL) AND WorkflowName = @1 AND WorkflowID != @2",
                            workflow.PortalID,
@@ -172,6 +210,7 @@ namespace DotNetNuke.Entities.Content.Workflow.Repositories
 
         private static void CacheWorkflow(IHostSettings hostSettings, Entities.Workflow workflow)
         {
+			Logger.LogDebug(">>> Entering CacheWorkflow(hostSettings={HostSettings},workflow={Workflow})", hostSettings, workflow);
             if (workflow.WorkflowID > 0)
             {
                 CBO.GetCachedObject<Entities.Workflow>(
@@ -182,6 +221,8 @@ namespace DotNetNuke.Entities.Content.Workflow.Repositories
                         DataCache.WorkflowsCachePriority),
                     _ => workflow);
             }
+			Logger.LogDebug("<<< Exiting CacheWorkflow(hostSettings={HostSettings},workflow={Workflow})", hostSettings, workflow);
         }
+		Logger.LogDebug("<<< Exiting WorkflowRepository()");
     }
 }

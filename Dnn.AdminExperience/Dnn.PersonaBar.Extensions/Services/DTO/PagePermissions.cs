@@ -23,6 +23,7 @@ namespace Dnn.PersonaBar.Pages.Services.Dto
         public PagePermissions(bool needDefinitions)
             : this(null, needDefinitions)
         {
+		eventLogger.LogDebug(">>> Entering PagePermissions(needDefinitions={NeedDefinitions})", needDefinitions);
         }
 
         /// <summary>Initializes a new instance of the <see cref="PagePermissions"/> class.</summary>
@@ -33,6 +34,7 @@ namespace Dnn.PersonaBar.Pages.Services.Dto
         {
             foreach (var role in PermissionProvider.Instance().ImplicitRolesForPages(PortalSettings.Current.PortalId))
             {
+			eventLogger.LogDebug("<<< Exiting PagePermissions(needDefinitions={NeedDefinitions})", needDefinitions);
                 this.EnsureRole(role, true, true);
             }
         }
@@ -46,6 +48,7 @@ namespace Dnn.PersonaBar.Pages.Services.Dto
         /// <inheritdoc />
         protected override void LoadPermissionDefinitions()
         {
+			eventLogger.LogDebug(">>> Entering LoadPermissionDefinitions()");
             foreach (var permission in this.PermissionDefinitionService.GetDefinitionsByTab())
             {
                 this.PermissionDefinitions.Add(new Permission
@@ -56,6 +59,7 @@ namespace Dnn.PersonaBar.Pages.Services.Dto
                     View = PermissionHelper.IsViewPermission(permission),
                 });
             }
+			eventLogger.LogDebug("<<< Exiting LoadPermissionDefinitions()");
         }
     }
 }

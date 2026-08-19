@@ -24,28 +24,47 @@ namespace DotNetNuke.Services.Scheduling
         /// <summary>Initializes a new instance of the <see cref="ScheduleHistoryItem"/> class.</summary>
         public ScheduleHistoryItem()
         {
+			TracelLogger.LogDebug(">>> Entering ScheduleHistoryItem()");
             this.scheduleHistoryID = Null.NullInteger;
             this.startDate = Null.NullDate;
+			TracelLogger.LogDebug("ScheduleHistoryItem(): this.scheduleHistoryID → {Arg0}", this.scheduleHistoryID);
+			TracelLogger.LogDebug("ScheduleHistoryItem(): startDate → {StartDate}", startDate);
+			TracelLogger.LogDebug("ScheduleHistoryItem(): this.startDate → {Arg0}", this.startDate);
             this.EndDate = Null.NullDate;
             this.succeeded = Null.NullBoolean;
             this.logNotes = new StringBuilder();
+			TracelLogger.LogDebug("ScheduleHistoryItem(): this.EndDate → {Arg0}", this.EndDate);
             this.server = Null.NullString;
+			TracelLogger.LogDebug("<<< Exiting ScheduleHistoryItem()");
+			TracelLogger.LogDebug("ScheduleHistoryItem(): scheduleHistoryID → {ScheduleHistoryID}", scheduleHistoryID);
         }
 
         /// <summary>Initializes a new instance of the <see cref="ScheduleHistoryItem"/> class.</summary>
+		TracelLogger.LogDebug("<<< Exiting ScheduleHistoryItem()");
         /// <param name="objScheduleItem">The schedule item.</param>
         public ScheduleHistoryItem(ScheduleItem objScheduleItem)
         {
+			TracelLogger.LogDebug(">>> Entering ScheduleHistoryItem(objScheduleItem={ObjScheduleItem})", objScheduleItem);
             this.AttachToEvent = objScheduleItem.AttachToEvent;
+			TracelLogger.LogDebug("ScheduleHistoryItem(objScheduleItem={ObjScheduleItem}): this.AttachToEvent → {Arg1}", objScheduleItem, this.AttachToEvent);
             this.CatchUpEnabled = objScheduleItem.CatchUpEnabled;
             this.Enabled = objScheduleItem.Enabled;
             this.NextStart = objScheduleItem.NextStart;
+			TracelLogger.LogDebug("ScheduleHistoryItem(objScheduleItem={ObjScheduleItem}): this.CatchUpEnabled → {Arg1}", objScheduleItem, this.CatchUpEnabled);
+			TracelLogger.LogDebug("ScheduleHistoryItem(objScheduleItem={ObjScheduleItem}): this.Enabled → {Arg1}", objScheduleItem, this.Enabled);
+			TracelLogger.LogDebug("ScheduleHistoryItem(objScheduleItem={ObjScheduleItem}): this.NextStart → {Arg1}", objScheduleItem, this.NextStart);
             this.ObjectDependencies = objScheduleItem.ObjectDependencies;
             this.ProcessGroup = objScheduleItem.ProcessGroup;
             this.RetainHistoryNum = objScheduleItem.RetainHistoryNum;
             this.RetryTimeLapse = objScheduleItem.RetryTimeLapse;
             this.RetryTimeLapseMeasurement = objScheduleItem.RetryTimeLapseMeasurement;
             this.ScheduleID = objScheduleItem.ScheduleID;
+			TracelLogger.LogDebug("ScheduleHistoryItem(objScheduleItem={ObjScheduleItem}): this.ObjectDependencies → {Arg1}", objScheduleItem, this.ObjectDependencies);
+			TracelLogger.LogDebug("ScheduleHistoryItem(objScheduleItem={ObjScheduleItem}): this.ProcessGroup → {Arg1}", objScheduleItem, this.ProcessGroup);
+			TracelLogger.LogDebug("ScheduleHistoryItem(objScheduleItem={ObjScheduleItem}): this.RetainHistoryNum → {Arg1}", objScheduleItem, this.RetainHistoryNum);
+			TracelLogger.LogDebug("ScheduleHistoryItem(objScheduleItem={ObjScheduleItem}): this.RetryTimeLapse → {Arg1}", objScheduleItem, this.RetryTimeLapse);
+			TracelLogger.LogDebug("ScheduleHistoryItem(objScheduleItem={ObjScheduleItem}): this.RetryTimeLapseMeasurement → {Arg1}", objScheduleItem, this.RetryTimeLapseMeasurement);
+			TracelLogger.LogDebug("ScheduleHistoryItem(objScheduleItem={ObjScheduleItem}): this.ScheduleID → {Arg1}", objScheduleItem, this.ScheduleID);
             this.ScheduleSource = objScheduleItem.ScheduleSource;
             this.ThreadID = objScheduleItem.ThreadID;
             this.TimeLapse = objScheduleItem.TimeLapse;
@@ -58,10 +77,12 @@ namespace DotNetNuke.Services.Scheduling
             this.EndDate = Null.NullDate;
             this.succeeded = Null.NullBoolean;
             this.logNotes = new StringBuilder();
+			TracelLogger.LogDebug("ScheduleHistoryItem(objScheduleItem={ObjScheduleItem}): this.ScheduleSource → {Arg1}", objScheduleItem, this.ScheduleSource);
             this.server = Null.NullString;
             this.ScheduleStartDate = objScheduleItem.ScheduleStartDate != Null.NullDate
                                     ? objScheduleItem.ScheduleStartDate
                                     : Null.NullDate;
+									TracelLogger.LogDebug("ScheduleHistoryItem(objScheduleItem={ObjScheduleItem}): this.ThreadID → {Arg1}", objScheduleItem, this.ThreadID);
         }
 
         public double ElapsedTime
@@ -225,16 +246,19 @@ namespace DotNetNuke.Services.Scheduling
 
         public virtual void AddLogNote(string notes)
         {
+			TracelLogger.LogDebug(">>> Entering AddLogNote(notes={Notes})", notes);
             this.logNotes.Append(notes);
             if (TracelLogger.IsTraceEnabled)
             {
                 TracelLogger.Trace(notes.Replace(@"<br/>", Environment.NewLine));
             }
+			TracelLogger.LogDebug("<<< Exiting AddLogNote(notes={Notes})", notes);
         }
 
         /// <inheritdoc />
         public override void Fill(IDataReader dr)
         {
+			TracelLogger.LogDebug(">>> Entering Fill(dr={Dr})", dr);
             this.ScheduleHistoryID = Null.SetNullInteger(dr["ScheduleHistoryID"]);
             this.StartDate = Null.SetNullDateTime(dr["StartDate"]);
             this.EndDate = Null.SetNullDateTime(dr["EndDate"]);
@@ -242,6 +266,7 @@ namespace DotNetNuke.Services.Scheduling
             this.LogNotes = Null.SetNullString(dr["LogNotes"]);
             this.Server = Null.SetNullString(dr["Server"]);
             this.FillInternal(dr);
+			TracelLogger.LogDebug("<<< Exiting Fill(dr={Dr})", dr);
         }
     }
 }

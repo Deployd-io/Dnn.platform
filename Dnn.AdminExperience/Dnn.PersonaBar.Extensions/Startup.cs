@@ -18,6 +18,7 @@ public class Startup : IDnnStartup
     /// <inheritdoc />
     public void ConfigureServices(IServiceCollection services)
     {
+	eventLogger.LogDebug(">>> Entering ConfigureServices(services={Services})", services);
 #pragma warning disable CS0618
         services.AddTransient<ICommandRepository, CommandRepository>();
 #pragma warning restore CS0618
@@ -28,5 +29,6 @@ public class Startup : IDnnStartup
         services.AddTransient<IThemesController, ThemesController>();
         services.AddTransient<IDefaultPortalThemeController, DefaultPortalThemeController>();
         services.AddTransient<ConfigConsoleController>();
+		eventLogger.LogDebug("<<< Exiting ConfigureServices(services={Services})", services);
     }
 }

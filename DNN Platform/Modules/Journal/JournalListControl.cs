@@ -28,6 +28,7 @@ namespace DotNetNuke.Modules.Journal.Controls
     [ToolboxData("<{0}:JournalListControl runat=server></{0}:JournalListControl>")]
     public class JournalListControl : WebControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(JournalListControl));
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Breaking Change")]
@@ -70,16 +71,20 @@ namespace DotNetNuke.Modules.Journal.Controls
         /// <inheritdoc />
         protected override void Render(HtmlTextWriter output)
         {
+			Logger.LogDebug(">>> Entering Render(output={Output})", output);
             if (this.Enabled)
             {
                 if (this.CurrentIndex < 0)
                 {
                     this.CurrentIndex = 0;
+					Logger.LogDebug("Render(output={Output}): this.CurrentIndex → {Arg1}", output, this.CurrentIndex);
                 }
 
                 JournalParser jp = new JournalParser(this.portalSettings, this.ModuleId, this.ProfileId, this.SocialGroupId, this.userInfo) { JournalId = this.JournalId };
+				Logger.LogDebug("Render(output={Output}): jp → {Jp}", output, jp);
                 output.Write(jp.GetList(this.CurrentIndex, this.PageSize));
             }
+			Logger.LogDebug("<<< Exiting Render(output={Output})", output);
         }
     }
 }

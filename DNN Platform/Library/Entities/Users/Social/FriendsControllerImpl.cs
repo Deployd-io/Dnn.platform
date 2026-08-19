@@ -13,6 +13,7 @@ namespace DotNetNuke.Entities.Users.Social.Internal
 
     internal class FriendsControllerImpl : IFriendsController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FriendsControllerImpl));
         internal const string FriendRequest = "FriendRequest";
 
         ////static FriendsControllerImpl()
@@ -23,8 +24,11 @@ namespace DotNetNuke.Entities.Users.Social.Internal
         /// <param name="targetUser">UserInfo for Target User.</param>
         public void AcceptFriend(UserInfo targetUser)
         {
+			Logger.LogDebug(">>> Entering AcceptFriend(targetUser={TargetUser})", targetUser);
             var initiatingUser = UserController.Instance.GetCurrentUserInfo();
             var friendRelationship = RelationshipController.Instance.GetFriendRelationship(initiatingUser, targetUser);
+			Logger.LogDebug("AcceptFriend(targetUser={TargetUser}): friendRelationship → {FriendRelationship}", targetUser, friendRelationship);
+			Logger.LogDebug("AcceptFriend(targetUser={TargetUser}): initiatingUser → {InitiatingUser}", targetUser, initiatingUser);
 
             RelationshipController.Instance.AcceptUserRelationship(friendRelationship.UserRelationshipId);
             NotificationsController.Instance.DeleteNotificationRecipient(
@@ -33,6 +37,7 @@ namespace DotNetNuke.Entities.Users.Social.Internal
                 initiatingUser.UserID);
 
             EventManager.Instance.OnFriendshipAccepted(new RelationshipEventArgs(friendRelationship, initiatingUser.PortalID));
+			Logger.LogDebug("<<< Exiting AcceptFriend(targetUser={TargetUser})", targetUser);
         }
 
         /// <summary>AddFriend - Current User initiates a Friend Request to the Target User.</summary>
@@ -42,8 +47,11 @@ namespace DotNetNuke.Entities.Users.Social.Internal
         /// </remarks>
         public void AddFriend(UserInfo targetUser)
         {
+			Logger.LogDebug(">>> Entering AddFriend(targetUser={TargetUser})", targetUser);
             var initiatingUser = UserController.Instance.GetCurrentUserInfo();
             this.AddFriend(initiatingUser, targetUser);
+			Logger.LogDebug("AddFriend(targetUser={TargetUser}): initiatingUser → {InitiatingUser}", targetUser, initiatingUser);
+			Logger.LogDebug("<<< Exiting AddFriend(targetUser={TargetUser})", targetUser);
         }
 
         /// <summary>AddFriend - Initiating User initiates a Friend Request to the Target User.</summary>
@@ -54,6 +62,7 @@ namespace DotNetNuke.Entities.Users.Social.Internal
         /// </remarks>
         public void AddFriend(UserInfo initiatingUser, UserInfo targetUser)
         {
+			Logger.LogDebug(">>> Entering AddFriend(initiatingUser={InitiatingUser},targetUser={TargetUser})", initiatingUser, targetUser);
             Requires.NotNull("user1", initiatingUser);
 
             // Check if the friendship has been requested first by target user
@@ -74,14 +83,18 @@ namespace DotNetNuke.Entities.Users.Social.Internal
             AddFriendRequestNotification(initiatingUser, targetUser, userRelationship);
 
             EventManager.Instance.OnFriendshipRequested(new RelationshipEventArgs(userRelationship, initiatingUser.PortalID));
+			Logger.LogDebug("<<< Exiting AddFriend(initiatingUser={InitiatingUser},targetUser={TargetUser})", initiatingUser, targetUser);
         }
 
         /// <summary>DeleteFriend - Current User deletes a friend relationship with the target User.</summary>
         /// <param name="targetUser">UserInfo for Target User.</param>
         public void DeleteFriend(UserInfo targetUser)
         {
+			Logger.LogDebug(">>> Entering DeleteFriend(targetUser={TargetUser})", targetUser);
             var initiatingUser = UserController.Instance.GetCurrentUserInfo();
             this.DeleteFriend(initiatingUser, targetUser);
+			Logger.LogDebug("DeleteFriend(targetUser={TargetUser}): initiatingUser → {InitiatingUser}", targetUser, initiatingUser);
+			Logger.LogDebug("<<< Exiting DeleteFriend(targetUser={TargetUser})", targetUser);
         }
 
         /// <summary>DeleteFriend - Initiating User deletes a friend relationship with the target User.</summary>
@@ -89,6 +102,7 @@ namespace DotNetNuke.Entities.Users.Social.Internal
         /// <param name="targetUser">UserInfo for Target User.</param>
         public void DeleteFriend(UserInfo initiatingUser, UserInfo targetUser)
         {
+			Logger.LogDebug(">>> Entering DeleteFriend(initiatingUser={InitiatingUser},targetUser={TargetUser})", initiatingUser, targetUser);
             Requires.NotNull("user1", initiatingUser);
 
             var friend = RelationshipController.Instance.GetUserRelationship(
@@ -99,16 +113,20 @@ namespace DotNetNuke.Entities.Users.Social.Internal
             RelationshipController.Instance.DeleteUserRelationship(friend);
 
             EventManager.Instance.OnFriendshipDeleted(new RelationshipEventArgs(friend, initiatingUser.PortalID));
+			Logger.LogDebug("<<< Exiting DeleteFriend(initiatingUser={InitiatingUser},targetUser={TargetUser})", initiatingUser, targetUser);
         }
 
         private static void AddFriendRequestNotification(UserInfo initiatingUser, UserInfo targetUser, UserRelationship userRelationship)
         {
+			Logger.LogDebug(">>> Entering AddFriendRequestNotification(initiatingUser={InitiatingUser},targetUser={TargetUser},userRelationship={UserRelationship})", initiatingUser, targetUser, userRelationship);
             var notificationType = NotificationsController.Instance.GetNotificationType(FriendRequest);
             var language = GetUserPreferredLocale(targetUser)?.Name;
+			Logger.LogDebug("AddFriendRequestNotification(initiatingUser={InitiatingUser},targetUser={TargetUser},userRelationship={UserRelationship}): language → {Language}", initiatingUser, targetUser, userRelationship, language);
             var subject = string.Format(
                 CultureInfo.CurrentCulture,
                 Localization.GetString("AddFriendRequestSubject", Localization.GlobalResourceFile, language),
                 initiatingUser.DisplayName);
+				Logger.LogDebug("AddFriendRequestNotification(initiatingUser={InitiatingUser},targetUser={TargetUser},userRelationship={UserRelationship}): notificationType → {NotificationType}", initiatingUser, targetUser, userRelationship, notificationType);
 
             var body = string.Format(
                 CultureInfo.CurrentCulture,
@@ -126,13 +144,16 @@ namespace DotNetNuke.Entities.Users.Social.Internal
             };
 
             NotificationsController.Instance.SendNotification(notification, initiatingUser.PortalID, null, new List<UserInfo> { targetUser });
+			Logger.LogDebug("<<< Exiting AddFriendRequestNotification(initiatingUser={InitiatingUser},targetUser={TargetUser},userRelationship={UserRelationship})", initiatingUser, targetUser, userRelationship);
         }
 
         private static CultureInfo GetUserPreferredLocale(UserInfo user)
         {
+			Logger.LogDebug(">>> Entering GetUserPreferredLocale(user={User})", user);
             string language = user.Profile.PreferredLocale;
             if (!string.IsNullOrEmpty(language))
             {
+			Logger.LogDebug("<<< Exiting GetUserPreferredLocale(user={User})", user);
                 return Localization.GetCultureFromString(user.PortalID, language);
             }
 

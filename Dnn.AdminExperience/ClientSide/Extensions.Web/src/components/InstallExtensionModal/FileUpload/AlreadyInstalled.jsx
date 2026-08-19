@@ -2,15 +2,20 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { SvgIcons } from "@dnnsoftware/dnn-react-common";
 import Html from "../../Html";
+const logger = console;
 
 export default class AlreadyInstalled extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
+		logger.debug('<<< Exiting constructor()');
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const { props } = this;
          
+		logger.debug('<<< Exiting render()');
         return <div className="already-installed">
             <div className="already-installed-container">
                 <div className="upload-file-name">{this.props.fileName || "undefined"}</div>

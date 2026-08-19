@@ -1,5 +1,7 @@
+const logger = console;
 'use strict';
 define(['jquery'], function ($) {
+	logger.debug('>>> Entering define()');
 	return {		
 		selector: 'input, textarea, select',
 		errorMessages: {
@@ -12,6 +14,7 @@ define(['jquery'], function ($) {
 			'email': 'Only valid email is allowed'
 		},
 		validate: function(container, customValidators){
+			logger.debug('<<< Exiting define()');
 			var valid = true;
 			var self = this;
             $(self.selector, container).each(function (index, input) {

@@ -20,18 +20,23 @@ namespace DotNetNuke.Tests.Web.Api
         [SetUp]
         public void Setup()
         {
+			eventLogger.LogDebug(">>> Entering Setup()");
             var mockMembership = MockComponentProvider.CreateNew<MembershipProvider>();
             mockMembership.Setup(m => m.PasswordRetrievalEnabled).Returns(true);
+			eventLogger.LogDebug("<<< Exiting Setup()");
         }
 
         [Test]
         public void SetsWwwAuthenticateHeaderOn401()
         {
+			eventLogger.LogDebug(">>> Entering SetsWwwAuthenticateHeaderOn401()");
             // Arrange
             var response = new HttpResponseMessage(HttpStatusCode.Unauthorized) { RequestMessage = new HttpRequestMessage() };
+			eventLogger.LogDebug("SetsWwwAuthenticateHeaderOn401(): response → {Response}", response);
 
             // Act
             var handler = new DigestAuthMessageHandler(true, false);
+			eventLogger.LogDebug("SetsWwwAuthenticateHeaderOn401(): handler → {Handler}", handler);
             handler.OnOutboundResponse(response, CancellationToken.None);
 
             using (Assert.EnterMultipleScope())
@@ -40,32 +45,40 @@ namespace DotNetNuke.Tests.Web.Api
                 Assert.That(response.Headers.WwwAuthenticate.First().Scheme, Is.EqualTo("Digest"));
                 Assert.That(response.Headers.WwwAuthenticate.First().Parameter, Does.Contain("realm=\"DNNAPI\""));
             }
+			eventLogger.LogDebug("<<< Exiting SetsWwwAuthenticateHeaderOn401()");
         }
 
         [Test]
         public void OmitsWwwAuthenticateHeaderOn401FromXmlHttpRequest()
         {
+			eventLogger.LogDebug(">>> Entering OmitsWwwAuthenticateHeaderOn401FromXmlHttpRequest()");
             // Arrange
             var response = new HttpResponseMessage(HttpStatusCode.Unauthorized) { RequestMessage = new HttpRequestMessage() };
+			eventLogger.LogDebug("OmitsWwwAuthenticateHeaderOn401FromXmlHttpRequest(): response → {Response}", response);
             response.RequestMessage.Headers.Add("X-REQUESTED-WITH", "XmlHttpRequest");
 
             // Act
             var handler = new DigestAuthMessageHandler(true, false);
+			eventLogger.LogDebug("OmitsWwwAuthenticateHeaderOn401FromXmlHttpRequest(): handler → {Handler}", handler);
             handler.OnOutboundResponse(response, CancellationToken.None);
 
             // Assert
             Assert.That(response.Headers.WwwAuthenticate, Is.Empty);
+			eventLogger.LogDebug("<<< Exiting OmitsWwwAuthenticateHeaderOn401FromXmlHttpRequest()");
         }
 
         [Test]
         public void MissingXmlHttpRequestValueDoesntThrowNullException()
         {
+			eventLogger.LogDebug(">>> Entering MissingXmlHttpRequestValueDoesntThrowNullException()");
             // Arrange
             var response = new HttpResponseMessage(HttpStatusCode.Unauthorized) { RequestMessage = new HttpRequestMessage() };
+			eventLogger.LogDebug("MissingXmlHttpRequestValueDoesntThrowNullException(): response → {Response}", response);
             response.RequestMessage.Headers.Add("X-REQUESTED-WITH", string.Empty);
 
             // Act
             var handler = new DigestAuthMessageHandler(true, false);
+			eventLogger.LogDebug("MissingXmlHttpRequestValueDoesntThrowNullException(): handler → {Handler}", handler);
             handler.OnOutboundResponse(response, CancellationToken.None);
 
             using (Assert.EnterMultipleScope())
@@ -74,16 +87,20 @@ namespace DotNetNuke.Tests.Web.Api
                 Assert.That(response.Headers.WwwAuthenticate.First().Scheme, Is.EqualTo("Digest"));
                 Assert.That(response.Headers.WwwAuthenticate.First().Parameter, Does.Contain("realm=\"DNNAPI\""));
             }
+			eventLogger.LogDebug("<<< Exiting MissingXmlHttpRequestValueDoesntThrowNullException()");
         }
 
         [Test]
         public void ResponseWithNullRequestReturnsUnauthorized()
         {
+			eventLogger.LogDebug(">>> Entering ResponseWithNullRequestReturnsUnauthorized()");
             // Arrange
             var response = new HttpResponseMessage(HttpStatusCode.Unauthorized) { RequestMessage = null };
+			eventLogger.LogDebug("ResponseWithNullRequestReturnsUnauthorized(): response → {Response}", response);
 
             // Act
             var handler = new DigestAuthMessageHandler(true, false);
+			eventLogger.LogDebug("ResponseWithNullRequestReturnsUnauthorized(): handler → {Handler}", handler);
             handler.OnOutboundResponse(response, CancellationToken.None);
 
             using (Assert.EnterMultipleScope())
@@ -92,6 +109,7 @@ namespace DotNetNuke.Tests.Web.Api
                 Assert.That(response.Headers.WwwAuthenticate.First().Scheme, Is.EqualTo("Digest"));
                 Assert.That(response.Headers.WwwAuthenticate.First().Parameter, Does.Contain("realm=\"DNNAPI\""));
             }
+			eventLogger.LogDebug("<<< Exiting ResponseWithNullRequestReturnsUnauthorized()");
         }
 
         // todo unit test actual authentication code

@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class EventMessageException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(EventMessageException));
     /// <inheritdoc />
     public EventMessageException()
     {
+	Logger.LogDebug(">>> Entering EventMessageException()");
+	Logger.LogDebug("<<< Exiting EventMessageException()");
     }
 
     /// <inheritdoc />
     public EventMessageException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering EventMessageException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting EventMessageException(message={Message})", message);
 
     /// <inheritdoc />
     public EventMessageException(string message, Exception innerException)

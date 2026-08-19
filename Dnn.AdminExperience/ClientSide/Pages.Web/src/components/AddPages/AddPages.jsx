@@ -8,30 +8,41 @@ import KeyWords from "./KeyWords";
 import PageTags from "./Tags";
 import DisplayInMenu from "./DisplayInMenu";
 import EnableScheduling from "./EnableScheduling";
+const logger = console;
 
 class AddPages extends Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
         this._isFinishLoad = false;
 
     }
 
     onChangeValue(key, value) {
+		logger.debug(`>>> Entering onChangeValue(key=${key},value=${value})`);
         const {onChangeField} = this.props;
         onChangeField(key, value);
+		logger.debug(`<<< Exiting onChangeValue(key=${key},value=${value})`);
     }
 
     onChangeEvent(key, event) {
+		logger.debug(`>>> Entering onChangeEvent(key=${key},event=${event})`);
         this.onChangeValue(key, event.target.value);
+		logger.debug(`<<< Exiting onChangeEvent(key=${key},event=${event})`);
     }
 
     onChangeTags(tags) {
+		logger.debug(`>>> Entering onChangeTags(tags=${tags})`);
         this.onChangeValue("tags", tags.join(","));
+		logger.debug(`<<< Exiting onChangeTags(tags=${tags})`);
     }
 
     getLeftColumnComponents() {
+		logger.debug('>>> Entering getLeftColumnComponents()');
         const {bulkPage} = this.props;
         const tags = bulkPage.tags ? bulkPage.tags.split(",") : [];
+		logger.debug(`getLeftColumnComponents(): tags → ${tags}`);
 
         const defaultLeftColumnComponents = [
             <BranchParent key="branchParent" parentId={bulkPage.parentId}
@@ -51,10 +62,12 @@ class AddPages extends Component {
 
         this.insertElementsInArray(defaultLeftColumnComponents, additionalComponents);
         this._isFinishLoad = true;
+		logger.debug('<<< Exiting getLeftColumnComponents()');
         return defaultLeftColumnComponents;
     }
 
     insertElementsInArray(array, elements) {
+		logger.debug(`>>> Entering insertElementsInArray(array=${array},elements=${elements})`);
         for (let i = 0; i < elements.length; i++) {
             let index = this.getInteger(elements[i].order);
             const Component = elements[i].component;
@@ -65,15 +78,18 @@ class AddPages extends Component {
             if (index || index === 0) {
                 index = Math.min(array.length, Math.max(0, index));
                 array.splice(index, 0, instance);
+				logger.debug(`<<< Exiting insertElementsInArray(array=${array},elements=${elements})`);
             }            
         }
     }
 
     getInteger(value) {
+		logger.debug(`>>> Entering getInteger(value=${value})`);
         if (value === 0) {
             return 0;
         }
         if (value) {
+		logger.debug(`<<< Exiting getInteger(value=${value})`);
             return parseInt(value.toString());
         }
         return value;
@@ -81,8 +97,10 @@ class AddPages extends Component {
     
  
     render() {
+		logger.debug('>>> Entering render()');
         const {bulkPage, onCancel, onValidate, onSave} = this.props;
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.addPages}>
                 <div className="addPagesDetail">

@@ -14,6 +14,8 @@ namespace Dnn.PersonaBar.Extensions.Components.Dto.Editors
         /// <summary>Initializes a new instance of the <see cref="CoreLanguagePackageDetailDto"/> class.</summary>
         public CoreLanguagePackageDetailDto()
         {
+		eventLogger.LogDebug(">>> Entering CoreLanguagePackageDetailDto()");
+		eventLogger.LogDebug("<<< Exiting CoreLanguagePackageDetailDto()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="CoreLanguagePackageDetailDto"/> class.</summary>

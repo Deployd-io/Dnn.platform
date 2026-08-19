@@ -25,12 +25,15 @@ namespace Dnn.PersonaBar.Licensing.Services
         [HttpGet]
         public HttpResponseMessage GetProduct()
         {
+			Logger.LogDebug(">>> Entering GetProduct()");
             try
             {
                 var response = new
                 {
                     Success = true,
                     Results = new
+					Logger.LogDebug("GetProduct(): Success → {Success}", Success);
+					Logger.LogDebug("GetProduct(): Results → {Results}", Results);
                     {
                         DotNetNukeContext.Current.Application.Name,
                         DotNetNukeContext.Current.Application.SKU,
@@ -43,6 +46,7 @@ namespace Dnn.PersonaBar.Licensing.Services
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetProduct()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }

@@ -1,3 +1,4 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
@@ -6,6 +7,7 @@
 */
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -15,8 +17,11 @@
 })(function(CodeMirror) {
   "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
   CodeMirror.defineMode("mumps", function() {
     function wordRegexp(words) {
+	logger.debug(`>>> Entering wordRegexp(words=${words})`);
+	logger.debug(`<<< Exiting wordRegexp(words=${words})`);
       return new RegExp("^((" + words.join(")|(") + "))\\b", "i");
     }
 
@@ -32,9 +37,12 @@
     var command = wordRegexp(commandKeywords);
 
     function tokenBase(stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
       if (stream.sol()) {
         state.label = true;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.label → ${state.label}`);
         state.commandMode = 0;
+		logger.debug(`tokenBase(stream=${stream},state=${state}): state.commandMode → ${state.commandMode}`);
       }
 
       // The <space> character has meaning in MUMPS. Ignoring consecutive
@@ -44,6 +52,7 @@
       // Examine each character and update a mode variable whose interpretation is:
       //   >0 => command    0 => argument    <0 => command post-conditional
       var ch = stream.peek();
+	logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
 
       if (ch == " " || ch == "\t") { // Pre-process <space>
         state.label = false;
@@ -125,20 +134,26 @@
 
       // Handle non-detected items
       stream.next();
+	logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
       return "error";
     }
 
     return {
       startState: function() {
+		logger.debug('>>> Entering startState()');
         return {
           label: false,
           commandMode: 0
         };
+		logger.debug('<<< Exiting startState()');
       },
 
       token: function(stream, state) {
+		logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
         var style = tokenBase(stream, state);
         if (state.label) return "tag";
+		logger.debug(`token(stream=${stream},state=${state}): style → ${style}`);
+		logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
         return style;
       }
     };

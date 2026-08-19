@@ -21,10 +21,12 @@ namespace DotNetNuke.Modules.Html
     using DotNetNuke.Services.Personalization;
     using DotNetNuke.UI.WebControls;
     using Microsoft.Extensions.DependencyInjection;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>The HtmlModule Class provides the UI for displaying the HTML.</summary>
     public partial class HtmlModule : HtmlModuleBase, IActionable
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private readonly IWorkflowManager workflowManager = WorkflowManager.Instance;
         private readonly INavigationManager navigationManager;
         private readonly HtmlTextController htmlTextController;
@@ -36,8 +38,10 @@ namespace DotNetNuke.Modules.Html
         public HtmlModule()
             : this(null, null)
         {
+		_logger.LogDebug(">>> Entering HtmlModule()");
         }
 
+		_logger.LogDebug("<<< Exiting HtmlModule()");
         /// <summary>Initializes a new instance of the <see cref="HtmlModule"/> class.</summary>
         /// <param name="navigationManager">The navigation manager.</param>
         /// <param name="htmlTextController">The HTML/Text controller.</param>
@@ -56,6 +60,7 @@ namespace DotNetNuke.Modules.Html
         {
             this.navigationManager = navigationManager ?? this.DependencyProvider.GetRequiredService<INavigationManager>();
             this.htmlTextController = htmlTextController ?? this.DependencyProvider.GetRequiredService<HtmlTextController>();
+			_logger.LogDebug("HtmlModule(settingsRepository={SettingsRepository},navigationManager={NavigationManager},htmlTextController={HtmlTextController}): htmlTextController → {HtmlTextController1}", settingsRepository, navigationManager, htmlTextController, htmlTextController);
         }
 
         /// <summary>Gets moduleActions is an interface property that returns the module actions collection for the module.</summary>
@@ -92,26 +97,32 @@ namespace DotNetNuke.Modules.Html
         /// <param name="e">The event arguments.</param>
         protected override void OnInit(EventArgs e)
         {
+			_logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
             this.lblContent.UpdateLabel += this.LblContent_UpdateLabel;
             this.editorEnabled = this.PortalSettings.InlineEditorEnabled;
+			_logger.LogDebug("OnInit(e={E}): this.editorEnabled → {Arg1}", e, this.editorEnabled);
             try
             {
                 this.workflowId = this.htmlTextController.GetWorkflow(this.ModuleId, this.TabId, this.PortalId).Value;
+				_logger.LogDebug("OnInit(e={E}): workflowId → {WorkflowId}", e, workflowId);
 
                 // Add an Action Event Handler to the Skin
                 this.AddActionHandler(this.ModuleAction_Click);
             }
             catch (Exception exc)
             {
+				_logger.LogError("Exception in OnInit(e={E}): {Arg1}", e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			_logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <summary>Page_Load runs when the control is loaded.</summary>
         /// <param name="e">The event arguments.</param>
         protected override void OnLoad(EventArgs e)
         {
+			_logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             try
             {
@@ -119,6 +130,7 @@ namespace DotNetNuke.Modules.Html
                 if (this.editorEnabled && this.IsEditable && Personalization.GetUserMode() == PortalSettings.Mode.Edit)
                 {
                     this.editorEnabled = true;
+					_logger.LogDebug("OnLoad(e={E}): this.editorEnabled → {Arg1}", e, this.editorEnabled);
                 }
                 else
                 {
@@ -127,7 +139,9 @@ namespace DotNetNuke.Modules.Html
 
                 // get content
                 HtmlTextInfo htmlTextInfo = null;
+				_logger.LogDebug("OnLoad(e={E}): htmlTextInfo → {HtmlTextInfo}", e, htmlTextInfo);
                 string contentString = string.Empty;
+				_logger.LogDebug("OnLoad(e={E}): contentString → {ContentString}", e, contentString);
 
                 htmlTextInfo = this.htmlTextController.GetTopHtmlText(this.ModuleId, !this.IsEditable, this.workflowId);
 
@@ -186,6 +200,7 @@ namespace DotNetNuke.Modules.Html
 
                 if (this.IsPostBack && AJAX.IsEnabled() && AJAX.GetScriptManager(this.Page).IsInAsyncPostBack)
                 {
+			_logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
                     var resetScript = $@"
 if(typeof dnn !== 'undefined' && typeof dnn.controls !== 'undefined' && typeof dnn.controls.controls !== 'undefined'){{
     var control = dnn.controls.controls['{HttpUtility.JavaScriptStringEncode(this.lblContent.ClientID)}'];
@@ -193,11 +208,13 @@ if(typeof dnn !== 'undefined' && typeof dnn.controls !== 'undefined' && typeof d
         dnn.controls.controls['{HttpUtility.JavaScriptStringEncode(this.lblContent.ClientID)}'] = null;
     }}
 }};";
+					_logger.LogDebug("OnLoad(e={E}): control → {Control}", e, control);
                     ScriptManager.RegisterClientScriptBlock(this.Page, this.Page.GetType(), $"ResetHtmlModule{this.ClientID}", resetScript, true);
                 }
             }
             catch (Exception exc)
             {
+				_logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
         }
@@ -205,27 +222,33 @@ if(typeof dnn !== 'undefined' && typeof dnn.controls !== 'undefined' && typeof d
         /// <summary>  lblContent_UpdateLabel allows for inline editing of content.</summary>
         private void LblContent_UpdateLabel(object source, DNNLabelEditEventArgs e)
         {
+			_logger.LogDebug(">>> Entering LblContent_UpdateLabel(source={Source},e={E})", source, e);
             try
             {
                 // verify security
                 if (!this.PortalSettings.AllowJsInHtmlModule && HtmlUtils.ContainsJavaScript(e.Text))
                 {
+					_logger.LogWarning("Throwing SecurityException from LblContent_UpdateLabel(source={Source},e={E})", source, e);
                     throw new SecurityException();
                 }
                 else if (this.editorEnabled && this.IsEditable && Personalization.GetUserMode() == PortalSettings.Mode.Edit)
                 {
                     // get content
                     HtmlTextInfo objContent = this.htmlTextController.GetTopHtmlText(this.ModuleId, false, this.workflowId);
+					_logger.LogDebug("LblContent_UpdateLabel(source={Source},e={E}): objContent → {ObjContent}", source, e, objContent);
                     if (objContent == null)
                     {
                         objContent = new HtmlTextInfo();
                         objContent.ItemID = -1;
+						_logger.LogDebug("LblContent_UpdateLabel(source={Source},e={E}): objContent.ItemID → {Arg2}", source, e, objContent.ItemID);
                     }
 
                     // set content attributes
                     objContent.ModuleID = this.ModuleId;
+					_logger.LogDebug("LblContent_UpdateLabel(source={Source},e={E}): objContent.ModuleID → {Arg2}", source, e, objContent.ModuleID);
                     objContent.Content = this.Server.HtmlEncode(e.Text);
                     objContent.WorkflowID = this.workflowId;
+					_logger.LogDebug("LblContent_UpdateLabel(source={Source},e={E}): objContent.WorkflowID → {Arg2}", source, e, objContent.WorkflowID);
                     objContent.StateID = this.workflowManager.GetWorkflow(this.workflowId).FirstState.StateID;
 
                     // save the content
@@ -238,13 +261,16 @@ if(typeof dnn !== 'undefined' && typeof dnn.controls !== 'undefined' && typeof d
             }
             catch (Exception exc)
             {
+				_logger.LogError("Exception in LblContent_UpdateLabel(source={Source},e={E}): {Arg2}", source, e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			_logger.LogDebug("<<< Exiting LblContent_UpdateLabel(source={Source},e={E})", source, e);
         }
 
         /// <summary>  ModuleAction_Click handles all ModuleAction events raised from the action menu.</summary>
         private void ModuleAction_Click(object sender, ActionEventArgs e)
         {
+			_logger.LogDebug(">>> Entering ModuleAction_Click(sender={Sender},e={E})", sender, e);
             try
             {
                 if (e.Action.CommandArgument == "publish")
@@ -254,11 +280,14 @@ if(typeof dnn !== 'undefined' && typeof dnn.controls !== 'undefined' && typeof d
                     {
                         // get content
                         HtmlTextInfo objContent = this.htmlTextController.GetTopHtmlText(this.ModuleId, false, this.workflowId);
+						_logger.LogDebug("ModuleAction_Click(sender={Sender},e={E}): objContent → {ObjContent}", sender, e, objContent);
                         var workflow = this.workflowManager.GetWorkflow(this.workflowId);
+						_logger.LogDebug("ModuleAction_Click(sender={Sender},e={E}): workflow → {Workflow}", sender, e, workflow);
                         if (objContent.StateID == workflow.FirstState.StateID)
                         {
                             // publish content
                             objContent.StateID = workflow.LastState.StateID;
+							_logger.LogDebug("ModuleAction_Click(sender={Sender},e={E}): objContent.StateID → {Arg2}", sender, e, objContent.StateID);
 
                             // save the content
                             this.htmlTextController.UpdateHtmlText(objContent, this.htmlTextController.GetMaximumVersionHistory(this.PortalId));
@@ -271,8 +300,10 @@ if(typeof dnn !== 'undefined' && typeof dnn.controls !== 'undefined' && typeof d
             }
             catch (Exception exc)
             {
+				_logger.LogError("Exception in ModuleAction_Click(sender={Sender},e={E}): {Arg2}", sender, e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			_logger.LogDebug("<<< Exiting ModuleAction_Click(sender={Sender},e={E})", sender, e);
         }
     }
 }

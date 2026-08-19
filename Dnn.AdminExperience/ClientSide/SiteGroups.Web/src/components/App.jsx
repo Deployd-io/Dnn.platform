@@ -5,30 +5,38 @@ import { GridCell, PersonaBarPageHeader } from "@dnnsoftware/dnn-react-common";
 import service from "../services/SiteGroupsService";
 import utils from "../utils";
 import Resx from "../localization";
+const logger = console;
 
 export default class SiteGroupApp extends React.Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
         this.state = {
             groups: [],
             currentGroup: null,
             unassignedSites: []
         };
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         this.loadState();
+		logger.debug('<<< Exiting componentDidMount()');
     }
 
     loadState() {
+		logger.debug('>>> Entering loadState()');
         const self = this;
         service.getSiteGroups().then(groups => self.setState({ groups: groups }));
+		logger.debug(`loadState(): self → ${self}`);
         service
             .getUnassignedSites()
             .then(sites => self.setState({ unassignedSites: sites }));
     }
 
     editNewGroup(id) {
+		logger.debug(`>>> Entering editNewGroup(id=${id})`);
         const site = this.state.unassignedSites.find(s => s.PortalId === id);
         this.setState({
             currentGroup: {
@@ -39,15 +47,18 @@ export default class SiteGroupApp extends React.Component {
                 Portals: []
             }
         });
+		logger.debug(`<<< Exiting editNewGroup(id=${id})`);
     }
 
     save(r) {
+		logger.debug(`>>> Entering save(r=${r})`);
         const self = this;
         const group = r.PortalGroup;
         const unassignedSites = r.UnassignedSites;
         const isNewGroup = group.PortalGroupId === -1;
         service.save(group).then(id => {
             if (isNewGroup) group.PortalGroupId = id;
+			logger.debug(`<<< Exiting save(r=${r})`);
             const groups = (isNewGroup
                 ? self.state.groups
                 : self.state.groups.filter(g => g.PortalGroupId !== group.PortalGroupId)
@@ -63,6 +74,7 @@ export default class SiteGroupApp extends React.Component {
     }
 
     deleteGroup(group) {
+		logger.debug(`>>> Entering deleteGroup(group=${group})`);
         const self = this;
         utils.confirm(
             Resx.get("DeleteGroup.Confirm"),
@@ -70,6 +82,7 @@ export default class SiteGroupApp extends React.Component {
             Resx.get("Cancel"),
             () => {
                 service.delete(group.PortalGroupId).then(() => {
+					logger.debug(`<<< Exiting deleteGroup(group=${group})`);
                     self.setState({
                         unassignedSites: self.state.unassignedSites
                             .concat(group.Portals)
@@ -86,6 +99,8 @@ export default class SiteGroupApp extends React.Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell>
                 <PersonaBarPageHeader title={Resx.get("nav_SiteGroups")}>

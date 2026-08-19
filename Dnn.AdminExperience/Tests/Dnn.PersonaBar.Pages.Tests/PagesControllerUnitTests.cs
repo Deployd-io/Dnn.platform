@@ -25,10 +25,12 @@ namespace Dnn.PersonaBar.Pages.Tests
     using Microsoft.Extensions.DependencyInjection;
     using Moq;
     using NUnit.Framework;
+	using Microsoft.Extensions.Logging;
 
     [TestFixture]
     public class PagesControllerUnitTests
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         private Mock<IBusinessControllerProvider> businessControllerProviderMock;
         private Mock<ITabController> tabControllerMock;
         private Mock<IModuleController> moduleControllerMock;
@@ -47,18 +49,31 @@ namespace Dnn.PersonaBar.Pages.Tests
         [SetUp]
         public void RunBeforeEachTest()
         {
+			_logger.LogDebug(">>> Entering RunBeforeEachTest()");
             this.businessControllerProviderMock = new Mock<IBusinessControllerProvider>();
             this.tabControllerMock = new Mock<ITabController>();
+			_logger.LogDebug("RunBeforeEachTest(): tabControllerMock → {TabControllerMock}", tabControllerMock);
+			_logger.LogDebug("RunBeforeEachTest(): businessControllerProviderMock → {BusinessControllerProviderMock}", businessControllerProviderMock);
             this.moduleControllerMock = new Mock<IModuleController>();
+			_logger.LogDebug("RunBeforeEachTest(): moduleControllerMock → {ModuleControllerMock}", moduleControllerMock);
             this.pageUrlsControllerMock = new Mock<IPageUrlsController>();
+			_logger.LogDebug("RunBeforeEachTest(): pageUrlsControllerMock → {PageUrlsControllerMock}", pageUrlsControllerMock);
             this.templateControllerMock = new Mock<ITemplateController>();
+			_logger.LogDebug("RunBeforeEachTest(): templateControllerMock → {TemplateControllerMock}", templateControllerMock);
             this.defaultPortalThemeControllerMock = new Mock<IDefaultPortalThemeController>();
+			_logger.LogDebug("RunBeforeEachTest(): defaultPortalThemeControllerMock → {DefaultPortalThemeControllerMock}", defaultPortalThemeControllerMock);
             this.cloneModuleExecutionContextMock = new Mock<ICloneModuleExecutionContext>();
+			_logger.LogDebug("RunBeforeEachTest(): cloneModuleExecutionContextMock → {CloneModuleExecutionContextMock}", cloneModuleExecutionContextMock);
             this.urlRewriterUtilsWrapperMock = new Mock<IUrlRewriterUtilsWrapper>();
+			_logger.LogDebug("RunBeforeEachTest(): urlRewriterUtilsWrapperMock → {UrlRewriterUtilsWrapperMock}", urlRewriterUtilsWrapperMock);
             this.friendlyUrlWrapperMock = new Mock<IFriendlyUrlWrapper>();
+			_logger.LogDebug("RunBeforeEachTest(): friendlyUrlWrapperMock → {FriendlyUrlWrapperMock}", friendlyUrlWrapperMock);
             this.contentVerifierMock = new Mock<IContentVerifier>();
+			_logger.LogDebug("RunBeforeEachTest(): contentVerifierMock → {ContentVerifierMock}", contentVerifierMock);
             this.portalControllerMock = new Mock<IPortalController>();
+			_logger.LogDebug("RunBeforeEachTest(): portalControllerMock → {PortalControllerMock}", portalControllerMock);
             this.personalizationControllerMock = new Mock<PersonalizationController>(Mock.Of<IHostSettings>(), Mock.Of<ICryptographyProvider>());
+			_logger.LogDebug("RunBeforeEachTest(): personalizationControllerMock → {PersonalizationControllerMock}", personalizationControllerMock);
             TabController.SetTestableInstance(this.tabControllerMock.Object);
             ModuleController.SetTestableInstance(this.moduleControllerMock.Object);
             PageUrlsController.SetTestableInstance(this.pageUrlsControllerMock.Object);
@@ -68,6 +83,7 @@ namespace Dnn.PersonaBar.Pages.Tests
             this.serviceProvider = FakeServiceProvider.Setup(
                 services =>
                 {
+					_logger.LogDebug("RunBeforeEachTest(): serviceProvider → {ServiceProvider}", serviceProvider);
                     services.AddSingleton(this.businessControllerProviderMock.Object);
                     services.AddSingleton(this.tabControllerMock.Object);
                     services.AddSingleton(this.moduleControllerMock.Object);
@@ -81,11 +97,13 @@ namespace Dnn.PersonaBar.Pages.Tests
                     services.AddSingleton(this.portalControllerMock.Object);
                     services.AddSingleton(this.personalizationControllerMock.Object);
                 });
+				_logger.LogDebug("<<< Exiting RunBeforeEachTest()");
         }
 
         [TearDown]
         public void TearDown()
         {
+			_logger.LogDebug(">>> Entering TearDown()");
             this.serviceProvider.Dispose();
             TabController.ClearInstance();
             ModuleController.ClearInstance();
@@ -95,6 +113,7 @@ namespace Dnn.PersonaBar.Pages.Tests
             PortalController.ClearInstance();
             TabVersionSettings.ClearInstance();
             TabWorkflowSettings.ClearInstance();
+			_logger.LogDebug("<<< Exiting TearDown()");
         }
 
         [TestCase("http://www.websitename.com/home/", "/home")]
@@ -103,11 +122,15 @@ namespace Dnn.PersonaBar.Pages.Tests
         [TestCase("blogs", "blogs")]
         public void ValidatePageUrlSettings_CleanNameForUrl_URLArgumentShouldBeLocalPath(string inputUrl, string expected)
         {
+			_logger.LogDebug(">>> Entering ValidatePageUrlSettings_CleanNameForUrl_URLArgumentShouldBeLocalPath(inputUrl={InputUrl},expected={Expected})", inputUrl, expected);
             // Arrange
             var modified = false;
             var tab = new TabInfo();
+			_logger.LogDebug("ValidatePageUrlSettings_CleanNameForUrl_URLArgumentShouldBeLocalPath(inputUrl={InputUrl},expected={Expected}): tab → {Tab}", inputUrl, expected, tab);
             var portalSettings = new PortalSettings();
+			_logger.LogDebug("ValidatePageUrlSettings_CleanNameForUrl_URLArgumentShouldBeLocalPath(inputUrl={InputUrl},expected={Expected}): portalSettings → {PortalSettings}", inputUrl, expected, portalSettings);
             var friendlyOptions = new FriendlyUrlOptions();
+			_logger.LogDebug("ValidatePageUrlSettings_CleanNameForUrl_URLArgumentShouldBeLocalPath(inputUrl={InputUrl},expected={Expected}): friendlyOptions → {FriendlyOptions}", inputUrl, expected, friendlyOptions);
 
             this.urlRewriterUtilsWrapperMock.Setup(d => d.GetExtendOptionsForURLs(It.IsAny<int>())).Returns(friendlyOptions);
             this.friendlyUrlWrapperMock.Setup(d => d.CleanNameForUrl(It.IsAny<string>(), friendlyOptions, out modified)).Returns(expected);
@@ -116,6 +139,8 @@ namespace Dnn.PersonaBar.Pages.Tests
             this.InitializePageController();
 
             PageSettings pageSettings = new PageSettings();
+			_logger.LogDebug("ValidatePageUrlSettings_CleanNameForUrl_URLArgumentShouldBeLocalPath(inputUrl={InputUrl},expected={Expected}): pageSettings → {PageSettings}", inputUrl, expected, pageSettings);
+			_logger.LogDebug("ValidatePageUrlSettings_CleanNameForUrl_URLArgumentShouldBeLocalPath(inputUrl={InputUrl},expected={Expected}): pageSettings.Url → {Arg2}", inputUrl, expected, pageSettings.Url);
             pageSettings.Url = inputUrl;
 
             string inValidField = string.Empty;
@@ -128,18 +153,23 @@ namespace Dnn.PersonaBar.Pages.Tests
             Assert.That(result, Is.True);
             this.urlRewriterUtilsWrapperMock.VerifyAll();
             this.friendlyUrlWrapperMock.Verify(d => d.CleanNameForUrl(expected, friendlyOptions, out modified), Times.Once());
+			_logger.LogDebug("<<< Exiting ValidatePageUrlSettings_CleanNameForUrl_URLArgumentShouldBeLocalPath(inputUrl={InputUrl},expected={Expected})", inputUrl, expected);
         }
 
         [Test]
         public void GetPageSettings_CallGetCurrentPortalSettings_WhenSettingParameterIsNull()
         {
+			_logger.LogDebug(">>> Entering GetPageSettings_CallGetCurrentPortalSettings_WhenSettingParameterIsNull()");
             var tabId = 0;
             var portalId = 0;
 
             var tab = new TabInfo();
+			_logger.LogDebug("GetPageSettings_CallGetCurrentPortalSettings_WhenSettingParameterIsNull(): tab → {Tab}", tab);
+			_logger.LogDebug("GetPageSettings_CallGetCurrentPortalSettings_WhenSettingParameterIsNull(): tab.PortalID → {Arg0}", tab.PortalID);
             tab.PortalID = portalId;
 
             var portalSettings = new PortalSettings();
+			_logger.LogDebug("GetPageSettings_CallGetCurrentPortalSettings_WhenSettingParameterIsNull(): portalSettings → {PortalSettings}", portalSettings);
 
             // Arrange
             this.tabControllerMock.Setup(t => t.GetTab(It.IsAny<int>(), It.IsAny<int>())).Returns(tab);
@@ -152,21 +182,26 @@ namespace Dnn.PersonaBar.Pages.Tests
 
             // Act
             TestDelegate pageSettingsCall = () => this.pagesController.GetPageSettings(tabId, null);
+			_logger.LogDebug("GetPageSettings_CallGetCurrentPortalSettings_WhenSettingParameterIsNull(): pageSettingsCall → {PageSettingsCall}", pageSettingsCall);
 
             // Assert
             Assert.Throws<PageNotFoundException>(pageSettingsCall);
             this.portalControllerMock.Verify(p => p.GetCurrentSettings(), Times.Once);
             this.portalControllerMock.Verify(p => p.GetCurrentPortalSettings(), Times.Once);
             this.contentVerifierMock.Verify(c => c.IsContentExistsForRequestedPortal(portalId, portalSettings, false));
+			_logger.LogDebug("<<< Exiting GetPageSettings_CallGetCurrentPortalSettings_WhenSettingParameterIsNull()");
         }
 
         [Test]
         public void UpdateTabWorkflowFromPageSettings_ClearsState_WhenWorkflowPostedButPortalWorkflowDisabled()
         {
+			_logger.LogDebug(">>> Entering UpdateTabWorkflowFromPageSettings_ClearsState_WhenWorkflowPostedButPortalWorkflowDisabled()");
             var tab = new TabInfo { PortalID = 1, TabID = 2, StateID = 6 };
             var pageSettings = new PageSettings { EnabledVersioning = true, WorkflowEnabled = true, WorkflowId = 9 };
             var tabVersionSettings = new Mock<ITabVersionSettings>();
+			_logger.LogDebug("UpdateTabWorkflowFromPageSettings_ClearsState_WhenWorkflowPostedButPortalWorkflowDisabled(): tabVersionSettings → {TabVersionSettings}", tabVersionSettings);
             var tabWorkflowSettings = new Mock<ITabWorkflowSettings>();
+			_logger.LogDebug("UpdateTabWorkflowFromPageSettings_ClearsState_WhenWorkflowPostedButPortalWorkflowDisabled(): tabWorkflowSettings → {TabWorkflowSettings}", tabWorkflowSettings);
             tabVersionSettings.Setup(s => s.IsVersioningEnabled(tab.PortalID)).Returns(false);
             tabWorkflowSettings.Setup(s => s.IsWorkflowEnabled(tab.PortalID)).Returns(false);
             TabVersionSettings.SetTestableInstance(tabVersionSettings.Object);
@@ -178,10 +213,12 @@ namespace Dnn.PersonaBar.Pages.Tests
             Assert.That(tab.StateID, Is.EqualTo(Null.NullInteger));
             tabVersionSettings.Verify(s => s.SetEnabledVersioningForTab(It.IsAny<int>(), It.IsAny<bool>()), Times.Never);
             tabWorkflowSettings.Verify(s => s.SetWorkflowEnabled(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>()), Times.Never);
+			_logger.LogDebug("<<< Exiting UpdateTabWorkflowFromPageSettings_ClearsState_WhenWorkflowPostedButPortalWorkflowDisabled()");
         }
 
         private void InitializePageController()
         {
+			_logger.LogDebug(">>> Entering InitializePageController()");
             this.pagesController = new TestablePagesControllerImpl(
                 this.businessControllerProviderMock.Object,
                 this.tabControllerMock.Object,
@@ -195,6 +232,8 @@ namespace Dnn.PersonaBar.Pages.Tests
                 this.contentVerifierMock.Object,
                 this.portalControllerMock.Object,
                 this.personalizationControllerMock.Object);
+				_logger.LogDebug("InitializePageController(): pagesController → {PagesController}", pagesController);
+				_logger.LogDebug("<<< Exiting InitializePageController()");
         }
 
         private sealed class TestablePagesControllerImpl : PagesControllerImpl
@@ -230,11 +269,15 @@ namespace Dnn.PersonaBar.Pages.Tests
                     Mock.Of<IHostSettings>(),
                     Mock.Of<IHostSettingsService>())
             {
+			_logger.LogDebug(">>> Entering TestablePagesControllerImpl(businessControllerProvider={BusinessControllerProvider},tabController={TabController},moduleController={ModuleController},pageUrlsController={PageUrlsController},templateController={TemplateController},defaultPortalThemeController={DefaultPortalThemeController},cloneModuleExecutionContext={CloneModuleExecutionContext},urlRewriterUtilsWrapper={UrlRewriterUtilsWrapper},friendlyUrlWrapper={FriendlyUrlWrapper},contentVerifier={ContentVerifier},portalController={PortalController},personalizationController={PersonalizationController})", businessControllerProvider, tabController, moduleController, pageUrlsController, templateController, defaultPortalThemeController, cloneModuleExecutionContext, urlRewriterUtilsWrapper, friendlyUrlWrapper, contentVerifier, portalController, personalizationController);
             }
+			_logger.LogDebug("<<< Exiting TestablePagesControllerImpl(businessControllerProvider={BusinessControllerProvider},tabController={TabController},moduleController={ModuleController},pageUrlsController={PageUrlsController},templateController={TemplateController},defaultPortalThemeController={DefaultPortalThemeController},cloneModuleExecutionContext={CloneModuleExecutionContext},urlRewriterUtilsWrapper={UrlRewriterUtilsWrapper},friendlyUrlWrapper={FriendlyUrlWrapper},contentVerifier={ContentVerifier},portalController={PortalController},personalizationController={PersonalizationController})", businessControllerProvider, tabController, moduleController, pageUrlsController, templateController, defaultPortalThemeController, cloneModuleExecutionContext, urlRewriterUtilsWrapper, friendlyUrlWrapper, contentVerifier, portalController, personalizationController);
 
             public void UpdateTabWorkflowFromPageSettingsForTest(TabInfo tab, PageSettings pageSettings)
             {
+				_logger.LogDebug(">>> Entering UpdateTabWorkflowFromPageSettingsForTest(tab={Tab},pageSettings={PageSettings})", tab, pageSettings);
                 this.UpdateTabWorkflowFromPageSettings(tab, pageSettings);
+				_logger.LogDebug("<<< Exiting UpdateTabWorkflowFromPageSettingsForTest(tab={Tab},pageSettings={PageSettings})", tab, pageSettings);
             }
         }
     }

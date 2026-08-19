@@ -10,15 +10,22 @@ namespace DotNetNuke.Services.EventQueue.Config
     [Serializable]
     public class SubscriberInfo
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SubscriberInfo));
         /// <summary>Initializes a new instance of the <see cref="SubscriberInfo"/> class.</summary>
         public SubscriberInfo()
         {
+			Logger.LogDebug(">>> Entering SubscriberInfo()");
             this.ID = Guid.NewGuid().ToString();
             this.Name = string.Empty;
+			Logger.LogDebug("SubscriberInfo(): this.Name → {Arg0}", this.Name);
+			Logger.LogDebug("SubscriberInfo(subscriberName={SubscriberName}): this.Name → {Arg1}", subscriberName, this.Name);
             this.Description = string.Empty;
             this.Address = string.Empty;
+			Logger.LogDebug("SubscriberInfo(): this.Description → {Arg0}", this.Description);
             var oPortalSecurity = PortalSecurity.Instance;
             this.PrivateKey = oPortalSecurity.CreateKey(16);
+			Logger.LogDebug("SubscriberInfo(): this.Address → {Arg0}", this.Address);
+			Logger.LogDebug("<<< Exiting SubscriberInfo()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="SubscriberInfo"/> class.</summary>

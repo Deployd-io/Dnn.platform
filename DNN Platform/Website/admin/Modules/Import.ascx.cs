@@ -39,8 +39,10 @@ namespace DotNetNuke.Modules.Admin.Modules
         public Import()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering Import()");
         }
 
+		Logger.LogDebug("<<< Exiting Import()");
         /// <summary>Initializes a new instance of the <see cref="Import"/> class.</summary>
         /// <param name="businessControllerProvider">The business controller provider.</param>
         /// <param name="navigationManager">The navigation manager.</param>
@@ -48,6 +50,10 @@ namespace DotNetNuke.Modules.Admin.Modules
         public Import(IBusinessControllerProvider businessControllerProvider, INavigationManager navigationManager)
             : this(businessControllerProvider, navigationManager, null)
         {
+		Logger.LogDebug(">>> Entering Import(businessControllerProvider={BusinessControllerProvider},navigationManager={NavigationManager})", businessControllerProvider, navigationManager);
+		Logger.LogDebug("<<< Exiting Import(businessControllerProvider={BusinessControllerProvider},navigationManager={NavigationManager})", businessControllerProvider, navigationManager);
+		Logger.LogDebug("Import(businessControllerProvider={BusinessControllerProvider},navigationManager={NavigationManager},permissionDefinitionService={PermissionDefinitionService}): navigationManager → {NavigationManager1}", businessControllerProvider, navigationManager, permissionDefinitionService, navigationManager);
+		Logger.LogDebug("Import(businessControllerProvider={BusinessControllerProvider},navigationManager={NavigationManager},permissionDefinitionService={PermissionDefinitionService}): permissionDefinitionService → {PermissionDefinitionService1}", businessControllerProvider, navigationManager, permissionDefinitionService, permissionDefinitionService);
         }
 
         /// <summary>Initializes a new instance of the <see cref="Import"/> class.</summary>
@@ -80,6 +86,7 @@ namespace DotNetNuke.Modules.Admin.Modules
         /// <inheritdoc />
         protected override void OnInit(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnInit(e={E})", e);
             base.OnInit(e);
 
             if (this.Request.QueryString["moduleid"] != null)
@@ -92,11 +99,13 @@ namespace DotNetNuke.Modules.Admin.Modules
             {
                 this.Response.Redirect(Globals.AccessDeniedURL(), true);
             }
+			Logger.LogDebug("<<< Exiting OnInit(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
 
             this.cboFolders.SelectionChanged += this.OnFoldersIndexChanged;
@@ -114,12 +123,15 @@ namespace DotNetNuke.Modules.Admin.Modules
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnLoad(e={E}): {Arg1}", e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         protected void OnFoldersIndexChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnFoldersIndexChanged(sender={Sender},e={E})", sender, e);
             this.cboFiles.Items.Clear();
             this.cboFiles.InsertItem(0, "<" + Localization.GetString("None_Specified") + ">", "-");
             if (this.cboFolders.SelectedItem == null)
@@ -133,12 +145,14 @@ namespace DotNetNuke.Modules.Admin.Modules
             }
 
             var folder = FolderManager.Instance.GetFolder(this.cboFolders.SelectedItemValueAsInt);
+			Logger.LogDebug("OnFoldersIndexChanged(sender={Sender},e={E}): folder → {Folder}", sender, e, folder);
             if (folder == null)
             {
                 return;
             }
 
             var files = Globals.GetFileList(this.PortalId, "export", false, folder.FolderPath);
+			Logger.LogDebug("OnFoldersIndexChanged(sender={Sender},e={E}): files → {Files}", sender, e, files);
             files.AddRange(Globals.GetFileList(this.PortalId, "xml", false, folder.FolderPath));
             foreach (FileItem file in files)
             {
@@ -158,16 +172,19 @@ namespace DotNetNuke.Modules.Admin.Modules
                     this.cboFiles.AddItem(file.Text.Replace("content." + Globals.CleanName(this.Module.DesktopModule.FriendlyName) + ".", string.Empty), file.Value);
                 }
             }
+			Logger.LogDebug("<<< Exiting OnFoldersIndexChanged(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnFilesIndexChanged(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnFilesIndexChanged(sender={Sender},e={E})", sender, e);
             if (this.cboFolders.SelectedItem == null)
             {
                 return;
             }
 
             var folder = FolderManager.Instance.GetFolder(this.cboFolders.SelectedItemValueAsInt);
+			Logger.LogDebug("OnFilesIndexChanged(sender={Sender},e={E}): folder → {Folder}", sender, e, folder);
             if (folder == null)
             {
                 return;
@@ -182,7 +199,9 @@ namespace DotNetNuke.Modules.Admin.Modules
             try
             {
                 var fileId = Convert.ToInt32(this.cboFiles.SelectedValue);
+				Logger.LogDebug("OnFilesIndexChanged(sender={Sender},e={E}): fileId → {FileId}", sender, e, fileId);
                 var file = DotNetNuke.Services.FileSystem.FileManager.Instance.GetFile(fileId);
+				Logger.LogDebug("OnFilesIndexChanged(sender={Sender},e={E}): file → {File}", sender, e, file);
                 using (var streamReader = new StreamReader(DotNetNuke.Services.FileSystem.FileManager.Instance.GetFileContent(file)))
                 {
                     this.txtContent.Text = streamReader.ReadToEnd();
@@ -190,17 +209,21 @@ namespace DotNetNuke.Modules.Admin.Modules
             }
             catch (Exception)
             {
+				Logger.LogError("Exception in OnFilesIndexChanged(sender={Sender},e={E}): {Arg2}", sender, e, Exception.Message);
                 this.txtContent.Text = string.Empty;
             }
+			Logger.LogDebug("<<< Exiting OnFilesIndexChanged(sender={Sender},e={E})", sender, e);
         }
 
         protected void OnImportClick(object sender, EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnImportClick(sender={Sender},e={E})", sender, e);
             try
             {
                 if (this.Module != null)
                 {
                     var strMessage = this.ImportModule();
+					Logger.LogDebug("OnImportClick(sender={Sender},e={E}): strMessage → {StrMessage}", sender, e, strMessage);
                     if (string.IsNullOrEmpty(strMessage))
                     {
                         this.Response.Redirect(this.ReturnURL, true);
@@ -213,12 +236,15 @@ namespace DotNetNuke.Modules.Admin.Modules
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in OnImportClick(sender={Sender},e={E}): {Arg2}", sender, e, exc.getMessage());
                 Exceptions.ProcessModuleLoadException(this, exc);
             }
+			Logger.LogDebug("<<< Exiting OnImportClick(sender={Sender},e={E})", sender, e);
         }
 
         private string ImportModule()
         {
+			Logger.LogDebug(">>> Entering ImportModule()");
             if (this.Module == null)
             {
                 return string.Empty;
@@ -232,6 +258,7 @@ namespace DotNetNuke.Modules.Admin.Modules
             try
             {
                 var controller = this.businessControllerProvider.GetInstance<IPortable>(this.Module);
+				Logger.LogDebug("ImportModule(): controller → {Controller}", controller);
                 if (controller is null)
                 {
                     return Localization.GetString("ImportNotSupported", this.LocalResourceFile);
@@ -241,15 +268,20 @@ namespace DotNetNuke.Modules.Admin.Modules
                 try
                 {
                     var content = XmlUtils.RemoveInvalidXmlCharacters(this.txtContent.Text);
+					Logger.LogDebug("ImportModule(): content → {Content}", content);
                     using var contentReader = XmlReader.Create(new StringReader(content), new XmlReaderSettings { XmlResolver = null, });
+					Logger.LogDebug("ImportModule(): contentReader → {ContentReader}", contentReader);
                     xmlDoc.Load(contentReader);
                 }
                 catch
                 {
+					private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Import.ascx));
+					Logger.LogError("Exception in ImportModule(): {Arg0}", exc.Message);
                     return Localization.GetString("NotValidXml", this.LocalResourceFile);
                 }
 
                 var strType = xmlDoc.DocumentElement.GetAttribute("type");
+				Logger.LogDebug("ImportModule(): strType → {StrType}", strType);
                 if (strType != Globals.CleanName(this.Module.DesktopModule.ModuleName) &&
                     strType != Globals.CleanName(this.Module.DesktopModule.FriendlyName))
                 {
@@ -257,6 +289,7 @@ namespace DotNetNuke.Modules.Admin.Modules
                 }
 
                 var strVersion = xmlDoc.DocumentElement.GetAttribute("version");
+				Logger.LogDebug("ImportModule(): strVersion → {StrVersion}", strVersion);
 
                 // DNN26810 if rootnode = "content", import only content(the old way)
                 if (xmlDoc.DocumentElement.Name.ToLowerInvariant() == "content")
@@ -285,6 +318,7 @@ namespace DotNetNuke.Modules.Admin.Modules
             }
             catch
             {
+				Logger.LogDebug("<<< Exiting ImportModule()");
                 return Localization.GetString("Error", this.LocalResourceFile);
             }
         }

@@ -1,8 +1,10 @@
 import Localization from "../localization";
+const logger = console;
 
 const regExpPositiveIntegerValue = /^(0|[1-9]\d*)$/;
 
 export default function validateFields(field, value) {
+	logger.debug(`>>> Entering validateFields(field=${field},value=${value})`);
     const errors = {};
 
     if (field === "smtpConnectionLimit" || field === "smtpMaxIdleTime" || field === "messageSchedulerBatchSize" ) {
@@ -14,5 +16,6 @@ export default function validateFields(field, value) {
         }
     }
 
+	logger.debug(`<<< Exiting validateFields(field=${field},value=${value})`);
     return errors;
 }

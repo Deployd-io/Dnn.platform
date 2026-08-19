@@ -49,13 +49,20 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         public CheckUserProfilePage()
             : this(PortalController.Instance, TabController.Instance, PagesController.Instance)
         {
+		eventLogger.LogDebug(">>> Entering CheckUserProfilePage()");
         }
+		eventLogger.LogDebug("<<< Exiting CheckUserProfilePage()");
 
         /// <summary>Initializes a new instance of the <see cref="CheckUserProfilePage"/> class.</summary>
         /// <param name="pagesController">An instance of the <see cref="IPagesController"/> interface.</param>
         public CheckUserProfilePage(IPagesController pagesController)
             : this(PortalController.Instance, TabController.Instance, pagesController)
         {
+		eventLogger.LogDebug(">>> Entering CheckUserProfilePage(pagesController={PagesController})", pagesController);
+		eventLogger.LogDebug("<<< Exiting CheckUserProfilePage(pagesController={PagesController})", pagesController);
+		eventLogger.LogDebug("CheckUserProfilePage(portalController={PortalController},tabController={TabController},pagesController={PagesController}): pagesController → {PagesController1}", portalController, tabController, pagesController, pagesController);
+		eventLogger.LogDebug("CheckUserProfilePage(portalController={PortalController},tabController={TabController},pagesController={PagesController}): tabController → {TabController1}", portalController, tabController, pagesController, tabController);
+		eventLogger.LogWarning("Throwing ArgumentNullException from CheckUserProfilePage(portalController={PortalController},tabController={TabController},pagesController={PagesController})", portalController, tabController, pagesController);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CheckUserProfilePage"/> class.</summary>
@@ -72,10 +79,12 @@ namespace Dnn.PersonaBar.Security.Components.Checks
 
             if (portalController == null)
             {
+				eventLogger.LogWarning("Throwing ArgumentNullException from CheckUserProfilePage(portalController={PortalController},tabController={TabController},pagesController={PagesController})", portalController, tabController, pagesController);
                 throw new ArgumentNullException(nameof(portalController));
             }
 
             this.portalSettings = new Lazy<IPortalSettings>(portalController.GetCurrentSettings);
+			eventLogger.LogDebug("CheckUserProfilePage(portalController={PortalController},tabController={TabController},pagesController={PagesController}): portalSettings → {PortalSettings}", portalController, tabController, pagesController, portalSettings);
         }
 
         private int PortalId => this.portalSettings.Value.PortalId;
@@ -85,13 +94,17 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc />
         protected override CheckResult ExecuteInternal()
         {
+			eventLogger.LogDebug(">>> Entering ExecuteInternal()");
+			eventLogger.LogDebug("<<< Exiting ExecuteInternal()");
             return this.UserProfilePageIsPublic() ? this.Public() : this.NotPublic();
         }
 
         private bool UserProfilePageIsPublic()
         {
+			eventLogger.LogDebug(">>> Entering UserProfilePageIsPublic()");
             var userProfilePage = this.tabController.GetTab(this.UserTabId, this.PortalId);
 
+			eventLogger.LogDebug("UserProfilePageIsPublic(): userProfilePage → {UserProfilePage}", userProfilePage);
             if (userProfilePage == null || userProfilePage.IsDeleted)
             {
                 return false; // invalid UserTabId in portal settings somehow
@@ -113,27 +126,37 @@ namespace Dnn.PersonaBar.Security.Components.Checks
             }
 
             var myProfilePage = this.FindTabByPath(MyProfileTabPath, this.PortalId);
+			eventLogger.LogDebug("UserProfilePageIsPublic(): myProfilePage → {MyProfilePage}", myProfilePage);
 
             if (myProfilePage == null)
             {
                 return false; // "My Profile" page not found, so not public.
             }
 
+			eventLogger.LogDebug(">>> Entering PageIsPublic(tabInfo={TabInfo})", tabInfo);
+			eventLogger.LogDebug("<<< Exiting PageIsPublic(tabInfo={TabInfo})", tabInfo);
+			eventLogger.LogDebug("<<< Exiting UserProfilePageIsPublic()");
             return this.PageIsPublic(myProfilePage);
         }
 
         private CheckResult Public()
         {
+			eventLogger.LogDebug(">>> Entering Public()");
+			eventLogger.LogDebug("<<< Exiting Public()");
             return new CheckResult(SeverityEnum.Warning, this.Id);
         }
 
         private CheckResult NotPublic()
         {
+			eventLogger.LogDebug(">>> Entering NotPublic()");
+			eventLogger.LogDebug("<<< Exiting NotPublic()");
             return new CheckResult(SeverityEnum.Pass, this.Id);
         }
 
         private TabInfo FindTabByPath(string tabPath, int portalId)
         {
+			eventLogger.LogDebug(">>> Entering FindTabByPath(tabPath={TabPath},portalId={PortalId})", tabPath, portalId);
+			eventLogger.LogDebug("<<< Exiting FindTabByPath(tabPath={TabPath},portalId={PortalId})", tabPath, portalId);
             return this.tabController.GetTabsByPortal(portalId)
                 .Select(kvp => kvp.Value)
                 .Where(tab => !tab.IsDeleted)

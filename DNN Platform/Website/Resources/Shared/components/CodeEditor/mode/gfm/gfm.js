@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("../markdown/markdown"), require("../../addon/mode/overlay"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,28 +13,38 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("gfm", function(config, modeConfig) {
+logger.debug('>>> Entering defineMode()');
   var codeDepth = 0;
+logger.debug('<<< Exiting defineMode()');
   function blankLine(state) {
+	logger.debug(`>>> Entering blankLine(state=${state})`);
     state.code = false;
+	logger.debug(`<<< Exiting blankLine(state=${state})`);
     return null;
   }
   var gfmOverlay = {
     startState: function() {
+	logger.debug('>>> Entering startState()');
       return {
         code: false,
         codeBlock: false,
         ateSpace: false
       };
+	logger.debug('<<< Exiting startState()');
     },
     copyState: function(s) {
+	logger.debug(`>>> Entering copyState(s=${s})`);
       return {
         code: s.code,
         codeBlock: s.codeBlock,
         ateSpace: s.ateSpace
       };
+	logger.debug(`<<< Exiting copyState(s=${s})`);
     },
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       state.combineTokens = null;
 
       // Hack to prevent formatting override inside code blocks (block and inline)
@@ -57,6 +69,9 @@ CodeMirror.defineMode("gfm", function(config, modeConfig) {
         stream.next();
         var before = stream.pos;
         stream.eatWhile('`');
+		logger.debug(`token(stream=${stream},state=${state}): state.code → ${state.code}`);
+		logger.debug(`token(stream=${stream},state=${state}): state.combineTokens → ${state.combineTokens}`);
+		logger.debug(`token(stream=${stream},state=${state}): state.codeBlock → ${state.codeBlock}`);
         var difference = 1 + stream.pos - before;
         if (!state.code) {
           codeDepth = difference;
@@ -74,6 +89,7 @@ CodeMirror.defineMode("gfm", function(config, modeConfig) {
       // Check if space. If so, links can be formatted later on
       if (stream.eatSpace()) {
         state.ateSpace = true;
+		logger.debug(`token(stream=${stream},state=${state}): state.ateSpace → ${state.ateSpace}`);
         return null;
       }
       if (stream.sol() || state.ateSpace) {
@@ -89,6 +105,7 @@ CodeMirror.defineMode("gfm", function(config, modeConfig) {
           // User#Num
           // #Num
           state.combineTokens = true;
+		logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
           return "link";
         }
       }

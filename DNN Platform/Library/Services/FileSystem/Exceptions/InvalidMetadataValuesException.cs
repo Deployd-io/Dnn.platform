@@ -10,9 +10,12 @@ namespace DotNetNuke.Services.FileSystem
     [Serializable]
     public class InvalidMetadataValuesException : Exception
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(InvalidMetadataValuesException));
         /// <summary>Initializes a new instance of the <see cref="InvalidMetadataValuesException"/> class.</summary>
         public InvalidMetadataValuesException()
         {
+		Logger.LogDebug(">>> Entering InvalidMetadataValuesException()");
+		Logger.LogDebug("<<< Exiting InvalidMetadataValuesException()");
         }
 
         /// <summary>Initializes a new instance of the <see cref="InvalidMetadataValuesException"/> class.</summary>
@@ -20,7 +23,9 @@ namespace DotNetNuke.Services.FileSystem
         public InvalidMetadataValuesException(string message)
             : base(message)
         {
+		Logger.LogDebug(">>> Entering InvalidMetadataValuesException(message={Message})", message);
         }
+		Logger.LogDebug("<<< Exiting InvalidMetadataValuesException(message={Message})", message);
 
         /// <summary>Initializes a new instance of the <see cref="InvalidMetadataValuesException"/> class.</summary>
         /// <param name="message">The message that describes the error.</param>

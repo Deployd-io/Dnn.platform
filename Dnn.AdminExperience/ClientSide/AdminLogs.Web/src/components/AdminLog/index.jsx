@@ -9,6 +9,7 @@ import { Checkbox, Dropdown, Pager, TextOverflowWrapper } from "@dnnsoftware/dnn
 import "./style.less";
 import util from "../../utils";
 import Localization from "localization";
+const logger = console;
 import {
     createPortalOptions,
     createLogTypeOptions
@@ -22,6 +23,7 @@ let isHost = false;
 class AdminLogPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             logList: [],
             portalList: [],
@@ -39,13 +41,18 @@ class AdminLogPanelBody extends Component {
             totalCount: 0
         };
         canEdit = util.settings.isHost || util.settings.permissions.ADMIN_LOGS_EDIT;
+		logger.debug(`constructor(): this.state → ${this.state}`);
+		logger.debug(`constructor(): canEdit → ${canEdit}`);
         isHost = util.settings.isHost;
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {props} = this;
         props.dispatch(LogActions.getPortalList(util.settings.isHost, (dataPortal) => {
             let portalList = Object.assign([], dataPortal.Results);
+			logger.debug(`UNSAFE_componentWillMount(): portalList → ${portalList}`);
             let currentPortalId = portalList[0].PortalId;
             let currentPortal = portalList[0].PortalName;
             this.setState({
@@ -63,11 +70,14 @@ class AdminLogPanelBody extends Component {
         pageSizeOptions.push({ "value": 50, "label": "50 entries per page" });
         pageSizeOptions.push({ "value": 100, "label": "100 entries per page" });
         pageSizeOptions.push({ "value": 250, "label": "250 entries per page" });
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
     getLogTypes() {
+		logger.debug('>>> Entering getLogTypes()');
         const {props} = this;
         props.dispatch(LogActions.getLogTypeList((dataLog) => {
             let logTypeList = Object.assign([], dataLog.Results);
+			logger.debug(`getLogTypes(): logTypeList → ${logTypeList}`);
             let currentLogType = logTypeList[0].LogTypeFriendlyName;
             let currentLogTypeKey = logTypeList[0].LogTypeKey;
             this.setState({
@@ -77,9 +87,11 @@ class AdminLogPanelBody extends Component {
             }, () => {
                 props.dispatch(LogActions.getLogList(this.getNextPage()));
             });
+			logger.debug('<<< Exiting getLogTypes()');
         }));
     }
     getNextPage() {
+		logger.debug('>>> Entering getNextPage()');
         const {state} = this;
         if (state.currentPortalId === -1 || state.currentPortalId === "-1") {
             return {
@@ -89,6 +101,7 @@ class AdminLogPanelBody extends Component {
             };
         }
         else {
+			logger.debug('<<< Exiting getNextPage()');
             return {
                 portalId: state.currentPortalId,
                 pageIndex: state.pageIndex || 0,
@@ -99,27 +112,33 @@ class AdminLogPanelBody extends Component {
     }
 
     onSelectAll() {
+		logger.debug('>>> Entering onSelectAll()');
         const {props} = this;
         if (props.excludedRowIds.length == 0) {
             props.dispatch(LogActions.deselectAll());
         }
         else {
             props.dispatch(LogActions.selectAll());
+			logger.debug('<<< Exiting onSelectAll()');
         }
     }
 
     onClearLog() {
+		logger.debug('>>> Entering onClearLog()');
         const {props} = this;
         util.utilities.confirm(Localization.get("ClearLog"), Localization.get("yes"), Localization.get("no"), () => {
             let getNextPageParam = this.getNextPage();
+			logger.debug(`onClearLog(): getNextPageParam → ${getNextPageParam}`);
 
             props.dispatch(LogActions.clearLog(() => {
                 props.dispatch(LogActions.getLogList(getNextPageParam));
+				logger.debug('<<< Exiting onClearLog()');
             }));
         });
     }
 
     onDeleteLogItems() {
+		logger.debug('>>> Entering onDeleteLogItems()');
         const {props, state} = this;
         if (props.selectedRowIds.length > 0) {
             util.utilities.confirm(Localization.get("LogDeleteWarning"), Localization.get("yes"), Localization.get("no"), () => {
@@ -143,16 +162,20 @@ class AdminLogPanelBody extends Component {
         }
         else {
             util.utilities.notifyError(Localization.get("SelectException"));
+			logger.debug('<<< Exiting onDeleteLogItems()');
         }
     }
 
     toggleEmailPanel() {
+		logger.debug('>>> Entering toggleEmailPanel()');
         this.setState({
             emailPanelOpen: !this.state.emailPanelOpen
         });
+		logger.debug('<<< Exiting toggleEmailPanel()');
     }
 
     onSelectPortal(option) {
+		logger.debug(`>>> Entering onSelectPortal(option=${option})`);
         const {props, state} = this;
         if (option.value !== state.currentPortalId) {
             this.setState({
@@ -162,10 +185,12 @@ class AdminLogPanelBody extends Component {
             }, () => {
                 props.dispatch(LogActions.getLogList(this.getNextPage()));
             });
+			logger.debug(`<<< Exiting onSelectPortal(option=${option})`);
         }
     }
 
     onSelectLogType(option) {
+		logger.debug(`>>> Entering onSelectLogType(option=${option})`);
         const {props, state} = this;
         if (option.value !== state.currentLogTypeKey) {
             this.setState({
@@ -175,10 +200,12 @@ class AdminLogPanelBody extends Component {
             }, () => {
                 props.dispatch(LogActions.getLogList(this.getNextPage()));
             });
+			logger.debug(`<<< Exiting onSelectLogType(option=${option})`);
         }
     }
 
     renderLogListHeader() {
+		logger.debug('>>> Entering renderLogListHeader()');
         const {props} = this;
         if (!props.excludedRowIds) {
             return;
@@ -200,6 +227,7 @@ class AdminLogPanelBody extends Component {
             </div>;
         });
 
+		logger.debug(`renderLogListHeader(): tableHeaders → ${tableHeaders}`);
         const isDeselectState = props.excludedRowIds.length == 0 && props.excludedRowIds.length || !props.excludedRowIds.length == 0 && props.selectedRowIds.length;
         const checkboxClassName = "checkbox" + (isDeselectState ? " deselect-state" : "");
         tableHeaders.unshift(<div key={"selector" + "999999"} className="logHeader logHeader-Checkbox" data-index="0">
@@ -208,12 +236,15 @@ class AdminLogPanelBody extends Component {
             </div>
         </div>);
 
+		logger.debug('<<< Exiting renderLogListHeader()');
         return <div className="logHeader-wrapper">{tableHeaders}</div>;
     }
 
 
     renderedLogList() {
+		logger.debug('>>> Entering renderedLogList()');
         const {props} = this;
+		logger.debug('<<< Exiting renderedLogList()');
         return props.logList.map((term, index) => {
             return (
                 <LogItemRow
@@ -235,13 +266,17 @@ class AdminLogPanelBody extends Component {
     }
 
     isLastPage() {
+		logger.debug('>>> Entering isLastPage()');
         const {props, state} = this;
         let total = Math.ceil(props.totalCount / state.pageSize);
+		logger.debug(`isLastPage(): total → ${total}`);
         let current = state.pageIndex * state.pageSize / state.pageSize + 1;
+		logger.debug('<<< Exiting isLastPage()');
         return total === current ? true : false;
     }
 
     onPageChange(currentPage, pageSize) {
+		logger.debug(`>>> Entering onPageChange(currentPage=${currentPage},pageSize=${pageSize})`);
         let {state, props} = this;
         if (pageSize !== undefined && state.pageSize !== pageSize) {
             state.pageSize = pageSize;
@@ -251,12 +286,17 @@ class AdminLogPanelBody extends Component {
             state
         }, () => {
             let getNextPageParam = this.getNextPage();
+			logger.debug(`onPageChange(currentPage=${currentPage},pageSize=${pageSize}): getNextPageParam → ${getNextPageParam}`);
             props.dispatch(LogActions.getLogList(getNextPageParam));
         });
+		logger.debug(`onPageChange(currentPage=${currentPage},pageSize=${pageSize}): state.pageSize → ${state.pageSize}`);
+		logger.debug(`<<< Exiting onPageChange(currentPage=${currentPage},pageSize=${pageSize})`);
     }
 
     renderPager() {
+		logger.debug('>>> Entering renderPager()');
         const {props, state} = this;
+		logger.debug('<<< Exiting renderPager()');
         return (
             <div className="logPager">
                 <Pager
@@ -277,6 +317,7 @@ class AdminLogPanelBody extends Component {
     }
 
     renderedLogLegend() {
+		logger.debug('>>> Entering renderedLogLegend()');
         const legendItems = [
             { "name": Localization.get("ExceptionCode"), "id": "Exception" },
             { "name": Localization.get("ItemCreatedCode"), "id": "ItemCreated" },
@@ -300,13 +341,17 @@ class AdminLogPanelBody extends Component {
             </div>;
         });
 
+		logger.debug(`renderedLogLegend(): legend → ${legend}`);
+		logger.debug('<<< Exiting renderedLogLegend()');
         return <div className="logLegend-wrapper">{legend}</div>;
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
         let portalOptions = createPortalOptions(state.portalList);
         let logTypeOptions = createLogTypeOptions(state.logTypeList);
+		logger.debug('<<< Exiting render()');
         return (
             <div style={{ margin: "0 20px", float: "left" }}>
                 <div className="toolbar">
@@ -392,6 +437,8 @@ AdminLogPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         logList: state.log.logList,
         logTypeList: state.log.logTypeList,

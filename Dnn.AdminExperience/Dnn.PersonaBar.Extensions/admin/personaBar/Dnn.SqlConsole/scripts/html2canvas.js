@@ -1,3 +1,4 @@
+const logger = console;
 ﻿/*
   html2canvas 0.4.1 <http://html2canvas.hertzen.com>
   Copyright (c) 2013 Niklas von Hertzen
@@ -190,6 +191,7 @@ _html2canvas.Util.OffsetBounds = function (element) {
 };
 
 function toPX(element, attribute, value ) {
+	logger.debug(`>>> Entering toPX(element=${element},attribute=${attribute},value=${value})`);
     var rsLeft = element.runtimeStyle && element.runtimeStyle[attribute],
         left,
         style = element.style;
@@ -213,6 +215,7 @@ function toPX(element, attribute, value ) {
         style.left = attribute === "fontSize" ? "1em" : (value || 0);
         value = style.pixelLeft + "px";
 
+		logger.debug(`toPX(element=${element},attribute=${attribute},value=${value}): value → ${value}`);
         // Revert the changed values
         style.left = left;
         if (rsLeft) {
@@ -220,7 +223,9 @@ function toPX(element, attribute, value ) {
         }
     }
 
+	logger.debug(`toPX(element=${element},attribute=${attribute},value=${value}): style.left → ${style.left}`);
     if (!/^(thin|medium|thick)$/i.test(value)) {
+	logger.debug(`<<< Exiting toPX(element=${element},attribute=${attribute},value=${value})`);
         return Math.round(parseFloat(value)) + "px";
     }
 
@@ -228,14 +233,18 @@ function toPX(element, attribute, value ) {
 }
 
 function asInt(val) {
+	logger.debug(`>>> Entering asInt(val=${val})`);
+	logger.debug(`<<< Exiting asInt(val=${val})`);
     return parseInt(val, 10);
 }
 
 function parseBackgroundSizePosition(value, element, attribute, index) {
+	logger.debug(`>>> Entering parseBackgroundSizePosition(value=${value},element=${element},attribute=${attribute},index=${index})`);
     value = (value || '').split(',');
     value = value[index || 0] || value[0] || 'auto';
     value = _html2canvas.Util.trimText(value).split(' ');
 
+	logger.debug(`parseBackgroundSizePosition(value=${value},element=${element},attribute=${attribute},index=${index}): value → ${value}`);
     if(attribute === 'backgroundSize' && (!value[0] || value[0].match(/cover|contain|auto/))) {
         //these values will be handled in the parent function
     } else {
@@ -251,6 +260,7 @@ function parseBackgroundSizePosition(value, element, attribute, index) {
         }
         value[1] = (value[1].indexOf("%") === -1) ? toPX(element, attribute + "Y", value[1]) : value[1];
     }
+	logger.debug(`<<< Exiting parseBackgroundSizePosition(value=${value},element=${element},attribute=${attribute},index=${index})`);
     return value;
 }
 
@@ -297,6 +307,7 @@ _html2canvas.Util.resizeBounds = function( current_width, current_height, target
 };
 
 function backgroundBoundsFactory( prop, el, bounds, image, imageIndex, backgroundSize ) {
+	logger.debug(`>>> Entering backgroundBoundsFactory(prop=${prop},el=${el},bounds=${bounds},image=${image},imageIndex=${imageIndex},backgroundSize=${backgroundSize})`);
     var bgposition =  _html2canvas.Util.getCSS( el, prop, imageIndex ) ,
     topPos,
     left,
@@ -325,6 +336,7 @@ function backgroundBoundsFactory( prop, el, bounds, image, imageIndex, backgroun
         } else {
           if (/contain|cover/.test(bgposition[0])) {
             var resized = _html2canvas.Util.resizeBounds(image.width, image.height, bounds.width, bounds.height, bgposition[0]);
+			logger.debug(`backgroundBoundsFactory(prop=${prop},el=${el},bounds=${bounds},image=${image},imageIndex=${imageIndex},backgroundSize=${backgroundSize}): resized → ${resized}`);
             left = resized.width;
             topPos = resized.height;
           } else {
@@ -350,6 +362,7 @@ function backgroundBoundsFactory( prop, el, bounds, image, imageIndex, backgroun
       topPos = parseInt(bgposition[1],10);
     }
 
+	logger.debug(`<<< Exiting backgroundBoundsFactory(prop=${prop},el=${el},bounds=${bounds},image=${image},imageIndex=${imageIndex},backgroundSize=${backgroundSize})`);
     return [left, topPos];
 }
 
@@ -418,6 +431,7 @@ _html2canvas.Util.isTransparent = function(backgroundColor) {
   return (backgroundColor === "transparent" || backgroundColor === "rgba(0, 0, 0, 0)");
 };
 _html2canvas.Util.Font = (function () {
+logger.debug(`>>> Entering function(colorStop=${colorStop})`);
 
   var fontData = {};
 
@@ -803,10 +817,13 @@ _html2canvas.Util.Font = (function () {
       }
     }
 
+	logger.debug(`<<< Exiting function(colorStop=${colorStop})`);
     return gradient;
   };
 
   function addScrollStops(grad) {
+	logger.debug(`>>> Entering addScrollStops(grad=${grad})`);
+	logger.debug(`<<< Exiting addScrollStops(grad=${grad})`);
     return function(colorStop) {
       try {
         grad.addColorStop(colorStop.stop, colorStop.color);
@@ -907,6 +924,7 @@ _html2canvas.Util.Font = (function () {
   };
 })();
 function h2cRenderContext(width, height) {
+logger.debug(`>>> Entering h2cRenderContext(width=${width},height=${height})`);
   var storage = [];
   return {
     storage: storage,
@@ -1011,6 +1029,8 @@ function h2cRenderContext(width, height) {
         name: "drawImage",
         'arguments': arguments
       });
+	logger.debug(`>>> Entering drawImage(ctx=${ctx})`);
+	logger.debug(`<<< Exiting drawImage(ctx=${ctx})`);
     },
     fillText: function () {
       storage.push({
@@ -1025,6 +1045,7 @@ function h2cRenderContext(width, height) {
         name: variable,
         'arguments': value
       });
+	logger.debug(`<<< Exiting h2cRenderContext(width=${width},height=${height})`);
       return value;
     }
   };
@@ -1051,6 +1072,8 @@ _html2canvas.Parse = function (images, options) {
   images = images || {};
 
   function documentWidth () {
+	logger.debug('>>> Entering documentWidth()');
+	logger.debug('<<< Exiting documentWidth()');
     return Math.max(
       Math.max(doc.body.scrollWidth, doc.documentElement.scrollWidth),
       Math.max(doc.body.offsetWidth, doc.documentElement.offsetWidth),
@@ -1059,6 +1082,8 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function documentHeight () {
+	logger.debug('>>> Entering documentHeight()');
+	logger.debug('<<< Exiting documentHeight()');
     return Math.max(
       Math.max(doc.body.scrollHeight, doc.documentElement.scrollHeight),
       Math.max(doc.body.offsetHeight, doc.documentElement.offsetHeight),
@@ -1067,25 +1092,32 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function getCSSInt(element, attribute) {
+	logger.debug(`>>> Entering getCSSInt(element=${element},attribute=${attribute})`);
     var val = parseInt(getCSS(element, attribute), 10);
+	logger.debug(`<<< Exiting getCSSInt(element=${element},attribute=${attribute})`);
     return (isNaN(val)) ? 0 : val; // borders in old IE are throwing 'medium' for demo.html
   }
 
   function renderRect (ctx, x, y, w, h, bgcolor) {
+	logger.debug(`>>> Entering renderRect(ctx=${ctx},x=${x},y=${y},w=${w},h=${h},bgcolor=${bgcolor})`);
     if (bgcolor !== "transparent"){
       ctx.setVariable("fillStyle", bgcolor);
       ctx.fillRect(x, y, w, h);
       numDraws+=1;
+	logger.debug(`<<< Exiting renderRect(ctx=${ctx},x=${x},y=${y},w=${w},h=${h},bgcolor=${bgcolor})`);
     }
   }
 
   function capitalize(m, p1, p2) {
+	logger.debug(`>>> Entering capitalize(m=${m},p1=${p1},p2=${p2})`);
     if (m.length > 0) {
+	logger.debug(`<<< Exiting capitalize(m=${m},p1=${p1},p2=${p2})`);
       return p1 + p2.toUpperCase();
     }
   }
 
   function textTransform (text, transform) {
+	logger.debug(`>>> Entering textTransform(text=${text},transform=${transform})`);
     switch(transform){
       case "lowercase":
         return text.toLowerCase();
@@ -1094,22 +1126,28 @@ _html2canvas.Parse = function (images, options) {
       case "uppercase":
         return text.toUpperCase();
       default:
+		logger.debug(`<<< Exiting textTransform(text=${text},transform=${transform})`);
         return text;
     }
   }
 
   function noLetterSpacing(letter_spacing) {
+	logger.debug(`>>> Entering noLetterSpacing(letter_spacing=${letter_spacing})`);
+	logger.debug(`<<< Exiting noLetterSpacing(letter_spacing=${letter_spacing})`);
     return (/^(normal|none|0px)$/.test(letter_spacing));
   }
 
   function drawText(currentText, x, y, ctx){
+	logger.debug(`>>> Entering drawText(currentText=${currentText},x=${x},y=${y},ctx=${ctx})`);
     if (currentText !== null && Util.trimText(currentText).length > 0) {
       ctx.fillText(currentText, x, y);
       numDraws+=1;
+	logger.debug(`<<< Exiting drawText(currentText=${currentText},x=${x},y=${y},ctx=${ctx})`);
     }
   }
 
   function setTextVariables(ctx, el, text_decoration, color) {
+	logger.debug(`>>> Entering setTextVariables(ctx=${ctx},el=${el},text_decoration=${text_decoration},color=${color})`);
     var align = false,
     bold = getCSS(el, "fontWeight"),
     family = getCSS(el, "fontFamily"),
@@ -1139,11 +1177,13 @@ _html2canvas.Parse = function (images, options) {
     }
 
     if (text_decoration !== "none"){
+	logger.debug(`<<< Exiting setTextVariables(ctx=${ctx},el=${el},text_decoration=${text_decoration},color=${color})`);
       return Util.Font(family, size, doc);
     }
   }
 
   function renderTextDecoration(ctx, text_decoration, bounds, metrics, color) {
+	logger.debug(`>>> Entering renderTextDecoration(ctx=${ctx},text_decoration=${text_decoration},bounds=${bounds},metrics=${metrics},color=${color})`);
     switch(text_decoration) {
       case "underline":
         // Draws a line at the baseline of the font
@@ -1158,9 +1198,11 @@ _html2canvas.Parse = function (images, options) {
         renderRect(ctx, bounds.left, Math.ceil(bounds.top + metrics.middle + metrics.lineWidth), bounds.width, 1, color);
         break;
     }
+	logger.debug(`<<< Exiting renderTextDecoration(ctx=${ctx},text_decoration=${text_decoration},bounds=${bounds},metrics=${metrics},color=${color})`);
   }
 
   function getTextBounds(state, text, textDecoration, isLast, transform) {
+	logger.debug(`>>> Entering getTextBounds(state=${state},text=${text},textDecoration=${textDecoration},isLast=${isLast},transform=${transform})`);
     var bounds;
     if (support.rangeBounds && !transform) {
       if (textDecoration !== "none" || Util.trimText(text).length !== 0) {
@@ -1169,20 +1211,27 @@ _html2canvas.Parse = function (images, options) {
       state.textOffset += text.length;
     } else if (state.node && typeof state.node.nodeValue === "string" ){
       var newTextNode = (isLast) ? state.node.splitText(text.length) : null;
+	logger.debug(`getTextBounds(state=${state},text=${text},textDecoration=${textDecoration},isLast=${isLast},transform=${transform}): newTextNode → ${newTextNode}`);
       bounds = textWrapperBounds(state.node, transform);
       state.node = newTextNode;
+	logger.debug(`getTextBounds(state=${state},text=${text},textDecoration=${textDecoration},isLast=${isLast},transform=${transform}): bounds → ${bounds}`);
     }
+	logger.debug(`<<< Exiting getTextBounds(state=${state},text=${text},textDecoration=${textDecoration},isLast=${isLast},transform=${transform})`);
     return bounds;
   }
 
   function textRangeBounds(text, textNode, textOffset) {
+	logger.debug(`>>> Entering textRangeBounds(text=${text},textNode=${textNode},textOffset=${textOffset})`);
     var range = doc.createRange();
     range.setStart(textNode, textOffset);
+	logger.debug(`textRangeBounds(text=${text},textNode=${textNode},textOffset=${textOffset}): range → ${range}`);
     range.setEnd(textNode, textOffset + text.length);
+	logger.debug(`<<< Exiting textRangeBounds(text=${text},textNode=${textNode},textOffset=${textOffset})`);
     return range.getBoundingClientRect();
   }
 
   function textWrapperBounds(oldTextNode, transform) {
+	logger.debug(`>>> Entering textWrapperBounds(oldTextNode=${oldTextNode},transform=${transform})`);
     var parent = oldTextNode.parentNode,
     wrapElement = doc.createElement('wrapper'),
     backupText = oldTextNode.cloneNode(true);
@@ -1191,11 +1240,14 @@ _html2canvas.Parse = function (images, options) {
     parent.replaceChild(wrapElement, oldTextNode);
 
     var bounds = transform ? Util.OffsetBounds(wrapElement) : Util.Bounds(wrapElement);
+	logger.debug(`textWrapperBounds(oldTextNode=${oldTextNode},transform=${transform}): bounds → ${bounds}`);
     parent.replaceChild(backupText, wrapElement);
+	logger.debug(`<<< Exiting textWrapperBounds(oldTextNode=${oldTextNode},transform=${transform})`);
     return bounds;
   }
 
   function renderText(el, textNode, stack) {
+	logger.debug(`>>> Entering renderText(el=${el},textNode=${textNode},stack=${stack})`);
     var ctx = stack.ctx,
     color = getCSS(el, "color"),
     textDecoration = getCSS(el, "textDecoration"),
@@ -1219,17 +1271,21 @@ _html2canvas.Parse = function (images, options) {
 
       if (options.chinese) {
         textList.forEach(function(word, index) {
+		logger.debug(`>>> Entering forEach(word=${word})`);
           if (/.*[\u4E00-\u9FA5].*$/.test(word)) {
             word = word.split("");
             word.unshift(index, 1);
             textList.splice.apply(textList, word);
+			logger.debug(`<<< Exiting forEach(word=${word})`);
           }
         });
       }
 
       textList.forEach(function(text, index) {
         var bounds = getTextBounds(state, text, textDecoration, (index < textList.length - 1), stack.transform.matrix);
+		logger.debug(`<<< Exiting renderText(el=${el},textNode=${textNode},stack=${stack})`);
         if (bounds) {
+		logger.debug(`forEach(bounds=${bounds}): bounds → ${bounds}`);
           drawText(text, bounds.left, bounds.bottom, ctx);
           renderTextDecoration(ctx, textDecoration, bounds, metrics, color);
         }
@@ -1238,9 +1294,11 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function listPosition (element, val) {
+	logger.debug(`>>> Entering listPosition(element=${element},val=${val})`);
     var boundElement = doc.createElement( "boundelement" ),
     originalType,
     bounds;
+	logger.debug(`listPosition(element=${element},val=${val}): boundElement → ${boundElement}`);
 
     boundElement.style.display = "inline";
 
@@ -1254,10 +1312,12 @@ _html2canvas.Parse = function (images, options) {
     bounds = Util.Bounds(boundElement);
     element.removeChild(boundElement);
     element.style.listStyleType = originalType;
+	logger.debug(`<<< Exiting listPosition(element=${element},val=${val})`);
     return bounds;
   }
 
   function elementIndex(el) {
+	logger.debug(`>>> Entering elementIndex(el=${el})`);
     var i = -1,
     count = 1,
     childs = el.parentNode.childNodes;
@@ -1270,15 +1330,18 @@ _html2canvas.Parse = function (images, options) {
       }
       return count;
     } else {
+	logger.debug(`<<< Exiting elementIndex(el=${el})`);
       return -1;
     }
   }
 
   function listItemText(element, type) {
+	logger.debug(`>>> Entering listItemText(element=${element},type=${type})`);
     var currentIndex = elementIndex(element), text;
     switch(type){
       case "decimal":
         text = currentIndex;
+		logger.debug(`listItemText(element=${element},type=${type}): currentIndex → ${currentIndex}`);
         break;
       case "decimal-leading-zero":
         text = (currentIndex.toString().length === 1) ? currentIndex = "0" + currentIndex.toString() : currentIndex.toString();
@@ -1297,10 +1360,12 @@ _html2canvas.Parse = function (images, options) {
         break;
     }
 
+	logger.debug(`<<< Exiting listItemText(element=${element},type=${type})`);
     return text + ". ";
   }
 
   function renderListItem(element, stack, elBounds) {
+	logger.debug(`>>> Entering renderListItem(element=${element},stack=${stack},elBounds=${elBounds})`);
     var x,
     text,
     ctx = stack.ctx,
@@ -1321,19 +1386,25 @@ _html2canvas.Parse = function (images, options) {
 
       drawText(text, x, listBounds.bottom, ctx);
     }
+	logger.debug(`<<< Exiting renderListItem(element=${element},stack=${stack},elBounds=${elBounds})`);
   }
 
   function loadImage (src){
+	logger.debug(`>>> Entering loadImage(src=${src})`);
     var img = images[src];
+	logger.debug(`<<< Exiting loadImage(src=${src})`);
     return (img && img.succeeded === true) ? img.img : false;
   }
 
   function clipBounds(src, dst){
+	logger.debug(`>>> Entering clipBounds(src=${src},dst=${dst})`);
     var x = Math.max(src.left, dst.left),
     y = Math.max(src.top, dst.top),
     x2 = Math.min((src.left + src.width), (dst.left + dst.width)),
     y2 = Math.min((src.top + src.height), (dst.top + dst.height));
+	logger.debug(`clipBounds(src=${src},dst=${dst}): x → ${x}`);
 
+	logger.debug(`<<< Exiting clipBounds(src=${src},dst=${dst})`);
     return {
       left:x,
       top:y,
@@ -1343,6 +1414,7 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function setZ(element, stack, parentStack){
+	logger.debug(`>>> Entering setZ(element=${element},stack=${stack},parentStack=${parentStack})`);
     var newContext,
     isPositioned = stack.cssPosition !== 'static',
     zIndex = isPositioned ? getCSS(element, 'zIndex') : 'auto',
@@ -1358,22 +1430,29 @@ _html2canvas.Parse = function (images, options) {
 
     stack.zIndex = newContext = h2czContext(zIndex);
     newContext.isPositioned = isPositioned;
+	logger.debug(`setZ(element=${element},stack=${stack},parentStack=${parentStack}): newContext.isPositioned → ${newContext.isPositioned}`);
     newContext.isFloated = isFloated;
+	logger.debug(`setZ(element=${element},stack=${stack},parentStack=${parentStack}): newContext.isFloated → ${newContext.isFloated}`);
     newContext.opacity = opacity;
     newContext.ownStacking = (zIndex !== 'auto' || opacity < 1);
+	logger.debug(`setZ(element=${element},stack=${stack},parentStack=${parentStack}): newContext.opacity → ${newContext.opacity}`);
 
     if (parentStack) {
       parentStack.zIndex.children.push(stack);
+	logger.debug(`<<< Exiting setZ(element=${element},stack=${stack},parentStack=${parentStack})`);
     }
   }
 
   function renderImage(ctx, element, image, bounds, borders) {
+logger.debug(`>>> Entering renderImage(ctx=${ctx},element=${element},image=${image},bounds=${bounds},borders=${borders})`);
 
     var paddingLeft = getCSSInt(element, 'paddingLeft'),
     paddingTop = getCSSInt(element, 'paddingTop'),
     paddingRight = getCSSInt(element, 'paddingRight'),
     paddingBottom = getCSSInt(element, 'paddingBottom');
+	logger.debug(`renderImage(ctx=${ctx},element=${element},image=${image},bounds=${bounds},borders=${borders}): paddingLeft → ${paddingLeft}`);
 
+	logger.debug(`<<< Exiting renderImage(ctx=${ctx},element=${element},image=${image},bounds=${bounds},borders=${borders})`);
     drawImage(
       ctx,
       image,
@@ -1389,16 +1468,21 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function getBorderData(element) {
+	logger.debug(`>>> Entering getBorderData(element=${element})`);
     return ["Top", "Right", "Bottom", "Left"].map(function(side) {
+	logger.debug('>>> Entering map()');
       return {
         width: getCSSInt(element, 'border' + side + 'Width'),
         color: getCSS(element, 'border' + side + 'Color')
       };
     });
+	logger.debug(`<<< Exiting getBorderData(element=${element})`);
   }
 
   function getBorderRadiusData(element) {
+	logger.debug(`>>> Entering getBorderRadiusData(element=${element})`);
     return ["TopLeft", "TopRight", "BottomRight", "BottomLeft"].map(function(side) {
+	logger.debug(`<<< Exiting getBorderRadiusData(element=${element})`);
       return getCSS(element, 'border' + side + 'Radius');
     });
   }
@@ -1468,14 +1552,18 @@ _html2canvas.Parse = function (images, options) {
   })(4 * ((Math.sqrt(2) - 1) / 3));
 
   function bezierCurve(start, startControl, endControl, end) {
+logger.debug(`>>> Entering bezierCurve(start=${start},startControl=${startControl},endControl=${endControl},end=${end})`);
 
     var lerp = function (a, b, t) {
+	logger.debug(`>>> Entering lerp(a=${a},b=${b},t=${t})`);
+	logger.debug(`<<< Exiting lerp(a=${a},b=${b},t=${t})`);
       return {
         x:a.x + (b.x - a.x) * t,
         y:a.y + (b.y - a.y) * t
       };
     };
 
+	logger.debug(`<<< Exiting bezierCurve(start=${start},startControl=${startControl},endControl=${endControl},end=${end})`);
     return {
       start: start,
       startControl: startControl,
@@ -1488,6 +1576,7 @@ _html2canvas.Parse = function (images, options) {
         abbc = lerp(ab, bc, t),
         bccd = lerp(bc, cd, t),
         dest = lerp(abbc, bccd, t);
+		logger.debug(`subdivide(t=${t}): ab → ${ab}`);
         return [bezierCurve(start, ab, abbc, dest), bezierCurve(dest, bccd, cd, end)];
       },
       curveTo: function(borderArgs) {
@@ -1500,6 +1589,7 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function parseCorner(borderArgs, radius1, radius2, corner1, corner2, x, y) {
+	logger.debug(`>>> Entering parseCorner(borderArgs=${borderArgs},radius1=${radius1},radius2=${radius2},corner1=${corner1},corner2=${corner2},x=${x},y=${y})`);
     if (radius1[0] > 0 || radius1[1] > 0) {
       borderArgs.push(["line", corner1[0].start.x, corner1[0].start.y]);
       corner1[0].curveTo(borderArgs);
@@ -1510,10 +1600,12 @@ _html2canvas.Parse = function (images, options) {
 
     if (radius2[0] > 0 || radius2[1] > 0) {
       borderArgs.push(["line", corner2[0].start.x, corner2[0].start.y]);
+	logger.debug(`<<< Exiting parseCorner(borderArgs=${borderArgs},radius1=${radius1},radius2=${radius2},corner1=${corner1},corner2=${corner2},x=${x},y=${y})`);
     }
   }
 
   function drawSide(borderData, radius1, radius2, outer1, inner1, outer2, inner2) {
+	logger.debug(`>>> Entering drawSide(borderData=${borderData},radius1=${radius1},radius2=${radius2},outer1=${outer1},inner1=${inner1},outer2=${outer2},inner2=${inner2})`);
     var borderArgs = [];
 
     if (radius1[0] > 0 || radius1[1] > 0) {
@@ -1540,10 +1632,12 @@ _html2canvas.Parse = function (images, options) {
       borderArgs.push([ "line", borderData.c4[0], borderData.c4[1]]);
     }
 
+	logger.debug(`<<< Exiting drawSide(borderData=${borderData},radius1=${radius1},radius2=${radius2},outer1=${outer1},inner1=${inner1},outer2=${outer2},inner2=${inner2})`);
     return borderArgs;
   }
 
   function calculateCurvePoints(bounds, borderRadius, borders) {
+logger.debug(`>>> Entering calculateCurvePoints(bounds=${bounds},borderRadius=${borderRadius},borders=${borders})`);
 
     var x = bounds.left,
     y = bounds.top,
@@ -1564,6 +1658,7 @@ _html2canvas.Parse = function (images, options) {
     bottomWidth = width - brh,
     leftHeight = height - blv;
 
+	logger.debug(`<<< Exiting calculateCurvePoints(bounds=${bounds},borderRadius=${borderRadius},borders=${borders})`);
     return {
       topLeftOuter: getCurvePoints(
         x,
@@ -1624,6 +1719,7 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function getBorderClip(element, borderPoints, borders, radius, bounds) {
+	logger.debug(`>>> Entering getBorderClip(element=${element},borderPoints=${borderPoints},borders=${borders},radius=${radius},bounds=${bounds})`);
     var backgroundClip = getCSS(element, 'backgroundClip'),
     borderArgs = [];
 
@@ -1632,6 +1728,7 @@ _html2canvas.Parse = function (images, options) {
       case "padding-box":
         parseCorner(borderArgs, radius[0], radius[1], borderPoints.topLeftInner, borderPoints.topRightInner, bounds.left + borders[3].width, bounds.top + borders[0].width);
         parseCorner(borderArgs, radius[1], radius[2], borderPoints.topRightInner, borderPoints.bottomRightInner, bounds.left + bounds.width - borders[1].width, bounds.top + borders[0].width);
+		logger.debug(`getBorderClip(element=${element},borderPoints=${borderPoints},borders=${borders},radius=${radius},bounds=${bounds}): backgroundClip → ${backgroundClip}`);
         parseCorner(borderArgs, radius[2], radius[3], borderPoints.bottomRightInner, borderPoints.bottomLeftInner, bounds.left + bounds.width - borders[1].width, bounds.top + bounds.height - borders[2].width);
         parseCorner(borderArgs, radius[3], radius[0], borderPoints.bottomLeftInner, borderPoints.topLeftInner, bounds.left + borders[3].width, bounds.top + bounds.height - borders[2].width);
         break;
@@ -1644,10 +1741,12 @@ _html2canvas.Parse = function (images, options) {
         break;
     }
 
+	logger.debug(`<<< Exiting getBorderClip(element=${element},borderPoints=${borderPoints},borders=${borders},radius=${radius},bounds=${bounds})`);
     return borderArgs;
   }
 
   function parseBorders(element, bounds, borders){
+	logger.debug(`>>> Entering parseBorders(element=${element},bounds=${bounds},borders=${borders})`);
     var x = bounds.left,
     y = bounds.top,
     width = bounds.width,
@@ -1735,19 +1834,25 @@ _html2canvas.Parse = function (images, options) {
       }
     }
 
+	logger.debug(`<<< Exiting parseBorders(element=${element},bounds=${bounds},borders=${borders})`);
     return borderData;
   }
 
   function createShape(ctx, args) {
+	logger.debug(`>>> Entering createShape(ctx=${ctx},args=${args})`);
     var shape = ctx.drawShape();
     args.forEach(function(border, index) {
       shape[(index === 0) ? "moveTo" : border[0] + "To" ].apply(null, border.slice(1));
     });
+	logger.debug(`createShape(ctx=${ctx},args=${args}): shape → ${shape}`);
+	logger.debug(`<<< Exiting createShape(ctx=${ctx},args=${args})`);
     return shape;
   }
 
   function renderBorders(ctx, borderArgs, color) {
+	logger.debug(`>>> Entering renderBorders(ctx=${ctx},borderArgs=${borderArgs},color=${color})`);
     if (color !== "transparent") {
+	logger.debug(`<<< Exiting renderBorders(ctx=${ctx},borderArgs=${borderArgs},color=${color})`);
       ctx.setVariable( "fillStyle", color);
       createShape(ctx, borderArgs);
       ctx.fill();
@@ -1756,11 +1861,13 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function renderFormValue (el, bounds, stack){
+logger.debug(`>>> Entering renderFormValue(el=${el},bounds=${bounds},stack=${stack})`);
 
     var valueWrap = doc.createElement('valuewrap'),
     cssPropertyArray = ['lineHeight','textAlign','fontFamily','color','fontSize','paddingLeft','paddingTop','width','height','border','borderLeftWidth','borderTopWidth'],
     textValue,
     textNode;
+	logger.debug(`renderFormValue(el=${el},bounds=${bounds},stack=${stack}): valueWrap → ${valueWrap}`);
 
     cssPropertyArray.forEach(function(property) {
       try {
@@ -1795,6 +1902,7 @@ _html2canvas.Parse = function (images, options) {
 
     renderText(el, textNode, stack);
     body.removeChild(valueWrap);
+	logger.debug(`<<< Exiting renderFormValue(el=${el},bounds=${bounds},stack=${stack})`);
   }
 
   function drawImage (ctx) {
@@ -1803,12 +1911,15 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function getPseudoElement(el, which) {
+	logger.debug(`>>> Entering getPseudoElement(el=${el},which=${which})`);
     var elStyle = window.getComputedStyle(el, which);
     if(!elStyle || !elStyle.content || elStyle.content === "none" || elStyle.content === "-moz-alt-content" || elStyle.display === "none") {
+	logger.debug(`getPseudoElement(el=${el},which=${which}): elStyle → ${elStyle}`);
       return;
     }
     var content = elStyle.content + '',
     first = content.substr( 0, 1 );
+	logger.debug(`getPseudoElement(el=${el},which=${which}): content → ${content}`);
     //strips quotes
     if(first === content.substr( content.length - 1 ) && first.match(/'|"/)) {
       content = content.substr( 1, content.length - 2 );
@@ -1837,12 +1948,16 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function indexedProperty(property) {
+	logger.debug(`>>> Entering indexedProperty(property=${property})`);
+	logger.debug(`<<< Exiting indexedProperty(property=${property})`);
     return (isNaN(window.parseInt(property, 10)));
   }
 
   function injectPseudoElements(el, stack) {
+	logger.debug(`>>> Entering injectPseudoElements(el=${el},stack=${stack})`);
     var before = getPseudoElement(el, ':before'),
     after = getPseudoElement(el, ':after');
+	logger.debug(`injectPseudoElements(el=${el},stack=${stack}): before → ${before}`);
     if(!before && !after) {
       return;
     }
@@ -1861,21 +1976,26 @@ _html2canvas.Parse = function (images, options) {
       parseElement(after, stack, true);
       el.removeChild(after);
       el.className = el.className.replace(pseudoHide + "-after", "").trim();
+	logger.debug(`<<< Exiting injectPseudoElements(el=${el},stack=${stack})`);
     }
 
   }
 
   function renderBackgroundRepeat(ctx, image, backgroundPosition, bounds) {
+	logger.debug(`>>> Entering renderBackgroundRepeat(ctx=${ctx},image=${image},backgroundPosition=${backgroundPosition},bounds=${bounds})`);
     var offsetX = Math.round(bounds.left + backgroundPosition.left),
     offsetY = Math.round(bounds.top + backgroundPosition.top);
+	logger.debug(`renderBackgroundRepeat(ctx=${ctx},image=${image},backgroundPosition=${backgroundPosition},bounds=${bounds}): offsetX → ${offsetX}`);
 
     ctx.createPattern(image);
     ctx.translate(offsetX, offsetY);
     ctx.fill();
     ctx.translate(-offsetX, -offsetY);
+	logger.debug(`<<< Exiting renderBackgroundRepeat(ctx=${ctx},image=${image},backgroundPosition=${backgroundPosition},bounds=${bounds})`);
   }
 
   function backgroundRepeatShape(ctx, image, backgroundPosition, bounds, left, top, width, height) {
+	logger.debug(`>>> Entering backgroundRepeatShape(ctx=${ctx},image=${image},backgroundPosition=${backgroundPosition},bounds=${bounds},left=${left},top=${top},width=${width},height=${height})`);
     var args = [];
     args.push(["line", Math.round(left), Math.round(top)]);
     args.push(["line", Math.round(left + width), Math.round(top)]);
@@ -1886,9 +2006,11 @@ _html2canvas.Parse = function (images, options) {
     ctx.clip();
     renderBackgroundRepeat(ctx, image, backgroundPosition, bounds);
     ctx.restore();
+	logger.debug(`<<< Exiting backgroundRepeatShape(ctx=${ctx},image=${image},backgroundPosition=${backgroundPosition},bounds=${bounds},left=${left},top=${top},width=${width},height=${height})`);
   }
 
   function renderBackgroundColor(ctx, backgroundBounds, bgcolor) {
+	logger.debug(`>>> Entering renderBackgroundColor(ctx=${ctx},backgroundBounds=${backgroundBounds},bgcolor=${bgcolor})`);
     renderRect(
       ctx,
       backgroundBounds.left,
@@ -1897,15 +2019,19 @@ _html2canvas.Parse = function (images, options) {
       backgroundBounds.height,
       bgcolor
       );
+	logger.debug(`<<< Exiting renderBackgroundColor(ctx=${ctx},backgroundBounds=${backgroundBounds},bgcolor=${bgcolor})`);
   }
 
   function renderBackgroundRepeating(el, bounds, ctx, image, imageIndex) {
+	logger.debug(`>>> Entering renderBackgroundRepeating(el=${el},bounds=${bounds},ctx=${ctx},image=${image},imageIndex=${imageIndex})`);
     var backgroundSize = Util.BackgroundSize(el, bounds, image, imageIndex),
     backgroundPosition = Util.BackgroundPosition(el, bounds, image, imageIndex, backgroundSize),
     backgroundRepeat = getCSS(el, "backgroundRepeat").split(",").map(Util.trimText);
+	logger.debug(`renderBackgroundRepeating(el=${el},bounds=${bounds},ctx=${ctx},image=${image},imageIndex=${imageIndex}): backgroundSize → ${backgroundSize}`);
 
     image = resizeImage(image, backgroundSize);
 
+	logger.debug(`renderBackgroundRepeating(el=${el},bounds=${bounds},ctx=${ctx},image=${image},imageIndex=${imageIndex}): image → ${image}`);
     backgroundRepeat = backgroundRepeat[imageIndex] || backgroundRepeat[0];
 
     switch (backgroundRepeat) {
@@ -1931,11 +2057,13 @@ _html2canvas.Parse = function (images, options) {
           width: image.width,
           height: image.height
         });
+		logger.debug(`<<< Exiting renderBackgroundRepeating(el=${el},bounds=${bounds},ctx=${ctx},image=${image},imageIndex=${imageIndex})`);
         break;
     }
   }
 
   function renderBackgroundImage(element, bounds, ctx) {
+	logger.debug(`>>> Entering renderBackgroundImage(element=${element},bounds=${bounds},ctx=${ctx})`);
     var backgroundImage = getCSS(element, "backgroundImage"),
     backgroundImages = Util.parseBackgroundImage(backgroundImage),
     image,
@@ -1959,11 +2087,13 @@ _html2canvas.Parse = function (images, options) {
         renderBackgroundRepeating(element, bounds, ctx, image, imageIndex);
       } else {
         Util.log("html2canvas: Error loading background:", backgroundImage);
+		logger.debug(`<<< Exiting renderBackgroundImage(element=${element},bounds=${bounds},ctx=${ctx})`);
       }
     }
   }
 
   function resizeImage(image, bounds) {
+	logger.debug(`>>> Entering resizeImage(image=${image},bounds=${bounds})`);
     if(image.width === bounds.width && image.height === bounds.height) {
       return image;
     }
@@ -1971,39 +2101,52 @@ _html2canvas.Parse = function (images, options) {
     var ctx, canvas = doc.createElement('canvas');
     canvas.width = bounds.width;
     canvas.height = bounds.height;
+	logger.debug(`resizeImage(image=${image},bounds=${bounds}): canvas.width → ${canvas.width}`);
+	logger.debug(`resizeImage(image=${image},bounds=${bounds}): canvas.height → ${canvas.height}`);
     ctx = canvas.getContext("2d");
     drawImage(ctx, image, 0, 0, image.width, image.height, 0, 0, bounds.width, bounds.height );
+	logger.debug(`<<< Exiting resizeImage(image=${image},bounds=${bounds})`);
     return canvas;
   }
 
   function setOpacity(ctx, element, parentStack) {
+	logger.debug(`>>> Entering setOpacity(ctx=${ctx},element=${element},parentStack=${parentStack})`);
+	logger.debug(`<<< Exiting setOpacity(ctx=${ctx},element=${element},parentStack=${parentStack})`);
     return ctx.setVariable("globalAlpha", getCSS(element, "opacity") * ((parentStack) ? parentStack.opacity : 1));
   }
 
   function removePx(str) {
+	logger.debug(`>>> Entering removePx(str=${str})`);
+	logger.debug(`<<< Exiting removePx(str=${str})`);
     return str.replace("px", "");
   }
 
   var transformRegExp = /(matrix)\((.+)\)/;
 
   function getTransform(element, parentStack) {
+	logger.debug(`>>> Entering getTransform(element=${element},parentStack=${parentStack})`);
     var transform = getCSS(element, "transform") || getCSS(element, "-webkit-transform") || getCSS(element, "-moz-transform") || getCSS(element, "-ms-transform") || getCSS(element, "-o-transform");
     var transformOrigin = getCSS(element, "transform-origin") || getCSS(element, "-webkit-transform-origin") || getCSS(element, "-moz-transform-origin") || getCSS(element, "-ms-transform-origin") || getCSS(element, "-o-transform-origin") || "0px 0px";
+	logger.debug(`getTransform(element=${element},parentStack=${parentStack}): transform → ${transform}`);
 
     transformOrigin = transformOrigin.split(" ").map(removePx).map(Util.asFloat);
+	logger.debug(`getTransform(element=${element},parentStack=${parentStack}): transformOrigin → ${transformOrigin}`);
 
     var matrix;
     if (transform && transform !== "none") {
       var match = transform.match(transformRegExp);
+	logger.debug(`getTransform(element=${element},parentStack=${parentStack}): match → ${match}`);
       if (match) {
         switch(match[1]) {
           case "matrix":
             matrix = match[2].split(",").map(Util.trimText).map(Util.asFloat);
+			logger.debug(`getTransform(element=${element},parentStack=${parentStack}): matrix → ${matrix}`);
             break;
         }
       }
     }
 
+	logger.debug(`<<< Exiting getTransform(element=${element},parentStack=${parentStack})`);
     return {
       origin: transformOrigin,
       matrix: matrix
@@ -2011,6 +2154,7 @@ _html2canvas.Parse = function (images, options) {
   }
 
   function createStack(element, parentStack, bounds, transform) {
+	logger.debug(`>>> Entering createStack(element=${element},parentStack=${parentStack},bounds=${bounds},transform=${transform})`);
     var ctx = h2cRenderContext((!parentStack) ? documentWidth() : bounds.width , (!parentStack) ? documentHeight() : bounds.height),
     stack = {
       ctx: ctx,
@@ -2021,6 +2165,7 @@ _html2canvas.Parse = function (images, options) {
       clip: (parentStack && parentStack.clip) ? Util.Extend( {}, parentStack.clip ) : null
     };
 
+	logger.debug(`createStack(element=${element},parentStack=${parentStack},bounds=${bounds},transform=${transform}): ctx → ${ctx}`);
     setZ(element, stack, parentStack);
 
     // TODO correct overflow for absolute content residing under a static position
@@ -2028,10 +2173,12 @@ _html2canvas.Parse = function (images, options) {
       stack.clip = (stack.clip) ? clipBounds(stack.clip, bounds) : bounds;
     }
 
+	logger.debug(`<<< Exiting createStack(element=${element},parentStack=${parentStack},bounds=${bounds},transform=${transform})`);
     return stack;
   }
 
   function getBackgroundBounds(borders, bounds, clip) {
+	logger.debug(`>>> Entering getBackgroundBounds(borders=${borders},bounds=${bounds},clip=${clip})`);
     var backgroundBounds = {
       left: bounds.left + borders[3].width,
       top: bounds.top + borders[0].width,
@@ -2039,21 +2186,27 @@ _html2canvas.Parse = function (images, options) {
       height: bounds.height - (borders[0].width + borders[2].width)
     };
 
+	logger.debug(`getBackgroundBounds(borders=${borders},bounds=${bounds},clip=${clip}): backgroundBounds → ${backgroundBounds}`);
     if (clip) {
       backgroundBounds = clipBounds(backgroundBounds, clip);
     }
 
+	logger.debug(`<<< Exiting getBackgroundBounds(borders=${borders},bounds=${bounds},clip=${clip})`);
     return backgroundBounds;
   }
 
   function getBounds(element, transform) {
+	logger.debug(`>>> Entering getBounds(element=${element},transform=${transform})`);
     var bounds = (transform.matrix) ? Util.OffsetBounds(element) : Util.Bounds(element);
     transform.origin[0] += bounds.left;
+	logger.debug(`getBounds(element=${element},transform=${transform}): bounds → ${bounds}`);
     transform.origin[1] += bounds.top;
+	logger.debug(`<<< Exiting getBounds(element=${element},transform=${transform})`);
     return bounds;
   }
 
   function renderElement(element, parentStack, pseudoElement, ignoreBackground) {
+	logger.debug(`>>> Entering renderElement(element=${element},parentStack=${parentStack},pseudoElement=${pseudoElement},ignoreBackground=${ignoreBackground})`);
     var transform = getTransform(element, parentStack),
     bounds = getBounds(element, transform),
     image,
@@ -2063,6 +2216,7 @@ _html2canvas.Parse = function (images, options) {
     backgroundBounds = getBackgroundBounds(borders, bounds, stack.clip),
     borderData = parseBorders(element, bounds, borders),
     backgroundColor = (ignoreElementsRegExp.test(element.nodeName)) ? "#efefef" : getCSS(element, "backgroundColor");
+	logger.debug(`renderElement(element=${element},parentStack=${parentStack},pseudoElement=${pseudoElement},ignoreBackground=${ignoreBackground}): transform → ${transform}`);
 
 
     createShape(ctx, borderData.clip);
@@ -2077,6 +2231,7 @@ _html2canvas.Parse = function (images, options) {
       stack.backgroundColor =  backgroundColor;
     }
 
+	logger.debug(`renderElement(element=${element},parentStack=${parentStack},pseudoElement=${pseudoElement},ignoreBackground=${ignoreBackground}): stack.backgroundColor → ${stack.backgroundColor}`);
     ctx.restore();
 
     borderData.borders.forEach(function(border) {
@@ -2120,6 +2275,7 @@ _html2canvas.Parse = function (images, options) {
         break;
     }
 
+	logger.debug(`<<< Exiting renderElement(element=${element},parentStack=${parentStack},pseudoElement=${pseudoElement},ignoreBackground=${ignoreBackground})`);
     return stack;
   }
 
@@ -2865,4 +3021,5 @@ _html2canvas.Renderer.Canvas = function(options) {
     return canvas;
   };
 };
+logger.debug(`<<< Exiting function(elem=${elem})`);
 })(window,document);

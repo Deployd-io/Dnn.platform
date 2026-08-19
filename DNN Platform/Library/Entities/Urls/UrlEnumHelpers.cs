@@ -16,6 +16,7 @@ namespace DotNetNuke.Entities.Urls
     /// <summary>Helpers for <see cref="NewBrowserTypes"/>.</summary>
     public partial class UrlEnumHelpers
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(UrlEnumHelpers));
         /// <summary>Converts a <paramref name="value"/> into a <see cref="OldBrowserTypes"/>.</summary>
         /// <param name="value">The string value.</param>
         /// <returns>The enum value.</returns>
@@ -28,8 +29,11 @@ namespace DotNetNuke.Entities.Urls
         /// <returns>The enum value.</returns>
         public static NewBrowserTypes ParseBrowserType(string value)
         {
+			Logger.LogDebug(">>> Entering ParseBrowserType(value={Value})", value);
+			Logger.LogDebug("<<< Exiting ParseBrowserType(value={Value})", value);
             return string.Equals(value, "Mobile", StringComparison.OrdinalIgnoreCase)
                 ? NewBrowserTypes.Mobile
+				Logger.LogDebug("<<< Exiting FromString(value={Value})", value);
                 : NewBrowserTypes.Normal;
         }
     }

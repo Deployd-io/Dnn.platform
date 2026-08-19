@@ -8,15 +8,19 @@ namespace DotNetNuke.Modules.Html
     using DotNetNuke.Common.Utilities;
     using DotNetNuke.Entities.Users;
     using DotNetNuke.Modules.Html.Components;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>The HtmlTextLogController is the Controller class for managing Log History information the HtmlText module.</summary>
     public class HtmlTextLogController
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>GetHtmlTextLog retrieves a collection of HtmlTextLogInfo objects for an Item.</summary>
         /// <param name="itemID">The Id of the Item.</param>
         /// <returns>An <see cref="ArrayList"/> of <see cref="HtmlTextLogInfo"/> instances.</returns>
         public ArrayList GetHtmlTextLog(int itemID)
         {
+			_logger.LogDebug(">>> Entering GetHtmlTextLog(itemID={ItemID})", itemID);
+			_logger.LogDebug("<<< Exiting GetHtmlTextLog(itemID={ItemID})", itemID);
             return CBO.FillCollection(DataProvider.Instance().GetHtmlTextLog(itemID), typeof(HtmlTextLogInfo));
         }
 
@@ -24,7 +28,9 @@ namespace DotNetNuke.Modules.Html
         /// <param name="objHtmlTextLog">An HtmlTextLogInfo object.</param>
         public void AddHtmlTextLog(HtmlTextLogInfo objHtmlTextLog)
         {
+			_logger.LogDebug(">>> Entering AddHtmlTextLog(objHtmlTextLog={ObjHtmlTextLog})", objHtmlTextLog);
             DataProvider.Instance().AddHtmlTextLog(objHtmlTextLog.ItemID, objHtmlTextLog.StateID, objHtmlTextLog.Comment, objHtmlTextLog.Approved, UserController.Instance.GetCurrentUserInfo().UserID);
+			_logger.LogDebug("<<< Exiting AddHtmlTextLog(objHtmlTextLog={ObjHtmlTextLog})", objHtmlTextLog);
         }
     }
 }

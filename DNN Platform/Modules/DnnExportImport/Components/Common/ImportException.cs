@@ -11,16 +11,21 @@ using System.Runtime.Serialization;
 [Serializable]
 public class ImportException : Exception
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ImportException));
     /// <inheritdoc />
     public ImportException()
     {
+	Logger.LogDebug(">>> Entering ImportException()");
+	Logger.LogDebug("<<< Exiting ImportException()");
     }
 
     /// <inheritdoc />
     public ImportException(string message)
         : base(message)
     {
+	Logger.LogDebug(">>> Entering ImportException(message={Message})", message);
     }
+	Logger.LogDebug("<<< Exiting ImportException(message={Message})", message);
 
     /// <inheritdoc />
     public ImportException(string message, Exception innerException)

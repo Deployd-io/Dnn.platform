@@ -21,6 +21,7 @@ using DotNetNuke.Services.Localization;
 /// <summary>Utilities for the journal module.</summary>
 public class Utilities
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Utilities));
     private static readonly Regex PageRegex = new Regex(
         "<(title)[^>]*?>((?:.|\\n)*?)</\\s*\\1\\s*>",
         RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled);
@@ -46,21 +47,28 @@ public class Utilities
     /// <returns>The localized text.</returns>
     public static string LocalizeControl(string controlText)
     {
+		Logger.LogDebug(">>> Entering LocalizeControl(controlText={ControlText})", controlText);
         var matches = ResexRegex.Matches(controlText);
         foreach (Match match in matches)
         {
+		Logger.LogDebug("LocalizeControl(controlText={ControlText}): matches → {Matches}", controlText, matches);
             var key = match.Value;
+			Logger.LogWarning("LocalizeControl(controlText={ControlText}): key → {Key}", controlText, key);
             var replace = GetSharedResource(key);
+			Logger.LogDebug("LocalizeControl(controlText={ControlText}): replace → {Replace}", controlText, replace);
 
             var newValue = match.Value;
+			Logger.LogDebug("LocalizeControl(controlText={ControlText}): newValue → {NewValue}", controlText, newValue);
             if (!string.IsNullOrEmpty(replace))
             {
                 newValue = replace;
             }
 
             controlText = controlText.Replace(key, newValue);
+			Logger.LogDebug("LocalizeControl(controlText={ControlText}): controlText → {ControlText1}", controlText, controlText);
         }
 
+		Logger.LogDebug("<<< Exiting LocalizeControl(controlText={ControlText})", controlText);
         return controlText;
     }
 
@@ -69,7 +77,9 @@ public class Utilities
     /// <returns>The shared resource value string.</returns>
     public static string GetSharedResource(string key)
     {
+		Logger.LogDebug(">>> Entering GetSharedResource(key={Key})", key);
         var value = Localization.GetString(key, Constants.SharedResourcesPath);
+		Logger.LogDebug("<<< Exiting GetSharedResource(key={Key})", key);
         return value == string.Empty ? key : value;
     }
 
@@ -78,12 +88,14 @@ public class Utilities
     /// <returns>The text without HTML tags.</returns>
     public static string RemoveHTML(string sText)
     {
+		Logger.LogDebug(">>> Entering RemoveHTML(sText={SText})", sText);
         if (string.IsNullOrEmpty(sText))
         {
             return string.Empty;
         }
 
         sText = HttpUtility.HtmlDecode(sText);
+		Logger.LogDebug("RemoveHTML(sText={SText}): sText → {SText1}", sText, sText);
         sText = HttpUtility.UrlDecode(sText);
         sText = sText.Trim();
         if (string.IsNullOrEmpty(sText))
@@ -92,6 +104,7 @@ public class Utilities
         }
 
         sText = HtmlTextRegex.Replace(sText, string.Empty);
+		Logger.LogDebug("<<< Exiting RemoveHTML(sText={SText})", sText);
         return HttpUtility.HtmlEncode(sText);
     }
 
@@ -101,7 +114,10 @@ public class Utilities
     /// <returns><c>true</c> if the users are friends; otherwise, <c>false</c>.</returns>
     public static bool AreFriends(UserInfo profileUser, UserInfo currentUser)
     {
+		Logger.LogDebug(">>> Entering AreFriends(profileUser={ProfileUser},currentUser={CurrentUser})", profileUser, currentUser);
         var friendsRelationShip = RelationshipController.Instance.GetFriendRelationship(profileUser, currentUser);
+		Logger.LogDebug("AreFriends(profileUser={ProfileUser},currentUser={CurrentUser}): friendsRelationShip → {FriendsRelationShip}", profileUser, currentUser, friendsRelationShip);
+		Logger.LogDebug("<<< Exiting AreFriends(profileUser={ProfileUser},currentUser={CurrentUser})", profileUser, currentUser);
         return friendsRelationShip is { Status: RelationshipStatus.Accepted, };
     }
 
@@ -110,8 +126,11 @@ public class Utilities
     /// <returns>The image as a Bitmap, or null if the image could not be retrieved.</returns>
     internal static Bitmap GetImageFromURL(string url)
     {
+		Logger.LogDebug(">>> Entering GetImageFromURL(url={Url})", url);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         Bitmap bmp = null;
         try
+		Logger.LogDebug("GetImageFromURL(url={Url}): bmp → {Bmp}", url, bmp);
         {
             if (!TryGetSafeUri(url, out var imageUri))
             {
@@ -119,11 +138,16 @@ public class Utilities
             }
 
             var myRequest = WebRequest.Create(imageUri);
+			Logger.LogDebug("GetImageFromURL(url={Url}): myRequest → {MyRequest}", url, myRequest);
+			Logger.LogDebug("GetImageFromURL(url={Url}): myRequest.Proxy → {Arg1}", url, myRequest.Proxy);
             myRequest.Proxy = null;
             using var myResponse = myRequest.GetResponse();
+			Logger.LogDebug("GetImageFromURL(url={Url}): myResponse → {MyResponse}", url, myResponse);
             using var myStream = myResponse.GetResponseStream();
+			Logger.LogDebug("GetImageFromURL(url={Url}): myStream → {MyStream}", url, myStream);
             var contentType = myResponse.ContentType;
             var extension = string.Empty;
+			Logger.LogDebug("GetImageFromURL(url={Url}): extension → {Extension}", url, extension);
             if (contentType.Contains("png"))
             {
                 extension = ".png";
@@ -146,6 +170,9 @@ public class Utilities
         }
         catch
         {
+			Logger.LogError("Exception in GetImageFromURL(url={Url}): {Arg1}", url, ex.Message);
+			Logger.LogInformation("GetImageFromURL(url)={Url}: external service call {Url1} took {Arg2} ms", url, url, __logStart.ElapsedMilliseconds);
+			Logger.LogDebug("<<< Exiting GetImageFromURL(url={Url})", url);
             return null;
         }
     }
@@ -156,6 +183,8 @@ public class Utilities
     /// <exception cref="UriFormatException">Thrown if the URL is invalid or unsafe.</exception>
     internal static string PrepareURL(string url)
     {
+		Logger.LogDebug(">>> Entering PrepareURL(url={Url})", url);
+		Logger.LogDebug("<<< Exiting PrepareURL(url={Url})", url);
         return !TryGetSafeUri(url, out var uri)
             ? throw new UriFormatException("Invalid or unsafe URL.")
             : uri.AbsoluteUri;
@@ -166,22 +195,29 @@ public class Utilities
     /// <returns>A <see cref="LinkInfo"/> object containing the link data.</returns>
     internal static LinkInfo GetLinkData(string url)
     {
+		Logger.LogDebug(">>> Entering GetLinkData(url={Url})", url);
         var page = GetPageFromURL(ref url, string.Empty, string.Empty);
         var link = new LinkInfo();
+		Logger.LogDebug("GetLinkData(url={Url}): link → {Link}", url, link);
+		Logger.LogDebug("GetLinkData(url={Url}): page → {Page}", url, page);
         if (string.IsNullOrEmpty(page))
         {
             return link;
         }
 
         link.URL = url;
+		Logger.LogDebug("GetLinkData(url={Url}): link.URL → {Arg1}", url, link.URL);
+		Logger.LogDebug("GetLinkData(url={Url}): link.Images → {Arg1}", url, link.Images);
         link.Images = [];
         var m = PageRegex.Match(page);
+		Logger.LogDebug("GetLinkData(url={Url}): m → {M}", url, m);
         if (m.Success)
         {
             link.Title = m.Groups[2].ToString().Trim();
         }
 
         var matches = MetaRegex.Matches(page);
+		Logger.LogDebug("GetLinkData(url={Url}): matches → {Matches}", url, matches);
         var i = 0;
         foreach (Match match in matches)
         {
@@ -191,11 +227,13 @@ public class Utilities
                 if (subM.Groups[4].Value.Equals("OG:DESCRIPTION", StringComparison.InvariantCultureIgnoreCase) || subM.Groups[4].Value.Equals("DESCRIPTION", StringComparison.InvariantCultureIgnoreCase))
                 {
                     link.Description = subM.Groups[9].Value;
+					Logger.LogDebug("GetLinkData(url={Url}): link.Description → {Arg1}", url, link.Description);
                 }
 
                 if (subM.Groups[4].Value.Equals("OG:TITLE", StringComparison.InvariantCultureIgnoreCase))
                 {
                     link.Title = subM.Groups[9].Value;
+					Logger.LogDebug("GetLinkData(url={Url}): link.Title → {Arg1}", url, link.Title);
                 }
 
                 if (subM.Groups[4].Value.Equals("OG:IMAGE", StringComparison.InvariantCultureIgnoreCase))
@@ -225,9 +263,11 @@ public class Utilities
         if (!url.Contains("http"))
         {
             url = $"http://{url}";
+			Logger.LogDebug("GetLinkData(url={Url}): url → {Url1}", url, url);
         }
 
         var uri = new Uri(url);
+		Logger.LogDebug("GetLinkData(url={Url}): uri → {Uri}", url, uri);
         var hostUrl = uri.Host;
         hostUrl = url.Contains("https:")
             ? $"https://{hostUrl}"
@@ -236,6 +276,7 @@ public class Utilities
         foreach (Match match in matches)
         {
             var imgSrc = match.Groups[5].Value;
+			Logger.LogDebug("GetLinkData(url={Url}): imgSrc → {ImgSrc}", url, imgSrc);
             if (string.IsNullOrEmpty(imgSrc))
             {
                 imgSrc = match.Groups[8].Value;
@@ -255,6 +296,7 @@ public class Utilities
             if (!imgList.Contains(imgSrc))
             {
                 var bmp = GetImageFromURL(imgSrc);
+				Logger.LogDebug("GetLinkData(url={Url}): bmp → {Bmp}", url, bmp);
                 if (bmp != null)
                 {
                     if (bmp.Height > 25 & bmp.Height < 500 & bmp.Width > 25 & bmp.Width < 500)
@@ -272,6 +314,7 @@ public class Utilities
             }
         }
 
+		Logger.LogDebug("<<< Exiting GetLinkData(url={Url})", url);
         return link;
     }
 
@@ -282,21 +325,30 @@ public class Utilities
     /// <returns>The HTML content of the page as a string.</returns>
     internal static string GetPageFromURL(ref string url, string username, string password)
     {
+		Logger.LogDebug(">>> Entering GetPageFromURL(url={Url},username={Username},password=<redacted>)", url, username);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var cookies = new CookieContainer();
 
+		Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password=<redacted>): cookies → {Cookies}", url, username, cookies);
         Uri pageUri;
         try
         {
             url = PrepareURL(url);
+			Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password=<redacted>): url → {Url1}", url, username, url);
             pageUri = new Uri(url);
         }
         catch (Exception ex)
         {
+			Logger.LogError("Exception in GetPageFromURL(url={Url},username={Username},password=<redacted>): {Arg3}", url, username, ex.getMessage());
             Services.Exceptions.Exceptions.LogException(ex);
             return string.Empty;
         }
 
         var webRequest = (HttpWebRequest)WebRequest.Create(pageUri);
+		Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password=<redacted>): webRequest → {WebRequest}", url, username, webRequest);
+		Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password=<redacted>): webRequest.KeepAlive → {Arg3}", url, username, webRequest.KeepAlive);
+		Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password=<redacted>): webRequest.Proxy → {Arg3}", url, username, webRequest.Proxy);
+		Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password=<redacted>): webRequest.CookieContainer → {Arg3}", url, username, webRequest.CookieContainer);
         webRequest.KeepAlive = false;
         webRequest.Proxy = null;
         webRequest.CookieContainer = cookies;
@@ -306,14 +358,18 @@ public class Utilities
         }
 
         var html = string.Empty;
+		Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password=<redacted>): html → {Html}", url, username, html);
         try
         {
             var webResponse = (HttpWebResponse)webRequest.GetResponse();
+			Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password=<redacted>): webResponse → {WebResponse}", url, username, webResponse);
             if (webRequest.HaveResponse & webResponse.StatusCode == HttpStatusCode.OK)
             {
                 webResponse.Cookies = webRequest.CookieContainer.GetCookies(webRequest.RequestUri);
                 using var stream = webResponse.GetResponseStream();
+				Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password=<redacted>): stream → {Stream}", url, username, stream);
                 using var streamReader = new StreamReader(stream, Encoding.UTF8);
+				Logger.LogDebug("GetPageFromURL(url={Url},username={Username},password=<redacted>): streamReader → {StreamReader}", url, username, streamReader);
                 html = streamReader.ReadToEnd();
                 streamReader.Close();
                 stream.Close();
@@ -326,18 +382,23 @@ public class Utilities
             Services.Exceptions.Exceptions.LogException(ex);
         }
 
+		Logger.LogInformation("GetPageFromURL(url,username,password)={Url},{Username},{Password}: external service call {Url1} took {Arg4} ms", url, username, password, url, __logStart.ElapsedMilliseconds);
+		Logger.LogDebug("<<< Exiting GetPageFromURL(url={Url},username={Username},password=<redacted>)", url, username);
         return html;
     }
 
     private static bool TryGetSafeUri(string input, out Uri uri)
     {
+		Logger.LogDebug(">>> Entering TryGetSafeUri(input={Input})", input);
         uri = null;
         if (string.IsNullOrWhiteSpace(input))
+		Logger.LogDebug("TryGetSafeUri(input={Input}): uri → {Uri}", input, uri);
         {
             return false;
         }
 
         var url = input.Trim();
+		Logger.LogDebug("TryGetSafeUri(input={Input}): url → {Url}", input, url);
         if (!url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) && !url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
         {
             url = $"http://{url}";
@@ -363,6 +424,7 @@ public class Utilities
         try
         {
             var addresses = Dns.GetHostAddresses(uri.DnsSafeHost);
+			Logger.LogDebug("TryGetSafeUri(input={Input}): addresses → {Addresses}", input, addresses);
             if (addresses.Length == 0)
             {
                 return false;
@@ -375,6 +437,8 @@ public class Utilities
         }
         catch
         {
+			Logger.LogError("Exception in TryGetSafeUri(input={Input}): {Arg1}", input, ex.Message);
+		Logger.LogDebug("<<< Exiting TryGetSafeUri(input={Input})", input);
             return false;
         }
 
@@ -383,6 +447,7 @@ public class Utilities
 
     private static bool IsBlockedAddress(IPAddress address)
     {
+		Logger.LogDebug(">>> Entering IsBlockedAddress(address={Address})", address);
         if (IPAddress.IsLoopback(address))
         {
             return true;
@@ -393,6 +458,7 @@ public class Utilities
             case AddressFamily.InterNetwork:
                 {
                     var bytes = address.GetAddressBytes();
+					Logger.LogDebug("IsBlockedAddress(address={Address}): bytes → {Bytes}", address, bytes);
 
                     // IPv4 ranges blocked for SSRF protection:
                     // - 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 (RFC 1918 private networks)
@@ -410,6 +476,7 @@ public class Utilities
                 {
                     var bytes = address.GetAddressBytes();
                     var uniqueLocal = (bytes[0] & 0xFE) == 0xFC;
+					Logger.LogDebug("IsBlockedAddress(address={Address}): uniqueLocal → {UniqueLocal}", address, uniqueLocal);
 
                     // IPv6 ranges blocked for the same reason as IPv4 internal ranges:
                     // - ::1 (loopback)
@@ -424,6 +491,7 @@ public class Utilities
                 }
 
             default:
+				Logger.LogDebug("<<< Exiting IsBlockedAddress(address={Address})", address);
                 return false;
         }
     }

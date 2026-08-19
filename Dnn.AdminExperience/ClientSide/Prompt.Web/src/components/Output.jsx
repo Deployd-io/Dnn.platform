@@ -7,10 +7,12 @@ import TextLine from "../components/TextLine";
 import Help from "../components/Help";
 import { renderObject } from "../utils/helpers";
 import DomKey from "../services/DomKey";
+const logger = console;
 
 export class Output extends Component {
 
     renderResults() {
+		logger.debug('>>> Entering renderResults()');
         const {props} = this;
         const {fieldOrder} = props;
 
@@ -44,24 +46,31 @@ export class Output extends Component {
         }
         else if (props.output) {
             const style = props.isHtml ? "" : props.isError ? "dnn-prompt-error" : `dnn-prompt-${props.style === "cmd" ? "cmd" : "ok"}`;
+			logger.debug('<<< Exiting renderResults()');
             return <TextLine key={DomKey.get("output")} txt={props.output} css={style} isHtml={props.isHtml}/>;
         }
     }
 
     renderData(data, fieldOrder) {
+		logger.debug(`>>> Entering renderData(data=${data},fieldOrder=${fieldOrder})`);
         if (data.length > 1) {
             return <DataTable rows={data} columns={fieldOrder} cssClass=""/>;
         } else if (data.length === 1) {
+		logger.debug(`<<< Exiting renderData(data=${data},fieldOrder=${fieldOrder})`);
             return renderObject(data[0], fieldOrder);
         }
         return <br />;
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         this.output = !props.clearOutput && this.output ? this.output : [];
         const out = this.renderResults();
+		logger.debug(`render(): this.output → ${this.output}`);
+		logger.debug(`render(): out → ${out}`);
         this.output.push(out);
+		logger.debug('<<< Exiting render()');
         return (
             <div className="dnn-prompt-output">
                 {!props.clearOutput && this.output}

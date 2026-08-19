@@ -14,17 +14,23 @@ namespace DotNetNuke.UI.WebControls
     [ToolboxData("<{0}:CheckEditControl runat=server></{0}:CheckEditControl>")]
     public class CheckEditControl : TrueFalseEditControl
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CheckEditControl));
         /// <summary>Initializes a new instance of the <see cref="CheckEditControl"/> class.</summary>
         public CheckEditControl()
         {
+			Logger.LogDebug(">>> Entering CheckEditControl()");
             this.SystemType = "System.Boolean";
+			Logger.LogDebug("CheckEditControl(): this.SystemType → {Arg0}", this.SystemType);
+			Logger.LogDebug("<<< Exiting CheckEditControl()");
         }
 
         /// <inheritdoc />
         public override bool LoadPostData(string postDataKey, NameValueCollection postCollection)
         {
+			Logger.LogDebug(">>> Entering LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
             string postedValue = postCollection[postDataKey];
             bool boolValue = false;
+			Logger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): boolValue → {BoolValue}", postDataKey, postCollection, boolValue);
             if (!(postedValue == null || postedValue == string.Empty))
             {
                 boolValue = true;
@@ -33,6 +39,8 @@ namespace DotNetNuke.UI.WebControls
             if (!this.BooleanValue.Equals(boolValue))
             {
                 this.Value = boolValue;
+				Logger.LogDebug("LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection}): this.Value → {Arg2}", postDataKey, postCollection, this.Value);
+			Logger.LogDebug("<<< Exiting LoadPostData(postDataKey={PostDataKey},postCollection={PostCollection})", postDataKey, postCollection);
                 return true;
             }
 
@@ -42,16 +50,19 @@ namespace DotNetNuke.UI.WebControls
         /// <inheritdoc />
         protected override void OnPreRender(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnPreRender(e={E})", e);
             base.OnPreRender(e);
             if (this.Page != null && this.EditMode == PropertyEditorMode.Edit)
             {
                 this.Page.RegisterRequiresPostBack(this);
             }
+			Logger.LogDebug("<<< Exiting OnPreRender(e={E})", e);
         }
 
         /// <inheritdoc />
         protected override void RenderEditMode(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering RenderEditMode(writer={Writer})", writer);
             writer.AddAttribute(HtmlTextWriterAttribute.Type, "checkbox");
             if (this.BooleanValue)
             {
@@ -68,11 +79,13 @@ namespace DotNetNuke.UI.WebControls
             writer.AddAttribute(HtmlTextWriterAttribute.Id, this.ClientID);
             writer.RenderBeginTag(HtmlTextWriterTag.Input);
             writer.RenderEndTag();
+			Logger.LogDebug("<<< Exiting RenderEditMode(writer={Writer})", writer);
         }
 
         /// <inheritdoc />
         protected override void RenderViewMode(HtmlTextWriter writer)
         {
+			Logger.LogDebug(">>> Entering RenderViewMode(writer={Writer})", writer);
             writer.AddAttribute(HtmlTextWriterAttribute.Type, "checkbox");
             if (this.BooleanValue)
             {
@@ -82,6 +95,7 @@ namespace DotNetNuke.UI.WebControls
             writer.AddAttribute(HtmlTextWriterAttribute.Disabled, "disabled");
             writer.RenderBeginTag(HtmlTextWriterTag.Input);
             writer.RenderEndTag();
+			Logger.LogDebug("<<< Exiting RenderViewMode(writer={Writer})", writer);
         }
     }
 }

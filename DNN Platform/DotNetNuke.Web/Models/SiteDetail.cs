@@ -11,10 +11,13 @@ namespace DotNetNuke.Web.Models
     [DataContract]
     public class SiteDetail
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(SiteDetail));
         /// <summary>Initializes a new instance of the <see cref="SiteDetail"/> class.</summary>
         public SiteDetail()
         {
+			Logger.LogDebug(">>> Entering SiteDetail()");
             this.Modules = new List<ModuleDetail>();
+			Logger.LogDebug("<<< Exiting SiteDetail()");
         }
 
         /// <summary>Gets or sets the version of DNN the site is running.</summary>

@@ -16,10 +16,12 @@ import {
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 class TestUrlPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             test: {
                 PageToTest: "",
@@ -28,16 +30,20 @@ class TestUrlPanelBody extends Component {
                 UrlToTest: ""
             }
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let {state, props} = this;
         let test = Object.assign({}, state.test);
+		logger.debug(`onSettingChange(key=${key},event=${event}): test → ${test}`);
 
         if (key === "PageToTest") {
             test[key] = event;
             if (test[key] === "-1") {
                 props.dispatch(SeoActions.clearUrlTestResults());
+				logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
             }
         }
         else if (key === "UrlToTest") {
@@ -56,9 +62,11 @@ class TestUrlPanelBody extends Component {
     }
 
     keyValuePairsToOptions(keyValuePairs) {
+		logger.debug(`>>> Entering keyValuePairsToOptions(keyValuePairs=${keyValuePairs})`);
         let options = [];
         if (keyValuePairs !== undefined) {
             options = keyValuePairs.map((item) => {
+		logger.debug(`<<< Exiting keyValuePairsToOptions(keyValuePairs=${keyValuePairs})`);
                 return { label: item.Key, value: item.Value };
             });
         }
@@ -66,19 +74,25 @@ class TestUrlPanelBody extends Component {
     }
 
     onTestPage() {
+		logger.debug('>>> Entering onTestPage()');
         let {state, props} = this;
         props.dispatch(SeoActions.testUrl(state.test.PageToTest, state.test.QueryString, state.test.CustomPageName));
+		logger.debug('<<< Exiting onTestPage()');
     }
 
     onTestUrl() {
+		logger.debug('>>> Entering onTestUrl()');
         let {state, props} = this;
         props.dispatch(SeoActions.testUrlRewrite(state.test.UrlToTest));
+		logger.debug('<<< Exiting onTestUrl()');
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const {props, state} = this;
         const noneSpecifiedText = "<" + resx.get("NoneSpecified") + ">";
+		logger.debug(`render(): noneSpecifiedText → ${noneSpecifiedText}`);
         const PageToTestParameters = {
             portalId: -2,
             cultureCode: "",
@@ -236,6 +250,7 @@ class TestUrlPanelBody extends Component {
             </InputGroup>
         </div>;
 
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.testUrl}>
                 <div className="columnTitleOne">{resx.get("TestPageUrl")}</div>
@@ -261,6 +276,8 @@ TestUrlPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         urls: state.seo.urls,

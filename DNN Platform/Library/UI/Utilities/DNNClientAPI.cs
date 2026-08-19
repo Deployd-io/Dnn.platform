@@ -25,6 +25,7 @@ namespace DotNetNuke.UI.Utilities
 
         public enum MinMaxPersistanceType
         {
+			private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DNNClientAPI));
             /// <summary>No min-max persistence.</summary>
             None = 0,
 
@@ -49,27 +50,37 @@ namespace DotNetNuke.UI.Utilities
 
         public static void SetInitialFocus(Page objPage, Control control)
         {
+			Logger.LogDebug(">>> Entering SetInitialFocus(objPage={ObjPage},control={Control})", objPage, control);
             AddBodyOnLoad(objPage, "__dnn_SetInitialFocus", "__dnn_SetInitialFocus('" + control.ClientID + "');");
+			Logger.LogDebug("<<< Exiting SetInitialFocus(objPage={ObjPage},control={Control})", objPage, control);
         }
 
         public static void SetScrollTop(Page objPage)
         {
+			Logger.LogDebug(">>> Entering SetScrollTop(objPage={ObjPage})", objPage);
             AddBodyOnLoad(objPage, "__dnn_setScrollTop", "__dnn_setScrollTop();");
+			Logger.LogDebug("<<< Exiting SetScrollTop(objPage={ObjPage})", objPage);
         }
 
         public static void EnableDragDrop(Page objPage)
         {
+			Logger.LogDebug(">>> Entering EnableDragDrop(objPage={ObjPage})", objPage);
             AddBodyOnLoad(objPage, "__dnn_enableDragDrop", "__dnn_enableDragDrop();");
+			Logger.LogDebug("<<< Exiting EnableDragDrop(objPage={ObjPage})", objPage);
         }
 
         public static void ShowModalPage(Page objPage, string url)
         {
+			Logger.LogDebug(">>> Entering ShowModalPage(objPage={ObjPage},url={Url})", objPage, url);
             AddBodyOnLoad(objPage, "__dnn_ShowModalPage", "__dnn_ShowModalPage('" + url + "');");
+			Logger.LogDebug("<<< Exiting ShowModalPage(objPage={ObjPage},url={Url})", objPage, url);
         }
 
         public static void InitFileManager(Page objPage)
         {
+			Logger.LogDebug(">>> Entering InitFileManager(objPage={ObjPage})", objPage);
             AddBodyOnLoad(objPage, "initFileManager", "initFileManager();");
+			Logger.LogDebug("<<< Exiting InitFileManager(objPage={ObjPage})", objPage);
         }
 
         /// <summary>Allows any module to have drag and drop functionality enabled.</summary>
@@ -81,6 +92,7 @@ namespace DotNetNuke.UI.Utilities
         /// </remarks>
         public static void EnableContainerDragAndDrop(Control objTitle, Control objContainer, int moduleID)
         {
+			Logger.LogDebug(">>> Entering EnableContainerDragAndDrop(objTitle={ObjTitle},objContainer={ObjContainer},moduleID={ModuleID})", objTitle, objContainer, moduleID);
             if (ClientAPI.ClientAPIDisabled() == false && ClientAPI.BrowserSupportsFunctionality(ClientAPI.ClientFunctionality.Positioning))
             {
                 EnableDragDrop(objTitle.Page);
@@ -90,12 +102,14 @@ namespace DotNetNuke.UI.Utilities
                 string strPanes = string.Empty;
                 string strPaneNames = string.Empty;
                 var objPortalSettings = (PortalSettings)HttpContext.Current.Items["PortalSettings"];
+				Logger.LogDebug("EnableContainerDragAndDrop(objTitle={ObjTitle},objContainer={ObjContainer},moduleID={ModuleID}): objPortalSettings → {ObjPortalSettings}", objTitle, objContainer, moduleID, objPortalSettings);
 
                 Control objCtl;
                 foreach (string strPane in objPortalSettings.ActiveTab.Panes)
                 {
                     objCtl = Common.Globals.FindControlRecursive(objContainer.Parent, strPane);
                     if (objCtl != null)
+					Logger.LogDebug("EnableContainerDragAndDrop(objTitle={ObjTitle},objContainer={ObjContainer},moduleID={ModuleID}): objCtl → {ObjCtl}", objTitle, objContainer, moduleID, objCtl);
                     {
                         strPanes += objCtl.ClientID + ";";
                     }
@@ -106,6 +120,7 @@ namespace DotNetNuke.UI.Utilities
                 ClientAPI.RegisterClientVariable(objTitle.Page, "__dnn_Panes", strPanes, true);
                 ClientAPI.RegisterClientVariable(objTitle.Page, "__dnn_PaneNames", strPaneNames, true);
             }
+			Logger.LogDebug("<<< Exiting EnableContainerDragAndDrop(objTitle={ObjTitle},objContainer={ObjContainer},moduleID={ModuleID})", objTitle, objContainer, moduleID);
         }
 
         /// <summary>Allows a button and a content area to support client side min/max functionality.</summary>
@@ -118,17 +133,23 @@ namespace DotNetNuke.UI.Utilities
         /// </remarks>
         public static void EnableMinMax(Control objButton, Control objContent, bool blnDefaultMin, MinMaxPersistanceType ePersistanceType)
         {
+			Logger.LogDebug(">>> Entering EnableMinMax(objButton={ObjButton},objContent={ObjContent},blnDefaultMin={BlnDefaultMin},ePersistanceType={EPersistanceType})", objButton, objContent, blnDefaultMin, ePersistanceType);
             EnableMinMax(objButton, objContent, -1, blnDefaultMin, string.Empty, string.Empty, ePersistanceType);
+			Logger.LogDebug("<<< Exiting EnableMinMax(objButton={ObjButton},objContent={ObjContent},blnDefaultMin={BlnDefaultMin},ePersistanceType={EPersistanceType})", objButton, objContent, blnDefaultMin, ePersistanceType);
         }
 
         public static void EnableMinMax(Control objButton, Control objContent, int intModuleId, bool blnDefaultMin, MinMaxPersistanceType ePersistanceType)
         {
+			Logger.LogDebug(">>> Entering EnableMinMax(objButton={ObjButton},objContent={ObjContent},intModuleId={IntModuleId},blnDefaultMin={BlnDefaultMin},ePersistanceType={EPersistanceType})", objButton, objContent, intModuleId, blnDefaultMin, ePersistanceType);
             EnableMinMax(objButton, objContent, intModuleId, blnDefaultMin, string.Empty, string.Empty, ePersistanceType);
+			Logger.LogDebug("<<< Exiting EnableMinMax(objButton={ObjButton},objContent={ObjContent},intModuleId={IntModuleId},blnDefaultMin={BlnDefaultMin},ePersistanceType={EPersistanceType})", objButton, objContent, intModuleId, blnDefaultMin, ePersistanceType);
         }
 
         public static void EnableMinMax(Control objButton, Control objContent, bool blnDefaultMin, string strMinIconLoc, string strMaxIconLoc, MinMaxPersistanceType ePersistanceType)
         {
+			Logger.LogDebug(">>> Entering EnableMinMax(objButton={ObjButton},objContent={ObjContent},blnDefaultMin={BlnDefaultMin},strMinIconLoc={StrMinIconLoc},strMaxIconLoc={StrMaxIconLoc},ePersistanceType={EPersistanceType})", objButton, objContent, blnDefaultMin, strMinIconLoc, strMaxIconLoc, ePersistanceType);
             EnableMinMax(objButton, objContent, -1, blnDefaultMin, strMinIconLoc, strMaxIconLoc, ePersistanceType);
+			Logger.LogDebug("<<< Exiting EnableMinMax(objButton={ObjButton},objContent={ObjContent},blnDefaultMin={BlnDefaultMin},strMinIconLoc={StrMinIconLoc},strMaxIconLoc={StrMaxIconLoc},ePersistanceType={EPersistanceType})", objButton, objContent, blnDefaultMin, strMinIconLoc, strMaxIconLoc, ePersistanceType);
         }
 
         /// <summary>Allows a button and a content area to support client side min/max functionality.</summary>
@@ -144,21 +165,28 @@ namespace DotNetNuke.UI.Utilities
         /// </remarks>
         public static void EnableMinMax(Control objButton, Control objContent, int intModuleId, bool blnDefaultMin, string strMinIconLoc, string strMaxIconLoc, MinMaxPersistanceType ePersistanceType)
         {
+			Logger.LogDebug(">>> Entering EnableMinMax(objButton={ObjButton},objContent={ObjContent},intModuleId={IntModuleId},blnDefaultMin={BlnDefaultMin},strMinIconLoc={StrMinIconLoc},strMaxIconLoc={StrMaxIconLoc},ePersistanceType={EPersistanceType})", objButton, objContent, intModuleId, blnDefaultMin, strMinIconLoc, strMaxIconLoc, ePersistanceType);
             EnableMinMax(objButton, objContent, intModuleId, blnDefaultMin, strMinIconLoc, strMaxIconLoc, ePersistanceType, 5);
+			Logger.LogDebug("<<< Exiting EnableMinMax(objButton={ObjButton},objContent={ObjContent},intModuleId={IntModuleId},blnDefaultMin={BlnDefaultMin},strMinIconLoc={StrMinIconLoc},strMaxIconLoc={StrMaxIconLoc},ePersistanceType={EPersistanceType})", objButton, objContent, intModuleId, blnDefaultMin, strMinIconLoc, strMaxIconLoc, ePersistanceType);
         }
 
         public static void EnableMinMax(Control objButton, Control objContent, bool blnDefaultMin, string strMinIconLoc, string strMaxIconLoc, MinMaxPersistanceType ePersistanceType, string strPersonalizationNamingCtr, string strPersonalizationKey)
         {
+			Logger.LogDebug(">>> Entering EnableMinMax(objButton={ObjButton},objContent={ObjContent},blnDefaultMin={BlnDefaultMin},strMinIconLoc={StrMinIconLoc},strMaxIconLoc={StrMaxIconLoc},ePersistanceType={EPersistanceType},strPersonalizationNamingCtr={StrPersonalizationNamingCtr},strPersonalizationKey={StrPersonalizationKey})", objButton, objContent, blnDefaultMin, strMinIconLoc, strMaxIconLoc, ePersistanceType, strPersonalizationNamingCtr, strPersonalizationKey);
             EnableMinMax(objButton, objContent, -1, blnDefaultMin, strMinIconLoc, strMaxIconLoc, ePersistanceType, 5, strPersonalizationNamingCtr, strPersonalizationKey);
+			Logger.LogDebug("<<< Exiting EnableMinMax(objButton={ObjButton},objContent={ObjContent},blnDefaultMin={BlnDefaultMin},strMinIconLoc={StrMinIconLoc},strMaxIconLoc={StrMaxIconLoc},ePersistanceType={EPersistanceType},strPersonalizationNamingCtr={StrPersonalizationNamingCtr},strPersonalizationKey={StrPersonalizationKey})", objButton, objContent, blnDefaultMin, strMinIconLoc, strMaxIconLoc, ePersistanceType, strPersonalizationNamingCtr, strPersonalizationKey);
         }
 
         public static void EnableMinMax(Control objButton, Control objContent, int intModuleId, bool blnDefaultMin, string strMinIconLoc, string strMaxIconLoc, MinMaxPersistanceType ePersistanceType, int intAnimationFrames)
         {
+			Logger.LogDebug(">>> Entering EnableMinMax(objButton={ObjButton},objContent={ObjContent},intModuleId={IntModuleId},blnDefaultMin={BlnDefaultMin},strMinIconLoc={StrMinIconLoc},strMaxIconLoc={StrMaxIconLoc},ePersistanceType={EPersistanceType},intAnimationFrames={IntAnimationFrames})", objButton, objContent, intModuleId, blnDefaultMin, strMinIconLoc, strMaxIconLoc, ePersistanceType, intAnimationFrames);
             EnableMinMax(objButton, objContent, intModuleId, blnDefaultMin, strMinIconLoc, strMaxIconLoc, ePersistanceType, intAnimationFrames, null, null);
+			Logger.LogDebug("<<< Exiting EnableMinMax(objButton={ObjButton},objContent={ObjContent},intModuleId={IntModuleId},blnDefaultMin={BlnDefaultMin},strMinIconLoc={StrMinIconLoc},strMaxIconLoc={StrMaxIconLoc},ePersistanceType={EPersistanceType},intAnimationFrames={IntAnimationFrames})", objButton, objContent, intModuleId, blnDefaultMin, strMinIconLoc, strMaxIconLoc, ePersistanceType, intAnimationFrames);
         }
 
         public static void EnableMinMax(Control objButton, Control objContent, int intModuleId, bool blnDefaultMin, string strMinIconLoc, string strMaxIconLoc, MinMaxPersistanceType ePersistanceType, int intAnimationFrames, string strPersonalizationNamingCtr, string strPersonalizationKey)
         {
+			Logger.LogDebug(">>> Entering EnableMinMax(objButton={ObjButton},objContent={ObjContent},intModuleId={IntModuleId},blnDefaultMin={BlnDefaultMin},strMinIconLoc={StrMinIconLoc},strMaxIconLoc={StrMaxIconLoc},ePersistanceType={EPersistanceType},intAnimationFrames={IntAnimationFrames},strPersonalizationNamingCtr={StrPersonalizationNamingCtr},strPersonalizationKey={StrPersonalizationKey})", objButton, objContent, intModuleId, blnDefaultMin, strMinIconLoc, strMaxIconLoc, ePersistanceType, intAnimationFrames, strPersonalizationNamingCtr, strPersonalizationKey);
             if (ClientAPI.BrowserSupportsFunctionality(ClientAPI.ClientFunctionality.DHTML))
             {
                 JavaScript.RegisterClientReference(objButton.Page, ClientAPI.ClientNamespaceReferences.dnn_dom);
@@ -230,6 +258,7 @@ namespace DotNetNuke.UI.Utilities
                 else
                 {
                     objContent.Visible = true;
+					Logger.LogDebug("EnableMinMax(objButton={ObjButton},objContent={ObjContent},intModuleId={IntModuleId},blnDefaultMin={BlnDefaultMin},strMinIconLoc={StrMinIconLoc},strMaxIconLoc={StrMaxIconLoc},ePersistanceType={EPersistanceType},intAnimationFrames={IntAnimationFrames},strPersonalizationNamingCtr={StrPersonalizationNamingCtr},strPersonalizationKey={StrPersonalizationKey}): objContent.Visible → {Arg10}", objButton, objContent, intModuleId, blnDefaultMin, strMinIconLoc, strMaxIconLoc, ePersistanceType, intAnimationFrames, strPersonalizationNamingCtr, strPersonalizationKey, objContent.Visible);
                 }
 
                 if (!string.IsNullOrEmpty(strMinIconLoc))
@@ -258,10 +287,15 @@ namespace DotNetNuke.UI.Utilities
             {
                 ClientAPI.RegisterClientVariable(objButton.Page, "animf_" + objContent.ClientID, intAnimationFrames.ToString(CultureInfo.InvariantCulture), true);
             }
+			Logger.LogDebug("<<< Exiting EnableMinMax(objButton={ObjButton},objContent={ObjContent},intModuleId={IntModuleId},blnDefaultMin={BlnDefaultMin},strMinIconLoc={StrMinIconLoc},strMaxIconLoc={StrMaxIconLoc},ePersistanceType={EPersistanceType},intAnimationFrames={IntAnimationFrames},strPersonalizationNamingCtr={StrPersonalizationNamingCtr},strPersonalizationKey={StrPersonalizationKey})", objButton, objContent, intModuleId, blnDefaultMin, strMinIconLoc, strMaxIconLoc, ePersistanceType, intAnimationFrames, strPersonalizationNamingCtr, strPersonalizationKey);
         }
 
         public static bool MinMaxContentVisibile(Control objButton, bool blnDefaultMin, MinMaxPersistanceType ePersistanceType)
         {
+			Logger.LogDebug(">>> Entering MinMaxContentVisibile(objButton={ObjButton},blnDefaultMin={BlnDefaultMin},ePersistanceType={EPersistanceType})", objButton, blnDefaultMin, ePersistanceType);
+			Logger.LogDebug("<<< Exiting MinMaxContentVisibile(objButton={ObjButton},blnDefaultMin={BlnDefaultMin},ePersistanceType={EPersistanceType})", objButton, blnDefaultMin, ePersistanceType);
+			Logger.LogDebug("<<< Exiting MinMaxContentVisibile(objButton={ObjButton},blnDefaultMin={BlnDefaultMin},ePersistanceType={EPersistanceType},value={Value})", objButton, blnDefaultMin, ePersistanceType, value);
+			Logger.LogDebug("<<< Exiting MinMaxContentVisibile(objButton={ObjButton},intModuleId={IntModuleId},blnDefaultMin={BlnDefaultMin},ePersistanceType={EPersistanceType})", objButton, intModuleId, blnDefaultMin, ePersistanceType);
             return MinMaxContentVisibile(objButton, -1, blnDefaultMin, ePersistanceType);
         }
 
@@ -352,6 +386,7 @@ namespace DotNetNuke.UI.Utilities
         // returns true when browser is capable of callbacks
         public static bool EnableClientPersonalization(string strNamingContainer, string strKey, Page objPage)
         {
+			Logger.LogDebug(">>> Entering EnableClientPersonalization(strNamingContainer={StrNamingContainer},strKey={StrKey},objPage={ObjPage})", strNamingContainer, strKey, objPage);
             if (ClientAPI.BrowserSupportsFunctionality(ClientAPI.ClientFunctionality.XMLHTTP))
             {
                 // Instead of sending the callback js function down to the client, we are hardcoding
@@ -370,6 +405,7 @@ namespace DotNetNuke.UI.Utilities
                     }
                 }
 
+			Logger.LogDebug("<<< Exiting EnableClientPersonalization(strNamingContainer={StrNamingContainer},strKey={StrKey},objPage={ObjPage})", strNamingContainer, strKey, objPage);
                 return true;
             }
 
@@ -378,20 +414,27 @@ namespace DotNetNuke.UI.Utilities
 
         public static bool IsPersonalizationKeyRegistered(string strKey)
         {
+			Logger.LogDebug(">>> Entering IsPersonalizationKeyRegistered(strKey={StrKey})", strKey);
+			Logger.LogDebug("<<< Exiting IsPersonalizationKeyRegistered(strKey={StrKey})", strKey);
             return ObjEnabledClientPersonalizationKeys.ContainsKey(strKey);
         }
 
         private static void AddBodyOnLoad(Page objPage, string scriptKey, string strJSFunction)
         {
+			Logger.LogDebug(">>> Entering AddBodyOnLoad(objPage={ObjPage},scriptKey={ScriptKey},strJSFunction={StrJSFunction})", objPage, scriptKey, strJSFunction);
             JavaScript.RegisterClientReference(objPage, ClientAPI.ClientNamespaceReferences.dnn);
             objPage.ClientScript.RegisterStartupScript(objPage.GetType(), scriptKey, strJSFunction, true);
+			Logger.LogDebug("<<< Exiting AddBodyOnLoad(objPage={ObjPage},scriptKey={ScriptKey},strJSFunction={StrJSFunction})", objPage, scriptKey, strJSFunction);
         }
 
         private static void SetMinMaxProperties(Control objButton, string strImage, string strToolTip, string strAltText)
         {
+			Logger.LogDebug(">>> Entering SetMinMaxProperties(objButton={ObjButton},strImage={StrImage},strToolTip={StrToolTip},strAltText={StrAltText})", objButton, strImage, strToolTip, strAltText);
             if (objButton is LinkButton)
             {
                 var objLB = (LinkButton)objButton;
+				Logger.LogDebug("SetMinMaxProperties(objButton={ObjButton},strImage={StrImage},strToolTip={StrToolTip},strAltText={StrAltText}): objLB → {ObjLB}", objButton, strImage, strToolTip, strAltText, objLB);
+				Logger.LogDebug("SetMinMaxProperties(objButton={ObjButton},strImage={StrImage},strToolTip={StrToolTip},strAltText={StrAltText}): objLB.ToolTip → {Arg4}", objButton, strImage, strToolTip, strAltText, objLB.ToolTip);
                 objLB.ToolTip = strToolTip;
                 if (objLB.Controls.Count > 0)
                 {
@@ -406,13 +449,19 @@ namespace DotNetNuke.UI.Utilities
             {
                 SetImageProperties(objButton, strImage, strToolTip, strAltText);
             }
+			Logger.LogDebug("<<< Exiting SetMinMaxProperties(objButton={ObjButton},strImage={StrImage},strToolTip={StrToolTip},strAltText={StrAltText})", objButton, strImage, strToolTip, strAltText);
         }
 
         private static void SetImageProperties(Control objControl, string strImage, string strToolTip, string strAltText)
         {
+			Logger.LogDebug(">>> Entering SetImageProperties(objControl={ObjControl},strImage={StrImage},strToolTip={StrToolTip},strAltText={StrAltText})", objControl, strImage, strToolTip, strAltText);
             if (objControl is Image)
             {
                 var objImage = (Image)objControl;
+				Logger.LogDebug("SetImageProperties(objControl={ObjControl},strImage={StrImage},strToolTip={StrToolTip},strAltText={StrAltText}): objImage → {ObjImage}", objControl, strImage, strToolTip, strAltText, objImage);
+				Logger.LogDebug("SetImageProperties(objControl={ObjControl},strImage={StrImage},strToolTip={StrToolTip},strAltText={StrAltText}): objImage.ImageUrl → {Arg4}", objControl, strImage, strToolTip, strAltText, objImage.ImageUrl);
+				Logger.LogDebug("SetImageProperties(objControl={ObjControl},strImage={StrImage},strToolTip={StrToolTip},strAltText={StrAltText}): objImage.AlternateText → {Arg4}", objControl, strImage, strToolTip, strAltText, objImage.AlternateText);
+				Logger.LogDebug("SetImageProperties(objControl={ObjControl},strImage={StrImage},strToolTip={StrToolTip},strAltText={StrAltText}): objImage.ToolTip → {Arg4}", objControl, strImage, strToolTip, strAltText, objImage.ToolTip);
                 objImage.ImageUrl = strImage;
                 objImage.AlternateText = strAltText;
                 objImage.ToolTip = strToolTip;
@@ -428,12 +477,16 @@ namespace DotNetNuke.UI.Utilities
             {
                 var objImage = (HtmlImage)objControl;
                 objImage.Src = strImage;
+				Logger.LogDebug("SetImageProperties(objControl={ObjControl},strImage={StrImage},strToolTip={StrToolTip},strAltText={StrAltText}): objImage.Src → {Arg4}", objControl, strImage, strToolTip, strAltText, objImage.Src);
+				Logger.LogDebug("SetImageProperties(objControl={ObjControl},strImage={StrImage},strToolTip={StrToolTip},strAltText={StrAltText}): objImage.Alt → {Arg4}", objControl, strImage, strToolTip, strAltText, objImage.Alt);
                 objImage.Alt = strAltText;
             }
+			Logger.LogDebug("<<< Exiting SetImageProperties(objControl={ObjControl},strImage={StrImage},strToolTip={StrToolTip},strAltText={StrAltText})", objControl, strImage, strToolTip, strAltText);
         }
 
         private static void AddAttribute(Control objControl, string strName, string strValue)
         {
+			Logger.LogDebug(">>> Entering AddAttribute(objControl={ObjControl},strName={StrName},strValue={StrValue})", objControl, strName, strValue);
             if (objControl is HtmlControl)
             {
                 ((HtmlControl)objControl).Attributes.Add(strName, strValue);
@@ -442,10 +495,12 @@ namespace DotNetNuke.UI.Utilities
             {
                 ((WebControl)objControl).Attributes.Add(strName, strValue);
             }
+			Logger.LogDebug("<<< Exiting AddAttribute(objControl={ObjControl},strName={StrName},strValue={StrValue})", objControl, strName, strValue);
         }
 
         private static void AddStyleAttribute(Control objControl, string strName, string strValue)
         {
+			Logger.LogDebug(">>> Entering AddStyleAttribute(objControl={ObjControl},strName={StrName},strValue={StrValue})", objControl, strName, strValue);
             if (objControl is HtmlControl)
             {
                 if (!string.IsNullOrEmpty(strValue))
@@ -468,6 +523,7 @@ namespace DotNetNuke.UI.Utilities
                     ((WebControl)objControl).Style.Remove(strName);
                 }
             }
+			Logger.LogDebug("<<< Exiting AddStyleAttribute(objControl={ObjControl},strName={StrName},strValue={StrValue})", objControl, strName, strValue);
         }
     }
 }

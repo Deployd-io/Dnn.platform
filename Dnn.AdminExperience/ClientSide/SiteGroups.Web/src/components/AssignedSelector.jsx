@@ -4,12 +4,17 @@ import { Scrollbars } from "react-custom-scrollbars";
 import { GridCell, SvgIcons } from "@dnnsoftware/dnn-react-common";
 import Resx from "localization";
 import styles from "./AssignedSelector.module.less";
+const logger = console;
 class AssignedSelector extends React.Component {
     constructor(props) {
         super(props);
+		logger.debug(`>>> Entering constructor(props=${props})`);
+		logger.debug(`<<< Exiting constructor(props=${props})`);
     }
 
     getPortalList(list, type) {
+		logger.debug(`>>> Entering getPortalList(list=${list},type=${type})`);
+		logger.debug(`<<< Exiting getPortalList(list=${list},type=${type})`);
         return list.map((portal, index) => {
             return (
                 <li
@@ -25,6 +30,7 @@ class AssignedSelector extends React.Component {
 
      
     render() {
+		logger.debug('>>> Entering render()');
         const assignedPortals = this.getPortalList(
             this.props.assignedPortals,
             "assignedPortals"
@@ -34,7 +40,9 @@ class AssignedSelector extends React.Component {
             "unassignedPortals"
         );
         let leftSelected = this.props.unassignedPortals.find(p => p.selected) !== null;
+		logger.debug(`render(): leftSelected → ${leftSelected}`);
         let rightSelected = this.props.assignedPortals.find(p => p.selected) !== null;
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className={styles.assignedSelector}>
                 <GridCell columnSize={45} className="selector-box">

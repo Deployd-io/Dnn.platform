@@ -73,25 +73,33 @@ namespace log4net.Core
         /// </remarks>
         public LocationInfo(Type callerStackBoundaryDeclaringType) 
         {
+			value.LogDebug(">>> Entering LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType})", callerStackBoundaryDeclaringType);
             // Initialize all fields
             this.m_className = NA;
+			value.LogDebug("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): this.m_className → {Arg1}", callerStackBoundaryDeclaringType, this.m_className);
             this.m_fileName = NA;
             this.m_lineNumber = NA;
+			value.LogDebug("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): this.m_fileName → {Arg1}", callerStackBoundaryDeclaringType, this.m_fileName);
+			value.LogDebug("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): this.m_lineNumber → {Arg1}", callerStackBoundaryDeclaringType, this.m_lineNumber);
             this.m_methodName = NA;
             this.m_fullInfo = NA;
 
 #if !NETCF && !NETSTANDARD1_3 // StackTrace isn't fully implemented for NETSTANDARD1_3 https://github.com/dotnet/corefx/issues/1797
+			value.LogDebug("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): this.m_methodName → {Arg1}", callerStackBoundaryDeclaringType, this.m_methodName);
+			value.LogDebug("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): this.m_fullInfo → {Arg1}", callerStackBoundaryDeclaringType, this.m_fullInfo);
             if (callerStackBoundaryDeclaringType != null)
             {
                 try
                 {
                     StackTrace st = new StackTrace(true);
+					value.LogDebug("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): st → {St}", callerStackBoundaryDeclaringType, st);
                     int frameIndex = 0;
                                                                                 
                     // skip frames not from fqnOfCallingClass
                     while (frameIndex < st.FrameCount)
                     {
                         StackFrame frame = st.GetFrame(frameIndex);
+						value.LogDebug("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): frame → {Frame}", callerStackBoundaryDeclaringType, frame);
                         if (frame != null && frame.GetMethod().DeclaringType == callerStackBoundaryDeclaringType)
                         {
                             break;
@@ -115,7 +123,9 @@ namespace log4net.Core
                         // take into account the frames we skip above
                         int adjustedFrameCount = st.FrameCount - frameIndex;
                         ArrayList stackFramesList = new ArrayList(adjustedFrameCount);
+						value.LogDebug("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): stackFramesList → {StackFramesList}", callerStackBoundaryDeclaringType, stackFramesList);
                         this.m_stackFrames = new StackFrameItem[adjustedFrameCount];
+						value.LogDebug("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): this.m_stackFrames → {Arg1}", callerStackBoundaryDeclaringType, this.m_stackFrames);
                         for (int i = frameIndex; i < st.FrameCount; i++) 
                         {
                             stackFramesList.Add(new StackFrameItem(st.GetFrame(i)));
@@ -125,10 +135,12 @@ namespace log4net.Core
                         
                         // now frameIndex is the first 'user' caller frame
                         StackFrame locationFrame = st.GetFrame(frameIndex);
+						value.LogDebug("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): locationFrame → {LocationFrame}", callerStackBoundaryDeclaringType, locationFrame);
 
                         if (locationFrame != null)
                         {
                             System.Reflection.MethodBase method = locationFrame.GetMethod();
+							value.LogDebug("LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType}): method → {Method}", callerStackBoundaryDeclaringType, method);
 
                             if (method != null)
                             {
@@ -155,6 +167,7 @@ namespace log4net.Core
                 }
             }
 #endif
+		value.LogDebug("<<< Exiting LocationInfo(callerStackBoundaryDeclaringType={CallerStackBoundaryDeclaringType})", callerStackBoundaryDeclaringType);
         }
 
         /// <summary>Constructor</summary>
@@ -170,12 +183,17 @@ namespace log4net.Core
         /// </remarks>
         public LocationInfo(string className, string methodName, string fileName, string lineNumber)
         {
+			value.LogDebug(">>> Entering LocationInfo(className=<redacted>,methodName={MethodName},fileName={FileName},lineNumber={LineNumber})", methodName, fileName, lineNumber);
             this.m_className = className;
             this.m_fileName = fileName;
+			value.LogDebug("LocationInfo(className=<redacted>,methodName={MethodName},fileName={FileName},lineNumber={LineNumber}): this.m_className → {Arg4}", methodName, fileName, lineNumber, this.m_className);
+			value.LogDebug("LocationInfo(className=<redacted>,methodName={MethodName},fileName={FileName},lineNumber={LineNumber}): this.m_fileName → {Arg4}", methodName, fileName, lineNumber, this.m_fileName);
             this.m_lineNumber = lineNumber;
             this.m_methodName = methodName;
             this.m_fullInfo = this.m_className + '.' + this.m_methodName + '(' + this.m_fileName + 
                               ':' + this.m_lineNumber + ')';
+							value.LogDebug("LocationInfo(className=<redacted>,methodName={MethodName},fileName={FileName},lineNumber={LineNumber}): this.m_lineNumber → {Arg4}", methodName, fileName, lineNumber, this.m_lineNumber);
+							value.LogDebug("<<< Exiting LocationInfo(className=<redacted>,methodName={MethodName},fileName={FileName},lineNumber={LineNumber})", methodName, fileName, lineNumber);
         }
 
         /// <summary>

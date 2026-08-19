@@ -10,6 +10,7 @@ namespace DotNetNuke.Web.Api
     /// <summary>Extension methods for <see cref="Route"/> and <see cref="IHttpRoute"/>.</summary>
     public static class RouteExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RouteExtensions));
         private const string NamespaceKey = "namespaces";
         private const string NameKey = "name";
 
@@ -18,6 +19,7 @@ namespace DotNetNuke.Web.Api
         /// <returns>Route name.</returns>
         public static string GetName(this Route route)
         {
+			Logger.LogDebug("<<< Exiting GetName(route={Route})", route);
             return (string)route.DataTokens[NameKey];
         }
 
@@ -35,6 +37,8 @@ namespace DotNetNuke.Web.Api
         internal static void SetNameSpaces(this Route route, string[] namespaces)
         {
             route.DataTokens[NamespaceKey] = namespaces;
+			Logger.LogDebug(">>> Entering SetNameSpaces(route={Route},namespaces={Namespaces})", route, namespaces);
+			Logger.LogDebug("<<< Exiting SetNameSpaces(route={Route},namespaces={Namespaces})", route, namespaces);
         }
 
         /// <summary>Set the namespaces for the route.</summary>
@@ -50,6 +54,7 @@ namespace DotNetNuke.Web.Api
         /// <returns>Namespaces.</returns>
         internal static string[] GetNameSpaces(this Route route)
         {
+			Logger.LogDebug("<<< Exiting GetNameSpaces(route={Route})", route);
             return (string[])route.DataTokens[NamespaceKey];
         }
 
@@ -67,6 +72,8 @@ namespace DotNetNuke.Web.Api
         internal static void SetName(this Route route, string name)
         {
             route.DataTokens[NameKey] = name;
+			Logger.LogDebug(">>> Entering SetName(route={Route},name={Name})", route, name);
+			Logger.LogDebug("<<< Exiting SetName(route={Route},name={Name})", route, name);
         }
 
         /// <summary>Set the name for the route.</summary>

@@ -1,3 +1,4 @@
+const logger = console;
 ﻿; if (typeof window.dnn === "undefined" || window.dnn === null) { window.dnn = {}; }; //var dnn = dnn || {};
 
 // Copyright (c) .NET Foundation. All rights reserved.
@@ -17,8 +18,11 @@
         return function() {
             if (typeof support === "undefined") {
                 var xhr = new XMLHttpRequest;
+				const _startApi = Date.now();
+				logger.info(`function(): API call took ${Date.now() - _startApi} ms`);
                 support = !!(xhr && ('upload' in xhr) && ('onprogress' in xhr.upload));
             }
+			logger.info(`function(support=${support}): API call took ${Date.now() - _start} ms`);
             return support;
         };
     })();

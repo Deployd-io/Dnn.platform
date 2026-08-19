@@ -7,18 +7,25 @@ import Localization from "localization";
 import Theme from "./Theme";
 import NoDataIcon from "./../SvgIcon/nodata.svg";
 import "./style.less";
+const logger = console;
 
 class ThemeList extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {};
+		logger.debug(`constructor(): this.state → ${this.state}`);
+		logger.debug('<<< Exiting constructor()');
     }
 
 
     render() {
+		logger.debug('>>> Entering render()');
         const { props } = this;
         let globalThemes = props.dataSource.filter(t => t.level === 4);
+		logger.debug(`render(): globalThemes → ${globalThemes}`);
         let siteThemes = props.dataSource.filter(t => t.level === 1 || t.level === 2);
+		logger.debug('<<< Exiting render()');
         return (
             <div className="theme-list-wrapper">
                 {globalThemes.length === 0 && siteThemes.length === 0 &&
@@ -74,6 +81,8 @@ ThemeList.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         currentTheme: state.theme.currentTheme
     };

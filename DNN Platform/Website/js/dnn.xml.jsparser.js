@@ -1,3 +1,4 @@
+const logger = console;
 ﻿
 dnn.xml.parserName='JS';dnn.xml.JsDocument=function()
 {this.root=new dnn.xml.JsXmlNode(this,'__root');this.childNodes=this.root.childNodes;this.currentHashCode=0;}
@@ -9,12 +10,14 @@ dnn.xml.JsDocument.prototype={hasChildNodes:function()
 {oNode=oParent.childNodes[i];if(oNode.nodeName==sNodeName)
 {if(sAttr==null)
 return oNode;else
+logger.debug('>>> Entering hasChildNodes()');
 {if(oNode.getAttribute(sAttr)==sValue)
 return oNode;}}
 if(oNode.childNodes.length>0)
 {var o=this.findNode(oNode,sNodeName,sAttr,sValue);if(o!=null)
 return o;}}},getNextHashCode:function()
 {this.currentHashCode++;return this.currentHashCode;}}
+logger.debug(`hasChildNodes(): o → ${o}`);
 dnn.xml.JsDocument.registerClass('dnn.xml.JsDocument');dnn.xml.JsXmlNode=function(ownerDocument,name)
 {this.ownerDocument=ownerDocument;this.nodeName=name;this.text='';this.childNodes=new Array();this.attributes=new Array();this.parentNode=null;this.hashCode=this.ownerDocument.getNextHashCode();this.nodeType=0;}
 dnn.xml.JsXmlNode.prototype={appendChild:function(oNode)
@@ -23,6 +26,7 @@ dnn.xml.JsXmlNode.prototype={appendChild:function(oNode)
 {if(bFound==false)
 {if(oParent.childNodes[i].hashCode==iHash)
 bFound=true;}
+logger.debug(`>>> Entering appendChild(oNode=${oNode})`);
 if(bFound)
 oParent.childNodes[i]=oParent.childNodes[i+1];}
 if(bFound)
@@ -32,6 +36,9 @@ oParent.childNodes.length=oParent.childNodes.length-1;return oNode;},hasChildNod
 oNode=this;var sXml='';if(oNode.nodeName!='__root')
 sXml='<'+oNode.nodeName+this.getAttributes(oNode)+'>';for(var i=0;i<oNode.childNodes.length;i++)
 {sXml+=this.getXml(oNode.childNodes[i])+oNode.childNodes[i].text;}
+logger.debug(`appendChild(oNode=${oNode}): oParent → ${oParent}`);
+logger.debug(`appendChild(oNode=${oNode}): sXml → ${sXml}`);
+logger.debug(`appendChild(oNode=${oNode}): oNode → ${oNode}`);
 if(oNode.nodeName!='__root')
 sXml=sXml+'</'+oNode.nodeName+'>';return sXml;},getAttributes:function(oNode)
 {var sRet='';for(var sAttr in oNode.attributes)
@@ -61,6 +68,7 @@ return true;else
 return false;},processOpenTag:function(oParent)
 {if(this.isOpenTag(this.getProcessString()))
 {var sArr=this.getProcessString().split(' ');var oNode=new dnn.xml.JsXmlNode(oParent.ownerDocument);oNode.nodeName=sArr[0].substr(1).replace('/','');oNode.parentNode=oParent;this.processAttributes(oNode);oParent.appendChild(oNode);oParent=oNode;}
+logger.debug(`parse(sXml=${sXml},oRoot=${oRoot}): sArr → ${sArr}`);
 return oParent},processAttributes:function(oNode)
 {var s=this.getProcessString();if(s.indexOf(' ')>-1)
 s=s.substr(s.indexOf(' ')+1);if(s.indexOf('=')>-1)
@@ -68,9 +76,11 @@ s=s.substr(s.indexOf(' ')+1);if(s.indexOf('=')>-1)
 {sChar=s.substr(i,1);if(sChar=='"')
 {if(bValue)
 {oNode.attributes[sName]=dnn.decodeHTML(sValue);sName='';sValue='';i++;}
+logger.debug(`>>> Entering processAttributes(oNode=${oNode})`);
 bValue=!bValue;}
 else if(sChar!='='||bValue==true)
 {if(bValue)
 sValue+=sChar;else
+logger.debug(`<<< Exiting parse(sXml=${sXml},oRoot=${oRoot})`);
 sName+=sChar;}}}}}
 dnn.xml.JsParser.registerClass('dnn.xml.JsParser');

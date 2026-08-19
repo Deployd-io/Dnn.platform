@@ -1,8 +1,11 @@
 import { siteBehavior as ActionTypes } from "../constants/actionTypes";
 import ApplicationService from "../services/applicationService";
+const logger = console;
 
 const siteBehaviorActions = {
     getDefaultPagesSettings(portalId, cultureCode, callback) {
+		logger.debug(`>>> Entering getDefaultPagesSettings(portalId=${portalId},cultureCode=${cultureCode},callback=${callback})`);
+		logger.debug(`<<< Exiting getDefaultPagesSettings(portalId=${portalId},cultureCode=${cultureCode},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getDefaultPagesSettings(portalId, cultureCode, data => {
                 dispatch({
@@ -19,6 +22,8 @@ const siteBehaviorActions = {
         };
     },
     updateDefaultPagesSettings(payload, callback, failureCallback) {
+		logger.debug(`>>> Entering updateDefaultPagesSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting updateDefaultPagesSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.updateDefaultPagesSettings(payload, data => {
                 dispatch({
@@ -38,6 +43,8 @@ const siteBehaviorActions = {
         };
     },
     defaultPagesSettingsClientModified(parameter) {
+		logger.debug(`>>> Entering defaultPagesSettingsClientModified(parameter=${parameter})`);
+		logger.debug(`<<< Exiting defaultPagesSettingsClientModified(parameter=${parameter})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SITESETTINGS_DEFAULT_PAGES_SETTINS_CLIENT_MODIFIED,
@@ -49,6 +56,8 @@ const siteBehaviorActions = {
         };
     },
     getMessagingSettings(portalId, callback) {
+		logger.debug(`>>> Entering getMessagingSettings(portalId=${portalId},callback=${callback})`);
+		logger.debug(`<<< Exiting getMessagingSettings(portalId=${portalId},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getMessagingSettings(portalId, data => {
                 dispatch({
@@ -65,6 +74,8 @@ const siteBehaviorActions = {
         };
     },
     updateMessagingSettings(payload, callback, failureCallback) {
+		logger.debug(`>>> Entering updateMessagingSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting updateMessagingSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.updateMessagingSettings(payload, data => {
                 dispatch({
@@ -84,6 +95,8 @@ const siteBehaviorActions = {
         };
     },
     messagingSettingsClientModified(parameter) {
+		logger.debug(`>>> Entering messagingSettingsClientModified(parameter=${parameter})`);
+		logger.debug(`<<< Exiting messagingSettingsClientModified(parameter=${parameter})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SITESETTINGS_MESSAGING_SETTINS_CLIENT_MODIFIED,
@@ -95,6 +108,8 @@ const siteBehaviorActions = {
         };
     },
     getProfileSettings(portalId, callback) {
+		logger.debug(`>>> Entering getProfileSettings(portalId=${portalId},callback=${callback})`);
+		logger.debug(`<<< Exiting getProfileSettings(portalId=${portalId},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getProfileSettings(portalId, data => {
                 dispatch({
@@ -112,6 +127,8 @@ const siteBehaviorActions = {
         };
     },
     updateProfileSettings(payload, callback, failureCallback) {
+		logger.debug(`>>> Entering updateProfileSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting updateProfileSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.updateProfileSettings(payload, data => {
                 dispatch({
@@ -131,6 +148,8 @@ const siteBehaviorActions = {
         };
     },
     profileSettingsClientModified(parameter) {
+		logger.debug(`>>> Entering profileSettingsClientModified(parameter=${parameter})`);
+		logger.debug(`<<< Exiting profileSettingsClientModified(parameter=${parameter})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SITESETTINGS_PROFILE_SETTINS_CLIENT_MODIFIED,
@@ -142,6 +161,8 @@ const siteBehaviorActions = {
         };
     },
     getProfileProperties(portalId, callback) {
+		logger.debug(`>>> Entering getProfileProperties(portalId=${portalId},callback=${callback})`);
+		logger.debug(`<<< Exiting getProfileProperties(portalId=${portalId},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getProfileProperties(portalId, data => {
                 dispatch({
@@ -157,6 +178,8 @@ const siteBehaviorActions = {
         };
     },
     getProfileProperty(propertyId, portalId, callback) {
+		logger.debug(`>>> Entering getProfileProperty(propertyId=${propertyId},portalId=${portalId},callback=${callback})`);
+		logger.debug(`<<< Exiting getProfileProperty(propertyId=${propertyId},portalId=${portalId},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getProfileProperty(propertyId, portalId, data => {
                 dispatch({
@@ -176,6 +199,8 @@ const siteBehaviorActions = {
         };
     },
     profilePropertyClientModified(parameter) {
+		logger.debug(`>>> Entering profilePropertyClientModified(parameter=${parameter})`);
+		logger.debug(`<<< Exiting profilePropertyClientModified(parameter=${parameter})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SITESETTINGS_PROFILE_PROPERTY_CLIENT_MODIFIED,
@@ -187,6 +212,8 @@ const siteBehaviorActions = {
         };
     },
     propertyLocalizationClientModified(parameter) {
+		logger.debug(`>>> Entering propertyLocalizationClientModified(parameter=${parameter})`);
+		logger.debug(`<<< Exiting propertyLocalizationClientModified(parameter=${parameter})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SITESETTINGS_PROFILE_PROPERTY_LOCALIZATION_CLIENT_MODIFIED,
@@ -198,6 +225,8 @@ const siteBehaviorActions = {
         };
     },
     cancelProfilePropertyClientModified() {
+		logger.debug('>>> Entering cancelProfilePropertyClientModified()');
+		logger.debug('<<< Exiting cancelProfilePropertyClientModified()');
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.CANCELED_SITESETTINGS_PROFILE_PROPERTY_CLIENT_MODIFIED,
@@ -208,6 +237,8 @@ const siteBehaviorActions = {
         };
     },
     cancelPropertyLocalizationClientModified() {
+		logger.debug('>>> Entering cancelPropertyLocalizationClientModified()');
+		logger.debug('<<< Exiting cancelPropertyLocalizationClientModified()');
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.CANCELED_SITESETTINGS_PROFILE_PROPERTY_LOCALIZATION_CLIENT_MODIFIED,
@@ -218,6 +249,8 @@ const siteBehaviorActions = {
         };
     },
     getProfilePropertyLocalization(portalId, propertyName, propertyCategory, cultureCode, callback) {
+		logger.debug(`>>> Entering getProfilePropertyLocalization(portalId=${portalId},propertyName=${propertyName},propertyCategory=${propertyCategory},cultureCode=${cultureCode},callback=${callback})`);
+		logger.debug(`<<< Exiting getProfilePropertyLocalization(portalId=${portalId},propertyName=${propertyName},propertyCategory=${propertyCategory},cultureCode=${cultureCode},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getProfilePropertyLocalization(portalId, propertyName, propertyCategory, cultureCode, data => {
                 dispatch({
@@ -234,6 +267,8 @@ const siteBehaviorActions = {
         };
     },
     updateProfileProperty(payload, callback, failureCallback) {
+		logger.debug(`>>> Entering updateProfileProperty(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting updateProfileProperty(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.updateProfileProperty(payload, data => {
                 dispatch({
@@ -253,6 +288,8 @@ const siteBehaviorActions = {
         };
     },
     addProfileProperty(payload, callback, failureCallback) {
+		logger.debug(`>>> Entering addProfileProperty(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting addProfileProperty(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.addProfileProperty(payload, data => {
                 dispatch({
@@ -272,6 +309,8 @@ const siteBehaviorActions = {
         };
     },
     deleteProfileProperty(propertyId, object, callback, failureCallback) {
+		logger.debug(`>>> Entering deleteProfileProperty(propertyId=${propertyId},object=${object},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting deleteProfileProperty(propertyId=${propertyId},object=${object},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.deleteProfileProperty(propertyId, data => {
                 dispatch({
@@ -291,6 +330,8 @@ const siteBehaviorActions = {
         };
     },
     updateProfilePropertyLocalization(payload, callback, failureCallback) {
+		logger.debug(`>>> Entering updateProfilePropertyLocalization(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting updateProfilePropertyLocalization(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.updateProfilePropertyLocalization(payload, data => {
                 dispatch({
@@ -310,6 +351,8 @@ const siteBehaviorActions = {
         };
     },
     getUrlMappingSettings(portalId, callback) {
+		logger.debug(`>>> Entering getUrlMappingSettings(portalId=${portalId},callback=${callback})`);
+		logger.debug(`<<< Exiting getUrlMappingSettings(portalId=${portalId},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getUrlMappingSettings(portalId, data => {
                 dispatch({
@@ -327,6 +370,8 @@ const siteBehaviorActions = {
         };
     },
     getSiteAliases(portalId, callback) {
+		logger.debug(`>>> Entering getSiteAliases(portalId=${portalId},callback=${callback})`);
+		logger.debug(`<<< Exiting getSiteAliases(portalId=${portalId},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getSiteAliases(portalId, data => {
                 dispatch({
@@ -342,6 +387,8 @@ const siteBehaviorActions = {
         };
     },
     urlMappingSettingsClientModified(parameter) {
+		logger.debug(`>>> Entering urlMappingSettingsClientModified(parameter=${parameter})`);
+		logger.debug(`<<< Exiting urlMappingSettingsClientModified(parameter=${parameter})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SITESETTINGS_URL_MAPPING_SETTINGS_CLIENT_MODIFIED,
@@ -353,6 +400,8 @@ const siteBehaviorActions = {
         };
     },
     updateUrlMappingSettings(payload, callback, failureCallback) {
+		logger.debug(`>>> Entering updateUrlMappingSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting updateUrlMappingSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.updateUrlMappingSettings(payload, data => {
                 dispatch({
@@ -372,6 +421,8 @@ const siteBehaviorActions = {
         };
     },
     getSiteAlias(aliasId, callback) {
+		logger.debug(`>>> Entering getSiteAlias(aliasId=${aliasId},callback=${callback})`);
+		logger.debug(`<<< Exiting getSiteAlias(aliasId=${aliasId},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getSiteAlias(aliasId, data => {
                 dispatch({
@@ -387,6 +438,8 @@ const siteBehaviorActions = {
         };
     },
     cancelSiteAliasClientModified() {
+		logger.debug('>>> Entering cancelSiteAliasClientModified()');
+		logger.debug('<<< Exiting cancelSiteAliasClientModified()');
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.CANCELED_SITESETTINGS_SITE_ALIAS_CLIENT_MODIFIED,
@@ -397,6 +450,8 @@ const siteBehaviorActions = {
         };
     },
     siteAliasClientModified(parameter) {
+		logger.debug(`>>> Entering siteAliasClientModified(parameter=${parameter})`);
+		logger.debug(`<<< Exiting siteAliasClientModified(parameter=${parameter})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SITESETTINGS_SITE_ALIAS_CLIENT_MODIFIED,
@@ -408,6 +463,8 @@ const siteBehaviorActions = {
         };
     },
     addSiteAlias(payload, callback, failureCallback) {
+		logger.debug(`>>> Entering addSiteAlias(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting addSiteAlias(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.addSiteAlias(payload, data => {
                 dispatch({
@@ -427,6 +484,8 @@ const siteBehaviorActions = {
         };
     },
     updateSiteAlias(payload, callback, failureCallback) {
+		logger.debug(`>>> Entering updateSiteAlias(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting updateSiteAlias(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.updateSiteAlias(payload, data => {
                 dispatch({
@@ -446,6 +505,8 @@ const siteBehaviorActions = {
         };
     },
     deleteSiteAlias(aliasId, aliases, callback, failureCallback) {
+		logger.debug(`>>> Entering deleteSiteAlias(aliasId=${aliasId},aliases=${aliases},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting deleteSiteAlias(aliasId=${aliasId},aliases=${aliases},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.deleteSiteAlias(aliasId, data => {
                 dispatch({
@@ -465,6 +526,8 @@ const siteBehaviorActions = {
         };
     },
     getPrivacySettings(portalId, callback) {
+		logger.debug(`>>> Entering getPrivacySettings(portalId=${portalId},callback=${callback})`);
+		logger.debug(`<<< Exiting getPrivacySettings(portalId=${portalId},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getPrivacySettings(portalId, data => {
                 dispatch({
@@ -481,6 +544,8 @@ const siteBehaviorActions = {
         };
     },
     updatePrivacySettings(payload, callback, failureCallback) {
+		logger.debug(`>>> Entering updatePrivacySettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting updatePrivacySettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.updatePrivacySettings(payload, data => {
                 dispatch({
@@ -500,6 +565,7 @@ const siteBehaviorActions = {
         };
     },
     resetTermsAgreement(payload, callback, failureCallback) {
+		logger.debug(`>>> Entering resetTermsAgreement(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
         ApplicationService.resetTermsAgreement(payload, data => {
             if (callback) {
                 callback(data);
@@ -507,10 +573,13 @@ const siteBehaviorActions = {
         }, data => {
             if (failureCallback) {
                 failureCallback(data);
+				logger.debug(`<<< Exiting resetTermsAgreement(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
             }
         });
     },
     privacySettingsClientModified(parameter) {
+		logger.debug(`>>> Entering privacySettingsClientModified(parameter=${parameter})`);
+		logger.debug(`<<< Exiting privacySettingsClientModified(parameter=${parameter})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SITESETTINGS_PRIVACY_SETTINGS_CLIENT_MODIFIED,
@@ -522,6 +591,8 @@ const siteBehaviorActions = {
         };
     },
     getOtherSettings(portalId, callback) {
+		logger.debug(`>>> Entering getOtherSettings(portalId=${portalId},callback=${callback})`);
+		logger.debug(`<<< Exiting getOtherSettings(portalId=${portalId},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getOtherSettings(portalId, data => {
                 dispatch({
@@ -539,6 +610,8 @@ const siteBehaviorActions = {
         };
     },
     updateOtherSettings(payload, callback, failureCallback) {
+		logger.debug(`>>> Entering updateOtherSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting updateOtherSettings(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.updateOtherSettings(payload, data => {
                 dispatch({
@@ -558,6 +631,8 @@ const siteBehaviorActions = {
         };
     },
     otherSettingsClientModified(parameter) {
+		logger.debug(`>>> Entering otherSettingsClientModified(parameter=${parameter})`);
+		logger.debug(`<<< Exiting otherSettingsClientModified(parameter=${parameter})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SITESETTINGS_OTHER_SETTINS_CLIENT_MODIFIED,
@@ -569,6 +644,8 @@ const siteBehaviorActions = {
         };
     },
     cancelOtherSettingsClientModified() {
+		logger.debug('>>> Entering cancelOtherSettingsClientModified()');
+		logger.debug('<<< Exiting cancelOtherSettingsClientModified()');
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.CANCELED_SITESETTINGS_OTHER_SETTINGS_CLIENT_MODIFIED,
@@ -579,6 +656,8 @@ const siteBehaviorActions = {
         };
     },
     updateProfilePropertyOrders(payload, object, callback, failureCallback) {
+		logger.debug(`>>> Entering updateProfilePropertyOrders(payload=${payload},object=${object},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting updateProfilePropertyOrders(payload=${payload},object=${object},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.updateProfilePropertyOrders(payload, data => {
                 dispatch({
@@ -599,6 +678,8 @@ const siteBehaviorActions = {
         };
     },
     sortProfileProperty(profileProperties) {
+		logger.debug(`>>> Entering sortProfileProperty(profileProperties=${profileProperties})`);
+		logger.debug(`<<< Exiting sortProfileProperty(profileProperties=${profileProperties})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.UPDATED_SITESETTINGS_PROFILE_PROPERTY_ORDER,
@@ -607,6 +688,8 @@ const siteBehaviorActions = {
         };
     },
     getListInfo(listName, portalId, callback) {
+		logger.debug(`>>> Entering getListInfo(listName=${listName},portalId=${portalId},callback=${callback})`);
+		logger.debug(`<<< Exiting getListInfo(listName=${listName},portalId=${portalId},callback=${callback})`);
         return (dispatch) => {
             ApplicationService.getListInfo(listName, portalId, data => {
                 dispatch({
@@ -623,6 +706,8 @@ const siteBehaviorActions = {
         };
     },
     updateListEntry(payload, callback, failureCallback) {
+		logger.debug(`>>> Entering updateListEntry(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting updateListEntry(payload=${payload},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.updateListEntry(payload, data => {
                 dispatch({
@@ -642,6 +727,8 @@ const siteBehaviorActions = {
         };
     },
     deleteListEntry(entryId, portalId, callback, failureCallback) {
+		logger.debug(`>>> Entering deleteListEntry(entryId=${entryId},portalId=${portalId},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting deleteListEntry(entryId=${entryId},portalId=${portalId},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.deleteListEntry(entryId, portalId, data => {
                 dispatch({
@@ -661,6 +748,8 @@ const siteBehaviorActions = {
         };
     },
     updateListEntryOrders(payload, object, callback, failureCallback) {
+		logger.debug(`>>> Entering updateListEntryOrders(payload=${payload},object=${object},callback=${callback},failureCallback=${failureCallback})`);
+		logger.debug(`<<< Exiting updateListEntryOrders(payload=${payload},object=${object},callback=${callback},failureCallback=${failureCallback})`);
         return (dispatch) => {
             ApplicationService.updateListEntryOrders(payload, data => {
                 dispatch({

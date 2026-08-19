@@ -5,6 +5,7 @@ import { Scrollbars } from "react-custom-scrollbars";
 import Localization from "localization";
 import Html from "../../Html";
 import "./style.less";
+const logger = console;
 
 const inputStyle = { width: "100%" };
 const releaseBoxStyle = {
@@ -15,9 +16,11 @@ const releaseBoxStyle = {
 };
 class ReleaseNotes extends Component {
     render() {
+		logger.debug('>>> Entering render()');
         const {props} = this;
         const {value} = props;
          
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className="release-notes extension-form">
                 {props.installationMode && <h6>{Localization.get("InstallExtension_ReleaseNotes.Header")}</h6>}

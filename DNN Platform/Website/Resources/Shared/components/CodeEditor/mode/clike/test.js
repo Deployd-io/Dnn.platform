@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function() {
+logger.debug('>>> Entering function()');
   var mode = CodeMirror.getMode({indentUnit: 2}, "text/x-c");
   function MT(name) { test.mode(name, mode, Array.prototype.slice.call(arguments, 1)); }
 
@@ -30,4 +32,5 @@
      "  [keyword for] (;;)",
      "    [variable x][operator ++];",
      "[keyword return];");
+	logger.debug('<<< Exiting function()');
 })();

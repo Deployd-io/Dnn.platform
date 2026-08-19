@@ -34,16 +34,20 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Commands
         /// <inheritdoc />
         public override void Init(string[] args, PortalSettings portalSettings, UserInfo userInfo, int activeTabId)
         {
+			Logger.LogDebug(">>> Entering Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
             this.RoleId = this.GetFlagValue(FlagId, "Role Id", -1, true, true, true);
+			Logger.LogDebug("<<< Exiting Init(args={Args},portalSettings={PortalSettings},userInfo={UserInfo},activeTabId={ActiveTabId})", args, portalSettings, userInfo, activeTabId);
         }
 
         /// <inheritdoc />
         public override ConsoleResultModel Run()
         {
+			Logger.LogDebug(">>> Entering Run()");
             try
             {
                 KeyValuePair<HttpStatusCode, string> message;
                 var roleName = RolesController.Instance.DeleteRole(this.PortalSettings, this.RoleId, out message);
+				Logger.LogDebug("Run(): roleName → {RoleName}", roleName);
                 return !string.IsNullOrEmpty(roleName)
                     ? new ConsoleResultModel($"{this.LocalizeString("DeleteRole.Message")} '{roleName}' ({this.RoleId})") { Records = 1 }
                     : new ConsoleErrorResultModel(message.Value);
@@ -51,6 +55,7 @@ namespace Dnn.PersonaBar.Roles.Components.Prompt.Commands
             catch (Exception ex)
             {
                 Logger.Error(ex);
+				Logger.LogDebug("<<< Exiting Run()");
                 return new ConsoleErrorResultModel(this.LocalizeString("DeleteRole.Error"));
             }
         }

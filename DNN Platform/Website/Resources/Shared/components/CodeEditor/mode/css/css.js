@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -11,11 +13,15 @@
 })(function(CodeMirror) {
 "use strict";
 
+logger.debug(`<<< Exiting function(exports=${exports})`);
 CodeMirror.defineMode("css", function(config, parserConfig) {
+logger.debug('>>> Entering defineMode()');
   var provided = parserConfig;
   if (!parserConfig.propertyKeywords) parserConfig = CodeMirror.resolveMode("text/css");
   parserConfig.inline = provided.inline;
+logger.debug(`function(exports=${exports}): parserConfig.inline → ${parserConfig.inline}`);
 
+logger.debug(`defineMode(): parserConfig.inline → ${parserConfig.inline}`);
   var indentUnit = config.indentUnit,
       tokenHooks = parserConfig.tokenHooks,
       documentTypes = parserConfig.documentTypes || {},
@@ -30,15 +36,19 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
       valueKeywords = parserConfig.valueKeywords || {},
       allowNested = parserConfig.allowNested;
 
+logger.debug(`defineMode(): allowNested → ${allowNested}`);
   var type, override;
   function ret(style, tp) { type = tp; return style; }
 
   // Tokenizers
 
   function tokenBase(stream, state) {
+	logger.debug(`>>> Entering tokenBase(stream=${stream},state=${state})`);
     var ch = stream.next();
     if (tokenHooks[ch]) {
+	logger.debug(`tokenBase(stream=${stream},state=${state}): ch → ${ch}`);
       var result = tokenHooks[ch](stream, state);
+	logger.debug(`tokenBase(stream=${stream},state=${state}): result → ${result}`);
       if (result !== false) return result;
     }
     if (ch == "@") {
@@ -81,16 +91,19 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
                (ch == "r" && stream.match("egexp("))) {
       stream.backUp(1);
       state.tokenize = tokenParenthesized;
+	logger.debug(`tokenBase(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
       return ret("property", "word");
     } else if (/[\w\\\-]/.test(ch)) {
       stream.eatWhile(/[\w\\\-]/);
       return ret("property", "word");
     } else {
+	logger.debug(`<<< Exiting tokenBase(stream=${stream},state=${state})`);
       return ret(null, null);
     }
   }
 
   function tokenString(quote) {
+	logger.debug(`>>> Entering tokenString(quote=${quote})`);
     return function(stream, state) {
       var escaped = false, ch;
       while ((ch = stream.next()) != null) {
@@ -101,11 +114,14 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
         escaped = !escaped && ch == "\\";
       }
       if (ch == quote || !escaped && quote != ")") state.tokenize = null;
+	logger.debug(`<<< Exiting tokenString(quote=${quote})`);
       return ret("string", "string");
     };
   }
 
   function tokenParenthesized(stream, state) {
+	logger.debug(`>>> Entering tokenParenthesized(stream=${stream},state=${state})`);
+	logger.debug(`tokenParenthesized(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
     stream.next(); // Must be '('
     if (!stream.match(/\s*[\"\')]/, false))
       state.tokenize = tokenString(")");
@@ -117,33 +133,49 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
   // Context management
 
   function Context(type, indent, prev) {
+	logger.debug(`>>> Entering Context(type=${type},indent=${indent},prev=${prev})`);
     this.type = type;
     this.indent = indent;
+	logger.debug(`Context(type=${type},indent=${indent},prev=${prev}): type → ${type}`);
+	logger.debug(`Context(type=${type},indent=${indent},prev=${prev}): this.type → ${this.type}`);
     this.prev = prev;
+	logger.debug(`Context(type=${type},indent=${indent},prev=${prev}): this.prev → ${this.prev}`);
+	logger.debug(`<<< Exiting Context(type=${type},indent=${indent},prev=${prev})`);
   }
 
   function pushContext(state, stream, type) {
+	logger.debug(`>>> Entering pushContext(state=${state},stream=${stream},type=${type})`);
     state.context = new Context(type, stream.indentation() + indentUnit, state.context);
+	logger.debug(`<<< Exiting pushContext(state=${state},stream=${stream},type=${type})`);
     return type;
   }
 
   function popContext(state) {
+	logger.debug(`>>> Entering popContext(state=${state})`);
     state.context = state.context.prev;
+	logger.debug(`popContext(state=${state}): state.context → ${state.context}`);
+	logger.debug(`<<< Exiting popContext(state=${state})`);
     return state.context.type;
   }
 
   function pass(type, stream, state) {
+	logger.debug(`>>> Entering pass(type=${type},stream=${stream},state=${state})`);
+	logger.debug(`<<< Exiting pass(type=${type},stream=${stream},state=${state})`);
     return states[state.context.type](type, stream, state);
   }
   function popAndPass(type, stream, state, n) {
+	logger.debug(`>>> Entering popAndPass(type=${type},stream=${stream},state=${state},n=${n})`);
     for (var i = n || 1; i > 0; i--)
       state.context = state.context.prev;
+	logger.debug(`popAndPass(type=${type},stream=${stream},state=${state},n=${n}): state.context → ${state.context}`);
+	logger.debug(`<<< Exiting popAndPass(type=${type},stream=${stream},state=${state},n=${n})`);
     return pass(type, stream, state);
   }
 
   // Parser
 
   function wordAsValue(stream) {
+	logger.debug(`>>> Entering wordAsValue(stream=${stream})`);
     var word = stream.current().toLowerCase();
     if (valueKeywords.hasOwnProperty(word))
       override = "atom";
@@ -164,6 +196,7 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
       return pushContext(state, stream, "atBlock");
     } else if (/@(font-face|counter-style)/.test(type)) {
       state.stateArg = type;
+	logger.debug(`function(type=${type},stream=${stream},state=${state}): state.stateArg → ${state.stateArg}`);
       return "restricted_atBlock_before";
     } else if (/^@(-(moz|ms|o|webkit)-)?keyframes$/.test(type)) {
       return "keyframes";
@@ -173,6 +206,7 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
       override = "builtin";
     } else if (type == "word") {
       override = "tag";
+	logger.debug(`function(type=${type},stream=${stream},state=${state}): override → ${override}`);
     } else if (type == "variable-definition") {
       return "maybeprop";
     } else if (type == "interpolation") {
@@ -182,6 +216,7 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
     } else if (allowNested && type == "(") {
       return pushContext(state, stream, "parens");
     }
+	logger.debug(`<<< Exiting function(type=${type},stream=${stream},state=${state})`);
     return state.context.type;
   };
 
@@ -189,6 +224,7 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
     if (type == "word") {
       var word = stream.current().toLowerCase();
       if (propertyKeywords.hasOwnProperty(word)) {
+		logger.debug(`function(type=${type},stream=${stream},state=${state}): word → ${word}`);
         override = "property";
         return "maybeprop";
       } else if (nonStandardPropertyKeywords.hasOwnProperty(word)) {
@@ -229,6 +265,7 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
     } else if (type == "interpolation") {
       return pushContext(state, stream, "interpolation");
     }
+	logger.debug(`<<< Exiting function(type=${type},_stream=${_stream},state=${state})`);
     return "prop";
   };
 
@@ -342,13 +379,16 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
 
   return {
     startState: function(base) {
+	logger.debug(`>>> Entering startState(base=${base})`);
       return {tokenize: null,
               state: parserConfig.inline ? "block" : "top",
               stateArg: null,
               context: new Context(parserConfig.inline ? "block" : "top", base || 0, null)};
+			logger.debug(`<<< Exiting startState(base=${base})`);
     },
 
     token: function(stream, state) {
+	logger.debug(`>>> Entering token(stream=${stream},state=${state})`);
       if (!state.tokenize && stream.eatSpace()) return null;
       var style = (state.tokenize || tokenBase)(stream, state);
       if (style && typeof style == "object") {
@@ -357,10 +397,13 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
       }
       override = style;
       state.state = states[state.state](type, stream, state);
+	logger.debug(`token(stream=${stream},state=${state}): override → ${override}`);
+	logger.debug(`<<< Exiting token(stream=${stream},state=${state})`);
       return override;
     },
 
     indent: function(state, textAfter) {
+	logger.debug(`>>> Entering indent(state=${state},textAfter=${textAfter})`);
       var cx = state.context, ch = textAfter && textAfter.charAt(0);
       var indent = cx.indent;
       if (cx.type == "prop" && (ch == "}" || ch == ")")) cx = cx.prev;
@@ -370,6 +413,7 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
            ch == "{" && (cx.type == "at" || cx.type == "atBlock"))) {
         indent = cx.indent - indentUnit;
         cx = cx.prev;
+		logger.debug(`<<< Exiting indent(state=${state},textAfter=${textAfter})`);
       }
       return indent;
     },
@@ -382,10 +426,12 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
 });
 
   function keySet(array) {
+	logger.debug(`>>> Entering keySet(array=${array})`);
     var keys = {};
     for (var i = 0; i < array.length; ++i) {
       keys[array[i]] = true;
     }
+	logger.debug(`<<< Exiting keySet(array=${array})`);
     return keys;
   }
 
@@ -657,14 +703,18 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
   CodeMirror.registerHelper("hintWords", "css", allWords);
 
   function tokenCComment(stream, state) {
+	logger.debug(`>>> Entering tokenCComment(stream=${stream},state=${state})`);
     var maybeEnd = false, ch;
     while ((ch = stream.next()) != null) {
       if (maybeEnd && ch == "/") {
         state.tokenize = null;
+		logger.debug(`tokenCComment(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
         break;
       }
       maybeEnd = (ch == "*");
     }
+	logger.debug(`tokenCComment(stream=${stream},state=${state}): maybeEnd → ${maybeEnd}`);
+	logger.debug(`<<< Exiting tokenCComment(stream=${stream},state=${state})`);
     return ["comment", "comment"];
   }
 
@@ -683,6 +733,7 @@ CodeMirror.defineMode("css", function(config, parserConfig) {
       "/": function(stream, state) {
         if (!stream.eat("*")) return false;
         state.tokenize = tokenCComment;
+		logger.debug(`function(stream=${stream},state=${state}): state.tokenize → ${state.tokenize}`);
         return tokenCComment(stream, state);
       }
     },

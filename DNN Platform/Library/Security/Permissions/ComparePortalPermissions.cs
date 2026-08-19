@@ -11,9 +11,12 @@ namespace DotNetNuke.Security.Permissions
     /// </summary>
     internal class ComparePortalPermissions : IComparer
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ComparePortalPermissions));
         /// <inheritdoc />
         public int Compare(object x, object y)
         {
+			Logger.LogDebug(">>> Entering Compare(x={X},y={Y})", x, y);
+			Logger.LogDebug("<<< Exiting Compare(x={X},y={Y})", x, y);
             return ((PortalPermissionInfo)x).PortalPermissionID.CompareTo(((PortalPermissionInfo)y).PortalPermissionID);
         }
     }

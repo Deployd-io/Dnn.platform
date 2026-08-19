@@ -8,10 +8,12 @@ import {
 } from "../../../actions";
 import util from "../../../utils";
 import resx from "../../../resources";
+const logger = console;
 
 class IgnoreWordsEditor extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
 
         this.state = {
             words: {
@@ -26,8 +28,10 @@ class IgnoreWordsEditor extends Component {
     }
 
     componentDidMount() {
+		logger.debug('>>> Entering componentDidMount()');
         const {props} = this;
         let words = Object.assign({}, props.words);
+		logger.debug('<<< Exiting componentDidMount()');
         words.CultureCode = props.culture;
         this.setState({
             words: Object.assign({}, props.words)
@@ -35,13 +39,16 @@ class IgnoreWordsEditor extends Component {
     }
 
     onSettingChange(key, event) {
+		logger.debug(`>>> Entering onSettingChange(key=${key},event=${event})`);
         let {state, props} = this;
         let words = Object.assign({}, state.words);
+		logger.debug(`onSettingChange(key=${key},event=${event}): words → ${words}`);
         
         words[key] = event.join();
 
         if (words[key] === "" && key === "StopWords") {
             state.error["tags"] = true;
+			logger.debug(`<<< Exiting onSettingChange(key=${key},event=${event})`);
         }
         else if (words[key] !== "" && key === "StopWords") {
             state.error["tags"] = false;
@@ -59,6 +66,7 @@ class IgnoreWordsEditor extends Component {
     }
 
     onSave() {
+		logger.debug('>>> Entering onSave()');
         const {props, state} = this;
         this.setState({
             triedToSubmit: true
@@ -68,9 +76,11 @@ class IgnoreWordsEditor extends Component {
         }
 
         props.onUpdate(state.words, state.culture);
+		logger.debug('<<< Exiting onSave()');
     }
     
     onCancel() {
+		logger.debug('>>> Entering onCancel()');
         const {props} = this;
         if (props.ignoreWordsClientModified) {
             util.utilities.confirm(resx.get("SettingsRestoreWarning"), resx.get("Yes"), resx.get("No"), () => {
@@ -80,13 +90,16 @@ class IgnoreWordsEditor extends Component {
         }
         else {
             props.Collapse();
+			logger.debug('<<< Exiting onCancel()');
         }
     }
 
      
     render() {
+		logger.debug('>>> Entering render()');
          
         if (this.state.words !== undefined || this.props.id === "add") {  
+			logger.debug('<<< Exiting render()');
             return (
                 <div className="words-editor">
                     <InputGroup>
@@ -128,6 +141,8 @@ IgnoreWordsEditor.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {              
         ignoreWordsClientModified: state.search.ignoreWordsClientModified
     };

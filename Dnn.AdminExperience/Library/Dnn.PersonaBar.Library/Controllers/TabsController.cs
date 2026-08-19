@@ -28,6 +28,7 @@ namespace Dnn.PersonaBar.Library.Controllers
 
     public class TabsController
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(TabsController));
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Breaking change")]
         public string LocalResourcesFile => Path.Combine("~/DesktopModules/admin/Dnn.PersonaBar/App_LocalResources/Tabs.resx");
 
@@ -47,8 +48,10 @@ namespace Dnn.PersonaBar.Library.Controllers
 
         public TabDto GetPortalTabs(UserInfo userInfo, int portalId, string cultureCode, bool isMultiLanguage, bool excludeAdminTabs = true, string roles = "", bool disabledNotSelectable = false, int sortOrder = 0, int selectedTabId = -1, string validateTab = "", bool includeHostPages = false, bool includeDisabled = false, bool includeDeleted = false, bool includeDeletedChildren = true)
         {
+			Logger.LogDebug(">>> Entering GetPortalTabs(userInfo={UserInfo},portalId={PortalId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},excludeAdminTabs={ExcludeAdminTabs},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},selectedTabId={SelectedTabId},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeleted={IncludeDeleted},includeDeletedChildren={IncludeDeletedChildren})", userInfo, portalId, cultureCode, isMultiLanguage, excludeAdminTabs, roles, disabledNotSelectable, sortOrder, selectedTabId, validateTab, includeHostPages, includeDisabled, includeDeleted, includeDeletedChildren);
             var portalInfo = PortalController.Instance.GetPortal(portalId);
 
+			Logger.LogDebug("GetPortalTabs(userInfo={UserInfo},portalId={PortalId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},excludeAdminTabs={ExcludeAdminTabs},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},selectedTabId={SelectedTabId},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeleted={IncludeDeleted},includeDeletedChildren={IncludeDeletedChildren}): portalInfo → {PortalInfo}", userInfo, portalId, cultureCode, isMultiLanguage, excludeAdminTabs, roles, disabledNotSelectable, sortOrder, selectedTabId, validateTab, includeHostPages, includeDisabled, includeDeleted, includeDeletedChildren, portalInfo);
             var rootNode = new TabDto
             {
                 Name = portalInfo.PortalName,
@@ -58,8 +61,10 @@ namespace Dnn.PersonaBar.Library.Controllers
                 HasChildren = true,
             };
             var tabs = new List<TabInfo>();
+			Logger.LogDebug("GetPortalTabs(userInfo={UserInfo},portalId={PortalId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},excludeAdminTabs={ExcludeAdminTabs},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},selectedTabId={SelectedTabId},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeleted={IncludeDeleted},includeDeletedChildren={IncludeDeletedChildren}): tabs → {Tabs}", userInfo, portalId, cultureCode, isMultiLanguage, excludeAdminTabs, roles, disabledNotSelectable, sortOrder, selectedTabId, validateTab, includeHostPages, includeDisabled, includeDeleted, includeDeletedChildren, tabs);
 
             cultureCode = string.IsNullOrEmpty(cultureCode) ? portalInfo.CultureCode : cultureCode;
+			Logger.LogDebug("GetPortalTabs(userInfo={UserInfo},portalId={PortalId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},excludeAdminTabs={ExcludeAdminTabs},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},selectedTabId={SelectedTabId},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeleted={IncludeDeleted},includeDeletedChildren={IncludeDeletedChildren}): cultureCode → {CultureCode1}", userInfo, portalId, cultureCode, isMultiLanguage, excludeAdminTabs, roles, disabledNotSelectable, sortOrder, selectedTabId, validateTab, includeHostPages, includeDisabled, includeDeleted, includeDeletedChildren, cultureCode);
             if (portalId > -1)
             {
                 tabs =
@@ -106,12 +111,14 @@ namespace Dnn.PersonaBar.Library.Controllers
             }
 
             var filterTabs = FilterTabsByRole(tabs, roles, disabledNotSelectable);
+			Logger.LogDebug("GetPortalTabs(userInfo={UserInfo},portalId={PortalId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},excludeAdminTabs={ExcludeAdminTabs},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},selectedTabId={SelectedTabId},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeleted={IncludeDeleted},includeDeletedChildren={IncludeDeletedChildren}): filterTabs → {FilterTabs}", userInfo, portalId, cultureCode, isMultiLanguage, excludeAdminTabs, roles, disabledNotSelectable, sortOrder, selectedTabId, validateTab, includeHostPages, includeDisabled, includeDeleted, includeDeletedChildren, filterTabs);
             rootNode.HasChildren = tabs.Count > 0;
             rootNode.Selectable = SecurityService.Instance.IsPagesAdminUser();
             foreach (var tab in tabs)
             {
                 string tooltip;
                 var nodeIcon = this.GetNodeIcon(tab, out tooltip);
+				Logger.LogDebug("GetPortalTabs(userInfo={UserInfo},portalId={PortalId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},excludeAdminTabs={ExcludeAdminTabs},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},selectedTabId={SelectedTabId},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeleted={IncludeDeleted},includeDeletedChildren={IncludeDeletedChildren}): nodeIcon → {NodeIcon}", userInfo, portalId, cultureCode, isMultiLanguage, excludeAdminTabs, roles, disabledNotSelectable, sortOrder, selectedTabId, validateTab, includeHostPages, includeDisabled, includeDeleted, includeDeletedChildren, nodeIcon);
                 var node = new TabDto
                 {
                     Name = tab.LocalizedTabName, ////$"{tab.TabName} {GetNodeStatusIcon(tab)}",
@@ -128,6 +135,7 @@ namespace Dnn.PersonaBar.Library.Controllers
 
             rootNode.ChildTabs = ApplySort(rootNode.ChildTabs, sortOrder).ToList();
 
+			Logger.LogDebug("<<< Exiting GetPortalTabs(userInfo={UserInfo},portalId={PortalId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},excludeAdminTabs={ExcludeAdminTabs},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},selectedTabId={SelectedTabId},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeleted={IncludeDeleted},includeDeletedChildren={IncludeDeletedChildren})", userInfo, portalId, cultureCode, isMultiLanguage, excludeAdminTabs, roles, disabledNotSelectable, sortOrder, selectedTabId, validateTab, includeHostPages, includeDisabled, includeDeleted, includeDeletedChildren);
             return selectedTabId > -1
                 ? this.MarkSelectedTab(rootNode, selectedTabId, portalInfo, cultureCode, isMultiLanguage, validateTab)
                 : rootNode;
@@ -135,6 +143,7 @@ namespace Dnn.PersonaBar.Library.Controllers
 
         public TabDto SearchPortalTabs(UserInfo userInfo, string searchText, int portalId, string roles = "", bool disabledNotSelectable = false, int sortOrder = 0, string validateTab = "", bool includeHostPages = false, bool includeDisabled = false, bool includeDeleted = false)
         {
+			Logger.LogDebug(">>> Entering SearchPortalTabs(userInfo={UserInfo},searchText={SearchText},portalId={PortalId},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeleted={IncludeDeleted})", userInfo, searchText, portalId, roles, disabledNotSelectable, sortOrder, validateTab, includeHostPages, includeDisabled, includeDeleted);
             var rootNode = new TabDto
             {
                 Name = PortalSettings.PortalName,
@@ -155,6 +164,7 @@ namespace Dnn.PersonaBar.Library.Controllers
             }
 
             var tabs = new List<TabInfo>();
+			Logger.LogDebug("SearchPortalTabs(userInfo={UserInfo},searchText={SearchText},portalId={PortalId},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeleted={IncludeDeleted}): tabs → {Tabs}", userInfo, searchText, portalId, roles, disabledNotSelectable, sortOrder, validateTab, includeHostPages, includeDisabled, includeDeleted, tabs);
             if (portalId > -1)
             {
                 tabs =
@@ -188,12 +198,14 @@ namespace Dnn.PersonaBar.Library.Controllers
             }
 
             var filterTabs = FilterTabsByRole(tabs, roles, disabledNotSelectable);
+			Logger.LogDebug("SearchPortalTabs(userInfo={UserInfo},searchText={SearchText},portalId={PortalId},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeleted={IncludeDeleted}): filterTabs → {FilterTabs}", userInfo, searchText, portalId, roles, disabledNotSelectable, sortOrder, validateTab, includeHostPages, includeDisabled, includeDeleted, filterTabs);
             rootNode.HasChildren = tabs.Count != 0;
             rootNode.Selectable = SecurityService.Instance.IsPagesAdminUser();
             foreach (var tab in tabs)
             {
                 string tooltip;
                 var nodeIcon = this.GetNodeIcon(tab, out tooltip);
+				Logger.LogDebug("SearchPortalTabs(userInfo={UserInfo},searchText={SearchText},portalId={PortalId},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeleted={IncludeDeleted}): nodeIcon → {NodeIcon}", userInfo, searchText, portalId, roles, disabledNotSelectable, sortOrder, validateTab, includeHostPages, includeDisabled, includeDeleted, nodeIcon);
                 var node = new TabDto
                 {
                     Name = tab.LocalizedTabName,
@@ -212,26 +224,36 @@ namespace Dnn.PersonaBar.Library.Controllers
                 rootNode.ChildTabs = ValidateModuleInTab(rootNode.ChildTabs, validateTab).ToList();
             }
 
+			Logger.LogDebug("<<< Exiting SearchPortalTabs(userInfo={UserInfo},searchText={SearchText},portalId={PortalId},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeleted={IncludeDeleted})", userInfo, searchText, portalId, roles, disabledNotSelectable, sortOrder, validateTab, includeHostPages, includeDisabled, includeDeleted);
             return rootNode;
         }
 
         public TabDto GetTabByCulture(int tabId, int portalId, string cultureCode)
         {
+			Logger.LogDebug(">>> Entering GetTabByCulture(tabId={TabId},portalId={PortalId},cultureCode={CultureCode})", tabId, portalId, cultureCode);
             cultureCode = string.IsNullOrEmpty(cultureCode) ? PortalController.Instance.GetPortal(portalId).CultureCode : cultureCode;
 
+			Logger.LogDebug("GetTabByCulture(tabId={TabId},portalId={PortalId},cultureCode={CultureCode}): cultureCode → {CultureCode1}", tabId, portalId, cultureCode, cultureCode);
             var locale = LocaleController.Instance.GetLocale(cultureCode);
+			Logger.LogDebug("GetTabByCulture(tabId={TabId},portalId={PortalId},cultureCode={CultureCode}): locale → {Locale}", tabId, portalId, cultureCode, locale);
+			Logger.LogDebug("<<< Exiting GetTabByCulture(tabId={TabId},portalId={PortalId},cultureCode={CultureCode})", tabId, portalId, cultureCode);
+			Logger.LogDebug("<<< Exiting GetTabByCulture(tabId={TabId},portalId={PortalId},locale={Locale})", tabId, portalId, locale);
             return this.GetTabByCulture(tabId, portalId, locale);
         }
 
         public IEnumerable<TabDto> GetTabsDescendants(int portalId, int parentId, string cultureCode, bool isMultiLanguage, string roles = "", bool disabledNotSelectable = false, int sortOrder = 0, string validateTab = "", bool includeHostPages = false, bool includeDisabled = false, bool includeDeletedChildren = true)
         {
+			Logger.LogDebug(">>> Entering GetTabsDescendants(portalId={PortalId},parentId={ParentId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeletedChildren={IncludeDeletedChildren})", portalId, parentId, cultureCode, isMultiLanguage, roles, disabledNotSelectable, sortOrder, validateTab, includeHostPages, includeDisabled, includeDeletedChildren);
             var descendants = new List<TabDto>();
             cultureCode = string.IsNullOrEmpty(cultureCode) ? PortalController.Instance.GetPortal(portalId).CultureCode : cultureCode;
+			Logger.LogDebug("GetTabsDescendants(portalId={PortalId},parentId={ParentId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeletedChildren={IncludeDeletedChildren}): cultureCode → {CultureCode1}", portalId, parentId, cultureCode, isMultiLanguage, roles, disabledNotSelectable, sortOrder, validateTab, includeHostPages, includeDisabled, includeDeletedChildren, cultureCode);
+			Logger.LogDebug("GetTabsDescendants(portalId={PortalId},parentId={ParentId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeletedChildren={IncludeDeletedChildren}): descendants → {Descendants}", portalId, parentId, cultureCode, isMultiLanguage, roles, disabledNotSelectable, sortOrder, validateTab, includeHostPages, includeDisabled, includeDeletedChildren, descendants);
 
             var tabs =
                 GetExportableTabs(TabController.Instance.GetTabsByPortal(portalId)
                     .WithCulture(cultureCode, true))
                     .WithParentId(parentId).ToList();
+				Logger.LogDebug("GetTabsDescendants(portalId={PortalId},parentId={ParentId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeletedChildren={IncludeDeletedChildren}): tabs → {Tabs}", portalId, parentId, cultureCode, isMultiLanguage, roles, disabledNotSelectable, sortOrder, validateTab, includeHostPages, includeDisabled, includeDeletedChildren, tabs);
 
             if (!string.IsNullOrEmpty(validateTab))
             {
@@ -239,6 +261,7 @@ namespace Dnn.PersonaBar.Library.Controllers
             }
 
             var filterTabs = FilterTabsByRole(tabs, roles, disabledNotSelectable);
+			Logger.LogDebug("GetTabsDescendants(portalId={PortalId},parentId={ParentId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeletedChildren={IncludeDeletedChildren}): filterTabs → {FilterTabs}", portalId, parentId, cultureCode, isMultiLanguage, roles, disabledNotSelectable, sortOrder, validateTab, includeHostPages, includeDisabled, includeDeletedChildren, filterTabs);
             foreach (var tab in tabs.Where(
                 x => x.ParentId == parentId &&
                 (
@@ -247,6 +270,7 @@ namespace Dnn.PersonaBar.Library.Controllers
             {
                 string tooltip;
                 var nodeIcon = this.GetNodeIcon(tab, out tooltip);
+				Logger.LogDebug("GetTabsDescendants(portalId={PortalId},parentId={ParentId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeletedChildren={IncludeDeletedChildren}): nodeIcon → {NodeIcon}", portalId, parentId, cultureCode, isMultiLanguage, roles, disabledNotSelectable, sortOrder, validateTab, includeHostPages, includeDisabled, includeDeletedChildren, nodeIcon);
                 var node = new TabDto
                 {
                     Name = tab.TabName, ////$"{tab.TabName} {GetNodeStatusIcon(tab)}",
@@ -260,12 +284,15 @@ namespace Dnn.PersonaBar.Library.Controllers
                 descendants.Add(node);
             }
 
+			Logger.LogDebug("<<< Exiting GetTabsDescendants(portalId={PortalId},parentId={ParentId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},roles={Roles},disabledNotSelectable={DisabledNotSelectable},sortOrder={SortOrder},validateTab={ValidateTab},includeHostPages={IncludeHostPages},includeDisabled={IncludeDisabled},includeDeletedChildren={IncludeDeletedChildren})", portalId, parentId, cultureCode, isMultiLanguage, roles, disabledNotSelectable, sortOrder, validateTab, includeHostPages, includeDisabled, includeDeletedChildren);
             return ApplySort(descendants, sortOrder);
         }
 
         private static bool IsSecuredTab(TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering IsSecuredTab(tab={Tab})", tab);
             var perms = tab.TabPermissions;
+				Logger.LogDebug("<<< Exiting IsSecuredTab(tab={Tab})", tab);
             return
                 perms.Cast<TabPermissionInfo>()
                     .All(perm => perm.RoleName != Globals.glbRoleAllUsersName || !perm.AllowAccess);
@@ -273,6 +300,7 @@ namespace Dnn.PersonaBar.Library.Controllers
 
         private static IEnumerable<TabDto> ApplySort(IEnumerable<TabDto> items, int sortOrder)
         {
+			Logger.LogDebug(">>> Entering ApplySort(items={Items},sortOrder={SortOrder})", items, sortOrder);
             switch (sortOrder)
             {
                 case 1: // sort by a-z
@@ -280,12 +308,15 @@ namespace Dnn.PersonaBar.Library.Controllers
                 case 2: // sort by z-a
                     return items.OrderByDescending(item => item.Name).ToList();
                 default: // no sort
+					Logger.LogDebug("<<< Exiting ApplySort(items={Items},sortOrder={SortOrder})", items, sortOrder);
                     return items;
             }
         }
 
         private static IEnumerable<TabDto> ValidateModuleInTab(IEnumerable<TabDto> tabs, string validateTab)
         {
+			Logger.LogDebug(">>> Entering ValidateModuleInTab(tabs={Tabs},validateTab={ValidateTab})", tabs, validateTab);
+			Logger.LogDebug("<<< Exiting ValidateModuleInTab(tabs={Tabs},validateTab={ValidateTab})", tabs, validateTab);
             return tabs.Where(
                 tab =>
                     (Convert.ToInt32(tab.TabId, CultureInfo.InvariantCulture) > 0 &&
@@ -300,10 +331,13 @@ namespace Dnn.PersonaBar.Library.Controllers
 
         private static List<int> FilterTabsByRole(IList<TabInfo> tabs, string roles, bool disabledNotSelectable)
         {
+			Logger.LogDebug(">>> Entering FilterTabsByRole(tabs={Tabs},roles={Roles},disabledNotSelectable={DisabledNotSelectable})", tabs, roles, disabledNotSelectable);
             var filterTabs = new List<int>();
             if (!string.IsNullOrEmpty(roles))
+			Logger.LogDebug("FilterTabsByRole(tabs={Tabs},roles={Roles},disabledNotSelectable={DisabledNotSelectable}): filterTabs → {FilterTabs}", tabs, roles, disabledNotSelectable, filterTabs);
             {
                 var roleList = roles.Split([';',], StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
+				Logger.LogDebug("FilterTabsByRole(tabs={Tabs},roles={Roles},disabledNotSelectable={DisabledNotSelectable}): roleList → {RoleList}", tabs, roles, disabledNotSelectable, roleList);
 
                 filterTabs.AddRange(
                     tabs.Where(
@@ -319,18 +353,24 @@ namespace Dnn.PersonaBar.Library.Controllers
                 filterTabs.AddRange(tabs.Where(t => !disabledNotSelectable || !t.DisableLink).Select(t => t.TabID));
             }
 
+			Logger.LogDebug("<<< Exiting FilterTabsByRole(tabs={Tabs},roles={Roles},disabledNotSelectable={DisabledNotSelectable})", tabs, roles, disabledNotSelectable);
             return filterTabs;
         }
 
         private static TabCollection GetExportableTabs(TabCollection tabs)
         {
+			Logger.LogDebug(">>> Entering GetExportableTabs(tabs={Tabs})", tabs);
             var exportableTabs = tabs.Where(kvp => !kvp.Value.IsSystem).Select(kvp => kvp.Value);
+			Logger.LogDebug("GetExportableTabs(tabs={Tabs}): exportableTabs → {ExportableTabs}", tabs, exportableTabs);
+			Logger.LogDebug("<<< Exiting GetExportableTabs(tabs={Tabs})", tabs);
             return new TabCollection(exportableTabs);
         }
 
         private static bool IsAdminTab(TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering IsAdminTab(tab={Tab})", tab);
             var perms = tab.TabPermissions;
+				Logger.LogDebug("<<< Exiting IsAdminTab(tab={Tab})", tab);
             return
                 perms.Cast<TabPermissionInfo>()
                     .All(perm => perm.RoleName == PortalSettings.AdministratorRoleName || !perm.AllowAccess);
@@ -338,7 +378,9 @@ namespace Dnn.PersonaBar.Library.Controllers
 
         private static bool IsRegisteredUserTab(TabInfo tab)
         {
+			Logger.LogDebug(">>> Entering IsRegisteredUserTab(tab={Tab})", tab);
             var perms = tab.TabPermissions;
+				Logger.LogDebug("<<< Exiting IsRegisteredUserTab(tab={Tab})", tab);
             return
                 perms.Cast<TabPermissionInfo>()
                     .Any(perm => perm.RoleName == PortalSettings.RegisteredRoleName && perm.AllowAccess);
@@ -346,16 +388,22 @@ namespace Dnn.PersonaBar.Library.Controllers
 
         private TabDto MarkSelectedTab(TabDto rootNode, int selectedTabId, IPortalInfo portalInfo, string cultureCode, bool isMultiLanguage, string validateTab)
         {
+			Logger.LogDebug(">>> Entering MarkSelectedTab(rootNode={RootNode},selectedTabId={SelectedTabId},portalInfo={PortalInfo},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},validateTab={ValidateTab})", rootNode, selectedTabId, portalInfo, cultureCode, isMultiLanguage, validateTab);
             var tempTabs = new List<int>();
             cultureCode = string.IsNullOrEmpty(cultureCode) ? portalInfo.CultureCode : cultureCode;
+			Logger.LogDebug("MarkSelectedTab(rootNode={RootNode},selectedTabId={SelectedTabId},portalInfo={PortalInfo},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},validateTab={ValidateTab}): cultureCode → {CultureCode1}", rootNode, selectedTabId, portalInfo, cultureCode, isMultiLanguage, validateTab, cultureCode);
             var locale = LocaleController.Instance.GetLocale(cultureCode);
+			Logger.LogDebug("MarkSelectedTab(rootNode={RootNode},selectedTabId={SelectedTabId},portalInfo={PortalInfo},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},validateTab={ValidateTab}): locale → {Locale}", rootNode, selectedTabId, portalInfo, cultureCode, isMultiLanguage, validateTab, locale);
             var selectedTab = this.GetTabByCulture(selectedTabId, portalInfo.PortalId, locale);
+			Logger.LogDebug("MarkSelectedTab(rootNode={RootNode},selectedTabId={SelectedTabId},portalInfo={PortalInfo},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},validateTab={ValidateTab}): selectedTab → {SelectedTab}", rootNode, selectedTabId, portalInfo, cultureCode, isMultiLanguage, validateTab, selectedTab);
+			Logger.LogDebug("MarkSelectedTab(rootNode={RootNode},selectedTabId={SelectedTabId},portalInfo={PortalInfo},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},validateTab={ValidateTab}): tempTabs → {TempTabs}", rootNode, selectedTabId, portalInfo, cultureCode, isMultiLanguage, validateTab, tempTabs);
             if (selectedTab != null)
             {
                 tempTabs.Add(Convert.ToInt32(selectedTab.TabId, CultureInfo.InvariantCulture));
                 if (selectedTab.ParentTabId > Null.NullInteger)
                 {
                     var parentTab = selectedTab;
+					Logger.LogDebug("MarkSelectedTab(rootNode={RootNode},selectedTabId={SelectedTabId},portalInfo={PortalInfo},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},validateTab={ValidateTab}): parentTab → {ParentTab}", rootNode, selectedTabId, portalInfo, cultureCode, isMultiLanguage, validateTab, parentTab);
                     do
                     {
                         parentTab = this.GetTabByCulture(parentTab.ParentTabId, portalInfo.PortalId, locale);
@@ -382,19 +430,24 @@ namespace Dnn.PersonaBar.Library.Controllers
                 rootNode.ChildTabs = ValidateModuleInTab(rootNode.ChildTabs, validateTab).ToList();
             }
 
+			Logger.LogDebug("<<< Exiting MarkSelectedTab(rootNode={RootNode},selectedTabId={SelectedTabId},portalInfo={PortalInfo},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage},validateTab={ValidateTab})", rootNode, selectedTabId, portalInfo, cultureCode, isMultiLanguage, validateTab);
             return rootNode;
         }
 
         private IEnumerable<TabDto> GetDescendantsForTabs(IEnumerable<int> tabIds, IEnumerable<TabDto> tabs, int selectedTabId, int portalId, string cultureCode, bool isMultiLanguage)
         {
+			Logger.LogDebug(">>> Entering GetDescendantsForTabs(tabIds={TabIds},tabs={Tabs},selectedTabId={SelectedTabId},portalId={PortalId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage})", tabIds, tabs, selectedTabId, portalId, cultureCode, isMultiLanguage);
             var enumerable = tabIds as int[] ?? tabIds.ToArray();
             if (tabs == null || tabIds == null || enumerable.Length == 0)
+			Logger.LogDebug("GetDescendantsForTabs(tabIds={TabIds},tabs={Tabs},selectedTabId={SelectedTabId},portalId={PortalId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage}): enumerable → {Enumerable}", tabIds, tabs, selectedTabId, portalId, cultureCode, isMultiLanguage, enumerable);
             {
                 return tabs;
             }
 
             var tabDtos = tabs as List<TabDto> ?? tabs.ToList();
+			Logger.LogDebug("GetDescendantsForTabs(tabIds={TabIds},tabs={Tabs},selectedTabId={SelectedTabId},portalId={PortalId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage}): tabDtos → {TabDtos}", tabIds, tabs, selectedTabId, portalId, cultureCode, isMultiLanguage, tabDtos);
             var tabId = enumerable.First();
+			Logger.LogDebug("GetDescendantsForTabs(tabIds={TabIds},tabs={Tabs},selectedTabId={SelectedTabId},portalId={PortalId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage}): tabId → {TabId}", tabIds, tabs, selectedTabId, portalId, cultureCode, isMultiLanguage, tabId);
             if (selectedTabId != tabId)
             {
                 if (!tabDtos.Exists(x => Convert.ToInt32(x.TabId, CultureInfo.InvariantCulture) == tabId))
@@ -432,6 +485,7 @@ namespace Dnn.PersonaBar.Library.Controllers
                     NodeCheckedState.Checked;
             }
 
+			Logger.LogDebug("<<< Exiting GetDescendantsForTabs(tabIds={TabIds},tabs={Tabs},selectedTabId={SelectedTabId},portalId={PortalId},cultureCode={CultureCode},isMultiLanguage={IsMultiLanguage})", tabIds, tabs, selectedTabId, portalId, cultureCode, isMultiLanguage);
             return tabDtos;
         }
 
@@ -439,6 +493,7 @@ namespace Dnn.PersonaBar.Library.Controllers
         {
             var tab = TabController.Instance.GetTabByCulture(tabId, portalId, locale);
             var nodeIcon = this.GetNodeIcon(tab, out var tooltip);
+			Logger.LogDebug("GetTabByCulture(tabId={TabId},portalId={PortalId},locale={Locale}): tab → {Tab}", tabId, portalId, locale, tab);
             return new TabDto
             {
                 Name = tab.TabName, ////$"{tab.TabName} {GetNodeStatusIcon(tab)}",
@@ -454,9 +509,11 @@ namespace Dnn.PersonaBar.Library.Controllers
 
         private string GetNodeIcon(TabInfo tab, out string toolTip)
         {
+			Logger.LogDebug(">>> Entering GetNodeIcon(tab={Tab})", tab);
             if (PortalSettings.HomeTabId == tab.TabID)
             {
                 toolTip = Localization.GetString("lblHome", this.LocalResourcesFile);
+				Logger.LogDebug("GetNodeIcon(tab={Tab}): toolTip → {ToolTip}", tab, toolTip);
                 return IconHome;
             }
 
@@ -479,6 +536,7 @@ namespace Dnn.PersonaBar.Library.Controllers
             }
 
             toolTip = Localization.GetString("lblEveryone", this.LocalResourcesFile);
+			Logger.LogDebug("<<< Exiting GetNodeIcon(tab={Tab})", tab);
             return AllUsersIcon;
         }
     }

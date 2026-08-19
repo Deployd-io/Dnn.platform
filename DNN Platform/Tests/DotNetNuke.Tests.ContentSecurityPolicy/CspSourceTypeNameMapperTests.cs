@@ -7,6 +7,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
     using System;
 
     using NUnit.Framework;
+	using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Unit tests for the CspSourceTypeNameMapper class.
@@ -14,12 +15,14 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
     [TestFixture]
     public class CspSourceTypeNameMapperTests
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         /// <summary>
         /// Tests GetSourceTypeName with all known source types.
         /// </summary>
         [Test]
         public void GetSourceTypeName_AllKnownTypes_ShouldReturnCorrectNames()
         {
+			_logger.LogDebug(">>> Entering GetSourceTypeName_AllKnownTypes_ShouldReturnCorrectNames()");
             // Arrange & Act & Assert
             Assert.That(CspSourceTypeNameMapper.GetSourceTypeName(CspSourceType.Host), Is.EqualTo("host"));
             Assert.That(CspSourceTypeNameMapper.GetSourceTypeName(CspSourceType.Scheme), Is.EqualTo("scheme"));
@@ -30,6 +33,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             Assert.That(CspSourceTypeNameMapper.GetSourceTypeName(CspSourceType.Hash), Is.EqualTo("hash"));
             Assert.That(CspSourceTypeNameMapper.GetSourceTypeName(CspSourceType.None), Is.EqualTo("'none'"));
             Assert.That(CspSourceTypeNameMapper.GetSourceTypeName(CspSourceType.StrictDynamic), Is.EqualTo("'strict-dynamic'"));
+			_logger.LogDebug("<<< Exiting GetSourceTypeName_AllKnownTypes_ShouldReturnCorrectNames()");
         }
 
         /// <summary>
@@ -38,12 +42,14 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void GetSourceType_AllKnownNames_ShouldReturnCorrectTypes()
         {
+			_logger.LogDebug(">>> Entering GetSourceType_AllKnownNames_ShouldReturnCorrectTypes()");
             // Arrange & Act & Assert
             Assert.That(CspSourceTypeNameMapper.GetSourceType("'self'"), Is.EqualTo(CspSourceType.Self));
             Assert.That(CspSourceTypeNameMapper.GetSourceType("'unsafe-inline'"), Is.EqualTo(CspSourceType.Inline));
             Assert.That(CspSourceTypeNameMapper.GetSourceType("'unsafe-eval'"), Is.EqualTo(CspSourceType.Eval));
             Assert.That(CspSourceTypeNameMapper.GetSourceType("'none'"), Is.EqualTo(CspSourceType.None));
             Assert.That(CspSourceTypeNameMapper.GetSourceType("'strict-dynamic'"), Is.EqualTo(CspSourceType.StrictDynamic));
+			_logger.LogDebug("<<< Exiting GetSourceType_AllKnownNames_ShouldReturnCorrectTypes()");
         }
 
         /// <summary>
@@ -52,12 +58,14 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void GetSourceType_CaseInsensitiveInput_ShouldReturnCorrectType()
         {
+			_logger.LogDebug(">>> Entering GetSourceType_CaseInsensitiveInput_ShouldReturnCorrectType()");
             // Arrange & Act & Assert
             Assert.That(CspSourceTypeNameMapper.GetSourceType("'SELF'"), Is.EqualTo(CspSourceType.Self));
             Assert.That(CspSourceTypeNameMapper.GetSourceType("'Unsafe-Inline'"), Is.EqualTo(CspSourceType.Inline));
             Assert.That(CspSourceTypeNameMapper.GetSourceType("'UNSAFE-EVAL'"), Is.EqualTo(CspSourceType.Eval));
             Assert.That(CspSourceTypeNameMapper.GetSourceType("'NONE'"), Is.EqualTo(CspSourceType.None));
             Assert.That(CspSourceTypeNameMapper.GetSourceType("'STRICT-DYNAMIC'"), Is.EqualTo(CspSourceType.StrictDynamic));
+			_logger.LogDebug("<<< Exiting GetSourceType_CaseInsensitiveInput_ShouldReturnCorrectType()");
         }
 
         /// <summary>
@@ -66,12 +74,16 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void GetSourceType_UnknownSourceName_ShouldThrowArgumentException()
         {
+			_logger.LogDebug(">>> Entering GetSourceType_UnknownSourceName_ShouldThrowArgumentException()");
             // Arrange
             var unknownSource = "'unknown-source'";
+			_logger.LogDebug("GetSourceType_UnknownSourceName_ShouldThrowArgumentException(): unknownSource → {UnknownSource}", unknownSource);
 
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => CspSourceTypeNameMapper.GetSourceType(unknownSource));
+			_logger.LogDebug("GetSourceType_UnknownSourceName_ShouldThrowArgumentException(): exception → {Exception}", exception);
             Assert.That(exception.Message, Does.Contain($"Unknown source name: {unknownSource}"));
+			_logger.LogDebug("<<< Exiting GetSourceType_UnknownSourceName_ShouldThrowArgumentException()");
         }
 
         /// <summary>
@@ -80,12 +92,15 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void GetSourceType_NullInput_ShouldThrowArgumentException()
         {
+			_logger.LogDebug(">>> Entering GetSourceType_NullInput_ShouldThrowArgumentException()");
             // Arrange
             string sourceName = null;
 
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => CspSourceTypeNameMapper.GetSourceType(sourceName));
+			_logger.LogDebug("GetSourceType_NullInput_ShouldThrowArgumentException(): exception → {Exception}", exception);
             Assert.That(exception.Message, Does.Contain("Source name cannot be null or empty"));
+			_logger.LogDebug("<<< Exiting GetSourceType_NullInput_ShouldThrowArgumentException()");
         }
 
         /// <summary>
@@ -94,12 +109,15 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void GetSourceType_EmptyInput_ShouldThrowArgumentException()
         {
+			_logger.LogDebug(">>> Entering GetSourceType_EmptyInput_ShouldThrowArgumentException()");
             // Arrange
             var sourceName = string.Empty;
 
             // Act & Assert
             var exception = Assert.Throws<ArgumentException>(() => CspSourceTypeNameMapper.GetSourceType(sourceName));
+			_logger.LogDebug("GetSourceType_EmptyInput_ShouldThrowArgumentException(): exception → {Exception}", exception);
             Assert.That(exception.Message, Does.Contain("Source name cannot be null or empty"));
+			_logger.LogDebug("<<< Exiting GetSourceType_EmptyInput_ShouldThrowArgumentException()");
         }
 
         /// <summary>
@@ -108,6 +126,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void TryGetSourceType_ValidSourceNames_ShouldReturnTrueAndCorrectType()
         {
+			_logger.LogDebug(">>> Entering TryGetSourceType_ValidSourceNames_ShouldReturnTrueAndCorrectType()");
             // Arrange & Act & Assert
             Assert.That(CspSourceTypeNameMapper.TryGetSourceType("'self'", out var selfType), Is.True);
             Assert.That(selfType, Is.EqualTo(CspSourceType.Self));
@@ -117,6 +136,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
 
             Assert.That(CspSourceTypeNameMapper.TryGetSourceType("'none'", out var noneType), Is.True);
             Assert.That(noneType, Is.EqualTo(CspSourceType.None));
+			_logger.LogDebug("<<< Exiting TryGetSourceType_ValidSourceNames_ShouldReturnTrueAndCorrectType()");
         }
 
         /// <summary>
@@ -125,6 +145,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void TryGetSourceType_InvalidSourceNames_ShouldReturnFalseAndDefaultType()
         {
+			_logger.LogDebug(">>> Entering TryGetSourceType_InvalidSourceNames_ShouldReturnFalseAndDefaultType()");
             // Arrange & Act & Assert
             Assert.That(CspSourceTypeNameMapper.TryGetSourceType("'unknown-source'", out var type1), Is.False);
             Assert.That(type1, Is.EqualTo(default(CspSourceType)));
@@ -137,6 +158,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
 
             Assert.That(CspSourceTypeNameMapper.TryGetSourceType("example.com", out var type4), Is.False);
             Assert.That(type4, Is.EqualTo(default(CspSourceType)));
+			_logger.LogDebug("<<< Exiting TryGetSourceType_InvalidSourceNames_ShouldReturnFalseAndDefaultType()");
         }
 
         /// <summary>
@@ -145,6 +167,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void IsQuotedKeyword_VariousInputs_ShouldReturnCorrectResults()
         {
+			_logger.LogDebug(">>> Entering IsQuotedKeyword_VariousInputs_ShouldReturnCorrectResults()");
             // Arrange & Act & Assert
             Assert.That(CspSourceTypeNameMapper.IsQuotedKeyword("'self'"), Is.True);
             Assert.That(CspSourceTypeNameMapper.IsQuotedKeyword("'unsafe-inline'"), Is.True);
@@ -160,6 +183,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             Assert.That(CspSourceTypeNameMapper.IsQuotedKeyword(null), Is.False);
             Assert.That(CspSourceTypeNameMapper.IsQuotedKeyword(string.Empty), Is.False);
             Assert.That(CspSourceTypeNameMapper.IsQuotedKeyword("   "), Is.False);
+			_logger.LogDebug("<<< Exiting IsQuotedKeyword_VariousInputs_ShouldReturnCorrectResults()");
         }
 
         /// <summary>
@@ -168,6 +192,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void IsNonceSource_VariousInputs_ShouldReturnCorrectResults()
         {
+			_logger.LogDebug(">>> Entering IsNonceSource_VariousInputs_ShouldReturnCorrectResults()");
             // Arrange & Act & Assert
             Assert.That(CspSourceTypeNameMapper.IsNonceSource("'nonce-abc123'"), Is.True);
             Assert.That(CspSourceTypeNameMapper.IsNonceSource("'nonce-xyz789def'"), Is.True);
@@ -183,6 +208,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             Assert.That(CspSourceTypeNameMapper.IsNonceSource(null), Is.False);
             Assert.That(CspSourceTypeNameMapper.IsNonceSource(string.Empty), Is.False);
             Assert.That(CspSourceTypeNameMapper.IsNonceSource("   "), Is.False);
+			_logger.LogDebug("<<< Exiting IsNonceSource_VariousInputs_ShouldReturnCorrectResults()");
         }
 
         /// <summary>
@@ -191,6 +217,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void IsHashSource_VariousInputs_ShouldReturnCorrectResults()
         {
+			_logger.LogDebug(">>> Entering IsHashSource_VariousInputs_ShouldReturnCorrectResults()");
             // Arrange & Act & Assert
             Assert.That(CspSourceTypeNameMapper.IsHashSource("'sha256-abc123'"), Is.True);
             Assert.That(CspSourceTypeNameMapper.IsHashSource("'sha384-def456'"), Is.True);
@@ -207,6 +234,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             Assert.That(CspSourceTypeNameMapper.IsHashSource(null), Is.False);
             Assert.That(CspSourceTypeNameMapper.IsHashSource(string.Empty), Is.False);
             Assert.That(CspSourceTypeNameMapper.IsHashSource("   "), Is.False);
+			_logger.LogDebug("<<< Exiting IsHashSource_VariousInputs_ShouldReturnCorrectResults()");
         }
 
         /// <summary>
@@ -215,6 +243,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void RoundTripConversion_SupportedSourceTypes_ShouldReturnOriginalType()
         {
+			_logger.LogDebug(">>> Entering RoundTripConversion_SupportedSourceTypes_ShouldReturnOriginalType()");
             // Note: Only testing source types that have direct string representations
             var supportedTypes = new[]
             {
@@ -229,9 +258,12 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             foreach (var originalType in supportedTypes)
             {
                 var sourceName = CspSourceTypeNameMapper.GetSourceTypeName(originalType);
+				_logger.LogDebug("RoundTripConversion_SupportedSourceTypes_ShouldReturnOriginalType(): sourceName → {SourceName}", sourceName);
                 var convertedType = CspSourceTypeNameMapper.GetSourceType(sourceName);
+				_logger.LogDebug("RoundTripConversion_SupportedSourceTypes_ShouldReturnOriginalType(): convertedType → {ConvertedType}", convertedType);
                 Assert.That(convertedType, Is.EqualTo(originalType), $"Round-trip conversion failed for {originalType}");
             }
+			_logger.LogDebug("<<< Exiting RoundTripConversion_SupportedSourceTypes_ShouldReturnOriginalType()");
         }
 
         /// <summary>
@@ -240,6 +272,7 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
         [Test]
         public void GetSourceType_NonQuotedSourceTypes_ShouldThrowException()
         {
+			_logger.LogDebug(">>> Entering GetSourceType_NonQuotedSourceTypes_ShouldThrowException()");
             // These types don't have direct string representations that can be parsed back
             var nonQuotedTypes = new[]
             {
@@ -252,10 +285,12 @@ namespace DotNetNuke.ContentSecurityPolicy.Tests
             foreach (var sourceType in nonQuotedTypes)
             {
                 var sourceName = CspSourceTypeNameMapper.GetSourceTypeName(sourceType);
+				_logger.LogDebug("GetSourceType_NonQuotedSourceTypes_ShouldThrowException(): sourceName → {SourceName}", sourceName);
 
                 // These should throw exceptions when trying to parse them back
                 Assert.Throws<ArgumentException>(() => CspSourceTypeNameMapper.GetSourceType(sourceName));
             }
+			_logger.LogDebug("<<< Exiting GetSourceType_NonQuotedSourceTypes_ShouldThrowException()");
         }
     }
 }

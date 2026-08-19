@@ -10,6 +10,7 @@ namespace DotNetNuke.Modules.NavigationProvider
     [SuppressMessage("Microsoft.Design", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix", Justification = "Breaking change")]
     public class NavigationEventArgs
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(NavigationEventArgs));
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
         public string ID;
@@ -23,8 +24,12 @@ namespace DotNetNuke.Modules.NavigationProvider
         /// <param name="objNode">The node.</param>
         public NavigationEventArgs(string strID, DNNNode objNode)
         {
+			Logger.LogDebug(">>> Entering NavigationEventArgs(strID={StrID},objNode={ObjNode})", strID, objNode);
             this.ID = strID;
             this.Node = objNode;
+			Logger.LogDebug("NavigationEventArgs(strID={StrID},objNode={ObjNode}): this.ID → {Arg2}", strID, objNode, this.ID);
+			Logger.LogDebug("NavigationEventArgs(strID={StrID},objNode={ObjNode}): Node → {Node}", strID, objNode, Node);
+			Logger.LogDebug("<<< Exiting NavigationEventArgs(strID={StrID},objNode={ObjNode})", strID, objNode);
         }
     }
 }

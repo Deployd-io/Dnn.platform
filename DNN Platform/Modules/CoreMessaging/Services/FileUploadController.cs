@@ -33,8 +33,10 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         [IFrameSupportedValidateAntiForgeryToken]
         public HttpResponseMessage UploadFile()
         {
+			Logger.LogDebug(">>> Entering UploadFile()");
             var statuses = new List<FilesStatus>();
             try
+			Logger.LogDebug("UploadFile(): statuses → {Statuses}", statuses);
             {
                 // todo can we eliminate the HttpContext here
                 this.UploadWholeFile(HttpContextSource.Current, statuses);
@@ -44,12 +46,15 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
                 Logger.Error(exc);
             }
 
+			Logger.LogDebug("<<< Exiting UploadFile()");
             return this.IframeSafeJson(statuses);
         }
 
         private HttpResponseMessage IframeSafeJson(List<FilesStatus> statuses)
         {
+			Logger.LogDebug(">>> Entering IframeSafeJson(statuses={Statuses})", statuses);
             // return json but label it as plain text
+			Logger.LogDebug("<<< Exiting IframeSafeJson(statuses={Statuses})", statuses);
             return new HttpResponseMessage
             {
                 Content = new StringContent(JsonConvert.SerializeObject(statuses)),
@@ -59,6 +64,7 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
         // Upload entire file
         private void UploadWholeFile(HttpContextBase context, ICollection<FilesStatus> statuses)
         {
+			Logger.LogDebug(">>> Entering UploadWholeFile(context={Context},statuses={Statuses})", context, statuses);
             for (var i = 0; i < context.Request.Files.Count; i++)
             {
                 var file = context.Request.Files[i];
@@ -68,14 +74,18 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
                 }
 
                 var fileName = Path.GetFileName(file.FileName);
+				Logger.LogDebug("UploadWholeFile(context={Context},statuses={Statuses}): fileName → {FileName}", context, statuses, fileName);
 
                 try
                 {
                     var userFolder = this.folderManager.GetUserFolder(this.UserInfo);
+					Logger.LogDebug("UploadWholeFile(context={Context},statuses={Statuses}): userFolder → {UserFolder}", context, statuses, userFolder);
 
                     // todo: deal with the case where the exact file name already exists.
                     var fileInfo = this.fileManager.AddFile(userFolder, fileName, file.InputStream, true, true, this.fileContentTypeManager.GetContentType(Path.GetExtension(fileName)));
+					Logger.LogDebug("UploadWholeFile(context={Context},statuses={Statuses}): fileInfo → {FileInfo}", context, statuses, fileInfo);
                     var fileIcon = Entities.Icons.IconController.IconURL("Ext" + fileInfo.Extension, "32x32");
+					Logger.LogDebug("UploadWholeFile(context={Context},statuses={Statuses}): fileIcon → {FileIcon}", context, statuses, fileIcon);
                     if (!File.Exists(context.Server.MapPath(fileIcon)))
                     {
                         fileIcon = Entities.Icons.IconController.IconURL("File", "32x32");
@@ -97,6 +107,7 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
                 }
                 catch (InvalidFileExtensionException)
                 {
+					Logger.LogError("Exception in UploadWholeFile(context={Context},statuses={Statuses}): {Arg2}", context, statuses, InvalidFileExtensionException.getMessage());
                     statuses.Add(new FilesStatus
                     {
                         success = false,
@@ -105,6 +116,7 @@ namespace DotNetNuke.Modules.CoreMessaging.Services
                     });
                 }
             }
+			Logger.LogDebug("<<< Exiting UploadWholeFile(context={Context},statuses={Statuses})", context, statuses);
         }
     }
 }

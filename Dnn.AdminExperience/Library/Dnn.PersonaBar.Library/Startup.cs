@@ -13,12 +13,15 @@ namespace Dnn.PersonaBar.Library
     /// <summary>Register services used by the Persona Bar library.</summary>
     internal sealed class Startup : IDnnStartup
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(Startup));
         /// <inheritdoc />
         public void ConfigureServices(IServiceCollection services)
         {
+			Logger.LogDebug(">>> Entering ConfigureServices(services={Services})", services);
             services.AddSingleton<IPersonaBarContainer, PersonaBarContainer>();
             services.AddSingleton<IPersonaBarController, PersonaBarController>();
             services.AddSingleton<IPersonaBarUserSettingsController, PersonaBarUserSettingsController>();
+			Logger.LogDebug("<<< Exiting ConfigureServices(services={Services})", services);
         }
     }
 }

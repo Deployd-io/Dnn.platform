@@ -18,6 +18,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
     /// <summary>Allows for registration of CSS and JavaScript resources.</summary>
     public class DnnHtmlInclude : Literal
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(DnnHtmlInclude));
         /// <summary>The pattern that matches a tag.</summary>
         public const string TagPattern = @"<{0}((\s+\w+(\s*=\s*(?:"".*?""|'.*?'|[^'"">\s]+))?)+\s*|\s*)/?>";
 
@@ -35,7 +36,11 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <param name="clientResourceController">The client resource controller.</param>
         public DnnHtmlInclude(IClientResourceController clientResourceController)
         {
+			Logger.LogDebug(">>> Entering DnnHtmlInclude(clientResourceController={ClientResourceController})", clientResourceController);
             this.clientResourceController = clientResourceController;
+			Logger.LogDebug("DnnHtmlInclude(clientResourceController={ClientResourceController}): this.clientResourceController → {Arg1}", clientResourceController, this.clientResourceController);
+			Logger.LogDebug("DnnHtmlInclude(clientResourceController={ClientResourceController}): clientResourceController → {ClientResourceController1}", clientResourceController, clientResourceController);
+			Logger.LogDebug("<<< Exiting DnnHtmlInclude(clientResourceController={ClientResourceController})", clientResourceController);
         }
 
         /// <summary>Gets or sets the provider to force for this resource include.</summary>
@@ -50,19 +55,25 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
         /// <inheritdoc />
         protected override void OnLoad(EventArgs e)
         {
+			Logger.LogDebug(">>> Entering OnLoad(e={E})", e);
             base.OnLoad(e);
             this.RegisterIncludes(this.Text);
             this.Text = string.Empty;
+			Logger.LogDebug("OnLoad(e={E}): this.Text → {Arg1}", e, this.Text);
+			Logger.LogDebug("<<< Exiting OnLoad(e={E})", e);
         }
 
         private void RegisterIncludes(string innerHtml)
         {
+			Logger.LogDebug(">>> Entering RegisterIncludes(innerHtml={InnerHtml})", innerHtml);
             this.RegisterIncludes(this.GetIncludes(innerHtml, ClientDependencyType.Css), ClientDependencyType.Css);
             this.RegisterIncludes(this.GetIncludes(innerHtml, ClientDependencyType.Javascript), ClientDependencyType.Javascript);
+			Logger.LogDebug("<<< Exiting RegisterIncludes(innerHtml={InnerHtml})", innerHtml);
         }
 
         private void RegisterIncludes(IEnumerable<BasicFile> files, ClientDependencyType dependencyType)
         {
+			Logger.LogDebug(">>> Entering RegisterIncludes(files={Files},dependencyType={DependencyType})", files, dependencyType);
             foreach (var file in files)
             {
                 switch (dependencyType)
@@ -91,10 +102,12 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
                         break;
                 }
             }
+			Logger.LogDebug("<<< Exiting RegisterIncludes(files={Files},dependencyType={DependencyType})", files, dependencyType);
         }
 
         private List<BasicFile> GetIncludes(string innerHtml, ClientDependencyType dependencyType)
         {
+			Logger.LogDebug(">>> Entering GetIncludes(innerHtml={InnerHtml},dependencyType={DependencyType})", innerHtml, dependencyType);
             Regex tagRegex;
             string sourceAttribute, mime;
             if (dependencyType == ClientDependencyType.Css)
@@ -104,6 +117,8 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
                 mime = "text/css";
             }
             else
+			Logger.LogDebug("GetIncludes(innerHtml={InnerHtml},dependencyType={DependencyType}): sourceAttribute → {SourceAttribute}", innerHtml, dependencyType, sourceAttribute);
+			Logger.LogDebug("GetIncludes(innerHtml={InnerHtml},dependencyType={DependencyType}): mime → {Mime}", innerHtml, dependencyType, mime);
             {
                 tagRegex = ScriptTagRegex;
                 sourceAttribute = "src";
@@ -111,6 +126,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
             }
 
             var files = new List<BasicFile>();
+			Logger.LogDebug("GetIncludes(innerHtml={InnerHtml},dependencyType={DependencyType}): files → {Files}", innerHtml, dependencyType, files);
             foreach (Match match in tagRegex.Matches(innerHtml))
             {
                 var allAttributes = Regex.Matches(match.Value, MatchAllAttributes, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)
@@ -168,6 +184,7 @@ namespace DotNetNuke.Web.Client.ClientResourceManagement
                 files.Add(file);
             }
 
+			Logger.LogDebug("<<< Exiting GetIncludes(innerHtml={InnerHtml},dependencyType={DependencyType})", innerHtml, dependencyType);
             return files;
         }
     }

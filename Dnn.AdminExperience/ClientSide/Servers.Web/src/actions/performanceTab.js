@@ -1,9 +1,12 @@
 import {performanceTab as ActionTypes}  from "../constants/actionTypes";
 import performanceTabService from "../services/performanceTabService";
 import localization from "../localization";
+const logger = console;
 
 const performanceTabActions = {
     loadPerformanceSettings() {
+		logger.debug('>>> Entering loadPerformanceSettings()');
+		logger.debug('<<< Exiting loadPerformanceSettings()');
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.LOAD_PERFORMANCE_TAB
@@ -17,6 +20,7 @@ const performanceTabActions = {
                     }
                 });
             }).catch(() => {
+				logger.error('Exception in loadPerformanceSettings()');
                 dispatch({
                     type: ActionTypes.ERROR_LOADING_PERFORMANCE_TAB,
                     payload: {
@@ -27,6 +31,8 @@ const performanceTabActions = {
         };
     },
     changePerformanceSettingsValue(key, value) {
+		logger.debug(`>>> Entering changePerformanceSettingsValue(key=${key},value=${value})`);
+		logger.debug(`<<< Exiting changePerformanceSettingsValue(key=${key},value=${value})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.CHANGE_PERFORMANCE_SETTINGS_VALUE,
@@ -38,6 +44,8 @@ const performanceTabActions = {
         };
     },
     incrementVersion(isGlobalSettings) {
+		logger.debug(`>>> Entering incrementVersion(isGlobalSettings=${isGlobalSettings})`);
+		logger.debug(`<<< Exiting incrementVersion(isGlobalSettings=${isGlobalSettings})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.INCREMENT_VERSION
@@ -59,6 +67,7 @@ const performanceTabActions = {
                     }
                 });
             }).catch(() => {
+				logger.error(`Exception in incrementVersion(isGlobalSettings=${isGlobalSettings}): (no error binding)`);
                 dispatch({
                     type: ActionTypes.ERROR_INCREMENTING_VERSION,
                     payload: {
@@ -69,6 +78,8 @@ const performanceTabActions = {
         };
     },
     save(performanceSettings) {
+		logger.debug(`>>> Entering save(performanceSettings=${performanceSettings})`);
+		logger.debug(`<<< Exiting save(performanceSettings=${performanceSettings})`);
         return (dispatch) => {
             dispatch({
                 type: ActionTypes.SAVE_PERFORMANCE_SETTINGS
@@ -82,6 +93,7 @@ const performanceTabActions = {
                     }
                 });
             }).catch(() => {
+				logger.error(`Exception in save(performanceSettings=${performanceSettings}): (no error binding)`);
                 dispatch({
                     type: ActionTypes.ERROR_SAVING_PERFORMANCE_SETTINGS,
                     payload: {

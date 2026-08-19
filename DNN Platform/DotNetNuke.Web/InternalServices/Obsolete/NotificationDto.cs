@@ -10,6 +10,7 @@ using DotNetNuke.Internal.SourceGenerators;
 [DnnDeprecated(10, 3, 3, "Use NotificationRequest")]
 public partial class NotificationDTO
 {
+	private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(NotificationDto));
     /// <summary>Gets or sets the ID of the notification.</summary>
     public int NotificationId { get; set; }
 
@@ -17,6 +18,8 @@ public partial class NotificationDTO
     /// <returns>A <see cref="NotificationRequest"/> instance.</returns>
     public NotificationRequest ToNotificationRequest()
     {
+		Logger.LogDebug(">>> Entering ToNotificationRequest()");
+		Logger.LogDebug("<<< Exiting ToNotificationRequest()");
         return new NotificationRequest
         {
             NotificationId = this.NotificationId,

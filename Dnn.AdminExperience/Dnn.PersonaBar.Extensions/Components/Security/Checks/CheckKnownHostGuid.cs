@@ -23,15 +23,19 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <param name="hostSettings">The host settings.</param>
         public CheckKnownHostGuid(IHostSettings hostSettings)
         {
+			eventLogger.LogDebug(">>> Entering CheckKnownHostGuid(hostSettings={HostSettings})", hostSettings);
             this.hostSettings = hostSettings;
 
+			eventLogger.LogDebug("CheckKnownHostGuid(hostSettings={HostSettings}): this.hostSettings → {Arg1}", hostSettings, this.hostSettings);
             var knownGuids = new HashSet<string>(
                 [
                     "181E4BC8-3FFE-4E30-8E08-038ACE517B97", // DNN 10.0.0 to 10.2.1
                 ],
                 StringComparer.OrdinalIgnoreCase);
+				eventLogger.LogDebug("CheckKnownHostGuid(hostSettings={HostSettings}): hostSettings → {HostSettings1}", hostSettings, hostSettings);
 
             this.hasKnownGuid = knownGuids.Contains(this.hostSettings.Guid);
+			eventLogger.LogDebug("<<< Exiting CheckKnownHostGuid(hostSettings={HostSettings})", hostSettings);
         }
 
         /// <inheritdoc/>
@@ -48,14 +52,18 @@ namespace Dnn.PersonaBar.Security.Components.Checks
         /// <inheritdoc/>
         public CheckResult Execute()
         {
+			eventLogger.LogDebug(">>> Entering Execute()");
             var result = new CheckResult(SeverityEnum.Pass, this.Id);
 
+			eventLogger.LogDebug("Execute(): result → {Result}", result);
             if (this.hasKnownGuid)
             {
                 result.Severity = SeverityEnum.Warning;
+				eventLogger.LogDebug("Execute(): result.Severity → {Arg0}", result.Severity);
                 result.Notes.Add(this.hostSettings.Guid);
             }
 
+			eventLogger.LogDebug("<<< Exiting Execute()");
             return result;
         }
     }

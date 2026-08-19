@@ -1,7 +1,9 @@
+const logger = console;
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
 (function ($) {
+	logger.debug('>>> Entering function()');
     window.SubscriptionsViewModel = function (ko, settings, root) {
         var self = this;
 
@@ -14,21 +16,28 @@
         
         this.search = function () {
             var startSearch = function () {
+				logger.debug('>>> Entering startSearch()');
                 self.isLoading(true);
+				logger.debug('<<< Exiting startSearch()');
             };
 
             var finishSearch = function () {
+				logger.debug('>>> Entering finishSearch()');
                 self.isLoading(false);
+				logger.debug('<<< Exiting finishSearch()');
             };
 
             var success = function (model) {
+				logger.debug(`>>> Entering success(model=${model})`);
                 self.results(model.Results);
                 self.totalCount(model.TotalResults || 0);
 
                 finishSearch();
+				logger.debug(`<<< Exiting success(model=${model})`);
             };
 
             var failure = function (xhr, status) {                
+				logger.debug(`>>> Entering failure(xhr=${xhr},status=${status})`);
                 if ((status || new String()).length > 0) {
                     $.dnnAlert({
                         title: localizer.getString('SearchErrorTitle'),
@@ -40,6 +49,7 @@
                 self.totalResults(0);
 
                 finishSearch();
+				logger.debug(`<<< Exiting failure(xhr=${xhr},status=${status})`);
             };
 
             startSearch();
@@ -59,6 +69,7 @@
         
         this.sortColumn = function (columnName) {
             var sort = '';
+			logger.debug(`function(columnName=${columnName}): sort → ${sort}`);
             if (self.sortedByColumnName() == columnName) {
                 if (self.sortedByOrder() == 'asc') sort = 'desc';
                 if (self.sortedByOrder() == '') sort = 'asc';
@@ -91,6 +102,7 @@
         };
 
         this.sortCssDescription = ko.computed(function () {
+			logger.debug('>>> Entering computed()');
             return self.sortCss('Description');
         });
         
@@ -107,6 +119,7 @@
         self.pageSlide = ko.observable(2);
         
         self.lastPage = ko.computed(function () {
+		logger.debug('<<< Exiting function()');
             return Math.ceil(self.totalCount() / self.pageSize());
         });
         
@@ -145,6 +158,7 @@
         
         // Wait for other components to finish registration
         $(document).ready(function () {
+			logger.debug(`>>> Entering ready(document=${document})`);
             if (root.pageControl != null) {
                 root.pageControl.page.subscribe(
                     function () {
@@ -153,6 +167,7 @@
             }
 
             // Do an initial search.
+			logger.debug(`<<< Exiting ready(document=${document})`);
             self.search();
         });
     };

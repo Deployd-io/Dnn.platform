@@ -1,7 +1,9 @@
+const logger = console;
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
+logger.debug(`>>> Entering function(exports=${exports})`);
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -10,12 +12,16 @@
     mod(CodeMirror);
 })(function(CodeMirror) {
   var Pos = CodeMirror.Pos;
+logger.debug(`<<< Exiting function(exports=${exports})`);
 
   function forEach(arr, f) {
+	logger.debug(`>>> Entering forEach(arr=${arr},f=${f})`);
     for (var i = 0, e = arr.length; i < e; ++i) f(arr[i]);
+	logger.debug(`<<< Exiting forEach(arr=${arr},f=${f})`);
   }
 
   function arrayContains(arr, item) {
+	logger.debug(`>>> Entering arrayContains(arr=${arr},item=${item})`);
     if (!Array.prototype.indexOf) {
       var i = arr.length;
       while (i--) {
@@ -23,6 +29,7 @@
           return true;
         }
       }
+	logger.debug(`<<< Exiting arrayContains(arr=${arr},item=${item})`);
       return false;
     }
     return arr.indexOf(item) != -1;
@@ -58,6 +65,8 @@
   }
 
   function javascriptHint(editor, options) {
+	logger.debug(`>>> Entering javascriptHint(editor=${editor},options=${options})`);
+	logger.debug(`<<< Exiting javascriptHint(editor=${editor},options=${options})`);
     return scriptHint(editor, javascriptKeywords,
                       function (e, cur) {return e.getTokenAt(cur);},
                       options);
@@ -65,13 +74,17 @@
   CodeMirror.registerHelper("hint", "javascript", javascriptHint);
 
   function getCoffeeScriptToken(editor, cur) {
+logger.debug(`>>> Entering getCoffeeScriptToken(editor=${editor},cur=${cur})`);
   // This getToken, it is for coffeescript, imitates the behavior of
   // getTokenAt method in javascript.js, that is, returning "property"
   // type and treat "." as indepenent token.
     var token = editor.getTokenAt(cur);
     if (cur.ch == token.start + 1 && token.string.charAt(0) == '.') {
       token.end = token.start;
+	logger.debug(`getCoffeeScriptToken(editor=${editor},cur=${cur}): token.end → ${token.end}`);
+	logger.debug(`getCoffeeScriptToken(editor=${editor},cur=${cur}): token.type → ${token.type}`);
       token.string = '.';
+	logger.debug(`getCoffeeScriptToken(editor=${editor},cur=${cur}): token.string → ${token.string}`);
       token.type = "property";
     }
     else if (/^\.[\w$_]*$/.test(token.string)) {
@@ -79,10 +92,13 @@
       token.start++;
       token.string = token.string.replace(/\./, '');
     }
+	logger.debug(`<<< Exiting getCoffeeScriptToken(editor=${editor},cur=${cur})`);
     return token;
   }
 
   function coffeescriptHint(editor, options) {
+	logger.debug(`>>> Entering coffeescriptHint(editor=${editor},options=${options})`);
+	logger.debug(`<<< Exiting coffeescriptHint(editor=${editor},options=${options})`);
     return scriptHint(editor, coffeescriptKeywords, getCoffeeScriptToken, options);
   }
   CodeMirror.registerHelper("hint", "coffeescript", coffeescriptHint);
@@ -100,13 +116,17 @@
   function getCompletions(token, context, keywords, options) {
     var found = [], start = token.string, global = options && options.globalScope || window;
     function maybeAdd(str) {
+	logger.debug(`>>> Entering maybeAdd(str=${str})`);
       if (str.lastIndexOf(start, 0) == 0 && !arrayContains(found, str)) found.push(str);
+	logger.debug(`<<< Exiting maybeAdd(str=${str})`);
     }
     function gatherCompletions(obj) {
+	logger.debug(`>>> Entering gatherCompletions(obj=${obj})`);
       if (typeof obj == "string") forEach(stringProps, maybeAdd);
       else if (obj instanceof Array) forEach(arrayProps, maybeAdd);
       else if (obj instanceof Function) forEach(funcProps, maybeAdd);
       for (var name in obj) maybeAdd(name);
+	logger.debug(`<<< Exiting gatherCompletions(obj=${obj})`);
     }
 
     if (context && context.length) {

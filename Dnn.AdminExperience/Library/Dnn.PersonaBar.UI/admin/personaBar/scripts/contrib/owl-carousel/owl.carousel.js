@@ -1,3 +1,4 @@
+const logger = console;
 /*
  *  jQuery OwlCarousel v1.3.2
  *
@@ -36,6 +37,7 @@ if (typeof Object.create !== "function") {
             var base = this, url;
 
             function getData(data) {
+				logger.debug(`>>> Entering getData(data=${data})`);
                 var i, content = "";
                 if (typeof base.options.jsonSuccess === "function") {
                     base.options.jsonSuccess.apply(this, [data]);
@@ -48,6 +50,7 @@ if (typeof Object.create !== "function") {
                     base.$elem.html(content);
                 }
                 base.logIn();
+				logger.debug(`<<< Exiting getData(data=${data})`);
             }
 
             if (typeof base.options.beforeInit === "function") {

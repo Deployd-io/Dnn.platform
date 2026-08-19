@@ -1,6 +1,7 @@
 import { Component, Host, h, Prop } from '@stencil/core';
 import { Item, ItemsClient } from '../../../services/ItemsClient';
 import state from "../../../store/store";
+const logger = console;
 
 @Component({
   tag: 'dnn-action-download-item',
@@ -16,18 +17,24 @@ export class DnnActionDownloadItem {
   private itemsClient: ItemsClient;
 
   constructor(){
+	logger.debug('>>> Entering constructor()');
     this.itemsClient = new ItemsClient(state.moduleId);
+	logger.debug('<<< Exiting constructor()');
   }
 
   private async handleClick() {
+	logger.debug('>>> Entering handleClick()');
     try {
       await this.itemsClient.download(this.item.itemId, false);
     } catch (error) {
       alert(error);
+	logger.debug('<<< Exiting handleClick()');
     }
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         <button onClick={() => void this.handleClick()}>

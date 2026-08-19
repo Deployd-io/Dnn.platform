@@ -24,9 +24,11 @@ namespace Dnn.PersonaBar.Servers.Services
         [HttpGet]
         public HttpResponseMessage GetDatabaseServerInfo()
         {
+			Logger.LogDebug(">>> Entering GetDatabaseServerInfo()");
             try
             {
                 var dbInfo = this.databaseController.GetDbInfo();
+				Logger.LogDebug("GetDatabaseServerInfo(): dbInfo → {DbInfo}", dbInfo);
                 var dbBackups = this.databaseController.GetDbBackups().Select(b => new
                 {
                     name = b.Name,
@@ -35,6 +37,11 @@ namespace Dnn.PersonaBar.Servers.Services
                     size = b.Size,
                     backupType = b.BackupType,
                 });
+				Logger.LogDebug("GetDatabaseServerInfo(): name → {Name}", name);
+				Logger.LogDebug("GetDatabaseServerInfo(): startDate → {StartDate}", startDate);
+				Logger.LogDebug("GetDatabaseServerInfo(): backupType → {BackupType}", backupType);
+				Logger.LogDebug("GetDatabaseServerInfo(): size → {Size}", size);
+				Logger.LogDebug("GetDatabaseServerInfo(): finishDate → {FinishDate}", finishDate);
                 var dbFileInfo = this.databaseController.GetDbFileInfo().Select(f => new
                 {
                     name = f.Name,
@@ -42,6 +49,8 @@ namespace Dnn.PersonaBar.Servers.Services
                     fileType = f.FileType,
                     fileName = f.ShortFileName,
                 });
+				Logger.LogDebug("GetDatabaseServerInfo(): fileName → {FileName}", fileName);
+				Logger.LogDebug("GetDatabaseServerInfo(): fileType → {FileType}", fileType);
 
                 return this.Request.CreateResponse(HttpStatusCode.OK, new
                 {
@@ -52,10 +61,17 @@ namespace Dnn.PersonaBar.Servers.Services
                     backups = dbBackups,
                     files = dbFileInfo,
                 });
+				Logger.LogDebug("GetDatabaseServerInfo(): files → {Files}", files);
+				Logger.LogDebug("GetDatabaseServerInfo(): productVersion → {ProductVersion}", productVersion);
+				Logger.LogDebug("GetDatabaseServerInfo(): backups → {Backups}", backups);
+				Logger.LogDebug("GetDatabaseServerInfo(): softwarePlatform → {SoftwarePlatform}", softwarePlatform);
+				Logger.LogDebug("GetDatabaseServerInfo(): servicePack → {ServicePack}", servicePack);
+				Logger.LogDebug("GetDatabaseServerInfo(): productEdition → {ProductEdition}", productEdition);
             }
             catch (Exception exc)
             {
                 Logger.Error(exc);
+				Logger.LogDebug("<<< Exiting GetDatabaseServerInfo()");
                 return this.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, exc);
             }
         }

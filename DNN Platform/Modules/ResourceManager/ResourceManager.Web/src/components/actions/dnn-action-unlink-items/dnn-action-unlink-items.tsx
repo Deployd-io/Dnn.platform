@@ -1,6 +1,7 @@
 import { Component, Host, h, Prop } from '@stencil/core';
 import { Item } from '../../../services/ItemsClient';
 import state from "../../../store/store";
+const logger = console;
 
 @Component({
   tag: 'dnn-action-unlink-items',
@@ -13,21 +14,32 @@ export class DnnActionUnlinkItems {
   @Prop() items!: Item[];
 
   private async handleClick() {
+	logger.debug('>>> Entering handleClick()');
     await this.showModal();
+	logger.debug('<<< Exiting handleClick()');
   }
 
   private async showModal(){
+	logger.debug('>>> Entering showModal()');
     const modal = document.createElement("dnn-modal");
     modal.preventBackdropDismiss = true;
+	logger.debug(`showModal(): modal → ${modal}`);
+	logger.debug(`showModal(): modal.preventBackdropDismiss → ${modal.preventBackdropDismiss}`);
     modal.hideCloseButton = true;
+	logger.debug(`showModal(): modal.hideCloseButton → ${modal.hideCloseButton}`);
     const editor = document.createElement("dnn-rm-unlink-items");
+	logger.debug(`showModal(): editor → ${editor}`);
     editor.items = this.items;
     modal.appendChild(editor);
+	logger.debug(`showModal(): editor.items → ${editor.items}`);
     document.body.appendChild(modal);
     await modal.show();
+	logger.debug('<<< Exiting showModal()');
   }
 
   render() {
+	logger.debug('>>> Entering render()');
+	logger.debug('<<< Exiting render()');
     return (
       <Host>
         <button onClick={() => void this.handleClick()}>

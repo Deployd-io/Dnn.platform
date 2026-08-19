@@ -5,12 +5,15 @@ namespace DotNetNuke.Entities.Tabs
 {
     public class PermissionsNotMetException : TabException
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PermissionsNotMetException));
         /// <summary>Initializes a new instance of the <see cref="PermissionsNotMetException"/> class.</summary>
         /// <param name="tabId">The tab ID.</param>
         /// <param name="message">The message that describes the error.</param>
         public PermissionsNotMetException(int tabId, string message)
             : base(tabId, message)
         {
+		Logger.LogDebug(">>> Entering PermissionsNotMetException(tabId={TabId},message={Message})", tabId, message);
+		Logger.LogDebug("<<< Exiting PermissionsNotMetException(tabId={TabId},message={Message})", tabId, message);
         }
     }
 }

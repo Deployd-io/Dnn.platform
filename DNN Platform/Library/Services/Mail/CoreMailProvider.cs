@@ -26,6 +26,7 @@ namespace DotNetNuke.Services.Mail
     /// <summary>A <see cref="MailProvider"/> implementation using the original core DNN logic (via <see cref="SmtpClient"/>).</summary>
     public class CoreMailProvider : MailProvider
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CoreMailProvider));
         private static readonly Regex SmtpServerRegex = new Regex("^[^:]+(:[0-9]{1,5})?$", RegexOptions.Compiled);
         private readonly IMailSettings mailSettings;
         private readonly IHostSettings hostSettings;
@@ -35,6 +36,10 @@ namespace DotNetNuke.Services.Mail
         public CoreMailProvider()
             : this(null, null)
         {
+		Logger.LogDebug(">>> Entering CoreMailProvider()");
+		Logger.LogDebug("<<< Exiting CoreMailProvider()");
+		Logger.LogDebug(">>> Entering CoreMailProvider(mailSettings={MailSettings},hostSettings={HostSettings})", mailSettings, hostSettings);
+		Logger.LogDebug("CoreMailProvider(mailSettings={MailSettings},hostSettings={HostSettings}): hostSettings → {HostSettings1}", mailSettings, hostSettings, hostSettings);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CoreMailProvider"/> class.</summary>
@@ -44,6 +49,7 @@ namespace DotNetNuke.Services.Mail
         {
             this.mailSettings = mailSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IMailSettings>();
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("<<< Exiting CoreMailProvider(mailSettings={MailSettings},hostSettings={HostSettings})", mailSettings, hostSettings);
         }
 
         private static int CurrentPortalId => PortalSettings.Current?.PortalId ?? Null.NullInteger;
@@ -53,6 +59,7 @@ namespace DotNetNuke.Services.Mail
         /// <inheritdoc />
         public override string SendMail(MailInfo mailInfo, SmtpInfo smtpInfo = null)
         {
+			Logger.LogDebug(">>> Entering SendMail(mailInfo={MailInfo},smtpInfo=<redacted>)", mailInfo);
             var (host, port, errorMessage) = ParseSmtpServer(this.mailSettings, ref smtpInfo);
             if (errorMessage != null)
             {
@@ -60,15 +67,19 @@ namespace DotNetNuke.Services.Mail
             }
 
             using var mailMessage = CreateMailMessage(this.mailSettings, this.hostSettings, mailInfo, smtpInfo);
+			Logger.LogDebug("SendMail(mailInfo={MailInfo},smtpInfo=<redacted>): mailMessage → {MailMessage}", mailInfo, mailMessage);
             try
             {
                 using var smtpClient = CreateSmtpClient(smtpInfo, host, port);
+				Logger.LogDebug("SendMail(mailInfo={MailInfo},smtpInfo=<redacted>): smtpClient → {SmtpClient}", mailInfo, smtpClient);
                 smtpClient.Send(mailMessage);
 
                 return string.Empty;
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in SendMail(mailInfo={MailInfo},smtpInfo=<redacted>): {Arg2}", mailInfo, exc.getMessage());
+				Logger.LogDebug("<<< Exiting SendMail(mailInfo={MailInfo},smtpInfo=<redacted>)", mailInfo);
                 return HandleException(exc);
             }
         }
@@ -76,6 +87,8 @@ namespace DotNetNuke.Services.Mail
         /// <inheritdoc />
         public override async Task<string> SendMailAsync(MailInfo mailInfo, SmtpInfo smtpInfo = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+			Logger.LogDebug(">>> Entering SendMailAsync(mailInfo={MailInfo},smtpInfo=<redacted>,cancellationToken=<redacted>)", mailInfo);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var (host, port, errorMessage) = ParseSmtpServer(this.mailSettings, ref smtpInfo);
             if (errorMessage != null)
             {
@@ -83,15 +96,20 @@ namespace DotNetNuke.Services.Mail
             }
 
             using var mailMessage = CreateMailMessage(this.mailSettings, this.hostSettings, mailInfo, smtpInfo);
+			Logger.LogDebug("SendMailAsync(mailInfo={MailInfo},smtpInfo=<redacted>,cancellationToken=<redacted>): mailMessage → {MailMessage}", mailInfo, mailMessage);
             try
             {
                 using var smtpClient = CreateSmtpClient(smtpInfo, host, port);
+				Logger.LogDebug("SendMailAsync(mailInfo={MailInfo},smtpInfo=<redacted>,cancellationToken=<redacted>): smtpClient → {SmtpClient}", mailInfo, smtpClient);
                 await smtpClient.SendMailAsync(mailMessage);
 
                 return string.Empty;
             }
             catch (Exception exc)
             {
+				Logger.LogError("Exception in SendMailAsync(mailInfo={MailInfo},smtpInfo=<redacted>,cancellationToken=<redacted>): {Arg3}", mailInfo, exc.getMessage());
+				Logger.LogInformation("SendMailAsync(mailInfo,smtpInfo,cancellationToken)={MailInfo},{SmtpInfo},{CancellationToken}: external service call took {Arg3} ms", mailInfo, smtpInfo, cancellationToken, __logStart.ElapsedMilliseconds);
+				Logger.LogDebug("<<< Exiting SendMailAsync(mailInfo={MailInfo},smtpInfo=<redacted>,cancellationToken=<redacted>)", mailInfo);
                 return HandleException(exc);
             }
         }
@@ -102,19 +120,24 @@ namespace DotNetNuke.Services.Mail
         /// <param name="bodyEncoding">The encoding of the message body.</param>
         internal static void AddAlternateView(MailMessage mailMessage, string body, Encoding bodyEncoding)
         {
+			Logger.LogDebug(">>> Entering AddAlternateView(mailMessage={MailMessage},body={Body},bodyEncoding={BodyEncoding})", mailMessage, body, bodyEncoding);
             // added support for multipart HTML messages
             // add text part as alternate view
             var plainView = AlternateView.CreateAlternateViewFromString(Mail.ConvertToText(body), bodyEncoding, "text/plain");
+			Logger.LogDebug("AddAlternateView(mailMessage={MailMessage},body={Body},bodyEncoding={BodyEncoding}): plainView → {PlainView}", mailMessage, body, bodyEncoding, plainView);
             mailMessage.AlternateViews.Add(plainView);
             if (mailMessage.IsBodyHtml)
             {
                 var htmlView = AlternateView.CreateAlternateViewFromString(body, bodyEncoding, "text/html");
+				Logger.LogDebug("AddAlternateView(mailMessage={MailMessage},body={Body},bodyEncoding={BodyEncoding}): htmlView → {HtmlView}", mailMessage, body, bodyEncoding, htmlView);
                 mailMessage.AlternateViews.Add(htmlView);
             }
+			Logger.LogDebug("<<< Exiting AddAlternateView(mailMessage={MailMessage},body={Body},bodyEncoding={BodyEncoding})", mailMessage, body, bodyEncoding);
         }
 
         private static string ValidateSmtpInfo(IMailSettings mailSettings, SmtpInfo smtpInfo)
         {
+			Logger.LogDebug(">>> Entering ValidateSmtpInfo(mailSettings={MailSettings},smtpInfo=<redacted>)", mailSettings);
             if (smtpInfo != null && !string.IsNullOrEmpty(smtpInfo.Server))
             {
                 return null;
@@ -122,6 +145,7 @@ namespace DotNetNuke.Services.Mail
 
             if (!string.IsNullOrWhiteSpace(mailSettings.GetServer(CurrentPortalId)))
             {
+			Logger.LogDebug("<<< Exiting ValidateSmtpInfo(mailSettings={MailSettings},smtpInfo=<redacted>)", mailSettings);
                 return null;
             }
 
@@ -130,8 +154,10 @@ namespace DotNetNuke.Services.Mail
 
         private static SmtpInfo GetDefaultSmtpInfo(IMailSettings mailSettings, SmtpInfo smtpInfo)
         {
+			Logger.LogDebug(">>> Entering GetDefaultSmtpInfo(mailSettings={MailSettings},smtpInfo=<redacted>)", mailSettings);
             if (smtpInfo != null && !string.IsNullOrEmpty(smtpInfo.Server))
             {
+			Logger.LogDebug("<<< Exiting GetDefaultSmtpInfo(mailSettings={MailSettings},smtpInfo=<redacted>)", mailSettings);
                 return smtpInfo;
             }
 
@@ -148,6 +174,7 @@ namespace DotNetNuke.Services.Mail
 
         private static MailMessage CreateMailMessage(IMailSettings mailSettings, IHostSettings hostSettings, MailInfo mailInfo, SmtpInfo smtpInfo)
         {
+			Logger.LogDebug(">>> Entering CreateMailMessage(mailSettings={MailSettings},hostSettings={HostSettings},mailInfo={MailInfo},smtpInfo=<redacted>)", mailSettings, hostSettings, mailInfo);
             // translate semi-colon delimiters to commas as ASP.NET 2.0 does not support semi-colons
             if (!string.IsNullOrEmpty(mailInfo.To))
             {
@@ -155,6 +182,7 @@ namespace DotNetNuke.Services.Mail
             }
 
             var mailMessage = new MailMessage(mailInfo.From, mailInfo.To);
+			Logger.LogDebug("CreateMailMessage(mailSettings={MailSettings},hostSettings={HostSettings},mailInfo={MailInfo},smtpInfo=<redacted>): mailMessage → {MailMessage}", mailSettings, hostSettings, mailInfo, mailMessage);
 
             if (!string.IsNullOrEmpty(mailInfo.Sender))
             {
@@ -191,8 +219,11 @@ namespace DotNetNuke.Services.Mail
                 if (mailMessage.Sender != null)
                 {
                     var senderAddress = mailInfo.Sender;
+					Logger.LogDebug("CreateMailMessage(mailSettings={MailSettings},hostSettings={HostSettings},mailInfo={MailInfo},smtpInfo=<redacted>): senderAddress → {SenderAddress}", mailSettings, hostSettings, mailInfo, senderAddress);
                     var senderDisplayName = mailInfo.FromName;
+					Logger.LogDebug("CreateMailMessage(mailSettings={MailSettings},hostSettings={HostSettings},mailInfo={MailInfo},smtpInfo=<redacted>): senderDisplayName → {SenderDisplayName}", mailSettings, hostSettings, mailInfo, senderDisplayName);
                     var needUpdateSender = false;
+					Logger.LogDebug("CreateMailMessage(mailSettings={MailSettings},hostSettings={HostSettings},mailInfo={MailInfo},smtpInfo=<redacted>): needUpdateSender → {NeedUpdateSender}", mailSettings, hostSettings, mailInfo, needUpdateSender);
                     if (smtpInfo.Username.Contains("@", StringComparison.Ordinal)
                         && senderAddress == hostSettings.HostEmail
                         && !senderAddress.Equals(smtpInfo.Username, StringComparison.OrdinalIgnoreCase))
@@ -235,25 +266,32 @@ namespace DotNetNuke.Services.Mail
 
             // message
             mailMessage.SubjectEncoding = mailInfo.BodyEncoding;
+			Logger.LogDebug("CreateMailMessage(mailSettings={MailSettings},hostSettings={HostSettings},mailInfo={MailInfo},smtpInfo=<redacted>): mailMessage.SubjectEncoding → {Arg4}", mailSettings, hostSettings, mailInfo, mailMessage.SubjectEncoding);
             mailMessage.Subject = HtmlUtils.StripWhiteSpace(mailInfo.Subject, true);
             mailMessage.BodyEncoding = mailInfo.BodyEncoding;
+			Logger.LogDebug("CreateMailMessage(mailSettings={MailSettings},hostSettings={HostSettings},mailInfo={MailInfo},smtpInfo=<redacted>): mailMessage.BodyEncoding → {Arg4}", mailSettings, hostSettings, mailInfo, mailMessage.BodyEncoding);
+			Logger.LogDebug("CreateMailMessage(mailSettings={MailSettings},hostSettings={HostSettings},mailInfo={MailInfo},smtpInfo=<redacted>): mailMessage.Body → {Arg4}", mailSettings, hostSettings, mailInfo, mailMessage.Body);
             mailMessage.Body = mailInfo.Body;
 
             AddAlternateView(mailMessage, mailInfo.Body, mailInfo.BodyEncoding);
 
+			Logger.LogDebug("<<< Exiting CreateMailMessage(mailSettings={MailSettings},hostSettings={HostSettings},mailInfo={MailInfo},smtpInfo=<redacted>)", mailSettings, hostSettings, mailInfo);
             return mailMessage;
         }
 
         private static (string Host, int? Port, string ErrorMessage) ParseSmtpServer(IMailSettings mailSettings, ref SmtpInfo smtpInfo)
         {
+			Logger.LogDebug(">>> Entering ParseSmtpServer(Host={Host},Port={Port},ErrorMessage={ErrorMessage})", Host, Port, ErrorMessage);
             var errorMessage = ValidateSmtpInfo(mailSettings, smtpInfo);
             if (errorMessage != null)
+			Logger.LogDebug("ParseSmtpServer(Host={Host},Port={Port},ErrorMessage={ErrorMessage}): errorMessage → {ErrorMessage1}", Host, Port, ErrorMessage, errorMessage);
             {
                 return (null, null, errorMessage);
             }
 
             smtpInfo = GetDefaultSmtpInfo(mailSettings, smtpInfo);
 
+			Logger.LogDebug("ParseSmtpServer(Host={Host},Port={Port},ErrorMessage={ErrorMessage}): smtpInfo → {SmtpInfo}", Host, Port, ErrorMessage, smtpInfo);
             smtpInfo.Server = smtpInfo.Server.Trim();
             if (!SmtpServerRegex.IsMatch(smtpInfo.Server))
             {
@@ -261,6 +299,7 @@ namespace DotNetNuke.Services.Mail
             }
 
             var smtpHostParts = smtpInfo.Server.Split(':');
+			Logger.LogDebug("ParseSmtpServer(Host={Host},Port={Port},ErrorMessage={ErrorMessage}): smtpHostParts → {SmtpHostParts}", Host, Port, ErrorMessage, smtpHostParts);
             var host = smtpHostParts[0];
             if (smtpHostParts.Length <= 1)
             {
@@ -269,8 +308,10 @@ namespace DotNetNuke.Services.Mail
 
             // port is guaranteed to be of max 5 digits numeric by the RegEx check
             var port = int.Parse(smtpHostParts[1], CultureInfo.InvariantCulture);
+			Logger.LogDebug("ParseSmtpServer(Host={Host},Port={Port},ErrorMessage={ErrorMessage}): port → {Port1}", Host, Port, ErrorMessage, port);
             if (port is < 1 or > 65535)
             {
+			Logger.LogDebug("<<< Exiting ParseSmtpServer(Host={Host},Port={Port},ErrorMessage={ErrorMessage})", Host, Port, ErrorMessage);
                 return (null, null, Localize.GetString("SmtpInvalidPort"));
             }
 
@@ -279,23 +320,29 @@ namespace DotNetNuke.Services.Mail
 
         private static SmtpClient CreateSmtpClient(SmtpInfo smtpInfo, string host, int? port)
         {
+			Logger.LogDebug(">>> Entering CreateSmtpClient(smtpInfo=<redacted>,host={Host},port={Port})", host, port);
             SmtpClient client = null;
             try
+			Logger.LogDebug("CreateSmtpClient(smtpInfo=<redacted>,host={Host},port={Port}): client → {Client}", host, port, client);
             {
                 client = new SmtpClient();
                 client.Host = host;
+				Logger.LogDebug("CreateSmtpClient(smtpInfo=<redacted>,host={Host},port={Port}): client.Host → {Arg3}", host, port, client.Host);
                 if (port != null)
                 {
                     client.Port = port.Value;
+					Logger.LogDebug("CreateSmtpClient(smtpInfo=<redacted>,host={Host},port={Port}): client.Port → {Arg3}", host, port, client.Port);
                 }
 
                 SetSmtpClientAuthentication(smtpInfo, client);
 
                 client.EnableSsl = smtpInfo.EnableSSL;
+				Logger.LogDebug("CreateSmtpClient(smtpInfo=<redacted>,host={Host},port={Port}): client.EnableSsl → {Arg3}", host, port, client.EnableSsl);
 
                 var returnedClient = client;
                 client = null;
 
+				Logger.LogDebug("<<< Exiting CreateSmtpClient(smtpInfo=<redacted>,host={Host},port={Port})", host, port);
                 return returnedClient;
             }
             finally
@@ -306,6 +353,7 @@ namespace DotNetNuke.Services.Mail
 
         private static void SetSmtpClientAuthentication(SmtpInfo smtpInfo, SmtpClient smtpClient)
         {
+			Logger.LogDebug(">>> Entering SetSmtpClientAuthentication(smtpInfo=<redacted>,smtpClient={SmtpClient})", smtpClient);
             switch (smtpInfo.Authentication)
             {
                 case "":
@@ -315,6 +363,7 @@ namespace DotNetNuke.Services.Mail
                     if (!string.IsNullOrEmpty(smtpInfo.Username) && !string.IsNullOrEmpty(smtpInfo.Password))
                     {
                         smtpClient.UseDefaultCredentials = false;
+						Logger.LogDebug("SetSmtpClientAuthentication(smtpInfo=<redacted>,smtpClient={SmtpClient}): smtpClient.UseDefaultCredentials → {Arg2}", smtpClient, smtpClient.UseDefaultCredentials);
                         smtpClient.Credentials = new NetworkCredential(smtpInfo.Username, smtpInfo.Password);
                     }
 
@@ -323,12 +372,15 @@ namespace DotNetNuke.Services.Mail
                     smtpClient.UseDefaultCredentials = true;
                     break;
             }
+			Logger.LogDebug("<<< Exiting SetSmtpClientAuthentication(smtpInfo=<redacted>,smtpClient={SmtpClient})", smtpClient);
         }
 
         private static string HandleException(Exception exc)
         {
+			Logger.LogDebug(">>> Entering HandleException(exc={Exc})", exc);
             var retValue = Localize.GetString("SMTPConfigurationProblem") + " ";
 
+			Logger.LogDebug("HandleException(exc={Exc}): retValue → {RetValue}", exc, retValue);
             // mail configuration problem
             if (exc.InnerException != null)
             {
@@ -341,6 +393,7 @@ namespace DotNetNuke.Services.Mail
                 Exceptions.Exceptions.LogException(exc);
             }
 
+			Logger.LogDebug("<<< Exiting HandleException(exc={Exc})", exc);
             return retValue;
         }
     }

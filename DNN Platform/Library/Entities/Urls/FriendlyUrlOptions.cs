@@ -14,6 +14,7 @@ namespace DotNetNuke.Entities.Urls
     [Serializable]
     public class FriendlyUrlOptions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(FriendlyUrlOptions));
         [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:FieldsMustBePrivate", Justification = "Breaking change")]
         [SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields", Justification = "Breaking change")]
         public bool ConvertDiacriticChars;
@@ -81,6 +82,7 @@ namespace DotNetNuke.Entities.Urls
 
         public FriendlyUrlOptions Clone()
         {
+			Logger.LogDebug(">>> Entering Clone()");
             var cloned = new FriendlyUrlOptions
             {
                 PunctuationReplacement = this.PunctuationReplacement,
@@ -93,11 +95,13 @@ namespace DotNetNuke.Entities.Urls
                 IllegalChars = this.IllegalChars,
                 ReplaceChars = this.ReplaceChars,
             };
+			Logger.LogDebug("<<< Exiting Clone()");
             return cloned;
         }
 
         private static Regex GetRegex(string regexText)
         {
+			Logger.LogDebug(">>> Entering GetRegex(regexText={RegexText})", regexText);
             Regex compiledRegex;
             if (RegexLookup.TryGetValue(regexText, out compiledRegex))
             {
@@ -108,6 +112,7 @@ namespace DotNetNuke.Entities.Urls
             {
                 if (RegexLookup.TryGetValue(regexText, out compiledRegex))
                 {
+				Logger.LogDebug("<<< Exiting GetRegex(regexText={RegexText})", regexText);
                     return compiledRegex;
                 }
 

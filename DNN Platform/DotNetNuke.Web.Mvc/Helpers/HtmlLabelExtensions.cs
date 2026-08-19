@@ -13,6 +13,7 @@ namespace DotNetNuke.Web.Mvc.Helpers
     /// <summary>Represents support for the HTML label element in an ASP.NET MVC view.</summary>
     public static class HtmlLabelExtensions
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(HtmlLabelExtensions));
         /// <summary>Returns an HTML label element and the property name of the property that is represented by the specified expression.</summary>
         ///
         /// <returns>
@@ -21,6 +22,11 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="expression">An expression that identifies the property to display.</param>
         public static MvcHtmlString Label(this DnnHtmlHelper html, string expression)
         {
+			Logger.LogDebug(">>> Entering Label(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting Label(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting Label(html={Html},expression={Expression},labelText={LabelText})", html, expression, labelText);
+			Logger.LogDebug("<<< Exiting Label(html={Html},expression={Expression},htmlAttributes={HtmlAttributes})", html, expression, htmlAttributes);
+			Logger.LogDebug("<<< Exiting Label(html={Html},expression={Expression},labelText={LabelText},htmlAttributes={HtmlAttributes})", html, expression, labelText, htmlAttributes);
             return html.HtmlHelper.Label(expression);
         }
 
@@ -87,7 +93,12 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param><param name="expression">An expression that identifies the property to display.</param><typeparam name="TModel">The type of the model.</typeparam><typeparam name="TValue">The type of the value.</typeparam>
         public static MvcHtmlString LabelFor<TModel, TValue>(this DnnHtmlHelper<TModel> html, Expression<Func<TModel, TValue>> expression)
         {
+			Logger.LogDebug(">>> Entering LabelFor(html={Html},expression={Expression})", html, expression);
             var htmlHelper = html.HtmlHelper as HtmlHelper<TModel>;
+			Logger.LogDebug("<<< Exiting LabelFor(html={Html},expression={Expression})", html, expression);
+			Logger.LogDebug("<<< Exiting LabelFor(html={Html},expression={Expression},labelText={LabelText})", html, expression, labelText);
+			Logger.LogDebug("<<< Exiting LabelFor(html={Html},expression={Expression},htmlAttributes={HtmlAttributes})", html, expression, htmlAttributes);
+			Logger.LogDebug("<<< Exiting LabelFor(html={Html},expression={Expression},labelText={LabelText},htmlAttributes={HtmlAttributes})", html, expression, labelText, htmlAttributes);
             return html.HtmlHelper.LabelFor(expression);
         }
 
@@ -154,6 +165,11 @@ namespace DotNetNuke.Web.Mvc.Helpers
         /// <param name="html">The HTML helper instance that this method extends.</param>
         public static MvcHtmlString LabelForModel(this DnnHtmlHelper html)
         {
+			Logger.LogDebug(">>> Entering LabelForModel(html={Html})", html);
+			Logger.LogDebug("<<< Exiting LabelForModel(html={Html})", html);
+			Logger.LogDebug("<<< Exiting LabelForModel(html={Html},labelText={LabelText})", html, labelText);
+			Logger.LogDebug("<<< Exiting LabelForModel(html={Html},htmlAttributes={HtmlAttributes})", html, htmlAttributes);
+			Logger.LogDebug("<<< Exiting LabelForModel(html={Html},labelText={LabelText},htmlAttributes={HtmlAttributes})", html, labelText, htmlAttributes);
             return html.HtmlHelper.LabelForModel();
         }
 

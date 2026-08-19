@@ -74,13 +74,16 @@ namespace Dnn.PersonaBar.Pages.Services.Dto
 
         private static bool IsLanguagePublished(int portalId, string code)
         {
+			eventLogger.LogDebug(">>> Entering IsLanguagePublished(portalId={PortalId},code={Code})", portalId, code);
             var isPublished = Null.NullBoolean;
             Locale enabledLanguage;
+			eventLogger.LogDebug("IsLanguagePublished(portalId={PortalId},code={Code}): isPublished → {IsPublished}", portalId, code, isPublished);
             if (LocaleController.Instance.GetLocales(portalId).TryGetValue(code, out enabledLanguage))
             {
                 isPublished = enabledLanguage.IsPublished;
             }
 
+			eventLogger.LogDebug("<<< Exiting IsLanguagePublished(portalId={PortalId},code={Code})", portalId, code);
             return isPublished;
         }
     }

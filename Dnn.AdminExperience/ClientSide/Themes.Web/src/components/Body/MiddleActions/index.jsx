@@ -6,11 +6,13 @@ import { GridCell, SearchBox, Dropdown } from "@dnnsoftware/dnn-react-common";
 import utils from "utils";
 import RestoreTheme from "./RestoreTheme";
 import "./style.less";
+const logger = console;
 
 let canEdit = false;
 class MiddleActions extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             selectedThemeFilter: {
                 label: Localization.get("ThemeLevelAll"),
@@ -18,20 +20,25 @@ class MiddleActions extends Component {
             }
         };
         canEdit = utils.params.settings.isHost || utils.params.settings.isAdmin || (utils.params.settings.permissions && utils.params.settings.permissions.EDIT === true);
+		logger.debug('<<< Exiting constructor()');
     }
 
     onKeywordChanged(value) {
+		logger.debug(`>>> Entering onKeywordChanged(value=${value})`);
         const { props } = this;
 
         props.onSearch.call(this, value);
+		logger.debug(`<<< Exiting onKeywordChanged(value=${value})`);
     }
 
     buildFiltersOptions() {
+		logger.debug('>>> Entering buildFiltersOptions()');
         const levelFilters = [
             { "Key": Localization.get("ThemeLevelAll"), "Value": 7 },
             { "Key": Localization.get("ThemeLevelGlobal"), "Value": 4 },
             { "Key": Localization.get("ThemeLevelSite"), "Value": 2 }
         ];
+		logger.debug('<<< Exiting buildFiltersOptions()');
         return levelFilters.map((levelFilter) => {
             return { label: levelFilter.Key, value: levelFilter.Value };
         });
@@ -50,7 +57,9 @@ class MiddleActions extends Component {
     }
 
     render() {
+		logger.debug('>>> Entering render()');
         let themeFilterOptions = this.buildFiltersOptions();
+		logger.debug('<<< Exiting render()');
         return (
             <GridCell className="middle-actions">
                 <GridCell columnSize={40}>
@@ -91,6 +100,8 @@ MiddleActions.propTypes = {
 };
 
 function mapStateToProps() {
+	logger.debug('>>> Entering mapStateToProps()');
+	logger.debug('<<< Exiting mapStateToProps()');
     return {};
 }
 

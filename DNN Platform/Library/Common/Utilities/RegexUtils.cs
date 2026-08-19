@@ -12,6 +12,7 @@ namespace DotNetNuke.Common.Utilities
 
     public class RegexUtils
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(RegexUtils));
         /// <summary>Creates and caches a Regex object for later use and retrieves it in a later call if it is cached.</summary>
         /// <param name="pattern">The regex pattern.</param>
         /// <param name="options">The regex options.</param>
@@ -19,8 +20,10 @@ namespace DotNetNuke.Common.Utilities
         /// <returns>The <see cref="Regex"/> instance.</returns>
         public static Regex GetCachedRegex(string pattern, RegexOptions options = RegexOptions.None, int timeoutSeconds = 2)
         {
+			Logger.LogDebug(">>> Entering GetCachedRegex(pattern={Pattern},options={Options},timeoutSeconds={TimeoutSeconds})", pattern, options, timeoutSeconds);
             Requires.NotNull("pattern", pattern);
             var key = pattern;
+			Logger.LogWarning("GetCachedRegex(pattern={Pattern},options={Options},timeoutSeconds={TimeoutSeconds}): key → {Key}", pattern, options, timeoutSeconds, key);
             if ((options & RegexOptions.IgnoreCase) != 0)
             {
                 key = (options & RegexOptions.CultureInvariant) != 0
@@ -36,6 +39,7 @@ namespace DotNetNuke.Common.Utilities
             if (timeoutSeconds < 1)
             {
                 timeoutSeconds = 1;
+				Logger.LogDebug("GetCachedRegex(pattern={Pattern},options={Options},timeoutSeconds={TimeoutSeconds}): timeoutSeconds → {TimeoutSeconds1}", pattern, options, timeoutSeconds, timeoutSeconds);
             }
             else if (timeoutSeconds > 10)
             {
@@ -43,12 +47,15 @@ namespace DotNetNuke.Common.Utilities
             }
 
             var cache = CachingProvider.Instance();
+			Logger.LogDebug("GetCachedRegex(pattern={Pattern},options={Options},timeoutSeconds={TimeoutSeconds}): cache → {Cache}", pattern, options, timeoutSeconds, cache);
             if (cache.GetItem(key) is not Regex regex)
             {
                 regex = new Regex(pattern, options & ~RegexOptions.Compiled, TimeSpan.FromSeconds(timeoutSeconds));
                 cache.Insert(key, regex, (DNNCacheDependency)null, Cache.NoAbsoluteExpiration, TimeSpan.FromMinutes(10), CacheItemPriority.BelowNormal, null);
+				Logger.LogDebug("GetCachedRegex(pattern={Pattern},options={Options},timeoutSeconds={TimeoutSeconds}): regex → {Regex}", pattern, options, timeoutSeconds, regex);
             }
 
+			Logger.LogDebug("<<< Exiting GetCachedRegex(pattern={Pattern},options={Options},timeoutSeconds={TimeoutSeconds})", pattern, options, timeoutSeconds);
             return regex;
         }
     }

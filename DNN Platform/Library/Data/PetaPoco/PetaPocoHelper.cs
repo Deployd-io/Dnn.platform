@@ -21,11 +21,15 @@ namespace DotNetNuke.Data.PetaPoco
 
         public static void ExecuteNonQuery(string connectionString, CommandType type, string sql, params object[] args)
         {
+			Logger.LogDebug(">>> Entering ExecuteNonQuery(connectionString={ConnectionString},type={Type},sql={Sql},args={Args})", connectionString, type, sql, args);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             ExecuteNonQuery(connectionString, type, Null.NullInteger, sql, args);
+			Logger.LogDebug("<<< Exiting ExecuteNonQuery(connectionString={ConnectionString},type={Type},sql={Sql},args={Args})", connectionString, type, sql, args);
         }
 
         public static void ExecuteNonQuery(string connectionString, CommandType type, int timeoutSec, string sql, params object[] args)
         {
+			Logger.LogDebug(">>> Entering ExecuteNonQuery(connectionString={ConnectionString},type={Type},timeoutSec={TimeoutSec},sql={Sql},args={Args})", connectionString, type, timeoutSec, sql, args);
             using (var database = new Database(connectionString, SqlProviderName) { EnableAutoSelect = false })
             {
                 if (type == CommandType.StoredProcedure)
@@ -41,6 +45,7 @@ namespace DotNetNuke.Data.PetaPoco
                 try
                 {
                     database.Execute(sql, args);
+					Logger.LogInformation("ExecuteNonQuery(connectionString,type,timeoutSec,args)={ConnectionString},{Type},{TimeoutSec},{Args}: database query executed in {Arg4} ms", connectionString, type, timeoutSec, args, __logStart.ElapsedMilliseconds);
                 }
                 catch (Exception ex)
                 {
@@ -48,35 +53,46 @@ namespace DotNetNuke.Data.PetaPoco
                     throw;
                 }
             }
+			Logger.LogDebug("<<< Exiting ExecuteNonQuery(connectionString={ConnectionString},type={Type},timeoutSec={TimeoutSec},sql={Sql},args={Args})", connectionString, type, timeoutSec, sql, args);
         }
 
         public static void BulkInsert(string connectionString, string procedureName, string tableParameterName, DataTable dataTable)
         {
+			Logger.LogDebug(">>> Entering BulkInsert(connectionString={ConnectionString},procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable})", connectionString, procedureName, tableParameterName, dataTable);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             BulkInsert(connectionString, Null.NullInteger, procedureName, tableParameterName, dataTable);
+			Logger.LogDebug("<<< Exiting BulkInsert(connectionString={ConnectionString},procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable})", connectionString, procedureName, tableParameterName, dataTable);
         }
 
         public static void BulkInsert(string connectionString, int timeoutSec, string procedureName, string tableParameterName, DataTable dataTable)
         {
+			Logger.LogDebug(">>> Entering BulkInsert(connectionString={ConnectionString},timeoutSec={TimeoutSec},procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable})", connectionString, timeoutSec, procedureName, tableParameterName, dataTable);
             if (dataTable.Rows.Count > 0)
             {
                 using var con = new SqlConnection(connectionString);
+				Logger.LogDebug("BulkInsert(connectionString={ConnectionString},timeoutSec={TimeoutSec},procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable}): con → {Con}", connectionString, timeoutSec, procedureName, tableParameterName, dataTable, con);
                 using var cmd = new SqlCommand(procedureName, con);
+				Logger.LogDebug("BulkInsert(connectionString={ConnectionString},timeoutSec={TimeoutSec},procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable}): cmd → {Cmd}", connectionString, timeoutSec, procedureName, tableParameterName, dataTable, cmd);
                 if (!tableParameterName.StartsWith("@", StringComparison.Ordinal))
                 {
                     tableParameterName = "@" + tableParameterName;
+					Logger.LogDebug("BulkInsert(connectionString={ConnectionString},timeoutSec={TimeoutSec},procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable}): tableParameterName → {TableParameterName1}", connectionString, timeoutSec, procedureName, tableParameterName, dataTable, tableParameterName);
                 }
 
                 if (timeoutSec > 0)
                 {
                     cmd.CommandTimeout = timeoutSec;
+					Logger.LogDebug("BulkInsert(connectionString={ConnectionString},timeoutSec={TimeoutSec},procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable}): cmd.CommandTimeout → {Arg5}", connectionString, timeoutSec, procedureName, tableParameterName, dataTable, cmd.CommandTimeout);
                 }
 
                 cmd.CommandType = CommandType.StoredProcedure;
+				Logger.LogDebug("BulkInsert(connectionString={ConnectionString},timeoutSec={TimeoutSec},procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable}): cmd.CommandType → {Arg5}", connectionString, timeoutSec, procedureName, tableParameterName, dataTable, cmd.CommandType);
                 cmd.Parameters.AddWithValue(tableParameterName, dataTable);
                 con.Open();
                 try
                 {
                     cmd.ExecuteNonQuery();
+					Logger.LogInformation("BulkInsert(connectionString,timeoutSec,procedureName,tableParameterName,dataTable)={ConnectionString},{TimeoutSec},{ProcedureName},{TableParameterName},{DataTable}: database query executed in {Arg5} ms", connectionString, timeoutSec, procedureName, tableParameterName, dataTable, __logStart.ElapsedMilliseconds);
                 }
                 catch (Exception ex)
                 {
@@ -86,15 +102,19 @@ namespace DotNetNuke.Data.PetaPoco
 
                 con.Close();
             }
+			Logger.LogDebug("<<< Exiting BulkInsert(connectionString={ConnectionString},timeoutSec={TimeoutSec},procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable})", connectionString, timeoutSec, procedureName, tableParameterName, dataTable);
         }
 
         public static void BulkInsert(string connectionString, string procedureName, string tableParameterName, DataTable dataTable, Dictionary<string, object> args)
         {
+			Logger.LogDebug(">>> Entering BulkInsert(connectionString={ConnectionString},procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable},args={Args})", connectionString, procedureName, tableParameterName, dataTable, args);
             BulkInsert(connectionString, procedureName, tableParameterName, dataTable, Null.NullInteger, args);
+			Logger.LogDebug("<<< Exiting BulkInsert(connectionString={ConnectionString},procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable},args={Args})", connectionString, procedureName, tableParameterName, dataTable, args);
         }
 
         public static void BulkInsert(string connectionString, string procedureName, string tableParameterName, DataTable dataTable, int timeoutSec, Dictionary<string, object> args)
         {
+			Logger.LogDebug(">>> Entering BulkInsert(connectionString={ConnectionString},procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable},timeoutSec={TimeoutSec},args={Args})", connectionString, procedureName, tableParameterName, dataTable, timeoutSec, args);
             if (dataTable.Rows.Count > 0)
             {
                 using (var con = new SqlConnection(connectionString))
@@ -120,6 +140,7 @@ namespace DotNetNuke.Data.PetaPoco
                     con.Open();
                     try
                     {
+						Logger.LogInformation("BulkInsert(connectionString,procedureName,tableParameterName,dataTable,timeoutSec,args)={ConnectionString},{ProcedureName},{TableParameterName},{DataTable},{TimeoutSec},{Args}: database query executed in {Arg6} ms", connectionString, procedureName, tableParameterName, dataTable, timeoutSec, args, __logStart.ElapsedMilliseconds);
                         cmd.ExecuteNonQuery();
                     }
                     catch (Exception)
@@ -131,10 +152,14 @@ namespace DotNetNuke.Data.PetaPoco
                     con.Close();
                 }
             }
+			Logger.LogDebug("<<< Exiting BulkInsert(connectionString={ConnectionString},procedureName={ProcedureName},tableParameterName={TableParameterName},dataTable={DataTable},timeoutSec={TimeoutSec},args={Args})", connectionString, procedureName, tableParameterName, dataTable, timeoutSec, args);
         }
 
         public static IDataReader ExecuteReader(string connectionString, CommandType type, string sql, params object[] args)
         {
+			Logger.LogDebug(">>> Entering ExecuteReader(connectionString={ConnectionString},type={Type},sql={Sql},args={Args})", connectionString, type, sql, args);
+			Logger.LogDebug("<<< Exiting ExecuteReader(connectionString={ConnectionString},type={Type},sql={Sql},args={Args})", connectionString, type, sql, args);
+			Logger.LogDebug("<<< Exiting ExecuteReader(connectionString={ConnectionString},type={Type},timeoutSec={TimeoutSec},sql={Sql},args={Args})", connectionString, type, timeoutSec, sql, args);
             return ExecuteReader(connectionString, type, Null.NullInteger, sql, args);
         }
 
@@ -170,6 +195,8 @@ namespace DotNetNuke.Data.PetaPoco
 
         public static T ExecuteScalar<T>(string connectionString, CommandType type, string sql, params object[] args)
         {
+			Logger.LogDebug(">>> Entering ExecuteScalar(connectionString={ConnectionString},type={Type},sql={Sql},args={Args})", connectionString, type, sql, args);
+			Logger.LogDebug("<<< Exiting ExecuteScalar(connectionString={ConnectionString},type={Type},sql={Sql},args={Args})", connectionString, type, sql, args);
             return ExecuteScalar<T>(connectionString, type, Null.NullInteger, sql, args);
         }
 
@@ -202,12 +229,16 @@ namespace DotNetNuke.Data.PetaPoco
         // ReSharper disable once InconsistentNaming
         public static void ExecuteSQL(string connectionString, string sql)
         {
+			Logger.LogDebug(">>> Entering ExecuteSQL(connectionString={ConnectionString},sql={Sql})", connectionString, sql);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             ExecuteSQL(connectionString, sql, Null.NullInteger);
+			Logger.LogDebug("<<< Exiting ExecuteSQL(connectionString={ConnectionString},sql={Sql})", connectionString, sql);
         }
 
         // ReSharper disable once InconsistentNaming
         public static void ExecuteSQL(string connectionString, string sql, int timeoutSec)
         {
+			Logger.LogDebug(">>> Entering ExecuteSQL(connectionString={ConnectionString},sql={Sql},timeoutSec={TimeoutSec})", connectionString, sql, timeoutSec);
             using (var database = new Database(connectionString, SqlProviderName) { EnableAutoSelect = false })
             {
                 if (timeoutSec > 0)
@@ -218,6 +249,7 @@ namespace DotNetNuke.Data.PetaPoco
                 try
                 {
                     database.Execute(sql);
+					Logger.LogInformation("ExecuteSQL(connectionString,timeoutSec)={ConnectionString},{TimeoutSec}: database query executed in {Arg2} ms", connectionString, timeoutSec, __logStart.ElapsedMilliseconds);
                 }
                 catch (Exception ex)
                 {
@@ -225,6 +257,7 @@ namespace DotNetNuke.Data.PetaPoco
                     throw;
                 }
             }
+			Logger.LogDebug("<<< Exiting ExecuteSQL(connectionString={ConnectionString},sql={Sql},timeoutSec={TimeoutSec})", connectionString, sql, timeoutSec);
         }
     }
 }

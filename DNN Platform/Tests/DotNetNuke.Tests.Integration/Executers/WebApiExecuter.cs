@@ -14,9 +14,11 @@ namespace DotNetNuke.Tests.Integration.Executers
     using DotNetNuke.Tests.Utilities;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+	using Microsoft.Extensions.Logging;
 
     public enum LoginAsUser
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         GivenUserName = 0,
         AnonymousUser = 1,
         RegisteredUser = 2,
@@ -36,12 +38,19 @@ namespace DotNetNuke.Tests.Integration.Executers
 
         protected WebApiExecuter()
         {
+			_logger.LogDebug(">>> Entering WebApiExecuter()");
             this.LoginAs = LoginAsUser.RegisteredUser;
             this.Login = WebApiTestHelper.LoginRegisteredUser;
+			_logger.LogDebug("WebApiExecuter(): this.LoginAs → {Arg0}", this.LoginAs);
+			_logger.LogDebug("WebApiExecuter(): Login → {Login}", Login);
+			_logger.LogDebug("WebApiExecuter(): this.Login → {Arg0}", this.Login);
             this.Anonymous = WebApiTestHelper.GetAnnonymousConnector;
 
             this.UserFirstName = Constants.RuFirstName;
+			_logger.LogDebug("WebApiExecuter(): Anonymous → {Anonymous}", Anonymous);
+			_logger.LogDebug("WebApiExecuter(): this.Anonymous → {Arg0}", this.Anonymous);
             this.UserLastName = Constants.RuLastName;
+			_logger.LogDebug("<<< Exiting WebApiExecuter()");
         }
 
         public string UserName
@@ -126,6 +135,8 @@ namespace DotNetNuke.Tests.Integration.Executers
 
         public HttpResponseMessage GetLastResponseMessage()
         {
+			_logger.LogDebug(">>> Entering GetLastResponseMessage()");
+			_logger.LogDebug("<<< Exiting GetLastResponseMessage()");
             return this.Responses.Last();
         }
 
@@ -134,17 +145,23 @@ namespace DotNetNuke.Tests.Integration.Executers
         /// <returns></returns>
         public JContainer GetLastDeserializeResponseMessage()
         {
+			_logger.LogDebug(">>> Entering GetLastDeserializeResponseMessage()");
             if (!this.Responses.Any())
             {
+				_logger.LogWarning("Throwing InvalidOperationException from GetLastDeserializeResponseMessage()");
                 throw new InvalidOperationException("GetLastDeserializeResponseMessage cannot be called when the Executer does not have any Responses");
             }
 
             var data = this.Responses.Last().Content.ReadAsStringAsync().Result;
+			_logger.LogDebug("GetLastDeserializeResponseMessage(): data → {Data}", data);
+			_logger.LogDebug("<<< Exiting GetLastDeserializeResponseMessage()");
             return JsonConvert.DeserializeObject<JContainer>(data);
         }
 
         public IEnumerable<HttpResponseMessage> GetResponseMessages()
         {
+			_logger.LogDebug(">>> Entering GetResponseMessages()");
+			_logger.LogDebug("<<< Exiting GetResponseMessages()");
             return this.Responses.ToArray();
         }
 
@@ -153,8 +170,11 @@ namespace DotNetNuke.Tests.Integration.Executers
         /// <returns></returns>
         public IEnumerable<JContainer> GetDeserializeResponseMessages()
         {
+			_logger.LogDebug(">>> Entering GetDeserializeResponseMessages()");
             if (!this.Responses.Any())
             {
+				_logger.LogWarning("Throwing InvalidOperationException from GetDeserializeResponseMessages()");
+			_logger.LogDebug("<<< Exiting GetDeserializeResponseMessages()");
                 throw new InvalidOperationException("GetDeserializeResponseMessages cannot be called when the Executer does not have any Responses");
             }
 

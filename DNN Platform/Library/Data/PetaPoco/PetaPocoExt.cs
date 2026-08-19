@@ -15,21 +15,28 @@ namespace DotNetNuke.Data.PetaPoco
         public static IDataReader ExecuteReader(this Database database, string sql, params object[] args)
 #pragma warning restore CS3001
         {
+			Logger.LogDebug(">>> Entering ExecuteReader(database={Database},sql={Sql},args={Args})", database, sql, args);
             IDataReader reader;
             try
             {
                 database.OpenSharedConnection();
                 sql = NormalizeSql(sql, args);
+				Logger.LogDebug("ExecuteReader(database={Database},sql={Sql},args={Args}): sql → {Sql1}", database, sql, args, sql);
 
                 using (IDbCommand command = database.CreateCommand(database.Connection, sql, args))
                 {
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
                     reader = command.ExecuteReader(CommandBehavior.CloseConnection);
                     database.OnExecutedCommand(command);
                 }
+				Logger.LogDebug("ExecuteReader(database={Database},sql={Sql},args={Args}): reader → {Reader}", database, sql, args, reader);
+				Logger.LogInformation("ExecuteReader(database,args)={Database},{Args}: database query executed in {Arg2} ms", database, args, __logStart.ElapsedMilliseconds);
             }
             catch (Exception exception)
             {
+				private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PetaPocoExt));
                 if (database.OnException(exception))
+				Logger.LogError("Exception in ExecuteReader(database={Database},sql={Sql},args={Args}): {Arg3}", database, sql, args, exception.Message);
                 {
                     throw;
                 }
@@ -37,6 +44,7 @@ namespace DotNetNuke.Data.PetaPoco
                 reader = null;
             }
 
+			Logger.LogDebug("<<< Exiting ExecuteReader(database={Database},sql={Sql},args={Args})", database, sql, args);
             return reader;
         }
 
@@ -46,6 +54,7 @@ namespace DotNetNuke.Data.PetaPoco
         /// <returns>Normalized sql string.</returns>
         private static string NormalizeSql(string sql, object[] args)
         {
+			Logger.LogDebug(">>> Entering NormalizeSql(sql={Sql},args={Args})", sql, args);
             const string ReplaceFrom = "@";
             const string ReplaceTo = "@@";
 
@@ -53,6 +62,7 @@ namespace DotNetNuke.Data.PetaPoco
                 (args != null && args.Length != 0) ||
                 string.IsNullOrWhiteSpace(sql))
             {
+			Logger.LogDebug("<<< Exiting NormalizeSql(sql={Sql},args={Args})", sql, args);
                 return sql;
             }
 

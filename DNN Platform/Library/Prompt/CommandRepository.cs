@@ -23,6 +23,7 @@ namespace DotNetNuke.Prompt
     /// <summary>The repository handles retrieving of commands from the entire DNN installation.</summary>
     public class CommandRepository : ServiceLocator<ICommandRepository, CommandRepository>, ICommandRepository
     {
+		private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(CommandRepository));
         private readonly IServiceScopeFactory serviceScopeFactory;
         private readonly IHostSettings hostSettings;
 
@@ -31,6 +32,10 @@ namespace DotNetNuke.Prompt
         public CommandRepository()
             : this(null)
         {
+		Logger.LogDebug(">>> Entering CommandRepository()");
+		Logger.LogDebug("<<< Exiting CommandRepository()");
+		Logger.LogDebug(">>> Entering CommandRepository(serviceScopeFactory={ServiceScopeFactory})", serviceScopeFactory);
+		Logger.LogDebug("CommandRepository(serviceScopeFactory={ServiceScopeFactory}): serviceScopeFactory → {ServiceScopeFactory1}", serviceScopeFactory, serviceScopeFactory);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CommandRepository"/> class.</summary>
@@ -38,7 +43,9 @@ namespace DotNetNuke.Prompt
         [Obsolete("Deprecated in DotNetNuke 10.0.2. Please use overload with IHostSettings. Scheduled removal in v12.0.0.")]
         public CommandRepository(IServiceScopeFactory serviceScopeFactory)
         {
+			Logger.LogDebug(">>> Entering CommandRepository(serviceScopeFactory={ServiceScopeFactory})", serviceScopeFactory);
             this.serviceScopeFactory = serviceScopeFactory ?? Globals.GetCurrentServiceProvider().GetRequiredService<IServiceScopeFactory>();
+			Logger.LogDebug("<<< Exiting CommandRepository(serviceScopeFactory={ServiceScopeFactory})", serviceScopeFactory);
         }
 
         /// <summary>Initializes a new instance of the <see cref="CommandRepository"/> class.</summary>
@@ -48,20 +55,27 @@ namespace DotNetNuke.Prompt
         {
             this.serviceScopeFactory = serviceScopeFactory ?? Globals.GetCurrentServiceProvider().GetRequiredService<IServiceScopeFactory>();
             this.hostSettings = hostSettings ?? Globals.GetCurrentServiceProvider().GetRequiredService<IHostSettings>();
+			Logger.LogDebug("CommandRepository(serviceScopeFactory={ServiceScopeFactory},hostSettings={HostSettings}): hostSettings → {HostSettings1}", serviceScopeFactory, hostSettings, hostSettings);
+			Logger.LogDebug("<<< Exiting CommandRepository(serviceScopeFactory={ServiceScopeFactory},hostSettings={HostSettings})", serviceScopeFactory, hostSettings);
         }
 
         /// <inheritdoc />
         public IEnumerable<ICommand> GetCommands()
         {
+			Logger.LogDebug(">>> Entering GetCommands()");
+			Logger.LogDebug("<<< Exiting GetCommands()");
             return this.CommandList().Values;
         }
 
         /// <inheritdoc />
         public IConsoleCommand GetCommand(IServiceProvider serviceProvider, string commandName)
         {
+			Logger.LogDebug(">>> Entering GetCommand(serviceProvider={ServiceProvider},commandName={CommandName})", serviceProvider, commandName);
             var allCommands = this.CommandList();
             if (allCommands.TryGetValue(commandName, out var command))
+			Logger.LogDebug("GetCommand(serviceProvider={ServiceProvider},commandName={CommandName}): allCommands → {AllCommands}", serviceProvider, commandName, allCommands);
             {
+			Logger.LogDebug("<<< Exiting GetCommand(serviceProvider={ServiceProvider},commandName={CommandName})", serviceProvider, commandName);
                 return (IConsoleCommand)ActivatorUtilities.CreateInstance(serviceProvider, Type.GetType(command.TypeFullName));
             }
 
@@ -71,7 +85,10 @@ namespace DotNetNuke.Prompt
         /// <inheritdoc />
         public ICommandHelp GetCommandHelp(IConsoleCommand consoleCommand)
         {
+			Logger.LogDebug(">>> Entering GetCommandHelp(consoleCommand={ConsoleCommand})", consoleCommand);
             var cacheKey = $"{consoleCommand.GetType().Name}-{System.Threading.Thread.CurrentThread.CurrentUICulture.Name}";
+			Logger.LogDebug("GetCommandHelp(consoleCommand={ConsoleCommand}): cacheKey → {CacheKey}", consoleCommand, cacheKey);
+			Logger.LogDebug("<<< Exiting GetCommandHelp(consoleCommand={ConsoleCommand})", consoleCommand);
             return DataCache.GetCachedData<ICommandHelp>(
                 this.hostSettings,
                 new CacheItemArgs(cacheKey, CacheItemPriority.Low),
@@ -81,33 +98,48 @@ namespace DotNetNuke.Prompt
         /// <inheritdoc />
         protected override Func<ICommandRepository> GetFactory()
         {
+			Logger.LogDebug(">>> Entering GetFactory()");
+			Logger.LogDebug("<<< Exiting GetFactory()");
             return Globals.DependencyProvider.GetRequiredService<ICommandRepository>;
         }
 
         private static string LocalizeString(string key, string resourcesFile = Constants.DefaultPromptResourceFile)
         {
+			Logger.LogDebug(">>> Entering LocalizeString(key={Key},resourcesFile={ResourcesFile})", key, resourcesFile);
             var localizedText = Localization.GetString(key, resourcesFile);
+			Logger.LogDebug("LocalizeString(key={Key},resourcesFile={ResourcesFile}): localizedText → {LocalizedText}", key, resourcesFile, localizedText);
+			Logger.LogDebug("<<< Exiting LocalizeString(key={Key},resourcesFile={ResourcesFile})", key, resourcesFile);
             return string.IsNullOrEmpty(localizedText) ? key : localizedText;
         }
 
         private static string CreateCommandFromClass(string className)
         {
+			Logger.LogDebug(">>> Entering CreateCommandFromClass(className=<redacted>)");
             var camelCasedParts = SplitCamelCase(className);
+			Logger.LogDebug("CreateCommandFromClass(className=<redacted>): camelCasedParts → {CamelCasedParts}", camelCasedParts);
+			Logger.LogDebug("<<< Exiting CreateCommandFromClass(className=<redacted>)");
             return string.Join("-", camelCasedParts.Select(x => x.ToLowerInvariant()));
         }
 
         private static string[] SplitCamelCase(string source)
         {
+			Logger.LogDebug(">>> Entering SplitCamelCase(source={Source})", source);
+			Logger.LogDebug("<<< Exiting SplitCamelCase(source={Source})", source);
             return Regex.Split(source, @"(?<!^)(?=[A-Z])");
         }
 
         private static CommandHelp GetCommandHelpInternal(IConsoleCommand consoleCommand)
         {
+			Logger.LogDebug(">>> Entering GetCommandHelpInternal(consoleCommand={ConsoleCommand})", consoleCommand);
             var commandHelp = new CommandHelp();
             if (consoleCommand != null)
+			Logger.LogDebug("GetCommandHelpInternal(consoleCommand={ConsoleCommand}): commandHelp → {CommandHelp}", consoleCommand, commandHelp);
             {
                 var cmd = consoleCommand.GetType();
+				Logger.LogDebug("GetCommandHelpInternal(consoleCommand={ConsoleCommand}): cmd → {Cmd}", consoleCommand, cmd);
+				Logger.LogDebug("GetCommandHelpInternal(consoleCommand={ConsoleCommand}): commandHelp.Name → {Arg1}", consoleCommand, commandHelp.Name);
                 var attr = cmd.GetCustomAttributes(typeof(ConsoleCommandAttribute), false).FirstOrDefault() as ConsoleCommandAttribute ?? new ConsoleCommandAttribute(CreateCommandFromClass(cmd.Name), Constants.CommandCategoryKeys.General, $"Prompt_{cmd.Name}_Description");
+				Logger.LogDebug("GetCommandHelpInternal(consoleCommand={ConsoleCommand}): attr → {Attr}", consoleCommand, attr);
                 commandHelp.Name = attr.Name;
                 commandHelp.Description = LocalizeString(attr.DescriptionKey, consoleCommand.LocalResourceFile);
                 var commandParameters = cmd.GetFields(BindingFlags.NonPublic | BindingFlags.Static)
@@ -124,15 +156,18 @@ namespace DotNetNuke.Prompt
                             LocalizeString(attribute.DescriptionKey, consoleCommand.LocalResourceFile),
                     }).ToList();
                     commandHelp.Options = options;
+					Logger.LogDebug("GetCommandHelpInternal(consoleCommand={ConsoleCommand}): commandHelp.Options → {Arg1}", consoleCommand, commandHelp.Options);
                 }
 
                 commandHelp.ResultHtml = consoleCommand.ResultHtml;
+				Logger.LogDebug("GetCommandHelpInternal(consoleCommand={ConsoleCommand}): commandHelp.ResultHtml → {Arg1}", consoleCommand, commandHelp.ResultHtml);
             }
             else
             {
                 commandHelp.Error = LocalizeString("Prompt_CommandNotFound");
             }
 
+			Logger.LogDebug("<<< Exiting GetCommandHelpInternal(consoleCommand={ConsoleCommand})", consoleCommand);
             return commandHelp;
         }
 

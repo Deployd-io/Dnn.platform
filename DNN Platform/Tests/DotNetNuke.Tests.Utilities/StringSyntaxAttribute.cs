@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information
@@ -7,6 +8,7 @@
 #nullable enable
 namespace System.Diagnostics.CodeAnalysis
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>Specifies the syntax used in a string.</summary>
     [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public sealed class StringSyntaxAttribute : Attribute
@@ -51,17 +53,24 @@ namespace System.Diagnostics.CodeAnalysis
         /// <param name="syntax">The syntax identifier.</param>
         public StringSyntaxAttribute(string syntax)
         {
+			_logger.LogDebug(">>> Entering StringSyntaxAttribute(syntax={Syntax})", syntax);
             Syntax = syntax;
             Arguments = Array.Empty<object?>();
+			_logger.LogDebug("StringSyntaxAttribute(syntax={Syntax},arguments={Arguments}): Syntax → {Syntax1}", syntax, arguments, Syntax);
+			_logger.LogDebug("StringSyntaxAttribute(syntax={Syntax}): Arguments → {Arguments}", syntax, Arguments);
+			_logger.LogDebug("<<< Exiting StringSyntaxAttribute(syntax={Syntax})", syntax);
         }
 
+		_logger.LogDebug("<<< Exiting StringSyntaxAttribute(syntax={Syntax})", syntax);
         /// <summary>Initializes the <see cref="StringSyntaxAttribute"/> with the identifier of the syntax used.</summary>
         /// <param name="syntax">The syntax identifier.</param>
         /// <param name="arguments">Optional arguments associated with the specific syntax employed.</param>
         public StringSyntaxAttribute(string syntax, params object?[] arguments)
         {
+			_logger.LogDebug(">>> Entering StringSyntaxAttribute(syntax={Syntax},arguments={Arguments})", syntax, arguments);
             Syntax = syntax;
             Arguments = arguments;
+			_logger.LogDebug("StringSyntaxAttribute(syntax={Syntax},arguments={Arguments}): Arguments → {Arguments1}", syntax, arguments, Arguments);
         }
 
         /// <summary>Gets the identifier of the syntax used.</summary>

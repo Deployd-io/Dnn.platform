@@ -10,18 +10,22 @@ import { GridCell } from "@dnnsoftware/dnn-react-common";
 import util from "../../utils";
 import resx from "../../resources";
 import styles from "./style.module.less";
+const logger = console;
 
 let tableFields = [];
 
 class ExtensionUrlProvidersPanelBody extends Component {
     constructor() {
         super();
+		logger.debug('>>> Entering constructor()');
         this.state = {
             openId: ""
         };
+		logger.debug('<<< Exiting constructor()');
     }
 
     UNSAFE_componentWillMount() {
+		logger.debug('>>> Entering UNSAFE_componentWillMount()');
         const {props} = this;
 
         tableFields = [];
@@ -29,49 +33,60 @@ class ExtensionUrlProvidersPanelBody extends Component {
         tableFields.push({ "name": resx.get("Enabled.Header"), "id": "Enabled" });
 
         props.dispatch(SeoActions.getExtensionUrlProviders());
+		logger.debug('<<< Exiting UNSAFE_componentWillMount()');
     }
 
     onUpdateProviderStatus(providerId, isActive) {
+		logger.debug(`>>> Entering onUpdateProviderStatus(providerId=${providerId},isActive=${isActive})`);
         const {props} = this;
 
         props.dispatch(SeoActions.updateExtensionUrlProviderStatus({ ProviderId: providerId, IsActive: isActive }, () => {
             util.utilities.notify(resx.get("SettingsUpdateSuccess"));
         }, () => {
             util.utilities.notifyError(resx.get("SettingsError"));
+			logger.debug(`<<< Exiting onUpdateProviderStatus(providerId=${providerId},isActive=${isActive})`);
         }));
     }
 
     uncollapse(id) {
+		logger.debug(`>>> Entering uncollapse(id=${id})`);
         setTimeout(() => {
             this.setState({
                 openId: id
             });
         }, this.timeout);
+		logger.debug(`<<< Exiting uncollapse(id=${id})`);
     }
 
     collapse() {
+		logger.debug('>>> Entering collapse()');
         if (this.state.openId !== "") {
             this.setState({
                 openId: ""
             });
+			logger.debug('<<< Exiting collapse()');
         }
     }
 
     toggle(openId) {
+		logger.debug(`>>> Entering toggle(openId=${openId})`);
         if (openId !== "") {
             this.uncollapse(openId);
         } else {
             this.collapse();
+			logger.debug(`<<< Exiting toggle(openId=${openId})`);
         }
     }
 
     renderProvidersHeader() {
+		logger.debug('>>> Entering renderProvidersHeader()');
         let tableHeaders = tableFields.map((field) => {
             let className = "provider-items header-" + field.id;
             return <div className={className} key={"header-" + field.id}>
                 <span>{field.name}</span>
             </div>;
         });
+		logger.debug('<<< Exiting renderProvidersHeader()');
         return <div className="header-row">{tableHeaders}</div>;
     }
 
@@ -107,6 +122,8 @@ class ExtensionUrlProvidersPanelBody extends Component {
 
      
     render() {
+		logger.debug('>>> Entering render()');
+		logger.debug('<<< Exiting render()');
         return (
             <div className={styles.extensionUrlProviders}>
                 <div className="columnTitle">{resx.get("ExtensionUrlProviders")}</div>
@@ -126,6 +143,8 @@ ExtensionUrlProvidersPanelBody.propTypes = {
 };
 
 function mapStateToProps(state) {
+	logger.debug(`>>> Entering mapStateToProps(state=${state})`);
+	logger.debug(`<<< Exiting mapStateToProps(state=${state})`);
     return {
         tabIndex: state.pagination.tabIndex,
         providers: state.seo.extensionUrlProviders
